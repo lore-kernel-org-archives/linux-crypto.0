@@ -1,31 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [-mm patch] Kconfig: move CRYPTO to the "Cryptographic options" menu
-Date: Mon, 14 Aug 2006 08:40:06 +1000
-Message-ID: <20060813224006.GA10592@gondor.apana.org.au>
-References: <20060813012454.f1d52189.akpm@osdl.org> <20060813210149.GR3543@stusta.de>
+Subject: Re: Warning: cryptodev-2.6 to be rebased
+Date: Tue, 15 Aug 2006 17:09:38 +1000
+Message-ID: <20060815070938.GA30796@gondor.apana.org.au>
+References: <20060806104937.GA30095@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@osdl.org>, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48134 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751698AbWHMWkc
+Received: from rhun.apana.org.au ([64.62.148.172]:54539 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S965233AbWHOHJp
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 13 Aug 2006 18:40:32 -0400
-To: Adrian Bunk <bunk@stusta.de>
+	Tue, 15 Aug 2006 03:09:45 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1GCt3U-00064r-DJ
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Aug 2006 17:09:40 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1GCt3T-0008IV-00
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Aug 2006 17:09:39 +1000
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20060813210149.GR3543@stusta.de>
+In-Reply-To: <20060806104937.GA30095@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Aug 13, 2006 at 11:01:49PM +0200, Adrian Bunk wrote:
+On Sun, Aug 06, 2006 at 08:49:37PM +1000, herbert wrote:
 > 
-> This patch moves the CRYPTO option to the "Cryptographic options" menu
-> (it was the only option directly in the toplevel menu).
+> Due to upcoming changes in the tree I've decided rearrange the patches
+> which means that the cryptodev-2.6 will soon be rebased.
 > 
-> Signed-off-by: Adrian Bunk <bunk@stusta.de>
+> So if you've made your own changes based on it now is the time to save
+> your changes before you clone it again.
 
-Thanke you Adrian, patch applied.
+Sorry, I've had to rebase it again due to conflicts in the mm tree.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
