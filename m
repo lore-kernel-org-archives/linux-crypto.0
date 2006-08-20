@@ -1,33 +1,61 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] cit_encrypt_iv/cit_decrypt_iv for ECB mode
-Date: Mon, 21 Aug 2006 08:58:30 +1000
-Message-ID: <20060820225830.GA31693@gondor.apana.org.au>
-References: <20060820002346.GA16995@openwall.com> <20060820080403.GA602@1wt.eu> <20060820144908.GA19602@openwall.com>
+Subject: Re: [-mm patch] CRYPTO_DEV_PADLOCK_AES must select CRYPTO_BLKCIPHER
+Date: Mon, 21 Aug 2006 09:04:15 +1000
+Message-ID: <20060820230415.GB31693@gondor.apana.org.au>
+References: <20060819220008.843d2f64.akpm@osdl.org> <20060820160928.GN7813@stusta.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Willy Tarreau <w@1wt.eu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+Cc: Andrew Morton <akpm@osdl.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Michal Ludvig <michal@logix.cz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:8708 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751784AbWHTW6q
+Received: from rhun.apana.org.au ([64.62.148.172]:27652 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751773AbWHTXEo
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Aug 2006 18:58:46 -0400
-To: Solar Designer <solar@openwall.com>
+	Sun, 20 Aug 2006 19:04:44 -0400
+To: Adrian Bunk <bunk@stusta.de>
 Content-Disposition: inline
-In-Reply-To: <20060820144908.GA19602@openwall.com>
+In-Reply-To: <20060820160928.GN7813@stusta.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Aug 20, 2006 at 06:49:08PM +0400, Solar Designer wrote:
+On Sun, Aug 20, 2006 at 06:09:28PM +0200, Adrian Bunk wrote:
 > 
-> Can we maybe define working but IV-ignoring functions for ECB (like I
-> did), but use memory-clearing nocrypt*() for CFB and CTR (as long as
-> these are not supported)?  Of course, all of these will return -ENOSYS.
+> BTW: The Kconfig+Makefile parts for padlock-sha seem to be missing.
 
-In cryptodev-2.6, with block ciphers you can no longer select CFB/CTR
-until someone writes support for them so this is no longer an issue.
+Thanks Adrian.
 
-For 2.4, I don't really mind either way what nocrypt does.
+> --- linux-2.6.18-rc4-mm2/drivers/crypto/Kconfig.old	2006-08-20 17:28:46.000000000 +0200
+> +++ linux-2.6.18-rc4-mm2/drivers/crypto/Kconfig	2006-08-20 17:44:56.000000000 +0200
+> @@ -16,6 +16,7 @@
+>  config CRYPTO_DEV_PADLOCK_AES
+>  	bool "Support for AES in VIA PadLock"
+>  	depends on CRYPTO_DEV_PADLOCK
+> +	select CRYPTO_BLKCIPHER
+>  	default y
+>  	help
+>  	  Use VIA PadLock for AES algorithm.
+
+Andrew, there is definitely something screwed up.  If you look at
+my tree this patch is already in the top changeset that was
+supposedly picked up by yout pull:
+
+GIT aabffae140135096195f6fb04d165bb204517db2 git+ssh://master.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+
+commit aabffae140135096195f6fb04d165bb204517db2
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Aug 15 22:49:54 2006 +1000
+
+    [CRYPTO] Kconfig: Added missing selects on BLKCIPHER
+    
+    Since padlock-aes and aes-s390/des-s390 now use the block cipher interface,
+    they need to select the BLKCIPHER Kconfig option.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Indeed, the s390 bits are there.  However, the padlock bits have
+gong missing.  Perhaps there was a problem when it was merged with
+the geode tree? This could explain why the Makefile bits for padlock
+went missing too.
 
 Cheers,
 -- 
