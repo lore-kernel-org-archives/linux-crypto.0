@@ -1,220 +1,124 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7/7] [CRYPTO] digest: Remove old HMAC implementation
-Date: Tue, 22 Aug 2006 00:27:59 +1000
-Message-ID: <E1GFAkx-00074Z-00@gondolin.me.apana.org.au>
-References: <20060821142407.GA26988@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Sender: netdev-owner@vger.kernel.org
+From: Solar Designer <solar@openwall.com>
+Subject: Re: [PATCH] cit_encrypt_iv/cit_decrypt_iv for ECB mode
+Date: Tue, 22 Aug 2006 10:28:53 +0400
+Message-ID: <20060822062853.GA1673@openwall.com>
+References: <20060820002346.GA16995@openwall.com> <20060820080403.GA602@1wt.eu> <20060820144908.GA19602@openwall.com> <20060820225830.GA31693@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="h31gzZEtNLTqOjlF"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mother.openwall.net ([195.42.179.200]:30155 "HELO
+	mother.openwall.net") by vger.kernel.org with SMTP id S1750895AbWHVGcK
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Aug 2006 02:32:10 -0400
+To: Willy Tarreau <w@1wt.eu>
+Content-Disposition: inline
+In-Reply-To: <20060820225830.GA31693@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] digest: Remove old HMAC implementation
 
-This patch removes the old HMAC implementation now that nobody uses it
-anymore.
+--h31gzZEtNLTqOjlF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: David S. Miller <davem@davemloft.net>
----
+On Mon, Aug 21, 2006 at 08:58:30AM +1000, Herbert Xu wrote:
+> On Sun, Aug 20, 2006 at 06:49:08PM +0400, Solar Designer wrote:
+> > 
+> > Can we maybe define working but IV-ignoring functions for ECB (like I
+> > did), but use memory-clearing nocrypt*() for CFB and CTR (as long as
+> > these are not supported)?  Of course, all of these will return -ENOSYS.
+> 
+> In cryptodev-2.6, with block ciphers you can no longer select CFB/CTR
+> until someone writes support for them so this is no longer an issue.
+> 
+> For 2.4, I don't really mind either way what nocrypt does.
 
- crypto/Kconfig         |    2 
- crypto/digest.c        |    3 -
- crypto/hmac.c          |  101 -------------------------------------------------
- crypto/internal.h      |   13 ------
- include/linux/crypto.h |   16 -------
- 5 files changed, 2 insertions(+), 133 deletions(-)
+OK, I've merged Willy's suggestion for the memset()s into the patch that
+I had submitted previously.  The resulting patch is attached.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -33,7 +33,7 @@ config CRYPTO_MANAGER
- 	  cbc(aes).
- 
- config CRYPTO_HMAC
--	bool "HMAC support"
-+	tristate "HMAC support"
- 	select CRYPTO_HASH
- 	help
- 	  HMAC: Keyed-Hashing for Message Authentication (RFC2104).
-diff --git a/crypto/digest.c b/crypto/digest.c
---- a/crypto/digest.c
-+++ b/crypto/digest.c
-@@ -191,10 +191,9 @@ int crypto_init_digest_ops(struct crypto
- 	ops->setkey	= dalg->dia_setkey ? setkey : nosetkey;
- 	ops->digestsize	= dalg->dia_digestsize;
- 	
--	return crypto_alloc_hmac_block(tfm);
-+	return 0;
+Alexander
+
+--h31gzZEtNLTqOjlF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="linux-2.4.33-nocrypt.diff"
+
+diff -urp linux-2.4.33/crypto/cipher.c linux/crypto/cipher.c
+--- linux-2.4.33/crypto/cipher.c	Sun Aug  8 03:26:04 2004
++++ linux/crypto/cipher.c	Tue Aug 22 09:53:35 2006
+@@ -147,6 +147,15 @@ static int ecb_encrypt(struct crypto_tfm
+ 	             ecb_process, 1, NULL);
  }
  
- void crypto_exit_digest_ops(struct crypto_tfm *tfm)
++static int ecb_encrypt_iv(struct crypto_tfm *tfm,
++			  struct scatterlist *dst,
++			  struct scatterlist *src,
++			  unsigned int nbytes, u8 *iv)
++{
++	ecb_encrypt(tfm, dst, src, nbytes);
++	return -ENOSYS;
++}
++
+ static int ecb_decrypt(struct crypto_tfm *tfm,
+                        struct scatterlist *dst,
+                        struct scatterlist *src,
+@@ -157,6 +166,15 @@ static int ecb_decrypt(struct crypto_tfm
+ 	             ecb_process, 1, NULL);
+ }
+ 
++static int ecb_decrypt_iv(struct crypto_tfm *tfm,
++			  struct scatterlist *dst,
++			  struct scatterlist *src,
++			  unsigned int nbytes, u8 *iv)
++{
++	ecb_decrypt(tfm, dst, src, nbytes);
++	return -ENOSYS;
++}
++
+ static int cbc_encrypt(struct crypto_tfm *tfm,
+                        struct scatterlist *dst,
+                        struct scatterlist *src,
+@@ -197,11 +215,20 @@ static int cbc_decrypt_iv(struct crypto_
+ 	             cbc_process, 0, iv);
+ }
+ 
++/*
++ * nocrypt*() zeroize the destination buffer to make sure we don't leak
++ * uninitialized memory contents if the caller ignores the return value.
++ * This is bad since the data in the source buffer is unused and may be
++ * lost, but an infoleak would be even worse.  The performance cost of
++ * memset() is irrelevant since a well-behaved caller would not bump into
++ * the error repeatedly.
++ */
+ static int nocrypt(struct crypto_tfm *tfm,
+                    struct scatterlist *dst,
+                    struct scatterlist *src,
+ 		   unsigned int nbytes)
  {
--	crypto_free_hmac_block(tfm);
++	memset(dst, 0, nbytes);
+ 	return -ENOSYS;
  }
-diff --git a/crypto/hmac.c b/crypto/hmac.c
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -29,107 +29,6 @@ struct hmac_ctx {
- 	struct crypto_hash *child;
- };
  
--static void hash_key(struct crypto_tfm *tfm, u8 *key, unsigned int keylen)
--{
--	struct scatterlist tmp;
--	
--	sg_set_buf(&tmp, key, keylen);
--	crypto_digest_digest(tfm, &tmp, 1, key);
--}
--
--int crypto_alloc_hmac_block(struct crypto_tfm *tfm)
--{
--	int ret = 0;
--
--	BUG_ON(!crypto_tfm_alg_blocksize(tfm));
--	
--	tfm->crt_hash.hmac_block = kmalloc(crypto_tfm_alg_blocksize(tfm),
--					   GFP_KERNEL);
--	if (tfm->crt_hash.hmac_block == NULL)
--		ret = -ENOMEM;
--
--	return ret;
--		
--}
--
--void crypto_free_hmac_block(struct crypto_tfm *tfm)
--{
--	kfree(tfm->crt_hash.hmac_block);
--}
--
--void crypto_hmac_init(struct crypto_tfm *tfm, u8 *key, unsigned int *keylen)
--{
--	unsigned int i;
--	struct scatterlist tmp;
--	char *ipad = tfm->crt_hash.hmac_block;
--	
--	if (*keylen > crypto_tfm_alg_blocksize(tfm)) {
--		hash_key(tfm, key, *keylen);
--		*keylen = crypto_tfm_alg_digestsize(tfm);
--	}
--
--	memset(ipad, 0, crypto_tfm_alg_blocksize(tfm));
--	memcpy(ipad, key, *keylen);
--
--	for (i = 0; i < crypto_tfm_alg_blocksize(tfm); i++)
--		ipad[i] ^= 0x36;
--
--	sg_set_buf(&tmp, ipad, crypto_tfm_alg_blocksize(tfm));
--	
--	crypto_digest_init(tfm);
--	crypto_digest_update(tfm, &tmp, 1);
--}
--
--void crypto_hmac_update(struct crypto_tfm *tfm,
--                        struct scatterlist *sg, unsigned int nsg)
--{
--	crypto_digest_update(tfm, sg, nsg);
--}
--
--void crypto_hmac_final(struct crypto_tfm *tfm, u8 *key,
--                       unsigned int *keylen, u8 *out)
--{
--	unsigned int i;
--	struct scatterlist tmp;
--	char *opad = tfm->crt_hash.hmac_block;
--	
--	if (*keylen > crypto_tfm_alg_blocksize(tfm)) {
--		hash_key(tfm, key, *keylen);
--		*keylen = crypto_tfm_alg_digestsize(tfm);
--	}
--
--	crypto_digest_final(tfm, out);
--
--	memset(opad, 0, crypto_tfm_alg_blocksize(tfm));
--	memcpy(opad, key, *keylen);
--		
--	for (i = 0; i < crypto_tfm_alg_blocksize(tfm); i++)
--		opad[i] ^= 0x5c;
--
--	sg_set_buf(&tmp, opad, crypto_tfm_alg_blocksize(tfm));
--
--	crypto_digest_init(tfm);
--	crypto_digest_update(tfm, &tmp, 1);
--	
--	sg_set_buf(&tmp, out, crypto_tfm_alg_digestsize(tfm));
--	
--	crypto_digest_update(tfm, &tmp, 1);
--	crypto_digest_final(tfm, out);
--}
--
--void crypto_hmac(struct crypto_tfm *tfm, u8 *key, unsigned int *keylen,
--                 struct scatterlist *sg, unsigned int nsg, u8 *out)
--{
--	crypto_hmac_init(tfm, key, keylen);
--	crypto_hmac_update(tfm, sg, nsg);
--	crypto_hmac_final(tfm, key, keylen, out);
--}
--
--EXPORT_SYMBOL_GPL(crypto_hmac_init);
--EXPORT_SYMBOL_GPL(crypto_hmac_update);
--EXPORT_SYMBOL_GPL(crypto_hmac_final);
--EXPORT_SYMBOL_GPL(crypto_hmac);
--
- static inline void *align_ptr(void *p, unsigned int align)
+@@ -210,6 +237,7 @@ static int nocrypt_iv(struct crypto_tfm 
+                       struct scatterlist *src,
+                       unsigned int nbytes, u8 *iv)
  {
- 	return (void *)ALIGN((unsigned long)p, align);
-diff --git a/crypto/internal.h b/crypto/internal.h
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -73,19 +73,6 @@ static inline void crypto_yield(u32 flag
- 		cond_resched();
++	memset(dst, 0, nbytes);
+ 	return -ENOSYS;
  }
  
--#ifdef CONFIG_CRYPTO_HMAC
--int crypto_alloc_hmac_block(struct crypto_tfm *tfm);
--void crypto_free_hmac_block(struct crypto_tfm *tfm);
--#else
--static inline int crypto_alloc_hmac_block(struct crypto_tfm *tfm)
--{
--	return 0;
--}
--
--static inline void crypto_free_hmac_block(struct crypto_tfm *tfm)
--{ }
--#endif
--
- #ifdef CONFIG_PROC_FS
- void __init crypto_init_proc(void);
- void __exit crypto_exit_proc(void);
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -295,9 +295,6 @@ struct hash_tfm {
- 		      unsigned int nsg, u8 *out);
- 	int (*setkey)(struct crypto_hash *tfm, const u8 *key,
- 		      unsigned int keylen);
--#ifdef CONFIG_CRYPTO_HMAC
--	void *hmac_block;
--#endif
- 	unsigned int digestsize;
- };
- 
-@@ -872,18 +869,5 @@ static inline int crypto_comp_decompress
- 	return tfm->crt_compress.cot_decompress(tfm, src, slen, dst, dlen);
- }
- 
--/*
-- * HMAC support.
-- */
--#ifdef CONFIG_CRYPTO_HMAC
--void crypto_hmac_init(struct crypto_tfm *tfm, u8 *key, unsigned int *keylen);
--void crypto_hmac_update(struct crypto_tfm *tfm,
--                        struct scatterlist *sg, unsigned int nsg);
--void crypto_hmac_final(struct crypto_tfm *tfm, u8 *key,
--                       unsigned int *keylen, u8 *out);
--void crypto_hmac(struct crypto_tfm *tfm, u8 *key, unsigned int *keylen,
--                 struct scatterlist *sg, unsigned int nsg, u8 *out);
--#endif	/* CONFIG_CRYPTO_HMAC */
--
- #endif	/* _LINUX_CRYPTO_H */
- 
+@@ -235,6 +263,11 @@ int crypto_init_cipher_ops(struct crypto
+ 	case CRYPTO_TFM_MODE_ECB:
+ 		ops->cit_encrypt = ecb_encrypt;
+ 		ops->cit_decrypt = ecb_decrypt;
++/* These should have been nocrypt_iv, but patch-cryptoloop-jari-2.4.22.0
++ * (and its other revisions) directly calls the *_iv() functions even in
++ * ECB mode and ignores their return value. */
++		ops->cit_encrypt_iv = ecb_encrypt_iv;
++		ops->cit_decrypt_iv = ecb_decrypt_iv;
+ 		break;
+ 		
+ 	case CRYPTO_TFM_MODE_CBC:
+
+--h31gzZEtNLTqOjlF--
