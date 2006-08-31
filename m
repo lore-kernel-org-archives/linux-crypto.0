@@ -1,124 +1,128 @@
-From: Solar Designer <solar@openwall.com>
-Subject: Re: [PATCH] cit_encrypt_iv/cit_decrypt_iv for ECB mode
-Date: Tue, 22 Aug 2006 10:28:53 +0400
-Message-ID: <20060822062853.GA1673@openwall.com>
-References: <20060820002346.GA16995@openwall.com> <20060820080403.GA602@1wt.eu> <20060820144908.GA19602@openwall.com> <20060820225830.GA31693@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="h31gzZEtNLTqOjlF"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+From: Rik Snel <rsnel@cube.dyndns.org>
+Subject: [PATCH 2/6] crypto: benbi IV, big endian narrow block count for LRW-32-AES
+Date: Thu, 31 Aug 2006 14:39:32 +0200
+Message-ID: <11570279791699-git-send-email-rsnel@cube.dyndns.org>
+References: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
+Reply-To: Rik Snel <rsnel@cube.dyndns.org>
+Cc: linux-crypto@vger.kernel.org, Rik Snel <rsnel@cube.dyndns.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mother.openwall.net ([195.42.179.200]:30155 "HELO
-	mother.openwall.net") by vger.kernel.org with SMTP id S1750895AbWHVGcK
+Received: from smtp-vbr4.xs4all.nl ([194.109.24.24]:7946 "EHLO
+	smtp-vbr4.xs4all.nl") by vger.kernel.org with ESMTP id S932168AbWHaMkN
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Aug 2006 02:32:10 -0400
-To: Willy Tarreau <w@1wt.eu>
-Content-Disposition: inline
-In-Reply-To: <20060820225830.GA31693@gondor.apana.org.au>
+	Thu, 31 Aug 2006 08:40:13 -0400
+To: herbert@gondor.apana.org.au
+In-Reply-To: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+LRW-32-AES needs a certain IV. This IV should be provided dm-crypt. 
+The block cipher mode could, in principle generate the correct IV from
+the plain IV, but I think that it is cleaner to supply the right IV
+directly.
 
---h31gzZEtNLTqOjlF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The sector -> narrow block calculation uses a shift for performance reasons.
+This shift is computed in .ctr and stored in cc->iv_gen_private (as a void*).
 
-On Mon, Aug 21, 2006 at 08:58:30AM +1000, Herbert Xu wrote:
-> On Sun, Aug 20, 2006 at 06:49:08PM +0400, Solar Designer wrote:
-> > 
-> > Can we maybe define working but IV-ignoring functions for ECB (like I
-> > did), but use memory-clearing nocrypt*() for CFB and CTR (as long as
-> > these are not supported)?  Of course, all of these will return -ENOSYS.
-> 
-> In cryptodev-2.6, with block ciphers you can no longer select CFB/CTR
-> until someone writes support for them so this is no longer an issue.
-> 
-> For 2.4, I don't really mind either way what nocrypt does.
+Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
+---
+ drivers/md/dm-crypt.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 55 insertions(+), 1 deletions(-)
 
-OK, I've merged Willy's suggestion for the memset()s into the patch that
-I had submitted previously.  The resulting patch is attached.
-
-Alexander
-
---h31gzZEtNLTqOjlF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="linux-2.4.33-nocrypt.diff"
-
-diff -urp linux-2.4.33/crypto/cipher.c linux/crypto/cipher.c
---- linux-2.4.33/crypto/cipher.c	Sun Aug  8 03:26:04 2004
-+++ linux/crypto/cipher.c	Tue Aug 22 09:53:35 2006
-@@ -147,6 +147,15 @@ static int ecb_encrypt(struct crypto_tfm
- 	             ecb_process, 1, NULL);
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 06961f7..12c871c 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -106,6 +106,9 @@ static kmem_cache_t *_crypt_io_pool;
+  *        encrypted with the bulk cipher using a salt as key. The salt
+  *        should be derived from the bulk cipher's key via hashing.
+  *
++ * benbi: the 64-bit "big-endian 'narrow block'-count", starting at 1
++ * 	  (needed for LRW-32-AES and possible other narrow block modes)
++ *
+  * plumb: unimplemented, see:
+  * http://article.gmane.org/gmane.linux.kernel.device-mapper.dm-crypt/454
+  */
+@@ -200,6 +203,49 @@ static int crypt_iv_essiv_gen(struct cry
+ 	return 0;
  }
  
-+static int ecb_encrypt_iv(struct crypto_tfm *tfm,
-+			  struct scatterlist *dst,
-+			  struct scatterlist *src,
-+			  unsigned int nbytes, u8 *iv)
++static int crypt_iv_benbi_ctr(struct crypt_config *cc, struct dm_target *ti,
++			      const char *opts)
 +{
-+	ecb_encrypt(tfm, dst, src, nbytes);
-+	return -ENOSYS;
++	unsigned int bs = crypto_blkcipher_blocksize(cc->tfm);
++	int log = long_log2(bs);
++
++	/* we need to calculate how far we must shift the sector count
++	 * to get the cipher block count, we use this shift in _gen */
++
++	if (1 << log != bs) {
++		ti->error = "cypher blocksize is not a power of 2";
++		return -EINVAL;
++	}
++
++	if (log > 9) {
++		ti->error = "cypher blocksize is > 512";
++		return -EINVAL;
++	}
++	
++	if (crypto_blkcipher_ivsize(cc->tfm) < sizeof(u64)) {
++		ti->error = "cypher ivsize is < 8";
++		return -EINVAL;
++	}
++
++	cc->iv_gen_private = (void*)(9 - log);
++
++	return 0;
 +}
 +
- static int ecb_decrypt(struct crypto_tfm *tfm,
-                        struct scatterlist *dst,
-                        struct scatterlist *src,
-@@ -157,6 +166,15 @@ static int ecb_decrypt(struct crypto_tfm
- 	             ecb_process, 1, NULL);
- }
- 
-+static int ecb_decrypt_iv(struct crypto_tfm *tfm,
-+			  struct scatterlist *dst,
-+			  struct scatterlist *src,
-+			  unsigned int nbytes, u8 *iv)
++static void crypt_iv_benbi_dtr(struct crypt_config *cc) 
 +{
-+	ecb_decrypt(tfm, dst, src, nbytes);
-+	return -ENOSYS;
++	cc->iv_gen_private = NULL; 
 +}
 +
- static int cbc_encrypt(struct crypto_tfm *tfm,
-                        struct scatterlist *dst,
-                        struct scatterlist *src,
-@@ -197,11 +215,20 @@ static int cbc_decrypt_iv(struct crypto_
- 	             cbc_process, 0, iv);
- }
++static int crypt_iv_benbi_gen(struct crypt_config *cc, u8 *iv, sector_t sector)
++{
++	memset(iv, 0, cc->iv_size - sizeof(u64)); /* rest is cleared below */
++	*(u64 *)(iv + cc->iv_size - sizeof(u64)) = 
++		cpu_to_be64(((u64)sector << (u32)cc->iv_gen_private) + 1);
++
++	return 0;
++}
++
+ static struct crypt_iv_operations crypt_iv_plain_ops = {
+ 	.generator = crypt_iv_plain_gen
+ };
+@@ -210,6 +256,11 @@ static struct crypt_iv_operations crypt_
+ 	.generator = crypt_iv_essiv_gen
+ };
  
-+/*
-+ * nocrypt*() zeroize the destination buffer to make sure we don't leak
-+ * uninitialized memory contents if the caller ignores the return value.
-+ * This is bad since the data in the source buffer is unused and may be
-+ * lost, but an infoleak would be even worse.  The performance cost of
-+ * memset() is irrelevant since a well-behaved caller would not bump into
-+ * the error repeatedly.
-+ */
- static int nocrypt(struct crypto_tfm *tfm,
-                    struct scatterlist *dst,
-                    struct scatterlist *src,
- 		   unsigned int nbytes)
- {
-+	memset(dst, 0, nbytes);
- 	return -ENOSYS;
- }
++static struct crypt_iv_operations crypt_iv_benbi_ops = {
++	.ctr	   = crypt_iv_benbi_ctr,
++	.dtr	   = crypt_iv_benbi_dtr,
++	.generator = crypt_iv_benbi_gen
++};
  
-@@ -210,6 +237,7 @@ static int nocrypt_iv(struct crypto_tfm 
-                       struct scatterlist *src,
-                       unsigned int nbytes, u8 *iv)
- {
-+	memset(dst, 0, nbytes);
- 	return -ENOSYS;
- }
+ static int
+ crypt_convert_scatterlist(struct crypt_config *cc, struct scatterlist *out,
+@@ -579,7 +630,8 @@ static int crypt_ctr(struct dm_target *t
+ 	cc->tfm = tfm;
  
-@@ -235,6 +263,11 @@ int crypto_init_cipher_ops(struct crypto
- 	case CRYPTO_TFM_MODE_ECB:
- 		ops->cit_encrypt = ecb_encrypt;
- 		ops->cit_decrypt = ecb_decrypt;
-+/* These should have been nocrypt_iv, but patch-cryptoloop-jari-2.4.22.0
-+ * (and its other revisions) directly calls the *_iv() functions even in
-+ * ECB mode and ignores their return value. */
-+		ops->cit_encrypt_iv = ecb_encrypt_iv;
-+		ops->cit_decrypt_iv = ecb_decrypt_iv;
- 		break;
- 		
- 	case CRYPTO_TFM_MODE_CBC:
+ 	/*
+-	 * Choose ivmode. Valid modes: "plain", "essiv:<esshash>".
++	 * Choose ivmode. Valid modes: "plain", "essiv:<esshash>", "benbi".
++	 *
+ 	 * See comments at iv code
+ 	 */
+ 
+@@ -589,6 +641,8 @@ static int crypt_ctr(struct dm_target *t
+ 		cc->iv_gen_ops = &crypt_iv_plain_ops;
+ 	else if (strcmp(ivmode, "essiv") == 0)
+ 		cc->iv_gen_ops = &crypt_iv_essiv_ops;
++	else if (strcmp(ivmode, "benbi") == 0)
++		cc->iv_gen_ops = &crypt_iv_benbi_ops;
+ 	else {
+ 		ti->error = "Invalid IV mode";
+ 		goto bad2;
+-- 
+1.4.1.1
 
---h31gzZEtNLTqOjlF--
