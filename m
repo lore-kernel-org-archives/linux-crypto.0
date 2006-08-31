@@ -1,128 +1,113 @@
 From: Rik Snel <rsnel@cube.dyndns.org>
-Subject: [PATCH 2/6] crypto: benbi IV, big endian narrow block count for LRW-32-AES
-Date: Thu, 31 Aug 2006 14:39:32 +0200
-Message-ID: <11570279791699-git-send-email-rsnel@cube.dyndns.org>
+Subject: [PATCH 3/6] crypto: some common 128-bit block operations, nicely centralized
+Date: Thu, 31 Aug 2006 14:39:33 +0200
+Message-ID: <11570279791046-git-send-email-rsnel@cube.dyndns.org>
 References: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
 Reply-To: Rik Snel <rsnel@cube.dyndns.org>
 Cc: linux-crypto@vger.kernel.org, Rik Snel <rsnel@cube.dyndns.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp-vbr4.xs4all.nl ([194.109.24.24]:7946 "EHLO
-	smtp-vbr4.xs4all.nl") by vger.kernel.org with ESMTP id S932168AbWHaMkN
+Received: from smtp-vbr4.xs4all.nl ([194.109.24.24]:58885 "EHLO
+	smtp-vbr4.xs4all.nl") by vger.kernel.org with ESMTP id S932149AbWHaMkM
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Aug 2006 08:40:13 -0400
+	Thu, 31 Aug 2006 08:40:12 -0400
 To: herbert@gondor.apana.org.au
 In-Reply-To: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-LRW-32-AES needs a certain IV. This IV should be provided dm-crypt. 
-The block cipher mode could, in principle generate the correct IV from
-the plain IV, but I think that it is cleaner to supply the right IV
-directly.
+128bit is a common blocksize in linux kernel cryptography, so it helps to
+centralize some common operations. The data must be aligned at sizeof(int)
+for decent performance.
 
-The sector -> narrow block calculation uses a shift for performance reasons.
-This shift is computed in .ctr and stored in cc->iv_gen_private (as a void*).
+The code, while mostly trivial, is based on a header file mode_hdr.h in
+http://fp.gladman.plus.com/AES/modes.vc8.19-06-06.zip
+
+The original copyright (and GPL statement) of the original author,
+Dr Brian Gladman, is preserved.
 
 Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
 ---
- drivers/md/dm-crypt.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 55 insertions(+), 1 deletions(-)
+ crypto/b128ops.h |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 72 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 06961f7..12c871c 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -106,6 +106,9 @@ static kmem_cache_t *_crypt_io_pool;
-  *        encrypted with the bulk cipher using a salt as key. The salt
-  *        should be derived from the bulk cipher's key via hashing.
-  *
-+ * benbi: the 64-bit "big-endian 'narrow block'-count", starting at 1
-+ * 	  (needed for LRW-32-AES and possible other narrow block modes)
+diff --git a/crypto/b128ops.h b/crypto/b128ops.h
+new file mode 100644
+index 0000000..d32bfc2
+--- /dev/null
++++ b/crypto/b128ops.h
+@@ -0,0 +1,72 @@
++/* b128ops.h - common 128-bit block operations
++ * 
++ * Copyright (c) 2003, Dr Brian Gladman, Worcester, UK.
++ * Copyright (c) 2006, Rik Snel <rsnel@cube.dyndns.org>
 + *
-  * plumb: unimplemented, see:
-  * http://article.gmane.org/gmane.linux.kernel.device-mapper.dm-crypt/454
-  */
-@@ -200,6 +203,49 @@ static int crypt_iv_essiv_gen(struct cry
- 	return 0;
- }
- 
-+static int crypt_iv_benbi_ctr(struct crypt_config *cc, struct dm_target *ti,
-+			      const char *opts)
++ * Based on Dr Brain Gladman's (GPL'd) work published at
++ * http://fp.gladman.plus.com/cryptography_technology/index.htm
++ * See the original copyright notice below.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++/*
++ ---------------------------------------------------------------------------
++ Copyright (c) 2003, Dr Brian Gladman, Worcester, UK.   All rights reserved.
++
++ LICENSE TERMS
++
++ The free distribution and use of this software in both source and binary
++ form is allowed (with or without changes) provided that:
++
++   1. distributions of this source code include the above copyright
++      notice, this list of conditions and the following disclaimer;
++
++   2. distributions in binary form include the above copyright
++      notice, this list of conditions and the following disclaimer
++      in the documentation and/or other associated materials;
++
++   3. the copyright holder's name is not used to endorse products
++      built using this software without specific written permission.
++
++ ALTERNATIVELY, provided that this notice is retained in full, this product
++ may be distributed under the terms of the GNU General Public License (GPL),
++ in which case the provisions of the GPL apply INSTEAD OF those given above.
++
++ DISCLAIMER
++
++ This software is provided 'as is' with no explicit or implied warranties
++ in respect of its properties, including, but not limited to, correctness
++ and/or fitness for purpose.
++ ---------------------------------------------------------------------------
++ Issue Date: 13/06/2006
++*/
++
++#ifndef _LINUX_B128OPS_H
++#define _LINUX_B128OPS_H
++
++#include <linux/byteorder/swab.h>
++
++/* watch out: for good performance p and q must be aligned to 32bit
++ * boundaries on a 32bit machine and to 64bit boundaries on a 64bit 
++ * machine. */
++inline void b128ops_mov(void *p, const void *q)
 +{
-+	unsigned int bs = crypto_blkcipher_blocksize(cc->tfm);
-+	int log = long_log2(bs);
-+
-+	/* we need to calculate how far we must shift the sector count
-+	 * to get the cipher block count, we use this shift in _gen */
-+
-+	if (1 << log != bs) {
-+		ti->error = "cypher blocksize is not a power of 2";
-+		return -EINVAL;
-+	}
-+
-+	if (log > 9) {
-+		ti->error = "cypher blocksize is > 512";
-+		return -EINVAL;
-+	}
-+	
-+	if (crypto_blkcipher_ivsize(cc->tfm) < sizeof(u64)) {
-+		ti->error = "cypher ivsize is < 8";
-+		return -EINVAL;
-+	}
-+
-+	cc->iv_gen_private = (void*)(9 - log);
-+
-+	return 0;
++	((u64*)p)[0] = ((u64*)q)[0];
++	((u64*)p)[1] = ((u64*)q)[1];
 +}
 +
-+static void crypt_iv_benbi_dtr(struct crypt_config *cc) 
++inline void b128ops_xor(void *p, const void *q)
 +{
-+	cc->iv_gen_private = NULL; 
++	((u64*)p)[0] ^= ((u64*)q)[0];
++	((u64*)p)[1] ^= ((u64*)q)[1];
 +}
 +
-+static int crypt_iv_benbi_gen(struct crypt_config *cc, u8 *iv, sector_t sector)
-+{
-+	memset(iv, 0, cc->iv_size - sizeof(u64)); /* rest is cleared below */
-+	*(u64 *)(iv + cc->iv_size - sizeof(u64)) = 
-+		cpu_to_be64(((u64)sector << (u32)cc->iv_gen_private) + 1);
-+
-+	return 0;
++inline void bswap64_block(void* d, const void* s, u32 n)
++{ 
++    while(n--) ((u64*)d)[n] = __swab64(((u64*)s)[n]);
 +}
 +
- static struct crypt_iv_operations crypt_iv_plain_ops = {
- 	.generator = crypt_iv_plain_gen
- };
-@@ -210,6 +256,11 @@ static struct crypt_iv_operations crypt_
- 	.generator = crypt_iv_essiv_gen
- };
- 
-+static struct crypt_iv_operations crypt_iv_benbi_ops = {
-+	.ctr	   = crypt_iv_benbi_ctr,
-+	.dtr	   = crypt_iv_benbi_dtr,
-+	.generator = crypt_iv_benbi_gen
-+};
- 
- static int
- crypt_convert_scatterlist(struct crypt_config *cc, struct scatterlist *out,
-@@ -579,7 +630,8 @@ static int crypt_ctr(struct dm_target *t
- 	cc->tfm = tfm;
- 
- 	/*
--	 * Choose ivmode. Valid modes: "plain", "essiv:<esshash>".
-+	 * Choose ivmode. Valid modes: "plain", "essiv:<esshash>", "benbi".
-+	 *
- 	 * See comments at iv code
- 	 */
- 
-@@ -589,6 +641,8 @@ static int crypt_ctr(struct dm_target *t
- 		cc->iv_gen_ops = &crypt_iv_plain_ops;
- 	else if (strcmp(ivmode, "essiv") == 0)
- 		cc->iv_gen_ops = &crypt_iv_essiv_ops;
-+	else if (strcmp(ivmode, "benbi") == 0)
-+		cc->iv_gen_ops = &crypt_iv_benbi_ops;
- 	else {
- 		ti->error = "Invalid IV mode";
- 		goto bad2;
++#endif /* _LINUX_B128OPS_H */
 -- 
 1.4.1.1
 
