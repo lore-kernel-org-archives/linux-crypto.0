@@ -1,52 +1,39 @@
-From: Rik Snel <rsnel@cube.dyndns.org>
-Subject: [PATCH 1/6] crypto: trivial comment improvements
-Date: Thu, 31 Aug 2006 14:39:31 +0200
-Message-ID: <11570279781564-git-send-email-rsnel@cube.dyndns.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: LRW implementation, please comment
+Date: Fri, 1 Sep 2006 13:52:25 +1000
+Message-ID: <20060901035225.GA9547@gondor.apana.org.au>
 References: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
-Reply-To: Rik Snel <rsnel@cube.dyndns.org>
-Cc: linux-crypto@vger.kernel.org, Rik Snel <rsnel@cube.dyndns.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp-vbr4.xs4all.nl ([194.109.24.24]:12041 "EHLO
-	smtp-vbr4.xs4all.nl") by vger.kernel.org with ESMTP id S932168AbWHaMkW
+Received: from rhun.apana.org.au ([64.62.148.172]:47110 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751097AbWIADwY
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Aug 2006 08:40:22 -0400
-To: herbert@gondor.apana.org.au
+	Thu, 31 Aug 2006 23:52:24 -0400
+To: Rik Snel <rsnel@cube.dyndns.org>
+Content-Disposition: inline
 In-Reply-To: <11570279761772-git-send-email-rsnel@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Just some minor comment nits. 
+Hi Rik:
 
-- little-endian is better than low-endian
-- and since it is called essiv everywere it should also be essiv 
-  in the comments (and not ess_iv)
+On Thu, Aug 31, 2006 at 02:39:30PM +0200, Rik Snel wrote:
+> 
+> This is an attempt at implementing LRW for the new blockcipher API.
+> Please review, test and comment. 
 
-Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
----
- drivers/md/dm-crypt.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+Thanks a lot for doing this.  It looks good to me.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 91d4081..06961f7 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -99,12 +99,12 @@ static kmem_cache_t *_crypt_io_pool;
- /*
-  * Different IV generation algorithms:
-  *
-- * plain: the initial vector is the 32-bit low-endian version of the sector
-+ * plain: the initial vector is the 32-bit little-endian version of the sector
-  *        number, padded with zeros if neccessary.
-  *
-- * ess_iv: "encrypted sector|salt initial vector", the sector number is
-- *         encrypted with the bulk cipher using a salt as key. The salt
-- *         should be derived from the bulk cipher's key via hashing.
-+ * essiv: "encrypted sector|salt initial vector", the sector number is
-+ *        encrypted with the bulk cipher using a salt as key. The salt
-+ *        should be derived from the bulk cipher's key via hashing.
-  *
-  * plumb: unimplemented, see:
-  * http://article.gmane.org/gmane.linux.kernel.device-mapper.dm-crypt/454
+There are a few style (see Documentation/CodingStyle) issues.  It would
+be good if you can fix them up before I apply the patches.
+
+Could you also convert the test vectors to use tcrypt.h/tcrypt.c?
+
+Cheers,
 -- 
-1.4.1.1
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
