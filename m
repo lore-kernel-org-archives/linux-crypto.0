@@ -1,54 +1,52 @@
-From: rsnel@cube.dyndns.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: LRW implementation, please comment
-Date: Fri, 1 Sep 2006 10:55:14 +0200
-Message-ID: <20060901085514.GA4821@cube.dyndns.org>
-References: <11570279761772-git-send-email-rsnel@cube.dyndns.org> <20060901035225.GA9547@gondor.apana.org.au>
+Date: Fri, 1 Sep 2006 20:37:07 +1000
+Message-ID: <20060901103707.GA17110@gondor.apana.org.au>
+References: <11570279761772-git-send-email-rsnel@cube.dyndns.org> <20060901035225.GA9547@gondor.apana.org.au> <20060901085514.GA4821@cube.dyndns.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp-vbr17.xs4all.nl ([194.109.24.37]:33289 "EHLO
-	smtp-vbr17.xs4all.nl") by vger.kernel.org with ESMTP
-	id S932449AbWIAIze (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Sep 2006 04:55:34 -0400
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:24847 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751444AbWIAKhF
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 Sep 2006 06:37:05 -0400
+To: rsnel@cube.dyndns.org
 Content-Disposition: inline
-In-Reply-To: <20060901035225.GA9547@gondor.apana.org.au>
+In-Reply-To: <20060901085514.GA4821@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
-
-On Fri, Sep 01, 2006 at 01:52:25PM +1000, Herbert Xu wrote:
-> On Thu, Aug 31, 2006 at 02:39:30PM +0200, Rik Snel wrote:
-> > This is an attempt at implementing LRW for the new blockcipher API.
-> > Please review, test and comment. 
+On Fri, Sep 01, 2006 at 10:55:14AM +0200, rsnel@cube.dyndns.org wrote:
 > 
-> Thanks a lot for doing this.  It looks good to me.
+> Can you give some examples about what I missed from CodingStyle?
+> (I just reread it and I think my patch adheres pretty well to those
+> rules: tabs=8, K&R bracing, don't pollute global namespace etc...)
 
-That's good to hear.
+It's only a few spots:
 
-> There are a few style (see Documentation/CodingStyle) issues.  It would
-> be good if you can fix them up before I apply the patches.
+* Space before * for pointers, e.g., (u64 *) instead of (u64*).
+* There is one line near the end b128ops.h that starts with spaces.
+* Some lines terminate with spaces.
 
-Can you give some examples about what I missed from CodingStyle?
-(I just reread it and I think my patch adheres pretty well to those
-rules: tabs=8, K&R bracing, don't pollute global namespace etc...)
+The last two issues can be caught if you test your patch with
 
-> Could you also convert the test vectors to use tcrypt.h/tcrypt.c?
+git apply --check --whitespace=error-all diff
 
-Yes, I just didn't know what tcrypt.[ch] was for, otherwise I would have put
-those vectors there in the first place. The last testvector, however,
-won't fit because it is an entire 512 byte sector. (which is not that
-bad, because alle narrow blocks (16 bytes) are encrypted independently,
-no realistic testvector of a wide block cipher mode would fit. (ABL uses
-blocks of any size, say 512 bytes, and if 1 bit changes in the plaintext
-block, the whole cypher block will be affected) I will propose something
-to fix that if ABL is finished.
+> Yes, I just didn't know what tcrypt.[ch] was for, otherwise I would have put
+> those vectors there in the first place. The last testvector, however,
+> won't fit because it is an entire 512 byte sector. (which is not that
+> bad, because alle narrow blocks (16 bytes) are encrypted independently,
+> no realistic testvector of a wide block cipher mode would fit. (ABL uses
+> blocks of any size, say 512 bytes, and if 1 bit changes in the plaintext
+> block, the whole cypher block will be affected) I will propose something
+> to fix that if ABL is finished.
 
-Greetings,
+Feel free to extend the tcrypt cipher test buffer to 512 bytes.
 
-Rik.
-
+Cheers,
 -- 
-Nothing is ever a total loss; it can always serve as a bad example.
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
