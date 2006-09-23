@@ -1,76 +1,77 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/7] [CRYPTO] api: Deprecate crypto_digest_* and crypto_alg_available
-Date: Sat, 02 Sep 2006 21:06:55 +1000
-Message-ID: <E1GJTKx-0001Fr-00@gondolin.me.apana.org.au>
-References: <20060902110520.GA4690@gondor.apana.org.au>
+From: "Rik Snel" <rsnel@cube.dyndns.org>
+Subject: [PATCH] adding speed_test_template for lrw(aes)
+Date: Sat, 23 Sep 2006 19:20:34 +0200
+Message-ID: <11590320342437-git-send-email-rsnel@cube.dyndns.org>
+Cc: linux-crypto@vger.kernel.org, Rik Snel <rsnel@cube.dyndns.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46608 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751071AbWIBLGz
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 2 Sep 2006 07:06:55 -0400
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Michal Ludvig <michal@logix.cz>
+Received: from smtp-vbr15.xs4all.nl ([194.109.24.35]:30736 "EHLO
+	smtp-vbr15.xs4all.nl") by vger.kernel.org with ESMTP
+	id S1750766AbWIWRVM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 23 Sep 2006 13:21:12 -0400
+To: herbert@gondor.apana.org.au
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] api: Deprecate crypto_digest_* and crypto_alg_available
+From: Rik Snel <rsnel@cube.dyndns.org>
 
-This patch marks the crypto_digest_* functions and crypto_alg_available
-as deprecated.  They've been replaced by crypto_hash_* and crypto_has_*
-respectively.
+lrw(aes) needs a different speed_test_template from standard aes because of
+the different keysize, lrw(aes) has 256, 320 and 384 bits and other aes
+modes have 128, 192, 256 bits.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
 ---
+ crypto/tcrypt.c |    4 ++--
+ crypto/tcrypt.h |   21 +++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
- include/linux/crypto.h |   18 +++++++++++++-----
- 1 files changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -241,9 +241,12 @@ int crypto_unregister_alg(struct crypto_
-  * Algorithm query interface.
-  */
- #ifdef CONFIG_CRYPTO
--int crypto_alg_available(const char *name, u32 flags);
-+int crypto_alg_available(const char *name, u32 flags)
-+	__deprecated_for_modules;
- int crypto_has_alg(const char *name, u32 type, u32 mask);
- #else
-+static int crypto_alg_available(const char *name, u32 flags);
-+	__deprecated_for_modules;
- static inline int crypto_alg_available(const char *name, u32 flags)
- {
- 	return 0;
-@@ -704,12 +707,15 @@ static inline void crypto_cipher_decrypt
- 						dst, src);
- }
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index ccad842..777fc63 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1200,9 +1200,9 @@ static void do_test(void)
+ 		test_cipher_speed("cbc(aes)", DECRYPT, sec, NULL, 0,
+ 				  aes_speed_template);
+ 		test_cipher_speed("lrw(aes)", ENCRYPT, sec, NULL, 0,
+-				  aes_speed_template);
++				  aes_lrw_speed_template);
+ 		test_cipher_speed("lrw(aes)", DECRYPT, sec, NULL, 0,
+-				  aes_speed_template);
++				  aes_lrw_speed_template);
+ 		break;
  
--void crypto_digest_init(struct crypto_tfm *tfm);
-+void crypto_digest_init(struct crypto_tfm *tfm) __deprecated_for_modules;
- void crypto_digest_update(struct crypto_tfm *tfm,
--			  struct scatterlist *sg, unsigned int nsg);
--void crypto_digest_final(struct crypto_tfm *tfm, u8 *out);
-+			  struct scatterlist *sg, unsigned int nsg)
-+	__deprecated_for_modules;
-+void crypto_digest_final(struct crypto_tfm *tfm, u8 *out)
-+	__deprecated_for_modules;
- void crypto_digest_digest(struct crypto_tfm *tfm,
--			  struct scatterlist *sg, unsigned int nsg, u8 *out);
-+			  struct scatterlist *sg, unsigned int nsg, u8 *out)
-+	__deprecated_for_modules;
+ 	case 201:
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index ab98b28..59fbc39 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -3589,6 +3589,27 @@ static struct cipher_speed aes_speed_tem
+ 	{  .klen = 0, .blen = 0, }
+ };
  
- static inline struct crypto_hash *__crypto_hash_cast(struct crypto_tfm *tfm)
- {
-@@ -723,6 +729,8 @@ static inline struct crypto_hash *crypto
- 	return __crypto_hash_cast(tfm);
- }
- 
-+static int crypto_digest_setkey(struct crypto_tfm *tfm, const u8 *key,
-+				unsigned int keylen) __deprecated;
- static inline int crypto_digest_setkey(struct crypto_tfm *tfm,
-                                        const u8 *key, unsigned int keylen)
- {
-
++static struct cipher_speed aes_lrw_speed_template[] = {
++	{ .klen = 32, .blen = 16, },
++	{ .klen = 32, .blen = 64, },
++	{ .klen = 32, .blen = 256, },
++	{ .klen = 32, .blen = 1024, },
++	{ .klen = 32, .blen = 8192, },
++	{ .klen = 40, .blen = 16, },
++	{ .klen = 40, .blen = 64, },
++	{ .klen = 40, .blen = 256, },
++	{ .klen = 40, .blen = 1024, },
++	{ .klen = 40, .blen = 8192, },
++	{ .klen = 48, .blen = 16, },
++	{ .klen = 48, .blen = 64, },
++	{ .klen = 48, .blen = 256, },
++	{ .klen = 48, .blen = 1024, },
++	{ .klen = 48, .blen = 8192, },
++
++	/* End marker */
++	{  .klen = 0, .blen = 0, }
++};
++
+ static struct cipher_speed des3_ede_speed_template[] = {
+ 	{ .klen = 24, .blen = 16, },
+ 	{ .klen = 24, .blen = 64, },
 -- 
-VGER BF report: H 0
+1.4.2.1
+
