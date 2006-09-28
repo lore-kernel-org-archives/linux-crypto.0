@@ -1,50 +1,38 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
-Date: Thu, 28 Sep 2006 16:08:26 +0400
-Message-ID: <20060928120826.GA18063@2ka.mipt.ru>
+From: Andreas Jellinghaus <aj@ciphirelabs.com>
+Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
+Date: Thu, 28 Sep 2006 15:23:43 +0200
+Message-ID: <451BCCDF.5000201@ciphirelabs.com>
+References: <20060928120826.GA18063@2ka.mipt.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Content-Disposition: inline
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=KOI8-R; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.ciphirelabs.net ([217.72.114.64]:60078 "EHLO
+	mx1.ciphirelabs.net") by vger.kernel.org with ESMTP
+	id S1751884AbWI1NYM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 Sep 2006 09:24:12 -0400
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+In-Reply-To: <20060928120826.GA18063@2ka.mipt.ru>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello.
+Evgeniy Polyakov wrote:
+> Hello.
+> 
+> I'm pleased to announce asynchronous crypto layer (acrypto) [1] release 
+> for 2.6.18 kernel tree. Acrypto allows to handle crypto requests 
+> asynchronously in hardware.
+> 
+> Combined patchset includes:
+>  * acrypto core
+>  * IPsec ESP4 port to acrypto
+>  * dm-crypt port to acrypto
 
-I'm pleased to announce asynchronous crypto layer (acrypto) [1] release 
-for 2.6.18 kernel tree. Acrypto allows to handle crypto requests 
-asynchronously in hardware.
+so I should be able to replace a plain 2.6.18 kernel with one
+with this patchset and use dm-crypt'ed partitions (e.g. swap,
+encrypted root filesystem) as usual without further changes?
 
-Combined patchset includes:
- * acrypto core
- * IPsec ESP4 port to acrypto
- * dm-crypt port to acrypto
- * OCF to acrypto bridge
+Did anyone test this with success?
 
-Acrypto supports following crypto providers:
- * SW crypto provider
- * HIFN 795x adapters
- * VIA nehemiah CPU
- * SuperCrypt CE99C003B
- * devices supported by OCF
-
-With this release of combined patchset for 2.6.18 I drop feature
-extensions for 2.6.16 and 2.6.17 trees and move them into maintenance
-state.
-
-Combined patchset [190k] and drivers for various acrypto providers can 
-be found on project's homepage.
-
-1. Acrypto homepage.
-http://tservice.net.ru/~s0mbre/old/?section=projects&item=acrypto
-
-Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-
--- 
-	Evgeniy Polyakov
-
-
--- 
-	Evgeniy Polyakov
+Regards, Andreas
