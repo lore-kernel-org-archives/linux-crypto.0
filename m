@@ -1,50 +1,35 @@
 From: "Jordan Crouse" <jordan.crouse@amd.com>
-Subject: crypto: Add support for the Geode AES engine (v2)
-Date: Thu, 28 Sep 2006 15:47:50 -0600
-Message-ID: <20060928214750.GM25387@cosmic.amd.com>
+Subject: Re: crypto: Add support for the Geode AES engine (v3)
+Date: Thu, 28 Sep 2006 16:03:36 -0600
+Message-ID: <20060928220336.GA24564@cosmic.amd.com>
 References: <20060927193147.GA21043@cosmic.amd.com>
  <20060928102337.GB23342@2ka.mipt.ru>
+ <20060928214750.GM25387@cosmic.amd.com>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="7qSK/uQB79J36Y4o"
+ boundary="ikeVEW9yuYc//A+q"
 Cc: linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com,
 	akpm@osdl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound-res.frontbridge.com ([63.161.60.49]:14932 "EHLO
-	outbound2-res-R.bigfish.com") by vger.kernel.org with ESMTP
-	id S1161184AbWI1Vkj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Sep 2006 17:40:39 -0400
+Received: from outbound-cpk.frontbridge.com ([207.46.163.16]:11164 "EHLO
+	outbound1-cpk-R.bigfish.com") by vger.kernel.org with ESMTP
+	id S1161119AbWI1V7y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 Sep 2006 17:59:54 -0400
 To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
-In-Reply-To: <20060928102337.GB23342@2ka.mipt.ru>
+In-Reply-To: <20060928214750.GM25387@cosmic.amd.com>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 
---7qSK/uQB79J36Y4o
+--ikeVEW9yuYc//A+q
 Content-Type: text/plain;
  charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 7bit
 
-> As far as I can see, register access is not protected, how can your
-> driver handle the case when dm-crypt and IPsec simultaneously try to
-> encrypt/decrypt some data, it can happen even around 
-> preemt_disable/enable calls and actually crypto processing can happen 
-> in interrupt context too (although it is not the best thing to do).
-
-I was sitting there trying to architect some grand scheme, and then it
-occured to me that we should just turn off the interrupts all together
-in the critical area.  Its not optimal for performance, but it
-avoids lots of crazy if statements.
-
-> You added timeout for the broken hardware condition, I think it is
-> better to return some error from _crypt() in that case, and, btw, that
-> name is not very good choice.
-
-Fixed the name and I return the error.  I don't propagate it through the
-whole chain, because quite frankly, if the crypto engine fails, then its
-a good bet the processor is on fire. :)
+Sigh - forgot to do an 'stg refresh' before generating the diff.  This one
+actually compiles.
 
 Jordan
 -- 
@@ -53,12 +38,18 @@ Senior Linux Engineer
 Advanced Micro Devices, Inc.
 <www.amd.com/embeddedprocessors>
 
---7qSK/uQB79J36Y4o
+--ikeVEW9yuYc//A+q
 Content-Type: text/plain;
  charset=us-ascii
 Content-Disposition: inline;
  filename=geode-lx-crypto.patch
 Content-Transfer-Encoding: 7bit
+
+[PATCH] crypto:  Add support for the Geode LX AES hardware
+
+This adds support for the AES engine on the Geode LX processor.
+
+Signed-off-by: Jordan Crouse <jordan.crouse@amd.com>
 
 diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
 index adb5541..e816535 100644
@@ -93,10 +84,10 @@ index 4c3d0ec..6059cf8 100644
 +obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
 diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
 new file mode 100644
-index 0000000..73b33ba
+index 0000000..1fbc41d
 --- /dev/null
 +++ b/drivers/crypto/geode-aes.c
-@@ -0,0 +1,481 @@
+@@ -0,0 +1,486 @@
 +/* CryptoAPI interface for the Geode LX hardware AES encryption module
 + * Copyright (C) 2004-2006, Advanced Micro Devices, Inc.
 + *
@@ -112,6 +103,7 @@ index 0000000..73b33ba
 +#include <linux/pci.h>
 +#include <linux/pci_ids.h>
 +#include <linux/crypto.h>
++#include <linux/spinlock.h>
 +#include <crypto/algapi.h>
 +
 +#include <asm/io.h>
@@ -162,6 +154,7 @@ index 0000000..73b33ba
 +/* Static structures */
 +
 +static void __iomem * _iobase;
++static spinlock_t lock;
 +
 +/* Write a 128 bit field (either a writable key or IV) */
 +static inline void
@@ -206,6 +199,7 @@ index 0000000..73b33ba
 +unsigned int
 +geode_aes_crypt(struct geode_aes_op *op)
 +{
++
 +	u32 flags = 0;
 +	int iflags;
 +
@@ -237,7 +231,7 @@ index 0000000..73b33ba
 +	if (op->mode == AES_MODE_CBC)
 +		GET_IV(op->iv);
 +
-+	spin_lock_irqrestore(&lock, iflags);
++	spin_unlock_irqrestore(&lock, iflags);
 +
 +	return op->len;
 +}
@@ -512,6 +506,8 @@ index 0000000..73b33ba
 +		goto erequest;
 +	}
 +
++	spin_lock_init(&lock);
++
 +	/* Clear any pending activity */
 +	AWRITE(AES_INTR_PENDING | AES_INTR_MASK, AES_INTR_REG);
 +
@@ -627,6 +623,6 @@ index 0000000..97f9eee
 +
 +#endif
 
---7qSK/uQB79J36Y4o--
+--ikeVEW9yuYc//A+q--
 
 
