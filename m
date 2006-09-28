@@ -1,55 +1,49 @@
 From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [RFC] crypto: Add support for the Geode AES engine
-Date: Thu, 28 Sep 2006 14:23:37 +0400
-Message-ID: <20060928102337.GB23342@2ka.mipt.ru>
-References: <20060927193147.GA21043@cosmic.amd.com>
+Subject: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
+Date: Thu, 28 Sep 2006 16:08:26 +0400
+Message-ID: <20060928120826.GA18063@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com,
-	akpm@osdl.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:56518 "EHLO 2ka.mipt.ru")
-	by vger.kernel.org with ESMTP id S1031364AbWI1KYJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Sep 2006 06:24:09 -0400
-To: Jordan Crouse <jordan.crouse@amd.com>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
 Content-Disposition: inline
-In-Reply-To: <20060927193147.GA21043@cosmic.amd.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 27, 2006 at 01:31:47PM -0600, Jordan Crouse (jordan.crouse@amd.com) wrote:
-> Hey all -
-> 
-> I've had a poor excuse for a crypto driver for the Geode LX AES hardware
-> sitting in my Geode GIT tree (and -mm) for some time now.  I sent out the 
-> original version some time ago (June) and I got some very smart 
-> recommendations for changes, but other events transpired, and I didn't do 
-> a very good job of following up.
-> 
-> So now, in the interest of getting this out of everybody's hair and on
-> the path to mainstreaming, I'm sending out a newly updated version of the 
-> driver for comments.  This should be fully updated for all the new API
-> changes in the crypto GIT tree.  Once this is acceptable, I would like to get
-> this pulled into the crypto tree.
+Hello.
 
-As far as I can see, register access is not protected, how can your
-driver handle the case when dm-crypt and IPsec simultaneously try to
-encrypt/decrypt some data, it can happen even around 
-preemt_disable/enable calls and actually crypto processing can happen 
-in interrupt context too (although it is not the best thing to do).
+I'm pleased to announce asynchronous crypto layer (acrypto) [1] release 
+for 2.6.18 kernel tree. Acrypto allows to handle crypto requests 
+asynchronously in hardware.
 
-You added timeout for the broken hardware condition, I think it is
-better to return some error from _crypt() in that case, and, btw, that
-name is not very good choice.
+Combined patchset includes:
+ * acrypto core
+ * IPsec ESP4 port to acrypto
+ * dm-crypt port to acrypto
+ * OCF to acrypto bridge
 
-> Thanks,
-> Jordan
-> -- 
-> Jordan Crouse
-> Senior Linux Engineer
-> Advanced Micro Devices, Inc.
-> <www.amd.com/embeddedprocessors>
+Acrypto supports following crypto providers:
+ * SW crypto provider
+ * HIFN 795x adapters
+ * VIA nehemiah CPU
+ * SuperCrypt CE99C003B
+ * devices supported by OCF
+
+With this release of combined patchset for 2.6.18 I drop feature
+extensions for 2.6.16 and 2.6.17 trees and move them into maintenance
+state.
+
+Combined patchset [190k] and drivers for various acrypto providers can 
+be found on project's homepage.
+
+1. Acrypto homepage.
+http://tservice.net.ru/~s0mbre/old/?section=projects&item=acrypto
+
+Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+
+-- 
+	Evgeniy Polyakov
 
 
 -- 
