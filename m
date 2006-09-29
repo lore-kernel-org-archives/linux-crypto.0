@@ -1,55 +1,37 @@
-From: "Jordan Crouse" <jordan.crouse@amd.com>
-Subject: Re: crypto: Add support for the Geode AES engine (v4)
-Date: Thu, 28 Sep 2006 18:16:24 -0600
-Message-ID: <20060929001624.GA3980@cosmic.amd.com>
-References: <20060927193147.GA21043@cosmic.amd.com>
- <20060928102337.GB23342@2ka.mipt.ru>
- <20060928214750.GM25387@cosmic.amd.com>
- <LYRIS-4270-86789-2006.09.28-16.10.32--jordan.crouse#amd.com@whitestar.amd.com>
- <20060928231739.GB24564@cosmic.amd.com>
- <20060928165421.1773af3b.akpm@osdl.org>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: crypto: Add support for the Geode AES engine
+Date: Fri, 29 Sep 2006 12:53:51 +0400
+Message-ID: <20060929085351.GA18626@2ka.mipt.ru>
+References: <20060927193147.GA21043@cosmic.amd.com> <LYRIS-4270-86779-2006.09.28-04.27.47--jordan.crouse#amd.com@whitestar.amd.com> <20060928163115.GL25387@cosmic.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>,
-	linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com
+Content-Type: text/plain; charset=koi8-r
+Cc: linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com,
+	akpm@osdl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound-red.frontbridge.com ([216.148.222.49]:32534 "EHLO
-	outbound1-red-R.bigfish.com") by vger.kernel.org with ESMTP
-	id S1161409AbWI2AI1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Sep 2006 20:08:27 -0400
-To: "Andrew Morton" <akpm@osdl.org>
-In-Reply-To: <20060928165421.1773af3b.akpm@osdl.org>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:29920 "EHLO 2ka.mipt.ru")
+	by vger.kernel.org with ESMTP id S1030423AbWI2IzG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Sep 2006 04:55:06 -0400
+To: Jordan Crouse <jordan.crouse@amd.com>
 Content-Disposition: inline
+In-Reply-To: <20060928163115.GL25387@cosmic.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 28/09/06 16:54 -0700, Andrew Morton wrote:
-> On Thu, 28 Sep 2006 17:17:39 -0600
-> "Jordan Crouse" <jordan.crouse@amd.com> wrote:
+On Thu, Sep 28, 2006 at 10:31:15AM -0600, Jordan Crouse (jordan.crouse@amd.com) wrote:
+> > As far as I can see, register access is not protected, how can your
+> > driver handle the case when dm-crypt and IPsec simultaneously try to
+> > encrypt/decrypt some data, it can happen even around 
+> > preemt_disable/enable calls and actually crypto processing can happen 
+> > in interrupt context too (although it is not the best thing to do).
 > 
-> > Add a driver to support the AES hardware on the Geode LX processor.
-> 
-> So... what are you planning on doing with this?  Ask Linus to pull
-> that git tree, or what?
+> I had the mutex in there, but I took it out based on our previous
+> conversations, which probably was a little rash.  If CRYPTO_TFM_REQ_MAY_SLEEP
+> is still a valid flag to check, I could use that along with a spin lock of
+> some sort.   I'll think about this a bit more.
 
-Good question - I guess I'm not sure what the correct protocol is here.  
-I should have done this long ago, so I was ready for the 2.6.19 window. 
-I also should have gotten it to the crypto guys first, before putting it
-in the Geode tree. I guess I never really expected it to be in 2.6.19,
-I just wanted to get this cleaned up and shipped off.  It was mocking me
-sitting there slowly bit rotting.
-
-As it stands, I think the right move is to get it into the crypto tree to
-patiently await 2.6.20.   
-
-Jordan
+If it is set, then you can safely sleep there, but if it is not, it does
+not always mean that sleeping is forbidden.
 
 -- 
-Jordan Crouse
-Senior Linux Engineer
-Advanced Micro Devices, Inc.
-<www.amd.com/embeddedprocessors>
-
-
+	Evgeniy Polyakov
