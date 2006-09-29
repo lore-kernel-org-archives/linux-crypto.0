@@ -1,56 +1,26 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+From: Samuel Tardieu <sam@rfc1149.net>
 Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
-Date: Fri, 29 Sep 2006 13:48:09 +0400
-Message-ID: <20060929094809.GA31117@2ka.mipt.ru>
-References: <20060928120826.GA18063@2ka.mipt.ru> <451BCCDF.5000201@ciphirelabs.com>
+Date: 29 Sep 2006 12:17:58 +0200
+Message-ID: <87wt7nm0x5.fsf@willow.rfc1149.net>
+References: <20060928120826.GA18063@2ka.mipt.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:36996 "EHLO 2ka.mipt.ru")
-	by vger.kernel.org with ESMTP id S1750921AbWI2JsR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Sep 2006 05:48:17 -0400
-To: Andreas Jellinghaus <aj@ciphirelabs.com>
-Content-Disposition: inline
-In-Reply-To: <451BCCDF.5000201@ciphirelabs.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1751075AbWI2KUp@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 28, 2006 at 03:23:43PM +0200, Andreas Jellinghaus (aj@ciphirelabs.com) wrote:
-> Evgeniy Polyakov wrote:
-> >Hello.
-> >
-> >I'm pleased to announce asynchronous crypto layer (acrypto) [1] release 
-> >for 2.6.18 kernel tree. Acrypto allows to handle crypto requests 
-> >asynchronously in hardware.
-> >
-> >Combined patchset includes:
-> > * acrypto core
-> > * IPsec ESP4 port to acrypto
-> > * dm-crypt port to acrypto
-> 
-> so I should be able to replace a plain 2.6.18 kernel with one
-> with this patchset and use dm-crypt'ed partitions (e.g. swap,
-> encrypted root filesystem) as usual without further changes?
-> 
-> Did anyone test this with success?
-> 
-> Regards, Andreas
+>>>>> "Evgeniy" == Evgeniy Polyakov <johnpol@2ka.mipt.ru> writes:
 
-As I answered in your first e-mail, yes, you just need to patch 2.6.18
-tree and load one of the crypto provider.
+Evgeniy> Hello.  I'm pleased to announce asynchronous crypto layer
+Evgeniy> (acrypto) [1] release for 2.6.18 kernel tree. Acrypto allows
+Evgeniy> to handle crypto requests asynchronously in hardware.
 
-Acrypto works with request/response model, i.e. you ask acrypto core to
-perform some operation on given buffers and if it can, it will call
-your callback when it is ready (or some error happend and acrypto was
-unable to reroute request to other device), otherwise it will return error.
+Would userspace programs benefit from this patch? In particular, would
+OpenSSL get better performances on Via nehemiah CPUs or does it need
+to be patched?
 
-With such a model it is possible to extend acrypto to any kind of
-operations on buffers, not only crypto related, for example it is
-possible to onload IPsec header transformation, perform DMA between
-specified areas and much more.
-
+  Sam
 -- 
-	Evgeniy Polyakov
+Samuel Tardieu -- sam@rfc1149.net -- http://www.rfc1149.net/
