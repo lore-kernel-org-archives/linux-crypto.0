@@ -1,37 +1,56 @@
 From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: crypto: Add support for the Geode AES engine
-Date: Fri, 29 Sep 2006 12:53:51 +0400
-Message-ID: <20060929085351.GA18626@2ka.mipt.ru>
-References: <20060927193147.GA21043@cosmic.amd.com> <LYRIS-4270-86779-2006.09.28-04.27.47--jordan.crouse#amd.com@whitestar.amd.com> <20060928163115.GL25387@cosmic.amd.com>
+Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
+Date: Fri, 29 Sep 2006 13:48:09 +0400
+Message-ID: <20060929094809.GA31117@2ka.mipt.ru>
+References: <20060928120826.GA18063@2ka.mipt.ru> <451BCCDF.5000201@ciphirelabs.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com,
-	akpm@osdl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:29920 "EHLO 2ka.mipt.ru")
-	by vger.kernel.org with ESMTP id S1030423AbWI2IzG (ORCPT
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:36996 "EHLO 2ka.mipt.ru")
+	by vger.kernel.org with ESMTP id S1750921AbWI2JsR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Sep 2006 04:55:06 -0400
-To: Jordan Crouse <jordan.crouse@amd.com>
+	Fri, 29 Sep 2006 05:48:17 -0400
+To: Andreas Jellinghaus <aj@ciphirelabs.com>
 Content-Disposition: inline
-In-Reply-To: <20060928163115.GL25387@cosmic.amd.com>
+In-Reply-To: <451BCCDF.5000201@ciphirelabs.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 28, 2006 at 10:31:15AM -0600, Jordan Crouse (jordan.crouse@amd.com) wrote:
-> > As far as I can see, register access is not protected, how can your
-> > driver handle the case when dm-crypt and IPsec simultaneously try to
-> > encrypt/decrypt some data, it can happen even around 
-> > preemt_disable/enable calls and actually crypto processing can happen 
-> > in interrupt context too (although it is not the best thing to do).
+On Thu, Sep 28, 2006 at 03:23:43PM +0200, Andreas Jellinghaus (aj@ciphirelabs.com) wrote:
+> Evgeniy Polyakov wrote:
+> >Hello.
+> >
+> >I'm pleased to announce asynchronous crypto layer (acrypto) [1] release 
+> >for 2.6.18 kernel tree. Acrypto allows to handle crypto requests 
+> >asynchronously in hardware.
+> >
+> >Combined patchset includes:
+> > * acrypto core
+> > * IPsec ESP4 port to acrypto
+> > * dm-crypt port to acrypto
 > 
-> I had the mutex in there, but I took it out based on our previous
-> conversations, which probably was a little rash.  If CRYPTO_TFM_REQ_MAY_SLEEP
-> is still a valid flag to check, I could use that along with a spin lock of
-> some sort.   I'll think about this a bit more.
+> so I should be able to replace a plain 2.6.18 kernel with one
+> with this patchset and use dm-crypt'ed partitions (e.g. swap,
+> encrypted root filesystem) as usual without further changes?
+> 
+> Did anyone test this with success?
+> 
+> Regards, Andreas
 
-If it is set, then you can safely sleep there, but if it is not, it does
-not always mean that sleeping is forbidden.
+As I answered in your first e-mail, yes, you just need to patch 2.6.18
+tree and load one of the crypto provider.
+
+Acrypto works with request/response model, i.e. you ask acrypto core to
+perform some operation on given buffers and if it can, it will call
+your callback when it is ready (or some error happend and acrypto was
+unable to reroute request to other device), otherwise it will return error.
+
+With such a model it is possible to extend acrypto to any kind of
+operations on buffers, not only crypto related, for example it is
+possible to onload IPsec header transformation, perform DMA between
+specified areas and much more.
 
 -- 
 	Evgeniy Polyakov
