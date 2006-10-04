@@ -1,46 +1,33 @@
-From: Vincent Jardin <vincent.jardin@6wind.com>
-Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
-Date: Fri, 29 Sep 2006 19:31:28 +0200
-Message-ID: <451D5870.6020100@6wind.com>
-References: <20060928120826.GA18063@2ka.mipt.ru> <87wt7nm0x5.fsf@willow.rfc1149.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto: Add support for the Geode AES engine (v4)
+Date: Wed, 4 Oct 2006 18:52:14 +1000
+Message-ID: <20061004085214.GA11140@gondor.apana.org.au>
+References: <20060927193147.GA21043@cosmic.amd.com> <20060928102337.GB23342@2ka.mipt.ru> <20060928214750.GM25387@cosmic.amd.com> <LYRIS-4270-86789-2006.09.28-16.10.32--jordan.crouse#amd.com@whitestar.amd.com> <20060928231739.GB24564@cosmic.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@osdl.org>,
+	Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
+	linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1-g19.free.fr ([212.27.42.27]:42913 "EHLO smtp1-g19.free.fr")
-	by vger.kernel.org with ESMTP id S1161858AbWI2Rbe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Sep 2006 13:31:34 -0400
-To: Samuel Tardieu <sam@rfc1149.net>
-In-Reply-To: <87wt7nm0x5.fsf@willow.rfc1149.net>
+Received: from rhun.apana.org.au ([64.62.148.172]:4873 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S964906AbWJDIwh
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Oct 2006 04:52:37 -0400
+To: Jordan Crouse <jordan.crouse@amd.com>
+Content-Disposition: inline
+In-Reply-To: <20060928231739.GB24564@cosmic.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-For the best synergy with OpenBSD guys, the OCF API should be considered:
-   
-http://www.usenix.org/events/usenix03/tech/full_papers/keromytis/keromytis_html/node8.html
+On Thu, Sep 28, 2006 at 11:17:39PM +0000, Jordan Crouse wrote:
+> 
+> Changes made and new version follows. Thanks for the comments.
 
-then, whatever a HW driver is added, the same IOCTLs will be used by 
-OpenSSL. The OCF patch for OpenSSL is already available.
+Patch applied.  Thanks everybody.
 
-Currently, it is not into the kernel git's repository so I think that 
-your Via CPU won't get better performances with OpenSSL
-
-Regards,
-   Vincent
-
-Samuel Tardieu wrote:
-
->Evgeniy> Hello.  I'm pleased to announce asynchronous crypto layer
->Evgeniy> (acrypto) [1] release for 2.6.18 kernel tree. Acrypto allows
->Evgeniy> to handle crypto requests asynchronously in hardware.
->
->Would userspace programs benefit from this patch? In particular, would
->OpenSSL get better performances on Via nehemiah CPUs or does it need
->to be patched?
->
->  Sam
->  
->
-
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
