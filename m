@@ -1,33 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: Add support for the Geode AES engine (v4)
-Date: Wed, 4 Oct 2006 18:52:14 +1000
-Message-ID: <20061004085214.GA11140@gondor.apana.org.au>
-References: <20060927193147.GA21043@cosmic.amd.com> <20060928102337.GB23342@2ka.mipt.ru> <20060928214750.GM25387@cosmic.amd.com> <LYRIS-4270-86789-2006.09.28-16.10.32--jordan.crouse#amd.com@whitestar.amd.com> <20060928231739.GB24564@cosmic.amd.com>
+From: "Yani K." <altus@aaanet.ru>
+Subject: from Yanochka
+Date: Fri, 06 Oct 2006 16:25:34 +0300
+Message-ID: <000801c6e94a$e0806380$0100a8c0@w200-216-200-157.grafixnet.com.br>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@osdl.org>,
-	Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
-	linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com
+Content-Type: text/plain;
+	charset="windows-1251"
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4873 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S964906AbWJDIwh
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Oct 2006 04:52:37 -0400
-To: Jordan Crouse <jordan.crouse@amd.com>
-Content-Disposition: inline
-In-Reply-To: <20060928231739.GB24564@cosmic.amd.com>
+Received: from w200-216-200-157.grafixnet.com.br ([200.216.200.157]:2309 "EHLO
+	w200-216-200-157.grafixnet.com.br") by vger.kernel.org with ESMTP
+	id S1422657AbWJFNYn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Oct 2006 09:24:43 -0400
+To: "Arthur" <mm-commits@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 28, 2006 at 11:17:39PM +0000, Jordan Crouse wrote:
-> 
-> Changes made and new version follows. Thanks for the comments.
+Hi	
 
-Patch applied.  Thanks everybody.
+I think we had correspondence a long time ago if it was not you I am sorry.
+If it was I could not answer you because my Mozilla mail manager was down for a 
+long time and I could not fix it only with my friend's help I got the emails 
+address out for me ..:)
+I hope it was whom we were corresponded with you are still interested, as I am, 
+though I realize much time has passed since then...
+I really don't know where to start ....
+Maybe you could tell me a little about yourself since I lost our early letters, 
+your appearance,age , hobbies, and are you still in the search?
+If it was you I wrote to and you are interested to get to know me better, I have 
+a profile at :
+http://www.youisnotalone.com/mydarling
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Don't really know what else to say for now I hope this is the right address
+
+Let me know if you are interested, And I hope
+you won't run when you see my picture :-)
+
+Yourth faithfully,
+
+Yanaa
+
+
