@@ -1,32 +1,53 @@
-From: Dag Arne Osvik <da@osvik.no>
-Subject: Re: [FYI]: Introduction of the support for RFC4312(The Camellia Cipher
- Algorithm)
-Date: Fri, 13 Oct 2006 10:07:03 +0200
-Message-ID: <452F4927.1090707@osvik.no>
-References: <20061013.143608.304095551.takamiya@po.ntts.co.jp>	<452F4506.50403@osvik.no> <20061013.165909.831838596.takamiya@po.ntts.co.jp>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Michael Frey <mfrey@pepper.com>
+Subject: Re: crypto: Add support for the Geode AES engine (v4)
+Date: Fri, 13 Oct 2006 13:18:20 -0400
+Message-ID: <9CF4A66D-5A4B-455D-BA9C-CC62377AB4C4@pepper.com>
+References: <LYRIS-7332-87686-2006.10.04-02.52.47--mfrey#pepper.com@whitestar.amd.com>
+Mime-Version: 1.0 (Apple Message framework v752.3)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Cc: "Jordan Crouse" <jordan.crouse@amd.com>,
+	"Andrew Morton" <akpm@osdl.org>,
+	"Evgeniy Polyakov" <johnpol@2ka.mipt.ru>,
+	linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.hosted.servetheworld.net ([83.143.81.74]:4745 "HELO
-	mail.hosted.servetheworld.net") by vger.kernel.org with SMTP
-	id S1750810AbWJMIHI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Oct 2006 04:07:08 -0400
-To: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
-In-Reply-To: <20061013.165909.831838596.takamiya@po.ntts.co.jp>
+Received: from chile.pepper.com ([65.219.252.51]:32676 "EHLO chile.pepper.com")
+	by vger.kernel.org with ESMTP id S1751408AbWJMRUW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Oct 2006 13:20:22 -0400
+In-Reply-To: <LYRIS-7332-87686-2006.10.04-02.52.47--mfrey#pepper.com@whitestar.amd.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Noriaki TAKAMIYA wrote:
->   I sent the collect URL. The following URL is correct.
-> 
->   https://info.isl.ntt.co.jp/crypt/eng/camellia/source_s.html 
+Does this patch support the eeprom on the AES module?
 
-Thank you,
+Also,  Can this patch be used on a 2.6.18 kernel?
 
-I'm cc'ing linux-crypto and netdev so you don't get more questions about
-this.
+Thanks,
+Michael
 
-Regards,
-  Dag Arne Osvik
+On Oct 4, 2006, at 4:52 AM, Herbert Xu wrote:
+
+> On Thu, Sep 28, 2006 at 11:17:39PM +0000, Jordan Crouse wrote:
+>>
+>> Changes made and new version follows. Thanks for the comments.
+>
+> Patch applied.  Thanks everybody.
+>
+> Cheers,
+> -- 
+> Visit Openswan at http://www.openswan.org/
+> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+>
+>
+> ---
+> You are currently subscribed to info-linux@geode.amd.com
+> as: mfrey@pepper.com
+> To unsubscribe send a blank email to:
+> leave-info-linux-7332K@whitestar.amd.com
+>
+
