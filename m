@@ -1,38 +1,32 @@
-From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
-Subject: [FYI]: Introduction of the support for RFC4312(The Camellia Cipher
+From: Dag Arne Osvik <da@osvik.no>
+Subject: Re: [FYI]: Introduction of the support for RFC4312(The Camellia Cipher
  Algorithm)
-Date: Fri, 13 Oct 2006 14:36:08 +0900 (JST)
-Message-ID: <20061013.143608.304095551.takamiya@po.ntts.co.jp>
+Date: Fri, 13 Oct 2006 10:07:03 +0200
+Message-ID: <452F4927.1090707@osvik.no>
+References: <20061013.143608.304095551.takamiya@po.ntts.co.jp>	<452F4506.50403@osvik.no> <20061013.165909.831838596.takamiya@po.ntts.co.jp>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: takamiya@po.ntts.co.jp, netdev@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-To: linux-crypto@vger.kernel.org
-Sender: netdev-owner@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.hosted.servetheworld.net ([83.143.81.74]:4745 "HELO
+	mail.hosted.servetheworld.net") by vger.kernel.org with SMTP
+	id S1750810AbWJMIHI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Oct 2006 04:07:08 -0400
+To: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+In-Reply-To: <20061013.165909.831838596.takamiya@po.ntts.co.jp>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+Noriaki TAKAMIYA wrote:
+>   I sent the collect URL. The following URL is correct.
+> 
+>   https://info.isl.ntt.co.jp/crypt/eng/camellia/source_s.html 
 
-  This is Takamiya, from NTT Software.
+Thank you,
 
-  NTT has released the code of the new cipher algorithm, which is
-  specified in RFC4312(The Camellia Cipher Algorithm)
+I'm cc'ing linux-crypto and netdev so you don't get more questions about
+this.
 
-  Please see
-  http://info.isl.ntt.co.jp/crypt/eng/camellia/source_s.html .
-
-  The above patch is available for the version of 2.6.18.
-
-  We started to prepare the patch against the cryptodev-2.6 tree, and
-  will submit it in the few weeks.
-
-  Best regards.
-
-P.S.
-  The patches to use camellia algorithm from ipsec-tools is also
-  available on the above URL, and it will be merged into the
-  ipsec-tools, too.
-
--- 
-Noriaki TAKAMIYA
+Regards,
+  Dag Arne Osvik
