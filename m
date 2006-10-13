@@ -1,42 +1,38 @@
-From: "Yani K." <altus@aaanet.ru>
-Subject: from Yanochka
-Date: Fri, 06 Oct 2006 16:25:34 +0300
-Message-ID: <000801c6e94a$e0806380$0100a8c0@w200-216-200-157.grafixnet.com.br>
+From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Subject: [FYI]: Introduction of the support for RFC4312(The Camellia Cipher
+ Algorithm)
+Date: Fri, 13 Oct 2006 14:36:08 +0900 (JST)
+Message-ID: <20061013.143608.304095551.takamiya@po.ntts.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="windows-1251"
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from w200-216-200-157.grafixnet.com.br ([200.216.200.157]:2309 "EHLO
-	w200-216-200-157.grafixnet.com.br") by vger.kernel.org with ESMTP
-	id S1422657AbWJFNYn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Oct 2006 09:24:43 -0400
-To: "Arthur" <mm-commits@vger.kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: takamiya@po.ntts.co.jp, netdev@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+To: linux-crypto@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi	
+Hi all,
 
-I think we had correspondence a long time ago if it was not you I am sorry.
-If it was I could not answer you because my Mozilla mail manager was down for a 
-long time and I could not fix it only with my friend's help I got the emails 
-address out for me ..:)
-I hope it was whom we were corresponded with you are still interested, as I am, 
-though I realize much time has passed since then...
-I really don't know where to start ....
-Maybe you could tell me a little about yourself since I lost our early letters, 
-your appearance,age , hobbies, and are you still in the search?
-If it was you I wrote to and you are interested to get to know me better, I have 
-a profile at :
-http://www.youisnotalone.com/mydarling
+  This is Takamiya, from NTT Software.
 
-Don't really know what else to say for now I hope this is the right address
+  NTT has released the code of the new cipher algorithm, which is
+  specified in RFC4312(The Camellia Cipher Algorithm)
 
-Let me know if you are interested, And I hope
-you won't run when you see my picture :-)
+  Please see
+  http://info.isl.ntt.co.jp/crypt/eng/camellia/source_s.html .
 
-Yourth faithfully,
+  The above patch is available for the version of 2.6.18.
 
-Yanaa
+  We started to prepare the patch against the cryptodev-2.6 tree, and
+  will submit it in the few weeks.
 
+  Best regards.
 
+P.S.
+  The patches to use camellia algorithm from ipsec-tools is also
+  available on the above URL, and it will be merged into the
+  ipsec-tools, too.
+
+-- 
+Noriaki TAKAMIYA
