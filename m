@@ -1,53 +1,50 @@
-From: Michael Frey <mfrey@pepper.com>
+From: "Jordan Crouse" <jordan.crouse@amd.com>
 Subject: Re: crypto: Add support for the Geode AES engine (v4)
-Date: Fri, 13 Oct 2006 13:18:20 -0400
-Message-ID: <9CF4A66D-5A4B-455D-BA9C-CC62377AB4C4@pepper.com>
+Date: Fri, 13 Oct 2006 11:34:26 -0600
+Message-ID: <20061013173426.GB5583@cosmic.amd.com>
 References: <LYRIS-7332-87686-2006.10.04-02.52.47--mfrey#pepper.com@whitestar.amd.com>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+ <9CF4A66D-5A4B-455D-BA9C-CC62377AB4C4@pepper.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: "Jordan Crouse" <jordan.crouse@amd.com>,
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
 	"Andrew Morton" <akpm@osdl.org>,
 	"Evgeniy Polyakov" <johnpol@2ka.mipt.ru>,
 	linux-crypto@vger.kernel.org, info-linux@ldcmail.amd.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from chile.pepper.com ([65.219.252.51]:32676 "EHLO chile.pepper.com")
-	by vger.kernel.org with ESMTP id S1751408AbWJMRUW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Oct 2006 13:20:22 -0400
-In-Reply-To: <LYRIS-7332-87686-2006.10.04-02.52.47--mfrey#pepper.com@whitestar.amd.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Received: from outbound-red.frontbridge.com ([216.148.222.49]:52477 "EHLO
+	outbound1-red-R.bigfish.com") by vger.kernel.org with ESMTP
+	id S1751317AbWJMRcj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Oct 2006 13:32:39 -0400
+To: "Michael Frey" <mfrey@pepper.com>
+In-Reply-To: <9CF4A66D-5A4B-455D-BA9C-CC62377AB4C4@pepper.com>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Does this patch support the eeprom on the AES module?
+On 13/10/06 13:18 -0400, Michael Frey wrote:
+> Does this patch support the eeprom on the AES module?
 
-Also,  Can this patch be used on a 2.6.18 kernel?
+No - not yet.  I wasn't happy with way we did that driver in the first 
+place (heaven help me, I make stupid programming decisions sometimes),
+and I also wanted to get the crypto engine itself in first.
 
-Thanks,
-Michael
+The eeprom will be coming soon - but probably not to this crowd, since
+it will (for now) just be a generic device providing a bit of storage
+on chip.  If there is a generic way for dealing with hardware keys in
+the crypto subsystem, then we can tie it together later.
 
-On Oct 4, 2006, at 4:52 AM, Herbert Xu wrote:
+> Also,  Can this patch be used on a 2.6.18 kernel?
 
-> On Thu, Sep 28, 2006 at 11:17:39PM +0000, Jordan Crouse wrote:
->>
->> Changes made and new version follows. Thanks for the comments.
->
-> Patch applied.  Thanks everybody.
->
-> Cheers,
-> -- 
-> Visit Openswan at http://www.openswan.org/
-> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
->
->
-> ---
-> You are currently subscribed to info-linux@geode.amd.com
-> as: mfrey@pepper.com
-> To unsubscribe send a blank email to:
-> leave-info-linux-7332K@whitestar.amd.com
->
+Hmmm... I use the new API - is that legal for 2.6.18?
+
+Jordan
+
+-- 
+Jordan Crouse
+Senior Linux Engineer
+Advanced Micro Devices, Inc.
+<www.amd.com/embeddedprocessors>
+
 
