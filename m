@@ -1,75 +1,115 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [CRYPTO] api: Select cryptomgr where needed
-Date: Mon, 16 Oct 2006 21:30:20 +1000
-Message-ID: <20061016113020.GA19771@gondor.apana.org.au>
+From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Subject: [PATCH 0/6] Changeset of Camellia cipher algorithm.
+Date: Wed, 18 Oct 2006 16:15:10 +0900 (JST)
+Message-ID: <20061018.161510.796986352.takamiya@po.ntts.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: James Morris <jmorris@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:56581 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1751197AbWJPLaa
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Oct 2006 07:30:30 -0400
-To: Andi Kleen <ak@suse.de>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: netdev@vger.kernel.org, takamiya@po.ntts.co.jp
+Return-path: <netdev-owner@vger.kernel.org>
+To: linux-crypto@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Andi:
+Hi,
 
-I'll send this patch to Linus which should prevent the problem
-that you were seeing.  James, this is probably what caused the
-racoon problems for you too.
+  This set of the patches enables to use of the Camellia cipher
+  algorithm for the ESP encryption.
 
-[CRYPTO] api: Select cryptomgr where needed
+  Git tree is also available on camellia20061017 branch at:
+  git://git.skbuff.net/gitroot/takamiya/camellia20061017
 
-Since cryptomgr is the only way to construct algorithm instances
-for now it makes sense to let the templates depend on it as
-otherwise it may be left off inadvertently.
+  The following patches are available for the top of davem's net-2.6
+  and herbert's cryptodev-2.6 trees.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+  Thank you.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+HEADLINES
+---------
+
+[PATCH 1/6] [CRYPTO] added Kconfig entry for Camellia.
+[PATCH 2/6] [CRYPTO] added the code of Camellia cipher algorithm.
+[PATCH 3/6] [CRYPTO] added the testing code of Camellia cipher algorithm.
+[PATCH 4/6] [IPSEC] added the definition of Camellia cipher algorithm.
+[PATCH 5/6] [IPSEC] added the entry of Camellia cipher algorithm to ealg_list[].
+[PATCH 6/6] [CRYPTO] added the developer of Camellia cipher algorithm.
+
+DIFFSTAT
+--------
+
+ Documentation/crypto/api-intro.txt |    5 
+ crypto/Kconfig                     |   15 
+ crypto/Makefile                    |    1 
+ crypto/camellia.c                  | 1802 ++++++++++++++++++++++++++++++++++++-
+ crypto/tcrypt.c                    |   43 
+ crypto/tcrypt.h                    |  166 +++
+ include/linux/pfkeyv2.h            |    2 
+ net/xfrm/xfrm_algo.c               |   18 
+ 8 files changed, 2045 insertions(+), 7 deletions(-)
+
+CHANGESETS
+----------
+
+commit 80a5df8127311212e99bd64103771de19c5908dd
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:51:40 2006 +0900
+
+    [CRYPTO] added the developer of Camellia cipher algorithm.
+    
+    This patch adds the developer of Camellia cipher algorithm.
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
+commit 2253254f5a802c1cc8a5fc367fae911172f28846
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:47:32 2006 +0900
+
+    [IPSEC] added the entry of Camellia cipher algorithm to ealg_list[].
+    
+    This patch adds the entry of Camellia cipher algorithm to ealg_list[].
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
+commit 1b6712cdb8fd31482d7e7da56e5f602357ec4aa4
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:45:24 2006 +0900
+
+    [IPSEC] added the definition of Camellia cipher algorithm.
+    
+    This patch adds the definitions used by pfkeyv2 interface for Camellia cipher
+    algorithm.
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
+commit e86050d8fbd04b1ace9c121ce90799c8210925be
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:43:14 2006 +0900
+
+    [CRYPTO] added the testing code of Camellia cipher algorithm.
+    
+    This patch adds the code of Camellia code for testing module.
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
+commit db41e54cb7081b4cd034378f17b8f8225586e2e2
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:34:15 2006 +0900
+
+    [CRYPTO] added the code of Camellia cipher algorithm.
+    
+    This patch adds the main code of Camellia cipher algorithm.
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
+commit 01b0c3898fdf1cb4da8cdf5577e58328ecb11e4e
+Author: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Date:   Tue Oct 17 01:31:35 2006 +0900
+
+    [CRYPTO] added Kconfig entry for Camellia.
+    
+    This patch adds the Kconfig entry for Camellia.
+    
+    Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+
 --
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1e2f39c..cbae839 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -27,7 +27,6 @@ config CRYPTO_HASH
- config CRYPTO_MANAGER
- 	tristate "Cryptographic algorithm manager"
- 	select CRYPTO_ALGAPI
--	default m
- 	help
- 	  Create default cryptographic template instantiations such as
- 	  cbc(aes).
-@@ -35,6 +34,7 @@ config CRYPTO_MANAGER
- config CRYPTO_HMAC
- 	tristate "HMAC support"
- 	select CRYPTO_HASH
-+	select CRYPTO_MANAGER
- 	help
- 	  HMAC: Keyed-Hashing for Message Authentication (RFC2104).
- 	  This is required for IPSec.
-@@ -131,6 +131,7 @@ config CRYPTO_TGR192
- config CRYPTO_ECB
- 	tristate "ECB support"
- 	select CRYPTO_BLKCIPHER
-+	select CRYPTO_MANAGER
- 	default m
- 	help
- 	  ECB: Electronic CodeBook mode
-@@ -140,6 +141,7 @@ config CRYPTO_ECB
- config CRYPTO_CBC
- 	tristate "CBC support"
- 	select CRYPTO_BLKCIPHER
-+	select CRYPTO_MANAGER
- 	default m
- 	help
- 	  CBC: Cipher Block Chaining mode
+Noriaki TAKAMIYA
