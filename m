@@ -1,46 +1,66 @@
-From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
-Subject: [PATCH 4/6] [IPSEC] added the definition of Camellia cipher
- algorithm.
-Date: Wed, 18 Oct 2006 16:17:28 +0900 (JST)
-Message-ID: <20061018.161728.179962417.takamiya@po.ntts.co.jp>
-References: <20061018.161510.796986352.takamiya@po.ntts.co.jp>
+From: Andreas Jellinghaus <aj@ciphirelabs.com>
+Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
+Date: Thu, 19 Oct 2006 17:04:19 +0200
+Message-ID: <453793F3.1080207@ciphirelabs.com>
+References: <20060928120826.GA18063@2ka.mipt.ru> <451BCCDF.5000201@ciphirelabs.com> <20060929094809.GA31117@2ka.mipt.ru>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=KOI8-R; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, takamiya@po.ntts.co.jp
+Cc: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail2.ics.ntts.co.jp ([202.32.24.42]:54683 "EHLO
-	mail2.ics.ntts.co.jp") by vger.kernel.org with ESMTP
-	id S1751033AbWJRHUt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Oct 2006 03:20:49 -0400
-To: linux-crypto@vger.kernel.org
-In-Reply-To: <20061018.161510.796986352.takamiya@po.ntts.co.jp>
+Received: from mx1.ciphirelabs.net ([217.72.114.64]:50562 "EHLO
+	mx1.ciphirelabs.net") by vger.kernel.org with ESMTP
+	id S1161437AbWJSPEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 Oct 2006 11:04:33 -0400
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+In-Reply-To: <20060929094809.GA31117@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi,
 
-This patch adds the definitions used by pfkeyv2 interface for Camellia
-cipher algorithm.
+I finally got around testing 2.6.18.1 + acrypto.
+but it "does not work" - I usualy boot, enter my
+passphrases for rsa key / openssl decrypts some random
+bytes with them, and a hex version of those random bytes
+is used with dm-setup to initialize a dm-crypt mapping
+which again is used for mounting root and swap (or
+resume in case it has a suspend image on them).
 
-Signed-off-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+but with the acrypto patched kernel the system freezes
+without any response. the script in the initramfs is not
+"set +x" so I'm not sure which command causes the freeze,
+so I guess it is either the dm-setup, the resume trigger
+(echo to a file in /sys/) or the mount for root or the
+swapon.
 
----
+> As I answered in your first e-mail, yes, you just need to patch 2.6.18
+> tree and load one of the crypto provider.
 
- include/linux/pfkeyv2.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+what exactly would be "load one of the crypto providers"?
++# Asynchronous crypto layer
++#
++CONFIG_ACRYPTO=y
++CONFIG_ASYNC_PROVIDER=y
++# CONFIG_CONSUMER is not set
++# CONFIG_ASYNC2OCF_BRIDGE is not set
++
++#
+this change to .config should be enough
+(ok, 2.6.18.1 also enabled CONFIG_CONNECTOR and CONFIG_PROC_EVENTS).
 
-1b6712cdb8fd31482d7e7da56e5f602357ec4aa4
-diff --git a/include/linux/pfkeyv2.h b/include/linux/pfkeyv2.h
-index d5dd471..b16e474 100644
---- a/include/linux/pfkeyv2.h
-+++ b/include/linux/pfkeyv2.h
-@@ -296,6 +296,7 @@ #define SADB_X_EALG_CASTCBC		6
- #define SADB_X_EALG_BLOWFISHCBC		7
- #define SADB_EALG_NULL			11
- #define SADB_X_EALG_AESCBC		12
-+#define SADB_X_EALG_CAMELLIACBC		22
- #define SADB_EALG_MAX                   253 /* last EALG */
- /* private allocations should use 249-255 (RFC2407) */
- #define SADB_X_EALG_SERPENTCBC  252     /* draft-ietf-ipsec-ciph-aes-cbc-00 */
--- 
-Noriaki TAKAMIYA
+I documented the setup of my laptop with encryption here:
+https://help.ubuntu.com/community/EncryptedFilesystemHowto4
+
+and I can post kernel config etc. if it helps. there was no
+kernel message when the machine froze (or more like waiting
+for something forever - ctrl-alt-del still worked fine).
+
+note: kernel 2.6.18 was working fine, I didn't try 2.6.18.1
+without acrypto changes, but I guess that isn't the issues.
+still if you think otherwise, I can give it a try. if there
+is some boot option to disable acrypto so dm-crypt will work
+as if compiled without acrypto, I would try that too.
+is there such an option?
+
+Thanks, Andreas
