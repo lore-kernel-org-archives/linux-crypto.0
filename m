@@ -1,51 +1,26 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [ACRYPTO] New asynchronous crypto layer (acrypto) release.
-Date: Sat, 21 Oct 2006 10:59:37 +0400
-Message-ID: <20061021065937.GA12921@2ka.mipt.ru>
-References: <20060928120826.GA18063@2ka.mipt.ru> <451BCCDF.5000201@ciphirelabs.com> <20060929094809.GA31117@2ka.mipt.ru> <453793F3.1080207@ciphirelabs.com> <20061020063111.GA26283@2ka.mipt.ru> <4538D070.80203@ciphirelabs.com>
+From: "Yana" <allenjw@btinternet.com>
+Subject: Re[2]: i'll be seeing u
+Date: Sat, 21 Oct 2006 16:01:31 +0300
+Message-ID: <004c01c6f510$eb252600$6a1b000a__40000.1604146839$1161438060$gmane$org@200-161-164-105.dsl.telesp.net.br>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain;
+	charset="windows-1251"
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:56981 "EHLO 2ka.mipt.ru")
-	by vger.kernel.org with ESMTP id S2992789AbWJUG7i (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 Oct 2006 02:59:38 -0400
-To: Andreas Jellinghaus <aj@ciphirelabs.com>
-Content-Disposition: inline
-In-Reply-To: <4538D070.80203@ciphirelabs.com>
+Received: from 190-48-234-102.speedy.com.ar ([190.48.234.102]:48396 "EHLO
+	190-48-234-102.speedy.com.ar") by vger.kernel.org with ESMTP
+	id S2993037AbWJUNkS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 21 Oct 2006 09:40:18 -0400
+To: "Niklas" <linux-arch@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 20, 2006 at 03:34:40PM +0200, Andreas Jellinghaus (aj@ciphirelabs.com) wrote:
-> >Btw, async provider only supports AES-128 in CBC mode, so if you try
-> >different ciphers, there can be some problems.
-> 
-> my code does
-> 
-> SECTORS=`blockdev --getsize /dev/hda3`
-> 
-> echo 0 $SECTORS crypt aes-cbc-essiv:sha256 $ROOTKEY 0 /dev/hda3 0 \
->         |dmsetup create root
-> 
-> so this is not compatible with acrypto I guess :(
-> any special reason why acrypto is limited this way?
+Hi, Niklas
 
-I'm lazy and I did not implemented async provider so it would request
-other ciphers. It is not limitation of acrypto, but instead of software
-async_provider, which should be extended to support any kind of ciphers,
-instead of precompiled one.
+I am a lovely and lonely Lady who is looking for the man who will make me happy and whom I want to feel like in paradise with!
+If you want to be my beautiful Hero who will save me from this loneliness find me 
+http://www.findsomelove.com/myhoney
+and wake me up with a warm kiss.
 
-> guess that limitation needs to go away before it can be added to
-> the linux kernel, or some workaround so dm-crypt will fall back on
-> not using acrypto or something like that in order to not brake existing
-> and working installations.
-
-Well, I guess async_provider itself should go away, instead I will
-change synchronous cryptoapi code to register itself as acrypto device
-when new tfm is created.
-
-> Thanks, Andreas
-
--- 
-	Evgeniy Polyakov
+goodbye
+Yanaa
