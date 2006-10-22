@@ -1,26 +1,34 @@
-From: "Yana" <allenjw@btinternet.com>
-Subject: Re[2]: i'll be seeing u
-Date: Sat, 21 Oct 2006 16:01:31 +0300
-Message-ID: <004c01c6f510$eb252600$6a1b000a__40000.1604146839$1161438060$gmane$org@200-161-164-105.dsl.telesp.net.br>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/6] Changeset of Camellia cipher algorithm.
+Date: Sun, 22 Oct 2006 15:07:47 +1000
+Message-ID: <20061022050747.GA28796@gondor.apana.org.au>
+References: <20061018.161510.796986352.takamiya@po.ntts.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="windows-1251"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 190-48-234-102.speedy.com.ar ([190.48.234.102]:48396 "EHLO
-	190-48-234-102.speedy.com.ar") by vger.kernel.org with ESMTP
-	id S2993037AbWJUNkS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 Oct 2006 09:40:18 -0400
-To: "Niklas" <linux-arch@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:10506 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1422991AbWJVFIB
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 22 Oct 2006 01:08:01 -0400
+To: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Content-Disposition: inline
+In-Reply-To: <20061018.161510.796986352.takamiya@po.ntts.co.jp>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi, Niklas
+On Wed, Oct 18, 2006 at 07:15:10AM +0000, Noriaki TAKAMIYA wrote:
+> 
+> [PATCH 1/6] [CRYPTO] added Kconfig entry for Camellia.
+> [PATCH 2/6] [CRYPTO] added the code of Camellia cipher algorithm.
+> [PATCH 3/6] [CRYPTO] added the testing code of Camellia cipher algorithm.
+> [PATCH 4/6] [IPSEC] added the definition of Camellia cipher algorithm.
+> [PATCH 5/6] [IPSEC] added the entry of Camellia cipher algorithm to ealg_list[].
+> [PATCH 6/6] [CRYPTO] added the developer of Camellia cipher algorithm.
 
-I am a lovely and lonely Lady who is looking for the man who will make me happy and whom I want to feel like in paradise with!
-If you want to be my beautiful Hero who will save me from this loneliness find me 
-http://www.findsomelove.com/myhoney
-and wake me up with a warm kiss.
-
-goodbye
-Yanaa
+I've applied all the patches to cryptodev-2.6.  Thanks!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
