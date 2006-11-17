@@ -1,43 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto/des.c cleanups for review
-Date: Fri, 17 Nov 2006 16:20:23 +1100
-Message-ID: <20061117052023.GB18592@gondor.apana.org.au>
-References: <20061116070516.31107.qmail@science.horizon.com>
+From: "Valiusha" <james@mwhpc.com>
+Subject: Re[3]:Let's learn each other!
+Date: Fri, 17 Nov 2006 14:40:47 +0200
+Message-ID: <002801c70a45$914b4980$c118000a@196.207.195.120>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:29956 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1162116AbWKQFUb
+Received: from [196.207.195.120] ([196.207.195.120]:19219 "EHLO
+	196.207.195.120") by vger.kernel.org with ESMTP id S933562AbWKQMj7
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Nov 2006 00:20:31 -0500
-To: linux@horizon.com
-Content-Disposition: inline
-In-Reply-To: <20061116070516.31107.qmail@science.horizon.com>
+	Fri, 17 Nov 2006 07:39:59 -0500
+To: "linux-assembly" <linux-assembly@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 16, 2006 at 02:05:16AM -0500, linux@horizon.com wrote:
-> I sent this to <da@osvik.no> on Nov. 1, but have received no response.
-> Is anyone interested?  The changes are all mixed up together, but I can
-> break them apart into a patch series if desired.
+I greet you!
 
-Yes breaking them into more related chunks would be good (although
-it is also good to not go overboard with too many one-liners :)
- 
-> (All placed in the public domain if you want to use them.)
+I am just a little girl in this big big world. I desire love and I try to find it.
+Do you want to learn more a pretty foreign lady who has intensions to create a happy family? If yes, you can find me here 
+http://greatfeelingoflove.com/flirtwithlove
 
-I'm sorry but I'm going to need a sign-off here (as per
-Documentation/SubmittingPatches).
+Warm hugs!
 
-> -	memcpy(dctx->expkey, tmp, sizeof(dctx->expkey));
-> +	memcpy(dctx->expkey, tmp, sizeof dctx->expkey);
-
-Please keep the brackets as that is the predominant kernel style.
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Valiusha
