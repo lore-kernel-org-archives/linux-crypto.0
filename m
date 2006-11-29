@@ -1,30 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv2 4/6] crypto: table driven multiplications in GF(2^128), needed by LRW (and in the future ABL)
-Date: Wed, 29 Nov 2006 09:24:59 +1100
-Message-ID: <20061128222459.GA16354@gondor.apana.org.au>
-References: <20061128200232.GA401@cube.dyndns.org> <E1GpAGq-00041C-00@gondolin.me.apana.org.au> <20061128211739.GA22569@cube.dyndns.org>
+Subject: Re: LRW... v2
+Date: Wed, 29 Nov 2006 19:04:06 +1100
+Message-ID: <20061129080406.GA21322@gondor.apana.org.au>
+References: <20060901103707.GA17110@gondor.apana.org.au> <11571588272948-git-send-email-rsnel@cube.dyndns.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46341 "EHLO
-	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1757802AbWK1WZC
+Received: from rhun.apana.org.au ([64.62.148.172]:8979 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S966206AbWK2IEO
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Nov 2006 17:25:02 -0500
+	Wed, 29 Nov 2006 03:04:14 -0500
 To: rsnel@cube.dyndns.org
 Content-Disposition: inline
-In-Reply-To: <20061128211739.GA22569@cube.dyndns.org>
+In-Reply-To: <11571588272948-git-send-email-rsnel@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 28, 2006 at 10:17:39PM +0100, rsnel@cube.dyndns.org wrote:
+On Sat, Sep 02, 2006 at 03:00:21AM +0200, rsnel@cube.dyndns.org wrote:
 > 
-> Did you try my patch: [PATCH] adding speed_test_template for lrw(aes)
-> which I sent on Sep 23?
+> Here is the updated version of my LRW patch set.
 
-Aha, that got buried in my mailbox.  I'll push it out soon.
+All patches merged and pushed into cryptodev-2.6.
 
-Cheers,
+Thanks again!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
