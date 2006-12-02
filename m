@@ -1,41 +1,103 @@
-From: Bodo Eggert <7eggert@gmx.de>
-Subject: Re: [RFC][PATCH] Pseudo-random number generator
-Date: Fri, 01 Dec 2006 18:33:01 +0100
-Message-ID: <E1GqCFx-0006X8-IO@be1.lrz>
-References: <7ngD0-8fX-11@gated-at.bofh.it> <7ngMA-8D-39@gated-at.bofh.it> <7niv3-4sQ-21@gated-at.bofh.it> <7niEE-4Mk-5@gated-at.bofh.it>
-Reply-To: 7eggert@gmx.de
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 2.6.20
+Date: Sat, 2 Dec 2006 14:59:58 +1100
+Message-ID: <20061202035958.GA26690@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.171]:42981 "EHLO
-	moutng.kundenserver.de") by vger.kernel.org with ESMTP
-	id S1031660AbWLARdL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Dec 2006 12:33:11 -0500
-To: Alan <alan@lxorguk.ukuu.org.uk>,
-	Jan Glauber <jan.glauber@de.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
+Received: from rhun.apana.org.au ([64.62.148.172]:2575 "EHLO
+	arnor.apana.org.au") by vger.kernel.org with ESMTP id S1162441AbWLBEAS
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 Dec 2006 23:00:18 -0500
+To: Linus Torvalds <torvalds@osdl.org>, Andrew Morton <akpm@osdl.org>,
+	"David S. Miller" <davem@davemloft.net>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Alan <alan@lxorguk.ukuu.org.uk> wrote:
-> On Fri, 01 Dec 2006 16:20:46 +0100
-> Jan Glauber <jan.glauber@de.ibm.com> wrote:
+Hi Linus:
 
->> Yes, a user can just symlink urandom to prandom and will have a fast=
-er
->> generator.
->=20
->=20
-> More usefully they can use it as an entropy source with an entropy
-> daemon to feed it into the standard urandom/random.
+This is an update of the crypto tree for 2.6.20.  It contains
+three new algorithms and one new hardware acceleration.  The
+new algorithms are Camellia (an alternative encryption algorithm
+to AES), XCBC-MAC (a MAC authentication based on encryption
+algorithms), and LRW (a chain method for block encryption).  The
+new AES acceleration is for the Geode LX.
 
-Only if other users will randomly drain /dev/prandom, otherwise you mig=
-ht
-as well use /dev/zero.
---=20
-Ich danke GMX daf=FCr, die Verwendung meiner Adressen mittels per SPF
-verbreiteten L=FCgen zu sabotieren.
+Please pull from
 
-http://david.woodhou.se/why-not-spf.html
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+It contains the following changes:
+
+Adrian Bunk:
+      [CRYPTO] xcbc: Make needlessly global code static
+      [CRYPTO] geode: Make needlessly global geode_aes_crypt() static
+      [CRYPTO] api: Remove unused functions
+
+Herbert Xu:
+      [BLOCK] dm-crypt: Align IV to u64 for essiv
+      [CRYPTO] camellia: Get setkey to use new calling convention
+      [CRYPTO] cryptoloop: Select CRYPTO_CBC
+
+Jordan Crouse:
+      crypto:  Add support for the Geode LX AES hardware
+
+Kazunori MIYAZAWA:
+      [CRYPTO] xcbc: New algorithm
+      [CRYPTO] tcrypt: Add test vectors of AES_XCBC
+      [IPSEC]: Add support for AES-XCBC-MAC
+
+Noriaki TAKAMIYA:
+      [CRYPTO] camellia: Add Kconfig entry.
+      [CRYPTO] camellia: added the code of Camellia cipher algorithm.
+      [CRYPTO] camellia: added the testing code of Camellia cipher
+      [IPSEC]: added the definition of Camellia cipher
+      [IPSEC]: added the entry of Camellia cipher algorithm to ealg_list[]
+      [CRYPTO] doc: added the developer of Camellia cipher
+
+Rik Snel:
+      [BLOCK] dm-crypt: benbi IV, big endian narrow block count for LRW-32-AES
+      [CRYPTO] lib: some common 128-bit block operations, nicely centralized
+      [CRYPTO] lib: table driven multiplications in GF(2^128)
+      [CRYPTO] lrw: Liskov Rivest Wagner, a tweakable narrow block cipher mode
+      [CRYPTO] tcrypt: LRW test vectors
+
+
+ Documentation/crypto/api-intro.txt |    4 
+ crypto/Kconfig                     |   49 +
+ crypto/Makefile                    |    4 
+ crypto/api.c                       |   15 
+ crypto/camellia.c                  | 1801 +++++++++++++++++++++++++++++++++++++
+ crypto/digest.c                    |   48 
+ crypto/gf128mul.c                  |  466 +++++++++
+ crypto/lrw.c                       |  301 ++++++
+ crypto/tcrypt.c                    |   58 +
+ crypto/tcrypt.h                    |  767 +++++++++++++++
+ crypto/xcbc.c                      |  348 +++++++
+ drivers/block/Kconfig              |    1 
+ drivers/crypto/Kconfig             |   13 
+ drivers/crypto/Makefile            |    1 
+ drivers/crypto/geode-aes.c         |  474 +++++++++
+ drivers/crypto/geode-aes.h         |   40 
+ drivers/md/dm-crypt.c              |   53 +
+ include/crypto/b128ops.h           |   80 +
+ include/crypto/gf128mul.h          |  198 ++++
+ include/linux/crypto.h             |   22 
+ include/linux/pfkeyv2.h            |    2 
+ net/xfrm/xfrm_algo.c               |   34 
+ 22 files changed, 4687 insertions(+), 92 deletions(-)
+ 
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
