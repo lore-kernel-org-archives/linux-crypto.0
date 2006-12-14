@@ -1,48 +1,420 @@
-From: Jan Glauber <jan.glauber@de.ibm.com>
-Subject: Re: [RFC][PATCH] Pseudo-random number generator
-Date: Fri, 08 Dec 2006 12:42:15 +0100
-Message-ID: <1165578135.5343.15.camel@bender>
-References: <1164979155.5882.23.camel@bender>
-	 <200612071606.33951.arnd@arndb.de> <1165504796.5607.17.camel@bender>
-	 <200612071943.14153.arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 1/2] Add PCBC crypto template support
+Date: Thu, 14 Dec 2006 12:55:59 +0000
+Message-ID: <20061214125559.14810.34458.stgit__19833.0846069895$1166140679$gmane$org@warthog.cambridge.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=fixed
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@nl.linux.org, dhowells@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mtagate3.de.ibm.com ([195.212.29.152]:2646 "EHLO
-	mtagate3.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1425412AbWLHLnD (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:3555 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752030AbWLNX5r (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Dec 2006 06:43:03 -0500
-To: Arnd Bergmann <arnd@arndb.de>
-In-Reply-To: <200612071943.14153.arnd@arndb.de>
+	Thu, 14 Dec 2006 18:57:47 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1Guzs5-00041J-Jf
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2006 10:20:13 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1Guzs4-0001zw-00
+	for <linux-crypto@vger.kernel.org>; Fri, 15 Dec 2006 10:20:12 +1100
+To: herbert.xu@redhat.com
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 2006-12-07 at 19:43 +0100, Arnd Bergmann wrote:
-> On Thursday 07 December 2006 16:19, Jan Glauber wrote:
-> > Hm, why is /dev/urandom implemented in the kernel?
-> > 
-> > It could be done completely in user-space (like libica already does)
-> > but I think having a device node where you can read from is the simplest
-> > implementation. Also, if we can solve the security flaw we could use it
-> > as replacement for /dev/urandom.
-> 
-> urandom is more useful, because can't be implemented in user space at
-> all. /dev/urandom will use the real randomness from the kernel as a seed
-> without depleting the entropy pool. How does your /dev/prandom device
-> compare to /dev/urandom performance-wise? If it can be made to use
-> the same input data and it turns out to be significantly faster, I can
-> see some use for it.
+Add PCBC crypto template support as used by RxRPC.
 
-The performance of the PRNG without constantly adding entropy is up tp
-factor 40 faster than /dev/urandom ;- , depending on the block size of
-the read.
+Signed-Off-By: David Howells <dhowells@redhat.com>
+---
 
-With the current patch it performs not so well because of the STCKE loop
-before every KMC. I think about removing them and changing the
-periodically seed to use get_random_bytes instead.
+ crypto/Kconfig  |    9 +
+ crypto/Makefile |    1 
+ crypto/pcbc.c   |  348 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 358 insertions(+), 0 deletions(-)
 
-Jan
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 92ba249..9d3a44c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -168,6 +168,15 @@ config CRYPTO_CBC
+ 	  CBC: Cipher Block Chaining mode
+ 	  This block cipher algorithm is required for IPSec.
+ 
++config CRYPTO_PCBC
++	tristate "PCBC support"
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_MANAGER
++	default m
++	help
++	  PCBC: Propagating Cipher Block Chaining mode
++	  This block cipher algorithm is required for RxRPC.
++
+ config CRYPTO_LRW
+ 	tristate "LRW support (EXPERIMENTAL)"
+ 	depends on EXPERIMENTAL
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 60e3d24..9ef048d 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -27,6 +27,7 @@ obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
+ obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
+ obj-$(CONFIG_CRYPTO_ECB) += ecb.o
+ obj-$(CONFIG_CRYPTO_CBC) += cbc.o
++obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_DES) += des.o
+ obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish.o
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+new file mode 100644
+index 0000000..0ffb46e
+--- /dev/null
++++ b/crypto/pcbc.c
+@@ -0,0 +1,348 @@
++/*
++ * PCBC: Propagating Cipher Block Chaining mode
++ *
++ * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * Derived from cbc.c
++ * - Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#include <crypto/algapi.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++
++struct crypto_pcbc_ctx {
++	struct crypto_cipher *child;
++	void (*xor)(u8 *dst, const u8 *src, unsigned int bs);
++};
++
++static int crypto_pcbc_setkey(struct crypto_tfm *parent, const u8 *key,
++			      unsigned int keylen)
++{
++	struct crypto_pcbc_ctx *ctx = crypto_tfm_ctx(parent);
++	struct crypto_cipher *child = ctx->child;
++	int err;
++
++	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_cipher_set_flags(child, crypto_tfm_get_flags(parent) &
++				CRYPTO_TFM_REQ_MASK);
++	err = crypto_cipher_setkey(child, key, keylen);
++	crypto_tfm_set_flags(parent, crypto_cipher_get_flags(child) &
++			     CRYPTO_TFM_RES_MASK);
++	return err;
++}
++
++static int crypto_pcbc_encrypt_segment(struct blkcipher_desc *desc,
++				       struct blkcipher_walk *walk,
++				       struct crypto_cipher *tfm,
++				       void (*xor)(u8 *, const u8 *,
++						   unsigned int))
++{
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(tfm)->cia_encrypt;
++	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	u8 *iv = walk->iv;
++
++	do {
++		xor(iv, src, bsize);
++		fn(crypto_cipher_tfm(tfm), dst, iv);
++		memcpy(iv, dst, bsize);
++		xor(iv, src, bsize);
++
++		src += bsize;
++		dst += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	return nbytes;
++}
++
++static int crypto_pcbc_encrypt_inplace(struct blkcipher_desc *desc,
++				       struct blkcipher_walk *walk,
++				       struct crypto_cipher *tfm,
++				       void (*xor)(u8 *, const u8 *,
++						   unsigned int))
++{
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(tfm)->cia_encrypt;
++	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *iv = walk->iv;
++	u8 tmpbuf[bsize];
++
++	do {
++		memcpy(tmpbuf, src, bsize);
++		xor(iv, tmpbuf, bsize);
++		fn(crypto_cipher_tfm(tfm), src, iv);
++		memcpy(iv, src, bsize);
++		xor(iv, tmpbuf, bsize);
++
++		src += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	memcpy(walk->iv, iv, bsize);
++
++	return nbytes;
++}
++
++static int crypto_pcbc_encrypt(struct blkcipher_desc *desc,
++			       struct scatterlist *dst, struct scatterlist *src,
++			       unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	struct crypto_blkcipher *tfm = desc->tfm;
++	struct crypto_pcbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
++	struct crypto_cipher *child = ctx->child;
++	void (*xor)(u8 *, const u8 *, unsigned int bs) = ctx->xor;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		if (walk.src.virt.addr == walk.dst.virt.addr)
++			nbytes = crypto_pcbc_encrypt_inplace(desc, &walk, child,
++							     xor);
++		else
++			nbytes = crypto_pcbc_encrypt_segment(desc, &walk, child,
++							     xor);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	return err;
++}
++
++static int crypto_pcbc_decrypt_segment(struct blkcipher_desc *desc,
++				       struct blkcipher_walk *walk,
++				       struct crypto_cipher *tfm,
++				       void (*xor)(u8 *, const u8 *,
++						   unsigned int))
++{
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(tfm)->cia_decrypt;
++	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	u8 *iv = walk->iv;
++
++	do {
++		fn(crypto_cipher_tfm(tfm), dst, src);
++		xor(dst, iv, bsize);
++		memcpy(iv, src, bsize);
++		xor(iv, dst, bsize);
++
++		src += bsize;
++		dst += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	memcpy(walk->iv, iv, bsize);
++
++	return nbytes;
++}
++
++static int crypto_pcbc_decrypt_inplace(struct blkcipher_desc *desc,
++				       struct blkcipher_walk *walk,
++				       struct crypto_cipher *tfm,
++				       void (*xor)(u8 *, const u8 *,
++						   unsigned int))
++{
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(tfm)->cia_decrypt;
++	int bsize = crypto_cipher_blocksize(tfm);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *iv = walk->iv;
++	u8 tmpbuf[bsize];
++
++	do {
++		memcpy(tmpbuf, src, bsize);
++		fn(crypto_cipher_tfm(tfm), src, src);
++		xor(src, iv, bsize);
++		memcpy(iv, tmpbuf, bsize);
++		xor(iv, src, bsize);
++
++		src += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	memcpy(walk->iv, iv, bsize);
++
++	return nbytes;
++}
++
++static int crypto_pcbc_decrypt(struct blkcipher_desc *desc,
++			       struct scatterlist *dst, struct scatterlist *src,
++			       unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	struct crypto_blkcipher *tfm = desc->tfm;
++	struct crypto_pcbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
++	struct crypto_cipher *child = ctx->child;
++	void (*xor)(u8 *, const u8 *, unsigned int bs) = ctx->xor;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		if (walk.src.virt.addr == walk.dst.virt.addr)
++			nbytes = crypto_pcbc_decrypt_inplace(desc, &walk, child,
++							     xor);
++		else
++			nbytes = crypto_pcbc_decrypt_segment(desc, &walk, child,
++							     xor);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	return err;
++}
++
++static void xor_byte(u8 *a, const u8 *b, unsigned int bs)
++{
++	do {
++		*a++ ^= *b++;
++	} while (--bs);
++}
++
++static void xor_quad(u8 *dst, const u8 *src, unsigned int bs)
++{
++	u32 *a = (u32 *)dst;
++	u32 *b = (u32 *)src;
++
++	do {
++		*a++ ^= *b++;
++	} while ((bs -= 4));
++}
++
++static void xor_64(u8 *a, const u8 *b, unsigned int bs)
++{
++	((u32 *)a)[0] ^= ((u32 *)b)[0];
++	((u32 *)a)[1] ^= ((u32 *)b)[1];
++}
++
++static void xor_128(u8 *a, const u8 *b, unsigned int bs)
++{
++	((u32 *)a)[0] ^= ((u32 *)b)[0];
++	((u32 *)a)[1] ^= ((u32 *)b)[1];
++	((u32 *)a)[2] ^= ((u32 *)b)[2];
++	((u32 *)a)[3] ^= ((u32 *)b)[3];
++}
++
++static int crypto_pcbc_init_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_instance *inst = (void *)tfm->__crt_alg;
++	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
++	struct crypto_pcbc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	switch (crypto_tfm_alg_blocksize(tfm)) {
++	case 8:
++		ctx->xor = xor_64;
++		break;
++
++	case 16:
++		ctx->xor = xor_128;
++		break;
++
++	default:
++		if (crypto_tfm_alg_blocksize(tfm) % 4)
++			ctx->xor = xor_byte;
++		else
++			ctx->xor = xor_quad;
++	}
++
++	tfm = crypto_spawn_tfm(spawn);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	ctx->child = crypto_cipher_cast(tfm);
++	return 0;
++}
++
++static void crypto_pcbc_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_pcbc_ctx *ctx = crypto_tfm_ctx(tfm);
++	crypto_free_cipher(ctx->child);
++}
++
++static struct crypto_instance *crypto_pcbc_alloc(void *param, unsigned int len)
++{
++	struct crypto_instance *inst;
++	struct crypto_alg *alg;
++
++	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
++				  CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
++	if (IS_ERR(alg))
++		return ERR_PTR(PTR_ERR(alg));
++
++	inst = crypto_alloc_instance("pcbc", alg);
++	if (IS_ERR(inst))
++		goto out_put_alg;
++
++	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
++	inst->alg.cra_priority = alg->cra_priority;
++	inst->alg.cra_blocksize = alg->cra_blocksize;
++	inst->alg.cra_alignmask = alg->cra_alignmask;
++	inst->alg.cra_type = &crypto_blkcipher_type;
++
++	if (!(alg->cra_blocksize % 4))
++		inst->alg.cra_alignmask |= 3;
++	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
++	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
++	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
++
++	inst->alg.cra_ctxsize = sizeof(struct crypto_pcbc_ctx);
++
++	inst->alg.cra_init = crypto_pcbc_init_tfm;
++	inst->alg.cra_exit = crypto_pcbc_exit_tfm;
++
++	inst->alg.cra_blkcipher.setkey = crypto_pcbc_setkey;
++	inst->alg.cra_blkcipher.encrypt = crypto_pcbc_encrypt;
++	inst->alg.cra_blkcipher.decrypt = crypto_pcbc_decrypt;
++
++out_put_alg:
++	crypto_mod_put(alg);
++	return inst;
++}
++
++static void crypto_pcbc_free(struct crypto_instance *inst)
++{
++	crypto_drop_spawn(crypto_instance_ctx(inst));
++	kfree(inst);
++}
++
++static struct crypto_template crypto_pcbc_tmpl = {
++	.name = "pcbc",
++	.alloc = crypto_pcbc_alloc,
++	.free = crypto_pcbc_free,
++	.module = THIS_MODULE,
++};
++
++static int __init crypto_pcbc_module_init(void)
++{
++	return crypto_register_template(&crypto_pcbc_tmpl);
++}
++
++static void __exit crypto_pcbc_module_exit(void)
++{
++	crypto_unregister_template(&crypto_pcbc_tmpl);
++}
++
++module_init(crypto_pcbc_module_init);
++module_exit(crypto_pcbc_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("PCBC block cipher algorithm");
