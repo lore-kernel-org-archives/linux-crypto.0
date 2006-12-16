@@ -1,31 +1,59 @@
-From: Herbert Xu <herbert.xu@redhat.com>
-Subject: Re: [PATCH 1/2] Add PCBC crypto template support
-Date: Sat, 16 Dec 2006 00:30:06 +1100
-Message-ID: <20061215133006.GB14923@gondor.apana.org.au>
-References: <20061215102637.17597.58730.stgit@warthog.cambridge.redhat.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: [ANN] Acrypto asynchronous crypto layer 2.6.19 release.
+Date: Sat, 16 Dec 2006 22:15:22 +0300
+Message-ID: <20061216191521.GA26549@2ka.mipt.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1648 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751891AbWLONaJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Dec 2006 08:30:09 -0500
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=koi8-r
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
 Content-Disposition: inline
-In-Reply-To: <20061215102637.17597.58730.stgit@warthog.cambridge.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 15, 2006 at 10:26:37AM +0000, David Howells wrote:
-> Add PCBC crypto template support as used by RxRPC.
-> 
-> Signed-Off-By: David Howells <dhowells@redhat.com>
+Hello.
 
-Thanks David!  I'll push this to mm via cryptodev.
+I am pleased to announce new release of the acrypto for 2.6.19 kernel -
+first asynchronous crypto layer for Linux kernel 2.6.
+
+Acrypto allows to handle crypto requests asynchronously in hardware.
+
+Acrypto supports following features:
+ * multiple asynchronous crypto device queues
+ * crypto session routing (allows to complete single crypto session when
+   several operations (crypto, hmac, anything) are completed)
+ * crypto session binding (bind crypto processing to specified device)
+ * modular load balancing (one can created load balancer which will get
+   into account for example pid of the calling process)
+ * crypto session batching genetically implemented by design (acrypto
+   provides the whole data structure to crypto device, i.e. it is
+   possible to use acrypto as a bridge which routes requests between
+   completely different devices, since it does not differentiate between
+   users, just handles requests)
+ * crypto session priority
+ * different kinds of crypto operation(RNG, asymmetrical crypto, HMAC and
+   any other)
+
+Combined patchset includes:
+ * acrypto core
+ * IPsec ESP4 port to acrypto
+ * dm-crypt port to acrypto
+ * OCF to acrypto bridge, which allows to run OCF device
+   drivers with acrypto (for example ixp4xx), requires OCF installed.
+
+Ported crypto drivers and benchmarks can be found on acrypto homepage:
+http://tservice.net.ru/~s0mbre/old/?section=projects&item=acrypto
+
+Changes from previous release:
+ * moved to 2.6.19 crypto API where it is used
+ * updated XFRM engine
+ * bugfixes
+
+2.6.16 - 2.6.18 releases moved to maintenance mode.
+
+Patchset is not attached due to its size (192kb).
+
+Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
