@@ -1,19 +1,33 @@
-From: Andreas Jellinghaus <aj@dungeon.inka.de>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Subject: Re: [ANN] Acrypto asynchronous crypto layer 2.6.19 release.
-Date: Mon, 18 Dec 2006 08:38:54 +0100
-Message-ID: <4586458E.6000503@dungeon.inka.de>
-References: <20061216191521.GA26549@2ka.mipt.ru>
+Date: Mon, 18 Dec 2006 12:57:40 +0300
+Message-ID: <20061218095740.GA5219@2ka.mipt.ru>
+References: <20061216191521.GA26549@2ka.mipt.ru> <4586458E.6000503@dungeon.inka.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753453AbWLRHgz@vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-In-Reply-To: <20061216191521.GA26549@2ka.mipt.ru>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=koi8-r
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:57134 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753688AbWLRJ5q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Dec 2006 04:57:46 -0500
+To: Andreas Jellinghaus <aj@dungeon.inka.de>
+Content-Disposition: inline
+In-Reply-To: <4586458E.6000503@dungeon.inka.de>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Does acrypto still have the same size restrictions
-I ran into with the last release?
+On Mon, Dec 18, 2006 at 08:38:54AM +0100, Andreas Jellinghaus (aj@dungeon.inka.de) wrote:
+> Does acrypto still have the same size restrictions
+> I ran into with the last release?
 
-Thanks, Andreas
+Actually I do not recall what is 'size retrictions' - if you talk about
+possibility to use software crypto provider, which supports one cipher
+in a time, then yes, but it is intended to be used with hardware though.
+Otherwise I do not recall any problems pointed to me.
+
+> Thanks, Andreas
+
+-- 
+	Evgeniy Polyakov
