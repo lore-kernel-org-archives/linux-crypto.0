@@ -1,275 +1,192 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/6] [CRYPTO] api: Add type-safe spawns
-Date: Wed, 24 Jan 2007 21:29:18 +1100
-Message-ID: <E1H9fNW-0005n6-00@gondolin.me.apana.org.au>
+Subject: [PATCH 4/6] [CRYPTO] api: Allow multiple frontends per backend
+Date: Wed, 24 Jan 2007 21:29:19 +1100
+Message-ID: <E1H9fNX-0005nA-00@gondolin.me.apana.org.au>
 References: <20070124102736.GA21977@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2901 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2904 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751020AbXAXK3V (ORCPT
+	with ESMTP id S1751021AbXAXK3W (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jan 2007 05:29:21 -0500
+	Wed, 24 Jan 2007 05:29:22 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1H9fNX-0005wh-1I
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:19 +1100
+	id 1H9fNY-0005wm-2s
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:20 +1100
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1H9fNW-0005n6-00
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:18 +1100
+	id 1H9fNX-0005nA-00
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:19 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] api: Add type-safe spawns
+[CRYPTO] api: Allow multiple frontends per backend
 
-This patch allows spawns of specific types (e.g., cipher) to be allocated.
+This patch adds support for multiple frontend types for each backend
+algorithm by passing the type and mask through to the backend type
+init function.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/algapi.c         |   13 +++++++++++--
- crypto/cbc.c            |    9 +++++----
- crypto/ecb.c            |    9 +++++----
- crypto/hmac.c           |    9 +++++----
- crypto/lrw.c            |   11 ++++++-----
- crypto/pcbc.c           |    9 +++++----
- crypto/xcbc.c           |    9 +++++----
- include/crypto/algapi.h |   20 +++++++++++++++++++-
- 8 files changed, 61 insertions(+), 28 deletions(-)
+ crypto/algapi.c         |    2 +-
+ crypto/api.c            |   25 +++++++++++++------------
+ crypto/blkcipher.c      |    5 +++--
+ crypto/hash.c           |    5 +++--
+ crypto/internal.h       |    3 ++-
+ include/crypto/algapi.h |    4 ++--
+ 6 files changed, 24 insertions(+), 20 deletions(-)
 
 diff --git a/crypto/algapi.c b/crypto/algapi.c
 --- a/crypto/algapi.c
 +++ b/crypto/algapi.c
-@@ -377,7 +377,8 @@ void crypto_drop_spawn(struct crypto_spa
- }
- EXPORT_SYMBOL_GPL(crypto_drop_spawn);
+@@ -401,7 +401,7 @@ struct crypto_tfm *crypto_spawn_tfm(stru
+ 	if (unlikely((alg->cra_flags ^ type) & mask))
+ 		goto out_put_alg;
  
--struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn)
-+struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
-+				    u32 mask)
- {
- 	struct crypto_alg *alg;
- 	struct crypto_alg *alg2;
-@@ -396,10 +397,18 @@ struct crypto_tfm *crypto_spawn_tfm(stru
- 		return ERR_PTR(-EAGAIN);
- 	}
- 
-+	tfm = ERR_PTR(-EINVAL);
-+	if (unlikely((alg->cra_flags ^ type) & mask))
-+		goto out_put_alg;
-+
- 	tfm = __crypto_alloc_tfm(alg);
+-	tfm = __crypto_alloc_tfm(alg);
++	tfm = __crypto_alloc_tfm(alg, type, mask);
  	if (IS_ERR(tfm))
--		crypto_mod_put(alg);
-+		goto out_put_alg;
-+
-+	return tfm;
+ 		goto out_put_alg;
  
-+out_put_alg:
-+	crypto_mod_put(alg);
- 	return tfm;
+diff --git a/crypto/api.c b/crypto/api.c
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -212,12 +212,12 @@ struct crypto_alg *crypto_alg_mod_lookup
  }
- EXPORT_SYMBOL_GPL(crypto_spawn_tfm);
-diff --git a/crypto/cbc.c b/crypto/cbc.c
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -243,6 +243,7 @@ static int crypto_cbc_init_tfm(struct cr
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_cipher *cipher;
+ EXPORT_SYMBOL_GPL(crypto_alg_mod_lookup);
  
- 	switch (crypto_tfm_alg_blocksize(tfm)) {
- 	case 8:
-@@ -260,11 +261,11 @@ static int crypto_cbc_init_tfm(struct cr
- 			ctx->xor = xor_quad;
- 	}
- 
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
- 
--	ctx->child = crypto_cipher_cast(tfm);
-+	ctx->child = cipher;
- 	return 0;
- }
- 
-diff --git a/crypto/ecb.c b/crypto/ecb.c
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -99,12 +99,13 @@ static int crypto_ecb_init_tfm(struct cr
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_ecb_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_cipher *cipher;
- 
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
- 
--	ctx->child = crypto_cipher_cast(tfm);
-+	ctx->child = cipher;
- 	return 0;
- }
- 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -172,15 +172,16 @@ static int hmac_digest(struct hash_desc 
- 
- static int hmac_init_tfm(struct crypto_tfm *tfm)
+-static int crypto_init_ops(struct crypto_tfm *tfm)
++static int crypto_init_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
  {
-+	struct crypto_hash *hash;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct hmac_ctx *ctx = hmac_ctx(__crypto_hash_cast(tfm));
+-	const struct crypto_type *type = tfm->__crt_alg->cra_type;
++	const struct crypto_type *type_obj = tfm->__crt_alg->cra_type;
  
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	hash = crypto_spawn_hash(spawn);
-+	if (IS_ERR(hash))
-+		return PTR_ERR(hash);
+-	if (type)
+-		return type->init(tfm);
++	if (type_obj)
++		return type_obj->init(tfm, type, mask);
  
--	ctx->child = crypto_hash_cast(tfm);
-+	ctx->child = hash;
- 	return 0;
+ 	switch (crypto_tfm_alg_type(tfm)) {
+ 	case CRYPTO_ALG_TYPE_CIPHER:
+@@ -266,14 +266,14 @@ static void crypto_exit_ops(struct crypt
+ 	}
  }
  
-diff --git a/crypto/lrw.c b/crypto/lrw.c
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -201,21 +201,22 @@ static int decrypt(struct blkcipher_desc
- 
- static int init_tfm(struct crypto_tfm *tfm)
+-static unsigned int crypto_ctxsize(struct crypto_alg *alg)
++static unsigned int crypto_ctxsize(struct crypto_alg *alg, u32 type, u32 mask)
  {
-+	struct crypto_cipher *cipher;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct priv *ctx = crypto_tfm_ctx(tfm);
- 	u32 *flags = &tfm->crt_flags;
+-	const struct crypto_type *type = alg->cra_type;
++	const struct crypto_type *type_obj = alg->cra_type;
+ 	unsigned int len;
  
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
+ 	len = alg->cra_alignmask & ~(crypto_tfm_ctx_alignment() - 1);
+-	if (type)
+-		return len + type->ctxsize(alg);
++	if (type_obj)
++		return len + type_obj->ctxsize(alg, type, mask);
  
--	if (crypto_tfm_alg_blocksize(tfm) != 16) {
-+	if (crypto_cipher_blocksize(cipher) != 16) {
- 		*flags |= CRYPTO_TFM_RES_BAD_BLOCK_LEN;
- 		return -EINVAL;
- 	}
- 
--	ctx->child = crypto_cipher_cast(tfm);
-+	ctx->child = cipher;
- 	return 0;
+ 	switch (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) {
+ 	default:
+@@ -303,20 +303,21 @@ void crypto_shoot_alg(struct crypto_alg 
  }
+ EXPORT_SYMBOL_GPL(crypto_shoot_alg);
  
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -247,6 +247,7 @@ static int crypto_pcbc_init_tfm(struct c
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_pcbc_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_cipher *cipher;
- 
- 	switch (crypto_tfm_alg_blocksize(tfm)) {
- 	case 8:
-@@ -264,11 +265,11 @@ static int crypto_pcbc_init_tfm(struct c
- 			ctx->xor = xor_quad;
- 	}
- 
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
- 
--	ctx->child = crypto_cipher_cast(tfm);
-+	ctx->child = cipher;
- 	return 0;
- }
- 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -254,14 +254,15 @@ static int crypto_xcbc_digest(struct has
- 
- static int xcbc_init_tfm(struct crypto_tfm *tfm)
+-struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg)
++struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
++				      u32 mask)
  {
-+	struct crypto_cipher *cipher;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
- 	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_xcbc_ctx *ctx = crypto_hash_ctx_aligned(__crypto_hash_cast(tfm));
- 	int bs = crypto_hash_blocksize(__crypto_hash_cast(tfm));
+ 	struct crypto_tfm *tfm = NULL;
+ 	unsigned int tfm_size;
+ 	int err = -ENOMEM;
  
--	tfm = crypto_spawn_tfm(spawn);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
+-	tfm_size = sizeof(*tfm) + crypto_ctxsize(alg);
++	tfm_size = sizeof(*tfm) + crypto_ctxsize(alg, type, mask);
+ 	tfm = kzalloc(tfm_size, GFP_KERNEL);
+ 	if (tfm == NULL)
+ 		goto out_err;
  
- 	switch(bs) {
- 	case 16:
-@@ -271,7 +272,7 @@ static int xcbc_init_tfm(struct crypto_t
- 		return -EINVAL;
- 	}
+ 	tfm->__crt_alg = alg;
  
--	ctx->child = crypto_cipher_cast(tfm);
-+	ctx->child = cipher;
- 	ctx->odds = (u8*)(ctx+1);
- 	ctx->prev = ctx->odds + bs;
- 	ctx->key = ctx->prev + bs;
+-	err = crypto_init_ops(tfm);
++	err = crypto_init_ops(tfm, type, mask);
+ 	if (err)
+ 		goto out_free_tfm;
+ 
+@@ -372,7 +373,7 @@ struct crypto_tfm *crypto_alloc_base(con
+ 			goto err;
+ 		}
+ 
+-		tfm = __crypto_alloc_tfm(alg);
++		tfm = __crypto_alloc_tfm(alg, type, mask);
+ 		if (!IS_ERR(tfm))
+ 			return tfm;
+ 
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -349,7 +349,8 @@ static int setkey(struct crypto_tfm *tfm
+ 	return cipher->setkey(tfm, key, keylen);
+ }
+ 
+-static unsigned int crypto_blkcipher_ctxsize(struct crypto_alg *alg)
++static unsigned int crypto_blkcipher_ctxsize(struct crypto_alg *alg, u32 type,
++					     u32 mask)
+ {
+ 	struct blkcipher_alg *cipher = &alg->cra_blkcipher;
+ 	unsigned int len = alg->cra_ctxsize;
+@@ -362,7 +363,7 @@ static unsigned int crypto_blkcipher_ctx
+ 	return len;
+ }
+ 
+-static int crypto_init_blkcipher_ops(struct crypto_tfm *tfm)
++static int crypto_init_blkcipher_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ {
+ 	struct blkcipher_tfm *crt = &tfm->crt_blkcipher;
+ 	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
+diff --git a/crypto/hash.c b/crypto/hash.c
+--- a/crypto/hash.c
++++ b/crypto/hash.c
+@@ -16,12 +16,13 @@
+ 
+ #include "internal.h"
+ 
+-static unsigned int crypto_hash_ctxsize(struct crypto_alg *alg)
++static unsigned int crypto_hash_ctxsize(struct crypto_alg *alg, u32 type,
++					u32 mask)
+ {
+ 	return alg->cra_ctxsize;
+ }
+ 
+-static int crypto_init_hash_ops(struct crypto_tfm *tfm)
++static int crypto_init_hash_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ {
+ 	struct hash_tfm *crt = &tfm->crt_hash;
+ 	struct hash_alg *alg = &tfm->__crt_alg->cra_hash;
+diff --git a/crypto/internal.h b/crypto/internal.h
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -120,7 +120,8 @@ void crypto_exit_compress_ops(struct cry
+ void crypto_larval_error(const char *name, u32 type, u32 mask);
+ 
+ void crypto_shoot_alg(struct crypto_alg *alg);
+-struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg);
++struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
++				      u32 mask);
+ 
+ int crypto_register_instance(struct crypto_template *tmpl,
+ 			     struct crypto_instance *inst);
 diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
 --- a/include/crypto/algapi.h
 +++ b/include/crypto/algapi.h
-@@ -93,7 +93,8 @@ struct crypto_template *crypto_lookup_te
- int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
- 		      struct crypto_instance *inst);
- void crypto_drop_spawn(struct crypto_spawn *spawn);
--struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn);
-+struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
-+				    u32 mask);
+@@ -18,8 +18,8 @@ struct module;
+ struct seq_file;
  
- struct crypto_alg *crypto_get_attr_alg(void *param, unsigned int len,
- 				       u32 type, u32 mask);
-@@ -132,11 +133,28 @@ static inline void *crypto_blkcipher_ctx
- 	return crypto_tfm_ctx_aligned(&tfm->base);
- }
- 
-+static inline struct crypto_cipher *crypto_spawn_cipher(
-+	struct crypto_spawn *spawn)
-+{
-+	u32 type = CRYPTO_ALG_TYPE_CIPHER;
-+	u32 mask = CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_cipher_cast(crypto_spawn_tfm(spawn, type, mask));
-+}
-+
- static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
- {
- 	return &crypto_cipher_tfm(tfm)->__crt_alg->cra_cipher;
- }
- 
-+static inline struct crypto_hash *crypto_spawn_hash(struct crypto_spawn *spawn)
-+{
-+	u32 type = CRYPTO_ALG_TYPE_HASH;
-+	u32 mask = CRYPTO_ALG_TYPE_HASH_MASK;
-+
-+	return __crypto_hash_cast(crypto_spawn_tfm(spawn, type, mask));
-+}
-+
- static inline void *crypto_hash_ctx_aligned(struct crypto_hash *tfm)
- {
- 	return crypto_tfm_ctx_aligned(&tfm->base);
+ struct crypto_type {
+-	unsigned int (*ctxsize)(struct crypto_alg *alg);
+-	int (*init)(struct crypto_tfm *tfm);
++	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
++	int (*init)(struct crypto_tfm *tfm, u32 type, u32 mask);
+ 	void (*exit)(struct crypto_tfm *tfm);
+ 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
+ };
