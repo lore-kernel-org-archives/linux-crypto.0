@@ -1,44 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [0/6] [CRYPTO]: Misc patches before async crypto
-Date: Wed, 24 Jan 2007 21:27:36 +1100
-Message-ID: <20070124102736.GA21977@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 1/6] [CRYPTO] tcrypt: Removed vestigial crypto_alloc_tfm call
+Date: Wed, 24 Jan 2007 21:29:16 +1100
+Message-ID: <E1H9fNU-0005my-00@gondolin.me.apana.org.au>
+References: <20070124102736.GA21977@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2893 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2897 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750937AbXAXK1k (ORCPT
+	with ESMTP id S1750999AbXAXK3S (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jan 2007 05:27:40 -0500
+	Wed, 24 Jan 2007 05:29:18 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1H9fLt-0005w2-Na
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:27:37 +1100
+	id 1H9fNU-0005wX-Qh
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:16 +1100
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1H9fLs-0005lh-00
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:27:36 +1100
-Content-Disposition: inline
+	id 1H9fNU-0005my-00
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2007 21:29:16 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi:
+[CRYPTO] tcrypt: Removed vestigial crypto_alloc_tfm call
 
-I'll be pushing these patches into cryptodev-2.6 tonight.
+The crypto_comp conversion missed the last remaining crypto_alloc_tfm
+call.  This patch replaces it with crypto_alloc_comp.
 
-This patch series removes the obsolete interfaces now that all users
-in mainline and mm have been converted.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-It also adds support to the API to allow multiple frontend types for
-one backend.  The immediate application will be to provide an async
-interface to all existing sync crypto algorithms.  However, it could
-also be used for other purposes such as providing a virtual address
-interface for synchronous algorithms where currently we require the
-use of scatterlists.
+ crypto/tcrypt.c |    2 +-
+ 1 files changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -767,7 +767,7 @@ static void test_deflate(void)
+ 	memcpy(tvmem, deflate_comp_tv_template, tsize);
+ 	tv = (void *)tvmem;
+ 
+-	tfm = crypto_alloc_tfm("deflate", 0);
++	tfm = crypto_alloc_comp("deflate", 0, CRYPTO_ALG_ASYNC);
+ 	if (tfm == NULL) {
+ 		printk("failed to load transform for deflate\n");
+ 		return;
