@@ -1,69 +1,40 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: [ANN] Acrypto asynchronous crypto layer 2.6.20 release.
-Date: Sat, 3 Feb 2007 19:21:18 +0300
-Message-ID: <20070203162118.GA8731@2ka.mipt.ru>
+From: "Tsai, Hong-Bin" <hbtsai@gmail.com>
+Subject: how can I protect my kernel image from being disclosed?
+Date: Tue, 6 Feb 2007 17:09:49 +0800
+Message-ID: <3befbf920702060109p4fefe8d4g949a401330b1034b@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:39362 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1946457AbXBCQVg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 3 Feb 2007 11:21:36 -0500
+Received: from an-out-0708.google.com ([209.85.132.247]:44624 "EHLO
+	an-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751806AbXBFJJv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 Feb 2007 04:09:51 -0500
+Received: by an-out-0708.google.com with SMTP id b33so1230396ana
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2007 01:09:50 -0800 (PST)
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello.
+Dear Gurus:
 
-I am pleased to announce new release of the acrypto for 2.6.20 kernel -
-first asynchronous crypto layer for Linux kernel 2.6.
+I've surveyed for secure boot for days and most of them are either
+grub-md5-crypt or u-boot and TPM support.
+There is a thread about using grub to decrypt kernel image, but the
+discussion didn't go to anywhere.
 
-Acrypto allows to handle crypto requests asynchronously in hardware.
+--> http://www.mail-archive.com/bug-grub@gnu.org/msg01976.html
 
-Acrypto supports following features:
- * multiple asynchronous crypto device queues
- * crypto session routing (allows to complete single crypto session when
-   several operations (crypto, hmac, anything) are completed)
- * crypto session binding (bind crypto processing to specified device)
- * modular load balancing (one can created load balancer which will get
-   into account for example pid of the calling process)
- * crypto session batching genetically implemented by design (acrypto
-   provides the whole data structure to crypto device, i.e. it is
-   possible to use acrypto as a bridge which routes requests between
-   completely different devices, since it does not differentiate between
-   users, just handles requests)
- * crypto session priority
- * different kinds of crypto operation(RNG, asymmetrical crypto, HMAC and
-   any other)
+So, I'd like to know if there is any bootloader capable of decrypting
+an encrypted kernel image via a secret key supplied, without the
+constraint of TPM?
 
-Combined patchset includes:
- * acrypto core
- * IPsec ESP4 port to acrypto
- * dm-crypt port to acrypto
- * OCF to acrypto bridge, which allows to run OCF device
-   drivers with acrypto (for example ixp4xx), requires OCF installed.
-
-Ported crypto drivers and benchmarks can be found on acrypto homepage:
-
-http://tservice.net.ru/~s0mbre/old/?section=projects&item=acrypto
-
-Changes from previous release:
- * moved to 2.6.20 API (work struct)
- * updated HIFN driver
-   * crypto->acrypto conversation (by Markus Kammerst)
-   * work struct changes
- * bugfixes
-
-TODO: 
- * extend software provider to support all types of ciphers
-
-2.6.16 - 2.6.19 releases moved to maintenance mode.
-
-Patchset is not attached due to its size (190kb).
-
-Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Thanks in advance.
 
 -- 
-	Evgeniy Polyakov
+Best regards,
+Hong-Bin
+blog: http://furseal.wordpress.com
+msn: benjamin@benjamin.idv.tw
