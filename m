@@ -1,40 +1,94 @@
-From: "Tsai, Hong-Bin" <hbtsai@gmail.com>
-Subject: how can I protect my kernel image from being disclosed?
-Date: Tue, 6 Feb 2007 17:09:49 +0800
-Message-ID: <3befbf920702060109p4fefe8d4g949a401330b1034b@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 2.6.21
+Date: Thu, 8 Feb 2007 02:47:17 +1100
+Message-ID: <20070207154717.GA2757@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from an-out-0708.google.com ([209.85.132.247]:44624 "EHLO
-	an-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751806AbXBFJJv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Feb 2007 04:09:51 -0500
-Received: by an-out-0708.google.com with SMTP id b33so1230396ana
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Feb 2007 01:09:50 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+To: "David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Dear Gurus:
+Hi Dave:
 
-I've surveyed for secure boot for days and most of them are either
-grub-md5-crypt or u-boot and TPM support.
-There is a thread about using grub to decrypt kernel image, but the
-discussion didn't go to anywhere.
+Here is the crypto update for 2.6.21:
 
---> http://www.mail-archive.com/bug-grub@gnu.org/msg01976.html
+Please pull from
 
-So, I'd like to know if there is any bootloader capable of decrypting
-an encrypted kernel image via a secret key supplied, without the
-constraint of TPM?
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Thanks in advance.
+or
 
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+Summary:
+
+* Added Camellia, PCBC, DES-like encryption for RxRPC.
+* API updates in preparation for async.
+
+Andrew Donofrio (1):
+      [CRYPTO] tcrypt: Added test vectors for sha384/sha512
+
+David Howells (2):
+      [CRYPTO] pcbc: Add Propagated CBC template
+      [CRYPTO] fcrypt: Add FCrypt from RxRPC
+
+Herbert Xu (7):
+      [CRYPTO] all: Check for usage in hard IRQ context
+      [CRYPTO] tcrypt: Removed vestigial crypto_alloc_tfm call
+      [CRYPTO] api: Remove deprecated interface
+      [CRYPTO] api: Add type-safe spawns
+      [CRYPTO] api: Allow multiple frontends per backend
+      [CRYPTO] xcbc: Use new cipher interface
+      [CRYPTO] api: Use structs for cipher/compression
+
+Noriaki TAKAMIYA (6):
+      [CRYPTO] camellia: Add Kconfig entry.
+      [CRYPTO] camellia: added the code of Camellia cipher algorithm.
+      [CRYPTO] camellia: added the testing code of Camellia cipher
+      [IPSEC]: added the definition of Camellia cipher
+      [IPSEC]: added the entry of Camellia cipher algorithm to ealg_list[]
+      [CRYPTO] doc: added the developer of Camellia cipher
+
+Richard Knutsson (1):
+      [CRYPTO] geode: Convert pci_module_init() to pci_register_driver()
+
+ Documentation/crypto/api-intro.txt |    4 
+ crypto/Kconfig                     |   31 
+ crypto/Makefile                    |    3 
+ crypto/algapi.c                    |   15 
+ crypto/api.c                       |   80 -
+ crypto/blkcipher.c                 |    9 
+ crypto/camellia.c                  | 1801 +++++++++++++++++++++++++++++++++++++
+ crypto/cbc.c                       |    9 
+ crypto/cipher.c                    |  447 ---------
+ crypto/compress.c                  |    5 
+ crypto/digest.c                    |   24 
+ crypto/ecb.c                       |    9 
+ crypto/fcrypt.c                    |  423 ++++++++
+ crypto/hash.c                      |    5 
+ crypto/hmac.c                      |    9 
+ crypto/internal.h                  |   27 
+ crypto/lrw.c                       |   11 
+ crypto/pcbc.c                      |  349 +++++++
+ crypto/tcrypt.c                    |   73 +
+ crypto/tcrypt.h                    |  538 +++++++++++
+ crypto/xcbc.c                      |   60 -
+ drivers/crypto/geode-aes.c         |    2 
+ fs/ecryptfs/crypto.c               |    4 
+ fs/ecryptfs/ecryptfs_kernel.h      |    1 
+ include/crypto/algapi.h            |   24 
+ include/linux/crypto.h             |  148 ---
+ include/linux/pfkeyv2.h            |    1 
+ net/xfrm/xfrm_algo.c               |   17 
+ 28 files changed, 3396 insertions(+), 733 deletions(-)
+
+Thanks,
 -- 
-Best regards,
-Hong-Bin
-blog: http://furseal.wordpress.com
-msn: benjamin@benjamin.idv.tw
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
