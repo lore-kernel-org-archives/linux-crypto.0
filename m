@@ -1,44 +1,39 @@
-From: "Joerg Roedel" <joerg.roedel@amd.com>
-Subject: Asynchronus crypto API
-Date: Fri, 9 Feb 2007 12:08:00 +0100
-Message-ID: <20070209110800.GB25171@amd.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: Asynchronus crypto API
+Date: Fri, 9 Feb 2007 14:31:11 +0300
+Message-ID: <20070209113108.GA11467@2ka.mipt.ru>
+References: <20070209110800.GB25171@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=koi8-r
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Joerg Roedel <joerg.roedel@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound-dub.frontbridge.com ([213.199.154.16]:64563 "EHLO
-	outbound2-dub-R.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1161237AbXBILOG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Feb 2007 06:14:06 -0500
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:56033 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1946354AbXBILcf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Feb 2007 06:32:35 -0500
 Content-Disposition: inline
+In-Reply-To: <20070209110800.GB25171@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+On Fri, Feb 09, 2007 at 12:08:00PM +0100, Joerg Roedel (joerg.roedel@amd.com) wrote:
+> Background: I recently bought a HIFN crypto card and would like to use
+> it under Linux without the need to use some external patchsets :)
 
-recently I read the documentation in Documentation/crypto/ to learn
-something about the Linux crypto API internals. There I read the
-following sentence
+Not for now - either use acrypto [1] or ocf [2].
 
-"Support for hardware crypto devices via an asynchronous interface is
-under development."
+Current stage in cryptoapi only supports sync interface, but having new
+registration mechanism allows a bit easier implementation of different
+algos, but still no async hardware is supported.
 
-Since this sentence is present at least since kernel 2.6.0 I would like
-to ask what the current state in the development of that API is?
-Is somebody still working on that API or are there some existing ideas
-for that which want to be implemented? I would like to help out with
-that if the help is needed.
-Background: I recently bought a HIFN crypto card and would like to use
-it under Linux without the need to use some external patchsets :)
+1. acrypto
+http://tservice.net.ru/~s0mbre/old/?section=projects&item=acrypto
 
-Joerg
+2. ocf
+http://ocf-linux.sourceforge.net/
 
 -- 
-Joerg Roedel
-Operating System Research Center
-AMD Saxony LLC & Co. KG
+	Evgeniy Polyakov
