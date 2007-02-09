@@ -1,41 +1,44 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: Crypto Update for 2.6.21
-Date: Thu, 08 Feb 2007 15:26:55 -0800 (PST)
-Message-ID: <20070208.152655.104035982.davem@davemloft.net>
-References: <20070207154717.GA2757@gondor.apana.org.au>
+From: "Joerg Roedel" <joerg.roedel@amd.com>
+Subject: Asynchronus crypto API
+Date: Fri, 9 Feb 2007 12:08:00 +0100
+Message-ID: <20070209110800.GB25171@amd.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain;
+ charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org
+To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:39846
-	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1752338AbXBHX05 (ORCPT
+Received: from outbound-dub.frontbridge.com ([213.199.154.16]:64563 "EHLO
+	outbound2-dub-R.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1161237AbXBILOG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Feb 2007 18:26:57 -0500
-In-Reply-To: <20070207154717.GA2757@gondor.apana.org.au>
+	Fri, 9 Feb 2007 06:14:06 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 8 Feb 2007 02:47:17 +1100
+Hello,
 
-> Here is the crypto update for 2.6.21:
-> 
-> Please pull from
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-> 
-> or
-> 
-> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+recently I read the documentation in Documentation/crypto/ to learn
+something about the Linux crypto API internals. There I read the
+following sentence
 
-Pulled, thanks a lot Herbert.
+"Support for hardware crypto devices via an asynchronous interface is
+under development."
 
-There was a minor merge conflict to resolve, because the
-S390 guys removed a bunch of their crypto options from
-crypto/Kconfig in a seperate changeset.  But I'm pretty
-sure I resolved that correctly.
+Since this sentence is present at least since kernel 2.6.0 I would like
+to ask what the current state in the development of that API is?
+Is somebody still working on that API or are there some existing ideas
+for that which want to be implemented? I would like to help out with
+that if the help is needed.
+Background: I recently bought a HIFN crypto card and would like to use
+it under Linux without the need to use some external patchsets :)
 
-Thanks again.
+Joerg
+
+-- 
+Joerg Roedel
+Operating System Research Center
+AMD Saxony LLC & Co. KG
