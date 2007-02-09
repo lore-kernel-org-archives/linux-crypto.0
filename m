@@ -1,44 +1,35 @@
-From: "Joerg Roedel" <joerg.roedel@amd.com>
-Subject: Re: Asynchronus crypto API
-Date: Fri, 9 Feb 2007 13:16:02 +0100
-Message-ID: <20070209121602.GC25171@amd.com>
-References: <20070209110800.GB25171@amd.com>
- <20070209113108.GA11467@2ka.mipt.ru>
+From: Jan Glauber <jan.glauber@de.ibm.com>
+Subject: Re: Crypto Update for 2.6.21
+Date: Fri, 09 Feb 2007 13:45:07 +0100
+Message-ID: <1171025107.5349.4.camel@localhost.localdomain>
+References: <20070207154717.GA2757@gondor.apana.org.au>
+	 <20070208.152655.104035982.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound-dub.frontbridge.com ([213.199.154.16]:58494 "EHLO
-	outbound2-dub-R.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1946402AbXBIMQY (ORCPT
+Received: from mtagate7.de.ibm.com ([195.212.29.156]:31293 "EHLO
+	mtagate7.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1946402AbXBIMpy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Feb 2007 07:16:24 -0500
-In-Reply-To: <20070209113108.GA11467@2ka.mipt.ru>
-Content-Disposition: inline
+	Fri, 9 Feb 2007 07:45:54 -0500
+In-Reply-To: <20070208.152655.104035982.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello Evgeniy,
+On Thu, 2007-02-08 at 15:26 -0800, David Miller wrote:
 
-On Fri, Feb 09, 2007 at 02:31:11PM +0300, Evgeniy Polyakov wrote:
-> On Fri, Feb 09, 2007 at 12:08:00PM +0100, Joerg Roedel (joerg.roedel@amd.com) wrote:
-> > Background: I recently bought a HIFN crypto card and would like to use
-> > it under Linux without the need to use some external patchsets :)
-> 
-> Not for now - either use acrypto [1] or ocf [2].
+> There was a minor merge conflict to resolve, because the
+> S390 guys removed a bunch of their crypto options from
+> crypto/Kconfig in a seperate changeset.  But I'm pretty
+> sure I resolved that correctly.
 
-Yes, these two I meant with "external patchsets" :-)
-It would be nice to have an asynchronous API in the mainstream kernel.
-An the documentation says it is under development, therefore I ask :)
+I'll check when the git server works again...
 
-Joerg
+Would it be better if I send patches that also touch common crypto
+code to Herbert for integration?
 
--- 
-Joerg Roedel
-Operating System Research Center
-AMD Saxony LLC & Co. KG
+Jan
