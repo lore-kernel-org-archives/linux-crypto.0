@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 2/6] MODSIGN: In-kernel crypto extensions
-Date: Wed, 14 Feb 2007 19:09:49 +0000
-Message-ID: <20070214190949.6438.28537.stgit@warthog.cambridge.redhat.com>
+Subject: [PATCH 3/6] MODSIGN: Add indications of module ELF types
+Date: Wed, 14 Feb 2007 19:09:54 +0000
+Message-ID: <20070214190954.6438.3461.stgit@warthog.cambridge.redhat.com>
 References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,154 +10,407 @@ Cc: linux-kernel@vger.kernel.org, davej@redhat.com,
 	arjan@infradead.org, linux-crypto@vger.kernel.org,
 	dhowells@redhat.com
 To: torvalds@osdl.org, akpm@osdl.org, herbert.xu@redhat.com
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S932456AbXBNTKM@vger.kernel.org>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S932479AbXBNTLP@vger.kernel.org>
 In-Reply-To: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Two extensions are added:
-
- (1) Support for SHA1 digestion of in-kernel buffers directly without the use
-     of scatter-gather lists.
-
- (2) Allocation of crypto algorithm instances without resort to fallback module
-     loading.
-
-SHA1 is used by module signature checking, and so must not itself require
-loading as a module when the module signature checking is enabled.
+Add per-arch indications of module ELF types and relocation table entry types.
 
 Signed-Off-By: David Howells <dhowells@redhat.com>
 ---
 
- crypto/api.c           |   46 +++++++++++++++++++++++++++++++++++++++++++++-
- crypto/digest.c        |    9 +++++++++
- include/linux/crypto.h |   11 +++++++++++
- 3 files changed, 65 insertions(+), 1 deletions(-)
+ include/asm-alpha/module.h   |    3 +++
+ include/asm-arm/module.h     |    5 +++++
+ include/asm-cris/module.h    |    5 +++++
+ include/asm-h8300/module.h   |    5 +++++
+ include/asm-i386/module.h    |    5 +++++
+ include/asm-ia64/module.h    |    5 +++++
+ include/asm-m32r/module.h    |    5 +++++
+ include/asm-m68k/module.h    |    5 +++++
+ include/asm-mips/module.h    |   12 ++++++++++--
+ include/asm-parisc/module.h  |    8 ++++++++
+ include/asm-powerpc/module.h |   10 ++++++++++
+ include/asm-s390/module.h    |    3 +++
+ include/asm-sh/module.h      |    5 +++++
+ include/asm-sparc/module.h   |    5 +++++
+ include/asm-sparc64/module.h |    5 +++++
+ include/asm-um/module-i386.h |    4 ++++
+ include/asm-v850/module.h    |    5 +++++
+ include/asm-x86_64/module.h  |    5 +++++
+ 18 files changed, 98 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 55af8bb..3138d7c 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -341,6 +341,45 @@ out:
- EXPORT_SYMBOL_GPL(__crypto_alloc_tfm);
+diff --git a/include/asm-alpha/module.h b/include/asm-alpha/module.h
+index 7b63743..3d5a3ea 100644
+--- a/include/asm-alpha/module.h
++++ b/include/asm-alpha/module.h
+@@ -6,6 +6,7 @@ struct mod_arch_specific
+ 	unsigned int gotsecindex;
+ };
+ 
++#define MODULES_ARE_ELF64
+ #define Elf_Sym Elf64_Sym
+ #define Elf_Shdr Elf64_Shdr
+ #define Elf_Ehdr Elf64_Ehdr
+@@ -13,6 +14,8 @@ struct mod_arch_specific
+ #define Elf_Dyn Elf64_Dyn
+ #define Elf_Rel Elf64_Rel
+ #define Elf_Rela Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ 
+ #define ARCH_SHF_SMALL SHF_ALPHA_GPREL
+ 
+diff --git a/include/asm-arm/module.h b/include/asm-arm/module.h
+index 24b168d..f1558f3 100644
+--- a/include/asm-arm/module.h
++++ b/include/asm-arm/module.h
+@@ -6,9 +6,14 @@ struct mod_arch_specific
+ 	int foo;
+ };
+ 
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr	Elf32_Shdr
+ #define Elf_Sym		Elf32_Sym
+ #define Elf_Ehdr	Elf32_Ehdr
++#define Elf_Rel		Elf32_Rel
++#define Elf_Rela	Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
  
  /*
-+ *	crypto_alloc_tfm2 - Find or load crypto module
-+ *	@name: Name of algorithm
-+ *	@flags: Flags to control algorithm instance
-+ *	@nomodload: True to suppress resort to module loading
-+ *
-+ *	Attempt to find or load a crypto algorithm module and create an
-+ *	instance of it.
-+ */
-+struct crypto_tfm *crypto_alloc_tfm2(const char *name, u32 flags,
-+				     int nomodload)
-+{
-+	struct crypto_tfm *tfm = NULL;
-+	int err;
-+
-+	do {
-+		struct crypto_alg *alg;
-+
-+		if (!nomodload)
-+			alg = crypto_alg_mod_lookup(name, 0, CRYPTO_ALG_ASYNC);
-+		else
-+			alg = crypto_alg_lookup(name, 0, CRYPTO_ALG_ASYNC);
-+
-+		err = PTR_ERR(alg);
-+		if (IS_ERR(alg))
-+			continue;
-+
-+		tfm = __crypto_alloc_tfm(alg, flags, 0);
-+		err = 0;
-+		if (IS_ERR(tfm)) {
-+			crypto_mod_put(alg);
-+			err = PTR_ERR(tfm);
-+			tfm = NULL;
-+		}
-+	} while (err == -EAGAIN && !signal_pending(current));
-+
-+	return tfm;
-+}
-+
-+/*
-  *	crypto_alloc_base - Locate algorithm and allocate transform
-  *	@alg_name: Name of algorithm
-  *	@type: Type of algorithm
-@@ -392,7 +431,12 @@ err:
- 	return ERR_PTR(err);
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_base);
-- 
-+
-+struct crypto_tfm *crypto_alloc_tfm(const char *name, u32 flags)
-+{
-+	return crypto_alloc_tfm2(name, flags, 0);
-+}
-+
- /*
-  *	crypto_free_tfm - Free crypto transform
-  *	@tfm: Transform to free
-diff --git a/crypto/digest.c b/crypto/digest.c
-index 1bf7414..d03a4e1 100644
---- a/crypto/digest.c
-+++ b/crypto/digest.c
-@@ -91,6 +91,14 @@ static int update(struct hash_desc *desc,
- 	return update2(desc, sg, nbytes);
- }
+  * Include the ARM architecture version.
+diff --git a/include/asm-cris/module.h b/include/asm-cris/module.h
+index 7ee7231..03f7b2e 100644
+--- a/include/asm-cris/module.h
++++ b/include/asm-cris/module.h
+@@ -3,7 +3,12 @@
+ /* cris is simple */
+ struct mod_arch_specific { };
  
-+static void update_kernel(struct hash_desc *desc,
-+			  const void *data, size_t count)
-+{
-+	struct crypto_tfm *tfm = crypto_hash_tfm(desc->tfm);
-+	tfm->__crt_alg->cra_digest.dia_update(tfm, data, count);
-+	crypto_yield(desc->flags);
-+}
-+
- static int final(struct hash_desc *desc, u8 *out)
- {
- 	struct crypto_tfm *tfm = crypto_hash_tfm(desc->tfm);
-@@ -146,6 +154,7 @@ int crypto_init_digest_ops(struct crypto_tfm *tfm)
- 	
- 	ops->init	= init;
- 	ops->update	= update;
-+	ops->update_kernel = update_kernel;
- 	ops->final	= final;
- 	ops->digest	= digest;
- 	ops->setkey	= dalg->dia_setkey ? setkey : nosetkey;
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 779aa78..d960ec1 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -273,6 +273,8 @@ struct hash_tfm {
- 	int (*init)(struct hash_desc *desc);
- 	int (*update)(struct hash_desc *desc,
- 		      struct scatterlist *sg, unsigned int nsg);
-+	void (*update_kernel)(struct hash_desc *desc,
-+			      const void *data, size_t count);
- 	int (*final)(struct hash_desc *desc, u8 *out);
- 	int (*digest)(struct hash_desc *desc, struct scatterlist *sg,
- 		      unsigned int nsg, u8 *out);
-@@ -341,6 +343,8 @@ struct crypto_attr_alg {
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ #endif /* _ASM_CRIS_MODULE_H */
+diff --git a/include/asm-h8300/module.h b/include/asm-h8300/module.h
+index de23231..b1c08e2 100644
+--- a/include/asm-h8300/module.h
++++ b/include/asm-h8300/module.h
+@@ -4,9 +4,14 @@
+  * This file contains the H8/300 architecture specific module code.
   */
-  
- struct crypto_tfm *crypto_alloc_tfm(const char *alg_name, u32 tfm_flags);
-+struct crypto_tfm *crypto_alloc_tfm2(const char *alg_name, u32 tfm_flags,
-+		int nomodload);
- struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask);
- void crypto_free_tfm(struct crypto_tfm *tfm);
+ struct mod_arch_specific { };
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
  
-@@ -739,6 +743,13 @@ static inline int crypto_hash_update(struct hash_desc *desc,
- 	return crypto_hash_crt(desc->tfm)->update(desc, sg, nbytes);
- }
+ #define MODULE_SYMBOL_PREFIX "_"
  
-+static inline void crypto_hash_update_kernel(struct hash_desc *desc,
-+					     const void *data,
-+					     size_t count)
-+{
-+	return crypto_hash_crt(desc->tfm)->update_kernel(desc, data, count);
-+}
-+
- static inline int crypto_hash_final(struct hash_desc *desc, u8 *out)
+diff --git a/include/asm-i386/module.h b/include/asm-i386/module.h
+index 02f8f54..42ab093 100644
+--- a/include/asm-i386/module.h
++++ b/include/asm-i386/module.h
+@@ -6,9 +6,14 @@ struct mod_arch_specific
  {
- 	return crypto_hash_crt(desc->tfm)->final(desc, out);
+ };
+ 
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ #ifdef CONFIG_M386
+ #define MODULE_PROC_FAMILY "386 "
+diff --git a/include/asm-ia64/module.h b/include/asm-ia64/module.h
+index d2da61e..191355a 100644
+--- a/include/asm-ia64/module.h
++++ b/include/asm-ia64/module.h
+@@ -23,9 +23,14 @@ struct mod_arch_specific {
+ 	unsigned int next_got_entry;	/* index of next available got entry */
+ };
+ 
++#define MODULES_ARE_ELF64
+ #define Elf_Shdr	Elf64_Shdr
+ #define Elf_Sym		Elf64_Sym
+ #define Elf_Ehdr	Elf64_Ehdr
++#define Elf_Rel		Elf64_Rel
++#define Elf_Rela	Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ 
+ #define MODULE_PROC_FAMILY	"ia64"
+ #define MODULE_ARCH_VERMAGIC	MODULE_PROC_FAMILY \
+diff --git a/include/asm-m32r/module.h b/include/asm-m32r/module.h
+index eb73ee0..7146455 100644
+--- a/include/asm-m32r/module.h
++++ b/include/asm-m32r/module.h
+@@ -3,8 +3,13 @@
+ 
+ struct mod_arch_specific { };
+ 
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr	Elf32_Shdr
+ #define Elf_Sym		Elf32_Sym
+ #define Elf_Ehdr	Elf32_Ehdr
++#define Elf_Rel		Elf32_Rel
++#define Elf_Rela	Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ #endif /* _ASM_M32R_MODULE_H */
+diff --git a/include/asm-m68k/module.h b/include/asm-m68k/module.h
+index c6d75af..ee98908 100644
+--- a/include/asm-m68k/module.h
++++ b/include/asm-m68k/module.h
+@@ -1,7 +1,12 @@
+ #ifndef _ASM_M68K_MODULE_H
+ #define _ASM_M68K_MODULE_H
+ struct mod_arch_specific { };
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ #endif /* _ASM_M68K_MODULE_H */
+diff --git a/include/asm-mips/module.h b/include/asm-mips/module.h
+index 399d03f..694f979 100644
+--- a/include/asm-mips/module.h
++++ b/include/asm-mips/module.h
+@@ -33,11 +33,15 @@ typedef struct {
+ } Elf64_Mips_Rela;
+ 
+ #ifdef CONFIG_32BIT
+-
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr	Elf32_Shdr
+ #define Elf_Sym		Elf32_Sym
+ #define Elf_Ehdr	Elf32_Ehdr
+ #define Elf_Addr	Elf32_Addr
++#define Elf_Rel		Elf32_Rel
++#define Elf_Rela	Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ #define Elf_Mips_Rel	Elf32_Rel
+ #define Elf_Mips_Rela	Elf32_Rela
+@@ -48,11 +52,15 @@ typedef struct {
+ #endif
+ 
+ #ifdef CONFIG_64BIT
+-
++#define MODULES_ARE_ELF64
+ #define Elf_Shdr	Elf64_Shdr
+ #define Elf_Sym		Elf64_Sym
+ #define Elf_Ehdr	Elf64_Ehdr
+ #define Elf_Addr	Elf64_Addr
++#define Elf_Rel		Elf64_Rel
++#define Elf_Rela	Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ 
+ #define Elf_Mips_Rel	Elf64_Mips_Rel
+ #define Elf_Mips_Rela	Elf64_Mips_Rela
+diff --git a/include/asm-parisc/module.h b/include/asm-parisc/module.h
+index 00f0688..ebd9a5e 100644
+--- a/include/asm-parisc/module.h
++++ b/include/asm-parisc/module.h
+@@ -4,17 +4,25 @@
+  * This file contains the parisc architecture specific module code.
+  */
+ #ifdef __LP64__
++#define MODULES_ARE_ELF64
+ #define Elf_Shdr Elf64_Shdr
+ #define Elf_Sym Elf64_Sym
+ #define Elf_Ehdr Elf64_Ehdr
+ #define Elf_Addr Elf64_Addr
++#define Elf_Rel Elf64_Rel
+ #define Elf_Rela Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ #else
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
+ #define Elf_Addr Elf32_Addr
++#define Elf_Rel Elf32_Rel
+ #define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ #endif
+ 
+ struct unwind_table;
+diff --git a/include/asm-powerpc/module.h b/include/asm-powerpc/module.h
+index e5f14b1..f9baae1 100644
+--- a/include/asm-powerpc/module.h
++++ b/include/asm-powerpc/module.h
+@@ -52,16 +52,26 @@ struct mod_arch_specific {
+  */
+ 
+ #ifdef __powerpc64__
++#    define MODULES_ARE_ELF64
+ #    define Elf_Shdr	Elf64_Shdr
+ #    define Elf_Sym	Elf64_Sym
+ #    define Elf_Ehdr	Elf64_Ehdr
++#    define Elf_Rel Elf64_Rel
++#    define Elf_Rela Elf64_Rela
++#    define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#    define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ #    ifdef MODULE
+ 	asm(".section .stubs,\"ax\",@nobits; .align 3; .previous");
+ #    endif
+ #else
++#    define MODULES_ARE_ELF32
+ #    define Elf_Shdr	Elf32_Shdr
+ #    define Elf_Sym	Elf32_Sym
+ #    define Elf_Ehdr	Elf32_Ehdr
++#    define Elf_Rel Elf32_Rel
++#    define Elf_Rela Elf32_Rela
++#    define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#    define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ #    ifdef MODULE
+ 	asm(".section .plt,\"ax\",@nobits; .align 3; .previous");
+ 	asm(".section .init.plt,\"ax\",@nobits; .align 3; .previous");
+diff --git a/include/asm-s390/module.h b/include/asm-s390/module.h
+index 1cc1c5a..b64dab0 100644
+--- a/include/asm-s390/module.h
++++ b/include/asm-s390/module.h
+@@ -29,14 +29,17 @@ struct mod_arch_specific
+ };
+ 
+ #ifdef __s390x__
++#define MODULES_ARE_ELF64
+ #define ElfW(x) Elf64_ ## x
+ #define ELFW(x) ELF64_ ## x
+ #else
++#define MODULES_ARE_ELF32
+ #define ElfW(x) Elf32_ ## x
+ #define ELFW(x) ELF32_ ## x
+ #endif
+ 
+ #define Elf_Addr ElfW(Addr)
++#define Elf_Rel ElfW(Rel)
+ #define Elf_Rela ElfW(Rela)
+ #define Elf_Shdr ElfW(Shdr)
+ #define Elf_Sym ElfW(Sym)
+diff --git a/include/asm-sh/module.h b/include/asm-sh/module.h
+index 118d5a2..c3cf495 100644
+--- a/include/asm-sh/module.h
++++ b/include/asm-sh/module.h
+@@ -9,9 +9,14 @@ struct mod_arch_specific {
+ 	/* Nothing to see here .. */
+ };
+ 
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr		Elf32_Shdr
+ #define Elf_Sym			Elf32_Sym
+ #define Elf_Ehdr		Elf32_Ehdr
++#define Elf_Rel			Elf32_Rel
++#define Elf_Rela		Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ #ifdef CONFIG_CPU_LITTLE_ENDIAN
+ # ifdef CONFIG_CPU_SH2
+diff --git a/include/asm-sparc/module.h b/include/asm-sparc/module.h
+index cbd9e67..e2921e2 100644
+--- a/include/asm-sparc/module.h
++++ b/include/asm-sparc/module.h
+@@ -1,7 +1,12 @@
+ #ifndef _ASM_SPARC_MODULE_H
+ #define _ASM_SPARC_MODULE_H
+ struct mod_arch_specific { };
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ #endif /* _ASM_SPARC_MODULE_H */
+diff --git a/include/asm-sparc64/module.h b/include/asm-sparc64/module.h
+index 3d77ba4..2e7ca17 100644
+--- a/include/asm-sparc64/module.h
++++ b/include/asm-sparc64/module.h
+@@ -1,7 +1,12 @@
+ #ifndef _ASM_SPARC64_MODULE_H
+ #define _ASM_SPARC64_MODULE_H
+ struct mod_arch_specific { };
++#define MODULES_ARE_ELF64
+ #define Elf_Shdr Elf64_Shdr
+ #define Elf_Sym Elf64_Sym
+ #define Elf_Ehdr Elf64_Ehdr
++#define Elf_Rel Elf64_Rel
++#define Elf_Rela Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ #endif /* _ASM_SPARC64_MODULE_H */
+diff --git a/include/asm-um/module-i386.h b/include/asm-um/module-i386.h
+index 5ead4a0..b441057 100644
+--- a/include/asm-um/module-i386.h
++++ b/include/asm-um/module-i386.h
+@@ -9,5 +9,9 @@ struct mod_arch_specific
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ #endif
+diff --git a/include/asm-v850/module.h b/include/asm-v850/module.h
+index 2c2f494..48752f3 100644
+--- a/include/asm-v850/module.h
++++ b/include/asm-v850/module.h
+@@ -31,9 +31,14 @@ struct mod_arch_specific
+ 	unsigned int core_plt_section, init_plt_section;
+ };
+ 
++#define MODULES_ARE_ELF32
+ #define Elf_Shdr Elf32_Shdr
+ #define Elf_Sym Elf32_Sym
+ #define Elf_Ehdr Elf32_Ehdr
++#define Elf_Rel Elf32_Rel
++#define Elf_Rela Elf32_Rela
++#define ELF_R_TYPE(X)	ELF32_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF32_R_SYM(X)
+ 
+ /* Make empty sections for module_frob_arch_sections to expand. */
+ #ifdef MODULE
+diff --git a/include/asm-x86_64/module.h b/include/asm-x86_64/module.h
+index 67f8f69..3a7373a 100644
+--- a/include/asm-x86_64/module.h
++++ b/include/asm-x86_64/module.h
+@@ -3,8 +3,13 @@
+ 
+ struct mod_arch_specific {}; 
+ 
++#define MODULES_ARE_ELF64
+ #define Elf_Shdr Elf64_Shdr
+ #define Elf_Sym Elf64_Sym
+ #define Elf_Ehdr Elf64_Ehdr
++#define Elf_Rel Elf64_Rel
++#define Elf_Rela Elf64_Rela
++#define ELF_R_TYPE(X)	ELF64_R_TYPE(X)
++#define ELF_R_SYM(X)	ELF64_R_SYM(X)
+ 
+ #endif 
