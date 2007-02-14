@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 4/6] MODSIGN: Module ELF verifier
-Date: Wed, 14 Feb 2007 19:09:59 +0000
-Message-ID: <20070214190959.6438.64122.stgit@warthog.cambridge.redhat.com>
+Subject: [PATCH 5/6] MODSIGN: Module signature checker and key manager
+Date: Wed, 14 Feb 2007 19:10:04 +0000
+Message-ID: <20070214191004.6438.19957.stgit@warthog.cambridge.redhat.com>
 References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,428 +10,956 @@ Cc: linux-kernel@vger.kernel.org, davej@redhat.com,
 	arjan@infradead.org, linux-crypto@vger.kernel.org,
 	dhowells@redhat.com
 To: torvalds@osdl.org, akpm@osdl.org, herbert.xu@redhat.com
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S932465AbXBNTKh@vger.kernel.org>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S932458AbXBNTKz@vger.kernel.org>
 In-Reply-To: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Do preliminary verification of the ELF structure of a module.  This is used to
-make sure that the ELF structure can then be used to check the module signature
-and access the module data without breaking the module loader.
-
-If the module's ELF metadata is determined to be bad, then ELIBBAD will be
-returned and a message will be logged to the kernel log.
+Add a facility to retain public keys and to verify signatures made with those
+public keys, given a signature and crypto_hash of the data that was signed.
 
 Signed-Off-By: David Howells <dhowells@redhat.com>
 ---
 
- init/Kconfig               |   11 ++
- kernel/Makefile            |    2 
- kernel/module-verify-elf.c |  304 ++++++++++++++++++++++++++++++++++++++++++++
- kernel/module-verify.c     |   41 ++++++
- kernel/module-verify.h     |   53 ++++++++
- kernel/module.c            |    7 +
- 6 files changed, 416 insertions(+), 2 deletions(-)
+ crypto/Kconfig                     |   13 +
+ crypto/Makefile                    |    1 
+ crypto/signature/Makefile          |   10 +
+ crypto/signature/dsa.c             |   96 ++++++
+ crypto/signature/key.h             |    7 
+ crypto/signature/ksign-keyring.c   |  116 +++++++
+ crypto/signature/ksign-parse.c     |  603 ++++++++++++++++++++++++++++++++++++
+ crypto/signature/ksign-publickey.c |   18 +
+ crypto/signature/ksign.c           |  180 +++++++++++
+ crypto/signature/local.h           |  160 ++++++++++
+ include/linux/crypto/ksign.h       |   22 +
+ 11 files changed, 1226 insertions(+), 0 deletions(-)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index ad33c97..0013f45 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -553,6 +553,17 @@ config MODULE_SRCVERSION_ALL
- 	  the version).  With this option, such a "srcversion" field
- 	  will be created for all modules.  If unsure, say N.
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index aab5b8f..e764509 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -453,6 +453,19 @@ config CRYPTO_MPILIB
+ 	help
+ 	  Multiprecision maths library from GnuPG
  
-+config MODULE_VERIFY_ELF
-+	bool "Module ELF structure verification"
-+	depends on MODULES
++config CRYPTO_SIGNATURE
++	bool "In-kernel signature checker (EXPERIMENTAL)"
++	depends on CRYPTO
 +	help
-+	  Check ELF structure of modules upon load
++	  Signature checker (used for module sig checking).
 +
-+config MODULE_VERIFY
-+	bool
-+	depends on MODULES
-+	default y if MODULE_VERIFY_ELF
++config CRYPTO_SIGNATURE_DSA
++	bool "Handle DSA signatures (EXPERIMENTAL)"
++	depends on CRYPTO_SIGNATURE
++	select CRYPTO_MPILIB
++	help
++	  DSA Signature checker.
 +
- config KMOD
- 	bool "Automatic kernel module loading"
- 	depends on MODULES
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 14f4d45..5ed0824 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -30,6 +30,8 @@ obj-$(CONFIG_DEBUG_SPINLOCK) += spinlock.o
- obj-$(CONFIG_PROVE_LOCKING) += spinlock.o
- obj-$(CONFIG_UID16) += uid16.o
- obj-$(CONFIG_MODULES) += module.o
-+obj-$(CONFIG_MODULE_VERIFY) += module-verify.o
-+obj-$(CONFIG_MODULE_VERIFY_ELF) += module-verify-elf.o
- obj-$(CONFIG_KALLSYMS) += kallsyms.o
- obj-$(CONFIG_PM) += power/
- obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
-diff --git a/kernel/module-verify-elf.c b/kernel/module-verify-elf.c
+ source "drivers/crypto/Kconfig"
+ 
+ endif	# if CRYPTO
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 49fc857..fe33414 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -50,3 +50,4 @@ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
+ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
+ 
+ obj-$(CONFIG_CRYPTO_MPILIB) += mpi/
++obj-$(CONFIG_CRYPTO_SIGNATURE) += signature/
+diff --git a/crypto/signature/Makefile b/crypto/signature/Makefile
 new file mode 100644
-index 0000000..6c4f1b1
+index 0000000..4d1042e
 --- /dev/null
-+++ b/kernel/module-verify-elf.c
-@@ -0,0 +1,304 @@
-+/* module-verify-elf.c: module ELF verifier
++++ b/crypto/signature/Makefile
+@@ -0,0 +1,10 @@
++#
++# Makefile for the signature checker
++#
++
++obj-y := \
++	ksign.o \
++	ksign-parse.o \
++	ksign-keyring.o \
++	ksign-publickey.o \
++	dsa.o
+diff --git a/crypto/signature/dsa.c b/crypto/signature/dsa.c
+new file mode 100644
+index 0000000..469539c
+--- /dev/null
++++ b/crypto/signature/dsa.c
+@@ -0,0 +1,96 @@
++/* dsa.c  -  DSA signature algorithm
++ *	Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 + *
-+ * Written by David Howells (dhowells@redhat.com)
++ * This file is part of GnuPG.
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
++ * GnuPG is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * GnuPG is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 + */
 +
 +#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <linux/elf.h>
-+#include "module-verify.h"
-+
-+#if 0
-+#define _debug(FMT, ...) printk(FMT, ##__VA_ARGS__)
-+#else
-+#define _debug(FMT, ...) do {} while (0)
-+#endif
++#include <linux/crypto/mpi.h>
++#include <asm/errno.h>
++#include "local.h"
 +
 +/*
-+ * verify the ELF structure of a module
++ * perform DSA algorithm signature verification
 + */
-+int module_verify_elf(struct module_verify_data *mvdata)
++int DSA_verify(const MPI datahash, const MPI sig[], const MPI pkey[])
 +{
-+	const Elf_Ehdr *hdr = mvdata->hdr;
-+	const Elf_Shdr *section, *section2, *secstop;
-+	const Elf_Rela *relas, *rela, *relastop;
-+	const Elf_Rel *rels, *rel, *relstop;
-+	const Elf_Sym *symbol, *symstop;
-+	size_t size, sssize, *secsize, tmp, tmp2;
-+	long last;
-+	int line;
++	MPI p, q, g, y, r, s;
++	MPI w = NULL, u1 = NULL, u2 = NULL, v = NULL;
++	MPI base[3];
++	MPI exp[3];
++	int rc;
 +
-+	size = mvdata->size;
-+	mvdata->nsects = hdr->e_shnum;
++	if (!datahash ||
++	    !sig[0] || !sig[1] ||
++	    !pkey[0] || !pkey[1] || !pkey[2] || !pkey[3])
++		return -EINVAL;
 +
-+#define elfcheck(X)							\
-+do { if (unlikely(!(X))) { line = __LINE__; goto elfcheck_error; } } while(0)
++	p = pkey[0];	/* prime */
++	q = pkey[1];	/* group order */
++	g = pkey[2];	/* group generator */
++	y = pkey[3];	/* g^x mod p */
++	r = sig[0];
++	s = sig[1];
 +
-+#define seccheck(X)							\
-+do { if (unlikely(!(X))) { line = __LINE__; goto seccheck_error; } } while(0)
++	if (!(mpi_cmp_ui(r, 0) > 0 && mpi_cmp(r, q) < 0)) {
++		printk("DSA_verify assertion failed [0 < r < q]\n");
++		return -EKEYREJECTED;
++	}
 +
-+#define symcheck(X)							\
-+do { if (unlikely(!(X))) { line = __LINE__; goto symcheck_error; } } while(0)
++	if (!(mpi_cmp_ui(s, 0) > 0 && mpi_cmp(s, q) < 0)) {
++		printk("DSA_verify assertion failed [0 < s < q]\n");
++		return -EKEYREJECTED;
++	}
 +
-+#define relcheck(X)							\
-+do { if (unlikely(!(X))) { line = __LINE__; goto relcheck_error; } } while(0)
++	rc = -ENOMEM;
++	w  = mpi_alloc(mpi_get_nlimbs(q)); if (!w ) goto cleanup;
++	u1 = mpi_alloc(mpi_get_nlimbs(q)); if (!u1) goto cleanup;
++	u2 = mpi_alloc(mpi_get_nlimbs(q)); if (!u2) goto cleanup;
++	v  = mpi_alloc(mpi_get_nlimbs(p)); if (!v ) goto cleanup;
 +
-+#define relacheck(X)							\
-+do { if (unlikely(!(X))) { line = __LINE__; goto relacheck_error; } } while(0)
++	/* w = s^(-1) mod q */
++	if (mpi_invm(w, s, q) < 0)
++		goto cleanup;
 +
-+	/* validate the ELF header */
-+	elfcheck(hdr->e_ehsize < size);
-+	elfcheck(hdr->e_entry == 0);
-+	elfcheck(hdr->e_phoff == 0);
-+	elfcheck(hdr->e_phnum == 0);
++	/* u1 = (datahash * w) mod q */
++	if (mpi_mulm(u1, datahash, w, q) < 0)
++		goto cleanup;
 +
-+	elfcheck(hdr->e_shnum < SHN_LORESERVE);
-+	elfcheck(hdr->e_shoff < size);
-+	elfcheck(hdr->e_shoff >= hdr->e_ehsize);
-+	elfcheck((hdr->e_shoff & (sizeof(long) - 1)) == 0);
-+	elfcheck(hdr->e_shstrndx > 0);
-+	elfcheck(hdr->e_shstrndx < hdr->e_shnum);
-+	elfcheck(hdr->e_shentsize == sizeof(Elf_Shdr));
++	/* u2 = r * w mod q  */
++	if (mpi_mulm(u2, r, w, q) < 0)
++		goto cleanup;
 +
-+	tmp = (size_t) hdr->e_shentsize * (size_t) hdr->e_shnum;
-+	elfcheck(tmp <= size - hdr->e_shoff);
++	/* v =  g^u1 * y^u2 mod p mod q */
++	base[0] = g;	exp[0] = u1;
++	base[1] = y;	exp[1] = u2;
++	base[2] = NULL;	exp[2] = NULL;
 +
-+	/* allocate a table to hold in-file section sizes */
-+	mvdata->secsizes = kcalloc(hdr->e_shnum, sizeof(size_t), GFP_KERNEL);
-+	if (!mvdata->secsizes)
++	if (mpi_mulpowm(v, base, exp, p) < 0)
++		goto cleanup;
++
++	if (mpi_fdiv_r(v, v, q) < 0)
++		goto cleanup;
++
++	rc = (mpi_cmp(v, r) == 0) ? 0 : -EKEYREJECTED;
++
++cleanup:
++	mpi_free(w);
++	mpi_free(u1);
++	mpi_free(u2);
++	mpi_free(v);
++	return rc;
++}
+diff --git a/crypto/signature/key.h b/crypto/signature/key.h
+new file mode 100644
+index 0000000..7297968
+--- /dev/null
++++ b/crypto/signature/key.h
+@@ -0,0 +1,7 @@
++const int ksign_def_public_key_size = 0;
++/* automatically generated by bin2hex */
++static unsigned char ksign_def_public_key[] __initdata =
++{
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
+diff --git a/crypto/signature/ksign-keyring.c b/crypto/signature/ksign-keyring.c
+new file mode 100644
+index 0000000..a839261
+--- /dev/null
++++ b/crypto/signature/ksign-keyring.c
+@@ -0,0 +1,116 @@
++/* ksign-keyring.c: public key cache
++ *
++ * Copyright (C) 2001 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This file is derived from part of GnuPG.
++ *
++ * GnuPG is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * GnuPG is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
++ */
++
++#include <linux/rwsem.h>
++#include "local.h"
++
++static LIST_HEAD(keyring);
++static DECLARE_RWSEM(keyring_sem);
++
++/*
++ * handle a public key element parsed from the keyring blob
++ */
++static int add_keyblock_key(struct ksign_public_key *pk, void *data)
++{
++	printk("- Added public key %X%X\n", pk->keyid[0], pk->keyid[1]);
++
++	if (pk->expiredate && pk->expiredate < xtime.tv_sec)
++		printk("  - public key has expired\n");
++
++	if (pk->timestamp > xtime.tv_sec )
++		printk("  - key was been created %lu seconds in future\n",
++		       pk->timestamp - xtime.tv_sec);
++
++	atomic_inc(&pk->count);
++
++	down_write(&keyring_sem);
++	list_add_tail(&pk->link, &keyring);
++	up_write(&keyring_sem);
++
++	return 0;
++}
++
++/*
++ * handle a user ID element parsed from the keyring blob
++ */
++static int add_keyblock_uid(struct ksign_user_id *uid, void *data)
++{
++	printk("- User ID: %s\n", uid->name);
++	return 1;
++}
++
++/*
++ * add the keys from a ASN.1 encoded blob into the keyring
++ */
++int ksign_load_keyring_from_buffer(const void *buffer, size_t size)
++{
++    printk("Loading keyring\n");
++
++    return ksign_parse_packets((const uint8_t *) buffer,
++			       size,
++			       NULL,
++			       add_keyblock_key,
++			       add_keyblock_uid,
++			       NULL);
++}
++
++/*
++ * find a public key by ID
++ */
++struct ksign_public_key *ksign_get_public_key(const uint32_t *keyid)
++{
++	struct ksign_public_key *pk;
++
++	down_read(&keyring_sem);
++
++	list_for_each_entry(pk, &keyring, link) {
++		if (memcmp(pk->keyid, keyid, sizeof(pk->keyid)) == 0) {
++			atomic_inc(&pk->count);
++			goto found;
++		}
++	}
++
++	pk = NULL;
++
++found:
++	up_read(&keyring_sem);
++	return pk;
++}
++
++/*
++ * clear the public-key keyring
++ */
++void ksign_clear_keyring(void)
++{
++	struct ksign_public_key *pk;
++
++	down_write(&keyring_sem);
++
++	while (!list_empty(&keyring)) {
++		pk = list_entry(keyring.next, struct ksign_public_key, link);
++		list_del(&pk->link);
++
++		ksign_put_public_key(pk);
++	}
++
++	up_write(&keyring_sem);
++}
+diff --git a/crypto/signature/ksign-parse.c b/crypto/signature/ksign-parse.c
+new file mode 100644
+index 0000000..96e2ff5
+--- /dev/null
++++ b/crypto/signature/ksign-parse.c
+@@ -0,0 +1,603 @@
++/* parse packet data
++ * Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
++ *
++ * This file is part of GnuPG.
++ *
++ * GnuPG is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * GnuPG is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
++ */
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <asm/errno.h>
++#include "local.h"
++
++static inline uint32_t buffer_to_u32(const uint8_t *buffer)
++{
++	uint32_t a;
++	a =  *buffer << 24;
++	a |= buffer[1] << 16;
++	a |= buffer[2] << 8;
++	a |= buffer[3];
++	return a;
++}
++
++static inline uint16_t read_16(const uint8_t **datap)
++{
++	uint16_t a;
++	a = *(*datap)++ << 8;
++	a |= *(*datap)++;
++	return a;
++}
++
++static inline uint32_t read_32(const uint8_t **datap)
++{
++	uint32_t a;
++	a =  *(*datap)++ << 24;
++	a |= *(*datap)++ << 16;
++	a |= *(*datap)++ << 8;
++	a |= *(*datap)++;
++	return a;
++}
++
++void ksign_free_signature(struct ksign_signature *sig)
++{
++	int i;
++
++	if (sig) {
++		for (i = 0; i < DSA_NSIG; i++)
++			mpi_free(sig->data[i]);
++		kfree(sig->hashed_data);
++		kfree(sig->unhashed_data);
++		kfree(sig);
++	}
++}
++
++void ksign_free_public_key(struct ksign_public_key *pk)
++{
++	int i;
++
++	if (pk) {
++		for (i = 0; i < DSA_NPKEY; i++)
++			mpi_free(pk->pkey[i]);
++		kfree(pk);
++	}
++}
++
++void ksign_free_user_id(struct ksign_user_id *uid)
++{
++	kfree(uid);
++}
++
++/*
++ *
++ */
++static void ksign_calc_pk_keyid(struct hash_desc *sha1,
++				struct ksign_public_key *pk)
++{
++	unsigned n;
++	unsigned nb[DSA_NPKEY];
++	unsigned nn[DSA_NPKEY];
++	uint8_t *pp[DSA_NPKEY];
++	uint32_t a32;
++	int i;
++	int npkey = DSA_NPKEY;
++
++	crypto_hash_init(sha1);
++
++	n = pk->version < 4 ? 8 : 6;
++	for (i = 0; i < npkey; i++) {
++		nb[i] = mpi_get_nbits(pk->pkey[i]);
++		pp[i] = mpi_get_buffer( pk->pkey[i], nn + i, NULL);
++		n += 2 + nn[i];
++	}
++
++	SHA1_putc(sha1, 0x99);     /* ctb */
++	SHA1_putc(sha1, n >> 8);   /* 2 uint8_t length header */
++	SHA1_putc(sha1, n);
++
++	if (pk->version < 4)
++		SHA1_putc(sha1, 3);
++	else
++		SHA1_putc(sha1, 4);
++
++	a32 = pk->timestamp;
++	SHA1_putc(sha1, a32 >> 24 );
++	SHA1_putc(sha1, a32 >> 16 );
++	SHA1_putc(sha1, a32 >>  8 );
++	SHA1_putc(sha1, a32 >>  0 );
++
++	if (pk->version < 4) {
++		uint16_t a16;
++
++		if( pk->expiredate )
++			a16 = (uint16_t)
++				((pk->expiredate - pk->timestamp) / 86400L);
++		else
++			a16 = 0;
++		SHA1_putc(sha1, a16 >> 8);
++		SHA1_putc(sha1, a16 >> 0);
++	}
++
++	SHA1_putc(sha1, PUBKEY_ALGO_DSA);
++
++	for (i = 0; i < npkey; i++) {
++		SHA1_putc(sha1, nb[i] >> 8);
++		SHA1_putc(sha1, nb[i]);
++		SHA1_write(sha1, pp[i], nn[i]);
++		kfree(pp[i]);
++	}
++}
++
++/*
++ * parse a user ID embedded in a signature
++ */
++static int ksign_parse_user_id(const uint8_t *datap, const uint8_t *endp,
++			       ksign_user_id_actor_t uidfnx, void *fnxdata)
++{
++	struct ksign_user_id *uid;
++	int rc = 0;
++	int n;
++
++	if (!uidfnx)
++		return 0;
++
++	n = endp - datap;
++	uid = kmalloc(sizeof(*uid) + n + 1, GFP_KERNEL);
++	if (!uid)
++		return -ENOMEM;
++	uid->len = n;
++
++	memcpy(uid->name, datap, n);
++	uid->name[n] = 0;
++
++	rc = uidfnx(uid, fnxdata);
++	if (rc == 0)
++		return rc; /* uidfnx keeps the record */
++	if (rc == 1)
++		rc = 0;
++
++	ksign_free_user_id(uid);
++	return rc;
++}
++
++/*
++ * extract a public key embedded in a signature
++ */
++static int ksign_parse_key(const uint8_t *datap, const uint8_t *endp,
++			   uint8_t *hdr, int hdrlen,
++			   ksign_public_key_actor_t pkfnx, void *fnxdata)
++{
++	struct ksign_public_key *pk;
++	struct hash_desc sha1;
++	unsigned long timestamp, expiredate;
++	uint8_t hash[SHA1_DIGEST_SIZE];
++	int i, version;
++	int is_v4 = 0;
++	int rc = 0;
++
++	if (endp - datap < 12) {
++		printk("ksign: public key packet too short\n");
++		return -EBADMSG;
++	}
++
++	version = *datap++;
++	switch (version) {
++	case 4:
++		is_v4 = 1;
++	case 2:
++	case 3:
++		break;
++	default:
++		printk("ksign: public key packet with unknown version %d\n",
++		       version);
++		return -EBADMSG;
++	}
++
++	timestamp = read_32(&datap);
++	if (is_v4) {
++		expiredate = 0; /* have to get it from the selfsignature */
++	} else {
++		unsigned short ndays;
++		ndays = read_16(&datap);
++		if (ndays)
++			expiredate = timestamp + ndays * 86400L;
++		else
++			expiredate = 0;
++	}
++
++	if (*datap++ != PUBKEY_ALGO_DSA) {
++		printk("ksign: public key packet with unknown version %d\n",
++		       version);
++		return 0;
++	}
++
++	/* extract the stuff from the DSA public key */
++	pk = kzalloc(sizeof(struct ksign_public_key), GFP_KERNEL);
++	if (!pk)
 +		return -ENOMEM;
 +
-+	/* validate the ELF section headers */
-+	mvdata->sections = mvdata->buffer + hdr->e_shoff;
-+	secstop = mvdata->sections + mvdata->nsects;
++	atomic_set(&pk->count, 1);
++	pk->timestamp	= timestamp;
++	pk->expiredate	= expiredate;
++	pk->hdrbytes	= hdrlen;
++	pk->version	= version;
 +
-+	sssize = mvdata->sections[hdr->e_shstrndx].sh_size;
-+	elfcheck(sssize > 0);
-+
-+	section = mvdata->sections;
-+	seccheck(section->sh_type == SHT_NULL);
-+	seccheck(section->sh_size == 0);
-+	seccheck(section->sh_offset == 0);
-+
-+	secsize = mvdata->secsizes + 1;
-+	for (section++; section < secstop; secsize++, section++) {
-+		seccheck(section->sh_name < sssize);
-+		seccheck(section->sh_link < hdr->e_shnum);
-+
-+		if (section->sh_entsize > 0)
-+			seccheck(section->sh_size % section->sh_entsize == 0);
-+
-+		seccheck(section->sh_offset >= hdr->e_ehsize);
-+		seccheck(section->sh_offset < size);
-+
-+		/* determine the section's in-file size */
-+		tmp = size - section->sh_offset;
-+		if (section->sh_offset < hdr->e_shoff)
-+			tmp = hdr->e_shoff - section->sh_offset;
-+
-+		for (section2 = mvdata->sections + 1;
-+		     section2 < secstop;
-+		     section2++) {
-+			if (section->sh_offset < section2->sh_offset) {
-+				tmp2 = section2->sh_offset -
-+					section->sh_offset;
-+				if (tmp2 < tmp)
-+					tmp = tmp2;
-+			}
-+		}
-+		*secsize = tmp;
-+
-+		_debug("Section %ld: %zx bytes at %lx\n",
-+		       section - mvdata->sections,
-+		       *secsize,
-+		       (unsigned long) section->sh_offset);
-+
-+		/* perform section type specific checks */
-+		switch (section->sh_type) {
-+		case SHT_NOBITS:
-+			break;
-+
-+		case SHT_REL:
-+			seccheck(section->sh_entsize == sizeof(Elf_Rel));
-+			goto more_rel_checks;
-+
-+		case SHT_RELA:
-+			seccheck(section->sh_entsize == sizeof(Elf_Rela));
-+		more_rel_checks:
-+			seccheck(section->sh_info > 0);
-+			seccheck(section->sh_info < hdr->e_shnum);
-+			goto more_sec_checks;
-+
-+		case SHT_SYMTAB:
-+			seccheck(section->sh_entsize == sizeof(Elf_Sym));
-+			goto more_sec_checks;
-+
-+		default:
-+		more_sec_checks:
-+			/* most types of section must be contained entirely
-+			 * within the file */
-+			seccheck(section->sh_size <= *secsize);
-+			break;
-+		}
++	for (i = 0; i < DSA_NPKEY; i++) {
++		unsigned int remaining = endp - datap;
++		pk->pkey[i] = mpi_read_from_buffer(datap, &remaining);
++		datap += remaining;
 +	}
 +
-+	/* validate the ELF section names */
-+	section = &mvdata->sections[hdr->e_shstrndx];
++	rc = -ENOMEM;
 +
-+	seccheck(section->sh_offset != hdr->e_shoff);
++	sha1.tfm = crypto_hash_cast(crypto_alloc_tfm2("sha1", 0, 1));
++	if (!sha1.tfm)
++		goto cleanup;
++	sha1.flags = 0;
 +
-+	mvdata->secstrings = mvdata->buffer + section->sh_offset;
++	ksign_calc_pk_keyid(&sha1, pk);
++	crypto_hash_final(&sha1, hash);
++	crypto_free_hash(sha1.tfm);
 +
-+	last = -1;
-+	for (section = mvdata->sections + 1; section < secstop; section++) {
-+		const char *secname;
-+		tmp = sssize - section->sh_name;
-+		secname = mvdata->secstrings + section->sh_name;
-+		seccheck(secname[0] != 0);
-+		if (section->sh_name > last)
-+			last = section->sh_name;
-+	}
++	pk->keyid[0] = hash[12] << 24 | hash[13] << 16 | hash[14] << 8 | hash[15];
++	pk->keyid[1] = hash[16] << 24 | hash[17] << 16 | hash[18] << 8 | hash[19];
 +
-+	if (last > -1) {
-+		tmp = sssize - last;
-+		elfcheck(memchr(mvdata->secstrings + last, 0, tmp) != NULL);
-+	}
++	rc = 0;
++	if (pkfnx)
++		rc = pkfnx(pk, fnxdata);
 +
-+	/* look for various sections in the module */
-+	for (section = mvdata->sections + 1; section < secstop; section++) {
-+		switch (section->sh_type) {
-+		case SHT_SYMTAB:
-+			if (strcmp(mvdata->secstrings + section->sh_name,
-+				   ".symtab") == 0
-+			    ) {
-+				seccheck(mvdata->symbols == NULL);
-+				mvdata->symbols =
-+					mvdata->buffer + section->sh_offset;
-+				mvdata->nsyms =
-+					section->sh_size / sizeof(Elf_Sym);
-+				seccheck(section->sh_size > 0);
-+			}
-+			break;
-+
-+		case SHT_STRTAB:
-+			if (strcmp(mvdata->secstrings + section->sh_name,
-+				   ".strtab") == 0
-+			    ) {
-+				seccheck(mvdata->strings == NULL);
-+				mvdata->strings =
-+					mvdata->buffer + section->sh_offset;
-+				sssize = mvdata->nstrings = section->sh_size;
-+				seccheck(section->sh_size > 0);
-+			}
-+			break;
-+		}
-+	}
-+
-+	if (!mvdata->symbols) {
-+		printk("Couldn't locate module symbol table\n");
-+		goto format_error;
-+	}
-+
-+	if (!mvdata->strings) {
-+		printk("Couldn't locate module strings table\n");
-+		goto format_error;
-+	}
-+
-+	/* validate the symbol table */
-+	symstop = mvdata->symbols + mvdata->nsyms;
-+
-+	symbol = mvdata->symbols;
-+	symcheck(ELF_ST_TYPE(symbol[0].st_info) == STT_NOTYPE);
-+	symcheck(symbol[0].st_shndx == SHN_UNDEF);
-+	symcheck(symbol[0].st_value == 0);
-+	symcheck(symbol[0].st_size == 0);
-+
-+	last = -1;
-+	for (symbol++; symbol < symstop; symbol++) {
-+		symcheck(symbol->st_name < sssize);
-+		if (symbol->st_name > last)
-+			last = symbol->st_name;
-+		symcheck(symbol->st_shndx < mvdata->nsects ||
-+			 symbol->st_shndx >= SHN_LORESERVE);
-+	}
-+
-+	if (last > -1) {
-+		tmp = sssize - last;
-+		elfcheck(memchr(mvdata->strings + last, 0, tmp) != NULL);
-+	}
-+
-+	/* validate each relocation table as best we can */
-+	for (section = mvdata->sections + 1; section < secstop; section++) {
-+		section2 = mvdata->sections + section->sh_info;
-+
-+		switch (section->sh_type) {
-+		case SHT_REL:
-+			rels = mvdata->buffer + section->sh_offset;
-+			relstop = mvdata->buffer +
-+				section->sh_offset + section->sh_size;
-+
-+			for (rel = rels; rel < relstop; rel++) {
-+				relcheck(rel->r_offset < section2->sh_size);
-+				relcheck(ELF_R_SYM(rel->r_info) <
-+					 mvdata->nsyms);
-+			}
-+
-+			break;
-+
-+		case SHT_RELA:
-+			relas = mvdata->buffer + section->sh_offset;
-+			relastop = mvdata->buffer +
-+				section->sh_offset + section->sh_size;
-+
-+			for (rela = relas; rela < relastop; rela++) {
-+				relacheck(rela->r_offset < section2->sh_size);
-+				relacheck(ELF_R_SYM(rela->r_info) <
-+					  mvdata->nsyms);
-+			}
-+
-+			break;
-+
-+		default:
-+			break;
-+		}
-+	}
-+
-+
-+	_debug("ELF okay\n");
-+	return 0;
-+
-+elfcheck_error:
-+	printk("Verify ELF error (assertion %d)\n", line);
-+	goto format_error;
-+
-+seccheck_error:
-+	printk("Verify ELF error [sec %ld] (assertion %d)\n",
-+	       (long)(section - mvdata->sections), line);
-+	goto format_error;
-+
-+symcheck_error:
-+	printk("Verify ELF error [sym %ld] (assertion %d)\n",
-+	       (long)(symbol - mvdata->symbols), line);
-+	goto format_error;
-+
-+relcheck_error:
-+	printk("Verify ELF error [sec %ld rel %ld] (assertion %d)\n",
-+	       (long)(section - mvdata->sections),
-+	       (long)(rel - rels), line);
-+	goto format_error;
-+
-+relacheck_error:
-+	printk("Verify ELF error [sec %ld rela %ld] (assertion %d)\n",
-+	       (long)(section - mvdata->sections),
-+	       (long)(rela - relas), line);
-+	goto format_error;
-+
-+format_error:
-+	return -ELIBBAD;
++cleanup:
++	ksign_put_public_key(pk);
++	return rc;
 +}
-diff --git a/kernel/module-verify.c b/kernel/module-verify.c
-new file mode 100644
-index 0000000..875279f
---- /dev/null
-+++ b/kernel/module-verify.c
-@@ -0,0 +1,41 @@
-+/* module-verify.c: module verifier
-+ *
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include "module-verify.h"
 +
 +/*
-+ * verify a module's integrity
-+ * - check the ELF is viable
++ * find an element representing the issuer
 + */
-+int module_verify(const Elf_Ehdr *hdr, size_t size)
++static const uint8_t *ksign_find_sig_issuer(const uint8_t *buffer)
 +{
-+	struct module_verify_data mvdata;
-+	int ret;
++	size_t buflen;
++	size_t n;
++	int type;
++	int seq = 0;
 +
-+	memset(&mvdata, 0, sizeof(mvdata));
-+	mvdata.buffer	= hdr;
-+	mvdata.hdr	= hdr;
-+	mvdata.size	= size;
++	if (!buffer)
++		return NULL;
 +
-+	ret = module_verify_elf(&mvdata);
-+	if (ret < 0) {
-+		if (ret == -ELIBBAD)
-+			printk("Module failed ELF checks\n");
-+		goto error;
++	buflen = read_16(&buffer);
++	while (buflen) {
++		n = *buffer++; buflen--;
++		if (n == 255) {
++			if (buflen < 4)
++				goto too_short;
++			n = read_32(&buffer);
++			buflen -= 4;
++		} else if (n >= 192) {
++			if(buflen < 2)
++				goto too_short;
++			n = ((n - 192) << 8) + *buffer + 192;
++			buffer++;
++			buflen--;
++		}
++
++		if (buflen < n)
++			goto too_short;
++
++		type = *buffer & 0x7f;
++		if (!(++seq > 0)) {
++			;
++		} else if (type == SIGSUBPKT_ISSUER) {
++			/* found */
++			buffer++;
++			n--;
++			if (n > buflen || n < 8)
++				goto too_short;
++			return buffer;
++		}
++
++		buffer += n;
++		buflen -= n;
 +	}
 +
-+error:
-+	kfree(mvdata.secsizes);
-+	kfree(mvdata.canonlist);
-+	return ret;
++too_short:
++	return NULL; /* end of subpackets; not found */
 +}
-diff --git a/kernel/module-verify.h b/kernel/module-verify.h
++
++/*
++ * extract signature data embedded in a signature
++ */
++static int ksign_parse_signature(const uint8_t *datap, const uint8_t *endp,
++				 ksign_signature_actor_t sigfnx, void *fnxdata)
++{
++	struct ksign_signature *sig;
++	size_t n;
++	int version, is_v4 = 0;
++	int rc;
++	int i;
++
++	if (endp - datap < 16) {
++		printk("ksign: signature packet too short\n");
++		return -EBADMSG;
++	}
++
++	version = *datap++;
++	switch (version) {
++	case 4:
++		is_v4 = 1;
++	case 3:
++	case 2:
++		break;
++	default:
++		printk("ksign: signature packet with unknown version %d\n",
++		       version);
++		return 0;
++	}
++
++	/* store information */
++	sig = kzalloc(sizeof(*sig), GFP_KERNEL);
++	if (!sig)
++		return -ENOMEM;
++
++	sig->version = version;
++
++	if (!is_v4)
++		datap++; /* ignore md5 length */
++
++	sig->sig_class = *datap++;
++	if (!is_v4) {
++		sig->timestamp = read_32(&datap);
++		sig->keyid[0] = read_32(&datap);
++		sig->keyid[1] = read_32(&datap);
++	}
++
++	rc = 0;
++	if (*datap++ != PUBKEY_ALGO_DSA) {
++		printk("ksign: ignoring non-DSA signature\n");
++		goto leave;
++	}
++	if (*datap++ != DIGEST_ALGO_SHA1) {
++		printk("ksign: ignoring non-SHA1 signature\n");
++		goto leave;
++	}
++
++	rc = -EBADMSG;
++	if (is_v4) {
++		/* read subpackets */
++		n = read_16(&datap); /* length of hashed data */
++		if (n > 10000) {
++			printk("ksign: signature packet:"
++			       " hashed data too long\n");
++			goto leave;
++		}
++		if (n) {
++			if ((size_t)(endp - datap) < n) {
++				printk("ksign: signature packet:"
++				       " available data too short\n");
++				goto leave;
++			}
++			sig->hashed_data = kmalloc(n + 2, GFP_KERNEL);
++			if (!sig->hashed_data) {
++				rc = -ENOMEM;
++				goto leave;
++			}
++			sig->hashed_data[0] = n >> 8;
++			sig->hashed_data[1] = n;
++			memcpy(sig->hashed_data + 2, datap, n);
++			datap += n;
++		}
++
++		n = read_16(&datap); /* length of unhashed data */
++		if (n > 10000) {
++			printk("ksign: signature packet:"
++			       " unhashed data too long\n");
++			goto leave;
++		}
++		if (n) {
++			if ((size_t) (endp - datap) < n) {
++				printk("ksign: signature packet:"
++				       " available data too short\n");
++				goto leave;
++			}
++			sig->unhashed_data = kmalloc(n + 2, GFP_KERNEL);
++			if (!sig->unhashed_data) {
++				rc = -ENOMEM;
++				goto leave;
++			}
++			sig->unhashed_data[0] = n >> 8;
++			sig->unhashed_data[1] = n;
++			memcpy(sig->unhashed_data + 2, datap, n);
++			datap += n;
++		}
++	}
++
++	if (endp - datap < 5) { /* sanity check */
++		printk("ksign: signature packet too short\n");
++		goto leave;
++	}
++
++	sig->digest_start[0] = *datap++;
++	sig->digest_start[1] = *datap++;
++
++	if (is_v4) {
++		const uint8_t *p;
++
++		p = ksign_find_sig_issuer(sig->hashed_data);
++		if (!p)
++			p = ksign_find_sig_issuer(sig->unhashed_data);
++		if (!p) {
++			printk("ksign: signature packet without issuer\n");
++		} else {
++			sig->keyid[0] = buffer_to_u32(p);
++			sig->keyid[1] = buffer_to_u32(p + 4);
++		}
++	}
++
++	for (i = 0; i < DSA_NSIG; i++) {
++		unsigned remaining = endp - datap;
++		sig->data[i] = mpi_read_from_buffer(datap, &remaining);
++		datap += remaining;
++	}
++
++	rc = 0;
++	if (sigfnx) {
++		rc = sigfnx(sig, fnxdata);
++		if (rc == 0)
++			return rc; /* sigfnx keeps the signature */
++		if (rc == 1)
++			rc = 0;
++	}
++
++leave:
++	ksign_free_signature(sig);
++	return rc;
++}
++
++/*
++ * parse the next packet and call appropriate handler function for known types
++ * - returns:
++ *     0 on EOF
++ *     1 if there might be more packets
++ *     -EBADMSG if the packet is in an invalid format
++ *     -ve on other error
++ */
++static int ksign_parse_one_packet(const uint8_t **datap,
++				  const uint8_t *endp,
++				  ksign_signature_actor_t sigfnx,
++				  ksign_public_key_actor_t pkfnx,
++				  ksign_user_id_actor_t uidfnx,
++				  void *data)
++{
++	int rc, c, ctb, pkttype, lenuint8_ts;
++	unsigned long pktlen;
++	uint8_t hdr[8];
++	int hdrlen;
++
++	/* extract the next packet and dispatch it */
++	rc = 0;
++	if (*datap >= endp)
++		goto leave;
++	ctb = *(*datap)++;
++
++	rc = -EBADMSG;
++
++	hdrlen = 0;
++	hdr[hdrlen++] = ctb;
++	if (!(ctb & 0x80)) {
++		printk("ksign: invalid packet (ctb=%02x)\n", ctb);
++		goto leave;
++	}
++
++	pktlen = 0;
++	if (ctb & 0x40) {
++		pkttype = ctb & 0x3f;
++		if (*datap >= endp) {
++			printk("ksign: 1st length byte missing\n");
++			goto leave;
++		}
++		c = *(*datap)++;
++		hdr[hdrlen++] = c;
++
++		if (c < 192) {
++			pktlen = c;
++		} else if (c < 224) {
++			pktlen = (c - 192) * 256;
++			if (*datap >= endp) {
++				printk("ksign: 2nd length uint8_t missing\n");
++				goto leave;
++			}
++			c = *(*datap)++;
++			hdr[hdrlen++] = c;
++			pktlen += c + 192;
++		} else if (c == 255) {
++			if (*datap + 3 >= endp) {
++				printk("ksign: 4 uint8_t length invalid\n");
++				goto leave;
++			}
++			pktlen  = (hdr[hdrlen++] = *(*datap)++ << 24);
++			pktlen |= (hdr[hdrlen++] = *(*datap)++ << 16);
++			pktlen |= (hdr[hdrlen++] = *(*datap)++ <<  8);
++			pktlen |= (hdr[hdrlen++] = *(*datap)++ <<  0);
++		} else {
++			pktlen = 0;/* to indicate partial length */
++		}
++	} else {
++		pkttype = (ctb >> 2) & 0xf;
++		lenuint8_ts = ((ctb & 3) == 3) ? 0 : (1 << (ctb & 3));
++		if( !lenuint8_ts ) {
++			pktlen = 0; /* don't know the value */
++		} else {
++			if (*datap + lenuint8_ts > endp) {
++				printk("ksign: length uint8_ts missing\n");
++				goto leave;
++			}
++			for( ; lenuint8_ts; lenuint8_ts-- ) {
++				pktlen <<= 8;
++				pktlen |= hdr[hdrlen++] = *(*datap)++;
++			}
++		}
++	}
++
++	if (*datap + pktlen > endp) {
++		printk("ksign: packet length longer than available data\n");
++		goto leave;
++	}
++
++	/* deal with the next packet appropriately */
++	switch (pkttype) {
++	case PKT_PUBLIC_KEY:
++		rc = ksign_parse_key(*datap, *datap + pktlen, hdr, hdrlen,
++				     pkfnx, data);
++		break;
++	case PKT_SIGNATURE:
++		rc = ksign_parse_signature(*datap, *datap + pktlen,
++					   sigfnx, data);
++		break;
++	case PKT_USER_ID:
++		rc = ksign_parse_user_id(*datap, *datap + pktlen,
++					 uidfnx, data);
++		break;
++	default:
++		rc = 0; /* unknown packet */
++		break;
++	}
++
++	*datap += pktlen;
++leave:
++	return rc;
++}
++
++/*
++ * parse the contents of a packet buffer, passing the signature, public key and
++ * user ID to the caller's callback functions
++ */
++int ksign_parse_packets(const uint8_t *buf,
++			size_t size,
++			ksign_signature_actor_t sigfnx,
++			ksign_public_key_actor_t pkfnx,
++			ksign_user_id_actor_t uidfnx,
++			void *data)
++{
++	const uint8_t *datap, *endp;
++	int rc;
++
++	datap = buf;
++	endp = buf + size;
++	do {
++		rc = ksign_parse_one_packet(&datap, endp,
++					    sigfnx, pkfnx, uidfnx, data);
++	} while (rc == 0 && datap < endp);
++
++	return rc;
++}
+diff --git a/crypto/signature/ksign-publickey.c b/crypto/signature/ksign-publickey.c
 new file mode 100644
-index 0000000..63f5e08
+index 0000000..832a419
 --- /dev/null
-+++ b/kernel/module-verify.h
-@@ -0,0 +1,53 @@
-+/* module-verify.h: module verification definitions
++++ b/crypto/signature/ksign-publickey.c
+@@ -0,0 +1,18 @@
++#include "local.h"
++#include "key.h"
++
++static int __init ksign_init(void)
++{
++	int rc;
++
++	printk("ksign: Installing public key data\n");
++
++	rc = ksign_load_keyring_from_buffer(ksign_def_public_key,
++					    ksign_def_public_key_size);
++	if (rc < 0)
++		printk("Unable to load default keyring: error=%d\n", -rc);
++
++	return rc;
++}
++
++module_init(ksign_init)
+diff --git a/crypto/signature/ksign.c b/crypto/signature/ksign.c
+new file mode 100644
+index 0000000..b62eb38
+--- /dev/null
++++ b/crypto/signature/ksign.c
+@@ -0,0 +1,180 @@
++/* ksign.c: signature checker
 + *
 + * Copyright (C) 2004 Red Hat, Inc. All Rights Reserved.
 + * Written by David Howells (dhowells@redhat.com)
@@ -442,70 +970,366 @@ index 0000000..63f5e08
 + * 2 of the License, or (at your option) any later version.
 + */
 +
-+#include <linux/types.h>
-+#include <asm/module.h>
++#include <linux/kernel.h>
++#include <asm/errno.h>
++#include "local.h"
 +
-+#ifdef CONFIG_MODULE_VERIFY
-+struct module_verify_data {
-+	struct crypto_tfm	*digest;	/* module signature digest */
-+	const void		*buffer;	/* module buffer */
-+	const Elf_Ehdr		*hdr;		/* ELF header */
-+	const Elf_Shdr		*sections;	/* ELF section table */
-+	const Elf_Sym		*symbols;	/* ELF symbol table */
-+	const char		*secstrings;	/* ELF section string table */
-+	const char		*strings;	/* ELF string table */
-+	size_t			*secsizes;	/* section size list */
-+	size_t			size;		/* module object size */
-+	size_t			nsects;		/* number of sections */
-+	size_t			nsyms;		/* number of symbols */
-+	size_t			nstrings;	/* size of strings section */
-+	size_t			signed_size;	/* count of bytes contributed to digest */
-+	int			*canonlist;	/* list of canonicalised sections */
-+	int			*canonmap;	/* section canonicalisation map */
-+	int			sig_index;	/* module signature section index */
-+	uint8_t			xcsum;		/* checksum of bytes contributed to digest */
-+	uint8_t			csum;		/* checksum of bytes representing a section */
++#if 0
++#define _debug(FMT, ...) printk(KERN_DEBUG FMT, ##__VA_ARGS__)
++#else
++#define _debug(FMT, ...) do { ; } while (0)
++#endif
++
++/*
++ * check the signature which is contained in SIG.
++ */
++static int ksign_signature_check(const struct ksign_signature *sig,
++				 struct crypto_hash *sha1_tfm)
++{
++	struct ksign_public_key *pk;
++	struct hash_desc sha1_d;
++	uint8_t sha1[SHA1_DIGEST_SIZE];
++	MPI result = NULL;
++	int rc = 0;
++
++	pk = ksign_get_public_key(sig->keyid);
++	if (!pk) {
++		printk("ksign: module signed with unknown public key\n");
++		printk("- signature keyid: %08x%08x ver=%u\n",
++		       sig->keyid[0], sig->keyid[1], sig->version);
++		return -ENOKEY;
++	}
++
++	if (pk->timestamp > sig->timestamp)
++		printk("ksign:"
++		       " public key is %lu seconds newer than the signature\n",
++		       pk->timestamp - sig->timestamp);
++
++	sha1_d.tfm = sha1_tfm;
++	sha1_d.flags = 0;
++
++	/* complete the digest */
++	if (sig->version >= 4)
++		SHA1_putc(&sha1_d, sig->version);
++	SHA1_putc(&sha1_d, sig->sig_class);
++
++	if (sig->version < 4) {
++		u32 a = sig->timestamp;
++		SHA1_putc(&sha1_d, (a >> 24) & 0xff);
++		SHA1_putc(&sha1_d, (a >> 16) & 0xff);
++		SHA1_putc(&sha1_d, (a >>  8) & 0xff);
++		SHA1_putc(&sha1_d, (a >>  0) & 0xff);
++	}
++	else {
++		uint8_t buf[6];
++		size_t n;
++		SHA1_putc(&sha1_d, PUBKEY_ALGO_DSA);
++		SHA1_putc(&sha1_d, DIGEST_ALGO_SHA1);
++		if (sig->hashed_data) {
++			n = (sig->hashed_data[0] << 8) | sig->hashed_data[1];
++			SHA1_write(&sha1_d, sig->hashed_data, n + 2);
++			n += 6;
++		}
++		else {
++			n = 6;
++		}
++
++		/* add some magic */
++		buf[0] = sig->version;
++		buf[1] = 0xff;
++		buf[2] = n >> 24;
++		buf[3] = n >> 16;
++		buf[4] = n >>  8;
++		buf[5] = n;
++		SHA1_write(&sha1_d, buf, 6);
++	}
++
++	crypto_hash_final(&sha1_d, sha1);
++	crypto_free_hash(sha1_tfm);
++
++	rc = -ENOMEM;
++	result = mpi_alloc((SHA1_DIGEST_SIZE + BYTES_PER_MPI_LIMB - 1) /
++			   BYTES_PER_MPI_LIMB);
++	if (!result)
++		goto cleanup;
++
++	rc = mpi_set_buffer(result, sha1, SHA1_DIGEST_SIZE, 0);
++	if (rc < 0)
++		goto cleanup;
++
++	rc = DSA_verify(result, sig->data, pk->pkey);
++
++ cleanup:
++	mpi_free(result);
++	ksign_put_public_key(pk);
++
++	return rc;
++}
++
++/*
++ * examine the signatures that are parsed out of the signature data - we keep
++ * the first one that's appropriate and ignore the rest
++ * - return 0 if signature of interest (sig not freed by caller)
++ * - return 1 if no interest (caller frees)
++ */
++static int ksign_grab_signature(struct ksign_signature *sig, void *fnxdata)
++{
++	struct ksign_signature **_sig = fnxdata;
++
++	if (sig->sig_class != 0x00) {
++		_debug("ksign: standalone signature of class 0x%02x\n",
++		       sig->sig_class);
++		return 1;
++	}
++
++	if (*_sig)
++		return 1;
++
++	*_sig = sig;
++	return 0;
++}
++
++/*
++ * verify the signature of some data with one of the kernel's known public keys
++ * - the SHA1 context should be currently open with the signed data digested
++ *   into it so that more data can be appended
++ * - the SHA1 context is finalised and freed before returning
++ */
++int ksign_verify_signature(const char *sigdata, unsigned sig_size,
++			   struct crypto_hash *sha1)
++{
++	struct ksign_signature *sig = NULL;
++	int retval;
++
++	/* parse the signature data to get the actual signature */
++	retval = ksign_parse_packets(sigdata, sig_size,
++				     &ksign_grab_signature, NULL, NULL,
++				     &sig);
++	if (retval < 0)
++		goto cleanup;
++
++	if (!sig) {
++		printk(KERN_NOTICE
++		       "Couldn't find valid DSA signature in module\n");
++		return -ENOENT;
++	}
++
++	_debug("signature keyid: %08x%08x ver=%u\n",
++	       sig->keyid[0], sig->keyid[1], sig->version);
++
++	/* check the data SHA1 transformation against the public key */
++	retval = ksign_signature_check(sig, sha1);
++	switch (retval) {
++	case 0:
++		_debug("ksign: Signature check succeeded\n");
++		break;
++	case -ENOMEM:
++		_debug("ksign: Signature check ENOMEM\n");
++		break;
++	default:
++		_debug("ksign: Signature check failed\n");
++		if (retval != -ENOKEY)
++			retval = -EKEYREJECTED;
++		break;
++	}
++
++ cleanup:
++	if (sig)
++		ksign_free_signature(sig);
++
++	return retval;
++}
+diff --git a/crypto/signature/local.h b/crypto/signature/local.h
+new file mode 100644
+index 0000000..aa18cc4
+--- /dev/null
++++ b/crypto/signature/local.h
+@@ -0,0 +1,160 @@
++/* local.h: kernel signature checker internal defs
++ *
++ * Copyright (C) 2004 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ * - Derived from GnuPG packet.h - packet definitions
++ *   - Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
++ *
++ * GnuPG is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * GnuPG is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
++ */
++
++#include <linux/list.h>
++#include <linux/crypto.h>
++#include <linux/crypto/ksign.h>
++#include <linux/crypto/mpi.h>
++#include <asm/atomic.h>
++
++#define SHA1_DIGEST_SIZE	20
++
++#define PUBKEY_USAGE_SIG	1	    /* key is good for signatures */
++#define PUBKEY_USAGE_ENC	2	    /* key is good for encryption */
++
++#define PUBKEY_ALGO_DSA		17
++#define DSA_NPKEY		4	/* number of MPI's in DSA public key */
++#define DSA_NSIG		2	/* number of MPI's in DSA signature */
++
++#define DIGEST_ALGO_SHA1	2
++
++typedef enum {
++	PKT_NONE			= 0,
++	PKT_SIGNATURE			= 2,	/* secret key encrypted packet */
++	PKT_PUBLIC_KEY			= 6,	/* public key */
++	PKT_USER_ID			= 13,	/* user id packet */
++} pkttype_t;
++
++typedef enum {
++	SIGSUBPKT_TEST_CRITICAL		= -3,
++	SIGSUBPKT_NONE			= 0,
++	SIGSUBPKT_SIG_CREATED		= 2,	/* signature creation time */
++	SIGSUBPKT_SIG_EXPIRE		= 3,	/* signature expiration time */
++	SIGSUBPKT_EXPORTABLE		= 4,	/* exportable */
++	SIGSUBPKT_TRUST			= 5,	/* trust signature */
++	SIGSUBPKT_REGEXP		= 6,	/* regular expression */
++	SIGSUBPKT_REVOCABLE		= 7,	/* revocable */
++	SIGSUBPKT_KEY_EXPIRE		= 9,	/* key expiration time */
++	SIGSUBPKT_ARR			= 10,	/* additional recipient request */
++	SIGSUBPKT_PREF_SYM		= 11,	/* preferred symmetric algorithms */
++	SIGSUBPKT_REV_KEY		= 12,	/* revocation key */
++	SIGSUBPKT_ISSUER		= 16,	/* issuer key ID */
++	SIGSUBPKT_NOTATION		= 20,	/* notation data */
++	SIGSUBPKT_PREF_HASH		= 21,	/* preferred hash algorithms */
++	SIGSUBPKT_PREF_COMPR		= 22,	/* preferred compression algorithms */
++	SIGSUBPKT_KS_FLAGS		= 23,	/* key server preferences */
++	SIGSUBPKT_PREF_KS		= 24,	/* preferred key server */
++	SIGSUBPKT_PRIMARY_UID		= 25,	/* primary user id */
++	SIGSUBPKT_POLICY		= 26,	/* policy URL */
++	SIGSUBPKT_KEY_FLAGS		= 27,	/* key flags */
++	SIGSUBPKT_SIGNERS_UID		= 28,	/* signer's user id */
++	SIGSUBPKT_REVOC_REASON		= 29,	/* reason for revocation */
++	SIGSUBPKT_PRIV_VERIFY_CACHE	= 101,	/* cache verification result */
++
++	SIGSUBPKT_FLAG_CRITICAL		= 128
++} sigsubpkttype_t;
++
++/*
++ * signature record
++ */
++struct ksign_signature {
++	uint32_t	keyid[2];		/* 64 bit keyid */
++	time_t		timestamp;		/* signature made */
++	uint8_t		version;
++	uint8_t		sig_class;		/* sig classification, append for MD calculation*/
++	uint8_t		*hashed_data;		/* all subpackets with hashed  data (v4 only) */
++	uint8_t		*unhashed_data;		/* ditto for unhashed data */
++	uint8_t		digest_start[2];	/* first 2 uint8_ts of the digest */
++	MPI		data[DSA_NSIG];
 +};
 +
-+/*
-+ * module-verify.c
-+ */
-+extern int module_verify(const Elf_Ehdr *hdr, size_t size);
++extern void ksign_free_signature(struct ksign_signature *sig);
 +
 +/*
-+ * module-verify-elf.c
++ * public key record
 + */
-+#ifdef CONFIG_MODULE_VERIFY_ELF
-+extern int module_verify_elf(struct module_verify_data *mvdata);
-+#else
-+#define module_verify_elf(m) (0)
++struct ksign_public_key {
++	struct list_head link;
++	atomic_t	count;			/* ref count */
++	time_t		timestamp;		/* key made */
++	time_t		expiredate;		/* expires at this date or 0 if not at all */
++	uint8_t		hdrbytes;		/* number of header bytes */
++	uint8_t		version;
++	int		is_valid;		/* key (especially subkey) is valid */
++	unsigned long	local_id;		/* internal use, valid if > 0 */
++	uint32_t	main_keyid[2];		/* keyid of the primary key */
++	uint32_t	keyid[2];		/* calculated by keyid_from_pk() */
++	MPI		pkey[DSA_NPKEY];
++};
++
++extern void ksign_free_public_key(struct ksign_public_key *pk);
++
++static inline void ksign_put_public_key(struct ksign_public_key *pk)
++{
++	if (atomic_dec_and_test(&pk->count))
++		ksign_free_public_key(pk);
++}
++
++extern int ksign_load_keyring_from_buffer(const void *buffer, size_t size);
++
++extern struct ksign_public_key *ksign_get_public_key(const uint32_t *keyid);
++
++/*
++ * user ID record
++ */
++struct ksign_user_id {
++	int		len;			/* length of the name */
++	char		name[0];
++};
++
++extern void ksign_free_user_id(struct ksign_user_id *uid);
++
++/*
++ *
++ */
++typedef int (*ksign_signature_actor_t)(struct ksign_signature *, void *fnxdata);
++typedef int (*ksign_public_key_actor_t)(struct ksign_public_key *, void *fnxdata);
++typedef int (*ksign_user_id_actor_t)(struct ksign_user_id *, void *fnxdata);
++
++extern int ksign_parse_packets(const uint8_t *buf,
++			       size_t size,
++			       ksign_signature_actor_t sigfnx,
++			       ksign_public_key_actor_t pkfnx,
++			       ksign_user_id_actor_t uidfnx,
++			       void *data);
++
++extern int DSA_verify(const MPI datahash, const MPI sig[], const MPI pkey[]);
++
++/*
++ * fast access to the digest
++ * - we _know_ the data is locked into kernel memory, so we don't want to have
++ *   to kmap() it
++ */
++static inline void SHA1_putc(struct hash_desc *sha1, uint8_t ch)
++{
++	crypto_hash_update_kernel(sha1, &ch, 1);
++}
++
++static inline void SHA1_write(struct hash_desc *sha1, const void *s, size_t n)
++{
++	crypto_hash_update_kernel(sha1, s, n);
++}
+diff --git a/include/linux/crypto/ksign.h b/include/linux/crypto/ksign.h
+new file mode 100644
+index 0000000..27c9e4a
+--- /dev/null
++++ b/include/linux/crypto/ksign.h
+@@ -0,0 +1,22 @@
++/* ksign.h: in-kernel signature checker
++ *
++ * Copyright (C) 2004 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ */
++
++#ifndef _LINUX_CRYPTO_KSIGN_H
++#define _LINUX_CRYPTO_KSIGN_H
++
++#include <linux/types.h>
++
++#ifdef CONFIG_CRYPTO_SIGNATURE
++extern int ksign_verify_signature(const char *sig, unsigned sig_size,
++				  struct crypto_hash *sha1);
 +#endif
 +
-+#else
-+#define module_verify(h, s) (0)
-+#endif
-diff --git a/kernel/module.c b/kernel/module.c
-index 8a94e05..86abdce 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -44,6 +44,7 @@
- #include <asm/semaphore.h>
- #include <asm/cacheflush.h>
- #include <linux/license.h>
-+#include "module-verify.h"
- 
- #if 0
- #define DEBUGP printk
-@@ -1605,8 +1606,10 @@ static struct module *load_module(void __user *umod,
- 		goto free_hdr;
- 	}
- 
--	if (len < hdr->e_shoff + hdr->e_shnum * sizeof(Elf_Shdr))
--		goto truncated;
-+	/* Verify the module's contents */
-+	err = module_verify(hdr, len);
-+	if (err < 0)
-+		goto free_hdr;
- 
- 	/* Convenience variables */
- 	sechdrs = (void *)hdr + hdr->e_shoff;
++#endif /* _LINUX_CRYPTO_KSIGN_H */
