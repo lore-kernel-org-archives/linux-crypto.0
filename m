@@ -1,58 +1,56 @@
-From: Adrian Bunk <bunk@stusta.de>
+From: "Indan Zupancic" <indan@nul.nu>
 Subject: Re: [PATCH 0/6] MODSIGN: Kernel module signing
-Date: Thu, 15 Feb 2007 22:03:06 +0100
-Message-ID: <20070215210306.GF13958@stusta.de>
-References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
+Date: Thu, 15 Feb 2007 22:31:52 +0100 (CET)
+Message-ID: <1715.81.207.0.53.1171575112.squirrel@secure.samage.net>
+References: <Pine.LNX.4.64.0702141121030.20368@woody.linux-foundation.org>
+    <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
+    <7291.1171482057@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: torvalds@osdl.org, akpm@osdl.org, herbert.xu@redhat.com,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "Linus Torvalds" <torvalds@linux-foundation.org>,
+	akpm@linux-foundation.org, herbert.xu@redhat.com,
 	linux-kernel@vger.kernel.org, davej@redhat.com,
 	arjan@infradead.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout.stusta.mhn.de ([141.84.69.5]:57977 "EHLO
-	mailhub.stusta.mhn.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1161271AbXBOVDB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Feb 2007 16:03:01 -0500
-Content-Disposition: inline
-In-Reply-To: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
+To: "David Howells" <dhowells@redhat.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1161399AbXBOVcF@vger.kernel.org>
+In-Reply-To: <7291.1171482057@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Feb 14, 2007 at 07:09:38PM +0000, David Howells wrote:
->...
-> There are several reasons why these patches are useful, amongst which are:
->...
->  (4) to allow other support providers to do likewise, or at least to _detect_
->      the fact that unsupported modules are loaded;
-> 
->  (5) to allow the detection of modules replaced by a second-order distro or a
->      preloaded Linux purveyor.
->...
+Hello,
 
-Who might have rebuilt the whole kernel using a new signature.
+On Wed, February 14, 2007 20:40, David Howells wrote:
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>
+>> >  (1) A cut-down MPI library derived from GPG with error handling added.
+>>
+>> Do we really need to add this?
+>
+> I presume you mean the MPI library specifically?  If so, then yes.  It's
+> necessary to do DSA signature verification (or RSA for that matter).
+>
+>> Wouldn't it be much nicer to just teach people to use one of the existing
+>> signature things that we need for _other_ cases anyway, and already have
+>> merged?
+>
+> Existing signature things?  I know not of such beasts, nor can I see them
+> offhand.
 
-Or a bug reporter might have edited out the parts containing the 
-information that unsupported code was loaded.
+The question is if using DSA/RSA is the right choice for something like this.
+I think that the symmetrically encrypted hash output as signature would provide
+the same amount of security. The only additional requirement is that the key
+can't be read by userspace. But if they can reach the kernel binary, they can
+modify it too. Same for the bootloader, where you'd want the key and initial
+checking anyway. Else this whole thing could be done in user space as Roman
+Zippel said...
 
-Or the unsupported module itself might have removed all traces of having 
-been loaded from the kernel.
+The ELF section stuff seems like unnecessary bloat too. Can't you use/extend
+modinfo, or kernel symbols?
 
-For printing nvidia(U), you could simply add some marker similar to 
-MODULE_LICENSE() that gets added to supported modules during "official" 
-builds and gets checked when loading a module.
+With the above changes the code should shrink to only a few hundred new lines
+of code, instead of thousands, and signature checking will be much faster too.
 
-That's 10k LOC less and the same level of security...
+Greetings,
 
-> David
-
-cu
-Adrian
-
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
+Indan
