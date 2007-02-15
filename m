@@ -1,48 +1,48 @@
-From: David Lang <david.lang@digitalinsight.com>
+From: Valdis.Kletnieks@vt.edu
 Subject: Re: [PATCH 0/6] MODSIGN: Kernel module signing
-Date: Thu, 15 Feb 2007 12:01:22 -0800 (PST)
-Message-ID: <Pine.LNX.4.63.0702151155330.9862@qynat.qvtvafvgr.pbz>
-References: <Pine.LNX.4.64.0702151530260.14458@scrub.home>
- <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
- <32081.1171560770@redhat.com> <Pine.LNX.4.64.0702151901380.14458@scrub.home>
+Date: Thu, 15 Feb 2007 15:34:28 -0500
+Message-ID: <200702152034.l1FKYS93012172@turing-police.cc.vt.edu>
+References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com> <200702142135.40832.agruen@suse.de> <20070215054559.GD15654@redhat.com>
+            <200702142214.53625.agruen@suse.de>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Cc: David Howells <dhowells@redhat.com>, torvalds@osdl.org,
-	akpm@osdl.org, herbert.xu@redhat.com, linux-kernel@vger.kernel.org,
-	davej@redhat.com, arjan@infradead.org, linux-crypto@vger.kernel.org
-To: Roman Zippel <zippel@linux-m68k.org>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1161155AbXBOURN@vger.kernel.org>
-In-Reply-To: <Pine.LNX.4.64.0702151901380.14458@scrub.home>
+Content-Type: multipart/signed; boundary="==_Exmh_1171571668_27755P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Cc: Dave Jones <davej@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Howells <dhowells@redhat.com>,
+	torvalds@linux-foundation.org, herbert.xu@redhat.com,
+	linux-kernel@vger.kernel.org, arjan@infradead.org,
+	linux-crypto@vger.kernel.org
+To: Andreas Gruenbacher <agruen@suse.de>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1161198AbXBOUfH@vger.kernel.org>
+In-Reply-To: Your message of "Wed, 14 Feb 2007 22:14:53 PST."
+             <200702142214.53625.agruen@suse.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 15 Feb 2007, Roman Zippel wrote:
+--==_Exmh_1171571668_27755P
+Content-Type: text/plain; charset=us-ascii
 
-> On Thu, 15 Feb 2007, David Howells wrote:
->
->> It is possible to protect /dev/mem and /dev/kmem or make them unavailable and
->> it is possible to protect the kernel's memory whilst it is running (provided
->> you don't have nommu or broken hardware and you don't let userspace concoct any
->> DMA request it likes) which mostly closes those other vectors I mentioned.
->> This isn't something I intended to look at with this patch.  Those are separate
->> holes.
->
-> Exactly and as long as there are these holes, these patches are only
-> kernel bloat. The simple verification can also be done in userspace and
-> module signing offers no real security.
-> What real value do these patches provide, that can't be reached via other
-> means? Who else than distributions would be interested in this? Pretty
-> much any use you initially mentioned can be done in simpler ways, e.g.
-> anyone afraid of modules simply disables module loading completely.
+On Wed, 14 Feb 2007 22:14:53 PST, Andreas Gruenbacher said:
+> I agree, that's really what should happen. We solve this by marking modules as
+> supported, partner supported, or unsupported, but in an "insecure" way, so
+> partners and users could try to fake the support status of a module and/or
+> remove status flags from Oopses, and cryptography wouldn't save us.
 
-this issue, and these holes keep comeing up in discussions, why can't these 
-holes be closed? I seem to remember seeing patches that would remove /dev/kmem 
-being sent to the list, but they weren't accepted into the kernel (and I seem to 
-remember people being against the concept of removeing them, not against 
-techincal details of the patches. but this was many years ago)
+Where cryptography *can* save you is that a partner or user can't fake a
+'Suse Supported' signature without access to the Suse private key.
 
-at one point I remember hearing that X required raw /dev/kmem, but for servers 
-you don't need/want X anyway, so this is a useful option even if X doesn't get 
-fixed.
+--==_Exmh_1171571668_27755P
+Content-Type: application/pgp-signature
 
-David Lang
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFF1MPUcC3lWbTT17ARAh66AJ9Gzvgd0zhuDVcrNqFTnRB2GRzatwCeLVDf
+kNp5hrMChhmnQIr5y+0Zehg=
+=5kzR
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1171571668_27755P--
