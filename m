@@ -1,72 +1,59 @@
-From: Valdis.Kletnieks@vt.edu
+From: Olaf Kirch <okir@lst.de>
 Subject: Re: [PATCH 0/6] MODSIGN: Kernel module signing
-Date: Thu, 15 Feb 2007 17:12:43 -0500
-Message-ID: <200702152212.l1FMCh0Z018611@turing-police.cc.vt.edu>
-References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com> <20070214194112.5bec3110.akpm@linux-foundation.org> <20070215041345.GA15654@redhat.com> <200702152055.l1FKtfTY012824@turing-police.cc.vt.edu>
-            <20070215213240.GG13958@stusta.de>
+Date: Fri, 16 Feb 2007 01:15:04 +0100
+Message-ID: <20070216001504.GA20951@linux.suse.de>
+References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com> <200702142214.53625.agruen@suse.de> <200702152034.l1FKYS93012172@turing-police.cc.vt.edu> <200702151412.43758.agruen@suse.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1171577563_27755P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Cc: Dave Jones <davej@redhat.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Valdis.Kletnieks@vt.edu, Dave Jones <davej@redhat.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	David Howells <dhowells@redhat.com>,
 	torvalds@linux-foundation.org, herbert.xu@redhat.com,
 	linux-kernel@vger.kernel.org, arjan@infradead.org,
 	linux-crypto@vger.kernel.org
-To: Adrian Bunk <bunk@stusta.de>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1161482AbXBOWOW@vger.kernel.org>
-In-Reply-To: Your message of "Thu, 15 Feb 2007 22:32:40 +0100."
-             <20070215213240.GG13958@stusta.de>
-Sender: linux-kernel-owner@vger.kernel.org
+To: Andreas Gruenbacher <agruen@suse.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [62.138.223.154] ([62.138.223.154]:4570 "EHLO
+	okir.darmstadt.suse.de" rhost-flags-FAIL-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1422876AbXBPAdb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 Feb 2007 19:33:31 -0500
+Content-Disposition: inline
+In-Reply-To: <200702151412.43758.agruen@suse.de>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
---==_Exmh_1171577563_27755P
-Content-Type: text/plain; charset=us-ascii
+On Thursday 15 February 2007 12:34, Valdis.Kletnieks@vt.edu wrote:
+> On Wed, 14 Feb 2007 22:14:53 PST, Andreas Gruenbacher said:
+> > I agree, that's really what should happen. We solve this by marking
+> > modules as supported, partner supported, or unsupported, but in an
+> > "insecure" way, so partners and users could try to fake the support
+> > status of a module and/or remove status flags from Oopses, and
+> > cryptography wouldn't save us.
+>
+> Where cryptography *can* save you is that a partner or user can't fake a
+> 'Suse Supported' signature without access to the Suse private key.
 
-On Thu, 15 Feb 2007 22:32:40 +0100, Adrian Bunk said:
-> There are different opinions whether the "complete source code" of the 
-> GPLv2 includes in such cases public keys, making it questionable whether 
-> your example will survive at court in all jurisdictions.
+The user has control over the running kernel, and given enough time
+and clue, can circumvent any protection mechanism the vendor comes
+up with. And that's a good thing IMO, unless you believe in "trusted
+computing" and all those Bigbrotherisms some agencies want to put
+in your machines.
 
-It's no less shaky than the whole EXPORT_SYMBOL_GPL-as-enforcement crock. :)
+So the user is running a system in some state that may or may not
+resemble what the vendor shipped. When the machine crashes, the
+user is free to munge the oops until it looks like a valid one.
 
-> E.g. remember that gpl-violations.org has already successfully enforced 
-> the publication of public keys for "firmware only loads signed kernels" 
-> cases by threatening companies to otherwise take legal actions in 
-> Germany.
+Someone mentioned in this context that you can sign the oops - but to
+do that you need a private key. And the whole point of this exercise is
+that the user does not have access to that key.
 
-A court order for the publication of *public* keys? :)
+So as far as support is concerned, you're back in square one.
+You cannot tell a "genuine" oops produced on a supported kernel
+from a doctored one produced on Joe Doe's Garage Kernel.
 
-I think you meant "private keys" in both paragraphs above.  And it's probably
-a non-issue the way Red Hat implemented it - they included a document on
-"How to generate your own public/private key pair", which invokes commands that
-create a bitstring that you can then use to sign the entire applicable part
-of the kernel tree.  The fact that it's not the *same* bitstring as they used
-is (IMHO) legally about as relevant as the fact that they compiled the tree
-with one release of GCC, included instructions on how to compile it, and I
-don't get a bitwise identical binary if I compile it with a different GCC
-release.
-
-Yes, you're still screwed if you only build *part* of the kernel tree and
-expect it to work - modules you sign won't load into their kernel, and vice
-versa.  But that's the same problem as the old 2.4 "You didn't do a make clean
-between rebuilds and you bugged out because different parts of the tree were
-built with different GCC releases".  As distributed, you *can* build a working
-kernel from the pieces and instructions provided.
-
-
-
---==_Exmh_1171577563_27755P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFF1NrbcC3lWbTT17ARArCoAJ9ICZV/weZlac6F/Ys3WarRaw0k/ACfY/py
-MUizyOd65J1buuquNJagu+I=
-=I4MO
------END PGP SIGNATURE-----
-
---==_Exmh_1171577563_27755P--
+Olaf
+-- 
+Olaf Kirch        |  Anyone who has had to work with X.509 has probably
+okir@lst.de       |  experienced what can best be described as
+------------------+  ISO water torture. -- Peter Gutmann
