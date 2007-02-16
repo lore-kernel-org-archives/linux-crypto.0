@@ -1,49 +1,49 @@
-From: Dave Jones <davej@redhat.com>
+From: Arjan van de Ven <arjan@infradead.org>
 Subject: Re: [PATCH 0/6] MODSIGN: Kernel module signing
-Date: Fri, 16 Feb 2007 15:21:35 -0500
-Message-ID: <20070216202135.GA22121@redhat.com>
-References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com> <20070215221304.GB6602@ucw.cz>
+Date: Fri, 16 Feb 2007 21:27:58 +0100
+Message-ID: <1171657678.12771.645.camel@laptopd505.fenrus.org>
+References: <20070214190938.6438.15091.stgit@warthog.cambridge.redhat.com>
+	 <20070215221304.GB6602@ucw.cz>  <20070216202135.GA22121@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>, torvalds@osdl.org,
-	akpm@osdl.org, herbert.xu@redhat.com, linux-kernel@vger.kernel.org,
-	arjan@infradead.org, linux-crypto@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Machek <pavel@ucw.cz>, David Howells <dhowells@redhat.com>,
+	torvalds@osdl.org, akpm@osdl.org, herbert.xu@redhat.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Dave Jones <davej@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([66.187.233.31]:34569 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1946121AbXBPUV7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Feb 2007 15:21:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20070215221304.GB6602@ucw.cz>
+Received: from pentafluge.infradead.org ([213.146.154.40]:34490 "EHLO
+	pentafluge.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1946126AbXBPU2J (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Feb 2007 15:28:09 -0500
+In-Reply-To: <20070216202135.GA22121@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 15, 2007 at 10:13:04PM +0000, Pavel Machek wrote:
- > Hi!
- > 
- > > Now, this is not a complete solution by any means: the core kernel is not
- > > protected, and nor are /dev/mem or /dev/kmem, but it denies (or at least
- > > controls) one relatively simple attack vector.
- > 
- > Could we fix the /dev/*mem holes, first? They are already used by
- > malicious modules (aka rootkits...).  Or can selinux already provide
- > /dev/*mem protection with no way for admin to turn it off?
 
-There are some valid uses for peeking through /dev/mem. Things like
-dmidecode for example.  So you don't want to disable it completely
-in a lot of cases, but have fine-grained access to specific parts
-of the file.  I'm not sure SELinux can do this. Maybe the MLS stuff
-helps here (though I'm far from an expert on this, so I could be
-talking out of my rear).
+> 
+> The restricted dev/mem patches we've had in Fedora for a while
+> do the right thing, but they're a bit crufty (in part due to
+> drivers/char/mem.c being a bit of a mess before we even start
+> patching it).  I've had "clean these up for upstream" on my
+> todo for a while. I might get around to it one of these days.
 
-The restricted dev/mem patches we've had in Fedora for a while
-do the right thing, but they're a bit crufty (in part due to
-drivers/char/mem.c being a bit of a mess before we even start
-patching it).  I've had "clean these up for upstream" on my
-todo for a while. I might get around to it one of these days.
 
-		Dave
+the real thing is that /dev/mem is too many things for too many people.
+Fundamentally it has 3 components
+1) ram-but-not-kernel data: basically BIOS datastructures
+2) kernel visible ram: user/kernel data, this has all the nasty cache
+coherency issues. This is also a "debug only" use, and "rootkit only"
+sometimes ;) 
+3) MMIO space: this really should not be used anymore, sysfs provides a
+MUCH better interface and it also breaks if you have enforcing IOMMU's
+in the system... it can't really work since the kernel doesn't get told
+which device is being accessed
+
+unless we split this up (well the third is split already) it's going to
+remain a big mess.
 
 -- 
-http://www.codemonkey.org.uk
+if you want to mail me at work (you don't), use arjan (at) linux.intel.com
+Test the interaction between Linux and your BIOS via http://www.linuxfirmwarekit.org
