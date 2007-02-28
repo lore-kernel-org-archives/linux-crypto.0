@@ -1,7 +1,7 @@
 From: Richard Purdie <rpurdie@openedhand.com>
-Subject: [PATCH 0/5] Add LZO Compression
-Date: Wed, 28 Feb 2007 19:13:18 +0000
-Message-ID: <1172689998.16062.135.camel@localhost.localdomain>
+Subject: [PATCH 1/5] Add LZO compression support to the kernel
+Date: Wed, 28 Feb 2007 19:13:24 +0000
+Message-ID: <1172690004.16062.136.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -20,29 +20,31 @@ Sender: linux-mtd-bounces@lists.infradead.org
 Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org+gldm-linux-mtd-36=gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The following patch series adds LZO compression support to the kernel
-and exposes it in a variety of places (jffs2, crypto).
+Add LZO1X compression/decompression support to the kernel.
 
-This is particularly useful for jffs2 where significant boot time
-speedups (~10%) and file read speed improvements (~40%) are seen when
-its used with only a slight drop in file compression ratio.
+This is based on the standard userspace lzo library, particularly 
+minilzo with the headers much trimmed down and simplified for kernel
+use. Its structured so that it should still diff with the userspace
+version for ease of future updating.
 
-It also adds a favourlzo mode to jffs2 which is similar to the existing
-size mode but lets lzo compression win if the lzo compressed size is
-"similar" to but not the best compression ratio. This means we can keep
-zlib compression where it makes a significant difference to compressed
-file size.
+Signed-off-by: Richard Purdie <rpurdie@openedhand.com>
 
-The final jffs2 patch which starts adding sysfs support is something I
-have around from testing and I'm including it for comments to see if its
-desirable upstream. It could be extended further to allow greater
-control of jffs2 at runtime.
+---
+ include/linux/lzo.h |   63 +
+ lib/Kconfig         |    5 
+ lib/Makefile        |    1 
+ lib/lzo/Makefile    |    3 
+ lib/lzo/lzoconf.h   |  186 +++++
+ lib/lzo/lzodefs.h   |  463 +++++++++++++
+ lib/lzo/lzointf.c   |   37 +
+ lib/lzo/minilzo.c   | 1771
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 2529 insertions(+)
 
-Richard
+http://folks.o-hand.com/richard/lzo/lzo_kernel.patch
+(since it exceeds the file size limit for LKML)
 
-
-
-
+I can email inline if anyone prefers it that way.
 
 
 ______________________________________________________
