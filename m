@@ -1,63 +1,59 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Problem with key sizes
-Date: Fri, 16 Mar 2007 16:23:47 +0100
-Message-ID: <20070316152347.GE13744@Chamillionaire.breakpoint.cc>
+From: Chinh Nguyen <cnguyen@certicom.com>
+Subject: SHA-2 HMAC support in linux kernel
+Date: Fri, 16 Mar 2007 16:51:40 -0500
+Message-ID: <45FB116C.5080205@certicom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40798 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753555AbXCPPz7 (ORCPT
+Received: from mail.ca.certicom.com ([38.113.160.197]:47421 "EHLO
+	mail.ca.certicom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965931AbXCPVLV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Mar 2007 11:55:59 -0400
-Received: id: bigeasy by Chamillionaire.breakpoint.cc with local
-	(easymta 1.00 BETA 1)
-	id 1HSEHT-0002hb-4O
-	for linux-crypto@vger.kernel.org; Fri, 16 Mar 2007 16:23:47 +0100
-Content-Disposition: inline
+	Fri, 16 Mar 2007 17:11:21 -0400
+Received: from spamfilter.certicom.com (localhost.localdomain [127.0.0.1])
+	by mail.ca.certicom.com (Postfix) with ESMTP id BFAA812B40180
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Mar 2007 15:51:50 -0500 (EST)
+Received: from mail.ca.certicom.com ([127.0.0.1])
+	by spamfilter.certicom.com (storm [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 10431-46 for <linux-crypto@vger.kernel.org>;
+	Fri, 16 Mar 2007 15:51:44 -0500 (EST)
+Received: from domino1.certicom.com (domino1.certicom.com [10.0.1.24])
+	by mail.ca.certicom.com (Postfix) with ESMTP id C9E3C12B40189
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Mar 2007 15:51:44 -0500 (EST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Hi,
 
-I have a little problem with the min|max keysize: /proc/crypto:
+I believe that this is the right list for my question. I'm trying to get 
+SHA-2 HMAC support working ipsec in linux kernel (I'm configuring via 
+pfkey).
 
-name         : aes
-driver       : aes-special
-module       : aes2
-priority     : 150
-refcnt       : 1
-type         : cipher
-blocksize    : 16
-min keysize  : 24
-max keysize  : 32
+First, sha-384 and sha-512 as authentication algorithm always return 
+function not support. But I noted that my linux kernel has a sha512 
+kernel module (with alias for sha384). Second, sha-256 uses a 12-byte 
+hmac (96 bits).
 
-name         : aes
-driver       : aes-generic
-module       : aes
-priority     : 100
-refcnt       : 1
-type         : cipher
-blocksize    : 16
-min keysize  : 16
-max keysize  : 32
+Looking at the source http://lxr.linux.no/source/net/xfrm/xfrm_algo.c, 
+it seems to confirm that this is true. In fact, sha-384 and sha-512 are 
+not supported at this time and sha-256 is truncated to 96-bit.
 
-16bit key are not supported by the -special algo, only by the -generic
-driver. My understanding of this was if someone needs 16bit keys
-aes-generic id used and for 24 and 32 bit long keys the -special driver.
-Unfortunately crypto_alloc_blkcipher() does not care about the min|max
-keysize field.
-I thing the main problem here is that the crypto api knows nothing about
-the key size until crypto_blkcipher_setkey() what is probably too late.
-Is it possible to modify the api to something like OpenSSL's
-aes-128-cbc (or cbc(aes(128)) in our case :) ) ?
+However, the following ietf draft, which I believe is very closed to 
+ratification (it has already been assigned iana numbers), specifies 
+sha-256 to use 128-bits as hmac (page 18): 
+http://www.ietf.org/internet-drafts/draft-kelly-ipsec-ciph-sha2-01.txt
 
-I have a question regarding the git tree: Which one is valid?
-MAINTAINERS says .../git/herbert/crypto-2.6.git but once I clone it,
-there is .git directory in it (with 151MB but no source code).
-./git/herbert/cryptodev-2.6.git on the other has source inside.
+sha-384 is 192 bits, and sha-512 is 256 bits.
 
--- 
-Best regards
-Sebastian Siewior
+1. Is adding sha-384 and sha-512 as simple as adding to the aalg_list 
+structure? Can this be done for some subsequent kernel release in the 
+future?
+2. Can the sha-256 be changed to use 128 bits? Or in order to not break 
+backward compatibility, another sha-256 hmac algorithm id be used for 
+128 bits?
+
+Thanks,
+
+Chinh
