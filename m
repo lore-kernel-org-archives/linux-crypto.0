@@ -1,51 +1,63 @@
-From: Richard Purdie <rpurdie@openedhand.com>
-Subject: Re: [PATCH 5/5] jffs2: Allow selection of compression mode via a
-	sysfs attribute
-Date: Wed, 28 Feb 2007 20:56:56 +0000
-Message-ID: <1172696216.16062.147.camel@localhost.localdomain>
-References: <1172690034.16062.144.camel@localhost.localdomain>
-	<1172691583.17031.35.camel@sauron>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Problem with key sizes
+Date: Fri, 16 Mar 2007 16:23:47 +0100
+Message-ID: <20070316152347.GE13744@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-mtd <linux-mtd@lists.infradead.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au
-To: dedekind@infradead.org
-Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
-In-Reply-To: <1172691583.17031.35.camel@sauron>
-List-Unsubscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
-	<mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mtd>
-List-Post: <mailto:linux-mtd@lists.infradead.org>
-List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
-	<mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
-Sender: linux-mtd-bounces@lists.infradead.org
-Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org+gldm-linux-mtd-36=gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=iso-8859-15
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40798 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753555AbXCPPz7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Mar 2007 11:55:59 -0400
+Received: id: bigeasy by Chamillionaire.breakpoint.cc with local
+	(easymta 1.00 BETA 1)
+	id 1HSEHT-0002hb-4O
+	for linux-crypto@vger.kernel.org; Fri, 16 Mar 2007 16:23:47 +0100
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2007-02-28 at 21:39 +0200, Artem Bityutskiy wrote:
-> On Wed, 2007-02-28 at 19:13 +0000, Richard Purdie wrote:
-> > +/* gives us jffs2_subsys */
-> > +static decl_subsys(jffs2, NULL, NULL);
-> 
-> There is actually a file-system subsys - look up for fs_subsys. It is
-> declared at fs/namespace.c.
+Hello,
 
-Further down the patch you'll see:
+I have a little problem with the min|max keysize: /proc/crypto:
 
-+	kset_set_kset_s(&jffs2_subsys, fs_subsys);
+name         : aes
+driver       : aes-special
+module       : aes2
+priority     : 150
+refcnt       : 1
+type         : cipher
+blocksize    : 16
+min keysize  : 24
+max keysize  : 32
 
-There was a reason for doing that instead using fs_subsys in the above
-although I can't remember why offhand. I did try it and it didn't work
-as expected...
+name         : aes
+driver       : aes-generic
+module       : aes
+priority     : 100
+refcnt       : 1
+type         : cipher
+blocksize    : 16
+min keysize  : 16
+max keysize  : 32
 
-Regards,
+16bit key are not supported by the -special algo, only by the -generic
+driver. My understanding of this was if someone needs 16bit keys
+aes-generic id used and for 24 and 32 bit long keys the -special driver.
+Unfortunately crypto_alloc_blkcipher() does not care about the min|max
+keysize field.
+I thing the main problem here is that the crypto api knows nothing about
+the key size until crypto_blkcipher_setkey() what is probably too late.
+Is it possible to modify the api to something like OpenSSL's
+aes-128-cbc (or cbc(aes(128)) in our case :) ) ?
 
-Richard
+I have a question regarding the git tree: Which one is valid?
+MAINTAINERS says .../git/herbert/crypto-2.6.git but once I clone it,
+there is .git directory in it (with 151MB but no source code).
+./git/herbert/cryptodev-2.6.git on the other has source inside.
 
-
-______________________________________________________
-Linux MTD discussion mailing list
-http://lists.infradead.org/mailman/listinfo/linux-mtd/
+-- 
+Best regards
+Sebastian Siewior
