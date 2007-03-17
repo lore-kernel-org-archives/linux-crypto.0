@@ -1,77 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Subject: Re: Problem with key sizes
-Date: Sat, 17 Mar 2007 15:12:17 +1100
-Message-ID: <E1HSQHB-0000Sn-00@gondolin.me.apana.org.au>
-References: <20070316152347.GE13744@Chamillionaire.breakpoint.cc>
+Date: Sat, 17 Mar 2007 21:28:53 +0100
+Message-ID: <20070317202853.GA7454@Chamillionaire.breakpoint.cc>
+References: <20070316152347.GE13744@Chamillionaire.breakpoint.cc> <E1HSQHB-0000Sn-00@gondolin.me.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15
 Cc: linux-crypto@vger.kernel.org
-To: linux-crypto@ml.breakpoint.cc (Sebastian Siewior)
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4847 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753730AbXCQEMU (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48887 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751076AbXCQU26 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 17 Mar 2007 00:12:20 -0400
-In-Reply-To: <20070316152347.GE13744@Chamillionaire.breakpoint.cc>
+	Sat, 17 Mar 2007 16:28:58 -0400
+Content-Disposition: inline
+In-Reply-To: <E1HSQHB-0000Sn-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Sebastian Siewior <linux-crypto@ml.breakpoint.cc> wrote:
-> 
-> I have a little problem with the min|max keysize: /proc/crypto:
-> 
-> name         : aes
-> driver       : aes-special
-> module       : aes2
-> priority     : 150
-> refcnt       : 1
-> type         : cipher
-> blocksize    : 16
-> min keysize  : 24
-> max keysize  : 32
-> 
-> name         : aes
-> driver       : aes-generic
-> module       : aes
-> priority     : 100
-> refcnt       : 1
-> type         : cipher
-> blocksize    : 16
-> min keysize  : 16
-> max keysize  : 32
-> 
-> 16bit key are not supported by the -special algo, only by the -generic
-> driver. My understanding of this was if someone needs 16bit keys
-> aes-generic id used and for 24 and 32 bit long keys the -special driver.
-> Unfortunately crypto_alloc_blkcipher() does not care about the min|max
-> keysize field.
-> I thing the main problem here is that the crypto api knows nothing about
-> the key size until crypto_blkcipher_setkey() what is probably too late.
-> Is it possible to modify the api to something like OpenSSL's
-> aes-128-cbc (or cbc(aes(128)) in our case :) ) ?
+* Herbert Xu | 2007-03-17 15:12:17 [+1100]:
 
-What exactly is the aes-special algorithm and where can I find a copy?
+>What exactly is the aes-special algorithm and where can I find a copy?
+The only difference between -special and -generic is the limited key
+size. It was just an example.
 
-Yes key length support is missing as far as algorithm selection
-is concerned.  I haven't worried too much about it because there
-hasn't been that many algorithms needing this.
+>Yes key length support is missing as far as algorithm selection
+>is concerned.  I haven't worried too much about it because there
+>hasn't been that many algorithms needing this.
+>
+>So my question is how hard is it to make aes-special support 16-bit keys?
+I was browsing through the api and noticed that the key size is not
+considered (except in proc code). If aes-special utilizes some hardware
+device to do the job it may be possible, that the hardware does not
+support all key sizes. This is the case for the Geode AES driver [1] and
+for the s390 aes driver [2]. The latter checks at runtime what key sizes
+are supported while Geode can only handle 16 byte long keys (according to
+the source). 
+The author may still add part of the aes-generic code as a fall back or
+try to load a fullback algorithm like VIA PadLock SHA1 does [3]. I
+prefer the latter. Anyway: I don't like the idea of adding fall back code
+for a key size, that I never claimed to support.
 
-So my question is how hard is it to make aes-special support 16-bit keys?
- 
-> I have a question regarding the git tree: Which one is valid?
-> MAINTAINERS says .../git/herbert/crypto-2.6.git but once I clone it,
-> there is .git directory in it (with 151MB but no source code).
-> ./git/herbert/cryptodev-2.6.git on the other has source inside.
+>If you find no source code after the clone all you have to do is check
+>them out with 'git-checkout-index -a'.
+ach, thx.
 
-crypto-2.6.git is the tree that is usually the tree that has been
-already submitted upstream.  cryptodev-2.6.git is the tree which
-will be submitted the next time the merge window opens.
-
-If you find no source code after the clone all you have to do is check
-them out with 'git-checkout-index -a'.
-
-Cheers,
+[1] drivers/crypto/geode-aes.c
+[2] arch/s390/crypto/aes_s390.c
+[3] drivers/crypto/padlock-sha.c
+>Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards
+Sebastian Siewior
