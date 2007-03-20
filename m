@@ -1,75 +1,55 @@
-From: "J. Bruce Fields" <bfields@fieldses.org>
-Subject: [PATCH] crypto: scatterwalk_copychunks() fails to advance through
-	scatterlist
-Date: Mon, 19 Mar 2007 19:55:08 -0400
-Message-ID: <20070319235508.GH29272@fieldses.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: scatterwalk_copychunks() fails to advance through scatterlist
+Date: Tue, 20 Mar 2007 16:16:56 +1100
+Message-ID: <20070320051656.GA17711@gondor.apana.org.au>
+References: <20070319235508.GH29272@fieldses.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: nfsv4@linux-nfs.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <nfsv4-bounces@linux-nfs.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, nfsv4@linux-nfs.org
+To: "J. Bruce Fields" <bfields@fieldses.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:2093 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S934017AbXCTFRI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Mar 2007 01:17:08 -0400
 Content-Disposition: inline
-List-Unsubscribe: <http://linux-nfs.org/cgi-bin/mailman/listinfo/nfsv4>,
-	<mailto:nfsv4-request@linux-nfs.org?subject=unsubscribe>
-List-Archive: <http://linux-nfs.org/pipermail/nfsv4>
-List-Post: <mailto:nfsv4@linux-nfs.org>
-List-Help: <mailto:nfsv4-request@linux-nfs.org?subject=help>
-List-Subscribe: <http://linux-nfs.org/cgi-bin/mailman/listinfo/nfsv4>,
-	<mailto:nfsv4-request@linux-nfs.org?subject=subscribe>
-Sender: nfsv4-bounces@linux-nfs.org
-Errors-To: nfsv4-bounces@linux-nfs.org
+In-Reply-To: <20070319235508.GH29272@fieldses.org>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the loop in scatterwalk_copychunks(), if walk->offset is zero,
-then scatterwalk_pagedone rounds that up to the nearest page boundary:
+On Mon, Mar 19, 2007 at 07:55:08PM -0400, J. Bruce Fields wrote:
+> In the loop in scatterwalk_copychunks(), if walk->offset is zero,
+> then scatterwalk_pagedone rounds that up to the nearest page boundary:
+> 
+> 		walk->offset += PAGE_SIZE - 1;
+> 		walk->offset &= PAGE_MASK;
+> 
+> which is a no-op in this case, so we don't advance to the next element
+> of the scatterlist array:
+> 
+> 		if (walk->offset >= walk->sg->offset + walk->sg->length)
+> 			scatterwalk_start(walk, sg_next(walk->sg));
+> 
+> and we end up copying the same data twice.
 
-		walk->offset += PAGE_SIZE - 1;
-		walk->offset &= PAGE_MASK;
+Thanks for the patch.  However I still have a question as to why
+this is happening.
 
-which is a no-op in this case, so we don't advance to the next element
-of the scatterlist array:
+As far as I can see scatterwalk_copychunks is only called in two
+places.  In both spots it only processes one block of data.  Since
+we set the maximum block size to PAGE_SIZE/8 I don't see how you
+can get an offset of zero and still roll over to the next page
+in scatterwalk_copychunks.
 
-		if (walk->offset >= walk->sg->offset + walk->sg->length)
-			scatterwalk_start(walk, sg_next(walk->sg));
+So perhaps the bug is elsewhere in the original patch?
 
-and we end up copying the same data twice.
+Your patch looks like a good clean-up anyway but I just wanted to
+make sure that I understand what the problem is first.
 
-It appears that other callers of scatterwalk_{page}done first advance
-walk->offset, so I believe that's the correct thing to do here.
-
-This caused a bug in NFS when run with krb5p security, which would
-cause some writes to fail with permissions errors--for example, writes
-of less than 8 bytes (the des blocksize) at the start of a file.
-
-A git-bisect shows the bug was originally introduced by
-5c64097aa0f6dc4f27718ef47ca9a12538d62860, first in 2.6.19-rc1.
-
-Signed-off-by: "J. Bruce Fields" <bfields@citi.umich.edu>
----
- crypto/scatterwalk.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index 35172d3..a664231 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -91,6 +91,8 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 		memcpy_dir(buf, vaddr, len_this_page, out);
- 		scatterwalk_unmap(vaddr, out);
- 
-+		scatterwalk_advance(walk, nbytes);
-+
- 		if (nbytes == len_this_page)
- 			break;
- 
-@@ -99,7 +101,5 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 
- 		scatterwalk_pagedone(walk, out, 1);
- 	}
--
--	scatterwalk_advance(walk, nbytes);
- }
- EXPORT_SYMBOL_GPL(scatterwalk_copychunks);
+Cheers,
 -- 
-1.5.0.3.31.ge47c
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
