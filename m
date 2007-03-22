@@ -1,45 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: scatterwalk_copychunks() fails to advance through scatterlist
-Date: Wed, 21 Mar 2007 09:04:43 +1100
-Message-ID: <20070320220443.GA25008@gondor.apana.org.au>
-References: <20070319235508.GH29272@fieldses.org> <20070320051656.GA17711@gondor.apana.org.au> <20070320141614.GA12165@fieldses.org> <20070320205421.GA23929@gondor.apana.org.au> <20070320211751.GC16930@fieldses.org>
+From: "Tsai, Hong-Bin" <hbtsai@gmail.com>
+Subject: How to utilize crypto source in kernel?
+Date: Thu, 22 Mar 2007 17:48:20 +0800
+Message-ID: <3befbf920703220248k3449d916ycd578bddc814246a@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, nfsv4@linux-nfs.org
-To: "J. Bruce Fields" <bfields@fieldses.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2600 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751959AbXCTWEq (ORCPT
+Received: from ug-out-1314.google.com ([66.249.92.171]:8448 "EHLO
+	ug-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932124AbXCVJsY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Mar 2007 18:04:46 -0400
+	Thu, 22 Mar 2007 05:48:24 -0400
+Received: by ug-out-1314.google.com with SMTP id 44so635194uga
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Mar 2007 02:48:22 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20070320211751.GC16930@fieldses.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 20, 2007 at 05:17:51PM -0400, J. Bruce Fields wrote:
-> 
-> By the way, the commit that I believe introduced this regression did two
-> or three different things at once--I spent some time staring at it and
-> can't say I really understand the change.  That's probably just me!  But
-> would it be possible to split up these patches fine enough that people
-> inexperienced with this code would have a better chance of understanding
-> what's going on?
+Dear gurus:
 
-Good point, I'll make sure they're more granular in future.
+I'd like to modify the kernel to load a encrypted initrd. While
+loading the initial ramdisk, kernel reads secret key from somewhere
+else and decrypts initrd, and then continues the boot process.
+However, I met a problem.
 
-> (And did the crypto testing module use to have some tests for buffers
-> that were fragmented in odd ways, or was I imagining that?  I'd be happy
-> to help come up with some test cases if it'd be useful.)
+Since there are crypto libraries reside in kernel, I believe that's
+the best resource for me to implement this mechanism. At first I
+followed the interfaces found in crypto/api.c, but found it is loads
+crypto-algorithms from modules. Even after I configured an algo as
+build-in module (say, aes), I always failed at its initialization
+stage. (crypto_alloc_blkcipher returns error)
 
-It does test fragments but it doesn't do it in the way you
-suggested.  In particular, the fragments probably won't be
-starting off at a page boundary.
+Please give me suggestions. Am I on a right course?
 
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Hong-Bin
+blog: http://furseal.wordpress.com
+msn: benjamin@benjamin.idv.tw
