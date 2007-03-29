@@ -1,58 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto API to compute the hash of some small kernel-memory buffer
-Date: Fri, 23 Mar 2007 17:51:03 +1100
-Message-ID: <20070323065103.GA17632@gondor.apana.org.au>
-References: <20070322001359.GA3126@home>
+Subject: [CRYPTO] api: Proc functions should be marked as unused
+Date: Thu, 29 Mar 2007 17:40:13 +1000
+Message-ID: <20070329074013.GA14428@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Nicolas Boullis <nboullis@debian.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3528 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2273 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933793AbXCWGvH (ORCPT
+	with ESMTP id S1753301AbXC2HkR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Mar 2007 02:51:07 -0400
+	Thu, 29 Mar 2007 03:40:17 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1HWpF0-0004Y2-8C
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Mar 2007 17:40:14 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1HWpEz-0003kw-00
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Mar 2007 17:40:13 +1000
 Content-Disposition: inline
-In-Reply-To: <20070322001359.GA3126@home>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 22, 2007 at 01:13:59AM +0100, Nicolas Boullis wrote:
-> 
-> First of all, sorry to bother you. I thought I'd rather ask my question 
-> to a list dedicated to the crypto API, but only found 
-> linux-crypto@vger.kernel.org that appears to be dead...
+Hi:
 
-Actually that list is alive and well.
+I'm adding this patch to the cryptodev-2.6 tree.
 
-> I'm working on a linux driver for some hardware MPEG decompression 
-> boards (see dxr3.sourceforge.net). Those cards have an on-board i2c 
-> serial EEPROM, and I'd like to compute a hash of the EEPROM's content, 
-> to mach different card models.
-> 
-> Since it's i2c-based, it can't be memory-mapped, so I think I have to 
-> first read it into a buffer in kernel memory. But the I have some 
-> trouble to compute the hash.
-> 
-> It seemed to work correctly, while I used the crypto_digest functions + 
-> a direct call to the dis_update function of the underlying algorith, 
-> although it was somewhat hackish...
-> 
-> It still seems to work allocating a crypto_hash transform and then using 
-> the underlying digest algorith functions, but looks even more hackish.
-> 
-> 
-> SO my question is: is there a non-hackish way to compute the hash of a 
-> kernel buffer? (I thought I'd use md5 but a different one would be as 
-> fine.)
+[CRYPTO] api: Proc functions should be marked as unused
 
-As long as your kernel buffer is malloced, you can turn it into an
-sg list with sg_set_buf.
+The proc functions were incorrectly marked as used rather than unused.
+They may be unused if proc is disabled.
 
-Once the async interface is in place, it might make sense to convert
-all remaining sync users to use an address-based interface instead
-of scatter lists.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 Cheers,
 -- 
@@ -60,3 +39,28 @@ Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -386,7 +386,7 @@ static int crypto_init_blkcipher_ops(str
+ }
+ 
+ static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
+-	__attribute_used__;
++	__attribute__ ((unused));
+ static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+ 	seq_printf(m, "type         : blkcipher\n");
+diff --git a/crypto/hash.c b/crypto/hash.c
+--- a/crypto/hash.c
++++ b/crypto/hash.c
+@@ -41,7 +41,7 @@ static int crypto_init_hash_ops(struct c
+ }
+ 
+ static void crypto_hash_show(struct seq_file *m, struct crypto_alg *alg)
+-	__attribute_used__;
++	__attribute__ ((unused));
+ static void crypto_hash_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+ 	seq_printf(m, "type         : hash\n");
