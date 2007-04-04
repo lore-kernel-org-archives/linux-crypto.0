@@ -1,42 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [1/2] [CRYPTO] api: Add async block cipher interface
-Date: Wed, 4 Apr 2007 15:15:26 +1000
-Message-ID: <20070404051525.GA31361@gondor.apana.org.au>
+Subject: [2/2] [CRYPTO] tcrypt: Use async blkcipher interface
+Date: Wed, 4 Apr 2007 17:42:04 +1000
+Message-ID: <20070404074204.GA31429@gondor.apana.org.au>
+References: <20070404051525.GA31361@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2678 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3247 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S2992626AbXDDFP2 (ORCPT
+	with ESMTP id S2992716AbXDDHmI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Apr 2007 01:15:28 -0400
+	Wed, 4 Apr 2007 03:42:08 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1HYxqA-0001EQ-Hw
-	for <linux-crypto@vger.kernel.org>; Wed, 04 Apr 2007 15:15:26 +1000
+	id 1HZ084-00028A-QH
+	for <linux-crypto@vger.kernel.org>; Wed, 04 Apr 2007 17:42:04 +1000
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1HYxqA-0008Aa-00
-	for <linux-crypto@vger.kernel.org>; Wed, 04 Apr 2007 15:15:26 +1000
+	id 1HZ084-0008UH-00
+	for <linux-crypto@vger.kernel.org>; Wed, 04 Apr 2007 17:42:04 +1000
 Content-Disposition: inline
+In-Reply-To: <20070404051525.GA31361@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi:
 
-[CRYPTO] api: Add async block cipher interface
+[CRYPTO] tcrypt: Use async blkcipher interface
 
-This patch adds the frontend interface for asynchronous block ciphers.
-In addition to the usual block cipher parameters, there is a callback
-function pointer and a data pointer.  The callback will be invoked only
-if the encrypt/decrypt handlers return -EINPROGRESS.  In other words,
-if the return value of zero the completion handler (or the equivalent
-code) needs to be invoked by the caller.
-
-The request structure is allocated and freed by the caller.  Its size
-is determined by calling crypto_ablkcipher_reqsize().  The helpers
-ablkcipher_request_alloc/ablkcipher_request_free can be used to manage
-the memory for a request.
+This patch converts the tcrypt module to use the asynchronous block cipher
+interface.  As all synchronous block ciphers can be used through the async
+interface, tcrypt is still able to test them.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
@@ -47,381 +41,228 @@ Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
-diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
---- a/crypto/blkcipher.c
-+++ b/crypto/blkcipher.c
-@@ -349,13 +349,48 @@ static int setkey(struct crypto_tfm *tfm
- 	return cipher->setkey(tfm, key, keylen);
- }
+1aeb72d6abedc918ff068da88c98136f7ab96c65
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 8eaa5aa..f0aed01 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -57,6 +57,11 @@
+ #define ENCRYPT 1
+ #define DECRYPT 0
  
-+static int async_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
-+			unsigned int keylen)
-+{
-+	return setkey(crypto_ablkcipher_tfm(tfm), key, keylen);
-+}
-+
-+static int async_encrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto_tfm *tfm = req->base.tfm;
-+	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
-+	struct blkcipher_desc desc = {
-+		.tfm = __crypto_blkcipher_cast(tfm),
-+		.info = req->info,
-+		.flags = req->base.flags,
-+	};
-+
-+
-+	return alg->encrypt(&desc, req->dst, req->src, req->nbytes);
-+}
-+
-+static int async_decrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto_tfm *tfm = req->base.tfm;
-+	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
-+	struct blkcipher_desc desc = {
-+		.tfm = __crypto_blkcipher_cast(tfm),
-+		.info = req->info,
-+		.flags = req->base.flags,
-+	};
-+
-+	return alg->decrypt(&desc, req->dst, req->src, req->nbytes);
-+}
-+
- static unsigned int crypto_blkcipher_ctxsize(struct crypto_alg *alg, u32 type,
- 					     u32 mask)
- {
- 	struct blkcipher_alg *cipher = &alg->cra_blkcipher;
- 	unsigned int len = alg->cra_ctxsize;
- 
--	if (cipher->ivsize) {
-+	type ^= CRYPTO_ALG_ASYNC;
-+	mask &= CRYPTO_ALG_ASYNC;
-+	if ((type & mask) && cipher->ivsize) {
- 		len = ALIGN(len, (unsigned long)alg->cra_alignmask + 1);
- 		len += cipher->ivsize;
- 	}
-@@ -363,16 +398,26 @@ static unsigned int crypto_blkcipher_ctx
- 	return len;
- }
- 
--static int crypto_init_blkcipher_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
-+static int crypto_init_blkcipher_ops_async(struct crypto_tfm *tfm)
-+{
-+	struct ablkcipher_tfm *crt = &tfm->crt_ablkcipher;
-+	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
-+
-+	crt->setkey = async_setkey;
-+	crt->encrypt = async_encrypt;
-+	crt->decrypt = async_decrypt;
-+	crt->ivsize = alg->ivsize;
-+
-+	return 0;
-+}
-+
-+static int crypto_init_blkcipher_ops_sync(struct crypto_tfm *tfm)
- {
- 	struct blkcipher_tfm *crt = &tfm->crt_blkcipher;
- 	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
- 	unsigned long align = crypto_tfm_alg_alignmask(tfm) + 1;
- 	unsigned long addr;
- 
--	if (alg->ivsize > PAGE_SIZE / 8)
--		return -EINVAL;
--
- 	crt->setkey = setkey;
- 	crt->encrypt = alg->encrypt;
- 	crt->decrypt = alg->decrypt;
-@@ -385,6 +430,21 @@ static int crypto_init_blkcipher_ops(str
- 	return 0;
- }
- 
-+static int crypto_init_blkcipher_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	struct blkcipher_alg *alg = &tfm->__crt_alg->cra_blkcipher;
-+
-+	if (alg->ivsize > PAGE_SIZE / 8)
-+		return -EINVAL;
-+
-+	type ^= CRYPTO_ALG_ASYNC;
-+	mask &= CRYPTO_ALG_ASYNC;
-+	if (type & mask)
-+		return crypto_init_blkcipher_ops_sync(tfm);
-+	else
-+		return crypto_init_blkcipher_ops_async(tfm);
-+}
-+
- static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	__attribute__ ((unused));
- static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -56,6 +56,7 @@
- 
- #define CRYPTO_TFM_REQ_WEAK_KEY		0x00000100
- #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
-+#define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
- #define CRYPTO_TFM_RES_WEAK_KEY		0x00100000
- #define CRYPTO_TFM_RES_BAD_KEY_LEN   	0x00200000
- #define CRYPTO_TFM_RES_BAD_KEY_SCHED 	0x00400000
-@@ -88,11 +89,37 @@
- #endif
- 
- struct scatterlist;
-+struct crypto_ablkcipher;
-+struct crypto_async_request;
- struct crypto_blkcipher;
- struct crypto_hash;
- struct crypto_tfm;
- struct crypto_type;
- 
-+typedef void (*crypto_completion_t)(struct crypto_async_request *req, int err);
-+
-+struct crypto_async_request {
-+	struct list_head list;
-+	crypto_completion_t complete;
-+	void *data;
-+	struct crypto_tfm *tfm;
-+
-+	u32 flags;
++struct tcrypt_result {
++	struct completion completion;
++	int err;
 +};
 +
-+struct ablkcipher_request {
-+	struct crypto_async_request base;
-+
-+	unsigned int nbytes;
-+
-+	void *info;
-+
-+	struct scatterlist *src;
-+	struct scatterlist *dst;
-+
-+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-+};
-+
- struct blkcipher_desc {
- 	struct crypto_blkcipher *tfm;
- 	void *info;
-@@ -232,6 +259,15 @@ static inline int crypto_has_alg(const c
-  * crypto_free_*(), as well as the various helpers below.
-  */
+ static unsigned int IDX[8] = { IDX1, IDX2, IDX3, IDX4, IDX5, IDX6, IDX7, IDX8 };
  
-+struct ablkcipher_tfm {
-+	int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
-+	              unsigned int keylen);
-+	int (*encrypt)(struct ablkcipher_request *req);
-+	int (*decrypt)(struct ablkcipher_request *req);
-+	unsigned int ivsize;
-+	unsigned int reqsize;
-+};
-+
- struct blkcipher_tfm {
- 	void *iv;
- 	int (*setkey)(struct crypto_tfm *tfm, const u8 *key,
-@@ -290,6 +326,7 @@ struct compress_tfm {
- 	                      u8 *dst, unsigned int *dlen);
- };
- 
-+#define crt_ablkcipher	crt_u.ablkcipher
- #define crt_blkcipher	crt_u.blkcipher
- #define crt_cipher	crt_u.cipher
- #define crt_hash	crt_u.hash
-@@ -300,6 +337,7 @@ struct crypto_tfm {
- 	u32 crt_flags;
- 	
- 	union {
-+		struct ablkcipher_tfm ablkcipher;
- 		struct blkcipher_tfm blkcipher;
- 		struct cipher_tfm cipher;
- 		struct hash_tfm hash;
-@@ -311,6 +349,10 @@ struct crypto_tfm {
- 	void *__crt_ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-+struct crypto_ablkcipher {
-+	struct crypto_tfm base;
-+};
-+
- struct crypto_blkcipher {
- 	struct crypto_tfm base;
- };
-@@ -411,6 +453,155 @@ static inline unsigned int crypto_tfm_ct
  /*
-  * API wrappers.
-  */
-+static inline struct crypto_ablkcipher *__crypto_ablkcipher_cast(
-+	struct crypto_tfm *tfm)
+@@ -84,6 +89,17 @@ static void hexdump(unsigned char *buf, unsigned int len)
+ 	printk("\n");
+ }
+ 
++static void tcrypt_complete(struct crypto_async_request *req, int err)
 +{
-+	return (struct crypto_ablkcipher *)tfm;
++	struct tcrypt_result *res = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	res->err = err;
++	complete(&res->completion);
 +}
 +
-+static inline struct crypto_ablkcipher *crypto_alloc_ablkcipher(
-+	const char *alg_name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_ablkcipher_cast(
-+		crypto_alloc_base(alg_name, type, mask));
-+}
-+
-+static inline struct crypto_tfm *crypto_ablkcipher_tfm(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline void crypto_free_ablkcipher(struct crypto_ablkcipher *tfm)
-+{
-+	crypto_free_tfm(crypto_ablkcipher_tfm(tfm));
-+}
-+
-+static inline int crypto_has_ablkcipher(const char *alg_name, u32 type,
-+					u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return crypto_has_alg(alg_name, type, mask);
-+}
-+
-+static inline struct ablkcipher_tfm *crypto_ablkcipher_crt(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return &crypto_ablkcipher_tfm(tfm)->crt_ablkcipher;
-+}
-+
-+static inline unsigned int crypto_ablkcipher_ivsize(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_ablkcipher_crt(tfm)->ivsize;
-+}
-+
-+static inline unsigned int crypto_ablkcipher_blocksize(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_tfm_alg_blocksize(crypto_ablkcipher_tfm(tfm));
-+}
-+
-+static inline unsigned int crypto_ablkcipher_alignmask(
-+	struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_tfm_alg_alignmask(crypto_ablkcipher_tfm(tfm));
-+}
-+
-+static inline u32 crypto_ablkcipher_get_flags(struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_tfm_get_flags(crypto_ablkcipher_tfm(tfm));
-+}
-+
-+static inline void crypto_ablkcipher_set_flags(struct crypto_ablkcipher *tfm,
-+					       u32 flags)
-+{
-+	crypto_tfm_set_flags(crypto_ablkcipher_tfm(tfm), flags);
-+}
-+
-+static inline void crypto_ablkcipher_clear_flags(struct crypto_ablkcipher *tfm,
-+						 u32 flags)
-+{
-+	crypto_tfm_clear_flags(crypto_ablkcipher_tfm(tfm), flags);
-+}
-+
-+static inline int crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
-+					   const u8 *key, unsigned int keylen)
-+{
-+	return crypto_ablkcipher_crt(tfm)->setkey(tfm, key, keylen);
-+}
-+
-+static inline struct crypto_ablkcipher *crypto_ablkcipher_reqtfm(
-+	struct ablkcipher_request *req)
-+{
-+	return __crypto_ablkcipher_cast(req->base.tfm);
-+}
-+
-+static inline int crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
-+{
-+	struct ablkcipher_tfm *crt =
-+		crypto_ablkcipher_crt(crypto_ablkcipher_reqtfm(req));
-+	return crt->encrypt(req);
-+}
-+
-+static inline int crypto_ablkcipher_decrypt(struct ablkcipher_request *req)
-+{
-+	struct ablkcipher_tfm *crt =
-+		crypto_ablkcipher_crt(crypto_ablkcipher_reqtfm(req));
-+	return crt->decrypt(req);
-+}
-+
-+static inline int crypto_ablkcipher_reqsize(struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_ablkcipher_crt(tfm)->reqsize;
-+}
-+
-+static inline struct ablkcipher_request *ablkcipher_request_alloc(
-+	struct crypto_ablkcipher *tfm, gfp_t gfp)
-+{
+ static void test_hash(char *algo, struct hash_testvec *template,
+ 		      unsigned int tcount)
+ {
+@@ -203,15 +219,14 @@ static void test_cipher(char *algo, int enc,
+ {
+ 	unsigned int ret, i, j, k, temp;
+ 	unsigned int tsize;
+-	unsigned int iv_len;
+-	unsigned int len;
+ 	char *q;
+-	struct crypto_blkcipher *tfm;
++	struct crypto_ablkcipher *tfm;
+ 	char *key;
+ 	struct cipher_testvec *cipher_tv;
+-	struct blkcipher_desc desc;
 +	struct ablkcipher_request *req;
-+
-+	req = kmalloc(sizeof(struct ablkcipher_request) +
-+		      crypto_ablkcipher_reqsize(tfm), gfp);
-+
-+	if (likely(req))
-+		req->base.tfm = crypto_ablkcipher_tfm(tfm);
-+
-+	return req;
-+}
-+
-+static inline void ablkcipher_request_free(struct ablkcipher_request *req)
-+{
-+	kfree(req);
-+}
-+
-+static inline void ablkcipher_request_set_callback(
-+	struct ablkcipher_request *req,
-+	u32 flags, crypto_completion_t complete, void *data)
-+{
-+	req->base.complete = complete;
-+	req->base.data = data;
-+	req->base.flags = flags;
-+}
-+
-+static inline void ablkcipher_request_set_crypt(
-+	struct ablkcipher_request *req,
-+	struct scatterlist *src, struct scatterlist *dst,
-+	unsigned int nbytes, void *iv)
-+{
-+	req->src = src;
-+	req->dst = dst;
-+	req->nbytes = nbytes;
-+	req->info = iv;
-+}
-+
- static inline struct crypto_blkcipher *__crypto_blkcipher_cast(
- 	struct crypto_tfm *tfm)
- {
-@@ -427,9 +618,9 @@ static inline struct crypto_blkcipher *c
- static inline struct crypto_blkcipher *crypto_alloc_blkcipher(
- 	const char *alg_name, u32 type, u32 mask)
- {
--	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
- 	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
--	mask |= CRYPTO_ALG_TYPE_MASK;
-+	mask |= CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC;
+ 	struct scatterlist sg[8];
+ 	const char *e;
++	struct tcrypt_result result;
  
- 	return __crypto_blkcipher_cast(crypto_alloc_base(alg_name, type, mask));
+ 	if (enc == ENCRYPT)
+ 	        e = "encryption";
+@@ -232,15 +247,24 @@ static void test_cipher(char *algo, int enc,
+ 	memcpy(tvmem, template, tsize);
+ 	cipher_tv = (void *)tvmem;
+ 
+-	tfm = crypto_alloc_blkcipher(algo, 0, CRYPTO_ALG_ASYNC);
++	init_completion(&result.completion);
++
++	tfm = crypto_alloc_ablkcipher(algo, 0, 0);
+ 
+ 	if (IS_ERR(tfm)) {
+ 		printk("failed to load transform for %s: %ld\n", algo,
+ 		       PTR_ERR(tfm));
+ 		return;
+ 	}
+-	desc.tfm = tfm;
+-	desc.flags = 0;
++
++	req = ablkcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		printk("failed to allocate request for %s\n", algo);
++		goto out;
++	}
++
++	ablkcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					tcrypt_complete, &result);
+ 
+ 	j = 0;
+ 	for (i = 0; i < tcount; i++) {
+@@ -249,17 +273,17 @@ static void test_cipher(char *algo, int enc,
+ 			printk("test %u (%d bit key):\n",
+ 			j, cipher_tv[i].klen * 8);
+ 
+-			crypto_blkcipher_clear_flags(tfm, ~0);
++			crypto_ablkcipher_clear_flags(tfm, ~0);
+ 			if (cipher_tv[i].wk)
+-				crypto_blkcipher_set_flags(
++				crypto_ablkcipher_set_flags(
+ 					tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+ 			key = cipher_tv[i].key;
+ 
+-			ret = crypto_blkcipher_setkey(tfm, key,
+-						      cipher_tv[i].klen);
++			ret = crypto_ablkcipher_setkey(tfm, key,
++						       cipher_tv[i].klen);
+ 			if (ret) {
+ 				printk("setkey() failed flags=%x\n",
+-				       crypto_blkcipher_get_flags(tfm));
++				       crypto_ablkcipher_get_flags(tfm));
+ 
+ 				if (!cipher_tv[i].fail)
+ 					goto out;
+@@ -268,19 +292,28 @@ static void test_cipher(char *algo, int enc,
+ 			sg_set_buf(&sg[0], cipher_tv[i].input,
+ 				   cipher_tv[i].ilen);
+ 
+-			iv_len = crypto_blkcipher_ivsize(tfm);
+-			if (iv_len)
+-				crypto_blkcipher_set_iv(tfm, cipher_tv[i].iv,
+-							iv_len);
++			ablkcipher_request_set_crypt(req, sg, sg,
++						     cipher_tv[i].ilen,
++						     cipher_tv[i].iv);
+ 
+-			len = cipher_tv[i].ilen;
+ 			ret = enc ?
+-				crypto_blkcipher_encrypt(&desc, sg, sg, len) :
+-				crypto_blkcipher_decrypt(&desc, sg, sg, len);
++				crypto_ablkcipher_encrypt(req) :
++				crypto_ablkcipher_decrypt(req);
+ 
+-			if (ret) {
+-				printk("%s () failed flags=%x\n", e,
+-				       desc.flags);
++			switch (ret) {
++			case 0:
++				break;
++			case -EINPROGRESS:
++			case -EBUSY:
++				ret = wait_for_completion_interruptible(
++					&result.completion);
++				if (!ret && !((ret = result.err))) {
++					INIT_COMPLETION(result.completion);
++					break;
++				}
++				/* fall through */
++			default:
++				printk("%s () failed err=%d\n", e, -ret);
+ 				goto out;
+ 			}
+ 
+@@ -303,17 +336,17 @@ static void test_cipher(char *algo, int enc,
+ 			printk("test %u (%d bit key):\n",
+ 			j, cipher_tv[i].klen * 8);
+ 
+-			crypto_blkcipher_clear_flags(tfm, ~0);
++			crypto_ablkcipher_clear_flags(tfm, ~0);
+ 			if (cipher_tv[i].wk)
+-				crypto_blkcipher_set_flags(
++				crypto_ablkcipher_set_flags(
+ 					tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+ 			key = cipher_tv[i].key;
+ 
+-			ret = crypto_blkcipher_setkey(tfm, key,
+-						      cipher_tv[i].klen);
++			ret = crypto_ablkcipher_setkey(tfm, key,
++						       cipher_tv[i].klen);
+ 			if (ret) {
+ 				printk("setkey() failed flags=%x\n",
+-				       crypto_blkcipher_get_flags(tfm));
++				       crypto_ablkcipher_get_flags(tfm));
+ 
+ 				if (!cipher_tv[i].fail)
+ 					goto out;
+@@ -329,19 +362,28 @@ static void test_cipher(char *algo, int enc,
+ 					   cipher_tv[i].tap[k]);
+ 			}
+ 
+-			iv_len = crypto_blkcipher_ivsize(tfm);
+-			if (iv_len)
+-				crypto_blkcipher_set_iv(tfm, cipher_tv[i].iv,
+-							iv_len);
++			ablkcipher_request_set_crypt(req, sg, sg,
++						     cipher_tv[i].ilen,
++						     cipher_tv[i].iv);
+ 
+-			len = cipher_tv[i].ilen;
+ 			ret = enc ?
+-				crypto_blkcipher_encrypt(&desc, sg, sg, len) :
+-				crypto_blkcipher_decrypt(&desc, sg, sg, len);
++				crypto_ablkcipher_encrypt(req) :
++				crypto_ablkcipher_decrypt(req);
+ 
+-			if (ret) {
+-				printk("%s () failed flags=%x\n", e,
+-				       desc.flags);
++			switch (ret) {
++			case 0:
++				break;
++			case -EINPROGRESS:
++			case -EBUSY:
++				ret = wait_for_completion_interruptible(
++					&result.completion);
++				if (!ret && !((ret = result.err))) {
++					INIT_COMPLETION(result.completion);
++					break;
++				}
++				/* fall through */
++			default:
++				printk("%s () failed err=%d\n", e, -ret);
+ 				goto out;
+ 			}
+ 
+@@ -360,7 +402,8 @@ static void test_cipher(char *algo, int enc,
+ 	}
+ 
+ out:
+-	crypto_free_blkcipher(tfm);
++	crypto_free_ablkcipher(tfm);
++	ablkcipher_request_free(req);
  }
-@@ -447,9 +638,9 @@ static inline void crypto_free_blkcipher
  
- static inline int crypto_has_blkcipher(const char *alg_name, u32 type, u32 mask)
- {
--	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
- 	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
--	mask |= CRYPTO_ALG_TYPE_MASK;
-+	mask |= CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC;
+ static int test_cipher_jiffies(struct blkcipher_desc *desc, int enc, char *p,
+@@ -832,7 +875,7 @@ static void test_available(void)
  
- 	return crypto_has_alg(alg_name, type, mask);
- }
+ 	while (*name) {
+ 		printk("alg %s ", *name);
+-		printk(crypto_has_alg(*name, 0, CRYPTO_ALG_ASYNC) ?
++		printk(crypto_has_alg(*name, 0, 0) ?
+ 		       "found\n" : "not found\n");
+ 		name++;
+ 	}
