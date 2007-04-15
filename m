@@ -1,43 +1,35 @@
-From: Michael Halcrow <mike@halcrow.us>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [CRYPTO] is it really optimized ?
-Date: Sat, 14 Apr 2007 14:44:35 -0500
-Message-ID: <20070414194434.GA18988@halcrow.us>
-References: <38b2ab8a0704140615y2ba8145bmd3c2316a41d99265@mail.gmail.com> <E1Hco0p-0007np-00@gondolin.me.apana.org.au>
-Reply-To: Michael Halcrow <mike@halcrow.us>
+Date: Sun, 15 Apr 2007 17:52:01 +1000
+Message-ID: <20070415075201.GA1644@gondor.apana.org.au>
+References: <38b2ab8a0704140615y2ba8145bmd3c2316a41d99265@mail.gmail.com> <E1Hco0p-0007np-00@gondolin.me.apana.org.au> <38b2ab8a0704141410q65f55381w26527aeb10fb4988@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Francis Moreau <francis.moro@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nlpi001.sbcis.sbc.com ([207.115.36.30]:13437 "EHLO
-	nlpi001.sbcis.sbc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751951AbXDOBSV (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:2360 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752216AbXDOHwK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Apr 2007 21:18:21 -0400
+	Sun, 15 Apr 2007 03:52:10 -0400
 Content-Disposition: inline
-In-Reply-To: <E1Hco0p-0007np-00@gondolin.me.apana.org.au>
+In-Reply-To: <38b2ab8a0704141410q65f55381w26527aeb10fb4988@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Apr 15, 2007 at 05:34:19AM +1000, Herbert Xu wrote:
-> Francis Moreau <francis.moro@gmail.com> wrote:
-> > 
-> > hmm yes indeed it should do the job, but I don't see how you do that.
-> > For example, let say I want to use "aes-foo" with eCryptfs. I can give
-> > a higher priority to "aes-foo" than "aes" one. When eCryptfs asks for
-> > a aes cipher it will pass "aes" name and since "aes-foo" has a higher
-> > priority then the cypto core will return "aes-foo" cipher, right ? But
-> > in this scheme, eCryptfs has not a higher priority than other kernel
-> > users. How can I prevent others to use "aes-foo" ?
+On Sat, Apr 14, 2007 at 11:10:08PM +0200, Francis Moreau wrote:
 > 
-> You would assign "aes-foo" a lower priority and then tell eCryptfs to
-> use "aes-foo" instead of "aes".
+> ok but do you think it's safe to assume that no others parts of the
+> kernel will request "aes-foo" ? Remember that the main point is to
+> optimize "aes-foo" ?
 
-Note that eCryptfs whitelists the cipher name (see
-fs/ecryptfs/crypto.c::ecryptfs_cipher_code_str_map[] and associated
-functions). This is because eCryptfs needs to pick a cipher code
-(RFC2440-ish) to identify the cipher in the encrypted file
-metadata. Shall I go ahead with a patch to add support for the '-'
-qualifier?
+What they request is up to the administrator.
 
-Mike
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
