@@ -1,394 +1,386 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/6] [CRYPTO] templates: Pass type/mask when creating instances
-Date: Mon, 16 Apr 2007 20:52:16 +1000
-Message-ID: <E1HdOoi-0002u4-00@gondolin.me.apana.org.au>
+Subject: [PATCH 2/6] [CRYPTO] api: Add async blkcipher type
+Date: Mon, 16 Apr 2007 20:52:17 +1000
+Message-ID: <E1HdOoj-0002u8-00@gondolin.me.apana.org.au>
 References: <<20070416105105.GA10188@gondor.apana.org.au>>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4918 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4920 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1030342AbXDPKwT (ORCPT
+	with ESMTP id S1030358AbXDPKwT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Mon, 16 Apr 2007 06:52:19 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1HdOoi-0004bH-Hi
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Apr 2007 20:52:16 +1000
+	id 1HdOoj-0004bM-NL
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Apr 2007 20:52:17 +1000
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1HdOoi-0002u4-00
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Apr 2007 20:52:16 +1000
+	id 1HdOoj-0002u8-00
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Apr 2007 20:52:17 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] templates: Pass type/mask when creating instances
+[CRYPTO] api: Add async blkcipher type
 
-This patch passes the type/mask along when constructing instances of
-templates.  This is in preparation for templates that may support
-multiple types of instances depending on what is requested.  For example,
-the planned software async crypto driver will use this construct.
-
-For the moment this allows us to check whether the instance constructed
-is of the correct type and avoid returning success if the type does not
-match.
+This patch adds the mid-level interface for asynchronous block ciphers.
+It also includes a generic queueing mechanism that can be used by other
+asynchronous crypto operations in future.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/algapi.c         |   42 ++++++++++++++++++++++++++++++++++++------
- crypto/cbc.c            |   11 ++++++++---
- crypto/cryptomgr.c      |   28 ++++++++++++++++++----------
- crypto/ecb.c            |   11 ++++++++---
- crypto/hmac.c           |   11 ++++++++---
- crypto/lrw.c            |   11 ++++++++---
- crypto/pcbc.c           |   11 ++++++++---
- crypto/xcbc.c           |   12 +++++++++---
- include/crypto/algapi.h |    8 +++++---
- include/linux/crypto.h  |    9 +++++++++
- 10 files changed, 117 insertions(+), 37 deletions(-)
+ crypto/Kconfig          |    4 ++
+ crypto/Makefile         |    1 
+ crypto/ablkcipher.c     |   83 ++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/algapi.c         |   62 +++++++++++++++++++++++++++++++++++
+ include/crypto/algapi.h |   58 +++++++++++++++++++++++++++++++++
+ include/linux/crypto.h  |   22 ++++++++++++
+ 6 files changed, 230 insertions(+)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -425,15 +425,45 @@ int crypto_unregister_notifier(struct no
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_notifier);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -16,6 +16,10 @@ config CRYPTO_ALGAPI
+ 	help
+ 	  This option provides the API for cryptographic algorithms.
  
--struct crypto_alg *crypto_get_attr_alg(void *param, unsigned int len,
--				       u32 type, u32 mask)
-+struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb)
- {
--	struct rtattr *rta = param;
-+	struct rtattr *rta = tb[CRYPTOA_TYPE - 1];
-+	struct crypto_attr_type *algt;
++config CRYPTO_ABLKCIPHER
++	tristate
++	select CRYPTO_BLKCIPHER
 +
-+	if (!rta)
-+		return ERR_PTR(-ENOENT);
-+	if (RTA_PAYLOAD(rta) < sizeof(*algt))
-+		return ERR_PTR(-EINVAL);
+ config CRYPTO_BLKCIPHER
+ 	tristate
+ 	select CRYPTO_ALGAPI
+diff --git a/crypto/Makefile b/crypto/Makefile
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -8,6 +8,7 @@ crypto_algapi-$(CONFIG_PROC_FS) += proc.
+ crypto_algapi-objs := algapi.o $(crypto_algapi-y)
+ obj-$(CONFIG_CRYPTO_ALGAPI) += crypto_algapi.o
+ 
++obj-$(CONFIG_CRYPTO_ABLKCIPHER) += ablkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER) += blkcipher.o
+ 
+ crypto_hash-objs := hash.o
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+new file mode 100644
+--- /dev/null
++++ b/crypto/ablkcipher.c
+@@ -0,0 +1,83 @@
++/*
++ * Asynchronous block chaining cipher operations.
++ * 
++ * This is the asynchronous version of blkcipher.c indicating completion
++ * via a callback.
++ *
++ * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option) 
++ * any later version.
++ *
++ */
 +
-+	algt = RTA_DATA(rta);
++#include <crypto/algapi.h>
++#include <linux/errno.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/seq_file.h>
 +
-+	return algt;
-+}
-+EXPORT_SYMBOL_GPL(crypto_get_attr_type);
-+
-+int crypto_check_attr_type(struct rtattr **tb, u32 type)
++static int setkey(struct crypto_ablkcipher *tfm, const u8 *key,
++		  unsigned int keylen)
 +{
-+	struct crypto_attr_type *algt;
++	struct ablkcipher_alg *cipher = crypto_ablkcipher_alg(tfm);
 +
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return PTR_ERR(algt);
-+
-+	if ((algt->type ^ type) & algt->mask)
++	if (keylen < cipher->min_keysize || keylen > cipher->max_keysize) {
++		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
 +		return -EINVAL;
++	}
++
++	return cipher->setkey(tfm, key, keylen);
++}
++
++static unsigned int crypto_ablkcipher_ctxsize(struct crypto_alg *alg, u32 type,
++					      u32 mask)
++{
++	return alg->cra_ctxsize;
++}
++
++static int crypto_init_ablkcipher_ops(struct crypto_tfm *tfm, u32 type,
++				      u32 mask)
++{
++	struct ablkcipher_alg *alg = &tfm->__crt_alg->cra_ablkcipher;
++	struct ablkcipher_tfm *crt = &tfm->crt_ablkcipher;
++
++	if (alg->ivsize > PAGE_SIZE / 8)
++		return -EINVAL;
++
++	crt->setkey = setkey;
++	crt->encrypt = alg->encrypt;
++	crt->decrypt = alg->decrypt;
++	crt->ivsize = alg->ivsize;
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_check_attr_type);
 +
-+struct crypto_alg *crypto_get_attr_alg(struct rtattr **tb, u32 type, u32 mask)
++static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
 +{
-+	struct rtattr *rta = tb[CRYPTOA_ALG - 1];
- 	struct crypto_attr_alg *alga;
- 
--	if (!RTA_OK(rta, len))
--		return ERR_PTR(-EBADR);
--	if (rta->rta_type != CRYPTOA_ALG || RTA_PAYLOAD(rta) < sizeof(*alga))
-+	if (!rta)
-+		return ERR_PTR(-ENOENT);
-+	if (RTA_PAYLOAD(rta) < sizeof(*alga))
- 		return ERR_PTR(-EINVAL);
- 
- 	alga = RTA_DATA(rta);
-diff --git a/crypto/cbc.c b/crypto/cbc.c
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -275,13 +275,18 @@ static void crypto_cbc_exit_tfm(struct c
- 	crypto_free_cipher(ctx->child);
++	struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
++
++	seq_printf(m, "type         : ablkcipher\n");
++	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
++	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
++	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
++	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
++	seq_printf(m, "qlen         : %u\n", ablkcipher->queue->qlen);
++	seq_printf(m, "max qlen     : %u\n", ablkcipher->queue->max_qlen);
++}
++
++const struct crypto_type crypto_ablkcipher_type = {
++	.ctxsize = crypto_ablkcipher_ctxsize,
++	.init = crypto_init_ablkcipher_ops,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_ablkcipher_show,
++#endif
++};
++EXPORT_SYMBOL_GPL(crypto_ablkcipher_type);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Asynchronous block chaining cipher type");
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -507,6 +507,68 @@ err_free_inst:
  }
+ EXPORT_SYMBOL_GPL(crypto_alloc_instance);
  
--static struct crypto_instance *crypto_cbc_alloc(void *param, unsigned int len)
-+static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
++void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen)
++{
++	INIT_LIST_HEAD(&queue->list);
++	queue->backlog = &queue->list;
++	queue->qlen = 0;
++	queue->max_qlen = max_qlen;
++}
++EXPORT_SYMBOL_GPL(crypto_init_queue);
++
++int crypto_enqueue_request(struct crypto_queue *queue,
++			   struct crypto_async_request *request)
++{
++	int err = -EINPROGRESS;
++
++	if (unlikely(queue->qlen >= queue->max_qlen)) {
++		err = -EBUSY;
++		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++			goto out;
++		if (queue->backlog == &queue->list)
++			queue->backlog = &request->list;
++	}
++
++	queue->qlen++;
++	list_add_tail(&request->list, &queue->list);
++
++out:
++	return err;
++}
++EXPORT_SYMBOL_GPL(crypto_enqueue_request);
++
++struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue)
++{
++	struct list_head *request;
++
++	if (unlikely(!queue->qlen))
++		return NULL;
++
++	queue->qlen--;
++
++	if (queue->backlog != &queue->list)
++		queue->backlog = queue->backlog->next;
++
++	request = queue->list.next;
++	list_del(request);
++
++	return list_entry(request, struct crypto_async_request, list);
++}
++EXPORT_SYMBOL_GPL(crypto_dequeue_request);
++
++int crypto_tfm_in_queue(struct crypto_queue *queue, struct crypto_tfm *tfm)
++{
++	struct crypto_async_request *req;
++
++	list_for_each_entry(req, &queue->list, list) {
++		if (req->tfm == tfm)
++			return 1;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_tfm_in_queue);
++
+ static int __init crypto_algapi_init(void)
  {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	int err;
- 
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
-diff --git a/crypto/cryptomgr.c b/crypto/cryptomgr.c
---- a/crypto/cryptomgr.c
-+++ b/crypto/cryptomgr.c
-@@ -26,14 +26,19 @@
- struct cryptomgr_param {
- 	struct work_struct work;
- 
-+	struct rtattr *tb[CRYPTOA_MAX];
-+
-+	struct {
-+		struct rtattr attr;
-+		struct crypto_attr_type data;
-+	} type;
-+
- 	struct {
- 		struct rtattr attr;
- 		struct crypto_attr_alg data;
- 	} alg;
- 
- 	struct {
--		u32 type;
--		u32 mask;
- 		char name[CRYPTO_MAX_ALG_NAME];
- 	} larval;
- 
-@@ -53,7 +58,7 @@ static void cryptomgr_probe(struct work_
- 		goto err;
- 
- 	do {
--		inst = tmpl->alloc(&param->alg, sizeof(param->alg));
-+		inst = tmpl->alloc(param->tb);
- 		if (IS_ERR(inst))
- 			err = PTR_ERR(inst);
- 		else if ((err = crypto_register_instance(tmpl, inst)))
-@@ -70,8 +75,8 @@ out:
- 	return;
- 
- err:
--	crypto_larval_error(param->larval.name, param->larval.type,
--			    param->larval.mask);
-+	crypto_larval_error(param->larval.name, param->type.data.type,
-+			    param->type.data.mask);
- 	goto out;
- }
- 
-@@ -82,7 +87,7 @@ static int cryptomgr_schedule_probe(stru
- 	const char *p;
- 	unsigned int len;
- 
--	param = kmalloc(sizeof(*param), GFP_KERNEL);
-+	param = kzalloc(sizeof(*param), GFP_KERNEL);
- 	if (!param)
- 		goto err;
- 
-@@ -94,7 +99,6 @@ static int cryptomgr_schedule_probe(stru
- 		goto err_free_param;
- 
- 	memcpy(param->template, name, len);
--	param->template[len] = 0;
- 
- 	name = p + 1;
- 	for (p = name; isalnum(*p) || *p == '-' || *p == '_'; p++)
-@@ -104,14 +108,18 @@ static int cryptomgr_schedule_probe(stru
- 	if (!len || *p != ')' || p[1])
- 		goto err_free_param;
- 
-+	param->type.attr.rta_len = sizeof(param->type);
-+	param->type.attr.rta_type = CRYPTOA_TYPE;
-+	param->type.data.type = larval->alg.cra_flags;
-+	param->type.data.mask = larval->mask;
-+	param->tb[CRYPTOA_TYPE - 1] = &param->type.attr;
-+
- 	param->alg.attr.rta_len = sizeof(param->alg);
- 	param->alg.attr.rta_type = CRYPTOA_ALG;
- 	memcpy(param->alg.data.name, name, len);
--	param->alg.data.name[len] = 0;
-+	param->tb[CRYPTOA_ALG - 1] = &param->alg.attr;
- 
- 	memcpy(param->larval.name, larval->alg.cra_name, CRYPTO_MAX_ALG_NAME);
--	param->larval.type = larval->alg.cra_flags;
--	param->larval.mask = larval->mask;
- 
- 	INIT_WORK(&param->work, cryptomgr_probe);
- 	schedule_work(&param->work);
-diff --git a/crypto/ecb.c b/crypto/ecb.c
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -115,13 +115,18 @@ static void crypto_ecb_exit_tfm(struct c
- 	crypto_free_cipher(ctx->child);
- }
- 
--static struct crypto_instance *crypto_ecb_alloc(void *param, unsigned int len)
-+static struct crypto_instance *crypto_ecb_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	int err;
- 
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -197,13 +197,18 @@ static void hmac_free(struct crypto_inst
- 	kfree(inst);
- }
- 
--static struct crypto_instance *hmac_alloc(void *param, unsigned int len)
-+static struct crypto_instance *hmac_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	int err;
- 
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_HASH,
--				  CRYPTO_ALG_TYPE_HASH_MASK | CRYPTO_ALG_ASYNC);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_HASH);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_HASH,
-+				  CRYPTO_ALG_TYPE_HASH_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
-diff --git a/crypto/lrw.c b/crypto/lrw.c
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -228,13 +228,18 @@ static void exit_tfm(struct crypto_tfm *
- 	crypto_free_cipher(ctx->child);
- }
- 
--static struct crypto_instance *alloc(void *param, unsigned int len)
-+static struct crypto_instance *alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	int err;
- 
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -279,13 +279,18 @@ static void crypto_pcbc_exit_tfm(struct 
- 	crypto_free_cipher(ctx->child);
- }
- 
--static struct crypto_instance *crypto_pcbc_alloc(void *param, unsigned int len)
-+static struct crypto_instance *crypto_pcbc_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	int err;
- 
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -288,12 +288,18 @@ static void xcbc_exit_tfm(struct crypto_
- 	crypto_free_cipher(ctx->child);
- }
- 
--static struct crypto_instance *xcbc_alloc(void *param, unsigned int len)
-+static struct crypto_instance *xcbc_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
--	alg = crypto_get_attr_alg(param, len, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_HASH_MASK | CRYPTO_ALG_ASYNC);
-+	int err;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_HASH);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
+ 	crypto_init_proc();
 diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
 --- a/include/crypto/algapi.h
 +++ b/include/crypto/algapi.h
-@@ -15,6 +15,7 @@
+@@ -13,6 +13,8 @@
+ #define _CRYPTO_ALGAPI_H
+ 
  #include <linux/crypto.h>
++#include <linux/list.h>
++#include <linux/kernel.h>
  
  struct module;
-+struct rtattr;
- struct seq_file;
+ struct rtattr;
+@@ -51,6 +53,14 @@ struct crypto_spawn {
+ 	struct crypto_instance *inst;
+ };
  
- struct crypto_type {
-@@ -38,7 +39,7 @@ struct crypto_template {
- 	struct hlist_head instances;
- 	struct module *module;
++struct crypto_queue {
++	struct list_head list;
++	struct list_head *backlog;
++
++	unsigned int qlen;
++	unsigned int max_qlen;
++};
++
+ struct scatter_walk {
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
+@@ -82,6 +92,7 @@ struct blkcipher_walk {
+ 	int flags;
+ };
  
--	struct crypto_instance *(*alloc)(void *param, unsigned int len);
-+	struct crypto_instance *(*alloc)(struct rtattr **tb);
- 	void (*free)(struct crypto_instance *inst);
++extern const struct crypto_type crypto_ablkcipher_type;
+ extern const struct crypto_type crypto_blkcipher_type;
+ extern const struct crypto_type crypto_hash_type;
  
- 	char name[CRYPTO_MAX_ALG_NAME];
-@@ -96,8 +97,9 @@ void crypto_drop_spawn(struct crypto_spa
- struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
- 				    u32 mask);
- 
--struct crypto_alg *crypto_get_attr_alg(void *param, unsigned int len,
--				       u32 type, u32 mask);
-+struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb);
-+int crypto_check_attr_type(struct rtattr **tb, u32 type);
-+struct crypto_alg *crypto_get_attr_alg(struct rtattr **tb, u32 type, u32 mask);
+@@ -103,6 +114,12 @@ struct crypto_alg *crypto_get_attr_alg(s
  struct crypto_instance *crypto_alloc_instance(const char *name,
  					      struct crypto_alg *alg);
+ 
++void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen);
++int crypto_enqueue_request(struct crypto_queue *queue,
++			   struct crypto_async_request *request);
++struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue);
++int crypto_tfm_in_queue(struct crypto_queue *queue, struct crypto_tfm *tfm);
++
+ int blkcipher_walk_done(struct blkcipher_desc *desc,
+ 			struct blkcipher_walk *walk, int err);
+ int blkcipher_walk_virt(struct blkcipher_desc *desc,
+@@ -125,6 +142,17 @@ static inline void *crypto_instance_ctx(
+ 	return inst->__ctx;
+ }
+ 
++static inline struct ablkcipher_alg *crypto_ablkcipher_alg(
++	struct crypto_ablkcipher *tfm)
++{
++	return &crypto_ablkcipher_tfm(tfm)->__crt_alg->cra_ablkcipher;
++}
++
++static inline void *crypto_ablkcipher_ctx(struct crypto_ablkcipher *tfm)
++{
++	return crypto_tfm_ctx(&tfm->base);
++}
++
+ static inline void *crypto_blkcipher_ctx(struct crypto_blkcipher *tfm)
+ {
+ 	return crypto_tfm_ctx(&tfm->base);
+@@ -172,5 +200,35 @@ static inline void blkcipher_walk_init(s
+ 	walk->total = nbytes;
+ }
+ 
++static inline struct crypto_async_request *crypto_get_backlog(
++	struct crypto_queue *queue)
++{
++	return queue->backlog == &queue->list ? NULL :
++	       container_of(queue->backlog, struct crypto_async_request, list);
++}
++
++static inline int ablkcipher_enqueue_request(struct ablkcipher_alg *alg,
++					     struct ablkcipher_request *request)
++{
++	return crypto_enqueue_request(alg->queue, &request->base);
++}
++
++static inline struct ablkcipher_request *ablkcipher_dequeue_request(
++	struct ablkcipher_alg *alg)
++{
++	return ablkcipher_request_cast(crypto_dequeue_request(alg->queue));
++}
++
++static inline void *ablkcipher_request_ctx(struct ablkcipher_request *req)
++{
++	return req->__ctx;
++}
++
++static inline int ablkcipher_tfm_in_queue(struct crypto_ablkcipher *tfm)
++{
++	return crypto_tfm_in_queue(crypto_ablkcipher_alg(tfm)->queue,
++				   crypto_ablkcipher_tfm(tfm));
++}
++
+ #endif	/* _CRYPTO_ALGAPI_H */
  
 diff --git a/include/linux/crypto.h b/include/linux/crypto.h
 --- a/include/linux/crypto.h
 +++ b/include/linux/crypto.h
-@@ -372,12 +372,21 @@ struct crypto_hash {
- enum {
- 	CRYPTOA_UNSPEC,
- 	CRYPTOA_ALG,
-+	CRYPTOA_TYPE,
-+	__CRYPTOA_MAX,
- };
+@@ -93,6 +93,7 @@ struct crypto_ablkcipher;
+ struct crypto_async_request;
+ struct crypto_blkcipher;
+ struct crypto_hash;
++struct crypto_queue;
+ struct crypto_tfm;
+ struct crypto_type;
  
-+#define CRYPTOA_MAX (__CRYPTOA_MAX - 1)
+@@ -143,6 +144,19 @@ struct hash_desc {
+  * Algorithms: modular crypto algorithm implementations, managed
+  * via crypto_register_alg() and crypto_unregister_alg().
+  */
++struct ablkcipher_alg {
++	int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
++	              unsigned int keylen);
++	int (*encrypt)(struct ablkcipher_request *req);
++	int (*decrypt)(struct ablkcipher_request *req);
 +
- struct crypto_attr_alg {
- 	char name[CRYPTO_MAX_ALG_NAME];
- };
- 
-+struct crypto_attr_type {
-+	u32 type;
-+	u32 mask;
++	struct crypto_queue *queue;
++
++	unsigned int min_keysize;
++	unsigned int max_keysize;
++	unsigned int ivsize;
 +};
 +
- /* 
-  * Transform user interface.
-  */
+ struct blkcipher_alg {
+ 	int (*setkey)(struct crypto_tfm *tfm, const u8 *key,
+ 	              unsigned int keylen);
+@@ -197,6 +211,7 @@ struct compress_alg {
+ 			      unsigned int slen, u8 *dst, unsigned int *dlen);
+ };
+ 
++#define cra_ablkcipher	cra_u.ablkcipher
+ #define cra_blkcipher	cra_u.blkcipher
+ #define cra_cipher	cra_u.cipher
+ #define cra_digest	cra_u.digest
+@@ -221,6 +236,7 @@ struct crypto_alg {
+ 	const struct crypto_type *cra_type;
+ 
+ 	union {
++		struct ablkcipher_alg ablkcipher;
+ 		struct blkcipher_alg blkcipher;
+ 		struct cipher_alg cipher;
+ 		struct digest_alg digest;
+@@ -572,6 +588,12 @@ static inline int crypto_ablkcipher_reqs
+ 	return crypto_ablkcipher_crt(tfm)->reqsize;
+ }
+ 
++static inline struct ablkcipher_request *ablkcipher_request_cast(
++	struct crypto_async_request *req)
++{
++	return container_of(req, struct ablkcipher_request, base);
++}
++
+ static inline struct ablkcipher_request *ablkcipher_request_alloc(
+ 	struct crypto_ablkcipher *tfm, gfp_t gfp)
+ {
