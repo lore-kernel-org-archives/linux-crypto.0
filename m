@@ -1,8 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/3] [DM] dm-crypt: Move post-processing into its
-	own queue
-Date: Mon, 16 Apr 2007 20:59:22 +1000
-Message-ID: <E1HdOva-0002wN-00@gondolin.me.apana.org.au>
+Subject: [PATCH 3/3] [DM] dm-crypt: Use crypto ablkcipher
+	interface
+Date: Mon, 16 Apr 2007 20:59:24 +1000
+Message-ID: <E1HdOvc-0002wW-00@gondolin.me.apana.org.au>
 References: <20070416105823.GA11225@gondor.apana.org.au>
 Reply-To: device-mapper development <dm-devel@redhat.com>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -19,145 +19,405 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-[DM] dm-crypt: Move post-processing into its own queue
+[DM] dm-crypt: Use crypto ablkcipher interface
 
-With async crypto we can have a large number of crypto requests
-outstanding.  When crypto requests for write operations are completed
-they need to be given back to the block layer in process context.
-
-We can't reuse kcryptd because it'll queue these requests after
-other requests which can cause starvation as memory isn't released
-untill these requests are fully complete.
-
-So this patch establishes a new queue for second stage processing.
-For now it only serves the crypto operations for reads.
+This patch converts the uses of blkcipher to ablkcipher so that
+async algorithms can be used if they're present.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/md/dm-crypt.c |   48 ++++++++++++++++++++++++++++++++++++++++--------
- 1 files changed, 40 insertions(+), 8 deletions(-)
+ drivers/md/dm-crypt.c |  219 +++++++++++++++++++++++++++++++++++---------------
+ 1 files changed, 157 insertions(+), 62 deletions(-)
 
 diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
 --- a/drivers/md/dm-crypt.c
 +++ b/drivers/md/dm-crypt.c
-@@ -37,7 +37,6 @@ struct crypt_io {
- 	struct work_struct work;
- 	atomic_t pending;
- 	int error;
--	int post_process;
+@@ -6,6 +6,7 @@
+  * This file is released under the GPL.
+  */
+ 
++#include <linux/completion.h>
+ #include <linux/err.h>
+ #include <linux/module.h>
+ #include <linux/init.h>
+@@ -31,6 +32,7 @@
+  * context holding the current state of a multi-part conversion
+  */
+ struct convert_context {
++	struct completion restart;
+ 	struct bio *bio_in;
+ 	struct bio *bio_out;
+ 	unsigned int offset_in;
+@@ -39,6 +41,7 @@ struct convert_context {
+ 	unsigned int idx_out;
+ 	sector_t sector;
+ 	int write;
++	atomic_t pending;
+ 	int err;
  };
  
- /*
-@@ -504,13 +503,25 @@ static void dec_pending(struct crypt_io 
- }
+@@ -60,6 +63,11 @@ struct crypt_io {
+ 	unsigned bvec_idx;
+ };
  
- /*
-- * kcryptd:
-+ * kcryptd/kcryptd-post:
-  *
-  * Needed because it would be very unwise to do decryption in an
-  * interrupt context.
-+ *
-+ * kcryptd performs the first stage, which is the actual read for
-+ * read processing and encryption for write processing.
-+ *
-+ * kcryptd-post performs the final stage, which is description for
-+ * read processing and the actual write for write processing.
-+ *
-+ * They must be separated as otherwise the final stages could be
-+ * starved by new requests which can block in the first stages due
-+ * to memory allocation.
-  */
- static struct workqueue_struct *_kcryptd_workqueue;
-+static struct workqueue_struct *_kcryptd_post_workqueue;
- static void kcryptd_do_work(struct work_struct *work);
-+static void kcryptd_post_work(struct work_struct *work);
++struct dm_crypt_request {
++	struct scatterlist sg_in;
++	struct scatterlist sg_out;
++};
++
+ struct crypt_config;
  
- static void kcryptd_queue_io(struct crypt_io *io)
+ struct crypt_iv_operations {
+@@ -80,10 +88,11 @@ struct crypt_config {
+ 	sector_t start;
+ 
+ 	/*
+-	 * pool for per bio private data and
+-	 * for encryption buffer pages
++	 * pool for per bio private data, crypto requests and
++	 * encryption requeusts/buffer pages
+ 	 */
+ 	mempool_t *io_pool;
++	mempool_t *req_pool;
+ 	mempool_t *page_pool;
+ 	struct bio_set *bs;
+ 
+@@ -99,9 +108,25 @@ struct crypt_config {
+ 	sector_t iv_offset;
+ 	unsigned int iv_size;
+ 
++	/*
++	 * Layout of each crypto request:
++	 *
++	 *   struct ablkcipher_request
++	 *      context
++	 *      padding
++	 *   struct dm_crypt_request
++	 *      padding
++	 *   IV
++	 *
++	 * The padding is added so that dm_crypt_request and the IV are
++	 * correctly aligned.
++	 */
++	unsigned int dmreq_start;
++	struct ablkcipher_request *req;
++
+ 	char cipher[CRYPTO_MAX_ALG_NAME];
+ 	char chainmode[CRYPTO_MAX_ALG_NAME];
+-	struct crypto_blkcipher *tfm;
++	struct crypto_ablkcipher *tfm;
+ 	unsigned long flags;
+ 	unsigned int key_size;
+ 	u8 key[0];
+@@ -188,7 +213,7 @@ static int crypt_iv_essiv_ctr(struct cry
+ 		return PTR_ERR(essiv_tfm);
+ 	}
+ 	if (crypto_cipher_blocksize(essiv_tfm) !=
+-	    crypto_blkcipher_ivsize(cc->tfm)) {
++	    crypto_ablkcipher_ivsize(cc->tfm)) {
+ 		ti->error = "Block size of ESSIV cipher does "
+ 			        "not match IV size of block cipher";
+ 		crypto_free_cipher(essiv_tfm);
+@@ -225,7 +250,7 @@ static int crypt_iv_essiv_gen(struct cry
+ static int crypt_iv_benbi_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 			      const char *opts)
  {
-@@ -518,6 +529,12 @@ static void kcryptd_queue_io(struct cryp
- 	queue_work(_kcryptd_workqueue, &io->work);
- }
+-	unsigned int bs = crypto_blkcipher_blocksize(cc->tfm);
++	unsigned int bs = crypto_ablkcipher_blocksize(cc->tfm);
+ 	int log = ilog2(bs);
  
-+static void kcryptd_queue_postio(struct crypt_io *io)
+ 	/* we need to calculate how far we must shift the sector count
+@@ -278,38 +303,6 @@ static struct crypt_iv_operations crypt_
+ 	.generator = crypt_iv_benbi_gen
+ };
+ 
+-static int
+-crypt_convert_scatterlist(struct crypt_config *cc, struct scatterlist *out,
+-                          struct scatterlist *in, unsigned int length,
+-                          int write, sector_t sector)
+-{
+-	u8 iv[cc->iv_size] __attribute__ ((aligned(__alignof__(u64))));
+-	struct blkcipher_desc desc = {
+-		.tfm = cc->tfm,
+-		.info = iv,
+-		.flags = CRYPTO_TFM_REQ_MAY_SLEEP,
+-	};
+-	int r;
+-
+-	if (cc->iv_gen_ops) {
+-		r = cc->iv_gen_ops->generator(cc, iv, sector);
+-		if (r < 0)
+-			return r;
+-
+-		if (write)
+-			r = crypto_blkcipher_encrypt_iv(&desc, out, in, length);
+-		else
+-			r = crypto_blkcipher_decrypt_iv(&desc, out, in, length);
+-	} else {
+-		if (write)
+-			r = crypto_blkcipher_encrypt(&desc, out, in, length);
+-		else
+-			r = crypto_blkcipher_decrypt(&desc, out, in, length);
+-	}
+-
+-	return r;
+-}
+-
+ static void dec_pending(struct crypt_io *io, int error);
+ 
+ static inline void crypt_read_done(struct convert_context *ctx, int async)
+@@ -321,6 +314,31 @@ static inline void crypt_read_done(struc
+ 
+ static void crypt_write_done(struct convert_context *ctx, int async);
+ 
++static void dm_crypt_complete(struct crypto_async_request *req, int err)
 +{
-+	INIT_WORK(&io->work, kcryptd_post_work);
-+	queue_work(_kcryptd_post_workqueue, &io->work);
++	struct convert_context *ctx = req->data;
++	struct crypt_io *io = container_of(ctx, struct crypt_io, ctx);
++	struct crypt_config *cc = io->target->private;
++
++	if (err == -EINPROGRESS) {
++		complete(&ctx->restart);
++		return;
++	}
++
++	mempool_free(ablkcipher_request_cast(req), cc->req_pool);
++
++	if (err)
++		ctx->err = err;
++
++	if (!atomic_dec_and_test(&ctx->pending))
++		return;
++
++	if (ctx->write)
++		crypt_write_done(ctx, 1);
++	else
++		crypt_read_done(ctx, 1);
 +}
 +
- static int crypt_endio(struct bio *clone, unsigned int done, int error)
- {
- 	struct crypt_io *io = clone->bi_private;
-@@ -544,8 +561,7 @@ static int crypt_endio(struct bio *clone
- 	}
- 
- 	bio_put(clone);
--	io->post_process = 1;
--	kcryptd_queue_io(io);
-+	kcryptd_queue_postio(io);
- 	return 0;
- 
- out:
-@@ -674,12 +690,18 @@ static void kcryptd_do_work(struct work_
- {
- 	struct crypt_io *io = container_of(work, struct crypt_io, work);
- 
--	if (io->post_process)
--		process_read_endio(io);
--	else if (bio_data_dir(io->base_bio) == READ)
-+	if (bio_data_dir(io->base_bio) == READ)
- 		process_read(io);
- 	else
- 		process_write(io);
-+} 
+ static void
+ crypt_convert_init(struct crypt_config *cc, struct convert_context *ctx,
+                    struct bio *bio_out, struct bio *bio_in,
+@@ -334,6 +352,17 @@ crypt_convert_init(struct crypt_config *
+ 	ctx->idx_out = bio_out ? bio_out->bi_idx : 0;
+ 	ctx->sector = sector + cc->iv_offset;
+ 	ctx->write = write;
 +
-+static void kcryptd_post_work(struct work_struct *work)
-+{
-+	struct crypt_io *io = container_of(work, struct crypt_io, work);
++	init_completion(&ctx->restart);
 +
-+	if (bio_data_dir(io->base_bio) == READ)
-+		process_read_endio(io);
++	atomic_set(&ctx->pending, 2);
++	ctx->err = 0;
++
++	if (cc->req)
++		ablkcipher_request_set_callback(
++			cc->req, CRYPTO_TFM_REQ_MAY_BACKLOG |
++				  CRYPTO_TFM_REQ_MAY_SLEEP,
++			dm_crypt_complete, ctx);
  }
  
  /*
-@@ -958,7 +980,7 @@ static int crypt_map(struct dm_target *t
- 	io->target = ti;
- 	io->base_bio = bio;
- 	io->first_clone = NULL;
--	io->error = io->post_process = 0;
-+	io->error = 0;
- 	atomic_set(&io->pending, 0);
- 	kcryptd_queue_io(io);
+@@ -342,45 +371,90 @@ crypt_convert_init(struct crypt_config *
+ static int crypt_convert(struct crypt_config *cc,
+                          struct convert_context *ctx)
+ {
+-	int r = 0;
++	struct ablkcipher_request *req = cc->req;
++	struct dm_crypt_request *dmreq;
++	u8 *iv;
++
++	dmreq = (void *)((char *)req + cc->dmreq_start);
++	iv = (u8 *)ALIGN((unsigned long)(dmreq + 1),
++			 crypto_ablkcipher_alignmask(cc->tfm) + 1);
  
-@@ -1086,6 +1108,13 @@ static int __init dm_crypt_init(void)
+ 	while(ctx->idx_in < ctx->bio_in->bi_vcnt &&
+ 	      ctx->idx_out < ctx->bio_out->bi_vcnt) {
+ 		struct bio_vec *bv_in = bio_iovec_idx(ctx->bio_in, ctx->idx_in);
+ 		struct bio_vec *bv_out = bio_iovec_idx(ctx->bio_out, ctx->idx_out);
+-		struct scatterlist sg_in = {
+-			.page = bv_in->bv_page,
+-			.offset = bv_in->bv_offset + ctx->offset_in,
+-			.length = 1 << SECTOR_SHIFT
+-		};
+-		struct scatterlist sg_out = {
+-			.page = bv_out->bv_page,
+-			.offset = bv_out->bv_offset + ctx->offset_out,
+-			.length = 1 << SECTOR_SHIFT
+-		};
++		int r;
++
++		if (!req) {
++			req = mempool_alloc(cc->req_pool, GFP_NOIO);
++			ablkcipher_request_set_tfm(req, cc->tfm);
++			ablkcipher_request_set_callback(
++				req, CRYPTO_TFM_REQ_MAY_BACKLOG |
++				     CRYPTO_TFM_REQ_MAY_SLEEP,
++				dm_crypt_complete, ctx);
++			dmreq = (void *)((char *)req + cc->dmreq_start);
++			iv = (u8 *)ALIGN(
++				(unsigned long)(dmreq + 1),
++				crypto_ablkcipher_alignmask(cc->tfm) + 1);
++		}
++
++		dmreq->sg_in.page = bv_in->bv_page;
++		dmreq->sg_in.offset = bv_in->bv_offset + ctx->offset_in;
++		dmreq->sg_in.length = 1 << SECTOR_SHIFT;
++
++		dmreq->sg_out.page = bv_out->bv_page;
++		dmreq->sg_out.offset = bv_out->bv_offset + ctx->offset_out;
++		dmreq->sg_out.length = 1 << SECTOR_SHIFT;
+ 
+-		ctx->offset_in += sg_in.length;
++		ctx->offset_in += 1<< SECTOR_SHIFT;
+ 		if (ctx->offset_in >= bv_in->bv_len) {
+ 			ctx->offset_in = 0;
+ 			ctx->idx_in++;
+ 		}
+ 
+-		ctx->offset_out += sg_out.length;
++		ctx->offset_out += 1 << SECTOR_SHIFT;
+ 		if (ctx->offset_out >= bv_out->bv_len) {
+ 			ctx->offset_out = 0;
+ 			ctx->idx_out++;
++		} 
++
++		if (cc->iv_gen_ops) {
++			r = cc->iv_gen_ops->generator(cc, iv, ctx->sector++);
++			if (r < 0) {
++				ctx->err = r;
++				break;
++			}
+ 		}
+ 
+-		r = crypt_convert_scatterlist(cc, &sg_out, &sg_in, sg_in.length,
+-		                              ctx->write, ctx->sector);
++		ablkcipher_request_set_crypt(req, &dmreq->sg_in,
++					     &dmreq->sg_out, 1 << SECTOR_SHIFT,
++					     iv);
++		if (ctx->write)
++			r = crypto_ablkcipher_encrypt(req);
++		else
++			r = crypto_ablkcipher_decrypt(req);
++
++		switch (r) {
++		case -EBUSY:
++			wait_for_completion(&ctx->restart);
++			INIT_COMPLETION(ctx->restart);
++			/* fall through*/
++		case -EINPROGRESS:
++			atomic_inc(&ctx->pending);
++			req = NULL;
++			/* fall through*/
++		case 0:
++			continue;
++		}
+ 
+ 		ctx->err = r;
++		break;
++	}
+ 
+-		if (r < 0)
+-			break;
++	cc->req = req;
+ 
+-		ctx->sector++;
+-	}
++	if (atomic_sub_return(2, &ctx->pending))
++		return -EINPROGRESS;
+ 
+ 	if (ctx->write)
+ 		crypt_write_done(ctx, 0);
+@@ -844,7 +918,7 @@ static int crypt_wipe_key(struct crypt_c
+ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ {
+ 	struct crypt_config *cc;
+-	struct crypto_blkcipher *tfm;
++	struct crypto_ablkcipher *tfm;
+ 	char *tmp;
+ 	char *cipher;
+ 	char *chainmode;
+@@ -898,7 +972,7 @@ static int crypt_ctr(struct dm_target *t
  		goto bad1;
  	}
  
-+	_kcryptd_post_workqueue = create_workqueue("kcryptd-post");
-+	if (!_kcryptd_post_workqueue) {
-+		r = -ENOMEM;
-+		DMERR("couldn't create kcryptd-post");
-+		goto bad1_5;
+-	tfm = crypto_alloc_blkcipher(cc->cipher, 0, CRYPTO_ALG_ASYNC);
++	tfm = crypto_alloc_ablkcipher(cc->cipher, 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		ti->error = "Error allocating crypto tfm";
+ 		goto bad1;
+@@ -930,7 +1004,7 @@ static int crypt_ctr(struct dm_target *t
+ 	    cc->iv_gen_ops->ctr(cc, ti, ivopts) < 0)
+ 		goto bad2;
+ 
+-	cc->iv_size = crypto_blkcipher_ivsize(tfm);
++	cc->iv_size = crypto_ablkcipher_ivsize(tfm);
+ 	if (cc->iv_size)
+ 		/* at least a 64 bit sector number should fit in our buffer */
+ 		cc->iv_size = max(cc->iv_size,
+@@ -950,6 +1024,21 @@ static int crypt_ctr(struct dm_target *t
+ 		goto bad3;
+ 	}
+ 
++	cc->dmreq_start = sizeof(struct ablkcipher_request);
++	cc->dmreq_start += crypto_ablkcipher_reqsize(tfm);
++	cc->dmreq_start = ALIGN(cc->dmreq_start, crypto_tfm_ctx_alignment());
++	cc->dmreq_start += crypto_ablkcipher_alignmask(tfm) &
++			   ~(crypto_tfm_ctx_alignment() - 1);
++
++	cc->req_pool = mempool_create_kmalloc_pool(
++		MIN_IOS, cc->dmreq_start +
++			 sizeof(struct dm_crypt_request) +
++			 cc->iv_size);
++	if (!cc->req_pool) {
++		ti->error = "Cannot allocate crypt request mempool";
++		goto bad_req_pool;
 +	}
 +
- 	r = dm_register_target(&crypt_target);
- 	if (r < 0) {
- 		DMERR("register failed %d", r);
-@@ -1095,6 +1124,8 @@ static int __init dm_crypt_init(void)
- 	return 0;
+ 	cc->page_pool = mempool_create_page_pool(MIN_POOL_PAGES, 0);
+ 	if (!cc->page_pool) {
+ 		ti->error = "Cannot allocate page mempool";
+@@ -962,7 +1051,7 @@ static int crypt_ctr(struct dm_target *t
+ 		goto bad_bs;
+ 	}
  
+-	if (crypto_blkcipher_setkey(tfm, cc->key, key_size) < 0) {
++	if (crypto_ablkcipher_setkey(tfm, cc->key, key_size) < 0) {
+ 		ti->error = "Error setting key";
+ 		goto bad5;
+ 	}
+@@ -1005,12 +1094,14 @@ bad5:
+ bad_bs:
+ 	mempool_destroy(cc->page_pool);
+ bad4:
++	mempool_destroy(cc->req_pool);
++bad_req_pool:
+ 	mempool_destroy(cc->io_pool);
+ bad3:
+ 	if (cc->iv_gen_ops && cc->iv_gen_ops->dtr)
+ 		cc->iv_gen_ops->dtr(cc);
  bad2:
-+	destroy_workqueue(_kcryptd_post_workqueue);
-+bad1_5:
- 	destroy_workqueue(_kcryptd_workqueue);
+-	crypto_free_blkcipher(tfm);
++	crypto_free_ablkcipher(tfm);
  bad1:
- 	kmem_cache_destroy(_crypt_io_pool);
-@@ -1108,6 +1139,7 @@ static void __exit dm_crypt_exit(void)
- 	if (r < 0)
- 		DMERR("unregister failed %d", r);
+ 	/* Must zero key material before freeing */
+ 	memset(cc, 0, sizeof(*cc) + cc->key_size * sizeof(u8));
+@@ -1022,14 +1113,18 @@ static void crypt_dtr(struct dm_target *
+ {
+ 	struct crypt_config *cc = (struct crypt_config *) ti->private;
  
-+	destroy_workqueue(_kcryptd_post_workqueue);
- 	destroy_workqueue(_kcryptd_workqueue);
- 	kmem_cache_destroy(_crypt_io_pool);
- }
++	if (cc->req)
++		mempool_free(cc->req, cc->req_pool);
++
+ 	bioset_free(cc->bs);
+ 	mempool_destroy(cc->page_pool);
++	mempool_destroy(cc->req_pool);
+ 	mempool_destroy(cc->io_pool);
+ 
+ 	kfree(cc->iv_mode);
+ 	if (cc->iv_gen_ops && cc->iv_gen_ops->dtr)
+ 		cc->iv_gen_ops->dtr(cc);
+-	crypto_free_blkcipher(cc->tfm);
++	crypto_free_ablkcipher(cc->tfm);
+ 	dm_put_device(ti, cc->dev);
+ 
+ 	/* Must zero key material before freeing */
