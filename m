@@ -1,45 +1,52 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+From: "Francis Moreau" <francis.moro@gmail.com>
 Subject: Re: [CRYPTO] is it really optimized ?
-Date: Tue, 17 Apr 2007 21:07:07 +0400
-Message-ID: <20070417170707.GA24070@2ka.mipt.ru>
-References: <20070417130431.GA8685@2ka.mipt.ru> <E1HdnwX-0005U1-00@gondolin.me.apana.org.au> <38b2ab8a0704170701p69fd547dwe3e2523ba5798b55@mail.gmail.com> <20070417150859.GA9512@2ka.mipt.ru> <38b2ab8a0704170834i1856886nafeeec692f49fea0@mail.gmail.com> <20070417155725.GA18959@2ka.mipt.ru> <38b2ab8a0704170918u72792c0ei591fea98eac2681d@mail.gmail.com>
+Date: Tue, 17 Apr 2007 19:24:04 +0200
+Message-ID: <38b2ab8a0704171024m3d838bdak14370a7d0931557f@mail.gmail.com>
+References: <38b2ab8a0704170659o3f65f5fbo94a59be58727d21c@mail.gmail.com>
+	 <E1HdoGm-0005WU-00@gondolin.me.apana.org.au>
+	 <38b2ab8a0704170741n619e169s6a2f3ac5b768a950@mail.gmail.com>
+	 <adairbv57s2.fsf@cisco.com>
+	 <38b2ab8a0704170914h3a766236t47bc7e1c8de67662@mail.gmail.com>
+	 <ada7isb3qr2.fsf@cisco.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
 	helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Francis Moreau <francis.moro@gmail.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1031227AbXDQRHn@vger.kernel.org>
+To: "Roland Dreier" <rdreier@cisco.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from wr-out-0506.google.com ([64.233.184.233]:12422 "EHLO
+	wr-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161133AbXDQRYH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Apr 2007 13:24:07 -0400
+Received: by wr-out-0506.google.com with SMTP id 76so1873286wra
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Apr 2007 10:24:05 -0700 (PDT)
+In-Reply-To: <ada7isb3qr2.fsf@cisco.com>
 Content-Disposition: inline
-In-Reply-To: <38b2ab8a0704170918u72792c0ei591fea98eac2681d@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 17, 2007 at 06:18:42PM +0200, Francis Moreau (francis.moro@gmail.com) wrote:
-> >If there are no another users, your code already has exclusive access.
-> 
-> sorry I don't understand that.
+On 4/17/07, Roland Dreier <rdreier@cisco.com> wrote:
+>  > > I wonder if there's some way you can cache the last caller and reload
+>  > > the key lazily (only when it changes).
+>  >
+>  > yes something that allows crypto drivers to detect if the key has
+>  > changed would be good.
+>
+> It seems trivial to keep the last key you were given and do a quick
+> memcmp in your setkey method to see if it's different from the last
+> key you pushed to hardware, and set a flag if it is.  Then only do
+> your set_key() if you have a new key to pass to hardware.
+>
+> I'm assuming the expense is in the aes_write() calls, and you could
+> avoid them if you know you're not writing something new.
+>
 
-Since there are no users except your module, you do have exclusive
-access already, i.e. you can stop key reloading and get your gain, but
-there is no possibility for crypto module to know that in advance
-(without hack like checking reference counter or storing private context
-pointer in some internals and check it for each new call for
-encrypt/decrypt).
+that's a wrong assumption. aes_write()/aes_read() are both used to
+access to the controller and are slow (no cache involved).
 
-> >One can not know if there will be any additional users at all (consider
-> >the case when new encrypted block device or ipsec negotiation started
-> >some time after module was loaded).
-> >
-> 
-> well I should say administrator should know.
-
-Yes, admin is a god. I would even say the god.
-So it can (if she/he wants to) setup any module with any name so that
-other users would never know it.
-
-> -- 
-> Francis
-
+thanks
 -- 
-	Evgeniy Polyakov
+Francis
