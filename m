@@ -1,41 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [CRYPTO] is it really optimized ?
-Date: Tue, 17 Apr 2007 10:41:17 +1000
-Message-ID: <20070417004117.GA16513@gondor.apana.org.au>
-References: <38b2ab8a0704140615y2ba8145bmd3c2316a41d99265@mail.gmail.com> <E1Hco0p-0007np-00@gondolin.me.apana.org.au> <38b2ab8a0704141410q65f55381w26527aeb10fb4988@mail.gmail.com> <20070415075201.GA1644@gondor.apana.org.au> <38b2ab8a0704160137g1ef0713fl943c51ed9049212b@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Francis Moreau <francis.moro@gmail.com>
+Subject: Re: alignmask in the API
+Date: Tue, 17 Apr 2007 15:35:05 +1000
+Message-ID: <E1HdgLJ-0004iw-00@gondolin.me.apana.org.au>
+References: <20070416212400.GA30547@Chamillionaire.breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org
+To: linux-crypto@ml.breakpoint.cc (Sebastian Siewior)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1659 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2581 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754228AbXDQAl2 (ORCPT
+	with ESMTP id S1753975AbXDQFfJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Apr 2007 20:41:28 -0400
-Content-Disposition: inline
-In-Reply-To: <38b2ab8a0704160137g1ef0713fl943c51ed9049212b@mail.gmail.com>
+	Tue, 17 Apr 2007 01:35:09 -0400
+In-Reply-To: <20070416212400.GA30547@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 16, 2007 at 10:37:01AM +0200, Francis Moreau wrote:
-> 
-> BTW, here are figures I got with 2 different versions of the driver
-> when using tcrypt module. The second being the result with the
-> optimized driver (no key reloading on each block):
-> 
-> normal version:
-> test 4 (128 bit key, 8192 byte blocks): 1 operation in 67991 cycles (8192 
-> bytes)
-> 
-> optimized version:
-> test 4 (128 bit key, 8192 byte blocks): 1 operation in 51783 cycles (8192 
-> bytes)
-> 
-> So the gain is 16000 cycles which seems to worth the change, isn't it ?
+Sebastian Siewior <linux-crypto@ml.breakpoint.cc> wrote:
+> The API allows to set an align mask. This mask is considered on the
+> allocation of cipher's private ctx and the IV (for block cipher). This
+> mask is ignored in the setkey function (what is fine with me). 
+> encrypt() and decrypt() functions get their data through a scatterlist.
+> Is my understanding correct that I can't assume any alignment of the
+> input / output data? If so, is it fungible to modify the caller's code
+> to respect the aligmask?
 
-Sounds like it would.  It would help of course if you posted the patch :)
+It's the API's responsibility to guarantee alignment.  So in principle
+neither the user nor the algorithm need to worry about alignment.
+
+However, for the sake of performance, the user should take care of
+alignment where it is easy to do.  For instance, if you have to
+allocate memory for an IV or src/dst as a crypto user, you should
+try to get something that's aligned properly.
+
+However, there is no point in doing an extra copy for the sake of
+alignment since the crypto API will do it for you anyway.
 
 Cheers,
 -- 
