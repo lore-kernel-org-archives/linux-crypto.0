@@ -1,40 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [CRYPTO] is it really optimized ?
-Date: Tue, 17 Apr 2007 23:40:58 +1000
-Message-ID: <E1HdnvW-0005Ti-00@gondolin.me.apana.org.au>
-References: <38b2ab8a0704170536x15920b15xedfd518cad50cee@mail.gmail.com>
-Cc: herbert@gondor.apana.org.au, helge.hafting@aitel.hist.no,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: francis.moro@gmail.com (Francis Moreau)
+Date: Tue, 17 Apr 2007 23:42:01 +1000
+Message-ID: <E1HdnwX-0005U1-00@gondolin.me.apana.org.au>
+References: <20070417130431.GA8685@2ka.mipt.ru>
+Cc: francis.moro@gmail.com, herbert@gondor.apana.org.au,
+	helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: johnpol@2ka.mipt.ru (Evgeniy Polyakov)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1251 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1268 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754332AbXDQNlE (ORCPT
+	with ESMTP id S1754328AbXDQNmH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Apr 2007 09:41:04 -0400
-In-Reply-To: <38b2ab8a0704170536x15920b15xedfd518cad50cee@mail.gmail.com>
+	Tue, 17 Apr 2007 09:42:07 -0400
+In-Reply-To: <20070417130431.GA8685@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Francis Moreau <francis.moro@gmail.com> wrote:
+Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
 >
->> > normal version:
->> > test 4 (128 bit key, 8192 byte blocks): 1 operation in 67991 cycles (8192
->> > bytes)
->> >
->> > optimized version:
->> > test 4 (128 bit key, 8192 byte blocks): 1 operation in 51783 cycles (8192
->> > bytes)
->> >
->> > So the gain is 16000 cycles which seems to worth the change, isn't it ?
->>
->> Sounds like it would.  It would help of course if you posted the patch :)
->>
+>> OK, I tried to cook up something very simple. Since I don't know this
+>> code, please be indulgent when reading the following patch ;)
 > 
-> OK, I tried to cook up something very simple. Since I don't know this
-> code, please be indulgent when reading the following patch ;)
+> Which means that after one has loaded ecryptfs module it can not use
+> ipsec and dm-crypt if there is only one crypto algo registered...
 
-Actually, I was referring to your AES module :)
+Yep.  We don't need such a flag anyway.  All we need is a way to tweak
+the priority and Bob's your uncle.
 
 Cheers,
 -- 
