@@ -1,57 +1,49 @@
-From: "Francis Moreau" <francis.moro@gmail.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Subject: Re: [CRYPTO] is it really optimized ?
-Date: Tue, 17 Apr 2007 16:41:00 +0200
-Message-ID: <38b2ab8a0704170741n619e169s6a2f3ac5b768a950@mail.gmail.com>
-References: <38b2ab8a0704170659o3f65f5fbo94a59be58727d21c@mail.gmail.com>
-	 <E1HdoGm-0005WU-00@gondolin.me.apana.org.au>
+Date: Tue, 17 Apr 2007 19:08:59 +0400
+Message-ID: <20070417150859.GA9512@2ka.mipt.ru>
+References: <20070417130431.GA8685@2ka.mipt.ru> <E1HdnwX-0005U1-00@gondolin.me.apana.org.au> <38b2ab8a0704170701p69fd547dwe3e2523ba5798b55@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=koi8-r
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	helge.hafting@aitel.hist.no, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+To: Francis Moreau <francis.moro@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nz-out-0506.google.com ([64.233.162.229]:60721 "EHLO
-	nz-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754434AbXDQOlB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Apr 2007 10:41:01 -0400
-Received: by nz-out-0506.google.com with SMTP id s1so1496983nze
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Apr 2007 07:41:01 -0700 (PDT)
-In-Reply-To: <E1HdoGm-0005WU-00@gondolin.me.apana.org.au>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:51205 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S964974AbXDQPJO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Apr 2007 11:09:14 -0400
 Content-Disposition: inline
+In-Reply-To: <38b2ab8a0704170701p69fd547dwe3e2523ba5798b55@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 4/17/07, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Francis Moreau <francis.moro@gmail.com> wrote:
-> > On 4/17/07, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >>
-> >> Actually, I was referring to your AES module :)
+On Tue, Apr 17, 2007 at 04:01:51PM +0200, Francis Moreau (francis.moro@gmail.com) wrote:
+> On 4/17/07, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 > >
-> > Well I don't if I can do that unfortunately.
->
-> What's the problem?
->
-
-Always the same problem. Some stupid people here think that they have
-designed the most wonderful AES hardware module. If I give you the
-code of the driver I'll show you a lot of "confidential" stuff.
-
-> > Actually there's nothing really interesting in this code, only key or
-> > acc loadings and that's it.
+> >Yep.  We don't need such a flag anyway.  All we need is a way to tweak
+> >the priority and Bob's your uncle.
 > >
-> > What do you want to see exactly ?
->
-> Well if your code's faster than what we have in the kernel then we
-> should use yours instead.
->
+> 
+> Could you elaborate please, I don't see how you prevent others users
+> to use this module with priority.
+> 
+> Priority is a stuff that tells you which aes implementation to use but
+> it does not prevent an implementation to be used several times...
 
-Again, my code is faster only because I skip the key loading in
-"cia_encrypt" method. Actually the gain is bigger in decryption mode
-than in encryption one because I also generate the decryption key for
-each block.
+Preventing anyone from using the module is incorrect.
+How will you handle the case when you have only one algo registered and
+it will be exclusively used by ecryptfs?
 
-You see there's absolutely no clever trick here...
+Herbert proposes to register _second_ algo (say aes-generic(prio_100)
+and aes_for_ecryptfs(prio_1)) with lower prio, so generic access will
+never try to catch aes_for_ecryptfs, but your code still can access it
+using full name.
+
+> Thanks
+> -- 
+> Francis
+
 -- 
-Francis
+	Evgeniy Polyakov
