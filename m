@@ -1,63 +1,70 @@
-From: David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH 2/5] jffs2: Add LZO compression support to jffs2
-Date: Wed, 25 Apr 2007 13:35:57 +0100
-Message-ID: <1177504557.2755.216.camel@pmac.infradead.org>
-References: <1172690012.16062.138.camel@localhost.localdomain>
+From: "Martin Schiller" <mschiller@tdt.de>
+Subject: Testing the geode-aes driver with the tcrypt module completely freezes the machine
+Date: Thu, 26 Apr 2007 11:04:21 +0200
+Message-ID: <000601c787e1$e169ff00$1a04010a@V505CP>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au,
-	linux-mtd <linux-mtd@lists.infradead.org>,
-	linux-crypto@vger.kernel.org
-To: Richard Purdie <rpurdie@openedhand.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from canuck.infradead.org ([209.217.80.40]:35896 "EHLO
-	canuck.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965565AbXDYMgE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Apr 2007 08:36:04 -0400
-In-Reply-To: <1172690012.16062.138.camel@localhost.localdomain>
+Received: from ns.tdt.de ([195.243.126.82]:45611 "EHLO ns.tdt.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1030459AbXDZKKW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Apr 2007 06:10:22 -0400
+Received: from ns (root@localhost)
+	by ns.tdt.de (8.11.6/8.11.6/SuSE Linux 0.5) with SMTP id l3Q95vX02496
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Apr 2007 11:05:57 +0200
+Received: from V505CP (mschiller3 [10.1.4.26])
+	by ns.tdt.de (8.11.6/8.11.6/SuSE Linux 0.5) with ESMTP id l3Q95vQ02489
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Apr 2007 11:05:57 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2007-02-28 at 19:13 +0000, Richard Purdie wrote:
-> Add LZO1X compression/decompression support to jffs2.
-> 
-> LZO's interface doesn't entirely match that required by jffs2 so a 
-> buffer and memcpy is unavoidable.
-> 
-> Signed-off-by: Richard Purdie <rpurdie@openedhand.com>
+Hello,
 
-> Index: linux/fs/jffs2/compr_lzo.c
-> ===================================================================
-> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-> +++ linux/fs/jffs2/compr_lzo.c	2007-02-28 18:12:31.000000000 +0000
-> @@ -0,0 +1,120 @@
-> +/*
-> + * JFFS2 LZO Compression Interface
-> + *
-> + * Copyright (C) 2007 Nokia Corporation. All rights reserved.
-> + *
-> + * Author: Richard Purdie <rpurdie@openedhand.com>
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * version 2 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful, but
-> + * WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, write to the Free Software
-> + * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-> + * 02110-1301 USA
-> + *
-> + */
+here is what I do:
 
-Please use the same licence, and the same boilerplate, as the rest of
-the JFFS2 code.
+- I have an AEWIN CB-6971 with an AMD Geode LX800.
 
--- 
-dwmw2
+- Testing with kernel 2.6.21-rc7-git5.
+
+- When the geode_aes module is loaded and I am loading the tcrypt modul=
+e,
+  the machine freezes completely.
+
+- When the geode_aes module is NOT loaded and I am loading the tcrypt
+module,
+  the test works well.
+
+Has anyone else tried to test the geode-aes driver with the tcrypt modu=
+le?
+
+I am also not able to use the geode-aes driver with openswan-2.4.7 on k=
+ernel
+2.6.19 (with patched-in geode driver).
+
+Regards,
+Martin
+
+
+--------------------------
+=20
+Martin Schiller
+Dipl.-Inf. FH
+Development
+
+
+T.D.T. Transfer Data Test GmbH
+Siemensstrasse 18
+Gewerbegebiet Altheim
+84051 Essenbach
+Germany=20
+
+mschiller@tdt.de
+www.tdt.de=20
+
+tel: +49 8703 929 00
+fax: +49 8703 929 201
+
+Gesch=E4ftsf=FChrer: Elisabeth Pickhardt &  Michael Pickhardt
+Registergericht Landshut, HRB: 1193=20
