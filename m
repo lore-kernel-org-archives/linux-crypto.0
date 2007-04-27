@@ -1,61 +1,48 @@
-From: "Martin Schiller" <mschiller@tdt.de>
-Subject: RE: Testing the geode-aes driver with the tcrypt module completely freezes the machine
-Date: Thu, 26 Apr 2007 13:27:56 +0200
-Message-ID: <000d01c787f5$efce4b00$1a04010a@V505CP>
-References: <000601c787e1$e169ff00$1a04010a@V505CP> <20070426110522.GB31648@Chamillionaire.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Testing the geode-aes driver with the tcrypt module completely freezes the machine
+Date: Fri, 27 Apr 2007 18:10:51 +1000
+Message-ID: <20070427081051.GA28960@gondor.apana.org.au>
+References: <000601c787e1$e169ff00$1a04010a@V505CP>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>
-To: "'Sebastian Siewior'" <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: info-linux@geode.amd.com, linux-crypto@vger.kernel.org
+To: Martin Schiller <mschiller@tdt.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.tdt.de ([195.243.126.82]:46228 "EHLO ns.tdt.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754650AbXDZL15 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Apr 2007 07:27:57 -0400
-Received: from ns (root@localhost)
-	by ns.tdt.de (8.11.6/8.11.6/SuSE Linux 0.5) with SMTP id l3QBRuW06656
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Apr 2007 13:27:56 +0200
-In-Reply-To: <20070426110522.GB31648@Chamillionaire.breakpoint.cc>
+Received: from rhun.apana.org.au ([64.62.148.172]:4108 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754140AbXD0ILR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Apr 2007 04:11:17 -0400
+Content-Disposition: inline
+In-Reply-To: <000601c787e1$e169ff00$1a04010a@V505CP>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thursday, April 26, 2007 1:05 PM, Sebastian Siewior wrote:
+On Thu, Apr 26, 2007 at 09:04:21AM +0000, Martin Schiller wrote:
+> 
+> here is what I do:
+> 
+> - I have an AEWIN CB-6971 with an AMD Geode LX800.
+> 
+> - Testing with kernel 2.6.21-rc7-git5.
+> 
+> - When the geode_aes module is loaded and I am loading the tcrypt module,
+>   the machine freezes completely.
+> 
+> - When the geode_aes module is NOT loaded and I am loading the tcrypt
+> module,
+>   the test works well.
+> 
+> Has anyone else tried to test the geode-aes driver with the tcrypt module?
+> 
+> I am also not able to use the geode-aes driver with openswan-2.4.7 on kernel
+> 2.6.19 (with patched-in geode driver).
 
-> * Martin Schiller | 2007-04-26 11:04:21 [+0200]:
->=20
->> - When the geode_aes module is loaded and I am loading the tcrypt
->>  module, the machine freezes completely.
->=20
-> could you modify the tcrpto module to test only ecb(aes) enc/dec with
-> keysize =3D 16 (1 instead of AES_ENC_TEST_VECTORS) and see if it is
-> still freezing? =20
->=20
+Jordan, do you have any ideas why this is happening?
 
-Tried it and it's still freezing.
-
-Any other suggestions?
-
-Regards,
-Martin
-
---------------------------------
-Martin Schiller
-Dipl.-Inf. FH
-Entwicklung / Development
-
-
-T.D.T. Transfer Data Test GmbH
-Siemensstrasse 18
-Gewerbegebiet Altheim
-84051 Essenbach
-Germany
-
-mschiller@tdt.de
-www.tdt.de
-
-tel: +49 8703 929 00
-fax: +49 8703 929 201
-
-Gesch=E4ftsf=FChrer: Elisabeth Pickhardt &  Michael Pickhardt
-Registergericht Landshut, HRB: 1193
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
