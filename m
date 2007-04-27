@@ -1,48 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Subject: Re: Testing the geode-aes driver with the tcrypt module completely freezes the machine
-Date: Fri, 27 Apr 2007 18:10:51 +1000
-Message-ID: <20070427081051.GA28960@gondor.apana.org.au>
-References: <000601c787e1$e169ff00$1a04010a@V505CP>
+Date: Fri, 27 Apr 2007 13:50:37 +0400
+Message-ID: <20070427095033.GB29804@2ka.mipt.ru>
+References: <000601c787e1$e169ff00$1a04010a@V505CP> <20070427081051.GA28960@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: info-linux@geode.amd.com, linux-crypto@vger.kernel.org
-To: Martin Schiller <mschiller@tdt.de>
+Content-Type: text/plain; charset=koi8-r
+Cc: Martin Schiller <mschiller@tdt.de>, info-linux@geode.amd.com,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4108 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754140AbXD0ILR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Apr 2007 04:11:17 -0400
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:59140 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755526AbXD0Jvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Apr 2007 05:51:32 -0400
 Content-Disposition: inline
-In-Reply-To: <000601c787e1$e169ff00$1a04010a@V505CP>
+In-Reply-To: <20070427081051.GA28960@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 26, 2007 at 09:04:21AM +0000, Martin Schiller wrote:
+On Fri, Apr 27, 2007 at 06:10:51PM +1000, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> > Has anyone else tried to test the geode-aes driver with the tcrypt module?
+> > 
+> > I am also not able to use the geode-aes driver with openswan-2.4.7 on kernel
+> > 2.6.19 (with patched-in geode driver).
 > 
-> here is what I do:
-> 
-> - I have an AEWIN CB-6971 with an AMD Geode LX800.
-> 
-> - Testing with kernel 2.6.21-rc7-git5.
-> 
-> - When the geode_aes module is loaded and I am loading the tcrypt module,
->   the machine freezes completely.
-> 
-> - When the geode_aes module is NOT loaded and I am loading the tcrypt
-> module,
->   the test works well.
-> 
-> Has anyone else tried to test the geode-aes driver with the tcrypt module?
-> 
-> I am also not able to use the geode-aes driver with openswan-2.4.7 on kernel
-> 2.6.19 (with patched-in geode driver).
+> Jordan, do you have any ideas why this is happening?
 
-Jordan, do you have any ideas why this is happening?
+Could it be compiler problem and broken hardware?
+Martin, can you test attached patch?
 
-Cheers,
+diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+index 6d3840e..724169b 100644
+--- a/drivers/crypto/geode-aes.c
++++ b/drivers/crypto/geode-aes.c
+@@ -78,7 +78,7 @@ static int
+ do_crypt(void *src, void *dst, int len, u32 flags)
+ {
+ 	u32 status;
+-	u32 counter = AES_OP_TIMEOUT;
++	int counter = AES_OP_TIMEOUT;
+ 
+ 	iowrite32(virt_to_phys(src), _iobase + AES_SOURCEA_REG);
+ 	iowrite32(virt_to_phys(dst), _iobase + AES_DSTA_REG);
+@@ -89,7 +89,9 @@ do_crypt(void *src, void *dst, int len, u32 flags)
+ 
+ 	do
+ 		status = ioread32(_iobase + AES_INTR_REG);
+-	while(!(status & AES_INTRA_PENDING) && --counter);
++	while(--counter > 0 && !(status & AES_INTRA_PENDING));
++
++	WARN_ON(!counter);
+ 
+ 	/* Clear the event */
+ 	iowrite32((status & 0xFF) | AES_INTRA_PENDING, _iobase + AES_INTR_REG);
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
