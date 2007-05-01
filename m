@@ -1,7 +1,8 @@
 From: Richard Purdie <rpurdie@openedhand.com>
-Subject: [PATCH 3/5] jffs2: Add a "favourlzo" compression mode to jffs2
-Date: Tue, 01 May 2007 15:47:12 +0100
-Message-ID: <1178030833.5883.55.camel@localhost.localdomain>
+Subject: [PATCH 4/5] jffs2: Allow selection of compression mode via a sysfs
+	attribute
+Date: Tue, 01 May 2007 15:47:19 +0100
+Message-ID: <1178030839.5883.56.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -20,151 +21,200 @@ Sender: linux-mtd-bounces@lists.infradead.org
 Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org+gldm-linux-mtd-36=gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a "favourlzo" compression mode to jffs2 which tries to
-optimise by size but gives lzo an advantage when comparing sizes.
-This means the faster lzo algorithm can be preferred when there
-isn't much difference in compressed size (the exact threshold can
-be changed).
+Allow selection of the compression mode for jffs2 via a sysfs
+attribute. This establishes a sysfs presence for jffs2 through
+which other compression options could easily be exported too.
 
 Signed-off-by: Richard Purdie <rpurdie@openedhand.com>
 ---
- fs/Kconfig       |    7 +++++++
- fs/jffs2/compr.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
- fs/jffs2/compr.h |    3 +++
- 3 files changed, 50 insertions(+), 5 deletions(-)
+ fs/Kconfig       |    9 ++++++++
+ fs/jffs2/compr.c |   41 ++++++++++++++++++++++++++++++++++++
+ fs/jffs2/compr.h |    6 +++++
+ fs/jffs2/super.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 117 insertions(+), 0 deletions(-)
 
 diff --git a/fs/Kconfig b/fs/Kconfig
-index 1645dfa..328a62f 100644
+index 328a62f..9da136b 100644
 --- a/fs/Kconfig
 +++ b/fs/Kconfig
-@@ -1359,6 +1359,13 @@ config JFFS2_CMODE_SIZE
-           Tries all compressors and chooses the one which has the smallest
-           result.
+@@ -1283,6 +1283,15 @@ config JFFS2_FS_SECURITY
+ 	  If you are not using a security module that requires using
+ 	  extended attributes for file security labels, say N.
  
-+config JFFS2_CMODE_FAVOURLZO
-+        bool "Favour LZO"
-+        help
-+          Tries all compressors and chooses the one which has the smallest
-+          result but gives some preference to LZO (which has faster
-+	  decompression) at the expense of size.
++config JFFS2_SYSFS
++	bool "JFFS2 sysfs attributes"
++	depends on JFFS2_FS
++	default n
++	help
++	  Enable control of jffs2 features through sysfs.
 +
- endchoice
- 
- config CRAMFS
++	  If unsure, say 'N'.
++
+ config JFFS2_COMPRESSION_OPTIONS
+ 	bool "Advanced compression options for JFFS2"
+ 	depends on JFFS2_FS
 diff --git a/fs/jffs2/compr.c b/fs/jffs2/compr.c
-index 6a23408..fdb0efd 100644
+index fdb0efd..8c57dc7 100644
 --- a/fs/jffs2/compr.c
 +++ b/fs/jffs2/compr.c
-@@ -24,6 +24,34 @@ static int jffs2_compression_mode = JFFS2_COMPR_MODE_PRIORITY;
- /* Statistics for blocks stored without compression */
- static uint32_t none_stat_compr_blocks=0,none_stat_decompr_blocks=0,none_stat_compr_size=0;
+@@ -11,6 +11,7 @@
+  *
+  */
  
-+
-+/*
-+ * Return 1 to use this compression
-+ */
-+static int jffs2_is_best_compression(struct jffs2_compressor *this,
-+		struct jffs2_compressor *best, uint32_t size, uint32_t bestsize)
-+{
-+	switch (jffs2_compression_mode) {
-+		case JFFS2_COMPR_MODE_SIZE:
-+			if (bestsize > size)
-+				return 1;
-+			return 0;
-+		case JFFS2_COMPR_MODE_FAVOURLZO:
-+			if ((this->compr == JFFS2_COMPR_LZO) && (bestsize > size))
-+				return 1;
-+			if ((best->compr != JFFS2_COMPR_LZO) && (bestsize > size))
-+				return 1;
-+			if ((this->compr == JFFS2_COMPR_LZO) && (bestsize > (size * FAVOUR_LZO_PERCENT / 100)))
-+				return 1;
-+			if ((bestsize * FAVOUR_LZO_PERCENT / 100) > size)
-+				return 1;
-+
-+			return 0;
-+	}
-+	/* Shouldn't happen */
-+	return 0;
-+}
-+
- /* jffs2_compress:
-  * @data: Pointer to uncompressed data
-  * @cdata: Pointer to returned pointer to buffer for compressed data
-@@ -89,6 +117,7 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
-                 if (ret == JFFS2_COMPR_NONE) kfree(output_buf);
-                 break;
-         case JFFS2_COMPR_MODE_SIZE:
-+        case JFFS2_COMPR_MODE_FAVOURLZO:
-                 orig_slen = *datalen;
-                 orig_dlen = *cdatalen;
-                 spin_lock(&jffs2_compressor_list_lock);
-@@ -97,7 +126,7 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
-                         if ((!this->compress)||(this->disabled))
-                                 continue;
-                         /* Allocating memory for output buffer if necessary */
--                        if ((this->compr_buf_size<orig_dlen)&&(this->compr_buf)) {
-+                        if ((this->compr_buf_size<orig_slen)&&(this->compr_buf)) {
-                                 spin_unlock(&jffs2_compressor_list_lock);
-                                 kfree(this->compr_buf);
-                                 spin_lock(&jffs2_compressor_list_lock);
-@@ -106,15 +135,15 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
-                         }
-                         if (!this->compr_buf) {
-                                 spin_unlock(&jffs2_compressor_list_lock);
--                                tmp_buf = kmalloc(orig_dlen,GFP_KERNEL);
-+                                tmp_buf = kmalloc(orig_slen,GFP_KERNEL);
-                                 spin_lock(&jffs2_compressor_list_lock);
-                                 if (!tmp_buf) {
--                                        printk(KERN_WARNING "JFFS2: No memory for compressor allocation. (%d bytes)\n",orig_dlen);
-+                                        printk(KERN_WARNING "JFFS2: No memory for compressor allocation. (%d bytes)\n",orig_slen);
-                                         continue;
-                                 }
-                                 else {
-                                         this->compr_buf = tmp_buf;
--                                        this->compr_buf_size = orig_dlen;
-+                                        this->compr_buf_size = orig_slen;
-                                 }
-                         }
-                         this->usecount++;
-@@ -125,7 +154,8 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
-                         spin_lock(&jffs2_compressor_list_lock);
-                         this->usecount--;
-                         if (!compr_ret) {
--                                if ((!best_dlen)||(best_dlen>*cdatalen)) {
-+				if (((!best_dlen) || jffs2_is_best_compression(this, best, *cdatalen, best_dlen))
-+						&& (*cdatalen < *datalen)) {
-                                         best_dlen = *cdatalen;
-                                         best_slen = *datalen;
-                                         best = this;
-@@ -297,9 +327,14 @@ int __init jffs2_compressors_init(void)
-         jffs2_compression_mode = JFFS2_COMPR_MODE_SIZE;
-         D1(printk(KERN_INFO "JFFS2: default compression mode: size\n");)
- #else
-+#ifdef CONFIG_JFFS2_CMODE_FAVOURLZO
-+        jffs2_compression_mode = JFFS2_COMPR_MODE_FAVOURLZO;
-+        D1(printk(KERN_INFO "JFFS2: default compression mode: favourlzo\n");)
-+#else
-         D1(printk(KERN_INFO "JFFS2: default compression mode: priority\n");)
- #endif
- #endif
-+#endif
++#include <linux/kobject.h>
+ #include "compr.h"
+ 
+ static DEFINE_SPINLOCK(jffs2_compressor_list_lock);
+@@ -296,6 +297,46 @@ int jffs2_unregister_compressor(struct jffs2_compressor *comp)
          return 0;
  }
  
++#ifdef CONFIG_JFFS2_SYSFS
++
++char *jffs2_get_compression_mode_name(void)
++{
++        switch (jffs2_compression_mode) {
++        case JFFS2_COMPR_MODE_NONE:
++                return "none";
++        case JFFS2_COMPR_MODE_PRIORITY:
++                return "priority";
++        case JFFS2_COMPR_MODE_SIZE:
++                return "size";
++	case JFFS2_COMPR_MODE_FAVOURLZO:
++		return "favourlzo";
++        }
++        return "unkown";
++}
++
++int jffs2_set_compression_mode_name(const char *name)
++{
++        if (!strncmp("none", name, 4)) {
++                jffs2_compression_mode = JFFS2_COMPR_MODE_NONE;
++                return 0;
++        }
++        if (!strncmp("priority", name, 8)) {
++                jffs2_compression_mode = JFFS2_COMPR_MODE_PRIORITY;
++                return 0;
++        }
++        if (!strncmp("size", name, 4)) {
++                jffs2_compression_mode = JFFS2_COMPR_MODE_SIZE;
++                return 0;
++        }
++	if (!strncmp("favourlzo", name, 9)) {
++		jffs2_compression_mode = JFFS2_COMPR_MODE_FAVOURLZO;
++		return 0;
++	}
++        return -EINVAL;
++}
++
++#endif
++
+ void jffs2_free_comprbuf(unsigned char *comprbuf, unsigned char *orig)
+ {
+         if (orig != comprbuf)
 diff --git a/fs/jffs2/compr.h b/fs/jffs2/compr.h
-index 8c6b2af..2b66941 100644
+index 2b66941..917f0d6 100644
 --- a/fs/jffs2/compr.h
 +++ b/fs/jffs2/compr.h
-@@ -38,6 +38,9 @@
- #define JFFS2_COMPR_MODE_NONE       0
- #define JFFS2_COMPR_MODE_PRIORITY   1
- #define JFFS2_COMPR_MODE_SIZE       2
-+#define JFFS2_COMPR_MODE_FAVOURLZO  3
-+
-+#define FAVOUR_LZO_PERCENT 80
+@@ -77,6 +77,12 @@ int jffs2_decompress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
  
- struct jffs2_compressor {
-         struct list_head list;
+ void jffs2_free_comprbuf(unsigned char *comprbuf, unsigned char *orig);
+ 
++#ifdef CONFIG_JFFS2_SYSFS
++int jffs2_set_compression_mode_name(const char *mode_name);
++char *jffs2_get_compression_mode_name(void);
++#endif
++
++
+ /* Compressor modules */
+ /* These functions will be called by jffs2_compressors_init/exit */
+ 
+diff --git a/fs/jffs2/super.c b/fs/jffs2/super.c
+index e51164a..9a67113 100644
+--- a/fs/jffs2/super.c
++++ b/fs/jffs2/super.c
+@@ -322,6 +322,54 @@ static struct file_system_type jffs2_fs_type = {
+ 	.kill_sb =	jffs2_kill_sb,
+ };
+ 
++#ifdef CONFIG_JFFS2_SYSFS
++
++static struct attribute jffs2_attr_mode = {
++	.name = "compression_mode",
++	.mode = S_IRUGO | S_IWUSR,
++};
++
++static struct attribute *jffs2_attrs[] = {
++	&jffs2_attr_mode,
++	NULL,
++};
++
++static ssize_t jffs2_attr_show(struct kobject *kobj, struct attribute *attr,
++		char *page)
++{
++	if (!strcmp("compression_mode", attr->name))
++		return sprintf(page, "%s\n", jffs2_get_compression_mode_name());
++	return 0;
++}
++
++static ssize_t jffs2_attr_store(struct kobject *kobj, struct attribute *attr,
++		const char *page, size_t count)
++{
++	int ret = -EINVAL;
++
++	if (!strcmp("compression_mode", attr->name)) {
++		ret = jffs2_set_compression_mode_name(page);
++		if (ret >= 0)
++			return count;
++	}
++	return ret;
++}
++
++static struct sysfs_ops jffs2_sysfs_ops = {
++	.show	=	jffs2_attr_show,
++	.store	=	jffs2_attr_store,
++};
++
++static struct kobj_type jffs2_subsys_type = {
++	.default_attrs	= jffs2_attrs,
++	.sysfs_ops	= &jffs2_sysfs_ops,
++};
++
++/* gives us jffs2_subsys */
++static decl_subsys(jffs2, NULL, NULL);
++
++#endif
++
+ static int __init init_jffs2_fs(void)
+ {
+ 	int ret;
+@@ -371,6 +419,16 @@ static int __init init_jffs2_fs(void)
+ 		printk(KERN_ERR "JFFS2 error: Failed to register filesystem\n");
+ 		goto out_slab;
+ 	}
++
++#ifdef CONFIG_JFFS2_SYSFS
++	/* Errors here are not fatal */
++	kset_set_kset_s(&jffs2_subsys, fs_subsys);
++	jffs2_subsys.kset.kobj.ktype = &jffs2_subsys_type;
++	ret = subsystem_register(&jffs2_subsys);
++	if (ret)
++		printk(KERN_WARNING "Error registering JFFS2 sysfs attributes\n");
++#endif
++
+ 	return 0;
+ 
+  out_slab:
+@@ -384,6 +442,9 @@ static int __init init_jffs2_fs(void)
+ 
+ static void __exit exit_jffs2_fs(void)
+ {
++#ifdef CONFIG_JFFS2_SYSFS
++	subsystem_unregister(&jffs2_subsys);
++#endif
+ 	unregister_filesystem(&jffs2_fs_type);
+ 	jffs2_destroy_slab_caches();
+ 	jffs2_compressors_exit();
 
 
 
