@@ -1,7 +1,7 @@
 From: Richard Purdie <rpurdie@openedhand.com>
-Subject: [PATCH 0/5] Add LZO Compression
-Date: Tue, 01 May 2007 15:46:34 +0100
-Message-ID: <1178030794.5883.50.camel@localhost.localdomain>
+Subject: [PATCH 3/5] jffs2: Add a "favourlzo" compression mode to jffs2
+Date: Tue, 01 May 2007 15:47:12 +0100
+Message-ID: <1178030833.5883.55.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -20,33 +20,152 @@ Sender: linux-mtd-bounces@lists.infradead.org
 Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org+gldm-linux-mtd-36=gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The following patch series adds LZO compression support to the kernel
-and exposes it in a variety of places (jffs2, crypto).
+Add a "favourlzo" compression mode to jffs2 which tries to
+optimise by size but gives lzo an advantage when comparing sizes.
+This means the faster lzo algorithm can be preferred when there
+isn't much difference in compressed size (the exact threshold can
+be changed).
 
-Its a resend of a previous posted series, rediffed against recent
-kernels with the couple of minors issues raised by David Woodhouse
-addressed.
+Signed-off-by: Richard Purdie <rpurdie@openedhand.com>
+---
+ fs/Kconfig       |    7 +++++++
+ fs/jffs2/compr.c |   45 ++++++++++++++++++++++++++++++++++++++++-----
+ fs/jffs2/compr.h |    3 +++
+ 3 files changed, 50 insertions(+), 5 deletions(-)
 
-This patch series is also available as:
-git://git.o-hand.com/linux-rpurdie linux-rpurdie-lzo
-(http://git.o-hand.com/?p=linux-rpurdie;a=shortlog;h=linux-rpurdie-lzo)
+diff --git a/fs/Kconfig b/fs/Kconfig
+index 1645dfa..328a62f 100644
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -1359,6 +1359,13 @@ config JFFS2_CMODE_SIZE
+           Tries all compressors and chooses the one which has the smallest
+           result.
+ 
++config JFFS2_CMODE_FAVOURLZO
++        bool "Favour LZO"
++        help
++          Tries all compressors and chooses the one which has the smallest
++          result but gives some preference to LZO (which has faster
++	  decompression) at the expense of size.
++
+ endchoice
+ 
+ config CRAMFS
+diff --git a/fs/jffs2/compr.c b/fs/jffs2/compr.c
+index 6a23408..fdb0efd 100644
+--- a/fs/jffs2/compr.c
++++ b/fs/jffs2/compr.c
+@@ -24,6 +24,34 @@ static int jffs2_compression_mode = JFFS2_COMPR_MODE_PRIORITY;
+ /* Statistics for blocks stored without compression */
+ static uint32_t none_stat_compr_blocks=0,none_stat_decompr_blocks=0,none_stat_compr_size=0;
+ 
++
++/*
++ * Return 1 to use this compression
++ */
++static int jffs2_is_best_compression(struct jffs2_compressor *this,
++		struct jffs2_compressor *best, uint32_t size, uint32_t bestsize)
++{
++	switch (jffs2_compression_mode) {
++		case JFFS2_COMPR_MODE_SIZE:
++			if (bestsize > size)
++				return 1;
++			return 0;
++		case JFFS2_COMPR_MODE_FAVOURLZO:
++			if ((this->compr == JFFS2_COMPR_LZO) && (bestsize > size))
++				return 1;
++			if ((best->compr != JFFS2_COMPR_LZO) && (bestsize > size))
++				return 1;
++			if ((this->compr == JFFS2_COMPR_LZO) && (bestsize > (size * FAVOUR_LZO_PERCENT / 100)))
++				return 1;
++			if ((bestsize * FAVOUR_LZO_PERCENT / 100) > size)
++				return 1;
++
++			return 0;
++	}
++	/* Shouldn't happen */
++	return 0;
++}
++
+ /* jffs2_compress:
+  * @data: Pointer to uncompressed data
+  * @cdata: Pointer to returned pointer to buffer for compressed data
+@@ -89,6 +117,7 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
+                 if (ret == JFFS2_COMPR_NONE) kfree(output_buf);
+                 break;
+         case JFFS2_COMPR_MODE_SIZE:
++        case JFFS2_COMPR_MODE_FAVOURLZO:
+                 orig_slen = *datalen;
+                 orig_dlen = *cdatalen;
+                 spin_lock(&jffs2_compressor_list_lock);
+@@ -97,7 +126,7 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
+                         if ((!this->compress)||(this->disabled))
+                                 continue;
+                         /* Allocating memory for output buffer if necessary */
+-                        if ((this->compr_buf_size<orig_dlen)&&(this->compr_buf)) {
++                        if ((this->compr_buf_size<orig_slen)&&(this->compr_buf)) {
+                                 spin_unlock(&jffs2_compressor_list_lock);
+                                 kfree(this->compr_buf);
+                                 spin_lock(&jffs2_compressor_list_lock);
+@@ -106,15 +135,15 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
+                         }
+                         if (!this->compr_buf) {
+                                 spin_unlock(&jffs2_compressor_list_lock);
+-                                tmp_buf = kmalloc(orig_dlen,GFP_KERNEL);
++                                tmp_buf = kmalloc(orig_slen,GFP_KERNEL);
+                                 spin_lock(&jffs2_compressor_list_lock);
+                                 if (!tmp_buf) {
+-                                        printk(KERN_WARNING "JFFS2: No memory for compressor allocation. (%d bytes)\n",orig_dlen);
++                                        printk(KERN_WARNING "JFFS2: No memory for compressor allocation. (%d bytes)\n",orig_slen);
+                                         continue;
+                                 }
+                                 else {
+                                         this->compr_buf = tmp_buf;
+-                                        this->compr_buf_size = orig_dlen;
++                                        this->compr_buf_size = orig_slen;
+                                 }
+                         }
+                         this->usecount++;
+@@ -125,7 +154,8 @@ uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
+                         spin_lock(&jffs2_compressor_list_lock);
+                         this->usecount--;
+                         if (!compr_ret) {
+-                                if ((!best_dlen)||(best_dlen>*cdatalen)) {
++				if (((!best_dlen) || jffs2_is_best_compression(this, best, *cdatalen, best_dlen))
++						&& (*cdatalen < *datalen)) {
+                                         best_dlen = *cdatalen;
+                                         best_slen = *datalen;
+                                         best = this;
+@@ -297,9 +327,14 @@ int __init jffs2_compressors_init(void)
+         jffs2_compression_mode = JFFS2_COMPR_MODE_SIZE;
+         D1(printk(KERN_INFO "JFFS2: default compression mode: size\n");)
+ #else
++#ifdef CONFIG_JFFS2_CMODE_FAVOURLZO
++        jffs2_compression_mode = JFFS2_COMPR_MODE_FAVOURLZO;
++        D1(printk(KERN_INFO "JFFS2: default compression mode: favourlzo\n");)
++#else
+         D1(printk(KERN_INFO "JFFS2: default compression mode: priority\n");)
+ #endif
+ #endif
++#endif
+         return 0;
+ }
+ 
+diff --git a/fs/jffs2/compr.h b/fs/jffs2/compr.h
+index 8c6b2af..2b66941 100644
+--- a/fs/jffs2/compr.h
++++ b/fs/jffs2/compr.h
+@@ -38,6 +38,9 @@
+ #define JFFS2_COMPR_MODE_NONE       0
+ #define JFFS2_COMPR_MODE_PRIORITY   1
+ #define JFFS2_COMPR_MODE_SIZE       2
++#define JFFS2_COMPR_MODE_FAVOURLZO  3
++
++#define FAVOUR_LZO_PERCENT 80
+ 
+ struct jffs2_compressor {
+         struct list_head list;
 
-LZO compression is particularly useful for jffs2 where significant boot
-time speedups (~10%) and file read speed improvements (~40%) are seen
-when its used with only a slight drop in file compression ratio.
-
-It also adds a favourlzo mode to jffs2 which is similar to the existing
-size mode but lets lzo compression win if the lzo compressed size is
-"similar" to but not the best compression ratio. This means we can keep
-zlib compression where it makes a significant difference to compressed
-file size.
-
-The final jffs2 patch which starts adding sysfs support for control of
-jffs2 options at runtime that are currently available only at boottime.
-There are several other controls which it may be desirable to add to the
-basic framework this patch creates in due course.
-
-Richard
 
 
 
