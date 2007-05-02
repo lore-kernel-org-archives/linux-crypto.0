@@ -1,55 +1,75 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/6] [CRYPTO] cryptd: Add software async crypto daemon
-Date: Wed, 2 May 2007 14:57:21 +1000
-Message-ID: <20070502045721.GC29384@gondor.apana.org.au>
-References: <<20070416105105.GA10188@gondor.apana.org.au>> <E1HdOom-0002uK-00@gondolin.me.apana.org.au> <20070501142329.GA3490@2ka.mipt.ru>
+Subject: Crypto Update for 2.6.22
+Date: Wed, 2 May 2007 15:02:34 +1000
+Message-ID: <20070502050234.GA29838@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+To: "David S. Miller" <davem@davemloft.net>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4180 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4199 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S2992738AbXEBE5b (ORCPT
+	with ESMTP id S1030572AbXEBFCl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 May 2007 00:57:31 -0400
+	Wed, 2 May 2007 01:02:41 -0400
 Content-Disposition: inline
-In-Reply-To: <20070501142329.GA3490@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Evgeniy:
+Hi:
 
-On Tue, May 01, 2007 at 06:23:29PM +0400, Evgeniy Polyakov wrote:
->
-> As far as I understand, this callback is called each time new tfm is
-> going to be created? And it is called for each crypto_template
+Here is the crypto update for 2.6.22:
 
-cryptd_blkcipher_init_tfm/cryptd_blkcipher_exit_tfm are per-tfm while
-cryptd_alloc_blkcipher/cryptd_alloc are per-instance.
+Please pull from
 
-> registered in the system, so it is task of the template to detect that
-> requested cypher tb[crypto_alg-1] is not supported by template.
-> Am I correct?
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-If the requested instance is not supported by this template then we'll
-just fail in cryptd_alloc.  Right now only BLKCIPHER cipher is supported
-so everything else will simply fail.
+or
 
-> If so, could it be better to have set of flags for template which would
-> show which operations are supported?
-> For example HIFH adapter can not perform blowfish encryption, but it
-> will be requested to do so each time new tfm is being requested, if my
-> analysis correct...
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Sorry, I think I've misled you there.  For something like the HIFH
-adapter you wouldn't do a template at all (well, not until we start
-expressing supported key lengths through templates).
+Summary:
 
-You'd simply register an algorithm of type BLKCIPHER | CRYPTO_ALG_ASYNC
-for each algorithm that you support.  You'd set the name of each of these
-according to their algorithm.  So for example AES would just be registered
-as "aes" (of course, you'd set your driver name differently).
+* Added API for asynchronous block ciphers.
+* Small clean-up's.
+
+
+Herbert Xu (9):
+      [CRYPTO] api: Proc functions should be marked as unused
+      [CRYPTO] api: Add async block cipher interface
+      [CRYPTO] tcrypt: Use async blkcipher interface
+      [CRYPTO] templates: Pass type/mask when creating instances
+      [CRYPTO] api: Add async blkcipher type
+      [CRYPTO] cryptomgr: Fix parsing of nested templates
+      [CRYPTO] api: Do not remove users unless new algorithm matches
+      [CRYPTO] cryptd: Add software async crypto daemon
+      [CRYPTO] api: Add ablkcipher_request_set_tfm
+
+Simon Arlott (1):
+      [CRYPTO] padlock: Remove pointless padlock module
+
+ crypto/Kconfig          |   13 +
+ crypto/Makefile         |    2 
+ crypto/ablkcipher.c     |   83 ++++++++++
+ crypto/algapi.c         |  169 +++++++++++++++++----
+ crypto/blkcipher.c      |   72 ++++++++-
+ crypto/cbc.c            |   11 +
+ crypto/cryptd.c         |  375 ++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/cryptomgr.c      |   66 +++++---
+ crypto/ecb.c            |   11 +
+ crypto/hash.c           |    2 
+ crypto/hmac.c           |   11 +
+ crypto/lrw.c            |   11 +
+ crypto/pcbc.c           |   11 +
+ crypto/tcrypt.c         |  121 ++++++++++-----
+ crypto/xcbc.c           |   12 +
+ drivers/crypto/Kconfig  |   16 --
+ drivers/crypto/Makefile |    1 
+ include/crypto/algapi.h |   84 ++++++++++
+ include/linux/crypto.h  |  236 +++++++++++++++++++++++++++++-
+ 19 files changed, 1166 insertions(+), 141 deletions(-)
 
 Cheers,
 -- 
