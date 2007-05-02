@@ -1,36 +1,32 @@
-From: "John Anthony Kazos Jr." <jakj@j-a-k-j.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: convert "crypto" subdirectory to UTF-8
-Date: Wed, 2 May 2007 05:56:43 -0400 (EDT)
-Message-ID: <alpine.DEB.0.98.0705020547140.9993@sigma.j-a-k-j.com>
-References: <alpine.DEB.0.83.0704171322280.914@sigma.j-a-k-j.com>
- <20070502044345.GA29384@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, trivial@kernel.org,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 02 May 2007 20:00:49 +1000
+Message-ID: <E1HjBdh-0002Bu-00@gondolin.me.apana.org.au>
+References: <alpine.DEB.0.98.0705020547140.9993@sigma.j-a-k-j.com>
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	trivial@kernel.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: jakj@j-a-k-j.com (John Anthony Kazos Jr.)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hammerhead.shentel.net ([204.111.1.228]:36805 "EHLO
-	hammerhead.shentel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S2992988AbXEBJ6O (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:2056 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750917AbXEBKBC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 May 2007 05:58:14 -0400
-In-Reply-To: <20070502044345.GA29384@gondor.apana.org.au>
+	Wed, 2 May 2007 06:01:02 -0400
+In-Reply-To: <alpine.DEB.0.98.0705020547140.9993@sigma.j-a-k-j.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-> > Convert the subdirectory "crypto" to UTF-8. The files changed are 
-> > <crypto/fcrypt.c> and <crypto/api.c>.
-> > 
-> > Signed-off-by: John Anthony Kazos Jr. <jakj@j-a-k-j.com>
-> 
-> Thanks.  Could you fix up include/linux/crypto.h as well?
+John Anthony Kazos Jr. <jakj@j-a-k-j.com> wrote:
+>
+> (Were you able to successfully apply the patch attached in octet-stream 
+> encoding?)
 
-Sure, will do. Since I've gotten almost no feedback about these patches 
-whatsoever, I figured either I was doing it wrong or nobody cared. I guess 
-I'll finish them all up and resubmit them and hope they stick. Gimme a 
-few days: There's a huge number of files throughout the tree to change, 
-and some of them (like the .map files) require non-trivial alterations.
+Yes it worked fine.
 
-(Were you able to successfully apply the patch attached in octet-stream 
-encoding?)
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
