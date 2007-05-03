@@ -1,36 +1,82 @@
-From: Arne Georg Gleditsch <argggh@dolphinics.no>
-Subject: Re: [PATCH] crypto: convert crypto.h to UTF-8
-Date: 03 May 2007 13:53:16 +0200
-Message-ID: <87r6pyqg2b.fsf@pelargir.dolphinics.no>
-References: <alpine.DEB.0.83.0704171322280.914@sigma.j-a-k-j.com>
-	<20070502044345.GA29384@gondor.apana.org.au>
-	<alpine.DEB.0.98.0705030711020.17390@sigma.j-a-k-j.com>
+From: "Martin Schiller" <mschiller@tdt.de>
+Subject: RE: Testing the geode-aes driver with the tcrypt module completely freezes the machine
+Date: Thu, 3 May 2007 15:12:43 +0200
+Message-ID: <000601c78d84$bc24b430$1a04010a@V505CP>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, trivial@kernel.org,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: "John Anthony Kazos Jr." <jakj@j-a-k-j.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>
+To: <johnpol@2ka.mipt.ru>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from poesci.dolphinics.no ([81.175.23.36]:44618 "EHLO
-	poesci.dolphinics.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030949AbXECMNg (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 May 2007 08:13:36 -0400
-In-Reply-To: <alpine.DEB.0.98.0705030711020.17390@sigma.j-a-k-j.com>
+Received: from ns.tdt.de ([195.243.126.82]:41917 "EHLO ns.tdt.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1161910AbXECNMl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 May 2007 09:12:41 -0400
+Received: from ns (root@localhost)
+	by ns.tdt.de (8.11.6/8.11.6/SuSE Linux 0.5) with SMTP id l43DCZW29306
+	for <linux-crypto@vger.kernel.org>; Thu, 3 May 2007 15:12:35 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-"John Anthony Kazos Jr." <jakj@j-a-k-j.com> writes:
-> Did this file individually, per request. Will re-do the whole tree later 
-> as I'm still working on my handy-dandy testing and patching tools and 
-> don't have a lot of time outside of work until the summer gets underway.
+On Thursday, May 03, 2007 00:58:45 -0700 , Evgeniy Polyakov wrote:
 
-While this is probably inevitable, it would be nice if there was some
-way to determine the actual coding system used for individual files.
-Especially if we're mixing latin1 and utf8 in the same tree.  Has
-something like adding "/* -*- coding: utf-8; -*- */" or similar to the
-top of converted files been considered?
+> Hi Martin.
 
--- 
-								Arne.
+Hi Evgeniy
+
+>> Sorry for my late answer, but I didn't get your message because I ha=
+ven't
+>> subscribed to the mailing-list.
+>> I've "found" it yesterday on the mailing-list archive. So please, co=
+uld
+you
+>> reply directly to me and to the mailing-list on any further messages=
+?
+>
+> I did, but your mail server bounced message.
+> This message is also sent to you directly, hope it will pass through.
+> Btw, AMD list bounces too.
+
+It didn't, but I talked to our mail server admin and now your mails sho=
+uld
+reach me. :-)
+
+After adding the debug outputs from your last patch, none of them was
+displayed.
+So I started adding some more outputs and doing a "line-by-line" debugg=
+ing
+and found out this (so far):
+
+The freeze is the result of an invinite while-loop in the function
+geode_ecb_encrypt()
+(and maybe also in the geode_ecb_decrypt()).
+
+The cause for this seems to be, that the op->src =3D=3D op->dst whereby=
+ the
+geode_aes_crypt() function does nothing at all,
+and so the value of nbytes will never be changed.
+
+Regards,
+Martin
+
+-------------------------------------------
+=20
+Martin Schiller
+Dipl.-Inf. FH
+Entwicklung / Development
+
+
+T.D.T. Transfer Data Test GmbH
+Siemensstrasse 18
+Gewerbegebiet Altheim
+84051 Essenbach
+Germany=20
+
+mschiller@tdt.de
+www.tdt.de=20
+
+tel: +49 8703 929 00
+fax: +49 8703 929 201
+
+Gesch=E4ftsf=FChrer: Elisabeth Pickhardt &  Michael Pickhardt
+Registergericht Landshut, HRB: 1193=20
