@@ -1,34 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Testing the geode-aes driver with the tcrypt module completely freezes the machine
-Date: Thu, 03 May 2007 23:49:35 +1000
-Message-ID: <E1Hjbgd-000086-00@gondolin.me.apana.org.au>
-References: <20070503132310.GA21082@2ka.mipt.ru>
-Cc: mschiller@tdt.de, linux-crypto@vger.kernel.org,
-	jordan.crouse@amd.com
-To: johnpol@2ka.mipt.ru (Evgeniy Polyakov)
+From: Arne Georg Gleditsch <argggh@dolphinics.no>
+Subject: Re: [PATCH] crypto: convert crypto.h to UTF-8
+Date: 03 May 2007 15:52:30 +0200
+Message-ID: <87hcquqajl.fsf@pelargir.dolphinics.no>
+References: <alpine.DEB.0.83.0704171322280.914@sigma.j-a-k-j.com>
+	<20070502044345.GA29384@gondor.apana.org.au>
+	<alpine.DEB.0.98.0705030711020.17390@sigma.j-a-k-j.com>
+	<87r6pyqg2b.fsf@pelargir.dolphinics.no>
+	<alpine.DEB.0.98.0705030915240.21257@sigma.j-a-k-j.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, trivial@kernel.org,
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+To: "John Anthony Kazos Jr." <jakj@j-a-k-j.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4391 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1161899AbXECNt6 (ORCPT
+Received: from poesci.dolphinics.no ([81.175.23.36]:45049 "EHLO
+	poesci.dolphinics.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161909AbXECNwc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 May 2007 09:49:58 -0400
-In-Reply-To: <20070503132310.GA21082@2ka.mipt.ru>
+	Thu, 3 May 2007 09:52:32 -0400
+In-Reply-To: <alpine.DEB.0.98.0705030915240.21257@sigma.j-a-k-j.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
-> 
-> Hm, driver does not perform encryption in-place at all.
-> Since we did not hear from AMD quite for a while, could you please
-> remove src==dst check in geode_aes_crypt() and run tests again.
-> If it is software protection against hardware bug, I doubt such hardware
-> should be used at all...
+"John Anthony Kazos Jr." <jakj@j-a-k-j.com> writes:
+> Besides, based on the actual binary representation of UTF-8, it's 
+> extremely unlikely for any ISO-8859-1 string to be detected as UTF-8. VIm 
+> already does this: UTF-8 it handles natively, but open up one of these 
+> unpatched files in VIm and you'll see "[converted]" at the bottom of your 
+> screen. Should happen if you open the attached .patch.bin file in VIm.
 
-I agree.  Jordan, could you please see if this can be fixed up?
+Yes, I agree that heuristics can be used to determine the coding
+system used with a high degree of probability.  I'm just suggesting we
+make the coding system explicit, in order to spare other applications
+that do visual presentation of Linux source code having to perform
+their own heuristics.
 
-Cheers,
+But hey, if I'm the only one wanting to see this particular bike shed
+painted blue...
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+								Arne.
