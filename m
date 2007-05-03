@@ -1,115 +1,78 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: Testing the geode-aes driver with the tcrypt module completely freezes the machine
-Date: Thu, 3 May 2007 11:57:44 +0400
-Message-ID: <20070503075744.GC17966@2ka.mipt.ru>
-References: <000601c787e1$e169ff00$1a04010a@V505CP> <20070427081051.GA28960@gondor.apana.org.au> <000301c78d4b$0f9ab810$1a04010a@V505CP>
+From: "John Anthony Kazos Jr." <jakj@j-a-k-j.com>
+Subject: [PATCH] crypto: convert crypto.h to UTF-8
+Date: Thu, 3 May 2007 07:17:25 -0400 (EDT)
+Message-ID: <alpine.DEB.0.98.0705030711020.17390@sigma.j-a-k-j.com>
+References: <alpine.DEB.0.83.0704171322280.914@sigma.j-a-k-j.com>
+ <20070502044345.GA29384@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org
-To: Martin Schiller <mschiller@tdt.de>
+Content-Type: MULTIPART/MIXED; BOUNDARY="1875672472-1995079615-1178191047=:17390"
+Cc: linux-kernel@vger.kernel.org, trivial@kernel.org,
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:51239 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161495AbXECH6S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 May 2007 03:58:18 -0400
-Content-Disposition: inline
-In-Reply-To: <000301c78d4b$0f9ab810$1a04010a@V505CP>
+Received: from hammerhead.shentel.net ([204.111.1.228]:54768 "EHLO
+	hammerhead.shentel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753388AbXECLTI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 May 2007 07:19:08 -0400
+In-Reply-To: <20070502044345.GA29384@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 03, 2007 at 08:19:52AM +0200, Martin Schiller (mschiller@tdt.de) wrote:
-> Hi Evgeniy,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Hi Martin.
+--1875672472-1995079615-1178191047=:17390
+Content-Type: TEXT/PLAIN; charset=iso-8859-15
+Content-Transfer-Encoding: 8BIT
 
-> Sorry for my late answer, but I didn't get your message because I haven't
-> subscribed to the mailing-list.
-> I've "found" it yesterday on the mailing-list archive. So please, could you
-> reply directly to me and to the mailing-list on any further messages?
+From: John Anthony Kazos Jr. <jakj@j-a-k-j.com>
 
-I did, but your mail server bounced message.
-This message is also sent to you directly, hope it will pass through.
-Btw, AMD list bounces too.
+Convert the encoding of <include/linux/crypto.h> from ISO-8859-1 to UTF-8.
 
-> I've tested the patch now, but nothing changed. When doing any aes cipher
-> tests with the tcrypt test module, the machine freezes without any error.
+Signed-off-by: John Anthony Kazos Jr. <jakj@j-a-k-j.com>
 
-Hmm, that means that main waiting loop of the driver is not an issue.
-Since it is PCI, likely bus is locked by incorrect written value into
-the space. Can you run with this patch (it will freeze too, but at
-least with some useful info), since AMD keeps silence, we will go hard
-way:
+---
 
-diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-index 6d3840e..6ddfab9 100644
---- a/drivers/crypto/geode-aes.c
-+++ b/drivers/crypto/geode-aes.c
-@@ -61,8 +61,10 @@ static inline void
- _writefield(u32 offset, void *value)
- {
- 	int i;
-+	printk("%s: start, offset: %x.\n", __func__, offset);
- 	for(i = 0; i < 4; i++)
- 		iowrite32(((u32 *) value)[i], _iobase + offset + (i * 4));
-+	printk("%s: finish, offset: %x.\n", __func__, offset);
- }
- 
- /* Read a 128 bit field (either a writable key or IV) */
-@@ -70,8 +72,10 @@ static inline void
- _readfield(u32 offset, void *value)
- {
- 	int i;
-+	printk("%s: start, offset: %x.\n", __func__, offset);
- 	for(i = 0; i < 4; i++)
- 		((u32 *) value)[i] = ioread32(_iobase + offset + (i * 4));
-+	printk("%s: finish, offset: %x.\n", __func__, offset);
- }
- 
- static int
-@@ -80,19 +84,24 @@ do_crypt(void *src, void *dst, int len, u32 flags)
- 	u32 status;
- 	u32 counter = AES_OP_TIMEOUT;
- 
-+	printk("%s: src: %p, dst: %p, len: %d, flags: %x\n", __func__, src, dst, len, flags);
- 	iowrite32(virt_to_phys(src), _iobase + AES_SOURCEA_REG);
- 	iowrite32(virt_to_phys(dst), _iobase + AES_DSTA_REG);
- 	iowrite32(len,  _iobase + AES_LENA_REG);
- 
-+	printk("%s: start op, likely will freeze.\n", __func__);
- 	/* Start the operation */
- 	iowrite32(AES_CTRL_START | flags, _iobase + AES_CTRLA_REG);
-+	printk("%s: started, but we are stil alive.\n", __func__);
- 
--	do
-+	do {
- 		status = ioread32(_iobase + AES_INTR_REG);
--	while(!(status & AES_INTRA_PENDING) && --counter);
-+		printk("%s: status: %x, counter: %u.\n", __func__, status, counter);
-+	} while(!(status & AES_INTRA_PENDING) && --counter);
- 
- 	/* Clear the event */
- 	iowrite32((status & 0xFF) | AES_INTRA_PENDING, _iobase + AES_INTR_REG);
-+	printk("%s: completed.\n", __func__);
- 	return counter ? 0 : 1;
- }
- 
-@@ -113,6 +122,7 @@ geode_aes_crypt(struct geode_aes_op *op)
- 
- 	/* Start the critical section */
- 
-+	printk("%s: start.\n", __func__);
- 	spin_lock_irqsave(&lock, iflags);
- 
- 	if (op->mode == AES_MODE_CBC) {
-@@ -131,6 +141,7 @@ geode_aes_crypt(struct geode_aes_op *op)
- 		_readfield(AES_WRITEIV0_REG, op->iv);
- 
- 	spin_unlock_irqrestore(&lock, iflags);
-+	printk("%s: completed.\n", __func__);
- 
- 	return op->len;
- }
+Did this file individually, per request. Will re-do the whole tree later 
+as I'm still working on my handy-dandy testing and patching tools and 
+don't have a lot of time outside of work until the summer gets underway.
 
+The patch works in ISO-8859-1 encoding. If I am unsuccessful in getting 
+this mail to send as that, or if your viewer reinterprets it from that, 
+you'll need to use the file attached as MIME type octet-stream. Thanks for 
+your time and interest.
 
--- 
-	Evgeniy Polyakov
+--- linux-2.6.21-rc7-git4.orig/include/linux/crypto.h	2007-04-20 20:22:13.000000000 -0400
++++ linux-2.6.21-rc7-git4.mod/include/linux/crypto.h	2007-05-03 07:09:47.000000000 -0400
+@@ -6,7 +6,7 @@
+  * Copyright (c) 2005 Herbert Xu <herbert@gondor.apana.org.au>
+  *
+  * Portions derived from Cryptoapi, by Alexander Kjeldaas <astor@fast.no>
+- * and Nettle, by Niels Möller.
++ * and Nettle, by Niels MÃ¶ller.
+  * 
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+--1875672472-1995079615-1178191047=:17390
+Content-Type: APPLICATION/octet-stream; name=include-linux-crypto-h-to-utf8.patch.bin
+Content-Transfer-Encoding: BASE64
+Content-ID: <alpine.DEB.0.98.0705030717250.17390@sigma.j-a-k-j.com>
+Content-Description: 
+Content-Disposition: attachment; filename=include-linux-crypto-h-to-utf8.patch.bin
+
+LS0tIGxpbnV4LTIuNi4yMS1yYzctZ2l0NC5vcmlnL2luY2x1ZGUvbGludXgv
+Y3J5cHRvLmgJMjAwNy0wNC0yMCAyMDoyMjoxMy4wMDAwMDAwMDAgLTA0MDAK
+KysrIGxpbnV4LTIuNi4yMS1yYzctZ2l0NC5tb2QvaW5jbHVkZS9saW51eC9j
+cnlwdG8uaAkyMDA3LTA1LTAzIDA3OjA5OjQ3LjAwMDAwMDAwMCAtMDQwMApA
+QCAtNiw3ICs2LDcgQEAKICAqIENvcHlyaWdodCAoYykgMjAwNSBIZXJiZXJ0
+IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+CiAgKgogICogUG9y
+dGlvbnMgZGVyaXZlZCBmcm9tIENyeXB0b2FwaSwgYnkgQWxleGFuZGVyIEtq
+ZWxkYWFzIDxhc3RvckBmYXN0Lm5vPgotICogYW5kIE5ldHRsZSwgYnkgTmll
+bHMgTfZsbGVyLgorICogYW5kIE5ldHRsZSwgYnkgTmllbHMgTcO2bGxlci4K
+ICAqIAogICogVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBj
+YW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkgaXQKICAqIHVuZGVy
+IHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Ug
+YXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlCg==
+
+--1875672472-1995079615-1178191047=:17390--
