@@ -1,39 +1,50 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: Testing the geode-aes driver with the tcrypt module completely freezes the machine
-Date: Thu, 3 May 2007 17:23:10 +0400
-Message-ID: <20070503132310.GA21082@2ka.mipt.ru>
-References: <000601c78d84$bc24b430$1a04010a@V505CP>
+From: "John Anthony Kazos Jr." <jakj@j-a-k-j.com>
+Subject: Re: [PATCH] crypto: convert crypto.h to UTF-8
+Date: Thu, 3 May 2007 09:21:11 -0400 (EDT)
+Message-ID: <alpine.DEB.0.98.0705030915240.21257@sigma.j-a-k-j.com>
+References: <alpine.DEB.0.83.0704171322280.914@sigma.j-a-k-j.com>
+ <20070502044345.GA29384@gondor.apana.org.au> <alpine.DEB.0.98.0705030711020.17390@sigma.j-a-k-j.com>
+ <87r6pyqg2b.fsf@pelargir.dolphinics.no>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: linux-crypto@vger.kernel.org
-To: Martin Schiller <mschiller@tdt.de>
+Content-Type: TEXT/PLAIN; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, trivial@kernel.org,
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Arne Georg Gleditsch <argggh@dolphinics.no>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:52947 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754056AbXECNX0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 May 2007 09:23:26 -0400
-Content-Disposition: inline
-In-Reply-To: <000601c78d84$bc24b430$1a04010a@V505CP>
+Received: from seahorse.shentel.net ([204.111.1.244]:60522 "EHLO
+	seahorse.shentel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1031243AbXECN1n (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 May 2007 09:27:43 -0400
+In-Reply-To: <87r6pyqg2b.fsf@pelargir.dolphinics.no>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 03, 2007 at 03:12:43PM +0200, Martin Schiller (mschiller@tdt.de) wrote:
-> The freeze is the result of an invinite while-loop in the function
-> geode_ecb_encrypt()
-> (and maybe also in the geode_ecb_decrypt()).
+> > Did this file individually, per request. Will re-do the whole tree later 
+> > as I'm still working on my handy-dandy testing and patching tools and 
+> > don't have a lot of time outside of work until the summer gets underway.
 > 
-> The cause for this seems to be, that the op->src == op->dst whereby the
-> geode_aes_crypt() function does nothing at all,
-> and so the value of nbytes will never be changed.
+> While this is probably inevitable, it would be nice if there was some
+> way to determine the actual coding system used for individual files.
+> Especially if we're mixing latin1 and utf8 in the same tree.  Has
+> something like adding "/* -*- coding: utf-8; -*- */" or similar to the
+> top of converted files been considered?
 
-Hm, driver does not perform encryption in-place at all.
-Since we did not hear from AMD quite for a while, could you please
-remove src==dst check in geode_aes_crypt() and run tests again.
-If it is software protection against hardware bug, I doubt such hardware
-should be used at all...
+There's no reason for any non-UTF-8 to be in the tree at all, so 
+eventually it won't be a problem. I'm (slowly but surely) working on 
+converting everything in the tree. GCC handles UTF-8 just fine, and all 
+non-stupid/non-broken distributions of GNU/Linux and other major Un*ces 
+should be based on (or at least compatible with) UTF-8 in basic 
+operations. Files like the keymaps will be more work to convert, but they 
+can be as well.
 
-> Regards,
-> Martin
+I'm operating on the assumption that anything in the tree that isn't UTF-8 
+is ISO-8859-1. Of course, I'm also checking it by hand to make sure a 
+small-O-with-umlaut doesn't become the Klingon logo...
 
--- 
-	Evgeniy Polyakov
+Besides, based on the actual binary representation of UTF-8, it's 
+extremely unlikely for any ISO-8859-1 string to be detected as UTF-8. VIm 
+already does this: UTF-8 it handles natively, but open up one of these 
+unpatched files in VIm and you'll see "[converted]" at the bottom of your 
+screen. Should happen if you open the attached .patch.bin file in VIm.
