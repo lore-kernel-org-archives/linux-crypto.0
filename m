@@ -1,46 +1,179 @@
 From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: alignmask in the API
-Date: Wed, 9 May 2007 09:05:53 +0200
-Message-ID: <20070509070553.GB21679@Chamillionaire.breakpoint.cc>
-References: <20070416212400.GA30547@Chamillionaire.breakpoint.cc> <E1HdgLJ-0004iw-00@gondolin.me.apana.org.au> <20070508171701.GB5234@Chamillionaire.breakpoint.cc> <20070509034024.GA32283@gondor.apana.org.au>
+Subject: [patch] [CRYPTO] add alignment for setkey()
+Date: Thu, 10 May 2007 11:57:17 +0200
+Message-ID: <20070510095717.GD26502@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41904 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40630 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S967872AbXEIHF6 (ORCPT
+	by vger.kernel.org with ESMTP id S1760619AbXEJJ5X (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 May 2007 03:05:58 -0400
+	Thu, 10 May 2007 05:57:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20070509034024.GA32283@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-05-09 13:40:24 [+1000]:
+setkey() in {cipher,blkcipher,ablkcipher,hash}.c does not respect the
+requested alignment by the algorithm. This patch fixes it.
 
->On Tue, May 08, 2007 at 07:17:01PM +0200, Sebastian Siewior wrote:
->> 
->> setkey() is for crypto user is defined as:
->> static inline int crypto_ablkcipher_setkey(struct crypto_ablkcipher
->>                 *tfm,
->>                 const u8 *key, unsigned int keylen)
->> {
->>         return crypto_ablkcipher_crt(tfm)->setkey(tfm, key, keylen);
->> }
->> 
->> If the key is not properly aligned by the caller, the cipher gets an
->> unaligned key.
->> What do you recommend?
->
->I recommend that you write a patch :)
-Okey.
-
->We just need some code in {cipher,blkcipher,ablkcipher}.c to check the
->alignment and copy it if necessary.  Check out how we deal with unaligned
->IVs in blkcipher.c for example.
-Will check.
-
->Cheers,
-Sebastian
+Signed-off-by: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Index: linux/crypto/cipher.c
+===================================================================
+--- linux.orig/crypto/cipher.c
++++ linux/crypto/cipher.c
+@@ -20,16 +20,32 @@
+ #include <linux/string.h>
+ #include "internal.h"
+ 
++static int setkey_unaligned(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen,
++		unsigned long alignmask)
++{
++	struct cipher_alg *cia = &tfm->__crt_alg->cra_cipher;
++	u8 buffer[keylen + alignmask];
++	u8 *alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
++
++	memcpy(alignbuffer, key, keylen);
++	return cia->cia_setkey(tfm, alignbuffer, keylen);
++}
++
+ static int setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct cipher_alg *cia = &tfm->__crt_alg->cra_cipher;
+-	
++	unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
++
+ 	tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
+ 	if (keylen < cia->cia_min_keysize || keylen > cia->cia_max_keysize) {
+ 		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+ 		return -EINVAL;
+-	} else
+-		return cia->cia_setkey(tfm, key, keylen);
++	}
++
++	if (unlikely((unsigned long) key & alignmask))
++		return setkey_unaligned(tfm, key, keylen, alignmask);
++
++	return cia->cia_setkey(tfm, key, keylen);
+ }
+ 
+ static void cipher_crypt_unaligned(void (*fn)(struct crypto_tfm *, u8 *,
+Index: linux/crypto/ablkcipher.c
+===================================================================
+--- linux.orig/crypto/ablkcipher.c
++++ linux/crypto/ablkcipher.c
+@@ -19,16 +19,31 @@
+ #include <linux/module.h>
+ #include <linux/seq_file.h>
+ 
++static int setkey_unaligned(struct crypto_ablkcipher *tfm, const u8 *key, unsigned int keylen,
++		unsigned long alignmask)
++{
++	struct ablkcipher_alg *cipher = crypto_ablkcipher_alg(tfm);
++	u8 buffer[keylen + alignmask];
++	u8 *alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
++
++	memcpy(alignbuffer, key, keylen);
++	return cipher->setkey(tfm, alignbuffer, keylen);
++}
++
+ static int setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 		  unsigned int keylen)
+ {
+ 	struct ablkcipher_alg *cipher = crypto_ablkcipher_alg(tfm);
++	unsigned long alignmask = crypto_ablkcipher_alignmask(tfm);
+ 
+ 	if (keylen < cipher->min_keysize || keylen > cipher->max_keysize) {
+ 		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+ 
++	if (unlikely((unsigned long) key & alignmask))
++		return setkey_unaligned(tfm, key, keylen, alignmask);
++
+ 	return cipher->setkey(tfm, key, keylen);
+ }
+ 
+Index: linux/crypto/blkcipher.c
+===================================================================
+--- linux.orig/crypto/blkcipher.c
++++ linux/crypto/blkcipher.c
+@@ -336,16 +336,31 @@ static int blkcipher_walk_first(struct b
+ 	return blkcipher_walk_next(desc, walk);
+ }
+ 
++static int setkey_unaligned(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen,
++		unsigned long alignmask)
++{
++	struct blkcipher_alg *cipher = &tfm->__crt_alg->cra_blkcipher;
++	u8 buffer[keylen + alignmask];
++	u8 *alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
++
++	memcpy(alignbuffer, key, keylen);
++	return cipher->setkey(tfm, alignbuffer, keylen);
++}
++
+ static int setkey(struct crypto_tfm *tfm, const u8 *key,
+ 		  unsigned int keylen)
+ {
+ 	struct blkcipher_alg *cipher = &tfm->__crt_alg->cra_blkcipher;
++	unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
+ 
+ 	if (keylen < cipher->min_keysize || keylen > cipher->max_keysize) {
+ 		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+ 		return -EINVAL;
+ 	}
+ 
++	if (unlikely((unsigned long) key & alignmask))
++		return setkey_unaligned(tfm, key, keylen, alignmask);
++
+ 	return cipher->setkey(tfm, key, keylen);
+ }
+ 
+Index: linux/crypto/hash.c
+===================================================================
+--- linux.orig/crypto/hash.c
++++ linux/crypto/hash.c
+@@ -22,6 +22,31 @@ static unsigned int crypto_hash_ctxsize(
+ 	return alg->cra_ctxsize;
+ }
+ 
++static int hash_setkey_unaligned(struct crypto_hash *crt, const u8 *key,
++		                 unsigned int keylen, unsigned int alignmask)
++{
++	struct crypto_tfm *tfm = crypto_hash_tfm(crt);
++	struct hash_alg *alg = &tfm->__crt_alg->cra_hash;
++	u8 buffer[keylen + alignmask];
++	u8 *alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
++
++	memcpy(alignbuffer, key, keylen);
++	return alg->setkey(crt, alignbuffer, keylen);
++}
++
++static int hash_setkey(struct crypto_hash *crt, const u8 *key,
++		unsigned int keylen)
++{
++	struct crypto_tfm *tfm = crypto_hash_tfm(crt);
++	struct hash_alg *alg = &tfm->__crt_alg->cra_hash;
++	unsigned int alignmask = crypto_hash_alignmask(crt);
++
++	if (unlikely((unsigned long) key & alignmask))
++		return hash_setkey_unaligned(crt, key, keylen, alignmask);
++
++	return alg->setkey(crt, key, keylen);
++}
++
+ static int crypto_init_hash_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ {
+ 	struct hash_tfm *crt = &tfm->crt_hash;
+@@ -34,7 +59,7 @@ static int crypto_init_hash_ops(struct c
+ 	crt->update = alg->update;
+ 	crt->final = alg->final;
+ 	crt->digest = alg->digest;
+-	crt->setkey = alg->setkey;
++	crt->setkey = hash_setkey;
+ 	crt->digestsize = alg->digestsize;
+ 
+ 	return 0;
