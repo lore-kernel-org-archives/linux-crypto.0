@@ -1,96 +1,42 @@
-From: Michal Piotrowski <michal.k.k.piotrowski@gmail.com>
-Subject: [1/3] 2.6.22-rc1: known regressions v2
-Date: Wed, 16 May 2007 22:31:30 +0200
-Message-ID: <464B6A22.905@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch] [CRYPTO] add alignment for setkey()
+Date: Fri, 18 May 2007 16:30:01 +1000
+Message-ID: <20070518063001.GA16171@gondor.apana.org.au>
+References: <20070510095717.GD26502@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Bob Tracy <rct@gherkin.frus.com>,
-	Dave Jones <davej@codemonkey.org.uk>,
-	linux-acpi@vger.kernel.org, Len Brown <lenb@kernel.org>,
-	Ray Lee <ray-lk@madrabbit.org>, alsa-devel@alsa-project.org,
-	"Takashi Iwai" <tiwai@suse.de>, "Jaroslav Kysela" <perex@suse.cz>,
-	Pete Clements <clem@clem.clem-digital.net>,
-	Rene Herman <rene.herman@gmail.com>, viro@zeniv.linux.org.uk,
-	Uwe Bugla <uwe.bugla@gmx.de>, linux-crypto@vger.kernel.org,
-	Luca Tettamanti <kronos.it@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ug-out-1314.google.com ([66.249.92.172]:18101 "EHLO
-	ug-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1763334AbXEPUb6 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:4053 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751908AbXERGaF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 May 2007 16:31:58 -0400
-Received: by ug-out-1314.google.com with SMTP id 44so193388uga
-        for <linux-crypto@vger.kernel.org>; Wed, 16 May 2007 13:31:57 -0700 (PDT)
+	Fri, 18 May 2007 02:30:05 -0400
+Content-Disposition: inline
+In-Reply-To: <20070510095717.GD26502@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+On Thu, May 10, 2007 at 11:57:17AM +0200, Sebastian Siewior wrote:
+> setkey() in {cipher,blkcipher,ablkcipher,hash}.c does not respect the
+> requested alignment by the algorithm. This patch fixes it.
 
-Here is a list of some known regressions in 2.6.22-rc1.
+Thanks for the patch!
+  
+> +static int setkey_unaligned(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen,
+> +		unsigned long alignmask)
+> +{
+> +	struct cipher_alg *cia = &tfm->__crt_alg->cra_cipher;
+> +	u8 buffer[keylen + alignmask];
 
-Feel free to add new regressions/remove fixed etc.
-http://kernelnewbies.org/known_regressions
+Hmm, I'm not comfortable with this since keylen could be unbounded,
+especially for hash algorithms.  How about getting the memory via
+kmalloc instead?
 
-
-
-Unclassified
-
-Subject    : AMD k6-III/450 won't boot w/2.6.22-rc1
-References : http://lkml.org/lkml/2007/5/16/192
-Submitter  : Bob Tracy <rct@gherkin.frus.com>
-Handled-By : Dave Jones <davej@codemonkey.org.uk>
-Status     : problem is being debugged
-
-
-
-ACPI
-
-Subject    : nx6125 has lost fan control
-References : http://lkml.org/lkml/2007/5/16/249
-Submitter  : Ray Lee <ray-lk@madrabbit.org>
-Status     : Unknown
-
-
-
-ALSA
-
-Subject    : lost snd_4236 device
-References : http://lkml.org/lkml/2007/5/13/87
-Submitter  : Pete Clements <clem@clem.clem-digital.net>
-Handled-By : Rene Herman <rene.herman@gmail.com>
-Patch      : http://lkml.org/lkml/2007/5/15/23
-Status     : patch available
-
-
-
-Block devices
-
-Subject    : loop devices limited to one single device
-References : http://lkml.org/lkml/2007/5/16/229
-Submitter  : Uwe Bugla <uwe.bugla@gmx.de>
-Status     : Unknown
-
-
-
-Cryptography
-
-Subject    : cryptomgr oops
-References : http://lkml.org/lkml/2007/5/14/283
-Submitter  : Luca Tettamanti <kronos.it@gmail.com>
-Handled-By : Herbert Xu <herbert@gondor.apana.org.au>
-Status     : problem is being debugged
-
-
-
-Regards,
-Michal
-
---
-Michal K. K. Piotrowski
-Kernel Monkeys
-(http://kernel.wikidot.com/start)
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
