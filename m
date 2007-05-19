@@ -1,40 +1,70 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [patch] [CRYPTO] add alignment for setkey()
-Date: Fri, 18 May 2007 16:37:39 +0200
-Message-ID: <20070518143739.GC16349@Chamillionaire.breakpoint.cc>
-References: <20070510095717.GD26502@Chamillionaire.breakpoint.cc> <20070518063001.GA16171@gondor.apana.org.au> <20070518134341.GA16349@Chamillionaire.breakpoint.cc> <20070518134632.GA21326@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [Patch] [CRYPTO] add alignment for setkey() (rev 2)
+Date: Sat, 19 May 2007 17:41:36 +1000
+Message-ID: <20070519074136.GA6281@gondor.apana.org.au>
+References: <20070518140130.GB16349@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:49390 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756270AbXEROhm (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:3070 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754437AbXESHlk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 May 2007 10:37:42 -0400
+	Sat, 19 May 2007 03:41:40 -0400
 Content-Disposition: inline
-In-Reply-To: <20070518134632.GA21326@gondor.apana.org.au>
+In-Reply-To: <20070518140130.GB16349@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-05-18 23:46:32 [+1000]:
+Hi Sebastian:
 
->> Good point. I take kmalloc() with GFP_KERNEL (the caller should not be
->> atomic at this point). Additionaly I zero the temporary key (I don't
->
->They shouldn't be.  But it would be good if you could do a grep to see
->if any of them are doing it in an atomic context since we've not tested
->for this before.
-Huh, this was too fast. I greped after sending the patch...
+On Fri, May 18, 2007 at 04:01:30PM +0200, Sebastian Siewior wrote:
+> setkey() in {cipher,blkcipher,ablkcipher,hash}.c does not respect the
+> requested alignment by the algorithm. This patch fixes it. The extra
+> memory is allocated by kmalloc() with GFP_KERNEL flag.
 
-drivers/net/ppp_mppe.c: can't tell, probably not.
-net/mac80211/wep.c: caller is requesting memory with GFP_ATOMIC. The
-code might get called from a tasklet handler but can't really say. There
-are some skbs around.
+I think we should stick with GFP_ATOMIC for now.  Once all the atomic
+users have been fixed (if they can be), then we can start changing this
+interface.
 
-The others are pretty easy to tell and they don't, just the mac80211.
-Do you s/GFP_KERNEL/GFP_ATOMIC/ ?
+> Index: ps3-linux/crypto/cipher.c
+> ===================================================================
+> --- ps3-linux.orig/crypto/cipher.c
+> +++ ps3-linux/crypto/cipher.c
+> @@ -20,16 +20,43 @@
+>  #include <linux/string.h>
+>  #include "internal.h"
+>  
+> +static int setkey_unaligned(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen,
+> +		unsigned long alignmask)
 
->Thanks,
-Sebastian
+Minor nit.  Could you get rid of the alignmask parameter here and just
+read it again from tfm? This should make it easier for certain compiler/
+arch combos to generate a tail call.
+
+>  static int setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
+>  {
+>  	struct cipher_alg *cia = &tfm->__crt_alg->cra_cipher;
+> -	
+> +	unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
+> +
+>  	tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
+>  	if (keylen < cia->cia_min_keysize || keylen > cia->cia_max_keysize) {
+>  		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+>  		return -EINVAL;
+> -	} else
+> -		return cia->cia_setkey(tfm, key, keylen);
+> +	}
+> +
+> +	if ((unsigned long) key & alignmask)
+
+Please kill the space before key.
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
