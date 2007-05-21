@@ -1,50 +1,55 @@
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [1/2] 2.6.22-rc2: known regressions with patches
-Date: Sun, 20 May 2007 03:10:50 +0200
-Message-ID: <20070520011050.GA31667@uranus.ravnborg.org>
-References: <464F74F2.8090207@googlemail.com>
+From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+Subject: Re: [PATCH] [XFRM] Camellia: fixed to add compat name for Camellia.
+Date: Mon, 21 May 2007 11:44:15 +0900 (JST)
+Message-ID: <20070521.114415.432839959.takamiya@po.ntts.co.jp>
+References: <20061018.161749.782295638.takamiya@po.ntts.co.jp>
+	<20070516.165231.783376564.takamiya@po.ntts.co.jp>
+	<20070516091856.GA21695@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Bob Tracy <rct@gherkin.frus.com>,
-	Dave Jones <davej@codemonkey.org.uk>,
-	Christian Volkmann <haveaniceday@cv-sv.de>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Luca Tettamanti <kronos.it@gmail.com>
-To: Michal Piotrowski <michal.k.k.piotrowski@gmail.com>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	camellia-oss@sec.ms.ntts.co.jp
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:46749 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755763AbXETBJy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 May 2007 21:09:54 -0400
-Content-Disposition: inline
-In-Reply-To: <464F74F2.8090207@googlemail.com>
+Received: from mail2.ics.ntts.co.jp ([202.32.24.42]:34895 "EHLO
+	mail2.ics.ntts.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752702AbXEUCph (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 May 2007 22:45:37 -0400
+In-Reply-To: <20070516091856.GA21695@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, May 20, 2007 at 12:06:42AM +0200, Michal Piotrowski wrote:
-> Hi all,
-> 
-> Here is a list of some known regressions in 2.6.22-rc2
-> with patches available.
-> 
-> Feel free to add new regressions/remove fixed etc.
-> http://kernelnewbies.org/known_regressions
-> 
-> 
-> 
-> Unclassified
-> 
-> Subject    : 2.6.22-rc2: section mismatch
-> References : http://lkml.org/lkml/2007/5/19/59
-> Submitter  : Andrey Borzenkov <arvidjaar@mail.ru>
-> Handled-By : Sam Ravnborg <sam@ravnborg.org>
-> Status     : fixed in kbuild-git.git
-2 warnings are fixed in kbuild.git
-The rest are fixed by http://lkml.org/lkml/2007/5/19/89 which I assume Andi Keen
-take care of.
+Hi,
 
-	Sam
+  Sorry for late reply.
+
+>> Wed, 16 May 2007 19:18:56 +1000
+>> [Subject: Re: [PATCH] [XFRM] Camellia: fixed to add compat name for Camellia.]
+>> Herbert Xu <herbert@gondor.apana.org.au> wrote...
+
+> Actually this was deliberate.  The compat name only exists so that
+> existing users aren't broken.  New users should always configure
+> it with the full name, that is, "cbc(camellia)".
+
+  Thank you for clarification.
+
+> Is there a case where this is difficult?
+
+  As you said, ipsec-tools(setkey) won't have such problem. I think of
+  the user who uses iproute(ip).
+
+  Now, 2.6.21 is going to be shipped in Fedora Core7. So the user of
+  Camellia on the FC7 must use keyword "cbc(camellia)" with iproute.
+
+  I know it is my miss, but I hope this fix mamkes the configuration
+  to be more easy by using iproute.
+
+  Regards,
+
+P.S.
+  I don't know how many users use iproute to set IPsec:-).
+
+--
+Noriaki TAKAMIYA
