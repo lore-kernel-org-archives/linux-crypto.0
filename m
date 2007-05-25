@@ -1,32 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [1/1] HIFN: preliminary HIFN 795x driver for new async cryptoapi.
-Date: Fri, 25 May 2007 21:03:14 +1000
-Message-ID: <20070525110314.GB28366@gondor.apana.org.au>
-References: <20070523080354.GA19665@2ka.mipt.ru> <E1HrV37-00076a-00@gondolin.me.apana.org.au> <20070525090004.GB3808@2ka.mipt.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-crypto@ml.breakpoint.cc
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Date: Fri, 25 May 2007 21:35:32 +1000
+Message-ID: <E1HrY4y-0007Xf-00@gondolin.me.apana.org.au>
+References: <20070525102035.GA10069@2ka.mipt.ru>
+Cc: linux-crypto@vger.kernel.org
+To: johnpol@2ka.mipt.ru (Evgeniy Polyakov)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4056 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4270 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751470AbXEYLDQ (ORCPT
+	with ESMTP id S1750936AbXEYLfe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 May 2007 07:03:16 -0400
-Content-Disposition: inline
-In-Reply-To: <20070525090004.GB3808@2ka.mipt.ru>
+	Fri, 25 May 2007 07:35:34 -0400
+In-Reply-To: <20070525102035.GA10069@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 25, 2007 at 01:00:05PM +0400, Evgeniy Polyakov wrote:
-> 
-> I think that would be good to have set of functions like
-> struct crypto_alg alloc_crypto_alg(char *name, setkey_callback,
-> encrypt/decrypt callbacks);
-> I will put them into driver initially for testing purposes, later
-> we could move them into generic code to be reused.
+Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
+>
+> So, dm-crypt will fail and will not try to process that block again, 
+> if crypto returns error. In acrypto I put a queue length as parameter 
+> to crypto device (crypto_alg in cryptoapi) structure, and acrypto 
+> load balancer always selected device which does have a space in the 
+> queue. I think something similar should be created for cryptoapi, so 
+> that even if device has higher prio it should not be selected until 
+> there is a place in its queue. Software implementation has infinite 
+> queue of course. In such case we do not need to have backlog queue,
+> which can be overflown too.
 
-I completely agree.
+The way I've solved is using the MAY_BACKLOG flag.  It's basically
+an emergency reserve queue of length 1.  So for each tfm object,
+you're guaranteed to be able to queue at least one request which
+is sufficient.
+
+This reminds me, I need to refresh my dm-crypt patch and repost it.
 
 Cheers,
 -- 
