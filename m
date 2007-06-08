@@ -1,41 +1,33 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [1/1 take 2] HIFN: preliminary HIFN 795x driver for new async cryptoapi.
-Date: Tue, 5 Jun 2007 19:02:45 +0400
-Message-ID: <20070605150245.GA29400@2ka.mipt.ru>
-References: <20070604134248.GA9645@2ka.mipt.ru> <20070605125604.GA16327@Chamillionaire.breakpoint.cc> <20070605130731.GA4643@2ka.mipt.ru>
+From: Marc St-Jean <Marc_St-Jean@pmc-sierra.com>
+Subject: Where has CRYPTO_TFM_MODE_nnn gone?
+Date: Thu, 7 Jun 2007 17:06:17 -0700
+Message-ID: <46689D79.8020908@pmc-sierra.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Cc: Shane McDonald <Shane_McDonald@pmc-sierra.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:53567 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754159AbXFEPD1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jun 2007 11:03:27 -0400
-Content-Disposition: inline
-In-Reply-To: <20070605130731.GA4643@2ka.mipt.ru>
+Received: from father.pmc-sierra.com ([216.241.224.13]:39251 "HELO
+	father.pmc-sierra.bc.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1765426AbXFHANg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Jun 2007 20:13:36 -0400
+Received: from bby1exi01.pmc_nt.nt.pmc-sierra.bc.ca (bby1exi01.pmc-sierra.bc.ca [216.241.231.251])
+	by pmxedge2.pmc-sierra.bc.ca (8.13.4/8.12.7) with ESMTP id l5806sdr003867
+	for <linux-crypto@vger.kernel.org>; Thu, 7 Jun 2007 17:06:54 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 05, 2007 at 05:07:31PM +0400, Evgeniy Polyakov (johnpol@2ka.mipt.ru) wrote:
-> This is tricky, hifn requires to have a key per crypto setup, so this
-> one must be in a crypto context, but context is not used right now, so
-> yes, it supports only one user. I will update it to use context, since
-> it is smaller that hifn_device.
+Hi all,
 
-Hmm, I was wrong, it is not possible (from first view).
+I'm porting a security engine driver from 2.6.18 to 2.6.21/22. I've found
+that although 'cit_mode' is still in struct cipher_tfm, the definitions
+for CRYPTO_TFM_MODE_ECB and CRYPTO_TFM_MODE_CBC are gone!
 
-Here is a sequence of events to setup a crypto session:
-1. user calls setkey, which results in tfm. It is possible to get a
-context from tfm. Context can be initialized via cra_init() callback in
-registered algorithm. But there is no way to provide a private pointer
-into that callback. So, there is no way to provide a pointer to
-hifn_device and thus tfm context can not find a hardware device to setup
-this session.
+Our HW needs to know what mode to set up some SA flags. Any advice on
+how to best find this mode from a common cipher function which can handle
+AES, DES and 3DES?
 
-Herbert, could you please elaborate how to provide a private pointer
-into cra_init without searching via static lists of all devices?
-
--- 
-	Evgeniy Polyakov
+Advance thanks,
+Marc
