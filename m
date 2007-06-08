@@ -1,33 +1,42 @@
-From: Marc St-Jean <Marc_St-Jean@pmc-sierra.com>
-Subject: Where has CRYPTO_TFM_MODE_nnn gone?
-Date: Thu, 7 Jun 2007 17:06:17 -0700
-Message-ID: <46689D79.8020908@pmc-sierra.com>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Cc: Shane McDonald <Shane_McDonald@pmc-sierra.com>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Where has CRYPTO_TFM_MODE_nnn gone?
+Date: Fri, 08 Jun 2007 16:17:48 +1000
+Message-ID: <E1HwXnA-0005QC-00@gondolin.me.apana.org.au>
+References: <46689D79.8020908@pmc-sierra.com>
+Cc: linux-crypto@vger.kernel.org, Shane_McDonald@pmc-sierra.com
+To: Marc_St-Jean@pmc-sierra.com (Marc St-Jean)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from father.pmc-sierra.com ([216.241.224.13]:39251 "HELO
-	father.pmc-sierra.bc.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1765426AbXFHANg (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:2281 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754843AbXFHGRz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Jun 2007 20:13:36 -0400
-Received: from bby1exi01.pmc_nt.nt.pmc-sierra.bc.ca (bby1exi01.pmc-sierra.bc.ca [216.241.231.251])
-	by pmxedge2.pmc-sierra.bc.ca (8.13.4/8.12.7) with ESMTP id l5806sdr003867
-	for <linux-crypto@vger.kernel.org>; Thu, 7 Jun 2007 17:06:54 -0700
+	Fri, 8 Jun 2007 02:17:55 -0400
+In-Reply-To: <46689D79.8020908@pmc-sierra.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+Marc St-Jean <Marc_St-Jean@pmc-sierra.com> wrote:
+> 
+> I'm porting a security engine driver from 2.6.18 to 2.6.21/22. I've found
+> that although 'cit_mode' is still in struct cipher_tfm, the definitions
+> for CRYPTO_TFM_MODE_ECB and CRYPTO_TFM_MODE_CBC are gone!
 
-I'm porting a security engine driver from 2.6.18 to 2.6.21/22. I've found
-that although 'cit_mode' is still in struct cipher_tfm, the definitions
-for CRYPTO_TFM_MODE_ECB and CRYPTO_TFM_MODE_CBC are gone!
+Thanks for noticing it, I'll make sure that cit_mode disappears :)
 
-Our HW needs to know what mode to set up some SA flags. Any advice on
-how to best find this mode from a common cipher function which can handle
-AES, DES and 3DES?
+> Our HW needs to know what mode to set up some SA flags. Any advice on
+> how to best find this mode from a common cipher function which can handle
+> AES, DES and 3DES?
 
-Advance thanks,
-Marc
+The block algorithm is now part of the name just like the cipher
+algorithm itself.  So if you're providing a block cipher you should
+register it as "cbc(aes)" (for example) instead of "aes" as you would've
+done previously.
+
+Check out drivers/crypto/padlock* for a good example.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
