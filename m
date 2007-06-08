@@ -1,77 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Where has CRYPTO_TFM_MODE_nnn gone?
-Date: Fri, 8 Jun 2007 16:26:52 +1000
-Message-ID: <20070608062652.GA21503@gondor.apana.org.au>
-References: <46689D79.8020908@pmc-sierra.com> <E1HwXnA-0005QC-00@gondolin.me.apana.org.au>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: [PATCH/RFC] [Crypto] Check if ablkcipher->queue field is used.
+Date: Fri, 8 Jun 2007 19:55:51 +0200
+Message-ID: <20070608175551.GA8770@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Shane_McDonald@pmc-sierra.com
-To: Marc St-Jean <Marc_St-Jean@pmc-sierra.com>
+Content-Type: text/plain; charset=iso-8859-15
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2315 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756537AbXFHG0z (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:51404 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1762787AbXFHRzw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jun 2007 02:26:55 -0400
+	Fri, 8 Jun 2007 13:55:52 -0400
+Received: id: bigeasy by Chamillionaire.breakpoint.cc with local
+	(easymta 1.00 BETA 1)
+	id 1Hwigh-0002rI-LF
+	for linux-crypto@vger.kernel.org; Fri, 08 Jun 2007 19:55:51 +0200
 Content-Disposition: inline
-In-Reply-To: <E1HwXnA-0005QC-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 08, 2007 at 04:17:48PM +1000, Herbert Xu wrote:
-> Marc St-Jean <Marc_St-Jean@pmc-sierra.com> wrote:
-> > 
-> > I'm porting a security engine driver from 2.6.18 to 2.6.21/22. I've found
-> > that although 'cit_mode' is still in struct cipher_tfm, the definitions
-> > for CRYPTO_TFM_MODE_ECB and CRYPTO_TFM_MODE_CBC are gone!
-> 
-> Thanks for noticing it, I'll make sure that cit_mode disappears :)
+Evgeniy's hifn driver and probably mine don't use ablkcipher->queue at all. 
+The show method of ablkcipher will access this field without checking if it 
+is valid.
 
-Here is the patch.
-
-[CRYPTO] cipher: Remove obsolete fields from cipher_tfm
-
-This removes all the unused block cipher fields from cipher_tfm.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 0de7e2a..357e8cf 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -295,28 +295,8 @@ struct blkcipher_tfm {
- };
+Signed-off-by: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Index: b/crypto/ablkcipher.c
+===================================================================
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -91,8 +91,10 @@ static void crypto_ablkcipher_show(struc
+ 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
+ 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
+ 	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
+-	seq_printf(m, "qlen         : %u\n", ablkcipher->queue->qlen);
+-	seq_printf(m, "max qlen     : %u\n", ablkcipher->queue->max_qlen);
++	if (ablkcipher->queue) {
++		seq_printf(m, "qlen         : %u\n", ablkcipher->queue->qlen);
++		seq_printf(m, "max qlen     : %u\n", ablkcipher->queue->max_qlen);
++	}
+ }
  
- struct cipher_tfm {
--	void *cit_iv;
--	unsigned int cit_ivsize;
--	u32 cit_mode;
- 	int (*cit_setkey)(struct crypto_tfm *tfm,
- 	                  const u8 *key, unsigned int keylen);
--	int (*cit_encrypt)(struct crypto_tfm *tfm,
--			   struct scatterlist *dst,
--			   struct scatterlist *src,
--			   unsigned int nbytes);
--	int (*cit_encrypt_iv)(struct crypto_tfm *tfm,
--	                      struct scatterlist *dst,
--	                      struct scatterlist *src,
--	                      unsigned int nbytes, u8 *iv);
--	int (*cit_decrypt)(struct crypto_tfm *tfm,
--			   struct scatterlist *dst,
--			   struct scatterlist *src,
--			   unsigned int nbytes);
--	int (*cit_decrypt_iv)(struct crypto_tfm *tfm,
--			   struct scatterlist *dst,
--			   struct scatterlist *src,
--			   unsigned int nbytes, u8 *iv);
--	void (*cit_xor_block)(u8 *dst, const u8 *src);
- 	void (*cit_encrypt_one)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
- 	void (*cit_decrypt_one)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
- };
+ const struct crypto_type crypto_ablkcipher_type = {
