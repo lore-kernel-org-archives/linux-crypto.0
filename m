@@ -1,43 +1,61 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [PATCH/RFC] [Crypto] Check if ablkcipher->queue field is used.
-Date: Fri, 8 Jun 2007 19:55:51 +0200
-Message-ID: <20070608175551.GA8770@Chamillionaire.breakpoint.cc>
+From: Marc St-Jean <Marc_St-Jean@pmc-sierra.com>
+Subject: Re: Where has CRYPTO_TFM_MODE_nnn gone?
+Date: Fri, 8 Jun 2007 12:13:17 -0700
+Message-ID: <4669AA4D.5040708@pmc-sierra.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Cc: linux-crypto@vger.kernel.org,
+	Shane McDonald <Shane_McDonald@pmc-sierra.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:51404 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1762787AbXFHRzw (ORCPT
+Received: from mother.pmc-sierra.com ([216.241.224.12]:37556 "HELO
+	mother.pmc-sierra.bc.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750908AbXFHTNj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jun 2007 13:55:52 -0400
-Received: id: bigeasy by Chamillionaire.breakpoint.cc with local
-	(easymta 1.00 BETA 1)
-	id 1Hwigh-0002rI-LF
-	for linux-crypto@vger.kernel.org; Fri, 08 Jun 2007 19:55:51 +0200
-Content-Disposition: inline
+	Fri, 8 Jun 2007 15:13:39 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Evgeniy's hifn driver and probably mine don't use ablkcipher->queue at all. 
-The show method of ablkcipher will access this field without checking if it 
-is valid.
+Herbert Xu wrote:
+> Marc St-Jean <Marc_St-Jean@pmc-sierra.com> wrote:
+>  >
+>  > I'm porting a security engine driver from 2.6.18 to 2.6.21/22. I've 
+> found
+>  > that although 'cit_mode' is still in struct cipher_tfm, the definitions
+>  > for CRYPTO_TFM_MODE_ECB and CRYPTO_TFM_MODE_CBC are gone!
+> 
+> Thanks for noticing it, I'll make sure that cit_mode disappears :)
 
-Signed-off-by: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Index: b/crypto/ablkcipher.c
-===================================================================
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -91,8 +91,10 @@ static void crypto_ablkcipher_show(struc
- 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
- 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
- 	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
--	seq_printf(m, "qlen         : %u\n", ablkcipher->queue->qlen);
--	seq_printf(m, "max qlen     : %u\n", ablkcipher->queue->max_qlen);
-+	if (ablkcipher->queue) {
-+		seq_printf(m, "qlen         : %u\n", ablkcipher->queue->qlen);
-+		seq_printf(m, "max qlen     : %u\n", ablkcipher->queue->max_qlen);
-+	}
- }
- 
- const struct crypto_type crypto_ablkcipher_type = {
+No problem :) Looking at your patch I see that you've also dropped
+cit_encrypt_iv/cit_decrypt_iv. That is likely related to my next question
+regarding crypto_tfm_alg_ivsize().
+
+In CBC mode we had a line of code copying cipher_desc.info to get the
+initialization vector. Such as:
+		/* Copy in IV */
+		memcpy((u8*)(sa->crypt_iv), desc->info,
+			crypto_tfm_alg_ivsize(tfm));
+
+Now the only reference to the function I can find is in an IPsec comment
+from include/net/esp.h. Any tips on getting the size?
+
+
+>  > Our HW needs to know what mode to set up some SA flags. Any advice on
+>  > how to best find this mode from a common cipher function which can 
+> handle
+>  > AES, DES and 3DES?
+> 
+> The block algorithm is now part of the name just like the cipher
+> algorithm itself.  So if you're providing a block cipher you should
+> register it as "cbc(aes)" (for example) instead of "aes" as you would've
+> done previously.
+
+And if we can support both I assume we must register multiple times?
+
+> Check out drivers/crypto/padlock* for a good example.
+
+Thanks, I have been looking at that code but unfortunately it supports
+fewer cryptos/hashes so does not answer all my questions.
+
+Marc
