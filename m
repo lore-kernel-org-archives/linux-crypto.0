@@ -1,62 +1,89 @@
-From: Matt Mackall <mpm@selenic.com>
-Subject: Re: [PATCH 2/3] [CRYPTO] Add optimized SHA-1 implementation for i486+
-Date: Sun, 10 Jun 2007 12:33:45 -0500
-Message-ID: <20070610173345.GV11115@waste.org>
-References: <20070608214242.23949.30350.stgit@dev> <20070608214253.23949.40465.stgit@dev> <20070609201159.GC11166@waste.org> <466B0C3F.3040300@garzik.org> <466B46D5.1020004@cs.cmu.edu> <20070610135956.GS11115@waste.org> <466C2B17.8000708@cs.cmu.edu>
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 3/3] [CRYPTO] Add optimized SHA-1 implementation for x86_64
+Date: 11 Jun 2007 14:01:56 +0200
+Message-ID: <p73lkeqvgwb.fsf@bingen.suse.de>
+References: <20070608214242.23949.30350.stgit@dev>
+	<20070608214258.23949.67358.stgit@dev>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jeff Garzik <jeff@garzik.org>, akpm@linux-foundation.org,
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Benjamin Gilbert <bgilbert@cs.cmu.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from waste.org ([66.93.16.53]:54972 "EHLO waste.org"
+Received: from mx1.suse.de ([195.135.220.2]:59774 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754073AbXFJReT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Jun 2007 13:34:19 -0400
-Content-Disposition: inline
-In-Reply-To: <466C2B17.8000708@cs.cmu.edu>
+	id S1750930AbXFKLGF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 Jun 2007 07:06:05 -0400
+In-Reply-To: <20070608214258.23949.67358.stgit@dev>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 10, 2007 at 12:47:19PM -0400, Benjamin Gilbert wrote:
-> Matt Mackall wrote:
-> >On Sat, Jun 09, 2007 at 08:33:25PM -0400, Benjamin Gilbert wrote:
-> >>It's not just the loop unrolling; it's the register allocation and 
-> >>spilling.  For comparison, I built SHATransform() from the 
-> >>drivers/char/random.c in 2.6.11, using gcc 3.3.5 with -O2 and 
-> >>SHA_CODE_SIZE == 3 (i.e., fully unrolled); I'm guessing this is pretty 
-> >>close to what you tested back then.  The resulting code is 49% MOV 
-> >>instructions, and 80% of *those* involve memory.  gcc4 is somewhat 
-> >>better, but it still spills a whole lot, both for the 2.6.11 unrolled 
-> >>code and for the current lib/sha1.c.
-> >
-> >Wait, your benchmark is comparing against the unrolled code?
-> 
-> No, it's comparing the current lib/sha1.c to the optimized code in the 
-> patch.  I was just pointing out that the unrolled code you were likely 
-> testing against, back then, may not have been very good.  (Though I 
-> assumed that you were talking about the unrolled code in random.c, not 
-> the code in CryptoAPI, so that might change the numbers some.  It 
-> appears from the post you linked below that the unrolled CryptoAPI code 
-> still beat the rolled version?)
+Benjamin Gilbert <bgilbert@cs.cmu.edu> writes:
 
-That predates lib/sha1.c by a while.
+> +/* push/pop wrappers that update the DWARF unwind table */
+> +#define PUSH(regname)						\
+> +	push			%regname;			\
+> +	CFI_ADJUST_CFA_OFFSET	8;				\
+> +	CFI_REL_OFFSET		regname, 0
+> +
+> +#define POP(regname)						\
+> +	pop			%regname;			\
+> +	CFI_ADJUST_CFA_OFFSET	-8;				\
+> +	CFI_RESTORE		regname
 
-> >How big is the -code- footprint?
-> 
-> About 3700 bytes for the 32-bit version of sha_transform().
+Please don't do these kinds of wrappers. They just obfuscate the code.
 
-lib/sha1.c's footprint is... 621 bytes today. Huh. That's up from 466
-bytes when it was introduced and no one's touched it:
+And BTW plain gas macros (.macro) are much nicer to read too
+than cpp macros.
 
-http://search.luky.org/ML/linux-kernel.2005/msg06648.html
 
-Stupid compilers.
+> +#define EXPAND(i)						\
+> +	movl	OFFSET(i % 16)(DATA), TMP;			\
+> +	xorl	OFFSET((i + 2) % 16)(DATA), TMP;		\
 
-But anyway. Cache footprint matters. The two big users of SHA1 in the
-kernel are /dev/random and IPSec, both of which typically operate on
-small chunks of data.
+Such overlapping memory accesses are somewhat dangerous as they tend
+to stall some CPUs.  Better probably to do a quad load and then extract.
 
--- 
-Mathematics is the supreme nostalgia of our time.
+If you care about the last cycle I would suggest you run 
+it at least once through the Pipeline simulator in the Linux
+version of AMD CodeAnalyst or through vtune.
+
+I haven't checked in detail if it's possible but it's suspicious you
+never use quad operations for anything. You keep at least half
+the CPU's bits idle all the time.
+
+> +	EXPAND(75); ROUND(SA, SB, SC, SD, SE, F2, TMP)
+> +	EXPAND(76); ROUND(SE, SA, SB, SC, SD, F2, TMP)
+> +	EXPAND(77); ROUND(SD, SE, SA, SB, SC, F2, TMP)
+> +	EXPAND(78); ROUND(SC, SD, SE, SA, SB, F2, TMP)
+> +	EXPAND(79); ROUND(SB, SC, SD, SE, SA, F2, TMP)
+
+Gut feeling is that the unroll factor is far too large.
+Have you tried a smaller one? That would save icache
+which is very important in the kernel. Unlike in your micro benchmark
+when kernel code runs normally caches are cold.  Smaller is faster then.
+And most kernel SHA applications don't process very much data anyways
+so startup costs are important.
+
+> diff --git a/lib/Kconfig b/lib/Kconfig
+> index 69fdb64..23a84ed 100644
+> --- a/lib/Kconfig
+> +++ b/lib/Kconfig
+> @@ -132,9 +132,14 @@ config SHA1_X86
+>  	depends on (X86 || UML_X86) && !64BIT && X86_BSWAP
+>  	default y
+>  
+> +config SHA1_X86_64
+> +	bool
+> +	depends on (X86 || UML_X86) && 64BIT
+> +	default y
+> +
+>  config SHA1_GENERIC
+>  	bool
+> -	depends on !SHA1_X86
+> +	depends on !SHA1_X86 && !SHA1_X86_64
+
+Better define a SHA_ARCH_OPTIMIZED helper symbol, otherwise
+this will get messy as more architectures add optimized versions.
+
+-Andi
