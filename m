@@ -1,34 +1,39 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [patch 1/1] add cast to regain ablkcipher_request from private ctx
-Date: Fri, 22 Jun 2007 15:06:47 +0200
-Message-ID: <20070622130647.GB28000@Chamillionaire.breakpoint.cc>
-References: <20070612162023.GA25764@Chamillionaire.breakpoint.cc> <20070622123916.GA30017@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [1/1 take 2] HIFN: preliminary HIFN 795x driver for new async cryptoapi.
+Date: Fri, 22 Jun 2007 17:32:06 +0400
+Message-ID: <20070622133205.GA28828@2ka.mipt.ru>
+References: <20070604134248.GA9645@2ka.mipt.ru> <20070605125604.GA16327@Chamillionaire.breakpoint.cc> <20070605130731.GA4643@2ka.mipt.ru> <20070605150245.GA29400@2ka.mipt.ru> <20070622073448.GB27341@gondor.apana.org.au> <20070622115859.GB29425@2ka.mipt.ru> <20070622123731.GB29919@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=koi8-r
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:54792 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751152AbXFVNGu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2007 09:06:50 -0400
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:48701 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752004AbXFVNcV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Jun 2007 09:32:21 -0400
 Content-Disposition: inline
-In-Reply-To: <20070622123916.GA30017@gondor.apana.org.au>
+In-Reply-To: <20070622123731.GB29919@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-06-22 20:39:16 [+0800]:
+On Fri, Jun 22, 2007 at 08:37:31PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> On Fri, Jun 22, 2007 at 03:58:59PM +0400, Evgeniy Polyakov wrote:
+> >
+> > > The crypto_alg object should contain a back pointer to the device.
+> > > In setkey, you have access to a tfm object which has a pointer to
+> > > the crypto_alg object.
+> > 
+> > crypto_alg does not contain it, or do I miss something?
+> 
+> You're right that it's not there as such.  However, there's
+> nothing stopping you from allocating struct crypto_alg + ctx
+> and putting your pointer there.
 
->On Tue, Jun 12, 2007 at 04:20:23PM +0000, Sebastian Siewior wrote:
->> This cast allows to regain the struct ablkcipher_request for a request 
->> from private data.
->
->How about just passing the ablkcipher_request instead of the ctx?
-Not pretty/possible/wanted.
-I could write now 20 lines of text that explains it. Instead I defer it
-until I post my source for the driver what is hopefully soon.
+Argh, I understand now. I will create an access wrapper in HIFN driver
+for such access for now, if there will be some API changes it will be
+possible to rewrite.
 
->Cheers,
-
-Sebastian
+-- 
+	Evgeniy Polyakov
