@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [1/1 take 2] HIFN: preliminary HIFN 795x driver for new async cryptoapi.
-Date: Fri, 22 Jun 2007 15:34:48 +0800
-Message-ID: <20070622073448.GB27341@gondor.apana.org.au>
-References: <20070604134248.GA9645@2ka.mipt.ru> <20070605125604.GA16327@Chamillionaire.breakpoint.cc> <20070605130731.GA4643@2ka.mipt.ru> <20070605150245.GA29400@2ka.mipt.ru>
+Subject: Re: [PATCH/RFC] [Crypto] Check if ablkcipher->queue field is used.
+Date: Fri, 22 Jun 2007 19:47:42 +0800
+Message-ID: <20070622114741.GA28395@gondor.apana.org.au>
+References: <20070608175551.GA8770@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2264 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3402 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750833AbXFVHew (ORCPT
+	with ESMTP id S1752334AbXFVLro (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2007 03:34:52 -0400
+	Fri, 22 Jun 2007 07:47:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20070605150245.GA29400@2ka.mipt.ru>
+In-Reply-To: <20070608175551.GA8770@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 05, 2007 at 07:02:45PM +0400, Evgeniy Polyakov wrote:
+On Fri, Jun 08, 2007 at 05:55:51PM +0000, Sebastian Siewior wrote:
+> Evgeniy's hifn driver and probably mine don't use ablkcipher->queue at all. 
+> The show method of ablkcipher will access this field without checking if it 
+> is valid.
 > 
-> Herbert, could you please elaborate how to provide a private pointer
-> into cra_init without searching via static lists of all devices?
+> Signed-off-by: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 
-The crypto_alg object should contain a back pointer to the device.
-In setkey, you have access to a tfm object which has a pointer to
-the crypto_alg object.
+Actually Evgeniy really needs to have a queue to handle users such
+as dm-crypt.
 
-Cheers,
+However, I agree with your patch since it is quite valid to not have
+a queue, e.g., a load balancer wouldn't need one since it's only
+passing the request on.
+
+So patch applied.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
