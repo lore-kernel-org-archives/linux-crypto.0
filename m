@@ -1,660 +1,759 @@
 From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [RFC 1/2] SPU-AES support (kernel side)
-Date: Wed, 27 Jun 2007 01:00:27 +0200
-Message-ID: <20070626230027.GA4581@Chamillionaire.breakpoint.cc>
+Subject: [RFC 2/2] add kernel support for spu task
+Date: Wed, 27 Jun 2007 01:00:49 +0200
+Message-ID: <20070626230049.GA4615@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-15
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:36772 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:36774 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752020AbXFZXA2 (ORCPT
+	by vger.kernel.org with ESMTP id S1755969AbXFZXAv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jun 2007 19:00:28 -0400
-Content-Disposition: inline; filename="aes-spu-async2.diff"
+	Tue, 26 Jun 2007 19:00:51 -0400
+Content-Disposition: inline; filename="spufs-add_kernel_spu_support.diff"
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch implements the AES cipher algorithm which is executed on the
-SPU using the crypto async interface. Currently only the ECB mode is
-implemented. The AES code that is executed on the SPU has been left
-apart (it is not exciting anyway).
+Utilisation of SPUs by the kernel, main implementation. 
+The idea behind this implementation is that there are single jobs that are
+executed asynchronous on the SPU. The user queues jobs with
+enqueue_for_spu() and gets a callback once the job is completed. The
+function itself does not block. The job will be queued in a linked list 
+(protected by a spinlock, calls from softirq context are possible) and the 
+kthread that handles the SPU will be woken up.
+The SPU thread takes the first element from the list, and calls the
+enqueue function supplied by the user. The user has now the chance to fill
+the ring buffer entry and set a callback for notification which will be
+called once the SPU code accomplished the task. The queue function has
+to ensure alignment & valid transfer size.
 
 Signed-off-by: Sebastian Siewior <bigeasy@breakpoint.cc>
---- a/arch/powerpc/platforms/cell/Makefile
-+++ b/arch/powerpc/platforms/cell/Makefile
-@@ -22,4 +22,5 @@ obj-$(CONFIG_SPU_BASE)			+= spu_callback
- 					   $(spufs-modular-m) \
- 					   $(spu-priv1-y) \
- 					   $(spu-manage-y) \
-+					   crypto/ \
- 					   spufs/
 --- /dev/null
-+++ b/arch/powerpc/platforms/cell/crypto/Kconfig
-@@ -0,0 +1,12 @@
-+config CRYPTO_AES_SPU
-+	tristate "AES cipher algorithm (SPU support)"
-+	select CRYPTO_ABLKCIPHER
-+	depends on SPU_KERNEL_SUPPORT
-+	default m
-+	help
-+	  AES cipher algorithms (FIPS-197). AES uses the Rijndael
-+	  algorithm.
-+	  The AES specifies three key sizes: 128, 192 and 256 bits.
-+	  See <http://csrc.nist.gov/CryptoToolkit/aes/> for more information.
-+
-+	  This version of AES performs its work on a SPU core.
---- /dev/null
-+++ b/arch/powerpc/platforms/cell/crypto/aes_spu_wrap.c
-@@ -0,0 +1,479 @@
++++ b/arch/powerpc/platforms/cell/spufs/kspu_helper.c
+@@ -0,0 +1,518 @@
 +/*
-+ * AES interface module for the async crypto API.
++ * Interface for accessing SPUs from the kernel.
 + *
 + * Author: Sebastian Siewior <bigeasy@breakpoint.cc>
 + * License: GPLv2
 + */
 +
-+#include <asm/byteorder.h>
-+#include <asm/system.h>
++#include <asm/spu_priv1.h>
 +#include <asm/kspu/kspu.h>
 +#include <asm/kspu/merged_code.h>
-+#include <crypto/algapi.h>
++#include <linux/kthread.h>
 +#include <linux/module.h>
-+#include <linux/crypto.h>
-+#include <linux/mutex.h>
-+#include <linux/err.h>
-+#include <linux/list.h>
-+#include <linux/delay.h>
-+#include <linux/spinlock.h>
-+#include <linux/mm.h>
-+#include <linux/scatterlist.h>
-+#include <linux/highmem.h>
-+#include <linux/vmalloc.h>
++#include <linux/init_task.h>
++#include <linux/hardirq.h>
++#include <linux/kernel.h>
++#include "spufs.h"
++#include "kspu_util.h"
 +
-+#include "aes_vmx_addon.h"
-+
-+struct map_key_spu {
-+	struct list_head list;
-+	unsigned int spu_slot;
-+	struct aes_ctx *slot_content;
-+};
-+
-+struct aes_ctx {
-+	/* the key used for enc|dec purpose */
-+	struct aes_key_struct key;
-+	/* identify the slot on the SPU */
-+	struct map_key_spu *key_mapping;
-+	/* identify the SPU that is used */
-+	struct async_aes *spe_ctx;
-+};
-+
-+struct async_d_request {
-+	enum SPU_FUNCTIONS crypto_operation;
-+	 /*
-+	  * If src|dst or iv is not properly aligned, we keep here a copy of
-+	  * it that is properly aligned.
-+	  */
-+	struct kspu_work_item kspu_work;
-+	unsigned char *al_data;
-+/*	unsigned char *aligned_iv; */
-+	unsigned char *mapped_src;
-+	unsigned char *mapped_dst;
-+	unsigned char *real_src;
-+	unsigned char *real_dst;
-+	unsigned int progress;
-+};
-+
-+struct async_aes {
-+	struct kspu_context *ctx;
-+	struct map_key_spu mapping_key_spu[SPU_KEY_SLOTS];
-+	struct list_head key_ring;
-+};
-+
-+static struct async_aes async_spu;
-+
-+#define AES_MIN_KEY_SIZE	16
-+#define AES_MAX_KEY_SIZE	32
-+#define AES_BLOCK_SIZE		16
-+#define ALIGN_MASK 15
-+#define MAX_TRANSFER_SIZE	(16 * 1024)
-+
-+static void cleanup_requests(struct ablkcipher_request *req,
-+		struct async_d_request *a_d_ctx)
++static int free_kspu_context(struct kspu_context *kctx)
 +{
-+	char *dst_addr;
-+	char *aligned_addr;
++	struct spu_context *spu_ctx = kctx->spu_ctx;
++	int ret;
 +
-+	if (a_d_ctx->al_data) {
-+		aligned_addr = (char *) ALIGN((unsigned long)
-+				a_d_ctx->al_data, ALIGN_MASK+1);
-+		dst_addr = a_d_ctx->mapped_dst + req->dst->offset;
++	if (spu_ctx->owner)
++		spu_forget(spu_ctx);
++	
++	put_spu_context(spu_ctx);
 +
-+		if ((unsigned long) dst_addr & ALIGN_MASK) {
-+			memcpy(dst_addr, aligned_addr, req->nbytes);
-+		}
-+		vfree(a_d_ctx->al_data);
-+		kunmap(a_d_ctx->mapped_dst);
-+		kunmap(a_d_ctx->mapped_src);
-+	}
-+#if 0
-+	if (a_d_ctx->aligned_iv) {
-+		memcpy(req->info, a_d_ctx->aligned_iv, MAX_TRANSFER_SIZE);
-+		kfree(a_d_ctx->aligned_iv);
-+	}
-+#endif
++
++	kfree(kctx->notify_cb_info);
++	kfree(kctx);
++
++	return ret;
 +}
 +
-+static void aes_finish_callback(struct kspu_work_item *kspu_work)
++static void setup_stack(struct kspu_context *kctx)
 +{
-+	struct async_d_request *a_d_ctx = container_of(kspu_work,
-+			struct async_d_request, kspu_work);
-+	struct ablkcipher_request *ablk_req = ablkcipher_ctx_cast(a_d_ctx);
++	struct spu_context *ctx = kctx->spu_ctx;
++	u8 *ls;
++	u32 *u32p;
 +
-+	a_d_ctx = ablkcipher_request_ctx(ablk_req);
-+	cleanup_requests(ablk_req, a_d_ctx);
++	spu_acquire_saved(ctx);
++	ls = ctx->ops->get_ls(ctx);
 +
-+	pr_debug("Request %p done, memory cleaned. Now calling crypto user\n",
-+			kspu_work);
-+	local_bh_disable();
-+	ablk_req->base.complete(&ablk_req->base, 0);
-+	local_bh_enable();
-+	return;
++#define BACKCHAIN (kctx->spu_code->kspu_data_offset - 16)
++#define STACK_GAP 176
++#define INITIAL_STACK (BACKCHAIN - STACK_GAP)
++
++	BUG_ON(INITIAL_STACK > KSPU_LS_SIZE);
++
++	u32p = (u32 *) &ls[BACKCHAIN];
++	u32p[0] = 0;
++	u32p[1] = 0;
++	u32p[2] = 0;
++	u32p[3] = 0;
++
++	u32p = (u32 *) &ls[INITIAL_STACK];
++	u32p[0] = BACKCHAIN;
++	u32p[1] = 0;
++	u32p[2] = 0;
++	u32p[3] = 0;
++
++	ctx->csa.lscsa->gprs[1].slot[0] = INITIAL_STACK;
++	spu_release(ctx);
++	pr_debug("SPU's stack ready 0x%04x\n", INITIAL_STACK);
 +}
 +
-+static void update_key_on_spu(struct aes_ctx *aes_ctx)
++static struct kspu_context *kcreate_spu_context(int flags,
++		struct kspu_code *spu_code)
 +{
-+	struct list_head *tail;
-+	struct map_key_spu *entry;
-+	struct aes_update_key *aes_update_key;
-+	struct kspu_job *work_item;
++	struct kspu_context *kctx;
++	struct spu_context *ctx;
++	unsigned int ret;
++	u8 *ls;
 +
-+	tail = async_spu.key_ring.prev;
-+	entry = list_entry(tail, struct map_key_spu, list);
-+	list_move(tail, &async_spu.key_ring);
++	flags |= SPU_CREATE_EVENTS_ENABLED;
++	ret = -EINVAL;
 +
-+	entry->slot_content = aes_ctx;
-+	aes_ctx->key_mapping = entry;
-+
-+	pr_debug("key for %p is not on the SPU. new slot: %d\n",
-+			aes_ctx, entry->spu_slot);
-+	work_item = kspu_get_rb_slot(aes_ctx->spe_ctx->ctx);
-+	work_item->operation = SPU_FUNC_aes_update_key;
-+	work_item->in = (unsigned long long) &aes_ctx->key;
-+	work_item->in_size = sizeof(aes_ctx->key);
-+
-+	aes_update_key = &work_item->aes_update_key;
-+	aes_update_key->keyid = entry->spu_slot;
-+
-+	kspu_mark_rb_slot_ready(aes_ctx->spe_ctx->ctx, NULL);
-+}
-+
-+static int prepare_request_mem(struct ablkcipher_request *req,
-+		struct async_d_request *a_d_ctx, struct aes_ctx *aes_ctx)
-+{
-+	char *src_addr, *dst_addr;
-+	char *aligned_addr;
-+
-+	a_d_ctx->mapped_src = kmap(req->src->page);
-+	if (!a_d_ctx->mapped_src)
++	if (flags & (~SPU_CREATE_FLAG_ALL))
++		goto err;
++	/*
++	 * it must be a multiple of 16 because this value is used to calculate
++	 * the initial stack frame which must be 16byte aligned
++	 */
++	if (spu_code->kspu_data_offset & 15)
 +		goto err;
 +
-+	a_d_ctx->mapped_dst = kmap(req->dst->page);
-+	if (!a_d_ctx->mapped_dst) {
-+		goto err_src;
-+	}
++	pr_debug("SPU's queue: %d elemets, %d bytes each (%d bytes total)\n",
++			spu_code->queue_mask+1, spu_code->queue_entr_size,
++			(spu_code->queue_mask+1) * spu_code->queue_entr_size);
 +
-+	src_addr = a_d_ctx->mapped_src + req->src->offset;
-+	dst_addr = a_d_ctx->mapped_dst + req->dst->offset;
++	ret = -EFBIG;
++	if (spu_code->code_len > KSPU_LS_SIZE)
++		goto err;
 +
-+	if ((unsigned long) src_addr & ALIGN_MASK ||
-+			(unsigned long) dst_addr & ALIGN_MASK) {
-+		/*
-+		 * vmalloc() is somewhat slower than __get_free_page().
-+		 * However, this is the slowpath. I expect the user to align
-+		 * properly in first place :).
-+		 * The reason for vmalloc() is that req->nbytes may be larger
-+		 * than one page and I don't want distinguish later where that
-+		 * memory come from.
-+		 */
-+		a_d_ctx->al_data = (char *) vmalloc(req->nbytes + ALIGN_MASK);
-+		if (!a_d_ctx->al_data) {
-+			goto err_dst;
-+		}
++	ret = -ENOMEM;
++	kctx = kzalloc(sizeof *kctx, GFP_KERNEL);
++	if (!kctx)
++		goto err;
 +
-+		aligned_addr = (char *) ALIGN((unsigned long)a_d_ctx->
-+				al_data, ALIGN_MASK+1);
-+		pr_debug("Unaligned data replaced with %p (%p)\n",
-+				a_d_ctx->al_data, aligned_addr);
++	kctx->spu_code = spu_code;
++	init_waitqueue_head(&kctx->newitem_wq);
++	spin_lock_init(&kctx->queue_lock);
++	INIT_LIST_HEAD(&kctx->work_queue);
++	kctx->notify_cb_info = kzalloc(sizeof(*kctx->notify_cb_info) *
++			(kctx->spu_code->queue_mask+1), GFP_KERNEL);
++	if (!kctx->notify_cb_info)
++		goto err_notify;
 +
-+		if ((unsigned long) src_addr & ALIGN_MASK) {
-+			memcpy(aligned_addr, src_addr, req->nbytes);
-+			a_d_ctx->real_src = aligned_addr;
-+		}
++	ctx = kalloc_spu_context();
++	if (!ctx)
++		goto err_spu_ctx;
 +
-+		if ((unsigned long) dst_addr & ALIGN_MASK) {
-+			a_d_ctx->real_dst = aligned_addr;
-+		}
-+	} else {
-+		a_d_ctx->al_data = NULL;
-+		a_d_ctx->real_src = src_addr;
-+		a_d_ctx->real_dst = dst_addr;
-+	}
-+#if 0
-+	pr_debug("aligned_IV: %p\n", a_d_ctx->aligned_iv);
++	kctx->spu_ctx = ctx;
++	ctx->flags = flags;
 +
-+	if ((unsigned long) req->info & ALIGN_MASK)
-+		a_d_ctx->aligned_iv = NULL;
-+	else
-+		a_d_ctx->aligned_iv = NULL;
-+#endif
-+	return 0;
-+err_dst:
-+	kunmap(a_d_ctx->mapped_dst);
-+err_src:
-+	kunmap(a_d_ctx->mapped_src);
++	spu_acquire(ctx);
++	ls = ctx->ops->get_ls(ctx);
++	memcpy(ls, spu_code->code, spu_code->code_len);
++	spu_release(ctx);
++	setup_stack(kctx);
++
++	return kctx;
++
++err_spu_ctx:
++	kfree(kctx->notify_cb_info);
++
++err_notify:
++	kfree(kctx);
 +err:
-+	return -ENOMEM;
-+
++	return ERR_PTR(ret);
 +}
 +
-+/*
-+ * aes_queue_work_items() is called by kspu to queue the work item on the SPU.
-+ * kspu ensures atleast one slot when calling. The function may return 0 if
-+ * more slots were required but not available. In this case, kspu will call
-+ * again with the same work item. The function has to notice that this work
-+ * item has been allready started and continue.
-+ * Other return values (!=0) will remove the work item from list.
++/**
++ * kspu_get_rb_slot - get a free slot to queue a work request on the SPU.
++ * @kctx:	kspu context, where the free slot is required
++ *
++ * Returns a free slot where a request may be queued on. Repeated calls will
++ * return the same slot until it is marked as taken (by
++ * kspu_mark_rb_slot_ready()).
 + */
-+static int aes_queue_work_items(struct kspu_work_item *kspu_work)
++struct kspu_job *kspu_get_rb_slot(struct kspu_context *kctx)
 +{
-+	struct async_d_request *a_d_ctx = container_of(kspu_work,
-+			struct async_d_request, kspu_work);
-+	struct ablkcipher_request *ablk_req = ablkcipher_ctx_cast(a_d_ctx);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(ablk_req);
-+	struct aes_ctx *aes_ctx = crypto_ablkcipher_ctx(tfm);
-+	struct kspu_job *work_item;
-+	struct aes_crypt *aes_crypt;
-+	int size_left, ret;
++	struct kspu_ring_data *ring_data;
++	unsigned char *ls;
++	int consumed, outstanding, queue_mask;
 +
-+	BUG_ON(ablk_req->nbytes & (AES_BLOCK_SIZE-1));
++	ls = kctx->spu_ctx->ops->get_ls(kctx->spu_ctx);
++	ls += kctx->spu_code->kspu_data_offset;
++	ring_data = (struct kspu_ring_data *) ls;
 +
-+	if (!a_d_ctx->progress) {
-+		if (!aes_ctx->key_mapping || aes_ctx !=
-+				aes_ctx->key_mapping->slot_content)
-+			update_key_on_spu(aes_ctx);
++	queue_mask = kctx->spu_code->queue_mask;
++	consumed = ring_data->consumed;
++	outstanding = ring_data->outstanding;
 +
-+		else
-+			list_move(&aes_ctx->key_mapping->list,
-+					&async_spu.key_ring);
++	outstanding++;
 +
-+		ret = prepare_request_mem(ablk_req, a_d_ctx, aes_ctx);
-+		if (ret)
-+			return 0;
++	if ((outstanding & queue_mask) ==
++			(consumed & queue_mask))
++		return NULL;
++
++	outstanding = ring_data->outstanding;
++
++	ls += sizeof (struct kspu_ring_data);
++	/* ls points now to the first queue slot */
++	ls += kctx->spu_code->queue_entr_size * (outstanding & queue_mask);
++
++	pr_debug("Return slot %d, at %p\n", (outstanding&queue_mask), ls);
++	return (struct kspu_job *) ls;
++
++}
++EXPORT_SYMBOL_GPL(kspu_get_rb_slot);
++
++/*
++ * kspu_mark_rb_slot_ready - mark a request valid.
++ * @kctx:	kspu context that the request belongs to
++ * @work:	work item that is used for notification. May be NULL.
++ *
++ * The slot will be marked as valid not returned kspu_get_rb_slot() until
++ * the request is processed. If @work is not NULL, work->notify will be
++ * called to notify the user, that his request is done.
++ */
++void kspu_mark_rb_slot_ready(struct kspu_context *kctx,
++		struct kspu_work_item *work)
++{
++	struct kspu_ring_data *ring_data;
++	unsigned char *ls;
++	int outstanding, queue_mask;
++
++	ls = kctx->spu_ctx->ops->get_ls(kctx->spu_ctx);
++	ls += kctx->spu_code->kspu_data_offset;
++	ring_data = (struct kspu_ring_data *) ls;
++
++	queue_mask = kctx->spu_code->queue_mask;
++	outstanding = ring_data->outstanding;
++	kctx->notify_cb_info[outstanding & queue_mask] = work;
++	pr_debug("item ready: outs %d, notification data %p\n",
++			outstanding &queue_mask, work);
++	outstanding++;
++	BUG_ON(outstanding == ring_data->consumed);
++	ring_data->outstanding = outstanding;
++}
++EXPORT_SYMBOL_GPL(kspu_mark_rb_slot_ready);
++
++static int notify_done_reqs(struct kspu_context *kctx)
++{
++	struct kspu_ring_data *ring_data;
++	struct kspu_work_item *kspu_work;
++	unsigned char *ls;
++	unsigned int current_notify, queue_mask;
++	unsigned ret = 0;
++
++	ls = kctx->spu_ctx->ops->get_ls(kctx->spu_ctx);
++	ls += kctx->spu_code->kspu_data_offset;
++	ring_data = (struct kspu_ring_data *) ls;
++	ls += sizeof (struct kspu_ring_data);
++
++	current_notify = kctx->last_notified;
++	queue_mask = kctx->spu_code->queue_mask;
++	pr_debug("notify| %d | %d\n", current_notify & queue_mask,
++			ring_data->consumed & queue_mask);
++
++	while (ring_data->consumed != current_notify) {
++
++		pr_debug("do notify %d\n", current_notify);
++
++		kspu_work = kctx->notify_cb_info[current_notify & queue_mask];
++		if (likely(kspu_work))
++			kspu_work->notify(kspu_work);
++
++		current_notify++;
++		ret = 1;
 +	}
++
++	kctx->last_notified = current_notify;
++	pr_debug("notify done\n");
++	return ret;
++}
++
++static int queue_requests(struct kspu_context *kctx)
++{
++	int ret;
++	int empty;
++	int queued = 0;
++	struct kspu_work_item *work;
++
++	WARN_ON(in_irq());
 +
 +	do {
-+		size_left = ablk_req->nbytes - a_d_ctx->progress;
++		if (!kspu_get_rb_slot(kctx))
++			break;
 +
-+		if (!size_left) {
-+			a_d_ctx->kspu_work.notify = aes_finish_callback;
-+			return 1;
-+		}
-+
-+		work_item = kspu_get_rb_slot(aes_ctx->spe_ctx->ctx);
-+		if (!work_item)
-+			return 0;
-+
-+		aes_crypt = &work_item->aes_crypt;
-+		work_item->operation = a_d_ctx->crypto_operation;
-+		work_item->in = (unsigned long int) a_d_ctx->real_src +
-+			a_d_ctx->progress;
-+		aes_crypt->out = (unsigned long int) a_d_ctx->real_dst +
-+			a_d_ctx->progress;
-+
-+		if (size_left > MAX_TRANSFER_SIZE) {
-+			a_d_ctx->progress += MAX_TRANSFER_SIZE;
-+			work_item->in_size = MAX_TRANSFER_SIZE;
++		spin_lock_bh(&kctx->queue_lock);
++		empty = list_empty(&kctx->work_queue);
++		if (unlikely(empty)) {
++			work = NULL;
 +		} else {
-+			a_d_ctx->progress += size_left;
-+			work_item->in_size = size_left;
++			work = list_first_entry(&kctx->work_queue,
++					struct kspu_work_item, list);
++			list_del(&work->list);
++		}
++		spin_unlock_bh(&kctx->queue_lock);
++
++		if (!work)
++			break;
++
++		pr_debug("Adding item %p to queue\n", work);
++		ret = work->enqueue(work);
++		if (unlikely(ret == 0)) {
++			pr_debug("Adding item %p again to list.\n", work);
++			spin_lock_bh(&kctx->queue_lock);
++			list_add(&work->list, &kctx->work_queue);
++			spin_unlock_bh(&kctx->queue_lock);
++			break;
 +		}
 +
-+		aes_crypt->iv = 0; /* XXX */
-+		aes_crypt->keyid = aes_ctx->key_mapping->spu_slot;
-+
-+		pr_debug("in: %p, out %p, data_size: %u\n",
-+				(void *) work_item->in,
-+				(void *) aes_crypt->out,
-+				work_item->in_size);
-+		pr_debug("iv: %p, key slot: %d\n", (void *) aes_crypt->iv,
-+				aes_crypt->keyid);
-+
-+		kspu_mark_rb_slot_ready(aes_ctx->spe_ctx->ctx,
-+				a_d_ctx->progress == ablk_req->nbytes ?
-+				kspu_work : NULL);
++		queued = 1;
 +	} while (1);
++	pr_debug("Queue requests done. => %d\n", queued);
++	return queued;
 +}
 +
-+static int enqueue_request(struct ablkcipher_request *req,
-+		enum SPU_FUNCTIONS op_type)
++/**
++ * kspu_enqueue_work_item - Enqueue a request that supposed to be queued on the
++ * SPU.
++ * @kctx:	kspu context that should be used.
++ * @work:	Work item that should be placed on the SPU
++ *
++ * The functions puts the work item in a list. Once a SPU slot is available,
++ * work->enqueue will be called from a kthread context. User's enqueue
++ * function may than queue the request on the SPU.
++ * kspu_enqueue_work_item() may be called from softirq.
++ */
++void kspu_enqueue_work_item(struct kspu_context *kctx,
++		struct kspu_work_item *work)
 +{
-+	struct async_d_request *asy_d_ctx = ablkcipher_request_ctx(req);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
-+	struct aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct kspu_work_item *work = &asy_d_ctx->kspu_work;
++	spin_lock_bh(&kctx->queue_lock);
++	list_add_tail(&work->list, &kctx->work_queue);
++	spin_unlock_bh(&kctx->queue_lock);
++	wake_up_all(&kctx->newitem_wq);
++}
++EXPORT_SYMBOL_GPL(kspu_enqueue_work_item);
 +
-+	asy_d_ctx->crypto_operation = op_type;
-+	asy_d_ctx->progress = 0;
-+	work->enqueue = aes_queue_work_items;
++static int pending_spu_work(struct kspu_context *kctx)
++{
++	struct kspu_ring_data *ring_data;
++	unsigned char *ls;
++	int queue_mask;
 +
-+	kspu_enqueue_work_item(ctx->spe_ctx->ctx, &asy_d_ctx->kspu_work);
-+	return -EINPROGRESS;
++	ls = kctx->spu_ctx->ops->get_ls(kctx->spu_ctx);
++	ls += kctx->spu_code->kspu_data_offset;
++	ring_data = (struct kspu_ring_data *) ls;
++
++	queue_mask = kctx->spu_code->queue_mask;
++	pr_debug("pending spu work status: %u == %u ?\n",
++			ring_data->consumed & queue_mask,
++			ring_data->outstanding & queue_mask);
++	if (ring_data->consumed == ring_data->outstanding)
++		return 0;
++
++	return 1;
 +}
 +
 +/*
-+ * AltiVec and not SPU code is because the key may disappear after calling
-+ * this func (for example if it is not properly aligned)
++ * Fill dummy requests in the ring buffer. Dummy requests are required
++ * to let MFC "transfer" data if there are not enough real requests.
++ * Transfers with a size of 0 bytes are nops for the MFC
 + */
-+static int aes_set_key_async(struct crypto_ablkcipher *parent,
-+		const u8 *key, unsigned int keylen)
++static void kspu_fill_dummy_reqs(struct kspu_context *kctx)
 +{
-+	struct aes_ctx *ctx = crypto_ablkcipher_ctx(parent);
++
++	struct kspu_ring_data *ring_data;
++	unsigned char *ls;
++	unsigned int queue_mask;
++	unsigned int requests;
++	struct kspu_job *kjob;
++	int i;
++
++	ls = kctx->spu_ctx->ops->get_ls(kctx->spu_ctx);
++	ls += kctx->spu_code->kspu_data_offset;
++	ring_data = (struct kspu_ring_data *) ls;
++
++	queue_mask = kctx->spu_code->queue_mask;
++
++	/* check for overflow */
++	requests = ring_data->outstanding - ring_data->consumed;
++
++	if (requests >= DMA_BUFFERS *2)
++		return;
++
++	for (i = requests; i < (DMA_BUFFERS*2); i++) {
++		kjob = kspu_get_rb_slot(kctx);
++		kjob->in_size = 0;
++		kspu_mark_rb_slot_ready(kctx, NULL);
++	}
++}
++
++static int spufs_run_kernel_spu(void *priv)
++{
++	struct kspu_context *kctx = (struct kspu_context *) priv;
++	struct spu_context *ctx = kctx->spu_ctx;
 +	int ret;
++	u32 status;
++	int npc = 0;
++	int fastpath;
++	DEFINE_WAIT(wait_for_stop);
++	DEFINE_WAIT(wait_for_ibox);
++	DEFINE_WAIT(wait_for_newitem);
 +
-+	ctx->spe_ctx = &async_spu;
-+	ctx->key.len = keylen / 4;
-+	ctx->key_mapping = NULL;
++	spu_enable_spu(ctx);
++	ctx->event_return = 0;
 +
-+	preempt_disable();
-+	enable_kernel_altivec();
-+	ret = expand_key(key, keylen / 4, &ctx->key.enc[0], &ctx->key.dec[0]);
-+	preempt_enable();
++	ret = spu_acquire_runnable(ctx, 0);
++	if (ret) {
++		mutex_unlock(&ctx->run_mutex);
++		printk(KERN_ERR "could not obtain runable spu: %d\n", ret);
++		BUG();
++	}
 +
-+	if (ret == -EINVAL)
-+		crypto_ablkcipher_set_flags(parent, CRYPTO_TFM_RES_BAD_KEY_LEN);
++	spu_run_init(ctx, &npc);
 +
++	do {
++		fastpath = 0;
++		prepare_to_wait(&ctx->stop_wq, &wait_for_stop,
++				TASK_INTERRUPTIBLE);
++		prepare_to_wait(&ctx->ibox_wq, &wait_for_ibox,
++				TASK_INTERRUPTIBLE);
++		prepare_to_wait(&kctx->newitem_wq, &wait_for_newitem,
++				TASK_INTERRUPTIBLE);
++
++		pr_debug("going to handle class1\n");
++		ret = spufs_handle_class1(ctx);
++		if (unlikely(ret)) {
++			/*
++			 * SPE_EVENT_SPE_DATA_STORAGE => refernce invalid memory
++			 */
++			printk(KERN_ERR "Invalid memory dereferenced by the"
++					"spu: %d\n", ret);
++			BUG();
++		}
++
++		pr_debug("going to process kspu_events\n");
++		/* FIXME BUG: We need a physical SPU to discover
++		 * ctx->spu->class_0_pending. It is not saved on context
++		 * switch. We may lose this on context switch.
++		 */
++		status = ctx->ops->status_read(ctx);
++		if ((ctx->spu && ctx->spu->class_0_pending) ||
++				status & SPU_STATUS_INVALID_INSTR) {
++			printk(KERN_ERR "kspu error, status_register: 0x%08x\n",
++					status);
++			printk(KERN_ERR "event return: 0x%08lx, spu's npc: \
++					0x%08x\n", kctx->spu_ctx->event_return,
++					kctx->spu_ctx->ops->npc_read(
++						kctx->spu_ctx));
++			BUG();
++		}
++
++		if (notify_done_reqs(kctx))
++			fastpath = 1;
++
++		if (queue_requests(kctx))
++			fastpath = 1;
++
++		if (!(status & SPU_STATUS_RUNNING)) {
++			/* spu is currently not running */
++			pr_debug("SPU not running, last stop code was: %08x\n",
++					status >> SPU_STOP_STATUS_SHIFT);
++			if (pending_spu_work(kctx)) {
++				/* spu should run again */
++				pr_debug("Activate SPU\n");
++				kspu_fill_dummy_reqs(kctx);
++				spu_release(ctx);
++				ret = spu_acquire_runnable(ctx, 0);
++				BUG_ON(ret);
++				ret = spu_run_init(ctx, &npc);
++				BUG_ON(ret);
++			} else {
++
++				/* spu probably finished working,  */
++				pr_debug("SPU will remain in stop state\n");
++				ret = spu_run_fini(ctx, &npc, &status);
++				BUG_ON(ret);
++				spu_yield(ctx);
++				spu_acquire(ctx);
++			}
++		}
++
++		if (fastpath)
++			continue;
++
++		spu_release(ctx);
++		schedule();
++		spu_acquire(ctx);
++
++	} while (!kthread_should_stop() || !list_empty(&kctx->work_queue));
++
++	finish_wait(&ctx->stop_wq, &wait_for_stop);
++	finish_wait(&ctx->ibox_wq, &wait_for_ibox);
++	finish_wait(&kctx->newitem_wq, &wait_for_newitem);
++
++	spu_release(ctx);
++	spu_disable_spu(ctx);
++	return 0;
++}
++
++static struct kspu_context *kspu_ctx;
++extern struct kspu_code single_spu_code;
++
++/**
++ * kspu_get_kctx - return a kspu context.
++ *
++ * Returns a kspu_context that identifies the SPU context used by the kernel.
++ * Right now only one static context exist which may be used by multiple users.
++ */
++struct kspu_context *kspu_get_kctx(void)
++{
++	return kspu_ctx;
++}
++EXPORT_SYMBOL_GPL(kspu_get_kctx);
++
++static int __init kspu_init(void)
++{
++	int ret = 0;
++
++	pr_debug("code @%p, len %d, offset 0x%08x, elemets: %d,"
++			"element size: %d\n", single_spu_code.code,
++			single_spu_code.code_len,
++			single_spu_code.kspu_data_offset,
++			single_spu_code.queue_mask,
++			single_spu_code.queue_entr_size);
++	kspu_ctx = kcreate_spu_context(0, &single_spu_code);
++	if (IS_ERR(kspu_ctx))
++		return PTR_ERR(kspu_ctx);
++
++	/* kthread_run */
++	kspu_ctx->thread = kthread_create(spufs_run_kernel_spu, kspu_ctx,
++			"spucode");
++	if (IS_ERR(kspu_ctx->thread)) {
++		ret = PTR_ERR(kspu_ctx->thread);
++		free_kspu_context(kspu_ctx);
++	}
++	wake_up_process(kspu_ctx->thread);
 +	return ret;
 +}
 +
-+static int aes_encrypt_ecb_async(struct ablkcipher_request *req)
++static void __exit kspu_exit(void)
 +{
-+
-+	req->info = NULL;
-+	return enqueue_request(req, SPU_FUNC_aes_encrypt_ecb);
++	kthread_stop(kspu_ctx->thread);
++	free_kspu_context(kspu_ctx);
 +}
 +
-+static int aes_decrypt_ecb_async(struct ablkcipher_request *req)
-+{
++module_init(kspu_init);
++module_exit(kspu_exit);
 +
-+	req->info = NULL;
-+	return enqueue_request(req, SPU_FUNC_aes_decrypt_ecb);
-+}
-+#if 0
-+static int aes_encrypt_cbc_async(struct ablkcipher_request *req)
-+{
-+	return enqueue_request(req, SPU_FUNC_aes_encrypt_cbc);
-+}
-+
-+static int aes_decrypt_cbc_async(struct ablkcipher_request *req)
-+{
-+	return enqueue_request(req, SPU_FUNC_aes_decrypt_cbc);
-+}
-+#endif
-+static int async_d_init(struct crypto_tfm *tfm)
-+{
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct async_d_request);
-+	return 0;
-+}
-+
-+static struct crypto_alg aes_ecb_alg_async = {
-+	.cra_name		= "ecb(aes)",
-+	.cra_driver_name	= "ecb-aes-spu-async",
-+	.cra_priority		= 125,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_alignmask		= 15,
-+	.cra_ctxsize		= sizeof(struct aes_ctx),
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(aes_ecb_alg_async.cra_list),
-+	.cra_init		= async_d_init,
-+	.cra_u	= {
-+		.ablkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= 0,
-+			.setkey		= aes_set_key_async,
-+			.encrypt	= aes_encrypt_ecb_async,
-+			.decrypt	= aes_decrypt_ecb_async,
-+		}
-+	}
-+};
-+#if 0
-+static struct crypto_alg aes_cbc_alg_async = {
-+	.cra_name		= "cbc(aes)",
-+	.cra_driver_name	= "cbc-aes-spu-async",
-+	.cra_priority		= 125,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_alignmask		= 15,
-+	.cra_ctxsize		= sizeof(struct aes_ctx),
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(aes_cbc_alg_async.cra_list),
-+	.cra_init		= async_d_init,
-+	.cra_u	= {
-+		.ablkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= aes_set_key_async,
-+			.encrypt	= aes_encrypt_cbc_async,
-+			.decrypt	= aes_decrypt_cbc_async,
-+		}
-+	}
-+};
-+#endif
-+
-+static void init_spu_key_mapping(struct async_aes *spe_ctx)
-+{
-+	unsigned int i;
-+
-+	INIT_LIST_HEAD(&spe_ctx->key_ring);
-+
-+	for (i = 0; i < SPU_KEY_SLOTS; i++) {
-+		list_add_tail(&spe_ctx->mapping_key_spu[i].list,
-+				&spe_ctx->key_ring);
-+		spe_ctx->mapping_key_spu[i].spu_slot = i;
-+	}
-+}
-+
-+static int init_async_ctx(struct async_aes *spe_ctx)
-+{
-+	int ret;
-+
-+	spe_ctx->ctx = kspu_get_kctx();
-+	init_spu_key_mapping(spe_ctx);
-+
-+	ret = crypto_register_alg(&aes_ecb_alg_async);
-+	if (ret) {
-+		printk(KERN_ERR "crypto_register_alg(ecb) failed: %d\n", ret);
-+		goto err_kthread;
-+	}
-+#if 0
-+	ret = crypto_register_alg(&aes_cbc_alg_async);
-+	if (ret) {
-+		printk(KERN_ERR "crypto_register_alg(cbc) failed: %d\n", ret);
-+		goto fail_cbc;
-+	}
-+#endif
-+	return 0;
-+#if 0
-+fail_cbc:
-+	crypto_unregister_alg(&aes_ecb_alg_async);
-+#endif
-+err_kthread:
-+	return ret;
-+}
-+
-+static void deinit_async_ctx(struct async_aes *async_aes)
-+{
-+
-+	crypto_unregister_alg(&aes_ecb_alg_async);
-+/*	crypto_unregister_alg(&aes_cbc_alg_async); */
-+}
-+
-+static int __init aes_init(void)
-+{
-+	unsigned int ret;
-+
-+	ret = init_async_ctx(&async_spu);
-+	if (ret) {
-+		printk(KERN_ERR "async_api_init() failed\n");
-+		return ret;
-+	}
-+	return 0;
-+}
-+
-+static void __exit aes_fini(void)
-+{
-+	deinit_async_ctx(&async_spu);
-+}
-+
-+module_init(aes_init);
-+module_exit(aes_fini);
-+
-+MODULE_DESCRIPTION("AES Cipher Algorithm with SPU support");
++MODULE_DESCRIPTION("KSPU interface module");
 +MODULE_AUTHOR("Sebastian Siewior <bigeasy@breakpoint.cc>");
 +MODULE_LICENSE("GPL");
---- a/arch/powerpc/platforms/cell/spufs/spu_main.c
-+++ b/arch/powerpc/platforms/cell/spufs/spu_main.c
-@@ -13,6 +13,14 @@
- 
- spu_operation spu_funcs[TOTAL_SPU_FUNCS] __attribute__((aligned(16))) = {
- 	[SPU_FUNC_nop] = spu_nop,
-+	[SPU_FUNC_aes_setkey] = spu_aes_setkey,
-+	[SPU_FUNC_aes_update_key] = spu_aes_update_key,
-+	[SPU_FUNC_aes_encrypt_ecb] = spu_aes_encrypt_ecb,
-+	[SPU_FUNC_aes_decrypt_ecb] = spu_aes_decrypt_ecb,
-+#if 0
-+	[SPU_FUNC_aes_encrypt_cbc] = spu_aes_encrypt_cbc,
-+	[SPU_FUNC_aes_decrypt_cbc] = spu_aes_decrypt_cbc,
-+#endif
- };
- 
- struct kspu_buffers kspu_buff[DMA_BUFFERS];
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -78,4 +78,5 @@ config ZCRYPT_MONOLITHIC
- 	  that contains all parts of the crypto device driver (ap bus,
- 	  request router and all the card drivers).
- 
-+source "arch/powerpc/platforms/cell/crypto/Kconfig"
- endmenu
 --- /dev/null
-+++ b/include/asm-powerpc/kspu/aes.h
-@@ -0,0 +1,49 @@
-+#ifndef  __SPU_AES_H__
-+#define  __SPU_AES_H__
++++ b/arch/powerpc/platforms/cell/spufs/kspu_util.h
+@@ -0,0 +1,29 @@
++#ifndef KSPU_UTIL_H
++#define KSPU_UTIL_H
++#include <linux/wait.h>
 +
-+#define MAX_AES_ROUNDS 15
-+#define MAX_AES_KEYSIZE_INT (MAX_AES_ROUNDS *4)
-+#define MAX_AES_KEYSIZE_BYTE (MAX_AES_KEYSIZE_INT *4)
-+#define SPU_KEY_SLOTS 5
-+
-+struct aes_key_struct {
-+	unsigned char enc[MAX_AES_KEYSIZE_BYTE] __attribute__((aligned(16)));
-+	unsigned char dec[MAX_AES_KEYSIZE_BYTE] __attribute__((aligned(16)));
-+	unsigned int len __attribute__((aligned(16)));
++struct kspu_code {
++	const unsigned int *code;
++	unsigned int code_len;
++	unsigned int kspu_data_offset;
++	unsigned int queue_mask;
++	unsigned int queue_entr_size;
 +};
 +
-+struct aes_set_key {
-+	/* in */
-+	unsigned long long plain __attribute__((aligned(16)));
-+	unsigned int len __attribute__((aligned(16)));
-+	unsigned int keyid __attribute__((aligned(16)));
-+
-+	/* out */
-+	unsigned long long keys __attribute__((aligned(16)));
++struct notify_cb_info {
++	void *notify;
 +};
 +
-+struct aes_update_key {
-+	/* copy key from ea to ls into a specific slot */
-+	unsigned int keyid __attribute__((aligned(16)));
++struct kspu_context {
++	struct spu_context *spu_ctx;
++	wait_queue_head_t newitem_wq;
++	void **notify_cb_info;
++	unsigned int last_notified;
++	struct kspu_code *spu_code;
++	struct task_struct *thread;
++	struct list_head work_queue;
++	/* access to the work_queue element. May be used from softirq */
++	spinlock_t queue_lock;
 +};
 +
-+struct aes_crypt {
-+	/* in */
-+	unsigned int keyid __attribute__((aligned(16)));
-+
-+	/* out */
-+	unsigned long long iv __attribute__((aligned(16))); /* as well as in */
-+	unsigned long long out __attribute__((aligned(16)));
-+};
-+
-+/* exported calls */
-+#if 0
-+int spu_aes_encrypt_cbc(union possible_arguments *pa);
-+int spu_aes_decrypt_cbc(union possible_arguments *pa);
 +#endif
+--- /dev/null
++++ b/arch/powerpc/platforms/cell/spufs/spu_main.c
+@@ -0,0 +1,100 @@
++/*
++ * This code can be considered as crt0.S
++ * Compile with -O[123S] and make sure that here is only one function
++ * that starts at 0x0
++ * Author: Sebastian Siewior <bigeasy@breakpoint.cc>
++ * License: GPLv2
++ */
++#include <asm/kspu/merged_code.h>
++#include <spu_mfcio.h>
++#include "spu_runtime.h"
 +
-+int spu_aes_setkey(unsigned int cur, unsigned int cur_buf);
-+int spu_aes_update_key(unsigned int cur, unsigned int cur_buf);
-+int spu_aes_encrypt_ecb(unsigned int cur, unsigned int cur_buf);
-+int spu_aes_decrypt_ecb(unsigned int cur, unsigned int cur_buf);
++#define barrier() __asm__ __volatile__("": : :"memory")
++
++spu_operation spu_funcs[TOTAL_SPU_FUNCS] __attribute__((aligned(16))) = {
++	[SPU_FUNC_nop] = spu_nop,
++};
++
++struct kspu_buffers kspu_buff[DMA_BUFFERS];
++
++void _start(void) __attribute__((noreturn));
++void _start(void)
++{
++	struct kernel_spu_data *spu_data;
++
++	spu_data = (struct kernel_spu_data*) KERNEL_SPU_DATA_OFFSET;
++
++	while (37) {
++		unsigned int consumed, outstanding, cur_req, cur_item, cur_buf;
++		unsigned int i;
++
++		spu_stop(1);
++		/*
++		 * Once started, it is guaranteed that at least DMA_BUFFERS *2 requests are in ring buffer.
++		 * The work order is:
++		 * 1. request DMA_BUFFERS transfers, every in a separate buffer with its own tag.
++		 * 2. process those buffers and request new ones.
++		 * 3. if more than (DMA_BUFFERS *2) are available, than the main loop begins:
++		 *   - wait for tag to finish transfers
++		 *   - notify done work
++		 *   - process request
++		 *   - write back
++		 * 4. if no more request are available, process the last DMA_BUFFERS request that are left,
++		 *    write them back and wait until that transfers completes and spu_stop()
++		 */
++
++		consumed = spu_data->kspu_ring_data.consumed;
++		cur_req = consumed;
++		cur_item = consumed;
++
++		/* 1 */
++		for (cur_buf = 0; cur_buf < DMA_BUFFERS; cur_buf++) {
++			init_get_data(&kspu_buff[cur_buf & DMA_BUFF_MASK].space[0],
++					&spu_data->work_item[cur_req & RB_MASK], cur_buf & DMA_BUFF_MASK);
++			cur_req++;
++		}
++
++		/* 2 */
++		for (cur_buf = 0; cur_buf < DMA_BUFFERS; cur_buf++) {
++			wait_for_buffer(1<< (cur_buf & DMA_BUFF_MASK));
++			spu_funcs[spu_data->work_item[cur_item & RB_MASK].operation]
++				(cur_item & RB_MASK, cur_buf & DMA_BUFF_MASK);
++
++			init_get_data(&kspu_buff[cur_buf & DMA_BUFF_MASK].space[0],
++					&spu_data->work_item[cur_req & RB_MASK], cur_buf & DMA_BUFF_MASK);
++			cur_item++;
++			cur_req++;
++		}
++
++		outstanding = spu_data->kspu_ring_data.outstanding;
++		/* 3 */
++		while (cur_req  != outstanding) {
++			wait_for_buffer(1<< (cur_buf & DMA_BUFF_MASK));
++			spu_data->kspu_ring_data.consumed++;
++			if (spu_stat_out_mbox())
++				spu_write_out_mbox(0x0);
++
++			spu_funcs[spu_data->work_item[cur_item & RB_MASK].operation]
++				(cur_item & RB_MASK, cur_buf & DMA_BUFF_MASK);
++
++			init_get_data(&kspu_buff[cur_buf & DMA_BUFF_MASK].space[0],
++					&spu_data->work_item[cur_req & RB_MASK], cur_buf & DMA_BUFF_MASK);
++			cur_item++;
++			cur_req++;
++			cur_buf++;
++			outstanding = spu_data->kspu_ring_data.outstanding;
++		}
++
++		/* 4 */
++		for (i = 0; i < DMA_BUFFERS; i++) {
++			wait_for_buffer(1<< (cur_buf & DMA_BUFF_MASK));
++			spu_funcs[spu_data->work_item[cur_item & RB_MASK].operation]
++				(cur_item & RB_MASK, cur_buf & DMA_BUFF_MASK);
++			cur_buf++;
++			cur_item++;
++		}
++
++		wait_for_buffer(ALL_DMA_BUFFS);
++		spu_data->kspu_ring_data.consumed = cur_item;
++	}
++}
+--- /dev/null
++++ b/include/asm-powerpc/kspu/kspu.h
+@@ -0,0 +1,23 @@
++#ifndef KSPU_KSPU_H
++#define KSPU_KSPU_H
++#ifdef __KERNEL__
++#include <linux/list.h>
++
++#define MAX_DMA_TRANSFER (16 * 1024)
++
++struct kspu_work_item {
++	struct list_head list;
++	int (*enqueue)(struct kspu_work_item *);
++	void (*notify)(struct kspu_work_item *);
++};
++
++struct kspu_context;
++
++struct kspu_job *kspu_get_rb_slot(struct kspu_context *kspu);
++void kspu_mark_rb_slot_ready(struct kspu_context *kspu,
++		struct kspu_work_item *work);
++void kspu_enqueue_work_item(struct kspu_context *kctx,
++		struct kspu_work_item *work);
++struct kspu_context *kspu_get_kctx(void);
 +#endif
---- a/include/asm-powerpc/kspu/merged_code.h
++#endif
+--- /dev/null
 +++ b/include/asm-powerpc/kspu/merged_code.h
-@@ -1,6 +1,7 @@
- #ifndef KSPU_MERGED_CODE_H
- #define KSPU_MERGED_CODE_H
- #include <linux/autoconf.h>
-+#include <asm/kspu/aes.h>
- 
- #define KSPU_LS_SIZE 0x40000
- 
-@@ -10,18 +11,30 @@
- #define DMA_BUFF_MASK (DMA_BUFFERS-1)
- #define ALL_DMA_BUFFS ((1 << DMA_BUFFERS)-1)
- 
--typedef int (*spu_operation)(unsigned int cur);
-+#define RB_MASK (RB_SLOTS-1)
+@@ -0,0 +1,40 @@
++#ifndef KSPU_MERGED_CODE_H
++#define KSPU_MERGED_CODE_H
++#include <linux/autoconf.h>
 +
-+typedef int (*spu_operation)(unsigned int cur_job, unsigned int cur_buf);
- 
- enum SPU_FUNCTIONS {
-+	SPU_FUNC_nop,
-+	SPU_FUNC_aes_setkey,
-+	SPU_FUNC_aes_update_key,
-+	SPU_FUNC_aes_encrypt_ecb,
-+	SPU_FUNC_aes_decrypt_ecb,
-+	SPU_FUNC_aes_encrypt_cbc,
-+	SPU_FUNC_aes_decrypt_cbc,
- 
- 	TOTAL_SPU_FUNCS,
- };
- 
--struct kspu_job {
++#define KSPU_LS_SIZE 0x40000
++
++#define RB_SLOTS 256
++
++#define DMA_BUFFERS   2
++#define DMA_BUFF_MASK (DMA_BUFFERS-1)
++#define ALL_DMA_BUFFS ((1 << DMA_BUFFERS)-1)
++
++typedef int (*spu_operation)(unsigned int cur);
++
++enum SPU_FUNCTIONS {
++
++	TOTAL_SPU_FUNCS,
++};
++
 +struct kspu_job {
- 	enum SPU_FUNCTIONS operation __attribute__((aligned(16)));
- 	unsigned long long in __attribute__((aligned(16)));
- 	unsigned int in_size __attribute__((aligned(16)));
- 	union {
-+		struct aes_set_key aes_set_key;
-+		struct aes_update_key aes_update_key;
-+		struct aes_crypt aes_crypt;
- 	} __attribute__((aligned(16)));
- };
- 
-@@ -32,7 +45,7 @@ struct kspu_ring_data {
- 
- struct kernel_spu_data {
- 	struct kspu_ring_data kspu_ring_data __attribute__((aligned(16)));
--	struct kspu_job work_item[RB_SLOTS] __attribute__((aligned(16)));
++	enum SPU_FUNCTIONS operation __attribute__((aligned(16)));
++	unsigned long long in __attribute__((aligned(16)));
++	unsigned int in_size __attribute__((aligned(16)));
++	union {
++	} __attribute__((aligned(16)));
++};
++
++struct kspu_ring_data {
++	volatile unsigned int consumed __attribute__((aligned(16)));
++	volatile unsigned int outstanding __attribute__((aligned(16)));
++};
++
++struct kernel_spu_data {
++	struct kspu_ring_data kspu_ring_data __attribute__((aligned(16)));
 +	struct kspu_job work_item[RB_SLOTS] __attribute__((aligned(16)));
- };
- 
- #define KERNEL_SPU_DATA_OFFSET (KSPU_LS_SIZE - sizeof(struct kernel_spu_data))
++};
++
++#define KERNEL_SPU_DATA_OFFSET (KSPU_LS_SIZE - sizeof(struct kernel_spu_data))
++
++#endif
 
 -- 
