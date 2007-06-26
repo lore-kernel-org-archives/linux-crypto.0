@@ -1,52 +1,58 @@
-From: Joy Latten <latten@austin.ibm.com>
-Subject: Re: combined mode algorithms
-Date: Tue, 26 Jun 2007 10:02:36 -0500
-Message-ID: <1182870156.15699.230.camel@faith.austin.ibm.com>
-References: <1182809638.15699.221.camel@faith.austin.ibm.com>
-	 <20070626090956.GA5833@2ka.mipt.ru>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: [RFC 0/2] AES ablkcipher driver for SPUs
+Date: Wed, 27 Jun 2007 00:59:52 +0200
+Message-ID: <20070626225952.GA4571@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e35.co.us.ibm.com ([32.97.110.153]:47828 "EHLO
-	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756589AbXFZPEJ (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:36770 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751433AbXFZXAB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jun 2007 11:04:09 -0400
-Received: from d03relay02.boulder.ibm.com (d03relay02.boulder.ibm.com [9.17.195.227])
-	by e35.co.us.ibm.com (8.13.8/8.13.8) with ESMTP id l5QF43IJ027831
-	for <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2007 11:04:03 -0400
-Received: from d03av04.boulder.ibm.com (d03av04.boulder.ibm.com [9.17.195.170])
-	by d03relay02.boulder.ibm.com (8.13.8/8.13.8/NCO v8.3) with ESMTP id l5QF3xA4216058
-	for <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2007 09:04:01 -0600
-Received: from d03av04.boulder.ibm.com (loopback [127.0.0.1])
-	by d03av04.boulder.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id l5QF3wW7007151
-	for <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2007 09:03:59 -0600
-In-Reply-To: <20070626090956.GA5833@2ka.mipt.ru>
+	Tue, 26 Jun 2007 19:00:01 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2007-06-26 at 13:09 +0400, Evgeniy Polyakov wrote:
-> On Mon, Jun 25, 2007 at 05:13:58PM -0500, Joy Latten (latten@austin.ibm.com) wrote:
-> > I have been reading IP Encapsulating Payload-(ESP) RFC4303 where use of
-> > combined mode algorithms are mentioned and accommodated for. 
-> > In trying to determine how I should handle this, I examined the
-> > crypto code and could not readily recognize any combined mode
-> > algorithms. Are there any current plans to implement combined mode
-> > algorithms?  
-> 
-> I think it should be first supported by ipsec stack at least with state,
-> where SA cold be configured, integrity check for the data/header is not 
-> a problem after that changes are stable. sha1/encryption is a poor man's
-> combined algo after all with hash data being ICV :)
-> 
+Hello Herbert,
 
-Ok, thanks. This helps. I can code up the infrastructure for this. I 
-am thinking I will eventually need one of the algorithms to test and
-complete it though. RFCs 4309 and 4106 specify ESP working with AES-CCM
-and AES-GCM.
+This driver adds support for AES on SPU. Patch is for review only because
+some parts of the code are not upstream yet.
+Patch one contains the main driver (which uses ablkcipher_ctx_cast()), 
+patch two is for clarity (parts of the missing API that is used).
 
-Regards,
-Joy
+Currently only ECB block mode is supported. I plan support for CBC but the
+way the IV currently handled is unfavorable (later more).
+
+aes_spu_wrap.c and kspu_helper.c run in the kernel, spu_main.c will run on
+a SPU (my hardware for computing :)). SPU can access kernel memory (even
+virtual) via asynchronous DMA transfers.
+All requests from the crypto user end up in a linked list which is managed
+by the kspu module (even no crypto requests will end up there as well but
+currently the AES driver is the only user). AES callback function
+(aes_queue_work_items()) is called to queue the request in a ring buffer 
+which is located on the hardware. Once some requests are enqueued the SPU
+is started.
+The SPU requests the first couple of blocks via DMA (init_get_data()).
+This request may not get satisfied immediately, the command does not
+block. Once all requests (DMA_BUFFERS num) are fired up, the SPU waits
+for the first buffer to complete and starts processing (via spu_funcs()).
+Ideally there are always transfers in the background (copy new data from
+main storage to SPU and copy processed data from SPU to main storage)
+while the SPU is processing a block of data.
+This is where my problems with the IV are starting. Currently I have to
+request the IV from main storage, wait for it, than I can use it and once
+I processed the block, I must write it back.
+What about a different handling of the IV with two functions like
+ablk_set_iv()
+ablk_get_iv()
+With something like this, I could store the IV in the SPU (in my key 
+struct for instance) and don't have to transfer it on every request
+(similar to what I do now with the key). I don't know if there are any
+crypto user that have multiple IVs/key but in such a case, I could cache
+IVs like I cache keys now. Any comments on that?
+
+Sebastian
+-- 
