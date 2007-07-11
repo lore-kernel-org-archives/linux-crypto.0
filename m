@@ -1,64 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.23
-Date: Wed, 11 Jul 2007 21:08:49 +0800
-Message-ID: <20070711130849.GA10494@gondor.apana.org.au>
+From: Sebastian Siewior <linux-crypto@vger.kernel.org>
+Subject: Comments on ablkcipher_request and async AES driver
+Date: Wed, 11 Jul 2007 15:31:21 +0200
+Message-ID: <20070711133121.GA19167@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: "David S. Miller" <davem@davemloft.net>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2045 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757558AbXGKNI5 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48671 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756028AbXGKNbc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2007 09:08:57 -0400
+	Wed, 11 Jul 2007 09:31:32 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi:
+Hello Herbert,
 
-iHere is the crypto update for 2.6.23:
+what about my
+[patch 1/1] add cast to regain ablkcipher_request from private ctx
 
-Please pull from
+and the async AES driver? Haven't seen any comments from your side so
+far (except the initial one where I said that I post my driver later).
+Did the mail sink in your inbox? :)
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-Summary:
-
-* Small fixes and clean-up's.
-
-
-Herbert Xu (2):
-      [CRYPTO] api: Wake up all waiters when larval completes
-      [CRYPTO] cipher: Remove obsolete fields from cipher_tfm
-
-Jan Engelhardt (1):
-      [CRYPTO] Kconfig: Use menuconfig objects
-
-Sebastian Siewior (2):
-      [CRYPTO] api: Handle unaligned keys in setkey
-      [CRYPTO] api: Allow ablkcipher with no queues
-
- crypto/Kconfig         |    6 +-----
- crypto/ablkcipher.c    |   31 +++++++++++++++++++++++++++++--
- crypto/algapi.c        |    4 ++--
- crypto/api.c           |    2 +-
- crypto/blkcipher.c     |   25 +++++++++++++++++++++++++
- crypto/cipher.c        |   33 ++++++++++++++++++++++++++++++---
- crypto/hash.c          |   38 +++++++++++++++++++++++++++++++++++++-
- include/linux/crypto.h |   20 --------------------
- 8 files changed, 125 insertions(+), 34 deletions(-)
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
