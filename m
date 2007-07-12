@@ -1,58 +1,57 @@
-From: Sebastian Siewior <bigeasy@breakpoint.cc>
-Subject: Re: [RFC 1/2] SPU-AES support (kernel side)
-Date: Thu, 12 Jul 2007 09:37:16 +0200
-Message-ID: <20070712073716.GB23840@Chamillionaire.breakpoint.cc>
-References: <20070626230027.GA4581@Chamillionaire.breakpoint.cc> <20070712043613.GC18292@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC 0/2] AES ablkcipher driver for SPUs
+Date: Thu, 12 Jul 2007 15:50:49 +0800
+Message-ID: <20070712075049.GA19868@gondor.apana.org.au>
+References: <20070626225952.GA4571@Chamillionaire.breakpoint.cc> <20070712043333.GB18292@gondor.apana.org.au> <20070712071833.GA23840@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:35059 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753750AbXGLHhS (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:1728 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755001AbXGLHuw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Jul 2007 03:37:18 -0400
+	Thu, 12 Jul 2007 03:50:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20070712043613.GC18292@gondor.apana.org.au>
+In-Reply-To: <20070712071833.GA23840@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-07-12 12:36:13 [+0800]:
-
->On Wed, Jun 27, 2007 at 01:00:27AM +0200, Sebastian Siewior wrote:
->>
->> +static int enqueue_request(struct ablkcipher_request *req,
->> +		enum SPU_FUNCTIONS op_type)
->> +{
->> +	struct async_d_request *asy_d_ctx = ablkcipher_request_ctx(req);
->> +	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
->> +	struct aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
->> +	struct kspu_work_item *work = &asy_d_ctx->kspu_work;
->> +
->> +	asy_d_ctx->crypto_operation = op_type;
->> +	asy_d_ctx->progress = 0;
->> +	work->enqueue = aes_queue_work_items;
->> +
->> +	kspu_enqueue_work_item(ctx->spe_ctx->ctx, &asy_d_ctx->kspu_work);
+On Thu, Jul 12, 2007 at 09:18:33AM +0200, Sebastian Siewior wrote:
 >
->OK this is a software queue so we want to put a limit on it.
-Limit means you want me to drop requests after a certain limit (i.e.
-when my queue is full)?
+> If there is a new IV on *every* request and I don't have to write the IV back
+> than I put it in my request struct next to the source address :). This indeed
+> solves my problem. What about jumbo frames in IPsec? Do I get 16 contiguous
 
->In fact, any reason why you couldn't juse use the existing
->crypto_enqueue_request interface here? That would also make
->that cast function unnecessary.
-I would have to start an extra thread that removes requests from
-crypto_enqueue_request and enqueues them into kspu_enqueue_work_item.
-The later may be used not just for crypto requests but for all KSPU
-users. I can't enqueue directly on the SPU in the first place because
-this requires to hold a mutex (and then I need an endless queue for the
-CRYPTO_TFM_REQ_MAY_BACKLOG requests anyway).
+You mean not writing back the final IV is good enough for you?
+If so we can probably add a request flag for that.
 
->
->Cheers,
->-- 
+> pages (16 * 4KiB for almost 64KiB which may be encrypted) or is this what you
+> mean with "the IV is going to change for almost every request" ?
 
-Cheers
-Sebastian
+They won't be contiguous so yes caching would help here.  However
+this case is exceedingly rare in the wild.
+
+> Oh Oh. Where do I get random numbers from? When do you expect me to do
+> this (aftee request received, request completed or in callback) and what
+> is this useful for (or how random must the number really be)? I could
+
+Well I was hoping that you had a built-in RNG or some such :)
+
+> The only thing I'm scared is that I can't use the updated IV for
+> following requests since it is not updated on enqueue time (my
+> assumption was that I need this for requests like jumbo frames where the
+> whole 64k frame is spitted into multiple 8k (smaller) requests and the IV from
+> previous 8k is required for the following 8k).
+
+If your hardware can't chain them up for you then yes you'd
+have to wait for each chunk to finish before processing the
+next one.  But as I said before this isn't that common at all.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
