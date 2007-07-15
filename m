@@ -1,43 +1,70 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: Crypto Update for 2.6.23
-Date: Sat, 14 Jul 2007 23:48:39 -0700 (PDT)
-Message-ID: <20070714.234839.34761809.davem@davemloft.net>
-References: <20070711130849.GA10494@gondor.apana.org.au>
+From: Adrian Bunk <bunk@stusta.de>
+Subject: [2.6 patch] drivers/crypto/Kconfig: hardware drivers shouldn't
+	"default m"
+Date: Sun, 15 Jul 2007 12:00:13 +0200
+Message-ID: <20070715100013.GI3565@stusta.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: torvalds@linux-foundation.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:53343
-	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1751875AbXGOGsh (ORCPT
+Received: from emailhub.stusta.mhn.de ([141.84.69.5]:33734 "EHLO
+	mailhub.stusta.mhn.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756812AbXGOKAu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Jul 2007 02:48:37 -0400
-In-Reply-To: <20070711130849.GA10494@gondor.apana.org.au>
+	Sun, 15 Jul 2007 06:00:50 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 11 Jul 2007 21:08:49 +0800
+Hardware drivers shouldn't default to m.
 
-> Here is the crypto update for 2.6.23:
-> 
-> Please pull from
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-> 
-> or
-> 
-> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
 
-I merged this into my net-2.6 tree, there was a tiny conflict
-in crypto/Kconfig I had to resolve because of the async_tx
-stuff that went in upstream.
+---
 
-Herbert can you contact the async_tx author to make sure that
-his crypto/ bits go through you in the future so that conflicts
-like this can be avoided?
+ drivers/crypto/Kconfig |    5 -----
+ 1 file changed, 5 deletions(-)
 
-Thanks.
+--- linux-2.6.22-rc6-mm1/drivers/crypto/Kconfig.old	2007-07-14 06:25:27.000000000 +0200
++++ linux-2.6.22-rc6-mm1/drivers/crypto/Kconfig	2007-07-14 06:25:35.000000000 +0200
+@@ -8,7 +8,6 @@
+ 	tristate "Support for VIA PadLock ACE"
+ 	depends on X86_32
+ 	select CRYPTO_ALGAPI
+-	default m
+ 	help
+ 	  Some VIA processors come with an integrated crypto engine
+ 	  (so called VIA PadLock ACE, Advanced Cryptography Engine)
+@@ -22,7 +21,6 @@
+ 	tristate "PadLock driver for AES algorithm"
+ 	depends on CRYPTO_DEV_PADLOCK
+ 	select CRYPTO_BLKCIPHER
+-	default m
+ 	help
+ 	  Use VIA PadLock for AES algorithm.
+ 
+@@ -36,7 +34,6 @@
+ 	depends on CRYPTO_DEV_PADLOCK
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+-	default m
+ 	help
+ 	  Use VIA PadLock for SHA1/SHA256 algorithms.
+ 
+@@ -52,7 +49,6 @@
+ 	depends on X86_32 && PCI
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_BLKCIPHER
+-	default m
+ 	help
+ 	  Say 'Y' here to use the AMD Geode LX processor on-board AES
+ 	  engine for the CryptoAPI AES algorithm.
+@@ -64,7 +60,6 @@
+ 	tristate "Support for PCI-attached cryptographic adapters"
+ 	depends on S390
+ 	select ZCRYPT_MONOLITHIC if ZCRYPT="y"
+-	default "m"
+ 	help
+ 	  Select this option if you want to use a PCI-attached cryptographic
+ 	  adapter like:
