@@ -1,54 +1,43 @@
-From: Adrian Bunk <bunk@stusta.de>
-Subject: [2.6 patch] crypto/Kconfig: remove "default m"s
-Date: Sat, 14 Jul 2007 06:53:50 +0200
-Message-ID: <20070714045349.GF3565@stusta.de>
+From: David Miller <davem@davemloft.net>
+Subject: Re: Crypto Update for 2.6.23
+Date: Sat, 14 Jul 2007 23:48:39 -0700 (PDT)
+Message-ID: <20070714.234839.34761809.davem@davemloft.net>
+References: <20070711130849.GA10494@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: torvalds@linux-foundation.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, akpm@linux-foundation.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout.stusta.mhn.de ([141.84.69.5]:60729 "EHLO
-	mailhub.stusta.mhn.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750827AbXGNEyQ (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:53343
+	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1751875AbXGOGsh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Jul 2007 00:54:16 -0400
-Content-Disposition: inline
+	Sun, 15 Jul 2007 02:48:37 -0400
+In-Reply-To: <20070711130849.GA10494@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Other options requiring specific block cipher algorithms already have 
-the appropriate select's.
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 11 Jul 2007 21:08:49 +0800
 
-Signed-off-by: Adrian Bunk <bunk@stusta.de>
+> Here is the crypto update for 2.6.23:
+> 
+> Please pull from
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+> 
+> or
+> 
+> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
----
+I merged this into my net-2.6 tree, there was a tiny conflict
+in crypto/Kconfig I had to resolve because of the async_tx
+stuff that went in upstream.
 
- crypto/Kconfig |    3 ---
- 1 file changed, 3 deletions(-)
+Herbert can you contact the async_tx author to make sure that
+his crypto/ bits go through you in the future so that conflicts
+like this can be avoided?
 
---- linux-2.6.22-rc6-mm1/crypto/Kconfig.old	2007-07-14 06:24:23.000000000 +0200
-+++ linux-2.6.22-rc6-mm1/crypto/Kconfig	2007-07-14 06:24:30.000000000 +0200
-@@ -146,7 +146,6 @@
- 	tristate "ECB support"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
--	default m
- 	help
- 	  ECB: Electronic CodeBook mode
- 	  This is the simplest block cipher algorithm.  It simply encrypts
-@@ -156,7 +155,6 @@
- 	tristate "CBC support"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
--	default m
- 	help
- 	  CBC: Cipher Block Chaining mode
- 	  This block cipher algorithm is required for IPSec.
-@@ -165,7 +163,6 @@
- 	tristate "PCBC support"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
--	default m
- 	help
- 	  PCBC: Propagating Cipher Block Chaining mode
- 	  This block cipher algorithm is required for RxRPC.
+Thanks.
