@@ -1,19 +1,19 @@
 From: "Nawang Chhetan" <nawang.chhetan@gmail.com>
-Subject: OCF Support on linux 2.6.
-Date: Mon, 16 Jul 2007 15:18:38 +0530
-Message-ID: <70a419b80707160248g57943dd3p6ed57fda2405014e@mail.gmail.com>
+Subject: OCF support on 2.6 Kernel.
+Date: Mon, 16 Jul 2007 15:25:12 +0530
+Message-ID: <70a419b80707160255r3e4e8b1fk8c0a8ca2152d52e6@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wa-out-1112.google.com ([209.85.146.181]:46868 "EHLO
+Received: from wa-out-1112.google.com ([209.85.146.181]:61135 "EHLO
 	wa-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758052AbXGPJsj (ORCPT
+	with ESMTP id S1765963AbXGPJzN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Jul 2007 05:48:39 -0400
-Received: by wa-out-1112.google.com with SMTP id v27so1519560wah
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Jul 2007 02:48:39 -0700 (PDT)
+	Mon, 16 Jul 2007 05:55:13 -0400
+Received: by wa-out-1112.google.com with SMTP id v27so1520982wah
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jul 2007 02:55:13 -0700 (PDT)
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
@@ -39,8 +39,6 @@ Do I need to insmod the SafeXcel-1141 driver too ?
 
 Please help !!
 
-
 -- 
 Nawang Chhetan
-Software Engineer
 SafeNet India.
