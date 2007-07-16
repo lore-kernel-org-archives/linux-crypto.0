@@ -1,108 +1,62 @@
-From: Frederik Sdun <fs_1600@web.de>
-Subject: Re: [PATCH] crypto/aes.c remove operator ? and variable t in
-	bf_setkey
-Date: Mon, 16 Jul 2007 15:15:13 +0200
-Message-ID: <1184591714.8255.16.camel@localhost>
-References: <1184547154.23516.12.camel@localhost>
-	 <20070716032831.GA25617@gondor.apana.org.au>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: Re: OCF Support on linux 2.6.
+Date: Tue, 17 Jul 2007 09:51:33 +1000
+Message-ID: <20070716235133.GA27925@securecomputing.com>
+References: <70a419b80707160248g57943dd3p6ed57fda2405014e@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Nawang Chhetan <nawang.chhetan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fmmailgate02.web.de ([217.72.192.227]:59958 "EHLO
-	fmmailgate02.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757205AbXGPNPR (ORCPT
+Received: from rex.snapgear.com ([203.143.235.140]:37159 "EHLO
+	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757921AbXGQAYn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Jul 2007 09:15:17 -0400
-In-Reply-To: <20070716032831.GA25617@gondor.apana.org.au>
+	Mon, 16 Jul 2007 20:24:43 -0400
+Content-Disposition: inline
+In-Reply-To: <70a419b80707160248g57943dd3p6ed57fda2405014e@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Removed the temporary variable t.
-Operator ? removed out of loop by false case. 
 
-Signed-off-by: Frederik Sdun <fs_1600@web.de>
+Jivin Nawang Chhetan lays it down ...
+> Hi All,
+> 
+> I am trying to integrate OCF-linux with Quicksec on linux 2.6 kernels.
+> Many versions of OCF-Linux have been released but wtihout clear
+> demarcation of 2.6 kernel versions they support. All they mention is
+> support for kernel verison 2.6.11 and later and the README within the
+> distributions states it can be easily modified to support recent
+> version of kernels( which is true, I did it for 2.6.17.7 )
+> My Question here is that:
+> Is there any good OCF-Linux documentation available ?
 
---- crypto/aes.c.orig   2007-07-15 11:43:21.000000000 +0200
-+++ crypto/aes.c        2007-07-16 14:38:57.000000000 +0200
-@@ -135,7 +135,7 @@ f_mult (u8 a, u8 b)
- static void __init
- gen_tabs (void)
- {
--       u32 i, t;
-+       u32 i;
-        u8 p, q;
- 
-        /* log and power tables for GF(2**8) finite field with
-@@ -157,8 +157,11 @@ gen_tabs (void)
-                p = (p << 1) ^ (p & 0x80 ? 0x01b : 0);
-        }
- 
--       for (i = 0; i < 256; ++i) {
--               p = (i ? pow_tab[255 - log_tab[i]] : 0);
-+       sbx_tab[0] = 0x63;
-+       isb_tab[0x63] = 0;
-+
-+       for (i = 1; i < 256; ++i) {
-+               p = pow_tab[255 - log_tab[i]];
-                q = ((p >> 7) | (p << 1)) ^ ((p >> 6) | (p << 2));
-                p ^= 0x63 ^ q ^ ((q >> 6) | (q << 2));
-                sbx_tab[i] = p;
-@@ -168,38 +171,36 @@ gen_tabs (void)
-        for (i = 0; i < 256; ++i) {
-                p = sbx_tab[i];
- 
--               t = p;
--               fl_tab[0][i] = t;
--               fl_tab[1][i] = rol32(t, 8);
--               fl_tab[2][i] = rol32(t, 16);
--               fl_tab[3][i] = rol32(t, 24);
-+               fl_tab[0][i] = p;
-+               fl_tab[1][i] = rol32(p, 8);
-+               fl_tab[2][i] = rol32(p, 16);
-+               fl_tab[3][i] = rol32(p, 24);
- 
--               t = ((u32) ff_mult (2, p)) |
-+               p = ((u32) ff_mult (2, p)) |
-                    ((u32) p << 8) |
-                    ((u32) p << 16) | ((u32) ff_mult (3, p) << 24);
- 
--               ft_tab[0][i] = t;
--               ft_tab[1][i] = rol32(t, 8);
--               ft_tab[2][i] = rol32(t, 16);
--               ft_tab[3][i] = rol32(t, 24);
-+               ft_tab[0][i] = p;
-+               ft_tab[1][i] = rol32(p, 8);
-+               ft_tab[2][i] = rol32(p, 16);
-+               ft_tab[3][i] = rol32(p, 24);
- 
-                p = isb_tab[i];
- 
--               t = p;
--               il_tab[0][i] = t;
--               il_tab[1][i] = rol32(t, 8);
--               il_tab[2][i] = rol32(t, 16);
--               il_tab[3][i] = rol32(t, 24);
-+               il_tab[0][i] = p;
-+               il_tab[1][i] = rol32(p, 8);
-+               il_tab[2][i] = rol32(p, 16);
-+               il_tab[3][i] = rol32(p, 24);
- 
--               t = ((u32) ff_mult (14, p)) |
-+               p = ((u32) ff_mult (14, p)) |
-                    ((u32) ff_mult (9, p) << 8) |
-                    ((u32) ff_mult (13, p) << 16) |
-                    ((u32) ff_mult (11, p) << 24);
- 
--               it_tab[0][i] = t;
--               it_tab[1][i] = rol32(t, 8);
--               it_tab[2][i] = rol32(t, 16);
--               it_tab[3][i] = rol32(t, 24);
-+               it_tab[0][i] = p;
-+               it_tab[1][i] = rol32(p, 8);
-+               it_tab[2][i] = rol32(p, 16);
-+               it_tab[3][i] = rol32(p, 24);
-        }
- }
+Only whats on the website.  Your best bet is to ask.
+The current releases work for kernels up to 2.6.18 without
+any major issues.  I should be doing a release this week with
+everything up to 2.6.22 supported fully.  Just finishing off the
+testing.
+
+> What is/are the version of 2.6 kernel, the OCF-Linux is most
+> stable/tested/developed for ?
+> Further I tried to use SafeXcel-1141 hardware accelerator ( which is
+> claimed to be supported) with OCF-Linux, but inserting the module
+> safe.ko (after ocf.ko and cryptodev.ko ) hangs the machine (Kernel
+> version 2.6.17.6 .).
+> Do I need to insmod the SafeXcel-1141 driver too ?
+
+I have used the safenet driver on SuperH and ARM platforms. It works
+fine there.  I don't have any way to test it on x86 though.
+
+It should work fine on 2.6.17, load everything with debug enabled
+and see what happens.
+
+If you are running on an x86_64 system, disable all the code in
+"random.c" however,  it was broken on 64bits arches in older versions.
+
+Cheers,
+Davidm
+
+-- 
+David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
+Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
