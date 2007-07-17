@@ -1,27 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [2.6 patch] crypto/Kconfig: remove "default m"s
-Date: Tue, 17 Jul 2007 20:31:59 +0800
-Message-ID: <20070717123158.GA6962@gondor.apana.org.au>
-References: <20070714045349.GF3565@stusta.de>
+Subject: Re: [2.6 patch] drivers/crypto/Kconfig: hardware drivers shouldn't "default m"
+Date: Tue, 17 Jul 2007 20:33:36 +0800
+Message-ID: <20070717123336.GA7211@gondor.apana.org.au>
+References: <20070715100013.GI3565@stusta.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 To: Adrian Bunk <bunk@stusta.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2972 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2983 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751808AbXGQMcr (ORCPT
+	with ESMTP id S1755659AbXGQMdn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Jul 2007 08:32:47 -0400
+	Tue, 17 Jul 2007 08:33:43 -0400
 Content-Disposition: inline
-In-Reply-To: <20070714045349.GF3565@stusta.de>
+In-Reply-To: <20070715100013.GI3565@stusta.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jul 14, 2007 at 06:53:50AM +0200, Adrian Bunk wrote:
-> Other options requiring specific block cipher algorithms already have 
-> the appropriate select's.
+On Sun, Jul 15, 2007 at 12:00:13PM +0200, Adrian Bunk wrote:
+> Hardware drivers shouldn't default to m.
 > 
 > Signed-off-by: Adrian Bunk <bunk@stusta.de>
 
