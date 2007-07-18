@@ -1,115 +1,50 @@
-From: Frederik Sdun <fs_1600@web.de>
-Subject: Re: [PATCH] crypto/aes.c remove operator ? and variable t in
-	bf_setkey
-Date: Wed, 18 Jul 2007 23:55:05 +0200
-Message-ID: <1184795705.11987.11.camel@localhost>
-References: <1184547154.23516.12.camel@localhost>
-	 <20070716032831.GA25617@gondor.apana.org.au>
-	 <1184591714.8255.16.camel@localhost>
-	 <20070717123505.GB7211@gondor.apana.org.au>
+From: Joy Latten <latten@austin.ibm.com>
+Subject: Re: combined mode algorithms
+Date: Wed, 18 Jul 2007 17:32:53 -0500
+Message-ID: <1184797973.15699.310.camel@faith.austin.ibm.com>
+References: <1182809638.15699.221.camel@faith.austin.ibm.com>
+	 <20070626090956.GA5833@2ka.mipt.ru>
+	 <1182870156.15699.230.camel@faith.austin.ibm.com>
+	 <20070718044612.GA14232@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fmmailgate03.web.de ([217.72.192.234]:64160 "EHLO
-	fmmailgate03.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753142AbXGRVzH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jul 2007 17:55:07 -0400
-In-Reply-To: <20070717123505.GB7211@gondor.apana.org.au>
+Received: from e4.ny.us.ibm.com ([32.97.182.144]:36694 "EHLO e4.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753470AbXGRWev (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Jul 2007 18:34:51 -0400
+Received: from d01relay02.pok.ibm.com (d01relay02.pok.ibm.com [9.56.227.234])
+	by e4.ny.us.ibm.com (8.13.8/8.13.8) with ESMTP id l6IMYowo017905
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Jul 2007 18:34:50 -0400
+Received: from d01av03.pok.ibm.com (d01av03.pok.ibm.com [9.56.224.217])
+	by d01relay02.pok.ibm.com (8.13.8/8.13.8/NCO v8.4) with ESMTP id l6IMYoLY522044
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Jul 2007 18:34:50 -0400
+Received: from d01av03.pok.ibm.com (loopback [127.0.0.1])
+	by d01av03.pok.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id l6IMYovX019571
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Jul 2007 18:34:50 -0400
+In-Reply-To: <20070718044612.GA14232@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi
-now i have the failure in my patch. i excuse for the spamming and foolness.
+On Wed, 2007-07-18 at 12:46 +0800, Herbert Xu wrote:
+> On Tue, Jun 26, 2007 at 10:02:36AM -0500, Joy Latten wrote:
+> >
+> > Ok, thanks. This helps. I can code up the infrastructure for this. I 
+> > am thinking I will eventually need one of the algorithms to test and
+> > complete it though. RFCs 4309 and 4106 specify ESP working with AES-CCM
+> > and AES-GCM.
+> 
+> Any progress on this Joy?
+> 
+> I'm about to start working on this myself in the next couple of
+> days.
+> 
+Great! I have been distracted with some other things, but will also
+start this in the next day or two. 
 
-happy coding Frederik
-
-Removed the temporary variable t which is not needed working copy of p.
-Operator ? removed out of loop by false case. 
-
-Signed-off-by: Frederik Sdun <fs_1600@web.de>
-
---- linux-2.6/crypto/aes.c.orig 2007-07-15 11:43:21.000000000 +0200
-+++ linux-2.6/crypto/aes.c      2007-07-18 23:40:49.000000000 +0200
-@@ -135,7 +135,7 @@ f_mult (u8 a, u8 b)
- static void __init
- gen_tabs (void)
- {
--       u32 i, t;
-+       u32 i;
-        u8 p, q;
- 
-        /* log and power tables for GF(2**8) finite field with
-@@ -157,8 +157,11 @@ gen_tabs (void)
-                p = (p << 1) ^ (p & 0x80 ? 0x01b : 0);
-        }
- 
--       for (i = 0; i < 256; ++i) {
--               p = (i ? pow_tab[255 - log_tab[i]] : 0);
-+       sbx_tab[0] = 0x63;
-+       isb_tab[0x63] = 0;
-+
-+       for (i = 1; i < 256; ++i) {
-+               p = pow_tab[255 - log_tab[i]];
-                q = ((p >> 7) | (p << 1)) ^ ((p >> 6) | (p << 2));
-                p ^= 0x63 ^ q ^ ((q >> 6) | (q << 2));
-                sbx_tab[i] = p;
-@@ -168,38 +171,36 @@ gen_tabs (void)
-        for (i = 0; i < 256; ++i) {
-                p = sbx_tab[i];
- 
--               t = p;
--               fl_tab[0][i] = t;
--               fl_tab[1][i] = rol32(t, 8);
--               fl_tab[2][i] = rol32(t, 16);
--               fl_tab[3][i] = rol32(t, 24);
-+               fl_tab[0][i] = p;
-+               fl_tab[1][i] = rol32(p, 8);
-+               fl_tab[2][i] = rol32(p, 16);
-+               fl_tab[3][i] = rol32(p, 24);
- 
--               t = ((u32) ff_mult (2, p)) |
-+               p = ((u32) ff_mult (2, p)) |
-                    ((u32) p << 8) |
-                    ((u32) p << 16) | ((u32) ff_mult (3, p) << 24);
- 
--               ft_tab[0][i] = t;
--               ft_tab[1][i] = rol32(t, 8);
--               ft_tab[2][i] = rol32(t, 16);
--               ft_tab[3][i] = rol32(t, 24);
-+               ft_tab[0][i] = p;
-+               ft_tab[1][i] = rol32(p, 8);
-+               ft_tab[2][i] = rol32(p, 16);
-+               ft_tab[3][i] = rol32(p, 24);
- 
-                p = isb_tab[i];
- 
--               t = p;
--               il_tab[0][i] = t;
--               il_tab[1][i] = rol32(t, 8);
--               il_tab[2][i] = rol32(t, 16);
--               il_tab[3][i] = rol32(t, 24);
-+               il_tab[0][i] = p;
-+               il_tab[1][i] = rol32(p, 8);
-+               il_tab[2][i] = rol32(p, 16);
-+               il_tab[3][i] = rol32(p, 24);
- 
--               t = ((u32) ff_mult (14, p)) |
-+               p = ((u32) ff_mult (14, p)) |
-                    ((u32) ff_mult (9, p) << 8) |
-                    ((u32) ff_mult (13, p) << 16) |
-                    ((u32) ff_mult (11, p) << 24);
- 
--               it_tab[0][i] = t;
--               it_tab[1][i] = rol32(t, 8);
--               it_tab[2][i] = rol32(t, 16);
--               it_tab[3][i] = rol32(t, 24);
-+               it_tab[0][i] = p;
-+               it_tab[1][i] = rol32(p, 8);
-+               it_tab[2][i] = rol32(p, 16);
-+               it_tab[3][i] = rol32(p, 24);
-        }
- }
+Regards,
+Joy 
