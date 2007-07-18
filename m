@@ -1,184 +1,115 @@
-From: "Nawang Chhetan" <nawang.chhetan@gmail.com>
-Subject: Re: OCF Support on linux 2.6.
-Date: Wed, 18 Jul 2007 17:10:01 +0530
-Message-ID: <70a419b80707180440q73ba41dcqba935f38402012b9@mail.gmail.com>
-References: <70a419b80707160248g57943dd3p6ed57fda2405014e@mail.gmail.com>
-	 <20070716235133.GA27925@securecomputing.com>
-	 <70a419b80707170020h6245b8e0w498c159ad885c588@mail.gmail.com>
-	 <20070718001420.GA31264@securecomputing.com>
-	 <70a419b80707172037qebf9afaq16f7a0ee296348f6@mail.gmail.com>
-	 <20070718041524.GA13685@securecomputing.com>
+From: Frederik Sdun <fs_1600@web.de>
+Subject: Re: [PATCH] crypto/aes.c remove operator ? and variable t in
+	bf_setkey
+Date: Wed, 18 Jul 2007 23:55:05 +0200
+Message-ID: <1184795705.11987.11.camel@localhost>
+References: <1184547154.23516.12.camel@localhost>
+	 <20070716032831.GA25617@gondor.apana.org.au>
+	 <1184591714.8255.16.camel@localhost>
+	 <20070717123505.GB7211@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "David McCullough" <David_Mccullough@securecomputing.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nz-out-0506.google.com ([64.233.162.239]:25069 "EHLO
-	nz-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753494AbXGRLkD (ORCPT
+Received: from fmmailgate03.web.de ([217.72.192.234]:64160 "EHLO
+	fmmailgate03.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753142AbXGRVzH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jul 2007 07:40:03 -0400
-Received: by nz-out-0506.google.com with SMTP id s18so140694nze
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Jul 2007 04:40:02 -0700 (PDT)
-In-Reply-To: <20070718041524.GA13685@securecomputing.com>
-Content-Disposition: inline
+	Wed, 18 Jul 2007 17:55:07 -0400
+In-Reply-To: <20070717123505.GB7211@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi David,
-                  I have noticed that with every release of OCF-Linux
-backward compatibilty is not taken care of.
+Hi
+now i have the failure in my patch. i excuse for the spamming and foolness.
 
-For example in cryptosoft.c file you declared a new instance of
-blkcipher_desc structure, this structure is no defined upto 2.6.18. I
-could find it on 2.6.20.1. I dont know about version of kernel in
-between.
+happy coding Frederik
 
-Is this a specific observation, or backward compatibilty is not
-considered at all?
+Removed the temporary variable t which is not needed working copy of p.
+Operator ? removed out of loop by false case. 
 
+Signed-off-by: Frederik Sdun <fs_1600@web.de>
 
-On 7/18/07, David McCullough <David_Mccullough@securecomputing.com> wrote:
->
-> Jivin Nawang Chhetan lays it down ...
-> > Hi David,
-> >         Thanks for the reply. Since there is no proper API
-> > documentation for the OCF-Linux, can we refer to original OpenBsd
-> > Cryptographic Documentaton . Like the one in the following link:
-> >
-> > http://www.digipedia.pl/man/crypto.9.html
-> >
-> >
-> > I just cross checked few API's and realized they are almost the same.
->
-> They are the same :-)  Its a linux port of the FreeBSD version of the
-> OpenBSD crypto API.
->
-> Have you looked at:
->
->        http://www.thought.net/jason/ocfpaper/
->        http://www.usenix.org/publications/library/proceedings/bsdcon03/tech/leffler_crypto/leffler_crypto.pdf
->
-> All available from the links page on:
->
->        http://ocf-linux.sourceforge.net/links.html
->
-> Cheers,
-> Davidm
->
-> > On 7/18/07, David McCullough <David_Mccullough@securecomputing.com> wrote:
-> > >
-> > >Jivin Nawang Chhetan lays it down ...
-> > >> Hi David,
-> > >>   Thanks for the reply. I have been using the SafeXcel 1141 card on
-> > >> x86 platform. Need to investigate this further as suggested by you.
-> > >
-> > >Make sure you have the latest safenet driver from the 2007 tarball,
-> > >there are some bus width fixes in there IIRC for all the PCI drivers.
-> > >
-> > >Other than that,  it's debug time.
-> > >
-> > >> I have a question, I have noticed that list of hardware accelerators
-> > >> are supported with OCF-Linux is a bit unclear, even though these
-> > >> hardware accelerators are mentioned clearly:
-> > >>
-> > >> 1.    Hifn-7751
-> > >
-> > >hifn 7751, 7956
-> > >
-> > >safenet 1141, 1741
-> > >
-> > >Intel IXP (465 425 and 422)
-> > >
-> > >Freescale SEC (talitos)
-> > >
-> > >There is also a Via padlock driver in freebsd that would be trivial to
-> > >port.
-> > >
-> > >Software (using linux kernel crypto API,  which may also use hardware :-)
-> > >
-> > >> Is this the exhaustive list ?
-> > >
-> > >The list above is,
-> > >
-> > >Cheers,
-> > >Davidm
-> > >
-> > >> On 7/17/07, David McCullough <David_Mccullough@securecomputing.com>
-> > >wrote:
-> > >> >
-> > >> >Jivin Nawang Chhetan lays it down ...
-> > >> >> Hi All,
-> > >> >>
-> > >> >> I am trying to integrate OCF-linux with Quicksec on linux 2.6 kernels.
-> > >> >> Many versions of OCF-Linux have been released but wtihout clear
-> > >> >> demarcation of 2.6 kernel versions they support. All they mention is
-> > >> >> support for kernel verison 2.6.11 and later and the README within the
-> > >> >> distributions states it can be easily modified to support recent
-> > >> >> version of kernels( which is true, I did it for 2.6.17.7 )
-> > >> >> My Question here is that:
-> > >> >> Is there any good OCF-Linux documentation available ?
-> > >> >
-> > >> >Only whats on the website.  Your best bet is to ask.
-> > >> >The current releases work for kernels up to 2.6.18 without
-> > >> >any major issues.  I should be doing a release this week with
-> > >> >everything up to 2.6.22 supported fully.  Just finishing off the
-> > >> >testing.
-> > >> >
-> > >> >> What is/are the version of 2.6 kernel, the OCF-Linux is most
-> > >> >> stable/tested/developed for ?
-> > >> >> Further I tried to use SafeXcel-1141 hardware accelerator ( which is
-> > >> >> claimed to be supported) with OCF-Linux, but inserting the module
-> > >> >> safe.ko (after ocf.ko and cryptodev.ko ) hangs the machine (Kernel
-> > >> >> version 2.6.17.6 .).
-> > >> >> Do I need to insmod the SafeXcel-1141 driver too ?
-> > >> >
-> > >> >I have used the safenet driver on SuperH and ARM platforms. It works
-> > >> >fine there.  I don't have any way to test it on x86 though.
-> > >> >
-> > >> >It should work fine on 2.6.17, load everything with debug enabled
-> > >> >and see what happens.
-> > >> >
-> > >> >If you are running on an x86_64 system, disable all the code in
-> > >> >"random.c" however,  it was broken on 64bits arches in older versions.
-> > >> >
-> > >> >Cheers,
-> > >> >Davidm
-> > >> >
-> > >> >--
-> > >> >David McCullough,  david_mccullough@securecomputing.com,   Ph:+61
-> > >734352815
-> > >> >Secure Computing - SnapGear  http://www.uCdot.org
-> > >http://www.cyberguard.com
-> > >> >
-> > >>
-> > >>
-> > >> --
-> > >> Nawang Chhetan
-> > >> Software Engineer
-> > >> SafeNet India.
-> > >>
-> > >
-> > >--
-> > >David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-> > >Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
-> > >
-> >
-> >
-> > --
-> > Nawang Chhetan
-> > Software Engineer
-> > SafeNet India.
-> >
->
-> --
-> David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-> Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
->
-
-
--- 
-Nawang Chhetan
-Software Engineer
-SafeNet India.
+--- linux-2.6/crypto/aes.c.orig 2007-07-15 11:43:21.000000000 +0200
++++ linux-2.6/crypto/aes.c      2007-07-18 23:40:49.000000000 +0200
+@@ -135,7 +135,7 @@ f_mult (u8 a, u8 b)
+ static void __init
+ gen_tabs (void)
+ {
+-       u32 i, t;
++       u32 i;
+        u8 p, q;
+ 
+        /* log and power tables for GF(2**8) finite field with
+@@ -157,8 +157,11 @@ gen_tabs (void)
+                p = (p << 1) ^ (p & 0x80 ? 0x01b : 0);
+        }
+ 
+-       for (i = 0; i < 256; ++i) {
+-               p = (i ? pow_tab[255 - log_tab[i]] : 0);
++       sbx_tab[0] = 0x63;
++       isb_tab[0x63] = 0;
++
++       for (i = 1; i < 256; ++i) {
++               p = pow_tab[255 - log_tab[i]];
+                q = ((p >> 7) | (p << 1)) ^ ((p >> 6) | (p << 2));
+                p ^= 0x63 ^ q ^ ((q >> 6) | (q << 2));
+                sbx_tab[i] = p;
+@@ -168,38 +171,36 @@ gen_tabs (void)
+        for (i = 0; i < 256; ++i) {
+                p = sbx_tab[i];
+ 
+-               t = p;
+-               fl_tab[0][i] = t;
+-               fl_tab[1][i] = rol32(t, 8);
+-               fl_tab[2][i] = rol32(t, 16);
+-               fl_tab[3][i] = rol32(t, 24);
++               fl_tab[0][i] = p;
++               fl_tab[1][i] = rol32(p, 8);
++               fl_tab[2][i] = rol32(p, 16);
++               fl_tab[3][i] = rol32(p, 24);
+ 
+-               t = ((u32) ff_mult (2, p)) |
++               p = ((u32) ff_mult (2, p)) |
+                    ((u32) p << 8) |
+                    ((u32) p << 16) | ((u32) ff_mult (3, p) << 24);
+ 
+-               ft_tab[0][i] = t;
+-               ft_tab[1][i] = rol32(t, 8);
+-               ft_tab[2][i] = rol32(t, 16);
+-               ft_tab[3][i] = rol32(t, 24);
++               ft_tab[0][i] = p;
++               ft_tab[1][i] = rol32(p, 8);
++               ft_tab[2][i] = rol32(p, 16);
++               ft_tab[3][i] = rol32(p, 24);
+ 
+                p = isb_tab[i];
+ 
+-               t = p;
+-               il_tab[0][i] = t;
+-               il_tab[1][i] = rol32(t, 8);
+-               il_tab[2][i] = rol32(t, 16);
+-               il_tab[3][i] = rol32(t, 24);
++               il_tab[0][i] = p;
++               il_tab[1][i] = rol32(p, 8);
++               il_tab[2][i] = rol32(p, 16);
++               il_tab[3][i] = rol32(p, 24);
+ 
+-               t = ((u32) ff_mult (14, p)) |
++               p = ((u32) ff_mult (14, p)) |
+                    ((u32) ff_mult (9, p) << 8) |
+                    ((u32) ff_mult (13, p) << 16) |
+                    ((u32) ff_mult (11, p) << 24);
+ 
+-               it_tab[0][i] = t;
+-               it_tab[1][i] = rol32(t, 8);
+-               it_tab[2][i] = rol32(t, 16);
+-               it_tab[3][i] = rol32(t, 24);
++               it_tab[0][i] = p;
++               it_tab[1][i] = rol32(p, 8);
++               it_tab[2][i] = rol32(p, 16);
++               it_tab[3][i] = rol32(p, 24);
+        }
+ }
