@@ -1,204 +1,59 @@
-From: David McCullough <David_Mccullough@securecomputing.com>
-Subject: Re: OCF Support on linux 2.6.
-Date: Thu, 19 Jul 2007 09:57:53 +1000
-Message-ID: <20070718235753.GA17629@securecomputing.com>
-References: <70a419b80707160248g57943dd3p6ed57fda2405014e@mail.gmail.com> <20070716235133.GA27925@securecomputing.com> <70a419b80707170020h6245b8e0w498c159ad885c588@mail.gmail.com> <20070718001420.GA31264@securecomputing.com> <70a419b80707172037qebf9afaq16f7a0ee296348f6@mail.gmail.com> <20070718041524.GA13685@securecomputing.com> <70a419b80707180440q73ba41dcqba935f38402012b9@mail.gmail.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: Looking for comments on a Linux driver for HW accelerated Kasumi+F8+F9 algorithms.
+Date: Thu, 19 Jul 2007 13:48:00 +0400
+Message-ID: <20070719094800.GB15839@2ka.mipt.ru>
+References: <515423.29711.qm@web81310.mail.mud.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Cc: linux-crypto@vger.kernel.org
-To: Nawang Chhetan <nawang.chhetan@gmail.com>
+To: tirumalareddy marri <tirumalareddymarri@yahoo.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rex.snapgear.com ([203.143.235.140]:50143 "EHLO
-	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1760721AbXGRX4k (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jul 2007 19:56:40 -0400
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:33450 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753162AbXGSJsO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 Jul 2007 05:48:14 -0400
 Content-Disposition: inline
-In-Reply-To: <70a419b80707180440q73ba41dcqba935f38402012b9@mail.gmail.com>
+In-Reply-To: <515423.29711.qm@web81310.mail.mud.yahoo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi.
 
-Jivin Nawang Chhetan lays it down ...
-> Hi David,
->                  I have noticed that with every release of OCF-Linux
-> backward compatibilty is not taken care of.
-> 
-> For example in cryptosoft.c file you declared a new instance of
-> blkcipher_desc structure, this structure is no defined upto 2.6.18. I
-> could find it on 2.6.20.1. I dont know about version of kernel in
-> between.
-> 
-> Is this a specific observation, or backward compatibilty is not
-> considered at all?
+On Wed, Jul 18, 2007 at 04:33:14PM -0700, tirumalareddy marri (tirumalareddymarri@yahoo.com) wrote:
+> Hi ,
+>   I have created Linux driver for HW accelerated
+> kasumi, F8 and F9 algorithms. Could you please look at
+> the driver and provide comments about the usage. This
+> driver is acts as a character driver. Encryption API's
+> can be accessed from kernel and user space. My concern
+> is accessing the driver from user space is secure or
+> not.
+>  
+>   If possible can some one please send me rules to
+> follow when we write a Linux security driver.
+> --------------------------- patch for the driver
+> -----------
 
-Ok,  if you are looking in the current 2007 based releases,  cryptosoft
-doesn't even work in that release :-(
+Sorry, but your patch looks horrible - your mailer broke alignment, you
+do not follow Linux kernel coding standards. Please fix that first.
 
-The version I am trying to put up this week has full backward compat to
-2.4 so that is just an aberation (a long one :-(
+According to patch itself, do all 440epx have that engine, since you
+access generic registers? Patch has too many debug prints in the hottest
+path, either remove them or wrap into helper which allows to turn them
+off - no one wants to read a message each time data is ready.
+Encryption is not protected against simultaneous access - there will be
+either bug or data corruption if several users simultaneously try to
+perfrom a processing. There is number of missed checks of the returned
+values of the functions which can fail. There is number of exported
+symbols without appropriate in-kernel users - it is not allowed.
 
-In general,  backwards compat is high on the list of things to provide.
-It helps ensure that the HW drivers are easier to maintain if nothing
-else ;-)
+And userspace interface - I will not argue if it is good or bad, but be
+ready to listen quite a few phrases about your taste.
 
-Cheers,
-Davidm
-
-> On 7/18/07, David McCullough <David_Mccullough@securecomputing.com> wrote:
-> >
-> >Jivin Nawang Chhetan lays it down ...
-> >> Hi David,
-> >>         Thanks for the reply. Since there is no proper API
-> >> documentation for the OCF-Linux, can we refer to original OpenBsd
-> >> Cryptographic Documentaton . Like the one in the following link:
-> >>
-> >> http://www.digipedia.pl/man/crypto.9.html
-> >>
-> >>
-> >> I just cross checked few API's and realized they are almost the same.
-> >
-> >They are the same :-)  Its a linux port of the FreeBSD version of the
-> >OpenBSD crypto API.
-> >
-> >Have you looked at:
-> >
-> >       http://www.thought.net/jason/ocfpaper/
-> >       http://www.usenix.org/publications/library/proceedings/bsdcon03/tech/leffler_crypto/leffler_crypto.pdf
-> >
-> >All available from the links page on:
-> >
-> >       http://ocf-linux.sourceforge.net/links.html
-> >
-> >Cheers,
-> >Davidm
-> >
-> >> On 7/18/07, David McCullough <David_Mccullough@securecomputing.com> 
-> >wrote:
-> >> >
-> >> >Jivin Nawang Chhetan lays it down ...
-> >> >> Hi David,
-> >> >>   Thanks for the reply. I have been using the SafeXcel 1141 card on
-> >> >> x86 platform. Need to investigate this further as suggested by you.
-> >> >
-> >> >Make sure you have the latest safenet driver from the 2007 tarball,
-> >> >there are some bus width fixes in there IIRC for all the PCI drivers.
-> >> >
-> >> >Other than that,  it's debug time.
-> >> >
-> >> >> I have a question, I have noticed that list of hardware accelerators
-> >> >> are supported with OCF-Linux is a bit unclear, even though these
-> >> >> hardware accelerators are mentioned clearly:
-> >> >>
-> >> >> 1.    Hifn-7751
-> >> >
-> >> >hifn 7751, 7956
-> >> >
-> >> >safenet 1141, 1741
-> >> >
-> >> >Intel IXP (465 425 and 422)
-> >> >
-> >> >Freescale SEC (talitos)
-> >> >
-> >> >There is also a Via padlock driver in freebsd that would be trivial to
-> >> >port.
-> >> >
-> >> >Software (using linux kernel crypto API,  which may also use hardware 
-> >:-)
-> >> >
-> >> >> Is this the exhaustive list ?
-> >> >
-> >> >The list above is,
-> >> >
-> >> >Cheers,
-> >> >Davidm
-> >> >
-> >> >> On 7/17/07, David McCullough <David_Mccullough@securecomputing.com>
-> >> >wrote:
-> >> >> >
-> >> >> >Jivin Nawang Chhetan lays it down ...
-> >> >> >> Hi All,
-> >> >> >>
-> >> >> >> I am trying to integrate OCF-linux with Quicksec on linux 2.6 
-> >kernels.
-> >> >> >> Many versions of OCF-Linux have been released but wtihout clear
-> >> >> >> demarcation of 2.6 kernel versions they support. All they mention 
-> >is
-> >> >> >> support for kernel verison 2.6.11 and later and the README within 
-> >the
-> >> >> >> distributions states it can be easily modified to support recent
-> >> >> >> version of kernels( which is true, I did it for 2.6.17.7 )
-> >> >> >> My Question here is that:
-> >> >> >> Is there any good OCF-Linux documentation available ?
-> >> >> >
-> >> >> >Only whats on the website.  Your best bet is to ask.
-> >> >> >The current releases work for kernels up to 2.6.18 without
-> >> >> >any major issues.  I should be doing a release this week with
-> >> >> >everything up to 2.6.22 supported fully.  Just finishing off the
-> >> >> >testing.
-> >> >> >
-> >> >> >> What is/are the version of 2.6 kernel, the OCF-Linux is most
-> >> >> >> stable/tested/developed for ?
-> >> >> >> Further I tried to use SafeXcel-1141 hardware accelerator ( which 
-> >is
-> >> >> >> claimed to be supported) with OCF-Linux, but inserting the module
-> >> >> >> safe.ko (after ocf.ko and cryptodev.ko ) hangs the machine (Kernel
-> >> >> >> version 2.6.17.6 .).
-> >> >> >> Do I need to insmod the SafeXcel-1141 driver too ?
-> >> >> >
-> >> >> >I have used the safenet driver on SuperH and ARM platforms. It works
-> >> >> >fine there.  I don't have any way to test it on x86 though.
-> >> >> >
-> >> >> >It should work fine on 2.6.17, load everything with debug enabled
-> >> >> >and see what happens.
-> >> >> >
-> >> >> >If you are running on an x86_64 system, disable all the code in
-> >> >> >"random.c" however,  it was broken on 64bits arches in older 
-> >versions.
-> >> >> >
-> >> >> >Cheers,
-> >> >> >Davidm
-> >> >> >
-> >> >> >--
-> >> >> >David McCullough,  david_mccullough@securecomputing.com,   Ph:+61
-> >> >734352815
-> >> >> >Secure Computing - SnapGear  http://www.uCdot.org
-> >> >http://www.cyberguard.com
-> >> >> >
-> >> >>
-> >> >>
-> >> >> --
-> >> >> Nawang Chhetan
-> >> >> Software Engineer
-> >> >> SafeNet India.
-> >> >>
-> >> >
-> >> >--
-> >> >David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 
-> >734352815
-> >> >Secure Computing - SnapGear  http://www.uCdot.org 
-> >http://www.cyberguard.com
-> >> >
-> >>
-> >>
-> >> --
-> >> Nawang Chhetan
-> >> Software Engineer
-> >> SafeNet India.
-> >>
-> >
-> >--
-> >David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-> >Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
-> >
-> 
-> 
-> -- 
-> Nawang Chhetan
-> Software Engineer
-> SafeNet India.
-> 
+I would suggest to create a generic userspace interface to deliver
+crypto events to/frm userspace and bind it to cryptoapi. You also likely
+want to create a cryptoapi driver to allow in-kernel subsystem to use
+kasumi at least.
 
 -- 
-David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
+	Evgeniy Polyakov
