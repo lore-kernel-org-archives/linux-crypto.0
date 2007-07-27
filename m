@@ -1,59 +1,49 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Re: [PATCH 1/3] [DM] dm-crypt: Move post-processing into
-	its	own queue
-Date: Wed, 25 Jul 2007 11:45:22 +0200
-Message-ID: <46A71BB2.5070806@redhat.com>
-References: <20070711030303.GA6730@gondor.apana.org.au>
-	<E1I8SWH-0001lg-00@gondolin.me.apana.org.au>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: ocf-linux-20070727 - Asynchronous Crypto support for linux
+Date: Fri, 27 Jul 2007 23:36:41 +1000
+Message-ID: <20070727133641.GA29614@securecomputing.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
-Cc: Christophe Saout <christophe@saout.de>,
-	Alasdair G Kergon <agk@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: device-mapper development <dm-devel@redhat.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <E1I8SWH-0001lg-00@gondolin.me.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rex.snapgear.com ([203.143.235.140]:42601 "EHLO
+	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1760896AbXG0Nel (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Jul 2007 09:34:41 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
 
-Herbert Xu wrote:
-> [DM] dm-crypt: Move post-processing into its own queue
-> 
->  
-> +	_kcryptd_io_workqueue = create_workqueue("kcryptd-io");
+Hi all,
 
-Adding another qlobal per-cpu queue can lead to wasteful creating
-of too many kernel threads in system (system with many cores etc.)
+A new release of the ocf-linux package is up (20070727):
 
-I have similar patches in my tree where the queues are created
-per crypt device (so every crypt device create two single-threaded
-queues).
+    http://ocf-linux.sourceforge.net/
 
-(And I am thinking about future support of barriers - it can be
-really complicated with global workqueue too.)
+This is really a test release for some people developing drivers on
+newer kernels and I didn't want to hold them out any longer.  It's
+stable but not everything I want to do has been included yet.  I expect
+to do another release within a week or so with some small extras and
+fixups.  The high level changes from the previous release:
 
+    * sync up with latest FreeBSD API Changes.
+    * pull in quite a few changes from the OpenSwan OCF version (more coming).
+    * 2.6 kernel support up to and including 2.6.22.
+    * 2.4 kernel support up to and including 2.4.35.
+    * full cryptosoft support for new kernel crypto API.
+    * updated openswan patch to 2.4.9 (with additional support for above
+      kernels).
 
-> @@ -1097,6 +1129,7 @@ static void __exit dm_crypt_exit(void)
->  	if (r < 0)
->  		DMERR("unregister failed %d", r);
->  
-> +	destroy_workqueue(_kcryptd_io_workqueue);
+Tested under 2.4.35 and 2.6.22 across multiple architectures.
+Also,  join up the mailing list if you are interested/working on this:
 
-also flush_workqueue(_kcryptd_io_workqueue) in crypt_dtr should be there.
+    http://lists.sourceforge.net/mailman/listinfo/ocf-linux-users
 
+Cheers,
+Davidm
 
-Milan
---
-mbroz@redhat.com
+-- 
+David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
+Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
