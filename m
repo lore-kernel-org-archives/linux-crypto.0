@@ -1,37 +1,45 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [patch] crypto: retrieve private ctx aligned
-Date: Thu, 2 Aug 2007 09:47:58 +0200
-Message-ID: <20070802074758.GB22601@Chamillionaire.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Alignment in the API, once again
+Date: Thu, 2 Aug 2007 15:57:24 +0800
+Message-ID: <20070802075724.GA12449@gondor.apana.org.au>
+References: <20070801230240.GA18744@Chamillionaire.breakpoint.cc> <20070802023006.GA10180@gondor.apana.org.au> <20070802074122.GA22601@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:52381 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752902AbXHBHr7 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:1614 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751387AbXHBH51 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Aug 2007 03:47:59 -0400
+	Thu, 2 Aug 2007 03:57:27 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1IGVYj-0006Qb-4H
+	for <linux-crypto@vger.kernel.org>; Thu, 02 Aug 2007 17:57:25 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1IGVYi-0003FE-00
+	for <linux-crypto@vger.kernel.org>; Thu, 02 Aug 2007 15:57:24 +0800
 Content-Disposition: inline
+In-Reply-To: <20070802074122.GA22601@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is function does the same thing for ablkcipher that is done for
-blkcipher by crypto_blkcipher_ctx_aligned(): it returns an aligned
-address of the private ctx.
+On Thu, Aug 02, 2007 at 09:41:22AM +0200, Sebastian Siewior wrote:
+> 
+> Okey this makes sense. What about crypto_ctxsize()? Isn't a bug there?
+> I can't specify an alignmask of 16 (what I assumed yesterday after a
+> part of brain switched to sleep()) because this brakes the ALIGN()
+> macro. Isn't something like
 
-Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -160,6 +160,11 @@ static inline void *crypto_ablkcipher_ct
- 	return crypto_tfm_ctx(&tfm->base);
- }
- 
-+static inline void *crypto_ablkcipher_ctx_aligned(struct crypto_ablkcipher *tfm)
-+{
-+	return crypto_tfm_ctx_aligned(&tfm->base);
-+}
-+
- static inline struct crypto_blkcipher *crypto_spawn_blkcipher(
- 	struct crypto_spawn *spawn)
- {
+15 & ~7 == 8
+
+is sufficient to guarantee 16-byte alignment.  Remember that
+the ctx member is already 8-byte aligned.  So we only need
+to add a maximum of 8 extra bytes to get it 16-byte aligned.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
