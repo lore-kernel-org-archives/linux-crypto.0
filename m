@@ -1,51 +1,41 @@
-From: "Ronen Shitrit" <rshitrit@marvell.com>
-Subject: status of async crypto
-Date: Sun, 5 Aug 2007 13:50:48 +0300
-Message-ID: <B9FFC3F97441D04093A504CEA31B7C4101AA34D2@msilexch01.marvell.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: status of async crypto
+Date: Sun, 5 Aug 2007 19:15:46 +0400
+Message-ID: <20070805151546.GC32132@2ka.mipt.ru>
+References: <B9FFC3F97441D04093A504CEA31B7C4101AA34D2@msilexch01.marvell.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Ronen Shitrit <rshitrit@marvell.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shoshil.marvell.com ([199.203.130.250]:14734 "EHLO
-	il.marvell.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755660AbXHEKvZ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 5 Aug 2007 06:51:25 -0400
-Received: from msilexch01.marvell.com (msilexch01.il.marvell.com [10.4.5.104])
-	by il.marvell.com (8.13.1/8.13.1) with ESMTP id l75ApOS0010035
-	for <linux-crypto@vger.kernel.org>; Sun, 5 Aug 2007 13:51:24 +0300 (IDT)
-Content-class: urn:content-classes:message
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:45502 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754296AbXHEPQD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 5 Aug 2007 11:16:03 -0400
+Content-Disposition: inline
+In-Reply-To: <B9FFC3F97441D04093A504CEA31B7C4101AA34D2@msilexch01.marvell.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all
+On Sun, Aug 05, 2007 at 01:50:48PM +0300, Ronen Shitrit (rshitrit@marvell.com) wrote:
+> I saw that the current code support async crypto for the dm-crypt, does
+> it
+> also support async crypto for the klips?
+> Is there any support for using the async crypto from the OpenSSL engine
+> library?
+> I saw that the async crypto support block cipher, does it also support
+> digest operations?
+> Can it support encryption + authentication (lets say AES-SHA1) as one
+> operation?
+> Is there any Documentation available? (I guess not)
 
-Until recently I was using kernel 2.6.12 with the OCF package in order
-to 
-get async encryption with HW engine for OpenSWAN, dm-crypt and OpenSSL.
+No for all above.
 
-Lately I have decided its time to move on to the latest kernel, and I
-found 
-that there is a new async crypto support in the kernel :)
+> What is the todo list for further development of the async crypto
+> support?
 
-Now I have to decide whether to use the OCF or the native async crypto.
-I have some questions and I would really appreciate if you can help
-here:
+New drivers and extending functionality if required. Some work is being
+done in this area, although not that fast.
 
-I saw that the current code support async crypto for the dm-crypt, does
-it
-also support async crypto for the klips?
-Is there any support for using the async crypto from the OpenSSL engine
-library?
-I saw that the async crypto support block cipher, does it also support
-digest operations?
-Can it support encryption + authentication (lets say AES-SHA1) as one
-operation?
-Is there any Documentation available? (I guess not)
-What is the todo list for further development of the async crypto
-support?
- 
-Thanks for your advice
-Ronen Shitrit
+-- 
+	Evgeniy Polyakov
