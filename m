@@ -1,33 +1,43 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Herbert Xu <herbert.xu@redhat.com>
 Subject: Re: status of async crypto
-Date: Tue, 7 Aug 2007 10:01:10 +0200
-Message-ID: <20070807080110.GA12182@Chamillionaire.breakpoint.cc>
-References: <B9FFC3F97441D04093A504CEA31B7C4101AA3B33@msilexch01.marvell.com> <E1IIJVg-0007RB-00@gondolin.me.apana.org.au>
+Date: Tue, 7 Aug 2007 16:04:47 +0800
+Message-ID: <20070807080447.GB27969@gondor.apana.org.au>
+References: <B9FFC3F97441D04093A504CEA31B7C4101AA3B33@msilexch01.marvell.com> <E1IIJVg-0007RB-00@gondolin.me.apana.org.au> <20070807080110.GA12182@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Ronen Shitrit <rshitrit@marvell.com>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Ronen Shitrit <rshitrit@marvell.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:47558 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755398AbXHGIB2 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:1569 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754523AbXHGIEt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Aug 2007 04:01:28 -0400
+	Tue, 7 Aug 2007 04:04:49 -0400
 Content-Disposition: inline
-In-Reply-To: <E1IIJVg-0007RB-00@gondolin.me.apana.org.au>
+In-Reply-To: <20070807080110.GA12182@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-08-07 15:29:44 [+0800]:
+On Tue, Aug 07, 2007 at 10:01:10AM +0200, Sebastian Siewior wrote:
+> * Herbert Xu | 2007-08-07 15:29:44 [+0800]:
+> 
+> >Joy Latten is looking
+> >at CTR, as well as converting IPsec over once the crypto
+> >infrastructure is done.
+> Can you estimate/guesstimate when the IPsec over async crypto will be
+> available?
+> I tried to test the dm-crypt user but the patches don't apply on top of
+> current git.
 
->Joy Latten is looking
->at CTR, as well as converting IPsec over once the crypto
->infrastructure is done.
-Can you estimate/guesstimate when the IPsec over async crypto will be
-available?
-I tried to test the dm-crypt user but the patches don't apply on top of
-current git.
+Originally I was going to convert IPsec to use ablkcipher
+which we can do right now.
 
->Cheers,
+This is certainly going to delay things a bit.  However,
+it's certainly pretty close to the top of my todo list
+right now.
 
-Sebastian
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
