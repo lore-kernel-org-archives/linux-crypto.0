@@ -1,43 +1,236 @@
-From: Herbert Xu <herbert.xu@redhat.com>
-Subject: Re: status of async crypto
-Date: Tue, 7 Aug 2007 16:04:47 +0800
-Message-ID: <20070807080447.GB27969@gondor.apana.org.au>
-References: <B9FFC3F97441D04093A504CEA31B7C4101AA3B33@msilexch01.marvell.com> <E1IIJVg-0007RB-00@gondolin.me.apana.org.au> <20070807080110.GA12182@Chamillionaire.breakpoint.cc>
+From: Hye-Shik Chang <perky@FreeBSD.org>
+Subject: PATCH: SEED cipher support
+Date: Mon, 13 Aug 2007 00:11:30 +0900
+Message-ID: <20070812151130.GA37318@FreeBSD.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Ronen Shitrit <rshitrit@marvell.com>, linux-crypto@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rJwd6BRFiFCcLxzm"
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1569 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754523AbXHGIEt (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Aug 2007 04:04:49 -0400
+Received: from mx2.freebsd.org ([69.147.83.53]:52474 "EHLO mx2.freebsd.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S937354AbXHLPTP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 12 Aug 2007 11:19:15 -0400
+Received: from hub.freebsd.org (hub.freebsd.org [IPv6:2001:4f8:fff6::36])
+	by mx2.freebsd.org (Postfix) with ESMTP id 48A7C678F
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Aug 2007 15:12:13 +0000 (UTC)
+	(envelope-from perky@FreeBSD.org)
+Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2001:4f8:fff6::34])
+	by hub.freebsd.org (Postfix) with ESMTP id 445FA16A41A
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Aug 2007 15:12:13 +0000 (UTC)
+	(envelope-from perky@FreeBSD.org)
+Received: from freefall.freebsd.org (freefall.freebsd.org [IPv6:2001:4f8:fff6::28])
+	by mx1.freebsd.org (Postfix) with ESMTP id 2DABB13C461
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Aug 2007 15:12:13 +0000 (UTC)
+	(envelope-from perky@FreeBSD.org)
+Received: from freefall.freebsd.org (perky@localhost [127.0.0.1])
+	by freefall.freebsd.org (8.14.1/8.14.1) with ESMTP id l7CFCDvB009840
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Aug 2007 15:12:13 GMT
+	(envelope-from perky@freefall.freebsd.org)
+Received: from localhost (localhost [[UNIX: localhost]])
+	by freefall.freebsd.org (8.14.1/8.14.1/Submit) id l7CFCCYn009824
+	for linux-crypto@vger.kernel.org; Sun, 12 Aug 2007 15:12:13 GMT
+	(envelope-from perky)
 Content-Disposition: inline
-In-Reply-To: <20070807080110.GA12182@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 07, 2007 at 10:01:10AM +0200, Sebastian Siewior wrote:
-> * Herbert Xu | 2007-08-07 15:29:44 [+0800]:
-> 
-> >Joy Latten is looking
-> >at CTR, as well as converting IPsec over once the crypto
-> >infrastructure is done.
-> Can you estimate/guesstimate when the IPsec over async crypto will be
-> available?
-> I tried to test the dm-crypt user but the patches don't apply on top of
-> current git.
 
-Originally I was going to convert IPsec to use ablkcipher
-which we can do right now.
+--rJwd6BRFiFCcLxzm
+Content-Type: multipart/mixed; boundary="WIyZ46R2i8wDzkSu"
+Content-Disposition: inline
 
-This is certainly going to delay things a bit.  However,
-it's certainly pretty close to the top of my todo list
-right now.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--WIyZ46R2i8wDzkSu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hello,
+
+Here I propose a patch for linux crypto API to add a support SEED
+(RFC4269).  This patch was generated against git-HEAD as of today.
+This patch have been used in few VPN appliance vendors in Korea for
+several years.  And it was verified by KISA, who developed the
+algorithm itself.
+
+As its importance in Korean banking industry, it would be great
+if linux incorporates the support.
+
+Thanks,
+Hye-Shik
+
+--WIyZ46R2i8wDzkSu
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="linux-20070812-kisa-seed-r4.diff.gz"
+Content-Transfer-Encoding: base64
+
+H4sICKcfv0YCA2xpbnV4LTIwMDcwODEyLWtpc2Etc2VlZC1yNC5kaWZmAO18a28b15blZ+lX
+FDwzDcmSpXqRLHYS4+rKSmzEcQzLmcntTFooFosW2xIlkFQs9yD/fdZZa50i9aBvGgPk4gJj
+wlKpzmuf/d6rDms8nUySZ88+TJdJfdjMP18vrw6/b65mk+mHZHTvxvZ0Nm5vk2Kc1VmbHxw0
+k142qQZJlqb9stx+9uzZgzm29/b2Hs7zl78kz8qst99P9sKvPE1wx4sev/vb2/c/nh29+emv
+r063k60k+fp8ubxe/Ovh4adPnw6aq8W0OWgX9fLg481Fe/NbOzuom4NRezhrF4tpezhvr6/m
+y8Xh89VYDL2+qGftsj5YtvN5jUkuD0bzw+lscjW/rJfTpj68rm8urkb1fN6CzqPZzWi6eFt/
+aA/Ol5cXmGp77y55pycnL7b3tpbz6WJZL9vkSbiRNNPr83ae1BcfrubT5fnlE3RZtBdts+y2
+9fq7o7evcPu8vbjGryR5dGCy8+7b4zLvD3cPtvdW3aaLpE6yvHo2grgWny8vWxDQJB/bz8no
+4qr5GOdZntfL5LxeJKO2nXH4uP2tvbi6bsfJ6HPy/avTo2Tn+6t5WyevIg+uZslp29xg+c/J
+0Yd21nzeTTBDzeEzdqgvEux2Nq7n4wQdgkzDsBXVVxMs3Sbv2uub0QUIw99c5YCTvFp6A/1k
+fnUzG9+l+RNm4Oiwm8X0P9swGntNsNeOCW2L1RZX/8q/omyDWnycLuqDq/nBx/lhuDxctO34
+8D8W17w4a2cfDvDHc0yTbN9TtBcn374+en8CbVkJ80U7uQgX0JPreVCr9V0+2R4/YjM/1B/b
+yfSiXSl7vGOrSZtJNphkBwd1OkjHTfOo1XRj7phNd5d2I7Pp7Q+C0VyN/uPZf985/vHNt6++
+O4s69u643E32vknqeVMeXG0/2un9yRH7LCGdDV2+f3n0b0cv2Ovjef2f9XhTR9mqlqTloOPe
+Yx2DErNbkMqm2SwQ9htLEJu6/vDq+OXRyevwm90vp8153V6c4femIcfvjotcvZt5U+Sh42Py
+JIXNSgb6e3vWfkoo5surcRtFaAHr38HBcDTq9+uCkj2E4R3Obi4u7krUswV5pvtpspftl1UG
+eW7vHT7d3kueJsfs92FeX5/DjuAyDsJtNtETHMtojqJSrprfn8PIrudh7GWwt8kcRrO4miw/
+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
+kF4AAA==
+
+--WIyZ46R2i8wDzkSu--
+
+--rJwd6BRFiFCcLxzm
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (FreeBSD)
+
+iD8DBQFGvyMgDWUsWc/bS6QRAmiQAJ4h/I73qa+BfLb800aU8YnyhPg9igCgtaPN
+hVvRCfydSir8AvHAETTaHBo=
+=GjPW
+-----END PGP SIGNATURE-----
+
+--rJwd6BRFiFCcLxzm--
