@@ -1,34 +1,40 @@
-From: joe@perches.com
-Subject: [PATCH] [139/2many] MAINTAINERS - CRYPTO API
-Date: Sun, 12 Aug 2007 23:25:46 -0700
-Message-ID: <46bff96a.HHCwZ6i46IaoRLWU%joe@perches.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-To: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, akpm@linux-foundation.org
+From: Sebastian Siewior <cbe-oss-dev@ml.breakpoint.cc>
+Subject: [patch 01/10] t add cast to regain ablkcipher_request from private ctx
+Date: Thu, 16 Aug 2007 22:01:06 +0200
+Message-ID: <20070816200134.680838000@ml.breakpoint.cc>
+References: <20070816200105.735608000@ml.breakpoint.cc>
+Cc: <herbert@gondor.apana.org.au>, <arnd@arndb.de>, <jk@ozlabs.org>,
+	linux-crypto@vger.kernel.org,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+To: cbe-oss-dev@ozlabs.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from DSL022.labridge.com ([206.117.136.22]:4219 "EHLO perches.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S966126AbXHMG0s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Aug 2007 02:26:48 -0400
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60599 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751210AbXHPUFw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 Aug 2007 16:05:52 -0400
+Content-Disposition: inline; filename=crypto_add_casts.diff
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add file pattern to MAINTAINER entry
+This cast allows to regain the struct ablkcipher_request for a request 
+from private data.
 
-Signed-off-by: Joe Perches <joe@perches.com>
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 794fe99..bc2e348 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1352,6 +1352,7 @@ M:	davem@davemloft.net
- L:	linux-crypto@vger.kernel.org
- T:	git kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
- S:	Maintained
-+F:	crypto/
+Signed-off-by: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -580,6 +580,12 @@ static inline struct ablkcipher_request 
+ 	return container_of(req, struct ablkcipher_request, base);
+ }
  
- CS5535 Audio ALSA driver
- P:	Jaya Kumar
++static inline struct ablkcipher_request *ablkcipher_ctx_cast(
++		void *ctx)
++{
++	return container_of(ctx, struct ablkcipher_request, __ctx);
++}
++
+ static inline struct ablkcipher_request *ablkcipher_request_alloc(
+ 	struct crypto_ablkcipher *tfm, gfp_t gfp)
+ {
+
+-- 
