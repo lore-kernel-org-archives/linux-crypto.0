@@ -1,304 +1,244 @@
 From: Sebastian Siewior <cbe-oss-dev@ml.breakpoint.cc>
-Subject: [patch 08/10] spufs: SPE side implementation of kspu
-Date: Thu, 16 Aug 2007 22:01:13 +0200
-Message-ID: <20070816200137.460008000@ml.breakpoint.cc>
+Subject: [patch 10/10] cryptoapi: async speed test
+Date: Thu, 16 Aug 2007 22:01:15 +0200
+Message-ID: <20070816200138.277096000@ml.breakpoint.cc>
 References: <20070816200105.735608000@ml.breakpoint.cc>
 Cc: <herbert@gondor.apana.org.au>, <arnd@arndb.de>, <jk@ozlabs.org>,
 	linux-crypto@vger.kernel.org,
 	Sebastian Siewior <sebastian@breakpoint.cc>
 To: cbe-oss-dev@ozlabs.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60617 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60604 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753388AbXHPUF5 (ORCPT
+	by vger.kernel.org with ESMTP id S1752541AbXHPUFx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Aug 2007 16:05:57 -0400
-Content-Disposition: inline; filename=spufs-add_kspu_spu_side.diff
+	Thu, 16 Aug 2007 16:05:53 -0400
+Content-Disposition: inline; filename=limi_speed_async.diff
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SPU part of KSPU which consists of the a multiplexor and one helper
-function. The multiplexor invokes the offloaded functions and performs multi
-buffering (DMA_BUFFERS=2 -> double buffering, DMA_BUFFERS= -> triple \ldots).
-The offloaded function cares only about processing the buffer and arranging
-the transfer of the result. Waiting for the transfers to complete as well as
-signaling the completion of functions is taken care of by the multiplexor.
+This was used to test the async AES algo. trcypt is working as well but does
+enqueue that much :-)
 
 Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
-
---- a/arch/powerpc/platforms/cell/spufs/Makefile
-+++ b/arch/powerpc/platforms/cell/spufs/Makefile
-@@ -12,13 +12,21 @@ SPU_AS		:= $(SPU_CROSS)gcc
- SPU_LD		:= $(SPU_CROSS)ld
- SPU_OBJCOPY	:= $(SPU_CROSS)objcopy
- SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include \
--		   -I$(objtree)/include2 -D__KERNEL__
-+		   -I$(objtree)/include2 -D__KERNEL__ -ffreestanding
- SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include \
- 		   -I$(objtree)/include2 -D__KERNEL__
- SPU_LDFLAGS	:= -N -Ttext=0x0
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -468,6 +468,12 @@ config CRYPTO_TEST
+ 	help
+ 	  Quick & dirty crypto test module.
  
- $(obj)/switch.o: $(obj)/spu_save_dump.h $(obj)/spu_restore_dump.h
--clean-files := spu_save_dump.h spu_restore_dump.h
-+clean-files := spu_save_dump.h spu_restore_dump.h spu_kspu_dump.h
++config CRYPTO_LIMI_SPEED_ASYNC
++	tristate "Crypto algorithm speed test with msec resolution"
++	help
++	  insmod/modprobe the module, and watch dmesg for results.
++	  Test is for aes only, see modinfo for options
 +
-+$(obj)/kspu.o: $(obj)/spu_kspu_dump.h
-+
-+spu_kspu_code_obj-y += $(obj)/spu_main.o $(obj)/spu_runtime.o
-+spu_kspu_code_obj-y += $(spu_kspu_code_obj-m)
-+
-+$(obj)/spu_kspu: $(spu_kspu_code_obj-y)
-+	$(call if_changed,spu_ld)
+ source "drivers/crypto/Kconfig"
  
- # Compile SPU files
-       cmd_spu_cc = $(SPU_CC) $(SPU_CFLAGS) -c -o $@ $<
+ endif	# if CRYPTO
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -50,6 +50,7 @@ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += mich
+ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
+ 
+ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
++obj-$(CONFIG_CRYPTO_LIMI_SPEED_ASYNC) += limi-speeda.o
+ 
+ #
+ # generic algorithms and the async_tx api
 --- /dev/null
-+++ b/arch/powerpc/platforms/cell/spufs/spu_main.c
-@@ -0,0 +1,116 @@
++++ b/crypto/limi-speeda.c
+@@ -0,0 +1,191 @@
 +/*
-+ * This code can be considered as crt0.S
-+ * Compile with -O[123S] and make sure that here is only one function
-+ * that starts at 0x0
-+ * Author: Sebastian Siewior <sebastian@breakpoint.cc>
-+ * License: GPLv2
++ * Code derived von crypt/tcrypt.h
++ *
++ * Small speed test with time resolution in msec.
++ * Author: Sebastian Siewior (sebastian _at_ breakpoint.cc)
++ * License: GPL v2
 + */
-+#include <asm/kspu/merged_code.h>
-+#include <spu_mfcio.h>
-+#include "spu_runtime.h"
 +
-+static spu_operation_t spu_ops[TOTAL_SPU_OPS] __attribute__((aligned(16))) = {
-+	[SPU_OP_nop] = spu_nop,
-+};
-+static unsigned char kspu_buff[DMA_BUFFERS][DMA_MAX_TRANS_SIZE];
++#include <linux/module.h>
++#include <linux/moduleparam.h>
++#include <linux/scatterlist.h>
++#include <linux/crypto.h>
++#include <linux/jiffies.h>
++#include <linux/types.h>
++#include <linux/err.h>
 +
-+void _start(void) __attribute__((noreturn));
-+void _start(void)
++static unsigned int buff_size = 16 * 1024;
++module_param(buff_size, uint, 0444);
++MODULE_PARM_DESC(buff_size, "Buffer allocated by kmalloc()");
++
++static unsigned int keylen = 16;
++module_param(keylen, uint, 0444);
++MODULE_PARM_DESC(keylen, "Length of the key (16,24 or 32 bits");
++
++static unsigned int mode = 0;
++module_param(mode, uint, 0444);
++MODULE_PARM_DESC(mode, "0 -> encryption else decryption");
++
++static unsigned int big_loops = 10;
++module_param(big_loops, uint, 0444);
++MODULE_PARM_DESC(big_loops, "Number of mensurations.");
++
++static unsigned int small_loops = 10000;
++module_param(small_loops, uint, 0444);
++MODULE_PARM_DESC(small_loops, "loops within one mesurement.");
++
++static unsigned int alg = 1;
++module_param(alg, uint, 0444);
++MODULE_PARM_DESC(alg, "0 -> ecb(aes), else -> cbc(aes)");
++
++static atomic_t req_pending;
++
++static void request_complete(struct crypto_async_request *req, int err)
 +{
-+	struct kernel_spu_data *spu_data;
++	wait_queue_head_t *complete_wq = req->data;
++	struct ablkcipher_request *ablk_req = ablkcipher_request_cast(req);
 +
-+	spu_data = (struct kernel_spu_data *) KERNEL_SPU_DATA_OFFSET;
++	atomic_dec(&req_pending);
++	ablkcipher_request_free(ablk_req);
++	wake_up_all(complete_wq);
++}
 +
-+	while (37) {
-+		struct kspu_job *kjob;
-+		unsigned char *dma_buff;
-+		unsigned int consumed;
-+		unsigned int outstanding;
-+		unsigned int cur_req;
-+		unsigned int cur_item;
-+		unsigned int cur_buf;
-+		unsigned int i;
++static int __init init(void)
++{
++	struct scatterlist sg[1];
++	unsigned char iv[16];
++	struct crypto_ablkcipher *tfm;
++	static char *in;
++	unsigned int i;
++	unsigned int ret;
++	unsigned long start, end;
++	unsigned long total = 0;
++	unsigned long size_kb;
++	unsigned char key[32] = { 1, 2, 3, 4, 5, 6 };
++	const unsigned char *algname;
++	struct ablkcipher_request *ablk_req = NULL;
++	wait_queue_head_t complete_wq;
++	DEFINE_WAIT(wait_for_request);
 +
-+		spu_stop(1);
-+		/*
-+		 * Once started, it is guaranteed that atleast DMA_BUFFERS *2
-+		 * requests are in ring buffer. The work order is:
-+		 * 1. request DMA_BUFFERS transfers, every in a seperate buffer
-+		 *    with its own tag.
-+		 * 2. process those buffers and request new ones.
-+		 * 3. if more than (DMA_BUFFERS *2) are available, than the
-+		 *    main loop begins:
-+		 *   - wait for tag to finish transfers
-+		 *   - notify done work
-+		 *   - process request
-+		 *   - write back
-+		 * 4. if no more request are available, process the last
-+		 *    DMA_BUFFERS request that are left, write them back and
-+		 *    wait until that transfers completes and spu_stop()
-+		 */
++	algname = alg ? "cbc(aes)" : "ecb(aes)";
++	printk("Limi-speed: %s buff_size: %u, keylen: %d, mode: %s\n", algname, buff_size, keylen,
++			mode ? "decryption" : "encryption");
++	printk("loops: %d, iterations: %d, ", big_loops, small_loops);
++	size_kb = small_loops * buff_size / 1024;
++	printk("=> %lu kb or %lu mb a loop\n", size_kb, size_kb/1024);
 +
-+		consumed = spu_data->kspu_ring_data.consumed;
-+		cur_req = consumed;
-+		cur_item = consumed;
-+
-+		/* 1 */
-+		for (cur_buf = 0; cur_buf < DMA_BUFFERS; cur_buf++) {
-+			init_get_data(kspu_buff[cur_buf & DMA_BUFF_MASK],
-+					&spu_data->work_item[cur_req & RB_MASK],
-+					cur_buf & DMA_BUFF_MASK);
-+			cur_req++;
-+		}
-+
-+		/* 2 */
-+		for (cur_buf = 0; cur_buf < DMA_BUFFERS; cur_buf++) {
-+			wait_for_buffer(1 << (cur_buf & DMA_BUFF_MASK));
-+
-+			kjob = &spu_data->work_item[cur_item & RB_MASK];
-+			dma_buff = kspu_buff[cur_buf & DMA_BUFF_MASK];
-+			spu_ops[kjob->operation]
-+				(kjob, dma_buff, cur_buf & DMA_BUFF_MASK);
-+
-+			init_get_data(dma_buff,
-+					&spu_data->work_item[cur_req & RB_MASK],
-+					cur_buf & DMA_BUFF_MASK);
-+			cur_item++;
-+			cur_req++;
-+		}
-+
-+		outstanding = spu_data->kspu_ring_data.outstanding;
-+		/* 3 */
-+		while (cur_req != outstanding) {
-+			wait_for_buffer(1 << (cur_buf & DMA_BUFF_MASK));
-+			spu_data->kspu_ring_data.consumed++;
-+			if (spu_stat_out_intr_mbox())
-+				spu_write_out_intr_mbox(0x0);
-+
-+			kjob = &spu_data->work_item[cur_item & RB_MASK];
-+			dma_buff = kspu_buff[cur_buf & DMA_BUFF_MASK];
-+			spu_ops[kjob->operation]
-+				(kjob, dma_buff, cur_buf & DMA_BUFF_MASK);
-+
-+			init_get_data(dma_buff,
-+					&spu_data->work_item[cur_req & RB_MASK],
-+					cur_buf & DMA_BUFF_MASK);
-+			cur_item++;
-+			cur_req++;
-+			cur_buf++;
-+			outstanding = spu_data->kspu_ring_data.outstanding;
-+		}
-+
-+		/* 4 */
-+		for (i = 0; i < DMA_BUFFERS; i++) {
-+			wait_for_buffer(1 << (cur_buf & DMA_BUFF_MASK));
-+			kjob = &spu_data->work_item[cur_item & RB_MASK];
-+			dma_buff = kspu_buff[cur_buf & DMA_BUFF_MASK];
-+			spu_ops[kjob->operation]
-+				(kjob, dma_buff, cur_buf & DMA_BUFF_MASK);
-+			cur_buf++;
-+			cur_item++;
-+		}
-+
-+		wait_for_buffer(ALL_DMA_BUFFS);
-+		spu_data->kspu_ring_data.consumed = cur_item;
++	if (keylen != 16 && keylen != 24 && keylen != 32) {
++		printk("Invalid keysize\n");
++		return -EINVAL;
 +	}
++
++	in = kmalloc(buff_size, GFP_KERNEL);
++	if (in == NULL) {
++		printk("Failed to allocate memory.\n");
++		return -ENOMEM;
++	}
++	printk("'Alloc' in %d @%p\n", buff_size, in);
++	memset(in, 0x24, buff_size);
++	sg_set_buf(sg, in, buff_size);
++
++	tfm = crypto_alloc_ablkcipher(algname, 0, 0 /* CRYPTO_ALG_ASYNC */);
++
++	if (IS_ERR(tfm)) {
++		printk("failed to load transform for %s: %ld\n", algname, PTR_ERR(tfm));
++		goto leave;
++	}
++
++	ret = crypto_ablkcipher_setkey(tfm, key, keylen);
++	if (ret) {
++		printk("setkey() failed\n");
++		goto out_tfm;
++	}
++
++	init_waitqueue_head(&complete_wq);
++	atomic_set(&req_pending, 0);
++
++	for (i=0 ; i<big_loops; i++) {
++		int j;
++		ret = 0;
++		start = jiffies;
++
++		for (j=0; j < small_loops; j++) {
++			while (1) {
++
++				prepare_to_wait(&complete_wq, &wait_for_request, TASK_INTERRUPTIBLE);
++				ablk_req = ablkcipher_request_alloc(tfm, GFP_KERNEL);
++				if (likely(ablk_req))
++					break;
++				printk("ablkcipher_request_alloc() failed\n");
++				schedule();
++			}
++			atomic_inc(&req_pending);
++
++			ablkcipher_request_set_callback(ablk_req, CRYPTO_TFM_REQ_MAY_BACKLOG, request_complete, &complete_wq);
++			ablkcipher_request_set_crypt(ablk_req, sg, sg, buff_size, &iv);
++
++			if (!mode)
++				ret = crypto_ablkcipher_encrypt(ablk_req);
++			else
++				ret = crypto_ablkcipher_decrypt(ablk_req);
++
++			if (unlikely(ret == -EBUSY)) {
++				schedule();
++
++			} else if (unlikely(ret == 0)) {
++				printk("Process in SYNC mode, this is not cool\n");
++				ablkcipher_request_free(ablk_req);
++				goto out_tfm;
++			} else if (unlikely(ret != -EINPROGRESS)) {
++				printk("encryption failed: %d after (i,j) (%u,%u) iterations\n", ret, i, j);
++				ablkcipher_request_free(ablk_req);
++				goto out_tfm;
++			}
++
++			if (signal_pending(current)) {
++				printk("signal catched\n");
++				break;
++			}
++
++		}
++
++		while (1) {
++//clean_up_exit:
++			prepare_to_wait(&complete_wq, &wait_for_request, TASK_INTERRUPTIBLE);
++			if (atomic_read(&req_pending) == 0)
++				break;
++			schedule();
++		}
++
++		end = jiffies;
++		finish_wait(&complete_wq, &wait_for_request);
++
++		if ( !time_after(start, end)) {
++			printk("Run: %u msec\n", jiffies_to_msecs(end - start));
++			total += jiffies_to_msecs(end - start);
++		} else {
++			printk("Run: %u msec\n", jiffies_to_msecs(start - end));
++			total += jiffies_to_msecs(start - end);
++		}
++		if (signal_pending(current))
++			break;
++	}
++
++	total /= big_loops;
++	size_kb *= 1000;
++	size_kb /= total;
++	printk("Average: %lu msec, approx. %lu kb/sec || %lu mb/sec  \n", total,
++			size_kb, size_kb/1024);
++out_tfm:
++	crypto_free_ablkcipher(tfm);
++leave:
++	kfree(in);
++	return -ENODEV;
 +}
---- /dev/null
-+++ b/arch/powerpc/platforms/cell/spufs/spu_runtime.c
-@@ -0,0 +1,40 @@
-+/*
-+ * Runtime helper functions, which intend to replace libc. They can't be merged
-+ * into spu_main.c because it must be guaranteed that _start() starts at 0x0.
-+ *
-+ * Author: Sebastian Siewior <sebastian@breakpoint.cc>
-+ * License: GPLv2
-+ */
 +
-+#include <spu_intrinsics.h>
-+#include <asm/kspu/merged_code.h>
++static void __exit fini(void) { }
 +
-+void spu_nop(struct kspu_job *kjob, void *buffer, unsigned int buf_num)
-+{
-+}
++module_init(init);
++module_exit(fini);
 +
-+/*
-+ * memcpy_aligned - copy memory
-+ * @src:	source of memory
-+ * @dst:	destination
-+ * @num:	number of bytes
-+ *
-+ * Copies @num bytes from @src to @dst. @src & @dst must be aligned at
-+ * 16byte boundary. If @src or @dst is not properly aligned, wrong data will be
-+ * read and or written. @num must be multiple of 16. If @num is not multiple of
-+ * 16 than the function simply do nothing
-+ */
-+void memcpy_aligned(void *dest, const void *src, unsigned int num)
-+{
-+	const vector unsigned char *s = src;
-+	vector unsigned char *d = dest;
-+
-+	if (num & 15)
-+		return;
-+	do {
-+		*d = *s;
-+		s++;
-+		d++;
-+		num -= 16;
-+	} while (num);
-+}
---- /dev/null
-+++ b/arch/powerpc/platforms/cell/spufs/spu_runtime.h
-@@ -0,0 +1,29 @@
-+#ifndef SPU_RUNTIME_H
-+#define SPU_RUNTIME_H
-+#include <spu_mfcio.h>
-+
-+static inline void init_get_data(void *buf, struct kspu_job *job,
-+		unsigned int dma_tag)
-+{
-+	mfc_getb(buf, job->in, job->in_size, dma_tag, 0, 0);
-+}
-+
-+static inline void init_put_data(void *buf, unsigned long long ea,
-+		unsigned int size, unsigned int dma_tag)
-+{
-+	mfc_putf(buf, ea, size, dma_tag, 0, 0);
-+}
-+
-+static inline void wait_for_buffer(unsigned int dma_tag)
-+{
-+	mfc_write_tag_mask(dma_tag);
-+	spu_mfcstat(MFC_TAG_UPDATE_ALL);
-+}
-+
-+void memcpy_aligned(void *dest, const void *src, unsigned int n);
-+
-+/* exported offloaded functions */
-+void spu_nop(struct kspu_job *kjob, void *buffer,
-+		unsigned int buf_num);
-+
-+#endif
---- /dev/null
-+++ b/include/asm-powerpc/kspu/merged_code.h
-@@ -0,0 +1,51 @@
-+#ifndef KSPU_MERGED_CODE_H
-+#define KSPU_MERGED_CODE_H
-+
-+#define KSPU_LS_SIZE 0x40000
-+
-+#define RB_SLOTS 256
-+#define RB_MASK (RB_SLOTS-1)
-+
-+#define DMA_MAX_TRANS_SIZE (16 * 1024)
-+#define DMA_BUFFERS   2
-+#define DMA_BUFF_MASK (DMA_BUFFERS-1)
-+#define ALL_DMA_BUFFS ((1 << DMA_BUFFERS)-1)
-+
-+/*
-+ * Every offloaded SPU operation has register itself in the SPU_OPERATIONS
-+ * between SPU_OP_nop & TOTAL_SPU_OPS
-+ */
-+enum SPU_OPERATIONS {
-+	SPU_OP_nop,
-+
-+	TOTAL_SPU_OPS,
-+};
-+
-+struct kspu_job {
-+	enum SPU_OPERATIONS operation __attribute__((aligned(16)));
-+	unsigned long long in __attribute__((aligned(16)));
-+	unsigned int in_size __attribute__((aligned(16)));
-+	/*
-+	 * This union is reserved for the parameter block of the offloaded
-+	 * function.
-+	 */
-+	union {
-+	} __attribute__((aligned(16)));
-+};
-+
-+typedef void (*spu_operation_t)(struct kspu_job *kjob, void *buffer,
-+		unsigned int buf_num);
-+
-+struct kspu_ring_data {
-+	volatile unsigned int consumed __attribute__((aligned(16)));
-+	volatile unsigned int outstanding __attribute__((aligned(16)));
-+};
-+
-+struct kernel_spu_data {
-+	struct kspu_ring_data kspu_ring_data __attribute__((aligned(16)));
-+	struct kspu_job work_item[RB_SLOTS] __attribute__((aligned(16)));
-+};
-+
-+#define KERNEL_SPU_DATA_OFFSET (KSPU_LS_SIZE - sizeof(struct kernel_spu_data))
-+
-+#endif
++MODULE_LICENSE("GPL");
 
 -- 
