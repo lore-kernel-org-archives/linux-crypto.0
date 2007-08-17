@@ -1,37 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: PATCH: SEED cipher support
-Date: Fri, 17 Aug 2007 11:23:14 +0800
-Message-ID: <20070817032314.GA14451@gondor.apana.org.au>
-References: <20070812151130.GA37318@FreeBSD.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Hye-Shik Chang <perky@FreeBSD.org>
+Date: Fri, 17 Aug 2007 11:24:28 +0800
+Message-ID: <E1ILsRo-0003lw-00@gondolin.me.apana.org.au>
+References: <20070812153152.GA3595@2ka.mipt.ru>
+Cc: perky@freebsd.org, linux-crypto@vger.kernel.org
+To: johnpol@2ka.mipt.ru (Evgeniy Polyakov)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4692 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4701 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752150AbXHQDXV (ORCPT
+	with ESMTP id S1752535AbXHQDYk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Aug 2007 23:23:21 -0400
-Content-Disposition: inline
-In-Reply-To: <20070812151130.GA37318@FreeBSD.org>
+	Thu, 16 Aug 2007 23:24:40 -0400
+In-Reply-To: <20070812153152.GA3595@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Aug 12, 2007 at 03:11:30PM +0000, Hye-Shik Chang wrote:
-> Hello,
+Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
 > 
-> Here I propose a patch for linux crypto API to add a support SEED
-> (RFC4269).  This patch was generated against git-HEAD as of today.
-> This patch have been used in few VPN appliance vendors in Korea for
-> several years.  And it was verified by KISA, who developed the
-> algorithm itself.
-> 
-> As its importance in Korean banking industry, it would be great
-> if linux incorporates the support.
+> Besides the only c++ comment in the tcrypt.c this patch
 
-Thanks for the patch! Could you please add a Signed-off-by
-and I'll merge it in.
+Those C++ comments are a pre-existing wart :)
+
+I'll make sure that they get killed.
 
 Cheers,
 -- 
