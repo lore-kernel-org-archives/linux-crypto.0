@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: can CTR use blkcipher_walk_virt()?
-Date: Fri, 17 Aug 2007 10:19:23 +0800
-Message-ID: <E1ILrQp-0003OV-00@gondolin.me.apana.org.au>
-References: <200708162100.l7GL0Qt4010595@faith.austin.ibm.com>
+Subject: Re: PATCH: SEED cipher support
+Date: Fri, 17 Aug 2007 11:23:14 +0800
+Message-ID: <20070817032314.GA14451@gondor.apana.org.au>
+References: <20070812151130.GA37318@FreeBSD.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: latten@austin.ibm.com (Joy Latten)
+To: Hye-Shik Chang <perky@FreeBSD.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4298 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4692 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752592AbXHQCTm (ORCPT
+	with ESMTP id S1752150AbXHQDXV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Aug 2007 22:19:42 -0400
-In-Reply-To: <200708162100.l7GL0Qt4010595@faith.austin.ibm.com>
+	Thu, 16 Aug 2007 23:23:21 -0400
+Content-Disposition: inline
+In-Reply-To: <20070812151130.GA37318@FreeBSD.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Joy Latten <latten@austin.ibm.com> wrote:
-> I am in learning mode and have been looking into CTR.
-> Based on the fact that CTR does not require the plaintext to 
-> be a multiple of the blocksize nor is padding required,
-> should I use cipher.c routines (as xcbc does) instead
-> of blkcipher.c routines (as cbc does)?
-> (I've been referencing rfc 3686.)
+On Sun, Aug 12, 2007 at 03:11:30PM +0000, Hye-Shik Chang wrote:
+> Hello,
+> 
+> Here I propose a patch for linux crypto API to add a support SEED
+> (RFC4269).  This patch was generated against git-HEAD as of today.
+> This patch have been used in few VPN appliance vendors in Korea for
+> several years.  And it was verified by KISA, who developed the
+> algorithm itself.
+> 
+> As its importance in Korean banking industry, it would be great
+> if linux incorporates the support.
 
-CBC is the correct model to follow.  For our purposes you
-will only get multiples of blocks.  The only difference
-is that unlike CBC you can chop bits off the last block
-of plain text and the same bits will be chopped off in
-the cipher text.
-
-With CBC chopping off bits in either changes the other one
-entirely.
+Thanks for the patch! Could you please add a Signed-off-by
+and I'll merge it in.
 
 Cheers,
 -- 
