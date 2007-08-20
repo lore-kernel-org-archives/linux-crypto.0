@@ -1,37 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: {twofish,aes}-{x86_64,i586} versus C implementations
-Date: Mon, 20 Aug 2007 21:07:41 +0800
-Message-ID: <20070820130741.GA13549@gondor.apana.org.au>
-References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070820130639.GN16680@bingen.suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Joy Latten <latten@austin.ibm.com>
+Subject: Re: combined mode algorithms
+Date: Mon, 20 Aug 2007 18:12:23 -0500
+Message-ID: <200708202312.l7KNCNBA015041@faith.austin.ibm.com>
 Cc: linux-crypto@vger.kernel.org
-To: Andi Kleen <ak@suse.de>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3687 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750932AbXHTNHq (ORCPT
+Received: from e34.co.us.ibm.com ([32.97.110.152]:54837 "EHLO
+	e34.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758462AbXHTXPN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Aug 2007 09:07:46 -0400
-Content-Disposition: inline
-In-Reply-To: <20070820130639.GN16680@bingen.suse.de>
+	Mon, 20 Aug 2007 19:15:13 -0400
+Received: from d03relay02.boulder.ibm.com (d03relay02.boulder.ibm.com [9.17.195.227])
+	by e34.co.us.ibm.com (8.13.8/8.13.8) with ESMTP id l7KNFCFQ029356
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Aug 2007 19:15:12 -0400
+Received: from d03av03.boulder.ibm.com (d03av03.boulder.ibm.com [9.17.195.169])
+	by d03relay02.boulder.ibm.com (8.13.8/8.13.8/NCO v8.5) with ESMTP id l7KNFCLR270650
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Aug 2007 17:15:12 -0600
+Received: from d03av03.boulder.ibm.com (loopback [127.0.0.1])
+	by d03av03.boulder.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id l7KNFCCg002650
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Aug 2007 17:15:12 -0600
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Aug 20, 2007 at 03:06:39PM +0200, Andi Kleen wrote:
 >
-> > Well it's not that useful for an assembly implementation
-> > that works on all instances of a given architecture.
-> 
-> I meant on x86. Sure for other architectures the C version is needed.
+>The salt will just come from the key field.  So instead of having
+>an 128-bit key for example, you'd have 152 bits.
 
-My point was that while it's not useful for aes-i586 on x86,
-it definitely is useful for padlock-aes which is also x86 asm
-but only works on a subset of x86 processors.
+ok, quick question, this 152 bits key will be part
+of input to setkey()? 
+The reason I am asking is because setkey in ablkcipher and
+blkcipher check key length for min and max size.  
+Thus for example, aes, when using a 256 bit key, would
+pass in 288 bits or 36 octet key. max is 32 bits, so would
+result in error. 
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If not passed into setkey, then I assume the salt/nonce
+would be parsed from key when ipsec daemon passes keys 
+into kernel...
+
+Joy
