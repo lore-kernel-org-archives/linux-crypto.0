@@ -1,47 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Andi Kleen <ak@suse.de>
 Subject: Re: {twofish,aes}-{x86_64,i586} versus C implementations
-Date: Mon, 20 Aug 2007 09:01:57 +0800
-Message-ID: <E1IMveX-0002Kv-00@gondolin.me.apana.org.au>
-References: <200708200234.25620.ak@suse.de>
-Cc: linux-crypto@vger.kernel.org
-To: ak@suse.de (Andi Kleen)
+Date: Mon, 20 Aug 2007 12:16:18 +0200
+Message-ID: <20070820101618.GE16680@bingen.suse.de>
+References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Andi Kleen <ak@suse.de>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3050 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750941AbXHTBPU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 19 Aug 2007 21:15:20 -0400
-In-Reply-To: <200708200234.25620.ak@suse.de>
+Received: from cantor.suse.de ([195.135.220.2]:55655 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752216AbXHTJWX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Aug 2007 05:22:23 -0400
+Content-Disposition: inline
+In-Reply-To: <E1IMveX-0002Kv-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Andi Kleen <ak@suse.de> wrote:
-> Hallo,
-> 
-> Currently there are two twofish and two aes implementions on x86.
-> Worse when both are enabled as modules a modprobe aes
-> will get the C version which seems to be slower on K8 
-> and about the same speed on Core2 on my tests.
+> Are you sure you get the C version when both are built-in
+> or loaded as modules? If so then we have a bug in the priority
+> code.
 
-Hi Andi:
+The usual use case is: Somebody -- either admin or some command 
+implicitely -- executes modprobe aes because some text file
+specifies the aes cipher. At least on my system that loads
+the C version when both are enabled. modprobe will not load
+multiple modules in this case.
 
-Are you sure you get the C version when both are built-in
-or loaded as modules? If so then we have a bug in the priority
-code.
+I don't think modprobe knows anything about these priorities.
 
-If you only have the C version loaded then that is understandable
-since the module loading code doesn't know about the other one.
+> We don't, but the system is meant to allow multiple
+> implementations to coexist and picking the best one
+> at run-time.
 
-> Is there a specific reason why anybody would prefer the C functions
-> over the assembler functions? 
+But that would require teaching the module loading user space
+about all this first, right?
 
-We don't, but the system is meant to allow multiple
-implementations to coexist and picking the best one
-at run-time.
+Also if one implementation is always better than the other
+then I see little reason to ever have both.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Andi
