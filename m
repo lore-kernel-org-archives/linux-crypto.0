@@ -1,49 +1,47 @@
-From: Andi Kleen <ak@suse.de>
-Subject: {twofish,aes}-{x86_64,i586} versus C implementations
-Date: Mon, 20 Aug 2007 02:34:25 +0200
-Message-ID: <200708200234.25620.ak@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: {twofish,aes}-{x86_64,i586} versus C implementations
+Date: Mon, 20 Aug 2007 09:01:57 +0800
+Message-ID: <E1IMveX-0002Kv-00@gondolin.me.apana.org.au>
+References: <200708200234.25620.ak@suse.de>
+Cc: linux-crypto@vger.kernel.org
+To: ak@suse.de (Andi Kleen)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.suse.de ([195.135.220.2]:57055 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757570AbXHTAed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 19 Aug 2007 20:34:33 -0400
-Received: from Relay1.suse.de (mail2.suse.de [195.135.221.8])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.suse.de (Postfix) with ESMTP id 8356A12D25
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Aug 2007 02:34:32 +0200 (CEST)
-Content-Disposition: inline
+Received: from rhun.apana.org.au ([64.62.148.172]:3050 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750941AbXHTBPU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 19 Aug 2007 21:15:20 -0400
+In-Reply-To: <200708200234.25620.ak@suse.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hallo,
+Andi Kleen <ak@suse.de> wrote:
+> Hallo,
+> 
+> Currently there are two twofish and two aes implementions on x86.
+> Worse when both are enabled as modules a modprobe aes
+> will get the C version which seems to be slower on K8 
+> and about the same speed on Core2 on my tests.
 
-Currently there are two twofish and two aes implementions on x86.
-Worse when both are enabled as modules a modprobe aes
-will get the C version which seems to be slower on K8 
-and about the same speed on Core2 on my tests.
- 
-Is there a specific reason why anybody would prefer the C functions
-over the assembler functions? 
+Hi Andi:
 
-Possible reasons I could think of:
-- If the assembler functions are optimized for a specific CPU the compiler
-might be able to do a better job on other CPUs.
-Is there evidence for this? I suspect it's not true.
+Are you sure you get the C version when both are built-in
+or loaded as modules? If so then we have a bug in the priority
+code.
 
-- They are not trusted and might be buggy. I assume they have
-been validated against the C versions with a wide range of input
-data, correct? 
+If you only have the C version loaded then that is understandable
+since the module loading code doesn't know about the other one.
 
-If none of these reasons are valid it might make sense to disable
-the C versions for x86 and only offer the assembler versions.
-Then modprobe aes|twofish would DTRT automatically.
+> Is there a specific reason why anybody would prefer the C functions
+> over the assembler functions? 
 
-Comments?
+We don't, but the system is meant to allow multiple
+implementations to coexist and picking the best one
+at run-time.
 
--Andi
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
