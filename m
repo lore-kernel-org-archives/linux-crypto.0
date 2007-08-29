@@ -1,34 +1,33 @@
-From: Sebastian Siewior <bigeasy@breakpoint.cc>
-Subject: Re: [patch 1/1] spufs: SPU-AES support (kspu+ablkcipher user)
-Date: Wed, 29 Aug 2007 11:28:25 +0200
-Message-ID: <20070829092825.GB24782@Chamillionaire.breakpoint.cc>
-References: <20070816200105.735608000@ml.breakpoint.cc> <20070816200137.867399000@ml.breakpoint.cc> <20070828154637.GA21007@Chamillionaire.breakpoint.cc> <20070829071507.GA5108@gondor.apana.org.au>
+From: Eran Ben-Avi <eranpublic@yahoo.com>
+Subject: OCF(20070727) cryptosoft errors with openssl 0.9.8e
+Date: Wed, 29 Aug 2007 05:14:58 -0700 (PDT)
+Message-ID: <163963.79179.qm@web62508.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org, arnd@arndb.de, jk@ozlabs.org,
-	cbe-oss-dev@ozlabs.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:54367 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753473AbXH2J21 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Aug 2007 05:28:27 -0400
-Content-Disposition: inline
-In-Reply-To: <20070829071507.GA5108@gondor.apana.org.au>
+Received: from web62508.mail.re1.yahoo.com ([69.147.75.100]:33761 "HELO
+	web62508.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1756415AbXH2MO7 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Aug 2007 08:14:59 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-08-29 15:15:07 [+0800]:
+Hi,
 
->Do you plan to use this for anything beyond AES? If so it
-I probably don't, others maybe.
+Did anyone test latest OCF(20070727) with openssl 0.9.8e ?
+I patched the OCF on kernel 2.6.23(rc) and ssl.patch on openssl 0.9.8e and got errors when tried to perform key decryption using cryptosoft driver.
+I tested it with older OCF on older kernel(2.6.12.6) and it worked properly.
 
->would be good to come up a way to share some of the crypto
->code between the main kernel and what runs on the SPUs.
-Yes. You could share almost everything except the setkey() function on
-the kernel side.
 
->Cheers,
+Thanks,
+Eran Ben-Avi
 
-Sebastian
+
+       
+____________________________________________________________________________________
+Got a little couch potato? 
+Check out fun summer activities for kids.
+http://search.yahoo.com/search?fr=oni_on_mail&p=summer+activities+for+kids&cs=bz 
