@@ -1,43 +1,38 @@
-From: Eran Ben-Avi <eranpublic@yahoo.com>
-Subject: OCF for Openswan 2.4.9 - tasklet or workqueue ?
-Date: Mon, 27 Aug 2007 15:12:45 -0700 (PDT)
-Message-ID: <384203.83962.qm@web62514.mail.re1.yahoo.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch 1/1] spufs: SPU-AES support (kspu+ablkcipher user)
+Date: Wed, 29 Aug 2007 15:15:07 +0800
+Message-ID: <20070829071507.GA5108@gondor.apana.org.au>
+References: <20070816200105.735608000@ml.breakpoint.cc> <20070816200137.867399000@ml.breakpoint.cc> <20070828154637.GA21007@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+To: linux-crypto@vger.kernel.org, arnd@arndb.de, jk@ozlabs.org,
+	cbe-oss-dev@ozlabs.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from web62514.mail.re1.yahoo.com ([69.147.75.106]:29823 "HELO
-	web62514.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1751971AbXH0WMu convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Aug 2007 18:12:50 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:4975 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751712AbXH2HPT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Aug 2007 03:15:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20070828154637.GA21007@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Tue, Aug 28, 2007 at 05:46:37PM +0200, Sebastian Siewior wrote:
+>
+> Herbert, could you please ACK / NACK your bits?
+> I added ablkcipher_request() in the driver with a proper type as you
+> suggested.
 
-I tested IPSec(tunnel mode) routing performance between 2 GbE ports using packet generator(SMARTBIT)  on ARM 500MHz with latest OCF patched on Openswan2.4.9 and I noticed the callback functions are using workqueue.
-Since RX was performed in NAPI mode with higher priority then TX (in workqueue), the callback function(in ipsec_ocf.c) was starved with zero routing.
-The problem was solved after I switched to use tasklet instead of current workqueue.
-Is there a room for updating next OCF release ?
+The crypto bits look alright.
 
-Please advice.
+Do you plan to use this for anything beyond AES? If so it
+would be good to come up a way to share some of the crypto
+code between the main kernel and what runs on the SPUs.
 
-Thanks,
-Eran Ben-Avi
-
-
-       
-____________________________________________________________________________________
-Be a better Heartthrob. Get better relationship answers from someone who knows. Yahoo! Answers - Check it out. 
-http://answers.yahoo.com/dir/?link=list&sid=396545433
-
-
-
-
-
-       
-____________________________________________________________________________________
-Building a website is a piece of cake. Yahoo! Small Business gives you all the tools to get online.
-http://smallbusiness.yahoo.com/webhosting 
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
