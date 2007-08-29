@@ -1,43 +1,39 @@
-From: David McCullough <David_Mccullough@securecomputing.com>
-Subject: Re: OCF(20070727) cryptosoft errors with openssl 0.9.8e
-Date: Wed, 29 Aug 2007 22:53:25 +1000
-Message-ID: <20070829125325.GB30139@securecomputing.com>
-References: <163963.79179.qm@web62508.mail.re1.yahoo.com>
+From: Markus Huehnerbein <silencer@gmx.ch>
+Subject: Problem using dm-crypt with geode LX800 AES-Engine
+Date: Wed, 29 Aug 2007 15:50:35 +0200
+Message-ID: <46D579AB.5040304@gmx.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, ocf-linux-users@lists.sourceforge.net
-To: Eran Ben-Avi <eranpublic@yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rex.snapgear.com ([203.143.235.140]:38513 "EHLO
-	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755259AbXH2Msd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Aug 2007 08:48:33 -0400
-Content-Disposition: inline
-In-Reply-To: <163963.79179.qm@web62508.mail.re1.yahoo.com>
+Received: from mail.gmx.net ([213.165.64.20]:55648 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1755932AbXH2Nuj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Aug 2007 09:50:39 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hello list,
 
-Jivin Eran Ben-Avi lays it down ...
-> Hi,
-> 
-> Did anyone test latest OCF(20070727) with openssl 0.9.8e ?
-> I patched the OCF on kernel 2.6.23(rc) and ssl.patch on openssl 0.9.8e
-> and got errors when tried to perform key decryption using cryptosoft driver.
-> I tested it with older OCF on older kernel(2.6.12.6) and it worked properly.
+I 've an embedded board with AMD Geode=E2=84=A2 LX 800 Chip. I'm runnin=
+g Debian
+Etch and Kernel 2.6.22.5. What I tried is to use dm-crypt /
+cryptsetup-luks 1.0.5 with the Geode AES-Engine.
 
-Which specific commands/openssl features were you running so I can
-reproduce it here ?  A lot of the openssl patch was reworked to make
-it more acceptable to send upstream as a patch.
+The Kernel Modul "geode_aes" is compiled and loaded successfully. The
+problem is, that if the module is loaded and I try:
+	cryptsetup -c aes -s 256 -h sha256 luksFormat /dev/hda2
+after supplying the password I get the following error:
 
-The things I use regularly were tested,  but not everything.  We have
-fixed a couple of bugs since 20070727 so if I can get some more
-information it might be time to do a new version with it fixed ;-)
+=46ailed to setup dm-crypt key mapping.
+Check kernel for support for the aes-cbc-plain cipher spec and verify
+that /dev/hda2 contains at least 258 sectors.
+=46ailed to write to key storage.
+Command failed.
 
-Cheers,
-Davidm
+If I remove the module (rmmod geode-aes) the cryptsetup works fine.
+Any suggestions are very welcome.
 
--- 
-David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
+Kind regards,
+Markus
