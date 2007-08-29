@@ -1,63 +1,82 @@
-From: Markus Huehnerbein <silencer@gmx.ch>
-Subject: Re: Problem using dm-crypt with geode LX800 AES-Engine
-Date: Wed, 29 Aug 2007 22:29:10 +0200
-Message-ID: <46D5D716.4040903@gmx.ch>
-References: <46D579AB.5040304@gmx.ch> <20070829141549.GD24782@Chamillionaire.breakpoint.cc> <46D585B5.9090607@gmx.ch> <20070829162200.GE24782@Chamillionaire.breakpoint.cc>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: Re: OCF(20070727) cryptosoft errors with openssl 0.9.8e
+Date: Thu, 30 Aug 2007 09:10:34 +1000
+Message-ID: <20070829231034.GA5844@securecomputing.com>
+References: <20070829125325.GB30139@securecomputing.com> <913426.96574.qm@web62509.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, ocf-linux-users@lists.sourceforge.net
+To: Eran Ben-Avi <eranpublic@yahoo.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:51423 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1755553AbXH2U3N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Aug 2007 16:29:13 -0400
-In-Reply-To: <20070829162200.GE24782@Chamillionaire.breakpoint.cc>
+Received: from rex.snapgear.com ([203.143.235.140]:39106 "EHLO
+	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755639AbXH2XFi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Aug 2007 19:05:38 -0400
+Content-Disposition: inline
+In-Reply-To: <913426.96574.qm@web62509.mail.re1.yahoo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 
-Sebastian Siewior wrote:
-> * Markus Huehnerbein | 2007-08-29 16:41:57 [+0200]:
+Jivin Eran Ben-Avi lays it down ...
+> Hi,
 > 
->> Thanks a lot! I confirm that it works with "-s 128" and also if "-s" is
->> skipped! But if I try to use cryptsetup with ESSIV (cryptsetup -c
->> aes-cbc-essiv:sha256 -y -s 128 luksFormat /dev/hda2) I get the same
-> what about sha128 instead?
+> Please ignore.Apparently the ocfnull was enabled along
+> with the cryptosoft - that was the root cause of my
+> problem.
+
+No problems.
+
+Cheers,
+Davidm
+
+> --- David McCullough
+> <David_Mccullough@securecomputing.com> wrote:
 > 
->> error. If the "geode-aes" does not support essiv why is this task not
->> performed by another algorithm in the cryptoAPI?
-> Actually it is. geode does not support keys != 128 bit. ESSIV uses as
-> key the output of sha256 what is 256. Check dmesg please. If my theory
-> is correct than you should see in dmesg or somewhere:
-> "Failed to set key for ESSIV cipher"
-> Is it?
-
-Yes, again you're right, if I use a hash with 256 bit I get the
-following syslog errors:
-
-device-mapper: table: 254:1: crypt: Error initializing ESSIV hash
-device-mapper: ioctl: error adding target to table
-device-mapper: ioctl: device doesn't appear to be in the dev hash table.
-
-Unfortunately there is no support for sha128 in the Kernel so I tried
-md5 as md5 also generates a 128 bit value.
-
-Preparing the Volume with:
-	cryptsetup -c aes-cbc-essiv:md5 -y -s 128 luksFormat /dev/hda2
-works fine ("Command successful" and no errors in the syslog) but when I
-try to open the device
-	cryptsetup luksOpen /dev/hda2 devdmcryptluks
-I get "Command failed." after entering the (correct) password. I also
-tried "luksOpen" with the same arguments as "luksFormat" but the same -
-"Command failed." without any trace in the syslog...
-
+> > 
+> > Jivin Eran Ben-Avi lays it down ...
+> > > Hi,
+> > > 
+> > > Did anyone test latest OCF(20070727) with openssl
+> > 0.9.8e ?
+> > > I patched the OCF on kernel 2.6.23(rc) and
+> > ssl.patch on openssl 0.9.8e
+> > > and got errors when tried to perform key
+> > decryption using cryptosoft driver.
+> > > I tested it with older OCF on older
+> > kernel(2.6.12.6) and it worked properly.
+> > 
+> > Which specific commands/openssl features were you
+> > running so I can
+> > reproduce it here ?  A lot of the openssl patch was
+> > reworked to make
+> > it more acceptable to send upstream as a patch.
+> > 
+> > The things I use regularly were tested,  but not
+> > everything.  We have
+> > fixed a couple of bugs since 20070727 so if I can
+> > get some more
+> > information it might be time to do a new version
+> > with it fixed ;-)
+> > 
+> > Cheers,
+> > Davidm
+> > 
+> > -- 
+> > David McCullough, 
+> > david_mccullough@securecomputing.com,   Ph:+61
+> > 734352815
+> > Secure Computing - SnapGear  http://www.uCdot.org
+> > http://www.cyberguard.com
+> > 
 > 
->> Thanks,
->> Markus
 > 
-> Sebastian
 > 
-Thanks again,
-Markus
+>       ____________________________________________________________________________________
+> Fussy? Opinionated? Impossible to please? Perfect.  Join Yahoo!'s user panel and lay it on us. http://surveylink.yahoo.com/gmrs/yahoo_panel_invite.asp?a=7 
+> 
+
+-- 
+David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
+Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
