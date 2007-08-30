@@ -1,52 +1,73 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7/8] [CRYPTO] api: Fixed crypto_*_reqsize return type
-Date: Thu, 30 Aug 2007 16:41:34 +0800
-Message-ID: <E1IQfao-0004Bu-00@gondolin.me.apana.org.au>
+Subject: [PATCH 6/8] [CRYPTO] scatterwalk: Add scatterwalk_map_and_copy
+Date: Thu, 30 Aug 2007 16:41:31 +0800
+Message-ID: <E1IQfal-0004Bn-00@gondolin.me.apana.org.au>
 References: <20070830083900.GA15936@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Thomas Graf <tgraf@suug.ch>,
 	Herbgert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1424 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1419 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756352AbXH3Ilh (ORCPT
+	with ESMTP id S1756326AbXH3Ilf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Aug 2007 04:41:37 -0400
+	Thu, 30 Aug 2007 04:41:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] api: Fixed crypto_*_reqsize return type
+[CRYPTO] scatterwalk: Add scatterwalk_map_and_copy
 
-This patch changes the return type of crypto_*_reqsize from int to
-unsigned int which matches what the underlying type is (and should
-be).
+This patch adds the function scatterwalk_map_and_copy which reads or
+writes a chunk of data from a scatterlist at a given offset.  It will
+be used by authenc which would read/write the authentication data at
+the end of the cipher/plain text.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/linux/crypto.h |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ crypto/scatterwalk.c |   22 ++++++++++++++++++++++
+ crypto/scatterwalk.h |    3 +++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index b1c7f41..fc32694 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -624,7 +624,8 @@ static inline int crypto_ablkcipher_decrypt(struct ablkcipher_request *req)
- 	return crt->decrypt(req);
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 81afd17..e93a8f6 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -107,3 +107,25 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 	}
  }
+ EXPORT_SYMBOL_GPL(scatterwalk_copychunks);
++
++void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
++			      unsigned int start, unsigned int nbytes, int out)
++{
++	struct scatter_walk walk;
++	unsigned int offset = 0;
++
++	for (;;) {
++		scatterwalk_start(&walk, sg);
++
++		if (start < offset + sg->length)
++			break;
++
++		offset += sg->length;
++		sg = sg_next(sg);
++	}
++
++	scatterwalk_advance(&walk, start - offset);
++	scatterwalk_copychunks(buf, &walk, nbytes, out);
++	scatterwalk_done(&walk, out, 0);
++}
++EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+diff --git a/crypto/scatterwalk.h b/crypto/scatterwalk.h
+index f1592cc..500a220 100644
+--- a/crypto/scatterwalk.h
++++ b/crypto/scatterwalk.h
+@@ -74,4 +74,7 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ void *scatterwalk_map(struct scatter_walk *walk, int out);
+ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
  
--static inline int crypto_ablkcipher_reqsize(struct crypto_ablkcipher *tfm)
-+static inline unsigned int crypto_ablkcipher_reqsize(
-+	struct crypto_ablkcipher *tfm)
- {
- 	return crypto_ablkcipher_crt(tfm)->reqsize;
- }
-@@ -766,7 +767,7 @@ static inline int crypto_aead_decrypt(struct aead_request *req)
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
- }
- 
--static inline int crypto_aead_reqsize(struct crypto_aead *tfm)
-+static inline unsigned int crypto_aead_reqsize(struct crypto_aead *tfm)
- {
- 	return crypto_aead_crt(tfm)->reqsize;
- }
++void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
++			      unsigned int start, unsigned int nbytes, int out);
++
+ #endif  /* _CRYPTO_SCATTERWALK_H */
