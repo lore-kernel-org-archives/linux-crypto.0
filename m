@@ -1,53 +1,54 @@
-From: Sebastian Siewior <bigeasy@breakpoint.cc>
-Subject: Re: [PATCH] an XTS blockcipher mode implementation without partial
-	blocks
-Date: Fri, 7 Sep 2007 20:38:32 +0200
-Message-ID: <20070907183832.GA23067@Chamillionaire.breakpoint.cc>
-References: <11888559161619-git-send-email-rsnel@cube.dyndns.org> <20070905002906.GA6930@Chamillionaire.breakpoint.cc> <20070906145726.GA30421@cube.dyndns.org>
+From: rsnel@cube.dyndns.org
+Subject: Re: [PATCH] an XTS blockcipher mode implementation without partial blocks
+Date: Fri, 7 Sep 2007 21:23:34 +0200
+Message-ID: <20070907192334.GA9862@cube.dyndns.org>
+References: <11888559161619-git-send-email-rsnel@cube.dyndns.org> <20070905002906.GA6930@Chamillionaire.breakpoint.cc> <20070906145726.GA30421@cube.dyndns.org> <20070907183832.GA23067@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org, christoph.sievers@gmail.com,
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org, christoph.sievers@gmail.com,
 	herbert@gondor.apana.org.au
-To: rsnel@cube.dyndns.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:35194 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758114AbXIGSii (ORCPT
+Received: from smtp-vbr15.xs4all.nl ([194.109.24.35]:3085 "EHLO
+	smtp-vbr15.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751824AbXIGTZG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Sep 2007 14:38:38 -0400
+	Fri, 7 Sep 2007 15:25:06 -0400
 Content-Disposition: inline
-In-Reply-To: <20070906145726.GA30421@cube.dyndns.org>
+In-Reply-To: <20070907183832.GA23067@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* rsnel@cube.dyndns.org | 2007-09-06 16:57:26 [+0200]:
+Hello,
 
->> The compiler should generate similar code.
+On Fri, Sep 07, 2007 at 08:38:32PM +0200, Sebastian Siewior wrote:
+> [...]
 >
->I'd rather tell the compiler what I want than to introduce a new local
->variable and a conditional branch in the hope that the compiler will
->optimize it away, just to avoid a goto.
->
->If you insist on getting rid of the goto, I could unroll the first
->iteration of the loop by hand. (when is submitted lrw.c it had the first
->iteration unrolled; Herbert replaced it with this goto)
+> >Christoph encountered a deadlock after a few hours and 16GB of data (on
+> >an aes-xts-plain partition). Assuming there is an error in xts.c, is
+> >there an obvious way of finding it?
+> 
+> Haven't seen any locks in your code, so your part may be fine. How do I
+> use this? 
+> 
+> cryptsetup -c aes-xts 
+> 
+> or?
 
-I didn't know that Herbert did it the same way. In that case you are
-fine :)
+for example: 
+cryptsetup --hash sha256 -s 256 -c aes-xts-plain create test /dev/some_partition
 
->Christoph encountered a deadlock after a few hours and 16GB of data (on
->an aes-xts-plain partition). Assuming there is an error in xts.c, is
->there an obvious way of finding it?
+The 'plain'-iv should give an on-disk format compatible with the
+requirements of IEEE1619/D16. Internally the 256-bit key is split in two
+128-bit AES keys. Other allowed key sizes for aes-xts-* are 2*192=384
+bit and 2*256=512 bit. (you may want to use a hash with more bits (I don't know
+what cryptsetup does if the hash gives less than keysize bits))
 
-Haven't seen any locks in your code, so your part may be fine. How do I
-use this? 
+Christoph, is your testing machine stable if you run the same test with
+aes-lrw-plain and the same keysize?
 
-cryptsetup -c aes-xts 
+Greetings,
 
-or?
+Rik.
 
->Greetings,
->
->Rik.
-
-Sebastian
+-- 
+Nothing is ever a total loss; it can always serve as a bad example.
