@@ -1,37 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] an XTS blockcipher mode implementation without partial blocks
-Date: Wed, 19 Sep 2007 20:24:31 +0800
-Message-ID: <20070919122431.GC19866@gondor.apana.org.au>
-References: <11890910223906-git-send-email-rsnel@cube.dyndns.org>
+Subject: Re: {twofish,aes}-{x86_64,i586} versus C implementations
+Date: Wed, 19 Sep 2007 20:29:43 +0800
+Message-ID: <20070919122943.GD19866@gondor.apana.org.au>
+References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070820130639.GN16680@bingen.suse.de> <20070902224226.GA22869@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, christoph.sievers@gmail.com
-To: Rik Snel <rsnel@cube.dyndns.org>
+To: Andi Kleen <ak@suse.de>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3477 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3530 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758981AbXISMYi (ORCPT
+	with ESMTP id S1754625AbXISM3w (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Sep 2007 08:24:38 -0400
+	Wed, 19 Sep 2007 08:29:52 -0400
 Content-Disposition: inline
-In-Reply-To: <11890910223906-git-send-email-rsnel@cube.dyndns.org>
+In-Reply-To: <20070902224226.GA22869@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 06, 2007 at 05:03:42PM +0200, Rik Snel wrote:
-> XTS currently considered to be the successor of the LRW mode by the IEEE1619
-> workgroup. LRW was discarded, because it was not secure if the encyption key
-> itself is encrypted with LRW.
+On Mon, Sep 03, 2007 at 12:42:27AM +0200, Sebastian Siewior wrote:
+>
+> [crypto] do not use generic AES on i386 and x86_64
 > 
-> XTS does not have this problem. The implementation is pretty straightforward,
-> a new function was added to gf128mul to handle GF(128) elements in ble format.
-> Four testvectors from the specification
-> 	http://grouper.ieee.org/groups/1619/email/pdf00086.pdf
-> were added, and they verify on my system.
-> 
-> Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
+> This patch automatically selects the assembly optimized version
+> of AES (if selected) and the generic version can no longer be
+> selected. The module will be called aes.ko
 
-Nice work.  Thanks Rik!
+You don't need to rename it because it already provides an
+alias for aes.
+
+Also please provide a way to build the generic AES code so
+that it can at least be tested on i386/x86_64.
+ 
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
