@@ -1,30 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cleanup: Use max() in blkcipher_get_spot() to state the intention.
-Date: Wed, 19 Sep 2007 19:16:01 +0800
-Message-ID: <20070919111601.GB19488@gondor.apana.org.au>
-References: <5562608.649291189210157514.JavaMail.root@tahiti.vyatta.com> <200709102146.47655.ioe-lkml@rameria.de> <20070911084058.GA4469@gondor.apana.org.au> <200709112153.25959.ioe-lkml@rameria.de>
+Subject: Re: [PATCH] an XTS blockcipher mode implementation without partial blocks
+Date: Wed, 19 Sep 2007 20:24:31 +0800
+Message-ID: <20070919122431.GC19866@gondor.apana.org.au>
+References: <11890910223906-git-send-email-rsnel@cube.dyndns.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Bob Gilligan <gilligan@vyatta.com>, linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Ingo Oeser <ioe-lkml@rameria.de>
+Cc: linux-crypto@vger.kernel.org, christoph.sievers@gmail.com
+To: Rik Snel <rsnel@cube.dyndns.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2980 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3477 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756928AbXISLQR (ORCPT
+	with ESMTP id S1758981AbXISMYi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Sep 2007 07:16:17 -0400
+	Wed, 19 Sep 2007 08:24:38 -0400
 Content-Disposition: inline
-In-Reply-To: <200709112153.25959.ioe-lkml@rameria.de>
+In-Reply-To: <11890910223906-git-send-email-rsnel@cube.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 11, 2007 at 09:53:24PM +0200, Ingo Oeser wrote:
-> [PATCH] crypto: cleanup: Use max() in blkcipher_get_spot() to state the intention.
+On Thu, Sep 06, 2007 at 05:03:42PM +0200, Rik Snel wrote:
+> XTS currently considered to be the successor of the LRW mode by the IEEE1619
+> workgroup. LRW was discarded, because it was not secure if the encyption key
+> itself is encrypted with LRW.
 > 
-> Signed-off-by: Ingo Oeser <ioe-lkml@rameria.de>
+> XTS does not have this problem. The implementation is pretty straightforward,
+> a new function was added to gf128mul to handle GF(128) elements in ble format.
+> Four testvectors from the specification
+> 	http://grouper.ieee.org/groups/1619/email/pdf00086.pdf
+> were added, and they verify on my system.
+> 
+> Signed-off-by: Rik Snel <rsnel@cube.dyndns.org>
 
-Patch applied.  Thanks!
+Nice work.  Thanks Rik!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
