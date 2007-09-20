@@ -1,34 +1,56 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: {twofish,aes}-{x86_64,i586} versus C implementations
-Date: Thu, 20 Sep 2007 08:20:58 +0800
-Message-ID: <20070920002058.GA26848@gondor.apana.org.au>
-References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070820130639.GN16680@bingen.suse.de> <20070902224226.GA22869@Chamillionaire.breakpoint.cc> <20070919122943.GD19866@gondor.apana.org.au> <20070919214652.GC20997@Chamillionaire.breakpoint.cc>
+Subject: Re: [PATCH 1/1]: CTR mode implementation
+Date: Thu, 20 Sep 2007 16:19:20 +0800
+Message-ID: <20070920081920.GA31211@gondor.apana.org.au>
+References: <200708301614.l7UGEj44031217@faith.austin.ibm.com> <20070919130615.GA20468@gondor.apana.org.au> <1190242276.15699.996.camel@faith.austin.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Andi Kleen <ak@suse.de>, linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, tgraf@suug.ch
+To: Joy Latten <latten@austin.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1300 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1030 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752413AbXITAVF (ORCPT
+	with ESMTP id S1760219AbXITIUF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Sep 2007 20:21:05 -0400
+	Thu, 20 Sep 2007 04:20:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20070919214652.GC20997@Chamillionaire.breakpoint.cc>
+In-Reply-To: <1190242276.15699.996.camel@faith.austin.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 19, 2007 at 11:46:52PM +0200, Sebastian Siewior wrote:
+On Wed, Sep 19, 2007 at 05:51:15PM -0500, Joy Latten wrote:
 >
-> >Also please provide a way to build the generic AES code so
-> >that it can at least be tested on i386/x86_64.
-> 
-> You want to auto compile aes-x86_64 if you are on x86_64 and additonally
-> the generic version. Is that correct?
-> If so, why do you want to have them both?
+> predictability into my sessions? I could truncate the salt
+> in my counter block to 2 bytes and put 2 bytes of the IV for
+> blocksizes of 8... does that sound, ok?
+> Or am I totally misunderstanding it all?
 
-So that the generic C version can actually be tested on x86.
-We don't want it to bit-rot which would make non-x86 2nd-class
-citizens.
+I suggest that you make these parameters to your CTR template.
+So instead of requesting for "ctr(aes)", you could request for
+"ctr(aes, 4, 8)" where 4 is the length of the nonce in the
+counter block and 8 is the length of the IV.  The counter
+itself would then be calculated as block_size - 4 - 8.
+
+> > > +static int crypto_ctr_encrypt(struct blkcipher_desc *desc,
+> > > +			      struct scatterlist *dst, struct scatterlist *src,
+> > > +			      unsigned int nbytes)
+> > > +{
+> > > +	struct blkcipher_walk walk;
+> > > +	struct crypto_blkcipher *tfm = desc->tfm;
+> > > +	struct crypto_ctr_ctx *ctx = crypto_blkcipher_ctx(tfm);
+> > > +	struct crypto_cipher *child = ctx->child;
+> > > +	u8 *counterblk = ctx->ctrblk;
+> > 
+> > We need to support simultaneous calls to the same tfm so you
+> > need to allocate this somewhere else.  Just use the original
+> > IV since it should be of the right length.
+> 
+> Just to make sure I understand what you meant, you mean just use
+> ctx->ctrblk directly?
+
+No I mean that you can't use anything from the ctx as the same
+ctx may be used by multiple calls at the same time.  You'd have
+to allocate it on the stack or via kmalloc.
 
 Cheers,
 -- 
