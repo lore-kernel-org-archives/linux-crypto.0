@@ -1,42 +1,210 @@
-From: Herbert Xu <herbert.xu@redhat.com>
-Subject: Re: [PATCH 1/1]: CTR mode implementation
-Date: Tue, 25 Sep 2007 09:17:11 +0800
-Message-ID: <20070925011711.GB23634@gondor.apana.org.au>
-References: <200709250031.l8P0VWjo014505@faith.austin.ibm.com>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: Re: Openswan 2.4.9 - tasklet or workqueue ?
+Date: Thu, 27 Sep 2007 00:26:10 +1000
+Message-ID: <20070926142610.GA32314@securecomputing.com>
+References: <20070827224021.GA23450@securecomputing.com> <440337.35301.qm@web62504.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, tgraf@suug.ch
-To: Joy Latten <latten@austin.ibm.com>
+Content-Type: multipart/mixed; boundary="azLHFNyN32YCQGCU"
+Cc: linux-crypto@vger.kernel.org, ocf-linux-users@lists.sourceforge.net
+To: Eran Ben-Avi <eranpublic@yahoo.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1251 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754571AbXIYBRu (ORCPT
+Received: from rex.snapgear.com ([203.143.235.140]:46675 "EHLO
+	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757442AbXIZOZG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Sep 2007 21:17:50 -0400
+	Wed, 26 Sep 2007 10:25:06 -0400
 Content-Disposition: inline
-In-Reply-To: <200709250031.l8P0VWjo014505@faith.austin.ibm.com>
+In-Reply-To: <440337.35301.qm@web62504.mail.re1.yahoo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 24, 2007 at 07:31:32PM -0500, Joy Latten wrote:
-> 
-> I have another question regarding this change to using a tuple.
-> The size of my counter is now, csize = blocksize - (noncesize + ivsize).
-> rfc 3686 (CTR-AES for ESP) states in section 4, that the counter
-> portion of the counter block be a 32-bit big endian. To keep
-> code endian-neutral as I can, would it be appropriate if I only did
-> this when my csize is 2, 4 or 8 bytes so I can easily use be16_to_cpu(), 
-> be32_to_cpu() and be64_to_cpu() respectively? And for all other 
-> sizes for csize, don't worry about this "endian" requirement, just store as is. 
-> Does it matter that I store the 32 bits as big endian?
 
-Just fail the algorithm construction if the the counter block
-size doesn't come out to be 4 for now.  We can change this later
-on when needs arise.
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Cheers,
+
+Jivin Eran Ben-Avi lays it down ...
+> > Jivin Eran Ben-Avi lays it down ...
+> > > Hi,
+> > > 
+> > > I tested IPSec(tunnel mode) routing performance
+> > between 2 GbE ports using packet generator(SMARTBIT)
+> >  on ARM 500MHz with latest OCF patched on
+> > Openswan2.4.9 and I noticed the callback functions
+> > are using workqueue.
+> > > Since RX was performed in NAPI mode with higher
+> > priority then TX (in workqueue), the callback
+> > function(in ipsec_ocf.c) was starved with zero
+> > routing.
+> > > The problem was solved after I switched to use
+> > tasklet instead of the workqueue.
+> > > Is there a room for updating next OCF release ?
+> > 
+> > Sure,  send in a patch. This is against
+> > ocf-linux-20070727 right ?
+> Yes.
+> Can you please estimate when next release will be
+> ready?
+
+I can probably do one in about a week (offline next week). I could more
+easily drop a diff since the last release if that helps you out.
+
+I have made a few small changes to your patch so it should be safe on
+2.4 systems yet still select tasklets on 2.6 automatically.
+
+Could you have a look at it ?  I have done some basic testing here
+and it seems ok,  haven't checked your performance increases yet ;-)
+
+Thanks,
+Davidm
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
+Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
+
+--azLHFNyN32YCQGCU
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="tasklet.diff"
+
+Index: openswan/linux/include/openswan/ipsec_rcv.h
+===================================================================
+RCS file: openswan/linux/include/openswan/ipsec_rcv.h,v
+retrieving revision 1.13
+diff -u -r1.13 ipsec_rcv.h
+--- openswan/linux/include/openswan/ipsec_rcv.h	26 Jun 2007 06:28:52 -0000	1.13
++++ openswan/linux/include/openswan/ipsec_rcv.h	26 Sep 2007 14:17:25 -0000
+@@ -149,6 +149,9 @@
+ 
+ #ifdef CONFIG_KLIPS_OCF
+ 	struct work_struct	workq;
++#ifdef DECLARE_TASKLET
++	struct tasklet_struct	tasklet;
++#endif
+ #endif
+ #ifndef NET_21
+ 	struct net_device *devp;
+Index: openswan/linux/include/openswan/ipsec_xmit.h
+===================================================================
+RCS file: openswan/linux/include/openswan/ipsec_xmit.h,v
+retrieving revision 1.9
+diff -u -r1.9 ipsec_xmit.h
+--- openswan/linux/include/openswan/ipsec_xmit.h	26 Jun 2007 05:26:25 -0000	1.9
++++ openswan/linux/include/openswan/ipsec_xmit.h	26 Sep 2007 14:17:25 -0000
+@@ -140,6 +140,9 @@
+ 	int		next_state;
+ #ifdef CONFIG_KLIPS_OCF
+ 	struct work_struct	workq;
++#ifdef DECLARE_TASKLET
++	struct tasklet_struct	tasklet;
++#endif
+ #endif
+ #ifdef CONFIG_KLIPS_ALG
+ 	struct ipsec_alg_auth *ixt_a;
+Index: openswan/linux/net/ipsec/ipsec_ocf.c
+===================================================================
+RCS file: openswan/linux/net/ipsec/ipsec_ocf.c,v
+retrieving revision 1.27
+diff -u -r1.27 ipsec_ocf.c
+--- openswan/linux/net/ipsec/ipsec_ocf.c	11 Jul 2007 00:35:01 -0000	1.27
++++ openswan/linux/net/ipsec/ipsec_ocf.c	26 Sep 2007 14:17:25 -0000
+@@ -56,7 +56,11 @@
+ #define USE_BATCH 1	/* enable batch mode */
+ #define USE_CBIMM 1	/* enable immediate callbacks */
+ #define FORCE_QS  0	/* force use of queues for continuation of state machine */
+-
++#ifdef DECLARE_TASKLET
++#define USE_TASKLET 1  /* use tasklet for continuation of state machine */
++#else
++#define USE_TASKLET 0  /* don't use tasklet for continuation of state machine */
++#endif
+ /*
+  * Because some OCF operations are synchronous (ie., software encryption)
+  * we need to protect ourselves from distructive re-entry.  All we do
+@@ -83,15 +87,21 @@
+ 		(*sm)(arg); \
+ 	})
+ 
+-#if FORCE_QS == 0
+-	#define PROCESS_NEXT(wq, wqsm, sm, arg) \
++#if USE_TASKLET == 1
++	#define PROCESS_NEXT(this, wqsm, sm) ({ \
++		tasklet_init(&this->tasklet, \
++			(void (*)(unsigned long)) sm, (unsigned long)this); \
++		tasklet_schedule(&this->tasklet); \
++		})
++#elif FORCE_QS == 0
++	#define PROCESS_NEXT(this, wqsm, sm) \
+ 		if (in_interrupt()) { \
+-			PROCESS_LATER(wq, wqsm, arg); \
++			PROCESS_LATER(this->workq, wqsm, this); \
+ 		} else { \
+-			PROCESS_NOW(sm, arg); \
++			PROCESS_NOW(sm, this); \
+ 		}
+ #else
+-	#define PROCESS_NEXT(wq, wqsm, sm, arg) PROCESS_LATER(wq, wqsm, arg)
++	#define PROCESS_NEXT(this, wqsm, sm) PROCESS_LATER(this->workq, wqsm, this)
+ #endif
+ 
+ /*
+@@ -218,6 +228,7 @@
+ 	return 1;
+ }
+ 
++#if USE_TASKLET == 0
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
+ static void
+ ipsec_rsm_wq(struct work_struct *work)
+@@ -228,6 +239,7 @@
+ #else
+ #define	ipsec_rsm_wq	ipsec_rsm
+ #endif
++#endif /* USE_TASKLET */
+ 
+ static int
+ ipsec_ocf_rcv_cb(struct cryptop *crp)
+@@ -235,7 +247,6 @@
+ 	struct ipsec_rcv_state *irs = (struct ipsec_rcv_state *)crp->crp_opaque;
+ 
+ 	KLIPS_PRINT(debug_rcv, "klips_debug:ipsec_ocf_rcv_cb\n");
+-
+ 	if (irs == NULL) {
+ 		KLIPS_PRINT(debug_rcv, "klips_debug:ipsec_ocf_rcv_cb: "
+ 				"NULL irs in callback\n");
+@@ -273,7 +284,7 @@
+ 	crp = NULL;
+ 
+ 	/* setup the rest of the processing now */
+-	PROCESS_NEXT(irs->workq, ipsec_rsm_wq, ipsec_rsm, irs);
++	PROCESS_NEXT(irs, ipsec_rsm_wq, ipsec_rsm);
+ 	return 0;
+ }
+ 
+@@ -396,6 +407,7 @@
+ 	return(IPSEC_RCV_PENDING);
+ }
+ 
++#if USE_TASKLET == 0
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
+ static void
+ ipsec_xsm_wq(struct work_struct *work)
+@@ -406,6 +418,7 @@
+ #else
+ #define	ipsec_xsm_wq	ipsec_xsm
+ #endif
++#endif /* USE_TASKLET */
+ 
+ static int
+ ipsec_ocf_xmit_cb(struct cryptop *crp)
+@@ -445,7 +458,7 @@
+ 	crp = NULL;
+ 
+ 	/* setup the rest of the processing now */
+-	PROCESS_NEXT(ixs->workq, ipsec_xsm_wq, ipsec_xsm, ixs);
++	PROCESS_NEXT(ixs, ipsec_xsm_wq, ipsec_xsm);
+ 	return 0;
+ }
+ 
+
+--azLHFNyN32YCQGCU--
