@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 8/8] [CRYPTO] aead: Add support for multiple template parameters
-Date: Fri, 28 Sep 2007 09:09:17 +0800
-Message-ID: <20070928010917.GA22657@gondor.apana.org.au>
-References: <200709272225.l8RMPjb5003200@faith.austin.ibm.com>
+Subject: Re: [PATCH 8/8] [CRYPTO] aead: Add authenc
+Date: Fri, 28 Sep 2007 09:10:23 +0800
+Message-ID: <20070928011023.GB22657@gondor.apana.org.au>
+References: <200709272229.l8RMT4n3003226@faith.austin.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Joy Latten <latten@austin.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3239 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3249 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752348AbXI1BJq (ORCPT
+	with ESMTP id S1753222AbXI1BKZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2007 21:09:46 -0400
+	Thu, 27 Sep 2007 21:10:25 -0400
 Content-Disposition: inline
-In-Reply-To: <200709272225.l8RMPjb5003200@faith.austin.ibm.com>
+In-Reply-To: <200709272229.l8RMT4n3003226@faith.austin.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 27, 2007 at 05:25:45PM -0500, Joy Latten wrote:
+On Thu, Sep 27, 2007 at 05:29:04PM -0500, Joy Latten wrote:
 >
-> Shouldn't p be incremented after this check? Otherwise, it will 
-> still be pointing to ')' after breaking from this for-loop and we will
-> end up copying "hmac(sha1" instead of "hmac(sha1)", right?
-> Also, I think we will prematurely break from top for-loop 
-> because of check, "if (*p == ')') break;" which is done further down...
+> Thus if user enters template without whitespaces,
+> then the above would cause a problem because the 
+> name in the template would not match up with the name
+> in the instance above. 
 
-Good catch, I've checked in the following patch.
+Indeed, white spaces are not allowed so they should go from
+these prints.  I've fixed it in my tree as below.
 
 Thanks,
 -- 
@@ -35,24 +35,22 @@ Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
-diff --git a/crypto/cryptomgr.c b/crypto/cryptomgr.c
-index c83884f..e5e3cf8 100644
---- a/crypto/cryptomgr.c
-+++ b/crypto/cryptomgr.c
-@@ -129,6 +129,7 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
- 			}
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 86b3ac8..0b29a6a 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -312,12 +312,12 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
  
- 			notnum = 1;
-+			p++;
- 		}
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME,
+-		     "authenc(%s, %u, %s, %u)", auth->cra_name, authsize,
++		     "authenc(%s,%u,%s,%u)", auth->cra_name, authsize,
+ 		     enc->cra_name, enckeylen) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_free_inst;
  
- 		len = p - name;
-@@ -151,7 +152,7 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
- 		param->tb[i + 1] = &param->attrs[i].attr;
- 		i++;
- 
--		if (WARN_ON(i >= CRYPTO_MAX_ATTRS))
-+		if (i >= CRYPTO_MAX_ATTRS)
- 			goto err_free_param;
- 
- 		if (*p == ')')
+ 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+-		     "authenc(%s, %u, %s, %u)", auth->cra_driver_name,
++		     "authenc(%s,%u,%s,%u)", auth->cra_driver_name,
+ 		     authsize, enc->cra_driver_name, enckeylen) >=
+ 	    CRYPTO_MAX_ALG_NAME)
+ 		goto err_free_inst;
