@@ -1,33 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [1/1 take 2] HIFN 795x driver.
-Date: Fri, 5 Oct 2007 16:18:56 +0800
-Message-ID: <20071005081856.GA10799@gondor.apana.org.au>
-References: <20071002150013.GA6023@2ka.mipt.ru> <20071002190512.GA8761@Chamillionaire.breakpoint.cc> <20071003084118.GA19117@2ka.mipt.ru> <20071003115405.GA8920@gondor.apana.org.au> <20071003120518.GA20250@2ka.mipt.ru> <20071004054923.GA16226@gondor.apana.org.au> <20071004092218.GA23613@2ka.mipt.ru> <20071004100414.GA24602@gondor.apana.org.au> <20071004150453.GA16027@2ka.mipt.ru>
+Subject: Re: [PATCH] [crypto] load the DES module by an alias
+Date: Fri, 5 Oct 2007 16:48:54 +0800
+Message-ID: <20071005084854.GA10959@gondor.apana.org.au>
+References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070930124239.GB24811@Chamillionaire.breakpoint.cc> <20071003073522.GA7285@gondor.apana.org.au> <20071004083512.GA11305@Chamillionaire.breakpoint.cc> <E1IdMSS-0004KR-RF@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <sebastian@breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1476 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1614 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751765AbXJEITB (ORCPT
+	with ESMTP id S1752804AbXJEIs5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Oct 2007 04:19:01 -0400
+	Fri, 5 Oct 2007 04:48:57 -0400
 Content-Disposition: inline
-In-Reply-To: <20071004150453.GA16027@2ka.mipt.ru>
+In-Reply-To: <E1IdMSS-0004KR-RF@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 04, 2007 at 07:04:53PM +0400, Evgeniy Polyakov wrote:
->
-> It just can not be used in asynchronous hardware, so I will create
-> soemthing new for HIFN driver specially.
+On Wed, Oct 03, 2007 at 09:23:37PM +0200, Sebastian Siewior wrote:
+> Loading the crypto algorithm by the alias instead of by module directly
+> has the advantage that all possible implementations of this algorithm
+> are loaded automatically and the crypto API can choose the best one
+> depending on its priority.
+> 
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-That sounds good.  We can put it into ablkcipher.c and then get
-rid of the phys stuff from blkcipher.c.
-
-Cheers,
+Applied.  Thanks!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
