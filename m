@@ -1,47 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [crypto] load the SHA1[1|256] module by an alias (v2)
-Date: Fri, 5 Oct 2007 23:10:51 +0800
-Message-ID: <20071005151051.GA13666@gondor.apana.org.au>
-References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070930124239.GB24811@Chamillionaire.breakpoint.cc> <20071003073522.GA7285@gondor.apana.org.au> <20071004083512.GA11305@Chamillionaire.breakpoint.cc> <E1IdMSX-0004KV-LS@Chamillionaire.breakpoint.cc> <20071005085744.GC10959@gondor.apana.org.au> <E1IdnjO-0006eu-JQ@Chamillionaire.breakpoint.cc>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH] [crypto] load the SHA1[1|256] module by an alias
+Date: Sat, 6 Oct 2007 23:54:08 +0200
+Message-ID: <20071006215408.GA3645@Chamillionaire.breakpoint.cc>
+References: <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070930124239.GB24811@Chamillionaire.breakpoint.cc> <20071003073522.GA7285@gondor.apana.org.au> <20071004083512.GA11305@Chamillionaire.breakpoint.cc> <E1IdMSX-0004KV-LS@Chamillionaire.breakpoint.cc> <20071005085744.GC10959@gondor.apana.org.au> <20071005135056.GA19693@Chamillionaire.breakpoint.cc> <20071005142022.GA13265@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-15
 Cc: linux-crypto@vger.kernel.org
-To: Sebastian Siewior <sebastian@breakpoint.cc>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1080 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756521AbXJEPKy (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:38207 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1765646AbXJFVyP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Oct 2007 11:10:54 -0400
+	Sat, 6 Oct 2007 17:54:15 -0400
 Content-Disposition: inline
-In-Reply-To: <E1IdnjO-0006eu-JQ@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20071005142022.GA13265@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 05, 2007 at 03:12:10PM +0200, Sebastian Siewior wrote:
-> Loading the crypto algorithm by the alias instead of by module directly
-> has the advantage that all possible implementations of this algorithm
-> are loaded automatically and the crypto API can choose the best one
-> depending on its priority.
-> Additionally it ensures that the generic implementation as well as the
-> HW driver (if available) is loaded in case the HW driver needs the
-> generic version as fallback in corner cases.
-> Also remove the probe for sha1 in padlock's init code.
-> Quote from Herbert:
->   The probe is actually pointless since we can always probe when
->   the algorithm is actually used which does not lead to dead-locks
->   like this.
+* Herbert Xu | 2007-10-05 22:20:22 [+0800]:
 
-Thanks.  I'll apply this tomorrow.
+>On Fri, Oct 05, 2007 at 03:50:56PM +0200, Sebastian Siewior wrote:
+>>
+>> I did not find a module_mutex. We hold a readlock of crypto_alg_sem
+>> within the crypto subsystem and request_module() increments
+>> kmod_concurrent (which may not exceed a certain limit). 
+>
+>However, it's still good to remove this code since doing a nested
+>modprobe of "sha" within a modprobe of "sha" just feels wrong.
 
-BTW, the dead-lock does exist after all.  The lock that's held
-is the user-space file lock held by modprobe.  Assuming that
-padlock-sha comes before sha in the alias list, then the second
-modprobe will hit padlock-sha again and dead-lock.
+Yes it feels wrong. It even may show that the fallback is not available
+if padlock is loaded before the generic ones.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
