@@ -1,42 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] [crypto] load the SHA1[1|256] module by an alias (v2)
-Date: Mon, 8 Oct 2007 11:21:12 +0800
-Message-ID: <20071008032112.GC32087@gondor.apana.org.au>
-References: <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070930124239.GB24811@Chamillionaire.breakpoint.cc> <20071003073522.GA7285@gondor.apana.org.au> <20071004083512.GA11305@Chamillionaire.breakpoint.cc> <E1IdMSX-0004KV-LS@Chamillionaire.breakpoint.cc> <20071005085744.GC10959@gondor.apana.org.au> <E1IdnjO-0006eu-JQ@Chamillionaire.breakpoint.cc> <20071005151051.GA13666@gondor.apana.org.au> <20071006220220.GC3645@Chamillionaire.breakpoint.cc>
+Date: Mon, 8 Oct 2007 12:12:07 +0800
+Message-ID: <20071008041207.GA32533@gondor.apana.org.au>
+References: <200708200234.25620.ak@suse.de> <E1IMveX-0002Kv-00@gondolin.me.apana.org.au> <20070820101618.GE16680@bingen.suse.de> <20070820120605.GA13163@gondor.apana.org.au> <20070930124239.GB24811@Chamillionaire.breakpoint.cc> <20071003073522.GA7285@gondor.apana.org.au> <20071004083512.GA11305@Chamillionaire.breakpoint.cc> <E1IdMSX-0004KV-LS@Chamillionaire.breakpoint.cc> <20071005085744.GC10959@gondor.apana.org.au> <E1IdnjO-0006eu-JQ@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <sebastian@breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1604 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1807 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752825AbXJHDVO (ORCPT
+	with ESMTP id S1750749AbXJHEMK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Oct 2007 23:21:14 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1IejBB-0005G5-Bh
-	for <linux-crypto@vger.kernel.org>; Mon, 08 Oct 2007 13:21:13 +1000
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1IejBA-0008NR-00
-	for <linux-crypto@vger.kernel.org>; Mon, 08 Oct 2007 11:21:12 +0800
+	Mon, 8 Oct 2007 00:12:10 -0400
 Content-Disposition: inline
-In-Reply-To: <20071006220220.GC3645@Chamillionaire.breakpoint.cc>
+In-Reply-To: <E1IdnjO-0006eu-JQ@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Oct 07, 2007 at 12:02:20AM +0200, Sebastian Siewior wrote:
->
-> >BTW, the dead-lock does exist after all.  The lock that's held
-> >is the user-space file lock held by modprobe.  Assuming that
-> >padlock-sha comes before sha in the alias list, then the second
-> >modprobe will hit padlock-sha again and dead-lock.
+On Fri, Oct 05, 2007 at 03:12:10PM +0200, Sebastian Siewior wrote:
+> Loading the crypto algorithm by the alias instead of by module directly
+> has the advantage that all possible implementations of this algorithm
+> are loaded automatically and the crypto API can choose the best one
+> depending on its priority.
+> Additionally it ensures that the generic implementation as well as the
+> HW driver (if available) is loaded in case the HW driver needs the
+> generic version as fallback in corner cases.
+> Also remove the probe for sha1 in padlock's init code.
+> Quote from Herbert:
+>   The probe is actually pointless since we can always probe when
+>   the algorithm is actually used which does not lead to dead-locks
+>   like this.
 > 
-> Really, hmm. That CRYPTO_ALG_NEED_FALLBACK flag is unused than? 
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-That flag is only known to the crypto code.  Modprobe knows
-nothing of it so the two probes will look the same to modprobe.
+Patch applied with one small change where I left the *-padlock
+aliases around since people might already be using them and
+they're correct as the specific name of those algorithms.
 
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
