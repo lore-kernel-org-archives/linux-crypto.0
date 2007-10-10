@@ -1,36 +1,38 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: Crypto Update for 2.6.24
-Date: Wed, 10 Oct 2007 02:40:05 -0700 (PDT)
-Message-ID: <20071010.024005.40832336.davem@davemloft.net>
-References: <20071010031729.GA26697@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/1]: Revised CTR mode implementation
+Date: Wed, 10 Oct 2007 23:17:43 +0800
+Message-ID: <20071010151743.GA8337@gondor.apana.org.au>
+References: <200710091944.l99JiedH009971@faith.austin.ibm.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: torvalds@linux-foundation.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Joy Latten <latten@austin.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:43888
-	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1753504AbXJJJkC (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:3833 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753953AbXJJPSK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Oct 2007 05:40:02 -0400
-In-Reply-To: <20071010031729.GA26697@gondor.apana.org.au>
+	Wed, 10 Oct 2007 11:18:10 -0400
+Content-Disposition: inline
+In-Reply-To: <200710091944.l99JiedH009971@faith.austin.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 10 Oct 2007 11:17:29 +0800
+On Tue, Oct 09, 2007 at 02:44:40PM -0500, Joy Latten wrote:
+> This should contain the geniv as well as all the
+> improvements discussed. All the testcases pass.
 
-> Here is the crypto update for 2.6.24:
-> 
-> Please pull from
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-> 
-> or
-> 
-> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+This looks pretty good!
 
-I've integrated this into my 2.6.24 networking tree, thanks
-Herbert.
+I'm going to apply this once I fix up the geniv problems found
+by Sebastian.
+
+BTW, could you please send me a final changeset description
+and Signed-off-by?
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
