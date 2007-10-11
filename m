@@ -1,30 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: authenc compile warnings in current net-2.6.24
-Date: Thu, 11 Oct 2007 11:26:11 +0800
-Message-ID: <20071011032611.GA14240@gondor.apana.org.au>
-References: <470D11B1.2040207@hartkopp.net> <20071010195337.GA21597@Chamillionaire.breakpoint.cc> <20071010.162528.91758998.davem@davemloft.net> <20071011032330.GA14165@gondor.apana.org.au>
+Subject: Re: [PATCH 1/1]: Revised CTR mode implementation
+Date: Thu, 11 Oct 2007 17:00:27 +0800
+Message-ID: <20071011090026.GA16740@gondor.apana.org.au>
+References: <200710091944.l99JiedH009971@faith.austin.ibm.com> <20071010151743.GA8337@gondor.apana.org.au> <1192032506.2477.285.camel@faith.austin.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: netdev@ml.breakpoint.cc, socketcan@hartkopp.net,
-	netdev@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: David Miller <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+To: Joy Latten <latten@austin.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4867 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2831 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751403AbXJKD02 (ORCPT
+	with ESMTP id S1752642AbXJKJAz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Oct 2007 23:26:28 -0400
+	Thu, 11 Oct 2007 05:00:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20071011032330.GA14165@gondor.apana.org.au>
+In-Reply-To: <1192032506.2477.285.camel@faith.austin.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 11, 2007 at 11:23:30AM +0800, Herbert Xu wrote:
+On Wed, Oct 10, 2007 at 11:08:26AM -0500, Joy Latten wrote:
 >
-> Yeah I've added a fix in the cryptodev tree.
+> This patch implements CTR mode for IPsec.
+> It is based off of RFC 3686.
 
-Oh and here's the actual patch.
+Thanks! I've just applied it to cryptodev-2.6 and will push it
+out soon.
 
 Cheers,
 -- 
@@ -32,49 +32,3 @@ Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-1cd6038ce42447f9a32e6d138af0b69ad56ea627
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 0b29a6a..126a529 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -84,8 +84,8 @@ static int crypto_authenc_hash(struct aead_request *req)
- 		.tfm = auth,
- 	};
- 	u8 *hash = aead_request_ctx(req);
--	struct scatterlist *dst;
--	unsigned int cryptlen;
-+	struct scatterlist *dst = req->dst;
-+	unsigned int cryptlen = req->cryptlen;
- 	int err;
- 
- 	hash = (u8 *)ALIGN((unsigned long)hash + crypto_hash_alignmask(auth), 
-@@ -100,8 +100,6 @@ static int crypto_authenc_hash(struct aead_request *req)
- 	if (err)
- 		goto auth_unlock;
- 
--	cryptlen = req->cryptlen;
--	dst = req->dst;
- 	err = crypto_hash_update(&desc, dst, cryptlen);
- 	if (err)
- 		goto auth_unlock;
-@@ -159,8 +157,8 @@ static int crypto_authenc_verify(struct aead_request *req)
- 	};
- 	u8 *ohash = aead_request_ctx(req);
- 	u8 *ihash;
--	struct scatterlist *src;
--	unsigned int cryptlen;
-+	struct scatterlist *src = req->src;
-+	unsigned int cryptlen = req->cryptlen;
- 	unsigned int authsize;
- 	int err;
- 
-@@ -177,8 +175,6 @@ static int crypto_authenc_verify(struct aead_request *req)
- 	if (err)
- 		goto auth_unlock;
- 
--	cryptlen = req->cryptlen;
--	src = req->src;
- 	err = crypto_hash_update(&desc, src, cryptlen);
- 	if (err)
- 		goto auth_unlock;
