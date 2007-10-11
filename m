@@ -1,74 +1,131 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Subject: Re: [1/1 take 3] HIFN 795x driver.
-Date: Thu, 11 Oct 2007 18:14:00 +0800
-Message-ID: <20071011101400.GA17192@gondor.apana.org.au>
-References: <20071010152146.GA13379@2ka.mipt.ru>
+Date: Thu, 11 Oct 2007 14:43:14 +0400
+Message-ID: <20071011104313.GA31211@2ka.mipt.ru>
+References: <20071010152146.GA13379@2ka.mipt.ru> <20071011101400.GA17192@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3490 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754033AbXJKKOE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Oct 2007 06:14:04 -0400
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:44827 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750930AbXJKKnU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Oct 2007 06:43:20 -0400
 Content-Disposition: inline
-In-Reply-To: <20071010152146.GA13379@2ka.mipt.ru>
+In-Reply-To: <20071011101400.GA17192@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 10, 2007 at 07:21:47PM +0400, Evgeniy Polyakov wrote:
->
-> It passed all tests for AES, DES and DES3_EDE except weak test for DES,
-> since hardware can not determine weak keys.
+On Thu, Oct 11, 2007 at 06:14:00PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> On Wed, Oct 10, 2007 at 07:21:47PM +0400, Evgeniy Polyakov wrote:
+> >
+> > It passed all tests for AES, DES and DES3_EDE except weak test for DES,
+> > since hardware can not determine weak keys.
+> 
+> Patch applied. Thanks Evgeniy!
 
-Patch applied. Thanks Evgeniy!
+Thanks!
 
-BTW, we should change it so that the DES algorithm's setkey
-function uses the same weak-key test as used by the generic
-DES code.
+> BTW, we should change it so that the DES algorithm's setkey
+> function uses the same weak-key test as used by the generic
+> DES code.
 
-Oh I had to apply the following fix-up in order for it to build
-against cryptodev-2.6.
+Attached patch fixes that with following tcrypt output:
+[71705.695117] test 5 (64 bit key):
+[71705.698462] setkey() failed flags=100100
+[71705.702499] 015744256a5ed31d
+[71705.705703] pass
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-diff --git a/arch/s390/crypto/sha1_s390.c b/arch/s390/crypto/sha1_s390.c
-diff --git a/arch/s390/crypto/sha256_s390.c b/arch/s390/crypto/sha256_s390.c
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-diff --git a/crypto/sha512.c b/crypto/sha512.c
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 6c446f3..b6c1ee1 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -1945,11 +1945,10 @@ static int hifn_handle_req(struct ablkcipher_request *req)
- 		err = hifn_setup_session(req);
+Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+
+diff --git a/crypto/des.c b/crypto/des.c
+index 1df3a71..37c0858 100644
+--- a/crypto/des.c
++++ b/crypto/des.c
+@@ -634,7 +634,7 @@ static const u32 S8[64] = {
+  *   Choice 1 has operated on the key.
+  *
+  */
+-static unsigned long ekey(u32 *pe, const u8 *k)
++unsigned long des_ekey(u32 *pe, const u8 *k)
+ {
+ 	/* K&R: long is at least 32 bits */
+ 	unsigned long a, b, c, d, w;
+@@ -709,6 +709,7 @@ static unsigned long ekey(u32 *pe, const u8 *k)
+ 	/* Zero if weak key */
+ 	return w;
+ }
++EXPORT_SYMBOL_GPL(des_ekey);
  
- 	if (err == -EAGAIN) {
--		struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 		unsigned long flags;
+ /*
+  * Decryption key expansion
+@@ -792,7 +793,7 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	int ret;
  
- 		spin_lock_irqsave(&dev->lock, flags);
--		err = ablkcipher_enqueue_request(crypto_ablkcipher_alg(tfm), req);
-+		err = ablkcipher_enqueue_request(&dev->queue, req);
- 		spin_unlock_irqrestore(&dev->lock, flags);
+ 	/* Expand to tmp */
+-	ret = ekey(tmp, key);
++	ret = des_ekey(tmp, key);
+ 
+ 	if (unlikely(ret == 0) && (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
+ 		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
+@@ -879,9 +880,9 @@ static int des3_ede_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 		return -EINVAL;
  	}
  
-@@ -2359,7 +2358,6 @@ static int hifn_alg_alloc(struct hifn_device *dev, struct hifn_alg_template *t)
- 	alg->alg.cra_module = THIS_MODULE;
- 	alg->alg.cra_u.ablkcipher = t->ablkcipher;
- 	alg->alg.cra_init = hifn_cra_init;
--	alg->alg.cra_ablkcipher.queue = &dev->queue;
+-	ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
++	des_ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
+ 	dkey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
+-	ekey(expkey, key);
++	des_ekey(expkey, key);
  
- 	alg->dev = dev;
+ 	return 0;
+ }
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index e3d01da..52b5bb4 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -90,9 +90,9 @@ config ZCRYPT_MONOLITHIC
  
-diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+ config CRYPTO_DEV_HIFN_795X
+ 	tristate "Driver HIFN 795x crypto accelerator chips"
++	select DES
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_ABLKCIPHER
+-	select CRYPTO_BLKCIPHER
+ 	help
+ 	  This option allows you to have support for HIFN 795x crypto adapters.
+ 
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 6c446f3..e152917 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -1915,6 +1915,8 @@ static void hifn_flush(struct hifn_device *dev)
+ 	spin_unlock_irqrestore(&dev->lock, flags);
+ }
+ 
++extern unsigned long des_ekey(u32 *pe, const u8 *k);
++
+ static int hifn_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 		unsigned int len)
+ {
+@@ -1927,6 +1929,16 @@ static int hifn_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 		return -1;
+ 	}
+ 
++	if (len == HIFN_DES_KEY_LENGTH) {
++		u32 tmp[32];
++		int ret = des_ekey(tmp, key);
++		
++		if (unlikely(ret == 0) && (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
++			tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
++			return -EINVAL;
++		}
++	}
++
+ 	dev->flags &= ~HIFN_FLAG_OLD_KEY;
+ 
+ 	memcpy(ctx->key, key, len);
+
+-- 
+	Evgeniy Polyakov
