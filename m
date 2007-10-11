@@ -1,137 +1,64 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [1/1 take 3] HIFN 795x driver.
-Date: Thu, 11 Oct 2007 15:40:36 +0400
-Message-ID: <20071011114034.GA12869@2ka.mipt.ru>
-References: <20071010152146.GA13379@2ka.mipt.ru> <20071011101400.GA17192@gondor.apana.org.au> <20071011104313.GA31211@2ka.mipt.ru> <20071011105202.GA17487@gondor.apana.org.au> <20071011113002.GA20119@2ka.mipt.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] consider keysize in algorithm selection
+Date: Thu, 11 Oct 2007 19:47:00 +0800
+Message-ID: <20071011114700.GA17801@gondor.apana.org.au>
+References: <20071010164400.GA19471@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:51563 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752158AbXJKLkr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Oct 2007 07:40:47 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:4110 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752781AbXJKLrE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Oct 2007 07:47:04 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1IfwVJ-0000gn-Jo
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Oct 2007 21:47:01 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1IfwVI-0004fY-00
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Oct 2007 19:47:00 +0800
 Content-Disposition: inline
-In-Reply-To: <20071011113002.GA20119@2ka.mipt.ru>
+In-Reply-To: <20071010164400.GA19471@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 11, 2007 at 03:30:03PM +0400, Evgeniy Polyakov (johnpol@2ka.mipt.ru) wrote:
-> On Thu, Oct 11, 2007 at 06:52:02PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
-> > On Thu, Oct 11, 2007 at 02:43:14PM +0400, Evgeniy Polyakov wrote:
-> > > 
-> > > Attached patch fixes that with following tcrypt output:
-> > 
-> > That was quick :)
-> > 
-> > Unfortunately it doesn't apply because des.c has been renamed
-> > to des_generic.c in cryptodev-2.6.  Could you please fix that
-> > up and also move the prototype into a header file, say
-> > include/crypto/des.h?
+Hi Sebastian:
 
-HIFN driver update to use DES weak key checks (exported in this patch).
+On Wed, Oct 10, 2007 at 06:44:00PM +0200, Sebastian Siewior wrote:
+>
+> Almost all users are easy to fix. The wlan stack allocates the cipher at
+> one time and sets the key at another time. So I don't know the requested
+> keysize at allocation time.
 
-Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Thanks for the patch!
 
---- linux-2.6.mainline/crypto/des.c	2007-10-11 05:05:35.000000000 +0400
-+++ linux-2.6.cryptodev-2.6/crypto/des_generic.c	2007-10-11 15:20:02.000000000 +0400
-@@ -20,13 +20,7 @@
- #include <linux/crypto.h>
- #include <linux/types.h>
- 
--#define DES_KEY_SIZE		8
--#define DES_EXPKEY_WORDS	32
--#define DES_BLOCK_SIZE		8
--
--#define DES3_EDE_KEY_SIZE	(3 * DES_KEY_SIZE)
--#define DES3_EDE_EXPKEY_WORDS	(3 * DES_EXPKEY_WORDS)
--#define DES3_EDE_BLOCK_SIZE	DES_BLOCK_SIZE
-+#include <crypto/des.h>
- 
- #define ROL(x, r) ((x) = rol32((x), (r)))
- #define ROR(x, r) ((x) = ror32((x), (r)))
-@@ -634,7 +628,7 @@
-  *   Choice 1 has operated on the key.
-  *
-  */
--static unsigned long ekey(u32 *pe, const u8 *k)
-+unsigned long des_ekey(u32 *pe, const u8 *k)
- {
- 	/* K&R: long is at least 32 bits */
- 	unsigned long a, b, c, d, w;
-@@ -709,6 +703,7 @@
- 	/* Zero if weak key */
- 	return w;
- }
-+EXPORT_SYMBOL_GPL(des_ekey);
- 
- /*
-  * Decryption key expansion
-@@ -792,7 +787,7 @@
- 	int ret;
- 
- 	/* Expand to tmp */
--	ret = ekey(tmp, key);
-+	ret = des_ekey(tmp, key);
- 
- 	if (unlikely(ret == 0) && (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
- 		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
-@@ -879,9 +874,9 @@
- 		return -EINVAL;
- 	}
- 
--	ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
-+	des_ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
- 	dkey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
--	ekey(expkey, key);
-+	des_ekey(expkey, key);
- 
- 	return 0;
- }
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index e3d01da..52b5bb4 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -90,9 +90,9 @@ config ZCRYPT_MONOLITHIC
- 
- config CRYPTO_DEV_HIFN_795X
- 	tristate "Driver HIFN 795x crypto accelerator chips"
-+	select DES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_ABLKCIPHER
--	select CRYPTO_BLKCIPHER
- 	help
- 	  This option allows you to have support for HIFN 795x crypto adapters.
- 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index b6c1ee1..c3479b0 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -29,6 +29,7 @@
- #include <linux/crypto.h>
- 
- #include <crypto/algapi.h>
-+#include <crypto/des.h>
- 
- #include <asm/kmap_types.h>
- 
-@@ -1927,6 +1928,16 @@ static int hifn_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 		return -1;
- 	}
- 
-+	if (len == HIFN_DES_KEY_LENGTH) {
-+		u32 tmp[DES_EXPKEY_WORDS];
-+		int ret = des_ekey(tmp, key);
-+		
-+		if (unlikely(ret == 0) && (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
-+			tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
-+			return -EINVAL;
-+		}
-+	}
-+
- 	dev->flags &= ~HIFN_FLAG_OLD_KEY;
- 
- 	memcpy(ctx->key, key, len);
+I'm not quite happy with adding keysize to the core API though.
+At some point I'd like to see the DMA operations folded into the
+API as well so having a key is going to be far from universal.
+
+In fact the compression operation is an existing example of a
+user that doesn't have a key.
+
+> In the fixup, crypto_authenc_alloc() got a little ugly. The keysize is
+> only consider for the blkcipher but the hash might also be limited. Tell
+> me what you thing about this one. Maybe something like cbc(aes|192) is a
+> better solution.
+
+We could do that.
+
+However, I think the number of extant devices that actually
+need this is so small that we can solve it using the fallback
+flag instead.
+
+In other words, let's make geode-aes use the padlock-sha method
+and just fall back to a lower-priority AES algorithm if it sees
+a key size that it can't handle.
+
+Cheers,
 -- 
-	Evgeniy Polyakov
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
