@@ -1,46 +1,70 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto patches
-Date: Thu, 18 Oct 2007 23:03:58 +0800
-Message-ID: <E1IiWuk-0000pb-00@gondolin.me.apana.org.au>
-References: <200710181228.13569.vda.linux@googlemail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, akpm@linux-foundation.org
-To: vda.linux@googlemail.com (Denys Vlasenko)
+From: Krzysztof Oledzki <olel@ans.pl>
+Subject: Re: Truncated(?) /proc/crypto on x86_64 on 2.6.22
+Date: Thu, 18 Oct 2007 17:19:34 +0200 (CEST)
+Message-ID: <Pine.LNX.4.64.0710181718450.12701@bizon.gios.gov.pl>
+References: <Pine.LNX.4.64.0710161949410.21430@bizon.gios.gov.pl>
+ <20071016193435.GA31668@Chamillionaire.breakpoint.cc>
+Mime-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="-187430788-731974481-1192720774=:12701"
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1079 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751396AbXJRPEJ (ORCPT
+Received: from bizon.gios.gov.pl ([212.244.124.8]:45825 "EHLO
+	bizon.gios.gov.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754281AbXJRPTv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Oct 2007 11:04:09 -0400
-In-Reply-To: <200710181228.13569.vda.linux@googlemail.com>
+	Thu, 18 Oct 2007 11:19:51 -0400
+In-Reply-To: <20071016193435.GA31668@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Denys Vlasenko <vda.linux@googlemail.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+---187430788-731974481-1192720774=:12701
+Content-Type: TEXT/PLAIN; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+
+
+
+On Tue, 16 Oct 2007, Sebastian Siewior wrote:
+
+> * Krzysztof Oledzki | 2007-10-16 19:56:33 [+0200]:
 >
-> I am ok with people disagreeing with me and considering 35k
-> not too big. However, IIRC that patch was not reviewed
-> (I've got no reply) and I have no way of knowing whether
-> it was deemed unacceptable or just was lost in the churn.
+>> After switching from i386 to x86_64 I noticed that /proc/crypto is much
+>> shorter:
+>>
+>> #  wc -l /proc/crypto crypto-64
+>>  482 /proc/crypto
+>>  349 crypto-64
+>>
+>
+> It is all fine from what I can see in this diff.
+>
+>
+>> # diff -Nur /proc/crypto crypto-64
+>> --- /proc/crypto        2007-10-16 19:49:45.110694374 +0200
+>> +++ crypto-64   2007-10-16 19:48:10.000000000 +0200
+>> @@ -1,136 +1,3 @@
+>> -name         : cbc(twofish)
+>> -driver       : cbc(twofish-i586)
+>> -module       : kernel
+>> -priority     : 200
+>> -refcnt       : 1
+>> -type         : blkcipher
+>> -blocksize    : 16
+>> -min keysize  : 16
+>> -max keysize  : 32
+>> -ivsize       : 16
+>> -
+>
+> This algo is stacked, because it was used. You have probably one output
+> after 'modprobe tcrypt' and the other before :)
 
-Sorry I can't find a copy in my mail box archive at all so it
-looks like it was lost on the way to my mail server.
+Right. The other (bigger) output is after starting IPSec. Sorry for the=20
+noise and thank you for the explanation.
 
-Unfortunately emails are lossy so sometimes things to tend to
-get lost.  The best thing to do if you get no reply at all is
-to resend your patch.
+Best regards,
 
-If I don't like something I will tell you in no uncertain
-terms :)
-
-> Please let me know what is the best channels to send
-> crypto patches through so that they are not lost. Thanks.
-
-linux-crypto is the best list but please CC me too.
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ =09=09=09Krzusztof Ol=EAdzki
+---187430788-731974481-1192720774=:12701--
