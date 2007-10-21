@@ -1,38 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: GCM & CTR (fwd)
-Date: Sat, 20 Oct 2007 21:32:55 +0800
-Message-ID: <20071020133255.GA28678@gondor.apana.org.au>
-References: <Pine.LNX.4.64.0710192300150.3619@antarct> <1192832972.2477.413.camel@faith.austin.ibm.com>
+Subject: Re: [RFC 1/5] [crypto] geode: use consistent IV copy
+Date: Sun, 21 Oct 2007 16:13:46 +0800
+Message-ID: <20071021081346.GA9397@gondor.apana.org.au>
+References: <1192788233-14968-1-git-send-email-linux-crypto@ml.breakpoint.cc> <1192788233-14968-2-git-send-email-linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mikko Herranen <mikko.herranen@cs.helsinki.fi>,
-	linux-crypto@vger.kernel.org
-To: Joy Latten <latten@austin.ibm.com>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <sebastian@breakpoint.cc>
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1169 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1530 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754521AbXJTNxn (ORCPT
+	with ESMTP id S1750763AbXJUINt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Oct 2007 09:53:43 -0400
+	Sun, 21 Oct 2007 04:13:49 -0400
 Content-Disposition: inline
-In-Reply-To: <1192832972.2477.413.camel@faith.austin.ibm.com>
+In-Reply-To: <1192788233-14968-2-git-send-email-linux-crypto@ml.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 19, 2007 at 10:29:32PM +0000, Joy Latten wrote:
->
-> I think the change to CTR would be simple.  
-> If noncesize + ivsize == blocksize, then use 
-> entire counterblock as counter and pass to  
-> ctr_inc_quad(). Currently, we just fail 
-> if noncesize + ivsize == blocksize.  
+On Fri, Oct 19, 2007 at 12:03:49PM +0200, Sebastian Siewior wrote:
+> From: Sebastian Siewior <sebastian@breakpoint.cc>
+> 
+> It is enough if the IV is copied before and after the while loop.
+> With DM-Crypt is seems not be required to save the IV after encrytion
+> because a new one is used in the request (dunno about other users).
+> It is not save to load the IV within while loop and not save afterwards
+> because we mill end up with the wrong IV if the request goes consists
+> of more than one page.
+> 
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-How about adding an explicit counter size parameter?
+Nice cleanup.  Patch applied.
 
-So intead of ctr(aes,4,8) for the standard IPsec CTR we'd have
-ctr(aes,4,8,4).  Then GCM can just use ctr(aes,4,12,4).
-
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
