@@ -1,23 +1,380 @@
 From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [RFC] group common used functions in software AES modules
-Date: Mon, 22 Oct 2007 19:22:11 +0200
-Message-ID: <1193073734-15789-1-git-send-email-linux-crypto@ml.breakpoint.cc>
-Cc: linux-crypto@vger.kernel.org
+Subject: [RFC 1/3] AES: group common functions
+Date: Mon, 22 Oct 2007 19:22:12 +0200
+Message-ID: <1193073734-15789-2-git-send-email-linux-crypto@ml.breakpoint.cc>
+References: <1193073734-15789-1-git-send-email-linux-crypto@ml.breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <sebastian@breakpoint.cc>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:53750 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:53752 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751903AbXJVRWS (ORCPT
+	by vger.kernel.org with ESMTP id S1751937AbXJVRWS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Mon, 22 Oct 2007 13:22:18 -0400
+In-Reply-To: <1193073734-15789-1-git-send-email-linux-crypto@ml.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello Herbert,
+From: Sebastian Siewior <sebastian@breakpoint.cc>
 
-this little patch series moves the the key generation routine and the four
-tables which are used encrypt/decrypt function into a separate module.
-Currently I converted the generic AES and the x86_64 variant. My 32bit asm 
-is rusted so the i586 assembly has to wait for a while :)
+There are three AES softwore modules in the kernel: One C version
+and two arch specific assembly versions. The key expansion routine as
+well as the the four lookup tables which are used during encryption
+and/or decryption are the same.
+This patch simply creates an independent module which shares the
+data structures across the modules.
 
-Sebastian
+Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+---
+ crypto/Kconfig       |    3 +
+ crypto/Makefile      |    1 +
+ crypto/aes_common.c  |  277 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/aes.h |   17 +++
+ 4 files changed, 298 insertions(+), 0 deletions(-)
+ create mode 100644 crypto/aes_common.c
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1f32071..26130d0 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -325,6 +325,9 @@ config CRYPTO_AES
+ 
+ 	  See <http://csrc.nist.gov/CryptoToolkit/aes/> for more information.
+ 
++config CRYPTO_AES_COMMON
++	tristate
++
+ config CRYPTO_AES_586
+ 	tristate "AES cipher algorithms (i586)"
+ 	depends on (X86 || UML_X86) && !64BIT
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 1f87db2..59b6a7e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -41,6 +41,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH) += twofish.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
+ obj-$(CONFIG_CRYPTO_SERPENT) += serpent.o
+ obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
++obj-$(CONFIG_CRYPTO_AES_COMMON) += aes_common.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia.o
+ obj-$(CONFIG_CRYPTO_CAST5) += cast5.o
+ obj-$(CONFIG_CRYPTO_CAST6) += cast6.o
+diff --git a/crypto/aes_common.c b/crypto/aes_common.c
+new file mode 100644
+index 0000000..6ba60cf
+--- /dev/null
++++ b/crypto/aes_common.c
+@@ -0,0 +1,277 @@
++/*
++ * Cryptographic API.
++ *
++ * AES Cipher Algorithm.
++ *
++ * Based on Brian Gladman's code.
++ *
++ * Linux developers:
++ *  Alexander Kjeldaas <astor@fast.no>
++ *  Herbert Valerio Riedel <hvr@hvrlab.org>
++ *  Kyle McMartin <kyle@debian.org>
++ *  Adam J. Richter <adam@yggdrasil.com> (conversion to 2.5 API).
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * ---------------------------------------------------------------------------
++ * Copyright (c) 2002, Dr Brian Gladman <brg@gladman.me.uk>, Worcester, UK.
++ * All rights reserved.
++ *
++ * LICENSE TERMS
++ *
++ * The free distribution and use of this software in both source and binary
++ * form is allowed (with or without changes) provided that:
++ *
++ *   1. distributions of this source code include the above copyright
++ *      notice, this list of conditions and the following disclaimer;
++ *
++ *   2. distributions in binary form include the above copyright
++ *      notice, this list of conditions and the following disclaimer
++ *      in the documentation and/or other associated materials;
++ *
++ *   3. the copyright holder's name is not used to endorse products
++ *      built using this software without specific written permission.
++ *
++ * ALTERNATIVELY, provided that this notice is retained in full, this product
++ * may be distributed under the terms of the GNU General Public License (GPL),
++ * in which case the provisions of the GPL apply INSTEAD OF those given above.
++ *
++ * DISCLAIMER
++ *
++ * This software is provided 'as is' with no explicit or implied warranties
++ * in respect of its properties, including, but not limited to, correctness
++ * and/or fitness for purpose.
++ * ---------------------------------------------------------------------------
++ */
++
++#include <crypto/aes.h>
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/errno.h>
++#include <linux/crypto.h>
++#include <asm/byteorder.h>
++
++static inline u8 byte(const u32 x, const unsigned n)
++{
++	return x >> (n << 3);
++}
++
++static u8 pow_tab[256] __initdata;
++static u8 log_tab[256] __initdata;
++static u8 sbx_tab[256] __initdata;
++static u8 isb_tab[256] __initdata;
++
++static u32 rco_tab[10];
++u32 crypto_ft_tab[4][256];
++u32 crypto_it_tab[4][256];
++u32 crypto_fl_tab[4][256];
++u32 crypto_il_tab[4][256];
++
++EXPORT_SYMBOL_GPL(crypto_ft_tab);
++EXPORT_SYMBOL_GPL(crypto_it_tab);
++EXPORT_SYMBOL_GPL(crypto_fl_tab);
++EXPORT_SYMBOL_GPL(crypto_il_tab);
++
++static inline u8 __init f_mult (u8 a, u8 b)
++{
++	u8 aa = log_tab[a], cc = aa + log_tab[b];
++
++	return pow_tab[cc + (cc < aa ? 1 : 0)];
++}
++
++#define ff_mult(a,b)    (a && b ? f_mult(a, b) : 0)
++
++#define ls_box(x)				\
++    ( crypto_fl_tab[0][byte(x, 0)] ^		\
++      crypto_fl_tab[1][byte(x, 1)] ^		\
++      crypto_fl_tab[2][byte(x, 2)] ^		\
++      crypto_fl_tab[3][byte(x, 3)] )
++
++static int __init gen_tabs (void)
++{
++	u32 i, t;
++	u8 p, q;
++
++	/* log and power tables for GF(2**8) finite field with
++	   0x011b as modular polynomial - the simplest primitive
++	   root is 0x03, used here to generate the tables */
++
++	for (i = 0, p = 1; i < 256; ++i) {
++		pow_tab[i] = (u8) p;
++		log_tab[p] = (u8) i;
++
++		p ^= (p << 1) ^ (p & 0x80 ? 0x01b : 0);
++	}
++
++	log_tab[1] = 0;
++
++	for (i = 0, p = 1; i < 10; ++i) {
++		rco_tab[i] = p;
++
++		p = (p << 1) ^ (p & 0x80 ? 0x01b : 0);
++	}
++
++	for (i = 0; i < 256; ++i) {
++		p = (i ? pow_tab[255 - log_tab[i]] : 0);
++		q = ((p >> 7) | (p << 1)) ^ ((p >> 6) | (p << 2));
++		p ^= 0x63 ^ q ^ ((q >> 6) | (q << 2));
++		sbx_tab[i] = p;
++		isb_tab[p] = (u8) i;
++	}
++
++	for (i = 0; i < 256; ++i) {
++		p = sbx_tab[i];
++
++		t = p;
++		crypto_fl_tab[0][i] = t;
++		crypto_fl_tab[1][i] = rol32(t, 8);
++		crypto_fl_tab[2][i] = rol32(t, 16);
++		crypto_fl_tab[3][i] = rol32(t, 24);
++
++		t = ((u32) ff_mult (2, p)) |
++		    ((u32) p << 8) |
++		    ((u32) p << 16) | ((u32) ff_mult (3, p) << 24);
++
++		crypto_ft_tab[0][i] = t;
++		crypto_ft_tab[1][i] = rol32(t, 8);
++		crypto_ft_tab[2][i] = rol32(t, 16);
++		crypto_ft_tab[3][i] = rol32(t, 24);
++
++		p = isb_tab[i];
++
++		t = p;
++		crypto_il_tab[0][i] = t;
++		crypto_il_tab[1][i] = rol32(t, 8);
++		crypto_il_tab[2][i] = rol32(t, 16);
++		crypto_il_tab[3][i] = rol32(t, 24);
++
++		t = ((u32) ff_mult (14, p)) |
++		    ((u32) ff_mult (9, p) << 8) |
++		    ((u32) ff_mult (13, p) << 16) |
++		    ((u32) ff_mult (11, p) << 24);
++
++		crypto_it_tab[0][i] = t;
++		crypto_it_tab[1][i] = rol32(t, 8);
++		crypto_it_tab[2][i] = rol32(t, 16);
++		crypto_it_tab[3][i] = rol32(t, 24);
++	}
++
++	return 0;
++}
++
++#define star_x(x) (((x) & 0x7f7f7f7f) << 1) ^ ((((x) & 0x80808080) >> 7) * 0x1b)
++
++#define imix_col(y,x)       \
++    u   = star_x(x);        \
++    v   = star_x(u);        \
++    w   = star_x(v);        \
++    t   = w ^ (x);          \
++   (y)  = u ^ v ^ w;        \
++   (y) ^= ror32(u ^ t,  8) ^ \
++          ror32(v ^ t, 16) ^ \
++          ror32(t,24)
++
++/* initialise the key schedule from the user supplied key */
++
++#define loop4(i)                                    \
++{   t = ror32(t,  8); t = ls_box(t) ^ rco_tab[i];    \
++    t ^= ctx->key_enc[4 * i];     ctx->key_enc[4 * i + 4] = t;    \
++    t ^= ctx->key_enc[4 * i + 1]; ctx->key_enc[4 * i + 5] = t;    \
++    t ^= ctx->key_enc[4 * i + 2]; ctx->key_enc[4 * i + 6] = t;    \
++    t ^= ctx->key_enc[4 * i + 3]; ctx->key_enc[4 * i + 7] = t;    \
++}
++
++#define loop6(i)                                    \
++{   t = ror32(t,  8); t = ls_box(t) ^ rco_tab[i];    \
++    t ^= ctx->key_enc[6 * i];     ctx->key_enc[6 * i + 6] = t;    \
++    t ^= ctx->key_enc[6 * i + 1]; ctx->key_enc[6 * i + 7] = t;    \
++    t ^= ctx->key_enc[6 * i + 2]; ctx->key_enc[6 * i + 8] = t;    \
++    t ^= ctx->key_enc[6 * i + 3]; ctx->key_enc[6 * i + 9] = t;    \
++    t ^= ctx->key_enc[6 * i + 4]; ctx->key_enc[6 * i + 10] = t;   \
++    t ^= ctx->key_enc[6 * i + 5]; ctx->key_enc[6 * i + 11] = t;   \
++}
++
++#define loop8(i)                                    \
++{   t = ror32(t,  8); ; t = ls_box(t) ^ rco_tab[i];  \
++    t ^= ctx->key_enc[8 * i];     ctx->key_enc[8 * i + 8] = t;    \
++    t ^= ctx->key_enc[8 * i + 1]; ctx->key_enc[8 * i + 9] = t;    \
++    t ^= ctx->key_enc[8 * i + 2]; ctx->key_enc[8 * i + 10] = t;   \
++    t ^= ctx->key_enc[8 * i + 3]; ctx->key_enc[8 * i + 11] = t;   \
++    t  = ctx->key_enc[8 * i + 4] ^ ls_box(t);    \
++    ctx->key_enc[8 * i + 12] = t;                \
++    t ^= ctx->key_enc[8 * i + 5]; ctx->key_enc[8 * i + 13] = t;   \
++    t ^= ctx->key_enc[8 * i + 6]; ctx->key_enc[8 * i + 14] = t;   \
++    t ^= ctx->key_enc[8 * i + 7]; ctx->key_enc[8 * i + 15] = t;   \
++}
++
++int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
++		unsigned int key_len)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	const __le32 *key = (const __le32 *)in_key;
++	u32 *flags = &tfm->crt_flags;
++	u32 i, j, t, u, v, w;
++
++	if (key_len % 8) {
++		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
++	}
++
++	ctx->key_length = key_len;
++
++	ctx->key_dec[key_len + 24] = ctx->key_enc[0] = le32_to_cpu(key[0]);
++	ctx->key_dec[key_len + 25] = ctx->key_enc[1] = le32_to_cpu(key[1]);
++	ctx->key_dec[key_len + 26] = ctx->key_enc[2] = le32_to_cpu(key[2]);
++	ctx->key_dec[key_len + 27] = ctx->key_enc[3] = le32_to_cpu(key[3]);
++
++	switch (key_len) {
++		case 16:
++			t = ctx->key_enc[3];
++			for (i = 0; i < 10; ++i)
++				loop4(i);
++			break;
++
++		case 24:
++			ctx->key_enc[4] = le32_to_cpu(key[4]);
++			t = ctx->key_enc[5] = le32_to_cpu(key[5]);
++			for (i = 0; i < 8; ++i)
++				loop6 (i);
++			break;
++
++		case 32:
++			ctx->key_enc[4] = le32_to_cpu(key[4]);
++			ctx->key_enc[5] = le32_to_cpu(key[5]);
++			ctx->key_enc[6] = le32_to_cpu(key[6]);
++			t = ctx->key_enc[7] = le32_to_cpu(key[7]);
++			for (i = 0; i < 7; ++i)
++				loop8(i);
++			break;
++	}
++
++	ctx->key_dec[0] = ctx->key_enc[key_len + 24];
++	ctx->key_dec[1] = ctx->key_enc[key_len + 25];
++	ctx->key_dec[2] = ctx->key_enc[key_len + 26];
++	ctx->key_dec[3] = ctx->key_enc[key_len + 27];
++
++	for (i = 4; i < key_len + 24; ++i) {
++		j = key_len + 24 - (i & ~3) + (i & 3);
++		imix_col(ctx->key_dec[j], ctx->key_enc[i]);
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_aes_set_key);
++
++static void damn_I_can_t_name_it_void(void)
++{
++}
++
++module_init(gen_tabs);
++module_exit(damn_I_can_t_name_it_void);
++
++MODULE_DESCRIPTION("Commom used functions for the Rijndael (AES) Cipher Algorithm");
++MODULE_LICENSE("Dual BSD/GPL");
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 9ff842f..ab7c7c8 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -5,6 +5,9 @@
+ #ifndef _CRYPTO_AES_H
+ #define _CRYPTO_AES_H
+ 
++#include <linux/types.h>
++#include <linux/crypto.h>
++
+ #define AES_MIN_KEY_SIZE	16
+ #define AES_MAX_KEY_SIZE	32
+ #define AES_KEYSIZE_128		16
+@@ -12,4 +15,18 @@
+ #define AES_KEYSIZE_256		32
+ #define AES_BLOCK_SIZE		16
+ 
++struct crypto_aes_ctx {
++	u32 key_length;
++	u32 key_enc[60];
++	u32 key_dec[60];
++};
++
++extern u32 crypto_ft_tab[4][256];
++extern u32 crypto_it_tab[4][256];
++extern u32 crypto_fl_tab[4][256];
++extern u32 crypto_il_tab[4][256];
++
++int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
++		unsigned int key_len);
++
+ #endif
+-- 
+1.5.3.4
