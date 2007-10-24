@@ -1,61 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Michael Halcrow <mike@halcrow.us>
 Subject: Re: [PATCH 1/1]: Add countersize to CTR
-Date: Wed, 24 Oct 2007 09:19:05 +0800
-Message-ID: <20071024011905.GA4063@gondor.apana.org.au>
-References: <200710232026.l9NKQTkC000737@faith.austin.ibm.com> <20071023204007.GT1635@halcrow.us> <20071024004230.GA3806@gondor.apana.org.au> <20071024005922.GU1635@halcrow.us>
+Date: Tue, 23 Oct 2007 22:22:23 -0500
+Message-ID: <20071024032223.GV1635@halcrow.us>
+References: <200710232026.l9NKQTkC000737@faith.austin.ibm.com> <20071023204007.GT1635@halcrow.us> <20071024004230.GA3806@gondor.apana.org.au> <20071024005922.GU1635@halcrow.us> <20071024011905.GA4063@gondor.apana.org.au>
+Reply-To: Michael Halcrow <mike@halcrow.us>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-ripemd160;
+	protocol="application/pgp-signature"; boundary="wu6d9FdQ4ohoCGf7"
 Cc: Joy Latten <latten@austin.ibm.com>, linux-crypto@vger.kernel.org,
 	mikko.herranen@cs.helsinki.fi
-To: Michael Halcrow <mike@halcrow.us>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3748 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753334AbXJXBTK (ORCPT
+Received: from nlpi015.sbcis.sbc.com ([207.115.36.44]:25380 "EHLO
+	nlpi015.prodigy.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753415AbXJXDbo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Oct 2007 21:19:10 -0400
+	Tue, 23 Oct 2007 23:31:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20071024005922.GU1635@halcrow.us>
+In-Reply-To: <20071024011905.GA4063@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 23, 2007 at 07:59:22PM -0500, Michael Halcrow wrote:
->
-> It is usually appropriate to print something to the system log when
-> there is an error condition in the kernel code. That can help triage
-> down the road when people have troubles.
-> 
-> The only reason I can think of as to why we would *not* want
-> explanations in the syslog for failures is if frequent failures are
-> expected in a significant fraction of deployments.
 
-These paths can be triggered from user-space in future so printks
-are not appropriate.
+--wu6d9FdQ4ohoCGf7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> > > > -		test_cipher("ctr(aes,4,8)", ENCRYPT, aes_ctr_enc_tv_template,
-> > > > +		test_cipher("ctr(aes,4,8,4)", ENCRYPT, aes_ctr_enc_tv_template,
-> > > >  			    AES_CTR_ENC_TEST_VECTORS);
-> > > > -		test_cipher("ctr(aes,4,8)", DECRYPT, aes_ctr_dec_tv_template,
-> > > > +		test_cipher("ctr(aes,4,8,4)", DECRYPT, aes_ctr_dec_tv_template,
-> > > >  			    AES_CTR_DEC_TEST_VECTORS);
-> > > 
-> > > I have never been particularly thrilled about the the string-based
-> > > method of parameterizing block ciphers for in-kernel API calls.
-> > 
-> > If you have a better suggestion I'd love to hear it!
-> 
-> Well, for calls made internally from kernel functions to kernel
-> functions, pretty much anything other than writing sequences of
-> comma-delimited parameters into to a character string.
+On Wed, Oct 24, 2007 at 09:19:05AM +0800, Herbert Xu wrote:
+> These paths can be triggered from user-space in future so printks
+> are not appropriate.
 
-Again these parameters ultimately come from user-space so this
-doesn't sound very practical.
+I am familiar with CryptoDev and Cryproc. Will you be implementing
+anything similar to what these projects are currently doing? Or do you
+have something else entirely in mind?
 
-Even for the kernel users how would you type these parameters?
+Mike
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--wu6d9FdQ4ohoCGf7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iQEVAwUBRx66bttAhTFtyodpAQNWEQf9FSrZtYixnoSdWL2sQFl4XNm1q5ikH4qE
+viXWvIu3cHEvI4Y5CyY93ycGgsl+zXEdd9xSh9TzxWEeI9ED+AQKUDx/5qekyDky
+zRIwgEkQbSMwJ4vL+TqANYqzDkLj9M3OHCv+HmlRpkpPaZW4/rl3+FL3CYggJNi8
+Rn+kp8MXb3TkBvhOeGEriO+elIPoL1nbpBJaYGvY74gozQ75KZPTPoE1fPBPrw4u
+IQHGV15kPEurPB9lrCLMWkXkc8QasaXjkFZYize/LpBu/3PteH4TrEaQbNXfSZhB
+P6ekS3BGq21jV7lXX4OAfTA2fhbPpqe6ZhknHCOPw+3yqg4xc/MCMg==
+=ZjHr
+-----END PGP SIGNATURE-----
+
+--wu6d9FdQ4ohoCGf7--
