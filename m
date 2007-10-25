@@ -1,487 +1,1382 @@
 From: Denys Vlasenko <vda.linux@googlemail.com>
-Subject: [PATCH0/5] camellia: cleanup, de-unrolling, and 64bit-ization
-Date: Thu, 25 Oct 2007 12:43:58 +0100
-Message-ID: <200710251243.58701.vda.linux@googlemail.com>
+Subject: [PATCH 1/5] camellia: cleanup
+Date: Thu, 25 Oct 2007 12:45:04 +0100
+Message-ID: <200710251245.04132.vda.linux@googlemail.com>
+References: <200710251243.58701.vda.linux@googlemail.com>
 Mime-Version: 1.0
 Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_+FIIHn/hzCnAyAB"
+  boundary="Boundary-00=_AHIIHoa1QedVz2q"
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ug-out-1314.google.com ([66.249.92.174]:3219 "EHLO
-	ug-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754766AbXJYLoI (ORCPT
+Received: from nf-out-0910.google.com ([64.233.182.186]:22800 "EHLO
+	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756761AbXJYLpO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Oct 2007 07:44:08 -0400
-Received: by ug-out-1314.google.com with SMTP id z38so481641ugc
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2007 04:44:06 -0700 (PDT)
+	Thu, 25 Oct 2007 07:45:14 -0400
+Received: by nf-out-0910.google.com with SMTP id g13so458745nfb
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2007 04:45:11 -0700 (PDT)
+In-Reply-To: <200710251243.58701.vda.linux@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
---Boundary-00=_+FIIHn/hzCnAyAB
+--Boundary-00=_AHIIHoa1QedVz2q
 Content-Type: text/plain;
-  charset="us-ascii"
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Hervert,
-
-Please review and maybe propagate upstream following patches.
-
-camellia1.diff:
-    Move code blocks around so that related pieces are closer together:
-    e.g. CAMELLIA_ROUNDSM macro does not need to be separated
-    from the rest of the code by huge array of constants.
-
-    Remove unused macros (COPY4WORD, SWAP4WORD, XOR4WORD[2])
-
-    Drop SUBL(), SUBR() macros which only obscure things.
-    Same for CAMELLIA_SP1110() macro and KEY_TABLE_TYPE typedef.
-
-    Remove useless comments:
-    /* encryption */ -- well it's obvious enough already!
-    void camellia_encrypt128(...)
-
-    Combine swap with copying at the beginning/end of encrypt/decrypt.
-
-
-camellia2.diff
-    Rename some macros to shorter names: CAMELLIA_RR8 -> ROR8,
-    making it easier to understand that it is just a right rotation,
-    nothing camellia-specific in it.
-    CAMELLIA_SUBKEY_L() -> SUBKEY_L() - just shorter.
-
-    Move be32 <-> cpu conversions out of en/decrypt128/256 and into
-    camellia_en/decrypt - no reason to have that code duplicated twice.
-
-
-camellia3.diff
-    Optimize GETU32 to use 4-byte memcpy (modern gcc will convert
-    such memcpy to single move instruction on i386).
-    Original GETU32 did four byte fetches, and shifted/XORed those.
-
-
-camellia4.diff
-    Move huge unrolled pieces of code (3 screenfuls) at the end of
-    128/256 key setup routines into common camellia_setup_tail(),
-    convert it to loop there.
-    Loop is still unrolled six times, so performance hit is very small,
-    code size win is big.
-
-
-camellia5.diff
-    Use alternative key setup implementation with mostly 64-bit ops
-    if BITS_PER_LONG >= 64. Both much smaller and much faster.
-
-    Unify camellia_en/decrypt128/256 into camellia_do_en/decrypt.
-    Code was similar, with just one additional if() we can use came code.
-
-    If CONFIG_CC_OPTIMIZE_FOR_SIZE is defined,
-    use loop in camellia_do_en/decrypt instead of unrolled code.
-    ~5% encrypt/decrypt slowdown.
-
-    Replace (x & 0xff) with (u8)x, gcc is not smart enough to realize
-    that it can do (x & 0xff) this way (which is smaller at least on i386).
-
-    Don't do (x & 0xff) in a few places where x cannot be > 255 anyway:
-        t0 = il >> 16; v = camellia_sp0222[(t1 >> 8) & 0xff];
-    il16 is u32, (thus t1 >> 8) is one byte!
-
-
-
-Benchmarking was done in userspace (see attached tarball for code).
-All times are in microseconds. Two runs give some idea of test variability.
-"Setup NN: NNNNNN NNNNNN" - time taken by 100000 key setups (two runs).
-"Encrypt: NNNNNN NNNNNN" - time taken by 1000 encryptions of 8K buffer.
-"Decrypt: NNNNNN NNNNNN" - time taken by 1000 decryptions of 8K buffer.
-"(matches)" - encrypt/decrypt cycle produced non corrupted plaintext.
-
-CONFIG_CC_OPTIMIZE_FOR_SIZE is not set:
-
-$ ./camellia
-Setup 16:32779 33169 Encrypt:153582 153740 Decrypt:150985 149811 (matches)
-Setup 24:49333 48987 Encrypt:197973 198853 Decrypt:201240 197585 (matches)
-Setup 32:46700 47680 Encrypt:195650 195800 Decrypt:195450 195469 (matches)
-$ ./camellia5
-Setup 16:33417 32968 Encrypt:149195 149095 Decrypt:148593 148661 (matches)
-Setup 24:50082 50064 Encrypt:201214 199204 Decrypt:197078 197579 (matches)
-Setup 32:48938 48824 Encrypt:200231 199545 Decrypt:198954 198996 (matches)
-$ ./camellia_64
-Setup 16:22247 22473 Encrypt:152321 149860 Decrypt:149058 148451 (matches)
-Setup 24:33832 34017 Encrypt:200428 202969 Decrypt:196789 195524 (matches)
-Setup 32:32884 32821 Encrypt:200414 200640 Decrypt:197857 195987 (matches)
-
-$ size camellia.o camellia7.o camellia_64.o
-   text    data     bss     dec     hex filename
-  24586       0       0   24586    600a camellia.o
-  21714       0       0   21714    54d2 camellia5.o
-  18666       0       0   18666    48ea camellia_64.o
-
-Very small speed loss in camellia -> camellia5, noticeably smaller size.
-Big key setup speedup in 64-bit camellia_64, and it is even smaller.
-
-
-CONFIG_CC_OPTIMIZE_FOR_SIZE is set:
-
-$ ./camellia_Os
-Setup 16:32573 34985 Encrypt:151825 152011 Decrypt:147581 147630 (matches)
-Setup 24:48528 49250 Encrypt:196223 199056 Decrypt:198811 196394 (matches)
-Setup 32:46650 47538 Encrypt:197466 196412 Decrypt:196290 196550 (matches)
-$ ./camellia5_Os
-Setup 16:33360 34487 Encrypt:154718 154499 Decrypt:157432 157135 (matches)
-Setup 24:53969 54304 Encrypt:205184 205818 Decrypt:210675 208552 (matches)
-Setup 32:53064 52904 Encrypt:205350 205439 Decrypt:211654 208468 (matches)
-$ ./camellia_64_Os
-Setup 16:24696 25894 Encrypt:155903 155747 Decrypt:157385 155696 (matches)
-Setup 24:33873 33230 Encrypt:206111 206385 Decrypt:208111 207650 (matches)
-Setup 32:32799 32325 Encrypt:209715 205973 Decrypt:207578 207644 (matches)
-
-$ size camellia_Os.o camellia7_Os.o camellia_64_Os.o
-   text    data     bss     dec     hex filename
-  24586       0       0   24586    600a camellia_Os.o
-  15906       0       0   15906    3e22 camellia5_Os.o
-  13098       0       0   13098    332a camellia_64_Os.o
-
-Some speed loss in camellia -> camellia5, much smaller size.
-Big key setup speedup in 64-bit camellia_64, and it is even smaller still.
-
-
-Above sizes are for userspace test programs. Kernel sizes are similar.
-For example, kernel module sizes with CONFIG_CC_OPTIMIZE_FOR_SIZE set, AMD64:
-
-$ size */camellia.o
-   text    data     bss     dec     hex filename
-  23208     272       0   23480    5bb8 crypto.org/camellia.o
-  11328     272       0   11600    2d50 crypto/camellia.o
+On Thursday 25 October 2007 12:43, Denys Vlasenko wrote:
+> Hi Hervert,
+> 
+> Please review and maybe propagate upstream following patches.
+> 
+> camellia1.diff:
+>     Move code blocks around so that related pieces are closer together:
+>     e.g. CAMELLIA_ROUNDSM macro does not need to be separated
+>     from the rest of the code by huge array of constants.
+> 
+>     Remove unused macros (COPY4WORD, SWAP4WORD, XOR4WORD[2])
+> 
+>     Drop SUBL(), SUBR() macros which only obscure things.
+>     Same for CAMELLIA_SP1110() macro and KEY_TABLE_TYPE typedef.
+> 
+>     Remove useless comments:
+>     /* encryption */ -- well it's obvious enough already!
+>     void camellia_encrypt128(...)
+> 
+>     Combine swap with copying at the beginning/end of encrypt/decrypt.
 
 Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
 --
 vda
 
---Boundary-00=_+FIIHn/hzCnAyAB
-Content-Type: application/x-tbz;
-  name="test_camellia.tar.bz2"
-Content-Transfer-Encoding: base64
+--Boundary-00=_AHIIHoa1QedVz2q
+Content-Type: text/x-diff;
+  charset="iso-8859-15";
+  name="camellia1.diff"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="test_camellia.tar.bz2"
+	filename="camellia1.diff"
 
-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
-ftHZY7tGFVlTJk6Cc822/jn/RkOqqqqnlL+t3xDFhbFGk6PonfLMqd8qelLDcs1KmTJ6+hPGIsne
-qqqzrDsDJJUZD6E6yp1lJkqZKmTJ0I5HRVVVdJEf13ZUnZRlZYzO0kdZO1tt7SE7mthCthWTDJgZ
-MmmQ2APB8oBAQUfmn2WV9k+onMknqvvvy6xrWtay5rWrdTGKqqyJjGtRdNMxjXelCRppvSJWks4k
-4kPl/KR9KMrLGZ/JlSZRlZYzPRJn8pHCjKyxmfyZUmUZWWMz+UZYyjKyxmfyZUmUZWWMz+M+ZH5n
-q+mrxZHEpvzFaKxcYzHraPbtdvrcHBXDhw4cHDhw4cOZIflSjpP+5MPbL8tkknYwsy8ONTQFhhFn
-Cp7YS8Qi46ioxJkJVKUppSlIZhGWYVnMJRKUplKUyllKkqpCIQypTKlKSyyhIKxpjGFY2U0aNGpp
-qZtatkmRQm0IAbw63ueL4PJ4ODU8XR6G55NHEec3trNo2trseLc9L0ubUOjNvdjc2NrR2NTY3jNw
-cG91b3etcByiIiOAiQQd1iEZuTo2ubW5ujsdjo6O12O1uB6mweZvGWQ2Dubh+Y+I94+I+o8xzHMc
-x9conKpK8/tJH28yfpbbf0kJ3do6LHdw0irGWMzvJHQnHRVW225HQkczmevZNDUsspMkd5I9O8np
-bbfSSR6u6pPRRlZYzTmIdBOTpbbYfRL9LuQwsktlKWyyyyT3fudYz2WPZZGWMsZnWJ6xJxFndI/c
-4VJ1UZWWMz989IsqsGxgAsEeLYwhY5yVmwzYGTJzrQKxTiNTA1PkLpq0YaMDJk4tgNolqJ3l/LxK
-9Fj0WRljLGZ3kd52hPzHVY6qMrLGZ1kfMTw9pJpYsf0e0fL5Xz3pOfNO9/D4TWSpp7ttsSkzGMxq
-VFaKwrGp9tNySDStynRo4k4knEkj9n0qT6UZWWMz9oyxlGVljM6T9o4WOFGVljMr9pGUZWWMyv2k
-ZRlZYzP2ZUmUZWWMzse9j7z6+8+pP63aXiSUwhM5l76iaZe+0+abbNbZbbaaK0y00h3HMXht1g6h
-+W6lCUIQlKJaZW0vi28ePEkknt67xnjfE8eMzPE8ePHjSUkkkyeHh4JhMKNVRVUQQQyKinFo9rU0
-exyMXeza3V4O563e8z1PU5vFm1NTc2tTe1tjq3ODc5ODk0a29qdjkw5jm4O4Q3KwHWDvbUNjo3t7
-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
-ymkaRpGkyTSOVt+QmiM3PHOSbkyTJMkyTJCTSEmSZJkmSZJkhLKKysrK2kKyimkyTMzmYZnZibT8
-IkiSJIkiSJhibszs25h2YiSSSSSSSSSSaTSIkkkkkkkkpaUtKtIpKqqqkkkkqUkkkkkkkkmltlkN
-9qGSZ/6SSJyDUbqlV1m2kzkki3qR+PE2/Dvh33965MgetfM73uEk1uqASZNheoSQvQDcgqidiHg0
-HFRAvbGTWkh6guMBAmBxbXBogt0kwWYqINbigHidsEH5j6i22eOb39td5mM1mtVTGqr0+/p/pPsP
-5Bh9DhyzMqsaFaac8nJyfqP1JkiScTr00ddn6pzODnjMzKUqsMYzMzMqpJMyZkzIkSZkzJJMyZkk
-kkSSSZmZMkZG5iTMjGMk1VZmZElVWZJJmXdc+L2HvPeMOXLlmZosUyPt9OTZ2OpiJJue17kkkklV
-JLXh2dknuHejy8qzIkSbVWZJJmTMlUlysykm2ZN1M3a22qtN1fDvh3w74d7PY9ltmsrVW20rKatq
-ra2tpStraq2vb7j3n1A445zM4MY00K0055OTk7z0YiScTlHue56K9VdW21tZTbW1V+5288UYzDRZ
-YrWoiNEISkSlL264cPDqkkm50YdHVszN5mVWGMNnRNttvVWZJJmTMkkkiSSTMzJku1VzduS7aq7G
-Kx/LPX6Z6Z5CT4Sn14lqPqXLbcyaBmT+ren9TEY/pm2obmbMnBZyyMlLG3MrIlqxwpk3MtVkzV1O
-VTVnMXd4ZjjMrbjU3oeeH5Yfz5E/bj8j9tj9z5s95/lQ9/M4ZIKJJJJJJJJMmSSTJkn3+wzU8jKI
-VEZia7rFNNNVSpiZpVTEM1NRllUxmJqdc7+/dZzU1GazUzEVO7u7morXHVrrFKmZmld7m+rpU1U1
-Xecu85qajNZqpqKmqiIVM5jNUqs5qYqZ0ZLMdOOqrjTKmla1hzGWXEtutL25dN95l11ba2mnHGmn
-Lum99x1xba2mnHGnNrum+8y66t2FRCIQiHEM5zm22c5znCUsspSZQ0pDsbSpSaFKUlKphNKShKFR
-SVKTRttx1KXLqr020rCc4y0hMSozLe53jLaGolszLe534yziUZZxlPZmcmSTx467dPGyyyIiIj3n
-R8bvTvHjMzMzMkkkkkkkkqqqSqlVVVVVHLs7urs7b42xxw45dFVVSSSR7vueDw0CZk28ZtpJpEkz
-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
-sOLWG28J8fs3b1z0ztyS1JJa5dXKd7nPHxvSSSSSTMkkzJJLaquqtkkkmZ2dkzJJJJMyRJJJbVVM
-W5llYxjGMV3R+idU+VY8ZPpvjJHolBOKKVIB/axqekUoE3EK1PQbwfraCSGH0ziHdNT4J98m58T2
-vkM+KlVkpj0b3Z4eJaZtZnrt3fHnJOWraqrUqtZZW1VqVVa9D42bFrz1Pad6x483jwltISa0bLY9
-m3buzturRFlVqtCISQQBY1jtNVch8HAd7yGTgqZIQEEDAQW3AtBQSiGShUwCFHAa2tkCtoPUcm0E
-LGHJCYgzaxhTRgELEnBGpYWYMiTXWZNTUu0/vQ8YanCVOJksqTBk4k1NE1Efpmk1JNB+dSxPiN8E
-MagiZss7bWtzaoWVNgcSkk+uSRohrUxKGSkkwjShuaTxny7djpMJySMkScjbAsURKDMGTAozfOw3
-A3UVWbdUPPpCkCHQqFa+x2v9gCaKCFQqFQMgQhBfKgEIYCJkIB9I73ah+JBDpB6ZuYOALRgQcWAM
-xrcO1o0UWjRk/Y9LdRiGBQuFxBPFNjztrJzYrA/W+QKABeD6X87MoaLIQUP3DqNbo1PyD4jkb+0G
-SJ/s7wGaoQDCEA87QUJjqvWD3vS2PADQSXUId7DDehUNoMMlN72HCT3yzJH1EKTsSfXipkg8ZXsR
-QozZKEN7DYNu2+Xj7Uawp6osQZ2EyDHHWaeNaPFmW4xj1ydra22wbXdtdnRucK613tqtXtA6RpY6
-x057uk3G21CiEycEF0CSGTKjsFuDFh3sTRLbbIHXGNn604bndMSHBopSqvOFL2McRs2XWZVeEZMS
-DmSMlNmWWirattvo2xEmoxskjvnTTWbWY1vXJ6bzc2O9xzenkpSlK14bdtLqmWDxjSNaE1GI2ijT
-RvJbaW27lLTLu290d8Poh7ieacTU80jhQIVOZEYSoYYdwEPsUNg9Y3syZe+Z5h/QMLQLV2jvZj7p
-uIieZzY3nQF4SyieHc83Dk0patgtj4Nu7dyQdbVWpVVrLVtWrUqqGIBR2vFUuQ2PJsADvIEFDFtc
-AwO99k8PN54hIqhKQvXcHVNIIqpJInbdhyliLWm0WtKoSqj5N79xs3wgZhc1KYIAfu2NGRJRrUrU
-8oXN71Kl/DUOxm3NSEmQXK7FYEIBCSEpKNOpuwcnYNYw/BisKhgvVk5loyfEZj1MMTyIaJ1VLOyY
-mTEyGTExPvPGbkgtBSC4f8BkoNjU4DqhR6wS8Ab2dg8R9AM/QNAkQAXNzDzCGYMyY8YmCkgKItBr
-o7R/CCH6YQo6v9ELmQyaZtWQs7LBLSk0SSSSSSSSSSW0mkRJbSshpJJJJS0paVaRSlVVVUkkklS0
-kkkkkkkkkkmlss+IfsYmiaHmziZkmckkTkN5kG6N5SVXWMSZxLSJ4tKSJJJJJJJJEkkkiSSxpJJJ
-JS0WlUlVVVVVJJJJUkkkkkkkkkSST48Q1BUExISYrzMCG5gCGtO40bROpyZG3VPoB2RidUVKj0Tv
-jRMHrnWafP4Go4m073Zbw6Fk4Fn0ws8DhI5qCEsKIlzIQ4sEMIQ3slSG9rstDmEqKhU7p9ZkZL1t
-ttk8Exk8XsneT6J0nMeh6JFjokn5CI/oSUYabhVZGkgqFSWSpODJMGoyaLMizc5h9DhDwTiPE8Si
-lFKKU8cHMHaoMMgFuaABJ0TaISB8ozZqMm9mwzL1NlAC0GjICjczP4//f8///9/76ghgqGC+5YCB
-xFTYDNkwMEwxFTMZzpCTUPUs9xKkjJUqp3Tgj40VWQ36OmfoPCIiIiOxvc2w5m9qE81UhIAaI2uQ
-iQxwG9p8CYCmL9IPYhrc+An3ijvHcAlAc13DAkQu+Qz2oztN5qB25u03bp5vFNDBJmhAhCDDUKGY
-gov1oSfYHcrwcAsQ2ujNfXtNMWoGoBUPsAtfW6CSTzHKzS1O0X5SSTRRPurifmK//o/qJWwBAMDm
-gt4FgPFsU8RsNj0tSWj2j0VI+hoPvESTxYN09bxAkpIppspokj8CGmmiSNEBsmEzKWlG+gHxY8be
-wtt/2taxtxUnSKeKXnGiU0mCTEs+sn80iIq4gwIi1DAJ6mEFUalmQB7SFksMjUEKmlPZQEMoB63g
-Enpd7INHsZNT2DYpQ2DC1IQJAIYwiDnghNW4SxACYOTQSxsFb0OcFaIhWQgeiFpFSyLEn9qSVOqU
-TU3CiJrdjtwh9QdmjxsLY3/8XckU4UJAFXH7bA==
+--- linux-2.6.23.src/crypto/camellia0.c	2007-10-24 19:01:54.000000000 +0100
++++ linux-2.6.23.src/crypto/camellia.c	2007-10-24 19:03:05.000000000 +0100
+@@ -36,176 +36,6 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ 
+-
+-#define CAMELLIA_MIN_KEY_SIZE        16
+-#define CAMELLIA_MAX_KEY_SIZE        32
+-#define CAMELLIA_BLOCK_SIZE 16
+-#define CAMELLIA_TABLE_BYTE_LEN 272
+-#define CAMELLIA_TABLE_WORD_LEN (CAMELLIA_TABLE_BYTE_LEN / 4)
+-
+-typedef u32 KEY_TABLE_TYPE[CAMELLIA_TABLE_WORD_LEN];
+-
+-
+-/* key constants */
+-
+-#define CAMELLIA_SIGMA1L (0xA09E667FL)
+-#define CAMELLIA_SIGMA1R (0x3BCC908BL)
+-#define CAMELLIA_SIGMA2L (0xB67AE858L)
+-#define CAMELLIA_SIGMA2R (0x4CAA73B2L)
+-#define CAMELLIA_SIGMA3L (0xC6EF372FL)
+-#define CAMELLIA_SIGMA3R (0xE94F82BEL)
+-#define CAMELLIA_SIGMA4L (0x54FF53A5L)
+-#define CAMELLIA_SIGMA4R (0xF1D36F1CL)
+-#define CAMELLIA_SIGMA5L (0x10E527FAL)
+-#define CAMELLIA_SIGMA5R (0xDE682D1DL)
+-#define CAMELLIA_SIGMA6L (0xB05688C2L)
+-#define CAMELLIA_SIGMA6R (0xB3E6C1FDL)
+-
+-struct camellia_ctx {
+-	int key_length;
+-	KEY_TABLE_TYPE key_table;
+-};
+-
+-
+-/*
+- *  macros
+- */
+-
+-
+-# define GETU32(pt) (((u32)(pt)[0] << 24)	\
+-		     ^ ((u32)(pt)[1] << 16)	\
+-		     ^ ((u32)(pt)[2] <<  8)	\
+-		     ^ ((u32)(pt)[3]))
+-
+-#define COPY4WORD(dst, src)			\
+-    do {					\
+-	(dst)[0]=(src)[0];			\
+-	(dst)[1]=(src)[1];			\
+-	(dst)[2]=(src)[2];			\
+-	(dst)[3]=(src)[3];			\
+-    }while(0)
+-
+-#define SWAP4WORD(word)				\
+-    do {					\
+-	CAMELLIA_SWAP4((word)[0]);		\
+-	CAMELLIA_SWAP4((word)[1]);		\
+-	CAMELLIA_SWAP4((word)[2]);		\
+-	CAMELLIA_SWAP4((word)[3]);		\
+-    }while(0)
+-
+-#define XOR4WORD(a, b)/* a = a ^ b */		\
+-    do {					\
+-	(a)[0]^=(b)[0];				\
+-	(a)[1]^=(b)[1];				\
+-	(a)[2]^=(b)[2];				\
+-	(a)[3]^=(b)[3];				\
+-    }while(0)
+-
+-#define XOR4WORD2(a, b, c)/* a = b ^ c */	\
+-    do {					\
+-	(a)[0]=(b)[0]^(c)[0];			\
+-	(a)[1]=(b)[1]^(c)[1];			\
+-	(a)[2]=(b)[2]^(c)[2];			\
+-	(a)[3]=(b)[3]^(c)[3];			\
+-    }while(0)
+-
+-#define CAMELLIA_SUBKEY_L(INDEX) (subkey[(INDEX)*2])
+-#define CAMELLIA_SUBKEY_R(INDEX) (subkey[(INDEX)*2 + 1])
+-
+-/* rotation right shift 1byte */
+-#define CAMELLIA_RR8(x) (((x) >> 8) + ((x) << 24))
+-/* rotation left shift 1bit */
+-#define CAMELLIA_RL1(x) (((x) << 1) + ((x) >> 31))
+-/* rotation left shift 1byte */
+-#define CAMELLIA_RL8(x) (((x) << 8) + ((x) >> 24))
+-
+-#define CAMELLIA_ROLDQ(ll, lr, rl, rr, w0, w1, bits)	\
+-    do {						\
+-	w0 = ll;					\
+-	ll = (ll << bits) + (lr >> (32 - bits));	\
+-	lr = (lr << bits) + (rl >> (32 - bits));	\
+-	rl = (rl << bits) + (rr >> (32 - bits));	\
+-	rr = (rr << bits) + (w0 >> (32 - bits));	\
+-    } while(0)
+-
+-#define CAMELLIA_ROLDQo32(ll, lr, rl, rr, w0, w1, bits)	\
+-    do {						\
+-	w0 = ll;					\
+-	w1 = lr;					\
+-	ll = (lr << (bits - 32)) + (rl >> (64 - bits));	\
+-	lr = (rl << (bits - 32)) + (rr >> (64 - bits));	\
+-	rl = (rr << (bits - 32)) + (w0 >> (64 - bits));	\
+-	rr = (w0 << (bits - 32)) + (w1 >> (64 - bits));	\
+-    } while(0)
+-
+-#define CAMELLIA_SP1110(INDEX) (camellia_sp1110[(INDEX)])
+-#define CAMELLIA_SP0222(INDEX) (camellia_sp0222[(INDEX)])
+-#define CAMELLIA_SP3033(INDEX) (camellia_sp3033[(INDEX)])
+-#define CAMELLIA_SP4404(INDEX) (camellia_sp4404[(INDEX)])
+-
+-#define CAMELLIA_F(xl, xr, kl, kr, yl, yr, il, ir, t0, t1)	\
+-    do {							\
+-	il = xl ^ kl;						\
+-	ir = xr ^ kr;						\
+-	t0 = il >> 16;						\
+-	t1 = ir >> 16;						\
+-	yl = CAMELLIA_SP1110(ir & 0xff)				\
+-	    ^ CAMELLIA_SP0222((t1 >> 8) & 0xff)			\
+-	    ^ CAMELLIA_SP3033(t1 & 0xff)			\
+-	    ^ CAMELLIA_SP4404((ir >> 8) & 0xff);		\
+-	yr = CAMELLIA_SP1110((t0 >> 8) & 0xff)			\
+-	    ^ CAMELLIA_SP0222(t0 & 0xff)			\
+-	    ^ CAMELLIA_SP3033((il >> 8) & 0xff)			\
+-	    ^ CAMELLIA_SP4404(il & 0xff);			\
+-	yl ^= yr;						\
+-	yr = CAMELLIA_RR8(yr);					\
+-	yr ^= yl;						\
+-    } while(0)
+-
+-
+-/*
+- * for speed up
+- *
+- */
+-#define CAMELLIA_FLS(ll, lr, rl, rr, kll, klr, krl, krr, t0, t1, t2, t3) \
+-    do {								\
+-	t0 = kll;							\
+-	t2 = krr;							\
+-	t0 &= ll;							\
+-	t2 |= rr;							\
+-	rl ^= t2;							\
+-	lr ^= CAMELLIA_RL1(t0);						\
+-	t3 = krl;							\
+-	t1 = klr;							\
+-	t3 &= rl;							\
+-	t1 |= lr;							\
+-	ll ^= t1;							\
+-	rr ^= CAMELLIA_RL1(t3);						\
+-    } while(0)
+-
+-#define CAMELLIA_ROUNDSM(xl, xr, kl, kr, yl, yr, il, ir, t0, t1)	\
+-    do {								\
+-	ir =  CAMELLIA_SP1110(xr & 0xff);				\
+-	il =  CAMELLIA_SP1110((xl>>24) & 0xff);				\
+-	ir ^= CAMELLIA_SP0222((xr>>24) & 0xff);				\
+-	il ^= CAMELLIA_SP0222((xl>>16) & 0xff);				\
+-	ir ^= CAMELLIA_SP3033((xr>>16) & 0xff);				\
+-	il ^= CAMELLIA_SP3033((xl>>8) & 0xff);				\
+-	ir ^= CAMELLIA_SP4404((xr>>8) & 0xff);				\
+-	il ^= CAMELLIA_SP4404(xl & 0xff);				\
+-	il ^= kl;							\
+-	ir ^= il ^ kr;							\
+-	yl ^= ir;							\
+-	yr ^= CAMELLIA_RR8(il) ^ ir;					\
+-    } while(0)
+-
+-/**
+- * Stuff related to the Camellia key schedule
+- */
+-#define SUBL(x) subL[(x)]
+-#define SUBR(x) subR[(x)]
+-
+-
+ static const u32 camellia_sp1110[256] = {
+ 	0x70707000,0x82828200,0x2c2c2c00,0xececec00,
+ 	0xb3b3b300,0x27272700,0xc0c0c000,0xe5e5e500,
+@@ -475,6 +305,122 @@ static const u32 camellia_sp4404[256] = 
+ };
+ 
+ 
++#define CAMELLIA_MIN_KEY_SIZE        16
++#define CAMELLIA_MAX_KEY_SIZE        32
++#define CAMELLIA_BLOCK_SIZE          16
++#define CAMELLIA_TABLE_BYTE_LEN     272
++
++
++/* key constants */
++
++#define CAMELLIA_SIGMA1L (0xA09E667FL)
++#define CAMELLIA_SIGMA1R (0x3BCC908BL)
++#define CAMELLIA_SIGMA2L (0xB67AE858L)
++#define CAMELLIA_SIGMA2R (0x4CAA73B2L)
++#define CAMELLIA_SIGMA3L (0xC6EF372FL)
++#define CAMELLIA_SIGMA3R (0xE94F82BEL)
++#define CAMELLIA_SIGMA4L (0x54FF53A5L)
++#define CAMELLIA_SIGMA4R (0xF1D36F1CL)
++#define CAMELLIA_SIGMA5L (0x10E527FAL)
++#define CAMELLIA_SIGMA5R (0xDE682D1DL)
++#define CAMELLIA_SIGMA6L (0xB05688C2L)
++#define CAMELLIA_SIGMA6R (0xB3E6C1FDL)
++
++/*
++ *  macros
++ */
++
++# define GETU32(pt) (((u32)(pt)[0] << 24)	\
++		     ^ ((u32)(pt)[1] << 16)	\
++		     ^ ((u32)(pt)[2] <<  8)	\
++		     ^ ((u32)(pt)[3]))
++
++/* rotation right shift 1byte */
++#define CAMELLIA_RR8(x) (((x) >> 8) + ((x) << 24))
++/* rotation left shift 1bit */
++#define CAMELLIA_RL1(x) (((x) << 1) + ((x) >> 31))
++/* rotation left shift 1byte */
++#define CAMELLIA_RL8(x) (((x) << 8) + ((x) >> 24))
++
++#define CAMELLIA_ROLDQ(ll, lr, rl, rr, w0, w1, bits)	\
++    do {						\
++	w0 = ll;					\
++	ll = (ll << bits) + (lr >> (32 - bits));	\
++	lr = (lr << bits) + (rl >> (32 - bits));	\
++	rl = (rl << bits) + (rr >> (32 - bits));	\
++	rr = (rr << bits) + (w0 >> (32 - bits));	\
++    } while(0)
++
++#define CAMELLIA_ROLDQo32(ll, lr, rl, rr, w0, w1, bits)	\
++    do {						\
++	w0 = ll;					\
++	w1 = lr;					\
++	ll = (lr << (bits - 32)) + (rl >> (64 - bits));	\
++	lr = (rl << (bits - 32)) + (rr >> (64 - bits));	\
++	rl = (rr << (bits - 32)) + (w0 >> (64 - bits));	\
++	rr = (w0 << (bits - 32)) + (w1 >> (64 - bits));	\
++    } while(0)
++
++
++#define CAMELLIA_F(xl, xr, kl, kr, yl, yr, il, ir, t0, t1)	\
++    do {							\
++	il = xl ^ kl;						\
++	ir = xr ^ kr;						\
++	t0 = il >> 16;						\
++	t1 = ir >> 16;						\
++	yl = camellia_sp1110[ir & 0xff]				\
++	   ^ camellia_sp0222[(t1 >> 8) & 0xff]			\
++	   ^ camellia_sp3033[t1 & 0xff]				\
++	   ^ camellia_sp4404[(ir >> 8) & 0xff];			\
++	yr = camellia_sp1110[(t0 >> 8) & 0xff]			\
++	   ^ camellia_sp0222[t0 & 0xff]				\
++	   ^ camellia_sp3033[(il >> 8) & 0xff]			\
++	   ^ camellia_sp4404[il & 0xff];			\
++	yl ^= yr;						\
++	yr = CAMELLIA_RR8(yr);					\
++	yr ^= yl;						\
++    } while(0)
++
++
++/*
++ * for speed up
++ *
++ */
++#define CAMELLIA_FLS(ll, lr, rl, rr, kll, klr, krl, krr, t0, t1, t2, t3) \
++    do {								\
++	t0 = kll;							\
++	t2 = krr;							\
++	t0 &= ll;							\
++	t2 |= rr;							\
++	rl ^= t2;							\
++	lr ^= CAMELLIA_RL1(t0);						\
++	t3 = krl;							\
++	t1 = klr;							\
++	t3 &= rl;							\
++	t1 |= lr;							\
++	ll ^= t1;							\
++	rr ^= CAMELLIA_RL1(t3);						\
++    } while(0)
++
++#define CAMELLIA_ROUNDSM(xl, xr, kl, kr, yl, yr, il, ir, t0, t1)	\
++    do {								\
++	ir =  camellia_sp1110[xr & 0xff];				\
++	il =  camellia_sp1110[(xl>>24) & 0xff];				\
++	ir ^= camellia_sp0222[(xr>>24) & 0xff];				\
++	il ^= camellia_sp0222[(xl>>16) & 0xff];				\
++	ir ^= camellia_sp3033[(xr>>16) & 0xff];				\
++	il ^= camellia_sp3033[(xl>>8) & 0xff];				\
++	ir ^= camellia_sp4404[(xr>>8) & 0xff];				\
++	il ^= camellia_sp4404[xl & 0xff];				\
++	il ^= kl;							\
++	ir ^= il ^ kr;							\
++	yl ^= ir;							\
++	yr ^= CAMELLIA_RR8(il) ^ ir;					\
++    } while(0)
++
++
++#define CAMELLIA_SUBKEY_L(INDEX) (subkey[(INDEX)*2])
++#define CAMELLIA_SUBKEY_R(INDEX) (subkey[(INDEX)*2 + 1])
+ 
+ static void camellia_setup128(const unsigned char *key, u32 *subkey)
+ {
+@@ -495,47 +441,47 @@ static void camellia_setup128(const unsi
+ 	 * generate KL dependent subkeys
+ 	 */
+ 	/* kw1 */
+-	SUBL(0) = kll; SUBR(0) = klr;
++	subL[0] = kll; subR[0] = klr;
+ 	/* kw2 */
+-	SUBL(1) = krl; SUBR(1) = krr;
++	subL[1] = krl; subR[1] = krr;
+ 	/* rotation left shift 15bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k3 */
+-	SUBL(4) = kll; SUBR(4) = klr;
++	subL[4] = kll; subR[4] = klr;
+ 	/* k4 */
+-	SUBL(5) = krl; SUBR(5) = krr;
++	subL[5] = krl; subR[5] = krr;
+ 	/* rotation left shift 15+30bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 30);
+ 	/* k7 */
+-	SUBL(10) = kll; SUBR(10) = klr;
++	subL[10] = kll; subR[10] = klr;
+ 	/* k8 */
+-	SUBL(11) = krl; SUBR(11) = krr;
++	subL[11] = krl; subR[11] = krr;
+ 	/* rotation left shift 15+30+15bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k10 */
+-	SUBL(13) = krl; SUBR(13) = krr;
++	subL[13] = krl; subR[13] = krr;
+ 	/* rotation left shift 15+30+15+17 bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 17);
+ 	/* kl3 */
+-	SUBL(16) = kll; SUBR(16) = klr;
++	subL[16] = kll; subR[16] = klr;
+ 	/* kl4 */
+-	SUBL(17) = krl; SUBR(17) = krr;
++	subL[17] = krl; subR[17] = krr;
+ 	/* rotation left shift 15+30+15+17+17 bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 17);
+ 	/* k13 */
+-	SUBL(18) = kll; SUBR(18) = klr;
++	subL[18] = kll; subR[18] = klr;
+ 	/* k14 */
+-	SUBL(19) = krl; SUBR(19) = krr;
++	subL[19] = krl; subR[19] = krr;
+ 	/* rotation left shift 15+30+15+17+17+17 bit */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 17);
+ 	/* k17 */
+-	SUBL(22) = kll; SUBR(22) = klr;
++	subL[22] = kll; subR[22] = klr;
+ 	/* k18 */
+-	SUBL(23) = krl; SUBR(23) = krr;
++	subL[23] = krl; subR[23] = krr;
+ 
+ 	/* generate KA */
+-	kll = SUBL(0); klr = SUBR(0);
+-	krl = SUBL(1); krr = SUBR(1);
++	kll = subL[0]; klr = subR[0];
++	krl = subL[1]; krr = subR[1];
+ 	CAMELLIA_F(kll, klr,
+ 		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
+ 		   w0, w1, il, ir, t0, t1);
+@@ -555,152 +501,150 @@ static void camellia_setup128(const unsi
+ 
+ 	/* generate KA dependent subkeys */
+ 	/* k1, k2 */
+-	SUBL(2) = kll; SUBR(2) = klr;
+-	SUBL(3) = krl; SUBR(3) = krr;
++	subL[2] = kll; subR[2] = klr;
++	subL[3] = krl; subR[3] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k5,k6 */
+-	SUBL(6) = kll; SUBR(6) = klr;
+-	SUBL(7) = krl; SUBR(7) = krr;
++	subL[6] = kll; subR[6] = klr;
++	subL[7] = krl; subR[7] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* kl1, kl2 */
+-	SUBL(8) = kll; SUBR(8) = klr;
+-	SUBL(9) = krl; SUBR(9) = krr;
++	subL[8] = kll; subR[8] = klr;
++	subL[9] = krl; subR[9] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k9 */
+-	SUBL(12) = kll; SUBR(12) = klr;
++	subL[12] = kll; subR[12] = klr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k11, k12 */
+-	SUBL(14) = kll; SUBR(14) = klr;
+-	SUBL(15) = krl; SUBR(15) = krr;
++	subL[14] = kll; subR[14] = klr;
++	subL[15] = krl; subR[15] = krr;
+ 	CAMELLIA_ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
+ 	/* k15, k16 */
+-	SUBL(20) = kll; SUBR(20) = klr;
+-	SUBL(21) = krl; SUBR(21) = krr;
++	subL[20] = kll; subR[20] = klr;
++	subL[21] = krl; subR[21] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 17);
+ 	/* kw3, kw4 */
+-	SUBL(24) = kll; SUBR(24) = klr;
+-	SUBL(25) = krl; SUBR(25) = krr;
+-
++	subL[24] = kll; subR[24] = klr;
++	subL[25] = krl; subR[25] = krr;
+ 
+ 	/* absorb kw2 to other subkeys */
+ 	/* round 2 */
+-	SUBL(3) ^= SUBL(1); SUBR(3) ^= SUBR(1);
++	subL[3] ^= subL[1]; subR[3] ^= subR[1];
+ 	/* round 4 */
+-	SUBL(5) ^= SUBL(1); SUBR(5) ^= SUBR(1);
++	subL[5] ^= subL[1]; subR[5] ^= subR[1];
+ 	/* round 6 */
+-	SUBL(7) ^= SUBL(1); SUBR(7) ^= SUBR(1);
+-	SUBL(1) ^= SUBR(1) & ~SUBR(9);
+-	dw = SUBL(1) & SUBL(9),
+-		SUBR(1) ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl2) */
++	subL[7] ^= subL[1]; subR[7] ^= subR[1];
++	subL[1] ^= subR[1] & ~subR[9];
++	dw = subL[1] & subL[9],
++		subR[1] ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl2) */
+ 	/* round 8 */
+-	SUBL(11) ^= SUBL(1); SUBR(11) ^= SUBR(1);
++	subL[11] ^= subL[1]; subR[11] ^= subR[1];
+ 	/* round 10 */
+-	SUBL(13) ^= SUBL(1); SUBR(13) ^= SUBR(1);
++	subL[13] ^= subL[1]; subR[13] ^= subR[1];
+ 	/* round 12 */
+-	SUBL(15) ^= SUBL(1); SUBR(15) ^= SUBR(1);
+-	SUBL(1) ^= SUBR(1) & ~SUBR(17);
+-	dw = SUBL(1) & SUBL(17),
+-		SUBR(1) ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl4) */
++	subL[15] ^= subL[1]; subR[15] ^= subR[1];
++	subL[1] ^= subR[1] & ~subR[17];
++	dw = subL[1] & subL[17],
++		subR[1] ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl4) */
+ 	/* round 14 */
+-	SUBL(19) ^= SUBL(1); SUBR(19) ^= SUBR(1);
++	subL[19] ^= subL[1]; subR[19] ^= subR[1];
+ 	/* round 16 */
+-	SUBL(21) ^= SUBL(1); SUBR(21) ^= SUBR(1);
++	subL[21] ^= subL[1]; subR[21] ^= subR[1];
+ 	/* round 18 */
+-	SUBL(23) ^= SUBL(1); SUBR(23) ^= SUBR(1);
++	subL[23] ^= subL[1]; subR[23] ^= subR[1];
+ 	/* kw3 */
+-	SUBL(24) ^= SUBL(1); SUBR(24) ^= SUBR(1);
++	subL[24] ^= subL[1]; subR[24] ^= subR[1];
+ 
+ 	/* absorb kw4 to other subkeys */
+-	kw4l = SUBL(25); kw4r = SUBR(25);
++	kw4l = subL[25]; kw4r = subR[25];
+ 	/* round 17 */
+-	SUBL(22) ^= kw4l; SUBR(22) ^= kw4r;
++	subL[22] ^= kw4l; subR[22] ^= kw4r;
+ 	/* round 15 */
+-	SUBL(20) ^= kw4l; SUBR(20) ^= kw4r;
++	subL[20] ^= kw4l; subR[20] ^= kw4r;
+ 	/* round 13 */
+-	SUBL(18) ^= kw4l; SUBR(18) ^= kw4r;
+-	kw4l ^= kw4r & ~SUBR(16);
+-	dw = kw4l & SUBL(16),
++	subL[18] ^= kw4l; subR[18] ^= kw4r;
++	kw4l ^= kw4r & ~subR[16];
++	dw = kw4l & subL[16],
+ 		kw4r ^= CAMELLIA_RL1(dw); /* modified for FL(kl3) */
+ 	/* round 11 */
+-	SUBL(14) ^= kw4l; SUBR(14) ^= kw4r;
++	subL[14] ^= kw4l; subR[14] ^= kw4r;
+ 	/* round 9 */
+-	SUBL(12) ^= kw4l; SUBR(12) ^= kw4r;
++	subL[12] ^= kw4l; subR[12] ^= kw4r;
+ 	/* round 7 */
+-	SUBL(10) ^= kw4l; SUBR(10) ^= kw4r;
+-	kw4l ^= kw4r & ~SUBR(8);
+-	dw = kw4l & SUBL(8),
++	subL[10] ^= kw4l; subR[10] ^= kw4r;
++	kw4l ^= kw4r & ~subR[8];
++	dw = kw4l & subL[8],
+ 		kw4r ^= CAMELLIA_RL1(dw); /* modified for FL(kl1) */
+ 	/* round 5 */
+-	SUBL(6) ^= kw4l; SUBR(6) ^= kw4r;
++	subL[6] ^= kw4l; subR[6] ^= kw4r;
+ 	/* round 3 */
+-	SUBL(4) ^= kw4l; SUBR(4) ^= kw4r;
++	subL[4] ^= kw4l; subR[4] ^= kw4r;
+ 	/* round 1 */
+-	SUBL(2) ^= kw4l; SUBR(2) ^= kw4r;
++	subL[2] ^= kw4l; subR[2] ^= kw4r;
+ 	/* kw1 */
+-	SUBL(0) ^= kw4l; SUBR(0) ^= kw4r;
+-
++	subL[0] ^= kw4l; subR[0] ^= kw4r;
+ 
+ 	/* key XOR is end of F-function */
+-	CAMELLIA_SUBKEY_L(0) = SUBL(0) ^ SUBL(2);/* kw1 */
+-	CAMELLIA_SUBKEY_R(0) = SUBR(0) ^ SUBR(2);
+-	CAMELLIA_SUBKEY_L(2) = SUBL(3);       /* round 1 */
+-	CAMELLIA_SUBKEY_R(2) = SUBR(3);
+-	CAMELLIA_SUBKEY_L(3) = SUBL(2) ^ SUBL(4); /* round 2 */
+-	CAMELLIA_SUBKEY_R(3) = SUBR(2) ^ SUBR(4);
+-	CAMELLIA_SUBKEY_L(4) = SUBL(3) ^ SUBL(5); /* round 3 */
+-	CAMELLIA_SUBKEY_R(4) = SUBR(3) ^ SUBR(5);
+-	CAMELLIA_SUBKEY_L(5) = SUBL(4) ^ SUBL(6); /* round 4 */
+-	CAMELLIA_SUBKEY_R(5) = SUBR(4) ^ SUBR(6);
+-	CAMELLIA_SUBKEY_L(6) = SUBL(5) ^ SUBL(7); /* round 5 */
+-	CAMELLIA_SUBKEY_R(6) = SUBR(5) ^ SUBR(7);
+-	tl = SUBL(10) ^ (SUBR(10) & ~SUBR(8));
+-	dw = tl & SUBL(8),  /* FL(kl1) */
+-		tr = SUBR(10) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(7) = SUBL(6) ^ tl; /* round 6 */
+-	CAMELLIA_SUBKEY_R(7) = SUBR(6) ^ tr;
+-	CAMELLIA_SUBKEY_L(8) = SUBL(8);       /* FL(kl1) */
+-	CAMELLIA_SUBKEY_R(8) = SUBR(8);
+-	CAMELLIA_SUBKEY_L(9) = SUBL(9);       /* FLinv(kl2) */
+-	CAMELLIA_SUBKEY_R(9) = SUBR(9);
+-	tl = SUBL(7) ^ (SUBR(7) & ~SUBR(9));
+-	dw = tl & SUBL(9),  /* FLinv(kl2) */
+-		tr = SUBR(7) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(10) = tl ^ SUBL(11); /* round 7 */
+-	CAMELLIA_SUBKEY_R(10) = tr ^ SUBR(11);
+-	CAMELLIA_SUBKEY_L(11) = SUBL(10) ^ SUBL(12); /* round 8 */
+-	CAMELLIA_SUBKEY_R(11) = SUBR(10) ^ SUBR(12);
+-	CAMELLIA_SUBKEY_L(12) = SUBL(11) ^ SUBL(13); /* round 9 */
+-	CAMELLIA_SUBKEY_R(12) = SUBR(11) ^ SUBR(13);
+-	CAMELLIA_SUBKEY_L(13) = SUBL(12) ^ SUBL(14); /* round 10 */
+-	CAMELLIA_SUBKEY_R(13) = SUBR(12) ^ SUBR(14);
+-	CAMELLIA_SUBKEY_L(14) = SUBL(13) ^ SUBL(15); /* round 11 */
+-	CAMELLIA_SUBKEY_R(14) = SUBR(13) ^ SUBR(15);
+-	tl = SUBL(18) ^ (SUBR(18) & ~SUBR(16));
+-	dw = tl & SUBL(16), /* FL(kl3) */
+-		tr = SUBR(18) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(15) = SUBL(14) ^ tl; /* round 12 */
+-	CAMELLIA_SUBKEY_R(15) = SUBR(14) ^ tr;
+-	CAMELLIA_SUBKEY_L(16) = SUBL(16);     /* FL(kl3) */
+-	CAMELLIA_SUBKEY_R(16) = SUBR(16);
+-	CAMELLIA_SUBKEY_L(17) = SUBL(17);     /* FLinv(kl4) */
+-	CAMELLIA_SUBKEY_R(17) = SUBR(17);
+-	tl = SUBL(15) ^ (SUBR(15) & ~SUBR(17));
+-	dw = tl & SUBL(17), /* FLinv(kl4) */
+-		tr = SUBR(15) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(18) = tl ^ SUBL(19); /* round 13 */
+-	CAMELLIA_SUBKEY_R(18) = tr ^ SUBR(19);
+-	CAMELLIA_SUBKEY_L(19) = SUBL(18) ^ SUBL(20); /* round 14 */
+-	CAMELLIA_SUBKEY_R(19) = SUBR(18) ^ SUBR(20);
+-	CAMELLIA_SUBKEY_L(20) = SUBL(19) ^ SUBL(21); /* round 15 */
+-	CAMELLIA_SUBKEY_R(20) = SUBR(19) ^ SUBR(21);
+-	CAMELLIA_SUBKEY_L(21) = SUBL(20) ^ SUBL(22); /* round 16 */
+-	CAMELLIA_SUBKEY_R(21) = SUBR(20) ^ SUBR(22);
+-	CAMELLIA_SUBKEY_L(22) = SUBL(21) ^ SUBL(23); /* round 17 */
+-	CAMELLIA_SUBKEY_R(22) = SUBR(21) ^ SUBR(23);
+-	CAMELLIA_SUBKEY_L(23) = SUBL(22);     /* round 18 */
+-	CAMELLIA_SUBKEY_R(23) = SUBR(22);
+-	CAMELLIA_SUBKEY_L(24) = SUBL(24) ^ SUBL(23); /* kw3 */
+-	CAMELLIA_SUBKEY_R(24) = SUBR(24) ^ SUBR(23);
++	CAMELLIA_SUBKEY_L(0) = subL[0] ^ subL[2];/* kw1 */
++	CAMELLIA_SUBKEY_R(0) = subR[0] ^ subR[2];
++	CAMELLIA_SUBKEY_L(2) = subL[3];       /* round 1 */
++	CAMELLIA_SUBKEY_R(2) = subR[3];
++	CAMELLIA_SUBKEY_L(3) = subL[2] ^ subL[4]; /* round 2 */
++	CAMELLIA_SUBKEY_R(3) = subR[2] ^ subR[4];
++	CAMELLIA_SUBKEY_L(4) = subL[3] ^ subL[5]; /* round 3 */
++	CAMELLIA_SUBKEY_R(4) = subR[3] ^ subR[5];
++	CAMELLIA_SUBKEY_L(5) = subL[4] ^ subL[6]; /* round 4 */
++	CAMELLIA_SUBKEY_R(5) = subR[4] ^ subR[6];
++	CAMELLIA_SUBKEY_L(6) = subL[5] ^ subL[7]; /* round 5 */
++	CAMELLIA_SUBKEY_R(6) = subR[5] ^ subR[7];
++	tl = subL[10] ^ (subR[10] & ~subR[8]);
++	dw = tl & subL[8],  /* FL(kl1) */
++		tr = subR[10] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(7) = subL[6] ^ tl; /* round 6 */
++	CAMELLIA_SUBKEY_R(7) = subR[6] ^ tr;
++	CAMELLIA_SUBKEY_L(8) = subL[8];       /* FL(kl1) */
++	CAMELLIA_SUBKEY_R(8) = subR[8];
++	CAMELLIA_SUBKEY_L(9) = subL[9];       /* FLinv(kl2) */
++	CAMELLIA_SUBKEY_R(9) = subR[9];
++	tl = subL[7] ^ (subR[7] & ~subR[9]);
++	dw = tl & subL[9],  /* FLinv(kl2) */
++		tr = subR[7] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(10) = tl ^ subL[11]; /* round 7 */
++	CAMELLIA_SUBKEY_R(10) = tr ^ subR[11];
++	CAMELLIA_SUBKEY_L(11) = subL[10] ^ subL[12]; /* round 8 */
++	CAMELLIA_SUBKEY_R(11) = subR[10] ^ subR[12];
++	CAMELLIA_SUBKEY_L(12) = subL[11] ^ subL[13]; /* round 9 */
++	CAMELLIA_SUBKEY_R(12) = subR[11] ^ subR[13];
++	CAMELLIA_SUBKEY_L(13) = subL[12] ^ subL[14]; /* round 10 */
++	CAMELLIA_SUBKEY_R(13) = subR[12] ^ subR[14];
++	CAMELLIA_SUBKEY_L(14) = subL[13] ^ subL[15]; /* round 11 */
++	CAMELLIA_SUBKEY_R(14) = subR[13] ^ subR[15];
++	tl = subL[18] ^ (subR[18] & ~subR[16]);
++	dw = tl & subL[16], /* FL(kl3) */
++		tr = subR[18] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(15) = subL[14] ^ tl; /* round 12 */
++	CAMELLIA_SUBKEY_R(15) = subR[14] ^ tr;
++	CAMELLIA_SUBKEY_L(16) = subL[16];     /* FL(kl3) */
++	CAMELLIA_SUBKEY_R(16) = subR[16];
++	CAMELLIA_SUBKEY_L(17) = subL[17];     /* FLinv(kl4) */
++	CAMELLIA_SUBKEY_R(17) = subR[17];
++	tl = subL[15] ^ (subR[15] & ~subR[17]);
++	dw = tl & subL[17], /* FLinv(kl4) */
++		tr = subR[15] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(18) = tl ^ subL[19]; /* round 13 */
++	CAMELLIA_SUBKEY_R(18) = tr ^ subR[19];
++	CAMELLIA_SUBKEY_L(19) = subL[18] ^ subL[20]; /* round 14 */
++	CAMELLIA_SUBKEY_R(19) = subR[18] ^ subR[20];
++	CAMELLIA_SUBKEY_L(20) = subL[19] ^ subL[21]; /* round 15 */
++	CAMELLIA_SUBKEY_R(20) = subR[19] ^ subR[21];
++	CAMELLIA_SUBKEY_L(21) = subL[20] ^ subL[22]; /* round 16 */
++	CAMELLIA_SUBKEY_R(21) = subR[20] ^ subR[22];
++	CAMELLIA_SUBKEY_L(22) = subL[21] ^ subL[23]; /* round 17 */
++	CAMELLIA_SUBKEY_R(22) = subR[21] ^ subR[23];
++	CAMELLIA_SUBKEY_L(23) = subL[22];     /* round 18 */
++	CAMELLIA_SUBKEY_R(23) = subR[22];
++	CAMELLIA_SUBKEY_L(24) = subL[24] ^ subL[23]; /* kw3 */
++	CAMELLIA_SUBKEY_R(24) = subR[24] ^ subR[23];
+ 
+ 	/* apply the inverse of the last half of P-function */
+ 	dw = CAMELLIA_SUBKEY_L(2) ^ CAMELLIA_SUBKEY_R(2),
+@@ -775,11 +719,8 @@ static void camellia_setup128(const unsi
+ 		dw = CAMELLIA_RL8(dw);/* round 18 */
+ 	CAMELLIA_SUBKEY_R(23) = CAMELLIA_SUBKEY_L(23) ^ dw,
+ 		CAMELLIA_SUBKEY_L(23) = dw;
+-
+-	return;
+ }
+ 
+-
+ static void camellia_setup256(const unsigned char *key, u32 *subkey)
+ {
+ 	u32 kll,klr,krl,krr;           /* left half of key */
+@@ -805,56 +746,56 @@ static void camellia_setup256(const unsi
+ 
+ 	/* generate KL dependent subkeys */
+ 	/* kw1 */
+-	SUBL(0) = kll; SUBR(0) = klr;
++	subL[0] = kll; subR[0] = klr;
+ 	/* kw2 */
+-	SUBL(1) = krl; SUBR(1) = krr;
++	subL[1] = krl; subR[1] = krr;
+ 	CAMELLIA_ROLDQo32(kll, klr, krl, krr, w0, w1, 45);
+ 	/* k9 */
+-	SUBL(12) = kll; SUBR(12) = klr;
++	subL[12] = kll; subR[12] = klr;
+ 	/* k10 */
+-	SUBL(13) = krl; SUBR(13) = krr;
++	subL[13] = krl; subR[13] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* kl3 */
+-	SUBL(16) = kll; SUBR(16) = klr;
++	subL[16] = kll; subR[16] = klr;
+ 	/* kl4 */
+-	SUBL(17) = krl; SUBR(17) = krr;
++	subL[17] = krl; subR[17] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 17);
+ 	/* k17 */
+-	SUBL(22) = kll; SUBR(22) = klr;
++	subL[22] = kll; subR[22] = klr;
+ 	/* k18 */
+-	SUBL(23) = krl; SUBR(23) = krr;
++	subL[23] = krl; subR[23] = krr;
+ 	CAMELLIA_ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
+ 	/* k23 */
+-	SUBL(30) = kll; SUBR(30) = klr;
++	subL[30] = kll; subR[30] = klr;
+ 	/* k24 */
+-	SUBL(31) = krl; SUBR(31) = krr;
++	subL[31] = krl; subR[31] = krr;
+ 
+ 	/* generate KR dependent subkeys */
+ 	CAMELLIA_ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
+ 	/* k3 */
+-	SUBL(4) = krll; SUBR(4) = krlr;
++	subL[4] = krll; subR[4] = krlr;
+ 	/* k4 */
+-	SUBL(5) = krrl; SUBR(5) = krrr;
++	subL[5] = krrl; subR[5] = krrr;
+ 	CAMELLIA_ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
+ 	/* kl1 */
+-	SUBL(8) = krll; SUBR(8) = krlr;
++	subL[8] = krll; subR[8] = krlr;
+ 	/* kl2 */
+-	SUBL(9) = krrl; SUBR(9) = krrr;
++	subL[9] = krrl; subR[9] = krrr;
+ 	CAMELLIA_ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
+ 	/* k13 */
+-	SUBL(18) = krll; SUBR(18) = krlr;
++	subL[18] = krll; subR[18] = krlr;
+ 	/* k14 */
+-	SUBL(19) = krrl; SUBR(19) = krrr;
++	subL[19] = krrl; subR[19] = krrr;
+ 	CAMELLIA_ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
+ 	/* k19 */
+-	SUBL(26) = krll; SUBR(26) = krlr;
++	subL[26] = krll; subR[26] = krlr;
+ 	/* k20 */
+-	SUBL(27) = krrl; SUBR(27) = krrr;
++	subL[27] = krrl; subR[27] = krrr;
+ 	CAMELLIA_ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
+ 
+ 	/* generate KA */
+-	kll = SUBL(0) ^ krll; klr = SUBR(0) ^ krlr;
+-	krl = SUBL(1) ^ krrl; krr = SUBR(1) ^ krrr;
++	kll = subL[0] ^ krll; klr = subR[0] ^ krlr;
++	krl = subL[1] ^ krrl; krr = subR[1] ^ krrr;
+ 	CAMELLIA_F(kll, klr,
+ 		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
+ 		   w0, w1, il, ir, t0, t1);
+@@ -887,208 +828,207 @@ static void camellia_setup256(const unsi
+ 	/* generate KA dependent subkeys */
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 15);
+ 	/* k5 */
+-	SUBL(6) = kll; SUBR(6) = klr;
++	subL[6] = kll; subR[6] = klr;
+ 	/* k6 */
+-	SUBL(7) = krl; SUBR(7) = krr;
++	subL[7] = krl; subR[7] = krr;
+ 	CAMELLIA_ROLDQ(kll, klr, krl, krr, w0, w1, 30);
+ 	/* k11 */
+-	SUBL(14) = kll; SUBR(14) = klr;
++	subL[14] = kll; subR[14] = klr;
+ 	/* k12 */
+-	SUBL(15) = krl; SUBR(15) = krr;
++	subL[15] = krl; subR[15] = krr;
+ 	/* rotation left shift 32bit */
+ 	/* kl5 */
+-	SUBL(24) = klr; SUBR(24) = krl;
++	subL[24] = klr; subR[24] = krl;
+ 	/* kl6 */
+-	SUBL(25) = krr; SUBR(25) = kll;
++	subL[25] = krr; subR[25] = kll;
+ 	/* rotation left shift 49 from k11,k12 -> k21,k22 */
+ 	CAMELLIA_ROLDQo32(kll, klr, krl, krr, w0, w1, 49);
+ 	/* k21 */
+-	SUBL(28) = kll; SUBR(28) = klr;
++	subL[28] = kll; subR[28] = klr;
+ 	/* k22 */
+-	SUBL(29) = krl; SUBR(29) = krr;
++	subL[29] = krl; subR[29] = krr;
+ 
+ 	/* generate KB dependent subkeys */
+ 	/* k1 */
+-	SUBL(2) = krll; SUBR(2) = krlr;
++	subL[2] = krll; subR[2] = krlr;
+ 	/* k2 */
+-	SUBL(3) = krrl; SUBR(3) = krrr;
++	subL[3] = krrl; subR[3] = krrr;
+ 	CAMELLIA_ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
+ 	/* k7 */
+-	SUBL(10) = krll; SUBR(10) = krlr;
++	subL[10] = krll; subR[10] = krlr;
+ 	/* k8 */
+-	SUBL(11) = krrl; SUBR(11) = krrr;
++	subL[11] = krrl; subR[11] = krrr;
+ 	CAMELLIA_ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
+ 	/* k15 */
+-	SUBL(20) = krll; SUBR(20) = krlr;
++	subL[20] = krll; subR[20] = krlr;
+ 	/* k16 */
+-	SUBL(21) = krrl; SUBR(21) = krrr;
++	subL[21] = krrl; subR[21] = krrr;
+ 	CAMELLIA_ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 51);
+ 	/* kw3 */
+-	SUBL(32) = krll; SUBR(32) = krlr;
++	subL[32] = krll; subR[32] = krlr;
+ 	/* kw4 */
+-	SUBL(33) = krrl; SUBR(33) = krrr;
++	subL[33] = krrl; subR[33] = krrr;
+ 
+ 	/* absorb kw2 to other subkeys */
+ 	/* round 2 */
+-	SUBL(3) ^= SUBL(1); SUBR(3) ^= SUBR(1);
++	subL[3] ^= subL[1]; subR[3] ^= subR[1];
+ 	/* round 4 */
+-	SUBL(5) ^= SUBL(1); SUBR(5) ^= SUBR(1);
++	subL[5] ^= subL[1]; subR[5] ^= subR[1];
+ 	/* round 6 */
+-	SUBL(7) ^= SUBL(1); SUBR(7) ^= SUBR(1);
+-	SUBL(1) ^= SUBR(1) & ~SUBR(9);
+-	dw = SUBL(1) & SUBL(9),
+-		SUBR(1) ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl2) */
++	subL[7] ^= subL[1]; subR[7] ^= subR[1];
++	subL[1] ^= subR[1] & ~subR[9];
++	dw = subL[1] & subL[9],
++		subR[1] ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl2) */
+ 	/* round 8 */
+-	SUBL(11) ^= SUBL(1); SUBR(11) ^= SUBR(1);
++	subL[11] ^= subL[1]; subR[11] ^= subR[1];
+ 	/* round 10 */
+-	SUBL(13) ^= SUBL(1); SUBR(13) ^= SUBR(1);
++	subL[13] ^= subL[1]; subR[13] ^= subR[1];
+ 	/* round 12 */
+-	SUBL(15) ^= SUBL(1); SUBR(15) ^= SUBR(1);
+-	SUBL(1) ^= SUBR(1) & ~SUBR(17);
+-	dw = SUBL(1) & SUBL(17),
+-		SUBR(1) ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl4) */
++	subL[15] ^= subL[1]; subR[15] ^= subR[1];
++	subL[1] ^= subR[1] & ~subR[17];
++	dw = subL[1] & subL[17],
++		subR[1] ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl4) */
+ 	/* round 14 */
+-	SUBL(19) ^= SUBL(1); SUBR(19) ^= SUBR(1);
++	subL[19] ^= subL[1]; subR[19] ^= subR[1];
+ 	/* round 16 */
+-	SUBL(21) ^= SUBL(1); SUBR(21) ^= SUBR(1);
++	subL[21] ^= subL[1]; subR[21] ^= subR[1];
+ 	/* round 18 */
+-	SUBL(23) ^= SUBL(1); SUBR(23) ^= SUBR(1);
+-	SUBL(1) ^= SUBR(1) & ~SUBR(25);
+-	dw = SUBL(1) & SUBL(25),
+-		SUBR(1) ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl6) */
++	subL[23] ^= subL[1]; subR[23] ^= subR[1];
++	subL[1] ^= subR[1] & ~subR[25];
++	dw = subL[1] & subL[25],
++		subR[1] ^= CAMELLIA_RL1(dw); /* modified for FLinv(kl6) */
+ 	/* round 20 */
+-	SUBL(27) ^= SUBL(1); SUBR(27) ^= SUBR(1);
++	subL[27] ^= subL[1]; subR[27] ^= subR[1];
+ 	/* round 22 */
+-	SUBL(29) ^= SUBL(1); SUBR(29) ^= SUBR(1);
++	subL[29] ^= subL[1]; subR[29] ^= subR[1];
+ 	/* round 24 */
+-	SUBL(31) ^= SUBL(1); SUBR(31) ^= SUBR(1);
++	subL[31] ^= subL[1]; subR[31] ^= subR[1];
+ 	/* kw3 */
+-	SUBL(32) ^= SUBL(1); SUBR(32) ^= SUBR(1);
+-
++	subL[32] ^= subL[1]; subR[32] ^= subR[1];
+ 
+ 	/* absorb kw4 to other subkeys */
+-	kw4l = SUBL(33); kw4r = SUBR(33);
++	kw4l = subL[33]; kw4r = subR[33];
+ 	/* round 23 */
+-	SUBL(30) ^= kw4l; SUBR(30) ^= kw4r;
++	subL[30] ^= kw4l; subR[30] ^= kw4r;
+ 	/* round 21 */
+-	SUBL(28) ^= kw4l; SUBR(28) ^= kw4r;
++	subL[28] ^= kw4l; subR[28] ^= kw4r;
+ 	/* round 19 */
+-	SUBL(26) ^= kw4l; SUBR(26) ^= kw4r;
+-	kw4l ^= kw4r & ~SUBR(24);
+-	dw = kw4l & SUBL(24),
++	subL[26] ^= kw4l; subR[26] ^= kw4r;
++	kw4l ^= kw4r & ~subR[24];
++	dw = kw4l & subL[24],
+ 		kw4r ^= CAMELLIA_RL1(dw); /* modified for FL(kl5) */
+ 	/* round 17 */
+-	SUBL(22) ^= kw4l; SUBR(22) ^= kw4r;
++	subL[22] ^= kw4l; subR[22] ^= kw4r;
+ 	/* round 15 */
+-	SUBL(20) ^= kw4l; SUBR(20) ^= kw4r;
++	subL[20] ^= kw4l; subR[20] ^= kw4r;
+ 	/* round 13 */
+-	SUBL(18) ^= kw4l; SUBR(18) ^= kw4r;
+-	kw4l ^= kw4r & ~SUBR(16);
+-	dw = kw4l & SUBL(16),
++	subL[18] ^= kw4l; subR[18] ^= kw4r;
++	kw4l ^= kw4r & ~subR[16];
++	dw = kw4l & subL[16],
+ 		kw4r ^= CAMELLIA_RL1(dw); /* modified for FL(kl3) */
+ 	/* round 11 */
+-	SUBL(14) ^= kw4l; SUBR(14) ^= kw4r;
++	subL[14] ^= kw4l; subR[14] ^= kw4r;
+ 	/* round 9 */
+-	SUBL(12) ^= kw4l; SUBR(12) ^= kw4r;
++	subL[12] ^= kw4l; subR[12] ^= kw4r;
+ 	/* round 7 */
+-	SUBL(10) ^= kw4l; SUBR(10) ^= kw4r;
+-	kw4l ^= kw4r & ~SUBR(8);
+-	dw = kw4l & SUBL(8),
++	subL[10] ^= kw4l; subR[10] ^= kw4r;
++	kw4l ^= kw4r & ~subR[8];
++	dw = kw4l & subL[8],
+ 		kw4r ^= CAMELLIA_RL1(dw); /* modified for FL(kl1) */
+ 	/* round 5 */
+-	SUBL(6) ^= kw4l; SUBR(6) ^= kw4r;
++	subL[6] ^= kw4l; subR[6] ^= kw4r;
+ 	/* round 3 */
+-	SUBL(4) ^= kw4l; SUBR(4) ^= kw4r;
++	subL[4] ^= kw4l; subR[4] ^= kw4r;
+ 	/* round 1 */
+-	SUBL(2) ^= kw4l; SUBR(2) ^= kw4r;
++	subL[2] ^= kw4l; subR[2] ^= kw4r;
+ 	/* kw1 */
+-	SUBL(0) ^= kw4l; SUBR(0) ^= kw4r;
++	subL[0] ^= kw4l; subR[0] ^= kw4r;
+ 
+ 	/* key XOR is end of F-function */
+-	CAMELLIA_SUBKEY_L(0) = SUBL(0) ^ SUBL(2);/* kw1 */
+-	CAMELLIA_SUBKEY_R(0) = SUBR(0) ^ SUBR(2);
+-	CAMELLIA_SUBKEY_L(2) = SUBL(3);       /* round 1 */
+-	CAMELLIA_SUBKEY_R(2) = SUBR(3);
+-	CAMELLIA_SUBKEY_L(3) = SUBL(2) ^ SUBL(4); /* round 2 */
+-	CAMELLIA_SUBKEY_R(3) = SUBR(2) ^ SUBR(4);
+-	CAMELLIA_SUBKEY_L(4) = SUBL(3) ^ SUBL(5); /* round 3 */
+-	CAMELLIA_SUBKEY_R(4) = SUBR(3) ^ SUBR(5);
+-	CAMELLIA_SUBKEY_L(5) = SUBL(4) ^ SUBL(6); /* round 4 */
+-	CAMELLIA_SUBKEY_R(5) = SUBR(4) ^ SUBR(6);
+-	CAMELLIA_SUBKEY_L(6) = SUBL(5) ^ SUBL(7); /* round 5 */
+-	CAMELLIA_SUBKEY_R(6) = SUBR(5) ^ SUBR(7);
+-	tl = SUBL(10) ^ (SUBR(10) & ~SUBR(8));
+-	dw = tl & SUBL(8),  /* FL(kl1) */
+-		tr = SUBR(10) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(7) = SUBL(6) ^ tl; /* round 6 */
+-	CAMELLIA_SUBKEY_R(7) = SUBR(6) ^ tr;
+-	CAMELLIA_SUBKEY_L(8) = SUBL(8);       /* FL(kl1) */
+-	CAMELLIA_SUBKEY_R(8) = SUBR(8);
+-	CAMELLIA_SUBKEY_L(9) = SUBL(9);       /* FLinv(kl2) */
+-	CAMELLIA_SUBKEY_R(9) = SUBR(9);
+-	tl = SUBL(7) ^ (SUBR(7) & ~SUBR(9));
+-	dw = tl & SUBL(9),  /* FLinv(kl2) */
+-		tr = SUBR(7) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(10) = tl ^ SUBL(11); /* round 7 */
+-	CAMELLIA_SUBKEY_R(10) = tr ^ SUBR(11);
+-	CAMELLIA_SUBKEY_L(11) = SUBL(10) ^ SUBL(12); /* round 8 */
+-	CAMELLIA_SUBKEY_R(11) = SUBR(10) ^ SUBR(12);
+-	CAMELLIA_SUBKEY_L(12) = SUBL(11) ^ SUBL(13); /* round 9 */
+-	CAMELLIA_SUBKEY_R(12) = SUBR(11) ^ SUBR(13);
+-	CAMELLIA_SUBKEY_L(13) = SUBL(12) ^ SUBL(14); /* round 10 */
+-	CAMELLIA_SUBKEY_R(13) = SUBR(12) ^ SUBR(14);
+-	CAMELLIA_SUBKEY_L(14) = SUBL(13) ^ SUBL(15); /* round 11 */
+-	CAMELLIA_SUBKEY_R(14) = SUBR(13) ^ SUBR(15);
+-	tl = SUBL(18) ^ (SUBR(18) & ~SUBR(16));
+-	dw = tl & SUBL(16), /* FL(kl3) */
+-		tr = SUBR(18) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(15) = SUBL(14) ^ tl; /* round 12 */
+-	CAMELLIA_SUBKEY_R(15) = SUBR(14) ^ tr;
+-	CAMELLIA_SUBKEY_L(16) = SUBL(16);     /* FL(kl3) */
+-	CAMELLIA_SUBKEY_R(16) = SUBR(16);
+-	CAMELLIA_SUBKEY_L(17) = SUBL(17);     /* FLinv(kl4) */
+-	CAMELLIA_SUBKEY_R(17) = SUBR(17);
+-	tl = SUBL(15) ^ (SUBR(15) & ~SUBR(17));
+-	dw = tl & SUBL(17), /* FLinv(kl4) */
+-		tr = SUBR(15) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(18) = tl ^ SUBL(19); /* round 13 */
+-	CAMELLIA_SUBKEY_R(18) = tr ^ SUBR(19);
+-	CAMELLIA_SUBKEY_L(19) = SUBL(18) ^ SUBL(20); /* round 14 */
+-	CAMELLIA_SUBKEY_R(19) = SUBR(18) ^ SUBR(20);
+-	CAMELLIA_SUBKEY_L(20) = SUBL(19) ^ SUBL(21); /* round 15 */
+-	CAMELLIA_SUBKEY_R(20) = SUBR(19) ^ SUBR(21);
+-	CAMELLIA_SUBKEY_L(21) = SUBL(20) ^ SUBL(22); /* round 16 */
+-	CAMELLIA_SUBKEY_R(21) = SUBR(20) ^ SUBR(22);
+-	CAMELLIA_SUBKEY_L(22) = SUBL(21) ^ SUBL(23); /* round 17 */
+-	CAMELLIA_SUBKEY_R(22) = SUBR(21) ^ SUBR(23);
+-	tl = SUBL(26) ^ (SUBR(26)
+-			 & ~SUBR(24));
+-	dw = tl & SUBL(24), /* FL(kl5) */
+-		tr = SUBR(26) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(23) = SUBL(22) ^ tl; /* round 18 */
+-	CAMELLIA_SUBKEY_R(23) = SUBR(22) ^ tr;
+-	CAMELLIA_SUBKEY_L(24) = SUBL(24);     /* FL(kl5) */
+-	CAMELLIA_SUBKEY_R(24) = SUBR(24);
+-	CAMELLIA_SUBKEY_L(25) = SUBL(25);     /* FLinv(kl6) */
+-	CAMELLIA_SUBKEY_R(25) = SUBR(25);
+-	tl = SUBL(23) ^ (SUBR(23) &
+-			 ~SUBR(25));
+-	dw = tl & SUBL(25), /* FLinv(kl6) */
+-		tr = SUBR(23) ^ CAMELLIA_RL1(dw);
+-	CAMELLIA_SUBKEY_L(26) = tl ^ SUBL(27); /* round 19 */
+-	CAMELLIA_SUBKEY_R(26) = tr ^ SUBR(27);
+-	CAMELLIA_SUBKEY_L(27) = SUBL(26) ^ SUBL(28); /* round 20 */
+-	CAMELLIA_SUBKEY_R(27) = SUBR(26) ^ SUBR(28);
+-	CAMELLIA_SUBKEY_L(28) = SUBL(27) ^ SUBL(29); /* round 21 */
+-	CAMELLIA_SUBKEY_R(28) = SUBR(27) ^ SUBR(29);
+-	CAMELLIA_SUBKEY_L(29) = SUBL(28) ^ SUBL(30); /* round 22 */
+-	CAMELLIA_SUBKEY_R(29) = SUBR(28) ^ SUBR(30);
+-	CAMELLIA_SUBKEY_L(30) = SUBL(29) ^ SUBL(31); /* round 23 */
+-	CAMELLIA_SUBKEY_R(30) = SUBR(29) ^ SUBR(31);
+-	CAMELLIA_SUBKEY_L(31) = SUBL(30);     /* round 24 */
+-	CAMELLIA_SUBKEY_R(31) = SUBR(30);
+-	CAMELLIA_SUBKEY_L(32) = SUBL(32) ^ SUBL(31); /* kw3 */
+-	CAMELLIA_SUBKEY_R(32) = SUBR(32) ^ SUBR(31);
++	CAMELLIA_SUBKEY_L(0) = subL[0] ^ subL[2];/* kw1 */
++	CAMELLIA_SUBKEY_R(0) = subR[0] ^ subR[2];
++	CAMELLIA_SUBKEY_L(2) = subL[3];       /* round 1 */
++	CAMELLIA_SUBKEY_R(2) = subR[3];
++	CAMELLIA_SUBKEY_L(3) = subL[2] ^ subL[4]; /* round 2 */
++	CAMELLIA_SUBKEY_R(3) = subR[2] ^ subR[4];
++	CAMELLIA_SUBKEY_L(4) = subL[3] ^ subL[5]; /* round 3 */
++	CAMELLIA_SUBKEY_R(4) = subR[3] ^ subR[5];
++	CAMELLIA_SUBKEY_L(5) = subL[4] ^ subL[6]; /* round 4 */
++	CAMELLIA_SUBKEY_R(5) = subR[4] ^ subR[6];
++	CAMELLIA_SUBKEY_L(6) = subL[5] ^ subL[7]; /* round 5 */
++	CAMELLIA_SUBKEY_R(6) = subR[5] ^ subR[7];
++	tl = subL[10] ^ (subR[10] & ~subR[8]);
++	dw = tl & subL[8],  /* FL(kl1) */
++		tr = subR[10] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(7) = subL[6] ^ tl; /* round 6 */
++	CAMELLIA_SUBKEY_R(7) = subR[6] ^ tr;
++	CAMELLIA_SUBKEY_L(8) = subL[8];       /* FL(kl1) */
++	CAMELLIA_SUBKEY_R(8) = subR[8];
++	CAMELLIA_SUBKEY_L(9) = subL[9];       /* FLinv(kl2) */
++	CAMELLIA_SUBKEY_R(9) = subR[9];
++	tl = subL[7] ^ (subR[7] & ~subR[9]);
++	dw = tl & subL[9],  /* FLinv(kl2) */
++		tr = subR[7] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(10) = tl ^ subL[11]; /* round 7 */
++	CAMELLIA_SUBKEY_R(10) = tr ^ subR[11];
++	CAMELLIA_SUBKEY_L(11) = subL[10] ^ subL[12]; /* round 8 */
++	CAMELLIA_SUBKEY_R(11) = subR[10] ^ subR[12];
++	CAMELLIA_SUBKEY_L(12) = subL[11] ^ subL[13]; /* round 9 */
++	CAMELLIA_SUBKEY_R(12) = subR[11] ^ subR[13];
++	CAMELLIA_SUBKEY_L(13) = subL[12] ^ subL[14]; /* round 10 */
++	CAMELLIA_SUBKEY_R(13) = subR[12] ^ subR[14];
++	CAMELLIA_SUBKEY_L(14) = subL[13] ^ subL[15]; /* round 11 */
++	CAMELLIA_SUBKEY_R(14) = subR[13] ^ subR[15];
++	tl = subL[18] ^ (subR[18] & ~subR[16]);
++	dw = tl & subL[16], /* FL(kl3) */
++		tr = subR[18] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(15) = subL[14] ^ tl; /* round 12 */
++	CAMELLIA_SUBKEY_R(15) = subR[14] ^ tr;
++	CAMELLIA_SUBKEY_L(16) = subL[16];     /* FL(kl3) */
++	CAMELLIA_SUBKEY_R(16) = subR[16];
++	CAMELLIA_SUBKEY_L(17) = subL[17];     /* FLinv(kl4) */
++	CAMELLIA_SUBKEY_R(17) = subR[17];
++	tl = subL[15] ^ (subR[15] & ~subR[17]);
++	dw = tl & subL[17], /* FLinv(kl4) */
++		tr = subR[15] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(18) = tl ^ subL[19]; /* round 13 */
++	CAMELLIA_SUBKEY_R(18) = tr ^ subR[19];
++	CAMELLIA_SUBKEY_L(19) = subL[18] ^ subL[20]; /* round 14 */
++	CAMELLIA_SUBKEY_R(19) = subR[18] ^ subR[20];
++	CAMELLIA_SUBKEY_L(20) = subL[19] ^ subL[21]; /* round 15 */
++	CAMELLIA_SUBKEY_R(20) = subR[19] ^ subR[21];
++	CAMELLIA_SUBKEY_L(21) = subL[20] ^ subL[22]; /* round 16 */
++	CAMELLIA_SUBKEY_R(21) = subR[20] ^ subR[22];
++	CAMELLIA_SUBKEY_L(22) = subL[21] ^ subL[23]; /* round 17 */
++	CAMELLIA_SUBKEY_R(22) = subR[21] ^ subR[23];
++	tl = subL[26] ^ (subR[26]
++			 & ~subR[24]);
++	dw = tl & subL[24], /* FL(kl5) */
++		tr = subR[26] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(23) = subL[22] ^ tl; /* round 18 */
++	CAMELLIA_SUBKEY_R(23) = subR[22] ^ tr;
++	CAMELLIA_SUBKEY_L(24) = subL[24];     /* FL(kl5) */
++	CAMELLIA_SUBKEY_R(24) = subR[24];
++	CAMELLIA_SUBKEY_L(25) = subL[25];     /* FLinv(kl6) */
++	CAMELLIA_SUBKEY_R(25) = subR[25];
++	tl = subL[23] ^ (subR[23] &
++			 ~subR[25]);
++	dw = tl & subL[25], /* FLinv(kl6) */
++		tr = subR[23] ^ CAMELLIA_RL1(dw);
++	CAMELLIA_SUBKEY_L(26) = tl ^ subL[27]; /* round 19 */
++	CAMELLIA_SUBKEY_R(26) = tr ^ subR[27];
++	CAMELLIA_SUBKEY_L(27) = subL[26] ^ subL[28]; /* round 20 */
++	CAMELLIA_SUBKEY_R(27) = subR[26] ^ subR[28];
++	CAMELLIA_SUBKEY_L(28) = subL[27] ^ subL[29]; /* round 21 */
++	CAMELLIA_SUBKEY_R(28) = subR[27] ^ subR[29];
++	CAMELLIA_SUBKEY_L(29) = subL[28] ^ subL[30]; /* round 22 */
++	CAMELLIA_SUBKEY_R(29) = subR[28] ^ subR[30];
++	CAMELLIA_SUBKEY_L(30) = subL[29] ^ subL[31]; /* round 23 */
++	CAMELLIA_SUBKEY_R(30) = subR[29] ^ subR[31];
++	CAMELLIA_SUBKEY_L(31) = subL[30];     /* round 24 */
++	CAMELLIA_SUBKEY_R(31) = subR[30];
++	CAMELLIA_SUBKEY_L(32) = subL[32] ^ subL[31]; /* kw3 */
++	CAMELLIA_SUBKEY_R(32) = subR[32] ^ subR[31];
+ 
+ 	/* apply the inverse of the last half of P-function */
+ 	dw = CAMELLIA_SUBKEY_L(2) ^ CAMELLIA_SUBKEY_R(2),
+@@ -1187,8 +1127,6 @@ static void camellia_setup256(const unsi
+ 		dw = CAMELLIA_RL8(dw);/* round 24 */
+ 	CAMELLIA_SUBKEY_R(31) = CAMELLIA_SUBKEY_L(31) ^ dw,
+ 		CAMELLIA_SUBKEY_L(31) = dw;
+-
+-	return;
+ }
+ 
+ static void camellia_setup192(const unsigned char *key, u32 *subkey)
+@@ -1197,20 +1135,16 @@ static void camellia_setup192(const unsi
+ 	u32 krll, krlr, krrl,krrr;
+ 
+ 	memcpy(kk, key, 24);
+-	memcpy((unsigned char *)&krll, key+16,4);
+-	memcpy((unsigned char *)&krlr, key+20,4);
++	memcpy((unsigned char *)&krll, key+16, 4);
++	memcpy((unsigned char *)&krlr, key+20, 4);
+ 	krrl = ~krll;
+ 	krrr = ~krlr;
+ 	memcpy(kk+24, (unsigned char *)&krrl, 4);
+ 	memcpy(kk+28, (unsigned char *)&krrr, 4);
+ 	camellia_setup256(kk, subkey);
+-	return;
+ }
+ 
+ 
+-/**
+- * Stuff related to camellia encryption/decryption
+- */
+ static void camellia_encrypt128(const u32 *subkey, __be32 *io_text)
+ {
+ 	u32 il,ir,t0,t1;               /* temporary valiables */
+@@ -1222,11 +1156,11 @@ static void camellia_encrypt128(const u3
+ 	io[2] = be32_to_cpu(io_text[2]);
+ 	io[3] = be32_to_cpu(io_text[3]);
+ 
+-	/* pre whitening but absorb kw2*/
++	/* pre whitening but absorb kw2 */
+ 	io[0] ^= CAMELLIA_SUBKEY_L(0);
+ 	io[1] ^= CAMELLIA_SUBKEY_R(0);
+-	/* main iteration */
+ 
++	/* main iteration */
+ 	CAMELLIA_ROUNDSM(io[0],io[1],
+ 			 CAMELLIA_SUBKEY_L(2),CAMELLIA_SUBKEY_R(2),
+ 			 io[2],io[3],il,ir,t0,t1);
+@@ -1298,19 +1232,10 @@ static void camellia_encrypt128(const u3
+ 	io[2] ^= CAMELLIA_SUBKEY_L(24);
+ 	io[3] ^= CAMELLIA_SUBKEY_R(24);
+ 
+-	t0 = io[0];
+-	t1 = io[1];
+-	io[0] = io[2];
+-	io[1] = io[3];
+-	io[2] = t0;
+-	io[3] = t1;
+-
+-	io_text[0] = cpu_to_be32(io[0]);
+-	io_text[1] = cpu_to_be32(io[1]);
+-	io_text[2] = cpu_to_be32(io[2]);
+-	io_text[3] = cpu_to_be32(io[3]);
+-
+-	return;
++	io_text[0] = cpu_to_be32(io[2]);
++	io_text[1] = cpu_to_be32(io[3]);
++	io_text[2] = cpu_to_be32(io[0]);
++	io_text[3] = cpu_to_be32(io[1]);
+ }
+ 
+ static void camellia_decrypt128(const u32 *subkey, __be32 *io_text)
+@@ -1324,7 +1249,7 @@ static void camellia_decrypt128(const u3
+ 	io[2] = be32_to_cpu(io_text[2]);
+ 	io[3] = be32_to_cpu(io_text[3]);
+ 
+-	/* pre whitening but absorb kw2*/
++	/* pre whitening but absorb kw2 */
+ 	io[0] ^= CAMELLIA_SUBKEY_L(24);
+ 	io[1] ^= CAMELLIA_SUBKEY_R(24);
+ 
+@@ -1400,25 +1325,12 @@ static void camellia_decrypt128(const u3
+ 	io[2] ^= CAMELLIA_SUBKEY_L(0);
+ 	io[3] ^= CAMELLIA_SUBKEY_R(0);
+ 
+-	t0 = io[0];
+-	t1 = io[1];
+-	io[0] = io[2];
+-	io[1] = io[3];
+-	io[2] = t0;
+-	io[3] = t1;
+-
+-	io_text[0] = cpu_to_be32(io[0]);
+-	io_text[1] = cpu_to_be32(io[1]);
+-	io_text[2] = cpu_to_be32(io[2]);
+-	io_text[3] = cpu_to_be32(io[3]);
+-
+-	return;
++	io_text[0] = cpu_to_be32(io[2]);
++	io_text[1] = cpu_to_be32(io[3]);
++	io_text[2] = cpu_to_be32(io[0]);
++	io_text[3] = cpu_to_be32(io[1]);
+ }
+ 
+-
+-/**
+- * stuff for 192 and 256bit encryption/decryption
+- */
+ static void camellia_encrypt256(const u32 *subkey, __be32 *io_text)
+ {
+ 	u32 il,ir,t0,t1;           /* temporary valiables */
+@@ -1430,7 +1342,7 @@ static void camellia_encrypt256(const u3
+ 	io[2] = be32_to_cpu(io_text[2]);
+ 	io[3] = be32_to_cpu(io_text[3]);
+ 
+-	/* pre whitening but absorb kw2*/
++	/* pre whitening but absorb kw2 */
+ 	io[0] ^= CAMELLIA_SUBKEY_L(0);
+ 	io[1] ^= CAMELLIA_SUBKEY_R(0);
+ 
+@@ -1530,22 +1442,12 @@ static void camellia_encrypt256(const u3
+ 	io[2] ^= CAMELLIA_SUBKEY_L(32);
+ 	io[3] ^= CAMELLIA_SUBKEY_R(32);
+ 
+-	t0 = io[0];
+-	t1 = io[1];
+-	io[0] = io[2];
+-	io[1] = io[3];
+-	io[2] = t0;
+-	io[3] = t1;
+-
+-	io_text[0] = cpu_to_be32(io[0]);
+-	io_text[1] = cpu_to_be32(io[1]);
+-	io_text[2] = cpu_to_be32(io[2]);
+-	io_text[3] = cpu_to_be32(io[3]);
+-
+-	return;
++	io_text[0] = cpu_to_be32(io[2]);
++	io_text[1] = cpu_to_be32(io[3]);
++	io_text[2] = cpu_to_be32(io[0]);
++	io_text[3] = cpu_to_be32(io[1]);
+ }
+ 
+-
+ static void camellia_decrypt256(const u32 *subkey, __be32 *io_text)
+ {
+ 	u32 il,ir,t0,t1;           /* temporary valiables */
+@@ -1557,7 +1459,7 @@ static void camellia_decrypt256(const u3
+ 	io[2] = be32_to_cpu(io_text[2]);
+ 	io[3] = be32_to_cpu(io_text[3]);
+ 
+-	/* pre whitening but absorb kw2*/
++	/* pre whitening but absorb kw2 */
+ 	io[0] ^= CAMELLIA_SUBKEY_L(32);
+ 	io[1] ^= CAMELLIA_SUBKEY_R(32);
+ 
+@@ -1657,22 +1559,18 @@ static void camellia_decrypt256(const u3
+ 	io[2] ^= CAMELLIA_SUBKEY_L(0);
+ 	io[3] ^= CAMELLIA_SUBKEY_R(0);
+ 
+-	t0 = io[0];
+-	t1 = io[1];
+-	io[0] = io[2];
+-	io[1] = io[3];
+-	io[2] = t0;
+-	io[3] = t1;
+-
+-	io_text[0] = cpu_to_be32(io[0]);
+-	io_text[1] = cpu_to_be32(io[1]);
+-	io_text[2] = cpu_to_be32(io[2]);
+-	io_text[3] = cpu_to_be32(io[3]);
+-
+-	return;
++	io_text[0] = cpu_to_be32(io[2]);
++	io_text[1] = cpu_to_be32(io[3]);
++	io_text[2] = cpu_to_be32(io[0]);
++	io_text[3] = cpu_to_be32(io[1]);
+ }
+ 
+ 
++struct camellia_ctx {
++	int key_length;
++	u32 key_table[CAMELLIA_TABLE_BYTE_LEN / 4];
++};
++
+ static int
+ camellia_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		 unsigned int key_len)
+@@ -1688,7 +1586,7 @@ camellia_set_key(struct crypto_tfm *tfm,
+ 
+ 	cctx->key_length = key_len;
+ 
+-	switch(key_len) {
++	switch (key_len) {
+ 	case 16:
+ 		camellia_setup128(key, cctx->key_table);
+ 		break;
+@@ -1698,14 +1596,11 @@ camellia_set_key(struct crypto_tfm *tfm,
+ 	case 32:
+ 		camellia_setup256(key, cctx->key_table);
+ 		break;
+-	default:
+-		break;
+ 	}
+ 
+ 	return 0;
+ }
+ 
+-
+ static void camellia_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
+@@ -1725,14 +1620,11 @@ static void camellia_encrypt(struct cryp
+ 	case 32:
+ 		camellia_encrypt256(cctx->key_table, tmp);
+ 		break;
+-	default:
+-		break;
+ 	}
+ 
+ 	memcpy(dst, tmp, CAMELLIA_BLOCK_SIZE);
+ }
+ 
+-
+ static void camellia_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
+@@ -1752,14 +1644,11 @@ static void camellia_decrypt(struct cryp
+ 	case 32:
+ 		camellia_decrypt256(cctx->key_table, tmp);
+ 		break;
+-	default:
+-		break;
+ 	}
+ 
+ 	memcpy(dst, tmp, CAMELLIA_BLOCK_SIZE);
+ }
+ 
+-
+ static struct crypto_alg camellia_alg = {
+ 	.cra_name		=	"camellia",
+ 	.cra_driver_name	=	"camellia-generic",
+@@ -1786,16 +1675,13 @@ static int __init camellia_init(void)
+ 	return crypto_register_alg(&camellia_alg);
+ }
+ 
+-
+ static void __exit camellia_fini(void)
+ {
+ 	crypto_unregister_alg(&camellia_alg);
+ }
+ 
+-
+ module_init(camellia_init);
+ module_exit(camellia_fini);
+ 
+-
+ MODULE_DESCRIPTION("Camellia Cipher Algorithm");
+ MODULE_LICENSE("GPL");
 
---Boundary-00=_+FIIHn/hzCnAyAB--
+--Boundary-00=_AHIIHoa1QedVz2q--
