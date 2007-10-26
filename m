@@ -1,56 +1,58 @@
-From: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
-Subject: Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
-Date: Fri, 26 Oct 2007 17:45:55 +0900 (JST)
-Message-ID: <20071026.174555.957835159.takamiya@po.ntts.co.jp>
-References: <200710251243.58701.vda.linux@googlemail.com>
-	<200710251248.29746.vda.linux@googlemail.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: Patch to support stream ciphers
+Date: Fri, 26 Oct 2007 14:21:02 +0400
+Message-ID: <20071026102102.GB4970@2ka.mipt.ru>
+References: <fd3e431c0710251055n1e810c90u285bb0be7d95dd07@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	camellia-oss@sec.ms.ntts.co.jp
-To: vda.linux@googlemail.com
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail2.ics.ntts.co.jp ([202.32.24.42]:33550 "EHLO
-	mail2.ics.ntts.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752798AbXJZJND (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Oct 2007 05:13:03 -0400
-In-Reply-To: <200710251248.29746.vda.linux@googlemail.com>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:52314 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750838AbXJZKVs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Oct 2007 06:21:48 -0400
+Content-Disposition: inline
+In-Reply-To: <fd3e431c0710251055n1e810c90u285bb0be7d95dd07@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
->> Thu, 25 Oct 2007 12:48:29 +0100
->> [Subject: [PATCH 5/5] camellia: de-unrolling, 64bit-ization]
->> Denys Vlasenko <vda.linux@googlemail.com> wrote...
+Hi.
 
-> On Thursday 25 October 2007 12:43, Denys Vlasenko wrote:
-> > Hi Hervert,
-> > 
-> > Please review and maybe propagate upstream following patches.
-> > 
-> > camellia5.diff
-> >     Use alternative key setup implementation with mostly 64-bit ops
-> >     if BITS_PER_LONG >= 64. Both much smaller and much faster.
-> > 
-> >     Unify camellia_en/decrypt128/256 into camellia_do_en/decrypt.
-> >     Code was similar, with just one additional if() we can use came code.
-> > 
-> >     If CONFIG_CC_OPTIMIZE_FOR_SIZE is defined,
-> >     use loop in camellia_do_en/decrypt instead of unrolled code.
-> >     ~5% encrypt/decrypt slowdown.
-> > 
-> >     Replace (x & 0xff) with (u8)x, gcc is not smart enough to realize
-> >     that it can do (x & 0xff) this way (which is smaller at least on i386).
-> > 
-> >     Don't do (x & 0xff) in a few places where x cannot be > 255 anyway:
-> >         t0 = il >> 16; v = camellia_sp0222[(t1 >> 8) & 0xff];
-> >     il16 is u32, (thus t1 >> 8) is one byte!
+On Fri, Oct 26, 2007 at 01:55:48AM +0800, Tan Swee Heng (thesweeheng@gmail.com) wrote:
+> Hi all,
 > 
-> Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
-> --
-> vda
-Acked-by: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+> I am learning CryptoAPI by porting stream ciphers into it
+> (particularly eSTREAM candidates at
+> <http://www.ecrypt.eu.org/stream/>). As eSTREAM ciphers manipulates IV
+> differently depending on algorithm design, it seems that standard
+> block modes cannot be used: ECB has no IV; CBC and CTR don't let
+> ciphers control how the IV is processed.
+> 
+> So I derived stream.c from Herbert's cbc.c and Joy's ctr.c. It wraps
+> around any cipher exporting cia_ivsize and cia_setiv_crypt() from
+> "struct cipher_alg". As a test case, I've used Daniel Bernstein's
+> Salsa20 implementation at <http://cr.yp.to/snuffle.html> as the
+> cipher. My patch against Herbert's cryptodev-2.6 git is attached.
+> 
+> Some questions come to mind:
+>  1. Is this the way to go for general stream ciphers?
+>  2. Would a separate "struct stream_alg" be better than hijacking
+> "struct cipher_alg"?
+>  3. Currently cia_setiv_crypt() does setiv() and inplace encryption;
+> is this a good design?
+>  4. Should the blocksize be 1 for the stream template?
 
---
-Noriaki TAKAMIYA
+It depends. I do not know any stream cipher, which operates on 1-byte
+quantity in real life, but stream means 1-byte blocksize is a correct
+assumption.
+
+Your approach is likely the less intrusive for existing block-based
+design, so I believe this is a way to go.
+
+Besides number of codying style issues (like comments, () placement,
+spaces and the like) it looks good.
+
+-- 
+	Evgeniy Polyakov
