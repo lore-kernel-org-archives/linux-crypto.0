@@ -1,42 +1,91 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [PATCH] [crypto] don't make CTR default M
-Date: Sun, 28 Oct 2007 16:49:02 +0100
-Message-ID: <20071028154902.GA26247@Chamillionaire.breakpoint.cc>
+From: Jens Axboe <jens.axboe@oracle.com>
+Subject: Re: [PATCH 1/2] [CRYPTO] tcrypt: Move sg_init_table out of timing loops
+Date: Mon, 29 Oct 2007 21:16:27 +0100
+Message-ID: <20071029201627.GD7499@kernel.dk>
+References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41984 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751365AbXJ1PtF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Oct 2007 11:49:05 -0400
+Received: from brick.kernel.dk ([87.55.233.238]:13450 "EHLO kernel.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752053AbXJ2UQc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Oct 2007 16:16:32 -0400
 Content-Disposition: inline
+In-Reply-To: <E1IlQfM-0003cO-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-NO other block mode is M by default.
+On Fri, Oct 26 2007, Herbert Xu wrote:
+> [CRYPTO] tcrypt: Move sg_init_table out of timing loops
+> 
+> This patch moves the sg_init_table out of the timing loops for hash
+> algorithms so that it doesn't impact on the speed test results.
 
-Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
----
+Wouldn't it be better to just make sg_init_one() call sg_init_table?
 
-Herbert, please squash this one into the CTR patch and if you set
-apply.whitespace strip
-than the white space damage shoud be fixed by itself on your next 
-rebase :)
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 4571231..ccc55a6 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -202,28 +202,6 @@ static inline void __sg_mark_end(struct scatterlist *sg)
+ }
+ 
+ /**
+- * sg_init_one - Initialize a single entry sg list
+- * @sg:		 SG entry
+- * @buf:	 Virtual address for IO
+- * @buflen:	 IO length
+- *
+- * Notes:
+- *   This should not be used on a single entry that is part of a larger
+- *   table. Use sg_init_table() for that.
+- *
+- **/
+-static inline void sg_init_one(struct scatterlist *sg, const void *buf,
+-			       unsigned int buflen)
+-{
+-	memset(sg, 0, sizeof(*sg));
+-#ifdef CONFIG_DEBUG_SG
+-	sg->sg_magic = SG_MAGIC;
+-#endif
+-	sg_mark_end(sg, 1);
+-	sg_set_buf(sg, buf, buflen);
+-}
+-
+-/**
+  * sg_init_table - Initialize SG table
+  * @sgl:	   The SG table
+  * @nents:	   Number of entries in table
+@@ -247,6 +225,24 @@ static inline void sg_init_table(struct scatterlist *sgl, unsigned int nents)
+ }
+ 
+ /**
++ * sg_init_one - Initialize a single entry sg list
++ * @sg:		 SG entry
++ * @buf:	 Virtual address for IO
++ * @buflen:	 IO length
++ *
++ * Notes:
++ *   This should not be used on a single entry that is part of a larger
++ *   table. Use sg_init_table() for that.
++ *
++ **/
++static inline void sg_init_one(struct scatterlist *sg, const void *buf,
++			       unsigned int buflen)
++{
++	sg_init_table(sg, 1);
++	sg_set_buf(sg, buf, buflen);
++}
++
++/**
+  * sg_phys - Return physical address of an sg entry
+  * @sg:	     SG entry
+  *
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index a375d4d..8cb6450 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -199,7 +199,6 @@ config CRYPTO_CTR
- 	tristate "CTR support"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
--	default m
- 	help
- 	  CTR: Counter mode
- 	  This block cipher algorithm is required for IPSec.
 -- 
-1.5.3.4
+Jens Axboe
