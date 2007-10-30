@@ -1,41 +1,93 @@
-From: Jens Axboe <jens.axboe@oracle.com>
-Subject: Re: [PATCH 1/2] [CRYPTO] tcrypt: Move sg_init_table out of timing loops
-Date: Tue, 30 Oct 2007 06:50:58 +0100
-Message-ID: <20071030055056.GG7499@kernel.dk>
-References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au> <20071029201627.GD7499@kernel.dk> <20071030000827.GA9037@gondor.apana.org.au>
+From: Boaz Harrosh <bharrosh@panasas.com>
+Subject: Re: [PATCH 1/2] [CRYPTO] tcrypt: Move sg_init_table out of timing
+ loops
+Date: Tue, 30 Oct 2007 11:31:45 +0200
+Message-ID: <4726FA01.2030002@panasas.com>
+References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au> <20071029201627.GD7499@kernel.dk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from brick.kernel.dk ([87.55.233.238]:27368 "EHLO kernel.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752727AbXJ3FvA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Oct 2007 01:51:00 -0400
-Content-Disposition: inline
-In-Reply-To: <20071030000827.GA9037@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
+To: Jens Axboe <jens.axboe@oracle.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20071029201627.GD7499@kernel.dk>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 30 2007, Herbert Xu wrote:
-> On Mon, Oct 29, 2007 at 09:16:27PM +0100, Jens Axboe wrote:
-> > On Fri, Oct 26 2007, Herbert Xu wrote:
-> > > [CRYPTO] tcrypt: Move sg_init_table out of timing loops
-> > > 
-> > > This patch moves the sg_init_table out of the timing loops for hash
-> > > algorithms so that it doesn't impact on the speed test results.
-> > 
-> > Wouldn't it be better to just make sg_init_one() call sg_init_table?
+On Mon, Oct 29 2007 at 22:16 +0200, Jens Axboe <jens.axboe@oracle.com> wrote:
+> On Fri, Oct 26 2007, Herbert Xu wrote:
+>> [CRYPTO] tcrypt: Move sg_init_table out of timing loops
+>>
+>> This patch moves the sg_init_table out of the timing loops for hash
+>> algorithms so that it doesn't impact on the speed test results.
 > 
-> This looks fine to me although I think it's orthogonal to the
-> patch you were quoting :)
+> Wouldn't it be better to just make sg_init_one() call sg_init_table?
+> 
+> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+> index 4571231..ccc55a6 100644
+> --- a/include/linux/scatterlist.h
+> +++ b/include/linux/scatterlist.h
+> @@ -202,28 +202,6 @@ static inline void __sg_mark_end(struct scatterlist *sg)
+>  }
+>  
+>  /**
+> - * sg_init_one - Initialize a single entry sg list
+> - * @sg:		 SG entry
+> - * @buf:	 Virtual address for IO
+> - * @buflen:	 IO length
+> - *
+> - * Notes:
+> - *   This should not be used on a single entry that is part of a larger
+> - *   table. Use sg_init_table() for that.
+> - *
+> - **/
+> -static inline void sg_init_one(struct scatterlist *sg, const void *buf,
+> -			       unsigned int buflen)
+> -{
+> -	memset(sg, 0, sizeof(*sg));
+> -#ifdef CONFIG_DEBUG_SG
+> -	sg->sg_magic = SG_MAGIC;
+> -#endif
+> -	sg_mark_end(sg, 1);
+> -	sg_set_buf(sg, buf, buflen);
+> -}
+> -
+> -/**
+>   * sg_init_table - Initialize SG table
+>   * @sgl:	   The SG table
+>   * @nents:	   Number of entries in table
+> @@ -247,6 +225,24 @@ static inline void sg_init_table(struct scatterlist *sgl, unsigned int nents)
+>  }
+>  
+>  /**
+> + * sg_init_one - Initialize a single entry sg list
+> + * @sg:		 SG entry
+> + * @buf:	 Virtual address for IO
+> + * @buflen:	 IO length
+> + *
+> + * Notes:
+> + *   This should not be used on a single entry that is part of a larger
+> + *   table. Use sg_init_table() for that.
+> + *
+> + **/
+> +static inline void sg_init_one(struct scatterlist *sg, const void *buf,
+> +			       unsigned int buflen)
+> +{
+> +	sg_init_table(sg, 1);
+> +	sg_set_buf(sg, buf, buflen);
+> +}
+> +
+> +/**
+>   * sg_phys - Return physical address of an sg entry
+>   * @sg:	     SG entry
+>   *
+> 
+Yes please submit this patch. scsi-ml is full of sg_init_one, specially
+on the error recovery path.
 
-How so? The reason you changed it to sg_init_table() + sg_set_buf() is
-exactly because sg_init_one() didn't properly init the entry (as they
-name promised).
-
--- 
-Jens Axboe
+Thanks
+Boaz
