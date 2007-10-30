@@ -1,41 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Jens Axboe <jens.axboe@oracle.com>
 Subject: Re: [PATCH 1/2] [CRYPTO] tcrypt: Move sg_init_table out of timing loops
-Date: Tue, 30 Oct 2007 08:08:27 +0800
-Message-ID: <20071030000827.GA9037@gondor.apana.org.au>
-References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au> <20071029201627.GD7499@kernel.dk>
+Date: Tue, 30 Oct 2007 06:50:58 +0100
+Message-ID: <20071030055056.GG7499@kernel.dk>
+References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au> <20071029201627.GD7499@kernel.dk> <20071030000827.GA9037@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org
-To: Jens Axboe <jens.axboe@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1307 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752873AbXJ3AJ3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Oct 2007 20:09:29 -0400
+Received: from brick.kernel.dk ([87.55.233.238]:27368 "EHLO kernel.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752727AbXJ3FvA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Oct 2007 01:51:00 -0400
 Content-Disposition: inline
-In-Reply-To: <20071029201627.GD7499@kernel.dk>
+In-Reply-To: <20071030000827.GA9037@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 29, 2007 at 09:16:27PM +0100, Jens Axboe wrote:
-> On Fri, Oct 26 2007, Herbert Xu wrote:
-> > [CRYPTO] tcrypt: Move sg_init_table out of timing loops
+On Tue, Oct 30 2007, Herbert Xu wrote:
+> On Mon, Oct 29, 2007 at 09:16:27PM +0100, Jens Axboe wrote:
+> > On Fri, Oct 26 2007, Herbert Xu wrote:
+> > > [CRYPTO] tcrypt: Move sg_init_table out of timing loops
+> > > 
+> > > This patch moves the sg_init_table out of the timing loops for hash
+> > > algorithms so that it doesn't impact on the speed test results.
 > > 
-> > This patch moves the sg_init_table out of the timing loops for hash
-> > algorithms so that it doesn't impact on the speed test results.
+> > Wouldn't it be better to just make sg_init_one() call sg_init_table?
 > 
-> Wouldn't it be better to just make sg_init_one() call sg_init_table?
+> This looks fine to me although I think it's orthogonal to the
+> patch you were quoting :)
 
-This looks fine to me although I think it's orthogonal to the
-patch you were quoting :)
+How so? The reason you changed it to sg_init_table() + sg_set_buf() is
+exactly because sg_init_one() didn't properly init the entry (as they
+name promised).
 
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jens Axboe
