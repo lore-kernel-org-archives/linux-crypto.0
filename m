@@ -1,38 +1,39 @@
-From: Jens Axboe <jens.axboe@oracle.com>
-Subject: Re: [PATCH 1/2] [CRYPTO] tcrypt: Move sg_init_table out of timing
-	loops
-Date: Tue, 30 Oct 2007 15:17:54 +0100
-Message-ID: <20071030141754.GT4993@kernel.dk>
-References: <20071026145905.GA13850@gondor.apana.org.au> <E1IlQfM-0003cO-00@gondolin.me.apana.org.au> <20071029201627.GD7499@kernel.dk> <20071030000827.GA9037@gondor.apana.org.au> <20071030055056.GG7499@kernel.dk> <20071030141820.GA16501@gondor.apana.org.au>
+From: Eran Ben-Avi <eranpublic@yahoo.com>
+Subject: mtu/fragmentation problem with openswan 2.4.9
+Date: Thu, 1 Nov 2007 07:25:34 -0700 (PDT)
+Message-ID: <246126.71492.qm@web62511.mail.re1.yahoo.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1755958AbXJ3OUk@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20071030141820.GA16501@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from web62511.mail.re1.yahoo.com ([69.147.75.103]:29597 "HELO
+	web62511.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1753490AbXKAOcP convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Nov 2007 10:32:15 -0400
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 30 2007, Herbert Xu wrote:
-> On Tue, Oct 30, 2007 at 06:50:58AM +0100, Jens Axboe wrote:
-> >
-> > How so? The reason you changed it to sg_init_table() + sg_set_buf() is
-> > exactly because sg_init_one() didn't properly init the entry (as they
-> > name promised).
-> 
-> For one of the cases yes but the other one repeatedly calls
-> sg_init_one on the same sg entry while we really only need
-> to initialise it once and call sg_set_buf afterwards.
-> 
-> Normally this is irrelevant but the loops in question are
-> trying to estimate the speed of the algorithms so it's good
-> to exclude as much noise from them as possible.
+Hi,
 
-Ah OK, I was referring to the replacement mentioned above.
+I encountered the following issue while working with openswan 2.4.9 on kernel 2.6.22.7:
+When I established ipsec tunnel connection between my reference board(ARM) running openswan  Vs.  
+windowsXP and tried to send file via ftp(PUT) from the board to  PC  I got the following error loop:
+klips_error:ipsec_xmit_send: ip_send() failed, err=90 .
+It seems like the ipsec0 device receives 1514 bytes packet from the ip stack and after adding the ipsec header it sends 1536 bytes which cross mtu boundery(1500) and therefore receive this error status from ip_fragment.
+I tested the same scenario with openswan 2.4.2 on kernel 2.6.12.6 and after the first error it seems like the linux stack was able to recover (maybe by sending the ICMP from ip_fragment ???) .
+I know I can prevent this problem by decreasing the ipsec0 mtu size to < ~1460b or to enable ip_no_pmtu_disc but it seems like bypassing the "real: problem.
 
--- 
-Jens Axboe
+Any suggestions ?
+
+Thanks,
+Eran Ben-Avi   
+
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
