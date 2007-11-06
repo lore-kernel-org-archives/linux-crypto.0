@@ -1,120 +1,170 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH] [CRYPTO] Extend sha256_generic.c to support SHA-224
-	and SHA-224-HMAC
-Date: Tue, 6 Nov 2007 20:02:42 +0100
-Message-ID: <20071106190242.GC15572@Chamillionaire.breakpoint.cc>
-References: <20071106182800.GA32299@compsoc.nuigalway.ie>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: Re: Patch to support stream ciphers
+Date: Wed, 7 Nov 2007 03:11:36 +0800
+Message-ID: <fd3e431c0711061111t440b02bcgbcdfbd269e33c8d6@mail.gmail.com>
+References: <fd3e431c0710251055n1e810c90u285bb0be7d95dd07@mail.gmail.com>
+	 <20071026102102.GB4970@2ka.mipt.ru>
+	 <fd3e431c0711031035k11cd9dfbt26d9fb9b2c52eb20@mail.gmail.com>
+	 <20071106121909.GA30349@2ka.mipt.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: Jonathan Lynch <jonathan.lynch@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "Linux Crypto" <linux-crypto@vger.kernel.org>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>
+To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:37753 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752973AbXKFTCq (ORCPT
+Received: from nz-out-0506.google.com ([64.233.162.238]:24217 "EHLO
+	nz-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753324AbXKFTLn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2007 14:02:46 -0500
+	Tue, 6 Nov 2007 14:11:43 -0500
+Received: by nz-out-0506.google.com with SMTP id s18so1439316nze
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Nov 2007 11:11:42 -0800 (PST)
+In-Reply-To: <20071106121909.GA30349@2ka.mipt.ru>
 Content-Disposition: inline
-In-Reply-To: <20071106182800.GA32299@compsoc.nuigalway.ie>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Jonathan Lynch | 2007-11-06 18:28:00 [+0000]:
+Hi Evgeniy,
 
->SHA-224 should be chosen as a hash algorithm when 112 bits of security
->strength is required.
+Thanks for the reply. Unfortunately my previous email did not make it
+on to the mailing list (it is blocked by Majorodomo as it exceeded
+100,000 bytes) so only you and Herbert received it. The rest of the
+reader would surely be confused by our current exchange. My apologies!
 
-Who uses such an algorithm (in terms of application)?
+I have rewrote the patch to avoid setting "cia_encrypt = NULL" and
+will be re-posting them. Also I will hold back the SOSEMANUK cipher
+for now.
 
->diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/tcrypt.c linux-2.6.24-rc1/crypto/tcrypt.c
->--- linux-2.6.24-rc1-vanilla/crypto/tcrypt.c	2007-11-05 17:12:50.468842000 +0000
->+++ linux-2.6.24-rc1/crypto/tcrypt.c	2007-11-06 10:20:30.985270000 +0000
->@@ -1097,10 +1102,14 @@ static void do_test(void)
-> 		break;
-> 
-> 	case 6:
->-		test_hash("sha256", sha256_tv_template, SHA256_TEST_VECTORS);
->+		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
-> 		break;
-> 
-> 	case 7:
->+		test_hash("sha256", sha256_tv_template, SHA256_TEST_VECTORS);
->+		break;
->+
->+	case 8:
-> 		test_cipher("ecb(blowfish)", ENCRYPT, bf_enc_tv_template,
-> 			    BF_ENC_TEST_VECTORS);
-> 		test_cipher("ecb(blowfish)", DECRYPT, bf_dec_tv_template,
->@@ -1111,7 +1120,7 @@ static void do_test(void)
-> 			    BF_CBC_DEC_TEST_VECTORS);
-> 		break;
-> 
->-	case 8:
->+	case 9:
-> 		test_cipher("ecb(twofish)", ENCRYPT, tf_enc_tv_template,
-> 			    TF_ENC_TEST_VECTORS);
-> 		test_cipher("ecb(twofish)", DECRYPT, tf_dec_tv_template,
+Swee Heng
 
-Extend does not mean you change the user interface of the module. Please
-pick your own number. This breaks atleast two of mine scripts.
-
->diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/tcrypt.h linux-2.6.24-rc1/crypto/tcrypt.h
->--- linux-2.6.24-rc1-vanilla/crypto/tcrypt.h	2007-11-05 17:12:50.492842000 +0000
->+++ linux-2.6.24-rc1/crypto/tcrypt.h	2007-11-05 18:18:31.610720000 +0000
->@@ -173,6 +173,33 @@ static struct hash_testvec sha1_tv_templ
-> 	}
-> };
-> 
->+
->+/*
->+ * SHA224 test vectors from from FIPS PUB 180-2
->+ */
->+#define SHA224_TEST_VECTORS     2
->+
->+static struct hash_testvec sha224_tv_template[] = {
->+	{
->+		.plaintext = "abc",
->+		.psize  = 3,
->+		.digest = { 0x23, 0x09, 0x7D, 0x22, 0x34, 0x05, 0xD8, 0x22,
->+			0x86, 0x42, 0xA4, 0x77, 0xBD, 0xA2, 0x55, 0xB3,
->+			0x2A, 0xAD, 0xBC, 0xE4, 0xBD, 0xA0, 0xB3, 0xF7,
->+			0xE3, 0x6C, 0x9D, 0xA7},
->+	}, {
->+		.plaintext =
->+		"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
->+		.psize  = 56,
->+		.digest = { 0x75, 0x38, 0x8B, 0x16, 0x51, 0x27, 0x76, 0xCC,
->+			0x5D, 0xBA, 0x5D, 0xA1, 0xFD, 0x89, 0x01, 0x50,
->+			0xB0, 0xC6, 0x45, 0x5C, 0xB4, 0xF5, 0x8B, 0x19,
->+			0x52, 0x52, 0x25, 0x25 },
->+		.np     = 2,
->+		.tap    = { 28, 28 }
->+	}
->+};
->+
-> /*
->  * SHA256 test vectors from from NIST
->  */
->@@ -753,6 +780,7 @@ static struct hash_testvec hmac_md5_tv_t
-> 	},
-> };
-> 
->+
-> /*
->  * HMAC-SHA1 test vectors from RFC2202
->  */
->@@ -817,6 +845,121 @@ static struct hash_testvec hmac_sha1_tv_
-> 	},
-> };
-> 
->+
->+/*
->+ * SHA224 HMAC test vectors from RFC4231
->+ */
->+#define HMAC_SHA224_TEST_VECTORS    4
->+
->+static struct hash_testvec hmac_sha224_tv_template[] = {
-
-Please don't introduce any empty lines. You could save hunk #2 btw :)
-
-Sebastian
+On Nov 6, 2007 8:19 PM, Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
+> Hi.
+>
+> On Sun, Nov 04, 2007 at 01:35:14AM +0800, Tan Swee Heng (thesweeheng@gmail.com) wrote:
+> > CHANGES
+> > 1. stream.c's blocksize is now 1 since (i) it makes more sense and
+> > (ii) the latest 2.6.24-rc1 git allows it.
+> > 2. SOSEMANUK, another eSTREAM candidate, has been ported.
+> > 3. Got rid of "coding style issues".. although I am not sure if I've
+> > eradicated all of them :-)
+>
+> I have some minor comments inlined below.
+> Btw, it is much better if you inline patch and put them into several
+> mails if needed.
+>
+> > TESTING
+> > 1. I've used "insmod tcrypt.ko mode=X" (X=34 for Salsa20 and X=35 for
+> > SOSEMANUK). The test vectors agree.
+> > 2. I've used "cryptsetup luksFormat -c salsa20-stream-plain
+> > /dev/loop0". That worked fine and I was able to create an encrypted
+> > ext2 filesystem using Salsa20 as the cipher.
+> > 3. However "cryptsetup luksFormat -c sosemanuk-stream-plain
+> > /dev/loop0" didn't work that well as I was unable to unlock using
+> > "cryptsetup luksOpen" later. (I am not sure where the problems lie.
+> > Any suggestion is welcomed.)
+>
+> Add debug prints all over the place and find where the problem lies...
+>
+> > BUG
+> > My patches currently set cia_encrypt and cia_decrypt to NULL. That
+> > isn't quite safe. Someone using luksFormat with "-c salsa20-cbc-plain"
+> > may cause the kernel to behave in an unbecoming manner as cbc will try
+> > to use salsa20's cia_encrypt. (Any suggestion is welcomed on how this
+> > can be avoided.)
+>
+> > PATCHES
+> > Attached to this mail are the patches. I've split them into 3 this
+> > time so as to make clear what are the changes for stream, salsa20 and
+> > sosemanuk respectively. They need to be applied in succession to the
+> > latest 2.6.24-rc1 cryptodev git.
+> >
+> > Swee Heng
+>
+> +static int crypto_stream_crypt_walk(struct blkcipher_walk *walk,
+> +                                   struct crypto_cipher *tfm)
+> +{
+> +       void (*fn)(struct crypto_tfm *, u8 *, const u8 *, u32) =
+> +               crypto_cipher_alg(tfm)->cia_setiv_crypt;
+> +       unsigned int nbytes = walk->nbytes;
+> +       u8 *src = walk->src.virt.addr;
+> +       u8 *dst = walk->dst.virt.addr;
+> +       u8 *iv = walk->iv;
+> +
+> +       if(dst != src)
+>
+> Need a space.
+>
+> +               memcpy(dst, src, nbytes);
+> +       fn(crypto_cipher_tfm(tfm), dst, iv, nbytes);
+> +       return 0;
+> +}
+>
+> +       if (!(alg->cra_blocksize % 4))
+> +               inst->alg.cra_alignmask |= 3;
+>
+> You have not changed align mask as wanted originally - is it intentional?
+>
+> +       inst->alg.cra_blkcipher.ivsize = 1;
+> +       inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
+> +       inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
+> +
+> +       inst->alg.cra_ctxsize = sizeof(struct crypto_stream_ctx);
+> +
+> +       inst->alg.cra_init = crypto_stream_init_tfm;
+> +       inst->alg.cra_exit = crypto_stream_exit_tfm;
+> +
+> +       inst->alg.cra_blkcipher.setkey = crypto_stream_setkey;
+> +       inst->alg.cra_blkcipher.encrypt = crypto_stream_crypt;
+> +       inst->alg.cra_blkcipher.decrypt = crypto_stream_crypt;
+> +
+> +out_put_alg:
+> +       crypto_mod_put(alg);
+> +       return inst;
+> +}
+>
+>
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -214,6 +214,10 @@ struct cipher_alg {
+>                           unsigned int keylen);
+>         void (*cia_encrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
+>         void (*cia_decrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
+> +
+> +       unsigned int cia_ivsize;
+> +       void (*cia_setiv_crypt)(struct crypto_tfm *tfm, u8 *dst,
+> +                               const u8 *iv, u32 nbytes);
+>  };
+>
+> I'm not sure it is a good way - you can save this iv and its size in the
+> context and get it from cipher's encrypt/decrypt callback.
+> Or modify every encrypt and decrypt callback to have iv as parameter,
+> which I believe not a good solution.
+>
+> In any case, you have to disallow unsupported usage (like cbc) in your
+> cipher callbacks.
+>
+> +static void xor_byte(u8 *a, const u8 *b, unsigned int bs)
+> +{
+> +        for (; bs; bs--)
+> +                *a++ ^= *b++;
+> +}
+> +
+> +static void xor_quad(u8 *dst, const u8 *src, unsigned int bs)
+> +{
+> +        u32 *a = (u32 *)dst;
+> +        u32 *b = (u32 *)src;
+> +
+> +        for (; bs >= 4; bs -= 4)
+> +                *a++ ^= *b++;
+> +
+> +        xor_byte((u8 *)a, (u8 *)b, bs);
+> +}
+>
+> This ones exist in cbc at least - move them into common header.
+> The same applies to sosemanuk algo.
+>
+>
+> --
+>         Evgeniy Polyakov
+>
