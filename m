@@ -1,113 +1,148 @@
-From: Eran Ben-Avi <eranpublic@yahoo.com>
-Subject: improper initialization of ipsec_table  in openswan 2.4.9
-Date: Tue, 6 Nov 2007 04:04:12 -0800 (PST)
-Message-ID: <537818.31005.qm@web62507.mail.re1.yahoo.com>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: Patch to support stream ciphers
+Date: Tue, 6 Nov 2007 15:19:09 +0300
+Message-ID: <20071106121909.GA30349@2ka.mipt.ru>
+References: <fd3e431c0710251055n1e810c90u285bb0be7d95dd07@mail.gmail.com> <20071026102102.GB4970@2ka.mipt.ru> <fd3e431c0711031035k11cd9dfbt26d9fb9b2c52eb20@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1932733950-1194350652=:31005"
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from web62507.mail.re1.yahoo.com ([69.147.75.99]:30494 "HELO
-	web62507.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1755458AbXKFMEN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2007 07:04:13 -0500
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:42735 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752464AbXKFMTX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 Nov 2007 07:19:23 -0500
+Content-Disposition: inline
+In-Reply-To: <fd3e431c0711031035k11cd9dfbt26d9fb9b2c52eb20@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
---0-1932733950-1194350652=:31005
-Content-Type: text/plain; charset=us-ascii
+Hi.
 
-Hi,
+On Sun, Nov 04, 2007 at 01:35:14AM +0800, Tan Swee Heng (thesweeheng@gmail.com) wrote:
+> CHANGES
+> 1. stream.c's blocksize is now 1 since (i) it makes more sense and
+> (ii) the latest 2.6.24-rc1 git allows it.
+> 2. SOSEMANUK, another eSTREAM candidate, has been ported.
+> 3. Got rid of "coding style issues".. although I am not sure if I've
+> eradicated all of them :-)
 
-While working with openswan 2.4.9  on kernel 2.6.22.7 I found a bug in file sysctl_net_ipsec.c.
-The initialization of ipsec_table is improper for newer kernel versions since ctl_table structure was updated.
-The 7th parameter which refer to *parent was initialized mistakenly with *proc_handler as it was in older kernel versions.
-As a result ipsec proc entries under /proc/sys/net/ipsec were created as directories instead of files which led  to improper behavior of openswan.
-Patch attached - the patch is only for newer kernel versions.Ofcourse it should be updated for backward compatibility.
+I have some minor comments inlined below.
+Btw, it is much better if you inline patch and put them into several
+mails if needed.
+
+> TESTING
+> 1. I've used "insmod tcrypt.ko mode=X" (X=34 for Salsa20 and X=35 for
+> SOSEMANUK). The test vectors agree.
+> 2. I've used "cryptsetup luksFormat -c salsa20-stream-plain
+> /dev/loop0". That worked fine and I was able to create an encrypted
+> ext2 filesystem using Salsa20 as the cipher.
+> 3. However "cryptsetup luksFormat -c sosemanuk-stream-plain
+> /dev/loop0" didn't work that well as I was unable to unlock using
+> "cryptsetup luksOpen" later. (I am not sure where the problems lie.
+> Any suggestion is welcomed.)
+
+Add debug prints all over the place and find where the problem lies...
+
+> BUG
+> My patches currently set cia_encrypt and cia_decrypt to NULL. That
+> isn't quite safe. Someone using luksFormat with "-c salsa20-cbc-plain"
+> may cause the kernel to behave in an unbecoming manner as cbc will try
+> to use salsa20's cia_encrypt. (Any suggestion is welcomed on how this
+> can be avoided.)
+
+> PATCHES
+> Attached to this mail are the patches. I've split them into 3 this
+> time so as to make clear what are the changes for stream, salsa20 and
+> sosemanuk respectively. They need to be applied in succession to the
+> latest 2.6.24-rc1 cryptodev git.
+> 
+> Swee Heng
+
++static int crypto_stream_crypt_walk(struct blkcipher_walk *walk,
++				    struct crypto_cipher *tfm)
++{
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *, u32) =
++		crypto_cipher_alg(tfm)->cia_setiv_crypt;
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	u8 *iv = walk->iv;
++
++	if(dst != src)
+
+Need a space.
+
++		memcpy(dst, src, nbytes);
++	fn(crypto_cipher_tfm(tfm), dst, iv, nbytes);
++	return 0;
++}
+
++	if (!(alg->cra_blocksize % 4))
++		inst->alg.cra_alignmask |= 3;
+
+You have not changed align mask as wanted originally - is it intentional?
+
++	inst->alg.cra_blkcipher.ivsize = 1;
++	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
++	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
++
++	inst->alg.cra_ctxsize = sizeof(struct crypto_stream_ctx);
++
++	inst->alg.cra_init = crypto_stream_init_tfm;
++	inst->alg.cra_exit = crypto_stream_exit_tfm;
++
++	inst->alg.cra_blkcipher.setkey = crypto_stream_setkey;
++	inst->alg.cra_blkcipher.encrypt = crypto_stream_crypt;
++	inst->alg.cra_blkcipher.decrypt = crypto_stream_crypt;
++
++out_put_alg:
++	crypto_mod_put(alg);
++	return inst;
++}
 
 
-Regards,
-Eran Ben-Avi
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -214,6 +214,10 @@ struct cipher_alg {
+ 	                  unsigned int keylen);
+ 	void (*cia_encrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
+ 	void (*cia_decrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
++
++	unsigned int cia_ivsize;
++	void (*cia_setiv_crypt)(struct crypto_tfm *tfm, u8 *dst,
++				const u8 *iv, u32 nbytes);
+ };
+
+I'm not sure it is a good way - you can save this iv and its size in the
+context and get it from cipher's encrypt/decrypt callback.
+Or modify every encrypt and decrypt callback to have iv as parameter,
+which I believe not a good solution.
+
+In any case, you have to disallow unsupported usage (like cbc) in your
+cipher callbacks.
+
++static void xor_byte(u8 *a, const u8 *b, unsigned int bs)
++{
++        for (; bs; bs--)
++                *a++ ^= *b++;
++}
++
++static void xor_quad(u8 *dst, const u8 *src, unsigned int bs)
++{
++        u32 *a = (u32 *)dst;
++        u32 *b = (u32 *)src;
++
++        for (; bs >= 4; bs -= 4)
++                *a++ ^= *b++;
++        
++        xor_byte((u8 *)a, (u8 *)b, bs);
++}
+
+This ones exist in cbc at least - move them into common header.
+The same applies to sosemanuk algo.
 
 
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-1932733950-1194350652=:31005
-Content-Type: text/x-patch; name="=?utf-8?q?sysctl.patch?="
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="=?utf-8?q?sysctl.patch?="
-
-LS0tIGxpbnV4L25ldC9pcHNlYy9zeXNjdGxfbmV0X2lwc2VjLmMJMjAwNC0w
-Ny0xMCAxNzoxMToxOC4wMDAwMDAwMDAgLTAyMDAKKysrIC4uL29wZW5zd2Fu
-LTIuNC45X2EvbGludXgvbmV0L2lwc2VjL3N5c2N0bF9uZXRfaXBzZWMuYwky
-MDA3LTExLTA2IDExOjEzOjEzLjAwMDAwMDAwMCAtMDIwMApAQCAtNzQsNDUg
-Kzc0LDQ1IEBACiBzdGF0aWMgY3RsX3RhYmxlIGlwc2VjX3RhYmxlW10gPSB7
-CiAjaWZkZWYgQ09ORklHX0tMSVBTX0RFQlVHCiAJeyBORVRfSVBTRUNfREVC
-VUdfQUgsICJkZWJ1Z19haCIsICZkZWJ1Z19haCwKLQkgIHNpemVvZihpbnQp
-LCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9m
-KGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAg
-CiAJeyBORVRfSVBTRUNfREVCVUdfRVNQLCAiZGVidWdfZXNwIiwgJmRlYnVn
-X2VzcCwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2lu
-dHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEws
-ICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfVFVO
-TkVMLCAiZGVidWdfdHVubmVsIiwgJmRlYnVnX3R1bm5lbCwKLQkgIHNpemVv
-ZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAg
-c2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVj
-fSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfRVJPVVRFLCAiZGVidWdfZXJv
-dXRlIiwgJmRlYnVnX2Vyb3V0ZSwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBO
-VUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2
-NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRf
-SVBTRUNfREVCVUdfU1BJLCAiZGVidWdfc3BpIiwgJmRlYnVnX3NwaSwKLQkg
-IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
-IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
-aW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfUkFESUosICJkZWJ1
-Z19yYWRpaiIsICZkZWJ1Z19yYWRpaiwKLQkgIHNpemVvZihpbnQpLCAwNjQ0
-LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCks
-IDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBO
-RVRfSVBTRUNfREVCVUdfTkVUTElOSywgImRlYnVnX25ldGxpbmsiLCAmZGVi
-dWdfbmV0bGluaywKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJv
-Y19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEws
-IE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVC
-VUdfWEZPUk0sICJkZWJ1Z194Zm9ybSIsICZkZWJ1Z194Zm9ybSwKLQkgIHNp
-emVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAor
-CSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50
-dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfUkNWLCAiZGVidWdfcmN2
-IiwgJmRlYnVnX3JjdiwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAm
-cHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5V
-TEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNf
-REVCVUdfUEZLRVksICJkZWJ1Z19wZmtleSIsICZkZWJ1Z19wZmtleSwKLQkg
-IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
-IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
-aW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfVkVSQk9TRSwgImRl
-YnVnX3ZlcmJvc2UiLCZzeXNjdGxfaXBzZWNfZGVidWdfdmVyYm9zZSwKLQkg
-IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
-IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
-aW50dmVjfSwgICAgCiAjaWZkZWYgQ09ORklHX0tMSVBTX0lQQ09NUAogCXsg
-TkVUX0lQU0VDX0RFQlVHX0lQQ09NUCwgImRlYnVnX2lwY29tcCIsICZzeXNj
-dGxfaXBzZWNfZGVidWdfaXBjb21wLAotCSAgc2l6ZW9mKGludCksIDA2NDQs
-IE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCisJICBzaXplb2YoaW50KSwg
-MDY0NCwgTlVMTCwgTlVMTCwgJnByb2NfZG9pbnR2ZWN9LCAgICAKICNlbmRp
-ZiAvKiBDT05GSUdfS0xJUFNfSVBDT01QICovCiAKICNpZmRlZiBDT05GSUdf
-S0xJUFNfUkVHUkVTUwogCXsgTkVUX0lQU0VDX1JFR1JFU1NfUEZLRVlfTE9T
-U0FHRSwgInBma2V5X2xvc3NhZ2UiLAogCSAgJnN5c2N0bF9pcHNlY19yZWdy
-ZXNzX3Bma2V5X2xvc3NhZ2UsCi0JICBzaXplb2YoaW50KSwgMDY0NCwgTlVM
-TCwgJnByb2NfZG9pbnR2ZWN9LAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5V
-TEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwKICNlbmRpZiAvKiBDT05GSUdf
-S0xJUFNfUkVHUkVTUyAqLwogCiAjZW5kaWYgLyogQ09ORklHX0tMSVBTX0RF
-QlVHICovCiAJeyBORVRfSVBTRUNfSUNNUCwgImljbXAiLCAmc3lzY3RsX2lw
-c2VjX2ljbXAsCi0JICBzaXplb2YoaW50KSwgMDY0NCwgTlVMTCwgJnByb2Nf
-ZG9pbnR2ZWN9LCAgICAKKwkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCBO
-VUxMLCAmcHJvY19kb2ludHZlY30sICAgIAogCXsgTkVUX0lQU0VDX0lOQk9V
-TkRfUE9MSUNZX0NIRUNLLCAiaW5ib3VuZF9wb2xpY3lfY2hlY2siLCAmc3lz
-Y3RsX2lwc2VjX2luYm91bmRfcG9saWN5X2NoZWNrLAotCSAgc2l6ZW9mKGlu
-dCksIDA2NDQsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCisJICBzaXpl
-b2YoaW50KSwgMDY0NCwgTlVMTCwgTlVMTCwgJnByb2NfZG9pbnR2ZWN9LCAg
-ICAKIAl7IE5FVF9JUFNFQ19UT1MsICJ0b3MiLCAmc3lzY3RsX2lwc2VjX3Rv
-cywKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZl
-Y30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZw
-cm9jX2RvaW50dmVjfSwgICAgCiAJezB9CiB9OwogCg==
-
---0-1932733950-1194350652=:31005--
+-- 
+	Evgeniy Polyakov
