@@ -1,229 +1,113 @@
-From: David McCullough <David_Mccullough@securecomputing.com>
-Subject: Re: Openswan 2.4.9 - tasklet or workqueue ?
-Date: Mon, 5 Nov 2007 13:35:46 +1000
-Message-ID: <20071105033545.GA11607@securecomputing.com>
-References: <43810.2490.qm@web62505.mail.re1.yahoo.com>
+From: Eran Ben-Avi <eranpublic@yahoo.com>
+Subject: improper initialization of ipsec_table  in openswan 2.4.9
+Date: Tue, 6 Nov 2007 04:04:12 -0800 (PST)
+Message-ID: <537818.31005.qm@web62507.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, ocf-linux-users@lists.sourceforge.net
-To: Eran Ben-Avi <eranpublic@yahoo.com>
+Content-Type: multipart/mixed; boundary="0-1932733950-1194350652=:31005"
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rex.snapgear.com ([203.143.235.140]:47487 "EHLO
-	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753047AbXKEDem (ORCPT
+Received: from web62507.mail.re1.yahoo.com ([69.147.75.99]:30494 "HELO
+	web62507.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1755458AbXKFMEN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 4 Nov 2007 22:34:42 -0500
-Content-Disposition: inline
-In-Reply-To: <43810.2490.qm@web62505.mail.re1.yahoo.com>
+	Tue, 6 Nov 2007 07:04:13 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+--0-1932733950-1194350652=:31005
+Content-Type: text/plain; charset=us-ascii
 
-Jivin Eran Ben-Avi lays it down ...
-...
-> > I have made a few small changes to your patch so it should be safe on
-> > 2.4 systems yet still select tasklets on 2.6 automatically.
-> > 
-> > Could you have a look at it ?  I have done some basic testing here
-> > and it seems ok,  haven't checked your performance increases yet ;-)
-> > 
-> Sorry for the late response.
-> It seems to be ok. I will test it more intensely in the next few days.
+Hi,
+
+While working with openswan 2.4.9  on kernel 2.6.22.7 I found a bug in file sysctl_net_ipsec.c.
+The initialization of ipsec_table is improper for newer kernel versions since ctl_table structure was updated.
+The 7th parameter which refer to *parent was initialized mistakenly with *proc_handler as it was in older kernel versions.
+As a result ipsec proc entries under /proc/sys/net/ipsec were created as directories instead of files which led  to improper behavior of openswan.
+Patch attached - the patch is only for newer kernel versions.Ofcourse it should be updated for backward compatibility.
 
 
-No problems,  I have it sitting there ready to go :-)
+Regards,
+Eran Ben-Avi
 
-Cheers,
-Davidm
 
-> > -----Inline Attachment Follows-----
-> > 
-> > Index: openswan/linux/include/openswan/ipsec_rcv.h
-> > ===================================================================
-> > RCS file: openswan/linux/include/openswan/ipsec_rcv.h,v
-> > retrieving revision 1.13
-> > diff -u -r1.13 ipsec_rcv.h
-> > --- openswan/linux/include/openswan/ipsec_rcv.h    26 Jun 2007
-> > 06:28:52
-> > 
->  -0000    1.13
-> > +++ openswan/linux/include/openswan/ipsec_rcv.h    26 Sep 2007
-> > 14:17:25
-> > 
->  -0000
-> > @@ -149,6 +149,9 @@
-> >  
-> >  #ifdef CONFIG_KLIPS_OCF
-> >      struct work_struct    workq;
-> > +#ifdef DECLARE_TASKLET
-> > +    struct tasklet_struct    tasklet;
-> > +#endif
-> >  #endif
-> >  #ifndef NET_21
-> >      struct net_device *devp;
-> > Index: openswan/linux/include/openswan/ipsec_xmit.h
-> > ===================================================================
-> > RCS file: openswan/linux/include/openswan/ipsec_xmit.h,v
-> > retrieving revision 1.9
-> > diff -u -r1.9 ipsec_xmit.h
-> > --- openswan/linux/include/openswan/ipsec_xmit.h    26 Jun
-> > 2007
-> > 
->  05:26:25 -0000    1.9
-> > +++ openswan/linux/include/openswan/ipsec_xmit.h    26 Sep
-> > 2007
-> > 
->  14:17:25 -0000
-> > @@ -140,6 +140,9 @@
-> >      int        next_state;
-> >  #ifdef CONFIG_KLIPS_OCF
-> >      struct work_struct    workq;
-> > +#ifdef DECLARE_TASKLET
-> > +    struct tasklet_struct    tasklet;
-> > +#endif
-> >  #endif
-> >  #ifdef CONFIG_KLIPS_ALG
-> >      struct ipsec_alg_auth *ixt_a;
-> > Index: openswan/linux/net/ipsec/ipsec_ocf.c
-> > ===================================================================
-> > RCS file: openswan/linux/net/ipsec/ipsec_ocf.c,v
-> > retrieving revision 1.27
-> > diff -u -r1.27 ipsec_ocf.c
-> > --- openswan/linux/net/ipsec/ipsec_ocf.c    11 Jul 2007 00:35:01
-> > -0000
-> > 
->     1.27
-> > +++ openswan/linux/net/ipsec/ipsec_ocf.c    26 Sep 2007 14:17:25 -0000
-> > @@ -56,7 +56,11 @@
-> >  #define USE_BATCH 1    /* enable batch mode */
-> >  #define USE_CBIMM 1    /* enable immediate callbacks */
-> >  #define FORCE_QS  0    /* force use of queues for continuation
-> > of
-> > 
->  state machine */
-> > -
-> > +#ifdef DECLARE_TASKLET
-> > +#define USE_TASKLET 1  /* use tasklet for continuation of
-> > state
-> > 
->  machine */
-> > +#else
-> > +#define USE_TASKLET 0  /* don't use tasklet for continuation of
-> > state
-> > 
->  machine */
-> > +#endif
-> >  /*
-> >   * Because some OCF operations are synchronous (ie.,
-> > software
-> > 
->  encryption)
-> >   * we need to protect ourselves from distructive re-entry.  All we do
-> > @@ -83,15 +87,21 @@
-> >          (*sm)(arg); \
-> >      })
-> >  
-> > -#if FORCE_QS == 0
-> > -    #define PROCESS_NEXT(wq, wqsm, sm, arg) \
-> > +#if USE_TASKLET == 1
-> > +    #define PROCESS_NEXT(this, wqsm, sm) ({ \
-> > +        tasklet_init(&this->tasklet, \
-> > +            (void (*)(unsigned long)) sm, (unsigned long)this); \
-> > +        tasklet_schedule(&this->tasklet); \
-> > +        })
-> > +#elif FORCE_QS == 0
-> > +    #define PROCESS_NEXT(this, wqsm, sm) \
-> >          if (in_interrupt()) { \
-> > -            PROCESS_LATER(wq, wqsm, arg); \
-> > +            PROCESS_LATER(this->workq, wqsm, this); \
-> >          } else { \
-> > -            PROCESS_NOW(sm, arg); \
-> > +            PROCESS_NOW(sm, this); \
-> >          }
-> >  #else
-> > -    #define PROCESS_NEXT(wq, wqsm, sm, arg) PROCESS_LATER(wq,
-> > wqsm,
-> > 
->  arg)
-> > +    #define PROCESS_NEXT(this, wqsm, sm)
-> > PROCESS_LATER(this->workq,
-> > 
->  wqsm, this)
-> >  #endif
-> >  
-> >  /*
-> > @@ -218,6 +228,7 @@
-> >      return 1;
-> >  }
-> >  
-> > +#if USE_TASKLET == 0
-> >  #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
-> >  static void
-> >  ipsec_rsm_wq(struct work_struct *work)
-> > @@ -228,6 +239,7 @@
-> >  #else
-> >  #define    ipsec_rsm_wq    ipsec_rsm
-> >  #endif
-> > +#endif /* USE_TASKLET */
-> >  
-> >  static int
-> >  ipsec_ocf_rcv_cb(struct cryptop *crp)
-> > @@ -235,7 +247,6 @@
-> >      struct ipsec_rcv_state *irs = (struct
-> > ipsec_rcv_state
-> > 
->  *)crp->crp_opaque;
-> >  
-> >      KLIPS_PRINT(debug_rcv, "klips_debug:ipsec_ocf_rcv_cb\n");
-> > -
-> >      if (irs == NULL) {
-> >          KLIPS_PRINT(debug_rcv, "klips_debug:ipsec_ocf_rcv_cb: "
-> >                  "NULL irs in callback\n");
-> > @@ -273,7 +284,7 @@
-> >      crp = NULL;
-> >  
-> >      /* setup the rest of the processing now */
-> > -    PROCESS_NEXT(irs->workq, ipsec_rsm_wq, ipsec_rsm, irs);
-> > +    PROCESS_NEXT(irs, ipsec_rsm_wq, ipsec_rsm);
-> >      return 0;
-> >  }
-> >  
-> > @@ -396,6 +407,7 @@
-> >      return(IPSEC_RCV_PENDING);
-> >  }
-> >  
-> > +#if USE_TASKLET == 0
-> >  #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
-> >  static void
-> >  ipsec_xsm_wq(struct work_struct *work)
-> > @@ -406,6 +418,7 @@
-> >  #else
-> >  #define    ipsec_xsm_wq    ipsec_xsm
-> >  #endif
-> > +#endif /* USE_TASKLET */
-> >  
-> >  static int
-> >  ipsec_ocf_xmit_cb(struct cryptop *crp)
-> > @@ -445,7 +458,7 @@
-> >      crp = NULL;
-> >  
-> >      /* setup the rest of the processing now */
-> > -    PROCESS_NEXT(ixs->workq, ipsec_xsm_wq, ipsec_xsm, ixs);
-> > +    PROCESS_NEXT(ixs, ipsec_xsm_wq, ipsec_xsm);
-> >      return 0;
-> >  }
-> >  
-> > 
-> > 
-> 
-> 
-> 
-> __________________________________________________
-> Do You Yahoo!?
-> Tired of spam?  Yahoo! Mail has the best spam protection around 
-> http://mail.yahoo.com
-> 
 
--- 
-David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
-Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+--0-1932733950-1194350652=:31005
+Content-Type: text/x-patch; name="=?utf-8?q?sysctl.patch?="
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="=?utf-8?q?sysctl.patch?="
+
+LS0tIGxpbnV4L25ldC9pcHNlYy9zeXNjdGxfbmV0X2lwc2VjLmMJMjAwNC0w
+Ny0xMCAxNzoxMToxOC4wMDAwMDAwMDAgLTAyMDAKKysrIC4uL29wZW5zd2Fu
+LTIuNC45X2EvbGludXgvbmV0L2lwc2VjL3N5c2N0bF9uZXRfaXBzZWMuYwky
+MDA3LTExLTA2IDExOjEzOjEzLjAwMDAwMDAwMCAtMDIwMApAQCAtNzQsNDUg
+Kzc0LDQ1IEBACiBzdGF0aWMgY3RsX3RhYmxlIGlwc2VjX3RhYmxlW10gPSB7
+CiAjaWZkZWYgQ09ORklHX0tMSVBTX0RFQlVHCiAJeyBORVRfSVBTRUNfREVC
+VUdfQUgsICJkZWJ1Z19haCIsICZkZWJ1Z19haCwKLQkgIHNpemVvZihpbnQp
+LCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9m
+KGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAg
+CiAJeyBORVRfSVBTRUNfREVCVUdfRVNQLCAiZGVidWdfZXNwIiwgJmRlYnVn
+X2VzcCwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2lu
+dHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEws
+ICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfVFVO
+TkVMLCAiZGVidWdfdHVubmVsIiwgJmRlYnVnX3R1bm5lbCwKLQkgIHNpemVv
+ZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAg
+c2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVj
+fSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfRVJPVVRFLCAiZGVidWdfZXJv
+dXRlIiwgJmRlYnVnX2Vyb3V0ZSwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBO
+VUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2
+NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRf
+SVBTRUNfREVCVUdfU1BJLCAiZGVidWdfc3BpIiwgJmRlYnVnX3NwaSwKLQkg
+IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
+IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
+aW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfUkFESUosICJkZWJ1
+Z19yYWRpaiIsICZkZWJ1Z19yYWRpaiwKLQkgIHNpemVvZihpbnQpLCAwNjQ0
+LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCks
+IDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBO
+RVRfSVBTRUNfREVCVUdfTkVUTElOSywgImRlYnVnX25ldGxpbmsiLCAmZGVi
+dWdfbmV0bGluaywKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJv
+Y19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEws
+IE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVC
+VUdfWEZPUk0sICJkZWJ1Z194Zm9ybSIsICZkZWJ1Z194Zm9ybSwKLQkgIHNp
+emVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAgIAor
+CSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2RvaW50
+dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfUkNWLCAiZGVidWdfcmN2
+IiwgJmRlYnVnX3JjdiwKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAm
+cHJvY19kb2ludHZlY30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5V
+TEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNf
+REVCVUdfUEZLRVksICJkZWJ1Z19wZmtleSIsICZkZWJ1Z19wZmtleSwKLQkg
+IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
+IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
+aW50dmVjfSwgICAgCiAJeyBORVRfSVBTRUNfREVCVUdfVkVSQk9TRSwgImRl
+YnVnX3ZlcmJvc2UiLCZzeXNjdGxfaXBzZWNfZGVidWdfdmVyYm9zZSwKLQkg
+IHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZlY30sICAg
+IAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZwcm9jX2Rv
+aW50dmVjfSwgICAgCiAjaWZkZWYgQ09ORklHX0tMSVBTX0lQQ09NUAogCXsg
+TkVUX0lQU0VDX0RFQlVHX0lQQ09NUCwgImRlYnVnX2lwY29tcCIsICZzeXNj
+dGxfaXBzZWNfZGVidWdfaXBjb21wLAotCSAgc2l6ZW9mKGludCksIDA2NDQs
+IE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCisJICBzaXplb2YoaW50KSwg
+MDY0NCwgTlVMTCwgTlVMTCwgJnByb2NfZG9pbnR2ZWN9LCAgICAKICNlbmRp
+ZiAvKiBDT05GSUdfS0xJUFNfSVBDT01QICovCiAKICNpZmRlZiBDT05GSUdf
+S0xJUFNfUkVHUkVTUwogCXsgTkVUX0lQU0VDX1JFR1JFU1NfUEZLRVlfTE9T
+U0FHRSwgInBma2V5X2xvc3NhZ2UiLAogCSAgJnN5c2N0bF9pcHNlY19yZWdy
+ZXNzX3Bma2V5X2xvc3NhZ2UsCi0JICBzaXplb2YoaW50KSwgMDY0NCwgTlVM
+TCwgJnByb2NfZG9pbnR2ZWN9LAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5V
+TEwsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwKICNlbmRpZiAvKiBDT05GSUdf
+S0xJUFNfUkVHUkVTUyAqLwogCiAjZW5kaWYgLyogQ09ORklHX0tMSVBTX0RF
+QlVHICovCiAJeyBORVRfSVBTRUNfSUNNUCwgImljbXAiLCAmc3lzY3RsX2lw
+c2VjX2ljbXAsCi0JICBzaXplb2YoaW50KSwgMDY0NCwgTlVMTCwgJnByb2Nf
+ZG9pbnR2ZWN9LCAgICAKKwkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCBO
+VUxMLCAmcHJvY19kb2ludHZlY30sICAgIAogCXsgTkVUX0lQU0VDX0lOQk9V
+TkRfUE9MSUNZX0NIRUNLLCAiaW5ib3VuZF9wb2xpY3lfY2hlY2siLCAmc3lz
+Y3RsX2lwc2VjX2luYm91bmRfcG9saWN5X2NoZWNrLAotCSAgc2l6ZW9mKGlu
+dCksIDA2NDQsIE5VTEwsICZwcm9jX2RvaW50dmVjfSwgICAgCisJICBzaXpl
+b2YoaW50KSwgMDY0NCwgTlVMTCwgTlVMTCwgJnByb2NfZG9pbnR2ZWN9LCAg
+ICAKIAl7IE5FVF9JUFNFQ19UT1MsICJ0b3MiLCAmc3lzY3RsX2lwc2VjX3Rv
+cywKLQkgIHNpemVvZihpbnQpLCAwNjQ0LCBOVUxMLCAmcHJvY19kb2ludHZl
+Y30sICAgIAorCSAgc2l6ZW9mKGludCksIDA2NDQsIE5VTEwsIE5VTEwsICZw
+cm9jX2RvaW50dmVjfSwgICAgCiAJezB9CiB9OwogCg==
+
+--0-1932733950-1194350652=:31005--
