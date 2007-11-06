@@ -1,170 +1,415 @@
-From: "Tan Swee Heng" <thesweeheng@gmail.com>
-Subject: Re: Patch to support stream ciphers
-Date: Wed, 7 Nov 2007 03:11:36 +0800
-Message-ID: <fd3e431c0711061111t440b02bcgbcdfbd269e33c8d6@mail.gmail.com>
-References: <fd3e431c0710251055n1e810c90u285bb0be7d95dd07@mail.gmail.com>
-	 <20071026102102.GB4970@2ka.mipt.ru>
-	 <fd3e431c0711031035k11cd9dfbt26d9fb9b2c52eb20@mail.gmail.com>
-	 <20071106121909.GA30349@2ka.mipt.ru>
+From: "Jordan Crouse" <jordan.crouse@amd.com>
+Subject: Re: geode: add fallback for unsupported modes, take 2
+Date: Tue, 6 Nov 2007 12:24:35 -0700
+Message-ID: <20071106192435.GC21362@cosmic.amd.com>
+References: <1192788233-14968-1-git-send-email-linux-crypto@ml.breakpoint.cc>
+ <1192788233-14968-5-git-send-email-linux-crypto@ml.breakpoint.cc>
+ <20071021083158.GD9397@gondor.apana.org.au>
+ <20071104205923.GB25799@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+ charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: "Linux Crypto" <linux-crypto@vger.kernel.org>,
-	"Herbert Xu" <herbert@gondor.apana.org.au>
-To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nz-out-0506.google.com ([64.233.162.238]:24217 "EHLO
-	nz-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753324AbXKFTLn (ORCPT
+Received: from outbound-blu.frontbridge.com ([65.55.251.16]:29001 "EHLO
+	outbound6-blu-R.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754073AbXKFTZd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2007 14:11:43 -0500
-Received: by nz-out-0506.google.com with SMTP id s18so1439316nze
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Nov 2007 11:11:42 -0800 (PST)
-In-Reply-To: <20071106121909.GA30349@2ka.mipt.ru>
+	Tue, 6 Nov 2007 14:25:33 -0500
+In-Reply-To: <20071104205923.GB25799@Chamillionaire.breakpoint.cc>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Evgeniy,
+On 04/11/07 21:59 +0100, Sebastian Siewior wrote:
+> The Geode AES crypto engine supports only 128 bit long key. This
+> patch adds fallback for other key sizes which are required by the
+> AES standard.
+> 
+> Cc: Jordan Crouse <jordan.crouse@amd.com>
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-Thanks for the reply. Unfortunately my previous email did not make it
-on to the mailing list (it is blocked by Majorodomo as it exceeded
-100,000 bytes) so only you and Herbert received it. The rest of the
-reader would surely be confused by our current exchange. My apologies!
+Acked-by: Jordan Crouse <jordan.crouse@amd.com>
 
-I have rewrote the patch to avoid setting "cia_encrypt = NULL" and
-will be re-posting them. Also I will hold back the SOSEMANUK cipher
-for now.
+Thanks!
 
-Swee Heng
-
-On Nov 6, 2007 8:19 PM, Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
-> Hi.
->
-> On Sun, Nov 04, 2007 at 01:35:14AM +0800, Tan Swee Heng (thesweeheng@gmail.com) wrote:
-> > CHANGES
-> > 1. stream.c's blocksize is now 1 since (i) it makes more sense and
-> > (ii) the latest 2.6.24-rc1 git allows it.
-> > 2. SOSEMANUK, another eSTREAM candidate, has been ported.
-> > 3. Got rid of "coding style issues".. although I am not sure if I've
-> > eradicated all of them :-)
->
-> I have some minor comments inlined below.
-> Btw, it is much better if you inline patch and put them into several
-> mails if needed.
->
-> > TESTING
-> > 1. I've used "insmod tcrypt.ko mode=X" (X=34 for Salsa20 and X=35 for
-> > SOSEMANUK). The test vectors agree.
-> > 2. I've used "cryptsetup luksFormat -c salsa20-stream-plain
-> > /dev/loop0". That worked fine and I was able to create an encrypted
-> > ext2 filesystem using Salsa20 as the cipher.
-> > 3. However "cryptsetup luksFormat -c sosemanuk-stream-plain
-> > /dev/loop0" didn't work that well as I was unable to unlock using
-> > "cryptsetup luksOpen" later. (I am not sure where the problems lie.
-> > Any suggestion is welcomed.)
->
-> Add debug prints all over the place and find where the problem lies...
->
-> > BUG
-> > My patches currently set cia_encrypt and cia_decrypt to NULL. That
-> > isn't quite safe. Someone using luksFormat with "-c salsa20-cbc-plain"
-> > may cause the kernel to behave in an unbecoming manner as cbc will try
-> > to use salsa20's cia_encrypt. (Any suggestion is welcomed on how this
-> > can be avoided.)
->
-> > PATCHES
-> > Attached to this mail are the patches. I've split them into 3 this
-> > time so as to make clear what are the changes for stream, salsa20 and
-> > sosemanuk respectively. They need to be applied in succession to the
-> > latest 2.6.24-rc1 cryptodev git.
-> >
-> > Swee Heng
->
-> +static int crypto_stream_crypt_walk(struct blkcipher_walk *walk,
-> +                                   struct crypto_cipher *tfm)
+> ---
+> 
+> Herbert, as you suggested I splitted cipher & blk code.
+> 
+> diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+> index da6164a..f2d4fba 100644
+> --- a/drivers/crypto/geode-aes.c
+> +++ b/drivers/crypto/geode-aes.c
+> @@ -114,18 +114,103 @@ geode_aes_crypt(struct geode_aes_op *op)
+>  
+>  /* CRYPTO-API Functions */
+>  
+> -static int
+> -geode_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int len)
+> +static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
+> +		unsigned int len)
+>  {
+>  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+> +	unsigned int ret;
+> +
+> +	op->keylen = len;
+> +
+> +	if (len == AES_KEYSIZE_128) {
+> +		memcpy(op->key, key, len);
+> +		return 0;
+> +	}
+>  
+> -	if (len != AES_KEY_LENGTH) {
+> +	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
+> +		/* not supported at all */
+>  		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+>  		return -EINVAL;
+>  	}
+>  
+> -	memcpy(op->key, key, len);
+> -	return 0;
+> +	/*
+> +	 * The requested key size is not supported by HW, do a fallback
+> +	 */
+> +	op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
+> +	op->fallback.blk->base.crt_flags |= (tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
+> +
+> +	ret = crypto_cipher_setkey(op->fallback.cip, key, len);
+> +	if (ret) {
+> +		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
+> +		tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
+> +	}
+> +	return ret;
+> +}
+> +
+> +static int geode_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
+> +		unsigned int len)
 > +{
-> +       void (*fn)(struct crypto_tfm *, u8 *, const u8 *, u32) =
-> +               crypto_cipher_alg(tfm)->cia_setiv_crypt;
-> +       unsigned int nbytes = walk->nbytes;
-> +       u8 *src = walk->src.virt.addr;
-> +       u8 *dst = walk->dst.virt.addr;
-> +       u8 *iv = walk->iv;
+> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+> +	unsigned int ret;
 > +
-> +       if(dst != src)
->
-> Need a space.
->
-> +               memcpy(dst, src, nbytes);
-> +       fn(crypto_cipher_tfm(tfm), dst, iv, nbytes);
-> +       return 0;
+> +	op->keylen = len;
+> +
+> +	if (len == AES_KEYSIZE_128) {
+> +		memcpy(op->key, key, len);
+> +		return 0;
+> +	}
+> +
+> +	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
+> +		/* not supported at all */
+> +		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+> +		return -EINVAL;
+> +	}
+> +
+> +	/*
+> +	 * The requested key size is not supported by HW, do a fallback
+> +	 */
+> +	op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
+> +	op->fallback.blk->base.crt_flags |= (tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
+> +
+> +	ret = crypto_blkcipher_setkey(op->fallback.blk, key, len);
+> +	if (ret) {
+> +		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
+> +		tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
+> +	}
+> +	return ret;
 > +}
->
-> +       if (!(alg->cra_blocksize % 4))
-> +               inst->alg.cra_alignmask |= 3;
->
-> You have not changed align mask as wanted originally - is it intentional?
->
-> +       inst->alg.cra_blkcipher.ivsize = 1;
-> +       inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
-> +       inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
 > +
-> +       inst->alg.cra_ctxsize = sizeof(struct crypto_stream_ctx);
+> +static int fallback_blk_dec(struct blkcipher_desc *desc,
+> +		struct scatterlist *dst, struct scatterlist *src,
+> +		unsigned int nbytes)
+> +{
+> +	unsigned int ret;
+> +	struct crypto_blkcipher *tfm;
+> +	struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
 > +
-> +       inst->alg.cra_init = crypto_stream_init_tfm;
-> +       inst->alg.cra_exit = crypto_stream_exit_tfm;
+> +	tfm = desc->tfm;
+> +	desc->tfm = op->fallback.blk;
 > +
-> +       inst->alg.cra_blkcipher.setkey = crypto_stream_setkey;
-> +       inst->alg.cra_blkcipher.encrypt = crypto_stream_crypt;
-> +       inst->alg.cra_blkcipher.decrypt = crypto_stream_crypt;
+> +	ret = crypto_blkcipher_decrypt(desc, dst, src, nbytes);
 > +
-> +out_put_alg:
-> +       crypto_mod_put(alg);
-> +       return inst;
+> +	desc->tfm = tfm;
+> +	return ret;
 > +}
->
->
-> --- a/include/linux/crypto.h
-> +++ b/include/linux/crypto.h
-> @@ -214,6 +214,10 @@ struct cipher_alg {
->                           unsigned int keylen);
->         void (*cia_encrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
->         void (*cia_decrypt)(struct crypto_tfm *tfm, u8 *dst, const u8 *src);
+> +static int fallback_blk_enc(struct blkcipher_desc *desc,
+> +		struct scatterlist *dst, struct scatterlist *src,
+> +		unsigned int nbytes)
+> +{
+> +	unsigned int ret;
+> +	struct crypto_blkcipher *tfm;
+> +	struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
 > +
-> +       unsigned int cia_ivsize;
-> +       void (*cia_setiv_crypt)(struct crypto_tfm *tfm, u8 *dst,
-> +                               const u8 *iv, u32 nbytes);
+> +	tfm = desc->tfm;
+> +	desc->tfm = op->fallback.blk;
+> +
+> +	ret = crypto_blkcipher_encrypt(desc, dst, src, nbytes);
+> +
+> +	desc->tfm = tfm;
+> +	return ret;
+>  }
+>  
+>  static void
+> @@ -133,8 +218,10 @@ geode_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+>  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+>  
+> -	if ((out == NULL) || (in == NULL))
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128)) {
+> +		crypto_cipher_encrypt_one(op->fallback.cip, out, in);
+>  		return;
+> +	}
+>  
+>  	op->src = (void *) in;
+>  	op->dst = (void *) out;
+> @@ -152,8 +239,10 @@ geode_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+>  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+>  
+> -	if ((out == NULL) || (in == NULL))
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128)) {
+> +		crypto_cipher_decrypt_one(op->fallback.cip, out, in);
+>  		return;
+> +	}
+>  
+>  	op->src = (void *) in;
+>  	op->dst = (void *) out;
+> @@ -165,24 +254,50 @@ geode_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  	geode_aes_crypt(op);
+>  }
+>  
+> +static int fallback_init_cip(struct crypto_tfm *tfm)
+> +{
+> +	const char *name = tfm->__crt_alg->cra_name;
+> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+> +
+> +	op->fallback.cip = crypto_alloc_cipher(name, 0,
+> +				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
+> +
+> +	if (IS_ERR(op->fallback.cip)) {
+> +		printk(KERN_ERR "Error allocating fallback algo %s\n", name);
+> +		return PTR_ERR(op->fallback.blk);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void fallback_exit_cip(struct crypto_tfm *tfm)
+> +{
+> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+> +
+> +	crypto_free_cipher(op->fallback.cip);
+> +	op->fallback.cip = NULL;
+> +}
+>  
+>  static struct crypto_alg geode_alg = {
+> -	.cra_name               =       "aes",
+> -	.cra_driver_name	=       "geode-aes-128",
+> -	.cra_priority           =       300,
+> -	.cra_alignmask          =       15,
+> -	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+> +	.cra_name			=	"aes",
+> +	.cra_driver_name	=	"geode-aes",
+> +	.cra_priority		=	300,
+> +	.cra_alignmask		=	15,
+> +	.cra_flags			=	CRYPTO_ALG_TYPE_CIPHER |
+> +							CRYPTO_ALG_NEED_FALLBACK,
+> +	.cra_init			=	fallback_init_cip,
+> +	.cra_exit			=	fallback_exit_cip,
+>  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
+>  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
+> -	.cra_module		=	THIS_MODULE,
+> -	.cra_list		=	LIST_HEAD_INIT(geode_alg.cra_list),
+> -	.cra_u			=	{
+> -		.cipher = {
+> -			.cia_min_keysize	=  AES_KEY_LENGTH,
+> -			.cia_max_keysize	=  AES_KEY_LENGTH,
+> -			.cia_setkey		=  geode_setkey,
+> -			.cia_encrypt		=  geode_encrypt,
+> -			.cia_decrypt		=  geode_decrypt
+> +	.cra_module			=	THIS_MODULE,
+> +	.cra_list			=	LIST_HEAD_INIT(geode_alg.cra_list),
+> +	.cra_u				=	{
+> +		.cipher	=	{
+> +			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
+> +			.cia_max_keysize	=	AES_MAX_KEY_SIZE,
+> +			.cia_setkey			=	geode_setkey_cip,
+> +			.cia_encrypt		=	geode_encrypt,
+> +			.cia_decrypt		=	geode_decrypt
+>  		}
+>  	}
 >  };
->
-> I'm not sure it is a good way - you can save this iv and its size in the
-> context and get it from cipher's encrypt/decrypt callback.
-> Or modify every encrypt and decrypt callback to have iv as parameter,
-> which I believe not a good solution.
->
-> In any case, you have to disallow unsupported usage (like cbc) in your
-> cipher callbacks.
->
-> +static void xor_byte(u8 *a, const u8 *b, unsigned int bs)
+> @@ -196,6 +311,9 @@ geode_cbc_decrypt(struct blkcipher_desc *desc,
+>  	struct blkcipher_walk walk;
+>  	int err, ret;
+>  
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
+> +		return fallback_blk_dec(desc, dst, src, nbytes);
+> +
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+>  	err = blkcipher_walk_virt(desc, &walk);
+>  	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
+> @@ -226,6 +344,9 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
+>  	struct blkcipher_walk walk;
+>  	int err, ret;
+>  
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
+> +		return fallback_blk_enc(desc, dst, src, nbytes);
+> +
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+>  	err = blkcipher_walk_virt(desc, &walk);
+>  	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
+> @@ -246,22 +367,49 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
+>  	return err;
+>  }
+>  
+> +static int fallback_init_blk(struct crypto_tfm *tfm)
 > +{
-> +        for (; bs; bs--)
-> +                *a++ ^= *b++;
+> +	const char *name = tfm->__crt_alg->cra_name;
+> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
+> +
+> +	op->fallback.blk = crypto_alloc_blkcipher(name, 0,
+> +			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
+> +
+> +	if (IS_ERR(op->fallback.blk)) {
+> +		printk(KERN_ERR "Error allocating fallback algo %s\n", name);
+> +		return PTR_ERR(op->fallback.blk);
+> +	}
+> +
+> +	return 0;
 > +}
 > +
-> +static void xor_quad(u8 *dst, const u8 *src, unsigned int bs)
+> +static void fallback_exit_blk(struct crypto_tfm *tfm)
 > +{
-> +        u32 *a = (u32 *)dst;
-> +        u32 *b = (u32 *)src;
+> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
 > +
-> +        for (; bs >= 4; bs -= 4)
-> +                *a++ ^= *b++;
-> +
-> +        xor_byte((u8 *)a, (u8 *)b, bs);
+> +	crypto_free_blkcipher(op->fallback.blk);
+> +	op->fallback.blk = NULL;
 > +}
->
-> This ones exist in cbc at least - move them into common header.
-> The same applies to sosemanuk algo.
->
->
-> --
->         Evgeniy Polyakov
->
+> +
+>  static struct crypto_alg geode_cbc_alg = {
+>  	.cra_name		=	"cbc(aes)",
+> -	.cra_driver_name	=	"cbc-aes-geode-128",
+> +	.cra_driver_name	=	"cbc-aes-geode",
+>  	.cra_priority		=	400,
+> -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
+> +	.cra_flags			=	CRYPTO_ALG_TYPE_BLKCIPHER |
+> +							CRYPTO_ALG_NEED_FALLBACK,
+> +	.cra_init			=	fallback_init_blk,
+> +	.cra_exit			=	fallback_exit_blk,
+>  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
+>  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
+>  	.cra_alignmask		=	15,
+> -	.cra_type		=	&crypto_blkcipher_type,
+> -	.cra_module		=	THIS_MODULE,
+> -	.cra_list		=	LIST_HEAD_INIT(geode_cbc_alg.cra_list),
+> -	.cra_u			=	{
+> -		.blkcipher = {
+> -			.min_keysize		=	AES_KEY_LENGTH,
+> -			.max_keysize		=	AES_KEY_LENGTH,
+> -			.setkey			=	geode_setkey,
+> +	.cra_type			=	&crypto_blkcipher_type,
+> +	.cra_module			=	THIS_MODULE,
+> +	.cra_list			=	LIST_HEAD_INIT(geode_cbc_alg.cra_list),
+> +	.cra_u				=	{
+> +		.blkcipher	=	{
+> +			.min_keysize	=	AES_MIN_KEY_SIZE,
+> +			.max_keysize	=	AES_MAX_KEY_SIZE,
+> +			.setkey			=	geode_setkey_blk,
+>  			.encrypt		=	geode_cbc_encrypt,
+>  			.decrypt		=	geode_cbc_decrypt,
+>  			.ivsize			=	AES_IV_LENGTH,
+> @@ -278,6 +426,9 @@ geode_ecb_decrypt(struct blkcipher_desc *desc,
+>  	struct blkcipher_walk walk;
+>  	int err, ret;
+>  
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
+> +		return fallback_blk_dec(desc, dst, src, nbytes);
+> +
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+>  	err = blkcipher_walk_virt(desc, &walk);
+>  
+> @@ -305,6 +456,9 @@ geode_ecb_encrypt(struct blkcipher_desc *desc,
+>  	struct blkcipher_walk walk;
+>  	int err, ret;
+>  
+> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
+> +		return fallback_blk_enc(desc, dst, src, nbytes);
+> +
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+>  	err = blkcipher_walk_virt(desc, &walk);
+>  
+> @@ -324,21 +478,24 @@ geode_ecb_encrypt(struct blkcipher_desc *desc,
+>  }
+>  
+>  static struct crypto_alg geode_ecb_alg = {
+> -	.cra_name		=	"ecb(aes)",
+> -	.cra_driver_name	=	"ecb-aes-geode-128",
+> +	.cra_name			=	"ecb(aes)",
+> +	.cra_driver_name	=	"ecb-aes-geode",
+>  	.cra_priority		=	400,
+> -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
+> +	.cra_flags			=	CRYPTO_ALG_TYPE_BLKCIPHER |
+> +							CRYPTO_ALG_NEED_FALLBACK,
+> +	.cra_init			=	fallback_init_blk,
+> +	.cra_exit			=	fallback_exit_blk,
+>  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
+>  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
+>  	.cra_alignmask		=	15,
+> -	.cra_type		=	&crypto_blkcipher_type,
+> -	.cra_module		=	THIS_MODULE,
+> -	.cra_list		=	LIST_HEAD_INIT(geode_ecb_alg.cra_list),
+> -	.cra_u			=	{
+> -		.blkcipher = {
+> -			.min_keysize		=	AES_KEY_LENGTH,
+> -			.max_keysize		=	AES_KEY_LENGTH,
+> -			.setkey			=	geode_setkey,
+> +	.cra_type			=	&crypto_blkcipher_type,
+> +	.cra_module			=	THIS_MODULE,
+> +	.cra_list			=	LIST_HEAD_INIT(geode_ecb_alg.cra_list),
+> +	.cra_u				=	{
+> +		.blkcipher	=	{
+> +			.min_keysize	=	AES_MIN_KEY_SIZE,
+> +			.max_keysize	=	AES_MAX_KEY_SIZE,
+> +			.setkey			=	geode_setkey_blk,
+>  			.encrypt		=	geode_ecb_encrypt,
+>  			.decrypt		=	geode_ecb_decrypt,
+>  		}
+> @@ -368,7 +525,7 @@ geode_aes_probe(struct pci_dev *dev, const struct pci_device_id *id)
+>  	if ((ret = pci_enable_device(dev)))
+>  		return ret;
+>  
+> -	if ((ret = pci_request_regions(dev, "geode-aes-128")))
+> +	if ((ret = pci_request_regions(dev, "geode-aes")))
+>  		goto eenable;
+>  
+>  	_iobase = pci_iomap(dev, 0, 0);
+> diff --git a/drivers/crypto/geode-aes.h b/drivers/crypto/geode-aes.h
+> index 2f1d559..14cc763 100644
+> --- a/drivers/crypto/geode-aes.h
+> +++ b/drivers/crypto/geode-aes.h
+> @@ -66,6 +66,12 @@ struct geode_aes_op {
+>  
+>  	u8 key[AES_KEY_LENGTH];
+>  	u8 iv[AES_IV_LENGTH];
+> +
+> +	union {
+> +		struct crypto_blkcipher *blk;
+> +		struct crypto_cipher *cip;
+> +	} fallback;
+> +	u32 keylen;
+>  };
+>  
+>  #endif
+> -- 
+> 1.5.3.4
+> 
+> 
+> 
+
+-- 
+Jordan Crouse
+Systems Software Development Engineer 
+Advanced Micro Devices, Inc.
