@@ -1,415 +1,186 @@
-From: "Jordan Crouse" <jordan.crouse@amd.com>
-Subject: Re: geode: add fallback for unsupported modes, take 2
-Date: Tue, 6 Nov 2007 12:24:35 -0700
-Message-ID: <20071106192435.GC21362@cosmic.amd.com>
-References: <1192788233-14968-1-git-send-email-linux-crypto@ml.breakpoint.cc>
- <1192788233-14968-5-git-send-email-linux-crypto@ml.breakpoint.cc>
- <20071021083158.GD9397@gondor.apana.org.au>
- <20071104205923.GB25799@Chamillionaire.breakpoint.cc>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: [PATCH 1/2] stream: Stream cipher wrapper
+Date: Wed, 7 Nov 2007 03:37:20 +0800
+Message-ID: <fd3e431c0711061137lfa743abwa2be4d563d39e83b@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
-Content-Transfer-Encoding: 7bit
-To: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
+Content-Type: multipart/mixed;
+	boundary="----=_Part_32688_6140053.1194377840546"
+To: "Linux Crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from outbound-blu.frontbridge.com ([65.55.251.16]:29001 "EHLO
-	outbound6-blu-R.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754073AbXKFTZd (ORCPT
+Received: from nz-out-0506.google.com ([64.233.162.228]:39677 "EHLO
+	nz-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753247AbXKFThW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2007 14:25:33 -0500
-In-Reply-To: <20071104205923.GB25799@Chamillionaire.breakpoint.cc>
-Content-Disposition: inline
+	Tue, 6 Nov 2007 14:37:22 -0500
+Received: by nz-out-0506.google.com with SMTP id s18so1446093nze
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Nov 2007 11:37:21 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 04/11/07 21:59 +0100, Sebastian Siewior wrote:
-> The Geode AES crypto engine supports only 128 bit long key. This
-> patch adds fallback for other key sizes which are required by the
-> AES standard.
-> 
-> Cc: Jordan Crouse <jordan.crouse@amd.com>
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+------=_Part_32688_6140053.1194377840546
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Acked-by: Jordan Crouse <jordan.crouse@amd.com>
+Added a "stream" template to support stream ciphers (eSTREAM
+candidates in particular) within the CryptoAPI framework.
 
-Thanks!
+The current patch differed from my first posting (25 Oct) to the
+mailing list in several ways:
+1. It now uses cia_setiv() only instead of cia_setiv_crypt() in
+include/linux/crypto.h. Reason: (a.) it is closer to the semantics of
+eSTREAM's API; (b.) I want to avoid setting cia_encrypt and
+cia_decrypt to NULL.
+2. It uses a blocksize of 1 for stream (as suggested by Evgeniy)
+3. It does not let the underlying cipher handle the full encryption of
+the buffer any more. Instead it does it in chunks of the underlying
+cipher's "block size", like the other block modes. (Most eSTREAM
+software candidates seem to have a native "block size").
 
-> ---
-> 
-> Herbert, as you suggested I splitted cipher & blk code.
-> 
-> diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-> index da6164a..f2d4fba 100644
-> --- a/drivers/crypto/geode-aes.c
-> +++ b/drivers/crypto/geode-aes.c
-> @@ -114,18 +114,103 @@ geode_aes_crypt(struct geode_aes_op *op)
->  
->  /* CRYPTO-API Functions */
->  
-> -static int
-> -geode_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int len)
-> +static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
-> +		unsigned int len)
->  {
->  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +	unsigned int ret;
-> +
-> +	op->keylen = len;
-> +
-> +	if (len == AES_KEYSIZE_128) {
-> +		memcpy(op->key, key, len);
-> +		return 0;
-> +	}
->  
-> -	if (len != AES_KEY_LENGTH) {
-> +	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
-> +		/* not supported at all */
->  		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
->  		return -EINVAL;
->  	}
->  
-> -	memcpy(op->key, key, len);
-> -	return 0;
-> +	/*
-> +	 * The requested key size is not supported by HW, do a fallback
-> +	 */
-> +	op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
-> +	op->fallback.blk->base.crt_flags |= (tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
-> +
-> +	ret = crypto_cipher_setkey(op->fallback.cip, key, len);
-> +	if (ret) {
-> +		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
-> +		tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
-> +	}
-> +	return ret;
-> +}
-> +
-> +static int geode_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
-> +		unsigned int len)
-> +{
-> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +	unsigned int ret;
-> +
-> +	op->keylen = len;
-> +
-> +	if (len == AES_KEYSIZE_128) {
-> +		memcpy(op->key, key, len);
-> +		return 0;
-> +	}
-> +
-> +	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
-> +		/* not supported at all */
-> +		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> +		return -EINVAL;
-> +	}
-> +
-> +	/*
-> +	 * The requested key size is not supported by HW, do a fallback
-> +	 */
-> +	op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
-> +	op->fallback.blk->base.crt_flags |= (tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
-> +
-> +	ret = crypto_blkcipher_setkey(op->fallback.blk, key, len);
-> +	if (ret) {
-> +		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
-> +		tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
-> +	}
-> +	return ret;
-> +}
-> +
-> +static int fallback_blk_dec(struct blkcipher_desc *desc,
-> +		struct scatterlist *dst, struct scatterlist *src,
-> +		unsigned int nbytes)
-> +{
-> +	unsigned int ret;
-> +	struct crypto_blkcipher *tfm;
-> +	struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
-> +
-> +	tfm = desc->tfm;
-> +	desc->tfm = op->fallback.blk;
-> +
-> +	ret = crypto_blkcipher_decrypt(desc, dst, src, nbytes);
-> +
-> +	desc->tfm = tfm;
-> +	return ret;
-> +}
-> +static int fallback_blk_enc(struct blkcipher_desc *desc,
-> +		struct scatterlist *dst, struct scatterlist *src,
-> +		unsigned int nbytes)
-> +{
-> +	unsigned int ret;
-> +	struct crypto_blkcipher *tfm;
-> +	struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
-> +
-> +	tfm = desc->tfm;
-> +	desc->tfm = op->fallback.blk;
-> +
-> +	ret = crypto_blkcipher_encrypt(desc, dst, src, nbytes);
-> +
-> +	desc->tfm = tfm;
-> +	return ret;
->  }
->  
->  static void
-> @@ -133,8 +218,10 @@ geode_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
->  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
->  
-> -	if ((out == NULL) || (in == NULL))
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128)) {
-> +		crypto_cipher_encrypt_one(op->fallback.cip, out, in);
->  		return;
-> +	}
->  
->  	op->src = (void *) in;
->  	op->dst = (void *) out;
-> @@ -152,8 +239,10 @@ geode_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
->  	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
->  
-> -	if ((out == NULL) || (in == NULL))
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128)) {
-> +		crypto_cipher_decrypt_one(op->fallback.cip, out, in);
->  		return;
-> +	}
->  
->  	op->src = (void *) in;
->  	op->dst = (void *) out;
-> @@ -165,24 +254,50 @@ geode_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  	geode_aes_crypt(op);
->  }
->  
-> +static int fallback_init_cip(struct crypto_tfm *tfm)
-> +{
-> +	const char *name = tfm->__crt_alg->cra_name;
-> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +
-> +	op->fallback.cip = crypto_alloc_cipher(name, 0,
-> +				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-> +
-> +	if (IS_ERR(op->fallback.cip)) {
-> +		printk(KERN_ERR "Error allocating fallback algo %s\n", name);
-> +		return PTR_ERR(op->fallback.blk);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void fallback_exit_cip(struct crypto_tfm *tfm)
-> +{
-> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +
-> +	crypto_free_cipher(op->fallback.cip);
-> +	op->fallback.cip = NULL;
-> +}
->  
->  static struct crypto_alg geode_alg = {
-> -	.cra_name               =       "aes",
-> -	.cra_driver_name	=       "geode-aes-128",
-> -	.cra_priority           =       300,
-> -	.cra_alignmask          =       15,
-> -	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
-> +	.cra_name			=	"aes",
-> +	.cra_driver_name	=	"geode-aes",
-> +	.cra_priority		=	300,
-> +	.cra_alignmask		=	15,
-> +	.cra_flags			=	CRYPTO_ALG_TYPE_CIPHER |
-> +							CRYPTO_ALG_NEED_FALLBACK,
-> +	.cra_init			=	fallback_init_cip,
-> +	.cra_exit			=	fallback_exit_cip,
->  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
->  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
-> -	.cra_module		=	THIS_MODULE,
-> -	.cra_list		=	LIST_HEAD_INIT(geode_alg.cra_list),
-> -	.cra_u			=	{
-> -		.cipher = {
-> -			.cia_min_keysize	=  AES_KEY_LENGTH,
-> -			.cia_max_keysize	=  AES_KEY_LENGTH,
-> -			.cia_setkey		=  geode_setkey,
-> -			.cia_encrypt		=  geode_encrypt,
-> -			.cia_decrypt		=  geode_decrypt
-> +	.cra_module			=	THIS_MODULE,
-> +	.cra_list			=	LIST_HEAD_INIT(geode_alg.cra_list),
-> +	.cra_u				=	{
-> +		.cipher	=	{
-> +			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
-> +			.cia_max_keysize	=	AES_MAX_KEY_SIZE,
-> +			.cia_setkey			=	geode_setkey_cip,
-> +			.cia_encrypt		=	geode_encrypt,
-> +			.cia_decrypt		=	geode_decrypt
->  		}
->  	}
->  };
-> @@ -196,6 +311,9 @@ geode_cbc_decrypt(struct blkcipher_desc *desc,
->  	struct blkcipher_walk walk;
->  	int err, ret;
->  
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
-> +		return fallback_blk_dec(desc, dst, src, nbytes);
-> +
->  	blkcipher_walk_init(&walk, dst, src, nbytes);
->  	err = blkcipher_walk_virt(desc, &walk);
->  	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
-> @@ -226,6 +344,9 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
->  	struct blkcipher_walk walk;
->  	int err, ret;
->  
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
-> +		return fallback_blk_enc(desc, dst, src, nbytes);
-> +
->  	blkcipher_walk_init(&walk, dst, src, nbytes);
->  	err = blkcipher_walk_virt(desc, &walk);
->  	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
-> @@ -246,22 +367,49 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
->  	return err;
->  }
->  
-> +static int fallback_init_blk(struct crypto_tfm *tfm)
-> +{
-> +	const char *name = tfm->__crt_alg->cra_name;
-> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +
-> +	op->fallback.blk = crypto_alloc_blkcipher(name, 0,
-> +			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-> +
-> +	if (IS_ERR(op->fallback.blk)) {
-> +		printk(KERN_ERR "Error allocating fallback algo %s\n", name);
-> +		return PTR_ERR(op->fallback.blk);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void fallback_exit_blk(struct crypto_tfm *tfm)
-> +{
-> +	struct geode_aes_op *op = crypto_tfm_ctx(tfm);
-> +
-> +	crypto_free_blkcipher(op->fallback.blk);
-> +	op->fallback.blk = NULL;
-> +}
-> +
->  static struct crypto_alg geode_cbc_alg = {
->  	.cra_name		=	"cbc(aes)",
-> -	.cra_driver_name	=	"cbc-aes-geode-128",
-> +	.cra_driver_name	=	"cbc-aes-geode",
->  	.cra_priority		=	400,
-> -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-> +	.cra_flags			=	CRYPTO_ALG_TYPE_BLKCIPHER |
-> +							CRYPTO_ALG_NEED_FALLBACK,
-> +	.cra_init			=	fallback_init_blk,
-> +	.cra_exit			=	fallback_exit_blk,
->  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
->  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
->  	.cra_alignmask		=	15,
-> -	.cra_type		=	&crypto_blkcipher_type,
-> -	.cra_module		=	THIS_MODULE,
-> -	.cra_list		=	LIST_HEAD_INIT(geode_cbc_alg.cra_list),
-> -	.cra_u			=	{
-> -		.blkcipher = {
-> -			.min_keysize		=	AES_KEY_LENGTH,
-> -			.max_keysize		=	AES_KEY_LENGTH,
-> -			.setkey			=	geode_setkey,
-> +	.cra_type			=	&crypto_blkcipher_type,
-> +	.cra_module			=	THIS_MODULE,
-> +	.cra_list			=	LIST_HEAD_INIT(geode_cbc_alg.cra_list),
-> +	.cra_u				=	{
-> +		.blkcipher	=	{
-> +			.min_keysize	=	AES_MIN_KEY_SIZE,
-> +			.max_keysize	=	AES_MAX_KEY_SIZE,
-> +			.setkey			=	geode_setkey_blk,
->  			.encrypt		=	geode_cbc_encrypt,
->  			.decrypt		=	geode_cbc_decrypt,
->  			.ivsize			=	AES_IV_LENGTH,
-> @@ -278,6 +426,9 @@ geode_ecb_decrypt(struct blkcipher_desc *desc,
->  	struct blkcipher_walk walk;
->  	int err, ret;
->  
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
-> +		return fallback_blk_dec(desc, dst, src, nbytes);
-> +
->  	blkcipher_walk_init(&walk, dst, src, nbytes);
->  	err = blkcipher_walk_virt(desc, &walk);
->  
-> @@ -305,6 +456,9 @@ geode_ecb_encrypt(struct blkcipher_desc *desc,
->  	struct blkcipher_walk walk;
->  	int err, ret;
->  
-> +	if (unlikely(op->keylen != AES_KEYSIZE_128))
-> +		return fallback_blk_enc(desc, dst, src, nbytes);
-> +
->  	blkcipher_walk_init(&walk, dst, src, nbytes);
->  	err = blkcipher_walk_virt(desc, &walk);
->  
-> @@ -324,21 +478,24 @@ geode_ecb_encrypt(struct blkcipher_desc *desc,
->  }
->  
->  static struct crypto_alg geode_ecb_alg = {
-> -	.cra_name		=	"ecb(aes)",
-> -	.cra_driver_name	=	"ecb-aes-geode-128",
-> +	.cra_name			=	"ecb(aes)",
-> +	.cra_driver_name	=	"ecb-aes-geode",
->  	.cra_priority		=	400,
-> -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-> +	.cra_flags			=	CRYPTO_ALG_TYPE_BLKCIPHER |
-> +							CRYPTO_ALG_NEED_FALLBACK,
-> +	.cra_init			=	fallback_init_blk,
-> +	.cra_exit			=	fallback_exit_blk,
->  	.cra_blocksize		=	AES_MIN_BLOCK_SIZE,
->  	.cra_ctxsize		=	sizeof(struct geode_aes_op),
->  	.cra_alignmask		=	15,
-> -	.cra_type		=	&crypto_blkcipher_type,
-> -	.cra_module		=	THIS_MODULE,
-> -	.cra_list		=	LIST_HEAD_INIT(geode_ecb_alg.cra_list),
-> -	.cra_u			=	{
-> -		.blkcipher = {
-> -			.min_keysize		=	AES_KEY_LENGTH,
-> -			.max_keysize		=	AES_KEY_LENGTH,
-> -			.setkey			=	geode_setkey,
-> +	.cra_type			=	&crypto_blkcipher_type,
-> +	.cra_module			=	THIS_MODULE,
-> +	.cra_list			=	LIST_HEAD_INIT(geode_ecb_alg.cra_list),
-> +	.cra_u				=	{
-> +		.blkcipher	=	{
-> +			.min_keysize	=	AES_MIN_KEY_SIZE,
-> +			.max_keysize	=	AES_MAX_KEY_SIZE,
-> +			.setkey			=	geode_setkey_blk,
->  			.encrypt		=	geode_ecb_encrypt,
->  			.decrypt		=	geode_ecb_decrypt,
->  		}
-> @@ -368,7 +525,7 @@ geode_aes_probe(struct pci_dev *dev, const struct pci_device_id *id)
->  	if ((ret = pci_enable_device(dev)))
->  		return ret;
->  
-> -	if ((ret = pci_request_regions(dev, "geode-aes-128")))
-> +	if ((ret = pci_request_regions(dev, "geode-aes")))
->  		goto eenable;
->  
->  	_iobase = pci_iomap(dev, 0, 0);
-> diff --git a/drivers/crypto/geode-aes.h b/drivers/crypto/geode-aes.h
-> index 2f1d559..14cc763 100644
-> --- a/drivers/crypto/geode-aes.h
-> +++ b/drivers/crypto/geode-aes.h
-> @@ -66,6 +66,12 @@ struct geode_aes_op {
->  
->  	u8 key[AES_KEY_LENGTH];
->  	u8 iv[AES_IV_LENGTH];
-> +
-> +	union {
-> +		struct crypto_blkcipher *blk;
-> +		struct crypto_cipher *cip;
-> +	} fallback;
-> +	u32 keylen;
->  };
->  
->  #endif
-> -- 
-> 1.5.3.4
-> 
-> 
-> 
+The current patch uses setkey(key, keylen) and setiv(iv, ivlen). The
+eSTREAM's API actually requires setkey(key, keylen, ivlen) and
+setiv(iv). The discrepancy arises because I am simply riding on the
+existing "struct cipher_alg". I will look into how this discrepancy
+can be resolved (perhaps by creating a separate "struct estream_alg").
+Until this discrepancy is resolved, some of the eSTREAM ciphers like
+SOSEMANUK may not be usable. Ciphers which have a fixed IV length
+(e.g. Salsa20) are usable using the current patch.
 
--- 
-Jordan Crouse
-Systems Software Development Engineer 
-Advanced Micro Devices, Inc.
+Swee Heng
+
+------=_Part_32688_6140053.1194377840546
+Content-Type: text/plain; name=patch1-stream.txt
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f8ota2bo0
+Content-Disposition: attachment; filename=patch1-stream.txt
+
+ZGlmZiAtLWdpdCBhL2NyeXB0by9LY29uZmlnIGIvY3J5cHRvL0tjb25maWcKaW5kZXggMWYzMjA3
+MS4uODkyODZhZCAxMDA2NDQKLS0tIGEvY3J5cHRvL0tjb25maWcKKysrIGIvY3J5cHRvL0tjb25m
+aWcKQEAgLTIwNCw2ICsyMDQsMTUgQEAgY29uZmlnIENSWVBUT19DVFIKIAkgIENUUjogQ291bnRl
+ciBtb2RlCiAJICBUaGlzIGJsb2NrIGNpcGhlciBhbGdvcml0aG0gaXMgcmVxdWlyZWQgZm9yIElQ
+U2VjLgogCitjb25maWcgQ1JZUFRPX1NUUkVBTQorCXRyaXN0YXRlICJTVFJFQU06IFN0cmVhbSBj
+aXBoZXIgc3VwcG9ydCAoRVhQRVJJTUVOVEFMKSIKKwlkZXBlbmRzIG9uIEVYUEVSSU1FTlRBTAor
+CXNlbGVjdCBDUllQVE9fQkxLQ0lQSEVSCisJc2VsZWN0IENSWVBUT19NQU5BR0VSCisJaGVscAor
+CSAgU1RSRUFNOiBTdHJlYW0gY2lwaGVyIHdyYXBwZXIKKwkgIFRoaXMgd3JhcHBlciBpcyB1c2Vk
+IGJ5IHN0cmVhbSBjaXBoZXJzIHN1Ym1pdHRlZCB0byBlU1RSRUFNLgorCiBjb25maWcgQ1JZUFRP
+X0NSWVBURAogCXRyaXN0YXRlICJTb2Z0d2FyZSBhc3luYyBjcnlwdG8gZGFlbW9uIgogCXNlbGVj
+dCBDUllQVE9fQUJMS0NJUEhFUgpkaWZmIC0tZ2l0IGEvY3J5cHRvL01ha2VmaWxlIGIvY3J5cHRv
+L01ha2VmaWxlCmluZGV4IDFmODdkYjIuLjMwOTk0YTIgMTAwNjQ0Ci0tLSBhL2NyeXB0by9NYWtl
+ZmlsZQorKysgYi9jcnlwdG8vTWFrZWZpbGUKQEAgLTMzLDYgKzMzLDcgQEAgb2JqLSQoQ09ORklH
+X0NSWVBUT19QQ0JDKSArPSBwY2JjLm8KIG9iai0kKENPTkZJR19DUllQVE9fTFJXKSArPSBscncu
+bwogb2JqLSQoQ09ORklHX0NSWVBUT19YVFMpICs9IHh0cy5vCiBvYmotJChDT05GSUdfQ1JZUFRP
+X0NUUikgKz0gY3RyLm8KK29iai0kKENPTkZJR19DUllQVE9fU1RSRUFNKSArPSBzdHJlYW0ubwog
+b2JqLSQoQ09ORklHX0NSWVBUT19DUllQVEQpICs9IGNyeXB0ZC5vCiBvYmotJChDT05GSUdfQ1JZ
+UFRPX0RFUykgKz0gZGVzX2dlbmVyaWMubwogb2JqLSQoQ09ORklHX0NSWVBUT19GQ1JZUFQpICs9
+IGZjcnlwdC5vCmRpZmYgLS1naXQgYS9jcnlwdG8vc3RyZWFtLmMgYi9jcnlwdG8vc3RyZWFtLmMK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uYjZhM2VjYwotLS0gL2Rldi9udWxs
+CisrKyBiL2NyeXB0by9zdHJlYW0uYwpAQCAtMCwwICsxLDE5NiBAQAorLyoKKyAqIFNUUjogU3Ry
+ZWFtIGNpcGhlciB3cmFwcGVyCisgKgorICogQ29weXJpZ2h0IChjKSAyMDA3IFRhbiBTd2VlIEhl
+bmcgPHRoZXN3ZWVoZW5nQGdtYWlsLmNvbT4KKyAqCisgKiBEZXJpdmVkIGZyb20KKyAqIC0gY2Jj
+LmM6IENvcHlyaWdodCAoYykgMjAwNiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5v
+cmcuYXU+CisgKiAtIGN0ci5jOiBDb3B5cmlnaHQgKGMpIElCTSBDb3JwLiAyMDA3IEpveSBMYXR0
+ZW4gPGxhdHRlbkB1cy5pYm0uY29tPgorICoKKyAqIFN0cmVhbSBjaXBoZXJzIHN1Ym1pdHRlZCB0
+byBlU1RSRUFNLCB0aGUgRUNSWVBUIFN0cmVhbSBDaXBoZXIgUHJvamVjdCwKKyAqIHVzZSBib3Ro
+IGtleSBhbmQgSVYgdG8gZ2VuZXJhdGUgYW4gZW5jcnlwdGVkIGtleXN0cmVhbS4gVGhlIGZvbGxv
+d2luZworICogY29kZSBwcm92aWRlcyBhIHdyYXBwZXIgbWVjaGFuaXNtIHRvIGNhbGwgc3VjaCBz
+dHJlYW0gY2lwaGVycy4KKyAqCisgKiBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91
+IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeSBpdAorICogdW5kZXIgdGhlIHRlcm1z
+IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkgdGhlIEZy
+ZWUKKyAqIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhlciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vu
+c2UsIG9yIChhdCB5b3VyIG9wdGlvbikKKyAqIGFueSBsYXRlciB2ZXJzaW9uLgorICoKKyAqLwor
+CisjaW5jbHVkZSA8Y3J5cHRvL2FsZ2FwaS5oPgorI2luY2x1ZGUgPGxpbnV4L2Vyci5oPgorI2lu
+Y2x1ZGUgPGxpbnV4L2luaXQuaD4KKyNpbmNsdWRlIDxsaW51eC9rZXJuZWwuaD4KKyNpbmNsdWRl
+IDxsaW51eC9tb2R1bGUuaD4KKyNpbmNsdWRlIDxsaW51eC9zY2F0dGVybGlzdC5oPgorI2luY2x1
+ZGUgPGxpbnV4L3NsYWIuaD4KKworc3RydWN0IGNyeXB0b19zdHJlYW1fY3R4IHsKKwlzdHJ1Y3Qg
+Y3J5cHRvX2NpcGhlciAqY2hpbGQ7Cit9OworCitzdGF0aWMgaW50IGNyeXB0b19zdHJlYW1fc2V0
+a2V5KHN0cnVjdCBjcnlwdG9fdGZtICpwYXJlbnQsIGNvbnN0IHU4ICprZXksCisJCQkJdW5zaWdu
+ZWQgaW50IGtleWxlbikKK3sKKwlzdHJ1Y3QgY3J5cHRvX3N0cmVhbV9jdHggKmN0eCA9IGNyeXB0
+b190Zm1fY3R4KHBhcmVudCk7CisJc3RydWN0IGNyeXB0b19jaXBoZXIgKmNoaWxkID0gY3R4LT5j
+aGlsZDsKKwlpbnQgZXJyOworCisJY3J5cHRvX2NpcGhlcl9jbGVhcl9mbGFncyhjaGlsZCwgQ1JZ
+UFRPX1RGTV9SRVFfTUFTSyk7CisJY3J5cHRvX2NpcGhlcl9zZXRfZmxhZ3MoY2hpbGQsIGNyeXB0
+b190Zm1fZ2V0X2ZsYWdzKHBhcmVudCkgJgorCQkJCUNSWVBUT19URk1fUkVRX01BU0spOworCWVy
+ciA9IGNyeXB0b19jaXBoZXJfc2V0a2V5KGNoaWxkLCBrZXksIGtleWxlbik7CisJY3J5cHRvX3Rm
+bV9zZXRfZmxhZ3MocGFyZW50LCBjcnlwdG9fY2lwaGVyX2dldF9mbGFncyhjaGlsZCkgJgorCQkJ
+ICAgICBDUllQVE9fVEZNX1JFU19NQVNLKTsKKwlyZXR1cm4gZXJyOworfQorCitzdGF0aWMgaW50
+IGNyeXB0b19zdHJlYW1fY3J5cHRfd2FsayhzdHJ1Y3QgYmxrY2lwaGVyX3dhbGsgKndhbGssCisJ
+CQkJICAgIHN0cnVjdCBjcnlwdG9fY2lwaGVyICp0Zm0pCit7CisJdm9pZCAoKnNldGl2KShzdHJ1
+Y3QgY3J5cHRvX3RmbSAqLCBjb25zdCB1OCAqLCB1bnNpZ25lZCBpbnQpID0KKwkJICAgICAgY3J5
+cHRvX2NpcGhlcl9hbGcodGZtKS0+Y2lhX3NldGl2OworCXZvaWQgKCpjcnlwdCkoc3RydWN0IGNy
+eXB0b190Zm0gKiwgdTggKiwgY29uc3QgdTggKikgPQorCQkgICAgICBjcnlwdG9fY2lwaGVyX2Fs
+Zyh0Zm0pLT5jaWFfZW5jcnlwdDsKKwl1bnNpZ25lZCBpbnQgaXZsZW4gPSBjcnlwdG9fY2lwaGVy
+X2FsZyh0Zm0pLT5jaWFfaXZzaXplOworCXVuc2lnbmVkIGludCBic2l6ZSA9IGNyeXB0b19jaXBo
+ZXJfYmxvY2tzaXplKHRmbSk7CisJdW5zaWduZWQgaW50IG5ieXRlcyA9IHdhbGstPm5ieXRlczsK
+Kwl1OCAqc3JjID0gd2Fsay0+c3JjLnZpcnQuYWRkcjsKKwl1OCAqZHN0ID0gd2Fsay0+ZHN0LnZp
+cnQuYWRkcjsKKwl1OCAqaXYgPSB3YWxrLT5pdjsKKwl1OCAqa3M7CisKKwlzZXRpdihjcnlwdG9f
+Y2lwaGVyX3RmbSh0Zm0pLCBpdiwgaXZsZW4pOworCXdoaWxlIChuYnl0ZXMgPj0gYnNpemUpIHsK
+KwkJY3J5cHQoY3J5cHRvX2NpcGhlcl90Zm0odGZtKSwgZHN0LCBzcmMpOworCQlkc3QgKz0gYnNp
+emU7CisJCXNyYyArPSBic2l6ZTsKKwkJbmJ5dGVzIC09IGJzaXplOworCX0KKwlpZiAobmJ5dGVz
+ID4gMCkgeworCQlrcyA9IGt6YWxsb2MoYnNpemUsIEdGUF9LRVJORUwpOworCQltZW1jcHkoa3Ms
+IHNyYywgbmJ5dGVzKTsKKwkJY3J5cHQoY3J5cHRvX2NpcGhlcl90Zm0odGZtKSwga3MsIGtzKTsK
+KwkJbWVtY3B5KGRzdCwga3MsIG5ieXRlcyk7CisJCWtmcmVlKGtzKTsKKwl9CisKKwlyZXR1cm4g
+MDsKK30KKworc3RhdGljIGludCBjcnlwdG9fc3RyZWFtX2NyeXB0KHN0cnVjdCBibGtjaXBoZXJf
+ZGVzYyAqZGVzYywKKwkJCSAgICAgICBzdHJ1Y3Qgc2NhdHRlcmxpc3QgKmRzdCwKKwkJCSAgICAg
+ICBzdHJ1Y3Qgc2NhdHRlcmxpc3QgKnNyYywKKwkJCSAgICAgICB1bnNpZ25lZCBpbnQgbmJ5dGVz
+KQoreworCXN0cnVjdCBibGtjaXBoZXJfd2FsayB3YWxrOworCXN0cnVjdCBjcnlwdG9fYmxrY2lw
+aGVyICp0Zm0gPSBkZXNjLT50Zm07CisJc3RydWN0IGNyeXB0b19zdHJlYW1fY3R4ICpjdHggPSBj
+cnlwdG9fYmxrY2lwaGVyX2N0eCh0Zm0pOworCXN0cnVjdCBjcnlwdG9fY2lwaGVyICpjaGlsZCA9
+IGN0eC0+Y2hpbGQ7CisJaW50IGVycjsKKworCWJsa2NpcGhlcl93YWxrX2luaXQoJndhbGssIGRz
+dCwgc3JjLCBuYnl0ZXMpOworCWVyciA9IGJsa2NpcGhlcl93YWxrX3ZpcnQoZGVzYywgJndhbGsp
+OworCisJd2hpbGUgKHdhbGsubmJ5dGVzKSB7CisJCW5ieXRlcyA9IGNyeXB0b19zdHJlYW1fY3J5
+cHRfd2Fsaygmd2FsaywgY2hpbGQpOworCQllcnIgPSBibGtjaXBoZXJfd2Fsa19kb25lKGRlc2Ms
+ICZ3YWxrLCBuYnl0ZXMpOworCX0KKworCXJldHVybiBlcnI7Cit9CisKKworc3RhdGljIGludCBj
+cnlwdG9fc3RyZWFtX2luaXRfdGZtKHN0cnVjdCBjcnlwdG9fdGZtICp0Zm0pCit7CisJc3RydWN0
+IGNyeXB0b19pbnN0YW5jZSAqaW5zdCA9ICh2b2lkICopdGZtLT5fX2NydF9hbGc7CisJc3RydWN0
+IGNyeXB0b19zcGF3biAqc3Bhd24gPSBjcnlwdG9faW5zdGFuY2VfY3R4KGluc3QpOworCXN0cnVj
+dCBjcnlwdG9fc3RyZWFtX2N0eCAqY3R4ID0gY3J5cHRvX3RmbV9jdHgodGZtKTsKKwlzdHJ1Y3Qg
+Y3J5cHRvX2NpcGhlciAqY2lwaGVyOworCisJY2lwaGVyID0gY3J5cHRvX3NwYXduX2NpcGhlcihz
+cGF3bik7CisJaWYgKElTX0VSUihjaXBoZXIpKQorCQlyZXR1cm4gUFRSX0VSUihjaXBoZXIpOwor
+CisJY3R4LT5jaGlsZCA9IGNpcGhlcjsKKwlyZXR1cm4gMDsKK30KKworc3RhdGljIHZvaWQgY3J5
+cHRvX3N0cmVhbV9leGl0X3RmbShzdHJ1Y3QgY3J5cHRvX3RmbSAqdGZtKQoreworCXN0cnVjdCBj
+cnlwdG9fc3RyZWFtX2N0eCAqY3R4ID0gY3J5cHRvX3RmbV9jdHgodGZtKTsKKwljcnlwdG9fZnJl
+ZV9jaXBoZXIoY3R4LT5jaGlsZCk7Cit9CisKK3N0YXRpYyBzdHJ1Y3QgY3J5cHRvX2luc3RhbmNl
+ICpjcnlwdG9fc3RyZWFtX2FsbG9jKHN0cnVjdCBydGF0dHIgKip0YikKK3sKKwlzdHJ1Y3QgY3J5
+cHRvX2luc3RhbmNlICppbnN0OworCXN0cnVjdCBjcnlwdG9fYWxnICphbGc7CisJaW50IGVycjsK
+KworCWVyciA9IGNyeXB0b19jaGVja19hdHRyX3R5cGUodGIsIENSWVBUT19BTEdfVFlQRV9CTEtD
+SVBIRVIpOworCWlmIChlcnIpCisJCXJldHVybiBFUlJfUFRSKGVycik7CisKKwlhbGcgPSBjcnlw
+dG9fZ2V0X2F0dHJfYWxnKHRiLCBDUllQVE9fQUxHX1RZUEVfQ0lQSEVSLAorCQkJCSAgQ1JZUFRP
+X0FMR19UWVBFX01BU0spOworCWlmIChJU19FUlIoYWxnKSkKKwkJcmV0dXJuIEVSUl9QVFIoUFRS
+X0VSUihhbGcpKTsKKworCWluc3QgPSBjcnlwdG9fYWxsb2NfaW5zdGFuY2UoInN0cmVhbSIsIGFs
+Zyk7CisJaWYgKElTX0VSUihpbnN0KSkKKwkJZ290byBvdXRfcHV0X2FsZzsKKworCWluc3QtPmFs
+Zy5jcmFfZmxhZ3MgPSBDUllQVE9fQUxHX1RZUEVfQkxLQ0lQSEVSOworCWluc3QtPmFsZy5jcmFf
+cHJpb3JpdHkgPSBhbGctPmNyYV9wcmlvcml0eTsKKwlpbnN0LT5hbGcuY3JhX2Jsb2Nrc2l6ZSA9
+IDE7CisJaW5zdC0+YWxnLmNyYV9hbGlnbm1hc2sgPSBhbGctPmNyYV9hbGlnbm1hc2s7CisJaW5z
+dC0+YWxnLmNyYV90eXBlID0gJmNyeXB0b19ibGtjaXBoZXJfdHlwZTsKKworCWluc3QtPmFsZy5j
+cmFfYmxrY2lwaGVyLml2c2l6ZSA9IGFsZy0+Y3JhX2NpcGhlci5jaWFfaXZzaXplOworCWluc3Qt
+PmFsZy5jcmFfYmxrY2lwaGVyLm1pbl9rZXlzaXplID0gYWxnLT5jcmFfY2lwaGVyLmNpYV9taW5f
+a2V5c2l6ZTsKKwlpbnN0LT5hbGcuY3JhX2Jsa2NpcGhlci5tYXhfa2V5c2l6ZSA9IGFsZy0+Y3Jh
+X2NpcGhlci5jaWFfbWF4X2tleXNpemU7CisKKwlpbnN0LT5hbGcuY3JhX2N0eHNpemUgPSBzaXpl
+b2Yoc3RydWN0IGNyeXB0b19zdHJlYW1fY3R4KTsKKworCWluc3QtPmFsZy5jcmFfaW5pdCA9IGNy
+eXB0b19zdHJlYW1faW5pdF90Zm07CisJaW5zdC0+YWxnLmNyYV9leGl0ID0gY3J5cHRvX3N0cmVh
+bV9leGl0X3RmbTsKKworCWluc3QtPmFsZy5jcmFfYmxrY2lwaGVyLnNldGtleSA9IGNyeXB0b19z
+dHJlYW1fc2V0a2V5OworCWluc3QtPmFsZy5jcmFfYmxrY2lwaGVyLmVuY3J5cHQgPSBjcnlwdG9f
+c3RyZWFtX2NyeXB0OworCWluc3QtPmFsZy5jcmFfYmxrY2lwaGVyLmRlY3J5cHQgPSBjcnlwdG9f
+c3RyZWFtX2NyeXB0OworCitvdXRfcHV0X2FsZzoKKwljcnlwdG9fbW9kX3B1dChhbGcpOworCXJl
+dHVybiBpbnN0OworfQorCitzdGF0aWMgdm9pZCBjcnlwdG9fc3RyZWFtX2ZyZWUoc3RydWN0IGNy
+eXB0b19pbnN0YW5jZSAqaW5zdCkKK3sKKwljcnlwdG9fZHJvcF9zcGF3bihjcnlwdG9faW5zdGFu
+Y2VfY3R4KGluc3QpKTsKKwlrZnJlZShpbnN0KTsKK30KKworc3RhdGljIHN0cnVjdCBjcnlwdG9f
+dGVtcGxhdGUgY3J5cHRvX3N0cmVhbV90bXBsID0geworCS5uYW1lID0gInN0cmVhbSIsCisJLmFs
+bG9jID0gY3J5cHRvX3N0cmVhbV9hbGxvYywKKwkuZnJlZSA9IGNyeXB0b19zdHJlYW1fZnJlZSwK
+KwkubW9kdWxlID0gVEhJU19NT0RVTEUsCit9OworCitzdGF0aWMgaW50IF9faW5pdCBjcnlwdG9f
+c3RyZWFtX21vZHVsZV9pbml0KHZvaWQpCit7CisJcmV0dXJuIGNyeXB0b19yZWdpc3Rlcl90ZW1w
+bGF0ZSgmY3J5cHRvX3N0cmVhbV90bXBsKTsKK30KKworc3RhdGljIHZvaWQgX19leGl0IGNyeXB0
+b19zdHJlYW1fbW9kdWxlX2V4aXQodm9pZCkKK3sKKwljcnlwdG9fdW5yZWdpc3Rlcl90ZW1wbGF0
+ZSgmY3J5cHRvX3N0cmVhbV90bXBsKTsKK30KKworbW9kdWxlX2luaXQoY3J5cHRvX3N0cmVhbV9t
+b2R1bGVfaW5pdCk7Cittb2R1bGVfZXhpdChjcnlwdG9fc3RyZWFtX21vZHVsZV9leGl0KTsKKwor
+TU9EVUxFX0xJQ0VOU0UoIkdQTCIpOworTU9EVUxFX0RFU0NSSVBUSU9OKCJTdHJlYW0gY2lwaGVy
+IHdyYXBwZXIiKTsKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvY3J5cHRvLmggYi9pbmNsdWRl
+L2xpbnV4L2NyeXB0by5oCmluZGV4IGYzMTEwZWIuLjM4OTBhMmUgMTAwNjQ0Ci0tLSBhL2luY2x1
+ZGUvbGludXgvY3J5cHRvLmgKKysrIGIvaW5jbHVkZS9saW51eC9jcnlwdG8uaApAQCAtMjE0LDYg
+KzIxNCwxMCBAQCBzdHJ1Y3QgY2lwaGVyX2FsZyB7CiAJICAgICAgICAgICAgICAgICAgdW5zaWdu
+ZWQgaW50IGtleWxlbik7CiAJdm9pZCAoKmNpYV9lbmNyeXB0KShzdHJ1Y3QgY3J5cHRvX3RmbSAq
+dGZtLCB1OCAqZHN0LCBjb25zdCB1OCAqc3JjKTsKIAl2b2lkICgqY2lhX2RlY3J5cHQpKHN0cnVj
+dCBjcnlwdG9fdGZtICp0Zm0sIHU4ICpkc3QsIGNvbnN0IHU4ICpzcmMpOworCisJdW5zaWduZWQg
+aW50IGNpYV9pdnNpemU7CisJdm9pZCAoKmNpYV9zZXRpdikoc3RydWN0IGNyeXB0b190Zm0gKnRm
+bSwgY29uc3QgdTggKml2LAorCQkJICB1bnNpZ25lZCBpbnQgaXZsZW4pOwogfTsKIAogc3RydWN0
+IGRpZ2VzdF9hbGcgewo=
+------=_Part_32688_6140053.1194377840546--
