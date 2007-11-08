@@ -1,441 +1,286 @@
-From: Jonathan Lynch <jonathan.lynch@intel.com>
-Subject: [PATCH] [CRYPTO] Extend sha256_generic.c to support SHA-224and SHA-224-HMAC
-Date: Wed, 7 Nov 2007 19:59:23 +0000
-Message-ID: <20071107195923.GA23977@compsoc.nuigalway.ie>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: Re: improper initialization of ipsec_table  in openswan 2.4.9
+Date: Thu, 8 Nov 2007 10:29:13 +1000
+Message-ID: <20071108002913.GA27507@securecomputing.com>
+References: <537818.31005.qm@web62507.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, jonathan.lynch@intel.com
-To: linux-crypto@vger.kernel.org
+Content-Type: multipart/mixed; boundary="EeQfGwPcQSOJBaQU"
+Cc: linux-crypto@vger.kernel.org, dev@lists.openswan.org
+To: Eran Ben-Avi <eranpublic@yahoo.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.nuigalway.ie ([140.203.201.100]:51924 "EHLO
-	mx1.nuigalway.ie" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753800AbXKGTv2 (ORCPT
+Received: from rex.snapgear.com ([203.143.235.140]:48967 "EHLO
+	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753081AbXKHA1z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Nov 2007 14:51:28 -0500
+	Wed, 7 Nov 2007 19:27:55 -0500
 Content-Disposition: inline
+In-Reply-To: <537818.31005.qm@web62507.mail.re1.yahoo.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Resubmitting this patch which extends sha256_generic.c to support SHA-224 as 
-described in FIPS 180-2 and RFC 3874. HMAC-SHA-224 as described in RFC4231 
-is then supported through the hmac interface.
 
-Patch includes test vectors for SHA-224 and HMAC-SHA-224.
+--EeQfGwPcQSOJBaQU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-SHA-224 chould be chosen as a hash algorithm when 112 bits of security 
-strength is required.
 
-Patch generated against the 2.6.24-rc1 kernel and tested against 
-2.6.24-rc1-git14 which includes fix for scatter gather implementation for HMAC. 
+Jivin Eran Ben-Avi lays it down ...
+> Hi,
+> 
+> While working with openswan 2.4.9  on kernel 2.6.22.7 I found a bug in file sysctl_net_ipsec.c.
+> The initialization of ipsec_table is improper for newer kernel versions since ctl_table structure was updated.
+> The 7th parameter which refer to *parent was initialized mistakenly with *proc_handler as it was in older kernel versions.
+> As a result ipsec proc entries under /proc/sys/net/ipsec were created as directories instead of files which led  to improper behavior of openswan.
+> Patch attached - the patch is only for newer kernel versions.Ofcourse it should be updated for backward compatibility.
 
-Please Apply.
+The newly released 2.4.10 version has a fix for this included,  but it
+only names the one field to avoid the structure alignment changes.
+Probably more a topic for the openswan dev list.
 
-Signed-off-by: Jonathan Lynch <jonathan.lynch@intel.com>
+I figure it needs to be more like the attached changes to 2.4.9 going forward.
+Will repost one I update to 2.4.10 (and then probably 2.5...) ;-)
 
----
+Cheers,
+Davidm
 
-diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/Kconfig linux-2.6.24-rc1/crypto/Kconfig
---- linux-2.6.24-rc1-vanilla/crypto/Kconfig	2007-11-05 17:12:50.291842000 +0000
-+++ linux-2.6.24-rc1/crypto/Kconfig	2007-11-05 18:18:31.571720000 +0000
-@@ -91,7 +91,7 @@ config CRYPTO_SHA1
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
- 
- config CRYPTO_SHA256
--	tristate "SHA256 digest algorithm"
-+	tristate "SHA224 and SHA256 digest algorithm"
- 	select CRYPTO_ALGAPI
- 	help
- 	  SHA256 secure hash standard (DFIPS 180-2).
-@@ -99,6 +99,9 @@ config CRYPTO_SHA256
- 	  This version of SHA implements a 256 bit hash with 128 bits of
- 	  security against collision attacks.
- 
-+          This code also includes SHA-224, a 224 bit hash with 112 bits
-+          of security against collision attacks.
-+
- config CRYPTO_SHA512
- 	tristate "SHA384 and SHA512 digest algorithms"
- 	select CRYPTO_ALGAPI
-diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/sha256_generic.c linux-2.6.24-rc1/crypto/sha256_generic.c
---- linux-2.6.24-rc1-vanilla/crypto/sha256_generic.c	2007-11-05 17:12:50.454842000 +0000
-+++ linux-2.6.24-rc1/crypto/sha256_generic.c	2007-11-06 14:24:52.872908000 +0000
-@@ -9,6 +9,7 @@
-  * Copyright (c) Jean-Luc Cooke <jlcooke@certainkey.com>
-  * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
-+ * SHA224 Support Copyright 2007 Intel Corporation <jonathan.lynch@intel.com>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -219,6 +220,22 @@ static void sha256_transform(u32 *state,
- 	memset(W, 0, 64 * sizeof(u32));
- }
- 
-+
-+static void sha224_init(struct crypto_tfm *tfm)
-+{
-+	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
-+	sctx->state[0] = SHA224_H0;
-+	sctx->state[1] = SHA224_H1;
-+	sctx->state[2] = SHA224_H2;
-+	sctx->state[3] = SHA224_H3;
-+	sctx->state[4] = SHA224_H4;
-+	sctx->state[5] = SHA224_H5;
-+	sctx->state[6] = SHA224_H6;
-+	sctx->state[7] = SHA224_H7;
-+	sctx->count[0] = 0;
-+	sctx->count[1] = 0;
-+}
-+
- static void sha256_init(struct crypto_tfm *tfm)
- {
- 	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
-@@ -295,8 +312,17 @@ static void sha256_final(struct crypto_t
- 	memset(sctx, 0, sizeof(*sctx));
- }
- 
-+static void sha224_final(struct crypto_tfm *tfm, u8 *hash)
-+{
-+	u8 D[SHA256_DIGEST_SIZE];
-+
-+	sha256_final(tfm, D);
-+
-+	memcpy(hash, D, SHA224_DIGEST_SIZE);
-+	memset(D, 0, SHA256_DIGEST_SIZE);
-+}
- 
--static struct crypto_alg alg = {
-+static struct crypto_alg sha256 = {
- 	.cra_name	=	"sha256",
- 	.cra_driver_name=	"sha256-generic",
- 	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
-@@ -304,28 +330,58 @@ static struct crypto_alg alg = {
- 	.cra_ctxsize	=	sizeof(struct sha256_ctx),
- 	.cra_module	=	THIS_MODULE,
- 	.cra_alignmask	=	3,
--	.cra_list       =       LIST_HEAD_INIT(alg.cra_list),
-+	.cra_list	=	LIST_HEAD_INIT(sha256.cra_list),
- 	.cra_u		=	{ .digest = {
- 	.dia_digestsize	=	SHA256_DIGEST_SIZE,
--	.dia_init   	= 	sha256_init,
--	.dia_update 	=	sha256_update,
--	.dia_final  	=	sha256_final } }
-+	.dia_init	=	sha256_init,
-+	.dia_update	=	sha256_update,
-+	.dia_final	=	sha256_final } }
-+};
-+
-+static struct crypto_alg sha224 = {
-+	.cra_name	= "sha224",
-+	.cra_driver_name = "sha224-generic",
-+	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
-+	.cra_blocksize	= SHA224_BLOCK_SIZE,
-+	.cra_ctxsize	= sizeof(struct sha256_ctx),
-+	.cra_module	= THIS_MODULE,
-+	.cra_alignmask	= 3,
-+	.cra_list	= LIST_HEAD_INIT(sha224.cra_list),
-+	.cra_u		= { .digest = {
-+	.dia_digestsize = SHA224_DIGEST_SIZE,
-+	.dia_init	= sha224_init,
-+	.dia_update	= sha256_update,
-+	.dia_final	= sha224_final } }
+> --- linux/net/ipsec/sysctl_net_ipsec.c	2004-07-10 17:11:18.000000000 -0200
+> +++ ../openswan-2.4.9_a/linux/net/ipsec/sysctl_net_ipsec.c	2007-11-06 11:13:13.000000000 -0200
+> @@ -74,45 +74,45 @@
+>  static ctl_table ipsec_table[] = {
+>  #ifdef CONFIG_KLIPS_DEBUG
+>  	{ NET_IPSEC_DEBUG_AH, "debug_ah", &debug_ah,
+> -	  sizeof(int), 0644, NULL, &proc_dointvec},    
+> +	  sizeof(int), 0644, NULL, NULL, &proc_dointvec},    
+>  	{ NET_IPSEC_DEBUG_ESP, "debug_esp", &debug_esp,
+> -	  sizeof(int), 0644, NULL, &proc_dointvec},    
+> +	  sizeof(int), 0644, NULL, NULL, &proc_dointvec},    
+....
+
+
+-- 
+David McCullough,  david_mccullough@securecomputing.com,   Ph:+61 734352815
+Secure Computing - SnapGear  http://www.uCdot.org http://www.cyberguard.com
+
+--EeQfGwPcQSOJBaQU
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="sysctl.diff"
+
+Index: openswan/linux/net/ipsec/sysctl_net_ipsec.c
+===================================================================
+RCS file: /cvs/sw/new-wave/openswan/linux/net/ipsec/sysctl_net_ipsec.c,v
+retrieving revision 1.2
+diff -u -r1.2 sysctl_net_ipsec.c
+--- openswan/linux/net/ipsec/sysctl_net_ipsec.c	26 Apr 2007 13:21:26 -0000	1.2
++++ openswan/linux/net/ipsec/sysctl_net_ipsec.c	8 Nov 2007 00:21:08 -0000
+@@ -73,58 +73,171 @@
  };
  
- static int __init init(void)
- {
--	return crypto_register_alg(&alg);
-+	int ret = 0;
+ static ctl_table ipsec_table[] = {
 +
-+	ret = crypto_register_alg(&sha224);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = crypto_register_alg(&sha256);
-+
-+	if (ret < 0)
-+		crypto_unregister_alg(&sha224);
-+
-+	return ret;
- }
- 
- static void __exit fini(void)
- {
--	crypto_unregister_alg(&alg);
-+	crypto_unregister_alg(&sha224);
-+	crypto_unregister_alg(&sha256);
- }
- 
- module_init(init);
- module_exit(fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm");
-+MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm");
- 
-+MODULE_ALIAS("sha224");
- MODULE_ALIAS("sha256");
-diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/tcrypt.c linux-2.6.24-rc1/crypto/tcrypt.c
---- linux-2.6.24-rc1-vanilla/crypto/tcrypt.c	2007-11-05 17:12:50.468842000 +0000
-+++ linux-2.6.24-rc1/crypto/tcrypt.c	2007-11-07 12:17:23.795465000 +0000
-@@ -12,6 +12,7 @@
-  * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-+ * 2007-11-06 Added SHA-224 and SHA-224-HMAC tests
-  * 2006-12-07 Added SHA384 HMAC and SHA512 HMAC tests
-  * 2004-08-09 Added cipher speed tests (Reyk Floeter <reyk@vantronix.net>)
-  * 2003-09-14 Rewritten by Kartikey Mahendra Bhatt
-@@ -74,8 +75,9 @@ static char *xbuf;
- static char *tvmem;
- 
- static char *check[] = {
--	"des", "md5", "des3_ede", "rot13", "sha1", "sha256", "blowfish",
--	"twofish", "serpent", "sha384", "sha512", "md4", "aes", "cast6",
-+	"des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256",
-+	"blowfish", "twofish", "serpent", "sha384", "sha512", "md4", "aes",
-+	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
- 	"arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
- 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
- 	"camellia", "seed", NULL
-@@ -908,6 +910,8 @@ static void do_test(void)
- 
- 		test_hash("md4", md4_tv_template, MD4_TEST_VECTORS);
- 
-+		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
-+
- 		test_hash("sha256", sha256_tv_template, SHA256_TEST_VECTORS);
- 
- 		//BLOWFISH
-@@ -1053,6 +1057,8 @@ static void do_test(void)
- 			  HMAC_MD5_TEST_VECTORS);
- 		test_hash("hmac(sha1)", hmac_sha1_tv_template,
- 			  HMAC_SHA1_TEST_VECTORS);
-+		test_hash("hmac(sha224)", hmac_sha224_tv_template,
-+			  HMAC_SHA224_TEST_VECTORS);
- 		test_hash("hmac(sha256)", hmac_sha256_tv_template,
- 			  HMAC_SHA256_TEST_VECTORS);
- 		test_hash("hmac(sha384)", hmac_sha384_tv_template,
-@@ -1281,6 +1287,9 @@ static void do_test(void)
- 			    camellia_cbc_dec_tv_template,
- 			    CAMELLIA_CBC_DEC_TEST_VECTORS);
- 		break;
-+	case 33:
-+		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
-+		break;
- 
- 	case 100:
- 		test_hash("hmac(md5)", hmac_md5_tv_template,
-@@ -1306,7 +1315,10 @@ static void do_test(void)
- 		test_hash("hmac(sha512)", hmac_sha512_tv_template,
- 			  HMAC_SHA512_TEST_VECTORS);
- 		break;
--
-+	case 105:
-+		test_hash("hmac(sha224)", hmac_sha224_tv_template,
-+			  HMAC_SHA224_TEST_VECTORS);
-+		break;
- 
- 	case 200:
- 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
-@@ -1441,6 +1453,10 @@ static void do_test(void)
- 		test_hash_speed("tgr192", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
- 
-+	case 313:
-+		test_hash_speed("sha224", sec, generic_hash_speed_template);
-+		if (mode > 300 && mode < 400) break;
-+
- 	case 399:
- 		break;
- 
-diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/crypto/tcrypt.h linux-2.6.24-rc1/crypto/tcrypt.h
---- linux-2.6.24-rc1-vanilla/crypto/tcrypt.h	2007-11-05 17:12:50.492842000 +0000
-+++ linux-2.6.24-rc1/crypto/tcrypt.h	2007-11-07 10:01:12.722969000 +0000
-@@ -173,6 +173,33 @@ static struct hash_testvec sha1_tv_templ
- 	}
- };
- 
-+
-+/*
-+ * SHA224 test vectors from from FIPS PUB 180-2
-+ */
-+#define SHA224_TEST_VECTORS     2
-+
-+static struct hash_testvec sha224_tv_template[] = {
+ #ifdef CONFIG_KLIPS_DEBUG
+-	{ NET_IPSEC_DEBUG_AH, "debug_ah", &debug_ah,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_ESP, "debug_esp", &debug_esp,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_TUNNEL, "debug_tunnel", &debug_tunnel,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_EROUTE, "debug_eroute", &debug_eroute,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_SPI, "debug_spi", &debug_spi,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_RADIJ, "debug_radij", &debug_radij,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_NETLINK, "debug_netlink", &debug_netlink,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_XFORM, "debug_xform", &debug_xform,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_RCV, "debug_rcv", &debug_rcv,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_PFKEY, "debug_pfkey", &debug_pfkey,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_DEBUG_VERBOSE, "debug_verbose",&sysctl_ipsec_debug_verbose,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
 +	{
-+		.plaintext = "abc",
-+		.psize  = 3,
-+		.digest = { 0x23, 0x09, 0x7D, 0x22, 0x34, 0x05, 0xD8, 0x22,
-+			0x86, 0x42, 0xA4, 0x77, 0xBD, 0xA2, 0x55, 0xB3,
-+			0x2A, 0xAD, 0xBC, 0xE4, 0xBD, 0xA0, 0xB3, 0xF7,
-+			0xE3, 0x6C, 0x9D, 0xA7},
-+	}, {
-+		.plaintext =
-+		"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-+		.psize  = 56,
-+		.digest = { 0x75, 0x38, 0x8B, 0x16, 0x51, 0x27, 0x76, 0xCC,
-+			0x5D, 0xBA, 0x5D, 0xA1, 0xFD, 0x89, 0x01, 0x50,
-+			0xB0, 0xC6, 0x45, 0x5C, 0xB4, 0xF5, 0x8B, 0x19,
-+			0x52, 0x52, 0x25, 0x25 },
-+		.np     = 2,
-+		.tap    = { 28, 28 }
-+	}
-+};
-+
- /*
-  * SHA256 test vectors from from NIST
-  */
-@@ -817,6 +844,121 @@ static struct hash_testvec hmac_sha1_tv_
- 	},
- };
- 
-+
-+/*
-+ * SHA224 HMAC test vectors from RFC4231
-+ */
-+#define HMAC_SHA224_TEST_VECTORS    4
-+
-+static struct hash_testvec hmac_sha224_tv_template[] = {
-+	{
-+		.key    = { 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
-+			0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
-+			0x0b, 0x0b, 0x0b, 0x0b },
-+		.ksize  = 20,
-+		/*  ("Hi There") */
-+		.plaintext = { 0x48, 0x69, 0x20, 0x54, 0x68, 0x65, 0x72, 0x65 },
-+		.psize  = 8,
-+		.digest = { 0x89, 0x6f, 0xb1, 0x12, 0x8a, 0xbb, 0xdf, 0x19,
-+			0x68, 0x32, 0x10, 0x7c, 0xd4, 0x9d, 0xf3, 0x3f,
-+			0x47, 0xb4, 0xb1, 0x16, 0x99, 0x12, 0xba, 0x4f,
-+			0x53, 0x68, 0x4b, 0x22},
-+	}, {
-+		.key    = { 0x4a, 0x65, 0x66, 0x65 }, /* ("Jefe") */
-+		.ksize  = 4,
-+		/* ("what do ya want for nothing?") */
-+		.plaintext = { 0x77, 0x68, 0x61, 0x74, 0x20, 0x64, 0x6f, 0x20,
-+			0x79, 0x61, 0x20, 0x77, 0x61, 0x6e, 0x74, 0x20,
-+			0x66, 0x6f, 0x72, 0x20, 0x6e, 0x6f, 0x74, 0x68,
-+			0x69, 0x6e, 0x67, 0x3f },
-+		.psize  = 28,
-+		.digest = { 0xa3, 0x0e, 0x01, 0x09, 0x8b, 0xc6, 0xdb, 0xbf,
-+			0x45, 0x69, 0x0f, 0x3a, 0x7e, 0x9e, 0x6d, 0x0f,
-+			0x8b, 0xbe, 0xa2, 0xa3, 0x9e, 0x61, 0x48, 0x00,
-+			0x8f, 0xd0, 0x5e, 0x44 },
-+		.np = 4,
-+		.tap    = { 7, 7, 7, 7 }
-+	}, {
-+		.key    = { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa },
-+		.ksize  = 131,
-+		/* ("Test Using Larger Than Block-Size Key - Hash Key First") */
-+		.plaintext = { 0x54, 0x65, 0x73, 0x74, 0x20, 0x55, 0x73, 0x69,
-+			0x6e, 0x67, 0x20, 0x4c, 0x61, 0x72, 0x67, 0x65,
-+			0x72, 0x20, 0x54, 0x68, 0x61, 0x6e, 0x20, 0x42,
-+			0x6c, 0x6f, 0x63, 0x6b, 0x2d, 0x53, 0x69, 0x7a,
-+			0x65, 0x20, 0x4b, 0x65, 0x79, 0x20, 0x2d, 0x20,
-+			0x48, 0x61, 0x73, 0x68, 0x20, 0x4b, 0x65, 0x79,
-+			0x20, 0x46, 0x69, 0x72, 0x73, 0x74 },
-+		.psize  = 54,
-+		.digest = { 0x95, 0xe9, 0xa0, 0xdb, 0x96, 0x20, 0x95, 0xad,
-+			0xae, 0xbe, 0x9b, 0x2d, 0x6f, 0x0d, 0xbc, 0xe2,
-+			0xd4, 0x99, 0xf1, 0x12, 0xf2, 0xd2, 0xb7, 0x27,
-+			0x3f, 0xa6, 0x87, 0x0e },
-+	}, {
-+		.key    = { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+			0xaa, 0xaa, 0xaa },
-+		.ksize  = 131,
-+		/* ("This is a test using a larger than block-size key and a")
-+		(" larger than block-size data. The key needs to be")
-+			(" hashed before being used by the HMAC algorithm.") */
-+		.plaintext = { 0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
-+			0x61, 0x20, 0x74, 0x65, 0x73, 0x74, 0x20, 0x75,
-+			0x73, 0x69, 0x6e, 0x67, 0x20, 0x61, 0x20, 0x6c,
-+			0x61, 0x72, 0x67, 0x65, 0x72, 0x20, 0x74, 0x68,
-+			0x61, 0x6e, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b,
-+			0x2d, 0x73, 0x69, 0x7a, 0x65, 0x20, 0x6b, 0x65,
-+			0x79, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x61, 0x20,
-+			0x6c, 0x61, 0x72, 0x67, 0x65, 0x72, 0x20, 0x74,
-+			0x68, 0x61, 0x6e, 0x20, 0x62, 0x6c, 0x6f, 0x63,
-+			0x6b, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x20, 0x64,
-+			0x61, 0x74, 0x61, 0x2e, 0x20, 0x54, 0x68, 0x65,
-+			0x20, 0x6b, 0x65, 0x79, 0x20, 0x6e, 0x65, 0x65,
-+			0x64, 0x73, 0x20, 0x74, 0x6f, 0x20, 0x62, 0x65,
-+			0x20, 0x68, 0x61, 0x73, 0x68, 0x65, 0x64, 0x20,
-+			0x62, 0x65, 0x66, 0x6f, 0x72, 0x65, 0x20, 0x62,
-+			0x65, 0x69, 0x6e, 0x67, 0x20, 0x75, 0x73, 0x65,
-+			0x64, 0x20, 0x62, 0x79, 0x20, 0x74, 0x68, 0x65,
-+			0x20, 0x48, 0x4d, 0x41, 0x43, 0x20, 0x61, 0x6c,
-+			0x67, 0x6f, 0x72, 0x69, 0x74, 0x68, 0x6d, 0x2e },
-+		.psize  = 152,
-+		.digest = { 0x3a, 0x85, 0x41, 0x66, 0xac, 0x5d, 0x9f, 0x02,
-+			0x3f, 0x54, 0xd5, 0x17, 0xd0, 0xb3, 0x9d, 0xbd,
-+			0x94, 0x67, 0x70, 0xdb, 0x9c, 0x2b, 0x95, 0xc9,
-+			0xf6, 0xf5, 0x65, 0xd1 },
++		.ctl_name     = NET_IPSEC_DEBUG_AH,
++		.procname     = "debug_ah",
++		.data         = &debug_ah,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
 +	},
-+};
-+
- /*
-  * HMAC-SHA256 test vectors from
-  * draft-ietf-ipsec-ciph-sha-256-01.txt
-diff -uprN -X linux-2.6.24-rc1-vanilla/Documentation/dontdiff linux-2.6.24-rc1-vanilla/include/crypto/sha.h linux-2.6.24-rc1/include/crypto/sha.h
---- linux-2.6.24-rc1-vanilla/include/crypto/sha.h	2007-11-05 17:14:02.110724000 +0000
-+++ linux-2.6.24-rc1/include/crypto/sha.h	2007-11-06 15:04:22.997509000 +0000
-@@ -8,6 +8,9 @@
- #define SHA1_DIGEST_SIZE        20
- #define SHA1_BLOCK_SIZE         64
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_ESP,
++		.procname     = "debug_esp",
++		.data         = &debug_esp,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_TUNNEL,
++		.procname     = "debug_tunnel",
++		.data         = &debug_tunnel,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_EROUTE,
++		.procname     = "debug_eroute",
++		.data         = &debug_eroute,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_SPI,
++		.procname     = "debug_spi",
++		.data         = &debug_spi,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_RADIJ,
++		.procname     = "debug_radij",
++		.data         = &debug_radij,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_NETLINK,
++		.procname     = "debug_netlink",
++		.data         = &debug_netlink,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_XFORM,
++		.procname     = "debug_xform",
++		.data         = &debug_xform,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_RCV,
++		.procname     = "debug_rcv",
++		.data         = &debug_rcv,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_PFKEY,
++		.procname     = "debug_pfkey",
++		.data         = &debug_pfkey,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_VERBOSE,
++		.procname     = "debug_verbose",
++		.data         = &sysctl_ipsec_debug_verbose,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
+ #ifdef CONFIG_KLIPS_IPCOMP
+-	{ NET_IPSEC_DEBUG_IPCOMP, "debug_ipcomp", &sysctl_ipsec_debug_ipcomp,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
++	{
++		.ctl_name     = NET_IPSEC_DEBUG_IPCOMP,
++		.procname     = "debug_ipcomp",
++		.data         = &sysctl_ipsec_debug_ipcomp,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
+ #endif /* CONFIG_KLIPS_IPCOMP */
  
-+#define SHA224_DIGEST_SIZE	28
-+#define SHA224_BLOCK_SIZE	64
-+
- #define SHA256_DIGEST_SIZE      32
- #define SHA256_BLOCK_SIZE       64
+ #ifdef CONFIG_KLIPS_REGRESS
+-	{ NET_IPSEC_REGRESS_PFKEY_LOSSAGE, "pfkey_lossage",
+-	  &sysctl_ipsec_regress_pfkey_lossage,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},
++	{
++		.ctl_name     = NET_IPSEC_REGRESS_PFKEY_LOSSAGE,
++		.procname     = "pfkey_lossage",
++		.data         = &sysctl_ipsec_regress_pfkey_lossage,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
+ #endif /* CONFIG_KLIPS_REGRESS */
  
-@@ -23,6 +26,15 @@
- #define SHA1_H3		0x10325476UL
- #define SHA1_H4		0xc3d2e1f0UL
- 
-+#define SHA224_H0	0xc1059ed8UL
-+#define SHA224_H1	0x367cd507UL
-+#define SHA224_H2	0x3070dd17UL
-+#define SHA224_H3	0xf70e5939UL
-+#define SHA224_H4	0xffc00b31UL
-+#define SHA224_H5	0x68581511UL
-+#define SHA224_H6	0x64f98fa7UL
-+#define SHA224_H7	0xbefa4fa4UL
+ #endif /* CONFIG_KLIPS_DEBUG */
+-	{ NET_IPSEC_ICMP, "icmp", &sysctl_ipsec_icmp,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_INBOUND_POLICY_CHECK, "inbound_policy_check", &sysctl_ipsec_inbound_policy_check,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{ NET_IPSEC_TOS, "tos", &sysctl_ipsec_tos,
+-	  sizeof(int), 0644, NULL, &proc_dointvec},    
+-	{0}
 +
- #define SHA256_H0	0x6a09e667UL
- #define SHA256_H1	0xbb67ae85UL
- #define SHA256_H2	0x3c6ef372UL
++	{
++		.ctl_name     = NET_IPSEC_ICMP,
++		.procname     = "icmp",
++		.data         = &sysctl_ipsec_icmp,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_INBOUND_POLICY_CHECK,
++		.procname     = "inbound_policy_check",
++		.data         = &sysctl_ipsec_inbound_policy_check,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = NET_IPSEC_TOS,
++		.procname     = "tos",
++		.data         = &sysctl_ipsec_tos,
++		.maxlen       = sizeof(int),
++		.mode         = 0644,
++		.proc_handler = &proc_dointvec
++	},
++	{
++		.ctl_name     = 0
++	}
+ };
+ 
+ static ctl_table ipsec_net_table[] = {
+-        { NET_IPSEC, "ipsec", NULL, 0, 0555, ipsec_table },
+-        { 0 }
++	{
++		.ctl_name     = NET_IPSEC,
++		.procname     = "ipsec",
++		.mode         = 0555,
++		.child        = ipsec_table
++	},
++	{
++		.ctl_name     = 0
++	}
+ };
+  
+ static ctl_table ipsec_root_table[] = {
+-        { CTL_NET, "net", NULL, 0, 0555, ipsec_net_table },
+-        { 0 }
++	{
++		.ctl_name     = CTL_NET,
++		.procname     = "net",
++		.mode         = 0555,
++		.child        = ipsec_net_table
++	},
++	{
++		.ctl_name     = 0
++	}
+ };
+  
+ static struct ctl_table_header *ipsec_table_header;
 
-Signed-off-by: Jonathan Lynch <jonathan.lynch@intel.com>
+--EeQfGwPcQSOJBaQU--
