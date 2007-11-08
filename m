@@ -1,41 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] libcrc32c: keep intermediate crc state in cpu order
-Date: Thu, 8 Nov 2007 21:37:46 +0800
-Message-ID: <20071108133746.GE17186@gondor.apana.org.au>
-References: <473186E9.5080300@panasas.com> <4731A5C5.3030109@panasas.com> <4731D387.5090901@panasas.com> <20071108001400O.tomof@acm.org> <4731DA0C.5090702@panasas.com> <4731FD41.1090704@panasas.com> <4732C6D2.5000904@panasas.com>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH 3/3] [crypto] AES x86_64, remove setkey
+Date: Thu, 8 Nov 2007 15:31:12 +0100
+Message-ID: <20071108143112.GD25676@Chamillionaire.breakpoint.cc>
+References: <1193585742-26284-1-git-send-email-linux-crypto@ml.breakpoint.cc> <E1ImAGK-0006r6-Nw@Chamillionaire.breakpoint.cc> <20071108132633.GB17186@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: open-iscsi@googlegroups.com, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Clay Haapala <chaapala@cisco.com>,
-	fujita.tomonori@lab.ntt.co.jp, michaelc@cs.wisc.edu,
-	djiang@mvista.com
-To: Benny Halevy <bhalevy@panasas.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3551 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753742AbXKHNiE (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:56229 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752999AbXKHObN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Nov 2007 08:38:04 -0500
+	Thu, 8 Nov 2007 09:31:13 -0500
 Content-Disposition: inline
-In-Reply-To: <4732C6D2.5000904@panasas.com>
+In-Reply-To: <20071108132633.GB17186@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 08, 2007 at 10:20:34AM +0200, Benny Halevy wrote:
-> crypto/crc32.c:chksum_final() is computing the digest as
-> *(__le32 *)out = ~cpu_to_le32(mctx->crc);
-> so the low-level crc32c_le routines should just keep
-> the crc in cpu order, otherwise it is getting swabbed
-> one too many times on big-endian machines.
-> 
-> Signed-off-by: Benny Halevy <bhalevy@fs1.bhalevy.com>
+* Herbert Xu | 2007-11-08 21:26:33 [+0800]:
 
-Patch applied.  Thanks!
+>On Sun, Oct 28, 2007 at 01:30:09PM +0100, Sebastian Siewior wrote:
+>> 
+>> The setkey() function can be shared with the generic algorithm.
+>> 
+>> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+>
+>Beautiful.  All applied.  Thanks Sebastian!
+thx. There is also one for i586 (if you are in merge mode :))
 
-I'll send this to stable too.
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
