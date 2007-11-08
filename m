@@ -1,39 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Fwd: Re: [PATCH] iSCSI fix endieness of digest to be network byte order
-Date: Thu, 8 Nov 2007 09:18:49 +0800
-Message-ID: <20071108011849.GA12428@gondor.apana.org.au>
-References: <47320C54.10406@panasas.com>
+From: Paul Wouters <paul@xelerance.com>
+Subject: Re: [Openswan dev] improper initialization of ipsec_table in
+ openswan 2.4.9
+Date: Wed, 7 Nov 2007 22:18:34 -0500 (EST)
+Message-ID: <Pine.LNX.4.64.0711072217340.26825@newtla.xelerance.com>
+References: <537818.31005.qm@web62507.mail.re1.yahoo.com>
+	<20071108002913.GA27507@securecomputing.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-	Mike Christie <michaelc@cs.wisc.edu>
-To: Benny Halevy <bhalevy@panasas.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1720 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753067AbXKHBTN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Nov 2007 20:19:13 -0500
-Content-Disposition: inline
-In-Reply-To: <47320C54.10406@panasas.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: dev@lists.openswan.org, linux-crypto@vger.kernel.org,
+	Eran Ben-Avi <eranpublic@yahoo.com>
+To: David McCullough <David_Mccullough@securecomputing.com>
+Return-path: <dev-bounces@openswan.org>
+In-Reply-To: <20071108002913.GA27507@securecomputing.com>
+List-Unsubscribe: <http://lists.openswan.org/mailman/listinfo/dev>,
+	<mailto:dev-request@openswan.org?subject=unsubscribe>
+List-Archive: <http://lists.openswan.org/pipermail/dev>
+List-Post: <mailto:dev@openswan.org>
+List-Help: <mailto:dev-request@openswan.org?subject=help>
+List-Subscribe: <http://lists.openswan.org/mailman/listinfo/dev>,
+	<mailto:dev-request@openswan.org?subject=subscribe>
+Sender: dev-bounces@openswan.org
+Errors-To: dev-bounces@openswan.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 07, 2007 at 07:04:52PM +0000, Benny Halevy wrote:
-> Am I dreaming (or just sleep deprived ;), or crc32c swabs the crc
-> one too many times on big-endian machines when CRC_LE_BITS != 1?
+On Thu, 8 Nov 2007, David McCullough wrote:
 
-Your patch looks good to me since nobody in the kernel actually
-uses the crc32c functions directly.
+> Date: Thu, 8 Nov 2007 10:29:13 +1000
+> From: David McCullough <David_Mccullough@securecomputing.com>
+> Cc:  <dev@lists.openswan.org>,  <linux-crypto@vger.kernel.org>
+> To: Eran Ben-Avi <eranpublic@yahoo.com>
+> Subject: Re: [Openswan dev] improper initialization of ipsec_table in openswan
+>      2.4.9
 
-Please resend the patch with a change description + sign-off.
+> The newly released 2.4.10 version has a fix for this included,  but it
+> only names the one field to avoid the structure alignment changes.
+> Probably more a topic for the openswan dev list.
+>
+> I figure it needs to be more like the attached changes to 2.4.9 going forward.
+> Will repost one I update to 2.4.10 (and then probably 2.5...) ;-)
 
-BTW you can get rid of the byteorder.h inclusion with the patch.
+The fix as attached, naming the structure items, is already in #testing (2.5.x)
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Paul
