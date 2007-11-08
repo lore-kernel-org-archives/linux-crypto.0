@@ -1,35 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [crypto] don't make CTR default M
-Date: Thu, 8 Nov 2007 21:28:23 +0800
-Message-ID: <20071108132823.GC17186@gondor.apana.org.au>
-References: <20071028154902.GA26247@Chamillionaire.breakpoint.cc>
+Subject: Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
+Date: Thu, 8 Nov 2007 21:30:20 +0800
+Message-ID: <20071108133019.GD17186@gondor.apana.org.au>
+References: <200710251243.58701.vda.linux@googlemail.com> <200710251248.29746.vda.linux@googlemail.com> <20071106142314.GE24423@gondor.apana.org.au> <200711071322.52630.vda.linux@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>
+To: Denys Vlasenko <vda.linux@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3479 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3505 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753934AbXKHN20 (ORCPT
+	with ESMTP id S1754025AbXKHNa2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Nov 2007 08:28:26 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1Iq7Qm-00022i-NR
-	for <linux-crypto@vger.kernel.org>; Fri, 09 Nov 2007 00:28:24 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1Iq7Ql-0004bP-00
-	for <linux-crypto@vger.kernel.org>; Thu, 08 Nov 2007 21:28:23 +0800
+	Thu, 8 Nov 2007 08:30:28 -0500
 Content-Disposition: inline
-In-Reply-To: <20071028154902.GA26247@Chamillionaire.breakpoint.cc>
+In-Reply-To: <200711071322.52630.vda.linux@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Oct 28, 2007 at 04:49:02PM +0100, Sebastian Siewior wrote:
-> NO other block mode is M by default.
-> 
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+On Wed, Nov 07, 2007 at 01:22:52PM +0000, Denys Vlasenko wrote:
+>
+> *I* am happy with 5% speed sacrifice. I'm afraid other people won't be.
 
-Patch applied.  Thanks.
+I'd like to hear the opinion of the author.
+
+Takamiya-san, what do you think about this change?
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
