@@ -1,32 +1,38 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH 3/3] [crypto] AES x86_64, remove setkey
-Date: Thu, 8 Nov 2007 15:31:12 +0100
-Message-ID: <20071108143112.GD25676@Chamillionaire.breakpoint.cc>
-References: <1193585742-26284-1-git-send-email-linux-crypto@ml.breakpoint.cc> <E1ImAGK-0006r6-Nw@Chamillionaire.breakpoint.cc> <20071108132633.GB17186@gondor.apana.org.au>
+From: Vlad Yasevich <vladislav.yasevich@hp.com>
+Subject: Re: Fwd: Re: [PATCH] iSCSI fix endieness of digest to be network
+ byte order
+Date: Thu, 08 Nov 2007 10:47:44 -0500
+Message-ID: <47332FA0.2020405@hp.com>
+References: <47320C54.10406@panasas.com> <20071108011849.GA12428@gondor.apana.org.au> <20071108170409B.fujita.tomonori@lab.ntt.co.jp> <20071108104040.GA16312@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+	bhalevy@panasas.com, linux-crypto@vger.kernel.org,
+	michaelc@cs.wisc.edu, netdev@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:56229 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752999AbXKHObN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Nov 2007 09:31:13 -0500
-Content-Disposition: inline
-In-Reply-To: <20071108132633.GB17186@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20071108104040.GA16312@gondor.apana.org.au>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2007-11-08 21:26:33 [+0800]:
+Herbert Xu wrote:
+> On Thu, Nov 08, 2007 at 05:04:09PM +0900, FUJITA Tomonori wrote:
+>> I wonder why crc32c isn't used directly while crc32 is used directly
+>> since they vary by only the polynomial.
+> 
+> It's because iSCSI uses it with scatterlists.  The crypto layer
+> provides a nice interface for that while using it directly would
+> require the user to do the scatterlist walk.
+> 
+>> Using crc32c directly might enable us to kill net/sctp/crc32c.c and
+>> merge lib/crc32.c and lib/libcrc32c?
+> 
+> I'm pretty sure we can kill net/sctp/crc32c.c today by converting
+> it over to use the crypto interface.
 
->On Sun, Oct 28, 2007 at 01:30:09PM +0100, Sebastian Siewior wrote:
->> 
->> The setkey() function can be shared with the generic algorithm.
->> 
->> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
->
->Beautiful.  All applied.  Thanks Sebastian!
-thx. There is also one for i586 (if you are in merge mode :))
 
-Sebastian
+Funny, I looked for crc32c in the lib just the other week and didn't spot
+it.  Need to look harder :)
+
+-vlad
