@@ -1,80 +1,22 @@
-From: Benny Halevy <bhalevy@panasas.com>
-Subject: Re: [PATCH] libcrc32c: keep intermediate crc state in cpu order
-Date: Thu, 08 Nov 2007 21:29:10 +0200
-Message-ID: <47336386.50406@panasas.com>
-References: <473186E9.5080300@panasas.com> <4731A5C5.3030109@panasas.com> <4731D387.5090901@panasas.com> <20071108001400O.tomof@acm.org> <4731DA0C.5090702@panasas.com> <4731FD41.1090704@panasas.com> <4732C6D2.5000904@panasas.com> <47335857.20303@mvista.com>
+From: "THUNDERBALL END OF YEAR PROMO" <thunderball096@libero.it>
+Subject: Hello!!!
+Date: Fri,  9 Nov 2007 12:22:41 +0100
+Message-ID: <JR8KXT$2E47193B70CE570AA6AA04A2666623AF@libero.it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: open-iscsi@googlegroups.com, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Clay Haapala <chaapala@cisco.com>,
-	fujita.tomonori@lab.ntt.co.jp, michaelc@cs.wisc.edu,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Dave Jiang <djiang@mvista.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gw-colo-pa.panasas.com ([66.238.117.130]:1390 "EHLO
-	cassoulet.panasas.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759958AbXKHTh4 (ORCPT
+Received: from smtp-out1.libero.it ([212.52.84.41]:59902 "EHLO
+	smtp-out1.libero.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751700AbXKIL1i convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Nov 2007 14:37:56 -0500
-In-Reply-To: <47335857.20303@mvista.com>
+	Fri, 9 Nov 2007 06:27:38 -0500
+Received: from mailrelay07.libero.it (192.168.32.94) by smtp-out1.libero.it (7.3.120)
+        id 47137F850283E925 for linux-crypto@vger.kernel.org; Fri, 9 Nov 2007 12:27:36 +0100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Nov. 08, 2007, 20:41 +0200, Dave Jiang <djiang@mvista.com> wrote:
-> Resolved my issue with BE open-iscsi initiator and LE IET target. Thanks!
-
-Super!  Thanks for testing!
-
-And many thanks to Tomo for identifying the byte-order problem
-in the crypto code.
-
-Benny
-
-
-> 
-> Benny Halevy wrote:
->> crypto/crc32.c:chksum_final() is computing the digest as
->> *(__le32 *)out = ~cpu_to_le32(mctx->crc);
->> so the low-level crc32c_le routines should just keep
->> the crc in cpu order, otherwise it is getting swabbed
->> one too many times on big-endian machines.
->>
->> Signed-off-by: Benny Halevy <bhalevy@fs1.bhalevy.com>
->> ---
->>  lib/libcrc32c.c |    7 ++-----
->>  1 files changed, 2 insertions(+), 5 deletions(-)
->>
->> diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
->> index 802f11f..b5c3287 100644
->> --- a/lib/libcrc32c.c
->> +++ b/lib/libcrc32c.c
->> @@ -33,7 +33,6 @@
->>  #include <linux/crc32c.h>
->>  #include <linux/compiler.h>
->>  #include <linux/module.h>
->> -#include <asm/byteorder.h>
->>  
->>  MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
->>  MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations");
->> @@ -161,15 +160,13 @@ static const u32 crc32c_table[256] = {
->>   */
->>  
->>  u32 __pure
->> -crc32c_le(u32 seed, unsigned char const *data, size_t length)
->> +crc32c_le(u32 crc, unsigned char const *data, size_t length)
->>  {
->> -	u32 crc = __cpu_to_le32(seed);
->> -	
->>  	while (length--)
->>  		crc =
->>  		    crc32c_table[(crc ^ *data++) & 0xFFL] ^ (crc >> 8);
->>  
->> -	return __le32_to_cpu(crc);
->> +	return crc;
->>  }
->>  
->>  #endif	/* CRC_LE_BITS == 8 */
-> 
-> 
+You won the sum of 850,000,GBP by the Thunderball promotions. contact this email for further instructions: gill_gamin4_2007@hotmail.com
+TEL:+447045708596
+Thank you.
