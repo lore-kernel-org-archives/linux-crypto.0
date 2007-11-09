@@ -1,38 +1,34 @@
 From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: [1/1] HIFN: schedule callback invocation to tasklet.
-Date: Fri, 9 Nov 2007 19:12:14 +0300
-Message-ID: <20071109161214.GA18200@2ka.mipt.ru>
+Subject: Re: [1/1] HIFN: schedule callback invocation to tasklet.
+Date: Fri, 9 Nov 2007 21:31:56 +0300
+Message-ID: <20071109183154.GA27736@2ka.mipt.ru>
+References: <20071109161214.GA18200@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:60918 "EHLO 2ka.mipt.ru"
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:40823 "EHLO 2ka.mipt.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752807AbXKIQLx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Nov 2007 11:11:53 -0500
+	id S1751391AbXKISbg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Nov 2007 13:31:36 -0500
 Content-Disposition: inline
+In-Reply-To: <20071109161214.GA18200@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi.
+On Fri, Nov 09, 2007 at 07:12:14PM +0300, Evgeniy Polyakov (johnpol@2ka.mipt.ru) wrote:
+> This patch forces HIFN driver to invoke crypto request callbacks from
+> tasklet (softirq context) instead of hardirq context, since network
+> stack expects it to be called from bottom halves.
 
-This patch forces HIFN driver to invoke crypto request callbacks from
-tasklet (softirq context) instead of hardirq context, since network
-stack expects it to be called from bottom halves.
-
-It is done by simply scheduling callback invocation via dedicated
-tasklet. Workqueue solution was dropped because of tooo slow
-rescheduling performance (7 times slower than tasklet, for mode details
-one can check this link:
-http://tservice.net.ru/~s0mbre/blog/devel/other/2007_11_09.html).
-
-Driver passed all AES and DES tests in tcryt.c module.
+And first patch is obviously wrong, since it does not stop tasklet on
+exit path, please apply given one.
 
 Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 
 diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index e152917..f5aa939 100644
+index e152917..0a7c07b 100644
 --- a/drivers/crypto/hifn_795x.c
 +++ b/drivers/crypto/hifn_795x.c
 @@ -26,6 +26,7 @@
@@ -90,6 +86,22 @@ index e152917..f5aa939 100644
  	crypto_init_queue(&dev->queue, 1);
  
  	err = request_irq(dev->irq, hifn_interrupt, IRQF_SHARED, dev->name, dev);
+@@ -2530,6 +2548,7 @@ err_out_stop_device:
+ 	hifn_stop_device(dev);
+ err_out_free_irq:
+ 	free_irq(dev->irq, dev->name);
++	tasklet_kill(&dev->tasklet);
+ err_out_free_desc:
+ 	pci_free_consistent(pdev, sizeof(struct hifn_dma),
+ 			dev->desc_virt, dev->desc_dma);
+@@ -2569,6 +2588,7 @@ static void hifn_remove(struct pci_dev *pdev)
+ 		hifn_stop_device(dev);
+ 
+ 		free_irq(dev->irq, dev->name);
++		tasklet_kill(&dev->tasklet);
+ 
+ 		hifn_flush(dev);
+ 
 
 -- 
 	Evgeniy Polyakov
