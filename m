@@ -1,37 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [1/1] HIFN: schedule callback invocation to tasklet.
-Date: Sat, 10 Nov 2007 20:25:44 +0800
-Message-ID: <20071110122544.GF5485@gondor.apana.org.au>
-References: <20071109161214.GA18200@2ka.mipt.ru> <20071109183154.GA27736@2ka.mipt.ru>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: geode: fix not inplace encryption
+Date: Sat, 10 Nov 2007 21:58:19 +0100
+Message-ID: <20071110205819.GB15150@Chamillionaire.breakpoint.cc>
+References: <20071106200155.GA28183@Chamillionaire.breakpoint.cc> <20071106213040.GA30907@cosmic.amd.com> <20071110113914.GD5485@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Jordan Crouse <jordan.crouse@amd.com>,
+	linux-crypto@vger.kernel.org, stable@kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2103 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751662AbXKJMZt (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:50681 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753852AbXKJU6W (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 10 Nov 2007 07:25:49 -0500
+	Sat, 10 Nov 2007 15:58:22 -0500
 Content-Disposition: inline
-In-Reply-To: <20071109183154.GA27736@2ka.mipt.ru>
+In-Reply-To: <20071110113914.GD5485@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 09, 2007 at 09:31:56PM +0300, Evgeniy Polyakov wrote:
-> On Fri, Nov 09, 2007 at 07:12:14PM +0300, Evgeniy Polyakov (johnpol@2ka.mipt.ru) wrote:
-> > This patch forces HIFN driver to invoke crypto request callbacks from
-> > tasklet (softirq context) instead of hardirq context, since network
-> > stack expects it to be called from bottom halves.
-> 
-> And first patch is obviously wrong, since it does not stop tasklet on
-> exit path, please apply given one.
-> 
-> Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+* Herbert Xu | 2007-11-10 19:39:14 [+0800]:
 
-Patch applied.  Thanks Evgeniy!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>On Tue, Nov 06, 2007 at 02:30:40PM -0700, Jordan Crouse wrote:
+>> On 06/11/07 21:01 +0100, Sebastian Siewior wrote:
+>> > Currently the Geode AES module fails to encrypt or decrypt if
+>> > the coherent bits are not set what is currently the case if the
+>> > encryption does not occur inplace. However, the encryption works 
+>> > on my Geode machine _only_ if the coherent bits are always set.
+>> > 
+>> > Cc: Jordan Crouse <jordan.crouse@amd.com>
+>> > Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+>> 
+>> Acked-by: Jordan Crouse <jordan.crouse@amd.com>
+>> 
+>> Anything in the cache is suspect - turning on coherency is the best plan
+>> to be rock solid.
+>
+>Patch applied.  Thanks.
+I haven't seen this patch in your crypto tree. Do you think about
+pushing this into .24?
+
+Sebastian
