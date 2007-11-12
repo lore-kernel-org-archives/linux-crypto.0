@@ -1,42 +1,58 @@
-From: "Loc Ho" <locnho@sbcglobal.net>
-Subject: New Crypto Hardware
-Date: Mon, 12 Nov 2007 10:19:49 -0800
-Message-ID: <007c01c82558$9d175180$2005420a@amcc.com>
-References: <0CA0A16855646F4FA96D25A158E299D603B5A5EB@SDCEXCHANGE01.ad.amcc.com>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: Re: [PATCH 1/2] stream: Stream cipher wrapper
+Date: Tue, 13 Nov 2007 03:44:42 +0800
+Message-ID: <fd3e431c0711121144q30af79a3y577be15c1a842a8b@mail.gmail.com>
+References: <fd3e431c0711061137lfa743abwa2be4d563d39e83b@mail.gmail.com>
+	 <20071111121151.GA14285@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-To: <linux-crypto@vger.kernel.org>
+Cc: "Linux Crypto" <linux-crypto@vger.kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp115.sbc.mail.sp1.yahoo.com ([69.147.64.88]:29802 "HELO
-	smtp115.sbc.mail.sp1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1752473AbXKLS0e (ORCPT
+Received: from wa-out-1112.google.com ([209.85.146.183]:25496 "EHLO
+	wa-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753538AbXKLTon (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Nov 2007 13:26:34 -0500
-In-Reply-To: 
+	Mon, 12 Nov 2007 14:44:43 -0500
+Received: by wa-out-1112.google.com with SMTP id v27so1644693wah
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Nov 2007 11:44:42 -0800 (PST)
+In-Reply-To: <20071111121151.GA14285@gondor.apana.org.au>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Hi Herbert, thanks for taking the time to review my patches. My reply is below.
 
-I am about to start developing a new device driver for new crypto hardware.
-I am thinking of starting with Linux CryptoAPI interface. But I have the
-following requirement:
+On Nov 11, 2007 8:11 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> In fact, thanks the work Joy has done with CTR, the Salsa20
+> stream cipher can be expressed as
+>         ctr(salsa20,0,16,8)
+> where salsa20 is the Salsa20 expansion function.
+I agree that Salsa20 can be implemented this way as it is essentially
+a hash function in counter mode. However this is not true in general
+of other eSTREAM candidates. I am hoping to find a general solution
+for eSTREAM ciphers, not just Salsa20.
 
-1. Asynchronous encrypt/decrypt
-2. Asynchronous hashing
-3. Asynchronous combined mode (GCM, CCM, and GMAC) 4.
-Asynchronous/synchronous public key accelaration (large vector operation) 5.
-Support for additional algorithms - ARC4, Kasumi, AES-XCBC and etc 6. Other
-minor offload such as windows check and etc. In fact, it can do packet level
-processing as well.
+> So could you please update your patches so that it works under
+> this framework? So your salsa20 simple cipher should be OK as
+> it is minus the extra bits like setiv.
+I could do that. But before I do, may I propose an alternative approach?
 
-What is the current state of asynchronous hashing? Will AEAD be changed to
-make use of asynchronous hashing? Is anyone working on #1 and changing AEAD
-to asychronous interface? In addition, most of the existent device driver
-only use  synchronous interface. Are there any one changing them to
-asynchronous crypto interface - such as NETKEY (Linux IPSec)?
+I would like to propose using a separate crypto_type, say
+crypto_estream_type, to "categorize" eSTREAM ciphers. Also separate
+estream_alg and estream_tfm will be used to support the setiv() call
+and to track the ivsize. A "stream" template will be used to specify
+the algorithm and ivsize - so for example Salsa20 will be
+"stream(salsa20,8)" to cryptomgr.
 
-Thanks,
-Loc
+I think this is a valid approach as it allows eSTREAM ciphers to be
+ported easily into the kernel without disturbing the existing block
+ciphers and block modes. I also think it is feasible because I've
+implemented it and tested it over the weekend. :P
+
+Please consider the merits of such an approach. I will post my 3
+patches in separate emails.
+
+Regards,
+Swee Heng
