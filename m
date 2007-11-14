@@ -1,56 +1,54 @@
-From: Denys Vlasenko <vda.linux@googlemail.com>
-Subject: Re: [camellia-oss:00952] Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
-Date: Tue, 13 Nov 2007 19:47:08 -0700
-Message-ID: <200711131947.09040.vda.linux@googlemail.com>
-References: <20071113.150702.628183529.takamiya@po.ntts.co.jp> <200711131534.33521.vda.linux@googlemail.com> <20071113.174104.224925773.davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3] [eSTREAM] stream: Wrapper for eSTREAM ciphers
+Date: Wed, 14 Nov 2007 11:07:40 +0800
+Message-ID: <20071114030740.GA8539@gondor.apana.org.au>
+References: <fd3e431c0711121159p4eec500fw5a3caec76f07295d@mail.gmail.com> <E1IrkoZ-0007hT-00@gondolin.me.apana.org.au> <fd3e431c0711130925s6b7acddck80dd0054b41d1147@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: takamiya@po.ntts.co.jp, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wr-out-0506.google.com ([64.233.184.227]:4792 "EHLO
-	wr-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753758AbXKNCrQ (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:1696 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753734AbXKNDIE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Nov 2007 21:47:16 -0500
-Received: by wr-out-0506.google.com with SMTP id 36so31892wra
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Nov 2007 18:47:15 -0800 (PST)
-In-Reply-To: <20071113.174104.224925773.davem@davemloft.net>
+	Tue, 13 Nov 2007 22:08:04 -0500
 Content-Disposition: inline
+In-Reply-To: <fd3e431c0711130925s6b7acddck80dd0054b41d1147@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tuesday 13 November 2007 18:41, David Miller wrote:
-> From: Denys Vlasenko <vda.linux@googlemail.com>
-> Date: Tue, 13 Nov 2007 15:34:33 -0700
+On Wed, Nov 14, 2007 at 01:25:37AM +0800, Tan Swee Heng wrote:
 >
-> > My preferred solution is to make loop unrolling conditional on
-> > CONFIG_CC_OPTIMIZE_FOR_SIZE - and this is what is done in my
-> > (first) patch (see attached). This part:
->
-> The default build is going to be CONFIG_CC_OPTIMIZE_FOR_SIZE
-> basically for everyone, this is what people get by default
-> and this is what every distribution uses.
->
-> Therefore %99.9999 of folks will get the slowdown.
->
-> So in my book this is not an acceptable way to deal with
-> this problem.
+> In fact, my "stream" template patch uses blkcipher in the same way.
+> However unlike "cbc" and "ctr", "stream" cannot process the IV. It
+> must pass it to the underlying eSTREAM cipher's setiv() because each
+> cipher's setiv() manipulates the IV differently. (Salsa20 uses it in a
+> counter block; other eSTREAM ciphers mix the IV with the key in their
+> key expansion.)
 
-Loop unrolling here amounts to 25% code growth:
+I think we're talking past each other :)
 
-   text    data     bss     dec     hex filename
-  21714       0       0   21714    54d2 camellia5.o
-  15906       0       0   15906    3e22 camellia5_Os.o
+What I'm suggesting is that you implement the stream ciphers that
+use an IV directly using the blkcipher interface, and not the cipher
+interface.  That way you can do whatever you want with the IV.
 
-Saving 25% or code size and going 5% slower is perfectly acceptable
-tradeof for some users. NB: I'm not saying all, ut some significant
-part of users would like to be able to have this choice.
+> So blkcipher is indeed fine for stream ciphers as you stated - I even
+> use it in "stream". The problem is that cipher_alg and cipher_tfm do
+> not have callbacks for eSTREAM ciphers to expose setiv(). The
+> "estream" patch tries to address this issue by introducing
+> crypto_estream_type, estream_alg and estream_tfm.
 
-If CONFIG_CC_OPTIMIZE_FOR_SIZE is not an acceptable method,
-do you have other ideas?
---
-vda
+That's right.  Apart from Salsa you shouldn't have to use the cipher
+interface at all.  Which means that what the cipher interface lacks
+is not a problem :)
+
+Salsa can use the cipher interface because deep down it's a block
+cipher.  It's just being used in counter mode.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
