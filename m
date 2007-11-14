@@ -1,37 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [camellia-oss:00952] Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
-Date: Wed, 14 Nov 2007 22:14:16 +0800
-Message-ID: <20071114141416.GA15085@gondor.apana.org.au>
-References: <200711131534.33521.vda.linux@googlemail.com> <20071113.194952.229187981.davem@davemloft.net> <200711132230.47844.vda.linux@googlemail.com> <200711140015.19887.vda.linux@googlemail.com>
+Subject: Re: IV copy strategy
+Date: Wed, 14 Nov 2007 22:22:53 +0800
+Message-ID: <20071114142253.GA15201@gondor.apana.org.au>
+References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, takamiya@po.ntts.co.jp,
-	linux-crypto@vger.kernel.org
-To: Denys Vlasenko <vda.linux@googlemail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2955 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3021 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754056AbXKNOOg (ORCPT
+	with ESMTP id S1754456AbXKNOWz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Nov 2007 09:14:36 -0500
+	Wed, 14 Nov 2007 09:22:55 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1IsJ8o-0000ua-2f
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Nov 2007 01:22:54 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1IsJ8n-0003yp-00
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Nov 2007 22:22:53 +0800
 Content-Disposition: inline
-In-Reply-To: <200711140015.19887.vda.linux@googlemail.com>
+In-Reply-To: <20071113231132.GA10680@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 14, 2007 at 12:15:19AM -0700, Denys Vlasenko wrote:
->
->     Use alternative key setup implementation with mostly 64-bit ops
->     if BITS_PER_LONG >= 64. Both much smaller and much faster.
+On Wed, Nov 14, 2007 at 12:11:32AM +0100, Sebastian Siewior wrote:
+> 
+> and everything goes back to normal. I checked walk.iv and it doesn't
+> change, it is still the same pointer. Do you free the walk.iv in the
+> meantime or is there another BUG I don't see? The IV length is 16 bytes.
+> Currently I'm lost ...
 
-Can we please not have two versions of the same algorithm in C?
-They're a pain to maintain and test.
+Indeed the last call to blkcipher_walk_done will free the IV if
+we had to copy it due to an alignment mismatch.  Since geode has
+an alignment of 16 bytes, that's almost a given.
 
-Where performance is paramount you could look at doing an assembly
-version.  Unlike two C versions at least that can be easily tested
-by someone who has access to the platform in question.
+You could copy from/to desc->info instead which would solve the
+problem.
 
-Thanks,
+However, why does op->iv exist at all? Surely we can just use
+walk->iv directly and the problem goes away completely?
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
