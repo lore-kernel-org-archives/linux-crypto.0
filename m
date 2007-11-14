@@ -1,58 +1,39 @@
-From: Denys Vlasenko <vda.linux@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [camellia-oss:00952] Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
-Date: Wed, 14 Nov 2007 00:38:31 -0700
-Message-ID: <200711140038.31859.vda.linux@googlemail.com>
-References: <200711131947.09040.vda.linux@googlemail.com> <200711132230.47844.vda.linux@googlemail.com> <20071113.221041.47706914.davem@davemloft.net>
+Date: Wed, 14 Nov 2007 22:14:16 +0800
+Message-ID: <20071114141416.GA15085@gondor.apana.org.au>
+References: <200711131534.33521.vda.linux@googlemail.com> <20071113.194952.229187981.davem@davemloft.net> <200711132230.47844.vda.linux@googlemail.com> <200711140015.19887.vda.linux@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: takamiya@po.ntts.co.jp, herbert@gondor.apana.org.au,
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, takamiya@po.ntts.co.jp,
 	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Denys Vlasenko <vda.linux@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wa-out-1112.google.com ([209.85.146.180]:4696 "EHLO
-	wa-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751193AbXKNHil (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:2955 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754056AbXKNOOg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Nov 2007 02:38:41 -0500
-Received: by wa-out-1112.google.com with SMTP id v27so99647wah
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Nov 2007 23:38:41 -0800 (PST)
-In-Reply-To: <20071113.221041.47706914.davem@davemloft.net>
+	Wed, 14 Nov 2007 09:14:36 -0500
 Content-Disposition: inline
+In-Reply-To: <200711140015.19887.vda.linux@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tuesday 13 November 2007 23:10, David Miller wrote:
-> From: Denys Vlasenko <vda.linux@googlemail.com>
-> Date: Tue, 13 Nov 2007 22:30:47 -0700
+On Wed, Nov 14, 2007 at 12:15:19AM -0700, Denys Vlasenko wrote:
 >
-> > On Tuesday 13 November 2007 20:49, David Miller wrote:
-> > > From: Denys Vlasenko <vda.linux@googlemail.com>
-> > > Date: Tue, 13 Nov 2007 19:47:08 -0700
-> > >
-> > > > If CONFIG_CC_OPTIMIZE_FOR_SIZE is not an acceptable method,
-> > > > do you have other ideas?
-> > >
-> > > Look at ways to make the code run faster without loop unrolling?
-> >
-> > I did it. I noticed that key setup is mostly operating on 64-bit
-> > quantities, and provided alternative implementation which
-> > exploits that fact. It's smaller and faster.
->
-> Great, then you don't have to unroll the loop and performance
-> is at least as good as before _and_ you save code space.
+>     Use alternative key setup implementation with mostly 64-bit ops
+>     if BITS_PER_LONG >= 64. Both much smaller and much faster.
 
-Unfortunately, it's applicable only to key setup,
-and unrolling happens in actual encryption.
+Can we please not have two versions of the same algorithm in C?
+They're a pain to maintain and test.
 
-But the point still stands: irrespective of other optimizations,
-unrolled and non-unrolled forms will still have different sizes
-and speeds, and in some cases (like this one) you can't
-pick one form which fits all.
+Where performance is paramount you could look at doing an assembly
+version.  Unlike two C versions at least that can be easily tested
+by someone who has access to the platform in question.
 
-> Please submit this new version :-)
-
-Just did it. It's linux-2.6.23.1.camellia5.diff
---
-vda
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
