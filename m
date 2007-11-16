@@ -1,48 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: IV copy strategy
-Date: Fri, 16 Nov 2007 21:47:56 +0800
-Message-ID: <20071116134756.GA10472@gondor.apana.org.au>
-References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au> <20071116111110.GB31765@2ka.mipt.ru> <20071116112530.GA9399@gondor.apana.org.au> <20071116114224.GC6441@2ka.mipt.ru>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: Re: [PATCH 2/3] [eSTREAM] stream: Wrapper for eSTREAM ciphers
+Date: Sat, 17 Nov 2007 01:48:04 +0800
+Message-ID: <fd3e431c0711160948n19455a6p2ba54f895359e44a@mail.gmail.com>
+References: <fd3e431c0711121159p4eec500fw5a3caec76f07295d@mail.gmail.com>
+	 <E1IrkoZ-0007hT-00@gondolin.me.apana.org.au>
+	 <fd3e431c0711130925s6b7acddck80dd0054b41d1147@mail.gmail.com>
+	 <20071114030740.GA8539@gondor.apana.org.au>
+	 <fd3e431c0711141714qbd444f9o2b15973caaf15a3c@mail.gmail.com>
+	 <20071115011807.GA21310@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3476 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757580AbXKPNr7 (ORCPT
+Received: from ik-out-1112.google.com ([66.249.90.176]:2221 "EHLO
+	ik-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757414AbXKPRsN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Nov 2007 08:47:59 -0500
+	Fri, 16 Nov 2007 12:48:13 -0500
+Received: by ik-out-1112.google.com with SMTP id c28so564048ika
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2007 09:48:06 -0800 (PST)
+In-Reply-To: <20071115011807.GA21310@gondor.apana.org.au>
 Content-Disposition: inline
-In-Reply-To: <20071116114224.GC6441@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 16, 2007 at 02:42:24PM +0300, Evgeniy Polyakov wrote:
->
-> > Actually on second thought why don't we change the interface
-> > for ablkcipher so that we allow the IV to be returned by either
-> > copying it to req->info or replacing the req->info pointer?
-> 
-> Better copy I think, since otherwise it has to allocate (in interrupt
-> context) and free iv for each packet. Even if it will be preallocated
-> during packet setup (in setiv() for example) it is unneded additional
-> overhead.
+Hi Herbert,
 
-I think you misunderstood me.  I'm suggesting that for CBC
-algorithms where the final IV is simply the last block of the
-dst buffer, if the last block is in lowmem and contiguous, that
-we simply put a pointer to it in place of the original IV.
+On Nov 15, 2007 9:18 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Actually what I suggested is that you add a wrapper called
+> salsa20 that then simply calls ctr(...) after constructing the IV.
+I tried that but encountered a problem: what is the blocksize for the
+underlying salsa20 expansion function. If 16 (block size of input)
+then crypto_ctr_crypt_{inplace,segment} will be taking steps that are
+too small. If 64 (block size of output) then we fail the ((noncesize +
+ivsize + countersize) < alg->cra_blocksize) test in
+crypto_crt_alloc(). It appears that ctr(salsa20,...) may not work or
+am I missing something here?
 
-There is no allocation involved.
+> We don't really need to have two copies of the ctr code under crypto :)
+Since I was unable to do ctr(salsa20,...) I simply let Bernstein's
+original code handles the increment of the counter.
 
-If you can't (i.e., not CBC or if the last block isn't contiguous
-or is highmem) then you just revert to copying.
+By the way, are there plans to collect the xor_{byte,quad,64,128}
+functions into a common header, say include/crypto/xor_n.h? It would
+be nice to have these common functions in a place where everyone can
+use. Currently cbc, ctr, pcbc and xcbc each has their own
+implementation. If it is useful to have such a header file, I can help
+to put together it. (After all, I foresee that I will need them when
+implementing other eSTREAM ciphers.)
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Swee Heng
