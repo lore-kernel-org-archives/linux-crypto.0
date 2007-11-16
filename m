@@ -1,48 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Subject: Re: IV copy strategy
-Date: Fri, 16 Nov 2007 17:30:31 +0800
-Message-ID: <20071116093031.GA8644@gondor.apana.org.au>
-References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au> <20071116081913.GA24538@Chamillionaire.breakpoint.cc>
+Date: Fri, 16 Nov 2007 14:11:10 +0300
+Message-ID: <20071116111110.GB31765@2ka.mipt.ru>
+References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org,
-	Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1347 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752749AbXKPJae (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Nov 2007 04:30:34 -0500
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:43237 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752632AbXKPLMa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Nov 2007 06:12:30 -0500
 Content-Disposition: inline
-In-Reply-To: <20071116081913.GA24538@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20071116020851.GC32509@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 16, 2007 at 09:19:13AM +0100, Sebastian Siewior wrote:
-> Not only in hfin. My SPU-AES has the same bug. Do you know someone who
-> wants to chain? I can remember that you said once "that this is
-> currently the case but we can change this since IPsec brings a new IV
-> for ever packet".
-> So, both of us have to fix it or must the crypto users complete their
-> encryption/decryption process in one go once they use async (we have no
-> documentation so we are very flexible here I guess :) )?
+On Fri, Nov 16, 2007 at 10:08:51AM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> > So a general question: Is it a must (requirement by the crypto API) to
+> > copy the IV back or not? I guess not if we move completely to async (one
+> > day) :)
+> 
+> You must copy it back to allow chaining.  Even when we go async
+> someone may wish to chain.  So in that sense you've just found a
+> bug in the hifn driver :)
 
-IPsec wouldn't need to chain but it is conceivable that others
-may wish to chain.  More importantly if you don't copy it out
-then chaining would be impossible in general so you're taking
-the choice away from the user.
+That's a question - should it copy IV back or not?
+Currently it is not required by crypto users.
 
-I just did a grep and RXKAD seems to be the only user that uses
-the IV (apart from IPsec that is).  So if we take chaining away
-then we might lose the ability to ever convert RXKAD to the
-ablkcipher interface.
+P.S. Sebastian, your mailer seems not to setup reply-to, since each time
+I reply, your mail is copied to the header :)
 
-I do recognise that for DMA devices copying the IV back may be
-expensive so perhaps we can add a request flag for this.
-
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
