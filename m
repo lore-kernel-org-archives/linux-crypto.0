@@ -1,37 +1,56 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: IV copy strategy
-Date: Fri, 16 Nov 2007 14:11:10 +0300
-Message-ID: <20071116111110.GB31765@2ka.mipt.ru>
-References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au>
+Date: Fri, 16 Nov 2007 19:25:30 +0800
+Message-ID: <20071116112530.GA9399@gondor.apana.org.au>
+References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au> <20071116111110.GB31765@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:43237 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752632AbXKPLMa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Nov 2007 06:12:30 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:2256 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756217AbXKPLZd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Nov 2007 06:25:33 -0500
 Content-Disposition: inline
-In-Reply-To: <20071116020851.GC32509@gondor.apana.org.au>
+In-Reply-To: <20071116111110.GB31765@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 16, 2007 at 10:08:51AM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
-> > So a general question: Is it a must (requirement by the crypto API) to
-> > copy the IV back or not? I guess not if we move completely to async (one
-> > day) :)
-> 
-> You must copy it back to allow chaining.  Even when we go async
-> someone may wish to chain.  So in that sense you've just found a
-> bug in the hifn driver :)
+On Fri, Nov 16, 2007 at 02:11:10PM +0300, Evgeniy Polyakov wrote:
+>
+> That's a question - should it copy IV back or not?
+> Currently it is not required by crypto users.
 
-That's a question - should it copy IV back or not?
-Currently it is not required by crypto users.
+Well currently we have exactly one crypto user of ablkcipher
+in the tree, and that's tcrypt :)
 
-P.S. Sebastian, your mailer seems not to setup reply-to, since each time
-I reply, your mail is copied to the header :)
+However, looking at the sync crypto users it would seem that
+chaining while not popular is used by at least RXKAD.  So I'd
+like to preserve this functionality.  Although in light of the
+fact that on DMA devices touching the encrypted result to copy
+the IV may be expensive, we could make it conditional on a flag
+inside the request, i.e., something like
 
+	CRYPTO_TFM_REQ_COPY_IV
+
+But the point is that this is something that has to be done by
+the algorithm since only it knows in general what/where the IV
+is.  So if the algorithm doesn't do that then the user can't
+easily work around this.
+
+Actually on second thought why don't we change the interface
+for ablkcipher so that we allow the IV to be returned by either
+copying it to req->info or replacing the req->info pointer?
+
+That way if the destination is linear and lowmem at the end we
+can just return a pointer to it without touching the data at all.
+
+Cheers,
 -- 
-	Evgeniy Polyakov
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
