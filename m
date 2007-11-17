@@ -1,189 +1,44 @@
 From: Patrick McHardy <kaber@trash.net>
-Subject: [RFC HIFN 01/02]: Improve PLL initialization
-Date: Sat, 17 Nov 2007 20:30:10 +0100 (MET)
-Message-ID: <20071117192951.19399.59884.sendpatchset@localhost.localdomain>
-References: <20071117192949.19399.75523.sendpatchset@localhost.localdomain>
+Subject: [RFC HIFN 00/02]: RNG support
+Date: Sat, 17 Nov 2007 20:30:09 +0100 (MET)
+Message-ID: <20071117192949.19399.75523.sendpatchset@localhost.localdomain>
 Cc: Patrick McHardy <kaber@trash.net>, linux-crypto@vger.kernel.org
 To: johnpol@2ka.mipt.ru
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:48301 "EHLO
+Received: from stinky.trash.net ([213.144.137.162]:48299 "EHLO
 	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761980AbXKQTaL (ORCPT
+	with ESMTP id S1759595AbXKQTaL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Sat, 17 Nov 2007 14:30:11 -0500
-In-Reply-To: <20071117192949.19399.75523.sendpatchset@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[HIFN]: Improve PLL initialization
+These two patches add support for using the HIFN rng.
 
-The current PLL initalization has a number of deficiencies:
+The first patch improves the PLL initialization a bit by making the
+reference clock configurable and its speed known to the driver, which
+is needed to calculate the amount of time to wait between two RNG reads.
+Since there is no way to find out the frequency reliably (especially for
+the external clock), it adds some sane looking defaults and a module
+parameter to override it. Suggestions how to improve this are welcome.
 
-- uses fixed multiplier of 8, which overclocks the chip when using a
-  reference clock that operates at frequencies above 33MHz. According
-  to a comment in the BSD source, this is true for the external clock
-  on almost all every board.
+The second patch adds hw_random support. The ugly part is finding out
+when to allow reads from the RNG. It currently translates the public
+key engine clock cycles to CPU cycles based on a 4GHz CPU and uses
+get_cycles(). The problems with this are obvious, it only works on CPUs
+that actually have some kind of cycle counter, has problems with
+unsynchronized TSCs and the 4GHz assumption is not very nice either,
+but I was reluctant to use ktime for this since it seems rather
+expensive to call ktime_get once per 4 bytes of random. Suggestion
+for improvement of this are also welcome :)
 
-- writes to a reserved bit
+Running rngtest on the random number generator indicates that it works
+properly, with an average failure ratio of about 1:1000 at ~2.5mbit.
 
-- doesn't allow to use the PCI clock
 
-This patch adds a module parameter to specify the reference clock
-(pci or external) and its frequency and uses that to calculate the
-optimum multiplier to reach the maximal speed. By default it uses
-the external clock and assumes a speed of 66MHz, which effectively
-halfs the frequency currently used.
+ drivers/crypto/hifn_795x.c |  158 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 156 insertions(+), 2 deletions(-)
 
-Signed-off-by: Patrick McHardy <kaber@trash.net>
-
----
-commit 3ca22e0c464bc84bffdf63d65c1094b2fed78bff
-tree 25f8eec10f986304415f7248255cfa813adf56fc
-parent c6e92f8a894cc97b3176ab6111ec3d5e20ef3583
-author Patrick McHardy <kaber@trash.net> Sat, 17 Nov 2007 20:15:39 +0100
-committer Patrick McHardy <kaber@trash.net> Sat, 17 Nov 2007 20:15:39 +0100
-
- drivers/crypto/hifn_795x.c |   93 +++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 91 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index fec32aa..81306b7 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -19,6 +19,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/moduleparam.h>
- #include <linux/mod_devicetable.h>
- #include <linux/interrupt.h>
- #include <linux/pci.h>
-@@ -47,6 +48,11 @@
- #define dprintk(f, a...)	do {} while (0)
- #endif
- 
-+static char hifn_pll_ref[sizeof("extNNN")] = "ext66";
-+module_param_string(pll_ref, hifn_pll_ref, sizeof(hifn_pll_ref), 0444);
-+MODULE_PARM_DESC(pll_ref,
-+		 "PLL reference clock (pci[freq] or ext[freq], default ext66)");
-+
- static atomic_t hifn_dev_number;
- 
- #define ACRYPTO_OP_DECRYPT	0
-@@ -286,7 +292,26 @@ static atomic_t hifn_dev_number;
- #define	HIFN_DMACNFG_DMARESET	0x00000002	/* DMA Reset # */
- #define	HIFN_DMACNFG_MSTRESET	0x00000001	/* Master Reset # */
- 
--#define	HIFN_PLL_7956		0x00001d18	/* 7956 PLL config value */
-+/* PLL configuraton register */
-+#define HIFN_PLL_REF_CLK_HBI	0x00000000	/* HBI reference clock */
-+#define HIFN_PLL_REF_CLK_PLL	0x00000001	/* PLL reference clock */
-+#define HIFN_PLL_BP		0x00000002	/* Reference clock bypass */
-+#define HIFN_PLL_PK_CLK_HBI	0x00000000	/* PK engine HBI clock */
-+#define HIFN_PLL_PK_CLK_PLL	0x00000008	/* PK engine PLL clock */
-+#define HIFN_PLL_PE_CLK_HBI	0x00000000	/* PE engine HBI clock */
-+#define HIFN_PLL_PE_CLK_PLL	0x00000010	/* PE engine PLL clock */
-+#define HIFN_PLL_RESERVED_1	0x00000400	/* Reserved bit, must be 1 */
-+#define HIFN_PLL_ND_SHIFT	11		/* Clock multiplier shift */
-+#define HIFN_PLL_ND_MULT_2	0x00000000	/* PLL clock multiplier 2 */
-+#define HIFN_PLL_ND_MULT_4	0x00000800	/* PLL clock multiplier 4 */
-+#define HIFN_PLL_ND_MULT_6	0x00001000	/* PLL clock multiplier 6 */
-+#define HIFN_PLL_ND_MULT_8	0x00001800	/* PLL clock multiplier 8 */
-+#define HIFN_PLL_ND_MULT_10	0x00002000	/* PLL clock multiplier 10 */
-+#define HIFN_PLL_ND_MULT_12	0x00002800	/* PLL clock multiplier 12 */
-+#define HIFN_PLL_IS_1_8		0x00000000	/* charge pump (mult. 1-8) */
-+#define HIFN_PLL_IS_9_12	0x00010000	/* charge pump (mult. 9-12) */
-+
-+#define HIFN_PLL_FCK_MAX	266		/* Maximum PLL frequency */
- 
- /* Public key reset register (HIFN_1_PUB_RESET) */
- #define	HIFN_PUBRST_RESET	0x00000001	/* reset public/rng unit */
-@@ -871,6 +896,48 @@ static void hifn_init_dma(struct hifn_device *dev)
- 	dma->cmdk = dma->srck = dma->dstk = dma->resk = 0;
- }
- 
-+/*
-+ * Initialize the PLL. We need to know the frequency of the reference clock
-+ * to calculate the optimal multiplier. For PCI we assume 66Mhz, since that
-+ * allows us to operate without the risk of overclocking the chip. If it
-+ * actually uses 33MHz, the chip will operate at half the speed, this can be
-+ * overriden by specifying the frequency as module parameter (pci33).
-+ *
-+ * Unfortunately the PCI clock is not very suitable since the HIFN needs a
-+ * stable clock and the PCI clock frequency may vary, so the default is the
-+ * external clock. There is no way to find out its frequency, we default to
-+ * 66Mhz since according to Mike Ham of HiFn, almost every board in existence
-+ * has an external crystal populated at 66Mhz.
-+ */
-+static void hifn_init_pll(struct hifn_device *dev)
-+{
-+	u32 pllcfg = HIFN_1_PLL | HIFN_PLL_RESERVED_1;
-+	unsigned int freq, m;
-+
-+	pllcfg = HIFN_1_PLL | HIFN_PLL_RESERVED_1 |
-+		 HIFN_PLL_PK_CLK_PLL | HIFN_PLL_PE_CLK_PLL;
-+
-+	if (strncmp(hifn_pll_ref, "ext", 3) == 0)
-+		pllcfg |= HIFN_PLL_REF_CLK_PLL;
-+	else
-+		pllcfg |= HIFN_PLL_REF_CLK_HBI;
-+
-+	if (hifn_pll_ref[3] != '\0')
-+		freq = simple_strtoul(hifn_pll_ref + 3, NULL, 10);
-+	else
-+		freq = 66;
-+
-+	m = HIFN_PLL_FCK_MAX / freq;
-+
-+	pllcfg |= (m / 2 - 1) << HIFN_PLL_ND_SHIFT;
-+	if (m <= 8)
-+		pllcfg |= HIFN_PLL_IS_1_8;
-+	else
-+		pllcfg |= HIFN_PLL_IS_9_12;
-+
-+	hifn_write_1(dev, HIFN_1_PLL, pllcfg);
-+}
-+
- static void hifn_init_registers(struct hifn_device *dev)
- {
- 	u32 dptr = dev->desc_dma;
-@@ -938,7 +1005,7 @@ static void hifn_init_registers(struct hifn_device *dev)
- #else
- 	hifn_write_0(dev, HIFN_0_PUCNFG, 0x10342);
- #endif
--	hifn_write_1(dev, HIFN_1_PLL, HIFN_PLL_7956);
-+	hifn_init_pll(dev);
- 
- 	hifn_write_0(dev, HIFN_0_PUISR, HIFN_PUISR_DSTOVER);
- 	hifn_write_1(dev, HIFN_1_DMA_CNFG, HIFN_DMACNFG_MSTRESET |
-@@ -2621,8 +2688,30 @@ static struct pci_driver hifn_pci_driver = {
- 
- static int __devinit hifn_init(void)
- {
-+	unsigned int freq;
- 	int err;
- 
-+	if (strncmp(hifn_pll_ref, "ext", 3) &&
-+	    strncmp(hifn_pll_ref, "pci", 3)) {
-+		printk(KERN_ERR "hifn795x: invalid pll_ref clock, must be"
-+				"pci or ext");
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * For the 7955/7956 the reference clock frequency must be in the
-+	 * range of 20MHz-100Mhz. For the 7954 the upper bound is 66.67Mhz,
-+	 * but this chip is currently not supported.
-+	 */
-+	if (hifn_pll_ref[3] != '\0') {
-+		freq = simple_strtoul(hifn_pll_ref + 3, NULL, 10);
-+		if (freq < 20 || freq > 100) {
-+			printk(KERN_ERR "hifn795x: invalid pll_ref frequency, "
-+					"must be in the range of 20-100");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	err = pci_register_driver(&hifn_pci_driver);
- 	if (err < 0) {
- 		dprintk("Failed to register PCI driver for %s device.\n",
+Patrick McHardy (2):
+      [HIFN]: Improve PLL initialization
+      [HIFN]: Add support for using the random number generator
