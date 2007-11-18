@@ -1,46 +1,48 @@
-From: Michael Buesch <mb@bu3sch.de>
-Subject: Re: [RFC HIFN 00/02]: RNG support
-Date: Sun, 18 Nov 2007 11:27:27 +0100
-Message-ID: <200711181127.28326.mb@bu3sch.de>
-References: <20071117192949.19399.75523.sendpatchset@localhost.localdomain> <473FB1E0.600@trash.net> <20071118040401.GA25625@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [camellia-oss:00952] Re: [PATCH 5/5] camellia: de-unrolling, 64bit-ization
+Date: Sun, 18 Nov 2007 21:21:39 +0800
+Message-ID: <20071118132139.GA28491@gondor.apana.org.au>
+References: <200711131534.33521.vda.linux@googlemail.com> <200711140015.19887.vda.linux@googlemail.com> <20071114141416.GA15085@gondor.apana.org.au> <200711141428.25933.vda.linux@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Patrick McHardy <kaber@trash.net>,
-	Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
-	linux-crypto@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Noriaki TAKAMIYA <takamiya@po.ntts.co.jp>,
+	David Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Denys Vlasenko <vda.linux@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from static-ip-62-75-166-246.inaddr.intergenia.de ([62.75.166.246]:46162
-	"EHLO vs166246.vserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751505AbXKRK2g (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:4473 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751834AbXKRNWD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Nov 2007 05:28:36 -0500
-In-Reply-To: <20071118040401.GA25625@gondor.apana.org.au>
+	Sun, 18 Nov 2007 08:22:03 -0500
 Content-Disposition: inline
+In-Reply-To: <200711141428.25933.vda.linux@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sunday 18 November 2007 05:04:01 Herbert Xu wrote:
-> On Sun, Nov 18, 2007 at 04:30:40AM +0100, Patrick McHardy wrote:
-> >
-> > On a related issue, I think the rng interface is not very suitable
-> > for chips like HIFN that have a constant random bandwidth, it would
-> > make a lot more sense to return the time to wait to the core, instead
-> > of waiting 10us in all cases. 256 cycles at a speed of 266MHz comes
-> > down to 0.96us, so we're waiting about 10 times as long as necessary.
-> > Since its busy waiting anyway, I'd think that from a performance POV
-> > constant polling or returning the exact amount of time would be more
-> > reasonable.
-> 
-> I agree, a better interface would be to let the hardware do the
-> blocking where necessary.
-> 
-> Michael, what do you think about this?
+On Wed, Nov 14, 2007 at 02:28:25PM -0700, Denys Vlasenko wrote:
+>
+> I also split this patch into two parts for easier review:
+> camellia5:
+>         adds 64-bit key setup
 
-Patches are welcome. ;)
+Sorry but this still duplicates way too much code.  Also key
+setup is the slow path relatively speaking so it's even less
+justifiable.
 
+> camellia6:
+>         unifies encrypt/decrypt routines for different key lengths.
+>         This reduces module size by ~25%, with tiny (less than 1%)
+>         speed impact.
+>         Also collapses encrypt/decrypt into more readable
+>         (visually shorter) form using macros.
+
+This looks pretty neat though.  I'll merge it unless I hear any
+objections.
+
+Thanks,
 -- 
-Greetings Michael.
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
