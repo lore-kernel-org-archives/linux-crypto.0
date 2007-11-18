@@ -1,39 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC HIFN 00/02]: RNG support
-Date: Sun, 18 Nov 2007 12:04:37 +0800
-Message-ID: <20071118040436.GA25705@gondor.apana.org.au>
-References: <20071117192949.19399.75523.sendpatchset@localhost.localdomain> <20071117195324.GA4010@2ka.mipt.ru> <20071118031402.GA25388@gondor.apana.org.au> <473FB1E0.600@trash.net> <20071118040401.GA25625@gondor.apana.org.au>
+Subject: Re: IV copy strategy
+Date: Sun, 18 Nov 2007 14:52:37 +0800
+Message-ID: <20071118065237.GA26456@gondor.apana.org.au>
+References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au> <20071116111110.GB31765@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
-	linux-crypto@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	mb@bu3sch.de
-To: Patrick McHardy <kaber@trash.net>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1757883AbXKREE5@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:1251 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750832AbXKRGwx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 18 Nov 2007 01:52:53 -0500
 Content-Disposition: inline
-In-Reply-To: <20071118040401.GA25625@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20071116111110.GB31765@2ka.mipt.ru>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Nov 18, 2007 at 12:04:01PM +0800, Herbert Xu wrote:
-> On Sun, Nov 18, 2007 at 04:30:40AM +0100, Patrick McHardy wrote:
-> >
-> > On a related issue, I think the rng interface is not very suitable
-> > for chips like HIFN that have a constant random bandwidth, it would
-> > make a lot more sense to return the time to wait to the core, instead
-> > of waiting 10us in all cases. 256 cycles at a speed of 266MHz comes
-> > down to 0.96us, so we're waiting about 10 times as long as necessary.
-> > Since its busy waiting anyway, I'd think that from a performance POV
-> > constant polling or returning the exact amount of time would be more
-> > reasonable.
-> 
-> I agree, a better interface would be to let the hardware do the
-> blocking where necessary.
+On Fri, Nov 16, 2007 at 02:11:10PM +0300, Evgeniy Polyakov wrote:
+>
+> That's a question - should it copy IV back or not?
+> Currently it is not required by crypto users.
 
-I meant the hardware driver of course.
+OK I've changed my mind :)
 
-Cheers,
+The reason is CTR, or rather the CTR as used by IPsec.  CTR
+itself should be able to chain, in fact one of the things I'll
+do later is to move most of the current CTR code into a chainable
+CTR with just the algorithm parameter, i.e., ctr(aes) which would
+be what we currently call ctr(0,16,16).  We can then put a non-
+chainable wrapper around that, perhaps ctr-ipsec(aes).
+
+In any case, it is clear that some algorithms simply won't be
+able to chain because the IV exposed to the outside is not the
+complete IV.
+
+So my plan is to add a new flag, CRYPTO_ALG_CIPHER_NOCHAIN that
+you would set on algorithms that cannot be chained.  The semantics
+is that everything else remains the same except that on encrypt
+calls, the req->info after completion is undefined.
+
+Users requiring chaining would then do
+
+	crypto_alloc_blkcipher("foo", 0, CRYPTO_ALG_CIPHER_NOCHAIN)
+
+For hardware offload devices such as yours where chaining does
+not come naturally you could then elect to not implement chaining
+and just set the flag.
+
+Please let me know if you see any problems with this approach.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
