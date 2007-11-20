@@ -1,45 +1,44 @@
-From: Michael Buesch <mb@bu3sch.de>
-Subject: Re: [HIFN 00/03]: RNG support v2
-Date: Mon, 19 Nov 2007 20:04:35 +0100
-Message-ID: <200711192004.35489.mb@bu3sch.de>
-References: <20071118213241.9217.7696.sendpatchset@localhost.localdomain> <200711191919.42466.mb@bu3sch.de> <4741D515.3050900@trash.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Moving xor_* functions into common header file
+Date: Tue, 20 Nov 2007 15:33:35 +0800
+Message-ID: <20071120073335.GA15090@gondor.apana.org.au>
+References: <fd3e431c0711191034qe0bda50r5123544076795b42@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, johnpol@2ka.mipt.ru,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Patrick McHardy <kaber@trash.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto <linux-crypto@vger.kernel.org>
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from static-ip-62-75-166-246.inaddr.intergenia.de ([62.75.166.246]:43924
-	"EHLO vs166246.vserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750883AbXKSTFg (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:3952 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754651AbXKTHdj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Nov 2007 14:05:36 -0500
-In-Reply-To: <4741D515.3050900@trash.net>
+	Tue, 20 Nov 2007 02:33:39 -0500
 Content-Disposition: inline
+In-Reply-To: <fd3e431c0711191034qe0bda50r5123544076795b42@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Monday 19 November 2007 19:25:25 Patrick McHardy wrote:
-> Michael Buesch wrote:
-> > On Sunday 18 November 2007 22:32:52 Patrick McHardy wrote:
-> >> These patches add support for using the HIFN rng.
-> > 
-> > Acked-by: Michael Buesch <mb@bu3sch.de>
-> > 
-> > Patrick, can you send this patchset to Andrew for inclusion into -mm?
+On Tue, Nov 20, 2007 at 02:34:48AM +0800, Tan Swee Heng wrote:
+> Hi,
 > 
-> 
-> I think he already pulls from Herbert's cryptodev-2.6 tree
-> (otherwise the patches useless anyway since the HIFN driver
-> is only in that tree).
-> 
-> 
-> 
+> 'grep "static void xor_" crypto/*' shows that cbc.c, ctr.c, pcbc.c and
+> xcbc.c share similar xor_* functions. It seems a good idea to
+> encourage code reuse by putting them into a common header (iirc
+> Evgeniy  suggested it when reviewing one of my earlier mail). It will
+> also be useful to me when porting other eSTREAM ciphers. So I would
+> like to move them into include/crypto/xor_n.h and make them all
+> "static inline". Any objections?
 
-Ok, well. Then apply it to any tree you like and push it
-upstream somehow. I'm OK with it.
+Do you actually need to xor anything that's not a multiple of
+8 bytes?
 
+I'm currently working on a patch to just restrict the block
+size for non-stream ciphers to multiples of 8 since that's what
+we have anyway.  That allows us to just use bitmap_xor.
+
+Cheers,
 -- 
-Greetings Michael.
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
