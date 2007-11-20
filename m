@@ -1,36 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Moving xor_* functions into common header file
-Date: Tue, 20 Nov 2007 16:52:19 +0800
-Message-ID: <20071120085219.GA15675@gondor.apana.org.au>
-References: <fd3e431c0711191034qe0bda50r5123544076795b42@mail.gmail.com> <20071120073335.GA15090@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: IV copy strategy
+Date: Tue, 20 Nov 2007 17:23:42 +0300
+Message-ID: <20071120142342.GA30073@2ka.mipt.ru>
+References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115211005.GA21159@Chamillionaire.breakpoint.cc> <20071116020851.GC32509@gondor.apana.org.au> <20071116111110.GB31765@2ka.mipt.ru> <20071118065237.GA26456@gondor.apana.org.au> <20071119103840.GC2048@2ka.mipt.ru> <20071119115655.GA5033@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4784 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752732AbXKTIwY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Nov 2007 03:52:24 -0500
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:53329 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755130AbXKTOYa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Nov 2007 09:24:30 -0500
 Content-Disposition: inline
-In-Reply-To: <20071120073335.GA15090@gondor.apana.org.au>
+In-Reply-To: <20071119115655.GA5033@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 20, 2007 at 03:33:35PM +0800, Herbert Xu wrote:
->
-> I'm currently working on a patch to just restrict the block
-> size for non-stream ciphers to multiples of 8 since that's what
-> we have anyway.  That allows us to just use bitmap_xor.
+On Mon, Nov 19, 2007 at 07:56:55PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> > I'm not sure what user will do, when it request chaining, but driver
+> > will set CRYPTO_ALG_CIPHER_NOCHAIN itself and return wrong/old in
+> > req->info?
+> > For IPsec it is not an issue though, but I can not say that for all.
+> 
+> Drivers that set CRYPTO_ALG_CIPHER_NOCHAIN won't be returned
+> if the user requests for a chaining cipher.  This is the same
+> as when you request for a cipher with no fallback that the
+> system won't return one needing a fallback.
+> 
+> If you're worried about users doing chaining we could even
+> create a new frontend type for it.  So the user would need
+> to allocate an object of type crypto_chncipher and use that
+> for operations that chain.
 
-Nevermind, obviously stream ciphers do need xors to the byte.
-So I'm spinning up a patch to put this into algapi.c and hence
-available for all crypto algorithms.
+Well, this looks like a good way forward.
+Not even getting into account, that it requires essentially zero
+efforts from driver writers :)
 
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
