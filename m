@@ -1,107 +1,69 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 10/11] [CRYPTO] aead: Add givcrypt operation
-Date: Thu, 22 Nov 2007 16:49:12 +0800
-Message-ID: <E1Iv7kG-00021s-00@gondolin.me.apana.org.au>
+Subject: [PATCH 11/11] [CRYPTO] authenc: Add givcrypt operation
+Date: Thu, 22 Nov 2007 16:49:14 +0800
+Message-ID: <E1Iv7kI-000220-00@gondolin.me.apana.org.au>
 References: <20071122084758.GA7536@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4697 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4698 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751551AbXKVItQ (ORCPT
+	with ESMTP id S1751506AbXKVItT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Nov 2007 03:49:16 -0500
+	Thu, 22 Nov 2007 03:49:19 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1Iv7kH-0008Ev-EG
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:49:13 +1100
+	id 1Iv7kI-0008F0-GG
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:49:14 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] aead: Add givcrypt operation
+[CRYPTO] authenc: Add givcrypt operation
 
-This patch adds the crypto_aead_givcrypt and associated support elements.
-The rationale is identical to that of the block cipher givcrypt operation,
-i.e., sometimes only the algorithm knows how the IV should be generated.
-
-The aead_request structure gains two new elements to support this operation.
-They are seq and giv.  The seq field should contain a strictly increasing
-64-bit integer which may be used by certain IV generators as an input value.
-The giv field will be used to store the generated IV.  It does not need to
-obey the alignment requirements of the algorithm because it's not used
-during the operation.
-
-The existing iv field must still be available as it will be used to store
-intermediate IVs and the output IV if chaining is desired.
+This patch implements the givcrypt function for authenc.  It simply
+calls the givcrypt operation on the underlying cipher instead of encrypt.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/aead.c          |    1 +
- include/linux/crypto.h |   14 +++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+ crypto/authenc.c |   21 +++++++++++++++++++++
+ 1 files changed, 21 insertions(+)
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 84a3501..44442ec 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -69,6 +69,7 @@ static int crypto_init_aead_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
- 
- 	crt->setkey = setkey;
- 	crt->encrypt = alg->encrypt;
-+	crt->givcrypt = alg->givcrypt;
- 	crt->decrypt = alg->decrypt;
- 	crt->ivsize = alg->ivsize;
- 	crt->authsize = alg->authsize;
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index cdbd251..9ef5b38 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -134,7 +134,9 @@ struct ablkcipher_request {
-  *	@base: Common attributes for async crypto requests
-  *	@assoclen: Length in bytes of associated data for authentication
-  *	@cryptlen: Length of data to be encrypted or decrypted
-- *	@iv: Initialisation vector
-+ *	@seq: Sequence number for IV generation
-+ *	@giv: Generated IV
-+ *	@iv: Input IV for encrypt and Output IV for both encrypt and givcrypt
-  *	@assoc: Associated data
-  *	@src: Source data
-  *	@dst: Destination data
-@@ -146,6 +148,9 @@ struct aead_request {
- 	unsigned int assoclen;
- 	unsigned int cryptlen;
- 
-+	u64 seq;
-+	u8 *giv;
-+
- 	u8 *iv;
- 
- 	struct scatterlist *assoc;
-@@ -196,6 +201,7 @@ struct aead_alg {
- 	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
- 	              unsigned int keylen);
- 	int (*encrypt)(struct aead_request *req);
-+	int (*givcrypt)(struct aead_request *req);
- 	int (*decrypt)(struct aead_request *req);
- 
- 	unsigned int ivsize;
-@@ -338,6 +344,7 @@ struct aead_tfm {
- 	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
- 	              unsigned int keylen);
- 	int (*encrypt)(struct aead_request *req);
-+	int (*givcrypt)(struct aead_request *req);
- 	int (*decrypt)(struct aead_request *req);
- 	unsigned int ivsize;
- 	unsigned int authsize;
-@@ -789,6 +796,11 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->encrypt(req);
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index bc4e608..c06f808 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -144,6 +144,26 @@ static int crypto_authenc_encrypt(struct aead_request *req)
+ 	return crypto_authenc_hash(req);
  }
  
-+static inline int crypto_aead_givcrypt(struct aead_request *req)
++static int crypto_authenc_givcrypt(struct aead_request *req)
 +{
-+	return crypto_aead_crt(crypto_aead_reqtfm(req))->givcrypt(req);
++	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
++	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
++	struct ablkcipher_request *abreq = aead_request_ctx(req);
++	int err;
++
++	ablkcipher_request_set_tfm(abreq, ctx->enc);
++	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
++					crypto_authenc_encrypt_done, req);
++	ablkcipher_request_set_crypt(abreq, req->src, req->dst, req->cryptlen,
++				     req->iv);
++
++	err = crypto_ablkcipher_givcrypt(abreq);
++	if (err)
++		return err;
++
++	return crypto_authenc_hash(req);
 +}
 +
- static inline int crypto_aead_decrypt(struct aead_request *req)
+ static int crypto_authenc_verify(struct aead_request *req)
  {
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+@@ -346,6 +366,7 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
+ 
+ 	inst->alg.cra_aead.setkey = crypto_authenc_setkey;
+ 	inst->alg.cra_aead.encrypt = crypto_authenc_encrypt;
++	inst->alg.cra_aead.givcrypt = crypto_authenc_givcrypt;
+ 	inst->alg.cra_aead.decrypt = crypto_authenc_decrypt;
+ 
+ out:
