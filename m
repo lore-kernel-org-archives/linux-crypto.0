@@ -1,242 +1,218 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/5] [CRYPTO] cbc: Use crypto_xor
-Date: Thu, 22 Nov 2007 16:37:46 +0800
-Message-ID: <E1Iv7ZC-0001wJ-00@gondolin.me.apana.org.au>
-References: <20071122083656.GB7368@gondor.apana.org.au>
+Subject: [PATCH 1/11] [CRYPTO] ablkcipher: Add givcrypt operation and givcipher type
+Date: Thu, 22 Nov 2007 16:48:39 +0800
+Message-ID: <E1Iv7jj-0001zw-00@gondolin.me.apana.org.au>
+References: <20071122084758.GA7536@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4621 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4659 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751073AbXKVIsG (ORCPT
+	with ESMTP id S1751260AbXKVIso (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Nov 2007 03:48:06 -0500
+	Thu, 22 Nov 2007 03:48:44 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1Iv7j7-0008A8-N9
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:48:02 +1100
+	id 1Iv7jj-0008Bj-ME
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:48:39 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] cbc: Use crypto_xor
+[CRYPTO] ablkcipher: Add givcrypt operation and givcipher type
 
-This patch replaces the custom xor in CBC with the generic crypto_xor.
+Different block cipher modes have different requirements for intialisation
+vectors.  For example, CBC can use a simple randomly generated IV while
+modes such as CTR must use an IV generation mechanisms that give a stronger
+guarantee on the lack of collisions.  Furthermore, disk encryption modes
+have their own IV generation algorithms.
+
+Up until now IV generation has been left to the users of the block cipher
+API.  This is inconvenient as the number of block cipher modes increase
+because the user needs to be aware of which mode is supposed tobe paired
+with which IV generation algorithm.
+
+Therefore it makes sense to integrate the IV generation into the crypto API.
+This patch takes the first step in that direction by creating a new ablkcipher
+operation, givcrypt that generates an IV before performing the actual
+encryption.
+
+It also creates the underlying givcipher type.  Algorithms that directly
+generate IVs would use it instead of ablkcipher.  All other algorithms
+(including all existing ones) would gain a givcipher algorithm upon
+registration.  This givcipher algorithm will be constructed from the geniv
+string that's stored in every algorithm.  That string will locate a template
+which is instantiated by the blkcipher/ablkcipher algorithm in question to
+give a givcipher algorithm.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cbc.c |   93 ++++++++++-------------------------------------------------
- 1 files changed, 16 insertions(+), 77 deletions(-)
+ crypto/ablkcipher.c     |   41 +++++++++++++++++++++++++++++++++++++++++
+ crypto/blkcipher.c      |    1 +
+ include/crypto/algapi.h |    1 +
+ include/linux/crypto.h  |   24 ++++++++++++++++++++++++
+ 4 files changed, 67 insertions(+)
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index 1f2649e..b013d6f 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -20,7 +20,6 @@
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index 2731acb..85e7875 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -94,6 +94,7 @@ static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
+ 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
+ 	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
++	seq_printf(m, "geniv        : %s\n", ablkcipher->geniv);
+ }
  
- struct crypto_cbc_ctx {
- 	struct crypto_cipher *child;
--	void (*xor)(u8 *dst, const u8 *src, unsigned int bs);
+ const struct crypto_type crypto_ablkcipher_type = {
+@@ -105,5 +106,45 @@ const struct crypto_type crypto_ablkcipher_type = {
+ };
+ EXPORT_SYMBOL_GPL(crypto_ablkcipher_type);
+ 
++static int crypto_init_givcipher_ops(struct crypto_tfm *tfm, u32 type,
++				      u32 mask)
++{
++	struct ablkcipher_alg *alg = &tfm->__crt_alg->cra_ablkcipher;
++	struct ablkcipher_tfm *crt = &tfm->crt_ablkcipher;
++
++	if (alg->ivsize > PAGE_SIZE / 8)
++		return -EINVAL;
++
++	crt->setkey = setkey;
++	crt->encrypt = alg->encrypt;
++	crt->givcrypt = alg->givcrypt;
++	crt->decrypt = alg->decrypt;
++	crt->ivsize = alg->ivsize;
++
++	return 0;
++}
++
++static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
++{
++	struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
++
++	seq_printf(m, "type         : givcipher\n");
++	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
++	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
++	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
++	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
++}
++
++const struct crypto_type crypto_givcipher_type = {
++	.ctxsize = crypto_ablkcipher_ctxsize,
++	.init = crypto_init_givcipher_ops,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_givcipher_show,
++#endif
++};
++EXPORT_SYMBOL_GPL(crypto_givcipher_type);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Asynchronous block chaining cipher type");
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 180d914..75c3ab9 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -496,6 +496,7 @@ static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ 	seq_printf(m, "min keysize  : %u\n", alg->cra_blkcipher.min_keysize);
+ 	seq_printf(m, "max keysize  : %u\n", alg->cra_blkcipher.max_keysize);
+ 	seq_printf(m, "ivsize       : %u\n", alg->cra_blkcipher.ivsize);
++	seq_printf(m, "geniv        : %s\n", alg->cra_blkcipher.geniv);
+ }
+ 
+ const struct crypto_type crypto_blkcipher_type = {
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 2cdb227..7f71c41 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -95,6 +95,7 @@ struct blkcipher_walk {
  };
  
- static int crypto_cbc_setkey(struct crypto_tfm *parent, const u8 *key,
-@@ -41,9 +40,7 @@ static int crypto_cbc_setkey(struct crypto_tfm *parent, const u8 *key,
+ extern const struct crypto_type crypto_ablkcipher_type;
++extern const struct crypto_type crypto_givcipher_type;
+ extern const struct crypto_type crypto_aead_type;
+ extern const struct crypto_type crypto_blkcipher_type;
+ extern const struct crypto_type crypto_hash_type;
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index f56ae87..95e99f4 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -34,6 +34,7 @@
+ #define CRYPTO_ALG_TYPE_HASH		0x00000003
+ #define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
+ #define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
++#define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
+ #define CRYPTO_ALG_TYPE_COMPRESS	0x00000008
+ #define CRYPTO_ALG_TYPE_AEAD		0x00000009
  
- static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
- 				      struct blkcipher_walk *walk,
--				      struct crypto_cipher *tfm,
--				      void (*xor)(u8 *, const u8 *,
--						  unsigned int))
-+				      struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		crypto_cipher_alg(tfm)->cia_encrypt;
-@@ -54,7 +51,7 @@ static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
- 	u8 *iv = walk->iv;
+@@ -116,6 +117,9 @@ struct ablkcipher_request {
  
- 	do {
--		xor(iv, src, bsize);
-+		crypto_xor(iv, src, bsize);
- 		fn(crypto_cipher_tfm(tfm), dst, iv);
- 		memcpy(iv, dst, bsize);
+ 	unsigned int nbytes;
  
-@@ -67,9 +64,7 @@ static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
- 
- static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
- 				      struct blkcipher_walk *walk,
--				      struct crypto_cipher *tfm,
--				      void (*xor)(u8 *, const u8 *,
--						  unsigned int))
-+				      struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		crypto_cipher_alg(tfm)->cia_encrypt;
-@@ -79,7 +74,7 @@ static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
- 	u8 *iv = walk->iv;
- 
- 	do {
--		xor(src, iv, bsize);
-+		crypto_xor(src, iv, bsize);
- 		fn(crypto_cipher_tfm(tfm), src, src);
- 		iv = src;
- 
-@@ -99,7 +94,6 @@ static int crypto_cbc_encrypt(struct blkcipher_desc *desc,
- 	struct crypto_blkcipher *tfm = desc->tfm;
- 	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
- 	struct crypto_cipher *child = ctx->child;
--	void (*xor)(u8 *, const u8 *, unsigned int bs) = ctx->xor;
- 	int err;
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
-@@ -107,11 +101,9 @@ static int crypto_cbc_encrypt(struct blkcipher_desc *desc,
- 
- 	while ((nbytes = walk.nbytes)) {
- 		if (walk.src.virt.addr == walk.dst.virt.addr)
--			nbytes = crypto_cbc_encrypt_inplace(desc, &walk, child,
--							    xor);
-+			nbytes = crypto_cbc_encrypt_inplace(desc, &walk, child);
- 		else
--			nbytes = crypto_cbc_encrypt_segment(desc, &walk, child,
--							    xor);
-+			nbytes = crypto_cbc_encrypt_segment(desc, &walk, child);
- 		err = blkcipher_walk_done(desc, &walk, nbytes);
- 	}
- 
-@@ -120,9 +112,7 @@ static int crypto_cbc_encrypt(struct blkcipher_desc *desc,
- 
- static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
- 				      struct blkcipher_walk *walk,
--				      struct crypto_cipher *tfm,
--				      void (*xor)(u8 *, const u8 *,
--						  unsigned int))
-+				      struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		crypto_cipher_alg(tfm)->cia_decrypt;
-@@ -134,7 +124,7 @@ static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
- 
- 	do {
- 		fn(crypto_cipher_tfm(tfm), dst, src);
--		xor(dst, iv, bsize);
-+		crypto_xor(dst, iv, bsize);
- 		iv = src;
- 
- 		src += bsize;
-@@ -148,9 +138,7 @@ static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
- 
- static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
- 				      struct blkcipher_walk *walk,
--				      struct crypto_cipher *tfm,
--				      void (*xor)(u8 *, const u8 *,
--						  unsigned int))
-+				      struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		crypto_cipher_alg(tfm)->cia_decrypt;
-@@ -171,11 +159,11 @@ static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
- 		fn(crypto_cipher_tfm(tfm), src, src);
- 		if ((nbytes -= bsize) < bsize)
- 			break;
--		xor(src, src - bsize, bsize);
-+		crypto_xor(src, src - bsize, bsize);
- 		src -= bsize;
- 	}
- 
--	xor(src, first_iv, bsize);
-+	crypto_xor(src, first_iv, bsize);
- 
- 	return nbytes;
- }
-@@ -188,7 +176,6 @@ static int crypto_cbc_decrypt(struct blkcipher_desc *desc,
- 	struct crypto_blkcipher *tfm = desc->tfm;
- 	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
- 	struct crypto_cipher *child = ctx->child;
--	void (*xor)(u8 *, const u8 *, unsigned int bs) = ctx->xor;
- 	int err;
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
-@@ -196,48 +183,15 @@ static int crypto_cbc_decrypt(struct blkcipher_desc *desc,
- 
- 	while ((nbytes = walk.nbytes)) {
- 		if (walk.src.virt.addr == walk.dst.virt.addr)
--			nbytes = crypto_cbc_decrypt_inplace(desc, &walk, child,
--							    xor);
-+			nbytes = crypto_cbc_decrypt_inplace(desc, &walk, child);
- 		else
--			nbytes = crypto_cbc_decrypt_segment(desc, &walk, child,
--							    xor);
-+			nbytes = crypto_cbc_decrypt_segment(desc, &walk, child);
- 		err = blkcipher_walk_done(desc, &walk, nbytes);
- 	}
- 
- 	return err;
- }
- 
--static void xor_byte(u8 *a, const u8 *b, unsigned int bs)
--{
--	do {
--		*a++ ^= *b++;
--	} while (--bs);
--}
--
--static void xor_quad(u8 *dst, const u8 *src, unsigned int bs)
--{
--	u32 *a = (u32 *)dst;
--	u32 *b = (u32 *)src;
--
--	do {
--		*a++ ^= *b++;
--	} while ((bs -= 4));
--}
--
--static void xor_64(u8 *a, const u8 *b, unsigned int bs)
--{
--	((u32 *)a)[0] ^= ((u32 *)b)[0];
--	((u32 *)a)[1] ^= ((u32 *)b)[1];
--}
--
--static void xor_128(u8 *a, const u8 *b, unsigned int bs)
--{
--	((u32 *)a)[0] ^= ((u32 *)b)[0];
--	((u32 *)a)[1] ^= ((u32 *)b)[1];
--	((u32 *)a)[2] ^= ((u32 *)b)[2];
--	((u32 *)a)[3] ^= ((u32 *)b)[3];
--}
--
- static int crypto_cbc_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
-@@ -245,22 +199,6 @@ static int crypto_cbc_init_tfm(struct crypto_tfm *tfm)
- 	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct crypto_cipher *cipher;
- 
--	switch (crypto_tfm_alg_blocksize(tfm)) {
--	case 8:
--		ctx->xor = xor_64;
--		break;
--
--	case 16:
--		ctx->xor = xor_128;
--		break;
--
--	default:
--		if (crypto_tfm_alg_blocksize(tfm) % 4)
--			ctx->xor = xor_byte;
--		else
--			ctx->xor = xor_quad;
--	}
--
- 	cipher = crypto_spawn_cipher(spawn);
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
-@@ -300,8 +238,9 @@ static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
- 	inst->alg.cra_alignmask = alg->cra_alignmask;
- 	inst->alg.cra_type = &crypto_blkcipher_type;
- 
--	if (!(alg->cra_blocksize % 4))
--		inst->alg.cra_alignmask |= 3;
-+	/* We access the data as u32s when xoring. */
-+	inst->alg.cra_alignmask |= __alignof__(u32) - 1;
++	u64 seq;
++	u8 *giv;
 +
- 	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
- 	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
- 	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
+ 	void *info;
+ 
+ 	struct scatterlist *src;
+@@ -177,11 +181,14 @@ struct ablkcipher_alg {
+ 	int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
+ 	              unsigned int keylen);
+ 	int (*encrypt)(struct ablkcipher_request *req);
++	int (*givcrypt)(struct ablkcipher_request *req);
+ 	int (*decrypt)(struct ablkcipher_request *req);
+ 
+ 	unsigned int min_keysize;
+ 	unsigned int max_keysize;
+ 	unsigned int ivsize;
++
++	char geniv[CRYPTO_MAX_ALG_NAME];
+ };
+ 
+ struct aead_alg {
+@@ -207,6 +214,8 @@ struct blkcipher_alg {
+ 	unsigned int min_keysize;
+ 	unsigned int max_keysize;
+ 	unsigned int ivsize;
++
++	char geniv[CRYPTO_MAX_ALG_NAME];
+ };
+ 
+ struct cipher_alg {
+@@ -318,6 +327,7 @@ struct ablkcipher_tfm {
+ 	int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
+ 	              unsigned int keylen);
+ 	int (*encrypt)(struct ablkcipher_request *req);
++	int (*givcrypt)(struct ablkcipher_request *req);
+ 	int (*decrypt)(struct ablkcipher_request *req);
+ 	unsigned int ivsize;
+ 	unsigned int reqsize;
+@@ -619,6 +629,13 @@ static inline int crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
+ 	return crt->encrypt(req);
+ }
+ 
++static inline int crypto_ablkcipher_givcrypt(struct ablkcipher_request *req)
++{
++	struct ablkcipher_tfm *crt =
++		crypto_ablkcipher_crt(crypto_ablkcipher_reqtfm(req));
++	return crt->givcrypt(req);
++}
++
+ static inline int crypto_ablkcipher_decrypt(struct ablkcipher_request *req)
+ {
+ 	struct ablkcipher_tfm *crt =
+@@ -683,6 +700,13 @@ static inline void ablkcipher_request_set_crypt(
+ 	req->info = iv;
+ }
+ 
++static inline void ablkcipher_request_set_giv(struct ablkcipher_request *req,
++					      u8 *giv, u64 seq)
++{
++	req->giv = giv;
++	req->seq = seq;
++}
++
+ static inline struct crypto_aead *__crypto_aead_cast(struct crypto_tfm *tfm)
+ {
+ 	return (struct crypto_aead *)tfm;
