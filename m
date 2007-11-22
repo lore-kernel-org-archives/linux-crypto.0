@@ -1,264 +1,210 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/11] [CRYPTO] blkcipher: Add givcipher_alloc_inst/givcipher_free_inst
-Date: Thu, 22 Nov 2007 16:48:42 +0800
-Message-ID: <E1Iv7jm-00020K-00@gondolin.me.apana.org.au>
+Subject: [PATCH 5/11] [CRYPTO] chainiv: Add chain IV generator
+Date: Thu, 22 Nov 2007 16:48:43 +0800
+Message-ID: <E1Iv7jn-00020S-00@gondolin.me.apana.org.au>
 References: <20071122084758.GA7536@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4678 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4679 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751489AbXKVIsw (ORCPT
+	with ESMTP id S1751528AbXKVIsz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Nov 2007 03:48:52 -0500
+	Thu, 22 Nov 2007 03:48:55 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1Iv7jn-0008CN-Va
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:48:44 +1100
+	id 1Iv7jq-0008Ce-3E
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 19:48:46 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[CRYPTO] blkcipher: Add givcipher_alloc_inst/givcipher_free_inst
+[CRYPTO] chainiv: Add chain IV generator
 
-This patch creates the infrastructure to help the construction of givcipher
-templates that wrap around existing blkcipher/ablkcipher algorithms by adding
-an IV generator to them.
+The chain IV generator is the one we've been using in the IPsec stack.
+It simply starts out with a random IV, then uses the last block of each
+encrypted packet's cipher text as the IV for the next packet.
 
-It also adds the function crypto_spawn_nivcipher that spawns ablkcipher
-objects without the givcrypt method.  This is to be used internally by
-the givcipher templates.
+It can only be used by synchronous ciphers since we have to make sure
+that we don't start the encryption of the next packet until the last
+one has completed.
+
+It does have the advantage of using very little CPU time since it doesn't
+have to generate anything at all.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/algapi.c         |   23 +++++---
- crypto/blkcipher.c      |  136 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/algapi.h |   16 +++++
- include/linux/crypto.h  |    1 
- 4 files changed, 168 insertions(+), 8 deletions(-)
+ crypto/Makefile  |    1 
+ crypto/chainiv.c |  153 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 08eca6d..217919c 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -519,14 +519,21 @@ struct crypto_instance *crypto_alloc_instance(const char *name,
- 	if (!inst)
- 		return ERR_PTR(-ENOMEM);
+diff --git a/crypto/Makefile b/crypto/Makefile
+index b8b3296..8d6afb4 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_AEAD) += aead.o
+ crypto_blkcipher-objs := ablkcipher.o
+ crypto_blkcipher-objs += blkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER) += crypto_blkcipher.o
++obj-$(CONFIG_CRYPTO_BLKCIPHER) += chainiv.o
  
--	err = -ENAMETOOLONG;
--	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME, "%s(%s)", name,
--		     alg->cra_name) >= CRYPTO_MAX_ALG_NAME)
--		goto err_free_inst;
--
--	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s(%s)",
--		     name, alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
--		goto err_free_inst;
-+	if (name) {
-+		err = -ENAMETOOLONG;
-+		if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME, "%s(%s)",
-+			     name, alg->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+			goto err_free_inst;
+ crypto_hash-objs := hash.o
+ obj-$(CONFIG_CRYPTO_HASH) += crypto_hash.o
+diff --git a/crypto/chainiv.c b/crypto/chainiv.c
+new file mode 100644
+index 0000000..25aa244
+--- /dev/null
++++ b/crypto/chainiv.c
+@@ -0,0 +1,153 @@
++/*
++ * chainiv: Chain IV Generator
++ *
++ * Generate IVs simply be using the last block of the previous encryption.
++ * This is mainly useful for CBC with a synchronous algorithm.
++ *
++ * Copyright (c) 2007 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
 +
-+		if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+			     "%s(%s)", name, alg->cra_driver_name) >=
-+		    CRYPTO_MAX_ALG_NAME)
-+			goto err_free_inst;
-+	} else {
-+		memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
-+		memcpy(inst->alg.cra_driver_name, alg->cra_driver_name,
-+		       CRYPTO_MAX_ALG_NAME);
-+	}
- 
- 	spawn = crypto_instance_ctx(inst);
- 	err = crypto_init_spawn(spawn, alg, inst,
-diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-index 75c3ab9..bd34643 100644
---- a/crypto/blkcipher.c
-+++ b/crypto/blkcipher.c
-@@ -508,5 +508,141 @@ const struct crypto_type crypto_blkcipher_type = {
- };
- EXPORT_SYMBOL_GPL(crypto_blkcipher_type);
- 
-+struct crypto_instance *givcipher_alloc_inst(struct crypto_template *tmpl,
-+					     struct rtattr **tb, u32 type,
-+					     u32 mask)
++#include <crypto/algapi.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/random.h>
++#include <linux/spinlock.h>
++#include <linux/string.h>
++
++struct chainiv_ctx {
++	struct crypto_ablkcipher *cipher;
++	spinlock_t lock;
++	char iv[];
++};
++
++static int chainiv_givcrypt(struct ablkcipher_request *req)
 +{
-+	struct {
-+		int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
-+		              unsigned int keylen);
-+		int (*encrypt)(struct ablkcipher_request *req);
-+		int (*decrypt)(struct ablkcipher_request *req);
-+
-+		unsigned int min_keysize;
-+		unsigned int max_keysize;
-+		unsigned int ivsize;
-+
-+		const char *geniv;
-+	} balg;
-+	const char *name;
-+	struct crypto_attr_type *algt;
-+	struct crypto_instance *inst;
-+	struct crypto_alg *alg;
++	struct crypto_ablkcipher *geniv = crypto_ablkcipher_reqtfm(req);
++	struct chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++	struct ablkcipher_request *subreq = ablkcipher_request_ctx(req);
++	unsigned int ivsize;
 +	int err;
 +
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return ERR_PTR(PTR_ERR(algt));
++	ablkcipher_request_set_tfm(subreq, ctx->cipher);
++	ablkcipher_request_set_callback(subreq, req->base.flags &
++						~CRYPTO_TFM_REQ_MAY_SLEEP,
++					req->base.complete, req->base.data);
++	ablkcipher_request_set_crypt(subreq, req->src, req->dst, req->nbytes,
++				     req->info);
 +
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_GIVCIPHER);
++	spin_lock_bh(&ctx->lock);
++
++	ivsize = crypto_ablkcipher_ivsize(geniv);
++
++	memcpy(req->giv, ctx->iv, ivsize);
++	memcpy(req->info, ctx->iv, ivsize);
++
++	err = crypto_ablkcipher_encrypt(subreq);
 +	if (err)
-+		return ERR_PTR(err);
++		goto unlock;
 +
-+	/* First look for an algorithm with no IV generator. */
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_BLKCIPHER | type,
-+				  CRYPTO_ALG_TYPE_NIVCIPHER_MASK | mask);
-+	err = PTR_ERR(alg);
-+	if (IS_ERR(alg)) {
-+		if (err != -ENOENT)
-+			return ERR_PTR(err);
-+		alg = NULL;
-+	}
++	memcpy(ctx->iv, req->info, ivsize);
 +
-+	if ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER) {
-+		balg.ivsize = alg->cra_blkcipher.ivsize;
-+		balg.min_keysize = alg->cra_blkcipher.min_keysize;
-+		balg.max_keysize = alg->cra_blkcipher.max_keysize;
++unlock:
++	spin_unlock_bh(&ctx->lock);
 +
-+		balg.setkey = async_setkey;
-+		balg.encrypt = async_encrypt;
-+		balg.decrypt = async_decrypt;
++	return err;
++}
 +
-+		balg.geniv = alg->cra_blkcipher.geniv;
-+	} else {
-+		balg.ivsize = alg->cra_ablkcipher.ivsize;
-+		balg.min_keysize = alg->cra_ablkcipher.min_keysize;
-+		balg.max_keysize = alg->cra_ablkcipher.max_keysize;
++static int chainiv_givcrypt_first(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *geniv = crypto_ablkcipher_reqtfm(req);
++	struct chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++	struct crypto_ablkcipher *cipher = ctx->cipher;
 +
-+		balg.setkey = alg->cra_ablkcipher.setkey;
-+		balg.encrypt = alg->cra_ablkcipher.encrypt;
-+		balg.decrypt = alg->cra_ablkcipher.decrypt;
++	spin_lock_bh(&ctx->lock);
++	if (crypto_ablkcipher_crt(cipher)->givcrypt != chainiv_givcrypt_first)
++		goto unlock;
 +
-+		balg.geniv = alg->cra_ablkcipher.geniv;
-+	}
++	crypto_ablkcipher_crt(cipher)->givcrypt = chainiv_givcrypt;
++	get_random_bytes(ctx->iv, crypto_ablkcipher_ivsize(geniv));
 +
-+	inst = ERR_PTR(-EAGAIN);
++unlock:
++	spin_unlock_bh(&ctx->lock);
 +
-+	if (!balg.ivsize)
-+		goto out_put_alg;
++	return chainiv_givcrypt(req);
++}
 +
-+	/* Use original name for default IV generator. */
-+	name = NULL;
++static int chainiv_init(struct crypto_tfm *tfm)
++{
++	struct crypto_instance *inst = (void *)tfm->__crt_alg;
++	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
++	struct chainiv_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_ablkcipher *cipher;
 +
-+	/*
-+	 * This is set unless we're constructing an algorithm with its
-+	 * default IV generator.  So check algorithms with IV generators
-+	 * too since we may be overriding them.
-+	 */
-+	if (algt->mask) {
-+		struct crypto_alg *giv;
++	cipher = crypto_spawn_nivcipher(spawn);
++	if (IS_ERR(cipher))
++		return PTR_ERR(cipher);
 +
-+		giv = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_BLKCIPHER | type,
-+					  CRYPTO_ALG_TYPE_BLKCIPHER_MASK |
-+					  mask);
-+		err = PTR_ERR(giv);
-+		if (IS_ERR(giv)) {
-+			inst = ERR_PTR(err);
-+			if (err != -ENOENT)
-+				goto out_put_alg;
-+			giv = NULL;
-+		}
++	ctx->cipher = cipher;
++	spin_lock_init(&ctx->lock);
 +
-+		if (!alg)
-+			alg = giv;
-+		else if (giv) {
-+			if (giv->cra_priority < alg->cra_priority) {
-+				crypto_mod_put(alg);
-+				alg = giv;
-+			} else
-+				crypto_mod_put(giv);
-+		}
++	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
++				      crypto_ablkcipher_reqsize(cipher);
 +
-+		name = tmpl->name;
-+	} else if (strcmp(tmpl->name, balg.geniv))
-+		goto out_put_alg;
++	return 0;
++}
 +
-+	inst = crypto_alloc_instance(name, alg);
++static void chainiv_exit(struct crypto_tfm *tfm)
++{
++	struct chainiv_ctx *ctx = crypto_tfm_ctx(tfm);
++	crypto_free_ablkcipher(ctx->cipher);
++}
++
++static struct crypto_template crypto_chainiv_tmpl;
++
++static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
++{
++	struct crypto_instance *inst;
++
++	inst = givcipher_alloc_inst(&crypto_chainiv_tmpl, tb, 0,
++				    CRYPTO_ALG_ASYNC);
 +	if (IS_ERR(inst))
-+		goto out_put_alg;
++		goto out;
 +
-+	inst->alg.cra_flags = CRYPTO_ALG_TYPE_GIVCIPHER;
-+	inst->alg.cra_flags |= alg->cra_flags & CRYPTO_ALG_ASYNC;
-+	inst->alg.cra_priority = alg->cra_priority;
-+	inst->alg.cra_blocksize = alg->cra_blocksize;
-+	inst->alg.cra_alignmask = alg->cra_alignmask;
-+	inst->alg.cra_type = &crypto_givcipher_type;
++	inst->alg.cra_ablkcipher.givcrypt = chainiv_givcrypt_first;
 +
-+	inst->alg.cra_ablkcipher.ivsize = balg.ivsize;
-+	inst->alg.cra_ablkcipher.min_keysize = balg.min_keysize;
-+	inst->alg.cra_ablkcipher.max_keysize = balg.max_keysize;
++	inst->alg.cra_init = chainiv_init;
++	inst->alg.cra_exit = chainiv_exit;
 +
-+	inst->alg.cra_ablkcipher.setkey = balg.setkey;
-+	inst->alg.cra_ablkcipher.encrypt = balg.encrypt;
-+	inst->alg.cra_ablkcipher.decrypt = balg.decrypt;
++	inst->alg.cra_ctxsize = sizeof(struct chainiv_ctx);
++	inst->alg.cra_ctxsize += inst->alg.cra_ablkcipher.ivsize;
 +
-+out_put_alg:
-+	crypto_mod_put(alg);
++out:
 +	return inst;
 +}
-+EXPORT_SYMBOL_GPL(givcipher_alloc_inst);
 +
-+void givcipher_free_inst(struct crypto_instance *inst)
++static struct crypto_template chainiv_tmpl = {
++	.name = "chainiv",
++	.alloc = chainiv_alloc,
++	.free = givcipher_free_inst,
++	.module = THIS_MODULE,
++};
++
++static int __init chainiv_module_init(void)
 +{
-+	crypto_drop_spawn(crypto_instance_ctx(inst));
-+	kfree(inst);
-+}
-+EXPORT_SYMBOL_GPL(givcipher_free_inst);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Generic block chaining cipher type");
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 7f71c41..bb8a2e8 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -139,6 +139,11 @@ int blkcipher_walk_virt_block(struct blkcipher_desc *desc,
- 			      struct blkcipher_walk *walk,
- 			      unsigned int blocksize);
- 
-+struct crypto_instance *givcipher_alloc_inst(struct crypto_template *tmpl,
-+					     struct rtattr **tb, u32 type,
-+					     u32 mask);
-+void givcipher_free_inst(struct crypto_instance *inst);
-+
- static inline void *crypto_tfm_ctx_aligned(struct crypto_tfm *tfm)
- {
- 	unsigned long addr = (unsigned long)crypto_tfm_ctx(tfm);
-@@ -201,6 +206,17 @@ static inline struct crypto_ablkcipher *crypto_spawn_ablkcipher(
- 	return __crypto_ablkcipher_cast(crypto_spawn_tfm(spawn, type, mask));
- }
- 
-+static inline struct crypto_ablkcipher *crypto_spawn_nivcipher(
-+	struct crypto_spawn *spawn)
-+{
-+	u32 type = CRYPTO_ALG_TYPE_BLKCIPHER;
-+	u32 mask = (spawn->alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+		   CRYPTO_ALG_TYPE_GIVCIPHER ? CRYPTO_ALG_TYPE_BLKCIPHER_MASK :
-+					       CRYPTO_ALG_TYPE_NIVCIPHER_MASK;
-+
-+	return __crypto_ablkcipher_cast(crypto_spawn_tfm(spawn, type, mask));
++	return crypto_register_template(&chainiv_tmpl);
 +}
 +
- static inline struct crypto_blkcipher *crypto_spawn_blkcipher(
- 	struct crypto_spawn *spawn)
- {
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 95e99f4..cdbd251 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -39,6 +39,7 @@
- #define CRYPTO_ALG_TYPE_AEAD		0x00000009
- 
- #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
-+#define CRYPTO_ALG_TYPE_NIVCIPHER_MASK	0x0000000e
- #define CRYPTO_ALG_TYPE_BLKCIPHER_MASK	0x0000000c
- 
- #define CRYPTO_ALG_LARVAL		0x00000010
++static void __exit chainiv_module_exit(void)
++{
++	crypto_unregister_template(&chainiv_tmpl);
++}
++
++module_init(chainiv_module_init);
++module_exit(chainiv_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Chain IV Generator");
