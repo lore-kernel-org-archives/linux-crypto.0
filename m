@@ -1,138 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 10/11] [CRYPTO] aead: Add givcrypt operation
-Date: Thu, 22 Nov 2007 23:51:07 +0800
-Message-ID: <20071122155107.GA11590@gondor.apana.org.au>
-References: <20071122084758.GA7536@gondor.apana.org.au> <E1Iv7kG-00021s-00@gondolin.me.apana.org.au>
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: Re: [PATCH 1/4] camellia: 64-bit optimization
+Date: Thu, 22 Nov 2007 14:29:36 -0800
+Message-ID: <200711221429.36309.vda.linux@googlemail.com>
+References: <200711210022.28510.vda.linux@googlemail.com> <200711210023.49410.vda.linux@googlemail.com> <20071122122528.GA9556@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Noriaki TAKAMIYA <takamiya@linux-ipv6.org>, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2270 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750875AbXKVPvK (ORCPT
+Received: from rv-out-0910.google.com ([209.85.198.185]:25866 "EHLO
+	rv-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754938AbXKVW3o (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Nov 2007 10:51:10 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1IvEKZ-0005a6-RS
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2007 02:51:08 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1IvEKZ-00031L-00
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 23:51:07 +0800
+	Thu, 22 Nov 2007 17:29:44 -0500
+Received: by rv-out-0910.google.com with SMTP id k20so2478480rvb
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Nov 2007 14:29:43 -0800 (PST)
+In-Reply-To: <20071122122528.GA9556@gondor.apana.org.au>
 Content-Disposition: inline
-In-Reply-To: <E1Iv7kG-00021s-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 22, 2007 at 04:49:12PM +0800, Herbert Xu wrote:
-> [CRYPTO] aead: Add givcrypt operation
-> 
-> This patch adds the crypto_aead_givcrypt and associated support elements.
-> The rationale is identical to that of the block cipher givcrypt operation,
-> i.e., sometimes only the algorithm knows how the IV should be generated.
-> 
-> The aead_request structure gains two new elements to support this operation.
-> They are seq and giv.  The seq field should contain a strictly increasing
-> 64-bit integer which may be used by certain IV generators as an input value.
-> The giv field will be used to store the generated IV.  It does not need to
-> obey the alignment requirements of the algorithm because it's not used
-> during the operation.
-> 
-> The existing iv field must still be available as it will be used to store
-> intermediate IVs and the output IV if chaining is desired.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Thursday 22 November 2007 04:25, Herbert Xu wrote:
+> On Wed, Nov 21, 2007 at 12:23:49AM -0800, Denys Vlasenko wrote:
+> > On Wednesday 21 November 2007 00:22, Denys Vlasenko wrote:
+> > > Patches start from 5 because pathches 1..4 are already
+> > > in cryptodev-2.6.
+> > >
+> > > camellia5:
+> > >         adds 64-bit key setup, it is used if BITS_PER_LONG is 64.
+> >
+> > Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+>
+> Denys, I really appreciate your work in cleaning this algorithm up.
+>
+> However, I just can't accept 600 lines of new code just to do setkey
+> faster/smaller on 64-bit platforms.  You know, some people have to
+> study these files line-by-line in order have them pass government
+> certifications and such.
 
-Oops, I left out the aead_request_set_giv function.  Here's the
-complete patch.
+480 lines after all patches are applied.
 
----
- crypto/aead.c          |    1 +
- include/linux/crypto.h |   21 ++++++++++++++++++++-
- 2 files changed, 21 insertions(+), 1 deletion(-)
+> OK I went back and looked at the figures, so we're talking about
+> either 1K extra on 64-bit if we use the 32-bit version or 2K extra
+> on 32-bit if we went for the 64-bit version.
+>
+> Either way it doesn't seem to be a big deal.  So how about just
+> picking one and sticking with it?
 
-078292bdc6d0faa5746bb091fa4b7930adab9881
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 84a3501..44442ec 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -69,6 +69,7 @@ static int crypto_init_aead_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
- 
- 	crt->setkey = setkey;
- 	crt->encrypt = alg->encrypt;
-+	crt->givcrypt = alg->givcrypt;
- 	crt->decrypt = alg->decrypt;
- 	crt->ivsize = alg->ivsize;
- 	crt->authsize = alg->authsize;
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index cdbd251..43e7fdd 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -134,7 +134,9 @@ struct ablkcipher_request {
-  *	@base: Common attributes for async crypto requests
-  *	@assoclen: Length in bytes of associated data for authentication
-  *	@cryptlen: Length of data to be encrypted or decrypted
-- *	@iv: Initialisation vector
-+ *	@seq: Sequence number for IV generation
-+ *	@giv: Generated IV
-+ *	@iv: Input IV for encrypt and Output IV for both encrypt and givcrypt
-  *	@assoc: Associated data
-  *	@src: Source data
-  *	@dst: Destination data
-@@ -146,6 +148,9 @@ struct aead_request {
- 	unsigned int assoclen;
- 	unsigned int cryptlen;
- 
-+	u64 seq;
-+	u8 *giv;
-+
- 	u8 *iv;
- 
- 	struct scatterlist *assoc;
-@@ -196,6 +201,7 @@ struct aead_alg {
- 	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
- 	              unsigned int keylen);
- 	int (*encrypt)(struct aead_request *req);
-+	int (*givcrypt)(struct aead_request *req);
- 	int (*decrypt)(struct aead_request *req);
- 
- 	unsigned int ivsize;
-@@ -338,6 +344,7 @@ struct aead_tfm {
- 	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
- 	              unsigned int keylen);
- 	int (*encrypt)(struct aead_request *req);
-+	int (*givcrypt)(struct aead_request *req);
- 	int (*decrypt)(struct aead_request *req);
- 	unsigned int ivsize;
- 	unsigned int authsize;
-@@ -789,6 +796,11 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->encrypt(req);
- }
- 
-+static inline int crypto_aead_givcrypt(struct aead_request *req)
-+{
-+	return crypto_aead_crt(crypto_aead_reqtfm(req))->givcrypt(req);
-+}
-+
- static inline int crypto_aead_decrypt(struct aead_request *req)
- {
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
-@@ -844,6 +856,13 @@ static inline void aead_request_set_crypt(struct aead_request *req,
- 	req->iv = iv;
- }
- 
-+static inline void aead_request_set_giv(struct aead_request *req, u8 *giv,
-+					u64 seq)
-+{
-+	req->giv = giv;
-+	req->seq = seq;
-+}
-+
- static inline void aead_request_set_assoc(struct aead_request *req,
- 					  struct scatterlist *assoc,
- 					  unsigned int assoclen)
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+"No big deal" approach resulted in thish module having 30k of code.
+I cut it down to 20-18k.
+
+In aic7xxx driver, similarly, I rediced size from 300k to 200k.
+Still not in mainline. This is depressing.
+
+I am an -Os guy and for me 1k out of 20k module doesn't sound too small.
+
+I will rework and repost patches so that 64-bit code is added by last
+patch, feel free to not apply it.
+--
+vda
