@@ -1,67 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [0/11] Add IV generators and givcrypt
-Date: Thu, 22 Nov 2007 20:09:37 +0800
-Message-ID: <20071122120937.GA9357@gondor.apana.org.au>
-References: <20071122084758.GA7536@gondor.apana.org.au> <20071122112558.GE2444@2ka.mipt.ru> <20071122113116.GD8781@gondor.apana.org.au> <20071122115707.GE28024@2ka.mipt.ru>
+Subject: Re: [PATCH 2/4] camellia: code shrink
+Date: Thu, 22 Nov 2007 20:28:26 +0800
+Message-ID: <20071122122826.GB9556@gondor.apana.org.au>
+References: <200711210022.28510.vda.linux@googlemail.com> <200711210025.10316.vda.linux@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Cc: Noriaki TAKAMIYA <takamiya@linux-ipv6.org>, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: Denys Vlasenko <vda.linux@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1190 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1674 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750696AbXKVMJk (ORCPT
+	with ESMTP id S1752055AbXKVM2r (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Nov 2007 07:09:40 -0500
+	Thu, 22 Nov 2007 07:28:47 -0500
 Content-Disposition: inline
-In-Reply-To: <20071122115707.GE28024@2ka.mipt.ru>
+In-Reply-To: <200711210025.10316.vda.linux@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 22, 2007 at 02:57:07PM +0300, Evgeniy Polyakov wrote:
->
-> Somehow you described that to others - just combine things together and
-> put to Documentation/crypto and that will be enough.
+On Wed, Nov 21, 2007 at 12:25:10AM -0800, Denys Vlasenko wrote:
+> On Wednesday 21 November 2007 00:22, Denys Vlasenko wrote:
+> > camellia6:
+> >         unifies encrypt/decrypt routines for different key lengths.
+> >         This reduces module size by ~25%, with tiny (less than 1%)
+> >         speed impact.
+> >         Also collapses encrypt/decrypt into more readable
+> >         (visually shorter) form using macros.
+> 
+> Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
 
-Patches are welcome :)
+Sorry, this doesn't apply without applying 1/4.
 
-> For example this patchset looks like possible first step in proper
-> chaining mechanism for hardware devices, but if this will be impemented
-> this way, then each hardware completion callback should be wrapped with
-> proper geniv methods (like those which copy iv back to req->info). Is
-> this right approach (for those users who care about correct returned
-> IV), or will it just use software implementation only?
+You couldn't have picked a better patch order :)
 
-I'm not sure I understand your question.
+Seriously, you'll make both of us happier if you put the easy
+patches first and the contentious stuff at the end.
 
-First of all givcrypt is designed to work for hardware devices too.
-If they can generate their own IVs then they should directly hook
-up to the givcrypt method and use the givcipher type.
-
-If not then they can use one of the precanned geniv wrappers and
-declare their preference in the in crypto_ablkcipher_alg->geniv.
-
-As to chaining, I presume you mean something like encryption
-followed by hashing? If so then this really doesn't have much to
-do with chaining at all.
-
-I think we don't really need chaining in general because the
-hardware doesn't do arbitrary chaining.  Instead what they do
-is specific chains that are useful for particular applications.
-
-Case in point would be encryption followed by hashing which is
-designed for IPsec.
-
-Therefore instead of having a general chaining abstraction I've
-chosen to do chaining support on a case-by-case basis.  For
-instance, the above chaining is now supported by the new crypto_aead
-transform type.
-
-It just so happens that people are also designing algorithms
-to make crypto_aead useful for software as well which is a
-bonus :)
-
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
