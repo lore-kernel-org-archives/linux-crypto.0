@@ -1,37 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [HIFN 00/03]: RNG support v2
-Date: Sun, 25 Nov 2007 14:46:32 +0800
-Message-ID: <20071125064632.GB1419@gondor.apana.org.au>
-References: <20071118213241.9217.7696.sendpatchset@localhost.localdomain> <20071124223845.2c81cd52.akpm@linux-foundation.org>
+From: Mikko Herranen <mikko.herranen@cs.helsinki.fi>
+Subject: Givcipher bug?
+Date: Sun, 25 Nov 2007 13:45:20 +0200 (EET)
+Message-ID: <Pine.LNX.4.64.0711251324330.3663@antarct>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Patrick McHardy <kaber@trash.net>, johnpol@2ka.mipt.ru,
-	linux-crypto@vger.kernel.org, mb@bu3sch.de,
-	linux-kernel@vger.kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2874 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751061AbXKYGrI (ORCPT
+Received: from pne-smtpout4-sn2.hy.skanova.net ([81.228.8.154]:41795 "EHLO
+	pne-smtpout4-sn2.hy.skanova.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751851AbXKYLqF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 25 Nov 2007 01:47:08 -0500
-Content-Disposition: inline
-In-Reply-To: <20071124223845.2c81cd52.akpm@linux-foundation.org>
+	Sun, 25 Nov 2007 06:46:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Nov 24, 2007 at 10:38:45PM -0800, Andrew Morton wrote:
-> On Sun, 18 Nov 2007 22:32:52 +0100 (MET) Patrick McHardy <kaber@trash.net> wrote:
-> 
-> > These patches add support for using the HIFN rng.
-> 
-> Dumb question: what is HIFN?
+Hi Herbert,
 
-They make crypto hardware: www.hifn.com.
+The newest cryptodev kernel hangs on "testing ctr(aes,4,8,4) encryption"
+in tcrypt. Stack trace:
 
-Cheers,
+[<c0291520>] schedule_timeout+0x6a/0xa4
+[<c0291383>] wait_for_common+0xad/0x104
+[<c0291433>] wait_for_completion+0x12/0x14
+[<c012a509>] call_usermodehelper_exec+0x76/0x8a
+[<c012a679>] request_module+0x98/0xdc
+[<c01c5be3>] crypto_larval_lookup+0x56/0x136
+[<d20213f9>] crypto_givcipher_default+0x20/0x11c [crypto_blkcipher]
+[<d2021512>] crypto_init_blkcipher_ops+0x1d/0xb7 [crypto_blkcipher]
+[<c01c5864>] __crypto_alloc_tfm+0x5c/0x122
+[<c01c5d9b>] crypto_alloc_base+0x31/0x6a
+[<d20c497e>] test_cipher+0xda/0x814 [tcrypt]
+[<d202751e>] init+0x151e/0x192b [tcrypt]
+[<c0141505>] sys_init_module+0x122/0x1959
+[<c0103f9e>] sysenter_past_esp+0x5f/0xa5
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Mikko Herranen
