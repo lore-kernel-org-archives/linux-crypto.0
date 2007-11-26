@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Add GCM/GMAC support to cryptoapi
-Date: Mon, 26 Nov 2007 22:22:22 +0800
-Message-ID: <20071126142222.GA28022@gondor.apana.org.au>
-References: <Pine.LNX.4.64.0711251601100.3663@antarct>
+Subject: Re: [PATCH 1/2] crypto test: use print_hex_dump from <linux/kernel.h>
+Date: Mon, 26 Nov 2007 22:39:39 +0800
+Message-ID: <20071126143939.GB28022@gondor.apana.org.au>
+References: <1196061182-6368-1-git-send-email-crquan@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Mikko Herranen <mikko.herranen@cs.helsinki.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2461 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753704AbXKZOW2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 Nov 2007 09:22:28 -0500
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Randy Dunlap <randy.dunlap@oracle.com>
+To: Denis Cheng <crquan@gmail.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1755304AbXKZOkD@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0711251601100.3663@antarct>
-Sender: linux-crypto-owner@vger.kernel.org
+In-Reply-To: <1196061182-6368-1-git-send-email-crquan@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Nov 25, 2007 at 04:22:53PM +0200, Mikko Herranen wrote:
-> These patches add GCM/GMAC support to the cryptoapi.
+On Mon, Nov 26, 2007 at 03:13:02PM +0800, Denis Cheng wrote:
+> these utilities implemented in lib/hexdump.c are more handy, please use this.
 > 
-> The first patch adds AEAD support to tcrypt, as it's currently not
-> possible to do combined encryption/authentication tests. The
-> second patch adds GCM to cryptoapi.
+> Cc: Randy Dunlap <randy.dunlap@oracle.com>
+> Signed-off-by: Denis Cheng <crquan@gmail.com>
 
-Both patches applied.  Thanks a lot Mikko!
+OK this is pretty nice.  But you just missed out because the
+GCM patches that just went in added more hexdump uses :)
 
-I made one little change in the Kconfig and turned the depends
-on CTR into a select.
+So could you please refresh your patch against the latest cryptodev
+tree? Please also clamp those long lines to 80 characters.
 
-Cheers,
+On an unrelated note, lib/hexdump.c should not print 8-bit text
+even though they pass the is_print test.  They just turn up as
+crap on Unicode terminals.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
