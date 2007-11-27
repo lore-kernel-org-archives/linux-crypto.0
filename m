@@ -1,84 +1,144 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [PATCH] [crypto] geode: do not copy the IV too often
-Date: Tue, 27 Nov 2007 20:33:58 +0100
-Message-ID: <20071127193358.GB3506@Chamillionaire.breakpoint.cc>
-References: <20071113231132.GA10680@Chamillionaire.breakpoint.cc> <20071114142253.GA15201@gondor.apana.org.au> <20071115212335.GB21159@Chamillionaire.breakpoint.cc> <20071126092521.GC18309@Chamillionaire.breakpoint.cc> <20071126092832.GA25693@gondor.apana.org.au> <20071126094226.GA18532@Chamillionaire.breakpoint.cc>
-Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: Re: Possible bug in CTR (and Salsa20) for large test vectors
+Date: Wed, 28 Nov 2007 07:09:08 +0800
+Message-ID: <fd3e431c0711271509t38efef8aoa0fa1a59d24ffe39@mail.gmail.com>
+References: <fd3e431c0711241207u462cacdfre0ca957cd16a6b58@mail.gmail.com>
+	 <fd3e431c0711250758k6cbfa13fja73f5298a4c356f4@mail.gmail.com>
+	 <20071126132153.GB27228@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
+Content-Type: multipart/mixed;
+	boundary="----=_Part_1622_25953099.1196204948677"
+Cc: "Linux Crypto" <linux-crypto@vger.kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:38961 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750966AbXK0Td7 (ORCPT
+Received: from rv-out-0910.google.com ([209.85.198.185]:61904 "EHLO
+	rv-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756760AbXK0XJK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Nov 2007 14:33:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20071126094226.GA18532@Chamillionaire.breakpoint.cc>
+	Tue, 27 Nov 2007 18:09:10 -0500
+Received: by rv-out-0910.google.com with SMTP id k20so1046530rvb
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Nov 2007 15:09:08 -0800 (PST)
+In-Reply-To: <20071126132153.GB27228@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-There is no reason to keep the IV in the private structre. Instead keep
-just a pointer to make the patch smaller :)
-This also remove a few memcpy()s
+------=_Part_1622_25953099.1196204948677
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
----
- drivers/crypto/geode-aes.c |    6 ++----
- drivers/crypto/geode-aes.h |    2 +-
- 2 files changed, 3 insertions(+), 5 deletions(-)
+Hi Herbert,
 
-diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-index 0ca92d4..68be7d0 100644
---- a/drivers/crypto/geode-aes.c
-+++ b/drivers/crypto/geode-aes.c
-@@ -315,7 +315,7 @@ geode_cbc_decrypt(struct blkcipher_desc *desc,
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt(desc, &walk);
--	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
-+	op->iv = walk.iv;
- 
- 	while((nbytes = walk.nbytes)) {
- 		op->src = walk.src.virt.addr,
-@@ -330,7 +330,6 @@ geode_cbc_decrypt(struct blkcipher_desc *desc,
- 		err = blkcipher_walk_done(desc, &walk, nbytes);
- 	}
- 
--	memcpy(walk.iv, op->iv, AES_IV_LENGTH);
- 	return err;
- }
- 
-@@ -348,7 +347,7 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt(desc, &walk);
--	memcpy(op->iv, walk.iv, AES_IV_LENGTH);
-+	op->iv = walk.iv;
- 
- 	while((nbytes = walk.nbytes)) {
- 		op->src = walk.src.virt.addr,
-@@ -362,7 +361,6 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
- 		err = blkcipher_walk_done(desc, &walk, nbytes);
- 	}
- 
--	memcpy(walk.iv, op->iv, AES_IV_LENGTH);
- 	return err;
- }
- 
-diff --git a/drivers/crypto/geode-aes.h b/drivers/crypto/geode-aes.h
-index 14cc763..f1855b5 100644
---- a/drivers/crypto/geode-aes.h
-+++ b/drivers/crypto/geode-aes.h
-@@ -65,7 +65,7 @@ struct geode_aes_op {
- 	int len;
- 
- 	u8 key[AES_KEY_LENGTH];
--	u8 iv[AES_IV_LENGTH];
-+	u8 *iv;
- 
- 	union {
- 		struct crypto_blkcipher *blk;
--- 
-1.5.3.4
+On Nov 26, 2007 9:21 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Here is my attempt at fixing it and optimising it a bit more.
+> The idea is that we should only process partial blocks when
+> we're at the end.  Otherwise we should do whole blocks.
+Great patch! I like it more than mine as it captures the essence of
+the problem better.
+
+> Please let me know if this works or not.
+It works if we change the following:
+(1.) both crypto_ctr_crypt_segment() and crypto_ctr_crypt_inplace()
+returns "nbytes" instead of 0;
+(2.) blkcipher_walk_done() is called with 0 and not "nbytes" after
+crypto_ctr_crypt_final().
+The final patch (combining yours and the two fixes) is attached to this email.
+
+> Oh any chance you could post a tcrypt patch for the large test?
+Sure. I will send it separately. But it will cause considerable bloat
+in tcrypt.ko.
+
+One question: Can we use crypto_cipher_encrypt_one() in both
+_segment() and _inplace()? It reads better than the function pointer
+fn().
+
+Regards,
+Swee Heng
+
+------=_Part_1622_25953099.1196204948677
+Content-Type: text/plain; name=patch1-ctr_bug.txt
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f9j1hj130
+Content-Disposition: attachment; filename=patch1-ctr_bug.txt
+
+ZGlmZiAtLWdpdCBhL2NyeXB0by9jdHIuYyBiL2NyeXB0by9jdHIuYwppbmRleCA0N2UwNDRhLi41
+N2RhN2QwIDEwMDY0NAotLS0gYS9jcnlwdG8vY3RyLmMKKysrIGIvY3J5cHRvL2N0ci5jCkBAIC01
+OSw2ICs1OSwyMSBAQCBzdGF0aWMgaW50IGNyeXB0b19jdHJfc2V0a2V5KHN0cnVjdCBjcnlwdG9f
+dGZtICpwYXJlbnQsIGNvbnN0IHU4ICprZXksCiAJcmV0dXJuIGVycjsKIH0KIAorc3RhdGljIHZv
+aWQgY3J5cHRvX2N0cl9jcnlwdF9maW5hbChzdHJ1Y3QgYmxrY2lwaGVyX3dhbGsgKndhbGssCisJ
+CQkJICAgc3RydWN0IGNyeXB0b19jaXBoZXIgKnRmbSwgdTggKmN0cmJsaywKKwkJCQkgICB1bnNp
+Z25lZCBpbnQgY291bnRlcnNpemUpCit7CisJdW5zaWduZWQgaW50IGJzaXplID0gY3J5cHRvX2Np
+cGhlcl9ibG9ja3NpemUodGZtKTsKKwl1OCAqa2V5c3RyZWFtID0gY3RyYmxrICsgYnNpemU7CisJ
+dTggKnNyYyA9IHdhbGstPnNyYy52aXJ0LmFkZHI7CisJdTggKmRzdCA9IHdhbGstPmRzdC52aXJ0
+LmFkZHI7CisJdW5zaWduZWQgaW50IG5ieXRlcyA9IHdhbGstPm5ieXRlczsKKworCWNyeXB0b19j
+aXBoZXJfZW5jcnlwdF9vbmUodGZtLCBrZXlzdHJlYW0sIGN0cmJsayk7CisJY3J5cHRvX3hvcihr
+ZXlzdHJlYW0sIHNyYywgbmJ5dGVzKTsKKwltZW1jcHkoZHN0LCBrZXlzdHJlYW0sIG5ieXRlcyk7
+Cit9CisKIHN0YXRpYyBpbnQgY3J5cHRvX2N0cl9jcnlwdF9zZWdtZW50KHN0cnVjdCBibGtjaXBo
+ZXJfd2FsayAqd2FsaywKIAkJCQkgICAgc3RydWN0IGNyeXB0b19jaXBoZXIgKnRmbSwgdTggKmN0
+cmJsaywKIAkJCQkgICAgdW5zaWduZWQgaW50IGNvdW50ZXJzaXplKQpAQCAtNjYsMzUgKzgxLDIz
+IEBAIHN0YXRpYyBpbnQgY3J5cHRvX2N0cl9jcnlwdF9zZWdtZW50KHN0cnVjdCBibGtjaXBoZXJf
+d2FsayAqd2FsaywKIAl2b2lkICgqZm4pKHN0cnVjdCBjcnlwdG9fdGZtICosIHU4ICosIGNvbnN0
+IHU4ICopID0KIAkJICAgY3J5cHRvX2NpcGhlcl9hbGcodGZtKS0+Y2lhX2VuY3J5cHQ7CiAJdW5z
+aWduZWQgaW50IGJzaXplID0gY3J5cHRvX2NpcGhlcl9ibG9ja3NpemUodGZtKTsKLQl1bnNpZ25l
+ZCBsb25nIGFsaWdubWFzayA9IGNyeXB0b19jaXBoZXJfYWxpZ25tYXNrKHRmbSkgfAotCQkJCSAg
+KF9fYWxpZ25vZl9fKHUzMikgLSAxKTsKLQl1OCBrc1tic2l6ZSArIGFsaWdubWFza107Ci0JdTgg
+KmtleXN0cmVhbSA9ICh1OCAqKUFMSUdOKCh1bnNpZ25lZCBsb25nKWtzLCBhbGlnbm1hc2sgKyAx
+KTsKIAl1OCAqc3JjID0gd2Fsay0+c3JjLnZpcnQuYWRkcjsKIAl1OCAqZHN0ID0gd2Fsay0+ZHN0
+LnZpcnQuYWRkcjsKIAl1bnNpZ25lZCBpbnQgbmJ5dGVzID0gd2Fsay0+bmJ5dGVzOwogCiAJZG8g
+ewogCQkvKiBjcmVhdGUga2V5c3RyZWFtICovCi0JCWZuKGNyeXB0b19jaXBoZXJfdGZtKHRmbSks
+IGtleXN0cmVhbSwgY3RyYmxrKTsKLQkJY3J5cHRvX3hvcihrZXlzdHJlYW0sIHNyYywgbWluKG5i
+eXRlcywgYnNpemUpKTsKLQotCQkvKiBjb3B5IHJlc3VsdCBpbnRvIGRzdCAqLwotCQltZW1jcHko
+ZHN0LCBrZXlzdHJlYW0sIG1pbihuYnl0ZXMsIGJzaXplKSk7CisJCWZuKGNyeXB0b19jaXBoZXJf
+dGZtKHRmbSksIGRzdCwgY3RyYmxrKTsKKwkJY3J5cHRvX3hvcihkc3QsIHNyYywgYnNpemUpOwog
+CiAJCS8qIGluY3JlbWVudCBjb3VudGVyIGluIGNvdW50ZXJibG9jayAqLwogCQljcnlwdG9faW5j
+KGN0cmJsayArIGJzaXplIC0gY291bnRlcnNpemUsIGNvdW50ZXJzaXplKTsKIAotCQlpZiAobmJ5
+dGVzIDwgYnNpemUpCi0JCQlicmVhazsKLQogCQlzcmMgKz0gYnNpemU7CiAJCWRzdCArPSBic2l6
+ZTsKLQkJbmJ5dGVzIC09IGJzaXplOwotCi0JfSB3aGlsZSAobmJ5dGVzKTsKKwl9IHdoaWxlICgo
+bmJ5dGVzIC09IGJzaXplKSA+PSBic2l6ZSk7CiAKLQlyZXR1cm4gMDsKKwlyZXR1cm4gbmJ5dGVz
+OwogfQogCiBzdGF0aWMgaW50IGNyeXB0b19jdHJfY3J5cHRfaW5wbGFjZShzdHJ1Y3QgYmxrY2lw
+aGVyX3dhbGsgKndhbGssCkBAIC0xMDQsMzAgKzEwNywyMiBAQCBzdGF0aWMgaW50IGNyeXB0b19j
+dHJfY3J5cHRfaW5wbGFjZShzdHJ1Y3QgYmxrY2lwaGVyX3dhbGsgKndhbGssCiAJdm9pZCAoKmZu
+KShzdHJ1Y3QgY3J5cHRvX3RmbSAqLCB1OCAqLCBjb25zdCB1OCAqKSA9CiAJCSAgIGNyeXB0b19j
+aXBoZXJfYWxnKHRmbSktPmNpYV9lbmNyeXB0OwogCXVuc2lnbmVkIGludCBic2l6ZSA9IGNyeXB0
+b19jaXBoZXJfYmxvY2tzaXplKHRmbSk7Ci0JdW5zaWduZWQgbG9uZyBhbGlnbm1hc2sgPSBjcnlw
+dG9fY2lwaGVyX2FsaWdubWFzayh0Zm0pIHwKLQkJCQkgIChfX2FsaWdub2ZfXyh1MzIpIC0gMSk7
+CiAJdW5zaWduZWQgaW50IG5ieXRlcyA9IHdhbGstPm5ieXRlczsKIAl1OCAqc3JjID0gd2Fsay0+
+c3JjLnZpcnQuYWRkcjsKLQl1OCBrc1tic2l6ZSArIGFsaWdubWFza107Ci0JdTggKmtleXN0cmVh
+bSA9ICh1OCAqKUFMSUdOKCh1bnNpZ25lZCBsb25nKWtzLCBhbGlnbm1hc2sgKyAxKTsKKwl1OCAq
+a2V5c3RyZWFtID0gY3RyYmxrICsgYnNpemU7CiAKIAlkbyB7CiAJCS8qIGNyZWF0ZSBrZXlzdHJl
+YW0gKi8KIAkJZm4oY3J5cHRvX2NpcGhlcl90Zm0odGZtKSwga2V5c3RyZWFtLCBjdHJibGspOwot
+CQljcnlwdG9feG9yKHNyYywga2V5c3RyZWFtLCBtaW4obmJ5dGVzLCBic2l6ZSkpOworCQljcnlw
+dG9feG9yKHNyYywga2V5c3RyZWFtLCBic2l6ZSk7CiAKIAkJLyogaW5jcmVtZW50IGNvdW50ZXIg
+aW4gY291bnRlcmJsb2NrICovCiAJCWNyeXB0b19pbmMoY3RyYmxrICsgYnNpemUgLSBjb3VudGVy
+c2l6ZSwgY291bnRlcnNpemUpOwogCi0JCWlmIChuYnl0ZXMgPCBic2l6ZSkKLQkJCWJyZWFrOwot
+CiAJCXNyYyArPSBic2l6ZTsKLQkJbmJ5dGVzIC09IGJzaXplOwotCi0JfSB3aGlsZSAobmJ5dGVz
+KTsKKwl9IHdoaWxlICgobmJ5dGVzIC09IGJzaXplKSA+PSBic2l6ZSk7CiAKLQlyZXR1cm4gMDsK
+KwlyZXR1cm4gbmJ5dGVzOwogfQogCiBzdGF0aWMgaW50IGNyeXB0b19jdHJfY3J5cHQoc3RydWN0
+IGJsa2NpcGhlcl9kZXNjICpkZXNjLApAQCAtMTQzLDcgKzEzOCw3IEBAIHN0YXRpYyBpbnQgY3J5
+cHRvX2N0cl9jcnlwdChzdHJ1Y3QgYmxrY2lwaGVyX2Rlc2MgKmRlc2MsCiAJCWNyeXB0b19pbnN0
+YW5jZV9jdHgoY3J5cHRvX3RmbV9hbGdfaW5zdGFuY2UoJnRmbS0+YmFzZSkpOwogCXVuc2lnbmVk
+IGxvbmcgYWxpZ25tYXNrID0gY3J5cHRvX2NpcGhlcl9hbGlnbm1hc2soY2hpbGQpIHwKIAkJCQkg
+IChfX2FsaWdub2ZfXyh1MzIpIC0gMSk7Ci0JdTggY2Jsa1tic2l6ZSArIGFsaWdubWFza107CisJ
+dTggY2Jsa1tic2l6ZSAqIDIgKyBhbGlnbm1hc2tdOwogCXU4ICpjb3VudGVyYmxrID0gKHU4ICop
+QUxJR04oKHVuc2lnbmVkIGxvbmcpY2JsaywgYWxpZ25tYXNrICsgMSk7CiAJaW50IGVycjsKIApA
+QCAtMTU4LDcgKzE1Myw3IEBAIHN0YXRpYyBpbnQgY3J5cHRvX2N0cl9jcnlwdChzdHJ1Y3QgYmxr
+Y2lwaGVyX2Rlc2MgKmRlc2MsCiAJLyogaW5pdGlhbGl6ZSBjb3VudGVyIHBvcnRpb24gb2YgY291
+bnRlciBibG9jayAqLwogCWNyeXB0b19pbmMoY291bnRlcmJsayArIGJzaXplIC0gaWN0eC0+Y291
+bnRlcnNpemUsIGljdHgtPmNvdW50ZXJzaXplKTsKIAotCXdoaWxlICh3YWxrLm5ieXRlcykgewor
+CXdoaWxlICh3YWxrLm5ieXRlcyA+PSBic2l6ZSkgewogCQlpZiAod2Fsay5zcmMudmlydC5hZGRy
+ID09IHdhbGsuZHN0LnZpcnQuYWRkcikKIAkJCW5ieXRlcyA9IGNyeXB0b19jdHJfY3J5cHRfaW5w
+bGFjZSgmd2FsaywgY2hpbGQsCiAJCQkJCQkJICBjb3VudGVyYmxrLApAQCAtMTcwLDYgKzE2NSwx
+MyBAQCBzdGF0aWMgaW50IGNyeXB0b19jdHJfY3J5cHQoc3RydWN0IGJsa2NpcGhlcl9kZXNjICpk
+ZXNjLAogCiAJCWVyciA9IGJsa2NpcGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIG5ieXRlcyk7
+CiAJfQorCisJaWYgKHdhbGsubmJ5dGVzKSB7CisJCWNyeXB0b19jdHJfY3J5cHRfZmluYWwoJndh
+bGssIGNoaWxkLCBjb3VudGVyYmxrLAorCQkJCSAgICAgICBpY3R4LT5jb3VudGVyc2l6ZSk7CisJ
+CWVyciA9IGJsa2NpcGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIDApOworCX0KKwogCXJldHVy
+biBlcnI7CiB9CiAKQEAgLTI3Nyw3ICsyNzksNyBAQCBzdGF0aWMgc3RydWN0IGNyeXB0b19pbnN0
+YW5jZSAqY3J5cHRvX2N0cl9hbGxvYyhzdHJ1Y3QgcnRhdHRyICoqdGIpCiAJaW5zdC0+YWxnLmNy
+YV9mbGFncyA9IENSWVBUT19BTEdfVFlQRV9CTEtDSVBIRVI7CiAJaW5zdC0+YWxnLmNyYV9wcmlv
+cml0eSA9IGFsZy0+Y3JhX3ByaW9yaXR5OwogCWluc3QtPmFsZy5jcmFfYmxvY2tzaXplID0gMTsK
+LQlpbnN0LT5hbGcuY3JhX2FsaWdubWFzayA9IF9fYWxpZ25vZl9fKHUzMikgLSAxOworCWluc3Qt
+PmFsZy5jcmFfYWxpZ25tYXNrID0gYWxnLT5jcmFfYWxpZ25tYXNrIHwgKF9fYWxpZ25vZl9fKHUz
+MikgLSAxKTsKIAlpbnN0LT5hbGcuY3JhX3R5cGUgPSAmY3J5cHRvX2Jsa2NpcGhlcl90eXBlOwog
+CiAJaW5zdC0+YWxnLmNyYV9ibGtjaXBoZXIuaXZzaXplID0gaXZzaXplOwo=
+------=_Part_1622_25953099.1196204948677--
