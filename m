@@ -1,37 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] [RESEND] crypto test: use print_hex_dump from <linux/kernel.h> instead
-Date: Tue, 27 Nov 2007 09:05:50 +0800
-Message-ID: <20071127010550.GB447@gondor.apana.org.au>
-References: <20071126143939.GB28022@gondor.apana.org.au> <1196098095-8995-1-git-send-email-crquan@gmail.com>
+Date: Tue, 27 Nov 2007 09:35:40 +0800
+Message-ID: <20071127013540.GA793@gondor.apana.org.au>
+References: <20071126143939.GB28022@gondor.apana.org.au> <1196098095-8995-1-git-send-email-crquan@gmail.com> <1196100104.31590.11.camel@localhost>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dengxw@163.com, Randy Dunlap <randy.dunlap@oracle.com>
-To: Denis Cheng <crquan@gmail.com>
+Cc: Denis Cheng <crquan@gmail.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dengxw@163.com,
+	Randy Dunlap <randy.dunlap@oracle.com>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4063 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4360 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754632AbXK0BFz (ORCPT
+	with ESMTP id S1753250AbXK0Bfr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 Nov 2007 20:05:55 -0500
+	Mon, 26 Nov 2007 20:35:47 -0500
 Content-Disposition: inline
-In-Reply-To: <1196098095-8995-1-git-send-email-crquan@gmail.com>
+In-Reply-To: <1196100104.31590.11.camel@localhost>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 27, 2007 at 01:28:15AM +0800, Denis Cheng wrote:
-> this patch is against cryptodev-2.6, and have passed scripts/checkpatch.pl
+On Mon, Nov 26, 2007 at 10:01:44AM -0800, Joe Perches wrote:
+> On Tue, 2007-11-27 at 01:28 +0800, Denis Cheng wrote:
+> > -static void hexdump(unsigned char *buf, unsigned int len)
+> > -{
+> > -	while (len--)
+> > -		printk("%02x", *buf++);
+> > -
+> > -	printk("\n");
+> > -}
 > 
-> KERN_DEBUG is stripped out, this acts more like the original in tcrypto.c
+> #define hexdump(buf, len) \
+> 	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_NONE, 16, 1, \
+> 	               (buf), (len), false)
 > 
-> and the last parameter "bool ascii" set to zero to disable ascii output,
-> this could keep it happy on Unicode terminals.
-> 
-> Cc: Randy Dunlap <randy.dunlap@oracle.com>
-> Signed-off-by: Denis Cheng <crquan@gmail.com>
+> requires no other changes.
 
-Sorry, it still doesn't compile because it doesn't change test_aead.
-Perhaps you need to pull cryptodev again?
+Yes that's a good idea.  Denis could you do another patch with
+this, preferably as a static inline function? That way you don't
+even need to worry about test_aead.
 
 Thanks,
 -- 
