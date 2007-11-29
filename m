@@ -1,50 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [RESEND] crypto test: use print_hex_dump from kernel.h instead
-Date: Thu, 29 Nov 2007 22:13:24 +1100
-Message-ID: <20071129111324.GH22537@gondor.apana.org.au>
-References: <20071126143939.GB28022@gondor.apana.org.au> <1196098095-8995-1-git-send-email-crquan@gmail.com> <1196100104.31590.11.camel@localhost> <20071127013540.GA793@gondor.apana.org.au> <1196131632-7285-1-git-send-email-crquan@gmail.com> <474B87F1.2060109@student.ltu.se> <91b13c310711262103w781b3047k6338acda56837c0@mail.gmail.com> <20071127012622.3e3a6bd1.akpm@linux-foundation.org>
+Subject: Re: [PATCH] [crypto] remove similar aes glue code
+Date: Fri, 30 Nov 2007 00:15:30 +1100
+Message-ID: <20071129131530.GD8487@gondor.apana.org.au>
+References: <20071102180503.712394234@ml.breakpoint.cc> <20071102181036.701800933@ml.breakpoint.cc> <20071110111955.GB5485@gondor.apana.org.au> <20071110212000.GC15150@Chamillionaire.breakpoint.cc> <20071111011856.GA10745@gondor.apana.org.au> <20071126093500.GD18309@Chamillionaire.breakpoint.cc> <20071126103222.GA26178@gondor.apana.org.au> <20071127193159.GA3506@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: rae l <crquan@gmail.com>,
-	Richard Knutsson <ricknu-0@student.ltu.se>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dengxw@163.com, Randy Dunlap <randy.dunlap@oracle.com>,
-	Joe Perches <joe@perches.com>
-To: Andrew Morton <akpm@linux-foundation.org>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2354 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3628 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752171AbXK2LNh (ORCPT
+	with ESMTP id S1756321AbXK2NPf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Nov 2007 06:13:37 -0500
+	Thu, 29 Nov 2007 08:15:35 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1IxjEr-0003q1-Ey
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Nov 2007 00:15:33 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1IxjEp-0004E3-00
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Nov 2007 00:15:31 +1100
 Content-Disposition: inline
-In-Reply-To: <20071127012622.3e3a6bd1.akpm@linux-foundation.org>
+In-Reply-To: <20071127193159.GA3506@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 27, 2007 at 01:26:22AM -0800, Andrew Morton wrote:
-> On Tue, 27 Nov 2007 13:03:29 +0800 "rae l" <crquan@gmail.com> wrote:
+On Tue, Nov 27, 2007 at 08:31:59PM +0100, Sebastian Siewior wrote:
+> 32 bit and 64 bit glue code is using (now) the same
+> piece code. This patch unifies them.
 > 
-> > -static void hexdump(unsigned char *buf, unsigned int len)
-> > +static inline void hexdump(unsigned char *buf, unsigned int len)
-> >  {
-> > -	while (len--)
-> > -		printk("%02x", *buf++);
-> > -
-> > -	printk("\n");
-> > +	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_OFFSET,
-> > +			16, 1,
-> > +			buf, len, false);
-> >  }
-> 
-> uninlining this function shrinks crypto/tcrypt.o's .text from 20,009 bytes
-> down to 19,701.
-> 
-> inlining is almost always wrong.
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-I agree.  Please do as Andrew suggests and resubmit.
-
-Thanks,
+Patch applied.  Thanks Sebastian!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
