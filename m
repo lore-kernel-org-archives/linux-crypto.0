@@ -1,33 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [crypto] S390-AES add fallback driver.
-Date: Sat, 1 Dec 2007 12:48:20 +1100
-Message-ID: <20071201014820.GA26895@gondor.apana.org.au>
-References: <20071130123910.GA1814@Chamillionaire.breakpoint.cc>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: [PATCH] [crypto] Make crypto core API modular
+Date: Sat, 1 Dec 2007 13:19:10 +0100
+Message-ID: <20071201121910.GA8048@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Jan Glauber <jang@linux.vnet.ibm.com>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3181 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756558AbXLABsW (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:42932 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752564AbXLAMTL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Nov 2007 20:48:22 -0500
+	Sat, 1 Dec 2007 07:19:11 -0500
 Content-Disposition: inline
-In-Reply-To: <20071130123910.GA1814@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 30, 2007 at 01:39:10PM +0100, Sebastian Siewior wrote:
-> Some CPUs support only 128 bit keys in HW. This patch adds SW fallback
-> support for the other keys which may be required. The generic algorithm
-> (and the block mode) must be availble in case of a fallback.
-> 
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
-> Signed-off-by: Jan Glauber <jang@linux.vnet.ibm.com>
+This patch makes the whole crypto API is modular.
 
-Applied to cryptode-2.6.  Thanks Sebastian!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+---
+ crypto/Kconfig         |    2 +-
+ crypto/Makefile        |    3 ++-
+ include/linux/crypto.h |    2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+--- linux-2.6.orig/crypto/Kconfig	2007-12-01 13:02:48.000000000 +0100
++++ linux-2.6/crypto/Kconfig	2007-12-01 13:02:55.000000000 +0100
+@@ -13,7 +13,7 @@
+ # Cryptographic API Configuration
+ #
+ menuconfig CRYPTO
+-	bool "Cryptographic API"
++	tristate "Cryptographic API"
+ 	help
+ 	  This option provides the core Cryptographic API.
+ 
+--- linux-2.6.orig/crypto/Makefile	2007-12-01 13:02:48.000000000 +0100
++++ linux-2.6/crypto/Makefile	2007-12-01 13:02:55.000000000 +0100
+@@ -2,7 +2,8 @@
+ # Cryptographic API
+ #
+ 
+-obj-$(CONFIG_CRYPTO) += api.o cipher.o digest.o compress.o
++obj-$(CONFIG_CRYPTO) += crypto_core.o
++crypto_core-y := api.o cipher.o digest.o compress.o
+ 
+ crypto_algapi-$(CONFIG_PROC_FS) += proc.o
+ crypto_algapi-objs := algapi.o scatterwalk.o $(crypto_algapi-y)
+--- linux-2.6.orig/include/linux/crypto.h	2007-12-01 13:02:48.000000000 +0100
++++ linux-2.6/include/linux/crypto.h	2007-12-01 13:02:55.000000000 +0100
+@@ -299,7 +299,7 @@
+ /*
+  * Algorithm query interface.
+  */
+-#ifdef CONFIG_CRYPTO
++#if defined(CONFIG_CRYPTO) || defined(CONFIG_CRYPTO_MODULE)
+ int crypto_has_alg(const char *name, u32 type, u32 mask);
+ #else
+ static inline int crypto_has_alg(const char *name, u32 type, u32 mask)
