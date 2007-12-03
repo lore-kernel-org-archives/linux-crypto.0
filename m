@@ -1,41 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Problems encountered with latest cryptodev-2.6 under UML
-Date: Mon, 3 Dec 2007 08:28:41 +1100
-Message-ID: <20071202212841.GA7343@gondor.apana.org.au>
-References: <fd3e431c0712020759tbc41c91o39c0c3e56be66734@mail.gmail.com>
+From: Jan Glauber <jang@linux.vnet.ibm.com>
+Subject: HMAC broken on s390
+Date: Mon, 03 Dec 2007 14:31:40 +0100
+Message-ID: <1196688700.4799.5.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1766 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750746AbXLBV2q (ORCPT
+Received: from mtagate6.de.ibm.com ([195.212.29.155]:16069 "EHLO
+	mtagate6.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751936AbXLCNcE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 2 Dec 2007 16:28:46 -0500
-Content-Disposition: inline
-In-Reply-To: <fd3e431c0712020759tbc41c91o39c0c3e56be66734@mail.gmail.com>
+	Mon, 3 Dec 2007 08:32:04 -0500
+Received: from d12nrmr1607.megacenter.de.ibm.com (d12nrmr1607.megacenter.de.ibm.com [9.149.167.49])
+	by mtagate6.de.ibm.com (8.13.8/8.13.8) with ESMTP id lB3DVrvA041590
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Dec 2007 13:31:53 GMT
+Received: from d12av02.megacenter.de.ibm.com (d12av02.megacenter.de.ibm.com [9.149.165.228])
+	by d12nrmr1607.megacenter.de.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id lB3DVrrs2867280
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Dec 2007 14:31:53 +0100
+Received: from d12av02.megacenter.de.ibm.com (loopback [127.0.0.1])
+	by d12av02.megacenter.de.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id lB3DVqQG015292
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Dec 2007 14:31:52 +0100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 02, 2007 at 11:59:51PM +0800, Tan Swee Heng wrote:
->
->     ... snipped...
->     testing cbc(des) encryption
->     test 1 (64 bit key):
->     setkey() failed flags=200000
-> 
->     testing cbc(des) decryption
->     test 1 (64 bit key):
->     setkey() failed flags=200000
+Hi Herbert,
 
-Yes as I said earlier geniv was broken.  I've since removed it from my
-tree.  I have a fixed version here which I'll post as soon as I've fixed
-gcm to use it.
+commit 788fefa33b0b50581585925c53c230a36af35d0e in cryptodev breaks hmac
+on s390 du to the usage of sg_chain():
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
+                            struct scatterlist *sgl)
+{
+#ifndef ARCH_HAS_SG_CHAIN
+        BUG();
+#endif
+
+ARCH_HAS_SG_CHAIN is false for s390 (and also for some other arch's).
+
+What should we do with this?
+
+Cheers,
+Jan
