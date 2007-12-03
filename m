@@ -1,51 +1,73 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: HMAC broken on s390
-Date: Tue, 4 Dec 2007 09:09:00 +1100
-Message-ID: <20071203220900.GA8573@gondor.apana.org.au>
-References: <1196688700.4799.5.camel@localhost.localdomain>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: [PATCH 1/2] salsa20_generic: Fix multi-page processing
+Date: Tue, 4 Dec 2007 06:31:28 +0800
+Message-ID: <fd3e431c0712031431j7e2827ceid925d852c65cab57@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	Jens Axboe <axboe@suse.de>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Jan Glauber <jang@linux.vnet.ibm.com>
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2070_991332.1196721088949"
+To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	"Linux Crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4635 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751229AbXLCWJM (ORCPT
+Received: from an-out-0708.google.com ([209.85.132.247]:49551 "EHLO
+	an-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751116AbXLCWb3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Dec 2007 17:09:12 -0500
-Content-Disposition: inline
-In-Reply-To: <1196688700.4799.5.camel@localhost.localdomain>
+	Mon, 3 Dec 2007 17:31:29 -0500
+Received: by an-out-0708.google.com with SMTP id d31so796140and
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Dec 2007 14:31:29 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 03, 2007 at 02:31:40PM +0100, Jan Glauber wrote:
-> Hi Herbert,
-> 
-> commit 788fefa33b0b50581585925c53c230a36af35d0e in cryptodev breaks hmac
-> on s390 du to the usage of sg_chain():
-> 
-> static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
->                             struct scatterlist *sgl)
-> {
-> #ifndef ARCH_HAS_SG_CHAIN
->         BUG();
-> #endif
-> 
-> ARCH_HAS_SG_CHAIN is false for s390 (and also for some other arch's).
-> 
-> What should we do with this?
+------=_Part_2070_991332.1196721088949
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Looks like we took a step backwards because the chaining I had
-before worked on all architectures :)
+This patch fixes the multi-page processing bug that affects large test
+vectors (the same bug that previously affected ctr.c).
 
-I suppose either we'll have to do our own chaining again or implement
-it for all architectures.  I'll look into this.
+There is an optimization for the case walk.nbytes == nbytes. Also we
+now use crypto_xor() instead of adhoc XOR routines.
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
+
+------=_Part_2070_991332.1196721088949
+Content-Type: text/plain; name=patch1-multi_page.txt
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f9rkt3110
+Content-Disposition: attachment; filename=patch1-multi_page.txt
+
+ZGlmZiAtLWdpdCBhL2NyeXB0by9zYWxzYTIwX2dlbmVyaWMuYyBiL2NyeXB0by9zYWxzYTIwX2dl
+bmVyaWMuYwppbmRleCBiNDkzMjhhLi4xZmE0ZTRkIDEwMDY0NAotLS0gYS9jcnlwdG8vc2Fsc2Ey
+MF9nZW5lcmljLmMKKysrIGIvY3J5cHRvL3NhbHNhMjBfZ2VuZXJpYy5jCkBAIC0xNDMsNyArMTQz
+LDYgQEAgc3RhdGljIHZvaWQgc2Fsc2EyMF9lbmNyeXB0X2J5dGVzKHN0cnVjdCBzYWxzYTIwX2N0
+eCAqY3R4LCB1OCAqZHN0LAogCQkJCSAgY29uc3QgdTggKnNyYywgdW5zaWduZWQgaW50IGJ5dGVz
+KQogewogCXU4IGJ1Zls2NF07Ci0JaW50IGk7CiAKIAlpZiAoZHN0ICE9IHNyYykKIAkJbWVtY3B5
+KGRzdCwgc3JjLCBieXRlcyk7CkBAIC0xNTYsMTUgKzE1NSwxMSBAQCBzdGF0aWMgdm9pZCBzYWxz
+YTIwX2VuY3J5cHRfYnl0ZXMoc3RydWN0IHNhbHNhMjBfY3R4ICpjdHgsIHU4ICpkc3QsCiAJCQlj
+dHgtPmlucHV0WzldID0gUExVU09ORShjdHgtPmlucHV0WzldKTsKIAogCQlpZiAoYnl0ZXMgPD0g
+NjQpIHsKLQkJCWZvciAoaSA9IDA7IGkgPCBieXRlcy80OyArK2kpCi0JCQkJKCh1MzIqKWRzdClb
+aV0gXj0gKCh1MzIqKWJ1ZilbaV07Ci0JCQlmb3IgKGkgPSBieXRlcyAtIGJ5dGVzICUgNDsgaSA8
+IGJ5dGVzOyArK2kpCi0JCQkJZHN0W2ldIF49IGJ1ZltpXTsKKwkJCWNyeXB0b194b3IoZHN0LCBi
+dWYsIGJ5dGVzKTsKIAkJCXJldHVybjsKIAkJfQogCi0JCWZvciAoaSA9IDA7IGkgPCA2NC80OyAr
+K2kpCi0JCQkoKHUzMiopZHN0KVtpXSBePSAoKHUzMiopYnVmKVtpXTsKKwkJY3J5cHRvX3hvcihk
+c3QsIGJ1ZiwgNjQpOwogCQlieXRlcyAtPSA2NDsKIAkJZHN0ICs9IDY0OwogCX0KQEAgLTE5Miwx
+MyArMTg3LDMwIEBAIHN0YXRpYyBpbnQgZW5jcnlwdChzdHJ1Y3QgYmxrY2lwaGVyX2Rlc2MgKmRl
+c2MsCiAJaW50IGVycjsKIAogCWJsa2NpcGhlcl93YWxrX2luaXQoJndhbGssIGRzdCwgc3JjLCBu
+Ynl0ZXMpOwotCWVyciA9IGJsa2NpcGhlcl93YWxrX3ZpcnQoZGVzYywgJndhbGspOworCWVyciA9
+IGJsa2NpcGhlcl93YWxrX3ZpcnRfYmxvY2soZGVzYywgJndhbGssIDY0KTsKIAogCXNhbHNhMjBf
+aXZzZXR1cChjdHgsIHdhbGsuaXYpOwotCXNhbHNhMjBfZW5jcnlwdF9ieXRlcyhjdHgsIHdhbGsu
+ZHN0LnZpcnQuYWRkciwKLQkJCSAgICAgIHdhbGsuc3JjLnZpcnQuYWRkciwgbmJ5dGVzKTsKIAot
+CWVyciA9IGJsa2NpcGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIDApOworCWlmIChsaWtlbHko
+d2Fsay5uYnl0ZXMgPT0gbmJ5dGVzKSkKKwl7CisJCXNhbHNhMjBfZW5jcnlwdF9ieXRlcyhjdHgs
+IHdhbGsuZHN0LnZpcnQuYWRkciwKKwkJCQkgICAgICB3YWxrLnNyYy52aXJ0LmFkZHIsIG5ieXRl
+cyk7CisJCXJldHVybiBibGtjaXBoZXJfd2Fsa19kb25lKGRlc2MsICZ3YWxrLCAwKTsKKwl9CisK
+Kwl3aGlsZSAod2Fsay5uYnl0ZXMgPj0gNjQpIHsKKwkJc2Fsc2EyMF9lbmNyeXB0X2J5dGVzKGN0
+eCwgd2Fsay5kc3QudmlydC5hZGRyLAorCQkJCSAgICAgIHdhbGsuc3JjLnZpcnQuYWRkciwKKwkJ
+CQkgICAgICB3YWxrLm5ieXRlcyAtICh3YWxrLm5ieXRlcyAlIDY0KSk7CisJCWVyciA9IGJsa2Np
+cGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIHdhbGsubmJ5dGVzICUgNjQpOworCX0KKworCWlm
+ICh3YWxrLm5ieXRlcykgeworCQlzYWxzYTIwX2VuY3J5cHRfYnl0ZXMoY3R4LCB3YWxrLmRzdC52
+aXJ0LmFkZHIsCisJCQkJICAgICAgd2Fsay5zcmMudmlydC5hZGRyLCB3YWxrLm5ieXRlcyk7CisJ
+CWVyciA9IGJsa2NpcGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIDApOworCX0KKwogCXJldHVy
+biBlcnI7CiB9CiAK
+------=_Part_2070_991332.1196721088949--
