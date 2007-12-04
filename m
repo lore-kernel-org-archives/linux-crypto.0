@@ -1,36 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: HMAC broken on s390
-Date: Tue, 4 Dec 2007 19:51:20 +1100
-Message-ID: <20071204085120.GA6492@gondor.apana.org.au>
-References: <1196688700.4799.5.camel@localhost.localdomain> <20071203220900.GA8573@gondor.apana.org.au> <20071204082511.GC23294@kernel.dk>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH] [crypto] Make crypto core API modular
+Date: Tue, 4 Dec 2007 15:08:01 +0100
+Message-ID: <20071204140801.GA9651@Chamillionaire.breakpoint.cc>
+References: <20071201121910.GA8048@Chamillionaire.breakpoint.cc> <20071202150950.GA15213@Chamillionaire.breakpoint.cc> <20071204011035.GA29403@gondor.apana.org.au>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jan Glauber <jang@linux.vnet.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Jens Axboe <jens.axboe@oracle.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3246 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751461AbXLDIvi (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:45832 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753268AbXLDOIH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Dec 2007 03:51:38 -0500
+	Tue, 4 Dec 2007 09:08:07 -0500
 Content-Disposition: inline
-In-Reply-To: <20071204082511.GC23294@kernel.dk>
+In-Reply-To: <20071204011035.GA29403@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 04, 2007 at 09:25:11AM +0100, Jens Axboe wrote:
-> 
-> You should continue to do your own chaining if it's a requirement for
-> the driver/layer to function, until we get rid of ARCH_HAS_SG_CHAIN.
-> That'll happen when all archs are converted.
+* Herbert Xu | 2007-12-04 12:10:35 [+1100]:
 
-Thanks for the confirmation.  I'll back out my conversion patch.
+>However, could you please fix all the crypto users to select CRYPTO
+>first? We can then do the modularisation for the next release.
+I mailed two patches to netdev where modules where using crypto code and
+were not selecting crypto in Kconfig. This is _now_ broken even before
+this patch. Others seemed to be fine on the first look.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>I think we should also get rid of the ifdef CONFIG_CRYPTO because it
+>has no legitimate uses.
+Okey, I try to get rid of this and I will check the crypto users.
+
+>Thanks,
+Sebastian
