@@ -1,48 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [crypto] Make crypto core API modular
-Date: Tue, 4 Dec 2007 12:10:35 +1100
-Message-ID: <20071204011035.GA29403@gondor.apana.org.au>
-References: <20071201121910.GA8048@Chamillionaire.breakpoint.cc> <20071202150950.GA15213@Chamillionaire.breakpoint.cc>
+From: Jens Axboe <jens.axboe@oracle.com>
+Subject: Re: HMAC broken on s390
+Date: Tue, 4 Dec 2007 09:25:11 +0100
+Message-ID: <20071204082511.GC23294@kernel.dk>
+References: <1196688700.4799.5.camel@localhost.localdomain> <20071203220900.GA8573@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Cc: Jan Glauber <jang@linux.vnet.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2667 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751060AbXLDBKi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Dec 2007 20:10:38 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1IzMJ1-0008Oy-VI
-	for <linux-crypto@vger.kernel.org>; Tue, 04 Dec 2007 12:10:36 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1IzMJ1-0007f0-00
-	for <linux-crypto@vger.kernel.org>; Tue, 04 Dec 2007 12:10:35 +1100
+Received: from brick.kernel.dk ([87.55.233.238]:23225 "EHLO kernel.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750717AbXLDI1T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 4 Dec 2007 03:27:19 -0500
 Content-Disposition: inline
-In-Reply-To: <20071202150950.GA15213@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20071203220900.GA8573@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 02, 2007 at 04:09:50PM +0100, Sebastian Siewior wrote:
-> * Sebastian Siewior | 2007-12-01 13:19:10 [+0100]:
+On Tue, Dec 04 2007, Herbert Xu wrote:
+> On Mon, Dec 03, 2007 at 02:31:40PM +0100, Jan Glauber wrote:
+> > Hi Herbert,
+> > 
+> > commit 788fefa33b0b50581585925c53c230a36af35d0e in cryptodev breaks hmac
+> > on s390 du to the usage of sg_chain():
+> > 
+> > static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
+> >                             struct scatterlist *sgl)
+> > {
+> > #ifndef ARCH_HAS_SG_CHAIN
+> >         BUG();
+> > #endif
+> > 
+> > ARCH_HAS_SG_CHAIN is false for s390 (and also for some other arch's).
+> > 
+> > What should we do with this?
 > 
-> >This patch makes the whole crypto API is modular.
-> Ups, I forgot to put a MODULE_VERSION("GPL") inside of the module.
-> Herbert, do you nack that patch due to non-sense or do you think that
-> this might be usefull and I should send an updated one?
+> Looks like we took a step backwards because the chaining I had
+> before worked on all architectures :)
+> 
+> I suppose either we'll have to do our own chaining again or implement
+> it for all architectures.  I'll look into this.
 
-Yes I like the idea.
+You should continue to do your own chaining if it's a requirement for
+the driver/layer to function, until we get rid of ARCH_HAS_SG_CHAIN.
+That'll happen when all archs are converted.
 
-However, could you please fix all the crypto users to select CRYPTO
-first? We can then do the modularisation for the next release.
+So don't rely on scatterlist helping you with chaining just yet, sorry.
 
-I think we should also get rid of the ifdef CONFIG_CRYPTO because it
-has no legitimate uses.
-
-Thanks,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jens Axboe
