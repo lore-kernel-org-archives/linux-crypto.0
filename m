@@ -1,30 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Problems encountered with latest cryptodev-2.6 under UML
-Date: Thu, 6 Dec 2007 10:42:28 +1100
-Message-ID: <20071205234228.GA25314@gondor.apana.org.au>
-References: <fd3e431c0712020759tbc41c91o39c0c3e56be66734@mail.gmail.com> <20071202212841.GA7343@gondor.apana.org.au> <fd3e431c0712050859x2e6c2d7bqc7c3e39cf243637@mail.gmail.com>
+Subject: Re: [PATCH 2/2] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
+Date: Thu, 6 Dec 2007 10:51:58 +1100
+Message-ID: <20071205235158.GA26184@gondor.apana.org.au>
+References: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com> <20071205214947.GA20246@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+To: Tan Swee Heng <thesweeheng@gmail.com>,
+	Linux Crypto <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3353 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3665 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751502AbXLEXmc (ORCPT
+	with ESMTP id S1754211AbXLEXwB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Dec 2007 18:42:32 -0500
+	Wed, 5 Dec 2007 18:52:01 -0500
 Content-Disposition: inline
-In-Reply-To: <fd3e431c0712050859x2e6c2d7bqc7c3e39cf243637@mail.gmail.com>
+In-Reply-To: <20071205214947.GA20246@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 06, 2007 at 12:59:27AM +0800, Tan Swee Heng wrote:
-> Sorry for the lousy bug report. I misinterpreted git-pull's "Already
-> up-to-date" to mean that it matches your tree exactly. Apparently that
-> is not the case. I just git-clone and the current tree works fine.
+On Wed, Dec 05, 2007 at 10:49:47PM +0100, Sebastian Siewior wrote:
+>
+> Besides that, I saw the keysetup routine is also included in assembly.
+> Is the computed key any different from the C version? *I* would prefer
+> to share the keysetup code with the C version because it is not a
+> performace critical part.
 
-Sorry, I had rebased my tree so you'd need to rewind your local
-version before it would match.  I should've made an announcement :)
+I agree.  But we can add the patch first and fix this up later :)
 
 Cheers,
 -- 
