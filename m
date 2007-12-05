@@ -1,1281 +1,3316 @@
-From: "Tan Swee Heng" <thesweeheng@gmail.com>
-Subject: [PATCH 2/2] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
-Date: Thu, 6 Dec 2007 04:31:25 +0800
-Message-ID: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH 2/2] salsa20_i586: Salsa20 stream cipher algorithm
+	(i586 version)
+Date: Wed, 5 Dec 2007 22:49:47 +0100
+Message-ID: <20071205214947.GA20246@Chamillionaire.breakpoint.cc>
+References: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_613_31150930.1196886685611"
-To: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	"Linux Crypto" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto <linux-crypto@vger.kernel.org>
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ug-out-1314.google.com ([66.249.92.172]:30842 "EHLO
-	ug-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750862AbXLEUb3 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:50693 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753410AbXLEVtz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Dec 2007 15:31:29 -0500
-Received: by ug-out-1314.google.com with SMTP id z38so561826ugc
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Dec 2007 12:31:27 -0800 (PST)
+	Wed, 5 Dec 2007 16:49:55 -0500
+Content-Disposition: inline
+In-Reply-To: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-------=_Part_613_31150930.1196886685611
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+* Tan Swee Heng | 2007-12-06 04:31:25 [+0800]:
 
-This patch contains the salsa20-i586 implementation. The original
-assembly code came from
-<http://cr.yp.to/snuffle/salsa20/x86-pm/salsa20.s>. I have reformatted
-it (added indents) so that it matches the other algorithms in
-arch/x86/crypto.
+>This patch contains the salsa20-i586 implementation. The original
+>assembly code came from
+><http://cr.yp.to/snuffle/salsa20/x86-pm/salsa20.s>. I have reformatted
+>it (added indents) so that it matches the other algorithms in
+>arch/x86/crypto.
+The patch is a large one. Do you thing all those comments are requried
+or helping to understand what is going on?
+Besides that, I saw the keysetup routine is also included in assembly.
+Is the computed key any different from the C version? *I* would prefer
+to share the keysetup code with the C version because it is not a
+performace critical part.
+There are a few labels like '_label:' and 'label:' One of them should be
+enough or am I missing something?
 
-This patch also contains a speed test for salsa20-i586. Usage is
-"modprobe tcrypt mode=206"
+>This patch also contains a speed test for salsa20-i586. Usage is
+>"modprobe tcrypt mode=206"
+>
+>Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
+>
+>====
+>Note: this is a resubmission; previously the indentation in the
+>assembly code was missing.
 
-Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
+>diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+>index b8fbb43..265135b 100644
+>--- a/arch/x86/crypto/Makefile
+>+++ b/arch/x86/crypto/Makefile
+>@@ -4,12 +4,14 @@
+> 
+> obj-$(CONFIG_CRYPTO_AES_586) += aes-i586.o
+> obj-$(CONFIG_CRYPTO_TWOFISH_586) += twofish-i586.o
+>+obj-$(CONFIG_CRYPTO_SALSA20_586) += salsa20-i586.o
+> 
+> obj-$(CONFIG_CRYPTO_AES_X86_64) += aes-x86_64.o
+> obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
+> 
+> aes-i586-y := aes-i586-asm_32.o aes_glue.o
+> twofish-i586-y := twofish-i586-asm_32.o twofish_32.o
+>+salsa20-i586-y := salsa20-i586-asm_32.o salsa20_32.o
+> 
+> aes-x86_64-y := aes-x86_64-asm_64.o aes_glue.o
+> twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_64.o
+>diff --git a/arch/x86/crypto/salsa20-i586-asm_32.S b/arch/x86/crypto/salsa20-i586-asm_32.S
+>new file mode 100644
+>index 0000000..7ad215a
+>--- /dev/null
+>+++ b/arch/x86/crypto/salsa20-i586-asm_32.S
+>@@ -0,0 +1,3069 @@
+>+# salsa20_pm.s version 20051229
+>+# D. J. Bernstein
+>+# Public domain.
+>+
+>+# int32 a
+>+
+>+# int32 p
+>+
+>+# int32 s
+>+
+>+# int32 t
+>+
+>+# int32 w
+>+
+>+# int32 r
+>+
+>+# int32 v
+>+
+>+# stack32 arg1
+>+
+>+# stack32 arg2
+>+
+>+# stack32 arg3
+>+
+>+# stack32 arg4
+>+
+>+# input arg1
+>+
+>+# input arg2
+>+
+>+# input arg3
+>+
+>+# input arg4
+>+
+>+# int32 eax
+>+
+>+# int32 ebx
+>+
+>+# int32 esi
+>+
+>+# int32 edi
+>+
+>+# int32 ebp
+>+
+>+# caller eax
+>+
+>+# caller ebx
+>+
+>+# caller esi
+>+
+>+# caller edi
+>+
+>+# caller ebp
+>+
+>+# int32 k
+>+
+>+# int32 kbits
+>+
+>+# int32 iv
+>+
+>+# int32 i
+>+
+>+# stack32 x_backup
+>+
+>+# int32 x
+>+
+>+# stack32 m_backup
+>+
+>+# int32 m
+>+
+>+# stack32 out_backup
+>+
+>+# int32 out
+>+
+>+# stack32 bytes_backup
+>+
+>+# int32 bytes
+>+
+>+# stack32 eax_stack
+>+
+>+# stack32 ebx_stack
+>+
+>+# stack32 esi_stack
+>+
+>+# stack32 edi_stack
+>+
+>+# stack32 ebp_stack
+>+
+>+# int32 in0
+>+
+>+# int32 in1
+>+
+>+# int32 in2
+>+
+>+# int32 in3
+>+
+>+# int32 in4
+>+
+>+# int32 in5
+>+
+>+# int32 in6
+>+
+>+# int32 in7
+>+
+>+# int32 in8
+>+
+>+# int32 in9
+>+
+>+# int32 in10
+>+
+>+# int32 in11
+>+
+>+# int32 in12
+>+
+>+# int32 in13
+>+
+>+# int32 in14
+>+
+>+# int32 in15
+>+
+>+# stack32 x0
+>+
+>+# stack32 x1
+>+
+>+# stack32 x2
+>+
+>+# stack32 x3
+>+
+>+# stack32 x4
+>+
+>+# stack32 x5
+>+
+>+# stack32 x6
+>+
+>+# stack32 x7
+>+
+>+# stack32 x8
+>+
+>+# stack32 x9
+>+
+>+# stack32 x10
+>+
+>+# stack32 x11
+>+
+>+# stack32 x12
+>+
+>+# stack32 x13
+>+
+>+# stack32 x14
+>+
+>+# stack32 x15
+>+
+>+# stack32 j0
+>+
+>+# stack32 j1
+>+
+>+# stack32 j2
+>+
+>+# stack32 j3
+>+
+>+# stack32 j4
+>+
+>+# stack32 j5
+>+
+>+# stack32 j6
+>+
+>+# stack32 j7
+>+
+>+# stack32 j8
+>+
+>+# stack32 j9
+>+
+>+# stack32 j10
+>+
+>+# stack32 j11
+>+
+>+# stack32 j12
+>+
+>+# stack32 j13
+>+
+>+# stack32 j14
+>+
+>+# stack32 j15
+>+
+>+# stack512 tmp
+>+
+>+# stack32 ctarget
+>+
+>+# enter ECRYPT_keystream_bytes
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_keystream_bytes
+>+_ECRYPT_keystream_bytes:
+>+ECRYPT_keystream_bytes:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	# eax_stack = eax
+>+	# movl <eax=int32#1,>eax_stack=stack32#5
+>+	# movl <eax=%eax,>eax_stack=80(%esp)
+>+	movl    %eax,80(%esp)
+>+
+>+	# ebx_stack = ebx
+>+	# movl <ebx=int32#4,>ebx_stack=stack32#6
+>+	# movl <ebx=%ebx,>ebx_stack=84(%esp)
+>+	movl    %ebx,84(%esp)
+>+
+>+	# esi_stack = esi
+>+	# movl <esi=int32#5,>esi_stack=stack32#7
+>+	# movl <esi=%esi,>esi_stack=88(%esp)
+>+	movl    %esi,88(%esp)
+>+
+>+	# edi_stack = edi
+>+	# movl <edi=int32#6,>edi_stack=stack32#8
+>+	# movl <edi=%edi,>edi_stack=92(%esp)
+>+	movl    %edi,92(%esp)
+>+
+>+	# ebp_stack = ebp
+>+	# movl <ebp=int32#7,>ebp_stack=stack32#9
+>+	# movl <ebp=%ebp,>ebp_stack=96(%esp)
+>+	movl    %ebp,96(%esp)
+>+
+>+	# x = arg1
+>+	# movl <arg1=stack32#-1,>x=int32#3
+>+	# movl <arg1=4(%esp,%eax),>x=%edx
+>+	movl    4(%esp,%eax),%edx
+>+
+>+	# m = arg2
+>+	# movl <arg2=stack32#-2,>m=int32#5
+>+	# movl <arg2=8(%esp,%eax),>m=%esi
+>+	movl    8(%esp,%eax),%esi
+>+
+>+	# out = m
+>+	# mov  <m=int32#5,>out=int32#6
+>+	# mov  <m=%esi,>out=%edi
+>+	mov      %esi,%edi
+>+
+>+	# bytes = arg3
+>+	# movl <arg3=stack32#-3,>bytes=int32#4
+>+	# movl <arg3=12(%esp,%eax),>bytes=%ebx
+>+	movl    12(%esp,%eax),%ebx
+>+
+>+	# bytes -= 0
+>+	# sub  $0,<bytes=int32#4
+>+	# sub  $0,<bytes=%ebx
+>+	sub      $0,%ebx
+>+
+>+	# goto done if unsigned<=
+>+	jbe     ._done
+>+
+>+	# a = 0
+>+	# mov  $0,>a=int32#1
+>+	# mov  $0,>a=%eax
+>+	mov      $0,%eax
+>+
+>+	# i = bytes
+>+	# mov  <bytes=int32#4,>i=int32#2
+>+	# mov  <bytes=%ebx,>i=%ecx
+>+	mov      %ebx,%ecx
+>+
+>+	# while (i) { *out++ = a; --i }
+>+	rep     stosb
+>+
+>+	# out -= bytes
+>+	# sub  <bytes=int32#4,<out=int32#6
+>+	# sub  <bytes=%ebx,<out=%edi
+>+	sub      %ebx,%edi
+>+
+>+	# goto start
+>+	jmp     ._start
+>+
+>+# enter ECRYPT_decrypt_bytes
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_decrypt_bytes
+>+_ECRYPT_decrypt_bytes:
+>+ECRYPT_decrypt_bytes:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	# eax_stack = eax
+>+	# movl <eax=int32#1,>eax_stack=stack32#5
+>+	# movl <eax=%eax,>eax_stack=80(%esp)
+>+	movl    %eax,80(%esp)
+>+
+>+	# ebx_stack = ebx
+>+	# movl <ebx=int32#4,>ebx_stack=stack32#6
+>+	# movl <ebx=%ebx,>ebx_stack=84(%esp)
+>+	movl    %ebx,84(%esp)
+>+
+>+	# esi_stack = esi
+>+	# movl <esi=int32#5,>esi_stack=stack32#7
+>+	# movl <esi=%esi,>esi_stack=88(%esp)
+>+	movl    %esi,88(%esp)
+>+
+>+	# edi_stack = edi
+>+	# movl <edi=int32#6,>edi_stack=stack32#8
+>+	# movl <edi=%edi,>edi_stack=92(%esp)
+>+	movl    %edi,92(%esp)
+>+
+>+	# ebp_stack = ebp
+>+	# movl <ebp=int32#7,>ebp_stack=stack32#9
+>+	# movl <ebp=%ebp,>ebp_stack=96(%esp)
+>+	movl    %ebp,96(%esp)
+>+
+>+	# x = arg1
+>+	# movl <arg1=stack32#-1,>x=int32#3
+>+	# movl <arg1=4(%esp,%eax),>x=%edx
+>+	movl    4(%esp,%eax),%edx
+>+
+>+	# m = arg2
+>+	# movl <arg2=stack32#-2,>m=int32#5
+>+	# movl <arg2=8(%esp,%eax),>m=%esi
+>+	movl    8(%esp,%eax),%esi
+>+
+>+	# out = arg3
+>+	# movl <arg3=stack32#-3,>out=int32#6
+>+	# movl <arg3=12(%esp,%eax),>out=%edi
+>+	movl    12(%esp,%eax),%edi
+>+
+>+	# bytes = arg4
+>+	# movl <arg4=stack32#-4,>bytes=int32#4
+>+	# movl <arg4=16(%esp,%eax),>bytes=%ebx
+>+	movl    16(%esp,%eax),%ebx
+>+
+>+	# bytes -= 0
+>+	# sub  $0,<bytes=int32#4
+>+	# sub  $0,<bytes=%ebx
+>+	sub      $0,%ebx
+>+
+>+	# goto done if unsigned<=
+>+	jbe     ._done
+>+
+>+	# goto start
+>+	jmp     ._start
+>+
+>+# enter ECRYPT_encrypt_bytes
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_encrypt_bytes
+>+_ECRYPT_encrypt_bytes:
+>+ECRYPT_encrypt_bytes:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	# eax_stack = eax
+>+	# movl <eax=int32#1,>eax_stack=stack32#5
+>+	# movl <eax=%eax,>eax_stack=80(%esp)
+>+	movl    %eax,80(%esp)
+>+
+>+	# ebx_stack = ebx
+>+	# movl <ebx=int32#4,>ebx_stack=stack32#6
+>+	# movl <ebx=%ebx,>ebx_stack=84(%esp)
+>+	movl    %ebx,84(%esp)
+>+
+>+	# esi_stack = esi
+>+	# movl <esi=int32#5,>esi_stack=stack32#7
+>+	# movl <esi=%esi,>esi_stack=88(%esp)
+>+	movl    %esi,88(%esp)
+>+
+>+	# edi_stack = edi
+>+	# movl <edi=int32#6,>edi_stack=stack32#8
+>+	# movl <edi=%edi,>edi_stack=92(%esp)
+>+	movl    %edi,92(%esp)
+>+
+>+	# ebp_stack = ebp
+>+	# movl <ebp=int32#7,>ebp_stack=stack32#9
+>+	# movl <ebp=%ebp,>ebp_stack=96(%esp)
+>+	movl    %ebp,96(%esp)
+>+
+>+	# x = arg1
+>+	# movl <arg1=stack32#-1,>x=int32#3
+>+	# movl <arg1=4(%esp,%eax),>x=%edx
+>+	movl    4(%esp,%eax),%edx
+>+
+>+	# m = arg2
+>+	# movl <arg2=stack32#-2,>m=int32#5
+>+	# movl <arg2=8(%esp,%eax),>m=%esi
+>+	movl    8(%esp,%eax),%esi
+>+
+>+	# out = arg3
+>+	# movl <arg3=stack32#-3,>out=int32#6
+>+	# movl <arg3=12(%esp,%eax),>out=%edi
+>+	movl    12(%esp,%eax),%edi
+>+
+>+	# bytes = arg4
+>+	# movl <arg4=stack32#-4,>bytes=int32#4
+>+	# movl <arg4=16(%esp,%eax),>bytes=%ebx
+>+	movl    16(%esp,%eax),%ebx
+>+
+>+	# bytes -= 0
+>+	# sub  $0,<bytes=int32#4
+>+	# sub  $0,<bytes=%ebx
+>+	sub      $0,%ebx
+>+
+>+	# goto done if unsigned<=
+>+	jbe     ._done
+>+
+>+	# start#
+>+._start:
+>+
+>+	# in0 = *(uint32 *) (x + 0)
+>+	# movl 0(<x=int32#3),>in0=int32#1
+>+	# movl 0(<x=%edx),>in0=%eax
+>+	movl    0(%edx),%eax
+>+
+>+	# in1 = *(uint32 *) (x + 4)
+>+	# movl 4(<x=int32#3),>in1=int32#2
+>+	# movl 4(<x=%edx),>in1=%ecx
+>+	movl    4(%edx),%ecx
+>+
+>+	# in2 = *(uint32 *) (x + 8)
+>+	# movl 8(<x=int32#3),>in2=int32#7
+>+	# movl 8(<x=%edx),>in2=%ebp
+>+	movl    8(%edx),%ebp
+>+
+>+	# j0 = in0
+>+	# movl <in0=int32#1,>j0=stack32#26
+>+	# movl <in0=%eax,>j0=164(%esp)
+>+	movl    %eax,164(%esp)
+>+
+>+	# in3 = *(uint32 *) (x + 12)
+>+	# movl 12(<x=int32#3),>in3=int32#1
+>+	# movl 12(<x=%edx),>in3=%eax
+>+	movl    12(%edx),%eax
+>+
+>+	# j1 = in1
+>+	# movl <in1=int32#2,>j1=stack32#27
+>+	# movl <in1=%ecx,>j1=168(%esp)
+>+	movl    %ecx,168(%esp)
+>+
+>+	# in4 = *(uint32 *) (x + 16)
+>+	# movl 16(<x=int32#3),>in4=int32#2
+>+	# movl 16(<x=%edx),>in4=%ecx
+>+	movl    16(%edx),%ecx
+>+
+>+	# j2 = in2
+>+	# movl <in2=int32#7,>j2=stack32#28
+>+	# movl <in2=%ebp,>j2=172(%esp)
+>+	movl    %ebp,172(%esp)
+>+
+>+	# in5 = *(uint32 *) (x + 20)
+>+	# movl 20(<x=int32#3),>in5=int32#7
+>+	# movl 20(<x=%edx),>in5=%ebp
+>+	movl    20(%edx),%ebp
+>+
+>+	# j3 = in3
+>+	# movl <in3=int32#1,>j3=stack32#29
+>+	# movl <in3=%eax,>j3=176(%esp)
+>+	movl    %eax,176(%esp)
+>+
+>+	# in6 = *(uint32 *) (x + 24)
+>+	# movl 24(<x=int32#3),>in6=int32#1
+>+	# movl 24(<x=%edx),>in6=%eax
+>+	movl    24(%edx),%eax
+>+
+>+	# j4 = in4
+>+	# movl <in4=int32#2,>j4=stack32#30
+>+	# movl <in4=%ecx,>j4=180(%esp)
+>+	movl    %ecx,180(%esp)
+>+
+>+	# in7 = *(uint32 *) (x + 28)
+>+	# movl 28(<x=int32#3),>in7=int32#2
+>+	# movl 28(<x=%edx),>in7=%ecx
+>+	movl    28(%edx),%ecx
+>+
+>+	# j5 = in5
+>+	# movl <in5=int32#7,>j5=stack32#31
+>+	# movl <in5=%ebp,>j5=184(%esp)
+>+	movl    %ebp,184(%esp)
+>+
+>+	# in8 = *(uint32 *) (x + 32)
+>+	# movl 32(<x=int32#3),>in8=int32#7
+>+	# movl 32(<x=%edx),>in8=%ebp
+>+	movl    32(%edx),%ebp
+>+
+>+	# j6 = in6
+>+	# movl <in6=int32#1,>j6=stack32#32
+>+	# movl <in6=%eax,>j6=188(%esp)
+>+	movl    %eax,188(%esp)
+>+
+>+	# in9 = *(uint32 *) (x + 36)
+>+	# movl 36(<x=int32#3),>in9=int32#1
+>+	# movl 36(<x=%edx),>in9=%eax
+>+	movl    36(%edx),%eax
+>+
+>+	# j7 = in7
+>+	# movl <in7=int32#2,>j7=stack32#33
+>+	# movl <in7=%ecx,>j7=192(%esp)
+>+	movl    %ecx,192(%esp)
+>+
+>+	# in10 = *(uint32 *) (x + 40)
+>+	# movl 40(<x=int32#3),>in10=int32#2
+>+	# movl 40(<x=%edx),>in10=%ecx
+>+	movl    40(%edx),%ecx
+>+
+>+	# j8 = in8
+>+	# movl <in8=int32#7,>j8=stack32#34
+>+	# movl <in8=%ebp,>j8=196(%esp)
+>+	movl    %ebp,196(%esp)
+>+
+>+	# in11 = *(uint32 *) (x + 44)
+>+	# movl 44(<x=int32#3),>in11=int32#7
+>+	# movl 44(<x=%edx),>in11=%ebp
+>+	movl    44(%edx),%ebp
+>+
+>+	# j9 = in9
+>+	# movl <in9=int32#1,>j9=stack32#35
+>+	# movl <in9=%eax,>j9=200(%esp)
+>+	movl    %eax,200(%esp)
+>+
+>+	# in12 = *(uint32 *) (x + 48)
+>+	# movl 48(<x=int32#3),>in12=int32#1
+>+	# movl 48(<x=%edx),>in12=%eax
+>+	movl    48(%edx),%eax
+>+
+>+	# j10 = in10
+>+	# movl <in10=int32#2,>j10=stack32#36
+>+	# movl <in10=%ecx,>j10=204(%esp)
+>+	movl    %ecx,204(%esp)
+>+
+>+	# in13 = *(uint32 *) (x + 52)
+>+	# movl 52(<x=int32#3),>in13=int32#2
+>+	# movl 52(<x=%edx),>in13=%ecx
+>+	movl    52(%edx),%ecx
+>+
+>+	# j11 = in11
+>+	# movl <in11=int32#7,>j11=stack32#37
+>+	# movl <in11=%ebp,>j11=208(%esp)
+>+	movl    %ebp,208(%esp)
+>+
+>+	# in14 = *(uint32 *) (x + 56)
+>+	# movl 56(<x=int32#3),>in14=int32#7
+>+	# movl 56(<x=%edx),>in14=%ebp
+>+	movl    56(%edx),%ebp
+>+
+>+	# j12 = in12
+>+	# movl <in12=int32#1,>j12=stack32#38
+>+	# movl <in12=%eax,>j12=212(%esp)
+>+	movl    %eax,212(%esp)
+>+
+>+	# in15 = *(uint32 *) (x + 60)
+>+	# movl 60(<x=int32#3),>in15=int32#1
+>+	# movl 60(<x=%edx),>in15=%eax
+>+	movl    60(%edx),%eax
+>+
+>+	# j13 = in13
+>+	# movl <in13=int32#2,>j13=stack32#39
+>+	# movl <in13=%ecx,>j13=216(%esp)
+>+	movl    %ecx,216(%esp)
+>+
+>+	# j14 = in14
+>+	# movl <in14=int32#7,>j14=stack32#40
+>+	# movl <in14=%ebp,>j14=220(%esp)
+>+	movl    %ebp,220(%esp)
+>+
+>+	# j15 = in15
+>+	# movl <in15=int32#1,>j15=stack32#41
+>+	# movl <in15=%eax,>j15=224(%esp)
+>+	movl    %eax,224(%esp)
+>+
+>+	# x_backup = x
+>+	# movl <x=int32#3,>x_backup=stack32#1
+>+	# movl <x=%edx,>x_backup=64(%esp)
+>+	movl    %edx,64(%esp)
+>+
+>+	# bytesatleast1#
+>+._bytesatleast1:
+>+
+>+	#   bytes - 64
+>+	# cmp  $64,<bytes=int32#4
+>+	# cmp  $64,<bytes=%ebx
+>+	cmp      $64,%ebx
+>+
+>+	#   goto nocopy if unsigned>=
+>+	jae     ._nocopy
+>+
+>+	#     ctarget = out
+>+	# movl <out=int32#6,>ctarget=stack32#42
+>+	# movl <out=%edi,>ctarget=228(%esp)
+>+	movl    %edi,228(%esp)
+>+
+>+	#     out = &tmp
+>+	# leal >tmp=stack512#1,>out=int32#6
+>+	# leal >tmp=0(%esp),>out=%edi
+>+	leal    0(%esp),%edi
+>+
+>+	#     i = bytes
+>+	# mov  <bytes=int32#4,>i=int32#2
+>+	# mov  <bytes=%ebx,>i=%ecx
+>+	mov      %ebx,%ecx
+>+
+>+	#     while (i) { *out++ = *m++; --i }
+>+	rep     movsb
+>+
+>+	#     out = &tmp
+>+	# leal >tmp=stack512#1,>out=int32#6
+>+	# leal >tmp=0(%esp),>out=%edi
+>+	leal    0(%esp),%edi
+>+
+>+	#     m = &tmp
+>+	# leal >tmp=stack512#1,>m=int32#5
+>+	# leal >tmp=0(%esp),>m=%esi
+>+	leal    0(%esp),%esi
+>+
+>+	#   nocopy#
+>+._nocopy:
+>+
+>+	#   out_backup = out
+>+	# movl <out=int32#6,>out_backup=stack32#3
+>+	# movl <out=%edi,>out_backup=72(%esp)
+>+	movl    %edi,72(%esp)
+>+
+>+	#   m_backup = m
+>+	# movl <m=int32#5,>m_backup=stack32#2
+>+	# movl <m=%esi,>m_backup=68(%esp)
+>+	movl    %esi,68(%esp)
+>+
+>+	#   bytes_backup = bytes
+>+	# movl <bytes=int32#4,>bytes_backup=stack32#4
+>+	# movl <bytes=%ebx,>bytes_backup=76(%esp)
+>+	movl    %ebx,76(%esp)
+>+
+>+	#   in0 = j0
+>+	# movl <j0=stack32#26,>in0=int32#1
+>+	# movl <j0=164(%esp),>in0=%eax
+>+	movl    164(%esp),%eax
+>+
+>+	#   in1 = j1
+>+	# movl <j1=stack32#27,>in1=int32#2
+>+	# movl <j1=168(%esp),>in1=%ecx
+>+	movl    168(%esp),%ecx
+>+
+>+	#   in2 = j2
+>+	# movl <j2=stack32#28,>in2=int32#3
+>+	# movl <j2=172(%esp),>in2=%edx
+>+	movl    172(%esp),%edx
+>+
+>+	#   in3 = j3
+>+	# movl <j3=stack32#29,>in3=int32#4
+>+	# movl <j3=176(%esp),>in3=%ebx
+>+	movl    176(%esp),%ebx
+>+
+>+	#   x0 = in0
+>+	# movl <in0=int32#1,>x0=stack32#10
+>+	# movl <in0=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	#   x1 = in1
+>+	# movl <in1=int32#2,>x1=stack32#11
+>+	# movl <in1=%ecx,>x1=104(%esp)
+>+	movl    %ecx,104(%esp)
+>+
+>+	#   x2 = in2
+>+	# movl <in2=int32#3,>x2=stack32#12
+>+	# movl <in2=%edx,>x2=108(%esp)
+>+	movl    %edx,108(%esp)
+>+
+>+	#   x3 = in3
+>+	# movl <in3=int32#4,>x3=stack32#13
+>+	# movl <in3=%ebx,>x3=112(%esp)
+>+	movl    %ebx,112(%esp)
+>+
+>+	#   in4 = j4
+>+	# movl <j4=stack32#30,>in4=int32#1
+>+	# movl <j4=180(%esp),>in4=%eax
+>+	movl    180(%esp),%eax
+>+
+>+	#   in5 = j5
+>+	# movl <j5=stack32#31,>in5=int32#2
+>+	# movl <j5=184(%esp),>in5=%ecx
+>+	movl    184(%esp),%ecx
+>+
+>+	#   in6 = j6
+>+	# movl <j6=stack32#32,>in6=int32#3
+>+	# movl <j6=188(%esp),>in6=%edx
+>+	movl    188(%esp),%edx
+>+
+>+	#   in7 = j7
+>+	# movl <j7=stack32#33,>in7=int32#4
+>+	# movl <j7=192(%esp),>in7=%ebx
+>+	movl    192(%esp),%ebx
+>+
+>+	#   x4 = in4
+>+	# movl <in4=int32#1,>x4=stack32#14
+>+	# movl <in4=%eax,>x4=116(%esp)
+>+	movl    %eax,116(%esp)
+>+
+>+	#   x5 = in5
+>+	# movl <in5=int32#2,>x5=stack32#15
+>+	# movl <in5=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	#   x6 = in6
+>+	# movl <in6=int32#3,>x6=stack32#16
+>+	# movl <in6=%edx,>x6=124(%esp)
+>+	movl    %edx,124(%esp)
+>+
+>+	#   x7 = in7
+>+	# movl <in7=int32#4,>x7=stack32#17
+>+	# movl <in7=%ebx,>x7=128(%esp)
+>+	movl    %ebx,128(%esp)
+>+
+>+	#   in8 = j8
+>+	# movl <j8=stack32#34,>in8=int32#1
+>+	# movl <j8=196(%esp),>in8=%eax
+>+	movl    196(%esp),%eax
+>+
+>+	#   in9 = j9
+>+	# movl <j9=stack32#35,>in9=int32#2
+>+	# movl <j9=200(%esp),>in9=%ecx
+>+	movl    200(%esp),%ecx
+>+
+>+	#   in10 = j10
+>+	# movl <j10=stack32#36,>in10=int32#3
+>+	# movl <j10=204(%esp),>in10=%edx
+>+	movl    204(%esp),%edx
+>+
+>+	#   in11 = j11
+>+	# movl <j11=stack32#37,>in11=int32#4
+>+	# movl <j11=208(%esp),>in11=%ebx
+>+	movl    208(%esp),%ebx
+>+
+>+	#   x8 = in8
+>+	# movl <in8=int32#1,>x8=stack32#18
+>+	# movl <in8=%eax,>x8=132(%esp)
+>+	movl    %eax,132(%esp)
+>+
+>+	#   x9 = in9
+>+	# movl <in9=int32#2,>x9=stack32#19
+>+	# movl <in9=%ecx,>x9=136(%esp)
+>+	movl    %ecx,136(%esp)
+>+
+>+	#   x10 = in10
+>+	# movl <in10=int32#3,>x10=stack32#20
+>+	# movl <in10=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	#   x11 = in11
+>+	# movl <in11=int32#4,>x11=stack32#21
+>+	# movl <in11=%ebx,>x11=144(%esp)
+>+	movl    %ebx,144(%esp)
+>+
+>+	#   in12 = j12
+>+	# movl <j12=stack32#38,>in12=int32#1
+>+	# movl <j12=212(%esp),>in12=%eax
+>+	movl    212(%esp),%eax
+>+
+>+	#   in13 = j13
+>+	# movl <j13=stack32#39,>in13=int32#2
+>+	# movl <j13=216(%esp),>in13=%ecx
+>+	movl    216(%esp),%ecx
+>+
+>+	#   in14 = j14
+>+	# movl <j14=stack32#40,>in14=int32#3
+>+	# movl <j14=220(%esp),>in14=%edx
+>+	movl    220(%esp),%edx
+>+
+>+	#   in15 = j15
+>+	# movl <j15=stack32#41,>in15=int32#4
+>+	# movl <j15=224(%esp),>in15=%ebx
+>+	movl    224(%esp),%ebx
+>+
+>+	#   x12 = in12
+>+	# movl <in12=int32#1,>x12=stack32#22
+>+	# movl <in12=%eax,>x12=148(%esp)
+>+	movl    %eax,148(%esp)
+>+
+>+	#   x13 = in13
+>+	# movl <in13=int32#2,>x13=stack32#23
+>+	# movl <in13=%ecx,>x13=152(%esp)
+>+	movl    %ecx,152(%esp)
+>+
+>+	#   x14 = in14
+>+	# movl <in14=int32#3,>x14=stack32#24
+>+	# movl <in14=%edx,>x14=156(%esp)
+>+	movl    %edx,156(%esp)
+>+
+>+	#   x15 = in15
+>+	# movl <in15=int32#4,>x15=stack32#25
+>+	# movl <in15=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	#   i = 20
+>+	# mov  $20,>i=int32#7
+>+	# mov  $20,>i=%ebp
+>+	mov      $20,%ebp
+>+
+>+	# p = x0
+>+	# movl <x0=stack32#10,>p=int32#1
+>+	# movl <x0=100(%esp),>p=%eax
+>+	movl    100(%esp),%eax
+>+
+>+	# s = x5
+>+	# movl <x5=stack32#15,>s=int32#2
+>+	# movl <x5=120(%esp),>s=%ecx
+>+	movl    120(%esp),%ecx
+>+
+>+	# t = x10
+>+	# movl <x10=stack32#20,>t=int32#3
+>+	# movl <x10=140(%esp),>t=%edx
+>+	movl    140(%esp),%edx
+>+
+>+	# w = x15
+>+	# movl <x15=stack32#25,>w=int32#4
+>+	# movl <x15=160(%esp),>w=%ebx
+>+	movl    160(%esp),%ebx
+>+
+>+	# mainloop#
+>+._mainloop:
+>+
+>+	# x0 = p
+>+	# movl <p=int32#1,>x0=stack32#10
+>+	# movl <p=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	# 				x10 = t
+>+	# movl <t=int32#3,>x10=stack32#20
+>+	# movl <t=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	# p += x12
+>+	# addl <x12=stack32#22,<p=int32#1
+>+	# addl <x12=148(%esp),<p=%eax
+>+	addl    148(%esp),%eax
+>+
+>+	# 		x5 = s
+>+	# movl <s=int32#2,>x5=stack32#15
+>+	# movl <s=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	# 				t += x6
+>+	# addl <x6=stack32#16,<t=int32#3
+>+	# addl <x6=124(%esp),<t=%edx
+>+	addl    124(%esp),%edx
+>+
+>+	# 						x15 = w
+>+	# movl <w=int32#4,>x15=stack32#25
+>+	# movl <w=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	# 		r = x1
+>+	# movl <x1=stack32#11,>r=int32#5
+>+	# movl <x1=104(%esp),>r=%esi
+>+	movl    104(%esp),%esi
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 						v = x11
+>+	# movl <x11=stack32#21,>v=int32#6
+>+	# movl <x11=144(%esp),>v=%edi
+>+	movl    144(%esp),%edi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# p <<<= 7
+>+	# rol  $7,<p=int32#1
+>+	# rol  $7,<p=%eax
+>+	rol      $7,%eax
+>+
+>+	# p ^= x4
+>+	# xorl <x4=stack32#14,<p=int32#1
+>+	# xorl <x4=116(%esp),<p=%eax
+>+	xorl    116(%esp),%eax
+>+
+>+	# 				t <<<= 7
+>+	# rol  $7,<t=int32#3
+>+	# rol  $7,<t=%edx
+>+	rol      $7,%edx
+>+
+>+	# 				t ^= x14
+>+	# xorl <x14=stack32#24,<t=int32#3
+>+	# xorl <x14=156(%esp),<t=%edx
+>+	xorl    156(%esp),%edx
+>+
+>+	# 		r <<<= 7
+>+	# rol  $7,<r=int32#5
+>+	# rol  $7,<r=%esi
+>+	rol      $7,%esi
+>+
+>+	# 		r ^= x9
+>+	# xorl <x9=stack32#19,<r=int32#5
+>+	# xorl <x9=136(%esp),<r=%esi
+>+	xorl    136(%esp),%esi
+>+
+>+	# 						v <<<= 7
+>+	# rol  $7,<v=int32#6
+>+	# rol  $7,<v=%edi
+>+	rol      $7,%edi
+>+
+>+	# 						v ^= x3
+>+	# xorl <x3=stack32#13,<v=int32#6
+>+	# xorl <x3=112(%esp),<v=%edi
+>+	xorl    112(%esp),%edi
+>+
+>+	# x4 = p
+>+	# movl <p=int32#1,>x4=stack32#14
+>+	# movl <p=%eax,>x4=116(%esp)
+>+	movl    %eax,116(%esp)
+>+
+>+	# 				x14 = t
+>+	# movl <t=int32#3,>x14=stack32#24
+>+	# movl <t=%edx,>x14=156(%esp)
+>+	movl    %edx,156(%esp)
+>+
+>+	# p += x0
+>+	# addl <x0=stack32#10,<p=int32#1
+>+	# addl <x0=100(%esp),<p=%eax
+>+	addl    100(%esp),%eax
+>+
+>+	# 		x9 = r
+>+	# movl <r=int32#5,>x9=stack32#19
+>+	# movl <r=%esi,>x9=136(%esp)
+>+	movl    %esi,136(%esp)
+>+
+>+	# 				t += x10
+>+	# addl <x10=stack32#20,<t=int32#3
+>+	# addl <x10=140(%esp),<t=%edx
+>+	addl    140(%esp),%edx
+>+
+>+	# 						x3 = v
+>+	# movl <v=int32#6,>x3=stack32#13
+>+	# movl <v=%edi,>x3=112(%esp)
+>+	movl    %edi,112(%esp)
+>+
+>+	# p <<<= 9
+>+	# rol  $9,<p=int32#1
+>+	# rol  $9,<p=%eax
+>+	rol      $9,%eax
+>+
+>+	# p ^= x8
+>+	# xorl <x8=stack32#18,<p=int32#1
+>+	# xorl <x8=132(%esp),<p=%eax
+>+	xorl    132(%esp),%eax
+>+
+>+	# 				t <<<= 9
+>+	# rol  $9,<t=int32#3
+>+	# rol  $9,<t=%edx
+>+	rol      $9,%edx
+>+
+>+	# 				t ^= x2
+>+	# xorl <x2=stack32#12,<t=int32#3
+>+	# xorl <x2=108(%esp),<t=%edx
+>+	xorl    108(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 9
+>+	# rol  $9,<s=int32#2
+>+	# rol  $9,<s=%ecx
+>+	rol      $9,%ecx
+>+
+>+	# 		s ^= x13
+>+	# xorl <x13=stack32#23,<s=int32#2
+>+	# xorl <x13=152(%esp),<s=%ecx
+>+	xorl    152(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 9
+>+	# rol  $9,<w=int32#4
+>+	# rol  $9,<w=%ebx
+>+	rol      $9,%ebx
+>+
+>+	# 						w ^= x7
+>+	# xorl <x7=stack32#17,<w=int32#4
+>+	# xorl <x7=128(%esp),<w=%ebx
+>+	xorl    128(%esp),%ebx
+>+
+>+	# x8 = p
+>+	# movl <p=int32#1,>x8=stack32#18
+>+	# movl <p=%eax,>x8=132(%esp)
+>+	movl    %eax,132(%esp)
+>+
+>+	# 				x2 = t
+>+	# movl <t=int32#3,>x2=stack32#12
+>+	# movl <t=%edx,>x2=108(%esp)
+>+	movl    %edx,108(%esp)
+>+
+>+	# p += x4
+>+	# addl <x4=stack32#14,<p=int32#1
+>+	# addl <x4=116(%esp),<p=%eax
+>+	addl    116(%esp),%eax
+>+
+>+	# 		x13 = s
+>+	# movl <s=int32#2,>x13=stack32#23
+>+	# movl <s=%ecx,>x13=152(%esp)
+>+	movl    %ecx,152(%esp)
+>+
+>+	# 				t += x14
+>+	# addl <x14=stack32#24,<t=int32#3
+>+	# addl <x14=156(%esp),<t=%edx
+>+	addl    156(%esp),%edx
+>+
+>+	# 						x7 = w
+>+	# movl <w=int32#4,>x7=stack32#17
+>+	# movl <w=%ebx,>x7=128(%esp)
+>+	movl    %ebx,128(%esp)
+>+
+>+	# p <<<= 13
+>+	# rol  $13,<p=int32#1
+>+	# rol  $13,<p=%eax
+>+	rol      $13,%eax
+>+
+>+	# p ^= x12
+>+	# xorl <x12=stack32#22,<p=int32#1
+>+	# xorl <x12=148(%esp),<p=%eax
+>+	xorl    148(%esp),%eax
+>+
+>+	# 				t <<<= 13
+>+	# rol  $13,<t=int32#3
+>+	# rol  $13,<t=%edx
+>+	rol      $13,%edx
+>+
+>+	# 				t ^= x6
+>+	# xorl <x6=stack32#16,<t=int32#3
+>+	# xorl <x6=124(%esp),<t=%edx
+>+	xorl    124(%esp),%edx
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 		r <<<= 13
+>+	# rol  $13,<r=int32#5
+>+	# rol  $13,<r=%esi
+>+	rol      $13,%esi
+>+
+>+	# 		r ^= x1
+>+	# xorl <x1=stack32#11,<r=int32#5
+>+	# xorl <x1=104(%esp),<r=%esi
+>+	xorl    104(%esp),%esi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# 						v <<<= 13
+>+	# rol  $13,<v=int32#6
+>+	# rol  $13,<v=%edi
+>+	rol      $13,%edi
+>+
+>+	# 						v ^= x11
+>+	# xorl <x11=stack32#21,<v=int32#6
+>+	# xorl <x11=144(%esp),<v=%edi
+>+	xorl    144(%esp),%edi
+>+
+>+	# x12 = p
+>+	# movl <p=int32#1,>x12=stack32#22
+>+	# movl <p=%eax,>x12=148(%esp)
+>+	movl    %eax,148(%esp)
+>+
+>+	# 				x6 = t
+>+	# movl <t=int32#3,>x6=stack32#16
+>+	# movl <t=%edx,>x6=124(%esp)
+>+	movl    %edx,124(%esp)
+>+
+>+	# p += x8
+>+	# addl <x8=stack32#18,<p=int32#1
+>+	# addl <x8=132(%esp),<p=%eax
+>+	addl    132(%esp),%eax
+>+
+>+	# 		x1 = r
+>+	# movl <r=int32#5,>x1=stack32#11
+>+	# movl <r=%esi,>x1=104(%esp)
+>+	movl    %esi,104(%esp)
+>+
+>+	# 				t += x2
+>+	# addl <x2=stack32#12,<t=int32#3
+>+	# addl <x2=108(%esp),<t=%edx
+>+	addl    108(%esp),%edx
+>+
+>+	# 						x11 = v
+>+	# movl <v=int32#6,>x11=stack32#21
+>+	# movl <v=%edi,>x11=144(%esp)
+>+	movl    %edi,144(%esp)
+>+
+>+	# p <<<= 18
+>+	# rol  $18,<p=int32#1
+>+	# rol  $18,<p=%eax
+>+	rol      $18,%eax
+>+
+>+	# p ^= x0
+>+	# xorl <x0=stack32#10,<p=int32#1
+>+	# xorl <x0=100(%esp),<p=%eax
+>+	xorl    100(%esp),%eax
+>+
+>+	# 				t <<<= 18
+>+	# rol  $18,<t=int32#3
+>+	# rol  $18,<t=%edx
+>+	rol      $18,%edx
+>+
+>+	# 				t ^= x10
+>+	# xorl <x10=stack32#20,<t=int32#3
+>+	# xorl <x10=140(%esp),<t=%edx
+>+	xorl    140(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 18
+>+	# rol  $18,<s=int32#2
+>+	# rol  $18,<s=%ecx
+>+	rol      $18,%ecx
+>+
+>+	# 		s ^= x5
+>+	# xorl <x5=stack32#15,<s=int32#2
+>+	# xorl <x5=120(%esp),<s=%ecx
+>+	xorl    120(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 18
+>+	# rol  $18,<w=int32#4
+>+	# rol  $18,<w=%ebx
+>+	rol      $18,%ebx
+>+
+>+	# 						w ^= x15
+>+	# xorl <x15=stack32#25,<w=int32#4
+>+	# xorl <x15=160(%esp),<w=%ebx
+>+	xorl    160(%esp),%ebx
+>+
+>+	# x0 = p
+>+	# movl <p=int32#1,>x0=stack32#10
+>+	# movl <p=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	# 				x10 = t
+>+	# movl <t=int32#3,>x10=stack32#20
+>+	# movl <t=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	# p += x3
+>+	# addl <x3=stack32#13,<p=int32#1
+>+	# addl <x3=112(%esp),<p=%eax
+>+	addl    112(%esp),%eax
+>+
+>+	# p <<<= 7
+>+	# rol  $7,<p=int32#1
+>+	# rol  $7,<p=%eax
+>+	rol      $7,%eax
+>+
+>+	# 		x5 = s
+>+	# movl <s=int32#2,>x5=stack32#15
+>+	# movl <s=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	# 				t += x9
+>+	# addl <x9=stack32#19,<t=int32#3
+>+	# addl <x9=136(%esp),<t=%edx
+>+	addl    136(%esp),%edx
+>+
+>+	# 						x15 = w
+>+	# movl <w=int32#4,>x15=stack32#25
+>+	# movl <w=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	# 		r = x4
+>+	# movl <x4=stack32#14,>r=int32#5
+>+	# movl <x4=116(%esp),>r=%esi
+>+	movl    116(%esp),%esi
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 						v = x14
+>+	# movl <x14=stack32#24,>v=int32#6
+>+	# movl <x14=156(%esp),>v=%edi
+>+	movl    156(%esp),%edi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# p ^= x1
+>+	# xorl <x1=stack32#11,<p=int32#1
+>+	# xorl <x1=104(%esp),<p=%eax
+>+	xorl    104(%esp),%eax
+>+
+>+	# 				t <<<= 7
+>+	# rol  $7,<t=int32#3
+>+	# rol  $7,<t=%edx
+>+	rol      $7,%edx
+>+
+>+	# 				t ^= x11
+>+	# xorl <x11=stack32#21,<t=int32#3
+>+	# xorl <x11=144(%esp),<t=%edx
+>+	xorl    144(%esp),%edx
+>+
+>+	# 		r <<<= 7
+>+	# rol  $7,<r=int32#5
+>+	# rol  $7,<r=%esi
+>+	rol      $7,%esi
+>+
+>+	# 		r ^= x6
+>+	# xorl <x6=stack32#16,<r=int32#5
+>+	# xorl <x6=124(%esp),<r=%esi
+>+	xorl    124(%esp),%esi
+>+
+>+	# 						v <<<= 7
+>+	# rol  $7,<v=int32#6
+>+	# rol  $7,<v=%edi
+>+	rol      $7,%edi
+>+
+>+	# 						v ^= x12
+>+	# xorl <x12=stack32#22,<v=int32#6
+>+	# xorl <x12=148(%esp),<v=%edi
+>+	xorl    148(%esp),%edi
+>+
+>+	# x1 = p
+>+	# movl <p=int32#1,>x1=stack32#11
+>+	# movl <p=%eax,>x1=104(%esp)
+>+	movl    %eax,104(%esp)
+>+
+>+	# 				x11 = t
+>+	# movl <t=int32#3,>x11=stack32#21
+>+	# movl <t=%edx,>x11=144(%esp)
+>+	movl    %edx,144(%esp)
+>+
+>+	# p += x0
+>+	# addl <x0=stack32#10,<p=int32#1
+>+	# addl <x0=100(%esp),<p=%eax
+>+	addl    100(%esp),%eax
+>+
+>+	# 		x6 = r
+>+	# movl <r=int32#5,>x6=stack32#16
+>+	# movl <r=%esi,>x6=124(%esp)
+>+	movl    %esi,124(%esp)
+>+
+>+	# 				t += x10
+>+	# addl <x10=stack32#20,<t=int32#3
+>+	# addl <x10=140(%esp),<t=%edx
+>+	addl    140(%esp),%edx
+>+
+>+	# 						x12 = v
+>+	# movl <v=int32#6,>x12=stack32#22
+>+	# movl <v=%edi,>x12=148(%esp)
+>+	movl    %edi,148(%esp)
+>+
+>+	# p <<<= 9
+>+	# rol  $9,<p=int32#1
+>+	# rol  $9,<p=%eax
+>+	rol      $9,%eax
+>+
+>+	# p ^= x2
+>+	# xorl <x2=stack32#12,<p=int32#1
+>+	# xorl <x2=108(%esp),<p=%eax
+>+	xorl    108(%esp),%eax
+>+
+>+	# 				t <<<= 9
+>+	# rol  $9,<t=int32#3
+>+	# rol  $9,<t=%edx
+>+	rol      $9,%edx
+>+
+>+	# 				t ^= x8
+>+	# xorl <x8=stack32#18,<t=int32#3
+>+	# xorl <x8=132(%esp),<t=%edx
+>+	xorl    132(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 9
+>+	# rol  $9,<s=int32#2
+>+	# rol  $9,<s=%ecx
+>+	rol      $9,%ecx
+>+
+>+	# 		s ^= x7
+>+	# xorl <x7=stack32#17,<s=int32#2
+>+	# xorl <x7=128(%esp),<s=%ecx
+>+	xorl    128(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 9
+>+	# rol  $9,<w=int32#4
+>+	# rol  $9,<w=%ebx
+>+	rol      $9,%ebx
+>+
+>+	# 						w ^= x13
+>+	# xorl <x13=stack32#23,<w=int32#4
+>+	# xorl <x13=152(%esp),<w=%ebx
+>+	xorl    152(%esp),%ebx
+>+
+>+	# x2 = p
+>+	# movl <p=int32#1,>x2=stack32#12
+>+	# movl <p=%eax,>x2=108(%esp)
+>+	movl    %eax,108(%esp)
+>+
+>+	# 				x8 = t
+>+	# movl <t=int32#3,>x8=stack32#18
+>+	# movl <t=%edx,>x8=132(%esp)
+>+	movl    %edx,132(%esp)
+>+
+>+	# p += x1
+>+	# addl <x1=stack32#11,<p=int32#1
+>+	# addl <x1=104(%esp),<p=%eax
+>+	addl    104(%esp),%eax
+>+
+>+	# 		x7 = s
+>+	# movl <s=int32#2,>x7=stack32#17
+>+	# movl <s=%ecx,>x7=128(%esp)
+>+	movl    %ecx,128(%esp)
+>+
+>+	# 				t += x11
+>+	# addl <x11=stack32#21,<t=int32#3
+>+	# addl <x11=144(%esp),<t=%edx
+>+	addl    144(%esp),%edx
+>+
+>+	# 						x13 = w
+>+	# movl <w=int32#4,>x13=stack32#23
+>+	# movl <w=%ebx,>x13=152(%esp)
+>+	movl    %ebx,152(%esp)
+>+
+>+	# p <<<= 13
+>+	# rol  $13,<p=int32#1
+>+	# rol  $13,<p=%eax
+>+	rol      $13,%eax
+>+
+>+	# p ^= x3
+>+	# xorl <x3=stack32#13,<p=int32#1
+>+	# xorl <x3=112(%esp),<p=%eax
+>+	xorl    112(%esp),%eax
+>+
+>+	# 				t <<<= 13
+>+	# rol  $13,<t=int32#3
+>+	# rol  $13,<t=%edx
+>+	rol      $13,%edx
+>+
+>+	# 				t ^= x9
+>+	# xorl <x9=stack32#19,<t=int32#3
+>+	# xorl <x9=136(%esp),<t=%edx
+>+	xorl    136(%esp),%edx
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 		r <<<= 13
+>+	# rol  $13,<r=int32#5
+>+	# rol  $13,<r=%esi
+>+	rol      $13,%esi
+>+
+>+	# 		r ^= x4
+>+	# xorl <x4=stack32#14,<r=int32#5
+>+	# xorl <x4=116(%esp),<r=%esi
+>+	xorl    116(%esp),%esi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# 						v <<<= 13
+>+	# rol  $13,<v=int32#6
+>+	# rol  $13,<v=%edi
+>+	rol      $13,%edi
+>+
+>+	# 						v ^= x14
+>+	# xorl <x14=stack32#24,<v=int32#6
+>+	# xorl <x14=156(%esp),<v=%edi
+>+	xorl    156(%esp),%edi
+>+
+>+	# x3 = p
+>+	# movl <p=int32#1,>x3=stack32#13
+>+	# movl <p=%eax,>x3=112(%esp)
+>+	movl    %eax,112(%esp)
+>+
+>+	# 				x9 = t
+>+	# movl <t=int32#3,>x9=stack32#19
+>+	# movl <t=%edx,>x9=136(%esp)
+>+	movl    %edx,136(%esp)
+>+
+>+	# p += x2
+>+	# addl <x2=stack32#12,<p=int32#1
+>+	# addl <x2=108(%esp),<p=%eax
+>+	addl    108(%esp),%eax
+>+
+>+	# 		x4 = r
+>+	# movl <r=int32#5,>x4=stack32#14
+>+	# movl <r=%esi,>x4=116(%esp)
+>+	movl    %esi,116(%esp)
+>+
+>+	# 				t += x8
+>+	# addl <x8=stack32#18,<t=int32#3
+>+	# addl <x8=132(%esp),<t=%edx
+>+	addl    132(%esp),%edx
+>+
+>+	# 						x14 = v
+>+	# movl <v=int32#6,>x14=stack32#24
+>+	# movl <v=%edi,>x14=156(%esp)
+>+	movl    %edi,156(%esp)
+>+
+>+	# p <<<= 18
+>+	# rol  $18,<p=int32#1
+>+	# rol  $18,<p=%eax
+>+	rol      $18,%eax
+>+
+>+	# p ^= x0
+>+	# xorl <x0=stack32#10,<p=int32#1
+>+	# xorl <x0=100(%esp),<p=%eax
+>+	xorl    100(%esp),%eax
+>+
+>+	# 				t <<<= 18
+>+	# rol  $18,<t=int32#3
+>+	# rol  $18,<t=%edx
+>+	rol      $18,%edx
+>+
+>+	# 				t ^= x10
+>+	# xorl <x10=stack32#20,<t=int32#3
+>+	# xorl <x10=140(%esp),<t=%edx
+>+	xorl    140(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 18
+>+	# rol  $18,<s=int32#2
+>+	# rol  $18,<s=%ecx
+>+	rol      $18,%ecx
+>+
+>+	# 		s ^= x5
+>+	# xorl <x5=stack32#15,<s=int32#2
+>+	# xorl <x5=120(%esp),<s=%ecx
+>+	xorl    120(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 18
+>+	# rol  $18,<w=int32#4
+>+	# rol  $18,<w=%ebx
+>+	rol      $18,%ebx
+>+
+>+	# 						w ^= x15
+>+	# xorl <x15=stack32#25,<w=int32#4
+>+	# xorl <x15=160(%esp),<w=%ebx
+>+	xorl    160(%esp),%ebx
+>+
+>+	# x0 = p
+>+	# movl <p=int32#1,>x0=stack32#10
+>+	# movl <p=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	# 				x10 = t
+>+	# movl <t=int32#3,>x10=stack32#20
+>+	# movl <t=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	# p += x12
+>+	# addl <x12=stack32#22,<p=int32#1
+>+	# addl <x12=148(%esp),<p=%eax
+>+	addl    148(%esp),%eax
+>+
+>+	# 		x5 = s
+>+	# movl <s=int32#2,>x5=stack32#15
+>+	# movl <s=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	# 				t += x6
+>+	# addl <x6=stack32#16,<t=int32#3
+>+	# addl <x6=124(%esp),<t=%edx
+>+	addl    124(%esp),%edx
+>+
+>+	# 						x15 = w
+>+	# movl <w=int32#4,>x15=stack32#25
+>+	# movl <w=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	# 		r = x1
+>+	# movl <x1=stack32#11,>r=int32#5
+>+	# movl <x1=104(%esp),>r=%esi
+>+	movl    104(%esp),%esi
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 						v = x11
+>+	# movl <x11=stack32#21,>v=int32#6
+>+	# movl <x11=144(%esp),>v=%edi
+>+	movl    144(%esp),%edi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# p <<<= 7
+>+	# rol  $7,<p=int32#1
+>+	# rol  $7,<p=%eax
+>+	rol      $7,%eax
+>+
+>+	# p ^= x4
+>+	# xorl <x4=stack32#14,<p=int32#1
+>+	# xorl <x4=116(%esp),<p=%eax
+>+	xorl    116(%esp),%eax
+>+
+>+	# 				t <<<= 7
+>+	# rol  $7,<t=int32#3
+>+	# rol  $7,<t=%edx
+>+	rol      $7,%edx
+>+
+>+	# 				t ^= x14
+>+	# xorl <x14=stack32#24,<t=int32#3
+>+	# xorl <x14=156(%esp),<t=%edx
+>+	xorl    156(%esp),%edx
+>+
+>+	# 		r <<<= 7
+>+	# rol  $7,<r=int32#5
+>+	# rol  $7,<r=%esi
+>+	rol      $7,%esi
+>+
+>+	# 		r ^= x9
+>+	# xorl <x9=stack32#19,<r=int32#5
+>+	# xorl <x9=136(%esp),<r=%esi
+>+	xorl    136(%esp),%esi
+>+
+>+	# 						v <<<= 7
+>+	# rol  $7,<v=int32#6
+>+	# rol  $7,<v=%edi
+>+	rol      $7,%edi
+>+
+>+	# 						v ^= x3
+>+	# xorl <x3=stack32#13,<v=int32#6
+>+	# xorl <x3=112(%esp),<v=%edi
+>+	xorl    112(%esp),%edi
+>+
+>+	# x4 = p
+>+	# movl <p=int32#1,>x4=stack32#14
+>+	# movl <p=%eax,>x4=116(%esp)
+>+	movl    %eax,116(%esp)
+>+
+>+	# 				x14 = t
+>+	# movl <t=int32#3,>x14=stack32#24
+>+	# movl <t=%edx,>x14=156(%esp)
+>+	movl    %edx,156(%esp)
+>+
+>+	# p += x0
+>+	# addl <x0=stack32#10,<p=int32#1
+>+	# addl <x0=100(%esp),<p=%eax
+>+	addl    100(%esp),%eax
+>+
+>+	# 		x9 = r
+>+	# movl <r=int32#5,>x9=stack32#19
+>+	# movl <r=%esi,>x9=136(%esp)
+>+	movl    %esi,136(%esp)
+>+
+>+	# 				t += x10
+>+	# addl <x10=stack32#20,<t=int32#3
+>+	# addl <x10=140(%esp),<t=%edx
+>+	addl    140(%esp),%edx
+>+
+>+	# 						x3 = v
+>+	# movl <v=int32#6,>x3=stack32#13
+>+	# movl <v=%edi,>x3=112(%esp)
+>+	movl    %edi,112(%esp)
+>+
+>+	# p <<<= 9
+>+	# rol  $9,<p=int32#1
+>+	# rol  $9,<p=%eax
+>+	rol      $9,%eax
+>+
+>+	# p ^= x8
+>+	# xorl <x8=stack32#18,<p=int32#1
+>+	# xorl <x8=132(%esp),<p=%eax
+>+	xorl    132(%esp),%eax
+>+
+>+	# 				t <<<= 9
+>+	# rol  $9,<t=int32#3
+>+	# rol  $9,<t=%edx
+>+	rol      $9,%edx
+>+
+>+	# 				t ^= x2
+>+	# xorl <x2=stack32#12,<t=int32#3
+>+	# xorl <x2=108(%esp),<t=%edx
+>+	xorl    108(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 9
+>+	# rol  $9,<s=int32#2
+>+	# rol  $9,<s=%ecx
+>+	rol      $9,%ecx
+>+
+>+	# 		s ^= x13
+>+	# xorl <x13=stack32#23,<s=int32#2
+>+	# xorl <x13=152(%esp),<s=%ecx
+>+	xorl    152(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 9
+>+	# rol  $9,<w=int32#4
+>+	# rol  $9,<w=%ebx
+>+	rol      $9,%ebx
+>+
+>+	# 						w ^= x7
+>+	# xorl <x7=stack32#17,<w=int32#4
+>+	# xorl <x7=128(%esp),<w=%ebx
+>+	xorl    128(%esp),%ebx
+>+
+>+	# x8 = p
+>+	# movl <p=int32#1,>x8=stack32#18
+>+	# movl <p=%eax,>x8=132(%esp)
+>+	movl    %eax,132(%esp)
+>+
+>+	# 				x2 = t
+>+	# movl <t=int32#3,>x2=stack32#12
+>+	# movl <t=%edx,>x2=108(%esp)
+>+	movl    %edx,108(%esp)
+>+
+>+	# p += x4
+>+	# addl <x4=stack32#14,<p=int32#1
+>+	# addl <x4=116(%esp),<p=%eax
+>+	addl    116(%esp),%eax
+>+
+>+	# 		x13 = s
+>+	# movl <s=int32#2,>x13=stack32#23
+>+	# movl <s=%ecx,>x13=152(%esp)
+>+	movl    %ecx,152(%esp)
+>+
+>+	# 				t += x14
+>+	# addl <x14=stack32#24,<t=int32#3
+>+	# addl <x14=156(%esp),<t=%edx
+>+	addl    156(%esp),%edx
+>+
+>+	# 						x7 = w
+>+	# movl <w=int32#4,>x7=stack32#17
+>+	# movl <w=%ebx,>x7=128(%esp)
+>+	movl    %ebx,128(%esp)
+>+
+>+	# p <<<= 13
+>+	# rol  $13,<p=int32#1
+>+	# rol  $13,<p=%eax
+>+	rol      $13,%eax
+>+
+>+	# p ^= x12
+>+	# xorl <x12=stack32#22,<p=int32#1
+>+	# xorl <x12=148(%esp),<p=%eax
+>+	xorl    148(%esp),%eax
+>+
+>+	# 				t <<<= 13
+>+	# rol  $13,<t=int32#3
+>+	# rol  $13,<t=%edx
+>+	rol      $13,%edx
+>+
+>+	# 				t ^= x6
+>+	# xorl <x6=stack32#16,<t=int32#3
+>+	# xorl <x6=124(%esp),<t=%edx
+>+	xorl    124(%esp),%edx
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 		r <<<= 13
+>+	# rol  $13,<r=int32#5
+>+	# rol  $13,<r=%esi
+>+	rol      $13,%esi
+>+
+>+	# 		r ^= x1
+>+	# xorl <x1=stack32#11,<r=int32#5
+>+	# xorl <x1=104(%esp),<r=%esi
+>+	xorl    104(%esp),%esi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# 						v <<<= 13
+>+	# rol  $13,<v=int32#6
+>+	# rol  $13,<v=%edi
+>+	rol      $13,%edi
+>+
+>+	# 						v ^= x11
+>+	# xorl <x11=stack32#21,<v=int32#6
+>+	# xorl <x11=144(%esp),<v=%edi
+>+	xorl    144(%esp),%edi
+>+
+>+	# x12 = p
+>+	# movl <p=int32#1,>x12=stack32#22
+>+	# movl <p=%eax,>x12=148(%esp)
+>+	movl    %eax,148(%esp)
+>+
+>+	# 				x6 = t
+>+	# movl <t=int32#3,>x6=stack32#16
+>+	# movl <t=%edx,>x6=124(%esp)
+>+	movl    %edx,124(%esp)
+>+
+>+	# p += x8
+>+	# addl <x8=stack32#18,<p=int32#1
+>+	# addl <x8=132(%esp),<p=%eax
+>+	addl    132(%esp),%eax
+>+
+>+	# 		x1 = r
+>+	# movl <r=int32#5,>x1=stack32#11
+>+	# movl <r=%esi,>x1=104(%esp)
+>+	movl    %esi,104(%esp)
+>+
+>+	# 				t += x2
+>+	# addl <x2=stack32#12,<t=int32#3
+>+	# addl <x2=108(%esp),<t=%edx
+>+	addl    108(%esp),%edx
+>+
+>+	# 						x11 = v
+>+	# movl <v=int32#6,>x11=stack32#21
+>+	# movl <v=%edi,>x11=144(%esp)
+>+	movl    %edi,144(%esp)
+>+
+>+	# p <<<= 18
+>+	# rol  $18,<p=int32#1
+>+	# rol  $18,<p=%eax
+>+	rol      $18,%eax
+>+
+>+	# p ^= x0
+>+	# xorl <x0=stack32#10,<p=int32#1
+>+	# xorl <x0=100(%esp),<p=%eax
+>+	xorl    100(%esp),%eax
+>+
+>+	# 				t <<<= 18
+>+	# rol  $18,<t=int32#3
+>+	# rol  $18,<t=%edx
+>+	rol      $18,%edx
+>+
+>+	# 				t ^= x10
+>+	# xorl <x10=stack32#20,<t=int32#3
+>+	# xorl <x10=140(%esp),<t=%edx
+>+	xorl    140(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 18
+>+	# rol  $18,<s=int32#2
+>+	# rol  $18,<s=%ecx
+>+	rol      $18,%ecx
+>+
+>+	# 		s ^= x5
+>+	# xorl <x5=stack32#15,<s=int32#2
+>+	# xorl <x5=120(%esp),<s=%ecx
+>+	xorl    120(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 18
+>+	# rol  $18,<w=int32#4
+>+	# rol  $18,<w=%ebx
+>+	rol      $18,%ebx
+>+
+>+	# 						w ^= x15
+>+	# xorl <x15=stack32#25,<w=int32#4
+>+	# xorl <x15=160(%esp),<w=%ebx
+>+	xorl    160(%esp),%ebx
+>+
+>+	# x0 = p
+>+	# movl <p=int32#1,>x0=stack32#10
+>+	# movl <p=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	# 				x10 = t
+>+	# movl <t=int32#3,>x10=stack32#20
+>+	# movl <t=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	# p += x3
+>+	# addl <x3=stack32#13,<p=int32#1
+>+	# addl <x3=112(%esp),<p=%eax
+>+	addl    112(%esp),%eax
+>+
+>+	# p <<<= 7
+>+	# rol  $7,<p=int32#1
+>+	# rol  $7,<p=%eax
+>+	rol      $7,%eax
+>+
+>+	# 		x5 = s
+>+	# movl <s=int32#2,>x5=stack32#15
+>+	# movl <s=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	# 				t += x9
+>+	# addl <x9=stack32#19,<t=int32#3
+>+	# addl <x9=136(%esp),<t=%edx
+>+	addl    136(%esp),%edx
+>+
+>+	# 						x15 = w
+>+	# movl <w=int32#4,>x15=stack32#25
+>+	# movl <w=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	# 		r = x4
+>+	# movl <x4=stack32#14,>r=int32#5
+>+	# movl <x4=116(%esp),>r=%esi
+>+	movl    116(%esp),%esi
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 						v = x14
+>+	# movl <x14=stack32#24,>v=int32#6
+>+	# movl <x14=156(%esp),>v=%edi
+>+	movl    156(%esp),%edi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# p ^= x1
+>+	# xorl <x1=stack32#11,<p=int32#1
+>+	# xorl <x1=104(%esp),<p=%eax
+>+	xorl    104(%esp),%eax
+>+
+>+	# 				t <<<= 7
+>+	# rol  $7,<t=int32#3
+>+	# rol  $7,<t=%edx
+>+	rol      $7,%edx
+>+
+>+	# 				t ^= x11
+>+	# xorl <x11=stack32#21,<t=int32#3
+>+	# xorl <x11=144(%esp),<t=%edx
+>+	xorl    144(%esp),%edx
+>+
+>+	# 		r <<<= 7
+>+	# rol  $7,<r=int32#5
+>+	# rol  $7,<r=%esi
+>+	rol      $7,%esi
+>+
+>+	# 		r ^= x6
+>+	# xorl <x6=stack32#16,<r=int32#5
+>+	# xorl <x6=124(%esp),<r=%esi
+>+	xorl    124(%esp),%esi
+>+
+>+	# 						v <<<= 7
+>+	# rol  $7,<v=int32#6
+>+	# rol  $7,<v=%edi
+>+	rol      $7,%edi
+>+
+>+	# 						v ^= x12
+>+	# xorl <x12=stack32#22,<v=int32#6
+>+	# xorl <x12=148(%esp),<v=%edi
+>+	xorl    148(%esp),%edi
+>+
+>+	# x1 = p
+>+	# movl <p=int32#1,>x1=stack32#11
+>+	# movl <p=%eax,>x1=104(%esp)
+>+	movl    %eax,104(%esp)
+>+
+>+	# 				x11 = t
+>+	# movl <t=int32#3,>x11=stack32#21
+>+	# movl <t=%edx,>x11=144(%esp)
+>+	movl    %edx,144(%esp)
+>+
+>+	# p += x0
+>+	# addl <x0=stack32#10,<p=int32#1
+>+	# addl <x0=100(%esp),<p=%eax
+>+	addl    100(%esp),%eax
+>+
+>+	# 		x6 = r
+>+	# movl <r=int32#5,>x6=stack32#16
+>+	# movl <r=%esi,>x6=124(%esp)
+>+	movl    %esi,124(%esp)
+>+
+>+	# 				t += x10
+>+	# addl <x10=stack32#20,<t=int32#3
+>+	# addl <x10=140(%esp),<t=%edx
+>+	addl    140(%esp),%edx
+>+
+>+	# 						x12 = v
+>+	# movl <v=int32#6,>x12=stack32#22
+>+	# movl <v=%edi,>x12=148(%esp)
+>+	movl    %edi,148(%esp)
+>+
+>+	# p <<<= 9
+>+	# rol  $9,<p=int32#1
+>+	# rol  $9,<p=%eax
+>+	rol      $9,%eax
+>+
+>+	# p ^= x2
+>+	# xorl <x2=stack32#12,<p=int32#1
+>+	# xorl <x2=108(%esp),<p=%eax
+>+	xorl    108(%esp),%eax
+>+
+>+	# 				t <<<= 9
+>+	# rol  $9,<t=int32#3
+>+	# rol  $9,<t=%edx
+>+	rol      $9,%edx
+>+
+>+	# 				t ^= x8
+>+	# xorl <x8=stack32#18,<t=int32#3
+>+	# xorl <x8=132(%esp),<t=%edx
+>+	xorl    132(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 9
+>+	# rol  $9,<s=int32#2
+>+	# rol  $9,<s=%ecx
+>+	rol      $9,%ecx
+>+
+>+	# 		s ^= x7
+>+	# xorl <x7=stack32#17,<s=int32#2
+>+	# xorl <x7=128(%esp),<s=%ecx
+>+	xorl    128(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 9
+>+	# rol  $9,<w=int32#4
+>+	# rol  $9,<w=%ebx
+>+	rol      $9,%ebx
+>+
+>+	# 						w ^= x13
+>+	# xorl <x13=stack32#23,<w=int32#4
+>+	# xorl <x13=152(%esp),<w=%ebx
+>+	xorl    152(%esp),%ebx
+>+
+>+	# x2 = p
+>+	# movl <p=int32#1,>x2=stack32#12
+>+	# movl <p=%eax,>x2=108(%esp)
+>+	movl    %eax,108(%esp)
+>+
+>+	# 				x8 = t
+>+	# movl <t=int32#3,>x8=stack32#18
+>+	# movl <t=%edx,>x8=132(%esp)
+>+	movl    %edx,132(%esp)
+>+
+>+	# p += x1
+>+	# addl <x1=stack32#11,<p=int32#1
+>+	# addl <x1=104(%esp),<p=%eax
+>+	addl    104(%esp),%eax
+>+
+>+	# 		x7 = s
+>+	# movl <s=int32#2,>x7=stack32#17
+>+	# movl <s=%ecx,>x7=128(%esp)
+>+	movl    %ecx,128(%esp)
+>+
+>+	# 				t += x11
+>+	# addl <x11=stack32#21,<t=int32#3
+>+	# addl <x11=144(%esp),<t=%edx
+>+	addl    144(%esp),%edx
+>+
+>+	# 						x13 = w
+>+	# movl <w=int32#4,>x13=stack32#23
+>+	# movl <w=%ebx,>x13=152(%esp)
+>+	movl    %ebx,152(%esp)
+>+
+>+	# p <<<= 13
+>+	# rol  $13,<p=int32#1
+>+	# rol  $13,<p=%eax
+>+	rol      $13,%eax
+>+
+>+	# p ^= x3
+>+	# xorl <x3=stack32#13,<p=int32#1
+>+	# xorl <x3=112(%esp),<p=%eax
+>+	xorl    112(%esp),%eax
+>+
+>+	# 				t <<<= 13
+>+	# rol  $13,<t=int32#3
+>+	# rol  $13,<t=%edx
+>+	rol      $13,%edx
+>+
+>+	# 				t ^= x9
+>+	# xorl <x9=stack32#19,<t=int32#3
+>+	# xorl <x9=136(%esp),<t=%edx
+>+	xorl    136(%esp),%edx
+>+
+>+	# 		r += s
+>+	# add  <s=int32#2,<r=int32#5
+>+	# add  <s=%ecx,<r=%esi
+>+	add      %ecx,%esi
+>+
+>+	# 		r <<<= 13
+>+	# rol  $13,<r=int32#5
+>+	# rol  $13,<r=%esi
+>+	rol      $13,%esi
+>+
+>+	# 		r ^= x4
+>+	# xorl <x4=stack32#14,<r=int32#5
+>+	# xorl <x4=116(%esp),<r=%esi
+>+	xorl    116(%esp),%esi
+>+
+>+	# 						v += w
+>+	# add  <w=int32#4,<v=int32#6
+>+	# add  <w=%ebx,<v=%edi
+>+	add      %ebx,%edi
+>+
+>+	# 						v <<<= 13
+>+	# rol  $13,<v=int32#6
+>+	# rol  $13,<v=%edi
+>+	rol      $13,%edi
+>+
+>+	# 						v ^= x14
+>+	# xorl <x14=stack32#24,<v=int32#6
+>+	# xorl <x14=156(%esp),<v=%edi
+>+	xorl    156(%esp),%edi
+>+
+>+	# x3 = p
+>+	# movl <p=int32#1,>x3=stack32#13
+>+	# movl <p=%eax,>x3=112(%esp)
+>+	movl    %eax,112(%esp)
+>+
+>+	# 				x9 = t
+>+	# movl <t=int32#3,>x9=stack32#19
+>+	# movl <t=%edx,>x9=136(%esp)
+>+	movl    %edx,136(%esp)
+>+
+>+	# p += x2
+>+	# addl <x2=stack32#12,<p=int32#1
+>+	# addl <x2=108(%esp),<p=%eax
+>+	addl    108(%esp),%eax
+>+
+>+	# 		x4 = r
+>+	# movl <r=int32#5,>x4=stack32#14
+>+	# movl <r=%esi,>x4=116(%esp)
+>+	movl    %esi,116(%esp)
+>+
+>+	# 				t += x8
+>+	# addl <x8=stack32#18,<t=int32#3
+>+	# addl <x8=132(%esp),<t=%edx
+>+	addl    132(%esp),%edx
+>+
+>+	# 						x14 = v
+>+	# movl <v=int32#6,>x14=stack32#24
+>+	# movl <v=%edi,>x14=156(%esp)
+>+	movl    %edi,156(%esp)
+>+
+>+	# p <<<= 18
+>+	# rol  $18,<p=int32#1
+>+	# rol  $18,<p=%eax
+>+	rol      $18,%eax
+>+
+>+	# p ^= x0
+>+	# xorl <x0=stack32#10,<p=int32#1
+>+	# xorl <x0=100(%esp),<p=%eax
+>+	xorl    100(%esp),%eax
+>+
+>+	# 				t <<<= 18
+>+	# rol  $18,<t=int32#3
+>+	# rol  $18,<t=%edx
+>+	rol      $18,%edx
+>+
+>+	# 				t ^= x10
+>+	# xorl <x10=stack32#20,<t=int32#3
+>+	# xorl <x10=140(%esp),<t=%edx
+>+	xorl    140(%esp),%edx
+>+
+>+	# 		s += r
+>+	# add  <r=int32#5,<s=int32#2
+>+	# add  <r=%esi,<s=%ecx
+>+	add      %esi,%ecx
+>+
+>+	# 		s <<<= 18
+>+	# rol  $18,<s=int32#2
+>+	# rol  $18,<s=%ecx
+>+	rol      $18,%ecx
+>+
+>+	# 		s ^= x5
+>+	# xorl <x5=stack32#15,<s=int32#2
+>+	# xorl <x5=120(%esp),<s=%ecx
+>+	xorl    120(%esp),%ecx
+>+
+>+	# 						w += v
+>+	# add  <v=int32#6,<w=int32#4
+>+	# add  <v=%edi,<w=%ebx
+>+	add      %edi,%ebx
+>+
+>+	# 						w <<<= 18
+>+	# rol  $18,<w=int32#4
+>+	# rol  $18,<w=%ebx
+>+	rol      $18,%ebx
+>+
+>+	# 						w ^= x15
+>+	# xorl <x15=stack32#25,<w=int32#4
+>+	# xorl <x15=160(%esp),<w=%ebx
+>+	xorl    160(%esp),%ebx
+>+
+>+	# i -= 4
+>+	# sub  $4,<i=int32#7
+>+	# sub  $4,<i=%ebp
+>+	sub      $4,%ebp
+>+
+>+	# goto mainloop if unsigned >
+>+	ja      ._mainloop
+>+
+>+	# x0 = p
+>+	# movl <p=int32#1,>x0=stack32#10
+>+	# movl <p=%eax,>x0=100(%esp)
+>+	movl    %eax,100(%esp)
+>+
+>+	# x5 = s
+>+	# movl <s=int32#2,>x5=stack32#15
+>+	# movl <s=%ecx,>x5=120(%esp)
+>+	movl    %ecx,120(%esp)
+>+
+>+	# x10 = t
+>+	# movl <t=int32#3,>x10=stack32#20
+>+	# movl <t=%edx,>x10=140(%esp)
+>+	movl    %edx,140(%esp)
+>+
+>+	# x15 = w
+>+	# movl <w=int32#4,>x15=stack32#25
+>+	# movl <w=%ebx,>x15=160(%esp)
+>+	movl    %ebx,160(%esp)
+>+
+>+	#   out = out_backup
+>+	# movl <out_backup=stack32#3,>out=int32#6
+>+	# movl <out_backup=72(%esp),>out=%edi
+>+	movl    72(%esp),%edi
+>+
+>+	#   m = m_backup
+>+	# movl <m_backup=stack32#2,>m=int32#5
+>+	# movl <m_backup=68(%esp),>m=%esi
+>+	movl    68(%esp),%esi
+>+
+>+	#   in0 = x0
+>+	# movl <x0=stack32#10,>in0=int32#1
+>+	# movl <x0=100(%esp),>in0=%eax
+>+	movl    100(%esp),%eax
+>+
+>+	#   in1 = x1
+>+	# movl <x1=stack32#11,>in1=int32#2
+>+	# movl <x1=104(%esp),>in1=%ecx
+>+	movl    104(%esp),%ecx
+>+
+>+	#   in0 += j0
+>+	# addl <j0=stack32#26,<in0=int32#1
+>+	# addl <j0=164(%esp),<in0=%eax
+>+	addl    164(%esp),%eax
+>+
+>+	#   in1 += j1
+>+	# addl <j1=stack32#27,<in1=int32#2
+>+	# addl <j1=168(%esp),<in1=%ecx
+>+	addl    168(%esp),%ecx
+>+
+>+	#   in0 ^= *(uint32 *) (m + 0)
+>+	# xorl 0(<m=int32#5),<in0=int32#1
+>+	# xorl 0(<m=%esi),<in0=%eax
+>+	xorl    0(%esi),%eax
+>+
+>+	#   in1 ^= *(uint32 *) (m + 4)
+>+	# xorl 4(<m=int32#5),<in1=int32#2
+>+	# xorl 4(<m=%esi),<in1=%ecx
+>+	xorl    4(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 0) = in0
+>+	# movl <in0=int32#1,0(<out=int32#6)
+>+	# movl <in0=%eax,0(<out=%edi)
+>+	movl    %eax,0(%edi)
+>+
+>+	#   *(uint32 *) (out + 4) = in1
+>+	# movl <in1=int32#2,4(<out=int32#6)
+>+	# movl <in1=%ecx,4(<out=%edi)
+>+	movl    %ecx,4(%edi)
+>+
+>+	#   in2 = x2
+>+	# movl <x2=stack32#12,>in2=int32#1
+>+	# movl <x2=108(%esp),>in2=%eax
+>+	movl    108(%esp),%eax
+>+
+>+	#   in3 = x3
+>+	# movl <x3=stack32#13,>in3=int32#2
+>+	# movl <x3=112(%esp),>in3=%ecx
+>+	movl    112(%esp),%ecx
+>+
+>+	#   in2 += j2
+>+	# addl <j2=stack32#28,<in2=int32#1
+>+	# addl <j2=172(%esp),<in2=%eax
+>+	addl    172(%esp),%eax
+>+
+>+	#   in3 += j3
+>+	# addl <j3=stack32#29,<in3=int32#2
+>+	# addl <j3=176(%esp),<in3=%ecx
+>+	addl    176(%esp),%ecx
+>+
+>+	#   in2 ^= *(uint32 *) (m + 8)
+>+	# xorl 8(<m=int32#5),<in2=int32#1
+>+	# xorl 8(<m=%esi),<in2=%eax
+>+	xorl    8(%esi),%eax
+>+
+>+	#   in3 ^= *(uint32 *) (m + 12)
+>+	# xorl 12(<m=int32#5),<in3=int32#2
+>+	# xorl 12(<m=%esi),<in3=%ecx
+>+	xorl    12(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 8) = in2
+>+	# movl <in2=int32#1,8(<out=int32#6)
+>+	# movl <in2=%eax,8(<out=%edi)
+>+	movl    %eax,8(%edi)
+>+
+>+	#   *(uint32 *) (out + 12) = in3
+>+	# movl <in3=int32#2,12(<out=int32#6)
+>+	# movl <in3=%ecx,12(<out=%edi)
+>+	movl    %ecx,12(%edi)
+>+
+>+	#   in4 = x4
+>+	# movl <x4=stack32#14,>in4=int32#1
+>+	# movl <x4=116(%esp),>in4=%eax
+>+	movl    116(%esp),%eax
+>+
+>+	#   in5 = x5
+>+	# movl <x5=stack32#15,>in5=int32#2
+>+	# movl <x5=120(%esp),>in5=%ecx
+>+	movl    120(%esp),%ecx
+>+
+>+	#   in4 += j4
+>+	# addl <j4=stack32#30,<in4=int32#1
+>+	# addl <j4=180(%esp),<in4=%eax
+>+	addl    180(%esp),%eax
+>+
+>+	#   in5 += j5
+>+	# addl <j5=stack32#31,<in5=int32#2
+>+	# addl <j5=184(%esp),<in5=%ecx
+>+	addl    184(%esp),%ecx
+>+
+>+	#   in4 ^= *(uint32 *) (m + 16)
+>+	# xorl 16(<m=int32#5),<in4=int32#1
+>+	# xorl 16(<m=%esi),<in4=%eax
+>+	xorl    16(%esi),%eax
+>+
+>+	#   in5 ^= *(uint32 *) (m + 20)
+>+	# xorl 20(<m=int32#5),<in5=int32#2
+>+	# xorl 20(<m=%esi),<in5=%ecx
+>+	xorl    20(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 16) = in4
+>+	# movl <in4=int32#1,16(<out=int32#6)
+>+	# movl <in4=%eax,16(<out=%edi)
+>+	movl    %eax,16(%edi)
+>+
+>+	#   *(uint32 *) (out + 20) = in5
+>+	# movl <in5=int32#2,20(<out=int32#6)
+>+	# movl <in5=%ecx,20(<out=%edi)
+>+	movl    %ecx,20(%edi)
+>+
+>+	#   in6 = x6
+>+	# movl <x6=stack32#16,>in6=int32#1
+>+	# movl <x6=124(%esp),>in6=%eax
+>+	movl    124(%esp),%eax
+>+
+>+	#   in7 = x7
+>+	# movl <x7=stack32#17,>in7=int32#2
+>+	# movl <x7=128(%esp),>in7=%ecx
+>+	movl    128(%esp),%ecx
+>+
+>+	#   in6 += j6
+>+	# addl <j6=stack32#32,<in6=int32#1
+>+	# addl <j6=188(%esp),<in6=%eax
+>+	addl    188(%esp),%eax
+>+
+>+	#   in7 += j7
+>+	# addl <j7=stack32#33,<in7=int32#2
+>+	# addl <j7=192(%esp),<in7=%ecx
+>+	addl    192(%esp),%ecx
+>+
+>+	#   in6 ^= *(uint32 *) (m + 24)
+>+	# xorl 24(<m=int32#5),<in6=int32#1
+>+	# xorl 24(<m=%esi),<in6=%eax
+>+	xorl    24(%esi),%eax
+>+
+>+	#   in7 ^= *(uint32 *) (m + 28)
+>+	# xorl 28(<m=int32#5),<in7=int32#2
+>+	# xorl 28(<m=%esi),<in7=%ecx
+>+	xorl    28(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 24) = in6
+>+	# movl <in6=int32#1,24(<out=int32#6)
+>+	# movl <in6=%eax,24(<out=%edi)
+>+	movl    %eax,24(%edi)
+>+
+>+	#   *(uint32 *) (out + 28) = in7
+>+	# movl <in7=int32#2,28(<out=int32#6)
+>+	# movl <in7=%ecx,28(<out=%edi)
+>+	movl    %ecx,28(%edi)
+>+
+>+	#   in8 = x8
+>+	# movl <x8=stack32#18,>in8=int32#1
+>+	# movl <x8=132(%esp),>in8=%eax
+>+	movl    132(%esp),%eax
+>+
+>+	#   in9 = x9
+>+	# movl <x9=stack32#19,>in9=int32#2
+>+	# movl <x9=136(%esp),>in9=%ecx
+>+	movl    136(%esp),%ecx
+>+
+>+	#   in8 += j8
+>+	# addl <j8=stack32#34,<in8=int32#1
+>+	# addl <j8=196(%esp),<in8=%eax
+>+	addl    196(%esp),%eax
+>+
+>+	#   in9 += j9
+>+	# addl <j9=stack32#35,<in9=int32#2
+>+	# addl <j9=200(%esp),<in9=%ecx
+>+	addl    200(%esp),%ecx
+>+
+>+	#   in8 ^= *(uint32 *) (m + 32)
+>+	# xorl 32(<m=int32#5),<in8=int32#1
+>+	# xorl 32(<m=%esi),<in8=%eax
+>+	xorl    32(%esi),%eax
+>+
+>+	#   in9 ^= *(uint32 *) (m + 36)
+>+	# xorl 36(<m=int32#5),<in9=int32#2
+>+	# xorl 36(<m=%esi),<in9=%ecx
+>+	xorl    36(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 32) = in8
+>+	# movl <in8=int32#1,32(<out=int32#6)
+>+	# movl <in8=%eax,32(<out=%edi)
+>+	movl    %eax,32(%edi)
+>+
+>+	#   *(uint32 *) (out + 36) = in9
+>+	# movl <in9=int32#2,36(<out=int32#6)
+>+	# movl <in9=%ecx,36(<out=%edi)
+>+	movl    %ecx,36(%edi)
+>+
+>+	#   in10 = x10
+>+	# movl <x10=stack32#20,>in10=int32#1
+>+	# movl <x10=140(%esp),>in10=%eax
+>+	movl    140(%esp),%eax
+>+
+>+	#   in11 = x11
+>+	# movl <x11=stack32#21,>in11=int32#2
+>+	# movl <x11=144(%esp),>in11=%ecx
+>+	movl    144(%esp),%ecx
+>+
+>+	#   in10 += j10
+>+	# addl <j10=stack32#36,<in10=int32#1
+>+	# addl <j10=204(%esp),<in10=%eax
+>+	addl    204(%esp),%eax
+>+
+>+	#   in11 += j11
+>+	# addl <j11=stack32#37,<in11=int32#2
+>+	# addl <j11=208(%esp),<in11=%ecx
+>+	addl    208(%esp),%ecx
+>+
+>+	#   in10 ^= *(uint32 *) (m + 40)
+>+	# xorl 40(<m=int32#5),<in10=int32#1
+>+	# xorl 40(<m=%esi),<in10=%eax
+>+	xorl    40(%esi),%eax
+>+
+>+	#   in11 ^= *(uint32 *) (m + 44)
+>+	# xorl 44(<m=int32#5),<in11=int32#2
+>+	# xorl 44(<m=%esi),<in11=%ecx
+>+	xorl    44(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 40) = in10
+>+	# movl <in10=int32#1,40(<out=int32#6)
+>+	# movl <in10=%eax,40(<out=%edi)
+>+	movl    %eax,40(%edi)
+>+
+>+	#   *(uint32 *) (out + 44) = in11
+>+	# movl <in11=int32#2,44(<out=int32#6)
+>+	# movl <in11=%ecx,44(<out=%edi)
+>+	movl    %ecx,44(%edi)
+>+
+>+	#   in12 = x12
+>+	# movl <x12=stack32#22,>in12=int32#1
+>+	# movl <x12=148(%esp),>in12=%eax
+>+	movl    148(%esp),%eax
+>+
+>+	#   in13 = x13
+>+	# movl <x13=stack32#23,>in13=int32#2
+>+	# movl <x13=152(%esp),>in13=%ecx
+>+	movl    152(%esp),%ecx
+>+
+>+	#   in12 += j12
+>+	# addl <j12=stack32#38,<in12=int32#1
+>+	# addl <j12=212(%esp),<in12=%eax
+>+	addl    212(%esp),%eax
+>+
+>+	#   in13 += j13
+>+	# addl <j13=stack32#39,<in13=int32#2
+>+	# addl <j13=216(%esp),<in13=%ecx
+>+	addl    216(%esp),%ecx
+>+
+>+	#   in12 ^= *(uint32 *) (m + 48)
+>+	# xorl 48(<m=int32#5),<in12=int32#1
+>+	# xorl 48(<m=%esi),<in12=%eax
+>+	xorl    48(%esi),%eax
+>+
+>+	#   in13 ^= *(uint32 *) (m + 52)
+>+	# xorl 52(<m=int32#5),<in13=int32#2
+>+	# xorl 52(<m=%esi),<in13=%ecx
+>+	xorl    52(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 48) = in12
+>+	# movl <in12=int32#1,48(<out=int32#6)
+>+	# movl <in12=%eax,48(<out=%edi)
+>+	movl    %eax,48(%edi)
+>+
+>+	#   *(uint32 *) (out + 52) = in13
+>+	# movl <in13=int32#2,52(<out=int32#6)
+>+	# movl <in13=%ecx,52(<out=%edi)
+>+	movl    %ecx,52(%edi)
+>+
+>+	#   in14 = x14
+>+	# movl <x14=stack32#24,>in14=int32#1
+>+	# movl <x14=156(%esp),>in14=%eax
+>+	movl    156(%esp),%eax
+>+
+>+	#   in15 = x15
+>+	# movl <x15=stack32#25,>in15=int32#2
+>+	# movl <x15=160(%esp),>in15=%ecx
+>+	movl    160(%esp),%ecx
+>+
+>+	#   in14 += j14
+>+	# addl <j14=stack32#40,<in14=int32#1
+>+	# addl <j14=220(%esp),<in14=%eax
+>+	addl    220(%esp),%eax
+>+
+>+	#   in15 += j15
+>+	# addl <j15=stack32#41,<in15=int32#2
+>+	# addl <j15=224(%esp),<in15=%ecx
+>+	addl    224(%esp),%ecx
+>+
+>+	#   in14 ^= *(uint32 *) (m + 56)
+>+	# xorl 56(<m=int32#5),<in14=int32#1
+>+	# xorl 56(<m=%esi),<in14=%eax
+>+	xorl    56(%esi),%eax
+>+
+>+	#   in15 ^= *(uint32 *) (m + 60)
+>+	# xorl 60(<m=int32#5),<in15=int32#2
+>+	# xorl 60(<m=%esi),<in15=%ecx
+>+	xorl    60(%esi),%ecx
+>+
+>+	#   *(uint32 *) (out + 56) = in14
+>+	# movl <in14=int32#1,56(<out=int32#6)
+>+	# movl <in14=%eax,56(<out=%edi)
+>+	movl    %eax,56(%edi)
+>+
+>+	#   *(uint32 *) (out + 60) = in15
+>+	# movl <in15=int32#2,60(<out=int32#6)
+>+	# movl <in15=%ecx,60(<out=%edi)
+>+	movl    %ecx,60(%edi)
+>+
+>+	#   bytes = bytes_backup
+>+	# movl <bytes_backup=stack32#4,>bytes=int32#4
+>+	# movl <bytes_backup=76(%esp),>bytes=%ebx
+>+	movl    76(%esp),%ebx
+>+
+>+	#   in8 = j8
+>+	# movl <j8=stack32#34,>in8=int32#1
+>+	# movl <j8=196(%esp),>in8=%eax
+>+	movl    196(%esp),%eax
+>+
+>+	#   in9 = j9
+>+	# movl <j9=stack32#35,>in9=int32#2
+>+	# movl <j9=200(%esp),>in9=%ecx
+>+	movl    200(%esp),%ecx
+>+
+>+	#   in8 += 1
+>+	# add  $1,<in8=int32#1
+>+	# add  $1,<in8=%eax
+>+	add      $1,%eax
+>+
+>+	#   in9 += 0 + carry
+>+	# adc  $0,<in9=int32#2
+>+	# adc  $0,<in9=%ecx
+>+	adc      $0,%ecx
+>+
+>+	#   j8 = in8
+>+	# movl <in8=int32#1,>j8=stack32#34
+>+	# movl <in8=%eax,>j8=196(%esp)
+>+	movl    %eax,196(%esp)
+>+
+>+	#   j9 = in9
+>+	# movl <in9=int32#2,>j9=stack32#35
+>+	# movl <in9=%ecx,>j9=200(%esp)
+>+	movl    %ecx,200(%esp)
+>+
+>+	#   bytes - 64
+>+	# cmp  $64,<bytes=int32#4
+>+	# cmp  $64,<bytes=%ebx
+>+	cmp      $64,%ebx
+>+
+>+	#   goto bytesatleast65 if unsigned>
+>+	ja      ._bytesatleast65
+>+
+>+	#     goto bytesatleast64 if unsigned>=
+>+	jae     ._bytesatleast64
+>+
+>+	#       m = out
+>+	# mov  <out=int32#6,>m=int32#5
+>+	# mov  <out=%edi,>m=%esi
+>+	mov      %edi,%esi
+>+
+>+	#       out = ctarget
+>+	# movl <ctarget=stack32#42,>out=int32#6
+>+	# movl <ctarget=228(%esp),>out=%edi
+>+	movl    228(%esp),%edi
+>+
+>+	#       i = bytes
+>+	# mov  <bytes=int32#4,>i=int32#2
+>+	# mov  <bytes=%ebx,>i=%ecx
+>+	mov      %ebx,%ecx
+>+
+>+	#       while (i) { *out++ = *m++; --i }
+>+	rep     movsb
+>+
+>+	#     bytesatleast64#
+>+._bytesatleast64:
+>+
+>+	#     x = x_backup
+>+	# movl <x_backup=stack32#1,>x=int32#1
+>+	# movl <x_backup=64(%esp),>x=%eax
+>+	movl    64(%esp),%eax
+>+
+>+	#     in8 = j8
+>+	# movl <j8=stack32#34,>in8=int32#2
+>+	# movl <j8=196(%esp),>in8=%ecx
+>+	movl    196(%esp),%ecx
+>+
+>+	#     in9 = j9
+>+	# movl <j9=stack32#35,>in9=int32#3
+>+	# movl <j9=200(%esp),>in9=%edx
+>+	movl    200(%esp),%edx
+>+
+>+	#     *(uint32 *) (x + 32) = in8
+>+	# movl <in8=int32#2,32(<x=int32#1)
+>+	# movl <in8=%ecx,32(<x=%eax)
+>+	movl    %ecx,32(%eax)
+>+
+>+	#     *(uint32 *) (x + 36) = in9
+>+	# movl <in9=int32#3,36(<x=int32#1)
+>+	# movl <in9=%edx,36(<x=%eax)
+>+	movl    %edx,36(%eax)
+>+
+>+	#     done#
+>+._done:
+>+
+>+	#     eax = eax_stack
+>+	# movl <eax_stack=stack32#5,>eax=int32#1
+>+	# movl <eax_stack=80(%esp),>eax=%eax
+>+	movl    80(%esp),%eax
+>+
+>+	#     ebx = ebx_stack
+>+	# movl <ebx_stack=stack32#6,>ebx=int32#4
+>+	# movl <ebx_stack=84(%esp),>ebx=%ebx
+>+	movl    84(%esp),%ebx
+>+
+>+	#     esi = esi_stack
+>+	# movl <esi_stack=stack32#7,>esi=int32#5
+>+	# movl <esi_stack=88(%esp),>esi=%esi
+>+	movl    88(%esp),%esi
+>+
+>+	#     edi = edi_stack
+>+	# movl <edi_stack=stack32#8,>edi=int32#6
+>+	# movl <edi_stack=92(%esp),>edi=%edi
+>+	movl    92(%esp),%edi
+>+
+>+	#     ebp = ebp_stack
+>+	# movl <ebp_stack=stack32#9,>ebp=int32#7
+>+	# movl <ebp_stack=96(%esp),>ebp=%ebp
+>+	movl    96(%esp),%ebp
+>+
+>+	#     leave
+>+	add     %eax,%esp
+>+	ret
+>+
+>+	#   bytesatleast65#
+>+._bytesatleast65:
+>+
+>+	#   bytes -= 64
+>+	# sub  $64,<bytes=int32#4
+>+	# sub  $64,<bytes=%ebx
+>+	sub      $64,%ebx
+>+
+>+	#   out += 64
+>+	# add  $64,<out=int32#6
+>+	# add  $64,<out=%edi
+>+	add      $64,%edi
+>+
+>+	#   m += 64
+>+	# add  $64,<m=int32#5
+>+	# add  $64,<m=%esi
+>+	add      $64,%esi
+>+
+>+	# goto bytesatleast1
+>+	jmp     ._bytesatleast1
+>+
+>+# enter ECRYPT_init
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_init
+>+_ECRYPT_init:
+>+ECRYPT_init:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	# leave
+>+	add     %eax,%esp
+>+	ret
+>+
+>+# enter ECRYPT_keysetup
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_keysetup
+>+_ECRYPT_keysetup:
+>+ECRYPT_keysetup:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	#   eax_stack = eax
+>+	# movl <eax=int32#1,>eax_stack=stack32#1
+>+	# movl <eax=%eax,>eax_stack=64(%esp)
+>+	movl    %eax,64(%esp)
+>+
+>+	#   ebx_stack = ebx
+>+	# movl <ebx=int32#4,>ebx_stack=stack32#2
+>+	# movl <ebx=%ebx,>ebx_stack=68(%esp)
+>+	movl    %ebx,68(%esp)
+>+
+>+	#   esi_stack = esi
+>+	# movl <esi=int32#5,>esi_stack=stack32#3
+>+	# movl <esi=%esi,>esi_stack=72(%esp)
+>+	movl    %esi,72(%esp)
+>+
+>+	#   edi_stack = edi
+>+	# movl <edi=int32#6,>edi_stack=stack32#4
+>+	# movl <edi=%edi,>edi_stack=76(%esp)
+>+	movl    %edi,76(%esp)
+>+
+>+	#   ebp_stack = ebp
+>+	# movl <ebp=int32#7,>ebp_stack=stack32#5
+>+	# movl <ebp=%ebp,>ebp_stack=80(%esp)
+>+	movl    %ebp,80(%esp)
+>+
+>+	#   k = arg2
+>+	# movl <arg2=stack32#-2,>k=int32#2
+>+	# movl <arg2=8(%esp,%eax),>k=%ecx
+>+	movl    8(%esp,%eax),%ecx
+>+
+>+	#   kbits = arg3
+>+	# movl <arg3=stack32#-3,>kbits=int32#3
+>+	# movl <arg3=12(%esp,%eax),>kbits=%edx
+>+	movl    12(%esp,%eax),%edx
+>+
+>+	#   x = arg1
+>+	# movl <arg1=stack32#-1,>x=int32#1
+>+	# movl <arg1=4(%esp,%eax),>x=%eax
+>+	movl    4(%esp,%eax),%eax
+>+
+>+	#   in1 = *(uint32 *) (k + 0)
+>+	# movl 0(<k=int32#2),>in1=int32#4
+>+	# movl 0(<k=%ecx),>in1=%ebx
+>+	movl    0(%ecx),%ebx
+>+
+>+	#   in2 = *(uint32 *) (k + 4)
+>+	# movl 4(<k=int32#2),>in2=int32#5
+>+	# movl 4(<k=%ecx),>in2=%esi
+>+	movl    4(%ecx),%esi
+>+
+>+	#   in3 = *(uint32 *) (k + 8)
+>+	# movl 8(<k=int32#2),>in3=int32#6
+>+	# movl 8(<k=%ecx),>in3=%edi
+>+	movl    8(%ecx),%edi
+>+
+>+	#   in4 = *(uint32 *) (k + 12)
+>+	# movl 12(<k=int32#2),>in4=int32#7
+>+	# movl 12(<k=%ecx),>in4=%ebp
+>+	movl    12(%ecx),%ebp
+>+
+>+	#   *(uint32 *) (x + 4) = in1
+>+	# movl <in1=int32#4,4(<x=int32#1)
+>+	# movl <in1=%ebx,4(<x=%eax)
+>+	movl    %ebx,4(%eax)
+>+
+>+	#   *(uint32 *) (x + 8) = in2
+>+	# movl <in2=int32#5,8(<x=int32#1)
+>+	# movl <in2=%esi,8(<x=%eax)
+>+	movl    %esi,8(%eax)
+>+
+>+	#   *(uint32 *) (x + 12) = in3
+>+	# movl <in3=int32#6,12(<x=int32#1)
+>+	# movl <in3=%edi,12(<x=%eax)
+>+	movl    %edi,12(%eax)
+>+
+>+	#   *(uint32 *) (x + 16) = in4
+>+	# movl <in4=int32#7,16(<x=int32#1)
+>+	# movl <in4=%ebp,16(<x=%eax)
+>+	movl    %ebp,16(%eax)
+>+
+>+	#   kbits - 256
+>+	# cmp  $256,<kbits=int32#3
+>+	# cmp  $256,<kbits=%edx
+>+	cmp      $256,%edx
+>+
+>+	#   goto kbits128 if unsigned<
+>+	jb      ._kbits128
+>+
+>+	#   kbits256#
+>+._kbits256:
+>+
+>+	#     in11 = *(uint32 *) (k + 16)
+>+	# movl 16(<k=int32#2),>in11=int32#3
+>+	# movl 16(<k=%ecx),>in11=%edx
+>+	movl    16(%ecx),%edx
+>+
+>+	#     in12 = *(uint32 *) (k + 20)
+>+	# movl 20(<k=int32#2),>in12=int32#4
+>+	# movl 20(<k=%ecx),>in12=%ebx
+>+	movl    20(%ecx),%ebx
+>+
+>+	#     in13 = *(uint32 *) (k + 24)
+>+	# movl 24(<k=int32#2),>in13=int32#5
+>+	# movl 24(<k=%ecx),>in13=%esi
+>+	movl    24(%ecx),%esi
+>+
+>+	#     in14 = *(uint32 *) (k + 28)
+>+	# movl 28(<k=int32#2),>in14=int32#2
+>+	# movl 28(<k=%ecx),>in14=%ecx
+>+	movl    28(%ecx),%ecx
+>+
+>+	#     *(uint32 *) (x + 44) = in11
+>+	# movl <in11=int32#3,44(<x=int32#1)
+>+	# movl <in11=%edx,44(<x=%eax)
+>+	movl    %edx,44(%eax)
+>+
+>+	#     *(uint32 *) (x + 48) = in12
+>+	# movl <in12=int32#4,48(<x=int32#1)
+>+	# movl <in12=%ebx,48(<x=%eax)
+>+	movl    %ebx,48(%eax)
+>+
+>+	#     *(uint32 *) (x + 52) = in13
+>+	# movl <in13=int32#5,52(<x=int32#1)
+>+	# movl <in13=%esi,52(<x=%eax)
+>+	movl    %esi,52(%eax)
+>+
+>+	#     *(uint32 *) (x + 56) = in14
+>+	# movl <in14=int32#2,56(<x=int32#1)
+>+	# movl <in14=%ecx,56(<x=%eax)
+>+	movl    %ecx,56(%eax)
+>+
+>+	#     in0 = 1634760805
+>+	# mov  $1634760805,>in0=int32#2
+>+	# mov  $1634760805,>in0=%ecx
+>+	mov      $1634760805,%ecx
+>+
+>+	#     in5 = 857760878
+>+	# mov  $857760878,>in5=int32#3
+>+	# mov  $857760878,>in5=%edx
+>+	mov      $857760878,%edx
+>+
+>+	#     in10 = 2036477234
+>+	# mov  $2036477234,>in10=int32#4
+>+	# mov  $2036477234,>in10=%ebx
+>+	mov      $2036477234,%ebx
+>+
+>+	#     in15 = 1797285236
+>+	# mov  $1797285236,>in15=int32#5
+>+	# mov  $1797285236,>in15=%esi
+>+	mov      $1797285236,%esi
+>+
+>+	#     *(uint32 *) (x + 0) = in0
+>+	# movl <in0=int32#2,0(<x=int32#1)
+>+	# movl <in0=%ecx,0(<x=%eax)
+>+	movl    %ecx,0(%eax)
+>+
+>+	#     *(uint32 *) (x + 20) = in5
+>+	# movl <in5=int32#3,20(<x=int32#1)
+>+	# movl <in5=%edx,20(<x=%eax)
+>+	movl    %edx,20(%eax)
+>+
+>+	#     *(uint32 *) (x + 40) = in10
+>+	# movl <in10=int32#4,40(<x=int32#1)
+>+	# movl <in10=%ebx,40(<x=%eax)
+>+	movl    %ebx,40(%eax)
+>+
+>+	#     *(uint32 *) (x + 60) = in15
+>+	# movl <in15=int32#5,60(<x=int32#1)
+>+	# movl <in15=%esi,60(<x=%eax)
+>+	movl    %esi,60(%eax)
+>+
+>+	#   goto keysetupdone
+>+	jmp     ._keysetupdone
+>+
+>+	#   kbits128#
+>+._kbits128:
+>+
+>+	#     in11 = *(uint32 *) (k + 0)
+>+	# movl 0(<k=int32#2),>in11=int32#3
+>+	# movl 0(<k=%ecx),>in11=%edx
+>+	movl    0(%ecx),%edx
+>+
+>+	#     in12 = *(uint32 *) (k + 4)
+>+	# movl 4(<k=int32#2),>in12=int32#4
+>+	# movl 4(<k=%ecx),>in12=%ebx
+>+	movl    4(%ecx),%ebx
+>+
+>+	#     in13 = *(uint32 *) (k + 8)
+>+	# movl 8(<k=int32#2),>in13=int32#5
+>+	# movl 8(<k=%ecx),>in13=%esi
+>+	movl    8(%ecx),%esi
+>+
+>+	#     in14 = *(uint32 *) (k + 12)
+>+	# movl 12(<k=int32#2),>in14=int32#2
+>+	# movl 12(<k=%ecx),>in14=%ecx
+>+	movl    12(%ecx),%ecx
+>+
+>+	#     *(uint32 *) (x + 44) = in11
+>+	# movl <in11=int32#3,44(<x=int32#1)
+>+	# movl <in11=%edx,44(<x=%eax)
+>+	movl    %edx,44(%eax)
+>+
+>+	#     *(uint32 *) (x + 48) = in12
+>+	# movl <in12=int32#4,48(<x=int32#1)
+>+	# movl <in12=%ebx,48(<x=%eax)
+>+	movl    %ebx,48(%eax)
+>+
+>+	#     *(uint32 *) (x + 52) = in13
+>+	# movl <in13=int32#5,52(<x=int32#1)
+>+	# movl <in13=%esi,52(<x=%eax)
+>+	movl    %esi,52(%eax)
+>+
+>+	#     *(uint32 *) (x + 56) = in14
+>+	# movl <in14=int32#2,56(<x=int32#1)
+>+	# movl <in14=%ecx,56(<x=%eax)
+>+	movl    %ecx,56(%eax)
+>+
+>+	#     in0 = 1634760805
+>+	# mov  $1634760805,>in0=int32#2
+>+	# mov  $1634760805,>in0=%ecx
+>+	mov      $1634760805,%ecx
+>+
+>+	#     in5 = 824206446
+>+	# mov  $824206446,>in5=int32#3
+>+	# mov  $824206446,>in5=%edx
+>+	mov      $824206446,%edx
+>+
+>+	#     in10 = 2036477238
+>+	# mov  $2036477238,>in10=int32#4
+>+	# mov  $2036477238,>in10=%ebx
+>+	mov      $2036477238,%ebx
+>+
+>+	#     in15 = 1797285236
+>+	# mov  $1797285236,>in15=int32#5
+>+	# mov  $1797285236,>in15=%esi
+>+	mov      $1797285236,%esi
+>+
+>+	#     *(uint32 *) (x + 0) = in0
+>+	# movl <in0=int32#2,0(<x=int32#1)
+>+	# movl <in0=%ecx,0(<x=%eax)
+>+	movl    %ecx,0(%eax)
+>+
+>+	#     *(uint32 *) (x + 20) = in5
+>+	# movl <in5=int32#3,20(<x=int32#1)
+>+	# movl <in5=%edx,20(<x=%eax)
+>+	movl    %edx,20(%eax)
+>+
+>+	#     *(uint32 *) (x + 40) = in10
+>+	# movl <in10=int32#4,40(<x=int32#1)
+>+	# movl <in10=%ebx,40(<x=%eax)
+>+	movl    %ebx,40(%eax)
+>+
+>+	#     *(uint32 *) (x + 60) = in15
+>+	# movl <in15=int32#5,60(<x=int32#1)
+>+	# movl <in15=%esi,60(<x=%eax)
+>+	movl    %esi,60(%eax)
+>+
+>+	#   keysetupdone#
+>+._keysetupdone:
+>+
+>+	#   eax = eax_stack
+>+	# movl <eax_stack=stack32#1,>eax=int32#1
+>+	# movl <eax_stack=64(%esp),>eax=%eax
+>+	movl    64(%esp),%eax
+>+
+>+	#   ebx = ebx_stack
+>+	# movl <ebx_stack=stack32#2,>ebx=int32#4
+>+	# movl <ebx_stack=68(%esp),>ebx=%ebx
+>+	movl    68(%esp),%ebx
+>+
+>+	#   esi = esi_stack
+>+	# movl <esi_stack=stack32#3,>esi=int32#5
+>+	# movl <esi_stack=72(%esp),>esi=%esi
+>+	movl    72(%esp),%esi
+>+
+>+	#   edi = edi_stack
+>+	# movl <edi_stack=stack32#4,>edi=int32#6
+>+	# movl <edi_stack=76(%esp),>edi=%edi
+>+	movl    76(%esp),%edi
+>+
+>+	#   ebp = ebp_stack
+>+	# movl <ebp_stack=stack32#5,>ebp=int32#7
+>+	# movl <ebp_stack=80(%esp),>ebp=%ebp
+>+	movl    80(%esp),%ebp
+>+
+>+	# leave
+>+	add     %eax,%esp
+>+	ret
+>+
+>+# enter ECRYPT_ivsetup
+>+.text
+>+.p2align 5
+>+.globl ECRYPT_ivsetup
+>+_ECRYPT_ivsetup:
+>+ECRYPT_ivsetup:
+>+	mov     %esp,%eax
+>+	and     $31,%eax
+>+	add     $256,%eax
+>+	sub     %eax,%esp
+>+
+>+	#   eax_stack = eax
+>+	# movl <eax=int32#1,>eax_stack=stack32#1
+>+	# movl <eax=%eax,>eax_stack=64(%esp)
+>+	movl    %eax,64(%esp)
+>+
+>+	#   ebx_stack = ebx
+>+	# movl <ebx=int32#4,>ebx_stack=stack32#2
+>+	# movl <ebx=%ebx,>ebx_stack=68(%esp)
+>+	movl    %ebx,68(%esp)
+>+
+>+	#   esi_stack = esi
+>+	# movl <esi=int32#5,>esi_stack=stack32#3
+>+	# movl <esi=%esi,>esi_stack=72(%esp)
+>+	movl    %esi,72(%esp)
+>+
+>+	#   edi_stack = edi
+>+	# movl <edi=int32#6,>edi_stack=stack32#4
+>+	# movl <edi=%edi,>edi_stack=76(%esp)
+>+	movl    %edi,76(%esp)
+>+
+>+	#   ebp_stack = ebp
+>+	# movl <ebp=int32#7,>ebp_stack=stack32#5
+>+	# movl <ebp=%ebp,>ebp_stack=80(%esp)
+>+	movl    %ebp,80(%esp)
+>+
+>+	#   iv = arg2
+>+	# movl <arg2=stack32#-2,>iv=int32#2
+>+	# movl <arg2=8(%esp,%eax),>iv=%ecx
+>+	movl    8(%esp,%eax),%ecx
+>+
+>+	#   x = arg1
+>+	# movl <arg1=stack32#-1,>x=int32#1
+>+	# movl <arg1=4(%esp,%eax),>x=%eax
+>+	movl    4(%esp,%eax),%eax
+>+
+>+	#   in6 = *(uint32 *) (iv + 0)
+>+	# movl 0(<iv=int32#2),>in6=int32#3
+>+	# movl 0(<iv=%ecx),>in6=%edx
+>+	movl    0(%ecx),%edx
+>+
+>+	#   in7 = *(uint32 *) (iv + 4)
+>+	# movl 4(<iv=int32#2),>in7=int32#2
+>+	# movl 4(<iv=%ecx),>in7=%ecx
+>+	movl    4(%ecx),%ecx
+>+
+>+	#   in8 = 0
+>+	# mov  $0,>in8=int32#4
+>+	# mov  $0,>in8=%ebx
+>+	mov      $0,%ebx
+>+
+>+	#   in9 = 0
+>+	# mov  $0,>in9=int32#5
+>+	# mov  $0,>in9=%esi
+>+	mov      $0,%esi
+>+
+>+	#   *(uint32 *) (x + 24) = in6
+>+	# movl <in6=int32#3,24(<x=int32#1)
+>+	# movl <in6=%edx,24(<x=%eax)
+>+	movl    %edx,24(%eax)
+>+
+>+	#   *(uint32 *) (x + 28) = in7
+>+	# movl <in7=int32#2,28(<x=int32#1)
+>+	# movl <in7=%ecx,28(<x=%eax)
+>+	movl    %ecx,28(%eax)
+>+
+>+	#   *(uint32 *) (x + 32) = in8
+>+	# movl <in8=int32#4,32(<x=int32#1)
+>+	# movl <in8=%ebx,32(<x=%eax)
+>+	movl    %ebx,32(%eax)
+>+
+>+	#   *(uint32 *) (x + 36) = in9
+>+	# movl <in9=int32#5,36(<x=int32#1)
+>+	# movl <in9=%esi,36(<x=%eax)
+>+	movl    %esi,36(%eax)
+>+
+>+	#   eax = eax_stack
+>+	# movl <eax_stack=stack32#1,>eax=int32#1
+>+	# movl <eax_stack=64(%esp),>eax=%eax
+>+	movl    64(%esp),%eax
+>+
+>+	#   ebx = ebx_stack
+>+	# movl <ebx_stack=stack32#2,>ebx=int32#4
+>+	# movl <ebx_stack=68(%esp),>ebx=%ebx
+>+	movl    68(%esp),%ebx
+>+
+>+	#   esi = esi_stack
+>+	# movl <esi_stack=stack32#3,>esi=int32#5
+>+	# movl <esi_stack=72(%esp),>esi=%esi
+>+	movl    72(%esp),%esi
+>+
+>+	#   edi = edi_stack
+>+	# movl <edi_stack=stack32#4,>edi=int32#6
+>+	# movl <edi_stack=76(%esp),>edi=%edi
+>+	movl    76(%esp),%edi
+>+
+>+	#   ebp = ebp_stack
+>+	# movl <ebp_stack=stack32#5,>ebp=int32#7
+>+	# movl <ebp_stack=80(%esp),>ebp=%ebp
+>+	movl    80(%esp),%ebp
+>+
+>+	# leave
+>+	add     %eax,%esp
+>+	ret
+>diff --git a/arch/x86/crypto/salsa20_32.c b/arch/x86/crypto/salsa20_32.c
+>new file mode 100644
+>index 0000000..14dd69d
+>--- /dev/null
+>+++ b/arch/x86/crypto/salsa20_32.c
+>@@ -0,0 +1,127 @@
+>+/*
+>+ * Glue code for optimized i586 version of  Salsa20.
+>+ *
+>+ * Copyright (c) 2007 Tan Swee Heng <thesweeheng@gmail.com>
+>+ *
+>+ * Optimized i586 assembly code taken from:
+>+ * - salsa20.s:
+>+ *     Public domain assembly code by Daniel. J. Bernstein <djb@cr.yp.to>.
+>+ *     Available from <http://cr.yp.to/snuffle/salsa20/x86-pm/salsa20.s>.
+>+ *     We renamed it salsa20-i586-asm_32.S and indented it nicely to match
+>+ *     the other ciphers.
+>+ *
+>+ * This program is free software; you can redistribute it and/or modify it
+>+ * under the terms of the GNU General Public License as published by the Free
+>+ * Software Foundation; either version 2 of the License, or (at your option)
+>+ * any later version.
+>+ *
+>+ */
+>+
+>+#include <crypto/algapi.h>
+>+#include <linux/module.h>
+>+#include <linux/crypto.h>
+>+
+>+#define SALSA20_IV_SIZE        8U
+>+#define SALSA20_MIN_KEY_SIZE  16U
+>+#define SALSA20_MAX_KEY_SIZE  32U
+>+
+>+// use the ECRYPT_* function names in salsa20-i586-asm_32.S
+>+#define salsa20_keysetup        ECRYPT_keysetup
+>+#define salsa20_ivsetup         ECRYPT_ivsetup
+>+#define salsa20_encrypt_bytes   ECRYPT_encrypt_bytes
+>+
+>+struct salsa20_ctx
+>+{
+>+	u32 input[16];
+>+};
+>+
+>+asmlinkage void salsa20_keysetup(struct salsa20_ctx *ctx, const u8 *k,
+>+				 u32 keysize, u32 ivsize);
+>+asmlinkage void salsa20_ivsetup(struct salsa20_ctx *ctx, const u8 *iv);
+>+asmlinkage void salsa20_encrypt_bytes(struct salsa20_ctx *ctx,
+>+				      const u8 *src, u8 *dst, u32 bytes);
+>+
+>+static int setkey(struct crypto_tfm *tfm, const u8 *key,
+>+		  unsigned int keysize)
+>+{
+>+	struct salsa20_ctx *ctx = crypto_tfm_ctx(tfm);
+>+	salsa20_keysetup(ctx, key, keysize*8, SALSA20_IV_SIZE*8);
+>+	return 0;
+>+}
+>+
+>+static int encrypt(struct blkcipher_desc *desc,
+>+		   struct scatterlist *dst, struct scatterlist *src,
+>+		   unsigned int nbytes)
+>+{
+>+	struct blkcipher_walk walk;
+>+	struct crypto_blkcipher *tfm = desc->tfm;
+>+	struct salsa20_ctx *ctx = crypto_blkcipher_ctx(tfm);
+>+	int err;
+>+
+>+	blkcipher_walk_init(&walk, dst, src, nbytes);
+>+	err = blkcipher_walk_virt_block(desc, &walk, 64);
+>+
+>+	salsa20_ivsetup(ctx, walk.iv);
+>+
+>+	if (likely(walk.nbytes == nbytes))
+>+	{
+>+		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
+>+				      walk.src.virt.addr, nbytes);
+>+		return blkcipher_walk_done(desc, &walk, 0);
+>+	}
+>+
+>+	while (walk.nbytes >= 64) {
+>+		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
+>+				      walk.src.virt.addr,
+>+				      walk.nbytes - (walk.nbytes % 64));
+>+		err = blkcipher_walk_done(desc, &walk, walk.nbytes % 64);
+>+	}
+>+
+>+	if (walk.nbytes) {
+>+		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
+>+				      walk.src.virt.addr, walk.nbytes);
+>+		err = blkcipher_walk_done(desc, &walk, 0);
+>+	}
+>+
+>+	return err;
+>+}
+>+
+>+static struct crypto_alg alg = {
+>+	.cra_name           =   "salsa20",
+>+	.cra_driver_name    =   "salsa20-i586",
+>+	.cra_priority       =   200,
+>+	.cra_flags          =   CRYPTO_ALG_TYPE_BLKCIPHER,
+>+	.cra_type           =   &crypto_blkcipher_type,
+>+	.cra_blocksize      =   1,
+>+	.cra_ctxsize        =   sizeof(struct salsa20_ctx),
+>+	.cra_alignmask      =	3,
+>+	.cra_module         =   THIS_MODULE,
+>+	.cra_list           =   LIST_HEAD_INIT(alg.cra_list),
+>+	.cra_u              =   {
+>+		.blkcipher = {
+>+			.setkey         =   setkey,
+>+			.encrypt        =   encrypt,
+>+			.decrypt        =   encrypt,
+>+			.min_keysize    =   SALSA20_MIN_KEY_SIZE,
+>+			.max_keysize    =   SALSA20_MAX_KEY_SIZE,
+>+			.ivsize         =   SALSA20_IV_SIZE,
+>+		}
+>+	}
+>+};
+>+
+>+static int __init init(void)
+>+{
+>+	return crypto_register_alg(&alg);
+>+}
+>+
+>+static void __exit fini(void)
+>+{
+>+	crypto_unregister_alg(&alg);
+>+}
+>+
+>+module_init(init);
+>+module_exit(fini);
+>+
+>+MODULE_LICENSE("GPL");
+>+MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm (i586 version)");
+>+MODULE_ALIAS("salsa20");
+>diff --git a/crypto/Kconfig b/crypto/Kconfig
+>index 40ae92c..5cd0eb8 100644
+>--- a/crypto/Kconfig
+>+++ b/crypto/Kconfig
+>@@ -476,6 +476,21 @@ config CRYPTO_SALSA20
+> 	  The Salsa20 stream cipher algorithm is designed by Daniel J.
+> 	  Bernstein <djb@cr.yp.to>. See <http://cr.yp.to/snuffle.html>
+> 
+>+config CRYPTO_SALSA20_586
+>+	tristate "Salsa20 stream cipher algorithm (i586) (EXPERIMENTAL)"
+>+	depends on (X86 || UML_X86) && !64BIT
+>+	depends on EXPERIMENTAL
+>+	select CRYPTO_BLKCIPHER
+>+	select CRYPTO_SALSA20
+>+	help
+>+	  Salsa20 stream cipher algorithm.
+>+
+>+	  Salsa20 is a stream cipher submitted to eSTREAM, the ECRYPT
+>+	  Stream Cipher Project. See <http://www.ecrypt.eu.org/stream/>
+>+
+>+	  The Salsa20 stream cipher algorithm is designed by Daniel J.
+>+	  Bernstein <djb@cr.yp.to>. See <http://cr.yp.to/snuffle.html>
+>+
+> config CRYPTO_DEFLATE
+> 	tristate "Deflate compression algorithm"
+> 	select CRYPTO_ALGAPI
+>diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+>index 6a474f4..cd8e04f 100644
+>--- a/crypto/tcrypt.c
+>+++ b/crypto/tcrypt.c
+>@@ -1662,6 +1662,8 @@ static void do_test(void)
+> 	case 206:
+> 		test_cipher_speed("salsa20-generic", ENCRYPT, sec, NULL, 0,
+> 				salsa20_speed_template);
+>+		test_cipher_speed("salsa20-i586", ENCRYPT, sec, NULL, 0,
+>+				salsa20_speed_template);
+> 		break;
+> 
+> 	case 300:
 
-====
-Note: this is a resubmission; previously the indentation in the
-assembly code was missing.
-
-------=_Part_613_31150930.1196886685611
-Content-Type: text/plain; name=patch2-salsa20_i586.txt
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f9ub6h3n0
-Content-Disposition: attachment; filename=patch2-salsa20_i586.txt
-
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2NyeXB0by9NYWtlZmlsZSBiL2FyY2gveDg2L2NyeXB0by9N
-YWtlZmlsZQppbmRleCBiOGZiYjQzLi4yNjUxMzViIDEwMDY0NAotLS0gYS9hcmNoL3g4Ni9jcnlw
-dG8vTWFrZWZpbGUKKysrIGIvYXJjaC94ODYvY3J5cHRvL01ha2VmaWxlCkBAIC00LDEyICs0LDE0
-IEBACiAKIG9iai0kKENPTkZJR19DUllQVE9fQUVTXzU4NikgKz0gYWVzLWk1ODYubwogb2JqLSQo
-Q09ORklHX0NSWVBUT19UV09GSVNIXzU4NikgKz0gdHdvZmlzaC1pNTg2Lm8KK29iai0kKENPTkZJ
-R19DUllQVE9fU0FMU0EyMF81ODYpICs9IHNhbHNhMjAtaTU4Ni5vCiAKIG9iai0kKENPTkZJR19D
-UllQVE9fQUVTX1g4Nl82NCkgKz0gYWVzLXg4Nl82NC5vCiBvYmotJChDT05GSUdfQ1JZUFRPX1RX
-T0ZJU0hfWDg2XzY0KSArPSB0d29maXNoLXg4Nl82NC5vCiAKIGFlcy1pNTg2LXkgOj0gYWVzLWk1
-ODYtYXNtXzMyLm8gYWVzX2dsdWUubwogdHdvZmlzaC1pNTg2LXkgOj0gdHdvZmlzaC1pNTg2LWFz
-bV8zMi5vIHR3b2Zpc2hfMzIubworc2Fsc2EyMC1pNTg2LXkgOj0gc2Fsc2EyMC1pNTg2LWFzbV8z
-Mi5vIHNhbHNhMjBfMzIubwogCiBhZXMteDg2XzY0LXkgOj0gYWVzLXg4Nl82NC1hc21fNjQubyBh
-ZXNfZ2x1ZS5vCiB0d29maXNoLXg4Nl82NC15IDo9IHR3b2Zpc2gteDg2XzY0LWFzbV82NC5vIHR3
-b2Zpc2hfNjQubwpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvY3J5cHRvL3NhbHNhMjAtaTU4Ni1hc21f
-MzIuUyBiL2FyY2gveDg2L2NyeXB0by9zYWxzYTIwLWk1ODYtYXNtXzMyLlMKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uN2FkMjE1YQotLS0gL2Rldi9udWxsCisrKyBiL2FyY2gv
-eDg2L2NyeXB0by9zYWxzYTIwLWk1ODYtYXNtXzMyLlMKQEAgLTAsMCArMSwzMDY5IEBACisjIHNh
-bHNhMjBfcG0ucyB2ZXJzaW9uIDIwMDUxMjI5CisjIEQuIEouIEJlcm5zdGVpbgorIyBQdWJsaWMg
-ZG9tYWluLgorCisjIGludDMyIGEKKworIyBpbnQzMiBwCisKKyMgaW50MzIgcworCisjIGludDMy
-IHQKKworIyBpbnQzMiB3CisKKyMgaW50MzIgcgorCisjIGludDMyIHYKKworIyBzdGFjazMyIGFy
-ZzEKKworIyBzdGFjazMyIGFyZzIKKworIyBzdGFjazMyIGFyZzMKKworIyBzdGFjazMyIGFyZzQK
-KworIyBpbnB1dCBhcmcxCisKKyMgaW5wdXQgYXJnMgorCisjIGlucHV0IGFyZzMKKworIyBpbnB1
-dCBhcmc0CisKKyMgaW50MzIgZWF4CisKKyMgaW50MzIgZWJ4CisKKyMgaW50MzIgZXNpCisKKyMg
-aW50MzIgZWRpCisKKyMgaW50MzIgZWJwCisKKyMgY2FsbGVyIGVheAorCisjIGNhbGxlciBlYngK
-KworIyBjYWxsZXIgZXNpCisKKyMgY2FsbGVyIGVkaQorCisjIGNhbGxlciBlYnAKKworIyBpbnQz
-MiBrCisKKyMgaW50MzIga2JpdHMKKworIyBpbnQzMiBpdgorCisjIGludDMyIGkKKworIyBzdGFj
-azMyIHhfYmFja3VwCisKKyMgaW50MzIgeAorCisjIHN0YWNrMzIgbV9iYWNrdXAKKworIyBpbnQz
-MiBtCisKKyMgc3RhY2szMiBvdXRfYmFja3VwCisKKyMgaW50MzIgb3V0CisKKyMgc3RhY2szMiBi
-eXRlc19iYWNrdXAKKworIyBpbnQzMiBieXRlcworCisjIHN0YWNrMzIgZWF4X3N0YWNrCisKKyMg
-c3RhY2szMiBlYnhfc3RhY2sKKworIyBzdGFjazMyIGVzaV9zdGFjaworCisjIHN0YWNrMzIgZWRp
-X3N0YWNrCisKKyMgc3RhY2szMiBlYnBfc3RhY2sKKworIyBpbnQzMiBpbjAKKworIyBpbnQzMiBp
-bjEKKworIyBpbnQzMiBpbjIKKworIyBpbnQzMiBpbjMKKworIyBpbnQzMiBpbjQKKworIyBpbnQz
-MiBpbjUKKworIyBpbnQzMiBpbjYKKworIyBpbnQzMiBpbjcKKworIyBpbnQzMiBpbjgKKworIyBp
-bnQzMiBpbjkKKworIyBpbnQzMiBpbjEwCisKKyMgaW50MzIgaW4xMQorCisjIGludDMyIGluMTIK
-KworIyBpbnQzMiBpbjEzCisKKyMgaW50MzIgaW4xNAorCisjIGludDMyIGluMTUKKworIyBzdGFj
-azMyIHgwCisKKyMgc3RhY2szMiB4MQorCisjIHN0YWNrMzIgeDIKKworIyBzdGFjazMyIHgzCisK
-KyMgc3RhY2szMiB4NAorCisjIHN0YWNrMzIgeDUKKworIyBzdGFjazMyIHg2CisKKyMgc3RhY2sz
-MiB4NworCisjIHN0YWNrMzIgeDgKKworIyBzdGFjazMyIHg5CisKKyMgc3RhY2szMiB4MTAKKwor
-IyBzdGFjazMyIHgxMQorCisjIHN0YWNrMzIgeDEyCisKKyMgc3RhY2szMiB4MTMKKworIyBzdGFj
-azMyIHgxNAorCisjIHN0YWNrMzIgeDE1CisKKyMgc3RhY2szMiBqMAorCisjIHN0YWNrMzIgajEK
-KworIyBzdGFjazMyIGoyCisKKyMgc3RhY2szMiBqMworCisjIHN0YWNrMzIgajQKKworIyBzdGFj
-azMyIGo1CisKKyMgc3RhY2szMiBqNgorCisjIHN0YWNrMzIgajcKKworIyBzdGFjazMyIGo4CisK
-KyMgc3RhY2szMiBqOQorCisjIHN0YWNrMzIgajEwCisKKyMgc3RhY2szMiBqMTEKKworIyBzdGFj
-azMyIGoxMgorCisjIHN0YWNrMzIgajEzCisKKyMgc3RhY2szMiBqMTQKKworIyBzdGFjazMyIGox
-NQorCisjIHN0YWNrNTEyIHRtcAorCisjIHN0YWNrMzIgY3RhcmdldAorCisjIGVudGVyIEVDUllQ
-VF9rZXlzdHJlYW1fYnl0ZXMKKy50ZXh0CisucDJhbGlnbiA1CisuZ2xvYmwgRUNSWVBUX2tleXN0
-cmVhbV9ieXRlcworX0VDUllQVF9rZXlzdHJlYW1fYnl0ZXM6CitFQ1JZUFRfa2V5c3RyZWFtX2J5
-dGVzOgorCW1vdiAgICAgJWVzcCwlZWF4CisJYW5kICAgICAkMzEsJWVheAorCWFkZCAgICAgJDI1
-NiwlZWF4CisJc3ViICAgICAlZWF4LCVlc3AKKworCSMgZWF4X3N0YWNrID0gZWF4CisJIyBtb3Zs
-IDxlYXg9aW50MzIjMSw+ZWF4X3N0YWNrPXN0YWNrMzIjNQorCSMgbW92bCA8ZWF4PSVlYXgsPmVh
-eF9zdGFjaz04MCglZXNwKQorCW1vdmwgICAgJWVheCw4MCglZXNwKQorCisJIyBlYnhfc3RhY2sg
-PSBlYngKKwkjIG1vdmwgPGVieD1pbnQzMiM0LD5lYnhfc3RhY2s9c3RhY2szMiM2CisJIyBtb3Zs
-IDxlYng9JWVieCw+ZWJ4X3N0YWNrPTg0KCVlc3ApCisJbW92bCAgICAlZWJ4LDg0KCVlc3ApCisK
-KwkjIGVzaV9zdGFjayA9IGVzaQorCSMgbW92bCA8ZXNpPWludDMyIzUsPmVzaV9zdGFjaz1zdGFj
-azMyIzcKKwkjIG1vdmwgPGVzaT0lZXNpLD5lc2lfc3RhY2s9ODgoJWVzcCkKKwltb3ZsICAgICVl
-c2ksODgoJWVzcCkKKworCSMgZWRpX3N0YWNrID0gZWRpCisJIyBtb3ZsIDxlZGk9aW50MzIjNiw+
-ZWRpX3N0YWNrPXN0YWNrMzIjOAorCSMgbW92bCA8ZWRpPSVlZGksPmVkaV9zdGFjaz05MiglZXNw
-KQorCW1vdmwgICAgJWVkaSw5MiglZXNwKQorCisJIyBlYnBfc3RhY2sgPSBlYnAKKwkjIG1vdmwg
-PGVicD1pbnQzMiM3LD5lYnBfc3RhY2s9c3RhY2szMiM5CisJIyBtb3ZsIDxlYnA9JWVicCw+ZWJw
-X3N0YWNrPTk2KCVlc3ApCisJbW92bCAgICAlZWJwLDk2KCVlc3ApCisKKwkjIHggPSBhcmcxCisJ
-IyBtb3ZsIDxhcmcxPXN0YWNrMzIjLTEsPng9aW50MzIjMworCSMgbW92bCA8YXJnMT00KCVlc3As
-JWVheCksPng9JWVkeAorCW1vdmwgICAgNCglZXNwLCVlYXgpLCVlZHgKKworCSMgbSA9IGFyZzIK
-KwkjIG1vdmwgPGFyZzI9c3RhY2szMiMtMiw+bT1pbnQzMiM1CisJIyBtb3ZsIDxhcmcyPTgoJWVz
-cCwlZWF4KSw+bT0lZXNpCisJbW92bCAgICA4KCVlc3AsJWVheCksJWVzaQorCisJIyBvdXQgPSBt
-CisJIyBtb3YgIDxtPWludDMyIzUsPm91dD1pbnQzMiM2CisJIyBtb3YgIDxtPSVlc2ksPm91dD0l
-ZWRpCisJbW92ICAgICAgJWVzaSwlZWRpCisKKwkjIGJ5dGVzID0gYXJnMworCSMgbW92bCA8YXJn
-Mz1zdGFjazMyIy0zLD5ieXRlcz1pbnQzMiM0CisJIyBtb3ZsIDxhcmczPTEyKCVlc3AsJWVheCks
-PmJ5dGVzPSVlYngKKwltb3ZsICAgIDEyKCVlc3AsJWVheCksJWVieAorCisJIyBieXRlcyAtPSAw
-CisJIyBzdWIgICQwLDxieXRlcz1pbnQzMiM0CisJIyBzdWIgICQwLDxieXRlcz0lZWJ4CisJc3Vi
-ICAgICAgJDAsJWVieAorCisJIyBnb3RvIGRvbmUgaWYgdW5zaWduZWQ8PQorCWpiZSAgICAgLl9k
-b25lCisKKwkjIGEgPSAwCisJIyBtb3YgICQwLD5hPWludDMyIzEKKwkjIG1vdiAgJDAsPmE9JWVh
-eAorCW1vdiAgICAgICQwLCVlYXgKKworCSMgaSA9IGJ5dGVzCisJIyBtb3YgIDxieXRlcz1pbnQz
-MiM0LD5pPWludDMyIzIKKwkjIG1vdiAgPGJ5dGVzPSVlYngsPmk9JWVjeAorCW1vdiAgICAgICVl
-YngsJWVjeAorCisJIyB3aGlsZSAoaSkgeyAqb3V0KysgPSBhOyAtLWkgfQorCXJlcCAgICAgc3Rv
-c2IKKworCSMgb3V0IC09IGJ5dGVzCisJIyBzdWIgIDxieXRlcz1pbnQzMiM0LDxvdXQ9aW50MzIj
-NgorCSMgc3ViICA8Ynl0ZXM9JWVieCw8b3V0PSVlZGkKKwlzdWIgICAgICAlZWJ4LCVlZGkKKwor
-CSMgZ290byBzdGFydAorCWptcCAgICAgLl9zdGFydAorCisjIGVudGVyIEVDUllQVF9kZWNyeXB0
-X2J5dGVzCisudGV4dAorLnAyYWxpZ24gNQorLmdsb2JsIEVDUllQVF9kZWNyeXB0X2J5dGVzCitf
-RUNSWVBUX2RlY3J5cHRfYnl0ZXM6CitFQ1JZUFRfZGVjcnlwdF9ieXRlczoKKwltb3YgICAgICVl
-c3AsJWVheAorCWFuZCAgICAgJDMxLCVlYXgKKwlhZGQgICAgICQyNTYsJWVheAorCXN1YiAgICAg
-JWVheCwlZXNwCisKKwkjIGVheF9zdGFjayA9IGVheAorCSMgbW92bCA8ZWF4PWludDMyIzEsPmVh
-eF9zdGFjaz1zdGFjazMyIzUKKwkjIG1vdmwgPGVheD0lZWF4LD5lYXhfc3RhY2s9ODAoJWVzcCkK
-Kwltb3ZsICAgICVlYXgsODAoJWVzcCkKKworCSMgZWJ4X3N0YWNrID0gZWJ4CisJIyBtb3ZsIDxl
-Yng9aW50MzIjNCw+ZWJ4X3N0YWNrPXN0YWNrMzIjNgorCSMgbW92bCA8ZWJ4PSVlYngsPmVieF9z
-dGFjaz04NCglZXNwKQorCW1vdmwgICAgJWVieCw4NCglZXNwKQorCisJIyBlc2lfc3RhY2sgPSBl
-c2kKKwkjIG1vdmwgPGVzaT1pbnQzMiM1LD5lc2lfc3RhY2s9c3RhY2szMiM3CisJIyBtb3ZsIDxl
-c2k9JWVzaSw+ZXNpX3N0YWNrPTg4KCVlc3ApCisJbW92bCAgICAlZXNpLDg4KCVlc3ApCisKKwkj
-IGVkaV9zdGFjayA9IGVkaQorCSMgbW92bCA8ZWRpPWludDMyIzYsPmVkaV9zdGFjaz1zdGFjazMy
-IzgKKwkjIG1vdmwgPGVkaT0lZWRpLD5lZGlfc3RhY2s9OTIoJWVzcCkKKwltb3ZsICAgICVlZGks
-OTIoJWVzcCkKKworCSMgZWJwX3N0YWNrID0gZWJwCisJIyBtb3ZsIDxlYnA9aW50MzIjNyw+ZWJw
-X3N0YWNrPXN0YWNrMzIjOQorCSMgbW92bCA8ZWJwPSVlYnAsPmVicF9zdGFjaz05NiglZXNwKQor
-CW1vdmwgICAgJWVicCw5NiglZXNwKQorCisJIyB4ID0gYXJnMQorCSMgbW92bCA8YXJnMT1zdGFj
-azMyIy0xLD54PWludDMyIzMKKwkjIG1vdmwgPGFyZzE9NCglZXNwLCVlYXgpLD54PSVlZHgKKwlt
-b3ZsICAgIDQoJWVzcCwlZWF4KSwlZWR4CisKKwkjIG0gPSBhcmcyCisJIyBtb3ZsIDxhcmcyPXN0
-YWNrMzIjLTIsPm09aW50MzIjNQorCSMgbW92bCA8YXJnMj04KCVlc3AsJWVheCksPm09JWVzaQor
-CW1vdmwgICAgOCglZXNwLCVlYXgpLCVlc2kKKworCSMgb3V0ID0gYXJnMworCSMgbW92bCA8YXJn
-Mz1zdGFjazMyIy0zLD5vdXQ9aW50MzIjNgorCSMgbW92bCA8YXJnMz0xMiglZXNwLCVlYXgpLD5v
-dXQ9JWVkaQorCW1vdmwgICAgMTIoJWVzcCwlZWF4KSwlZWRpCisKKwkjIGJ5dGVzID0gYXJnNAor
-CSMgbW92bCA8YXJnND1zdGFjazMyIy00LD5ieXRlcz1pbnQzMiM0CisJIyBtb3ZsIDxhcmc0PTE2
-KCVlc3AsJWVheCksPmJ5dGVzPSVlYngKKwltb3ZsICAgIDE2KCVlc3AsJWVheCksJWVieAorCisJ
-IyBieXRlcyAtPSAwCisJIyBzdWIgICQwLDxieXRlcz1pbnQzMiM0CisJIyBzdWIgICQwLDxieXRl
-cz0lZWJ4CisJc3ViICAgICAgJDAsJWVieAorCisJIyBnb3RvIGRvbmUgaWYgdW5zaWduZWQ8PQor
-CWpiZSAgICAgLl9kb25lCisKKwkjIGdvdG8gc3RhcnQKKwlqbXAgICAgIC5fc3RhcnQKKworIyBl
-bnRlciBFQ1JZUFRfZW5jcnlwdF9ieXRlcworLnRleHQKKy5wMmFsaWduIDUKKy5nbG9ibCBFQ1JZ
-UFRfZW5jcnlwdF9ieXRlcworX0VDUllQVF9lbmNyeXB0X2J5dGVzOgorRUNSWVBUX2VuY3J5cHRf
-Ynl0ZXM6CisJbW92ICAgICAlZXNwLCVlYXgKKwlhbmQgICAgICQzMSwlZWF4CisJYWRkICAgICAk
-MjU2LCVlYXgKKwlzdWIgICAgICVlYXgsJWVzcAorCisJIyBlYXhfc3RhY2sgPSBlYXgKKwkjIG1v
-dmwgPGVheD1pbnQzMiMxLD5lYXhfc3RhY2s9c3RhY2szMiM1CisJIyBtb3ZsIDxlYXg9JWVheCw+
-ZWF4X3N0YWNrPTgwKCVlc3ApCisJbW92bCAgICAlZWF4LDgwKCVlc3ApCisKKwkjIGVieF9zdGFj
-ayA9IGVieAorCSMgbW92bCA8ZWJ4PWludDMyIzQsPmVieF9zdGFjaz1zdGFjazMyIzYKKwkjIG1v
-dmwgPGVieD0lZWJ4LD5lYnhfc3RhY2s9ODQoJWVzcCkKKwltb3ZsICAgICVlYngsODQoJWVzcCkK
-KworCSMgZXNpX3N0YWNrID0gZXNpCisJIyBtb3ZsIDxlc2k9aW50MzIjNSw+ZXNpX3N0YWNrPXN0
-YWNrMzIjNworCSMgbW92bCA8ZXNpPSVlc2ksPmVzaV9zdGFjaz04OCglZXNwKQorCW1vdmwgICAg
-JWVzaSw4OCglZXNwKQorCisJIyBlZGlfc3RhY2sgPSBlZGkKKwkjIG1vdmwgPGVkaT1pbnQzMiM2
-LD5lZGlfc3RhY2s9c3RhY2szMiM4CisJIyBtb3ZsIDxlZGk9JWVkaSw+ZWRpX3N0YWNrPTkyKCVl
-c3ApCisJbW92bCAgICAlZWRpLDkyKCVlc3ApCisKKwkjIGVicF9zdGFjayA9IGVicAorCSMgbW92
-bCA8ZWJwPWludDMyIzcsPmVicF9zdGFjaz1zdGFjazMyIzkKKwkjIG1vdmwgPGVicD0lZWJwLD5l
-YnBfc3RhY2s9OTYoJWVzcCkKKwltb3ZsICAgICVlYnAsOTYoJWVzcCkKKworCSMgeCA9IGFyZzEK
-KwkjIG1vdmwgPGFyZzE9c3RhY2szMiMtMSw+eD1pbnQzMiMzCisJIyBtb3ZsIDxhcmcxPTQoJWVz
-cCwlZWF4KSw+eD0lZWR4CisJbW92bCAgICA0KCVlc3AsJWVheCksJWVkeAorCisJIyBtID0gYXJn
-MgorCSMgbW92bCA8YXJnMj1zdGFjazMyIy0yLD5tPWludDMyIzUKKwkjIG1vdmwgPGFyZzI9OCgl
-ZXNwLCVlYXgpLD5tPSVlc2kKKwltb3ZsICAgIDgoJWVzcCwlZWF4KSwlZXNpCisKKwkjIG91dCA9
-IGFyZzMKKwkjIG1vdmwgPGFyZzM9c3RhY2szMiMtMyw+b3V0PWludDMyIzYKKwkjIG1vdmwgPGFy
-ZzM9MTIoJWVzcCwlZWF4KSw+b3V0PSVlZGkKKwltb3ZsICAgIDEyKCVlc3AsJWVheCksJWVkaQor
-CisJIyBieXRlcyA9IGFyZzQKKwkjIG1vdmwgPGFyZzQ9c3RhY2szMiMtNCw+Ynl0ZXM9aW50MzIj
-NAorCSMgbW92bCA8YXJnND0xNiglZXNwLCVlYXgpLD5ieXRlcz0lZWJ4CisJbW92bCAgICAxNigl
-ZXNwLCVlYXgpLCVlYngKKworCSMgYnl0ZXMgLT0gMAorCSMgc3ViICAkMCw8Ynl0ZXM9aW50MzIj
-NAorCSMgc3ViICAkMCw8Ynl0ZXM9JWVieAorCXN1YiAgICAgICQwLCVlYngKKworCSMgZ290byBk
-b25lIGlmIHVuc2lnbmVkPD0KKwlqYmUgICAgIC5fZG9uZQorCisJIyBzdGFydCMKKy5fc3RhcnQ6
-CisKKwkjIGluMCA9ICoodWludDMyICopICh4ICsgMCkKKwkjIG1vdmwgMCg8eD1pbnQzMiMzKSw+
-aW4wPWludDMyIzEKKwkjIG1vdmwgMCg8eD0lZWR4KSw+aW4wPSVlYXgKKwltb3ZsICAgIDAoJWVk
-eCksJWVheAorCisJIyBpbjEgPSAqKHVpbnQzMiAqKSAoeCArIDQpCisJIyBtb3ZsIDQoPHg9aW50
-MzIjMyksPmluMT1pbnQzMiMyCisJIyBtb3ZsIDQoPHg9JWVkeCksPmluMT0lZWN4CisJbW92bCAg
-ICA0KCVlZHgpLCVlY3gKKworCSMgaW4yID0gKih1aW50MzIgKikgKHggKyA4KQorCSMgbW92bCA4
-KDx4PWludDMyIzMpLD5pbjI9aW50MzIjNworCSMgbW92bCA4KDx4PSVlZHgpLD5pbjI9JWVicAor
-CW1vdmwgICAgOCglZWR4KSwlZWJwCisKKwkjIGowID0gaW4wCisJIyBtb3ZsIDxpbjA9aW50MzIj
-MSw+ajA9c3RhY2szMiMyNgorCSMgbW92bCA8aW4wPSVlYXgsPmowPTE2NCglZXNwKQorCW1vdmwg
-ICAgJWVheCwxNjQoJWVzcCkKKworCSMgaW4zID0gKih1aW50MzIgKikgKHggKyAxMikKKwkjIG1v
-dmwgMTIoPHg9aW50MzIjMyksPmluMz1pbnQzMiMxCisJIyBtb3ZsIDEyKDx4PSVlZHgpLD5pbjM9
-JWVheAorCW1vdmwgICAgMTIoJWVkeCksJWVheAorCisJIyBqMSA9IGluMQorCSMgbW92bCA8aW4x
-PWludDMyIzIsPmoxPXN0YWNrMzIjMjcKKwkjIG1vdmwgPGluMT0lZWN4LD5qMT0xNjgoJWVzcCkK
-Kwltb3ZsICAgICVlY3gsMTY4KCVlc3ApCisKKwkjIGluNCA9ICoodWludDMyICopICh4ICsgMTYp
-CisJIyBtb3ZsIDE2KDx4PWludDMyIzMpLD5pbjQ9aW50MzIjMgorCSMgbW92bCAxNig8eD0lZWR4
-KSw+aW40PSVlY3gKKwltb3ZsICAgIDE2KCVlZHgpLCVlY3gKKworCSMgajIgPSBpbjIKKwkjIG1v
-dmwgPGluMj1pbnQzMiM3LD5qMj1zdGFjazMyIzI4CisJIyBtb3ZsIDxpbjI9JWVicCw+ajI9MTcy
-KCVlc3ApCisJbW92bCAgICAlZWJwLDE3MiglZXNwKQorCisJIyBpbjUgPSAqKHVpbnQzMiAqKSAo
-eCArIDIwKQorCSMgbW92bCAyMCg8eD1pbnQzMiMzKSw+aW41PWludDMyIzcKKwkjIG1vdmwgMjAo
-PHg9JWVkeCksPmluNT0lZWJwCisJbW92bCAgICAyMCglZWR4KSwlZWJwCisKKwkjIGozID0gaW4z
-CisJIyBtb3ZsIDxpbjM9aW50MzIjMSw+ajM9c3RhY2szMiMyOQorCSMgbW92bCA8aW4zPSVlYXgs
-PmozPTE3NiglZXNwKQorCW1vdmwgICAgJWVheCwxNzYoJWVzcCkKKworCSMgaW42ID0gKih1aW50
-MzIgKikgKHggKyAyNCkKKwkjIG1vdmwgMjQoPHg9aW50MzIjMyksPmluNj1pbnQzMiMxCisJIyBt
-b3ZsIDI0KDx4PSVlZHgpLD5pbjY9JWVheAorCW1vdmwgICAgMjQoJWVkeCksJWVheAorCisJIyBq
-NCA9IGluNAorCSMgbW92bCA8aW40PWludDMyIzIsPmo0PXN0YWNrMzIjMzAKKwkjIG1vdmwgPGlu
-ND0lZWN4LD5qND0xODAoJWVzcCkKKwltb3ZsICAgICVlY3gsMTgwKCVlc3ApCisKKwkjIGluNyA9
-ICoodWludDMyICopICh4ICsgMjgpCisJIyBtb3ZsIDI4KDx4PWludDMyIzMpLD5pbjc9aW50MzIj
-MgorCSMgbW92bCAyOCg8eD0lZWR4KSw+aW43PSVlY3gKKwltb3ZsICAgIDI4KCVlZHgpLCVlY3gK
-KworCSMgajUgPSBpbjUKKwkjIG1vdmwgPGluNT1pbnQzMiM3LD5qNT1zdGFjazMyIzMxCisJIyBt
-b3ZsIDxpbjU9JWVicCw+ajU9MTg0KCVlc3ApCisJbW92bCAgICAlZWJwLDE4NCglZXNwKQorCisJ
-IyBpbjggPSAqKHVpbnQzMiAqKSAoeCArIDMyKQorCSMgbW92bCAzMig8eD1pbnQzMiMzKSw+aW44
-PWludDMyIzcKKwkjIG1vdmwgMzIoPHg9JWVkeCksPmluOD0lZWJwCisJbW92bCAgICAzMiglZWR4
-KSwlZWJwCisKKwkjIGo2ID0gaW42CisJIyBtb3ZsIDxpbjY9aW50MzIjMSw+ajY9c3RhY2szMiMz
-MgorCSMgbW92bCA8aW42PSVlYXgsPmo2PTE4OCglZXNwKQorCW1vdmwgICAgJWVheCwxODgoJWVz
-cCkKKworCSMgaW45ID0gKih1aW50MzIgKikgKHggKyAzNikKKwkjIG1vdmwgMzYoPHg9aW50MzIj
-MyksPmluOT1pbnQzMiMxCisJIyBtb3ZsIDM2KDx4PSVlZHgpLD5pbjk9JWVheAorCW1vdmwgICAg
-MzYoJWVkeCksJWVheAorCisJIyBqNyA9IGluNworCSMgbW92bCA8aW43PWludDMyIzIsPmo3PXN0
-YWNrMzIjMzMKKwkjIG1vdmwgPGluNz0lZWN4LD5qNz0xOTIoJWVzcCkKKwltb3ZsICAgICVlY3gs
-MTkyKCVlc3ApCisKKwkjIGluMTAgPSAqKHVpbnQzMiAqKSAoeCArIDQwKQorCSMgbW92bCA0MCg8
-eD1pbnQzMiMzKSw+aW4xMD1pbnQzMiMyCisJIyBtb3ZsIDQwKDx4PSVlZHgpLD5pbjEwPSVlY3gK
-Kwltb3ZsICAgIDQwKCVlZHgpLCVlY3gKKworCSMgajggPSBpbjgKKwkjIG1vdmwgPGluOD1pbnQz
-MiM3LD5qOD1zdGFjazMyIzM0CisJIyBtb3ZsIDxpbjg9JWVicCw+ajg9MTk2KCVlc3ApCisJbW92
-bCAgICAlZWJwLDE5NiglZXNwKQorCisJIyBpbjExID0gKih1aW50MzIgKikgKHggKyA0NCkKKwkj
-IG1vdmwgNDQoPHg9aW50MzIjMyksPmluMTE9aW50MzIjNworCSMgbW92bCA0NCg8eD0lZWR4KSw+
-aW4xMT0lZWJwCisJbW92bCAgICA0NCglZWR4KSwlZWJwCisKKwkjIGo5ID0gaW45CisJIyBtb3Zs
-IDxpbjk9aW50MzIjMSw+ajk9c3RhY2szMiMzNQorCSMgbW92bCA8aW45PSVlYXgsPmo5PTIwMCgl
-ZXNwKQorCW1vdmwgICAgJWVheCwyMDAoJWVzcCkKKworCSMgaW4xMiA9ICoodWludDMyICopICh4
-ICsgNDgpCisJIyBtb3ZsIDQ4KDx4PWludDMyIzMpLD5pbjEyPWludDMyIzEKKwkjIG1vdmwgNDgo
-PHg9JWVkeCksPmluMTI9JWVheAorCW1vdmwgICAgNDgoJWVkeCksJWVheAorCisJIyBqMTAgPSBp
-bjEwCisJIyBtb3ZsIDxpbjEwPWludDMyIzIsPmoxMD1zdGFjazMyIzM2CisJIyBtb3ZsIDxpbjEw
-PSVlY3gsPmoxMD0yMDQoJWVzcCkKKwltb3ZsICAgICVlY3gsMjA0KCVlc3ApCisKKwkjIGluMTMg
-PSAqKHVpbnQzMiAqKSAoeCArIDUyKQorCSMgbW92bCA1Mig8eD1pbnQzMiMzKSw+aW4xMz1pbnQz
-MiMyCisJIyBtb3ZsIDUyKDx4PSVlZHgpLD5pbjEzPSVlY3gKKwltb3ZsICAgIDUyKCVlZHgpLCVl
-Y3gKKworCSMgajExID0gaW4xMQorCSMgbW92bCA8aW4xMT1pbnQzMiM3LD5qMTE9c3RhY2szMiMz
-NworCSMgbW92bCA8aW4xMT0lZWJwLD5qMTE9MjA4KCVlc3ApCisJbW92bCAgICAlZWJwLDIwOCgl
-ZXNwKQorCisJIyBpbjE0ID0gKih1aW50MzIgKikgKHggKyA1NikKKwkjIG1vdmwgNTYoPHg9aW50
-MzIjMyksPmluMTQ9aW50MzIjNworCSMgbW92bCA1Nig8eD0lZWR4KSw+aW4xND0lZWJwCisJbW92
-bCAgICA1NiglZWR4KSwlZWJwCisKKwkjIGoxMiA9IGluMTIKKwkjIG1vdmwgPGluMTI9aW50MzIj
-MSw+ajEyPXN0YWNrMzIjMzgKKwkjIG1vdmwgPGluMTI9JWVheCw+ajEyPTIxMiglZXNwKQorCW1v
-dmwgICAgJWVheCwyMTIoJWVzcCkKKworCSMgaW4xNSA9ICoodWludDMyICopICh4ICsgNjApCisJ
-IyBtb3ZsIDYwKDx4PWludDMyIzMpLD5pbjE1PWludDMyIzEKKwkjIG1vdmwgNjAoPHg9JWVkeCks
-PmluMTU9JWVheAorCW1vdmwgICAgNjAoJWVkeCksJWVheAorCisJIyBqMTMgPSBpbjEzCisJIyBt
-b3ZsIDxpbjEzPWludDMyIzIsPmoxMz1zdGFjazMyIzM5CisJIyBtb3ZsIDxpbjEzPSVlY3gsPmox
-Mz0yMTYoJWVzcCkKKwltb3ZsICAgICVlY3gsMjE2KCVlc3ApCisKKwkjIGoxNCA9IGluMTQKKwkj
-IG1vdmwgPGluMTQ9aW50MzIjNyw+ajE0PXN0YWNrMzIjNDAKKwkjIG1vdmwgPGluMTQ9JWVicCw+
-ajE0PTIyMCglZXNwKQorCW1vdmwgICAgJWVicCwyMjAoJWVzcCkKKworCSMgajE1ID0gaW4xNQor
-CSMgbW92bCA8aW4xNT1pbnQzMiMxLD5qMTU9c3RhY2szMiM0MQorCSMgbW92bCA8aW4xNT0lZWF4
-LD5qMTU9MjI0KCVlc3ApCisJbW92bCAgICAlZWF4LDIyNCglZXNwKQorCisJIyB4X2JhY2t1cCA9
-IHgKKwkjIG1vdmwgPHg9aW50MzIjMyw+eF9iYWNrdXA9c3RhY2szMiMxCisJIyBtb3ZsIDx4PSVl
-ZHgsPnhfYmFja3VwPTY0KCVlc3ApCisJbW92bCAgICAlZWR4LDY0KCVlc3ApCisKKwkjIGJ5dGVz
-YXRsZWFzdDEjCisuX2J5dGVzYXRsZWFzdDE6CisKKwkjICAgYnl0ZXMgLSA2NAorCSMgY21wICAk
-NjQsPGJ5dGVzPWludDMyIzQKKwkjIGNtcCAgJDY0LDxieXRlcz0lZWJ4CisJY21wICAgICAgJDY0
-LCVlYngKKworCSMgICBnb3RvIG5vY29weSBpZiB1bnNpZ25lZD49CisJamFlICAgICAuX25vY29w
-eQorCisJIyAgICAgY3RhcmdldCA9IG91dAorCSMgbW92bCA8b3V0PWludDMyIzYsPmN0YXJnZXQ9
-c3RhY2szMiM0MgorCSMgbW92bCA8b3V0PSVlZGksPmN0YXJnZXQ9MjI4KCVlc3ApCisJbW92bCAg
-ICAlZWRpLDIyOCglZXNwKQorCisJIyAgICAgb3V0ID0gJnRtcAorCSMgbGVhbCA+dG1wPXN0YWNr
-NTEyIzEsPm91dD1pbnQzMiM2CisJIyBsZWFsID50bXA9MCglZXNwKSw+b3V0PSVlZGkKKwlsZWFs
-ICAgIDAoJWVzcCksJWVkaQorCisJIyAgICAgaSA9IGJ5dGVzCisJIyBtb3YgIDxieXRlcz1pbnQz
-MiM0LD5pPWludDMyIzIKKwkjIG1vdiAgPGJ5dGVzPSVlYngsPmk9JWVjeAorCW1vdiAgICAgICVl
-YngsJWVjeAorCisJIyAgICAgd2hpbGUgKGkpIHsgKm91dCsrID0gKm0rKzsgLS1pIH0KKwlyZXAg
-ICAgIG1vdnNiCisKKwkjICAgICBvdXQgPSAmdG1wCisJIyBsZWFsID50bXA9c3RhY2s1MTIjMSw+
-b3V0PWludDMyIzYKKwkjIGxlYWwgPnRtcD0wKCVlc3ApLD5vdXQ9JWVkaQorCWxlYWwgICAgMCgl
-ZXNwKSwlZWRpCisKKwkjICAgICBtID0gJnRtcAorCSMgbGVhbCA+dG1wPXN0YWNrNTEyIzEsPm09
-aW50MzIjNQorCSMgbGVhbCA+dG1wPTAoJWVzcCksPm09JWVzaQorCWxlYWwgICAgMCglZXNwKSwl
-ZXNpCisKKwkjICAgbm9jb3B5IworLl9ub2NvcHk6CisKKwkjICAgb3V0X2JhY2t1cCA9IG91dAor
-CSMgbW92bCA8b3V0PWludDMyIzYsPm91dF9iYWNrdXA9c3RhY2szMiMzCisJIyBtb3ZsIDxvdXQ9
-JWVkaSw+b3V0X2JhY2t1cD03MiglZXNwKQorCW1vdmwgICAgJWVkaSw3MiglZXNwKQorCisJIyAg
-IG1fYmFja3VwID0gbQorCSMgbW92bCA8bT1pbnQzMiM1LD5tX2JhY2t1cD1zdGFjazMyIzIKKwkj
-IG1vdmwgPG09JWVzaSw+bV9iYWNrdXA9NjgoJWVzcCkKKwltb3ZsICAgICVlc2ksNjgoJWVzcCkK
-KworCSMgICBieXRlc19iYWNrdXAgPSBieXRlcworCSMgbW92bCA8Ynl0ZXM9aW50MzIjNCw+Ynl0
-ZXNfYmFja3VwPXN0YWNrMzIjNAorCSMgbW92bCA8Ynl0ZXM9JWVieCw+Ynl0ZXNfYmFja3VwPTc2
-KCVlc3ApCisJbW92bCAgICAlZWJ4LDc2KCVlc3ApCisKKwkjICAgaW4wID0gajAKKwkjIG1vdmwg
-PGowPXN0YWNrMzIjMjYsPmluMD1pbnQzMiMxCisJIyBtb3ZsIDxqMD0xNjQoJWVzcCksPmluMD0l
-ZWF4CisJbW92bCAgICAxNjQoJWVzcCksJWVheAorCisJIyAgIGluMSA9IGoxCisJIyBtb3ZsIDxq
-MT1zdGFjazMyIzI3LD5pbjE9aW50MzIjMgorCSMgbW92bCA8ajE9MTY4KCVlc3ApLD5pbjE9JWVj
-eAorCW1vdmwgICAgMTY4KCVlc3ApLCVlY3gKKworCSMgICBpbjIgPSBqMgorCSMgbW92bCA8ajI9
-c3RhY2szMiMyOCw+aW4yPWludDMyIzMKKwkjIG1vdmwgPGoyPTE3MiglZXNwKSw+aW4yPSVlZHgK
-Kwltb3ZsICAgIDE3MiglZXNwKSwlZWR4CisKKwkjICAgaW4zID0gajMKKwkjIG1vdmwgPGozPXN0
-YWNrMzIjMjksPmluMz1pbnQzMiM0CisJIyBtb3ZsIDxqMz0xNzYoJWVzcCksPmluMz0lZWJ4CisJ
-bW92bCAgICAxNzYoJWVzcCksJWVieAorCisJIyAgIHgwID0gaW4wCisJIyBtb3ZsIDxpbjA9aW50
-MzIjMSw+eDA9c3RhY2szMiMxMAorCSMgbW92bCA8aW4wPSVlYXgsPngwPTEwMCglZXNwKQorCW1v
-dmwgICAgJWVheCwxMDAoJWVzcCkKKworCSMgICB4MSA9IGluMQorCSMgbW92bCA8aW4xPWludDMy
-IzIsPngxPXN0YWNrMzIjMTEKKwkjIG1vdmwgPGluMT0lZWN4LD54MT0xMDQoJWVzcCkKKwltb3Zs
-ICAgICVlY3gsMTA0KCVlc3ApCisKKwkjICAgeDIgPSBpbjIKKwkjIG1vdmwgPGluMj1pbnQzMiMz
-LD54Mj1zdGFjazMyIzEyCisJIyBtb3ZsIDxpbjI9JWVkeCw+eDI9MTA4KCVlc3ApCisJbW92bCAg
-ICAlZWR4LDEwOCglZXNwKQorCisJIyAgIHgzID0gaW4zCisJIyBtb3ZsIDxpbjM9aW50MzIjNCw+
-eDM9c3RhY2szMiMxMworCSMgbW92bCA8aW4zPSVlYngsPngzPTExMiglZXNwKQorCW1vdmwgICAg
-JWVieCwxMTIoJWVzcCkKKworCSMgICBpbjQgPSBqNAorCSMgbW92bCA8ajQ9c3RhY2szMiMzMCw+
-aW40PWludDMyIzEKKwkjIG1vdmwgPGo0PTE4MCglZXNwKSw+aW40PSVlYXgKKwltb3ZsICAgIDE4
-MCglZXNwKSwlZWF4CisKKwkjICAgaW41ID0gajUKKwkjIG1vdmwgPGo1PXN0YWNrMzIjMzEsPmlu
-NT1pbnQzMiMyCisJIyBtb3ZsIDxqNT0xODQoJWVzcCksPmluNT0lZWN4CisJbW92bCAgICAxODQo
-JWVzcCksJWVjeAorCisJIyAgIGluNiA9IGo2CisJIyBtb3ZsIDxqNj1zdGFjazMyIzMyLD5pbjY9
-aW50MzIjMworCSMgbW92bCA8ajY9MTg4KCVlc3ApLD5pbjY9JWVkeAorCW1vdmwgICAgMTg4KCVl
-c3ApLCVlZHgKKworCSMgICBpbjcgPSBqNworCSMgbW92bCA8ajc9c3RhY2szMiMzMyw+aW43PWlu
-dDMyIzQKKwkjIG1vdmwgPGo3PTE5MiglZXNwKSw+aW43PSVlYngKKwltb3ZsICAgIDE5MiglZXNw
-KSwlZWJ4CisKKwkjICAgeDQgPSBpbjQKKwkjIG1vdmwgPGluND1pbnQzMiMxLD54ND1zdGFjazMy
-IzE0CisJIyBtb3ZsIDxpbjQ9JWVheCw+eDQ9MTE2KCVlc3ApCisJbW92bCAgICAlZWF4LDExNigl
-ZXNwKQorCisJIyAgIHg1ID0gaW41CisJIyBtb3ZsIDxpbjU9aW50MzIjMiw+eDU9c3RhY2szMiMx
-NQorCSMgbW92bCA8aW41PSVlY3gsPng1PTEyMCglZXNwKQorCW1vdmwgICAgJWVjeCwxMjAoJWVz
-cCkKKworCSMgICB4NiA9IGluNgorCSMgbW92bCA8aW42PWludDMyIzMsPng2PXN0YWNrMzIjMTYK
-KwkjIG1vdmwgPGluNj0lZWR4LD54Nj0xMjQoJWVzcCkKKwltb3ZsICAgICVlZHgsMTI0KCVlc3Ap
-CisKKwkjICAgeDcgPSBpbjcKKwkjIG1vdmwgPGluNz1pbnQzMiM0LD54Nz1zdGFjazMyIzE3CisJ
-IyBtb3ZsIDxpbjc9JWVieCw+eDc9MTI4KCVlc3ApCisJbW92bCAgICAlZWJ4LDEyOCglZXNwKQor
-CisJIyAgIGluOCA9IGo4CisJIyBtb3ZsIDxqOD1zdGFjazMyIzM0LD5pbjg9aW50MzIjMQorCSMg
-bW92bCA8ajg9MTk2KCVlc3ApLD5pbjg9JWVheAorCW1vdmwgICAgMTk2KCVlc3ApLCVlYXgKKwor
-CSMgICBpbjkgPSBqOQorCSMgbW92bCA8ajk9c3RhY2szMiMzNSw+aW45PWludDMyIzIKKwkjIG1v
-dmwgPGo5PTIwMCglZXNwKSw+aW45PSVlY3gKKwltb3ZsICAgIDIwMCglZXNwKSwlZWN4CisKKwkj
-ICAgaW4xMCA9IGoxMAorCSMgbW92bCA8ajEwPXN0YWNrMzIjMzYsPmluMTA9aW50MzIjMworCSMg
-bW92bCA8ajEwPTIwNCglZXNwKSw+aW4xMD0lZWR4CisJbW92bCAgICAyMDQoJWVzcCksJWVkeAor
-CisJIyAgIGluMTEgPSBqMTEKKwkjIG1vdmwgPGoxMT1zdGFjazMyIzM3LD5pbjExPWludDMyIzQK
-KwkjIG1vdmwgPGoxMT0yMDgoJWVzcCksPmluMTE9JWVieAorCW1vdmwgICAgMjA4KCVlc3ApLCVl
-YngKKworCSMgICB4OCA9IGluOAorCSMgbW92bCA8aW44PWludDMyIzEsPng4PXN0YWNrMzIjMTgK
-KwkjIG1vdmwgPGluOD0lZWF4LD54OD0xMzIoJWVzcCkKKwltb3ZsICAgICVlYXgsMTMyKCVlc3Ap
-CisKKwkjICAgeDkgPSBpbjkKKwkjIG1vdmwgPGluOT1pbnQzMiMyLD54OT1zdGFjazMyIzE5CisJ
-IyBtb3ZsIDxpbjk9JWVjeCw+eDk9MTM2KCVlc3ApCisJbW92bCAgICAlZWN4LDEzNiglZXNwKQor
-CisJIyAgIHgxMCA9IGluMTAKKwkjIG1vdmwgPGluMTA9aW50MzIjMyw+eDEwPXN0YWNrMzIjMjAK
-KwkjIG1vdmwgPGluMTA9JWVkeCw+eDEwPTE0MCglZXNwKQorCW1vdmwgICAgJWVkeCwxNDAoJWVz
-cCkKKworCSMgICB4MTEgPSBpbjExCisJIyBtb3ZsIDxpbjExPWludDMyIzQsPngxMT1zdGFjazMy
-IzIxCisJIyBtb3ZsIDxpbjExPSVlYngsPngxMT0xNDQoJWVzcCkKKwltb3ZsICAgICVlYngsMTQ0
-KCVlc3ApCisKKwkjICAgaW4xMiA9IGoxMgorCSMgbW92bCA8ajEyPXN0YWNrMzIjMzgsPmluMTI9
-aW50MzIjMQorCSMgbW92bCA8ajEyPTIxMiglZXNwKSw+aW4xMj0lZWF4CisJbW92bCAgICAyMTIo
-JWVzcCksJWVheAorCisJIyAgIGluMTMgPSBqMTMKKwkjIG1vdmwgPGoxMz1zdGFjazMyIzM5LD5p
-bjEzPWludDMyIzIKKwkjIG1vdmwgPGoxMz0yMTYoJWVzcCksPmluMTM9JWVjeAorCW1vdmwgICAg
-MjE2KCVlc3ApLCVlY3gKKworCSMgICBpbjE0ID0gajE0CisJIyBtb3ZsIDxqMTQ9c3RhY2szMiM0
-MCw+aW4xND1pbnQzMiMzCisJIyBtb3ZsIDxqMTQ9MjIwKCVlc3ApLD5pbjE0PSVlZHgKKwltb3Zs
-ICAgIDIyMCglZXNwKSwlZWR4CisKKwkjICAgaW4xNSA9IGoxNQorCSMgbW92bCA8ajE1PXN0YWNr
-MzIjNDEsPmluMTU9aW50MzIjNAorCSMgbW92bCA8ajE1PTIyNCglZXNwKSw+aW4xNT0lZWJ4CisJ
-bW92bCAgICAyMjQoJWVzcCksJWVieAorCisJIyAgIHgxMiA9IGluMTIKKwkjIG1vdmwgPGluMTI9
-aW50MzIjMSw+eDEyPXN0YWNrMzIjMjIKKwkjIG1vdmwgPGluMTI9JWVheCw+eDEyPTE0OCglZXNw
-KQorCW1vdmwgICAgJWVheCwxNDgoJWVzcCkKKworCSMgICB4MTMgPSBpbjEzCisJIyBtb3ZsIDxp
-bjEzPWludDMyIzIsPngxMz1zdGFjazMyIzIzCisJIyBtb3ZsIDxpbjEzPSVlY3gsPngxMz0xNTIo
-JWVzcCkKKwltb3ZsICAgICVlY3gsMTUyKCVlc3ApCisKKwkjICAgeDE0ID0gaW4xNAorCSMgbW92
-bCA8aW4xND1pbnQzMiMzLD54MTQ9c3RhY2szMiMyNAorCSMgbW92bCA8aW4xND0lZWR4LD54MTQ9
-MTU2KCVlc3ApCisJbW92bCAgICAlZWR4LDE1NiglZXNwKQorCisJIyAgIHgxNSA9IGluMTUKKwkj
-IG1vdmwgPGluMTU9aW50MzIjNCw+eDE1PXN0YWNrMzIjMjUKKwkjIG1vdmwgPGluMTU9JWVieCw+
-eDE1PTE2MCglZXNwKQorCW1vdmwgICAgJWVieCwxNjAoJWVzcCkKKworCSMgICBpID0gMjAKKwkj
-IG1vdiAgJDIwLD5pPWludDMyIzcKKwkjIG1vdiAgJDIwLD5pPSVlYnAKKwltb3YgICAgICAkMjAs
-JWVicAorCisJIyBwID0geDAKKwkjIG1vdmwgPHgwPXN0YWNrMzIjMTAsPnA9aW50MzIjMQorCSMg
-bW92bCA8eDA9MTAwKCVlc3ApLD5wPSVlYXgKKwltb3ZsICAgIDEwMCglZXNwKSwlZWF4CisKKwkj
-IHMgPSB4NQorCSMgbW92bCA8eDU9c3RhY2szMiMxNSw+cz1pbnQzMiMyCisJIyBtb3ZsIDx4NT0x
-MjAoJWVzcCksPnM9JWVjeAorCW1vdmwgICAgMTIwKCVlc3ApLCVlY3gKKworCSMgdCA9IHgxMAor
-CSMgbW92bCA8eDEwPXN0YWNrMzIjMjAsPnQ9aW50MzIjMworCSMgbW92bCA8eDEwPTE0MCglZXNw
-KSw+dD0lZWR4CisJbW92bCAgICAxNDAoJWVzcCksJWVkeAorCisJIyB3ID0geDE1CisJIyBtb3Zs
-IDx4MTU9c3RhY2szMiMyNSw+dz1pbnQzMiM0CisJIyBtb3ZsIDx4MTU9MTYwKCVlc3ApLD53PSVl
-YngKKwltb3ZsICAgIDE2MCglZXNwKSwlZWJ4CisKKwkjIG1haW5sb29wIworLl9tYWlubG9vcDoK
-KworCSMgeDAgPSBwCisJIyBtb3ZsIDxwPWludDMyIzEsPngwPXN0YWNrMzIjMTAKKwkjIG1vdmwg
-PHA9JWVheCw+eDA9MTAwKCVlc3ApCisJbW92bCAgICAlZWF4LDEwMCglZXNwKQorCisJIyAJCQkJ
-eDEwID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54MTA9c3RhY2szMiMyMAorCSMgbW92bCA8dD0l
-ZWR4LD54MTA9MTQwKCVlc3ApCisJbW92bCAgICAlZWR4LDE0MCglZXNwKQorCisJIyBwICs9IHgx
-MgorCSMgYWRkbCA8eDEyPXN0YWNrMzIjMjIsPHA9aW50MzIjMQorCSMgYWRkbCA8eDEyPTE0OCgl
-ZXNwKSw8cD0lZWF4CisJYWRkbCAgICAxNDgoJWVzcCksJWVheAorCisJIyAJCXg1ID0gcworCSMg
-bW92bCA8cz1pbnQzMiMyLD54NT1zdGFjazMyIzE1CisJIyBtb3ZsIDxzPSVlY3gsPng1PTEyMCgl
-ZXNwKQorCW1vdmwgICAgJWVjeCwxMjAoJWVzcCkKKworCSMgCQkJCXQgKz0geDYKKwkjIGFkZGwg
-PHg2PXN0YWNrMzIjMTYsPHQ9aW50MzIjMworCSMgYWRkbCA8eDY9MTI0KCVlc3ApLDx0PSVlZHgK
-KwlhZGRsICAgIDEyNCglZXNwKSwlZWR4CisKKwkjIAkJCQkJCXgxNSA9IHcKKwkjIG1vdmwgPHc9
-aW50MzIjNCw+eDE1PXN0YWNrMzIjMjUKKwkjIG1vdmwgPHc9JWVieCw+eDE1PTE2MCglZXNwKQor
-CW1vdmwgICAgJWVieCwxNjAoJWVzcCkKKworCSMgCQlyID0geDEKKwkjIG1vdmwgPHgxPXN0YWNr
-MzIjMTEsPnI9aW50MzIjNQorCSMgbW92bCA8eDE9MTA0KCVlc3ApLD5yPSVlc2kKKwltb3ZsICAg
-IDEwNCglZXNwKSwlZXNpCisKKwkjIAkJciArPSBzCisJIyBhZGQgIDxzPWludDMyIzIsPHI9aW50
-MzIjNQorCSMgYWRkICA8cz0lZWN4LDxyPSVlc2kKKwlhZGQgICAgICAlZWN4LCVlc2kKKworCSMg
-CQkJCQkJdiA9IHgxMQorCSMgbW92bCA8eDExPXN0YWNrMzIjMjEsPnY9aW50MzIjNgorCSMgbW92
-bCA8eDExPTE0NCglZXNwKSw+dj0lZWRpCisJbW92bCAgICAxNDQoJWVzcCksJWVkaQorCisJIyAJ
-CQkJCQl2ICs9IHcKKwkjIGFkZCAgPHc9aW50MzIjNCw8dj1pbnQzMiM2CisJIyBhZGQgIDx3PSVl
-YngsPHY9JWVkaQorCWFkZCAgICAgICVlYngsJWVkaQorCisJIyBwIDw8PD0gNworCSMgcm9sICAk
-Nyw8cD1pbnQzMiMxCisJIyByb2wgICQ3LDxwPSVlYXgKKwlyb2wgICAgICAkNywlZWF4CisKKwkj
-IHAgXj0geDQKKwkjIHhvcmwgPHg0PXN0YWNrMzIjMTQsPHA9aW50MzIjMQorCSMgeG9ybCA8eDQ9
-MTE2KCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDExNiglZXNwKSwlZWF4CisKKwkjIAkJCQl0IDw8
-PD0gNworCSMgcm9sICAkNyw8dD1pbnQzMiMzCisJIyByb2wgICQ3LDx0PSVlZHgKKwlyb2wgICAg
-ICAkNywlZWR4CisKKwkjIAkJCQl0IF49IHgxNAorCSMgeG9ybCA8eDE0PXN0YWNrMzIjMjQsPHQ9
-aW50MzIjMworCSMgeG9ybCA8eDE0PTE1NiglZXNwKSw8dD0lZWR4CisJeG9ybCAgICAxNTYoJWVz
-cCksJWVkeAorCisJIyAJCXIgPDw8PSA3CisJIyByb2wgICQ3LDxyPWludDMyIzUKKwkjIHJvbCAg
-JDcsPHI9JWVzaQorCXJvbCAgICAgICQ3LCVlc2kKKworCSMgCQlyIF49IHg5CisJIyB4b3JsIDx4
-OT1zdGFjazMyIzE5LDxyPWludDMyIzUKKwkjIHhvcmwgPHg5PTEzNiglZXNwKSw8cj0lZXNpCisJ
-eG9ybCAgICAxMzYoJWVzcCksJWVzaQorCisJIyAJCQkJCQl2IDw8PD0gNworCSMgcm9sICAkNyw8
-dj1pbnQzMiM2CisJIyByb2wgICQ3LDx2PSVlZGkKKwlyb2wgICAgICAkNywlZWRpCisKKwkjIAkJ
-CQkJCXYgXj0geDMKKwkjIHhvcmwgPHgzPXN0YWNrMzIjMTMsPHY9aW50MzIjNgorCSMgeG9ybCA8
-eDM9MTEyKCVlc3ApLDx2PSVlZGkKKwl4b3JsICAgIDExMiglZXNwKSwlZWRpCisKKwkjIHg0ID0g
-cAorCSMgbW92bCA8cD1pbnQzMiMxLD54ND1zdGFjazMyIzE0CisJIyBtb3ZsIDxwPSVlYXgsPng0
-PTExNiglZXNwKQorCW1vdmwgICAgJWVheCwxMTYoJWVzcCkKKworCSMgCQkJCXgxNCA9IHQKKwkj
-IG1vdmwgPHQ9aW50MzIjMyw+eDE0PXN0YWNrMzIjMjQKKwkjIG1vdmwgPHQ9JWVkeCw+eDE0PTE1
-NiglZXNwKQorCW1vdmwgICAgJWVkeCwxNTYoJWVzcCkKKworCSMgcCArPSB4MAorCSMgYWRkbCA8
-eDA9c3RhY2szMiMxMCw8cD1pbnQzMiMxCisJIyBhZGRsIDx4MD0xMDAoJWVzcCksPHA9JWVheAor
-CWFkZGwgICAgMTAwKCVlc3ApLCVlYXgKKworCSMgCQl4OSA9IHIKKwkjIG1vdmwgPHI9aW50MzIj
-NSw+eDk9c3RhY2szMiMxOQorCSMgbW92bCA8cj0lZXNpLD54OT0xMzYoJWVzcCkKKwltb3ZsICAg
-ICVlc2ksMTM2KCVlc3ApCisKKwkjIAkJCQl0ICs9IHgxMAorCSMgYWRkbCA8eDEwPXN0YWNrMzIj
-MjAsPHQ9aW50MzIjMworCSMgYWRkbCA8eDEwPTE0MCglZXNwKSw8dD0lZWR4CisJYWRkbCAgICAx
-NDAoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MyA9IHYKKwkjIG1vdmwgPHY9aW50MzIjNiw+eDM9
-c3RhY2szMiMxMworCSMgbW92bCA8dj0lZWRpLD54Mz0xMTIoJWVzcCkKKwltb3ZsICAgICVlZGks
-MTEyKCVlc3ApCisKKwkjIHAgPDw8PSA5CisJIyByb2wgICQ5LDxwPWludDMyIzEKKwkjIHJvbCAg
-JDksPHA9JWVheAorCXJvbCAgICAgICQ5LCVlYXgKKworCSMgcCBePSB4OAorCSMgeG9ybCA8eDg9
-c3RhY2szMiMxOCw8cD1pbnQzMiMxCisJIyB4b3JsIDx4OD0xMzIoJWVzcCksPHA9JWVheAorCXhv
-cmwgICAgMTMyKCVlc3ApLCVlYXgKKworCSMgCQkJCXQgPDw8PSA5CisJIyByb2wgICQ5LDx0PWlu
-dDMyIzMKKwkjIHJvbCAgJDksPHQ9JWVkeAorCXJvbCAgICAgICQ5LCVlZHgKKworCSMgCQkJCXQg
-Xj0geDIKKwkjIHhvcmwgPHgyPXN0YWNrMzIjMTIsPHQ9aW50MzIjMworCSMgeG9ybCA8eDI9MTA4
-KCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEwOCglZXNwKSwlZWR4CisKKwkjIAkJcyArPSByCisJ
-IyBhZGQgIDxyPWludDMyIzUsPHM9aW50MzIjMgorCSMgYWRkICA8cj0lZXNpLDxzPSVlY3gKKwlh
-ZGQgICAgICAlZXNpLCVlY3gKKworCSMgCQlzIDw8PD0gOQorCSMgcm9sICAkOSw8cz1pbnQzMiMy
-CisJIyByb2wgICQ5LDxzPSVlY3gKKwlyb2wgICAgICAkOSwlZWN4CisKKwkjIAkJcyBePSB4MTMK
-KwkjIHhvcmwgPHgxMz1zdGFjazMyIzIzLDxzPWludDMyIzIKKwkjIHhvcmwgPHgxMz0xNTIoJWVz
-cCksPHM9JWVjeAorCXhvcmwgICAgMTUyKCVlc3ApLCVlY3gKKworCSMgCQkJCQkJdyArPSB2CisJ
-IyBhZGQgIDx2PWludDMyIzYsPHc9aW50MzIjNAorCSMgYWRkICA8dj0lZWRpLDx3PSVlYngKKwlh
-ZGQgICAgICAlZWRpLCVlYngKKworCSMgCQkJCQkJdyA8PDw9IDkKKwkjIHJvbCAgJDksPHc9aW50
-MzIjNAorCSMgcm9sICAkOSw8dz0lZWJ4CisJcm9sICAgICAgJDksJWVieAorCisJIyAJCQkJCQl3
-IF49IHg3CisJIyB4b3JsIDx4Nz1zdGFjazMyIzE3LDx3PWludDMyIzQKKwkjIHhvcmwgPHg3PTEy
-OCglZXNwKSw8dz0lZWJ4CisJeG9ybCAgICAxMjgoJWVzcCksJWVieAorCisJIyB4OCA9IHAKKwkj
-IG1vdmwgPHA9aW50MzIjMSw+eDg9c3RhY2szMiMxOAorCSMgbW92bCA8cD0lZWF4LD54OD0xMzIo
-JWVzcCkKKwltb3ZsICAgICVlYXgsMTMyKCVlc3ApCisKKwkjIAkJCQl4MiA9IHQKKwkjIG1vdmwg
-PHQ9aW50MzIjMyw+eDI9c3RhY2szMiMxMgorCSMgbW92bCA8dD0lZWR4LD54Mj0xMDgoJWVzcCkK
-Kwltb3ZsICAgICVlZHgsMTA4KCVlc3ApCisKKwkjIHAgKz0geDQKKwkjIGFkZGwgPHg0PXN0YWNr
-MzIjMTQsPHA9aW50MzIjMQorCSMgYWRkbCA8eDQ9MTE2KCVlc3ApLDxwPSVlYXgKKwlhZGRsICAg
-IDExNiglZXNwKSwlZWF4CisKKwkjIAkJeDEzID0gcworCSMgbW92bCA8cz1pbnQzMiMyLD54MTM9
-c3RhY2szMiMyMworCSMgbW92bCA8cz0lZWN4LD54MTM9MTUyKCVlc3ApCisJbW92bCAgICAlZWN4
-LDE1MiglZXNwKQorCisJIyAJCQkJdCArPSB4MTQKKwkjIGFkZGwgPHgxND1zdGFjazMyIzI0LDx0
-PWludDMyIzMKKwkjIGFkZGwgPHgxND0xNTYoJWVzcCksPHQ9JWVkeAorCWFkZGwgICAgMTU2KCVl
-c3ApLCVlZHgKKworCSMgCQkJCQkJeDcgPSB3CisJIyBtb3ZsIDx3PWludDMyIzQsPng3PXN0YWNr
-MzIjMTcKKwkjIG1vdmwgPHc9JWVieCw+eDc9MTI4KCVlc3ApCisJbW92bCAgICAlZWJ4LDEyOCgl
-ZXNwKQorCisJIyBwIDw8PD0gMTMKKwkjIHJvbCAgJDEzLDxwPWludDMyIzEKKwkjIHJvbCAgJDEz
-LDxwPSVlYXgKKwlyb2wgICAgICAkMTMsJWVheAorCisJIyBwIF49IHgxMgorCSMgeG9ybCA8eDEy
-PXN0YWNrMzIjMjIsPHA9aW50MzIjMQorCSMgeG9ybCA8eDEyPTE0OCglZXNwKSw8cD0lZWF4CisJ
-eG9ybCAgICAxNDgoJWVzcCksJWVheAorCisJIyAJCQkJdCA8PDw9IDEzCisJIyByb2wgICQxMyw8
-dD1pbnQzMiMzCisJIyByb2wgICQxMyw8dD0lZWR4CisJcm9sICAgICAgJDEzLCVlZHgKKworCSMg
-CQkJCXQgXj0geDYKKwkjIHhvcmwgPHg2PXN0YWNrMzIjMTYsPHQ9aW50MzIjMworCSMgeG9ybCA8
-eDY9MTI0KCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEyNCglZXNwKSwlZWR4CisKKwkjIAkJciAr
-PSBzCisJIyBhZGQgIDxzPWludDMyIzIsPHI9aW50MzIjNQorCSMgYWRkICA8cz0lZWN4LDxyPSVl
-c2kKKwlhZGQgICAgICAlZWN4LCVlc2kKKworCSMgCQlyIDw8PD0gMTMKKwkjIHJvbCAgJDEzLDxy
-PWludDMyIzUKKwkjIHJvbCAgJDEzLDxyPSVlc2kKKwlyb2wgICAgICAkMTMsJWVzaQorCisJIyAJ
-CXIgXj0geDEKKwkjIHhvcmwgPHgxPXN0YWNrMzIjMTEsPHI9aW50MzIjNQorCSMgeG9ybCA8eDE9
-MTA0KCVlc3ApLDxyPSVlc2kKKwl4b3JsICAgIDEwNCglZXNwKSwlZXNpCisKKwkjIAkJCQkJCXYg
-Kz0gdworCSMgYWRkICA8dz1pbnQzMiM0LDx2PWludDMyIzYKKwkjIGFkZCAgPHc9JWVieCw8dj0l
-ZWRpCisJYWRkICAgICAgJWVieCwlZWRpCisKKwkjIAkJCQkJCXYgPDw8PSAxMworCSMgcm9sICAk
-MTMsPHY9aW50MzIjNgorCSMgcm9sICAkMTMsPHY9JWVkaQorCXJvbCAgICAgICQxMywlZWRpCisK
-KwkjIAkJCQkJCXYgXj0geDExCisJIyB4b3JsIDx4MTE9c3RhY2szMiMyMSw8dj1pbnQzMiM2CisJ
-IyB4b3JsIDx4MTE9MTQ0KCVlc3ApLDx2PSVlZGkKKwl4b3JsICAgIDE0NCglZXNwKSwlZWRpCisK
-KwkjIHgxMiA9IHAKKwkjIG1vdmwgPHA9aW50MzIjMSw+eDEyPXN0YWNrMzIjMjIKKwkjIG1vdmwg
-PHA9JWVheCw+eDEyPTE0OCglZXNwKQorCW1vdmwgICAgJWVheCwxNDgoJWVzcCkKKworCSMgCQkJ
-CXg2ID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54Nj1zdGFjazMyIzE2CisJIyBtb3ZsIDx0PSVl
-ZHgsPng2PTEyNCglZXNwKQorCW1vdmwgICAgJWVkeCwxMjQoJWVzcCkKKworCSMgcCArPSB4OAor
-CSMgYWRkbCA8eDg9c3RhY2szMiMxOCw8cD1pbnQzMiMxCisJIyBhZGRsIDx4OD0xMzIoJWVzcCks
-PHA9JWVheAorCWFkZGwgICAgMTMyKCVlc3ApLCVlYXgKKworCSMgCQl4MSA9IHIKKwkjIG1vdmwg
-PHI9aW50MzIjNSw+eDE9c3RhY2szMiMxMQorCSMgbW92bCA8cj0lZXNpLD54MT0xMDQoJWVzcCkK
-Kwltb3ZsICAgICVlc2ksMTA0KCVlc3ApCisKKwkjIAkJCQl0ICs9IHgyCisJIyBhZGRsIDx4Mj1z
-dGFjazMyIzEyLDx0PWludDMyIzMKKwkjIGFkZGwgPHgyPTEwOCglZXNwKSw8dD0lZWR4CisJYWRk
-bCAgICAxMDgoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MTEgPSB2CisJIyBtb3ZsIDx2PWludDMy
-IzYsPngxMT1zdGFjazMyIzIxCisJIyBtb3ZsIDx2PSVlZGksPngxMT0xNDQoJWVzcCkKKwltb3Zs
-ICAgICVlZGksMTQ0KCVlc3ApCisKKwkjIHAgPDw8PSAxOAorCSMgcm9sICAkMTgsPHA9aW50MzIj
-MQorCSMgcm9sICAkMTgsPHA9JWVheAorCXJvbCAgICAgICQxOCwlZWF4CisKKwkjIHAgXj0geDAK
-KwkjIHhvcmwgPHgwPXN0YWNrMzIjMTAsPHA9aW50MzIjMQorCSMgeG9ybCA8eDA9MTAwKCVlc3Ap
-LDxwPSVlYXgKKwl4b3JsICAgIDEwMCglZXNwKSwlZWF4CisKKwkjIAkJCQl0IDw8PD0gMTgKKwkj
-IHJvbCAgJDE4LDx0PWludDMyIzMKKwkjIHJvbCAgJDE4LDx0PSVlZHgKKwlyb2wgICAgICAkMTgs
-JWVkeAorCisJIyAJCQkJdCBePSB4MTAKKwkjIHhvcmwgPHgxMD1zdGFjazMyIzIwLDx0PWludDMy
-IzMKKwkjIHhvcmwgPHgxMD0xNDAoJWVzcCksPHQ9JWVkeAorCXhvcmwgICAgMTQwKCVlc3ApLCVl
-ZHgKKworCSMgCQlzICs9IHIKKwkjIGFkZCAgPHI9aW50MzIjNSw8cz1pbnQzMiMyCisJIyBhZGQg
-IDxyPSVlc2ksPHM9JWVjeAorCWFkZCAgICAgICVlc2ksJWVjeAorCisJIyAJCXMgPDw8PSAxOAor
-CSMgcm9sICAkMTgsPHM9aW50MzIjMgorCSMgcm9sICAkMTgsPHM9JWVjeAorCXJvbCAgICAgICQx
-OCwlZWN4CisKKwkjIAkJcyBePSB4NQorCSMgeG9ybCA8eDU9c3RhY2szMiMxNSw8cz1pbnQzMiMy
-CisJIyB4b3JsIDx4NT0xMjAoJWVzcCksPHM9JWVjeAorCXhvcmwgICAgMTIwKCVlc3ApLCVlY3gK
-KworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMyIzYsPHc9aW50MzIjNAorCSMgYWRk
-ICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVlYngKKworCSMgCQkJCQkJdyA8PDw9
-IDE4CisJIyByb2wgICQxOCw8dz1pbnQzMiM0CisJIyByb2wgICQxOCw8dz0lZWJ4CisJcm9sICAg
-ICAgJDE4LCVlYngKKworCSMgCQkJCQkJdyBePSB4MTUKKwkjIHhvcmwgPHgxNT1zdGFjazMyIzI1
-LDx3PWludDMyIzQKKwkjIHhvcmwgPHgxNT0xNjAoJWVzcCksPHc9JWVieAorCXhvcmwgICAgMTYw
-KCVlc3ApLCVlYngKKworCSMgeDAgPSBwCisJIyBtb3ZsIDxwPWludDMyIzEsPngwPXN0YWNrMzIj
-MTAKKwkjIG1vdmwgPHA9JWVheCw+eDA9MTAwKCVlc3ApCisJbW92bCAgICAlZWF4LDEwMCglZXNw
-KQorCisJIyAJCQkJeDEwID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54MTA9c3RhY2szMiMyMAor
-CSMgbW92bCA8dD0lZWR4LD54MTA9MTQwKCVlc3ApCisJbW92bCAgICAlZWR4LDE0MCglZXNwKQor
-CisJIyBwICs9IHgzCisJIyBhZGRsIDx4Mz1zdGFjazMyIzEzLDxwPWludDMyIzEKKwkjIGFkZGwg
-PHgzPTExMiglZXNwKSw8cD0lZWF4CisJYWRkbCAgICAxMTIoJWVzcCksJWVheAorCisJIyBwIDw8
-PD0gNworCSMgcm9sICAkNyw8cD1pbnQzMiMxCisJIyByb2wgICQ3LDxwPSVlYXgKKwlyb2wgICAg
-ICAkNywlZWF4CisKKwkjIAkJeDUgPSBzCisJIyBtb3ZsIDxzPWludDMyIzIsPng1PXN0YWNrMzIj
-MTUKKwkjIG1vdmwgPHM9JWVjeCw+eDU9MTIwKCVlc3ApCisJbW92bCAgICAlZWN4LDEyMCglZXNw
-KQorCisJIyAJCQkJdCArPSB4OQorCSMgYWRkbCA8eDk9c3RhY2szMiMxOSw8dD1pbnQzMiMzCisJ
-IyBhZGRsIDx4OT0xMzYoJWVzcCksPHQ9JWVkeAorCWFkZGwgICAgMTM2KCVlc3ApLCVlZHgKKwor
-CSMgCQkJCQkJeDE1ID0gdworCSMgbW92bCA8dz1pbnQzMiM0LD54MTU9c3RhY2szMiMyNQorCSMg
-bW92bCA8dz0lZWJ4LD54MTU9MTYwKCVlc3ApCisJbW92bCAgICAlZWJ4LDE2MCglZXNwKQorCisJ
-IyAJCXIgPSB4NAorCSMgbW92bCA8eDQ9c3RhY2szMiMxNCw+cj1pbnQzMiM1CisJIyBtb3ZsIDx4
-ND0xMTYoJWVzcCksPnI9JWVzaQorCW1vdmwgICAgMTE2KCVlc3ApLCVlc2kKKworCSMgCQlyICs9
-IHMKKwkjIGFkZCAgPHM9aW50MzIjMiw8cj1pbnQzMiM1CisJIyBhZGQgIDxzPSVlY3gsPHI9JWVz
-aQorCWFkZCAgICAgICVlY3gsJWVzaQorCisJIyAJCQkJCQl2ID0geDE0CisJIyBtb3ZsIDx4MTQ9
-c3RhY2szMiMyNCw+dj1pbnQzMiM2CisJIyBtb3ZsIDx4MTQ9MTU2KCVlc3ApLD52PSVlZGkKKwlt
-b3ZsICAgIDE1NiglZXNwKSwlZWRpCisKKwkjIAkJCQkJCXYgKz0gdworCSMgYWRkICA8dz1pbnQz
-MiM0LDx2PWludDMyIzYKKwkjIGFkZCAgPHc9JWVieCw8dj0lZWRpCisJYWRkICAgICAgJWVieCwl
-ZWRpCisKKwkjIHAgXj0geDEKKwkjIHhvcmwgPHgxPXN0YWNrMzIjMTEsPHA9aW50MzIjMQorCSMg
-eG9ybCA8eDE9MTA0KCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDEwNCglZXNwKSwlZWF4CisKKwkj
-IAkJCQl0IDw8PD0gNworCSMgcm9sICAkNyw8dD1pbnQzMiMzCisJIyByb2wgICQ3LDx0PSVlZHgK
-Kwlyb2wgICAgICAkNywlZWR4CisKKwkjIAkJCQl0IF49IHgxMQorCSMgeG9ybCA8eDExPXN0YWNr
-MzIjMjEsPHQ9aW50MzIjMworCSMgeG9ybCA8eDExPTE0NCglZXNwKSw8dD0lZWR4CisJeG9ybCAg
-ICAxNDQoJWVzcCksJWVkeAorCisJIyAJCXIgPDw8PSA3CisJIyByb2wgICQ3LDxyPWludDMyIzUK
-KwkjIHJvbCAgJDcsPHI9JWVzaQorCXJvbCAgICAgICQ3LCVlc2kKKworCSMgCQlyIF49IHg2CisJ
-IyB4b3JsIDx4Nj1zdGFjazMyIzE2LDxyPWludDMyIzUKKwkjIHhvcmwgPHg2PTEyNCglZXNwKSw8
-cj0lZXNpCisJeG9ybCAgICAxMjQoJWVzcCksJWVzaQorCisJIyAJCQkJCQl2IDw8PD0gNworCSMg
-cm9sICAkNyw8dj1pbnQzMiM2CisJIyByb2wgICQ3LDx2PSVlZGkKKwlyb2wgICAgICAkNywlZWRp
-CisKKwkjIAkJCQkJCXYgXj0geDEyCisJIyB4b3JsIDx4MTI9c3RhY2szMiMyMiw8dj1pbnQzMiM2
-CisJIyB4b3JsIDx4MTI9MTQ4KCVlc3ApLDx2PSVlZGkKKwl4b3JsICAgIDE0OCglZXNwKSwlZWRp
-CisKKwkjIHgxID0gcAorCSMgbW92bCA8cD1pbnQzMiMxLD54MT1zdGFjazMyIzExCisJIyBtb3Zs
-IDxwPSVlYXgsPngxPTEwNCglZXNwKQorCW1vdmwgICAgJWVheCwxMDQoJWVzcCkKKworCSMgCQkJ
-CXgxMSA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDExPXN0YWNrMzIjMjEKKwkjIG1vdmwgPHQ9
-JWVkeCw+eDExPTE0NCglZXNwKQorCW1vdmwgICAgJWVkeCwxNDQoJWVzcCkKKworCSMgcCArPSB4
-MAorCSMgYWRkbCA8eDA9c3RhY2szMiMxMCw8cD1pbnQzMiMxCisJIyBhZGRsIDx4MD0xMDAoJWVz
-cCksPHA9JWVheAorCWFkZGwgICAgMTAwKCVlc3ApLCVlYXgKKworCSMgCQl4NiA9IHIKKwkjIG1v
-dmwgPHI9aW50MzIjNSw+eDY9c3RhY2szMiMxNgorCSMgbW92bCA8cj0lZXNpLD54Nj0xMjQoJWVz
-cCkKKwltb3ZsICAgICVlc2ksMTI0KCVlc3ApCisKKwkjIAkJCQl0ICs9IHgxMAorCSMgYWRkbCA8
-eDEwPXN0YWNrMzIjMjAsPHQ9aW50MzIjMworCSMgYWRkbCA8eDEwPTE0MCglZXNwKSw8dD0lZWR4
-CisJYWRkbCAgICAxNDAoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MTIgPSB2CisJIyBtb3ZsIDx2
-PWludDMyIzYsPngxMj1zdGFjazMyIzIyCisJIyBtb3ZsIDx2PSVlZGksPngxMj0xNDgoJWVzcCkK
-Kwltb3ZsICAgICVlZGksMTQ4KCVlc3ApCisKKwkjIHAgPDw8PSA5CisJIyByb2wgICQ5LDxwPWlu
-dDMyIzEKKwkjIHJvbCAgJDksPHA9JWVheAorCXJvbCAgICAgICQ5LCVlYXgKKworCSMgcCBePSB4
-MgorCSMgeG9ybCA8eDI9c3RhY2szMiMxMiw8cD1pbnQzMiMxCisJIyB4b3JsIDx4Mj0xMDgoJWVz
-cCksPHA9JWVheAorCXhvcmwgICAgMTA4KCVlc3ApLCVlYXgKKworCSMgCQkJCXQgPDw8PSA5CisJ
-IyByb2wgICQ5LDx0PWludDMyIzMKKwkjIHJvbCAgJDksPHQ9JWVkeAorCXJvbCAgICAgICQ5LCVl
-ZHgKKworCSMgCQkJCXQgXj0geDgKKwkjIHhvcmwgPHg4PXN0YWNrMzIjMTgsPHQ9aW50MzIjMwor
-CSMgeG9ybCA8eDg9MTMyKCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEzMiglZXNwKSwlZWR4CisK
-KwkjIAkJcyArPSByCisJIyBhZGQgIDxyPWludDMyIzUsPHM9aW50MzIjMgorCSMgYWRkICA8cj0l
-ZXNpLDxzPSVlY3gKKwlhZGQgICAgICAlZXNpLCVlY3gKKworCSMgCQlzIDw8PD0gOQorCSMgcm9s
-ICAkOSw8cz1pbnQzMiMyCisJIyByb2wgICQ5LDxzPSVlY3gKKwlyb2wgICAgICAkOSwlZWN4CisK
-KwkjIAkJcyBePSB4NworCSMgeG9ybCA8eDc9c3RhY2szMiMxNyw8cz1pbnQzMiMyCisJIyB4b3Js
-IDx4Nz0xMjgoJWVzcCksPHM9JWVjeAorCXhvcmwgICAgMTI4KCVlc3ApLCVlY3gKKworCSMgCQkJ
-CQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMyIzYsPHc9aW50MzIjNAorCSMgYWRkICA8dj0lZWRp
-LDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVlYngKKworCSMgCQkJCQkJdyA8PDw9IDkKKwkjIHJv
-bCAgJDksPHc9aW50MzIjNAorCSMgcm9sICAkOSw8dz0lZWJ4CisJcm9sICAgICAgJDksJWVieAor
-CisJIyAJCQkJCQl3IF49IHgxMworCSMgeG9ybCA8eDEzPXN0YWNrMzIjMjMsPHc9aW50MzIjNAor
-CSMgeG9ybCA8eDEzPTE1MiglZXNwKSw8dz0lZWJ4CisJeG9ybCAgICAxNTIoJWVzcCksJWVieAor
-CisJIyB4MiA9IHAKKwkjIG1vdmwgPHA9aW50MzIjMSw+eDI9c3RhY2szMiMxMgorCSMgbW92bCA8
-cD0lZWF4LD54Mj0xMDgoJWVzcCkKKwltb3ZsICAgICVlYXgsMTA4KCVlc3ApCisKKwkjIAkJCQl4
-OCA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDg9c3RhY2szMiMxOAorCSMgbW92bCA8dD0lZWR4
-LD54OD0xMzIoJWVzcCkKKwltb3ZsICAgICVlZHgsMTMyKCVlc3ApCisKKwkjIHAgKz0geDEKKwkj
-IGFkZGwgPHgxPXN0YWNrMzIjMTEsPHA9aW50MzIjMQorCSMgYWRkbCA8eDE9MTA0KCVlc3ApLDxw
-PSVlYXgKKwlhZGRsICAgIDEwNCglZXNwKSwlZWF4CisKKwkjIAkJeDcgPSBzCisJIyBtb3ZsIDxz
-PWludDMyIzIsPng3PXN0YWNrMzIjMTcKKwkjIG1vdmwgPHM9JWVjeCw+eDc9MTI4KCVlc3ApCisJ
-bW92bCAgICAlZWN4LDEyOCglZXNwKQorCisJIyAJCQkJdCArPSB4MTEKKwkjIGFkZGwgPHgxMT1z
-dGFjazMyIzIxLDx0PWludDMyIzMKKwkjIGFkZGwgPHgxMT0xNDQoJWVzcCksPHQ9JWVkeAorCWFk
-ZGwgICAgMTQ0KCVlc3ApLCVlZHgKKworCSMgCQkJCQkJeDEzID0gdworCSMgbW92bCA8dz1pbnQz
-MiM0LD54MTM9c3RhY2szMiMyMworCSMgbW92bCA8dz0lZWJ4LD54MTM9MTUyKCVlc3ApCisJbW92
-bCAgICAlZWJ4LDE1MiglZXNwKQorCisJIyBwIDw8PD0gMTMKKwkjIHJvbCAgJDEzLDxwPWludDMy
-IzEKKwkjIHJvbCAgJDEzLDxwPSVlYXgKKwlyb2wgICAgICAkMTMsJWVheAorCisJIyBwIF49IHgz
-CisJIyB4b3JsIDx4Mz1zdGFjazMyIzEzLDxwPWludDMyIzEKKwkjIHhvcmwgPHgzPTExMiglZXNw
-KSw8cD0lZWF4CisJeG9ybCAgICAxMTIoJWVzcCksJWVheAorCisJIyAJCQkJdCA8PDw9IDEzCisJ
-IyByb2wgICQxMyw8dD1pbnQzMiMzCisJIyByb2wgICQxMyw8dD0lZWR4CisJcm9sICAgICAgJDEz
-LCVlZHgKKworCSMgCQkJCXQgXj0geDkKKwkjIHhvcmwgPHg5PXN0YWNrMzIjMTksPHQ9aW50MzIj
-MworCSMgeG9ybCA8eDk9MTM2KCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEzNiglZXNwKSwlZWR4
-CisKKwkjIAkJciArPSBzCisJIyBhZGQgIDxzPWludDMyIzIsPHI9aW50MzIjNQorCSMgYWRkICA8
-cz0lZWN4LDxyPSVlc2kKKwlhZGQgICAgICAlZWN4LCVlc2kKKworCSMgCQlyIDw8PD0gMTMKKwkj
-IHJvbCAgJDEzLDxyPWludDMyIzUKKwkjIHJvbCAgJDEzLDxyPSVlc2kKKwlyb2wgICAgICAkMTMs
-JWVzaQorCisJIyAJCXIgXj0geDQKKwkjIHhvcmwgPHg0PXN0YWNrMzIjMTQsPHI9aW50MzIjNQor
-CSMgeG9ybCA8eDQ9MTE2KCVlc3ApLDxyPSVlc2kKKwl4b3JsICAgIDExNiglZXNwKSwlZXNpCisK
-KwkjIAkJCQkJCXYgKz0gdworCSMgYWRkICA8dz1pbnQzMiM0LDx2PWludDMyIzYKKwkjIGFkZCAg
-PHc9JWVieCw8dj0lZWRpCisJYWRkICAgICAgJWVieCwlZWRpCisKKwkjIAkJCQkJCXYgPDw8PSAx
-MworCSMgcm9sICAkMTMsPHY9aW50MzIjNgorCSMgcm9sICAkMTMsPHY9JWVkaQorCXJvbCAgICAg
-ICQxMywlZWRpCisKKwkjIAkJCQkJCXYgXj0geDE0CisJIyB4b3JsIDx4MTQ9c3RhY2szMiMyNCw8
-dj1pbnQzMiM2CisJIyB4b3JsIDx4MTQ9MTU2KCVlc3ApLDx2PSVlZGkKKwl4b3JsICAgIDE1Nigl
-ZXNwKSwlZWRpCisKKwkjIHgzID0gcAorCSMgbW92bCA8cD1pbnQzMiMxLD54Mz1zdGFjazMyIzEz
-CisJIyBtb3ZsIDxwPSVlYXgsPngzPTExMiglZXNwKQorCW1vdmwgICAgJWVheCwxMTIoJWVzcCkK
-KworCSMgCQkJCXg5ID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54OT1zdGFjazMyIzE5CisJIyBt
-b3ZsIDx0PSVlZHgsPng5PTEzNiglZXNwKQorCW1vdmwgICAgJWVkeCwxMzYoJWVzcCkKKworCSMg
-cCArPSB4MgorCSMgYWRkbCA8eDI9c3RhY2szMiMxMiw8cD1pbnQzMiMxCisJIyBhZGRsIDx4Mj0x
-MDgoJWVzcCksPHA9JWVheAorCWFkZGwgICAgMTA4KCVlc3ApLCVlYXgKKworCSMgCQl4NCA9IHIK
-KwkjIG1vdmwgPHI9aW50MzIjNSw+eDQ9c3RhY2szMiMxNAorCSMgbW92bCA8cj0lZXNpLD54ND0x
-MTYoJWVzcCkKKwltb3ZsICAgICVlc2ksMTE2KCVlc3ApCisKKwkjIAkJCQl0ICs9IHg4CisJIyBh
-ZGRsIDx4OD1zdGFjazMyIzE4LDx0PWludDMyIzMKKwkjIGFkZGwgPHg4PTEzMiglZXNwKSw8dD0l
-ZWR4CisJYWRkbCAgICAxMzIoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MTQgPSB2CisJIyBtb3Zs
-IDx2PWludDMyIzYsPngxND1zdGFjazMyIzI0CisJIyBtb3ZsIDx2PSVlZGksPngxND0xNTYoJWVz
-cCkKKwltb3ZsICAgICVlZGksMTU2KCVlc3ApCisKKwkjIHAgPDw8PSAxOAorCSMgcm9sICAkMTgs
-PHA9aW50MzIjMQorCSMgcm9sICAkMTgsPHA9JWVheAorCXJvbCAgICAgICQxOCwlZWF4CisKKwkj
-IHAgXj0geDAKKwkjIHhvcmwgPHgwPXN0YWNrMzIjMTAsPHA9aW50MzIjMQorCSMgeG9ybCA8eDA9
-MTAwKCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDEwMCglZXNwKSwlZWF4CisKKwkjIAkJCQl0IDw8
-PD0gMTgKKwkjIHJvbCAgJDE4LDx0PWludDMyIzMKKwkjIHJvbCAgJDE4LDx0PSVlZHgKKwlyb2wg
-ICAgICAkMTgsJWVkeAorCisJIyAJCQkJdCBePSB4MTAKKwkjIHhvcmwgPHgxMD1zdGFjazMyIzIw
-LDx0PWludDMyIzMKKwkjIHhvcmwgPHgxMD0xNDAoJWVzcCksPHQ9JWVkeAorCXhvcmwgICAgMTQw
-KCVlc3ApLCVlZHgKKworCSMgCQlzICs9IHIKKwkjIGFkZCAgPHI9aW50MzIjNSw8cz1pbnQzMiMy
-CisJIyBhZGQgIDxyPSVlc2ksPHM9JWVjeAorCWFkZCAgICAgICVlc2ksJWVjeAorCisJIyAJCXMg
-PDw8PSAxOAorCSMgcm9sICAkMTgsPHM9aW50MzIjMgorCSMgcm9sICAkMTgsPHM9JWVjeAorCXJv
-bCAgICAgICQxOCwlZWN4CisKKwkjIAkJcyBePSB4NQorCSMgeG9ybCA8eDU9c3RhY2szMiMxNSw8
-cz1pbnQzMiMyCisJIyB4b3JsIDx4NT0xMjAoJWVzcCksPHM9JWVjeAorCXhvcmwgICAgMTIwKCVl
-c3ApLCVlY3gKKworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMyIzYsPHc9aW50MzIj
-NAorCSMgYWRkICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVlYngKKworCSMgCQkJ
-CQkJdyA8PDw9IDE4CisJIyByb2wgICQxOCw8dz1pbnQzMiM0CisJIyByb2wgICQxOCw8dz0lZWJ4
-CisJcm9sICAgICAgJDE4LCVlYngKKworCSMgCQkJCQkJdyBePSB4MTUKKwkjIHhvcmwgPHgxNT1z
-dGFjazMyIzI1LDx3PWludDMyIzQKKwkjIHhvcmwgPHgxNT0xNjAoJWVzcCksPHc9JWVieAorCXhv
-cmwgICAgMTYwKCVlc3ApLCVlYngKKworCSMgeDAgPSBwCisJIyBtb3ZsIDxwPWludDMyIzEsPngw
-PXN0YWNrMzIjMTAKKwkjIG1vdmwgPHA9JWVheCw+eDA9MTAwKCVlc3ApCisJbW92bCAgICAlZWF4
-LDEwMCglZXNwKQorCisJIyAJCQkJeDEwID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54MTA9c3Rh
-Y2szMiMyMAorCSMgbW92bCA8dD0lZWR4LD54MTA9MTQwKCVlc3ApCisJbW92bCAgICAlZWR4LDE0
-MCglZXNwKQorCisJIyBwICs9IHgxMgorCSMgYWRkbCA8eDEyPXN0YWNrMzIjMjIsPHA9aW50MzIj
-MQorCSMgYWRkbCA8eDEyPTE0OCglZXNwKSw8cD0lZWF4CisJYWRkbCAgICAxNDgoJWVzcCksJWVh
-eAorCisJIyAJCXg1ID0gcworCSMgbW92bCA8cz1pbnQzMiMyLD54NT1zdGFjazMyIzE1CisJIyBt
-b3ZsIDxzPSVlY3gsPng1PTEyMCglZXNwKQorCW1vdmwgICAgJWVjeCwxMjAoJWVzcCkKKworCSMg
-CQkJCXQgKz0geDYKKwkjIGFkZGwgPHg2PXN0YWNrMzIjMTYsPHQ9aW50MzIjMworCSMgYWRkbCA8
-eDY9MTI0KCVlc3ApLDx0PSVlZHgKKwlhZGRsICAgIDEyNCglZXNwKSwlZWR4CisKKwkjIAkJCQkJ
-CXgxNSA9IHcKKwkjIG1vdmwgPHc9aW50MzIjNCw+eDE1PXN0YWNrMzIjMjUKKwkjIG1vdmwgPHc9
-JWVieCw+eDE1PTE2MCglZXNwKQorCW1vdmwgICAgJWVieCwxNjAoJWVzcCkKKworCSMgCQlyID0g
-eDEKKwkjIG1vdmwgPHgxPXN0YWNrMzIjMTEsPnI9aW50MzIjNQorCSMgbW92bCA8eDE9MTA0KCVl
-c3ApLD5yPSVlc2kKKwltb3ZsICAgIDEwNCglZXNwKSwlZXNpCisKKwkjIAkJciArPSBzCisJIyBh
-ZGQgIDxzPWludDMyIzIsPHI9aW50MzIjNQorCSMgYWRkICA8cz0lZWN4LDxyPSVlc2kKKwlhZGQg
-ICAgICAlZWN4LCVlc2kKKworCSMgCQkJCQkJdiA9IHgxMQorCSMgbW92bCA8eDExPXN0YWNrMzIj
-MjEsPnY9aW50MzIjNgorCSMgbW92bCA8eDExPTE0NCglZXNwKSw+dj0lZWRpCisJbW92bCAgICAx
-NDQoJWVzcCksJWVkaQorCisJIyAJCQkJCQl2ICs9IHcKKwkjIGFkZCAgPHc9aW50MzIjNCw8dj1p
-bnQzMiM2CisJIyBhZGQgIDx3PSVlYngsPHY9JWVkaQorCWFkZCAgICAgICVlYngsJWVkaQorCisJ
-IyBwIDw8PD0gNworCSMgcm9sICAkNyw8cD1pbnQzMiMxCisJIyByb2wgICQ3LDxwPSVlYXgKKwly
-b2wgICAgICAkNywlZWF4CisKKwkjIHAgXj0geDQKKwkjIHhvcmwgPHg0PXN0YWNrMzIjMTQsPHA9
-aW50MzIjMQorCSMgeG9ybCA8eDQ9MTE2KCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDExNiglZXNw
-KSwlZWF4CisKKwkjIAkJCQl0IDw8PD0gNworCSMgcm9sICAkNyw8dD1pbnQzMiMzCisJIyByb2wg
-ICQ3LDx0PSVlZHgKKwlyb2wgICAgICAkNywlZWR4CisKKwkjIAkJCQl0IF49IHgxNAorCSMgeG9y
-bCA8eDE0PXN0YWNrMzIjMjQsPHQ9aW50MzIjMworCSMgeG9ybCA8eDE0PTE1NiglZXNwKSw8dD0l
-ZWR4CisJeG9ybCAgICAxNTYoJWVzcCksJWVkeAorCisJIyAJCXIgPDw8PSA3CisJIyByb2wgICQ3
-LDxyPWludDMyIzUKKwkjIHJvbCAgJDcsPHI9JWVzaQorCXJvbCAgICAgICQ3LCVlc2kKKworCSMg
-CQlyIF49IHg5CisJIyB4b3JsIDx4OT1zdGFjazMyIzE5LDxyPWludDMyIzUKKwkjIHhvcmwgPHg5
-PTEzNiglZXNwKSw8cj0lZXNpCisJeG9ybCAgICAxMzYoJWVzcCksJWVzaQorCisJIyAJCQkJCQl2
-IDw8PD0gNworCSMgcm9sICAkNyw8dj1pbnQzMiM2CisJIyByb2wgICQ3LDx2PSVlZGkKKwlyb2wg
-ICAgICAkNywlZWRpCisKKwkjIAkJCQkJCXYgXj0geDMKKwkjIHhvcmwgPHgzPXN0YWNrMzIjMTMs
-PHY9aW50MzIjNgorCSMgeG9ybCA8eDM9MTEyKCVlc3ApLDx2PSVlZGkKKwl4b3JsICAgIDExMigl
-ZXNwKSwlZWRpCisKKwkjIHg0ID0gcAorCSMgbW92bCA8cD1pbnQzMiMxLD54ND1zdGFjazMyIzE0
-CisJIyBtb3ZsIDxwPSVlYXgsPng0PTExNiglZXNwKQorCW1vdmwgICAgJWVheCwxMTYoJWVzcCkK
-KworCSMgCQkJCXgxNCA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDE0PXN0YWNrMzIjMjQKKwkj
-IG1vdmwgPHQ9JWVkeCw+eDE0PTE1NiglZXNwKQorCW1vdmwgICAgJWVkeCwxNTYoJWVzcCkKKwor
-CSMgcCArPSB4MAorCSMgYWRkbCA8eDA9c3RhY2szMiMxMCw8cD1pbnQzMiMxCisJIyBhZGRsIDx4
-MD0xMDAoJWVzcCksPHA9JWVheAorCWFkZGwgICAgMTAwKCVlc3ApLCVlYXgKKworCSMgCQl4OSA9
-IHIKKwkjIG1vdmwgPHI9aW50MzIjNSw+eDk9c3RhY2szMiMxOQorCSMgbW92bCA8cj0lZXNpLD54
-OT0xMzYoJWVzcCkKKwltb3ZsICAgICVlc2ksMTM2KCVlc3ApCisKKwkjIAkJCQl0ICs9IHgxMAor
-CSMgYWRkbCA8eDEwPXN0YWNrMzIjMjAsPHQ9aW50MzIjMworCSMgYWRkbCA8eDEwPTE0MCglZXNw
-KSw8dD0lZWR4CisJYWRkbCAgICAxNDAoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MyA9IHYKKwkj
-IG1vdmwgPHY9aW50MzIjNiw+eDM9c3RhY2szMiMxMworCSMgbW92bCA8dj0lZWRpLD54Mz0xMTIo
-JWVzcCkKKwltb3ZsICAgICVlZGksMTEyKCVlc3ApCisKKwkjIHAgPDw8PSA5CisJIyByb2wgICQ5
-LDxwPWludDMyIzEKKwkjIHJvbCAgJDksPHA9JWVheAorCXJvbCAgICAgICQ5LCVlYXgKKworCSMg
-cCBePSB4OAorCSMgeG9ybCA8eDg9c3RhY2szMiMxOCw8cD1pbnQzMiMxCisJIyB4b3JsIDx4OD0x
-MzIoJWVzcCksPHA9JWVheAorCXhvcmwgICAgMTMyKCVlc3ApLCVlYXgKKworCSMgCQkJCXQgPDw8
-PSA5CisJIyByb2wgICQ5LDx0PWludDMyIzMKKwkjIHJvbCAgJDksPHQ9JWVkeAorCXJvbCAgICAg
-ICQ5LCVlZHgKKworCSMgCQkJCXQgXj0geDIKKwkjIHhvcmwgPHgyPXN0YWNrMzIjMTIsPHQ9aW50
-MzIjMworCSMgeG9ybCA8eDI9MTA4KCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEwOCglZXNwKSwl
-ZWR4CisKKwkjIAkJcyArPSByCisJIyBhZGQgIDxyPWludDMyIzUsPHM9aW50MzIjMgorCSMgYWRk
-ICA8cj0lZXNpLDxzPSVlY3gKKwlhZGQgICAgICAlZXNpLCVlY3gKKworCSMgCQlzIDw8PD0gOQor
-CSMgcm9sICAkOSw8cz1pbnQzMiMyCisJIyByb2wgICQ5LDxzPSVlY3gKKwlyb2wgICAgICAkOSwl
-ZWN4CisKKwkjIAkJcyBePSB4MTMKKwkjIHhvcmwgPHgxMz1zdGFjazMyIzIzLDxzPWludDMyIzIK
-KwkjIHhvcmwgPHgxMz0xNTIoJWVzcCksPHM9JWVjeAorCXhvcmwgICAgMTUyKCVlc3ApLCVlY3gK
-KworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMyIzYsPHc9aW50MzIjNAorCSMgYWRk
-ICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVlYngKKworCSMgCQkJCQkJdyA8PDw9
-IDkKKwkjIHJvbCAgJDksPHc9aW50MzIjNAorCSMgcm9sICAkOSw8dz0lZWJ4CisJcm9sICAgICAg
-JDksJWVieAorCisJIyAJCQkJCQl3IF49IHg3CisJIyB4b3JsIDx4Nz1zdGFjazMyIzE3LDx3PWlu
-dDMyIzQKKwkjIHhvcmwgPHg3PTEyOCglZXNwKSw8dz0lZWJ4CisJeG9ybCAgICAxMjgoJWVzcCks
-JWVieAorCisJIyB4OCA9IHAKKwkjIG1vdmwgPHA9aW50MzIjMSw+eDg9c3RhY2szMiMxOAorCSMg
-bW92bCA8cD0lZWF4LD54OD0xMzIoJWVzcCkKKwltb3ZsICAgICVlYXgsMTMyKCVlc3ApCisKKwkj
-IAkJCQl4MiA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDI9c3RhY2szMiMxMgorCSMgbW92bCA8
-dD0lZWR4LD54Mj0xMDgoJWVzcCkKKwltb3ZsICAgICVlZHgsMTA4KCVlc3ApCisKKwkjIHAgKz0g
-eDQKKwkjIGFkZGwgPHg0PXN0YWNrMzIjMTQsPHA9aW50MzIjMQorCSMgYWRkbCA8eDQ9MTE2KCVl
-c3ApLDxwPSVlYXgKKwlhZGRsICAgIDExNiglZXNwKSwlZWF4CisKKwkjIAkJeDEzID0gcworCSMg
-bW92bCA8cz1pbnQzMiMyLD54MTM9c3RhY2szMiMyMworCSMgbW92bCA8cz0lZWN4LD54MTM9MTUy
-KCVlc3ApCisJbW92bCAgICAlZWN4LDE1MiglZXNwKQorCisJIyAJCQkJdCArPSB4MTQKKwkjIGFk
-ZGwgPHgxND1zdGFjazMyIzI0LDx0PWludDMyIzMKKwkjIGFkZGwgPHgxND0xNTYoJWVzcCksPHQ9
-JWVkeAorCWFkZGwgICAgMTU2KCVlc3ApLCVlZHgKKworCSMgCQkJCQkJeDcgPSB3CisJIyBtb3Zs
-IDx3PWludDMyIzQsPng3PXN0YWNrMzIjMTcKKwkjIG1vdmwgPHc9JWVieCw+eDc9MTI4KCVlc3Ap
-CisJbW92bCAgICAlZWJ4LDEyOCglZXNwKQorCisJIyBwIDw8PD0gMTMKKwkjIHJvbCAgJDEzLDxw
-PWludDMyIzEKKwkjIHJvbCAgJDEzLDxwPSVlYXgKKwlyb2wgICAgICAkMTMsJWVheAorCisJIyBw
-IF49IHgxMgorCSMgeG9ybCA8eDEyPXN0YWNrMzIjMjIsPHA9aW50MzIjMQorCSMgeG9ybCA8eDEy
-PTE0OCglZXNwKSw8cD0lZWF4CisJeG9ybCAgICAxNDgoJWVzcCksJWVheAorCisJIyAJCQkJdCA8
-PDw9IDEzCisJIyByb2wgICQxMyw8dD1pbnQzMiMzCisJIyByb2wgICQxMyw8dD0lZWR4CisJcm9s
-ICAgICAgJDEzLCVlZHgKKworCSMgCQkJCXQgXj0geDYKKwkjIHhvcmwgPHg2PXN0YWNrMzIjMTYs
-PHQ9aW50MzIjMworCSMgeG9ybCA8eDY9MTI0KCVlc3ApLDx0PSVlZHgKKwl4b3JsICAgIDEyNCgl
-ZXNwKSwlZWR4CisKKwkjIAkJciArPSBzCisJIyBhZGQgIDxzPWludDMyIzIsPHI9aW50MzIjNQor
-CSMgYWRkICA8cz0lZWN4LDxyPSVlc2kKKwlhZGQgICAgICAlZWN4LCVlc2kKKworCSMgCQlyIDw8
-PD0gMTMKKwkjIHJvbCAgJDEzLDxyPWludDMyIzUKKwkjIHJvbCAgJDEzLDxyPSVlc2kKKwlyb2wg
-ICAgICAkMTMsJWVzaQorCisJIyAJCXIgXj0geDEKKwkjIHhvcmwgPHgxPXN0YWNrMzIjMTEsPHI9
-aW50MzIjNQorCSMgeG9ybCA8eDE9MTA0KCVlc3ApLDxyPSVlc2kKKwl4b3JsICAgIDEwNCglZXNw
-KSwlZXNpCisKKwkjIAkJCQkJCXYgKz0gdworCSMgYWRkICA8dz1pbnQzMiM0LDx2PWludDMyIzYK
-KwkjIGFkZCAgPHc9JWVieCw8dj0lZWRpCisJYWRkICAgICAgJWVieCwlZWRpCisKKwkjIAkJCQkJ
-CXYgPDw8PSAxMworCSMgcm9sICAkMTMsPHY9aW50MzIjNgorCSMgcm9sICAkMTMsPHY9JWVkaQor
-CXJvbCAgICAgICQxMywlZWRpCisKKwkjIAkJCQkJCXYgXj0geDExCisJIyB4b3JsIDx4MTE9c3Rh
-Y2szMiMyMSw8dj1pbnQzMiM2CisJIyB4b3JsIDx4MTE9MTQ0KCVlc3ApLDx2PSVlZGkKKwl4b3Js
-ICAgIDE0NCglZXNwKSwlZWRpCisKKwkjIHgxMiA9IHAKKwkjIG1vdmwgPHA9aW50MzIjMSw+eDEy
-PXN0YWNrMzIjMjIKKwkjIG1vdmwgPHA9JWVheCw+eDEyPTE0OCglZXNwKQorCW1vdmwgICAgJWVh
-eCwxNDgoJWVzcCkKKworCSMgCQkJCXg2ID0gdAorCSMgbW92bCA8dD1pbnQzMiMzLD54Nj1zdGFj
-azMyIzE2CisJIyBtb3ZsIDx0PSVlZHgsPng2PTEyNCglZXNwKQorCW1vdmwgICAgJWVkeCwxMjQo
-JWVzcCkKKworCSMgcCArPSB4OAorCSMgYWRkbCA8eDg9c3RhY2szMiMxOCw8cD1pbnQzMiMxCisJ
-IyBhZGRsIDx4OD0xMzIoJWVzcCksPHA9JWVheAorCWFkZGwgICAgMTMyKCVlc3ApLCVlYXgKKwor
-CSMgCQl4MSA9IHIKKwkjIG1vdmwgPHI9aW50MzIjNSw+eDE9c3RhY2szMiMxMQorCSMgbW92bCA8
-cj0lZXNpLD54MT0xMDQoJWVzcCkKKwltb3ZsICAgICVlc2ksMTA0KCVlc3ApCisKKwkjIAkJCQl0
-ICs9IHgyCisJIyBhZGRsIDx4Mj1zdGFjazMyIzEyLDx0PWludDMyIzMKKwkjIGFkZGwgPHgyPTEw
-OCglZXNwKSw8dD0lZWR4CisJYWRkbCAgICAxMDgoJWVzcCksJWVkeAorCisJIyAJCQkJCQl4MTEg
-PSB2CisJIyBtb3ZsIDx2PWludDMyIzYsPngxMT1zdGFjazMyIzIxCisJIyBtb3ZsIDx2PSVlZGks
-PngxMT0xNDQoJWVzcCkKKwltb3ZsICAgICVlZGksMTQ0KCVlc3ApCisKKwkjIHAgPDw8PSAxOAor
-CSMgcm9sICAkMTgsPHA9aW50MzIjMQorCSMgcm9sICAkMTgsPHA9JWVheAorCXJvbCAgICAgICQx
-OCwlZWF4CisKKwkjIHAgXj0geDAKKwkjIHhvcmwgPHgwPXN0YWNrMzIjMTAsPHA9aW50MzIjMQor
-CSMgeG9ybCA8eDA9MTAwKCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDEwMCglZXNwKSwlZWF4CisK
-KwkjIAkJCQl0IDw8PD0gMTgKKwkjIHJvbCAgJDE4LDx0PWludDMyIzMKKwkjIHJvbCAgJDE4LDx0
-PSVlZHgKKwlyb2wgICAgICAkMTgsJWVkeAorCisJIyAJCQkJdCBePSB4MTAKKwkjIHhvcmwgPHgx
-MD1zdGFjazMyIzIwLDx0PWludDMyIzMKKwkjIHhvcmwgPHgxMD0xNDAoJWVzcCksPHQ9JWVkeAor
-CXhvcmwgICAgMTQwKCVlc3ApLCVlZHgKKworCSMgCQlzICs9IHIKKwkjIGFkZCAgPHI9aW50MzIj
-NSw8cz1pbnQzMiMyCisJIyBhZGQgIDxyPSVlc2ksPHM9JWVjeAorCWFkZCAgICAgICVlc2ksJWVj
-eAorCisJIyAJCXMgPDw8PSAxOAorCSMgcm9sICAkMTgsPHM9aW50MzIjMgorCSMgcm9sICAkMTgs
-PHM9JWVjeAorCXJvbCAgICAgICQxOCwlZWN4CisKKwkjIAkJcyBePSB4NQorCSMgeG9ybCA8eDU9
-c3RhY2szMiMxNSw8cz1pbnQzMiMyCisJIyB4b3JsIDx4NT0xMjAoJWVzcCksPHM9JWVjeAorCXhv
-cmwgICAgMTIwKCVlc3ApLCVlY3gKKworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMy
-IzYsPHc9aW50MzIjNAorCSMgYWRkICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVl
-YngKKworCSMgCQkJCQkJdyA8PDw9IDE4CisJIyByb2wgICQxOCw8dz1pbnQzMiM0CisJIyByb2wg
-ICQxOCw8dz0lZWJ4CisJcm9sICAgICAgJDE4LCVlYngKKworCSMgCQkJCQkJdyBePSB4MTUKKwkj
-IHhvcmwgPHgxNT1zdGFjazMyIzI1LDx3PWludDMyIzQKKwkjIHhvcmwgPHgxNT0xNjAoJWVzcCks
-PHc9JWVieAorCXhvcmwgICAgMTYwKCVlc3ApLCVlYngKKworCSMgeDAgPSBwCisJIyBtb3ZsIDxw
-PWludDMyIzEsPngwPXN0YWNrMzIjMTAKKwkjIG1vdmwgPHA9JWVheCw+eDA9MTAwKCVlc3ApCisJ
-bW92bCAgICAlZWF4LDEwMCglZXNwKQorCisJIyAJCQkJeDEwID0gdAorCSMgbW92bCA8dD1pbnQz
-MiMzLD54MTA9c3RhY2szMiMyMAorCSMgbW92bCA8dD0lZWR4LD54MTA9MTQwKCVlc3ApCisJbW92
-bCAgICAlZWR4LDE0MCglZXNwKQorCisJIyBwICs9IHgzCisJIyBhZGRsIDx4Mz1zdGFjazMyIzEz
-LDxwPWludDMyIzEKKwkjIGFkZGwgPHgzPTExMiglZXNwKSw8cD0lZWF4CisJYWRkbCAgICAxMTIo
-JWVzcCksJWVheAorCisJIyBwIDw8PD0gNworCSMgcm9sICAkNyw8cD1pbnQzMiMxCisJIyByb2wg
-ICQ3LDxwPSVlYXgKKwlyb2wgICAgICAkNywlZWF4CisKKwkjIAkJeDUgPSBzCisJIyBtb3ZsIDxz
-PWludDMyIzIsPng1PXN0YWNrMzIjMTUKKwkjIG1vdmwgPHM9JWVjeCw+eDU9MTIwKCVlc3ApCisJ
-bW92bCAgICAlZWN4LDEyMCglZXNwKQorCisJIyAJCQkJdCArPSB4OQorCSMgYWRkbCA8eDk9c3Rh
-Y2szMiMxOSw8dD1pbnQzMiMzCisJIyBhZGRsIDx4OT0xMzYoJWVzcCksPHQ9JWVkeAorCWFkZGwg
-ICAgMTM2KCVlc3ApLCVlZHgKKworCSMgCQkJCQkJeDE1ID0gdworCSMgbW92bCA8dz1pbnQzMiM0
-LD54MTU9c3RhY2szMiMyNQorCSMgbW92bCA8dz0lZWJ4LD54MTU9MTYwKCVlc3ApCisJbW92bCAg
-ICAlZWJ4LDE2MCglZXNwKQorCisJIyAJCXIgPSB4NAorCSMgbW92bCA8eDQ9c3RhY2szMiMxNCw+
-cj1pbnQzMiM1CisJIyBtb3ZsIDx4ND0xMTYoJWVzcCksPnI9JWVzaQorCW1vdmwgICAgMTE2KCVl
-c3ApLCVlc2kKKworCSMgCQlyICs9IHMKKwkjIGFkZCAgPHM9aW50MzIjMiw8cj1pbnQzMiM1CisJ
-IyBhZGQgIDxzPSVlY3gsPHI9JWVzaQorCWFkZCAgICAgICVlY3gsJWVzaQorCisJIyAJCQkJCQl2
-ID0geDE0CisJIyBtb3ZsIDx4MTQ9c3RhY2szMiMyNCw+dj1pbnQzMiM2CisJIyBtb3ZsIDx4MTQ9
-MTU2KCVlc3ApLD52PSVlZGkKKwltb3ZsICAgIDE1NiglZXNwKSwlZWRpCisKKwkjIAkJCQkJCXYg
-Kz0gdworCSMgYWRkICA8dz1pbnQzMiM0LDx2PWludDMyIzYKKwkjIGFkZCAgPHc9JWVieCw8dj0l
-ZWRpCisJYWRkICAgICAgJWVieCwlZWRpCisKKwkjIHAgXj0geDEKKwkjIHhvcmwgPHgxPXN0YWNr
-MzIjMTEsPHA9aW50MzIjMQorCSMgeG9ybCA8eDE9MTA0KCVlc3ApLDxwPSVlYXgKKwl4b3JsICAg
-IDEwNCglZXNwKSwlZWF4CisKKwkjIAkJCQl0IDw8PD0gNworCSMgcm9sICAkNyw8dD1pbnQzMiMz
-CisJIyByb2wgICQ3LDx0PSVlZHgKKwlyb2wgICAgICAkNywlZWR4CisKKwkjIAkJCQl0IF49IHgx
-MQorCSMgeG9ybCA8eDExPXN0YWNrMzIjMjEsPHQ9aW50MzIjMworCSMgeG9ybCA8eDExPTE0NCgl
-ZXNwKSw8dD0lZWR4CisJeG9ybCAgICAxNDQoJWVzcCksJWVkeAorCisJIyAJCXIgPDw8PSA3CisJ
-IyByb2wgICQ3LDxyPWludDMyIzUKKwkjIHJvbCAgJDcsPHI9JWVzaQorCXJvbCAgICAgICQ3LCVl
-c2kKKworCSMgCQlyIF49IHg2CisJIyB4b3JsIDx4Nj1zdGFjazMyIzE2LDxyPWludDMyIzUKKwkj
-IHhvcmwgPHg2PTEyNCglZXNwKSw8cj0lZXNpCisJeG9ybCAgICAxMjQoJWVzcCksJWVzaQorCisJ
-IyAJCQkJCQl2IDw8PD0gNworCSMgcm9sICAkNyw8dj1pbnQzMiM2CisJIyByb2wgICQ3LDx2PSVl
-ZGkKKwlyb2wgICAgICAkNywlZWRpCisKKwkjIAkJCQkJCXYgXj0geDEyCisJIyB4b3JsIDx4MTI9
-c3RhY2szMiMyMiw8dj1pbnQzMiM2CisJIyB4b3JsIDx4MTI9MTQ4KCVlc3ApLDx2PSVlZGkKKwl4
-b3JsICAgIDE0OCglZXNwKSwlZWRpCisKKwkjIHgxID0gcAorCSMgbW92bCA8cD1pbnQzMiMxLD54
-MT1zdGFjazMyIzExCisJIyBtb3ZsIDxwPSVlYXgsPngxPTEwNCglZXNwKQorCW1vdmwgICAgJWVh
-eCwxMDQoJWVzcCkKKworCSMgCQkJCXgxMSA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDExPXN0
-YWNrMzIjMjEKKwkjIG1vdmwgPHQ9JWVkeCw+eDExPTE0NCglZXNwKQorCW1vdmwgICAgJWVkeCwx
-NDQoJWVzcCkKKworCSMgcCArPSB4MAorCSMgYWRkbCA8eDA9c3RhY2szMiMxMCw8cD1pbnQzMiMx
-CisJIyBhZGRsIDx4MD0xMDAoJWVzcCksPHA9JWVheAorCWFkZGwgICAgMTAwKCVlc3ApLCVlYXgK
-KworCSMgCQl4NiA9IHIKKwkjIG1vdmwgPHI9aW50MzIjNSw+eDY9c3RhY2szMiMxNgorCSMgbW92
-bCA8cj0lZXNpLD54Nj0xMjQoJWVzcCkKKwltb3ZsICAgICVlc2ksMTI0KCVlc3ApCisKKwkjIAkJ
-CQl0ICs9IHgxMAorCSMgYWRkbCA8eDEwPXN0YWNrMzIjMjAsPHQ9aW50MzIjMworCSMgYWRkbCA8
-eDEwPTE0MCglZXNwKSw8dD0lZWR4CisJYWRkbCAgICAxNDAoJWVzcCksJWVkeAorCisJIyAJCQkJ
-CQl4MTIgPSB2CisJIyBtb3ZsIDx2PWludDMyIzYsPngxMj1zdGFjazMyIzIyCisJIyBtb3ZsIDx2
-PSVlZGksPngxMj0xNDgoJWVzcCkKKwltb3ZsICAgICVlZGksMTQ4KCVlc3ApCisKKwkjIHAgPDw8
-PSA5CisJIyByb2wgICQ5LDxwPWludDMyIzEKKwkjIHJvbCAgJDksPHA9JWVheAorCXJvbCAgICAg
-ICQ5LCVlYXgKKworCSMgcCBePSB4MgorCSMgeG9ybCA8eDI9c3RhY2szMiMxMiw8cD1pbnQzMiMx
-CisJIyB4b3JsIDx4Mj0xMDgoJWVzcCksPHA9JWVheAorCXhvcmwgICAgMTA4KCVlc3ApLCVlYXgK
-KworCSMgCQkJCXQgPDw8PSA5CisJIyByb2wgICQ5LDx0PWludDMyIzMKKwkjIHJvbCAgJDksPHQ9
-JWVkeAorCXJvbCAgICAgICQ5LCVlZHgKKworCSMgCQkJCXQgXj0geDgKKwkjIHhvcmwgPHg4PXN0
-YWNrMzIjMTgsPHQ9aW50MzIjMworCSMgeG9ybCA8eDg9MTMyKCVlc3ApLDx0PSVlZHgKKwl4b3Js
-ICAgIDEzMiglZXNwKSwlZWR4CisKKwkjIAkJcyArPSByCisJIyBhZGQgIDxyPWludDMyIzUsPHM9
-aW50MzIjMgorCSMgYWRkICA8cj0lZXNpLDxzPSVlY3gKKwlhZGQgICAgICAlZXNpLCVlY3gKKwor
-CSMgCQlzIDw8PD0gOQorCSMgcm9sICAkOSw8cz1pbnQzMiMyCisJIyByb2wgICQ5LDxzPSVlY3gK
-Kwlyb2wgICAgICAkOSwlZWN4CisKKwkjIAkJcyBePSB4NworCSMgeG9ybCA8eDc9c3RhY2szMiMx
-Nyw8cz1pbnQzMiMyCisJIyB4b3JsIDx4Nz0xMjgoJWVzcCksPHM9JWVjeAorCXhvcmwgICAgMTI4
-KCVlc3ApLCVlY3gKKworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQgIDx2PWludDMyIzYsPHc9aW50
-MzIjNAorCSMgYWRkICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAgICAlZWRpLCVlYngKKworCSMg
-CQkJCQkJdyA8PDw9IDkKKwkjIHJvbCAgJDksPHc9aW50MzIjNAorCSMgcm9sICAkOSw8dz0lZWJ4
-CisJcm9sICAgICAgJDksJWVieAorCisJIyAJCQkJCQl3IF49IHgxMworCSMgeG9ybCA8eDEzPXN0
-YWNrMzIjMjMsPHc9aW50MzIjNAorCSMgeG9ybCA8eDEzPTE1MiglZXNwKSw8dz0lZWJ4CisJeG9y
-bCAgICAxNTIoJWVzcCksJWVieAorCisJIyB4MiA9IHAKKwkjIG1vdmwgPHA9aW50MzIjMSw+eDI9
-c3RhY2szMiMxMgorCSMgbW92bCA8cD0lZWF4LD54Mj0xMDgoJWVzcCkKKwltb3ZsICAgICVlYXgs
-MTA4KCVlc3ApCisKKwkjIAkJCQl4OCA9IHQKKwkjIG1vdmwgPHQ9aW50MzIjMyw+eDg9c3RhY2sz
-MiMxOAorCSMgbW92bCA8dD0lZWR4LD54OD0xMzIoJWVzcCkKKwltb3ZsICAgICVlZHgsMTMyKCVl
-c3ApCisKKwkjIHAgKz0geDEKKwkjIGFkZGwgPHgxPXN0YWNrMzIjMTEsPHA9aW50MzIjMQorCSMg
-YWRkbCA8eDE9MTA0KCVlc3ApLDxwPSVlYXgKKwlhZGRsICAgIDEwNCglZXNwKSwlZWF4CisKKwkj
-IAkJeDcgPSBzCisJIyBtb3ZsIDxzPWludDMyIzIsPng3PXN0YWNrMzIjMTcKKwkjIG1vdmwgPHM9
-JWVjeCw+eDc9MTI4KCVlc3ApCisJbW92bCAgICAlZWN4LDEyOCglZXNwKQorCisJIyAJCQkJdCAr
-PSB4MTEKKwkjIGFkZGwgPHgxMT1zdGFjazMyIzIxLDx0PWludDMyIzMKKwkjIGFkZGwgPHgxMT0x
-NDQoJWVzcCksPHQ9JWVkeAorCWFkZGwgICAgMTQ0KCVlc3ApLCVlZHgKKworCSMgCQkJCQkJeDEz
-ID0gdworCSMgbW92bCA8dz1pbnQzMiM0LD54MTM9c3RhY2szMiMyMworCSMgbW92bCA8dz0lZWJ4
-LD54MTM9MTUyKCVlc3ApCisJbW92bCAgICAlZWJ4LDE1MiglZXNwKQorCisJIyBwIDw8PD0gMTMK
-KwkjIHJvbCAgJDEzLDxwPWludDMyIzEKKwkjIHJvbCAgJDEzLDxwPSVlYXgKKwlyb2wgICAgICAk
-MTMsJWVheAorCisJIyBwIF49IHgzCisJIyB4b3JsIDx4Mz1zdGFjazMyIzEzLDxwPWludDMyIzEK
-KwkjIHhvcmwgPHgzPTExMiglZXNwKSw8cD0lZWF4CisJeG9ybCAgICAxMTIoJWVzcCksJWVheAor
-CisJIyAJCQkJdCA8PDw9IDEzCisJIyByb2wgICQxMyw8dD1pbnQzMiMzCisJIyByb2wgICQxMyw8
-dD0lZWR4CisJcm9sICAgICAgJDEzLCVlZHgKKworCSMgCQkJCXQgXj0geDkKKwkjIHhvcmwgPHg5
-PXN0YWNrMzIjMTksPHQ9aW50MzIjMworCSMgeG9ybCA8eDk9MTM2KCVlc3ApLDx0PSVlZHgKKwl4
-b3JsICAgIDEzNiglZXNwKSwlZWR4CisKKwkjIAkJciArPSBzCisJIyBhZGQgIDxzPWludDMyIzIs
-PHI9aW50MzIjNQorCSMgYWRkICA8cz0lZWN4LDxyPSVlc2kKKwlhZGQgICAgICAlZWN4LCVlc2kK
-KworCSMgCQlyIDw8PD0gMTMKKwkjIHJvbCAgJDEzLDxyPWludDMyIzUKKwkjIHJvbCAgJDEzLDxy
-PSVlc2kKKwlyb2wgICAgICAkMTMsJWVzaQorCisJIyAJCXIgXj0geDQKKwkjIHhvcmwgPHg0PXN0
-YWNrMzIjMTQsPHI9aW50MzIjNQorCSMgeG9ybCA8eDQ9MTE2KCVlc3ApLDxyPSVlc2kKKwl4b3Js
-ICAgIDExNiglZXNwKSwlZXNpCisKKwkjIAkJCQkJCXYgKz0gdworCSMgYWRkICA8dz1pbnQzMiM0
-LDx2PWludDMyIzYKKwkjIGFkZCAgPHc9JWVieCw8dj0lZWRpCisJYWRkICAgICAgJWVieCwlZWRp
-CisKKwkjIAkJCQkJCXYgPDw8PSAxMworCSMgcm9sICAkMTMsPHY9aW50MzIjNgorCSMgcm9sICAk
-MTMsPHY9JWVkaQorCXJvbCAgICAgICQxMywlZWRpCisKKwkjIAkJCQkJCXYgXj0geDE0CisJIyB4
-b3JsIDx4MTQ9c3RhY2szMiMyNCw8dj1pbnQzMiM2CisJIyB4b3JsIDx4MTQ9MTU2KCVlc3ApLDx2
-PSVlZGkKKwl4b3JsICAgIDE1NiglZXNwKSwlZWRpCisKKwkjIHgzID0gcAorCSMgbW92bCA8cD1p
-bnQzMiMxLD54Mz1zdGFjazMyIzEzCisJIyBtb3ZsIDxwPSVlYXgsPngzPTExMiglZXNwKQorCW1v
-dmwgICAgJWVheCwxMTIoJWVzcCkKKworCSMgCQkJCXg5ID0gdAorCSMgbW92bCA8dD1pbnQzMiMz
-LD54OT1zdGFjazMyIzE5CisJIyBtb3ZsIDx0PSVlZHgsPng5PTEzNiglZXNwKQorCW1vdmwgICAg
-JWVkeCwxMzYoJWVzcCkKKworCSMgcCArPSB4MgorCSMgYWRkbCA8eDI9c3RhY2szMiMxMiw8cD1p
-bnQzMiMxCisJIyBhZGRsIDx4Mj0xMDgoJWVzcCksPHA9JWVheAorCWFkZGwgICAgMTA4KCVlc3Ap
-LCVlYXgKKworCSMgCQl4NCA9IHIKKwkjIG1vdmwgPHI9aW50MzIjNSw+eDQ9c3RhY2szMiMxNAor
-CSMgbW92bCA8cj0lZXNpLD54ND0xMTYoJWVzcCkKKwltb3ZsICAgICVlc2ksMTE2KCVlc3ApCisK
-KwkjIAkJCQl0ICs9IHg4CisJIyBhZGRsIDx4OD1zdGFjazMyIzE4LDx0PWludDMyIzMKKwkjIGFk
-ZGwgPHg4PTEzMiglZXNwKSw8dD0lZWR4CisJYWRkbCAgICAxMzIoJWVzcCksJWVkeAorCisJIyAJ
-CQkJCQl4MTQgPSB2CisJIyBtb3ZsIDx2PWludDMyIzYsPngxND1zdGFjazMyIzI0CisJIyBtb3Zs
-IDx2PSVlZGksPngxND0xNTYoJWVzcCkKKwltb3ZsICAgICVlZGksMTU2KCVlc3ApCisKKwkjIHAg
-PDw8PSAxOAorCSMgcm9sICAkMTgsPHA9aW50MzIjMQorCSMgcm9sICAkMTgsPHA9JWVheAorCXJv
-bCAgICAgICQxOCwlZWF4CisKKwkjIHAgXj0geDAKKwkjIHhvcmwgPHgwPXN0YWNrMzIjMTAsPHA9
-aW50MzIjMQorCSMgeG9ybCA8eDA9MTAwKCVlc3ApLDxwPSVlYXgKKwl4b3JsICAgIDEwMCglZXNw
-KSwlZWF4CisKKwkjIAkJCQl0IDw8PD0gMTgKKwkjIHJvbCAgJDE4LDx0PWludDMyIzMKKwkjIHJv
-bCAgJDE4LDx0PSVlZHgKKwlyb2wgICAgICAkMTgsJWVkeAorCisJIyAJCQkJdCBePSB4MTAKKwkj
-IHhvcmwgPHgxMD1zdGFjazMyIzIwLDx0PWludDMyIzMKKwkjIHhvcmwgPHgxMD0xNDAoJWVzcCks
-PHQ9JWVkeAorCXhvcmwgICAgMTQwKCVlc3ApLCVlZHgKKworCSMgCQlzICs9IHIKKwkjIGFkZCAg
-PHI9aW50MzIjNSw8cz1pbnQzMiMyCisJIyBhZGQgIDxyPSVlc2ksPHM9JWVjeAorCWFkZCAgICAg
-ICVlc2ksJWVjeAorCisJIyAJCXMgPDw8PSAxOAorCSMgcm9sICAkMTgsPHM9aW50MzIjMgorCSMg
-cm9sICAkMTgsPHM9JWVjeAorCXJvbCAgICAgICQxOCwlZWN4CisKKwkjIAkJcyBePSB4NQorCSMg
-eG9ybCA8eDU9c3RhY2szMiMxNSw8cz1pbnQzMiMyCisJIyB4b3JsIDx4NT0xMjAoJWVzcCksPHM9
-JWVjeAorCXhvcmwgICAgMTIwKCVlc3ApLCVlY3gKKworCSMgCQkJCQkJdyArPSB2CisJIyBhZGQg
-IDx2PWludDMyIzYsPHc9aW50MzIjNAorCSMgYWRkICA8dj0lZWRpLDx3PSVlYngKKwlhZGQgICAg
-ICAlZWRpLCVlYngKKworCSMgCQkJCQkJdyA8PDw9IDE4CisJIyByb2wgICQxOCw8dz1pbnQzMiM0
-CisJIyByb2wgICQxOCw8dz0lZWJ4CisJcm9sICAgICAgJDE4LCVlYngKKworCSMgCQkJCQkJdyBe
-PSB4MTUKKwkjIHhvcmwgPHgxNT1zdGFjazMyIzI1LDx3PWludDMyIzQKKwkjIHhvcmwgPHgxNT0x
-NjAoJWVzcCksPHc9JWVieAorCXhvcmwgICAgMTYwKCVlc3ApLCVlYngKKworCSMgaSAtPSA0CisJ
-IyBzdWIgICQ0LDxpPWludDMyIzcKKwkjIHN1YiAgJDQsPGk9JWVicAorCXN1YiAgICAgICQ0LCVl
-YnAKKworCSMgZ290byBtYWlubG9vcCBpZiB1bnNpZ25lZCA+CisJamEgICAgICAuX21haW5sb29w
-CisKKwkjIHgwID0gcAorCSMgbW92bCA8cD1pbnQzMiMxLD54MD1zdGFjazMyIzEwCisJIyBtb3Zs
-IDxwPSVlYXgsPngwPTEwMCglZXNwKQorCW1vdmwgICAgJWVheCwxMDAoJWVzcCkKKworCSMgeDUg
-PSBzCisJIyBtb3ZsIDxzPWludDMyIzIsPng1PXN0YWNrMzIjMTUKKwkjIG1vdmwgPHM9JWVjeCw+
-eDU9MTIwKCVlc3ApCisJbW92bCAgICAlZWN4LDEyMCglZXNwKQorCisJIyB4MTAgPSB0CisJIyBt
-b3ZsIDx0PWludDMyIzMsPngxMD1zdGFjazMyIzIwCisJIyBtb3ZsIDx0PSVlZHgsPngxMD0xNDAo
-JWVzcCkKKwltb3ZsICAgICVlZHgsMTQwKCVlc3ApCisKKwkjIHgxNSA9IHcKKwkjIG1vdmwgPHc9
-aW50MzIjNCw+eDE1PXN0YWNrMzIjMjUKKwkjIG1vdmwgPHc9JWVieCw+eDE1PTE2MCglZXNwKQor
-CW1vdmwgICAgJWVieCwxNjAoJWVzcCkKKworCSMgICBvdXQgPSBvdXRfYmFja3VwCisJIyBtb3Zs
-IDxvdXRfYmFja3VwPXN0YWNrMzIjMyw+b3V0PWludDMyIzYKKwkjIG1vdmwgPG91dF9iYWNrdXA9
-NzIoJWVzcCksPm91dD0lZWRpCisJbW92bCAgICA3MiglZXNwKSwlZWRpCisKKwkjICAgbSA9IG1f
-YmFja3VwCisJIyBtb3ZsIDxtX2JhY2t1cD1zdGFjazMyIzIsPm09aW50MzIjNQorCSMgbW92bCA8
-bV9iYWNrdXA9NjgoJWVzcCksPm09JWVzaQorCW1vdmwgICAgNjgoJWVzcCksJWVzaQorCisJIyAg
-IGluMCA9IHgwCisJIyBtb3ZsIDx4MD1zdGFjazMyIzEwLD5pbjA9aW50MzIjMQorCSMgbW92bCA8
-eDA9MTAwKCVlc3ApLD5pbjA9JWVheAorCW1vdmwgICAgMTAwKCVlc3ApLCVlYXgKKworCSMgICBp
-bjEgPSB4MQorCSMgbW92bCA8eDE9c3RhY2szMiMxMSw+aW4xPWludDMyIzIKKwkjIG1vdmwgPHgx
-PTEwNCglZXNwKSw+aW4xPSVlY3gKKwltb3ZsICAgIDEwNCglZXNwKSwlZWN4CisKKwkjICAgaW4w
-ICs9IGowCisJIyBhZGRsIDxqMD1zdGFjazMyIzI2LDxpbjA9aW50MzIjMQorCSMgYWRkbCA8ajA9
-MTY0KCVlc3ApLDxpbjA9JWVheAorCWFkZGwgICAgMTY0KCVlc3ApLCVlYXgKKworCSMgICBpbjEg
-Kz0gajEKKwkjIGFkZGwgPGoxPXN0YWNrMzIjMjcsPGluMT1pbnQzMiMyCisJIyBhZGRsIDxqMT0x
-NjgoJWVzcCksPGluMT0lZWN4CisJYWRkbCAgICAxNjgoJWVzcCksJWVjeAorCisJIyAgIGluMCBe
-PSAqKHVpbnQzMiAqKSAobSArIDApCisJIyB4b3JsIDAoPG09aW50MzIjNSksPGluMD1pbnQzMiMx
-CisJIyB4b3JsIDAoPG09JWVzaSksPGluMD0lZWF4CisJeG9ybCAgICAwKCVlc2kpLCVlYXgKKwor
-CSMgICBpbjEgXj0gKih1aW50MzIgKikgKG0gKyA0KQorCSMgeG9ybCA0KDxtPWludDMyIzUpLDxp
-bjE9aW50MzIjMgorCSMgeG9ybCA0KDxtPSVlc2kpLDxpbjE9JWVjeAorCXhvcmwgICAgNCglZXNp
-KSwlZWN4CisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDApID0gaW4wCisJIyBtb3ZsIDxpbjA9
-aW50MzIjMSwwKDxvdXQ9aW50MzIjNikKKwkjIG1vdmwgPGluMD0lZWF4LDAoPG91dD0lZWRpKQor
-CW1vdmwgICAgJWVheCwwKCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDQpID0gaW4x
-CisJIyBtb3ZsIDxpbjE9aW50MzIjMiw0KDxvdXQ9aW50MzIjNikKKwkjIG1vdmwgPGluMT0lZWN4
-LDQoPG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCw0KCVlZGkpCisKKwkjICAgaW4yID0geDIKKwkj
-IG1vdmwgPHgyPXN0YWNrMzIjMTIsPmluMj1pbnQzMiMxCisJIyBtb3ZsIDx4Mj0xMDgoJWVzcCks
-PmluMj0lZWF4CisJbW92bCAgICAxMDgoJWVzcCksJWVheAorCisJIyAgIGluMyA9IHgzCisJIyBt
-b3ZsIDx4Mz1zdGFjazMyIzEzLD5pbjM9aW50MzIjMgorCSMgbW92bCA8eDM9MTEyKCVlc3ApLD5p
-bjM9JWVjeAorCW1vdmwgICAgMTEyKCVlc3ApLCVlY3gKKworCSMgICBpbjIgKz0gajIKKwkjIGFk
-ZGwgPGoyPXN0YWNrMzIjMjgsPGluMj1pbnQzMiMxCisJIyBhZGRsIDxqMj0xNzIoJWVzcCksPGlu
-Mj0lZWF4CisJYWRkbCAgICAxNzIoJWVzcCksJWVheAorCisJIyAgIGluMyArPSBqMworCSMgYWRk
-bCA8ajM9c3RhY2szMiMyOSw8aW4zPWludDMyIzIKKwkjIGFkZGwgPGozPTE3NiglZXNwKSw8aW4z
-PSVlY3gKKwlhZGRsICAgIDE3NiglZXNwKSwlZWN4CisKKwkjICAgaW4yIF49ICoodWludDMyICop
-IChtICsgOCkKKwkjIHhvcmwgOCg8bT1pbnQzMiM1KSw8aW4yPWludDMyIzEKKwkjIHhvcmwgOCg8
-bT0lZXNpKSw8aW4yPSVlYXgKKwl4b3JsICAgIDgoJWVzaSksJWVheAorCisJIyAgIGluMyBePSAq
-KHVpbnQzMiAqKSAobSArIDEyKQorCSMgeG9ybCAxMig8bT1pbnQzMiM1KSw8aW4zPWludDMyIzIK
-KwkjIHhvcmwgMTIoPG09JWVzaSksPGluMz0lZWN4CisJeG9ybCAgICAxMiglZXNpKSwlZWN4CisK
-KwkjICAgKih1aW50MzIgKikgKG91dCArIDgpID0gaW4yCisJIyBtb3ZsIDxpbjI9aW50MzIjMSw4
-KDxvdXQ9aW50MzIjNikKKwkjIG1vdmwgPGluMj0lZWF4LDgoPG91dD0lZWRpKQorCW1vdmwgICAg
-JWVheCw4KCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDEyKSA9IGluMworCSMgbW92
-bCA8aW4zPWludDMyIzIsMTIoPG91dD1pbnQzMiM2KQorCSMgbW92bCA8aW4zPSVlY3gsMTIoPG91
-dD0lZWRpKQorCW1vdmwgICAgJWVjeCwxMiglZWRpKQorCisJIyAgIGluNCA9IHg0CisJIyBtb3Zs
-IDx4ND1zdGFjazMyIzE0LD5pbjQ9aW50MzIjMQorCSMgbW92bCA8eDQ9MTE2KCVlc3ApLD5pbjQ9
-JWVheAorCW1vdmwgICAgMTE2KCVlc3ApLCVlYXgKKworCSMgICBpbjUgPSB4NQorCSMgbW92bCA8
-eDU9c3RhY2szMiMxNSw+aW41PWludDMyIzIKKwkjIG1vdmwgPHg1PTEyMCglZXNwKSw+aW41PSVl
-Y3gKKwltb3ZsICAgIDEyMCglZXNwKSwlZWN4CisKKwkjICAgaW40ICs9IGo0CisJIyBhZGRsIDxq
-ND1zdGFjazMyIzMwLDxpbjQ9aW50MzIjMQorCSMgYWRkbCA8ajQ9MTgwKCVlc3ApLDxpbjQ9JWVh
-eAorCWFkZGwgICAgMTgwKCVlc3ApLCVlYXgKKworCSMgICBpbjUgKz0gajUKKwkjIGFkZGwgPGo1
-PXN0YWNrMzIjMzEsPGluNT1pbnQzMiMyCisJIyBhZGRsIDxqNT0xODQoJWVzcCksPGluNT0lZWN4
-CisJYWRkbCAgICAxODQoJWVzcCksJWVjeAorCisJIyAgIGluNCBePSAqKHVpbnQzMiAqKSAobSAr
-IDE2KQorCSMgeG9ybCAxNig8bT1pbnQzMiM1KSw8aW40PWludDMyIzEKKwkjIHhvcmwgMTYoPG09
-JWVzaSksPGluND0lZWF4CisJeG9ybCAgICAxNiglZXNpKSwlZWF4CisKKwkjICAgaW41IF49ICoo
-dWludDMyICopIChtICsgMjApCisJIyB4b3JsIDIwKDxtPWludDMyIzUpLDxpbjU9aW50MzIjMgor
-CSMgeG9ybCAyMCg8bT0lZXNpKSw8aW41PSVlY3gKKwl4b3JsICAgIDIwKCVlc2kpLCVlY3gKKwor
-CSMgICAqKHVpbnQzMiAqKSAob3V0ICsgMTYpID0gaW40CisJIyBtb3ZsIDxpbjQ9aW50MzIjMSwx
-Nig8b3V0PWludDMyIzYpCisJIyBtb3ZsIDxpbjQ9JWVheCwxNig8b3V0PSVlZGkpCisJbW92bCAg
-ICAlZWF4LDE2KCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDIwKSA9IGluNQorCSMg
-bW92bCA8aW41PWludDMyIzIsMjAoPG91dD1pbnQzMiM2KQorCSMgbW92bCA8aW41PSVlY3gsMjAo
-PG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCwyMCglZWRpKQorCisJIyAgIGluNiA9IHg2CisJIyBt
-b3ZsIDx4Nj1zdGFjazMyIzE2LD5pbjY9aW50MzIjMQorCSMgbW92bCA8eDY9MTI0KCVlc3ApLD5p
-bjY9JWVheAorCW1vdmwgICAgMTI0KCVlc3ApLCVlYXgKKworCSMgICBpbjcgPSB4NworCSMgbW92
-bCA8eDc9c3RhY2szMiMxNyw+aW43PWludDMyIzIKKwkjIG1vdmwgPHg3PTEyOCglZXNwKSw+aW43
-PSVlY3gKKwltb3ZsICAgIDEyOCglZXNwKSwlZWN4CisKKwkjICAgaW42ICs9IGo2CisJIyBhZGRs
-IDxqNj1zdGFjazMyIzMyLDxpbjY9aW50MzIjMQorCSMgYWRkbCA8ajY9MTg4KCVlc3ApLDxpbjY9
-JWVheAorCWFkZGwgICAgMTg4KCVlc3ApLCVlYXgKKworCSMgICBpbjcgKz0gajcKKwkjIGFkZGwg
-PGo3PXN0YWNrMzIjMzMsPGluNz1pbnQzMiMyCisJIyBhZGRsIDxqNz0xOTIoJWVzcCksPGluNz0l
-ZWN4CisJYWRkbCAgICAxOTIoJWVzcCksJWVjeAorCisJIyAgIGluNiBePSAqKHVpbnQzMiAqKSAo
-bSArIDI0KQorCSMgeG9ybCAyNCg8bT1pbnQzMiM1KSw8aW42PWludDMyIzEKKwkjIHhvcmwgMjQo
-PG09JWVzaSksPGluNj0lZWF4CisJeG9ybCAgICAyNCglZXNpKSwlZWF4CisKKwkjICAgaW43IF49
-ICoodWludDMyICopIChtICsgMjgpCisJIyB4b3JsIDI4KDxtPWludDMyIzUpLDxpbjc9aW50MzIj
-MgorCSMgeG9ybCAyOCg8bT0lZXNpKSw8aW43PSVlY3gKKwl4b3JsICAgIDI4KCVlc2kpLCVlY3gK
-KworCSMgICAqKHVpbnQzMiAqKSAob3V0ICsgMjQpID0gaW42CisJIyBtb3ZsIDxpbjY9aW50MzIj
-MSwyNCg8b3V0PWludDMyIzYpCisJIyBtb3ZsIDxpbjY9JWVheCwyNCg8b3V0PSVlZGkpCisJbW92
-bCAgICAlZWF4LDI0KCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDI4KSA9IGluNwor
-CSMgbW92bCA8aW43PWludDMyIzIsMjgoPG91dD1pbnQzMiM2KQorCSMgbW92bCA8aW43PSVlY3gs
-MjgoPG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCwyOCglZWRpKQorCisJIyAgIGluOCA9IHg4CisJ
-IyBtb3ZsIDx4OD1zdGFjazMyIzE4LD5pbjg9aW50MzIjMQorCSMgbW92bCA8eDg9MTMyKCVlc3Ap
-LD5pbjg9JWVheAorCW1vdmwgICAgMTMyKCVlc3ApLCVlYXgKKworCSMgICBpbjkgPSB4OQorCSMg
-bW92bCA8eDk9c3RhY2szMiMxOSw+aW45PWludDMyIzIKKwkjIG1vdmwgPHg5PTEzNiglZXNwKSw+
-aW45PSVlY3gKKwltb3ZsICAgIDEzNiglZXNwKSwlZWN4CisKKwkjICAgaW44ICs9IGo4CisJIyBh
-ZGRsIDxqOD1zdGFjazMyIzM0LDxpbjg9aW50MzIjMQorCSMgYWRkbCA8ajg9MTk2KCVlc3ApLDxp
-bjg9JWVheAorCWFkZGwgICAgMTk2KCVlc3ApLCVlYXgKKworCSMgICBpbjkgKz0gajkKKwkjIGFk
-ZGwgPGo5PXN0YWNrMzIjMzUsPGluOT1pbnQzMiMyCisJIyBhZGRsIDxqOT0yMDAoJWVzcCksPGlu
-OT0lZWN4CisJYWRkbCAgICAyMDAoJWVzcCksJWVjeAorCisJIyAgIGluOCBePSAqKHVpbnQzMiAq
-KSAobSArIDMyKQorCSMgeG9ybCAzMig8bT1pbnQzMiM1KSw8aW44PWludDMyIzEKKwkjIHhvcmwg
-MzIoPG09JWVzaSksPGluOD0lZWF4CisJeG9ybCAgICAzMiglZXNpKSwlZWF4CisKKwkjICAgaW45
-IF49ICoodWludDMyICopIChtICsgMzYpCisJIyB4b3JsIDM2KDxtPWludDMyIzUpLDxpbjk9aW50
-MzIjMgorCSMgeG9ybCAzNig8bT0lZXNpKSw8aW45PSVlY3gKKwl4b3JsICAgIDM2KCVlc2kpLCVl
-Y3gKKworCSMgICAqKHVpbnQzMiAqKSAob3V0ICsgMzIpID0gaW44CisJIyBtb3ZsIDxpbjg9aW50
-MzIjMSwzMig8b3V0PWludDMyIzYpCisJIyBtb3ZsIDxpbjg9JWVheCwzMig8b3V0PSVlZGkpCisJ
-bW92bCAgICAlZWF4LDMyKCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDM2KSA9IGlu
-OQorCSMgbW92bCA8aW45PWludDMyIzIsMzYoPG91dD1pbnQzMiM2KQorCSMgbW92bCA8aW45PSVl
-Y3gsMzYoPG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCwzNiglZWRpKQorCisJIyAgIGluMTAgPSB4
-MTAKKwkjIG1vdmwgPHgxMD1zdGFjazMyIzIwLD5pbjEwPWludDMyIzEKKwkjIG1vdmwgPHgxMD0x
-NDAoJWVzcCksPmluMTA9JWVheAorCW1vdmwgICAgMTQwKCVlc3ApLCVlYXgKKworCSMgICBpbjEx
-ID0geDExCisJIyBtb3ZsIDx4MTE9c3RhY2szMiMyMSw+aW4xMT1pbnQzMiMyCisJIyBtb3ZsIDx4
-MTE9MTQ0KCVlc3ApLD5pbjExPSVlY3gKKwltb3ZsICAgIDE0NCglZXNwKSwlZWN4CisKKwkjICAg
-aW4xMCArPSBqMTAKKwkjIGFkZGwgPGoxMD1zdGFjazMyIzM2LDxpbjEwPWludDMyIzEKKwkjIGFk
-ZGwgPGoxMD0yMDQoJWVzcCksPGluMTA9JWVheAorCWFkZGwgICAgMjA0KCVlc3ApLCVlYXgKKwor
-CSMgICBpbjExICs9IGoxMQorCSMgYWRkbCA8ajExPXN0YWNrMzIjMzcsPGluMTE9aW50MzIjMgor
-CSMgYWRkbCA8ajExPTIwOCglZXNwKSw8aW4xMT0lZWN4CisJYWRkbCAgICAyMDgoJWVzcCksJWVj
-eAorCisJIyAgIGluMTAgXj0gKih1aW50MzIgKikgKG0gKyA0MCkKKwkjIHhvcmwgNDAoPG09aW50
-MzIjNSksPGluMTA9aW50MzIjMQorCSMgeG9ybCA0MCg8bT0lZXNpKSw8aW4xMD0lZWF4CisJeG9y
-bCAgICA0MCglZXNpKSwlZWF4CisKKwkjICAgaW4xMSBePSAqKHVpbnQzMiAqKSAobSArIDQ0KQor
-CSMgeG9ybCA0NCg8bT1pbnQzMiM1KSw8aW4xMT1pbnQzMiMyCisJIyB4b3JsIDQ0KDxtPSVlc2kp
-LDxpbjExPSVlY3gKKwl4b3JsICAgIDQ0KCVlc2kpLCVlY3gKKworCSMgICAqKHVpbnQzMiAqKSAo
-b3V0ICsgNDApID0gaW4xMAorCSMgbW92bCA8aW4xMD1pbnQzMiMxLDQwKDxvdXQ9aW50MzIjNikK
-KwkjIG1vdmwgPGluMTA9JWVheCw0MCg8b3V0PSVlZGkpCisJbW92bCAgICAlZWF4LDQwKCVlZGkp
-CisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDQ0KSA9IGluMTEKKwkjIG1vdmwgPGluMTE9aW50
-MzIjMiw0NCg8b3V0PWludDMyIzYpCisJIyBtb3ZsIDxpbjExPSVlY3gsNDQoPG91dD0lZWRpKQor
-CW1vdmwgICAgJWVjeCw0NCglZWRpKQorCisJIyAgIGluMTIgPSB4MTIKKwkjIG1vdmwgPHgxMj1z
-dGFjazMyIzIyLD5pbjEyPWludDMyIzEKKwkjIG1vdmwgPHgxMj0xNDgoJWVzcCksPmluMTI9JWVh
-eAorCW1vdmwgICAgMTQ4KCVlc3ApLCVlYXgKKworCSMgICBpbjEzID0geDEzCisJIyBtb3ZsIDx4
-MTM9c3RhY2szMiMyMyw+aW4xMz1pbnQzMiMyCisJIyBtb3ZsIDx4MTM9MTUyKCVlc3ApLD5pbjEz
-PSVlY3gKKwltb3ZsICAgIDE1MiglZXNwKSwlZWN4CisKKwkjICAgaW4xMiArPSBqMTIKKwkjIGFk
-ZGwgPGoxMj1zdGFjazMyIzM4LDxpbjEyPWludDMyIzEKKwkjIGFkZGwgPGoxMj0yMTIoJWVzcCks
-PGluMTI9JWVheAorCWFkZGwgICAgMjEyKCVlc3ApLCVlYXgKKworCSMgICBpbjEzICs9IGoxMwor
-CSMgYWRkbCA8ajEzPXN0YWNrMzIjMzksPGluMTM9aW50MzIjMgorCSMgYWRkbCA8ajEzPTIxNigl
-ZXNwKSw8aW4xMz0lZWN4CisJYWRkbCAgICAyMTYoJWVzcCksJWVjeAorCisJIyAgIGluMTIgXj0g
-Kih1aW50MzIgKikgKG0gKyA0OCkKKwkjIHhvcmwgNDgoPG09aW50MzIjNSksPGluMTI9aW50MzIj
-MQorCSMgeG9ybCA0OCg8bT0lZXNpKSw8aW4xMj0lZWF4CisJeG9ybCAgICA0OCglZXNpKSwlZWF4
-CisKKwkjICAgaW4xMyBePSAqKHVpbnQzMiAqKSAobSArIDUyKQorCSMgeG9ybCA1Mig8bT1pbnQz
-MiM1KSw8aW4xMz1pbnQzMiMyCisJIyB4b3JsIDUyKDxtPSVlc2kpLDxpbjEzPSVlY3gKKwl4b3Js
-ICAgIDUyKCVlc2kpLCVlY3gKKworCSMgICAqKHVpbnQzMiAqKSAob3V0ICsgNDgpID0gaW4xMgor
-CSMgbW92bCA8aW4xMj1pbnQzMiMxLDQ4KDxvdXQ9aW50MzIjNikKKwkjIG1vdmwgPGluMTI9JWVh
-eCw0OCg8b3V0PSVlZGkpCisJbW92bCAgICAlZWF4LDQ4KCVlZGkpCisKKwkjICAgKih1aW50MzIg
-KikgKG91dCArIDUyKSA9IGluMTMKKwkjIG1vdmwgPGluMTM9aW50MzIjMiw1Mig8b3V0PWludDMy
-IzYpCisJIyBtb3ZsIDxpbjEzPSVlY3gsNTIoPG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCw1Migl
-ZWRpKQorCisJIyAgIGluMTQgPSB4MTQKKwkjIG1vdmwgPHgxND1zdGFjazMyIzI0LD5pbjE0PWlu
-dDMyIzEKKwkjIG1vdmwgPHgxND0xNTYoJWVzcCksPmluMTQ9JWVheAorCW1vdmwgICAgMTU2KCVl
-c3ApLCVlYXgKKworCSMgICBpbjE1ID0geDE1CisJIyBtb3ZsIDx4MTU9c3RhY2szMiMyNSw+aW4x
-NT1pbnQzMiMyCisJIyBtb3ZsIDx4MTU9MTYwKCVlc3ApLD5pbjE1PSVlY3gKKwltb3ZsICAgIDE2
-MCglZXNwKSwlZWN4CisKKwkjICAgaW4xNCArPSBqMTQKKwkjIGFkZGwgPGoxND1zdGFjazMyIzQw
-LDxpbjE0PWludDMyIzEKKwkjIGFkZGwgPGoxND0yMjAoJWVzcCksPGluMTQ9JWVheAorCWFkZGwg
-ICAgMjIwKCVlc3ApLCVlYXgKKworCSMgICBpbjE1ICs9IGoxNQorCSMgYWRkbCA8ajE1PXN0YWNr
-MzIjNDEsPGluMTU9aW50MzIjMgorCSMgYWRkbCA8ajE1PTIyNCglZXNwKSw8aW4xNT0lZWN4CisJ
-YWRkbCAgICAyMjQoJWVzcCksJWVjeAorCisJIyAgIGluMTQgXj0gKih1aW50MzIgKikgKG0gKyA1
-NikKKwkjIHhvcmwgNTYoPG09aW50MzIjNSksPGluMTQ9aW50MzIjMQorCSMgeG9ybCA1Nig8bT0l
-ZXNpKSw8aW4xND0lZWF4CisJeG9ybCAgICA1NiglZXNpKSwlZWF4CisKKwkjICAgaW4xNSBePSAq
-KHVpbnQzMiAqKSAobSArIDYwKQorCSMgeG9ybCA2MCg8bT1pbnQzMiM1KSw8aW4xNT1pbnQzMiMy
-CisJIyB4b3JsIDYwKDxtPSVlc2kpLDxpbjE1PSVlY3gKKwl4b3JsICAgIDYwKCVlc2kpLCVlY3gK
-KworCSMgICAqKHVpbnQzMiAqKSAob3V0ICsgNTYpID0gaW4xNAorCSMgbW92bCA8aW4xND1pbnQz
-MiMxLDU2KDxvdXQ9aW50MzIjNikKKwkjIG1vdmwgPGluMTQ9JWVheCw1Nig8b3V0PSVlZGkpCisJ
-bW92bCAgICAlZWF4LDU2KCVlZGkpCisKKwkjICAgKih1aW50MzIgKikgKG91dCArIDYwKSA9IGlu
-MTUKKwkjIG1vdmwgPGluMTU9aW50MzIjMiw2MCg8b3V0PWludDMyIzYpCisJIyBtb3ZsIDxpbjE1
-PSVlY3gsNjAoPG91dD0lZWRpKQorCW1vdmwgICAgJWVjeCw2MCglZWRpKQorCisJIyAgIGJ5dGVz
-ID0gYnl0ZXNfYmFja3VwCisJIyBtb3ZsIDxieXRlc19iYWNrdXA9c3RhY2szMiM0LD5ieXRlcz1p
-bnQzMiM0CisJIyBtb3ZsIDxieXRlc19iYWNrdXA9NzYoJWVzcCksPmJ5dGVzPSVlYngKKwltb3Zs
-ICAgIDc2KCVlc3ApLCVlYngKKworCSMgICBpbjggPSBqOAorCSMgbW92bCA8ajg9c3RhY2szMiMz
-NCw+aW44PWludDMyIzEKKwkjIG1vdmwgPGo4PTE5NiglZXNwKSw+aW44PSVlYXgKKwltb3ZsICAg
-IDE5NiglZXNwKSwlZWF4CisKKwkjICAgaW45ID0gajkKKwkjIG1vdmwgPGo5PXN0YWNrMzIjMzUs
-PmluOT1pbnQzMiMyCisJIyBtb3ZsIDxqOT0yMDAoJWVzcCksPmluOT0lZWN4CisJbW92bCAgICAy
-MDAoJWVzcCksJWVjeAorCisJIyAgIGluOCArPSAxCisJIyBhZGQgICQxLDxpbjg9aW50MzIjMQor
-CSMgYWRkICAkMSw8aW44PSVlYXgKKwlhZGQgICAgICAkMSwlZWF4CisKKwkjICAgaW45ICs9IDAg
-KyBjYXJyeQorCSMgYWRjICAkMCw8aW45PWludDMyIzIKKwkjIGFkYyAgJDAsPGluOT0lZWN4CisJ
-YWRjICAgICAgJDAsJWVjeAorCisJIyAgIGo4ID0gaW44CisJIyBtb3ZsIDxpbjg9aW50MzIjMSw+
-ajg9c3RhY2szMiMzNAorCSMgbW92bCA8aW44PSVlYXgsPmo4PTE5NiglZXNwKQorCW1vdmwgICAg
-JWVheCwxOTYoJWVzcCkKKworCSMgICBqOSA9IGluOQorCSMgbW92bCA8aW45PWludDMyIzIsPmo5
-PXN0YWNrMzIjMzUKKwkjIG1vdmwgPGluOT0lZWN4LD5qOT0yMDAoJWVzcCkKKwltb3ZsICAgICVl
-Y3gsMjAwKCVlc3ApCisKKwkjICAgYnl0ZXMgLSA2NAorCSMgY21wICAkNjQsPGJ5dGVzPWludDMy
-IzQKKwkjIGNtcCAgJDY0LDxieXRlcz0lZWJ4CisJY21wICAgICAgJDY0LCVlYngKKworCSMgICBn
-b3RvIGJ5dGVzYXRsZWFzdDY1IGlmIHVuc2lnbmVkPgorCWphICAgICAgLl9ieXRlc2F0bGVhc3Q2
-NQorCisJIyAgICAgZ290byBieXRlc2F0bGVhc3Q2NCBpZiB1bnNpZ25lZD49CisJamFlICAgICAu
-X2J5dGVzYXRsZWFzdDY0CisKKwkjICAgICAgIG0gPSBvdXQKKwkjIG1vdiAgPG91dD1pbnQzMiM2
-LD5tPWludDMyIzUKKwkjIG1vdiAgPG91dD0lZWRpLD5tPSVlc2kKKwltb3YgICAgICAlZWRpLCVl
-c2kKKworCSMgICAgICAgb3V0ID0gY3RhcmdldAorCSMgbW92bCA8Y3RhcmdldD1zdGFjazMyIzQy
-LD5vdXQ9aW50MzIjNgorCSMgbW92bCA8Y3RhcmdldD0yMjgoJWVzcCksPm91dD0lZWRpCisJbW92
-bCAgICAyMjgoJWVzcCksJWVkaQorCisJIyAgICAgICBpID0gYnl0ZXMKKwkjIG1vdiAgPGJ5dGVz
-PWludDMyIzQsPmk9aW50MzIjMgorCSMgbW92ICA8Ynl0ZXM9JWVieCw+aT0lZWN4CisJbW92ICAg
-ICAgJWVieCwlZWN4CisKKwkjICAgICAgIHdoaWxlIChpKSB7ICpvdXQrKyA9ICptKys7IC0taSB9
-CisJcmVwICAgICBtb3ZzYgorCisJIyAgICAgYnl0ZXNhdGxlYXN0NjQjCisuX2J5dGVzYXRsZWFz
-dDY0OgorCisJIyAgICAgeCA9IHhfYmFja3VwCisJIyBtb3ZsIDx4X2JhY2t1cD1zdGFjazMyIzEs
-Png9aW50MzIjMQorCSMgbW92bCA8eF9iYWNrdXA9NjQoJWVzcCksPng9JWVheAorCW1vdmwgICAg
-NjQoJWVzcCksJWVheAorCisJIyAgICAgaW44ID0gajgKKwkjIG1vdmwgPGo4PXN0YWNrMzIjMzQs
-PmluOD1pbnQzMiMyCisJIyBtb3ZsIDxqOD0xOTYoJWVzcCksPmluOD0lZWN4CisJbW92bCAgICAx
-OTYoJWVzcCksJWVjeAorCisJIyAgICAgaW45ID0gajkKKwkjIG1vdmwgPGo5PXN0YWNrMzIjMzUs
-PmluOT1pbnQzMiMzCisJIyBtb3ZsIDxqOT0yMDAoJWVzcCksPmluOT0lZWR4CisJbW92bCAgICAy
-MDAoJWVzcCksJWVkeAorCisJIyAgICAgKih1aW50MzIgKikgKHggKyAzMikgPSBpbjgKKwkjIG1v
-dmwgPGluOD1pbnQzMiMyLDMyKDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjg9JWVjeCwzMig8eD0l
-ZWF4KQorCW1vdmwgICAgJWVjeCwzMiglZWF4KQorCisJIyAgICAgKih1aW50MzIgKikgKHggKyAz
-NikgPSBpbjkKKwkjIG1vdmwgPGluOT1pbnQzMiMzLDM2KDx4PWludDMyIzEpCisJIyBtb3ZsIDxp
-bjk9JWVkeCwzNig8eD0lZWF4KQorCW1vdmwgICAgJWVkeCwzNiglZWF4KQorCisJIyAgICAgZG9u
-ZSMKKy5fZG9uZToKKworCSMgICAgIGVheCA9IGVheF9zdGFjaworCSMgbW92bCA8ZWF4X3N0YWNr
-PXN0YWNrMzIjNSw+ZWF4PWludDMyIzEKKwkjIG1vdmwgPGVheF9zdGFjaz04MCglZXNwKSw+ZWF4
-PSVlYXgKKwltb3ZsICAgIDgwKCVlc3ApLCVlYXgKKworCSMgICAgIGVieCA9IGVieF9zdGFjawor
-CSMgbW92bCA8ZWJ4X3N0YWNrPXN0YWNrMzIjNiw+ZWJ4PWludDMyIzQKKwkjIG1vdmwgPGVieF9z
-dGFjaz04NCglZXNwKSw+ZWJ4PSVlYngKKwltb3ZsICAgIDg0KCVlc3ApLCVlYngKKworCSMgICAg
-IGVzaSA9IGVzaV9zdGFjaworCSMgbW92bCA8ZXNpX3N0YWNrPXN0YWNrMzIjNyw+ZXNpPWludDMy
-IzUKKwkjIG1vdmwgPGVzaV9zdGFjaz04OCglZXNwKSw+ZXNpPSVlc2kKKwltb3ZsICAgIDg4KCVl
-c3ApLCVlc2kKKworCSMgICAgIGVkaSA9IGVkaV9zdGFjaworCSMgbW92bCA8ZWRpX3N0YWNrPXN0
-YWNrMzIjOCw+ZWRpPWludDMyIzYKKwkjIG1vdmwgPGVkaV9zdGFjaz05MiglZXNwKSw+ZWRpPSVl
-ZGkKKwltb3ZsICAgIDkyKCVlc3ApLCVlZGkKKworCSMgICAgIGVicCA9IGVicF9zdGFjaworCSMg
-bW92bCA8ZWJwX3N0YWNrPXN0YWNrMzIjOSw+ZWJwPWludDMyIzcKKwkjIG1vdmwgPGVicF9zdGFj
-az05NiglZXNwKSw+ZWJwPSVlYnAKKwltb3ZsICAgIDk2KCVlc3ApLCVlYnAKKworCSMgICAgIGxl
-YXZlCisJYWRkICAgICAlZWF4LCVlc3AKKwlyZXQKKworCSMgICBieXRlc2F0bGVhc3Q2NSMKKy5f
-Ynl0ZXNhdGxlYXN0NjU6CisKKwkjICAgYnl0ZXMgLT0gNjQKKwkjIHN1YiAgJDY0LDxieXRlcz1p
-bnQzMiM0CisJIyBzdWIgICQ2NCw8Ynl0ZXM9JWVieAorCXN1YiAgICAgICQ2NCwlZWJ4CisKKwkj
-ICAgb3V0ICs9IDY0CisJIyBhZGQgICQ2NCw8b3V0PWludDMyIzYKKwkjIGFkZCAgJDY0LDxvdXQ9
-JWVkaQorCWFkZCAgICAgICQ2NCwlZWRpCisKKwkjICAgbSArPSA2NAorCSMgYWRkICAkNjQsPG09
-aW50MzIjNQorCSMgYWRkICAkNjQsPG09JWVzaQorCWFkZCAgICAgICQ2NCwlZXNpCisKKwkjIGdv
-dG8gYnl0ZXNhdGxlYXN0MQorCWptcCAgICAgLl9ieXRlc2F0bGVhc3QxCisKKyMgZW50ZXIgRUNS
-WVBUX2luaXQKKy50ZXh0CisucDJhbGlnbiA1CisuZ2xvYmwgRUNSWVBUX2luaXQKK19FQ1JZUFRf
-aW5pdDoKK0VDUllQVF9pbml0OgorCW1vdiAgICAgJWVzcCwlZWF4CisJYW5kICAgICAkMzEsJWVh
-eAorCWFkZCAgICAgJDI1NiwlZWF4CisJc3ViICAgICAlZWF4LCVlc3AKKworCSMgbGVhdmUKKwlh
-ZGQgICAgICVlYXgsJWVzcAorCXJldAorCisjIGVudGVyIEVDUllQVF9rZXlzZXR1cAorLnRleHQK
-Ky5wMmFsaWduIDUKKy5nbG9ibCBFQ1JZUFRfa2V5c2V0dXAKK19FQ1JZUFRfa2V5c2V0dXA6CitF
-Q1JZUFRfa2V5c2V0dXA6CisJbW92ICAgICAlZXNwLCVlYXgKKwlhbmQgICAgICQzMSwlZWF4CisJ
-YWRkICAgICAkMjU2LCVlYXgKKwlzdWIgICAgICVlYXgsJWVzcAorCisJIyAgIGVheF9zdGFjayA9
-IGVheAorCSMgbW92bCA8ZWF4PWludDMyIzEsPmVheF9zdGFjaz1zdGFjazMyIzEKKwkjIG1vdmwg
-PGVheD0lZWF4LD5lYXhfc3RhY2s9NjQoJWVzcCkKKwltb3ZsICAgICVlYXgsNjQoJWVzcCkKKwor
-CSMgICBlYnhfc3RhY2sgPSBlYngKKwkjIG1vdmwgPGVieD1pbnQzMiM0LD5lYnhfc3RhY2s9c3Rh
-Y2szMiMyCisJIyBtb3ZsIDxlYng9JWVieCw+ZWJ4X3N0YWNrPTY4KCVlc3ApCisJbW92bCAgICAl
-ZWJ4LDY4KCVlc3ApCisKKwkjICAgZXNpX3N0YWNrID0gZXNpCisJIyBtb3ZsIDxlc2k9aW50MzIj
-NSw+ZXNpX3N0YWNrPXN0YWNrMzIjMworCSMgbW92bCA8ZXNpPSVlc2ksPmVzaV9zdGFjaz03Migl
-ZXNwKQorCW1vdmwgICAgJWVzaSw3MiglZXNwKQorCisJIyAgIGVkaV9zdGFjayA9IGVkaQorCSMg
-bW92bCA8ZWRpPWludDMyIzYsPmVkaV9zdGFjaz1zdGFjazMyIzQKKwkjIG1vdmwgPGVkaT0lZWRp
-LD5lZGlfc3RhY2s9NzYoJWVzcCkKKwltb3ZsICAgICVlZGksNzYoJWVzcCkKKworCSMgICBlYnBf
-c3RhY2sgPSBlYnAKKwkjIG1vdmwgPGVicD1pbnQzMiM3LD5lYnBfc3RhY2s9c3RhY2szMiM1CisJ
-IyBtb3ZsIDxlYnA9JWVicCw+ZWJwX3N0YWNrPTgwKCVlc3ApCisJbW92bCAgICAlZWJwLDgwKCVl
-c3ApCisKKwkjICAgayA9IGFyZzIKKwkjIG1vdmwgPGFyZzI9c3RhY2szMiMtMiw+az1pbnQzMiMy
-CisJIyBtb3ZsIDxhcmcyPTgoJWVzcCwlZWF4KSw+az0lZWN4CisJbW92bCAgICA4KCVlc3AsJWVh
-eCksJWVjeAorCisJIyAgIGtiaXRzID0gYXJnMworCSMgbW92bCA8YXJnMz1zdGFjazMyIy0zLD5r
-Yml0cz1pbnQzMiMzCisJIyBtb3ZsIDxhcmczPTEyKCVlc3AsJWVheCksPmtiaXRzPSVlZHgKKwlt
-b3ZsICAgIDEyKCVlc3AsJWVheCksJWVkeAorCisJIyAgIHggPSBhcmcxCisJIyBtb3ZsIDxhcmcx
-PXN0YWNrMzIjLTEsPng9aW50MzIjMQorCSMgbW92bCA8YXJnMT00KCVlc3AsJWVheCksPng9JWVh
-eAorCW1vdmwgICAgNCglZXNwLCVlYXgpLCVlYXgKKworCSMgICBpbjEgPSAqKHVpbnQzMiAqKSAo
-ayArIDApCisJIyBtb3ZsIDAoPGs9aW50MzIjMiksPmluMT1pbnQzMiM0CisJIyBtb3ZsIDAoPGs9
-JWVjeCksPmluMT0lZWJ4CisJbW92bCAgICAwKCVlY3gpLCVlYngKKworCSMgICBpbjIgPSAqKHVp
-bnQzMiAqKSAoayArIDQpCisJIyBtb3ZsIDQoPGs9aW50MzIjMiksPmluMj1pbnQzMiM1CisJIyBt
-b3ZsIDQoPGs9JWVjeCksPmluMj0lZXNpCisJbW92bCAgICA0KCVlY3gpLCVlc2kKKworCSMgICBp
-bjMgPSAqKHVpbnQzMiAqKSAoayArIDgpCisJIyBtb3ZsIDgoPGs9aW50MzIjMiksPmluMz1pbnQz
-MiM2CisJIyBtb3ZsIDgoPGs9JWVjeCksPmluMz0lZWRpCisJbW92bCAgICA4KCVlY3gpLCVlZGkK
-KworCSMgICBpbjQgPSAqKHVpbnQzMiAqKSAoayArIDEyKQorCSMgbW92bCAxMig8az1pbnQzMiMy
-KSw+aW40PWludDMyIzcKKwkjIG1vdmwgMTIoPGs9JWVjeCksPmluND0lZWJwCisJbW92bCAgICAx
-MiglZWN4KSwlZWJwCisKKwkjICAgKih1aW50MzIgKikgKHggKyA0KSA9IGluMQorCSMgbW92bCA8
-aW4xPWludDMyIzQsNCg8eD1pbnQzMiMxKQorCSMgbW92bCA8aW4xPSVlYngsNCg8eD0lZWF4KQor
-CW1vdmwgICAgJWVieCw0KCVlYXgpCisKKwkjICAgKih1aW50MzIgKikgKHggKyA4KSA9IGluMgor
-CSMgbW92bCA8aW4yPWludDMyIzUsOCg8eD1pbnQzMiMxKQorCSMgbW92bCA8aW4yPSVlc2ksOCg8
-eD0lZWF4KQorCW1vdmwgICAgJWVzaSw4KCVlYXgpCisKKwkjICAgKih1aW50MzIgKikgKHggKyAx
-MikgPSBpbjMKKwkjIG1vdmwgPGluMz1pbnQzMiM2LDEyKDx4PWludDMyIzEpCisJIyBtb3ZsIDxp
-bjM9JWVkaSwxMig8eD0lZWF4KQorCW1vdmwgICAgJWVkaSwxMiglZWF4KQorCisJIyAgICoodWlu
-dDMyICopICh4ICsgMTYpID0gaW40CisJIyBtb3ZsIDxpbjQ9aW50MzIjNywxNig8eD1pbnQzMiMx
-KQorCSMgbW92bCA8aW40PSVlYnAsMTYoPHg9JWVheCkKKwltb3ZsICAgICVlYnAsMTYoJWVheCkK
-KworCSMgICBrYml0cyAtIDI1NgorCSMgY21wICAkMjU2LDxrYml0cz1pbnQzMiMzCisJIyBjbXAg
-ICQyNTYsPGtiaXRzPSVlZHgKKwljbXAgICAgICAkMjU2LCVlZHgKKworCSMgICBnb3RvIGtiaXRz
-MTI4IGlmIHVuc2lnbmVkPAorCWpiICAgICAgLl9rYml0czEyOAorCisJIyAgIGtiaXRzMjU2Iwor
-Ll9rYml0czI1NjoKKworCSMgICAgIGluMTEgPSAqKHVpbnQzMiAqKSAoayArIDE2KQorCSMgbW92
-bCAxNig8az1pbnQzMiMyKSw+aW4xMT1pbnQzMiMzCisJIyBtb3ZsIDE2KDxrPSVlY3gpLD5pbjEx
-PSVlZHgKKwltb3ZsICAgIDE2KCVlY3gpLCVlZHgKKworCSMgICAgIGluMTIgPSAqKHVpbnQzMiAq
-KSAoayArIDIwKQorCSMgbW92bCAyMCg8az1pbnQzMiMyKSw+aW4xMj1pbnQzMiM0CisJIyBtb3Zs
-IDIwKDxrPSVlY3gpLD5pbjEyPSVlYngKKwltb3ZsICAgIDIwKCVlY3gpLCVlYngKKworCSMgICAg
-IGluMTMgPSAqKHVpbnQzMiAqKSAoayArIDI0KQorCSMgbW92bCAyNCg8az1pbnQzMiMyKSw+aW4x
-Mz1pbnQzMiM1CisJIyBtb3ZsIDI0KDxrPSVlY3gpLD5pbjEzPSVlc2kKKwltb3ZsICAgIDI0KCVl
-Y3gpLCVlc2kKKworCSMgICAgIGluMTQgPSAqKHVpbnQzMiAqKSAoayArIDI4KQorCSMgbW92bCAy
-OCg8az1pbnQzMiMyKSw+aW4xND1pbnQzMiMyCisJIyBtb3ZsIDI4KDxrPSVlY3gpLD5pbjE0PSVl
-Y3gKKwltb3ZsICAgIDI4KCVlY3gpLCVlY3gKKworCSMgICAgICoodWludDMyICopICh4ICsgNDQp
-ID0gaW4xMQorCSMgbW92bCA8aW4xMT1pbnQzMiMzLDQ0KDx4PWludDMyIzEpCisJIyBtb3ZsIDxp
-bjExPSVlZHgsNDQoPHg9JWVheCkKKwltb3ZsICAgICVlZHgsNDQoJWVheCkKKworCSMgICAgICoo
-dWludDMyICopICh4ICsgNDgpID0gaW4xMgorCSMgbW92bCA8aW4xMj1pbnQzMiM0LDQ4KDx4PWlu
-dDMyIzEpCisJIyBtb3ZsIDxpbjEyPSVlYngsNDgoPHg9JWVheCkKKwltb3ZsICAgICVlYngsNDgo
-JWVheCkKKworCSMgICAgICoodWludDMyICopICh4ICsgNTIpID0gaW4xMworCSMgbW92bCA8aW4x
-Mz1pbnQzMiM1LDUyKDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjEzPSVlc2ksNTIoPHg9JWVheCkK
-Kwltb3ZsICAgICVlc2ksNTIoJWVheCkKKworCSMgICAgICoodWludDMyICopICh4ICsgNTYpID0g
-aW4xNAorCSMgbW92bCA8aW4xND1pbnQzMiMyLDU2KDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjE0
-PSVlY3gsNTYoPHg9JWVheCkKKwltb3ZsICAgICVlY3gsNTYoJWVheCkKKworCSMgICAgIGluMCA9
-IDE2MzQ3NjA4MDUKKwkjIG1vdiAgJDE2MzQ3NjA4MDUsPmluMD1pbnQzMiMyCisJIyBtb3YgICQx
-NjM0NzYwODA1LD5pbjA9JWVjeAorCW1vdiAgICAgICQxNjM0NzYwODA1LCVlY3gKKworCSMgICAg
-IGluNSA9IDg1Nzc2MDg3OAorCSMgbW92ICAkODU3NzYwODc4LD5pbjU9aW50MzIjMworCSMgbW92
-ICAkODU3NzYwODc4LD5pbjU9JWVkeAorCW1vdiAgICAgICQ4NTc3NjA4NzgsJWVkeAorCisJIyAg
-ICAgaW4xMCA9IDIwMzY0NzcyMzQKKwkjIG1vdiAgJDIwMzY0NzcyMzQsPmluMTA9aW50MzIjNAor
-CSMgbW92ICAkMjAzNjQ3NzIzNCw+aW4xMD0lZWJ4CisJbW92ICAgICAgJDIwMzY0NzcyMzQsJWVi
-eAorCisJIyAgICAgaW4xNSA9IDE3OTcyODUyMzYKKwkjIG1vdiAgJDE3OTcyODUyMzYsPmluMTU9
-aW50MzIjNQorCSMgbW92ICAkMTc5NzI4NTIzNiw+aW4xNT0lZXNpCisJbW92ICAgICAgJDE3OTcy
-ODUyMzYsJWVzaQorCisJIyAgICAgKih1aW50MzIgKikgKHggKyAwKSA9IGluMAorCSMgbW92bCA8
-aW4wPWludDMyIzIsMCg8eD1pbnQzMiMxKQorCSMgbW92bCA8aW4wPSVlY3gsMCg8eD0lZWF4KQor
-CW1vdmwgICAgJWVjeCwwKCVlYXgpCisKKwkjICAgICAqKHVpbnQzMiAqKSAoeCArIDIwKSA9IGlu
-NQorCSMgbW92bCA8aW41PWludDMyIzMsMjAoPHg9aW50MzIjMSkKKwkjIG1vdmwgPGluNT0lZWR4
-LDIwKDx4PSVlYXgpCisJbW92bCAgICAlZWR4LDIwKCVlYXgpCisKKwkjICAgICAqKHVpbnQzMiAq
-KSAoeCArIDQwKSA9IGluMTAKKwkjIG1vdmwgPGluMTA9aW50MzIjNCw0MCg8eD1pbnQzMiMxKQor
-CSMgbW92bCA8aW4xMD0lZWJ4LDQwKDx4PSVlYXgpCisJbW92bCAgICAlZWJ4LDQwKCVlYXgpCisK
-KwkjICAgICAqKHVpbnQzMiAqKSAoeCArIDYwKSA9IGluMTUKKwkjIG1vdmwgPGluMTU9aW50MzIj
-NSw2MCg8eD1pbnQzMiMxKQorCSMgbW92bCA8aW4xNT0lZXNpLDYwKDx4PSVlYXgpCisJbW92bCAg
-ICAlZXNpLDYwKCVlYXgpCisKKwkjICAgZ290byBrZXlzZXR1cGRvbmUKKwlqbXAgICAgIC5fa2V5
-c2V0dXBkb25lCisKKwkjICAga2JpdHMxMjgjCisuX2tiaXRzMTI4OgorCisJIyAgICAgaW4xMSA9
-ICoodWludDMyICopIChrICsgMCkKKwkjIG1vdmwgMCg8az1pbnQzMiMyKSw+aW4xMT1pbnQzMiMz
-CisJIyBtb3ZsIDAoPGs9JWVjeCksPmluMTE9JWVkeAorCW1vdmwgICAgMCglZWN4KSwlZWR4CisK
-KwkjICAgICBpbjEyID0gKih1aW50MzIgKikgKGsgKyA0KQorCSMgbW92bCA0KDxrPWludDMyIzIp
-LD5pbjEyPWludDMyIzQKKwkjIG1vdmwgNCg8az0lZWN4KSw+aW4xMj0lZWJ4CisJbW92bCAgICA0
-KCVlY3gpLCVlYngKKworCSMgICAgIGluMTMgPSAqKHVpbnQzMiAqKSAoayArIDgpCisJIyBtb3Zs
-IDgoPGs9aW50MzIjMiksPmluMTM9aW50MzIjNQorCSMgbW92bCA4KDxrPSVlY3gpLD5pbjEzPSVl
-c2kKKwltb3ZsICAgIDgoJWVjeCksJWVzaQorCisJIyAgICAgaW4xNCA9ICoodWludDMyICopIChr
-ICsgMTIpCisJIyBtb3ZsIDEyKDxrPWludDMyIzIpLD5pbjE0PWludDMyIzIKKwkjIG1vdmwgMTIo
-PGs9JWVjeCksPmluMTQ9JWVjeAorCW1vdmwgICAgMTIoJWVjeCksJWVjeAorCisJIyAgICAgKih1
-aW50MzIgKikgKHggKyA0NCkgPSBpbjExCisJIyBtb3ZsIDxpbjExPWludDMyIzMsNDQoPHg9aW50
-MzIjMSkKKwkjIG1vdmwgPGluMTE9JWVkeCw0NCg8eD0lZWF4KQorCW1vdmwgICAgJWVkeCw0NCgl
-ZWF4KQorCisJIyAgICAgKih1aW50MzIgKikgKHggKyA0OCkgPSBpbjEyCisJIyBtb3ZsIDxpbjEy
-PWludDMyIzQsNDgoPHg9aW50MzIjMSkKKwkjIG1vdmwgPGluMTI9JWVieCw0OCg8eD0lZWF4KQor
-CW1vdmwgICAgJWVieCw0OCglZWF4KQorCisJIyAgICAgKih1aW50MzIgKikgKHggKyA1MikgPSBp
-bjEzCisJIyBtb3ZsIDxpbjEzPWludDMyIzUsNTIoPHg9aW50MzIjMSkKKwkjIG1vdmwgPGluMTM9
-JWVzaSw1Mig8eD0lZWF4KQorCW1vdmwgICAgJWVzaSw1MiglZWF4KQorCisJIyAgICAgKih1aW50
-MzIgKikgKHggKyA1NikgPSBpbjE0CisJIyBtb3ZsIDxpbjE0PWludDMyIzIsNTYoPHg9aW50MzIj
-MSkKKwkjIG1vdmwgPGluMTQ9JWVjeCw1Nig8eD0lZWF4KQorCW1vdmwgICAgJWVjeCw1NiglZWF4
-KQorCisJIyAgICAgaW4wID0gMTYzNDc2MDgwNQorCSMgbW92ICAkMTYzNDc2MDgwNSw+aW4wPWlu
-dDMyIzIKKwkjIG1vdiAgJDE2MzQ3NjA4MDUsPmluMD0lZWN4CisJbW92ICAgICAgJDE2MzQ3NjA4
-MDUsJWVjeAorCisJIyAgICAgaW41ID0gODI0MjA2NDQ2CisJIyBtb3YgICQ4MjQyMDY0NDYsPmlu
-NT1pbnQzMiMzCisJIyBtb3YgICQ4MjQyMDY0NDYsPmluNT0lZWR4CisJbW92ICAgICAgJDgyNDIw
-NjQ0NiwlZWR4CisKKwkjICAgICBpbjEwID0gMjAzNjQ3NzIzOAorCSMgbW92ICAkMjAzNjQ3NzIz
-OCw+aW4xMD1pbnQzMiM0CisJIyBtb3YgICQyMDM2NDc3MjM4LD5pbjEwPSVlYngKKwltb3YgICAg
-ICAkMjAzNjQ3NzIzOCwlZWJ4CisKKwkjICAgICBpbjE1ID0gMTc5NzI4NTIzNgorCSMgbW92ICAk
-MTc5NzI4NTIzNiw+aW4xNT1pbnQzMiM1CisJIyBtb3YgICQxNzk3Mjg1MjM2LD5pbjE1PSVlc2kK
-Kwltb3YgICAgICAkMTc5NzI4NTIzNiwlZXNpCisKKwkjICAgICAqKHVpbnQzMiAqKSAoeCArIDAp
-ID0gaW4wCisJIyBtb3ZsIDxpbjA9aW50MzIjMiwwKDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjA9
-JWVjeCwwKDx4PSVlYXgpCisJbW92bCAgICAlZWN4LDAoJWVheCkKKworCSMgICAgICoodWludDMy
-ICopICh4ICsgMjApID0gaW41CisJIyBtb3ZsIDxpbjU9aW50MzIjMywyMCg8eD1pbnQzMiMxKQor
-CSMgbW92bCA8aW41PSVlZHgsMjAoPHg9JWVheCkKKwltb3ZsICAgICVlZHgsMjAoJWVheCkKKwor
-CSMgICAgICoodWludDMyICopICh4ICsgNDApID0gaW4xMAorCSMgbW92bCA8aW4xMD1pbnQzMiM0
-LDQwKDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjEwPSVlYngsNDAoPHg9JWVheCkKKwltb3ZsICAg
-ICVlYngsNDAoJWVheCkKKworCSMgICAgICoodWludDMyICopICh4ICsgNjApID0gaW4xNQorCSMg
-bW92bCA8aW4xNT1pbnQzMiM1LDYwKDx4PWludDMyIzEpCisJIyBtb3ZsIDxpbjE1PSVlc2ksNjAo
-PHg9JWVheCkKKwltb3ZsICAgICVlc2ksNjAoJWVheCkKKworCSMgICBrZXlzZXR1cGRvbmUjCisu
-X2tleXNldHVwZG9uZToKKworCSMgICBlYXggPSBlYXhfc3RhY2sKKwkjIG1vdmwgPGVheF9zdGFj
-az1zdGFjazMyIzEsPmVheD1pbnQzMiMxCisJIyBtb3ZsIDxlYXhfc3RhY2s9NjQoJWVzcCksPmVh
-eD0lZWF4CisJbW92bCAgICA2NCglZXNwKSwlZWF4CisKKwkjICAgZWJ4ID0gZWJ4X3N0YWNrCisJ
-IyBtb3ZsIDxlYnhfc3RhY2s9c3RhY2szMiMyLD5lYng9aW50MzIjNAorCSMgbW92bCA8ZWJ4X3N0
-YWNrPTY4KCVlc3ApLD5lYng9JWVieAorCW1vdmwgICAgNjgoJWVzcCksJWVieAorCisJIyAgIGVz
-aSA9IGVzaV9zdGFjaworCSMgbW92bCA8ZXNpX3N0YWNrPXN0YWNrMzIjMyw+ZXNpPWludDMyIzUK
-KwkjIG1vdmwgPGVzaV9zdGFjaz03MiglZXNwKSw+ZXNpPSVlc2kKKwltb3ZsICAgIDcyKCVlc3Ap
-LCVlc2kKKworCSMgICBlZGkgPSBlZGlfc3RhY2sKKwkjIG1vdmwgPGVkaV9zdGFjaz1zdGFjazMy
-IzQsPmVkaT1pbnQzMiM2CisJIyBtb3ZsIDxlZGlfc3RhY2s9NzYoJWVzcCksPmVkaT0lZWRpCisJ
-bW92bCAgICA3NiglZXNwKSwlZWRpCisKKwkjICAgZWJwID0gZWJwX3N0YWNrCisJIyBtb3ZsIDxl
-YnBfc3RhY2s9c3RhY2szMiM1LD5lYnA9aW50MzIjNworCSMgbW92bCA8ZWJwX3N0YWNrPTgwKCVl
-c3ApLD5lYnA9JWVicAorCW1vdmwgICAgODAoJWVzcCksJWVicAorCisJIyBsZWF2ZQorCWFkZCAg
-ICAgJWVheCwlZXNwCisJcmV0CisKKyMgZW50ZXIgRUNSWVBUX2l2c2V0dXAKKy50ZXh0CisucDJh
-bGlnbiA1CisuZ2xvYmwgRUNSWVBUX2l2c2V0dXAKK19FQ1JZUFRfaXZzZXR1cDoKK0VDUllQVF9p
-dnNldHVwOgorCW1vdiAgICAgJWVzcCwlZWF4CisJYW5kICAgICAkMzEsJWVheAorCWFkZCAgICAg
-JDI1NiwlZWF4CisJc3ViICAgICAlZWF4LCVlc3AKKworCSMgICBlYXhfc3RhY2sgPSBlYXgKKwkj
-IG1vdmwgPGVheD1pbnQzMiMxLD5lYXhfc3RhY2s9c3RhY2szMiMxCisJIyBtb3ZsIDxlYXg9JWVh
-eCw+ZWF4X3N0YWNrPTY0KCVlc3ApCisJbW92bCAgICAlZWF4LDY0KCVlc3ApCisKKwkjICAgZWJ4
-X3N0YWNrID0gZWJ4CisJIyBtb3ZsIDxlYng9aW50MzIjNCw+ZWJ4X3N0YWNrPXN0YWNrMzIjMgor
-CSMgbW92bCA8ZWJ4PSVlYngsPmVieF9zdGFjaz02OCglZXNwKQorCW1vdmwgICAgJWVieCw2OCgl
-ZXNwKQorCisJIyAgIGVzaV9zdGFjayA9IGVzaQorCSMgbW92bCA8ZXNpPWludDMyIzUsPmVzaV9z
-dGFjaz1zdGFjazMyIzMKKwkjIG1vdmwgPGVzaT0lZXNpLD5lc2lfc3RhY2s9NzIoJWVzcCkKKwlt
-b3ZsICAgICVlc2ksNzIoJWVzcCkKKworCSMgICBlZGlfc3RhY2sgPSBlZGkKKwkjIG1vdmwgPGVk
-aT1pbnQzMiM2LD5lZGlfc3RhY2s9c3RhY2szMiM0CisJIyBtb3ZsIDxlZGk9JWVkaSw+ZWRpX3N0
-YWNrPTc2KCVlc3ApCisJbW92bCAgICAlZWRpLDc2KCVlc3ApCisKKwkjICAgZWJwX3N0YWNrID0g
-ZWJwCisJIyBtb3ZsIDxlYnA9aW50MzIjNyw+ZWJwX3N0YWNrPXN0YWNrMzIjNQorCSMgbW92bCA8
-ZWJwPSVlYnAsPmVicF9zdGFjaz04MCglZXNwKQorCW1vdmwgICAgJWVicCw4MCglZXNwKQorCisJ
-IyAgIGl2ID0gYXJnMgorCSMgbW92bCA8YXJnMj1zdGFjazMyIy0yLD5pdj1pbnQzMiMyCisJIyBt
-b3ZsIDxhcmcyPTgoJWVzcCwlZWF4KSw+aXY9JWVjeAorCW1vdmwgICAgOCglZXNwLCVlYXgpLCVl
-Y3gKKworCSMgICB4ID0gYXJnMQorCSMgbW92bCA8YXJnMT1zdGFjazMyIy0xLD54PWludDMyIzEK
-KwkjIG1vdmwgPGFyZzE9NCglZXNwLCVlYXgpLD54PSVlYXgKKwltb3ZsICAgIDQoJWVzcCwlZWF4
-KSwlZWF4CisKKwkjICAgaW42ID0gKih1aW50MzIgKikgKGl2ICsgMCkKKwkjIG1vdmwgMCg8aXY9
-aW50MzIjMiksPmluNj1pbnQzMiMzCisJIyBtb3ZsIDAoPGl2PSVlY3gpLD5pbjY9JWVkeAorCW1v
-dmwgICAgMCglZWN4KSwlZWR4CisKKwkjICAgaW43ID0gKih1aW50MzIgKikgKGl2ICsgNCkKKwkj
-IG1vdmwgNCg8aXY9aW50MzIjMiksPmluNz1pbnQzMiMyCisJIyBtb3ZsIDQoPGl2PSVlY3gpLD5p
-bjc9JWVjeAorCW1vdmwgICAgNCglZWN4KSwlZWN4CisKKwkjICAgaW44ID0gMAorCSMgbW92ICAk
-MCw+aW44PWludDMyIzQKKwkjIG1vdiAgJDAsPmluOD0lZWJ4CisJbW92ICAgICAgJDAsJWVieAor
-CisJIyAgIGluOSA9IDAKKwkjIG1vdiAgJDAsPmluOT1pbnQzMiM1CisJIyBtb3YgICQwLD5pbjk9
-JWVzaQorCW1vdiAgICAgICQwLCVlc2kKKworCSMgICAqKHVpbnQzMiAqKSAoeCArIDI0KSA9IGlu
-NgorCSMgbW92bCA8aW42PWludDMyIzMsMjQoPHg9aW50MzIjMSkKKwkjIG1vdmwgPGluNj0lZWR4
-LDI0KDx4PSVlYXgpCisJbW92bCAgICAlZWR4LDI0KCVlYXgpCisKKwkjICAgKih1aW50MzIgKikg
-KHggKyAyOCkgPSBpbjcKKwkjIG1vdmwgPGluNz1pbnQzMiMyLDI4KDx4PWludDMyIzEpCisJIyBt
-b3ZsIDxpbjc9JWVjeCwyOCg8eD0lZWF4KQorCW1vdmwgICAgJWVjeCwyOCglZWF4KQorCisJIyAg
-ICoodWludDMyICopICh4ICsgMzIpID0gaW44CisJIyBtb3ZsIDxpbjg9aW50MzIjNCwzMig8eD1p
-bnQzMiMxKQorCSMgbW92bCA8aW44PSVlYngsMzIoPHg9JWVheCkKKwltb3ZsICAgICVlYngsMzIo
-JWVheCkKKworCSMgICAqKHVpbnQzMiAqKSAoeCArIDM2KSA9IGluOQorCSMgbW92bCA8aW45PWlu
-dDMyIzUsMzYoPHg9aW50MzIjMSkKKwkjIG1vdmwgPGluOT0lZXNpLDM2KDx4PSVlYXgpCisJbW92
-bCAgICAlZXNpLDM2KCVlYXgpCisKKwkjICAgZWF4ID0gZWF4X3N0YWNrCisJIyBtb3ZsIDxlYXhf
-c3RhY2s9c3RhY2szMiMxLD5lYXg9aW50MzIjMQorCSMgbW92bCA8ZWF4X3N0YWNrPTY0KCVlc3Ap
-LD5lYXg9JWVheAorCW1vdmwgICAgNjQoJWVzcCksJWVheAorCisJIyAgIGVieCA9IGVieF9zdGFj
-aworCSMgbW92bCA8ZWJ4X3N0YWNrPXN0YWNrMzIjMiw+ZWJ4PWludDMyIzQKKwkjIG1vdmwgPGVi
-eF9zdGFjaz02OCglZXNwKSw+ZWJ4PSVlYngKKwltb3ZsICAgIDY4KCVlc3ApLCVlYngKKworCSMg
-ICBlc2kgPSBlc2lfc3RhY2sKKwkjIG1vdmwgPGVzaV9zdGFjaz1zdGFjazMyIzMsPmVzaT1pbnQz
-MiM1CisJIyBtb3ZsIDxlc2lfc3RhY2s9NzIoJWVzcCksPmVzaT0lZXNpCisJbW92bCAgICA3Migl
-ZXNwKSwlZXNpCisKKwkjICAgZWRpID0gZWRpX3N0YWNrCisJIyBtb3ZsIDxlZGlfc3RhY2s9c3Rh
-Y2szMiM0LD5lZGk9aW50MzIjNgorCSMgbW92bCA8ZWRpX3N0YWNrPTc2KCVlc3ApLD5lZGk9JWVk
-aQorCW1vdmwgICAgNzYoJWVzcCksJWVkaQorCisJIyAgIGVicCA9IGVicF9zdGFjaworCSMgbW92
-bCA8ZWJwX3N0YWNrPXN0YWNrMzIjNSw+ZWJwPWludDMyIzcKKwkjIG1vdmwgPGVicF9zdGFjaz04
-MCglZXNwKSw+ZWJwPSVlYnAKKwltb3ZsICAgIDgwKCVlc3ApLCVlYnAKKworCSMgbGVhdmUKKwlh
-ZGQgICAgICVlYXgsJWVzcAorCXJldApkaWZmIC0tZ2l0IGEvYXJjaC94ODYvY3J5cHRvL3NhbHNh
-MjBfMzIuYyBiL2FyY2gveDg2L2NyeXB0by9zYWxzYTIwXzMyLmMKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKaW5kZXggMDAwMDAwMC4uMTRkZDY5ZAotLS0gL2Rldi9udWxsCisrKyBiL2FyY2gveDg2L2Ny
-eXB0by9zYWxzYTIwXzMyLmMKQEAgLTAsMCArMSwxMjcgQEAKKy8qCisgKiBHbHVlIGNvZGUgZm9y
-IG9wdGltaXplZCBpNTg2IHZlcnNpb24gb2YgIFNhbHNhMjAuCisgKgorICogQ29weXJpZ2h0IChj
-KSAyMDA3IFRhbiBTd2VlIEhlbmcgPHRoZXN3ZWVoZW5nQGdtYWlsLmNvbT4KKyAqCisgKiBPcHRp
-bWl6ZWQgaTU4NiBhc3NlbWJseSBjb2RlIHRha2VuIGZyb206CisgKiAtIHNhbHNhMjAuczoKKyAq
-ICAgICBQdWJsaWMgZG9tYWluIGFzc2VtYmx5IGNvZGUgYnkgRGFuaWVsLiBKLiBCZXJuc3RlaW4g
-PGRqYkBjci55cC50bz4uCisgKiAgICAgQXZhaWxhYmxlIGZyb20gPGh0dHA6Ly9jci55cC50by9z
-bnVmZmxlL3NhbHNhMjAveDg2LXBtL3NhbHNhMjAucz4uCisgKiAgICAgV2UgcmVuYW1lZCBpdCBz
-YWxzYTIwLWk1ODYtYXNtXzMyLlMgYW5kIGluZGVudGVkIGl0IG5pY2VseSB0byBtYXRjaAorICog
-ICAgIHRoZSBvdGhlciBjaXBoZXJzLgorICoKKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3
-YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5IGl0CisgKiB1bmRlciB0
-aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBi
-eSB0aGUgRnJlZQorICogU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBvZiB0
-aGUgTGljZW5zZSwgb3IgKGF0IHlvdXIgb3B0aW9uKQorICogYW55IGxhdGVyIHZlcnNpb24uCisg
-KgorICovCisKKyNpbmNsdWRlIDxjcnlwdG8vYWxnYXBpLmg+CisjaW5jbHVkZSA8bGludXgvbW9k
-dWxlLmg+CisjaW5jbHVkZSA8bGludXgvY3J5cHRvLmg+CisKKyNkZWZpbmUgU0FMU0EyMF9JVl9T
-SVpFICAgICAgICA4VQorI2RlZmluZSBTQUxTQTIwX01JTl9LRVlfU0laRSAgMTZVCisjZGVmaW5l
-IFNBTFNBMjBfTUFYX0tFWV9TSVpFICAzMlUKKworLy8gdXNlIHRoZSBFQ1JZUFRfKiBmdW5jdGlv
-biBuYW1lcyBpbiBzYWxzYTIwLWk1ODYtYXNtXzMyLlMKKyNkZWZpbmUgc2Fsc2EyMF9rZXlzZXR1
-cCAgICAgICAgRUNSWVBUX2tleXNldHVwCisjZGVmaW5lIHNhbHNhMjBfaXZzZXR1cCAgICAgICAg
-IEVDUllQVF9pdnNldHVwCisjZGVmaW5lIHNhbHNhMjBfZW5jcnlwdF9ieXRlcyAgIEVDUllQVF9l
-bmNyeXB0X2J5dGVzCisKK3N0cnVjdCBzYWxzYTIwX2N0eAoreworCXUzMiBpbnB1dFsxNl07Cit9
-OworCithc21saW5rYWdlIHZvaWQgc2Fsc2EyMF9rZXlzZXR1cChzdHJ1Y3Qgc2Fsc2EyMF9jdHgg
-KmN0eCwgY29uc3QgdTggKmssCisJCQkJIHUzMiBrZXlzaXplLCB1MzIgaXZzaXplKTsKK2FzbWxp
-bmthZ2Ugdm9pZCBzYWxzYTIwX2l2c2V0dXAoc3RydWN0IHNhbHNhMjBfY3R4ICpjdHgsIGNvbnN0
-IHU4ICppdik7Cithc21saW5rYWdlIHZvaWQgc2Fsc2EyMF9lbmNyeXB0X2J5dGVzKHN0cnVjdCBz
-YWxzYTIwX2N0eCAqY3R4LAorCQkJCSAgICAgIGNvbnN0IHU4ICpzcmMsIHU4ICpkc3QsIHUzMiBi
-eXRlcyk7CisKK3N0YXRpYyBpbnQgc2V0a2V5KHN0cnVjdCBjcnlwdG9fdGZtICp0Zm0sIGNvbnN0
-IHU4ICprZXksCisJCSAgdW5zaWduZWQgaW50IGtleXNpemUpCit7CisJc3RydWN0IHNhbHNhMjBf
-Y3R4ICpjdHggPSBjcnlwdG9fdGZtX2N0eCh0Zm0pOworCXNhbHNhMjBfa2V5c2V0dXAoY3R4LCBr
-ZXksIGtleXNpemUqOCwgU0FMU0EyMF9JVl9TSVpFKjgpOworCXJldHVybiAwOworfQorCitzdGF0
-aWMgaW50IGVuY3J5cHQoc3RydWN0IGJsa2NpcGhlcl9kZXNjICpkZXNjLAorCQkgICBzdHJ1Y3Qg
-c2NhdHRlcmxpc3QgKmRzdCwgc3RydWN0IHNjYXR0ZXJsaXN0ICpzcmMsCisJCSAgIHVuc2lnbmVk
-IGludCBuYnl0ZXMpCit7CisJc3RydWN0IGJsa2NpcGhlcl93YWxrIHdhbGs7CisJc3RydWN0IGNy
-eXB0b19ibGtjaXBoZXIgKnRmbSA9IGRlc2MtPnRmbTsKKwlzdHJ1Y3Qgc2Fsc2EyMF9jdHggKmN0
-eCA9IGNyeXB0b19ibGtjaXBoZXJfY3R4KHRmbSk7CisJaW50IGVycjsKKworCWJsa2NpcGhlcl93
-YWxrX2luaXQoJndhbGssIGRzdCwgc3JjLCBuYnl0ZXMpOworCWVyciA9IGJsa2NpcGhlcl93YWxr
-X3ZpcnRfYmxvY2soZGVzYywgJndhbGssIDY0KTsKKworCXNhbHNhMjBfaXZzZXR1cChjdHgsIHdh
-bGsuaXYpOworCisJaWYgKGxpa2VseSh3YWxrLm5ieXRlcyA9PSBuYnl0ZXMpKQorCXsKKwkJc2Fs
-c2EyMF9lbmNyeXB0X2J5dGVzKGN0eCwgd2Fsay5kc3QudmlydC5hZGRyLAorCQkJCSAgICAgIHdh
-bGsuc3JjLnZpcnQuYWRkciwgbmJ5dGVzKTsKKwkJcmV0dXJuIGJsa2NpcGhlcl93YWxrX2RvbmUo
-ZGVzYywgJndhbGssIDApOworCX0KKworCXdoaWxlICh3YWxrLm5ieXRlcyA+PSA2NCkgeworCQlz
-YWxzYTIwX2VuY3J5cHRfYnl0ZXMoY3R4LCB3YWxrLmRzdC52aXJ0LmFkZHIsCisJCQkJICAgICAg
-d2Fsay5zcmMudmlydC5hZGRyLAorCQkJCSAgICAgIHdhbGsubmJ5dGVzIC0gKHdhbGsubmJ5dGVz
-ICUgNjQpKTsKKwkJZXJyID0gYmxrY2lwaGVyX3dhbGtfZG9uZShkZXNjLCAmd2Fsaywgd2Fsay5u
-Ynl0ZXMgJSA2NCk7CisJfQorCisJaWYgKHdhbGsubmJ5dGVzKSB7CisJCXNhbHNhMjBfZW5jcnlw
-dF9ieXRlcyhjdHgsIHdhbGsuZHN0LnZpcnQuYWRkciwKKwkJCQkgICAgICB3YWxrLnNyYy52aXJ0
-LmFkZHIsIHdhbGsubmJ5dGVzKTsKKwkJZXJyID0gYmxrY2lwaGVyX3dhbGtfZG9uZShkZXNjLCAm
-d2FsaywgMCk7CisJfQorCisJcmV0dXJuIGVycjsKK30KKworc3RhdGljIHN0cnVjdCBjcnlwdG9f
-YWxnIGFsZyA9IHsKKwkuY3JhX25hbWUgICAgICAgICAgID0gICAic2Fsc2EyMCIsCisJLmNyYV9k
-cml2ZXJfbmFtZSAgICA9ICAgInNhbHNhMjAtaTU4NiIsCisJLmNyYV9wcmlvcml0eSAgICAgICA9
-ICAgMjAwLAorCS5jcmFfZmxhZ3MgICAgICAgICAgPSAgIENSWVBUT19BTEdfVFlQRV9CTEtDSVBI
-RVIsCisJLmNyYV90eXBlICAgICAgICAgICA9ICAgJmNyeXB0b19ibGtjaXBoZXJfdHlwZSwKKwku
-Y3JhX2Jsb2Nrc2l6ZSAgICAgID0gICAxLAorCS5jcmFfY3R4c2l6ZSAgICAgICAgPSAgIHNpemVv
-ZihzdHJ1Y3Qgc2Fsc2EyMF9jdHgpLAorCS5jcmFfYWxpZ25tYXNrICAgICAgPQkzLAorCS5jcmFf
-bW9kdWxlICAgICAgICAgPSAgIFRISVNfTU9EVUxFLAorCS5jcmFfbGlzdCAgICAgICAgICAgPSAg
-IExJU1RfSEVBRF9JTklUKGFsZy5jcmFfbGlzdCksCisJLmNyYV91ICAgICAgICAgICAgICA9ICAg
-eworCQkuYmxrY2lwaGVyID0geworCQkJLnNldGtleSAgICAgICAgID0gICBzZXRrZXksCisJCQku
-ZW5jcnlwdCAgICAgICAgPSAgIGVuY3J5cHQsCisJCQkuZGVjcnlwdCAgICAgICAgPSAgIGVuY3J5
-cHQsCisJCQkubWluX2tleXNpemUgICAgPSAgIFNBTFNBMjBfTUlOX0tFWV9TSVpFLAorCQkJLm1h
-eF9rZXlzaXplICAgID0gICBTQUxTQTIwX01BWF9LRVlfU0laRSwKKwkJCS5pdnNpemUgICAgICAg
-ICA9ICAgU0FMU0EyMF9JVl9TSVpFLAorCQl9CisJfQorfTsKKworc3RhdGljIGludCBfX2luaXQg
-aW5pdCh2b2lkKQoreworCXJldHVybiBjcnlwdG9fcmVnaXN0ZXJfYWxnKCZhbGcpOworfQorCitz
-dGF0aWMgdm9pZCBfX2V4aXQgZmluaSh2b2lkKQoreworCWNyeXB0b191bnJlZ2lzdGVyX2FsZygm
-YWxnKTsKK30KKworbW9kdWxlX2luaXQoaW5pdCk7Cittb2R1bGVfZXhpdChmaW5pKTsKKworTU9E
-VUxFX0xJQ0VOU0UoIkdQTCIpOworTU9EVUxFX0RFU0NSSVBUSU9OICgiU2Fsc2EyMCBzdHJlYW0g
-Y2lwaGVyIGFsZ29yaXRobSAoaTU4NiB2ZXJzaW9uKSIpOworTU9EVUxFX0FMSUFTKCJzYWxzYTIw
-Iik7CmRpZmYgLS1naXQgYS9jcnlwdG8vS2NvbmZpZyBiL2NyeXB0by9LY29uZmlnCmluZGV4IDQw
-YWU5MmMuLjVjZDBlYjggMTAwNjQ0Ci0tLSBhL2NyeXB0by9LY29uZmlnCisrKyBiL2NyeXB0by9L
-Y29uZmlnCkBAIC00NzYsNiArNDc2LDIxIEBAIGNvbmZpZyBDUllQVE9fU0FMU0EyMAogCSAgVGhl
-IFNhbHNhMjAgc3RyZWFtIGNpcGhlciBhbGdvcml0aG0gaXMgZGVzaWduZWQgYnkgRGFuaWVsIEou
-CiAJICBCZXJuc3RlaW4gPGRqYkBjci55cC50bz4uIFNlZSA8aHR0cDovL2NyLnlwLnRvL3NudWZm
-bGUuaHRtbD4KIAorY29uZmlnIENSWVBUT19TQUxTQTIwXzU4NgorCXRyaXN0YXRlICJTYWxzYTIw
-IHN0cmVhbSBjaXBoZXIgYWxnb3JpdGhtIChpNTg2KSAoRVhQRVJJTUVOVEFMKSIKKwlkZXBlbmRz
-IG9uIChYODYgfHwgVU1MX1g4NikgJiYgITY0QklUCisJZGVwZW5kcyBvbiBFWFBFUklNRU5UQUwK
-KwlzZWxlY3QgQ1JZUFRPX0JMS0NJUEhFUgorCXNlbGVjdCBDUllQVE9fU0FMU0EyMAorCWhlbHAK
-KwkgIFNhbHNhMjAgc3RyZWFtIGNpcGhlciBhbGdvcml0aG0uCisKKwkgIFNhbHNhMjAgaXMgYSBz
-dHJlYW0gY2lwaGVyIHN1Ym1pdHRlZCB0byBlU1RSRUFNLCB0aGUgRUNSWVBUCisJICBTdHJlYW0g
-Q2lwaGVyIFByb2plY3QuIFNlZSA8aHR0cDovL3d3dy5lY3J5cHQuZXUub3JnL3N0cmVhbS8+CisK
-KwkgIFRoZSBTYWxzYTIwIHN0cmVhbSBjaXBoZXIgYWxnb3JpdGhtIGlzIGRlc2lnbmVkIGJ5IERh
-bmllbCBKLgorCSAgQmVybnN0ZWluIDxkamJAY3IueXAudG8+LiBTZWUgPGh0dHA6Ly9jci55cC50
-by9zbnVmZmxlLmh0bWw+CisKIGNvbmZpZyBDUllQVE9fREVGTEFURQogCXRyaXN0YXRlICJEZWZs
-YXRlIGNvbXByZXNzaW9uIGFsZ29yaXRobSIKIAlzZWxlY3QgQ1JZUFRPX0FMR0FQSQpkaWZmIC0t
-Z2l0IGEvY3J5cHRvL3RjcnlwdC5jIGIvY3J5cHRvL3RjcnlwdC5jCmluZGV4IDZhNDc0ZjQuLmNk
-OGUwNGYgMTAwNjQ0Ci0tLSBhL2NyeXB0by90Y3J5cHQuYworKysgYi9jcnlwdG8vdGNyeXB0LmMK
-QEAgLTE2NjIsNiArMTY2Miw4IEBAIHN0YXRpYyB2b2lkIGRvX3Rlc3Qodm9pZCkKIAljYXNlIDIw
-NjoKIAkJdGVzdF9jaXBoZXJfc3BlZWQoInNhbHNhMjAtZ2VuZXJpYyIsIEVOQ1JZUFQsIHNlYywg
-TlVMTCwgMCwKIAkJCQlzYWxzYTIwX3NwZWVkX3RlbXBsYXRlKTsKKwkJdGVzdF9jaXBoZXJfc3Bl
-ZWQoInNhbHNhMjAtaTU4NiIsIEVOQ1JZUFQsIHNlYywgTlVMTCwgMCwKKwkJCQlzYWxzYTIwX3Nw
-ZWVkX3RlbXBsYXRlKTsKIAkJYnJlYWs7CiAKIAljYXNlIDMwMDoK
-------=_Part_613_31150930.1196886685611--
+Sebastian
