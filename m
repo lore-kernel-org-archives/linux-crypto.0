@@ -1,610 +1,126 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/5] [CRYPTO] gcm: Fix ICV handling
-Date: Fri, 07 Dec 2007 16:19:44 +0800
-Message-ID: <E1J0YQy-00021n-00@gondolin.me.apana.org.au>
+Subject: [PATCH 5/5] [CRYPTO] scatterwalk: Restore custom sg chaining for now
+Date: Fri, 07 Dec 2007 16:19:47 +0800
+Message-ID: <E1J0YR1-000229-00@gondolin.me.apana.org.au>
 References: <20071207081904.GA7733@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1991 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1995 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751928AbXLGITs (ORCPT
+	with ESMTP id S1752351AbXLGITv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Dec 2007 03:19:48 -0500
+	Fri, 7 Dec 2007 03:19:51 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J0YQz-0005ER-4E
-	for <linux-crypto@vger.kernel.org>; Fri, 07 Dec 2007 19:19:45 +1100
+	id 1J0YR2-0005Eh-Pw
+	for <linux-crypto@vger.kernel.org>; Fri, 07 Dec 2007 19:19:49 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] gcm: Fix ICV handling
+[CRYPTO] scatterwalk: Restore custom sg chaining for now
 
-The crypto_aead convention for ICVs is to include it directly in the
-output.  If we decided to change this in future then we would make
-the ICV (if the algorithm has an explicit one) available in the
-request itself.
+Unfortunately the generic chaining hasn't been ported to all architectures
+yet, and notably not s390.  So this patch restores the chainging that we've
+been using previously which does work everywhere.
 
-For now no algorithm needs this so this patch changes gcm to conform
-to this convention.  It also adjusts the tcrypt aead tests to take
-this into account.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+eigned-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/gcm.c    |   68 +++++++++++++++++------------
- crypto/tcrypt.c |   44 ++++++------------
- crypto/tcrypt.h |  130 ++++++++++++++++++++++++--------------------------------
- 3 files changed, 113 insertions(+), 129 deletions(-)
+ crypto/digest.c              |    2 +-
+ crypto/gcm.c                 |    2 +-
+ crypto/hmac.c                |    3 ++-
+ crypto/scatterwalk.c         |    4 ++--
+ include/crypto/scatterwalk.h |   11 +++++++++++
+ 5 files changed, 17 insertions(+), 5 deletions(-)
 
+diff --git a/crypto/digest.c b/crypto/digest.c
+index 52845f5..6fd43bd 100644
+--- a/crypto/digest.c
++++ b/crypto/digest.c
+@@ -75,7 +75,7 @@ static int update2(struct hash_desc *desc,
+ 
+ 		if (!nbytes)
+ 			break;
+-		sg = sg_next(sg);
++		sg = scatterwalk_sg_next(sg);
+ 	}
+ 
+ 	return 0;
 diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 5681c79..ed8a626 100644
+index 67cd067..f293502 100644
 --- a/crypto/gcm.c
 +++ b/crypto/gcm.c
-@@ -36,6 +36,7 @@ struct crypto_gcm_ghash_ctx {
+@@ -98,7 +98,7 @@ static void crypto_gcm_ghash_update_sg(struct crypto_gcm_ghash_ctx *ctx,
+ 		n = scatterwalk_clamp(&walk, len);
  
- struct crypto_gcm_req_priv_ctx {
- 	u8 auth_tag[16];
-+	u8 iauth_tag[16];
- 	u8 counter[16];
- 	struct crypto_gcm_ghash_ctx ghash;
- };
-@@ -89,6 +90,9 @@ static void crypto_gcm_ghash_update_sg(struct crypto_gcm_ghash_ctx *ctx,
- 	u8 *src;
- 	int n;
+ 		if (!n) {
+-			scatterwalk_start(&walk, sg_next(walk.sg));
++			scatterwalk_start(&walk, scatterwalk_sg_next(walk.sg));
+ 			n = scatterwalk_clamp(&walk, len);
+ 		}
  
-+	if (!len)
-+		return;
-+
- 	scatterwalk_start(&walk, sg);
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 34c3706..a1d016a 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -17,6 +17,7 @@
+  */
  
- 	while (len) {
-@@ -211,9 +215,10 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ #include <crypto/algapi.h>
++#include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -160,7 +161,7 @@ static int hmac_digest(struct hash_desc *pdesc, struct scatterlist *sg,
+ 
+ 	sg_init_table(sg1, 2);
+ 	sg_set_buf(sg1, ipad, bs);
+-	sg_chain(sg1, 2, sg);
++	scatterwalk_sg_chain(sg1, 2, sg);
+ 
+ 	sg_init_table(sg2, 1);
+ 	sg_set_buf(sg2, opad, bs + ds);
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 12d1901..297e19d 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -61,7 +61,7 @@ static void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 		walk->offset += PAGE_SIZE - 1;
+ 		walk->offset &= PAGE_MASK;
+ 		if (walk->offset >= walk->sg->offset + walk->sg->length)
+-			scatterwalk_start(walk, sg_next(walk->sg));
++			scatterwalk_start(walk, scatterwalk_sg_next(walk->sg));
+ 	}
  }
  
- static int crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
--				  struct aead_request *req,
--				  void (*done)(struct crypto_async_request *,
--					       int))
-+				 struct aead_request *req,
-+				 unsigned int cryptlen,
-+				 void (*done)(struct crypto_async_request *,
-+					      int))
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
-@@ -228,7 +233,7 @@ static int crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
- 	ablkcipher_request_set_callback(ablk_req, aead_request_flags(req),
- 					done, req);
- 	ablkcipher_request_set_crypt(ablk_req, req->src, req->dst,
--				     req->cryptlen, counter);
-+				     cryptlen, counter);
+@@ -112,7 +112,7 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 			break;
  
- 	err = crypto_gcm_encrypt_counter(aead, auth_tag, 0, req->iv);
- 	if (err)
-@@ -239,18 +244,16 @@ static int crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
+ 		offset += sg->length;
+-		sg = sg_next(sg);
++		sg = scatterwalk_sg_next(sg);
+ 	}
  
- 	crypto_gcm_ghash_init(ghash, flags, ctx->gf128);
- 
--	if (req->assoclen) {
--		crypto_gcm_ghash_update_sg(ghash, req->assoc, req->assoclen);
--		crypto_gcm_ghash_flush(ghash);
--	}
-+	crypto_gcm_ghash_update_sg(ghash, req->assoc, req->assoclen);
-+	crypto_gcm_ghash_flush(ghash);
- 
-  out:
- 	return err;
+ 	scatterwalk_advance(&walk, start - offset);
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 07b6f17..bd62431 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -52,6 +52,17 @@ static inline void crypto_yield(u32 flags)
+ 		cond_resched();
  }
  
--static void crypto_gcm_encrypt_done(struct crypto_async_request *areq, int err)
-+static int crypto_gcm_hash(struct aead_request *req)
- {
--	struct aead_request *req = areq->data;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
- 	u8 *auth_tag = pctx->auth_tag;
- 	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
-@@ -259,18 +262,28 @@ static void crypto_gcm_encrypt_done(struct crypto_async_request *areq, int err)
- 	crypto_gcm_ghash_final_xor(ghash, req->assoclen, req->cryptlen,
- 				   auth_tag);
- 
-+	scatterwalk_map_and_copy(auth_tag, req->dst, req->cryptlen,
-+				 crypto_aead_authsize(aead), 1);
-+	return 0;
++static inline void scatterwalk_sg_chain(struct scatterlist *sg1, int num,
++					struct scatterlist *sg2)
++{
++	sg_set_page(&sg1[num - 1], (void *)sg2, 0, 0);
 +}
 +
-+static void crypto_gcm_encrypt_done(struct crypto_async_request *areq, int err)
++static inline struct scatterlist *scatterwalk_sg_next(struct scatterlist *sg)
 +{
-+	struct aead_request *req = areq->data;
++	return (++sg)->length ? sg : (void *)sg_page(sg);
++}
 +
-+	if (!err)
-+		err = crypto_gcm_hash(req);
-+
- 	aead_request_complete(req, err);
- }
- 
- static int crypto_gcm_encrypt(struct aead_request *req)
+ static inline unsigned long scatterwalk_samebuf(struct scatter_walk *walk_in,
+ 						struct scatter_walk *walk_out)
  {
- 	struct ablkcipher_request abreq;
--	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
--	u8 *auth_tag = pctx->auth_tag;
--	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
- 	int err = 0;
- 
--	err = crypto_gcm_init_crypt(&abreq, req, crypto_gcm_encrypt_done);
-+	err = crypto_gcm_init_crypt(&abreq, req, req->cryptlen,
-+				    crypto_gcm_encrypt_done);
- 	if (err)
- 		return err;
- 
-@@ -278,14 +291,9 @@ static int crypto_gcm_encrypt(struct aead_request *req)
- 		err = crypto_ablkcipher_encrypt(&abreq);
- 		if (err)
- 			return err;
--
--		crypto_gcm_ghash_update_sg(ghash, req->dst, req->cryptlen);
- 	}
- 
--	crypto_gcm_ghash_final_xor(ghash, req->assoclen, req->cryptlen,
--				   auth_tag);
--
--	return err;
-+	return crypto_gcm_hash(req);
- }
- 
- static void crypto_gcm_decrypt_done(struct crypto_async_request *areq, int err)
-@@ -296,25 +304,29 @@ static void crypto_gcm_decrypt_done(struct crypto_async_request *areq, int err)
- static int crypto_gcm_decrypt(struct aead_request *req)
- {
- 	struct ablkcipher_request abreq;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
- 	u8 *auth_tag = pctx->auth_tag;
-+	u8 *iauth_tag = pctx->iauth_tag;
- 	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
--	u8 tag[16];
-+	unsigned int cryptlen = req->cryptlen;
-+	unsigned int authsize = crypto_aead_authsize(aead);
- 	int err;
- 
--	if (!req->cryptlen)
-+	if (cryptlen < authsize)
- 		return -EINVAL;
-+	cryptlen -= authsize;
- 
--	memcpy(tag, auth_tag, 16);
--	err = crypto_gcm_init_crypt(&abreq, req, crypto_gcm_decrypt_done);
-+	err = crypto_gcm_init_crypt(&abreq, req, cryptlen,
-+				    crypto_gcm_decrypt_done);
- 	if (err)
- 		return err;
- 
--	crypto_gcm_ghash_update_sg(ghash, req->src, req->cryptlen);
--	crypto_gcm_ghash_final_xor(ghash, req->assoclen, req->cryptlen,
--				   auth_tag);
-+	crypto_gcm_ghash_update_sg(ghash, req->src, cryptlen);
-+	crypto_gcm_ghash_final_xor(ghash, req->assoclen, cryptlen, auth_tag);
- 
--	if (memcmp(tag, auth_tag, 16))
-+	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
-+	if (memcmp(iauth_tag, auth_tag, authsize))
- 		return -EINVAL;
- 
- 	return crypto_ablkcipher_decrypt(&abreq);
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index df93595..a6d4160 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -235,6 +235,7 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 	struct scatterlist asg[8];
- 	const char *e;
- 	struct tcrypt_result result;
-+	unsigned int authsize;
- 
- 	if (enc == ENCRYPT)
- 		e = "encryption";
-@@ -265,6 +266,8 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 		return;
- 	}
- 
-+	authsize = crypto_aead_authsize(tfm);
-+
- 	req = aead_request_alloc(tfm, GFP_KERNEL);
- 	if (!req) {
- 		printk(KERN_INFO "failed to allocate request for %s\n", algo);
-@@ -296,7 +299,7 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 			}
- 
- 			sg_init_one(&sg[0], aead_tv[i].input,
--				    aead_tv[i].ilen);
-+				    aead_tv[i].ilen + (enc ? authsize : 0));
- 
- 			sg_init_one(&asg[0], aead_tv[i].assoc,
- 				    aead_tv[i].alen);
-@@ -307,13 +310,9 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 
- 			aead_request_set_assoc(req, asg, aead_tv[i].alen);
- 
--			if (enc) {
--				ret = crypto_aead_encrypt(req);
--			} else {
--				memcpy(req->__ctx, aead_tv[i].tag,
--				       aead_tv[i].tlen);
--				ret = crypto_aead_decrypt(req);
--			}
-+			ret = enc ?
-+				crypto_aead_encrypt(req) :
-+				crypto_aead_decrypt(req);
- 
- 			switch (ret) {
- 			case 0:
-@@ -335,16 +334,10 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 
- 			q = kmap(sg_page(&sg[0])) + sg[0].offset;
- 			hexdump(q, aead_tv[i].rlen);
--			printk(KERN_INFO "auth tag: ");
--			hexdump((unsigned char *)req->__ctx, aead_tv[i].tlen);
- 
- 			printk(KERN_INFO "enc/dec: %s\n",
- 			       memcmp(q, aead_tv[i].result,
- 				      aead_tv[i].rlen) ? "fail" : "pass");
--
--			printk(KERN_INFO "auth tag: %s\n",
--			       memcmp(req->__ctx, aead_tv[i].tag,
--				      aead_tv[i].tlen) ? "fail" : "pass");
- 		}
- 	}
- 
-@@ -381,6 +374,9 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 					   aead_tv[i].tap[k]);
- 			}
- 
-+			if (enc)
-+				sg[k - 1].length += authsize;
-+
- 			sg_init_table(asg, aead_tv[i].anp);
- 			for (k = 0, temp = 0; k < aead_tv[i].anp; k++) {
- 				memcpy(&axbuf[IDX[k]],
-@@ -397,13 +393,9 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 
- 			aead_request_set_assoc(req, asg, aead_tv[i].alen);
- 
--			if (enc) {
--				ret = crypto_aead_encrypt(req);
--			} else {
--				memcpy(req->__ctx, aead_tv[i].tag,
--				       aead_tv[i].tlen);
--				ret = crypto_aead_decrypt(req);
--			}
-+			ret = enc ?
-+				crypto_aead_encrypt(req) :
-+				crypto_aead_decrypt(req);
- 
- 			switch (ret) {
- 			case 0:
-@@ -429,17 +421,13 @@ static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 				hexdump(q, aead_tv[i].tap[k]);
- 				printk(KERN_INFO "%s\n",
- 				       memcmp(q, aead_tv[i].result + temp,
--					      aead_tv[i].tap[k]) ?
-+					      aead_tv[i].tap[k] -
-+					      (k < aead_tv[i].np - 1 || enc ?
-+					       0 : authsize)) ?
- 				       "fail" : "pass");
- 
- 				temp += aead_tv[i].tap[k];
- 			}
--			printk(KERN_INFO "auth tag: ");
--			hexdump((unsigned char *)req->__ctx, aead_tv[i].tlen);
--
--			printk(KERN_INFO "auth tag: %s\n",
--			       memcmp(req->__ctx, aead_tv[i].tag,
--				      aead_tv[i].tlen) ? "fail" : "pass");
- 		}
- 	}
- 
-diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
-index 05aba22..439e290 100644
---- a/crypto/tcrypt.h
-+++ b/crypto/tcrypt.h
-@@ -60,7 +60,6 @@ struct aead_testvec {
- 	char input[512];
- 	char assoc[512];
- 	char result[512];
--	char tag[128];
- 	unsigned char tap[MAX_TAP];
- 	unsigned char atap[MAX_TAP];
- 	int np;
-@@ -71,7 +70,6 @@ struct aead_testvec {
- 	unsigned short ilen;
- 	unsigned short alen;
- 	unsigned short rlen;
--	unsigned short tlen;
- };
- 
- struct cipher_speed {
-@@ -4682,18 +4680,17 @@ static struct cipher_testvec aes_ctr_dec_tv_template[] = {
- static struct aead_testvec aes_gcm_enc_tv_template[] = {
- 	{ /* From McGrew & Viega - http://citeseer.ist.psu.edu/656989.html */
- 		.klen	= 16,
--		.tag	= { 0x58, 0xe2, 0xfc, 0xce, 0xfa, 0x7e, 0x30, 0x61,
-+		.result	= { 0x58, 0xe2, 0xfc, 0xce, 0xfa, 0x7e, 0x30, 0x61,
- 			    0x36, 0x7f, 0x1d, 0x57, 0xa4, 0xe7, 0x45, 0x5a },
--		.tlen	= 16
-+		.rlen	= 16,
- 	}, {
- 		.klen	= 16,
- 		.ilen	= 16,
- 		.result = { 0x03, 0x88, 0xda, 0xce, 0x60, 0xb6, 0xa3, 0x92,
--			    0xf3, 0x28, 0xc2, 0xb9, 0x71, 0xb2, 0xfe, 0x78 },
--		.rlen	= 16,
--		.tag	= { 0xab, 0x6e, 0x47, 0xd4, 0x2c, 0xec, 0x13, 0xbd,
-+			    0xf3, 0x28, 0xc2, 0xb9, 0x71, 0xb2, 0xfe, 0x78,
-+			    0xab, 0x6e, 0x47, 0xd4, 0x2c, 0xec, 0x13, 0xbd,
- 			    0xf5, 0x3a, 0x67, 0xb2, 0x12, 0x57, 0xbd, 0xdf },
--		.tlen	= 16
-+		.rlen	= 32,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
-@@ -4716,11 +4713,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
- 			    0x21, 0xd5, 0x14, 0xb2, 0x54, 0x66, 0x93, 0x1c,
- 			    0x7d, 0x8f, 0x6a, 0x5a, 0xac, 0x84, 0xaa, 0x05,
- 			    0x1b, 0xa3, 0x0b, 0x39, 0x6a, 0x0a, 0xac, 0x97,
--			    0x3d, 0x58, 0xe0, 0x91, 0x47, 0x3f, 0x59, 0x85 },
--		.rlen	= 64,
--		.tag	= { 0x4d, 0x5c, 0x2a, 0xf3, 0x27, 0xcd, 0x64, 0xa6,
-+			    0x3d, 0x58, 0xe0, 0x91, 0x47, 0x3f, 0x59, 0x85,
-+			    0x4d, 0x5c, 0x2a, 0xf3, 0x27, 0xcd, 0x64, 0xa6,
- 			    0x2c, 0xf3, 0x5a, 0xbd, 0x2b, 0xa6, 0xfa, 0xb4 },
--		.tlen	= 16
-+		.rlen	= 80,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
-@@ -4747,25 +4743,23 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
- 			    0x21, 0xd5, 0x14, 0xb2, 0x54, 0x66, 0x93, 0x1c,
- 			    0x7d, 0x8f, 0x6a, 0x5a, 0xac, 0x84, 0xaa, 0x05,
- 			    0x1b, 0xa3, 0x0b, 0x39, 0x6a, 0x0a, 0xac, 0x97,
--			    0x3d, 0x58, 0xe0, 0x91 },
--		.rlen	= 60,
--		.tag	= { 0x5b, 0xc9, 0x4f, 0xbc, 0x32, 0x21, 0xa5, 0xdb,
-+			    0x3d, 0x58, 0xe0, 0x91,
-+			    0x5b, 0xc9, 0x4f, 0xbc, 0x32, 0x21, 0xa5, 0xdb,
- 			    0x94, 0xfa, 0xe9, 0x5a, 0xe7, 0x12, 0x1a, 0x47 },
--		.tlen	= 16
-+		.rlen	= 76,
- 	}, {
- 		.klen	= 24,
--		.tag	= { 0xcd, 0x33, 0xb2, 0x8a, 0xc7, 0x73, 0xf7, 0x4b,
-+		.result	= { 0xcd, 0x33, 0xb2, 0x8a, 0xc7, 0x73, 0xf7, 0x4b,
- 			    0xa0, 0x0e, 0xd1, 0xf3, 0x12, 0x57, 0x24, 0x35 },
--		.tlen	= 16
-+		.rlen	= 16,
- 	}, {
- 		.klen	= 24,
- 		.ilen	= 16,
- 		.result = { 0x98, 0xe7, 0x24, 0x7c, 0x07, 0xf0, 0xfe, 0x41,
--			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00 },
--		.rlen	= 16,
--		.tag	= { 0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
-+			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00,
-+			    0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
- 			    0x8e, 0xf4, 0xd4, 0x58, 0x75, 0x14, 0xf0, 0xfb },
--		.tlen	= 16
-+		.rlen	= 32,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -4789,11 +4783,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
- 			    0x7d, 0x77, 0x3d, 0x00, 0xc1, 0x44, 0xc5, 0x25,
- 			    0xac, 0x61, 0x9d, 0x18, 0xc8, 0x4a, 0x3f, 0x47,
- 			    0x18, 0xe2, 0x44, 0x8b, 0x2f, 0xe3, 0x24, 0xd9,
--			    0xcc, 0xda, 0x27, 0x10, 0xac, 0xad, 0xe2, 0x56 },
--		.rlen	= 64,
--		.tag	= { 0x99, 0x24, 0xa7, 0xc8, 0x58, 0x73, 0x36, 0xbf,
-+			    0xcc, 0xda, 0x27, 0x10, 0xac, 0xad, 0xe2, 0x56,
-+			    0x99, 0x24, 0xa7, 0xc8, 0x58, 0x73, 0x36, 0xbf,
- 			    0xb1, 0x18, 0x02, 0x4d, 0xb8, 0x67, 0x4a, 0x14 },
--		.tlen	= 16
-+		.rlen	= 80,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -4821,20 +4814,19 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
- 			    0x7d, 0x77, 0x3d, 0x00, 0xc1, 0x44, 0xc5, 0x25,
- 			    0xac, 0x61, 0x9d, 0x18, 0xc8, 0x4a, 0x3f, 0x47,
- 			    0x18, 0xe2, 0x44, 0x8b, 0x2f, 0xe3, 0x24, 0xd9,
--			    0xcc, 0xda, 0x27, 0x10 },
--		.rlen	= 60,
--		.tag	= { 0x25, 0x19, 0x49, 0x8e, 0x80, 0xf1, 0x47, 0x8f,
-+			    0xcc, 0xda, 0x27, 0x10,
-+			    0x25, 0x19, 0x49, 0x8e, 0x80, 0xf1, 0x47, 0x8f,
- 			    0x37, 0xba, 0x55, 0xbd, 0x6d, 0x27, 0x61, 0x8c },
--		.tlen	= 16,
-+		.rlen	= 76,
- 		.np	= 2,
- 		.tap	= { 32, 28 },
- 		.anp	= 2,
- 		.atap	= { 8, 12 }
- 	}, {
- 		.klen	= 32,
--		.tag	= { 0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9,
-+		.result	= { 0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9,
- 			    0xa9, 0x63, 0xb4, 0xf1, 0xc4, 0xcb, 0x73, 0x8b },
--		.tlen	= 16
-+		.rlen	= 16,
- 	}
- };
- 
-@@ -4842,12 +4834,11 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 	{ /* From McGrew & Viega - http://citeseer.ist.psu.edu/656989.html */
- 		.klen	= 32,
- 		.input	= { 0xce, 0xa7, 0x40, 0x3d, 0x4d, 0x60, 0x6b, 0x6e,
--			    0x07, 0x4e, 0xc5, 0xd3, 0xba, 0xf3, 0x9d, 0x18 },
--		.ilen	= 16,
--		.rlen	= 16,
--		.tag	= { 0xd0, 0xd1, 0xc8, 0xa7, 0x99, 0x99, 0x6b, 0xf0,
-+			    0x07, 0x4e, 0xc5, 0xd3, 0xba, 0xf3, 0x9d, 0x18,
-+			    0xd0, 0xd1, 0xc8, 0xa7, 0x99, 0x99, 0x6b, 0xf0,
- 			    0x26, 0x5b, 0x98, 0xb5, 0xd4, 0x8a, 0xb9, 0x19 },
--		.tlen	= 16
-+		.ilen	= 32,
-+		.rlen	= 16,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -4863,8 +4854,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d,
- 			    0xa7, 0xb0, 0x8b, 0x10, 0x56, 0x82, 0x88, 0x38,
- 			    0xc5, 0xf6, 0x1e, 0x63, 0x93, 0xba, 0x7a, 0x0a,
--			    0xbc, 0xc9, 0xf6, 0x62, 0x89, 0x80, 0x15, 0xad },
--		.ilen	= 64,
-+			    0xbc, 0xc9, 0xf6, 0x62, 0x89, 0x80, 0x15, 0xad,
-+			    0xb0, 0x94, 0xda, 0xc5, 0xd9, 0x34, 0x71, 0xbd,
-+			    0xec, 0x1a, 0x50, 0x22, 0x70, 0xe3, 0xcc, 0x6c },
-+		.ilen	= 80,
- 		.result = { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
- 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
- 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
-@@ -4874,9 +4867,6 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39, 0x1a, 0xaf, 0xd2, 0x55 },
- 		.rlen	= 64,
--		.tag	= { 0xb0, 0x94, 0xda, 0xc5, 0xd9, 0x34, 0x71, 0xbd,
--			    0xec, 0x1a, 0x50, 0x22, 0x70, 0xe3, 0xcc, 0x6c },
--		.tlen	= 16
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -4892,8 +4882,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x8c, 0xb0, 0x8e, 0x48, 0x59, 0x0d, 0xbb, 0x3d,
- 			    0xa7, 0xb0, 0x8b, 0x10, 0x56, 0x82, 0x88, 0x38,
- 			    0xc5, 0xf6, 0x1e, 0x63, 0x93, 0xba, 0x7a, 0x0a,
--			    0xbc, 0xc9, 0xf6, 0x62 },
--		.ilen	= 60,
-+			    0xbc, 0xc9, 0xf6, 0x62,
-+			    0x76, 0xfc, 0x6e, 0xce, 0x0f, 0x4e, 0x17, 0x68,
-+			    0xcd, 0xdf, 0x88, 0x53, 0xbb, 0x2d, 0x55, 0x1b },
-+		.ilen	= 76,
- 		.assoc	= { 0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xab, 0xad, 0xda, 0xd2 },
-@@ -4907,11 +4899,8 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39 },
- 		.rlen	= 60,
--		.tag	= { 0x76, 0xfc, 0x6e, 0xce, 0x0f, 0x4e, 0x17, 0x68,
--			    0xcd, 0xdf, 0x88, 0x53, 0xbb, 0x2d, 0x55, 0x1b },
--		.tlen	= 16,
- 		.np     = 2,
--		.tap    = { 48, 12 },
-+		.tap    = { 48, 28 },
- 		.anp	= 3,
- 		.atap	= { 8, 8, 4 }
- 	}, {
-@@ -4927,8 +4916,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x21, 0xd5, 0x14, 0xb2, 0x54, 0x66, 0x93, 0x1c,
- 			    0x7d, 0x8f, 0x6a, 0x5a, 0xac, 0x84, 0xaa, 0x05,
- 			    0x1b, 0xa3, 0x0b, 0x39, 0x6a, 0x0a, 0xac, 0x97,
--			    0x3d, 0x58, 0xe0, 0x91, 0x47, 0x3f, 0x59, 0x85 },
--		.ilen	= 64,
-+			    0x3d, 0x58, 0xe0, 0x91, 0x47, 0x3f, 0x59, 0x85,
-+			    0x4d, 0x5c, 0x2a, 0xf3, 0x27, 0xcd, 0x64, 0xa6,
-+			    0x2c, 0xf3, 0x5a, 0xbd, 0x2b, 0xa6, 0xfa, 0xb4 },
-+		.ilen	= 80,
- 		.result = { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
- 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
- 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
-@@ -4938,9 +4929,6 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39, 0x1a, 0xaf, 0xd2, 0x55 },
- 		.rlen	= 64,
--		.tag	= { 0x4d, 0x5c, 0x2a, 0xf3, 0x27, 0xcd, 0x64, 0xa6,
--			    0x2c, 0xf3, 0x5a, 0xbd, 0x2b, 0xa6, 0xfa, 0xb4 },
--		.tlen	= 16
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
-@@ -4954,8 +4942,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x21, 0xd5, 0x14, 0xb2, 0x54, 0x66, 0x93, 0x1c,
- 			    0x7d, 0x8f, 0x6a, 0x5a, 0xac, 0x84, 0xaa, 0x05,
- 			    0x1b, 0xa3, 0x0b, 0x39, 0x6a, 0x0a, 0xac, 0x97,
--			    0x3d, 0x58, 0xe0, 0x91 },
--		.ilen	= 60,
-+			    0x3d, 0x58, 0xe0, 0x91,
-+			    0x5b, 0xc9, 0x4f, 0xbc, 0x32, 0x21, 0xa5, 0xdb,
-+			    0x94, 0xfa, 0xe9, 0x5a, 0xe7, 0x12, 0x1a, 0x47 },
-+		.ilen	= 76,
- 		.assoc	= { 0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xab, 0xad, 0xda, 0xd2 },
-@@ -4969,18 +4959,14 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39 },
- 		.rlen	= 60,
--		.tag	= { 0x5b, 0xc9, 0x4f, 0xbc, 0x32, 0x21, 0xa5, 0xdb,
--			    0x94, 0xfa, 0xe9, 0x5a, 0xe7, 0x12, 0x1a, 0x47 },
--		.tlen	= 16
- 	}, {
- 		.klen	= 24,
- 		.input	= { 0x98, 0xe7, 0x24, 0x7c, 0x07, 0xf0, 0xfe, 0x41,
--			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00 },
--		.ilen	= 16,
--		.rlen	= 16,
--		.tag	= { 0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
-+			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00,
-+			    0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
- 			    0x8e, 0xf4, 0xd4, 0x58, 0x75, 0x14, 0xf0, 0xfb },
--		.tlen	= 16
-+		.ilen	= 32,
-+		.rlen	= 16,
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -4995,8 +4981,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x7d, 0x77, 0x3d, 0x00, 0xc1, 0x44, 0xc5, 0x25,
- 			    0xac, 0x61, 0x9d, 0x18, 0xc8, 0x4a, 0x3f, 0x47,
- 			    0x18, 0xe2, 0x44, 0x8b, 0x2f, 0xe3, 0x24, 0xd9,
--			    0xcc, 0xda, 0x27, 0x10, 0xac, 0xad, 0xe2, 0x56 },
--		.ilen	= 64,
-+			    0xcc, 0xda, 0x27, 0x10, 0xac, 0xad, 0xe2, 0x56,
-+			    0x99, 0x24, 0xa7, 0xc8, 0x58, 0x73, 0x36, 0xbf,
-+			    0xb1, 0x18, 0x02, 0x4d, 0xb8, 0x67, 0x4a, 0x14 },
-+		.ilen	= 80,
- 		.result = { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
- 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
- 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
-@@ -5006,9 +4994,6 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39, 0x1a, 0xaf, 0xd2, 0x55 },
- 		.rlen	= 64,
--		.tag	= { 0x99, 0x24, 0xa7, 0xc8, 0x58, 0x73, 0x36, 0xbf,
--			    0xb1, 0x18, 0x02, 0x4d, 0xb8, 0x67, 0x4a, 0x14 },
--		.tlen	= 16
- 	}, {
- 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
- 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
-@@ -5023,8 +5008,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0x7d, 0x77, 0x3d, 0x00, 0xc1, 0x44, 0xc5, 0x25,
- 			    0xac, 0x61, 0x9d, 0x18, 0xc8, 0x4a, 0x3f, 0x47,
- 			    0x18, 0xe2, 0x44, 0x8b, 0x2f, 0xe3, 0x24, 0xd9,
--			    0xcc, 0xda, 0x27, 0x10 },
--		.ilen	= 60,
-+			    0xcc, 0xda, 0x27, 0x10,
-+			    0x25, 0x19, 0x49, 0x8e, 0x80, 0xf1, 0x47, 0x8f,
-+			    0x37, 0xba, 0x55, 0xbd, 0x6d, 0x27, 0x61, 0x8c },
-+		.ilen	= 76,
- 		.assoc	= { 0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef,
- 			    0xab, 0xad, 0xda, 0xd2 },
-@@ -5038,9 +5025,6 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
- 			    0xb1, 0x6a, 0xed, 0xf5, 0xaa, 0x0d, 0xe6, 0x57,
- 			    0xba, 0x63, 0x7b, 0x39 },
- 		.rlen	= 60,
--		.tag	= { 0x25, 0x19, 0x49, 0x8e, 0x80, 0xf1, 0x47, 0x8f,
--			    0x37, 0xba, 0x55, 0xbd, 0x6d, 0x27, 0x61, 0x8c },
--		.tlen	= 16
- 	}
- };
- 
