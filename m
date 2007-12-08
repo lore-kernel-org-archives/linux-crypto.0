@@ -1,70 +1,59 @@
 From: "Tan Swee Heng" <thesweeheng@gmail.com>
-Subject: [PATCH 1/2]: salsa20_i586: Corrected order of source and destination buffers.
-Date: Sat, 8 Dec 2007 23:31:30 +0800
-Message-ID: <fd3e431c0712080731w4ead1910gf16a256bc7e58ea9@mail.gmail.com>
+Subject: Re: [PATCH 2/2] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
+Date: Sun, 9 Dec 2007 02:13:40 +0800
+Message-ID: <fd3e431c0712081013n731447bap600c2157fd036cb6@mail.gmail.com>
+References: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com>
+	 <20071205214947.GA20246@Chamillionaire.breakpoint.cc>
+	 <fd3e431c0712070902s202f2369l73d1bcd9302600de@mail.gmail.com>
+	 <20071207184432.GE24292@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_3324_13323929.1197127890172"
-To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: "Sebastian Siewior" <linux-crypto@ml.breakpoint.cc>,
+	"Tan Swee Heng" <thesweeheng@gmail.com>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>,
 	"Linux Crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wr-out-0506.google.com ([64.233.184.226]:30405 "EHLO
+Received: from wr-out-0506.google.com ([64.233.184.235]:61185 "EHLO
 	wr-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751655AbXLHPbc (ORCPT
+	with ESMTP id S1751319AbXLHSNl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Dec 2007 10:31:32 -0500
-Received: by wr-out-0506.google.com with SMTP id c49so854733wra
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Dec 2007 07:31:30 -0800 (PST)
+	Sat, 8 Dec 2007 13:13:41 -0500
+Received: by wr-out-0506.google.com with SMTP id c49so881748wra
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Dec 2007 10:13:40 -0800 (PST)
+In-Reply-To: <20071207184432.GE24292@Chamillionaire.breakpoint.cc>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-------=_Part_3324_13323929.1197127890172
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Sebastian,
 
-The current salsa20_32.c called the salsa20_encrypt_bytes() function
-with the source and destination buffers in the wrong order. This patch
-corrects it.
+On Dec 8, 2007 2:44 AM, Sebastian Siewior <linux-crypto@ml.breakpoint.cc> wrote:
+> >The keysetup() should be the same as the C version... except that I've
+> >previously modified the C version to use key length in bytes while the
+> >assembly version uses bits! :-) I could change the C code back. But I
+> >personally prefer to use the assembly version since it was distributed
+> >as a "self-contained and complete solution" in Bernstein's
+> >"salsa20.s".
+> I would go for the smaller files. That's why merged the AES code
+> earlier.
+I've seen your good work with the AES code. But I will stick with the
+assembly version for the time being... at least until I've done the
+Salsa x86-64 version and perhaps a few more eSTREAM ciphers.
 
-Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
+> I would not mind modifing the source code for the greated good :) Should
+> you make a mistake than the test vectors should detect them.
+Test vectors are great for catching general bugs (wrong S-box entry,
+wrong transformation, etc) but they can be weak at boundary conditions
+(an extra byte mistakenly written at the end of the output buffer) and
+against malicious intent (malicious code added without breaking
+crypto). Since I don't expect people to trust a newbie like me, I'd
+rather stick to not modifying the original assembly code too much. :-)
 
+> After all, you modified the C version and s/keysize/bits.
+With hindsight, I wish I had not modified the keysize bits in the C
+version. It was the source of a bug while I was writing up the i586
+patch (I forgot to multiply keylen by 8). So I may revert them
+eventually to make them consistent with the assembly version. :-)
 
-Some thoughts:
-I detected this when testing against the large test vector. For small
-test vectors, the blkcipher_walk code uses source and destination
-buffers that are equal. Only near the page boundary, does
-blkcipher_walk uses different buffers. (At least this is true on my
-system from what I've observed.) Since many of the tcrypt test vectors
-are small, therefore src == dst frequently when blkcipher_walk-ing. It
-seems to imply that most of the *_segment() code in the block cipher
-modes are seldom tested. Perhaps this is something that a new tcrypt
-framework should address.
-
-------=_Part_3324_13323929.1197127890172
-Content-Type: text/plain; name=patch1-salsa20_i586_src_dst.txt
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f9yah9520
-Content-Disposition: attachment; filename=patch1-salsa20_i586_src_dst.txt
-
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2NyeXB0by9zYWxzYTIwXzMyLmMgYi9hcmNoL3g4Ni9jcnlw
-dG8vc2Fsc2EyMF8zMi5jCmluZGV4IDE0ZGQ2OWQuLjExNDhhMTcgMTAwNjQ0Ci0tLSBhL2FyY2gv
-eDg2L2NyeXB0by9zYWxzYTIwXzMyLmMKKysrIGIvYXJjaC94ODYvY3J5cHRvL3NhbHNhMjBfMzIu
-YwpAQCAtNjUsMjEgKzY1LDIxIEBAIHN0YXRpYyBpbnQgZW5jcnlwdChzdHJ1Y3QgYmxrY2lwaGVy
-X2Rlc2MgKmRlc2MsCiAKIAlpZiAobGlrZWx5KHdhbGsubmJ5dGVzID09IG5ieXRlcykpCiAJewot
-CQlzYWxzYTIwX2VuY3J5cHRfYnl0ZXMoY3R4LCB3YWxrLmRzdC52aXJ0LmFkZHIsCi0JCQkJICAg
-ICAgd2Fsay5zcmMudmlydC5hZGRyLCBuYnl0ZXMpOworCQlzYWxzYTIwX2VuY3J5cHRfYnl0ZXMo
-Y3R4LCB3YWxrLnNyYy52aXJ0LmFkZHIsCisJCQkJICAgICAgd2Fsay5kc3QudmlydC5hZGRyLCBu
-Ynl0ZXMpOwogCQlyZXR1cm4gYmxrY2lwaGVyX3dhbGtfZG9uZShkZXNjLCAmd2FsaywgMCk7CiAJ
-fQogCiAJd2hpbGUgKHdhbGsubmJ5dGVzID49IDY0KSB7Ci0JCXNhbHNhMjBfZW5jcnlwdF9ieXRl
-cyhjdHgsIHdhbGsuZHN0LnZpcnQuYWRkciwKLQkJCQkgICAgICB3YWxrLnNyYy52aXJ0LmFkZHIs
-CisJCXNhbHNhMjBfZW5jcnlwdF9ieXRlcyhjdHgsIHdhbGsuc3JjLnZpcnQuYWRkciwKKwkJCQkg
-ICAgICB3YWxrLmRzdC52aXJ0LmFkZHIsCiAJCQkJICAgICAgd2Fsay5uYnl0ZXMgLSAod2Fsay5u
-Ynl0ZXMgJSA2NCkpOwogCQllcnIgPSBibGtjaXBoZXJfd2Fsa19kb25lKGRlc2MsICZ3YWxrLCB3
-YWxrLm5ieXRlcyAlIDY0KTsKIAl9CiAKIAlpZiAod2Fsay5uYnl0ZXMpIHsKLQkJc2Fsc2EyMF9l
-bmNyeXB0X2J5dGVzKGN0eCwgd2Fsay5kc3QudmlydC5hZGRyLAotCQkJCSAgICAgIHdhbGsuc3Jj
-LnZpcnQuYWRkciwgd2Fsay5uYnl0ZXMpOworCQlzYWxzYTIwX2VuY3J5cHRfYnl0ZXMoY3R4LCB3
-YWxrLnNyYy52aXJ0LmFkZHIsCisJCQkJICAgICAgd2Fsay5kc3QudmlydC5hZGRyLCB3YWxrLm5i
-eXRlcyk7CiAJCWVyciA9IGJsa2NpcGhlcl93YWxrX2RvbmUoZGVzYywgJndhbGssIDApOwogCX0K
-IAo=
-------=_Part_3324_13323929.1197127890172--
+Swee Heng
