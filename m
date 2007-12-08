@@ -1,33 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] salsa20_i586: Salsa20 stream cipher algorithm (i586 version)
-Date: Sat, 8 Dec 2007 11:30:23 +0800
-Message-ID: <20071208033023.GA17073@gondor.apana.org.au>
-References: <fd3e431c0712051231h44c7bc6epa2f526116cf2c47@mail.gmail.com> <20071207092211.GA8496@gondor.apana.org.au> <fd3e431c0712071921g14b9983dl6bfdfe41a3f8852@mail.gmail.com>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH] [crypto] Geode: Copy the IV back in case of an
+	fallback.
+Date: Sat, 8 Dec 2007 13:40:02 +0100
+Message-ID: <20071208124002.GA1911@Chamillionaire.breakpoint.cc>
+References: <20071207182405.GA24292@Chamillionaire.breakpoint.cc> <20071208014641.GC16140@gondor.apana.org.au>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2311 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753336AbXLHDa0 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:36684 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753802AbXLHMkE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Dec 2007 22:30:26 -0500
+	Sat, 8 Dec 2007 07:40:04 -0500
 Content-Disposition: inline
-In-Reply-To: <fd3e431c0712071921g14b9983dl6bfdfe41a3f8852@mail.gmail.com>
+In-Reply-To: <20071208014641.GC16140@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 08, 2007 at 11:21:55AM +0800, Tan Swee Heng wrote:
+* Herbert Xu | 2007-12-08 09:46:41 [+0800]:
+
+>On Fri, Dec 07, 2007 at 07:24:05PM +0100, Sebastian Siewior wrote:
+>> Jan pointed this out to me and fixed it in the fallback code for s390
+>> and now I remembered that this could also be fixed here :)
+>> 
+>> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 >
-> If I post the x86-64 version of Bernstein's code, can you help to test
-> it? :P I don't have an x86-64.
+>No, the default IV is put into desc->info by the system.
+>
+>I see where the problem is though.  We should never call the
+>functions crypto_blkcipher_encrypt/decrypt, it should always be
+>crypto_blkcipher_encrypt_iv/crypto_blkcipher_decrypt_iv.
+>
+>Please make a patch to get the fallback to do that.
+Haven't seen that function before. Patch is on the way.
 
-Of course :)
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>Thanks,
+Sebastian
