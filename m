@@ -1,42 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2]: salsa20_i586: Corrected order of source and destination buffers.
-Date: Mon, 10 Dec 2007 16:09:37 +0800
-Message-ID: <20071210080937.GA1058@gondor.apana.org.au>
-References: <fd3e431c0712080731w4ead1910gf16a256bc7e58ea9@mail.gmail.com>
+From: "Tan Swee Heng" <thesweeheng@gmail.com>
+Subject: Re: Fwd: [PATCH 2/2]: salsa20_i586: Removed extraneous comments and functions
+Date: Tue, 11 Dec 2007 05:58:27 +0800
+Message-ID: <fd3e431c0712101358w7466bf51r1eaf175bcdd3dca1@mail.gmail.com>
+References: <fd3e431c0712080737i1998f90t223cf21408d28414@mail.gmail.com>
+	 <fd3e431c0712081817rdf24635r6251cb053b8db70f@mail.gmail.com>
+	 <20071209021925.GA24418@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	"Linux Crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3367 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750941AbXLJIJl (ORCPT
+Received: from rn-out-0910.google.com ([64.233.170.188]:59244 "EHLO
+	rn-out-0102.google.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751467AbXLJV62 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 03:09:41 -0500
+	Mon, 10 Dec 2007 16:58:28 -0500
+Received: by rn-out-0102.google.com with SMTP id i6so260117rng
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Dec 2007 13:58:27 -0800 (PST)
+In-Reply-To: <20071209021925.GA24418@gondor.apana.org.au>
 Content-Disposition: inline
-In-Reply-To: <fd3e431c0712080731w4ead1910gf16a256bc7e58ea9@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 08, 2007 at 11:31:30PM +0800, Tan Swee Heng wrote:
-> 
-> Some thoughts:
-> I detected this when testing against the large test vector. For small
-> test vectors, the blkcipher_walk code uses source and destination
-> buffers that are equal. Only near the page boundary, does
-> blkcipher_walk uses different buffers. (At least this is true on my
-> system from what I've observed.) Since many of the tcrypt test vectors
-> are small, therefore src == dst frequently when blkcipher_walk-ing. It
-> seems to imply that most of the *_segment() code in the block cipher
-> modes are seldom tested. Perhaps this is something that a new tcrypt
-> framework should address.
+Hi Herbert,
 
-We could change tcrypt to run every test twice, once as in-place
-and once as not-in-place.
+On Dec 9, 2007 10:19 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Sun, Dec 09, 2007 at 10:17:05AM +0800, Tan Swee Heng wrote:
+> > Hi Herbert, I think my mail below exceeded the 100K limit when the
+> > mailer converted the 74K patch into MIME attachement. So it has been
+> > blocked. Any chance you can unblock it? Thanks.
+>
+> Could you simply redo this patch as a new addition and I'll replace
+> the existing i586 patch with this.  That should make it much smaller.
+
+I was away from my email for a while. Was just about to redo the i586
+patch as you suggested when I realized you have already combined them.
+Thanks a lot!
 
 Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Swee Heng
