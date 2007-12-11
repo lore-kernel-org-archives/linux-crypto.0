@@ -1,299 +1,120 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 13/19] [CRYPTO] skcipher: Create default givcipher instances
-Date: Tue, 11 Dec 2007 12:05:41 +0800
-Message-ID: <E1J1wNJ-0002l1-00@gondolin.me.apana.org.au>
+Subject: [PATCH 15/19] [CRYPTO] skcipher: Add top-level givencrypt/givdecrypt calls
+Date: Tue, 11 Dec 2007 12:05:43 +0800
+Message-ID: <E1J1wNL-0002lF-00@gondolin.me.apana.org.au>
 References: <20071211040215.GA10360@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1965 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1970 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751935AbXLKEFs (ORCPT
+	with ESMTP id S1751941AbXLKEFx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 23:05:48 -0500
+	Mon, 10 Dec 2007 23:05:53 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J1wNK-00067y-UD
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:43 +1100
+	id 1J1wNN-000686-RC
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:46 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] skcipher: Create default givcipher instances
+[CRYPTO] skcipher: Add top-level givencrypt/givdecrypt calls
 
-This patch makes crypto_alloc_ablkcipher/crypto_grab_skcipher always
-return algorithms that are capable of generating their own IVs through
-givencrypt and givdecrypt.  Each algorithm may specify its default IV
-generator through the geniv field.
-
-For algorithms that do not set the geniv field, the blkcipher layer will
-pick a default.  Currently it's chainiv for synchronous algorithms and
-eseqiv for asynchronous algorithms.  Note that if these wrappers do not
-work on an algorithm then that algorithm must specify its own geniv or
-it can't be used at all.
+This patch finally makes the givencrypt/givdecrypt operations available
+to users by adding crypto_skcipher_givencrypt and crypto_skcipher_givdecrypt.
+A suite of helpers to allocate and fill in the request is also available.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ablkcipher.c    |  142 ++++++++++++++++++++++++++++++++++++++++++++++++-
- crypto/api.c           |   19 ++++--
- crypto/internal.h      |    2 
- include/linux/crypto.h |    9 ---
- 4 files changed, 158 insertions(+), 14 deletions(-)
+ include/crypto/skcipher.h |   72 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 72 insertions(+)
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index 1c15722..d3fc416 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -18,6 +18,8 @@
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/seq_file.h>
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index c283fab..25fd612 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -14,6 +14,8 @@
+ #define _CRYPTO_SKCIPHER_H
  
-@@ -163,14 +165,115 @@ const char *crypto_default_geniv(const struct crypto_alg *alg)
- 	return alg->cra_flags & CRYPTO_ALG_ASYNC ? "eseqiv" : "chainiv";
+ #include <linux/crypto.h>
++#include <linux/kernel.h>
++#include <linux/slab.h>
+ 
+ /**
+  *	struct skcipher_givcrypt_request - Crypto request with IV generation
+@@ -34,5 +36,75 @@ static inline struct crypto_ablkcipher *skcipher_givcrypt_reqtfm(
+ 	return crypto_ablkcipher_reqtfm(&req->creq);
  }
  
-+static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
++static inline int crypto_skcipher_givencrypt(
++	struct skcipher_givcrypt_request *req)
 +{
-+	struct rtattr *tb[3];
-+	struct {
-+		struct rtattr attr;
-+		struct crypto_attr_type data;
-+	} ptype;
-+	struct {
-+		struct rtattr attr;
-+		struct crypto_attr_alg data;
-+	} palg;
-+	struct crypto_template *tmpl;
-+	struct crypto_instance *inst;
-+	struct crypto_alg *larval;
-+	const char *geniv;
-+	int err;
++	struct ablkcipher_tfm *crt =
++		crypto_ablkcipher_crt(skcipher_givcrypt_reqtfm(req));
++	return crt->givencrypt(req);
++};
 +
-+	larval = crypto_larval_lookup(alg->cra_driver_name,
-+				      CRYPTO_ALG_TYPE_GIVCIPHER,
-+				      CRYPTO_ALG_TYPE_MASK);
-+	err = PTR_ERR(larval);
-+	if (IS_ERR(larval))
-+		goto out;
++static inline int crypto_skcipher_givdecrypt(
++	struct skcipher_givcrypt_request *req)
++{
++	struct ablkcipher_tfm *crt =
++		crypto_ablkcipher_crt(skcipher_givcrypt_reqtfm(req));
++	return crt->givdecrypt(req);
++};
 +
-+	err = -EAGAIN;
-+	if (!crypto_is_larval(larval))
-+		goto out;
-+
-+	ptype.attr.rta_len = sizeof(ptype);
-+	ptype.attr.rta_type = CRYPTOA_TYPE;
-+	ptype.data.type = type | CRYPTO_ALG_GENIV;
-+	/* GENIV tells the template that we're making a default geniv. */
-+	ptype.data.mask = mask | CRYPTO_ALG_GENIV;
-+	tb[0] = &ptype.attr;
-+
-+	palg.attr.rta_len = sizeof(palg);
-+	palg.attr.rta_type = CRYPTOA_ALG;
-+	/* Must use the exact name to locate ourselves. */
-+	memcpy(palg.data.name, alg->cra_driver_name, CRYPTO_MAX_ALG_NAME);
-+	tb[1] = &palg.attr;
-+
-+	tb[2] = NULL;
-+
-+	if ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER)
-+		geniv = alg->cra_blkcipher.geniv;
-+	else
-+		geniv = alg->cra_ablkcipher.geniv;
-+
-+	if (!geniv)
-+		geniv = crypto_default_geniv(alg);
-+
-+	tmpl = crypto_lookup_template(geniv);
-+	err = -ENOENT;
-+	if (!tmpl)
-+		goto kill_larval;
-+
-+	inst = tmpl->alloc(tb);
-+	err = PTR_ERR(inst);
-+	if (IS_ERR(inst))
-+		goto put_tmpl;
-+
-+	if ((err = crypto_register_instance(tmpl, inst))) {
-+		tmpl->free(inst);
-+		goto put_tmpl;
-+	}
-+
-+	/* Redo the lookup to use the instance we just registered. */
-+	err = -EAGAIN;
-+
-+put_tmpl:
-+	crypto_tmpl_put(tmpl);
-+kill_larval:
-+	crypto_mod_put(larval);
-+	crypto_larval_kill(larval);
-+out:
-+	crypto_mod_put(alg);
-+	return err;
++static inline void skcipher_givcrypt_set_tfm(
++	struct skcipher_givcrypt_request *req, struct crypto_ablkcipher *tfm)
++{
++	req->creq.base.tfm = crypto_ablkcipher_tfm(tfm);
 +}
 +
-+static struct crypto_alg *crypto_lookup_skcipher(const char *name, u32 type,
-+						 u32 mask)
++static inline struct skcipher_givcrypt_request *skcipher_givcrypt_cast(
++	struct crypto_async_request *req)
 +{
-+	struct crypto_alg *alg;
-+
-+	alg = crypto_alg_mod_lookup(name, crypto_skcipher_type(type),
-+				    crypto_skcipher_mask(mask));
-+	if (IS_ERR(alg))
-+		return alg;
-+
-+	if ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_GIVCIPHER)
-+		return alg;
-+
-+	if (!((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	      CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
-+					  alg->cra_ablkcipher.ivsize))
-+		return alg;
-+
-+	return ERR_PTR(crypto_givcipher_default(alg, type, mask));
++	return container_of(ablkcipher_request_cast(req),
++			    struct skcipher_givcrypt_request, creq);
 +}
 +
- int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn, const char *name,
- 			 u32 type, u32 mask)
- {
- 	struct crypto_alg *alg;
- 	int err;
- 
--	alg = crypto_alg_mod_lookup(name, crypto_skcipher_type(type),
--				    crypto_skcipher_mask(mask));
-+	alg = crypto_lookup_skcipher(name, type, mask);
- 	if (IS_ERR(alg))
- 		return PTR_ERR(alg);
- 
-@@ -180,5 +283,40 @@ int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn, const char *name,
- }
- EXPORT_SYMBOL_GPL(crypto_grab_skcipher);
- 
-+struct crypto_ablkcipher *crypto_alloc_ablkcipher(const char *alg_name,
-+						  u32 type, u32 mask)
++static inline struct skcipher_givcrypt_request *skcipher_givcrypt_alloc(
++	struct crypto_ablkcipher *tfm, gfp_t gfp)
 +{
-+	struct crypto_tfm *tfm;
-+	int err;
++	struct skcipher_givcrypt_request *req;
 +
-+	for (;;) {
-+		struct crypto_alg *alg;
++	req = kmalloc(sizeof(struct skcipher_givcrypt_request) +
++		      crypto_ablkcipher_reqsize(tfm), gfp);
 +
-+		alg = crypto_lookup_skcipher(alg_name, type, mask);
-+		if (IS_ERR(alg)) {
-+			err = PTR_ERR(alg);
-+			goto err;
-+		}
++	if (likely(req))
++		skcipher_givcrypt_set_tfm(req, tfm);
 +
-+		tfm = __crypto_alloc_tfm(alg, type, mask);
-+		if (!IS_ERR(tfm))
-+			return __crypto_ablkcipher_cast(tfm);
-+
-+		crypto_mod_put(alg);
-+		err = PTR_ERR(tfm);
-+
-+err:
-+		if (err != -EAGAIN)
-+			break;
-+		if (signal_pending(current)) {
-+			err = -EINTR;
-+			break;
-+		}
-+	}
-+
-+	return ERR_PTR(err);
++	return req;
 +}
-+EXPORT_SYMBOL_GPL(crypto_alloc_ablkcipher);
 +
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Asynchronous block chaining cipher type");
-diff --git a/crypto/api.c b/crypto/api.c
-index 1f5c724..a2496d1 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -137,7 +137,7 @@ static struct crypto_alg *crypto_larval_alloc(const char *name, u32 type,
- 	return alg;
- }
- 
--static void crypto_larval_kill(struct crypto_alg *alg)
-+void crypto_larval_kill(struct crypto_alg *alg)
- {
- 	struct crypto_larval *larval = (void *)alg;
- 
-@@ -147,6 +147,7 @@ static void crypto_larval_kill(struct crypto_alg *alg)
- 	complete_all(&larval->completion);
- 	crypto_alg_put(alg);
- }
-+EXPORT_SYMBOL_GPL(crypto_larval_kill);
- 
- static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
- {
-@@ -176,11 +177,9 @@ static struct crypto_alg *crypto_alg_lookup(const char *name, u32 type,
- 	return alg;
- }
- 
--struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
-+struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
- {
- 	struct crypto_alg *alg;
--	struct crypto_alg *larval;
--	int ok;
- 
- 	if (!name)
- 		return ERR_PTR(-ENOENT);
-@@ -193,7 +192,17 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
- 	if (alg)
- 		return crypto_is_larval(alg) ? crypto_larval_wait(alg) : alg;
- 
--	larval = crypto_larval_alloc(name, type, mask);
-+	return crypto_larval_alloc(name, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_larval_lookup);
-+
-+struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
++static inline void skcipher_givcrypt_free(struct skcipher_givcrypt_request *req)
 +{
-+	struct crypto_alg *alg;
-+	struct crypto_alg *larval;
-+	int ok;
++	kfree(req);
++}
 +
-+	larval = crypto_larval_lookup(name, type, mask);
- 	if (IS_ERR(larval) || !crypto_is_larval(larval))
- 		return larval;
++static inline void skcipher_givcrypt_set_callback(
++	struct skcipher_givcrypt_request *req, u32 flags,
++	crypto_completion_t complete, void *data)
++{
++	ablkcipher_request_set_callback(&req->creq, flags, complete, data);
++}
++
++static inline void skcipher_givcrypt_set_crypt(
++	struct skcipher_givcrypt_request *req,
++	struct scatterlist *src, struct scatterlist *dst,
++	unsigned int nbytes, void *iv)
++{
++	ablkcipher_request_set_crypt(&req->creq, src, dst, nbytes, iv);
++}
++
++static inline void skcipher_givcrypt_set_giv(
++	struct skcipher_givcrypt_request *req, u8 *giv, u64 seq)
++{
++	req->giv = giv;
++	req->seq = seq;
++}
++
+ #endif	/* _CRYPTO_SKCIPHER_H */
  
-diff --git a/crypto/internal.h b/crypto/internal.h
-index cb13952..32f4c21 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -93,6 +93,8 @@ void crypto_exit_digest_ops(struct crypto_tfm *tfm);
- void crypto_exit_cipher_ops(struct crypto_tfm *tfm);
- void crypto_exit_compress_ops(struct crypto_tfm *tfm);
- 
-+void crypto_larval_kill(struct crypto_alg *alg);
-+struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask);
- void crypto_larval_error(const char *name, u32 type, u32 mask);
- 
- void crypto_shoot_alg(struct crypto_alg *alg);
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index fa7afa9..835dcaf 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -561,13 +561,8 @@ static inline u32 crypto_skcipher_mask(u32 mask)
- 	return mask;
- }
- 
--static inline struct crypto_ablkcipher *crypto_alloc_ablkcipher(
--	const char *alg_name, u32 type, u32 mask)
--{
--	return __crypto_ablkcipher_cast(
--		crypto_alloc_base(alg_name, crypto_skcipher_type(type),
--				  crypto_skcipher_mask(mask)));
--}
-+struct crypto_ablkcipher *crypto_alloc_ablkcipher(const char *alg_name,
-+						  u32 type, u32 mask);
- 
- static inline struct crypto_tfm *crypto_ablkcipher_tfm(
- 	struct crypto_ablkcipher *tfm)
