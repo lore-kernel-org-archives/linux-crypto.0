@@ -1,589 +1,585 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/8] [CRYPTO] ctr: Refactor into ctr and rfc3686
-Date: Tue, 11 Dec 2007 11:50:23 +0800
-Message-ID: <E1J1w8V-0002eX-00@gondolin.me.apana.org.au>
+Subject: [PATCH 4/8] [CRYPTO] gcm: Use ctr(4,8,4)
+Date: Tue, 11 Dec 2007 11:50:22 +0800
+Message-ID: <E1J1w8U-0002eQ-00@gondolin.me.apana.org.au>
 References: <20071211034945.GA10099@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1777 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1775 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751810AbXLKDua (ORCPT
+	with ESMTP id S1751838AbXLKDu2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 22:50:30 -0500
+	Mon, 10 Dec 2007 22:50:28 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J1w8X-0005pe-2y
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 14:50:26 +1100
+	id 1J1w8V-0005pZ-Td
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 14:50:24 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] ctr: Refactor into ctr and rfc3686
+[CRYPTO] gcm: Use ctr(4,8,4)
 
-As discussed previously, this patch moves the basic CTR functionality
-into a chainable algorithm called ctr.  The IPsec-specific variant of
-it is now placed on top with the name rfc3686.
+This patch changes gcm from using ctr(0,16,4) to ctr(4,8,4).  This is
+so that we can utilise the IV generator that will be built into ctr
+later.
 
-So ctr(aes) gives a chainable cipher with IV size 16 while the IPsec
-variant will be called rfc3686(ctr(aes)).  This patch also adjusts
-gcm accordingly.
-
-This is necessary before we can get gcm to use the cipher-level IV
-generator.
+However, this also changes the key layout of gcm so that the 4-byte
+salt becomes part of the key.  This is consistent with RFC 4106.
 
 eigned-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ctr.c    |  334 ++++++++++++++++++++++++++++++++++----------------------
- crypto/gcm.c    |    5 
- crypto/tcrypt.c |    8 -
- 3 files changed, 212 insertions(+), 135 deletions(-)
+ crypto/gcm.c         |  176 ++++++++++++++++++++++++++-------------------------
+ crypto/tcrypt.h      |   94 +++++++++++++--------------
+ include/crypto/ctr.h |   20 +++++
+ 3 files changed, 159 insertions(+), 131 deletions(-)
 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 57da7d0..1052b31 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -11,6 +11,7 @@
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 73565d6..8f35670 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -9,6 +9,7 @@
   */
  
  #include <crypto/algapi.h>
 +#include <crypto/ctr.h>
+ #include <crypto/gf128mul.h>
+ #include <crypto/scatterwalk.h>
  #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -19,16 +20,13 @@
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
+@@ -21,6 +22,7 @@
  
--struct ctr_instance_ctx {
--	struct crypto_spawn alg;
--	unsigned int noncesize;
--	unsigned int ivsize;
--	unsigned int countersize;
--};
--
- struct crypto_ctr_ctx {
- 	struct crypto_cipher *child;
--	u8 *nonce;
-+};
-+
-+struct crypto_rfc3686_ctx {
-+	struct crypto_blkcipher *child;
-+	u8 nonce[CTR_RFC3686_NONCE_SIZE];
+ struct gcm_instance_ctx {
+ 	struct crypto_spawn ctr;
++	char cipher_name[CRYPTO_MAX_ALG_NAME];
  };
  
- static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
-@@ -36,18 +34,7 @@ static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
+ struct crypto_gcm_ctx {
+@@ -36,9 +38,10 @@ struct crypto_gcm_ghash_ctx {
+ };
+ 
+ struct crypto_gcm_req_priv_ctx {
++	struct scatterlist src[2];
++	struct scatterlist dst[2];
+ 	u8 auth_tag[16];
+ 	u8 iauth_tag[16];
+-	u8 counter[16];
+ 	struct crypto_gcm_ghash_ctx ghash;
+ 	struct ablkcipher_request abreq;
+ };
+@@ -150,44 +153,17 @@ static void crypto_gcm_ghash_final_xor(struct crypto_gcm_ghash_ctx *ctx,
+ 	crypto_xor(dst, buf, 16);
+ }
+ 
+-static inline void crypto_gcm_set_counter(u8 *counterblock, u32 value)
+-{
+-	*((u32 *)&counterblock[12]) = cpu_to_be32(value);
+-}
+-
+-static int crypto_gcm_encrypt_counter(struct crypto_aead *aead, u8 *block,
+-				       u32 value, const u8 *iv)
+-{
+-	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
+-	struct crypto_ablkcipher *ctr = ctx->ctr;
+-	struct ablkcipher_request req;
+-	struct scatterlist sg;
+-	u8 counterblock[16];
+-
+-	if (iv == NULL)
+-		memset(counterblock, 0, 12);
+-	else
+-		memcpy(counterblock, iv, 12);
+-
+-	crypto_gcm_set_counter(counterblock, value);
+-
+-	sg_init_one(&sg, block, 16);
+-	ablkcipher_request_set_tfm(&req, ctr);
+-	ablkcipher_request_set_crypt(&req, &sg, &sg, 16, counterblock);
+-	ablkcipher_request_set_callback(&req, 0, NULL, NULL);
+-	memset(block, 0, 16);
+-	return crypto_ablkcipher_encrypt(&req);
+-}
+-
+ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 			     unsigned int keylen)
  {
- 	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(parent);
- 	struct crypto_cipher *child = ctx->child;
--	struct ctr_instance_ctx *ictx =
--		crypto_instance_ctx(crypto_tfm_alg_instance(parent));
--	unsigned int noncelen = ictx->noncesize;
++	struct crypto_instance *inst = crypto_tfm_alg_instance(
++		crypto_aead_tfm(aead));
++	struct gcm_instance_ctx *ictx = crypto_instance_ctx(inst);
+ 	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct crypto_ablkcipher *ctr = ctx->ctr;
+-	int alignmask = crypto_ablkcipher_alignmask(ctr);
+-	u8 alignbuf[16+alignmask];
+-	u8 *hash = (u8 *)ALIGN((unsigned long)alignbuf, alignmask+1);
 -	int err = 0;
--
--	/* the nonce is stored in bytes at end of key */
--	if (keylen < noncelen)
--		return  -EINVAL;
--
--	memcpy(ctx->nonce, key + (keylen - noncelen), noncelen);
--
--	keylen -=  noncelen;
++	struct crypto_cipher *cipher;
++	be128 hash;
 +	int err;
  
- 	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
- 	crypto_cipher_set_flags(child, crypto_tfm_get_flags(parent) &
-@@ -60,11 +47,13 @@ static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
- }
+ 	crypto_ablkcipher_clear_flags(ctr, CRYPTO_TFM_REQ_MASK);
+ 	crypto_ablkcipher_set_flags(ctr, crypto_aead_get_flags(aead) &
+@@ -195,62 +171,80 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
  
- static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
--				   struct crypto_cipher *tfm, u8 *ctrblk,
--				   unsigned int countersize)
-+				   struct crypto_cipher *tfm)
- {
- 	unsigned int bsize = crypto_cipher_blocksize(tfm);
--	u8 *keystream = ctrblk + bsize;
-+	unsigned long alignmask = crypto_cipher_alignmask(tfm);
-+	u8 *ctrblk = walk->iv;
-+	u8 tmp[bsize + alignmask];
-+	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
- 	unsigned int nbytes = walk->nbytes;
-@@ -72,15 +61,17 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
- 	crypto_cipher_encrypt_one(tfm, keystream, ctrblk);
- 	crypto_xor(keystream, src, nbytes);
- 	memcpy(dst, keystream, nbytes);
-+
-+	crypto_inc(ctrblk, bsize);
- }
+ 	err = crypto_ablkcipher_setkey(ctr, key, keylen);
+ 	if (err)
+-		goto out;
++		return err;
  
- static int crypto_ctr_crypt_segment(struct blkcipher_walk *walk,
--				    struct crypto_cipher *tfm, u8 *ctrblk,
--				    unsigned int countersize)
-+				    struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		   crypto_cipher_alg(tfm)->cia_encrypt;
- 	unsigned int bsize = crypto_cipher_blocksize(tfm);
-+	u8 *ctrblk = walk->iv;
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
- 	unsigned int nbytes = walk->nbytes;
-@@ -91,7 +82,7 @@ static int crypto_ctr_crypt_segment(struct blkcipher_walk *walk,
- 		crypto_xor(dst, src, bsize);
+ 	crypto_aead_set_flags(aead, crypto_ablkcipher_get_flags(ctr) &
+ 				       CRYPTO_TFM_RES_MASK);
  
- 		/* increment counter in counterblock */
--		crypto_inc(ctrblk + bsize - countersize, countersize);
-+		crypto_inc(ctrblk, bsize);
- 
- 		src += bsize;
- 		dst += bsize;
-@@ -101,15 +92,17 @@ static int crypto_ctr_crypt_segment(struct blkcipher_walk *walk,
- }
- 
- static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
--				    struct crypto_cipher *tfm, u8 *ctrblk,
--				    unsigned int countersize)
-+				    struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
- 		   crypto_cipher_alg(tfm)->cia_encrypt;
- 	unsigned int bsize = crypto_cipher_blocksize(tfm);
-+	unsigned long alignmask = crypto_cipher_alignmask(tfm);
- 	unsigned int nbytes = walk->nbytes;
-+	u8 *ctrblk = walk->iv;
- 	u8 *src = walk->src.virt.addr;
--	u8 *keystream = ctrblk + bsize;
-+	u8 tmp[bsize + alignmask];
-+	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
- 
- 	do {
- 		/* create keystream */
-@@ -117,7 +110,7 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
- 		crypto_xor(src, keystream, bsize);
- 
- 		/* increment counter in counterblock */
--		crypto_inc(ctrblk + bsize - countersize, countersize);
-+		crypto_inc(ctrblk, bsize);
- 
- 		src += bsize;
- 	} while ((nbytes -= bsize) >= bsize);
-@@ -134,41 +127,22 @@ static int crypto_ctr_crypt(struct blkcipher_desc *desc,
- 	struct crypto_ctr_ctx *ctx = crypto_blkcipher_ctx(tfm);
- 	struct crypto_cipher *child = ctx->child;
- 	unsigned int bsize = crypto_cipher_blocksize(child);
--	struct ctr_instance_ctx *ictx =
--		crypto_instance_ctx(crypto_tfm_alg_instance(&tfm->base));
--	unsigned long alignmask = crypto_cipher_alignmask(child) |
--				  (__alignof__(u32) - 1);
--	u8 cblk[bsize * 2 + alignmask];
--	u8 *counterblk = (u8 *)ALIGN((unsigned long)cblk, alignmask + 1);
- 	int err;
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt_block(desc, &walk, bsize);
- 
--	/* set up counter block */
--	memset(counterblk, 0 , bsize);
--	memcpy(counterblk, ctx->nonce, ictx->noncesize);
--	memcpy(counterblk + ictx->noncesize, walk.iv, ictx->ivsize);
--
--	/* initialize counter portion of counter block */
--	crypto_inc(counterblk + bsize - ictx->countersize, ictx->countersize);
--
- 	while (walk.nbytes >= bsize) {
- 		if (walk.src.virt.addr == walk.dst.virt.addr)
--			nbytes = crypto_ctr_crypt_inplace(&walk, child,
--							  counterblk,
--							  ictx->countersize);
-+			nbytes = crypto_ctr_crypt_inplace(&walk, child);
- 		else
--			nbytes = crypto_ctr_crypt_segment(&walk, child,
--							  counterblk,
--							  ictx->countersize);
-+			nbytes = crypto_ctr_crypt_segment(&walk, child);
- 
- 		err = blkcipher_walk_done(desc, &walk, nbytes);
- 	}
- 
- 	if (walk.nbytes) {
--		crypto_ctr_crypt_final(&walk, child, counterblk,
--				       ictx->countersize);
-+		crypto_ctr_crypt_final(&walk, child);
- 		err = blkcipher_walk_done(desc, &walk, 0);
- 	}
- 
-@@ -178,15 +152,11 @@ static int crypto_ctr_crypt(struct blkcipher_desc *desc,
- static int crypto_ctr_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct ctr_instance_ctx *ictx = crypto_instance_ctx(inst);
-+	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct crypto_cipher *cipher;
- 
--	ctx->nonce = kzalloc(ictx->noncesize, GFP_KERNEL);
--	if (!ctx->nonce)
--		return -ENOMEM;
--
--	cipher = crypto_spawn_cipher(&ictx->alg);
-+	cipher = crypto_spawn_cipher(spawn);
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
- 
-@@ -199,7 +169,6 @@ static void crypto_ctr_exit_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	kfree(ctx->nonce);
- 	crypto_free_cipher(ctx->child);
- }
- 
-@@ -207,10 +176,6 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
--	struct ctr_instance_ctx *ictx;
--	unsigned int noncesize;
--	unsigned int ivsize;
--	unsigned int countersize;
- 	int err;
- 
- 	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-@@ -222,71 +187,28 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- 	if (IS_ERR(alg))
- 		return ERR_PTR(PTR_ERR(alg));
- 
--	err = crypto_attr_u32(tb[2], &noncesize);
--	if (err)
--		goto out_put_alg;
--
--	err = crypto_attr_u32(tb[3], &ivsize);
--	if (err)
--		goto out_put_alg;
--
--	err = crypto_attr_u32(tb[4], &countersize);
--	if (err)
--		goto out_put_alg;
--
--	/* verify size of nonce + iv + counter
--	 * counter must be >= 4 bytes.
--	 */
-+	/* Block size must be >= 4 bytes. */
- 	err = -EINVAL;
--	if (((noncesize + ivsize + countersize) < alg->cra_blocksize) ||
--	    ((noncesize + ivsize) > alg->cra_blocksize) ||
--	    (countersize > alg->cra_blocksize) || (countersize < 4))
-+	if (alg->cra_blocksize < 4)
- 		goto out_put_alg;
- 
- 	/* If this is false we'd fail the alignment of crypto_inc. */
--	if ((alg->cra_blocksize - countersize) % 4)
-+	if (alg->cra_blocksize % 4)
- 		goto out_put_alg;
- 
--	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
--	err = -ENOMEM;
--	if (!inst)
--		goto out_put_alg;
--
--	err = -ENAMETOOLONG;
--	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME,
--		     "ctr(%s,%u,%u,%u)", alg->cra_name, noncesize,
--		     ivsize, countersize) >= CRYPTO_MAX_ALG_NAME) {
--		goto err_free_inst;
--	}
--
--	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
--		     "ctr(%s,%u,%u,%u)", alg->cra_driver_name, noncesize,
--		     ivsize, countersize) >= CRYPTO_MAX_ALG_NAME) {
--		goto err_free_inst;
--	}
--
--	ictx = crypto_instance_ctx(inst);
--	ictx->noncesize = noncesize;
--	ictx->ivsize = ivsize;
--	ictx->countersize = countersize;
--
--	err = crypto_init_spawn(&ictx->alg, alg, inst,
--		CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
--	if (err)
--		goto err_free_inst;
-+	inst = crypto_alloc_instance("ctr", alg);
-+	if (IS_ERR(inst))
-+		goto out;
- 
--	err = 0;
- 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
- 	inst->alg.cra_priority = alg->cra_priority;
- 	inst->alg.cra_blocksize = 1;
- 	inst->alg.cra_alignmask = alg->cra_alignmask | (__alignof__(u32) - 1);
- 	inst->alg.cra_type = &crypto_blkcipher_type;
- 
--	inst->alg.cra_blkcipher.ivsize = ivsize;
--	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize
--					      + noncesize;
--	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize
--					      + noncesize;
-+	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
-+	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
-+	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
- 
- 	inst->alg.cra_ctxsize = sizeof(struct crypto_ctr_ctx);
- 
-@@ -297,24 +219,18 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- 	inst->alg.cra_blkcipher.encrypt = crypto_ctr_crypt;
- 	inst->alg.cra_blkcipher.decrypt = crypto_ctr_crypt;
- 
--err_free_inst:
--	if (err)
--		kfree(inst);
--
--out_put_alg:
-+out:
- 	crypto_mod_put(alg);
--
--	if (err)
--		inst = ERR_PTR(err);
--
- 	return inst;
-+
-+out_put_alg:
-+	inst = ERR_PTR(err);
-+	goto out;
- }
- 
- static void crypto_ctr_free(struct crypto_instance *inst)
- {
--	struct ctr_instance_ctx *ictx = crypto_instance_ctx(inst);
--
--	crypto_drop_spawn(&ictx->alg);
-+	crypto_drop_spawn(crypto_instance_ctx(inst));
- 	kfree(inst);
- }
- 
-@@ -325,13 +241,174 @@ static struct crypto_template crypto_ctr_tmpl = {
- 	.module = THIS_MODULE,
- };
- 
-+static int crypto_rfc3686_setkey(struct crypto_tfm *parent, const u8 *key,
-+				 unsigned int keylen)
-+{
-+	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(parent);
-+	struct crypto_blkcipher *child = ctx->child;
-+	int err;
-+
-+	/* the nonce is stored in bytes at end of key */
-+	if (keylen < CTR_RFC3686_NONCE_SIZE)
-+		return -EINVAL;
-+
-+	memcpy(ctx->nonce, key + (keylen - CTR_RFC3686_NONCE_SIZE),
-+	       CTR_RFC3686_NONCE_SIZE);
-+
-+	keylen -= CTR_RFC3686_NONCE_SIZE;
-+
-+	crypto_blkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_blkcipher_set_flags(child, crypto_tfm_get_flags(parent) &
-+					  CRYPTO_TFM_REQ_MASK);
-+	err = crypto_blkcipher_setkey(child, key, keylen);
-+	crypto_tfm_set_flags(parent, crypto_blkcipher_get_flags(child) &
-+				     CRYPTO_TFM_RES_MASK);
-+
-+	return err;
-+}
-+
-+static int crypto_rfc3686_crypt(struct blkcipher_desc *desc,
-+				struct scatterlist *dst,
-+				struct scatterlist *src, unsigned int nbytes)
-+{
-+	struct crypto_blkcipher *tfm = desc->tfm;
-+	struct crypto_rfc3686_ctx *ctx = crypto_blkcipher_ctx(tfm);
-+	struct crypto_blkcipher *child = ctx->child;
-+	unsigned long alignmask = crypto_blkcipher_alignmask(tfm);
-+	u8 ivblk[CTR_RFC3686_BLOCK_SIZE + alignmask];
-+	u8 *iv = PTR_ALIGN(ivblk + 0, alignmask + 1);
-+	u8 *info = desc->info;
-+	int err;
-+
-+	/* set up counter block */
-+	memcpy(iv, ctx->nonce, CTR_RFC3686_NONCE_SIZE);
-+	memcpy(iv + CTR_RFC3686_NONCE_SIZE, info, CTR_RFC3686_IV_SIZE);
-+
-+	/* initialize counter portion of counter block */
-+	*(__be32 *)(iv + CTR_RFC3686_NONCE_SIZE + CTR_RFC3686_IV_SIZE) =
-+		cpu_to_be32(1);
-+
-+	desc->tfm = child;
-+	desc->info = iv;
-+	err = crypto_blkcipher_encrypt_iv(desc, dst, src, nbytes);
-+	desc->tfm = tfm;
-+	desc->info = info;
-+
-+	return err;
-+}
-+
-+static int crypto_rfc3686_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = (void *)tfm->__crt_alg;
-+	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_blkcipher *cipher;
-+
-+	cipher = crypto_spawn_blkcipher(spawn);
+-	err = crypto_gcm_encrypt_counter(aead, hash, -1, NULL);
++	cipher = crypto_alloc_cipher(ictx->cipher_name, 0, 0);
 +	if (IS_ERR(cipher))
 +		return PTR_ERR(cipher);
 +
-+	ctx->child = cipher;
-+
-+	return 0;
-+}
-+
-+static void crypto_rfc3686_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_blkcipher(ctx->child);
-+}
-+
-+static struct crypto_instance *crypto_rfc3686_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+	struct crypto_alg *alg;
-+	int err;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg = crypto_attr_alg(tb[1], CRYPTO_ALG_TYPE_BLKCIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
-+	err = PTR_ERR(alg);
-+	if (IS_ERR(alg))
-+		return ERR_PTR(err);
-+
-+	/* We only support 16-byte blocks. */
 +	err = -EINVAL;
-+	if (alg->cra_blkcipher.ivsize != CTR_RFC3686_BLOCK_SIZE)
-+		goto out_put_alg;
-+
-+	/* Not a stream cipher? */
-+	if (alg->cra_blocksize != 1)
-+		goto out_put_alg;
-+
-+	inst = crypto_alloc_instance("rfc3686", alg);
-+	if (IS_ERR(inst))
++	if (crypto_cipher_blocksize(cipher) != sizeof(hash))
 +		goto out;
 +
-+	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
-+	inst->alg.cra_priority = alg->cra_priority;
-+	inst->alg.cra_blocksize = 1;
-+	inst->alg.cra_alignmask = alg->cra_alignmask;
-+	inst->alg.cra_type = &crypto_blkcipher_type;
++	crypto_cipher_clear_flags(cipher, CRYPTO_TFM_REQ_MASK);
++	crypto_cipher_set_flags(cipher, crypto_aead_get_flags(aead) &
++					CRYPTO_TFM_REQ_MASK);
++	err = crypto_cipher_setkey(cipher, key,
++				   keylen - CTR_RFC3686_NONCE_SIZE);
++	crypto_aead_set_flags(aead, crypto_cipher_get_flags(cipher) &
++				    CRYPTO_TFM_RES_MASK);
 +
-+	inst->alg.cra_blkcipher.ivsize = CTR_RFC3686_IV_SIZE;
-+	inst->alg.cra_blkcipher.min_keysize = alg->cra_blkcipher.min_keysize
-+					      + CTR_RFC3686_NONCE_SIZE;
-+	inst->alg.cra_blkcipher.max_keysize = alg->cra_blkcipher.max_keysize
-+					      + CTR_RFC3686_NONCE_SIZE;
+ 	if (err)
+ 		goto out;
+ 
++	memset(&hash, 0, sizeof(hash));
++	crypto_cipher_encrypt_one(cipher, (u8 *)&hash, (u8 *)&hash);
 +
-+	inst->alg.cra_ctxsize = sizeof(struct crypto_rfc3686_ctx);
-+
-+	inst->alg.cra_init = crypto_rfc3686_init_tfm;
-+	inst->alg.cra_exit = crypto_rfc3686_exit_tfm;
-+
-+	inst->alg.cra_blkcipher.setkey = crypto_rfc3686_setkey;
-+	inst->alg.cra_blkcipher.encrypt = crypto_rfc3686_crypt;
-+	inst->alg.cra_blkcipher.decrypt = crypto_rfc3686_crypt;
-+
-+out:
-+	crypto_mod_put(alg);
-+	return inst;
-+
-+out_put_alg:
-+	inst = ERR_PTR(err);
-+	goto out;
-+}
-+
-+static struct crypto_template crypto_rfc3686_tmpl = {
-+	.name = "rfc3686",
-+	.alloc = crypto_rfc3686_alloc,
-+	.free = crypto_ctr_free,
-+	.module = THIS_MODULE,
-+};
-+
- static int __init crypto_ctr_module_init(void)
+ 	if (ctx->gf128 != NULL)
+ 		gf128mul_free_4k(ctx->gf128);
+ 
+-	ctx->gf128 = gf128mul_init_4k_lle((be128 *)hash);
++	ctx->gf128 = gf128mul_init_4k_lle((be128 *)&hash);
+ 
+ 	if (ctx->gf128 == NULL)
+ 		err = -ENOMEM;
+ 
+  out:
++	crypto_free_cipher(cipher);
+ 	return err;
+ }
+ 
+-static int crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
+-				 struct aead_request *req,
+-				 unsigned int cryptlen,
+-				 void (*done)(struct crypto_async_request *,
+-					      int))
++static void crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
++				  struct aead_request *req,
++				  unsigned int cryptlen)
  {
--	return crypto_register_template(&crypto_ctr_tmpl);
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
+ 	u32 flags = req->base.tfm->crt_flags;
+-	u8 *auth_tag = pctx->auth_tag;
+-	u8 *counter = pctx->counter;
+ 	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
+-	int err = 0;
++	struct scatterlist *dst;
+ 
+-	ablkcipher_request_set_tfm(ablk_req, ctx->ctr);
+-	ablkcipher_request_set_callback(ablk_req, aead_request_flags(req),
+-					done, req);
+-	ablkcipher_request_set_crypt(ablk_req, req->src, req->dst,
+-				     cryptlen, counter);
++	memset(pctx->auth_tag, 0, sizeof(pctx->auth_tag));
+ 
+-	err = crypto_gcm_encrypt_counter(aead, auth_tag, 0, req->iv);
+-	if (err)
+-		goto out;
++	sg_init_table(pctx->src, 2);
++	sg_set_buf(pctx->src, pctx->auth_tag, sizeof(pctx->auth_tag));
++	scatterwalk_sg_chain(pctx->src, 2, req->src);
+ 
+-	memcpy(counter, req->iv, 12);
+-	crypto_gcm_set_counter(counter, 1);
++	dst = pctx->src;
++	if (req->src != req->dst) {
++		sg_init_table(pctx->dst, 2);
++		sg_set_buf(pctx->dst, pctx->auth_tag, sizeof(pctx->auth_tag));
++		scatterwalk_sg_chain(pctx->dst, 2, req->dst);
++		dst = pctx->dst;
++	}
++
++	ablkcipher_request_set_tfm(ablk_req, ctx->ctr);
++	ablkcipher_request_set_crypt(ablk_req, pctx->src, dst,
++				     cryptlen + sizeof(pctx->auth_tag),
++				     req->iv);
+ 
+ 	crypto_gcm_ghash_init(ghash, flags, ctx->gf128);
+ 
+ 	crypto_gcm_ghash_update_sg(ghash, req->assoc, req->assoclen);
+ 	crypto_gcm_ghash_flush(ghash);
+-
+- out:
+-	return err;
+ }
+ 
+ static int crypto_gcm_hash(struct aead_request *req)
+@@ -283,25 +277,44 @@ static int crypto_gcm_encrypt(struct aead_request *req)
+ {
+ 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
+ 	struct ablkcipher_request *abreq = &pctx->abreq;
+-	int err = 0;
 +	int err;
 +
-+	err = crypto_register_template(&crypto_ctr_tmpl);
-+	if (err)
-+		goto out;
-+
-+	err = crypto_register_template(&crypto_rfc3686_tmpl);
-+	if (err)
-+		goto out_drop_ctr;
-+
-+out:
-+	return err;
-+
-+out_drop_ctr:
-+	crypto_unregister_template(&crypto_ctr_tmpl);
-+	goto out;
++	crypto_gcm_init_crypt(abreq, req, req->cryptlen);
++	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
++					crypto_gcm_encrypt_done, req);
+ 
+-	err = crypto_gcm_init_crypt(abreq, req, req->cryptlen,
+-				    crypto_gcm_encrypt_done);
++	err = crypto_ablkcipher_encrypt(abreq);
+ 	if (err)
+ 		return err;
+ 
+-	if (req->cryptlen) {
+-		err = crypto_ablkcipher_encrypt(abreq);
+-		if (err)
+-			return err;
+-	}
+-
+ 	return crypto_gcm_hash(req);
  }
  
- static void __exit crypto_ctr_module_exit(void)
++static int crypto_gcm_verify(struct aead_request *req)
++{
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
++	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
++	u8 *auth_tag = pctx->auth_tag;
++	u8 *iauth_tag = pctx->iauth_tag;
++	unsigned int authsize = crypto_aead_authsize(aead);
++	unsigned int cryptlen = req->cryptlen - authsize;
++
++	crypto_gcm_ghash_final_xor(ghash, req->assoclen, cryptlen, auth_tag);
++
++	authsize = crypto_aead_authsize(aead);
++	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
++	return memcmp(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
++}
++
+ static void crypto_gcm_decrypt_done(struct crypto_async_request *areq, int err)
  {
-+	crypto_unregister_template(&crypto_rfc3686_tmpl);
- 	crypto_unregister_template(&crypto_ctr_tmpl);
+-	aead_request_complete(areq->data, err);
++	struct aead_request *req = areq->data;
++
++	if (!err)
++		err = crypto_gcm_verify(req);
++
++	aead_request_complete(req, err);
  }
  
-@@ -340,3 +417,4 @@ module_exit(crypto_ctr_module_exit);
+ static int crypto_gcm_decrypt(struct aead_request *req)
+@@ -309,8 +322,6 @@ static int crypto_gcm_decrypt(struct aead_request *req)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
+ 	struct ablkcipher_request *abreq = &pctx->abreq;
+-	u8 *auth_tag = pctx->auth_tag;
+-	u8 *iauth_tag = pctx->iauth_tag;
+ 	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
+ 	unsigned int cryptlen = req->cryptlen;
+ 	unsigned int authsize = crypto_aead_authsize(aead);
+@@ -320,19 +331,17 @@ static int crypto_gcm_decrypt(struct aead_request *req)
+ 		return -EINVAL;
+ 	cryptlen -= authsize;
  
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("CTR Counter block mode");
-+MODULE_ALIAS("rfc3686");
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 8f35670..1624301 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -402,9 +402,8 @@ static struct crypto_instance *crypto_gcm_alloc(struct rtattr **tb)
- 		return inst;
+-	err = crypto_gcm_init_crypt(abreq, req, cryptlen,
+-				    crypto_gcm_decrypt_done);
+-	if (err)
+-		return err;
++	crypto_gcm_init_crypt(abreq, req, cryptlen);
++	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
++					crypto_gcm_decrypt_done, req);
  
+ 	crypto_gcm_ghash_update_sg(ghash, req->src, cryptlen);
+-	crypto_gcm_ghash_final_xor(ghash, req->assoclen, cryptlen, auth_tag);
+ 
+-	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
+-	if (memcmp(iauth_tag, auth_tag, authsize))
+-		return -EBADMSG;
++	err = crypto_ablkcipher_decrypt(abreq);
++	if (err)
++		return err;
+ 
+-	return crypto_ablkcipher_decrypt(abreq);
++	return crypto_gcm_verify(req);
+ }
+ 
+ static int crypto_gcm_init_tfm(struct crypto_tfm *tfm)
+@@ -395,7 +404,7 @@ static struct crypto_instance *crypto_gcm_alloc(struct rtattr **tb)
  	inst = ERR_PTR(ENAMETOOLONG);
--	if (snprintf(
--		    ctr_name, CRYPTO_MAX_ALG_NAME,
--		    "ctr(%s,4,8,4)", cipher->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+	if (snprintf(ctr_name, CRYPTO_MAX_ALG_NAME, "rfc3686(ctr(%s))",
-+		     cipher->cra_name) >= CRYPTO_MAX_ALG_NAME)
+ 	if (snprintf(
+ 		    ctr_name, CRYPTO_MAX_ALG_NAME,
+-		    "ctr(%s,0,16,4)", cipher->cra_name) >= CRYPTO_MAX_ALG_NAME)
++		    "ctr(%s,4,8,4)", cipher->cra_name) >= CRYPTO_MAX_ALG_NAME)
  		return inst;
  
  	ctr = crypto_alg_mod_lookup(ctr_name, CRYPTO_ALG_TYPE_BLKCIPHER,
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 0cfb8eb..1142b49 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1193,9 +1193,9 @@ static void do_test(void)
- 			    AES_XTS_ENC_TEST_VECTORS);
- 		test_cipher("xts(aes)", DECRYPT, aes_xts_dec_tv_template,
- 			    AES_XTS_DEC_TEST_VECTORS);
--		test_cipher("ctr(aes,4,8,4)", ENCRYPT, aes_ctr_enc_tv_template,
-+		test_cipher("rfc3686(ctr(aes))", ENCRYPT, aes_ctr_enc_tv_template,
- 			    AES_CTR_ENC_TEST_VECTORS);
--		test_cipher("ctr(aes,4,8,4)", DECRYPT, aes_ctr_dec_tv_template,
-+		test_cipher("rfc3686(ctr(aes))", DECRYPT, aes_ctr_dec_tv_template,
- 			    AES_CTR_DEC_TEST_VECTORS);
- 		test_aead("gcm(aes)", ENCRYPT, aes_gcm_enc_tv_template,
- 			  AES_GCM_ENC_TEST_VECTORS);
-@@ -1394,9 +1394,9 @@ static void do_test(void)
- 			    AES_XTS_ENC_TEST_VECTORS);
- 		test_cipher("xts(aes)", DECRYPT, aes_xts_dec_tv_template,
- 			    AES_XTS_DEC_TEST_VECTORS);
--		test_cipher("ctr(aes,4,8,4)", ENCRYPT, aes_ctr_enc_tv_template,
-+		test_cipher("rfc3686(ctr(aes))", ENCRYPT, aes_ctr_enc_tv_template,
- 			    AES_CTR_ENC_TEST_VECTORS);
--		test_cipher("ctr(aes,4,8,4)", DECRYPT, aes_ctr_dec_tv_template,
-+		test_cipher("rfc3686(ctr(aes))", DECRYPT, aes_ctr_dec_tv_template,
- 			    AES_CTR_DEC_TEST_VECTORS);
- 		break;
+@@ -404,9 +413,6 @@ static struct crypto_instance *crypto_gcm_alloc(struct rtattr **tb)
+ 	if (IS_ERR(ctr))
+ 		return ERR_PTR(PTR_ERR(ctr));
  
+-	if (cipher->cra_blocksize != 16)
+-		goto out_put_ctr;
+-
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
+ 	err = -ENOMEM;
+ 	if (!inst)
+@@ -425,10 +431,12 @@ static struct crypto_instance *crypto_gcm_alloc(struct rtattr **tb)
+ 	if (err)
+ 		goto err_free_inst;
+ 
++	memcpy(ctx->cipher_name, cipher->cra_driver_name, CRYPTO_MAX_ALG_NAME);
++
+ 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC;
+ 	inst->alg.cra_priority = ctr->cra_priority;
+ 	inst->alg.cra_blocksize = 16;
+-	inst->alg.cra_alignmask = __alignof__(u32) - 1;
++	inst->alg.cra_alignmask = ctr->cra_alignmask | (__alignof__(u64) - 1);
+ 	inst->alg.cra_type = &crypto_aead_type;
+ 	inst->alg.cra_aead.ivsize = 12;
+ 	inst->alg.cra_aead.maxauthsize = 16;
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 5b86509..ac90cf1 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -4679,12 +4679,12 @@ static struct cipher_testvec aes_ctr_dec_tv_template[] = {
+ 
+ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 	{ /* From McGrew & Viega - http://citeseer.ist.psu.edu/656989.html */
+-		.klen	= 16,
++		.klen	= 20,
+ 		.result	= { 0x58, 0xe2, 0xfc, 0xce, 0xfa, 0x7e, 0x30, 0x61,
+ 			    0x36, 0x7f, 0x1d, 0x57, 0xa4, 0xe7, 0x45, 0x5a },
+ 		.rlen	= 16,
+ 	}, {
+-		.klen	= 16,
++		.klen	= 20,
+ 		.ilen	= 16,
+ 		.result = { 0x03, 0x88, 0xda, 0xce, 0x60, 0xb6, 0xa3, 0x92,
+ 			    0xf3, 0x28, 0xc2, 0xb9, 0x71, 0xb2, 0xfe, 0x78,
+@@ -4693,10 +4693,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 		.rlen	= 32,
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 16,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 20,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
+ 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
+ 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
+@@ -4719,10 +4719,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 		.rlen	= 80,
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 16,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 20,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
+ 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
+ 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
+@@ -4748,12 +4748,12 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 			    0x94, 0xfa, 0xe9, 0x5a, 0xe7, 0x12, 0x1a, 0x47 },
+ 		.rlen	= 76,
+ 	}, {
+-		.klen	= 24,
++		.klen	= 28,
+ 		.result	= { 0xcd, 0x33, 0xb2, 0x8a, 0xc7, 0x73, 0xf7, 0x4b,
+ 			    0xa0, 0x0e, 0xd1, 0xf3, 0x12, 0x57, 0x24, 0x35 },
+ 		.rlen	= 16,
+ 	}, {
+-		.klen	= 24,
++		.klen	= 28,
+ 		.ilen	= 16,
+ 		.result = { 0x98, 0xe7, 0x24, 0x7c, 0x07, 0xf0, 0xfe, 0x41,
+ 			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00,
+@@ -4763,10 +4763,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+-			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c },
+-		.klen	= 24,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 28,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
+ 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
+ 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
+@@ -4790,10 +4790,10 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+-			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c },
+-		.klen	= 24,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 28,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0xd9, 0x31, 0x32, 0x25, 0xf8, 0x84, 0x06, 0xe5,
+ 			    0xa5, 0x59, 0x09, 0xc5, 0xaf, 0xf5, 0x26, 0x9a,
+ 			    0x86, 0xa7, 0xa9, 0x53, 0x15, 0x34, 0xf7, 0xda,
+@@ -4823,7 +4823,7 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 		.anp	= 2,
+ 		.atap	= { 8, 12 }
+ 	}, {
+-		.klen	= 32,
++		.klen	= 36,
+ 		.result	= { 0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9,
+ 			    0xa9, 0x63, 0xb4, 0xf1, 0xc4, 0xcb, 0x73, 0x8b },
+ 		.rlen	= 16,
+@@ -4832,7 +4832,7 @@ static struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 
+ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 	{ /* From McGrew & Viega - http://citeseer.ist.psu.edu/656989.html */
+-		.klen	= 32,
++		.klen	= 36,
+ 		.input	= { 0xce, 0xa7, 0x40, 0x3d, 0x4d, 0x60, 0x6b, 0x6e,
+ 			    0x07, 0x4e, 0xc5, 0xd3, 0xba, 0xf3, 0x9d, 0x18,
+ 			    0xd0, 0xd1, 0xc8, 0xa7, 0x99, 0x99, 0x6b, 0xf0,
+@@ -4843,10 +4843,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+ 			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 32,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 36,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x52, 0x2d, 0xc1, 0xf0, 0x99, 0x56, 0x7d, 0x07,
+ 			    0xf4, 0x7f, 0x37, 0xa3, 0x2a, 0x84, 0x42, 0x7d,
+ 			    0x64, 0x3a, 0x8c, 0xdc, 0xbf, 0xe5, 0xc0, 0xc9,
+@@ -4871,10 +4871,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+ 			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 32,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 36,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x52, 0x2d, 0xc1, 0xf0, 0x99, 0x56, 0x7d, 0x07,
+ 			    0xf4, 0x7f, 0x37, 0xa3, 0x2a, 0x84, 0x42, 0x7d,
+ 			    0x64, 0x3a, 0x8c, 0xdc, 0xbf, 0xe5, 0xc0, 0xc9,
+@@ -4905,10 +4905,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 		.atap	= { 8, 8, 4 }
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 16,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 20,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x42, 0x83, 0x1e, 0xc2, 0x21, 0x77, 0x74, 0x24,
+ 			    0x4b, 0x72, 0x21, 0xb7, 0x84, 0xd0, 0xd4, 0x9c,
+ 			    0xe3, 0xaa, 0x21, 0x2f, 0x2c, 0x02, 0xa4, 0xe0,
+@@ -4931,10 +4931,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 		.rlen	= 64,
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+-			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08 },
+-		.klen	= 16,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 20,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x42, 0x83, 0x1e, 0xc2, 0x21, 0x77, 0x74, 0x24,
+ 			    0x4b, 0x72, 0x21, 0xb7, 0x84, 0xd0, 0xd4, 0x9c,
+ 			    0xe3, 0xaa, 0x21, 0x2f, 0x2c, 0x02, 0xa4, 0xe0,
+@@ -4960,7 +4960,7 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 			    0xba, 0x63, 0x7b, 0x39 },
+ 		.rlen	= 60,
+ 	}, {
+-		.klen	= 24,
++		.klen	= 28,
+ 		.input	= { 0x98, 0xe7, 0x24, 0x7c, 0x07, 0xf0, 0xfe, 0x41,
+ 			    0x1c, 0x26, 0x7e, 0x43, 0x84, 0xb0, 0xf6, 0x00,
+ 			    0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
+@@ -4970,10 +4970,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+-			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c },
+-		.klen	= 24,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 28,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x39, 0x80, 0xca, 0x0b, 0x3c, 0x00, 0xe8, 0x41,
+ 			    0xeb, 0x06, 0xfa, 0xc4, 0x87, 0x2a, 0x27, 0x57,
+ 			    0x85, 0x9e, 0x1c, 0xea, 0xa6, 0xef, 0xd9, 0x84,
+@@ -4997,10 +4997,10 @@ static struct aead_testvec aes_gcm_dec_tv_template[] = {
+ 	}, {
+ 		.key	= { 0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+ 			    0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08,
+-			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c },
+-		.klen	= 24,
+-		.iv	= { 0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+-			    0xde, 0xca, 0xf8, 0x88 },
++			    0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
++			    0xca, 0xfe, 0xba, 0xbe },
++		.klen	= 28,
++		.iv	= { 0xfa, 0xce, 0xdb, 0xad, 0xde, 0xca, 0xf8, 0x88 },
+ 		.input	= { 0x39, 0x80, 0xca, 0x0b, 0x3c, 0x00, 0xe8, 0x41,
+ 			    0xeb, 0x06, 0xfa, 0xc4, 0x87, 0x2a, 0x27, 0x57,
+ 			    0x85, 0x9e, 0x1c, 0xea, 0xa6, 0xef, 0xd9, 0x84,
+diff --git a/include/crypto/ctr.h b/include/crypto/ctr.h
+new file mode 100644
+index 0000000..4180fc0
+--- /dev/null
++++ b/include/crypto/ctr.h
+@@ -0,0 +1,20 @@
++/*
++ * CTR: Counter mode
++ *
++ * Copyright (c) 2007 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#ifndef _CRYPTO_CTR_H
++#define _CRYPTO_CTR_H
++
++#define CTR_RFC3686_NONCE_SIZE 4
++#define CTR_RFC3686_IV_SIZE 8
++#define CTR_RFC3686_BLOCK_SIZE 16
++
++#endif  /* _CRYPTO_CTR_H */
