@@ -1,39 +1,51 @@
-From: Joy Latten <latten@austin.ibm.com>
-Subject: Re: PATCH[1/2]: CCM Mode
-Date: Tue, 11 Dec 2007 12:18:10 -0600
-Message-ID: <200712111818.lBBIIApw025684@faith.austin.ibm.com>
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, latten@austin.ibm.com
+From: Adrian Bunk <bunk@kernel.org>
+Subject: [2.6 patch] crypto/geode-aes.c: add __dev{init,exit} annotations
+Date: Tue, 11 Dec 2007 23:19:50 +0100
+Message-ID: <20071211221949.GB14204@stusta.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jordan Crouse <jordan.crouse@amd.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e4.ny.us.ibm.com ([32.97.182.144]:45234 "EHLO e4.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752875AbXLKSTU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Dec 2007 13:19:20 -0500
-Received: from d01relay04.pok.ibm.com (d01relay04.pok.ibm.com [9.56.227.236])
-	by e4.ny.us.ibm.com (8.13.8/8.13.8) with ESMTP id lBBIJIi1019536
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 13:19:18 -0500
-Received: from d01av02.pok.ibm.com (d01av02.pok.ibm.com [9.56.224.216])
-	by d01relay04.pok.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id lBBIJH8p114076
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 13:19:17 -0500
-Received: from d01av02.pok.ibm.com (loopback [127.0.0.1])
-	by d01av02.pok.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id lBBIJHGc010351
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 13:19:17 -0500
+Received: from emailhub.stusta.mhn.de ([141.84.69.5]:54601 "EHLO
+	mailhub.stusta.mhn.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752728AbXLKWTt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Dec 2007 17:19:49 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This patch adds __dev{init,exit} annotations.
 
->On Tue, Dec 11, 2007 at 04:24:26AM -0600, Joy Latten wrote:
->>
->> Please let me know if all looks ok or not.
->> I may need to rebase this patch or change something in
->> light of Herbert's recent patchsets. I will take a look
->> at them later today.
->
->Don't worry about my changes.  I'll fix up your patch so that
->it works with the current cryptodev tree.
+Signed-off-by: Adrian Bunk <bunk@kernel.org>
 
-Ok, thanks! Please let me know if there is anything I
-can help with.
+---
 
-regards,
-Joy
+ drivers/crypto/geode-aes.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+9a5ecd183293da27ad66241b51c93bea0634df55 
+diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+index 711e246..96deb47 100644
+--- a/drivers/crypto/geode-aes.c
++++ b/drivers/crypto/geode-aes.c
+@@ -374,7 +374,7 @@ static struct crypto_alg geode_ecb_alg = {
+ 	}
+ };
+ 
+-static void
++static void __devexit
+ geode_aes_remove(struct pci_dev *dev)
+ {
+ 	crypto_unregister_alg(&geode_alg);
+@@ -389,7 +389,7 @@ geode_aes_remove(struct pci_dev *dev)
+ }
+ 
+ 
+-static int
++static int __devinit
+ geode_aes_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ {
+ 	int ret;
