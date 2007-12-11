@@ -1,114 +1,177 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 19/19] [CRYPTO] aead: Add top-level givencrypt/givdecrypt calls
-Date: Tue, 11 Dec 2007 12:05:48 +0800
-Message-ID: <E1J1wNQ-0002lh-00@gondolin.me.apana.org.au>
+Subject: [PATCH 18/19] [CRYPTO] gcm: Add givcrypt operations
+Date: Tue, 11 Dec 2007 12:05:47 +0800
+Message-ID: <E1J1wNP-0002la-00@gondolin.me.apana.org.au>
 References: <20071211040215.GA10360@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1976 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1975 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751944AbXLKEFz (ORCPT
+	with ESMTP id S1751972AbXLKEF4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 23:05:55 -0500
+	Mon, 10 Dec 2007 23:05:56 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J1wNS-00068e-Uw
+	id 1J1wNS-00068R-5C
 	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:51 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] aead: Add top-level givencrypt/givdecrypt calls
-
-This patch finally makes the givencrypt/givdecrypt operations available
-to users by adding crypto_aead_givencrypt and crypto_aead_givdecrypt.
-A suite of helpers to allocate and fill in the request is also available.
-
+[CRYPTO] gcm: Add givcrypt operations
+    
+This patch implements the givcrypt functions for gcm.  It simply calls
+the givcrypt operations on the underlying cipher instead of encrypt or
+decrypt.
+    
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/crypto/aead.h |   67 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 67 insertions(+)
+ crypto/gcm.c |   75 ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 67 insertions(+), 8 deletions(-)
 
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 0839203..0edf949 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -15,6 +15,7 @@
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 1fdefe5..7775ea0 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -8,6 +8,7 @@
+  * by the Free Software Foundation.
+  */
  
- #include <linux/crypto.h>
- #include <linux/kernel.h>
-+#include <linux/slab.h>
++#include <crypto/aead.h>
+ #include <crypto/ctr.h>
+ #include <crypto/gf128mul.h>
+ #include <crypto/internal/skcipher.h>
+@@ -41,7 +42,7 @@ struct crypto_gcm_req_priv_ctx {
+ 	u8 auth_tag[16];
+ 	u8 iauth_tag[16];
+ 	struct crypto_gcm_ghash_ctx ghash;
+-	struct ablkcipher_request abreq;
++	struct skcipher_givcrypt_request greq;
+ };
  
- /**
-  *	struct aead_givcrypt_request - AEAD request with IV generation
-@@ -35,4 +36,70 @@ static inline struct crypto_aead *aead_givcrypt_reqtfm(
- 	return crypto_aead_reqtfm(&req->areq);
+ static void crypto_gcm_ghash_init(struct crypto_gcm_ghash_ctx *ctx, u32 flags,
+@@ -271,15 +272,21 @@ static void crypto_gcm_encrypt_done(struct crypto_async_request *areq, int err)
+ 	aead_request_complete(req, err);
  }
  
-+static inline int crypto_aead_givencrypt(struct aead_givcrypt_request *req)
++static void crypto_gcm_init_encrypt(struct ablkcipher_request *abreq,
++				    struct aead_request *req)
 +{
-+	struct aead_tfm *crt = crypto_aead_crt(aead_givcrypt_reqtfm(req));
-+	return crt->givencrypt(req);
-+};
-+
-+static inline int crypto_aead_givdecrypt(struct aead_givcrypt_request *req)
-+{
-+	struct aead_tfm *crt = crypto_aead_crt(aead_givcrypt_reqtfm(req));
-+	return crt->givdecrypt(req);
-+};
-+
-+static inline void aead_givcrypt_set_tfm(struct aead_givcrypt_request *req,
-+					 struct crypto_aead *tfm)
-+{
-+	req->areq.base.tfm = crypto_aead_tfm(tfm);
++	crypto_gcm_init_crypt(abreq, req, req->cryptlen);
++	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
++					crypto_gcm_encrypt_done, req);
 +}
 +
-+static inline struct aead_givcrypt_request *aead_givcrypt_alloc(
-+	struct crypto_aead *tfm, gfp_t gfp)
+ static int crypto_gcm_encrypt(struct aead_request *req)
+ {
+ 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
+-	struct ablkcipher_request *abreq = &pctx->abreq;
++	struct ablkcipher_request *abreq = &pctx->greq.creq;
+ 	int err;
+ 
+-	crypto_gcm_init_crypt(abreq, req, req->cryptlen);
+-	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+-					crypto_gcm_encrypt_done, req);
++	crypto_gcm_init_encrypt(abreq, req);
+ 
+ 	err = crypto_ablkcipher_encrypt(abreq);
+ 	if (err)
+@@ -288,6 +295,24 @@ static int crypto_gcm_encrypt(struct aead_request *req)
+ 	return crypto_gcm_hash(req);
+ }
+ 
++static int crypto_gcm_givencrypt(struct aead_givcrypt_request *req)
 +{
-+	struct aead_givcrypt_request *req;
++	struct aead_request *areq = &req->areq;
++	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(areq);
++	struct skcipher_givcrypt_request *greq = &pctx->greq;
++	struct ablkcipher_request *abreq = &greq->creq;
++	int err;
 +
-+	req = kmalloc(sizeof(struct aead_givcrypt_request) +
-+		      crypto_aead_reqsize(tfm), gfp);
++	crypto_gcm_init_encrypt(abreq, areq);
++	skcipher_givcrypt_set_giv(greq, req->giv, req->seq);
 +
-+	if (likely(req))
-+		aead_givcrypt_set_tfm(req, tfm);
++	err = crypto_skcipher_givencrypt(greq);
++	if (err)
++		return err;
 +
-+	return req;
++	return crypto_gcm_hash(areq);
 +}
 +
-+static inline void aead_givcrypt_free(struct aead_givcrypt_request *req)
-+{
-+	kfree(req);
+ static int crypto_gcm_verify(struct aead_request *req)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+@@ -315,15 +340,14 @@ static void crypto_gcm_decrypt_done(struct crypto_async_request *areq, int err)
+ 	aead_request_complete(req, err);
+ }
+ 
+-static int crypto_gcm_decrypt(struct aead_request *req)
++static int crypto_gcm_init_decrypt(struct ablkcipher_request *abreq,
++				   struct aead_request *req)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
+-	struct ablkcipher_request *abreq = &pctx->abreq;
+ 	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
+ 	unsigned int cryptlen = req->cryptlen;
+ 	unsigned int authsize = crypto_aead_authsize(aead);
+-	int err;
+ 
+ 	if (cryptlen < authsize)
+ 		return -EINVAL;
+@@ -334,6 +358,18 @@ static int crypto_gcm_decrypt(struct aead_request *req)
+ 					crypto_gcm_decrypt_done, req);
+ 
+ 	crypto_gcm_ghash_update_sg(ghash, req->src, cryptlen);
++	return 0;
 +}
 +
-+static inline void aead_givcrypt_set_callback(
-+	struct aead_givcrypt_request *req, u32 flags,
-+	crypto_completion_t complete, void *data)
++static int crypto_gcm_decrypt(struct aead_request *req)
 +{
-+	aead_request_set_callback(&req->areq, flags, complete, data);
++	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(req);
++	struct ablkcipher_request *abreq = &pctx->greq.creq;
++	int err;
++
++	err = crypto_gcm_init_decrypt(abreq, req);
++	if (err)
++		return err;
+ 
+ 	err = crypto_ablkcipher_decrypt(abreq);
+ 	if (err)
+@@ -342,6 +378,27 @@ static int crypto_gcm_decrypt(struct aead_request *req)
+ 	return crypto_gcm_verify(req);
+ }
+ 
++static int crypto_gcm_givdecrypt(struct aead_givcrypt_request *req)
++{
++	struct aead_request *areq = &req->areq;
++	struct crypto_gcm_req_priv_ctx *pctx = aead_request_ctx(areq);
++	struct skcipher_givcrypt_request *greq = &pctx->greq;
++	struct ablkcipher_request *abreq = &greq->creq;
++	int err;
++
++	err = crypto_gcm_init_decrypt(abreq, areq);
++	if (err)
++		return err;
++
++	skcipher_givcrypt_set_giv(greq, req->giv, req->seq);
++
++	err = crypto_skcipher_givdecrypt(greq);
++	if (err)
++		return err;
++
++	return crypto_gcm_verify(areq);
 +}
 +
-+static inline void aead_givcrypt_set_crypt(struct aead_givcrypt_request *req,
-+					   struct scatterlist *src,
-+					   struct scatterlist *dst,
-+					   unsigned int nbytes, void *iv)
-+{
-+	aead_request_set_crypt(&req->areq, src, dst, nbytes, iv);
-+}
-+
-+static inline void aead_givcrypt_set_assoc(struct aead_givcrypt_request *req,
-+					   struct scatterlist *assoc,
-+					   unsigned int assoclen)
-+{
-+	aead_request_set_assoc(&req->areq, assoc, assoclen);
-+}
-+
-+static inline void aead_givcrypt_set_giv(struct aead_givcrypt_request *req,
-+					 u8 *giv, u64 seq)
-+{
-+	req->giv = giv;
-+	req->seq = seq;
-+}
-+
- #endif	/* _CRYPTO_AEAD_H */
+ static int crypto_gcm_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
+@@ -440,6 +497,8 @@ static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
+ 	inst->alg.cra_aead.setkey = crypto_gcm_setkey;
+ 	inst->alg.cra_aead.encrypt = crypto_gcm_encrypt;
+ 	inst->alg.cra_aead.decrypt = crypto_gcm_decrypt;
++	inst->alg.cra_aead.givencrypt = crypto_gcm_givencrypt;
++	inst->alg.cra_aead.givdecrypt = crypto_gcm_givdecrypt;
+ 
+ out:
+ 	return inst;
