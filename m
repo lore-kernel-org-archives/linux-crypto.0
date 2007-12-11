@@ -1,120 +1,320 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 15/19] [CRYPTO] skcipher: Add top-level givencrypt/givdecrypt calls
-Date: Tue, 11 Dec 2007 12:05:43 +0800
-Message-ID: <E1J1wNL-0002lF-00@gondolin.me.apana.org.au>
+Subject: [PATCH 12/19] [CRYPTO] eseqiv: Add Encrypted Sequence Number IV Generator
+Date: Tue, 11 Dec 2007 12:05:40 +0800
+Message-ID: <E1J1wNI-0002ku-00@gondolin.me.apana.org.au>
 References: <20071211040215.GA10360@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1970 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1961 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751941AbXLKEFx (ORCPT
+	with ESMTP id S1751357AbXLKEFo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 23:05:53 -0500
+	Mon, 10 Dec 2007 23:05:44 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J1wNN-000686-RC
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:46 +1100
+	id 1J1wNJ-00067t-Jy
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:41 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] skcipher: Add top-level givencrypt/givdecrypt calls
+[CRYPTO] eseqiv: Add Encrypted Sequence Number IV Generator
 
-This patch finally makes the givencrypt/givdecrypt operations available
-to users by adding crypto_skcipher_givencrypt and crypto_skcipher_givdecrypt.
-A suite of helpers to allocate and fill in the request is also available.
+This generator generates an IV based on a sequence number by xoring it
+with a salt and then encrypting it with the same key as used to encrypt
+the plain text.  This algorithm requires that the block size be equal
+to the IV size.  It is mainly useful for CBC.
+
+It has one noteworthy property that for IPsec the IV happens to lie
+just before the plain text so the IV generation simply increases the
+number of encrypted blocks by one.  Therefore the cost of this generator
+is entirely dependent on the speed of the underlying cipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/crypto/skcipher.h |   72 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 72 insertions(+)
+ crypto/Makefile |    1 
+ crypto/eseqiv.c |  264 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 265 insertions(+)
 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index c283fab..25fd612 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -14,6 +14,8 @@
- #define _CRYPTO_SKCIPHER_H
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 4b2e0c3..968b796 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -14,6 +14,7 @@ crypto_blkcipher-objs := ablkcipher.o
+ crypto_blkcipher-objs += blkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER) += crypto_blkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER) += chainiv.o
++obj-$(CONFIG_CRYPTO_BLKCIPHER) += eseqiv.o
  
- #include <linux/crypto.h>
+ crypto_hash-objs := hash.o
+ obj-$(CONFIG_CRYPTO_HASH) += crypto_hash.o
+diff --git a/crypto/eseqiv.c b/crypto/eseqiv.c
+new file mode 100644
+index 0000000..eb90d27
+--- /dev/null
++++ b/crypto/eseqiv.c
+@@ -0,0 +1,264 @@
++/*
++ * eseqiv: Encrypted Sequence Number IV Generator
++ *
++ * This generator generates an IV based on a sequence number by xoring it
++ * with a salt and then encrypting it with the same key as used to encrypt
++ * the plain text.  This algorithm requires that the block size be equal
++ * to the IV size.  It is mainly useful for CBC.
++ *
++ * Copyright (c) 2007 Herbert Xu <herbert@gondor.apana.org.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
++#include <linux/err.h>
++#include <linux/init.h>
 +#include <linux/kernel.h>
-+#include <linux/slab.h>
- 
- /**
-  *	struct skcipher_givcrypt_request - Crypto request with IV generation
-@@ -34,5 +36,75 @@ static inline struct crypto_ablkcipher *skcipher_givcrypt_reqtfm(
- 	return crypto_ablkcipher_reqtfm(&req->creq);
- }
- 
-+static inline int crypto_skcipher_givencrypt(
-+	struct skcipher_givcrypt_request *req)
-+{
-+	struct ablkcipher_tfm *crt =
-+		crypto_ablkcipher_crt(skcipher_givcrypt_reqtfm(req));
-+	return crt->givencrypt(req);
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/random.h>
++#include <linux/scatterlist.h>
++#include <linux/spinlock.h>
++#include <linux/string.h>
++
++struct eseqiv_request_ctx {
++	struct scatterlist src[2];
++	struct scatterlist dst[2];
++	char tail[];
 +};
 +
-+static inline int crypto_skcipher_givdecrypt(
-+	struct skcipher_givcrypt_request *req)
-+{
-+	struct ablkcipher_tfm *crt =
-+		crypto_ablkcipher_crt(skcipher_givcrypt_reqtfm(req));
-+	return crt->givdecrypt(req);
++struct eseqiv_ctx {
++	spinlock_t lock;
++	unsigned int reqoff;
++	char salt[];
 +};
 +
-+static inline void skcipher_givcrypt_set_tfm(
-+	struct skcipher_givcrypt_request *req, struct crypto_ablkcipher *tfm)
++static void eseqiv_complete2(struct skcipher_givcrypt_request *req)
 +{
-+	req->creq.base.tfm = crypto_ablkcipher_tfm(tfm);
++	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
++	struct eseqiv_request_ctx *reqctx = skcipher_givcrypt_reqctx(req);
++
++	memcpy(req->giv, PTR_ALIGN((u8 *)reqctx->tail,
++			 crypto_ablkcipher_alignmask(geniv) + 1),
++	       crypto_ablkcipher_ivsize(geniv));
 +}
 +
-+static inline struct skcipher_givcrypt_request *skcipher_givcrypt_cast(
-+	struct crypto_async_request *req)
++static void eseqiv_complete(struct crypto_async_request *base, int err)
 +{
-+	return container_of(ablkcipher_request_cast(req),
-+			    struct skcipher_givcrypt_request, creq);
++	struct skcipher_givcrypt_request *req = base->data;
++
++	if (err)
++		goto out;
++
++	eseqiv_complete2(req);
++
++out:
++	skcipher_givcrypt_complete(req, err);
 +}
 +
-+static inline struct skcipher_givcrypt_request *skcipher_givcrypt_alloc(
-+	struct crypto_ablkcipher *tfm, gfp_t gfp)
++static void eseqiv_chain(struct scatterlist *head, struct scatterlist *sg,
++			 int chain)
 +{
-+	struct skcipher_givcrypt_request *req;
++	if (chain) {
++		head->length += sg->length;
++		sg = scatterwalk_sg_next(sg);
++	}
 +
-+	req = kmalloc(sizeof(struct skcipher_givcrypt_request) +
-+		      crypto_ablkcipher_reqsize(tfm), gfp);
-+
-+	if (likely(req))
-+		skcipher_givcrypt_set_tfm(req, tfm);
-+
-+	return req;
++	if (sg)
++		scatterwalk_sg_chain(head, 2, sg);
++	else
++		sg_mark_end(head);
 +}
 +
-+static inline void skcipher_givcrypt_free(struct skcipher_givcrypt_request *req)
++static int eseqiv_givencrypt(struct skcipher_givcrypt_request *req)
 +{
-+	kfree(req);
++	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
++	struct eseqiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++	struct eseqiv_request_ctx *reqctx = skcipher_givcrypt_reqctx(req);
++	struct ablkcipher_request *subreq;
++	crypto_completion_t complete;
++	void *data;
++	struct scatterlist *osrc, *odst;
++	struct scatterlist *dst;
++	struct page *srcp;
++	struct page *dstp;
++	u8 *giv;
++	u8 *vsrc;
++	u8 *vdst;
++	__be64 seq;
++	unsigned int ivsize;
++	unsigned int len;
++	int err;
++
++	subreq = (void *)(reqctx->tail + ctx->reqoff);
++	ablkcipher_request_set_tfm(subreq, skcipher_geniv_cipher(geniv));
++
++	giv = req->giv;
++	complete = req->creq.base.complete;
++	data = req->creq.base.data;
++
++	osrc = req->creq.src;
++	odst = req->creq.dst;
++	srcp = sg_page(osrc);
++	dstp = sg_page(odst);
++	vsrc = PageHighMem(srcp) ? NULL : page_address(srcp) + osrc->offset;
++	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + odst->offset;
++
++	ivsize = crypto_ablkcipher_ivsize(geniv);
++
++	if (vsrc != giv + ivsize && vdst != giv + ivsize) {
++		giv = PTR_ALIGN((u8 *)reqctx->tail,
++				crypto_ablkcipher_alignmask(geniv) + 1);
++		complete = eseqiv_complete;
++		data = req;
++	}
++
++	ablkcipher_request_set_callback(subreq, req->creq.base.flags, complete,
++					data);
++
++	sg_init_table(reqctx->src, 2);
++	sg_set_buf(reqctx->src, giv, ivsize);
++	eseqiv_chain(reqctx->src, osrc, vsrc == giv + ivsize);
++
++	dst = reqctx->src;
++	if (osrc != odst) {
++		sg_init_table(reqctx->dst, 2);
++		sg_set_buf(reqctx->dst, giv, ivsize);
++		eseqiv_chain(reqctx->dst, odst, vdst == giv + ivsize);
++
++		dst = reqctx->dst;
++	}
++
++	ablkcipher_request_set_crypt(subreq, reqctx->src, dst,
++				     req->creq.nbytes, req->creq.info);
++
++	memcpy(req->creq.info, ctx->salt, ivsize);
++
++	len = ivsize;
++	if (ivsize > sizeof(u64)) {
++		memset(req->giv, 0, ivsize - sizeof(u64));
++		len = sizeof(u64);
++	}
++	seq = cpu_to_be64(req->seq);
++	memcpy(req->giv + ivsize - len, &seq, len);
++
++	err = crypto_ablkcipher_encrypt(subreq);
++	if (err)
++		goto out;
++
++	eseqiv_complete2(req);
++
++out:
++	return err;
 +}
 +
-+static inline void skcipher_givcrypt_set_callback(
-+	struct skcipher_givcrypt_request *req, u32 flags,
-+	crypto_completion_t complete, void *data)
++static int eseqiv_givencrypt_first(struct skcipher_givcrypt_request *req)
 +{
-+	ablkcipher_request_set_callback(&req->creq, flags, complete, data);
++	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
++	struct eseqiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++
++	spin_lock_bh(&ctx->lock);
++	if (crypto_ablkcipher_crt(geniv)->givencrypt != eseqiv_givencrypt_first)
++		goto unlock;
++
++	crypto_ablkcipher_crt(geniv)->givencrypt = eseqiv_givencrypt;
++	get_random_bytes(ctx->salt, crypto_ablkcipher_ivsize(geniv));
++
++unlock:
++	spin_unlock_bh(&ctx->lock);
++
++	return eseqiv_givencrypt(req);
 +}
 +
-+static inline void skcipher_givcrypt_set_crypt(
-+	struct skcipher_givcrypt_request *req,
-+	struct scatterlist *src, struct scatterlist *dst,
-+	unsigned int nbytes, void *iv)
++static int eseqiv_init(struct crypto_tfm *tfm)
 +{
-+	ablkcipher_request_set_crypt(&req->creq, src, dst, nbytes, iv);
++	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
++	struct eseqiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++	unsigned long alignmask;
++	unsigned int reqsize;
++
++	spin_lock_init(&ctx->lock);
++
++	alignmask = crypto_tfm_ctx_alignment() - 1;
++	reqsize = sizeof(struct eseqiv_request_ctx);
++
++	if (alignmask & reqsize) {
++		alignmask &= reqsize;
++		alignmask--;
++	}
++
++	alignmask = ~alignmask;
++	alignmask &= crypto_ablkcipher_alignmask(geniv);
++
++	reqsize += alignmask;
++	reqsize += crypto_ablkcipher_ivsize(geniv);
++	reqsize = ALIGN(reqsize, crypto_tfm_ctx_alignment());
++
++	ctx->reqoff = reqsize - sizeof(struct eseqiv_request_ctx);
++
++	tfm->crt_ablkcipher.reqsize = reqsize +
++				      sizeof(struct ablkcipher_request);
++
++	return skcipher_geniv_init(tfm);
 +}
 +
-+static inline void skcipher_givcrypt_set_giv(
-+	struct skcipher_givcrypt_request *req, u8 *giv, u64 seq)
++static struct crypto_template eseqiv_tmpl;
++
++static struct crypto_instance *eseqiv_alloc(struct rtattr **tb)
 +{
-+	req->giv = giv;
-+	req->seq = seq;
++	struct crypto_instance *inst;
++	int err;
++
++	inst = skcipher_geniv_alloc(&eseqiv_tmpl, tb, 0, 0);
++	if (IS_ERR(inst))
++		goto out;
++
++	err = -EINVAL;
++	if (inst->alg.cra_ablkcipher.ivsize != inst->alg.cra_blocksize)
++		goto free_inst;
++
++	inst->alg.cra_ablkcipher.givencrypt = eseqiv_givencrypt_first;
++
++	inst->alg.cra_init = eseqiv_init;
++	inst->alg.cra_exit = skcipher_geniv_exit;
++
++	inst->alg.cra_ctxsize = sizeof(struct eseqiv_ctx);
++	inst->alg.cra_ctxsize += inst->alg.cra_ablkcipher.ivsize;
++
++out:
++	return inst;
++
++free_inst:
++	skcipher_geniv_free(inst);
++	inst = ERR_PTR(err);
++	goto out;
 +}
 +
- #endif	/* _CRYPTO_SKCIPHER_H */
- 
++static struct crypto_template eseqiv_tmpl = {
++	.name = "eseqiv",
++	.alloc = eseqiv_alloc,
++	.free = skcipher_geniv_free,
++	.module = THIS_MODULE,
++};
++
++static int __init eseqiv_module_init(void)
++{
++	return crypto_register_template(&eseqiv_tmpl);
++}
++
++static void __exit eseqiv_module_exit(void)
++{
++	crypto_unregister_template(&eseqiv_tmpl);
++}
++
++module_init(eseqiv_module_init);
++module_exit(eseqiv_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Encrypted Sequence Number IV Generator");
