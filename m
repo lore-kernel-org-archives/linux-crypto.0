@@ -1,196 +1,274 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 10/19] [CRYPTO] chainiv: Add chain IV generator
-Date: Tue, 11 Dec 2007 12:05:38 +0800
-Message-ID: <E1J1wNG-0002ka-00@gondolin.me.apana.org.au>
+Subject: [PATCH 17/19] [CRYPTO] authenc: Add givencrypt operation
+Date: Tue, 11 Dec 2007 12:05:45 +0800
+Message-ID: <E1J1wNN-0002lT-00@gondolin.me.apana.org.au>
 References: <20071211040215.GA10360@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1956 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:1973 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751198AbXLKEFm (ORCPT
+	with ESMTP id S1751956AbXLKEFy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Dec 2007 23:05:42 -0500
+	Mon, 10 Dec 2007 23:05:54 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J1wNH-00067l-JO
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:39 +1100
+	id 1J1wNQ-00068H-Fl
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2007 15:05:49 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] chainiv: Add chain IV generator
+[CRYPTO] authenc: Add givencrypt operation
 
-The chain IV generator is the one we've been using in the IPsec stack.
-It simply starts out with a random IV, then uses the last block of each
-encrypted packet's cipher text as the IV for the next packet.
-
-It can only be used by synchronous ciphers since we have to make sure
-that we don't start the encryption of the next packet until the last
-one has completed.
-
-It does have the advantage of using very little CPU time since it doesn't
-have to generate anything at all.
+This patch implements the givencrypt function for authenc.  It simply
+calls the givencrypt operation on the underlying cipher instead of encrypt.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/Makefile  |    1 
- crypto/chainiv.c |  139 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 140 insertions(+)
+ crypto/authenc.c |  136 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 files changed, 114 insertions(+), 22 deletions(-)
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 2a1883f..4b2e0c3 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_AEAD) += aead.o
- crypto_blkcipher-objs := ablkcipher.o
- crypto_blkcipher-objs += blkcipher.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER) += crypto_blkcipher.o
-+obj-$(CONFIG_CRYPTO_BLKCIPHER) += chainiv.o
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 7ef0a58..caa0853 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -10,6 +10,7 @@
+  *
+  */
  
- crypto_hash-objs := hash.o
- obj-$(CONFIG_CRYPTO_HASH) += crypto_hash.o
-diff --git a/crypto/chainiv.c b/crypto/chainiv.c
-new file mode 100644
-index 0000000..38868d1
---- /dev/null
-+++ b/crypto/chainiv.c
-@@ -0,0 +1,139 @@
-+/*
-+ * chainiv: Chain IV Generator
-+ *
-+ * Generate IVs simply be using the last block of the previous encryption.
-+ * This is mainly useful for CBC with a synchronous algorithm.
-+ *
-+ * Copyright (c) 2007 Herbert Xu <herbert@gondor.apana.org.au>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#include <crypto/internal/skcipher.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/random.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
-+
-+struct chainiv_ctx {
-+	spinlock_t lock;
-+	char iv[];
-+};
-+
-+static int chainiv_givencrypt(struct skcipher_givcrypt_request *req)
++#include <crypto/aead.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/authenc.h>
+ #include <crypto/scatterwalk.h>
+@@ -87,6 +88,20 @@ badkey:
+ 	goto out;
+ }
+ 
++static void authenc_chain(struct scatterlist *head, struct scatterlist *sg,
++			  int chain)
 +{
-+	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
-+	struct chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
-+	struct ablkcipher_request *subreq = skcipher_givcrypt_reqctx(req);
-+	unsigned int ivsize;
++	if (chain) {
++		head->length += sg->length;
++		sg = scatterwalk_sg_next(sg);
++	}
++
++	if (sg)
++		scatterwalk_sg_chain(head, 2, sg);
++	else
++		sg_mark_end(head);
++}
++
+ static u8 *crypto_authenc_hash(struct aead_request *req, unsigned int flags,
+ 			       struct scatterlist *cipher,
+ 			       unsigned int cryptlen)
+@@ -127,18 +142,31 @@ auth_unlock:
+ 	return hash;
+ }
+ 
+-static int crypto_authenc_genicv(struct aead_request *req, unsigned int flags)
++static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
++				 unsigned int flags)
+ {
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	struct scatterlist *dst = req->dst;
+-	unsigned int cryptlen = req->cryptlen;
++	struct scatterlist cipher[2];
++	struct page *dstp;
++	unsigned int ivsize = crypto_aead_ivsize(authenc);
++	unsigned int cryptlen;
++	u8 *vdst;
+ 	u8 *hash;
+ 
+-	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
++	dstp = sg_page(dst);
++	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
++
++	sg_init_table(cipher, 2);
++	sg_set_buf(cipher, iv, ivsize);
++	authenc_chain(cipher, dst, vdst == iv + ivsize);
++
++	cryptlen = req->cryptlen + ivsize;
++	hash = crypto_authenc_hash(req, flags, cipher, cryptlen);
+ 	if (IS_ERR(hash))
+ 		return PTR_ERR(hash);
+ 
+-	scatterwalk_map_and_copy(hash, dst, cryptlen,
++	scatterwalk_map_and_copy(hash, cipher, cryptlen,
+ 				 crypto_aead_authsize(authenc), 1);
+ 	return 0;
+ }
+@@ -146,8 +174,16 @@ static int crypto_authenc_genicv(struct aead_request *req, unsigned int flags)
+ static void crypto_authenc_encrypt_done(struct crypto_async_request *req,
+ 					int err)
+ {
+-	if (!err)
+-		err = crypto_authenc_genicv(req->data, 0);
++	if (!err) {
++		struct aead_request *areq = req->data;
++		struct crypto_aead *authenc = crypto_aead_reqtfm(areq);
++		struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
++		struct ablkcipher_request *abreq = aead_request_ctx(areq);
++		u8 *iv = (u8 *)(abreq + 1) +
++			 crypto_ablkcipher_reqsize(ctx->enc);
++
++		err = crypto_authenc_genicv(areq, iv, 0);
++	}
+ 
+ 	aead_request_complete(req->data, err);
+ }
+@@ -157,45 +193,99 @@ static int crypto_authenc_encrypt(struct aead_request *req)
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+ 	struct ablkcipher_request *abreq = aead_request_ctx(req);
++	struct crypto_ablkcipher *enc = ctx->enc;
++	struct scatterlist *dst = req->dst;
++	unsigned int cryptlen = req->cryptlen;
++	u8 *iv = (u8 *)(abreq + 1) + crypto_ablkcipher_reqsize(enc);
+ 	int err;
+ 
+-	ablkcipher_request_set_tfm(abreq, ctx->enc);
++	ablkcipher_request_set_tfm(abreq, enc);
+ 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+ 					crypto_authenc_encrypt_done, req);
+-	ablkcipher_request_set_crypt(abreq, req->src, req->dst, req->cryptlen,
+-				     req->iv);
++	ablkcipher_request_set_crypt(abreq, req->src, dst, cryptlen, req->iv);
++
++	memcpy(iv, req->iv, crypto_aead_ivsize(authenc));
+ 
+ 	err = crypto_ablkcipher_encrypt(abreq);
+ 	if (err)
+ 		return err;
+ 
+-	return crypto_authenc_genicv(req, CRYPTO_TFM_REQ_MAY_SLEEP);
++	return crypto_authenc_genicv(req, iv, CRYPTO_TFM_REQ_MAY_SLEEP);
++}
++
++static void crypto_authenc_givencrypt_done(struct crypto_async_request *req,
++					   int err)
++{
++	if (!err) {
++		struct aead_givcrypt_request *greq = req->data;
++
++		err = crypto_authenc_genicv(&greq->areq, greq->giv, 0);
++	}
++
++	aead_request_complete(req->data, err);
++}
++
++static int crypto_authenc_givencrypt(struct aead_givcrypt_request *req)
++{
++	struct crypto_aead *authenc = aead_givcrypt_reqtfm(req);
++	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
++	struct aead_request *areq = &req->areq;
++	struct skcipher_givcrypt_request *greq = aead_request_ctx(areq);
++	u8 *iv = req->giv;
 +	int err;
 +
-+	ablkcipher_request_set_tfm(subreq, skcipher_geniv_cipher(geniv));
-+	ablkcipher_request_set_callback(subreq, req->creq.base.flags &
-+						~CRYPTO_TFM_REQ_MAY_SLEEP,
-+					req->creq.base.complete,
-+					req->creq.base.data);
-+	ablkcipher_request_set_crypt(subreq, req->creq.src, req->creq.dst,
-+				     req->creq.nbytes, req->creq.info);
++	skcipher_givcrypt_set_tfm(greq, ctx->enc);
++	skcipher_givcrypt_set_callback(greq, aead_request_flags(areq),
++				       crypto_authenc_givencrypt_done, areq);
++	skcipher_givcrypt_set_crypt(greq, areq->src, areq->dst, areq->cryptlen,
++				    areq->iv);
++	skcipher_givcrypt_set_giv(greq, iv, req->seq);
 +
-+	spin_lock_bh(&ctx->lock);
-+
-+	ivsize = crypto_ablkcipher_ivsize(geniv);
-+
-+	memcpy(req->giv, ctx->iv, ivsize);
-+	memcpy(subreq->info, ctx->iv, ivsize);
-+
-+	err = crypto_ablkcipher_encrypt(subreq);
++	err = crypto_skcipher_givencrypt(greq);
 +	if (err)
-+		goto unlock;
++		return err;
 +
-+	memcpy(ctx->iv, subreq->info, ivsize);
++	return crypto_authenc_genicv(areq, iv, CRYPTO_TFM_REQ_MAY_SLEEP);
+ }
+ 
+ static int crypto_authenc_verify(struct aead_request *req,
++				 struct scatterlist *cipher,
+ 				 unsigned int cryptlen)
+ {
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	u8 *ohash;
+ 	u8 *ihash;
+-	struct scatterlist *src = req->src;
+ 	unsigned int authsize;
+ 
+-	ohash = crypto_authenc_hash(req, CRYPTO_TFM_REQ_MAY_SLEEP, src,
++	ohash = crypto_authenc_hash(req, CRYPTO_TFM_REQ_MAY_SLEEP, cipher,
+ 				    cryptlen);
+ 	if (IS_ERR(ohash))
+ 		return PTR_ERR(ohash);
+ 
+ 	authsize = crypto_aead_authsize(authenc);
+ 	ihash = ohash + authsize;
+-	scatterwalk_map_and_copy(ihash, src, cryptlen, authsize, 0);
++	scatterwalk_map_and_copy(ihash, cipher, cryptlen, authsize, 0);
+ 	return memcmp(ihash, ohash, authsize) ? -EBADMSG: 0;
+ }
+ 
+-static void crypto_authenc_decrypt_done(struct crypto_async_request *req,
+-					int err)
++static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
++				  unsigned int cryptlen)
+ {
+-	aead_request_complete(req->data, err);
++	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
++	struct scatterlist *src = req->src;
++	struct scatterlist cipher[2];
++	struct page *srcp;
++	unsigned int ivsize = crypto_aead_ivsize(authenc);
++	u8 *vsrc;
 +
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
++	srcp = sg_page(src);
++	vsrc = PageHighMem(srcp) ? NULL : page_address(srcp) + src->offset;
 +
-+	return err;
-+}
++	sg_init_table(cipher, 2);
++	sg_set_buf(cipher, iv, ivsize);
++	authenc_chain(cipher, src, vsrc == iv + ivsize);
 +
-+static int chainiv_givencrypt_first(struct skcipher_givcrypt_request *req)
-+{
-+	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
-+	struct chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
-+
-+	spin_lock_bh(&ctx->lock);
-+	if (crypto_ablkcipher_crt(geniv)->givencrypt !=
-+	    chainiv_givencrypt_first)
-+		goto unlock;
-+
-+	crypto_ablkcipher_crt(geniv)->givencrypt = chainiv_givencrypt;
-+	get_random_bytes(ctx->iv, crypto_ablkcipher_ivsize(geniv));
-+
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
-+
-+	return chainiv_givencrypt(req);
-+}
-+
-+static int chainiv_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
-+	struct chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
-+
-+	spin_lock_init(&ctx->lock);
-+
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request);
-+
-+	return skcipher_geniv_init(tfm);
-+}
-+
-+static struct crypto_template chainiv_tmpl;
-+
-+static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+
-+	inst = skcipher_geniv_alloc(&chainiv_tmpl, tb, 0,
-+				    CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(inst))
-+		goto out;
-+
-+	inst->alg.cra_ablkcipher.givencrypt = chainiv_givencrypt_first;
-+
-+	inst->alg.cra_init = chainiv_init;
-+	inst->alg.cra_exit = skcipher_geniv_exit;
-+
-+	inst->alg.cra_ctxsize = sizeof(struct chainiv_ctx) +
-+				inst->alg.cra_ablkcipher.ivsize;
-+
-+out:
-+	return inst;
-+}
-+
-+static struct crypto_template chainiv_tmpl = {
-+	.name = "chainiv",
-+	.alloc = chainiv_alloc,
-+	.free = skcipher_geniv_free,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init chainiv_module_init(void)
-+{
-+	return crypto_register_template(&chainiv_tmpl);
-+}
-+
-+static void __exit chainiv_module_exit(void)
-+{
-+	crypto_unregister_template(&chainiv_tmpl);
-+}
-+
-+module_init(chainiv_module_init);
-+module_exit(chainiv_module_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Chain IV Generator");
++	return crypto_authenc_verify(req, cipher, cryptlen + ivsize);
+ }
+ 
+ static int crypto_authenc_decrypt(struct aead_request *req)
+@@ -205,21 +295,21 @@ static int crypto_authenc_decrypt(struct aead_request *req)
+ 	struct ablkcipher_request *abreq = aead_request_ctx(req);
+ 	unsigned int cryptlen = req->cryptlen;
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
++	u8 *iv = req->iv;
+ 	int err;
+ 
+ 	if (cryptlen < authsize)
+ 		return -EINVAL;
+ 	cryptlen -= authsize;
+ 
+-	err = crypto_authenc_verify(req, cryptlen);
++	err = crypto_authenc_iverify(req, iv, cryptlen);
+ 	if (err)
+ 		return err;
+ 
+ 	ablkcipher_request_set_tfm(abreq, ctx->enc);
+ 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
+-					crypto_authenc_decrypt_done, req);
+-	ablkcipher_request_set_crypt(abreq, req->src, req->dst, cryptlen,
+-				     req->iv);
++					req->base.complete, req->base.data);
++	ablkcipher_request_set_crypt(abreq, req->src, req->dst, cryptlen, iv);
+ 
+ 	return crypto_ablkcipher_decrypt(abreq);
+ }
+@@ -248,8 +338,9 @@ static int crypto_authenc_init_tfm(struct crypto_tfm *tfm)
+ 				      (crypto_hash_alignmask(auth) &
+ 				       ~(crypto_tfm_ctx_alignment() - 1)) +
+ 				      crypto_hash_digestsize(auth) * 2,
+-				      sizeof(struct ablkcipher_request) +
+-				      crypto_ablkcipher_reqsize(enc));
++				      sizeof(struct skcipher_givcrypt_request) +
++				      crypto_ablkcipher_reqsize(enc) +
++				      crypto_ablkcipher_ivsize(enc));
+ 
+ 	spin_lock_init(&ctx->auth_lock);
+ 
+@@ -346,6 +437,7 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
+ 	inst->alg.cra_aead.setkey = crypto_authenc_setkey;
+ 	inst->alg.cra_aead.encrypt = crypto_authenc_encrypt;
+ 	inst->alg.cra_aead.decrypt = crypto_authenc_decrypt;
++	inst->alg.cra_aead.givencrypt = crypto_authenc_givencrypt;
+ 
+ out:
+ 	crypto_mod_put(auth);
