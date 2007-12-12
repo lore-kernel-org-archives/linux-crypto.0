@@ -1,30 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [2.6 patch] crypto/geode-aes.c: add __dev{init,exit} annotations
-Date: Wed, 12 Dec 2007 10:43:08 +0800
-Message-ID: <20071212024308.GA21320@gondor.apana.org.au>
-References: <20071211221949.GB14204@stusta.de>
+Subject: Re: PATCH[1/2]: CCM Mode
+Date: Wed, 12 Dec 2007 20:29:44 +0800
+Message-ID: <20071212122944.GA25381@gondor.apana.org.au>
+References: <200712111818.lBBIIApw025684@faith.austin.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jordan Crouse <jordan.crouse@amd.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Adrian Bunk <bunk@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Joy Latten <latten@austin.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:1369 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:3690 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751993AbXLLCnW (ORCPT
+	with ESMTP id S1751052AbXLLM3v (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Dec 2007 21:43:22 -0500
+	Wed, 12 Dec 2007 07:29:51 -0500
 Content-Disposition: inline
-In-Reply-To: <20071211221949.GB14204@stusta.de>
+In-Reply-To: <200712111818.lBBIIApw025684@faith.austin.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 11, 2007 at 11:19:50PM +0100, Adrian Bunk wrote:
-> This patch adds __dev{init,exit} annotations.
-> 
-> Signed-off-by: Adrian Bunk <bunk@kernel.org>
+On Tue, Dec 11, 2007 at 12:18:10PM -0600, Joy Latten wrote:
+>
+> Ok, thanks! Please let me know if there is anything I
+> can help with.
 
-Applied to cryptodev.  Thanks Adrian.
+OK, took me a while but here it is finally.  Please let me know
+if you see any problems.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
