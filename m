@@ -1,38 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [0/4] Fix null algorithm with IPsec
-Date: Fri, 14 Dec 2007 16:39:09 +0800
-Message-ID: <20071214083909.GA15726@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 2/4] [CRYPTO] null: Allow setkey on digest_null
+Date: Fri, 14 Dec 2007 16:39:44 +0800
+Message-ID: <E1J365A-00046y-00@gondolin.me.apana.org.au>
+References: <20071214083909.GA15726@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4676 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4700 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754397AbXLNIjL (ORCPT
+	with ESMTP id S1756416AbXLNIjq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Dec 2007 03:39:11 -0500
+	Fri, 14 Dec 2007 03:39:46 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J364c-000085-1F
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 19:39:10 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1J364b-00046N-00
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 16:39:09 +0800
-Content-Disposition: inline
+	id 1J365A-000091-ON
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 19:39:44 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+[CRYPTO] null: Allow setkey on digest_null 
 
-I tried to use the null algorithm to test the IPsec infrastructure
-and found that it didn't work anymore.  So here's a bunch of fixes
-for that.  The first patch also does a faster null encryption so
-we can better measure the IPsec stack overhead as opposed to the
-encryption overhead.
+We need to allow setkey on digest_null if it is to be used directly by
+authenc instead of through hmac.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+
+ crypto/crypto_null.c |    1 +
+ 1 files changed, 1 insertion(+)
+
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index fc2d2a4..ff7b3de 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -98,6 +98,7 @@ static struct crypto_alg digest_null = {
+ 	.cra_list		=       LIST_HEAD_INIT(digest_null.cra_list),	
+ 	.cra_u			=	{ .digest = {
+ 	.dia_digestsize		=	NULL_DIGEST_SIZE,
++	.dia_setkey   		=	null_setkey,
+ 	.dia_init   		=	null_init,
+ 	.dia_update 		=	null_update,
+ 	.dia_final  		=	null_final } }
