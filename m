@@ -1,170 +1,125 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/4] [CRYPTO] null: Add null blkcipher algorithm
-Date: Fri, 14 Dec 2007 16:39:42 +0800
-Message-ID: <E1J3658-00046r-00@gondolin.me.apana.org.au>
+Subject: [PATCH 3/4] [CRYPTO] skcipher: Fix givcrypt on zero IV ciphers
+Date: Fri, 14 Dec 2007 16:39:45 +0800
+Message-ID: <E1J365B-000475-00@gondolin.me.apana.org.au>
 References: <20071214083909.GA15726@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4696 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4703 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756416AbXLNIjp (ORCPT
+	with ESMTP id S1757139AbXLNIjs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Dec 2007 03:39:45 -0500
+	Fri, 14 Dec 2007 03:39:48 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J3659-00008v-Fc
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 19:39:43 +1100
+	id 1J365B-000095-RV
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 19:39:46 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] null: Add null blkcipher algorithm
+[CRYPTO] skcipher: Fix givcrypt on zero IV ciphers
 
-This patch adds a null blkcipher algorithm called ecb(cipher_null) for
-backwards compatibility.  Previously the null algorithm when used by
-IPsec copied the data byte by byte.  This new algorithm optimises that
-to a straight memcpy which lets us better measure inherent overheads in
-our IPsec code.
+We need to set the givencrypt/givdecrypt on zero IV ciphers to the
+encrypt/decrypt functions.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/crypto_null.c               |   69 +++++++++++++++++++++++++++++++------
- include/crypto/internal/skcipher.h |    5 ++
- 2 files changed, 64 insertions(+), 10 deletions(-)
+ crypto/ablkcipher.c                |   14 ++++++++++++++
+ crypto/aead.c                      |   14 ++++++++++++++
+ crypto/blkcipher.c                 |    4 ++++
+ include/crypto/internal/skcipher.h |    2 ++
+ 4 files changed, 34 insertions(+)
 
-diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
-index 29f7747..fc2d2a4 100644
---- a/crypto/crypto_null.c
-+++ b/crypto/crypto_null.c
-@@ -16,15 +16,17 @@
-  * (at your option) any later version.
-  *
-  */
-+
-+#include <crypto/internal/skcipher.h>
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/crypto.h>
- #include <linux/string.h>
- 
- #define NULL_KEY_SIZE		0
- #define NULL_BLOCK_SIZE		1
- #define NULL_DIGEST_SIZE	0
-+#define NULL_IV_SIZE		0
- 
- static int null_compress(struct crypto_tfm *tfm, const u8 *src,
- 			 unsigned int slen, u8 *dst, unsigned int *dlen)
-@@ -55,6 +57,26 @@ static void null_crypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	memcpy(dst, src, NULL_BLOCK_SIZE);
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index 0bfc01f..ca08290 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -70,6 +70,16 @@ static unsigned int crypto_ablkcipher_ctxsize(struct crypto_alg *alg, u32 type,
+ 	return alg->cra_ctxsize;
  }
  
-+static int skcipher_null_crypt(struct blkcipher_desc *desc,
-+			       struct scatterlist *dst,
-+			       struct scatterlist *src, unsigned int nbytes)
++int skcipher_null_givencrypt(struct skcipher_givcrypt_request *req)
 +{
-+	struct blkcipher_walk walk;
-+	int err;
-+
-+	blkcipher_walk_init(&walk, dst, src, nbytes);
-+	err = blkcipher_walk_virt(desc, &walk);
-+
-+	while (walk.nbytes) {
-+		if (walk.src.virt.addr != walk.dst.virt.addr)
-+			memcpy(walk.dst.virt.addr, walk.src.virt.addr,
-+			       walk.nbytes);
-+		err = blkcipher_walk_done(desc, &walk, 0);
-+	}
-+
-+	return err;
++	return crypto_ablkcipher_encrypt(&req->creq);
 +}
 +
- static struct crypto_alg compress_null = {
- 	.cra_name		=	"compress_null",
- 	.cra_flags		=	CRYPTO_ALG_TYPE_COMPRESS,
-@@ -96,6 +118,25 @@ static struct crypto_alg cipher_null = {
- 	.cia_decrypt		=	null_crypt } }
- };
- 
-+static struct crypto_alg skcipher_null = {
-+	.cra_name		=	"ecb(cipher_null)",
-+	.cra_driver_name	=	"ecb-cipher_null",
-+	.cra_priority		=	100,
-+	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		=	NULL_BLOCK_SIZE,
-+	.cra_type		=	&crypto_blkcipher_type,
-+	.cra_ctxsize		=	0,
-+	.cra_module		=	THIS_MODULE,
-+	.cra_list		=	LIST_HEAD_INIT(skcipher_null.cra_list),
-+	.cra_u			=	{ .blkcipher = {
-+	.min_keysize		=	NULL_KEY_SIZE,
-+	.max_keysize		=	NULL_KEY_SIZE,
-+	.ivsize			=	NULL_IV_SIZE,
-+	.setkey			= 	null_setkey,
-+	.encrypt		=	skcipher_null_crypt,
-+	.decrypt		=	skcipher_null_crypt } }
-+};
++int skcipher_null_givdecrypt(struct skcipher_givcrypt_request *req)
++{
++	return crypto_ablkcipher_decrypt(&req->creq);
++}
 +
- MODULE_ALIAS("compress_null");
- MODULE_ALIAS("digest_null");
- MODULE_ALIAS("cipher_null");
-@@ -108,27 +149,35 @@ static int __init init(void)
- 	if (ret < 0)
- 		goto out;
- 
-+	ret = crypto_register_alg(&skcipher_null);
-+	if (ret < 0)
-+		goto out_unregister_cipher;
-+
- 	ret = crypto_register_alg(&digest_null);
--	if (ret < 0) {
--		crypto_unregister_alg(&cipher_null);
--		goto out;
--	}
-+	if (ret < 0)
-+		goto out_unregister_skcipher;
- 
- 	ret = crypto_register_alg(&compress_null);
--	if (ret < 0) {
--		crypto_unregister_alg(&digest_null);
--		crypto_unregister_alg(&cipher_null);
--		goto out;
--	}
-+	if (ret < 0)
-+		goto out_unregister_digest;
- 
- out:	
- 	return ret;
-+
-+out_unregister_digest:
-+	crypto_unregister_alg(&digest_null);
-+out_unregister_skcipher:
-+	crypto_unregister_alg(&skcipher_null);
-+out_unregister_cipher:
-+	crypto_unregister_alg(&cipher_null);
-+	goto out;
- }
- 
- static void __exit fini(void)
+ static int crypto_init_ablkcipher_ops(struct crypto_tfm *tfm, u32 type,
+ 				      u32 mask)
  {
- 	crypto_unregister_alg(&compress_null);
- 	crypto_unregister_alg(&digest_null);
-+	crypto_unregister_alg(&skcipher_null);
- 	crypto_unregister_alg(&cipher_null);
- }
+@@ -82,6 +92,10 @@ static int crypto_init_ablkcipher_ops(struct crypto_tfm *tfm, u32 type,
+ 	crt->setkey = setkey;
+ 	crt->encrypt = alg->encrypt;
+ 	crt->decrypt = alg->decrypt;
++	if (!alg->ivsize) {
++		crt->givencrypt = skcipher_null_givencrypt;
++		crt->givdecrypt = skcipher_null_givdecrypt;
++	}
+ 	crt->base = __crypto_ablkcipher_cast(tfm);
+ 	crt->ivsize = alg->ivsize;
+ 
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 68fa3d2..2bf039b 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -130,6 +130,16 @@ const struct crypto_type crypto_aead_type = {
+ };
+ EXPORT_SYMBOL_GPL(crypto_aead_type);
+ 
++static int aead_null_givencrypt(struct aead_givcrypt_request *req)
++{
++	return crypto_aead_encrypt(&req->areq);
++}
++
++static int aead_null_givdecrypt(struct aead_givcrypt_request *req)
++{
++	return crypto_aead_decrypt(&req->areq);
++}
++
+ static int crypto_init_nivaead_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ {
+ 	struct aead_alg *alg = &tfm->__crt_alg->cra_aead;
+@@ -141,6 +151,10 @@ static int crypto_init_nivaead_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ 	crt->setkey = setkey;
+ 	crt->encrypt = alg->encrypt;
+ 	crt->decrypt = alg->decrypt;
++	if (!alg->ivsize) {
++		crt->givencrypt = aead_null_givencrypt;
++		crt->givdecrypt = aead_null_givdecrypt;
++	}
+ 	crt->base = __crypto_aead_cast(tfm);
+ 	crt->ivsize = alg->ivsize;
+ 	crt->authsize = alg->maxauthsize;
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 6f84481..88407e5 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -450,6 +450,10 @@ static int crypto_init_blkcipher_ops_async(struct crypto_tfm *tfm)
+ 	crt->setkey = async_setkey;
+ 	crt->encrypt = async_encrypt;
+ 	crt->decrypt = async_decrypt;
++	if (!alg->ivsize) {
++		crt->givencrypt = skcipher_null_givencrypt;
++		crt->givdecrypt = skcipher_null_givdecrypt;
++	}
+ 	crt->base = __crypto_ablkcipher_cast(tfm);
+ 	crt->ivsize = alg->ivsize;
  
 diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 80c5bfb..ecf2c8d 100644
+index ecf2c8d..0053f34 100644
 --- a/include/crypto/internal/skcipher.h
 +++ b/include/crypto/internal/skcipher.h
-@@ -86,5 +86,10 @@ static inline void skcipher_givcrypt_complete(
- 	ablkcipher_request_complete(&req->creq, err);
+@@ -53,6 +53,8 @@ static inline struct crypto_ablkcipher *crypto_spawn_skcipher(
+ 				 crypto_skcipher_mask(0)));
  }
  
-+static inline u32 ablkcipher_request_flags(struct ablkcipher_request *req)
-+{
-+	return req->base.flags;
-+}
-+
- #endif	/* _CRYPTO_INTERNAL_SKCIPHER_H */
++int skcipher_null_givencrypt(struct skcipher_givcrypt_request *req);
++int skcipher_null_givdecrypt(struct skcipher_givcrypt_request *req);
+ const char *crypto_default_geniv(const struct crypto_alg *alg);
  
+ struct crypto_instance *skcipher_geniv_alloc(struct crypto_template *tmpl,
