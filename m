@@ -1,75 +1,171 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/3] [CRYPTO] api: Show async type
-Date: Fri, 14 Dec 2007 22:46:32 +0800
-Message-ID: <E1J3Bo8-0004wF-00@gondolin.me.apana.org.au>
+Subject: [PATCH 3/3] [CRYPTO] all: Add crypto_require_sync to fix ASYNC mask calculation
+Date: Fri, 14 Dec 2007 22:46:33 +0800
+Message-ID: <E1J3Bo9-0004wN-00@gondolin.me.apana.org.au>
 References: <20071214144317.GA18890@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4864 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4865 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751186AbXLNOqh (ORCPT
+	with ESMTP id S1753228AbXLNOqh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Fri, 14 Dec 2007 09:46:37 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J3Bo9-000586-JY
+	id 1J3BoA-000589-F8
 	for <linux-crypto@vger.kernel.org>; Sat, 15 Dec 2007 01:46:34 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] api: Show async type
+[CRYPTO] all: Add crypto_require_sync to fix ASYNC mask calculation
 
-This patch adds an async field to /proc/crypto for ablkcipher and aead
-algorithms.
+Previously the user-requested ASYNC mask was calculated as
+
+	(type ^ CRYPTO_ALG_ASYNC) & mask
+
+This is incorrect as bits in the mask other than CRYPTO_ALG_ASYNC may
+be included in the result.  The correct expression is
+
+	(type ^ CRYPTO_ALG_ASYNC) & mask & CRYPTO_ALG_ASYNC
+
+This patch introduces the function crypto_require_sync to do this and
+changes all the spots that did the calculation by hand to call it.
+
+This patch also changes authenc to set its ASYNC status depending on
+the ASYNC status of the underlying skcipher.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ablkcipher.c |    4 ++++
- crypto/aead.c       |    4 ++++
- 2 files changed, 8 insertions(+)
+ crypto/aead.c           |    2 +-
+ crypto/authenc.c        |    7 ++++---
+ crypto/blkcipher.c      |    2 +-
+ crypto/ccm.c            |    6 +++---
+ crypto/chainiv.c        |    3 +--
+ crypto/gcm.c            |    4 ++--
+ include/crypto/algapi.h |    9 +++++++++
+ 7 files changed, 21 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index ca08290..83cfed7 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -109,6 +109,8 @@ static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
- 
- 	seq_printf(m, "type         : ablkcipher\n");
-+	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
-+					     "yes" : "no");
- 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
- 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
- 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
-@@ -158,6 +160,8 @@ static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
- 
- 	seq_printf(m, "type         : givcipher\n");
-+	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
-+					     "yes" : "no");
- 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
- 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
- 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
 diff --git a/crypto/aead.c b/crypto/aead.c
-index 2bf039b..c43fa81 100644
+index c43fa81..4a62ea7 100644
 --- a/crypto/aead.c
 +++ b/crypto/aead.c
-@@ -115,6 +115,8 @@ static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
- 	struct aead_alg *aead = &alg->cra_aead;
+@@ -239,7 +239,7 @@ struct crypto_instance *aead_geniv_alloc(struct crypto_template *tmpl,
+ 	spawn = crypto_instance_ctx(inst);
  
- 	seq_printf(m, "type         : aead\n");
-+	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
-+					     "yes" : "no");
- 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
- 	seq_printf(m, "ivsize       : %u\n", aead->ivsize);
- 	seq_printf(m, "maxauthsize  : %u\n", aead->maxauthsize);
-@@ -169,6 +171,8 @@ static void crypto_nivaead_show(struct seq_file *m, struct crypto_alg *alg)
- 	struct aead_alg *aead = &alg->cra_aead;
+ 	/* Ignore async algorithms if necessary. */
+-	mask |= (algt->type ^ CRYPTO_ALG_ASYNC) & algt->mask;
++	mask |= crypto_requires_sync(algt->type, algt->mask);
  
- 	seq_printf(m, "type         : nivaead\n");
-+	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
-+					     "yes" : "no");
- 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
- 	seq_printf(m, "ivsize       : %u\n", aead->ivsize);
- 	seq_printf(m, "maxauthsize  : %u\n", aead->maxauthsize);
+ 	crypto_set_aead_spawn(spawn, inst);
+ 	err = crypto_grab_nivaead(spawn, name, type, mask);
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index caa0853..ed8ac5a 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -400,8 +400,8 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
+ 
+ 	crypto_set_skcipher_spawn(&ctx->enc, inst);
+ 	err = crypto_grab_skcipher(&ctx->enc, enc_name, 0,
+-				   (algt->type ^ CRYPTO_ALG_ASYNC) &
+-				   algt->mask);
++				   crypto_requires_sync(algt->type,
++							algt->mask));
+ 	if (err)
+ 		goto err_drop_auth;
+ 
+@@ -418,7 +418,8 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
+ 		     enc->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto err_drop_enc;
+ 
+-	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC;
++	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD;
++	inst->alg.cra_flags |= enc->cra_flags & CRYPTO_ALG_ASYNC;
+ 	inst->alg.cra_priority = enc->cra_priority * 10 + auth->cra_priority;
+ 	inst->alg.cra_blocksize = enc->cra_blocksize;
+ 	inst->alg.cra_alignmask = auth->cra_alignmask | enc->cra_alignmask;
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 88407e5..4a7e65c 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -576,7 +576,7 @@ struct crypto_instance *skcipher_geniv_alloc(struct crypto_template *tmpl,
+ 	spawn = crypto_instance_ctx(inst);
+ 
+ 	/* Ignore async algorithms if necessary. */
+-	mask |= (algt->type ^ CRYPTO_ALG_ASYNC) & algt->mask;
++	mask |= crypto_requires_sync(algt->type, algt->mask);
+ 
+ 	crypto_set_skcipher_spawn(spawn, inst);
+ 	err = crypto_grab_nivcipher(spawn, name, type, mask);
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 44eff9e..7ca2519 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -494,8 +494,8 @@ static struct crypto_instance *crypto_ccm_alloc_common(struct rtattr **tb,
+ 
+ 	crypto_set_skcipher_spawn(&ictx->ctr, inst);
+ 	err = crypto_grab_skcipher(&ictx->ctr, ctr_name, 0,
+-				   (algt->type ^ CRYPTO_ALG_ASYNC) &
+-				   algt->mask);
++				   crypto_requires_sync(algt->type,
++							algt->mask));
+ 	if (err)
+ 		goto err_drop_cipher;
+ 
+@@ -744,7 +744,7 @@ static struct crypto_instance *crypto_rfc4309_alloc(struct rtattr **tb)
+ 	spawn = crypto_instance_ctx(inst);
+ 	crypto_set_aead_spawn(spawn, inst);
+ 	err = crypto_grab_aead(spawn, ccm_name, 0,
+-			       (algt->type ^ CRYPTO_ALG_ASYNC) & algt->mask);
++			       crypto_requires_sync(algt->type, algt->mask));
+ 	if (err)
+ 		goto out_free_inst;
+ 
+diff --git a/crypto/chainiv.c b/crypto/chainiv.c
+index 0bdb212..d17fa04 100644
+--- a/crypto/chainiv.c
++++ b/crypto/chainiv.c
+@@ -289,8 +289,7 @@ static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
+ 
+ 	inst->alg.cra_ctxsize = sizeof(struct chainiv_ctx);
+ 
+-	if (!((algt->type ^ CRYPTO_ALG_ASYNC) & algt->mask &
+-	      CRYPTO_ALG_ASYNC)) {
++	if (!crypto_requires_sync(algt->type, algt->mask)) {
+ 		inst->alg.cra_flags |= CRYPTO_ALG_ASYNC;
+ 
+ 		inst->alg.cra_ablkcipher.givencrypt =
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 6c08587..6f23f02 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -469,8 +469,8 @@ static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
+ 	ctx = crypto_instance_ctx(inst);
+ 	crypto_set_skcipher_spawn(&ctx->ctr, inst);
+ 	err = crypto_grab_skcipher(&ctx->ctr, ctr_name, 0,
+-				   (algt->type ^ CRYPTO_ALG_ASYNC) &
+-				   algt->mask);
++				   crypto_requires_sync(algt->type,
++							algt->mask));
+ 	if (err)
+ 		goto err_free_inst;
+ 
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index e4e3792..60d06e7 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -305,5 +305,14 @@ static inline struct crypto_alg *crypto_get_attr_alg(struct rtattr **tb,
+ 	return crypto_attr_alg(tb[1], type, mask);
+ }
+ 
++/*
++ * Returns CRYPTO_ALG_ASYNC if type/mask requires the use of sync algorithms.
++ * Otherwise returns zero.
++ */
++static inline int crypto_requires_sync(u32 type, u32 mask)
++{
++	return (type ^ CRYPTO_ALG_ASYNC) & mask & CRYPTO_ALG_ASYNC;
++}
++
+ #endif	/* _CRYPTO_ALGAPI_H */
+ 
