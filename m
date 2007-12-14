@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: (was Re: 2.6.24-rc5-mm1) crypto/authenc.c select symbol in Kconfig
-Date: Fri, 14 Dec 2007 16:53:12 +0800
-Message-ID: <20071214085312.GA15864@gondor.apana.org.au>
-References: <20071213024050.7d6e5f3e.akpm@linux-foundation.org> <20071213174636.GA30228@gollum.tnic>
+Subject: [0/3] Avoid spinning in chainiv if allowed
+Date: Fri, 14 Dec 2007 22:43:17 +0800
+Message-ID: <20071214144317.GA18890@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: bbpetkov@yahoo.de, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1763755AbXLNIxc@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:4783 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755270AbXLNOnT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Dec 2007 09:43:19 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1J3Bkz-00054A-SD
+	for <linux-crypto@vger.kernel.org>; Sat, 15 Dec 2007 01:43:18 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1J3Bkz-0004ux-00
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Dec 2007 22:43:17 +0800
 Content-Disposition: inline
-In-Reply-To: <20071213174636.GA30228@gollum.tnic>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 13, 2007 at 06:46:37PM +0100, Borislav Petkov wrote:
->
-> which fails because crypto_hash_type is declared in crypto/hash.c. You might wanna
-> fix it like so:
-> 
-> Signed-off-by: Borislav Petkov <bbpetkov@yahoo.de>
+Hi:
 
-Patch applied.  Thanks for picking this up.
-
-> --- crypto/Kconfig.orig	2007-12-13 18:44:19.000000000 +0100
-> +++ crypto/Kconfig	2007-12-13 18:39:00.000000000 +0100
-
-BTW please generate patch -p1 patches in future.
+Now that things have settled down I've picked up the old async
+chainiv patch and updated it for the current tree.  Here is the
+result.
 
 Cheers,
 -- 
