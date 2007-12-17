@@ -1,58 +1,100 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/8] [CRYPTO] ccm: Fix construction of rfc4309 algorithm
-Date: Mon, 17 Dec 2007 18:31:13 +0800
-Message-ID: <E1J4DFh-00038i-00@gondolin.me.apana.org.au>
+Subject: [PATCH 6/8] [CRYPTO] ccm: Add setauthsize
+Date: Mon, 17 Dec 2007 18:31:18 +0800
+Message-ID: <E1J4DFm-00039H-00@gondolin.me.apana.org.au>
 References: <20071217103037.GA11988@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4829 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:4842 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758917AbXLQKbP (ORCPT
+	with ESMTP id S1760300AbXLQKb1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Dec 2007 05:31:15 -0500
+	Mon, 17 Dec 2007 05:31:27 -0500
 Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
 	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J4DFi-0008V6-5m
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Dec 2007 21:31:14 +1100
+	id 1J4DFn-0008VT-SU
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Dec 2007 21:31:20 +1100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[CRYPTO] ccm: Fix construction of rfc4309 algorithm
+[CRYPTO] ccm: Add setauthsize
 
-There is a silly typo in the rfc4309 construction that refers to a
-blkcipher when it should be aead.  This broke the allocation of rfc4309
-algorithms.
-
-This patch fixes that and removes a duplicate type checking at the
-start of that same function.
+We need to provide setauthsize functions to check the validity of the
+ICV length requested and more importantly to pass along the ICV length
+from rfc4309 to the underlying ccm object.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ccm.c |    6 +-----
- 1 files changed, 1 insertion(+), 5 deletions(-)
+ crypto/ccm.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 files changed, 37 insertions(+)
 
 diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 7ca2519..8c7d3b7 100644
+index 82bcc14..61ab0b9 100644
 --- a/crypto/ccm.c
 +++ b/crypto/ccm.c
-@@ -728,10 +728,6 @@ static struct crypto_instance *crypto_rfc4309_alloc(struct rtattr **tb)
- 	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
- 		return ERR_PTR(-EINVAL);
+@@ -101,6 +101,24 @@ out:
+ 	return err;
+ }
  
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD);
--	if (err)
--		return ERR_PTR(err);
--
- 	ccm_name = crypto_attr_alg_name(tb[1]);
- 	err = PTR_ERR(ccm_name);
- 	if (IS_ERR(ccm_name))
-@@ -753,7 +749,7 @@ static struct crypto_instance *crypto_rfc4309_alloc(struct rtattr **tb)
- 	err = -EINVAL;
++static int crypto_ccm_setauthsize(struct crypto_aead *tfm,
++				  unsigned int authsize)
++{
++	switch (authsize) {
++	case 4:
++	case 6:
++	case 8:
++	case 12:
++	case 14:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ static int format_input(u8 *info, struct aead_request *req,
+ 			unsigned int cryptlen)
+ {
+@@ -531,6 +549,7 @@ static struct crypto_instance *crypto_ccm_alloc_common(struct rtattr **tb,
+ 	inst->alg.cra_init = crypto_ccm_init_tfm;
+ 	inst->alg.cra_exit = crypto_ccm_exit_tfm;
+ 	inst->alg.cra_aead.setkey = crypto_ccm_setkey;
++	inst->alg.cra_aead.setauthsize = crypto_ccm_setauthsize;
+ 	inst->alg.cra_aead.encrypt = crypto_ccm_encrypt;
+ 	inst->alg.cra_aead.decrypt = crypto_ccm_decrypt;
  
- 	/* We only support 16-byte blocks. */
--	if (alg->cra_blkcipher.ivsize != 16)
-+	if (alg->cra_aead.ivsize != 16)
- 		goto out_drop_alg;
+@@ -642,6 +661,23 @@ static int crypto_rfc4309_setkey(struct crypto_aead *parent, const u8 *key,
+ 	return err;
+ }
  
- 	/* Not a stream cipher? */
++static int crypto_rfc4309_setauthsize(struct crypto_aead *parent,
++				      unsigned int authsize)
++{
++	struct crypto_rfc4309_ctx *ctx = crypto_aead_ctx(parent);
++
++	switch (authsize) {
++	case 8:
++	case 12:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return crypto_aead_setauthsize(ctx->child, authsize);
++}
++
+ static struct aead_request *crypto_rfc4309_crypt(struct aead_request *req)
+ {
+ 	struct aead_request *subreq = aead_request_ctx(req);
+@@ -780,6 +816,7 @@ static struct crypto_instance *crypto_rfc4309_alloc(struct rtattr **tb)
+ 	inst->alg.cra_exit = crypto_rfc4309_exit_tfm;
+ 
+ 	inst->alg.cra_aead.setkey = crypto_rfc4309_setkey;
++	inst->alg.cra_aead.setauthsize = crypto_rfc4309_setauthsize;
+ 	inst->alg.cra_aead.encrypt = crypto_rfc4309_encrypt;
+ 	inst->alg.cra_aead.decrypt = crypto_rfc4309_decrypt;
+ 
