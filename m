@@ -1,47 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] Renamed salsa20_32.c to salsa20_glue.c
-Date: Tue, 18 Dec 2007 00:01:36 +0800
-Message-ID: <20071217160136.GA14440@gondor.apana.org.au>
-References: <fd3e431c0712160959o240861cqbfcc05672507d51f@mail.gmail.com> <20071216195310.GA29507@Chamillionaire.breakpoint.cc>
+Subject: Re: [PATCH 2/2] Salsa20 stream cipher algorithm (x86-64 version)
+Date: Tue, 18 Dec 2007 00:06:36 +0800
+Message-ID: <20071217160636.GB14440@gondor.apana.org.au>
+References: <fd3e431c0712161006mf162962je617794061c19398@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Tan Swee Heng <thesweeheng@gmail.com>,
-	Linux Crypto <linux-crypto@vger.kernel.org>
+Cc: Linux Crypto <linux-crypto@vger.kernel.org>
+To: Tan Swee Heng <thesweeheng@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2329 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:2392 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758950AbXLQQBk (ORCPT
+	with ESMTP id S1756032AbXLQQGk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Dec 2007 11:01:40 -0500
+	Mon, 17 Dec 2007 11:06:40 -0500
 Content-Disposition: inline
-In-Reply-To: <20071216195310.GA29507@Chamillionaire.breakpoint.cc>
+In-Reply-To: <fd3e431c0712161006mf162962je617794061c19398@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 16, 2007 at 08:53:10PM +0100, Sebastian Siewior wrote:
-> * Tan Swee Heng | 2007-12-17 01:59:26 [+0800]:
+On Mon, Dec 17, 2007 at 02:06:15AM +0800, Tan Swee Heng wrote:
+> This is the x86-64 version of the Salsa20 stream cipher algorithm. The
+> original assembly code came from
+> <http://cr.yp.to/snuffle/salsa20/amd64-3/salsa20.s>. It has been
+> reformatted for clarity.
 > 
-> >The salsa20_32.c file is renamed to salsa20_glue.c. This is done
+> Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
 
-Patch applied.  Thanks!
+Patch applied.  Thanks a lot!
 
-> >diff --git a/arch/x86/crypto/salsa20_glue.c b/arch/x86/crypto/salsa20_glue.c
-> >new file mode 100644
-> >index 0000000..8592ccb
-> >--- /dev/null
-> >+++ b/arch/x86/crypto/salsa20_glue.c
-> 
-> >+static struct crypto_alg alg = {
-> >+	.cra_name           =   "salsa20",
-> >+	.cra_driver_name    =   "salsa20-asm",
-> 
-> >+MODULE_ALIAS("salsa20");
-> 
-> I guess Herbert wants to see here a
-> MODULE_ALIAS("salsa20-asm");
-> here as well.
+> Hi Herbert, as mentioned some time ago, I don't have an x86-64. So
+> please help me test it. Thanks!
+> The Python script used to automate the reformatting is also attached
+> in case anyone is interested.
 
-I've added that too.
+Yes it works fine here.
 
 Cheers,
 -- 
