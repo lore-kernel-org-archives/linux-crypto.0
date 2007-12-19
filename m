@@ -1,34 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] Salsa20 stream cipher algorithm (x86-64 version)
-Date: Tue, 18 Dec 2007 22:57:57 +0800
-Message-ID: <20071218145757.GA31094@gondor.apana.org.au>
-References: <fd3e431c0712161006mf162962je617794061c19398@mail.gmail.com> <20071216202640.GB29507@Chamillionaire.breakpoint.cc> <fd3e431c0712170951oe83e5d7i74b2d477de21d7a0@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	Linux Crypto <linux-crypto@vger.kernel.org>
-To: Tan Swee Heng <thesweeheng@gmail.com>
+From: calle@calle.in-berlin.de
+Subject: Re: RE: SALE 70% OFF on Pfizer
+Date: Wed, 19 Dec 2007 23:58:20 GMT
+Message-ID: <200712192358.lBJNwJum000496@calle.in-berlin.de>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3604 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756243AbXLRO6F (ORCPT
+Received: from fallback-mx.in-berlin.de ([192.109.42.17]:53898 "EHLO
+	fallback-mx.in-berlin.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753086AbXLTLJv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Dec 2007 09:58:05 -0500
-Content-Disposition: inline
-In-Reply-To: <fd3e431c0712170951oe83e5d7i74b2d477de21d7a0@mail.gmail.com>
+	Thu, 20 Dec 2007 06:09:51 -0500
+Received: from methan.in-berlin.de (methan.in-berlin.de [130.133.8.34])
+	by fallback-mx.in-berlin.de (8.14.1/8.13.6/Debian-1) with ESMTP id lBK03s1n026772
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Dec 2007 01:03:54 +0100
+Received: from calle.in-berlin.de (calle.in-berlin.de [217.197.81.210])
+	by methan.in-berlin.de (8.14.2/8.14.2/Debian-2) with ESMTP id lBJNwLgI014395
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Dec 2007 00:58:23 +0100
+Received: from calle.in-berlin.de (localhost [127.0.0.1])
+	by calle.in-berlin.de (8.13.5/8.13.5/Debian-3) with ESMTP id lBJNwKtA000499
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Dec 2007 23:58:21 GMT
+Received: (from listmoved@localhost)
+	by calle.in-berlin.de (8.13.5/8.13.5/Submit) id lBJNwJum000496
+	for linux-crypto@vger.kernel.org; Wed, 19 Dec 2007 23:58:20 GMT
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 18, 2007 at 01:51:27AM +0800, Tan Swee Heng wrote:
->
-> Subject: [PATCH] Removed dependency on CRYPTO_SALSA20
-> 
-> Signed-off-by: Tan Swee Heng <thesweeheng@gmail.com>
+Hallo.
+
+Die Mailingliste linux-avmb1@calle.in-berlin.de ist umgezogen,
+da sie durch Spams verseucht wurde.
+
+Siehe https://mlists.in-berlin.de/mailman/listinfo/linux-avmb1
+
+The mailing list linux-avmb1@calle.in-berlin.de was been moved,
+we got too many spams.
+
+Visit https://mlists.in-berlin.de/mailman/listinfo/linux-avmb1
 
 
-Patch applied.  Thanks.
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+calle
