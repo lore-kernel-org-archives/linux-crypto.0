@@ -1,42 +1,39 @@
-From: calle@calle.in-berlin.de
-Subject: Re: RE: SALE 70% OFF on Pfizer
-Date: Wed, 19 Dec 2007 23:58:20 GMT
-Message-ID: <200712192358.lBJNwJum000496@calle.in-berlin.de>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: New Crypto Hardware
+Date: Tue, 25 Dec 2007 15:32:02 +0800
+Message-ID: <20071225073202.GA31076@gondor.apana.org.au>
+References: <E1IrkmY-0007gp-00@gondolin.me.apana.org.au> <0CA0A16855646F4FA96D25A158E299D603EB866F@SDCEXCHANGE01.ad.amcc.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Loc Ho <lho@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fallback-mx.in-berlin.de ([192.109.42.17]:53898 "EHLO
-	fallback-mx.in-berlin.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753086AbXLTLJv (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:4059 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751206AbXLYHcG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Dec 2007 06:09:51 -0500
-Received: from methan.in-berlin.de (methan.in-berlin.de [130.133.8.34])
-	by fallback-mx.in-berlin.de (8.14.1/8.13.6/Debian-1) with ESMTP id lBK03s1n026772
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Dec 2007 01:03:54 +0100
-Received: from calle.in-berlin.de (calle.in-berlin.de [217.197.81.210])
-	by methan.in-berlin.de (8.14.2/8.14.2/Debian-2) with ESMTP id lBJNwLgI014395
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Dec 2007 00:58:23 +0100
-Received: from calle.in-berlin.de (localhost [127.0.0.1])
-	by calle.in-berlin.de (8.13.5/8.13.5/Debian-3) with ESMTP id lBJNwKtA000499
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Dec 2007 23:58:21 GMT
-Received: (from listmoved@localhost)
-	by calle.in-berlin.de (8.13.5/8.13.5/Submit) id lBJNwJum000496
-	for linux-crypto@vger.kernel.org; Wed, 19 Dec 2007 23:58:20 GMT
+	Tue, 25 Dec 2007 02:32:06 -0500
+Content-Disposition: inline
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D603EB866F@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hallo.
+On Fri, Dec 21, 2007 at 09:41:11AM -0800, Loc Ho wrote:
+> Hi Herbert,
+> 
+> Begin of next year, I will be start adding asynchronous hashing support.
+> I would like to check with you before I start. Besides modeled after
+> crypto async block cipher, do you have any suggestion?
 
-Die Mailingliste linux-avmb1@calle.in-berlin.de ist umgezogen,
-da sie durch Spams verseucht wurde.
+Thanks for looking into this.
 
-Siehe https://mlists.in-berlin.de/mailman/listinfo/linux-avmb1
+What I'd like to see is to have the hash context moved into
+the request.  This is necessary for us to support simultanenous
+hash operations on the same tfm.
 
-The mailing list linux-avmb1@calle.in-berlin.de was been moved,
-we got too many spams.
-
-Visit https://mlists.in-berlin.de/mailman/listinfo/linux-avmb1
-
-
-calle
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
