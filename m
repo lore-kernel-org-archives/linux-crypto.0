@@ -1,70 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [CRYPTO] xcbc: Fix algorithm leak when block size check fails
-Date: Tue, 1 Jan 2008 16:00:20 +1100
-Message-ID: <20080101050020.GA31107@gondor.apana.org.au>
-References: <20080101044607.GA27124@gondor.apana.org.au> <20080101045004.GA27410@gondor.apana.org.au> <20080101045821.GA30853@gondor.apana.org.au>
+From: Dennison Williams <evoltech@2inches.com>
+Subject: ext3 filesystem is not recognized after losetup -e aes
+Date: Fri, 04 Jan 2008 22:47:47 -0800
+Message-ID: <477F2813.3010003@2inches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:3145 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750722AbYAAFAW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jan 2008 00:00:22 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1J9ZEi-0005Sx-GV
-	for <linux-crypto@vger.kernel.org>; Tue, 01 Jan 2008 16:00:20 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1J9ZEi-00086c-00
-	for <linux-crypto@vger.kernel.org>; Tue, 01 Jan 2008 16:00:20 +1100
-Content-Disposition: inline
-In-Reply-To: <20080101045821.GA30853@gondor.apana.org.au>
+Received: from ns1.2inches.com ([64.147.164.71]:53069 "EHLO vostok.2inches.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750766AbYAEHOV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 5 Jan 2008 02:14:21 -0500
+Received: from [192.168.2.101] (adsl-75-36-186-243.dsl.pltn13.sbcglobal.net [75.36.186.243])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: evoltech)
+	by vostok.2inches.com (Postfix) with ESMTP id B27191828853
+	for <linux-crypto@vger.kernel.org>; Fri,  4 Jan 2008 22:28:10 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 01, 2008 at 03:58:21PM +1100, Herbert Xu wrote:
-> 
-> In order to see if it still works:
-> 
-> [CRYPTO] tcrypt: Make xcbc available as a standalone test
+Here is the setup: MD software RAID 5 on 4 disks (md0), a LVM logical
+volume (/dev/volume_group/logical_volume) comprised of one physical
+device (/dev/md0), a encryption layer provided by the cryptoloop driver
+(losetup -e aes /dev/loop0 /dev/volume_group/logical_volume), then a
+EXT3 file system (mkfs.ext3 /dev/loop0).
 
-It helps to have a break:
+Recently the RAID device kicked out one of the disks during a large file
+transfer. After re-adding the disk to the array whith "mdadm /dev/mdo
+-add /dev/sde (smartctl didn't report
+anything wrong with it, I am not sure why this happened), authenticating
+against the cryptographic layer, then trying to mount the drive, I get
+the following error:
 
-[CRYPTO] tcrypt: Make xcbc available as a standalone test
+[root@storage redhat]# mount -t ext3 /dev/loop1 /terrorbyte/1/
+mount: wrong fs type, bad option, bad superblock on /dev/loop1,
 
-Currently the gcm(aes) tests have to be taken together with all other
-algorithms.  This patch makes it available by itself at number 106.
+The message in /var/log/message is:
+VFS: Can't find ext3 filesystem on dev loop1.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+I then tried to e2fsck the /dev/loop1 partition with all of the
+different blocks that were reported from:
+mke2fs -n /dev/loop1
+with no luck still.
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 72073ef..1ab8c01 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1608,11 +1608,17 @@ static void do_test(void)
- 		test_hash("hmac(sha512)", hmac_sha512_tv_template,
- 			  HMAC_SHA512_TEST_VECTORS);
- 		break;
-+
- 	case 105:
- 		test_hash("hmac(sha224)", hmac_sha224_tv_template,
- 			  HMAC_SHA224_TEST_VECTORS);
- 		break;
- 
-+	case 106:
-+		test_hash("xcbc(aes)", aes_xcbc128_tv_template,
-+			  XCBC_AES_TEST_VECTORS);
-+		break;
-+
- 	case 200:
- 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
- 				  aes_speed_template);
+I don't think that LVM has anything to do with it, because on another
+volume group, that didn't loose any drives, there is a encrypted logical
+volume that has the same problem.  Actually all of the drives that I
+have encrypted have this problem now. I am unsure of where the problem
+actually is, and how to go about debugging it. Any suggestions would be
+appreciated.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sincerely,
+Dennison Williams
