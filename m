@@ -1,81 +1,79 @@
-From: "=?ISO-8859-1?Q?Ilpo_J=E4rvinen?=" <ilpo.jarvinen@helsinki.fi>
-Subject: [PATCH] [CRYPTO] cast6: inline bloat--
-Date: Mon, 7 Jan 2008 15:40:58 +0200 (EET)
-Message-ID: <Pine.LNX.4.64.0801071535300.31652@kivilampi-30.cs.helsinki.fi>
+From: Dennison Williams <evoltech@2inches.com>
+Subject: Re: ext3 filesystem is not recognized after losetup -e aes
+Date: Mon, 07 Jan 2008 12:37:28 -0800
+Message-ID: <47828D88.2080903@2inches.com>
+References: <477F2813.3010003@2inches.com>
 Mime-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="-696243703-2102025713-1199713258=:31652"
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from courier.cs.helsinki.fi ([128.214.9.1]:51815 "EHLO
-	mail.cs.helsinki.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752891AbYAGNlA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Jan 2008 08:41:00 -0500
+Received: from ns1.2inches.com ([64.147.164.71]:60631 "EHLO vostok.2inches.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755174AbYAGUhd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jan 2008 15:37:33 -0500
+Received: from [192.168.1.105] (adsl-70-132-11-93.dsl.snfc21.sbcglobal.net [70.132.11.93])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: evoltech)
+	by vostok.2inches.com (Postfix) with ESMTP id B06E6182889E
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Jan 2008 12:17:18 -0800 (PST)
+In-Reply-To: <477F2813.3010003@2inches.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+I am pretty confident that this problem is somewhere in the block driver
+/ crypto driver combo and am considering digging through the code.
+Before I do can anyone point me in the direction pertinent documentation
+, specific drivers, etc.?
 
----696243703-2102025713-1199713258=:31652
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Dennison Williams wrote:
+> Here is the setup: MD software RAID 5 on 4 disks (md0), a LVM logical
+> volume (/dev/volume_group/logical_volume) comprised of one physical
+> device (/dev/md0), a encryption layer provided by the cryptoloop driver
+> (losetup -e aes /dev/loop0 /dev/volume_group/logical_volume), then a
+> EXT3 file system (mkfs.ext3 /dev/loop0).
+> 
+> Recently the RAID device kicked out one of the disks during a large file
+> transfer. After re-adding the disk to the array whith "mdadm /dev/mdo
+> -add /dev/sde (smartctl didn't report
+> anything wrong with it, I am not sure why this happened), authenticating
+> against the cryptographic layer, then trying to mount the drive, I get
+> the following error:
+> 
+> [root@storage redhat]# mount -t ext3 /dev/loop1 /terrorbyte/1/
+> mount: wrong fs type, bad option, bad superblock on /dev/loop1,
+> 
+> The message in /var/log/message is:
+> VFS: Can't find ext3 filesystem on dev loop1.
+> 
+> I then tried to e2fsck the /dev/loop1 partition with all of the
+> different blocks that were reported from:
+> mke2fs -n /dev/loop1
+> with no luck still.
+> 
+> I don't think that LVM has anything to do with it, because on another
+> volume group, that didn't loose any drives, there is a encrypted logical
+> volume that has the same problem.  Actually all of the drives that I
+> have encrypted have this problem now. I am unsure of where the problem
+> actually is, and how to go about debugging it. Any suggestions would be
+> appreciated.
+> 
+> Sincerely,
+> Dennison Williams
+> -
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Bloat-o-meter shows rather high readings for cast6...
 
-crypto/cast6.c:
-  cast6_setkey  | -1310
-  cast6_encrypt | -4567
-  cast6_decrypt | -4561
- 3 functions changed, 10438 bytes removed, diff: -10438
-
-crypto/cast6.c:
-  W    | +659
-  Q    | +308
-  QBAR | +316
- 3 functions changed, 1283 bytes added, diff: +1283
-
-crypto/cast6.o:
- 6 functions changed, 1283 bytes added, 10438 bytes removed, diff: -9155
-
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@helsinki.fi>
----
- crypto/cast6.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/cast6.c b/crypto/cast6.c
-index 136ab6d..5fd9420 100644
---- a/crypto/cast6.c
-+++ b/crypto/cast6.c
-@@ -369,7 +369,7 @@ static const u8 Tr[4][8] = {
- };
- 
- /* forward octave */
--static inline void W(u32 *key, unsigned int i) {
-+static void W(u32 *key, unsigned int i) {
- 	u32 I;
- 	key[6] ^= F1(key[7], Tr[i % 4][0], Tm[i][0]);
- 	key[5] ^= F2(key[6], Tr[i % 4][1], Tm[i][1]);
-@@ -428,7 +428,7 @@ static int cast6_setkey(struct crypto_tfm *tfm, const u8 *in_key,
- }
- 
- /*forward quad round*/
--static inline void Q (u32 * block, u8 * Kr, u32 * Km) {
-+static void Q (u32 * block, u8 * Kr, u32 * Km) {
- 	u32 I;
- 	block[2] ^= F1(block[3], Kr[0], Km[0]);
- 	block[1] ^= F2(block[2], Kr[1], Km[1]);
-@@ -437,7 +437,7 @@ static inline void Q (u32 * block, u8 * Kr, u32 * Km) {
- }
- 
- /*reverse quad round*/
--static inline void QBAR (u32 * block, u8 * Kr, u32 * Km) {
-+static void QBAR (u32 * block, u8 * Kr, u32 * Km) {
- 	u32 I;
-         block[3] ^= F1(block[0], Kr[3], Km[3]);
-         block[0] ^= F3(block[1], Kr[2], Km[2]);
 -- 
-1.5.0.6
-
----696243703-2102025713-1199713258=:31652--
+*****************************************************************
+* To communicate with me securely, please email me and I will   *
+* send you my public key.  We can then verify each others       *
+* fingerprints in person, or over the phone.                    *
+*                                                               *
+* I am open and willing to talk about setting up PGP, the       *
+* security problems inherent with PGP, and alternatives to PGP  *
+* for secure electronic communication.                          *
+*****************************************************************
