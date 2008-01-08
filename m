@@ -1,35 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 1/2] [XFRM] remove ifdef crypto
-Date: Tue, 8 Jan 2008 17:13:50 +1100
-Message-ID: <20080108061350.GC2529@gondor.apana.org.au>
-References: <20080105123637.GA12561@Chamillionaire.breakpoint.cc> <E1JB8I6-0003Pk-OJ@Chamillionaire.breakpoint.cc>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [CRYPTO] api: Set default CRYPTO_MINALIGN to unsigned long long
+Date: Mon, 07 Jan 2008 22:14:25 -0800 (PST)
+Message-ID: <20080107.221425.140140329.davem@davemloft.net>
+References: <20080108060911.GA4305@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Sebastian Siewior <sebastian@breakpoint.cc>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:4416 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755308AbYAHGNx (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:54375
+	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1753170AbYAHGOZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Jan 2008 01:13:53 -0500
-Content-Disposition: inline
-In-Reply-To: <E1JB8I6-0003Pk-OJ@Chamillionaire.breakpoint.cc>
+	Tue, 8 Jan 2008 01:14:25 -0500
+In-Reply-To: <20080108060911.GA4305@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jan 05, 2008 at 01:36:37PM +0100, Sebastian Siewior wrote:
-> and select the crypto subsystem if neccessary
-> 
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Tue, 8 Jan 2008 17:09:11 +1100
 
-Could you please resend this patch to David Miller and cc netdev?
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index 0aba104..6a20fc9 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -90,6 +90,8 @@
+>  #define CRYPTO_MINALIGN ARCH_KMALLOC_MINALIGN
+>  #elif defined(ARCH_SLAB_MINALIGN)
+>  #define CRYPTO_MINALIGN ARCH_SLAB_MINALIGN
+> +#else
+> +#define CRYPTO_MINALIGN __alignof__(unsigned long long)
+>  #endif
+>  
+>  #ifdef CRYPTO_MINALIGN
 
-I'll merge the other once this one is in Linus's tree.
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Not to nit-pick but the CRYPTO_MINALIGN ifdef there at the
+end is superfluous.  It will always be defined.
