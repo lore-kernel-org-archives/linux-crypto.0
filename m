@@ -1,34 +1,44 @@
-From: Andi Kleen <andi@firstfloor.org>
+From: "=?ISO-8859-1?Q?Ilpo_J=E4rvinen?=" <ilpo.jarvinen@helsinki.fi>
 Subject: Re: [PATCH] [CRYPTO] cast6: inline bloat--
-Date: Thu, 10 Jan 2008 04:03:43 +0100
-Message-ID: <p73ve62nzzk.fsf@bingen.suse.de>
+Date: Thu, 10 Jan 2008 11:17:10 +0200 (EET)
+Message-ID: <Pine.LNX.4.64.0801101114070.1408@kivilampi-30.cs.helsinki.fi>
 References: <Pine.LNX.4.64.0801071535300.31652@kivilampi-30.cs.helsinki.fi>
+ <p73ve62nzzk.fsf@bingen.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: MULTIPART/MIXED; BOUNDARY="-696243703-1608343329-1199956630=:1408"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-To: =?iso-8859-1?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@helsinki.fi>
+To: Andi Kleen <andi@firstfloor.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.suse.de ([195.135.220.2]:43895 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754436AbYAJDDp convert rfc822-to-8bit (ORCPT
+Received: from courier.cs.helsinki.fi ([128.214.9.1]:39246 "EHLO
+	mail.cs.helsinki.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751691AbYAJJRM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Jan 2008 22:03:45 -0500
-In-Reply-To: <Pine.LNX.4.64.0801071535300.31652@kivilampi-30.cs.helsinki.fi>
- ("Ilpo =?iso-8859-1?Q?J=E4rvinen=22's?= message of "Mon\, 7 Jan 2008
- 15\:40\:58 +0200 \(EET\)")
+	Thu, 10 Jan 2008 04:17:12 -0500
+In-Reply-To: <p73ve62nzzk.fsf@bingen.suse.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-"Ilpo J=E4rvinen" <ilpo.jarvinen@helsinki.fi> writes:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> Bloat-o-meter shows rather high readings for cast6...
+---696243703-1608343329-1199956630=:1408
+Content-Type: TEXT/PLAIN; charset=iso-8859-1
+Content-Transfer-Encoding: 8BIT
 
-Have you measured if the performance doesn't suffer from that
-change? Inner loops of ciphers tend to be quite performance
-sensitive and the inlines might actually help a lot.=20
+On Thu, 10 Jan 2008, Andi Kleen wrote:
 
-On the other hand setkey is probably not as sensitive.
+> "Ilpo Järvinen" <ilpo.jarvinen@helsinki.fi> writes:
+> 
+> > Bloat-o-meter shows rather high readings for cast6...
+> 
+> Have you measured if the performance doesn't suffer from that
+> change? Inner loops of ciphers tend to be quite performance
+> sensitive and the inlines might actually help a lot. 
 
--Andi
+No, I haven't measured.
+
+
+-- 
+ i.
+---696243703-1608343329-1199956630=:1408--
