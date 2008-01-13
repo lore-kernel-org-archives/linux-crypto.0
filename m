@@ -1,59 +1,37 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH] [CRYPTO] cast6: inline bloat--
-Date: Sat, 12 Jan 2008 09:04:47 +0100
-Message-ID: <20080112080447.GA26384@Chamillionaire.breakpoint.cc>
-References: <Pine.LNX.4.64.0801071535300.31652@kivilampi-30.cs.helsinki.fi> <p73ve62nzzk.fsf@bingen.suse.de> <Pine.LNX.4.64.0801101114070.1408@kivilampi-30.cs.helsinki.fi> <20080110092555.GB25076@one.firstfloor.org> <20080110092746.GA11613@gondor.apana.org.au> <20080110133529.GA13851@Chamillionaire.breakpoint.cc> <20080110154650.GA29453@one.firstfloor.org> <20080112000937.GA23721@Chamillionaire.breakpoint.cc> <20080112005742.GA898@gondor.apana.org.au>
-Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] [crypto] twofish-asm: Merge common glue code
+Date: Sun, 13 Jan 2008 11:35:14 +1100
+Message-ID: <20080113003513.GA8764@gondor.apana.org.au>
+References: <20080112003420.GB23721@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Andi Kleen <andi@firstfloor.org>,
-	Ilpo J?rvinen <ilpo.jarvinen@helsinki.fi>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:43736 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759720AbYALIEy (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:2708 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751937AbYAMAfT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Jan 2008 03:04:54 -0500
+	Sat, 12 Jan 2008 19:35:19 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
+	id 1JDqon-0007wm-54
+	for <linux-crypto@vger.kernel.org>; Sun, 13 Jan 2008 11:35:17 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1JDqok-0002OZ-00
+	for <linux-crypto@vger.kernel.org>; Sun, 13 Jan 2008 11:35:14 +1100
 Content-Disposition: inline
-In-Reply-To: <20080112005742.GA898@gondor.apana.org.au>
+In-Reply-To: <20080112003420.GB23721@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Herbert Xu | 2008-01-12 11:57:42 [+1100]:
+On Sat, Jan 12, 2008 at 01:34:20AM +0100, Sebastian Siewior wrote:
+> There is almost no difference between 32 & 64 bit glue code.
+> 
+> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
->
->Thanks for following this through!
-np
-
->
->> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
->> index 1ab8c01..a935abc 100644
->> --- a/crypto/tcrypt.c
->> +++ b/crypto/tcrypt.c
->> @@ -1705,6 +1705,12 @@ static void do_test(void)
->>                 test_cipher_speed("salsa20", ENCRYPT, sec, NULL, 0,
->>                                   salsa20_speed_template);
->>                 break;
->> +       case 207:
->> +               test_cipher_speed("ecb(cast6)", ENCRYPT, sec, NULL, 0,
->> +                               camellia_speed_template);
->> +               test_cipher_speed("ecb(cast6)", DECRYPT, sec, NULL, 0,
->> +                               camellia_speed_template);
->> +               break;
->
->Perhaps we should make a generic speed template that works for all
->ciphers?
-Most of them aren't that different, I try to make something.
-
->Cheers,
->-- 
->Visit Openswan at http://www.openswan.org/
->Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
->Home Page: http://gondor.apana.org.au/~herbert/
->PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->-
->To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Applied to cryptodev-2.6.  Thanks Sebastian.
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
