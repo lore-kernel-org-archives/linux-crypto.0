@@ -1,40 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] [crypto] twofish-asm: fix module description
-Date: Mon, 14 Jan 2008 17:09:28 +1100
-Message-ID: <20080114060928.GA17937@gondor.apana.org.au>
-References: <20080112003420.GB23721@Chamillionaire.breakpoint.cc> <20080113003513.GA8764@gondor.apana.org.au> <20080113140153.GA6469@Chamillionaire.breakpoint.cc>
+From: "Kevin Coffman" <kwc@citi.umich.edu>
+Subject: AES with CTS Mode
+Date: Tue, 15 Jan 2008 15:28:15 -0500
+Message-ID: <4d569c330801151228o1cf32b2dn6f6e49922b1036e9@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:2826 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751245AbYANGJb (ORCPT
+Received: from wx-out-0506.google.com ([66.249.82.233]:28077 "EHLO
+	wx-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753134AbYAOU2S (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Jan 2008 01:09:31 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
-	by arnor.apana.org.au with esmtp (Exim 4.50 #1 (Debian))
-	id 1JEIVl-0006Vq-0T
-	for <linux-crypto@vger.kernel.org>; Mon, 14 Jan 2008 17:09:29 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
-	id 1JEIVk-0004jX-00
-	for <linux-crypto@vger.kernel.org>; Mon, 14 Jan 2008 17:09:28 +1100
+	Tue, 15 Jan 2008 15:28:18 -0500
+Received: by wx-out-0506.google.com with SMTP id h31so1499257wxd.4
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Jan 2008 12:28:17 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20080113140153.GA6469@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 13, 2008 at 03:01:53PM +0100, Sebastian Siewior wrote:
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
-> ---
-> * Herbert Xu | 2008-01-13 11:35:14 [+1100]:
-> 
-> >Applied to cryptodev-2.6.  Thanks Sebastian.
-> could you please squash this one into :)
+Hello,
+I need to implement AES with CTS mode for NFSv4 (rfc3962 & rfc4121).
 
-I've added this fix.  Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I have implemented CTS starting with a copy of CBC (crypto/cbc.c),
+since CTS is the same as CBC except for the last two blocks.
+
+A problem that I'm running into is that the NFS/RPC code needs to call
+the crypt functions in chunks as we currently do for other encryption
+types.  However, I am not seeing a way to inform the crypto code of
+the total length to be encrypted such that it can just do regular CBC
+until the last two blocks (of the last chunk).
+
+Am I missing something, or is there an example of this sort of thing
+that I am missing?  Any other suggestions?
+
+Thanks,
+K.C.
