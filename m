@@ -1,48 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AES with CTS Mode
-Date: Thu, 17 Jan 2008 15:44:06 +1100
-Message-ID: <20080117044406.GC6221@gondor.apana.org.au>
-References: <4d569c330801151228o1cf32b2dn6f6e49922b1036e9@mail.gmail.com>
+Subject: Re: New Crypto Hardware
+Date: Thu, 17 Jan 2008 22:23:14 +1100
+Message-ID: <20080117112314.GC9020@gondor.apana.org.au>
+References: <E1IrkmY-0007gp-00@gondolin.me.apana.org.au> <0CA0A16855646F4FA96D25A158E299D603EB866F@SDCEXCHANGE01.ad.amcc.com> <20071225073202.GA31076@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D603FCC15D@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Kevin Coffman <kwc@citi.umich.edu>
+To: Loc Ho <lho@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57952 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:42985 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752983AbYAQEoJ (ORCPT
+	with ESMTP id S1751302AbYAQLXQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Jan 2008 23:44:09 -0500
+	Thu, 17 Jan 2008 06:23:16 -0500
 Content-Disposition: inline
-In-Reply-To: <4d569c330801151228o1cf32b2dn6f6e49922b1036e9@mail.gmail.com>
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D603FCC15D@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 15, 2008 at 08:28:15PM +0000, Kevin Coffman wrote:
-> I need to implement AES with CTS mode for NFSv4 (rfc3962 & rfc4121).
+On Wed, Jan 16, 2008 at 10:19:04AM -0800, Loc Ho wrote:
+> Hi,
+> 
+> For hashing, there are HMAC key if HMAC and digest size. As digest size
+> is part of the algorithm, there is only HMAC key. Are you referring to
+> moving the HMAC key from transformation into the request structure? As I
+> am modeled after ablkcipher_request structure, there will be a context
+> point 'void *__ctx[] CRYPTO_MINALIGN_ATTR;' for the request operation.
 
-I love new algorithm submissions :)
+No I meant the context that has to be stored between calls to
+crypto_hash_update and crypto_hash_final.
 
-> I have implemented CTS starting with a copy of CBC (crypto/cbc.c),
-> since CTS is the same as CBC except for the last two blocks.
-
-I think you're going about this the hard way.  CTS should be done as
-a generic wrapper on top of any existing block mode of operations.
-In other words, the final result should look like "cts(cbc(aes))".
-
-That means you don't need to implement anything specific to CBC.
-
-> A problem that I'm running into is that the NFS/RPC code needs to call
-> the crypt functions in chunks as we currently do for other encryption
-> types.  However, I am not seeing a way to inform the crypto code of
-> the total length to be encrypted such that it can just do regular CBC
-> until the last two blocks (of the last chunk).
-
-If you can put the entire plain text into one SG list then it would
-be best.  If not then just do as you described and feed whole blocks
-to plain CBC until you reach the last two and give them to CTS.
-
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
