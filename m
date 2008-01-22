@@ -1,143 +1,81 @@
-From: Sebastian Siewior <sebastian@breakpoint.cc>
-Subject: [PATCH] [crypto] blockmode, use cipher ret val
-Date: Sat, 19 Jan 2008 01:02:15 +0100
-Message-ID: <1200700935-3844-6-git-send-email-sebastian@breakpoint.cc>
-References: <1200700935-3844-1-git-send-email-sebastian@breakpoint.cc>
-Cc: linux-crypto@ml.breakpoint.cc,
-	Sebastian Siewior <sebastian@breakpoint.cc>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: "Loc Ho" <locnho@sbcglobal.net>
+Subject: RE: New Crypto Hardware
+Date: Mon, 21 Jan 2008 17:29:13 -0800
+Message-ID: <002301c85c96$32a67a40$5c05420a@amcc.com>
+References: <E1IrkmY-0007gp-00@gondolin.me.apana.org.au> <0CA0A16855646F4FA96D25A158E299D603EB866F@SDCEXCHANGE01.ad.amcc.com> <20071225073202.GA31076@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D603FCC15D@SDCEXCHANGE01.ad.amcc.com> <20080117112314.GC9020@gondor.apana.org.au> <001c01c85937$ff3313f0$5c05420a@amcc.com> <20080117202735.GA22733@Chamillionaire.breakpoint.cc> <0CA0A16855646F4FA96D25A158E299D603FCC4D7@SDCEXCHANGE01.ad.amcc.com> <20080118230721.GA30470@Chamillionaire.breakpoint.cc>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
+To: "'Sebastian Siewior'" <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:34803 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752172AbYASId4 (ORCPT
+Received: from smtp116.sbc.mail.sp1.yahoo.com ([69.147.64.89]:39954 "HELO
+	smtp116.sbc.mail.sp1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1754007AbYAVB3L (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Jan 2008 03:33:56 -0500
-Received: id: bigeasy by Chamillionaire.breakpoint.cc with local
-	(easymta 1.00 BETA 1)
-	id 1JG99H-0002dQ-4G
-	for linux-crypto@vger.kernel.org; Sat, 19 Jan 2008 09:33:55 +0100
-In-Reply-To: <1200700935-3844-1-git-send-email-sebastian@breakpoint.cc>
+	Mon, 21 Jan 2008 20:29:11 -0500
+In-Reply-To: <20080118230721.GA30470@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
----
- crypto/cbc.c |   22 +++++++++++++---------
- crypto/ecb.c |    7 ++++---
- 2 files changed, 17 insertions(+), 12 deletions(-)
+Hi,
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index a525dcc..15c8095 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -50,17 +50,18 @@ static int crypto_cbc_encrypt_segment(struct blkcipher_desc *desc,
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
- 	u8 *iv = walk->iv;
-+	int ret;
- 
- 	do {
- 		crypto_xor(iv, src, bsize);
--		fn(crypto_cipher_tfm(tfm), dst, iv);
-+		ret = fn(crypto_cipher_tfm(tfm), dst, iv);
- 		memcpy(iv, dst, bsize);
- 
- 		src += bsize;
- 		dst += bsize;
--	} while ((nbytes -= bsize) >= bsize);
-+	} while (!ret && (nbytes -= bsize) >= bsize);
- 
--	return nbytes;
-+	return nbytes ? nbytes : ret;
- }
- 
- static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
-@@ -73,14 +74,15 @@ static int crypto_cbc_encrypt_inplace(struct blkcipher_desc *desc,
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
- 	u8 *iv = walk->iv;
-+	int ret;
- 
- 	do {
- 		crypto_xor(src, iv, bsize);
--		fn(crypto_cipher_tfm(tfm), src, src);
-+		ret = fn(crypto_cipher_tfm(tfm), src, src);
- 		iv = src;
- 
- 		src += bsize;
--	} while ((nbytes -= bsize) >= bsize);
-+	} while (!ret && (nbytes -= bsize) >= bsize);
- 
- 	memcpy(walk->iv, iv, bsize);
- 
-@@ -122,15 +124,16 @@ static int crypto_cbc_decrypt_segment(struct blkcipher_desc *desc,
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
- 	u8 *iv = walk->iv;
-+	int ret;
- 
- 	do {
--		fn(crypto_cipher_tfm(tfm), dst, src);
-+		ret = fn(crypto_cipher_tfm(tfm), dst, src);
- 		crypto_xor(dst, iv, bsize);
- 		iv = src;
- 
- 		src += bsize;
- 		dst += bsize;
--	} while ((nbytes -= bsize) >= bsize);
-+	} while (!ret && (nbytes -= bsize) >= bsize);
- 
- 	memcpy(walk->iv, iv, bsize);
- 
-@@ -147,14 +150,15 @@ static int crypto_cbc_decrypt_inplace(struct blkcipher_desc *desc,
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
- 	u8 last_iv[bsize];
-+	int ret;
- 
- 	/* Start of the last block. */
- 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
- 	memcpy(last_iv, src, bsize);
- 
- 	for (;;) {
--		fn(crypto_cipher_tfm(tfm), src, src);
--		if ((nbytes -= bsize) < bsize)
-+		ret = fn(crypto_cipher_tfm(tfm), src, src);
-+		if (ret || (nbytes -= bsize) < bsize)
- 			break;
- 		crypto_xor(src, src - bsize, bsize);
- 		src -= bsize;
-diff --git a/crypto/ecb.c b/crypto/ecb.c
-index 1edb94f..04a5083 100644
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -46,6 +46,7 @@ static int crypto_ecb_crypt(struct blkcipher_desc *desc,
- 	int bsize = crypto_cipher_blocksize(tfm);
- 	unsigned int nbytes;
- 	int err;
-+	int ret = 0;
- 
- 	err = blkcipher_walk_virt(desc, walk);
- 
-@@ -54,16 +55,16 @@ static int crypto_ecb_crypt(struct blkcipher_desc *desc,
- 		u8 *wdst = walk->dst.virt.addr;
- 
- 		do {
--			fn(crypto_cipher_tfm(tfm), wdst, wsrc);
-+			ret = fn(crypto_cipher_tfm(tfm), wdst, wsrc);
- 	
- 			wsrc += bsize;
- 			wdst += bsize;
--		} while ((nbytes -= bsize) >= bsize);
-+		} while ((nbytes -= bsize) >= bsize && !ret);
- 
- 		err = blkcipher_walk_done(desc, walk, nbytes);
- 	}
- 
--	return err;
-+	return err ? err : ret;
- }
- 
- static int crypto_ecb_encrypt(struct blkcipher_desc *desc,
--- 
-1.5.3.6
+If that is the case, then in order to fully support async hashing, I would
+need an async version of HASH interface and an async version of digest. Am I
+correct? Do you think it will be inconsistent if it is assumed that if the
+functional setkey is not called, then it is digest. If it is called, then it
+is hash.
+
+-Loc
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org
+[mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Sebastian Siewior
+Sent: Friday, January 18, 2008 3:07 PM
+To: Loc Ho
+Cc: Herbert Xu; linux-crypto@vger.kernel.org
+Subject: Re: New Crypto Hardware
+
+* Loc Ho | 2008-01-17 13:25:38 [-0800]:
+
+>>Questions:
+>>2. What is the difference between digest and hash type besides one 
+>>operation on transformation structure (tfm) and the other on 
+>>descriptor
+>(desc)?
+>They are used for different things.
+>Digest is something like sha1 or md5. You just feed your algoritm with 
+>data and get a single result. A hash on the other hand has a key which 
+>is used as a salt, a random initialization string.
+>
+>[LH]
+>Are you referring hash as HMAC mode of MD5/SHA? For normal MD5, use 
+>digest algorthm. For HMAC mode of MD5, use HASH. Is this correct?
+Yes. You request them as hmac(sha1) resp. hmac(md5).
+
+>>3. Currently, cryptodev-2.6 git doesn't work under PPC4xx development 
+>>board but Denx linux latest works. Have anyone tested on PPC4xx board?
+>
+>Please define doesn't work.
+>
+>[LH]
+>When I compile and load Denx Linux for my sequoia board, the Kernel 
+>comes up and I get  kernel message. When I compile and load 
+>cryptodev-2.6.git HEAD with the same config from Denx branch, nothing.
+>It seems like cryptodev-2.6 doesn't support the sequoia board. What I 
+>have to do is patch only crypto file into Denx linux and that seems to 
+>work for me.
+cryptodev-2.6 is almost v2.6.24-rc8 tree + cryptodev patches. If you can
+boot v2.6.24-rc8 than you should have no problems with cryptodev. I don't
+know the diff between denx-linux & linus-linux.
+
+>Thanks,
+>Loc
+
+Sebastian
+-
+To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+the body of a message to majordomo@vger.kernel.org More majordomo info at
+http://vger.kernel.org/majordomo-info.html
