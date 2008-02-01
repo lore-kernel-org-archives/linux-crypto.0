@@ -1,46 +1,44 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Trouble with non modular ciphers
-Date: Thu, 31 Jan 2008 14:12:21 +0100
-Message-ID: <20080131131221.GA21439@Chamillionaire.breakpoint.cc>
-References: <200801311021.24240.ak@suse.de> <20080131124834.GA21310@Chamillionaire.breakpoint.cc> <200801311349.54179.ak@suse.de>
+Date: Fri, 1 Feb 2008 11:12:18 +1100
+Message-ID: <20080201001218.GA13596@gondor.apana.org.au>
+References: <200801311021.24240.ak@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
 To: Andi Kleen <ak@suse.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:57978 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933827AbYAaNMW (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:58305 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1762747AbYBAAMV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Jan 2008 08:12:22 -0500
+	Thu, 31 Jan 2008 19:12:21 -0500
 Content-Disposition: inline
-In-Reply-To: <200801311349.54179.ak@suse.de>
+In-Reply-To: <200801311021.24240.ak@suse.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Andi Kleen | 2008-01-31 13:49:54 [+0100]:
+On Thu, Jan 31, 2008 at 10:21:24AM +0100, Andi Kleen wrote:
+> 
+> FYI -- with a linus git kernel of yesterday or so I ran into a problem where 
+> one cipher module (CBC) was compiled in and the rest modular. dm_crypt 
+> could not resolve the cipher module until I turned it into a module.
+> I don't remember if cryptomanager was modular or not.
+> 
+> I don't have the exact configuration anymore unfortunately, but just
+> wanted to report the problem.
 
->On Thursday 31 January 2008 13:48:34 Sebastian Siewior wrote:
->> * Andi Kleen | 2008-01-31 10:21:24 [+0100]:
->> 
->> >FYI -- with a linus git kernel of yesterday or so I ran into a problem where 
->> >one cipher module (CBC) was compiled in and the rest modular. dm_crypt 
->> >could not resolve the cipher module until I turned it into a module.
->> and dm_crypt itself was a module?
->
->I don't remember to be honest. Is it important?
-It could be possible that dm_crypt is trying to use the crypto API
-before it is initialized, but I doubt it.
+OK, I couldn't find anything bad from looking through the Kconfig.
+What happens if you try to build it in again?
 
->
->> >Also I found that cryptomanager is quite unhappy when CONFIG_KMOD
->> >is not defined. Perhaps it should Kconfig select it?
->> If you disable modules, than why should one module enable it?
->
->CONFIG_KMOD is not modules (that is CONFIG_MODULES), but module
->autoloading.
-Ach, you right. This problem has every user of try_then_request_module()
-and I don't see anybody selecting CONFIG_KMOD in the kernel.
+> Also I found that cryptomanager is quite unhappy when CONFIG_KMOD
+> is not defined. Perhaps it should Kconfig select it?
 
->-Andi
-Sebastian
+Good point.  Yes we should do that.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
