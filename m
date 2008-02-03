@@ -1,44 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Trouble with non modular ciphers
-Date: Fri, 1 Feb 2008 11:12:18 +1100
-Message-ID: <20080201001218.GA13596@gondor.apana.org.au>
-References: <200801311021.24240.ak@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Sebastian Siewior <sebastian@breakpoint.cc>
+Subject: [patch 0/3] Shrink the tcrypt module and fix one XTEA test vector
+Date: Sun, 03 Feb 2008 13:55:24 +0100
+Message-ID: <20080203125524.339000971@breakoint.cc>
 Cc: linux-crypto@vger.kernel.org
-To: Andi Kleen <ak@suse.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:58305 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1762747AbYBAAMV (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:34766 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1763705AbYBCNRa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Jan 2008 19:12:21 -0500
-Content-Disposition: inline
-In-Reply-To: <200801311021.24240.ak@suse.de>
+	Sun, 3 Feb 2008 08:17:30 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 31, 2008 at 10:21:24AM +0100, Andi Kleen wrote:
-> 
-> FYI -- with a linus git kernel of yesterday or so I ran into a problem where 
-> one cipher module (CBC) was compiled in and the rest modular. dm_crypt 
-> could not resolve the cipher module until I turned it into a module.
-> I don't remember if cryptomanager was modular or not.
-> 
-> I don't have the exact configuration anymore unfortunately, but just
-> wanted to report the problem.
+Hello Herbert,
 
-OK, I couldn't find anything bad from looking through the Kconfig.
-What happens if you try to build it in again?
+I noticed that the tcrypt module got really fat. Don't worry, it is still
+less than the nvidia blob :)
+Patch
+- #1 replaces the memcpy of the struct to something that works with
+  pointers. I noticed that some tests failed without doing this.
+- #2 is the big diet. A copy of the patch is at [1] in case it does not
+  pass the list filters.
+- #3 changes one of the XTEA test vectors because the test vector itself
+  seems to be wrong (and nobody noticed this before).
 
-> Also I found that cryptomanager is quite unhappy when CONFIG_KMOD
-> is not defined. Perhaps it should Kconfig select it?
 
-Good point.  Yes we should do that.
+[1] http://download.breakpoint.cc/0002-crypto-shrink-the-tcrypt-module.patch 575 KiB
 
-Cheers,
+Sebastian
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
