@@ -1,32 +1,39 @@
-From: "Loc Ho" <locnho@sbcglobal.net>
-Subject: Async Linux NETKEY (IPSec Stack)
-Date: Mon, 4 Feb 2008 10:56:27 -0800
-Message-ID: <00bb01c8675f$a5872270$5c05420a@amcc.com>
-References: <200801311021.24240.ak@suse.de> <20080201001218.GA13596@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Async Linux NETKEY (IPSec Stack)
+Date: Tue, 5 Feb 2008 09:37:07 +1100
+Message-ID: <20080204223707.GA2025@gondor.apana.org.au>
+References: <200801311021.24240.ak@suse.de> <20080201001218.GA13596@gondor.apana.org.au> <00bb01c8675f$a5872270$5c05420a@amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: "'Herbert Xu'" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Loc Ho <locnho@sbcglobal.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp119.sbc.mail.sp1.yahoo.com ([69.147.64.92]:45621 "HELO
-	smtp119.sbc.mail.sp1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1754957AbYBDS4U (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:60111 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757049AbYBDWhK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Feb 2008 13:56:20 -0500
-In-Reply-To: <20080201001218.GA13596@gondor.apana.org.au>
+	Mon, 4 Feb 2008 17:37:10 -0500
+Content-Disposition: inline
+In-Reply-To: <00bb01c8675f$a5872270$5c05420a@amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Mon, Feb 04, 2008 at 10:56:27AM -0800, Loc Ho wrote:
+> 
+> I just want to check on the status of Linux NETKEY change to support
+> asynchronous Linux CryptoAPI interface. Have ESP, AH, and AEAD changes to
+> make use of async API?
+> 
+> In addition, I submitted async HASH and DIGEST patch over a week ago. Any
+> comments and whether it will be accepted?
 
-I just want to check on the status of Linux NETKEY change to support
-asynchronous Linux CryptoAPI interface. Have ESP, AH, and AEAD changes to
-make use of async API?
-
-In addition, I submitted async HASH and DIGEST patch over a week ago. Any
-comments and whether it will be accepted?
+Sorry but I'm currently travelling so I can't give your patches the
+proper attention.  I'll look at them as soon as things quiten down
+in a couple of weeks.
 
 Thanks,
-Loc
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
