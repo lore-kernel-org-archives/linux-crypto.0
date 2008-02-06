@@ -1,51 +1,74 @@
-From: "Torsten Wildschek" <wildsche@googlemail.com>
-Subject: Re: Async Linux NETKEY (IPSec Stack)
-Date: Tue, 5 Feb 2008 22:46:47 +0000
-Message-ID: <2e688f4c0802051446s212508d7n4562acb3c28e20ac@mail.gmail.com>
+From: Patrick McHardy <kaber@trash.net>
+Subject: [HIFN]: Fix invalid config ifdefs for RNG support
+Date: Wed, 06 Feb 2008 14:57:57 +0100
+Message-ID: <47A9BCE5.5080307@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------050709050106020504070004"
 Cc: linux-crypto@vger.kernel.org
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rn-out-0910.google.com ([64.233.170.186]:62942 "EHLO
-	rn-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760659AbYBEWqs (ORCPT
+Received: from stinky.trash.net ([213.144.137.162]:54823 "EHLO
+	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752027AbYBFN6A (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Feb 2008 17:46:48 -0500
-Received: by rn-out-0910.google.com with SMTP id i24so3158997rng.19
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Feb 2008 14:46:47 -0800 (PST)
-Content-Disposition: inline
+	Wed, 6 Feb 2008 08:58:00 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+This is a multi-part message in MIME format.
+--------------050709050106020504070004
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
-how about Loc's question regarding "Linux NETKEY change to support
-asynchronous Linux CryptoAPI"? I know that there are quite a few
-people interested
-in that.
 
-Cheers,
-           Torsten
-On Tue, 5 Feb 2008, Herbert Xu wrote:
+--------------050709050106020504070004
+Content-Type: text/plain;
+ name="x"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="x"
 
-> On Mon, Feb 04, 2008 at 10:56:27AM -0800, Loc Ho wrote:
->>
->> I just want to check on the status of Linux NETKEY change to support
->> asynchronous Linux CryptoAPI interface. Have ESP, AH, and AEAD changes to
->> make use of async API?
->>
->> In addition, I submitted async HASH and DIGEST patch over a week ago. Any
->> comments and whether it will be accepted?
->
-> Sorry but I'm currently travelling so I can't give your patches the
-> proper attention.  I'll look at them as soon as things quiten down
-> in a couple of weeks.
->
-> Thanks,
-> --
-> Visit Openswan at http://www.openswan.org/
-> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+commit 3810a091ff8bc9b5038647a4b32a08267284f3f9
+Author: Patrick McHardy <kaber@gw.localnet>
+Date:   Wed Feb 6 14:56:09 2008 +0100
+
+    [HIFN]: Fix invalid config ifdefs for RNG support
+    
+    The CRYPTO_DEV_HIFN_795X_RNG ifdefs are missing the CONFIG_ prefix.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index dfbf24c..3110bf7 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -463,7 +463,7 @@ struct hifn_device
+ 
+ 	unsigned int		pk_clk_freq;
+ 
+-#ifdef CRYPTO_DEV_HIFN_795X_RNG
++#ifdef CONFIG_CRYPTO_DEV_HIFN_795X_RNG
+ 	unsigned int		rng_wait_time;
+ 	ktime_t			rngtime;
+ 	struct hwrng		rng;
+@@ -795,7 +795,7 @@ static struct pci2id {
+ 	}
+ };
+ 
+-#ifdef CRYPTO_DEV_HIFN_795X_RNG
++#ifdef CONFIG_CRYPTO_DEV_HIFN_795X_RNG
+ static int hifn_rng_data_present(struct hwrng *rng, int wait)
+ {
+ 	struct hifn_device *dev = (struct hifn_device *)rng->priv;
+@@ -880,7 +880,7 @@ static int hifn_init_pubrng(struct hifn_device *dev)
+ 	dprintk("Chip %s: RNG engine has been successfully initialised.\n",
+ 			dev->name);
+ 
+-#ifdef CRYPTO_DEV_HIFN_795X_RNG
++#ifdef CONFIG_CRYPTO_DEV_HIFN_795X_RNG
+ 	/* First value must be discarded */
+ 	hifn_read_1(dev, HIFN_1_RNG_DATA);
+ 	dev->rngtime = ktime_get();
+
+--------------050709050106020504070004--
