@@ -1,29 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Async Linux NETKEY (IPSec Stack)
-Date: Thu, 7 Feb 2008 13:49:24 +1100
-Message-ID: <20080207024924.GA25787@gondor.apana.org.au>
-References: <2e688f4c0802051421m43b7d340id1b1ded97a9c423b@mail.gmail.com> <20080206195718.GC20308@gondor.apana.org.au>
+Subject: Re: [HIFN]: Fix invalid config ifdefs for RNG support
+Date: Fri, 8 Feb 2008 02:00:19 +1100
+Message-ID: <20080207150019.GA6768@gondor.apana.org.au>
+References: <47A9BCE5.5080307@trash.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Torsten Wildschek <wildsche@googlemail.com>
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34365 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:48678 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758907AbYBGCt2 (ORCPT
+	with ESMTP id S1755846AbYBGPAW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Feb 2008 21:49:28 -0500
+	Thu, 7 Feb 2008 10:00:22 -0500
 Content-Disposition: inline
-In-Reply-To: <20080206195718.GC20308@gondor.apana.org.au>
+In-Reply-To: <47A9BCE5.5080307@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 07, 2008 at 06:57:18AM +1100, Herbert Xu wrote:
->
-> That's already upstream I think.
+On Wed, Feb 06, 2008 at 02:57:57PM +0100, Patrick McHardy wrote:
 
-Actually it isn't in Linus's tree yet so it might be pushed back
-to 2.6.26.
+> commit 3810a091ff8bc9b5038647a4b32a08267284f3f9
+> Author: Patrick McHardy <kaber@gw.localnet>
+> Date:   Wed Feb 6 14:56:09 2008 +0100
+> 
+>     [HIFN]: Fix invalid config ifdefs for RNG support
+>     
+>     The CRYPTO_DEV_HIFN_795X_RNG ifdefs are missing the CONFIG_ prefix.
+>     
+>     Signed-off-by: Patrick McHardy <kaber@trash.net>
+
+Patch applied.  Thanks Patrick!
+
+I'll push this for 2.6.25.
 
 Cheers,
 -- 
