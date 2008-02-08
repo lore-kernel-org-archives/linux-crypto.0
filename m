@@ -1,38 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [HIFN]: Fix invalid config ifdefs for RNG support
-Date: Fri, 8 Feb 2008 02:00:19 +1100
-Message-ID: <20080207150019.GA6768@gondor.apana.org.au>
-References: <47A9BCE5.5080307@trash.net>
+Subject: Re: Async Linux NETKEY (IPSec Stack)
+Date: Sat, 9 Feb 2008 05:23:59 +1100
+Message-ID: <20080208182358.GA18688@gondor.apana.org.au>
+References: <2e688f4c0802051421m43b7d340id1b1ded97a9c423b@mail.gmail.com> <20080206195718.GC20308@gondor.apana.org.au> <20080207024924.GA25787@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Patrick McHardy <kaber@trash.net>
+To: Torsten Wildschek <wildsche@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48678 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:34185 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755846AbYBGPAW (ORCPT
+	with ESMTP id S1760790AbYBHSYD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Feb 2008 10:00:22 -0500
+	Fri, 8 Feb 2008 13:24:03 -0500
 Content-Disposition: inline
-In-Reply-To: <47A9BCE5.5080307@trash.net>
+In-Reply-To: <20080207024924.GA25787@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 06, 2008 at 02:57:57PM +0100, Patrick McHardy wrote:
-
-> commit 3810a091ff8bc9b5038647a4b32a08267284f3f9
-> Author: Patrick McHardy <kaber@gw.localnet>
-> Date:   Wed Feb 6 14:56:09 2008 +0100
+On Thu, Feb 07, 2008 at 01:49:24PM +1100, Herbert Xu wrote:
 > 
->     [HIFN]: Fix invalid config ifdefs for RNG support
->     
->     The CRYPTO_DEV_HIFN_795X_RNG ifdefs are missing the CONFIG_ prefix.
->     
->     Signed-off-by: Patrick McHardy <kaber@trash.net>
+> Actually it isn't in Linus's tree yet so it might be pushed back
+> to 2.6.26.
 
-Patch applied.  Thanks Patrick!
-
-I'll push this for 2.6.25.
+Doh I'm obviously clueless.  It is already in Linus's tree
+at changeset 1a6509d991225ad210de54c63314fd9542922095.
 
 Cheers,
 -- 
