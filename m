@@ -1,34 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Async Linux NETKEY (IPSec Stack)
-Date: Sat, 9 Feb 2008 05:23:59 +1100
-Message-ID: <20080208182358.GA18688@gondor.apana.org.au>
-References: <2e688f4c0802051421m43b7d340id1b1ded97a9c423b@mail.gmail.com> <20080206195718.GC20308@gondor.apana.org.au> <20080207024924.GA25787@gondor.apana.org.au>
+From: Patrick McHardy <kaber@trash.net>
+Subject: HIFN+IPsec crashes in current -git
+Date: Wed, 13 Feb 2008 14:17:45 +0100
+Message-ID: <47B2EDF9.6020900@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Torsten Wildschek <wildsche@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34185 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1760790AbYBHSYD (ORCPT
+Received: from stinky.trash.net ([213.144.137.162]:61121 "EHLO
+	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751376AbYBMNRu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Feb 2008 13:24:03 -0500
-Content-Disposition: inline
-In-Reply-To: <20080207024924.GA25787@gondor.apana.org.au>
+	Wed, 13 Feb 2008 08:17:50 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 07, 2008 at 01:49:24PM +1100, Herbert Xu wrote:
-> 
-> Actually it isn't in Linus's tree yet so it might be pushed back
-> to 2.6.26.
+I'm getting crashes when using HIFN and IPsec (ESP with
+AES + MD5) in the current -git tree. I didn't capture the
+Oops, but there seem to be a number of problems:
 
-Doh I'm obviously clueless.  It is already in Linus's tree
-at changeset 1a6509d991225ad210de54c63314fd9542922095.
+- hifn_setup_session walks over the scatterlist, subtracting
+   the scatterlist element size from nbytes until nbytes
+   reaches zero. In my case nbytes is 12 byte smaller than
+   the scatterlist, so nbytes underflows and it oopses when
+   walking over the of the scatterlist.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- similar problem in ablkcipher_walk
+
+- After adding a hack to only walk the correct amount of
+   bytes, I got another crash because the return value
+   of ablkcipher_walk is not checked for errors, which
+   can cause sg_num to take a very large value.
+
+- After adding more hacks to work around the crash,
+   I got "bad page state" on resume and a refcount
+   underflow in dst_release() called by xfrm_input(),
+   but that may very well be caused by my hacks.
+
+I couldn't figure out where in the crypto code the
+nbytes decrement by 12 bytes compared to the length
+seen when setting up the crypto operation happens
+or I might have tried to properly fix it myself.
+I'll happily test patches in case someone more
+familiar with the code does a proper fix.
