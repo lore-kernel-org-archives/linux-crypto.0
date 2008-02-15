@@ -1,52 +1,36 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: HIFN+IPsec crashes in current -git
-Date: Thu, 14 Feb 2008 12:30:31 +0300
-Message-ID: <20080214093031.GA5258@2ka.mipt.ru>
-References: <47B2EDF9.6020900@trash.net> <20080213144442.GA10683@2ka.mipt.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch] crypto test build failure
+Date: Fri, 15 Feb 2008 19:19:58 +0800
+Message-ID: <20080215111958.GA13284@gondor.apana.org.au>
+References: <20080209195232.GC11728@slug>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Patrick McHardy <kaber@trash.net>
+Cc: linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Frederik Deweerdt <deweerdt@free.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:55510 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752100AbYBNJbM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Feb 2008 04:31:12 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:33342 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1762071AbYBOLUF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Feb 2008 06:20:05 -0500
 Content-Disposition: inline
-In-Reply-To: <20080213144442.GA10683@2ka.mipt.ru>
+In-Reply-To: <20080209195232.GC11728@slug>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Patrick.
-
-On Wed, Feb 13, 2008 at 05:44:42PM +0300, Evgeniy Polyakov (johnpol@2ka.mipt.ru) wrote:
-> Any chance you can apply following patch and check output for correct
-> and broken cases (it will produce 2 or 3 debug strings for each crypto
-> operation)?
+On Sat, Feb 09, 2008 at 08:52:32PM +0100, Frederik Deweerdt wrote:
+> Hello Herbert,
 > 
-> diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-> index dfbf24c..b8b088d 100644
-> --- a/drivers/crypto/hifn_795x.c
-> +++ b/drivers/crypto/hifn_795x.c
-> @@ -1558,6 +1558,23 @@ err_out_unmap:
->  	return err;
->  }
->  
-> +static void hifn_dump_req(struct ablkcipher_request *req, const char *prefix)
-> +{
-> +	int nbytes = (signed)req->nbytes;
-> +	struct scatterlist *src, *dst;
-> +	int idx = 0;
-> +
-> +	printk("%s: nbytes: %u, ", prefix, nbytes);
-> +	while (nbytes > 0) {
-> +		src = &req->src[idx];
-> +		dst = &req->dst[idx];
-> +
-> +		printk("%u/%u ", src->length, dst->length);
-> +		nbytes -= src->length;
+> Building latest git fails with the following error:
+> 	ERROR: "crypto_alloc_ablkcipher" [crypto/tcrypt.ko] undefined!
+> This appears to happen because CONFIG_CRYPTO_TEST is set while
+> CONFIG_CRYPTO_BLKCIPHER is not.
+> The following patch fixes the problem for me.
 
-Ouch, forgot idx++;
-
+Patch applied.  Thanks a lot!
 -- 
-	Evgeniy Polyakov
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
