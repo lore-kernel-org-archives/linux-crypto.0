@@ -1,35 +1,36 @@
-From: Patrick McHardy <kaber@trash.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: HIFN+IPsec crashes in current -git
-Date: Tue, 19 Feb 2008 17:27:25 +0100
-Message-ID: <47BB036D.7090701@trash.net>
-References: <E1JRLsx-0003Yz-00@gondolin.me.apana.org.au>
+Date: Wed, 20 Feb 2008 08:53:29 +0800
+Message-ID: <20080220005329.GA21565@gondor.apana.org.au>
+References: <E1JRLsx-0003Yz-00@gondolin.me.apana.org.au> <47BB036D.7090701@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, johnpol@2ka.mipt.ru
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from viefep32-int.chello.at ([62.179.121.50]:42309 "EHLO
-	viefep32-int.chello.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755604AbYBSQ1l (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:55099 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755044AbYBTAxb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Feb 2008 11:27:41 -0500
-In-Reply-To: <E1JRLsx-0003Yz-00@gondolin.me.apana.org.au>
+	Tue, 19 Feb 2008 19:53:31 -0500
+Content-Disposition: inline
+In-Reply-To: <47BB036D.7090701@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> Patrick McHardy <kaber@trash.net> wrote:
->> I couldn't figure out where in the crypto code the
->> nbytes decrement by 12 bytes compared to the length
->> seen when setting up the crypto operation happens
->> or I might have tried to properly fix it myself.
->> I'll happily test patches in case someone more
->> familiar with the code does a proper fix.
-> 
-> The usual ICV is 12 bytes long so that could be where it's coming
-> from.
+On Tue, Feb 19, 2008 at 05:27:25PM +0100, Patrick McHardy wrote:
+>
+> Yes, probably. So I take it the assumption in HIFN that the
+> sg-list length matches req->nbytes is incorrect?
 
+Where were you seeing the discrepancy? If it's at the point of
+entry into the HIFN code then the bug is further up.  If it's
+within the HIFN code then I don't know where 12 came from either
+since the ICV is not visible to it.
 
-Yes, probably. So I take it the assumption in HIFN that the
-sg-list length matches req->nbytes is incorrect?
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
