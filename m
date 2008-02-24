@@ -1,154 +1,33 @@
 From: Sebastian Siewior <sebastian@breakpoint.cc>
-Subject: [RFC] generic_aes: export generic setkey
-Date: Sun, 24 Feb 2008 12:01:03 +0100
-Message-ID: <1203850864-16681-2-git-send-email-sebastian@breakpoint.cc>
-References: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc>
-Cc: linux-crypto@vger.kernel.org,
-	Sebastian Siewior <sebastian@breakpoint.cc>
+Subject: [RFC] padlock aes, unification of setkey()
+Date: Sun, 24 Feb 2008 12:01:02 +0100
+Message-ID: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41750 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41754 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751846AbYBXLBI (ORCPT
+	by vger.kernel.org with ESMTP id S1751937AbYBXLBI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Sun, 24 Feb 2008 06:01:08 -0500
-In-Reply-To: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The key expansion routine could be get little more generic, become
-a kernel doc entry and then get exported.
+>From Sebastian Siewior <sebastian@breakpoint.cc> # This line is ignored.
+Subject: [RFC] padlock aes, unification of setkey()
 
-Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
----
- crypto/aes_generic.c |   56 +++++++++++++++++++++++++++++++++++++++++--------
- include/crypto/aes.h |    8 +++++-
- 2 files changed, 53 insertions(+), 11 deletions(-)
+Hello Herbert,
 
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index f33a99c..9322531 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -229,18 +229,29 @@ static void __init gen_tabs(void)
- 	ctx->key_enc[8 * i + 15] = t;			\
- } while (0)
- 
--int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+/**
-+ * crypto_aes_expand_key - Expands the AES key as described in FIPS-197
-+ * @ctx:	The location where the computed key will be stored.
-+ * @in_key:	The supplied key.
-+ * @key_len:	The length of the supplied key.
-+ *
-+ * Returns 0 on success. The function fails only if an invalid key size (or
-+ * pointer) is supplied.
-+ * The expanded key size is 240 bytes (max of 14 rounds with a unique 16 bytes
-+ * key schedule plus a 16 bytes key which is used before the first round).
-+ * The decryption key is prepared for the "Equivalent Inverse Cipher" as
-+ * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
-+ * for the initial combination, the second slot for the first round and so on.
-+ */
-+int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 		unsigned int key_len)
- {
--	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	const __le32 *key = (const __le32 *)in_key;
--	u32 *flags = &tfm->crt_flags;
- 	u32 i, t, u, v, w, j;
- 
--	if (key_len % 8) {
--		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
-+			key_len != AES_KEYSIZE_256)
- 		return -EINVAL;
--	}
- 
- 	ctx->key_length = key_len;
- 
-@@ -250,20 +261,20 @@ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	ctx->key_dec[key_len + 27] = ctx->key_enc[3] = le32_to_cpu(key[3]);
- 
- 	switch (key_len) {
--	case 16:
-+	case AES_KEYSIZE_128:
- 		t = ctx->key_enc[3];
- 		for (i = 0; i < 10; ++i)
- 			loop4(i);
- 		break;
- 
--	case 24:
-+	case AES_KEYSIZE_192:
- 		ctx->key_enc[4] = le32_to_cpu(key[4]);
- 		t = ctx->key_enc[5] = le32_to_cpu(key[5]);
- 		for (i = 0; i < 8; ++i)
- 			loop6(i);
- 		break;
- 
--	case 32:
-+	case AES_KEYSIZE_256:
- 		ctx->key_enc[4] = le32_to_cpu(key[4]);
- 		ctx->key_enc[5] = le32_to_cpu(key[5]);
- 		ctx->key_enc[6] = le32_to_cpu(key[6]);
-@@ -284,6 +295,33 @@ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	}
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(crypto_aes_expand_key);
-+
-+/**
-+ * crypto_aes_set_key - Set the AES key.
-+ * @tfm:	The %crypto_tfm that is used in the context.
-+ * @in_key:	The input key.
-+ * @key_len:	The size of the key.
-+ *
-+ * Returns 0 on success, on failure the %CRYPTO_TFM_RES_BAD_KEY_LEN flag in tfm
-+ * is set. The function uses crypto_aes_expand_key() to expand the key.
-+ * &crypto_aes_ctx _must_ be the private data embedded in @tfm which is
-+ * retrieved with crypto_tfm_ctx().
-+ */
-+int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+		unsigned int key_len)
-+{
-+	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 *flags = &tfm->crt_flags;
-+	int ret;
-+
-+	ret = crypto_aes_expand_key(ctx, in_key, key_len);
-+	if (!ret)
-+		return 0;
-+
-+	*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+	return -EINVAL;
-+}
- EXPORT_SYMBOL_GPL(crypto_aes_set_key);
- 
- /* encrypt a block of text */
-diff --git a/include/crypto/aes.h b/include/crypto/aes.h
-index d480b76..40008d6 100644
---- a/include/crypto/aes.h
-+++ b/include/crypto/aes.h
-@@ -14,11 +14,13 @@
- #define AES_KEYSIZE_192		24
- #define AES_KEYSIZE_256		32
- #define AES_BLOCK_SIZE		16
-+#define AES_MAX_KEYLENGTH	(15 * 16)
-+#define AES_MAX_KEYLENGTH_U32	(AES_MAX_KEYLENGTH / sizeof(u32))
- 
- struct crypto_aes_ctx {
- 	u32 key_length;
--	u32 key_enc[60];
--	u32 key_dec[60];
-+	u32 key_enc[AES_MAX_KEYLENGTH_U32];
-+	u32 key_dec[AES_MAX_KEYLENGTH_U32];
- };
- 
- extern u32 crypto_ft_tab[4][256];
-@@ -28,4 +30,6 @@ extern u32 crypto_il_tab[4][256];
- 
- int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 		unsigned int key_len);
-+int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+		unsigned int key_len);
- #endif
--- 
-1.5.3.7
+I sit on those two since November. Back then Michal dropped me an email
+and told me that he will test it and get back to me. This didn't happen
+so far.
+The binary format of the key was the same, the last time I checked, so
+the second patch could really work :)
+
+One thing I'm concerned about is the stack utilization. The initial
+version had a structure with 256 bytes on the stack. Mine has a bigger
+structure with 484 bytes. I'm not sure if it is better to dynamically
+allocate it, move it to the private key structure or pad the generic
+aes structure in order to enforce the required alignment.
+
+Sebastian
