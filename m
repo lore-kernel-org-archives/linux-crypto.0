@@ -1,72 +1,110 @@
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [2.6.25 patch] drivers/crypto/hifn_795x.c: fix 64bit division
-Date: Thu, 28 Feb 2008 10:02:44 +0200
-Message-ID: <20080228080244.GA29269@cs181133002.pp.htv.fi>
-References: <20080226122100.GB22699@deprecation.cyrius.com> <20080226153421.GB10717@cs181133002.pp.htv.fi> <20080226185240.GA2521@2ka.mipt.ru> <20080226160439.5941cc31.akpm@linux-foundation.org> <20080227062207.GB10603@cs181133002.pp.htv.fi> <20080226224719.6994a3bf.akpm@linux-foundation.org>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: [PATCH] [crypto] XTS: use proper alignment.
+Date: Sun, 2 Mar 2008 12:20:04 +0100
+Message-ID: <20080302112004.GA16659@Chamillionaire.breakpoint.cc>
+References: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc> <47C15AEC.5040705@the2masters.de> <20080224125117.GA17076@Chamillionaire.breakpoint.cc> <47C1CE67.70804@the2masters.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
-	Martin Michlmayr <tbm@cyrius.com>,
-	linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ralf Baechle <ralf@linux-mips.org>,
-	linux-crypto@vger.kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Stefan Hellermann <stefan@the2masters.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp4.pp.htv.fi ([213.243.153.38]:41943 "EHLO smtp4.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759137AbYB1ID5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Feb 2008 03:03:57 -0500
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:52944 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753501AbYCBLUH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 2 Mar 2008 06:20:07 -0500
 Content-Disposition: inline
-In-Reply-To: <20080226224719.6994a3bf.akpm@linux-foundation.org>
+In-Reply-To: <47C1CE67.70804@the2masters.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 26, 2008 at 10:47:19PM -0800, Andrew Morton wrote:
->...
-> Something like this:
+The XTS blockmode uses a copy of the IV which is saved on the stack
+and may or may not be properly aligned. If it is not, it will break
+hardware cipher like the geode or padlock.
+This patch moves the copy of IV to the private structre which has the
+same aligment as the underlying cipher.
 
-Generally agreed, but
+Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+---
+Stefan, please try the following patch, it should fix your xts problem.
 
-> --- a/include/linux/delay.h~a
-> +++ a/include/linux/delay.h
-> @@ -7,10 +7,12 @@
->   * Delay routines, using a pre-computed "loops_per_jiffy" value.
->   */
->  
-> -extern unsigned long loops_per_jiffy;
-> +#include <linux/kernel.h>
->  
->  #include <asm/delay.h>
->  
-> +extern unsigned long loops_per_jiffy;
-> +
->...
+ crypto/xts.c |   32 +++++++++++++++++---------------
+ 1 files changed, 17 insertions(+), 15 deletions(-)
 
-this part of your patch breaks m68k:
-
-<--  snip  -->
-
-...
-  CC      init/main.o
-In file included from 
-/home/bunk/linux/kernel-2.6/git/linux-2.6/include/linux/delay.h:12,
-                 from 
-/home/bunk/linux/kernel-2.6/git/linux-2.6/init/main.c:19:
-include2/asm/delay.h: In function '__const_udelay':
-include2/asm/delay.h:33: error: 'loops_per_jiffy' undeclared (first use in this function)
-include2/asm/delay.h:33: error: (Each undeclared identifier is reported only once
-include2/asm/delay.h:33: error: for each function it appears in.)
-make[2]: *** [init/main.o] Error 1
-
-<--  snip  -->
-
-cu
-Adrian
-
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 8eb08bf..4457022 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -24,7 +24,17 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/gf128mul.h>
+ 
++struct sinfo {
++	be128 t;
++	struct crypto_tfm *tfm;
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
++};
++
+ struct priv {
++	/* s.t being the first member in this struct enforces proper alignment
++	 * required by the underlying cipher without explicit knowing the it.
++	 */
++	struct sinfo s;
+ 	struct crypto_cipher *child;
+ 	struct crypto_cipher *tweak;
+ };
+@@ -76,12 +86,6 @@ static int setkey(struct crypto_tfm *parent, const u8 *key,
+ 	return 0;
+ }
+ 
+-struct sinfo {
+-	be128 t;
+-	struct crypto_tfm *tfm;
+-	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
+-};
+-
+ static inline void xts_round(struct sinfo *s, void *dst, const void *src)
+ {
+ 	be128_xor(dst, &s->t, src);		/* PP <- T xor P */
+@@ -97,13 +101,12 @@ static int crypt(struct blkcipher_desc *d,
+ 	int err;
+ 	unsigned int avail;
+ 	const int bs = crypto_cipher_blocksize(ctx->child);
+-	struct sinfo s = {
+-		.tfm = crypto_cipher_tfm(ctx->child),
+-		.fn = fn
+-	};
+-	be128 *iv;
+ 	u8 *wsrc;
+ 	u8 *wdst;
++	struct sinfo *s = &ctx->s;
++
++	s->tfm = crypto_cipher_tfm(ctx->child);
++	s->fn = fn;
+ 
+ 	err = blkcipher_walk_virt(d, w);
+ 	if (!w->nbytes)
+@@ -115,17 +118,16 @@ static int crypt(struct blkcipher_desc *d,
+ 	wdst = w->dst.virt.addr;
+ 
+ 	/* calculate first value of T */
+-	iv = (be128 *)w->iv;
+-	tw(crypto_cipher_tfm(ctx->tweak), (void *)&s.t, w->iv);
++	tw(crypto_cipher_tfm(ctx->tweak), (void *)&s->t, w->iv);
+ 
+ 	goto first;
+ 
+ 	for (;;) {
+ 		do {
+-			gf128mul_x_ble(&s.t, &s.t);
++			gf128mul_x_ble(&s->t, &s->t);
+ 
+ first:
+-			xts_round(&s, wdst, wsrc);
++			xts_round(s, wdst, wsrc);
+ 
+ 			wsrc += bs;
+ 			wdst += bs;
 -- 
+1.5.3.4
 
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
