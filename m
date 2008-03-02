@@ -1,34 +1,41 @@
-From: Stefan Hellermann <stefan@the2masters.de>
-Subject: Re: [PATCH] [crypto] XTS: use proper alignment.
-Date: Sun, 02 Mar 2008 15:04:29 +0100
-Message-ID: <47CAB3ED.4090802@the2masters.de>
-References: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc> <47C15AEC.5040705@the2masters.de> <20080224125117.GA17076@Chamillionaire.breakpoint.cc> <47C1CE67.70804@the2masters.de> <20080302112004.GA16659@Chamillionaire.breakpoint.cc> <47CA97D5.8090804@the2masters.de> <20080302132202.GB16659@Chamillionaire.breakpoint.cc> <47CAB084.6060607@the2masters.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] [PATCH] [crypto] LRW: use proper alignment.
+Date: Mon, 3 Mar 2008 00:23:19 +0800
+Message-ID: <20080302162319.GA23822@gondor.apana.org.au>
+References: <958c4032ba3b28931dea586d0338bf1ec1594659.1204465942.git.sebastian@breakpoint.cc> <1b5471b654eea02f82ccf0aad032fbbb951cbbc5.1204465942.git.sebastian@breakpoint.cc> <47CAB33E.2050207@the2masters.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Siewior <sebastian@breakpoint.cc>,
+	linux-crypto@vger.kernel.org
+To: Stefan Hellermann <stefan@the2masters.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp10.unit.tiscali.de ([213.205.33.46]:42929 "EHLO
-	smtp10.unit.tiscali.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751433AbYCBOEn (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:53508 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754004AbYCBQX1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 2 Mar 2008 09:04:43 -0500
-In-Reply-To: <47CAB084.6060607@the2masters.de>
+	Sun, 2 Mar 2008 11:23:27 -0500
+Content-Disposition: inline
+In-Reply-To: <47CAB33E.2050207@the2masters.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Sun, Mar 02, 2008 at 03:01:34PM +0100, Stefan Hellermann wrote:
+> Sebastian Siewior schrieb:
+> > The LRW blockmode uses a copy of the IV which is saved on the stack
+> > and may or may not be properly aligned. If it is not, it will break
+> > hardware cipher like the geode or padlock.
+> > This patch moves the copy of IV to the private structre which has the
+> > same aligment as the underlying cipher.
+> > Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
 > 
-> I tried lrw-benbi/lrw-plain this time, but it doesn't work, with or without padlock_aes.
-> dmesg logs:
-> device-mapper: table: 252:6: crypt: Error allocating crypto tfm
-> device-mapper: ioctl: error adding target to table
-> device-mapper: ioctl: device doesn't appear to be in the dev hash table
-> 
+> Tested-by: Stefan Hellermann <stefan@the2masters.de>
 
-forget this ... with CONFIG_CRYPTO_LRW unset it can't work. But with your new patch it
-works even with padlock_aes.
+Thanks Sebastian and Stefan!  I'll apply this for 2.6.25 and push
+it to stable as well.
 
-
-Thanks
-Stefan
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
