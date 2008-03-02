@@ -1,116 +1,34 @@
 From: Stefan Hellermann <stefan@the2masters.de>
-Subject: Re: [PATCH] [PATCH] [crypto] LRW: use proper alignment.
-Date: Sun, 02 Mar 2008 15:01:34 +0100
-Message-ID: <47CAB33E.2050207@the2masters.de>
-References: <958c4032ba3b28931dea586d0338bf1ec1594659.1204465942.git.sebastian@breakpoint.cc> <1b5471b654eea02f82ccf0aad032fbbb951cbbc5.1204465942.git.sebastian@breakpoint.cc>
+Subject: Re: [PATCH] [crypto] XTS: use proper alignment.
+Date: Sun, 02 Mar 2008 15:04:29 +0100
+Message-ID: <47CAB3ED.4090802@the2masters.de>
+References: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc> <47C15AEC.5040705@the2masters.de> <20080224125117.GA17076@Chamillionaire.breakpoint.cc> <47C1CE67.70804@the2masters.de> <20080302112004.GA16659@Chamillionaire.breakpoint.cc> <47CA97D5.8090804@the2masters.de> <20080302132202.GB16659@Chamillionaire.breakpoint.cc> <47CAB084.6060607@the2masters.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Sebastian Siewior <sebastian@breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp10.unit.tiscali.de ([213.205.33.46]:38571 "EHLO
+Received: from smtp10.unit.tiscali.de ([213.205.33.46]:42929 "EHLO
 	smtp10.unit.tiscali.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752294AbYCBOCY (ORCPT
+	with ESMTP id S1751433AbYCBOEn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 2 Mar 2008 09:02:24 -0500
-In-Reply-To: <1b5471b654eea02f82ccf0aad032fbbb951cbbc5.1204465942.git.sebastian@breakpoint.cc>
+	Sun, 2 Mar 2008 09:04:43 -0500
+In-Reply-To: <47CAB084.6060607@the2masters.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sebastian Siewior schrieb:
-> The LRW blockmode uses a copy of the IV which is saved on the stack
-> and may or may not be properly aligned. If it is not, it will break
-> hardware cipher like the geode or padlock.
-> This patch moves the copy of IV to the private structre which has the
-> same aligment as the underlying cipher.
-> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
-
-Tested-by: Stefan Hellermann <stefan@the2masters.de>
-
-> ---
->  crypto/lrw.c |   32 ++++++++++++++++++--------------
->  1 files changed, 18 insertions(+), 14 deletions(-)
 > 
-> diff --git a/crypto/lrw.c b/crypto/lrw.c
-> index 9d52e58..0c3ce3e 100644
-> --- a/crypto/lrw.c
-> +++ b/crypto/lrw.c
-> @@ -27,7 +27,17 @@
->  #include <crypto/b128ops.h>
->  #include <crypto/gf128mul.h>
->  
-> +struct sinfo {
-> +	be128 t;
-> +	struct crypto_tfm *tfm;
-> +	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
-> +};
-> +
->  struct priv {
-> +	/* s.t being the first member in this struct enforces proper alignment
-> +	 * required by the underlying cipher without explicit knowing the it.
-> +	 */
-> +	struct sinfo s;
->  	struct crypto_cipher *child;
->  	/* optimizes multiplying a random (non incrementing, as at the
->  	 * start of a new sector) value with key2, we could also have
-> @@ -83,12 +93,6 @@ static int setkey(struct crypto_tfm *parent, const u8 *key,
->  	return 0;
->  }
->  
-> -struct sinfo {
-> -	be128 t;
-> -	struct crypto_tfm *tfm;
-> -	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
-> -};
-> -
->  static inline void inc(be128 *iv)
->  {
->  	if (!(iv->b = cpu_to_be64(be64_to_cpu(iv->b) + 1)))
-> @@ -128,14 +132,14 @@ static int crypt(struct blkcipher_desc *d,
->  	int err;
->  	unsigned int avail;
->  	const int bs = crypto_cipher_blocksize(ctx->child);
-> -	struct sinfo s = {
-> -		.tfm = crypto_cipher_tfm(ctx->child),
-> -		.fn = fn
-> -	};
-> +	struct sinfo *s = &ctx->s;
->  	be128 *iv;
->  	u8 *wsrc;
->  	u8 *wdst;
->  
-> +	s->tfm = crypto_cipher_tfm(ctx->child);
-> +	s->fn = fn;
-> +
->  	err = blkcipher_walk_virt(d, w);
->  	if (!(avail = w->nbytes))
->  		return err;
-> @@ -145,10 +149,10 @@ static int crypt(struct blkcipher_desc *d,
->  
->  	/* calculate first value of T */
->  	iv = (be128 *)w->iv;
-> -	s.t = *iv;
-> +	s->t = *iv;
->  
->  	/* T <- I*Key2 */
-> -	gf128mul_64k_bbe(&s.t, ctx->table);
-> +	gf128mul_64k_bbe(&s->t, ctx->table);
->  
->  	goto first;
->  
-> @@ -156,11 +160,11 @@ static int crypt(struct blkcipher_desc *d,
->  		do {
->  			/* T <- I*Key2, using the optimization
->  			 * discussed in the specification */
-> -			be128_xor(&s.t, &s.t, &ctx->mulinc[get_index128(iv)]);
-> +			be128_xor(&s->t, &s->t, &ctx->mulinc[get_index128(iv)]);
->  			inc(iv);
->  
->  first:
-> -			lrw_round(&s, wdst, wsrc);
-> +			lrw_round(s, wdst, wsrc);
->  
->  			wsrc += bs;
->  			wdst += bs;
+> I tried lrw-benbi/lrw-plain this time, but it doesn't work, with or without padlock_aes.
+> dmesg logs:
+> device-mapper: table: 252:6: crypt: Error allocating crypto tfm
+> device-mapper: ioctl: error adding target to table
+> device-mapper: ioctl: device doesn't appear to be in the dev hash table
+> 
+
+forget this ... with CONFIG_CRYPTO_LRW unset it can't work. But with your new patch it
+works even with padlock_aes.
+
+
+Thanks
+Stefan
