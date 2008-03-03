@@ -1,456 +1,161 @@
 From: Jan Glauber <jang@linux.vnet.ibm.com>
-Subject: [PATCH 1/4] generic sha_update and sha_final for s390
-Date: Mon, 03 Mar 2008 17:19:43 +0100
-Message-ID: <1204561183.6025.51.camel@localhost.localdomain>
+Subject: [PATCH 3/4] sha384 hardware acceleration for s390
+Date: Mon, 03 Mar 2008 17:19:47 +0100
+Message-ID: <1204561187.6025.53.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mtagate2.de.ibm.com ([195.212.29.151]:59651 "EHLO
-	mtagate2.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754504AbYCCQUB (ORCPT
+Received: from mtagate8.de.ibm.com ([195.212.29.157]:9169 "EHLO
+	mtagate8.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755589AbYCCQUS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Mar 2008 11:20:01 -0500
+	Mon, 3 Mar 2008 11:20:18 -0500
 Received: from d12nrmr1607.megacenter.de.ibm.com (d12nrmr1607.megacenter.de.ibm.com [9.149.167.49])
-	by mtagate2.de.ibm.com (8.13.8/8.13.8) with ESMTP id m23GJt35091382
-	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 16:19:55 GMT
+	by mtagate8.de.ibm.com (8.13.8/8.13.8) with ESMTP id m23GKHjC024866
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 16:20:17 GMT
 Received: from d12av02.megacenter.de.ibm.com (d12av02.megacenter.de.ibm.com [9.149.165.228])
-	by d12nrmr1607.megacenter.de.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id m23GJbjx1134806
-	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 17:19:38 +0100
+	by d12nrmr1607.megacenter.de.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id m23GJgZT475336
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 17:19:44 +0100
 Received: from d12av02.megacenter.de.ibm.com (loopback [127.0.0.1])
-	by d12av02.megacenter.de.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id m23GJb5Q019640
-	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 16:19:37 GMT
+	by d12av02.megacenter.de.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id m23GJfDB019726
+	for <linux-crypto@vger.kernel.org>; Mon, 3 Mar 2008 16:19:42 GMT
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The sha_{update|final} functions are similar for every sha variant.
-Since that is error-prone and redundant replace these functions by
-a shared generic implementation for s390.
+Exploit the System z10 hardware acceleration for SHA384.
 
 Signed-off-by: Jan Glauber <jang@linux.vnet.ibm.com>
 ---
- arch/s390/crypto/Makefile      |    4 -
- arch/s390/crypto/sha.h         |   34 +++++++++++++++
- arch/s390/crypto/sha1_s390.c   |   91 ++---------------------------------------
- arch/s390/crypto/sha256_s390.c |   90 ++--------------------------------------
- arch/s390/crypto/sha_common.c  |   90 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 138 insertions(+), 171 deletions(-)
+ arch/s390/crypto/sha512_s390.c |   57 +++++++++++++++++++++++++++++++++++------
+ drivers/crypto/Kconfig         |    6 ++--
+ 2 files changed, 54 insertions(+), 9 deletions(-)
 
-Index: cryptodev-2.6/arch/s390/crypto/Makefile
+Index: cryptodev-2.6/drivers/crypto/Kconfig
 ===================================================================
---- cryptodev-2.6.orig/arch/s390/crypto/Makefile
-+++ cryptodev-2.6/arch/s390/crypto/Makefile
-@@ -2,8 +2,8 @@
- # Cryptographic API
- #
+--- cryptodev-2.6.orig/drivers/crypto/Kconfig
++++ cryptodev-2.6/drivers/crypto/Kconfig
+@@ -101,7 +101,7 @@ config CRYPTO_SHA256_S390
+ 	  security against collision attacks.
  
--obj-$(CONFIG_CRYPTO_SHA1_S390) += sha1_s390.o
--obj-$(CONFIG_CRYPTO_SHA256_S390) += sha256_s390.o
-+obj-$(CONFIG_CRYPTO_SHA1_S390) += sha1_s390.o sha_common.o
-+obj-$(CONFIG_CRYPTO_SHA256_S390) += sha256_s390.o sha_common.o
- obj-$(CONFIG_CRYPTO_DES_S390) += des_s390.o des_check_key.o
- obj-$(CONFIG_CRYPTO_AES_S390) += aes_s390.o
- obj-$(CONFIG_S390_PRNG) += prng.o
-Index: cryptodev-2.6/arch/s390/crypto/sha.h
+ config CRYPTO_SHA512_S390
+-	tristate "SHA512 digest algorithm"
++	tristate "SHA384 and SHA512 digest algorithm"
+ 	depends on S390
+ 	select CRYPTO_ALGAPI
+ 	help
+@@ -109,7 +109,9 @@ config CRYPTO_SHA512_S390
+ 	  SHA512 secure hash standard.
+ 
+ 	  This version of SHA implements a 512 bit hash with 256 bits of
+-	  security against collision attacks.
++	  security against collision attacks. The code also includes SHA-384,
++	  a 384 bit hash with 192 bits of security against collision attacks.
++
+ 
+ config CRYPTO_DES_S390
+ 	tristate "DES and Triple DES cipher algorithms"
+Index: cryptodev-2.6/arch/s390/crypto/sha512_s390.c
 ===================================================================
---- /dev/null
-+++ cryptodev-2.6/arch/s390/crypto/sha.h
-@@ -0,0 +1,34 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * s390 generic implementation of the SHA Secure Hash Algorithms.
-+ *
-+ * Copyright IBM Corp. 2007
-+ * Author(s): Jan Glauber (jang@de.ibm.com)
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#ifndef _CRYPTO_ARCH_S390_SHA_H
-+#define _CRYPTO_ARCH_S390_SHA_H
+--- cryptodev-2.6.orig/arch/s390/crypto/sha512_s390.c
++++ cryptodev-2.6/arch/s390/crypto/sha512_s390.c
+@@ -1,7 +1,7 @@
+ /*
+  * Cryptographic API.
+  *
+- * s390 implementation of the SHA512 Secure Hash Algorithm.
++ * s390 implementation of the SHA512 and SHA38 Secure Hash Algorithm.
+  *
+  * Copyright IBM Corp. 2007
+  * Author(s): Jan Glauber (jang@de.ibm.com)
+@@ -35,7 +35,7 @@ static void sha512_init(struct crypto_tf
+ 	ctx->func = KIMD_SHA_512;
+ }
+ 
+-static struct crypto_alg alg = {
++static struct crypto_alg sha512_alg = {
+ 	.cra_name	=	"sha512",
+ 	.cra_driver_name =	"sha512-s390",
+ 	.cra_priority	=	CRYPT_S390_PRIORITY,
+@@ -43,7 +43,7 @@ static struct crypto_alg alg = {
+ 	.cra_blocksize	=	SHA512_BLOCK_SIZE,
+ 	.cra_ctxsize	=	sizeof(struct s390_sha_ctx),
+ 	.cra_module	=	THIS_MODULE,
+-	.cra_list	=	LIST_HEAD_INIT(alg.cra_list),
++	.cra_list	=	LIST_HEAD_INIT(sha512_alg.cra_list),
+ 	.cra_u		=	{ .digest = {
+ 	.dia_digestsize	=	SHA512_DIGEST_SIZE,
+ 	.dia_init	=	sha512_init,
+@@ -51,21 +51,64 @@ static struct crypto_alg alg = {
+ 	.dia_final	=	s390_sha_final } }
+ };
+ 
++MODULE_ALIAS("sha512");
 +
-+#include <linux/crypto.h>
-+#include <crypto/sha.h>
++static void sha384_init(struct crypto_tfm *tfm)
++{
++	struct s390_sha_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+/* must be big enough for the largest SHA variant */
-+#define SHA_MAX_BLOCK_SIZE      SHA256_BLOCK_SIZE
++	*(__u64 *)&ctx->state[0] = 0xcbbb9d5dc1059ed8ULL;
++	*(__u64 *)&ctx->state[2] = 0x629a292a367cd507ULL;
++	*(__u64 *)&ctx->state[4] = 0x9159015a3070dd17ULL;
++	*(__u64 *)&ctx->state[6] = 0x152fecd8f70e5939ULL;
++	*(__u64 *)&ctx->state[8] = 0x67332667ffc00b31ULL;
++	*(__u64 *)&ctx->state[10] = 0x8eb44a8768581511ULL;
++	*(__u64 *)&ctx->state[12] = 0xdb0c2e0d64f98fa7ULL;
++	*(__u64 *)&ctx->state[14] = 0x47b5481dbefa4fa4ULL;
++	ctx->count = 0;
++	ctx->func = KIMD_SHA_512;
++}
 +
-+struct s390_sha_ctx {
-+	u64 count;              /* message length in bytes */
-+	u32 state[8];
-+	u8 buf[2 * SHA_MAX_BLOCK_SIZE];
-+	int func;		/* KIMD function to use */
++static struct crypto_alg sha384_alg = {
++	.cra_name	=	"sha384",
++	.cra_driver_name =	"sha384-s390",
++	.cra_priority	=	CRYPT_S390_PRIORITY,
++	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
++	.cra_blocksize	=	SHA384_BLOCK_SIZE,
++	.cra_ctxsize	=	sizeof(struct s390_sha_ctx),
++	.cra_module	=	THIS_MODULE,
++	.cra_list	=	LIST_HEAD_INIT(sha384_alg.cra_list),
++	.cra_u		=	{ .digest = {
++	.dia_digestsize	=	SHA384_DIGEST_SIZE,
++	.dia_init	=	sha384_init,
++	.dia_update	=	s390_sha_update,
++	.dia_final	=	s390_sha_final } }
 +};
 +
-+void s390_sha_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len);
-+void s390_sha_final(struct crypto_tfm *tfm, u8 *out);
++MODULE_ALIAS("sha384");
 +
-+#endif
-Index: cryptodev-2.6/arch/s390/crypto/sha1_s390.c
-===================================================================
---- cryptodev-2.6.orig/arch/s390/crypto/sha1_s390.c
-+++ cryptodev-2.6/arch/s390/crypto/sha1_s390.c
-@@ -29,16 +29,11 @@
- #include <crypto/sha.h>
- 
- #include "crypt_s390.h"
--
--struct s390_sha1_ctx {
--	u64 count;		/* message length */
--	u32 state[5];
--	u8 buf[2 * SHA1_BLOCK_SIZE];
--};
-+#include "sha.h"
- 
- static void sha1_init(struct crypto_tfm *tfm)
- {
--	struct s390_sha1_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct s390_sha_ctx *sctx = crypto_tfm_ctx(tfm);
- 
- 	sctx->state[0] = SHA1_H0;
- 	sctx->state[1] = SHA1_H1;
-@@ -46,79 +41,7 @@ static void sha1_init(struct crypto_tfm 
- 	sctx->state[3] = SHA1_H3;
- 	sctx->state[4] = SHA1_H4;
- 	sctx->count = 0;
--}
--
--static void sha1_update(struct crypto_tfm *tfm, const u8 *data,
--			unsigned int len)
--{
--	struct s390_sha1_ctx *sctx = crypto_tfm_ctx(tfm);
--	unsigned int index;
--	int ret;
--
--	/* how much is already in the buffer? */
--	index = sctx->count & 0x3f;
--
--	sctx->count += len;
--
--	if (index + len < SHA1_BLOCK_SIZE)
--		goto store;
--
--	/* process one stored block */
--	if (index) {
--		memcpy(sctx->buf + index, data, SHA1_BLOCK_SIZE - index);
--		ret = crypt_s390_kimd(KIMD_SHA_1, sctx->state, sctx->buf,
--				      SHA1_BLOCK_SIZE);
--		BUG_ON(ret != SHA1_BLOCK_SIZE);
--		data += SHA1_BLOCK_SIZE - index;
--		len -= SHA1_BLOCK_SIZE - index;
--	}
--
--	/* process as many blocks as possible */
--	if (len >= SHA1_BLOCK_SIZE) {
--		ret = crypt_s390_kimd(KIMD_SHA_1, sctx->state, data,
--				      len & ~(SHA1_BLOCK_SIZE - 1));
--		BUG_ON(ret != (len & ~(SHA1_BLOCK_SIZE - 1)));
--		data += ret;
--		len -= ret;
--	}
--
--store:
--	/* anything left? */
--	if (len)
--		memcpy(sctx->buf + index , data, len);
--}
--
--/* Add padding and return the message digest. */
--static void sha1_final(struct crypto_tfm *tfm, u8 *out)
--{
--	struct s390_sha1_ctx *sctx = crypto_tfm_ctx(tfm);
--	u64 bits;
--	unsigned int index, end;
--	int ret;
--
--	/* must perform manual padding */
--	index = sctx->count & 0x3f;
--	end =  (index < 56) ? SHA1_BLOCK_SIZE : (2 * SHA1_BLOCK_SIZE);
--
--	/* start pad with 1 */
--	sctx->buf[index] = 0x80;
--
--	/* pad with zeros */
--	index++;
--	memset(sctx->buf + index, 0x00, end - index - 8);
--
--	/* append message length */
--	bits = sctx->count * 8;
--	memcpy(sctx->buf + end - 8, &bits, sizeof(bits));
--
--	ret = crypt_s390_kimd(KIMD_SHA_1, sctx->state, sctx->buf, end);
--	BUG_ON(ret != end);
--
--	/* copy digest to out */
--	memcpy(out, sctx->state, SHA1_DIGEST_SIZE);
--
--	/* wipe context */
--	memset(sctx, 0, sizeof *sctx);
-+	sctx->func = KIMD_SHA_1;
- }
- 
- static struct crypto_alg alg = {
-@@ -127,21 +50,20 @@ static struct crypto_alg alg = {
- 	.cra_priority	=	CRYPT_S390_PRIORITY,
- 	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
- 	.cra_blocksize	=	SHA1_BLOCK_SIZE,
--	.cra_ctxsize	=	sizeof(struct s390_sha1_ctx),
-+	.cra_ctxsize	=	sizeof(struct s390_sha_ctx),
- 	.cra_module	=	THIS_MODULE,
- 	.cra_list	=	LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u		=	{ .digest = {
- 	.dia_digestsize	=	SHA1_DIGEST_SIZE,
- 	.dia_init	=	sha1_init,
--	.dia_update	=	sha1_update,
--	.dia_final	=	sha1_final } }
-+	.dia_update	=	s390_sha_update,
-+	.dia_final	=	s390_sha_final } }
- };
- 
  static int __init init(void)
  {
- 	if (!crypt_s390_func_available(KIMD_SHA_1))
++	int ret;
++
+ 	if (!crypt_s390_func_available(KIMD_SHA_512))
  		return -EOPNOTSUPP;
--
- 	return crypto_register_alg(&alg);
+-	return crypto_register_alg(&alg);
++	if ((ret = crypto_register_alg(&sha512_alg)) < 0)
++		goto out;
++	if ((ret = crypto_register_alg(&sha384_alg)) < 0)
++		crypto_unregister_alg(&sha512_alg);
++out:
++	return ret;
  }
  
-@@ -154,6 +76,5 @@ module_init(init);
- module_exit(fini);
- 
- MODULE_ALIAS("sha1");
--
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
-Index: cryptodev-2.6/arch/s390/crypto/sha256_s390.c
-===================================================================
---- cryptodev-2.6.orig/arch/s390/crypto/sha256_s390.c
-+++ cryptodev-2.6/arch/s390/crypto/sha256_s390.c
-@@ -22,16 +22,11 @@
- #include <crypto/sha.h>
- 
- #include "crypt_s390.h"
--
--struct s390_sha256_ctx {
--	u64 count;		/* message length */
--	u32 state[8];
--	u8 buf[2 * SHA256_BLOCK_SIZE];
--};
-+#include "sha.h"
- 
- static void sha256_init(struct crypto_tfm *tfm)
+ static void __exit fini(void)
  {
--	struct s390_sha256_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct s390_sha_ctx *sctx = crypto_tfm_ctx(tfm);
- 
- 	sctx->state[0] = SHA256_H0;
- 	sctx->state[1] = SHA256_H1;
-@@ -42,79 +37,7 @@ static void sha256_init(struct crypto_tf
- 	sctx->state[6] = SHA256_H6;
- 	sctx->state[7] = SHA256_H7;
- 	sctx->count = 0;
--}
--
--static void sha256_update(struct crypto_tfm *tfm, const u8 *data,
--			  unsigned int len)
--{
--	struct s390_sha256_ctx *sctx = crypto_tfm_ctx(tfm);
--	unsigned int index;
--	int ret;
--
--	/* how much is already in the buffer? */
--	index = sctx->count & 0x3f;
--
--	sctx->count += len;
--
--	if ((index + len) < SHA256_BLOCK_SIZE)
--		goto store;
--
--	/* process one stored block */
--	if (index) {
--		memcpy(sctx->buf + index, data, SHA256_BLOCK_SIZE - index);
--		ret = crypt_s390_kimd(KIMD_SHA_256, sctx->state, sctx->buf,
--				      SHA256_BLOCK_SIZE);
--		BUG_ON(ret != SHA256_BLOCK_SIZE);
--		data += SHA256_BLOCK_SIZE - index;
--		len -= SHA256_BLOCK_SIZE - index;
--	}
--
--	/* process as many blocks as possible */
--	if (len >= SHA256_BLOCK_SIZE) {
--		ret = crypt_s390_kimd(KIMD_SHA_256, sctx->state, data,
--				      len & ~(SHA256_BLOCK_SIZE - 1));
--		BUG_ON(ret != (len & ~(SHA256_BLOCK_SIZE - 1)));
--		data += ret;
--		len -= ret;
--	}
--
--store:
--	/* anything left? */
--	if (len)
--		memcpy(sctx->buf + index , data, len);
--}
--
--/* Add padding and return the message digest */
--static void sha256_final(struct crypto_tfm *tfm, u8 *out)
--{
--	struct s390_sha256_ctx *sctx = crypto_tfm_ctx(tfm);
--	u64 bits;
--	unsigned int index, end;
--	int ret;
--
--	/* must perform manual padding */
--	index = sctx->count & 0x3f;
--	end = (index < 56) ? SHA256_BLOCK_SIZE : (2 * SHA256_BLOCK_SIZE);
--
--	/* start pad with 1 */
--	sctx->buf[index] = 0x80;
--
--	/* pad with zeros */
--	index++;
--	memset(sctx->buf + index, 0x00, end - index - 8);
--
--	/* append message length */
--	bits = sctx->count * 8;
--	memcpy(sctx->buf + end - 8, &bits, sizeof(bits));
--
--	ret = crypt_s390_kimd(KIMD_SHA_256, sctx->state, sctx->buf, end);
--	BUG_ON(ret != end);
--
--	/* copy digest to out */
--	memcpy(out, sctx->state, SHA256_DIGEST_SIZE);
--
--	/* wipe context */
--	memset(sctx, 0, sizeof *sctx);
-+	sctx->func = KIMD_SHA_256;
+-	crypto_unregister_alg(&alg);
++	crypto_unregister_alg(&sha512_alg);
++	crypto_unregister_alg(&sha384_alg);
  }
  
- static struct crypto_alg alg = {
-@@ -123,14 +46,14 @@ static struct crypto_alg alg = {
- 	.cra_priority	=	CRYPT_S390_PRIORITY,
- 	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
- 	.cra_blocksize	=	SHA256_BLOCK_SIZE,
--	.cra_ctxsize	=	sizeof(struct s390_sha256_ctx),
-+	.cra_ctxsize	=	sizeof(struct s390_sha_ctx),
- 	.cra_module	=	THIS_MODULE,
- 	.cra_list	=	LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u		=	{ .digest = {
- 	.dia_digestsize	=	SHA256_DIGEST_SIZE,
- 	.dia_init	=	sha256_init,
--	.dia_update	=	sha256_update,
--	.dia_final	=	sha256_final } }
-+	.dia_update	=	s390_sha_update,
-+	.dia_final	=	s390_sha_final } }
- };
- 
- static int init(void)
-@@ -150,6 +73,5 @@ module_init(init);
+ module_init(init);
  module_exit(fini);
  
- MODULE_ALIAS("sha256");
--
+-MODULE_ALIAS("sha512");
  MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm");
-Index: cryptodev-2.6/arch/s390/crypto/sha_common.c
-===================================================================
---- /dev/null
-+++ cryptodev-2.6/arch/s390/crypto/sha_common.c
-@@ -0,0 +1,90 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * s390 generic implementation of the SHA Secure Hash Algorithms.
-+ *
-+ * Copyright IBM Corp. 2007
-+ * Author(s): Jan Glauber (jang@de.ibm.com)
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#include <linux/crypto.h>
-+#include "sha.h"
-+#include "crypt_s390.h"
-+
-+void s390_sha_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
-+{
-+	struct s390_sha_ctx *ctx = crypto_tfm_ctx(tfm);
-+	unsigned int bsize = crypto_tfm_alg_blocksize(tfm);
-+	unsigned int index;
-+	int ret;
-+
-+	/* how much is already in the buffer? */
-+	index = ctx->count & (bsize - 1);
-+	ctx->count += len;
-+
-+	if ((index + len) < bsize)
-+		goto store;
-+
-+	/* process one stored block */
-+	if (index) {
-+		memcpy(ctx->buf + index, data, bsize - index);
-+		ret = crypt_s390_kimd(ctx->func, ctx->state, ctx->buf, bsize);
-+		BUG_ON(ret != bsize);
-+		data += bsize - index;
-+		len -= bsize - index;
-+	}
-+
-+	/* process as many blocks as possible */
-+	if (len >= bsize) {
-+		ret = crypt_s390_kimd(ctx->func, ctx->state, data,
-+				      len & ~(bsize - 1));
-+		BUG_ON(ret != (len & ~(bsize - 1)));
-+		data += ret;
-+		len -= ret;
-+	}
-+store:
-+	if (len)
-+		memcpy(ctx->buf + index , data, len);
-+}
-+EXPORT_SYMBOL_GPL(s390_sha_update);
-+
-+void s390_sha_final(struct crypto_tfm *tfm, u8 *out)
-+{
-+	struct s390_sha_ctx *ctx = crypto_tfm_ctx(tfm);
-+	unsigned int bsize = crypto_tfm_alg_blocksize(tfm);
-+	u64 bits;
-+	unsigned int index, end;
-+	int ret;
-+
-+	/* must perform manual padding */
-+	index = ctx->count & (bsize - 1);
-+	end = (index < bsize - 8) ? bsize : (2 * bsize);
-+
-+	/* start pad with 1 */
-+	ctx->buf[index] = 0x80;
-+	index++;
-+
-+	/* pad with zeros */
-+	memset(ctx->buf + index, 0x00, end - index - 8);
-+
-+	bits = ctx->count * 8;
-+	memcpy(ctx->buf + end - 8, &bits, sizeof(bits));
-+
-+	ret = crypt_s390_kimd(ctx->func, ctx->state, ctx->buf, end);
-+	BUG_ON(ret != end);
-+
-+	/* copy digest to out */
-+	memcpy(out, ctx->state, crypto_hash_digestsize(crypto_hash_cast(tfm)));
-+	/* wipe context */
-+	memset(ctx, 0, sizeof *ctx);
-+}
-+EXPORT_SYMBOL_GPL(s390_sha_final);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("s390 SHA cipher common functions");
+-MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm");
++MODULE_DESCRIPTION("SHA512 and SHA-384 Secure Hash Algorithm");
 
 
