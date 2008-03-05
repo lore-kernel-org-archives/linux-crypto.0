@@ -1,59 +1,41 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] [crypto] XTS: use proper alignment.
-Date: Wed, 5 Mar 2008 12:46:52 +0100
-Message-ID: <20080305114652.GA18070@Chamillionaire.breakpoint.cc>
-References: <20080302135135.GC16659@Chamillionaire.breakpoint.cc> <958c4032ba3b28931dea586d0338bf1ec1594659.1204465942.git.sebastian@breakpoint.cc> <20080305111602.GB27552@gondor.apana.org.au>
+Date: Wed, 5 Mar 2008 19:52:03 +0800
+Message-ID: <20080305115203.GA28021@gondor.apana.org.au>
+References: <20080302135135.GC16659@Chamillionaire.breakpoint.cc> <958c4032ba3b28931dea586d0338bf1ec1594659.1204465942.git.sebastian@breakpoint.cc> <20080305111602.GB27552@gondor.apana.org.au> <20080305114652.GA18070@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	Stefan Hellermann <stefan@the2masters.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48022 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759677AbYCELqy (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:56002 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1763518AbYCELwF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Mar 2008 06:46:54 -0500
+	Wed, 5 Mar 2008 06:52:05 -0500
 Content-Disposition: inline
-In-Reply-To: <20080305111602.GB27552@gondor.apana.org.au>
+In-Reply-To: <20080305114652.GA18070@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Herbert Xu | 2008-03-05 19:16:02 [+0800]:
+On Wed, Mar 05, 2008 at 12:46:52PM +0100, Sebastian Siewior wrote:
+>
+> I'm not sure if we are allowed to modify the IV or if it should
+> remain untouched. If it is possible to modify it, I could encrypt it
+> inplace and save two memcpy().
+> I will check this tonight.
 
->> +struct sinfo {
->> +	be128 t;
->> +	struct crypto_tfm *tfm;
->> +	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
->> +};
->> +
->>  struct priv {
->> +	/* s.t being the first member in this struct enforces proper alignment
->> +	 * required by the underlying cipher without explicit knowing the it.
->> +	 */
->> +	struct sinfo s;
->
->tfm objects should be reentrant so you can't store any per-op
->info in the context structure.
-I could also do kmalloc(), align() and kfree() after encrypt but this
-was faster.
+I just had a quick look and it seems that you should be able to
+store the result in the IV.
 
->
->> -	tw(crypto_cipher_tfm(ctx->tweak), (void *)&s.t, w->iv);
->> +	tw(crypto_cipher_tfm(ctx->tweak), (void *)&s->t, w->iv);
->
->However, the real question is why do we need this at all? The
->tw argument should be using the proper entry points that do
->copying for you if necessary.
->
->OK, I see that the issue is that we're using cia_encrypt instead
->of cit_encrypt_one.  So if we just change that then it should work
->correctly.
-I'm not sure if we are allowed to modify the IV or if it should
-remain untouched. If it is possible to modify it, I could encrypt it
-inplace and save two memcpy().
-I will check this tonight.
+However this won't work for LRW since we need the IV to increment
+it.  But then again LRW seems to be fine as it is since its
+arguments are already aligned by the blkcipher walker.
 
->
->Cheers,
-Sebastian
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
