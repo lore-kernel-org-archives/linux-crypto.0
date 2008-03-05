@@ -1,30 +1,77 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH] [crypto] XTS: use proper alignment.
-Date: Wed, 5 Mar 2008 17:37:53 +0100
-Message-ID: <20080305163753.GA20787@Chamillionaire.breakpoint.cc>
-References: <20080302135135.GC16659@Chamillionaire.breakpoint.cc> <958c4032ba3b28931dea586d0338bf1ec1594659.1204465942.git.sebastian@breakpoint.cc> <20080305111602.GB27552@gondor.apana.org.au> <20080305114652.GA18070@Chamillionaire.breakpoint.cc> <20080305115203.GA28021@gondor.apana.org.au> <20080305120153.GA18425@Chamillionaire.breakpoint.cc> <47CEA7F5.2080700@the2masters.de>
-Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Stefan Hellermann <stefan@the2masters.de>
+From: Joy Latten <latten@austin.ibm.com>
+Subject: kernel crashes when using aes-xcbc-mac with IPsec
+Date: Wed, 5 Mar 2008 14:19:21 -0600
+Message-ID: <200803052019.m25KJLlF018029@faith.austin.ibm.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:54215 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753533AbYCEQhz (ORCPT
+Received: from e36.co.us.ibm.com ([32.97.110.154]:58011 "EHLO
+	e36.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753239AbYCEUW0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Mar 2008 11:37:55 -0500
-Content-Disposition: inline
-In-Reply-To: <47CEA7F5.2080700@the2masters.de>
+	Wed, 5 Mar 2008 15:22:26 -0500
+Received: from d03relay04.boulder.ibm.com (d03relay04.boulder.ibm.com [9.17.195.106])
+	by e36.co.us.ibm.com (8.13.8/8.13.8) with ESMTP id m25KMLI5031989
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 15:22:21 -0500
+Received: from d03av02.boulder.ibm.com (d03av02.boulder.ibm.com [9.17.195.168])
+	by d03relay04.boulder.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id m25KMKWM158850
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 13:22:20 -0700
+Received: from d03av02.boulder.ibm.com (loopback [127.0.0.1])
+	by d03av02.boulder.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id m25KMKTF006230
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 13:22:20 -0700
+Received: from austin.ibm.com (netmail1.austin.ibm.com [9.41.248.175])
+	by d03av02.boulder.ibm.com (8.12.11.20060308/8.12.11) with ESMTP id m25KMK6E006202
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 13:22:20 -0700
+Received: from faith.austin.ibm.com (faith.austin.ibm.com [9.53.40.35])
+	by austin.ibm.com (8.13.8/8.12.10) with ESMTP id m25KMKF6031602
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 14:22:20 -0600
+Received: from faith.austin.ibm.com (localhost.localdomain [127.0.0.1])
+	by faith.austin.ibm.com (8.13.4/8.12.8) with ESMTP id m25KJMLv018030
+	for <linux-crypto@vger.kernel.org>; Wed, 5 Mar 2008 14:19:22 -0600
+Received: (from jml@localhost)
+	by faith.austin.ibm.com (8.13.4/8.13.4/Submit) id m25KJLlF018029
+	for linux-crypto@vger.kernel.org; Wed, 5 Mar 2008 14:19:21 -0600
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Stefan Hellermann | 2008-03-05 15:02:29 [+0100]:
+Resending since I typed incorrect email address.
 
->I think it crashed one time, but I haven't really tried using LRW since XTS is said to
->provide better security. Now I'm not able to reproduce the crash, it works with vanilla
->2.6.25-rc4.
-Okey, I drop the LRW patch and provide only a XTS fix.
+When using aes-xcbc-mac for authentication in IPsec, 
+the kernel crashes. It seems this algorithm doesn't 
+account for the space IPsec may make in scatterlist for authtag.
+Thus when crypto_xcbc_digest_update2() gets called,
+nbytes may be less than sg[i].length. 
+Since nbytes is an unsigned number, it wraps
+at the end of the loop allowing us to go back 
+into loop when we shouldn't. 
 
-Sebastian
+I used update function in digest.c to model this fix.
+Please let me know if it looks ok.
+
+regards,
+Joy 
+
+Signed-off-by: Joy Latten <latten@austin.ibm.com>
+
+diff -urpN net-2.6.26/crypto/xcbc.c net-2.6.26.patch/crypto/xcbc.c
+--- net-2.6.26/crypto/xcbc.c	2008-03-04 16:11:32.000000000 -0600
++++ net-2.6.26.patch/crypto/xcbc.c	2008-03-04 18:28:51.000000000 -0600
+@@ -124,6 +124,11 @@ static int crypto_xcbc_digest_update2(st
+ 		unsigned int offset = sg[i].offset;
+ 		unsigned int slen = sg[i].length;
+ 
++		if (unlikely(slen > nbytes))
++			slen = nbytes;
++
++		nbytes -= slen;
++
+ 		while (slen > 0) {
+ 			unsigned int len = min(slen, ((unsigned int)(PAGE_SIZE)) - offset);
+ 			char *p = crypto_kmap(pg, 0) + offset;
+@@ -177,7 +182,6 @@ static int crypto_xcbc_digest_update2(st
+ 			offset = 0;
+ 			pg++;
+ 		}
+-		nbytes-=sg[i].length;
+ 		i++;
+ 	} while (nbytes>0);
+ 
