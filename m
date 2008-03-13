@@ -1,56 +1,55 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: RE: Test AES-CCM mode via IPSec (NETKEY)
-Date: Thu, 13 Mar 2008 10:34:32 -0700
-Message-ID: <0CA0A16855646F4FA96D25A158E299D6043753E4@SDCEXCHANGE01.ad.amcc.com>
-References: <E1JSQiw-0002dT-00@gondolin.me.apana.org.au>
+From: "Loc Ho" <locnho@sbcglobal.net>
+Subject: RE: [PATCH 1/1] CryptoAPI: Add Async Hash Support
+Date: Thu, 13 Mar 2008 10:39:32 -0700
+Message-ID: <008401c88531$331f7350$a820420a@amcc.com>
+References: <20080117112314.GC9020@gondor.apana.org.au> <001c01c85937$ff3313f0$5c05420a@amcc.com> <20080117202735.GA22733@Chamillionaire.breakpoint.cc> <0CA0A16855646F4FA96D25A158E299D603FCC4D7@SDCEXCHANGE01.ad.amcc.com> <20080118230721.GA30470@Chamillionaire.breakpoint.cc> <002301c85c96$32a67a40$5c05420a@amcc.com> <20080122231818.GB6920@Chamillionaire.breakpoint.cc> <002d01c85d66$11e1d7c0$5c05420a@amcc.com> <004601c85ecd$1eb53d80$5c05420a@amcc.com> <004a01c85efc$56f2ee70$5c05420a@amcc.com> <20080313114230.GC8393@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: <linux-crypto@vger.kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>,
+	"'Sebastian Siewior'" <linux-crypto@ml.breakpoint.cc>
+To: "'Herbert Xu'" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail01-ext1.amcc.com ([198.137.200.72]:45164 "EHLO
-	sdcmail01.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754033AbYCMRoE convert rfc822-to-8bit (ORCPT
+Received: from smtp116.sbc.mail.sp1.yahoo.com ([69.147.64.89]:45738 "HELO
+	smtp116.sbc.mail.sp1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1752174AbYCMRqK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Mar 2008 13:44:04 -0400
-Content-class: urn:content-classes:message
-In-Reply-To: <E1JSQiw-0002dT-00@gondolin.me.apana.org.au>
+	Thu, 13 Mar 2008 13:46:10 -0400
+In-Reply-To: <20080313114230.GC8393@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+ Hi,
 
-I had tried this and it works after I manual performed the patch to
-iproute2.
+Okay... Don't forget the async digest patch (separate email) as well. Is
+there a reason why we still need the "async crypto deamon"?
 
-It is possible to use program "ip" to setup algorithm non-combined mode,
-such as "authenc(cbc(aes),hmac(md5))"? If so, how?
-
--Loc 
+-Loc
 
 -----Original Message-----
-From: linux-crypto-owner@vger.kernel.org
-[mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
-Sent: Thursday, February 21, 2008 9:46 PM
+From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
+Sent: Thursday, March 13, 2008 4:43 AM
 To: Loc Ho
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: Test AES-CCM mode via IPSec (NETKEY)
+Cc: linux-crypto@vger.kernel.org; 'Sebastian Siewior'
+Subject: Re: [PATCH 1/1] CryptoAPI: Add Async Hash Support
 
-Loc Ho <locnho@sbcglobal.net> wrote:
-> 
-> I am trying to test AES-CCM mode via IPSec. Setkey doesn't seem to 
-> support "aes-ccm" mode. Anyone try this yet? Or should I checkout 
-> OpenSwan or racoon?
+On Thu, Jan 24, 2008 at 06:45:25PM -0800, Loc Ho wrote:
+> >From e5d67c3670f1ec15339a92cc291027c0a059aaed Mon Sep 17 00:00:00 
+> >2001
+> From: Loc Ho <lho@amcc.com>
+> Date: Thu, 24 Jan 2008 18:13:28 -0800
+> Subject: [PATCH] Add Async Hash Support
 
-Sorry, I forgot to submit the iproute2 patch for this.
+I'm really sorry for not responding earlier.
 
-See if this one helps.
+Anyway the code looks good over all and I'm going to play with it here a
+little before sticking it into cryptodev.
 
-Cheers,
+Thanks!
 --
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au> Home Page:
 http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
