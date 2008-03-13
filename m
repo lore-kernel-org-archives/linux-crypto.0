@@ -1,41 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch 0/3] Shrink the tcrypt module and fix one XTEA test vector
-Date: Thu, 13 Mar 2008 20:29:48 +0800
-Message-ID: <20080313122948.GA8743@gondor.apana.org.au>
-References: <20080203125524.339000971@breakoint.cc>
+From: "Loc Ho" <lho@amcc.com>
+Subject: RE: Test AES-CCM mode via IPSec (NETKEY)
+Date: Thu, 13 Mar 2008 10:34:32 -0700
+Message-ID: <0CA0A16855646F4FA96D25A158E299D6043753E4@SDCEXCHANGE01.ad.amcc.com>
+References: <E1JSQiw-0002dT-00@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Sebastian Siewior <sebastian@breakpoint.cc>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-crypto@vger.kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45167 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752783AbYCMM3u (ORCPT
+Received: from sdcmail01-ext1.amcc.com ([198.137.200.72]:45164 "EHLO
+	sdcmail01.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754033AbYCMRoE convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Mar 2008 08:29:50 -0400
-Content-Disposition: inline
-In-Reply-To: <20080203125524.339000971@breakoint.cc>
+	Thu, 13 Mar 2008 13:44:04 -0400
+Content-class: urn:content-classes:message
+In-Reply-To: <E1JSQiw-0002dT-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Sebastian:
+Hi,
 
-On Sun, Feb 03, 2008 at 01:55:24PM +0100, Sebastian Siewior wrote:
-> Hello Herbert,
+I had tried this and it works after I manual performed the patch to
+iproute2.
+
+It is possible to use program "ip" to setup algorithm non-combined mode,
+such as "authenc(cbc(aes),hmac(md5))"? If so, how?
+
+-Loc 
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org
+[mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+Sent: Thursday, February 21, 2008 9:46 PM
+To: Loc Ho
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: Test AES-CCM mode via IPSec (NETKEY)
+
+Loc Ho <locnho@sbcglobal.net> wrote:
 > 
-> I noticed that the tcrypt module got really fat. Don't worry, it is still
-> less than the nvidia blob :)
-> Patch
-> - #1 replaces the memcpy of the struct to something that works with
->   pointers. I noticed that some tests failed without doing this.
-> - #2 is the big diet. A copy of the patch is at [1] in case it does not
->   pass the list filters.
-> - #3 changes one of the XTEA test vectors because the test vector itself
->   seems to be wrong (and nobody noticed this before).
+> I am trying to test AES-CCM mode via IPSec. Setkey doesn't seem to 
+> support "aes-ccm" mode. Anyone try this yet? Or should I checkout 
+> OpenSwan or racoon?
 
-This is awesome! All applied to cryptodev-2.6.  Thanks a lot!
--- 
+Sorry, I forgot to submit the iproute2 patch for this.
+
+See if this one helps.
+
+Cheers,
+--
 Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au> Home Page:
+http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
