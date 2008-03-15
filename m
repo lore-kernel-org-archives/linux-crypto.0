@@ -1,47 +1,52 @@
-From: "Kevin Coffman" <kwc-vtMw8L3fJ9vSiEDVxGk4TQ@public.gmane.org>
-Subject: theoretical rpcsec_gss deadlock
-Date: Fri, 14 Mar 2008 14:23:20 -0400
-Message-ID: <4d569c330803141123o23a35f4bm99ea9ca97a26c59d@mail.gmail.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: theoretical rpcsec_gss deadlock
+Date: Sat, 15 Mar 2008 09:18:12 +0800
+Message-ID: <20080315011812.GA24837@gondor.apana.org.au>
+References: <4d569c330803141123o23a35f4bm99ea9ca97a26c59d@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Herbert Xu" <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+To: Kevin Coffman <kwc-vtMw8L3fJ9vSiEDVxGk4TQ@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
+In-Reply-To: <4d569c330803141123o23a35f4bm99ea9ca97a26c59d-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-The rpcsec_gss code used for NFS currently does basically the
-following to create a checksum for each rpc:
+On Fri, Mar 14, 2008 at 02:23:20PM -0400, Kevin Coffman wrote:
+>
+> Herbert, Bruce Fields says you suggested a while back that an
+> interface was already there, or was being planned?  Can you give me
+> any details?  Could we possibly help?
 
-  crypto_alloc_hash()
-  crypto_hash_init()
-  crypto_hash_update() ...
-  crypto_hash_final()
-  crypto_free_hash()
+Have a look at the linux-crypto archive for the async hash patch
+that was posted in January/February.  That will eventually allow
+the same tfm to be used in parallel.  However, there is much work
+to be done as all existing transforms would have to be updated for
+this.
 
-The crypto_alloc_hash() poses a possible deadlock situation.
-(Although it hasn't been a problem so far in practice.)  It would be
-preferable to allocate the transform once in a context (shared by
-multiple tasks).  However, doing so seems to cause problems with bad
-checksums.  We'd rather not have to add a spinlock to serialize its
-use.  Is there a way to allocate state information on the stack (or
-elsewhere) such that the transform can be shared simultaneously?
+> Another question:  The current checksum code deals only with "md5".
+> Support for newer Kerberos encryption types uses keyed hashes.  In an
+> extreme case, support for the rc4-hmac Kerberos encryption type
+> requires a new hash key be derived for each rpc.  Would this interface
+> be able to deal with changing keys as well?  In that same case, the
+> "rc4" cipher key changes with each rpc as well.
 
-Herbert, Bruce Fields says you suggested a while back that an
-interface was already there, or was being planned?  Can you give me
-any details?  Could we possibly help?
+Sorry, but setting the key is an expensive operation in general,
+so the rule is one tfm per key to allow simultaneous operations
+on the same key.
 
-Another question:  The current checksum code deals only with "md5".
-Support for newer Kerberos encryption types uses keyed hashes.  In an
-extreme case, support for the rc4-hmac Kerberos encryption type
-requires a new hash key be derived for each rpc.  Would this interface
-be able to deal with changing keys as well?  In that same case, the
-"rc4" cipher key changes with each rpc as well.
+However, if hmac is the only mode you're ever going to support,
+you could consider implementing hmac by hand which would allow you
+to share the underlying algorithm tfm object.  This is because
+the hmac key just gets hashed into the underlying tfm.
 
-Thanks,
-K.C.
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
 To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
