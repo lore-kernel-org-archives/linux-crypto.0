@@ -1,53 +1,41 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: theoretical rpcsec_gss deadlock
-Date: Sat, 15 Mar 2008 09:18:12 +0800
-Message-ID: <20080315011812.GA24837@gondor.apana.org.au>
-References: <4d569c330803141123o23a35f4bm99ea9ca97a26c59d@mail.gmail.com>
+From: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Subject: Re: [patch 2/2] zcrypt: add support for large random numbers
+Date: Mon, 17 Mar 2008 10:44:10 +0100
+Message-ID: <1205747051.16137.21.camel@localhost>
+References: <20080314092523.147382820@de.ibm.com>
+	 <20080314093046.914555041@de.ibm.com>
+	 <20080314091402.fa409ac7.randy.dunlap@oracle.com>
+Reply-To: schwidefsky@de.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Kevin Coffman <kwc-vtMw8L3fJ9vSiEDVxGk4TQ@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <4d569c330803141123o23a35f4bm99ea9ca97a26c59d-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org, Ralph Wuerthner <rwuerthn@de.ibm.com>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mtagate3.de.ibm.com ([195.212.29.152]:25520 "EHLO
+	mtagate3.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751848AbYCQIoW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 17 Mar 2008 04:44:22 -0400
+In-Reply-To: <20080314091402.fa409ac7.randy.dunlap@oracle.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 14, 2008 at 02:23:20PM -0400, Kevin Coffman wrote:
->
-> Herbert, Bruce Fields says you suggested a while back that an
-> interface was already there, or was being planned?  Can you give me
-> any details?  Could we possibly help?
+On Fri, 2008-03-14 at 09:14 -0700, Randy Dunlap wrote:
+> Linux kernel uses "/**" to indicate the beginning of kernel-doc
+> notation, so when the comment block is not kernel-doc, please don't
+> use that /** to begin the comment block.
+> (multiple occurrences of this)
 
-Have a look at the linux-crypto archive for the async hash patch
-that was posted in January/February.  That will eventually allow
-the same tfm to be used in parallel.  However, there is much work
-to be done as all existing transforms would have to be updated for
-this.
+True. This is done consistently wrong in the zcrypt driver. I would
+prefer to do a separate kernel-doc cleanup patch and leave this patch as
+it is. Ok ?
 
-> Another question:  The current checksum code deals only with "md5".
-> Support for newer Kerberos encryption types uses keyed hashes.  In an
-> extreme case, support for the rc4-hmac Kerberos encryption type
-> requires a new hash key be derived for each rpc.  Would this interface
-> be able to deal with changing keys as well?  In that same case, the
-> "rc4" cipher key changes with each rpc as well.
-
-Sorry, but setting the key is an expensive operation in general,
-so the rule is one tfm per key to allow simultaneous operations
-on the same key.
-
-However, if hmac is the only mode you're ever going to support,
-you could consider implementing hmac by hand which would allow you
-to share the underlying algorithm tfm object.  This is because
-the hmac key just gets hashed into the underlying tfm.
-
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+blue skies,
+  Martin.
+
+"Reality continues to ruin my life." - Calvin.
+
+
