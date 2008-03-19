@@ -1,36 +1,35 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [patch 2/2] zcrypt: add support for large random numbers
-Date: Mon, 17 Mar 2008 08:02:28 -0700
-Message-ID: <47DE8804.9010401@oracle.com>
-References: <20080314092523.147382820@de.ibm.com>	 <20080314093046.914555041@de.ibm.com>	 <20080314091402.fa409ac7.randy.dunlap@oracle.com> <1205747051.16137.21.camel@localhost>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [RFC 1/2] [XFRM] remove ifdef crypto
+Date: Wed, 19 Mar 2008 18:14:29 +0100
+Message-ID: <20080319171429.GA933@Chamillionaire.breakpoint.cc>
+References: <20080105123637.GA12561@Chamillionaire.breakpoint.cc> <E1JB8I6-0003Pk-OJ@Chamillionaire.breakpoint.cc> <20080108061350.GC2529@gondor.apana.org.au>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, Ralph Wuerthner <rwuerthn@de.ibm.com>
-To: schwidefsky@de.ibm.com
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from agminet01.oracle.com ([141.146.126.228]:10989 "EHLO
-	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753726AbYCQPDj (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:50580 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753304AbYCSVCQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Mar 2008 11:03:39 -0400
-In-Reply-To: <1205747051.16137.21.camel@localhost>
+	Wed, 19 Mar 2008 17:02:16 -0400
+Content-Disposition: inline
+In-Reply-To: <20080108061350.GC2529@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Martin Schwidefsky wrote:
-> On Fri, 2008-03-14 at 09:14 -0700, Randy Dunlap wrote:
->> Linux kernel uses "/**" to indicate the beginning of kernel-doc
->> notation, so when the comment block is not kernel-doc, please don't
->> use that /** to begin the comment block.
->> (multiple occurrences of this)
-> 
-> True. This is done consistently wrong in the zcrypt driver. I would
-> prefer to do a separate kernel-doc cleanup patch and leave this patch as
-> it is. Ok ?
+* Herbert Xu | 2008-01-08 17:13:50 [+1100]:
 
-Sure.  Thanks.
+>On Sat, Jan 05, 2008 at 01:36:37PM +0100, Sebastian Siewior wrote:
+>> and select the crypto subsystem if neccessary
+>> 
+>> Signed-off-by: Sebastian Siewior <sebastian@breakpoint.cc>
+>
+>Could you please resend this patch to David Miller and cc netdev?
+>
+>I'll merge the other once this one is in Linus's tree.
 
--- 
-~Randy
+That is allready in Linus' tree, did you forgot about 2/2?
+
+Sebastian
