@@ -1,35 +1,42 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: User Space API handling of large buffer
-Date: Thu, 27 Mar 2008 14:50:47 -0700
-Message-ID: <0CA0A16855646F4FA96D25A158E299D604466B38@SDCEXCHANGE01.ad.amcc.com>
-References: <20080220202543.3209.47410.stgit@jazz.citi.umich.edu> <20080324131204.GA7324@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D6043EDC6C@SDCEXCHANGE01.ad.amcc.com> <20080325030723.GA12830@gondor.apana.org.au> <20080325122656.GA15675@2ka.mipt.ru> <0CA0A16855646F4FA96D25A158E299D6043EDDC3@SDCEXCHANGE01.ad.amcc.com> <20080326214821.GA4066@2ka.mipt.ru>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [RFC 2/2] [crypto] make the crypto subsystem fully modular
+Date: Fri, 28 Mar 2008 23:23:54 +0100
+Message-ID: <20080328222354.GA24018@Chamillionaire.breakpoint.cc>
+References: <20080105123637.GA12561@Chamillionaire.breakpoint.cc> <E1JB8IB-0003Pt-Kk@Chamillionaire.breakpoint.cc> <20080324123559.GA7097@gondor.apana.org.au>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>
-To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail01-ext1.amcc.com ([198.137.200.72]:41402 "EHLO
-	sdcmail01.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757619AbYC0Vus convert rfc822-to-8bit (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:51156 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753897AbYC1WX5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Mar 2008 17:50:48 -0400
-Content-class: urn:content-classes:message
-In-Reply-To: <20080326214821.GA4066@2ka.mipt.ru>
+	Fri, 28 Mar 2008 18:23:57 -0400
+Content-Disposition: inline
+In-Reply-To: <20080324123559.GA7097@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+* Herbert Xu | 2008-03-24 20:35:59 [+0800]:
 
-While creating user space API for Linux Crypto, I have a problem with
-large buffer. I am look for suggestion as to how to handle large user
-buffer greater than PAGE_SIZE. In the event, call issues an operation
-with data larger than PAGE_SIZE, must I create an array of page size
-scatterlist? Or can I using just one scatterlist entry? 
+>On Sat, Jan 05, 2008 at 01:36:37PM +0100, Sebastian Siewior wrote:
+>>
+>> diff --git a/crypto/api.c b/crypto/api.c
+>> index a2496d1..0a0f41e 100644
+>> --- a/crypto/api.c
+>> +++ b/crypto/api.c
+>> @@ -445,3 +445,6 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+>>  	return ret;
+>>  }
+>>  EXPORT_SYMBOL_GPL(crypto_has_alg);
+>> +
+>> +MODULE_DESCRIPTION("Cryptographic core API");
+>> +MODULE_LICENSE("GPL");
+>
+>Could you please add an exit handler? That way we can unload the
+>module which is probably the most important application of this.
+We can do this allready because we don't have an init function.
 
-Would Linux allocates non-continuous memory but use TLB to make them
-look continous when calling kmalloc?
-
--Loc
+Sebastian
