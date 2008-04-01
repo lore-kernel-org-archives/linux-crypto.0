@@ -1,32 +1,48 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH] crypto: cts wrapper mode errata
-Date: Mon, 31 Mar 2008 21:51:50 +0200
-Message-ID: <20080331195150.GC32563@Chamillionaire.breakpoint.cc>
-References: <20080331183913.3095.59520.stgit@jazz.citi.umich.edu> <20080331192444.GB32563@Chamillionaire.breakpoint.cc> <4d569c330803311227y108195c4g749fa0e32107a6d1@mail.gmail.com>
-Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [crypto] padlock-AES, use generic setkey function
+Date: Tue, 1 Apr 2008 21:25:42 +0800
+Message-ID: <20080401132542.GA25108@gondor.apana.org.au>
+References: <1203850864-16681-1-git-send-email-sebastian@breakpoint.cc> <1203850864-16681-3-git-send-email-sebastian@breakpoint.cc> <47D99F62.7010100@the2masters.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Kevin Coffman <kwc@citi.umich.edu>
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Siewior <sebastian@breakpoint.cc>,
+	linux-crypto@vger.kernel.org, Michal Ludvig <michal@logix.cz>
+To: Stefan Hellermann <stefan@the2masters.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:44785 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751212AbYCaTvw (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:47715 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757534AbYDANZz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Mar 2008 15:51:52 -0400
+	Tue, 1 Apr 2008 09:25:55 -0400
 Content-Disposition: inline
-In-Reply-To: <4d569c330803311227y108195c4g749fa0e32107a6d1@mail.gmail.com>
+In-Reply-To: <47D99F62.7010100@the2masters.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Kevin Coffman | 2008-03-31 15:27:30 [-0400]:
+On Thu, Mar 13, 2008 at 10:40:50PM +0100, Stefan Hellermann wrote:
+> Sebastian Siewior schrieb:
+> > Padlock AES' setkey routine is the same as exported by the generic
+> > implementation. So we could use it.
+> > 
+> 
+> I tested this and "[RFC] generic_aes: export generic setkey" on a padlock-enabled Via
+> board, and did the following test:
+> 
+> Create, open, write to, read from and close a linux dm-crypt device with aes-cbc-essiv,
+> aes-lrw-benbi and aes-xts-plain.
+> 
+> Then I took a huge encrypted disk-image (encrypted without this patches), opened it with
+> cryptsetup-luks, booted the OS from the disc over iscsi, started a filesystem-check. The
+> check completed successful.
+> 
+> So I think this and the other patch are save.
+> 
+> 
+> Tested-by: Stefan Hellermann <stefan@the2masters.de>
 
->> Did you forget something
->>  or is this on purpose? I assume "a couple of minor issues" is > 1 :)
->
->OK, lets call them a couple of minor nits/typos ?
-No problem. Just trying to ensure you did not forget anything.
-
->K.C.
-
-Sebastian
+Both patches applied.  Thanks a lot!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
