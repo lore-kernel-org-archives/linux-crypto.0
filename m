@@ -1,53 +1,52 @@
-From: Joy Latten <latten@austin.ibm.com>
-Subject: [PATCH]: kernel crashes when ipsec uses xcbc-mac with big data chunk
-Date: Tue, 1 Apr 2008 12:23:10 -0500
-Message-ID: <200804011723.m31HNAxB008013@faith.austin.ibm.com>
-Cc: herbert@gondor.apana.org.au
-To: linux-crypto@vger.kernel.org
+From: Stefan Hellermann <stefan@the2masters.de>
+Subject: Re: [RFC] [crypto] padlock-aes loadkey ondemand
+Date: Tue, 01 Apr 2008 20:38:46 +0200
+Message-ID: <47F28136.3080502@the2masters.de>
+References: <20080328223333.GB24018@Chamillionaire.breakpoint.cc> <47EFE3F6.4060704@the2masters.de> <20080330210152.GA25597@Chamillionaire.breakpoint.cc>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e6.ny.us.ibm.com ([32.97.182.146]:35106 "EHLO e6.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756056AbYDAR0t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Apr 2008 13:26:49 -0400
-Received: from d01relay02.pok.ibm.com (d01relay02.pok.ibm.com [9.56.227.234])
-	by e6.ny.us.ibm.com (8.13.8/8.13.8) with ESMTP id m31HSpIM005553
-	for <linux-crypto@vger.kernel.org>; Tue, 1 Apr 2008 13:28:51 -0400
-Received: from d01av04.pok.ibm.com (d01av04.pok.ibm.com [9.56.224.64])
-	by d01relay02.pok.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id m31HQmZ8206690
-	for <linux-crypto@vger.kernel.org>; Tue, 1 Apr 2008 13:26:48 -0400
-Received: from d01av04.pok.ibm.com (loopback [127.0.0.1])
-	by d01av04.pok.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id m31HQl43009077
-	for <linux-crypto@vger.kernel.org>; Tue, 1 Apr 2008 13:26:48 -0400
+Received: from smtp10.unit.tiscali.de ([213.205.33.46]:35937 "EHLO
+	smtp10.unit.tiscali.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752790AbYDASjE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Apr 2008 14:39:04 -0400
+In-Reply-To: <20080330210152.GA25597@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel crashes when ipsec passes a udp packet of about 14XX bytes
-of data to aes-xcbc-mac.
+Sebastian Siewior schrieb:
+> * Stefan Hellermann | 2008-03-30 21:03:18 [+0200]:
+> 
+>> Hi,
+> Hi,
+> 
+>> I tested this patch with success, "512 bit key, 8192 byte blocks" is 29% faster!
+> That's something.
+> 
+>> Thanks for this work!
+> np :)
+> 
+>> Tested-By: Stefan Hellermann
+>>
+>> (Or what is the appropriate line here?)
+> I thing that is okey if we add some numbers you provided.
+> 
+>> Here's tcrypt mode=200 output for xts without this patch
+> As far as I remember you posted once some MiB/sec dm-crypt numbers the
+> last time. Could you please post them as well since I don't which block
+> size is the majority of the read/write request.
 
-It seems the first xxxx bytes of the data are in first sg entry,
-and remaining xx bytes are in next sg entry. But we don't 
-check next sg entry to see if we need to go look the page up.
+Now I have more numbers :)
+read from a device through dm-crypt with aes-cts-plain, 256-bit mode (512bit keysize for
+cryptsetup)
+without this patch: 54MB/s with plain dd(blocksize 512b), 51MB/s with dd and a blocksize
+of 512kib (Yes, it's slower with a larger blocksize!)
+with this patch: 63MB/s with dd and a blocksize of 512b, 64MB/s with a blocksize of 512k
+(This time the larger blocksize was a little bit faster in each test)
+I did 5 tests for each combination, top shows everytime ~90% user and ~0% wait
 
-I noticed in hmac.c, we do a scatterwalk_sg_next(), to do this check
-and possible lookup, thus xcbc.c needs to use this routine too.
-
-A 15-hour run of an ipsec stress test sending streams of tcp and
-udp packets of various sizes,  using this patch and 
-aes-xcbc-mac completed successfully, so hopefully this fixes the
-problem.
-
-regards,
-Joy
- 
-Signed-off-by: Joy Latten <latten@austin.ibm.com>
-
-diff -urpN net-2.6.26/crypto/xcbc.c net-2.6.26.sb/crypto/xcbc.c
---- net-2.6.26/crypto/xcbc.c	2008-03-31 15:27:17.000000000 -0500
-+++ net-2.6.26.sb/crypto/xcbc.c	2008-03-31 15:43:53.000000000 -0500
-@@ -116,13 +116,11 @@ static int crypto_xcbc_digest_update2(st
- 	struct crypto_xcbc_ctx *ctx = crypto_hash_ctx_aligned(parent);
- 	struct crypto_cipher *tfm = ctx->child;
- 	int bs = crypto_hash_blocksize(parent);
--	unsigned int i = 0;
- 
--	do {
+Stefan
