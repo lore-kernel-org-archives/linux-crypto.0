@@ -1,69 +1,39 @@
-From: "Vasile Marii" <vascim@gmail.com>
-Subject: blokcipher interface to geode-aes
-Date: Wed, 2 Apr 2008 10:17:59 +0300
-Message-ID: <ff203bd00804020017h7c9e076dgd6077fe4e8405190@mail.gmail.com>
-References: <ff203bd00804012346w60a70967jc6f08feb3d170acb@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [crypto] padlock-aes loadkey ondemand
+Date: Wed, 2 Apr 2008 15:22:58 +0800
+Message-ID: <20080402072258.GA7720@gondor.apana.org.au>
+References: <20080328223333.GB24018@Chamillionaire.breakpoint.cc> <47EFE3F6.4060704@the2masters.de> <20080330210152.GA25597@Chamillionaire.breakpoint.cc> <47F28136.3080502@the2masters.de> <20080402064419.GC32234@Chamillionaire.breakpoint.cc> <20080402065015.GA7421@gondor.apana.org.au> <20080402071722.GF32234@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Stefan Hellermann <stefan@the2masters.de>,
+	linux-crypto@vger.kernel.org
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from an-out-0708.google.com ([209.85.132.251]:5878 "EHLO
-	an-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759324AbYDBHSB (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:44411 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751724AbYDBHXF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Apr 2008 03:18:01 -0400
-Received: by an-out-0708.google.com with SMTP id d31so656117and.103
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Apr 2008 00:18:00 -0700 (PDT)
-In-Reply-To: <ff203bd00804012346w60a70967jc6f08feb3d170acb@mail.gmail.com>
+	Wed, 2 Apr 2008 03:23:05 -0400
 Content-Disposition: inline
+In-Reply-To: <20080402071722.GF32234@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-@ Sebastian Siewior
->>I'm trying to write a driver for hardware accelerated aes-cbc crypting
->>device to use with ipsec. I have a geode-aes and I'm spying on it
->>trying to understand all the stuff needed to make it work.
->>Well, when I'm initializing the geode module, I'm sending some test
- >>vectors:
->> Key       : 0xc286696d887c9aa0611bbb3e2025a45a
->>IV        : 0x562e17996d093d28ddb3ba695a2e6f58
->>Plaintext : 0x000102030405060708090a0b0c0d0e0f
-> >             101112131415161718191a1b1c1d1e1f
->>Ciphertext expected:
-> >              d296cd94 c2cccf8a 3a863028 b5e1dc0a
->>              7586602d 253cfff9 1b8266be a6d61ab1
->>This looks like the test vector #2 for cbc enc.
+On Wed, Apr 02, 2008 at 09:17:22AM +0200, Sebastian Siewior wrote:
+> I'm not sure if they have SMP or multicore out / plans but I gave a
+> little thought on this early morning: The only problem is if we get
+> swapped to another cores before encryption process beginns and after key
+> reset thing. If the scheduler decides to swap cores than EFLAGS should
+> be reloaded and wer are fine. The only problem that I see with cpus > 1
+> is that we might reload the key if it is not required. This could be
+> solved with old_ctx pointer beeing a percpu. 
 
->Are you using the in kernel module or your own?
->Which kernel version do you use?
-it is the geode-aes driver from kernel 2.6.24.2 but modified, meaning
-that on loading no algorithms are registred, just some data(hand
-written) is put on input of geode-aes and some is taken out. Because
-the results differ from test vectors, i concluded that some other
-operations are made on data...before entering geode-aes.
->Try to run the tcrypt module for testing.
->modprobe tcrypt mode=10
->will test _all_ aes variants, you can ignore them all except the cbc
->part.
-ok, i will install it and will watch.
->>Is the plaintext in ipsec not so "plain"? Is the kernel doing some
->>modifications on it while  trabelling thru blkcipher_walkvirt &
->>friends?
->No. That one should only walk through the scatterlist and ensures
->alignment that is required.
+Yeah I think having a percpu would be good even if it isn't needed
+right now.
 
->> What is the real interface between ipsec and algorithms?
->>Thanks in advance!
->Take a look on tcrypt.c. That one is pretty easy. ipsec uses the
->asynchronous interface.
-OK i'll do this right now, but the next question is:
-after all, in blockcipher mode, the src, and dst addresses filled by
-blkcipher_walk... are the real plaintext source and destination? No
-other operations are made on that data?
-Thanks a lot for response.
->
->--
->Vasile Marii
-
-Sebastian
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
