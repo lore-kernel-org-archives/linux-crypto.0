@@ -1,40 +1,68 @@
-From: Stefan Hellermann <stefan@the2masters.de>
-Subject: Re: [RFC] [crypto] padlock-aes loadkey ondemand
-Date: Wed, 02 Apr 2008 17:48:33 +0200
-Message-ID: <47F3AAD1.90406@the2masters.de>
-References: <20080328223333.GB24018@Chamillionaire.breakpoint.cc> <47EFE3F6.4060704@the2masters.de> <20080330210152.GA25597@Chamillionaire.breakpoint.cc> <47F28136.3080502@the2masters.de> <20080402064419.GC32234@Chamillionaire.breakpoint.cc> <20080402065015.GA7421@gondor.apana.org.au>
+From: Joy Latten <latten@us.ibm.com>
+Subject: RE: Test AES-CCM mode via IPSec (NETKEY)
+Date: Fri, 04 Apr 2008 17:37:26 -0500
+Message-ID: <1207348646.4158.3.camel@faith.austin.ibm.com>
+References: <E1JSQiw-0002dT-00@gondolin.me.apana.org.au>
+	 <0CA0A16855646F4FA96D25A158E299D6043753E4@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Loc Ho <lho@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp11.unit.tiscali.de ([213.205.33.47]:34475 "EHLO
-	smtp11.unit.tiscali.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755196AbYDBPt0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Apr 2008 11:49:26 -0400
-In-Reply-To: <20080402065015.GA7421@gondor.apana.org.au>
+Received: from e4.ny.us.ibm.com ([32.97.182.144]:56490 "EHLO e4.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751008AbYDDWtb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Apr 2008 18:49:31 -0400
+Received: from d01relay02.pok.ibm.com (d01relay02.pok.ibm.com [9.56.227.234])
+	by e4.ny.us.ibm.com (8.13.8/8.13.8) with ESMTP id m34MnUTn014980
+	for <linux-crypto@vger.kernel.org>; Fri, 4 Apr 2008 18:49:30 -0400
+Received: from d01av01.pok.ibm.com (d01av01.pok.ibm.com [9.56.224.215])
+	by d01relay02.pok.ibm.com (8.13.8/8.13.8/NCO v8.7) with ESMTP id m34MnUft246314
+	for <linux-crypto@vger.kernel.org>; Fri, 4 Apr 2008 18:49:30 -0400
+Received: from d01av01.pok.ibm.com (loopback [127.0.0.1])
+	by d01av01.pok.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id m34MnTeN014028
+	for <linux-crypto@vger.kernel.org>; Fri, 4 Apr 2008 18:49:30 -0400
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D6043753E4@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu schrieb:
-> On Wed, Apr 02, 2008 at 08:44:19AM +0200, Sebastian Siewior wrote:
->> Herbert: I was going to Cc you and ask if the speed improvements are
->> okey / enough to consider this patch for inclusion but I see now that
->> you found this thread on your own :) Do you want me to form a patch? 
+I was wondering if you could post what you passed to ip command for ccm
+to get it to work with ipsec. I have not had much luck so far.
+
+thanks!!
+
+regards, 
+Joy
+
+On Thu, 2008-03-13 at 10:34 -0700, Loc Ho wrote:
+> Hi,
 > 
-> Yes please! BTW, can VIA do SMP? If so then we'll need some code
-> to deal with that and if not, we should add a run-time check to
-> fail the module insertion if ever such a beast should arise.
-
-Till now VIA has no SMP and nothing planed (as far as I know, I'm not a VIA guy). There
-next gen processors will be called isaiah, without smp but with 64bit and lots of other
-features ( http://www.via.com.tw/en/products/processors/isaiah-arch/ )
-
-Cheers
-Stefan
-
+> I had tried this and it works after I manual performed the patch to
+> iproute2.
 > 
-> Cheers,
+> It is possible to use program "ip" to setup algorithm non-combined mode,
+> such as "authenc(cbc(aes),hmac(md5))"? If so, how?
+> 
+> -Loc 
+> 
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org
+> [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+> Sent: Thursday, February 21, 2008 9:46 PM
+> To: Loc Ho
+> Cc: linux-crypto@vger.kernel.org
+> Subject: Re: Test AES-CCM mode via IPSec (NETKEY)
+> 
+> Loc Ho <locnho@sbcglobal.net> wrote:
+> > 
+> > I am trying to test AES-CCM mode via IPSec. Setkey doesn't seem to 
+> > support "aes-ccm" mode. Anyone try this yet? Or should I checkout 
+> > OpenSwan or racoon?
+> 
+> Sorry, I forgot to submit the iproute2 patch for this.
+> 
+> See if this one helps.
+> 
+
