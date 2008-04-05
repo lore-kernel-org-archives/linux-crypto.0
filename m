@@ -1,34 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cts wrapper mode errata
-Date: Sat, 5 Apr 2008 21:11:22 +0800
-Message-ID: <20080405131122.GA4772@gondor.apana.org.au>
-References: <20080331183913.3095.59520.stgit@jazz.citi.umich.edu>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: blokcipher interface to geode-aes
+Date: Sat, 5 Apr 2008 16:52:20 +0200
+Message-ID: <20080405145220.GA9821@Chamillionaire.breakpoint.cc>
+References: <ff203bd00804012346w60a70967jc6f08feb3d170acb@mail.gmail.com> <ff203bd00804020017h7c9e076dgd6077fe4e8405190@mail.gmail.com>
+Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-15
 Cc: linux-crypto@vger.kernel.org
-To: Kevin Coffman <kwc@citi.umich.edu>
+To: Vasile Marii <vascim@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52015 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751647AbYDENL0 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:46056 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751890AbYDEOwW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 5 Apr 2008 09:11:26 -0400
+	Sat, 5 Apr 2008 10:52:22 -0400
 Content-Disposition: inline
-In-Reply-To: <20080331183913.3095.59520.stgit@jazz.citi.umich.edu>
+In-Reply-To: <ff203bd00804020017h7c9e076dgd6077fe4e8405190@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 31, 2008 at 02:39:13PM -0400, Kevin Coffman wrote:
-> This patch fixes a couple of minor issues found by J. Bruce Fields
-> while reviewing with the CTS mode patch already applied.
-> 
-> It also changes the license to "Dual BSD/GPL".
-> 
-> Signed-off-by: Kevin Coffman <kwc@citi.umich.edu>
+* Vasile Marii | 2008-04-02 10:17:59 [+0300]:
 
-Thanks.  I've combined this with the original patch.
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>>Are you using the in kernel module or your own?
+>>Which kernel version do you use?
+>it is the geode-aes driver from kernel 2.6.24.2 but modified, meaning
+That kernel should have a working version. So in theoory it should work
+without your modifications.
+
+>OK i'll do this right now, but the next question is:
+>after all, in blockcipher mode, the src, and dst addresses filled by
+>blkcipher_walk... are the real plaintext source and destination? No
+>other operations are made on that data?
+Yes. The data is not modified by the crypto stack. Dump the data on the
+the entre of the function and you will see it. Keep in mind that it is a
+kernel address and the geode expects a physical address.
+>>--
+>>Vasile Marii
+>
+Sebastian
