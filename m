@@ -1,36 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [crypto] padlock-aes loadkey ondemand
-Date: Wed, 9 Apr 2008 11:38:30 -0500
-Message-ID: <20080409163830.GA5738@gondor.apana.org.au>
-References: <20080328223333.GB24018@Chamillionaire.breakpoint.cc> <47EFE3F6.4060704@the2masters.de> <20080330210152.GA25597@Chamillionaire.breakpoint.cc> <47F28136.3080502@the2masters.de> <20080402064419.GC32234@Chamillionaire.breakpoint.cc> <20080402065015.GA7421@gondor.apana.org.au> <47F3AAD1.90406@the2masters.de>
+From: "Loc Ho" <lho@amcc.com>
+Subject: RE: [PATCH 1/1] CryptoAPI: Add Async Hash Support
+Date: Wed, 9 Apr 2008 19:03:45 -0700
+Message-ID: <0CA0A16855646F4FA96D25A158E299D6044D6442@SDCEXCHANGE01.ad.amcc.com>
+References: <20080117112314.GC9020@gondor.apana.org.au> <001c01c85937$ff3313f0$5c05420a@amcc.com> <20080117202735.GA22733@Chamillionaire.breakpoint.cc> <0CA0A16855646F4FA96D25A158E299D603FCC4D7@SDCEXCHANGE01.ad.amcc.com> <20080118230721.GA30470@Chamillionaire.breakpoint.cc> <002301c85c96$32a67a40$5c05420a@amcc.com> <20080122231818.GB6920@Chamillionaire.breakpoint.cc> <002d01c85d66$11e1d7c0$5c05420a@amcc.com> <004601c85ecd$1eb53d80$5c05420a@amcc.com> <004a01c85efc$56f2ee70$5c05420a@amcc.com> <20080313114230.GC8393@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	linux-crypto@vger.kernel.org
-To: Stefan Hellermann <stefan@the2masters.de>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-crypto@vger.kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59528 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752490AbYDIQik (ORCPT
+Received: from sdcmail01-ext1.amcc.com ([198.137.200.72]:46113 "EHLO
+	sdcmail01.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753155AbYDJCDt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Apr 2008 12:38:40 -0400
-Content-Disposition: inline
-In-Reply-To: <47F3AAD1.90406@the2masters.de>
+	Wed, 9 Apr 2008 22:03:49 -0400
+Content-class: urn:content-classes:message
+In-Reply-To: <20080313114230.GC8393@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 02, 2008 at 05:48:33PM +0200, Stefan Hellermann wrote:
-> 
-> Till now VIA has no SMP and nothing planed (as far as I know, I'm not a VIA guy). There
-> next gen processors will be called isaiah, without smp but with 64bit and lots of other
-> features ( http://www.via.com.tw/en/products/processors/isaiah-arch/ )
+Hi Herbert,
 
-Apparently they're planning a multi-core version in future so
-we should definitely plan for that.
+I just sync with cryptodev git and don't see async hash/digest added.
+Have it being committed?
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Loc
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org
+[mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+Sent: Thursday, March 13, 2008 4:43 AM
+To: Loc Ho
+Cc: linux-crypto@vger.kernel.org; 'Sebastian Siewior'
+Subject: Re: [PATCH 1/1] CryptoAPI: Add Async Hash Support
+
+On Thu, Jan 24, 2008 at 06:45:25PM -0800, Loc Ho wrote:
+> >From e5d67c3670f1ec15339a92cc291027c0a059aaed Mon Sep 17 00:00:00 
+> >2001
+> From: Loc Ho <lho@amcc.com>
+> Date: Thu, 24 Jan 2008 18:13:28 -0800
+> Subject: [PATCH] Add Async Hash Support
+
+I'm really sorry for not responding earlier.
+
+Anyway the code looks good over all and I'm going to play with it here a
+little before sticking it into cryptodev.
+
