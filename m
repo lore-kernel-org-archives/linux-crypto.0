@@ -1,35 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] CryptoAPI: Add Async Hash Support
-Date: Wed, 9 Apr 2008 21:29:58 -0500
-Message-ID: <20080410022958.GB10391@gondor.apana.org.au>
-References: <20080117202735.GA22733@Chamillionaire.breakpoint.cc> <0CA0A16855646F4FA96D25A158E299D603FCC4D7@SDCEXCHANGE01.ad.amcc.com> <20080118230721.GA30470@Chamillionaire.breakpoint.cc> <002301c85c96$32a67a40$5c05420a@amcc.com> <20080122231818.GB6920@Chamillionaire.breakpoint.cc> <002d01c85d66$11e1d7c0$5c05420a@amcc.com> <004601c85ecd$1eb53d80$5c05420a@amcc.com> <004a01c85efc$56f2ee70$5c05420a@amcc.com> <20080313114230.GC8393@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D6044D6442@SDCEXCHANGE01.ad.amcc.com>
+From: Adrian Bunk <bunk@kernel.org>
+Subject: [2.6 patch] add include/asm-avr32/xor.h
+Date: Mon, 14 Apr 2008 17:16:32 +0300
+Message-ID: <20080414141632.GA6695@cs181133002.pp.htv.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Loc Ho <lho@amcc.com>
+Content-Type: text/plain; charset=utf-8
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: hskinnemoen@atmel.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:51663 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752406AbYDJCaB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Apr 2008 22:30:01 -0400
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:41733 "EHLO smtp6.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1760592AbYDNORh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Apr 2008 10:17:37 -0400
 Content-Disposition: inline
-In-Reply-To: <0CA0A16855646F4FA96D25A158E299D6044D6442@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 09, 2008 at 07:03:45PM -0700, Loc Ho wrote:
-> Hi Herbert,
-> 
-> I just sync with cryptodev git and don't see async hash/digest added.
-> Have it being committed?
+This patch fixes the following compile error with CONFIG_MD_RAID456
+on avr32:
 
-Sorry, I haven't finished testing it yet.  I hope to get to it
-soon.
+<--  snip  -->
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+...
+  CC [M]  crypto/xor.o
+/home/bunk/linux/kernel-2.6/git/linux-2.6/crypto/xor.c:23:21: error: asm/xor.h: No such file or directory
+/home/bunk/linux/kernel-2.6/git/linux-2.6/crypto/xor.c: In function 'calibrate_xor_blocks':
+/home/bunk/linux/kernel-2.6/git/linux-2.6/crypto/xor.c:131: error: 'XOR_TRY_TEMPLATES' undeclared (first use in this function)
+/home/bunk/linux/kernel-2.6/git/linux-2.6/crypto/xor.c:131: error: (Each undeclared identifier is reported only once
+/home/bunk/linux/kernel-2.6/git/linux-2.6/crypto/xor.c:131: error: for each function it appears in.)
+make[2]: *** [crypto/xor.o] Error 1
+
+<--  snip  -->
+
+Signed-off-by: Adrian Bunk <bunk@kernel.org>
+
+---
+601f75e99c076c16e2648f4860cac4fc6ce187ea diff --git a/include/asm-avr32/xor.h b/include/asm-avr32/xor.h
+new file mode 100644
+index 0000000..99c87aa
+--- /dev/null
++++ b/include/asm-avr32/xor.h
+@@ -0,0 +1,6 @@
++#ifndef _ASM_XOR_H
++#define _ASM_XOR_H
++
++#include <asm-generic/xor.h>
++
++#endif
+
