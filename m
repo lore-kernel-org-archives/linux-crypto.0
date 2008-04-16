@@ -1,39 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Subject: Re: [PATCH -mm crypto] AES: x86_64 asm implementation optimization
-Date: Wed, 16 Apr 2008 17:50:09 +0800
-Message-ID: <20080416095009.GA28629@gondor.apana.org.au>
-References: <1207723262.18313.37.camel@caritas-dev.intel.com> <20080416073108.GA13494@Chamillionaire.breakpoint.cc> <1208333949.4322.5.camel@caritas-dev.intel.com> <87r6d65huf.fsf@basil.nowhere.org>
+Date: Wed, 16 Apr 2008 20:40:16 +0200
+Message-ID: <20080416184016.GA21365@Chamillionaire.breakpoint.cc>
+References: <1207723262.18313.37.camel@caritas-dev.intel.com> <20080416073108.GA13494@Chamillionaire.breakpoint.cc> <1208333949.4322.5.camel@caritas-dev.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Huang, Ying" <ying.huang@intel.com>,
-	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	"Adam J. Richter" <adam@yggdrasil.com>,
-	Alexander Kjeldaas <astor@fast.no>, akpm@linux-foundation.org,
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"Adam J. Richter" <adam@yggdrasil.com>, akpm@linux-foundation.org,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	mingo@elte.hu, tglx@linutronix.de
-To: Andi Kleen <andi@firstfloor.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44071 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756453AbYDPJue (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Apr 2008 05:50:34 -0400
+To: "Huang, Ying" <ying.huang@intel.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1756219AbYDPSkf@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87r6d65huf.fsf@basil.nowhere.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1208333949.4322.5.camel@caritas-dev.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 16, 2008 at 10:23:04AM +0200, Andi Kleen wrote:
-> 
-> It would be also quite possible to use two different implementations,
-> one for AMD another for Intel.  crypto frame work should have no
-> problems dealing with that.
+cut Alexander Kjeldaas <astor@fast.no> from CC coz his mails bounce.
 
-Yes that would definitely be an option.
+* Huang, Ying | 2008-04-16 16:19:09 [+0800]:
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>Can you help me to test these patches
+>to find out the reason for degradation on AMD CPU.
+Sure. 
+
+>> >--- a/include/crypto/aes.h
+>> >+++ b/include/crypto/aes.h
+>> >@@ -19,6 +19,7 @@
+>> > 
+>> > struct crypto_aes_ctx {
+>> > 	u32 key_length;
+>> >+	u32 _pad1;
+>> 
+>> Why is this pad required? Do you want special alignment of the keys?
+>
+>Because the key is loaded in 64bit in this patch, I want to align the
+>key with 64bit address.
+
+Than this won't work all the time. To make it bulletproof
+- set .cra_alignmask in the glue code properly
+- use the attribute aligned thing
+- retrieve your private struct via crypto_tfm_ctx_aligned()
+
+You might want to take a look on padlock-aes.c. The same thing is done
+there but instead of crypto_tfm_ctx_aligned() a private function is
+used (to let the compiler optimize most of the code away). Depending on
+Herbert's mood you might get away with this as well (what would be
+probably the case since you might prefer to do it asm) :)
+
+>> > 	u32 key_enc[AES_MAX_KEYLENGTH_U32];
+>> > 	u32 key_dec[AES_MAX_KEYLENGTH_U32];
+>> > };
+>> >
+>
+>Best Regards,
+>Huang Ying
+>
+
+Sebastian
