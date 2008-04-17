@@ -1,260 +1,39 @@
-From: "Huang, Ying" <ying.huang@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH -mm crypto] AES: x86_64 asm implementation optimization
-Date: Thu, 17 Apr 2008 11:36:43 +0800
-Message-ID: <1208403403.4322.27.camel@caritas-dev.intel.com>
-References: <1207723262.18313.37.camel@caritas-dev.intel.com>
-	 <20080416073108.GA13494@Chamillionaire.breakpoint.cc>
-	 <1208333949.4322.5.camel@caritas-dev.intel.com>
-	 <20080416184016.GA21365@Chamillionaire.breakpoint.cc>
+Date: Thu, 17 Apr 2008 11:34:02 +0800
+Message-ID: <20080417033402.GB3394@gondor.apana.org.au>
+References: <1207723262.18313.37.camel@caritas-dev.intel.com> <20080416073108.GA13494@Chamillionaire.breakpoint.cc> <1208333949.4322.5.camel@caritas-dev.intel.com> <20080416184016.GA21365@Chamillionaire.breakpoint.cc> <1208397123.4322.21.camel@caritas-dev.intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-Y6pv7NZ+Jaj27uINcS5i"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
 	"Adam J. Richter" <adam@yggdrasil.com>, akpm@linux-foundation.org,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	mingo@elte.hu, tglx@linutronix.de
-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+To: "Huang, Ying" <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:8931 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756875AbYDQDc1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Apr 2008 23:32:27 -0400
-In-Reply-To: <20080416184016.GA21365@Chamillionaire.breakpoint.cc>
+Received: from rhun.apana.org.au ([64.62.148.172]:45442 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753337AbYDQDeM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Apr 2008 23:34:12 -0400
+Content-Disposition: inline
+In-Reply-To: <1208397123.4322.21.camel@caritas-dev.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Thu, Apr 17, 2008 at 09:52:03AM +0800, Huang, Ying wrote:
+>
+> As far as I know, the CRYPTO_MINALIGN is defined in
+> include/linux/crypto.h as __alignof__(unsigned long long), and the
+> __crt_ctx in crypto_tfm is aligned in CRYPTO_MINALIGN. So I think adding
+> a pad is sufficient for x86_64 implementation.
 
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+It should be sufficient but it would be better to use an align
+attribute to better document the intention.
 
-Hi, Sebastian,
-
-The files attached is the separated patches, from step1 to step 7. Thank
-you very much for your help.
-
-Best Regards,
-Huang Ying
-
-On Wed, 2008-04-16 at 20:40 +0200, Sebastian Siewior wrote:
-> cut Alexander Kjeldaas <astor@fast.no> from CC coz his mails bounce.
-> 
-> * Huang, Ying | 2008-04-16 16:19:09 [+0800]:
-> 
-> >Can you help me to test these patches
-> >to find out the reason for degradation on AMD CPU.
-> Sure. 
-> 
-> >> >--- a/include/crypto/aes.h
-> >> >+++ b/include/crypto/aes.h
-> >> >@@ -19,6 +19,7 @@
-> >> > 
-> >> > struct crypto_aes_ctx {
-> >> > 	u32 key_length;
-> >> >+	u32 _pad1;
-> >> 
-> >> Why is this pad required? Do you want special alignment of the keys?
-> >
-> >Because the key is loaded in 64bit in this patch, I want to align the
-> >key with 64bit address.
-> 
-> Than this won't work all the time. To make it bulletproof
-> - set .cra_alignmask in the glue code properly
-> - use the attribute aligned thing
-> - retrieve your private struct via crypto_tfm_ctx_aligned()
-> 
-> You might want to take a look on padlock-aes.c. The same thing is done
-> there but instead of crypto_tfm_ctx_aligned() a private function is
-> used (to let the compiler optimize most of the code away). Depending on
-> Herbert's mood you might get away with this as well (what would be
-> probably the case since you might prefer to do it asm) :)
-> 
-> >> > 	u32 key_enc[AES_MAX_KEYLENGTH_U32];
-> >> > 	u32 key_dec[AES_MAX_KEYLENGTH_U32];
-> >> > };
-> >> >
-> >
-> >Best Regards,
-> >Huang Ying
-> >
-> 
-> Sebastian
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step1.patch
-Content-Type: text/x-vhdl; name=step1.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgIDExICsrKysrKysr
-LS0tDQogMSBmaWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCg0K
-LS0tIGEvYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMNCisrKyBiL2FyY2gveDg2
-L2NyeXB0by9hZXMteDg2XzY0LWFzbV82NC5TDQpAQCAtNDksMTMgKzQ5LDE3IEBADQogI2RlZmlu
-ZSBSOQklcjkNCiAjZGVmaW5lIFIxMAklcjEwDQogI2RlZmluZSBSMTEJJXIxMQ0KKyNkZWZpbmUg
-UjEyCSVyMTINCisjZGVmaW5lIFIxNQklcjE1DQorI2RlZmluZSBSMTYJJXJzcA0KIA0KICNkZWZp
-bmUgcHJvbG9ndWUoRlVOQyxLRVksQjEyOCxCMTkyLHIxLHIyLHIzLHI0LHI1LHI2LHI3LHI4LHI5
-LHIxMCxyMTEpIFwNCiAJLmdsb2JhbAlGVU5DOwkJCVwNCiAJLnR5cGUJRlVOQyxAZnVuY3Rpb247
-CQlcDQogCS5hbGlnbgk4OwkJCVwNCi1GVU5DOgltb3ZxCXIxLHIyOwkJCVwNCi0JbW92cQlyMyxy
-NDsJCQlcDQorRlVOQzoJc3VicQkkOCwgUjE2OwkJXA0KKwltb3ZxCXIzLCByNDsJCQlcDQorCW1v
-dnEJcjEsIChSMTYpOwkJXA0KIAlsZWFxCUJBU0UrS0VZKzQ4KzQocjgpLHI5OwlcDQogCW1vdnEJ
-cjEwLHIxMTsJCVwNCiAJbW92bAkocjcpLHI1ICMjIEU7CQlcDQpAQCAtNzQsNyArNzgsOCBAQCBG
-VU5DOgltb3ZxCXIxLHIyOwkJCVwNCiAJbGVhcQkzMihyOSkscjk7DQogDQogI2RlZmluZSBlcGls
-b2d1ZShyMSxyMixyMyxyNCxyNSxyNixyNyxyOCxyOSkgXA0KLQltb3ZxCXIxLHIyOwkJCVwNCisJ
-bW92cQkoUjE2KSxyMjsJCVwNCisJYWRkcQkkOCxSMTY7CQkJXA0KIAltb3ZxCXIzLHI0OwkJCVwN
-CiAJbW92bAlyNSAjIyBFLChyOSk7CQlcDQogCW1vdmwJcjYgIyMgRSw0KHI5KTsJCVwNCg==
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step2.patch
-Content-Type: text/x-vhdl; name=step2.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgICA4ICsrKystLS0t
-DQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCg0KLS0t
-IGEvYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMNCisrKyBiL2FyY2gveDg2L2Ny
-eXB0by9hZXMteDg2XzY0LWFzbV82NC5TDQpAQCAtOTAsMTMgKzkwLDEzIEBAIEZVTkM6CXN1YnEJ
-JDgsIFIxNjsJCVwNCiAjZGVmaW5lIHJvdW5kKFRBQixPRkZTRVQscjEscjIscjMscjQscjUscjYs
-cjcscjgscmEscmIscmMscmQpIFwNCiAJbW92emJsCXIyICMjIEgscjUgIyMgRTsJXA0KIAltb3Z6
-YmwJcjIgIyMgTCxyNiAjIyBFOwlcDQorCW1vdnEJcjQsUjg7CQkJXA0KKwlzaHJsCSQxNixyNCAj
-IyBFOwkJXA0KIAltb3ZsCVRBQisxMDI0KCxyNSw0KSxyNSAjIyBFO1wNCi0JbW92dwlyNCAjIyBY
-LHIyICMjIFg7CVwNCiAJbW92bAlUQUIoLHI2LDQpLHI2ICMjIEU7CVwNCi0Jcm9sbAkkMTYscjIg
-IyMgRTsJCVwNCi0Jc2hybAkkMTYscjQgIyMgRTsJCVwNCiAJbW92emJsCXI0ICMjIEgscjcgIyMg
-RTsJXA0KIAltb3Z6YmwJcjQgIyMgTCxyNCAjIyBFOwlcDQorCXNocmwJJDE2LHIyICMjIEU7CQlc
-DQogCXhvcmwJT0ZGU0VUKHI4KSxyYSAjIyBFOwlcDQogCXhvcmwJT0ZGU0VUKzQocjgpLHJiICMj
-IEU7CVwNCiAJeG9ybAlUQUIrMzA3MigscjcsNCkscjUgIyMgRTtcDQpAQCAtMTIzLDcgKzEyMyw3
-IEBAIEZVTkM6CXN1YnEJJDgsIFIxNjsJCVwNCiAJeG9ybAlUQUIoLHIxLDQpLHIzICMjIEU7CVwN
-CiAJbW92emJsCXIyICMjIEgscjEgIyMgRTsJXA0KIAltb3Z6YmwJcjIgIyMgTCxyNyAjIyBFOwlc
-DQotCXNocmwJJDE2LHIyICMjIEU7CQlcDQorCW1vdnEJUjgscjI7CQkJXA0KIAl4b3JsCVRBQisz
-MDcyKCxyMSw0KSxyMyAjIyBFO1wNCiAJeG9ybAlUQUIrMjA0OCgscjcsNCkscjQgIyMgRTtcDQog
-CW1vdnpibAlyMiAjIyBILHIxICMjIEU7CVwNCg==
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step3.patch
-Content-Type: text/x-vhdl; name=step3.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgIDEyICsrKysrKy0t
-LS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pDQoN
-Ci0tLSBhL2FyY2gveDg2L2NyeXB0by9hZXMteDg2XzY0LWFzbV82NC5TDQorKysgYi9hcmNoL3g4
-Ni9jcnlwdG8vYWVzLXg4Nl82NC1hc21fNjQuUw0KQEAgLTU3LDEzICs1NywxMyBAQA0KIAkuZ2xv
-YmFsCUZVTkM7CQkJXA0KIAkudHlwZQlGVU5DLEBmdW5jdGlvbjsJCVwNCiAJLmFsaWduCTg7CQkJ
-XA0KLUZVTkM6CXN1YnEJJDgsIFIxNjsJCVwNCi0JbW92cQlyMywgcjQ7CQkJXA0KLQltb3ZxCXIx
-LCAoUjE2KTsJCVwNCitGVU5DOglzdWJxCSQxNiwgUjE2OwkJXA0KKwltb3ZsCShyNykscjUgIyMg
-RTsJCVwNCiAJbGVhcQlCQVNFK0tFWSs0OCs0KHI4KSxyOTsJXA0KIAltb3ZxCXIxMCxyMTE7CQlc
-DQotCW1vdmwJKHI3KSxyNSAjIyBFOwkJXA0KKwltb3ZxCXIxLCAoUjE2KTsJCVwNCiAJbW92bAk0
-KHI3KSxyMSAjIyBFOwkJXA0KKwltb3ZxCXIzLCA4KFIxNik7CQlcDQogCW1vdmwJOChyNykscjYg
-IyMgRTsJCVwNCiAJbW92bAkxMihyNykscjcgIyMgRTsJCVwNCiAJbW92bAlCQVNFKzAocjgpLHIx
-MCAjIyBFOwlcDQpAQCAtNzksMTEgKzc5LDExIEBAIEZVTkM6CXN1YnEJJDgsIFIxNjsJCVwNCiAN
-CiAjZGVmaW5lIGVwaWxvZ3VlKHIxLHIyLHIzLHI0LHI1LHI2LHI3LHI4LHI5KSBcDQogCW1vdnEJ
-KFIxNikscjI7CQlcDQotCWFkZHEJJDgsUjE2OwkJCVwNCi0JbW92cQlyMyxyNDsJCQlcDQogCW1v
-dmwJcjUgIyMgRSwocjkpOwkJXA0KKwltb3ZxCTgoUjE2KSxyNDsJCVwNCiAJbW92bAlyNiAjIyBF
-LDQocjkpOwkJXA0KIAltb3ZsCXI3ICMjIEUsOChyOSk7CQlcDQorCWFkZHEJJDE2LFIxNjsJCVwN
-CiAJbW92bAlyOCAjIyBFLDEyKHI5KTsJCVwNCiAJcmV0Ow0KIA0K
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step4.patch
-Content-Type: text/x-vhdl; name=step4.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgIDEwICsrKysrLS0t
-LS0NCiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KDQot
-LS0gYS9hcmNoL3g4Ni9jcnlwdG8vYWVzLXg4Nl82NC1hc21fNjQuUw0KKysrIGIvYXJjaC94ODYv
-Y3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMNCkBAIC05OSwxNCArOTksMTQgQEAgRlVOQzoJc3Vi
-cQkkMTYsIFIxNjsJCVwNCiAJc2hybAkkMTYscjIgIyMgRTsJCVwNCiAJeG9ybAlPRkZTRVQocjgp
-LHJhICMjIEU7CVwNCiAJeG9ybAlPRkZTRVQrNChyOCkscmIgIyMgRTsJXA0KKwltb3ZxCXIzLFI5
-OwkJCVwNCiAJeG9ybAlUQUIrMzA3MigscjcsNCkscjUgIyMgRTtcDQogCXhvcmwJVEFCKzIwNDgo
-LHI0LDQpLHI2ICMjIEU7XA0KLQltb3Z6YmwJcjEgIyMgTCxyNyAjIyBFOwlcDQogCW1vdnpibAly
-MSAjIyBILHI0ICMjIEU7CVwNCi0JbW92bAlUQUIrMTAyNCgscjQsNCkscjQgIyMgRTtcDQotCW1v
-dncJcjMgIyMgWCxyMSAjIyBYOwlcDQotCXJvbGwJJDE2LHIxICMjIEU7CQlcDQorCW1vdnpibAly
-MSAjIyBMLHI3ICMjIEU7CVwNCiAJc2hybAkkMTYscjMgIyMgRTsJCVwNCisJc2hybAkkMTYscjEg
-IyMgRTsJCVwNCisJbW92bAlUQUIrMTAyNCgscjQsNCkscjQgIyMgRTtcDQogCXhvcmwJVEFCKCxy
-Nyw0KSxyNSAjIyBFOwlcDQogCW1vdnpibAlyMyAjIyBILHI3ICMjIEU7CVwNCiAJbW92emJsCXIz
-ICMjIEwscjMgIyMgRTsJXA0KQEAgLTExNCw3ICsxMTQsNyBAQCBGVU5DOglzdWJxCSQxNiwgUjE2
-OwkJXA0KIAl4b3JsCVRBQisyMDQ4KCxyMyw0KSxyNSAjIyBFO1wNCiAJbW92emJsCXIxICMjIEgs
-cjcgIyMgRTsJXA0KIAltb3Z6YmwJcjEgIyMgTCxyMyAjIyBFOwlcDQotCXNocmwJJDE2LHIxICMj
-IEU7CQlcDQorCW1vdnEJUjkscjE7CQkJXA0KIAl4b3JsCVRBQiszMDcyKCxyNyw0KSxyNiAjIyBF
-O1wNCiAJbW92bAlUQUIrMjA0OCgscjMsNCkscjMgIyMgRTtcDQogCW1vdnpibAlyMSAjIyBILHI3
-ICMjIEU7CVwNCg==
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step5.patch
-Content-Type: text/x-vhdl; name=step5.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgICA4ICsrKysrLS0t
-DQogaW5jbHVkZS9jcnlwdG8vYWVzLmggICAgICAgICAgICAgICAgfCAgICAxICsNCiAyIGZpbGVz
-IGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCg0KLS0tIGEvYXJjaC94
-ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMNCisrKyBiL2FyY2gveDg2L2NyeXB0by9hZXMt
-eDg2XzY0LWFzbV82NC5TDQpAQCAtNTcsMTQgKzU3LDE1IEBADQogCS5nbG9iYWwJRlVOQzsJCQlc
-DQogCS50eXBlCUZVTkMsQGZ1bmN0aW9uOwkJXA0KIAkuYWxpZ24JODsJCQlcDQotRlVOQzoJc3Vi
-cQkkMTYsIFIxNjsJCVwNCitGVU5DOglzdWJxCSQyNCwgUjE2OwkJXA0KIAltb3ZsCShyNykscjUg
-IyMgRTsJCVwNCi0JbGVhcQlCQVNFK0tFWSs0OCs0KHI4KSxyOTsJXA0KKwlsZWFxCUJBU0UrS0VZ
-KzQ4KzgocjgpLHI5OwlcDQogCW1vdnEJcjEwLHIxMTsJCVwNCiAJbW92cQlyMSwgKFIxNik7CQlc
-DQogCW1vdmwJNChyNykscjEgIyMgRTsJCVwNCiAJbW92cQlyMywgOChSMTYpOwkJXA0KIAltb3Zs
-CTgocjcpLHI2ICMjIEU7CQlcDQorCW1vdnEJUjEyLCAxNihSMTYpOwkJXA0KIAltb3ZsCTEyKHI3
-KSxyNyAjIyBFOwkJXA0KIAltb3ZsCUJBU0UrMChyOCkscjEwICMjIEU7CVwNCiAJeG9ybAktNDgo
-cjkpLHI1ICMjIEU7CVwNCkBAIC04Miw4ICs4Myw5IEBAIEZVTkM6CXN1YnEJJDE2LCBSMTY7CQlc
-DQogCW1vdmwJcjUgIyMgRSwocjkpOwkJXA0KIAltb3ZxCTgoUjE2KSxyNDsJCVwNCiAJbW92bAly
-NiAjIyBFLDQocjkpOwkJXA0KKwltb3ZxCTE2KFIxNiksUjEyOwkJXA0KIAltb3ZsCXI3ICMjIEUs
-OChyOSk7CQlcDQotCWFkZHEJJDE2LFIxNjsJCVwNCisJYWRkcQkkMjQsUjE2OwkJXA0KIAltb3Zs
-CXI4ICMjIEUsMTIocjkpOwkJXA0KIAlyZXQ7DQogDQotLS0gYS9pbmNsdWRlL2NyeXB0by9hZXMu
-aA0KKysrIGIvaW5jbHVkZS9jcnlwdG8vYWVzLmgNCkBAIC0xOSw2ICsxOSw3IEBADQogDQogc3Ry
-dWN0IGNyeXB0b19hZXNfY3R4IHsNCiAJdTMyIGtleV9sZW5ndGg7DQorCXUzMiBfcGFkMTsNCiAJ
-dTMyIGtleV9lbmNbQUVTX01BWF9LRVlMRU5HVEhfVTMyXTsNCiAJdTMyIGtleV9kZWNbQUVTX01B
-WF9LRVlMRU5HVEhfVTMyXTsNCiB9Ow0K
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step6.patch
-Content-Type: text/x-vhdl; name=step6.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgICA2ICsrKystLQ0K
-IDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQoNCi0tLSBh
-L2FyY2gveDg2L2NyeXB0by9hZXMteDg2XzY0LWFzbV82NC5TDQorKysgYi9hcmNoL3g4Ni9jcnlw
-dG8vYWVzLXg4Nl82NC1hc21fNjQuUw0KQEAgLTk4LDkgKzk4LDggQEAgRlVOQzoJc3VicQkkMjQs
-IFIxNjsJCVwNCiAJbW92bAlUQUIoLHI2LDQpLHI2ICMjIEU7CVwNCiAJbW92emJsCXI0ICMjIEgs
-cjcgIyMgRTsJXA0KIAltb3Z6YmwJcjQgIyMgTCxyNCAjIyBFOwlcDQorCW1vdnEJT0ZGU0VUKHI4
-KSxSMTI7CQlcDQogCXNocmwJJDE2LHIyICMjIEU7CQlcDQotCXhvcmwJT0ZGU0VUKHI4KSxyYSAj
-IyBFOwlcDQotCXhvcmwJT0ZGU0VUKzQocjgpLHJiICMjIEU7CVwNCiAJbW92cQlyMyxSOTsJCQlc
-DQogCXhvcmwJVEFCKzMwNzIoLHI3LDQpLHI1ICMjIEU7XA0KIAl4b3JsCVRBQisyMDQ4KCxyNCw0
-KSxyNiAjIyBFO1wNCkBAIC0xMTYsNyArMTE1LDkgQEAgRlVOQzoJc3VicQkkMjQsIFIxNjsJCVwN
-CiAJeG9ybAlUQUIrMjA0OCgscjMsNCkscjUgIyMgRTtcDQogCW1vdnpibAlyMSAjIyBILHI3ICMj
-IEU7CVwNCiAJbW92emJsCXIxICMjIEwscjMgIyMgRTsJXA0KKwl4b3JxCVIxMixyYTsJCQlcDQog
-CW1vdnEJUjkscjE7CQkJXA0KKwlzaHJxCSQzMixSMTI7CQlcDQogCXhvcmwJVEFCKzMwNzIoLHI3
-LDQpLHI2ICMjIEU7XA0KIAltb3ZsCVRBQisyMDQ4KCxyMyw0KSxyMyAjIyBFO1wNCiAJbW92emJs
-CXIxICMjIEgscjcgIyMgRTsJXA0KQEAgLTEyNiw2ICsxMjcsNyBAQCBGVU5DOglzdWJxCSQyNCwg
-UjE2OwkJXA0KIAltb3Z6YmwJcjIgIyMgSCxyMSAjIyBFOwlcDQogCW1vdnpibAlyMiAjIyBMLHI3
-ICMjIEU7CVwNCiAJbW92cQlSOCxyMjsJCQlcDQorCXhvcnEJUjEyLHJiOwkJCVwNCiAJeG9ybAlU
-QUIrMzA3MigscjEsNCkscjMgIyMgRTtcDQogCXhvcmwJVEFCKzIwNDgoLHI3LDQpLHI0ICMjIEU7
-XA0KIAltb3Z6YmwJcjIgIyMgSCxyMSAjIyBFOwlcDQo=
-
-
---=-Y6pv7NZ+Jaj27uINcS5i
-Content-Disposition: attachment; filename=step7.patch
-Content-Type: text/x-vhdl; name=step7.patch; charset=utf-8
-Content-Transfer-Encoding: base64
-
-LS0tDQogYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMgfCAgIDEwICsrKysrKy0t
-LS0NCiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KDQot
-LS0gYS9hcmNoL3g4Ni9jcnlwdG8vYWVzLXg4Nl82NC1hc21fNjQuUw0KKysrIGIvYXJjaC94ODYv
-Y3J5cHRvL2Flcy14ODZfNjQtYXNtXzY0LlMNCkBAIC0xMTcsNiArMTE3LDcgQEAgRlVOQzoJc3Vi
-cQkkMjQsIFIxNjsJCVwNCiAJbW92emJsCXIxICMjIEwscjMgIyMgRTsJXA0KIAl4b3JxCVIxMixy
-YTsJCQlcDQogCW1vdnEJUjkscjE7CQkJXA0KKwltb3ZxCU9GRlNFVCs4KHI4KSxSOTsJXA0KIAlz
-aHJxCSQzMixSMTI7CQlcDQogCXhvcmwJVEFCKzMwNzIoLHI3LDQpLHI2ICMjIEU7XA0KIAltb3Zs
-CVRBQisyMDQ4KCxyMyw0KSxyMyAjIyBFO1wNCkBAIC0xMjYsMTYgKzEyNywxNyBAQCBGVU5DOglz
-dWJxCSQyNCwgUjE2OwkJXA0KIAl4b3JsCVRBQigscjEsNCkscjMgIyMgRTsJXA0KIAltb3Z6YmwJ
-cjIgIyMgSCxyMSAjIyBFOwlcDQogCW1vdnpibAlyMiAjIyBMLHI3ICMjIEU7CVwNCisJeG9ycQlS
-OSxyYzsJCQlcDQogCW1vdnEJUjgscjI7CQkJXA0KKwlzaHJxCSQzMixSOTsJCQlcDQogCXhvcnEJ
-UjEyLHJiOwkJCVwNCiAJeG9ybAlUQUIrMzA3MigscjEsNCkscjMgIyMgRTtcDQogCXhvcmwJVEFC
-KzIwNDgoLHI3LDQpLHI0ICMjIEU7XA0KIAltb3Z6YmwJcjIgIyMgSCxyMSAjIyBFOwlcDQorCXhv
-cnEJUjkscmQ7CQkJXA0KIAltb3Z6YmwJcjIgIyMgTCxyMiAjIyBFOwlcDQotCXhvcmwJT0ZGU0VU
-KzgocjgpLHJjICMjIEU7CVwNCi0JeG9ybAlPRkZTRVQrMTIocjgpLHJkICMjIEU7CVwNCi0JeG9y
-bAlUQUIrMTAyNCgscjEsNCkscjMgIyMgRTtcDQotCXhvcmwJVEFCKCxyMiw0KSxyNCAjIyBFOw0K
-Kwl4b3JsCVRBQigscjIsNCkscjQgIyMgRTsJXA0KKwl4b3JsCVRBQisxMDI0KCxyMSw0KSxyMyAj
-IyBFOw0KIA0KICNkZWZpbmUgbW92ZV9yZWdzKHIxLHIyLHIzLHI0KSBcDQogCW1vdmwJcjMgIyMg
-RSxyMSAjIyBFOwlcDQo=
-
-
---=-Y6pv7NZ+Jaj27uINcS5i--
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
