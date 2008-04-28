@@ -1,44 +1,95 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH -mm crypto] AES: x86_64 asm implementation optimization
-Date: Fri, 25 Apr 2008 09:37:51 +0200
-Message-ID: <20080425073751.GC4460@Chamillionaire.breakpoint.cc>
-References: <1207723262.18313.37.camel@caritas-dev.intel.com> <20080416073108.GA13494@Chamillionaire.breakpoint.cc> <1208333949.4322.5.camel@caritas-dev.intel.com> <20080416184016.GA21365@Chamillionaire.breakpoint.cc> <1208403403.4322.27.camel@caritas-dev.intel.com> <20080423223221.GB16683@Chamillionaire.breakpoint.cc> <1209093077.20936.24.camel@caritas-dev.intel.com> <20080425071258.GA4460@Chamillionaire.breakpoint.cc> <1209108087.20936.30.camel@caritas-dev.intel.com>
-Reply-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+From: Patrick McHardy <kaber@trash.net>
+Subject: [CRYPTO]: authenc: fix async crypto crash in crypto_authenc_genicv()
+Date: Mon, 28 Apr 2008 03:55:22 +0200
+Message-ID: <48152E8A.2020706@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"Adam J. Richter" <adam@yggdrasil.com>, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	mingo@elte.hu, tglx@linutronix.de
-To: "Huang, Ying" <ying.huang@intel.com>
+Content-Type: multipart/mixed;
+ boundary="------------040802080203030105060807"
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:44831 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753679AbYDYHh4 (ORCPT
+Received: from stinky.trash.net ([213.144.137.162]:40056 "EHLO
+	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753354AbYD1B7a (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Apr 2008 03:37:56 -0400
-Content-Disposition: inline
-In-Reply-To: <1209108087.20936.30.camel@caritas-dev.intel.com>
+	Sun, 27 Apr 2008 21:59:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Huang, Ying | 2008-04-25 15:21:27 [+0800]:
+This is a multi-part message in MIME format.
+--------------040802080203030105060807
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
->Hi, Sebastian,
-Hi Huang,
 
->> >So I think the reason maybe the read/write port throughput of CPU.
->> Ah so it is just a local problem you say? I may get my fingers on
->> another amd box....
->
->I mean the read/write port design difference between CPU
->micro-architecture. It is not a local problem. Sorry for my English.
-No, that is what I meant somehow. It is possible that AMD improved this
-in a later CPU generation. The AMD box I have is a pretty old one in
-comparison to Intel's dual core. It is also possible that they are
-aiming a different target and nothing changed :)
 
->Best Regards,
->Huang Ying
+--------------040802080203030105060807
+Content-Type: text/plain;
+ name="x"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="x"
 
-Sebastian
+commit 5546f35aa64c020074eca8546d638fc0305eb9ff
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Sun Apr 27 22:22:11 2008 +0200
+
+    [CRYPTO]: authenc: fix async crypto crash in crypto_authenc_genicv()
+    
+    crypto_authenc_givencrypt_done uses req->data as struct aead_givcrypt_request,
+    while it really points to a struct aead_request, causing this crash:
+    
+    BUG: unable to handle kernel paging request at 6b6b6b6b
+    IP: [<dc87517b>] :authenc:crypto_authenc_genicv+0x23/0x109
+    *pde = 00000000
+    Oops: 0000 [#1] PREEMPT DEBUG_PAGEALLOC
+    Modules linked in: hifn_795x authenc esp4 aead xfrm4_mode_tunnel sha1_generic hmac crypto_hash]
+    
+    Pid: 3074, comm: ping Not tainted (2.6.25 #4)
+    EIP: 0060:[<dc87517b>] EFLAGS: 00010296 CPU: 0
+    EIP is at crypto_authenc_genicv+0x23/0x109 [authenc]
+    EAX: daa04690 EBX: daa046e0 ECX: dab0a100 EDX: daa046b0
+    ESI: 6b6b6b6b EDI: dc872054 EBP: c033ff60 ESP: c033ff0c
+     DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 0068
+    Process ping (pid: 3074, ti=c033f000 task=db883a80 task.ti=dab6c000)
+    Stack: 00000000 daa046b0 c0215a3e daa04690 dab0a100 00000000 ffffffff db9fd7f0
+           dba208c0 dbbb1720 00000001 daa04720 00000001 c033ff54 c0119ca9 dc852a75
+           c033ff60 c033ff60 daa046e0 00000000 00000001 c033ff6c dc87527b 00000001
+    Call Trace:
+     [<c0215a3e>] ? dev_alloc_skb+0x14/0x29
+     [<c0119ca9>] ? printk+0x15/0x17
+     [<dc87527b>] ? crypto_authenc_givencrypt_done+0x1a/0x27 [authenc]
+     [<dc850cca>] ? hifn_process_ready+0x34a/0x352 [hifn_795x]
+     [<dc8353c7>] ? rhine_napipoll+0x3f2/0x3fd [via_rhine]
+     [<dc851a56>] ? hifn_check_for_completion+0x4d/0xa6 [hifn_795x]
+     [<dc851ab9>] ? hifn_tasklet_callback+0xa/0xc [hifn_795x]
+     [<c011d046>] ? tasklet_action+0x3f/0x66
+     [<c011d230>] ? __do_softirq+0x38/0x7a
+     [<c0105a5f>] ? do_softirq+0x3e/0x71
+     [<c011d17c>] ? irq_exit+0x2c/0x65
+     [<c010e0c0>] ? smp_apic_timer_interrupt+0x5f/0x6a
+     [<c01042e4>] ? apic_timer_interrupt+0x28/0x30
+     [<dc851640>] ? hifn_handle_req+0x44a/0x50d [hifn_795x]
+     ...
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index ed8ac5a..4b22676 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -217,9 +217,10 @@ static void crypto_authenc_givencrypt_done(struct crypto_async_request *req,
+ 					   int err)
+ {
+ 	if (!err) {
+-		struct aead_givcrypt_request *greq = req->data;
++		struct aead_request *areq = req->data;
++		struct skcipher_givcrypt_request *greq = aead_request_ctx(areq);
+ 
+-		err = crypto_authenc_genicv(&greq->areq, greq->giv, 0);
++		err = crypto_authenc_genicv(areq, greq->giv, 0);
+ 	}
+ 
+ 	aead_request_complete(req->data, err);
+
+--------------040802080203030105060807--
