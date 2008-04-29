@@ -1,41 +1,28 @@
-From: Julia Lawall <julia@diku.dk>
-Subject: Re: [revised PATCH] crypto: Correct kzalloc error test
-Date: Tue, 29 Apr 2008 16:18:08 +0200 (MEST)
-Message-ID: <Pine.LNX.4.58.0804291617210.1185@pc-041.diku.dk>
-References: <E1JqqUc-0005Rg-00@gondolin.me.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [RFC XFRM]: esp: fix scatterlist of out bounds access with crypto_eseqiv
+Date: Tue, 29 Apr 2008 18:21:44 +0400
+Message-ID: <20080429142144.GB16068@2ka.mipt.ru>
+References: <48161D99.5070303@trash.net> <20080429014107.GA16700@gondor.apana.org.au> <4816AD93.5090404@trash.net> <20080429135932.GA20790@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Patrick McHardy <kaber@trash.net>, linux-crypto@vger.kernel.org,
+	Linux Netdev List <netdev@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:51559 "EHLO mgw2.diku.dk"
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:52953 "EHLO 2ka.mipt.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758334AbYD2OSL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Apr 2008 10:18:11 -0400
-In-Reply-To: <E1JqqUc-0005Rg-00@gondolin.me.apana.org.au>
+	id S932618AbYD2OWp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Apr 2008 10:22:45 -0400
+Content-Disposition: inline
+In-Reply-To: <20080429135932.GA20790@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+On Tue, Apr 29, 2008 at 09:59:32PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> It's a good thing the hifn driver doesn't work yet :)
 
-Normally, kzalloc returns NULL or a valid pointer value, not a value to be
-tested using IS_ERR.
+Hey, it works :))
+Just not always, which is great at attracting Patrick and problems.
 
-Signed-off-by: Julia Lawall <julia@diku.dk>
----
-diff -u -p  a/crypto/cryptd.c b/crypto/cryptd.c
---- a/crypto/cryptd.c	2008-04-16 13:27:56.000000000 +0200
-+++ b/crypto/cryptd.c	2008-04-29 16:13:10.000000000 +0200
-@@ -190,8 +190,10 @@ static struct crypto_instance *cryptd_al
- 	int err;
-
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
--	if (IS_ERR(inst))
-+	if (!inst) {
-+		inst = ERR_PTR(-ENOMEM);
- 		goto out;
-+	}
-
- 	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+-- 
+	Evgeniy Polyakov
