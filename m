@@ -1,28 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC XFRM]: esp: fix scatterlist of out bounds access with crypto_eseqiv
-Date: Tue, 29 Apr 2008 22:45:03 +0800
-Message-ID: <20080429144503.GA21238@gondor.apana.org.au>
-References: <48161D99.5070303@trash.net> <20080429014107.GA16700@gondor.apana.org.au> <4816AD93.5090404@trash.net> <20080429135932.GA20790@gondor.apana.org.au> <20080429142144.GB16068@2ka.mipt.ru>
+Subject: Re: [revised PATCH] crypto: Correct kzalloc error test
+Date: Wed, 30 Apr 2008 00:27:58 +0800
+Message-ID: <20080429162758.GA21883@gondor.apana.org.au>
+References: <E1JqqUc-0005Rg-00@gondolin.me.apana.org.au> <Pine.LNX.4.58.0804291617210.1185@pc-041.diku.dk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Patrick McHardy <kaber@trash.net>, linux-crypto@vger.kernel.org,
-	Linux Netdev List <netdev@vger.kernel.org>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Julia Lawall <julia@diku.dk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:33378 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753891AbYD2Q2F (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Apr 2008 12:28:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20080429142144.GB16068@2ka.mipt.ru>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <Pine.LNX.4.58.0804291617210.1185@pc-041.diku.dk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 29, 2008 at 06:21:44PM +0400, Evgeniy Polyakov wrote:
+On Tue, Apr 29, 2008 at 04:18:08PM +0200, Julia Lawall wrote:
+> From: Julia Lawall <julia@diku.dk>
 > 
-> Hey, it works :))
-> Just not always, which is great at attracting Patrick and problems.
+> Normally, kzalloc returns NULL or a valid pointer value, not a value to be
+> tested using IS_ERR.
+> 
+> Signed-off-by: Julia Lawall <julia@diku.dk>
 
-I was more commenting on the bugs in the crypto layer that breaks
-hifn rather than the hifn driver itself :)
-
-Cheers,
+Patch applied.  Thanks Julia!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
