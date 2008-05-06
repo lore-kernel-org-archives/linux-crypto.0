@@ -1,33 +1,39 @@
-From: =?ISO-8859-1?Q?Adrian-Ken_R=FCegsegger?= <rueegsegger@swiss-it.ch>
-Subject: Re: tcrypt: hmac test with keys > blocksize fail
-Date: Tue, 06 May 2008 22:53:45 +0200
-Message-ID: <4820C559.2000801@swiss-it.ch>
-References: <E1JtKP9-0004NE-00@gondolin.me.apana.org.au>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: Desynchronizing dm-raid1
+Date: Tue, 6 May 2008 18:50:42 -0400 (EDT)
+Message-ID: <Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
+References: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au>
+Reply-To: device-mapper development <dm-devel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-crypto@ml.breakpoint.cc
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: dm-devel@redhat.com, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:2492 "EHLO
-	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757527AbYEFUxw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 May 2008 16:53:52 -0400
-In-Reply-To: <E1JtKP9-0004NE-00@gondolin.me.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au>
+List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
+List-Id: linux-crypto.vger.kernel.org
 
-Herbert Xu wrote:
-  > Actually this just exposed an ancient bug in hmac.  It relied
-> on the key to be in identity-mapped memory which has never been
-> guaranteed.
-> 
-> This patch fixes the problem for me.
+On Tue, 6 May 2008, Herbert Xu wrote:
 
-I have tested the patch and it resolves the issue indeed. It also let's 
-the same RIPEMD hmac tests (see my submitted patches) run correctly.
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+>>
+>> BTW: is it guaranteed for crypto functions that they read the source data
+>> only once?
+>
+> There is no such guarantee.
+>
+> Cheers,
 
-Thanks alot!
+So we'll have to copy the sector to temporary space before encrypting it.
 
--Adrian
+I'll look at it.
+
+Mikulas
