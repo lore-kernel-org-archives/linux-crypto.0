@@ -1,30 +1,31 @@
 From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [HIFN 05/n]: Fix data alignment checks
-Date: Wed, 7 May 2008 17:22:51 +0400
-Message-ID: <20080507132251.GK23422@2ka.mipt.ru>
-References: <48219D24.1040702@trash.net> <48219FF6.2090009@trash.net> <20080507124220.GA23422@2ka.mipt.ru> <4821A45B.7060209@trash.net> <20080507130433.GF23422@2ka.mipt.ru> <4821A92C.1040707@trash.net>
+Subject: Re: [HIFN 01/n]: Endianess fixes
+Date: Wed, 7 May 2008 17:23:45 +0400
+Message-ID: <20080507132345.GL23422@2ka.mipt.ru>
+References: <48219D24.1040702@trash.net> <20080507130011.GD23422@2ka.mipt.ru> <4821A843.9080003@trash.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:50997 "EHLO 2ka.mipt.ru"
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:51003 "EHLO 2ka.mipt.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752342AbYEGNXL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2008 09:23:11 -0400
+	id S1751983AbYEGNX6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 May 2008 09:23:58 -0400
 Content-Disposition: inline
-In-Reply-To: <4821A92C.1040707@trash.net>
+In-Reply-To: <4821A843.9080003@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 07, 2008 at 03:05:48PM +0200, Patrick McHardy (kaber@trash.net) wrote:
-> As a side-note: its also not just an overseight in the documentation,
-> not aligning the destination buffer to a multiple of 4 results in the
-> HW freezing, the source buffer alignment changes work fine though.
+On Wed, May 07, 2008 at 03:01:55PM +0200, Patrick McHardy (kaber@trash.net) wrote:
+> >We can also be safe without volatile annotations.
+> >  
+> 
+> Yes, will also be taken care of by a later patch :)
 
-Probably I just mirrored dst to src alignment and thus forced mask to be
-at least 3.
+I just receive them in a strange order and do not know when others will
+arrive :)
 
 -- 
 	Evgeniy Polyakov
