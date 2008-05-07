@@ -1,57 +1,161 @@
-From: "Huang, Ying" <ying.huang@intel.com>
-Subject: Re: [PATCH -mm crypto] AES: x86_64 asm implementation optimization
-Date: Wed, 07 May 2008 13:26:13 +0800
-Message-ID: <1210137973.4676.15.camel@caritas-dev.intel.com>
-References: <1207723262.18313.37.camel@caritas-dev.intel.com>
-	 <20080416073108.GA13494@Chamillionaire.breakpoint.cc>
-	 <1208333949.4322.5.camel@caritas-dev.intel.com>
-	 <20080416184016.GA21365@Chamillionaire.breakpoint.cc>
-	 <1208403403.4322.27.camel@caritas-dev.intel.com>
-	 <20080423223221.GB16683@Chamillionaire.breakpoint.cc>
-	 <1209093077.20936.24.camel@caritas-dev.intel.com>
-	 <20080429221225.GA5280@Chamillionaire.breakpoint.cc>
+From: Patrick McHardy <kaber@trash.net>
+Subject: [RFC, TCRYPT]: Catch cipher destination memory corruption
+Date: Wed, 07 May 2008 10:14:54 +0200
+Message-ID: <482164FE.4020208@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/mixed;
+ boundary="------------000602050602090102020903"
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stinky.trash.net ([213.144.137.162]:55708 "EHLO
+	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756821AbYEGIP2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 May 2008 04:15:28 -0400
+Received: from [192.168.0.100] (unknown [78.42.204.165])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by stinky.trash.net (Postfix) with ESMTP id 7AC6E948B6
+	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2008 10:15:27 +0200 (MEST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+This is a multi-part message in MIME format.
+--------------000602050602090102020903
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"Adam J. Richter" <adam@yggdrasil.com>, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	mingo@elte.hu, tglx@linutronix.de
-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1761652AbYEGFUr@vger.kernel.org>
-In-Reply-To: <20080429221225.GA5280@Chamillionaire.breakpoint.cc>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
 
-Hi, Sebastian,
+This patch adds checks to tcrypt to catch destination buffer
+corruption for cipher tests across pages, which was useful
+while fixing corruption caused by the HIFN driver.
 
-On Wed, 2008-04-30 at 00:12 +0200, Sebastian Siewior wrote:
-> * Huang, Ying | 2008-04-25 11:11:17 [+0800]:
-> 
-> >Hi, Sebastian,
-> Hi Huang,
-> 
-> sorry for the delay.
-> 
-> >I changed the patches to group the read or write together instead of
-> >interleaving. Can you help me to test these new patches? The new patches
-> >is attached with the mail.
-> The new results are attached.
+It works by always clearing xbuf before the cipher operation
+and counts how many bytes beyond the end of each buffer pointed
+to by a scatterlist entry are non-zero.
 
-It seems that the performance degradation between step4 to step5 is
-decreased. But the overall performance degradation between step0 to
-step7 is still about 5%.
+The byte count is unreliable, if enough bytes are corrupted
+it might reach the beginning of a new destination area and
+include it in the count. I don't think this is important to
+handle 100% correct since it usually shouldn't happen anyway,
+but if this is considered a problem I would simply remove
+the byte count entirely and only check the first byte.
 
-I also test the patches on Pentium 4 CPUs, and the performance decreased
-too. So I think this optimization is CPU micro-architecture dependent.
 
-While the dependency between instructions are reduced, more registers
-(at most 3) are saved/restored before/after encryption/decryption. If
-the CPU has no extra execution unit for newly independent instructions
-but more registers are saved/restored, the performance will decrease.
 
-We maybe should select different implementation based on
-micro-architecture.
+--------------000602050602090102020903
+Content-Type: text/plain;
+ name="x"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="x"
 
-Best Regards,
-Huang Ying
+commit b50b099a28f8e970cfe54b38bfc317e213a1faa7
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Wed May 7 08:32:05 2008 +0200
+
+    [TCRYPT]: Catch cipher destination memory corruption
+    
+    Check whether the destination buffer is written to beyond the last
+    byte contained in the scatterlist.
+    
+    Also change IDX1 of the cross-page access offsets to a multiple of 4.
+    This triggers a corruption in the HIFN driver and doesn't seem to
+    negatively impact other testcases.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 6beabc5..1aa443d 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -46,7 +46,7 @@
+ /*
+  * Indexes into the xbuf to simulate cross-page access.
+  */
+-#define IDX1		37
++#define IDX1		32
+ #define IDX2		32400
+ #define IDX3		1
+ #define IDX4		8193
+@@ -218,7 +218,7 @@ out:
+ static void test_aead(char *algo, int enc, struct aead_testvec *template,
+ 		      unsigned int tcount)
+ {
+-	unsigned int ret, i, j, k, temp;
++	unsigned int ret, i, j, k, n, temp;
+ 	char *q;
+ 	struct crypto_aead *tfm;
+ 	char *key;
+@@ -360,7 +360,6 @@ next_one:
+ 	}
+ 
+ 	printk(KERN_INFO "\ntesting %s %s across pages (chunking)\n", algo, e);
+-	memset(xbuf, 0, XBUFSIZE);
+ 	memset(axbuf, 0, XBUFSIZE);
+ 
+ 	for (i = 0, j = 0; i < tcount; i++) {
+@@ -388,6 +387,7 @@ next_one:
+ 					goto out;
+ 			}
+ 
++			memset(xbuf, 0, XBUFSIZE);
+ 			sg_init_table(sg, template[i].np);
+ 			for (k = 0, temp = 0; k < template[i].np; k++) {
+ 				memcpy(&xbuf[IDX[k]],
+@@ -459,6 +459,14 @@ next_one:
+ 					       0 : authsize)) ?
+ 				       "fail" : "pass");
+ 
++				for (n = 0; q[template[i].tap[k] + n]; n++)
++					;
++				if (n) {
++					printk("Result buffer corruption %u "
++					       "bytes:\n", n);
++					hexdump(&q[template[i].tap[k]], n);
++				}
++
+ 				temp += template[i].tap[k];
+ 				kunmap(sg_page(&sg[k]));
+ 			}
+@@ -473,7 +481,7 @@ out:
+ static void test_cipher(char *algo, int enc,
+ 			struct cipher_testvec *template, unsigned int tcount)
+ {
+-	unsigned int ret, i, j, k, temp;
++	unsigned int ret, i, j, k, n, temp;
+ 	char *q;
+ 	struct crypto_ablkcipher *tfm;
+ 	struct ablkcipher_request *req;
+@@ -581,7 +589,6 @@ static void test_cipher(char *algo, int enc,
+ 	}
+ 
+ 	printk("\ntesting %s %s across pages (chunking)\n", algo, e);
+-	memset(xbuf, 0, XBUFSIZE);
+ 
+ 	j = 0;
+ 	for (i = 0; i < tcount; i++) {
+@@ -602,6 +609,7 @@ static void test_cipher(char *algo, int enc,
+ 			printk("test %u (%d bit key):\n",
+ 			j, template[i].klen * 8);
+ 
++			memset(xbuf, 0, XBUFSIZE);
+ 			crypto_ablkcipher_clear_flags(tfm, ~0);
+ 			if (template[i].wk)
+ 				crypto_ablkcipher_set_flags(
+@@ -663,6 +671,14 @@ static void test_cipher(char *algo, int enc,
+ 					memcmp(q, template[i].result + temp,
+ 						template[i].tap[k]) ? "fail" :
+ 					"pass");
++
++				for (n = 0; q[template[i].tap[k] + n]; n++)
++					;
++				if (n) {
++					printk("Result buffer corruption %u "
++					       "bytes:\n", n);
++					hexdump(&q[template[i].tap[k]], n);
++				}
+ 				temp += template[i].tap[k];
+ 				kunmap(sg_page(&sg[k]));
+ 			}
+
+--------------000602050602090102020903--
