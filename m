@@ -1,37 +1,29 @@
-From: Patrick McHardy <kaber@trash.net>
-Subject: Re: [HIFN 01/n]: Endianess fixes
-Date: Wed, 07 May 2008 15:01:55 +0200
-Message-ID: <4821A843.9080003@trash.net>
-References: <48219D24.1040702@trash.net> <20080507130011.GD23422@2ka.mipt.ru>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [HIFN 05/n]: Fix data alignment checks
+Date: Wed, 7 May 2008 17:04:33 +0400
+Message-ID: <20080507130433.GF23422@2ka.mipt.ru>
+References: <48219D24.1040702@trash.net> <48219FF6.2090009@trash.net> <20080507124220.GA23422@2ka.mipt.ru> <4821A45B.7060209@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:63560 "EHLO
-	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750895AbYEGNCf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2008 09:02:35 -0400
-In-Reply-To: <20080507130011.GD23422@2ka.mipt.ru>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:59436 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752095AbYEGNEp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 May 2008 09:04:45 -0400
+Content-Disposition: inline
+In-Reply-To: <4821A45B.7060209@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Evgeniy Polyakov wrote:
-> On Wed, May 07, 2008 at 02:14:28PM +0200, Patrick McHardy (kaber@trash.net) wrote:
->   
->>     [HIFN]: Endianess fixes
->>     
->>     HIFN uses little-endian by default, move cpu_to_le32 conversion to hifn_write_0/
->>     hifn_write_1, add sparse annotations and fix an invalid endian conversion in
->>     hifn_setup_src_desc.
->>     
->
-> We can also be safe without volatile annotations.
->   
+On Wed, May 07, 2008 at 02:45:15PM +0200, Patrick McHardy (kaber@trash.net) wrote:
+> Of the data buffers only the destination buffer needs to be aligned,
+> see the Source Pointer description in "2.2 Source Descriptors" in
+> the HIFN documentation.
 
-Yes, will also be taken care of by a later patch :)
+Ok, thanks for the reference.
 
-
+-- 
+	Evgeniy Polyakov
