@@ -1,44 +1,30 @@
-From: Patrick McHardy <kaber@trash.net>
-Subject: Re: [HIFN 11/n]: Have HW invalidate src and dest descriptors after
- processing
-Date: Wed, 07 May 2008 15:18:11 +0200
-Message-ID: <4821AC13.3040809@trash.net>
-References: <48219D24.1040702@trash.net> <4821A63D.1040408@trash.net> <20080507131428.GI23422@2ka.mipt.ru>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [HIFN 05/n]: Fix data alignment checks
+Date: Wed, 7 May 2008 17:22:51 +0400
+Message-ID: <20080507132251.GK23422@2ka.mipt.ru>
+References: <48219D24.1040702@trash.net> <48219FF6.2090009@trash.net> <20080507124220.GA23422@2ka.mipt.ru> <4821A45B.7060209@trash.net> <20080507130433.GF23422@2ka.mipt.ru> <4821A92C.1040707@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:64120 "EHLO
-	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750753AbYEGNSq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2008 09:18:46 -0400
-In-Reply-To: <20080507131428.GI23422@2ka.mipt.ru>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:50997 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752342AbYEGNXL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 May 2008 09:23:11 -0400
+Content-Disposition: inline
+In-Reply-To: <4821A92C.1040707@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Evgeniy Polyakov wrote:
-> On Wed, May 07, 2008 at 02:53:17PM +0200, Patrick McHardy (kaber@trash.net) wrote:
->>     The descriptors need to be invalidated after processing for ring
->>     cleanup to work properly and to avoid using an old destination
->>     descriptor when the src and cmd descriptors are already set up
->>     and the dst descriptor isn't.
->>     
->>     Signed-off-by: Patrick McHardy <kaber@trash.net>
-> 
-> Well, we only care about cmd register and do not process valid bit in
-> others, instead of cmd is not valid we do not use others, but we can
-> also check other descriptors too.
+On Wed, May 07, 2008 at 03:05:48PM +0200, Patrick McHardy (kaber@trash.net) wrote:
+> As a side-note: its also not just an overseight in the documentation,
+> not aligning the destination buffer to a multiple of 4 results in the
+> HW freezing, the source buffer alignment changes work fine though.
 
-I noticed the ring cleanup debugging printing ever increasing
-use counts for src and dst descriptors, which went away with
-this patch, but the more important point is avoiding that the
-HW accidentally uses an old descriptors of course.
+Probably I just mirrored dst to src alignment and thus forced mask to be
+at least 3.
 
-> Thanks Patrick, I have no objections.
-
-Thanks Evgeniy. Thats it for now, next round will take until
-tonight or maybe tommorrow.
+-- 
+	Evgeniy Polyakov
