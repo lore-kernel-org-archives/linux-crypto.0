@@ -1,61 +1,46 @@
-From: Patrick McHardy <kaber@trash.net>
-Subject: [HIFN 09/n]: Fix max queue length value
-Date: Wed, 07 May 2008 14:38:31 +0200
-Message-ID: <4821A2C7.9070100@trash.net>
-References: <48219D24.1040702@trash.net>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [HIFN 05/n]: Fix data alignment checks
+Date: Wed, 7 May 2008 16:42:20 +0400
+Message-ID: <20080507124220.GA23422@2ka.mipt.ru>
+References: <48219D24.1040702@trash.net> <48219FF6.2090009@trash.net>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------060108000802040005040709"
-Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:62854 "EHLO
-	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753803AbYEGMjM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2008 08:39:12 -0400
-In-Reply-To: <48219D24.1040702@trash.net>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:57716 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755013AbYEGMm1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 May 2008 08:42:27 -0400
+Content-Disposition: inline
+In-Reply-To: <48219FF6.2090009@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060108000802040005040709
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+On Wed, May 07, 2008 at 02:26:30PM +0200, Patrick McHardy (kaber@trash.net) wrote:
+> I'm not entirely sure about the alignmask change at the end of
+> this patch, is an alignmask of 1 correct if no source buffer
+> alignment is required, but the destination buffer should be
+> (doesn't have to be though) 4 byte aligned?
 
+> commit f76618d53e82c8905214e889a3f79f1816c680fb
+> Author: Patrick McHardy <kaber@trash.net>
+> Date:   Wed May 7 12:44:15 2008 +0200
+> 
+>     [HIFN]: Fix data alignment checks
+>     
+>     The check for misalignment of the scatterlist data has two bugs:
+>     
+>     - the source buffer doesn't need to be aligned at all
+>     - the destination buffer and its size needs to be aligned to a multiple
+>       of 4, not to the crypto alg blocksize
+>     
 
+If memory serves me right, both src and dst addresses have to be 4 bytes
+aligned. Protocol alignment is not needed.
 
---------------060108000802040005040709
-Content-Type: text/x-diff;
- name="09.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="09.diff"
+If it is not the issue, then I have no objections.
 
-commit 21b18f9b22c7aa0a458c3f93fc1771a5eb5e70c8
-Author: Patrick McHardy <kaber@trash.net>
-Date:   Wed May 7 13:00:10 2008 +0200
-
-    [HIFN]: Fix max queue length value
-    
-    All but the last element of the command and result descriptor rings can be
-    used for crypto requests, fix HIFN_QUEUE_LENGTH.
-    
-    Signed-off-by: Patrick McHardy <kaber@trash.net>
-
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index b28e8b1..7d19b15 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -371,7 +371,7 @@ static atomic_t hifn_dev_number;
- 
- #define HIFN_D_DST_DALIGN		4
- 
--#define HIFN_QUEUE_LENGTH		HIFN_D_CMD_RSIZE-5
-+#define HIFN_QUEUE_LENGTH		HIFN_D_CMD_RSIZE-1
- 
- #define AES_MIN_KEY_SIZE		16
- #define AES_MAX_KEY_SIZE		32
-
---------------060108000802040005040709--
+-- 
+	Evgeniy Polyakov
