@@ -1,161 +1,183 @@
 From: Patrick McHardy <kaber@trash.net>
-Subject: [RFC, TCRYPT]: Catch cipher destination memory corruption
-Date: Wed, 07 May 2008 10:14:54 +0200
-Message-ID: <482164FE.4020208@trash.net>
+Subject: [HIFN 01/n]: Endianess fixes
+Date: Wed, 07 May 2008 14:14:28 +0200
+Message-ID: <48219D24.1040702@trash.net>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="------------000602050602090102020903"
+ boundary="------------010302080408000203000506"
+Cc: Evgeniy Polyakov <johnpol@2ka.mipt.ru>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:55708 "EHLO
+Received: from stinky.trash.net ([213.144.137.162]:62065 "EHLO
 	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756821AbYEGIP2 (ORCPT
+	with ESMTP id S1754471AbYEGMPN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2008 04:15:28 -0400
-Received: from [192.168.0.100] (unknown [78.42.204.165])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by stinky.trash.net (Postfix) with ESMTP id 7AC6E948B6
-	for <linux-crypto@vger.kernel.org>; Wed,  7 May 2008 10:15:27 +0200 (MEST)
+	Wed, 7 May 2008 08:15:13 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------000602050602090102020903
+--------------010302080408000203000506
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This patch adds checks to tcrypt to catch destination buffer
-corruption for cipher tests across pages, which was useful
-while fixing corruption caused by the HIFN driver.
-
-It works by always clearing xbuf before the cipher operation
-and counts how many bytes beyond the end of each buffer pointed
-to by a scatterlist entry are non-zero.
-
-The byte count is unreliable, if enough bytes are corrupted
-it might reach the beginning of a new destination area and
-include it in the count. I don't think this is important to
-handle 100% correct since it usually shouldn't happen anyway,
-but if this is considered a problem I would simply remove
-the byte count entirely and only check the first byte.
+Attached is the first of my fixes for the HIFN driver. I've
+got it to a working state with tcrypt, IPsec and dm-crypt, a
+few of the patches still need a bit work though, so I'll send
+the ones that I already consider ready one by one.
 
 
 
---------------000602050602090102020903
-Content-Type: text/plain;
- name="x"
+--------------010302080408000203000506
+Content-Type: text/x-diff;
+ name="01.diff"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline;
- filename="x"
+ filename="01.diff"
 
-commit b50b099a28f8e970cfe54b38bfc317e213a1faa7
+commit aa543b1fcddd097b5129a9a3056f888737d88102
 Author: Patrick McHardy <kaber@trash.net>
-Date:   Wed May 7 08:32:05 2008 +0200
+Date:   Wed May 7 12:27:09 2008 +0200
 
-    [TCRYPT]: Catch cipher destination memory corruption
+    [HIFN]: Endianess fixes
     
-    Check whether the destination buffer is written to beyond the last
-    byte contained in the scatterlist.
-    
-    Also change IDX1 of the cross-page access offsets to a multiple of 4.
-    This triggers a corruption in the HIFN driver and doesn't seem to
-    negatively impact other testcases.
+    HIFN uses little-endian by default, move cpu_to_le32 conversion to hifn_write_0/
+    hifn_write_1, add sparse annotations and fix an invalid endian conversion in
+    hifn_setup_src_desc.
     
     Signed-off-by: Patrick McHardy <kaber@trash.net>
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 6beabc5..1aa443d 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -46,7 +46,7 @@
- /*
-  * Indexes into the xbuf to simulate cross-page access.
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 81f3f95..d7a51ee 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -535,10 +535,10 @@ struct hifn_crypt_command
   */
--#define IDX1		37
-+#define IDX1		32
- #define IDX2		32400
- #define IDX3		1
- #define IDX4		8193
-@@ -218,7 +218,7 @@ out:
- static void test_aead(char *algo, int enc, struct aead_testvec *template,
- 		      unsigned int tcount)
+ struct hifn_mac_command
  {
--	unsigned int ret, i, j, k, temp;
-+	unsigned int ret, i, j, k, n, temp;
- 	char *q;
- 	struct crypto_aead *tfm;
- 	char *key;
-@@ -360,7 +360,6 @@ next_one:
- 	}
+-	volatile u16 		masks;
+-	volatile u16 		header_skip;
+-	volatile u16 		source_count;
+-	volatile u16 		reserved;
++	volatile __le16 	masks;
++	volatile __le16 	header_skip;
++	volatile __le16 	source_count;
++	volatile __le16 	reserved;
+ };
  
- 	printk(KERN_INFO "\ntesting %s %s across pages (chunking)\n", algo, e);
--	memset(xbuf, 0, XBUFSIZE);
- 	memset(axbuf, 0, XBUFSIZE);
+ #define	HIFN_MAC_CMD_ALG_MASK		0x0001
+@@ -564,10 +564,10 @@ struct hifn_mac_command
  
- 	for (i = 0, j = 0; i < tcount; i++) {
-@@ -388,6 +387,7 @@ next_one:
- 					goto out;
- 			}
- 
-+			memset(xbuf, 0, XBUFSIZE);
- 			sg_init_table(sg, template[i].np);
- 			for (k = 0, temp = 0; k < template[i].np; k++) {
- 				memcpy(&xbuf[IDX[k]],
-@@ -459,6 +459,14 @@ next_one:
- 					       0 : authsize)) ?
- 				       "fail" : "pass");
- 
-+				for (n = 0; q[template[i].tap[k] + n]; n++)
-+					;
-+				if (n) {
-+					printk("Result buffer corruption %u "
-+					       "bytes:\n", n);
-+					hexdump(&q[template[i].tap[k]], n);
-+				}
-+
- 				temp += template[i].tap[k];
- 				kunmap(sg_page(&sg[k]));
- 			}
-@@ -473,7 +481,7 @@ out:
- static void test_cipher(char *algo, int enc,
- 			struct cipher_testvec *template, unsigned int tcount)
+ struct hifn_comp_command
  {
--	unsigned int ret, i, j, k, temp;
-+	unsigned int ret, i, j, k, n, temp;
- 	char *q;
- 	struct crypto_ablkcipher *tfm;
- 	struct ablkcipher_request *req;
-@@ -581,7 +589,6 @@ static void test_cipher(char *algo, int enc,
- 	}
+-	volatile u16 		masks;
+-	volatile u16 		header_skip;
+-	volatile u16 		source_count;
+-	volatile u16 		reserved;
++	volatile __le16 	masks;
++	volatile __le16 	header_skip;
++	volatile __le16 	source_count;
++	volatile __le16 	reserved;
+ };
  
- 	printk("\ntesting %s %s across pages (chunking)\n", algo, e);
--	memset(xbuf, 0, XBUFSIZE);
+ #define	HIFN_COMP_CMD_SRCLEN_M		0xc000
+@@ -583,10 +583,10 @@ struct hifn_comp_command
  
- 	j = 0;
- 	for (i = 0; i < tcount; i++) {
-@@ -602,6 +609,7 @@ static void test_cipher(char *algo, int enc,
- 			printk("test %u (%d bit key):\n",
- 			j, template[i].klen * 8);
+ struct hifn_base_result
+ {
+-	volatile u16 		flags;
+-	volatile u16 		session;
+-	volatile u16 		src_cnt;		/* 15:0 of source count */
+-	volatile u16 		dst_cnt;		/* 15:0 of dest count */
++	volatile __le16 	flags;
++	volatile __le16 	session;
++	volatile __le16 	src_cnt;		/* 15:0 of source count */
++	volatile __le16 	dst_cnt;		/* 15:0 of dest count */
+ };
  
-+			memset(xbuf, 0, XBUFSIZE);
- 			crypto_ablkcipher_clear_flags(tfm, ~0);
- 			if (template[i].wk)
- 				crypto_ablkcipher_set_flags(
-@@ -663,6 +671,14 @@ static void test_cipher(char *algo, int enc,
- 					memcmp(q, template[i].result + temp,
- 						template[i].tap[k]) ? "fail" :
- 					"pass");
-+
-+				for (n = 0; q[template[i].tap[k] + n]; n++)
-+					;
-+				if (n) {
-+					printk("Result buffer corruption %u "
-+					       "bytes:\n", n);
-+					hexdump(&q[template[i].tap[k]], n);
-+				}
- 				temp += template[i].tap[k];
- 				kunmap(sg_page(&sg[k]));
- 			}
+ #define	HIFN_BASE_RES_DSTOVERRUN	0x0200	/* destination overrun */
+@@ -597,8 +597,8 @@ struct hifn_base_result
+ 
+ struct hifn_comp_result
+ {
+-	volatile u16 		flags;
+-	volatile u16 		crc;
++	volatile __le16		flags;
++	volatile __le16		crc;
+ };
+ 
+ #define	HIFN_COMP_RES_LCB_M		0xff00	/* longitudinal check byte */
+@@ -609,8 +609,8 @@ struct hifn_comp_result
+ 
+ struct hifn_mac_result
+ {
+-	volatile u16 		flags;
+-	volatile u16 		reserved;
++	volatile __le16 	flags;
++	volatile __le16 	reserved;
+ 	/* followed by 0, 6, 8, or 10 u16's of the MAC, then crypt */
+ };
+ 
+@@ -619,8 +619,8 @@ struct hifn_mac_result
+ 
+ struct hifn_crypt_result
+ {
+-	volatile u16 		flags;
+-	volatile u16 		reserved;
++	volatile __le16		flags;
++	volatile __le16		reserved;
+ };
+ 
+ #define	HIFN_CRYPT_RES_SRC_NOTZERO	0x0001	/* source expired */
+@@ -686,12 +686,12 @@ static inline u32 hifn_read_1(struct hifn_device *dev, u32 reg)
+ 
+ static inline void hifn_write_0(struct hifn_device *dev, u32 reg, u32 val)
+ {
+-	writel(val, dev->bar[0] + reg);
++	writel((__force u32)cpu_to_le32(val), dev->bar[0] + reg);
+ }
+ 
+ static inline void hifn_write_1(struct hifn_device *dev, u32 reg, u32 val)
+ {
+-	writel(val, dev->bar[1] + reg);
++	writel((__force u32)cpu_to_le32(val), dev->bar[1] + reg);
+ }
+ 
+ static void hifn_wait_puc(struct hifn_device *dev)
+@@ -1037,14 +1037,14 @@ static void hifn_init_registers(struct hifn_device *dev)
+ 	hifn_write_0(dev, HIFN_0_PUIER, HIFN_PUIER_DSTOVER);
+ 
+ 	/* write all 4 ring address registers */
+-	hifn_write_1(dev, HIFN_1_DMA_CRAR, __cpu_to_le32(dptr +
+-				offsetof(struct hifn_dma, cmdr[0])));
+-	hifn_write_1(dev, HIFN_1_DMA_SRAR, __cpu_to_le32(dptr +
+-				offsetof(struct hifn_dma, srcr[0])));
+-	hifn_write_1(dev, HIFN_1_DMA_DRAR, __cpu_to_le32(dptr +
+-				offsetof(struct hifn_dma, dstr[0])));
+-	hifn_write_1(dev, HIFN_1_DMA_RRAR, __cpu_to_le32(dptr +
+-				offsetof(struct hifn_dma, resr[0])));
++	hifn_write_1(dev, HIFN_1_DMA_CRAR, dptr +
++				offsetof(struct hifn_dma, cmdr[0]));
++	hifn_write_1(dev, HIFN_1_DMA_SRAR, dptr +
++				offsetof(struct hifn_dma, srcr[0]));
++	hifn_write_1(dev, HIFN_1_DMA_DRAR, dptr +
++				offsetof(struct hifn_dma, dstr[0]));
++	hifn_write_1(dev, HIFN_1_DMA_RRAR, dptr +
++				offsetof(struct hifn_dma, resr[0]));
+ 
+ 	mdelay(2);
+ #if 0
+@@ -1178,8 +1178,8 @@ static int hifn_setup_src_desc(struct hifn_device *dev, struct page *page,
+ 	idx = dma->srci;
+ 
+ 	dma->srcr[idx].p = __cpu_to_le32(addr);
+-	dma->srcr[idx].l = __cpu_to_le32(size) | HIFN_D_VALID |
+-			HIFN_D_MASKDONEIRQ | HIFN_D_NOINVALID | HIFN_D_LAST;
++	dma->srcr[idx].l = __cpu_to_le32(size | HIFN_D_VALID |
++			HIFN_D_MASKDONEIRQ | HIFN_D_NOINVALID | HIFN_D_LAST);
+ 
+ 	if (++idx == HIFN_D_SRC_RSIZE) {
+ 		dma->srcr[idx].l = __cpu_to_le32(HIFN_D_VALID |
 
---------------000602050602090102020903--
+--------------010302080408000203000506--
