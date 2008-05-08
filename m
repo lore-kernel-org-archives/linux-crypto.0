@@ -1,33 +1,31 @@
-From: Patrick McHardy <kaber@trash.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC, TCRYPT]: Catch cipher destination memory corruption
-Date: Thu, 08 May 2008 12:27:55 +0200
-Message-ID: <4822D5AB.9040401@trash.net>
-References: <E1Jtz38-0000J0-00@gondolin.me.apana.org.au>
+Date: Thu, 8 May 2008 19:29:20 +0800
+Message-ID: <20080508112919.GA3144@gondor.apana.org.au>
+References: <E1Jtz38-0000J0-00@gondolin.me.apana.org.au> <4822D5AB.9040401@trash.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Patrick McHardy <kaber@trash.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:61131 "EHLO
-	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759216AbYEHK2b (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:41991 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752123AbYEHL3W (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 May 2008 06:28:31 -0400
-In-Reply-To: <E1Jtz38-0000J0-00@gondolin.me.apana.org.au>
+	Thu, 8 May 2008 07:29:22 -0400
+Content-Disposition: inline
+In-Reply-To: <4822D5AB.9040401@trash.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> Hi Patrick:
+On Thu, May 08, 2008 at 12:27:55PM +0200, Patrick McHardy wrote:
 > 
-> Patrick McHardy <kaber@trash.net> wrote:
->> This patch adds checks to tcrypt to catch destination buffer
->> corruption for cipher tests across pages, which was useful
->> while fixing corruption caused by the HIFN driver.
-> 
-> This seems like a pretty useful check.
+> Would you like me to do any changes? Otherwise, please feel free
+> to apply :)
 
-
-Would you like me to do any changes? Otherwise, please feel free
-to apply :)
+Duly applied :)
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
