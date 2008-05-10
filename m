@@ -1,31 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RESEND][PATCH 0/4][CRYPTO] add support for extended RIPEMD hash algorithms
-Date: Fri, 9 May 2008 21:44:41 +0800
-Message-ID: <20080509134441.GA13058@gondor.apana.org.au>
-References: <1210270016-6725-1-git-send-email-rueegsegger@swiss-it.ch>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: [HIFN 1/1] Remove duplicated include
+Date: Sat, 10 May 2008 11:50:58 +0400
+Message-ID: <20080510075057.GB5145@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:58003 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752608AbYEINon (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 May 2008 09:44:43 -0400
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:49012 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750803AbYEJHvQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 10 May 2008 03:51:16 -0400
 Content-Disposition: inline
-In-Reply-To: <1210270016-6725-1-git-send-email-rueegsegger@swiss-it.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 08, 2008 at 08:06:52PM +0200, Adrian-Ken Rueegsegger wrote:
-> Resending because of missing sign-off.
-> 
-> These patches add RIPEMD-256/320 support to the cryptoapi.
+Removed duplicated include file <linux/interrupt.h>.
 
-All applied.  Thank you.
+Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
+Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+
+--- a/drivers/crypto/hifn_795x.c        2008-05-08 22:03:12.000000000 +0800
++++ b/drivers/crypto/hifn_795x.c        2008-05-08 22:03:56.000000000 +0800
+@@ -29,7 +29,6 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/scatterlist.h>
+ #include <linux/highmem.h>
+-#include <linux/interrupt.h>
+ #include <linux/crypto.h>
+ #include <linux/hw_random.h>
+ #include <linux/ktime.h>
+
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
