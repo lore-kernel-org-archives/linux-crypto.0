@@ -1,123 +1,113 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: [PATCH 3/3] [CRYPTO] tcrypt: Add Async Hash Support
-Date: Tue, 13 May 2008 13:30:24 -0700
-Message-ID: <0CA0A16855646F4FA96D25A158E299D604720780@SDCEXCHANGE01.ad.amcc.com>
-References: <20080118230721.GA30470@Chamillionaire.breakpoint.cc> <002301c85c96$32a67a40$5c05420a@amcc.com> <20080122231818.GB6920@Chamillionaire.breakpoint.cc> <002d01c85d66$11e1d7c0$5c05420a@amcc.com> <004601c85ecd$1eb53d80$5c05420a@amcc.com> <004a01c85efc$56f2ee70$5c05420a@amcc.com> <20080313114230.GC8393@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D6044D6442@SDCEXCHANGE01.ad.amcc.com> <20080422111635.GA19543@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D6045B3153@SDCEXCHANGE01.ad.amcc.com> <20080507130047.GA26872@gondor.apana.org.au>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: Desynchronizing dm-raid1
+Date: Tue, 13 May 2008 16:35:03 -0400 (EDT)
+Message-ID: <Pine.LNX.4.64.0805131622120.486@engineering.redhat.com>
+References: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au>
+	<Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
+	<Pine.LNX.4.64.0805122325050.373@engineering.redhat.com>
+	<20080513033822.GA9604@gondor.apana.org.au>
+Reply-To: device-mapper development <dm-devel@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C8B538.39DB7022"
-Cc: <linux-crypto@vger.kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02-ext1.amcc.com ([198.137.200.73]:24163 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757987AbYEMUas (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2008 16:30:48 -0400
-Content-class: urn:content-classes:message
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: dm-devel@redhat.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <20080513033822.GA9604@gondor.apana.org.au>
+List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
+List-Id: linux-crypto.vger.kernel.org
 
-This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C8B538.39DB7022
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, 13 May 2008, Herbert Xu wrote:
 
-Patch 3/3 attached. I still can't get the line wrap problem solved.
-Therefore it is attached instead inline.
+> On Mon, May 12, 2008 at 11:28:44PM -0400, Mikulas Patocka wrote:
+>>
+>> Or do you thint it would be useless (all major disk-encryption algorithms
+>> read input buffer more times?) or it would create too much code
+>> complexity?
+>
+> I'm open to this approach.  As long as you do the work and come up
+> with the patch that is :)
+>
+> Cheers,
 
--Loc=20
+And where would you propose to place this bit?
 
-------_=_NextPart_001_01C8B538.39DB7022
-Content-Type: application/octet-stream;
-	name="0003-CRYPTO-tcrypt-Add-asynchronous-hash-support.patch"
-Content-Transfer-Encoding: base64
-Content-Description: 0003-CRYPTO-tcrypt-Add-asynchronous-hash-support.patch
-Content-Disposition: attachment;
-	filename="0003-CRYPTO-tcrypt-Add-asynchronous-hash-support.patch"
+One possibility would be struct crypto_tfm->crt_flags
+Another possibility is struct crypto_alg->cra_flags
 
-RnJvbSBiYjgzYTY2ODYzMzBjNTY0ZTk0NmNiZmMyY2Q4NmMwZDg0MDQyY2ZjIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMb2MgSG8gPGxob0BhbWNjLmNvbT4KRGF0ZTogVHVlLCAxMyBN
-YXkgMjAwOCAxMzowOToyNiAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIFtDUllQVE9dIHRjcnlwdDog
-QWRkIGFzeW5jaHJvbm91cyBoYXNoIHN1cHBvcnQKClRoaXMgcGF0Y2ggYWRkcyBhc3luY2hyb25v
-dXMgaGFzaCBzdXBwb3J0IHRlc3QgY29kZS4KClNpZ25lZC1vZmYtYnk6IExvYyBIbyA8bGhvQGFt
-Y2MuY29tPgotLS0KIGNyeXB0by90Y3J5cHQuYyB8ICAgNzYgKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tCiAxIGZpbGVzIGNoYW5nZWQsIDU3IGlu
-c2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2NyeXB0by90Y3J5cHQu
-YyBiL2NyeXB0by90Y3J5cHQuYwppbmRleCAwMmUwOTBlLi4yODAxZjQ1IDEwMDY0NAotLS0gYS9j
-cnlwdG8vdGNyeXB0LmMKKysrIGIvY3J5cHRvL3RjcnlwdC5jCkBAIC0xMDQsMjIgKzEwNCwzMCBA
-QCBzdGF0aWMgdm9pZCB0ZXN0X2hhc2goY2hhciAqYWxnbywgc3RydWN0IGhhc2hfdGVzdHZlYyAq
-dGVtcGxhdGUsCiAJdW5zaWduZWQgaW50IGksIGosIGssIHRlbXA7CiAJc3RydWN0IHNjYXR0ZXJs
-aXN0IHNnWzhdOwogCWNoYXIgcmVzdWx0WzY0XTsKLQlzdHJ1Y3QgY3J5cHRvX2hhc2ggKnRmbTsK
-LQlzdHJ1Y3QgaGFzaF9kZXNjIGRlc2M7CisJc3RydWN0IGNyeXB0b19haGFzaCAqdGZtOworCXN0
-cnVjdCBhaGFzaF9yZXF1ZXN0ICpyZXE7CisJc3RydWN0IHRjcnlwdF9yZXN1bHQgdHJlc3VsdDsK
-IAlpbnQgcmV0OwogCXZvaWQgKmhhc2hfYnVmZjsKIAogCXByaW50aygiXG50ZXN0aW5nICVzXG4i
-LCBhbGdvKTsKIAotCXRmbSA9IGNyeXB0b19hbGxvY19oYXNoKGFsZ28sIDAsIENSWVBUT19BTEdf
-QVNZTkMpOworCWluaXRfY29tcGxldGlvbigmdHJlc3VsdC5jb21wbGV0aW9uKTsKKworCXRmbSA9
-IGNyeXB0b19hbGxvY19haGFzaChhbGdvLCAwLCAwKTsKIAlpZiAoSVNfRVJSKHRmbSkpIHsKIAkJ
-cHJpbnRrKCJmYWlsZWQgdG8gbG9hZCB0cmFuc2Zvcm0gZm9yICVzOiAlbGRcbiIsIGFsZ28sCiAJ
-CSAgICAgICBQVFJfRVJSKHRmbSkpOwogCQlyZXR1cm47CiAJfQogCi0JZGVzYy50Zm0gPSB0Zm07
-Ci0JZGVzYy5mbGFncyA9IDA7CisJcmVxID0gYWhhc2hfcmVxdWVzdF9hbGxvYyh0Zm0sIEdGUF9L
-RVJORUwpOworCWlmICghcmVxKSB7CisJCXByaW50ayhLRVJOX0VSUiAiZmFpbGVkIHRvIGFsbG9j
-YXRlIHJlcXVlc3QgZm9yICVzXG4iLCBhbGdvKTsKKwkJZ290byBvdXRfbm9yZXE7CisJfQorCWFo
-YXNoX3JlcXVlc3Rfc2V0X2NhbGxiYWNrKHJlcSwgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0cs
-CisJCQkJICAgdGNyeXB0X2NvbXBsZXRlLCAmdHJlc3VsdCk7CiAKIAlmb3IgKGkgPSAwOyBpIDwg
-dGNvdW50OyBpKyspIHsKIAkJcHJpbnRrKCJ0ZXN0ICV1OlxuIiwgaSArIDEpOwpAQCAtMTMzLDgg
-KzE0MSw5IEBAIHN0YXRpYyB2b2lkIHRlc3RfaGFzaChjaGFyICphbGdvLCBzdHJ1Y3QgaGFzaF90
-ZXN0dmVjICp0ZW1wbGF0ZSwKIAkJc2dfaW5pdF9vbmUoJnNnWzBdLCBoYXNoX2J1ZmYsIHRlbXBs
-YXRlW2ldLnBzaXplKTsKIAogCQlpZiAodGVtcGxhdGVbaV0ua3NpemUpIHsKLQkJCXJldCA9IGNy
-eXB0b19oYXNoX3NldGtleSh0Zm0sIHRlbXBsYXRlW2ldLmtleSwKLQkJCQkJCSB0ZW1wbGF0ZVtp
-XS5rc2l6ZSk7CisJCQljcnlwdG9fYWhhc2hfY2xlYXJfZmxhZ3ModGZtLCB+MCk7CisJCQlyZXQg
-PSBjcnlwdG9fYWhhc2hfc2V0a2V5KHRmbSwgdGVtcGxhdGVbaV0ua2V5LAorCQkJCQkJICB0ZW1w
-bGF0ZVtpXS5rc2l6ZSk7CiAJCQlpZiAocmV0KSB7CiAJCQkJcHJpbnRrKCJzZXRrZXkoKSBmYWls
-ZWQgcmV0PSVkXG4iLCByZXQpOwogCQkJCWtmcmVlKGhhc2hfYnVmZik7CkBAIC0xNDIsMTcgKzE1
-MSwzMCBAQCBzdGF0aWMgdm9pZCB0ZXN0X2hhc2goY2hhciAqYWxnbywgc3RydWN0IGhhc2hfdGVz
-dHZlYyAqdGVtcGxhdGUsCiAJCQl9CiAJCX0KIAotCQlyZXQgPSBjcnlwdG9faGFzaF9kaWdlc3Qo
-JmRlc2MsIHNnLCB0ZW1wbGF0ZVtpXS5wc2l6ZSwgcmVzdWx0KTsKLQkJaWYgKHJldCkgeworCQlh
-aGFzaF9yZXF1ZXN0X3NldF9jcnlwdChyZXEsIHNnLCByZXN1bHQsIHRlbXBsYXRlW2ldLnBzaXpl
-KTsKKwkJcmV0ID0gY3J5cHRvX2FoYXNoX2RpZ2VzdChyZXEpOworCQlzd2l0Y2ggKHJldCkgewor
-CQljYXNlIDA6CisJCQlicmVhazsKKwkJY2FzZSAtRUlOUFJPR1JFU1M6CisJCWNhc2UgLUVCVVNZ
-OgorCQkJcmV0ID0gd2FpdF9mb3JfY29tcGxldGlvbl9pbnRlcnJ1cHRpYmxlKAorCQkJCSZ0cmVz
-dWx0LmNvbXBsZXRpb24pOworCQkJaWYgKCFyZXQgJiYgIShyZXQgPSB0cmVzdWx0LmVycikpIHsK
-KwkJCQlJTklUX0NPTVBMRVRJT04odHJlc3VsdC5jb21wbGV0aW9uKTsKKwkJCQlicmVhazsKKwkJ
-CX0KKwkJCS8qIGZhbGwgdGhyb3VnaCAqLworCQlkZWZhdWx0OgogCQkJcHJpbnRrKCJkaWdlc3Qg
-KCkgZmFpbGVkIHJldD0lZFxuIiwgcmV0KTsKIAkJCWtmcmVlKGhhc2hfYnVmZik7CiAJCQlnb3Rv
-IG91dDsKIAkJfQogCi0JCWhleGR1bXAocmVzdWx0LCBjcnlwdG9faGFzaF9kaWdlc3RzaXplKHRm
-bSkpOworCQloZXhkdW1wKHJlc3VsdCwgY3J5cHRvX2FoYXNoX2RpZ2VzdHNpemUodGZtKSk7CiAJ
-CXByaW50aygiJXNcbiIsCiAJCSAgICAgICBtZW1jbXAocmVzdWx0LCB0ZW1wbGF0ZVtpXS5kaWdl
-c3QsCi0JCQkgICAgICBjcnlwdG9faGFzaF9kaWdlc3RzaXplKHRmbSkpID8KKwkJCSAgICAgIGNy
-eXB0b19haGFzaF9kaWdlc3RzaXplKHRmbSkpID8KIAkJICAgICAgICJmYWlsIiA6ICJwYXNzIik7
-CiAJCWtmcmVlKGhhc2hfYnVmZik7CiAJfQpAQCAtMTgxLDggKzIwMyw5IEBAIHN0YXRpYyB2b2lk
-IHRlc3RfaGFzaChjaGFyICphbGdvLCBzdHJ1Y3QgaGFzaF90ZXN0dmVjICp0ZW1wbGF0ZSwKIAkJ
-CX0KIAogCQkJaWYgKHRlbXBsYXRlW2ldLmtzaXplKSB7Ci0JCQkJcmV0ID0gY3J5cHRvX2hhc2hf
-c2V0a2V5KHRmbSwgdGVtcGxhdGVbaV0ua2V5LAotCQkJCQkJCSB0ZW1wbGF0ZVtpXS5rc2l6ZSk7
-CisJCQkJY3J5cHRvX2FoYXNoX2NsZWFyX2ZsYWdzKHRmbSwgfjApOworCQkJCXJldCA9IGNyeXB0
-b19haGFzaF9zZXRrZXkodGZtLCB0ZW1wbGF0ZVtpXS5rZXksCisJCQkJCQkJICB0ZW1wbGF0ZVtp
-XS5rc2l6ZSk7CiAKIAkJCQlpZiAocmV0KSB7CiAJCQkJCXByaW50aygic2V0a2V5KCkgZmFpbGVk
-IHJldD0lZFxuIiwgcmV0KTsKQEAgLTE5MCwyMyArMjEzLDM4IEBAIHN0YXRpYyB2b2lkIHRlc3Rf
-aGFzaChjaGFyICphbGdvLCBzdHJ1Y3QgaGFzaF90ZXN0dmVjICp0ZW1wbGF0ZSwKIAkJCQl9CiAJ
-CQl9CiAKLQkJCXJldCA9IGNyeXB0b19oYXNoX2RpZ2VzdCgmZGVzYywgc2csIHRlbXBsYXRlW2ld
-LnBzaXplLAotCQkJCQkJIHJlc3VsdCk7Ci0JCQlpZiAocmV0KSB7CisJCQlhaGFzaF9yZXF1ZXN0
-X3NldF9jcnlwdChyZXEsIHNnLCByZXN1bHQsCisJCQkJCQl0ZW1wbGF0ZVtpXS5wc2l6ZSk7CisJ
-CQlyZXQgPSBjcnlwdG9fYWhhc2hfZGlnZXN0KHJlcSk7CisJCQlzd2l0Y2ggKHJldCkgeworCQkJ
-Y2FzZSAwOgorCQkJCWJyZWFrOworCQkJY2FzZSAtRUlOUFJPR1JFU1M6CisJCQljYXNlIC1FQlVT
-WToKKwkJCQlyZXQgPSB3YWl0X2Zvcl9jb21wbGV0aW9uX2ludGVycnVwdGlibGUoCisJCQkJCSZ0
-cmVzdWx0LmNvbXBsZXRpb24pOworCQkJCWlmICghcmV0ICYmICEocmV0ID0gdHJlc3VsdC5lcnIp
-KSB7CisJCQkJCUlOSVRfQ09NUExFVElPTih0cmVzdWx0LmNvbXBsZXRpb24pOworCQkJCQlicmVh
-azsKKwkJCQl9CisJCQkJLyogZmFsbCB0aHJvdWdoICovCisJCQlkZWZhdWx0OgogCQkJCXByaW50
-aygiZGlnZXN0ICgpIGZhaWxlZCByZXQ9JWRcbiIsIHJldCk7CiAJCQkJZ290byBvdXQ7CiAJCQl9
-CiAKLQkJCWhleGR1bXAocmVzdWx0LCBjcnlwdG9faGFzaF9kaWdlc3RzaXplKHRmbSkpOworCQkJ
-aGV4ZHVtcChyZXN1bHQsIGNyeXB0b19haGFzaF9kaWdlc3RzaXplKHRmbSkpOwogCQkJcHJpbnRr
-KCIlc1xuIiwKIAkJCSAgICAgICBtZW1jbXAocmVzdWx0LCB0ZW1wbGF0ZVtpXS5kaWdlc3QsCi0J
-CQkJICAgICAgY3J5cHRvX2hhc2hfZGlnZXN0c2l6ZSh0Zm0pKSA/CisJCQkJICAgICAgY3J5cHRv
-X2FoYXNoX2RpZ2VzdHNpemUodGZtKSkgPwogCQkJICAgICAgICJmYWlsIiA6ICJwYXNzIik7CiAJ
-CX0KIAl9CiAKIG91dDoKLQljcnlwdG9fZnJlZV9oYXNoKHRmbSk7CisJYWhhc2hfcmVxdWVzdF9m
-cmVlKHJlcSk7CitvdXRfbm9yZXE6CisJY3J5cHRvX2ZyZWVfYWhhc2godGZtKTsKIH0KIAogc3Rh
-dGljIHZvaWQgdGVzdF9hZWFkKGNoYXIgKmFsZ28sIGludCBlbmMsIHN0cnVjdCBhZWFkX3Rlc3R2
-ZWMgKnRlbXBsYXRlLAotLSAKMS41LjMKCg==
+Can chaining mode change the value of the flag? (I presume that yes)
 
-------_=_NextPart_001_01C8B538.39DB7022--
+So make a bit in struct crypto_alg. And propagate it to 
+crypto_alg->cra_flags of chaining modes that read input data only once?
+
+I'm not familiar with Linux crypto API, so the location of the flag should 
+be selected by someone who knows it well.
+
+Here I'm sending the patch for dm-crypt. To optimize it further, you 
+should add the test after bio_data_dir(ctx->bio_in) == WRITE test --- i.e. 
+if the algorithm is safe to read input only once, the smaller and faster 
+branch can be executed.
+
+Mikukas
+
+---
+
+Copy data when writing to the device.
+
+This patch fixes damaged blocks on encrypted device when the computer crashes.
+
+Linux IO architecture allows the data to be modified while they are being
+written.
+
+While we are processing write requests, the data may change, and it is expected,
+that each byte written to the device is either old byte or new byte.
+
+Some crypto functions may read the input buffer more than once and so they'll
+produce garbage if the buffer changes under them. When this garbage is
+read again and decrypted, it may produce damage in all bytes in the block. This
+damage is visible only if the computer crashes; if it didn't crash, the memory
+manager writes correct buffer or page contents some times later.
+
+So we first copy data to a temporary buffer with memcpy and then encrypt them
+in place.
+
+Mikulas Patocka <mpatocka@redhat.com>
+
+---
+  drivers/md/dm-crypt.c |   14 ++++++++++++--
+  1 file changed, 12 insertions(+), 2 deletions(-)
+
+Index: linux-2.6.25.3/drivers/md/dm-crypt.c
+===================================================================
+--- linux-2.6.25.3.orig/drivers/md/dm-crypt.c	2008-05-13 21:48:32.000000000 +0200
++++ linux-2.6.25.3/drivers/md/dm-crypt.c	2008-05-13 22:14:12.000000000 +0200
+@@ -360,8 +360,18 @@ static int crypt_convert_block(struct cr
+  			 crypto_ablkcipher_alignmask(cc->tfm) + 1);
+
+  	sg_init_table(&dmreq->sg_in, 1);
+-	sg_set_page(&dmreq->sg_in, bv_in->bv_page, 1 << SECTOR_SHIFT,
+-		    bv_in->bv_offset + ctx->offset_in);
++	if (bio_data_dir(ctx->bio_in) == WRITE) {
++		char *page_in = kmap_atomic(bv_in->bv_page, KM_USER0);
++		char *page_out = kmap_atomic(bv_out->bv_page, KM_USER1);
++		memcpy(page_out + bv_out->bv_offset + ctx->offset_out, page_in + bv_in->bv_offset + ctx->offset_in, 1 << SECTOR_SHIFT);
++		kunmap_atomic(page_in, KM_USER0);
++		kunmap_atomic(page_out, KM_USER1);
++
++		sg_set_page(&dmreq->sg_in, bv_out->bv_page, 1 << SECTOR_SHIFT,
++			    bv_out->bv_offset + ctx->offset_out);
++	} else
++		sg_set_page(&dmreq->sg_in, bv_in->bv_page, 1 << SECTOR_SHIFT,
++			    bv_in->bv_offset + ctx->offset_in);
+
+  	sg_init_table(&dmreq->sg_out, 1);
+  	sg_set_page(&dmreq->sg_out, bv_out->bv_page, 1 << SECTOR_SHIFT,
