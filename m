@@ -1,36 +1,53 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: [HIFN 1/1] Remove duplicated include
-Date: Sat, 10 May 2008 11:50:58 +0400
-Message-ID: <20080510075057.GB5145@2ka.mipt.ru>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: Desynchronizing dm-raid1
+Date: Mon, 12 May 2008 23:28:44 -0400 (EDT)
+Message-ID: <Pine.LNX.4.64.0805122325050.373@engineering.redhat.com>
+References: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au>
+	<Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
+Reply-To: device-mapper development <dm-devel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: dm-devel@redhat.com, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:49012 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750803AbYEJHvQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 10 May 2008 03:51:16 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
+List-Id: linux-crypto.vger.kernel.org
 
-Removed duplicated include file <linux/interrupt.h>.
+On Tue, 6 May 2008, Mikulas Patocka wrote:
 
-Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
-Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+> On Tue, 6 May 2008, Herbert Xu wrote:
+>
+>> Mikulas Patocka <mpatocka@redhat.com> wrote:
+>>> 
+>>> BTW: is it guaranteed for crypto functions that they read the source data
+>>> only once?
+>> 
+>> There is no such guarantee.
+>> 
+>> Cheers,
+>
+> So we'll have to copy the sector to temporary space before encrypting it.
+>
+> I'll look at it.
+>
+> Mikulas
 
---- a/drivers/crypto/hifn_795x.c        2008-05-08 22:03:12.000000000 +0800
-+++ b/drivers/crypto/hifn_795x.c        2008-05-08 22:03:56.000000000 +0800
-@@ -29,7 +29,6 @@
- #include <linux/dma-mapping.h>
- #include <linux/scatterlist.h>
- #include <linux/highmem.h>
--#include <linux/interrupt.h>
- #include <linux/crypto.h>
- #include <linux/hw_random.h>
- #include <linux/ktime.h>
+Do you think that it would make sense to add a flag to crypto API that 
+says that the encryption function reads the input only once? --- so that 
+we wouldn't have to copy the data when using an algorithm which doesn't 
+need it.
 
+Or do you thint it would be useless (all major disk-encryption algorithms 
+read input buffer more times?) or it would create too much code 
+complexity?
 
--- 
-	Evgeniy Polyakov
+Mikulas
