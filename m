@@ -1,54 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [dm-devel] Desynchronizing dm-raid1
-Date: Wed, 14 May 2008 09:14:57 +0800
-Message-ID: <20080514011457.GB18728@gondor.apana.org.au>
-References: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au> <Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com> <Pine.LNX.4.64.0805122325050.373@engineering.redhat.com> <20080513033822.GA9604@gondor.apana.org.au> <Pine.LNX.4.64.0805131622120.486@engineering.redhat.com>
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: tcrypt: hmac test with keys > blocksize fail
+Date: Wed, 14 May 2008 09:27:10 +0200
+Message-ID: <20080514072710.GA9280@Chamillionaire.breakpoint.cc>
+References: <481BAD7A.3010003@swiss-it.ch> <E1JtKP9-0004NE-00@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-	malahal@us.ibm.com
-To: Mikulas Patocka <mpatocka@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Adrian-Ken R??egsegger <rueegsegger@swiss-it.ch>,
+	linux-crypto@vger.kernel.org, linux-crypto@ml.breakpoint.cc
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48827 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757960AbYENBPB (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41237 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752058AbYENH1O (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2008 21:15:01 -0400
+	Wed, 14 May 2008 03:27:14 -0400
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0805131622120.486@engineering.redhat.com>
+In-Reply-To: <E1JtKP9-0004NE-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 13, 2008 at 04:35:03PM -0400, Mikulas Patocka wrote:
->
-> And where would you propose to place this bit?
-> 
-> One possibility would be struct crypto_tfm->crt_flags
-> Another possibility is struct crypto_alg->cra_flags
+* Herbert Xu | 2008-05-06 18:28:15 [+0800]:
 
-The latter definitely because this is an algorithm property.
+>Actually this just exposed an ancient bug in hmac.  It relied
+>on the key to be in identity-mapped memory which has never been
+>guaranteed.
 
-> Can chaining mode change the value of the flag? (I presume that yes)
+huh. Thanks Herbert. I haven't seen this on 32bit machine.
 
-If you mean templates like CBC then it depends.  You should
-set it to zero by default for safety but most of them should
-be able to turn it on once audited.
+>Thanks,
 
-If it turns out that the majority of algorithms support this,
-you could even decide to only select those algorithms that do.
-Suppose your bit is
-
-	CRYPTO_ALG_FOO
-
-then you could do
-
-	crypto_alloc_blkcipher(name, CRYPTO_ALG_FOO, CRYPTO_ALG_FOO)
-
-to demand only those algorithms that comply.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
