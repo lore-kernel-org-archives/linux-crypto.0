@@ -1,61 +1,32 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: Userspace API proposal was: Re: [PATCH 1/1] RFC: Add CryptoAPI User Space Interface Support
-Date: Wed, 14 May 2008 20:09:41 +0400
-Message-ID: <20080514160941.GA7419@2ka.mipt.ru>
-References: <DB599F406D04E34389140B7D99C71B1B055EE51E@SDCEXCHANGE01.ad.amcc.com> <0CA0A16855646F4FA96D25A158E299D60301C29D@SDCEXCHANGE01.ad.amcc.com> <DB599F406D04E34389140B7D99C71B1B055EE6B2@SDCEXCHANGE01.ad.amcc.com> <0CA0A16855646F4FA96D25A158E299D60472088A@SDCEXCHANGE01.ad.amcc.com> <20080514103224.GA10416@Chamillionaire.breakpoint.cc> <20080514110311.GA22116@gondor.apana.org.au> <20080514115730.GA10664@Chamillionaire.breakpoint.cc> <20080514121855.GA14949@2ka.mipt.ru> <0CA0A16855646F4FA96D25A158E299D604720974@SDCEXCHANGE01.ad.amcc.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [HIFN 1/1] Remove duplicated include
+Date: Thu, 15 May 2008 14:30:18 +0800
+Message-ID: <20080515063018.GA30832@gondor.apana.org.au>
+References: <20080510075057.GB5145@2ka.mipt.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shasi Pulijala <spulijala@amcc.com>,
-	linux-crypto@vger.kernel.org
-To: Loc Ho <lho@amcc.com>
+Cc: linux-crypto@vger.kernel.org
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:56515 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751001AbYENQJx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 May 2008 12:09:53 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:54860 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750998AbYEOGaX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 May 2008 02:30:23 -0400
 Content-Disposition: inline
-In-Reply-To: <0CA0A16855646F4FA96D25A158E299D604720974@SDCEXCHANGE01.ad.amcc.com>
+In-Reply-To: <20080510075057.GB5145@2ka.mipt.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
-
-On Wed, May 14, 2008 at 08:40:43AM -0700, Loc Ho (lho@amcc.com) wrote:
-> Option #2:
-> 1. Use syscall with algorithm name and its associated parameters
-> 2. Operation such as encrypt, decrypt, hash, and etc are operated via
-> another two system call - crypto_read and crypto_write
-> 3. For this option, how should one handle asynchronous operation???
-
-No need to read/write syscall, initialization one returns a file
-descriptor, which can be read/written via usual read/write calls.
-It is also pollable.
-
-> Option #3:
+On Sat, May 10, 2008 at 11:50:58AM +0400, Evgeniy Polyakov wrote:
+> Removed duplicated include file <linux/interrupt.h>.
 > 
-> 1. Use syscall to create a special crypto device folder per an algorithm
-> 2. A handle is returned and a crypto filesystem entry is create for that
-> handle
-> 3. Crypto parameter can be set based on read/write on that folder
-> 4. Crypto operation will be based on file created under that folder. It
-> will inherit all crypto attributes of that folder.
-> 5. And etc... (See previous email)
-> 6. This approach is overkill and totally unnecessary.
-> 
-> Does this email summary all suggested solution? If not please add to
-> this list. Which one will like be accepted into the crypto tree???
+> Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
+> Signed-off-by: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
 
-Essentially it is the same as second one, but with aditional eye-candies
-like simplified key management (some file in some dir written and key is
-being changed).
-
-
-Belive me, there will be always people, who do not like your interface,
-whatever one you will create, with second or third approach such number
-will be smaller, so just create what you like and prove your point is
-strong. New interfaces is such a tasty ground for empty talks :)
-
+Patch applied.  Thanks!
 -- 
-	Evgeniy Polyakov
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
