@@ -1,36 +1,35 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH v2] crypto: rmd128: make it work on my prefered
-	architecture
-Date: Sat, 17 May 2008 10:27:54 +0200
-Message-ID: <20080517082754.GC19540@Chamillionaire.breakpoint.cc>
-References: <20080515200706.GA3081@Chamillionaire.breakpoint.cc> <20080517081003.GA19540@Chamillionaire.breakpoint.cc> <20080517.012235.82078077.davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: rmd128: make it work on my prefered architecture
+Date: Sat, 17 May 2008 16:37:38 +0800
+Message-ID: <20080517083738.GA17452@gondor.apana.org.au>
+References: <20080515200706.GA3081@Chamillionaire.breakpoint.cc> <20080517081003.GA19540@Chamillionaire.breakpoint.cc> <20080517.012235.82078077.davem@davemloft.net> <20080517082754.GC19540@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
 	rueegsegger@swiss-it.ch
-To: David Miller <davem@davemloft.net>
+To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:33453 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751941AbYEQI16 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:39845 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751581AbYEQIhp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 17 May 2008 04:27:58 -0400
+	Sat, 17 May 2008 04:37:45 -0400
 Content-Disposition: inline
-In-Reply-To: <20080517.012235.82078077.davem@davemloft.net>
+In-Reply-To: <20080517082754.GC19540@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* David Miller | 2008-05-17 01:22:35 [-0700]:
-
->From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
->Date: Sat, 17 May 2008 10:10:03 +0200
+On Sat, May 17, 2008 at 10:27:54AM +0200, Sebastian Siewior wrote:
 >
->> +	ROUND(aa, bb, cc, dd, F1, K1, le32_to_cpu(in[ 0]),  11);
->
->Not to nitpick, but if you use le32_to_cpup() this will allow the
->use of little-endian load instructions on powerpc and sparc.
+> I know that. Please see my follow up mail with some tiny numbers.
+> gcc-4.1.1 was used on a mpc8544.
 
-I know that. Please see my follow up mail with some tiny numbers.
-gcc-4.1.1 was used on a mpc8544.
+But what do the numbers look like on other architectures?  In
+particular, x86-* and sparc64?
 
-Sebastian
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
