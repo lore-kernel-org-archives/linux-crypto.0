@@ -1,37 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next 20080519 build failure
-Date: Tue, 20 May 2008 14:39:22 +0800
-Message-ID: <E1JyLVK-00026D-00@gondolin.me.apana.org.au>
-References: <20080519163035.GA8804@coyote.octets.fr>
-Cc: linux-crypto@vger.kernel.org
-To: p.o.roussel@free.fr (Philippe Roussel)
+Subject: Re: [BUILD_FAILURE] linux-next: Tree for May 19 - build fails on cryptd_alloc_hash ()
+Date: Tue, 20 May 2008 14:40:28 +0800
+Message-ID: <E1JyLWO-00026u-00@gondolin.me.apana.org.au>
+References: <20080519102627.997d61ef.randy.dunlap@oracle.com>
+Cc: kamalesh@linux.vnet.ibm.com, sfr@canb.auug.org.au,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, apw@shadowen.org
+To: randy.dunlap@oracle.com (Randy Dunlap)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57356 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:57366 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757021AbYETGjY (ORCPT
+	with ESMTP id S1753891AbYETGlo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 May 2008 02:39:24 -0400
-In-Reply-To: <20080519163035.GA8804@coyote.octets.fr>
+	Tue, 20 May 2008 02:41:44 -0400
+In-Reply-To: <20080519102627.997d61ef.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Philippe Roussel <p.o.roussel@free.fr> wrote:
-> Hi,
+Randy Dunlap <randy.dunlap@oracle.com> wrote:
+>
+> Fixed on Thu May 15:  http://lkml.org/lkml/2008/5/15/433
+> and Herbert says that he merged it on Fri May 16,
+> so why did it miss being in linux-next on Mon May 19?
 > 
-> While building randconfigs I rant into 
-> 
-> crypto/built-in.o: In function cryptd_alloc':cryptd.c:(.text+0xe35b): undefined reference to crypto_ahash_type'
-> make: *** [.tmp_vmlinux1] Error 1
-> 
-> with 
-> 
-> CONFIG_CRYPTO=y
-> CONFIG_CRYPTO_HASH=m
+> Wrong tree/branch/whatever?
 
-You need CONFIG_CRYPTO_HASH=y since you've got CONFIG_CRYPTD=y.
-
-This is alerady fixed in my tree but I forgot to push :) Sorry.
-It's pushed now.
+Sorry, I forgot to push :) It's there now so should show up tomorrow.
 
 Cheers,
 -- 
