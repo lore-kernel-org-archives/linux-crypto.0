@@ -1,41 +1,26 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: Hardware Acceleration on Freescale MPC8349
-Date: Tue, 20 May 2008 12:32:11 -0500
-Message-ID: <20080520123211.82434454.kim.phillips@freescale.com>
-References: <61362e760805200901o3a7d3c20g1a9fd9359b5d1215@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "Barry G" <mr.scada@gmail.com>
+From: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+Subject: [PATCH 0/3] [CRYPTO] ripemd: Fix endian issues
+Date: Tue, 20 May 2008 21:49:49 +0200
+Message-ID: <1211312992-6439-1-git-send-email-rueegsegger@swiss-it.ch>
+Cc: sebastian@breakpoint.cc, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw01.freescale.net ([192.88.165.102]:58822 "EHLO
-	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756609AbYETRcd (ORCPT
+Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:51075 "EHLO
+	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757677AbYETTtz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 May 2008 13:32:33 -0400
-In-Reply-To: <61362e760805200901o3a7d3c20g1a9fd9359b5d1215@mail.gmail.com>
+	Tue, 20 May 2008 15:49:55 -0400
+In-Reply-To: <>
+References: <>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 20 May 2008 09:01:55 -0700
-"Barry G" <mr.scada@gmail.com> wrote:
+These patches fix the endian issues reported by Sebastian Siewior for
+the three remaining RIPEMD modules rmd160, rmd256 and rmd320.
 
-> Hello,
-> 
-> I am trying to get HW accelerated IPsec connections working
-> on the SEC 2.4 engine in the MPC8349.
-> 
-> I am hoping to use StrongSwan which uses the native XFRM
-> kernel components.  Unfortunately it looks like the only
-> working option available to me is the OCF stuff (using the Talitos
-> driver) which only works with OpenSwan.
-> 
-> Is anyone working on a HW accelerator for the Freescale SEC engine
-> that XFRM IPsec connections can use?
+ crypto/rmd160.c |   37 +++++++++----------------------------
+ crypto/rmd256.c |   37 +++++++++----------------------------
+ crypto/rmd320.c |   37 +++++++++----------------------------
+ 3 files changed, 27 insertions(+), 84 deletions(-)
 
-I have one that's not suitable for submission yet; I'm working on
-authenc(hmac(sha1),cbc(aes)) support and intend on submitting it
-before the next window opens.
 
-Kim
