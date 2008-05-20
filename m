@@ -1,115 +1,34 @@
-From: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
-Subject: [PATCH 3/3] [CRYPTO] rmd320: Fix endian problems
-Date: Tue, 20 May 2008 21:49:52 +0200
-Message-ID: <1211312992-6439-4-git-send-email-rueegsegger@swiss-it.ch>
-References: <>
- <1211312992-6439-1-git-send-email-rueegsegger@swiss-it.ch>
- <1211312992-6439-2-git-send-email-rueegsegger@swiss-it.ch>
- <1211312992-6439-3-git-send-email-rueegsegger@swiss-it.ch>
-Cc: sebastian@breakpoint.cc, linux-crypto@vger.kernel.org,
-	Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
-To: herbert@gondor.apana.org.au
+From: Sebastian Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH 0/3] [CRYPTO] ripemd: Fix endian issues
+Date: Tue, 20 May 2008 23:32:34 +0200
+Message-ID: <20080520213234.GA998@Chamillionaire.breakpoint.cc>
+References: <1211312992-6439-1-git-send-email-rueegsegger@swiss-it.ch>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:51094 "EHLO
-	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758494AbYETTt6 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60316 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758213AbYETVcg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 May 2008 15:49:58 -0400
-In-Reply-To: <1211312992-6439-3-git-send-email-rueegsegger@swiss-it.ch>
+	Tue, 20 May 2008 17:32:36 -0400
+Content-Disposition: inline
+In-Reply-To: <1211312992-6439-1-git-send-email-rueegsegger@swiss-it.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes endian issues making rmd320 work
-properly on big-endian machines.
+* Adrian-Ken Rueegsegger | 2008-05-20 21:49:49 [+0200]:
 
-Signed-off-by: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
----
- crypto/rmd320.c |   37 +++++++++----------------------------
- 1 files changed, 9 insertions(+), 28 deletions(-)
+>These patches fix the endian issues reported by Sebastian Siewior for
+>the three remaining RIPEMD modules rmd160, rmd256 and rmd320.
+>
+> crypto/rmd160.c |   37 +++++++++----------------------------
+> crypto/rmd256.c |   37 +++++++++----------------------------
+> crypto/rmd320.c |   37 +++++++++----------------------------
+> 3 files changed, 27 insertions(+), 84 deletions(-)
+For the whole series:
+Acked-by: Sebastian Siewior <sebastian@breakpoint.cc>
 
-diff --git a/crypto/rmd320.c b/crypto/rmd320.c
-index b39c054..5b172f8 100644
---- a/crypto/rmd320.c
-+++ b/crypto/rmd320.c
-@@ -47,7 +47,7 @@ struct rmd320_ctx {
- #define F5(x, y, z) (x ^ (y | ~z))
- 
- #define ROUND(a, b, c, d, e, f, k, x, s)  { \
--	(a) += f((b), (c), (d)) + (x) + (k); \
-+	(a) += f((b), (c), (d)) + le32_to_cpu(x) + (k); \
- 	(a) = rol32((a), (s)) + (e); \
- 	(c) = rol32((c), 10); \
- }
-@@ -280,28 +280,6 @@ static void rmd320_transform(u32 *state, u32 const *in)
- 	return;
- }
- 
--static inline void le32_to_cpu_array(u32 *buf, unsigned int words)
--{
--	while (words--) {
--		le32_to_cpus(buf);
--		buf++;
--	}
--}
--
--static inline void cpu_to_le32_array(u32 *buf, unsigned int words)
--{
--	while (words--) {
--		cpu_to_le32s(buf);
--		buf++;
--	}
--}
--
--static inline void rmd320_transform_helper(struct rmd320_ctx *ctx)
--{
--	le32_to_cpu_array(ctx->buffer, sizeof(ctx->buffer) / sizeof(u32));
--	rmd320_transform(ctx->state, ctx->buffer);
--}
--
- static void rmd320_init(struct crypto_tfm *tfm)
- {
- 	struct rmd320_ctx *rctx = crypto_tfm_ctx(tfm);
-@@ -340,13 +318,13 @@ static void rmd320_update(struct crypto_tfm *tfm, const u8 *data,
- 	memcpy((char *)rctx->buffer + (sizeof(rctx->buffer) - avail),
- 	       data, avail);
- 
--	rmd320_transform_helper(rctx);
-+	rmd320_transform(rctx->state, rctx->buffer);
- 	data += avail;
- 	len -= avail;
- 
- 	while (len >= sizeof(rctx->buffer)) {
- 		memcpy(rctx->buffer, data, sizeof(rctx->buffer));
--		rmd320_transform_helper(rctx);
-+		rmd320_transform(rctx->state, rctx->buffer);
- 		data += sizeof(rctx->buffer);
- 		len -= sizeof(rctx->buffer);
- 	}
-@@ -358,10 +336,12 @@ static void rmd320_update(struct crypto_tfm *tfm, const u8 *data,
- static void rmd320_final(struct crypto_tfm *tfm, u8 *out)
- {
- 	struct rmd320_ctx *rctx = crypto_tfm_ctx(tfm);
--	u32 index, padlen;
-+	u32 i, index, padlen;
- 	u64 bits;
-+	u32 *dst = (u32 *)out;
- 	static const u8 padding[64] = { 0x80, };
--	bits = rctx->byte_count << 3;
-+
-+	bits = cpu_to_le64(rctx->byte_count << 3);
- 
- 	/* Pad out to 56 mod 64 */
- 	index = rctx->byte_count & 0x3f;
-@@ -372,7 +352,8 @@ static void rmd320_final(struct crypto_tfm *tfm, u8 *out)
- 	rmd320_update(tfm, (const u8 *)&bits, sizeof(bits));
- 
- 	/* Store state in digest */
--	memcpy(out, rctx->state, sizeof(rctx->state));
-+	for (i = 0; i < 10; i++)
-+		dst[i] = cpu_to_le32(rctx->state[i]);
- 
- 	/* Wipe context */
- 	memset(rctx, 0, sizeof(*rctx));
--- 
-1.5.2.5
-
+Thanks for fixing this.
+Sebastian
