@@ -1,46 +1,45 @@
-From: =?ISO-8859-15?Q?Adrian-Ken_R=FCegsegger?= <rueegsegger@swiss-it.ch>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] [CRYPTO] rmd128: Fix endian problems
-Date: Mon, 19 May 2008 23:24:32 +0200
-Message-ID: <4831F010.5020202@swiss-it.ch>
-References: <20080517081003.GA19540@Chamillionaire.breakpoint.cc> <12111465553916-git-send-email-rueegsegger@swiss-it.ch> <20080519200145.GB16813@Chamillionaire.breakpoint.cc> <4831E50B.4060101@swiss-it.ch> <20080519205944.GC16813@Chamillionaire.breakpoint.cc>
+Date: Tue, 20 May 2008 10:28:32 +0800
+Message-ID: <20080520022832.GA6604@gondor.apana.org.au>
+References: <20080517081003.GA19540@Chamillionaire.breakpoint.cc> <12111465553916-git-send-email-rueegsegger@swiss-it.ch> <20080519200145.GB16813@Chamillionaire.breakpoint.cc> <4831E50B.4060101@swiss-it.ch> <20080519205944.GC16813@Chamillionaire.breakpoint.cc> <4831F010.5020202@swiss-it.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
+	linux-crypto@vger.kernel.org
+To: Adrian-Ken =?iso-8859-1?Q?R=FCegsegger?= <rueegsegger@swiss-it.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:2524 "EHLO
-	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760122AbYESVYg (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:42747 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752853AbYETC2o (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 May 2008 17:24:36 -0400
-In-Reply-To: <20080519205944.GC16813@Chamillionaire.breakpoint.cc>
+	Mon, 19 May 2008 22:28:44 -0400
+Content-Disposition: inline
+In-Reply-To: <4831F010.5020202@swiss-it.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sebastian Siewior wrote:
-> * Adrian-Ken R?egsegger | 2008-05-19 22:37:31 [+0200]:
->> Sebastian Siewior wrote:
->>> * Adrian-Ken Rueegsegger | 2008-05-18 23:35:55 [+0200]:
->>>> Sebastian, would you be so kind to test this patch on PowerPC?
->>> Acked-by: Sebastian Siewior <sebastian@breakpoint.cc>
->> Sebastian, thanks for testing :)
-> You welcome.
-> Any particular reason why named it rmd... instead of ripemd...?
+On Mon, May 19, 2008 at 11:24:32PM +0200, Adrian-Ken R=FCegsegger wrote=
+:
+>
+> >> If there are no objections I will prepare patches for the other RI=
+PEMD modules and submit all of them in one patch set.
+> > Any objections on moving ripemd.h from include/crypto into crypto?
+>=20
+> Not from my side. I put it there because the SHA header file is in th=
+e same place.
 
-Looking at other crypto modules like tgr192 or wp512 I got the impression that names should
-be kept short.
+OK it's moved.
 
->> If there are no objections I will prepare patches for the other RIPEMD modules and submit all of them in one patch set.
-> Any objections on moving ripemd.h from include/crypto into crypto?
-
-Not from my side. I put it there because the SHA header file is in the same place.
-
--Adrian
-
-> Herbert?
-> Since you only use it within crypto/ and you don't need it in userspace
-> or arch/ I would prefer to have it in crypto.
-> 
->> -Adrian
-> Sebastian
+Cheers,
+--=20
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
