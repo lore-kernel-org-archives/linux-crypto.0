@@ -1,40 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Hardware Acceleration on Freescale MPC8349
-Date: Wed, 21 May 2008 13:52:43 +0800
-Message-ID: <E1JyhFj-0004Wq-00@gondolin.me.apana.org.au>
-References: <20080520123211.82434454.kim.phillips@freescale.com>
-Cc: mr.scada@gmail.com, linux-crypto@vger.kernel.org
-To: kim.phillips@freescale.com (Kim Phillips)
+From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH v2] crypto: rmd128: make it work on my prefered
+	architecture
+Date: Wed, 21 May 2008 09:09:54 +0200
+Message-ID: <20080521070954.GA5290@Chamillionaire.breakpoint.cc>
+References: <20080517.020122.229980431.davem@davemloft.net> <20080517091451.GE19540@Chamillionaire.breakpoint.cc> <20080517095625.GA17878@gondor.apana.org.au> <20080520.194723.268247612.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	rueegsegger@swiss-it.ch
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59713 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754450AbYEUFwv (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40061 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755306AbYEUHJ7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 May 2008 01:52:51 -0400
-In-Reply-To: <20080520123211.82434454.kim.phillips@freescale.com>
+	Wed, 21 May 2008 03:09:59 -0400
+Content-Disposition: inline
+In-Reply-To: <20080520.194723.268247612.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Kim Phillips <kim.phillips@freescale.com> wrote:
->
-> I have one that's not suitable for submission yet; I'm working on
-> authenc(hmac(sha1),cbc(aes)) support and intend on submitting it
-> before the next window opens.
+* David Miller | 2008-05-20 19:47:23 [-0700]:
 
-That sounds cool!
+>From: Herbert Xu <herbert@gondor.apana.org.au>
+I though you and Herbert are two different persons.
 
-Please don't let the window stop you though.  Because the earlier
-your patch goes into a tree the sooner it can be pushed to Linus
-when the window does open.
+>Performance is significantly increased on Niagara2 by using
+>the little-endian loads inside of the transformation loop, as
+>expected.   The numbers below are first before, then after,
+>the patch at the very end of this email is applied.
+That was, what I expected as well but the numbers were different. I
+checked the assembly code and I had the le loads but more code. I will
+check with different compiler maybe it will get better here as well.
 
-In other words, the merge window should have no effect on your
-patch submission.  In fact, if you wait for the merge window to
-open first, it'll only mean that I can't push it to Linus for that
-release and it'll have to wait for the next one.
+>And this is what I suggested in the first place.  Was was not
+>suggesting that the endian converting preparation loop be retained.
+>Rather, I was suggesting that the in[] array be accessed with the
+>special loads.
+This was what I did. The only difference between now and my patch is
+that I haven't put the le load into the macro.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
