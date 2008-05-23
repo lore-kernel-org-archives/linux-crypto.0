@@ -1,49 +1,176 @@
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: Desynchronizing dm-raid1
-Date: Fri, 23 May 2008 10:59:33 -0400 (EDT)
-Message-ID: <Pine.LNX.4.64.0805231057110.31371@engineering.redhat.com>
-References: <E1JtKQL-0004Nm-00@gondolin.me.apana.org.au>
-	<Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
-	<Pine.LNX.4.64.0805122325050.373@engineering.redhat.com>
-	<20080513033822.GA9604@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805131622120.486@engineering.redhat.com>
-	<20080514011457.GB18728@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805212210330.17520@engineering.redhat.com>
-	<20080522024225.GA28400@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805220828500.15805@engineering.redhat.com>
-	<20080522235345.GA4019@gondor.apana.org.au>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: [PATCH] tcrypt: add self test for des3_ebe cipher operating in cbc
+	mode
+Date: Fri, 23 May 2008 16:18:55 -0400
+Message-ID: <20080523195145.GA28328@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Cc: dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-	Alasdair G Kergon <agk@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20080522235345.GA4019@gondor.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	nhorman@tuxdriver.com
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ra.tuxdriver.com ([70.61.120.52]:2153 "EHLO ra.tuxdriver.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753434AbYEWUT3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 May 2008 16:19:29 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> On Thu, May 22, 2008 at 08:32:45AM -0400, Mikulas Patocka wrote:
->>
->> There may be external modules.
->
-> Sorry but we don't support external modules.  They should be merged
-> upstream rather than distributed in the wild.
->
-> Cheers,
+Patch to add checking of DES3 test vectors using CBC mode.  FIPS-1402-2
+compliance mandates that any supported mode of oepration must include a self
+test.  This satisfies that requirement for cbc(des_ebe).  Tested successfully by
+me
 
-If you want to negate the meaning of the flag, then you have to write it 
-yourself. I, as non-developer of crypto code, can prove that on given path 
-the input data are read only once --- but I can't prove that on all paths 
-and all possible chaining modes of algorithms the data are read once, 
-because I don't know about all of them.
+Regards
+Neil
 
-Mikulas
+Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+
+
+tcrypt.c |    8 +++++
+tcrypt.h |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+2 files changed, 98 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 6beabc5..649a8e4 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1180,6 +1180,14 @@ static void do_test(void)
+ 		test_cipher("ecb(des3_ede)", DECRYPT, des3_ede_dec_tv_template,
+ 			    DES3_EDE_DEC_TEST_VECTORS);
+ 
++		test_cipher("cbc(des3_ede)", ENCRYPT,
++			    des3_ede_cbc_enc_tv_template,
++			    DES3_EDE_CBC_ENC_TEST_VECTORS);
++
++		test_cipher("cbc(des3_ede)", DECRYPT,
++			    des3_ede_cbc_dec_tv_template,
++			    DES3_EDE_CBC_DEC_TEST_VECTORS);
++
+ 		test_hash("md4", md4_tv_template, MD4_TEST_VECTORS);
+ 
+ 		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 47bc0ec..8893733 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -1442,6 +1442,8 @@ static struct hash_testvec hmac_sha512_tv_template[] = {
+ #define DES_CBC_DEC_TEST_VECTORS	4
+ #define DES3_EDE_ENC_TEST_VECTORS	3
+ #define DES3_EDE_DEC_TEST_VECTORS	3
++#define DES3_EDE_CBC_ENC_TEST_VECTORS	1
++#define DES3_EDE_CBC_DEC_TEST_VECTORS	1
+ 
+ static struct cipher_testvec des_enc_tv_template[] = {
+ 	{ /* From Applied Cryptography */
+@@ -1680,9 +1682,6 @@ static struct cipher_testvec des_cbc_dec_tv_template[] = {
+ 	},
+ };
+ 
+-/*
+- * We really need some more test vectors, especially for DES3 CBC.
+- */
+ static struct cipher_testvec des3_ede_enc_tv_template[] = {
+ 	{ /* These are from openssl */
+ 		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef"
+@@ -1745,6 +1744,94 @@ static struct cipher_testvec des3_ede_dec_tv_template[] = {
+ 	},
+ };
+ 
++static struct cipher_testvec des3_ede_cbc_enc_tv_template[] = {
++	{ /* Generated from openssl */
++		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result = "\x15\x8d\x5d\x34\x1b\x3f\xda\xda"
++			  "\x4f\xce\x21\x82\x12\x54\x21\x0d"
++			  "\xb2\x36\xda\xcc\xff\xb2\xff\x79"
++			  "\x30\xe9\x95\xf4\x52\xf6\xf1\x43"
++			  "\xf2\x88\xe1\x1c\x42\xa1\x6a\x11"
++			  "\xda\x8f\xbd\x94\x5e\xe5\xa8\x43"
++			  "\xe4\x4f\xbd\x0d\x1e\x67\xa1\x89"
++			  "\x9a\x4e\x66\x62\x50\xb3\x07\x3e"
++			  "\xc8\xc1\x87\x3d\x96\x62\xf7\xe7"
++			  "\x96\x15\xa8\x34\xb6\x94\x1a\x17"
++			  "\x05\xde\x62\xd6\xd8\x73\xd6\xb4"
++			  "\x24\x1f\x57\xb6\x80\x9a\x65\x50"
++			  "\xa0\xee\x2f\x8b\x4c\x80\x86\xfb"
++			  "\xbb\xda\xa0\xa2\x4b\x49\x6c\x72"
++			  "\x69\x83\xe9\xaa\x92\x56\x33\x95"
++			  "\xbc\x80\x88\x04\xde\xd5\x74\x9f",
++		.rlen	= 128,
++	},
++};
++
++static struct cipher_testvec des3_ede_cbc_dec_tv_template[] = {
++	{ /* Generated from openssl */
++		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.input =  "\x15\x8d\x5d\x34\x1b\x3f\xda\xda"
++			  "\x4f\xce\x21\x82\x12\x54\x21\x0d"
++			  "\xb2\x36\xda\xcc\xff\xb2\xff\x79"
++			  "\x30\xe9\x95\xf4\x52\xf6\xf1\x43"
++			  "\xf2\x88\xe1\x1c\x42\xa1\x6a\x11"
++			  "\xda\x8f\xbd\x94\x5e\xe5\xa8\x43"
++			  "\xe4\x4f\xbd\x0d\x1e\x67\xa1\x89"
++			  "\x9a\x4e\x66\x62\x50\xb3\x07\x3e"
++			  "\xc8\xc1\x87\x3d\x96\x62\xf7\xe7"
++			  "\x96\x15\xa8\x34\xb6\x94\x1a\x17"
++			  "\x05\xde\x62\xd6\xd8\x73\xd6\xb4"
++			  "\x24\x1f\x57\xb6\x80\x9a\x65\x50"
++			  "\xa0\xee\x2f\x8b\x4c\x80\x86\xfb"
++			  "\xbb\xda\xa0\xa2\x4b\x49\x6c\x72"
++			  "\x69\x83\xe9\xaa\x92\x56\x33\x95"
++			  "\xbc\x80\x88\x04\xde\xd5\x74\x9f",
++		.ilen	= 128,
++		.result	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.rlen	= 128,
++	},
++};
++
+ /*
+  * Blowfish test vectors.
+  */
+-- 
+/****************************************************
+ * Neil Horman <nhorman@tuxdriver.com>
+ * Software Engineer, Red Hat
+ ****************************************************/
