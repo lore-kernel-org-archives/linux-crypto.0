@@ -1,50 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Desynchronizing dm-raid1
-Date: Sat, 24 May 2008 10:01:19 +1000
-Message-ID: <20080524000119.GA26747@gondor.apana.org.au>
-References: <Pine.LNX.4.64.0805061849020.7260@engineering.redhat.com>
-	<Pine.LNX.4.64.0805122325050.373@engineering.redhat.com>
-	<20080513033822.GA9604@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805131622120.486@engineering.redhat.com>
-	<20080514011457.GB18728@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805212210330.17520@engineering.redhat.com>
-	<20080522024225.GA28400@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805220828500.15805@engineering.redhat.com>
-	<20080522235345.GA4019@gondor.apana.org.au>
-	<Pine.LNX.4.64.0805231057110.31371@engineering.redhat.com>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+Subject: Re: [PATCH] tcrypt: add self test for des3_ebe cipher operating in cbc mode
+Date: Sat, 24 May 2008 10:06:25 +1000
+Message-ID: <20080524000624.GB26747@gondor.apana.org.au>
+References: <20080523195145.GA28328@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-	Alasdair G Kergon <agk@redhat.com>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Return-path: <dm-devel-bounces@redhat.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Neil Horman <nhorman@tuxdriver.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:38156 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752151AbYEXAG1 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 May 2008 20:06:27 -0400
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0805231057110.31371@engineering.redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20080523195145.GA28328@hmsreliant.think-freely.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 23, 2008 at 10:59:33AM -0400, Mikulas Patocka wrote:
->
-> If you want to negate the meaning of the flag, then you have to write it 
-> yourself. I, as non-developer of crypto code, can prove that on given path 
-> the input data are read only once --- but I can't prove that on all paths 
-> and all possible chaining modes of algorithms the data are read once, 
-> because I don't know about all of them.
+Hi Neil:
 
-Huh? Inverting it would give exactly the same result as your current
-patch.  If you're not confident with it inverted, then I can't see
-how you could be confident about the patch as it is.
+On Fri, May 23, 2008 at 04:18:55PM -0400, Neil Horman wrote:
+> Patch to add checking of DES3 test vectors using CBC mode.  FIPS-1402-2
+> compliance mandates that any supported mode of oepration must include a self
+> test.  This satisfies that requirement for cbc(des_ebe).  Tested successfully by
+> me
 
-Cheers,
+Could you document the source of these vectors in the patch
+description please?
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
