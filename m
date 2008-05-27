@@ -1,54 +1,44 @@
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: Re: [PATCH] CRYPTO:  Simplify code using ARRAY_SIZE() macro.
-Date: Tue, 27 May 2008 04:50:02 -0400 (EDT)
-Message-ID: <alpine.LFD.1.10.0805270449390.6239@localhost.localdomain>
-References: <alpine.LFD.1.10.0805250731530.23219@localhost.localdomain> <20080526112058.GA16525@gondor.apana.org.au>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v2] crypto: rmd128: make it work on my prefered
+ architecture
+Date: Tue, 27 May 2008 04:37:08 -0700 (PDT)
+Message-ID: <20080527.043708.50978984.davem@davemloft.net>
+References: <20080517095625.GA17878@gondor.apana.org.au>
+	<20080520.194723.268247612.davem@davemloft.net>
+	<20080526110508.GB14743@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@ml.breakpoint.cc, linux-crypto@vger.kernel.org,
+	rueegsegger@swiss-it.ch
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:43404 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756729AbYE0IuL (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:57432
+	"EHLO sunset.davemloft.net" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1754982AbYE0LhM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 May 2008 04:50:11 -0400
-In-Reply-To: <20080526112058.GA16525@gondor.apana.org.au>
+	Tue, 27 May 2008 07:37:12 -0400
+In-Reply-To: <20080526110508.GB14743@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 26 May 2008, Herbert Xu wrote:
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Mon, 26 May 2008 21:05:08 +1000
 
-> On Sun, May 25, 2008 at 11:32:45AM +0000, Robert P. J. Day wrote:
-> >
-> > Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
-> >
-> > ---
-> >
-> > diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-> > index 81f3f95..c4c018d 100644
-> > --- a/drivers/crypto/hifn_795x.c
-> > +++ b/drivers/crypto/hifn_795x.c
-> > @@ -894,7 +894,7 @@ static int hifn_enable_crypto(struct hifn_device *dev)
-> >  	char *offtbl = NULL;
-> >  	int i;
-> >
-> > -	for (i = 0; i < sizeof(pci2id)/sizeof(pci2id[0]); i++) {
-> > +	for (i = 0; i < ARRAY_SIZE(pci2id)); i++) {
->
-> You've got an extra parenthesis here.  You should be building the
-> patches that you send, no matter how trivial they might look!
->
-> I've fixed it for you this time.
+> On Tue, May 20, 2008 at 07:47:23PM -0700, David Miller wrote:
+> 
+> > -------------------- before patch --------------------
+> > 
+> > [452862.338505] testing speed of rmd128
+> > [452862.354441] test  0 (   16 byte blocks,   16 bytes per update,   1 updates):   6064 cycles/operation,  379 cycles/byte
+> 
+> > -------------------- after patch --------------------
+> > 
+> > [453226.216294] testing speed of rmd128
+> > [453226.216322] test  0 (   16 byte blocks,   16 bytes per update,   1 updates):   2784 cycles/operation,  174 cycles/byte
+> 
+> Looks good Dave! I've done the same thing for the other rmd* files
+> and for the store on the result.  Let me know if this looks OK and
+> I'll commit.
 
-yes, my apologies.  thanks.
-
-rday
---
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+Looks ok to me, thanks!
