@@ -1,38 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: IPSec ESP Authenc Offload
-Date: Thu, 29 May 2008 08:22:46 +1000
-Message-ID: <20080528222246.GA7798@gondor.apana.org.au>
-References: <alpine.LFD.1.10.0805250731530.23219@localhost.localdomain> <20080526112058.GA16525@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D604814C4A@SDCEXCHANGE01.ad.amcc.com> <20080528063434.GA1173@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D604814F16@SDCEXCHANGE01.ad.amcc.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: calculte md5 sum?
+Date: Thu, 29 May 2008 08:28:24 +1000
+Message-ID: <E1K1U88-0003wA-00@gondolin.me.apana.org.au>
+References: <379e30200805281013g4d75dcf4vf4eaa8e0645f1e43@mail.gmail.com>
 Cc: linux-crypto@vger.kernel.org
-To: Loc Ho <lho@amcc.com>
+To: tobias.koeck@gmail.com (Tobias Koeck)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:36870 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:54527 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753428AbYE1WWt (ORCPT
+	with ESMTP id S1752656AbYE1W21 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 May 2008 18:22:49 -0400
-Content-Disposition: inline
-In-Reply-To: <0CA0A16855646F4FA96D25A158E299D604814F16@SDCEXCHANGE01.ad.amcc.com>
+	Wed, 28 May 2008 18:28:27 -0400
+In-Reply-To: <379e30200805281013g4d75dcf4vf4eaa8e0645f1e43@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 28, 2008 at 09:42:47AM -0700, Loc Ho wrote:
-> Hi,
+Tobias Koeck <tobias.koeck@gmail.com> wrote:
+> I'm programming on a netfilter module and need to use the kernel md5
+> sum functions to calculate a md5 sum from some integers.
 > 
-> With IPSec ESP Authenc, it is expected that the selected driver
-> generates "IV" as well as encrypts the data. Our 'hardware' (available
-> currently), can only handle either no header processing or header
-> processing (from ESP to IV processing but not individual field
-> processing). 
+> I'm still searching for a decent documenation (kerneli.org seems to be
+> down) and some example how to do it.
 > 
-> For no header processing, we will have to do a lot more work in software
-> - create a context SA for each requested operation, copy from the
-> initial context SA, after the operation completed, retrieve the update
-> IV from context SA, and then write it back to the packet.
+> Has anybody an idea or a small example how to implement this?
 
-Do you still need to do this if we used a software-generated IV?
+Start by looking at how others use it:
+
+	grep crypto_hash net/*/*.c
 
 Cheers,
 -- 
