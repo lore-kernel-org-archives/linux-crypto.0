@@ -1,63 +1,40 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 2/2] talitos: Freescale integrated security engine (SEC)
- driver
-Date: Fri, 30 May 2008 17:19:30 -0500
-Message-ID: <20080530171930.61965d59.kim.phillips@freescale.com>
-References: <20080529141250.0946b02c.kim.phillips@freescale.com>
-	<20080530180904.GA18945@2ka.mipt.ru>
-	<20080530143614.1e675228.kim.phillips@freescale.com>
-	<4840585D.8050805@freescale.com>
-	<20080530151638.087970ab.kim.phillips@freescale.com>
-	<4840615F.4070103@freescale.com>
-	<20080530153505.21eb1ec4.kim.phillips@freescale.com>
-	<48406562.4010306@freescale.com>
-	<20080530154820.6e56b625.kim.phillips@freescale.com>
-	<20080530211204.GA15768@2ka.mipt.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] tcrypt: add self test for des3_ebe cipher operating in cbc mode
+Date: Sat, 31 May 2008 08:46:22 +1000
+Message-ID: <20080530224622.GA1788@gondor.apana.org.au>
+References: <20080523195145.GA28328@hmsreliant.think-freely.org> <20080524000624.GB26747@gondor.apana.org.au> <20080524003458.GB10168@localhost.localdomain> <484038CE.2080606@swiss-it.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Scott Wood <scottwood@freescale.com>, linuxppc-dev@ozlabs.org,
-	mr.scada@gmail.com, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
+	davem@davemloft.net
+To: Adrian-Ken =?iso-8859-1?Q?R=FCegsegger?= <rueegsegger@swiss-it.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw02.freescale.net ([192.88.165.103]:42274 "EHLO
-	de01egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751521AbYE3WVT (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:38018 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750726AbYE3Wqg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 May 2008 18:21:19 -0400
-In-Reply-To: <20080530211204.GA15768@2ka.mipt.ru>
+	Fri, 30 May 2008 18:46:36 -0400
+Content-Disposition: inline
+In-Reply-To: <484038CE.2080606@swiss-it.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 31 May 2008 01:12:08 +0400
-Evgeniy Polyakov <johnpol@2ka.mipt.ru> wrote:
+On Fri, May 30, 2008 at 07:26:38PM +0200, Adrian-Ken R=FCegsegger wrote=
+:
+>=20
+> I was wondering why you created your own test vectors. Wouldn't stand=
+ardized test vectors by NIST or ANSI be preferable?
 
-> On Fri, May 30, 2008 at 03:48:20PM -0500, Kim Phillips (kim.phillips@freescale.com) wrote:
-> > sorry, by ISR I meant interrupt status registers.  but I can't tell
-> > where the suspected simultaneous accesses are.  Evgeniy, can you point
-> > out the register accesses you're talking about?
-> 
-> priv->status is accessed from tasklets, although readonly, but that rises
-> a red flag... Also callback invocation tasklet drops the lock around
-
-ok, I see what you are saying now; if a channel gets done during
-talitos_done processing, it'll trigger an interrupt and reset
-priv->status, leaving the tasklet in the dark as to which channel has
-done status, depending on how many channel dones it has already
-processed.  I think the only solution here is to call flush_channel on
-each channel, regardless of the bits in the interrupt status - I'll
-send out a patch shortly.
-
-> callback, during that time cached status and priv itself (and tail like
-> in two simultaneous flushes) could change (or not?)
-
-I think you're talking about a different 'status' here; flush_channel's
-local 'status' doesn't resemble priv->status bits in any way, it looks
-at the descriptor header writeback bits for done status, on a per
-descriptor basis.  It forwards this descriptor done vs. error status to
-the callback.
-
-priv itself won't change; it's uniquely associated to the device.
-
-Kim
+If you could post a patch with those that would be very much
+appreciated.  Thanks!
+--=20
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
