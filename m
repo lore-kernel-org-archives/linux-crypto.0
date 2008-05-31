@@ -1,54 +1,47 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [PATCH 2/2] talitos: Freescale integrated security engine (SEC) driver
-Date: Sat, 31 May 2008 13:59:02 +0400
-Message-ID: <20080531095901.GA16281@2ka.mipt.ru>
-References: <20080530180904.GA18945@2ka.mipt.ru> <20080530143614.1e675228.kim.phillips@freescale.com> <4840585D.8050805@freescale.com> <20080530151638.087970ab.kim.phillips@freescale.com> <4840615F.4070103@freescale.com> <20080530153505.21eb1ec4.kim.phillips@freescale.com> <48406562.4010306@freescale.com> <20080530154820.6e56b625.kim.phillips@freescale.com> <20080530211204.GA15768@2ka.mipt.ru> <20080530171930.61965d59.kim.phillips@freescale.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH] tcrypt: add self test for des3_ebe cipher operating in cbc mode
+Date: Sat, 31 May 2008 12:37:18 -0400
+Message-ID: <20080531163718.GB3130@localhost.localdomain>
+References: <20080523195145.GA28328@hmsreliant.think-freely.org> <20080524000624.GB26747@gondor.apana.org.au> <20080524003458.GB10168@localhost.localdomain> <484038CE.2080606@swiss-it.ch> <20080530224622.GA1788@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Scott Wood <scottwood@freescale.com>, linuxppc-dev@ozlabs.org,
-	mr.scada@gmail.com, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Adrian-Ken =?iso-8859-1?Q?R=FCegsegger?=
+	<rueegsegger@swiss-it.ch>, linux-crypto@vger.kernel.org,
+	davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.82.65]:56366 "EHLO 2ka.mipt.ru"
+Received: from ra.tuxdriver.com ([70.61.120.52]:4282 "EHLO ra.tuxdriver.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750840AbYEaJ7R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 31 May 2008 05:59:17 -0400
+	id S1752939AbYEaQb6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 31 May 2008 12:31:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20080530171930.61965d59.kim.phillips@freescale.com>
+In-Reply-To: <20080530224622.GA1788@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
+On Sat, May 31, 2008 at 08:46:22AM +1000, Herbert Xu wrote:
+> On Fri, May 30, 2008 at 07:26:38PM +0200, Adrian-Ken R=FCegsegger wro=
+te:
+> >=20
+> > I was wondering why you created your own test vectors. Wouldn't sta=
+ndardized test vectors by NIST or ANSI be preferable?
+>=20
+> If you could post a patch with those that would be very much
+> appreciated.  Thanks!
+=46or future reference, do you have a link where NIST standard test vec=
+tors can be
+obtained?
+Regards
+Neil
 
-On Fri, May 30, 2008 at 05:19:30PM -0500, Kim Phillips (kim.phillips@freescale.com) wrote:
-> ok, I see what you are saying now; if a channel gets done during
-> talitos_done processing, it'll trigger an interrupt and reset
-> priv->status, leaving the tasklet in the dark as to which channel has
-> done status, depending on how many channel dones it has already
-> processed.  I think the only solution here is to call flush_channel on
-> each channel, regardless of the bits in the interrupt status - I'll
-> send out a patch shortly.
-
-Out of curiosity, what is number of channels? I had simialar issue with
-HIFN crypto driver and limited number of descriptor to 80 iirc, since
-with that number HIFN traversal did not show perfromance degradataion on
-Ghz x86.
-
-> > callback, during that time cached status and priv itself (and tail like
-> > in two simultaneous flushes) could change (or not?)
-> 
-> I think you're talking about a different 'status' here; flush_channel's
-> local 'status' doesn't resemble priv->status bits in any way, it looks
-> at the descriptor header writeback bits for done status, on a per
-> descriptor basis.  It forwards this descriptor done vs. error status to
-> the callback.
-> 
-> priv itself won't change; it's uniquely associated to the device.
-
-I meant descriptor hdr value accessed via it - can it be checked in
-tasklet under the lock and in submit path without? Can they correlate
-somehow?
-
--- 
-	Evgeniy Polyakov
+> --=20
+> Visit Openswan at http://www.openswan.org/
+> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
