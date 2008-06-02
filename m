@@ -1,219 +1,79 @@
-From: Neil Horman <nhorman@tuxdriver.com>
+From: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
 Subject: Re: [PATCH] tcrypt: add self test for des3_ebe cipher operating in
-	cbc mode
-Date: Mon, 2 Jun 2008 16:45:41 -0400
-Message-ID: <20080602204541.GA23861@hmsreliant.think-freely.org>
-References: <4841F6F6.2020502@swiss-it.ch> <20080601160349.GA29225@localhost.localdomain> <4842C9CA.9070506@swiss-it.ch> <20080601221839.GA5171@localhost.localdomain> <48432622.1090300@swiss-it.ch> <20080602083210.GA22264@gondor.apana.org.au> <20080602124542.GA15844@hmsreliant.think-freely.org> <20080602124847.GA25391@gondor.apana.org.au> <20080602161730.GA19139@hmsreliant.think-freely.org> <484455E6.7090602@swiss-it.ch>
+ cbc mode
+Date: Mon, 02 Jun 2008 23:55:46 +0200
+Message-ID: <48446C62.60502@swiss-it.ch>
+References: <20080523195145.GA28328@hmsreliant.think-freely.org> <20080524000624.GB26747@gondor.apana.org.au> <20080524003458.GB10168@localhost.localdomain> <484038CE.2080606@swiss-it.ch> <20080530224622.GA1788@gondor.apana.org.au> <20080531163718.GB3130@localhost.localdomain> <4841FEF7.4020203@swiss-it.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ra.tuxdriver.com ([70.61.120.52]:3574 "EHLO ra.tuxdriver.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751547AbYFBUp7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Jun 2008 16:45:59 -0400
-Content-Disposition: inline
-In-Reply-To: <484455E6.7090602@swiss-it.ch>
+Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:46290 "EHLO
+	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751292AbYFBVzv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Jun 2008 17:55:51 -0400
+In-Reply-To: <4841FEF7.4020203@swiss-it.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 02, 2008 at 10:19:50PM +0200, Adrian-Ken Rueegsegger wrote:
+Adrian-Ken Rueegsegger wrote:
 > Neil Horman wrote:
-> > On Mon, Jun 02, 2008 at 10:48:48PM +1000, Herbert Xu wrote:
-> >> On Mon, Jun 02, 2008 at 08:45:42AM -0400, Neil Horman wrote:
-> >>> Copy that.  I think I found the problem, anyway.  The verdict is that Adrian was
-> >>> right, and I'm klutz.  I mixed up the output vector from a successful and a
-> >>> failed test during development.  I'll repost shortly.  Sorry for the trouble!
-> >> No worries.
-> > 
-> > Ok, corrected the broken output vector and retested _several_ times.  Also added
-> > to test case 4 as requested.  Sorry again for the trouble
-> 
-> Thanks a lot for clearing this up! I don't know if this is appropriate but in any case:
-> 
-Thank you for your good eyes!  They make an excellent backstop for sloppy
-fingers :) 
+>> On Sat, May 31, 2008 at 08:46:22AM +1000, Herbert Xu wrote:
+>>> On Fri, May 30, 2008 at 07:26:38PM +0200, Adrian-Ken R=FCegsegger w=
+rote:
+>>>> I was wondering why you created your own test vectors. Wouldn't st=
+andardized test vectors by NIST or ANSI be preferable?
+>>> If you could post a patch with those that would be very much
+>>> appreciated.  Thanks!
+>=20
+> I am putting together a patch using the test vectors found at [3] and=
+ the ones I gathered from ANSI X9.52 and ISO/IEC FDIS 10116:2005. Stran=
+ge enough the ANSI and ISO test vectors pass while the ones from NIST d=
+o not yield the expected results. I have not yet identified the specifi=
+c differences between the various test vector sets. It is not clearly s=
+tated if/which padding was employed so that might be the reason...
 
-> Acked-by: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
-> 
+The reason for getting different results with test vectors from [3] is,=
+ that one must repeatedly
+apply the encryption/decryption 10000 times eventhough it's not clearly=
+ specified in that document
+itself. The Monte Carlo test that has to be used to get the results is =
+described in [2]
+(section 3.2, page 24).
+
+Adrian
+=20
+>> For future reference, do you have a link where NIST standard test ve=
+ctors can be
+>> obtained?
+>=20
+> A good place to start is [1]. More specifically for TDES: [2] and [3]=
+=2E Note that the tests described in [2] will not work with the current=
+ DES3 implementation since the employed keys will be identified as weak=
+ keys and the setkey operation would fail.
+>=20
+> By the way: when explicitly trying to set a weak key for DES3 I got t=
+he following warning:
+>=20
+> setkey() failed flags=3D0
+>=20
+> Shouldn't the flags be set to CRYPTO_TFM_RES_BAD_KEY_SCHED at that po=
+int (see crypto/des_generic.c, line 873)?
+>=20
+> Thanks,
 > Adrian
-> > 
-> > 
-> >     Patch to add checking  of DES3 test vectors using CBC mode.  FIPS-140-2
-> >     compliance mandates that any supported mode of operation must include a self
-> >     test.  This satisfies that requirement for cbc(des3_ede).  The included test
-> >     vector was generated by me using openssl.  Key/IV was generated with the
-> >     following command:
-> >     openssl enc -des_ede_cbc -P
-> >     input and output values were generated by repeating the string "Too many
-> >     secrets" a few times over, truncating it to 128 bytes, and encrypting it with
-> >     openssl using the aformentioned key.  Tested successfully by myself
-> > 
-> > Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
-> > 
-> > 
-> >  tcrypt.c |   16 ++++++++++
-> >  tcrypt.h |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
-> >  2 files changed, 106 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> > index 6beabc5..30cd541 100644
-> > --- a/crypto/tcrypt.c
-> > +++ b/crypto/tcrypt.c
-> > @@ -1180,6 +1180,14 @@ static void do_test(void)
-> >  		test_cipher("ecb(des3_ede)", DECRYPT, des3_ede_dec_tv_template,
-> >  			    DES3_EDE_DEC_TEST_VECTORS);
-> >  
-> > +		test_cipher("cbc(des3_ede)", ENCRYPT,
-> > +			    des3_ede_cbc_enc_tv_template,
-> > +			    DES3_EDE_CBC_ENC_TEST_VECTORS);
-> > +
-> > +		test_cipher("cbc(des3_ede)", DECRYPT,
-> > +			    des3_ede_cbc_dec_tv_template,
-> > +			    DES3_EDE_CBC_DEC_TEST_VECTORS);
-> > +
-> >  		test_hash("md4", md4_tv_template, MD4_TEST_VECTORS);
-> >  
-> >  		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
-> > @@ -1390,6 +1398,14 @@ static void do_test(void)
-> >  			    DES3_EDE_ENC_TEST_VECTORS);
-> >  		test_cipher("ecb(des3_ede)", DECRYPT, des3_ede_dec_tv_template,
-> >  			    DES3_EDE_DEC_TEST_VECTORS);
-> > +
-> > +		test_cipher("cbc(des3_ede)", ENCRYPT,
-> > +			    des3_ede_cbc_enc_tv_template,
-> > +			    DES3_EDE_CBC_ENC_TEST_VECTORS);
-> > +
-> > +		test_cipher("cbc(des3_ede)", DECRYPT,
-> > +			    des3_ede_cbc_dec_tv_template,
-> > +			    DES3_EDE_CBC_DEC_TEST_VECTORS);
-> >  		break;
-> >  
-> >  	case 5:
-> > diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
-> > index 47bc0ec..aaff76f 100644
-> > --- a/crypto/tcrypt.h
-> > +++ b/crypto/tcrypt.h
-> > @@ -1442,6 +1442,8 @@ static struct hash_testvec hmac_sha512_tv_template[] = {
-> >  #define DES_CBC_DEC_TEST_VECTORS	4
-> >  #define DES3_EDE_ENC_TEST_VECTORS	3
-> >  #define DES3_EDE_DEC_TEST_VECTORS	3
-> > +#define DES3_EDE_CBC_ENC_TEST_VECTORS	1
-> > +#define DES3_EDE_CBC_DEC_TEST_VECTORS	1
-> >  
-> >  static struct cipher_testvec des_enc_tv_template[] = {
-> >  	{ /* From Applied Cryptography */
-> > @@ -1680,9 +1682,6 @@ static struct cipher_testvec des_cbc_dec_tv_template[] = {
-> >  	},
-> >  };
-> >  
-> > -/*
-> > - * We really need some more test vectors, especially for DES3 CBC.
-> > - */
-> >  static struct cipher_testvec des3_ede_enc_tv_template[] = {
-> >  	{ /* These are from openssl */
-> >  		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef"
-> > @@ -1745,6 +1744,94 @@ static struct cipher_testvec des3_ede_dec_tv_template[] = {
-> >  	},
-> >  };
-> >  
-> > +static struct cipher_testvec des3_ede_cbc_enc_tv_template[] = {
-> > +	{ /* Generated from openssl */
-> > +		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
-> > +			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
-> > +			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
-> > +		.klen	= 24,
-> > +		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-> > +		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
-> > +			  "\x53\x20\x63\x65\x65\x72\x73\x74"
-> > +			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
-> > +			  "\x20\x79\x65\x53\x72\x63\x74\x65"
-> > +			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
-> > +			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
-> > +			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
-> > +			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
-> > +			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
-> > +			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
-> > +			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
-> > +			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
-> > +			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
-> > +			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
-> > +			  "\x63\x65\x65\x72\x73\x74\x54\x20"
-> > +			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
-> > +		.ilen	= 128,
-> > +		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
-> > +			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
-> > +			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
-> > +			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
-> > +			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
-> > +			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
-> > +			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
-> > +			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
-> > +			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
-> > +			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
-> > +			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
-> > +			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
-> > +			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
-> > +			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
-> > +			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
-> > +			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19",
-> > +		.rlen	= 128,
-> > +	},
-> > +};
-> > +
-> > +static struct cipher_testvec des3_ede_cbc_dec_tv_template[] = {
-> > +	{ /* Generated from openssl */
-> > +		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
-> > +			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
-> > +			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
-> > +		.klen	= 24,
-> > +		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
-> > +		.input	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
-> > +			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
-> > +			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
-> > +			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
-> > +			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
-> > +			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
-> > +			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
-> > +			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
-> > +			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
-> > +			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
-> > +			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
-> > +			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
-> > +			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
-> > +			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
-> > +			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
-> > +			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19",
-> > +		.ilen	= 128,
-> > +		.result	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
-> > +			  "\x53\x20\x63\x65\x65\x72\x73\x74"
-> > +			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
-> > +			  "\x20\x79\x65\x53\x72\x63\x74\x65"
-> > +			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
-> > +			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
-> > +			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
-> > +			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
-> > +			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
-> > +			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
-> > +			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
-> > +			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
-> > +			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
-> > +			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
-> > +			  "\x63\x65\x65\x72\x73\x74\x54\x20"
-> > +			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
-> > +		.rlen	= 128,
-> > +	},
-> > +};
-> > +
-> >  /*
-> >   * Blowfish test vectors.
-> >   */
-> > 
-
--- 
-/****************************************************
- * Neil Horman <nhorman@tuxdriver.com>
- * Software Engineer, Red Hat
- ****************************************************/
+> __________
+>=20
+> [1] - http://csrc.nist.gov/groups/STM/cavp/standards.html
+> [2] - http://csrc.nist.gov/publications/nistpubs/800-20/800-20.pdf
+> [3] - http://csrc.nist.gov/groups/STM/cavp/documents/des/tripledes-ve=
+ctors.zip
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
