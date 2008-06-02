@@ -1,230 +1,210 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [PATCH v2] crypto: rmd128: make it work on my prefered
-	architecture
-Date: Mon, 2 Jun 2008 22:17:39 +0200
-Message-ID: <20080602201739.GA19706@Chamillionaire.breakpoint.cc>
-References: <20080517.020122.229980431.davem@davemloft.net> <20080517091451.GE19540@Chamillionaire.breakpoint.cc> <20080517095625.GA17878@gondor.apana.org.au> <20080520.194723.268247612.davem@davemloft.net> <20080526110508.GB14743@gondor.apana.org.au>
+From: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+Subject: Re: [PATCH] tcrypt: add self test for des3_ebe cipher operating in
+ cbc mode
+Date: Mon, 02 Jun 2008 22:19:50 +0200
+Message-ID: <484455E6.7090602@swiss-it.ch>
+References: <20080524000624.GB26747@gondor.apana.org.au> <20080524003458.GB10168@localhost.localdomain> <4841F6F6.2020502@swiss-it.ch> <20080601160349.GA29225@localhost.localdomain> <4842C9CA.9070506@swiss-it.ch> <20080601221839.GA5171@localhost.localdomain> <48432622.1090300@swiss-it.ch> <20080602083210.GA22264@gondor.apana.org.au> <20080602124542.GA15844@hmsreliant.think-freely.org> <20080602124847.GA25391@gondor.apana.org.au> <20080602161730.GA19139@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	rueegsegger@swiss-it.ch
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60025 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750862AbYFBURv (ORCPT
+Received: from zux006-004-203.adsl.green.ch ([81.6.4.203]:45963 "EHLO
+	mailx.swiss-it.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751193AbYFBUTz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Jun 2008 16:17:51 -0400
-Content-Disposition: inline
-In-Reply-To: <20080526110508.GB14743@gondor.apana.org.au>
+	Mon, 2 Jun 2008 16:19:55 -0400
+In-Reply-To: <20080602161730.GA19139@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Herbert Xu | 2008-05-26 21:05:08 [+1000]:
+Neil Horman wrote:
+> On Mon, Jun 02, 2008 at 10:48:48PM +1000, Herbert Xu wrote:
+>> On Mon, Jun 02, 2008 at 08:45:42AM -0400, Neil Horman wrote:
+>>> Copy that.  I think I found the problem, anyway.  The verdict is that Adrian was
+>>> right, and I'm klutz.  I mixed up the output vector from a successful and a
+>>> failed test during development.  I'll repost shortly.  Sorry for the trouble!
+>> No worries.
+> 
+> Ok, corrected the broken output vector and retested _several_ times.  Also added
+> to test case 4 as requested.  Sorry again for the trouble
 
->Sebastian, if you're still seeing worse results on powerpc could you
->post the actual numbers with/without this patch?
+Thanks a lot for clearing this up! I don't know if this is appropriate but in any case:
 
-le32:
-~~~~~
-|testing speed of rmd128
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    105 cycles/operation,    6 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    201 cycles/operation,    3 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    161 cycles/operation,    2 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    519 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    365 cycles/operation,    1 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    329 cycles/operation,    1 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   1798 cycles/operation,    1 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1038 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):    994 cycles/operation,    0 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   3503 cycles/operation,    1 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   1981 cycles/operation,    0 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   1896 cycles/operation,    0 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   1881 cycles/operation,    0 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   6914 cycles/operation,    1 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   3870 cycles/operation,    0 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   3698 cycles/operation,    0 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   3654 cycles/operation,    0 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  13736 cycles/operation,    1 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):   7649 cycles/operation,    0 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):   7305 cycles/operation,    0 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):   7215 cycles/operation,    0 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):   7210 cycles/operation,    0 cycles/byte
-|
-|testing speed of rmd160
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    144 cycles/operation,    9 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    276 cycles/operation,    4 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    237 cycles/operation,    3 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    706 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    552 cycles/operation,    2 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    517 cycles/operation,    2 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2432 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1671 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1628 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   4731 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   3211 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   3124 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   3109 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   9332 cycles/operation,    2 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   6290 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   6116 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   6072 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  18532 cycles/operation,    2 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  12450 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  12102 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  12011 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  12006 cycles/operation,    1 cycles/byte
-|
-|testing speed of rmd256
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    116 cycles/operation,    7 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    217 cycles/operation,    3 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    178 cycles/operation,    2 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    551 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    399 cycles/operation,    1 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    365 cycles/operation,    1 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   1890 cycles/operation,    1 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1147 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1104 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   3677 cycles/operation,    1 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   2190 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   2104 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   2089 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   7251 cycles/operation,    1 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   4276 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   4104 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   4060 cycles/operation,    0 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  14398 cycles/operation,    1 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):   8447 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):   8103 cycles/operation,    0 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):   8015 cycles/operation,    0 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):   8011 cycles/operation,    0 cycles/byte
-|
-|testing speed of rmd320
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    144 cycles/operation,    9 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    270 cycles/operation,    4 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    231 cycles/operation,    3 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    680 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    529 cycles/operation,    2 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    493 cycles/operation,    1 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2326 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1579 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1535 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   4521 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   3026 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   2939 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   2925 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   8911 cycles/operation,    2 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   5922 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   5748 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   5703 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  17690 cycles/operation,    2 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  11711 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  11363 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  11275 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  11271 cycles/operation,    1 cycles/byte
+Acked-by: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
 
-le32p:
-~~~~~~
-|testing speed of rmd128
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    124 cycles/operation,    7 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    238 cycles/operation,    3 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    199 cycles/operation,    3 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    613 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    462 cycles/operation,    1 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    426 cycles/operation,    1 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2118 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1371 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1328 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   4127 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   2630 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   2545 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   2531 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   8144 cycles/operation,    1 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   5149 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   4979 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   4936 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  16176 cycles/operation,    1 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  10187 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):   9847 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):   9761 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):   9756 cycles/operation,    1 cycles/byte
-|
-|testing speed of rmd160
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    161 cycles/operation,   10 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    311 cycles/operation,    4 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    273 cycles/operation,    4 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    796 cycles/operation,    3 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    645 cycles/operation,    2 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    610 cycles/operation,    2 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2737 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1992 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1949 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   5325 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   3835 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   3749 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   3734 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):  10501 cycles/operation,    2 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   7520 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   7348 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   7305 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  20853 cycles/operation,    2 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  14892 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  14547 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  14460 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  14456 cycles/operation,    1 cycles/byte
-|
-|testing speed of rmd256
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    129 cycles/operation,    8 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    245 cycles/operation,    3 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    206 cycles/operation,    3 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    626 cycles/operation,    2 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    475 cycles/operation,    1 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    443 cycles/operation,    1 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2155 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   1418 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1370 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   4194 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   2717 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   2621 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   2606 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):   8271 cycles/operation,    2 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   5318 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   5126 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   5077 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  16426 cycles/operation,    2 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  10518 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  10134 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  10037 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  10033 cycles/operation,    1 cycles/byte
-|
-|testing speed of rmd320
-|test  0 (   16 byte blocks,   16 bytes per update,   1 updates):    167 cycles/operation,   10 cycles/byte
-|test  1 (   64 byte blocks,   16 bytes per update,   4 updates):    319 cycles/operation,    4 cycles/byte
-|test  2 (   64 byte blocks,   64 bytes per update,   1 updates):    280 cycles/operation,    4 cycles/byte
-|test  3 (  256 byte blocks,   16 bytes per update,  16 updates):    809 cycles/operation,    3 cycles/byte
-|test  4 (  256 byte blocks,   64 bytes per update,   4 updates):    658 cycles/operation,    2 cycles/byte
-|test  5 (  256 byte blocks,  256 bytes per update,   1 updates):    623 cycles/operation,    2 cycles/byte
-|test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates):   2774 cycles/operation,    2 cycles/byte
-|test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates):   2028 cycles/operation,    1 cycles/byte
-|test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates):   1985 cycles/operation,    1 cycles/byte
-|test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates):   5394 cycles/operation,    2 cycles/byte
-|test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates):   3902 cycles/operation,    1 cycles/byte
-|test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates):   3815 cycles/operation,    1 cycles/byte
-|test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates):   3801 cycles/operation,    1 cycles/byte
-|test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates):  10634 cycles/operation,    2 cycles/byte
-|test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates):   7650 cycles/operation,    1 cycles/byte
-|test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   7476 cycles/operation,    1 cycles/byte
-|test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   7433 cycles/operation,    1 cycles/byte
-|test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):  21115 cycles/operation,    2 cycles/byte
-|test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates):  15145 cycles/operation,    1 cycles/byte
-|test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates):  14799 cycles/operation,    1 cycles/byte
-|test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates):  14711 cycles/operation,    1 cycles/byte
-|test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates):  14706 cycles/operation,    1 cycles/byte
-
-This is mpc8544 with gcc-4.1.1. The other powerpc machine I have
-available and could run a test is a ps3. Unfortunately I have to
-suspend this for two weeks.
-Arnd told me, that the powerpc folks were discussing an index field in
-their in/out macros. I check that once I'm back again.
-
-Sebastian
+Adrian
+> 
+> 
+>     Patch to add checking  of DES3 test vectors using CBC mode.  FIPS-140-2
+>     compliance mandates that any supported mode of operation must include a self
+>     test.  This satisfies that requirement for cbc(des3_ede).  The included test
+>     vector was generated by me using openssl.  Key/IV was generated with the
+>     following command:
+>     openssl enc -des_ede_cbc -P
+>     input and output values were generated by repeating the string "Too many
+>     secrets" a few times over, truncating it to 128 bytes, and encrypting it with
+>     openssl using the aformentioned key.  Tested successfully by myself
+> 
+> Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+> 
+> 
+>  tcrypt.c |   16 ++++++++++
+>  tcrypt.h |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 106 insertions(+), 3 deletions(-)
+> 
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index 6beabc5..30cd541 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -1180,6 +1180,14 @@ static void do_test(void)
+>  		test_cipher("ecb(des3_ede)", DECRYPT, des3_ede_dec_tv_template,
+>  			    DES3_EDE_DEC_TEST_VECTORS);
+>  
+> +		test_cipher("cbc(des3_ede)", ENCRYPT,
+> +			    des3_ede_cbc_enc_tv_template,
+> +			    DES3_EDE_CBC_ENC_TEST_VECTORS);
+> +
+> +		test_cipher("cbc(des3_ede)", DECRYPT,
+> +			    des3_ede_cbc_dec_tv_template,
+> +			    DES3_EDE_CBC_DEC_TEST_VECTORS);
+> +
+>  		test_hash("md4", md4_tv_template, MD4_TEST_VECTORS);
+>  
+>  		test_hash("sha224", sha224_tv_template, SHA224_TEST_VECTORS);
+> @@ -1390,6 +1398,14 @@ static void do_test(void)
+>  			    DES3_EDE_ENC_TEST_VECTORS);
+>  		test_cipher("ecb(des3_ede)", DECRYPT, des3_ede_dec_tv_template,
+>  			    DES3_EDE_DEC_TEST_VECTORS);
+> +
+> +		test_cipher("cbc(des3_ede)", ENCRYPT,
+> +			    des3_ede_cbc_enc_tv_template,
+> +			    DES3_EDE_CBC_ENC_TEST_VECTORS);
+> +
+> +		test_cipher("cbc(des3_ede)", DECRYPT,
+> +			    des3_ede_cbc_dec_tv_template,
+> +			    DES3_EDE_CBC_DEC_TEST_VECTORS);
+>  		break;
+>  
+>  	case 5:
+> diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+> index 47bc0ec..aaff76f 100644
+> --- a/crypto/tcrypt.h
+> +++ b/crypto/tcrypt.h
+> @@ -1442,6 +1442,8 @@ static struct hash_testvec hmac_sha512_tv_template[] = {
+>  #define DES_CBC_DEC_TEST_VECTORS	4
+>  #define DES3_EDE_ENC_TEST_VECTORS	3
+>  #define DES3_EDE_DEC_TEST_VECTORS	3
+> +#define DES3_EDE_CBC_ENC_TEST_VECTORS	1
+> +#define DES3_EDE_CBC_DEC_TEST_VECTORS	1
+>  
+>  static struct cipher_testvec des_enc_tv_template[] = {
+>  	{ /* From Applied Cryptography */
+> @@ -1680,9 +1682,6 @@ static struct cipher_testvec des_cbc_dec_tv_template[] = {
+>  	},
+>  };
+>  
+> -/*
+> - * We really need some more test vectors, especially for DES3 CBC.
+> - */
+>  static struct cipher_testvec des3_ede_enc_tv_template[] = {
+>  	{ /* These are from openssl */
+>  		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef"
+> @@ -1745,6 +1744,94 @@ static struct cipher_testvec des3_ede_dec_tv_template[] = {
+>  	},
+>  };
+>  
+> +static struct cipher_testvec des3_ede_cbc_enc_tv_template[] = {
+> +	{ /* Generated from openssl */
+> +		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
+> +			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
+> +			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
+> +		.klen	= 24,
+> +		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
+> +		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
+> +			  "\x53\x20\x63\x65\x65\x72\x73\x74"
+> +			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
+> +			  "\x20\x79\x65\x53\x72\x63\x74\x65"
+> +			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
+> +			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
+> +			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
+> +			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
+> +			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
+> +			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
+> +			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
+> +			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
+> +			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
+> +			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
+> +			  "\x63\x65\x65\x72\x73\x74\x54\x20"
+> +			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
+> +		.ilen	= 128,
+> +		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
+> +			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
+> +			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
+> +			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
+> +			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
+> +			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
+> +			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
+> +			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
+> +			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
+> +			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
+> +			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
+> +			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
+> +			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
+> +			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
+> +			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
+> +			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19",
+> +		.rlen	= 128,
+> +	},
+> +};
+> +
+> +static struct cipher_testvec des3_ede_cbc_dec_tv_template[] = {
+> +	{ /* Generated from openssl */
+> +		.key	= "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
+> +			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
+> +			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
+> +		.klen	= 24,
+> +		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
+> +		.input	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
+> +			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
+> +			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
+> +			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
+> +			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
+> +			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
+> +			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
+> +			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
+> +			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
+> +			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
+> +			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
+> +			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
+> +			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
+> +			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
+> +			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
+> +			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19",
+> +		.ilen	= 128,
+> +		.result	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
+> +			  "\x53\x20\x63\x65\x65\x72\x73\x74"
+> +			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
+> +			  "\x20\x79\x65\x53\x72\x63\x74\x65"
+> +			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
+> +			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
+> +			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
+> +			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
+> +			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
+> +			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
+> +			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
+> +			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
+> +			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
+> +			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
+> +			  "\x63\x65\x65\x72\x73\x74\x54\x20"
+> +			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
+> +		.rlen	= 128,
+> +	},
+> +};
+> +
+>  /*
+>   * Blowfish test vectors.
+>   */
+> 
