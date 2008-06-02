@@ -1,30 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] [XFRM] xfrm_algo: correct usage of RIPEMD-160
-Date: Mon, 2 Jun 2008 17:11:04 +1000
-Message-ID: <20080602071104.GA21560@gondor.apana.org.au>
-References: <1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch> <1212340578-15574-2-git-send-email-rueegsegger@swiss-it.ch> <20080602065132.GA11128@Chamillionaire.breakpoint.cc> <48439AF0.30508@swiss-it.ch> <20080602070456.GA21479@gondor.apana.org.au> <48439CB4.5090809@swiss-it.ch>
+Subject: Re: Crypto Fixes for 2.6.26
+Date: Mon, 2 Jun 2008 18:05:12 +1000
+Message-ID: <20080602080512.GA22059@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au> <20080509132343.GA12979@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	linux-crypto@vger.kernel.org
-To: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59140 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:49973 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752537AbYFBHLL (ORCPT
+	with ESMTP id S1751225AbYFBIFS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Jun 2008 03:11:11 -0400
+	Mon, 2 Jun 2008 04:05:18 -0400
 Content-Disposition: inline
-In-Reply-To: <48439CB4.5090809@swiss-it.ch>
+In-Reply-To: <20080509132343.GA12979@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 02, 2008 at 09:09:40AM +0200, Adrian-Ken Rueegsegger wrote:
-> 
-> Ok thanks for the clarification. I will resubmit the patch to the addresses you specified.
-> I assume linux-crypto should also be cc'd?
+Hi Linus:
 
-Yes please.
+This push fixes a crash in CTS when SG debugging is enabled as
+it doesn't set the debugging markers.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Alexey Dobriyan (1):
+      [CRYPTO] cts: Init SG tables
+
+ crypto/cts.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
 Thanks,
 -- 
