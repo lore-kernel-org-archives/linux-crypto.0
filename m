@@ -1,29 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] [XFRM] xfrm_algo: correct usage of RIPEMD-160
-Date: Mon, 2 Jun 2008 20:41:07 +1000
-Message-ID: <20080602104107.GA22943@gondor.apana.org.au>
-References: <1212399189188-git-send-email-rueegsegger@swiss-it.ch> <12123991893044-git-send-email-rueegsegger@swiss-it.ch>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: BUG in scatterlist.h when loading tcrypt
+Date: Mon, 2 Jun 2008 14:46:27 +0400
+Message-ID: <20080602104627.GA9967@2ka.mipt.ru>
+References: <20080602090529.GA28838@alice>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Eric Sesterhenn <snakebyte@gmx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from relay.2ka.mipt.ru ([194.85.82.65]:49186 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752610AbYFBKqe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Jun 2008 06:46:34 -0400
 Content-Disposition: inline
-In-Reply-To: <12123991893044-git-send-email-rueegsegger@swiss-it.ch>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20080602090529.GA28838@alice>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 02, 2008 at 11:33:09AM +0200, Adrian-Ken Rueegsegger wrote:
-> This patch fixes the usage of RIPEMD-160 in xfrm_algo which in turn
-> allows hmac(rmd160) to be used as authentication mechanism in IPsec
-> ESP and AH (see RFC 2857).
+Hi.
+
+On Mon, Jun 02, 2008 at 11:08:59AM +0200, Eric Sesterhenn (snakebyte@gmx.de) wrote:
+> i guess this shouldnt happen, got this
+> when loading the tcrypt module
 > 
-> Signed-off-by: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>
+> [   60.113277] testing ecb(seed) decryption across pages (chunking)
+> [   60.113309] 
+> [   60.113311] testing cts(cbc(aes)) encryption
+> [   60.120984] test 1 (128 bit key):
+> [   60.121153] ------------[ cut here ]------------
+> [   60.121312] kernel BUG at include/linux/scatterlist.h:65!
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Fix will be in Linus' tree soon, Herbert just pushed it upstream.
+http://git.kernel.org/?p=linux/kernel/git/herbert/crypto-2.6.git;a=commit;h=c4913c7b71abc79b008a3c118628cfb59bdb0efc
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
