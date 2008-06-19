@@ -1,32 +1,36 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 1/4] crypto/talitos: rm duplicate timeout definition
-Date: Mon, 16 Jun 2008 11:10:40 -0500
-Message-ID: <20080616111040.b8bde43a.kim.phillips@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linuxppc-dev@ozlabs.org, herbert@gondor.apana.org.au
-To: linux-crypto@vger.kernel.org
+From: Andre Haupt <andre@bitwigglers.org>
+Subject: [PATCH] crypto: remove duplicate include of linux/interrupt.h
+Date: Thu, 19 Jun 2008 14:43:08 +0200
+Message-ID: <1213879388-11418-1-git-send-email-andre@bitwigglers.org>
+Cc: johnpol@2ka.mipt.ru, linux-crypto@vger.kernel.org,
+	Andre Haupt <andre@bitwigglers.org>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw01.freescale.net ([192.88.165.102]:62581 "EHLO
-	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754157AbYFPQTq (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.174]:54638 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754935AbYFSMoC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Jun 2008 12:19:46 -0400
+	Thu, 19 Jun 2008 08:44:02 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Signed-off-by: Andre Haupt <andre@bitwigglers.org>
 ---
- drivers/crypto/talitos.h |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+ drivers/crypto/hifn_795x.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
-index 989763d..27deb65 100644
---- a/drivers/crypto/talitos.h
-+++ b/drivers/crypto/talitos.h
-@@ -28,8 +28,6 @@
-  *
-  */
- 
--#define TALITOS_TIMEOUT 100000
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 81f3f95..9bf8559 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -29,7 +29,6 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/scatterlist.h>
+ #include <linux/highmem.h>
+-#include <linux/interrupt.h>
+ #include <linux/crypto.h>
+ #include <linux/hw_random.h>
+ #include <linux/ktime.h>
+-- 
+1.5.5.GIT
+
