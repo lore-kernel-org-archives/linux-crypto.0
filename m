@@ -1,34 +1,29 @@
-From: Andre Haupt <andre@bitwigglers.org>
-Subject: Re: [PATCH] crypto: remove duplicate include of linux/interrupt.h
-Date: Thu, 19 Jun 2008 14:55:08 +0200
-Message-ID: <20080619125508.GA11645@ahaupt-debian-vm.localdomain>
-References: <1213879388-11418-1-git-send-email-andre@bitwigglers.org> <20080619125115.GA10549@2ka.mipt.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto/talitos: rm duplicate timeout definition
+Date: Mon, 23 Jun 2008 19:50:52 +0800
+Message-ID: <20080623115052.GA31688@gondor.apana.org.au>
+References: <20080616111040.b8bde43a.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andre Haupt <andre@bitwigglers.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1759483AbYFSNHo@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:33392 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752473AbYFWLu6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Jun 2008 07:50:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20080619125115.GA10549@2ka.mipt.ru>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20080616111040.b8bde43a.kim.phillips@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 19, 2008 at 04:51:15PM +0400, Evgeniy Polyakov wrote:
-> Hi.
-> 
-> On Thu, Jun 19, 2008 at 02:43:08PM +0200, Andre Haupt (andre@bitwigglers.org) wrote:
-> > Signed-off-by: Andre Haupt <andre@bitwigglers.org>
-> 
-> Thank you for the patch,  but similar one from Huang Weiyi is in Herbert Xu
-> cryptodev-2.6 tree an will be pushed upstream in upcoming merge window.
-> 
-Ok, didn't notice that.
+On Mon, Jun 16, 2008 at 11:10:40AM -0500, Kim Phillips wrote:
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-regards,
-
-Andre
-
-
-> -- 
-> 	Evgeniy Polyakov
+I've merged these patches into the original changeset.  Thanks!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
