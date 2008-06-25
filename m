@@ -1,35 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] ixp4xx: Hardware crypto support for IXP4xx CPUs
-Date: Wed, 25 Jun 2008 14:43:15 +0800
-Message-ID: <20080625064315.GA17520@gondor.apana.org.au>
-References: <20080615123719.GG21180@mail3.prorata.de>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: "deflate" crypto module questions
+Date: Wed, 25 Jun 2008 19:26:28 +0200 (CEST)
+Message-ID: <Pine.LNX.4.64.0806251916240.8685@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Christian Hohnstaedt <christian@hohnstaedt.de>
+Content-Type: MULTIPART/MIXED; BOUNDARY="-584349381-273319450-1214414788=:8685"
+Cc: linux-crypto@vger.kernel.org,
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+To: James Morris <jmorris@namei.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:38254 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750812AbYFYGnU (ORCPT
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:58307 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752348AbYFYR0b (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Jun 2008 02:43:20 -0400
-Content-Disposition: inline
-In-Reply-To: <20080615123719.GG21180@mail3.prorata.de>
+	Wed, 25 Jun 2008 13:26:31 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jun 15, 2008 at 12:37:19PM +0000, Christian Hohnstaedt wrote:
-> Add support for the hardware crypto engine provided by the NPE C
-> of the Intel IXP4xx networking processor series.
-> 
-> Supported ciphers: des, des3, aes
-> and a combination of them with md5 and sha1 hmac
-> 
-> Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Applied to crpytodev-2.6.  Thanks Christian!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+---584349381-273319450-1214414788=:8685
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+
+	Hi,
+
+I have a few questions about the "deflate" crypto module (crypto/deflate.c).
+
+  1. Why does it support decompression of full chunks only (i.e. all compressed
+     data has to be passed at once)?  Is there a specific reason for that?
+     Or is it just because so far nobody needed partial decompression?
+
+  2. Why was the lazy allocation removed back in 2004?
+     If you're interested in decompression only, it's a bit wasteful to
+     allocate 262 KiB of memory for compression and never use it.
+
+Thanks for your answers!
+
+Please CC me, as I'm not subscribed, and
+http://vger.kernel.org/vger-lists.html#linux-crypto doesn't list any archives.
+
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+
+Sony Techsoft Centre
+The Corporate Village · Da Vincilaan 7-D1 · B-1935 Zaventem · Belgium
+
+Phone:    +32 (0)2 700 8453
+Fax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+Sony Technology and Software Centre Europe
+A division of Sony Service Centre (Europe) N.V.
+Registered office: Technologielaan 7 · B-1840 Londerzeel · Belgium
+VAT BE 0413.825.160 · RPR Brussels
+Fortis 293-0376800-10 GEBA-BE-BB
+---584349381-273319450-1214414788=:8685--
