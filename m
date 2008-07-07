@@ -1,68 +1,132 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [Fwd: [PATCH]Using Intel CRC32 instruction to implement hardware accelerated CRC32c algorithm.]
-Date: Mon, 7 Jul 2008 18:44:25 +0800
-Message-ID: <20080707104425.GA10924@gondor.apana.org.au>
-References: <1215422258.19059.26.camel@localhost.localdomain>
+Subject: [PATCH] crypto: hash - Fixed digest size check
+Date: Mon, 7 Jul 2008 20:31:31 +0800
+Message-ID: <20080707123131.GA12105@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, chaapala@cisco.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	arjan@linux.intel.com
-To: austin zhang <austin_zhang@linux.intel.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1754979AbYGGKoo@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:34688 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753344AbYGGMbe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jul 2008 08:31:34 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1KFpsR-00056B-Kz
+	for <linux-crypto@vger.kernel.org>; Mon, 07 Jul 2008 22:31:32 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1KFpsR-00039W-00
+	for <linux-crypto@vger.kernel.org>; Mon, 07 Jul 2008 20:31:31 +0800
 Content-Disposition: inline
-In-Reply-To: <1215422258.19059.26.camel@localhost.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 07, 2008 at 05:17:38AM -0400, austin zhang wrote:
->  From NHM processor onward, Intel processors can support hardware accelerated
->  CRC32c algorithm with the new CRC32 instruction in SSE 4.2 instruction set. 
->  The patch detects the availability of the feature, and chooses the most proper 
->  way to calculate CRC32c checksum.
->  Byte code instructions are used for compiler compatibility. No MMX / XMM 
->  registers is involved in the implementation.
->  
->  After basic testing with iSCSI and confirmed that the iSCSI head digest 
->  routines can be speeded up by 4x - 10x.
->  
->  This patch is created against mainline 2.6.26-rc8
-> 
->  Signed-off-by: Austin Zhang <austin_zhang@linux.intel.com>
->  Signed-off-by: Kent Liu <kent.liu@linux.intel.com>
+Hi:
 
-Thanks Austin! I love the idea :)
+I'm going to add this patch to cryptodev-2.6:
 
-However, the way it's done in lib is a bit iffy.  For a start
-testing an x86-specific variable at run-time is not a goer. In
-any case, supporting hardware implementations transparently is
-what the crypto API is meant to do so why don't we just use that.
+commit cbc5176dbb8d80d50efa515d7f8bed90b1fdc922
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Jul 7 20:23:56 2008 +0800
 
-I've done a grep on the users of crc32c.  I think what we should
-do is:
+    crypto: hash - Fixed digest size check
+    
+    The digest size check on hash algorithms is incorrect.  It's
+    perfectly valid for hash algorithms to have a digest length
+    longer than their block size.  For example crc32c has a block
+    size of 1 and a digest size of 4.  Rather than having it lie
+    about its block size, this patch fixes the checks to do what
+    they really should which is to bound the digest size so that
+    code placing the digest on the stack continue to work.
+    
+    HMAC however still needs to check this as it's only defined
+    for such algorithms.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-1) Utilise the brand new crypto ahash interface (note that it's
-designed to support sync just as well as async despite the name)
-to rewrite the crypto/crc32c implementation such that one tfm can
-be used by multiple users.  All that has to be done is to move
-the state from the tfm into the request object.
-
-2) Convert all crc32c users to use the crypto interface and phase
-out lib/crc32c completely.
-
-3) Add the Intel-specific crc32c implementation through the crypto
-API.
-
-That way none of this iffy testing will be necessary.  Even better,
-most users can share one common tfm and therefore there will only
-be one test for the CPU flag at boot time rather than every time
-it's used.
-
-In fact, we could even skip 2) and reimplement lib/crc32c as a
-wrapper on the crypto crc32c interface with a shared tfm so you
-don't need to modify its existing users.
-
-Cheers,
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index a83e035..8c1f918 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -68,7 +68,7 @@ static int crypto_init_ahash_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ 	struct ahash_alg *alg = &tfm->__crt_alg->cra_ahash;
+ 	struct ahash_tfm *crt   = &tfm->crt_ahash;
+ 
+-	if (alg->digestsize > crypto_tfm_alg_blocksize(tfm))
++	if (alg->digestsize > PAGE_SIZE / 8)
+ 		return -EINVAL;
+ 
+ 	crt->init = alg->init;
+diff --git a/crypto/digest.c b/crypto/digest.c
+index 025c9ae..d63d5d9 100644
+--- a/crypto/digest.c
++++ b/crypto/digest.c
+@@ -141,7 +141,7 @@ int crypto_init_digest_ops(struct crypto_tfm *tfm)
+ 	struct hash_tfm *ops = &tfm->crt_hash;
+ 	struct digest_alg *dalg = &tfm->__crt_alg->cra_digest;
+ 
+-	if (dalg->dia_digestsize > crypto_tfm_alg_blocksize(tfm))
++	if (dalg->dia_digestsize > PAGE_SIZE / 8)
+ 		return -EINVAL;
+ 	
+ 	ops->init	= init;
+diff --git a/crypto/hash.c b/crypto/hash.c
+index f9400a0..0d7caa9 100644
+--- a/crypto/hash.c
++++ b/crypto/hash.c
+@@ -152,7 +152,7 @@ static int crypto_init_hash_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+ {
+ 	struct hash_alg *alg = &tfm->__crt_alg->cra_hash;
+ 
+-	if (alg->digestsize > crypto_tfm_alg_blocksize(tfm))
++	if (alg->digestsize > PAGE_SIZE / 8)
+ 		return -EINVAL;
+ 
+ 	if ((mask & CRYPTO_ALG_TYPE_HASH_MASK) != CRYPTO_ALG_TYPE_HASH_MASK)
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 14c6351..7ff2d6a 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -226,6 +226,7 @@ static struct crypto_instance *hmac_alloc(struct rtattr **tb)
+ 	struct crypto_instance *inst;
+ 	struct crypto_alg *alg;
+ 	int err;
++	int ds;
+ 
+ 	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_HASH);
+ 	if (err)
+@@ -236,6 +237,13 @@ static struct crypto_instance *hmac_alloc(struct rtattr **tb)
+ 	if (IS_ERR(alg))
+ 		return ERR_CAST(alg);
+ 
++	inst = ERR_PTR(-EINVAL);
++	ds = (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
++	     CRYPTO_ALG_TYPE_HASH ? alg->cra_hash.digestsize :
++				    alg->cra_digest.dia_digestsize;
++	if (ds > alg->cra_blocksize)
++		goto out_put_alg;
++
+ 	inst = crypto_alloc_instance("hmac", alg);
+ 	if (IS_ERR(inst))
+ 		goto out_put_alg;
+@@ -246,14 +254,10 @@ static struct crypto_instance *hmac_alloc(struct rtattr **tb)
+ 	inst->alg.cra_alignmask = alg->cra_alignmask;
+ 	inst->alg.cra_type = &crypto_hash_type;
+ 
+-	inst->alg.cra_hash.digestsize =
+-		(alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+-		CRYPTO_ALG_TYPE_HASH ? alg->cra_hash.digestsize :
+-				       alg->cra_digest.dia_digestsize;
++	inst->alg.cra_hash.digestsize = ds;
+ 
+ 	inst->alg.cra_ctxsize = sizeof(struct hmac_ctx) +
+-				ALIGN(inst->alg.cra_blocksize * 2 +
+-				      inst->alg.cra_hash.digestsize,
++				ALIGN(inst->alg.cra_blocksize * 2 + ds,
+ 				      sizeof(void *));
+ 
+ 	inst->alg.cra_init = hmac_init_tfm;
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
