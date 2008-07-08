@@ -1,48 +1,30 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: FW: [Fwd: [PATCH]Using Intel CRC32 instruction to implement hardware accelerated CRC32c algorithm.]
-Date: Tue, 8 Jul 2008 16:00:53 +0400
-Message-ID: <20080708120050.GA6410@2ka.mipt.ru>
-References: <000901c8e0d4$6f5cf230$7fb410ac@ccr.corp.intel.com> <1215512754.2906.23.camel@localhost.localdomain>
+From: "mike zheng" <mail4mz@gmail.com>
+Subject: Freescale SEC driver with cryptoloop on MPC8567e
+Date: Tue, 8 Jul 2008 14:03:28 -0400
+Message-ID: <5c9cd53b0807081103y583d0013ic0d22fb46490be2b@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	chaapala@cisco.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, arjan@linux.intel.com
-To: austin zhang <austin_zhang@linux.intel.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1756779AbYGHMBj@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: kim.phillips@freescale.com
+To: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rv-out-0506.google.com ([209.85.198.238]:43742 "EHLO
+	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750889AbYGHSDb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Jul 2008 14:03:31 -0400
+Received: by rv-out-0506.google.com with SMTP id k40so3248794rvb.1
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Jul 2008 11:03:29 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1215512754.2906.23.camel@localhost.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
+Hello,
 
-On Tue, Jul 08, 2008 at 06:25:54AM -0400, austin zhang (austin_zhang@li=
-nux.intel.com) wrote:
-> > designed to support sync just as well as async despite the name)
-> =EF=BB=BFDo you mean use async_xxx interface?
+Any one know how can I integrate the Freescale's SEC driver with
+cryptoloop in Kernel2.4 on MPC8567e? Or which version of kernel shall
+I take if it is already there?
 
-No, async_xxx is very different hardware assist, although it can be
-converted to cryptoapi too.
+Thanks for your help,
 
-> > to rewrite the crypto/crc32c implementation such that one tfm can
-> > be used by multiple users.  All that has to be done is to move
-> > the state from the tfm into the request object.
-> =20
-> > 2) Convert all crc32c users to use the crypto interface and phase
-> > out lib/crc32c completely.
-> >=20
-> > 3) Add the Intel-specific crc32c implementation through the crypto
-> > API.
-> Agreed. And which module in crypto is the template for following the =
-crypto API?
-
-This is some kind of how cbc(cipher) or ecb(cipher) templates are done:
-cbc(aes), cbc(aes-i686) for example.
-The same would be possible to do with crc32c but for checksumming (whic=
-h
-is effectively a hash).
-
---=20
-	Evgeniy Polyakov
+Mike
