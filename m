@@ -1,33 +1,49 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: Freescale SEC driver with cryptoloop on MPC8567e
-Date: Tue, 8 Jul 2008 15:28:47 -0500
-Message-ID: <20080708152847.6a248104.kim.phillips@freescale.com>
-References: <5c9cd53b0807081103y583d0013ic0d22fb46490be2b@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 2.6.26
+Date: Wed, 9 Jul 2008 08:37:41 +0800
+Message-ID: <20080709003741.GA32340@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au> <20080509132343.GA12979@gondor.apana.org.au> <20080602080512.GA22059@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
-To: "mike zheng" <mail4mz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw01.freescale.net ([192.88.165.102]:33652 "EHLO
-	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754548AbYGHU3K (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:38175 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752131AbYGIAhs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Jul 2008 16:29:10 -0400
-In-Reply-To: <5c9cd53b0807081103y583d0013ic0d22fb46490be2b@mail.gmail.com>
+	Tue, 8 Jul 2008 20:37:48 -0400
+Content-Disposition: inline
+In-Reply-To: <20080602080512.GA22059@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 8 Jul 2008 14:03:28 -0400
-"mike zheng" <mail4mz@gmail.com> wrote:
+Hi Linus:
 
-> Hello,
-> 
-> Any one know how can I integrate the Freescale's SEC driver with
-> cryptoloop in Kernel2.4 on MPC8567e? Or which version of kernel shall
-> I take if it is already there?
+This push fixes a memory leak in the crypto testing module.  Since
+this module is designed to be used repeatedly, the leak could add
+up quickly.
 
-Take Herbert's cryptodev-2.6 tree and add support in the talitos driver
-for the ablkcipher algorithm you're using.
+Please pull from
 
-Kim
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Darren Jenkins (1):
+      crypto: tcrypt - Fix memory leak in test_cipher
+
+ crypto/tcrypt.c |   10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
