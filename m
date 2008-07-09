@@ -1,47 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.26
-Date: Wed, 9 Jul 2008 08:37:41 +0800
-Message-ID: <20080709003741.GA32340@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080509132343.GA12979@gondor.apana.org.au> <20080602080512.GA22059@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Subject: Re: [PATCH] padlock: don't whinge when loaded on a non-VIA cpu
+Date: Wed, 09 Jul 2008 13:58:21 +0800
+Message-ID: <E1KGSh3-0002uS-00@gondolin.me.apana.org.au>
+References: <20080708193741.GB28899@phobos.i.cabal.ca>
+Cc: alan@lxorguk.ukuu.org.uk, kyle@mcmartin.ca, kmcmartin@redhat.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: kyle@mcmartin.ca (Kyle McMartin)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:38175 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53460 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752131AbYGIAhs (ORCPT
+	with ESMTP id S1751013AbYGIF6f (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Jul 2008 20:37:48 -0400
-Content-Disposition: inline
-In-Reply-To: <20080602080512.GA22059@gondor.apana.org.au>
+	Wed, 9 Jul 2008 01:58:35 -0400
+In-Reply-To: <20080708193741.GB28899@phobos.i.cabal.ca>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Kyle McMartin <kyle@mcmartin.ca> wrote:
+> 
+> I completely agree, but I don't know anything about Centaur cpuids...
+> 
+> Something like this might suffice:
 
-This push fixes a memory leak in the crypto testing module.  Since
-this module is designed to be used repeatedly, the leak could add
-up quickly.
+Please base your patch on top of cryptodev-2.6 which already has
+a fix on this from Jeremy Katz.  Also I suggest you either remove
+the printk completely or invert it so that it prints something
+when the hardware is detected.
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Darren Jenkins (1):
-      crypto: tcrypt - Fix memory leak in test_cipher
-
- crypto/tcrypt.c |   10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
-
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
