@@ -1,48 +1,59 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: Regarding integration with cryptodev
-Date: Fri, 11 Jul 2008 10:04:04 +0400
-Message-ID: <20080711060403.GA10064@2ka.mipt.ru>
-References: <001401c8e306$6d821650$900bc70a@dlh.st.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] check for s390 crypto facility availablility
+Date: Fri, 11 Jul 2008 20:29:38 +0800
+Message-ID: <20080711122938.GA4140@gondor.apana.org.au>
+References: <1215702043.12011.6.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Manish RATHI <manish.rathi@st.com>
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Jan Glauber <jang@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.80.65]:35192 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752260AbYGKGER (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2008 02:04:17 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:37340 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752419AbYGKM3l (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2008 08:29:41 -0400
 Content-Disposition: inline
-In-Reply-To: <001401c8e306$6d821650$900bc70a@dlh.st.com>
+In-Reply-To: <1215702043.12011.6.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
+On Thu, Jul 10, 2008 at 03:00:43PM +0000, Jan Glauber wrote:
+> 
+> here is a small patch for the s390 crypto detection.
+> 
+> [PATCH] respect STFL bit for s390 crypto
+> 
+> From: <jang@linux.vnet.ibm.com>
+> 
+> For all s390 in-kernel crypto algorithms we check at module
+> load time whether the CPACF facility bit is on. If the facility
+> is not enabled we bail out.
+> 
+> Signed-off-by: <jang@linux.vnet.ibm.com>
 
-On Fri, Jul 11, 2008 at 09:00:12AM +0530, Manish RATHI (manish.rathi@st.com) wrote:
-> Is there any effort done to make linux crypto api to work with cryptodev?
+Thanks Jan, the patch looks harmless enough.
 
-No.
+> --- ./arch/s390/crypto/crypt_s390.h.stfle
+> +++ ./arch/s390/crypto/crypt_s390.h
+> @@ -294,6 +294,10 @@ static inline int crypt_s390_func_availa
+>  	unsigned char status[16];
+>  	int ret;
+>  
+> +	/* check if CPACF facility (bit 17) is available */
+> +	if (!(stfl() & 1ULL << (31 - 17)))
+> +		return 0;
 
-> How can I use kernel space linux crypto with user space libraries?
+However, the patch description doesn't exactly tell me what
+happens without this check.  I mean, does the machine go up
+in flames if the check would have bailed :)
 
-You can not.
+That leads to my next question, is this something that must
+go into 2.6.26 or can it wait?
 
-> Does Linux crypto framework provide async APIs like OCF? What are the pros and cons of Linux crypto in comparison to OCF?
-
-Cryptoapi does much more than OCF has.
-
-> Has anybody tested openswan KLIPS patch with 2.6.24 kernel so that ipsec use OCF?
-
-Unlikely...
-
-There is a work to implement userspace interface for cryptoapi, which
-will use all its features, be asynchronous (there is a patch to
-implement aio_read/aio_write with crypto file descriptors), although
-work is in early development, it promises interesting capabilities.
-
-Check work from Shasi Pulijala <spulijala@amcc.com> and
-Loc Ho <lho@amcc.com>
-
+Cheers,
 -- 
-	Evgeniy Polyakov
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
