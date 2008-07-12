@@ -1,44 +1,38 @@
-From: Imre Kaloz <kaloz@openwrt.org>
-Subject: [PATCH] The IXP4xx crypto driver should select CRYPTO_AUTHENC
-Date: Fri, 11 Jul 2008 22:15:02 +0200
-Message-ID: <12158073023807-git-send-email-kaloz@openwrt.org>
-Cc: chohnstaedt@innominate.com, Imre Kaloz <kaloz@openwrt.org>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] check for s390 crypto facility availablility
+Date: Sat, 12 Jul 2008 15:42:59 +0800
+Message-ID: <20080712074259.GA11866@gondor.apana.org.au>
+References: <1215702043.12011.6.camel@localhost.localdomain> <20080711122938.GA4140@gondor.apana.org.au> <1215801280.9088.12.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Jan Glauber <jang@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from viefep18-int.chello.at ([213.46.255.22]:32334 "EHLO
-	viefep21-int.chello.at" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759575AbYGKUQ0 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:51428 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751813AbYGLHnI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2008 16:16:26 -0400
-Received: from edge04.upc.biz ([192.168.13.239]) by viefep26-int.chello.at
-          (InterMail vM.7.08.02.00 201-2186-121-20061213) with ESMTP
-          id <20080711201508.PMNT24211.viefep26-int.chello.at@edge04.upc.biz>
-          for <linux-crypto@vger.kernel.org>;
-          Fri, 11 Jul 2008 22:15:08 +0200
+	Sat, 12 Jul 2008 03:43:08 -0400
+Content-Disposition: inline
+In-Reply-To: <1215801280.9088.12.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Without CRYPTO_AUTHENC the driver fails to build:
-drivers/built-in.o: In function `ixp_module_init':
-ixp4xx_crypto.c:(.init.text+0x3250): undefined reference to `crypto_aead_type'
+On Fri, Jul 11, 2008 at 06:34:40PM +0000, Jan Glauber wrote:
+> [PATCH] respect STFL bit for s390 crypto
+> 
+> From: <jang@linux.vnet.ibm.com>
+> 
+> Bevore issuing any s390 crypto operation check whether the
+> CPACF facility is enabled in the facility list. That way a
+> virtualization layer can prevent usage of the CPACF facility
+> regardless of the availability of the crypto instructions.
+> 
+> Signed-off-by: <jang@linux.vnet.ibm.com>
 
-Signed-off-by: Imre Kaloz <kaloz@openwrt.org>
----
- drivers/crypto/Kconfig |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index eb2ec2e..e522144 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -195,6 +195,7 @@ config CRYPTO_DEV_IXP4XX
- 	depends on ARCH_IXP4XX
- 	select CRYPTO_DES
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_AUTHENC
- 	select CRYPTO_BLKCIPHER
- 	help
- 	  Driver for the IXP4xx NPE crypto engine.
+Applied to cryptodev-2.6.  Thank you!
 -- 
-1.5.2.5
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
