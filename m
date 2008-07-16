@@ -1,30 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [2.6 patch] properly indent the CRYPTO_RMD* kconfig entries
-Date: Wed, 16 Jul 2008 19:16:25 +0800
-Message-ID: <20080716111625.GA15417@gondor.apana.org.au>
-References: <20080715100521.GC29742@cs181140183.pp.htv.fi>
+Subject: Re: [PATCH 1/2] RNG: Add Pseudo Random Number Generator to kernel
+Date: Wed, 16 Jul 2008 20:45:33 +0800
+Message-ID: <20080716124533.GA16103@gondor.apana.org.au>
+References: <20080703202102.GB5237@hmsendeavour.rdu.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Adrian Bunk <bunk@kernel.org>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47400 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53455 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751196AbYGPLQh (ORCPT
+	with ESMTP id S1752049AbYGPMpg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Jul 2008 07:16:37 -0400
+	Wed, 16 Jul 2008 08:45:36 -0400
 Content-Disposition: inline
-In-Reply-To: <20080715100521.GC29742@cs181140183.pp.htv.fi>
+In-Reply-To: <20080703202102.GB5237@hmsendeavour.rdu.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 15, 2008 at 01:05:21PM +0300, Adrian Bunk wrote:
-> Instead of tabs there were two spaces.
-> 
-> Signed-off-by: Adrian Bunk <bunk@kernel.org>
+On Thu, Jul 03, 2008 at 04:21:02PM -0400, Neil Horman wrote:
+>
+> + * See http://csrc.nist.gov/groups/STM/cavp/documents/rng/931rngext.pdf
+> + * for implementation details
 
-Thanks, I'll put these in cryptodev-2.6.
+BTW, any reason why counter mode is used? This document specifies
+simple AES only, with no modes of operations.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
