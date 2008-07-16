@@ -1,26 +1,32 @@
-From: =?UTF-8?Q?almafa?= <almafa@lajt.hu>
-Subject: =?UTF-8?Q?Change_in_cryptoloop=3F?=
-Date: Wed, 16 Jul 2008 12:19:11 +0200
-Message-ID: <160f87b3.285a00ca.487dcb1f.5e239@o2.pl>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [2.6 patch] properly indent the CRYPTO_RMD* kconfig entries
+Date: Wed, 16 Jul 2008 19:16:25 +0800
+Message-ID: <20080716111625.GA15417@gondor.apana.org.au>
+References: <20080715100521.GC29742@cs181140183.pp.htv.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Adrian-Ken Rueegsegger <rueegsegger@swiss-it.ch>,
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Adrian Bunk <bunk@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from h107.lajt.hu ([193.17.41.107]:52636 "EHLO web50-1.lajt.hu"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755878AbYGPKmn convert rfc822-to-8bit (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:47400 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751196AbYGPLQh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Jul 2008 06:42:43 -0400
-Received: from o2.pl (unknown [10.50.0.182])
-	by web50-1.lajt.hu (Postfix) with SMTP id 74C871C030A
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Jul 2008 12:19:18 +0200 (CEST)
+	Wed, 16 Jul 2008 07:16:37 -0400
+Content-Disposition: inline
+In-Reply-To: <20080715100521.GC29742@cs181140183.pp.htv.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello!
+On Tue, Jul 15, 2008 at 01:05:21PM +0300, Adrian Bunk wrote:
+> Instead of tabs there were two spaces.
+> 
+> Signed-off-by: Adrian Bunk <bunk@kernel.org>
 
-I am using cryptoloop for a while, the volume I have problem with was created at march 24-25 (scripts was created at march 24 so that's why I think) on my Gentoo. It used to work for a while, but now I cannot mount it. I even tried to mount it from a LiveCD, it doesn't help neither. What should I try to decipher? I suppose I know the password.
-
-Thanks in advance.
-
+Thanks, I'll put these in cryptodev-2.6.
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
