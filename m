@@ -1,71 +1,107 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 4/6] crypto: talitos - fix GFP flag usage
-Date: Thu, 17 Jul 2008 11:22:06 -0500
-Message-ID: <20080717112206.ec05b503.kim.phillips@freescale.com>
-References: <20080716182215.36c1bd11.kim.phillips@freescale.com>
-	<BDCB5191-EEDE-4046-A741-80E6EF1333CF@kernel.crashing.org>
-	<20080717121758.GA25267@gondor.apana.org.au>
-	<D59ED865-85CF-4C1E-9D79-D9DD0DE49505@kernel.crashing.org>
-	<20080717102746.33381e30.kim.phillips@freescale.com>
-	<8819CEAD-C9D4-4645-A272-026AE2B39D7B@kernel.crashing.org>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: [PATCH] crypto: Cleaning some more minor nits in prng
+Date: Thu, 17 Jul 2008 14:30:12 -0400
+Message-ID: <20080717183012.GF17892@hmsendeavour.rdu.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev <linuxppc-dev@ozlabs.org>
-To: Kumar Gala <galak@kernel.crashing.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+	nhorman@tuxdriver.com
+To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw01.freescale.net ([192.88.165.102]:46298 "EHLO
-	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753412AbYGQQYo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2008 12:24:44 -0400
-In-Reply-To: <8819CEAD-C9D4-4645-A272-026AE2B39D7B@kernel.crashing.org>
+Received: from ra.tuxdriver.com ([70.61.120.52]:2296 "EHLO ra.tuxdriver.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757683AbYGQSaZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2008 14:30:25 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 17 Jul 2008 10:51:43 -0500
-Kumar Gala <galak@kernel.crashing.org> wrote:
 
-> 
-> On Jul 17, 2008, at 10:27 AM, Kim Phillips wrote:
-> 
-> > On Thu, 17 Jul 2008 07:26:14 -0500
-> > Kumar Gala <galak@kernel.crashing.org> wrote:
-> >
-> >>
-> >> On Jul 17, 2008, at 7:17 AM, Herbert Xu wrote:
-> >>
-> >>> On Wed, Jul 16, 2008 at 06:33:45PM -0500, Kumar Gala wrote:
-> >>>>
-> >>>> On Jul 16, 2008, at 6:22 PM, Kim Phillips wrote:
-> >>>>
-> >>>>> use GFP_ATOMIC when necessary; use atomic_t when allocating
-> >>>>> submit_count.
-> >>>>
-> >>>> why?
-> >>>
-> >>> You mean why are atomics required? Yes that is a good question.
-> >>
-> >> Yep. the commit message isn't explaining why, just what :)
-> >
-> > In honouring requests that don't have the CRYPTO_TFM_REQ_MAY_SLEEP  
-> > set,
-> > afaict, it's the standard non-wait variant GFP that drivers use (see
-> > the ixp4xx driver for e.g.).
-> 
-> so GFP_ATOMIC and atomic_t aren't related.  I can understand the need  
-> for GFP_ATOMIC, but I don't get why something needs to be declared  
-> atomic_t.
+ Clean up a few more minor nits in the prng
+    
+ Now that we use a plain cipher instead of a blkcipher, we don't need an iv
+ anymore, so remove that parameter from the reset_prng_context function.  Make
+ it instead with a legngth parameter, so that we can treat the key as a blob,
+ rather than a string.  Also change the get_prng_bytes function to make nbytes
+ a size_t, so we don't have to worry about signed math there
+    
+ Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
 
-I see what the source of confusion is now; it appears I missed this
-atomic_t clean-up when making the patchseries; the atomic_t fix belongs
-in the previous "preempt overflow interrupts" patch (3/6).
+ prng.c |   11 +++++++----
+ prng.h |    4 ++--
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-atomic_t is needed for atomic operations which protect resource
-contention on submit_count, which subsequently represents submission
-slot availability on a particular SEC channel for multiple, potentially
-simultaneous, users.
-
-Kim
+diff --git a/crypto/prng.c b/crypto/prng.c
+index 9e2d277..0b1831e 100644
+--- a/crypto/prng.c
++++ b/crypto/prng.c
+@@ -189,7 +189,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx)
+ }
+ 
+ /* Our exported functions */
+-int get_prng_bytes(char *buf, int nbytes, struct prng_context *ctx)
++int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx)
+ {
+ 	unsigned long flags;
+ 	unsigned char *ptr = buf;
+@@ -284,7 +284,7 @@ struct prng_context *alloc_prng_context(void)
+ 
+ 	spin_lock_init(&ctx->prng_lock);
+ 
+-	if (reset_prng_context(ctx, NULL, NULL, NULL, NULL)) {
++	if (reset_prng_context(ctx, NULL, DEFAULT_PRNG_KSZ, NULL, NULL)) {
+ 		kfree(ctx);
+ 		ctx = NULL;
+ 	}
+@@ -302,7 +302,7 @@ void free_prng_context(struct prng_context *ctx)
+ EXPORT_SYMBOL_GPL(free_prng_context);
+ 
+ int reset_prng_context(struct prng_context *ctx,
+-		       unsigned char *key, unsigned char *iv,
++		       unsigned char *key, size_t klen,
+ 		       unsigned char *V, unsigned char *DT)
+ {
+ 	int ret;
+@@ -313,6 +313,9 @@ int reset_prng_context(struct prng_context *ctx,
+ 
+ 	prng_key = (key != NULL) ? key : (unsigned char *)DEFAULT_PRNG_KEY;
+ 
++	if (!key)
++		klen = DEFAULT_PRNG_KSZ;
++
+ 	if (V)
+ 		memcpy(ctx->V, V, DEFAULT_BLK_SZ);
+ 	else
+@@ -339,7 +342,7 @@ int reset_prng_context(struct prng_context *ctx,
+ 
+ 	ctx->rand_data_valid = DEFAULT_BLK_SZ;
+ 
+-	ret = crypto_cipher_setkey(ctx->tfm, prng_key, strlen(prng_key));
++	ret = crypto_cipher_setkey(ctx->tfm, prng_key, klen);
+ 	if (ret) {
+ 		dbgprint(KERN_CRIT "PRNG: setkey() failed flags=%x\n",
+ 			crypto_cipher_get_flags(ctx->tfm));
+diff --git a/crypto/prng.h b/crypto/prng.h
+index 1ac9be5..a6ad203 100644
+--- a/crypto/prng.h
++++ b/crypto/prng.h
+@@ -15,10 +15,10 @@
+ #define _PRNG_H_
+ struct prng_context;
+ 
+-int get_prng_bytes(char *buf, int nbytes, struct prng_context *ctx);
++int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx);
+ struct prng_context *alloc_prng_context(void);
+ int reset_prng_context(struct prng_context *ctx,
+-			unsigned char *key, unsigned char *iv,
++			unsigned char *key, size_t klen,
+ 			unsigned char *V,
+ 			unsigned char *DT);
+ void free_prng_context(struct prng_context *ctx);
+-- 
+/***************************************************
+ *Neil Horman
+ *nhorman@tuxdriver.com
+ *gpg keyid: 1024D / 0x92A74FA1
+ *http://pgp.mit.edu
+ ***************************************************/
