@@ -1,41 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/6] crypto: talitos - remove calls to of_node_put
-Date: Thu, 17 Jul 2008 20:17:20 +0800
-Message-ID: <20080717121719.GA25179@gondor.apana.org.au>
-References: <20080716182146.0b095f5d.kim.phillips@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Kumar Gala <galak@kernel.crashing.org>
+Subject: Re: [PATCH 4/6] crypto: talitos - fix GFP flag usage
+Date: Thu, 17 Jul 2008 07:26:14 -0500
+Message-ID: <D59ED865-85CF-4C1E-9D79-D9DD0DE49505@kernel.crashing.org>
+References: <20080716182215.36c1bd11.kim.phillips@freescale.com> <BDCB5191-EEDE-4046-A741-80E6EF1333CF@kernel.crashing.org> <20080717121758.GA25267@gondor.apana.org.au>
+Mime-Version: 1.0 (Apple Message framework v926)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linuxppc-dev <linuxppc-dev@ozlabs.org>, linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@ozlabs.org>
-Content-Disposition: inline
-In-Reply-To: <20080716182146.0b095f5d.kim.phillips@freescale.com>
-List-Unsubscribe: <https://ozlabs.org/mailman/options/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@ozlabs.org?subject=unsubscribe>
-List-Archive: <http://ozlabs.org/pipermail/linuxppc-dev>
-List-Post: <mailto:linuxppc-dev@ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@ozlabs.org?subject=help>
-List-Subscribe: <https://ozlabs.org/mailman/listinfo/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@ozlabs.org?subject=subscribe>
-Sender: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@ozlabs.org
-Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@ozlabs.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Kim Phillips <kim.phillips@freescale.com>,
+	linux-crypto@vger.kernel.org,
+	linuxppc-dev <linuxppc-dev@ozlabs.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gate.crashing.org ([63.228.1.57]:55958 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751321AbYGQM0b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2008 08:26:31 -0400
+In-Reply-To: <20080717121758.GA25267@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 16, 2008 at 06:21:46PM -0500, Kim Phillips wrote:
-> From: Lee Nipper <lee.nipper@freescale.com>
-> 
-> Remove of_node_put calls since there is no corresponding of_node_get.
-> This patch prevents an exception when talitos is loaded a 2nd time.
-> This sequence: modprobe talitos; rmmod talitos; modprobe talitos
-> causes this message: "WARNING: Bad of_node_put() on /soc8349@e0000000/crypto@30000".
-> 
-> Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-All applied to crpyto-2.6.  Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Jul 17, 2008, at 7:17 AM, Herbert Xu wrote:
+
+> On Wed, Jul 16, 2008 at 06:33:45PM -0500, Kumar Gala wrote:
+>>
+>> On Jul 16, 2008, at 6:22 PM, Kim Phillips wrote:
+>>
+>>> use GFP_ATOMIC when necessary; use atomic_t when allocating
+>>> submit_count.
+>>
+>> why?
+>
+> You mean why are atomics required? Yes that is a good question.
+
+Yep. the commit message isn't explaining why, just what :)
+
+> Kim?
+
+- k
