@@ -1,61 +1,64 @@
-From: Johannes Weiner <hannes@saeurebad.de>
-Subject: crypto stuff broken in -mm?
-Date: Sun, 20 Jul 2008 19:24:48 +0200
-Message-ID: <87ljzwh3j3.fsf@saeurebad.de>
+From: "Barry G" <mr.scada@gmail.com>
+Subject: Debugging Talitos
+Date: Mon, 21 Jul 2008 15:27:33 -0700
+Message-ID: <61362e760807211527w550f070dk37fd59454f839c3d@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org, kim.phillips@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from saeurebad.de ([85.214.36.134]:59169 "EHLO saeurebad.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757572AbYGTRZQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Jul 2008 13:25:16 -0400
+Received: from an-out-0708.google.com ([209.85.132.243]:56433 "EHLO
+	an-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751014AbYGUW1f (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Jul 2008 18:27:35 -0400
+Received: by an-out-0708.google.com with SMTP id d40so401860and.103
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Jul 2008 15:27:33 -0700 (PDT)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hello,
 
-I can not access my encrypted partitions with -mm while they work with
-mainline.
+I am working on getting HW acceleration working via the talitos
+driver for the 8347E.
 
-For both trees I have similar configs, I didn't change anything relative
-to this subsystem:
+We are running 2.6.25.4 with the realtime patchset and ubifs.
+I have a testbed setup of machines like:
+A<->B<->C<->D
 
-CONFIG_CRYPTO=y
-CONFIG_CRYPTO_ALGAPI=y
-CONFIG_CRYPTO_BLKCIPHER=y
-CONFIG_CRYPTO_MANAGER=y
-CONFIG_CRYPTO_CBC=y
-CONFIG_CRYPTO_SHA256=y
-CONFIG_CRYPTO_AES=y
-CONFIG_CRYPTO_AES_586=y
+I am running a talitos aware kernel on B and C.  (I cloned linux-2.6 and
+copied talitos.[c|h] and changed Kconfig and Makefile in drivers/crypto.
 
-On mainline I do cryptsetup and then mount /dev/mapper/foo /mnt/foo
-successfully, while I have the following behaviour on -mm:
+Unfortunately, I am still seeing only about 20 Mbit/sec from iperf (same
+as before I installed the talitos module).  I also don't see any talitos
+stuff in the drivers:
+# cat /proc/crypto | grep -i talitos
+#
 
-# cryptsetup create foo /dev/sdd1
-Enter passphrase:
-# mount /dev/mapper/foo /mnt/foo
-mount: you must specify the filesystem type
-# mount -t ext3 /dev/mapper/foo /mnt/foo
-mount: wrong fs type, bad option, bad superblock on /dev/mapper/foo,
-       missing codepage or helper program, or other error
-       In some cases useful info is found in syslog - try
-       dmesg | tail  or so
-# dmesg | tail -n1
-[56975.640750] VFS: Can't find ext3 filesystem on dev dm-0.
-# cryptsetup --version
-cryptsetup 1.0.5
+I do have a /sys/bus/of_platform/drivers/talitos folder with uevent,unbind,bind
+though.
 
-(This is the only relevant info in dmesg, unfortunately).
+dmesg | grep -i talitos also returns nothing.
 
-The cipher is aes-cbc-plain, according to cryptsetup status.
+What is the best way to go about debugging the crypto stuff?  Should I jump
+in and start printk'ing everything or ?  Do I need other changes from
+the tree than the taliltos driver?
 
-It's a 32bit x86 machine.  I suspect that -next has the same problem as
--mm's crypto changes seem to come from linux-next.patch.
+BTW, here is the relevent entry in the DTS:
+crypto@30000 {
+   device_type = "crypto";
+   model = "SEC2";
+   compatible = "talitos";
+   reg = <30000 10000>;
+   interrupts = <b 8>;
+   interrupt-parent = < &ipic >;
+   num-channels = <4>;
+   channel-fifo-len = <18>;
+   exec-units-mask = <0000007e>;
+   descriptor-types-mask = <01010ebf>;
+};
 
-I am willing to try patches (and hope they won't destroy 640GB worth of
-porn).
+Thanks,
 
-	Hannes
+Barry
