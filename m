@@ -1,41 +1,55 @@
-From: Johannes Weiner <hannes@saeurebad.de>
-Subject: Re: crypto stuff broken in -mm?
-Date: Fri, 25 Jul 2008 03:28:35 +0200
-Message-ID: <874p6eg3b0.fsf@saeurebad.de>
-References: <87ljzwh3j3.fsf@saeurebad.de>
-	<20080724074306.GA5071@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 2.6.27
+Date: Sun, 27 Jul 2008 14:36:59 +0800
+Message-ID: <20080727063659.GA936@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from saeurebad.de ([85.214.36.134]:47041 "EHLO saeurebad.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752000AbYGYB3A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Jul 2008 21:29:00 -0400
-In-Reply-To: <20080724074306.GA5071@gondor.apana.org.au> (Herbert Xu's message
-	of "Thu, 24 Jul 2008 15:43:06 +0800")
+Received: from rhun.apana.org.au ([64.62.148.172]:43607 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752051AbYG0GhI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 27 Jul 2008 02:37:08 -0400
+Content-Disposition: inline
+In-Reply-To: <20080501102812.GA7151@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+Hi Linus:
 
-> On Sun, Jul 20, 2008 at 05:24:48PM +0000, Johannes Weiner wrote:
->> 
->> I can not access my encrypted partitions with -mm while they work with
->> mainline.
->> 
->> For both trees I have similar configs, I didn't change anything relative
->> to this subsystem:
->
-> I can't reproduce this problem here.  I've created an encrypted
-> volume with 2.6.23 and it still decrypts correctly with the latest
-> upstream Linux kernel which has all the crypto updates.
->
-> So it looks like one of the other patches in mm that's causing
-> this.  Please try backing out any device mapper related changes
-> and see if things improve.
+This push fixes a number of bugs in the recently added talitos
+driver.
 
-It works with next-20080724.
+Please pull from
 
-	Hannes
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Kim Phillips (4):
+      crypto: talitos - Preempt overflow interrupts
+      crypto: talitos - Fix GFP flag usage
+      crypto: talitos - Stop leaking memory in error path
+      crypto: talitos - sparse fix
+
+Lee Nipper (2):
+      crypto: talitos - Remove calls to of_node_put
+      crypto: talitos - Correct dst != src case handling
+
+ drivers/crypto/talitos.c |   49 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 34 insertions(+), 15 deletions(-)
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
