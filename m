@@ -1,39 +1,61 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos - add handling for SEC 3.x treatment of link table
-Date: Wed, 30 Jul 2008 16:27:50 +0800
-Message-ID: <20080730082750.GA28076@gondor.apana.org.au>
-References: <1217370547.17033.17.camel@al08linux99>
+Subject: crypto: tcrypt - Fix AEAD testing
+Date: Wed, 30 Jul 2008 16:42:19 +0800
+Message-ID: <20080730084219.GA28306@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Lee Nipper <lee.nipper@freescale.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:41959 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:59290 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751812AbYG3IiJ (ORCPT
+	with ESMTP id S1751502AbYG3ImW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Jul 2008 04:38:09 -0400
+	Wed, 30 Jul 2008 04:42:22 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] ident=mail)
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1KO7GF-0001RQ-QW
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Jul 2008 18:42:20 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 3.36 #1 (Debian))
+	id 1KO7GF-0007N2-00
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Jul 2008 16:42:19 +0800
 Content-Disposition: inline
-In-Reply-To: <1217370547.17033.17.camel@al08linux99>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 29, 2008 at 10:29:06PM +0000, Lee Nipper wrote:
-> Later SEC revision requires the link table (used for scatter/gather)
-> to have an extra entry to account for the total length in descriptor [4],
-> which contains cipher Input and ICV.
-> This only applies to decrypt, not encrypt.
-> Without this change, on 837x, a gather return/length error results
-> when a decryption uses a link table to gather the fragments.
-> This is observed by doing a ping with size of 1447 or larger with AES,
-> or a ping with size 1455 or larger with 3des.
-> 
-> So, add check for SEC compatible "fsl,3.0" for using extra link table entry.
-> 
-> Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Hi:
 
-Patch applied.  Thanks!
+Just noticed a regression I caused:
+
+commit 80cdd7e17b52d343c4fe9d3860f84204ead0d9a0
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Wed Jul 30 16:23:51 2008 +0800
+
+    crypto: tcrypt - Fix AEAD testing
+    
+    My changeset 4b22f0ddb6564210c9ded7ba25b2a1007733e784
+    
+    	crypto: tcrpyt - Remove unnecessary kmap/kunmap calls
+    
+    introduced a typo that broke AEAD chunk testing.  In particular,
+    axbuf should really be xbuf.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 59821a2..a25d6e2 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -481,7 +481,7 @@ next_one:
+ 
+ 			for (k = 0, temp = 0; k < template[i].np; k++) {
+ 				printk(KERN_INFO "page %u\n", k);
+-				q = &axbuf[IDX[k]];
++				q = &xbuf[IDX[k]];
+ 				hexdump(q, template[i].tap[k]);
+ 				printk(KERN_INFO "%s\n",
+ 				       memcmp(q, template[i].result + temp,
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
