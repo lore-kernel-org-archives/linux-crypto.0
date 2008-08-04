@@ -1,42 +1,42 @@
-From: Arjan van de Ven <arjan@infradead.org>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
- algorithm by new crypto API.
-Date: Mon, 4 Aug 2008 07:20:15 -0700
-Message-ID: <20080804072015.0fcd23e7@infradead.org>
-References: <1217842507.20845.18.camel@localhost.localdomain>
-	<1217844725.3454.580.camel@pmac.infradead.org>
-	<1217846139.20845.25.camel@localhost.localdomain>
-	<1217846726.3454.589.camel@pmac.infradead.org>
-	<20080804140435.GA11227@gondor.apana.org.au>
+From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Subject: Re: [PATCH 1/1 v4] Add CryptoAPI User Interface Support
+Date: Mon, 4 Aug 2008 18:21:43 +0400
+Message-ID: <20080804142143.GA21120@2ka.mipt.ru>
+References: <0CA0A16855646F4FA96D25A158E299D604CAFC9B@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: David Woodhouse <dwmw2@infradead.org>,
-	Austin Zhang <austin_zhang@linux.intel.com>,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Shasi Pulijala <spulijala@amcc.com>,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Loc Ho <lho@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:42584 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753338AbYHDOUV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 10:20:21 -0400
-In-Reply-To: <20080804140435.GA11227@gondor.apana.org.au>
+Received: from relay.2ka.mipt.ru ([194.85.80.65]:56683 "EHLO 2ka.mipt.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753399AbYHDOVo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 Aug 2008 10:21:44 -0400
+Content-Disposition: inline
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D604CAFC9B@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 4 Aug 2008 22:04:35 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi.
 
-> There only three crc32c users in the kernel tree and the crypto
-> interface will serve the perfectly.
+On Wed, Jul 30, 2008 at 04:53:01PM -0700, Loc Ho (lho@amcc.com) wrote:
+> This is Linux CryptoAPI user space interface support patch v4. This version includes:
+> 
+> * Add async support using Linux AIO.
+> * Interafce to choose Copy to/from user and pinning pages based on size of data.
+> * Asynchronous operations are issued through aio write function call. And result data
+> is read back in the same context using the retry aio operations.
+> * The crypto operation structure is passed via the data parameter of the write function.
+> Internally, it will perform a copy from user call just as the synchronous I/O control version.
 
-isn't it a bit heavy for something as simple as a crc?
-(which after all is one instruction now ;0)
+What does prevent from simultaneous command execution? Or setkey() vs.
+run() race? Do you rely on BKL which 'guards' ioctl execution? How is
+->write() protected from ioctl()?
 
+Please also remove forward declarations and rearrange code if needed.
+You can also drop looong ******** lines from comments.
 
 -- 
-If you want to reach me at my work email, use arjan@linux.intel.com
-For development, discussion and tips for power savings, 
-visit http://www.lesswatts.org
+	Evgeniy Polyakov
