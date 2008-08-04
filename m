@@ -1,53 +1,42 @@
-From: Austin Zhang <austin_zhang@linux.intel.com>
+From: David Woodhouse <dwmw2@infradead.org>
 Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
 	algorithm by new crypto API.
-Date: Mon, 04 Aug 2008 06:58:01 -0400
-Message-ID: <1217847481.20845.37.camel@localhost.localdomain>
+Date: Mon, 04 Aug 2008 12:25:58 +0100
+Message-ID: <1217849158.3454.599.camel@pmac.infradead.org>
 References: <1217842507.20845.18.camel@localhost.localdomain>
 	 <1217844725.3454.580.camel@pmac.infradead.org>
 	 <1217846139.20845.25.camel@localhost.localdomain>
 	 <1217846726.3454.589.camel@pmac.infradead.org>
+	 <1217847481.20845.37.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Woodhouse <dwmw2@infradead.org>
+To: Austin Zhang <austin_zhang@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.21]:63893 "EHLO
-	orsmga101.jf.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752568AbYHDK7p (ORCPT
+Received: from bombadil.infradead.org ([18.85.46.34]:46147 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751920AbYHDMjJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 06:59:45 -0400
-In-Reply-To: <1217846726.3454.589.camel@pmac.infradead.org>
+	Mon, 4 Aug 2008 08:39:09 -0400
+In-Reply-To: <1217847481.20845.37.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2008-08-04 at 11:45 +0100, David Woodhouse wrote:
-> Are we deprecating libcrc32c, then? Or just turning it into a wrapper
-> around the crypto code?
-Maybe I can pick up =EF=BB=BFcrc32c_intel_le_hw_byte and =EF=BB=BFcrc32=
-c_intel_le_hw
-into=20
-one arch-related file and make the current new crypto  interface and
-libcrc32c
-call it.
-> Either way, does it really make sense to force all crc32 users to pul=
-l
-> in the whole crypto framework? Some may get fractious about that...
-If there were really few (or no) user using that previous interface, it=
- will
-be reasonable to merge the crc32c totally into crypto subsystem as a
-digest method.
-And I remembered Herbert had mentioned he will convert those previous
-interface=20
-calling to new crypto API. For the crc32c, he had done for it.
+On Mon, 2008-08-04 at 06:58 -0400, Austin Zhang wrote:
+> BTW, why did I always got each email on this thread twice:(? (the same
+> email twice) 
 
-BTW, why did I always got each email on this thread twice:(? (the same
-email twice)=20
+You're probably subscribed to the linux-kernel list, and you're also
+being Cc'd directly.
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Normally, your filters should notice the copy which has a Return-Path:
+matching 'linux-kernel-owner.*@vger.kernel.org', and put that into your
+lkml folder with a few hundred other messages each day -- while the copy
+which is direct will still have the original sender, and would go into
+your inbox where you'll see it.
+
+-- 
+dwmw2
+
