@@ -1,36 +1,53 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: RE: [PATCH 1/1 v4] Add CryptoAPI User Interface Support
-Date: Mon, 4 Aug 2008 10:43:13 -0700
-Message-ID: <0CA0A16855646F4FA96D25A158E299D604CB04AE@SDCEXCHANGE01.ad.amcc.com>
-References: <0CA0A16855646F4FA96D25A158E299D604CAFC9B@SDCEXCHANGE01.ad.amcc.com> <20080804142143.GA21120@2ka.mipt.ru>
+From: "Benoit Boissinot" <bboissin@gmail.com>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API.
+Date: Mon, 4 Aug 2008 20:02:37 +0200
+Message-ID: <40f323d00808041102s276c065fn8db6f5a79fdf7ad1@mail.gmail.com>
+References: <1217857537.29139.70.camel@think.oraclecorp.com>
+	 <E1KQ2D2-0003Fn-00@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	"Shasi Pulijala" <spulijala@amcc.com>,
-	<linux-crypto@vger.kernel.org>
-To: "Evgeniy Polyakov" <johnpol@2ka.mipt.ru>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "Chris Mason" <chris.mason@oracle.com>, dwmw2@infradead.org,
+	austin_zhang@linux.intel.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02-ext1.amcc.com ([198.137.200.73]:63095 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752201AbYHDRnR convert rfc822-to-8bit (ORCPT
+Received: from yx-out-2324.google.com ([74.125.44.30]:26083 "EHLO
+	yx-out-2324.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753287AbYHDSCi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 13:43:17 -0400
-Content-class: urn:content-classes:message
-In-Reply-To: <20080804142143.GA21120@2ka.mipt.ru>
+	Mon, 4 Aug 2008 14:02:38 -0400
+Received: by yx-out-2324.google.com with SMTP id 8so188631yxm.1
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Aug 2008 11:02:37 -0700 (PDT)
+In-Reply-To: <E1KQ2D2-0003Fn-00@gondolin.me.apana.org.au>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
+On Mon, Aug 4, 2008 at 5:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Chris Mason <chris.mason@oracle.com> wrote:
+>>
+>>>From a performance point of view I'm probably reading the crypto API
+>> code wrong, but it looks like my choices are to either have a long
+>> standing context and use locking around the digest/hash calls to protect
+>> internal crypto state, or create a new context every time and take a
+>> perf hit while crypto looks up the right module.
 >
->What does prevent from simultaneous command execution? Or setkey() vs.
->run() race? Do you rely on BKL which 'guards' ioctl execution? How is
->->write() protected from ioctl()?
+> You're looking at the old hash interface.  New users should use the
+> ahash interface which was only recently added to the kernel.  It
+> lets you store the state in the request object which you pass to
+> the algorithm on every call.  This means that you only need one
+> tfm in the entire system for crc32c.
 >
+> BTW, don't let the a in ahash intimidate you.  It's meant to support
+> synchronous implementations such as the Intel instruction just as
+> well as asynchronous ones.
 
-We wasn't plan on protecting this. It is the caller responsibity to call in the proper order. If the caller want to change the key, it musts do so before issue run or after all run operations completed. Actually, I think it is better if we drop setkey. If the caller want to operate on a different key, create another transform. Are you concern that the underlying driver might have problem handling key change?
+Since I couldn't find any ahash user in the tree (outside of tcrypt.c), can you
+provide some example source code as to how to use it (especially synchonously).
 
-Sync (ioctl) and Async (AIO) are not meant to be use concurrently. But if the caller issus both, I believe this shouldn't be a problem. Do you see a problem?
+For example the code for the digest_null testing would be fine.
 
--Loc
+regards,
+
+Benoit
