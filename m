@@ -1,40 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API.
-Date: Mon, 4 Aug 2008 22:54:11 +0800
-Message-ID: <20080804145411.GA11889@gondor.apana.org.au>
-References: <1217842507.20845.18.camel@localhost.localdomain> <1217844725.3454.580.camel@pmac.infradead.org> <1217846139.20845.25.camel@localhost.localdomain> <1217846726.3454.589.camel@pmac.infradead.org> <20080804140435.GA11227@gondor.apana.org.au> <20080804072015.0fcd23e7@infradead.org> <1217861341.3454.641.camel@pmac.infradead.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Arjan van de Ven <arjan@infradead.org>,
-	Austin Zhang <austin_zhang@linux.intel.com>,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Woodhouse <dwmw2@infradead.org>
+Date: Mon, 04 Aug 2008 23:12:07 +0800
+Message-ID: <E1KQ1jD-00039b-00@gondolin.me.apana.org.au>
+References: <20080804072015.0fcd23e7@infradead.org>
+Cc: herbert@gondor.apana.org.au, dwmw2@infradead.org,
+	austin_zhang@linux.intel.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: arjan@infradead.org (Arjan van de Ven)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:43127 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:44841 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756970AbYHDOyV (ORCPT
+	with ESMTP id S1750751AbYHDPMR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 10:54:21 -0400
-Content-Disposition: inline
-In-Reply-To: <1217861341.3454.641.camel@pmac.infradead.org>
+	Mon, 4 Aug 2008 11:12:17 -0400
+In-Reply-To: <20080804072015.0fcd23e7@infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 04, 2008 at 03:49:01PM +0100, David Woodhouse wrote:
->
-> And even for people who don't care about that, it doesn't look
-> particularly good. It looks like btrfs would need either to keep setting
-> up a crypto context and then tearing it down, or have a pool of
-> long-standing contexts and do some kind of locking on them -- neither of
-> which seem particularly optimal compared with just calling into
-> libcrc32c.
+Arjan van de Ven <arjan@infradead.org> wrote:
+> On Mon, 4 Aug 2008 22:04:35 +0800
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+>> There only three crc32c users in the kernel tree and the crypto
+>> interface will serve the perfectly.
+> 
+> isn't it a bit heavy for something as simple as a crc?
+> (which after all is one instruction now ;0)
 
-No you don't have to set things up every time you use crc32c.
-The crypto interface lets you have a single tfm that can be
-used by multiple users simultaneously.  For ahash algorithms
-all the state is stored in the request which can stay on the
-stack.
+Well AES on the PadLock is also a single instruction and nobody
+has ever complained :)
+
+Seriously, the crypto code is extremely small on the data path.
+The heaviest part is the indirect function call but you have to
+have that in order to support multiple implementations cleanly.
+
+All the fat is on the control path, i.e., tfm allocation.  For
+crc32c you only need a single tfm since all the state is stored
+in the request object.
+
+Note that you should ignore the existing crc32c user, iSCSI as
+it was written before the new crypto hash interface was available.
+I will be converting it along with the other two crc32c users. to
+the new ahash interface.
 
 Cheers,
 -- 
