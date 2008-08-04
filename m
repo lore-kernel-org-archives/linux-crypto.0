@@ -1,51 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API.
-Date: Mon, 04 Aug 2008 23:12:07 +0800
-Message-ID: <E1KQ1jD-00039b-00@gondolin.me.apana.org.au>
-References: <20080804072015.0fcd23e7@infradead.org>
-Cc: herbert@gondor.apana.org.au, dwmw2@infradead.org,
-	austin_zhang@linux.intel.com, davem@davemloft.net,
+From: Chris Mason <chris.mason@oracle.com>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
+	algorithm by new crypto API.
+Date: Mon, 04 Aug 2008 09:45:37 -0400
+Message-ID: <1217857537.29139.70.camel@think.oraclecorp.com>
+References: <1217842507.20845.18.camel@localhost.localdomain>
+	 <1217844725.3454.580.camel@pmac.infradead.org>
+	 <1217846139.20845.25.camel@localhost.localdomain>
+	 <1217846726.3454.589.camel@pmac.infradead.org>
+Mime-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: Austin Zhang <austin_zhang@linux.intel.com>,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: arjan@infradead.org (Arjan van de Ven)
+To: David Woodhouse <dwmw2@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44841 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750751AbYHDPMR (ORCPT
+Received: from agminet02.oracle.com ([141.146.126.229]:12411 "EHLO
+	agminet02.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751852AbYHDPOW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 11:12:17 -0400
-In-Reply-To: <20080804072015.0fcd23e7@infradead.org>
+	Mon, 4 Aug 2008 11:14:22 -0400
+In-Reply-To: <1217846726.3454.589.camel@pmac.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Arjan van de Ven <arjan@infradead.org> wrote:
-> On Mon, 4 Aug 2008 22:04:35 +0800
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Mon, 2008-08-04 at 11:45 +0100, David Woodhouse wrote:
+> On Mon, 2008-08-04 at 06:35 -0400, Austin Zhang wrote:
+> > On Mon, 2008-08-04 at 11:12 +0100, David Woodhouse wrote:
+> > > You could perhaps just use 'unsigned long' here, to avoid the ifdef.
+> > Thanks. 
+> > > And it would be nice if we could make libcrc32c use this too, rather
+> > > than just the 'crypto' users.
+> > From previous discussing, herbert would like to transfer the libcrc32c 
+> > interface by new crypto because there were few user using the current 
+> > libcrc32c interface. 
 > 
->> There only three crc32c users in the kernel tree and the crypto
->> interface will serve the perfectly.
+> Are we deprecating libcrc32c, then? Or just turning it into a wrapper
+> around the crypto code?
 > 
-> isn't it a bit heavy for something as simple as a crc?
-> (which after all is one instruction now ;0)
 
-Well AES on the PadLock is also a single instruction and nobody
-has ever complained :)
+Long term I'd like to switch btrfs to the crypto api, but right now I'm
+using libcrc32c.
 
-Seriously, the crypto code is extremely small on the data path.
-The heaviest part is the indirect function call but you have to
-have that in order to support multiple implementations cleanly.
+>From a performance point of view I'm probably reading the crypto API
+code wrong, but it looks like my choices are to either have a long
+standing context and use locking around the digest/hash calls to protect
+internal crypto state, or create a new context every time and take a
+perf hit while crypto looks up the right module.
 
-All the fat is on the control path, i.e., tfm allocation.  For
-crc32c you only need a single tfm since all the state is stored
-in the request object.
+Either way it looks slower than just calling good old libcrc32c.
 
-Note that you should ignore the existing crc32c user, iSCSI as
-it was written before the new crypto hash interface was available.
-I will be converting it along with the other two crc32c users. to
-the new ahash interface.
+-chris
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
