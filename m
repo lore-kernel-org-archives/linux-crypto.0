@@ -1,36 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API.
-Date: Mon, 4 Aug 2008 22:19:16 +0800
-Message-ID: <20080804141916.GC11415@gondor.apana.org.au>
+From: Arjan van de Ven <arjan@infradead.org>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
+ algorithm by new crypto API.
+Date: Mon, 4 Aug 2008 07:20:15 -0700
+Message-ID: <20080804072015.0fcd23e7@infradead.org>
 References: <1217842507.20845.18.camel@localhost.localdomain>
+	<1217844725.3454.580.camel@pmac.infradead.org>
+	<1217846139.20845.25.camel@localhost.localdomain>
+	<1217846726.3454.589.camel@pmac.infradead.org>
+	<20080804140435.GA11227@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	davem@davemloft.net, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Austin Zhang <austin_zhang@linux.intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:60722 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754294AbYHDOTU (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:42584 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753338AbYHDOUV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 10:19:20 -0400
-Content-Disposition: inline
-In-Reply-To: <1217842507.20845.18.camel@localhost.localdomain>
+	Mon, 4 Aug 2008 10:20:21 -0400
+In-Reply-To: <20080804140435.GA11227@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 04, 2008 at 05:35:07AM -0400, Austin Zhang wrote:
->
-> +config CRYPTO_CRC32C_INTEL
-> +        tristate "CRC32c INTEL hardware acceleration"
-> +        select CRYPTO_HASH
+On Mon, 4 Aug 2008 22:04:35 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-You need some sort of a dependency here.  See what the other
-assembly algorithms do it.
+> There only three crc32c users in the kernel tree and the crypto
+> interface will serve the perfectly.
 
-Cheers,
+isn't it a bit heavy for something as simple as a crc?
+(which after all is one instruction now ;0)
+
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If you want to reach me at my work email, use arjan@linux.intel.com
+For development, discussion and tips for power savings, 
+visit http://www.lesswatts.org
