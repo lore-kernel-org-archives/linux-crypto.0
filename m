@@ -1,48 +1,48 @@
-From: Chris Mason <chris.mason@oracle.com>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate
-	CRC32c	algorithm by new crypto API.
-Date: Mon, 04 Aug 2008 12:14:56 -0400
-Message-ID: <1217866496.29139.75.camel@think.oraclecorp.com>
-References: <E1KQ2D2-0003Fn-00@gondolin.me.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: dwmw2@infradead.org, austin_zhang@linux.intel.com,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate	CRC32c	algorithm by new crypto API.
+Date: Tue, 05 Aug 2008 00:45:34 +0800
+Message-ID: <E1KQ3Be-0003T3-00@gondolin.me.apana.org.au>
+References: <1217866496.29139.75.camel@think.oraclecorp.com>
+Cc: herbert@gondor.apana.org.au, dwmw2@infradead.org,
+	austin_zhang@linux.intel.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: chris.mason@oracle.com (Chris Mason)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rgminet01.oracle.com ([148.87.113.118]:58147 "EHLO
-	rgminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751920AbYHDQQf (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:50547 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753238AbYHDQpw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 12:16:35 -0400
-In-Reply-To: <E1KQ2D2-0003Fn-00@gondolin.me.apana.org.au>
+	Mon, 4 Aug 2008 12:45:52 -0400
+In-Reply-To: <1217866496.29139.75.camel@think.oraclecorp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2008-08-04 at 23:42 +0800, Herbert Xu wrote:
-> Chris Mason <chris.mason@oracle.com> wrote:
-> >
-> >>From a performance point of view I'm probably reading the crypto API
-> > code wrong, but it looks like my choices are to either have a long
-> > standing context and use locking around the digest/hash calls to protect
-> > internal crypto state, or create a new context every time and take a
-> > perf hit while crypto looks up the right module.
+Chris Mason <chris.mason@oracle.com> wrote:
 > 
-> You're looking at the old hash interface.  New users should use the
-> ahash interface which was only recently added to the kernel.  It
-> lets you store the state in the request object which you pass to
-> the algorithm on every call.  This means that you only need one
-> tfm in the entire system for crc32c.
-> 
+> Great to hear, that solves my main concern then.  There is still the
+> embedded argument against needing all of crypto api just for libcrc32c.
 
-Great to hear, that solves my main concern then.  There is still the
-embedded argument against needing all of crypto api just for libcrc32c.
+The existing users are iSCSI, SCTP, Infiniband, all of which are
+clearly crucial in the embedded space :)
 
-It does make sense to me to have a libcrc32c that does the HW detection
-and uses HW assist when present, and just have the cypto api call that.
+> It does make sense to me to have a libcrc32c that does the HW detection
+> and uses HW assist when present, and just have the cypto api call that.
 
--chris
+Well then you're going to have to do the check on every call.
 
+Seriously, I'm happy to trim off any fat from the crypto API for the
+embedded space.  For a start, if you only needed hashing then we
+could do without the legacy cipher/compress support.  That shaves
+off 800 bytes on i386.  There is also still some legacy code in
+api.c itself.  Getting rid of them should get us to around 2K.
 
+On the other hand, one of the advantages of doing it through the
+crypto API is that this kind of selection is useful for quite a
+few operations, e.g., xor or even memcpy.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
