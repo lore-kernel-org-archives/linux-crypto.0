@@ -1,41 +1,38 @@
-From: Arjan van de Ven <arjan@infradead.org>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate	CRC32c
- algorithm by new crypto API.
-Date: Mon, 4 Aug 2008 10:06:05 -0700
-Message-ID: <20080804100605.4f0921f4@infradead.org>
-References: <1217866496.29139.75.camel@think.oraclecorp.com>
-	<E1KQ3Be-0003T3-00@gondolin.me.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate	CRC32c algorithm by new crypto API.
+Date: Tue, 5 Aug 2008 01:10:18 +0800
+Message-ID: <20080804171017.GA13725@gondor.apana.org.au>
+References: <1217866496.29139.75.camel@think.oraclecorp.com> <E1KQ3Be-0003T3-00@gondolin.me.apana.org.au> <20080804100605.4f0921f4@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: chris.mason@oracle.com (Chris Mason), herbert@gondor.apana.org.au,
-	dwmw2@infradead.org, austin_zhang@linux.intel.com,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Chris Mason <chris.mason@oracle.com>, dwmw2@infradead.org,
+	austin_zhang@linux.intel.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Arjan van de Ven <arjan@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:32867 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753715AbYHDRGP (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:51102 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758798AbYHDRKi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 13:06:15 -0400
-In-Reply-To: <E1KQ3Be-0003T3-00@gondolin.me.apana.org.au>
+	Mon, 4 Aug 2008 13:10:38 -0400
+Content-Disposition: inline
+In-Reply-To: <20080804100605.4f0921f4@infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 05 Aug 2008 00:45:34 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Mon, Aug 04, 2008 at 10:06:05AM -0700, Arjan van de Ven wrote:
+> 
+> well you still have that indirect function call
+> 
+> for libcrc32 we could alternatives() that...
 
-> On the other hand, one of the advantages of doing it through the
-> crypto API is that this kind of selection is useful for quite a
-> few operations, e.g., xor or even memcpy.
+I don't see why you couldn't do that for the crypto API too
+if you wanted to.  That way it would benefit all crypto users
+rather than just the crc32c (note the extra c) users.
 
-well you still have that indirect function call
-
-for libcrc32 we could alternatives() that...
-
-
+Cheers,
 -- 
-If you want to reach me at my work email, use arjan@linux.intel.com
-For development, discussion and tips for power savings, 
-visit http://www.lesswatts.org
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
