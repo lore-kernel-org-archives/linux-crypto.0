@@ -1,42 +1,63 @@
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: [PATCH 1/1 v4] Add CryptoAPI User Interface Support
-Date: Mon, 4 Aug 2008 18:21:43 +0400
-Message-ID: <20080804142143.GA21120@2ka.mipt.ru>
-References: <0CA0A16855646F4FA96D25A158E299D604CAFC9B@SDCEXCHANGE01.ad.amcc.com>
+From: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
+	algorithm by new crypto API.
+Date: Mon, 04 Aug 2008 15:49:01 +0100
+Message-ID: <1217861341.3454.641.camel@pmac.infradead.org>
+References: <1217842507.20845.18.camel@localhost.localdomain>
+	 <1217844725.3454.580.camel@pmac.infradead.org>
+	 <1217846139.20845.25.camel@localhost.localdomain>
+	 <1217846726.3454.589.camel@pmac.infradead.org>
+	 <20080804140435.GA11227@gondor.apana.org.au>
+	 <20080804072015.0fcd23e7@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Shasi Pulijala <spulijala@amcc.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	davem@davemloft.net, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Loc Ho <lho@amcc.com>
+To: Arjan van de Ven <arjan@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.80.65]:56683 "EHLO 2ka.mipt.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753399AbYHDOVo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Aug 2008 10:21:44 -0400
-Content-Disposition: inline
-In-Reply-To: <0CA0A16855646F4FA96D25A158E299D604CAFC9B@SDCEXCHANGE01.ad.amcc.com>
+Received: from bombadil.infradead.org ([18.85.46.34]:50894 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754471AbYHDOtH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 Aug 2008 10:49:07 -0400
+In-Reply-To: <20080804072015.0fcd23e7@infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
-
-On Wed, Jul 30, 2008 at 04:53:01PM -0700, Loc Ho (lho@amcc.com) wrote:
-> This is Linux CryptoAPI user space interface support patch v4. This version includes:
+On Mon, 2008-08-04 at 07:20 -0700, Arjan van de Ven wrote:
+> On Mon, 4 Aug 2008 22:04:35 +0800
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
 > 
-> * Add async support using Linux AIO.
-> * Interafce to choose Copy to/from user and pinning pages based on size of data.
-> * Asynchronous operations are issued through aio write function call. And result data
-> is read back in the same context using the retry aio operations.
-> * The crypto operation structure is passed via the data parameter of the write function.
-> Internally, it will perform a copy from user call just as the synchronous I/O control version.
+> > There only three crc32c users in the kernel tree and the crypto
+> > interface will serve the perfectly.
+> 
+> isn't it a bit heavy for something as simple as a crc?
+> (which after all is one instruction now ;0)
 
-What does prevent from simultaneous command execution? Or setkey() vs.
-run() race? Do you rely on BKL which 'guards' ioctl execution? How is
-->write() protected from ioctl()?
+It does seem that way. For users who care about 'bloat' and are _only_
+interested in crc32, it's yet another chunk of extra infrastructure
+which offers no benefit to them.
 
-Please also remove forward declarations and rearrange code if needed.
-You can also drop looong ******** lines from comments.
+And even for people who don't care about that, it doesn't look
+particularly good. It looks like btrfs would need either to keep setting
+up a crypto context and then tearing it down, or have a pool of
+long-standing contexts and do some kind of locking on them -- neither of
+which seem particularly optimal compared with just calling into
+libcrc32c.
+
+We can't even set up one context per cpu and disable preempt while we
+use it, can we? The routines are allowed to sleep?
+
+(Although I have to admit I do like the fact that it'd only be available
+through EXPORT_SYMBOL_GPL if we do force people to use the crypto
+API...)
 
 -- 
-	Evgeniy Polyakov
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
+
+
+
