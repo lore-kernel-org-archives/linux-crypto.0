@@ -1,33 +1,45 @@
 From: Austin Zhang <austin_zhang@linux.intel.com>
 Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
 	algorithm by new crypto API.
-Date: Tue, 05 Aug 2008 05:51:34 -0400
-Message-ID: <1217929894.1613.0.camel@localhost.localdomain>
+Date: Tue, 05 Aug 2008 05:59:11 -0400
+Message-ID: <1217930351.1613.4.camel@localhost.localdomain>
 References: <1217842507.20845.18.camel@localhost.localdomain>
-	 <1217859214.3454.629.camel@pmac.infradead.org>
+	 <20080804141916.GC11415@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Woodhouse <dwmw2@infradead.org>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.21]:10367 "EHLO
-	orsmga101.jf.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753234AbYHEJxW (ORCPT
+Received: from mga10.intel.com ([192.55.52.92]:49757 "EHLO
+	fmsmga102.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755042AbYHEKA4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Aug 2008 05:53:22 -0400
-In-Reply-To: <1217859214.3454.629.camel@pmac.infradead.org>
+	Tue, 5 Aug 2008 06:00:56 -0400
+In-Reply-To: <20080804141916.GC11415@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2008-08-04 at 15:13 +0100, David Woodhouse wrote:
-> Am I missing something here, or are you registering the crypto algorithm
-> _unconditionally_ and then just causing init requests for it to fail on
-> older hardware?  Wouldn't it be better to register the driver _only_
-> when the hardware is capable? Or at least "if at least one cpu is
-> capable".
-Thanks, I will move it to module init.
-> I think that should depend on CONFIG_X86? 
-Thanks.
+On Mon, 2008-08-04 at 22:19 +0800, Herbert Xu wrote:
+> On Mon, Aug 04, 2008 at 05:35:07AM -0400, Austin Zhang wrote:
+> >
+> > +config CRYPTO_CRC32C_INTEL
+> > +        tristate "CRC32c INTEL hardware acceleration"
+> > +        select CRYPTO_HASH
+> 
+> You need some sort of a dependency here.  See what the other
+> assembly algorithms do it.
+> 
+> Cheers,
+How about:
++config CRYPTO_CRC32C_INTEL
++        tristate "CRC32c INTEL hardware acceleration"
++       depends on X86
++        select CRYPTO_ALGAPI
++        help
++          In Intel processor with SSE4.2 supported, the processor will
+......
+
+It should only depend on X86.
 
