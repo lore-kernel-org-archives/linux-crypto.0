@@ -1,72 +1,44 @@
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c
-	algorithm by new crypto API -V2.
-Date: Tue, 5 Aug 2008 16:04:08 +0300
-Message-ID: <20080805130408.GD25371@cs181140183.pp.htv.fi>
-References: <1217937403.3641.8.camel@localhost.localdomain> <20080805123944.GA22680@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate	CRC32c algorithm by new crypto API.
+Date: Tue, 5 Aug 2008 22:04:36 +0800
+Message-ID: <20080805140436.GA23405@gondor.apana.org.au>
+References: <1217866496.29139.75.camel@think.oraclecorp.com> <E1KQ3Be-0003T3-00@gondolin.me.apana.org.au> <20080804100605.4f0921f4@infradead.org> <20080804171017.GA13725@gondor.apana.org.au> <20080804171316.GA13819@gondor.apana.org.au> <48983521.9070203@aitel.hist.no>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Austin Zhang <austin_zhang@linux.intel.com>, dwmw2@infradead.org,
-	davem@davemloft.net, randy.dunlap@oracle.com,
+Content-Type: text/plain; charset=us-ascii
+Cc: Arjan van de Ven <arjan@infradead.org>,
+	Chris Mason <chris.mason@oracle.com>, dwmw2@infradead.org,
+	austin_zhang@linux.intel.com, davem@davemloft.net,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Helge Hafting <helge.hafting@aitel.hist.no>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp4.pp.htv.fi ([213.243.153.38]:47585 "EHLO smtp4.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760224AbYHENas (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Aug 2008 09:30:48 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:48415 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752689AbYHEOE6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 Aug 2008 10:04:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20080805123944.GA22680@gondor.apana.org.au>
+In-Reply-To: <48983521.9070203@aitel.hist.no>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 05, 2008 at 08:39:44PM +0800, Herbert Xu wrote:
-> Hi Austin:
-> 
-> On Tue, Aug 05, 2008 at 07:56:43AM -0400, Austin Zhang wrote:
-> > Revised by comments:
-> > Move hardware feature detect into module init;
-> > Revise dependency in Kconfig;
-> > Revise variable type;
-> > Add information output while module loading failed; 
-> >  
-> > 
-> > >From NHM processor onward, Intel processors can support hardware
-> > accelerated
-> > CRC32c algorithm with the new CRC32 instruction in SSE 4.2 instruction
-> > set.
-> > The patch detects the availability of the feature, and chooses the most
-> > proper
-> > way to calculate CRC32c checksum.
-> > Byte code instructions are used for compiler compatibility.
-> > No MMX / XMM registers is involved in the implementation.
-> > 
-> > Signed-off-by: Austin Zhang <austin.zhang@intel.com>
-> > Signed-off-by: Kent Liu <kent.liu@intel.com>
-> 
-> I tried to apply your patch but it doesn't work:
-> 
-> $ git apply --check --whitespace=error-all ~/p
-> fatal: patch fragment without header at line 34: @@ -0,0 +1,190 @@
-> $
-> 
-> Looks like your mail client has folded all the lines.
->...
+On Tue, Aug 05, 2008 at 01:10:25PM +0200, Helge Hafting wrote:
+>
+> How about making crc32c an inline function then?
+> On processors that have this feature, this compiles to that single
+> instruction, plus whatever setup it needs. Nice and efficient.
+> On other processors, either inline the algorithm or inline
+> a call to an out of line function, depending on how bulky this is.
 
-Documentation/email-clients.txt contains a section explaining what to do 
-in Evolution.
+Please read the thread carefully.  Being a single instruction
+is nothing special.  The same thing applies for other algorithms
+too, e.g., AES is also just a single instruction with the VIA
+PadLock (and Intel in future).
 
-> And here.
-> 
-> Thanks,
+The crypto API has handled this just fine.
 
-cu
-Adrian
-
+Cheers,
 -- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
