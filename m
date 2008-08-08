@@ -1,331 +1,457 @@
 From: "Shasi Pulijala" <spulijala@amcc.com>
-Subject: OpenSSL patch to support Linux CryptoAPI.
-Date: Fri, 8 Aug 2008 11:31:58 -0700
-Message-ID: <DB599F406D04E34389140B7D99C71B1B05D9E002@SDCEXCHANGE01.ad.amcc.com>
+Subject: [PATCH 1/1 v1] Add CryptoAPI PKA Support
+Date: Fri, 8 Aug 2008 13:02:48 -0700
+Message-ID: <DB599F406D04E34389140B7D99C71B1B05D9E03B@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C8F985.0AE9E710"
-Cc: "Loc Ho" <lho@amcc.com>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: <linux-crypto@vger.kernel.org>, "Loc Ho" <lho@amcc.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02-ext1.amcc.com ([198.137.200.73]:52406 "EHLO
+Received: from sdcmail02-ext1.amcc.com ([198.137.200.73]:57896 "EHLO
 	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753908AbYHHSb7 (ORCPT
+	with ESMTP id S1750771AbYHHUCt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Aug 2008 14:31:59 -0400
+	Fri, 8 Aug 2008 16:02:49 -0400
 Content-class: urn:content-classes:message
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a multi-part message in MIME format.
+ 
+From: Shasi Pulijala <spulijala@amcc.com>
 
-------_=_NextPart_001_01C8F985.0AE9E710
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Hi Herbert,
 
+This patch adds PKA support to Linux CryptoAPI. All the basic algorithms like add, sub, div, expmod and expmod-crt can be supported by this interface. Currently the max number of src and dst operands have been defined as 6 and 2 respectively. These values should fit all the above mentioned algorithms (for example add needs 2 for input and 1 for output, expmod-crt 6 for input and 1 for output). Although, there is no specific mapping of operands, it is assumed that for add, operand A would be the first entry, operand B would be the second entry of the source. The output would be the first output.
 
-Hi,
-=20
-OpenSSL patch to support Linux CryptoAPI via CryptoDev interface. This =
-patch depends on OCF patch to OpenSSL. After applying OCF patch to =
-OpenSSL, apply this patch which will replace the lower interface into =
-the Linux kernel.
-=20
--Shasi
+Signed-off-by: Shasi Pulijala <spulijala@amcc.com>
+Acked-by: Loc Ho <lho@amcc.com>
+---
+ crypto/Kconfig          |    4 +
+ crypto/Makefile         |    1 +
+ crypto/pka.c            |  107 +++++++++++++++++++++++++++++++++
+ include/crypto/algapi.h |   17 +++++
+ include/linux/crypto.h  |  153 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 279 insertions(+), 3 deletions(-)
+ create mode 100644 crypto/pka.c
 
-------_=_NextPart_001_01C8F985.0AE9E710
-Content-Type: text/plain;
-	name="0001-Cryptodev-OpenSSL-Patch.txt"
-Content-Transfer-Encoding: base64
-Content-Description: 0001-Cryptodev-OpenSSL-Patch.txt
-Content-Disposition: attachment;
-	filename="0001-Cryptodev-OpenSSL-Patch.txt"
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index eb66c4e..4e112e9 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -38,6 +38,10 @@ config CRYPTO_HASH
+ 	tristate
+ 	select CRYPTO_ALGAPI
+ 
++config CRYPTO_PKA
++	tristate
++	select CRYPTO_ALGAPI
++
+ config CRYPTO_MANAGER
+ 	tristate "Cryptographic algorithm manager"
+ 	select CRYPTO_ALGAPI
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 6819da9..949f08e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -19,9 +19,9 @@ obj-$(CONFIG_CRYPTO_BLKCIPHER) += crypto_blkcipher.o
+ obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
+ 
+ crypto_hash-objs := hash.o
++obj-$(CONFIG_CRYPTO_PKA) += pka.o
+ obj-$(CONFIG_CRYPTO_HASH) += crypto_hash.o
+ 
+ obj-$(CONFIG_CRYPTO_MANAGER) += cryptomgr.o
+ obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+diff --git a/crypto/pka.c b/crypto/pka.c
+new file mode 100644
+index 0000000..532e8d5
+--- /dev/null
++++ b/crypto/pka.c
+@@ -0,0 +1,107 @@
++/*
++ * @ pka.c
++ * Linux CryptoAPI Module for PKA
++ *
++ * Copyright (c) 2008 Shasi Pulijala <spulijala@amcc.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ */
++
++#include <crypto/algapi.h>
++#include <linux/err.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/seq_file.h>
++
++#include "internal.h"
++
++static unsigned int crypto_pka_ctxsize(struct crypto_alg *alg, u32 type,
++					u32 mask)
++{
++	return alg->cra_ctxsize;
++}
++
++static int crypto_init_pka_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
++{
++	struct pka_alg *alg = &tfm->__crt_alg->cra_pka;
++	struct pka_tfm *crt   = &tfm->crt_pka;
++	
++	crt->base   = __crypto_pka_cast(tfm);
++	crt->pka_op = alg->pka_op;
++	return 0;
++}
++
++static void crypto_pka_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++static void crypto_pka_show(struct seq_file *m, struct crypto_alg *alg)
++{
++	seq_printf(m, "type         : pka\n");
++	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
++					     "yes" : "no");
++}
++
++const struct crypto_type crypto_pka_type = {
++	.ctxsize = crypto_pka_ctxsize,
++	.init = crypto_init_pka_ops,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_pka_show,
++#endif
++};
++EXPORT_SYMBOL_GPL(crypto_pka_type);
++
++struct crypto_pka *crypto_alloc_pka(const char *alg_name,
++					u32 type, u32 mask)
++{
++	struct crypto_tfm *tfm;
++	int err;
++
++	mask &= ~CRYPTO_ALG_TYPE_MASK;
++
++	for (;;) {
++		struct crypto_alg *alg;
++
++		type &= ~CRYPTO_ALG_TYPE_MASK;
++		type |= CRYPTO_ALG_TYPE_ASYNC_PKA;
++		alg = crypto_alg_mod_lookup(alg_name, type, mask);
++		if (IS_ERR(alg)) {
++			type &= ~CRYPTO_ALG_TYPE_MASK;
++			type |= CRYPTO_ALG_TYPE_ASYNC_PKA;
++			alg = crypto_alg_mod_lookup(alg_name, type, mask);
++			if (IS_ERR(alg)) {
++				err = PTR_ERR(alg);
++				goto err;
++			}
++		}
++
++		tfm = __crypto_alloc_tfm(alg, type, mask | CRYPTO_ALG_ASYNC);
++		if (!IS_ERR(tfm))
++			return __crypto_pka_cast(tfm);
++
++		crypto_mod_put(alg);
++		err = PTR_ERR(tfm);
++
++err:
++		if (err != -EAGAIN)
++			break;
++		if (signal_pending(current)) {
++			err = -EINTR;
++			break;
++		}
++	}
++
++	return ERR_PTR(err);
++}
++EXPORT_SYMBOL_GPL(crypto_alloc_pka);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Cryptographic PKA type");
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 60d06e7..2498a9c 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -98,6 +98,7 @@ extern const struct crypto_type crypto_ablkcipher_type;
+ extern const struct crypto_type crypto_aead_type;
+ extern const struct crypto_type crypto_blkcipher_type;
+ extern const struct crypto_type crypto_hash_type;
++extern const struct crypto_type crypto_pka_type;
+ 
+ void crypto_mod_put(struct crypto_alg *alg);
+ 
+@@ -314,5 +315,21 @@ static inline int crypto_requires_sync(u32 type, u32 mask)
+ 	return (type ^ CRYPTO_ALG_ASYNC) & mask & CRYPTO_ALG_ASYNC;
+ }
+ 
++static inline void *crypto_pka_ctx(struct crypto_pka *tfm)
++{
++	return crypto_tfm_ctx(&tfm->base);
++}
++
++static inline struct pka_alg *crypto_pka_alg(
++		struct crypto_pka *tfm)
++{
++	return &crypto_pka_tfm(tfm)->__crt_alg->cra_pka;
++}
++
++static inline void *pka_request_ctx(struct pka_request *req)
++{
++	return req->__ctx;
++}
++
+ #endif	/* _CRYPTO_ALGAPI_H */
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 425824b..ae697f6 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -37,6 +37,7 @@
+ #define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
+ #define CRYPTO_ALG_TYPE_COMPRESS	0x00000008
+ #define CRYPTO_ALG_TYPE_AEAD		0x00000009
++#define CRYPTO_ALG_TYPE_ASYNC_PKA	0x0000000B
+ 
+ #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
+ #define CRYPTO_ALG_TYPE_BLKCIPHER_MASK	0x0000000c
+@@ -102,6 +103,7 @@ struct crypto_async_request;
+ struct crypto_aead;
+ struct crypto_blkcipher;
+ struct crypto_hash;
++struct crypto_pka;
+ struct crypto_tfm;
+ struct crypto_type;
+ struct aead_givcrypt_request;
+@@ -132,6 +134,33 @@ struct ablkcipher_request {
+ };
+ 
+ /**
++ *	struct pka_request - PKA request
++ *	@base: Common attributes for async pka requests
++ *	@src: list of source operands
++ *	@dst: result operands
++ *	@shift_value: shift value for shift operation
++ *	@__ctx: Start of private context data
++ */
++#define PKA_SRC_OPERANDS		6
++#define PKA_DST_OPERANDS		2
++
++struct pka_request {
++	struct crypto_async_request base;
++
++	struct scatterlist		*src[6];
++	struct scatterlist		*dst[2];
++	u32			operand_src_size[6];
++	u32			operand_dst_size[2];
++
++	int iops;
++	int oops;
++
++	u8	shift_value;
++
++	void *__ctx[] CRYPTO_MINALIGN_ATTR;
++};
++
++/**
+  *	struct aead_request - AEAD request
+  *	@base: Common attributes for async crypto requests
+  *	@assoclen: Length in bytes of associated data for authentication
+@@ -266,6 +295,10 @@ struct compress_alg {
+ 			      unsigned int slen, u8 *dst, unsigned int *dlen);
+ };
+ 
++struct pka_alg {
++	int (*pka_op)(struct pka_request *req);
++};
++
+ #define cra_ablkcipher	cra_u.ablkcipher
+ #define cra_aead	cra_u.aead
+ #define cra_blkcipher	cra_u.blkcipher
+@@ -273,6 +306,7 @@ struct compress_alg {
+ #define cra_digest	cra_u.digest
+ #define cra_hash	cra_u.hash
+ #define cra_compress	cra_u.compress
++#define cra_pka		cra_u.pka
+ 
+ struct crypto_alg {
+ 	struct list_head cra_list;
+@@ -299,12 +333,13 @@ struct crypto_alg {
+ 		struct digest_alg digest;
+ 		struct hash_alg hash;
+ 		struct compress_alg compress;
++		struct pka_alg	pka;
+ 	} cra_u;
+ 
+ 	int (*cra_init)(struct crypto_tfm *tfm);
+ 	void (*cra_exit)(struct crypto_tfm *tfm);
+ 	void (*cra_destroy)(struct crypto_alg *alg);
+-	
++ 
+ 	struct module *cra_module;
+ };
+ 
+@@ -392,17 +427,23 @@ struct compress_tfm {
+ 	                      u8 *dst, unsigned int *dlen);
+ };
+ 
++struct pka_tfm {
++	struct crypto_pka *base;
++	int (*pka_op)(struct pka_request *req);
++};
++
+ #define crt_ablkcipher	crt_u.ablkcipher
+ #define crt_aead	crt_u.aead
+ #define crt_blkcipher	crt_u.blkcipher
+ #define crt_cipher	crt_u.cipher
+ #define crt_hash	crt_u.hash
+ #define crt_compress	crt_u.compress
++#define crt_pka		crt_u.pka
+ 
+ struct crypto_tfm {
+ 
+ 	u32 crt_flags;
+-	
++ 
+ 	union {
+ 		struct ablkcipher_tfm ablkcipher;
+ 		struct aead_tfm aead;
+@@ -410,8 +451,9 @@ struct crypto_tfm {
+ 		struct cipher_tfm cipher;
+ 		struct hash_tfm hash;
+ 		struct compress_tfm compress;
++		struct pka_tfm	pka;
+ 	} crt_u;
+-	
++ 
+ 	struct crypto_alg *__crt_alg;
+ 
+ 	void *__crt_ctx[] CRYPTO_MINALIGN_ATTR;
+@@ -441,6 +483,10 @@ struct crypto_hash {
+ 	struct crypto_tfm base;
+ };
+ 
++struct crypto_pka {
++	struct crypto_tfm base;
++};
++
+ enum {
+ 	CRYPTOA_UNSPEC,
+ 	CRYPTOA_ALG,
+@@ -1264,5 +1310,106 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
+ 						    src, slen, dst, dlen);
+ }
+ 
++static inline struct crypto_digest *__crypto_digest_cast(
++		struct crypto_tfm *tfm)
++{
++	return (struct crypto_digest *) tfm;
++}
++
++static inline struct crypto_pka *__crypto_pka_cast(struct crypto_tfm *tfm)
++{
++	return (struct crypto_pka *) tfm;
++}
++
++static inline struct crypto_tfm *crypto_pka_tfm(
++		struct crypto_pka *tfm)
++{
++	return &tfm->base;
++}
++
++static inline struct pka_tfm *crypto_pka_crt(struct crypto_pka *tfm)
++{
++	return &crypto_pka_tfm(tfm)->crt_pka;
++}
++
++static inline struct crypto_pka *crypto_pka_reqtfm(
++		struct pka_request *req)
++{
++	return __crypto_pka_cast(req->base.tfm);
++}
++
++static inline int crypto_pka_op(struct pka_request *req)
++{
++	struct pka_tfm *crt = crypto_pka_crt(crypto_pka_reqtfm(req));
++	return crt->pka_op(req);
++}
++
++static inline void pka_request_set_tfm(
++		struct pka_request *req, struct crypto_pka *tfm)
++{
++	req->base.tfm = crypto_pka_tfm(crypto_pka_crt(tfm)->base);
++}
++
++static inline struct pka_request *pka_request_alloc(
++		struct crypto_pka *tfm, gfp_t gfp)
++{
++	struct pka_request *req;
++
++	req = kmalloc(sizeof(struct pka_request), gfp);
++
++	if (likely(req))
++		pka_request_set_tfm(req, tfm);
++
++	return req;
++}
++
++static inline void pka_request_free(struct pka_request *req)
++{
++	kfree(req);
++}
++
++static inline void crypto_free_pka(struct crypto_pka *tfm)
++{
++	crypto_free_tfm(crypto_pka_tfm(tfm));
++}
++
++static inline void pka_request_set_operands(
++		struct pka_request *req,
++		struct scatterlist **sg_src,
++		struct scatterlist **sg_dst,
++		u32  *ssize,
++		u32  *dsize,
++		int iops, int oops, u8 shift)
++{
++	int i;
++	req->iops = iops;
++	req->oops = oops;
++	req->shift_value = shift;
++	
++	for (i = 0; i < iops; i++) {
++		req->src[i] = sg_src[i];
++		req->operand_src_size[i] = ssize[i];
++	}
++	
++	for (i = 0; i < oops; i++) {
++		req->dst[i] = sg_dst[i];
++		req->operand_dst_size[i] = dsize[i];
++	}
++
++}
++
++static inline void pka_request_set_callback(
++		struct pka_request *req,
++	u32 flags, crypto_completion_t complete, void *data)
++{
++	req->base.complete = complete;
++	req->base.data = data;
++	req->base.flags = flags;
++}
++
++
++struct crypto_pka *crypto_alloc_pka(const char *alg_name,
++				    u32 type, u32 mask);
++
+ #endif	/* _LINUX_CRYPTO_H */
+ 
+-- 
+1.5.5
 
-ZGlmZiAtTmF1ciAvdXNlci9vcGVuc3NsL29wZW5zc2wtMC45LjhnL2NyeXB0by9jcnlwdG9kZXYu
-aCAvdXNlci9saW51eC9vcGVuc3NsLTAuOS44Zy9jcnlwdG8vY3J5cHRvZGV2LmgNCi0tLSAvdXNl
-ci9vcGVuc3NsL29wZW5zc2wtMC45LjhnL2NyeXB0by9jcnlwdG9kZXYuaCAyMDA4LTA4LTA3IDE1
-OjU3OjE0LjAwNzg1NDAwMCAtMDcwMA0KKysrIC91c2VyL2xpbnV4L29wZW5zc2wtMC45LjhnL2Ny
-eXB0by9jcnlwdG9kZXYuaCAyMDA4LTA4LTA3IDE4OjE2OjQxLjk1NTQ3NzAwMCAtMDcwMA0KQEAg
-LTYxLDYgKzYxLDggQEANCiAjaWZuZGVmIF9DUllQVE9fQ1JZUFRPX0hfDQogI2RlZmluZSBfQ1JZ
-UFRPX0NSWVBUT19IXw0KIA0KKyNpbmNsdWRlIDxsaW51eC90eXBlcy5oPg0KKw0KIC8qIFNvbWUg
-aW5pdGlhbCB2YWx1ZXMgKi8NCiAjZGVmaW5lIENSWVBUT19EUklWRVJTX0lOSVRJQUwJNA0KICNk
-ZWZpbmUgQ1JZUFRPX1NXX1NFU1NJT05TCTMyDQpAQCAtMTI4LDYgKzEzMCw3IEBADQogDQogLyog
-TWF4IHNpemUgb2YgZGF0YSB0aGF0IGNhbiBiZSBwcm9jZXNzZWQgKi8NCiAjZGVmaW5lIENSWVBU
-T19NQVhfREFUQV9MRU4JCTY0KjEwMjQgLSAxDQorI2RlZmluZSBDUllQVE9fTUFYX0FMR19OQU1F
-CQkyMA0KIA0KIA0KICNkZWZpbmUgQ1JZUFRPX0FMR09SSVRITV9NSU4JCTENCkBAIC0xNzgsMTYg
-KzE4MSwxMyBAQA0KICNkZWZpbmUgQ1JZUFRPX0ZMQUdfU09GVFdBUkUJMHgwMjAwMDAwMAkvKiBz
-b2Z0d2FyZSBpbXBsZW1lbnRhdGlvbiAqLw0KIA0KIC8qIE5COiBkZXByZWNhdGVkICovDQotc3Ry
-dWN0IHNlc3Npb25fb3Agew0KLQl1X2ludDMyX3QJY2lwaGVyOwkJLyogaWUuIENSWVBUT19ERVNf
-Q0JDICovDQotCXVfaW50MzJfdAltYWM7CQkvKiBpZS4gQ1JZUFRPX01ENV9ITUFDICovDQogDQot
-CXVfaW50MzJfdAlrZXlsZW47CQkvKiBjaXBoZXIga2V5ICovDQotCWNhZGRyX3QJCWtleTsNCi0J
-aW50CQltYWNrZXlsZW47CS8qIG1hYyBrZXkgKi8NCi0JY2FkZHJfdAkJbWFja2V5Ow0KLQ0KLSAg
-CXVfaW50MzJfdAlzZXM7CQkvKiByZXR1cm5zOiBzZXNzaW9uICMgKi8gDQorc3RydWN0IHNlc3Np
-b25fb3Agew0KKwlfX3UxNgkJYWxnb19zaXplOw0KKwlfX3UxNgkJa2V5X3NpemU7CS8qIGNpcGhl
-ciBrZXkgbGVuZ3RoICovDQorCV9fdTE2CQlobWFja2V5X3NpemU7CS8qIG1hYyBrZXkgbGVuZ3Ro
-ICovDQorCV9fdTE2CQlpY3Zfc2l6ZTsJLyogYXV0aHNpemUgKGNjbSwgZ2NtKSAqLw0KKwlfX3U4
-CQlkYXRhWzBdOw0KIH07DQogDQogc3RydWN0IHNlc3Npb24yX29wIHsNCkBAIC0xOTksMjUgKzE5
-OSwyNCBAQA0KIAlpbnQJCW1hY2tleWxlbjsJLyogbWFjIGtleSAqLw0KIAljYWRkcl90CQltYWNr
-ZXk7DQogDQotICAJdV9pbnQzMl90CXNlczsJCS8qIHJldHVybnM6IHNlc3Npb24gIyAqLyANCisJ
-dV9pbnQzMl90CXNlczsJCS8qIHJldHVybnM6IHNlc3Npb24gIyAqLw0KIAlpbnQJCWNyaWQ7CQkv
-KiBkcml2ZXIgaWQgKyBmbGFncyAocncpICovDQogCWludAkJcGFkWzRdOwkJLyogZm9yIGZ1dHVy
-ZSBleHBhbnNpb24gKi8NCiB9Ow0KIA0KIHN0cnVjdCBjcnlwdF9vcCB7DQotCXVfaW50MzJfdAlz
-ZXM7DQotCXVfaW50MTZfdAlvcDsJCS8qIGkuZS4gQ09QX0VOQ1JZUFQgKi8NCiAjZGVmaW5lIENP
-UF9OT05FCTANCiAjZGVmaW5lIENPUF9FTkNSWVBUCTENCiAjZGVmaW5lIENPUF9ERUNSWVBUCTIN
-Ci0JdV9pbnQxNl90CWZsYWdzOw0KLSNkZWZpbmUJQ09QX0ZfQkFUQ0gJMHgwMDA4CQkvKiBCYXRj
-aCBvcCBpZiBwb3NzaWJsZSAqLw0KLQl1X2ludAkJbGVuOw0KLQljYWRkcl90CQlzcmMsIGRzdDsJ
-LyogYmVjb21lIGlvdltdIGluc2lkZSBrZXJuZWwgKi8NCi0JY2FkZHJfdAkJbWFjOwkJLyogbXVz
-dCBiZSBiaWcgZW5vdWdoIGZvciBjaG9zZW4gTUFDICovDQotCWNhZGRyX3QJCWl2Ow0KKwlfX3Ux
-NgkJb3A7CQkvKiBpLmUuIENPUF9FTkNSWVBUICovDQorCV9fdTE2CQlmbGFnczsNCisJX191MTYJ
-CWl2X3NpemU7DQorCV9fdTE2IAkJYXNzb2Nfc2l6ZTsNCisJX191MzIJCXNyY19zaXplOw0KKwlj
-YWRkcl90CQlzcmNfZGF0YTsNCisJY2FkZHJfdAkJZHN0X2RhdGE7DQorCV9fdTgJCWRhdGFbMF07
-CS8qIG11c3QgYmUgYmlnIGVub3VnaCBmb3IgY2hvc2VuIE1BQyAqLw0KIH07DQotDQogLyoNCiAg
-KiBQYXJhbWV0ZXJzIGZvciBsb29raW5nIHVwIGEgY3J5cHRvIGRyaXZlci9kZXZpY2UgYnkNCiAg
-KiBkZXZpY2UgbmFtZSBvciBieSBpZC4gIFRoZSBsYXR0ZXIgYXJlIHJldHVybmVkIGZvcg0KZGlm
-ZiAtTmF1ciAvdXNlci9vcGVuc3NsL29wZW5zc2wtMC45LjhnL2NyeXB0by9lbmdpbmUvZW5nX2Ny
-eXB0b2Rldi5jIC91c2VyL2xpbnV4L29wZW5zc2wtMC45LjhnL2NyeXB0by9lbmdpbmUvZW5nX2Ny
-eXB0b2Rldi5jDQotLS0gL3VzZXIvb3BlbnNzbC9vcGVuc3NsLTAuOS44Zy9jcnlwdG8vZW5naW5l
-L2VuZ19jcnlwdG9kZXYuYyAyMDA4LTA4LTA3IDE4OjA1OjAyLjkxNjY1NTAwMCAtMDcwMA0KKysr
-IC91c2VyL2xpbnV4L29wZW5zc2wtMC45LjhnL2NyeXB0by9lbmdpbmUvZW5nX2NyeXB0b2Rldi5j
-IDIwMDgtMDgtMDcgMTg6MDU6MDUuNDc5MzI1MDAwIC0wNzAwDQpAQCAtMzEsNiArMzEsOSBAQA0K
-ICNpbmNsdWRlIDxvcGVuc3NsL2V2cC5oPg0KICNpbmNsdWRlIDxvcGVuc3NsL2JuLmg+DQogDQor
-I2RlZmluZSBDUllQVE9ERVZfTElOVVgNCisjZGVmaW5lIFVTRV9DUllQVE9ERVZfRElHRVNUUw0K
-Kw0KICNpZiAoZGVmaW5lZChfX3VuaXhfXykgfHwgZGVmaW5lZCh1bml4KSkgJiYgIWRlZmluZWQo
-VVNHKSAmJiBcDQogCShkZWZpbmVkKE9wZW5CU0QpIHx8IGRlZmluZWQoX19GcmVlQlNEX3ZlcnNp
-b24pKQ0KICNpbmNsdWRlIDxzeXMvcGFyYW0uaD4NCkBAIC0xMzYsNiArMTM5LDQzIEBADQogCXsg
-MCwgTlVMTCwgTlVMTCwgMCB9DQogfTsNCiANCisvKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKg0KKyog
-VGFibGUgTG9va3VwIGZvciBBbGdvcml0aG1zIG5hbWUoQ3J5cHRvL2hhc2ggbmFtZSkNCisqIEhl
-bHBlciBTdHJ1Y3R1cmUNCisqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqDQorKi8NCitjaGFyICphbGdv
-X21hcF90YmxbQ1JZUFRPX0FMR09SSVRITV9NQVhdID0gew0KKwlbQ1JZUFRPX0RFU19DQkNdICAJ
-PSAiY2JjKGRlcykiLA0KKwlbQ1JZUFRPXzNERVNfQ0JDXSAJPSAiY2JjKGRlczNfZWRlKSIsDQor
-CVtDUllQVE9fTUQ1X0hNQUNdIAk9ICJobWFjKG1kNSkiLA0KKwlbQ1JZUFRPX0JMRl9DQkNdICAJ
-PSAiY2JjKGJsb3dmaXNoKSIsDQorCVtDUllQVE9fQ0FTVF9DQkNdCT0gImNiYyhjYXN0NSkiLA0K
-KwlbQ1JZUFRPX1NLSVBKQUNLX0NCQ10JPSAiY2FtZWxsaWEiLA0KKwlbQ1JZUFRPX01ENV9ITUFD
-XQk9ICJobWFjKG1kNSkiLA0KKwlbQ1JZUFRPX1NIQTFfSE1BQ10JPSAiaG1hYyhzaGExKSIsDQor
-CVtDUllQVE9fUklQRU1EMTYwX0hNQUNdCT0gImhtYWMocm1kMTYwKSIsDQorCVtDUllQVE9fTUQ1
-X0tQREtdCT0gIiIsDQorCVtDUllQVE9fU0hBMV9LUERLXQk9ICIiLA0KKwlbQ1JZUFRPX1JJSk5E
-QUVMMTI4X0NCQ10gPSAiY2JjKGFlcykiLA0KKwlbQ1JZUFRPX0FFU19DQkNdCT0gImNiYyhhZXMp
-IiwNCisJW0NSWVBUT19BUkM0XQkJPSAiZWNiKGFyYzQpIiwNCisJW0NSWVBUT19NRDVdCQk9ICJt
-ZDUiLA0KKwlbQ1JZUFRPX1NIQTFdCQk9ICJzaGExIiwNCisJW0NSWVBUT19OVUxMX0hNQUNdCT0g
-IiIsDQorCVtDUllQVE9fTlVMTF9DQkNdCT0gIiIsDQorCVtDUllQVE9fREVGTEFURV9DT01QXQk9
-ICJkZWZsYXRlIiwNCisJW0NSWVBUT19TSEEyXzI1Nl9ITUFDXQk9ICJobWFjKHNoYTI1NikiLA0K
-KwlbQ1JZUFRPX1NIQTJfMzg0X0hNQUNdCT0gImhtYWMoc2hhMzg0KSIsDQorCVtDUllQVE9fU0hB
-Ml81MTJfSE1BQ10JPSAiaG1hYyhzaGE1MTIpIiwNCisJW0NSWVBUT19DQU1FTExJQV9DQkNdCT0g
-ImNiYyhjYW1lbGxpYSkiLA0KKwlbQ1JZUFRPX1NIQTJfMjU2XQk9ICJzaGEyNTYiLA0KKwlbQ1JZ
-UFRPX1NIQTJfMzg0XQk9ICJzaGEzODQiLA0KKwlbQ1JZUFRPX1NIQTJfNTEyXQk9ICJzaGE1MTIi
-LA0KKwlbQ1JZUFRPX1JJUEVNRDE2MF0JPSAicm1kMTYwIiwNCisJW0NSWVBUT19BRVNfR0NNXQk9
-ICJnY20oYWVzKSIsDQorCVtDUllQVE9fQUVTX0NDTV0JPSAiY2NtKGFlcykiLA0KK307DQorDQog
-c3RhdGljIHN0cnVjdCB7DQogCWludAlpZDsNCiAJaW50CW5pZDsNCkBAIC0xNjEsOCArMjAxLDgg
-QEANCiAJeyBDUllQVE9fUklQRU1EMTYwX0hNQUMsCU5JRF9yaXBlbWQxNjAsCQkxNi8qPyovfSwN
-CiAJeyBDUllQVE9fTUQ1X0tQREssCQlOSURfdW5kZWYsCQkwfSwNCiAJeyBDUllQVE9fU0hBMV9L
-UERLLAkJTklEX3VuZGVmLAkJMH0sDQotCXsgQ1JZUFRPX01ENSwJCQlOSURfbWQ1LAkJMTZ9LA0K
-LQl7IENSWVBUT19TSEExLAkJCU5JRF9zaGExLAkJMjB9LA0KKwl7IENSWVBUT19NRDUsCQkJTklE
-X21kNSwJCTB9LA0KKwl7IENSWVBUT19TSEExLAkJCU5JRF9zaGExLAkJMH0sDQogCXsgMCwJCQkJ
-TklEX3VuZGVmLAkJMH0sDQogfTsNCiANCkBAIC0xNzAsNiArMjEwLDE4IEBADQogICogUmV0dXJu
-IGEgZmQgaWYgL2Rldi9jcnlwdG8gc2VlbXMgdXNhYmxlLCAwIG90aGVyd2lzZS4NCiAgKi8NCiBz
-dGF0aWMgaW50DQorb3Blbl9jcnlwdG9kZXZfZmQodm9pZCkNCit7DQorCWludCBmZDsNCisJZmQg
-PSBvcGVuKCIvZGV2L2NyeXB0byIsIE9fUkRXUiwgMCk7DQorCWlmIChmZCA8IDApIHsNCisJCXBl
-cnJvcigib3BlbigvZGV2L2NyeXB0bykiKTsNCisJCXJldHVybiAtMTsNCisJfQ0KKwlyZXR1cm4g
-ZmQ7DQorDQorfQ0KK3N0YXRpYyBpbnQNCiBvcGVuX2Rldl9jcnlwdG8odm9pZCkNCiB7DQogCXN0
-YXRpYyBpbnQgZmQgPSAtMTsNCkBAIC0yNzksMjcgKzMzMSwzMSBAQA0KIGdldF9jcnlwdG9kZXZf
-Y2lwaGVycyhjb25zdCBpbnQgKipjbmlkcykNCiB7DQogCXN0YXRpYyBpbnQgbmlkc1tDUllQVE9f
-QUxHT1JJVEhNX01BWF07DQotCXN0cnVjdCBzZXNzaW9uX29wIHNlc3M7DQorCWNoYXIgZGF0YW1b
-MTAwXTsNCisJc3RydWN0IHNlc3Npb25fb3AgKm9wID0gKHN0cnVjdCBzZXNzaW9uX29wICopZGF0
-YW07DQogCWludCBmZCwgaSwgY291bnQgPSAwOw0KLQ0KLQlpZiAoKGZkID0gZ2V0X2Rldl9jcnlw
-dG8oKSkgPCAwKSB7DQotCQkqY25pZHMgPSBOVUxMOw0KLQkJcmV0dXJuICgwKTsNCi0JfQ0KLQlt
-ZW1zZXQoJnNlc3MsIDAsIHNpemVvZihzZXNzKSk7DQotCXNlc3Mua2V5ID0gKGNhZGRyX3QpIjEy
-MzQ1Njc4OWFiY2RlZmdoaWprbG1ubyI7DQotDQorCWNoYXIgKmtleTsNCisJDQogCWZvciAoaSA9
-IDA7IGNpcGhlcnNbaV0uaWQgJiYgY291bnQgPCBDUllQVE9fQUxHT1JJVEhNX01BWDsgaSsrKSB7
-DQogCQlpZiAoY2lwaGVyc1tpXS5uaWQgPT0gTklEX3VuZGVmKQ0KIAkJCWNvbnRpbnVlOw0KLQkJ
-c2Vzcy5jaXBoZXIgPSBjaXBoZXJzW2ldLmlkOw0KLQkJc2Vzcy5rZXlsZW4gPSBjaXBoZXJzW2ld
-LmtleWxlbjsNCi0JCXNlc3MubWFjID0gMDsNCi0JCWlmIChpb2N0bChmZCwgQ0lPQ0dTRVNTSU9O
-LCAmc2VzcykgIT0gLTEgJiYNCi0JCSAgICBpb2N0bChmZCwgQ0lPQ0ZTRVNTSU9OLCAmc2Vzcy5z
-ZXMpICE9IC0xKQ0KKwkJaWYgKChmZCA9IG9wZW5fY3J5cHRvZGV2X2ZkKCkpIDwgMCkgew0KKwkJ
-CSpjbmlkcyA9IE5VTEw7DQorCQkJcmV0dXJuICgwKTsNCisJCX0NCisJCW1lbXNldChvcCwgMCwg
-c2l6ZW9mKHN0cnVjdCBzZXNzaW9uX29wKSk7DQorCQlrZXkgPSAoY2FkZHJfdCkiMTIzNDU2Nzg5
-YWJjZGVmZ2hpamtsbW5vIjsNCisJCW9wLT5hbGdvX3NpemUgPSBzdHJsZW4oYWxnb19tYXBfdGJs
-W2NpcGhlcnNbaV0uaWRdKTsNCisJCW9wLT5rZXlfc2l6ZSA9IGNpcGhlcnNbaV0ua2V5bGVuOw0K
-KwkJb3AtPmhtYWNrZXlfc2l6ZSA9IDA7DQorCQltZW1jcHkob3AtPmRhdGEsIGFsZ29fbWFwX3Ri
-bFtjaXBoZXJzW2ldLmlkXSwgb3AtPmFsZ29fc2l6ZSk7DQorCQlvcC0+ZGF0YVtvcC0+YWxnb19z
-aXplKytdID0gJ1wwJzsNCisJCW1lbWNweShvcC0+ZGF0YSArIG9wLT5hbGdvX3NpemUsIGtleSwg
-b3AtPmtleV9zaXplKTsNCisJCQ0KKwkJaWYgKGlvY3RsKGZkLCBDSU9DR1NFU1NJT04sIG9wKSAh
-PSAtMSkNCiAJCQluaWRzW2NvdW50KytdID0gY2lwaGVyc1tpXS5uaWQ7DQorCQljbG9zZShmZCk7
-DQogCX0NCi0JY2xvc2UoZmQpOw0KIA0KIAlpZiAoY291bnQgPiAwKQ0KIAkJKmNuaWRzID0gbmlk
-czsNCkBAIC0zMTgsMjYgKzM3NCwzNCBAQA0KIGdldF9jcnlwdG9kZXZfZGlnZXN0cyhjb25zdCBp
-bnQgKipjbmlkcykNCiB7DQogCXN0YXRpYyBpbnQgbmlkc1tDUllQVE9fQUxHT1JJVEhNX01BWF07
-DQotCXN0cnVjdCBzZXNzaW9uX29wIHNlc3M7DQorCWNoYXIgZGF0YVsxMDBdOw0KKwlzdHJ1Y3Qg
-c2Vzc2lvbl9vcCAqb3AgPSAoc3RydWN0IHNlc3Npb25fb3AgKilkYXRhOw0KIAlpbnQgZmQsIGks
-IGNvdW50ID0gMDsNCisJY2hhciAqbWFja2V5ID0gTlVMTDsNCiANCi0JaWYgKChmZCA9IGdldF9k
-ZXZfY3J5cHRvKCkpIDwgMCkgew0KLQkJKmNuaWRzID0gTlVMTDsNCi0JCXJldHVybiAoMCk7DQot
-CX0NCi0JbWVtc2V0KCZzZXNzLCAwLCBzaXplb2Yoc2VzcykpOw0KLQlzZXNzLm1hY2tleSA9IChj
-YWRkcl90KSIxMjM0NTY3ODlhYmNkZWZnaGlqa2xtbm8iOw0KIAlmb3IgKGkgPSAwOyBkaWdlc3Rz
-W2ldLmlkICYmIGNvdW50IDwgQ1JZUFRPX0FMR09SSVRITV9NQVg7IGkrKykgew0KIAkJaWYgKGRp
-Z2VzdHNbaV0ubmlkID09IE5JRF91bmRlZikNCiAJCQljb250aW51ZTsNCi0JCXNlc3MubWFjID0g
-ZGlnZXN0c1tpXS5pZDsNCi0JCXNlc3MubWFja2V5bGVuID0gZGlnZXN0c1tpXS5rZXlsZW47DQot
-CQlzZXNzLmNpcGhlciA9IDA7DQotCQlpZiAoaW9jdGwoZmQsIENJT0NHU0VTU0lPTiwgJnNlc3Mp
-ICE9IC0xICYmDQotCQkgICAgaW9jdGwoZmQsIENJT0NGU0VTU0lPTiwgJnNlc3Muc2VzKSAhPSAt
-MSkNCisJCWlmICgoZmQgPSBvcGVuX2NyeXB0b2Rldl9mZCgpKSA8IDApIHsNCisJCQkqY25pZHMg
-PSBOVUxMOw0KKwkJCXJldHVybiAoMCk7DQorCQl9DQorDQorCQltZW1zZXQob3AsIDAsIHNpemVv
-ZihzdHJ1Y3Qgc2Vzc2lvbl9vcCkpOw0KKwkJb3AtPmFsZ29fc2l6ZSA9IHN0cmxlbihhbGdvX21h
-cF90YmxbZGlnZXN0c1tpXS5pZF0pOw0KKwkJb3AtPmtleV9zaXplID0gMDsNCisJCW9wLT5obWFj
-a2V5X3NpemUgPSBkaWdlc3RzW2ldLmtleWxlbjsNCisJCW1lbWNweShvcC0+ZGF0YSwgYWxnb19t
-YXBfdGJsW2RpZ2VzdHNbaV0uaWRdLCBvcC0+YWxnb19zaXplKTsNCisJCWlmIChvcC0+aG1hY2tl
-eV9zaXplKQ0KKwkJCW1hY2tleSA9IChjYWRkcl90KSIxMjM0NTY3ODlhYmNkZWZnaGlqa2xtbm8i
-Ow0KKwkJb3AtPmRhdGFbb3AtPmFsZ29fc2l6ZSsrXSA9ICdcMCc7DQorCQltZW1jcHkob3AtPmRh
-dGEgKyBvcC0+YWxnb19zaXplLCBtYWNrZXksIG9wLT5obWFja2V5X3NpemUpOw0KKw0KKwkJaWYg
-KGlvY3RsKGZkLCBDSU9DR1NFU1NJT04sIG9wKSAhPSAtMSkNCiAJCQluaWRzW2NvdW50KytdID0g
-ZGlnZXN0c1tpXS5uaWQ7DQorCQljbG9zZShmZCk7DQorCQkNCiAJfQ0KLQljbG9zZShmZCk7DQog
-DQogCWlmIChjb3VudCA+IDApDQogCQkqY25pZHMgPSBuaWRzOw0KQEAgLTM5NiwxMyArNDYwLDE3
-IEBADQogI2VuZGlmDQogfQ0KIA0KKw0KIHN0YXRpYyBpbnQNCiBjcnlwdG9kZXZfY2lwaGVyKEVW
-UF9DSVBIRVJfQ1RYICpjdHgsIHVuc2lnbmVkIGNoYXIgKm91dCwNCiAJCQljb25zdCB1bnNpZ25l
-ZCBjaGFyICppbiwgdW5zaWduZWQgaW50IGlubCkNCiB7DQotCXN0cnVjdCBjcnlwdF9vcCBjcnlw
-Ow0KKw0KIAlzdHJ1Y3QgZGV2X2NyeXB0b19zdGF0ZSAqc3RhdGUgPSBjdHgtPmNpcGhlcl9kYXRh
-Ow0KLQlzdHJ1Y3Qgc2Vzc2lvbl9vcCAqc2VzcyA9ICZzdGF0ZS0+ZF9zZXNzOw0KKwljaGFyIGRh
-dGFvcFsxMDBdOw0KKwlzdHJ1Y3QgY3J5cHRfb3AgKmNyeXAgPSAoc3RydWN0IGNyeXB0X29wICop
-ZGF0YW9wOw0KKwlpbnQgcmV0Ow0KKwkNCiAJdm9pZCAqaWl2Ow0KIAl1bnNpZ25lZCBjaGFyIHNh
-dmVfaXZbRVZQX01BWF9JVl9MRU5HVEhdOw0KIA0KQEAgLTQxMywzMCArNDgxLDMwIEBADQogCWlm
-ICgoaW5sICUgY3R4LT5jaXBoZXItPmJsb2NrX3NpemUpICE9IDApDQogCQlyZXR1cm4gKDApOw0K
-IA0KLQltZW1zZXQoJmNyeXAsIDAsIHNpemVvZihjcnlwKSk7DQorCW1lbXNldChjcnlwLCAwLCBz
-aXplb2Yoc3RydWN0IGNyeXB0X29wKSk7DQogDQotCWNyeXAuc2VzID0gc2Vzcy0+c2VzOw0KLQlj
-cnlwLmZsYWdzID0gMDsNCi0JY3J5cC5sZW4gPSBpbmw7DQotCWNyeXAuc3JjID0gKGNhZGRyX3Qp
-IGluOw0KLQljcnlwLmRzdCA9IChjYWRkcl90KSBvdXQ7DQotCWNyeXAubWFjID0gMDsNCisJY3J5
-cC0+aXZfc2l6ZSA9IGN0eC0+Y2lwaGVyLT5pdl9sZW47DQorCWNyeXAtPmFzc29jX3NpemUgPSAw
-Ow0KKwljcnlwLT5zcmNfc2l6ZSA9IGlubDsNCisJY3J5cC0+c3JjX2RhdGEgPSAoY2FkZHJfdCkg
-aW47DQorCWNyeXAtPmRzdF9kYXRhID0gKGNhZGRyX3QpIG91dDsNCiANCi0JY3J5cC5vcCA9IGN0
-eC0+ZW5jcnlwdCA/IENPUF9FTkNSWVBUIDogQ09QX0RFQ1JZUFQ7DQorCWNyeXAtPm9wID0gY3R4
-LT5lbmNyeXB0ID8gQ09QX0VOQ1JZUFQgOiBDT1BfREVDUllQVDsNCiANCiAJaWYgKGN0eC0+Y2lw
-aGVyLT5pdl9sZW4pIHsNCi0JCWNyeXAuaXYgPSAoY2FkZHJfdCkgY3R4LT5pdjsNCisJCW1lbWNw
-eShjcnlwLT5kYXRhLCBjdHgtPml2LCBjcnlwLT5pdl9zaXplKTsNCiAJCWlmICghY3R4LT5lbmNy
-eXB0KSB7DQogCQkJaWl2ID0gKHZvaWQgKikgaW4gKyBpbmwgLSBjdHgtPmNpcGhlci0+aXZfbGVu
-Ow0KIAkJCW1lbWNweShzYXZlX2l2LCBpaXYsIGN0eC0+Y2lwaGVyLT5pdl9sZW4pOw0KIAkJfQ0K
-IAl9IGVsc2UNCi0JCWNyeXAuaXYgPSBOVUxMOw0KLQ0KLQlpZiAoaW9jdGwoc3RhdGUtPmRfZmQs
-IENJT0NDUllQVCwgJmNyeXApID09IC0xKSB7DQorCWNyeXAtPml2X3NpemUgPSAwOw0KKwkJDQor
-CXJldCA9IGlvY3RsKHN0YXRlLT5kX2ZkLCBDSU9DQ1JZUFQsIGNyeXApOw0KKwlpZiAocmV0KSB7
-DQogCQkvKiBYWFggbmVlZCBiZXR0ZXIgZXJycm9yIGhhbmRsaW5nDQotCQkgKiB0aGlzIGNhbiBm
-YWlsIGZvciBhIG51bWJlciBvZiBkaWZmZXJlbnQgcmVhc29ucy4NCi0JCSAqLw0KKwkJKiB0aGlz
-IGNhbiBmYWlsIGZvciBhIG51bWJlciBvZiBkaWZmZXJlbnQgcmVhc29ucy4NCisJCSovDQogCQly
-ZXR1cm4gKDApOw0KIAl9DQogDQpAQCAtNDQ4LDQ0ICs1MTYsNTAgQEANCiAJCW1lbWNweShjdHgt
-Pml2LCBpaXYsIGN0eC0+Y2lwaGVyLT5pdl9sZW4pOw0KIAl9DQogCXJldHVybiAoMSk7DQorDQog
-fQ0KIA0KIHN0YXRpYyBpbnQNCiBjcnlwdG9kZXZfaW5pdF9rZXkoRVZQX0NJUEhFUl9DVFggKmN0
-eCwgY29uc3QgdW5zaWduZWQgY2hhciAqa2V5LA0KIAljb25zdCB1bnNpZ25lZCBjaGFyICppdiwg
-aW50IGVuYykNCiB7DQorDQogCXN0cnVjdCBkZXZfY3J5cHRvX3N0YXRlICpzdGF0ZSA9IGN0eC0+
-Y2lwaGVyX2RhdGE7DQotCXN0cnVjdCBzZXNzaW9uX29wICpzZXNzID0gJnN0YXRlLT5kX3Nlc3M7
-DQorCWNoYXIgZGF0YVsxMDBdOw0KKwlzdHJ1Y3Qgc2Vzc2lvbl9vcCAqb3AgPSAoc3RydWN0IHNl
-c3Npb25fb3AgKilkYXRhOw0KIAlpbnQgY2lwaGVyLCBpOw0KLQ0KKwkNCiAJZm9yIChpID0gMDsg
-Y2lwaGVyc1tpXS5pZDsgaSsrKQ0KIAkJaWYgKGN0eC0+Y2lwaGVyLT5uaWQgPT0gY2lwaGVyc1tp
-XS5uaWQgJiYNCi0JCSAgICBjdHgtPmNpcGhlci0+aXZfbGVuIDw9IGNpcGhlcnNbaV0uaXZtYXgg
-JiYNCi0JCSAgICBjdHgtPmtleV9sZW4gPT0gY2lwaGVyc1tpXS5rZXlsZW4pIHsNCisJCQkJICBj
-dHgtPmNpcGhlci0+aXZfbGVuIDw9IGNpcGhlcnNbaV0uaXZtYXggJiYNCisJCQkJICBjdHgtPmtl
-eV9sZW4gPT0gY2lwaGVyc1tpXS5rZXlsZW4pIHsNCiAJCQljaXBoZXIgPSBjaXBoZXJzW2ldLmlk
-Ow0KIAkJCWJyZWFrOw0KLQkJfQ0KKwkgIAl9DQogDQogCWlmICghY2lwaGVyc1tpXS5pZCkgew0K
-LQkJc3RhdGUtPmRfZmQgPSAtMTsNCi0JCXJldHVybiAoMCk7DQorCSBzdGF0ZS0+ZF9mZCA9IC0x
-Ow0KKwkgcmV0dXJuICgwKTsNCiAJfQ0KKwkNCiANCi0JbWVtc2V0KHNlc3MsIDAsIHNpemVvZihz
-dHJ1Y3Qgc2Vzc2lvbl9vcCkpOw0KLQ0KLQlpZiAoKHN0YXRlLT5kX2ZkID0gZ2V0X2Rldl9jcnlw
-dG8oKSkgPCAwKQ0KLQkJcmV0dXJuICgwKTsNCi0NCi0Jc2Vzcy0+a2V5ID0gKHVuc2lnbmVkIGNo
-YXIgKilrZXk7DQotCXNlc3MtPmtleWxlbiA9IGN0eC0+a2V5X2xlbjsNCi0Jc2Vzcy0+Y2lwaGVy
-ID0gY2lwaGVyOw0KKwlpZiAoKHN0YXRlLT5kX2ZkID0gb3Blbl9jcnlwdG9kZXZfZmQoKSkgPCAw
-KQ0KKwkgIHJldHVybiAoMCk7DQogDQotCWlmIChpb2N0bChzdGF0ZS0+ZF9mZCwgQ0lPQ0dTRVNT
-SU9OLCBzZXNzKSA9PSAtMSkgew0KLQkJY2xvc2Uoc3RhdGUtPmRfZmQpOw0KLQkJc3RhdGUtPmRf
-ZmQgPSAtMTsNCi0JCXJldHVybiAoMCk7DQorCW1lbXNldChvcCwgMCwgc2l6ZW9mKHN0cnVjdCBz
-ZXNzaW9uX29wKSk7DQorCW9wLT5hbGdvX3NpemUgPSBzdHJsZW4oYWxnb19tYXBfdGJsW2NpcGhl
-cl0pOw0KKwlvcC0+a2V5X3NpemUgPSBjdHgtPmtleV9sZW47DQorCW1lbWNweShvcC0+ZGF0YSwg
-YWxnb19tYXBfdGJsW2NpcGhlcnNbaV0uaWRdLCBvcC0+YWxnb19zaXplKTsNCisJb3AtPmRhdGFb
-b3AtPmFsZ29fc2l6ZSsrXSA9ICdcMCc7DQorCW1lbWNweShvcC0+ZGF0YSArIG9wLT5hbGdvX3Np
-emUsICh1bnNpZ25lZCBjaGFyICopa2V5LCBvcC0+a2V5X3NpemUpOw0KKw0KKwlpZiAoaW9jdGwo
-c3RhdGUtPmRfZmQsIENJT0NHU0VTU0lPTiwgb3ApID09IC0xKSB7DQorCQkJIGNsb3NlKHN0YXRl
-LT5kX2ZkKTsNCisJCQkgIHN0YXRlLT5kX2ZkID0gLTE7DQorCQkJcmV0dXJuICgwKTsNCiAJfQ0K
-IAlyZXR1cm4gKDEpOw0KKw0KIH0NCiANCiAvKg0KQEAgLTQ5NSw5ICs1NjksOSBAQA0KIHN0YXRp
-YyBpbnQNCiBjcnlwdG9kZXZfY2xlYW51cChFVlBfQ0lQSEVSX0NUWCAqY3R4KQ0KIHsNCisNCiAJ
-aW50IHJldCA9IDA7DQogCXN0cnVjdCBkZXZfY3J5cHRvX3N0YXRlICpzdGF0ZSA9IGN0eC0+Y2lw
-aGVyX2RhdGE7DQotCXN0cnVjdCBzZXNzaW9uX29wICpzZXNzID0gJnN0YXRlLT5kX3Nlc3M7DQog
-DQogCWlmIChzdGF0ZS0+ZF9mZCA8IDApDQogCQlyZXR1cm4gKDApOw0KQEAgLTUxMywxNyArNTg3
-LDE0IEBADQogCSAqIHByaW50IG1lc3NhZ2VzIHRvIHVzZXJzIG9mIHRoZSBsaWJyYXJ5LiBobW0u
-Lg0KIAkgKi8NCiANCi0JaWYgKGlvY3RsKHN0YXRlLT5kX2ZkLCBDSU9DRlNFU1NJT04sICZzZXNz
-LT5zZXMpID09IC0xKSB7DQotCQlyZXQgPSAwOw0KLQl9IGVsc2Ugew0KLQkJcmV0ID0gMTsNCi0J
-fQ0KIAljbG9zZShzdGF0ZS0+ZF9mZCk7DQogCXN0YXRlLT5kX2ZkID0gLTE7DQogDQogCXJldHVy
-biAocmV0KTsNCisNCiB9DQogDQorDQogLyoNCiAgKiBsaWJjcnlwdG8gRVZQIHN0dWZmIC0gdGhp
-cyBpcyBob3cgd2UgZ2V0IHdpcmVkIHRvIEVWUCBzbyB0aGUgZW5naW5lDQogICogZ2V0cyBjYWxs
-ZWQgd2hlbiBsaWJjcnlwdG8gcmVxdWVzdHMgYSBjaXBoZXIgTklELg0KQEAgLTY3OCw4ICs3NDks
-MTEgQEANCiBzdGF0aWMgaW50IGNyeXB0b2Rldl9kaWdlc3RfaW5pdChFVlBfTURfQ1RYICpjdHgp
-DQogew0KIAlzdHJ1Y3QgZGV2X2NyeXB0b19zdGF0ZSAqc3RhdGUgPSBjdHgtPm1kX2RhdGE7DQot
-CXN0cnVjdCBzZXNzaW9uX29wICpzZXNzID0gJnN0YXRlLT5kX3Nlc3M7DQorCWNoYXIgZGF0YVsx
-MDBdOw0KKwlzdHJ1Y3Qgc2Vzc2lvbl9vcCAqc2VzcyA9IChzdHJ1Y3Qgc2Vzc2lvbl9vcCAqKWRh
-dGE7DQogCWludCBkaWdlc3Q7DQorCWludCByZXQ7DQorCQ0KIA0KIAlpZiAoKGRpZ2VzdCA9IGRp
-Z2VzdF9uaWRfdG9fY3J5cHRvZGV2KGN0eC0+ZGlnZXN0LT50eXBlKSkgPT0gTklEX3VuZGVmKXsN
-CiAJCXByaW50ZigiY3J5cHRvZGV2X2RpZ2VzdF9pbml0OiBDYW4ndCBnZXQgZGlnZXN0IFxuIik7
-DQpAQCAtNjg4LDE2ICs3NjIsMjEgQEANCiANCiAJbWVtc2V0KHN0YXRlLCAwLCBzaXplb2Yoc3Ry
-dWN0IGRldl9jcnlwdG9fc3RhdGUpKTsNCiANCi0JaWYgKChzdGF0ZS0+ZF9mZCA9IGdldF9kZXZf
-Y3J5cHRvKCkpIDwgMCkgew0KKwlpZiAoKHN0YXRlLT5kX2ZkID0gb3Blbl9jcnlwdG9kZXZfZmQo
-KSkgPCAwKSB7DQogCQlwcmludGYoImNyeXB0b2Rldl9kaWdlc3RfaW5pdDogQ2FuJ3QgZ2V0IERl
-diBcbiIpOw0KIAkJcmV0dXJuICgwKTsNCiAJfQ0KIA0KLQlzZXNzLT5tYWNrZXkgPSBzdGF0ZS0+
-ZHVtbXlfbWFjX2tleTsNCi0Jc2Vzcy0+bWFja2V5bGVuID0gZGlnZXN0X2tleV9sZW5ndGgoY3R4
-LT5kaWdlc3QtPnR5cGUpOw0KLQlzZXNzLT5tYWMgPSBkaWdlc3Q7DQotDQotCWlmIChpb2N0bChz
-dGF0ZS0+ZF9mZCwgQ0lPQ0dTRVNTSU9OLCBzZXNzKSA8IDApIHsNCisJbWVtc2V0KHNlc3MsIDAs
-IHNpemVvZihzdHJ1Y3Qgc2Vzc2lvbl9vcCkpOw0KKwlzZXNzLT5hbGdvX3NpemUgPSBzdHJsZW4o
-YWxnb19tYXBfdGJsW2RpZ2VzdF0pOw0KKwlzZXNzLT5obWFja2V5X3NpemUgPSBkaWdlc3Rfa2V5
-X2xlbmd0aChjdHgtPmRpZ2VzdC0+dHlwZSk7DQorCW1lbWNweShzZXNzLT5kYXRhLCBhbGdvX21h
-cF90YmxbZGlnZXN0XSwgc2Vzcy0+YWxnb19zaXplKTsNCisJc2Vzcy0+ZGF0YVtzZXNzLT5hbGdv
-X3NpemUrK10gPSAnXDAnOw0KKwlpZiAoc2Vzcy0+aG1hY2tleV9zaXplKQ0KKwkJbWVtY3B5KHNl
-c3MtPmRhdGEgKyBzZXNzLT5hbGdvX3NpemUsDQorCQkgICAgICAgc3RhdGUtPmR1bW15X21hY19r
-ZXksIHNlc3MtPmhtYWNrZXlfc2l6ZSk7DQorCQ0KKwlpZiAoKHJldCA9IGlvY3RsKHN0YXRlLT5k
-X2ZkLCBDSU9DR1NFU1NJT04sIHNlc3MpKSA8IDApIHsNCiAJCWNsb3NlKHN0YXRlLT5kX2ZkKTsN
-CiAJCXN0YXRlLT5kX2ZkID0gLTE7DQogCQlwcmludGYoImNyeXB0b2Rldl9kaWdlc3RfaW5pdDog
-T3BlbiBzZXNzaW9uIGZhaWxlZFxuIik7DQpAQCAtNzEwLDkgKzc4OSw5IEBADQogc3RhdGljIGlu
-dCBjcnlwdG9kZXZfZGlnZXN0X3VwZGF0ZShFVlBfTURfQ1RYICpjdHgsIGNvbnN0IHZvaWQgKmRh
-dGEsDQogCQkJCQlzaXplX3QgY291bnQpDQogew0KLQlzdHJ1Y3QgY3J5cHRfb3AgY3J5cDsNCisJ
-Y2hhciBkYXRhY1sxMDBdOw0KKwlzdHJ1Y3QgY3J5cHRfb3AgKmNyeXAgPSAoc3RydWN0IGNyeXB0
-X29wICopZGF0YWM7DQogCXN0cnVjdCBkZXZfY3J5cHRvX3N0YXRlICpzdGF0ZSA9IGN0eC0+bWRf
-ZGF0YTsNCi0Jc3RydWN0IHNlc3Npb25fb3AgKnNlc3MgPSAmc3RhdGUtPmRfc2VzczsNCiANCiAJ
-aWYgKCFkYXRhIHx8IHN0YXRlLT5kX2ZkIDwgMCkgew0KIAkJcHJpbnRmKCJjcnlwdG9kZXZfZGln
-ZXN0X3VwZGF0ZTogaWxsZWdhbCBpbnB1dHMgXG4iKTsNCkBAIC03MzMsMjEgKzgxMiwxOSBAQA0K
-IAkJfQ0KIA0KIAkJbWVtY3B5KHN0YXRlLT5tYWNfZGF0YSArIHN0YXRlLT5tYWNfbGVuLCBkYXRh
-LCBjb3VudCk7DQotICAgCQlzdGF0ZS0+bWFjX2xlbiArPSBjb3VudDsNCisJCXN0YXRlLT5tYWNf
-bGVuICs9IGNvdW50Ow0KIAkNCiAJCXJldHVybiAoMSk7DQogCX0NCiANCi0JbWVtc2V0KCZjcnlw
-LCAwLCBzaXplb2YoY3J5cCkpOw0KKwltZW1zZXQoY3J5cCwgMCwgc2l6ZW9mKHN0cnVjdCBjcnlw
-dF9vcCkpOw0KKwkNCisJY3J5cC0+c3JjX3NpemUgPSBjb3VudDsNCisJY3J5cC0+c3JjX2RhdGEg
-PSAoY2FkZHJfdCkgZGF0YTsNCisJY3J5cC0+ZHN0X2RhdGEgPSBzdGF0ZS0+ZGlnZXN0X3JlczsN
-CiANCi0JY3J5cC5zZXMgPSBzZXNzLT5zZXM7DQotCWNyeXAuZmxhZ3MgPSAwOw0KLQljcnlwLmxl
-biA9IGNvdW50Ow0KLQljcnlwLnNyYyA9IChjYWRkcl90KSBkYXRhOw0KLQljcnlwLmRzdCA9IE5V
-TEw7DQotCWNyeXAubWFjID0gc3RhdGUtPmRpZ2VzdF9yZXM7DQogDQotCWlmIChpb2N0bChzdGF0
-ZS0+ZF9mZCwgQ0lPQ0NSWVBULCAmY3J5cCkgPCAwKSB7DQorCWlmIChpb2N0bChzdGF0ZS0+ZF9m
-ZCwgQ0lPQ0NSWVBULCBjcnlwKSA8IDApIHsNCiAJCXByaW50ZigiY3J5cHRvZGV2X2RpZ2VzdF91
-cGRhdGU6IGRpZ2VzdCBmYWlsZWQgXG4iKTsNCiAJCXJldHVybiAoMCk7DQogCX0NCkBAIC03NTcs
-OSArODM0LDkgQEANCiANCiBzdGF0aWMgaW50IGNyeXB0b2Rldl9kaWdlc3RfZmluYWwoRVZQX01E
-X0NUWCAqY3R4LCB1bnNpZ25lZCBjaGFyICptZCkNCiB7DQotCXN0cnVjdCBjcnlwdF9vcCBjcnlw
-Ow0KKwljaGFyIGRhdGFvcFsxMDBdOw0KKwlzdHJ1Y3QgY3J5cHRfb3AgKmNyeXAgPSAoc3RydWN0
-IGNyeXB0X29wICopZGF0YW9wOw0KIAlzdHJ1Y3QgZGV2X2NyeXB0b19zdGF0ZSAqc3RhdGUgPSBj
-dHgtPm1kX2RhdGE7DQotCXN0cnVjdCBzZXNzaW9uX29wICpzZXNzID0gJnN0YXRlLT5kX3Nlc3M7
-DQogDQogCWludCByZXQgPSAxOw0KIA0KQEAgLTc3MCwxNiArODQ3LDEzIEBADQogDQogCWlmICgh
-IChjdHgtPmZsYWdzICYgRVZQX01EX0NUWF9GTEFHX09ORVNIT1QpICkgew0KIAkJLyogaWYgYXBw
-bGljYXRpb24gZG9lc24ndCBzdXBwb3J0IG9uZSBidWZmZXIgKi8NCi0JCW1lbXNldCgmY3J5cCwg
-MCwgc2l6ZW9mKGNyeXApKTsNCi0NCi0JCWNyeXAuc2VzID0gc2Vzcy0+c2VzOw0KLQkJY3J5cC5m
-bGFncyA9IDA7DQotCQljcnlwLmxlbiA9IHN0YXRlLT5tYWNfbGVuOw0KLQkJY3J5cC5zcmMgPSBz
-dGF0ZS0+bWFjX2RhdGE7DQotCQljcnlwLmRzdCA9IE5VTEw7DQotCQljcnlwLm1hYyA9IG1kOw0K
-KwkJbWVtc2V0KGNyeXAsIDAsIHNpemVvZihzdHJ1Y3QgY3J5cHRfb3ApKTsNCisJCQ0KKwkJY3J5
-cC0+c3JjX3NpemUgPSBzdGF0ZS0+bWFjX2xlbjsNCisJCWNyeXAtPnNyY19kYXRhID0gc3RhdGUt
-Pm1hY19kYXRhOw0KKwkJY3J5cC0+ZHN0X2RhdGEgPSBtZDsNCiANCi0JCWlmIChpb2N0bChzdGF0
-ZS0+ZF9mZCwgQ0lPQ0NSWVBULCAmY3J5cCkgPCAwKSB7DQorCQlpZiAoaW9jdGwoc3RhdGUtPmRf
-ZmQsIENJT0NDUllQVCwgY3J5cCkgPCAwKSB7DQogCQkJcHJpbnRmKCJjcnlwdG9kZXZfZGlnZXN0
-X2ZpbmFsOiBkaWdlc3QgZmFpbGVkIEZpbmFsXG4iKTsNCiAJCQlyZXR1cm4gKDApOw0KIAkJfQ0K
-QEAgLTc5Nyw3ICs4NzEsNiBAQA0KIHsNCiAJaW50IHJldCA9IDE7DQogCXN0cnVjdCBkZXZfY3J5
-cHRvX3N0YXRlICpzdGF0ZSA9IGN0eC0+bWRfZGF0YTsNCi0Jc3RydWN0IHNlc3Npb25fb3AgKnNl
-c3MgPSAmc3RhdGUtPmRfc2VzczsNCiANCiAJaWYgKHN0YXRlLT5kX2ZkIDwgMCkgew0KIAkJcHJp
-bnRmKCJjcnlwdG9kZXZfZGlnZXN0X2NsZWFudXA6IGlsbGVnYWwgaW5wdXRcbiIpOw0KQEAgLTgx
-MywxMyArODg2LDcgQEANCiAJaWYgKHN0YXRlLT5jb3B5KQ0KIAkJcmV0dXJuIDE7DQogDQotCWlm
-IChpb2N0bChzdGF0ZS0+ZF9mZCwgQ0lPQ0ZTRVNTSU9OLCAmc2Vzcy0+c2VzKSA8IDApIHsNCi0J
-CXByaW50ZigiY3J5cHRvZGV2X2RpZ2VzdF9jbGVhbnVwOiBmYWlsZWQgdG8gY2xvc2Ugc2Vzc2lv
-blxuIik7DQotCQlyZXQgPSAwOw0KLQl9IGVsc2Ugew0KLQkJcmV0ID0gMTsNCi0JfQ0KLQljbG9z
-ZShzdGF0ZS0+ZF9mZCk7CQ0KKwljbG9zZShzdGF0ZS0+ZF9mZCk7DQogCXN0YXRlLT5kX2ZkID0g
-LTE7DQogDQogCXJldHVybiAocmV0KTsNCkBAIC0xMzM0LDYgKzE0MDEsOCBAQA0KIA0KIAlpZiAo
-ZW5naW5lID09IE5VTEwpDQogCQlyZXR1cm47DQorCS8qQXN5bW1ldGljIENyeXB0byBBbGdvcml0
-aG1zIG5vdCB5ZXQgc3VwcG9ydGVkIGJ5IExpbnV4IENyeXB0b2RldiovDQorI2lmbmRlZiBDUllQ
-VE9ERVZfTElOVVgNCiAJaWYgKChmZCA9IGdldF9kZXZfY3J5cHRvKCkpIDwgMCkgew0KIAkJRU5H
-SU5FX2ZyZWUoZW5naW5lKTsNCiAJCXJldHVybjsNCkBAIC0xMzQ4LDcgKzE0MTcsNyBAQA0KIAkJ
-cmV0dXJuOw0KIAl9DQogCWNsb3NlKGZkKTsNCi0NCisjZW5kaWYNCiAJaWYgKCFFTkdJTkVfc2V0
-X2lkKGVuZ2luZSwgImNyeXB0b2RldiIpIHx8DQogCSAgICAhRU5HSU5FX3NldF9uYW1lKGVuZ2lu
-ZSwgIkJTRCBjcnlwdG9kZXYgZW5naW5lIikgfHwNCiAJICAgICFFTkdJTkVfc2V0X2NpcGhlcnMo
-ZW5naW5lLCBjcnlwdG9kZXZfZW5naW5lX2NpcGhlcnMpIHx8DQo=
-
-------_=_NextPart_001_01C8F985.0AE9E710--
