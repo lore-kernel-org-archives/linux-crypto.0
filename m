@@ -1,52 +1,52 @@
-From: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: [RFC] [crypto] padlock-aes loadkey ondemand
-Date: Sat, 9 Aug 2008 13:20:13 +0200
-Message-ID: <20080809112013.GA7914@Chamillionaire.breakpoint.cc>
-References: <20080328223333.GB24018@Chamillionaire.breakpoint.cc> <47EFE3F6.4060704@the2masters.de> <20080330210152.GA25597@Chamillionaire.breakpoint.cc> <47F28136.3080502@the2masters.de> <20080402064419.GC32234@Chamillionaire.breakpoint.cc> <20080402065015.GA7421@gondor.apana.org.au> <20080402071722.GF32234@Chamillionaire.breakpoint.cc> <20080402072258.GA7720@gondor.apana.org.au> <20080807145312.GA11073@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/1 v1] Add CryptoAPI PKA Support
+Date: Sun, 10 Aug 2008 18:43:04 +0800
+Message-ID: <20080810104304.GC4526@gondor.apana.org.au>
+References: <DB599F406D04E34389140B7D99C71B1B05D9E03B@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Stefan Hellermann <stefan@the2masters.de>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Loc Ho <lho@amcc.com>
+To: Shasi Pulijala <spulijala@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:47970 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751352AbYHILUR (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:41969 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752742AbYHJKnI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 9 Aug 2008 07:20:17 -0400
+	Sun, 10 Aug 2008 06:43:08 -0400
 Content-Disposition: inline
-In-Reply-To: <20080807145312.GA11073@gondor.apana.org.au>
+In-Reply-To: <DB599F406D04E34389140B7D99C71B1B05D9E03B@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Herbert Xu | 2008-08-07 22:53:12 [+0800]:
+On Fri, Aug 08, 2008 at 01:02:48PM -0700, Shasi Pulijala wrote:
+>  
+> This patch adds PKA support to Linux CryptoAPI. All the basic algorithms like add, sub, div, expmod and expmod-crt can be supported by this interface. Currently the max number of src and dst operands have been defined as 6 and 2 respectively. These values should fit all the above mentioned algorithms (for example add needs 2 for input and 1 for output, expmod-crt 6 for input and 1 for output). Although, there is no specific mapping of operands, it is assumed that for add, operand A would be the first entry, operand B would be the second entry of the source. The output would be the first output.
 
->I've coded this up with the per-cpu structure and it seems to work.
-yup, excellent. Thanks for finishing this. I had the following comment
-above my DEFINE_PER_CPU definition (I replaced my definition with
-last_cword):
-|/*
-| * PER-CPU last_cword is here to make this code SMP / future safe and works as
-| * follows: After every crypt operation, the CPU sets EFLAGS:30 to indicate
-| * that the key is already in the CPU and catch-the-key-from-memory operation
-| * can be saved. This bit needs to be cleared if we change the key. This bit is
-| * auto-cleared by the CPU on every context switch (and can not be set by the
-| * kernel). We don't lock our self to one CPU during the crypt process because
-| * it isn't required: If we get scheduled to another CPU after the var check
-| * and before the crypt operation than the CPU clears the EFLAGS:30 bit and the
-| * CPU reloads the key anyway. The same things happens if we get scheduled to
-| * another CPU after the crypt operation but before we set last_cword.
-| */
+Could you please tell us why we need this at all? For instance,
+what hardware devices will be supported and who will be the users?
 
-I had a few missing pieces and was never was in the mode to finish it.
+> +struct pka_request {
+> +	struct crypto_async_request base;
+> +
+> +	struct scatterlist		*src[6];
+> +	struct scatterlist		*dst[2];
+> +	u32			operand_src_size[6];
+> +	u32			operand_dst_size[2];
+> +
+> +	int iops;
+> +	int oops;
 
->It doesn't make much of a difference for ECB/CBC but with LRW/XTS
->it gives a huge boost.
-Well, the spec says the key reload takes a lot of time so it should give
-a big boost to everything what isn't supported directly in HW.
-The padlock supports a few other modes like OFB but I doubt they are
-required since they aren't even implemented in SW.
+No, multiplexed interfaces are bad in general.  Please provide
+separate interfaces for each operation.
 
->Cheers,
+You should also post a software implementation so that
 
-Sebastian
+1) You illustrate what this is all about.
+2) We have a yardstick for the hardware devices.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
