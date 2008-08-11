@@ -1,41 +1,37 @@
-From: Jean-Christophe Dubois <jcd@tribudubois.net>
-Subject: [PATCH] remove unnecessary variable in xfrm_output_resume()
-Date: Tue, 12 Aug 2008 08:12:24 +0200
-Message-ID: <200808120812.26363.jcd@tribudubois.net>
+From: Pavel Machek <pavel@suse.cz>
+Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API -V3.
+Date: Mon, 11 Aug 2008 18:10:15 +0200
+Message-ID: <20080811161015.GA5240@ucw.cz>
+References: <a36005b50808072038w3e88658p6769e1e3779b6cab@mail.gmail.com> <E1KRS7u-0005EP-00@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Ulrich Drepper <drepper@gmail.com>, austin_zhang@linux.intel.com,
+	bunk@kernel.org, dwmw2@infradead.org, davem@davemloft.net,
+	randy.dunlap@oracle.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from postfix1-g20.free.fr ([212.27.60.42]:59280 "EHLO
-	postfix1-g20.free.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751152AbYHLGOE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Aug 2008 02:14:04 -0400
-Received: from smtp7-g19.free.fr (smtp7-g19.free.fr [212.27.42.64])
-	by postfix1-g20.free.fr (Postfix) with ESMTP id C00CB293CA3B
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Aug 2008 08:14:01 +0200 (CEST)
-Received: from smtp7-g19.free.fr (localhost [127.0.0.1])
-	by smtp7-g19.free.fr (Postfix) with ESMTP id 9A4A2B0177
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Aug 2008 08:12:30 +0200 (CEST)
-Received: from lancelot.dubois.etowns.net (lns-bzn-51f-81-56-146-209.adsl.proxad.net [81.56.146.209])
-	by smtp7-g19.free.fr (Postfix) with ESMTP id 7AC31B015E
-	for <linux-crypto@vger.kernel.org>; Tue, 12 Aug 2008 08:12:30 +0200 (CEST)
+Received: from gprs189-60.eurotel.cz ([160.218.189.60]:3543 "EHLO spitz.ucw.cz"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752898AbYHLO7c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Aug 2008 10:59:32 -0400
 Content-Disposition: inline
+In-Reply-To: <E1KRS7u-0005EP-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Small fix removing an unnecessary intermediate variable.
+On Fri 2008-08-08 21:35:30, Herbert Xu wrote:
+> Ulrich Drepper <drepper@gmail.com> wrote:
+> >
+> > I think you want to use
+> > 
+> >  #define SCALE_F sizeof(unsigned long)
+> 
+> Yeah in general that's what we should do.  However, this driver
+> is specific to Intel x86 CPUs.
 
-Signed-off-by: Jean-Christophe DUBOIS  <jcd@tribudubois.net>
----
+I thought we support intel x86 cpus in both 32 and 64bit modes...?
 
-diff -Naur linux-2.6.26.2.org/net/xfrm/xfrm_output.c linux-2.6.26.2/net/xfrm/xfrm_output.c
---- linux-2.6.26.2.org/net/xfrm/xfrm_output.c   2008-08-12 00:37:29.000000000 +0200
-+++ linux-2.6.26.2/net/xfrm/xfrm_output.c       2008-08-12 00:40:40.000000000 +0200
-@@ -112,16 +112,13 @@
- int xfrm_output_resume(struct sk_buff *skb, int err)
- {
-        while (likely((err = xfrm_output_one(skb, err)) == 0)) {
--               struct xfrm_state *x;
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
