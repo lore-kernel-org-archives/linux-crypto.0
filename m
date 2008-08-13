@@ -1,37 +1,33 @@
-From: Pavel Machek <pavel@suse.cz>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] Using Intel CRC32 instruction to accelerate CRC32c algorithm by new crypto API -V3.
-Date: Mon, 11 Aug 2008 18:10:15 +0200
-Message-ID: <20080811161015.GA5240@ucw.cz>
-References: <a36005b50808072038w3e88658p6769e1e3779b6cab@mail.gmail.com> <E1KRS7u-0005EP-00@gondolin.me.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ulrich Drepper <drepper@gmail.com>, austin_zhang@linux.intel.com,
-	bunk@kernel.org, dwmw2@infradead.org, davem@davemloft.net,
-	randy.dunlap@oracle.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 13 Aug 2008 11:14:16 +1000
+Message-ID: <E1KT4wK-0007mN-00@gondolin.me.apana.org.au>
+References: <20080811161015.GA5240@ucw.cz>
+Cc: herbert@gondor.apana.org.au, drepper@gmail.com,
+	austin_zhang@linux.intel.com, bunk@kernel.org, dwmw2@infradead.org,
+	davem@davemloft.net, randy.dunlap@oracle.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: pavel@suse.cz (Pavel Machek)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gprs189-60.eurotel.cz ([160.218.189.60]:3543 "EHLO spitz.ucw.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752898AbYHLO7c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Aug 2008 10:59:32 -0400
-Content-Disposition: inline
-In-Reply-To: <E1KRS7u-0005EP-00@gondolin.me.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:40485 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752243AbYHMBOm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Aug 2008 21:14:42 -0400
+In-Reply-To: <20080811161015.GA5240@ucw.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri 2008-08-08 21:35:30, Herbert Xu wrote:
-> Ulrich Drepper <drepper@gmail.com> wrote:
-> >
-> > I think you want to use
-> > 
-> >  #define SCALE_F sizeof(unsigned long)
-> 
-> Yeah in general that's what we should do.  However, this driver
-> is specific to Intel x86 CPUs.
+Pavel Machek <pavel@suse.cz> wrote:
+>
+> I thought we support intel x86 cpus in both 32 and 64bit modes...?
 
-I thought we support intel x86 cpus in both 32 and 64bit modes...?
+Yes we do, but the original patch had ugly ifdefs that did the
+same thing.
 
+Cheers,
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
