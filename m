@@ -1,69 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.27
-Date: Wed, 13 Aug 2008 22:16:20 +1000
-Message-ID: <20080813121620.GA23142@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au>
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Subject: Re: [PATCH] remove unnecessary variable in xfrm_output_resume()
+Date: Wed, 13 Aug 2008 20:50:21 +0200
+Message-ID: <200808132050.23072.jcd@tribudubois.net>
+References: <200808120812.26363.jcd@tribudubois.net> <20080813.023814.141037459.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ingo Molnar <mingo@elte.hu>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:54720 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751634AbYHMMQ1 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Aug 2008 08:16:27 -0400
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: David Miller <davem@davemloft.net>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20080813.023814.141037459.davem@davemloft.net>
 Content-Disposition: inline
-In-Reply-To: <20080727063659.GA936@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+Le Wednesday 13 August 2008 11:38:14 David Miller, vous avez =E9crit=A0=
+:
+> From: Jean-Christophe Dubois <jcd@tribudubois.net>
+> Date: Tue, 12 Aug 2008 08:12:24 +0200
+>
+> > Small fix removing an unnecessary intermediate variable.
+> >
+> > Signed-off-by: Jean-Christophe DUBOIS  <jcd@tribudubois.net>
+>
+> Your patch is whitespace mangled by your email client, the tab
+> characters have been corrupted into spaces, therefore your patch
+> will not apply.
+>
+> Please fix this up and resubmit.
 
-This push contains a bunch of fixes for new code/regressions
-introduced since 2.6.26 plus a fix for an old padlock bug that
-has risen to the surface due to recent FPU changes.
+Sorry, I'll resubmit.
 
-Previously the bug was mostly harmless though it had the potential
-to leak FPU state, but since 2.6.26 it has become lethal resulting
-in crashes if the padlock is used during process creation.
+JC
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+>
+> Thanks.
+> --
+> To unsubscribe from this list: send the line "unsubscribe netdev" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-Herbert Xu (3):
-      crypto: tcrypt - Fix AEAD chunk testing
-      crypto: hash - Fix digest size check for digest type
-      crypto: hash - Add missing top-level functions
-
-Lee Nipper (1):
-      crypto: talitos - Add handling for SEC 3.x treatment of link table
-
-Suresh Siddha (1):
-      crypto: padlock - fix VIA PadLock instruction usage with irq_ts_save/restore()
-
- crypto/digest.c                  |    2 -
- crypto/tcrypt.c                  |   28 +++++++++++++-------
- drivers/char/hw_random/via-rng.c |    8 +++++
- drivers/crypto/padlock-aes.c     |   28 +++++++++++++++++++-
- drivers/crypto/padlock-sha.c     |    9 ++++++
- drivers/crypto/talitos.c         |   54 ++++++++++++++++++++++++++++-----------
- include/asm-x86/i387.h           |   32 +++++++++++++++++++++++
- include/crypto/hash.h            |   18 +++++++++++++
- 8 files changed, 153 insertions(+), 26 deletions(-)
- 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
