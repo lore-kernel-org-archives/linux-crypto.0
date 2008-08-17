@@ -1,280 +1,166 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: obscure state information on free
-Date: Sun, 17 Aug 2008 22:20:47 +1000
-Message-ID: <20080817122047.GA26084@gondor.apana.org.au>
-References: <20080811202607.GA11527@hmsreliant.think-freely.org> <20080814115137.GA5721@gondor.apana.org.au> <20080814122137.GA10969@hmsendeavour.rdu.redhat.com>
+Subject: Re: crypto: skcipher - Use RNG interface instead of get_random_bytes
+Date: Sun, 17 Aug 2008 22:22:33 +1000
+Message-ID: <20080817122233.GA26195@gondor.apana.org.au>
+References: <20080811202607.GA11527@hmsreliant.think-freely.org> <20080814115137.GA5721@gondor.apana.org.au> <20080814122331.GA21061@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	davem@davemloft.net
 To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:60684 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:60689 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752523AbYHQMUv (ORCPT
+	with ESMTP id S1752658AbYHQMWg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Aug 2008 08:20:51 -0400
+	Sun, 17 Aug 2008 08:22:36 -0400
 Content-Disposition: inline
-In-Reply-To: <20080814122137.GA10969@hmsendeavour.rdu.redhat.com>
+In-Reply-To: <20080814122331.GA21061@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 14, 2008 at 08:21:37AM -0400, Neil Horman wrote:
+On Thu, Aug 14, 2008 at 10:23:31PM +1000, Herbert Xu wrote:
 > 
-> Looks great to me.  Thanks Herbert!
+> And here is the IV generator patch on top.
 
-Unfortunately it didn't quite work :)
+This also dead-locked if built as modules.  I've split out the
+IV generators from crypto_blkcipher so it doesn't interfere with
+cryptomgr.
 
-First of all there was a module dependency loop between cryptomgr,
-rng and crypto_blkcipher.  This is fixed by putting krng in its
-own module.  Also I made a typo in the rng_reset helper so it
-ended up calling itself over and over again.
+commit 106475b7c368794f22493fc67d98b874eb0f9383
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sun Aug 17 18:04:30 2008 +1000
 
-Here is an incremental patch to fix this up.  I've also renamed
-rngapi.c to rng.c for consistency.
+    crypto: skcipher - Move IV generators into their own modules
+    
+    This patch moves the default IV generators into their own modules
+    in order to break a dependency loop between cryptomgr, rng, and
+    blkcipher.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-There is also a new global rng object for everyone to use rather
-than having it allocated by every user separately.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
 diff --git a/crypto/Makefile b/crypto/Makefile
-index a14ed7d..42e3980 100644
+index 42e3980..ed2be05 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -24,8 +24,6 @@ obj-$(CONFIG_CRYPTO_HASH) += crypto_hash.o
+@@ -13,9 +13,9 @@ obj-$(CONFIG_CRYPTO_AEAD) += aead.o
  
- cryptomgr-objs := algboss.o testmgr.o
+ crypto_blkcipher-objs := ablkcipher.o
+ crypto_blkcipher-objs += blkcipher.o
+-crypto_blkcipher-objs += chainiv.o
+-crypto_blkcipher-objs += eseqiv.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER) += crypto_blkcipher.o
++obj-$(CONFIG_CRYPTO_BLKCIPHER) += chainiv.o
++obj-$(CONFIG_CRYPTO_BLKCIPHER) += eseqiv.o
+ obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
  
--rng-objs := rngapi.o krng.o
--
- obj-$(CONFIG_CRYPTO_MANAGER) += cryptomgr.o
- obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
- obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
-@@ -74,6 +72,7 @@ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_RNG) += rng.o
-+obj-$(CONFIG_CRYPTO_RNG) += krng.o
- obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
- obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
+ crypto_hash-objs := hash.o
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index 185f955..4a7e65c 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -696,34 +696,5 @@ void skcipher_geniv_exit(struct crypto_tfm *tfm)
+ }
+ EXPORT_SYMBOL_GPL(skcipher_geniv_exit);
  
-diff --git a/crypto/krng.c b/crypto/krng.c
-index 8ef62a9..4328bb3 100644
---- a/crypto/krng.c
-+++ b/crypto/krng.c
-@@ -62,5 +62,5 @@ module_init(krng_mod_init);
- module_exit(krng_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Random Number Generator API");
-+MODULE_DESCRIPTION("Kernel Random Number Generator");
- MODULE_ALIAS("stdrng");
-diff --git a/crypto/rng.c b/crypto/rng.c
-new file mode 100644
-index 0000000..6e94bc7
---- /dev/null
-+++ b/crypto/rng.c
-@@ -0,0 +1,126 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * RNG operations.
-+ *
-+ * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#include <asm/atomic.h>
-+#include <crypto/internal/rng.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/random.h>
-+#include <linux/seq_file.h>
-+#include <linux/string.h>
-+
-+static DEFINE_MUTEX(crypto_default_rng_lock);
-+struct crypto_rng *crypto_default_rng;
-+EXPORT_SYMBOL_GPL(crypto_default_rng);
-+static int crypto_default_rng_refcnt;
-+
-+static int rngapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+{
-+	u8 *buf = NULL;
-+	int err;
-+
-+	if (!seed && slen) {
-+		buf = kmalloc(slen, GFP_KERNEL);
-+		if (!buf)
-+			return -ENOMEM;
-+
-+		get_random_bytes(buf, slen);
-+		seed = buf;
-+	}
-+
-+	err = crypto_rng_alg(tfm)->rng_reset(tfm, seed, slen);
-+
-+	kfree(buf);
-+	return err;
-+}
-+
-+static int crypto_init_rng_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	struct rng_alg *alg = &tfm->__crt_alg->cra_rng;
-+	struct rng_tfm *ops = &tfm->crt_rng;
-+
-+	ops->rng_gen_random = alg->rng_make_random;
-+	ops->rng_reset = rngapi_reset;
-+
-+	return 0;
-+}
-+
-+static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_printf(m, "type         : rng\n");
-+	seq_printf(m, "seedsize     : %u\n", alg->cra_rng.seedsize);
-+}
-+
-+static unsigned int crypto_rng_ctxsize(struct crypto_alg *alg, u32 type,
-+				       u32 mask)
-+{
-+	return alg->cra_ctxsize;
-+}
-+
-+const struct crypto_type crypto_rng_type = {
-+	.ctxsize = crypto_rng_ctxsize,
-+	.init = crypto_init_rng_ops,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_rng_show,
-+#endif
-+};
-+EXPORT_SYMBOL_GPL(crypto_rng_type);
-+
-+int crypto_get_default_rng(void)
-+{
-+	struct crypto_rng *rng;
-+	int err;
-+
-+	mutex_lock(&crypto_default_rng_lock);
-+	if (!crypto_default_rng) {
-+		rng = crypto_alloc_rng("stdrng", 0, 0);
-+		err = PTR_ERR(rng);
-+		if (IS_ERR(rng))
-+			goto unlock;
-+
-+		err = crypto_rng_reset(rng, NULL, crypto_rng_seedsize(rng));
-+		if (err) {
-+			crypto_free_rng(rng);
-+			goto unlock;
-+		}
-+
-+		crypto_default_rng = rng;
-+	}
-+
-+	crypto_default_rng_refcnt++;
-+	err = 0;
-+
-+unlock:
-+	mutex_unlock(&crypto_default_rng_lock);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(crypto_get_default_rng);
-+
-+void crypto_put_default_rng(void)
-+{
-+	mutex_lock(&crypto_default_rng_lock);
-+	if (!--crypto_default_rng_refcnt) {
-+		crypto_free_rng(crypto_default_rng);
-+		crypto_default_rng = NULL;
-+	}
-+	mutex_unlock(&crypto_default_rng_lock);
-+}
-+EXPORT_SYMBOL_GPL(crypto_put_default_rng);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Random Number Genertor");
-diff --git a/crypto/rngapi.c b/crypto/rngapi.c
-deleted file mode 100644
-index ea57697..0000000
---- a/crypto/rngapi.c
-+++ /dev/null
-@@ -1,74 +0,0 @@
--/*
-- * Cryptographic API.
-- *
-- * RNG operations.
-- *
-- * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-- *
-- */
--
--#include <crypto/internal/rng.h>
--#include <linux/errno.h>
--#include <linux/module.h>
--#include <linux/random.h>
--#include <linux/seq_file.h>
--#include <linux/string.h>
--
--static int rngapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+-static int __init blkcipher_module_init(void)
 -{
--	u8 *buf = NULL;
 -	int err;
 -
--	if (!seed && slen) {
--		buf = kmalloc(slen, GFP_KERNEL);
--		if (!buf)
--			return -ENOMEM;
+-	err = chainiv_module_init();
+-	if (err)
+-		goto out;
 -
--		get_random_bytes(buf, slen);
--		seed = buf;
--	}
+-	err = eseqiv_module_init();
+-	if (err)
+-		goto eseqiv_err;
 -
--	err = crypto_rng_crt(tfm)->rng_reset(tfm, seed, slen);
--
--	kfree(buf);
+-out:
 -	return err;
+-
+-eseqiv_err:
+-	chainiv_module_exit();
+-	goto out;
 -}
 -
--static int crypto_init_rng_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+-static void __exit blkcipher_module_exit(void)
 -{
--	struct rng_alg *alg = &tfm->__crt_alg->cra_rng;
--	struct rng_tfm *ops = &tfm->crt_rng;
--
--	ops->rng_gen_random = alg->rng_make_random;
--	ops->rng_reset = rngapi_reset;
--
--	return 0;
+-	eseqiv_module_exit();
+-	chainiv_module_exit();
 -}
 -
--static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
--	__attribute__ ((unused));
--static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
--{
--	seq_printf(m, "type         : rng\n");
--	seq_printf(m, "seedsize     : %u\n", alg->cra_rng.seedsize);
--}
+-module_init(blkcipher_module_init);
+-module_exit(blkcipher_module_exit);
 -
--static unsigned int crypto_rng_ctxsize(struct crypto_alg *alg, u32 type,
--				       u32 mask)
--{
--	return alg->cra_ctxsize;
--}
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Generic block chaining cipher type");
+diff --git a/crypto/chainiv.c b/crypto/chainiv.c
+index 9affade..cf68d43 100644
+--- a/crypto/chainiv.c
++++ b/crypto/chainiv.c
+@@ -320,12 +320,18 @@ static struct crypto_template chainiv_tmpl = {
+ 	.module = THIS_MODULE,
+ };
+ 
+-int __init chainiv_module_init(void)
++static int __init chainiv_module_init(void)
+ {
+ 	return crypto_register_template(&chainiv_tmpl);
+ }
+ 
+-void chainiv_module_exit(void)
++static void chainiv_module_exit(void)
+ {
+ 	crypto_unregister_template(&chainiv_tmpl);
+ }
++
++module_init(chainiv_module_init);
++module_exit(chainiv_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Chain IV Generator");
+diff --git a/crypto/eseqiv.c b/crypto/eseqiv.c
+index 881d309..f5def21 100644
+--- a/crypto/eseqiv.c
++++ b/crypto/eseqiv.c
+@@ -248,12 +248,18 @@ static struct crypto_template eseqiv_tmpl = {
+ 	.module = THIS_MODULE,
+ };
+ 
+-int __init eseqiv_module_init(void)
++static int __init eseqiv_module_init(void)
+ {
+ 	return crypto_register_template(&eseqiv_tmpl);
+ }
+ 
+-void __exit eseqiv_module_exit(void)
++static void __exit eseqiv_module_exit(void)
+ {
+ 	crypto_unregister_template(&eseqiv_tmpl);
+ }
++
++module_init(eseqiv_module_init);
++module_exit(eseqiv_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Encrypted Sequence Number IV Generator");
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index ccc32ba..2ba42cd 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -15,7 +15,6 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/skcipher.h>
+-#include <linux/init.h>
+ #include <linux/types.h>
+ 
+ struct rtattr;
+@@ -65,11 +64,6 @@ void skcipher_geniv_free(struct crypto_instance *inst);
+ int skcipher_geniv_init(struct crypto_tfm *tfm);
+ void skcipher_geniv_exit(struct crypto_tfm *tfm);
+ 
+-int __init eseqiv_module_init(void);
+-void __exit eseqiv_module_exit(void);
+-int __init chainiv_module_init(void);
+-void chainiv_module_exit(void);
