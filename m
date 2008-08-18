@@ -1,103 +1,50 @@
 From: Christian Hohnstaedt <christian@hohnstaedt.de>
-Subject: [PATCH] ixp4xx_crypto: avoid firmware loading during module initialisation
-Date: Mon, 18 Aug 2008 08:44:55 +0200
-Message-ID: <20080818064455.GK22567@mail3.prorata.de>
+Subject: [PATCH] crypto: fix larval lookup
+Date: Mon, 18 Aug 2008 09:02:04 +0200
+Message-ID: <20080818070204.GL22567@mail3.prorata.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail3.prorata.de ([62.145.31.200]:42481 "EHLO mail3.prorata.de"
+Received: from mail3.prorata.de ([62.145.31.200]:42526 "EHLO mail3.prorata.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750829AbYHRGvj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Aug 2008 02:51:39 -0400
+	id S1751801AbYHRHCI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Aug 2008 03:02:08 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
- By moving the firmware-loading to the transform initialisation,
- the driver may be compiled in.
 
- Notify the user if the firmware does not support AES, or even
- no crypto at all.
+crypto_alg_mod_lookup() runs in a timeout (60s) for unknown algos.
+
+crypto_larval_error() doesn't find the larval and thus doesn't
+finish crypto_larval_wait, because
+the larval->mask has the CRYPTO_ALG_TESTED bit set, while
+crypto_alg_lookup() is called without that bit in the mask
+and the mask comparison in __crypto_alg_lookup fails.
+
+Since larvals itself never get tested, it seems ok to 
+reset that bit.
 
 Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
 ---
- drivers/crypto/ixp4xx_crypto.c |   44 ++++++++++++++++++++++++++++++++++++---
- 1 files changed, 40 insertions(+), 4 deletions(-)
+ crypto/api.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 42a107f..c3aa5a4 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -438,10 +438,6 @@ static int init_ixp_crypto(void)
- 	if (!npe_c)
- 		return ret;
+diff --git a/crypto/api.c b/crypto/api.c
+index cd232d4..0a4012e 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -118,7 +118,7 @@ struct crypto_larval *crypto_larval_alloc(const char *name, u32 type, u32 mask)
+ 	if (!larval)
+ 		return ERR_PTR(-ENOMEM);
  
--	if (!npe_running(npe_c)) {
--		npe_load_firmware(npe_c, npe_name(npe_c), dev);
--	}
--
- 	/* buffer_pool will also be used to sometimes store the hmac,
- 	 * so assure it is large enough
- 	 */
-@@ -526,9 +522,45 @@ static void free_sa_dir(struct ix_sa_dir *dir)
- static int init_tfm(struct crypto_tfm *tfm)
- {
- 	struct ixp_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 msg[2] = { 0, 0 };
-+	static u32 image_id = 0;
- 	int ret;
- 
- 	atomic_set(&ctx->configuring, 0);
-+
-+	if (!npe_running(npe_c)) {
-+		ret = npe_load_firmware(npe_c, npe_name(npe_c), dev);
-+		if (ret)
-+			return ret;
-+		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		image_id = msg[1];
-+	}
-+	if (!image_id) {
-+		if (npe_send_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		image_id = msg[1];
-+	}
-+	switch ((image_id>>16) & 0xff) {
-+		case 3:
-+			if (cipher_cfg_enc(tfm) & MOD_AES) {
-+				printk(KERN_ERR "Firmware of %s lacks AES "
-+					"support\n", npe_name(npe_c));
-+				return -ENODEV;
-+			}
-+		case 4:
-+		case 5:
-+			break;
-+		default:
-+			printk(KERN_ERR "Firmware of %s lacks crypto support\n",
-+				npe_name(npe_c));
-+			return -ENODEV;
-+	}
- 	ret = init_sa_dir(&ctx->encrypt);
- 	if (ret)
- 		return ret;
-@@ -537,6 +569,10 @@ static int init_tfm(struct crypto_tfm *tfm)
- 		free_sa_dir(&ctx->encrypt);
- 	}
- 	return ret;
-+
-+npe_error:
-+	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
-+	return -EIO;
- }
- 
- static int init_tfm_ablk(struct crypto_tfm *tfm)
+-	larval->mask = mask;
++	larval->mask = mask & ~CRYPTO_ALG_TESTED;
+ 	larval->alg.cra_flags = CRYPTO_ALG_LARVAL | type;
+ 	larval->alg.cra_priority = -1;
+ 	larval->alg.cra_destroy = crypto_larval_destroy;
 -- 
 1.5.6.3
 
