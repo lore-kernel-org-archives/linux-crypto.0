@@ -1,8 +1,8 @@
-From: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Oops in authenc: 2.6.26.3
-Date: Thu, 21 Aug 2008 11:56:10 -0300
-Message-ID: <20080821145610.GE11198@khazad-dum.debian.net>
-References: <20080820203245.ea01ff39.kernel1@cyberdogtech.com> <20080821070225.GA31894@aeris> <20080821083615.GA1971@gondor.apana.org.au>
+Date: Fri, 22 Aug 2008 08:13:38 +1000
+Message-ID: <20080821221338.GA14521@gondor.apana.org.au>
+References: <20080820203245.ea01ff39.kernel1@cyberdogtech.com> <20080821070225.GA31894@aeris> <20080821083615.GA1971@gondor.apana.org.au> <20080821145610.GE11198@khazad-dum.debian.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Sascha Biberhofer <biberhofer@inode.at>,
@@ -11,17 +11,21 @@ Cc: Sascha Biberhofer <biberhofer@inode.at>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	netdev@vger.kernel.org,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
 Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20080821083615.GA1971@gondor.apana.org.au>
+In-Reply-To: <20080821145610.GE11198@khazad-dum.debian.net>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Cc: stable@kernel.org ?
+On Thu, Aug 21, 2008 at 11:56:10AM -0300, Henrique de Moraes Holschuh wrote:
+> Cc: stable@kernel.org ?
 
+Once it's merged by Linus I'll push it to stable.
+
+Thanks,
 -- 
-  "One disk to rule them all, One disk to find them. One disk to bring
-  them all and in the darkness grind them. In the Land of Redmond
-  where the shadows lie." -- The Silicon Valley Tarot
-  Henrique Holschuh
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
