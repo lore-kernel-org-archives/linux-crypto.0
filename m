@@ -1,50 +1,38 @@
-From: "Mr.William  Juwais" <williamjuwais90@jmail.co.za>
-Subject: FROM  MR.WILLIAM  JUWAIS
-Date: Fri, 22 Aug 2008 12:58:24 +0200
-Message-ID: <20080822125823.19067lc6e1rkvugw@webmail-html.freesurf.fr>
+From: Tomasz Chmielewski <mangoo@wpkg.org>
+Subject: how can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
+Date: Fri, 22 Aug 2008 13:14:20 +0200
+Message-ID: <48AE9F8C.1000506@wpkg.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orne.fr.clara.net ([212.43.206.200]:50031 "EHLO
-	smtp-defer.fr.clara.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751810AbYHVLOL (ORCPT
+Received: from mx03.syneticon.net ([87.79.32.166]:3894 "EHLO
+	mx03.syneticon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752441AbYHVLOl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Aug 2008 07:14:11 -0400
-Content-Disposition: inline
+	Fri, 22 Aug 2008 07:14:41 -0400
+Received: from localhost (filter1.syneticon.net [192.168.113.3])
+	by mx03.syneticon.net (Postfix) with ESMTP id A440A95F1
+	for <linux-crypto@vger.kernel.org>; Fri, 22 Aug 2008 13:14:40 +0200 (CEST)
+Received: from mx03.syneticon.net ([192.168.113.4])
+	by localhost (mx03.syneticon.net [192.168.113.3]) (amavisd-new, port 10025)
+	with ESMTP id 1JJ9rcESgDt2 for <linux-crypto@vger.kernel.org>;
+	Fri, 22 Aug 2008 13:14:21 +0200 (CEST)
+Received: from [192.168.10.145] (koln-4db413b6.pool.einsundeins.de [77.180.19.182])
+	by mx03.syneticon.net (Postfix) with ESMTP
+	for <linux-crypto@vger.kernel.org>; Fri, 22 Aug 2008 13:14:21 +0200 (CEST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+How can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
+
+I have XScale-IXP42x CPU, the ixp4xx_crypto module loads fine, but I'm 
+not sure how to use it.
+
+Any pointing to the documentation?
 
 
-Respected Sir,
-
-With all due respect,My name is William Juwais, an accountant with a  
-Government owned Gold Refinery Company here in South Africa. I wish  
-you to help me lay claims to balance funds derived from a contract  
-executed to our company by one of our contractors. The total contract  
-sum was US$158,109,000 and US$140,000,000 has already been paid.  
-Leaving a balance of US$18,109,000.
-
-It is my intention to form a company with you when the funds are  
-paid.My area of interest is Real Estate or any other investment of  
-your great idea, I also desire absolute confidentiality and  
-professionalism in this transaction. For more information, write to me  
-via (williamjuwais90@jmail.co.za) with the following:
-
-(1) FULL NAMES:
-(2) DIRECT TELEPHONE NO:
-(3) HOME OR OFFICE ADDRESS
-(4) AGE AND OCCUPATION:
-
-I wait to hear from you soonest.
-
-Best Regard,
-
-Mr.William Juwais.
-
-
+-- 
+Tomasz Chmielewski
+http://wpkg.org
