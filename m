@@ -1,38 +1,34 @@
-From: Tomasz Chmielewski <mangoo@wpkg.org>
-Subject: how can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
-Date: Fri, 22 Aug 2008 13:14:20 +0200
-Message-ID: <48AE9F8C.1000506@wpkg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: how can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
+Date: Fri, 22 Aug 2008 21:37:12 +1000
+Message-ID: <E1KWUx6-0003if-00@gondolin.me.apana.org.au>
+References: <48AE9F8C.1000506@wpkg.org>
+Cc: linux-crypto@vger.kernel.org
+To: mangoo@wpkg.org (Tomasz Chmielewski)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx03.syneticon.net ([87.79.32.166]:3894 "EHLO
-	mx03.syneticon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752441AbYHVLOl (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:56891 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751529AbYHVLhR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Aug 2008 07:14:41 -0400
-Received: from localhost (filter1.syneticon.net [192.168.113.3])
-	by mx03.syneticon.net (Postfix) with ESMTP id A440A95F1
-	for <linux-crypto@vger.kernel.org>; Fri, 22 Aug 2008 13:14:40 +0200 (CEST)
-Received: from mx03.syneticon.net ([192.168.113.4])
-	by localhost (mx03.syneticon.net [192.168.113.3]) (amavisd-new, port 10025)
-	with ESMTP id 1JJ9rcESgDt2 for <linux-crypto@vger.kernel.org>;
-	Fri, 22 Aug 2008 13:14:21 +0200 (CEST)
-Received: from [192.168.10.145] (koln-4db413b6.pool.einsundeins.de [77.180.19.182])
-	by mx03.syneticon.net (Postfix) with ESMTP
-	for <linux-crypto@vger.kernel.org>; Fri, 22 Aug 2008 13:14:21 +0200 (CEST)
+	Fri, 22 Aug 2008 07:37:17 -0400
+In-Reply-To: <48AE9F8C.1000506@wpkg.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-How can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
+Tomasz Chmielewski <mangoo@wpkg.org> wrote:
+> How can I verify that CRYPTO_DEV_IXP4XX (ixp4xx_crypto) works?
+> 
+> I have XScale-IXP42x CPU, the ixp4xx_crypto module loads fine, but I'm 
+> not sure how to use it.
 
-I have XScale-IXP42x CPU, the ixp4xx_crypto module loads fine, but I'm 
-not sure how to use it.
+Just use something that uses one of the algorithms provided by it,
+e.g., setup an IPsec SA.  The system will use it automatically.
+You can verify it by either looking at the refcnt field in
+/proc/crypto or through lsmod.
 
-Any pointing to the documentation?
-
-
+Cheers,
 -- 
-Tomasz Chmielewski
-http://wpkg.org
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
