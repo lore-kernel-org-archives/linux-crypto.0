@@ -1,52 +1,39 @@
-From: Michal Ludvig <michal@logix.cz>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: PadLock XSHA
-Date: Sat, 30 Aug 2008 21:55:00 +1200
-Message-ID: <48B918F4.9030604@logix.cz>
-References: <20080830084316.GA19371@gondor.apana.org.au>
+Date: Sat, 30 Aug 2008 23:21:04 +1000
+Message-ID: <20080830132104.GA20867@gondor.apana.org.au>
+References: <20080830084316.GA19371@gondor.apana.org.au> <48B918F4.9030604@logix.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Michal Ludvig <michal@logix.cz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bubetka.logix.cz ([208.84.148.239]:36987 "EHLO maxipes.logix.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750777AbYH3KOl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 30 Aug 2008 06:14:41 -0400
-In-Reply-To: <20080830084316.GA19371@gondor.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:44569 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751469AbYH3NVJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 30 Aug 2008 09:21:09 -0400
+Content-Disposition: inline
+In-Reply-To: <48B918F4.9030604@logix.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-> Can you remind me the reason why our PadLock SHA implementation
-> copies things into a page before hashing it?
+On Sat, Aug 30, 2008 at 09:55:00PM +1200, Michal Ludvig wrote:
 > 
-> According to the programming manual, it would seem that the state
-> should be recorded in EDI after each 64-byte block so we should
-> be able to use the init/update/final model, no?
-> 
-> Or has the chip changed since we implemented it?
+> IIRC The first versions of VIA PadLock required the input data to be
+> aligned on 16-bytes boundaries and more importantly they always
+> finalised the hash. Therefore we had to collect all data before hashing
+> them.
 
-IIRC The first versions of VIA PadLock required the input data to be
-aligned on 16-bytes boundaries and more importantly they always
-finalised the hash. Therefore we had to collect all data before hashing
-them.
+Ah yes, the finalisation is the killer.
 
-The only way to allow for multiple updates before final() was through a
-page fault, i.e. have a writable page followed by a non-accessible page,
-put all the data that go into update() towards the end of the r/w page
-and with some PadLock trickery run or resume hashing and tell it to hash
-more than a page of input. As soon as it stepped to the non-accessible
-space it would save the current state to memory and raise the page
-fault. This has been implemented in OpenSSL padlock engine but am not
-sure if we did it in the kernel as well. I doubt it.
+I'm working on a new sync hash interface that moves the state
+out of the tfm and was just thinking of how padlock-sha would
+work within that.
 
-AFAIK Recent versions of PadLock don't insist on finalising the hash and
- don't insist on input data alignment either and this workaround isn't
-needed anymore. I don't know if VIA still sells their motherboard models
-with the older CPUs or not.
-
-HTH,
-
-Michal
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
