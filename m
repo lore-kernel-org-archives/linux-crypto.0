@@ -1,47 +1,42 @@
-From: Phillip Lougher <phillip@lougher.demon.co.uk>
-Subject: Re: [Squashfs-devel] [patch 0/3] [RFC] zlib crypto module
-Date: Sat, 06 Sep 2008 05:41:03 +0100
-Message-ID: <48C209DF.5040509@lougher.demon.co.uk>
-References: <20080829134158.108976037@vixen.sonytel.be>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Camellia encryption module: incompatible
+Date: Sun, 7 Sep 2008 00:42:50 +1000
+Message-ID: <20080906144250.GA8829@gondor.apana.org.au>
+References: <20080906124449.GB28842@frittella.fluido.as>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, squashfs-devel@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org, linux-embedded@vger.kernel.org
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Harvey Harrison <harvey.harrison@gmail.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Carlo E. Prelz" <fluido@fluido.as>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from anchor-post-37.mail.demon.net ([194.217.242.87]:52030 "EHLO
-	anchor-post-37.mail.demon.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750967AbYIFElA (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:57761 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751607AbYIFOm7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Sep 2008 00:41:00 -0400
-In-Reply-To: <20080829134158.108976037@vixen.sonytel.be>
+	Sat, 6 Sep 2008 10:42:59 -0400
+Content-Disposition: inline
+In-Reply-To: <20080906124449.GB28842@frittella.fluido.as>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Geert Uytterhoeven wrote:
-> These patches add a (de)compression module for the "zlib" format using the
-> crypto API:
->   [1] crypto: Add a zlib crypto module
->   [2] tcrypt: Add a self test for the zlib crypto module
->   [3] squashfs: Switch from zlib/inflate to "zlib" crypto module
+On Sat, Sep 06, 2008 at 02:44:49PM +0200, Carlo E. Prelz wrote:
+> Hello there. I see you are the person who pushed upwards changes
+> related to the Linux crypto susbsystem for 2.6.27. I wanted to let you
+> know that, on a Core2 laptop platform, the new code for the Camellia
+> module generates different encrypted content. Both implementations
+> work, but a file that was encrypted with pre-2.6.27 cannot be
+> decrypted with the current code. 
 > 
-> The last patch is a proof-of-concept to make SquashFS 3.4 use this new zlib
-> crypto module. This makes it easier to e.g. change the decompression algorithm
-> in SquashFS or to make use of a hardware-accelerated zlib crypto module.
-> 
-> It can be extended to other compressed file systems, like e.g. AxFS and CRAMFS.
-> 
-> All comments are welcome. Thanks!
-> 
+> Was this intentional? I saw no indication about this on the notes that
+> went with the patch. 
 
-Moving Squashfs over to the crypto API is a good idea.  When the zlib 
-crypto module code is in the mainline kernel moving Squashfs, AxFS and 
-CRAMFS over will be easy.
+No this is not intentional.  Thanks for reminding me.
 
-Are you planning to do the necessary work to get this (or a subsequent 
-version following the comments from Herbert Xu) into mainline?
+Harvey, I think I'm going to revert the bitops change for now.
 
-Cheers
-
-Phillip
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
