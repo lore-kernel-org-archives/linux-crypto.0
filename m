@@ -1,42 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: "Carlo E. Prelz" <fluido@fluido.as>
 Subject: Re: Camellia encryption module: incompatible
-Date: Sun, 7 Sep 2008 00:42:50 +1000
-Message-ID: <20080906144250.GA8829@gondor.apana.org.au>
-References: <20080906124449.GB28842@frittella.fluido.as>
+Date: Sat, 6 Sep 2008 22:57:56 +0200
+Message-ID: <20080906205756.GB13532@frittella.fluido.as>
+References: <20080906124449.GB28842@frittella.fluido.as> <20080906144250.GA8829@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Harvey Harrison <harvey.harrison@gmail.com>,
+Content-Transfer-Encoding: 7bit
+Cc: "Carlo E. Prelz" <fluido@fluido.as>,
+	Harvey Harrison <harvey.harrison@gmail.com>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: "Carlo E. Prelz" <fluido@fluido.as>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57761 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751607AbYIFOm7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Sep 2008 10:42:59 -0400
+Received: from fluido.speedxs.nl ([83.98.238.192]:60416 "EHLO fluido.as"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752841AbYIFVCu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Sep 2008 17:02:50 -0400
 Content-Disposition: inline
-In-Reply-To: <20080906124449.GB28842@frittella.fluido.as>
+In-Reply-To: <20080906144250.GA8829@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Sep 06, 2008 at 02:44:49PM +0200, Carlo E. Prelz wrote:
-> Hello there. I see you are the person who pushed upwards changes
-> related to the Linux crypto susbsystem for 2.6.27. I wanted to let you
-> know that, on a Core2 laptop platform, the new code for the Camellia
-> module generates different encrypted content. Both implementations
-> work, but a file that was encrypted with pre-2.6.27 cannot be
-> decrypted with the current code. 
-> 
-> Was this intentional? I saw no indication about this on the notes that
-> went with the patch. 
+	Subject: Re: Camellia encryption module: incompatible
+	Date: dom 07 set 08 12:42:50 +1000
 
-No this is not intentional.  Thanks for reminding me.
+Quoting Herbert Xu (herbert@gondor.apana.org.au):
 
-Harvey, I think I'm going to revert the bitops change for now.
+> No this is not intentional.  Thanks for reminding me.
 
-Cheers,
+Thank you all for all the work that goes into maintaining Linux... 
+
+> Harvey, I think I'm going to revert the bitops change for now.
+
+I will be glad to verify that all is OK as soon as the change
+percolates into a 2.6.27-rc patch.
+
+Carlo
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+  *         Se la Strada e la sua Virtu' non fossero state messe da parte,
+* K * Carlo E. Prelz - fluido@fluido.as             che bisogno ci sarebbe
+  *               di parlare tanto di amore e di rettitudine? (Chuang-Tzu)
