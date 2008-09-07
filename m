@@ -1,42 +1,46 @@
-From: "Carlo E. Prelz" <fluido@fluido.as>
+From: Harvey Harrison <harvey.harrison@gmail.com>
 Subject: Re: Camellia encryption module: incompatible
-Date: Sat, 6 Sep 2008 22:57:56 +0200
-Message-ID: <20080906205756.GB13532@frittella.fluido.as>
-References: <20080906124449.GB28842@frittella.fluido.as> <20080906144250.GA8829@gondor.apana.org.au>
+Date: Sun, 07 Sep 2008 12:55:42 -0700
+Message-ID: <1220817342.24115.0.camel@brick>
+References: <20080906124449.GB28842@frittella.fluido.as>
+	 <20080906144250.GA8829@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 Cc: "Carlo E. Prelz" <fluido@fluido.as>,
-	Harvey Harrison <harvey.harrison@gmail.com>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fluido.speedxs.nl ([83.98.238.192]:60416 "EHLO fluido.as"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752841AbYIFVCu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Sep 2008 17:02:50 -0400
-Content-Disposition: inline
+Received: from wf-out-1314.google.com ([209.85.200.172]:55224 "EHLO
+	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754528AbYIGTzj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Sep 2008 15:55:39 -0400
+Received: by wf-out-1314.google.com with SMTP id 27so1276394wfd.4
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Sep 2008 12:55:38 -0700 (PDT)
 In-Reply-To: <20080906144250.GA8829@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-	Subject: Re: Camellia encryption module: incompatible
-	Date: dom 07 set 08 12:42:50 +1000
-
-Quoting Herbert Xu (herbert@gondor.apana.org.au):
-
+On Sun, 2008-09-07 at 00:42 +1000, Herbert Xu wrote:
+> On Sat, Sep 06, 2008 at 02:44:49PM +0200, Carlo E. Prelz wrote:
+> > Hello there. I see you are the person who pushed upwards changes
+> > related to the Linux crypto susbsystem for 2.6.27. I wanted to let you
+> > know that, on a Core2 laptop platform, the new code for the Camellia
+> > module generates different encrypted content. Both implementations
+> > work, but a file that was encrypted with pre-2.6.27 cannot be
+> > decrypted with the current code. 
+> > 
+> > Was this intentional? I saw no indication about this on the notes that
+> > went with the patch. 
+> 
 > No this is not intentional.  Thanks for reminding me.
-
-Thank you all for all the work that goes into maintaining Linux... 
-
+> 
 > Harvey, I think I'm going to revert the bitops change for now.
+> 
 
-I will be glad to verify that all is OK as soon as the change
-percolates into a 2.6.27-rc patch.
+Please do, I still haven't managed to to track down why this changes
+any behavior, I'll resubmit at a later date if I ever figure it out.
 
-Carlo
+Harvey
 
--- 
-  *         Se la Strada e la sua Virtu' non fossero state messe da parte,
-* K * Carlo E. Prelz - fluido@fluido.as             che bisogno ci sarebbe
-  *               di parlare tanto di amore e di rettitudine? (Chuang-Tzu)
