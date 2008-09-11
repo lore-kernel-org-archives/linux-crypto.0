@@ -1,48 +1,60 @@
-From: "Carlo E. Prelz" <fluido@fluido.as>
-Subject: Re: Camellia encryption module: incompatible
-Date: Wed, 10 Sep 2008 16:58:16 +0200
-Message-ID: <20080910145816.GA30598@frittella.fluido.as>
-References: <20080906124449.GB28842@frittella.fluido.as> <20080906144250.GA8829@gondor.apana.org.au> <1220817342.24115.0.camel@brick>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH 2.6.27] crypto: talitos - avoid consecutive packets going
+ out with same IV
+Date: Thu, 11 Sep 2008 11:27:18 -0500
+Message-ID: <20080911112718.1ba65892.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Harvey Harrison <harvey.harrison@gmail.com>
+Cc: herbert@gondor.apana.org.au, Lee.Nipper@freescale.com
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fluido.speedxs.nl ([83.98.238.192]:47684 "EHLO fluido.as"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751654AbYIJO5v (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Sep 2008 10:57:51 -0400
-Content-Disposition: inline
-In-Reply-To: <1220817342.24115.0.camel@brick>
+Received: from de01egw01.freescale.net ([192.88.165.102]:39114 "EHLO
+	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752120AbYIKQ2A (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Sep 2008 12:28:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-	Subject: Re: Camellia encryption module: incompatible
-	Date: dom 07 set 08 12:55:42 -0700
+the SEC's h/w IV out implementation DMAs the trailing encrypted payload
+block of the last encryption to ctx->iv.  Since the last encryption may
+still be pending completion, we can sufficiently prevent successive
+packets from being transmitted with the same IV by xoring with sequence
+number.
 
-Quoting Harvey Harrison (harvey.harrison@gmail.com):
+also initialize alg_list earlier to prevent oopsing on a failed probe.
 
-> > > Was this intentional? I saw no indication about this on the notes that
-> > > went with the patch. 
-> > 
-> > No this is not intentional.  Thanks for reminding me.
-> > 
-> > Harvey, I think I'm going to revert the bitops change for now.
-> > 
-> 
-> Please do, I still haven't managed to to track down why this changes
-> any behavior, I'll resubmit at a later date if I ever figure it out.
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
+---
+ drivers/crypto/talitos.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-I can confirm that, with 2.6.27-rc6, my camellia-encrypted partition
-mounts cleanly once more.
-
-Thanks
-
-Carlo
-
--- 
-  *         Se la Strada e la sua Virtu' non fossero state messe da parte,
-* K * Carlo E. Prelz - fluido@fluido.as             che bisogno ci sarebbe
-  *               di parlare tanto di amore e di rettitudine? (Chuang-Tzu)
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index ee827a7..b6ad3ac 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1157,6 +1157,8 @@ static int aead_authenc_givencrypt(
+ 	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_MODE0_ENCRYPT;
+ 
+ 	memcpy(req->giv, ctx->iv, crypto_aead_ivsize(authenc));
++	/* avoid consecutive packets going out with same IV */
++	*(__be64 *)req->giv ^= cpu_to_be64(req->seq);
+ 
+ 	return ipsec_esp(edesc, areq, req->giv, req->seq,
+ 			 ipsec_esp_encrypt_done);
+@@ -1449,6 +1451,8 @@ static int talitos_probe(struct of_device *ofdev,
+ 
+ 	priv->ofdev = ofdev;
+ 
++	INIT_LIST_HEAD(&priv->alg_list);
++
+ 	tasklet_init(&priv->done_task, talitos_done, (unsigned long)dev);
+ 	tasklet_init(&priv->error_task, talitos_error, (unsigned long)dev);
+ 
+@@ -1575,8 +1579,6 @@ static int talitos_probe(struct of_device *ofdev,
+ 	}
+ 
+ 	/* register crypto algorithms the device supports */
+-	INIT_LIST_HEAD(&priv->alg_list);
