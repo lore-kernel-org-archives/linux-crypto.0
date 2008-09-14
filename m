@@ -1,60 +1,51 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 2.6.27] crypto: talitos - avoid consecutive packets going
- out with same IV
-Date: Thu, 11 Sep 2008 11:27:18 -0500
-Message-ID: <20080911112718.1ba65892.kim.phillips@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 2.6.27
+Date: Sun, 14 Sep 2008 14:35:24 -0700
+Message-ID: <20080914213524.GA3590@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20080813121620.GA23142@gondor.apana.org.au> <20080822151102.GA678@gondor.apana.org.au> <20080908043323.GA15259@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, Lee.Nipper@freescale.com
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw01.freescale.net ([192.88.165.102]:39114 "EHLO
-	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752120AbYIKQ2A (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:59880 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753344AbYINVfb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Sep 2008 12:28:00 -0400
+	Sun, 14 Sep 2008 17:35:31 -0400
+Content-Disposition: inline
+In-Reply-To: <20080908043323.GA15259@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-the SEC's h/w IV out implementation DMAs the trailing encrypted payload
-block of the last encryption to ctx->iv.  Since the last encryption may
-still be pending completion, we can sufficiently prevent successive
-packets from being transmitted with the same IV by xoring with sequence
-number.
+Hi Linus:
 
-also initialize alg_list earlier to prevent oopsing on a failed probe.
+This push fixes a security problem in the talitos driver which
+was added after 2.6.26.  When triggered talitos may cause two
+IPsec packets to be generated with the same IV which weakens
+the protection offered by encryption.  This only affects talitos
+users obviously.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
-Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
----
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Kim Phillips (1):
+      crypto: talitos - Avoid consecutive packets going out with same IV
+
  drivers/crypto/talitos.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index ee827a7..b6ad3ac 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1157,6 +1157,8 @@ static int aead_authenc_givencrypt(
- 	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_MODE0_ENCRYPT;
- 
- 	memcpy(req->giv, ctx->iv, crypto_aead_ivsize(authenc));
-+	/* avoid consecutive packets going out with same IV */
-+	*(__be64 *)req->giv ^= cpu_to_be64(req->seq);
- 
- 	return ipsec_esp(edesc, areq, req->giv, req->seq,
- 			 ipsec_esp_encrypt_done);
-@@ -1449,6 +1451,8 @@ static int talitos_probe(struct of_device *ofdev,
- 
- 	priv->ofdev = ofdev;
- 
-+	INIT_LIST_HEAD(&priv->alg_list);
-+
- 	tasklet_init(&priv->done_task, talitos_done, (unsigned long)dev);
- 	tasklet_init(&priv->error_task, talitos_error, (unsigned long)dev);
- 
-@@ -1575,8 +1579,6 @@ static int talitos_probe(struct of_device *ofdev,
- 	}
- 
- 	/* register crypto algorithms the device supports */
--	INIT_LIST_HEAD(&priv->alg_list);
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
