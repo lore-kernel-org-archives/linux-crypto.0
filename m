@@ -1,2667 +1,546 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: [PATCH] crypto: AMCC Crypto4xx Device Driver
-Date: Fri, 19 Sep 2008 16:46:43 -0700
-Message-ID: <0CA0A16855646F4FA96D25A158E299D6050D18FF@SDCEXCHANGE01.ad.amcc.com>
+From: Dimitri Puzin <max@psycast.de>
+Subject: hifn_795x in Linux-2.6.27-rc7
+Date: Mon, 22 Sep 2008 19:39:23 +0200
+Message-ID: <48D7D84B.9020507@psycast.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: "James Hsiao" <jhsiao@amcc.com>, <linux-crypto@vger.kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigC38574F1043EFCF8E9F36535"
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02.amcc.com ([198.137.200.73]:37417 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750846AbYISXq6 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Sep 2008 19:46:58 -0400
-Content-class: urn:content-classes:message
+Received: from mail.skyhub.de ([88.198.39.20]:59357 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752762AbYIVSNq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Sep 2008 14:13:46 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6F0B41C336A
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2008 19:39:49 +0200 (CEST)
+Received: from mail.skyhub.de ([127.0.0.1])
+	by localhost (corsair.skyhub.de [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id GtmQY3kLTj2C for <linux-crypto@vger.kernel.org>;
+	Mon, 22 Sep 2008 19:39:38 +0200 (CEST)
+Received: from elexis.lan.psycast.de (unknown [83.236.228.205])
+	(using TLSv1 with cipher AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTP
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2008 19:39:38 +0200 (CEST)
+Received: from host-106.lan.psycast.de ([172.22.76.106])
+	by elexis.lan.psycast.de with esmtp (Exim 4.63)
+	(envelope-from <max@psycast.de>)
+	id 1KhpNg-0004B0-Q0
+	for linux-crypto@vger.kernel.org; Mon, 22 Sep 2008 19:39:34 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigC38574F1043EFCF8E9F36535
+Content-Type: multipart/mixed;
+ boundary="------------030100090203060809070605"
 
-This is the initial release of crypto device driver for AMCC 4xx SoC. I am forwarding this on behave of James Hsiao as his submission did not show up on the mailing list.
+This is a multi-part message in MIME format.
+--------------030100090203060809070605
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
--Loc
+Hi all,
 
+I'm trying to use a Soekris Hifn 7955 based pci card to accelerate
+dm-crypt device on vanilla 2.6.27-rc7 LK.
 
-Signed-off-by: James Hsiao <jhsiao@amcc.com>
-Acked-by: Loc Ho <lho@amcc.com>
----
- arch/powerpc/boot/dts/kilauea.dts       |   10 +
- drivers/crypto/Kconfig                  |    8 +
- drivers/crypto/Makefile                 |    1 +
- drivers/crypto/amcc/Makefile            |   27 +
- drivers/crypto/amcc/crypto4xx_alg.c     |  397 ++++++++++
- drivers/crypto/amcc/crypto4xx_core.c    | 1228 +++++++++++++++++++++++++++++++
- drivers/crypto/amcc/crypto4xx_core.h    |  265 +++++++
- drivers/crypto/amcc/crypto4xx_reg_def.h |  290 ++++++++
- drivers/crypto/amcc/crypto4xx_sa.c      |   91 +++
- drivers/crypto/amcc/crypto4xx_sa.h      |  223 ++++++
- 10 files changed, 2540 insertions(+), 0 deletions(-)
- create mode 100644 drivers/crypto/amcc/Makefile
- create mode 100644 drivers/crypto/amcc/crypto4xx_alg.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_reg_def.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.h
+# cryptsetup luksFormat -c aes-cbc-plain -s 256 /dev/generic/test
+completes successfully but the volume is unreadable.
+Dmesg is
 
-diff --git a/arch/powerpc/boot/dts/kilauea.dts b/arch/powerpc/boot/dts/kilauea.dts
-index dececc4..0ccd2e8 100644
---- a/arch/powerpc/boot/dts/kilauea.dts
-+++ b/arch/powerpc/boot/dts/kilauea.dts
-@@ -94,6 +94,15 @@
- 			dcr-reg = <0x010 0x002>;
- 		};
- 
-+		CRYPTO: crypto@ef700000 {
-+			device_type = "crypto";	
-+			compatible = "crypto4xx-crypto", "amcc,crypto4xx-crypto";
-+			reg = <0xef700000 0x80400>;
-+			interrupt-parent = <&UIC0>;
-+			interrupts = <0x17 0x2>;
-+
-+		};
-+
- 		MAL0: mcmal {
- 			compatible = "ibm,mcmal-405ex", "ibm,mcmal2";
- 			dcr-reg = <0x180 0x062>;
-@@ -342,5 +351,6 @@
- 				0x0 0x0 0x0 0x3 &UIC2 0xd 0x4 /* swizzled int C */
- 				0x0 0x0 0x0 0x4 &UIC2 0xe 0x4 /* swizzled int D */>;
- 		};
-+
- 	};
- };
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index e522144..454bd8c 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -200,4 +200,12 @@ config CRYPTO_DEV_IXP4XX
- 	help
- 	  Driver for the IXP4xx NPE crypto engine.
- 
-+config CRYPTO_DEV_PPC4XX
-+	tristate "Driver AMCC PPC4XX crypto accelerator"
-+	select CRYPTO_HASH
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  This option allows you to have support for AMCC crypto acceleration.
-+
- endif # CRYPTO_HW
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 73557b2..9bf4a2b 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -4,3 +4,4 @@ obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
- obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_IXP4XX) += ixp4xx_crypto.o
-+obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
-diff --git a/drivers/crypto/amcc/Makefile b/drivers/crypto/amcc/Makefile
-new file mode 100644
-index 0000000..4b06655
---- /dev/null
-+++ b/drivers/crypto/amcc/Makefile
-@@ -0,0 +1,27 @@
-+################################################################################
-+#  (C) Copyright 2007 Applied Micro Circuits Corporation
-+#  James Hsiao, AMCC, support@amcc.com
-+# 
-+#  This program is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU General Public License as
-+#  published by the Free Software Foundation; either version 2 of
-+#  the License, or (at your option) any later version.
-+# 
-+#  This program is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+#  GNU General Public License for more details.
-+# 
-+#  You should have received a copy of the GNU General Public License
-+#  along with this program; if not, write to the Free Software
-+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-+#  MA 02111-1307 USA
-+# 
-+################################################################################
-+#
-+# Makefile for the AMCC Crypto Acclerator Device Driver
-+#
-+
-+obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += crypto4xx.o
-+
-+crypto4xx-objs :=  crypto4xx_core.o crypto4xx_alg.o crypto4xx_sa.o
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-new file mode 100644
-index 0000000..76fc7ff
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -0,0 +1,397 @@
-+/*****************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file crypto4xx_alg.c
-+ *
-+ * This file implements the Linux crypto algorithms.
-+ *
-+ *****************************************************************************
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/moduleparam.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/highmem.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <linux/hash.h>
-+#include <linux/pci.h>
-+#include <linux/rtnetlink.h>
-+#include <crypto/aead.h>
-+#include <crypto/algapi.h>
-+#include <crypto/des.h>
-+#include <crypto/authenc.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
-+
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_sa.h"
-+#include "crypto4xx_core.h"
-+
-+static inline int crypto4xx_encrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	struct crypto4xx_ctx *rctx = ablkcipher_request_ctx(req);
-+	int    rc;
-+	u32 offset;
-+	struct dynamic_sa_ctl *sa  = NULL;
-+
-+	/* Application only provided ptr for the rctx
-+	* we alloc memory for it. And along we alloc memory for the sa in it */
-+	ctx->use_rctx = 1;
-+	rc = crypto4xx_alloc_sa_rctx(ctx, rctx);
-+	if (rc)
-+		goto err_nomem;
-+	sa  = (struct dynamic_sa_ctl *)(rctx->sa_out);
-+	offset = get_dynamic_sa_offset_iv_field(rctx);
-+	/* copy req->iv to state_record->iv */
-+	if (req->info)
-+		crypto4xx_memcpy_le(rctx->state_record, req->info,
-+				get_dynamic_sa_iv_size(rctx));
-+	else
-+		memset(rctx->state_record, 0, get_dynamic_sa_iv_size(rctx));
-+	sa->sa_command_0.bf.dir = CRYPTO_OUTBOUND;
-+	rctx->hash_final = 0;
-+	rctx->is_hash = 0;
-+	rctx->pd_ctl = 0x1;
-+	rctx->direction = CRYPTO_OUTBOUND;
-+	return crypto4xx_setup_crypto(&req->base);
-+
-+err_nomem:
-+	return -ENOMEM;
-+}
-+
-+static inline int crypto4xx_decrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	struct crypto4xx_ctx *rctx = ablkcipher_request_ctx(req);
-+	struct dynamic_sa_ctl *sa  = NULL;
-+	int    rc;
-+	u32 offset;
-+
-+	/* Application only provided ptr for the rctx
-+	* we alloc memory for it. And along we alloc memory for the sa in it*/
-+	ctx->use_rctx = 1;
-+	rc = crypto4xx_alloc_sa_rctx(ctx, rctx);
-+	if (rc != 0)
-+		goto err_nomem;
-+	sa  = (struct dynamic_sa_ctl *)(rctx->sa_in);
-+	offset = get_dynamic_sa_offset_iv_field(rctx);
-+	/* copy req->iv to state_record->iv */
-+	if (req->info)
-+		crypto4xx_memcpy_le(rctx->state_record, req->info,
-+				get_dynamic_sa_iv_size(rctx));
-+	else
-+		memset(rctx->state_record, 0, get_dynamic_sa_iv_size(rctx));
-+	sa->sa_command_0.bf.dir = CRYPTO_INBOUND;
-+	rctx->hash_final = 0;
-+	rctx->is_hash = 0;
-+	rctx->pd_ctl = 1;
-+	rctx->direction = CRYPTO_INBOUND;
-+
-+	return crypto4xx_setup_crypto(&req->base);
-+
-+err_nomem:
-+	return -ENOMEM;
-+}
-+
-+/**
-+ * AES Functions
-+ *
-+ */
-+static int crypto4xx_setkey_aes(struct crypto_ablkcipher *cipher,
-+				 const u8 *key,
-+				 unsigned int keylen,
-+				 unsigned char cm,
-+				 u8 fb)
-+{
-+	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct dynamic_sa_ctl *sa;
-+	int    rc;
-+
-+	if ((keylen != 256/8) &&  (keylen != 128/8) &&  (keylen != 192/8)) {
-+		crypto_ablkcipher_set_flags(cipher,
-+				CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -1;
-+	}
-+
-+	/* Create SA */
-+	if (ctx->sa_in_dma_addr || ctx->sa_out_dma_addr)
-+		crypto4xx_free_sa(ctx);
-+
-+	if (keylen == 256/8)
-+		crypto4xx_alloc_sa(ctx, SA_AES256_LEN);
-+	else if (keylen == 192/8)
-+		crypto4xx_alloc_sa(ctx, SA_AES192_LEN);
-+	else
-+		crypto4xx_alloc_sa(ctx, SA_AES128_LEN);
-+
-+	if (!ctx->sa_in_dma_addr || !ctx->sa_out_dma_addr)
-+		goto err_nomem;
-+	if (ctx->state_record_dma_addr == 0) {
-+		rc = crypto4xx_alloc_state_record(ctx);
-+		if (rc != 0)
-+			goto err_nomem_sr;
-+	}
-+	/* Setup SA */
-+	sa = (struct dynamic_sa_ctl *)(ctx->sa_in);
-+	ctx->hash_final = 0;
-+	sa->sa_command_0.bf.hash_alg = SA_HASH_ALG_NULL;
-+	sa->sa_command_0.bf.cipher_alg = SA_CIPHER_ALG_AES;
-+	sa->sa_command_0.bf.opcode = SA_OPCODE_ENCRYPT;
-+	sa->sa_command_0.bf.load_iv = 2;
-+
-+	sa->sa_command_1.bf.sa_rev = 1;
-+	sa->sa_command_1.bf.copy_payload = 1;
-+	sa->sa_command_1.bf.crypto_mode31 = (cm & 4) >> 2;
-+	sa->sa_command_1.bf.crypto_mode9_8 = (cm & 3);
-+	sa->sa_command_1.bf.feedback_mode = fb;
-+	sa->sa_command_1.bf.mutable_bit_proc = 1;
-+
-+	if (keylen >= 256/8) {
-+		crypto4xx_memcpy_le(((struct dynamic_sa_aes256 *)sa)->key,
-+					key, keylen);
-+		sa->sa_contents = SA_AES256_CONTENTS;
-+		sa->sa_command_1.bf.key_len = SA_AES_KEY_LEN_256;
-+	} else if (keylen >= 192/8) {
-+		crypto4xx_memcpy_le(((struct dynamic_sa_aes192 *)sa)->key,
-+					key, keylen);
-+		sa->sa_contents = SA_AES192_CONTENTS;
-+		sa->sa_command_1.bf.key_len = SA_AES_KEY_LEN_192;
-+	} else {
-+		crypto4xx_memcpy_le(((struct dynamic_sa_aes128 *)sa)->key,
-+					key, keylen);
-+		sa->sa_contents = SA_AES128_CONTENTS;
-+		sa->sa_command_1.bf.key_len = SA_AES_KEY_LEN_128;
-+	}
-+	memcpy(ctx->sa_in + get_dynamic_sa_offset_state_ptr_field(ctx),
-+			(void *)&(ctx->state_record_dma_addr), 4);
-+	memcpy(ctx->sa_out, ctx->sa_in, ctx->sa_len*4);
-+	sa = (struct dynamic_sa_ctl *)(ctx->sa_out);
-+	sa->sa_command_0.bf.dir = CRYPTO_OUTBOUND;
-+
-+	return 0;
-+
-+err_nomem_sr:
-+	crypto4xx_free_sa(ctx);
-+
-+err_nomem:
-+	return -ENOMEM;
-+
-+}
-+
-+static inline int crypto4xx_setkey_aes_cbc(struct crypto_ablkcipher *cipher,
-+					   const u8 *key, unsigned int keylen)
-+{
-+	return crypto4xx_setkey_aes(cipher, key, keylen,
-+				    CRYPTO_MODE_CBC,
-+				    CRYPTO_FEEDBACK_MODE_NO_FB);
-+}
-+
-+/**
-+ * HASH SHA1 Functions
-+ *
-+ */
-+static int crypto4xx_hash_alg_init(struct crypto_tfm *tfm,
-+				   unsigned int sa_len,
-+				   unsigned char ha,
-+				   unsigned char hm)
-+{
-+	struct crypto_alg *alg = tfm->__crt_alg;
-+	struct crypto4xx_alg *my_alg = crypto_alg_to_crypto4xx_alg(alg);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct dynamic_sa_ctl *sa;
-+
-+	ctx->dev   = my_alg->dev;
-+	ctx->is_hash = 1;
-+	ctx->hash_final = 0;
-+
-+	/* Create SA */
-+	if (ctx->sa_in_dma_addr || ctx->sa_out_dma_addr)
-+		crypto4xx_free_sa(ctx);
-+
-+	crypto4xx_alloc_sa(ctx, sa_len);
-+	if (!ctx->sa_in_dma_addr || !ctx->sa_out_dma_addr)
-+		goto err_nomem;
-+
-+	if (ctx->state_record_dma_addr == 0) {
-+		crypto4xx_alloc_state_record(ctx);
-+		if (!ctx->state_record_dma_addr)
-+			goto err_nomem_sr;
-+	} else {
-+		CRYPTUTL_PRINTK(KERN_INFO, "crypto4xx_hash_alg_init: "
-+				"State Record Already Exists \n");
-+	}
-+	tfm->crt_ahash.reqsize = sizeof(struct crypto4xx_ctx);
-+	sa = (struct dynamic_sa_ctl *)(ctx->sa_in);
-+
-+	/* Setup hash algorithm and hash mode */
-+	sa->sa_command_0.w = 0;
-+	sa->sa_command_0.bf.hash_alg = ha;
-+	sa->sa_command_0.bf.gather = 0;
-+	sa->sa_command_0.bf.save_hash_state = 1;
-+	sa->sa_command_0.bf.cipher_alg = SA_CIPHER_ALG_NULL;
-+	sa->sa_command_0.bf.opcode = SA_OPCODE_HASH;
-+
-+	/* load hash state set to no load, since we don't no init idigest  */
-+	sa->sa_command_0.bf.load_hash_state = 3;
-+	sa->sa_command_0.bf.dir = 0;
-+	sa->sa_command_0.bf.opcode = SA_OPCODE_HASH;
-+	sa->sa_command_1.w = 0;
-+	sa->sa_command_1.bf.hmac_muting = 0;
-+	/* dynamic sa, need to set it to  rev 2 */
-+	sa->sa_command_1.bf.sa_rev = 1;
-+	sa->sa_command_1.bf.copy_payload = 0;
-+	sa->sa_command_1.bf.mutable_bit_proc = 1;
-+
-+	/* Need to zero hash digest in SA */
-+	if (ha == SA_HASH_ALG_SHA1) {
-+		sa->sa_contents = SA_HASH160_CONTENTS;
-+		memset(((struct dynamic_sa_hash160 *)
-+				(ctx->sa_in))->inner_digest, 0, 20);
-+		memset(((struct dynamic_sa_hash160 *)
-+				(ctx->sa_in))->outer_digest, 0, 20);
-+		((struct dynamic_sa_hash160 *)(ctx->sa_in))->state_ptr
-+				= ctx->state_record_dma_addr;
-+	} else {
-+		CRYPTUTL_PRINTK(KERN_ERR, "ERROR: invalid hash"
-+				" algorithm used \n");
-+	}
-+
-+	return 0;
-+
-+err_nomem_sr:
-+	crypto4xx_free_sa(ctx);
-+err_nomem:
-+	return -ENOMEM;
-+
-+}
-+
-+static int crypto4xx_hash_init(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	int ds;
-+	struct dynamic_sa_ctl *sa;
-+
-+	CRYPTUTL_PRINTK(KERN_INFO, "crypto4xx_hash_init called ctx=0x%08x,"
-+			"ctx->sa = 0x%08x\n",
-+			(u32)ctx, (u32)ctx->sa_in);
-+	ctx->use_rctx = 0;
-+	sa = (struct dynamic_sa_ctl *)(ctx->sa_in);
-+	ds = crypto_ahash_digestsize(
-+			__crypto_ahash_cast(req->base.tfm));
-+	sa->sa_command_0.bf.digest_len = ds>>2;
-+	sa->sa_command_0.bf.load_hash_state = SA_LOAD_HASH_FROM_SA;
-+	ctx->is_hash = 1;
-+	ctx->direction = CRYPTO_INBOUND;
-+
-+	return 0;
-+}
-+
-+static int crypto4xx_hash_update(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+
-+	ctx->is_hash = 1;
-+	ctx->hash_final = 0;
-+	ctx->use_rctx = 0;
-+	ctx->pd_ctl = 0x11;
-+	ctx->direction = CRYPTO_INBOUND;
-+	return crypto4xx_setup_crypto(&req->base);
-+}
-+
-+static int crypto4xx_hash_final(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *rctx = ahash_request_ctx(req);
-+
-+	crypto4xx_free_sa_rctx(rctx);
-+	return 0;
-+}
-+
-+static int crypto4xx_hash_digest(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+
-+	ctx->use_rctx = 0;
-+	ctx->hash_final = 1;
-+	ctx->pd_ctl = 0x11;
-+	ctx->direction = CRYPTO_INBOUND;
-+	return crypto4xx_setup_crypto(&req->base);
-+}
-+
-+/**
-+ * SHA1 and SHA2 Algorithm
-+ */
-+static int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm)
-+{
-+	return crypto4xx_hash_alg_init(tfm,
-+				       SA_HASH160_LEN,
-+				       SA_HASH_ALG_SHA1,
-+				       SA_HASH_MODE_HASH);
-+}
-+
-+/**
-+ * Support Crypto Algorithms
-+ */
-+struct crypto_alg crypto4xx_basic_alg[] = {
-+
-+	/* Crypto AES modes */
-+	{.cra_name 		= "cbc(aes)",
-+	 .cra_driver_name 	= "cbc-aes",
-+	 .cra_priority 		= CRYPTO4XX_CRYPTO_PRIORITY,
-+	 .cra_flags 		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-+	 .cra_blocksize 	= 16,	/* 128-bits block */
-+	 .cra_ctxsize 		= sizeof(struct crypto4xx_ctx),
-+	 .cra_alignmask 	= 0,
-+	 .cra_type 		= &crypto_ablkcipher_type,
-+	 .cra_module 		= THIS_MODULE,
-+	 .cra_u 		= {.ablkcipher = {
-+	 .min_keysize 		= 16,	/* AES min key size is 128-bits */
-+	 .max_keysize 		= 32,	/* AES max key size is 256-bits */
-+	 .ivsize 		= 16,	/* IV size is 16 bytes */
-+	 .setkey 		= crypto4xx_setkey_aes_cbc,
-+	 .encrypt 		= crypto4xx_encrypt,
-+	 .decrypt 		= crypto4xx_decrypt,
-+	 } }
-+	},
-+	/* Hash SHA1, SHA2 */
-+	{.cra_name 		= "sha1",
-+	 .cra_driver_name 	= "sha1",
-+	 .cra_priority 		= CRYPTO4XX_CRYPTO_PRIORITY,
-+	 .cra_flags 		= CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
-+	 .cra_blocksize 	= 64,	/* SHA1 block size is 512-bits */
-+	 .cra_ctxsize 		= sizeof(struct crypto4xx_ctx),
-+	 .cra_alignmask 	= 0,
-+	 .cra_type   		= &crypto_ahash_type,
-+	 .cra_init 		= crypto4xx_sha1_alg_init,
-+	 .cra_module 		= THIS_MODULE,
-+	 .cra_u  		= {.ahash = {
-+	 .digestsize 		= 20,	/* Disgest is 160-bits */
-+	 .init   		= crypto4xx_hash_init,
-+	 .update 		= crypto4xx_hash_update,
-+	 .final  		= crypto4xx_hash_final,
-+	 .digest 		= crypto4xx_hash_digest,
-+	 } }
-+	},
-+	/* Terminator */
-+	{.cra_name = "" }
-+};
-+
-+
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-new file mode 100644
-index 0000000..216c5db
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -0,0 +1,1228 @@
-+/****************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file   crypto4xx_core.c
-+ *
-+ * This file implements AMCC crypto offload Linux device driver for use with
-+ * Linux CryptoAPI.
-+ *
-+ ****************************************************************************
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/moduleparam.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/interrupt.h>
-+#include <linux/completion.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/highmem.h>
-+#include <linux/random.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <crypto/des.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/slab.h>
-+#include <linux/pci.h>
-+#include <linux/platform_device.h>
-+#include <linux/proc_fs.h>
-+#include <linux/timer.h>
-+#include <linux/of_platform.h>
-+#include <asm/dcr.h>
-+#include <asm/dcr-regs.h>
-+#include <asm/cacheflush.h>
-+
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_core.h"
-+#include "crypto4xx_sa.h"
-+
-+#define CRYPTO4XX_CRYPTO_PRIORITY	300
-+#define PPC4XX_SEC_VERSION_STR		"0.1"
-+
-+struct crypto4xx_core_device lsec_core;
-+
-+u32 crypto4xx_write32(u32 reg, u32 val)
-+{
-+	writel(val, lsec_core.ce_base + reg);
-+	return 0;
-+}
-+
-+u32 crypto4xx_read32(u32 reg, u32 *val)
-+{
-+	*val = readl(lsec_core.ce_base + reg);
-+	return 0;
-+}
-+
-+/**
-+ * PPC4XX Crypto Engine Initialization Routine
-+ */
-+int32_t crypto4xx_init(struct crypto4xx_device  *dev)
-+{
-+	u32 rc = 0;
-+	union ce_ring_size ring_size;
-+	union ce_ring_contol ring_ctrl;
-+	union ce_part_ring_size part_ring_size;
-+	union ce_io_threshold io_threshold;
-+	u32 rand_num;
-+
-+	union ce_pe_dma_cfg pe_dma_cfg;
-+
-+	mtdcri(SDR0, SDR0_SRST0, mfdcri(SDR0, SDR0_SRST0) | SRST0_CRYP);
-+	mtdcri(SDR0, SDR0_SRST0, mfdcri(SDR0, SDR0_SRST0) & ~SRST0_CRYP);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_BYTE_ORDER_CFG, 0x22222);
-+
-+	/* setup pe dma, include reset sg, pdr and pe, then release reset */
-+	pe_dma_cfg.w = 0;
-+
-+	pe_dma_cfg.bf.bo_sgpd_en = 1;
-+	pe_dma_cfg.bf.bo_data_en = 0;
-+	pe_dma_cfg.bf.bo_sa_en = 1;
-+	pe_dma_cfg.bf.bo_pd_en = 1;
-+
-+	pe_dma_cfg.bf.dynamic_sa_en = 1;
-+	pe_dma_cfg.bf.reset_sg = 1;
-+	pe_dma_cfg.bf.reset_pdr = 1;
-+	pe_dma_cfg.bf.reset_pe = 1;
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PE_DMA_CFG, pe_dma_cfg.w);
-+
-+	/* un reset pe,sg and pdr */
-+	pe_dma_cfg.bf.pe_mode = 0;
-+	pe_dma_cfg.bf.reset_sg = 0;
-+	pe_dma_cfg.bf.reset_pdr = 0;
-+	pe_dma_cfg.bf.reset_pe = 0;
-+	pe_dma_cfg.bf.bo_td_en = 0;
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PE_DMA_CFG, pe_dma_cfg.w);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PDR_BASE, dev->pdr_pa);
-+	crypto4xx_write32(CRYPTO_ENGINE_RDR_BASE, dev->pdr_pa);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PRNG_CTRL, 3);
-+	get_random_bytes(&rand_num, sizeof(rand_num));
-+	crypto4xx_write32(CRYPTO_ENGINE_PRNG_SEED_L, rand_num);
-+	get_random_bytes(&rand_num, sizeof(rand_num));
-+	crypto4xx_write32(CRYPTO_ENGINE_PRNG_SEED_L, rand_num);
-+
-+	ring_size.w = 0;
-+	ring_size.bf.ring_offset = PPC4XX_PD_SIZE;
-+	ring_size.bf.ring_size   = PPC4XX_NUM_PD;
-+	crypto4xx_write32(CRYPTO_ENGINE_RING_SIZE, ring_size.w);
-+
-+	ring_ctrl.w = 0;
-+	crypto4xx_write32(CRYPTO_ENGINE_RING_CTRL, ring_ctrl.w);
-+	crypto4xx_write32(CRYPTO_ENGINE_DC_CTRL, 1);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_GATH_RING_BASE, dev->gdr_pa);
-+	crypto4xx_write32(CRYPTO_ENGINE_SCAT_RING_BASE, dev->sdr_pa);
-+
-+	part_ring_size.w = 0;
-+	part_ring_size.bf.sdr_size = PPC4XX_SDR_SIZE;
-+	part_ring_size.bf.gdr_size = PPC4XX_GDR_SIZE;
-+	crypto4xx_write32(CRYPTO_ENGINE_PART_RING_SIZE, part_ring_size.w);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PART_RING_CFG,
-+			  0x0000ffff & PPC4XX_SD_BUFFER_SIZE);
-+	io_threshold.w = 0;
-+	io_threshold.bf.output_threshold = PPC4XX_OUTPUT_THRESHOLD;
-+	io_threshold.bf.input_threshold  = PPC4XX_INPUT_THRESHOLD;
-+	crypto4xx_write32(CRYPTO_ENGINE_IO_THRESHOLD, io_threshold.w);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PDR_BASE_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_RDR_BASE_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_PKT_SRC_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_PKT_DEST_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_SA_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_GATH_RING_BASE_UADDR, 0x0);
-+	crypto4xx_write32(CRYPTO_ENGINE_SCAT_RING_BASE_UADDR, 0x0);
-+
-+	/* un reset pe,sg and pdr */
-+	pe_dma_cfg.bf.pe_mode = 1;
-+	pe_dma_cfg.bf.reset_sg = 0;
-+	pe_dma_cfg.bf.reset_pdr = 0;
-+	pe_dma_cfg.bf.reset_pe = 0;
-+	pe_dma_cfg.bf.bo_td_en = 0;
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_PE_DMA_CFG, pe_dma_cfg.w);
-+	/*clear all pending interrupt*/
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_CLR, 0x3ffff);
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_DESCR_CNT, PPC4XX_INT_DESCR_CNT);
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_TIMEOUT_CNT,
-+			  PPC4XX_INT_TIMEOUT_CNT);
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_CFG, PPC4XX_INT_CFG);
-+#ifdef CONFIG_USING_PD_DONE_INT
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_EN, CRYPTO_CTX_DONE_INT);
-+#else
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_EN, CRYPTO_PD_DONE_INT);
-+#endif
-+
-+	return rc;
-+}
-+
-+void crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size)
-+{
-+	ctx->sa_in = pci_alloc_consistent(NULL, size * 4,
-+						&ctx->sa_in_dma_addr);
-+	ctx->sa_out = pci_alloc_consistent(NULL, size * 4,
-+						&ctx->sa_out_dma_addr);
-+	ctx->sa_len = size;
-+}
-+
-+void crypto4xx_free_sa(struct crypto4xx_ctx *ctx)
-+{
-+	if (ctx->sa_in != NULL) {
-+		pci_free_consistent(NULL, ctx->sa_len*4,
-+					ctx->sa_in, ctx->sa_in_dma_addr);
-+	}
-+
-+	if (ctx->sa_out != NULL) {
-+		pci_free_consistent(NULL, ctx->sa_len*4,
-+					ctx->sa_out, ctx->sa_out_dma_addr);
-+	}
-+	ctx->sa_in_dma_addr = 0;
-+	ctx->sa_out_dma_addr = 0;
-+	ctx->sa_len = 0;
-+}
-+
-+u32 crypto4xx_alloc_state_record(struct crypto4xx_ctx *ctx)
-+{
-+	ctx->state_record =
-+		pci_alloc_consistent(NULL,
-+				sizeof(struct dynamic_sa_state_record),
-+				&ctx->state_record_dma_addr);
-+	if (!ctx->state_record_dma_addr)
-+		return -ENOMEM;
-+	memset(ctx->state_record, 0, sizeof(struct dynamic_sa_state_record));
-+	return 0;
-+
-+}
-+
-+void crypto4xx_free_state_record(struct crypto4xx_ctx *ctx)
-+{
-+	if (ctx->state_record != NULL)
-+		pci_free_consistent(NULL,
-+				    sizeof(struct dynamic_sa_state_record),
-+				    ctx->state_record,
-+				    ctx->state_record_dma_addr);
-+	ctx->state_record_dma_addr = 0;
-+}
-+
-+/**
-+ * alloc memory for the gather ring
-+ * no need to alloc buf for the ring
-+ * gdr_tail, gdr_head and gdr_count are initialized by this function
-+ */
-+u32 crypto4xx_build_pdr(struct crypto4xx_device  *dev)
-+{
-+	int i;
-+	dev->pdr = pci_alloc_consistent(NULL,
-+					sizeof(struct ce_pd) * PPC4XX_NUM_PD,
-+					&dev->pdr_pa);
-+	if (!dev->pdr)
-+		return -ENOMEM;
-+	dev->pdr_uinfo = kzalloc(sizeof(struct pd_uinfo) * PPC4XX_NUM_PD,
-+					GFP_KERNEL);
-+	if (!dev->pdr_uinfo)
-+		return -ENOMEM;
-+
-+	memset(dev->pdr, 0,  sizeof(struct ce_pd) * PPC4XX_NUM_PD);
-+
-+	for (i = 0; i < PPC4XX_NUM_PD; i++) {
-+		dev->pd_uinfo_array[i] = (struct pd_uinfo *)(dev->pdr_uinfo +
-+						sizeof(struct pd_uinfo) * i);
-+		dev->pdp_array[i] = (struct ce_pd *)(dev->pdr +
-+				sizeof(struct ce_pd) * i);
-+		dev->pd_uinfo_array[i]->state = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+void crypto4xx_destroy_pdr(struct crypto4xx_device  *dev)
-+{
-+	int i;
-+	if (dev->pdr != NULL)
-+		pci_free_consistent(NULL,
-+				sizeof(struct ce_pd) * PPC4XX_NUM_PD,
-+				dev->pdr,
-+				dev->pdr_pa);
-+	if (dev->pdr_uinfo != NULL)
-+		kfree(dev->pdr_uinfo);
-+	for (i = 0; i < PPC4XX_NUM_PD; i++)
-+		dev->pd_uinfo_array[i] = NULL;
-+}
-+
-+u32 crypto4xx_get_pd_from_pdr(struct crypto4xx_device *dev)
-+{
-+	u32 retval;
-+	u32 tmp;
-+
-+	retval = dev->pdr_head;
-+	tmp = (dev->pdr_head + 1) % PPC4XX_NUM_PD;
-+
-+	if (tmp == dev->pdr_tail)
-+		return ERING_WAS_FULL;
-+	dev->pdr_head = tmp;
-+
-+	return retval;
-+}
-+
-+
-+u32 crypto4xx_put_pd_to_pdr(struct crypto4xx_device *dev, u32 idx)
-+{
-+	struct pd_uinfo *pd_uinfo;
-+
-+	pd_uinfo = dev->pd_uinfo_array[idx];
-+	pd_uinfo->state = PD_ENTRY_FREE;
-+
-+	if (dev->pdr_tail != PPC4XX_LAST_PD)
-+		dev->pdr_tail++;
-+	else
-+		dev->pdr_tail = 0;
-+
-+	return 0;
-+}
-+
-+struct ce_pd *crypto4xx_get_pdp(struct crypto4xx_device *dev,
-+				dma_addr_t *pd_dma, u32 idx)
-+{
-+	*pd_dma = dev->pdr_pa + sizeof(struct ce_pd) * idx;
-+	return dev->pdp_array[idx];
-+}
-+
-+/**
-+ * alloc memory for the gather ring
-+ * no need to alloc buf for the ring
-+ * gdr_tail, gdr_head and gdr_count are initialized by this function
-+ */
-+u32 crypto4xx_build_gdr(struct crypto4xx_device  *dev)
-+{
-+	dev->gdr = pci_alloc_consistent(NULL,
-+					sizeof(struct ce_gd) *
-+					PPC4XX_NUM_GD,
-+					&dev->gdr_pa);
-+	if (!dev->gdr)
-+		return -ENOMEM;
-+	memset(dev->gdr, 0,  sizeof(struct ce_gd) * PPC4XX_NUM_GD);
-+	return 0;
-+}
-+
-+void crypto4xx_destroy_gdr(struct crypto4xx_device  *dev)
-+{
-+	pci_free_consistent(NULL,
-+				sizeof(struct ce_gd) * PPC4XX_NUM_GD,
-+				dev->gdr,
-+				dev->gdr_pa);
-+}
-+
-+u32 crypto4xx_get_gd_from_gdr(struct crypto4xx_device *dev)
-+{
-+	u32 retval;
-+	u32 tmp;
-+
-+	retval = dev->gdr_head;
-+	tmp = (dev->gdr_head+1) % PPC4XX_NUM_GD;
-+
-+	if (tmp == dev->gdr_tail)
-+		return ERING_WAS_FULL;
-+	dev->gdr_head = tmp;
-+	return retval;
-+}
-+
-+u32 crypto4xx_put_gd_to_gdr(struct crypto4xx_device *dev)
-+{
-+	if (dev->gdr_tail == dev->gdr_head)
-+		return 0;
-+
-+	if (dev->gdr_tail != PPC4XX_LAST_GD)
-+		dev->gdr_tail++;
-+	else
-+		dev->gdr_tail = 0;
-+
-+	return 0;
-+}
-+
-+struct ce_gd *crypto4xx_get_gdp(struct crypto4xx_device *dev,
-+				dma_addr_t *gd_dma, u32 idx)
-+{
-+	*gd_dma = dev->gdr_pa + sizeof(struct ce_gd)*idx;
-+	return (struct ce_gd *) (dev->gdr + sizeof(struct ce_gd) * idx);
-+}
-+
-+/**
-+ * alloc memory for the scatter ring
-+ * need to alloc buf for the ring
-+ * sdr_tail, sdr_head and sdr_count are initialized by this function
-+ */
-+u32 crypto4xx_build_sdr(struct crypto4xx_device  *dev)
-+{
-+	int i;
-+	/* alloc memory for scatter descriptor ring */
-+	dev->sdr = pci_alloc_consistent(NULL,
-+					sizeof(struct ce_sd) * PPC4XX_NUM_SD,
-+					&dev->sdr_pa);
-+	if (!dev->sdr)
-+		return -ENOMEM;
-+	memset(dev->sdr, 0,  sizeof(struct ce_sd) * PPC4XX_NUM_SD);
-+	for (i = 0; i < PPC4XX_NUM_SD; i++) {
-+		dev->sdp_array[i] = (struct ce_sd *)(dev->sdr +
-+				sizeof(struct ce_sd) * i);
-+	}
-+
-+	dev->scatter_buffer_size = PPC4XX_SD_BUFFER_SIZE;
-+	dev->scatter_buffer_va =
-+		pci_alloc_consistent(NULL,
-+			     dev->scatter_buffer_size * PPC4XX_NUM_SD,
-+			     &dev->scatter_buffer_pa);
-+	if (!dev->scatter_buffer_va)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void crypto4xx_destroy_sdr(struct crypto4xx_device  *dev)
-+{
-+	pci_free_consistent(NULL,
-+				sizeof(struct ce_sd) * PPC4XX_NUM_SD,
-+				dev->sdr,
-+				dev->sdr_pa);
-+
-+	pci_free_consistent(NULL,
-+				dev->scatter_buffer_size * PPC4XX_NUM_SD,
-+				dev->scatter_buffer_va,
-+				dev->scatter_buffer_pa);
-+}
-+
-+u32 crypto4xx_get_sd_from_sdr(struct crypto4xx_device *dev)
-+{
-+	u32 retval;
-+	u32 tmp;
-+
-+	retval = dev->sdr_head;
-+	tmp  = (dev->sdr_head+1) % PPC4XX_NUM_SD;
-+
-+	if (tmp == dev->sdr_tail)
-+		return ERING_WAS_FULL;
-+
-+	dev->sdr_head = tmp;
-+	return retval;
-+}
-+
-+u32 crypto4xx_put_sd_to_sdr(struct crypto4xx_device *dev)
-+{
-+	if (dev->sdr_tail == dev->sdr_head)
-+		return 0;
-+
-+	if (dev->sdr_tail != PPC4XX_LAST_SD)
-+		dev->sdr_tail++;
-+	else
-+		dev->sdr_tail = 0;
-+
-+	return 0;
-+}
-+
-+struct ce_sd *crypto4xx_get_sdp(struct crypto4xx_device *dev,
-+				dma_addr_t *sd_dma, u32 idx)
-+{
-+	*sd_dma = dev->sdr_pa + sizeof(struct ce_sd) * idx;
-+	return  (struct ce_sd *)(dev->sdr + sizeof(struct ce_sd) * idx);
-+}
-+
-+void ppc4xx_fill_one_page(dma_addr_t addr, u32 length,
-+			  u32 idx, u32 *next_sd,
-+			  u32 *offset, u32 *nbytes)
-+{
-+	struct crypto4xx_device *dev = &(lsec_core.dev);
-+	u32 len;
-+
-+	if (length > dev->scatter_buffer_size) {
-+		memcpy(phys_to_virt(addr),
-+			dev->scatter_buffer_va +
-+			idx*dev->scatter_buffer_size + (*offset),
-+			dev->scatter_buffer_size);
-+		*offset = 0;
-+		length -= dev->scatter_buffer_size;
-+		*nbytes -= dev->scatter_buffer_size;
-+		if (idx == PPC4XX_LAST_SD)
-+			idx = 0;
-+		else
-+			idx++;
-+		*next_sd = idx;
-+		ppc4xx_fill_one_page(addr + dev->scatter_buffer_size, length,
-+			     idx, next_sd, offset, nbytes);
-+		return;
-+	} else if (length < dev->scatter_buffer_size) {
-+			memcpy(phys_to_virt(addr),
-+				dev->scatter_buffer_va +
-+				idx*dev->scatter_buffer_size + (*offset),
-+				length);
-+			if ((*offset + length) == dev->scatter_buffer_size) {
-+				if (idx == PPC4XX_LAST_SD)
-+					idx = 0;
-+				else
-+					idx++;
-+				*next_sd = idx;
-+				*nbytes -= length;
-+				*offset = 0;
-+			} else {
-+				*next_sd = idx;
-+				*nbytes -= length;
-+				*offset += length;
-+			}
-+			return ;
-+		} else {
-+
-+			len = (*nbytes <= dev->scatter_buffer_size) ?
-+				*nbytes : dev->scatter_buffer_size;
-+			memcpy(phys_to_virt(addr),
-+				dev->scatter_buffer_va +
-+				idx*dev->scatter_buffer_size + (*offset),
-+				len);
-+			offset = 0;
-+			*nbytes -= len;
-+			if (idx == PPC4XX_LAST_SD)
-+				*next_sd = 0;
-+			else
-+				*next_sd = idx+1;
-+			return;
-+		}
-+}
-+
-+void crypto4xx_copy_pkt_to_dst(struct ce_pd *pd,
-+			       struct pd_uinfo *pd_uinfo,
-+			       u32 nbytes,
-+			       struct scatterlist *dst,
-+			       u8 type)
-+{
-+	struct crypto4xx_device *dev = &(lsec_core.dev);
-+	struct scatterlist *sg;
-+	dma_addr_t addr;
-+	u32 this_sd;
-+	u32 offset;
-+	u32 next_sd;
-+	u32 len;
-+	u32 i;
-+	u32 sg_len;
-+
-+	this_sd = pd_uinfo->first_sd;
-+	next_sd = this_sd;
-+	offset = 0;
-+	i = 0;
-+	while (nbytes) {
-+		sg = &dst[i];
-+		sg_len = sg->length;
-+		/*1: dst->length > sd_buffer_size:  so while loop
-+		until length done  */
-+		addr = dma_map_page(NULL, sg_page(sg),
-+				sg->offset, sg->length,
-+				DMA_TO_DEVICE);
-+		if (offset == 0) {
-+			len = (nbytes <= sg->length) ? nbytes : sg->length;
-+			ppc4xx_fill_one_page(addr, len, this_sd, &next_sd,
-+					     &offset, &nbytes);
-+			if (!nbytes)
-+				return;
-+			i++;
-+		} else {
-+			len = (nbytes <=
-+				(dev->scatter_buffer_size - offset)) ? nbytes
-+				: (dev->scatter_buffer_size
-+				- offset);
-+			ppc4xx_fill_one_page(addr, len, this_sd, &next_sd,
-+					     &offset, &nbytes);
-+			this_sd = next_sd;
-+			/* addr is begin of dest, we just fill len bytes,
-+				from left ofer sd*/
-+			if (!nbytes)
-+				return;
-+			sg_len -= len;
-+			if (sg_len) {
-+				ppc4xx_fill_one_page(addr + len,
-+						sg_len, this_sd,
-+						&next_sd, &offset, &nbytes);
-+				i++;
-+			}
-+		}
-+		this_sd = next_sd;
-+	}
-+}
-+
-+u32 crypto4xx_copy_digest_to_dst(struct pd_uinfo *pd_uinfo,
-+				 struct crypto4xx_ctx *ctx)
-+{
-+	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *)(ctx->sa_in);
-+	struct dynamic_sa_state_record *state_record =
-+			(struct dynamic_sa_state_record *)(ctx->state_record);
-+
-+	if (sa->sa_command_0.bf.hash_alg == SA_HASH_ALG_SHA1) {
-+		memcpy((void *)pd_uinfo->dest_va, state_record->save_digest,
-+				SA_HASH_ALG_SHA1_DIGEST_SIZE);
-+	}
-+	return 0;
-+}
-+
-+
-+void crypto4xx_ret_sg_desc(struct crypto4xx_device *dev,
-+						struct pd_uinfo *pd_uinfo)
-+{
-+	int i;
-+	struct ce_sd *sd = NULL;
-+
-+	if (pd_uinfo->first_gd != 0xffffffff) {
-+		if (pd_uinfo->first_gd  <= pd_uinfo->last_gd) {
-+			for (i = pd_uinfo->first_gd;
-+				i <= pd_uinfo->last_gd; i++)
-+				crypto4xx_put_gd_to_gdr(dev);
-+
-+		} else {
-+			for (i = pd_uinfo->first_gd;
-+				i < PPC4XX_NUM_GD; i++)
-+				crypto4xx_put_gd_to_gdr(dev);
-+			for (i = 0; i <= pd_uinfo->last_gd; i++)
-+				crypto4xx_put_gd_to_gdr(dev);
-+		}
-+	}
-+
-+	if (pd_uinfo->first_sd != 0xffffffff) {
-+		if (pd_uinfo->first_sd  <= pd_uinfo->last_sd) {
-+			for (i = pd_uinfo->first_sd;
-+				i <= pd_uinfo->last_sd; i++) {
-+				sd = (struct ce_sd *)(dev->sdr +
-+						sizeof(struct ce_sd)*i);
-+				sd->ctl.done = 0;
-+				sd->ctl.rdy = 0;
-+				crypto4xx_put_sd_to_sdr(dev);
-+			}
-+		} else {
-+			for (i = pd_uinfo->first_sd; i < PPC4XX_NUM_SD; i++) {
-+				sd = (struct ce_sd *)(dev->sdr +
-+						sizeof(struct ce_sd)*i);
-+				sd->ctl.done = 0;
-+				sd->ctl.rdy = 0;
-+				crypto4xx_put_sd_to_sdr(dev);
-+			}
-+			for (i = 0; i <= pd_uinfo->last_sd; i++) {
-+				sd = (struct ce_sd *)(dev->sdr +
-+						sizeof(struct ce_sd)*i);
-+				sd->ctl.done = 0;
-+				sd->ctl.rdy = 0;
-+				crypto4xx_put_sd_to_sdr(dev);
-+			}
-+		}
-+	}
-+
-+	pd_uinfo->first_gd = pd_uinfo->last_gd = 0xffffffff;
-+	pd_uinfo->first_sd = pd_uinfo->last_sd = 0xffffffff;
-+}
-+
-+
-+u32 crypto4xx_ablkcipher_done(struct pd_uinfo *pd_uinfo, struct ce_pd *pd)
-+{
-+	struct crypto4xx_ctx *ctx;
-+	struct crypto4xx_ctx *rctx = NULL;
-+	struct ablkcipher_request *ablk_req;
-+	struct scatterlist *dst;
-+	dma_addr_t addr;
-+
-+	ablk_req = ablkcipher_request_cast(pd_uinfo->async_req);
-+	ctx  = crypto_tfm_ctx(ablk_req->base.tfm);
-+
-+	if (ctx->use_rctx == 1)
-+		rctx = ablkcipher_request_ctx(ablk_req);
-+
-+	if (pd_uinfo->using_sd) {
-+		crypto4xx_copy_pkt_to_dst(pd,
-+					  pd_uinfo,
-+					  ablk_req->nbytes,
-+					  ablk_req->dst,
-+					  CRYPTO_ALG_TYPE_ABLKCIPHER);
-+		crypto4xx_ret_sg_desc(&(lsec_core.dev), pd_uinfo);
-+	} else {
-+		dst = pd_uinfo->dest_va;
-+		addr = dma_map_page(NULL, sg_page(dst), dst->offset,
-+				    dst->length, DMA_FROM_DEVICE);
-+	}
-+
-+	if (rctx != NULL) {
-+		if (rctx->sa_in_dma_addr) {
-+			pci_free_consistent(NULL,
-+					    rctx->sa_len * 4,
-+					    rctx->sa_in,
-+					    rctx->sa_in_dma_addr);
-+		}
-+		if (rctx->sa_in_dma_addr) {
-+			pci_free_consistent(NULL,
-+					    rctx->sa_len * 4,
-+					    rctx->sa_out,
-+					    rctx->sa_out_dma_addr);
-+		}
-+	}
-+	if (ablk_req->base.complete != NULL)
-+		ablk_req->base.complete(&ablk_req->base, 0);
-+	return 0;
-+}
-+
-+u32 crypto4xx_ahash_done(struct pd_uinfo *pd_uinfo)
-+{
-+	struct crypto4xx_ctx *ctx;
-+	struct crypto4xx_ctx *rctx = NULL;
-+	struct ahash_request *ahash_req;
-+
-+	ahash_req = ahash_request_cast(pd_uinfo->async_req);
-+	ctx  = crypto_tfm_ctx(ahash_req->base.tfm);
-+
-+	crypto4xx_copy_digest_to_dst(pd_uinfo,
-+				crypto_tfm_ctx(ahash_req->base.tfm));
-+	crypto4xx_ret_sg_desc(&(lsec_core.dev), pd_uinfo);
-+
-+	if (ctx->use_rctx == 1) {
-+		rctx = ahash_request_ctx(ahash_req);
-+		if (rctx != NULL) {
-+			if (rctx->sa_in_dma_addr) {
-+				pci_free_consistent(NULL,
-+						rctx->sa_len * 4,
-+						rctx->sa_in,
-+						rctx->sa_in_dma_addr);
-+			}
-+			if (rctx->sa_out_dma_addr) {
-+				pci_free_consistent(NULL,
-+						rctx->sa_len * 4,
-+						rctx->sa_out,
-+						rctx->sa_out_dma_addr);
-+			}
-+		}
-+	}
-+	/* call user provided callback function x */
-+	if (ahash_req->base.complete != NULL)
-+		ahash_req->base.complete(&ahash_req->base, 0);
-+	return 0;
-+}
-+
-+u32 crypto4xx_pd_done(struct crypto4xx_core_device *lsec, u32 idx)
-+{
-+	struct ce_pd *pd;
-+	struct pd_uinfo *pd_uinfo;
-+
-+	pd = lsec->dev.pdp_array[idx];
-+	pd_uinfo = lsec->dev.pd_uinfo_array[idx];
-+
-+	if (crypto_tfm_alg_type(pd_uinfo->async_req->tfm) ==
-+			CRYPTO_ALG_TYPE_ABLKCIPHER)
-+		return crypto4xx_ablkcipher_done(pd_uinfo, pd);
-+	else
-+		return crypto4xx_ahash_done(pd_uinfo);
-+	return 0;
-+}
-+
-+u32 crypto4xx_alloc_sa_rctx(struct crypto4xx_ctx *ctx,
-+				struct crypto4xx_ctx *rctx)
-+{
-+	rctx->sa_in = pci_alloc_consistent(NULL, ctx->sa_len*4,
-+					&rctx->sa_in_dma_addr);
-+	if (!rctx->sa_in)
-+		return -ENOMEM;
-+
-+	rctx->sa_out = pci_alloc_consistent(NULL, ctx->sa_len*4,
-+					&rctx->sa_out_dma_addr);
-+	if (!rctx->sa_out)
-+		return -ENOMEM;
-+
-+	rctx->sa_len = ctx->sa_len;
-+	rctx->state_record = ctx->state_record;
-+	rctx->state_record_dma_addr = ctx->state_record_dma_addr;
-+	rctx->bypass = ctx->bypass;
-+	memcpy(rctx->sa_in, ctx->sa_in, ctx->sa_len * 4);
-+	memcpy(rctx->sa_out, ctx->sa_out, ctx->sa_len * 4);
-+
-+	return 0;
-+}
-+
-+void crypto4xx_free_sa_rctx(struct crypto4xx_ctx *rctx)
-+{
-+	if (rctx->sa_in != NULL) {
-+		pci_free_consistent(NULL,
-+				    rctx->sa_len * 4,
-+				    rctx->sa_in,
-+				    rctx->sa_in_dma_addr);
-+	}
-+	if (rctx->sa_out != NULL) {
-+		pci_free_consistent(NULL,
-+				    rctx->sa_len * 4,
-+				    rctx->sa_out,
-+				    rctx->sa_out_dma_addr);
-+	}
-+	rctx->sa_len = 0;
-+	rctx->state_record = NULL;
-+	rctx->state_record_dma_addr = 0;
-+}
-+
-+void crypto4xx_memcpy_le(unsigned int *dst,
-+			 const unsigned char *buf,
-+			 int len)
-+{
-+	/* SA is in big endian */
-+	for (; len; buf += 4, len -= 4)
-+		*dst++ = cpu_to_le32(*(unsigned int *) buf);
-+}
-+
-+u32 crypto4xx_stop_all(void)
-+{
-+	crypto4xx_destroy_pdr(&lsec_core.dev);
-+	crypto4xx_destroy_sdr(&lsec_core.dev);
-+	crypto4xx_destroy_gdr(&lsec_core.dev);
-+
-+	return 0;
-+}
-+
-+u32 crypto4xx_build_pd(struct crypto4xx_device  *dev,
-+			struct crypto_async_request *req,
-+			u32 pd_entry,
-+			struct crypto4xx_ctx *ctx,
-+			struct scatterlist *src,
-+			struct scatterlist *dst,
-+			u16 datalen,
-+			u8 type)
-+{
-+	dma_addr_t addr, pd_dma, sd_dma, gd_dma;
-+	struct dynamic_sa_ctl *sa;
-+	struct scatterlist *sg;
-+	struct ce_pd *pd;
-+	struct pd_uinfo *pd_uinfo;
-+	unsigned int nbytes = datalen, idx;
-+	struct ce_gd *gd = NULL;
-+	u32 gd_idx = 0;
-+	struct ce_sd *sd = NULL;
-+	u32 sd_idx = 0;
-+
-+	pd = crypto4xx_get_pdp(dev, &pd_dma, pd_entry);
-+	pd_uinfo = dev->pd_uinfo_array[pd_entry];
-+	pd_uinfo->async_req = req;
-+
-+	if (ctx->direction == CRYPTO_INBOUND) {
-+		pd->sa = ctx->sa_in_dma_addr;
-+		sa = (struct dynamic_sa_ctl *)ctx->sa_in;
-+	} else {
-+		pd->sa = ctx->sa_out_dma_addr;
-+		sa = (struct dynamic_sa_ctl *)ctx->sa_out;
-+	}
-+
-+	pd->sa_len = ctx->sa_len;
-+
-+	/* If first is last then we are single */
-+	if (sg_is_last(src)) {
-+		pd->src = dma_map_page(NULL, sg_page(src),
-+				    src->offset, src->length,
-+				    DMA_TO_DEVICE);
-+		/* Disable gather in sa command */
-+		sa->sa_command_0.bf.gather = 0;
-+		/* Indicate gather array is not used */
-+		pd_uinfo->first_gd = pd_uinfo->last_gd = 0xffffffff;
-+	} else {
-+		src = &src[0];
-+		/* get first gd we are going to use */
-+		gd_idx = crypto4xx_get_gd_from_gdr(dev);
-+		if (gd_idx == ERING_WAS_FULL) {
-+			crypto4xx_ret_sg_desc(dev, pd_uinfo);
-+			return -EAGAIN;
-+		}
-+		pd_uinfo->first_gd = gd_idx;
-+		gd = crypto4xx_get_gdp(dev, &gd_dma, gd_idx);
-+		pd->src = gd_dma;
-+		/* Enable gather */
-+		sa->sa_command_0.bf.gather = 1;
-+		idx = 0;
-+
-+		/* walk the sg, and setup gather array */
-+		/* Seems that CRYPTO_ENGINE DMA is byte align,
-+		so we can use ptr directly from sg */
-+		while (nbytes != 0) {
-+			sg = &src[idx];
-+			addr = dma_map_page(NULL, sg_page(sg),
-+					    sg->offset, sg->length,
-+					    DMA_TO_DEVICE);
-+			gd->ptr = addr;
-+			gd->ctl_len.len = sg->length;
-+			gd->ctl_len.done = 0;
-+			gd->ctl_len.ready = 1;
-+			nbytes -= sg->length;
-+			if (!nbytes)
-+				break;
-+			/* Get first gd we are going to use */
-+			gd_idx = crypto4xx_get_gd_from_gdr(dev);
-+			if (gd_idx == ERING_WAS_FULL) {
-+				crypto4xx_ret_sg_desc(dev, pd_uinfo);
-+				return -EAGAIN;
-+			}
-+			gd = crypto4xx_get_gdp(dev, &gd_dma, gd_idx);
-+			pd_uinfo->last_gd = gd_idx;
-+			idx++;
-+		}
-+	}
-+	if (dev->scatter_buffer_size <= datalen)
-+		nbytes = datalen;
-+	if (ctx->is_hash  || sg_is_last(dst)) {
-+		/* we know application give us dst a whole piece of memory */
-+		/* no need to use scatter ring */
-+		pd_uinfo->using_sd = 0;
-+		pd_uinfo->first_sd = pd_uinfo->last_sd = 0xffffffff;
-+		pd_uinfo->dest_va = dst;
-+		sa->sa_command_0.bf.scatter = 0;
-+		if (ctx->is_hash) {
-+			pd->dest = virt_to_phys((void *)dst);
-+		} else {
-+			pd->dest = dma_map_page(NULL, sg_page(dst),
-+				    dst->offset, dst->length,
-+				    DMA_TO_DEVICE);
-+		}
-+
-+	} else {
-+		sa->sa_command_0.bf.scatter = 1;
-+		pd_uinfo->using_sd = 1;
-+		pd_uinfo->first_sd = pd_uinfo->last_sd = sd_idx;
-+		sd_idx = crypto4xx_get_sd_from_sdr(dev);
-+		if (sd_idx == 0xffffffff)
-+			return -EAGAIN;
-+		sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
-+		pd->dest = sd_dma;
-+		/* setup scatter descriptor */
-+		sd->ctl.done = 0;
-+		sd->ctl.rdy = 1;
-+		/* sd->ptr should be setup by sd_init routine*/
-+		idx = 0;
-+		if (nbytes >= PPC4XX_SD_BUFFER_SIZE)
-+			nbytes -= PPC4XX_SD_BUFFER_SIZE;
-+		else if (nbytes < PPC4XX_SD_BUFFER_SIZE)
-+			nbytes = 0;
-+		while (nbytes) {
-+			sd_idx = crypto4xx_get_sd_from_sdr(dev);
-+			if (sd_idx == 0xffffffff) {
-+				crypto4xx_ret_sg_desc(dev, pd_uinfo);
-+				/*Fixme implement some error code later */
-+				return -EAGAIN;
-+			}
-+			sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
-+			pd_uinfo->last_sd = sd_idx;
-+			/* setup scatter descriptor */
-+			sd->ctl.done = 0;
-+			sd->ctl.rdy = 1;
-+			if (nbytes >= PPC4XX_SD_BUFFER_SIZE)
-+				nbytes -= PPC4XX_SD_BUFFER_SIZE;
-+			else
-+			/*this SD entry can hold sd_buffer_size,
-+				its more the need so done */
-+				 nbytes = 0;
-+		}
-+	}
-+	pd->pd_ctl.w = ctx->pd_ctl;
-+	pd->pd_ctl_len.w = 0x00400000 | (ctx->bypass<<24) | datalen;
-+	pd_uinfo->state = PD_ENTRY_INUSE;
-+
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_DESCR_RD, 1);
-+	return -EINPROGRESS;
-+
-+}
-+
-+u32 crypto4xx_start_device(struct crypto4xx_device *dev)
-+{
-+	u32 rc ;
-+	rc = crypto4xx_init(dev);
-+	return rc;
-+}
-+
-+int crypto4xx_handle_req(struct crypto_async_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->tfm);
-+	struct crypto4xx_device *dev = ctx->dev;
-+	struct crypto4xx_ctx *rctx;
-+	struct pd_uinfo *pd_uinfo;
-+
-+	int ret = -EAGAIN;
-+
-+	u32 pd_entry;
-+
-+	pd_entry = crypto4xx_get_pd_from_pdr(dev);  /* index to the entry */
-+	if (pd_entry == ERING_WAS_FULL)
-+		return -EAGAIN;
-+
-+	pd_uinfo = dev->pd_uinfo_array[pd_entry];
-+
-+	if (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_ABLKCIPHER) {
-+		struct ablkcipher_request *ablk_req;
-+		ablk_req = ablkcipher_request_cast(req);
-+		if (ctx->use_rctx) {
-+			rctx = ablkcipher_request_ctx(ablk_req);
-+			return crypto4xx_build_pd(dev, req, pd_entry, rctx,
-+						ablk_req->src, ablk_req->dst,
-+						ablk_req->nbytes, ABLK);
-+		} else {
-+			return crypto4xx_build_pd(dev, req, pd_entry, ctx,
-+						ablk_req->src, ablk_req->dst,
-+						ablk_req->nbytes,
-+						ABLK);
-+		}
-+	} else {
-+		struct ahash_request *ahash_req;
-+		ahash_req = ahash_request_cast(req);
-+		if (ctx->use_rctx) {
-+			rctx = ahash_request_ctx(ahash_req);
-+			return crypto4xx_build_pd(dev, req, pd_entry, rctx,
-+					ahash_req->src,
-+					(struct scatterlist *)
-+					ahash_req->result,
-+					ahash_req->nbytes,
-+					AHASH);
-+		} else {
-+		return crypto4xx_build_pd(dev, req, pd_entry, ctx,
-+					ahash_req->src,
-+					(struct scatterlist *)
-+					ahash_req->result,
-+					ahash_req->nbytes,
-+					AHASH);
-+		}
-+	}
-+	return ret;
-+}
-+
-+int crypto4xx_setup_crypto(struct crypto_async_request *req)
-+{
-+	return crypto4xx_handle_req(req);
-+}
-+
-+/**
-+ * Algorithm Registration Functions
-+ *
-+ */
-+static int crypto4xx_alg_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_alg    *alg = tfm->__crt_alg;
-+	struct crypto4xx_alg *amcc_alg = crypto_alg_to_crypto4xx_alg(alg);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->dev = amcc_alg->dev;
-+	ctx->sa_in = NULL;
-+	ctx->sa_out = NULL;
-+	ctx->sa_in_dma_addr = 0;
-+	ctx->sa_out_dma_addr = 0;
-+	ctx->sa_len = 0;
-+
-+	if (alg->cra_type == &crypto_ablkcipher_type)
-+		tfm->crt_ablkcipher.reqsize = sizeof(struct crypto4xx_ctx);
-+	else if (alg->cra_type == &crypto_ahash_type)
-+		tfm->crt_ahash.reqsize = sizeof(struct crypto4xx_ctx);
-+	return 0;
-+}
-+
-+void crypto4xx_alg_exit(struct crypto_tfm *tfm)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+	crypto4xx_free_sa(ctx);
-+	crypto4xx_free_state_record(ctx);
-+}
-+
-+static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
-+				  struct crypto_alg *crypto_alg)
-+{
-+	struct crypto4xx_alg *alg;
-+	int i;
-+	int rc = 0;
-+
-+	for (i = 0; crypto_alg[i].cra_name[0] != '\0'; i++) {
-+		alg = kzalloc(sizeof(struct crypto4xx_alg), GFP_KERNEL);
-+		if (!alg)
-+			return -ENOMEM;
-+
-+		alg->alg = crypto_alg[i];
-+		INIT_LIST_HEAD(&alg->alg.cra_list);
-+		if (alg->alg.cra_init == NULL)
-+			alg->alg.cra_init = crypto4xx_alg_init;
-+		if (alg->alg.cra_exit == NULL)
-+			alg->alg.cra_exit = crypto4xx_alg_exit;
-+		alg->dev = sec_dev;
-+		list_add_tail(&alg->entry, &sec_dev->alg_list);
-+		rc = crypto_register_alg(&alg->alg);
-+		if (rc) {
-+			list_del(&alg->entry);
-+			kfree(alg);
-+			return rc;
-+		}
-+	}
-+	return rc;
-+}
-+
-+static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
-+{
-+	struct crypto4xx_alg *alg, *tmp;
-+
-+	list_for_each_entry_safe(alg, tmp, &sec_dev->alg_list, entry) {
-+		list_del(&alg->entry);
-+		crypto_unregister_alg(&alg->alg);
-+		kfree(alg);
-+	}
-+}
-+
-+static void crypto4xx_bh_tasklet_cb(unsigned long data)
-+{
-+	struct crypto4xx_core_device *lsec;
-+	struct pd_uinfo *pd_uinfo;
-+	struct ce_pd *pd;
-+	u32 tail;
-+
-+	lsec = (struct crypto4xx_core_device *) data;
-+
-+	while (lsec->dev.pdr_head != lsec->dev.pdr_tail) {
-+		tail = lsec->dev.pdr_tail;
-+		pd_uinfo = lsec->dev.pd_uinfo_array[tail];
-+		pd =  lsec->dev.pdp_array[tail];
-+		if ((pd_uinfo->state == PD_ENTRY_INUSE) &&
-+				   pd->pd_ctl.bf.pe_done &&
-+				   !pd->pd_ctl.bf.host_ready) {
-+			pd->pd_ctl.bf.pe_done = 0;
-+			crypto4xx_pd_done(lsec, tail);
-+			crypto4xx_put_pd_to_pdr(&(lsec->dev), tail);
-+			pd_uinfo->state = PD_ENTRY_FREE;
-+		} else {
-+			/* if tail not done, break */
-+			break;
-+		}
-+	}
-+}
-+
-+/**
-+ * Top Half of isr.
-+ */
-+static int crypto4xx_ce_interrupt_handler(int irq, void *id)
-+{
-+	if (lsec_core.ce_base == 0)
-+		return 0;
-+
-+	lsec_core.irq_cnt++;
-+	crypto4xx_write32(CRYPTO_ENGINE_INT_CLR, 0x3ffff);
-+	tasklet_schedule(&lsec_core.tasklet);
-+
-+	return IRQ_HANDLED;
-+}
-+/**
-+ * Module Initialization Routine
-+ *
-+ */
-+static int __init crypto4xx_crypto_probe(struct of_device *ofdev,
-+				      const struct of_device_id *match)
-+{
-+	int rc;
-+	struct resource res;
-+
-+	lsec_core.ce_base = 0;
-+	lsec_core.irq_cnt = 0ll;
-+
-+	memset(&lsec_core.dev, 0, sizeof(struct crypto4xx_device));
-+
-+	INIT_LIST_HEAD(&lsec_core.dev.alg_list);
-+
-+	crypto4xx_build_pdr(&(lsec_core.dev));
-+	crypto4xx_build_gdr(&(lsec_core.dev));
-+	crypto4xx_build_sdr(&(lsec_core.dev));
-+
-+	/* Init tasklet for bottom half processing */
-+	tasklet_init(&lsec_core.tasklet, crypto4xx_bh_tasklet_cb,
-+			(unsigned long)&lsec_core);
-+
-+	/* Register for Crypto isr, Crypto Engine IRQ */
-+	lsec_core.irq = of_irq_to_resource(ofdev->node, 0, NULL);
-+	rc = request_irq(lsec_core.irq, crypto4xx_ce_interrupt_handler, 0,
-+			 lsec_core.dev.name, NULL);
-+	if (rc)
-+		goto err_register_intr;
-+
-+	/* include address for kasumi that is eip06*/
-+	rc = of_address_to_resource(ofdev->node, 0, &res);
-+	if (rc)
-+		return -ENODEV;
-+
-+	lsec_core.ce_phy_address = res.start;
-+	lsec_core.ce_base = ioremap(lsec_core.ce_phy_address, 0x80400);
-+
-+	/* need to setup pdr, rdr, gdr and sdr */
-+	rc = crypto4xx_start_device(&lsec_core.dev);
-+	if (rc)
-+		goto err_register_intr;
-+
-+	/* Register security algorithms with Linux CryptoAPI */
-+	rc = crypto4xx_register_alg(&lsec_core.dev, crypto4xx_basic_alg);
-+	if (rc)
-+		goto err_register_alg;
-+
-+	CRYPTUTL_PRINTK(KERN_INFO, "Loaded AMCC PPC4XX crypto "
-+			"accelerator driver v%s\n", PPC4XX_SEC_VERSION_STR);
-+
-+	return rc;
-+
-+err_register_intr:
-+err_register_alg:
-+	crypto4xx_unregister_alg(&lsec_core.dev);
-+	free_irq(lsec_core.irq, &lsec_core.dev.name);
-+	crypto4xx_stop_all();
-+
-+	return rc;
-+}
-+
-+static int __exit crypto4xx_crypto_remove(struct of_device *dev)
-+{
-+	free_irq(lsec_core.irq, NULL);
-+	/* Un-register with Linux CryptoAPI */
-+	crypto4xx_unregister_alg(&lsec_core.dev);
-+	/* Free all allocated memory */
-+	crypto4xx_stop_all();
-+
-+	CRYPTUTL_PRINTK(KERN_INFO, "Unloaded AMCC PPC4XX crypto "
-+			"accelerator driver v%s\n", PPC4XX_SEC_VERSION_STR);
-+
-+	return 0;
-+}
-+
-+static struct of_device_id crypto4xx_crypto_match[] = {
-+	{ .compatible      = "crypto4xx-crypto", },
-+	{ .compatible      = "amcc,crypto4xx-crypto",},
-+	{ },
-+};
-+
-+static struct of_platform_driver crypto4xx_crypto_driver = {
-+	.name		= "crypto4xx-crypto",
-+	.match_table	= crypto4xx_crypto_match,
-+	.probe		= crypto4xx_crypto_probe,
-+	.remove		= crypto4xx_crypto_remove,
-+};
-+
-+static int __init crypto4xx_lsec_init(void)
-+{
-+	return of_register_platform_driver(&crypto4xx_crypto_driver);
-+}
-+
-+static void __exit crypto4xx_lsec_exit(void)
-+{
-+	of_unregister_platform_driver(&crypto4xx_crypto_driver);
-+}
-+
-+module_init(crypto4xx_lsec_init);
-+module_exit(crypto4xx_lsec_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("James Hsiao <jhsiao@amcc.com>");
-+MODULE_DESCRIPTION("Driver for AMCC PPC4xx crypto accelerator");
-+
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-new file mode 100644
-index 0000000..27b5d51
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -0,0 +1,265 @@
-+/*******************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file   crypto4xx_core.h
-+ *
-+ * This is the header file for AMCC Crypto offload Linux device driver for
-+ * use with Linux CryptoAPI.
-+ *
-+ *******************************************************************************
-+ */
-+
-+#ifndef __CRYPTO4XX_CORE_H__
-+#define __CRYPTO4XX_CORE_H__
-+
-+/**
-+ * Debugging Macro
-+ *
-+ */
-+#define PPC4XX_SEC_DEBUG
-+#define PFX	"CRYPTO4XX: "
-+
-+#if !defined(PPC4XX_SEC_DEBUG)
-+#	define CRYPTUTL_PRINTK(ll, fmt, ...)
-+#else
-+#	define CRYPTUTL_PRINTK(ll, fmt, ...) \
-+	do { \
-+		printk(ll PFX fmt "\n", ##__VA_ARGS__); \
-+} while (0);
-+#endif
-+
-+#define CRYPTO4XX_CRYPTO_PRIORITY	300
-+
-+#define PPC4XX_LAST_PD			63
-+#define PPC4XX_NUM_PD			64
-+
-+#define PPC4XX_LAST_GD			1023
-+#define PPC4XX_NUM_GD			1024
-+
-+#define PPC4XX_LAST_SD			63
-+#define PPC4XX_NUM_SD			64
-+
-+#define PPC4XX_SD_BUFFER_SIZE		2048
-+
-+#define PPC4XX_INT_DESCR_CNT		4
-+#define PPC4XX_INT_TIMEOUT_CNT		0
-+/* FIXme arbitory number*/
-+#define PPC4XX_INT_CFG			1
-+
-+#ifdef CONFIG_405EX
-+#define SDR0_SRST0			0x00000200
-+#define SRST0_CRYP			0x00000008
-+#else
-+#define SDR0_SRST0			0x00000201
-+#define SRST0_CRYP			0x08000000
-+#endif
-+
-+#define SDR0_CRYP0			0x00004500
-+#define CRYP0_INT			0x80000000
-+
-+/*
-+ * These define will be used in crypto4xx_build_pd
-+ * AHASH don't have dst scatterlist iso u8*
-+ * with the type field it can destinguish what is
-+ */
-+#define ABLK				0
-+#define AHASH				1
-+
-+#define PD_ENTRY_INUSE			1
-+#define PD_ENTRY_FREE			0
-+
-+#define EALLOC_MEM_FAIL			0xfffffffd
-+#define EDOWNSEMA_FAIL			0xfffffffe
-+#define ERING_WAS_FULL			0xffffffff
-+
-+struct crypto4xx_device;
-+extern struct crypto4xx_core_device lsec_core;
-+extern struct crypto_alg crypto4xx_basic_alg[];
-+
-+struct pd_uinfo {
-+	struct crypto4xx_device *dev;
-+	u32   state;
-+	u32 using_sd;
-+	void *pd_va;                             /* offset from pdr */
-+	void *rd_va;                             /* offset from rdr, could be
-+						 same as pdr(same as pd_va)*/
-+	u32 first_gd;                            /* first gather discriptor
-+							used by this packet */
-+	u32 last_gd;                             /* last gather discriptor
-+							used by this packet */
-+	u32 first_sd;                            /* first scatter discriptor
-+							used by this packet */
-+	u32 last_sd;                             /* last scatter discriptor
-+							used by this packet */
-+	u32 first_done;
-+	u32 last_done;
-+	struct scatterlist *dest_va;
-+	u32 cryptype;
-+	struct crypto_async_request *async_req;  /* base crypto request
-+							for this packet */
-+};
-+
-+struct crypto4xx_device {
-+	u8   dev_id;			/* Device ID - id of device to
-+						send request to */
-+	char *name;
-+	void *pdr;			/* base address of packet
-+						descriptor ring */
-+	dma_addr_t pdr_pa;		/* physical address used to
-+						program ce pdr_base_register */
-+	void *rdr;			/* result descriptor ring, maybe same
-+						location as pdr */
-+	dma_addr_t rdr_pa;             /* physical address used to
-+						program ce rdr_base_register */
-+	void *gdr;                     /* gather descriptor ring,
-+						for inbound packet/fragments */
-+					/* address of particle is
-+						from the request, src sg*/
-+	dma_addr_t gdr_pa;		/* physical address used to
-+						program ce gdr_base_register */
-+	void *sdr;			/* scatter descriptor ring,for outbound
-+						packet/fragments
-+						must be same size, so init them
-+						to 2k each safe for large
-+						packets */
-+	dma_addr_t sdr_pa;		/* physical address used to
-+						program ce sdr_base_register */
-+	dma_addr_t scatter_buffer_pa;
-+	void *scatter_buffer_va;
-+	u32 scatter_buffer_size;
-+	int pdr_tail;
-+	int pdr_head;
-+	u32 gdr_tail;
-+	u32 gdr_head;
-+	u32 sdr_tail;
-+	u32 sdr_head;
-+	void *pdr_uinfo;
-+	struct list_head alg_list;	/* List of algorithm supported
-+							by this device */
-+	struct pd_uinfo *pd_uinfo_array[PPC4XX_NUM_PD];
-+	struct ce_pd *pdp_array[PPC4XX_NUM_PD];
-+	struct ce_gd *gdp_array[PPC4XX_NUM_GD];
-+	struct ce_sd *sdp_array[PPC4XX_NUM_SD];
-+};
-+
-+struct crypto4xx_core_device {
-+	struct crypto4xx_device dev;
-+	u32 int_status;
-+	u32 irq;
-+	u64 irq_cnt;
-+	struct tasklet_struct tasklet;
-+	u64  ce_phy_address;
-+	void __iomem *ce_base;
-+};
-+
-+struct crypto4xx_ctx {
-+	struct crypto4xx_device *dev;
-+	void *sa_in;
-+	dma_addr_t sa_in_dma_addr;
-+	void *sa_out;
-+	dma_addr_t sa_out_dma_addr;
-+	void *state_record;
-+	dma_addr_t state_record_dma_addr;
-+	u16 sa_len;
-+	u32 direction;
-+	u32 use_rctx;
-+	u32 next_hdr;
-+	u32 save_iv;
-+	u32 pd_ctl_len;
-+	u32 pd_ctl;
-+	u32 bypass;
-+	u32 is_hash;
-+	u32 hash_final;
-+};
-+
-+struct crypto4xx_req_ctx {
-+	struct crypto4xx_device *dev;	/* Device in which
-+					operation to send to */
-+	void  *sa;
-+	dma_addr_t sa_dma_addr;
-+	u16 sa_len;
-+};
-+
-+struct crypto4xx_alg {
-+	struct list_head  entry;
-+	struct crypto_alg alg;
-+	struct crypto4xx_device *dev;
-+};
-+
-+#define crypto_alg_to_crypto4xx_alg(x) \
-+		container_of(x, struct crypto4xx_alg, alg)
-+
-+extern u32 crypto4xx_write32(u32 reg, u32 val);
-+extern u32 crypto4xx_read32(u32 reg, u32 *val);
-+extern u32 crypto4xx_get_pd_from_pdr(struct crypto4xx_device *dev);
-+extern u32 crypto4xx_put_pd_to_pdr(struct crypto4xx_device *dev, u32 idx);
-+
-+extern struct ce_pd *crypto4xx_get_pdp(struct crypto4xx_device *dev,
-+				       dma_addr_t *pd_dma, u32 idx);
-+extern struct ce_gd *crypto4xx_get_gdp(struct crypto4xx_device *dev,
-+				       dma_addr_t *gd_dma, u32 idx);
-+extern struct ce_sd *crypto4xx_get_sdp(struct crypto4xx_device *dev,
-+				       dma_addr_t *sd_dma, u32 idx);
-+extern void crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size);
-+extern u32 crypto4xx_alloc_sa_rctx(struct crypto4xx_ctx *ctx,
-+				   struct crypto4xx_ctx *rctx);
-+
-+
-+extern struct crypto4xx_ctx *crypto4xx_alloc_ctx
-+		(struct crypto4xx_ctx   *ctx);
-+
-+extern void crypto4xx_free_ctx(struct crypto4xx_ctx   *ctx);
-+extern u32 crypto4xx_build_pdr(struct crypto4xx_device  *dev);
-+extern u32 crypto4xx_build_gdr(struct crypto4xx_device  *dev);
-+extern u32 crypto4xx_build_sdr(struct crypto4xx_device  *dev);
-+
-+extern u32 crypto4xx_pd_done(struct crypto4xx_core_device *lsec, u32 idx);
-+
-+extern u32 crypto4xx_start_device(struct crypto4xx_device *dev);
-+
-+extern u32 crypto4xx_stop_all(void);
-+extern u32 crypto4xx_config_clear(void);
-+
-+extern void crypto4xx_free_sa(struct crypto4xx_ctx *ctx);
-+extern u32 crypto4xx_alloc_state_record(struct crypto4xx_ctx *ctx);
-+extern void crypto4xx_free_state_record(struct crypto4xx_ctx *ctx);
-+
-+extern u32 get_dynamic_sa_offset_state_ptr_field(struct crypto4xx_ctx *ctx);
-+extern u32 get_dynamic_sa_offset_iv_field(struct crypto4xx_ctx *ctx);
-+extern void dump_dynamic_sa_iv_field(struct crypto4xx_ctx *ctx);
-+extern u32 get_dynamic_sa_iv_size(struct crypto4xx_ctx *ctx);
-+
-+
-+extern void crypto4xx_memcpy_be(unsigned int *dst,
-+				const unsigned char *buf, int len);
-+extern void crypto4xx_memcpy_le(unsigned int *dst,
-+				const unsigned char *buf, int len);
-+extern int crypto4xx_setup_crypto(struct crypto_async_request *req);
-+
-+extern u32 crypto4xx_check_pd_done(struct crypto4xx_device  *dev);
-+extern  void crypto4xx_alg_exit(struct crypto_tfm *tfm);
-+extern void crypto4xx_free_sa_rctx(struct crypto4xx_ctx *rctx);
-+extern int crypto4xx_handle_req(struct crypto_async_request *req);
-+extern u32 crypto4xx_build_pd(struct crypto4xx_device  *dev,
-+			      struct crypto_async_request *req,
-+			      u32 pd_entry,
-+			      struct crypto4xx_ctx *ctx,
-+			      struct scatterlist *src,
-+			      struct scatterlist *dst,
-+			      u16 datalen,
-+			      u8 type);
-+
-+#endif
-diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
-new file mode 100644
-index 0000000..04b0751
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
-@@ -0,0 +1,290 @@
-+/****************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file crypto4xx_reg_def.h
-+ *
-+ * This filr defines the register set for Security Subsystem
-+ *
-+ ****************************************************************************
-+ */
-+
-+#ifndef __CRYPTO_ENGINE_REG_DEF_H__
-+#define __CRYPTO_ENGINE_REG_DEF_H__
-+
-+/* CRYPTO_ENGINE Register offset */
-+#define CRYPTO_ENGINE_DESCRIPTOR			0x00000000
-+#define CRYPTO_ENGINE_CTRL_STAT				0x00000000
-+#define CRYPTO_ENGINE_SOURCE				0x00000004
-+#define CRYPTO_ENGINE_DEST				0x00000008
-+#define CRYPTO_ENGINE_SA				0x0000000C
-+#define CRYPTO_ENGINE_SA_LENGTH				0x00000010
-+#define CRYPTO_ENGINE_LENGTH				0x00000014
-+
-+
-+#define CRYPTO_ENGINE_PE_DMA_CFG			0x00000040
-+#define CRYPTO_ENGINE_PE_DMA_STAT			0x00000044
-+#define CRYPTO_ENGINE_PDR_BASE				0x00000048
-+#define CRYPTO_ENGINE_RDR_BASE				0x0000004c
-+#define CRYPTO_ENGINE_RING_SIZE				0x00000050
-+#define CRYPTO_ENGINE_RING_CTRL				0x00000054
-+#define CRYPTO_ENGINE_INT_RING_STAT			0x00000058
-+#define CRYPTO_ENGINE_EXT_RING_STAT			0x0000005c
-+#define CRYPTO_ENGINE_IO_THRESHOLD			0x00000060
-+#define CRYPTO_ENGINE_GATH_RING_BASE			0x00000064
-+#define CRYPTO_ENGINE_SCAT_RING_BASE			0x00000068
-+#define CRYPTO_ENGINE_PART_RING_SIZE			0x0000006c
-+#define CRYPTO_ENGINE_PART_RING_CFG		        0x00000070
-+
-+#define CRYPTO_ENGINE_PDR_BASE_UADDR			0x00000080
-+#define CRYPTO_ENGINE_RDR_BASE_UADDR			0x00000084
-+#define CRYPTO_ENGINE_PKT_SRC_UADDR			0x00000088
-+#define CRYPTO_ENGINE_PKT_DEST_UADDR			0x0000008c
-+#define CRYPTO_ENGINE_SA_UADDR				0x00000090
-+#define CRYPTO_ENGINE_GATH_RING_BASE_UADDR		0x000000A0
-+#define CRYPTO_ENGINE_SCAT_RING_BASE_UADDR		0x000000A4
-+
-+#define CRYPTO_ENGINE_SEQ_RD				0x00000408
-+#define CRYPTO_ENGINE_SEQ_MASK_RD			0x0000040C
-+
-+#define CRYPTO_ENGINE_SA_CMD_0				0x00010600
-+#define CRYPTO_ENGINE_SA_CMD_1				0x00010604
-+
-+#define CRYPTO_ENGINE_STATE_PTR				0x000106dc
-+#define CRYPTO_ENGINE_STATE_IV				0x00010700
-+#define CRYPTO_ENGINE_STATE_HASH_BYTE_CNT_0		0x00010710
-+#define CRYPTO_ENGINE_STATE_HASH_BYTE_CNT_1		0x00010714
-+
-+#define CRYPTO_ENGINE_STATE_IDIGEST_0			0x00010718
-+#define CRYPTO_ENGINE_STATE_IDIGEST_1			0x0001071c
-+
-+#define CRYPTO_ENGINE_DATA_IN				0x00018000
-+#define CRYPTO_ENGINE_DATA_OUT			        0x0001c000
-+
-+
-+#define CRYPTO_ENGINE_INT_UNMASK_STAT			0x000500a0
-+#define CRYPTO_ENGINE_INT_MASK_STAT			0x000500a4
-+#define CRYPTO_ENGINE_INT_CLR				0x000500a4
-+#define CRYPTO_ENGINE_INT_EN				0x000500a8
-+
-+#define CRYPTO_ENGINE_INT_PKA				0x00000002
-+#define CRYPTO_ENGINE_INT_PDR_DONE			0x00008000
-+#define CRYPTO_ENGINE_INT_MA_WR_ERR			0x00020000
-+#define CRYPTO_ENGINE_INT_MA_RD_ERR			0x00010000
-+#define CRYPTO_ENGINE_INT_PE_ERR			0x00000200
-+#define CRYPTO_ENGINE_INT_USER_DMA_ERR			0x00000040
-+#define CRYPTO_ENGINE_INT_SLAVE_ERR			0x00000010
-+#define CRYPTO_ENGINE_INT_MASTER_ERR			0x00000008
-+#define CRYPTO_ENGINE_INT_ERROR				0x00030258
-+
-+#define CRYPTO_ENGINE_INT_CFG				0x000500ac
-+#define CRYPTO_ENGINE_INT_DESCR_RD			0x000500b0
-+#define CRYPTO_ENGINE_INT_DESCR_CNT			0x000500b4
-+#define CRYPTO_ENGINE_INT_TIMEOUT_CNT			0x000500b8
-+
-+#define CRYPTO_ENGINE_DC_CTRL				0x00060080
-+#define CRYPTO_ENGINE_DEVICE_ID				0x00060084
-+#define CRYPTO_ENGINE_DEVICE_INFO			0x00060088
-+#define CRYPTO_ENGINE_DMA_USER_SRC			0x00060094
-+#define CRYPTO_ENGINE_DMA_USER_DEST			0x00060098
-+#define CRYPTO_ENGINE_DMA_USER_CMD			0x0006009C
-+
-+#define CRYPTO_ENGINE_DMA_CFG	        		0x000600d4
-+#define CRYPTO_ENGINE_BYTE_ORDER_CFG 			0x000600d8
-+#define CRYPTO_ENGINE_ENDIAN_CFG			0x000600d8
-+
-+#define CRYPTO_ENGINE_PRNG_STAT				0x00070000
-+#define CRYPTO_ENGINE_PRNG_CTRL				0x00070004
-+#define CRYPTO_ENGINE_PRNG_SEED_L			0x00070008
-+#define CRYPTO_ENGINE_PRNG_SEED_H			0x0007000c
-+
-+#define CRYPTO_ENGINE_PRNG_RES_0			0x00070020
-+#define CRYPTO_ENGINE_PRNG_RES_1			0x00070024
-+#define CRYPTO_ENGINE_PRNG_RES_2			0x00070028
-+#define CRYPTO_ENGINE_PRNG_RES_3			0x0007002C
-+
-+#define CRYPTO_ENGINE_PRNG_LFSR_L			0x00070030
-+#define CRYPTO_ENGINE_PRNG_LFSR_H			0x00070034
-+
-+/**
-+ * Initilize CRYPTO ENGINE registers, and memory bases.
-+ */
-+
-+#define PPC4XX_PDR_POLL			0x3ff
-+#define PPC4XX_OUTPUT_THRESHOLD		2
-+#define PPC4XX_INPUT_THRESHOLD		2
-+#define PPC4XX_PD_SIZE			6
-+#define CRYPTO_CTX_DONE_INT		0x2000
-+#define CRYPTO_PD_DONE_INT		0x8000
-+/**
-+ * all follow define are ad hoc
-+ */
-+#define PPC4XX_RING_RETRY		100
-+#define PPC4XX_RING_POLL		100
-+#define PPC4XX_SDR_SIZE			PPC4XX_NUM_SD
-+#define PPC4XX_GDR_SIZE			PPC4XX_NUM_GD
-+
-+/**
-+ *
-+ * IPE Generic Security Association (SA) with all possible fields. These will
-+ * never likely used except for reference purpose. These structure format
-+ * can be not changed as the hardware expects them to be layout as defined.
-+ * Field can be removed or reduced but ordering can not be changed.
-+ *
-+ *
-+ */
-+
-+#define CRYPTO_ENGINE_DMA_CFG_OFFSET			0x40
-+union ce_pe_dma_cfg {
-+	struct {
-+		u32 rsv:7;
-+		u32 dir_host:1;
-+		u32 rsv1:2;
-+		u32 bo_td_en:1;
-+		u32 dis_pdr_upd:1;
-+		u32 bo_sgpd_en:1;
-+		u32 bo_data_en:1;
-+		u32 bo_sa_en:1;
-+		u32 bo_pd_en:1;
-+		u32 rsv2:4;
-+		u32 dynamic_sa_en:1;
-+		u32 pdr_mode:2;
-+		u32 pe_mode:1;
-+		u32 rsv3:5;
-+		u32 reset_sg:1;
-+		u32 reset_pdr:1;
-+		u32 reset_pe:1;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_ENGINE_PDR_BASE_OFFSET			0x48
-+#define CRYPTO_ENGINE_RDR_BASE_OFFSET			0x4c
-+
-+#define CRYPTO_ENGINE_RING_SIZE_OFFSET			0x50
-+union ce_ring_size {
-+	struct {
-+		u32 ring_offset:16;
-+		u32 rsv:6;
-+		u32 ring_size:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_ENGINE_RING_CONTROL_OFFSET		0x54
-+union ce_ring_contol {
-+	struct {
-+		u32 continuous:1;
-+		u32 rsv:5;
-+		u32 ring_retry_divisor:10;
-+		u32 rsv1:4;
-+		u32 ring_poll_divisor:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_ENGINE_IO_THRESHOLD_OFFSET		0x60
-+union ce_io_threshold {
-+	struct {
-+		u32 rsv:6;
-+		u32 output_threshold:10;
-+		u32 rsv1:6;
-+		u32 input_threshold:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_ENGINE_GATHER_RING_BASE_OFFSET		0x64
-+#define CRYPTO_ENGINE_SCATTER_RING_BASE_OFFSET		0x68
-+
-+union ce_part_ring_size  {
-+	struct {
-+		u32 sdr_size:16;
-+		u32 gdr_size:16;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define MAX_BURST_SIZE_32	0
-+#define MAX_BURST_SIZE_64	1
-+#define MAX_BURST_SIZE_128	2
-+#define MAX_BURST_SIZE_256	3
-+
-+/* gather descriptor control length */
-+struct gd_ctl_len {
-+	u32 len:16;
-+	u32 rsv:14;
-+	u32 done:1;
-+	u32 ready:1;
-+} __attribute__((packed));
-+
-+struct ce_gd {
-+	u32 ptr;
-+	struct gd_ctl_len ctl_len;
-+} __attribute__((packed));
-+
-+struct sd_ctl {
-+	u32 ctl:30;
-+	u32 done:1;
-+	u32 rdy:1;
-+} __attribute__((packed));
-+
-+struct ce_sd {
-+	struct sd_ctl ctl;
-+} __attribute__((packed));
-+
-+#define PD_PAD_CTL_32	0x10
-+#define PD_PAD_CTL_64	0x20
-+#define PD_PAD_CTL_128	0x40
-+#define PD_PAD_CTL_256	0x80
-+union ce_pd_ctl {
-+	struct {
-+		u32 pd_pad_ctl:8;
-+		u32 status:8;
-+		u32 next_hdr:8;
-+		u32 rsv:2;
-+		u32 cached_sa:1;
-+		u32 hash_final:1;
-+		u32 init_arc4:1;
-+		u32 rsv1:1;
-+		u32 pe_done:1;
-+		u32 host_ready:1;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+union ce_pd_ctl_len {
-+	struct {
-+		u32 bypass:8;
-+		u32 pe_done:1;
-+		u32 host_ready:1;
-+		u32 rsv:2;
-+		u32 pkt_len:20;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+struct ce_pd {
-+	union ce_pd_ctl   pd_ctl;
-+	dma_addr_t src;
-+	dma_addr_t dest;
-+	dma_addr_t sa;                 /* get from ctx->sa_dma_addr */
-+	u32 sa_len;                    /* only if dynamic sa is used */
-+	union ce_pd_ctl_len pd_ctl_len;
-+
-+} __attribute__((packed));
-+
-+
-+#endif
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.c b/drivers/crypto/amcc/crypto4xx_sa.c
-new file mode 100644
-index 0000000..36ce18d
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_sa.c
-@@ -0,0 +1,91 @@
-+/****************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file crypto4xx_sa.c
-+ *
-+ * This file implements the security context
-+ * assoicate format.
-+ *
-+ ****************************************************************************
-+ */
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/moduleparam.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/highmem.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <crypto/des.h>
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_sa.h"
-+#include "crypto4xx_core.h"
-+
-+u32 get_dynamic_sa_offset_iv_field(struct crypto4xx_ctx *ctx)
-+{
-+	u32 offset;
-+	union dynamic_sa_contents cts;
-+
-+	cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_in))->sa_contents;
-+
-+	offset = cts.bf.key_size
-+		+ cts.bf.inner_size
-+		+ cts.bf.outer_size
-+		+ cts.bf.spi
-+		+ cts.bf.seq_num0
-+		+ cts.bf.seq_num1
-+		+ cts.bf.seq_num_mask0
-+		+ cts.bf.seq_num_mask1
-+		+ cts.bf.seq_num_mask2
-+		+ cts.bf.seq_num_mask3;
-+
-+	return sizeof(struct dynamic_sa_ctl) + offset * 4;
-+}
-+
-+u32 get_dynamic_sa_offset_state_ptr_field(struct crypto4xx_ctx *ctx)
-+{
-+	u32 offset;
-+	union dynamic_sa_contents cts;
-+
-+	cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_in))->sa_contents;
-+
-+	offset = cts.bf.key_size
-+		+ cts.bf.inner_size
-+		+ cts.bf.outer_size
-+		+ cts.bf.spi
-+		+ cts.bf.seq_num0
-+		+ cts.bf.seq_num1
-+		+ cts.bf.seq_num_mask0
-+		+ cts.bf.seq_num_mask1
-+		+ cts.bf.seq_num_mask2
-+		+ cts.bf.seq_num_mask3
-+		+ cts.bf.iv0
-+		+ cts.bf.iv1
-+		+ cts.bf.iv2
-+		+ cts.bf.iv3;
-+
-+	return sizeof(struct dynamic_sa_ctl) + offset * 4;
-+}
-+
-+u32 get_dynamic_sa_iv_size(struct crypto4xx_ctx *ctx)
-+{
-+	union dynamic_sa_contents cts;
-+	cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_in))->sa_contents;
-+	return (cts.bf.iv0 + cts.bf.iv1 + cts.bf.iv2 + cts.bf.iv3) * 4;
-+}
-+
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.h b/drivers/crypto/amcc/crypto4xx_sa.h
-new file mode 100644
-index 0000000..f60a9d8
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_sa.h
-@@ -0,0 +1,223 @@
-+/****************************************************************************
-+ * AMCC SoC Crypto4XX Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file crypto4xx_sa.h
-+ *
-+ * This file defines the security context
-+ * assoicate format.
-+ *
-+ ****************************************************************************
-+ */
-+
-+#ifndef __CRYPTO4XX_SA_H__
-+#define __CRYPTO4XX_SA_H__
-+
-+#define u32 unsigned int
-+
-+/**
-+ *
-+ * Contents of Dynamic Security Association (SA) with all possible fields
-+ */
-+union dynamic_sa_contents {
-+	struct {
-+		u32 arc4_state_ptr:1;
-+		u32 arc4_ij_ptr:1;
-+		u32 state_ptr:1;
-+		u32 iv3:1;
-+		u32 iv2:1;
-+		u32 iv1:1;
-+		u32 iv0:1;
-+		u32 seq_num_mask3:1;
-+		u32 seq_num_mask2:1;
-+		u32 seq_num_mask1:1;
-+		u32 seq_num_mask0:1;
-+		u32 seq_num1:1;
-+		u32 seq_num0:1;
-+		u32 spi:1;
-+		u32 outer_size:5;
-+		u32 inner_size:5;
-+		u32 key_size:4;
-+		u32 cmd_size:4;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_OUTBOUND                 0
-+#define CRYPTO_INBOUND                  1
-+
-+#define SA_OPCODE_ENCRYPT               0
-+#define SA_OPCODE_DECRYPT               0
-+
-+#define SA_OPCODE_HASH                  3
-+
-+#define SA_CIPHER_ALG_DES               0
-+#define SA_CIPHER_ALG_3DES              1
-+#define SA_CIPHER_ALG_ARC4              2
-+#define SA_CIPHER_ALG_AES               3
-+#define SA_CIPHER_ALG_KASUMI            4
-+#define SA_CIPHER_ALG_NULL             15
-+
-+#define SA_HASH_ALG_MD5                 0
-+#define SA_HASH_ALG_SHA1                1
-+#define SA_HASH_ALG_NULL               15
-+
-+#define SA_HASH_ALG_SHA1_DIGEST_SIZE   20
-+
-+#define SA_LOAD_HASH_FROM_SA            0
-+#define SA_LOAD_HASH_FROM_STATE         2
-+#define SA_LOAD_HASH_NO_LOAD            3
-+
-+union sa_command_0 {
-+	struct {
-+		u32 scatter:1;
-+		u32 gather:1;
-+		u32 save_hash_state:1;
-+		u32 save_iv:1;
-+		u32 load_hash_state:2;
-+		u32 load_iv:2;
-+		u32 digest_len:4;
-+		u32 hdr_proc:1;
-+		u32 extend_pad:1;
-+		u32 stream_cipher_pad:1;
-+		u32 rsv:1;
-+		u32 hash_alg:4;
-+		u32 cipher_alg:4;
-+		u32 pad_type:2;
-+		u32 op_group:2;
-+		u32 dir:1;
-+		u32 opcode:3;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_MODE_ECB                  0
-+#define CRYPTO_MODE_CBC                  1
-+
-+#define CRYPTO_FEEDBACK_MODE_NO_FB       0
-+#define CRYPTO_FEEDBACK_MODE_64BIT_OFB   0
-+#define CRYPTO_FEEDBACK_MODE_8BIT_CFB    1
-+#define CRYPTO_FEEDBACK_MODE_1BIT_CFB    2
-+#define CRYPTO_FEEDBACK_MODE_128BIT_CFB  3
-+
-+#define SA_AES_KEY_LEN_128               2
-+#define SA_AES_KEY_LEN_192               3
-+#define SA_AES_KEY_LEN_256               4
-+
-+/**
-+ * The follow 4 defines usage of hmac_muting bit in sa_command_1
-+ * In Basic hash mode  this bit define simple hash or hmac.
-+ * In IPsec mode, this bit define muting control.
-+ */
-+#define SA_HASH_MODE_HASH                0
-+#define SA_HASH_MODE_HMAC                1
-+
-+union sa_command_1 {
-+	struct {
-+		u32 crypto_mode31:1;
-+		u32 save_arc4_state:1;
-+		u32 arc4_stateful:1;
-+		u32 key_len:5;
-+		u32 hash_crypto_offset:8;
-+		u32 sa_rev:2;
-+		u32 byte_offset:1;
-+		u32 hmac_muting:1;
-+		u32 feedback_mode:2;
-+		u32 crypto_mode9_8:2;
-+		u32 extended_seq_num:1;
-+		u32 seq_num_mask:1;
-+		u32 mutable_bit_proc:1;
-+		u32 ip_version:1;
-+		u32 copy_pad:1;
-+		u32 copy_payload:1;
-+		u32 copy_hdr:1;
-+		u32 rsv1:1;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+struct dynamic_sa_ctl {
-+	u32 sa_contents;
-+	union sa_command_0 sa_command_0;
-+	union sa_command_1 sa_command_1;
-+
-+} __attribute__((packed));
-+
-+/**
-+ * State Record for Security Association (SA)
-+ */
-+struct  dynamic_sa_state_record {
-+	u32 save_iv[4];
-+	u32 save_hash_byte_cnt[2];
-+	u32 save_digest[16];
-+} __attribute__((packed));
-+
-+/**
-+ * Security Association (SA) for AES128
-+ *
-+ */
-+struct dynamic_sa_aes128 {
-+	struct dynamic_sa_ctl	ctrl;
-+	u32 key[4];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+
-+#define SA_AES128_LEN		(sizeof(struct dynamic_sa_aes128)/4)
-+#define SA_AES128_CONTENTS      0x3e000042
-+
-+/*
-+ * Security Association (SA) for AES192
-+ */
-+struct dynamic_sa_aes192 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 key[6];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+
-+#define SA_AES192_LEN		(sizeof(struct dynamic_sa_aes192)/4)
-+#define SA_AES192_CONTENTS	0x3e000062
-+
-+/**
-+ * Security Association (SA) for AES256
-+ */
-+struct dynamic_sa_aes256 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 key[8];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+
-+#define SA_AES256_LEN		(sizeof(struct dynamic_sa_aes256)/4)
-+#define SA_AES256_CONTENTS	0x3e000082
-+
-+/**
-+ * Security Association (SA) for HASH160: HMAC-SHA1
-+ */
-+struct dynamic_sa_hash160 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 inner_digest[5];
-+	u32 outer_digest[5];
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+#define SA_HASH160_LEN		(sizeof(struct dynamic_sa_hash160)/4)
-+#define SA_HASH160_CONTENTS     0x2000a502
-+
-+#endif
--- 
-1.5.4-rc3.GIT
+hifn795x 0000:03:04.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+hifn795x: assuming 66MHz clock speed, override with
+hifn_pll_ref=3Dext<frequency>
+hifn0: AES 128 ECB test has been successfully passed.
+Driver for HIFN 795x crypto accelerator chip has been successfully
+registered.
+nommu_map_single: overflow 1fe047e00+512 of device mask ffffffff
+nommu_map_single: overflow 1fe047e00+512 of device mask ffffffff
+nommu_map_single: overflow 1fe047e00+512 of device mask ffffffff
 
+The same works when I use software AES module. The hardware is a dual
+opteron 252 with 8 GB RAM on a tyan S2882D mainboard. OS is Debian Lenny
+i386. Kernel built from vanilla sources from kernel.org. The .config is
+attached.
+
+Regards,
+
+Dimitri Puzin
+
+--------------030100090203060809070605
+Content-Type: application/x-gzip;
+ name="config.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="config.gz"
+
+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
+
+--------------030100090203060809070605--
+
+--------------enigC38574F1043EFCF8E9F36535
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkjX2FAACgkQyVXQMXpCqpizLgCgk7Ogi1aJDqEZe0xF28SB4mU5
+ClUAoJBSmEWjfCvLQGWR4OUj9I+ncu6+
+=PFtY
+-----END PGP SIGNATURE-----
+
+--------------enigC38574F1043EFCF8E9F36535--
