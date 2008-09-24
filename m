@@ -1,90 +1,195 @@
 From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-Subject: Re: hifn_795x in Linux-2.6.27-rc7
-Date: Wed, 24 Sep 2008 21:00:34 +0400
-Message-ID: <20080924170032.GA5190@2ka.mipt.ru>
-References: <48D7D84B.9020507@psycast.de> <20080923165521.GA26513@2ka.mipt.ru> <48D93028.20903@psycast.de> <48DA6D7D.80705@trash.net>
+Subject: Re: [PATCH 1/1 v6] Add CryptoAPI User Interface Support Patch v6
+Date: Wed, 24 Sep 2008 21:12:20 +0400
+Message-ID: <20080924171220.GB5190@2ka.mipt.ru>
+References: <DB599F406D04E34389140B7D99C71B1B061D6209@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dimitri Puzin <max@psycast.de>, linux-crypto@vger.kernel.org
-To: Patrick McHardy <kaber@trash.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, Loc Ho <lho@amcc.com>
+To: Shasi Pulijala <spulijala@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay.2ka.mipt.ru ([194.85.80.65]:47329 "EHLO 2ka.mipt.ru"
+Received: from relay.2ka.mipt.ru ([194.85.80.65]:42411 "EHLO 2ka.mipt.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751234AbYIXRBe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Sep 2008 13:01:34 -0400
+	id S1751630AbYIXRN1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Sep 2008 13:13:27 -0400
 Content-Disposition: inline
-In-Reply-To: <48DA6D7D.80705@trash.net>
+In-Reply-To: <DB599F406D04E34389140B7D99C71B1B061D6209@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Patrick.
+Hi.
 
-On Wed, Sep 24, 2008 at 06:40:29PM +0200, Patrick McHardy (kaber@trash.net) wrote:
-> There are a few known problems left in the HIFN driver that I have
-> patches for but unfortunately didn't manage to clean them up and
-> submit them yet.
+On Mon, Sep 22, 2008 at 03:40:23PM -0700, Shasi Pulijala (spulijala@amcc.com) wrote:
+>  This is Linux CryptoAPI user space interface support patch v6. This version adds:
+> -Adds a reference count for checking the inappropriate deletion of allocated data in synchronous operations.
+> -Also some minor changes like removal of double pointers etc.
+
+Couple of comments inline.
+
+> From: Shasi Pulijala <spulijala@amcc.com>
 > 
-> Looking at my queue, what's still broken is roughly:
 > 
->    [HIFN]: Have HW invalidate src and dest descriptors after processing
->   
->    The descriptors need to be invalidated after processing for ring
->    cleanup to work properly and to avoid using an old destination
->    descriptor when the src and cmd descriptors are already set up
->    and the dst descriptor isn't.
->   
->    Signed-off-by: Patrick McHardy <kaber@trash.net>
-> 
-> That one is actually probably OK but I didn't send it upstream yet because
-> I didn't finish all follow-up patches that depend on how this works.
-> 
-> Further:
-> 
->    [HIFN]: Fix DMA setup
-> 
-> without a changelog :) IIRC the problem is that HIFN sets up each
-> DMA descriptor for the full request length, even though it should
-> only cover on SG entry. The result is memory corruption.
+> Signed-off-by: Shasi Pulijala <spulijala@amcc.com>
+> Acked-by: Loc Ho <lho@amcc.com>
 
-Can not tell without patch itself, but code operates on the number of
-bytes provided from the higher levels, not full dma size (0x3ff bytes).
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 69f1be6..0cd97c2 100644
 
->    [HIFN]: Don't copy src sg list
-> 
-> also without a changelog. I think this one was just an optimization,
-> the source descriptors don't have alignment or size restrictions and
-> thus we don't need to linearize it first.
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 7cf3625..4ed5634 100644
 
-Also can not say for sure, but there should not be src linearization,
-instead we copy data from src to aligned dst and then perform crypto
-processin in place, and then copy data back.
+This two constantly hangs to be applied. Please rebase against vanilla
+tree. There are also number of trailing whitespaces in the patch.
 
->    [HIFN]: Fix request context corruption
->   
->    HIFN uses the transform context to store per-request data, which breaks
->    when more than one request is outstanding. Move per request members from
->    struct hifn_context to a new struct hifn_request_context and convert
->    the code to use this.
+> +
+> +static int cryptodev_run_acipher(struct csession *ses_ptr,
+> +				struct crypto_item_op *cop,
+> +				struct kiocb *iocb);
+> +static int cryptodev_run_ahash(struct csession *ses_ptr,
+> +				struct crypto_item_op *cop,
+> +				struct kiocb *iocb);
+> +static int cryptodev_run_aead(struct csession *ses_ptr,
+> +				struct crypto_item_op *cop,
+> +				struct kiocb *iocb);
+> +static void cryptodev_async_aio_complete(struct crypto_async_request *req,
+> +					 int err);
 
-Its per-tfm, so things like key and iv are ok, and others should only be
-accessed under the lock, but there may be problems.
+Please drop forward declarations. They confuse readers and automatic
+tools.
 
-> and:
->  
->    [HIFN]: Fix queue processing
-> 
-> again without a changelog. The problem this patch fixed was missing crypto
-> backlog handling, causing crashes with dm_crypt under load.
+> +static int cryptodev_set_user_pages(char __user *src, struct scatterlist *sg,
+> +					struct page **pages, size_t bufsize,
+> +					int *nr_pages, char **null_buf)
+> +{
+> +	unsigned long offset;
+> +	struct page *page = NULL;
+> +	int x;
+> +	int rop;
+> +	int err;
+> +
+> +	if (!src) {
+> +		*nr_pages = 0;
+> +		CDPRINTK(1, KERN_INFO, "Case of null buffer\n");
+> +		*null_buf = kzalloc(bufsize, GFP_KERNEL);
+> +		if (!*null_buf)
+> +			return -ENOMEM;
+> +		sg_init_one(&sg[0], *null_buf, bufsize);
+> +		return 0;
+> +	}
+> +
+> +	offset = (unsigned long) src & ~PAGE_MASK;
+> +	if (!pages) {
+> +		printk(KERN_ERR PFX "pages memory allocation failed\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	down_read(&current->mm->mmap_sem);
+> +	err = get_user_pages(current, current->mm,
+> +			((unsigned long) src) & PAGE_MASK,
+> +			*nr_pages, 1, 0, /* read, force */ pages, NULL);
+> +	up_read(&current->mm->mmap_sem);
+> +
+> +	if (err != *nr_pages) {
+> +		printk(KERN_ERR PFX "pages requested[%d] !="
+> +			" pages granted[%d]\n", *nr_pages, err);
+> +		return err < 0 ? err : -EINVAL;
+> +
+> +	}
+> +
+> +	if (sg_single) {
+> +		page = pages[0];
+> +		CDPRINTK(2, KERN_INFO, "single buffer implementation\n");
+> +		sg_set_page(&sg[0], page, bufsize, offset);
+> +		return 0;
+> +	}
+> +
+> +	sg_init_table(sg, *nr_pages);
+> +	for (x = 0; x < *nr_pages; x++) {
+> +		page = pages[x] ;
+> +		if (!page || IS_ERR(page)) {
+> +			printk(KERN_ERR PFX "missing page in "
+> +				"DumpUserPages %d\n", x);
+> +			return -EFAULT;
+> +		}
+> +		sg_set_page(&sg[x], page, bufsize, offset);
+> +		rop = PAGE_SIZE - sg[x].offset;
+> +		if (bufsize > rop) {
+> +			sg[x].length = rop;
+> +			bufsize = bufsize - rop;
+> +		}
+> +		offset = 0;
 
-Yup, that's messy :)
+What if bufsize is smaller than 'rop', but there are several pages?
+This will initialize wrong buffers, but probably there is a check somewhere
+above this layer.
 
-> If someone is interested in picking this up I could send my old patches,
-> I probably won't manage to do it myself in the next time.
+> +	if (cop->eop == COP_ENCRYPT)
+> +		ret = crypto_aead_encrypt(req);
+> +	else
+> +		ret = crypto_aead_decrypt(req);
+> +
+> +	switch (ret) {
+> +	case 0:
+> +		if (!iocb)
+> +			atomic_dec(&result->opcnt);
+> +		break;
+> +	case -EINPROGRESS:
+> +	case -EBUSY:
+> +		if (iocb) {
+> +			CDPRINTK(2, KERN_INFO,
+> +				"Async Call AEAD:Returning Now\n");
+> +			return -EIOCBQUEUED;
+> +		}
+> +		ret = wait_for_completion_interruptible(
+> +					&result->crypto_completion);
+> +		if (!ret)
+> +			ret = result->err;
+> +		if (!ret) {
+> +			INIT_COMPLETION(result->crypto_completion);
+> +			break;
+> +		}
+> +		/* fall through */
+> +	default:
+> +		printk(KERN_ERR PFX "sid %p enc/dec failed error %d\n",
+> +			ses_ptr, -ret);
+> +		if (!iocb)
+> +			atomic_dec(&result->opcnt);
+> +		break;
+> +	}
+> +
+> +	if (nopin && !ret) {
+> +		if (copy_to_user(dst, data, enc ? bufsize + authsize :
+> +						bufsize - authsize))
+> +			printk(KERN_ERR PFX
+> +				"failed to copy encrypted data "
+> +				"to user space\n");
+> +		CD_HEXDUMP(data, enc ? bufsize + authsize :
+> +					bufsize - authsize);
+> +	}
+> +
+> +	/* Check if last reference */
+> +	if (atomic_dec_and_test(&ses_ptr->refcnt))
+> +		cryptodev_destroy_session(ses_ptr);
+> +	if (dst_flag)
+> +		cryptodev_release_pages(result->dpages, nr_dpages);
+> +out_spages:
+> +	cryptodev_release_pages(result->spages, nr_spages);
+> +
+> +out_tmp:
+> +	if (atomic_dec_and_test(&result->opcnt))
+> +		cryptodev_destroy_res(result);
+> +	return ret;
+> +}
 
-Please do, if they work for you, we can just apply them, but I would
-like first to check them out.
+Still this is not an async crypto.
 
-Thank you!
+Is it what you expect it to be? Since it is protected by the per-ctx
+lock and waits for the crypto operation completion. Also, since waiting
+is interruptible, it is possible to destroy session and/or release
+pages, so actual crypto processing will crash the system.
+
+Are there any benchmark of this approach?
 
 -- 
 	Evgeniy Polyakov
