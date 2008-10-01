@@ -1,42 +1,83 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: CTS (cipher text stealing mode) and short packets
-Date: Wed, 1 Oct 2008 23:55:09 +0800
-Message-ID: <20081001155509.GA14952@gondor.apana.org.au>
-References: <f9d2a5e10809292008i48e66474hbde8c7723b848c50@mail.gmail.com> <E1KkgHv-00011M-OJ@gondolin.me.apana.org.au> <f9d2a5e10809300941m2f63bf4cuc89b2c5f5fe5382@mail.gmail.com>
+From: Harald Welte <laforge@gnumonks.org>
+Subject: Re: PadLock XSHA
+Date: Thu, 2 Oct 2008 01:45:30 +0200
+Message-ID: <20081001234530.GA25827@prithivi.gnumonks.org>
+References: <20080830084316.GA19371@gondor.apana.org.au> <48B918F4.9030604@logix.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kwc@citi.umich.edu, linux-crypto@vger.kernel.org
-To: Russ Dill <russ.dill@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Michal Ludvig <michal@logix.cz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35582 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752541AbYJAPzR (ORCPT
+Received: from ganesha.gnumonks.org ([213.95.27.120]:43690 "EHLO
+	ganesha.gnumonks.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752205AbYJBHu1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Oct 2008 11:55:17 -0400
+	Thu, 2 Oct 2008 03:50:27 -0400
 Content-Disposition: inline
-In-Reply-To: <f9d2a5e10809300941m2f63bf4cuc89b2c5f5fe5382@mail.gmail.com>
+In-Reply-To: <48B918F4.9030604@logix.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 30, 2008 at 09:41:04AM -0700, Russ Dill wrote:
+
+--UugvWAfsgieZRqgk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Sorry for the late response, and putting on my VIA hat for a second:
+
+On Sat, Aug 30, 2008 at 09:55:00PM +1200, Michal Ludvig wrote:
+=20
+> > Can you remind me the reason why our PadLock SHA implementation
+> > copies things into a page before hashing it?
+> >=20
+> > According to the programming manual, it would seem that the state
+> > should be recorded in EDI after each 64-byte block so we should
+> > be able to use the init/update/final model, no?
+> >=20
+> > Or has the chip changed since we implemented it?
+>=20
+> IIRC The first versions of VIA PadLock required the input data to be
+> aligned on 16-bytes boundaries and more importantly they always
+> finalised the hash. Therefore we had to collect all data before hashing
+> them.
 >
-> I'm just not sure how to best fit that into an API. In the case of
-> number of bytes being greater than the underlying block size,
-> everything works "normally". But in the case of the number of bytes
-> being less than or equal to the block size, the IV sent to the remote
-> end needs to be modified.
+> AFAIK Recent versions of PadLock don't insist on finalising the hash and
+> don't insist on input data alignment either and this workaround isn't
+> needed anymore. I don't know if VIA still sells their motherboard models
+> with the older CPUs or not.
 
-I see.  I think the easiest way right now is to use the givencrypt
-interface.  The only time you can modify the IV is when you are
-able to send the IV to the other side, in which case givencrypt
-should be a reasonable interface.
+as far as I know, all VIA padlock enabled processors that you can buy today
+always finalize the hash.  I have heard rumors that with the CN / Nano this=
+ is
+changing.  VIA will update the padlock programming manual about that.
 
-If the user calls you through encrypt then you just fail any
-requests <= block_size.
+Since AFAIK Nano is still only sampling and thre's no end-user product with
+that CPU in the market yet, there's no hurry right now.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'll make sure to ping you guys once three is news about this.
+--=20
+- Harald Welte <laforge@gnumonks.org>           http://laforge.gnumonks.org/
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+"Privacy in residential applications is a desirable marketing option."
+                                                  (ETSI EN 300 175-7 Ch. A6)
+
+--UugvWAfsgieZRqgk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFI5AuaXaXGVTD0i/8RAm5zAJ46Y2bghuZEhJJ8l9KESVAOPF2IDgCfVune
+mxkTovvQf2GKFl12H93ZKjA=
+=SamR
+-----END PGP SIGNATURE-----
+
+--UugvWAfsgieZRqgk--
