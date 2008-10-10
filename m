@@ -1,96 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.28
-Date: Fri, 10 Oct 2008 15:09:18 +0800
-Message-ID: <20081010070918.GA28057@gondor.apana.org.au>
-References: <20080421024306.GA6813@gondor.apana.org.au> <20080714121403.GA28523@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Update for 2.6.28
+Date: Fri, 10 Oct 2008 11:22:44 -0700 (PDT)
+Message-ID: <alpine.LFD.2.00.0810101118050.3503@nehalem.linux-foundation.org>
+References: <20080421024306.GA6813@gondor.apana.org.au> <20080714121403.GA28523@gondor.apana.org.au> <20081010070918.GA28057@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35843 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750831AbYJJHJY (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:37092 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758561AbYJJSXz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Oct 2008 03:09:24 -0400
-Content-Disposition: inline
-In-Reply-To: <20080714121403.GA28523@gondor.apana.org.au>
+	Fri, 10 Oct 2008 14:23:55 -0400
+In-Reply-To: <20081010070918.GA28057@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
 
-Here is the crypto update for 2.6.28:
 
-The highlight of this batch is the new run-time self-test framework
-for algorithms.  This reorganises the same tests that we've always
-had such that they're run at algorithm registration time so that
-only algorithms passing the tests of their type are made available
-to users.  Hopefully that means people won't be sending me any
-more algorithm updates that fail these tests :)
+On Fri, 10 Oct 2008, Herbert Xu wrote:
+> 
+> Here is the crypto update for 2.6.28:
 
-Apart from that a new algorithm type for random number generators.
-The only two algorithms in that type are the existing kernel RNG
-plus a PRNG based on AES.  This is used by IPsec for IV generation.
+Umm. "Here" was empty.
 
-We also have a new implementation of CRC32c that uses the Intel
-instruction for CRC32c.
+Mind adding where it actually is, again?
 
-Adrian Bunk (1):
-      crypto: Kconfig - Replace leading spaces with tabs
+Yeah, yeah, I can look at my old merges (you didn't think I _remember_ 
+things, did you?), and I can see that it's going to be
 
-Austin Zhang (1):
-      crypto: crc32c - Use Intel CRC32 instruction
+	git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
 
-Herbert Xu (10):
-      crypto: api - Export crypto_alg_lookup instead of __crypto_alg_lookup
-      crypto: api - Display larval objects properly
-      crypto: tcrypt - Avoid using contiguous pages
-      crypto: tcrypt - Abort and only log if there is an error
-      crypto: tcrypt - Add alg_test interface
-      crypto: cryptomgr - Add test infrastructure
-      crypto: api - Use test infrastructure
-      crypto: cryptomgr - Test ciphers using ECB
-      crypto: skcipher - Move IV generators into their own modules
-      crypto: skcipher - Use RNG interface instead of get_random_bytes
+but really, please do always say where things are supposed to come from!
 
-Neil Horman (2):
-      crypto: api - Add fips_enable flag
-      crypto: rng - RNG interface and implementation
+Also, please us
 
- arch/x86/crypto/Makefile           |    2 
- arch/x86/crypto/crc32c-intel.c     |  197 
- crypto/Kconfig                     |  127 
- crypto/Makefile                    |   12 
- crypto/algapi.c                    |  147 
- crypto/algboss.c                   |  300 +
- crypto/ansi_cprng.c                |  417 +
- crypto/api.c                       |   81 
- crypto/blkcipher.c                 |   29 
- crypto/chainiv.c                   |   44 
- crypto/cryptomgr.c                 |  222 
- crypto/eseqiv.c                    |   35 
- crypto/fips.c                      |   27 
- crypto/internal.h                  |   18 
- crypto/krng.c                      |   66 
- crypto/proc.c                      |   57 
- crypto/rng.c                       |  126 
- crypto/seqiv.c                     |   27 
- crypto/tcrypt.c                    | 1347 -----
- crypto/tcrypt.h                    | 8709 ------------------------------------
- crypto/testmgr.c                   | 1868 +++++++
- crypto/testmgr.h                   | 8738 +++++++++++++++++++++++++++++++++++++
- include/crypto/internal/rng.h      |   26 
- include/crypto/internal/skcipher.h |    6 
- include/crypto/rng.h               |   75 
- include/linux/crypto.h             |   35 
- 26 files changed, 12464 insertions(+), 10274 deletions(-)
+	git diff -M --stat --summary
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+for the diffstat. That way I would have seen the
+
+ crypto/{cryptomgr.c => algboss.c}  |   92 +-
+
+as a rename in the email, instead of having to look why my numbers don't 
+match the numbers you claimed..
+
+		Linus
