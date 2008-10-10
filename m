@@ -1,61 +1,43 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: Crypto Update for 2.6.28
-Date: Fri, 10 Oct 2008 11:29:06 -0700
-Message-ID: <20081010112906.cfabaac7.randy.dunlap@oracle.com>
-References: <20080421024306.GA6813@gondor.apana.org.au>
-	<20080714121403.GA28523@gondor.apana.org.au>
-	<20081010070918.GA28057@gondor.apana.org.au>
-	<alpine.LFD.2.00.0810101118050.3503@nehalem.linux-foundation.org>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: talitos - pass correct interrupt status to
+ error handler
+Date: Fri, 10 Oct 2008 17:58:48 -0500
+Message-ID: <20081010175848.a6ce7bd5.kim.phillips@freescale.com>
+References: <1223323740.24986.12.camel@al08linux99>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-crypto <linux-crypto@vger.kernel.org>,
+	Lee Nipper <lee.nipper@freescale.com>, Vishnu@freescale.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from agminet01.oracle.com ([141.146.126.228]:10215 "EHLO
-	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757889AbYJJSbh (ORCPT
+Received: from de01egw01.freescale.net ([192.88.165.102]:51393 "EHLO
+	de01egw01.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751554AbYJJWv4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Oct 2008 14:31:37 -0400
-In-Reply-To: <alpine.LFD.2.00.0810101118050.3503@nehalem.linux-foundation.org>
+	Fri, 10 Oct 2008 18:51:56 -0400
+In-Reply-To: <1223323740.24986.12.camel@al08linux99>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 10 Oct 2008 11:22:44 -0700 (PDT) Linus Torvalds wrote:
+On Mon, 06 Oct 2008 15:09:00 -0500
+Lee Nipper <lee.nipper@freescale.com> wrote:
 
+> From: Kim Phillips <kim.phillips@freescale.com>
 > 
+> since we ack early, the re-read interrupt status in talitos_error
+> may be already updated with a new value.  Pass the error ISR value
+> directly in order to report and handle the error based on the correct
+> error status.
 > 
-> On Fri, 10 Oct 2008, Herbert Xu wrote:
-> > 
-> > Here is the crypto update for 2.6.28:
+> Also remove unused error tasklet.
 > 
-> Umm. "Here" was empty.
-> 
-> Mind adding where it actually is, again?
-> 
-> Yeah, yeah, I can look at my old merges (you didn't think I _remember_ 
-> things, did you?), and I can see that it's going to be
-> 
-> 	git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-> 
-> but really, please do always say where things are supposed to come from!
-> 
-> Also, please us
-> 
-> 	git diff -M --stat --summary
-> 
-> for the diffstat. That way I would have seen the
-> 
->  crypto/{cryptomgr.c => algboss.c}  |   92 +-
-> 
-> as a rename in the email, instead of having to look why my numbers don't 
-> match the numbers you claimed..
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
+> ---
 
+Herbert, I noticed your crypto update pull request was missing this
+patch series (and the off-by-one fix from Suresh).  I realize they were
+posted a bit late, but are they under consideration for 2.6.28?
 
-Herbert, see section 16 of Documentation/SubmittingPatches.
-
----
-~Randy
+Kim
