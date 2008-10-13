@@ -1,37 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] trigger a panic when operating in FIPS mode and a
-	crypto self test fails.
-Date: Sun, 12 Oct 2008 20:38:11 +0800
-Message-ID: <20081012123811.GA14351@gondor.apana.org.au>
-References: <20080922192727.GA4718@hmsreliant.think-freely.org>
+From: Lee Nipper <lee.nipper@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: talitos - pass correct interrupt status
+	to	error handler
+Date: Mon, 13 Oct 2008 09:52:35 -0500
+Message-ID: <1223909555.25819.7.camel@al08linux99>
+References: <E1Kp09g-0003in-8T@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50964 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752183AbYJLMi0 (ORCPT
+Received: from de01egw02.freescale.net ([192.88.165.103]:61801 "EHLO
+	de01egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755011AbYJMOmJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 12 Oct 2008 08:38:26 -0400
-Content-Disposition: inline
-In-Reply-To: <20080922192727.GA4718@hmsreliant.think-freely.org>
+	Mon, 13 Oct 2008 10:42:09 -0400
+Received: from de01smr01.freescale.net (de01smr01.freescale.net [10.208.0.31])
+	by de01egw02.freescale.net (8.12.11/de01egw02) with ESMTP id m9DEg5in024753
+	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2008 07:42:06 -0700 (MST)
+Received: from az33exm25.fsl.freescale.net (az33exm25.am.freescale.net [10.64.32.16])
+	by de01smr01.freescale.net (8.13.1/8.13.0) with ESMTP id m9DEg5J9011275
+	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2008 09:42:05 -0500 (CDT)
+In-Reply-To: <E1Kp09g-0003in-8T@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 22, 2008 at 03:27:27PM -0400, Neil Horman wrote:
-> Hey all-
-> 	The FIPS specification requires that should self test for any supported
-> crypto algorithm fail during operation in fips mode, we need to prevent the use
-> of any crypto functionality until such time as the system can be re-initialized.
-> Seems like the best way to handle that would be to panic the system if we were
-> in fips mode and failed a self test.  This patch implements that functionality.
-> I've built and run it successfully with and 
+On Sun, 2008-10-12 at 05:34 -0700, Herbert Xu wrote:
+> I've applied all three patches.  However, I had to fix up the
+> bits around INIT_LIST_HEAD in 1 and 3.  So please check the
+> cryptodev-2.6 tree and let me know if it's wrong.
+> 
+I checked cryptodev-2.6 and it looks good.  Thank you!
 
-Patch applied.  Thanks Neil!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I thought I had double checked the 3 patches against mainline
+but obviously I had not.  I must have gotten skewed a bit.
+I will be more careful.
+
+Thanks for the fix up.
+
+Lee
+
