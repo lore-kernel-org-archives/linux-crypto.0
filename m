@@ -1,42 +1,50 @@
-From: Lee Nipper <lee.nipper@freescale.com>
-Subject: Re: [PATCH 1/3] crypto: talitos - pass correct interrupt status
-	to	error handler
-Date: Mon, 13 Oct 2008 09:52:35 -0500
-Message-ID: <1223909555.25819.7.camel@al08linux99>
-References: <E1Kp09g-0003in-8T@gondolin.me.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Vishnu Suresh <Vishnu@freescale.com>
+Subject: [PATCH] crypto: talitos Preempt overflow interrupts off-by-one fix
+Date: Thu, 16 Oct 2008 15:14:51 +0530
+Message-ID: <1224150291-28500-1-git-send-email-Vishnu@freescale.com>
+Cc: Lee.Nipper@freescale.com, Vishnu Suresh <Vishnu@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from de01egw02.freescale.net ([192.88.165.103]:61801 "EHLO
+Received: from de01egw02.freescale.net ([192.88.165.103]:63767 "EHLO
 	de01egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755011AbYJMOmJ (ORCPT
+	with ESMTP id S1755922AbYJPJkM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Oct 2008 10:42:09 -0400
-Received: from de01smr01.freescale.net (de01smr01.freescale.net [10.208.0.31])
-	by de01egw02.freescale.net (8.12.11/de01egw02) with ESMTP id m9DEg5in024753
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2008 07:42:06 -0700 (MST)
-Received: from az33exm25.fsl.freescale.net (az33exm25.am.freescale.net [10.64.32.16])
-	by de01smr01.freescale.net (8.13.1/8.13.0) with ESMTP id m9DEg5J9011275
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Oct 2008 09:42:05 -0500 (CDT)
-In-Reply-To: <E1Kp09g-0003in-8T@gondolin.me.apana.org.au>
+	Thu, 16 Oct 2008 05:40:12 -0400
+Received: from de01smr02.am.mot.com (de01smr02.freescale.net [10.208.0.151])
+	by de01egw02.freescale.net (8.12.11/de01egw02) with ESMTP id m9G9e1Kw029610
+	for <linux-crypto@vger.kernel.org>; Thu, 16 Oct 2008 02:40:05 -0700 (MST)
+Received: from zin33exm21.fsl.freescale.net (zin33exm21.ap.freescale.net [10.232.192.8])
+	by de01smr02.am.mot.com (8.13.1/8.13.0) with ESMTP id m9G9dwqW027878
+	for <linux-crypto@vger.kernel.org>; Thu, 16 Oct 2008 04:39:59 -0500 (CDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 2008-10-12 at 05:34 -0700, Herbert Xu wrote:
-> I've applied all three patches.  However, I had to fix up the
-> bits around INIT_LIST_HEAD in 1 and 3.  So please check the
-> cryptodev-2.6 tree and let me know if it's wrong.
-> 
-I checked cryptodev-2.6 and it looks good.  Thank you!
+In commit ec6644d6325b5a38525f1d5b20fd4bf7db05cf2a "crypto: talitos - Preempt
+overflow interrupts", the test in atomic_inc_not_zero was interpreted by the
+author to be applied after the increment operation (not before). This off-by-one
+fix prevents overflow error interrupts from occurring when requests are frequent
+and large enough to do so.
 
-I thought I had double checked the 3 patches against mainline
-but obviously I had not.  I must have gotten skewed a bit.
-I will be more careful.
+Signed-off-by: Vishnu Suresh <Vishnu@freescale.com>
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/talitos.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Thanks for the fix up.
-
-Lee
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 6836cb7..c2294f2 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1598,7 +1598,7 @@ static int talitos_probe(struct of_device *ofdev,
+ 		goto err_out;
+ 	}
+ 	for (i = 0; i < priv->num_channels; i++)
+-		atomic_set(&priv->submit_count[i], -priv->chfifo_len);
++		atomic_set(&priv->submit_count[i], -(priv->chfifo_len - 1));
+ 
+ 	priv->head = kzalloc(sizeof(int) * priv->num_channels, GFP_KERNEL);
+ 	priv->tail = kzalloc(sizeof(int) * priv->num_channels, GFP_KERNEL);
+-- 
+1.5.4
 
