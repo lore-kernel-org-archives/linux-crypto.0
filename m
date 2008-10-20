@@ -1,38 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos Preempt overflow interrupts off-by-one
-	fix
-Date: Mon, 20 Oct 2008 21:15:54 +0800
-Message-ID: <20081020131554.GA7986@gondor.apana.org.au>
-References: <1224150291-28500-1-git-send-email-Vishnu@freescale.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v2
+Date: Mon, 20 Oct 2008 16:14:20 -0500
+Message-ID: <20081020161420.793a452a.kim.phillips@freescale.com>
+References: <1224189246-11440-1-git-send-email-jhsiao@amcc.com>
+	<0CA0A16855646F4FA96D25A158E299D69CF4CB@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Lee.Nipper@freescale.com,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Vishnu Suresh <Vishnu@freescale.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: "James Hsiao" <jhsiao@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:37014 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751535AbYJTNP7 (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:51468 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752928AbYJTVFi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Oct 2008 09:15:59 -0400
-Content-Disposition: inline
-In-Reply-To: <1224150291-28500-1-git-send-email-Vishnu@freescale.com>
+	Mon, 20 Oct 2008 17:05:38 -0400
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D69CF4CB@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 16, 2008 at 09:44:51AM +0000, Vishnu Suresh wrote:
-> In commit ec6644d6325b5a38525f1d5b20fd4bf7db05cf2a "crypto: talitos - Preempt
-> overflow interrupts", the test in atomic_inc_not_zero was interpreted by the
-> author to be applied after the increment operation (not before). This off-by-one
-> fix prevents overflow error interrupts from occurring when requests are frequent
-> and large enough to do so.
-> 
-> Signed-off-by: Vishnu Suresh <Vishnu@freescale.com>
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+On Thu, 16 Oct 2008 15:04:44 -0700
+"James Hsiao" <jhsiao@amcc.com> wrote:
 
-Patch applied.  Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> I did most of the changes based on your recommandations. 
+
+ok, I still think you'll get more powerpc review coverage on
+linuxppc-dev though.
+
+Kim
