@@ -1,226 +1,88 @@
-From: Christian Hohnstaedt <christian@hohnstaedt.de>
-Subject: Re: [PATCH] ixp4xx_crypto: avoid firmware loading during module initialisation
-Date: Thu, 23 Oct 2008 14:28:32 +0200
-Message-ID: <20081023122832.GC16037@mail3.prorata.de>
-References: <20080818064455.GK22567@mail3.prorata.de> <E1KVJFO-0007Vh-00@gondolin.me.apana.org.au>
+From: "Barry G" <mr.scada@gmail.com>
+Subject: Enabling Talitos kills all IPsec traffic
+Date: Thu, 23 Oct 2008 16:12:22 -0700
+Message-ID: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christian Hohnstaedt <christian@hohnstaedt.de>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org,
+	"Kim Phillips" <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail3.prorata.de ([62.145.31.200]:33313 "EHLO mail3.prorata.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751118AbYJWMfk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Oct 2008 08:35:40 -0400
+Received: from ey-out-2122.google.com ([74.125.78.27]:41243 "EHLO
+	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759270AbYJWXMZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Oct 2008 19:12:25 -0400
+Received: by ey-out-2122.google.com with SMTP id 6so197021eyi.37
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Oct 2008 16:12:23 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <E1KVJFO-0007Vh-00@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 19, 2008 at 02:55:10PM +1000, Herbert Xu wrote:
-> Christian Hohnstaedt <christian@hohnstaedt.de> wrote:
-> > By moving the firmware-loading to the transform initialisation,
-> > the driver may be compiled in.
-> > 
-> > Notify the user if the firmware does not support AES, or even
-> > no crypto at all.
-> 
-> What happens when two tfms are constructed at the same time?
-> 
+Hello,
 
-Subject: [PATCH] ixp4xx_crypto: avoid firmware loading during module initialisation
+I am working on setting up an IPsec network with two PowerQuicc 8349E devices.
+I am using Strongswan for key negotiation.  I have a test connection between two
+devices running the 2.6.27.3 kernel.  Everything works fine with
+CONFIG_CRYPTO_DEV_TALITOS
+unset.  Strongswan configures the XFRM tunnels and I get ESP traffic flow
+between my remote networks.
 
- By moving the firmware-loading to the transform initialisation,
- the driver may be compiled in.
+I wanted to enable the Talitos driver for hw entropy.  If I rebuild
+the kernel with
+CONFIG_CRYPTO_DEV_TALITOS set to y, strongswan still successfully negotiates
+an IPsec SA, but no traffic flows.
 
- Notify the user if the firmware does not support AES, or even
- no crypto at all.
+I have a very repeatable configuration (everything configured from
+rc.local, etc).
 
- Protect firmware loading and memory allocation by a mutex.
+Any ideas what is wrong?  Any recommendations on places to start looking?
 
-Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
----
- drivers/crypto/ixp4xx_crypto.c |  101 ++++++++++++++++++++++++++-------------
- 1 files changed, 67 insertions(+), 34 deletions(-)
+Also, is it correct that Talitos only accelerates AEAD connections, not ESP/AH
+protocols so there will be no performance increase for me until Strongswan
+adds rfc5282 support?
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 2d637e0..440d672 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -17,6 +17,7 @@
- #include <linux/rtnetlink.h>
- #include <linux/interrupt.h>
- #include <linux/spinlock.h>
-+#include <linux/semaphore.h>
- 
- #include <crypto/ctr.h>
- #include <crypto/des.h>
-@@ -244,44 +245,25 @@ static inline const struct ix_hash_algo *ix_hash(struct crypto_tfm *tfm)
- 	return container_of(tfm->__crt_alg, struct ixp_alg, crypto)->hash;
- }
- 
--static int setup_crypt_desc(void)
--{
--	BUILD_BUG_ON(sizeof(struct crypt_ctl) != 64);
--	crypt_virt = dma_alloc_coherent(dev,
--			NPE_QLEN * sizeof(struct crypt_ctl),
--			&crypt_phys, GFP_KERNEL);
--	if (!crypt_virt)
--		return -ENOMEM;
--	memset(crypt_virt, 0, NPE_QLEN * sizeof(struct crypt_ctl));
--	return 0;
--}
--
- static spinlock_t desc_lock;
- static struct crypt_ctl *get_crypt_desc(void)
- {
- 	int i;
- 	static int idx = 0;
- 	unsigned long flags;
-+	struct crypt_ctl *ret = NULL;
- 
- 	spin_lock_irqsave(&desc_lock, flags);
- 
--	if (unlikely(!crypt_virt))
--		setup_crypt_desc();
--	if (unlikely(!crypt_virt)) {
--		spin_unlock_irqrestore(&desc_lock, flags);
--		return NULL;
--	}
- 	i = idx;
- 	if (crypt_virt[i].ctl_flags == CTL_FLAG_UNUSED) {
- 		if (++idx >= NPE_QLEN)
- 			idx = 0;
- 		crypt_virt[i].ctl_flags = CTL_FLAG_USED;
--		spin_unlock_irqrestore(&desc_lock, flags);
--		return crypt_virt +i;
--	} else {
--		spin_unlock_irqrestore(&desc_lock, flags);
--		return NULL;
-+		ret = crypt_virt +i;
- 	}
-+	spin_unlock_irqrestore(&desc_lock, flags);
-+	return ret;
- }
- 
- static spinlock_t emerg_lock;
-@@ -291,12 +273,11 @@ static struct crypt_ctl *get_crypt_desc_emerg(void)
- 	static int idx = NPE_QLEN;
- 	struct crypt_ctl *desc;
- 	unsigned long flags;
-+	struct crypt_ctl *ret = NULL;
- 
- 	desc = get_crypt_desc();
- 	if (desc)
- 		return desc;
--	if (unlikely(!crypt_virt))
--		return NULL;
- 
- 	spin_lock_irqsave(&emerg_lock, flags);
- 	i = idx;
-@@ -304,12 +285,10 @@ static struct crypt_ctl *get_crypt_desc_emerg(void)
- 		if (++idx >= NPE_QLEN_TOTAL)
- 			idx = NPE_QLEN;
- 		crypt_virt[i].ctl_flags = CTL_FLAG_USED;
--		spin_unlock_irqrestore(&emerg_lock, flags);
--		return crypt_virt +i;
--	} else {
--		spin_unlock_irqrestore(&emerg_lock, flags);
--		return NULL;
-+		ret = crypt_virt +i;
- 	}
-+	spin_unlock_irqrestore(&emerg_lock, flags);
-+	return ret;
- }
- 
- static void free_buf_chain(struct buffer_desc *buf, u32 phys)
-@@ -438,10 +417,6 @@ static int init_ixp_crypto(void)
- 	if (!npe_c)
- 		return ret;
- 
--	if (!npe_running(npe_c)) {
--		npe_load_firmware(npe_c, npe_name(npe_c), dev);
--	}
--
- 	/* buffer_pool will also be used to sometimes store the hmac,
- 	 * so assure it is large enough
- 	 */
-@@ -526,9 +501,62 @@ static void free_sa_dir(struct ix_sa_dir *dir)
- static int init_tfm(struct crypto_tfm *tfm)
- {
- 	struct ixp_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 msg[2] = { 0, 0 };
-+	static u32 image_id = 0;
-+	static DECLARE_MUTEX(firmware);
- 	int ret;
- 
-+	ret = down_interruptible(&firmware);
-+	if (ret != 0)
-+		return ret;
-+
-+	if (!npe_running(npe_c)) {
-+		ret = npe_load_firmware(npe_c, npe_name(npe_c), dev);
-+		if (ret) {
-+			up(&firmware);
-+			return ret;
-+		}
-+		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		image_id = msg[1];
-+	}
-+	if (!image_id) {
-+		if (npe_send_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
-+			goto npe_error;
-+
-+		image_id = msg[1];
-+	}
-+
-+	BUILD_BUG_ON(sizeof(struct crypt_ctl) != 64);
-+	if (!crypt_virt)
-+		crypt_virt = dma_alloc_coherent(dev,
-+			NPE_QLEN * sizeof(struct crypt_ctl),
-+			&crypt_phys, GFP_KERNEL);
-+	if (!crypt_virt)
-+		return -ENOMEM;
-+
-+	up(&firmware);
-+
- 	atomic_set(&ctx->configuring, 0);
-+	switch ((image_id>>16) & 0xff) {
-+		case 3:
-+			if (cipher_cfg_enc(tfm) & MOD_AES) {
-+				printk(KERN_ERR "Firmware of %s lacks AES "
-+					"support\n", npe_name(npe_c));
-+				return -ENODEV;
-+			}
-+		case 4:
-+		case 5:
-+			break;
-+		default:
-+			printk(KERN_ERR "Firmware of %s lacks crypto support\n",
-+				npe_name(npe_c));
-+			return -ENODEV;
-+	}
- 	ret = init_sa_dir(&ctx->encrypt);
- 	if (ret)
- 		return ret;
-@@ -537,6 +565,11 @@ static int init_tfm(struct crypto_tfm *tfm)
- 		free_sa_dir(&ctx->encrypt);
- 	}
- 	return ret;
-+
-+npe_error:
-+	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
-+	up(&firmware);
-+	return -EIO;
- }
- 
- static int init_tfm_ablk(struct crypto_tfm *tfm)
--- 
-1.5.6.5
+Attached is the output for my device.  The output is the same with or
+without the TALITOS driver (Except for the keys and the SPI values of course):
+# ip xfrm state
+src 192.168.1.1 dst 192.168.1.2
+	proto esp spi 0xcc0b06a6 reqid 1 mode tunnel
+	replay-window 32
+	auth hmac(sha256)
+0xffab7c320d8375cad9633af7c67d923df47183296b9eb8a25fca5c8e5670e8ac
+	enc cbc(aes) 0x1e918673fd34a1dbb52480e8587f656790194727114cddfdc5f41d19972c1649
+	sel src 0.0.0.0/0 dst 0.0.0.0/0
+src 192.168.1.2 dst 192.168.1.1
+	proto esp spi 0xc929ef13 reqid 1 mode tunnel
+	replay-window 32
+	auth hmac(sha256)
+0x2330715271fb3cb23e35bce99ef21c60e4c6a81d684533c2be114e6d1e85197e
+	enc cbc(aes) 0x1cc443b036fcf1aeb4d6e25da46e07681b513ea489816c507b32f0f79e1cbbc2
+	sel src 0.0.0.0/0 dst 0.0.0.0/0
+# ip xfrm policy
+src 0.0.0.0/0 dst 0.0.0.0/0
+	dir 3 priority 0
+src 0.0.0.0/0 dst 0.0.0.0/0
+	dir 4 priority 0
+src 0.0.0.0/0 dst 0.0.0.0/0
+	dir 3 priority 0
+src 0.0.0.0/0 dst 0.0.0.0/0
+	dir 4 priority 0
+src 0.0.0.0/0 dst 0.0.0.0/0
+	dir 3 priority 0
+src 10.201.0.0/16 dst 192.168.2.0/24
+	dir out priority 2840
+	tmpl src 192.168.1.1 dst 192.168.1.2
+		proto esp reqid 1 mode tunnel
+src 192.168.2.0/24 dst 10.201.0.0/16
+	dir in priority 2760
+	tmpl src 192.168.1.2 dst 192.168.1.1
+		proto esp reqid 1 mode tunnel
+src 192.168.2.0/24 dst 10.201.0.0/16
+	dir fwd priority 2760
+	tmpl src 192.168.1.2 dst 192.168.1.1
+		proto esp reqid 1 mode tunnel
 
+Thanks in advance for any help,
+
+Barry
