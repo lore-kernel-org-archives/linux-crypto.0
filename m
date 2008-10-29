@@ -1,54 +1,43 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v2
-Date: Tue, 28 Oct 2008 17:49:32 -0500
-Message-ID: <20081028174932.36f264c1.kim.phillips@freescale.com>
-References: <1225158336-8777-1-git-send-email-jhsiao@amcc.com>
-	<1225158932.4768.29.camel@jhsiao-usb>
+Subject: Re: Enabling Talitos kills all IPsec traffic
+Date: Tue, 28 Oct 2008 19:02:57 -0500
+Message-ID: <20081028190257.a0d5a6d8.kim.phillips@freescale.com>
+References: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: jhsiao@amcc.com
+Cc: linux-crypto@vger.kernel.org
+To: "Barry G" <mr.scada@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:61083 "EHLO
+Received: from az33egw02.freescale.net ([192.88.158.103]:36876 "EHLO
 	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752651AbYJ1Wkh (ORCPT
+	with ESMTP id S1753314AbYJ1Xwx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Oct 2008 18:40:37 -0400
-In-Reply-To: <1225158932.4768.29.camel@jhsiao-usb>
+	Tue, 28 Oct 2008 19:52:53 -0400
+In-Reply-To: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 27 Oct 2008 18:55:32 -0700
-James Hsiao <jhsiao@amcc.com> wrote:
+On Thu, 23 Oct 2008 16:12:22 -0700
+"Barry G" <mr.scada@gmail.com> wrote:
 
-> Hi All,
-> 
-> This patch was reviewed by Kim Phillips. 
-> Kim suggest us submit this to linuxppc-dev for more review.
+> I wanted to enable the Talitos driver for hw entropy.  If I rebuild
+> the kernel with
+> CONFIG_CRYPTO_DEV_TALITOS set to y, strongswan still successfully negotiates
+> an IPsec SA, but no traffic flows.
 
-Are you going to send it?
+does no traffic flow at all or is it all getting dropped?
 
-use of device_type usage in the dts and dma_ mapping operations getting
-passed NULL are just two examples of issues that are undergoing
-transition in powerpc arch.
+> Also, is it correct that Talitos only accelerates AEAD connections, not ESP/AH
+> protocols so there will be no performance increase for me until Strongswan
+> adds rfc5282 support?
 
-> > Signed-off-by: James Hsiao <jhsiao@amcc.com>
-> > ---
-> >  arch/powerpc/boot/dts/kilauea.dts       |   10 +-
-> >  drivers/crypto/Kconfig                  |    9 +
-> >  drivers/crypto/Makefile                 |    1 +
-> >  drivers/crypto/amcc/Makefile            |   27 +
-> >  drivers/crypto/amcc/crypto4xx_alg.c     |  404 ++++++++++
-> >  drivers/crypto/amcc/crypto4xx_core.c    | 1220 +++++++++++++++++++++++++++++++
-> >  drivers/crypto/amcc/crypto4xx_core.h    |  200 +++++
-> >  drivers/crypto/amcc/crypto4xx_reg_def.h |  291 ++++++++
-> >  drivers/crypto/amcc/crypto4xx_sa.c      |   98 +++
-> >  drivers/crypto/amcc/crypto4xx_sa.h      |  223 ++++++
+I'm not sure what you mean here; talitos supports aes-cbc but doesn't
+support aes-ccm nor aes-gcm.
 
-and please don't (a) top-post, and (b) leave the entire patch in your
-reply.
+> 	auth hmac(sha256)
+> 0xffab7c320d8375cad9633af7c67d923df47183296b9eb8a25fca5c8e5670e8ac
 
-Thanks,
+can you try hmac(sha1) until I get a decent setkey?
 
 Kim
