@@ -1,107 +1,54 @@
-From: "Barry G" <mr.scada@gmail.com>
-Subject: Re: Enabling Talitos kills all IPsec traffic
-Date: Wed, 29 Oct 2008 10:33:39 -0700
-Message-ID: <61362e760810291033i565bb105pe0c8056b8c5538d@mail.gmail.com>
-References: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
-	 <20081028190257.a0d5a6d8.kim.phillips@freescale.com>
+From: James Hsiao <jhsiao@amcc.com>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v2
+Date: Wed, 29 Oct 2008 16:05:24 -0700
+Message-ID: <1225321524.4841.58.camel@jhsiao-usb>
+References: <1225158336-8777-1-git-send-email-jhsiao@amcc.com>
+	 <1225158932.4768.29.camel@jhsiao-usb>
+	 <20081029131428.GA13501@Chamillionaire.breakpoint.cc>
+Reply-To: jhsiao@amcc.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "Kim Phillips" <kim.phillips@freescale.com>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from yw-out-2324.google.com ([74.125.46.31]:65406 "EHLO
-	yw-out-2324.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753802AbYJ2Rdk (ORCPT
+Received: from sdcmail02.amcc.com ([198.137.200.73]:17604 "EHLO
+	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758268AbYJ2XEJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Oct 2008 13:33:40 -0400
-Received: by yw-out-2324.google.com with SMTP id 9so38300ywe.1
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Oct 2008 10:33:39 -0700 (PDT)
-In-Reply-To: <20081028190257.a0d5a6d8.kim.phillips@freescale.com>
-Content-Disposition: inline
+	Wed, 29 Oct 2008 19:04:09 -0400
+In-Reply-To: <20081029131428.GA13501@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->> CONFIG_CRYPTO_DEV_TALITOS set to y, strongswan still successfully negotiates
->> an IPsec SA, but no traffic flows.
->
-> does no traffic flow at all or is it all getting dropped?
+I think the patch format in the email is incorrect, so the one go to
+linux-crypto was filtered out. And the one directly to Kim was received
+and Kim kindly reviewed....
 
-Unencrypted traffic still flows fine.  Sniffing traffic on the encrypted link,
-I see the ISAKMP SA init, but no ESP traffic flows after the link is
-established even though I have traffic that matches the policy happening.
+Thanks for review.
 
-The firewall is not dropping traffic, as all default filter chain
-policies are ACCEPT and
-I have no rules added.
+James
 
-Interesting enough, the counters for the INPUT, FORWARD, and OUTPUT chain
-all still increase even though no traffic leaves the device on the
-remote network pointing
-interface.
+On Wed, 2008-10-29 at 14:14 +0100, Sebastian Andrzej Siewior wrote:
+> * James Hsiao | 2008-10-27 18:55:32 [-0700]:
+> >Kim suggest us submit this to linuxppc-dev for more review.
+> so do I
+> 
+> >> 
+> >> diff --git a/arch/powerpc/boot/dts/kilauea.dts b/arch/powerpc/boot/dts/kilauea.dts
+> >> index dececc4..58b48a0 100644
+> >> --- a/arch/powerpc/boot/dts/kilauea.dts
+> >> +++ b/arch/powerpc/boot/dts/kilauea.dts
+> >> @@ -1,4 +1,4 @@
+> >> -/*
+> >> +/* 
+> >>   * Device Tree Source for AMCC Kilauea (405EX)
+> >>   *
+> Usually we are removing leading/trailing blanks. Not the other way
+> around. 
+> I haven't seen this change in the submit at Date: Fri, 19 Sep 2008
+> 16:46:43 -0700. Is this an updated version or does my mailbox leak
+> emails?
+> 
+> Sebastian
 
-It looks to me like the kernel gets the SA and still processes
-packets, but doesn't actually let them leave box.  The mangle and nat tables
-are empty, so I don't know what would stop the packet that late in the flow.
-
->
->> Also, is it correct that Talitos only accelerates AEAD connections, not ESP/AH
->> protocols so there will be no performance increase for me until Strongswan
->> adds rfc5282 support?
->
-> I'm not sure what you mean here; talitos supports aes-cbc but doesn't
-> support aes-ccm nor aes-gcm.
-The reason I ask is:
-# cat /proc/crypto | grep -i talitos
-driver       : authenc-hmac-md5-cbc-3des-talitos
-driver       : authenc-hmac-md5-cbc-aes-talitos
-driver       : authenc-hmac-sha256-cbc-3des-talitos
-driver       : authenc-hmac-sha256-cbc-aes-talitos
-driver       : authenc-hmac-sha1-cbc-3des-talitos
-driver       : authenc-hmac-sha1-cbc-aes-talitos
-
-All talitos drivers have the authenc prefix.  The aes-cbc entry in my
-crypto is:
-name         : cbc(aes)
-driver       : cbc(aes-generic)
-module       : kernel
-priority     : 100
-refcnt       : 1
-type         : blkcipher
-blocksize    : 16
-min keysize  : 16
-max keysize  : 32
-ivsize       : 16
-geniv        : <default>
-
-Since its priority isn't 3000 and its driver isn't a talitos driver, I figure
-it is software.   Disabling the software AES driver in the kernel
-results in an error
-from strongswan when it tries to add the SA to the kernel.
-
-> can you try hmac(sha1) until I get a decent setkey?
-Certainly.  I have reconfigured Strongswan to use AES-128 and SHA1:
-
-# ip xfrm state
-src 192.168.1.1 dst 192.168.1.2
-	proto esp spi 0xca44d182 reqid 1 mode tunnel
-	replay-window 32
-	auth hmac(sha1) 0x48eacafaaaeb134933642d83c44f2293c277810b
-	enc cbc(aes) 0x31f28f683a1e9774110abbafe462ac18
-	sel src 0.0.0.0/0 dst 0.0.0.0/0
-src 192.168.1.2 dst 192.168.1.1
-	proto esp spi 0xc5240eb5 reqid 1 mode tunnel
-	replay-window 32
-	auth hmac(sha1) 0xbdf7f26e1ee7339f98dd12c35c85e4af3b671ebc
-	enc cbc(aes) 0x49ffa621e1baf7921857f4fe1a8003e4
-	sel src 0.0.0.0/0 dst 0.0.0.0/0
-
-Moving to aes-128 and sha1 had no affect on the problem.
-Unsetting CONFIG_CRYPTO_DEV_TALITOS gives me ESP traffic
-and everything works as desired.
-
-FYI, my network is 10.201.0./16--192.168.1.1/24==192.168.1.2/24--192.168.2.0/24
-
-Thanks Kim!
-
-Barry
