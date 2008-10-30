@@ -1,54 +1,76 @@
-From: James Hsiao <jhsiao@amcc.com>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v2
-Date: Wed, 29 Oct 2008 16:05:24 -0700
-Message-ID: <1225321524.4841.58.camel@jhsiao-usb>
-References: <1225158336-8777-1-git-send-email-jhsiao@amcc.com>
-	 <1225158932.4768.29.camel@jhsiao-usb>
-	 <20081029131428.GA13501@Chamillionaire.breakpoint.cc>
-Reply-To: jhsiao@amcc.com
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: Enabling Talitos kills all IPsec traffic
+Date: Wed, 29 Oct 2008 19:40:01 -0500
+Message-ID: <20081029194001.1264cf20.kim.phillips@freescale.com>
+References: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
+	<20081028190257.a0d5a6d8.kim.phillips@freescale.com>
+	<61362e760810291033i565bb105pe0c8056b8c5538d@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org
+To: "Barry G" <mr.scada@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02.amcc.com ([198.137.200.73]:17604 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758268AbYJ2XEJ (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:55666 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751200AbYJ3A3u (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Oct 2008 19:04:09 -0400
-In-Reply-To: <20081029131428.GA13501@Chamillionaire.breakpoint.cc>
+	Wed, 29 Oct 2008 20:29:50 -0400
+In-Reply-To: <61362e760810291033i565bb105pe0c8056b8c5538d@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I think the patch format in the email is incorrect, so the one go to
-linux-crypto was filtered out. And the one directly to Kim was received
-and Kim kindly reviewed....
+On Wed, 29 Oct 2008 10:33:39 -0700
+"Barry G" <mr.scada@gmail.com> wrote:
 
-Thanks for review.
-
-James
-
-On Wed, 2008-10-29 at 14:14 +0100, Sebastian Andrzej Siewior wrote:
-> * James Hsiao | 2008-10-27 18:55:32 [-0700]:
-> >Kim suggest us submit this to linuxppc-dev for more review.
-> so do I
+> >> Also, is it correct that Talitos only accelerates AEAD connections, not ESP/AH
+> >> protocols so there will be no performance increase for me until Strongswan
+> >> adds rfc5282 support?
+> >
+> > I'm not sure what you mean here; talitos supports aes-cbc but doesn't
+> > support aes-ccm nor aes-gcm.
+> The reason I ask is:
+> # cat /proc/crypto | grep -i talitos
+> driver       : authenc-hmac-md5-cbc-3des-talitos
+> driver       : authenc-hmac-md5-cbc-aes-talitos
+> driver       : authenc-hmac-sha256-cbc-3des-talitos
+> driver       : authenc-hmac-sha256-cbc-aes-talitos
+> driver       : authenc-hmac-sha1-cbc-3des-talitos
+> driver       : authenc-hmac-sha1-cbc-aes-talitos
 > 
-> >> 
-> >> diff --git a/arch/powerpc/boot/dts/kilauea.dts b/arch/powerpc/boot/dts/kilauea.dts
-> >> index dececc4..58b48a0 100644
-> >> --- a/arch/powerpc/boot/dts/kilauea.dts
-> >> +++ b/arch/powerpc/boot/dts/kilauea.dts
-> >> @@ -1,4 +1,4 @@
-> >> -/*
-> >> +/* 
-> >>   * Device Tree Source for AMCC Kilauea (405EX)
-> >>   *
-> Usually we are removing leading/trailing blanks. Not the other way
-> around. 
-> I haven't seen this change in the submit at Date: Fri, 19 Sep 2008
-> 16:46:43 -0700. Is this an updated version or does my mailbox leak
-> emails?
+> All talitos drivers have the authenc prefix.  The aes-cbc entry in my
+> crypto is:
+> name         : cbc(aes)
+> driver       : cbc(aes-generic)
+> module       : kernel
+> priority     : 100
+> refcnt       : 1
+> type         : blkcipher
+> blocksize    : 16
+> min keysize  : 16
+> max keysize  : 32
+> ivsize       : 16
+> geniv        : <default>
 > 
-> Sebastian
+> Since its priority isn't 3000 and its driver isn't a talitos driver, I figure
+> it is software.   Disabling the software AES driver in the kernel
+> results in an error
+> from strongswan when it tries to add the SA to the kernel.
 
+Selecting talitos also selects CRYPTO_AUTHENC.  Can you try sending
+traffic with CRYPTO_DEV_TALITOS unset and CRYPTO_AUTHENC set if you
+haven't already?
+
+If Strongswan works with authenc and s/w crypto (talitos unset), and
+the SEC is firing interrupts (grep talitos /proc/interrupts), can you
+try with the latest cryptodev-2.6 git tree?  There's an error reporting
+fix for talitos there that may manifest any h/w the error may be
+reporting, depending on the level of traffic.
+
+Otherwise, if you still want to use Strongswan, you can keep talitos
+entropy support by commenting out the crypto algorithm registration
+section of talitos_probe().
+
+hth,
+
+Kim
