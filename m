@@ -1,58 +1,37 @@
-From: Eran Ben-Avi <eranpublic@yahoo.com>
-Subject: manual keying with OpenSwan 2.6.18
-Date: Wed, 5 Nov 2008 03:45:36 -0800 (PST)
-Message-ID: <671883.95768.qm@web62501.mail.re1.yahoo.com>
+From: Sebastian Andrzej Siewior <bigeasy@breakpoint.cc>
+Subject: Re: [PATCH] crypto: add test vectors for skein256/512/1024
+Date: Wed, 5 Nov 2008 22:27:48 +0100
+Message-ID: <20081105212748.GA4990@Chamillionaire.breakpoint.cc>
+References: <20081102161506.GA21940@havoc.gtf.org> <20081102201518.GA23620@Chamillionaire.breakpoint.cc> <490E5788.4080300@garzik.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from web62501.mail.re1.yahoo.com ([69.147.75.93]:24084 "HELO
-	web62501.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1754398AbYKELwS convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Nov 2008 06:52:18 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Jeff Garzik <jeff@garzik.org>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753334AbYKEV2U@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <490E5788.4080300@garzik.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+* Jeff Garzik | 2008-11-02 20:44:40 [-0500]:
 
-I'm using OpenSwan 2.6.18 with kernel 2.6.26.5 on ARM based system and =
-trying to run ipsec session with the following connection(ipsec.conf):
+> Sebastian Andrzej Siewior wrote:
+>> I grabed them from http://www.schneier.com/skein.html. The last test 
+>> vector
+>> (3) in every category is currently deactivated because it failed always.
+>> It is unlikely that I made a type because I copy+pasted the tables + vim
+>> magiced them. So maybe code may missbehave on requests lengths which are
+>> not a multiple of 4 or the vectors can not be used due to some other
+>> limitations that I've overseen.
 
-conn=A0test
-=A0=A0=A0 type=3Dtunnel
-=A0=A0=A0 authby=3Dsecret
-=A0=A0=A0 left=3D192.168.0.1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
-# Picks up our dynamic IP
-=A0=A0=A0 leftsubnet=3D192.167.0.0/16
-=A0=A0=A0 right=3D192.168.1.1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 # =
-Remote information
-=A0=A0=A0 rightsubnet=3D192.168.1.0/24
-=A0=A0=A0 auto=3Droute
-=A0=A0=A0 spi=3D0x668
-=A0=A0=A0 esp=3D3des-sha1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 # ESP enc/au=
-th algorithm (3des-md5-96/3des-sha1-96)
-=A0=A0=A0 espenckey=3D0x01234567_89abcdef_02468ace_13579bdf_12345678_9a=
-bcdef0
-=A0=A0=A0 espauthkey=3D0x12345678_9abcdef0_2468ace0_2468ace0_13579bdf
+Okay, that was a false positive :)
+The "untouched" reference implementation outputs the same hash. The
+additional information (tree, ...) is part of the third argument in
+Skein_XXX_InitExt() which isn't used. So we can safely drop the third
+test vector.
 
-when I start the ipsec service, the following message appears(refer to =
-spi parameter):
-can not load config '/etc/ipsec.conf': /etc/ipsec.conf:46: valid keywor=
-d, but value is not a number [0x668]
-=46ailed to parse config setup portion of ipsec.conf
+>
+> 	Jeff
 
-Did I miss something ?
-
-Thanks,
-Eran.
-
-
-
-     =20
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Sebastian
