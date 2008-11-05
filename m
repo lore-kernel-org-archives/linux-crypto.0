@@ -1,35 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: extend ansi_cprng to allow resetting of DT
-	value
-Date: Wed, 5 Nov 2008 12:13:53 +0800
-Message-ID: <20081105041353.GA19366@gondor.apana.org.au>
-References: <20081103212240.GB24888@hmsreliant.think-freely.org> <200811041604.24895.jarod@redhat.com>
+From: Eran Ben-Avi <eranpublic@yahoo.com>
+Subject: manual keying with OpenSwan 2.6.18
+Date: Wed, 5 Nov 2008 03:45:36 -0800 (PST)
+Message-ID: <671883.95768.qm@web62501.mail.re1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Neil Horman <nhorman@tuxdriver.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:37583 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752811AbYKEEOF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Nov 2008 23:14:05 -0500
-Content-Disposition: inline
-In-Reply-To: <200811041604.24895.jarod@redhat.com>
+Received: from web62501.mail.re1.yahoo.com ([69.147.75.93]:24084 "HELO
+	web62501.mail.re1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1754398AbYKELwS convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Nov 2008 06:52:18 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 04, 2008 at 04:04:24PM -0500, Jarod Wilson wrote:
-> 
-> Even better than my original version, since it lets providing a DT value be 
-> optional. Go ahead and slap this on there too:
-> 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+Hi,
 
-Applied to cryptodev.  Thanks everyone!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'm using OpenSwan 2.6.18 with kernel 2.6.26.5 on ARM based system and =
+trying to run ipsec session with the following connection(ipsec.conf):
+
+conn=A0test
+=A0=A0=A0 type=3Dtunnel
+=A0=A0=A0 authby=3Dsecret
+=A0=A0=A0 left=3D192.168.0.1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
+# Picks up our dynamic IP
+=A0=A0=A0 leftsubnet=3D192.167.0.0/16
+=A0=A0=A0 right=3D192.168.1.1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 # =
+Remote information
+=A0=A0=A0 rightsubnet=3D192.168.1.0/24
+=A0=A0=A0 auto=3Droute
+=A0=A0=A0 spi=3D0x668
+=A0=A0=A0 esp=3D3des-sha1=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 # ESP enc/au=
+th algorithm (3des-md5-96/3des-sha1-96)
+=A0=A0=A0 espenckey=3D0x01234567_89abcdef_02468ace_13579bdf_12345678_9a=
+bcdef0
+=A0=A0=A0 espauthkey=3D0x12345678_9abcdef0_2468ace0_2468ace0_13579bdf
+
+when I start the ipsec service, the following message appears(refer to =
+spi parameter):
+can not load config '/etc/ipsec.conf': /etc/ipsec.conf:46: valid keywor=
+d, but value is not a number [0x668]
+=46ailed to parse config setup portion of ipsec.conf
+
+Did I miss something ?
+
+Thanks,
+Eran.
+
+
+
+     =20
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
