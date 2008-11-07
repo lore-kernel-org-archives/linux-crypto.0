@@ -1,37 +1,58 @@
-From: Sebastian Andrzej Siewior <bigeasy@breakpoint.cc>
-Subject: Re: [PATCH] crypto: add test vectors for skein256/512/1024
-Date: Wed, 5 Nov 2008 22:27:48 +0100
-Message-ID: <20081105212748.GA4990@Chamillionaire.breakpoint.cc>
-References: <20081102161506.GA21940@havoc.gtf.org> <20081102201518.GA23620@Chamillionaire.breakpoint.cc> <490E5788.4080300@garzik.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [0/10] New crypto hash interface
+Date: Fri, 7 Nov 2008 16:35:36 +0800
+Message-ID: <20081107083536.GA10169@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Jeff Garzik <jeff@garzik.org>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753334AbYKEV2U@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:39114 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750952AbYKGIfk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 7 Nov 2008 03:35:40 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1KyMob-00067L-8O
+	for <linux-crypto@vger.kernel.org>; Fri, 07 Nov 2008 19:35:37 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1KyMoa-0002ju-Kn
+	for linux-crypto@vger.kernel.org; Fri, 07 Nov 2008 16:35:36 +0800
 Content-Disposition: inline
-In-Reply-To: <490E5788.4080300@garzik.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-* Jeff Garzik | 2008-11-02 20:44:40 [-0500]:
+Hi:
 
-> Sebastian Andrzej Siewior wrote:
->> I grabed them from http://www.schneier.com/skein.html. The last test 
->> vector
->> (3) in every category is currently deactivated because it failed always.
->> It is unlikely that I made a type because I copy+pasted the tables + vim
->> magiced them. So maybe code may missbehave on requests lengths which are
->> not a multiple of 4 or the vectors can not be used due to some other
->> limitations that I've overseen.
+The crc32c stuff finally tipped me over the edge into implementing
+the often-talked about sync hash interface.  Our hash interface
+backend has always been targeted towards software implementations
+in that it takes byte arrays instead of scatter lists.  However,
+the frontend has always been based on scatter lists.
 
-Okay, that was a false positive :)
-The "untouched" reference implementation outputs the same hash. The
-additional information (tree, ...) is part of the third argument in
-Skein_XXX_InitExt() which isn't used. So we can safely drop the third
-test vector.
+Now that we have the ahash frontend for asynchronous users, there
+is room for a synchronous interface that uses byte arrays only.
+This is now implemented as shash.
 
->
-> 	Jeff
+Furthermore, the shash interface also supports the simultaneous
+use of one tfm object by multiple threads, just like ahash.  This
+is accomplished by storing the hash state in a descriptor object
+passed in by the user.
 
-Sebastian
+One immediate benefit is that we'll be able to remove the locking
+that IPsec currently applies around the hash operation.
+
+As it stands the shash backend coexists with the hash/digest backend
+and algorithms implemented as shash will be available to the old
+hash frontend, but not vice versa.  The plan is to convert all
+software hash algorithms to the new interface (starting with
+crc32c), and then converting all hash/digest users to the new
+frontend.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
