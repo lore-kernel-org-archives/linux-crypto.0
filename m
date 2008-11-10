@@ -1,68 +1,39 @@
-From: Julia Lawall <julia@diku.dk>
-Subject: [PATCH 1/8] crypto/md4.c: use ARRAY_SIZE
-Date: Sun, 9 Nov 2008 17:54:15 +0100 (CET)
-Message-ID: <Pine.LNX.4.64.0811091753500.32509@ask.diku.dk>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: What is the difference between aead.ko and authenc.ko ?
+Date: Mon, 10 Nov 2008 14:50:39 +0800
+Message-ID: <E1KzQbf-0008LR-JT@gondolin.me.apana.org.au>
+References: <200811071027.21178.djenkins@mvista.com>
+Cc: linux-crypto@vger.kernel.org
+To: djenkins@mvista.com (Dean Jenkins)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:37594 "EHLO mgw2.diku.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755260AbYKIQyU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 9 Nov 2008 11:54:20 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:45372 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750912AbYKJGuq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Nov 2008 01:50:46 -0500
+In-Reply-To: <200811071027.21178.djenkins@mvista.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+Dean Jenkins <djenkins@mvista.com> wrote:
+> 
+> Can anyone explain the difference between aead.ko and authenc.ko ?
 
-ARRAY_SIZE is more concise to use when the size of an array is divided by
-the size of its type or the size of its first element.
+AEAD is a type of crypto algorithms, just like cipher or hash.
 
-The semantic patch that makes this change is as follows:
-(http://www.emn.fr/x-info/coccinelle/)
+Authenc is a particular AEAD algorithm, just like AES is a cipher
+or SHA is a hash.
 
-// <smpl>
-@i@
-@@
+> How does crypto decide to use aead.ko instead of authenc.ko ? I am guessing it 
+> is something to do with XFRM ?
 
-#include <linux/kernel.h>
+Well IPsec uses the AEAD interface so it loads the aead.ko due
+to symbol dependencies.  The authenc module is loaded if the
+user specifies a normal block cipher and hash algorithm.
 
-@depends on i using "paren.iso"@
-type T;
-T[] E;
-@@
-
-- (sizeof(E)/sizeof(T))
-+ ARRAY_SIZE(E)
-// </smpl>
-
-Signed-off-by: Julia Lawall <julia@diku.dk>
-
----
- crypto/md4.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/md4.c b/crypto/md4.c
-index 3c19aa0..a143c4a 100644
---- a/crypto/md4.c
-+++ b/crypto/md4.c
-@@ -148,7 +148,7 @@ static void md4_transform(u32 *hash, u32 const *in)
- 
- static inline void md4_transform_helper(struct md4_ctx *ctx)
- {
--	le32_to_cpu_array(ctx->block, sizeof(ctx->block) / sizeof(u32));
-+	le32_to_cpu_array(ctx->block, ARRAY_SIZE(ctx->block));
- 	md4_transform(ctx->hash, ctx->block);
- }
- 
-@@ -214,7 +214,7 @@ static void md4_final(struct crypto_tfm *tfm, u8 *out)
- 	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
- 	                  sizeof(u64)) / sizeof(u32));
- 	md4_transform(mctx->hash, mctx->block);
--	cpu_to_le32_array(mctx->hash, sizeof(mctx->hash) / sizeof(u32));
-+	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
- 	memcpy(out, mctx->hash, sizeof(mctx->hash));
- 	memset(mctx, 0, sizeof(*mctx));
- }
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
