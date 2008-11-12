@@ -1,59 +1,51 @@
-From: "Barry G" <mr.scada@gmail.com>
-Subject: Re: Enabling Talitos kills all IPsec traffic
-Date: Wed, 12 Nov 2008 13:06:55 -0800
-Message-ID: <61362e760811121306u5dc47da4o6f71dacb3f86bd21@mail.gmail.com>
-References: <61362e760810231612s6fe4dfbfk1c63986881d7152e@mail.gmail.com>
-	 <20081028190257.a0d5a6d8.kim.phillips@freescale.com>
-	 <61362e760810291033i565bb105pe0c8056b8c5538d@mail.gmail.com>
-	 <20081029194001.1264cf20.kim.phillips@freescale.com>
-	 <61362e760810300958p70d96138xbadd42a53a6f4abc@mail.gmail.com>
-	 <61362e760810301606y3ca2e6ffr669e020e27b9fa71@mail.gmail.com>
-	 <E036452DB507994DAF931ADC4A56AE2002BA6DFC@az33exm25.fsl.freescale.net>
-	 <61362e760810302317t1b70a31bs5340c9d74a62900d@mail.gmail.com>
+From: Tobias Geiger <tobias.geiger@vido.info>
+Subject: Re: dm-crypt using hifn_795x - still broken
+Date: Wed, 12 Nov 2008 23:36:49 +0100
+Message-ID: <200811122336.49835.tobias.geiger@vido.info>
+References: <200811121710.41666.tobias.geiger@vido.info> <200811122043.06790.tobias.geiger@vido.info> <20081112205121.GB7854@ioremap.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Cc: "Phillips Kim-R1AAHA" <Kim.Phillips@freescale.com>,
-	linux-crypto@vger.kernel.org
-To: "Nipper Lee" <Lee.Nipper@freescale.com>
+Cc: linux-crypto@vger.kernel.org
+To: Evgeniy Polyakov <zbr@ioremap.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from yx-out-2324.google.com ([74.125.44.28]:56165 "EHLO
-	yx-out-2324.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753989AbYKLVG4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Nov 2008 16:06:56 -0500
-Received: by yx-out-2324.google.com with SMTP id 8so289447yxm.1
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Nov 2008 13:06:55 -0800 (PST)
-In-Reply-To: <61362e760810302317t1b70a31bs5340c9d74a62900d@mail.gmail.com>
+Received: from www.vido.info ([78.47.43.171]:52516 "EHLO mail.vido.info"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750933AbYKLWg7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Nov 2008 17:36:59 -0500
+In-Reply-To: <20081112205121.GB7854@ioremap.net>
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->>> # grep talitos /proc/interrupts
->>>  24:          0   IPIC   Level     talitos
->>>
->>> What could cause this?
->>>
+Hi Evgeniy
 
-Doh!  After playing around for a few days, I figured it out:
->From the DTS File:
-crypto@30000 {
+it works! for the first time i have this card, it actually does something 
+useful ;) Thanks a lot so far!
+
+Problem now is, it eates up all my cpu somehow - i.e. my system now generates 
+hi/si 98% of the time, everything feels ~200% slower than "normal"
+
+Greetings and many thanks for your efforts
+Tobias
+
+Am Mittwoch, 12. November 2008 schrieb Evgeniy Polyakov:
+> On Wed, Nov 12, 2008 at 08:43:06PM +0100, Tobias Geiger 
+(tobias.geiger@vido.info) wrote:
+> > Hello Evgeniy,
+> >
+> > i tried that, know it just hangs while mounting the decrypted device. No
+> > special dmesg error or anything.:
+>
+> Please try attached patch against vanilla driver.
+> Likely I messed up with ring size.
+>
+> diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+> index 4d22b21..c743cfc 100644
+> --- a/drivers/crypto/hifn_795x.c
+> +++ b/drivers/crypto/hifn_795x.c
+> @@ -38,9 +38,6 @@
+>
+>  #include <asm/kmap_types.h>
 ...
-interrupts = <0x11 0x8>;
-...
-};
-
-Turns out SEC is Interrupt ID 11, which is 0xb or 11, but not 0x11.  Not
-sure how that got into there.
-
-Changing the DTS file results in a firing interrupt and HW accelerated
-crypto traffic.
-
-For the record, both IKEv1 and IKEv2 traffic works fine.  On my
-test network between two 8347 devices we are getting ~44 Mbit throughput using
-SHA256 and AES256.  Switching to SHA1 and AES128 gives me ~ 49 Mbit throughput
-(half duplex, iperf reported).
-
-Thanks Herbert, Kim, Lee,
-
-Barry
