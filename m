@@ -1,42 +1,42 @@
-From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: Re: dm-crypt using hifn_795x - still broken
-Date: Wed, 12 Nov 2008 19:20:10 +0300
-Message-ID: <20081112162009.GA2051@ioremap.net>
-References: <200811121710.41666.tobias.geiger@vido.info>
+From: Tobias Geiger <tobias.geiger@vido.info>
+Subject: dm-crypt using hifn_795x - still broken
+Date: Wed, 12 Nov 2008 17:10:41 +0100
+Message-ID: <200811121710.41666.tobias.geiger@vido.info>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Tobias Geiger <tobias.geiger@vido.info>
+To: zbr@ioremap.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from netgear.net.ru ([195.178.208.66]:46460 "EHLO tservice.net.ru"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1751206AbYKLQUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Nov 2008 11:20:16 -0500
+Received: from www.vido.info ([78.47.43.171]:45056 "EHLO mail.vido.info"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752198AbYKLQoG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Nov 2008 11:44:06 -0500
 Content-Disposition: inline
-In-Reply-To: <200811121710.41666.tobias.geiger@vido.info>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Tobias.
+Hi,
 
-On Wed, Nov 12, 2008 at 05:10:41PM +0100, Tobias Geiger (tobias.geiger@vido.info) wrote:
-> hifn0: r: 00000000, active: 0, started: 20, success: 4247: qlen: 0/1, reset: 
-> 1.
+i tested 2.6.28-rc4 with the patch from 
+http://marc.info/?l=linux-crypto-vger&m=122643041300555&w=2
 
-Please try to disable watchdog for now, its logic to detect stall
-hardware is a bit subtle:
+but i get the following error, as soon as i try to mount the de-crypted 
+dm-cypt-block device (cryptsetup luksOpen however works):
 
---- drivers/crypto/hifn_795x.c~	2008-11-12 19:20:18.000000000 +0300
-+++ drivers/crypto/hifn_795x.c	2008-11-12 19:20:50.000000000 +0300
-@@ -2689,7 +2689,7 @@
- 		goto err_out_unregister_rng;
- 
- 	INIT_DELAYED_WORK(&dev->work, hifn_work);
--	schedule_delayed_work(&dev->work, HZ);
-+	//schedule_delayed_work(&dev->work, HZ);
- 
- 	dprintk("HIFN crypto accelerator card at %s has been "
- 			"successfully registered as %s.\n",
+hifn0: r: 00000000, active: 0, started: 20, success: 4247: qlen: 0/1, reset: 
+1.
+hifn795x: assuming 66MHz clock speed, override with 
+hifn_pll_ref=ext<frequency>
+I/O error in filesystem ("dm-0") meta-data dev dm-0 block 0x1c88d6fb       
+("xlog_bread")
+error 5 buf count 2097152
+XFS: failed to find log head
+XFS: log mount/recovery failed: error 5
+XFS: log mount failed
 
--- 
-	Evgeniy Polyakov
+tell me if you need more info for debugging this.
+
+Thanks for your efforts!
+Tobias
