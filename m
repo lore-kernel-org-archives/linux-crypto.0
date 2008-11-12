@@ -1,97 +1,90 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH] crypto: ansi_cprng: avoid incorrect extra call to
-	_get_more_prng_bytes
-Date: Wed, 12 Nov 2008 14:58:29 -0500
-Message-ID: <20081112195829.GA10601@hmsreliant.think-freely.org>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: [PATCH] crypto: ansi_cprng: avoid incorrect extra call to _get_more_prng_bytes
+Date: Wed, 12 Nov 2008 15:00:43 -0500
+Message-ID: <200811121500.44044.jarod@redhat.com>
 References: <200811121452.59789.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Neil Horman <nhorman@tuxdriver.com>, herbert@gondor.apana.org.au,
 	davem@davemloft.net, linux-kernel@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:60475 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754203AbYKLUAh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Nov 2008 15:00:37 -0500
-Content-Disposition: inline
+Received: from mx2.redhat.com ([66.187.237.31]:32998 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753547AbYKLUBL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Nov 2008 15:01:11 -0500
 In-Reply-To: <200811121452.59789.jarod@redhat.com>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 12, 2008 at 02:52:59PM -0500, Jarod Wilson wrote:
+On Wednesday 12 November 2008 14:52:59 Jarod Wilson wrote:
 > While working with some FIPS RNGVS test vectors yesterday, I discovered a
 > little bug in the way the ansi_cprng code works right now.
-> 
+>
 > For example, the following test vector (complete with expected result)
 > from http://csrc.nist.gov/groups/STM/cavp/documents/rng/RNGVS.pdf ...
-> 
+>
 > Key = f3b1666d13607242ed061cabb8d46202
 > DT = e6b3be782a23fa62d71d4afbb0e922fc
 > V = f0000000000000000000000000000000
 > R = 88dda456302423e5f69da57e7b95c73a
-> 
+>
 > ...when run through ansi_cprng, yields an incorrect R value
 > of e2afe0d794120103d6e86a2b503bdfaa.
-> 
+>
 > If I load up ansi_cprng w/dbg=1 though, it was fairly obvious what was
 > going wrong:
-> 
+>
 > ----8<----
 > getting 16 random bytes for context ffff810033fb2b10
 > Calling _get_more_prng_bytes for context ffff810033fb2b10
-> Input DT: 00000000: e6 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> Input I: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-> Input V: 00000000: f0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-> tmp stage 0: 00000000: e6 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> tmp stage 1: 00000000: f4 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84 
-> tmp stage 2: 00000000: 8c 53 6f 73 a4 1a af d4 20 89 68 f4 58 64 f8 be 
+> Input DT: 00000000: e6 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> Input I: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> Input V: 00000000: f0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> tmp stage 0: 00000000: e6 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> tmp stage 1: 00000000: f4 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84
+> tmp stage 2: 00000000: 8c 53 6f 73 a4 1a af d4 20 89 68 f4 58 64 f8 be
 > Returning new block for context ffff810033fb2b10
-> Output DT: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> Output I: 00000000: 04 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84 
-> Output V: 00000000: 48 89 3b 71 bc e4 00 b6 5e 21 ba 37 8a 0a d5 70 
-> New Random Data: 00000000: 88 dd a4 56 30 24 23 e5 f6 9d a5 7e 7b 95 c7 3a 
+> Output DT: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> Output I: 00000000: 04 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84
+> Output V: 00000000: 48 89 3b 71 bc e4 00 b6 5e 21 ba 37 8a 0a d5 70
+> New Random Data: 00000000: 88 dd a4 56 30 24 23 e5 f6 9d a5 7e 7b 95 c7 3a
 > Calling _get_more_prng_bytes for context ffff810033fb2b10
-> Input DT: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> Input I: 00000000: 04 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84 
-> Input V: 00000000: 48 89 3b 71 bc e4 00 b6 5e 21 ba 37 8a 0a d5 70 
-> tmp stage 0: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> tmp stage 1: 00000000: 80 6b 3a 8c 23 ae 8f 53 be 71 4c 16 fc 13 b2 ea 
-> tmp stage 2: 00000000: 2a 4d e1 2a 0b 58 8e e6 36 b8 9c 0a 26 22 b8 30 
+> Input DT: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> Input I: 00000000: 04 8e cb 25 94 3e 8c 31 d6 14 cd 8a 23 f1 3f 84
+> Input V: 00000000: 48 89 3b 71 bc e4 00 b6 5e 21 ba 37 8a 0a d5 70
+> tmp stage 0: 00000000: e7 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> tmp stage 1: 00000000: 80 6b 3a 8c 23 ae 8f 53 be 71 4c 16 fc 13 b2 ea
+> tmp stage 2: 00000000: 2a 4d e1 2a 0b 58 8e e6 36 b8 9c 0a 26 22 b8 30
 > Returning new block for context ffff810033fb2b10
-> Output DT: 00000000: e8 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc 
-> Output I: 00000000: c8 e2 01 fd 9f 4a 8f e5 e0 50 f6 21 76 19 67 9a 
-> Output V: 00000000: ba 98 e3 75 c0 1b 81 8d 03 d6 f8 e2 0c c6 54 4b 
-> New Random Data: 00000000: e2 af e0 d7 94 12 01 03 d6 e8 6a 2b 50 3b df aa 
+> Output DT: 00000000: e8 b3 be 78 2a 23 fa 62 d7 1d 4a fb b0 e9 22 fc
+> Output I: 00000000: c8 e2 01 fd 9f 4a 8f e5 e0 50 f6 21 76 19 67 9a
+> Output V: 00000000: ba 98 e3 75 c0 1b 81 8d 03 d6 f8 e2 0c c6 54 4b
+> New Random Data: 00000000: e2 af e0 d7 94 12 01 03 d6 e8 6a 2b 50 3b df aa
 > returning 16 from get_prng_bytes in context ffff810033fb2b10
 > ----8<----
-> 
+>
 > The expected result is there, in the first "New Random Data", but we're
-> incorrectly making a second call to _get_more_prng_bytes, due to some checks
-> that are slightly off, which resulted in our original bytes never being
-> returned anywhere.
-> 
+> incorrectly making a second call to _get_more_prng_bytes, due to some
+> checks that are slightly off, which resulted in our original bytes never
+> being returned anywhere.
+>
 > One approach to fixing this would be to alter some byte_count checks in
 > get_prng_bytes, but it would mean the last DEFAULT_BLK_SZ bytes would be
 > copied a byte at a time, rather than in a single memcpy, so a slightly more
-> involved, equally functional, and ultimately more efficient way of fixing this
-> was suggested to me by Neil, which I'm submitting here. All of the RNGVS ANSI
-> X9.31 AES128 VST test vectors I've passed through ansi_cprng are now returning
-> the expected results with this change.
-> 
-> ---
-> 
+> involved, equally functional, and ultimately more efficient way of fixing
+> this was suggested to me by Neil, which I'm submitting here. All of the
+> RNGVS ANSI X9.31 AES128 VST test vectors I've passed through ansi_cprng are
+> now returning the expected results with this change.
 
-I went over this with Jarod.  Its a good fix.
+D'oh. Forgot this:
 
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
-
-
-Neil
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
 
 -- 
-/****************************************************
- * Neil Horman <nhorman@tuxdriver.com>
- * Software Engineer, Red Hat
- ****************************************************/
+Jarod Wilson
+jarod@redhat.com
+
