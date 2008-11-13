@@ -1,67 +1,75 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH linux-next] : Tree for November 12 (libcrc32c)
-Date: Thu, 13 Nov 2008 22:09:28 +0800
-Message-ID: <20081113140928.GC31608@gondor.apana.org.au>
-References: <20081112182818.6e259488.sfr@canb.auug.org.au> <20081112130105.430c47e4.randy.dunlap@oracle.com>
+From: Josh Boyer <jwboyer@linux.vnet.ibm.com>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v3]
+Date: Thu, 13 Nov 2008 11:13:01 -0500
+Message-ID: <20081113111301.32acf396@zod.rchland.ibm.com>
+References: <1226097047.5078.23.camel@jhsiao-usb>
+	<20081112183359.2ba1e894.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	akpm <akpm@linux-foundation.org>, linux-crypto@vger.kernel.org,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	davem@davemloft.net
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Return-path: <linux-next-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20081112130105.430c47e4.randy.dunlap@oracle.com>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: jhsiao@amcc.com, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e1.ny.us.ibm.com ([32.97.182.141]:57884 "EHLO e1.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751160AbYKMQN0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 13 Nov 2008 11:13:26 -0500
+Received: from d01relay06.pok.ibm.com (d01relay06.pok.ibm.com [9.56.227.116])
+	by e1.ny.us.ibm.com (8.13.1/8.13.1) with ESMTP id mADGDG6c014403
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 11:13:16 -0500
+Received: from d03av03.boulder.ibm.com (d03av03.boulder.ibm.com [9.17.195.169])
+	by d01relay06.pok.ibm.com (8.13.8/8.13.8/NCO v9.1) with ESMTP id mADGDIOx466986
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 11:13:19 -0500
+Received: from d03av03.boulder.ibm.com (loopback [127.0.0.1])
+	by d03av03.boulder.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id mADGD8Uw009763
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 09:13:09 -0700
+In-Reply-To: <20081112183359.2ba1e894.kim.phillips@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 12, 2008 at 01:01:05PM -0800, Randy Dunlap wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
+On Wed, 12 Nov 2008 18:33:59 -0600
+Kim Phillips <kim.phillips@freescale.com> wrote:
+
+> On Fri, 07 Nov 2008 14:30:47 -0800
+> James Hsiao <jhsiao@amcc.com> wrote:
+> > + * Changes:
+> > + *	James Hsiao:	10/04/08
+> > + *			replace global variable lsec_core with data in
+> > + *			in struct device.
+> > + *			add parameter to various functions due to
+> > + *			to remove of global variable lsec_core
+> > + *			crypto4xx_alloc_sa now return error code.
+> > + *			not using PVR to identify which CPU, using DTS.
+> > + *			move this into the probe function.
+> > + *			pass struct device pointer to dma_alloc_coherent
+> > + *			and dma_free_coherent functions.
+> > + *			make function static where ever is possible.
+> > + *			remove crypto4xx_start_device.
+> > + *			remove crypt4xx_setup_crypto.
+> > + *			in crypto4xx_crypt_remove add kill tasklet.
+> > + *			in crypto4xx_stop_all unmap ce_base and free core_dev.
+> > + *			add lock to all get/put pd/sd/gd functions.
+> > + *			change PPC4XX_SEC_VERSION_STR to "0.3"
 > 
-> libcrc32c uses CRYPTO interfaces so it should depend on CRYPTO.
+> no changes list please.
+
+If you want to do a changelog for the patch itself to describe the
+differences between patch v2 and v3 and so-on, that is fine and actually
+very helpful to reviewers. Just do it after the commit log of the
+patch, but outside of the actual patch itself.
+
+> ..this is the type of reason why linuxppc-dev must be cc'd on this
+> patch; one is supposed to dynamically allocate and populate the
+> descriptor for the h/w, then grab the queue lock, quickly instruct the
+> h/w where to find it, and then immediately release it.  This is covered
+> in the Linux Device Drivers book, and further details can be found under
+> Documentation/, see e.g. spinlocks.txt.
 > 
-> crypto/built-in.o: In function `crc32c_mod_init':
-> crc32c.c:(.init.text+0xc): undefined reference to `crypto_register_shash'
-> crypto/built-in.o: In function `crc32c_mod_fini':
-> crc32c.c:(.exit.text+0xc): undefined reference to `crypto_unregister_shash'
-> lib/built-in.o: In function `crc32c':
-> (.text+0xfcf9): undefined reference to `crypto_shash_update'
-> lib/built-in.o: In function `libcrc32c_mod_init':
-> libcrc32c.c:(.init.text+0x666): undefined reference to `crypto_alloc_shash'
-> lib/built-in.o: In function `libcrc32c_mod_fini':
-> libcrc32c.c:(.exit.text+0xc): undefined reference to `crypto_free_tfm'
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+> I recommend you seek to get Josh Boyer's (amcc maintainer) acceptance
+> of this patch.
 
-Thanks, I've fixed it as follows:
+Fixing the things Kim highlighted would be a good start.  And please CC
+me, or at least linuxppc-dev, on future revisions.
 
-commit d9cc217c79df50f9a9f7937aeaa54d89ae198686
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Thu Nov 13 22:05:13 2008 +0800
-
-    libcrc32c: Select CRYPTO in Kconfig
-    
-    Selecting CRYPTO_CRC32C is not enough as CRYPTO which CRYPTO_CRC32C
-    depends on may be disabled.  This patch adds the select on CRYPTO.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/lib/Kconfig b/lib/Kconfig
-index d09edb7..963009a 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -64,6 +64,7 @@ config CRC7
- 
- config LIBCRC32C
- 	tristate "CRC32c (Castagnoli, et al) Cyclic Redundancy-Check"
-+	select CRYPTO
- 	select CRYPTO_CRC32C
- 	help
- 	  This option is provided for the case where no in-kernel-tree
-
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+josh
