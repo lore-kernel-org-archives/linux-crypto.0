@@ -1,27 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v3]
-Date: Thu, 13 Nov 2008 21:17:32 +0800
-Message-ID: <20081113131732.GA31608@gondor.apana.org.au>
-References: <1226097047.5078.23.camel@jhsiao-usb>
+Subject: Re: [PATCH 1/8] crypto/md4.c: use ARRAY_SIZE
+Date: Thu, 13 Nov 2008 21:19:18 +0800
+Message-ID: <20081113131918.GB31608@gondor.apana.org.au>
+References: <Pine.LNX.4.64.0811091753500.32509@ask.diku.dk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: James Hsiao <jhsiao@amcc.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Julia Lawall <julia@diku.dk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47394 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:35789 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752306AbYKMNRg (ORCPT
+	with ESMTP id S1751658AbYKMNTZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Nov 2008 08:17:36 -0500
+	Thu, 13 Nov 2008 08:19:25 -0500
 Content-Disposition: inline
-In-Reply-To: <1226097047.5078.23.camel@jhsiao-usb>
+In-Reply-To: <Pine.LNX.4.64.0811091753500.32509@ask.diku.dk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 07, 2008 at 02:30:47PM -0800, James Hsiao wrote:
-> Hi Herbert,
+On Sun, Nov 09, 2008 at 05:54:15PM +0100, Julia Lawall wrote:
+> From: Julia Lawall <julia@diku.dk>
 > 
-> This is patch version 3 of AMCC's security device driver.
+> ARRAY_SIZE is more concise to use when the size of an array is divided by
+> the size of its type or the size of its first element.
 
 Applied to cryptodev.  Thanks!
 -- 
