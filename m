@@ -1,75 +1,69 @@
-From: Josh Boyer <jwboyer@linux.vnet.ibm.com>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v3]
-Date: Thu, 13 Nov 2008 11:13:01 -0500
-Message-ID: <20081113111301.32acf396@zod.rchland.ibm.com>
-References: <1226097047.5078.23.camel@jhsiao-usb>
-	<20081112183359.2ba1e894.kim.phillips@freescale.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto: ansi_cprng: fix inverted DT increment routine
+Date: Thu, 13 Nov 2008 11:36:11 -0500
+Message-ID: <200811131136.15875.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: jhsiao@amcc.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: Neil Horman <nhorman@tuxdriver.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e1.ny.us.ibm.com ([32.97.182.141]:57884 "EHLO e1.ny.us.ibm.com"
+Received: from mx2.redhat.com ([66.187.237.31]:50973 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751160AbYKMQN0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Nov 2008 11:13:26 -0500
-Received: from d01relay06.pok.ibm.com (d01relay06.pok.ibm.com [9.56.227.116])
-	by e1.ny.us.ibm.com (8.13.1/8.13.1) with ESMTP id mADGDG6c014403
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 11:13:16 -0500
-Received: from d03av03.boulder.ibm.com (d03av03.boulder.ibm.com [9.17.195.169])
-	by d01relay06.pok.ibm.com (8.13.8/8.13.8/NCO v9.1) with ESMTP id mADGDIOx466986
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 11:13:19 -0500
-Received: from d03av03.boulder.ibm.com (loopback [127.0.0.1])
-	by d03av03.boulder.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id mADGD8Uw009763
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Nov 2008 09:13:09 -0700
-In-Reply-To: <20081112183359.2ba1e894.kim.phillips@freescale.com>
+	id S1751198AbYKMQgb convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 13 Nov 2008 11:36:31 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 12 Nov 2008 18:33:59 -0600
-Kim Phillips <kim.phillips@freescale.com> wrote:
+The ANSI X9.31 PRNG docs aren't particularly clear on how to increment DT,
+but empirical testing shows we're incrementing from the wrong end. A 10,000
+iteration Monte Carlo RNG test currently winds up not getting the expected
+result.
 
-> On Fri, 07 Nov 2008 14:30:47 -0800
-> James Hsiao <jhsiao@amcc.com> wrote:
-> > + * Changes:
-> > + *	James Hsiao:	10/04/08
-> > + *			replace global variable lsec_core with data in
-> > + *			in struct device.
-> > + *			add parameter to various functions due to
-> > + *			to remove of global variable lsec_core
-> > + *			crypto4xx_alloc_sa now return error code.
-> > + *			not using PVR to identify which CPU, using DTS.
-> > + *			move this into the probe function.
-> > + *			pass struct device pointer to dma_alloc_coherent
-> > + *			and dma_free_coherent functions.
-> > + *			make function static where ever is possible.
-> > + *			remove crypto4xx_start_device.
-> > + *			remove crypt4xx_setup_crypto.
-> > + *			in crypto4xx_crypt_remove add kill tasklet.
-> > + *			in crypto4xx_stop_all unmap ce_base and free core_dev.
-> > + *			add lock to all get/put pd/sd/gd functions.
-> > + *			change PPC4XX_SEC_VERSION_STR to "0.3"
-> 
-> no changes list please.
+>From http://csrc.nist.gov/groups/STM/cavp/documents/rng/RNGVS.pdf :
 
-If you want to do a changelog for the patch itself to describe the
-differences between patch v2 and v3 and so-on, that is fine and actually
-very helpful to reviewers. Just do it after the commit log of the
-patch, but outside of the actual patch itself.
+# CAVS 4.3
+# ANSI931 MCT
+[X9.31]
+[AES 128-Key]
 
-> ..this is the type of reason why linuxppc-dev must be cc'd on this
-> patch; one is supposed to dynamically allocate and populate the
-> descriptor for the h/w, then grab the queue lock, quickly instruct the
-> h/w where to find it, and then immediately release it.  This is covered
-> in the Linux Device Drivers book, and further details can be found under
-> Documentation/, see e.g. spinlocks.txt.
-> 
-> I recommend you seek to get Josh Boyer's (amcc maintainer) acceptance
-> of this patch.
+COUNT = 0
+Key = 9f5b51200bf334b5d82be8c37255c848
+DT = 6376bbe52902ba3b67c925fa701f11ac
+V = 572c8e76872647977e74fbddc49501d1
+R = 48e9bd0d06ee18fbe45790d5c3fc9b73
 
-Fixing the things Kim highlighted would be a good start.  And please CC
-me, or at least linuxppc-dev, on future revisions.
+Currently, we get 0dd08496c4f7178bfa70a2161a79459a after 10000 loops.
 
-josh
+Inverting the DT increment routine results in us obtaining the expected result
+of 48e9bd0d06ee18fbe45790d5c3fc9b73. Verified on both x86_64 and ppc64.
+
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+
+---
+
+ crypto/ansi_cprng.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index 486aa93..a7c703d 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -161,7 +161,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx)
+ 	/*
+ 	 * Now update our DT value
+ 	 */
+-	for (i = 0; i < DEFAULT_BLK_SZ; i++) {
++	for (i = DEFAULT_BLK_SZ - 1; i >= 0; i--) {
+ 		ctx->DT[i] += 1;
+ 		if (ctx->DT[i] != 0)
+ 			break;
+
+-- 
+Jarod Wilson
+jarod@redhat.com
+
