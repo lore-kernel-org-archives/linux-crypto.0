@@ -1,105 +1,71 @@
 From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: [PATCH] Remove some unused cruft.
-Date: Wed, 19 Nov 2008 17:03:32 +0300
-Message-ID: <1227103414231-git-send-email-zbr@ioremap.net>
+Subject: [PATCH] Have HW invalidate src and dest descriptors after processing
+Date: Wed, 19 Nov 2008 17:03:27 +0300
+Message-ID: <12271034131753-git-send-email-zbr@ioremap.net>
 References: <12271034133347-git-send-email-zbr@ioremap.net>
  <12271034132587-git-send-email-zbr@ioremap.net>
- <12271034131753-git-send-email-zbr@ioremap.net>
- <1227103414646-git-send-email-zbr@ioremap.net>
- <1227103414418-git-send-email-zbr@ioremap.net>
- <12271034142436-git-send-email-zbr@ioremap.net>
- <12271034143351-git-send-email-zbr@ioremap.net>
 Cc: linux-crypto@vger.kernel.org, Patrick McHardy <kaber@trash.net>,
 	Evgeniy Polyakov <zbr@ioremap.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zbr.yandex.ru ([213.180.219.33]:37378 "EHLO gavana.yandex.ru"
+Received: from zbr.yandex.ru ([213.180.219.33]:37392 "EHLO gavana.yandex.ru"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753979AbYKSOHy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2008 09:07:54 -0500
-In-Reply-To: <12271034143351-git-send-email-zbr@ioremap.net>
+	id S1753978AbYKSOH5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Nov 2008 09:07:57 -0500
+In-Reply-To: <12271034132587-git-send-email-zbr@ioremap.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Patrick McHardy <kaber@trash.net>
 
+The descriptors need to be invalidated after processing for ring
+cleanup to work properly and to avoid using an old destination
+descriptor when the src and cmd descriptors are already set up
+and the dst descriptor isn't.
+
 Signed-off-by: Patrick McHardy <kaber@trash.net>
 Signed-off-by: Evgeniy Polyakov <zbr@ioremap.net>
 ---
- drivers/crypto/hifn_795x.c |   32 +-------------------------------
- 1 files changed, 1 insertions(+), 31 deletions(-)
+ drivers/crypto/hifn_795x.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 47952d8..73aef49 100644
+index 320d08d..4d22b21 100644
 --- a/drivers/crypto/hifn_795x.c
 +++ b/drivers/crypto/hifn_795x.c
-@@ -38,9 +38,6 @@
+@@ -1296,7 +1296,7 @@ static int hifn_setup_src_desc(struct hifn_device *dev, struct page *page,
  
- #include <asm/kmap_types.h>
+ 	dma->srcr[idx].p = __cpu_to_le32(addr);
+ 	dma->srcr[idx].l = __cpu_to_le32(size | HIFN_D_VALID |
+-			HIFN_D_MASKDONEIRQ | HIFN_D_NOINVALID | HIFN_D_LAST);
++			HIFN_D_MASKDONEIRQ | HIFN_D_LAST);
  
--#undef dprintk
--
--#define HIFN_TEST
- //#define HIFN_DEBUG
- 
- #ifdef HIFN_DEBUG
-@@ -406,8 +403,6 @@ struct hifn_dma {
- 	u8			command_bufs[HIFN_D_CMD_RSIZE][HIFN_MAX_COMMAND];
- 	u8			result_bufs[HIFN_D_CMD_RSIZE][HIFN_MAX_RESULT];
- 
--	u64			test_src, test_dst;
--
+ 	if (++idx == HIFN_D_SRC_RSIZE) {
+ 		dma->srcr[idx].l = __cpu_to_le32(HIFN_D_VALID |
+@@ -1324,7 +1324,7 @@ static void hifn_setup_res_desc(struct hifn_device *dev)
+ 			HIFN_D_VALID | HIFN_D_LAST);
  	/*
- 	 *  Our current positions for insertion and removal from the descriptor
- 	 *  rings.
-@@ -434,9 +429,6 @@ struct hifn_device
- 	struct pci_dev		*pdev;
- 	void __iomem		*bar[3];
+ 	 * dma->resr[dma->resi].l = __cpu_to_le32(HIFN_MAX_RESULT | HIFN_D_VALID |
+-	 *					HIFN_D_LAST | HIFN_D_NOINVALID);
++	 *					HIFN_D_LAST);
+ 	 */
  
--	unsigned long		result_mem;
--	dma_addr_t		dst;
--
- 	void			*desc_virt;
- 	dma_addr_t		desc_dma;
+ 	if (++dma->resi == HIFN_D_RES_RSIZE) {
+@@ -1353,12 +1353,12 @@ static void hifn_setup_dst_desc(struct hifn_device *dev, struct page *page,
+ 	idx = dma->dsti;
+ 	dma->dstr[idx].p = __cpu_to_le32(addr);
+ 	dma->dstr[idx].l = __cpu_to_le32(size |	HIFN_D_VALID |
+-			HIFN_D_MASKDONEIRQ | HIFN_D_NOINVALID | HIFN_D_LAST);
++			HIFN_D_MASKDONEIRQ | HIFN_D_LAST);
  
-@@ -446,8 +438,6 @@ struct hifn_device
- 
- 	spinlock_t		lock;
- 
--	void 			*priv;
--
- 	u32			flags;
- 	int			active, started;
- 	struct delayed_work	work;
-@@ -2638,22 +2628,11 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 			goto err_out_unmap_bars;
+ 	if (++idx == HIFN_D_DST_RSIZE) {
+ 		dma->dstr[idx].l = __cpu_to_le32(HIFN_D_VALID |
+ 				HIFN_D_JUMP | HIFN_D_MASKDONEIRQ |
+-				HIFN_D_LAST | HIFN_D_NOINVALID);
++				HIFN_D_LAST);
+ 		idx = 0;
  	}
- 
--	dev->result_mem = __get_free_pages(GFP_KERNEL, HIFN_MAX_RESULT_ORDER);
--	if (!dev->result_mem) {
--		dprintk("Failed to allocate %d pages for result_mem.\n",
--				HIFN_MAX_RESULT_ORDER);
--		goto err_out_unmap_bars;
--	}
--	memset((void *)dev->result_mem, 0, PAGE_SIZE*(1<<HIFN_MAX_RESULT_ORDER));
--
--	dev->dst = pci_map_single(pdev, (void *)dev->result_mem,
--			PAGE_SIZE << HIFN_MAX_RESULT_ORDER, PCI_DMA_FROMDEVICE);
--
- 	dev->desc_virt = pci_alloc_consistent(pdev, sizeof(struct hifn_dma),
- 			&dev->desc_dma);
- 	if (!dev->desc_virt) {
- 		dprintk("Failed to allocate descriptor rings.\n");
--		goto err_out_free_result_pages;
-+		goto err_out_unmap_bars;
- 	}
- 	memset(dev->desc_virt, 0, sizeof(struct hifn_dma));
- 
-@@ -2713,11 +2692,6 @@ err_out_free_desc:
- 	pci_free_consistent(pdev, sizeof(struct hifn_dma),
- 			dev->desc_virt, dev->desc_dma);
- 
--err_out_free_result_pages:
--	pci_unmap_single(pdev, dev->dst, PAGE_SIZE << HIFN_MAX_RESULT_ORDER,
--			PCI_DMA_FROMDEVICE);
--	free_pages(dev->result_mem, HIFN_MAX_RESULT_ORDER);
+ 	dma->dsti = idx;
+-- 
+1.5.2.5
+
