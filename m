@@ -1,37 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Evgeniy Polyakov <zbr@ioremap.net>
 Subject: Re: [PATCH] short benchmarks
-Date: Thu, 20 Nov 2008 21:27:26 +0800
-Message-ID: <20081120132726.GA18140@gondor.apana.org.au>
-References: <12271034133347-git-send-email-zbr@ioremap.net> <12271034132587-git-send-email-zbr@ioremap.net> <12271034131753-git-send-email-zbr@ioremap.net> <1227103414646-git-send-email-zbr@ioremap.net> <1227103414418-git-send-email-zbr@ioremap.net> <12271034142436-git-send-email-zbr@ioremap.net> <4924CAC8.1070504@online.de>
+Date: Thu, 20 Nov 2008 17:25:56 +0300
+Message-ID: <20081120142556.GA2564@ioremap.net>
+References: <12271034133347-git-send-email-zbr@ioremap.net> <12271034132587-git-send-email-zbr@ioremap.net> <12271034131753-git-send-email-zbr@ioremap.net> <1227103414646-git-send-email-zbr@ioremap.net> <1227103414418-git-send-email-zbr@ioremap.net> <12271034142436-git-send-email-zbr@ioremap.net> <4924CAC8.1070504@online.de> <20081120132726.GA18140@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Evgeniy Polyakov <zbr@ioremap.net>, linux-crypto@vger.kernel.org,
-	Patrick McHardy <kaber@trash.net>
-To: Andreas Gerlich <linux-crypto@online.de>
+Cc: Andreas Gerlich <linux-crypto@online.de>,
+	linux-crypto@vger.kernel.org, Patrick McHardy <kaber@trash.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45888 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754515AbYKTN1q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Nov 2008 08:27:46 -0500
+Received: from netgear.net.ru ([195.178.208.66]:55136 "EHLO tservice.net.ru"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1755788AbYKTO0A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Nov 2008 09:26:00 -0500
 Content-Disposition: inline
-In-Reply-To: <4924CAC8.1070504@online.de>
+In-Reply-To: <20081120132726.GA18140@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 20, 2008 at 03:26:16AM +0100, Andreas Gerlich wrote:
-> Hello,
+On Thu, Nov 20, 2008 at 09:27:26PM +0800, Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> On Thu, Nov 20, 2008 at 03:26:16AM +0100, Andreas Gerlich wrote:
+> > Hello,
+> > 
+> > here some short benchmarks with the new HIFN 795x driver:
 > 
-> here some short benchmarks with the new HIFN 795x driver:
+> Awesome!
+> 
+> Now if only I could get those hifn bug fixes in a form that I
+> could apply :)
 
-Awesome!
+Hey, I sent you a series of perfectly split patches, even with cool
+descriptions and other bureaucratic parts like signed-off, from: and so
+on :)
 
-Now if only I could get those hifn bug fixes in a form that I
-could apply :)
+I also tested that patches apply clearly against current mainline
+(current as of yesterday).
 
-Cheers,
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Evgeniy Polyakov
