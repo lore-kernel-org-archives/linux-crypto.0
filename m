@@ -1,182 +1,273 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH/RFC 3/4] crypto: Add a test for the "zlib" crypto module
-Date: Mon, 24 Nov 2008 17:13:26 +0100 (CET)
-Message-ID: <Pine.LNX.4.64.0811241713070.9844@vixen.sonytel.be>
+Subject: [PATCH/RFC 4/4] squashfs: Make SquashFS 4 use the new "zlib" crypto
+ module
+Date: Mon, 24 Nov 2008 17:14:07 +0100 (CET)
+Message-ID: <Pine.LNX.4.64.0811241713290.9844@vixen.sonytel.be>
 References: <20080829134158.108976037@vixen.sonytel.be>
  <20080829134418.874948211@vixen.sonytel.be> <20080830062315.GA18441@gondor.apana.org.au>
  <Pine.LNX.4.64.0811241700100.9844@vixen.sonytel.be>
  <Pine.LNX.4.64.0811241711510.9844@vixen.sonytel.be>
  <Pine.LNX.4.64.0811241712390.9844@vixen.sonytel.be>
+ <Pine.LNX.4.64.0811241713070.9844@vixen.sonytel.be>
 Mime-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
+Cc: Phillip Lougher <phillip@lougher.demon.co.uk>,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:51176 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:51183 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753143AbYKXQN1 (ORCPT
+	by vger.kernel.org with ESMTP id S1752989AbYKXQOJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2008 11:13:27 -0500
-In-Reply-To: <Pine.LNX.4.64.0811241712390.9844@vixen.sonytel.be>
+	Mon, 24 Nov 2008 11:14:09 -0500
+In-Reply-To: <Pine.LNX.4.64.0811241713070.9844@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Modify SquashFS 4 to use the new "zlib" crypto module as a proof-of-con=
+cept for
+the partial decompression CRYPTO API enhancements.
+
+Note: Patch against squashfs-2.6.git, as SquashFS is not yet in mainlin=
+e
+
 Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 ---
- tcrypt.c  |    6 +++-
- testmgr.c |   15 +++++++++++
- testmgr.h |   81 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
- 3 files changed, 101 insertions(+), 1 deletion(-)
+ Kconfig                   |    3 +-
+ squashfs/block.c          |   67 +++++++++++++++++++++++++++----------=
+---------
+ squashfs/squashfs_fs_sb.h |    4 ++
+ squashfs/super.c          |   20 ++++++++-----
+ 4 files changed, 58 insertions(+), 36 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 28a45a1..c3c9124 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -53,7 +53,7 @@ static char *check[] =3D {
- 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
- 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
- 	"camellia", "seed", "salsa20", "rmd128", "rmd160", "rmd256", "rmd320"=
-,
--	"lzo", "cts", NULL
-+	"lzo", "cts", "zlib", NULL
- };
+diff --git a/fs/Kconfig b/fs/Kconfig
+index 1d7a5f9..8eebe53 100644
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -934,7 +934,8 @@ config CRAMFS
+ config SQUASHFS
+ 	tristate "SquashFS 4.0 - Squashed file system support"
+ 	depends on BLOCK
+-	select ZLIB_INFLATE
++	select CRYPTO
++	select CRYPTO_ZLIB
+ 	help
+ 	  Saying Y here includes support for SquashFS 4.0 (a Compressed
+ 	  Read-Only File System).  Squashfs is a highly compressed read-only
+diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
+index da5f88b..9a681cb 100644
+--- a/fs/squashfs/block.c
++++ b/fs/squashfs/block.c
+@@ -32,7 +32,7 @@
+ #include <linux/mutex.h>
+ #include <linux/string.h>
+ #include <linux/buffer_head.h>
+-#include <linux/zlib.h>
++#include <linux/crypto.h>
 =20
- static int test_cipher_jiffies(struct blkcipher_desc *desc, int enc,
-@@ -661,6 +661,10 @@ static void do_test(int m)
- 		tcrypt_test("ecb(seed)");
- 		break;
-=20
-+	case 44:
-+		tcrypt_test("zlib");
-+		break;
-+
- 	case 100:
- 		tcrypt_test("hmac(md5)");
- 		break;
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b828c6c..9320bb8 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1770,6 +1770,21 @@ static const struct alg_test_desc alg_test_descs=
-[] =3D {
- 				}
- 			}
- 		}
-+	}, {
-+		.alg =3D "zlib",
-+		.test =3D alg_test_comp,
-+		.suite =3D {
-+			.comp =3D {
-+				.comp =3D {
-+					.vecs =3D zlib_comp_tv_template,
-+					.count =3D ZLIB_COMP_TEST_VECTORS
-+				},
-+				.decomp =3D {
-+					.vecs =3D zlib_decomp_tv_template,
-+					.count =3D ZLIB_DECOMP_TEST_VECTORS
-+				}
-+			}
-+		}
+ #include "squashfs_fs.h"
+ #include "squashfs_fs_sb.h"
+@@ -150,7 +150,8 @@ int squashfs_read_data(struct super_block *sb, void=
+ *buffer,
  	}
- };
 =20
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index dee94d9..6307b42 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -8509,6 +8509,87 @@ static struct comp_testvec lzo_decomp_tv_templat=
-e[] =3D {
- };
+ 	if (compressed) {
+-		int zlib_err =3D 0;
++		int error =3D 0;
++		struct comp_request req;
 =20
- /*
-+ * Zlib test vectors (null-terminated strings).
-+ * Params: winbits=3DDEF_WBITS, Z_DEFAULT_COMPRESSION, MAX_MEM_LEVEL.
-+ */
-+#define ZLIB_COMP_TEST_VECTORS 2
-+#define ZLIB_DECOMP_TEST_VECTORS 2
+ 		/*
+ 		 * Uncompress block.
+@@ -158,8 +159,8 @@ int squashfs_read_data(struct super_block *sb, void=
+ *buffer,
+=20
+ 		mutex_lock(&msblk->read_data_mutex);
+=20
+-		msblk->stream.next_out =3D buffer;
+-		msblk->stream.avail_out =3D srclength;
++		req.next_out =3D buffer;
++		req.avail_out =3D srclength;
+=20
+ 		for (bytes =3D 0; k < b; k++) {
+ 			avail =3D min(c_byte - bytes, msblk->devblksize - offset);
+@@ -168,16 +169,19 @@ int squashfs_read_data(struct super_block *sb, vo=
+id *buffer,
+ 			if (!buffer_uptodate(bh[k]))
+ 				goto release_mutex;
+=20
+-			msblk->stream.next_in =3D bh[k]->b_data + offset;
+-			msblk->stream.avail_in =3D avail;
++			req.next_in =3D bh[k]->b_data + offset;
++			req.avail_in =3D avail;
+=20
+ 			if (k =3D=3D 0) {
+-				zlib_err =3D zlib_inflateInit(&msblk->stream);
+-				if (zlib_err !=3D Z_OK) {
+-					ERROR("zlib_inflateInit returned"
+-						" unexpected result 0x%x,"
+-						" srclength %d\n", zlib_err,
+-						srclength);
++				error =3D crypto_comp_decompress_init(msblk->tfm,
++								    &req);
++				if (error && error !=3D -EAGAIN) {
++					ERROR("crypto_comp_decompress_init "
++					      "returned unexpected result %d, "
++					      "srclength %d, avail_in %u, "
++					      "avail_out %u\n",
++					      error, srclength, req.avail_in,
++					      req.avail_out);
+ 					goto release_mutex;
+ 				}
+=20
+@@ -186,15 +190,25 @@ int squashfs_read_data(struct super_block *sb, vo=
+id *buffer,
+ 					brelse(bh[k]);
+ 					continue;
+ 				}
 +
-+static struct comp_testvec zlib_comp_tv_template[] =3D {
-+	{
-+		.inlen	=3D 70,
-+		.outlen	=3D 44,
-+		.input	=3D "Join us now and share the software "
-+			"Join us now and share the software ",
-+		.output	=3D "\x78\x9c\xf3\xca\xcf\xcc\x53\x28"
-+			  "\x2d\x56\xc8\xcb\x2f\x57\x48\xcc"
-+			  "\x4b\x51\x28\xce\x48\x2c\x4a\x55"
-+			  "\x28\xc9\x48\x55\x28\xce\x4f\x2b"
-+			  "\x29\x07\x71\xbc\x08\x2b\x01\x00"
-+			  "\x7c\x65\x19\x3d",
-+	}, {
-+		.inlen	=3D 191,
-+		.outlen	=3D 128,
-+		.input	=3D "This document describes a compression method based on th=
-e DEFLATE"
-+			"compression algorithm.  This document defines the application of "
-+			"the DEFLATE algorithm to the IP Payload Compression Protocol.",
-+		.output	=3D "\x78\x9c\x5d\x8d\x31\x0e\xc2\x30"
-+			  "\x10\x04\xbf\xb2\x2f\xc8\x1f\x10"
-+			  "\x04\x09\x89\xc2\x85\x3f\x70\xb1"
-+			  "\x2f\xf8\x24\xdb\x67\xd9\x47\xc1"
-+			  "\xef\x49\x68\x12\x51\xae\x76\x67"
-+			  "\xd6\x27\x19\x88\x1a\xde\x85\xab"
-+			  "\x21\xf2\x08\x5d\x16\x1e\x20\x04"
-+			  "\x2d\xad\xf3\x18\xa2\x15\x85\x2d"
-+			  "\x69\xc4\x42\x83\x23\xb6\x6c\x89"
-+			  "\x71\x9b\xef\xcf\x8b\x9f\xcf\x33"
-+			  "\xca\x2f\xed\x62\xa9\x4c\x80\xff"
-+			  "\x13\xaf\x52\x37\xed\x0e\x52\x6b"
-+			  "\x59\x02\xd9\x4e\xe8\x7a\x76\x1d"
-+			  "\x02\x98\xfe\x8a\x87\x83\xa3\x4f"
-+			  "\x56\x8a\xb8\x9e\x8e\x5c\x57\xd3"
-+			  "\xa0\x79\xfa\x02\x2e\x32\x45\x4e",
-+	},
-+};
-+
-+static struct comp_testvec zlib_decomp_tv_template[] =3D {
-+	{
-+		.inlen	=3D 128,
-+		.outlen	=3D 191,
-+		.input	=3D "\x78\x9c\x5d\x8d\x31\x0e\xc2\x30"
-+			  "\x10\x04\xbf\xb2\x2f\xc8\x1f\x10"
-+			  "\x04\x09\x89\xc2\x85\x3f\x70\xb1"
-+			  "\x2f\xf8\x24\xdb\x67\xd9\x47\xc1"
-+			  "\xef\x49\x68\x12\x51\xae\x76\x67"
-+			  "\xd6\x27\x19\x88\x1a\xde\x85\xab"
-+			  "\x21\xf2\x08\x5d\x16\x1e\x20\x04"
-+			  "\x2d\xad\xf3\x18\xa2\x15\x85\x2d"
-+			  "\x69\xc4\x42\x83\x23\xb6\x6c\x89"
-+			  "\x71\x9b\xef\xcf\x8b\x9f\xcf\x33"
-+			  "\xca\x2f\xed\x62\xa9\x4c\x80\xff"
-+			  "\x13\xaf\x52\x37\xed\x0e\x52\x6b"
-+			  "\x59\x02\xd9\x4e\xe8\x7a\x76\x1d"
-+			  "\x02\x98\xfe\x8a\x87\x83\xa3\x4f"
-+			  "\x56\x8a\xb8\x9e\x8e\x5c\x57\xd3"
-+			  "\xa0\x79\xfa\x02\x2e\x32\x45\x4e",
-+		.output	=3D "This document describes a compression method based on t=
-he DEFLATE"
-+			"compression algorithm.  This document defines the application of "
-+			"the DEFLATE algorithm to the IP Payload Compression Protocol.",
-+	}, {
-+		.inlen	=3D 44,
-+		.outlen	=3D 70,
-+		.input	=3D "\x78\x9c\xf3\xca\xcf\xcc\x53\x28"
-+			  "\x2d\x56\xc8\xcb\x2f\x57\x48\xcc"
-+			  "\x4b\x51\x28\xce\x48\x2c\x4a\x55"
-+			  "\x28\xc9\x48\x55\x28\xce\x4f\x2b"
-+			  "\x29\x07\x71\xbc\x08\x2b\x01\x00"
-+			  "\x7c\x65\x19\x3d",
-+		.output	=3D "Join us now and share the software "
-+			"Join us now and share the software ",
-+	},
-+};
-+
-+/*
-  * Michael MIC test vectors from IEEE 802.11i
++			} else {
++				error =3D crypto_comp_decompress_update(msblk->tfm,
++								      &req);
++				if (error) {
++					ERROR("crypto_comp_decompress_update "
++					      "returned unexpected result %d, "
++					      "srclength %d, avail_in %u, "
++					      "avail_out %u\n",
++					      error, srclength, req.avail_in,
++					      req.avail_out);
++					goto release_mutex;
++				}
+ 			}
+=20
+-			zlib_err =3D zlib_inflate(&msblk->stream, Z_NO_FLUSH);
+-			if (zlib_err !=3D Z_OK && zlib_err !=3D Z_STREAM_END) {
+-				ERROR("zlib_inflate returned unexpected result"
+-					" 0x%x, srclength %d, avail_in %d,"
+-					" avail_out %d\n", zlib_err, srclength,
+-					msblk->stream.avail_in,
+-					msblk->stream.avail_out);
++			if (req.avail_in) {
++				ERROR("crypto_comp_decompress_* did not "
++				      "consume all input data (%u left)\n",
++				      req.avail_in);
+ 				goto release_mutex;
+ 			}
+=20
+@@ -203,16 +217,15 @@ int squashfs_read_data(struct super_block *sb, vo=
+id *buffer,
+ 			brelse(bh[k]);
+ 		}
+=20
+-		if (zlib_err !=3D Z_STREAM_END)
+-			goto release_mutex;
+-
+-		zlib_err =3D zlib_inflateEnd(&msblk->stream);
+-		if (zlib_err !=3D Z_OK) {
+-			ERROR("zlib_inflateEnd returned unexpected result 0x%x,"
+-				" srclength %d\n", zlib_err, srclength);
++		error =3D crypto_comp_decompress_final(msblk->tfm, &req);
++		if (error) {
++			ERROR("crypto_comp_decompress_final returned "
++			      "unexpected result %d, srclength %d, avail_in "
++			      "%u, avail_out %u\n",
++			      error, srclength, req.avail_in, req.avail_out);
+ 			goto release_mutex;
+ 		}
+-		bytes =3D msblk->stream.total_out;
++		bytes =3D req.next_out - buffer;
+ 		mutex_unlock(&msblk->read_data_mutex);
+ 	} else {
+ 		/*
+diff --git a/fs/squashfs/squashfs_fs_sb.h b/fs/squashfs/squashfs_fs_sb.=
+h
+index 18e5af4..769bbef 100644
+--- a/fs/squashfs/squashfs_fs_sb.h
++++ b/fs/squashfs/squashfs_fs_sb.h
+@@ -23,6 +23,8 @@
+  * squashfs_fs_sb.h
   */
- #define MICHAEL_MIC_TEST_VECTORS 6
+=20
++#include <linux/crypto.h>
++
+ #include "squashfs_fs.h"
+=20
+ struct squashfs_cache_entry {
+@@ -63,7 +65,7 @@ struct squashfs_sb_info {
+ 	struct mutex		read_data_mutex;
+ 	struct mutex		meta_index_mutex;
+ 	struct meta_index	*meta_index;
+-	z_stream		stream;
++	struct crypto_comp	*tfm;
+ 	__le64			*inode_lookup_table;
+ 	long long		inode_table;
+ 	long long		directory_table;
+diff --git a/fs/squashfs/super.c b/fs/squashfs/super.c
+index 44f94aa..38e0535 100644
+--- a/fs/squashfs/super.c
++++ b/fs/squashfs/super.c
+@@ -35,13 +35,17 @@
+ #include <linux/pagemap.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+-#include <linux/zlib.h>
++#include <linux/crypto.h>
+=20
+ #include "squashfs_fs.h"
+ #include "squashfs_fs_sb.h"
+ #include "squashfs_fs_i.h"
+ #include "squashfs.h"
+=20
++
++#define SQUASHFS_CRYPTO_ALG	"zlib"
++
++
+ static struct file_system_type squashfs_fs_type;
+ static struct super_operations squashfs_super_ops;
+=20
+@@ -86,9 +90,11 @@ static int squashfs_fill_super(struct super_block *s=
+b, void *data, int silent)
+ 	}
+ 	msblk =3D sb->s_fs_info;
+=20
+-	msblk->stream.workspace =3D vmalloc(zlib_inflate_workspacesize());
+-	if (msblk->stream.workspace =3D=3D NULL) {
+-		ERROR("Failed to allocate zlib workspace\n");
++	msblk->tfm =3D crypto_alloc_comp(SQUASHFS_CRYPTO_ALG, 0,
++				       CRYPTO_ALG_ASYNC);
++	if (IS_ERR(msblk->tfm)) {
++		ERROR("Failed to load %s crypto module\n", SQUASHFS_CRYPTO_ALG);
++		msblk->tfm =3D NULL;
+ 		goto failure;
+ 	}
+=20
+@@ -284,14 +290,14 @@ failed_mount:
+ 	kfree(msblk->inode_lookup_table);
+ 	kfree(msblk->fragment_index);
+ 	kfree(msblk->id_table);
+-	vfree(msblk->stream.workspace);
++	crypto_free_comp(msblk->tfm);
+ 	kfree(sb->s_fs_info);
+ 	sb->s_fs_info =3D NULL;
+ 	kfree(sblk);
+ 	return err;
+=20
+ failure:
+-	vfree(msblk->stream.workspace);
++	crypto_free_comp(msblk->tfm);
+ 	kfree(sb->s_fs_info);
+ 	sb->s_fs_info =3D NULL;
+ 	return -ENOMEM;
+@@ -333,7 +339,7 @@ static void squashfs_put_super(struct super_block *=
+sb)
+ 		kfree(sbi->id_table);
+ 		kfree(sbi->fragment_index);
+ 		kfree(sbi->meta_index);
+-		vfree(sbi->stream.workspace);
++		crypto_free_comp(sbi->tfm);
+ 		kfree(sb->s_fs_info);
+ 		sb->s_fs_info =3D NULL;
+ 	}
 
 With kind regards,
 
