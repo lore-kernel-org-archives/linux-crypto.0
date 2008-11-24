@@ -1,40 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] ansi_cprng: zero out key data on exit
-Date: Mon, 24 Nov 2008 21:22:07 +0800
-Message-ID: <20081124132207.GB18313@gondor.apana.org.au>
-References: <20081114205536.GA27175@hmsreliant.think-freely.org>
+Subject: Re: [PATCH] Have HW invalidate src and dest descriptors after
+	processing
+Date: Mon, 24 Nov 2008 21:53:52 +0800
+Message-ID: <20081124135352.GC18313@gondor.apana.org.au>
+References: <12271034133347-git-send-email-zbr@ioremap.net> <12271034132587-git-send-email-zbr@ioremap.net> <12271034131753-git-send-email-zbr@ioremap.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Cc: linux-crypto@vger.kernel.org, Patrick McHardy <kaber@trash.net>
+To: Evgeniy Polyakov <zbr@ioremap.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:58607 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:51585 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750704AbYKXNWN (ORCPT
+	with ESMTP id S1750823AbYKXNxz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2008 08:22:13 -0500
+	Mon, 24 Nov 2008 08:53:55 -0500
 Content-Disposition: inline
-In-Reply-To: <20081114205536.GA27175@hmsreliant.think-freely.org>
+In-Reply-To: <12271034131753-git-send-email-zbr@ioremap.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 14, 2008 at 03:55:36PM -0500, Neil Horman wrote:
->
-> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-> index 72db0fd..e6ad373 100644
-> --- a/crypto/ansi_cprng.c
-> +++ b/crypto/ansi_cprng.c
-> @@ -266,6 +266,7 @@ done:
->  static void free_prng_context(struct prng_context *ctx)
->  {
->  	crypto_free_cipher(ctx->tfm);
-> +	memset(ctx, 0, sizeof(struct prng_context));
->  }
+On Wed, Nov 19, 2008 at 02:03:27PM +0000, Evgeniy Polyakov wrote:
+> From: Patrick McHardy <kaber@trash.net>
+> 
+> The descriptors need to be invalidated after processing for ring
+> cleanup to work properly and to avoid using an old destination
+> descriptor when the src and cmd descriptors are already set up
+> and the dst descriptor isn't.
+> 
+> Signed-off-by: Patrick McHardy <kaber@trash.net>
+> Signed-off-by: Evgeniy Polyakov <zbr@ioremap.net>
+> ---
+>  drivers/crypto/hifn_795x.c |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+> index 320d08d..4d22b21 100644
+> --- a/drivers/crypto/hifn_795x.c
+> +++ b/drivers/crypto/hifn_795x.c
+> @@ -1296,7 +1296,7 @@ static int hifn_setup_src_desc(struct hifn_device *dev, struct page *page,
+>  
+>  	dma->srcr[idx].p = __cpu_to_le32(addr);
+>  	dma->srcr[idx].l = __cpu_to_le32(size | HIFN_D_VALID |
+> -			HIFN_D_MASKDONEIRQ | HIFN_D_NOINVALID | HIFN_D_LAST);
+> +			HIFN_D_MASKDONEIRQ | HIFN_D_LAST);
 
-crypto_free_tfm should already handle this, no?
+Something is not right here.  This patch is an exact reversal
+of the previous patch in this series.  Could you please take a
+look?
 
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
