@@ -1,88 +1,47 @@
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH] crypto: Validate output length in (de)compression tests
-Date: Thu, 27 Nov 2008 18:48:13 +0100 (CET)
-Message-ID: <Pine.LNX.4.64.0811271847240.10372@vixen.sonytel.be>
+From: Dean Jenkins <djenkins@mvista.com>
+Subject: ESP output when using NULL encryption and NON authentication
+Date: Thu, 27 Nov 2008 18:13:18 +0000
+Message-ID: <200811271813.18727.djenkins@mvista.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:55573 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752655AbYK0Rs0 (ORCPT
+Received: from gateway-1237.mvista.com ([63.81.120.158]:7278 "EHLO
+	gateway-1237.mvista.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751720AbYK0SNU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Nov 2008 12:48:26 -0500
+	Thu, 27 Nov 2008 13:13:20 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When self-testing (de)compression algorithms, make sure the actual size=
- of
-the (de)compressed output data matches the expected output size.
-Otherwise, in case the actual output size would be smaller than the exp=
-ected
-output size, the subsequent buffer compare test would still succeed, an=
-d no
-error would be reported.
+Hi,
 
-Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+I am writing a kernel driver for hardware crypto offloading for IPsec.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 67ff4aa..24eb013 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -843,6 +843,14 @@ static int test_comp(struct crypto_comp *tfm, stru=
-ct comp_testvec *ctemplate,
- 			goto out;
- 		}
-=20
-+		if (dlen !=3D ctemplate[i].outlen ) {
-+			printk(KERN_ERR "alg: comp: Compression test %d "
-+			       "failed for %s: output len =3D %d\n", i + 1, algo,
-+			       dlen);
-+			ret =3D -EINVAL;
-+			goto out;
-+		}
-+
- 		if (memcmp(result, ctemplate[i].output, dlen)) {
- 			printk(KERN_ERR "alg: comp: Compression test %d "
- 			       "failed for %s\n", i + 1, algo);
-@@ -867,6 +875,14 @@ static int test_comp(struct crypto_comp *tfm, stru=
-ct comp_testvec *ctemplate,
- 			goto out;
- 		}
-=20
-+		if (dlen !=3D dtemplate[i].outlen) {
-+			printk(KERN_ERR "alg: comp: Decompression test %d "
-+			       "failed for %s: output len =3D %d\n", i + 1, algo,
-+			       dlen);
-+			ret =3D -EINVAL;
-+			goto out;
-+		}
-+
- 		if (memcmp(result, dtemplate[i].output, dlen)) {
- 			printk(KERN_ERR "alg: comp: Decompression test %d "
- 			       "failed for %s\n", i + 1, algo);
+I have configured IPsec to use NULL encryption and NON authentication. The ESP 
+packets contain just the encapsulated packet as expected.
 
-With kind regards,
+However, ESP's call to crypto_aead_decrypt() puts the start of the 
+encapsulated packet (first 16 bytes) into the IV field of the AEAD request 
+instead of wholly in the src scatterlist. The dst scatterlist is in fact the 
+same src scatterlist.
 
-Geert Uytterhoeven
-Software Architect
+I guessing that the NULL encryption need to copy the start of the packet from 
+the IV field and join it back up with the end of the packet in src and place 
+the whole packet in the dst. Am I right ?
 
-Sony Techsoft Centre Europe
-The Corporate Village =C2=B7 Da Vincilaan 7-D1 =C2=B7 B-1935 Zaventem =C2=
-=B7 Belgium
+My question is how do I increase the size of the dst scatterlist as it is too 
+small to hold the complete packet ?
 
-Phone:    +32 (0)2 700 8453
-=46ax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
+If I use software encryption then the ESP packets work OK. So there must be 
+special treatment for NULL encryption and NON authentication. Can someone 
+please explain ?
 
-A division of Sony Europe (Belgium) N.V.
-VAT BE 0413.825.160 =C2=B7 RPR Brussels
-=46ortis =C2=B7 BIC GEBABEBB =C2=B7 IBAN BE41293037680010
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Also, I note that tcrypt.ko does not test authenc.
+
+Thanks,
+Dean Jenkins
+MontaVista Software
