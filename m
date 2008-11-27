@@ -1,48 +1,88 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: Tree for November 26 (lib80211 + crypto)
-Date: Thu, 27 Nov 2008 09:51:32 +0800
-Message-ID: <20081127015131.GA11493@gondor.apana.org.au>
-References: <20081127014949.9b9a69b7.sfr@canb.auug.org.au> <20081126133234.2a8323d0.randy.dunlap@oracle.com>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH] crypto: Validate output length in (de)compression tests
+Date: Thu, 27 Nov 2008 18:48:13 +0100 (CET)
+Message-ID: <Pine.LNX.4.64.0811271847240.10372@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-wireless@vger.kernel.org,
-	"John W. Linville" <linville@tuxdriver.com>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Return-path: <linux-next-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20081126133234.2a8323d0.randy.dunlap@oracle.com>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:55573 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752655AbYK0Rs0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Nov 2008 12:48:26 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 26, 2008 at 01:32:34PM -0800, Randy Dunlap wrote:
-> On Thu, 27 Nov 2008 01:49:49 +1100 Stephen Rothwell wrote:
-> 
-> > Hi all,
-> > 
-> > Changes since 20081125:
-> > 
-> > Today's tree fails the powerpc allyesconfig build.
-> 
-> 
-> lib80211_crypt_wep.c:(.text+0x388c7): undefined reference to `crypto_free_tfm'
-> lib80211_crypt_wep.c:(.text+0x388fc): undefined reference to `crypto_alloc_base'
-> lib80211_crypt_ccmp.c:(.text+0x39131): undefined reference to `crypto_alloc_base'
-> lib80211_crypt_ccmp.c:(.text+0x390e7): undefined reference to `crypto_free_tfm'
-> lib80211_crypt_tkip.c:(.text+0x3a219): undefined reference to `crypto_free_tfm'
-> lib80211_crypt_tkip.c:(.text+0x3a21e): undefined reference to `crypto_free_tfm'
-> lib80211_crypt_tkip.c:(.text+0x3a26e): undefined reference to `crypto_alloc_base'
-> lib80211_crypt_tkip.c:(.text+0x3a27c): undefined reference to `crypto_alloc_base'
-> 
-> config attached.  Drivers are built-in, crypto is modular.
+When self-testing (de)compression algorithms, make sure the actual size=
+ of
+the (de)compressed output data matches the expected output size.
+Otherwise, in case the actual output size would be smaller than the exp=
+ected
+output size, the subsequent buffer compare test would still succeed, an=
+d no
+error would be reported.
 
-John, looks like wireless is missing a select on CRYPTO somewhere.
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 67ff4aa..24eb013 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -843,6 +843,14 @@ static int test_comp(struct crypto_comp *tfm, stru=
+ct comp_testvec *ctemplate,
+ 			goto out;
+ 		}
+=20
++		if (dlen !=3D ctemplate[i].outlen ) {
++			printk(KERN_ERR "alg: comp: Compression test %d "
++			       "failed for %s: output len =3D %d\n", i + 1, algo,
++			       dlen);
++			ret =3D -EINVAL;
++			goto out;
++		}
++
+ 		if (memcmp(result, ctemplate[i].output, dlen)) {
+ 			printk(KERN_ERR "alg: comp: Compression test %d "
+ 			       "failed for %s\n", i + 1, algo);
+@@ -867,6 +875,14 @@ static int test_comp(struct crypto_comp *tfm, stru=
+ct comp_testvec *ctemplate,
+ 			goto out;
+ 		}
+=20
++		if (dlen !=3D dtemplate[i].outlen) {
++			printk(KERN_ERR "alg: comp: Decompression test %d "
++			       "failed for %s: output len =3D %d\n", i + 1, algo,
++			       dlen);
++			ret =3D -EINVAL;
++			goto out;
++		}
++
+ 		if (memcmp(result, dtemplate[i].output, dlen)) {
+ 			printk(KERN_ERR "alg: comp: Decompression test %d "
+ 			       "failed for %s\n", i + 1, algo);
+
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+
+Sony Techsoft Centre Europe
+The Corporate Village =C2=B7 Da Vincilaan 7-D1 =C2=B7 B-1935 Zaventem =C2=
+=B7 Belgium
+
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =C2=B7 RPR Brussels
+=46ortis =C2=B7 BIC GEBABEBB =C2=B7 IBAN BE41293037680010
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
