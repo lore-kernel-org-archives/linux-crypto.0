@@ -1,32 +1,39 @@
-From: tanglb@sina.com
-Subject: vgdisplay problem with hifn795x
-Date: Sat, 29 Nov 2008 20:46:28 +0800
-Message-ID: <20081129124628.DBB1B36FC0E@mail3-113.sinamail.sina.com.cn>
+From: Evgeniy Polyakov <zbr@ioremap.net>
+Subject: Re: vgdisplay problem with hifn795x
+Date: Sat, 29 Nov 2008 17:25:14 +0300
+Message-ID: <20081129142514.GA354@ioremap.net>
+References: <20081129124628.DBB1B36FC0E@mail3-113.sinamail.sina.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: tanglb@sina.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from r3-113.sinamail.sina.com.cn ([202.108.3.113]:65175 "EHLO
-	mail3-113.sinamail.sina.com.cn" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751311AbYK2M5D (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 29 Nov 2008 07:57:03 -0500
+Received: from corega.com.ru ([195.178.208.66]:56280 "EHLO tservice.net.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751194AbYK2OZR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 29 Nov 2008 09:25:17 -0500
+Content-Disposition: inline
+In-Reply-To: <20081129124628.DBB1B36FC0E@mail3-113.sinamail.sina.com.cn>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-RGVhciBhbGwsDQoNCkknbSB0ZXN0aW5nIG9uZSBoaWZuIGNhcmQgd2l0aCBjcnlwdHNldHVwLCBi
-dXQgdGhlIHZnZGlzcGxheSB3aWxsIGhhbmcgYWZ0ZXIgSSBjcmVhdGVkIHRoZSBMVg0KYnkgY3J5
-cHRzZXR1cC4gSWYgSSByZWJvb3QgdGhlIHN5c3RlbSwgdGhlIHN5c3RlbSB3aWxsIGhhbmcgZHVy
-aW5nIGFjdGl2YXRpbmcgTFZzIGF0IGJvb3QgdGltZS4NCg0KVGhlIHN5c3RlbSBpcyBDZW50T1M1
-LjIrMi42LjI3LjQga2VybmVsLiBJIHVzZWQgYWxsIGRlZmF1bHQgb3B0aW9ucyB0byBjcmVhdGUg
-dGhlIGVuY3J5cHRpb24gZGlzay4NCg0KW3Jvb3RAbHNzMTAwIH5dIyBjcnlwdHNldHVwIHN0YXR1
-cyBlbmNyeXB0DQovZGV2L21hcHBlci9lbmNyeXB0IGlzIGFjdGl2ZToNCiAgY2lwaGVyOiAgYWVz
-LWNiYy1lc3NpdjpzaGEyNTYNCiAga2V5c2l6ZTogMTI4IGJpdHMNCiAgZGV2aWNlOiAgL2Rldi9t
-YXBwZXIvdm9sLWVuY3J5cHQNCiAgb2Zmc2V0OiAgMTAzMiBzZWN0b3JzDQogIHNpemU6ICAgIDIw
-OTYxMjAgc2VjdG9ycw0KICBtb2RlOiAgICByZWFkL3dyaXRlDQoNCkkgc2VhcmNoZWQgdGhlIGFs
-aWFzLCBidXQgbm8gY2x1ZSBmb3IgdmdkaXNwYWx5Lg0KQ291bGQgeW91IHBsZWFzZSBnaXZlIHNv
-bWUgaGludHM/IChQbGVhc2UgY2MgbWUgYmVjYXVzZSBJJ20gbm90IGluIHRoaXMgYWxpYXMgeWV0
-KQ0KVGhhbmsgeW91IQ0KDQpSZWdhcmRzLA0KTGluZ2JvCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCtDCwMu/1bzkoaqh
-qtPrxfPT0b+q0MS31s/tzfjC59DCyfq77qOhKGh0dHA6Ly9zcGFjZS5zaW5hLmNvbS5jbi8gKQ==
+Hi.
+
+On Sat, Nov 29, 2008 at 08:46:28PM +0800, tanglb@sina.com (tanglb@sina.com) wrote:
+> I'm testing one hifn card with cryptsetup, but the vgdisplay will hang after I created the LV
+> by cryptsetup. If I reboot the system, the system will hang during activating LVs at boot time.
+> 
+> The system is CentOS5.2+2.6.27.4 kernel. I used all default options to create the encryption disk.
+
+I do not know what is vgdisplay, but HIFN driver got several bug fixes
+recently, so if problem is related to the driver, likely it was fixed.
+You may try pulling driver from the cryptodev repo [1] into your kernel
+build system and compile it, or wait for the kernel update from your
+vendor. Likely this bugfixes will be pushed into mainline tree in 2.6.29
+merge window.
+
+1. cryptodev tree
+http://git.kernel.org/?p=linux/kernel/git/herbert/cryptodev-2.6.git
+
+-- 
+	Evgeniy Polyakov
