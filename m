@@ -1,34 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: ESP output when using NULL encryption and NON authentication
-Date: Sat, 29 Nov 2008 12:33:39 +0800
-Message-ID: <E1L6HWV-0000zI-B5@gondolin.me.apana.org.au>
-References: <200811271813.18727.djenkins@mvista.com>
-Cc: linux-crypto@vger.kernel.org
-To: djenkins@mvista.com (Dean Jenkins)
+From: tanglb@sina.com
+Subject: vgdisplay problem with hifn795x
+Date: Sat, 29 Nov 2008 20:46:28 +0800
+Message-ID: <20081129124628.DBB1B36FC0E@mail3-113.sinamail.sina.com.cn>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48304 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750906AbYK2Edp (ORCPT
+Received: from r3-113.sinamail.sina.com.cn ([202.108.3.113]:65175 "EHLO
+	mail3-113.sinamail.sina.com.cn" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751311AbYK2M5D (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Nov 2008 23:33:45 -0500
-In-Reply-To: <200811271813.18727.djenkins@mvista.com>
+	Sat, 29 Nov 2008 07:57:03 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dean Jenkins <djenkins@mvista.com> wrote:
->
-> However, ESP's call to crypto_aead_decrypt() puts the start of the 
-> encapsulated packet (first 16 bytes) into the IV field of the AEAD request 
-> instead of wholly in the src scatterlist. The dst scatterlist is in fact the 
-> same src scatterlist.
-
-Well if you're using NULL encryption then the IV size will be zero.
-So even though the IV field has the pointer to the start of the
-payload so does the src scatterlist.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+RGVhciBhbGwsDQoNCkknbSB0ZXN0aW5nIG9uZSBoaWZuIGNhcmQgd2l0aCBjcnlwdHNldHVwLCBi
+dXQgdGhlIHZnZGlzcGxheSB3aWxsIGhhbmcgYWZ0ZXIgSSBjcmVhdGVkIHRoZSBMVg0KYnkgY3J5
+cHRzZXR1cC4gSWYgSSByZWJvb3QgdGhlIHN5c3RlbSwgdGhlIHN5c3RlbSB3aWxsIGhhbmcgZHVy
+aW5nIGFjdGl2YXRpbmcgTFZzIGF0IGJvb3QgdGltZS4NCg0KVGhlIHN5c3RlbSBpcyBDZW50T1M1
+LjIrMi42LjI3LjQga2VybmVsLiBJIHVzZWQgYWxsIGRlZmF1bHQgb3B0aW9ucyB0byBjcmVhdGUg
+dGhlIGVuY3J5cHRpb24gZGlzay4NCg0KW3Jvb3RAbHNzMTAwIH5dIyBjcnlwdHNldHVwIHN0YXR1
+cyBlbmNyeXB0DQovZGV2L21hcHBlci9lbmNyeXB0IGlzIGFjdGl2ZToNCiAgY2lwaGVyOiAgYWVz
+LWNiYy1lc3NpdjpzaGEyNTYNCiAga2V5c2l6ZTogMTI4IGJpdHMNCiAgZGV2aWNlOiAgL2Rldi9t
+YXBwZXIvdm9sLWVuY3J5cHQNCiAgb2Zmc2V0OiAgMTAzMiBzZWN0b3JzDQogIHNpemU6ICAgIDIw
+OTYxMjAgc2VjdG9ycw0KICBtb2RlOiAgICByZWFkL3dyaXRlDQoNCkkgc2VhcmNoZWQgdGhlIGFs
+aWFzLCBidXQgbm8gY2x1ZSBmb3IgdmdkaXNwYWx5Lg0KQ291bGQgeW91IHBsZWFzZSBnaXZlIHNv
+bWUgaGludHM/IChQbGVhc2UgY2MgbWUgYmVjYXVzZSBJJ20gbm90IGluIHRoaXMgYWxpYXMgeWV0
+KQ0KVGhhbmsgeW91IQ0KDQpSZWdhcmRzLA0KTGluZ2JvCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCtDCwMu/1bzkoaqh
+qtPrxfPT0b+q0MS31s/tzfjC59DCyfq77qOhKGh0dHA6Ly9zcGFjZS5zaW5hLmNvbS5jbi8gKQ==
