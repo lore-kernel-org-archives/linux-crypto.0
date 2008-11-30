@@ -1,44 +1,43 @@
-From: tanglb@sina.com
-Subject: =?GBK?B?u9i4tKO6UmU6IHZnZGlzcGxheSBwcm9ibGVtIHdpdGggaGlmbjc5NXg=?=
-Date: Sun, 30 Nov 2008 16:26:00 +0800
-Message-ID: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
+From: Evgeniy Polyakov <zbr@ioremap.net>
+Subject: Re: =?utf-8?B?5Zue5aSN77yaUmU=?=
+	=?utf-8?Q?=3A?= vgdisplay problem with hifn795x
+Date: Sun, 30 Nov 2008 13:12:08 +0300
+Message-ID: <20081130101208.GA20720@ioremap.net>
+References: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Evgeniy Polyakov <zbr@ioremap.net>
+To: tanglb@sina.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from r3-113.sinamail.sina.com.cn ([202.108.3.113]:62450 "EHLO
-	mail3-113.sinamail.sina.com.cn" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750943AbYK3I0E (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 30 Nov 2008 03:26:04 -0500
+Received: from cs-studio.ru ([195.178.208.66]:57774 "EHLO tservice.net.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751054AbYK3KML (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 30 Nov 2008 05:12:11 -0500
+Content-Disposition: inline
+In-Reply-To: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGksDQoNCkkgZG93bmxvYWRlZCB0aGUgc291cmNlIGZpbGUgZnJvbSB5b3VyIGxpbmsgYW5kIGNv
-bXBpbGVkIHN1Y2Nlc3NmdWxseS4NCkJ1dCBpdCBzdGlsbCBoYW5nIHdoZW4gSSB0cmllZCB0byBy
-dW4gIm1rZnMueGZzIi4NCg0KVGhlIGhpZm4gY2FyZCBpcyBFeHByZXNzIERTIDEwMCwgUGFydCBO
-dW1iZXIgaXM6Nzk1NkhYTC1QQ0lVLg0KUGxlYXNlIGxldCBtZSBrbm93IGlmIHlvdSBuZWVkIGZ1
-cnRoZXIgaW5mb3JtYXRpb24uDQpUaGFuayB5b3UhDQoNClJlZ2FyZHMsDQpMaW5nYm8NCg0KLS0t
-LS0g1K3KvNPKvP4gLS0tLS0NCreivP7Iy6O6RXZnZW5peSBQb2x5YWtvdiANCsrVvP7Iy6O6dGFu
-Z2xiQHNpbmEuY29tDQrW98zio7pSZTogdmdkaXNwbGF5IHByb2JsZW0gd2l0aCBoaWZuNzk1eA0K
-yNXG2qO6MjAwOC0xMS0yOSAyMjoyNToxNA0KDQpIaS4NCg0KT24gU2F0LCBOb3YgMjksIDIwMDgg
-YXQgMDg6NDY6MjhQTSArMDgwMCwgdGFuZ2xiQHNpbmEuY29tICh0YW5nbGJAc2luYS5jb20pIHdy
-b3RlOg0KPiBJJ20gdGVzdGluZyBvbmUgaGlmbiBjYXJkIHdpdGggY3J5cHRzZXR1cCwgYnV0IHRo
-ZSB2Z2Rpc3BsYXkgd2lsbCBoYW5nIGFmdGVyIEkgY3JlYXRlZCB0aGUgTFYNCj4gYnkgY3J5cHRz
-ZXR1cC4gSWYgSSByZWJvb3QgdGhlIHN5c3RlbSwgdGhlIHN5c3RlbSB3aWxsIGhhbmcgZHVyaW5n
-IGFjdGl2YXRpbmcgTFZzIGF0IGJvb3QgdGltZS4NCj4gDQo+IFRoZSBzeXN0ZW0gaXMgQ2VudE9T
-NS4yKzIuNi4yNy40IGtlcm5lbC4gSSB1c2VkIGFsbCBkZWZhdWx0IG9wdGlvbnMgdG8gY3JlYXRl
-IHRoZSBlbmNyeXB0aW9uIGRpc2suDQoNCkkgZG8gbm90IGtub3cgd2hhdCBpcyB2Z2Rpc3BsYXks
-IGJ1dCBISUZOIGRyaXZlciBnb3Qgc2V2ZXJhbCBidWcgZml4ZXMNCnJlY2VudGx5LCBzbyBpZiBw
-cm9ibGVtIGlzIHJlbGF0ZWQgdG8gdGhlIGRyaXZlciwgbGlrZWx5IGl0IHdhcyBmaXhlZC4NCllv
-dSBtYXkgdHJ5IHB1bGxpbmcgZHJpdmVyIGZyb20gdGhlIGNyeXB0b2RldiByZXBvIFsxXSBpbnRv
-IHlvdXIga2VybmVsDQpidWlsZCBzeXN0ZW0gYW5kIGNvbXBpbGUgaXQsIG9yIHdhaXQgZm9yIHRo
-ZSBrZXJuZWwgdXBkYXRlIGZyb20geW91cg0KdmVuZG9yLiBMaWtlbHkgdGhpcyBidWdmaXhlcyB3
-aWxsIGJlIHB1c2hlZCBpbnRvIG1haW5saW5lIHRyZWUgaW4gMi42LjI5DQptZXJnZSB3aW5kb3cu
-DQoNCjEuIGNyeXB0b2RldiB0cmVlDQpodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvP3A9bGludXgva2Vy
-bmVsL2dpdC9oZXJiZXJ0L2NyeXB0b2Rldi0yLjYuZ2l0DQoNCi0tIA0KRXZnZW5peSBQb2x5YWtv
-dg0KCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tCtDCwMu/1bzkoaqhqtPrxfPT0b+q0MS31s/tzfjC59DCyfq77qOhKGh0
-dHA6Ly9zcGFjZS5zaW5hLmNvbS5jbi8gKQ==
+On Sun, Nov 30, 2008 at 04:26:00PM +0800, tanglb@sina.com (tanglb@sina.com) wrote:
+> I downloaded the source file from your link and compiled successfully.
+> But it still hang when I tried to run "mkfs.xfs".
+
+Please enable debug mode with attached patch and send dmesg output.
+Thank you.
+
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 6e9b39c..ca621f6 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -38,7 +38,7 @@
+ 
+ #include <asm/kmap_types.h>
+ 
+-//#define HIFN_DEBUG
++#define HIFN_DEBUG
+ 
+ #ifdef HIFN_DEBUG
+ #define dprintk(f, a...) 	printk(f, ##a)
+
+-- 
+	Evgeniy Polyakov
