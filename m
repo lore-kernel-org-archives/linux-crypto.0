@@ -1,49 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: next-20081125: crypto hard disk gets unaccessable
-Date: Sun, 30 Nov 2008 12:32:15 +0800
-Message-ID: <20081130043215.GA10310@gondor.apana.org.au>
-References: <20081128063355.GA4700@denkbrett.schottelius.org>
-	<20081129192939.925275f0.akpm@linux-foundation.org>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+From: tanglb@sina.com
+Subject: =?GBK?B?u9i4tKO6UmU6IHZnZGlzcGxheSBwcm9ibGVtIHdpdGggaGlmbjc5NXg=?=
+Date: Sun, 30 Nov 2008 16:26:00 +0800
+Message-ID: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christophe Saout <christophe@saout.de>,
-	Nico -telmich- Schottelius <nico-linux-next@schottelius.org>,
-	LKML <linux-kernel@vger.kernel.org>, dm-devel@redhat.com,
-	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>
-Return-path: <dm-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <20081129192939.925275f0.akpm@linux-foundation.org>
-List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Evgeniy Polyakov <zbr@ioremap.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from r3-113.sinamail.sina.com.cn ([202.108.3.113]:62450 "EHLO
+	mail3-113.sinamail.sina.com.cn" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750943AbYK3I0E (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 30 Nov 2008 03:26:04 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Nov 29, 2008 at 07:29:39PM -0800, Andrew Morton wrote:
->
-> > [69186.618377] RAX: 00000000fffffff0 RBX: b6e3880000000010 RCX: 0000000000000000
-> > [69186.618382] RDX: 0000000000000010 RSI: b6e3880000000000 RDI: ffff88007a3da4e0
-
-> > [69186.618611] Code: 08 48 89 51 08 48 89 0a 48 b9 00 01 10 00 00 00 ad de 48 ba 00 02 20 00 00 00 ad de 48 89 08 48 89 50 08 c3 41 89 d0 31 c9 eb 0e <8b> 04 0e 41 83 e8 04 31 04 0f 48 83 c1 04 41 83 f8 03 77 ec 41 
-
-	8b 04 0e                mov    (%rsi,%rcx,1),%eax
-
-So we were fed a bogus pointer by the caller.
- 
-> I assume that 2.6.28-rc6 is OK?
-
-Nothing has changed in the crypto ciphers lately.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+SGksDQoNCkkgZG93bmxvYWRlZCB0aGUgc291cmNlIGZpbGUgZnJvbSB5b3VyIGxpbmsgYW5kIGNv
+bXBpbGVkIHN1Y2Nlc3NmdWxseS4NCkJ1dCBpdCBzdGlsbCBoYW5nIHdoZW4gSSB0cmllZCB0byBy
+dW4gIm1rZnMueGZzIi4NCg0KVGhlIGhpZm4gY2FyZCBpcyBFeHByZXNzIERTIDEwMCwgUGFydCBO
+dW1iZXIgaXM6Nzk1NkhYTC1QQ0lVLg0KUGxlYXNlIGxldCBtZSBrbm93IGlmIHlvdSBuZWVkIGZ1
+cnRoZXIgaW5mb3JtYXRpb24uDQpUaGFuayB5b3UhDQoNClJlZ2FyZHMsDQpMaW5nYm8NCg0KLS0t
+LS0g1K3KvNPKvP4gLS0tLS0NCreivP7Iy6O6RXZnZW5peSBQb2x5YWtvdiANCsrVvP7Iy6O6dGFu
+Z2xiQHNpbmEuY29tDQrW98zio7pSZTogdmdkaXNwbGF5IHByb2JsZW0gd2l0aCBoaWZuNzk1eA0K
+yNXG2qO6MjAwOC0xMS0yOSAyMjoyNToxNA0KDQpIaS4NCg0KT24gU2F0LCBOb3YgMjksIDIwMDgg
+YXQgMDg6NDY6MjhQTSArMDgwMCwgdGFuZ2xiQHNpbmEuY29tICh0YW5nbGJAc2luYS5jb20pIHdy
+b3RlOg0KPiBJJ20gdGVzdGluZyBvbmUgaGlmbiBjYXJkIHdpdGggY3J5cHRzZXR1cCwgYnV0IHRo
+ZSB2Z2Rpc3BsYXkgd2lsbCBoYW5nIGFmdGVyIEkgY3JlYXRlZCB0aGUgTFYNCj4gYnkgY3J5cHRz
+ZXR1cC4gSWYgSSByZWJvb3QgdGhlIHN5c3RlbSwgdGhlIHN5c3RlbSB3aWxsIGhhbmcgZHVyaW5n
+IGFjdGl2YXRpbmcgTFZzIGF0IGJvb3QgdGltZS4NCj4gDQo+IFRoZSBzeXN0ZW0gaXMgQ2VudE9T
+NS4yKzIuNi4yNy40IGtlcm5lbC4gSSB1c2VkIGFsbCBkZWZhdWx0IG9wdGlvbnMgdG8gY3JlYXRl
+IHRoZSBlbmNyeXB0aW9uIGRpc2suDQoNCkkgZG8gbm90IGtub3cgd2hhdCBpcyB2Z2Rpc3BsYXks
+IGJ1dCBISUZOIGRyaXZlciBnb3Qgc2V2ZXJhbCBidWcgZml4ZXMNCnJlY2VudGx5LCBzbyBpZiBw
+cm9ibGVtIGlzIHJlbGF0ZWQgdG8gdGhlIGRyaXZlciwgbGlrZWx5IGl0IHdhcyBmaXhlZC4NCllv
+dSBtYXkgdHJ5IHB1bGxpbmcgZHJpdmVyIGZyb20gdGhlIGNyeXB0b2RldiByZXBvIFsxXSBpbnRv
+IHlvdXIga2VybmVsDQpidWlsZCBzeXN0ZW0gYW5kIGNvbXBpbGUgaXQsIG9yIHdhaXQgZm9yIHRo
+ZSBrZXJuZWwgdXBkYXRlIGZyb20geW91cg0KdmVuZG9yLiBMaWtlbHkgdGhpcyBidWdmaXhlcyB3
+aWxsIGJlIHB1c2hlZCBpbnRvIG1haW5saW5lIHRyZWUgaW4gMi42LjI5DQptZXJnZSB3aW5kb3cu
+DQoNCjEuIGNyeXB0b2RldiB0cmVlDQpodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvP3A9bGludXgva2Vy
+bmVsL2dpdC9oZXJiZXJ0L2NyeXB0b2Rldi0yLjYuZ2l0DQoNCi0tIA0KRXZnZW5peSBQb2x5YWtv
+dg0KCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCtDCwMu/1bzkoaqhqtPrxfPT0b+q0MS31s/tzfjC59DCyfq77qOhKGh0
+dHA6Ly9zcGFjZS5zaW5hLmNvbS5jbi8gKQ==
