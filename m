@@ -1,43 +1,62 @@
-From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: Re: =?utf-8?B?5Zue5aSN77yaUmU=?=
-	=?utf-8?Q?=3A?= vgdisplay problem with hifn795x
-Date: Sun, 30 Nov 2008 13:12:08 +0300
-Message-ID: <20081130101208.GA20720@ioremap.net>
-References: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: Re: next-20081125: crypto hard disk gets unaccessable
+Date: Mon, 01 Dec 2008 01:16:06 +0100
+Message-ID: <49332CC6.4080606@redhat.com>
+References: <20081128063355.GA4700@denkbrett.schottelius.org>
+	<20081129192939.925275f0.akpm@linux-foundation.org>
+Reply-To: device-mapper development <dm-devel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: tanglb@sina.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cs-studio.ru ([195.178.208.66]:57774 "EHLO tservice.net.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751054AbYK3KML (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 30 Nov 2008 05:12:11 -0500
-Content-Disposition: inline
-In-Reply-To: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Christophe Saout <christophe@saout.de>, LKML <linux-kernel@vger.kernel.org>,
+	device-mapper development <dm-devel@redhat.com>,
+	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Herbert@redhat.com, Xu <herbert@gondor.apana.org.au>
+To: Nico -telmich- Schottelius <nico-linux-next@schottelius.org>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <20081129192939.925275f0.akpm@linux-foundation.org>
+List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Nov 30, 2008 at 04:26:00PM +0800, tanglb@sina.com (tanglb@sina.com) wrote:
-> I downloaded the source file from your link and compiled successfully.
-> But it still hang when I tried to run "mkfs.xfs".
+Andrew Morton wrote:
+> (cc's added)
+> 
+>> After about four suspend & resume operations in the midst of editing
+>> a file, the system beeped twice and issued this error:
 
-Please enable debug mode with attached patch and send dmesg output.
-Thank you.
+Did this work before? If so, please can you provide version where
+it works?
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 6e9b39c..ca621f6 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -38,7 +38,7 @@
- 
- #include <asm/kmap_types.h>
- 
--//#define HIFN_DEBUG
-+#define HIFN_DEBUG
- 
- #ifdef HIFN_DEBUG
- #define dprintk(f, a...) 	printk(f, ##a)
+It is suspend to encrypted swap?
 
--- 
-	Evgeniy Polyakov
+There should not be any recent change in dm-crypt related to this path,
+so I expect it is some bug related to suspend/resume in combination with
+running crypto - like corruption of some memory caused during suspend...
+
+
+> [lots of snippage]
+>> [69186.618357] RIP: 0010:[<ffffffff8031f246>]  [<ffffffff8031f246>] crypto_xor+0x7/0x48
+
+> [69186.618468]  [<ffffffffa027226a>] ? crypto_cbc_encrypt+0xfa/0x15a [cbc]
+> [69186.618481]  [<ffffffffa0285705>] ? aes_encrypt+0x0/0x7 [aes_x86_64]
+> [69186.618494]  [<ffffffffa020667d>] ? async_encrypt+0x35/0x3a [crypto_blkcipher]
+> [69186.618509]  [<ffffffffa0269a6f>] ? crypt_convert+0x1d2/0x253 [dm_crypt]
+> [69186.618522]  [<ffffffffa0269ed6>] ? kcryptd_crypt+0x3e6/0x407 [dm_crypt]
+> [69186.618533]  [<ffffffffa0269af0>] ? kcryptd_crypt+0x0/0x407 [dm_crypt]
+
+I assume that crypto run here synchronously (not through asynchronous completion callback).
+
+Herbert - is my guess ok? (The asynchronous handling in dm-crypt was the only part changed recently.)
+(And I think that except crypto hw nobody uses asynchronous mode yet by default.)
+
+Milan
+--
+mbroz@redhat.com
