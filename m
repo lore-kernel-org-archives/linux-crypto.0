@@ -1,289 +1,241 @@
 From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 4/5] crypto: tgr192 - Switch to shash
-Date: Tue,  2 Dec 2008 23:38:33 +0100
-Message-ID: <122825751834-git-send-email-ken@codelabs.ch>
+Subject: [PATCH 3/5] crypto: sha256 - Switch to shash
+Date: Tue,  2 Dec 2008 23:38:32 +0100
+Message-ID: <12282575173222-git-send-email-ken@codelabs.ch>
 References: <12282575141051-git-send-email-ken@codelabs.ch>
  <12282575163307-git-send-email-ken@codelabs.ch>
- <12282575173222-git-send-email-ken@codelabs.ch>
 Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
 	Adrian-Ken Rueegsegger <ken@codelabs.ch>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:54071 "EHLO
+Received: from [217.150.249.120] ([217.150.249.120]:54065 "EHLO
 	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752365AbYLBWin (ORCPT
+	with ESMTP id S1752466AbYLBWil (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2008 17:38:43 -0500
-In-Reply-To: <12282575173222-git-send-email-ken@codelabs.ch>
+	Tue, 2 Dec 2008 17:38:41 -0500
+In-Reply-To: <12282575163307-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes tgr192, tgr160 and tgr128 to the new shash interface.
+This patch changes sha256 and sha224 to the new shash interface.
 
 Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 ---
- crypto/tgr192.c |  135 +++++++++++++++++++++++++++++--------------------------
- 1 files changed, 71 insertions(+), 64 deletions(-)
+ crypto/sha256_generic.c |  104 +++++++++++++++++++++++++---------------------
+ 1 files changed, 56 insertions(+), 48 deletions(-)
 
-diff --git a/crypto/tgr192.c b/crypto/tgr192.c
-index a92414f..cbca4f2 100644
---- a/crypto/tgr192.c
-+++ b/crypto/tgr192.c
-@@ -21,11 +21,11 @@
-  * (at your option) any later version.
+diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+index 5a8dd47..caa3542 100644
+--- a/crypto/sha256_generic.c
++++ b/crypto/sha256_generic.c
+@@ -17,10 +17,10 @@
+  * any later version.
   *
   */
 +#include <crypto/internal/hash.h>
  #include <linux/init.h>
  #include <linux/module.h>
  #include <linux/mm.h>
- #include <asm/byteorder.h>
 -#include <linux/crypto.h>
  #include <linux/types.h>
- 
- #define TGR192_DIGEST_SIZE 24
-@@ -495,24 +495,26 @@ static void tgr192_transform(struct tgr192_ctx *tctx, const u8 * data)
- 	tctx->c = c;
+ #include <crypto/sha.h>
+ #include <asm/byteorder.h>
+@@ -69,7 +69,7 @@ static void sha256_transform(u32 *state, const u8 *input)
+ 	/* now blend */
+ 	for (i = 16; i < 64; i++)
+ 		BLEND_OP(i, W);
+-    
++
+ 	/* load the state into our registers */
+ 	a=state[0];  b=state[1];  c=state[2];  d=state[3];
+ 	e=state[4];  f=state[5];  g=state[6];  h=state[7];
+@@ -220,9 +220,9 @@ static void sha256_transform(u32 *state, const u8 *input)
  }
  
--static void tgr192_init(struct crypto_tfm *tfm)
-+static int tgr192_init(struct shash_desc *desc)
- {
--	struct tgr192_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
  
- 	tctx->a = 0x0123456789abcdefULL;
- 	tctx->b = 0xfedcba9876543210ULL;
- 	tctx->c = 0xf096a5b4c3b2e187ULL;
- 	tctx->nblocks = 0;
- 	tctx->count = 0;
+-static void sha224_init(struct crypto_tfm *tfm)
++static int sha224_init(struct shash_desc *desc)
+ {
+-	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha256_ctx *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA224_H0;
+ 	sctx->state[1] = SHA224_H1;
+ 	sctx->state[2] = SHA224_H2;
+@@ -233,11 +233,13 @@ static void sha224_init(struct crypto_tfm *tfm)
+ 	sctx->state[7] = SHA224_H7;
+ 	sctx->count[0] = 0;
+ 	sctx->count[1] = 0;
 +
 +	return 0;
  }
  
+-static void sha256_init(struct crypto_tfm *tfm)
++static int sha256_init(struct shash_desc *desc)
+ {
+-	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha256_ctx *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA256_H0;
+ 	sctx->state[1] = SHA256_H1;
+ 	sctx->state[2] = SHA256_H2;
+@@ -247,12 +249,14 @@ static void sha256_init(struct crypto_tfm *tfm)
+ 	sctx->state[6] = SHA256_H6;
+ 	sctx->state[7] = SHA256_H7;
+ 	sctx->count[0] = sctx->count[1] = 0;
++
++	return 0;
+ }
  
- /* Update the message digest with the contents
-  * of INBUF with length INLEN. */
--static void tgr192_update(struct crypto_tfm *tfm, const u8 *inbuf,
-+static int tgr192_update(struct shash_desc *desc, const u8 *inbuf,
+-static void sha256_update(struct crypto_tfm *tfm, const u8 *data,
++static int sha256_update(struct shash_desc *desc, const u8 *data,
  			  unsigned int len)
  {
--	struct tgr192_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
+-	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha256_ctx *sctx = shash_desc_ctx(desc);
+ 	unsigned int i, index, part_len;
  
- 	if (tctx->count == 64) {	/* flush the buffer */
- 		tgr192_transform(tctx, tctx->hash);
-@@ -520,15 +522,15 @@ static void tgr192_update(struct crypto_tfm *tfm, const u8 *inbuf,
- 		tctx->nblocks++;
+ 	/* Compute number of bytes mod 128 */
+@@ -277,14 +281,16 @@ static void sha256_update(struct crypto_tfm *tfm, const u8 *data,
+ 	} else {
+ 		i = 0;
  	}
- 	if (!inbuf) {
--		return;
-+		return 0;
- 	}
- 	if (tctx->count) {
- 		for (; len && tctx->count < 64; len--) {
- 			tctx->hash[tctx->count++] = *inbuf++;
- 		}
--		tgr192_update(tfm, NULL, 0);
-+		tgr192_update(desc, NULL, 0);
- 		if (!len) {
--			return;
-+			return 0;
- 		}
- 
- 	}
-@@ -543,20 +545,22 @@ static void tgr192_update(struct crypto_tfm *tfm, const u8 *inbuf,
- 	for (; len && tctx->count < 64; len--) {
- 		tctx->hash[tctx->count++] = *inbuf++;
- 	}
+-	
++
+ 	/* Buffer remaining input */
+ 	memcpy(&sctx->buf[index], &data[i], len-i);
 +
 +	return 0;
  }
  
- 
- 
- /* The routine terminates the computation */
--static void tgr192_final(struct crypto_tfm *tfm, u8 * out)
-+static int tgr192_final(struct shash_desc *desc, u8 * out)
+-static void sha256_final(struct crypto_tfm *tfm, u8 *out)
++static int sha256_final(struct shash_desc *desc, u8 *out)
  {
--	struct tgr192_ctx *tctx = crypto_tfm_ctx(tfm);
-+	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
- 	__be64 *dst = (__be64 *)out;
- 	__be64 *be64p;
- 	__le32 *le32p;
- 	u32 t, msb, lsb;
+-	struct sha256_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha256_ctx *sctx = shash_desc_ctx(desc);
+ 	__be32 *dst = (__be32 *)out;
+ 	__be32 bits[2];
+ 	unsigned int index, pad_len;
+@@ -298,10 +304,10 @@ static void sha256_final(struct crypto_tfm *tfm, u8 *out)
+ 	/* Pad out to 56 mod 64. */
+ 	index = (sctx->count[0] >> 3) & 0x3f;
+ 	pad_len = (index < 56) ? (56 - index) : ((64+56) - index);
+-	sha256_update(tfm, padding, pad_len);
++	sha256_update(desc, padding, pad_len);
  
--	tgr192_update(tfm, NULL, 0); /* flush */ ;
-+	tgr192_update(desc, NULL, 0); /* flush */ ;
+ 	/* Append length (before padding) */
+-	sha256_update(tfm, (const u8 *)bits, sizeof(bits));
++	sha256_update(desc, (const u8 *)bits, sizeof(bits));
  
- 	msb = 0;
- 	t = tctx->nblocks;
-@@ -584,7 +588,7 @@ static void tgr192_final(struct crypto_tfm *tfm, u8 * out)
- 		while (tctx->count < 64) {
- 			tctx->hash[tctx->count++] = 0;
- 		}
--		tgr192_update(tfm, NULL, 0); /* flush */ ;
-+		tgr192_update(desc, NULL, 0); /* flush */ ;
- 		memset(tctx->hash, 0, 56);    /* fill next block with zeroes */
- 	}
- 	/* append the 64 bit count */
-@@ -598,91 +602,94 @@ static void tgr192_final(struct crypto_tfm *tfm, u8 * out)
- 	dst[0] = be64p[0] = cpu_to_be64(tctx->a);
- 	dst[1] = be64p[1] = cpu_to_be64(tctx->b);
- 	dst[2] = be64p[2] = cpu_to_be64(tctx->c);
+ 	/* Store state in digest */
+ 	for (i = 0; i < 8; i++)
+@@ -309,71 +315,73 @@ static void sha256_final(struct crypto_tfm *tfm, u8 *out)
+ 
+ 	/* Zeroize sensitive information. */
+ 	memset(sctx, 0, sizeof(*sctx));
 +
 +	return 0;
  }
  
--static void tgr160_final(struct crypto_tfm *tfm, u8 * out)
-+static int tgr160_final(struct shash_desc *desc, u8 * out)
+-static void sha224_final(struct crypto_tfm *tfm, u8 *hash)
++static int sha224_final(struct shash_desc *desc, u8 *hash)
  {
- 	u8 D[64];
+ 	u8 D[SHA256_DIGEST_SIZE];
  
--	tgr192_final(tfm, D);
-+	tgr192_final(desc, D);
- 	memcpy(out, D, TGR160_DIGEST_SIZE);
- 	memset(D, 0, TGR192_DIGEST_SIZE);
+-	sha256_final(tfm, D);
++	sha256_final(desc, D);
+ 
+ 	memcpy(hash, D, SHA224_DIGEST_SIZE);
+ 	memset(D, 0, SHA256_DIGEST_SIZE);
 +
 +	return 0;
  }
  
--static void tgr128_final(struct crypto_tfm *tfm, u8 * out)
-+static int tgr128_final(struct shash_desc *desc, u8 * out)
- {
- 	u8 D[64];
- 
--	tgr192_final(tfm, D);
-+	tgr192_final(desc, D);
- 	memcpy(out, D, TGR128_DIGEST_SIZE);
- 	memset(D, 0, TGR192_DIGEST_SIZE);
-+
-+	return 0;
- }
- 
--static struct crypto_alg tgr192 = {
--	.cra_name = "tgr192",
--	.cra_flags = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize = TGR192_BLOCK_SIZE,
--	.cra_ctxsize = sizeof(struct tgr192_ctx),
--	.cra_module = THIS_MODULE,
--	.cra_alignmask = 7,
--	.cra_list = LIST_HEAD_INIT(tgr192.cra_list),
--	.cra_u = {.digest = {
--			     .dia_digestsize = TGR192_DIGEST_SIZE,
--			     .dia_init = tgr192_init,
--			     .dia_update = tgr192_update,
--			     .dia_final = tgr192_final}}
-+static struct shash_alg tgr192 = {
-+	.digestsize	=	TGR192_DIGEST_SIZE,
-+	.init		=	tgr192_init,
-+	.update		=	tgr192_update,
-+	.final		=	tgr192_final,
-+	.descsize	=	sizeof(struct tgr192_ctx),
+-static struct crypto_alg sha256 = {
+-	.cra_name	=	"sha256",
+-	.cra_driver_name=	"sha256-generic",
+-	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	=	SHA256_BLOCK_SIZE,
+-	.cra_ctxsize	=	sizeof(struct sha256_ctx),
+-	.cra_module	=	THIS_MODULE,
+-	.cra_alignmask	=	3,
+-	.cra_list	=	LIST_HEAD_INIT(sha256.cra_list),
+-	.cra_u		=	{ .digest = {
+-	.dia_digestsize	=	SHA256_DIGEST_SIZE,
+-	.dia_init	=	sha256_init,
+-	.dia_update	=	sha256_update,
+-	.dia_final	=	sha256_final } }
++static struct shash_alg sha256 = {
++	.digestsize	=	SHA256_DIGEST_SIZE,
++	.init		=	sha256_init,
++	.update		=	sha256_update,
++	.final		=	sha256_final,
++	.descsize	=	sizeof(struct sha256_ctx),
 +	.base		=	{
-+		.cra_name	=	"tgr192",
++		.cra_name	=	"sha256",
++		.cra_driver_name=	"sha256-generic",
 +		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	TGR192_BLOCK_SIZE,
++		.cra_blocksize	=	SHA256_BLOCK_SIZE,
 +		.cra_module	=	THIS_MODULE,
 +	}
  };
  
--static struct crypto_alg tgr160 = {
--	.cra_name = "tgr160",
--	.cra_flags = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize = TGR192_BLOCK_SIZE,
--	.cra_ctxsize = sizeof(struct tgr192_ctx),
--	.cra_module = THIS_MODULE,
--	.cra_alignmask = 7,
--	.cra_list = LIST_HEAD_INIT(tgr160.cra_list),
--	.cra_u = {.digest = {
--			     .dia_digestsize = TGR160_DIGEST_SIZE,
--			     .dia_init = tgr192_init,
--			     .dia_update = tgr192_update,
--			     .dia_final = tgr160_final}}
-+static struct shash_alg tgr160 = {
-+	.digestsize	=	TGR160_DIGEST_SIZE,
-+	.init		=	tgr192_init,
-+	.update		=	tgr192_update,
-+	.final		=	tgr160_final,
-+	.descsize	=	sizeof(struct tgr192_ctx),
+-static struct crypto_alg sha224 = {
+-	.cra_name	= "sha224",
+-	.cra_driver_name = "sha224-generic",
+-	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	= SHA224_BLOCK_SIZE,
+-	.cra_ctxsize	= sizeof(struct sha256_ctx),
+-	.cra_module	= THIS_MODULE,
+-	.cra_alignmask	= 3,
+-	.cra_list	= LIST_HEAD_INIT(sha224.cra_list),
+-	.cra_u		= { .digest = {
+-	.dia_digestsize = SHA224_DIGEST_SIZE,
+-	.dia_init	= sha224_init,
+-	.dia_update	= sha256_update,
+-	.dia_final	= sha224_final } }
++static struct shash_alg sha224 = {
++	.digestsize	=	SHA224_DIGEST_SIZE,
++	.init		=	sha224_init,
++	.update		=	sha256_update,
++	.final		=	sha224_final,
++	.descsize	=	sizeof(struct sha256_ctx),
 +	.base		=	{
-+		.cra_name	=	"tgr160",
++		.cra_name	=	"sha224",
++		.cra_driver_name=	"sha224-generic",
 +		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	TGR192_BLOCK_SIZE,
++		.cra_blocksize	=	SHA224_BLOCK_SIZE,
 +		.cra_module	=	THIS_MODULE,
 +	}
  };
  
--static struct crypto_alg tgr128 = {
--	.cra_name = "tgr128",
--	.cra_flags = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize = TGR192_BLOCK_SIZE,
--	.cra_ctxsize = sizeof(struct tgr192_ctx),
--	.cra_module = THIS_MODULE,
--	.cra_alignmask = 7,
--	.cra_list = LIST_HEAD_INIT(tgr128.cra_list),
--	.cra_u = {.digest = {
--			     .dia_digestsize = TGR128_DIGEST_SIZE,
--			     .dia_init = tgr192_init,
--			     .dia_update = tgr192_update,
--			     .dia_final = tgr128_final}}
-+static struct shash_alg tgr128 = {
-+	.digestsize	=	TGR128_DIGEST_SIZE,
-+	.init		=	tgr192_init,
-+	.update		=	tgr192_update,
-+	.final		=	tgr128_final,
-+	.descsize	=	sizeof(struct tgr192_ctx),
-+	.base		=	{
-+		.cra_name	=	"tgr128",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	TGR192_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
- static int __init tgr192_mod_init(void)
+ static int __init sha256_generic_mod_init(void)
  {
  	int ret = 0;
  
--	ret = crypto_register_alg(&tgr192);
-+	ret = crypto_register_shash(&tgr192);
+-	ret = crypto_register_alg(&sha224);
++	ret = crypto_register_shash(&sha224);
  
- 	if (ret < 0) {
- 		goto out;
- 	}
+ 	if (ret < 0)
+ 		return ret;
  
--	ret = crypto_register_alg(&tgr160);
-+	ret = crypto_register_shash(&tgr160);
- 	if (ret < 0) {
--		crypto_unregister_alg(&tgr192);
-+		crypto_unregister_shash(&tgr192);
- 		goto out;
- 	}
+-	ret = crypto_register_alg(&sha256);
++	ret = crypto_register_shash(&sha256);
  
--	ret = crypto_register_alg(&tgr128);
-+	ret = crypto_register_shash(&tgr128);
- 	if (ret < 0) {
--		crypto_unregister_alg(&tgr192);
--		crypto_unregister_alg(&tgr160);
-+		crypto_unregister_shash(&tgr192);
-+		crypto_unregister_shash(&tgr160);
- 	}
-       out:
+ 	if (ret < 0)
+-		crypto_unregister_alg(&sha224);
++		crypto_unregister_shash(&sha224);
+ 
  	return ret;
-@@ -690,9 +697,9 @@ static int __init tgr192_mod_init(void)
- 
- static void __exit tgr192_mod_fini(void)
- {
--	crypto_unregister_alg(&tgr192);
--	crypto_unregister_alg(&tgr160);
--	crypto_unregister_alg(&tgr128);
-+	crypto_unregister_shash(&tgr192);
-+	crypto_unregister_shash(&tgr160);
-+	crypto_unregister_shash(&tgr128);
  }
  
- MODULE_ALIAS("tgr160");
+ static void __exit sha256_generic_mod_fini(void)
+ {
+-	crypto_unregister_alg(&sha224);
+-	crypto_unregister_alg(&sha256);
++	crypto_unregister_shash(&sha224);
++	crypto_unregister_shash(&sha256);
+ }
+ 
+ module_init(sha256_generic_mod_init);
 -- 
 1.5.2.5
 
