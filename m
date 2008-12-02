@@ -1,148 +1,154 @@
 From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 1/5] crypto: md4 - Switch to shash
-Date: Tue,  2 Dec 2008 23:38:30 +0100
-Message-ID: <12282575141051-git-send-email-ken@codelabs.ch>
+Subject: [PATCH 5/5] crypto: michael_mic - Switch to shash
+Date: Tue,  2 Dec 2008 23:38:34 +0100
+Message-ID: <12282575202908-git-send-email-ken@codelabs.ch>
+References: <12282575141051-git-send-email-ken@codelabs.ch>
+ <12282575163307-git-send-email-ken@codelabs.ch>
+ <12282575173222-git-send-email-ken@codelabs.ch>
+ <122825751834-git-send-email-ken@codelabs.ch>
 Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
 	Adrian-Ken Rueegsegger <ken@codelabs.ch>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:54053 "EHLO
+Received: from [217.150.249.120] ([217.150.249.120]:54065 "EHLO
 	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752269AbYLBWii (ORCPT
+	with ESMTP id S1752442AbYLBWin (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2008 17:38:38 -0500
+	Tue, 2 Dec 2008 17:38:43 -0500
+In-Reply-To: <122825751834-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes md4 to the new shash interface.
+This patch changes michael_mic to the  new shash interface.
 
 Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 ---
- crypto/md4.c |   52 +++++++++++++++++++++++++++++-----------------------
- 1 files changed, 29 insertions(+), 23 deletions(-)
+ crypto/michael_mic.c |   63 ++++++++++++++++++++++++++-----------------------
+ 1 files changed, 33 insertions(+), 30 deletions(-)
 
-diff --git a/crypto/md4.c b/crypto/md4.c
-index a143c4a..7fca1f5 100644
---- a/crypto/md4.c
-+++ b/crypto/md4.c
-@@ -20,8 +20,8 @@
-  * (at your option) any later version.
-  *
+diff --git a/crypto/michael_mic.c b/crypto/michael_mic.c
+index 9e917b8..88ba103 100644
+--- a/crypto/michael_mic.c
++++ b/crypto/michael_mic.c
+@@ -9,12 +9,11 @@
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
   */
+-
 +#include <crypto/internal/hash.h>
+ #include <asm/byteorder.h>
  #include <linux/init.h>
--#include <linux/crypto.h>
- #include <linux/kernel.h>
+ #include <linux/module.h>
  #include <linux/string.h>
+-#include <linux/crypto.h>
  #include <linux/types.h>
-@@ -58,7 +58,7 @@ static inline u32 H(u32 x, u32 y, u32 z)
- {
- 	return x ^ y ^ z;
- }
--                        
-+
- #define ROUND1(a,b,c,d,k,s) (a = lshift(a + F(b,c,d) + k, s))
- #define ROUND2(a,b,c,d,k,s) (a = lshift(a + G(b,c,d) + k + (u32)0x5A827999,s))
- #define ROUND3(a,b,c,d,k,s) (a = lshift(a + H(b,c,d) + k + (u32)0x6ED9EBA1,s))
-@@ -152,20 +152,22 @@ static inline void md4_transform_helper(struct md4_ctx *ctx)
- 	md4_transform(ctx->hash, ctx->block);
- }
  
--static void md4_init(struct crypto_tfm *tfm)
-+static int md4_init(struct shash_desc *desc)
- {
--	struct md4_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct md4_ctx *mctx = shash_desc_ctx(desc);
  
- 	mctx->hash[0] = 0x67452301;
- 	mctx->hash[1] = 0xefcdab89;
- 	mctx->hash[2] = 0x98badcfe;
- 	mctx->hash[3] = 0x10325476;
- 	mctx->byte_count = 0;
+@@ -45,17 +44,19 @@ do {				\
+ } while (0)
+ 
+ 
+-static void michael_init(struct crypto_tfm *tfm)
++static int michael_init(struct shash_desc *desc)
+ {
+-	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
++	struct michael_mic_ctx *mctx = shash_desc_ctx(desc);
+ 	mctx->pending_len = 0;
 +
 +	return 0;
  }
  
--static void md4_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
-+static int md4_update(struct shash_desc *desc, const u8 *data, unsigned int len)
- {
--	struct md4_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct md4_ctx *mctx = shash_desc_ctx(desc);
- 	const u32 avail = sizeof(mctx->block) - (mctx->byte_count & 0x3f);
  
- 	mctx->byte_count += len;
-@@ -173,7 +175,7 @@ static void md4_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
- 	if (avail > len) {
- 		memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
- 		       data, len);
--		return;
-+		return 0;
+-static void michael_update(struct crypto_tfm *tfm, const u8 *data,
++static int michael_update(struct shash_desc *desc, const u8 *data,
+ 			   unsigned int len)
+ {
+-	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
++	struct michael_mic_ctx *mctx = shash_desc_ctx(desc);
+ 	const __le32 *src;
+ 
+ 	if (mctx->pending_len) {
+@@ -68,7 +69,7 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
+ 		len -= flen;
+ 
+ 		if (mctx->pending_len < 4)
+-			return;
++			return 0;
+ 
+ 		src = (const __le32 *)mctx->pending;
+ 		mctx->l ^= le32_to_cpup(src);
+@@ -88,12 +89,14 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
+ 		mctx->pending_len = len;
+ 		memcpy(mctx->pending, src, len);
+ 	}
++
++	return 0;
+ }
+ 
+ 
+-static void michael_final(struct crypto_tfm *tfm, u8 *out)
++static int michael_final(struct shash_desc *desc, u8 *out)
+ {
+-	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
++	struct michael_mic_ctx *mctx = shash_desc_ctx(desc);
+ 	u8 *data = mctx->pending;
+ 	__le32 *dst = (__le32 *)out;
+ 
+@@ -119,17 +122,19 @@ static void michael_final(struct crypto_tfm *tfm, u8 *out)
+ 
+ 	dst[0] = cpu_to_le32(mctx->l);
+ 	dst[1] = cpu_to_le32(mctx->r);
++
++	return 0;
+ }
+ 
+ 
+-static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
++static int michael_setkey(struct crypto_shash *tfm, const u8 *key,
+ 			  unsigned int keylen)
+ {
+-	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
++	struct michael_mic_ctx *mctx = crypto_shash_ctx(tfm);
+ 	const __le32 *data = (const __le32 *)key;
+ 
+ 	if (keylen != 8) {
+-		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
  	}
  
- 	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
-@@ -191,11 +193,13 @@ static void md4_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
- 	}
- 
- 	memcpy(mctx->block, data, len);
-+
-+	return 0;
+@@ -138,33 +143,31 @@ static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	return 0;
  }
  
--static void md4_final(struct crypto_tfm *tfm, u8 *out)
-+static int md4_final(struct shash_desc *desc, u8 *out)
- {
--	struct md4_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct md4_ctx *mctx = shash_desc_ctx(desc);
- 	const unsigned int offset = mctx->byte_count & 0x3f;
- 	char *p = (char *)mctx->block + offset;
- 	int padding = 56 - (offset + 1);
-@@ -217,30 +221,32 @@ static void md4_final(struct crypto_tfm *tfm, u8 *out)
- 	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
- 	memcpy(out, mctx->hash, sizeof(mctx->hash));
- 	memset(mctx, 0, sizeof(*mctx));
-+
-+	return 0;
- }
- 
--static struct crypto_alg alg = {
--	.cra_name	=	"md4",
--	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize	=	MD4_HMAC_BLOCK_SIZE,
--	.cra_ctxsize	=	sizeof(struct md4_ctx),
--	.cra_module	=	THIS_MODULE,
--	.cra_list       =       LIST_HEAD_INIT(alg.cra_list),	
--	.cra_u		=	{ .digest = {
--	.dia_digestsize	=	MD4_DIGEST_SIZE,
--	.dia_init   	= 	md4_init,
--	.dia_update 	=	md4_update,
--	.dia_final  	=	md4_final } }
+-
+-static struct crypto_alg michael_mic_alg = {
+-	.cra_name	= "michael_mic",
+-	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	= 8,
+-	.cra_ctxsize	= sizeof(struct michael_mic_ctx),
+-	.cra_module	= THIS_MODULE,
+-	.cra_alignmask	= 3,
+-	.cra_list	= LIST_HEAD_INIT(michael_mic_alg.cra_list),
+-	.cra_u		= { .digest = {
+-	.dia_digestsize	= 8,
+-	.dia_init	= michael_init,
+-	.dia_update	= michael_update,
+-	.dia_final	= michael_final,
+-	.dia_setkey	= michael_setkey } }
 +static struct shash_alg alg = {
-+	.digestsize	=	MD4_DIGEST_SIZE,
-+	.init		=	md4_init,
-+	.update		=	md4_update,
-+	.final		=	md4_final,
-+	.descsize	=	sizeof(struct md4_ctx),
-+	.base		=	{
-+		.cra_name	=	"md4",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	MD4_HMAC_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
++	.digestsize		=	8,
++	.setkey			=	michael_setkey,
++	.init			=	michael_init,
++	.update			=	michael_update,
++	.final			=	michael_final,
++	.descsize		=	sizeof(struct michael_mic_ctx),
++	.base			=	{
++		.cra_name		=	"michael_mic",
++		.cra_blocksize		=	8,
++		.cra_alignmask		=	3,
++		.cra_ctxsize		=	sizeof(struct michael_mic_ctx),
++		.cra_module		=	THIS_MODULE,
 +	}
  };
  
- static int __init md4_mod_init(void)
- {
--	return crypto_register_alg(&alg);
-+	return crypto_register_shash(&alg);
- }
- 
- static void __exit md4_mod_fini(void)
- {
--	crypto_unregister_alg(&alg);
-+	crypto_unregister_shash(&alg);
- }
- 
- module_init(md4_mod_init);
--- 
-1.5.2.5
-
