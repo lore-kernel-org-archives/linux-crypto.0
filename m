@@ -1,230 +1,41 @@
-From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 2/4] crypto: sha512 - Switch to shash
-Date: Thu,  4 Dec 2008 01:18:10 +0100
-Message-ID: <12283498942104-git-send-email-ken@codelabs.ch>
-References: <12283498922490-git-send-email-ken@codelabs.ch>
- <12283498932360-git-send-email-ken@codelabs.ch>
-Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 4/4][RFC] crypto: michael_mic - Switch to shash
+Date: Thu, 4 Dec 2008 11:29:56 +0800
+Message-ID: <20081204032956.GA16987@gondor.apana.org.au>
+References: <12283498922490-git-send-email-ken@codelabs.ch> <12283498932360-git-send-email-ken@codelabs.ch> <12283498942104-git-send-email-ken@codelabs.ch> <12283498953450-git-send-email-ken@codelabs.ch> <12283498962759-git-send-email-ken@codelabs.ch>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com
+To: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:40693 "EHLO
-	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751017AbYLDASS (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:46776 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752709AbYLDDhW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2008 19:18:18 -0500
-In-Reply-To: <12283498932360-git-send-email-ken@codelabs.ch>
+	Wed, 3 Dec 2008 22:37:22 -0500
+Content-Disposition: inline
+In-Reply-To: <12283498962759-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes sha512 and sha384 to the new shash interface.
+On Thu, Dec 04, 2008 at 01:18:12AM +0100, Adrian-Ken Rueegsegger wrote:
+>
+>  struct michael_mic_ctx {
+> +	u32 l, r;
+> +};
+> +
+> +struct michael_mic_desc_ctx {
+>  	u8 pending[4];
+>  	size_t pending_len;
+>  
+>  	u32 l, r;
+>  };
 
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
----
- crypto/sha512_generic.c |  107 ++++++++++++++++++++++++----------------------
- 1 files changed, 56 insertions(+), 51 deletions(-)
+Any reason why you left them in the desc context?
 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index e0b0303..2834e55 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -10,12 +10,11 @@
-  * later version.
-  *
-  */
--
-+#include <crypto/internal/hash.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/mm.h>
- #include <linux/init.h>
--#include <linux/crypto.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- 
-@@ -134,10 +133,10 @@ sha512_transform(u64 *state, const u8 *input)
- 	memset(W, 0, 80 * sizeof(u64));
- }
- 
--static void
--sha512_init(struct crypto_tfm *tfm)
-+static int
-+sha512_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA512_H0;
- 	sctx->state[1] = SHA512_H1;
- 	sctx->state[2] = SHA512_H2;
-@@ -147,12 +146,14 @@ sha512_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA512_H6;
- 	sctx->state[7] = SHA512_H7;
- 	sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha384_init(struct crypto_tfm *tfm)
-+static int
-+sha384_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA384_H0;
- 	sctx->state[1] = SHA384_H1;
- 	sctx->state[2] = SHA384_H2;
-@@ -162,12 +163,14 @@ sha384_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA384_H6;
- 	sctx->state[7] = SHA384_H7;
-         sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
-+static int
-+sha512_update(struct shash_desc *desc, const u8 *data, unsigned int len)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 
- 	unsigned int i, index, part_len;
- 
-@@ -199,12 +202,14 @@ sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
- 
- 	/* Buffer remaining input */
- 	memcpy(&sctx->buf[index], &data[i], len - i);
-+
-+	return 0;
- }
- 
--static void
--sha512_final(struct crypto_tfm *tfm, u8 *hash)
-+static int
-+sha512_final(struct shash_desc *desc, u8 *hash)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
-         static u8 padding[128] = { 0x80, };
- 	__be64 *dst = (__be64 *)hash;
- 	__be32 bits[4];
-@@ -220,10 +225,10 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 	/* Pad out to 112 mod 128. */
- 	index = (sctx->count[0] >> 3) & 0x7f;
- 	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
--	sha512_update(tfm, padding, pad_len);
-+	sha512_update(desc, padding, pad_len);
- 
- 	/* Append length (before padding) */
--	sha512_update(tfm, (const u8 *)bits, sizeof(bits));
-+	sha512_update(desc, (const u8 *)bits, sizeof(bits));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 8; i++)
-@@ -231,66 +236,66 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 
- 	/* Zeroize sensitive information. */
- 	memset(sctx, 0, sizeof(struct sha512_ctx));
-+
-+	return 0;
- }
- 
--static void sha384_final(struct crypto_tfm *tfm, u8 *hash)
-+static int sha384_final(struct shash_desc *desc, u8 *hash)
- {
-         u8 D[64];
- 
--	sha512_final(tfm, D);
-+	sha512_final(desc, D);
- 
-         memcpy(hash, D, 48);
-         memset(D, 0, 64);
-+
-+	return 0;
- }
- 
--static struct crypto_alg sha512 = {
--        .cra_name       = "sha512",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA512_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--        .cra_module     = THIS_MODULE,
--	.cra_alignmask	= 3,
--        .cra_list       = LIST_HEAD_INIT(sha512.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA512_DIGEST_SIZE,
--                                .dia_init       = sha512_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha512_final }
--        }
-+static struct shash_alg sha512 = {
-+	.digestsize	=	SHA512_DIGEST_SIZE,
-+	.init		=	sha512_init,
-+	.update		=	sha512_update,
-+	.final		=	sha512_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha512",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA512_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
--static struct crypto_alg sha384 = {
--        .cra_name       = "sha384",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA384_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--	.cra_alignmask	= 3,
--        .cra_module     = THIS_MODULE,
--        .cra_list       = LIST_HEAD_INIT(sha384.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA384_DIGEST_SIZE,
--                                .dia_init       = sha384_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha384_final }
--        }
-+static struct shash_alg sha384 = {
-+	.digestsize	=	SHA384_DIGEST_SIZE,
-+	.init		=	sha384_init,
-+	.update		=	sha512_update,
-+	.final		=	sha384_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha384",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA384_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
- static int __init sha512_generic_mod_init(void)
- {
-         int ret = 0;
- 
--        if ((ret = crypto_register_alg(&sha384)) < 0)
-+	if ((ret = crypto_register_shash(&sha384)) < 0)
-                 goto out;
--        if ((ret = crypto_register_alg(&sha512)) < 0)
--                crypto_unregister_alg(&sha384);
-+        if ((ret = crypto_register_shash(&sha512)) < 0)
-+                crypto_unregister_shash(&sha384);
- out:
-         return ret;
- }
- 
- static void __exit sha512_generic_mod_fini(void)
- {
--        crypto_unregister_alg(&sha384);
--        crypto_unregister_alg(&sha512);
-+        crypto_unregister_shash(&sha384);
-+        crypto_unregister_shash(&sha512);
- }
- 
- module_init(sha512_generic_mod_init);
+Cheers,
 -- 
-1.5.2.5
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
