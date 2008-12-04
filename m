@@ -1,173 +1,245 @@
 From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 4/4][RFC] crypto: michael_mic - Switch to shash
-Date: Thu,  4 Dec 2008 01:18:12 +0100
-Message-ID: <12283498962759-git-send-email-ken@codelabs.ch>
+Subject: [PATCH 3/4] crypto: wp512 - Switch to shash
+Date: Thu,  4 Dec 2008 01:18:11 +0100
+Message-ID: <12283498953450-git-send-email-ken@codelabs.ch>
 References: <12283498922490-git-send-email-ken@codelabs.ch>
  <12283498932360-git-send-email-ken@codelabs.ch>
  <12283498942104-git-send-email-ken@codelabs.ch>
- <12283498953450-git-send-email-ken@codelabs.ch>
 Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
 	Adrian-Ken Rueegsegger <ken@codelabs.ch>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:40708 "EHLO
+Received: from [217.150.249.120] ([217.150.249.120]:40700 "EHLO
 	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751789AbYLDAST (ORCPT
+	with ESMTP id S1751576AbYLDASS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2008 19:18:19 -0500
-In-Reply-To: <12283498953450-git-send-email-ken@codelabs.ch>
+	Wed, 3 Dec 2008 19:18:18 -0500
+In-Reply-To: <12283498942104-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes michael_mic to the new shash interface.
+This patch changes wp512, wp384 and wp256 to the new shash interface.
 
 Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 ---
- crypto/michael_mic.c |   72 ++++++++++++++++++++++++++++---------------------
- 1 files changed, 41 insertions(+), 31 deletions(-)
+ crypto/wp512.c |  121 ++++++++++++++++++++++++++++++--------------------------
+ 1 files changed, 65 insertions(+), 56 deletions(-)
 
-diff --git a/crypto/michael_mic.c b/crypto/michael_mic.c
-index 9e917b8..079b761 100644
---- a/crypto/michael_mic.c
-+++ b/crypto/michael_mic.c
-@@ -9,23 +9,25 @@
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
+diff --git a/crypto/wp512.c b/crypto/wp512.c
+index bff2856..7234272 100644
+--- a/crypto/wp512.c
++++ b/crypto/wp512.c
+@@ -19,11 +19,11 @@
+  * (at your option) any later version.
+  *
   */
--
 +#include <crypto/internal/hash.h>
- #include <asm/byteorder.h>
  #include <linux/init.h>
  #include <linux/module.h>
- #include <linux/string.h>
+ #include <linux/mm.h>
+ #include <asm/byteorder.h>
 -#include <linux/crypto.h>
  #include <linux/types.h>
  
+ #define WP512_DIGEST_SIZE 64
+@@ -980,8 +980,8 @@ static void wp512_process_buffer(struct wp512_ctx *wctx) {
  
- struct michael_mic_ctx {
-+	u32 l, r;
-+};
-+
-+struct michael_mic_desc_ctx {
- 	u8 pending[4];
- 	size_t pending_len;
- 
- 	u32 l, r;
- };
- 
--
- static inline u32 xswap(u32 val)
- {
- 	return ((val & 0x00ff00ff) << 8) | ((val & 0xff00ff00) >> 8);
-@@ -45,17 +47,22 @@ do {				\
- } while (0)
- 
- 
--static void michael_init(struct crypto_tfm *tfm)
-+static int michael_init(struct shash_desc *desc)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
-+	struct michael_mic_ctx *ctx = crypto_shash_ctx(desc->tfm);
- 	mctx->pending_len = 0;
-+	mctx->l = ctx->l;
-+	mctx->r = ctx->r;
-+
-+	return 0;
  }
  
+-static void wp512_init(struct crypto_tfm *tfm) {
+-	struct wp512_ctx *wctx = crypto_tfm_ctx(tfm);
++static int wp512_init(struct shash_desc *desc) {
++	struct wp512_ctx *wctx = shash_desc_ctx(desc);
+ 	int i;
  
--static void michael_update(struct crypto_tfm *tfm, const u8 *data,
-+static int michael_update(struct shash_desc *desc, const u8 *data,
- 			   unsigned int len)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	const __le32 *src;
- 
- 	if (mctx->pending_len) {
-@@ -68,7 +75,7 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		len -= flen;
- 
- 		if (mctx->pending_len < 4)
--			return;
-+			return 0;
- 
- 		src = (const __le32 *)mctx->pending;
- 		mctx->l ^= le32_to_cpup(src);
-@@ -88,12 +95,14 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		mctx->pending_len = len;
- 		memcpy(mctx->pending, src, len);
+ 	memset(wctx->bitLength, 0, 32);
+@@ -990,12 +990,14 @@ static void wp512_init(struct crypto_tfm *tfm) {
+ 	for (i = 0; i < 8; i++) {
+ 		wctx->hash[i] = 0L;
  	}
 +
 +	return 0;
  }
  
- 
--static void michael_final(struct crypto_tfm *tfm, u8 *out)
-+static int michael_final(struct shash_desc *desc, u8 *out)
+-static void wp512_update(struct crypto_tfm *tfm, const u8 *source,
++static int wp512_update(struct shash_desc *desc, const u8 *source,
+ 			 unsigned int len)
  {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	u8 *data = mctx->pending;
- 	__le32 *dst = (__le32 *)out;
+-	struct wp512_ctx *wctx = crypto_tfm_ctx(tfm);
++	struct wp512_ctx *wctx = shash_desc_ctx(desc);
+ 	int sourcePos    = 0;
+ 	unsigned int bits_len = len * 8; // convert to number of bits
+ 	int sourceGap    = (8 - ((int)bits_len & 7)) & 7;
+@@ -1051,11 +1053,12 @@ static void wp512_update(struct crypto_tfm *tfm, const u8 *source,
+ 	wctx->bufferBits   = bufferBits;
+ 	wctx->bufferPos    = bufferPos;
  
-@@ -119,17 +128,20 @@ static void michael_final(struct crypto_tfm *tfm, u8 *out)
++	return 0;
+ }
  
- 	dst[0] = cpu_to_le32(mctx->l);
- 	dst[1] = cpu_to_le32(mctx->r);
+-static void wp512_final(struct crypto_tfm *tfm, u8 *out)
++static int wp512_final(struct shash_desc *desc, u8 *out)
+ {
+-	struct wp512_ctx *wctx = crypto_tfm_ctx(tfm);
++	struct wp512_ctx *wctx = shash_desc_ctx(desc);
+ 	int i;
+    	u8 *buffer      = wctx->buffer;
+    	u8 *bitLength   = wctx->bitLength;
+@@ -1084,89 +1087,95 @@ static void wp512_final(struct crypto_tfm *tfm, u8 *out)
+ 		digest[i] = cpu_to_be64(wctx->hash[i]);
+    	wctx->bufferBits   = bufferBits;
+    	wctx->bufferPos    = bufferPos;
 +
 +	return 0;
  }
  
- 
--static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
-+static int michael_setkey(struct crypto_shash *tfm, const u8 *key,
- 			  unsigned int keylen)
+-static void wp384_final(struct crypto_tfm *tfm, u8 *out)
++static int wp384_final(struct shash_desc *desc, u8 *out)
  {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_ctx *mctx = crypto_shash_ctx(tfm);
+ 	u8 D[64];
+ 
+-	wp512_final(tfm, D);
++	wp512_final(desc, D);
+ 	memcpy (out, D, WP384_DIGEST_SIZE);
+ 	memset (D, 0, WP512_DIGEST_SIZE);
 +
- 	const __le32 *data = (const __le32 *)key;
- 
- 	if (keylen != 8) {
--		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		return -EINVAL;
- 	}
- 
-@@ -138,33 +150,31 @@ static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	return 0;
++	return 0;
  }
  
--
--static struct crypto_alg michael_mic_alg = {
--	.cra_name	= "michael_mic",
--	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize	= 8,
--	.cra_ctxsize	= sizeof(struct michael_mic_ctx),
--	.cra_module	= THIS_MODULE,
--	.cra_alignmask	= 3,
--	.cra_list	= LIST_HEAD_INIT(michael_mic_alg.cra_list),
--	.cra_u		= { .digest = {
--	.dia_digestsize	= 8,
--	.dia_init	= michael_init,
--	.dia_update	= michael_update,
--	.dia_final	= michael_final,
--	.dia_setkey	= michael_setkey } }
-+static struct shash_alg alg = {
-+	.digestsize		=	8,
-+	.setkey			=	michael_setkey,
-+	.init			=	michael_init,
-+	.update			=	michael_update,
-+	.final			=	michael_final,
-+	.descsize		=	sizeof(struct michael_mic_desc_ctx),
-+	.base			=	{
-+		.cra_name		=	"michael_mic",
-+		.cra_blocksize		=	8,
-+		.cra_alignmask		=	3,
-+		.cra_ctxsize		=	sizeof(struct michael_mic_ctx),
-+		.cra_module		=	THIS_MODULE,
+-static void wp256_final(struct crypto_tfm *tfm, u8 *out)
++static int wp256_final(struct shash_desc *desc, u8 *out)
+ {
+ 	u8 D[64];
+ 
+-	wp512_final(tfm, D);
++	wp512_final(desc, D);
+ 	memcpy (out, D, WP256_DIGEST_SIZE);
+ 	memset (D, 0, WP512_DIGEST_SIZE);
++
++	return 0;
+ }
+ 
+-static struct crypto_alg wp512 = {
+-	.cra_name	=	"wp512",
+-	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	=	WP512_BLOCK_SIZE,
+-	.cra_ctxsize	=	sizeof(struct wp512_ctx),
+-	.cra_module	=	THIS_MODULE,
+-	.cra_list       =       LIST_HEAD_INIT(wp512.cra_list),	
+-	.cra_u		=	{ .digest = {
+-	.dia_digestsize	=	WP512_DIGEST_SIZE,
+-	.dia_init   	= 	wp512_init,
+-	.dia_update 	=	wp512_update,
+-	.dia_final  	=	wp512_final } }
++static struct shash_alg wp512 = {
++	.digestsize	=	WP512_DIGEST_SIZE,
++	.init		=	wp512_init,
++	.update		=	wp512_update,
++	.final		=	wp512_final,
++	.descsize	=	sizeof(struct wp512_ctx),
++	.base		=	{
++		.cra_name	=	"wp512",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	WP512_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
 +	}
  };
  
+-static struct crypto_alg wp384 = {
+-	.cra_name	=	"wp384",
+-	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	=	WP512_BLOCK_SIZE,
+-	.cra_ctxsize	=	sizeof(struct wp512_ctx),
+-	.cra_module	=	THIS_MODULE,
+-	.cra_list       =       LIST_HEAD_INIT(wp384.cra_list),	
+-	.cra_u		=	{ .digest = {
+-	.dia_digestsize	=	WP384_DIGEST_SIZE,
+-	.dia_init   	= 	wp512_init,
+-	.dia_update 	=	wp512_update,
+-	.dia_final  	=	wp384_final } }
++static struct shash_alg wp384 = {
++	.digestsize	=	WP384_DIGEST_SIZE,
++	.init		=	wp512_init,
++	.update		=	wp512_update,
++	.final		=	wp384_final,
++	.descsize	=	sizeof(struct wp512_ctx),
++	.base		=	{
++		.cra_name	=	"wp384",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	WP512_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
+ };
+ 
+-static struct crypto_alg wp256 = {
+-	.cra_name	=	"wp256",
+-	.cra_flags	=	CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize	=	WP512_BLOCK_SIZE,
+-	.cra_ctxsize	=	sizeof(struct wp512_ctx),
+-	.cra_module	=	THIS_MODULE,
+-	.cra_list       =       LIST_HEAD_INIT(wp256.cra_list),	
+-	.cra_u		=	{ .digest = {
+-	.dia_digestsize	=	WP256_DIGEST_SIZE,
+-	.dia_init   	= 	wp512_init,
+-	.dia_update 	=	wp512_update,
+-	.dia_final  	=	wp256_final } }
++static struct shash_alg wp256 = {
++	.digestsize	=	WP256_DIGEST_SIZE,
++	.init		=	wp512_init,
++	.update		=	wp512_update,
++	.final		=	wp256_final,
++	.descsize	=	sizeof(struct wp512_ctx),
++	.base		=	{
++		.cra_name	=	"wp256",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	WP512_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
+ };
+ 
+ static int __init wp512_mod_init(void)
+ {
+ 	int ret = 0;
+ 
+-	ret = crypto_register_alg(&wp512);
++	ret = crypto_register_shash(&wp512);
+ 
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = crypto_register_alg(&wp384);
++	ret = crypto_register_shash(&wp384);
+ 	if (ret < 0)
+ 	{
+-		crypto_unregister_alg(&wp512);
++		crypto_unregister_shash(&wp512);
+ 		goto out;
+ 	}
+ 
+-	ret = crypto_register_alg(&wp256);
++	ret = crypto_register_shash(&wp256);
+ 	if (ret < 0)
+ 	{
+-		crypto_unregister_alg(&wp512);
+-		crypto_unregister_alg(&wp384);
++		crypto_unregister_shash(&wp512);
++		crypto_unregister_shash(&wp384);
+ 	}
+ out:
+ 	return ret;
+@@ -1174,9 +1183,9 @@ out:
+ 
+ static void __exit wp512_mod_fini(void)
+ {
+-	crypto_unregister_alg(&wp512);
+-	crypto_unregister_alg(&wp384);
+-	crypto_unregister_alg(&wp256);
++	crypto_unregister_shash(&wp512);
++	crypto_unregister_shash(&wp384);
++	crypto_unregister_shash(&wp256);
+ }
+ 
+ MODULE_ALIAS("wp384");
+-- 
+1.5.2.5
+
