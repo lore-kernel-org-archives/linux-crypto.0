@@ -1,188 +1,40 @@
-From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 4/4 v2] crypto: michael_mic - Switch to shash
-Date: Thu,  4 Dec 2008 10:32:10 +0100
-Message-ID: <12283831332300-git-send-email-ken@codelabs.ch>
-References: 2008120406812.GB18141@gondor.apana.org.au
- <12283831302697-git-send-email-ken@codelabs.ch>
- <12283831303264-git-send-email-ken@codelabs.ch>
- <12283831312369-git-send-email-ken@codelabs.ch>
- <122838313275-git-send-email-ken@codelabs.ch>
-Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4 v2] crypto: sha512 - Remove W (message schedule)
+	from struct sha512_ctx
+Date: Thu, 4 Dec 2008 18:05:43 +0800
+Message-ID: <20081204100543.GA19425@gondor.apana.org.au>
+References: <12283831302697-git-send-email-ken@codelabs.ch> <12283831303264-git-send-email-ken@codelabs.ch>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com
+To: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:50139 "EHLO
-	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1753968AbYLDJcP (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:55666 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751342AbYLDKFq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Dec 2008 04:32:15 -0500
-In-Reply-To: <122838313275-git-send-email-ken@codelabs.ch>
+	Thu, 4 Dec 2008 05:05:46 -0500
+Content-Disposition: inline
+In-Reply-To: <12283831303264-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes michael_mic to the new shash interface.
+On Thu, Dec 04, 2008 at 10:32:07AM +0100, Adrian-Ken Rueegsegger wrote:
+>
+>  static void
+> -sha512_transform(u64 *state, u64 *W, const u8 *input)
+> +sha512_transform(u64 *state, const u8 *input)
+>  {
+>  	u64 a, b, c, d, e, f, g, h, t1, t2;
+> -
+> +	u64 W[80];
 
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
----
- crypto/Kconfig       |    2 +-
- crypto/michael_mic.c |   72 ++++++++++++++++++++++++++++---------------------
- 2 files changed, 42 insertions(+), 32 deletions(-)
+This is too big for the stack.  So we need to put it somewhere
+else.  A static per-cpu area is one choice.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e2b903d..9003f11 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -259,7 +259,7 @@ config CRYPTO_MD5
- 
- config CRYPTO_MICHAEL_MIC
- 	tristate "Michael MIC keyed digest algorithm"
--	select CRYPTO_ALGAPI
-+	select CRYPTO_HASH
- 	help
- 	  Michael MIC is used for message integrity protection in TKIP
- 	  (IEEE 802.11i). This algorithm is required for TKIP, but it
-diff --git a/crypto/michael_mic.c b/crypto/michael_mic.c
-index 9e917b8..079b761 100644
---- a/crypto/michael_mic.c
-+++ b/crypto/michael_mic.c
-@@ -9,23 +9,25 @@
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
-  */
--
-+#include <crypto/internal/hash.h>
- #include <asm/byteorder.h>
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/string.h>
--#include <linux/crypto.h>
- #include <linux/types.h>
- 
- 
- struct michael_mic_ctx {
-+	u32 l, r;
-+};
-+
-+struct michael_mic_desc_ctx {
- 	u8 pending[4];
- 	size_t pending_len;
- 
- 	u32 l, r;
- };
- 
--
- static inline u32 xswap(u32 val)
- {
- 	return ((val & 0x00ff00ff) << 8) | ((val & 0xff00ff00) >> 8);
-@@ -45,17 +47,22 @@ do {				\
- } while (0)
- 
- 
--static void michael_init(struct crypto_tfm *tfm)
-+static int michael_init(struct shash_desc *desc)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
-+	struct michael_mic_ctx *ctx = crypto_shash_ctx(desc->tfm);
- 	mctx->pending_len = 0;
-+	mctx->l = ctx->l;
-+	mctx->r = ctx->r;
-+
-+	return 0;
- }
- 
- 
--static void michael_update(struct crypto_tfm *tfm, const u8 *data,
-+static int michael_update(struct shash_desc *desc, const u8 *data,
- 			   unsigned int len)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	const __le32 *src;
- 
- 	if (mctx->pending_len) {
-@@ -68,7 +75,7 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		len -= flen;
- 
- 		if (mctx->pending_len < 4)
--			return;
-+			return 0;
- 
- 		src = (const __le32 *)mctx->pending;
- 		mctx->l ^= le32_to_cpup(src);
-@@ -88,12 +95,14 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		mctx->pending_len = len;
- 		memcpy(mctx->pending, src, len);
- 	}
-+
-+	return 0;
- }
- 
- 
--static void michael_final(struct crypto_tfm *tfm, u8 *out)
-+static int michael_final(struct shash_desc *desc, u8 *out)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	u8 *data = mctx->pending;
- 	__le32 *dst = (__le32 *)out;
- 
-@@ -119,17 +128,20 @@ static void michael_final(struct crypto_tfm *tfm, u8 *out)
- 
- 	dst[0] = cpu_to_le32(mctx->l);
- 	dst[1] = cpu_to_le32(mctx->r);
-+
-+	return 0;
- }
- 
- 
--static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
-+static int michael_setkey(struct crypto_shash *tfm, const u8 *key,
- 			  unsigned int keylen)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_ctx *mctx = crypto_shash_ctx(tfm);
-+
- 	const __le32 *data = (const __le32 *)key;
- 
- 	if (keylen != 8) {
--		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		return -EINVAL;
- 	}
- 
-@@ -138,33 +150,31 @@ static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	return 0;
- }
- 
--
--static struct crypto_alg michael_mic_alg = {
--	.cra_name	= "michael_mic",
--	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize	= 8,
--	.cra_ctxsize	= sizeof(struct michael_mic_ctx),
--	.cra_module	= THIS_MODULE,
--	.cra_alignmask	= 3,
--	.cra_list	= LIST_HEAD_INIT(michael_mic_alg.cra_list),
--	.cra_u		= { .digest = {
--	.dia_digestsize	= 8,
--	.dia_init	= michael_init,
--	.dia_update	= michael_update,
--	.dia_final	= michael_final,
--	.dia_setkey	= michael_setkey } }
-+static struct shash_alg alg = {
-+	.digestsize		=	8,
-+	.setkey			=	michael_setkey,
-+	.init			=	michael_init,
-+	.update			=	michael_update,
-+	.final			=	michael_final,
-+	.descsize		=	sizeof(struct michael_mic_desc_ctx),
-+	.base			=	{
-+		.cra_name		=	"michael_mic",
-+		.cra_blocksize		=	8,
-+		.cra_alignmask		=	3,
-+		.cra_ctxsize		=	sizeof(struct michael_mic_ctx),
-+		.cra_module		=	THIS_MODULE,
-+	}
- };
- 
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
