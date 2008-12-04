@@ -1,188 +1,229 @@
 From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 4/4 v3] crypto: michael_mic - Switch to shash
-Date: Thu,  4 Dec 2008 23:43:48 +0100
-Message-ID: <122843063240-git-send-email-ken@codelabs.ch>
+Subject: [PATCH 2/4 v3] crypto: sha512 - Switch to shash
+Date: Thu,  4 Dec 2008 23:43:46 +0100
+Message-ID: <12284306293090-git-send-email-ken@codelabs.ch>
 References: <20081204100543.GA19425@gondor.apana.org.au>
  <12284306281986-git-send-email-ken@codelabs.ch>
  <1228430628526-git-send-email-ken@codelabs.ch>
- <12284306293090-git-send-email-ken@codelabs.ch>
- <12284306302052-git-send-email-ken@codelabs.ch>
 Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
 	Adrian-Ken Rueegsegger <ken@codelabs.ch>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:54619 "EHLO
+Received: from [217.150.249.120] ([217.150.249.120]:54607 "EHLO
 	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1756753AbYLDWny (ORCPT
+	with ESMTP id S1756854AbYLDWnw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Dec 2008 17:43:54 -0500
-In-Reply-To: <12284306302052-git-send-email-ken@codelabs.ch>
+	Thu, 4 Dec 2008 17:43:52 -0500
+In-Reply-To: <1228430628526-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes michael_mic to the new shash interface.
+This patch changes sha512 and sha384 to the new shash interface.
 
 Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 ---
- crypto/Kconfig       |    2 +-
- crypto/michael_mic.c |   72 ++++++++++++++++++++++++++++---------------------
- 2 files changed, 42 insertions(+), 32 deletions(-)
+ crypto/sha512_generic.c |  112 +++++++++++++++++++++++++----------------------
+ 1 files changed, 59 insertions(+), 53 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0583a26..6593b5a 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -260,7 +260,7 @@ config CRYPTO_MD5
- 
- config CRYPTO_MICHAEL_MIC
- 	tristate "Michael MIC keyed digest algorithm"
--	select CRYPTO_ALGAPI
-+	select CRYPTO_HASH
- 	help
- 	  Michael MIC is used for message integrity protection in TKIP
- 	  (IEEE 802.11i). This algorithm is required for TKIP, but it
-diff --git a/crypto/michael_mic.c b/crypto/michael_mic.c
-index 9e917b8..079b761 100644
---- a/crypto/michael_mic.c
-+++ b/crypto/michael_mic.c
-@@ -9,23 +9,25 @@
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
+diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
+index 660c5c3..ec9cef3 100644
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -10,7 +10,7 @@
+  * later version.
+  *
   */
 -
 +#include <crypto/internal/hash.h>
- #include <asm/byteorder.h>
- #include <linux/init.h>
+ #include <linux/kernel.h>
  #include <linux/module.h>
- #include <linux/string.h>
--#include <linux/crypto.h>
- #include <linux/types.h>
+ #include <linux/mm.h>
+@@ -138,10 +138,10 @@ sha512_transform(u64 *state, const u8 *input)
+ 	put_cpu_var(msg_schedule);
+ }
  
- 
- struct michael_mic_ctx {
-+	u32 l, r;
-+};
-+
-+struct michael_mic_desc_ctx {
- 	u8 pending[4];
- 	size_t pending_len;
- 
- 	u32 l, r;
- };
- 
--
- static inline u32 xswap(u32 val)
+-static void
+-sha512_init(struct crypto_tfm *tfm)
++static int
++sha512_init(struct shash_desc *desc)
  {
- 	return ((val & 0x00ff00ff) << 8) | ((val & 0xff00ff00) >> 8);
-@@ -45,17 +47,22 @@ do {				\
- } while (0)
- 
- 
--static void michael_init(struct crypto_tfm *tfm)
-+static int michael_init(struct shash_desc *desc)
- {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
-+	struct michael_mic_ctx *ctx = crypto_shash_ctx(desc->tfm);
- 	mctx->pending_len = 0;
-+	mctx->l = ctx->l;
-+	mctx->r = ctx->r;
+-	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha512_ctx *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA512_H0;
+ 	sctx->state[1] = SHA512_H1;
+ 	sctx->state[2] = SHA512_H2;
+@@ -151,12 +151,14 @@ sha512_init(struct crypto_tfm *tfm)
+ 	sctx->state[6] = SHA512_H6;
+ 	sctx->state[7] = SHA512_H7;
+ 	sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
 +
 +	return 0;
  }
  
- 
--static void michael_update(struct crypto_tfm *tfm, const u8 *data,
-+static int michael_update(struct shash_desc *desc, const u8 *data,
- 			   unsigned int len)
+-static void
+-sha384_init(struct crypto_tfm *tfm)
++static int
++sha384_init(struct shash_desc *desc)
  {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	const __le32 *src;
- 
- 	if (mctx->pending_len) {
-@@ -68,7 +75,7 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		len -= flen;
- 
- 		if (mctx->pending_len < 4)
--			return;
-+			return 0;
- 
- 		src = (const __le32 *)mctx->pending;
- 		mctx->l ^= le32_to_cpup(src);
-@@ -88,12 +95,14 @@ static void michael_update(struct crypto_tfm *tfm, const u8 *data,
- 		mctx->pending_len = len;
- 		memcpy(mctx->pending, src, len);
- 	}
+-	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha512_ctx *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA384_H0;
+ 	sctx->state[1] = SHA384_H1;
+ 	sctx->state[2] = SHA384_H2;
+@@ -166,12 +168,14 @@ sha384_init(struct crypto_tfm *tfm)
+ 	sctx->state[6] = SHA384_H6;
+ 	sctx->state[7] = SHA384_H7;
+         sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
 +
 +	return 0;
  }
  
- 
--static void michael_final(struct crypto_tfm *tfm, u8 *out)
-+static int michael_final(struct shash_desc *desc, u8 *out)
+-static void
+-sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
++static int
++sha512_update(struct shash_desc *desc, const u8 *data, unsigned int len)
  {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_desc_ctx *mctx = shash_desc_ctx(desc);
- 	u8 *data = mctx->pending;
- 	__le32 *dst = (__le32 *)out;
+-	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha512_ctx *sctx = shash_desc_ctx(desc);
  
-@@ -119,17 +128,20 @@ static void michael_final(struct crypto_tfm *tfm, u8 *out)
+ 	unsigned int i, index, part_len;
  
- 	dst[0] = cpu_to_le32(mctx->l);
- 	dst[1] = cpu_to_le32(mctx->r);
+@@ -203,12 +207,14 @@ sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
+ 
+ 	/* Buffer remaining input */
+ 	memcpy(&sctx->buf[index], &data[i], len - i);
 +
 +	return 0;
  }
  
- 
--static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
-+static int michael_setkey(struct crypto_shash *tfm, const u8 *key,
- 			  unsigned int keylen)
+-static void
+-sha512_final(struct crypto_tfm *tfm, u8 *hash)
++static int
++sha512_final(struct shash_desc *desc, u8 *hash)
  {
--	struct michael_mic_ctx *mctx = crypto_tfm_ctx(tfm);
-+	struct michael_mic_ctx *mctx = crypto_shash_ctx(tfm);
+-	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
++	struct sha512_ctx *sctx = shash_desc_ctx(desc);
+         static u8 padding[128] = { 0x80, };
+ 	__be64 *dst = (__be64 *)hash;
+ 	__be32 bits[4];
+@@ -224,10 +230,10 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
+ 	/* Pad out to 112 mod 128. */
+ 	index = (sctx->count[0] >> 3) & 0x7f;
+ 	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
+-	sha512_update(tfm, padding, pad_len);
++	sha512_update(desc, padding, pad_len);
+ 
+ 	/* Append length (before padding) */
+-	sha512_update(tfm, (const u8 *)bits, sizeof(bits));
++	sha512_update(desc, (const u8 *)bits, sizeof(bits));
+ 
+ 	/* Store state in digest */
+ 	for (i = 0; i < 8; i++)
+@@ -235,66 +241,66 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
+ 
+ 	/* Zeroize sensitive information. */
+ 	memset(sctx, 0, sizeof(struct sha512_ctx));
 +
- 	const __le32 *data = (const __le32 *)key;
- 
- 	if (keylen != 8) {
--		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		return -EINVAL;
- 	}
- 
-@@ -138,33 +150,31 @@ static int michael_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	return 0;
++	return 0;
  }
  
--
--static struct crypto_alg michael_mic_alg = {
--	.cra_name	= "michael_mic",
--	.cra_flags	= CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize	= 8,
--	.cra_ctxsize	= sizeof(struct michael_mic_ctx),
--	.cra_module	= THIS_MODULE,
+-static void sha384_final(struct crypto_tfm *tfm, u8 *hash)
++static int sha384_final(struct shash_desc *desc, u8 *hash)
+ {
+-        u8 D[64];
++	u8 D[64];
+ 
+-	sha512_final(tfm, D);
++	sha512_final(desc, D);
+ 
+-        memcpy(hash, D, 48);
+-        memset(D, 0, 64);
++	memcpy(hash, D, 48);
++	memset(D, 0, 64);
++
++	return 0;
+ }
+ 
+-static struct crypto_alg sha512 = {
+-        .cra_name       = "sha512",
+-        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize  = SHA512_BLOCK_SIZE,
+-        .cra_ctxsize    = sizeof(struct sha512_ctx),
+-        .cra_module     = THIS_MODULE,
 -	.cra_alignmask	= 3,
--	.cra_list	= LIST_HEAD_INIT(michael_mic_alg.cra_list),
--	.cra_u		= { .digest = {
--	.dia_digestsize	= 8,
--	.dia_init	= michael_init,
--	.dia_update	= michael_update,
--	.dia_final	= michael_final,
--	.dia_setkey	= michael_setkey } }
-+static struct shash_alg alg = {
-+	.digestsize		=	8,
-+	.setkey			=	michael_setkey,
-+	.init			=	michael_init,
-+	.update			=	michael_update,
-+	.final			=	michael_final,
-+	.descsize		=	sizeof(struct michael_mic_desc_ctx),
-+	.base			=	{
-+		.cra_name		=	"michael_mic",
-+		.cra_blocksize		=	8,
-+		.cra_alignmask		=	3,
-+		.cra_ctxsize		=	sizeof(struct michael_mic_ctx),
-+		.cra_module		=	THIS_MODULE,
+-        .cra_list       = LIST_HEAD_INIT(sha512.cra_list),
+-        .cra_u          = { .digest = {
+-                                .dia_digestsize = SHA512_DIGEST_SIZE,
+-                                .dia_init       = sha512_init,
+-                                .dia_update     = sha512_update,
+-                                .dia_final      = sha512_final }
+-        }
++static struct shash_alg sha512 = {
++	.digestsize	=	SHA512_DIGEST_SIZE,
++	.init		=	sha512_init,
++	.update		=	sha512_update,
++	.final		=	sha512_final,
++	.descsize	=	sizeof(struct sha512_ctx),
++	.base		=	{
++		.cra_name	=	"sha512",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	SHA512_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
 +	}
  };
  
+-static struct crypto_alg sha384 = {
+-        .cra_name       = "sha384",
+-        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
+-	.cra_blocksize  = SHA384_BLOCK_SIZE,
+-        .cra_ctxsize    = sizeof(struct sha512_ctx),
+-	.cra_alignmask	= 3,
+-        .cra_module     = THIS_MODULE,
+-        .cra_list       = LIST_HEAD_INIT(sha384.cra_list),
+-        .cra_u          = { .digest = {
+-                                .dia_digestsize = SHA384_DIGEST_SIZE,
+-                                .dia_init       = sha384_init,
+-                                .dia_update     = sha512_update,
+-                                .dia_final      = sha384_final }
+-        }
++static struct shash_alg sha384 = {
++	.digestsize	=	SHA384_DIGEST_SIZE,
++	.init		=	sha384_init,
++	.update		=	sha512_update,
++	.final		=	sha384_final,
++	.descsize	=	sizeof(struct sha512_ctx),
++	.base		=	{
++		.cra_name	=	"sha384",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	SHA384_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
+ };
+ 
+ static int __init sha512_generic_mod_init(void)
+ {
+         int ret = 0;
+ 
+-        if ((ret = crypto_register_alg(&sha384)) < 0)
++        if ((ret = crypto_register_shash(&sha384)) < 0)
+                 goto out;
+-        if ((ret = crypto_register_alg(&sha512)) < 0)
+-                crypto_unregister_alg(&sha384);
++        if ((ret = crypto_register_shash(&sha512)) < 0)
++                crypto_unregister_shash(&sha384);
+ out:
+         return ret;
+ }
+ 
+ static void __exit sha512_generic_mod_fini(void)
+ {
+-        crypto_unregister_alg(&sha384);
+-        crypto_unregister_alg(&sha512);
++        crypto_unregister_shash(&sha384);
++        crypto_unregister_shash(&sha512);
+ }
+ 
+ module_init(sha512_generic_mod_init);
+-- 
+1.5.2.5
+
