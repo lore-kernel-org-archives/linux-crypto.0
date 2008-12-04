@@ -1,49 +1,34 @@
-From: Kumar Gala <galak@kernel.crashing.org>
-Subject: Re: [PATCH] crypto: talitos - Fix modpost warning
-Date: Wed, 3 Dec 2008 09:36:05 -0600
-Message-ID: <9DE57422-83C5-4561-9D94-4C74865E5994@kernel.crashing.org>
-References: <1228278556-1056-1-git-send-email-galak@kernel.crashing.org> <20081203120640.GB9818@gondor.apana.org.au> <75DC3D14-4019-4C55-A553-C54063790DD8@kernel.crashing.org>
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linuxppc-dev@ozlabs.org,
-	linux-crypto@vger.kernel.org
-To: Kumar Gala <galak@kernel.crashing.org>
+From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+Subject: [PATCH 0/4] Switch remaining algorithms to shash
+Date: Thu,  4 Dec 2008 01:18:08 +0100
+Message-ID: <12283498922490-git-send-email-ken@codelabs.ch>
+Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:55993 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753240AbYLCPgS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2008 10:36:18 -0500
-In-Reply-To: <75DC3D14-4019-4C55-A553-C54063790DD8@kernel.crashing.org>
+Received: from [217.150.249.120] ([217.150.249.120]:40688 "EHLO
+	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1750824AbYLDASR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Dec 2008 19:18:17 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This series converts the remaining hash algorithms to use the new shash
+interface.
 
-On Dec 3, 2008, at 8:52 AM, Kumar Gala wrote:
+The first patch removes the message schedule W from struct sha512_ctx
+since it gets calculated anew on each execution of sha512_transform. This
+reduces the size of sha512_ctx considerably and will allow it to be
+registered as a shash algorithm (it will pass the size check in
+crypto_register_shash (crypto/shash.c:490)).
+Herbert, could you explain why descsize must be smaller (or equal)
+than PAGE_SIZE / 8?
 
->
-> On Dec 3, 2008, at 6:06 AM, Herbert Xu wrote:
->
->> On Tue, Dec 02, 2008 at 10:29:16PM -0600, Kumar Gala wrote:
->>> Removed __devexit from talitos_remove() since its also called from
->>> talitos_probe().
->>>
->>> WARNING: vmlinux.o(.text+0x28a008): Section mismatch in reference  
->>> from the function talitos_probe() to the  
->>> function .devexit.text:talitos_remove()
->>> The function talitos_probe() references a function in an exit  
->>> section.
->>> Often the function talitos_remove() has valid usage outside the  
->>> exit section
->>> and the fix is to remove the __devexit annotation of talitos_remove.
->>>
->>> Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
->>
->> OK, but what about the __devexit_p reference on talitos_remove?
->> We should remove that too.
->
-> missed that one.  will fix up and post a new patch.
+The next two patches switch sha512 and wp512 to the new shash interface.
 
-Nevermind.  Al bet me to this fix :)
+The fourth patch is another try to convert michael_mic. The key values
+l and r are duplicated in the descriptor part since they are used and
+changed during the actual transformation. I would be gratefull for
+comments on this patch since I am not sure it's the proper way to do it.
 
-- k
+Adrian
