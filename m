@@ -1,242 +1,309 @@
-From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH] crypto: sha512 - Switch to shash
-Date: Fri,  5 Dec 2008 01:29:56 +0100
-Message-ID: <12284369963751-git-send-email-ken@codelabs.ch>
-References: <12284306293090-git-send-email-ken@codelabs.ch>
- <12284369962234-git-send-email-ken@codelabs.ch>
-Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>
-To: herbert@gondor.apana.org.au
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v4]
+Date: Thu, 4 Dec 2008 19:32:56 -0600
+Message-ID: <20081204193256.12dbc306.kim.phillips@freescale.com>
+References: <1228256232.4770.47.camel@jhsiao-usb>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, jwboyer@linux.vnet.ibm.com,
+	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+To: jhsiao@amcc.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:43186 "EHLO
-	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751455AbYLEAaA (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:53664 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752117AbYLEBar (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Dec 2008 19:30:00 -0500
-In-Reply-To: <12284369962234-git-send-email-ken@codelabs.ch>
+	Thu, 4 Dec 2008 20:30:47 -0500
+In-Reply-To: <1228256232.4770.47.camel@jhsiao-usb>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes sha512 and sha384 to the new shash interface.
+On Tue, 02 Dec 2008 14:17:12 -0800
+James Hsiao <jhsiao@amcc.com> wrote:
 
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
----
- crypto/Kconfig          |    2 +-
- crypto/sha512_generic.c |  112 +++++++++++++++++++++++++----------------------
- 2 files changed, 60 insertions(+), 54 deletions(-)
+> Hi,
+> 
+> This patch add canyonlands support.
+> 
+> Few performance optimizations:
+> Redesigned the crypto4xx_build_pd(), which now calculate number of
+> scatter and gather descriptors need before taking them. Instead take 
+> these descriptors one by one, now we take them together. Doing this way
+> the time needed to be locked is much reduced. This function now supports
+> aad which needed by future release. 
+> 
+> Introduced functions to setup the commands registers. This is to reduce
+> code space and increase the likelihood for cache hit.
+> 
+> Eliminate the need for dynamically alloc memory for request context, by
+> cache up per packet 'sa' in pd_uinfo.
+> 
+> Response to previous review:
+> Removed not needed includes.
+> Avoid using if else flow as Kim suggested in few places.
+> lineup multiline parameters of functions.
+> removed change log.
+> 
+> We still include crypto/internal/hash.h because we support 'ahash' which
+> need that header file.
+> 
+> We still have the wrapper function for alg_init(), because  we will have
+> multiple algorithm files and external define for the struct ...alg[]
+> does not work.
+> 
+> Thanks
+> James
+> 
+> 
+> Signed-off-by: James Hsiao <jhsiao@amcc.com>
+> ---
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c8fb468..6d2c5bf 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -341,7 +341,7 @@ config CRYPTO_SHA256
- 
- config CRYPTO_SHA512
- 	tristate "SHA384 and SHA512 digest algorithms"
--	select CRYPTO_ALGAPI
-+	select CRYPTO_HASH
- 	help
- 	  SHA512 secure hash standard (DFIPS 180-2).
- 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index 660c5c3..ec9cef3 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -10,7 +10,7 @@
-  * later version.
-  *
-  */
--
-+#include <crypto/internal/hash.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-@@ -138,10 +138,10 @@ sha512_transform(u64 *state, const u8 *input)
- 	put_cpu_var(msg_schedule);
- }
- 
--static void
--sha512_init(struct crypto_tfm *tfm)
-+static int
-+sha512_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA512_H0;
- 	sctx->state[1] = SHA512_H1;
- 	sctx->state[2] = SHA512_H2;
-@@ -151,12 +151,14 @@ sha512_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA512_H6;
- 	sctx->state[7] = SHA512_H7;
- 	sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha384_init(struct crypto_tfm *tfm)
-+static int
-+sha384_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA384_H0;
- 	sctx->state[1] = SHA384_H1;
- 	sctx->state[2] = SHA384_H2;
-@@ -166,12 +168,14 @@ sha384_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA384_H6;
- 	sctx->state[7] = SHA384_H7;
-         sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
-+static int
-+sha512_update(struct shash_desc *desc, const u8 *data, unsigned int len)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 
- 	unsigned int i, index, part_len;
- 
-@@ -203,12 +207,14 @@ sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
- 
- 	/* Buffer remaining input */
- 	memcpy(&sctx->buf[index], &data[i], len - i);
-+
-+	return 0;
- }
- 
--static void
--sha512_final(struct crypto_tfm *tfm, u8 *hash)
-+static int
-+sha512_final(struct shash_desc *desc, u8 *hash)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
-         static u8 padding[128] = { 0x80, };
- 	__be64 *dst = (__be64 *)hash;
- 	__be32 bits[4];
-@@ -224,10 +230,10 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 	/* Pad out to 112 mod 128. */
- 	index = (sctx->count[0] >> 3) & 0x7f;
- 	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
--	sha512_update(tfm, padding, pad_len);
-+	sha512_update(desc, padding, pad_len);
- 
- 	/* Append length (before padding) */
--	sha512_update(tfm, (const u8 *)bits, sizeof(bits));
-+	sha512_update(desc, (const u8 *)bits, sizeof(bits));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 8; i++)
-@@ -235,66 +241,66 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 
- 	/* Zeroize sensitive information. */
- 	memset(sctx, 0, sizeof(struct sha512_ctx));
-+
-+	return 0;
- }
- 
--static void sha384_final(struct crypto_tfm *tfm, u8 *hash)
-+static int sha384_final(struct shash_desc *desc, u8 *hash)
- {
--        u8 D[64];
-+	u8 D[64];
- 
--	sha512_final(tfm, D);
-+	sha512_final(desc, D);
- 
--        memcpy(hash, D, 48);
--        memset(D, 0, 64);
-+	memcpy(hash, D, 48);
-+	memset(D, 0, 64);
-+
-+	return 0;
- }
- 
--static struct crypto_alg sha512 = {
--        .cra_name       = "sha512",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA512_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--        .cra_module     = THIS_MODULE,
--	.cra_alignmask	= 3,
--        .cra_list       = LIST_HEAD_INIT(sha512.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA512_DIGEST_SIZE,
--                                .dia_init       = sha512_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha512_final }
--        }
-+static struct shash_alg sha512 = {
-+	.digestsize	=	SHA512_DIGEST_SIZE,
-+	.init		=	sha512_init,
-+	.update		=	sha512_update,
-+	.final		=	sha512_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha512",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA512_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
--static struct crypto_alg sha384 = {
--        .cra_name       = "sha384",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA384_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--	.cra_alignmask	= 3,
--        .cra_module     = THIS_MODULE,
--        .cra_list       = LIST_HEAD_INIT(sha384.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA384_DIGEST_SIZE,
--                                .dia_init       = sha384_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha384_final }
--        }
-+static struct shash_alg sha384 = {
-+	.digestsize	=	SHA384_DIGEST_SIZE,
-+	.init		=	sha384_init,
-+	.update		=	sha512_update,
-+	.final		=	sha384_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha384",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA384_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
- static int __init sha512_generic_mod_init(void)
- {
-         int ret = 0;
- 
--        if ((ret = crypto_register_alg(&sha384)) < 0)
-+        if ((ret = crypto_register_shash(&sha384)) < 0)
-                 goto out;
--        if ((ret = crypto_register_alg(&sha512)) < 0)
--                crypto_unregister_alg(&sha384);
-+        if ((ret = crypto_register_shash(&sha512)) < 0)
-+                crypto_unregister_shash(&sha384);
- out:
-         return ret;
- }
- 
- static void __exit sha512_generic_mod_fini(void)
- {
--        crypto_unregister_alg(&sha384);
--        crypto_unregister_alg(&sha512);
-+        crypto_unregister_shash(&sha384);
-+        crypto_unregister_shash(&sha512);
- }
- 
- module_init(sha512_generic_mod_init);
--- 
-1.5.2.5
+just fyi, all text above the --- line above is part of the git commit
+message - might want to help the maintainers by cleaning up things like
+"Hi" etc. and moving them here, below the --- line.
 
+> diff --git a/arch/powerpc/boot/dts/canyonlands.dts b/arch/powerpc/boot/dts/canyonlands.dts
+> index 79fe412..b0f0096 100644
+> --- a/arch/powerpc/boot/dts/canyonlands.dts
+> +++ b/arch/powerpc/boot/dts/canyonlands.dts
+> @@ -116,6 +116,13 @@
+>  			dcr-reg = <0x010 0x002>;
+>  		};
+>  
+> +		CRYPTO: crypto@180000 {
+> +			compatible = "amcc,ppc460ex-crypto", "amcc,ppc4xx-crypto";
+> +			reg = <4 0x00180000 0x80400>;
+> +			interrupt-parent = <&UIC0>;
+> +			interrupts = <0x1d 0x4>;
+
+that's odd, according to the current canyonlands.dts, irq 0x1d is
+already assigned to UART2 (and the request_irq this driver makes
+doesn't specify a shared flag).
+
+> diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
+> new file mode 100644
+> index 0000000..7a693e4
+> --- /dev/null
+> +++ b/drivers/crypto/amcc/crypto4xx_alg.c
+> +static int crypto4xx_decrypt(struct ablkcipher_request *req)
+> +{
+> +	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+> +
+> +	ctx->direction = DIR_INBOUND;
+> +	ctx->hash_final = 0;
+> +	ctx->is_hash = 0;
+> +	ctx->pd_ctl = 1;
+> +	ctx->direction = DIR_INBOUND;
+
+duplicate assignment
+
+> diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+> +/*
+> + * derive number of elements in scatterlist
+> + * Shamlessly copy from talitos.c
+
+this fn should one day be refactored and placed in lib/scatterlist.c -
+all the crypto drivers currently implement their own version.
+
+> + */
+> +static int get_sg_count(struct scatterlist *sg_list, int nbytes)
+> +{
+> +	struct scatterlist *sg = sg_list;
+> +	int sg_nents = 0;
+> +
+> +	while (nbytes) {
+> +		sg_nents++;
+> +		if (sg->length > nbytes)
+> +			break;
+
+this is slightly different - this condition shouldn't need checking
+here - see [1] below..
+
+> +		nbytes -= sg->length;
+> +		sg = sg_next(sg);
+> +	}
+> +
+> +	return sg_nents;
+> +}
+
+> +u32 crypto4xx_build_pd(struct crypto_async_request *req,
+> +			struct crypto4xx_ctx *ctx,
+> +			struct scatterlist *src,
+> +			struct scatterlist *dst,
+> +			unsigned int datalen,
+> +			struct scatterlist *assoc,
+> +			u32 aad_len, void *iv, u32 iv_len)
+> +{
+> +	struct crypto4xx_device *dev = ctx->dev;
+> +	dma_addr_t addr, pd_dma, sd_dma, gd_dma;
+> +	struct dynamic_sa_ctl *sa;
+> +	struct scatterlist *sg;
+> +	struct scatterlist *aad;
+> +	struct ce_gd *gd;
+> +	struct ce_pd *pd;
+> +	u32 num_gd, num_sd;
+> +	u32 fst_gd = 0xffffffff;
+> +	u32 fst_sd = 0xffffffff;
+> +	u32 pd_entry;
+> +	struct pd_uinfo *pd_uinfo = NULL;
+> +	unsigned int nbytes = datalen, idx;
+> +	unsigned int aadlen = 0;
+> +	unsigned int ivlen = 0;
+> +	u32 gd_idx = 0;
+> +
+> +	/* figure how many gd is needed */
+> +	if (aad_len) {
+> +		num_gd = get_sg_count(assoc, aad_len) +
+> +			get_sg_count(src, datalen);
+
+this is dead code - aad_len is never non-zero - is there some code
+missing from crypto4xx_alg.c?  Also, IIRC, assoc is a superset of src,
+so I believe something like num_gd = get_sg_count(assoc, aad_len +
+datalen) would work better - this should also permit removal of the
+nbytes reached check in [1] in get_sg_count.
+
+> +	/*
+> +	 * The follow section of code needs to be protected
+> +	 * The gather ring and scatter ring needs to be consecutive
+> +	 * In case of run out of any kind of descriptor, the descriptor
+> +	 * already got must be return the original place. So, here
+> +	 * we disable interrupt.
+> +	 * We found using irq disable here is 30% faster than
+> +	 * using preempt disable.
+> +	 */
+> +	local_irq_disable();
+
+the 30% increase in speed shouldn't be for the preemption-off case, and
+not using preempt_{en,dis}able adds latency outside of this driver for
+users that have preemption turned on (local_irq_enable doesn't check to
+reschedule).  To satisfy memory barrier (completely absent here),
+preemption, and smp requirements, use of spin_lock methods is
+recommended.  Performance shouldn't be negatively affected if
+CONFIG_SMP and CONFIG_PREEMPT are turned off.
+
+> +		while (nbytes) {
+> +			sd_idx = get_next_sd(sd_idx);
+> +			sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
+> +			/* setup scatter descriptor */
+> +			sd->ctl.done = 0;
+> +			sd->ctl.rdy = 1;
+> +			if (nbytes >= PPC4XX_SD_BUFFER_SIZE)
+> +				nbytes -= PPC4XX_SD_BUFFER_SIZE;
+> +			else
+> +				/*
+> +				 * SD entry can hold PPC4XX_SD_BUFFER_SIZE,
+> +				 * which is more than nbytes, so done.
+> +				 */
+> +			    nbytes = 0;
+
+alignment
+
+> +/**
+> + * Algorithm Registration Functions
+> + */
+> +static int crypto4xx_alg_init(struct crypto_tfm *tfm)
+> +{
+> +	struct crypto_alg    *alg = tfm->__crt_alg;
+> +	struct crypto4xx_alg *amcc_alg = crypto_alg_to_crypto4xx_alg(alg);
+> +	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
+> +
+> +	ctx->dev = amcc_alg->dev;
+> +	ctx->sa_in = NULL;
+> +	ctx->sa_out = NULL;
+> +	ctx->sa_in_dma_addr = 0;
+> +	ctx->sa_out_dma_addr = 0;
+> +	ctx->sa_len = 0;
+> +
+> +	if (alg->cra_type == &crypto_ablkcipher_type)
+> +		tfm->crt_ablkcipher.reqsize = sizeof(struct crypto4xx_ctx);
+> +	else if (alg->cra_type == &crypto_ahash_type)
+> +		tfm->crt_ahash.reqsize = sizeof(struct crypto4xx_ctx);
+
+insert blank line here please
+
+> +	return 0;
+> +}
+> +
+> +static void crypto4xx_alg_exit(struct crypto_tfm *tfm)
+> +{
+> +	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
+
+insert blank line here please
+
+> +	crypto4xx_free_sa(ctx);
+<snip>
+> +	printk(KERN_INFO "Loaded AMCC PPC4xx crypto "
+> +	       "accelerator driver v%s\n", PPC4XX_SEC_VERSION_STR);
+> +
+> +	return rc;
+> +
+> +err_start_dev:
+> +err_register_alg:
+
+no redundant labels, please.
+
+also, if some algorithms succeed registration, and then one fails, this
+code doesn't handle the de-registration of the ones that succeeded -
+not nice if the user wants this situation to revert to s/w crypto.
+
+> +	iounmap(core_dev->dev->ce_base);
+> +	free_irq(core_dev->irq, dev);
+> +	irq_dispose_mapping(core_dev->irq);
+> +err_request_irq:
+
+irq_dispose_mapping goes here
+
+> +err_build_sdr:
+> +	crypto4xx_destroy_gdr(core_dev->dev);
+
+destroy_sdr, no?
+
+> +err_build_gdr:
+
+destroy_gdr should probably go here
+
+> +err_build_pdr:
+> +	crypto4xx_destroy_pdr(core_dev->dev);
+> +	kfree(core_dev->dev);
+> +err_alloc_dev:
+> +	kfree(core_dev);
+> +
+> +	return rc;
+> +}
+
+missing at least a tasklet_kill and an iounmap
+
+> diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+> new file mode 100644
+> index 0000000..7d27959
+> --- /dev/null
+> +++ b/drivers/crypto/amcc/crypto4xx_core.h
+> @@ -0,0 +1,190 @@
+
+> +extern struct crypto4xx_core_device lsec_core;
+
+this appears to be leftovers from prior versions of this patch
+
+> +extern struct crypto_alg crypto4xx_basic_alg[];
+
+afaict, this isn't necessary either
+
+> diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
+> new file mode 100644
+> index 0000000..9db78e8
+> --- /dev/null
+> +++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
+> @@ -0,0 +1,283 @@
+> +#ifndef __CRYPTO_ENGINE_REG_DEF_H__
+> +#define __CRYPTO_ENGINE_REG_DEF_H__
+> +
+> +/* CRYPTO_ENGINE Register offset */
+> +#define CRYPTO_ENGINE_DESCRIPTOR			0x00000000
+
+can we s/CRYPTO_ENGINE_/PPC4XX_/g (or CRYPTO4XX_?) so as to not pollute
+CRYPTO_ namespace?
+
+Thanks,
+
+Kim
