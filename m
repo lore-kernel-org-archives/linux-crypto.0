@@ -1,59 +1,62 @@
-From: "Lingbo Tang (SINA)" <tanglb@sina.com>
-Subject: Re: =?UTF-8?B?5Zue5aSN77yaUmU6IHZnZGlzcGxheSBwcm9ibGVtIHdpdGggaGk=?=
- =?UTF-8?B?Zm43OTV4?=
-Date: Sat, 06 Dec 2008 22:09:55 +0800
-Message-ID: <493A87B3.3050209@sina.com>
-References: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn> <20081130101208.GA20720@ioremap.net>
+From: Evgeniy Polyakov <zbr@ioremap.net>
+Subject: Re: =?utf-8?B?5Zue5aSN77yaUmU=?=
+	=?utf-8?Q?=3A?= vgdisplay problem with hifn795x
+Date: Sat, 6 Dec 2008 18:19:14 +0300
+Message-ID: <20081206151914.GA31165@ioremap.net>
+References: <20081130082600.C00C836FC34@mail3-113.sinamail.sina.com.cn> <20081130101208.GA20720@ioremap.net> <493A87B3.3050209@sina.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="XsQoSWH+UP9D9v3l"
 Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Evgeniy Polyakov <zbr@ioremap.net>
+To: "Lingbo Tang (SINA)" <tanglb@sina.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail3-167.sinamail.sina.com.cn ([202.108.3.167]:51469 "EHLO
-	smtp3-75.sinamail.sina.com.cn" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755871AbYLFOKU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Dec 2008 09:10:20 -0500
-Received: from mail5-202.sinamail.sina.com.cn (unknown [10.55.5.202])
-	by smtp3-75.sinamail.sina.com.cn (SINAMAIL) with ESMTP id 0E84DD632CC
-	for <linux-crypto@vger.kernel.org>; Sat,  6 Dec 2008 22:10:17 +0800 (CST)
-In-Reply-To: <20081130101208.GA20720@ioremap.net>
+Received: from cs-studio.ru ([195.178.208.66]:46614 "EHLO tservice.net.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752949AbYLFPTQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Dec 2008 10:19:16 -0500
+Content-Disposition: inline
+In-Reply-To: <493A87B3.3050209@sina.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-Evgeniy Polyakov wrote:
-> On Sun, Nov 30, 2008 at 04:26:00PM +0800, tanglb@sina.com (tanglb@sina.com) wrote:
->> I downloaded the source file from your link and compiled successfully.
->> But it still hang when I tried to run "mkfs.xfs".
-> 
-> Please enable debug mode with attached patch and send dmesg output.
-> Thank you.
+--XsQoSWH+UP9D9v3l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The weird thing is that there is no problem if I turned on the debug
-option. I can see kcryptd taking 99% CPU time and there are many
-debug output from the serial port, but the encrypted LVM worked eventually.
+On Sat, Dec 06, 2008 at 10:09:55PM +0800, Lingbo Tang (SINA) (tanglb@sina.com) wrote:
+> In some cases the non-debug version can work with "mkfs.xfs", but it
+> could not in most case.
+> I tried to disable most services in the system, but it seems have no
+> related to the system load.
 
-In some cases the non-debug version can work with "mkfs.xfs", but it
-could not in most case.
-I tried to disable most services in the system, but it seems have no
-related to the system load.
+So I suppose it is easy to reproduce problem. Please show 'dmesg' output
+for the hung case when debug is turned off. Did you see register dump
+message when that happened? Please also try attached patch and show the
+hung dmesg (with tured off heavy debug).
 
-> 
-> diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-> index 6e9b39c..ca621f6 100644
-> --- a/drivers/crypto/hifn_795x.c
-> +++ b/drivers/crypto/hifn_795x.c
-> @@ -38,7 +38,7 @@
->  
->  #include <asm/kmap_types.h>
->  
-> -//#define HIFN_DEBUG
-> +#define HIFN_DEBUG
->  
->  #ifdef HIFN_DEBUG
->  #define dprintk(f, a...) 	printk(f, ##a)
-> 
+Thank you.
 
+-- 
+	Evgeniy Polyakov
 
+--XsQoSWH+UP9D9v3l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="hifn.err_debug"
+
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 6e9b39c..fc29bec 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2093,6 +2093,10 @@ static int hifn_handle_req(struct ablkcipher_request *req)
+ 		spin_unlock_irqrestore(&dev->lock, flags);
+ 	}
+ 
++	if (err)
++		printk("%s: nbytes: %u, started: %u, qlen: %d, err: %d.\n",
++			__func__, req->nbytes, dev->started, dev->queue.qlen, err);
++
+ 	return err;
+ }
+ 
+
+--XsQoSWH+UP9D9v3l--
