@@ -1,243 +1,113 @@
-From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH 2/2 v4] crypto: sha512 - Switch to shash
-Date: Sun,  7 Dec 2008 23:17:29 +0100
-Message-ID: <1228688251180-git-send-email-ken@codelabs.ch>
-References: <20081207113302.GB13736@gondor.apana.org.au>
- <1228688249887-git-send-email-ken@codelabs.ch>
- <12286882501412-git-send-email-ken@codelabs.ch>
-Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>
-To: herbert@gondor.apana.org.au
+From: "Kay Sievers" <kay.sievers@vrfy.org>
+Subject: Re: Runaway loop with the current git.
+Date: Sun, 7 Dec 2008 23:26:43 +0100
+Message-ID: <ac3eb2510812071426n2bd1bbefjd4fcdcd0e2efff80@mail.gmail.com>
+References: <E1L9Kwp-0003tF-RR@gondolin.me.apana.org.au>
+	 <20081207175245.2d074299@lxorguk.ukuu.org.uk>
+	 <20081207175438.GA3181@ioremap.net>
+	 <20081207180302.339bf58d@lxorguk.ukuu.org.uk>
+	 <ac3eb2510812071013o5d9f3319i44fb7f54b17025ca@mail.gmail.com>
+	 <20081207181559.63549cfc@lxorguk.ukuu.org.uk>
+	 <ac3eb2510812071021g44207efftb1e74f21578433be@mail.gmail.com>
+	 <20081207183112.3ef31caa@lxorguk.ukuu.org.uk>
+	 <ac3eb2510812071102s40ed4704we2221b2e53e4c099@mail.gmail.com>
+	 <20081207200008.5af2d1e9@lxorguk.ukuu.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: "Evgeniy Polyakov" <zbr@ioremap.net>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org,
+	"Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>
+To: "Alan Cox" <alan@lxorguk.ukuu.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [217.150.249.120] ([217.150.249.120]:42651 "EHLO
-	fenrir.codelabs.ch" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752737AbYLGWRe (ORCPT
+Received: from ik-out-1112.google.com ([66.249.90.183]:2575 "EHLO
+	ik-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753050AbYLGW0q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Dec 2008 17:17:34 -0500
-In-Reply-To: <12286882501412-git-send-email-ken@codelabs.ch>
+	Sun, 7 Dec 2008 17:26:46 -0500
+Received: by ik-out-1112.google.com with SMTP id c29so679035ika.5
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Dec 2008 14:26:44 -0800 (PST)
+In-Reply-To: <20081207200008.5af2d1e9@lxorguk.ukuu.org.uk>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch changes sha512 and sha384 to the new shash interface.
+On Sun, Dec 7, 2008 at 21:00, Alan Cox <alan@lxorguk.ukuu.org.uk> wrote:
+>> >        max_modprobes = min(max_threads/2, MAX_KMOD_CONCURRENT);
+>> >        atomic_inc(&kmod_concurrent);
+>> >        if (atomic_read(&kmod_concurrent) > max_modprobes) {
+>> >                /* We may be blaming an innocent here, but unlikely */
+>> >                if (kmod_loop_msg++ < 5)
+>> >                        printk(KERN_ERR
+>> >                               "request_module: runaway loop modprobe
+>> > %s\n", module_name);
+>> >                atomic_dec(&kmod_concurrent);
+>> >                return -ENOMEM;
+>> >        }
+>> >
+>> > Happy now. Print it out, share it with friends, find someone who can read
+>> > C if you are stuck.
+>>
+>> It does not work, that's all.
+>
+> It works for me.
 
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
----
- crypto/Kconfig          |    2 +-
- crypto/sha512_generic.c |  112 +++++++++++++++++++++++++----------------------
- 2 files changed, 60 insertions(+), 54 deletions(-)
+It runs in a loop here, just like the $subject says, and bko#12153 says.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 6593b5a..017a044 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -341,7 +341,7 @@ config CRYPTO_SHA256
- 
- config CRYPTO_SHA512
- 	tristate "SHA384 and SHA512 digest algorithms"
--	select CRYPTO_ALGAPI
-+	select CRYPTO_HASH
- 	help
- 	  SHA512 secure hash standard (DFIPS 180-2).
- 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index cb85516..3bea38d 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -10,7 +10,7 @@
-  * later version.
-  *
-  */
--
-+#include <crypto/internal/hash.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-@@ -138,10 +138,10 @@ sha512_transform(u64 *state, const u8 *input)
- 	put_cpu_var(msg_schedule);
- }
- 
--static void
--sha512_init(struct crypto_tfm *tfm)
-+static int
-+sha512_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA512_H0;
- 	sctx->state[1] = SHA512_H1;
- 	sctx->state[2] = SHA512_H2;
-@@ -151,12 +151,14 @@ sha512_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA512_H6;
- 	sctx->state[7] = SHA512_H7;
- 	sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha384_init(struct crypto_tfm *tfm)
-+static int
-+sha384_init(struct shash_desc *desc)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA384_H0;
- 	sctx->state[1] = SHA384_H1;
- 	sctx->state[2] = SHA384_H2;
-@@ -166,12 +168,14 @@ sha384_init(struct crypto_tfm *tfm)
- 	sctx->state[6] = SHA384_H6;
- 	sctx->state[7] = SHA384_H7;
-         sctx->count[0] = sctx->count[1] = sctx->count[2] = sctx->count[3] = 0;
-+
-+	return 0;
- }
- 
--static void
--sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
-+static int
-+sha512_update(struct shash_desc *desc, const u8 *data, unsigned int len)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
- 
- 	unsigned int i, index, part_len;
- 
-@@ -203,12 +207,14 @@ sha512_update(struct crypto_tfm *tfm, const u8 *data, unsigned int len)
- 
- 	/* Buffer remaining input */
- 	memcpy(&sctx->buf[index], &data[i], len - i);
-+
-+	return 0;
- }
- 
--static void
--sha512_final(struct crypto_tfm *tfm, u8 *hash)
-+static int
-+sha512_final(struct shash_desc *desc, u8 *hash)
- {
--	struct sha512_ctx *sctx = crypto_tfm_ctx(tfm);
-+	struct sha512_ctx *sctx = shash_desc_ctx(desc);
-         static u8 padding[128] = { 0x80, };
- 	__be64 *dst = (__be64 *)hash;
- 	__be32 bits[4];
-@@ -224,10 +230,10 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 	/* Pad out to 112 mod 128. */
- 	index = (sctx->count[0] >> 3) & 0x7f;
- 	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
--	sha512_update(tfm, padding, pad_len);
-+	sha512_update(desc, padding, pad_len);
- 
- 	/* Append length (before padding) */
--	sha512_update(tfm, (const u8 *)bits, sizeof(bits));
-+	sha512_update(desc, (const u8 *)bits, sizeof(bits));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 8; i++)
-@@ -235,66 +241,66 @@ sha512_final(struct crypto_tfm *tfm, u8 *hash)
- 
- 	/* Zeroize sensitive information. */
- 	memset(sctx, 0, sizeof(struct sha512_ctx));
-+
-+	return 0;
- }
- 
--static void sha384_final(struct crypto_tfm *tfm, u8 *hash)
-+static int sha384_final(struct shash_desc *desc, u8 *hash)
- {
--        u8 D[64];
-+	u8 D[64];
- 
--	sha512_final(tfm, D);
-+	sha512_final(desc, D);
- 
--        memcpy(hash, D, 48);
--        memset(D, 0, 64);
-+	memcpy(hash, D, 48);
-+	memset(D, 0, 64);
-+
-+	return 0;
- }
- 
--static struct crypto_alg sha512 = {
--        .cra_name       = "sha512",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA512_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--        .cra_module     = THIS_MODULE,
--	.cra_alignmask	= 3,
--        .cra_list       = LIST_HEAD_INIT(sha512.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA512_DIGEST_SIZE,
--                                .dia_init       = sha512_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha512_final }
--        }
-+static struct shash_alg sha512 = {
-+	.digestsize	=	SHA512_DIGEST_SIZE,
-+	.init		=	sha512_init,
-+	.update		=	sha512_update,
-+	.final		=	sha512_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha512",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA512_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
--static struct crypto_alg sha384 = {
--        .cra_name       = "sha384",
--        .cra_flags      = CRYPTO_ALG_TYPE_DIGEST,
--	.cra_blocksize  = SHA384_BLOCK_SIZE,
--        .cra_ctxsize    = sizeof(struct sha512_ctx),
--	.cra_alignmask	= 3,
--        .cra_module     = THIS_MODULE,
--        .cra_list       = LIST_HEAD_INIT(sha384.cra_list),
--        .cra_u          = { .digest = {
--                                .dia_digestsize = SHA384_DIGEST_SIZE,
--                                .dia_init       = sha384_init,
--                                .dia_update     = sha512_update,
--                                .dia_final      = sha384_final }
--        }
-+static struct shash_alg sha384 = {
-+	.digestsize	=	SHA384_DIGEST_SIZE,
-+	.init		=	sha384_init,
-+	.update		=	sha512_update,
-+	.final		=	sha384_final,
-+	.descsize	=	sizeof(struct sha512_ctx),
-+	.base		=	{
-+		.cra_name	=	"sha384",
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA384_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
- };
- 
- static int __init sha512_generic_mod_init(void)
- {
-         int ret = 0;
- 
--        if ((ret = crypto_register_alg(&sha384)) < 0)
-+        if ((ret = crypto_register_shash(&sha384)) < 0)
-                 goto out;
--        if ((ret = crypto_register_alg(&sha512)) < 0)
--                crypto_unregister_alg(&sha384);
-+        if ((ret = crypto_register_shash(&sha512)) < 0)
-+                crypto_unregister_shash(&sha384);
- out:
-         return ret;
- }
- 
- static void __exit sha512_generic_mod_fini(void)
- {
--        crypto_unregister_alg(&sha384);
--        crypto_unregister_alg(&sha512);
-+        crypto_unregister_shash(&sha384);
-+        crypto_unregister_shash(&sha512);
- }
- 
- module_init(sha512_generic_mod_init);
--- 
-1.5.2.5
+>> Reproduce the bug and look at it for yourself.
+>
+> Well since you've got a reproducer and this code works for me (I've tested
+> it just fine), why don't you go and reproduce the problem then post a fix
+> to that code I quoted instead of all this reordering rubbish. If you fix
+> this code not only won't you risk all the mess from re-ordering
+> initialisations around the kernel but you'll fix non console related
+> looping which you imply is also broken as you claim that code doesn't
+> work for you.
+>
+> If I deliberately break my module utils I see a sequence of modprobes
+> which then hits kmod_concurrent limit then causes a -ENOMEM back to
+> userspace which then fails the file open. The bug report also shows the
+> printk is displayed so the runaway loop *was* detected and the code paths
+> taken which stopped the loop.
 
+Sure, I can try to find out why the limiter does does not work here.
+
+> I get open -> modprobe -> open -> modprobe -> open -> modprobe ... ->
+> open fail, then open fail, open fail, open fail, open fail back to the
+> first modprobe exiting.
+>
+> Your proposal to keep the current recent modprobe parameter strings would
+> shorten the amount of recursion but it wouldn't change the result that I
+> can see. If I open /dev/console early and wrongly from a modprobe then I
+> ultimately get a failing open just as I should do.
+
+No, my proposal would prevent the kernel to call any modprobe for the
+special built-in device 5:1, it shortens the recursion to zero, which
+sounds like the right fix. It's really weird to fix the symptoms,
+instead of the real problem.
+
+The kernel forks a binary with a broken environment. Even the
+in-kernel-tree cpio generator creates /dev/console, and accessing it
+from a kernel forked binary makes it crash. The kernel must provide a
+sane environment for stuff that it calls, I think, that is pretty
+obvious.
+
+Device 5:1 is a core device, which never makes sense to call modprobe
+for it. No other later driver will ever register that dev_t, so we
+should do it before calling out to other random userspace stuff which
+triggers the kernel to go crazy with its own devices.
+
+My proposal was to connect 5:1 to the kobject map at the same time as
+we register the whole tty class. We allocate the class, create sysfs
+entries, run /sbin/modprobe at that time, why shouldn't we just
+register the dev_t that time too?
+
+It properly prevents the needless userspace "driver searching" for a
+well known, already created, but not properly registered core device.
+
+It makes the process environment sane, and prevents the root cause of
+the bug, and does not just limit the damage.
+
+Thanks,
+Kay
