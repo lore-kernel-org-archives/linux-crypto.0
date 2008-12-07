@@ -1,62 +1,46 @@
-From: Evgeniy Polyakov <zbr@ioremap.net>
+From: "Kay Sievers" <kay.sievers@vrfy.org>
 Subject: Re: Runaway loop with the current git.
-Date: Sun, 7 Dec 2008 20:13:56 +0300
-Message-ID: <20081207171356.GB472@ioremap.net>
-References: <20081207112335.0afd5192@lxorguk.ukuu.org.uk> <E1L9Kwp-0003tF-RR@gondolin.me.apana.org.au> <20081207155507.GA15355@gondor.apana.org.au> <ac3eb2510812070803i150d91e7led58128796e8045e@mail.gmail.com> <20081207160921.693f637a@lxorguk.ukuu.org.uk> <20081207163151.GA31838@ioremap.net> <20081207170108.39dfd93f@lxorguk.ukuu.org.uk>
+Date: Sun, 7 Dec 2008 18:17:46 +0100
+Message-ID: <ac3eb2510812070917g28874a3bm757d89856ee1fb28@mail.gmail.com>
+References: <20081207112335.0afd5192@lxorguk.ukuu.org.uk>
+	 <E1L9Kwp-0003tF-RR@gondolin.me.apana.org.au>
+	 <20081207155507.GA15355@gondor.apana.org.au>
+	 <ac3eb2510812070803i150d91e7led58128796e8045e@mail.gmail.com>
+	 <20081207160921.693f637a@lxorguk.ukuu.org.uk>
+	 <20081207163151.GA31838@ioremap.net>
+	 <20081207170108.39dfd93f@lxorguk.ukuu.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Kay Sievers <kay.sievers@vrfy.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: "Evgeniy Polyakov" <zbr@ioremap.net>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>,
 	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+	"Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>
+To: "Alan Cox" <alan@lxorguk.ukuu.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from corega.com.ru ([195.178.208.66]:50331 "EHLO tservice.net.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751524AbYLGRN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Dec 2008 12:13:58 -0500
-Content-Disposition: inline
+Received: from ey-out-2122.google.com ([74.125.78.26]:51781 "EHLO
+	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754536AbYLGRRs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Dec 2008 12:17:48 -0500
+Received: by ey-out-2122.google.com with SMTP id 6so313790eyi.37
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Dec 2008 09:17:46 -0800 (PST)
 In-Reply-To: <20081207170108.39dfd93f@lxorguk.ukuu.org.uk>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 07, 2008 at 05:01:08PM +0000, Alan Cox (alan@lxorguk.ukuu.org.uk) wrote:
-> > Wrong. First at least because tty/console stuff is built in.
-> 
+On Sun, Dec 7, 2008 at 18:01, Alan Cox <alan@lxorguk.ukuu.org.uk> wrote:
+>> Wrong. First at least because tty/console stuff is built in.
+>
 > Are you two people or just two names and email addresses for
 > the same ?
 
-Depending on who you are asking for.
+Damn, now you found that out.
 
-> /dev/console is a logical mapping to a device which may well be
-> different, loaded after PCI is initialised and dependant on PCI.
+I suggest you get a few more mail addresses too, to back your
+non-sensical claims, and try to establish silly userspace rules to
+work around an obvious kernel bug. :)
 
-Yup. It may. But in showed case it is not. In showed case it showed a
-bug. Which you call a feature.
-
-> > But we alredy got, that you decided that Debian's initramfs-tools (0.92e)
-> > are allowed not to boot with some kernel configs.
-> 
-> Yes. They won't boot if you don't include any disk drivers. They won't
-> boot if you don't include any file systems. They wont boot in a million
-> other cases. That is the user space not the kernel at fault.
-
-But right now _everything_ is presented. All things are in places.
-Disk drivers, filesystem, and even that stupid console/tty driver.
-It _IS_ in the kernel.
-
-> The kernel is doing precisely what it is supposed to. It is even logging
-> the user space bug and stopping trying to get stuck in a loop loading a
-> module in order to attempt to cope with the user space bug.
-> 
-> If you want to complain then file a debian bug, go fix the user space.
-
-You introduce so naive rules for the initramfs userspace... It should
-not use console, it should not load modules, which may load another
-one... What next, not to use syscalls? Sigh, instead of thinking on how
-to fix the weak boot process so that next time similar problem arises,
-we ended up with pointing a finger one to another... Hope we will not
-get another similar cases though.
-
--- 
-	Evgeniy Polyakov
+Good luck, looking forward to your creativity,
+Kay
