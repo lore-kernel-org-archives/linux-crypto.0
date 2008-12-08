@@ -1,62 +1,52 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH v4] crypto: des3_ede: permit weak keys unless REQ_WEAK_KEY set
-Date: Mon, 8 Dec 2008 10:41:41 -0500
-Message-ID: <200812081041.42296.jarod@redhat.com>
-References: <200812041557.49601.jarod@redhat.com> <20081205152427.GA32475@gondor.apana.org.au> <200812051458.10426.jarod@redhat.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v4]
+Date: Mon, 8 Dec 2008 12:09:36 -0600
+Message-ID: <20081208120936.28721efb.kim.phillips@freescale.com>
+References: <1228256232.4770.47.camel@jhsiao-usb>
+	<20081204193256.12dbc306.kim.phillips@freescale.com>
+	<1228519451.5444.59.camel@jhsiao-usb>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: herbert@gondor.apana.org.au, jwboyer@linux.vnet.ibm.com,
+	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+To: jhsiao@amcc.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:42183 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751337AbYLHPiT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Dec 2008 10:38:19 -0500
-In-Reply-To: <200812051458.10426.jarod@redhat.com>
-Content-Disposition: inline
+Received: from az33egw02.freescale.net ([192.88.158.103]:39255 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750756AbYLHSGf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Dec 2008 13:06:35 -0500
+In-Reply-To: <1228519451.5444.59.camel@jhsiao-usb>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-While its a slightly insane to bypass the key1 == key2 ||
-key2 == key3 check in triple-des, since it reduces it to the
-same strength as des, some folks do need to do this from time
-to time for backwards compatibility with des.
+On Fri, 05 Dec 2008 15:24:11 -0800
+James Hsiao <jhsiao@amcc.com> wrote:
 
-My own case is FIPS CAVS test vectors. Many triple-des test
-vectors use a single key, replicated 3x. In order to get the
-expected results, des3_ede_setkey() needs to only reject weak
-keys if the CRYPTO_TFM_REQ_WEAK_KEY flag is set.
+> Without the check, nbytes could become negative. The aead test case
+> with .np will crash(ie. gcm tests), those test  have sg->length >
+> nbytes.
+> 
+> About aad_len, we didn't release code that use aad yet. We did test this
+> function with aad_len none zero(the gcm tests).
 
-Also sets a more appropriate RES flag when a weak key is found.
+ok - btw, it would be nice if these submissions were more
+self-consistent, that way we could see how aad_len is being assigned.
 
-This time, hopefully without unintended line wrapping...
+> About the irq_disable or spin_lock. 
+> The driver could be used by a kernel thread and esp4 at same time. As I
+> know process is preemptable. When the driver is used by a process it is
+> possible to be preempted. The hardware require scatter/gather descriptor
+> to be consecutive. So, if the process get a gather descriptor and then
+> it is preempted by another process or esp4 which get a gather descriptor
+> and return to the original process, the origianl process could get a non
+> consecutive gather descriptor.   
+> So, if spin_lock is recommended then I have to use spin_lock_irq_save,
+> which use irq_disable too. Do you think that is acceptable? 
 
-Signed-off-by: Jarod Wilson <jarod@redhat.com>
+yes.
 
----
- crypto/des_generic.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index 5d0e458..5bd3ee3 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -868,9 +868,10 @@ static int des3_ede_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	u32 *flags = &tfm->crt_flags;
- 
- 	if (unlikely(!((K[0] ^ K[2]) | (K[1] ^ K[3])) ||
--		     !((K[2] ^ K[4]) | (K[3] ^ K[5]))))
-+		     !((K[2] ^ K[4]) | (K[3] ^ K[5]))) &&
-+		     (*flags & CRYPTO_TFM_REQ_WEAK_KEY))
- 	{
--		*flags |= CRYPTO_TFM_RES_BAD_KEY_SCHED;
-+		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
- 		return -EINVAL;
- 	}
- 
--- 
-Jarod Wilson
-jarod@redhat.com
+Kim
