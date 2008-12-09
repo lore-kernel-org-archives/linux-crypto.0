@@ -1,53 +1,36 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v4]
-Date: Mon, 8 Dec 2008 18:35:52 -0600
-Message-ID: <20081208183552.744cb4ae.kim.phillips@freescale.com>
-References: <1228256232.4770.47.camel@jhsiao-usb>
-	<20081204193256.12dbc306.kim.phillips@freescale.com>
-	<1228773307.4906.14.camel@jhsiao-usb>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Runaway loop with the current git.
+Date: Tue, 9 Dec 2008 08:42:24 +0800
+Message-ID: <20081209002451.GA31315@gondor.apana.org.au>
+References: <20081207112335.0afd5192@lxorguk.ukuu.org.uk> <E1L9Kwp-0003tF-RR@gondolin.me.apana.org.au> <20081207155507.GA15355@gondor.apana.org.au> <20081208130646.GB15381@ioremap.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, jwboyer@linux.vnet.ibm.com,
-	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
-To: jhsiao@amcc.com
+Content-Type: text/plain; charset=us-ascii
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, kay.sievers@vrfy.org,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Evgeniy Polyakov <zbr@ioremap.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:54693 "EHLO
-	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753752AbYLIAka (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:48141 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753806AbYLIAmi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Dec 2008 19:40:30 -0500
-In-Reply-To: <1228773307.4906.14.camel@jhsiao-usb>
+	Mon, 8 Dec 2008 19:42:38 -0500
+Content-Disposition: inline
+In-Reply-To: <20081208130646.GB15381@ioremap.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 08 Dec 2008 13:55:07 -0800
-James Hsiao <jhsiao@amcc.com> wrote:
+On Mon, Dec 08, 2008 at 04:06:46PM +0300, Evgeniy Polyakov wrote:
+>
+> Your patch does not apply cleanly to the latest git and missed
+> rng dependency to rng2.
 
-> >> +     /* figure how many gd is needed */
-> >> +     if (aad_len) {
-> >> +             num_gd = get_sg_count(assoc, aad_len) +
-> >> +                     get_sg_count(src, datalen);
-> 
-> > this is dead code - aad_len is never non-zero - is there some code
-> > missing from crypto4xx_alg.c?  Also, IIRC, assoc is a superset of src,
-> > so I believe something like num_gd = get_sg_count(assoc, aad_len +
-> > datalen) would work better - this should also permit removal of the
-> > nbytes reached check in [1] in get_sg_count.
-> 
-> For the get num_gd, assoc and src are two different scatter_lists. One
-> for the packet and one for the aad, so, it makes more sense to me to
-> count them seperately. Yes?
+Right it was against cryptodev-2.6 actually.  Thanks for fixing
+it up and confirming.  I'll submit this to Linus.
 
-ok I looked it up - they are disjoint sg lists, so, yes, you're right.
-
-> The way to driver pass aad and aad_len is from crypto4xx_build_pd. 
-> This aad support will be used in the future. Do you want me to remover
-> from the current release?  The reason I have it in, is to avoid too much
-> code change for the future release.
-
-removing it would definitely make both this and any forthcoming aead
-patches more on topic and thus easier to review (plus I suspect adding
-unused code to the kernel is generally frowned upon...)
-
-Kim
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
