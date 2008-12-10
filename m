@@ -1,57 +1,54 @@
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Subject: Re: Runaway loop with the current git.
-Date: Tue, 9 Dec 2008 10:13:32 +0000
-Message-ID: <20081209101332.2b81601b@lxorguk.ukuu.org.uk>
-References: <20081207180302.339bf58d@lxorguk.ukuu.org.uk>
-	<ac3eb2510812071013o5d9f3319i44fb7f54b17025ca@mail.gmail.com>
-	<20081207181559.63549cfc@lxorguk.ukuu.org.uk>
-	<ac3eb2510812071021g44207efftb1e74f21578433be@mail.gmail.com>
-	<20081207183112.3ef31caa@lxorguk.ukuu.org.uk>
-	<ac3eb2510812071102s40ed4704we2221b2e53e4c099@mail.gmail.com>
-	<20081207200008.5af2d1e9@lxorguk.ukuu.org.uk>
-	<ac3eb2510812071426n2bd1bbefjd4fcdcd0e2efff80@mail.gmail.com>
-	<20081208011850.GA10289@mit.edu>
-	<ac3eb2510812071935v7e1b8c75x4d8fa9ce1c8dba6@mail.gmail.com>
-	<20081209010937.GL2501@mit.edu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Update for 2.6.28
+Date: Wed, 10 Dec 2008 23:35:24 +1100
+Message-ID: <20081210123524.GA11696@gondor.apana.org.au>
+References: <20080421024306.GA6813@gondor.apana.org.au> <20080714121403.GA28523@gondor.apana.org.au> <20081010070918.GA28057@gondor.apana.org.au> <alpine.LFD.2.00.0810101118050.3503@nehalem.linux-foundation.org> <20081011021357.GB3685@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Kay Sievers <kay.sievers@vrfy.org>,
-	Evgeniy Polyakov <zbr@ioremap.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Theodore Tso <tytso@mit.edu>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from earthlight.etchedpixels.co.uk ([81.2.110.250]:47693 "EHLO
-	lxorguk.ukuu.org.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751466AbYLIKOA (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:42172 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750907AbYLJMfd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Dec 2008 05:14:00 -0500
-In-Reply-To: <20081209010937.GL2501@mit.edu>
+	Wed, 10 Dec 2008 07:35:33 -0500
+Content-Disposition: inline
+In-Reply-To: <20081011021357.GB3685@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> apparently not triggering, since it could be that Debian's initrd
-> might cause some other uncaught recursion loop if we don't drive this
-> problem determination to root cause.
+Hi Linus:
 
-Agreed - and there are all sorts of obscure and wonderful other ways to
-trip this up which need the detector (AF_UNIX modular and doing a syslog
-for example).
+At this late stage there is just one fix for a regression from
+2.6.27.  We used to allow algorithms to be built-in with the new
+testing framework built as a module.  This meant that the built-in
+algorithms may not get tested properly if modules can't be loaded
+when the built-in algorithms are registered.  It also seems to
+trigger a modprobe loop on one distro.  This configuration is now
+forbidden.
+ 
+Please pull from
 
-> > That's why I still think it's a good thing, to connect the core tty
-> > devices to their dev_t handler internally, before we init all the
-> > other drivers and run userspace.
-> 
-> Um, how early?  (/me searches lkml.org for the original patch).  Ah,
-> OK, you want to do it postcore....  There may actually be a problem
-> with that, because it looks like vtconsole_class_init (which is
-> currently run as a postcore initcall) really wants to happen before
-> the tty layer initializes itself.  So moving tty into postcore could
-> potentially run into problems, depending on whether vt.c's or
-> tty_io.c's initcalls are run first.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Its playing with fire and doing so to paper over a completely different
-problem. The recursion detector is generic and should be sufficient. If
-it isn't then it needs improving to be generic, sufficient and working.
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (1):
+      crypto: api - Disallow cryptomgr as a module if algorithms are built-in
+
+ crypto/Kconfig  |   36 ++++++++++++++++++++++++++++++++----
+ crypto/Makefile |   18 +++++++++---------
+ 2 files changed, 41 insertions(+), 13 deletions(-)
+ 
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
