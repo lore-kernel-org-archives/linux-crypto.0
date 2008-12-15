@@ -1,45 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC PATCH crypto] AES: Add support to Intel AES-NI
 	instructions
-Date: Mon, 15 Dec 2008 22:28:46 +1100
-Message-ID: <20081215112846.GA31804@gondor.apana.org.au>
-References: <1229054926.5936.160.camel@yhuang-dev.sh.intel.com> <20081212195722.GA24489@Chamillionaire.breakpoint.cc> <1229307542.5936.204.camel@yhuang-dev.sh.intel.com> <20081215090745.GA4991@Chamillionaire.breakpoint.cc>
+Date: Mon, 15 Dec 2008 23:38:01 +1100
+Message-ID: <20081215123801.GA32485@gondor.apana.org.au>
+References: <1229054926.5936.160.camel@yhuang-dev.sh.intel.com> <20081212195722.GA24489@Chamillionaire.breakpoint.cc> <1229307542.5936.204.camel@yhuang-dev.sh.intel.com> <20081215033842.GA28499@gondor.apana.org.au> <1229318099.5936.224.camel@yhuang-dev.sh.intel.com> <20081215052106.GA29324@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Huang Ying <ying.huang@intel.com>,
+Cc: "Siddha, Suresh B" <suresh.b.siddha@intel.com>,
+	Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
 	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	"mingo@elte.hu" <mingo@elte.hu>,
 	"tglx@linutronix.de" <tglx@linutronix.de>
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:37594 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753116AbYLOL27 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Dec 2008 06:28:59 -0500
+To: Huang Ying <ying.huang@intel.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1751968AbYLOMi0@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20081215090745.GA4991@Chamillionaire.breakpoint.cc>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20081215052106.GA29324@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 15, 2008 at 10:07:45AM +0100, Sebastian Andrzej Siewior wrote:
+On Mon, Dec 15, 2008 at 04:21:06PM +1100, Herbert Xu wrote:
 >
-> You have to it if you want to bypass the crypto layer and call asm
-> functions directly and I'm not sure whether bypassing the crypto layer
-> is a good thing. Both asm routines (the 32bit and 64bit) assume that
-> keylen ist at +0 followed by enc key, dec key. Ach and they don't do the
-> ALIGN thing.
+> > a. Do not touch SSE state in soft_irq
+> > b. Disable/restore soft_irq in kernel_fpu_begin/kernel_fpu_end
+> > c. Use a per-CPU data structure to save kernel FPU state during
+> > soft_irq.
+> > 
+> > The mothod a is used in patch.
 > 
-> Herbert what do you thing?
+> Could you run the tcrypt speed test on this and measure the
+> difference between the native AES vs. the fallback? Depending
+> on the difference I think we'd want to consider b) or c).
 
-I think it would be OK if it called the assembly routine directly
-and we moved this under asm/x86-64.  We should do the latter anyway
-regardless of what we decide.
+Here's another option
 
-However, I'm skeptical about whether we should use of a fallback at
-all rather than making this work in softirq context.
+d. When we're in interrupt context, schedule a task to perform
+the encryption asynchronously.
 
 Cheers,
 -- 
