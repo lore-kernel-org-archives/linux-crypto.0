@@ -1,46 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH crypto] AES: Add support to Intel AES-NI
-	instructions
-Date: Mon, 15 Dec 2008 23:38:01 +1100
-Message-ID: <20081215123801.GA32485@gondor.apana.org.au>
-References: <1229054926.5936.160.camel@yhuang-dev.sh.intel.com> <20081212195722.GA24489@Chamillionaire.breakpoint.cc> <1229307542.5936.204.camel@yhuang-dev.sh.intel.com> <20081215033842.GA28499@gondor.apana.org.au> <1229318099.5936.224.camel@yhuang-dev.sh.intel.com> <20081215052106.GA29324@gondor.apana.org.au>
+From: Suresh Siddha <suresh.b.siddha@intel.com>
+Subject: Re: [RFC PATCH crypto] AES: Add support to Intel AES-NI instructions
+Date: Mon, 15 Dec 2008 10:26:54 -0800
+Message-ID: <20081215182653.GC18346@linux-os.sc.intel.com>
+References: <1229054926.5936.160.camel@yhuang-dev.sh.intel.com> <20081212195722.GA24489@Chamillionaire.breakpoint.cc> <1229307542.5936.204.camel@yhuang-dev.sh.intel.com> <20081215033842.GA28499@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Siddha, Suresh B" <suresh.b.siddha@intel.com>,
+Cc: "Huang, Ying" <ying.huang@intel.com>,
+	"Siddha, Suresh B" <suresh.b.siddha@intel.com>,
 	Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
 	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	"mingo@elte.hu" <mingo@elte.hu>,
 	"tglx@linutronix.de" <tglx@linutronix.de>
-To: Huang Ying <ying.huang@intel.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1751968AbYLOMi0@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:29315 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751020AbYLOS04 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Dec 2008 13:26:56 -0500
 Content-Disposition: inline
-In-Reply-To: <20081215052106.GA29324@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20081215033842.GA28499@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 15, 2008 at 04:21:06PM +1100, Herbert Xu wrote:
->
-> > a. Do not touch SSE state in soft_irq
-> > b. Disable/restore soft_irq in kernel_fpu_begin/kernel_fpu_end
-> > c. Use a per-CPU data structure to save kernel FPU state during
-> > soft_irq.
-> > 
-> > The mothod a is used in patch.
+On Sun, Dec 14, 2008 at 07:38:42PM -0800, Herbert Xu wrote:
+> On Mon, Dec 15, 2008 at 10:19:02AM +0800, Huang Ying wrote:
+> >
+> > The general x86 implementation is used as the fall back for new AES-NI
+> > based implementation. Because AES-NI can not be used in kernel soft_irq
+> > context. If crypto layer is used to access general x86 implementation,
 > 
-> Could you run the tcrypt speed test on this and measure the
-> difference between the native AES vs. the fallback? Depending
-> on the difference I think we'd want to consider b) or c).
+> Why is that? The VIA PadLock also "touches" the SSE state but we still
+> use it on softirq paths.
+> 
+> In fact Suresh told me earlier that your AES instruction wasn't
+> going to have the SSE problems that VIA had, is this not the case?
 
-Here's another option
+As Huang mentioned, AES instructions touch SSE registers and thus have
+different requirements. I agree that we have to do some performance
+analysis to come up with the optimized model.
 
-d. When we're in interrupt context, schedule a task to perform
-the encryption asynchronously.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+thanks,
+suresh
