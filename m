@@ -1,64 +1,75 @@
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: [PATCH/RFC 2/8] crypto: compress - Add pcomp interface
-Date: Thu, 18 Dec 2008 18:28:09 +0100 (CET)
-Message-ID: <Pine.LNX.4.64.0812181820100.25762@vixen.sonytel.be>
-References: <20081217163634.998961917@vixen.sonytel.be>
- <20081217164036.539681327@vixen.sonytel.be> <20081218061908.GB27951@gondor.apana.org.au>
+From: Lee Nipper <lee.nipper@freescale.com>
+Subject: [PATCH] crypto: talitos - ack done interrupt in isr instead of
+	tasklet
+Date: Thu, 18 Dec 2008 12:35:05 -0600
+Message-ID: <1229625305.26363.190.camel@al08linux99>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: Kim Phillips <kim.phillips@freescale.com>
+To: linux-crypto <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:56222 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752423AbYLRR2R (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:47095 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752080AbYLRSet (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Dec 2008 12:28:17 -0500
-In-Reply-To: <20081218061908.GB27951@gondor.apana.org.au>
+	Thu, 18 Dec 2008 13:34:49 -0500
+Received: from de01smr02.am.mot.com (de01smr02.freescale.net [10.208.0.151])
+	by az33egw02.freescale.net (8.14.3/az33egw02) with ESMTP id mBIIYlxZ016887
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2008 11:34:47 -0700 (MST)
+Received: from az33exm25.fsl.freescale.net (az33exm25.am.freescale.net [10.64.32.16])
+	by de01smr02.am.mot.com (8.13.1/8.13.0) with ESMTP id mBIIYjLN011609
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Dec 2008 12:34:46 -0600 (CST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 18 Dec 2008, Herbert Xu wrote:
-> On Wed, Dec 17, 2008 at 05:36:37PM +0100, Geert Uytterhoeven wrote:
-> > @@ -3,7 +3,7 @@
-> >  #
-> > =20
-> >  obj-$(CONFIG_CRYPTO) +=3D crypto.o
-> > -crypto-objs :=3D api.o cipher.o digest.o compress.o
-> > +crypto-objs :=3D api.o cipher.o digest.o compress.o pcompress.o
->=20
-> Sorry, you modelled it on the wrong type.  These are the original
-> and obsolete types.  You should model it on one of the others.  I
-> recommend the crypto_shash type which is most recent.
+Previous commit for interrupt mitigation moved the done interrupt
+acknowlegement from the isr to the talitos_done tasklet.
+This patch moves the done interrupt acknowledgement back
+into the isr so that done interrupts will always be acknowledged.
+This covers the case for acknowledging interrupts for channel done processing
+that has actually already been completed by the tasklet prior to fielding
+a pending interrupt.
 
-Can you please elaborate a bit more?
+Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+This patch applies to
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
 
-You mean pcomp should provide a struct crypto_type?
-And the underlying algorithms shouldn't use crypto_alg directly anymore=
-?
+ drivers/crypto/talitos.c |   20 +++++++-------------
+ 1 files changed, 7 insertions(+), 13 deletions(-)
 
-Thanks!
-
-With kind regards,
-
-Geert Uytterhoeven
-Software Architect
-
-Sony Techsoft Centre Europe
-The Corporate Village =C2=B7 Da Vincilaan 7-D1 =C2=B7 B-1935 Zaventem =C2=
-=B7 Belgium
-
-Phone:    +32 (0)2 700 8453
-=46ax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
-
-A division of Sony Europe (Belgium) N.V.
-VAT BE 0413.825.160 =C2=B7 RPR Brussels
-=46ortis =C2=B7 BIC GEBABEBB =C2=B7 IBAN BE41293037680010
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index c2294f2..d14c68d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -330,11 +330,9 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+ 
+ 		/* descriptors with their done bits set don't get the error */
+ 		rmb();
+-		if ((request->desc->hdr & DESC_HDR_DONE) == DESC_HDR_DONE) {
++		if ((request->desc->hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
+ 			status = 0;
+-			/* Ack each pkt completed on channel */
+-			out_be32(priv->reg + TALITOS_ICR, (1 << (ch * 2)));
+-		} else
++		else
+ 			if (!error)
+ 				break;
+ 			else
+@@ -575,17 +573,13 @@ static irqreturn_t talitos_interrupt(int irq, void *data)
+ 
+ 	isr = in_be32(priv->reg + TALITOS_ISR);
+ 	isr_lo = in_be32(priv->reg + TALITOS_ISR_LO);
++	/* Acknowledge interrupt */
++	out_be32(priv->reg + TALITOS_ICR, isr);
++	out_be32(priv->reg + TALITOS_ICR_LO, isr_lo);
+ 
+-	if (unlikely((isr & ~TALITOS_ISR_CHDONE) || isr_lo)) {
+-		/*
+-		 * Acknowledge error interrupts here.
+-		 * Done interrupts are ack'ed as part of done_task.
+-		 */
+-		out_be32(priv->reg + TALITOS_ICR, isr);
+-		out_be32(priv->reg + TALITOS_ICR_LO, isr_lo);
