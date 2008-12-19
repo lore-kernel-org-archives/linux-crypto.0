@@ -1,71 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH/RFC 2/8] crypto: compress - Add pcomp interface
-Date: Fri, 19 Dec 2008 09:12:51 +1100
-Message-ID: <20081218221251.GA1304@gondor.apana.org.au>
-References: <20081217163634.998961917@vixen.sonytel.be> <20081217164036.539681327@vixen.sonytel.be> <20081218061908.GB27951@gondor.apana.org.au> <Pine.LNX.4.64.0812181820100.25762@vixen.sonytel.be>
+From: Christoph Hellwig <hch@lst.de>
+Subject: alg: cipher: Test 1 failed on encryption for aes-asm
+Date: Fri, 19 Dec 2008 21:26:03 +0100
+Message-ID: <20081219202603.GA31265@lst.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:55096 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753910AbYLRWMz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Dec 2008 17:12:55 -0500
+Received: from verein.lst.de ([213.95.11.210]:43460 "EHLO verein.lst.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750874AbYLSU0H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 19 Dec 2008 15:26:07 -0500
+Received: from verein.lst.de (localhost [127.0.0.1])
+	by verein.lst.de (8.12.3/8.12.3/Debian-7.1) with ESMTP id mBJKQ4IF031359
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO)
+	for <linux-crypto@vger.kernel.org>; Fri, 19 Dec 2008 21:26:04 +0100
+Received: (from hch@localhost)
+	by verein.lst.de (8.12.3/8.12.3/Debian-6.6) id mBJKQ4N0031357
+	for linux-crypto@vger.kernel.org; Fri, 19 Dec 2008 21:26:04 +0100
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0812181820100.25762@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 18, 2008 at 06:28:09PM +0100, Geert Uytterhoeven wrote:
->
-> Can you please elaborate a bit more?
+On my new thinkpad with a Intel Core2 Duo T9600 I reproducibly get
+this message during boot:
 
-In the old scheme, each type required you to change crypto_tfm
-and crypto_alg since they had the type-specific information
-embedded in it.  Starting with crypto_shash, we are now totally
-decentralised.  All type-specific information is now added to
-the base structures.  Let's take shash_alg as an example, in
-the old days we'd put the algorithms into a structure and embed
-the structure in crypto_alg, now we instead put crypto_alg in
-shash_alg, like this:
+[    0.657034] alg: cipher: Test 1 failed on encryption for aes-asm
+[    0.657111] 00000000: 00 01 02 03 04 05 06 07 08 08 08 08 08 08 08 08 
 
-struct shash_alg {
-	int (*init)(struct shash_desc *desc);
-	int (*reinit)(struct shash_desc *desc);
-	int (*update)(struct shash_desc *desc, const u8 *data,
-		      unsigned int len);
-	int (*final)(struct shash_desc *desc, u8 *out);
-	int (*finup)(struct shash_desc *desc, const u8 *data,
-		     unsigned int len, u8 *out);
-	int (*digest)(struct shash_desc *desc, const u8 *data,
-		      unsigned int len, u8 *out);
-	int (*setkey)(struct crypto_shash *tfm, const u8 *key,
-		      unsigned int keylen);
+I'd assume it's not a hardware but, so my the assembly code doesn't
+like the debian toolchain?  It's
 
-	unsigned int descsize;
-	unsigned int digestsize;
+	binutils 2.18.1~cvs20080103-7
+	gcc 4.3.2-1
 
-	struct crypto_alg base;
-};
-
-> You mean pcomp should provide a struct crypto_type?
-
-Yes, it should.  Although starting wish shash crypto_type no
-longer needs to be directly visible to the algorithms as each
-new type should now provide its own registration function which
-can fill in the type object.
-
-> And the underlying algorithms shouldn't use crypto_alg directly anymore?
-
-Right.  Please take a look at include/crypto/hash.h, crypto/shash.c,
-and crypto/sha1_generic.c from the cryptodev tree.  This should
-provide everything you need to write a new type.
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+(all the Debian package versions)
