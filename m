@@ -1,72 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: alg: cipher: Test 1 failed on encryption for aes-asm
-Date: Sat, 20 Dec 2008 14:21:59 +1100
-Message-ID: <20081220032159.GA15615@gondor.apana.org.au>
-References: <20081219202603.GA31265@lst.de>
+Subject: Re: [PATCH] crypto: talitos - ack done interrupt in isr instead of
+	tasklet
+Date: Sat, 20 Dec 2008 17:10:01 +1100
+Message-ID: <20081220061001.GA16654@gondor.apana.org.au>
+References: <1229625305.26363.190.camel@al08linux99>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>
+Cc: linux-crypto <linux-crypto@vger.kernel.org>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Lee Nipper <lee.nipper@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:51563 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:42287 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750910AbYLTDWD (ORCPT
+	with ESMTP id S1751608AbYLTGKG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Dec 2008 22:22:03 -0500
+	Sat, 20 Dec 2008 01:10:06 -0500
 Content-Disposition: inline
-In-Reply-To: <20081219202603.GA31265@lst.de>
+In-Reply-To: <1229625305.26363.190.camel@al08linux99>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 19, 2008 at 08:26:03PM +0000, Christoph Hellwig wrote:
-> On my new thinkpad with a Intel Core2 Duo T9600 I reproducibly get
-> this message during boot:
+On Thu, Dec 18, 2008 at 06:35:05PM +0000, Lee Nipper wrote:
+> Previous commit for interrupt mitigation moved the done interrupt
+> acknowlegement from the isr to the talitos_done tasklet.
+> This patch moves the done interrupt acknowledgement back
+> into the isr so that done interrupts will always be acknowledged.
+> This covers the case for acknowledging interrupts for channel done processing
+> that has actually already been completed by the tasklet prior to fielding
+> a pending interrupt.
 > 
-> [    0.657034] alg: cipher: Test 1 failed on encryption for aes-asm
-> [    0.657111] 00000000: 00 01 02 03 04 05 06 07 08 08 08 08 08 08 08 08 
+> Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-The correct output should be
-
-		.result = "\x69\xc4\xe0\xd8\x6a\x7b\x04\x30"
-			  "\xd8\xcd\xb7\x80\x70\xb4\xc5\x5a",
-
-> I'd assume it's not a hardware but, so my the assembly code doesn't
-> like the debian toolchain?  It's
-> 
-> 	binutils 2.18.1~cvs20080103-7
-> 	gcc 4.3.2-1
-> 
-> (all the Debian package versions)
-
-Weird.  I've got exactly the same versions as you, using yesterday's
-Linus git tree, and it works just fine on a Core 2 Quad Q6600.  From
-/proc/crypto after boot:
-
-name         : aes
-driver       : aes-asm
-module       : aes_x86_64
-priority     : 200
-refcnt       : 1
-selftest     : passed
-type         : cipher
-blocksize    : 16
-min keysize  : 16
-max keysize  : 32
-
-name         : aes
-driver       : aes-generic
-module       : aes_generic
-priority     : 100
-refcnt       : 1
-selftest     : passed
-type         : cipher
-blocksize    : 16
-min keysize  : 16
-max keysize  : 32
-
-Are you in 64-bit mode or legacy mode? I'm in 64.
-
-Cheers,
+Patch applied.  Thanks Lee!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
