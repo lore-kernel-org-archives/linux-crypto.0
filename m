@@ -1,7 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.29
-Date: Thu, 25 Dec 2008 11:17:24 +1100
-Message-ID: <20081225001724.GA2813@gondor.apana.org.au>
+Subject: Re: Crypto Update for 2.6.29
+Date: Thu, 25 Dec 2008 11:20:20 +1100
+Message-ID: <20081225002020.GA2912@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 To: Linus Torvalds <torvalds@linux-foundation.org>,
@@ -9,12 +10,13 @@ To: Linus Torvalds <torvalds@linux-foundation.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46374 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:46379 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751425AbYLYARb (ORCPT
+	with ESMTP id S1751462AbYLYAU0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Dec 2008 19:17:31 -0500
+	Wed, 24 Dec 2008 19:20:26 -0500
 Content-Disposition: inline
+In-Reply-To: <20081225001724.GA2813@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -35,6 +37,17 @@ instruction.
 
 Apart from that there is the usual collection of bug fixes and
 updates to algorithms and drivers.
+
+Now with the pull location :)
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
 
 Adrian-Ken Rueegsegger (10):
       libcrc32c: Fix "crc32c undefined" compilation error
@@ -168,7 +181,13 @@ Vishnu Suresh (1):
  44 files changed, 3331 insertions(+), 1420 deletions(-)
  create mode 100644 crypto/shash.c
 
-Thanks,
+> Thanks,
+> -- 
+> Visit Openswan at http://www.openswan.org/
+> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
