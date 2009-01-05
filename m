@@ -1,34 +1,97 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: alg: cipher: Test 1 failed on encryption for aes-asm
-Date: Sat, 3 Jan 2009 08:57:39 +1100
-Message-ID: <20090102215739.GB29294@gondor.apana.org.au>
-References: <20081219202603.GA31265@lst.de> <20081220032159.GA15615@gondor.apana.org.au> <1230022166.17529.82.camel@yhuang-dev.sh.intel.com> <20081223130154.GA23717@Chamillionaire.breakpoint.cc> <1230083021.17529.98.camel@yhuang-dev.sh.intel.com> <20081224044851.GA20851@gondor.apana.org.au> <20090102212427.GA19624@Chamillionaire.breakpoint.cc>
+From: Huang Ying <ying.huang@intel.com>
+Subject: [RFC PATCH crypto 1/4] AES-NI: Move key_length in struct
+	crypto_aes_ctx to be the last field
+Date: Mon, 05 Jan 2009 10:02:07 +0800
+Message-ID: <1231120927.5937.26.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Huang Ying <ying.huang@intel.com>, Christoph Hellwig <hch@lst.de>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-m7rYrI7bqU9HPY22dook"
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [64.62.148.172] ([64.62.148.172]:56429 "EHLO arnor.apana.org.au"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1757066AbZABWFm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Jan 2009 17:05:42 -0500
-Content-Disposition: inline
-In-Reply-To: <20090102212427.GA19624@Chamillionaire.breakpoint.cc>
+Received: from mga11.intel.com ([192.55.52.93]:40490 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750836AbZAECCM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 4 Jan 2009 21:02:12 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 02, 2009 at 10:24:27PM +0100, Sebastian Andrzej Siewior wrote:
-> 
-> No matter what you pick as your final solution, should I send a
-> 's/module_init/subsys_initcall/' patch for cryptomgr & algapi?
 
-cryptomgr already uses subsys_initcall and algapi doesn't need
-it yet because it only registers the proc entry.
+--=-m7rYrI7bqU9HPY22dook
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The Intel AES-NI AES acceleration instructions need key_enc, key_dec
+in struct crypto_aes_ctx to be 16 byte aligned, it make this easier to
+move key_length to be the last one.
+
+Signed-off-by: Huang Ying <ying.huang@intel.com>
+
+---
+ arch/x86/crypto/aes-i586-asm_32.S   |    6 +++---
+ arch/x86/crypto/aes-x86_64-asm_64.S |    4 ++--
+ include/crypto/aes.h                |    2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+--- a/arch/x86/crypto/aes-i586-asm_32.S
++++ b/arch/x86/crypto/aes-i586-asm_32.S
+@@ -46,9 +46,9 @@
+ #define in_blk 16
+=20
+ /* offsets in crypto_tfm structure */
+-#define klen (crypto_tfm_ctx_offset + 0)
+-#define ekey (crypto_tfm_ctx_offset + 4)
+-#define dkey (crypto_tfm_ctx_offset + 244)
++#define klen (crypto_tfm_ctx_offset + 480)
++#define ekey (crypto_tfm_ctx_offset + 0)
++#define dkey (crypto_tfm_ctx_offset + 240)
+=20
+ // register mapping for encrypt and decrypt subroutines
+=20
+--- a/arch/x86/crypto/aes-x86_64-asm_64.S
++++ b/arch/x86/crypto/aes-x86_64-asm_64.S
+@@ -56,13 +56,13 @@
+ 	.align	8;			\
+ FUNC:	movq	r1,r2;			\
+ 	movq	r3,r4;			\
+-	leaq	BASE+KEY+48+4(r8),r9;	\
++	leaq	BASE+KEY+48(r8),r9;	\
+ 	movq	r10,r11;		\
+ 	movl	(r7),r5 ## E;		\
+ 	movl	4(r7),r1 ## E;		\
+ 	movl	8(r7),r6 ## E;		\
+ 	movl	12(r7),r7 ## E;		\
+-	movl	BASE+0(r8),r10 ## E;	\
++	movl	BASE+480(r8),r10 ## E;	\
+ 	xorl	-48(r9),r5 ## E;	\
+ 	xorl	-44(r9),r1 ## E;	\
+ 	xorl	-40(r9),r6 ## E;	\
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -18,9 +18,9 @@
+ #define AES_MAX_KEYLENGTH_U32	(AES_MAX_KEYLENGTH / sizeof(u32))
+=20
+ struct crypto_aes_ctx {
+-	u32 key_length;
+ 	u32 key_enc[AES_MAX_KEYLENGTH_U32];
+ 	u32 key_dec[AES_MAX_KEYLENGTH_U32];
++	u32 key_length;
+ };
+=20
+ extern const u32 crypto_ft_tab[4][256];
+
+
+--=-m7rYrI7bqU9HPY22dook
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAklhahsACgkQKhFGF+eHlpgGVwCeOZ4tzLK4yZdci2GrtiUDvwvl
+ftMAn0+ekkPjgiXNwapfGatZCHzGnlrK
+=Yb/g
+-----END PGP SIGNATURE-----
+
+--=-m7rYrI7bqU9HPY22dook--
+
