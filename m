@@ -1,39 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Huang Ying <ying.huang@intel.com>
 Subject: Re: [RFC PATCH crypto 4/4] AES-NI: Add support to Intel AES-NI
 	instructions for x86_64 platform
-Date: Mon, 12 Jan 2009 14:06:45 +1100
-Message-ID: <20090112030645.GA2651@gondor.apana.org.au>
-References: <1231120947.5937.31.camel@yhuang-dev.sh.intel.com> <20090109070144.GA7358@gondor.apana.org.au> <1231491273.5937.94.camel@yhuang-dev.sh.intel.com> <20090109091814.GA10881@gondor.apana.org.au> <20090110100823.GA22352@gondor.apana.org.au> <1231727423.5937.101.camel@yhuang-dev.sh.intel.com>
+Date: Mon, 12 Jan 2009 14:55:10 +0800
+Message-ID: <1231743310.5937.107.camel@yhuang-dev.sh.intel.com>
+References: <1231120947.5937.31.camel@yhuang-dev.sh.intel.com>
+	 <20090109070144.GA7358@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-pgGYok33G0B8RvoQt4kN"
 Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46183 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752071AbZALDGx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 Jan 2009 22:06:53 -0500
-Content-Disposition: inline
-In-Reply-To: <1231727423.5937.101.camel@yhuang-dev.sh.intel.com>
+Received: from mga14.intel.com ([143.182.124.37]:43530 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750977AbZALGzN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Jan 2009 01:55:13 -0500
+In-Reply-To: <20090109070144.GA7358@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 12, 2009 at 10:30:23AM +0800, Huang Ying wrote:
->
-> With this method, we can allocate only one cryptd tfm internally,
-> without dedicated blkcipher tfm. If kernel is using FPU, crypd tfm is
-> used, otherwise, the underlying blkcipher tfm is used directly.
 
-I'm not sure what you're saying here.  But the blkcipher object
-is reentrant.  Meaning that it can be used simultaneously on two
-CPUs as long as you don't change the key under it.
+--=-pgGYok33G0B8RvoQt4kN
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Fri, 2009-01-09 at 15:01 +0800, Herbert Xu wrote:
+> Actually I was thinking of something as simple as just using
+> cryptd as is.  That is, register a blkcipher algorithm for your
+> version of cbc-aes, but don't register under the name cbc(aes),
+> e.g., register it under the name of __cbc-aes-aesni for both alg
+> name and driver name.  You can register it under cbc(aes) too
+> if you add the fallback in there.
+>=20
+> Then for the real thing, just allocate the blkcipher __cbc_*,
+> plus the ablkcipher cryptd(__cbc_*), and invoke the right one
+> depending on caller context.
+
+One more question:
+
+I use a "shell" cbc(aes) algorithm which chooses between
+cryptd(__cbc-aes-aesni) and __cbc-aes-aesni according to context. But
+the struct ablkcipher_request passed in can not be used for cryptd(*).
+This can be resolved by allocating another struct ablkcipher_request for
+cryptd(*) for each incoming struct ablkcipher_request. But is there any
+better solution?
+
+Best Regards,
+Huang Ying
+
+--=-pgGYok33G0B8RvoQt4kN
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAklq6UsACgkQKhFGF+eHlph79gCfaq/sf1JlBB8zTb2HLVGTiqmU
+JHoAmgNCiJdMqjwZCoOBKmWyM4GvqLjI
+=EgKi
+-----END PGP SIGNATURE-----
+
+--=-pgGYok33G0B8RvoQt4kN--
+
