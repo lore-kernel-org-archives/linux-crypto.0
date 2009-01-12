@@ -1,43 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH crypto 4/4] AES-NI: Add support to Intel AES-NI
-	instructions for x86_64 platform
-Date: Mon, 12 Jan 2009 21:43:35 +1100
-Message-ID: <20090112104335.GA4942@gondor.apana.org.au>
-References: <1231120947.5937.31.camel@yhuang-dev.sh.intel.com> <20090109070144.GA7358@gondor.apana.org.au> <1231743310.5937.107.camel@yhuang-dev.sh.intel.com>
+From: Dean Jenkins <djenkins@mvista.com>
+Subject: kernel BUG at crypto/scatterwalk.c:37! when using modified tcrypt for HMAC testing
+Date: Mon, 12 Jan 2009 13:53:42 +0000
+Message-ID: <200901121353.42705.djenkins@mvista.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50980 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752143AbZALKnl (ORCPT
+Received: from gateway-1237.mvista.com ([63.81.120.158]:64605 "EHLO
+	gateway-1237.mvista.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754801AbZALNxp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Jan 2009 05:43:41 -0500
+	Mon, 12 Jan 2009 08:53:45 -0500
 Content-Disposition: inline
-In-Reply-To: <1231743310.5937.107.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 12, 2009 at 02:55:10PM +0800, Huang Ying wrote:
->
-> I use a "shell" cbc(aes) algorithm which chooses between
-> cryptd(__cbc-aes-aesni) and __cbc-aes-aesni according to context. But
-> the struct ablkcipher_request passed in can not be used for cryptd(*).
-> This can be resolved by allocating another struct ablkcipher_request for
-> cryptd(*) for each incoming struct ablkcipher_request. But is there any
-> better solution?
+Hi,
 
-You should include that other ablkcipher_request as part of the
-context of your ablkcipher_request.
+I'm trying to test AEAD based HMAC (sha1-96) with NULL encryption using a 
+modified tcrypt module.
 
-See for example how aead embeds it.
+I'm using a 2.6.27.4 kernel on an armv5te platform.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I hit a BUG() at crypto/scatterwalk.c:37 that indicates that the scatterlist 
+length is zero.
+
+I've traced this back to crypto/authenc.c function crypto_authenc_genicv()...
+
+There is a call to authenc_chain(cipher, dst, vdst == iv + ivsize);
+
+It seems the test vdst == iv + ivsize fails. Does anyone know the purpose of 
+the test ? I think it is trying to check that the end of the IV field matches 
+something in the reg->dst scatterlist ?
+
+authenc_chain() is...
+
+static void authenc_chain(struct scatterlist *head, struct scatterlist *sg,
+			  int chain)
+{
+	if (chain) {
+		head->length += sg->length;
+		sg = scatterwalk_sg_next(sg);
+	}
+
+	if (sg)
+		scatterwalk_sg_chain(head, 2, sg);
+	else
+		sg_mark_end(head);
+}
+
+Therefore the value of chain is 0 and this causes authenc_chain() to not 
+update the length in head eg. chiper[0] scatterlist.
+
+Can anyone please tell me what authenc_chain() is trying to do ?
+
+Is there a "special" relationship to create the IV buffer with respect to the 
+dst scatterlist within tcrypt so that chain = 1 ? If I use ESP4 in IPsec 
+instead of tcrypt, then chain does equal 1.
+
+Thanks for any info ?
+
+Regards,
+
+Dean Jenkins
+MontaVista Software
+
