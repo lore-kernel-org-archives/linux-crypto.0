@@ -1,370 +1,293 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH] crypto: compress - Add pcomp interface
-Date: Tue, 13 Jan 2009 16:59:40 +0100
-Message-ID: <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH] squashfs: Make SquashFS 4 use the new pcomp crypto interface
+Date: Tue, 13 Jan 2009 16:59:46 +0100
+Message-ID: <1231862386-11128-8-git-send-email-Geert.Uytterhoeven@sonycom.com>
 References: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-7-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>,
+	Phillip Lougher <phillip@lougher.demon.co.uk>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:47628 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:47649 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753214AbZAMP7z (ORCPT
+	by vger.kernel.org with ESMTP id S1753339AbZAMP77 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2009 10:59:55 -0500
-In-Reply-To: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	Tue, 13 Jan 2009 10:59:59 -0500
+In-Reply-To: <1231862386-11128-7-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The current "comp" crypto interface supports one-shot (de)compression only,
-i.e. the whole data buffer to be (de)compressed must be passed at once, and
-the whole (de)compressed data buffer will be received at once.
-In several use-cases (e.g. compressed file systems that store files in big
-compressed blocks), this workflow is not suitable.
-Furthermore, the "comp" type doesn't provide for the configuration of
-(de)compression parameters, and always allocates workspace memory for both
-compression and decompression, which may waste memory.
-
-To solve this, add a "pcomp" partial (de)compression interface that provides
-the following operations:
-  - crypto_pcomp_compress_{init,update,final}() for compression,
-  - crypto_pcomp_decompress_{init,update,final}() for decompression,
-  - crypto_pcomp_setup(), to configure (de)compression parameters (incl.
-    allocating workspace memory).
-
-The (de)compression methods take a struct comp_request, which was mimicked
-after the z_stream object in zlib, and contains buffer pointer and length
-pairs for input and output.
-
-The setup method takes an opaque parameter pointer, whose meaning depends on
-the actual (name of the) (de)compression algorithm.
+Modify SquashFS 4 to use the new "pcomp" crypto interface for decompression,
+instead of calling the underlying zlib library directly. This simplifies e.g.
+the addition of support for hardware decompression and different decompression
+algorithms.
 
 Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Cc: Phillip Lougher <phillip@lougher.demon.co.uk>
 ---
- crypto/Kconfig                     |    4 +
- crypto/Makefile                    |    2 +
- crypto/pcompress.c                 |   94 +++++++++++++++++++++++++
- include/crypto/compress.h          |  132 ++++++++++++++++++++++++++++++++++++
- include/crypto/internal/compress.h |   29 ++++++++
- include/linux/crypto.h             |    1 +
- 6 files changed, 262 insertions(+), 0 deletions(-)
- create mode 100644 crypto/pcompress.c
- create mode 100644 include/crypto/compress.h
- create mode 100644 include/crypto/internal/compress.h
+ fs/Kconfig                   |    3 +-
+ fs/squashfs/block.c          |   81 ++++++++++++++++++++++++------------------
+ fs/squashfs/squashfs_fs_sb.h |    2 +-
+ fs/squashfs/super.c          |   36 ++++++++++++++----
+ 4 files changed, 77 insertions(+), 45 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8dde4fc..740e3bc 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -75,6 +75,10 @@ config CRYPTO_RNG2
- 	tristate
- 	select CRYPTO_ALGAPI2
- 
-+config CRYPTO_PCOMP
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
- config CRYPTO_MANAGER
- 	tristate "Cryptographic algorithm manager"
- 	select CRYPTO_MANAGER2
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 46b08bf..8de194f 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -25,6 +25,8 @@ crypto_hash-objs += ahash.o
- crypto_hash-objs += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
-+obj-$(CONFIG_CRYPTO_PCOMP) += pcompress.o
-+
- cryptomgr-objs := algboss.o testmgr.o
- 
- obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
-diff --git a/crypto/pcompress.c b/crypto/pcompress.c
-new file mode 100644
-index 0000000..b9e3724
---- /dev/null
-+++ b/crypto/pcompress.c
-@@ -0,0 +1,94 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Partial compression operations.
-+ *
-+ * Copyright 2008 Sony Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software Foundation,
-+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
-+ */
-+
-+#define pr_fmt(fmt)	"%s: " fmt, __func__
-+
-+#include <linux/crypto.h>
-+#include <linux/errno.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/string.h>
+diff --git a/fs/Kconfig b/fs/Kconfig
+index 51307b0..6636018 100644
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -935,7 +935,8 @@ config CRAMFS
+ config SQUASHFS
+ 	tristate "SquashFS 4.0 - Squashed file system support"
+ 	depends on BLOCK
+-	select ZLIB_INFLATE
++	select CRYPTO
++	select CRYPTO_DEFLATE
+ 	help
+ 	  Saying Y here includes support for SquashFS 4.0 (a Compressed
+ 	  Read-Only File System).  Squashfs is a highly compressed read-only
+diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
+index c837dfc..959e993 100644
+--- a/fs/squashfs/block.c
++++ b/fs/squashfs/block.c
+@@ -32,7 +32,8 @@
+ #include <linux/mutex.h>
+ #include <linux/string.h>
+ #include <linux/buffer_head.h>
+-#include <linux/zlib.h>
 +
 +#include <crypto/compress.h>
+ 
+ #include "squashfs_fs.h"
+ #include "squashfs_fs_sb.h"
+@@ -153,7 +154,9 @@ int squashfs_read_data(struct super_block *sb, void **buffer, u64 index,
+ 	}
+ 
+ 	if (compressed) {
+-		int zlib_err = 0, zlib_init = 0;
++		int error = 0, decomp_init = 0;
++		struct comp_request req;
++		unsigned int produced = 0;
+ 
+ 		/*
+ 		 * Uncompress block.
+@@ -161,12 +164,13 @@ int squashfs_read_data(struct super_block *sb, void **buffer, u64 index,
+ 
+ 		mutex_lock(&msblk->read_data_mutex);
+ 
+-		msblk->stream.avail_out = 0;
+-		msblk->stream.avail_in = 0;
++		req.avail_out = 0;
++		req.avail_in = 0;
+ 
+ 		bytes = length;
++		length = 0;
+ 		do {
+-			if (msblk->stream.avail_in == 0 && k < b) {
++			if (req.avail_in == 0 && k < b) {
+ 				avail = min(bytes, msblk->devblksize - offset);
+ 				bytes -= avail;
+ 				wait_on_buffer(bh[k]);
+@@ -179,50 +183,57 @@ int squashfs_read_data(struct super_block *sb, void **buffer, u64 index,
+ 					continue;
+ 				}
+ 
+-				msblk->stream.next_in = bh[k]->b_data + offset;
+-				msblk->stream.avail_in = avail;
++				req.next_in = bh[k]->b_data + offset;
++				req.avail_in = avail;
+ 				offset = 0;
+ 			}
+ 
+-			if (msblk->stream.avail_out == 0) {
+-				msblk->stream.next_out = buffer[page++];
+-				msblk->stream.avail_out = PAGE_CACHE_SIZE;
++			if (req.avail_out == 0) {
++				req.next_out = buffer[page++];
++				req.avail_out = PAGE_CACHE_SIZE;
+ 			}
+ 
+-			if (!zlib_init) {
+-				zlib_err = zlib_inflateInit(&msblk->stream);
+-				if (zlib_err != Z_OK) {
+-					ERROR("zlib_inflateInit returned"
+-						" unexpected result 0x%x,"
+-						" srclength %d\n", zlib_err,
+-						srclength);
++			if (!decomp_init) {
++				error = crypto_pcomp_decompress_init(msblk->tfm);
++				if (error) {
++					ERROR("crypto_pcomp_decompress_init "
++						"returned %d, srclength %d\n",
++						error, srclength);
+ 					goto release_mutex;
+ 				}
+-				zlib_init = 1;
++				decomp_init = 1;
++			}
 +
-+#include "internal.h"
++			produced = req.avail_out;
++			error = crypto_pcomp_decompress_update(msblk->tfm,
++							       &req);
++			if (error) {
++				ERROR("crypto_pcomp_decompress_update "
++					"returned %d, srclength %d, avail_in "
++					"%d, avail_out %d\n", error, srclength,
++					req.avail_in, req.avail_out);
++				goto release_mutex;
+ 			}
++			produced -= req.avail_out;
+ 
+-			zlib_err = zlib_inflate(&msblk->stream, Z_NO_FLUSH);
++			length += produced;
+ 
+-			if (msblk->stream.avail_in == 0 && k < b)
++			if (req.avail_in == 0 && k < b)
+ 				put_bh(bh[k++]);
+-		} while (zlib_err == Z_OK);
+-
+-		if (zlib_err != Z_STREAM_END) {
+-			ERROR("zlib_inflate returned unexpected result"
+-				" 0x%x, srclength %d, avail_in %d,"
+-				" avail_out %d\n", zlib_err, srclength,
+-				msblk->stream.avail_in,
+-				msblk->stream.avail_out);
+-			goto release_mutex;
+-		}
+ 
+-		zlib_err = zlib_inflateEnd(&msblk->stream);
+-		if (zlib_err != Z_OK) {
+-			ERROR("zlib_inflateEnd returned unexpected result 0x%x,"
+-				" srclength %d\n", zlib_err, srclength);
++		} while (bytes || produced);
 +
++		produced = req.avail_out;
++		error = crypto_pcomp_decompress_final(msblk->tfm, &req);
++		if (error) {
++			ERROR("crypto_pcomp_decompress_final returned %d, "
++				"srclength %d\n", error, srclength);
+ 			goto release_mutex;
+ 		}
+-		length = msblk->stream.total_out;
++		produced -= req.avail_out;
 +
-+static int crypto_init_pcomp_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	return 0;
-+}
++		length += produced;
 +
-+static unsigned int crypto_pcomp_ctxsize(struct crypto_alg *alg, u32 type,
-+					 u32 mask)
-+{
-+	return alg->cra_ctxsize;
-+}
-+
-+static int crypto_pcomp_init_tfm(struct crypto_tfm *tfm,
-+				 const struct crypto_type *frontend)
-+{
-+	if (frontend->type != CRYPTO_ALG_TYPE_PCOMPRESS)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static void crypto_pcomp_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_pcomp_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	seq_printf(m, "type         : pcomp\n");
-+}
-+
-+static const struct crypto_type crypto_pcomp_type = {
-+	.ctxsize	= crypto_pcomp_ctxsize,
-+	.init		= crypto_init_pcomp_ops,
-+	.init_tfm	= crypto_pcomp_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show		= crypto_pcomp_show,
-+#endif
-+	.maskclear	= ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset	= CRYPTO_ALG_TYPE_MASK,
-+	.type		= CRYPTO_ALG_TYPE_PCOMPRESS,
-+	.tfmsize	= offsetof(struct crypto_pcomp, base),
-+};
-+
-+int crypto_register_pcomp(struct pcomp_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
-+
-+	base->cra_type = &crypto_pcomp_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_PCOMPRESS;
-+
-+	return crypto_register_alg(base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_pcomp);
-+
-+int crypto_unregister_pcomp(struct pcomp_alg *alg)
-+{
-+	return crypto_unregister_alg(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_pcomp);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Partial (de)compression type");
-+MODULE_AUTHOR("Sony Corporation");
-diff --git a/include/crypto/compress.h b/include/crypto/compress.h
-new file mode 100644
-index 0000000..a6493b9
---- /dev/null
-+++ b/include/crypto/compress.h
-@@ -0,0 +1,132 @@
-+/*
-+ * Compress: Compression algorithms under the cryptographic API.
-+ *
-+ * Copyright 2008 Sony Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software Foundation,
-+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
-+ */
-+
-+#ifndef _CRYPTO_COMPRESS_H
-+#define _CRYPTO_COMPRESS_H
-+
-+#include <linux/crypto.h>
-+
-+
-+struct comp_request {
-+	const void *next_in;		/* next input byte */
-+	void *next_out;			/* next output byte */
-+	unsigned int avail_in;		/* bytes available at next_in */
-+	unsigned int avail_out;		/* bytes available at next_out */
-+};
-+
-+struct pcomp_alg {
-+	int (*setup)(struct crypto_tfm *tfm, const void *params);
-+	int (*compress_init)(struct crypto_tfm *tfm);
-+	int (*compress_update)(struct crypto_tfm *tfm,
-+			       struct comp_request *req);
-+	int (*compress_final)(struct crypto_tfm *tfm,
-+			      struct comp_request *req);
-+	int (*decompress_init)(struct crypto_tfm *tfm);
-+	int (*decompress_update)(struct crypto_tfm *tfm,
-+				 struct comp_request *req);
-+	int (*decompress_final)(struct crypto_tfm *tfm,
-+				struct comp_request *req);
-+
-+	struct crypto_alg base;
-+};
-+
-+struct crypto_pcomp {
-+	struct crypto_tfm base;
-+};
-+
-+static inline struct crypto_pcomp *__crypto_pcomp_cast(struct crypto_tfm *tfm)
-+{
-+	return (struct crypto_pcomp *)tfm;
-+}
-+
-+static inline struct crypto_pcomp *crypto_alloc_pcomp(const char *alg_name,
-+						      u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_PCOMPRESS;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_pcomp_cast(crypto_alloc_base(alg_name, type, mask));
-+}
-+
-+static inline struct crypto_tfm *crypto_pcomp_tfm(struct crypto_pcomp *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline void crypto_free_pcomp(struct crypto_pcomp *tfm)
-+{
-+	crypto_free_tfm(crypto_pcomp_tfm(tfm));
-+}
-+
-+static inline struct pcomp_alg *__crypto_pcomp_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct pcomp_alg, base);
-+}
-+
-+static inline struct pcomp_alg *crypto_pcomp_alg(struct crypto_pcomp *tfm)
-+{
-+	return __crypto_pcomp_alg(crypto_pcomp_tfm(tfm)->__crt_alg);
-+}
-+
-+static inline int crypto_pcomp_setup(struct crypto_pcomp *tfm,
-+				     const void *params)
-+{
-+	return crypto_pcomp_alg(tfm)->setup(crypto_pcomp_tfm(tfm), params);
-+}
-+
-+static inline int crypto_pcomp_compress_init(struct crypto_pcomp *tfm)
-+{
-+	return crypto_pcomp_alg(tfm)->compress_init(crypto_pcomp_tfm(tfm));
-+}
-+
-+static inline int crypto_pcomp_compress_update(struct crypto_pcomp *tfm,
-+					       struct comp_request *req)
-+{
-+	return crypto_pcomp_alg(tfm)->compress_update(crypto_pcomp_tfm(tfm),
-+						      req);
-+}
-+
-+static inline int crypto_pcomp_compress_final(struct crypto_pcomp *tfm,
-+					      struct comp_request *req)
-+{
-+	return crypto_pcomp_alg(tfm)->compress_final(crypto_pcomp_tfm(tfm),
-+						     req);
-+}
-+
-+static inline int crypto_pcomp_decompress_init(struct crypto_pcomp *tfm)
-+{
-+	return crypto_pcomp_alg(tfm)->decompress_init(crypto_pcomp_tfm(tfm));
-+}
-+
-+static inline int crypto_pcomp_decompress_update(struct crypto_pcomp *tfm,
-+						 struct comp_request *req)
-+{
-+	return crypto_pcomp_alg(tfm)->decompress_update(crypto_pcomp_tfm(tfm),
-+							req);
-+}
-+
-+static inline int crypto_pcomp_decompress_final(struct crypto_pcomp *tfm,
-+						struct comp_request *req)
-+{
-+	return crypto_pcomp_alg(tfm)->decompress_final(crypto_pcomp_tfm(tfm),
-+						       req);
-+}
-+
-+#endif	/* _CRYPTO_COMPRESS_H */
-diff --git a/include/crypto/internal/compress.h b/include/crypto/internal/compress.h
-new file mode 100644
-index 0000000..db2f264
---- /dev/null
-+++ b/include/crypto/internal/compress.h
-@@ -0,0 +1,29 @@
-+/*
-+ * Compress: Compression algorithms under the cryptographic API.
-+ *
-+ * Copyright 2008 Sony Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software Foundation,
-+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
-+ */
-+
-+#ifndef _CRYPTO_INTERNAL_COMPRESS_H
-+#define _CRYPTO_INTERNAL_COMPRESS_H
-+
+ 		mutex_unlock(&msblk->read_data_mutex);
+ 	} else {
+ 		/*
+diff --git a/fs/squashfs/squashfs_fs_sb.h b/fs/squashfs/squashfs_fs_sb.h
+index c8c6561..4eae75b 100644
+--- a/fs/squashfs/squashfs_fs_sb.h
++++ b/fs/squashfs/squashfs_fs_sb.h
+@@ -64,7 +64,7 @@ struct squashfs_sb_info {
+ 	struct mutex		read_data_mutex;
+ 	struct mutex		meta_index_mutex;
+ 	struct meta_index	*meta_index;
+-	z_stream		stream;
++	struct crypto_pcomp	*tfm;
+ 	__le64			*inode_lookup_table;
+ 	u64			inode_table;
+ 	u64			directory_table;
+diff --git a/fs/squashfs/super.c b/fs/squashfs/super.c
+index a0466d7..e6c4a1b 100644
+--- a/fs/squashfs/super.c
++++ b/fs/squashfs/super.c
+@@ -36,11 +36,17 @@
+ #include <linux/module.h>
+ #include <linux/zlib.h>
+ 
 +#include <crypto/compress.h>
 +
-+int crypto_register_pcomp(struct pcomp_alg *alg);
-+int crypto_unregister_pcomp(struct pcomp_alg *alg);
-+
-+#endif	/* _CRYPTO_INTERNAL_COMPRESS_H */
-+
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 3bacd71..61b483a 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -40,6 +40,7 @@
- #define CRYPTO_ALG_TYPE_SHASH		0x00000009
- #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
-+#define CRYPTO_ALG_TYPE_PCOMPRESS	0x0000000f
+ #include "squashfs_fs.h"
+ #include "squashfs_fs_sb.h"
+ #include "squashfs_fs_i.h"
+ #include "squashfs.h"
  
- #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
- #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000c
++
++#define SQUASHFS_CRYPTO_ALG	"deflate"
++
++
+ static struct file_system_type squashfs_fs_type;
+ static struct super_operations squashfs_super_ops;
+ 
+@@ -74,6 +80,7 @@ static int squashfs_fill_super(struct super_block *sb, void *data, int silent)
+ 	unsigned short flags;
+ 	unsigned int fragments;
+ 	u64 lookup_table_start;
++	struct deflate_comp_params params;
+ 	int err;
+ 
+ 	TRACE("Entered squashfs_fill_superblock\n");
+@@ -85,16 +92,29 @@ static int squashfs_fill_super(struct super_block *sb, void *data, int silent)
+ 	}
+ 	msblk = sb->s_fs_info;
+ 
+-	msblk->stream.workspace = kmalloc(zlib_inflate_workspacesize(),
+-		GFP_KERNEL);
+-	if (msblk->stream.workspace == NULL) {
+-		ERROR("Failed to allocate zlib workspace\n");
++	msblk->tfm = crypto_alloc_pcomp(SQUASHFS_CRYPTO_ALG, 0,
++					CRYPTO_ALG_ASYNC);
++	if (IS_ERR(msblk->tfm)) {
++		ERROR("Failed to load %s crypto module\n",
++		      SQUASHFS_CRYPTO_ALG);
++		msblk->tfm = NULL;
++		err = -ENOMEM;
++		goto failure;
++	}
++
++	params.enable_comp = 0;
++	params.enable_decomp = 1;
++	params.windowBits = DEF_WBITS;
++	err = crypto_pcomp_setup(msblk->tfm, &params);
++	if (err) {
++		ERROR("Failed to set up decompression parameters\n");
+ 		goto failure;
+ 	}
+ 
+ 	sblk = kzalloc(sizeof(*sblk), GFP_KERNEL);
+ 	if (sblk == NULL) {
+ 		ERROR("Failed to allocate squashfs_super_block\n");
++		err = -ENOMEM;
+ 		goto failure;
+ 	}
+ 
+@@ -283,17 +303,17 @@ failed_mount:
+ 	kfree(msblk->inode_lookup_table);
+ 	kfree(msblk->fragment_index);
+ 	kfree(msblk->id_table);
+-	kfree(msblk->stream.workspace);
++	crypto_free_pcomp(msblk->tfm);
+ 	kfree(sb->s_fs_info);
+ 	sb->s_fs_info = NULL;
+ 	kfree(sblk);
+ 	return err;
+ 
+ failure:
+-	kfree(msblk->stream.workspace);
++	crypto_free_pcomp(msblk->tfm);
+ 	kfree(sb->s_fs_info);
+ 	sb->s_fs_info = NULL;
+-	return -ENOMEM;
++	return err;
+ }
+ 
+ 
+@@ -332,7 +352,7 @@ static void squashfs_put_super(struct super_block *sb)
+ 		kfree(sbi->id_table);
+ 		kfree(sbi->fragment_index);
+ 		kfree(sbi->meta_index);
+-		kfree(sbi->stream.workspace);
++		crypto_free_pcomp(sbi->tfm);
+ 		kfree(sb->s_fs_info);
+ 		sb->s_fs_info = NULL;
+ 	}
 -- 
 1.6.0.4
 
