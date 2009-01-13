@@ -1,158 +1,268 @@
-From: Dean Jenkins <djenkins@mvista.com>
-Subject: Re: kernel BUG at crypto/scatterwalk.c:37! when using modified
-	tcrypt for HMAC testing
-Date: Tue, 13 Jan 2009 14:46:14 +0000
-Message-ID: <1231857974.7937.74.camel@libdev3.mvista.co.uk>
-References: <20090113003704.GA13775@gondor.apana.org.au>
-Reply-To: djenkins@mvista.com
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-bwoIYtGCYT0N0FosFfyL"
-Cc: linux-crypto@vger.kernel.org
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH] crypto: testmgr - Add support for the pcomp interface
+Date: Tue, 13 Jan 2009 16:59:41 +0100
+Message-ID: <1231862386-11128-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
+References: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [63.81.120.158] ([63.81.120.158]:29520 "EHLO
-	gateway-1237.mvista.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1756371AbZAMOqM (ORCPT
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:47633 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752327AbZAMP7w (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2009 09:46:12 -0500
-In-Reply-To: <20090113003704.GA13775@gondor.apana.org.au>
+	Tue, 13 Jan 2009 10:59:52 -0500
+In-Reply-To: <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+---
+ crypto/testmgr.c |  181 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.h |    9 +++
+ 2 files changed, 190 insertions(+), 0 deletions(-)
 
---=-bwoIYtGCYT0N0FosFfyL
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hi Herbert,
-
-Many thanks that fixed it.
-
-Regards,
-
-Dean Jenkins
-MontaVista Software
-
---=-bwoIYtGCYT0N0FosFfyL
-Content-Disposition: inline
-Content-Description: Forwarded message - Re: kernel BUG at
-	crypto/scatterwalk.c:37! when using modified tcrypt for HMAC testing
-Content-Type: message/rfc822
-
-Return-Path: <herbert@gondor.apana.org.au>
-Received: from hermes.mvista.com ([unix socket]) by hermes.mvista.com
-	(Cyrus v2.2.3-Invoca-RPM-2.2.3-4) with LMTP; Mon, 12 Jan 2009 16:37:40 -0800
-X-Sieve: CMU Sieve 2.2
-Received: from dune.mvista.com (unknown [10.20.1.91]) by hermes.mvista.com
-	(Postfix) with ESMTP id 342E818A4B for <djenkins@mvista.com>; Mon, 12 Jan
-	2009 16:37:39 -0800 (PST)
-Received: (qmail 26310 invoked from network); 13 Jan 2009 00:37:38 -0000
-X-Spam-Checker-Version: SpamAssassin 3.1.7 (2006-10-05) on thoth.mvista.com
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=5.0 tests=AWL,BAYES_00,
-	USER_IN_WHITELIST_TO autolearn=ham version=3.1.7
-Received: from unknown (HELO arnor.apana.org.au) (64.62.148.172) by
-	dune.mvista.com with DES-CBC3-SHA encrypted SMTP; 13 Jan 2009 00:37:09 -0000
-Received: from gondolin.me.apana.org.au ([192.168.0.6]) by
-	arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian)) id 1LMXHG-0008T1-S4;
-	Tue, 13 Jan 2009 11:37:07 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>) id 1LMXHF-0003aP-CH; Tue, 13
-	Jan 2009 11:37:05 +1100
-Date: Tue, 13 Jan 2009 11:37:04 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: djenkins@mvista.com
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: kernel BUG at crypto/scatterwalk.c:37! when using modified
-	tcrypt for HMAC testing
-Message-ID: <20090113003704.GA13775@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.18 (2008-05-17)
-Content-Transfer-Encoding: 7bit
-
-Dean Jenkins <djenkins@mvista.com> wrote:
->
-> I'm using a 2.6.27.4 kernel on an armv5te platform.
-> 
-> I hit a BUG() at crypto/scatterwalk.c:37 that indicates that the scatterlist 
-> length is zero.
-> 
-> I've traced this back to crypto/authenc.c function crypto_authenc_genicv()...
-
-Does this patch fix it?
-
-commit 700aa8bfa071875cda833f44491d3548ad79951e
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Jan 13 11:26:18 2009 +1100
-
-    crypto: authenc - Fix zero-length IV crash
-    
-    As it is if an algorithm with a zero-length IV is used (e.g.,
-    NULL encryption) with authenc, authenc may generate an SG entry
-    of length zero, which will trigger a BUG check in the hash layer.
-    
-    This patch fixes it by skipping the IV SG generation if the IV
-    size is zero.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 40b6e9e..5793b64 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -158,16 +158,19 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
- 	dstp = sg_page(dst);
- 	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a75f11f..aad718f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -72,6 +72,13 @@ struct comp_test_suite {
+ 	} comp, decomp;
+ };
  
--	sg_init_table(cipher, 2);
--	sg_set_buf(cipher, iv, ivsize);
--	authenc_chain(cipher, dst, vdst == iv + ivsize);
-+	if (ivsize) {
-+		sg_init_table(cipher, 2);
-+		sg_set_buf(cipher, iv, ivsize);
-+		authenc_chain(cipher, dst, vdst == iv + ivsize);
-+		dst = cipher;
-+	}
- 
- 	cryptlen = req->cryptlen + ivsize;
--	hash = crypto_authenc_hash(req, flags, cipher, cryptlen);
-+	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
- 	if (IS_ERR(hash))
- 		return PTR_ERR(hash);
- 
--	scatterwalk_map_and_copy(hash, cipher, cryptlen,
-+	scatterwalk_map_and_copy(hash, dst, cryptlen,
- 				 crypto_aead_authsize(authenc), 1);
- 	return 0;
- }
-@@ -285,11 +288,14 @@ static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
- 	srcp = sg_page(src);
- 	vsrc = PageHighMem(srcp) ? NULL : page_address(srcp) + src->offset;
- 
--	sg_init_table(cipher, 2);
--	sg_set_buf(cipher, iv, ivsize);
--	authenc_chain(cipher, src, vsrc == iv + ivsize);
-+	if (ivsize) {
-+		sg_init_table(cipher, 2);
-+		sg_set_buf(cipher, iv, ivsize);
-+		authenc_chain(cipher, src, vsrc == iv + ivsize);
-+		src = cipher;
-+	}
- 
--	return crypto_authenc_verify(req, cipher, cryptlen + ivsize);
-+	return crypto_authenc_verify(req, src, cryptlen + ivsize);
++struct pcomp_test_suite {
++	struct {
++		struct pcomp_testvec *vecs;
++		unsigned int count;
++	} comp, decomp;
++};
++
+ struct hash_test_suite {
+ 	struct hash_testvec *vecs;
+ 	unsigned int count;
+@@ -86,6 +93,7 @@ struct alg_test_desc {
+ 		struct aead_test_suite aead;
+ 		struct cipher_test_suite cipher;
+ 		struct comp_test_suite comp;
++		struct pcomp_test_suite pcomp;
+ 		struct hash_test_suite hash;
+ 	} suite;
+ };
+@@ -898,6 +906,157 @@ out:
+ 	return ret;
  }
  
- static int crypto_authenc_decrypt(struct aead_request *req)
-
-Thanks,
++static int test_pcomp(struct crypto_pcomp *tfm,
++		      struct pcomp_testvec *ctemplate,
++		      struct pcomp_testvec *dtemplate, int ctcount,
++		      int dtcount)
++{
++	const char *algo = crypto_tfm_alg_driver_name(crypto_pcomp_tfm(tfm));
++	unsigned int i;
++	char result[COMP_BUF_SIZE];
++	int error;
++
++	for (i = 0; i < ctcount; i++) {
++		struct comp_request req;
++
++		error = crypto_pcomp_setup(tfm, ctemplate[i].params);
++		if (error) {
++			pr_err("alg: pcomp: compression setup failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		error = crypto_pcomp_compress_init(tfm);
++		if (error) {
++			pr_err("alg: pcomp: compression init failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		memset(result, 0, sizeof(result));
++
++		req.next_in = ctemplate[i].input;
++		req.avail_in = ctemplate[i].inlen / 2;
++		req.next_out = result;
++		req.avail_out = ctemplate[i].outlen / 2;
++
++		error = crypto_pcomp_compress_update(tfm, &req);
++		if (error && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: compression update failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		/* Add remaining input data */
++		req.avail_in += (ctemplate[i].inlen + 1) / 2;
++
++		error = crypto_pcomp_compress_update(tfm, &req);
++		if (error && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: compression update failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		/* Provide remaining output space */
++		req.avail_out += COMP_BUF_SIZE - ctemplate[i].outlen / 2;
++
++		error = crypto_pcomp_compress_final(tfm, &req);
++		if (error) {
++			pr_err("alg: pcomp: compression final failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		if (COMP_BUF_SIZE - req.avail_out != ctemplate[i].outlen) {
++			pr_err("alg: comp: Compression test %d failed for %s: "
++			       "output len = %d (expected %d)\n", i + 1, algo,
++			       COMP_BUF_SIZE - req.avail_out,
++			       ctemplate[i].outlen);
++			return -EINVAL;
++		}
++
++		if (memcmp(result, ctemplate[i].output, ctemplate[i].outlen)) {
++			pr_err("alg: pcomp: Compression test %d failed for "
++			       "%s\n", i + 1, algo);
++			hexdump(result, ctemplate[i].outlen);
++			return -EINVAL;
++		}
++	}
++
++	for (i = 0; i < dtcount; i++) {
++		struct comp_request req;
++
++		error = crypto_pcomp_setup(tfm, dtemplate[i].params);
++		if (error) {
++			pr_err("alg: pcomp: decompression setup failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		error = crypto_pcomp_decompress_init(tfm);
++		if (error) {
++			pr_err("alg: pcomp: decompression init failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		memset(result, 0, sizeof(result));
++
++		req.next_in = dtemplate[i].input;
++		req.avail_in = dtemplate[i].inlen / 2;
++		req.next_out = result;
++		req.avail_out = dtemplate[i].outlen / 2;
++
++		error = crypto_pcomp_decompress_update(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression update failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		/* Add remaining input data */
++		req.avail_in += (dtemplate[i].inlen + 1) / 2;
++
++		error = crypto_pcomp_decompress_update(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression update failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		/* Provide remaining output space */
++		req.avail_out += COMP_BUF_SIZE - dtemplate[i].outlen / 2;
++
++		error = crypto_pcomp_decompress_final(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression final failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		if (COMP_BUF_SIZE - req.avail_out != dtemplate[i].outlen) {
++			pr_err("alg: comp: Decompression test %d failed for "
++			       "%s: output len = %d (expected %d)\n", i + 1,
++			       algo, COMP_BUF_SIZE - req.avail_out,
++			       dtemplate[i].outlen);
++			return -EINVAL;
++		}
++
++		if (memcmp(result, dtemplate[i].output, dtemplate[i].outlen)) {
++			pr_err("alg: pcomp: Decompression test %d failed for "
++			       "%s\n", i + 1, algo);
++			hexdump(result, dtemplate[i].outlen);
++			return -EINVAL;
++		}
++	}
++
++	return 0;
++}
++
+ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+@@ -1007,6 +1166,28 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
+ 	return err;
+ }
+ 
++static int alg_test_pcomp(const struct alg_test_desc *desc, const char *driver,
++			  u32 type, u32 mask)
++{
++	struct crypto_pcomp *tfm;
++	int err;
++
++	tfm = crypto_alloc_pcomp(driver, type, mask);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: pcomp: Failed to load transform for %s: %ld\n",
++		       driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++
++	err = test_pcomp(tfm, desc->suite.pcomp.comp.vecs,
++			 desc->suite.pcomp.decomp.vecs,
++			 desc->suite.pcomp.comp.count,
++			 desc->suite.pcomp.decomp.count);
++
++	crypto_free_pcomp(tfm);
++	return err;
++}
++
+ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 132953e..81b7eb0 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -15,6 +15,8 @@
+ #ifndef _CRYPTO_TESTMGR_H
+ #define _CRYPTO_TESTMGR_H
+ 
++#include <crypto/compress.h>
++
+ #define MAX_DIGEST_SIZE		64
+ #define MAX_TAP			8
+ 
+@@ -8347,6 +8349,13 @@ struct comp_testvec {
+ 	char output[COMP_BUF_SIZE];
+ };
+ 
++struct pcomp_testvec {
++	const void *params;
++	int inlen, outlen;
++	char input[COMP_BUF_SIZE];
++	char output[COMP_BUF_SIZE];
++};
++
+ /*
+  * Deflate test vectors (null-terminated strings).
+  * Params: winbits=-11, Z_DEFAULT_COMPRESSION, MAX_MEM_LEVEL.
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
---=-bwoIYtGCYT0N0FosFfyL--
+1.6.0.4
 
