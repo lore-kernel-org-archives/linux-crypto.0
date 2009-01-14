@@ -1,122 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: compress - Add pcomp interface
-Date: Wed, 14 Jan 2009 14:16:13 +1100
-Message-ID: <20090114031613.GA7429@gondor.apana.org.au>
-References: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Subject: crypto: shash - Remove superfluous check in init_tfm
+Date: Wed, 14 Jan 2009 17:03:57 +1100
+Message-ID: <20090114060357.GA15666@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46906 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:49106 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752603AbZANDQR (ORCPT
+	with ESMTP id S1754606AbZANGD7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2009 22:16:17 -0500
+	Wed, 14 Jan 2009 01:03:59 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1LMyr8-00018N-4p
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2009 17:03:58 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1LMyr7-000451-CE
+	for linux-crypto@vger.kernel.org; Wed, 14 Jan 2009 17:03:57 +1100
 Content-Disposition: inline
-In-Reply-To: <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Geert:
+Hi:
 
-On Tue, Jan 13, 2009 at 04:59:40PM +0100, Geert Uytterhoeven wrote:
-> The current "comp" crypto interface supports one-shot (de)compression only,
-> i.e. the whole data buffer to be (de)compressed must be passed at once, and
-> the whole (de)compressed data buffer will be received at once.
-> In several use-cases (e.g. compressed file systems that store files in big
-> compressed blocks), this workflow is not suitable.
-> Furthermore, the "comp" type doesn't provide for the configuration of
-> (de)compression parameters, and always allocates workspace memory for both
-> compression and decompression, which may waste memory.
+I'll added this to cryptodev-2.6.
 
-Thanks for the patch-set!
+commit 1f4cfc229e0e8c3b48cfada9aecfc72ff438fa61
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Wed Jan 14 13:34:48 2009 +1100
 
-> diff --git a/crypto/pcompress.c b/crypto/pcompress.c
-> new file mode 100644
-> index 0000000..b9e3724
-> --- /dev/null
-> +++ b/crypto/pcompress.c
-> @@ -0,0 +1,94 @@
-> +/*
-> + * Cryptographic API.
-> + *
-> + * Partial compression operations.
-> + *
-> + * Copyright 2008 Sony Corporation
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; version 2 of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, write to the Free Software Foundation,
-> + * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
-> + */
-> +
-> +#define pr_fmt(fmt)	"%s: " fmt, __func__
+    crypto: shash - Remove superfluous check in init_tfm
+    
+    We're currently checking the frontend type in init_tfm.  This is
+    completely pointless because the fact that we're called at all
+    means that the frontend is ours so the type must match as well.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-This appears to be unused?
-
-> +static int crypto_pcomp_init_tfm(struct crypto_tfm *tfm,
-> +				 const struct crypto_type *frontend)
-> +{
-> +	if (frontend->type != CRYPTO_ALG_TYPE_PCOMPRESS)
-> +		return -EINVAL;
-
-This is my fault.  The check is redundant so you can remove it.
-I'll kill it in shash too.
-
-> +struct pcomp_alg {
-> +	int (*setup)(struct crypto_tfm *tfm, const void *params);
-
-Actually I was thinking of separate alloc functions for compress
-and decompress so that
-
-1) We know what the user wants to do without every algorithm
-reinventing their own signalling for it;
-
-2) The parameters can be separated.
-
-Also, this is something that we'll potentially export to user-space,
-so we need to ensure that it is invariant to word length.
-
-So something like this would be good
-
-	int (*setup_comp)(struct crypto_pcomp *tfm, const void *params,
-			  unsigned int length);
-	int (*setup_decomp)(struct crypto_pcomp *tfm, const void *params,
-			    unsigned int length);
-
-The actual parameters should be formatted using the netlink helpers
-(nla_*).  So each parameter that you want to set should show up as
-a netlink attribute.  If a paramter is absent then you'd just use
-the default, etc.
-
-> +	int (*compress_init)(struct crypto_tfm *tfm);
-
-That should be struct crypto_pcomp.
-
-> +static inline struct crypto_pcomp *crypto_alloc_pcomp(const char *alg_name,
-> +						      u32 type, u32 mask)
-> +{
-> +	type &= ~CRYPTO_ALG_TYPE_MASK;
-> +	type |= CRYPTO_ALG_TYPE_PCOMPRESS;
-> +	mask |= CRYPTO_ALG_TYPE_MASK;
-> +
-> +	return __crypto_pcomp_cast(crypto_alloc_base(alg_name, type, mask));
-> +}
-
-That's the old way to allocate tfm's which won't work since pcomp
-is using the new type API.  You should do it the way that shash
-does it.
-
-Cheers,
+diff --git a/crypto/shash.c b/crypto/shash.c
+index c9df367..b96b6e5 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -437,8 +437,6 @@ static unsigned int crypto_shash_ctxsize(struct crypto_alg *alg, u32 type,
+ static int crypto_shash_init_tfm(struct crypto_tfm *tfm,
+ 				 const struct crypto_type *frontend)
+ {
+-	if (frontend->type != CRYPTO_ALG_TYPE_SHASH)
+-		return -EINVAL;
+ 	return 0;
+ }
+ 
+Cheres,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
