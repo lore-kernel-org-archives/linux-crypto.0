@@ -1,71 +1,95 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: Re: Use cryptd(%s) as cryptd-ed algorithm name instead of %s
-Date: Wed, 14 Jan 2009 15:01:51 +0800
-Message-ID: <1231916511.5937.151.camel@yhuang-dev.sh.intel.com>
-References: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com>
-	 <20090114065359.GA16044@gondor.apana.org.au>
+Subject: [RFC PATCH crypto -v3 1/2] AES-NI: Add support to access
+	underlying blkcipher under cryptd ablkcipher
+Date: Wed, 14 Jan 2009 15:44:06 +0800
+Message-ID: <1231919046.5937.159.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-XZKUfC8tHQUIZ0vlIVmr"
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-U6X1Ug46Ppbs8JSpwwN9"
+Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:64907 "EHLO mga09.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:51986 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753314AbZANHBy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2009 02:01:54 -0500
-In-Reply-To: <20090114065359.GA16044@gondor.apana.org.au>
+	id S1753638AbZANHoI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2009 02:44:08 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---=-XZKUfC8tHQUIZ0vlIVmr
+--=-U6X1Ug46Ppbs8JSpwwN9
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2009-01-14 at 14:53 +0800, Herbert Xu wrote:
-> On Wed, Jan 14, 2009 at 02:44:08PM +0800, Huang Ying wrote:
-> > Because:
-> >=20
-> > 1. if use %s, you can only request cryptd(<driver name>), not
-> >    cryptd(<alg name>), because generated new algorithm instance has
-> >    algorithm name: <alg name> and driver name cryptd(<driver name>).
->=20
-> This is intentional.  For the purposes we talked about we should
-> be requesting cryptd(<driver name>), as otherwise you may end up
-> with someone else's AES algorithm as the base.
+cryptd_alloc_ablkcipher() will allocate a cryptd-ed ablkcipher for
+specified algorithm name. The new allocated one is guaranteed to be
+cryptd-ed ablkcipher, so the blkcipher underlying can be gotten via
+cryptd_ablkcipher_child().
 
-Current cryptd works well for AES-NI implementation. But how about
-somebody want cryptd(cbc(aes)), and don't care about the driver.
+Signed-off-by: Huang Ying <ying.huang@intel.com>
 
-> > 2. Generated cryptd-ed algorithm will have the same algorithm name and
-> >    higher priority, but some user may not want to use cryptd-ed
-> >    version.
->=20
-> The priority shouldn't be an issue in our case since the AES-NI
-> algorithm should register itself as an ablkcipher with an even
-> higher priority.
+---
+ crypto/cryptd.c         |   19 +++++++++++++++++++
+ include/crypto/algapi.h |    5 +++++
+ 2 files changed, 24 insertions(+)
 
-Yes, not an issue for AES-NI case until now. But, for example there is
-no aes-ni, if someone request cryptd(cbc(aes-asm)), other user will get
-cryptd(cbc(aes-asm)) instead of cbc(aes-asm) when request cbc(aes), is
-this a good behavior?
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -537,6 +537,25 @@ static struct crypto_template cryptd_tmp
+ 	.module =3D THIS_MODULE,
+ };
+=20
++struct crypto_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
++						  u32 type, u32 mask)
++{
++	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
++
++	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
++		     "cryptd(%s)", alg_name) >=3D CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-EINVAL);
++	return crypto_alloc_ablkcipher(cryptd_alg_name, type, mask);
++}
++EXPORT_SYMBOL_GPL(cryptd_alloc_ablkcipher);
++
++struct crypto_blkcipher *cryptd_ablkcipher_child(struct crypto_ablkcipher =
+*tfm)
++{
++	struct cryptd_blkcipher_ctx *ctx =3D crypto_ablkcipher_ctx(tfm);
++	return ctx->child;
++}
++EXPORT_SYMBOL_GPL(cryptd_ablkcipher_child);
++
+ static inline int cryptd_create_thread(struct cryptd_state *state,
+ 				       int (*fn)(void *data), const char *name)
+ {
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -145,6 +145,11 @@ int blkcipher_walk_virt_block(struct blk
+ 			      struct blkcipher_walk *walk,
+ 			      unsigned int blocksize);
+=20
++/* alg_name should be algorithm to be cryptd-ed */
++struct crypto_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
++						  u32 type, u32 mask);
++struct crypto_blkcipher *cryptd_ablkcipher_child(struct crypto_ablkcipher =
+*tfm);
++
+ static inline void *crypto_tfm_ctx_aligned(struct crypto_tfm *tfm)
+ {
+ 	unsigned long addr =3D (unsigned long)crypto_tfm_ctx(tfm);
 
-Best Regards,
-Huang Ying
 
-
---=-XZKUfC8tHQUIZ0vlIVmr
+--=-U6X1Ug46Ppbs8JSpwwN9
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEUEABECAAYFAkltjdwACgkQKhFGF+eHlpjGgQCWK3boOD9Ozpho3AhqUEfXYAll
-4gCfRmF6aesJ1bIM/d0S5PNQRE32zeE=
-=QGK7
+iEYEABECAAYFAkltl8MACgkQKhFGF+eHlpg+wACgowtavfGpphtSzwTWpMXKg/5d
+5nIAoJhgilhiu4uFl3MkYWl4OspA5m/b
+=5aIb
 -----END PGP SIGNATURE-----
 
---=-XZKUfC8tHQUIZ0vlIVmr--
+--=-U6X1Ug46Ppbs8JSpwwN9--
 
