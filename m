@@ -1,52 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Use cryptd(%s) as cryptd-ed algorithm name instead of %s
-Date: Wed, 14 Jan 2009 19:23:44 +1100
-Message-ID: <20090114082344.GA16692@gondor.apana.org.au>
-References: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com> <20090114065359.GA16044@gondor.apana.org.au> <1231916511.5937.151.camel@yhuang-dev.sh.intel.com>
+From: Dean Jenkins <djenkins@mvista.com>
+Subject: Does ESP support 64 bit sequence numbering for authentication hash
+	?
+Date: Wed, 14 Jan 2009 14:23:53 +0000
+Message-ID: <1231943033.7937.120.camel@libdev3.mvista.co.uk>
+Reply-To: djenkins@mvista.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+To: list crypto <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59982 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753305AbZANIXs (ORCPT
+Received: from gateway-1237.mvista.com ([63.81.120.158]:42468 "EHLO
+	gateway-1237.mvista.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751214AbZANOXx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2009 03:23:48 -0500
-Content-Disposition: inline
-In-Reply-To: <1231916511.5937.151.camel@yhuang-dev.sh.intel.com>
+	Wed, 14 Jan 2009 09:23:53 -0500
+Received: from [192.168.5.105] (unknown [10.120.0.200])
+	by hermes.mvista.com (Postfix) with ESMTP id 8A7F0189AA
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2009 06:23:49 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 14, 2009 at 03:01:51PM +0800, Huang Ying wrote:
-> 
-> Current cryptd works well for AES-NI implementation. But how about
-> somebody want cryptd(cbc(aes)), and don't care about the driver.
+Hi,
 
-That's not an issue, if the user wants then all he has to do is
-create cryptd(cbc(aes)) (how that is done is a different matter,
-hopefully something that we will address as part of the user-space
-API to crypto API), and then just using cbc(aes) will be sufficient.
+Does ESP support 64 bit sequence numbering for use with the
+authentication HMAC ?
 
-In any case, the algorithm name has to be cbc(aes) for it to work,
-since that is what it is.
- 
-> Yes, not an issue for AES-NI case until now. But, for example there is
-> no aes-ni, if someone request cryptd(cbc(aes-asm)), other user will get
-> cryptd(cbc(aes-asm)) instead of cbc(aes-asm) when request cbc(aes), is
-> this a good behavior?
+I've looked at struct aead_givcrypt_request and it has a u64 seq member.
+Does ESP populate this with a 64 bit sequence number ?
 
-The idea is to allow user-space to control priorities in future
-through a netlink interface.  Then this simply becomes a matter
-of system administration.
+If 32 bit sequence numbering negotiated then how does the HMAC routine
+know that it should not use the top 32 bits of seq ? Or is it simply
+that if the top 32 bits are zero then the HMAC just uses the lower 32
+bits ?
 
-For now you simply don't create the cryptd object if you don't
-intend to use it as the system default for that algorithm.
+Thanks for any insight.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Dean Jenkins
+MontaVista Software
+
