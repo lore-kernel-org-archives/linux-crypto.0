@@ -1,60 +1,67 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: shash - Remove superfluous check in init_tfm
-Date: Wed, 14 Jan 2009 17:03:57 +1100
-Message-ID: <20090114060357.GA15666@gondor.apana.org.au>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Use cryptd(%s) as cryptd-ed algorithm name instead of %s
+Date: Wed, 14 Jan 2009 14:44:08 +0800
+Message-ID: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-8cegAMkWd/GWRuciTo1o"
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49106 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754606AbZANGD7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2009 01:03:59 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1LMyr8-00018N-4p
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Jan 2009 17:03:58 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1LMyr7-000451-CE
-	for linux-crypto@vger.kernel.org; Wed, 14 Jan 2009 17:03:57 +1100
-Content-Disposition: inline
+Received: from mga01.intel.com ([192.55.52.88]:33539 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752621AbZANGoR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2009 01:44:17 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
 
-I'll added this to cryptodev-2.6.
+--=-8cegAMkWd/GWRuciTo1o
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-commit 1f4cfc229e0e8c3b48cfada9aecfc72ff438fa61
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Wed Jan 14 13:34:48 2009 +1100
+Because:
 
-    crypto: shash - Remove superfluous check in init_tfm
-    
-    We're currently checking the frontend type in init_tfm.  This is
-    completely pointless because the fact that we're called at all
-    means that the frontend is ours so the type must match as well.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+1. if use %s, you can only request cryptd(<driver name>), not
+   cryptd(<alg name>), because generated new algorithm instance has
+   algorithm name: <alg name> and driver name cryptd(<driver name>).
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index c9df367..b96b6e5 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -437,8 +437,6 @@ static unsigned int crypto_shash_ctxsize(struct crypto_alg *alg, u32 type,
- static int crypto_shash_init_tfm(struct crypto_tfm *tfm,
- 				 const struct crypto_type *frontend)
- {
--	if (frontend->type != CRYPTO_ALG_TYPE_SHASH)
--		return -EINVAL;
- 	return 0;
- }
- 
-Cheres,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2. Generated cryptd-ed algorithm will have the same algorithm name and
+   higher priority, but some user may not want to use cryptd-ed
+   version.
+
+Signed-off-by: Huang Ying <ying.huang@intel.com>
+
+---
+ crypto/cryptd.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -215,7 +215,9 @@ static struct crypto_instance *cryptd_al
+=20
+ 	ctx->state =3D state;
+=20
+-	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
++	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME,
++		     "cryptd(%s)", alg->cra_name) >=3D CRYPTO_MAX_ALG_NAME)
++		goto out_free_inst;
+=20
+ 	inst->alg.cra_priority =3D alg->cra_priority + 50;
+ 	inst->alg.cra_blocksize =3D alg->cra_blocksize;
+
+
+--=-8cegAMkWd/GWRuciTo1o
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkltibMACgkQKhFGF+eHlpiFDgCfRrxNsesjmM39mzQxWVN8gwF9
+uQcAn1ToKNBajnqvmD38hZe4qHqd/aqo
+=8QGZ
+-----END PGP SIGNATURE-----
+
+--=-8cegAMkWd/GWRuciTo1o--
+
