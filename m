@@ -1,67 +1,46 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Use cryptd(%s) as cryptd-ed algorithm name instead of %s
-Date: Wed, 14 Jan 2009 14:44:08 +0800
-Message-ID: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Use cryptd(%s) as cryptd-ed algorithm name instead of %s
+Date: Wed, 14 Jan 2009 17:53:59 +1100
+Message-ID: <20090114065359.GA16044@gondor.apana.org.au>
+References: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-8cegAMkWd/GWRuciTo1o"
+Content-Type: text/plain; charset=us-ascii
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:33539 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752621AbZANGoR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2009 01:44:17 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:42245 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752104AbZANGyE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2009 01:54:04 -0500
+Content-Disposition: inline
+In-Reply-To: <1231915448.5937.145.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Jan 14, 2009 at 02:44:08PM +0800, Huang Ying wrote:
+> Because:
+> 
+> 1. if use %s, you can only request cryptd(<driver name>), not
+>    cryptd(<alg name>), because generated new algorithm instance has
+>    algorithm name: <alg name> and driver name cryptd(<driver name>).
 
---=-8cegAMkWd/GWRuciTo1o
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+This is intentional.  For the purposes we talked about we should
+be requesting cryptd(<driver name>), as otherwise you may end up
+with someone else's AES algorithm as the base.
 
-Because:
+> 2. Generated cryptd-ed algorithm will have the same algorithm name and
+>    higher priority, but some user may not want to use cryptd-ed
+>    version.
 
-1. if use %s, you can only request cryptd(<driver name>), not
-   cryptd(<alg name>), because generated new algorithm instance has
-   algorithm name: <alg name> and driver name cryptd(<driver name>).
+The priority shouldn't be an issue in our case since the AES-NI
+algorithm should register itself as an ablkcipher with an even
+higher priority.
 
-2. Generated cryptd-ed algorithm will have the same algorithm name and
-   higher priority, but some user may not want to use cryptd-ed
-   version.
-
-Signed-off-by: Huang Ying <ying.huang@intel.com>
-
----
- crypto/cryptd.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -215,7 +215,9 @@ static struct crypto_instance *cryptd_al
-=20
- 	ctx->state =3D state;
-=20
--	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
-+	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "cryptd(%s)", alg->cra_name) >=3D CRYPTO_MAX_ALG_NAME)
-+		goto out_free_inst;
-=20
- 	inst->alg.cra_priority =3D alg->cra_priority + 50;
- 	inst->alg.cra_blocksize =3D alg->cra_blocksize;
-
-
---=-8cegAMkWd/GWRuciTo1o
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkltibMACgkQKhFGF+eHlpiFDgCfRrxNsesjmM39mzQxWVN8gwF9
-uQcAn1ToKNBajnqvmD38hZe4qHqd/aqo
-=8QGZ
------END PGP SIGNATURE-----
-
---=-8cegAMkWd/GWRuciTo1o--
-
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
