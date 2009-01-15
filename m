@@ -1,46 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 2.6.29
-Date: Thu, 15 Jan 2009 15:40:20 +1100
-Message-ID: <20090115044020.GA29891@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au>
+Subject: Re: Does ESP support 64 bit sequence numbering for authentication
+	hash ?
+Date: Thu, 15 Jan 2009 16:56:44 +1100
+Message-ID: <20090115055644.GA30626@gondor.apana.org.au>
+References: <1231943033.7937.120.camel@libdev3.mvista.co.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: djenkins@mvista.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48371 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:50653 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755196AbZAOEk3 (ORCPT
+	with ESMTP id S1752563AbZAOF4s (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2009 23:40:29 -0500
+	Thu, 15 Jan 2009 00:56:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20080727063659.GA936@gondor.apana.org.au>
+In-Reply-To: <1231943033.7937.120.camel@libdev3.mvista.co.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Dean Jenkins <djenkins@mvista.com> wrote:
+> 
+> Does ESP support 64 bit sequence numbering for use with the
+> authentication HMAC ?
 
-This push fixes a crash in authenc that may occur if null encryption
-is used (a rare configuration).
+We don't support 64-bit sequence numbers yet.  If you look at
+struct xfrm_replay_state which is where we store the sequence
+number internally you'll find that it uses u32s.
 
-Please pull from
+Patches for 64-bit support are welcome of course.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+> I've looked at struct aead_givcrypt_request and it has a u64 seq member.
+> Does ESP populate this with a 64 bit sequence number ?
 
-or
+That's different.  That's a generic value used to construct the IV.
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+> If 32 bit sequence numbering negotiated then how does the HMAC routine
+> know that it should not use the top 32 bits of seq ? Or is it simply
+> that if the top 32 bits are zero then the HMAC just uses the lower 32
+> bits ?
 
+Because the value we start out with is a u32, the high bits are
+never set for IPsec.
 
-Herbert Xu (1):
-      crypto: authenc - Fix zero-length IV crash
-
- crypto/authenc.c |   24 +++++++++++++++---------
- 1 files changed, 15 insertions(+), 9 deletions(-)
-
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
