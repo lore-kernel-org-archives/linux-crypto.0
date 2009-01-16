@@ -1,54 +1,139 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: compress - Add pcomp interface
-Date: Fri, 16 Jan 2009 15:27:49 +1100
-Message-ID: <20090116042749.GA11435@gondor.apana.org.au>
-References: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090114031613.GA7429@gondor.apana.org.au> <Pine.LNX.4.64.0901141528010.31703@vixen.sonytel.be> <20090115030526.GA27726@gondor.apana.org.au> <alpine.LRH.2.00.0901151149080.16463@vixen.sonytel.be>
+From: Huang Ying <ying.huang@intel.com>
+Subject: [PATCH crypto -v5 1/2] AES-NI: Add support to access underlying
+	blkcipher under cryptd ablkcipher
+Date: Fri, 16 Jan 2009 15:10:20 +0800
+Message-ID: <1232089820.13948.28.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-Ksa8edocmFr4QH5UQUSG"
+Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44919 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754679AbZAPE1y (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Jan 2009 23:27:54 -0500
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.00.0901151149080.16463@vixen.sonytel.be>
+Received: from mga09.intel.com ([134.134.136.24]:29107 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753596AbZAPHKX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Jan 2009 02:10:23 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 15, 2009 at 11:54:53AM +0100, Geert Uytterhoeven wrote:
->
-> But there are pr_debug()s ;-)
 
-Well they must've turned invisible in the copy I received :)
+--=-Ksa8edocmFr4QH5UQUSG
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> By "both alloc function", do you mean the .setup_comp() and .setup_decomp()
-> functions? If yes, then I understand.
+cryptd_alloc_ablkcipher() will allocate a cryptd-ed ablkcipher for
+specified algorithm name. The new allocated one is guaranteed to be
+cryptd-ed ablkcipher, so the blkcipher underlying can be gotten via
+cryptd_ablkcipher_child().
 
-Yes.
 
-> (Yesterday, I thought you meant to have separate alloc functions instead of the
-> one crypto_alloc_pcomp())
+v5:
 
-No we want a single tfm for this.
+- Move declaration to crypto/cryptd.h
 
-If we ever get hardware that can handle only one of the two
-operations we can always implement software fallbacks as we
-do for hashing and encryption.
+- Fix allocation error processing in cryptd_alloc_ablkcipher()
 
-> I doubt whether it's a good idea to drop the compatibility soon, as the
-> underlying LZO library in the kernel doesn't support partial (de)compression,
-> and needs significant rework to do so.
+Signed-off-by: Huang Ying <ying.huang@intel.com>
 
-Yes but LZO has exactly one user (ubifs) in the kernel and it can
-stick to the current interface until we convert it over.  It's
-just not worth the extra work to help a single user.
+---
+ crypto/cryptd.c         |   33 +++++++++++++++++++++++++++++++++
+ include/crypto/cryptd.h |   27 +++++++++++++++++++++++++++
+ 2 files changed, 60 insertions(+)
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -12,6 +12,7 @@
+=20
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/cryptd.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -537,6 +538,38 @@ static struct crypto_template cryptd_tmp
+ 	.module =3D THIS_MODULE,
+ };
+=20
++struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
++						  u32 type, u32 mask)
++{
++	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
++	struct crypto_ablkcipher *tfm;
++
++	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
++		     "cryptd(%s)", alg_name) >=3D CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-EINVAL);
++	tfm =3D crypto_alloc_ablkcipher(cryptd_alg_name, type, mask);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++	if (crypto_ablkcipher_tfm(tfm)->__crt_alg->cra_module !=3D THIS_MODULE)
++		return ERR_PTR(-EINVAL);
++
++	return __cryptd_ablkcipher_cast(tfm);
++}
++EXPORT_SYMBOL_GPL(cryptd_alloc_ablkcipher);
++
++struct crypto_blkcipher *cryptd_ablkcipher_child(struct cryptd_ablkcipher =
+*tfm)
++{
++	struct cryptd_blkcipher_ctx *ctx =3D crypto_ablkcipher_ctx(&tfm->base);
++	return ctx->child;
++}
++EXPORT_SYMBOL_GPL(cryptd_ablkcipher_child);
++
++void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm)
++{
++	crypto_free_ablkcipher(&tfm->base);
++}
++EXPORT_SYMBOL_GPL(cryptd_free_ablkcipher);
++
+ static inline int cryptd_create_thread(struct cryptd_state *state,
+ 				       int (*fn)(void *data), const char *name)
+ {
+--- /dev/null
++++ b/include/crypto/cryptd.h
+@@ -0,0 +1,27 @@
++/*
++ * Software async crypto daemon
++ */
++
++#ifndef _CRYPTO_CRYPT_H
++#define _CRYPTO_CRYPT_H
++
++#include <linux/crypto.h>
++#include <linux/kernel.h>
++
++struct cryptd_ablkcipher {
++	struct crypto_ablkcipher base;
++};
++
++static inline struct cryptd_ablkcipher *__cryptd_ablkcipher_cast(
++	struct crypto_ablkcipher *tfm)
++{
++	return (struct cryptd_ablkcipher *)tfm;
++}
++
++/* alg_name should be algorithm to be cryptd-ed */
++struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
++						  u32 type, u32 mask);
++struct crypto_blkcipher *cryptd_ablkcipher_child(struct cryptd_ablkcipher =
+*tfm);
++void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm);
++
++#endif
+
+
+--=-Ksa8edocmFr4QH5UQUSG
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAklwMtYACgkQKhFGF+eHlpg1XwCdF7MdkcJxRObx2hTl3uI/IwV1
+TBcAn1z0ky0uJDZ4Wt20GMLwZUE30xbS
+=VBeh
+-----END PGP SIGNATURE-----
+
+--=-Ksa8edocmFr4QH5UQUSG--
+
