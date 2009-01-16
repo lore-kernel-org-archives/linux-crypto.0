@@ -1,34 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH crypto -v4 2/2] AES-NI: Add support to Intel AES-NI
-	instructions for x86_64 platform
-Date: Fri, 16 Jan 2009 14:41:21 +1100
-Message-ID: <20090116034121.GA10996@gondor.apana.org.au>
-References: <1232008119.5937.200.camel@yhuang-dev.sh.intel.com> <25e057c00901150147t570d8ab6g3b2b99c60f10c3c2@mail.gmail.com> <1232068858.5937.222.camel@yhuang-dev.sh.intel.com> <20090116015356.GA9822@gondor.apana.org.au> <1232073422.13948.3.camel@yhuang-dev.sh.intel.com> <20090116032639.GA10390@gondor.apana.org.au> <1232077045.13948.14.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [PATCH] crypto: compress - Add pcomp interface
+Date: Fri, 16 Jan 2009 15:27:49 +1100
+Message-ID: <20090116042749.GA11435@gondor.apana.org.au>
+References: <1231862386-11128-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1231862386-11128-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090114031613.GA7429@gondor.apana.org.au> <Pine.LNX.4.64.0901141528010.31703@vixen.sonytel.be> <20090115030526.GA27726@gondor.apana.org.au> <alpine.LRH.2.00.0901151149080.16463@vixen.sonytel.be>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: roel kluin <roel.kluin@gmail.com>,
-	Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35873 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:44919 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754950AbZAPDl3 (ORCPT
+	with ESMTP id S1754679AbZAPE1y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Jan 2009 22:41:29 -0500
+	Thu, 15 Jan 2009 23:27:54 -0500
 Content-Disposition: inline
-In-Reply-To: <1232077045.13948.14.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <alpine.LRH.2.00.0901151149080.16463@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 16, 2009 at 11:37:25AM +0800, Huang Ying wrote:
-> 
-> I think Roel Kluin is the real reporter.
+On Thu, Jan 15, 2009 at 11:54:53AM +0100, Geert Uytterhoeven wrote:
+>
+> But there are pr_debug()s ;-)
 
-OK I'll add him as well.
+Well they must've turned invisible in the copy I received :)
 
-Thanks,
+> By "both alloc function", do you mean the .setup_comp() and .setup_decomp()
+> functions? If yes, then I understand.
+
+Yes.
+
+> (Yesterday, I thought you meant to have separate alloc functions instead of the
+> one crypto_alloc_pcomp())
+
+No we want a single tfm for this.
+
+If we ever get hardware that can handle only one of the two
+operations we can always implement software fallbacks as we
+do for hashing and encryption.
+
+> I doubt whether it's a good idea to drop the compatibility soon, as the
+> underlying LZO library in the kernel doesn't support partial (de)compression,
+> and needs significant rework to do so.
+
+Yes but LZO has exactly one user (ubifs) in the kernel and it can
+stick to the current interface until we convert it over.  It's
+just not worth the extra work to help a single user.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
