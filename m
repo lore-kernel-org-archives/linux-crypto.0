@@ -1,29 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH crypto -v6 1/2] AES-NI: Add support to access
-	underlying blkcipher under cryptd ablkcipher
-Date: Sun, 18 Jan 2009 16:29:05 +1100
-Message-ID: <20090118052905.GA23663@gondor.apana.org.au>
-References: <1232091666.13948.52.camel@yhuang-dev.sh.intel.com>
+Subject: Re: crypto: libcrc32c should select crc32c
+Date: Sun, 18 Jan 2009 16:37:13 +1100
+Message-ID: <20090118053713.GB23663@gondor.apana.org.au>
+References: <alpine.LSU.2.00.0901172346500.14505@fbirervta.pbzchgretzou.qr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Siewior <linux-crypto@ml.breakpoint.cc>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1759539AbZARF3c@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Jan Engelhardt <jengelh@medozas.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:37458 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750838AbZARFhS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 18 Jan 2009 00:37:18 -0500
 Content-Disposition: inline
-In-Reply-To: <1232091666.13948.52.camel@yhuang-dev.sh.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <alpine.LSU.2.00.0901172346500.14505@fbirervta.pbzchgretzou.qr>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 16, 2009 at 03:41:06PM +0800, Huang Ying wrote:
-> cryptd_alloc_ablkcipher() will allocate a cryptd-ed ablkcipher for
-> specified algorithm name. The new allocated one is guaranteed to be
-> cryptd-ed ablkcipher, so the blkcipher underlying can be gotten via
-> cryptd_ablkcipher_child().
+On Sat, Jan 17, 2009 at 11:48:42PM +0100, Jan Engelhardt wrote:
+>
+> Looking at libcrc32c.c shows that it essentially depends on the
+> crc32c crypto module, which was not packed into my initramfs image
+> by mkinitrd because.. there is no dependency.
 
-Both patches applied.
+Actually the whole point of doing the crc32c/libcrc32c reversal
+was to allow multiple providers of crc32c.  As it stands we have
+a generic C version plus an Intel version.
 
-Thanks a lot for your hard work on this!
+So by applying yuor patch we'll go back to always using the C
+version which is unacceptable.
+
+I think a better way of tackling this is to note this information
+explicitly in the module.  For example, just like module aliases
+we can add explicit module dependencies.  mkinitrd can then use
+this for its computation.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
