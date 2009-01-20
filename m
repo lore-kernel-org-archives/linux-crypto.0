@@ -1,37 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: libcrc32c should select crc32c
-Date: Tue, 20 Jan 2009 08:08:26 +1100
-Message-ID: <20090119210826.GA6609@gondor.apana.org.au>
-References: <alpine.LSU.2.00.0901172346500.14505@fbirervta.pbzchgretzou.qr> <20090118053713.GB23663@gondor.apana.org.au> <alpine.LSU.2.00.0901180910390.14063@fbirervta.pbzchgretzou.qr> <20090118204542.GA2978@uranus.ravnborg.org> <alpine.LSU.2.00.0901192050550.11601@fbirervta.pbzchgretzou.qr>
+From: Jamie Iles <jamie.iles@picochip.com>
+Subject: IPSec AH hardware offload
+Date: Tue, 20 Jan 2009 14:14:48 +0000
+Message-ID: <20090120141448.GG3849@brook.picochip.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-crypto@vger.kernel.org
-To: Jan Engelhardt <jengelh@medozas.de>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49650 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754406AbZASVIj (ORCPT
+Received: from mail2.picochip.com ([82.111.145.34]:40947 "EHLO
+	arun.picochip.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750825AbZATOgE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jan 2009 16:08:39 -0500
+	Tue, 20 Jan 2009 09:36:04 -0500
+Received: from localhost (jamiei.ovpn.rb.picochip.com [172.17.21.82])
+	by arun.picochip.com (8.13.1/8.13.1) with ESMTP id n0KECuf8017868
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Jan 2009 14:12:56 GMT
 Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.00.0901192050550.11601@fbirervta.pbzchgretzou.qr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 19, 2009 at 08:51:49PM +0100, Jan Engelhardt wrote:
->
-> So what will the crypto subsystem try to do then, implementation-wise,
-> given that kbuild cannot be manually tuned this way?
+Hi,
 
-Well if nobody wants to do the work to get the explcit dependencies
-than I suggest that you hardcode this into your mkinitrd.
-
-The patch you gave initially is unacceptable because it means
-that most people will be stuck with the unoptimised version.
+I'm currently developing a driver for a hardware crypto offload engine that is
+capable of offloading both ESP and AH in IPSec. I've noticed that none of the
+crypto drivers in 2.6.28 do offload for ahash and that the netkey AH
+implementation both use synchronous hashes. Are the synchronous software
+versions likely to be more efficient than hardware offloading or is there an
+architectural reason for not using async hashes?
 
 Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+    Jamie
+This email and any files transmitted with it are confidential and intended solely for the use of the individuals to whom they are addressed. If you have received this email in error please notify the sender and delete the message from your system immediately.
+
