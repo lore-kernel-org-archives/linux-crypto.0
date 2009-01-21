@@ -1,324 +1,100 @@
-From: Andreas Steffen <andreas.steffen@strongswan.org>
-Subject: Linux 2.6.28 and AEAD initialization
-Date: Wed, 21 Jan 2009 03:29:48 +0100
-Message-ID: <4976889C.3090602@strongswan.org>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto: fix handling of ccm vectors with null assoc data
+Date: Wed, 21 Jan 2009 16:41:01 -0500
+Message-ID: <200901211641.02351.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Neil Horman <nhorman@tuxdriver.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sidv0150.hsr.ch ([152.96.52.150]:52599 "EHLO strongswan.org"
+Received: from mx2.redhat.com ([66.187.237.31]:55499 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753734AbZAUCwL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Jan 2009 21:52:11 -0500
+	id S1751408AbZAUVg2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Jan 2009 16:36:28 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Its a valid use case to have null associated data in a ccm vector, but
+this case isn't being handled properly right now.
 
-with the Linux 2.6.28 kernel the first time xfrm_user.c:xfrm_add_sa()
-is called with either "rfc4106(gcm(aes))" or "rfc4309(ccm(aes))",
-an EEXIST error is returned and the installation of the IPsec SA fails.
-A detailed analysis of the function calls (see trace added below) shows
-that aead.c:crypto_lookup_aead() first loads
+The following ccm decryption/verification test vector, using the
+rfc4309 implementation regularly triggers a panic, as will any
+other vector with null assoc data:
 
-name         : rfc4106(gcm(aes))
-driver       : rfc4106(gcm_base(ctr(aes-generic)))
-module       : kernel
-priority     : 100
-refcnt       : 1
-selftest     : passed
-type         : nivaead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : seqiv
+* key: ab2f8a74b71cd2b1ff802e487d82f8b9
+* iv: c6fb7d800d13abd8a6b2d8
+* Associated Data: [NULL]
+* Tag Length: 8
+* input: d5e8939fc7892e2b
 
-Because of type=nivaead
+The resulting panic looks like so:
 
-    if (alg->cra_type == &crypto_aead_type)
-        return alg;
+Unable to handle kernel paging request at ffff810064ddaec0 RIP: 
+ [<ffffffff8864c4d7>] :ccm:get_data_to_compute+0x1a6/0x1d6
+PGD 8063 PUD 0 
+Oops: 0002 [1] SMP 
+last sysfs file: /module/libata/version
+CPU 0
+Modules linked in: crypto_tester_kmod(U) seqiv krng ansi_cprng chainiv rng ctr aes_generic aes_x86_64 ccm cryptomgr testmgr_cipher testmgr aead crypto_blkcipher crypto_a
+lgapi des ipv6 xfrm_nalgo crypto_api autofs4 hidp l2cap bluetooth nfs lockd fscache nfs_acl sunrpc ip_conntrack_netbios_ns ipt_REJECT xt_state ip_conntrack nfnetlink xt_
+tcpudp iptable_filter ip_tables x_tables dm_mirror dm_log dm_multipath scsi_dh dm_mod video hwmon backlight sbs i2c_ec button battery asus_acpi acpi_memhotplug ac lp sg 
+snd_intel8x0 snd_ac97_codec ac97_bus snd_seq_dummy snd_seq_oss joydev snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss ide_cd snd_pcm floppy parport_p
+c shpchp e752x_edac snd_timer e1000 i2c_i801 edac_mc snd soundcore snd_page_alloc i2c_core cdrom parport serio_raw pcspkr ata_piix libata sd_mod scsi_mod ext3 jbd uhci_h
+cd ohci_hcd ehci_hcd
+Pid: 12844, comm: crypto-tester Tainted: G      2.6.18-128.el5.fips1 #1
+RIP: 0010:[<ffffffff8864c4d7>]  [<ffffffff8864c4d7>] :ccm:get_data_to_compute+0x1a6/0x1d6
+RSP: 0018:ffff8100134434e8  EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8100104898b0 RCX: ffffffffab6aea10
+RDX: 0000000000000010 RSI: ffff8100104898c0 RDI: ffff810064ddaec0
+RBP: 0000000000000000 R08: ffff8100104898b0 R09: 0000000000000000
+R10: ffff8100103bac84 R11: ffff8100104898b0 R12: ffff810010489858
+R13: ffff8100104898b0 R14: ffff8100103bac00 R15: 0000000000000000
+FS:  00002ab881adfd30(0000) GS:ffffffff803ac000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+CR2: ffff810064ddaec0 CR3: 0000000012a88000 CR4: 00000000000006e0
+Process crypto-tester (pid: 12844, threadinfo ffff810013442000, task ffff81003d165860)
+Stack:  ffff8100103bac00 ffff8100104898e8 ffff8100134436f8 ffffffff00000000
+ 0000000000000000 ffff8100104898b0 0000000000000000 ffff810010489858
+ 0000000000000000 ffff8100103bac00 ffff8100134436f8 ffffffff8864c634
+Call Trace:
+ [<ffffffff8864c634>] :ccm:crypto_ccm_auth+0x12d/0x140
+ [<ffffffff8864cf73>] :ccm:crypto_ccm_decrypt+0x161/0x23a
+ [<ffffffff88633643>] :crypto_tester_kmod:cavs_test_rfc4309_ccm+0x4a5/0x559
+[...]
 
-crypto_lookup_aead() does not return the algorithm and falls through
-to the statement
+The above is from a RHEL5-based kernel, but upstream is susceptible too.
 
-    return ERR_PTR(crypto_nivaead_default(alg, type, mask));
+The fix is trivial: in crypto/ccm.c:crypto_ccm_auth(), pctx->ilen contains
+whatever was in memory when pctx was allocated if assoclen is 0. The tested
+fix is to simply add an else clause setting pctx->ilen to 0 for the
+assoclen == 0 case, so that get_data_to_compute() doesn't try doing
+things its not supposed to.
 
-which makes another call to algapi.c;__crypto_register_alg().
-Because the driver has already been installed
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
 
-    ret = -EEXIST;
-    ...
+---
+ crypto/ccm.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-	if (crypto_is_larval(q)) {
-	    if (!strcmp(alg->cra_driver_name, q->cra_driver_name))
-	        goto err;
-	    continue;
-	}
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 7cf7e5a..c36d654 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -266,6 +266,8 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
+ 	if (assoclen) {
+ 		pctx->ilen = format_adata(idata, assoclen);
+ 		get_data_to_compute(cipher, pctx, req->assoc, req->assoclen);
++	} else {
++		pctx->ilen = 0;
+ 	}
+ 
+ 	/* compute plaintext into mac */
 
-__crypto_register_alg() exits with the EEXIST error code.
-
-The second time around the type=aead algorithm is additionally loaded
-
-name         : rfc4106(gcm(aes))
-driver       : rfc4106(gcm_base(ctr(aes-generic)))
-module       : kernel
-priority     : 100
-refcnt       : 1
-selftest     : passed
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : seqiv
-
-name         : rfc4106(gcm(aes))
-driver       : rfc4106(gcm_base(ctr(aes-generic)))
-module       : kernel
-priority     : 100
-refcnt       : 1
-selftest     : passed
-type         : nivaead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : seqiv
-
-and the IPsec SAs can be set up successfully.
-
-With the Linux 2.6.27.10 and earlier kernels the aead type is
-loaded right at the beginning and no problems occur:
-
-name         : rfc4106(gcm(aes))
-driver       : rfc4106(gcm_base(ctr(aes-asm)))
-module       : kernel
-priority     : 200
-refcnt       : 1
-type         : aead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : seqiv
-
-name         : rfc4106(gcm(aes))
-driver       : rfc4106(gcm_base(ctr(aes-asm)))
-module       : kernel
-priority     : 200
-refcnt       : 1
-type         : nivaead
-async        : yes
-blocksize    : 1
-ivsize       : 8
-maxauthsize  : 16
-geniv        : seqiv
-
-Best regards
-
-Andreas
-
-Trace of function calls returning EEXIST:
-
------------------------------------------------------------------------------
-net/xfrm/xfrm_user.c:xfrm_add_sa()
-{
-	x = xfrm_state_construct(p, attrs, &err);
-	if (!x)
-		return err;
-}
-
------------------------------------------------------------------------------
-net/xfrm/xfrm_user.c:xfrm_state_construct()
-{
-	err = xfrm_init_state(x);
-	if (err)
-		goto error;
-    ...
-error:
-	x->km.state = XFRM_STATE_DEAD;
-	xfrm_state_put(x);
-error_no_put:
-	*errp = err;
-	return NULL;
-}
-
------------------------------------------------------------------------------
-net/xfrm/xfrm_state.c:xfrm_init_state()
-{
-	x->type = xfrm_get_type(x->id.proto, family);
-	if (x->type == NULL)
-		goto error;
-
-	err = x->type->init_state(x);
-	if (err)
-		goto error;
-    ...
-error:
-	return err;
-}
-
------------------------------------------------------------------------------
-linux/net/xfrm.h:struct xfrm_type
-{
-	char			*description;
-	struct module		*owner;
-	__u8			proto;
-	__u8			flags;
-#define XFRM_TYPE_NON_FRAGMENT	1
-#define XFRM_TYPE_REPLAY_PROT	2
-#define XFRM_TYPE_LOCAL_COADDR	4
-#define XFRM_TYPE_REMOTE_COADDR	8
-
-	int			(*init_state)(struct xfrm_state *x);
-	void			(*destructor)(struct xfrm_state *);
-	int			(*input)(struct xfrm_state *, struct sk_buff *skb);
-	int			(*output)(struct xfrm_state *, struct sk_buff *pskb);
-	int			(*reject)(struct xfrm_state *, struct sk_buff *, struct flowi *);
-	int			(*hdr_offset)(struct xfrm_state *, struct sk_buff *, u8 **);
-	/* Estimate maximal size of result of transformation of a dgram */
-	u32			(*get_mtu)(struct xfrm_state *, int size);
-};
-
------------------------------------------------------------------------------
-net/ipv4/esp4.c:esp_init_state()
-{
-	if (x->aead)
-		err = esp_init_aead(x);
-	}
-	else
-		err = esp_init_authenc(x);
-
-	if (err)
-		goto error;
-
-}
-
------------------------------------------------------------------------------
-net/ipv4/esp4.c:esp_init_aead()
-{
-	struct esp_data *esp = x->data;
-	struct crypto_aead *aead;
-	int err;
-
-	aead = crypto_alloc_aead(x->aead->alg_name, 0, 0);
-	err = PTR_ERR(aead);
-	if (IS_ERR(aead))
-		goto error;
-
-error:
-	return err;
-}
-
------------------------------------------------------------------------------
-crypto/aead.c:crypto_alloc_aead()
-{
-		alg = crypto_lookup_aead(alg_name, type, mask);
-		if (IS_ERR(alg)) {
-			err = PTR_ERR(alg);
-			goto err;
-		}
-
-err:
-		if (err != -EAGAIN)
-			break;
-		if (signal_pending(current)) {
-			err = -EINTR;
-			break;
-		}
-	}
-
-	return ERR_PTR(err);
-}
-
------------------------------------------------------------------------------
-crypto/aead.c:crypto_lookup_aead()
-{
-	struct crypto_alg *alg;
-
-	alg = crypto_alg_mod_lookup(name, type, mask);
-	if (IS_ERR(alg))
-		return alg;
-
-    /* after the first call alg->cra_type is &crypto_nivaead_type */
-
-	if (alg->cra_type == &crypto_aead_type)
-		return alg;
-
-	if (!alg->cra_aead.ivsize)
-		return alg;
-
-	return ERR_PTR(crypto_nivaead_default(alg, type, mask));
-}
-
------------------------------------------------------------------------------
-crypto/aead.c:crypto_nivaead_default()
-{
-	if ((err = crypto_register_instance(tmpl, inst))) {
-		tmpl->free(inst);
-		goto put_tmpl;
-	}
-
-	/* Redo the lookup to use the instance we just registered. */
-	err = -EAGAIN;
-
-put_tmpl:
-	crypto_tmpl_put(tmpl);
-kill_larval:
-	crypto_larval_kill(larval);
-drop_larval:
-	crypto_mod_put(larval);
-out:
-	crypto_mod_put(alg);
-	return err;
-}
-
------------------------------------------------------------------------------
-crypto/algapi.c:crypto_register_instance()
-{
-	larval = __crypto_register_alg(&inst->alg);
-	if (IS_ERR(larval))
-		goto unlock;
-
-	hlist_add_head(&inst->list, &tmpl->instances);
-	inst->tmpl = tmpl;
-
-unlock:
-	up_write(&crypto_alg_sem);
-
-	err = PTR_ERR(larval);
-	if (IS_ERR(larval))
-		goto err;
-
-	crypto_wait_for_test(larval);
-	err = 0;
-
-err:
-	return err;
-}
-
------------------------------------------------------------------------------
-crypto/algapi.c:__crypto_register_alg()
-{
-	ret = -EEXIST;
-    ...
-
-		if (crypto_is_larval(q)) {
-			if (!strcmp(alg->cra_driver_name, q->cra_driver_name))
-				goto err;
-			continue;
-		}
-}
-
-Uff!
-
-======================================================================
-Andreas Steffen                         andreas.steffen@strongswan.org
-strongSwan - the Linux VPN Solution!                www.strongswan.org
-              Institute for Internet Technologies and Applications
-University of Applied Sciences Rapperswil
-CH-8640 Rapperswil (Switzerland)
-===========================================================[ITA-HSR]==
-
+-- 
+Jarod Wilson
+jarod@redhat.com
