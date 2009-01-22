@@ -1,43 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] per-CPU cryptd thread implementation based on workqueue
-Date: Thu, 22 Jan 2009 18:30:40 +1100
-Message-ID: <20090122073040.GA12395@gondor.apana.org.au>
-References: <1232075437.13948.12.camel@yhuang-dev.sh.intel.com> <20090116033105.GB10390@gondor.apana.org.au> <1232591537.6101.3.camel@yhuang-dev.sh.intel.com> <20090122030400.GA10229@gondor.apana.org.au> <1232608558.6101.13.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [PATCH] crypto: fix handling of ccm vectors with null assoc
+	data
+Date: Thu, 22 Jan 2009 19:58:43 +1100
+Message-ID: <20090122085843.GA13088@gondor.apana.org.au>
+References: <200901211641.02351.jarod@redhat.com> <20090122010722.GA6937@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Cc: Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52140 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:49009 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754672AbZAVHan (ORCPT
+	with ESMTP id S1752908AbZAVI6t (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Jan 2009 02:30:43 -0500
+	Thu, 22 Jan 2009 03:58:49 -0500
 Content-Disposition: inline
-In-Reply-To: <1232608558.6101.13.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <20090122010722.GA6937@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 22, 2009 at 03:15:58PM +0800, Huang Ying wrote:
+On Wed, Jan 21, 2009 at 08:07:22PM -0500, Neil Horman wrote:
+>
+> > Signed-off-by: Jarod Wilson <jarod@redhat.com>
 > 
-> Yes. Except that, now we do not need a spin lock really. I think the
-> spin lock may be useful if we enqueue a request on other CPU's queue to
-> do load balance. And if it is possible that the work_struct to be
-> executed on CPU other original CPU for CPU hotplug (current code do
-> not).
+> This looks good to me.  Thanks Jarod!
+> Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-Right, but I think load-balancing should be explicitly enabled,
-i.e., we probably don't want to do it by default for AES-NI.
-
-The way I see load balancing work is if you had a template that
-sat on top of cryptd pass the requests to the cryptd on a CPU
-it chooses.
-
-Then we can enable it for any algorithm in the system simply
-by instantiating that template for it.
-
-Cheers,
+Patch applied.  Thanks Jarod!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
