@@ -1,61 +1,47 @@
-From: Andrey Borzenkov <arvidjaar@mail.ru>
-Subject: Clarification of allowed context for crypto routines
-Date: Fri, 23 Jan 2009 22:29:46 +0300
-Message-ID: <200901232229.47885.arvidjaar@mail.ru>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Clarification of allowed context for crypto routines
+Date: Sat, 24 Jan 2009 09:31:50 +1100
+Message-ID: <20090123223150.GA1264@gondor.apana.org.au>
+References: <200901232229.47885.arvidjaar@mail.ru>
 Mime-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1351120.y7ki5iFoNh";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andrey Borzenkov <arvidjaar@mail.ru>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from flock1.newmail.ru ([82.204.219.207]:37970 "HELO
-	flock1.newmail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1753699AbZAWT3x (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:36087 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757366AbZAWWb5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jan 2009 14:29:53 -0500
+	Fri, 23 Jan 2009 17:31:57 -0500
+Content-Disposition: inline
+In-Reply-To: <200901232229.47885.arvidjaar@mail.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---nextPart1351120.y7ki5iFoNh
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Andrey Borzenkov <arvidjaar@mail.ru> wrote:
+>
+> As I can understand, user context requirement is due to potential for 
+> setkey to sleep (although it appears, that currently the only module 
+> that can sleep is shash which is calling kmalloc with GFP_KERNEL). Is it 
+> correct?
 
-According to Documentation/crypto/api-intro.txt:
+Yep.
 
-DEVELOPER NOTES
+> But where is the difference between hard and softirq contexts? I fail to 
+> see any technical reason for this requirement.
 
-Transforms may only be allocated in user context, and cryptographic
-methods may only be called from softirq and user contexts.  For
-transforms with a setkey method it too should only be called from
-user context.
+The reasons are two-fold:
 
-As I can understand, user context requirement is due to potential for=20
-setkey to sleep (although it appears, that currently the only module=20
-that can sleep is shash which is calling kmalloc with GFP_KERNEL). Is it=20
-correct?
+1) Crypto operations are so slow in general that if you did them
+in hard IRQ context it would just be wrong;
 
-But where is the difference between hard and softirq contexts? I fail to=20
-see any technical reason for this requirement.
+2) The highmem primitives we use are currently softirq only.  We
+could make them work for hardirq as well, but because of 1) we
+didn't.
 
-Thank you!
-
-=2Dandrey
-
---nextPart1351120.y7ki5iFoNh
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkl6GqsACgkQR6LMutpd94wabgCgz9YRcaGpNcysA8t6WMH8YIS1
-2GoAoInnK/mDJP+wp00/nu2fEM4dBR+M
-=2w+r
------END PGP SIGNATURE-----
-
---nextPart1351120.y7ki5iFoNh--
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
