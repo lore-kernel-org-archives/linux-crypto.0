@@ -1,47 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Andrey Borzenkov <arvidjaar@mail.ru>
 Subject: Re: Clarification of allowed context for crypto routines
-Date: Sat, 24 Jan 2009 09:31:50 +1100
-Message-ID: <20090123223150.GA1264@gondor.apana.org.au>
-References: <200901232229.47885.arvidjaar@mail.ru>
+Date: Sat, 24 Jan 2009 08:15:02 +0300
+Message-ID: <200901240815.08903.arvidjaar@mail.ru>
+References: <20090123223150.GA1264@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed;
+  boundary="nextPart1971456.Rklm8hRX3Q";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Andrey Borzenkov <arvidjaar@mail.ru>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:36087 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757366AbZAWWb5 (ORCPT
+Received: from flock1.newmail.ru ([82.204.219.207]:38067 "HELO
+	flock1.newmail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750726AbZAXFPT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jan 2009 17:31:57 -0500
-Content-Disposition: inline
-In-Reply-To: <200901232229.47885.arvidjaar@mail.ru>
+	Sat, 24 Jan 2009 00:15:19 -0500
+In-Reply-To: <20090123223150.GA1264@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Andrey Borzenkov <arvidjaar@mail.ru> wrote:
+--nextPart1971456.Rklm8hRX3Q
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+On 24 =D1=8F=D0=BD=D0=B2=D0=B0=D1=80=D1=8F 2009 01:31:50 Herbert Xu wrote:
 >
-> As I can understand, user context requirement is due to potential for 
-> setkey to sleep (although it appears, that currently the only module 
-> that can sleep is shash which is calling kmalloc with GFP_KERNEL). Is it 
-> correct?
+> 2) The highmem primitives we use are currently softirq only.  We
+> could make them work for hardirq as well, but because of 1) we
+> didn't.
+>
 
-Yep.
+Could you point to example of such primitive in code under crypto?
 
-> But where is the difference between hard and softirq contexts? I fail to 
-> see any technical reason for this requirement.
+Thank you!
 
-The reasons are two-fold:
+--nextPart1971456.Rklm8hRX3Q
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
-1) Crypto operations are so slow in general that if you did them
-in hard IRQ context it would just be wrong;
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
 
-2) The highmem primitives we use are currently softirq only.  We
-could make them work for hardirq as well, but because of 1) we
-didn't.
+iEYEABECAAYFAkl6o9cACgkQR6LMutpd94zN8gCfZTFWXNkXz5VpKiRpnUOZvACe
+6wEAn1DmGc5hzBo1pjjp8caVyTmXhCTE
+=ZbNI
+-----END PGP SIGNATURE-----
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--nextPart1971456.Rklm8hRX3Q--
