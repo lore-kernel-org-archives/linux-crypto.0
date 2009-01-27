@@ -1,45 +1,60 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Clarification of allowed context for crypto routines
-Date: Sat, 24 Jan 2009 20:32:45 +1100
-Message-ID: <20090124093245.GA4889@gondor.apana.org.au>
-References: <200901240815.08903.arvidjaar@mail.ru>
+Subject: Re: Crypto Fixes for 2.6.29
+Date: Tue, 27 Jan 2009 17:15:46 +1100
+Message-ID: <20090127061546.GA27962@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20090115044020.GA29891@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Andrey Borzenkov <arvidjaar@mail.ru>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47990 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:52682 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751015AbZAXJct (ORCPT
+	with ESMTP id S1751481AbZA0GPx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 24 Jan 2009 04:32:49 -0500
+	Tue, 27 Jan 2009 01:15:53 -0500
 Content-Disposition: inline
-In-Reply-To: <200901240815.08903.arvidjaar@mail.ru>
+In-Reply-To: <20090115044020.GA29891@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Andrey Borzenkov <arvidjaar@mail.ru> wrote:
->=20
-> On 24 =D1=8F=D0=BD=D0=B2=D0=B0=D1=80=D1=8F 2009 01:31:50 Herbert Xu w=
-rote:
->>
->> 2) The highmem primitives we use are currently softirq only.  We
->> could make them work for hardirq as well, but because of 1) we
->> didn't.
->=20
-> Could you point to example of such primitive in code under crypto?
+Hi Linus:
 
-Grep for kmap under crypto.
+This push fixes a number of minor bugs:
 
-Cheers,
---=20
+* A crash in authenc that may occur if null encryption is used
+  (a rare configuration).
+* Error handling in blkcipher_walk_done (though this error should
+  never occur unless underlying algorithm is buggy).
+* Crash in CCM with no association data (only occurs for certification
+  testing).
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (2):
+      crypto: authenc - Fix zero-length IV crash
+      crypto: blkcipher - Fix WARN_ON handling in walk_done
+
+Jarod Wilson (1):
+      crypto: ccm - Fix handling of null assoc data
+
+ crypto/authenc.c   |   24 +++++++++++++++---------
+ crypto/blkcipher.c |    2 +-
+ crypto/ccm.c       |    2 ++
+ 3 files changed, 18 insertions(+), 10 deletions(-)
+ 
+Thanks,
+-- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
