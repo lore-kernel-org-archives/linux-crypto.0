@@ -1,44 +1,62 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v5
-Date: Wed, 28 Jan 2009 14:59:37 +1100
-Message-ID: <20090128035937.GA13157@gondor.apana.org.au>
-References: <1231788650.5533.16.camel@jhsiao-usb>
+Subject: Re: [PATCH] crypto: Force panic on continuous CPRNG test failure
+	when in FIPS mode
+Date: Wed, 28 Jan 2009 15:18:28 +1100
+Message-ID: <20090128041828.GB13157@gondor.apana.org.au>
+References: <20090123155817.GA29548@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kim.phillips@freescale.com, jwboyer@linux.vnet.ibm.com,
-	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
-To: James Hsiao <jhsiao@amcc.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40811 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:32806 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751557AbZA1D7v (ORCPT
+	with ESMTP id S1752320AbZA1ESd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Jan 2009 22:59:51 -0500
+	Tue, 27 Jan 2009 23:18:33 -0500
 Content-Disposition: inline
-In-Reply-To: <1231788650.5533.16.camel@jhsiao-usb>
+In-Reply-To: <20090123155817.GA29548@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 12, 2009 at 11:30:50AM -0800, James Hsiao wrote:
-> This is the 5th submission of AMCC's security driver.
-> - remove aad support in build pd function, since we didn't release any
-> algorithm that use aead yet.
+On Fri, Jan 23, 2009 at 10:58:17AM -0500, Neil Horman wrote:
 > 
-> - changed some hardcode value to #defines
-> 
-> - changed local_irq_disable/enable to spinlock_irq_save/restore
-> 
-> - fixed bug in crypto4xx_probe on error exit.
-> 
-> 
-> Signed-off-by: James Hsiao <jhsiao@amcc.com>
+> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+> index 0fac8ff..7eef5be 100644
+> --- a/crypto/ansi_cprng.c
+> +++ b/crypto/ansi_cprng.c
+> @@ -132,10 +132,20 @@ static int _get_more_prng_bytes(struct prng_context *ctx)
+>  			 */
+>  			if (!memcmp(ctx->rand_data, ctx->last_rand_data,
+>  					DEFAULT_BLK_SZ)) {
+> -				printk(KERN_ERR
+> -					"ctx %p Failed repetition check!\n",
+> -					ctx);
+> -				ctx->flags |= PRNG_NEED_RESET;
+> +				if (fips_enabled) {
+> +					/* FIPS 140-2 requires that we disable
+> +					 * further use of crypto code if we fail
+> +					 * this test,  easiest way to do that
+> +					 * is panic the box
+> +					 */
+> +					panic("cprng %p failed continuity test",
+> +						ctx);  
+> +				} else {
+> +					printk(KERN_ERR
+> +						"ctx %p Failed repetition check!\n",
+> +						ctx);
+> +					ctx->flags |= PRNG_NEED_RESET;
+> +				}
 
-I was going to apply this but you didn't give me a changelog
-that I can throw into the tree without feeling guilty!
+I'm OK with this change but I'd like it to look like:
 
-Please always attach a proper changelog with each submission
-so I don't have to do this.  You can put the changelog elsewhere
-in the email.
+	if (fips_enabled) {
+		panic(...)
+	}
+
+	blah blah blah
+
+This way the FIPS crap doesn't get in the way of everyday use.
 
 Thanks,
 -- 
