@@ -1,39 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: sha-s390 - Switch to shash
-Date: Wed, 28 Jan 2009 14:56:15 +1100
-Message-ID: <20090128035615.GA13051@gondor.apana.org.au>
-References: <20090118225517.GA30510@gondor.apana.org.au>
+Subject: Re: [PATCH] AMCC Crypto4xx Device Driver v5
+Date: Wed, 28 Jan 2009 14:59:37 +1100
+Message-ID: <20090128035937.GA13157@gondor.apana.org.au>
+References: <1231788650.5533.16.camel@jhsiao-usb>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Cc: kim.phillips@freescale.com, jwboyer@linux.vnet.ibm.com,
+	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+To: James Hsiao <jhsiao@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59857 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:40811 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752281AbZA1D4V (ORCPT
+	with ESMTP id S1751557AbZA1D7v (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Jan 2009 22:56:21 -0500
+	Tue, 27 Jan 2009 22:59:51 -0500
 Content-Disposition: inline
-In-Reply-To: <20090118225517.GA30510@gondor.apana.org.au>
+In-Reply-To: <1231788650.5533.16.camel@jhsiao-usb>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 19, 2009 at 09:55:17AM +1100, Herbert Xu wrote:
+On Mon, Jan 12, 2009 at 11:30:50AM -0800, James Hsiao wrote:
+> This is the 5th submission of AMCC's security driver.
+> - remove aad support in build pd function, since we didn't release any
+> algorithm that use aead yet.
 > 
-> Could you let me if this patch breaks s390?
+> - changed some hardcode value to #defines
 > 
-> commit 0fe7dddf02811152d7e58747bfe419ec0f43ea4e
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Sun Jan 18 20:33:33 2009 +1100
+> - changed local_irq_disable/enable to spinlock_irq_save/restore
 > 
->     crypto: sha-s390 - Switch to shash
->     
->     This patch converts the S390 sha algorithms to the new shash interface.
->     
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> - fixed bug in crypto4xx_probe on error exit.
+> 
+> 
+> Signed-off-by: James Hsiao <jhsiao@amcc.com>
 
-I'm going to throw this into cryptodev and if it breaks, please
-yell.
+I was going to apply this but you didn't give me a changelog
+that I can throw into the tree without feeling guilty!
+
+Please always attach a proper changelog with each submission
+so I don't have to do this.  You can put the changelog elsewhere
+in the email.
 
 Thanks,
 -- 
