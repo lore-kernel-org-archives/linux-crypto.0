@@ -1,80 +1,46 @@
 From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH] crypto: Force panic on continuous CPRNG test failure
-	when in FIPS mode
-Date: Wed, 28 Jan 2009 07:58:48 -0500
-Message-ID: <20090128125848.GC6361@hmsreliant.think-freely.org>
-References: <20090123155817.GA29548@hmsreliant.think-freely.org> <20090128041828.GB13157@gondor.apana.org.au> <20090128121511.GA6361@hmsreliant.think-freely.org> <20090128121741.GA17496@gondor.apana.org.au>
+Subject: [PATCH] crypto: Add myself as the maintainer for the CPRNG
+Date: Wed, 28 Jan 2009 10:28:52 -0500
+Message-ID: <20090128152852.GA6990@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: nhorman@tuxdriver.com
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:50994 "EHLO
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:59426 "EHLO
 	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751123AbZA1M65 (ORCPT
+	with ESMTP id S1750937AbZA1P3D (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Jan 2009 07:58:57 -0500
+	Wed, 28 Jan 2009 10:29:03 -0500
 Content-Disposition: inline
-In-Reply-To: <20090128121741.GA17496@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 28, 2009 at 11:17:41PM +1100, Herbert Xu wrote:
-> On Wed, Jan 28, 2009 at 07:15:11AM -0500, Neil Horman wrote:
-> > On Wed, Jan 28, 2009 at 03:18:28PM +1100, Herbert Xu wrote:
-> > > 
-> > > I'm OK with this change but I'd like it to look like:
-> > > 
-> > > 	if (fips_enabled) {
-> > > 		panic(...)
-> > > 	}
-> > > 
-> > > 	blah blah blah
-> > > 
-> > > This way the FIPS crap doesn't get in the way of everyday use.
-> > > 
-> > > Thanks,
-> > 
-> > 
-> > Sure, new patch, extra commentary removed.  Also brought the panic/printk text
-> > into agreement.
-> 
-> Hmm no I wasn't referring to the comment, but rather that you
-> should just move the stuff in the else branch into the main code
-> path since the panic makes the else redundant.
-> 
 
-Ahh, my bad.  Here you go
-
-
-
-FIPS 140-2 specifies that all access to various cryptographic modules be
-prevented in the event that any of the provided self tests fail on the various
-implemented algorithms.  We already panic when any of the test in testmgr.c
-fail when we are operating in fips mode.  The continuous test in the cprng here
-was missed when that was implmented.  This code simply checks for the
-fips_enabled flag if the test fails, and warns us via syslog or panics the box
-accordingly.
-
+Add myself as the maintainer for the CPRNG.  Herbert shouldn't deal with it
+alone if (when?) it breaks :)
+Neil
+    
 Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
 
-diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 7447806..9ec0f0a 100644
---- a/crypto/ansi_cprng.c
-+++ b/crypto/ansi_cprng.c
-@@ -132,9 +132,15 @@ static int _get_more_prng_bytes(struct prng_context *ctx)
- 			 */
- 			if (!memcmp(ctx->rand_data, ctx->last_rand_data,
- 					DEFAULT_BLK_SZ)) {
-+				if (fips_enabled) {
-+					panic("cprng %p Failed repetition check!\n",
-+						ctx);  
-+				} 
+
+MAINTAINERS |    6 ++++++
+1 file changed, 6 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 57e0309..b488092 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1252,6 +1252,12 @@ L:	linux-crypto@vger.kernel.org
+ T:	git kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+ S:	Maintained
+ 
++CRYPTOGRAPHIC RANDOM NUMBER GENERATOR
++P:	Neil Horman
++M:	nhorman@tuxdriver.com
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
 +
- 				printk(KERN_ERR
- 					"ctx %p Failed repetition check!\n",
- 					ctx);
-+
- 				ctx->flags |= PRNG_NEED_RESET;
- 				return -EINVAL;
- 			}
+ CS5535 Audio ALSA driver
+ P:	Jaya Kumar
+ M:	jayakumar.alsa@gmail.com
