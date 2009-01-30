@@ -1,2570 +1,1523 @@
-From: James Hsiao <jhsiao@amcc.com>
-Subject: [PATCH] AMCC Crypto4xx Device Driver v6
-Date: Wed, 28 Jan 2009 14:53:05 -0800
-Message-ID: <1233183185.4809.52.camel@jhsiao-usb>
-Reply-To: jhsiao@amcc.com
+From: Pierre Habouzit <madcoder@debian.org>
+Subject: [RFC] MPI module
+Date: Fri, 30 Jan 2009 01:15:23 +0100
+Message-ID: <20090130001523.GA909@artemis.corp>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: kim.phillips@freescale.com, jwboyer@linux.vnet.ibm.com,
-	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.or
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: multipart/signed; boundary="NDin8bjvE/0mNLFQ";
+	protocol="application/pgp-signature"; micalg=SHA1
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02.amcc.com ([198.137.200.73]:12775 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753096AbZA1Wte (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Jan 2009 17:49:34 -0500
+Received: from pan.madism.org ([88.191.52.104]:45605 "EHLO hermes.madism.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752419AbZA3AWy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 29 Jan 2009 19:22:54 -0500
+Received: from madism.org (olympe.madism.org [82.243.245.108])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(Client CN "artemis.madism.org", Issuer "madism.org" (verified OK))
+	by hermes.madism.org (Postfix) with ESMTPS id 513253FDA2
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Jan 2009 01:15:25 +0100 (CET)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support for AMCC ppc4xx security device driver. This is the
-initial release that includes the driver framework with AES and SHA1 algorithms
-support.
-The remaining algorithms will be released in the near future.
 
-Signed-off-by: James Hsiao <jhsiao@amcc.com>
+--NDin8bjvE/0mNLFQ
+Content-Type: multipart/mixed; boundary="4Ckj6UjgE2iN1+kY"
+Content-Disposition: inline
+
+
+--4Ckj6UjgE2iN1+kY
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+First let's talk about my endgame, and then my questions.
+
+My endgame is simple, I'd like to see an in-kernel SSL/TLS
+implementation in Linux happen. There are many reasons to want that,
+ranging from performance reasons (waking the userland each time you
+perform a handshake isn't particularly nice, and it's easy to make
+system-wide session caches) to really cool features being enabled:
+  - you can send "secure" file descriptors around through Unix Sockets,
+    or prepare a "secure" socket, let it be your stdin/stdout pair and
+    exec a service knowing nothing about SSL (think inetd-like stuff) ;
+  - you can deploy secure services where the actual server knows nothing
+    about the certificate that is used ;
+  - you can have a system-wide service dealing with peer certificate
+    validations and have a real system-wide policy in this regard ;
+  - you could even think of some netfilter stuff to enforce security on
+    a given socket, even if the service behind the socket knows nothing
+    about it (bye bye stunnel)...
+
+Nowadays, the kernel has most of what we need cipher-wise for TLS/SSL.
+Only the key-exchange protocols and the very TLS protocol are lacking.
+I'm currently addressing the former issue, namely, bringing RSA and
+Diffie-Hellman to the kernel.
+
+I'm quite new to the kernel cryptographic layer, hence I'm posting a
+really early patch so that I can get some comments about style or
+choices I made that are bad for the kernel. This first patch is a
+concise implementation of primitives needed to implement RSA and DHM
+key-exchange protocols. I've not tested it yet, it's likely to contain
+bugs.
+
+Though, I have a few questions.
+
+(1) I need arch-specific headers to propose optimized assembly code for
+the MPI multiplications. The API header is <crypto/bignum.h> though
+there is no asm-generic/crypto/bignum.h header. Should I create such a
+header or is using asm-generic/bignum.h (which is what the patch does
+atm) correct ?
+
+(2) The SSL library I based my work upon provides an SSE2 implementation
+of the MPI multiplication, though I'm unsure how I should enable it. For
+now it's guarded behind a #ifdef __HAVE_SSE2 which doesn't exist.  I
+imagine options are either detecting if the compilation target has SSE2,
+or some kind of runtime test, but I'm unsure what the kernel ways are in
+that regard.
+
+(3) I'm creating a module, but I'm unsure if that should not just be
+yes-or-no stuff. I don't know what the policy is in that regard.
+
+
+I believe that the code is quite readable, though if anything looks
+wrong, please tell me :)
+
+
+PS: wrt my endgame, I'm for now really concentrating on the crypto
+    stuff, IOW bringing RSA and Diffie-Hellman in.
+
+    I don't intend to bring x509 and certificate validation _into_ the
+    kernel, it makes no sense to me, this can be delegated to userland
+    easily.
+
+--=20
+=C2=B7O=C2=B7  Pierre Habouzit
+=C2=B7=C2=B7O                                                madcoder@debia=
+n.org
+OOO                                                http://www.madism.org
+
+--4Ckj6UjgE2iN1+kY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline; filename="0001-crypto-add-multiple-precision-APIs.patch"
+Content-Transfer-Encoding: quoted-printable
+
+=46rom: Pierre Habouzit <madcoder@debian.org>
+Subject: [PATCH] crypto: add multiple precision APIs
+
+Adds CONFIG_CRYPTO_BIGNUM to provide mpi_* APIs.
+
+This introduces the multiple precision integers, through the `struct mpi`
+type. MPI instances are just a bunch of unsigned longs (or limbs), in
+little endian order, which is a rather usual representation.
+
+Though, MPI instances have to respect a couple of invariants, the most
+importants being:
+  * at any time the length (number of least significant limbs) of the MPI
+    is known;
+  * at any time, all allocated limbs after the most significant limb must
+    be set to 0.
+
+Many mpi_* APIs use that fact to compute a valid result (see for example
+mpi_sbits or mpi_is_zero).
+
+Signed-off-by: Pierre Habouzit <madcoder@debian.org>
 ---
- arch/powerpc/boot/dts/canyonlands.dts   |    7 +
- arch/powerpc/boot/dts/kilauea.dts       |    7 +
- drivers/crypto/Kconfig                  |    9 +
- drivers/crypto/Makefile                 |    1 +
- drivers/crypto/amcc/Makefile            |    2 +
- drivers/crypto/amcc/crypto4xx_alg.c     |  293 +++++++
- drivers/crypto/amcc/crypto4xx_core.c    | 1310 +++++++++++++++++++++++++++++++
- drivers/crypto/amcc/crypto4xx_core.h    |  177 +++++
- drivers/crypto/amcc/crypto4xx_reg_def.h |  284 +++++++
- drivers/crypto/amcc/crypto4xx_sa.c      |  108 +++
- drivers/crypto/amcc/crypto4xx_sa.h      |  243 ++++++
- 11 files changed, 2441 insertions(+), 0 deletions(-)
- create mode 100644 drivers/crypto/amcc/Makefile
- create mode 100644 drivers/crypto/amcc/crypto4xx_alg.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_reg_def.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.h
+ arch/x86/include/asm/bignum.h    |   11 +
+ arch/x86/include/asm/bignum_32.h |  127 ++++++
+ arch/x86/include/asm/bignum_64.h |   51 +++
+ crypto/Kconfig                   |    6 +
+ crypto/Makefile                  |    1 +
+ crypto/bignum.c                  |  805 ++++++++++++++++++++++++++++++++++=
+++++
+ include/asm-generic/bignum.h     |   80 ++++
+ include/crypto/bignum.h          |  209 ++++++++++
+ 8 files changed, 1290 insertions(+), 0 deletions(-)
+ create mode 100644 arch/x86/include/asm/bignum.h
+ create mode 100644 arch/x86/include/asm/bignum_32.h
+ create mode 100644 arch/x86/include/asm/bignum_64.h
+ create mode 100644 crypto/bignum.c
+ create mode 100644 include/asm-generic/bignum.h
+ create mode 100644 include/crypto/bignum.h
 
-diff --git a/arch/powerpc/boot/dts/canyonlands.dts b/arch/powerpc/boot/dts/canyonlands.dts
-index 8b5ba82..4447def 100644
---- a/arch/powerpc/boot/dts/canyonlands.dts
-+++ b/arch/powerpc/boot/dts/canyonlands.dts
-@@ -127,6 +127,13 @@
- 			dcr-reg = <0x010 0x002>;
- 		};
- 
-+		CRYPTO: crypto@180000 {
-+			compatible = "amcc,ppc460ex-crypto", "amcc,ppc4xx-crypto";
-+			reg = <4 0x00180000 0x80400>;
-+			interrupt-parent = <&UIC0>;
-+			interrupts = <0x1d 0x4>;
-+		};
-+
- 		MAL0: mcmal {
- 			compatible = "ibm,mcmal-460ex", "ibm,mcmal2";
- 			dcr-reg = <0x180 0x062>;
-diff --git a/arch/powerpc/boot/dts/kilauea.dts b/arch/powerpc/boot/dts/kilauea.dts
-index dececc4..272b87f 100644
---- a/arch/powerpc/boot/dts/kilauea.dts
-+++ b/arch/powerpc/boot/dts/kilauea.dts
-@@ -94,6 +94,13 @@
- 			dcr-reg = <0x010 0x002>;
- 		};
- 
-+		CRYPTO: crypto@ef700000 {
-+			compatible = "amcc,ppc405ex-crypto", "amcc,ppc4xx-crypto";
-+			reg = <0xef700000 0x80400>;
-+			interrupt-parent = <&UIC0>;
-+			interrupts = <0x17 0x2>;
-+		};
-+
- 		MAL0: mcmal {
- 			compatible = "ibm,mcmal-405ex", "ibm,mcmal2";
- 			dcr-reg = <0x180 0x062>;
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index e522144..9ecc2e4 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -200,4 +200,13 @@ config CRYPTO_DEV_IXP4XX
- 	help
- 	  Driver for the IXP4xx NPE crypto engine.
- 
-+config CRYPTO_DEV_PPC4XX
-+	tristate "Driver AMCC PPC4xx crypto accelerator"
-+	depends on PPC && 4xx
-+	select CRYPTO_HASH
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  This option allows you to have support for AMCC crypto acceleration.
-+
- endif # CRYPTO_HW
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 73557b2..9bf4a2b 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -4,3 +4,4 @@ obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
- obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_IXP4XX) += ixp4xx_crypto.o
-+obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
-diff --git a/drivers/crypto/amcc/Makefile b/drivers/crypto/amcc/Makefile
+diff --git a/arch/x86/include/asm/bignum.h b/arch/x86/include/asm/bignum.h
 new file mode 100644
-index 0000000..aa376e8
+index 0000000..e33da47
 --- /dev/null
-+++ b/drivers/crypto/amcc/Makefile
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += crypto4xx.o
-+crypto4xx-objs :=  crypto4xx_core.o crypto4xx_alg.o crypto4xx_sa.o
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
++++ b/arch/x86/include/asm/bignum.h
+@@ -0,0 +1,11 @@
++#ifndef _ASM_X86_BIGNUM_H
++#define _ASM_X86_BIGNUM_H
++
++#ifdef CONFIG_X86_32
++# include "bignum_32.h"
++#else
++# include "bignum_64.h"
++#endif
++#include <asm-generic/bignum.h>
++
++#endif
+diff --git a/arch/x86/include/asm/bignum_32.h b/arch/x86/include/asm/bignum=
+_32.h
 new file mode 100644
-index 0000000..61b6e1b
+index 0000000..0923585
 --- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -0,0 +1,293 @@
++++ b/arch/x86/include/asm/bignum_32.h
+@@ -0,0 +1,127 @@
 +/**
-+ * AMCC SoC PPC4xx Crypto Driver
++ *  Multi-precision integer library
 + *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
++ *  Based on XySSL:
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
++ *    Copyright (C) 2006-2008  Christophe Devine
 + *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
 + *
-+ * This file implements the Linux crypto algorithms.
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 + */
 +
-+#include <linux/kernel.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <linux/hash.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/dma-mapping.h>
-+#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/sha.h>
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_sa.h"
-+#include "crypto4xx_core.h"
++#ifndef _ASM_X86_BIGNUM_32_H
++#define _ASM_X86_BIGNUM_32_H
 +
-+void set_dynamic_sa_command_0(struct dynamic_sa_ctl *sa, u32 save_h,
-+			      u32 save_iv, u32 ld_h, u32 ld_iv, u32 hdr_proc,
-+			      u32 h, u32 c, u32 pad_type, u32 op_grp, u32 op,
-+			      u32 dir)
-+{
-+	sa->sa_command_0.w = 0;
-+	sa->sa_command_0.bf.save_hash_state = save_h;
-+	sa->sa_command_0.bf.save_iv = save_iv;
-+	sa->sa_command_0.bf.load_hash_state = ld_h;
-+	sa->sa_command_0.bf.load_iv = ld_iv;
-+	sa->sa_command_0.bf.hdr_proc = hdr_proc;
-+	sa->sa_command_0.bf.hash_alg = h;
-+	sa->sa_command_0.bf.cipher_alg = c;
-+	sa->sa_command_0.bf.pad_type = pad_type & 3;
-+	sa->sa_command_0.bf.extend_pad = pad_type >> 2;
-+	sa->sa_command_0.bf.op_group = op_grp;
-+	sa->sa_command_0.bf.opcode = op;
-+	sa->sa_command_0.bf.dir = dir;
-+}
++#define MPI_MULADDC_INIT                           \
++	asm("movl   %%ebx, %0      " : "=3Dm" (t));  \
++	asm("movl   %0, %%esi      " :: "m" (s));  \
++	asm("movl   %0, %%edi      " :: "m" (d));  \
++	asm("movl   %0, %%ecx      " :: "m" (c));  \
++	asm("movl   %0, %%ebx      " :: "m" (b))
 +
-+void set_dynamic_sa_command_1(struct dynamic_sa_ctl *sa, u32 cm, u32 hmac_mc,
-+			      u32 cfb, u32 esn, u32 sn_mask, u32 mute,
-+			      u32 cp_pad, u32 cp_pay, u32 cp_hdr)
-+{
-+	sa->sa_command_1.w = 0;
-+	sa->sa_command_1.bf.crypto_mode31 = (cm & 4) >> 2;
-+	sa->sa_command_1.bf.crypto_mode9_8 = cm & 3;
-+	sa->sa_command_1.bf.feedback_mode = cfb,
-+	sa->sa_command_1.bf.sa_rev = 1;
-+	sa->sa_command_1.bf.extended_seq_num = esn;
-+	sa->sa_command_1.bf.seq_num_mask = sn_mask;
-+	sa->sa_command_1.bf.mutable_bit_proc = mute;
-+	sa->sa_command_1.bf.copy_pad = cp_pad;
-+	sa->sa_command_1.bf.copy_payload = cp_pay;
-+	sa->sa_command_1.bf.copy_hdr = cp_hdr;
-+}
++#define MPI_MULADDC_CORE                           \
++	asm("lodsl                 ");             \
++	asm("mull   %ebx           ");             \
++	asm("addl   %ecx,   %eax   ");             \
++	asm("adcl   $0,     %edx   ");             \
++	asm("addl   (%edi), %eax   ");             \
++	asm("adcl   $0,     %edx   ");             \
++	asm("movl   %edx,   %ecx   ");             \
++	asm("stosl                 ")
 +
-+int crypto4xx_encrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++#if defined(__HAVE_SSE2)
 +
-+	ctx->direction = DIR_OUTBOUND;
-+	ctx->hash_final = 0;
-+	ctx->is_hash = 0;
-+	ctx->pd_ctl = 0x1;
++#define MPI_MULADDC_8                              \
++	asm("movd     %ecx,     %mm1     ");       \
++	asm("movd     %ebx,     %mm0     ");       \
++	asm("movd     (%edi),   %mm3     ");       \
++	asm("paddq    %mm3,     %mm1     ");       \
++	asm("movd     (%esi),   %mm2     ");       \
++	asm("pmuludq  %mm0,     %mm2     ");       \
++	asm("movd     4(%esi),  %mm4     ");       \
++	asm("pmuludq  %mm0,     %mm4     ");       \
++	asm("movd     8(%esi),  %mm6     ");       \
++	asm("pmuludq  %mm0,     %mm6     ");       \
++	asm("movd     12(%esi), %mm7     ");       \
++	asm("pmuludq  %mm0,     %mm7     ");       \
++	asm("paddq    %mm2,     %mm1     ");       \
++	asm("movd     4(%edi),  %mm3     ");       \
++	asm("paddq    %mm4,     %mm3     ");       \
++	asm("movd     8(%edi),  %mm5     ");       \
++	asm("paddq    %mm6,     %mm5     ");       \
++	asm("movd     12(%edi), %mm4     ");       \
++	asm("paddq    %mm4,     %mm7     ");       \
++	asm("movd     %mm1,     (%edi)   ");       \
++	asm("movd     16(%esi), %mm2     ");       \
++	asm("pmuludq  %mm0,     %mm2     ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("movd     20(%esi), %mm4     ");       \
++	asm("pmuludq  %mm0,     %mm4     ");       \
++	asm("paddq    %mm3,     %mm1     ");       \
++	asm("movd     24(%esi), %mm6     ");       \
++	asm("pmuludq  %mm0,     %mm6     ");       \
++	asm("movd     %mm1,     4(%edi)  ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("movd     28(%esi), %mm3     ");       \
++	asm("pmuludq  %mm0,     %mm3     ");       \
++	asm("paddq    %mm5,     %mm1     ");       \
++	asm("movd     16(%edi), %mm5     ");       \
++	asm("paddq    %mm5,     %mm2     ");       \
++	asm("movd     %mm1,     8(%edi)  ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("paddq    %mm7,     %mm1     ");       \
++	asm("movd     20(%edi), %mm5     ");       \
++	asm("paddq    %mm5,     %mm4     ");       \
++	asm("movd     %mm1,     12(%edi) ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("paddq    %mm2,     %mm1     ");       \
++	asm("movd     24(%edi), %mm5     ");       \
++	asm("paddq    %mm5,     %mm6     ");       \
++	asm("movd     %mm1,     16(%edi) ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("paddq    %mm4,     %mm1     ");       \
++	asm("movd     28(%edi), %mm5     ");       \
++	asm("paddq    %mm5,     %mm3     ");       \
++	asm("movd     %mm1,     20(%edi) ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("paddq    %mm6,     %mm1     ");       \
++	asm("movd     %mm1,     24(%edi) ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("paddq    %mm3,     %mm1     ");       \
++	asm("movd     %mm1,     28(%edi) ");       \
++	asm("addl     $32,      %edi     ");       \
++	asm("addl     $32,      %esi     ");       \
++	asm("psrlq    $32,      %mm1     ");       \
++	asm("movd     %mm1,     %ecx     ")
 +
-+	return crypto4xx_build_pd(&req->base, ctx, req->src, req->dst,
-+				  req->nbytes, req->info,
-+				  get_dynamic_sa_iv_size(ctx));
-+}
++#define MPI_MULADDC_STOP                           \
++	asm("emms                        ");       \
++	asm("movl   %0, %%ebx      " :: "m" (t));  \
++	asm("movl   %%ecx, %0      " : "=3Dm" (c));  \
++	asm("movl   %%edi, %0      " : "=3Dm" (d));  \
++	asm("movl   %%esi, %0      " : "=3Dm" (s) :: \
++	"eax", "ecx", "edx", "esi", "edi")
 +
-+int crypto4xx_decrypt(struct ablkcipher_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++#else
 +
-+	ctx->direction = DIR_INBOUND;
-+	ctx->hash_final = 0;
-+	ctx->is_hash = 0;
-+	ctx->pd_ctl = 1;
++#define MPI_MULADDC_STOP                           \
++	asm("movl   %0, %%ebx      " :: "m" (t));  \
++	asm("movl   %%ecx, %0      " : "=3Dm" (c));  \
++	asm("movl   %%edi, %0      " : "=3Dm" (d));  \
++	asm("movl   %%esi, %0      " : "=3Dm" (s) :: \
++	"eax", "ecx", "edx", "esi", "edi")
 +
-+	return crypto4xx_build_pd(&req->base, ctx, req->src, req->dst,
-+				  req->nbytes, req->info,
-+				  get_dynamic_sa_iv_size(ctx));
-+}
++#endif /* SSE2 */
 +
++#endif
+diff --git a/arch/x86/include/asm/bignum_64.h b/arch/x86/include/asm/bignum=
+_64.h
+new file mode 100644
+index 0000000..b22598b
+--- /dev/null
++++ b/arch/x86/include/asm/bignum_64.h
+@@ -0,0 +1,51 @@
 +/**
-+ * AES Functions
++ *  Multi-precision integer library
++ *
++ *  Based on XySSL:
++ *
++ *    Copyright (C) 2006-2008  Christophe Devine
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 + */
-+static int crypto4xx_setkey_aes(struct crypto_ablkcipher *cipher,
-+				const u8 *key,
-+				unsigned int keylen,
-+				unsigned char cm,
-+				u8 fb)
++
++#ifndef _ASM_X86_BIGNUM_64_H
++#define _ASM_X86_BIGNUM_64_H
++
++#define MPI_MULADDC_INIT                            \
++	asm("movq   %0, %%rsi      " :: "m" (s));   \
++	asm("movq   %0, %%rdi      " :: "m" (d));   \
++	asm("movq   %0, %%rcx      " :: "m" (c));   \
++	asm("movq   %0, %%rbx      " :: "m" (b));   \
++	asm("xorq   %r8, %r8       ")
++
++#define MPI_MULADDC_CORE                            \
++	asm("movq  (%rsi),%rax     ");              \
++	asm("mulq   %rbx           ");              \
++	asm("addq   $8,   %rsi     ");              \
++	asm("addq   %rcx, %rax     ");              \
++	asm("movq   %r8,  %rcx     ");              \
++	asm("adcq   $0,   %rdx     ");              \
++	asm("nop                   ");              \
++	asm("addq   %rax, (%rdi)   ");              \
++	asm("adcq   %rdx, %rcx     ");              \
++	asm("addq   $8,   %rdi     ")
++
++#define MPI_MULADDC_STOP                            \
++	asm("movq   %%rcx, %0      " : "=3Dm" (c));   \
++	asm("movq   %%rdi, %0      " : "=3Dm" (d));   \
++	asm("movq   %%rsi, %0      " : "=3Dm" (s) ::  \
++	"rax", "rcx", "rdx", "rbx", "rsi", "rdi", "r8")
++
++#endif
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 8dde4fc..12a7d99 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -29,6 +29,12 @@ config CRYPTO_FIPS
+ 	  certification.  You should say no unless you know what
+ 	  this is.
+=20
++config CRYPTO_BIGNUM
++        tristate "Big Number library"
++        help
++	  This option provides the APIs for multiple precision integer
++	  operations.
++
+ config CRYPTO_ALGAPI
+ 	tristate
+ 	select CRYPTO_ALGAPI2
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 46b08bf..270cdea 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -6,6 +6,7 @@ obj-$(CONFIG_CRYPTO) +=3D crypto.o
+ crypto-objs :=3D api.o cipher.o digest.o compress.o
+=20
+ obj-$(CONFIG_CRYPTO_FIPS) +=3D fips.o
++obj-$(CONFIG_CRYPTO_BIGNUM) +=3D bignum.o
+=20
+ crypto_algapi-$(CONFIG_PROC_FS) +=3D proc.o
+ crypto_algapi-objs :=3D algapi.o scatterwalk.o $(crypto_algapi-y)
+diff --git a/crypto/bignum.c b/crypto/bignum.c
+new file mode 100644
+index 0000000..7e4279c
+--- /dev/null
++++ b/crypto/bignum.c
+@@ -0,0 +1,805 @@
++/*
++ *  Multi-precision integer library
++ *
++ *  Based on XySSL:
++ *
++ *    Copyright (C) 2006-2008  Christophe Devine
++ *    Copyright (C) 2009       Pierre Habouzit <madcoder@debian.org>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++/*
++ *  This MPI implementation is based on:
++ *
++ *  http://www.cacr.math.uwaterloo.ca/hac/about/chap14.pdf
++ *  http://www.stillhq.com/extracted/gnupg-api/struct mpi/
++ *  http://math.libtomcrypt.com/files/tommath.pdf
++ */
++
++#include <linux/module.h>
++#include <linux/errno.h>
++#include <crypto/bignum.h>
++
++#define ciL           ((int)sizeof(unsigned long))    /* chars in limb  */
++#define biL           (ciL << 3)                      /* bits  in limb  */
++#define MPI_CHK(f)    if (unlikely(ret =3D f) !=3D 0) goto cleanup
++#if (BITS_PER_LONG =3D=3D 32)
++#  define __be_long_to_cpu(x)  __be32_to_cpu(x)
++#  define __cpu_to_be_long(x)  __cpu_to_be32(x)
++#else
++#  define __be_long_to_cpu(x)  __be64_to_cpu(x)
++#  define __cpu_to_be_long(x)  __cpu_to_be64(x)
++#endif
++
++#define MPI_FROM_INT(i) \
++	{ .sign =3D (i) < 0,                                   \
++	  .len  =3D (i) !=3D 0,                                  \
++	  .p =3D (unsigned long []){ (i) < 0 ? -i : i },       \
++	}
++static struct mpi const ONE =3D MPI_FROM_INT(1);
++
++static inline void mpi_setlen(struct mpi *X, int len, int do_fix)
 +{
-+	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct dynamic_sa_ctl *sa;
-+	int    rc;
-+
-+	if (keylen != AES_KEYSIZE_256 &&
-+		keylen != AES_KEYSIZE_192 && keylen != AES_KEYSIZE_128) {
-+		crypto_ablkcipher_set_flags(cipher,
-+				CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
++	if (len < X->len)
++		memset(X->p + len, 0, (X->len - len) * ciL);
++	if (do_fix) {
++		while (len > 0 && X->p[len - 1] =3D=3D 0)
++			len--;
 +	}
++	X->len =3D len;
++}
 +
-+	/* Create SA */
-+	if (ctx->sa_in_dma_addr || ctx->sa_out_dma_addr)
-+		crypto4xx_free_sa(ctx);
-+
-+	rc = crypto4xx_alloc_sa(ctx, SA_AES128_LEN + (keylen-16) / 4);
-+	if (rc)
-+		return rc;
-+
-+	if (ctx->state_record_dma_addr == 0) {
-+		rc = crypto4xx_alloc_state_record(ctx);
-+		if (rc) {
-+			crypto4xx_free_sa(ctx);
-+			return rc;
-+		}
-+	}
-+	/* Setup SA */
-+	sa = (struct dynamic_sa_ctl *) ctx->sa_in;
-+	ctx->hash_final = 0;
-+
-+	set_dynamic_sa_command_0(sa, SA_NOT_SAVE_HASH, SA_NOT_SAVE_IV,
-+				 SA_LOAD_HASH_FROM_SA, SA_LOAD_IV_FROM_STATE,
-+				 SA_NO_HEADER_PROC, SA_HASH_ALG_NULL,
-+				 SA_CIPHER_ALG_AES, SA_PAD_TYPE_ZERO,
-+				 SA_OP_GROUP_BASIC, SA_OPCODE_DECRYPT,
-+				 DIR_INBOUND);
-+
-+	set_dynamic_sa_command_1(sa, cm, SA_HASH_MODE_HASH,
-+				 fb, SA_EXTENDED_SN_OFF,
-+				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
-+				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
-+				 SA_NOT_COPY_HDR);
-+	crypto4xx_memcpy_le(ctx->sa_in + get_dynamic_sa_offset_key_field(ctx),
-+			    key, keylen);
-+	sa->sa_contents = SA_AES_CONTENTS | (keylen << 2);
-+	sa->sa_command_1.bf.key_len = keylen >> 3;
-+	ctx->is_hash = 0;
-+	ctx->direction = DIR_INBOUND;
-+	memcpy(ctx->sa_in + get_dynamic_sa_offset_state_ptr_field(ctx),
-+			(void *)&ctx->state_record_dma_addr, 4);
-+	ctx->offset_to_sr_ptr = get_dynamic_sa_offset_state_ptr_field(ctx);
-+
-+	memcpy(ctx->sa_out, ctx->sa_in, ctx->sa_len * 4);
-+	sa = (struct dynamic_sa_ctl *) ctx->sa_out;
-+	sa->sa_command_0.bf.dir = DIR_OUTBOUND;
-+
++static int mpi_set_2pow(struct mpi *X, int pow)
++{
++	if (mpi_grow(X, pow / biL))
++		return -ENOMEM;
++	mpi_zero(X);
++	X->p[pow / biL] =3D 1 << (pow % biL);
++	mpi_setlen(X, pow / biL + 1, 0);
 +	return 0;
 +}
 +
-+int crypto4xx_setkey_aes_cbc(struct crypto_ablkcipher *cipher,
-+			     const u8 *key, unsigned int keylen)
++int mpi_grow(struct mpi *X, int nblimbs)
 +{
-+	return crypto4xx_setkey_aes(cipher, key, keylen, CRYPTO_MODE_CBC,
-+				    CRYPTO_FEEDBACK_MODE_NO_FB);
-+}
++	unsigned long *p;
 +
-+/**
-+ * HASH SHA1 Functions
-+ */
-+static int crypto4xx_hash_alg_init(struct crypto_tfm *tfm,
-+				   unsigned int sa_len,
-+				   unsigned char ha,
-+				   unsigned char hm)
-+{
-+	struct crypto_alg *alg = tfm->__crt_alg;
-+	struct crypto4xx_alg *my_alg = crypto_alg_to_crypto4xx_alg(alg);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct dynamic_sa_ctl *sa;
-+	struct dynamic_sa_hash160 *sa_in;
-+	int rc;
-+
-+	ctx->dev   = my_alg->dev;
-+	ctx->is_hash = 1;
-+	ctx->hash_final = 0;
-+
-+	/* Create SA */
-+	if (ctx->sa_in_dma_addr || ctx->sa_out_dma_addr)
-+		crypto4xx_free_sa(ctx);
-+
-+	rc = crypto4xx_alloc_sa(ctx, sa_len);
-+	if (rc)
-+		return rc;
-+
-+	if (ctx->state_record_dma_addr == 0) {
-+		crypto4xx_alloc_state_record(ctx);
-+		if (!ctx->state_record_dma_addr) {
-+			crypto4xx_free_sa(ctx);
++	if (unlikely(nblimbs < 0))
++		return -ENOMEM;
++	if (X->alloc < nblimbs) {
++		p =3D krealloc(X->p, nblimbs * ciL, GFP_KERNEL);
++		if (!p)
 +			return -ENOMEM;
++		memset(p + X->alloc, 0, (nblimbs - X->alloc) * ciL);
++		X->alloc =3D nblimbs;
++		X->p =3D p;
++	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(mpi_grow);
++
++static int mpi_copy(struct mpi *X, const struct mpi *Y)
++{
++	if (X =3D=3D Y)
++		return 0;
++
++	if (mpi_grow(X, Y->len))
++		return -ENOMEM;
++
++	X->sign =3D Y->sign;
++	memcpy(X->p, Y->p, Y->len * ciL);
++	mpi_setlen(X, Y->len, 0);
++	return 0;
++}
++
++int mpi_read_binary(struct mpi *X, const u8 *buf, int buflen)
++{
++	unsigned long u;
++	int i, v0, v1, xl;
++
++	while (buflen > 0 && *buf =3D=3D 0) {
++		buf++;
++		buflen--;
++	}
++
++	xl =3D DIV_ROUND_UP(buflen, ciL);
++	if (mpi_grow(X, xl))
++		return -ENOMEM;
++
++	v0 =3D buflen / ciL;
++	v1 =3D buflen % ciL;
++
++	if (v1) {
++		for (u =3D i =3D 0; i < v1; i++) {
++			u =3D (u << 8) | *buf++;
++		}
++		X->p[v0] =3D u;
++	}
++	for (i =3D v0 - 1; i >=3D 0; i--, buf +=3D ciL) {
++		memcpy(&u, buf, ciL);
++		X->p[i] =3D __be_long_to_cpu(u);
++	}
++	mpi_setlen(X, xl, 0);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(mpi_read_binary);
++
++u8 *mpi_write_binary(const struct mpi *X, u8 *buf, int buflen)
++{
++	unsigned long u;
++	int i, v0, v1;
++
++	if (buflen > ciL * X->len) {
++		memset(buf, 0, buflen - ciL * X->len);
++		buf   +=3D buflen - ciL * X->len;
++		buflen =3D ciL * X->len;
++		v0     =3D X->len;
++	} else {
++		v0 =3D buflen / ciL;
++		v1 =3D buflen % ciL;
++
++		for (i =3D v1 - 1; i >=3D 0; i--) {
++			*buf++ =3D X->p[v0] >> (i << 3);
 +		}
 +	}
-+
-+	tfm->crt_ahash.reqsize = sizeof(struct crypto4xx_ctx);
-+	sa = (struct dynamic_sa_ctl *) ctx->sa_in;
-+	set_dynamic_sa_command_0(sa, SA_SAVE_HASH, SA_NOT_SAVE_IV,
-+				 SA_NOT_LOAD_HASH, SA_LOAD_IV_FROM_SA,
-+				 SA_NO_HEADER_PROC, ha, SA_CIPHER_ALG_NULL,
-+				 SA_PAD_TYPE_ZERO, SA_OP_GROUP_BASIC,
-+				 SA_OPCODE_HASH, DIR_INBOUND);
-+	set_dynamic_sa_command_1(sa, 0, SA_HASH_MODE_HASH,
-+				 CRYPTO_FEEDBACK_MODE_NO_FB, SA_EXTENDED_SN_OFF,
-+				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
-+				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
-+				 SA_NOT_COPY_HDR);
-+	ctx->direction = DIR_INBOUND;
-+	sa->sa_contents = SA_HASH160_CONTENTS;
-+	sa_in = (struct dynamic_sa_hash160 *) ctx->sa_in;
-+	/* Need to zero hash digest in SA */
-+	memset(sa_in->inner_digest, 0, sizeof(sa_in->inner_digest));
-+	memset(sa_in->outer_digest, 0, sizeof(sa_in->outer_digest));
-+	sa_in->state_ptr = ctx->state_record_dma_addr;
-+	ctx->offset_to_sr_ptr = get_dynamic_sa_offset_state_ptr_field(ctx);
-+
-+	return 0;
-+}
-+
-+int crypto4xx_hash_init(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	int ds;
-+	struct dynamic_sa_ctl *sa;
-+
-+	sa = (struct dynamic_sa_ctl *) ctx->sa_in;
-+	ds = crypto_ahash_digestsize(
-+			__crypto_ahash_cast(req->base.tfm));
-+	sa->sa_command_0.bf.digest_len = ds >> 2;
-+	sa->sa_command_0.bf.load_hash_state = SA_LOAD_HASH_FROM_SA;
-+	ctx->is_hash = 1;
-+	ctx->direction = DIR_INBOUND;
-+
-+	return 0;
-+}
-+
-+int crypto4xx_hash_update(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+
-+	ctx->is_hash = 1;
-+	ctx->hash_final = 0;
-+	ctx->pd_ctl = 0x11;
-+	ctx->direction = DIR_INBOUND;
-+
-+	return crypto4xx_build_pd(&req->base, ctx, req->src,
-+				  (struct scatterlist *) req->result,
-+				  req->nbytes, NULL, 0);
-+}
-+
-+int crypto4xx_hash_final(struct ahash_request *req)
-+{
-+	return 0;
-+}
-+
-+int crypto4xx_hash_digest(struct ahash_request *req)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+
-+	ctx->hash_final = 1;
-+	ctx->pd_ctl = 0x11;
-+	ctx->direction = DIR_INBOUND;
-+
-+	return crypto4xx_build_pd(&req->base, ctx, req->src,
-+				  (struct scatterlist *) req->result,
-+				  req->nbytes, NULL, 0);
-+}
-+
-+/**
-+ * SHA1 Algorithm
-+ */
-+int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm)
-+{
-+	return crypto4xx_hash_alg_init(tfm, SA_HASH160_LEN, SA_HASH_ALG_SHA1,
-+				       SA_HASH_MODE_HASH);
-+}
-+
-+
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-new file mode 100644
-index 0000000..4c0dfb2
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -0,0 +1,1310 @@
-+/**
-+ * AMCC SoC PPC4xx Crypto Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * This file implements AMCC crypto offload Linux device driver for use with
-+ * Linux CryptoAPI.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/random.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/platform_device.h>
-+#include <linux/init.h>
-+#include <linux/of_platform.h>
-+#include <asm/dcr.h>
-+#include <asm/dcr-regs.h>
-+#include <asm/cacheflush.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/sha.h>
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_core.h"
-+#include "crypto4xx_sa.h"
-+
-+#define PPC4XX_SEC_VERSION_STR			"0.5"
-+
-+/**
-+ * PPC4xx Crypto Engine Initialization Routine
-+ */
-+static void crypto4xx_hw_init(struct crypto4xx_device *dev)
-+{
-+	union ce_ring_size ring_size;
-+	union ce_ring_contol ring_ctrl;
-+	union ce_part_ring_size part_ring_size;
-+	union ce_io_threshold io_threshold;
-+	u32 rand_num;
-+	union ce_pe_dma_cfg pe_dma_cfg;
-+
-+	writel(PPC4XX_BYTE_ORDER, dev->ce_base + CRYPTO4XX_BYTE_ORDER_CFG);
-+	/* setup pe dma, include reset sg, pdr and pe, then release reset */
-+	pe_dma_cfg.w = 0;
-+	pe_dma_cfg.bf.bo_sgpd_en = 1;
-+	pe_dma_cfg.bf.bo_data_en = 0;
-+	pe_dma_cfg.bf.bo_sa_en = 1;
-+	pe_dma_cfg.bf.bo_pd_en = 1;
-+	pe_dma_cfg.bf.dynamic_sa_en = 1;
-+	pe_dma_cfg.bf.reset_sg = 1;
-+	pe_dma_cfg.bf.reset_pdr = 1;
-+	pe_dma_cfg.bf.reset_pe = 1;
-+	writel(pe_dma_cfg.w, dev->ce_base + CRYPTO4XX_PE_DMA_CFG);
-+	/* un reset pe,sg and pdr */
-+	pe_dma_cfg.bf.pe_mode = 0;
-+	pe_dma_cfg.bf.reset_sg = 0;
-+	pe_dma_cfg.bf.reset_pdr = 0;
-+	pe_dma_cfg.bf.reset_pe = 0;
-+	pe_dma_cfg.bf.bo_td_en = 0;
-+	writel(pe_dma_cfg.w, dev->ce_base + CRYPTO4XX_PE_DMA_CFG);
-+	writel(dev->pdr_pa, dev->ce_base + CRYPTO4XX_PDR_BASE);
-+	writel(dev->pdr_pa, dev->ce_base + CRYPTO4XX_RDR_BASE);
-+	writel(PPC4XX_PRNG_CTRL_AUTO_EN, dev->ce_base + CRYPTO4XX_PRNG_CTRL);
-+	get_random_bytes(&rand_num, sizeof(rand_num));
-+	writel(rand_num, dev->ce_base + CRYPTO4XX_PRNG_SEED_L);
-+	get_random_bytes(&rand_num, sizeof(rand_num));
-+	writel(rand_num, dev->ce_base + CRYPTO4XX_PRNG_SEED_H);
-+	ring_size.w = 0;
-+	ring_size.bf.ring_offset = PPC4XX_PD_SIZE;
-+	ring_size.bf.ring_size   = PPC4XX_NUM_PD;
-+	writel(ring_size.w, dev->ce_base + CRYPTO4XX_RING_SIZE);
-+	ring_ctrl.w = 0;
-+	writel(ring_ctrl.w, dev->ce_base + CRYPTO4XX_RING_CTRL);
-+	writel(PPC4XX_DC_3DES_EN, dev->ce_base + CRYPTO4XX_DEVICE_CTRL);
-+	writel(dev->gdr_pa, dev->ce_base + CRYPTO4XX_GATH_RING_BASE);
-+	writel(dev->sdr_pa, dev->ce_base + CRYPTO4XX_SCAT_RING_BASE);
-+	part_ring_size.w = 0;
-+	part_ring_size.bf.sdr_size = PPC4XX_SDR_SIZE;
-+	part_ring_size.bf.gdr_size = PPC4XX_GDR_SIZE;
-+	writel(part_ring_size.w, dev->ce_base + CRYPTO4XX_PART_RING_SIZE);
-+	writel(PPC4XX_SD_BUFFER_SIZE, dev->ce_base + CRYPTO4XX_PART_RING_CFG);
-+	io_threshold.w = 0;
-+	io_threshold.bf.output_threshold = PPC4XX_OUTPUT_THRESHOLD;
-+	io_threshold.bf.input_threshold  = PPC4XX_INPUT_THRESHOLD;
-+	writel(io_threshold.w, dev->ce_base + CRYPTO4XX_IO_THRESHOLD);
-+	writel(0, dev->ce_base + CRYPTO4XX_PDR_BASE_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_RDR_BASE_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_PKT_SRC_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_PKT_DEST_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_SA_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_GATH_RING_BASE_UADDR);
-+	writel(0, dev->ce_base + CRYPTO4XX_SCAT_RING_BASE_UADDR);
-+	/* un reset pe,sg and pdr */
-+	pe_dma_cfg.bf.pe_mode = 1;
-+	pe_dma_cfg.bf.reset_sg = 0;
-+	pe_dma_cfg.bf.reset_pdr = 0;
-+	pe_dma_cfg.bf.reset_pe = 0;
-+	pe_dma_cfg.bf.bo_td_en = 0;
-+	writel(pe_dma_cfg.w, dev->ce_base + CRYPTO4XX_PE_DMA_CFG);
-+	/*clear all pending interrupt*/
-+	writel(PPC4XX_INTERRUPT_CLR, dev->ce_base + CRYPTO4XX_INT_CLR);
-+	writel(PPC4XX_INT_DESCR_CNT, dev->ce_base + CRYPTO4XX_INT_DESCR_CNT);
-+	writel(PPC4XX_INT_DESCR_CNT, dev->ce_base + CRYPTO4XX_INT_DESCR_CNT);
-+	writel(PPC4XX_INT_CFG, dev->ce_base + CRYPTO4XX_INT_CFG);
-+	writel(PPC4XX_PD_DONE_INT, dev->ce_base + CRYPTO4XX_INT_EN);
-+}
-+
-+int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size)
-+{
-+	ctx->sa_in = dma_alloc_coherent(ctx->dev->core_dev->device, size * 4,
-+					&ctx->sa_in_dma_addr, GFP_ATOMIC);
-+	if (ctx->sa_in == NULL)
-+		return -ENOMEM;
-+
-+	ctx->sa_out = dma_alloc_coherent(ctx->dev->core_dev->device, size * 4,
-+					 &ctx->sa_out_dma_addr, GFP_ATOMIC);
-+	if (ctx->sa_out == NULL) {
-+		dma_free_coherent(ctx->dev->core_dev->device,
-+				  ctx->sa_len * 4,
-+				  ctx->sa_in, ctx->sa_in_dma_addr);
-+		return -ENOMEM;
++	for (i =3D v0 - 1; i >=3D 0; i--, buf +=3D ciL) {
++		u =3D __cpu_to_be_long(X->p[i]);
++		memcpy(buf, &u, ciL);
 +	}
-+
-+	memset(ctx->sa_in, 0, size * 4);
-+	memset(ctx->sa_out, 0, size * 4);
-+	ctx->sa_len = size;
-+
-+	return 0;
++	return buf;
 +}
++EXPORT_SYMBOL_GPL(mpi_write_binary);
 +
-+void crypto4xx_free_sa(struct crypto4xx_ctx *ctx)
-+{
-+	if (ctx->sa_in != NULL)
-+		dma_free_coherent(ctx->dev->core_dev->device, ctx->sa_len * 4,
-+				  ctx->sa_in, ctx->sa_in_dma_addr);
-+	if (ctx->sa_out != NULL)
-+		dma_free_coherent(ctx->dev->core_dev->device, ctx->sa_len * 4,
-+				  ctx->sa_out, ctx->sa_out_dma_addr);
 +
-+	ctx->sa_in_dma_addr = 0;
-+	ctx->sa_out_dma_addr = 0;
-+	ctx->sa_len = 0;
-+}
-+
-+u32 crypto4xx_alloc_state_record(struct crypto4xx_ctx *ctx)
-+{
-+	ctx->state_record = dma_alloc_coherent(ctx->dev->core_dev->device,
-+				sizeof(struct sa_state_record),
-+				&ctx->state_record_dma_addr, GFP_ATOMIC);
-+	if (!ctx->state_record_dma_addr)
-+		return -ENOMEM;
-+	memset(ctx->state_record, 0, sizeof(struct sa_state_record));
-+
-+	return 0;
-+}
-+
-+void crypto4xx_free_state_record(struct crypto4xx_ctx *ctx)
-+{
-+	if (ctx->state_record != NULL)
-+		dma_free_coherent(ctx->dev->core_dev->device,
-+				  sizeof(struct sa_state_record),
-+				  ctx->state_record,
-+				  ctx->state_record_dma_addr);
-+	ctx->state_record_dma_addr = 0;
-+}
-+
-+/**
-+ * alloc memory for the gather ring
-+ * no need to alloc buf for the ring
-+ * gdr_tail, gdr_head and gdr_count are initialized by this function
-+ */
-+static u32 crypto4xx_build_pdr(struct crypto4xx_device *dev)
++int mpi_ctz(const struct mpi *X)
 +{
 +	int i;
-+	struct pd_uinfo *pd_uinfo;
-+	dev->pdr = dma_alloc_coherent(dev->core_dev->device,
-+				      sizeof(struct ce_pd) * PPC4XX_NUM_PD,
-+				      &dev->pdr_pa, GFP_ATOMIC);
-+	if (!dev->pdr)
-+		return -ENOMEM;
 +
-+	dev->pdr_uinfo = kzalloc(sizeof(struct pd_uinfo) * PPC4XX_NUM_PD,
-+				GFP_KERNEL);
-+	if (!dev->pdr_uinfo) {
-+		dma_free_coherent(dev->core_dev->device,
-+				  sizeof(struct ce_pd) * PPC4XX_NUM_PD,
-+				  dev->pdr,
-+				  dev->pdr_pa);
-+		return -ENOMEM;
++	for (i =3D 0; i < X->len; i++) {
++		if (X->p[i])
++			return i * biL + __builtin_ctzl(X->p[i]);
 +	}
-+	memset(dev->pdr, 0,  sizeof(struct ce_pd) * PPC4XX_NUM_PD);
-+	dev->shadow_sa_pool = dma_alloc_coherent(dev->core_dev->device,
-+				   256 * PPC4XX_NUM_PD,
-+				   &dev->shadow_sa_pool_pa,
-+				   GFP_ATOMIC);
-+	if (!dev->shadow_sa_pool)
-+		return -ENOMEM;
-+
-+	dev->shadow_sr_pool = dma_alloc_coherent(dev->core_dev->device,
-+			 sizeof(struct sa_state_record) * PPC4XX_NUM_PD,
-+			 &dev->shadow_sr_pool_pa, GFP_ATOMIC);
-+	if (!dev->shadow_sr_pool)
-+		return -ENOMEM;
-+	for (i = 0; i < PPC4XX_NUM_PD; i++) {
-+		pd_uinfo = (struct pd_uinfo *) (dev->pdr_uinfo +
-+						sizeof(struct pd_uinfo) * i);
-+
-+		/* alloc 256 bytes which is enough for any kind of dynamic sa */
-+		pd_uinfo->sa_va = dev->shadow_sa_pool + 256 * i;
-+		pd_uinfo->sa_pa = dev->shadow_sa_pool_pa + 256 * i;
-+
-+		/* alloc state record */
-+		pd_uinfo->sr_va = dev->shadow_sr_pool +
-+		    sizeof(struct sa_state_record) * i;
-+		pd_uinfo->sr_pa = dev->shadow_sr_pool_pa +
-+		    sizeof(struct sa_state_record) * i;
-+	}
-+
-+	return 0;
++	return -1;
 +}
++EXPORT_SYMBOL_GPL(mpi_ctz);
 +
-+static void crypto4xx_destroy_pdr(struct crypto4xx_device *dev)
++int mpi_sbits(const struct mpi *X)
 +{
-+	if (dev->pdr != NULL)
-+		dma_free_coherent(dev->core_dev->device,
-+				  sizeof(struct ce_pd) * PPC4XX_NUM_PD,
-+				  dev->pdr, dev->pdr_pa);
-+	if (dev->shadow_sa_pool)
-+		dma_free_coherent(dev->core_dev->device, 256 * PPC4XX_NUM_PD,
-+				  dev->shadow_sa_pool, dev->shadow_sa_pool_pa);
-+	if (dev->shadow_sr_pool)
-+		dma_free_coherent(dev->core_dev->device,
-+			sizeof(struct sa_state_record) * PPC4XX_NUM_PD,
-+			dev->shadow_sr_pool, dev->shadow_sr_pool_pa);
-+
-+	kfree(dev->pdr_uinfo);
-+}
-+
-+static u32 crypto4xx_get_pd_from_pdr_nolock(struct crypto4xx_device *dev)
-+{
-+	u32 retval;
-+	u32 tmp;
-+
-+	retval = dev->pdr_head;
-+	tmp = (dev->pdr_head + 1) % PPC4XX_NUM_PD;
-+
-+	if (tmp == dev->pdr_tail)
-+		return ERING_WAS_FULL;
-+
-+	dev->pdr_head = tmp;
-+
-+	return retval;
-+}
-+
-+static u32 crypto4xx_put_pd_to_pdr(struct crypto4xx_device *dev, u32 idx)
-+{
-+	struct pd_uinfo *pd_uinfo;
-+	unsigned long flags;
-+
-+	pd_uinfo = (struct pd_uinfo *)(dev->pdr_uinfo +
-+				       sizeof(struct pd_uinfo) * idx);
-+	spin_lock_irqsave(&dev->core_dev->lock, flags);
-+	if (dev->pdr_tail != PPC4XX_LAST_PD)
-+		dev->pdr_tail++;
-+	else
-+		dev->pdr_tail = 0;
-+	pd_uinfo->state = PD_ENTRY_FREE;
-+	spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+
-+	return 0;
-+}
-+
-+static struct ce_pd *crypto4xx_get_pdp(struct crypto4xx_device *dev,
-+				       dma_addr_t *pd_dma, u32 idx)
-+{
-+	*pd_dma = dev->pdr_pa + sizeof(struct ce_pd) * idx;
-+
-+	return dev->pdr + sizeof(struct ce_pd) * idx;
-+}
-+
-+/**
-+ * alloc memory for the gather ring
-+ * no need to alloc buf for the ring
-+ * gdr_tail, gdr_head and gdr_count are initialized by this function
-+ */
-+static u32 crypto4xx_build_gdr(struct crypto4xx_device *dev)
-+{
-+	dev->gdr = dma_alloc_coherent(dev->core_dev->device,
-+				      sizeof(struct ce_gd) * PPC4XX_NUM_GD,
-+				      &dev->gdr_pa, GFP_ATOMIC);
-+	if (!dev->gdr)
-+		return -ENOMEM;
-+
-+	memset(dev->gdr, 0, sizeof(struct ce_gd) * PPC4XX_NUM_GD);
-+
-+	return 0;
-+}
-+
-+static inline void crypto4xx_destroy_gdr(struct crypto4xx_device *dev)
-+{
-+	dma_free_coherent(dev->core_dev->device,
-+			  sizeof(struct ce_gd) * PPC4XX_NUM_GD,
-+			  dev->gdr, dev->gdr_pa);
-+}
-+
-+/*
-+ * when this function is called.
-+ * preemption or interrupt must be disabled
-+ */
-+u32 crypto4xx_get_n_gd(struct crypto4xx_device *dev, int n)
-+{
-+	u32 retval;
-+	u32 tmp;
-+	if (n >= PPC4XX_NUM_GD)
-+		return ERING_WAS_FULL;
-+
-+	retval = dev->gdr_head;
-+	tmp = (dev->gdr_head + n) % PPC4XX_NUM_GD;
-+	if (dev->gdr_head > dev->gdr_tail) {
-+		if (tmp < dev->gdr_head && tmp >= dev->gdr_tail)
-+			return ERING_WAS_FULL;
-+	} else if (dev->gdr_head < dev->gdr_tail) {
-+		if (tmp < dev->gdr_head || tmp >= dev->gdr_tail)
-+			return ERING_WAS_FULL;
-+	}
-+	dev->gdr_head = tmp;
-+
-+	return retval;
-+}
-+
-+static u32 crypto4xx_put_gd_to_gdr(struct crypto4xx_device *dev)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&dev->core_dev->lock, flags);
-+	if (dev->gdr_tail == dev->gdr_head) {
-+		spin_unlock_irqrestore(&dev->core_dev->lock, flags);
++	if (X->len =3D=3D 0)
 +		return 0;
-+	}
-+
-+	if (dev->gdr_tail != PPC4XX_LAST_GD)
-+		dev->gdr_tail++;
-+	else
-+		dev->gdr_tail = 0;
-+
-+	spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+
-+	return 0;
++	return X->len * biL + (biL - __builtin_clzl(X->p[X->len - 1]));
 +}
++EXPORT_SYMBOL_GPL(mpi_sbits);
 +
-+static inline struct ce_gd *crypto4xx_get_gdp(struct crypto4xx_device *dev,
-+					      dma_addr_t *gd_dma, u32 idx)
++int mpi_shift_l(struct mpi *X, int count)
 +{
-+	*gd_dma = dev->gdr_pa + sizeof(struct ce_gd) * idx;
++	int i, v0, v1, bits;
 +
-+	return (struct ce_gd *) (dev->gdr + sizeof(struct ce_gd) * idx);
-+}
-+
-+/**
-+ * alloc memory for the scatter ring
-+ * need to alloc buf for the ring
-+ * sdr_tail, sdr_head and sdr_count are initialized by this function
-+ */
-+static u32 crypto4xx_build_sdr(struct crypto4xx_device *dev)
-+{
-+	int i;
-+	struct ce_sd *sd_array;
-+
-+	/* alloc memory for scatter descriptor ring */
-+	dev->sdr = dma_alloc_coherent(dev->core_dev->device,
-+				      sizeof(struct ce_sd) * PPC4XX_NUM_SD,
-+				      &dev->sdr_pa, GFP_ATOMIC);
-+	if (!dev->sdr)
-+		return -ENOMEM;
-+
-+	dev->scatter_buffer_size = PPC4XX_SD_BUFFER_SIZE;
-+	dev->scatter_buffer_va =
-+		dma_alloc_coherent(dev->core_dev->device,
-+			dev->scatter_buffer_size * PPC4XX_NUM_SD,
-+			&dev->scatter_buffer_pa, GFP_ATOMIC);
-+	if (!dev->scatter_buffer_va) {
-+		dma_free_coherent(dev->core_dev->device,
-+				  sizeof(struct ce_sd) * PPC4XX_NUM_SD,
-+				  dev->sdr, dev->sdr_pa);
-+		return -ENOMEM;
-+	}
-+
-+	sd_array = dev->sdr;
-+
-+	for (i = 0; i < PPC4XX_NUM_SD; i++) {
-+		sd_array[i].ptr = dev->scatter_buffer_pa +
-+				  dev->scatter_buffer_size * i;
-+	}
-+
-+	return 0;
-+}
-+
-+static void crypto4xx_destroy_sdr(struct crypto4xx_device *dev)
-+{
-+	if (dev->sdr != NULL)
-+		dma_free_coherent(dev->core_dev->device,
-+				  sizeof(struct ce_sd) * PPC4XX_NUM_SD,
-+				  dev->sdr, dev->sdr_pa);
-+
-+	if (dev->scatter_buffer_va != NULL)
-+		dma_free_coherent(dev->core_dev->device,
-+				  dev->scatter_buffer_size * PPC4XX_NUM_SD,
-+				  dev->scatter_buffer_va,
-+				  dev->scatter_buffer_pa);
-+}
-+
-+/*
-+ * when this function is called.
-+ * preemption or interrupt must be disabled
-+ */
-+static u32 crypto4xx_get_n_sd(struct crypto4xx_device *dev, int n)
-+{
-+	u32 retval;
-+	u32 tmp;
-+
-+	if (n >= PPC4XX_NUM_SD)
-+		return ERING_WAS_FULL;
-+
-+	retval = dev->sdr_head;
-+	tmp = (dev->sdr_head + n) % PPC4XX_NUM_SD;
-+	if (dev->sdr_head > dev->gdr_tail) {
-+		if (tmp < dev->sdr_head && tmp >= dev->sdr_tail)
-+			return ERING_WAS_FULL;
-+	} else if (dev->sdr_head < dev->sdr_tail) {
-+		if (tmp < dev->sdr_head || tmp >= dev->sdr_tail)
-+			return ERING_WAS_FULL;
-+	} /* the head = tail, or empty case is already take cared */
-+	dev->sdr_head = tmp;
-+
-+	return retval;
-+}
-+
-+static u32 crypto4xx_put_sd_to_sdr(struct crypto4xx_device *dev)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&dev->core_dev->lock, flags);
-+	if (dev->sdr_tail == dev->sdr_head) {
-+		spin_unlock_irqrestore(&dev->core_dev->lock, flags);
++	if (count =3D=3D 0 || mpi_is_zero(X))
 +		return 0;
-+	}
-+	if (dev->sdr_tail != PPC4XX_LAST_SD)
-+		dev->sdr_tail++;
-+	else
-+		dev->sdr_tail = 0;
-+	spin_unlock_irqrestore(&dev->core_dev->lock, flags);
 +
++	v0 =3D count / biL;
++	v1 =3D count % biL;
++	bits =3D mpi_sbits(X);
++
++	if (mpi_grow(X, DIV_ROUND_UP(bits + count, BITS_PER_LONG)))
++		return -ENOMEM;
++
++	if (v1 =3D=3D 0) {
++		memmove(X->p + v0, X->p, (X->len - v0) * ciL);
++	} else {
++		unsigned long limb, rest =3D 0;
++
++		for (i =3D X->len - 1; i >=3D 0; i--) {
++			limb =3D X->p[i];
++			X->p[i + v0 + 1] =3D rest | (limb >> (biL - v1));
++			rest             =3D limb << v1;
++		}
++		X->p[v0] =3D rest;
++	}
++	memset(X->p, 0, v0 * ciL);
++	X->len =3D DIV_ROUND_UP(bits + count, BITS_PER_LONG);
 +	return 0;
 +}
++EXPORT_SYMBOL_GPL(mpi_shift_l);
 +
-+static inline struct ce_sd *crypto4xx_get_sdp(struct crypto4xx_device *dev,
-+					      dma_addr_t *sd_dma, u32 idx)
++void mpi_shift_r(struct mpi *X, int count)
 +{
-+	*sd_dma = dev->sdr_pa + sizeof(struct ce_sd) * idx;
++	int i, v0, v1, bits;
 +
-+	return  (struct ce_sd *)(dev->sdr + sizeof(struct ce_sd) * idx);
++	if (count =3D=3D 0)
++		return;
++
++	bits =3D mpi_sbits(X);
++	if (count >=3D bits) {
++		mpi_zero(X);
++		return;
++	}
++
++	v0 =3D count / biL;
++	v1 =3D count % biL;
++
++	if (v1 =3D=3D 0) {
++		memmove(X->p, X->p + v0, (X->len - v0) * ciL);
++	} else {
++		unsigned long limb, rest =3D X->p[v0] >> v1;
++
++		for (i =3D 0; i < X->len - v0 - 1; i++) {
++			limb    =3D X->p[i + v0 + 1];
++			X->p[i] =3D rest | (limb << (biL - v1));
++			rest    =3D limb >> v1;
++		}
++	}
++	mpi_setlen(X, DIV_ROUND_UP(bits - count, BITS_PER_LONG), 0);
 +}
++EXPORT_SYMBOL_GPL(mpi_shift_r);
 +
-+static u32 crypto4xx_fill_one_page(struct crypto4xx_device *dev,
-+				   dma_addr_t *addr, u32 *length,
-+				   u32 *idx, u32 *offset, u32 *nbytes)
++static int mpi_cmp_abs(const struct mpi *X, const struct mpi *Y)
 +{
-+	u32 len;
++	int xl =3D X->len;
 +
-+	if (*length > dev->scatter_buffer_size) {
-+		memcpy(phys_to_virt(*addr),
-+			dev->scatter_buffer_va +
-+			*idx * dev->scatter_buffer_size + *offset,
-+			dev->scatter_buffer_size);
-+		*offset = 0;
-+		*length -= dev->scatter_buffer_size;
-+		*nbytes -= dev->scatter_buffer_size;
-+		if (*idx == PPC4XX_LAST_SD)
-+			*idx = 0;
-+		else
-+			(*idx)++;
-+		*addr = *addr +  dev->scatter_buffer_size;
++	if (xl > Y->len)
 +		return 1;
-+	} else if (*length < dev->scatter_buffer_size) {
-+		memcpy(phys_to_virt(*addr),
-+			dev->scatter_buffer_va +
-+			*idx * dev->scatter_buffer_size + *offset, *length);
-+		if ((*offset + *length) == dev->scatter_buffer_size) {
-+			if (*idx == PPC4XX_LAST_SD)
-+				*idx = 0;
-+			else
-+				(*idx)++;
-+			*nbytes -= *length;
-+			*offset = 0;
-+		} else {
-+			*nbytes -= *length;
-+			*offset += *length;
-+		}
++	if (Y->len > xl)
++		return -1;
 +
-+		return 0;
-+	} else {
-+		len = (*nbytes <= dev->scatter_buffer_size) ?
-+				(*nbytes) : dev->scatter_buffer_size;
-+		memcpy(phys_to_virt(*addr),
-+			dev->scatter_buffer_va +
-+			*idx * dev->scatter_buffer_size + *offset,
-+			len);
-+		*offset = 0;
-+		*nbytes -= len;
-+
-+		if (*idx == PPC4XX_LAST_SD)
-+			*idx = 0;
-+		else
-+			(*idx)++;
-+
-+		return 0;
-+    }
-+}
-+
-+static void crypto4xx_copy_pkt_to_dst(struct crypto4xx_device *dev,
-+				      struct ce_pd *pd,
-+				      struct pd_uinfo *pd_uinfo,
-+				      u32 nbytes,
-+				      struct scatterlist *dst)
-+{
-+	dma_addr_t addr;
-+	u32 this_sd;
-+	u32 offset;
-+	u32 len;
-+	u32 i;
-+	u32 sg_len;
-+	struct scatterlist *sg;
-+
-+	this_sd = pd_uinfo->first_sd;
-+	offset = 0;
-+	i = 0;
-+
-+	while (nbytes) {
-+		sg = &dst[i];
-+		sg_len = sg->length;
-+		addr = dma_map_page(dev->core_dev->device, sg_page(sg),
-+				sg->offset, sg->length, DMA_TO_DEVICE);
-+
-+		if (offset == 0) {
-+			len = (nbytes <= sg->length) ? nbytes : sg->length;
-+			while (crypto4xx_fill_one_page(dev, &addr, &len,
-+				&this_sd, &offset, &nbytes))
-+				;
-+			if (!nbytes)
-+				return;
-+			i++;
-+		} else {
-+			len = (nbytes <= (dev->scatter_buffer_size - offset)) ?
-+				nbytes : (dev->scatter_buffer_size - offset);
-+			len = (sg->length < len) ? sg->length : len;
-+			while (crypto4xx_fill_one_page(dev, &addr, &len,
-+					       &this_sd, &offset, &nbytes))
-+				;
-+			if (!nbytes)
-+				return;
-+			sg_len -= len;
-+			if (sg_len) {
-+				addr += len;
-+				while (crypto4xx_fill_one_page(dev, &addr,
-+					&sg_len, &this_sd, &offset, &nbytes))
-+					;
-+			}
-+			i++;
-+		}
-+	}
-+}
-+
-+static u32 crypto4xx_copy_digest_to_dst(struct pd_uinfo *pd_uinfo,
-+					struct crypto4xx_ctx *ctx)
-+{
-+	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *) ctx->sa_in;
-+	struct sa_state_record *state_record =
-+				(struct sa_state_record *) pd_uinfo->sr_va;
-+
-+	if (sa->sa_command_0.bf.hash_alg == SA_HASH_ALG_SHA1) {
-+		memcpy((void *) pd_uinfo->dest_va, state_record->save_digest,
-+		       SA_HASH_ALG_SHA1_DIGEST_SIZE);
++	while (xl-- > 0) {
++		if (X->p[xl] > Y->p[xl])
++			return 1;
++		if (X->p[xl] < Y->p[xl])
++			return -1;
 +	}
 +
 +	return 0;
 +}
 +
-+static void crypto4xx_ret_sg_desc(struct crypto4xx_device *dev,
-+				  struct pd_uinfo *pd_uinfo)
++int mpi_cmp(const struct mpi *X, const struct mpi *Y)
 +{
-+	int i;
-+	if (pd_uinfo->num_gd) {
-+		for (i = 0; i < pd_uinfo->num_gd; i++)
-+			crypto4xx_put_gd_to_gdr(dev);
-+		pd_uinfo->first_gd = 0xffffffff;
-+		pd_uinfo->num_gd = 0;
++	int xl =3D X->len;
++	int sign =3D 1 - 2 * X->sign;
++
++	if (X->sign !=3D Y->sign)
++		return sign;
++
++	if (xl > Y->len)
++		return sign;
++	if (Y->len > xl)
++		return -sign;
++
++	while (xl-- > 0) {
++		if (X->p[xl] > Y->p[xl])
++			return sign;
++		if (X->p[xl] < Y->p[xl])
++			return -sign;
 +	}
-+	if (pd_uinfo->num_sd) {
-+		for (i = 0; i < pd_uinfo->num_sd; i++)
-+			crypto4xx_put_sd_to_sdr(dev);
-+
-+		pd_uinfo->first_sd = 0xffffffff;
-+		pd_uinfo->num_sd = 0;
-+	}
-+}
-+
-+static u32 crypto4xx_ablkcipher_done(struct crypto4xx_device *dev,
-+				     struct pd_uinfo *pd_uinfo,
-+				     struct ce_pd *pd)
-+{
-+	struct crypto4xx_ctx *ctx;
-+	struct ablkcipher_request *ablk_req;
-+	struct scatterlist *dst;
-+	dma_addr_t addr;
-+
-+	ablk_req = ablkcipher_request_cast(pd_uinfo->async_req);
-+	ctx  = crypto_tfm_ctx(ablk_req->base.tfm);
-+
-+	if (pd_uinfo->using_sd) {
-+		crypto4xx_copy_pkt_to_dst(dev, pd, pd_uinfo, ablk_req->nbytes,
-+					  ablk_req->dst);
-+	} else {
-+		dst = pd_uinfo->dest_va;
-+		addr = dma_map_page(dev->core_dev->device, sg_page(dst),
-+				    dst->offset, dst->length, DMA_FROM_DEVICE);
-+	}
-+	crypto4xx_ret_sg_desc(dev, pd_uinfo);
-+	if (ablk_req->base.complete != NULL)
-+		ablk_req->base.complete(&ablk_req->base, 0);
-+
 +	return 0;
 +}
-+
-+static u32 crypto4xx_ahash_done(struct crypto4xx_device *dev,
-+				struct pd_uinfo *pd_uinfo)
++int mpi_cmp_int(const struct mpi *X, int y)
 +{
-+	struct crypto4xx_ctx *ctx;
-+	struct ahash_request *ahash_req;
-+
-+	ahash_req = ahash_request_cast(pd_uinfo->async_req);
-+	ctx  = crypto_tfm_ctx(ahash_req->base.tfm);
-+
-+	crypto4xx_copy_digest_to_dst(pd_uinfo,
-+				     crypto_tfm_ctx(ahash_req->base.tfm));
-+	crypto4xx_ret_sg_desc(dev, pd_uinfo);
-+	/* call user provided callback function x */
-+	if (ahash_req->base.complete != NULL)
-+		ahash_req->base.complete(&ahash_req->base, 0);
-+
-+	return 0;
++	struct mpi _Y =3D MPI_FROM_INT(y);
++	return mpi_cmp(X, &_Y);
 +}
++EXPORT_SYMBOL_GPL(mpi_cmp);
++EXPORT_SYMBOL_GPL(mpi_cmp_int);
 +
-+static u32 crypto4xx_pd_done(struct crypto4xx_device *dev, u32 idx)
-+{
-+	struct ce_pd *pd;
-+	struct pd_uinfo *pd_uinfo;
-+
-+	pd =  dev->pdr + sizeof(struct ce_pd)*idx;
-+	pd_uinfo = dev->pdr_uinfo + sizeof(struct pd_uinfo)*idx;
-+	if (crypto_tfm_alg_type(pd_uinfo->async_req->tfm) ==
-+			CRYPTO_ALG_TYPE_ABLKCIPHER)
-+		return crypto4xx_ablkcipher_done(dev, pd_uinfo, pd);
-+	else
-+		return crypto4xx_ahash_done(dev, pd_uinfo);
-+}
-+
-+/**
-+ * Note: Only use this function to copy items that is word aligned.
++/*
++ * Unsigned addition: X =3D |A| + |B|  (HAC 14.7)
 + */
-+void crypto4xx_memcpy_le(unsigned int *dst,
-+			 const unsigned char *buf,
-+			 int len)
++static int mpi_add_abs(struct mpi *X, const struct mpi *A, const struct mp=
+i *B)
 +{
-+	u8 *tmp;
-+	for (; len >= 4; buf += 4, len -= 4)
-+		*dst++ = cpu_to_le32(*(unsigned int *) buf);
++	unsigned long *x, *a, *b, c;
++	int i;
 +
-+	tmp = (u8 *)dst;
-+	switch (len) {
-+	case 3:
-+		*tmp++ = 0;
-+		*tmp++ = *(buf+2);
-+		*tmp++ = *(buf+1);
-+		*tmp++ = *buf;
-+		break;
-+	case 2:
-+		*tmp++ = 0;
-+		*tmp++ = 0;
-+		*tmp++ = *(buf+1);
-+		*tmp++ = *buf;
-+		break;
-+	case 1:
-+		*tmp++ = 0;
-+		*tmp++ = 0;
-+		*tmp++ = 0;
-+		*tmp++ = *buf;
-+		break;
-+	default:
-+		break;
++	if (B->len > A->len)
++		swap(A, B);
++
++	if (mpi_grow(X, A->len + 1))
++		return -ENOMEM;
++
++	a =3D A->p; b =3D B->p; x =3D X->p;
++
++	for (c =3D i =3D 0; i < B->len; i++, x++, a++, b++) {
++		*x  =3D *a + c;
++		c   =3D (*x < c) + (*x + *b < *b);
++		*x +=3D *b;
 +	}
-+}
-+
-+static void crypto4xx_stop_all(struct crypto4xx_core_device *core_dev)
-+{
-+	crypto4xx_destroy_pdr(core_dev->dev);
-+	crypto4xx_destroy_gdr(core_dev->dev);
-+	crypto4xx_destroy_sdr(core_dev->dev);
-+	dev_set_drvdata(core_dev->device, NULL);
-+	iounmap(core_dev->dev->ce_base);
-+	kfree(core_dev->dev);
-+	kfree(core_dev);
-+}
-+
-+void crypto4xx_return_pd(struct crypto4xx_device *dev,
-+			 u32 pd_entry, struct ce_pd *pd,
-+			 struct pd_uinfo *pd_uinfo)
-+{
-+	/* irq should be already disabled */
-+	dev->pdr_head = pd_entry;
-+	pd->pd_ctl.w = 0;
-+	pd->pd_ctl_len.w = 0;
-+	pd_uinfo->state = PD_ENTRY_FREE;
++	for (; c && i < A->len; i++, x++, a++) {
++		*x  =3D *a + c;
++		c   =3D (*x < c);
++	}
++	if (X !=3D A)
++		memcpy(x, a, (A->len - i) * ciL);
++	if (c)
++		*x  =3D c;
++	mpi_setlen(X, A->len + c, 0);
++	return 0;
 +}
 +
 +/*
-+ * derive number of elements in scatterlist
-+ * Shamlessly copy from talitos.c
++ * Unsigned substraction: X =3D |A| - |B|  (HAC 14.9)
++ * assumes |A| > |B|
 + */
-+static int get_sg_count(struct scatterlist *sg_list, int nbytes)
++static int mpi_sub_abs(struct mpi *X, const struct mpi *A, const struct mp=
+i *B)
 +{
-+	struct scatterlist *sg = sg_list;
-+	int sg_nents = 0;
-+
-+	while (nbytes) {
-+		sg_nents++;
-+		if (sg->length > nbytes)
-+			break;
-+		nbytes -= sg->length;
-+		sg = sg_next(sg);
-+	}
-+
-+	return sg_nents;
-+}
-+
-+static u32 get_next_gd(u32 current)
-+{
-+	if (current != PPC4XX_LAST_GD)
-+		return current + 1;
-+	else
-+		return 0;
-+}
-+
-+static u32 get_next_sd(u32 current)
-+{
-+	if (current != PPC4XX_LAST_SD)
-+		return current + 1;
-+	else
-+		return 0;
-+}
-+
-+u32 crypto4xx_build_pd(struct crypto_async_request *req,
-+		       struct crypto4xx_ctx *ctx,
-+		       struct scatterlist *src,
-+		       struct scatterlist *dst,
-+		       unsigned int datalen,
-+		       void *iv, u32 iv_len)
-+{
-+	struct crypto4xx_device *dev = ctx->dev;
-+	dma_addr_t addr, pd_dma, sd_dma, gd_dma;
-+	struct dynamic_sa_ctl *sa;
-+	struct scatterlist *sg;
-+	struct ce_gd *gd;
-+	struct ce_pd *pd;
-+	u32 num_gd, num_sd;
-+	u32 fst_gd = 0xffffffff;
-+	u32 fst_sd = 0xffffffff;
-+	u32 pd_entry;
-+	unsigned long flags;
-+	struct pd_uinfo *pd_uinfo = NULL;
-+	unsigned int nbytes = datalen, idx;
-+	unsigned int ivlen = 0;
-+	u32 gd_idx = 0;
-+
-+	/* figure how many gd is needed */
-+	num_gd = get_sg_count(src, datalen);
-+	if (num_gd == 1)
-+		num_gd = 0;
-+
-+	/* figure how many sd is needed */
-+	if (sg_is_last(dst) || ctx->is_hash) {
-+		num_sd = 0;
-+	} else {
-+		if (datalen > PPC4XX_SD_BUFFER_SIZE) {
-+			num_sd = datalen / PPC4XX_SD_BUFFER_SIZE;
-+			if (datalen % PPC4XX_SD_BUFFER_SIZE)
-+				num_sd++;
-+		} else {
-+			num_sd = 1;
-+		}
-+	}
-+
-+	/*
-+	 * The follow section of code needs to be protected
-+	 * The gather ring and scatter ring needs to be consecutive
-+	 * In case of run out of any kind of descriptor, the descriptor
-+	 * already got must be return the original place.
-+	 */
-+	spin_lock_irqsave(&dev->core_dev->lock, flags);
-+	if (num_gd) {
-+		fst_gd = crypto4xx_get_n_gd(dev, num_gd);
-+		if (fst_gd == ERING_WAS_FULL) {
-+			spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+			return -EAGAIN;
-+		}
-+	}
-+	if (num_sd) {
-+		fst_sd = crypto4xx_get_n_sd(dev, num_sd);
-+		if (fst_sd == ERING_WAS_FULL) {
-+			if (num_gd)
-+				dev->gdr_head = fst_gd;
-+			spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+			return -EAGAIN;
-+		}
-+	}
-+	pd_entry = crypto4xx_get_pd_from_pdr_nolock(dev);
-+	if (pd_entry == ERING_WAS_FULL) {
-+		if (num_gd)
-+			dev->gdr_head = fst_gd;
-+		if (num_sd)
-+			dev->sdr_head = fst_sd;
-+		spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+		return -EAGAIN;
-+	}
-+	spin_unlock_irqrestore(&dev->core_dev->lock, flags);
-+
-+	pd_uinfo = (struct pd_uinfo *)(dev->pdr_uinfo +
-+				       sizeof(struct pd_uinfo) * pd_entry);
-+	pd = crypto4xx_get_pdp(dev, &pd_dma, pd_entry);
-+	pd_uinfo->async_req = req;
-+	pd_uinfo->num_gd = num_gd;
-+	pd_uinfo->num_sd = num_sd;
-+
-+	if (iv_len || ctx->is_hash) {
-+		ivlen = iv_len;
-+		pd->sa = pd_uinfo->sa_pa;
-+		sa = (struct dynamic_sa_ctl *) pd_uinfo->sa_va;
-+		if (ctx->direction == DIR_INBOUND)
-+			memcpy(sa, ctx->sa_in, ctx->sa_len * 4);
-+		else
-+			memcpy(sa, ctx->sa_out, ctx->sa_len * 4);
-+
-+		memcpy((void *) sa + ctx->offset_to_sr_ptr,
-+			&pd_uinfo->sr_pa, 4);
-+
-+		if (iv_len)
-+			crypto4xx_memcpy_le(pd_uinfo->sr_va, iv, iv_len);
-+	} else {
-+		if (ctx->direction == DIR_INBOUND) {
-+			pd->sa = ctx->sa_in_dma_addr;
-+			sa = (struct dynamic_sa_ctl *) ctx->sa_in;
-+		} else {
-+			pd->sa = ctx->sa_out_dma_addr;
-+			sa = (struct dynamic_sa_ctl *) ctx->sa_out;
-+		}
-+	}
-+	pd->sa_len = ctx->sa_len;
-+	if (num_gd) {
-+		/* get first gd we are going to use */
-+		gd_idx = fst_gd;
-+		pd_uinfo->first_gd = fst_gd;
-+		pd_uinfo->num_gd = num_gd;
-+		gd = crypto4xx_get_gdp(dev, &gd_dma, gd_idx);
-+		pd->src = gd_dma;
-+		/* enable gather */
-+		sa->sa_command_0.bf.gather = 1;
-+		idx = 0;
-+		src = &src[0];
-+		/* walk the sg, and setup gather array */
-+		while (nbytes) {
-+			sg = &src[idx];
-+			addr = dma_map_page(dev->core_dev->device, sg_page(sg),
-+				    sg->offset, sg->length, DMA_TO_DEVICE);
-+			gd->ptr = addr;
-+			gd->ctl_len.len = sg->length;
-+			gd->ctl_len.done = 0;
-+			gd->ctl_len.ready = 1;
-+			if (sg->length >= nbytes)
-+				break;
-+			nbytes -= sg->length;
-+			gd_idx = get_next_gd(gd_idx);
-+			gd = crypto4xx_get_gdp(dev, &gd_dma, gd_idx);
-+			idx++;
-+		}
-+	} else {
-+		pd->src = (u32)dma_map_page(dev->core_dev->device, sg_page(src),
-+				src->offset, src->length, DMA_TO_DEVICE);
-+		/*
-+		 * Disable gather in sa command
-+		 */
-+		sa->sa_command_0.bf.gather = 0;
-+		/*
-+		 * Indicate gather array is not used
-+		 */
-+		pd_uinfo->first_gd = 0xffffffff;
-+		pd_uinfo->num_gd = 0;
-+	}
-+	if (ctx->is_hash || sg_is_last(dst)) {
-+		/*
-+		 * we know application give us dst a whole piece of memory
-+		 * no need to use scatter ring.
-+		 * In case of is_hash, the icv is always at end of src data.
-+		 */
-+		pd_uinfo->using_sd = 0;
-+		pd_uinfo->first_sd = 0xffffffff;
-+		pd_uinfo->num_sd = 0;
-+		pd_uinfo->dest_va = dst;
-+		sa->sa_command_0.bf.scatter = 0;
-+		if (ctx->is_hash)
-+			pd->dest = virt_to_phys((void *)dst);
-+		else
-+			pd->dest = (u32)dma_map_page(dev->core_dev->device,
-+					sg_page(dst), dst->offset,
-+					dst->length, DMA_TO_DEVICE);
-+	} else {
-+		struct ce_sd *sd = NULL;
-+		u32 sd_idx = fst_sd;
-+		nbytes = datalen;
-+		sa->sa_command_0.bf.scatter = 1;
-+		pd_uinfo->using_sd = 1;
-+		pd_uinfo->dest_va = dst;
-+		pd_uinfo->first_sd = fst_sd;
-+		pd_uinfo->num_sd = num_sd;
-+		sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
-+		pd->dest = sd_dma;
-+		/* setup scatter descriptor */
-+		sd->ctl.done = 0;
-+		sd->ctl.rdy = 1;
-+		/* sd->ptr should be setup by sd_init routine*/
-+		idx = 0;
-+		if (nbytes >= PPC4XX_SD_BUFFER_SIZE)
-+			nbytes -= PPC4XX_SD_BUFFER_SIZE;
-+		else
-+			nbytes = 0;
-+		while (nbytes) {
-+			sd_idx = get_next_sd(sd_idx);
-+			sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
-+			/* setup scatter descriptor */
-+			sd->ctl.done = 0;
-+			sd->ctl.rdy = 1;
-+			if (nbytes >= PPC4XX_SD_BUFFER_SIZE)
-+				nbytes -= PPC4XX_SD_BUFFER_SIZE;
-+			else
-+				/*
-+				 * SD entry can hold PPC4XX_SD_BUFFER_SIZE,
-+				 * which is more than nbytes, so done.
-+				 */
-+				nbytes = 0;
-+		}
-+	}
-+
-+	sa->sa_command_1.bf.hash_crypto_offset = 0;
-+	pd->pd_ctl.w = ctx->pd_ctl;
-+	pd->pd_ctl_len.w = 0x00400000 | (ctx->bypass << 24) | datalen;
-+	pd_uinfo->state = PD_ENTRY_INUSE;
-+	wmb();
-+	/* write any value to push engine to read a pd */
-+	writel(1, dev->ce_base + CRYPTO4XX_INT_DESCR_RD);
-+	return -EINPROGRESS;
-+}
-+
-+/**
-+ * Algorithm Registration Functions
-+ */
-+static int crypto4xx_alg_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_alg *alg = tfm->__crt_alg;
-+	struct crypto4xx_alg *amcc_alg = crypto_alg_to_crypto4xx_alg(alg);
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->dev = amcc_alg->dev;
-+	ctx->sa_in = NULL;
-+	ctx->sa_out = NULL;
-+	ctx->sa_in_dma_addr = 0;
-+	ctx->sa_out_dma_addr = 0;
-+	ctx->sa_len = 0;
-+
-+	if (alg->cra_type == &crypto_ablkcipher_type)
-+		tfm->crt_ablkcipher.reqsize = sizeof(struct crypto4xx_ctx);
-+	else if (alg->cra_type == &crypto_ahash_type)
-+		tfm->crt_ahash.reqsize = sizeof(struct crypto4xx_ctx);
-+
-+	return 0;
-+}
-+
-+static void crypto4xx_alg_exit(struct crypto_tfm *tfm)
-+{
-+	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto4xx_free_sa(ctx);
-+	crypto4xx_free_state_record(ctx);
-+}
-+
-+int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
-+			   struct crypto_alg *crypto_alg, int array_size)
-+{
-+	struct crypto4xx_alg *alg;
++	unsigned long *x, *a, *b, c;
 +	int i;
-+	int rc = 0;
 +
-+	for (i = 0; i < array_size; i++) {
-+		alg = kzalloc(sizeof(struct crypto4xx_alg), GFP_KERNEL);
-+		if (!alg)
-+			return -ENOMEM;
-+
-+		alg->alg = crypto_alg[i];
-+		INIT_LIST_HEAD(&alg->alg.cra_list);
-+		if (alg->alg.cra_init == NULL)
-+			alg->alg.cra_init = crypto4xx_alg_init;
-+		if (alg->alg.cra_exit == NULL)
-+			alg->alg.cra_exit = crypto4xx_alg_exit;
-+		alg->dev = sec_dev;
-+		rc = crypto_register_alg(&alg->alg);
-+		if (rc) {
-+			list_del(&alg->entry);
-+			kfree(alg);
-+		} else {
-+			list_add_tail(&alg->entry, &sec_dev->alg_list);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
-+{
-+	struct crypto4xx_alg *alg, *tmp;
-+
-+	list_for_each_entry_safe(alg, tmp, &sec_dev->alg_list, entry) {
-+		list_del(&alg->entry);
-+		crypto_unregister_alg(&alg->alg);
-+		kfree(alg);
-+	}
-+}
-+
-+static void crypto4xx_bh_tasklet_cb(unsigned long data)
-+{
-+	struct device *dev = (struct device *)data;
-+	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
-+	struct pd_uinfo *pd_uinfo;
-+	struct ce_pd *pd;
-+	u32 tail;
-+
-+	while (core_dev->dev->pdr_head != core_dev->dev->pdr_tail) {
-+		tail = core_dev->dev->pdr_tail;
-+		pd_uinfo = core_dev->dev->pdr_uinfo +
-+			sizeof(struct pd_uinfo)*tail;
-+		pd =  core_dev->dev->pdr + sizeof(struct ce_pd) * tail;
-+		if ((pd_uinfo->state == PD_ENTRY_INUSE) &&
-+				   pd->pd_ctl.bf.pe_done &&
-+				   !pd->pd_ctl.bf.host_ready) {
-+			pd->pd_ctl.bf.pe_done = 0;
-+			crypto4xx_pd_done(core_dev->dev, tail);
-+			crypto4xx_put_pd_to_pdr(core_dev->dev, tail);
-+			pd_uinfo->state = PD_ENTRY_FREE;
-+		} else {
-+			/* if tail not done, break */
-+			break;
-+		}
-+	}
-+}
-+
-+/**
-+ * Top Half of isr.
-+ */
-+static irqreturn_t crypto4xx_ce_interrupt_handler(int irq, void *data)
-+{
-+	struct device *dev = (struct device *)data;
-+	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
-+
-+	if (core_dev->dev->ce_base == 0)
-+		return 0;
-+
-+	writel(PPC4XX_INTERRUPT_CLR,
-+	       core_dev->dev->ce_base + CRYPTO4XX_INT_CLR);
-+	tasklet_schedule(&core_dev->tasklet);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+/**
-+ * Supported Crypto Algorithms
-+ */
-+struct crypto_alg crypto4xx_alg[] = {
-+	/* Crypto AES modes */
-+	{
-+		.cra_name 	= "cbc(aes)",
-+		.cra_driver_name = "cbc-aes-ppc4xx",
-+		.cra_priority 	= CRYPTO4XX_CRYPTO_PRIORITY,
-+		.cra_flags 	= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-+		.cra_blocksize 	= AES_BLOCK_SIZE,
-+		.cra_ctxsize 	= sizeof(struct crypto4xx_ctx),
-+		.cra_alignmask 	= 0,
-+		.cra_type 	= &crypto_ablkcipher_type,
-+		.cra_module 	= THIS_MODULE,
-+		.cra_u 		= {
-+			.ablkcipher = {
-+				.min_keysize 	= AES_MIN_KEY_SIZE,
-+				.max_keysize 	= AES_MAX_KEY_SIZE,
-+				.ivsize		= AES_IV_SIZE,
-+				.setkey 	= crypto4xx_setkey_aes_cbc,
-+				.encrypt 	= crypto4xx_encrypt,
-+				.decrypt 	= crypto4xx_decrypt,
-+			}
-+		}
-+	},
-+	/* Hash SHA1 */
-+	{
-+		.cra_name	= "sha1",
-+		.cra_driver_name = "sha1-ppc4xx",
-+		.cra_priority	= CRYPTO4XX_CRYPTO_PRIORITY,
-+		.cra_flags	= CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
-+		.cra_blocksize	= SHA1_BLOCK_SIZE,
-+		.cra_ctxsize	= sizeof(struct crypto4xx_ctx),
-+		.cra_alignmask	= 0,
-+		.cra_type	= &crypto_ahash_type,
-+		.cra_init	= crypto4xx_sha1_alg_init,
-+		.cra_module	= THIS_MODULE,
-+		.cra_u		= {
-+			.ahash = {
-+				.digestsize 	= SHA1_DIGEST_SIZE,
-+				.init		= crypto4xx_hash_init,
-+				.update		= crypto4xx_hash_update,
-+				.final  	= crypto4xx_hash_final,
-+				.digest 	= crypto4xx_hash_digest,
-+			}
-+		}
-+	},
-+};
-+
-+/**
-+ * Module Initialization Routine
-+ */
-+static int __init crypto4xx_probe(struct of_device *ofdev,
-+				  const struct of_device_id *match)
-+{
-+	int rc;
-+	struct resource res;
-+	struct device *dev = &ofdev->dev;
-+	struct crypto4xx_core_device *core_dev;
-+
-+	rc = of_address_to_resource(ofdev->node, 0, &res);
-+	if (rc)
-+		return -ENODEV;
-+
-+	if (of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) {
-+		mtdcri(SDR0, PPC460EX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC460EX_SDR0_SRST) | PPC460EX_CE_RESET);
-+		mtdcri(SDR0, PPC460EX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC460EX_SDR0_SRST) & ~PPC460EX_CE_RESET);
-+	} else if (of_find_compatible_node(NULL, NULL,
-+			"amcc,ppc405ex-crypto")) {
-+		mtdcri(SDR0, PPC405EX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC405EX_SDR0_SRST) | PPC405EX_CE_RESET);
-+		mtdcri(SDR0, PPC405EX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC405EX_SDR0_SRST) & ~PPC405EX_CE_RESET);
-+	} else if (of_find_compatible_node(NULL, NULL,
-+			"amcc,ppc460sx-crypto")) {
-+		mtdcri(SDR0, PPC460SX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC460SX_SDR0_SRST) | PPC460SX_CE_RESET);
-+		mtdcri(SDR0, PPC460SX_SDR0_SRST,
-+		       mfdcri(SDR0, PPC460SX_SDR0_SRST) & ~PPC460SX_CE_RESET);
-+	} else {
-+		printk(KERN_ERR "Crypto Function Not supported!\n");
-+		return -EINVAL;
-+	}
-+
-+	core_dev = kzalloc(sizeof(struct crypto4xx_core_device), GFP_KERNEL);
-+	if (!core_dev)
++	if (mpi_grow(X, A->len))
 +		return -ENOMEM;
 +
-+	dev_set_drvdata(dev, core_dev);
-+	core_dev->ofdev = ofdev;
-+	core_dev->dev = kzalloc(sizeof(struct crypto4xx_device), GFP_KERNEL);
-+	if (!core_dev->dev)
-+		goto err_alloc_dev;
++	a =3D A->p; b =3D B->p; x =3D X->p;
 +
-+	core_dev->dev->core_dev = core_dev;
-+	core_dev->device = dev;
-+	spin_lock_init(&core_dev->lock);
-+	INIT_LIST_HEAD(&core_dev->dev->alg_list);
-+	rc = crypto4xx_build_pdr(core_dev->dev);
-+	if (rc)
-+		goto err_build_pdr;
++	for (c =3D i =3D 0; i < B->len; i++, x++, a++, b++) {
++		*x  =3D *a - c;
++		c   =3D (*a < c) + (*x < *b);
++		*x  =3D *x - *b;
++	}
++	for (; c && i < A->len; i++, x++, a++) {
++		*x  =3D *a - c;
++		c   =3D (*a < c);
++	}
++	if (X !=3D A)
++		memcpy(x, a, (A->len - i) * ciL);
++	mpi_setlen(X, A->len, 1);
++	return 0;
++}
 +
-+	rc = crypto4xx_build_gdr(core_dev->dev);
-+	if (rc)
-+		goto err_build_gdr;
++static int mpi_add_or_sub(struct mpi *X, const struct mpi *A,
++			  const struct mpi *B, int is_add)
++{
++	int ret;
 +
-+	rc = crypto4xx_build_sdr(core_dev->dev);
-+	if (rc)
-+		goto err_build_sdr;
-+
-+	/* Init tasklet for bottom half processing */
-+	tasklet_init(&core_dev->tasklet, crypto4xx_bh_tasklet_cb,
-+		     (unsigned long) dev);
-+
-+	/* Register for Crypto isr, Crypto Engine IRQ */
-+	core_dev->irq = irq_of_parse_and_map(ofdev->node, 0);
-+	rc = request_irq(core_dev->irq, crypto4xx_ce_interrupt_handler, 0,
-+			 core_dev->dev->name, dev);
-+	if (rc)
-+		goto err_request_irq;
-+
-+	core_dev->dev->ce_base = of_iomap(ofdev->node, 0);
-+	if (!core_dev->dev->ce_base) {
-+		dev_err(dev, "failed to of_iomap\n");
-+		goto err_iomap;
++	if ((A->sign =3D=3D B->sign) =3D=3D is_add) {
++		ret =3D mpi_add_abs(X, A, B);
++		X->sign =3D A->sign;
++	} else {
++		ret =3D mpi_cmp_abs(A, B);
++		if (ret > 0) {
++			ret =3D mpi_sub_abs(X, A, B);
++			X->sign =3D A->sign;
++		} else if (ret < 0) {
++			ret =3D mpi_sub_abs(X, B, A);
++			X->sign =3D A->sign ^ 1;
++		} else {
++			mpi_zero(X);
++		}
 +	}
 +
-+	/* need to setup pdr, rdr, gdr and sdr before this */
-+	crypto4xx_hw_init(core_dev->dev);
++	return ret;
++}
 +
-+	/* Register security algorithms with Linux CryptoAPI */
-+	rc = crypto4xx_register_alg(core_dev->dev, crypto4xx_alg,
-+			       ARRAY_SIZE(crypto4xx_alg));
-+	if (rc)
-+		goto err_start_dev;
++int mpi_add(struct mpi *X, const struct mpi *A, const struct mpi *B)
++{
++	return mpi_add_or_sub(X, A, B, 1);
++}
++int mpi_add_int(struct mpi *X, const struct mpi *A, int b)
++{
++	struct mpi _B =3D MPI_FROM_INT(b);
++	return mpi_add(X, A, &_B);
++}
++int mpi_sub(struct mpi *X, const struct mpi *A, const struct mpi *B)
++{
++	return mpi_add_or_sub(X, A, B, 0);
++}
++int mpi_sub_int(struct mpi *X, const struct mpi *A, int b)
++{
++	struct mpi _B =3D MPI_FROM_INT(b);
++	return mpi_sub(X, A, &_B);
++}
++EXPORT_SYMBOL_GPL(mpi_add);
++EXPORT_SYMBOL_GPL(mpi_add_int);
++EXPORT_SYMBOL_GPL(mpi_sub);
++EXPORT_SYMBOL_GPL(mpi_sub_int);
 +
++/*
++ * A /=3D 2; while (A is even) A /=3D 2
++ * Assumes A is non zero and positive
++ */
++static void mpi_gcd_hlp(struct mpi *A)
++{
++	if (A->len =3D=3D 1 && A->p[0] =3D=3D 1) {
++		mpi_zero(A);
++	} else {
++		A->p[0] &=3D ~1UL;
++		mpi_shift_r(A, mpi_ctz(A));
++	}
++}
++int mpi_gcd(struct mpi *G, const struct mpi *A, const struct mpi *B)
++{
++	struct mpi X =3D MPI_INIT, Y =3D MPI_INIT;
++	int ret, lzx, lzy;
++
++	if (mpi_is_zero(A) || mpi_is_zero(B))
++		return -EINVAL;
++
++	lzx =3D mpi_ctz(A);
++	lzy =3D mpi_ctz(B);
++	MPI_CHK(mpi_copy(&X, A));
++	MPI_CHK(mpi_copy(&Y, B));
++	X.sign =3D Y.sign =3D 0;
++	mpi_shift_r(&X, lzx);
++	mpi_shift_r(&Y, lzy);
++
++	while (!mpi_is_zero(&X)) {
++		ret =3D mpi_cmp_abs(&X, &Y);
++		if (ret > 0) {
++			mpi_sub_abs(&X, &X, &Y);
++			mpi_gcd_hlp(&X);
++		} else if (ret < 0) {
++			mpi_sub_abs(&Y, &Y, &X);
++			mpi_gcd_hlp(&Y);
++		} else
++			break;
++	}
++
++	mpi_shift_l(&Y, lzx < lzy ? lzx : lzy);
++	swap(*G, Y);
++
++cleanup:
++	mpi_destroy(&Y);
++	mpi_destroy(&X);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(mpi_gcd);
++
++static void mpi_mul_hlp(int i, unsigned long *s, unsigned long *d, unsigne=
+d long b)
++{
++	unsigned long c =3D 0, t =3D 0;
++
++	if (i & 1) {
++		MPI_MULADDC_INIT; MPI_MULADDC_CORE; MPI_MULADDC_STOP;
++	}
++	if (i & 2) {
++		MPI_MULADDC_INIT; MPI_MULADDC_CORE2; MPI_MULADDC_STOP;
++	}
++	if (i & 4) {
++		MPI_MULADDC_INIT; MPI_MULADDC_CORE4; MPI_MULADDC_STOP;
++	}
++	for (i /=3D 8; i >=3D 0; i--) {
++		MPI_MULADDC_INIT; MPI_MULADDC_CORE8; MPI_MULADDC_STOP;
++	}
++
++	/* may be used by asm code and gcc isn't too clever about it */
++	t =3D t;
++	do {
++		*d +=3D c; c =3D (*d < c); d++;
++	} while (c);
++}
++
++int mpi_mul(struct mpi *X, const struct mpi *A, const struct mpi *B)
++{
++	struct mpi T =3D MPI_INIT;
++	int al, bl, i;
++
++	if (A->len < B->len)
++		swap(A, B);
++
++	al =3D A->len;
++	bl =3D B->len;
++	if (mpi_grow(X, al + bl))
++		return -ENOMEM;
++
++	if (X =3D=3D A) {
++		T =3D *A;
++		A =3D &T;
++		mpi_init(X);
++	} else if (X =3D=3D B) {
++		T =3D *B;
++		B =3D &T;
++		mpi_init(X);
++	} else {
++		mpi_zero(X);
++	}
++
++	for (i =3D bl - 1; i >=3D 0; i--)
++		mpi_mul_hlp(al, A->p, X->p + i, B->p[i]);
++
++	X->sign =3D A->sign ^ B->sign;
++	mpi_setlen(X, al + bl, 1);
++	kfree(T.p);
 +	return 0;
++}
++EXPORT_SYMBOL_GPL(mpi_mul);
 +
-+err_start_dev:
-+	iounmap(core_dev->dev->ce_base);
-+err_iomap:
-+	free_irq(core_dev->irq, dev);
-+	irq_dispose_mapping(core_dev->irq);
-+	tasklet_kill(&core_dev->tasklet);
-+err_request_irq:
-+	crypto4xx_destroy_sdr(core_dev->dev);
-+err_build_sdr:
-+	crypto4xx_destroy_gdr(core_dev->dev);
-+err_build_gdr:
-+	crypto4xx_destroy_pdr(core_dev->dev);
-+err_build_pdr:
-+	kfree(core_dev->dev);
-+err_alloc_dev:
-+	kfree(core_dev);
++/*
++ * Baseline multiplication: X =3D A * b
++ */
++static int mpi_mul_ulong(struct mpi *X, struct mpi *A, unsigned long b)
++{
++	unsigned long p[1] =3D { b };
++	struct mpi B =3D { .sign =3D 0, .len =3D 1, .p =3D p };
 +
-+	return rc;
++	return mpi_mul(X, A, &B);
 +}
 +
-+static int __exit crypto4xx_remove(struct of_device *ofdev)
++/*
++ * Division by struct mpi: A =3D Q * B + R  (HAC 14.20)
++ */
++int mpi_div(struct mpi *Q, struct mpi *R, const struct mpi *A, const struc=
+t mpi *B)
 +{
-+	struct device *dev = &ofdev->dev;
-+	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
++	struct mpi X  =3D MPI_INIT, Y  =3D MPI_INIT, Z =3D MPI_INIT;
++	struct mpi T1 =3D MPI_INIT, T2 =3D MPI_INIT;
++	int ret =3D -ENOMEM, i, xl, yl, lambda;
 +
-+	free_irq(core_dev->irq, dev);
-+	irq_dispose_mapping(core_dev->irq);
++	if (mpi_is_zero(B))
++		return -EINVAL;
 +
-+	tasklet_kill(&core_dev->tasklet);
-+	/* Un-register with Linux CryptoAPI */
-+	crypto4xx_unregister_alg(core_dev->dev);
-+	/* Free all allocated memory */
-+	crypto4xx_stop_all(core_dev);
++	if (mpi_cmp_abs(A, B) < 0) {
++		if (Q)
++			mpi_zero(Q);
++		return R ? mpi_copy(R, A) : 0;
++	}
 +
++	MPI_CHK(mpi_copy(&X, A));
++	MPI_CHK(mpi_copy(&Y, B));
++	X.sign =3D Y.sign =3D 0;
++
++	MPI_CHK(mpi_grow(&Z, A->len - B->len + 2));
++	MPI_CHK(mpi_grow(&T1, 2));
++	MPI_CHK(mpi_grow(&T2, 3));
++
++	/* HAC 14.23: normalization */
++	lambda =3D __builtin_clzl(Y.p[Y.len - 1]);
++	if (lambda) {
++		MPI_CHK(mpi_shift_l(&X, lambda));
++		MPI_CHK(mpi_shift_l(&Y, lambda));
++	}
++
++	xl =3D X.len;
++	yl =3D Y.len;
++	mpi_shift_l(&Y, biL * (xl - yl));
++
++	while (mpi_cmp(&X, &Y) >=3D 0) {
++		Z.p[xl - yl]++;
++		mpi_sub(&X, &X, &Y);
++	}
++	mpi_shift_r(&Y, biL * (xl - yl));
++
++	for (i =3D xl - 1; i >=3D yl; i--) {
++		if (X.p[i] >=3D Y.p[yl - 1])
++			Z.p[i - yl] =3D ULONG_MAX;
++		else {
++#if (BITS_PER_LONG =3D=3D 32)
++			unsigned long long r;
++
++			r  =3D (unsigned long long)X.p[i] << biL;
++			r |=3D (unsigned long long)X.p[i - 1];
++			Z.p[i - yl] =3D r / Y.p[yl - 1];
++#else
++			/*
++			 * __udiv_qrnnd_c, from gmp/longlong.h
++			 */
++			unsigned long q0, q1, r0, r1;
++			unsigned long d0, d1, d, m;
++
++			d  =3D Y.p[yl];
++			d0 =3D (d << 32) >> 32;
++			d1 =3D (d >> 32);
++
++			q1 =3D X.p[i] / d1;
++			r1 =3D X.p[i] - d1 * q1;
++			r1 <<=3D 32;
++			r1 |=3D (X.p[i - 1] >> 32);
++
++			m =3D q1 * d0;
++			if (r1 < m) {
++				q1--, r1 +=3D d;
++				while (r1 >=3D d && r1 < m)
++					q1--, r1 +=3D d;
++			}
++			r1 -=3D m;
++
++			q0 =3D r1 / d1;
++			r0 =3D r1 - d1 * q0;
++			r0 <<=3D 32;
++			r0 |=3D (X.p[i - 1] << 32) >> 32;
++
++			m =3D q0 * d0;
++			if (r0 < m) {
++				q0--, r0 +=3D d;
++				while (r0 >=3D d && r0 < m)
++					q0--, r0 +=3D d;
++			}
++			r0 -=3D m;
++
++			Z.p[i - yl] =3D (q1 << 32) | q0;
++#endif
++		}
++
++		Z.p[i - yl]++;
++		do {
++			Z.p[i - yl]--;
++
++			mpi_zero(&T1);
++			T1.p[0] =3D (yl <=3D 1) ? 0 : Y.p[yl - 2];
++			T1.p[1] =3D Y.p[yl - 1];
++			mpi_setlen(&T1, 2, 1);
++			MPI_CHK(mpi_mul_ulong(&T1, &T1, Z.p[i - yl]));
++
++			mpi_zero(&T2);
++			T2.p[0] =3D (i < 2) ? 0 : X.p[i - 2];
++			T2.p[1] =3D (i < 1) ? 0 : X.p[i - 1];
++			T2.p[2] =3D X.p[i];
++			mpi_setlen(&T2, 3, 1);
++		} while (mpi_cmp(&T1, &T2) > 0);
++
++		MPI_CHK(mpi_mul_ulong(&T1, &Y, Z.p[i - yl]));
++		MPI_CHK(mpi_shift_l(&T1,  biL * (i - yl)));
++		MPI_CHK(mpi_sub(&X, &X, &T1));
++
++		if (X.sign) {
++			MPI_CHK(mpi_copy(&T1, &Y));
++			MPI_CHK(mpi_shift_l(&T1, biL * (i - yl)));
++			MPI_CHK(mpi_add(&X, &X, &T1));
++			Z.p[i - yl]--;
++		}
++	}
++
++	if (Q) {
++		mpi_setlen(&Z, Z.alloc, 1);
++		swap(*Q, Z);
++		Q->sign =3D A->sign ^ B->sign;
++	}
++
++	if (R) {
++		mpi_shift_r(&X, lambda);
++		swap(*R, X);
++		R->sign =3D mpi_is_zero(R) ? 0 : A->sign;
++	}
++	ret =3D 0;
++
++cleanup:
++	kfree(X.p);
++	kfree(Y.p);
++	kfree(Z.p);
++	kfree(T1.p);
++	kfree(T2.p);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(mpi_div);
++
++/*
++ * Modulo: R =3D A mod B
++ */
++int mpi_mod(struct mpi *R, const struct mpi *A, const struct mpi *B)
++{
++	int ret =3D mpi_div(NULL, R, A, B);
++
++	while (ret =3D=3D 0 && R->sign)
++		ret =3D mpi_add(R, R, B);
++
++	while (ret =3D=3D 0 && mpi_cmp(R, B) >=3D 0)
++		ret =3D mpi_sub(R, R, B);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(mpi_mod);
++
++/*
++ * Fast Montgomery initialization (thanks to Tom St Denis)
++ */
++static unsigned long mpi_montg_init(const struct mpi *N)
++{
++	unsigned long x, m0 =3D N->p[0];
++
++	x  =3D m0;
++	x +=3D ((m0 + 2) & 4) << 1;
++	x *=3D (2 - (m0 * x));
++	x *=3D (2 - (m0 * x));
++	x *=3D (2 - (m0 * x));
++#if (BITS_PER_LONG =3D=3D 64)
++	x *=3D (2 - (m0 * x));
++#endif
++	return ~x + 1;
++}
++
++/*
++ * Montgomery multiplication: A =3D A * B * R^-1 mod N  (HAC 14.36)
++ * T is a buffer that shall be N->len * 2 limbs big at least.
++ */
++static void mpi_montmul(struct mpi *A, const struct mpi *B, const struct m=
+pi *N,
++			unsigned long mm, struct mpi *T)
++{
++	int i, n, m;
++	unsigned long u0, u1, *d;
++
++	mpi_zero(T);
++
++	d =3D T->p;
++	n =3D N->len;
++	m =3D B->len < n ? B->len : n;
++
++	for (i =3D 0; i < n; i++) {
++		/*
++		 * T =3D (T + u0*B + u1*N) / 2^biL
++		 */
++		u0 =3D A->p[i];
++		u1 =3D (d[0] + u0 * B->p[0]) * mm;
++
++		mpi_mul_hlp(m, B->p, d, u0);
++		mpi_mul_hlp(n, N->p, d, u1);
++
++		*d++ =3D u0; d[n + 1] =3D 0;
++	}
++
++	memcpy(A->p, d, (n + 1) * ciL);
++	mpi_setlen(A, n + 1, 1);
++	mpi_setlen(T, T->alloc, 1);
++	if (mpi_cmp_abs(A, N) >=3D 0)
++		mpi_sub_abs(A, A, N);
++	else {
++		/* prevent timing attacks */
++		mpi_sub_abs(T, N, A);
++	}
++}
++
++/*
++ * Montgomery exponentiation: A =3D X^E mod N  (HAC 14.94)
++ */
++int mpi_exp_mod(struct mpi *A, const struct mpi *X, const struct mpi *E,
++		const struct mpi *N, struct mpi *_RR)
++{
++	struct mpi RR =3D MPI_INIT, _X =3D MPI_INIT, T =3D MPI_INIT;
++	unsigned long mm;
++	int ret, i;
++
++	MPI_CHK(mpi_grow(&T, N->len * 2));
++	mm =3D mpi_montg_init(N);
++
++	/* If 1st call, pre-compute R^2 mod N */
++	if (!_RR || !_RR->p) {
++		mpi_set_2pow(&RR, N->len * 2 * biL);
++		MPI_CHK(mpi_mod(&RR, &RR, N));
++		if (_RR)
++			*_RR =3D RR;
++	} else
++		RR =3D *_RR;
++
++	/* _X =3D X * R^2 * R^-1 mod N =3D X * R mod N */
++	MPI_CHK(mpi_mod(&_X, X, N));
++	mpi_montmul(&_X, &RR, N, mm, &T);
++
++	/* A =3D R^2 * R^-1 mod N =3D R mod N */
++	MPI_CHK(mpi_copy(A, &RR));
++	mpi_montmul(A, &ONE, N, mm, &T);
++
++	for (i =3D mpi_sbits(E) - 1; i >=3D 0; i--) {
++		mpi_montmul(A, A, N, mm, &T);
++		if (E->p[i / biL] & (1 << (i % biL)))
++			mpi_montmul(A, &_X, N, mm, &T);
++	}
++
++cleanup:
++	if (!_RR)
++		kfree(RR.p);
++	kfree(_X.p);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(mpi_exp_mod);
++
++static int __init crypto_bignum_init(void)
++{
 +	return 0;
 +}
 +
-+static struct of_device_id crypto4xx_match[] = {
-+	{ .compatible      = "amcc,ppc4xx-crypto",},
-+	{ },
-+};
-+
-+static struct of_platform_driver crypto4xx_driver = {
-+	.name		= "crypto4xx",
-+	.match_table	= crypto4xx_match,
-+	.probe		= crypto4xx_probe,
-+	.remove		= crypto4xx_remove,
-+};
-+
-+static int __init crypto4xx_init(void)
++static void __exit crypto_bignum_exit(void)
 +{
-+	return of_register_platform_driver(&crypto4xx_driver);
 +}
 +
-+static void __exit crypto4xx_exit(void)
-+{
-+	of_unregister_platform_driver(&crypto4xx_driver);
-+}
-+
-+module_init(crypto4xx_init);
-+module_exit(crypto4xx_exit);
++module_init(crypto_bignum_init);
++module_exit(crypto_bignum_exit);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("James Hsiao <jhsiao@amcc.com>");
-+MODULE_DESCRIPTION("Driver for AMCC PPC4xx crypto accelerator");
-+
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
++MODULE_DESCRIPTION("Multiple Precision Integers API");
++MODULE_AUTHOR("Pierre Habouzit <madcoder@debian.org>");
+diff --git a/include/asm-generic/bignum.h b/include/asm-generic/bignum.h
 new file mode 100644
-index 0000000..1ef1034
+index 0000000..91f003e
 --- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -0,0 +1,177 @@
-+/**
-+ * AMCC SoC PPC4xx Crypto Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * This is the header file for AMCC Crypto offload Linux device driver for
-+ * use with Linux CryptoAPI.
-+
-+ */
-+
-+#ifndef __CRYPTO4XX_CORE_H__
-+#define __CRYPTO4XX_CORE_H__
-+
-+#define PPC460SX_SDR0_SRST                      0x201
-+#define PPC405EX_SDR0_SRST                      0x200
-+#define PPC460EX_SDR0_SRST                      0x201
-+#define PPC460EX_CE_RESET                       0x08000000
-+#define PPC460SX_CE_RESET                       0x20000000
-+#define PPC405EX_CE_RESET                       0x00000008
-+
-+#define CRYPTO4XX_CRYPTO_PRIORITY		300
-+#define PPC4XX_LAST_PD				63
-+#define PPC4XX_NUM_PD				64
-+#define PPC4XX_LAST_GD				1023
-+#define PPC4XX_NUM_GD				1024
-+#define PPC4XX_LAST_SD				63
-+#define PPC4XX_NUM_SD				64
-+#define PPC4XX_SD_BUFFER_SIZE			2048
-+
-+#define PD_ENTRY_INUSE				1
-+#define PD_ENTRY_FREE				0
-+#define ERING_WAS_FULL				0xffffffff
-+
-+struct crypto4xx_device;
-+
-+struct pd_uinfo {
-+	struct crypto4xx_device *dev;
-+	u32   state;
-+	u32 using_sd;
-+	u32 first_gd;		/* first gather discriptor
-+				used by this packet */
-+	u32 num_gd;             /* number of gather discriptor
-+				used by this packet */
-+	u32 first_sd;		/* first scatter discriptor
-+				used by this packet */
-+	u32 num_sd;		/* number of scatter discriptors
-+				used by this packet */
-+	void *sa_va;		/* shadow sa, when using cp from ctx->sa */
-+	u32 sa_pa;
-+	void *sr_va;		/* state record for shadow sa */
-+	u32 sr_pa;
-+	struct scatterlist *dest_va;
-+	struct crypto_async_request *async_req; 	/* base crypto request
-+							for this packet */
-+};
-+
-+struct crypto4xx_device {
-+	struct crypto4xx_core_device *core_dev;
-+	char *name;
-+	u64  ce_phy_address;
-+	void __iomem *ce_base;
-+
-+	void *pdr;			/* base address of packet
-+					descriptor ring */
-+	dma_addr_t pdr_pa;		/* physical address used to
-+					program ce pdr_base_register */
-+	void *gdr;                      /* gather descriptor ring */
-+	dma_addr_t gdr_pa;		/* physical address used to
-+					program ce gdr_base_register */
-+	void *sdr;			/* scatter descriptor ring */
-+	dma_addr_t sdr_pa;		/* physical address used to
-+					program ce sdr_base_register */
-+	void *scatter_buffer_va;
-+	dma_addr_t scatter_buffer_pa;
-+	u32 scatter_buffer_size;
-+
-+	void *shadow_sa_pool;		/* pool of memory for sa in pd_uinfo */
-+	dma_addr_t shadow_sa_pool_pa;
-+	void *shadow_sr_pool;		/* pool of memory for sr in pd_uinfo */
-+	dma_addr_t shadow_sr_pool_pa;
-+	u32 pdr_tail;
-+	u32 pdr_head;
-+	u32 gdr_tail;
-+	u32 gdr_head;
-+	u32 sdr_tail;
-+	u32 sdr_head;
-+	void *pdr_uinfo;
-+	struct list_head alg_list;	/* List of algorithm supported
-+					by this device */
-+};
-+
-+struct crypto4xx_core_device {
-+	struct device *device;
-+	struct of_device *ofdev;
-+	struct crypto4xx_device *dev;
-+	u32 int_status;
-+	u32 irq;
-+	struct tasklet_struct tasklet;
-+	spinlock_t lock;
-+};
-+
-+struct crypto4xx_ctx {
-+	struct crypto4xx_device *dev;
-+	void *sa_in;
-+	dma_addr_t sa_in_dma_addr;
-+	void *sa_out;
-+	dma_addr_t sa_out_dma_addr;
-+	void *state_record;
-+	dma_addr_t state_record_dma_addr;
-+	u32 sa_len;
-+	u32 offset_to_sr_ptr;           /* offset to state ptr, in dynamic sa */
-+	u32 direction;
-+	u32 next_hdr;
-+	u32 save_iv;
-+	u32 pd_ctl_len;
-+	u32 pd_ctl;
-+	u32 bypass;
-+	u32 is_hash;
-+	u32 hash_final;
-+};
-+
-+struct crypto4xx_req_ctx {
-+	struct crypto4xx_device *dev;	/* Device in which
-+					operation to send to */
-+	void *sa;
-+	u32 sa_dma_addr;
-+	u16 sa_len;
-+};
-+
-+struct crypto4xx_alg {
-+	struct list_head  entry;
-+	struct crypto_alg alg;
-+	struct crypto4xx_device *dev;
-+};
-+
-+#define crypto_alg_to_crypto4xx_alg(x) \
-+		container_of(x, struct crypto4xx_alg, alg)
-+
-+extern int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size);
-+extern void crypto4xx_free_sa(struct crypto4xx_ctx *ctx);
-+extern u32 crypto4xx_alloc_sa_rctx(struct crypto4xx_ctx *ctx,
-+				   struct crypto4xx_ctx *rctx);
-+extern void crypto4xx_free_sa_rctx(struct crypto4xx_ctx *rctx);
-+extern void crypto4xx_free_ctx(struct crypto4xx_ctx *ctx);
-+extern u32 crypto4xx_alloc_state_record(struct crypto4xx_ctx *ctx);
-+extern u32 get_dynamic_sa_offset_state_ptr_field(struct crypto4xx_ctx *ctx);
-+extern u32 get_dynamic_sa_offset_key_field(struct crypto4xx_ctx *ctx);
-+extern u32 get_dynamic_sa_iv_size(struct crypto4xx_ctx *ctx);
-+extern void crypto4xx_memcpy_le(unsigned int *dst,
-+				const unsigned char *buf, int len);
-+extern u32 crypto4xx_build_pd(struct crypto_async_request *req,
-+			      struct crypto4xx_ctx *ctx,
-+			      struct scatterlist *src,
-+			      struct scatterlist *dst,
-+			      unsigned int datalen,
-+			      void *iv, u32 iv_len);
-+extern int crypto4xx_setkey_aes_cbc(struct crypto_ablkcipher *cipher,
-+				    const u8 *key, unsigned int keylen);
-+extern int crypto4xx_encrypt(struct ablkcipher_request *req);
-+extern int crypto4xx_decrypt(struct ablkcipher_request *req);
-+extern int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm);
-+extern int crypto4xx_hash_digest(struct ahash_request *req);
-+extern int crypto4xx_hash_final(struct ahash_request *req);
-+extern int crypto4xx_hash_update(struct ahash_request *req);
-+extern int crypto4xx_hash_init(struct ahash_request *req);
-+#endif
-diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
-new file mode 100644
-index 0000000..7d4edb0
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
-@@ -0,0 +1,284 @@
-+/**
-+ * AMCC SoC PPC4xx Crypto Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * This filr defines the register set for Security Subsystem
-+ */
-+
-+#ifndef __CRYPTO4XX_REG_DEF_H__
-+#define __CRYPTO4XX_REG_DEF_H__
-+
-+/* CRYPTO4XX Register offset */
-+#define CRYPTO4XX_DESCRIPTOR			0x00000000
-+#define CRYPTO4XX_CTRL_STAT			0x00000000
-+#define CRYPTO4XX_SOURCE			0x00000004
-+#define CRYPTO4XX_DEST				0x00000008
-+#define CRYPTO4XX_SA				0x0000000C
-+#define CRYPTO4XX_SA_LENGTH			0x00000010
-+#define CRYPTO4XX_LENGTH			0x00000014
-+
-+#define CRYPTO4XX_PE_DMA_CFG			0x00000040
-+#define CRYPTO4XX_PE_DMA_STAT			0x00000044
-+#define CRYPTO4XX_PDR_BASE			0x00000048
-+#define CRYPTO4XX_RDR_BASE			0x0000004c
-+#define CRYPTO4XX_RING_SIZE			0x00000050
-+#define CRYPTO4XX_RING_CTRL			0x00000054
-+#define CRYPTO4XX_INT_RING_STAT			0x00000058
-+#define CRYPTO4XX_EXT_RING_STAT			0x0000005c
-+#define CRYPTO4XX_IO_THRESHOLD			0x00000060
-+#define CRYPTO4XX_GATH_RING_BASE		0x00000064
-+#define CRYPTO4XX_SCAT_RING_BASE		0x00000068
-+#define CRYPTO4XX_PART_RING_SIZE		0x0000006c
-+#define CRYPTO4XX_PART_RING_CFG		        0x00000070
-+
-+#define CRYPTO4XX_PDR_BASE_UADDR		0x00000080
-+#define CRYPTO4XX_RDR_BASE_UADDR		0x00000084
-+#define CRYPTO4XX_PKT_SRC_UADDR			0x00000088
-+#define CRYPTO4XX_PKT_DEST_UADDR		0x0000008c
-+#define CRYPTO4XX_SA_UADDR			0x00000090
-+#define CRYPTO4XX_GATH_RING_BASE_UADDR		0x000000A0
-+#define CRYPTO4XX_SCAT_RING_BASE_UADDR		0x000000A4
-+
-+#define CRYPTO4XX_SEQ_RD			0x00000408
-+#define CRYPTO4XX_SEQ_MASK_RD			0x0000040C
-+
-+#define CRYPTO4XX_SA_CMD_0			0x00010600
-+#define CRYPTO4XX_SA_CMD_1			0x00010604
-+
-+#define CRYPTO4XX_STATE_PTR			0x000106dc
-+#define CRYPTO4XX_STATE_IV			0x00010700
-+#define CRYPTO4XX_STATE_HASH_BYTE_CNT_0		0x00010710
-+#define CRYPTO4XX_STATE_HASH_BYTE_CNT_1		0x00010714
-+
-+#define CRYPTO4XX_STATE_IDIGEST_0		0x00010718
-+#define CRYPTO4XX_STATE_IDIGEST_1		0x0001071c
-+
-+#define CRYPTO4XX_DATA_IN			0x00018000
-+#define CRYPTO4XX_DATA_OUT			0x0001c000
-+
-+#define CRYPTO4XX_INT_UNMASK_STAT		0x000500a0
-+#define CRYPTO4XX_INT_MASK_STAT			0x000500a4
-+#define CRYPTO4XX_INT_CLR			0x000500a4
-+#define CRYPTO4XX_INT_EN			0x000500a8
-+
-+#define CRYPTO4XX_INT_PKA			0x00000002
-+#define CRYPTO4XX_INT_PDR_DONE			0x00008000
-+#define CRYPTO4XX_INT_MA_WR_ERR			0x00020000
-+#define CRYPTO4XX_INT_MA_RD_ERR			0x00010000
-+#define CRYPTO4XX_INT_PE_ERR			0x00000200
-+#define CRYPTO4XX_INT_USER_DMA_ERR		0x00000040
-+#define CRYPTO4XX_INT_SLAVE_ERR			0x00000010
-+#define CRYPTO4XX_INT_MASTER_ERR		0x00000008
-+#define CRYPTO4XX_INT_ERROR			0x00030258
-+
-+#define CRYPTO4XX_INT_CFG			0x000500ac
-+#define CRYPTO4XX_INT_DESCR_RD			0x000500b0
-+#define CRYPTO4XX_INT_DESCR_CNT			0x000500b4
-+#define CRYPTO4XX_INT_TIMEOUT_CNT		0x000500b8
-+
-+#define CRYPTO4XX_DEVICE_CTRL			0x00060080
-+#define CRYPTO4XX_DEVICE_ID			0x00060084
-+#define CRYPTO4XX_DEVICE_INFO			0x00060088
-+#define CRYPTO4XX_DMA_USER_SRC			0x00060094
-+#define CRYPTO4XX_DMA_USER_DEST			0x00060098
-+#define CRYPTO4XX_DMA_USER_CMD			0x0006009C
-+
-+#define CRYPTO4XX_DMA_CFG	        	0x000600d4
-+#define CRYPTO4XX_BYTE_ORDER_CFG 		0x000600d8
-+#define CRYPTO4XX_ENDIAN_CFG			0x000600d8
-+
-+#define CRYPTO4XX_PRNG_STAT			0x00070000
-+#define CRYPTO4XX_PRNG_CTRL			0x00070004
-+#define CRYPTO4XX_PRNG_SEED_L			0x00070008
-+#define CRYPTO4XX_PRNG_SEED_H			0x0007000c
-+
-+#define CRYPTO4XX_PRNG_RES_0			0x00070020
-+#define CRYPTO4XX_PRNG_RES_1			0x00070024
-+#define CRYPTO4XX_PRNG_RES_2			0x00070028
-+#define CRYPTO4XX_PRNG_RES_3			0x0007002C
-+
-+#define CRYPTO4XX_PRNG_LFSR_L			0x00070030
-+#define CRYPTO4XX_PRNG_LFSR_H			0x00070034
-+
-+/**
-+ * Initilize CRYPTO ENGINE registers, and memory bases.
-+ */
-+#define PPC4XX_PDR_POLL				0x3ff
-+#define PPC4XX_OUTPUT_THRESHOLD			2
-+#define PPC4XX_INPUT_THRESHOLD			2
-+#define PPC4XX_PD_SIZE				6
-+#define PPC4XX_CTX_DONE_INT			0x2000
-+#define PPC4XX_PD_DONE_INT			0x8000
-+#define PPC4XX_BYTE_ORDER			0x22222
-+#define PPC4XX_INTERRUPT_CLR			0x3ffff
-+#define PPC4XX_PRNG_CTRL_AUTO_EN		0x3
-+#define PPC4XX_DC_3DES_EN			1
-+#define PPC4XX_INT_DESCR_CNT			4
-+#define PPC4XX_INT_TIMEOUT_CNT			0
-+#define PPC4XX_INT_CFG				1
-+/**
-+ * all follow define are ad hoc
-+ */
-+#define PPC4XX_RING_RETRY			100
-+#define PPC4XX_RING_POLL			100
-+#define PPC4XX_SDR_SIZE				PPC4XX_NUM_SD
-+#define PPC4XX_GDR_SIZE				PPC4XX_NUM_GD
-+
-+/**
-+  * Generic Security Association (SA) with all possible fields. These will
-+ * never likely used except for reference purpose. These structure format
-+ * can be not changed as the hardware expects them to be layout as defined.
-+ * Field can be removed or reduced but ordering can not be changed.
-+ */
-+#define CRYPTO4XX_DMA_CFG_OFFSET		0x40
-+union ce_pe_dma_cfg {
-+	struct {
-+		u32 rsv:7;
-+		u32 dir_host:1;
-+		u32 rsv1:2;
-+		u32 bo_td_en:1;
-+		u32 dis_pdr_upd:1;
-+		u32 bo_sgpd_en:1;
-+		u32 bo_data_en:1;
-+		u32 bo_sa_en:1;
-+		u32 bo_pd_en:1;
-+		u32 rsv2:4;
-+		u32 dynamic_sa_en:1;
-+		u32 pdr_mode:2;
-+		u32 pe_mode:1;
-+		u32 rsv3:5;
-+		u32 reset_sg:1;
-+		u32 reset_pdr:1;
-+		u32 reset_pe:1;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO4XX_PDR_BASE_OFFSET		0x48
-+#define CRYPTO4XX_RDR_BASE_OFFSET		0x4c
-+#define CRYPTO4XX_RING_SIZE_OFFSET		0x50
-+union ce_ring_size {
-+	struct {
-+		u32 ring_offset:16;
-+		u32 rsv:6;
-+		u32 ring_size:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO4XX_RING_CONTROL_OFFSET		0x54
-+union ce_ring_contol {
-+	struct {
-+		u32 continuous:1;
-+		u32 rsv:5;
-+		u32 ring_retry_divisor:10;
-+		u32 rsv1:4;
-+		u32 ring_poll_divisor:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO4XX_IO_THRESHOLD_OFFSET		0x60
-+union ce_io_threshold {
-+	struct {
-+		u32 rsv:6;
-+		u32 output_threshold:10;
-+		u32 rsv1:6;
-+		u32 input_threshold:10;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO4XX_GATHER_RING_BASE_OFFSET	0x64
-+#define CRYPTO4XX_SCATTER_RING_BASE_OFFSET	0x68
-+
-+union ce_part_ring_size  {
-+	struct {
-+		u32 sdr_size:16;
-+		u32 gdr_size:16;
-+	} bf;
-+    u32 w;
-+} __attribute__((packed));
-+
-+#define MAX_BURST_SIZE_32			0
-+#define MAX_BURST_SIZE_64			1
-+#define MAX_BURST_SIZE_128			2
-+#define MAX_BURST_SIZE_256			3
-+
-+/* gather descriptor control length */
-+struct gd_ctl_len {
-+	u32 len:16;
-+	u32 rsv:14;
-+	u32 done:1;
-+	u32 ready:1;
-+} __attribute__((packed));
-+
-+struct ce_gd {
-+	u32 ptr;
-+	struct gd_ctl_len ctl_len;
-+} __attribute__((packed));
-+
-+struct sd_ctl {
-+	u32 ctl:30;
-+	u32 done:1;
-+	u32 rdy:1;
-+} __attribute__((packed));
-+
-+struct ce_sd {
-+    u32 ptr;
-+	struct sd_ctl ctl;
-+} __attribute__((packed));
-+
-+#define PD_PAD_CTL_32	0x10
-+#define PD_PAD_CTL_64	0x20
-+#define PD_PAD_CTL_128	0x40
-+#define PD_PAD_CTL_256	0x80
-+union ce_pd_ctl {
-+	struct {
-+		u32 pd_pad_ctl:8;
-+		u32 status:8;
-+		u32 next_hdr:8;
-+		u32 rsv:2;
-+		u32 cached_sa:1;
-+		u32 hash_final:1;
-+		u32 init_arc4:1;
-+		u32 rsv1:1;
-+		u32 pe_done:1;
-+		u32 host_ready:1;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+union ce_pd_ctl_len {
-+	struct {
-+		u32 bypass:8;
-+		u32 pe_done:1;
-+		u32 host_ready:1;
-+		u32 rsv:2;
-+		u32 pkt_len:20;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+struct ce_pd {
-+	union ce_pd_ctl   pd_ctl;
-+	u32 src;
-+	u32 dest;
-+	u32 sa;                 /* get from ctx->sa_dma_addr */
-+	u32 sa_len;             /* only if dynamic sa is used */
-+	union ce_pd_ctl_len pd_ctl_len;
-+
-+} __attribute__((packed));
-+#endif
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.c b/drivers/crypto/amcc/crypto4xx_sa.c
-new file mode 100644
-index 0000000..466fd94
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_sa.c
-@@ -0,0 +1,108 @@
-+/**
-+ * AMCC SoC PPC4xx Crypto Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * @file crypto4xx_sa.c
-+ *
-+ * This file implements the security context
-+ * assoicate format.
-+ */
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/moduleparam.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/highmem.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <crypto/des.h>
-+#include "crypto4xx_reg_def.h"
-+#include "crypto4xx_sa.h"
-+#include "crypto4xx_core.h"
-+
-+u32 get_dynamic_sa_offset_iv_field(struct crypto4xx_ctx *ctx)
-+{
-+	u32 offset;
-+	union dynamic_sa_contents cts;
-+
-+	if (ctx->direction == DIR_INBOUND)
-+		cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_in))->sa_contents;
-+	else
-+		cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_out))->sa_contents;
-+	offset = cts.bf.key_size
-+		+ cts.bf.inner_size
-+		+ cts.bf.outer_size
-+		+ cts.bf.spi
-+		+ cts.bf.seq_num0
-+		+ cts.bf.seq_num1
-+		+ cts.bf.seq_num_mask0
-+		+ cts.bf.seq_num_mask1
-+		+ cts.bf.seq_num_mask2
-+		+ cts.bf.seq_num_mask3;
-+
-+	return sizeof(struct dynamic_sa_ctl) + offset * 4;
-+}
-+
-+u32 get_dynamic_sa_offset_state_ptr_field(struct crypto4xx_ctx *ctx)
-+{
-+	u32 offset;
-+	union dynamic_sa_contents cts;
-+
-+	if (ctx->direction == DIR_INBOUND)
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_in)->sa_contents;
-+	else
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_out)->sa_contents;
-+	offset = cts.bf.key_size
-+		+ cts.bf.inner_size
-+		+ cts.bf.outer_size
-+		+ cts.bf.spi
-+		+ cts.bf.seq_num0
-+		+ cts.bf.seq_num1
-+		+ cts.bf.seq_num_mask0
-+		+ cts.bf.seq_num_mask1
-+		+ cts.bf.seq_num_mask2
-+		+ cts.bf.seq_num_mask3
-+		+ cts.bf.iv0
-+		+ cts.bf.iv1
-+		+ cts.bf.iv2
-+		+ cts.bf.iv3;
-+
-+	return sizeof(struct dynamic_sa_ctl) + offset * 4;
-+}
-+
-+u32 get_dynamic_sa_iv_size(struct crypto4xx_ctx *ctx)
-+{
-+	union dynamic_sa_contents cts;
-+
-+	if (ctx->direction == DIR_INBOUND)
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_in)->sa_contents;
-+	else
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_out)->sa_contents;
-+	return (cts.bf.iv0 + cts.bf.iv1 + cts.bf.iv2 + cts.bf.iv3) * 4;
-+}
-+
-+u32 get_dynamic_sa_offset_key_field(struct crypto4xx_ctx *ctx)
-+{
-+	union dynamic_sa_contents cts;
-+
-+	if (ctx->direction == DIR_INBOUND)
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_in)->sa_contents;
-+	else
-+		cts.w = ((struct dynamic_sa_ctl *) ctx->sa_out)->sa_contents;
-+
-+	return sizeof(struct dynamic_sa_ctl);
-+}
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.h b/drivers/crypto/amcc/crypto4xx_sa.h
-new file mode 100644
-index 0000000..4b83ed7
---- /dev/null
-+++ b/drivers/crypto/amcc/crypto4xx_sa.h
-@@ -0,0 +1,243 @@
-+/**
-+ * AMCC SoC PPC4xx Crypto Driver
-+ *
-+ * Copyright (c) 2008 Applied Micro Circuits Corporation.
-+ * All rights reserved. James Hsiao <jhsiao@amcc.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * This file defines the security context
-+ * assoicate format.
-+ */
-+
-+#ifndef __CRYPTO4XX_SA_H__
-+#define __CRYPTO4XX_SA_H__
-+
-+#define AES_IV_SIZE				16
-+
-+/**
-+ * Contents of Dynamic Security Association (SA) with all possible fields
-+ */
-+union dynamic_sa_contents {
-+	struct {
-+		u32 arc4_state_ptr:1;
-+		u32 arc4_ij_ptr:1;
-+		u32 state_ptr:1;
-+		u32 iv3:1;
-+		u32 iv2:1;
-+		u32 iv1:1;
-+		u32 iv0:1;
-+		u32 seq_num_mask3:1;
-+		u32 seq_num_mask2:1;
-+		u32 seq_num_mask1:1;
-+		u32 seq_num_mask0:1;
-+		u32 seq_num1:1;
-+		u32 seq_num0:1;
-+		u32 spi:1;
-+		u32 outer_size:5;
-+		u32 inner_size:5;
-+		u32 key_size:4;
-+		u32 cmd_size:4;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+#define DIR_OUTBOUND				0
-+#define DIR_INBOUND				1
-+#define SA_OP_GROUP_BASIC			0
-+#define SA_OPCODE_ENCRYPT			0
-+#define SA_OPCODE_DECRYPT			0
-+#define SA_OPCODE_HASH				3
-+#define SA_CIPHER_ALG_DES			0
-+#define SA_CIPHER_ALG_3DES			1
-+#define SA_CIPHER_ALG_ARC4			2
-+#define SA_CIPHER_ALG_AES			3
-+#define SA_CIPHER_ALG_KASUMI			4
-+#define SA_CIPHER_ALG_NULL			15
-+
-+#define SA_HASH_ALG_MD5				0
-+#define SA_HASH_ALG_SHA1			1
-+#define SA_HASH_ALG_NULL			15
-+#define SA_HASH_ALG_SHA1_DIGEST_SIZE		20
-+
-+#define SA_LOAD_HASH_FROM_SA			0
-+#define SA_LOAD_HASH_FROM_STATE			2
-+#define SA_NOT_LOAD_HASH			3
-+#define SA_LOAD_IV_FROM_SA			0
-+#define SA_LOAD_IV_FROM_INPUT			1
-+#define SA_LOAD_IV_FROM_STATE			2
-+#define SA_LOAD_IV_GEN_IV			3
-+
-+#define SA_PAD_TYPE_CONSTANT			2
-+#define SA_PAD_TYPE_ZERO			3
-+#define SA_PAD_TYPE_TLS				5
-+#define SA_PAD_TYPE_DTLS			5
-+#define SA_NOT_SAVE_HASH			0
-+#define SA_SAVE_HASH				1
-+#define SA_NOT_SAVE_IV				0
-+#define SA_SAVE_IV				1
-+#define SA_HEADER_PROC				1
-+#define SA_NO_HEADER_PROC			0
-+
-+union sa_command_0 {
-+	struct {
-+		u32 scatter:1;
-+		u32 gather:1;
-+		u32 save_hash_state:1;
-+		u32 save_iv:1;
-+		u32 load_hash_state:2;
-+		u32 load_iv:2;
-+		u32 digest_len:4;
-+		u32 hdr_proc:1;
-+		u32 extend_pad:1;
-+		u32 stream_cipher_pad:1;
-+		u32 rsv:1;
-+		u32 hash_alg:4;
-+		u32 cipher_alg:4;
-+		u32 pad_type:2;
-+		u32 op_group:2;
-+		u32 dir:1;
-+		u32 opcode:3;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+#define CRYPTO_MODE_ECB				0
-+#define CRYPTO_MODE_CBC				1
-+
-+#define CRYPTO_FEEDBACK_MODE_NO_FB		0
-+#define CRYPTO_FEEDBACK_MODE_64BIT_OFB		0
-+#define CRYPTO_FEEDBACK_MODE_8BIT_CFB		1
-+#define CRYPTO_FEEDBACK_MODE_1BIT_CFB		2
-+#define CRYPTO_FEEDBACK_MODE_128BIT_CFB		3
-+
-+#define SA_AES_KEY_LEN_128			2
-+#define SA_AES_KEY_LEN_192			3
-+#define SA_AES_KEY_LEN_256			4
-+
-+#define SA_REV2					1
-+/**
-+ * The follow defines bits sa_command_1
-+ * In Basic hash mode  this bit define simple hash or hmac.
-+ * In IPsec mode, this bit define muting control.
-+ */
-+#define SA_HASH_MODE_HASH			0
-+#define SA_HASH_MODE_HMAC			1
-+#define SA_MC_ENABLE				0
-+#define SA_MC_DISABLE				1
-+#define SA_NOT_COPY_HDR				0
-+#define SA_COPY_HDR				1
-+#define SA_NOT_COPY_PAD				0
-+#define SA_COPY_PAD				1
-+#define SA_NOT_COPY_PAYLOAD			0
-+#define SA_COPY_PAYLOAD				1
-+#define SA_EXTENDED_SN_OFF			0
-+#define SA_EXTENDED_SN_ON			1
-+#define SA_SEQ_MASK_OFF				0
-+#define SA_SEQ_MASK_ON				1
-+
-+union sa_command_1 {
-+	struct {
-+		u32 crypto_mode31:1;
-+		u32 save_arc4_state:1;
-+		u32 arc4_stateful:1;
-+		u32 key_len:5;
-+		u32 hash_crypto_offset:8;
-+		u32 sa_rev:2;
-+		u32 byte_offset:1;
-+		u32 hmac_muting:1;
-+		u32 feedback_mode:2;
-+		u32 crypto_mode9_8:2;
-+		u32 extended_seq_num:1;
-+		u32 seq_num_mask:1;
-+		u32 mutable_bit_proc:1;
-+		u32 ip_version:1;
-+		u32 copy_pad:1;
-+		u32 copy_payload:1;
-+		u32 copy_hdr:1;
-+		u32 rsv1:1;
-+	} bf;
-+	u32 w;
-+} __attribute__((packed));
-+
-+struct dynamic_sa_ctl {
-+	u32 sa_contents;
-+	union sa_command_0 sa_command_0;
-+	union sa_command_1 sa_command_1;
-+} __attribute__((packed));
-+
-+/**
-+ * State Record for Security Association (SA)
-+ */
-+struct  sa_state_record {
-+	u32 save_iv[4];
-+	u32 save_hash_byte_cnt[2];
-+	u32 save_digest[16];
-+} __attribute__((packed));
-+
-+/**
-+ * Security Association (SA) for AES128
-+ *
-+ */
-+struct dynamic_sa_aes128 {
-+	struct dynamic_sa_ctl	ctrl;
-+	u32 key[4];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+
-+#define SA_AES128_LEN		(sizeof(struct dynamic_sa_aes128)/4)
-+#define SA_AES128_CONTENTS	0x3e000042
-+
++++ b/include/asm-generic/bignum.h
+@@ -0,0 +1,80 @@
 +/*
-+ * Security Association (SA) for AES192
++ *  Multi-precision integer library
++ *
++ *  Based on XySSL:
++ *
++ *    Copyright (C) 2006-2008  Christophe Devine
++ *    Copyright (C) 2009       Pierre Habouzit <madcoder@debian.org>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 + */
-+struct dynamic_sa_aes192 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 key[6];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
 +
-+#define SA_AES192_LEN		(sizeof(struct dynamic_sa_aes192)/4)
-+#define SA_AES192_CONTENTS	0x3e000062
++#ifndef _ASM_GENERIC_BIGNUM
++#define _ASM_GENERIC_BIGNUM
 +
-+/**
-+ * Security Association (SA) for AES256
-+ */
-+struct dynamic_sa_aes256 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 key[8];
-+	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
++#include <asm/types.h>
 +
-+#define SA_AES256_LEN		(sizeof(struct dynamic_sa_aes256)/4)
-+#define SA_AES256_CONTENTS	0x3e000082
-+#define SA_AES_CONTENTS		0x3e000002
++#ifndef MPI_MULADDC_CORE
++#if (BITS_PER_LONG =3D=3D 32)
 +
-+/**
-+ * Security Association (SA) for HASH160: HMAC-SHA1
-+ */
-+struct dynamic_sa_hash160 {
-+	struct dynamic_sa_ctl ctrl;
-+	u32 inner_digest[5];
-+	u32 outer_digest[5];
-+	u32 state_ptr;
-+	u32 reserved;
-+} __attribute__((packed));
-+#define SA_HASH160_LEN		(sizeof(struct dynamic_sa_hash160)/4)
-+#define SA_HASH160_CONTENTS     0x2000a502
++#define MPI_MULADDC_INIT                    \
++	unsigned long long r;               \
++	unsigned long r0, r1
++
++#define MPI_MULADDC_CORE                    \
++	r   =3D *(s++) * (t_dbl) b;           \
++	r0  =3D r;                            \
++	r1  =3D r >> biL;                     \
++	r0 +=3D c;  r1 +=3D (r0 <  c);          \
++	r0 +=3D *d; r1 +=3D (r0 < *d);          \
++	c =3D r1; *(d++) =3D r0;
++
++#else
++
++#define MPI_MULADDC_INIT                    \
++	unsigned long s0, s1, b0, b1;       \
++	unsigned long r0, r1, rx, ry;       \
++	b0 =3D (b << 32) >> 32;               \
++	b1 =3D (b >> 32);
++
++#define MPI_MULADDC_CORE                    \
++	s0 =3D (*s << 32) >> 32;              \
++	s1 =3D (*s >> 32); s++;               \
++	rx =3D s0 * b1; r0 =3D s0 * b0;         \
++	ry =3D s1 * b0; r1 =3D s1 * b1;         \
++	r1 +=3D (rx >> 32);                   \
++	r1 +=3D (ry >> 32);                   \
++	rx <<=3D 32; ry <<=3D 32;               \
++	r0 +=3D rx; r1 +=3D (r0 < rx);          \
++	r0 +=3D ry; r1 +=3D (r0 < ry);          \
++	r0 +=3D  c; r1 +=3D (r0 <  c);          \
++	r0 +=3D *d; r1 +=3D (r0 < *d);          \
++	c =3D r1; *(d++) =3D r0;
 +
 +#endif
++#define MPI_MULADDC_STOP    do { } while (0)
++#endif
++
++#ifndef MPI_MULADDC_CORE2
++#define MPI_MULADDC_CORE2 do { MPI_MULADDC_CORE; MPI_MULADDC_CORE; } while=
+ (0)
++#endif
++#ifndef MPI_MULADDC_CORE4
++#define MPI_MULADDC_CORE4 do { MPI_MULADDC_CORE2; MPI_MULADDC_CORE2; } whi=
+le (0)
++#endif
++#ifndef MPI_MULADDC_CORE8
++#define MPI_MULADDC_CORE8 do { MPI_MULADDC_CORE4; MPI_MULADDC_CORE4; } whi=
+le (0)
++#endif
++
++#endif
+diff --git a/include/crypto/bignum.h b/include/crypto/bignum.h
+new file mode 100644
+index 0000000..dc5f3bd
+--- /dev/null
++++ b/include/crypto/bignum.h
+@@ -0,0 +1,209 @@
++/*
++ *  Multi-precision integer library
++ *
++ *  Based on XySSL:
++ *
++ *    Copyright (C) 2006-2008  Christophe Devine
++ *    Copyright (C) 2009       Pierre Habouzit <madcoder@debian.org>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#ifndef _LINUX_BIGNUM_H
++#define _LINUX_BIGNUM_H
++
++#include <linux/string.h>
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <asm/bignum.h>
++
++/**
++ * \brief          MPI structure
++ *
++ * invariants:
++ *  - alloc is the number of allocated limbs
++ *  - len is the number of non zero limbs (p[len - 1] is never 0)
++ *  - p[len .. alloc[ must always be set to 0
++ *  - "0" is positive.
++ *  - sign is set to 1 for negative values.
++ */
++struct mpi {
++	unsigned sign  :  1; /*!< integer sign         */
++	unsigned alloc : 31; /*!< allocated limbs      */
++	unsigned len;        /*!< number of used limbs */
++	unsigned long *p;    /*!< pointer to limbs     */
++};
++
++#define MPI_INIT  { .p =3D NULL }
++
++static inline void mpi_init(struct mpi *X) {
++	memset(X, 0, sizeof(*X));
++}
++
++static inline void mpi_zero(struct mpi *X) {
++	memset(X->p, 0, X->len * sizeof(*X->p));
++	X->sign =3D 0;
++	X->len  =3D 0;
++}
++
++static inline void mpi_destroy(struct mpi *X) {
++	kfree(X->p);
++}
++
++static inline int mpi_is_zero(const struct mpi *X) {
++	return X->len =3D=3D 0;
++}
++
++/**
++ * \brief          Enlarge to the specified number of limbs
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_grow(struct mpi *X, int nblimbs);
++
++/**
++ * \brief          Import X from unsigned binary data, big endian
++ *
++ * \param X        destination struct mpi
++ * \param buf      input buffer
++ * \param buflen   input buffer size
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_read_binary(struct mpi *X, const u8 *buf, int buflen);
++
++/**
++ * \brief          Export X into unsigned binary data, big endian
++ *
++ * If %buflen is too short, the %X is truncated. If %buflen is larger than=
+ the
++ * number of octets required to write %X, then the buffer is left-padded w=
+ith
++ * zeroes.
++ *
++ * \param X        source struct mpi
++ * \param buf      output buffer
++ * \param buflen   number of octets of %X to write
++ *
++ * \return         a pointer to the last written byte in buf.
++ */
++u8 *mpi_write_binary(const struct mpi *X, u8 *buf, int buflen);
++
++
++/**
++ * \brief          Return the number of traling zeroes
++ *
++ * \return         -1 if X is zero
++ */
++int mpi_ctz(const struct mpi *X);
++
++/**
++ * \brief          Return the number of significant bits
++ */
++int mpi_sbits(const struct mpi *X);
++
++/**
++ * \brief          Left-shift: X <<=3D count
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_shift_l(struct mpi *X, int count);
++
++/**
++ * \brief          Right-shift: X >>=3D count
++ */
++void mpi_shift_r(struct mpi *X, int count);
++
++/**
++ * \brief          Compare signed values
++ *
++ * \return         1 if X is greater than Y,
++ *                -1 if X is lesser  than Y or
++ *                 0 if X is equal to Y
++ */
++int mpi_cmp(const struct mpi *X, const struct mpi *Y);
++int mpi_cmp_int(const struct mpi *X, int i);
++
++/**
++ * \brief          Signed addition: X =3D A + B
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_add(struct mpi *X, const struct mpi *A, const struct mpi *B);
++int mpi_add_int(struct mpi *X, const struct mpi *A, int b);
++
++/**
++ * \brief          Signed substraction: X =3D A - B
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_sub(struct mpi *X, const struct mpi *A, const struct mpi *B);
++int mpi_sub_int(struct mpi *X, const struct mpi *A, int b);
++
++/**
++ * \brief          Greatest common divisor: G =3D gcd(A, B)
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_gcd(struct mpi *G, const struct mpi *A, const struct mpi *B);
++
++/**
++ * \brief          Baseline multiplication: X =3D A * B
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed
++ */
++int mpi_mul(struct mpi *X, const struct mpi *A, const struct mpi *B);
++
++/**
++ * \brief          Division by struct mpi: A =3D Q * B + R
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed,
++ *                 -EINVAL if B =3D=3D 0
++ *
++ * \note           Either Q or R can be NULL.
++ */
++int mpi_div(struct mpi *Q, struct mpi *R,
++            const struct mpi *A, const struct mpi *B);
++
++/**
++ * \brief          Modulo: R =3D A mod B
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed,
++ *                 -EINVAL if B =3D=3D 0
++ */
++int mpi_mod(struct mpi *R, const struct mpi *A, const struct mpi *B);
++
++/**
++ * \brief          Sliding-window exponentiation: X =3D A^E mod N
++ *
++ * \return         0 if successful,
++ *                 -ENOMEM if memory allocation failed,
++ *                 -EINVAL if N is negative or even
++ *
++ * \note           _RR is used to avoid re-computing R*R mod N across
++ *                 multiple calls, which speeds up things a bit. It can
++ *                 be set to NULL if the extra performance is unneeded.
++ */
++int mpi_exp_mod(struct mpi *X, const struct mpi *A,
++                const struct mpi *E, const struct mpi *N, struct mpi *_RR);
++
++#endif /* bignum.h */
+--=20
+1.6.1.399.g0d272
 
+
+--4Ckj6UjgE2iN1+kY--
+
+--NDin8bjvE/0mNLFQ
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkmCRpoACgkQvGr7W6Hudhx01wCeLW2hCjsBovlFqvKTTlfNhGJt
+vPQAnAuIcC5J8B7dIMMJczfflR3URbtg
+=tIp9
+-----END PGP SIGNATURE-----
+
+--NDin8bjvE/0mNLFQ--
