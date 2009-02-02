@@ -1,32 +1,152 @@
 From: Huang Ying <ying.huang@intel.com>
 Subject: Re: [RFC] per-CPU cryptd thread implementation based on workqueue
-Date: Sun, 01 Feb 2009 17:37:06 +0800
-Message-ID: <1233481026.19806.12.camel@yhuang-dev.sh.intel.com>
+Date: Mon, 02 Feb 2009 10:59:32 +0800
+Message-ID: <1233543572.19806.32.camel@yhuang-dev.sh.intel.com>
 References: <1232075437.13948.12.camel@yhuang-dev.sh.intel.com>
 	 <20090116033105.GB10390@gondor.apana.org.au>
 	 <1232591537.6101.3.camel@yhuang-dev.sh.intel.com>
 	 <20090123230706.4c8ae0ea.akpm@linux-foundation.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-k1DWqKDwWs+H5IFg47i5"
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-F45DS98ULoQEz3RbYQet"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:32309 "EHLO mga01.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:57617 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752612AbZBAJhT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Feb 2009 04:37:19 -0500
+	id S1752906AbZBBC7g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 1 Feb 2009 21:59:36 -0500
 In-Reply-To: <20090123230706.4c8ae0ea.akpm@linux-foundation.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---=-k1DWqKDwWs+H5IFg47i5
+--=-F45DS98ULoQEz3RbYQet
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Sorry for my late. Last week is Chinese new year holiday.
+I design a performance testing for cryptd with a little modified
+dm-crypt. The testing script is as follow:
+
+-------------------- script begin ---------------------------
+#!/bin/sh
+
+dmc_create()
+{
+        # Create a crypt device using dmsetup
+        dmsetup create $2 --table "0 `blockdev --getsize $1` crypt cbc(aes-=
+asm)?cryptd?plain:plain babebabebabebabebabebabebabebabe 0 $1 0"
+}
+
+dmsetup remove crypt0
+dmsetup remove crypt1
+
+dd if=3D/dev/zero of=3D/dev/ram0 bs=3D1M count=3D4 >& /dev/null
+dd if=3D/dev/zero of=3D/dev/ram1 bs=3D1M count=3D4 >& /dev/null
+
+dmc_create /dev/ram0 crypt0
+dmc_create /dev/ram1 crypt1
+
+cat >tr.sh <<EOF
+#!/bin/sh
+
+for n in \$(seq 10); do
+        dd if=3D/dev/dm-0 of=3D/dev/null >& /dev/null &
+        dd if=3D/dev/dm-1 of=3D/dev/null >& /dev/null &
+done
+wait
+EOF
+
+for n in $(seq 10); do
+        /usr/bin/time sh tr.sh
+done
+rm tr.sh
+-------------------- script end   ---------------------------
+
+The separator of dm-crypt parameter is changed from "-" to "?", because
+"-" is used in some cipher driver name too, and cryptds need to specify
+cipher driver name instead of cipher name.
+
+The test result on an Intel Core2 E6400 (two cores) is as follow:
+
+without crypto workqueue patch:
+-----------------wo cryptowq begin --------------------------
+0.04user 0.38system 0:00.39elapsed 107%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6566minor)pagefaults 0swaps
+0.07user 0.35system 0:00.35elapsed 121%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6567minor)pagefaults 0swaps
+0.06user 0.34system 0:00.30elapsed 135%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6562minor)pagefaults 0swaps
+0.05user 0.37system 0:00.36elapsed 119%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6607minor)pagefaults 0swaps
+0.06user 0.36system 0:00.35elapsed 120%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6562minor)pagefaults 0swaps
+0.05user 0.37system 0:00.31elapsed 136%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6594minor)pagefaults 0swaps
+0.04user 0.34system 0:00.30elapsed 126%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6597minor)pagefaults 0swaps
+0.06user 0.32system 0:00.31elapsed 125%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6571minor)pagefaults 0swaps
+0.06user 0.34system 0:00.31elapsed 134%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6581minor)pagefaults 0swaps
+0.05user 0.38system 0:00.31elapsed 138%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6600minor)pagefaults 0swaps
+-----------------wo cryptowq end   --------------------------
+
+
+with crypto workqueue patch:
+------------------w cryptowq begin --------------------------
+0.02user 0.31system 0:00.24elapsed 141%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6554minor)pagefaults 0swaps
+0.05user 0.34system 0:00.31elapsed 127%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6606minor)pagefaults 0swaps
+0.07user 0.33system 0:00.26elapsed 155%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6559minor)pagefaults 0swaps
+0.07user 0.32system 0:00.26elapsed 151%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6562minor)pagefaults 0swaps
+0.05user 0.34system 0:00.26elapsed 150%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6603minor)pagefaults 0swaps
+0.03user 0.36system 0:00.31elapsed 124%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6562minor)pagefaults 0swaps
+0.04user 0.35system 0:00.26elapsed 147%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6586minor)pagefaults 0swaps
+0.03user 0.37system 0:00.27elapsed 146%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6562minor)pagefaults 0swaps
+0.04user 0.36system 0:00.26elapsed 154%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6594minor)pagefaults 0swaps
+0.04user 0.35system 0:00.26elapsed 154%CPU (0avgtext+0avgdata 0maxresident)=
+k
+0inputs+0outputs (0major+6557minor)pagefaults 0swaps
+------------------w cryptowq end   --------------------------
+
+The middle value of elapsed time is:
+wo cryptwq: 0.31
+w  cryptwq: 0.26
+
+The performance gain is about (0.31-0.26)/0.26 =3D 0.192.
+
+Best Regards,
+Huang Ying
 
 On Sat, 2009-01-24 at 15:07 +0800, Andrew Morton wrote:
 > On Thu, 22 Jan 2009 10:32:17 +0800 Huang Ying <ying.huang@intel.com> wrot=
@@ -47,9 +167,7 @@ e:
 > Please always prefer to include performance measurements when proposing
 > a performance-enhancing patch.  Otherwise we have no basis upon which
 > to evaluate the patch's worth.
-
-I will setup a testing to measure the performance gain.
-
+>=20
 > > +++ b/crypto/crypto_wq.c
 > > @@ -0,0 +1,39 @@
 > > +/*
@@ -90,9 +208,7 @@ ption)
 >=20
 > I don't believe that it is possible to get here with kcrypto_wq=3D=3DNULL=
 .
-
-Yes. I will fix this.
-
+>=20
 > >
 > > ...
 > >
@@ -117,9 +233,7 @@ Yes. I will fix this.
 > Do we actually need to use CRYPTD_STATE_INUSE here?  The
 > WORK_STRUCT_PENDING handling in the workqueue does basically the same
 > thing?
-
-Yes. It is not necessary, I will fix this.
-
+>=20
 > > +	put_cpu();
 > > +
 > > +	return err;
@@ -129,9 +243,7 @@ Yes. It is not necessary, I will fix this.
 *tfm)
 >=20
 > Did this need to have global scope?
-
-It should be static. I will fix this.
-
+>=20
 > > +{
 > > +	int cpu, in_queue;
 > > +	struct cryptd_cpu_queue *cpu_queue;
@@ -150,12 +262,7 @@ It should be static. I will fix this.
 > Did you consider using for_each_online_cpu() and implementing CPU
 > hotplug?  There might be situations where the number of possible CPUs
 > is much greater than the number of online CPUs.
-
-For cryptd_queue_init() and cryptd_queue_fini(), I think
-for_each_possible_cpu() is sufficient and simpler. Because they are only
-need to be executed once and in slow path. For cryptd_in_queue,
-for_each_online_cpu() can be used.
-
+>=20
 > > +static void cryptd_queue_work_done(struct cryptd_cpu_queue *cpu_queue)
 > > +{
 > > +	int queued;
@@ -180,11 +287,7 @@ for_each_online_cpu() can be used.
 > It isn't immediately clear (to me) what this function does, what its
 > role is in the overall scheme.  It wouldn't hurt at all to put a nice
 > comment over non-trivial functions explaining such things.
-
-This function is used for CRYPTD_STATE_INUSE logic, because
-CRYPTD_STATE_INUSE is not needed, this function is not needed too. Just
-calling queue_work() at end of cryptd_queue_work() is sufficient.
-
+>=20
 > > +static void cryptd_queue_work(struct work_struct *work)
 > > +{
 > > +	struct cryptd_cpu_queue *cpu_queue =3D
@@ -197,24 +300,65 @@ calling queue_work() at end of cryptd_queue_work() is sufficient.
 > 	cpu_queue =3D container_of(work, struct cryptd_cpu_queue, work);
 >=20
 > rather than uglifying the code to fit in 80-cols.
+>=20
+> > +	struct crypto_async_request *req, *backlog;
+> > +
+> > +	/* Only handle one request at a time to avoid hogging crypto
+> > +	 * workqueue */
+> > +	spin_lock_bh(&cpu_queue->lock);
+> > +	backlog =3D crypto_get_backlog(&cpu_queue->queue);
+> > +	req =3D crypto_dequeue_request(&cpu_queue->queue);
+> > +	spin_unlock_bh(&cpu_queue->lock);
+> > +
+> > +	if (!req)
+> > +		goto out;
+> > +
+> > +	if (backlog)
+> > +		backlog->complete(backlog, -EINPROGRESS);
+> > +	req->complete(req, 0);
+> > +out:
+> > +	cryptd_queue_work_done(cpu_queue);
+> > +}
+> > +
+> > +static inline struct cryptd_queue *cryptd_get_queue(struct crypto_tfm =
+*tfm)
+> >  {
+> >  	struct crypto_instance *inst =3D crypto_tfm_alg_instance(tfm);
+> >  	struct cryptd_instance_ctx *ictx =3D crypto_instance_ctx(inst);
+> > -	return ictx->state;
+> > +	return ictx->queue;
+> >  }
+> > =20
+> >  static int cryptd_blkcipher_setkey(struct crypto_ablkcipher *parent,
+> > @@ -131,19 +248,13 @@ static int cryptd_blkcipher_enqueue(stru
+> >  {
+> >  	struct cryptd_blkcipher_request_ctx *rctx =3D ablkcipher_request_ctx(=
+req);
+> >  	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(req);
+> > -	struct cryptd_state *state =3D
+> > -		cryptd_get_state(crypto_ablkcipher_tfm(tfm));
+> > -	int err;
+> > +	struct cryptd_queue *queue =3D
+> > +		cryptd_get_queue(crypto_ablkcipher_tfm(tfm));
+>=20
+> ditto
+>=20
+> >
+> > ...
+> >
+>=20
 
-OK. I will fix this.
-
-Best Regards,
-Huang Ying
-
-
---=-k1DWqKDwWs+H5IFg47i5
+--=-F45DS98ULoQEz3RbYQet
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEABECAAYFAkmFbUAACgkQKhFGF+eHlpj/zACeMyxUi6wCHd9ckIxg+7HvFugY
-OlsAoKx2z26wKgXQgEEryrM2/mQHoc1u
-=atP6
+iEYEABECAAYFAkmGYZEACgkQKhFGF+eHlphQxQCeJUfsf2Xgbqp2R7ggKA4XmAte
+PiQAoIB7mTjH/UR1g0OFSmJe9xAmpEEt
+=xVDw
 -----END PGP SIGNATURE-----
 
---=-k1DWqKDwWs+H5IFg47i5--
+--=-F45DS98ULoQEz3RbYQet--
 
