@@ -1,76 +1,130 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: sha-s390 - Switch to shash
-Date: Tue, 3 Feb 2009 12:48:06 +1100
-Message-ID: <20090203014806.GA32506@gondor.apana.org.au>
-References: <20090118225517.GA30510@gondor.apana.org.au> <20090128035615.GA13051@gondor.apana.org.au> <1233577246.18006.1.camel@localhost> <1233597667.1536.10.camel@localhost.localdomain>
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 2/3] crypto: Per-CPU cryptd thread implementation based
+ on kcrypto_wq
+Date: Tue, 3 Feb 2009 01:10:38 -0800
+Message-ID: <20090203011038.c12acc5b.akpm@linux-foundation.org>
+References: <1233556940.19806.58.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Martin Schwidefksy <schwidefsky@de.ibm.com>
-To: Jan Glauber <jang@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:37133 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753187AbZBCBsP (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:49027 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751065AbZBCJLR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Feb 2009 20:48:15 -0500
-Content-Disposition: inline
-In-Reply-To: <1233597667.1536.10.camel@localhost.localdomain>
+	Tue, 3 Feb 2009 04:11:17 -0500
+In-Reply-To: <1233556940.19806.58.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 02, 2009 at 06:01:07PM +0000, Jan Glauber wrote:
+On Mon, 02 Feb 2009 14:42:20 +0800 Huang Ying <ying.huang@intel.com> wrote:
+
+> Original cryptd thread implementation has scalability issue, this
+> patch solve the issue with a per-CPU thread implementation.
+> 
+> struct cryptd_queue is defined to be a per-CPU queue, which holds one
+> struct cryptd_cpu_queue for each CPU. In struct cryptd_cpu_queue, a
+> struct crypto_queue holds all requests for the CPU, a struct
+> work_struct is used to run all requests for the CPU.
+> 
+> ...
 >
-> The patch is not yet in cryptodev, so I applied it on top of cryptode=
-v.
-> Compiling it gives me the following error:
->=20
->  CC [M]  arch/s390/crypto/sha256_s390.o
-> arch/s390/crypto/sha_common.c: In function =E2=80=98s390_sha_update=E2=
-=80=99:
-> arch/s390/crypto/sha_common.c:23: error: implicit declaration of func=
-tion =E2=80=98crypto_shash_blocksize=E2=80=99
-> make[1]: *** [arch/s390/crypto/sha_common.o] Error 1
+> +int cryptd_init_queue(struct cryptd_queue *queue, unsigned int max_cpu_qlen)
+> +{
+> +	int cpu;
+> +	struct cryptd_cpu_queue *cpu_queue;
+> +
+> +	queue->cpu_queue = alloc_percpu(struct cryptd_cpu_queue);
+> +	if (!queue->cpu_queue)
+> +		return -ENOMEM;
+> +	for_each_possible_cpu(cpu) {
+> +		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
+> +		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
+> +		INIT_WORK(&cpu_queue->work, cryptd_queue_worker);
+> +	}
+> +	return 0;
+> +}
 
-Thanks for testing! It turns out that this was the first in-tree
-user for crypto_shash_blocksize so I'll need to add it.
+Could be made static, I believe.
 
-crypto: shash - Add crypto_shash_blocksize
+> +void cryptd_fini_queue(struct cryptd_queue *queue)
+> +{
+> +	int cpu;
+> +	struct cryptd_cpu_queue *cpu_queue;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
+> +		BUG_ON(cpu_queue->queue.qlen);
+> +	}
+> +	free_percpu(queue->cpu_queue);
+> +}
 
-This function is needed by algorithms that don't know their own
-block size, e.g., in s390 where the code is common between multiple
-versions of SHA.
+Ditto.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> +int cryptd_enqueue_request(struct cryptd_queue *queue,
+> +			   struct crypto_async_request *request)
+> +{
+> +	int cpu, err;
+> +	struct cryptd_cpu_queue *cpu_queue;
+> +
+> +	cpu = get_cpu();
+> +	cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
+> +	err = crypto_enqueue_request(&cpu_queue->queue, request);
+> +	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+> +	put_cpu();
+> +
+> +	return err;
+> +}
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index cd16d6e..b71c86b 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -231,6 +231,11 @@ static inline unsigned int crypto_shash_alignmask(
- 	return crypto_tfm_alg_alignmask(crypto_shash_tfm(tfm));
- }
-=20
-+static inline unsigned int crypto_shash_blocksize(struct crypto_shash =
-*tfm)
-+{
-+	return crypto_tfm_alg_blocksize(crypto_shash_tfm(tfm));
-+}
-+
- static inline struct shash_alg *__crypto_shash_alg(struct crypto_alg *=
-alg)
- {
- 	return container_of(alg, struct shash_alg, base);
+Ditto?
 
-Cheers,
---=20
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +static void cryptd_queue_worker(struct work_struct *work)
+
+A few comments explaining the code wouldn't kill us...
+
+> +{
+> +	struct cryptd_cpu_queue *cpu_queue;
+> +	struct crypto_async_request *req, *backlog;
+> +
+> +	cpu_queue = container_of(work, struct cryptd_cpu_queue, work);
+> +	/* Only handle one request at a time to avoid hogging crypto
+> +	 * workqueue */
+
+Not sure what that means.
+
+> +	preempt_disable();
+> +	backlog = crypto_get_backlog(&cpu_queue->queue);
+> +	req = crypto_dequeue_request(&cpu_queue->queue);
+> +	preempt_enable();
+
+This function is run by a per-cpu thread, so it cannot be migrated to
+another CPU by the CPU scheduler.
+
+It is quite unclear what this preempt_disable() is needed for.  Please
+either remove it or provide adequate comments.
+
+> +	if (!req)
+> +		goto out;
+> +
+> +	if (backlog)
+> +		backlog->complete(backlog, -EINPROGRESS);
+> +	req->complete(req, 0);
+> +out:
+> +	if (cpu_queue->queue.qlen)
+> +		queue_work(kcrypto_wq, &cpu_queue->work);
+
+Again, unclear and needs commentary.
+
+If we come here via the `goto out;' path above, this CPU queue has no
+more work do do, I think?  If so, why does it requeue itself?
+
+> +}
+> +
+> 
+> ...
+>
+
