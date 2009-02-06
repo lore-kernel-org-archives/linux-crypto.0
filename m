@@ -1,31 +1,52 @@
-From: Frank Seidel <fseidel@suse.de>
-Subject: Re: [PATCH] crypto: add missing KERN_* constants to printks
-Date: Fri, 06 Feb 2009 15:59:31 +0100
-Message-ID: <498C5053.4010809@suse.de>
-References: <498C46DE.8040700@suse.de> <20090206145838.GA28197@x200.localdomain> <498C4F2E.1070204@f-seidel.de> <20090206150315.GA28249@x200.localdomain>
+From: Lee Nipper <lee.nipper@freescale.com>
+Subject: ablkcipher algorithm with givencrypt
+Date: Fri, 06 Feb 2009 17:26:52 -0600
+Message-ID: <1233962812.362.378.camel@al08linux99>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: Frank Seidel <frank@f-seidel.de>,
-	linux kernel <linux-kernel@vger.kernel.org>,
-	akpm@linux-foundation.org, "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	jarod@redhat.com
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1759001AbZBFPAX@vger.kernel.org>
-In-Reply-To: <20090206150315.GA28249@x200.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from az33egw02.freescale.net ([192.88.158.103]:56252 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757467AbZBFXYr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Feb 2009 18:24:47 -0500
+Received: from az33smr01.freescale.net (az33smr01.freescale.net [10.64.34.199])
+	by az33egw02.freescale.net (8.14.3/az33egw02) with ESMTP id n16NOjpk005001
+	for <linux-crypto@vger.kernel.org>; Fri, 6 Feb 2009 16:24:46 -0700 (MST)
+Received: from az33exm25.fsl.freescale.net (az33exm25.am.freescale.net [10.64.32.16])
+	by az33smr01.freescale.net (8.13.1/8.13.0) with ESMTP id n16NOjbl027978
+	for <linux-crypto@vger.kernel.org>; Fri, 6 Feb 2009 17:24:45 -0600 (CST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Alexey Dobriyan schrieb:
-> Some messages there were truly debugging and some clearly weren't
-> WARNING, but INFO.
+Herbert,
 
-Yes, i also thought so, but i didn't venture to change it
-to i think it looks like. And as bevor they also were all at
-the same (unspecified/default) level...
-Do you think its worth/i should redo it and adapt the loglevel
-more appropriate?
+I'm implementing ablkcipher algorithms in talitos and need some clarification.
 
-Thanks,
-Frank
+If an ablkcipher crypto algorithm implements .givencrypt with geniv as "<built-in>"
+what is the reason that it cannot be used as a building block cipher for
+an IPsec use case ?
+
+I've noticed that if an ablkcipher algorithm does not implement givencrypt,
+and sets geniv to eseqiv, then the algorithm can somewhat support an IPsec use case.
+During testing however, it seems that eseqiv_givencrypt doesn't handle a scatterlist
+fully for an already fragmented src.  For example, a large ping (> 1460 bytes)
+going out causes a scatterlist with two entries within esp_output, but it appears that
+the src scatterlist doesn't carry forth properly through eseqiv_givencrypt
+into the ablkcipher encrypt routine.
+
+I'm wondering if I've stumbled onto a bug in this case.
+At the least my understanding is incomplete.
+
+Thank you,
+
+Lee Nipper
+Freescale Semiconductor Inc.
+ 
+
+
+
+
+
