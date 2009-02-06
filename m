@@ -1,46 +1,31 @@
-From: Alexey Dobriyan <adobriyan@gmail.com>
+From: Frank Seidel <fseidel@suse.de>
 Subject: Re: [PATCH] crypto: add missing KERN_* constants to printks
-Date: Fri, 6 Feb 2009 18:03:15 +0300
-Message-ID: <20090206150315.GA28249@x200.localdomain>
-References: <498C46DE.8040700@suse.de> <20090206145838.GA28197@x200.localdomain> <498C4F2E.1070204@f-seidel.de>
+Date: Fri, 06 Feb 2009 15:59:31 +0100
+Message-ID: <498C5053.4010809@suse.de>
+References: <498C46DE.8040700@suse.de> <20090206145838.GA28197@x200.localdomain> <498C4F2E.1070204@f-seidel.de> <20090206150315.GA28249@x200.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Frank Seidel <fseidel@suse.de>,
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Frank Seidel <frank@f-seidel.de>,
 	linux kernel <linux-kernel@vger.kernel.org>,
 	akpm@linux-foundation.org, "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	jarod@redhat.com
-To: Frank Seidel <frank@f-seidel.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.152]:43570 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750722AbZBFO5Q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Feb 2009 09:57:16 -0500
-Content-Disposition: inline
-In-Reply-To: <498C4F2E.1070204@f-seidel.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1759001AbZBFPAX@vger.kernel.org>
+In-Reply-To: <20090206150315.GA28249@x200.localdomain>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 06, 2009 at 03:54:38PM +0100, Frank Seidel wrote:
-> Alexey Dobriyan schrieb:
-> > On Fri, Feb 06, 2009 at 03:19:10PM +0100, Frank Seidel wrote:
-> >> According to kerneljanitors todo list all printk calls (beginning
-> >> a new line) should have an according KERN_* constant.
-> > 
-> > Forget about kernel janitors todo list, fix a bug instead.
-> 
-> Sure, i am eager to get my hands dirty in the kernel ;-),
-> but i needed to start somewhere and everybody told me
-> that the janitors todo list would be good place to start.
-> 
-> >> Those are the missing pieces here for the crypto subsystem.
-> > 
-> > You're inserting KERN_WARNING everywhere, what for?
-> 
-> Because every new line should have KERN_* constant and
-> KERN_WARNING is default/doesn't change current printout
-> behaviour.
+Alexey Dobriyan schrieb:
+> Some messages there were truly debugging and some clearly weren't
+> WARNING, but INFO.
 
-Some messages there were truly debugging and some clearly weren't
-WARNING, but INFO.
+Yes, i also thought so, but i didn't venture to change it
+to i think it looks like. And as bevor they also were all at
+the same (unspecified/default) level...
+Do you think its worth/i should redo it and adapt the loglevel
+more appropriate?
+
+Thanks,
+Frank
