@@ -1,110 +1,63 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: [PATCH 08/10] crypto/des_generic.c: des_dkey code shrink.
-Date: Sun, 08 Feb 2009 06:54:08 -0500
-Message-ID: <20090208115408.5998.qmail@science.horizon.com>
+Subject: [PATCH 09/10] crypto/des_generic: Eliminate some flags pointers.
+Date: Sun, 08 Feb 2009 06:54:32 -0500
+Message-ID: <20090208115432.6193.qmail@science.horizon.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, linux@horizon.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from science.horizon.com ([192.35.100.1]:17686 "HELO
+Received: from science.horizon.com ([192.35.100.1]:17690 "HELO
 	science.horizon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752742AbZBHMAu (ORCPT
+	with SMTP id S1752752AbZBHMBO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Feb 2009 07:00:50 -0500
+	Sun, 8 Feb 2009 07:01:14 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some loss in speed, but a great space savings.
+There's no need to cache a value that's used once in the typical case.
 ---
- crypto/des_generic.c |   72 +++++++++-----------------------------------------
- 1 files changed, 13 insertions(+), 59 deletions(-)
+ crypto/des_generic.c |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index 656039b..baf51cf 100644
+index baf51cf..a4f3165 100644
 --- a/crypto/des_generic.c
 +++ b/crypto/des_generic.c
-@@ -667,68 +667,22 @@ EXPORT_SYMBOL_GPL(des_ekey);
-  *
-  * No weak key checking is performed, as this is only used by triple DES
-  *
-+ * Since the decryption round keys are just the encryption round keys in
-+ * reverse order, this just generates the encryption key and reverses it.
-+ * A special-purpose function would be faster, but it would waste a lot of
-+ * space.
-  */
- sstatic void des_dkey(u32 pe[DES_EXPKEY_WORDS], const u8 k[DES_KEY_SIZE])
+@@ -690,15 +690,14 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 		      unsigned int keylen)
  {
--	/* K&R: long is at least 32 bits */
--	unsigned long a, b, c, d;
--	const u32 *pt = pc2;
--
--	d = pc1[ ((k[4] & 0x0e) << 4) + (k[0] & 0x1e) ];
--	c = pc1[ ((k[5] & 0x0e) << 4) + (k[1] & 0x1e) ];
--	b = pc1[ ((k[6] & 0x0e) << 4) + (k[2] & 0x1e) ];
--	a = pc1[ ((k[7] & 0x0e) << 4) + (k[3] & 0x1e) ];
--
--	pe[ 0 * 2] = PC2(pt, a, b, c, d); d = rs[d];
--	pe[ 1 * 2] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 2 * 2] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 3 * 2] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 4 * 2] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 5 * 2] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 6 * 2] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 7 * 2] = PC2(pt, d, a, b, c); c = rs[c];
--	pe[ 8 * 2] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[ 9 * 2] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[10 * 2] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[11 * 2] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[12 * 2] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[13 * 2] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[14 * 2] = PC2(pt, c, d, a, b); b = rs[b];
--	pe[15 * 2] = PC2(pt, b, c, d, a);
--
--	/* Skip to next table set */
--	pt += 512;
--
--	d = pc1[ ((k[0] & 0xe0) >> 4) + (k[4] & 0xf0) + 1 ];
--	c = pc1[ ((k[1] & 0xe0) >> 4) + (k[5] & 0xf0) + 1 ];
--	b = pc1[ ((k[2] & 0xe0) >> 4) + (k[6] & 0xf0) + 1 ];
--	a = pc1[ ((k[3] & 0xe0) >> 4) + (k[7] & 0xf0) + 1 ];
--
--	pe[ 0 * 2 + 1] = PC2(pt, a, b, c, d); d = rs[d];
--	pe[ 1 * 2 + 1] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 2 * 2 + 1] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 3 * 2 + 1] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 4 * 2 + 1] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 5 * 2 + 1] = PC2(pt, d, a, b, c); c = rs[c]; b = rs[b];
--	pe[ 6 * 2 + 1] = PC2(pt, b, c, d, a); a = rs[a]; d = rs[d];
--	pe[ 7 * 2 + 1] = PC2(pt, d, a, b, c); c = rs[c];
--	pe[ 8 * 2 + 1] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[ 9 * 2 + 1] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[10 * 2 + 1] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[11 * 2 + 1] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[12 * 2 + 1] = PC2(pt, c, d, a, b); b = rs[b]; a = rs[a];
--	pe[13 * 2 + 1] = PC2(pt, a, b, c, d); d = rs[d]; c = rs[c];
--	pe[14 * 2 + 1] = PC2(pt, c, d, a, b); b = rs[b];
--	pe[15 * 2 + 1] = PC2(pt, b, c, d, a);
-+	int i;
+ 	struct des_ctx *dctx = crypto_tfm_ctx(tfm);
+-	u32 *flags = &tfm->crt_flags;
+ 	u32 tmp[DES_EXPKEY_WORDS];
+ 	int ret;
  
--	/* Fixup: 2413 5768 -> 1357 2468 */
--	for (d = 0; d < 16; ++d) {
--		a = pe[2 * d];
--		b = pe[2 * d + 1];
--		MASKSWAP(a, b, c, 0xffff0000);
--		ROL(b, 18);
--		pe[2 * d] = a;
--		pe[2 * d + 1] = b;
-+	des_ekey(pe, k)
-+	/* Swap 0<->30, 1<->31, 2<->28, 3<->29, 4<->26,... 14<->16, 15<->17 */
-+	for (i = 0; i < 16; i++) {
-+		int j = 0x1e ^ i;
-+		u32 t = pe[i];
-+		pe[i] = pe[j];
-+		pe[j] = t;
+ 	/* Expand to tmp */
+ 	ret = des_ekey(tmp, key);
+ 
+-	if (unlikely(ret == 0) && (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
+-		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
++	if (unlikely(ret == 0) && (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
++		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+ 		return -EINVAL;
  	}
- }
+ 
+@@ -773,13 +772,12 @@ static int des3_ede_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	const u32 *K = (const u32 *)key;
+ 	struct des3_ede_ctx *dctx = crypto_tfm_ctx(tfm);
+ 	u32 *expkey = dctx->expkey;
+-	u32 *flags = &tfm->crt_flags;
+ 
+ 	if (unlikely(!(((K[0] ^ K[2]) | (K[1] ^ K[3])) & 0xfefefefe) ||
+ 		     !(((K[2] ^ K[4]) | (K[3] ^ K[5])) & 0xfefefefe)) &&
+-		     (*flags & CRYPTO_TFM_REQ_WEAK_KEY))
++		     (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY))
+ 	{
+-		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
++		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+ 		return -EINVAL;
+ 	}
  
 -- 
 1.6.0.6
