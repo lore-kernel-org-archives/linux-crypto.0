@@ -1,63 +1,98 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.29
-Date: Mon, 9 Feb 2009 14:39:24 +1100
-Message-ID: <20090209033924.GA31250@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20090115044020.GA29891@gondor.apana.org.au> <20090127061546.GA27962@gondor.apana.org.au>
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [Bugme-new] [Bug 12680] New: Not having a VIA PadLock hardware
+ incurs a long delay in probing on modules insertion attempt.
+Date: Mon, 9 Feb 2009 13:05:36 -0800
+Message-ID: <20090209130536.9a7a87cd.akpm@linux-foundation.org>
+References: <bug-12680-10286@http.bugzilla.kernel.org/>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: bugme-daemon@bugzilla.kernel.org, v.quequet-techniques@orange.fr
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:42555 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752988AbZBIDje (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:35599 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753484AbZBIVFo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Feb 2009 22:39:34 -0500
-Content-Disposition: inline
-In-Reply-To: <20090127061546.GA27962@gondor.apana.org.au>
+	Mon, 9 Feb 2009 16:05:44 -0500
+In-Reply-To: <bug-12680-10286@http.bugzilla.kernel.org/>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
 
-This push fixes a number of bugs/regerssions:
+(switched to email.  Please respond via emailed reply-to-all, not via the
+bugzilla web interface).
 
-* shash modules weren't ref counted properly.
-* AEAD initialisation may fail which broke IPsec.
-* Not all memory were zeroed when a crypto tfm is freed.
-* We were doing flush_dcache_page on slab pages.
- 
-Please pull from
+On Mon,  9 Feb 2009 09:12:59 -0800 (PST)
+bugme-daemon@bugzilla.kernel.org wrote:
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+> http://bugzilla.kernel.org/show_bug.cgi?id=12680
+> 
+>            Summary: Not having a VIA PadLock hardware incurs a long delay in
+>                     probing on modules insertion attempt.
+>            Product: Drivers
+>            Version: 2.5
+>      KernelVersion: Any 2.6.29 release candidate
+>           Platform: All
+>         OS/Version: Linux
+>               Tree: Mainline
+>             Status: NEW
+>           Severity: normal
+>           Priority: P1
+>          Component: Other
+>         AssignedTo: drivers_other@kernel-bugs.osdl.org
 
-or
+hm, we don't seem to have a bugzilla category for crypto.
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+>         ReportedBy: v.quequet-techniques@orange.fr
+> 
+> 
+> Latest working kernel version: 2.6.28.4
+> Earliest failing kernel version: 2.6.29-rc1
 
+I'll ask Rafael to track this as a post-2.6.28 regression.
 
-Adrian-Ken Rueegsegger (1):
-      crypto: shash - Fix module refcount
+> Distribution:
+> Hardware Environment: IA32 i686 Athlon model 10
+> Software Environment: Pristine kernel 2.6.29-rc4-git1 + Debian Lenny/Sid
+> Problem Description: Not having a VIA PadLock hardware incurs a long delay in
+> probing on modules insertion attempt:
+> 
+>   I can't say whether this abnormally long probe delay occurs on "padlock_aes"
+> or "padlock_sha" module insertion attempt or both.
+> 
+>   I do not have such hardware indeed.
+> 
+> I've never observed this problem so far with Linux version <= 2.6.28.4 .
+> 
+> Steps to reproduce:
+> 
+> Power-on your system ;-)
+> 
+> In hope my report will prove useful.
+> 
 
-Herbert Xu (4):
-      crypto: api - Fix algorithm test race that broke aead initialisation
-      crypto: api - Fix zeroing on free
-      crypto: shash - Fix tfm destruction
-      crypto: scatterwalk - Avoid flush_dcache_page on slab pages
+Neither of those drivers have changed in six months, so the breakage
+must be elsewhere.
 
- crypto/algapi.c        |    6 +++++-
- crypto/api.c           |   20 ++++++++++----------
- crypto/scatterwalk.c   |    3 ++-
- crypto/shash.c         |    7 ++++++-
- include/crypto/hash.h  |    2 +-
- include/linux/crypto.h |    7 ++++++-
- 6 files changed, 30 insertions(+), 15 deletions(-)
+I guess this should be easy for others to reproduce.
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+How long is the "long" delay?
+
+Please do this:
+
+	add "log_buf_len=1M" to the kernel boot command line
+	reboot
+
+	dmesg -n 8
+	modprobe padlock_aes &
+	sleep 1
+	echo t > /prog/sysrq-trigger
+	dmesg -s 1000000 > foo
+
+and then send us `foo'.  Pleas avoid wordwrapping it.
+
+This will permit us to see where `modprobe' is getting stuck.
+
+Thanks.
+
