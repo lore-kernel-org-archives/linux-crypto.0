@@ -1,62 +1,37 @@
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-Subject: [PATCH] Export symbol ksize()
-Date: Tue, 10 Feb 2009 15:21:44 +0200
-Message-ID: <1234272104-10211-1-git-send-email-kirill@shutemov.name>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Christoph Lameter <cl@linux-foundation.org>,
-	Pekka Enberg <penberg@cs.helsinki.fi>,
-	Matt Mackall <mpm@selenic.com>
-Return-path: <owner-linux-mm@kvack.org>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+From: Pekka Enberg <penberg@cs.helsinki.fi>
+Subject: Re: [PATCH] Export symbol ksize()
+Date: Tue, 10 Feb 2009 15:35:03 +0200
+Message-ID: <84144f020902100535i4d626a9fj8cbb305120cf332a@mail.gmail.com>
+References: <1234272104-10211-1-git-send-email-kirill@shutemov.name>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Christoph Lameter <cl@linux-foundation.org>,
+	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from fg-out-1718.google.com ([72.14.220.154]:58312 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752103AbZBJNfF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 10 Feb 2009 08:35:05 -0500
+In-Reply-To: <1234272104-10211-1-git-send-email-kirill@shutemov.name>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-It needed for crypto.ko
+On Tue, Feb 10, 2009 at 3:21 PM, Kirill A. Shutemov
+<kirill@shutemov.name> wrote:
+> It needed for crypto.ko
+>
+> Signed-off-by: Kirill A. Shutemov <kirill@shutemov.name>
 
-Signed-off-by: Kirill A. Shutemov <kirill@shutemov.name>
----
- mm/slab.c |    1 +
- mm/slob.c |    1 +
- mm/slub.c |    1 +
- 3 files changed, 3 insertions(+), 0 deletions(-)
+That's bit terse for a changelog. I did a quick grep but wasn't able
+to find the offending call-site. Where is it?
 
-diff --git a/mm/slab.c b/mm/slab.c
-index ddc41f3..4d00855 100644
---- a/mm/slab.c
-+++ b/mm/slab.c
-@@ -4457,3 +4457,4 @@ size_t ksize(const void *objp)
- 
- 	return obj_size(virt_to_cache(objp));
- }
-+EXPORT_SYMBOL(ksize);
-diff --git a/mm/slob.c b/mm/slob.c
-index bf7e8fc..52bc8a2 100644
---- a/mm/slob.c
-+++ b/mm/slob.c
-@@ -521,6 +521,7 @@ size_t ksize(const void *block)
- 	} else
- 		return sp->page.private;
- }
-+EXPORT_SYMBOL(ksize);
- 
- struct kmem_cache {
- 	unsigned int size, align;
-diff --git a/mm/slub.c b/mm/slub.c
-index bdc9abb..0280eee 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -2736,6 +2736,7 @@ size_t ksize(const void *object)
- 	 */
- 	return s->size;
- }
-+EXPORT_SYMBOL(ksize);
- 
- void kfree(const void *x)
- {
--- 
-1.6.1.3.GIT
+We unexported ksize() because it's a problematic interface and you
+almost certainly want to use the alternatives (e.g. krealloc). I think
+I need bit more convincing to apply this patch...
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+                        Pekka
