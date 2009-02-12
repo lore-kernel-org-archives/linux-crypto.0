@@ -1,32 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Matt Mackall <mpm@selenic.com>
 Subject: Re: [PATCH] Export symbol ksize()
-Date: Fri, 13 Feb 2009 07:09:57 +0800
-Message-ID: <20090212230957.GB21609@gondor.apana.org.au>
-References: <1234272104-10211-1-git-send-email-kirill@shutemov.name> <84144f020902100535i4d626a9fj8cbb305120cf332a@mail.gmail.com> <20090210134651.GA5115@epbyminw8406h.minsk.epam.com> <Pine.LNX.4.64.0902101605070.20991@melkki.cs.Helsinki.FI> <20090212104349.GA13859@gondor.apana.org.au> <1234435521.28812.165.camel@penberg-laptop> <20090212105034.GC13859@gondor.apana.org.au> <1234454104.28812.175.camel@penberg-laptop>
+Date: Thu, 12 Feb 2009 17:37:01 -0600
+Message-ID: <1234481821.3152.27.camel@calx>
+References: <1234272104-10211-1-git-send-email-kirill@shutemov.name>
+	 <1234435521.28812.165.camel@penberg-laptop>
+	 <20090212105034.GC13859@gondor.apana.org.au>
+	 <200902130010.46623.nickpiggin@yahoo.com.au>
+	 <20090212230934.GA21609@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
-	Christoph Lameter <cl@linux-foundation.org>,
-	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	Geert.Uytterhoeven@sonycom.com
-To: Pekka Enberg <penberg@cs.helsinki.fi>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: Nick Piggin <nickpiggin@yahoo.com.au>,
+        Pekka Enberg <penberg@cs.helsinki.fi>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Christoph Lameter <cl@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Geert.Uytterhoeven@sonycom.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <1234454104.28812.175.camel@penberg-laptop>
+In-Reply-To: <20090212230934.GA21609@gondor.apana.org.au>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 12, 2009 at 05:55:04PM +0200, Pekka Enberg wrote:
+On Fri, 2009-02-13 at 07:09 +0800, Herbert Xu wrote:
+> On Fri, Feb 13, 2009 at 12:10:45AM +1100, Nick Piggin wrote:
+> > 
+> > I would be interested to know how that goes. You always have this
+> > circular issue that if a little more space helps significantly, then
+> > maybe it is a good idea to explicitly ask for those bytes. Of course
+> > that larger allocation is also likely to have some slack bytes.
 > 
-> OK, fair enough, I applied Kirill's patch. Thanks.
+> Well, the thing is we don't know apriori whether we need the
+> extra space.  The idea is to use the extra space if available
+> to avoid reallocation when we hit things like IPsec.
 
-Thanks Pekka!
+I'm not entirely convinced by this argument. If you're concerned about
+space rather than performance, then you want an allocator that doesn't
+waste space in the first place and you don't try to do "sub-allocations"
+by hand. If you're concerned about performance, you instead optimize
+your allocator to be as fast as possible and again avoid conditional
+branches for sub-allocations.
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+http://selenic.com : development and support for Mercurial and Linux
+
 
 --
 To unsubscribe, send a message with 'unsubscribe linux-mm' in
