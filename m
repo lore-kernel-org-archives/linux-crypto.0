@@ -1,42 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] Export symbol ksize()
-Date: Fri, 13 Feb 2009 07:09:34 +0800
-Message-ID: <20090212230934.GA21609@gondor.apana.org.au>
-References: <1234272104-10211-1-git-send-email-kirill@shutemov.name> <1234435521.28812.165.camel@penberg-laptop> <20090212105034.GC13859@gondor.apana.org.au> <200902130010.46623.nickpiggin@yahoo.com.au>
+Date: Fri, 13 Feb 2009 07:09:57 +0800
+Message-ID: <20090212230957.GB21609@gondor.apana.org.au>
+References: <1234272104-10211-1-git-send-email-kirill@shutemov.name> <84144f020902100535i4d626a9fj8cbb305120cf332a@mail.gmail.com> <20090210134651.GA5115@epbyminw8406h.minsk.epam.com> <Pine.LNX.4.64.0902101605070.20991@melkki.cs.Helsinki.FI> <20090212104349.GA13859@gondor.apana.org.au> <1234435521.28812.165.camel@penberg-laptop> <20090212105034.GC13859@gondor.apana.org.au> <1234454104.28812.175.camel@penberg-laptop>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Pekka Enberg <penberg@cs.helsinki.fi>,
-	"Kirill A. Shutemov" <kirill@shutemov.name>,
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
 	Christoph Lameter <cl@linux-foundation.org>,
 	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
 	Geert.Uytterhoeven@sonycom.com
-To: Nick Piggin <nickpiggin@yahoo.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46555 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750776AbZBLXKE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Feb 2009 18:10:04 -0500
+To: Pekka Enberg <penberg@cs.helsinki.fi>
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <200902130010.46623.nickpiggin@yahoo.com.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1234454104.28812.175.camel@penberg-laptop>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 13, 2009 at 12:10:45AM +1100, Nick Piggin wrote:
+On Thu, Feb 12, 2009 at 05:55:04PM +0200, Pekka Enberg wrote:
 > 
-> I would be interested to know how that goes. You always have this
-> circular issue that if a little more space helps significantly, then
-> maybe it is a good idea to explicitly ask for those bytes. Of course
-> that larger allocation is also likely to have some slack bytes.
+> OK, fair enough, I applied Kirill's patch. Thanks.
 
-Well, the thing is we don't know apriori whether we need the
-extra space.  The idea is to use the extra space if available
-to avoid reallocation when we hit things like IPsec.
-
-Cheers,
+Thanks Pekka!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
