@@ -1,38 +1,109 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Johannes Weiner <hannes@cmpxchg.org>
 Subject: Re: [PATCH] Export symbol ksize()
-Date: Mon, 16 Feb 2009 09:57:06 +0800
-Message-ID: <20090216015706.GA13948@gondor.apana.org.au>
-References: <1234454104.28812.175.camel@penberg-laptop> <20090215133638.5ef517ac.akpm@linux-foundation.org> <1234734194.5669.176.camel@calx> <20090215135555.688ae1a3.akpm@linux-foundation.org> <1234741781.5669.204.camel@calx> <20090215170052.44ee8fd5.akpm@linux-foundation.org> <20090216012110.GA13575@gondor.apana.org.au> <1234747726.5669.215.camel@calx> <20090216015229.GA13892@gondor.apana.org.au> <1234749279.5669.225.camel@calx>
+Date: Mon, 16 Feb 2009 14:56:43 +0100
+Message-ID: <20090216135643.GA6927@cmpxchg.org>
+References: <1234272104-10211-1-git-send-email-kirill@shutemov.name> <84144f020902100535i4d626a9fj8cbb305120cf332a@mail.gmail.com> <20090210134651.GA5115@epbyminw8406h.minsk.epam.com> <Pine.LNX.4.64.0902101605070.20991@melkki.cs.Helsinki.FI>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Pekka Enberg <penberg@cs.helsinki.fi>,
-	"Kirill A. Shutemov" <kirill@shutemov.name>,
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
 	Christoph Lameter <cl@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, Geert.Uytterhoeven@sonycom.com
-To: Matt Mackall <mpm@selenic.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35024 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753245AbZBPB5U (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Feb 2009 20:57:20 -0500
+	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Geert.Uytterhoeven@sonycom.com
+To: Pekka J Enberg <penberg@cs.helsinki.fi>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1758009AbZBPNyw@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1234749279.5669.225.camel@calx>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <Pine.LNX.4.64.0902101605070.20991@melkki.cs.Helsinki.FI>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Feb 15, 2009 at 07:54:39PM -0600, Matt Mackall wrote:
->
-> I'll bite.. what's wrong with page boundaries? Do we play per-SKB TLB
-> games in virtual network drivers?
+On Tue, Feb 10, 2009 at 04:06:53PM +0200, Pekka J Enberg wrote:
+> On Tue, Feb 10, 2009 at 03:35:03PM +0200, Pekka Enberg wrote:
+> > > We unexported ksize() because it's a problematic interface and you
+> > > almost certainly want to use the alternatives (e.g. krealloc). I think
+> > > I need bit more convincing to apply this patch...
+>  
+> On Tue, 10 Feb 2009, Kirill A. Shutemov wrote:
+> > It just a quick fix. If anybody knows better solution, I have no
+> > objections.
+> 
+> Herbert, what do you think of this (untested) patch? Alternatively, we 
+> could do something like kfree_secure() but it seems overkill for this one 
+> call-site.
 
-Because virtual physical memory is not physically contiguous.
+There are more callsites which do memset() + kfree():
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	arch/s390/crypto/prng.c
+	drivers/s390/crypto/zcrypt_pcixcc.c
+	drivers/md/dm-crypt.c
+	drivers/usb/host/hwa-hc.c
+	drivers/usb/wusbcore/cbaf.c
+	(drivers/w1/w1{,_int}.c)
+	fs/cifs/misc.c
+	fs/cifs/connect.c
+	fs/ecryptfs/keystore.c
+	fs/ecryptfs/messaging.c
+	net/atm/mpoa_caches.c
+
+How about the attached patch?  One problem is that zeroing ksize()
+bytes can have an overhead of nearly twice the actual allocation size.
+
+So we would need an interface that lets the caller pass in either a
+number of bytes it wants to have zeroed out or say idontknow.
+
+Perhaps add a size parameter that is cut to ksize() if it's too big?
+Or (ssize_t)-1 for figureitoutyourself?
+
+	Hannes
+
+---
+Subject: slab: introduce kzfree()
+
+kzfree() is a wrapper for kfree() that additionally zeroes the
+underlying memory before releasing it to the slab allocator.
+
+---
+ include/linux/slab.h |    1 +
+ mm/util.c            |   20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+--- a/include/linux/slab.h
++++ b/include/linux/slab.h
+@@ -127,6 +127,7 @@ int kmem_ptr_validate(struct kmem_cache 
+ void * __must_check __krealloc(const void *, size_t, gfp_t);
+ void * __must_check krealloc(const void *, size_t, gfp_t);
+ void kfree(const void *);
++void kzfree(const void *);
+ size_t ksize(const void *);
+ 
+ /*
+--- a/mm/util.c
++++ b/mm/util.c
+@@ -129,6 +129,26 @@ void *krealloc(const void *p, size_t new
+ }
+ EXPORT_SYMBOL(krealloc);
+ 
++/**
++ * kzfree - like kfree but zero memory
++ * @p: object to free memory of
++ * @zsize: size of the memory region to zero
++ *
++ * The memory of the object @p points to is zeroed before freed.
++ * If @p is %NULL, kzfree() does nothing.
++ */
++void kzfree(const void *p)
++{
++	size_t ks;
++	void *mem = (void *)p;
++
++	if (unlikely(ZERO_OR_NULL_PTR(mem)))
++		return;
++	ks = ksize(mem);
++	memset(mem, 0, ks);
++	kfree(mem);
++}
++
+ /*
+  * strndup_user - duplicate an existing string from user space
+  * @s: The string to duplicate
