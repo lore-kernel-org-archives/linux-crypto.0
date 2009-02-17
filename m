@@ -1,51 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.29
-Date: Tue, 17 Feb 2009 20:12:52 +0800
-Message-ID: <20090217121252.GA22812@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20090115044020.GA29891@gondor.apana.org.au> <20090127061546.GA27962@gondor.apana.org.au> <20090209033924.GA31250@gondor.apana.org.au>
+From: Christoph Lameter <cl@linux-foundation.org>
+Subject: Re: [PATCH] Export symbol ksize()
+Date: Tue, 17 Feb 2009 11:17:19 -0500 (EST)
+Message-ID: <alpine.DEB.1.10.0902171115010.29986@qirst.com>
+References: <1234272104-10211-1-git-send-email-kirill@shutemov.name>  <84144f020902100535i4d626a9fj8cbb305120cf332a@mail.gmail.com>  <20090210134651.GA5115@epbyminw8406h.minsk.epam.com>  <Pine.LNX.4.64.0902101605070.20991@melkki.cs.Helsinki.FI>
+ <20090212104349.GA13859@gondor.apana.org.au>  <1234435521.28812.165.camel@penberg-laptop>  <20090212105034.GC13859@gondor.apana.org.au>  <1234454104.28812.175.camel@penberg-laptop>  <20090215133638.5ef517ac.akpm@linux-foundation.org>  <1234734194.5669.176.camel@calx>
+  <20090215135555.688ae1a3.akpm@linux-foundation.org> <1234741781.5669.204.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52764 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750916AbZBQMNE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Feb 2009 07:13:04 -0500
-Content-Disposition: inline
-In-Reply-To: <20090209033924.GA31250@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+    Pekka Enberg <penberg@cs.helsinki.fi>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "Kirill A. Shutemov" <kirill@shutemov.name>, linux-kernel@vger.kernel.org,
+    linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+    Geert.Uytterhoeven@sonycom.com
+To: Matt Mackall <mpm@selenic.com>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1234741781.5669.204.camel@calx>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Sun, 15 Feb 2009, Matt Mackall wrote:
 
-This push fixes LRW (used for disk encryption) on big endian.
-It turns out that it just never worked over there.  Based on
-the fact that nobody screamed about it after the addition of
-mandatory testing, it seems that it just isn't used so we don't
-have to worry about existing big-endian LRW deployments.
+> And it -is- a category error. The fact that kmalloc is implemented on
+> top of kmem_cache_alloc is an implementation detail that callers should
+> not assume. They shouldn't call kfree() on kmem_cache_alloc objects
+> (even though it might just happen to work), nor should they call
+> ksize().
 
-Please pull from
+ksize does not take a kmem_cache pointer and it is mainly used for
+figuring out how much space kmalloc really allocated for an object. As
+such its more part of the kmalloc/kfree set of calls than the
+kmem_cache_* calls.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+We could add another call
 
-or
+	kmem_cache_size()
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+for symmetries sake.
 
 
-Herbert Xu (1):
-      crypto: lrw - Fix big endian support
-
- crypto/lrw.c |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
- 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
