@@ -1,34 +1,78 @@
-From: Christoph Lameter <cl@linux-foundation.org>
-Subject: Re: [PATCH] Export symbol ksize()
-Date: Tue, 17 Feb 2009 12:06:37 -0500 (EST)
-Message-ID: <alpine.DEB.1.10.0902171205390.15929@qirst.com>
-References: <1234272104-10211-1-git-send-email-kirill@shutemov.name>  <20090212104349.GA13859@gondor.apana.org.au>  <1234435521.28812.165.camel@penberg-laptop>  <20090212105034.GC13859@gondor.apana.org.au>  <1234454104.28812.175.camel@penberg-laptop>
- <20090215133638.5ef517ac.akpm@linux-foundation.org>  <1234734194.5669.176.camel@calx>  <20090215135555.688ae1a3.akpm@linux-foundation.org>  <1234741781.5669.204.camel@calx>  <alpine.DEB.1.10.0902171115010.29986@qirst.com>
- <84144f020902170903g5756cf4cy57f98cd5955ff2e3@mail.gmail.com>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH] crypto: shash - Handle failures in crypto_alloc_shash()
+ correctly
+Date: Tue, 17 Feb 2009 18:46:40 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0902171845420.13163@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Matt Mackall <mpm@selenic.com>, Andrew Morton <akpm@linux-foundation.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    "Kirill A. Shutemov" <kirill@shutemov.name>, linux-kernel@vger.kernel.org,
-    linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-    Geert.Uytterhoeven@sonycom.com
-To: Pekka Enberg <penberg@cs.helsinki.fi>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <84144f020902170903g5756cf4cy57f98cd5955ff2e3@mail.gmail.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:37838 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754388AbZBQRqo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Feb 2009 12:46:44 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 17 Feb 2009, Pekka Enberg wrote:
+crypto_alloc_tfm() returns an error-valued pointer in case of failure,
+which must not be translated using __crypto_shash_cast().
 
-> Hmm, kmem_cache_size() seems bit pointless to me. For
-> kmem_cache_create()'d caches, actual allocated size should be more or
-> less optimal with no extra space.
+Currently everything works fine because __crypto_shash_cast() is a no-o=
+p
+(crypto_shash.base is at offset zero).
 
-Cacheline alignment and word alignment etc etc can still add some space to
-the object.
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+---
+ crypto/shash.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 13a0dc1..fbc6993 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -480,8 +480,12 @@ static const struct crypto_type crypto_shash_type =
+=3D {
+ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type=
+,
+ 					u32 mask)
+ {
+-	return __crypto_shash_cast(
+-		crypto_alloc_tfm(alg_name, &crypto_shash_type, type, mask));
++	struct crypto_tfm *tfm =3D crypto_alloc_tfm(alg_name, &crypto_shash_t=
+ype,
++						  type, mask);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++
++	return __crypto_shash_cast(tfm);
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_shash);
+=20
+--=20
+1.6.0.4
+
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+
+Sony Techsoft Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
+
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
 --
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
