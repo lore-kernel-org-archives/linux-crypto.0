@@ -1,62 +1,268 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: LRW endian issues?
-Date: Wed, 18 Feb 2009 15:14:16 +0100 (CET)
-Message-ID: <alpine.LRH.2.00.0902181512570.29726@vixen.sonytel.be>
-References: <20090206040124.GA4299@gondor.apana.org.au> <alpine.LRH.2.00.0902061117570.26894@vixen.sonytel.be> <20090210120218.GA23234@gondor.apana.org.au> <alpine.LRH.2.00.0902121629480.29413@vixen.sonytel.be> <20090218134451.GA29520@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: rsnel@cube.dyndns.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 2/5] crypto: testmgr - Add support for the pcomp interface
+Date: Wed, 18 Feb 2009 16:53:19 +0100
+Message-ID: <1234972402-24298-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
+References: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:55264 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:57301 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751928AbZBROOS (ORCPT
+	by vger.kernel.org with ESMTP id S1752568AbZBRPxZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Feb 2009 09:14:18 -0500
-In-Reply-To: <20090218134451.GA29520@gondor.apana.org.au>
+	Wed, 18 Feb 2009 10:53:25 -0500
+In-Reply-To: <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 18 Feb 2009, Herbert Xu wrote:
-> On Thu, Feb 12, 2009 at 04:30:11PM +0100, Geert Uytterhoeven wrote:
-> >
-> > > Thanks, could you try this patch?
-> >=20
-> > Unfortunately it doesn't seem to make any difference.
->=20
-> Thanks for testing.  I've reproduced the problem here and this
-> is the fix I've come up with.
->=20
-> commit 6fe4a28d8855e072036f36ee22f0a8f43f44918f
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Wed Feb 18 21:41:29 2009 +0800
->=20
->     crypto: testmgr - Test skciphers with no IVs
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+---
+ crypto/testmgr.c |  181 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.h |    9 +++
+ 2 files changed, 190 insertions(+), 0 deletions(-)
 
-I can confirm the test no longer hangs on "modprobe tcrypt mode=3D10" (=
-after
-reverting "crypto: lrw - Fix big endian support").
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a75f11f..54b96ed 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -72,6 +72,13 @@ struct comp_test_suite {
+ 	} comp, decomp;
+ };
+ 
++struct pcomp_test_suite {
++	struct {
++		struct pcomp_testvec *vecs;
++		unsigned int count;
++	} comp, decomp;
++};
++
+ struct hash_test_suite {
+ 	struct hash_testvec *vecs;
+ 	unsigned int count;
+@@ -86,6 +93,7 @@ struct alg_test_desc {
+ 		struct aead_test_suite aead;
+ 		struct cipher_test_suite cipher;
+ 		struct comp_test_suite comp;
++		struct pcomp_test_suite pcomp;
+ 		struct hash_test_suite hash;
+ 	} suite;
+ };
+@@ -898,6 +906,157 @@ out:
+ 	return ret;
+ }
+ 
++static int test_pcomp(struct crypto_pcomp *tfm,
++		      struct pcomp_testvec *ctemplate,
++		      struct pcomp_testvec *dtemplate, int ctcount,
++		      int dtcount)
++{
++	const char *algo = crypto_tfm_alg_driver_name(crypto_pcomp_tfm(tfm));
++	unsigned int i;
++	char result[COMP_BUF_SIZE];
++	int error;
++
++	for (i = 0; i < ctcount; i++) {
++		struct comp_request req;
++
++		error = crypto_compress_setup(tfm, ctemplate[i].params);
++		if (error) {
++			pr_err("alg: pcomp: compression setup failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		error = crypto_compress_init(tfm);
++		if (error) {
++			pr_err("alg: pcomp: compression init failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		memset(result, 0, sizeof(result));
++
++		req.next_in = ctemplate[i].input;
++		req.avail_in = ctemplate[i].inlen / 2;
++		req.next_out = result;
++		req.avail_out = ctemplate[i].outlen / 2;
++
++		error = crypto_compress_update(tfm, &req);
++		if (error && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: compression update failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		/* Add remaining input data */
++		req.avail_in += (ctemplate[i].inlen + 1) / 2;
++
++		error = crypto_compress_update(tfm, &req);
++		if (error && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: compression update failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		/* Provide remaining output space */
++		req.avail_out += COMP_BUF_SIZE - ctemplate[i].outlen / 2;
++
++		error = crypto_compress_final(tfm, &req);
++		if (error) {
++			pr_err("alg: pcomp: compression final failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		if (COMP_BUF_SIZE - req.avail_out != ctemplate[i].outlen) {
++			pr_err("alg: comp: Compression test %d failed for %s: "
++			       "output len = %d (expected %d)\n", i + 1, algo,
++			       COMP_BUF_SIZE - req.avail_out,
++			       ctemplate[i].outlen);
++			return -EINVAL;
++		}
++
++		if (memcmp(result, ctemplate[i].output, ctemplate[i].outlen)) {
++			pr_err("alg: pcomp: Compression test %d failed for "
++			       "%s\n", i + 1, algo);
++			hexdump(result, ctemplate[i].outlen);
++			return -EINVAL;
++		}
++	}
++
++	for (i = 0; i < dtcount; i++) {
++		struct comp_request req;
++
++		error = crypto_decompress_setup(tfm, dtemplate[i].params);
++		if (error) {
++			pr_err("alg: pcomp: decompression setup failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		error = crypto_decompress_init(tfm);
++		if (error) {
++			pr_err("alg: pcomp: decompression init failed on test "
++			       "%d for %s: error=%d\n", i + 1, algo, error);
++			return error;
++		}
++
++		memset(result, 0, sizeof(result));
++
++		req.next_in = dtemplate[i].input;
++		req.avail_in = dtemplate[i].inlen / 2;
++		req.next_out = result;
++		req.avail_out = dtemplate[i].outlen / 2;
++
++		error = crypto_decompress_update(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression update failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		/* Add remaining input data */
++		req.avail_in += (dtemplate[i].inlen + 1) / 2;
++
++		error = crypto_decompress_update(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression update failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		/* Provide remaining output space */
++		req.avail_out += COMP_BUF_SIZE - dtemplate[i].outlen / 2;
++
++		error = crypto_decompress_final(tfm, &req);
++		if (error  && (error != -EAGAIN || req.avail_in)) {
++			pr_err("alg: pcomp: decompression final failed on "
++			       "test %d for %s: error=%d\n", i + 1, algo,
++			       error);
++			return error;
++		}
++
++		if (COMP_BUF_SIZE - req.avail_out != dtemplate[i].outlen) {
++			pr_err("alg: comp: Decompression test %d failed for "
++			       "%s: output len = %d (expected %d)\n", i + 1,
++			       algo, COMP_BUF_SIZE - req.avail_out,
++			       dtemplate[i].outlen);
++			return -EINVAL;
++		}
++
++		if (memcmp(result, dtemplate[i].output, dtemplate[i].outlen)) {
++			pr_err("alg: pcomp: Decompression test %d failed for "
++			       "%s\n", i + 1, algo);
++			hexdump(result, dtemplate[i].outlen);
++			return -EINVAL;
++		}
++	}
++
++	return 0;
++}
++
+ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+@@ -1007,6 +1166,28 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
+ 	return err;
+ }
+ 
++static int alg_test_pcomp(const struct alg_test_desc *desc, const char *driver,
++			  u32 type, u32 mask)
++{
++	struct crypto_pcomp *tfm;
++	int err;
++
++	tfm = crypto_alloc_pcomp(driver, type, mask);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: pcomp: Failed to load transform for %s: %ld\n",
++		       driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++
++	err = test_pcomp(tfm, desc->suite.pcomp.comp.vecs,
++			 desc->suite.pcomp.decomp.vecs,
++			 desc->suite.pcomp.comp.count,
++			 desc->suite.pcomp.decomp.count);
++
++	crypto_free_pcomp(tfm);
++	return err;
++}
++
+ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 			 u32 type, u32 mask)
+ {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 132953e..81b7eb0 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -15,6 +15,8 @@
+ #ifndef _CRYPTO_TESTMGR_H
+ #define _CRYPTO_TESTMGR_H
+ 
++#include <crypto/compress.h>
++
+ #define MAX_DIGEST_SIZE		64
+ #define MAX_TAP			8
+ 
+@@ -8347,6 +8349,13 @@ struct comp_testvec {
+ 	char output[COMP_BUF_SIZE];
+ };
+ 
++struct pcomp_testvec {
++	const void *params;
++	int inlen, outlen;
++	char input[COMP_BUF_SIZE];
++	char output[COMP_BUF_SIZE];
++};
++
+ /*
+  * Deflate test vectors (null-terminated strings).
+  * Params: winbits=-11, Z_DEFAULT_COMPRESSION, MAX_MEM_LEVEL.
+-- 
+1.6.0.4
 
-With kind regards,
-
-Geert Uytterhoeven
-Software Architect
-
-Sony Techsoft Centre Europe
-The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
-gium
-
-Phone:    +32 (0)2 700 8453
-=46ax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
-
-A division of Sony Europe (Belgium) N.V.
-VAT BE 0413.825.160 =B7 RPR Brussels
-=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
