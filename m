@@ -1,27 +1,59 @@
-From: Nathanael Leichter <olkpvimpg_rhc@emapfrance.com>
-Subject: =?windows-1251?B?QSBNaXJhY2xlIEFmdGVyIFVzaW5nIFRoaXMgRGlldCBTb2x1dGlvbg==?=
-Date: Wed, 18 Feb 2009 20:12:34 +0800
-Message-ID: <44076.910618651$1234960369@news.gmane.org>
-Reply-To: Nathanael Leichter <kaitlynn.mezick1959@gmail.com>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: Re: [PATCH] crypto: shash - Handle failures in crypto_alloc_shash()
+ correctly
+Date: Wed, 18 Feb 2009 14:27:38 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0902181409440.29726@vixen.sonytel.be>
+References: <alpine.LRH.2.00.0902171845420.13163@vixen.sonytel.be> <20090218085842.GA28120@gondor.apana.org.au> <alpine.LRH.2.00.0902181005570.28815@vixen.sonytel.be> <20090218094548.GA28420@gondor.apana.org.au> <alpine.LRH.2.00.0902181057490.29726@vixen.sonytel.be>
+ <20090218110641.GA28781@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from msr40.hinet.net ([168.95.4.140]:41514 "EHLO msr40.hinet.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751659AbZBRMbK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Feb 2009 07:31:10 -0500
-Received: from google.com (218-162-194-206.dynamic.hinet.net [218.162.194.206])
-	by msr40.hinet.net (8.9.3/8.9.3) with ESMTP id UAA18191
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2009 20:12:29 +0800 (CST)
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:54124 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751788AbZBRN1k (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Feb 2009 08:27:40 -0500
+In-Reply-To: <20090218110641.GA28781@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGVsbG8hDQoNCkRpZCB5b3Uga25vdyB0aGF0IGlmIHlvdSBzdWNjZWVkIGluIHJlZ3VsYXRpbmcgeW91ciBpbnN1bGluIHRoaXMgd2lsbCBsZWFkIHlvdSB0byBhIEZhc3QgYW5kIFBlcm1hbmVudCBGQVQgTE9TUz8NCg0KV2UgYXJlIGhlcmUgdG8gaGVscCB5b3UgZG8gdGhhdCEgT3VyIGNvbXBhbnkgaGFzIHRoZSBwbGVhc3VyZSBhbmQgYWxzbyB0aGUgcmlnaHRzIHRvIHByb21vdGUgdGhlIGxhdGVzdCBwcm92ZWQgd2VpZ2h0IGxvc3MgcHJvZ3JhbSwgd2hpY2ggaXMgdGhlIG1vc3QgaGVhbHRoaWVyIHdlaWdodCBsb3NzIGRpZXQgZXZlci4gTm8gb25lIGhhcyBkb25lIHRoYXQgc28gZmFyIC0gd2UgaGF2ZSBGcmVlIFRyaWFscyBhdmFpbGFibGUuIFlvdSBqdXN0IGhhdmUgdG8gY29uZmlybSB0aGF0IHlvdSB3aXNoIHRvIHJlY2VpdmUgYW5kIHRyeSB0aGVtLCBhbmQgd2Ugd2lsbCBzZW5kIHRoZW0gcmlnaHQgdG8geW91ciBkb29yLiBZb3UgaGF2ZSBub3RoaW5nIHRvIGxvb3NlIC0geW91IGNhbiBvbmx5IGxvc2Ugd2VpZ2h0IGZhc3QgYW5kIHBlcm1hbmVudGx5Lg0KDQpJZiB5b3Ugd2FudCB0byBiZSBhIHBhcnQgb2YgdGhpcyBzdWNjZXNzZnVsIHBy
- b2dyYW1tZSwganVzdCBhbnN3ZXIgYmFjayB0byB0aGlzIGxldHRlciwgb3Igc2VuZCB1cyBhbiBhbnN3ZXIgdG8gcGhpbGxpc2JyYW5kd2VpbjE5NzBAZ21haWwuY29tDQoNClRoaXMgaXMgYWwgeW91IGhhdmUgdG8gZG8gaW4gb3JkZXIgdG8gYmVjb21!
-lIHRoZSBwZXJzb24geW91IGhhdmUgZXZlciB3YW50ZWQuIFdlIGhhdmUgb25seSBvbmUgcmVxdWVzdCAtIHBsZWFzZSwgaHVycnkgdXAsIGFzIHRoZSBzdXBwbGllcyBvZiB0aGVzZSBGUkVFIFRSSUFMUyBhcmUgdmVyeSBsaW1pdGVkIGFuZCBnb2luZyB2ZXJ5IGZhc3QhDQoNCkJlc3Qgd2lzaGVzLA0KRGVsaXZlcnkgRGVwYXJ0bWVudCwNCk51dHJpdGlvbiBTeXN0ZW0KCgoKCgoKCgoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBlbWFpbCBoYXMgYmVlbiB3cml0dGVuIGFuZCBwcm92ZWQgdG8gYmUgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSByZWNlbnRseSBlc3RhYmxpc2hlZCBjYW4tc3BhbSBhY3QgbGF3IGluIFVTLiBXZSBhcmUgbm90IHByb3Zva2luZyBvciBmb3JjaW5nIGFueSBwZXJzb24gaW4gYW55IHdheSB0byBwYXJ0aWNpcGF0ZSBpbiBvdXIgcHJvZ3JhbXMuIFRvIHBhcnRpY2lwYXRlIGlzIHlvdXIgb3duIGRlY2lzaW9uIGFuZCB5b3UgY2FycnkgdGhlIHJlc3BvbnNpYmlsaXR5IG9mIHRha2luZyBmdXJ0aGVyIHBhcnQgaW4gdGhpcyBwcm9tb3Rpb24uIEF
- ueXdheSwgaWYgeW91IGRvbid0IHdhbnQgdG8gcmVjZWl2ZSBtb3JlIGdvb2Qgb2ZmZXJzIGZyb20gdXMsIHlvdSBjYW4gc2ltcGx5IFVuc3Vic2NyaWJlIGJ5IHNlbmRpbmcgdXMgYSBub3RpZmljYXRpb24gZW1haWwgdG8gZ2V0Lm91dF9mcm9tX2xpc3!
-RAeWFob28uY29tIHdpdGggYSBtYWlsLXN1YmplY3QgYW5kIHRleHQgIlVuc3Vic2NyaWJlIG1lIiwgYW5kIHdlIHdpbGwgZ2V0IHlvdXIgZW1haWwgb3V0IG9mIG91ciBsaXN0IHdpdGhpbiAxMCBkYXlzLgoKVGhpcyBtZXNzYWdlIGlzIFNUUklDVExZIENPTkZJREVOVElBTCBhbmQgaXMgc29sZWx5IGZvciB0aGUgaW5kaXZpZHVhbCBvciBvcmdhbmlzYXRpb24gdG8gd2hvbSBpdCBpcyBhZGRyZXNzZWQuIEl0IG1heSBjb250YWluIFBSSVZJTEVHRUQgYW5kIENPTkZJREVOVElBTCBpbmZvcm1hdGlvbi4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgeW91IGFyZSBoZXJlYnkgbm90aWZpZWQgdGhhdCBhbnkgZGlzc2VtaW5hdGlvbiwgZGlzdHJpYnV0aW9uIG9yIGNvcHlpbmcgb2YgdGhpcyBjb21tdW5pY2F0aW9uIGFuZCBpdHMgY29udGVudHMgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgaW50ZXJlc3RlZCBpbiB0aGUgb2ZmZXJlZCBwcm9tb3Rpb25zLCBwbGVhc2UganVzdCBkb24ndCBhbnN3ZXIuIElmIHlvdSB0aGluayB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBjb250ZW50cy
- BpbiBlcnJvciwgcGxlYXNlIGRlbGV0ZSBpdCBmcm9tIHlvdXIgY29tcHV0ZXIsIG9yIGZvbGxvdyB0aGUgdW5zdWJzY3JpYmluZyBwcm9jZWR1cmUgc2hvd24gYWJvdmUuCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL!
-S0tLS0tLS0tLS0tLS0tLS0tLS0tLQoJCQ==
+On Wed, 18 Feb 2009, Herbert Xu wrote:
+> On Wed, Feb 18, 2009 at 10:59:13AM +0100, Geert Uytterhoeven wrote:
+> > But if you put stuff in your crypto_* before base, you still need t=
+he special
+> > translation (and check for IS_ERR()).
+>=20
+> You've lost me.  With my patch crypto_create_tfm will either
+> return the pointer to the start of the area allocated or an error.
+>=20
+> Why would you need any special translation?
+
+Sorry, I misread your patch. crypto_create_tfm() already takes care of =
+the
+translation.
+
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+
+Sony Techsoft Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
+
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
