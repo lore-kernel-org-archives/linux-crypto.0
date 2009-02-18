@@ -1,268 +1,79 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH 2/5] crypto: testmgr - Add support for the pcomp interface
-Date: Wed, 18 Feb 2009 16:53:19 +0100
-Message-ID: <1234972402-24298-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
-References: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
- <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH 0/5] Partial (de)compression Crypto API
+Date: Wed, 18 Feb 2009 16:53:17 +0100
+Message-ID: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:57301 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:57291 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752568AbZBRPxZ (ORCPT
+	by vger.kernel.org with ESMTP id S1751720AbZBRPxY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Feb 2009 10:53:25 -0500
-In-Reply-To: <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	Wed, 18 Feb 2009 10:53:24 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
----
- crypto/testmgr.c |  181 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/testmgr.h |    9 +++
- 2 files changed, 190 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a75f11f..54b96ed 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -72,6 +72,13 @@ struct comp_test_suite {
- 	} comp, decomp;
- };
- 
-+struct pcomp_test_suite {
-+	struct {
-+		struct pcomp_testvec *vecs;
-+		unsigned int count;
-+	} comp, decomp;
-+};
-+
- struct hash_test_suite {
- 	struct hash_testvec *vecs;
- 	unsigned int count;
-@@ -86,6 +93,7 @@ struct alg_test_desc {
- 		struct aead_test_suite aead;
- 		struct cipher_test_suite cipher;
- 		struct comp_test_suite comp;
-+		struct pcomp_test_suite pcomp;
- 		struct hash_test_suite hash;
- 	} suite;
- };
-@@ -898,6 +906,157 @@ out:
- 	return ret;
- }
- 
-+static int test_pcomp(struct crypto_pcomp *tfm,
-+		      struct pcomp_testvec *ctemplate,
-+		      struct pcomp_testvec *dtemplate, int ctcount,
-+		      int dtcount)
-+{
-+	const char *algo = crypto_tfm_alg_driver_name(crypto_pcomp_tfm(tfm));
-+	unsigned int i;
-+	char result[COMP_BUF_SIZE];
-+	int error;
-+
-+	for (i = 0; i < ctcount; i++) {
-+		struct comp_request req;
-+
-+		error = crypto_compress_setup(tfm, ctemplate[i].params);
-+		if (error) {
-+			pr_err("alg: pcomp: compression setup failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		error = crypto_compress_init(tfm);
-+		if (error) {
-+			pr_err("alg: pcomp: compression init failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		memset(result, 0, sizeof(result));
-+
-+		req.next_in = ctemplate[i].input;
-+		req.avail_in = ctemplate[i].inlen / 2;
-+		req.next_out = result;
-+		req.avail_out = ctemplate[i].outlen / 2;
-+
-+		error = crypto_compress_update(tfm, &req);
-+		if (error && (error != -EAGAIN || req.avail_in)) {
-+			pr_err("alg: pcomp: compression update failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		/* Add remaining input data */
-+		req.avail_in += (ctemplate[i].inlen + 1) / 2;
-+
-+		error = crypto_compress_update(tfm, &req);
-+		if (error && (error != -EAGAIN || req.avail_in)) {
-+			pr_err("alg: pcomp: compression update failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		/* Provide remaining output space */
-+		req.avail_out += COMP_BUF_SIZE - ctemplate[i].outlen / 2;
-+
-+		error = crypto_compress_final(tfm, &req);
-+		if (error) {
-+			pr_err("alg: pcomp: compression final failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		if (COMP_BUF_SIZE - req.avail_out != ctemplate[i].outlen) {
-+			pr_err("alg: comp: Compression test %d failed for %s: "
-+			       "output len = %d (expected %d)\n", i + 1, algo,
-+			       COMP_BUF_SIZE - req.avail_out,
-+			       ctemplate[i].outlen);
-+			return -EINVAL;
-+		}
-+
-+		if (memcmp(result, ctemplate[i].output, ctemplate[i].outlen)) {
-+			pr_err("alg: pcomp: Compression test %d failed for "
-+			       "%s\n", i + 1, algo);
-+			hexdump(result, ctemplate[i].outlen);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	for (i = 0; i < dtcount; i++) {
-+		struct comp_request req;
-+
-+		error = crypto_decompress_setup(tfm, dtemplate[i].params);
-+		if (error) {
-+			pr_err("alg: pcomp: decompression setup failed on "
-+			       "test %d for %s: error=%d\n", i + 1, algo,
-+			       error);
-+			return error;
-+		}
-+
-+		error = crypto_decompress_init(tfm);
-+		if (error) {
-+			pr_err("alg: pcomp: decompression init failed on test "
-+			       "%d for %s: error=%d\n", i + 1, algo, error);
-+			return error;
-+		}
-+
-+		memset(result, 0, sizeof(result));
-+
-+		req.next_in = dtemplate[i].input;
-+		req.avail_in = dtemplate[i].inlen / 2;
-+		req.next_out = result;
-+		req.avail_out = dtemplate[i].outlen / 2;
-+
-+		error = crypto_decompress_update(tfm, &req);
-+		if (error  && (error != -EAGAIN || req.avail_in)) {
-+			pr_err("alg: pcomp: decompression update failed on "
-+			       "test %d for %s: error=%d\n", i + 1, algo,
-+			       error);
-+			return error;
-+		}
-+
-+		/* Add remaining input data */
-+		req.avail_in += (dtemplate[i].inlen + 1) / 2;
-+
-+		error = crypto_decompress_update(tfm, &req);
-+		if (error  && (error != -EAGAIN || req.avail_in)) {
-+			pr_err("alg: pcomp: decompression update failed on "
-+			       "test %d for %s: error=%d\n", i + 1, algo,
-+			       error);
-+			return error;
-+		}
-+
-+		/* Provide remaining output space */
-+		req.avail_out += COMP_BUF_SIZE - dtemplate[i].outlen / 2;
-+
-+		error = crypto_decompress_final(tfm, &req);
-+		if (error  && (error != -EAGAIN || req.avail_in)) {
-+			pr_err("alg: pcomp: decompression final failed on "
-+			       "test %d for %s: error=%d\n", i + 1, algo,
-+			       error);
-+			return error;
-+		}
-+
-+		if (COMP_BUF_SIZE - req.avail_out != dtemplate[i].outlen) {
-+			pr_err("alg: comp: Decompression test %d failed for "
-+			       "%s: output len = %d (expected %d)\n", i + 1,
-+			       algo, COMP_BUF_SIZE - req.avail_out,
-+			       dtemplate[i].outlen);
-+			return -EINVAL;
-+		}
-+
-+		if (memcmp(result, dtemplate[i].output, dtemplate[i].outlen)) {
-+			pr_err("alg: pcomp: Decompression test %d failed for "
-+			       "%s\n", i + 1, algo);
-+			hexdump(result, dtemplate[i].outlen);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 			 u32 type, u32 mask)
- {
-@@ -1007,6 +1166,28 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
- 	return err;
- }
- 
-+static int alg_test_pcomp(const struct alg_test_desc *desc, const char *driver,
-+			  u32 type, u32 mask)
-+{
-+	struct crypto_pcomp *tfm;
-+	int err;
-+
-+	tfm = crypto_alloc_pcomp(driver, type, mask);
-+	if (IS_ERR(tfm)) {
-+		pr_err("alg: pcomp: Failed to load transform for %s: %ld\n",
-+		       driver, PTR_ERR(tfm));
-+		return PTR_ERR(tfm);
-+	}
-+
-+	err = test_pcomp(tfm, desc->suite.pcomp.comp.vecs,
-+			 desc->suite.pcomp.decomp.vecs,
-+			 desc->suite.pcomp.comp.count,
-+			 desc->suite.pcomp.decomp.count);
-+
-+	crypto_free_pcomp(tfm);
-+	return err;
-+}
-+
- static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
- 			 u32 type, u32 mask)
- {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 132953e..81b7eb0 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -15,6 +15,8 @@
- #ifndef _CRYPTO_TESTMGR_H
- #define _CRYPTO_TESTMGR_H
- 
-+#include <crypto/compress.h>
-+
- #define MAX_DIGEST_SIZE		64
- #define MAX_TAP			8
- 
-@@ -8347,6 +8349,13 @@ struct comp_testvec {
- 	char output[COMP_BUF_SIZE];
- };
- 
-+struct pcomp_testvec {
-+	const void *params;
-+	int inlen, outlen;
-+	char input[COMP_BUF_SIZE];
-+	char output[COMP_BUF_SIZE];
-+};
-+
- /*
-  * Deflate test vectors (null-terminated strings).
-  * Params: winbits=-11, Z_DEFAULT_COMPRESSION, MAX_MEM_LEVEL.
--- 
-1.6.0.4
+The following patch series adds support for partial (de)compression to =
+the
+CRYPTO API, and modifies SquashFS 4 to use this:
 
+  [1] crypto: compress - Add pcomp interface
+  [2] crypto: testmgr - Add support for the pcomp interface
+  [3] crypto: new zlib crypto module, using pcomp
+  [4] crypto: testmgr - add zlib test
+  [5] squashfs: Make SquashFS 4 use the new pcomp crypto interface
+
+The patches are based on:
+  linux-2.6.git + cryptodev-2.6.git + commit 3f683d61 ("crypto: api - F=
+ix
+  crypto_alloc_tfm/create_create_tfm return convention")
+
+Changes since last version (2009-02-13):
+  - Convert crypto_pcomp to a new-style crypto module, using crypto_all=
+oc_tfm()
+    instead of crypto_alloc_base()
+  - Pass crypto_pcomp pointers instead of crypto_tfm pointers where app=
+ropriate
+  - Use crypto_destroy_tfm() instead of crypto_free_tfm(), to take into=
+ account
+    the offset info the slab object
+  - Remove redundant check for CRYPTO_ALG_TYPE_PCOMPRESS in
+    crypto_pcomp_init_tfm()
+  - Use separate setup functions for compression and decompression
+  - Sanitize naming to crypto_{,de}compress_{setup,init,update,final}()
+  - Remove backwards-compatibility layer (export pcomp through comp), a=
+s
+    requested by Herbert Xu
+  - Create a new "zlib" pcomp module instead of modifying the existing
+    "deflate" comp module=20
+  - Readd accidentally removed ".cra_module =3D THIS_MODULE", which all=
+owed the
+    zlib module to be rmmoded while it was in use
+  - Fix the pcomp/testmgr dependency
+
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+
+Sony Techsoft Centre Europe
+The Corporate Village =C2=B7 Da Vincilaan 7-D1 =C2=B7 B-1935 Zaventem =C2=
+=B7 Belgium
+
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =C2=B7 RPR Brussels
+=46ortis =C2=B7 BIC GEBABEBB =C2=B7 IBAN BE41293037680010
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
