@@ -1,37 +1,27 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: shash - Handle failures in
-	crypto_alloc_shash() correctly
-Date: Wed, 18 Feb 2009 19:06:41 +0800
-Message-ID: <20090218110641.GA28781@gondor.apana.org.au>
-References: <alpine.LRH.2.00.0902171845420.13163@vixen.sonytel.be> <20090218085842.GA28120@gondor.apana.org.au> <alpine.LRH.2.00.0902181005570.28815@vixen.sonytel.be> <20090218094548.GA28420@gondor.apana.org.au> <alpine.LRH.2.00.0902181057490.29726@vixen.sonytel.be>
+From: Nathanael Leichter <olkpvimpg_rhc@emapfrance.com>
+Subject: =?windows-1251?B?QSBNaXJhY2xlIEFmdGVyIFVzaW5nIFRoaXMgRGlldCBTb2x1dGlvbg==?=
+Date: Wed, 18 Feb 2009 20:12:34 +0800
+Message-ID: <44076.910618651$1234960369@news.gmane.org>
+Reply-To: Nathanael Leichter <kaitlynn.mezick1959@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Content-Type: text/plain; charset=windows-1251
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:51294 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752076AbZBRLGp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Feb 2009 06:06:45 -0500
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.00.0902181057490.29726@vixen.sonytel.be>
+Received: from msr40.hinet.net ([168.95.4.140]:41514 "EHLO msr40.hinet.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751659AbZBRMbK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Feb 2009 07:31:10 -0500
+Received: from google.com (218-162-194-206.dynamic.hinet.net [218.162.194.206])
+	by msr40.hinet.net (8.9.3/8.9.3) with ESMTP id UAA18191
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2009 20:12:29 +0800 (CST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 18, 2009 at 10:59:13AM +0100, Geert Uytterhoeven wrote:
-> 
-> But if you put stuff in your crypto_* before base, you still need the special
-> translation (and check for IS_ERR()).
-
-You've lost me.  With my patch crypto_create_tfm will either
-return the pointer to the start of the area allocated or an error.
-
-Why would you need any special translation?
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+SGVsbG8hDQoNCkRpZCB5b3Uga25vdyB0aGF0IGlmIHlvdSBzdWNjZWVkIGluIHJlZ3VsYXRpbmcgeW91ciBpbnN1bGluIHRoaXMgd2lsbCBsZWFkIHlvdSB0byBhIEZhc3QgYW5kIFBlcm1hbmVudCBGQVQgTE9TUz8NCg0KV2UgYXJlIGhlcmUgdG8gaGVscCB5b3UgZG8gdGhhdCEgT3VyIGNvbXBhbnkgaGFzIHRoZSBwbGVhc3VyZSBhbmQgYWxzbyB0aGUgcmlnaHRzIHRvIHByb21vdGUgdGhlIGxhdGVzdCBwcm92ZWQgd2VpZ2h0IGxvc3MgcHJvZ3JhbSwgd2hpY2ggaXMgdGhlIG1vc3QgaGVhbHRoaWVyIHdlaWdodCBsb3NzIGRpZXQgZXZlci4gTm8gb25lIGhhcyBkb25lIHRoYXQgc28gZmFyIC0gd2UgaGF2ZSBGcmVlIFRyaWFscyBhdmFpbGFibGUuIFlvdSBqdXN0IGhhdmUgdG8gY29uZmlybSB0aGF0IHlvdSB3aXNoIHRvIHJlY2VpdmUgYW5kIHRyeSB0aGVtLCBhbmQgd2Ugd2lsbCBzZW5kIHRoZW0gcmlnaHQgdG8geW91ciBkb29yLiBZb3UgaGF2ZSBub3RoaW5nIHRvIGxvb3NlIC0geW91IGNhbiBvbmx5IGxvc2Ugd2VpZ2h0IGZhc3QgYW5kIHBlcm1hbmVudGx5Lg0KDQpJZiB5b3Ugd2FudCB0byBiZSBhIHBhcnQgb2YgdGhpcyBzdWNjZXNzZnVsIHBy
+ b2dyYW1tZSwganVzdCBhbnN3ZXIgYmFjayB0byB0aGlzIGxldHRlciwgb3Igc2VuZCB1cyBhbiBhbnN3ZXIgdG8gcGhpbGxpc2JyYW5kd2VpbjE5NzBAZ21haWwuY29tDQoNClRoaXMgaXMgYWwgeW91IGhhdmUgdG8gZG8gaW4gb3JkZXIgdG8gYmVjb21!
+lIHRoZSBwZXJzb24geW91IGhhdmUgZXZlciB3YW50ZWQuIFdlIGhhdmUgb25seSBvbmUgcmVxdWVzdCAtIHBsZWFzZSwgaHVycnkgdXAsIGFzIHRoZSBzdXBwbGllcyBvZiB0aGVzZSBGUkVFIFRSSUFMUyBhcmUgdmVyeSBsaW1pdGVkIGFuZCBnb2luZyB2ZXJ5IGZhc3QhDQoNCkJlc3Qgd2lzaGVzLA0KRGVsaXZlcnkgRGVwYXJ0bWVudCwNCk51dHJpdGlvbiBTeXN0ZW0KCgoKCgoKCgoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBlbWFpbCBoYXMgYmVlbiB3cml0dGVuIGFuZCBwcm92ZWQgdG8gYmUgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSByZWNlbnRseSBlc3RhYmxpc2hlZCBjYW4tc3BhbSBhY3QgbGF3IGluIFVTLiBXZSBhcmUgbm90IHByb3Zva2luZyBvciBmb3JjaW5nIGFueSBwZXJzb24gaW4gYW55IHdheSB0byBwYXJ0aWNpcGF0ZSBpbiBvdXIgcHJvZ3JhbXMuIFRvIHBhcnRpY2lwYXRlIGlzIHlvdXIgb3duIGRlY2lzaW9uIGFuZCB5b3UgY2FycnkgdGhlIHJlc3BvbnNpYmlsaXR5IG9mIHRha2luZyBmdXJ0aGVyIHBhcnQgaW4gdGhpcyBwcm9tb3Rpb24uIEF
+ ueXdheSwgaWYgeW91IGRvbid0IHdhbnQgdG8gcmVjZWl2ZSBtb3JlIGdvb2Qgb2ZmZXJzIGZyb20gdXMsIHlvdSBjYW4gc2ltcGx5IFVuc3Vic2NyaWJlIGJ5IHNlbmRpbmcgdXMgYSBub3RpZmljYXRpb24gZW1haWwgdG8gZ2V0Lm91dF9mcm9tX2xpc3!
+RAeWFob28uY29tIHdpdGggYSBtYWlsLXN1YmplY3QgYW5kIHRleHQgIlVuc3Vic2NyaWJlIG1lIiwgYW5kIHdlIHdpbGwgZ2V0IHlvdXIgZW1haWwgb3V0IG9mIG91ciBsaXN0IHdpdGhpbiAxMCBkYXlzLgoKVGhpcyBtZXNzYWdlIGlzIFNUUklDVExZIENPTkZJREVOVElBTCBhbmQgaXMgc29sZWx5IGZvciB0aGUgaW5kaXZpZHVhbCBvciBvcmdhbmlzYXRpb24gdG8gd2hvbSBpdCBpcyBhZGRyZXNzZWQuIEl0IG1heSBjb250YWluIFBSSVZJTEVHRUQgYW5kIENPTkZJREVOVElBTCBpbmZvcm1hdGlvbi4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgeW91IGFyZSBoZXJlYnkgbm90aWZpZWQgdGhhdCBhbnkgZGlzc2VtaW5hdGlvbiwgZGlzdHJpYnV0aW9uIG9yIGNvcHlpbmcgb2YgdGhpcyBjb21tdW5pY2F0aW9uIGFuZCBpdHMgY29udGVudHMgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgaW50ZXJlc3RlZCBpbiB0aGUgb2ZmZXJlZCBwcm9tb3Rpb25zLCBwbGVhc2UganVzdCBkb24ndCBhbnN3ZXIuIElmIHlvdSB0aGluayB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBjb250ZW50cy
+ BpbiBlcnJvciwgcGxlYXNlIGRlbGV0ZSBpdCBmcm9tIHlvdXIgY29tcHV0ZXIsIG9yIGZvbGxvdyB0aGUgdW5zdWJzY3JpYmluZyBwcm9jZWR1cmUgc2hvd24gYWJvdmUuCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL!
+S0tLS0tLS0tLS0tLS0tLS0tLS0tLQoJCQ==
