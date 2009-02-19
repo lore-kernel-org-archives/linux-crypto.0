@@ -1,48 +1,43 @@
-From: Lee Nipper <lee.nipper@freescale.com>
-Subject: [PATCH] crypto: ahash - fix ahash digest size
-Date: Wed, 18 Feb 2009 16:49:39 -0600
-Message-ID: <1234997380.362.495.camel@al08linux99>
+From: Jared Hulbert <jaredeh@gmail.com>
+Subject: Re: [PATCH 5/5] squashfs: Make SquashFS 4 use the new pcomp crypto
+	interface
+Date: Wed, 18 Feb 2009 16:24:29 -0800
+Message-ID: <6934efce0902181624q57f3423dm50cda218781e4399@mail.gmail.com>
+References: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Phillip Lougher <phillip@lougher.demon.co.uk>
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:56054 "EHLO
-	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761657AbZBRWrK (ORCPT
+Received: from wf-out-1314.google.com ([209.85.200.170]:54145 "EHLO
+	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751678AbZBSAYa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Feb 2009 17:47:10 -0500
-Received: from az33smr01.freescale.net (az33smr01.freescale.net [10.64.34.199])
-	by az33egw02.freescale.net (8.14.3/az33egw02) with ESMTP id n1IMl8Al003498
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2009 15:47:08 -0700 (MST)
-Received: from az33exm25.fsl.freescale.net (az33exm25.am.freescale.net [10.64.32.16])
-	by az33smr01.freescale.net (8.13.1/8.13.0) with ESMTP id n1IMl8XQ003707
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Feb 2009 16:47:08 -0600 (CST)
+	Wed, 18 Feb 2009 19:24:30 -0500
+In-Reply-To: <1234972402-24298-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto_ahash_show changed to use cra_ahash for digestsize reference.
-
-Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
----
-Makes digestsize for an ahash to be shown correctly.
- crypto/ahash.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index ba5292d..b2d1ee3 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -214,7 +214,7 @@ static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
- 					     "yes" : "no");
- 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
--	seq_printf(m, "digestsize   : %u\n", alg->cra_hash.digestsize);
-+	seq_printf(m, "digestsize   : %u\n", alg->cra_ahash.digestsize);
- }
- 
- const struct crypto_type crypto_ahash_type = {
--- 
-1.6.0.4
+> Modify SquashFS 4 to use the new "pcomp" crypto interface for decompression,
+> instead of calling the underlying zlib library directly. This simplifies e.g.
+> the addition of support for hardware decompression and different decompression
+> algorithms.
 
 
+Geert,
+
+When did this become an option?  I thought zlib in the crypto
+interface was not compatible with zlib.  Is that not the case anymore?
+ Have you looked at AXFS enough to judge if this would be as easy a
+job as it looks to convert?
+
+
+How do you get from here to supporting alternate compressors?
