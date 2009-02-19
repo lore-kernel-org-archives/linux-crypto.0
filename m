@@ -1,36 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -v2 1/3] crypto: Use dedicated workqueue for crypto
-	subsystem
-Date: Thu, 19 Feb 2009 14:44:31 +0800
-Message-ID: <20090219064431.GA2011@gondor.apana.org.au>
-References: <1234246430.20270.73.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [PATCH] crypto: ahash - fix ahash digest size
+Date: Thu, 19 Feb 2009 14:47:07 +0800
+Message-ID: <20090219064707.GA2094@gondor.apana.org.au>
+References: <1234997380.362.495.camel@al08linux99>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Cc: linux-crypto@vger.kernel.org
+To: Lee Nipper <lee.nipper@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46439 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:38554 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752660AbZBSGoi (ORCPT
+	with ESMTP id S1757932AbZBSGrK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Feb 2009 01:44:38 -0500
+	Thu, 19 Feb 2009 01:47:10 -0500
 Content-Disposition: inline
-In-Reply-To: <1234246430.20270.73.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <1234997380.362.495.camel@al08linux99>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 10, 2009 at 02:13:50PM +0800, Huang Ying wrote:
-> Use dedicated workqueue for crypto subsystem
+Lee Nipper <lee.nipper@freescale.com> wrote:
+> crypto_ahash_show changed to use cra_ahash for digestsize reference.
 > 
-> A dedicated workqueue named kcrypto_wq is created to be used by crypto
-> subsystem. The system shared keventd_wq is not suitable for
-> encryption/decryption, because of potential starvation problem.
-> 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
+> Signed-off-by: Lee Nipper <lee.nipper@freescale.com>
 
-All applied.  Thanks a lot for doing this!
+Good catch! Applied to crpyto-2.6.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
