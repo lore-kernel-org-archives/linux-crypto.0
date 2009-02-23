@@ -1,88 +1,120 @@
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: [PATCH 5/5] squashfs: Make SquashFS 4 use the new pcomp crypto
-  interface
-Date: Thu, 19 Feb 2009 14:42:14 +0100 (CET)
-Message-ID: <alpine.LRH.2.00.0902191415220.14749@vixen.sonytel.be>
-References: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <1234972402-24298-3-git-send-email-Geert.Uytterhoeven@sonycom.com> <1234972402-24298-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
- <1234972402-24298-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1234972402-24298-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <6934efce0902181624q57f3423dm50cda218781e4399@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/1 v8] Add CryptoAPI User Interface Support v8
+Date: Mon, 23 Feb 2009 17:35:58 +0800
+Message-ID: <20090223093558.GC10515@gondor.apana.org.au>
+References: <DB599F406D04E34389140B7D99C71B1B06F2B86C@SDCEXCHANGE01.ad.amcc.com> <20090128044634.GE13157@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D605D3F8FD@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Phillip Lougher <phillip@lougher.demon.co.uk>
-To: Jared Hulbert <jaredeh@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Evgeniy Polyakov <zbr@ioremap.net>,
+	Shasi Pulijala <spulijala@amcc.com>
+To: Loc Ho <lho@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:43458 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750826AbZBSNmQ (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:53531 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752198AbZBWJgI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Feb 2009 08:42:16 -0500
-In-Reply-To: <6934efce0902181624q57f3423dm50cda218781e4399@mail.gmail.com>
+	Mon, 23 Feb 2009 04:36:08 -0500
+Content-Disposition: inline
+In-Reply-To: <0CA0A16855646F4FA96D25A158E299D605D3F8FD@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-	Hi Jared,
+On Fri, Feb 06, 2009 at 04:13:40PM -0800, Loc Ho wrote:
+> 
+> struct crypto_type {
+> 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
+> 	int (*init)(struct crypto_tfm *tfm, u32 type, u32 mask);
+> 	void (*exit)(struct crypto_tfm *tfm);
+> 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
+> 	int (*uspace_setparam)(struct crypto_tfm *tfm, void *param, u32 param_size);
+> 	int (*uspace_op)(struct crypto_tfm *tfm, 
+> 			const struct iovec *iov, u32 iov_cnt,
+> 			crypto_completion_t cb, void *ctx);
+> };
 
-How's AXFS going?
+I'd like to see a name field.  It's better to have user-space
+pass through a string for the type instead of an ID.
 
-On Wed, 18 Feb 2009, Jared Hulbert wrote:
-> > Modify SquashFS 4 to use the new "pcomp" crypto interface for decom=
-pression,
-> > instead of calling the underlying zlib library directly. This simpl=
-ifies e.g.
-> > the addition of support for hardware decompression and different de=
-compression
-> > algorithms.
->=20
-> When did this become an option?  I thought zlib in the crypto
-> interface was not compatible with zlib.  Is that not the case anymore=
-?
+The reason you want user-space to pass that through is so that
+you can locate the crypto_type object and then call crypto_alloc_tfm
+on it..
 
-The "deflate" crypto module uses hardcoded parameters for the raw defla=
-te mode,
-that's why it's incompatible.
+Also the other two functions should take a void * instead of
+crypto_tfm * since crypto_alloc_tfm now returns that.
+ 
+> struct uspace_session {
+> 	__u8 alg_name[64];
+> 	__u32 front_type; /* I don't believe we need this - leave for now */
 
-However, the new "zlib" crypto module is compatible with zlib, as you c=
-an
-specify the all (de)compression parameters.
+So instead of front_type I'd like to see front_type_name.
+ 
+> struct uspace_param {
+> 	__u16 size;		/* We need this parameter as I/O control is only one pointer */
+> 	__u8 data[0];	/* Variable size - parameters are crypto type specific */
+> };
+> 
+> struct uspace_param_ahash { /* This is the data field of struct uspace_param */
+> 	__u16 hmackey_size;
+> 	__u8	data[0];
+> };
+> 
+> struct uspace_param_aead { /* This is the data field of struct uspace_param */
+> 	__u16 key_size;
+> 	__u16 hmackey_size;
+> 	__u8	data[0];
+> };
+> 
+> /* Create crypto session */
+> #define CIOCGSESSION    _IOWR('c', 101, struct session_op)
+> /* Set algorithm parameters */
+> #define CIOCPARAM    	_IOWR('c', 102, struct key_op)
+> 
+> struct upsace_aead_op {	/* Per operation for aead type */
+> 	#define COP_NONE	0
+> 	#define COP_ENCRYPT	1
+> 	#define COP_DECRYPT	2
+> 	__u16		op;		/* i.e. COP_ENCRYPT */
+> 	__u16		flags;
+> 	__u16		iv_size;
+> 	__u16 	assoc_size;
+> 	__u8		data[0];	/* parameter for aead per operation */		
+> };
 
-BTW, you probably want to read the full patch series, including the
-introduction :-)
+OK, I presume the idea is to stuff this into the iov that's passed
+to uspace_op?
 
->  Have you looked at AXFS enough to judge if this would be as easy a
-> job as it looks to convert?
+I'm starting to think that write(2) isn't really what we want.  The
+reason is that each operation always has two types of data: obviously
+we have the data itself, plus ancillary information like this struct
+right here.
 
-I looked at the relevant code in AXFS before.  Yes, I think it would be=
- an
-easy job.
+So how about switching over to the socket interface:
 
-> How do you get from here to supporting alternate compressors?
+1. Create fd.
 
-Your file system code needs a mapping from compressor ID (as stored in =
-your
-file system metadata) to crypto module name and (de)compression paramet=
-ers.
+	fd = socket(AF_ALGO, SOCK_DGRAM, 0);
 
-With kind regards,
+2. Allocate tfm, alg_name would be the uspace_session struct.
 
-Geert Uytterhoeven
-Software Architect
+	connect(fd, alg_name, alg_name_len);
 
-Sony Techsoft Centre Europe
-The Corporate Village =C2=B7 Da Vincilaan 7-D1 =C2=B7 B-1935 Zaventem =C2=
-=B7 Belgium
+3. Set parameters.
 
-Phone:    +32 (0)2 700 8453
-=46ax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
+	setsockopt(fd, ..., param, param_len);
 
-A division of Sony Europe (Belgium) N.V.
-VAT BE 0413.825.160 =C2=B7 RPR Brussels
-=46ortis =C2=B7 BIC GEBABEBB =C2=B7 IBAN BE41293037680010
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+4. Operate.
+
+	sendmsg(fd, msg, flags);
+
+Here struct msghdr provides for both the IOV array and space for
+ancillary information.
+
+Then the uspace_op function would just need to take a msg plus
+the callback stuff.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
