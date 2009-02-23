@@ -1,118 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1 v8] Add CryptoAPI User Interface Support v8
-Date: Mon, 23 Feb 2009 17:35:58 +0800
-Message-ID: <20090223093558.GC10515@gondor.apana.org.au>
-References: <DB599F406D04E34389140B7D99C71B1B06F2B86C@SDCEXCHANGE01.ad.amcc.com> <20090128044634.GE13157@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D605D3F8FD@SDCEXCHANGE01.ad.amcc.com>
+Subject: Re: Crypto Fixes for 2.6.29
+Date: Mon, 23 Feb 2009 17:54:28 +0800
+Message-ID: <20090223095428.GA11076@gondor.apana.org.au>
+References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20090115044020.GA29891@gondor.apana.org.au> <20090127061546.GA27962@gondor.apana.org.au> <20090209033924.GA31250@gondor.apana.org.au> <20090217121252.GA22812@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Evgeniy Polyakov <zbr@ioremap.net>,
-	Shasi Pulijala <spulijala@amcc.com>
-To: Loc Ho <lho@amcc.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:53531 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:50161 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752198AbZBWJgI (ORCPT
+	with ESMTP id S1750971AbZBWJyi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Feb 2009 04:36:08 -0500
+	Mon, 23 Feb 2009 04:54:38 -0500
 Content-Disposition: inline
-In-Reply-To: <0CA0A16855646F4FA96D25A158E299D605D3F8FD@SDCEXCHANGE01.ad.amcc.com>
+In-Reply-To: <20090217121252.GA22812@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 06, 2009 at 04:13:40PM -0800, Loc Ho wrote:
-> 
-> struct crypto_type {
-> 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
-> 	int (*init)(struct crypto_tfm *tfm, u32 type, u32 mask);
-> 	void (*exit)(struct crypto_tfm *tfm);
-> 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
-> 	int (*uspace_setparam)(struct crypto_tfm *tfm, void *param, u32 param_size);
-> 	int (*uspace_op)(struct crypto_tfm *tfm, 
-> 			const struct iovec *iov, u32 iov_cnt,
-> 			crypto_completion_t cb, void *ctx);
-> };
+Hi Linus:
 
-I'd like to see a name field.  It's better to have user-space
-pass through a string for the type instead of an ID.
+This push fixes a bug in /proc/crypto where it may display a
+bogus digest size for ahash algorithms.
 
-The reason you want user-space to pass that through is so that
-you can locate the crypto_type object and then call crypto_alloc_tfm
-on it..
+Please pull from
 
-Also the other two functions should take a void * instead of
-crypto_tfm * since crypto_alloc_tfm now returns that.
- 
-> struct uspace_session {
-> 	__u8 alg_name[64];
-> 	__u32 front_type; /* I don't believe we need this - leave for now */
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-So instead of front_type I'd like to see front_type_name.
- 
-> struct uspace_param {
-> 	__u16 size;		/* We need this parameter as I/O control is only one pointer */
-> 	__u8 data[0];	/* Variable size - parameters are crypto type specific */
-> };
-> 
-> struct uspace_param_ahash { /* This is the data field of struct uspace_param */
-> 	__u16 hmackey_size;
-> 	__u8	data[0];
-> };
-> 
-> struct uspace_param_aead { /* This is the data field of struct uspace_param */
-> 	__u16 key_size;
-> 	__u16 hmackey_size;
-> 	__u8	data[0];
-> };
-> 
-> /* Create crypto session */
-> #define CIOCGSESSION    _IOWR('c', 101, struct session_op)
-> /* Set algorithm parameters */
-> #define CIOCPARAM    	_IOWR('c', 102, struct key_op)
-> 
-> struct upsace_aead_op {	/* Per operation for aead type */
-> 	#define COP_NONE	0
-> 	#define COP_ENCRYPT	1
-> 	#define COP_DECRYPT	2
-> 	__u16		op;		/* i.e. COP_ENCRYPT */
-> 	__u16		flags;
-> 	__u16		iv_size;
-> 	__u16 	assoc_size;
-> 	__u8		data[0];	/* parameter for aead per operation */		
-> };
+or
 
-OK, I presume the idea is to stuff this into the iov that's passed
-to uspace_op?
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-I'm starting to think that write(2) isn't really what we want.  The
-reason is that each operation always has two types of data: obviously
-we have the data itself, plus ancillary information like this struct
-right here.
 
-So how about switching over to the socket interface:
+Lee Nipper (1):
+      crypto: ahash - Fix digest size in /proc/crypto
 
-1. Create fd.
+ crypto/ahash.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-	fd = socket(AF_ALGO, SOCK_DGRAM, 0);
-
-2. Allocate tfm, alg_name would be the uspace_session struct.
-
-	connect(fd, alg_name, alg_name_len);
-
-3. Set parameters.
-
-	setsockopt(fd, ..., param, param_len);
-
-4. Operate.
-
-	sendmsg(fd, msg, flags);
-
-Here struct msghdr provides for both the IOV array and space for
-ancillary information.
-
-Then the uspace_op function would just need to take a msg plus
-the callback stuff.
-
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
