@@ -1,35 +1,96 @@
-From: Thiago Galesi <thiagogalesi@gmail.com>
+From: Neil Horman <nhorman@tuxdriver.com>
 Subject: Re: [PATCH][trivial] crypto: tcrypt - reduce stack size
-Date: Wed, 25 Feb 2009 11:06:18 -0300
-Message-ID: <82ecf08e0902250606g1e1a0a16l3a20fd1e8222d94e@mail.gmail.com>
+Date: Wed, 25 Feb 2009 09:06:23 -0500
+Message-ID: <20090225140623.GC16150@hmsreliant.think-freely.org>
 References: <49A54C23.8090209@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Cc: linux kernel <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org, Frank Seidel <frank@f-seidel.de>,
 	akpm@linux-foundation.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, nhorman@tuxdriver.com,
-	lho@amcc.com, kaber@trash.net, darrenrjenkins@gmail.com
+	"David S. Miller" <davem@davemloft.net>, lho@amcc.com,
+	kaber@trash.net, darrenrjenkins@gmail.com
 To: Frank Seidel <fseidel@suse.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.232]:51673 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753151AbZBYOGU convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Feb 2009 09:06:20 -0500
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1758108AbZBYOGw@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <49A54C23.8090209@suse.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-> =A0 =A0 =A0 =A0int i;
-> =A0 =A0 =A0 =A0int ret;
->
-> - =A0 =A0 =A0 printk("\ntesting speed of %s\n", algo);
-> + =A0 =A0 =A0 printk(KERN_INFO "\ntesting speed of %s\n", algo);
+On Wed, Feb 25, 2009 at 02:48:19PM +0100, Frank Seidel wrote:
+> From: Frank Seidel <frank@f-seidel.de>
+> 
+> Applying kernel janitors todos (printk calls need KERN_*
+> constants on linebeginnings, reduce stack footprint where
+> possible) to tcrypts test_hash_speed (where stacks
+> memory footprint was very high (on i386 1184 bytes to
+> 292 now).
+> 
+> Signed-off-by: Frank Seidel <frank@f-seidel.de>
+> ---
+>  
+>  	if (IS_ERR(tfm)) {
+> -		printk("failed to load transform for %s: %ld\n", algo,
+> +		printk(KERN_ERR "failed to load transform for %s: %ld\n", algo,
+>  		       PTR_ERR(tfm));
+> +		kfree(output);
+>  		return;
+Its just a stylistic nit, but I think I'd rather see this be a goto to the kfree
+at the end of the function.  You can move the out label down to just the kfree,
+and rename the current out usage to out_free_tfm.  I think if you're going to
+add the kfree at the bottom, you might as well make use of it for all cases.
 
-Wouldn't it be better to take the first \n out as well??
+If you change that, I'll ack this.
 
+Thanks & Regards
+Neil
 
---=20
+>  	}
+>  
+>  	desc.tfm = tfm;
+>  	desc.flags = 0;
+>  
+> -	if (crypto_hash_digestsize(tfm) > sizeof(output)) {
+> -		printk("digestsize(%u) > outputbuffer(%zu)\n",
+> -		       crypto_hash_digestsize(tfm), sizeof(output));
+> +	if (crypto_hash_digestsize(tfm) > output_size) {
+> +		printk(KERN_ERR "digestsize(%u) > outputbuffer(%zu)\n",
+> +		       crypto_hash_digestsize(tfm), output_size);
+>  		goto out;
+>  	}
+>  
+> @@ -427,12 +435,14 @@ static void test_hash_speed(const char *
+>  
+>  	for (i = 0; speed[i].blen != 0; i++) {
+>  		if (speed[i].blen > TVMEMSIZE * PAGE_SIZE) {
+> -			printk("template (%u) too big for tvmem (%lu)\n",
+> +			printk(KERN_ERR
+> +			       "template (%u) too big for tvmem (%lu)\n",
+>  			       speed[i].blen, TVMEMSIZE * PAGE_SIZE);
+>  			goto out;
+>  		}
+>  
+> -		printk("test%3u (%5u byte blocks,%5u bytes per update,%4u updates): ",
+> +		printk(KERN_INFO "test%3u "
+> +		       "(%5u byte blocks,%5u bytes per update,%4u updates): ",
+>  		       i, speed[i].blen, speed[i].plen, speed[i].blen / speed[i].plen);
+>  
+>  		if (sec)
+> @@ -443,13 +453,14 @@ static void test_hash_speed(const char *
+>  					       speed[i].plen, output);
+>  
+>  		if (ret) {
+> -			printk("hashing failed ret=%d\n", ret);
+> +			printk(KERN_ERR "hashing failed ret=%d\n", ret);
+>  			break;
+>  		}
+>  	}
+>  
+>  out:
+>  	crypto_free_hash(tfm);
+> +	kfree(output);
+>  }
+>  
+>  static void test_available(void)
+> 
