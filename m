@@ -1,482 +1,257 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH 4/6] crypto: new zlib crypto module, using pcomp
-Date: Wed, 25 Feb 2009 14:43:12 +0100
-Message-ID: <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH 5/6] crypto: testmgr - add zlib test
+Date: Wed, 25 Feb 2009 14:43:13 +0100
+Message-ID: <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
 References: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
  <1235569394-15217-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
  <1235569394-15217-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
  <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>,
-	James Morris <jmorris@namei.org>
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:63877 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:63880 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754282AbZBYNnU (ORCPT
+	by vger.kernel.org with ESMTP id S1754291AbZBYNnU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Wed, 25 Feb 2009 08:43:20 -0500
-In-Reply-To: <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+In-Reply-To: <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Cc: James Morris <jmorris@namei.org>
 ---
- crypto/Kconfig            |    9 +
- crypto/Makefile           |    1 +
- crypto/zlib.c             |  378 +++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/compress.h |   20 +++
- 4 files changed, 408 insertions(+), 0 deletions(-)
- create mode 100644 crypto/zlib.c
+ crypto/Kconfig   |    1 +
+ crypto/tcrypt.c  |    6 ++-
+ crypto/testmgr.c |   15 ++++++
+ crypto/testmgr.h |  137 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 158 insertions(+), 1 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c00c985..8845eff 100644
+index 8845eff..632330d 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -743,6 +743,15 @@ config CRYPTO_DEFLATE
- 
- 	  You will most probably want this if using IPSec.
- 
-+config CRYPTO_ZLIB
-+	tristate "Zlib compression algorithm"
+@@ -91,6 +91,7 @@ config CRYPTO_MANAGER2
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_HASH2
+ 	select CRYPTO_BLKCIPHER2
 +	select CRYPTO_PCOMP
-+	select ZLIB_INFLATE
-+	select ZLIB_DEFLATE
-+	select NLATTR
-+	help
-+	  This is the zlib algorithm.
-+
- config CRYPTO_LZO
- 	tristate "LZO compression algorithm"
- 	select CRYPTO_ALGAPI
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 8de194f..836a764 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -72,6 +72,7 @@ obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
- obj-$(CONFIG_CRYPTO_SEED) += seed.o
- obj-$(CONFIG_CRYPTO_SALSA20) += salsa20_generic.o
- obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
-+obj-$(CONFIG_CRYPTO_ZLIB) += zlib.o
- obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
- obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o
-diff --git a/crypto/zlib.c b/crypto/zlib.c
-new file mode 100644
-index 0000000..33609ba
---- /dev/null
-+++ b/crypto/zlib.c
-@@ -0,0 +1,378 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Zlib algorithm
-+ *
-+ * Copyright 2008 Sony Corporation
-+ *
-+ * Based on deflate.c, which is
-+ * Copyright (c) 2003 James Morris <jmorris@intercode.com.au>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ * FIXME: deflate transforms will require up to a total of about 436k of kernel
-+ * memory on i386 (390k for compression, the rest for decompression), as the
-+ * current zlib kernel code uses a worst case pre-allocation system by default.
-+ * This needs to be fixed so that the amount of memory required is properly
-+ * related to the winbits and memlevel parameters.
-+ */
-+
-+#define pr_fmt(fmt)	"%s: " fmt, __func__
-+
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/zlib.h>
-+#include <linux/vmalloc.h>
-+#include <linux/interrupt.h>
-+#include <linux/mm.h>
-+#include <linux/net.h>
-+#include <linux/slab.h>
-+
-+#include <crypto/internal/compress.h>
-+
-+#include <net/netlink.h>
-+
-+
-+struct zlib_ctx {
-+	struct z_stream_s comp_stream;
-+	struct z_stream_s decomp_stream;
-+	int decomp_windowBits;
-+};
-+
-+
-+static void zlib_comp_exit(struct zlib_ctx *ctx)
-+{
-+	struct z_stream_s *stream = &ctx->comp_stream;
-+
-+	if (stream->workspace) {
-+		zlib_deflateEnd(stream);
-+		vfree(stream->workspace);
-+		stream->workspace = NULL;
-+	}
-+}
-+
-+static void zlib_decomp_exit(struct zlib_ctx *ctx)
-+{
-+	struct z_stream_s *stream = &ctx->decomp_stream;
-+
-+	if (stream->workspace) {
-+		zlib_inflateEnd(stream);
-+		kfree(stream->workspace);
-+		stream->workspace = NULL;
-+	}
-+}
-+
-+static int zlib_init(struct crypto_tfm *tfm)
-+{
-+	return 0;
-+}
-+
-+static void zlib_exit(struct crypto_tfm *tfm)
-+{
-+	struct zlib_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	zlib_comp_exit(ctx);
-+	zlib_decomp_exit(ctx);
-+}
-+
-+
-+static int zlib_compress_setup(struct crypto_pcomp *tfm, void *params,
-+			       unsigned int len)
-+{
-+	struct zlib_ctx *ctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &ctx->comp_stream;
-+	struct nlattr *tb[ZLIB_COMP_MAX + 1];
-+	size_t workspacesize;
-+	int ret;
-+
-+	ret = nla_parse(tb, ZLIB_COMP_MAX, params, len, NULL);
-+	if (ret)
-+		return ret;
-+
-+	zlib_comp_exit(ctx);
-+
-+	workspacesize = zlib_deflate_workspacesize();
-+	stream->workspace = vmalloc(workspacesize);
-+	if (!stream->workspace)
-+		return -ENOMEM;
-+
-+	memset(stream->workspace, 0, workspacesize);
-+	ret = zlib_deflateInit2(stream,
-+				tb[ZLIB_COMP_LEVEL]
-+					? nla_get_u32(tb[ZLIB_COMP_LEVEL])
-+					: Z_DEFAULT_COMPRESSION,
-+				tb[ZLIB_COMP_METHOD]
-+					? nla_get_u32(tb[ZLIB_COMP_METHOD])
-+					: Z_DEFLATED,
-+				tb[ZLIB_COMP_WINDOWBITS]
-+					? nla_get_u32(tb[ZLIB_COMP_WINDOWBITS])
-+					: MAX_WBITS,
-+				tb[ZLIB_COMP_MEMLEVEL]
-+					? nla_get_u32(tb[ZLIB_COMP_MEMLEVEL])
-+					: DEF_MEM_LEVEL,
-+				tb[ZLIB_COMP_STRATEGY]
-+					? nla_get_u32(tb[ZLIB_COMP_STRATEGY])
-+					: Z_DEFAULT_STRATEGY);
-+	if (ret != Z_OK) {
-+		vfree(stream->workspace);
-+		stream->workspace = NULL;
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int zlib_compress_init(struct crypto_pcomp *tfm)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->comp_stream;
-+
-+	ret = zlib_deflateReset(stream);
-+	if (ret != Z_OK)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int zlib_compress_update(struct crypto_pcomp *tfm,
-+				struct comp_request *req)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->comp_stream;
-+
-+	pr_debug("avail_in %u, avail_out %u\n", req->avail_in, req->avail_out);
-+	stream->next_in = req->next_in;
-+	stream->avail_in = req->avail_in;
-+	stream->next_out = req->next_out;
-+	stream->avail_out = req->avail_out;
-+
-+	ret = zlib_deflate(stream, Z_NO_FLUSH);
-+	switch (ret) {
-+	case Z_OK:
-+		break;
-+
-+	case Z_BUF_ERROR:
-+		pr_debug("zlib_deflate could not make progress\n");
-+		return -EAGAIN;
-+
-+	default:
-+		pr_debug("zlib_deflate failed %d\n", ret);
-+		return -EINVAL;
-+	}
-+
-+	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
-+		 stream->avail_in, stream->avail_out,
-+		 req->avail_in - stream->avail_in,
-+		 req->avail_out - stream->avail_out);
-+	req->next_in = stream->next_in;
-+	req->avail_in = stream->avail_in;
-+	req->next_out = stream->next_out;
-+	req->avail_out = stream->avail_out;
-+	return 0;
-+}
-+
-+static int zlib_compress_final(struct crypto_pcomp *tfm,
-+			       struct comp_request *req)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->comp_stream;
-+
-+	pr_debug("avail_in %u, avail_out %u\n", req->avail_in, req->avail_out);
-+	stream->next_in = req->next_in;
-+	stream->avail_in = req->avail_in;
-+	stream->next_out = req->next_out;
-+	stream->avail_out = req->avail_out;
-+
-+	ret = zlib_deflate(stream, Z_FINISH);
-+	if (ret != Z_STREAM_END) {
-+		pr_debug("zlib_deflate failed %d\n", ret);
-+		return -EINVAL;
-+	}
-+
-+	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
-+		 stream->avail_in, stream->avail_out,
-+		 req->avail_in - stream->avail_in,
-+		 req->avail_out - stream->avail_out);
-+	req->next_in = stream->next_in;
-+	req->avail_in = stream->avail_in;
-+	req->next_out = stream->next_out;
-+	req->avail_out = stream->avail_out;
-+	return 0;
-+}
-+
-+
-+static int zlib_decompress_setup(struct crypto_pcomp *tfm, void *params,
-+				 unsigned int len)
-+{
-+	struct zlib_ctx *ctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &ctx->decomp_stream;
-+	struct nlattr *tb[ZLIB_DECOMP_MAX + 1];
-+	int ret = 0;
-+
-+	ret = nla_parse(tb, ZLIB_DECOMP_MAX, params, len, NULL);
-+	if (ret)
-+		return ret;
-+
-+	zlib_decomp_exit(ctx);
-+
-+	ctx->decomp_windowBits = tb[ZLIB_DECOMP_WINDOWBITS]
-+				 ? nla_get_u32(tb[ZLIB_DECOMP_WINDOWBITS])
-+				 : DEF_WBITS;
-+
-+	stream->workspace = kzalloc(zlib_inflate_workspacesize(), GFP_KERNEL);
-+	if (!stream->workspace)
-+		return -ENOMEM;
-+
-+	ret = zlib_inflateInit2(stream, ctx->decomp_windowBits);
-+	if (ret != Z_OK) {
-+		kfree(stream->workspace);
-+		stream->workspace = NULL;
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int zlib_decompress_init(struct crypto_pcomp *tfm)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->decomp_stream;
-+
-+	ret = zlib_inflateReset(stream);
-+	if (ret != Z_OK)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int zlib_decompress_update(struct crypto_pcomp *tfm,
-+				  struct comp_request *req)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->decomp_stream;
-+
-+	pr_debug("avail_in %u, avail_out %u\n", req->avail_in, req->avail_out);
-+	stream->next_in = req->next_in;
-+	stream->avail_in = req->avail_in;
-+	stream->next_out = req->next_out;
-+	stream->avail_out = req->avail_out;
-+
-+	ret = zlib_inflate(stream, Z_SYNC_FLUSH);
-+	switch (ret) {
-+	case Z_OK:
-+	case Z_STREAM_END:
-+		break;
-+
-+	case Z_BUF_ERROR:
-+		pr_debug("zlib_inflate could not make progress\n");
-+		return -EAGAIN;
-+
-+	default:
-+		pr_debug("zlib_inflate failed %d\n", ret);
-+		return -EINVAL;
-+	}
-+
-+	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
-+		 stream->avail_in, stream->avail_out,
-+		 req->avail_in - stream->avail_in,
-+		 req->avail_out - stream->avail_out);
-+	req->next_in = stream->next_in;
-+	req->avail_in = stream->avail_in;
-+	req->next_out = stream->next_out;
-+	req->avail_out = stream->avail_out;
-+	return 0;
-+}
-+
-+static int zlib_decompress_final(struct crypto_pcomp *tfm,
-+				 struct comp_request *req)
-+{
-+	int ret;
-+	struct zlib_ctx *dctx = crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
-+	struct z_stream_s *stream = &dctx->decomp_stream;
-+
-+	pr_debug("avail_in %u, avail_out %u\n", req->avail_in, req->avail_out);
-+	stream->next_in = req->next_in;
-+	stream->avail_in = req->avail_in;
-+	stream->next_out = req->next_out;
-+	stream->avail_out = req->avail_out;
-+
-+	if (dctx->decomp_windowBits < 0) {
-+		ret = zlib_inflate(stream, Z_SYNC_FLUSH);
-+		/*
-+		 * Work around a bug in zlib, which sometimes wants to taste an
-+		 * extra byte when being used in the (undocumented) raw deflate
-+		 * mode. (From USAGI).
-+		 */
-+		if (ret == Z_OK && !stream->avail_in && stream->avail_out) {
-+			const void *saved_next_in = stream->next_in;
-+			u8 zerostuff = 0;
-+
-+			stream->next_in = &zerostuff;
-+			stream->avail_in = 1;
-+			ret = zlib_inflate(stream, Z_FINISH);
-+			stream->next_in = saved_next_in;
-+			stream->avail_in = 0;
-+		}
-+	} else
-+		ret = zlib_inflate(stream, Z_FINISH);
-+	if (ret != Z_STREAM_END) {
-+		pr_debug("zlib_inflate failed %d\n", ret);
-+		return -EINVAL;
-+	}
-+
-+	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
-+		 stream->avail_in, stream->avail_out,
-+		 req->avail_in - stream->avail_in,
-+		 req->avail_out - stream->avail_out);
-+	req->next_in = stream->next_in;
-+	req->avail_in = stream->avail_in;
-+	req->next_out = stream->next_out;
-+	req->avail_out = stream->avail_out;
-+	return 0;
-+}
-+
-+
-+static struct pcomp_alg zlib_alg = {
-+	.compress_setup		= zlib_compress_setup,
-+	.compress_init		= zlib_compress_init,
-+	.compress_update	= zlib_compress_update,
-+	.compress_final		= zlib_compress_final,
-+	.decompress_setup	= zlib_decompress_setup,
-+	.decompress_init	= zlib_decompress_init,
-+	.decompress_update	= zlib_decompress_update,
-+	.decompress_final	= zlib_decompress_final,
-+
-+	.base			= {
-+		.cra_name	= "zlib",
-+		.cra_flags	= CRYPTO_ALG_TYPE_PCOMPRESS,
-+		.cra_ctxsize	= sizeof(struct zlib_ctx),
-+		.cra_module	= THIS_MODULE,
-+		.cra_init	= zlib_init,
-+		.cra_exit	= zlib_exit,
-+	}
-+};
-+
-+static int __init zlib_mod_init(void)
-+{
-+	return crypto_register_pcomp(&zlib_alg);
-+}
-+
-+static void __exit zlib_mod_fini(void)
-+{
-+	crypto_unregister_pcomp(&zlib_alg);
-+}
-+
-+module_init(zlib_mod_init);
-+module_exit(zlib_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Zlib Compression Algorithm");
-+MODULE_AUTHOR("Sony Corporation");
-diff --git a/include/crypto/compress.h b/include/crypto/compress.h
-index b7d2287..86163ef 100644
---- a/include/crypto/compress.h
-+++ b/include/crypto/compress.h
-@@ -30,6 +30,26 @@ struct comp_request {
- 	unsigned int avail_out;		/* bytes available at next_out */
+ 
+ config CRYPTO_GF128MUL
+ 	tristate "GF(2^128) multiplication functions (EXPERIMENTAL)"
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 28a45a1..c3c9124 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -53,7 +53,7 @@ static char *check[] = {
+ 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
+ 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
+ 	"camellia", "seed", "salsa20", "rmd128", "rmd160", "rmd256", "rmd320",
+-	"lzo", "cts", NULL
++	"lzo", "cts", "zlib", NULL
  };
  
-+enum zlib_comp_params {
-+	ZLIB_COMP_LEVEL = 1,		/* e.g. Z_DEFAULT_COMPRESSION */
-+	ZLIB_COMP_METHOD,		/* e.g. Z_DEFLATED */
-+	ZLIB_COMP_WINDOWBITS,		/* e.g. MAX_WBITS */
-+	ZLIB_COMP_MEMLEVEL,		/* e.g. DEF_MEM_LEVEL */
-+	ZLIB_COMP_STRATEGY,		/* e.g. Z_DEFAULT_STRATEGY */
-+	__ZLIB_COMP_MAX,
-+};
+ static int test_cipher_jiffies(struct blkcipher_desc *desc, int enc,
+@@ -661,6 +661,10 @@ static void do_test(int m)
+ 		tcrypt_test("ecb(seed)");
+ 		break;
+ 
++	case 44:
++		tcrypt_test("zlib");
++		break;
 +
-+#define ZLIB_COMP_MAX	(__ZLIB_COMP_MAX - 1)
-+
-+
-+enum zlib_decomp_params {
-+	ZLIB_DECOMP_WINDOWBITS = 1,	/* e.g. DEF_WBITS */
-+	__ZLIB_DECOMP_MAX,
-+};
-+
-+#define ZLIB_DECOMP_MAX	(__ZLIB_DECOMP_MAX - 1)
-+
-+
- struct crypto_pcomp {
- 	struct crypto_tfm base;
+ 	case 100:
+ 		tcrypt_test("hmac(md5)");
+ 		break;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index e750357..b50c3c6 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2018,6 +2018,21 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				}
+ 			}
+ 		}
++	}, {
++		.alg = "zlib",
++		.test = alg_test_pcomp,
++		.suite = {
++			.pcomp = {
++				.comp = {
++					.vecs = zlib_comp_tv_template,
++					.count = ZLIB_COMP_TEST_VECTORS
++				},
++				.decomp = {
++					.vecs = zlib_decomp_tv_template,
++					.count = ZLIB_DECOMP_TEST_VECTORS
++				}
++			}
++		}
+ 	}
  };
+ 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index c517e43..526f00a 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -15,6 +15,9 @@
+ #ifndef _CRYPTO_TESTMGR_H
+ #define _CRYPTO_TESTMGR_H
+ 
++#include <linux/netlink.h>
++#include <linux/zlib.h>
++
+ #include <crypto/compress.h>
+ 
+ #define MAX_DIGEST_SIZE		64
+@@ -8361,6 +8364,7 @@ struct pcomp_testvec {
+  * Deflate test vectors (null-terminated strings).
+  * Params: winbits=-11, Z_DEFAULT_COMPRESSION, MAX_MEM_LEVEL.
+  */
++
+ #define DEFLATE_COMP_TEST_VECTORS 2
+ #define DEFLATE_DECOMP_TEST_VECTORS 2
+ 
+@@ -8436,6 +8440,139 @@ static struct comp_testvec deflate_decomp_tv_template[] = {
+ 	},
+ };
+ 
++#define ZLIB_COMP_TEST_VECTORS 2
++#define ZLIB_DECOMP_TEST_VECTORS 2
++
++static const struct {
++	struct nlattr nla;
++	int val;
++} deflate_comp_params[] = {
++	{
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_COMP_LEVEL,
++		},
++		.val			= Z_DEFAULT_COMPRESSION,
++	}, {
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_COMP_METHOD,
++		},
++		.val			= Z_DEFLATED,
++	}, {
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_COMP_WINDOWBITS,
++		},
++		.val			= -11,
++	}, {
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_COMP_MEMLEVEL,
++		},
++		.val			= MAX_MEM_LEVEL,
++	}, {
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_COMP_STRATEGY,
++		},
++		.val			= Z_DEFAULT_STRATEGY,
++	}
++};
++
++static const struct {
++	struct nlattr nla;
++	int val;
++} deflate_decomp_params[] = {
++	{
++		.nla = {
++			.nla_len	= NLA_HDRLEN + sizeof(int),
++			.nla_type	= ZLIB_DECOMP_WINDOWBITS,
++		},
++		.val			= -11,
++	}
++};
++
++static struct pcomp_testvec zlib_comp_tv_template[] = {
++	{
++		.params = &deflate_comp_params,
++		.paramsize = sizeof(deflate_comp_params),
++		.inlen	= 70,
++		.outlen	= 38,
++		.input	= "Join us now and share the software "
++			"Join us now and share the software ",
++		.output	= "\xf3\xca\xcf\xcc\x53\x28\x2d\x56"
++			  "\xc8\xcb\x2f\x57\x48\xcc\x4b\x51"
++			  "\x28\xce\x48\x2c\x4a\x55\x28\xc9"
++			  "\x48\x55\x28\xce\x4f\x2b\x29\x07"
++			  "\x71\xbc\x08\x2b\x01\x00",
++	}, {
++		.params = &deflate_comp_params,
++		.paramsize = sizeof(deflate_comp_params),
++		.inlen	= 191,
++		.outlen	= 122,
++		.input	= "This document describes a compression method based on the DEFLATE"
++			"compression algorithm.  This document defines the application of "
++			"the DEFLATE algorithm to the IP Payload Compression Protocol.",
++		.output	= "\x5d\x8d\x31\x0e\xc2\x30\x10\x04"
++			  "\xbf\xb2\x2f\xc8\x1f\x10\x04\x09"
++			  "\x89\xc2\x85\x3f\x70\xb1\x2f\xf8"
++			  "\x24\xdb\x67\xd9\x47\xc1\xef\x49"
++			  "\x68\x12\x51\xae\x76\x67\xd6\x27"
++			  "\x19\x88\x1a\xde\x85\xab\x21\xf2"
++			  "\x08\x5d\x16\x1e\x20\x04\x2d\xad"
++			  "\xf3\x18\xa2\x15\x85\x2d\x69\xc4"
++			  "\x42\x83\x23\xb6\x6c\x89\x71\x9b"
++			  "\xef\xcf\x8b\x9f\xcf\x33\xca\x2f"
++			  "\xed\x62\xa9\x4c\x80\xff\x13\xaf"
++			  "\x52\x37\xed\x0e\x52\x6b\x59\x02"
++			  "\xd9\x4e\xe8\x7a\x76\x1d\x02\x98"
++			  "\xfe\x8a\x87\x83\xa3\x4f\x56\x8a"
++			  "\xb8\x9e\x8e\x5c\x57\xd3\xa0\x79"
++			  "\xfa\x02",
++	},
++};
++
++static struct pcomp_testvec zlib_decomp_tv_template[] = {
++	{
++		.params = &deflate_decomp_params,
++		.paramsize = sizeof(deflate_decomp_params),
++		.inlen	= 122,
++		.outlen	= 191,
++		.input	= "\x5d\x8d\x31\x0e\xc2\x30\x10\x04"
++			  "\xbf\xb2\x2f\xc8\x1f\x10\x04\x09"
++			  "\x89\xc2\x85\x3f\x70\xb1\x2f\xf8"
++			  "\x24\xdb\x67\xd9\x47\xc1\xef\x49"
++			  "\x68\x12\x51\xae\x76\x67\xd6\x27"
++			  "\x19\x88\x1a\xde\x85\xab\x21\xf2"
++			  "\x08\x5d\x16\x1e\x20\x04\x2d\xad"
++			  "\xf3\x18\xa2\x15\x85\x2d\x69\xc4"
++			  "\x42\x83\x23\xb6\x6c\x89\x71\x9b"
++			  "\xef\xcf\x8b\x9f\xcf\x33\xca\x2f"
++			  "\xed\x62\xa9\x4c\x80\xff\x13\xaf"
++			  "\x52\x37\xed\x0e\x52\x6b\x59\x02"
++			  "\xd9\x4e\xe8\x7a\x76\x1d\x02\x98"
++			  "\xfe\x8a\x87\x83\xa3\x4f\x56\x8a"
++			  "\xb8\x9e\x8e\x5c\x57\xd3\xa0\x79"
++			  "\xfa\x02",
++		.output	= "This document describes a compression method based on the DEFLATE"
++			"compression algorithm.  This document defines the application of "
++			"the DEFLATE algorithm to the IP Payload Compression Protocol.",
++	}, {
++		.params = &deflate_decomp_params,
++		.paramsize = sizeof(deflate_decomp_params),
++		.inlen	= 38,
++		.outlen	= 70,
++		.input	= "\xf3\xca\xcf\xcc\x53\x28\x2d\x56"
++			  "\xc8\xcb\x2f\x57\x48\xcc\x4b\x51"
++			  "\x28\xce\x48\x2c\x4a\x55\x28\xc9"
++			  "\x48\x55\x28\xce\x4f\x2b\x29\x07"
++			  "\x71\xbc\x08\x2b\x01\x00",
++		.output	= "Join us now and share the software "
++			"Join us now and share the software ",
++	},
++};
++
+ /*
+  * LZO test vectors (null-terminated strings).
+  */
 -- 
 1.6.0.4
 
