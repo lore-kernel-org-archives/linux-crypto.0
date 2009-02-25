@@ -1,74 +1,92 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: [PATCH] crypto: compress - Add pcomp interface
-Date: Wed, 25 Feb 2009 14:26:28 +0100 (CET)
-Message-ID: <alpine.LRH.2.00.0902251425570.4063@vixen.sonytel.be>
-References: <20090114031613.GA7429@gondor.apana.org.au> <Pine.LNX.4.64.0901141528010.31703@vixen.sonytel.be> <20090115030526.GA27726@gondor.apana.org.au> <alpine.LRH.2.00.0902051703150.4290@vixen.sonytel.be> <20090210061822.GA19774@gondor.apana.org.au>
- <alpine.LRH.2.00.0902121613580.29413@vixen.sonytel.be> <20090219040847.GA973@gondor.apana.org.au> <alpine.LRH.2.00.0902191005110.27630@vixen.sonytel.be> <20090219104250.GA9633@gondor.apana.org.au> <alpine.LRH.2.00.0902231822080.22762@vixen.sonytel.be>
- <20090225025605.GA30920@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/6] netlink: Move netlink attribute parsing support to lib/
+Date: Wed, 25 Feb 2009 14:43:09 +0100
+Message-ID: <1235569394-15217-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+References: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:63445 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:63860 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753416AbZBYN0c (ORCPT
+	by vger.kernel.org with ESMTP id S1752668AbZBYNnT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Feb 2009 08:26:32 -0500
-In-Reply-To: <20090225025605.GA30920@gondor.apana.org.au>
+	Wed, 25 Feb 2009 08:43:19 -0500
+In-Reply-To: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 25 Feb 2009, Herbert Xu wrote:
-> On Mon, Feb 23, 2009 at 06:32:19PM +0100, Geert Uytterhoeven wrote:
-> >
-> > Is the below (on top of my last patch series) what you have in mind=
-?
->=20
-> Looks great to me!
+Netlink attribute parsing may be used even if CONFIG_NET is not set.
+Move it from net/netlink to lib and control its inclusion based on the new
+config symbol CONFIG_NLATTR, which is selected by CONFIG_NET.
 
-OK.
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
+---
+ lib/Kconfig                        |    6 ++++++
+ lib/Makefile                       |    2 ++
+ net/netlink/attr.c => lib/nlattr.c |    0
+ net/Kconfig                        |    1 +
+ net/netlink/Makefile               |    2 +-
+ 5 files changed, 10 insertions(+), 1 deletions(-)
+ rename net/netlink/attr.c => lib/nlattr.c (100%)
 
-> > Notes:
-> >   - I had to drop the `const' from the `params' pointers of
-> >     pcomp_alg.{,de}compress_setup().
-> >     Trying to make nla_parse() take const nlattr structures instead=
- seems to
-> >     open a big can of worms...
->=20
-> I don't think that's a big deal.
->=20
-> >   - I should add a dependency of CONFIG_CRYPTO_ZLIB on CONFIG_NET (=
-due to the
-> >     need for nla_parse()). However, I don't like that.
->=20
-> Dave has OKed it for the attribute stuff to be moved into lib.
-> So if you want to tackle that then be my guest :) Otherwise I'll
-> look into moving it.
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 03c2c24..cea9e30 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -174,4 +174,10 @@ config DISABLE_OBSOLETE_CPUMASK_FUNCTIONS
+        bool "Disable obsolete cpumask functions" if DEBUG_PER_CPU_MAPS
+        depends on EXPERIMENTAL && BROKEN
+ 
++#
++# Netlink attribute parsing support is select'ed if needed
++#
++config NLATTR
++	bool
++
+ endmenu
+diff --git a/lib/Makefile b/lib/Makefile
+index 32b0e64..b2c09da 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -84,6 +84,8 @@ obj-$(CONFIG_HAVE_ARCH_TRACEHOOK) += syscall.o
+ 
+ obj-$(CONFIG_DYNAMIC_PRINTK_DEBUG) += dynamic_printk.o
+ 
++obj-$(CONFIG_NLATTR) += nlattr.o
++
+ hostprogs-y	:= gen_crc32table
+ clean-files	:= crc32table.h
+ 
+diff --git a/net/netlink/attr.c b/lib/nlattr.c
+similarity index 100%
+rename from net/netlink/attr.c
+rename to lib/nlattr.c
+diff --git a/net/Kconfig b/net/Kconfig
+index cdb8fde..eab40a4 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -4,6 +4,7 @@
+ 
+ menuconfig NET
+ 	bool "Networking support"
++	select NLATTR
+ 	---help---
+ 	  Unless you really know what you are doing, you should say Y here.
+ 	  The reason is that some programs need kernel networking support even
+diff --git a/net/netlink/Makefile b/net/netlink/Makefile
+index e3589c2..bdd6ddf 100644
+--- a/net/netlink/Makefile
++++ b/net/netlink/Makefile
+@@ -2,4 +2,4 @@
+ # Makefile for the netlink driver.
+ #
+ 
+-obj-y  				:= af_netlink.o attr.o genetlink.o
++obj-y  				:= af_netlink.o genetlink.o
+-- 
+1.6.0.4
 
-I already have a patch for that. I'll fold the netlink parsing into the
-original series and will resubmit.
-
-With kind regards,
-
-Geert Uytterhoeven
-Software Architect
-
-Sony Techsoft Centre Europe
-The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
-gium
-
-Phone:    +32 (0)2 700 8453
-=46ax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
-
-A division of Sony Europe (Belgium) N.V.
-VAT BE 0413.825.160 =B7 RPR Brussels
-=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
