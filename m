@@ -1,38 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: ixp4xx_crypto panic with fragmented packets in scatterlist
-Date: Thu, 26 Feb 2009 14:41:08 +0800
-Message-ID: <20090226064108.GA11726@gondor.apana.org.au>
-References: <20090225115407.GB6283@elara.bln.innominate.local>
+Subject: Re: Re:[PATCH] ixp4xx_crypto panic with fragmented packets in
+	scatterlist
+Date: Thu, 26 Feb 2009 14:42:27 +0800
+Message-ID: <20090226064227.GA11766@gondor.apana.org.au>
+References: <49A5654C.1080002@hiramoto.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: karl@hiramoto.org, chohnstaedt@innominate.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Christian Hohnstaedt <chohnstaedt@innominate.com>
+Cc: chohnstaedt@innominate.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.arm.linux.org.uk
+To: Karl Hiramoto <karl@hiramoto.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:60044 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:60049 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750733AbZBZGlS (ORCPT
+	with ESMTP id S1750895AbZBZGme (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Feb 2009 01:41:18 -0500
+	Thu, 26 Feb 2009 01:42:34 -0500
 Content-Disposition: inline
-In-Reply-To: <20090225115407.GB6283@elara.bln.innominate.local>
+In-Reply-To: <49A5654C.1080002@hiramoto.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Christian Hohnstaedt <chohnstaedt@innominate.com> wrote:
->
-> However the scatterlist iteration in the arm implementation of
-> dma_map_sg() uses neither of them, but simply sg++
+Karl Hiramoto <karl@hiramoto.org> wrote:
 > 
-> Please try the attached compile-tested patch.
+> The attached patch fixes my issue, but am not sure if it is correct or
+> will  cause problems else where.
 
-The chaining is only allowed within the crypto layer (because
-we haven't ported the generic chaining to all platforms).  So
-for the time being all drivers must remove the chaining before
-giving the scatter list to an external party, such as the DMA
-API.
+This is what we'll do once generic chaining is available on all
+architectures.  Until then it's up to the driver to fix the SG
+list up before passing it to DMA.
 
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
