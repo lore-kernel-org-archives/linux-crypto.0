@@ -1,38 +1,41 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH] ixp4xx_crypto panic with fragmented packets in scatterlist
-Date: Thu, 26 Feb 2009 09:55:52 +0000
-Message-ID: <20090226095552.GB5811@n2100.arm.linux.org.uk>
-References: <49A2E421.5050806@hiramoto.org> <49A3F3FA.1000801@hiramoto.org> <20090225090735.GA6283@elara.bln.innominate.local> <49A5110B.2050803@hiramoto.org> <20090225115407.GB6283@elara.bln.innominate.local> <49A55744.3010702@hiramoto.org> <49A5654C.1080002@hiramoto.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] ixp4xx_crypto panic with fragmented packets in
+	scatterlist
+Date: Thu, 26 Feb 2009 20:10:43 +0800
+Message-ID: <20090226121043.GA13749@gondor.apana.org.au>
+References: <20090226095552.GB5811@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Christian Hohnstaedt <chohnstaedt@innominate.com>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.arm.linux.org.uk>
-To: Karl Hiramoto <karl@hiramoto.org>
+Cc: karl@hiramoto.org, chohnstaedt@innominate.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.arm.linux.org.uk
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:50486 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751163AbZBZJ41 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:55668 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754800AbZBZMK4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Feb 2009 04:56:27 -0500
+	Thu, 26 Feb 2009 07:10:56 -0500
 Content-Disposition: inline
-In-Reply-To: <49A5654C.1080002@hiramoto.org>
+In-Reply-To: <20090226095552.GB5811@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 25, 2009 at 04:35:40PM +0100, Karl Hiramoto wrote:
-> The attached patch fixes my issue, but am not sure if it is correct or
-> will  cause problems else where.
+Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+>
+> We can't merge this until _all_ of ARM has been fixed for walking
+> scatterlist chains.
 
-> diff -Naurp linux-2.6.28.7.a/arch/arm/include/asm/scatterlist.h linux-2.6.28.7.b/arch/arm/include/asm/scatterlist.h
-> --- linux-2.6.28.7.a/arch/arm/include/asm/scatterlist.h	2009-02-20 23:41:27.000000000 +0100
-> +++ linux-2.6.28.7.b/arch/arm/include/asm/scatterlist.h	2009-02-25 16:19:59.000000000 +0100
-> @@ -24,4 +24,6 @@ struct scatterlist {
->  #define sg_dma_address(sg)      ((sg)->dma_address)
->  #define sg_dma_len(sg)          ((sg)->length)
->  
-> +#define ARCH_HAS_SG_CHAIN
-> +
+Right, this is definitely not the way to fix this bug.  Because
+even if ARM completely supported chaining, you still have to fix
+all the other architectures as well.
 
-We can't merge this until _all_ of ARM has been fixed for walking
-scatterlist chains.
+So please just fix the driver to remove the chaining before doing
+DMA.
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
