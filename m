@@ -1,51 +1,112 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Re: Bug of dm-crypt?
-Date: Fri, 27 Feb 2009 09:41:02 +0100
-Message-ID: <49A7A71E.50702@redhat.com>
-References: <1235712716.6204.100.camel@yhuang-dev.sh.intel.com> <20090227054147.GA22159@gondor.apana.org.au>
+From: Huang Ying <ying.huang@intel.com>
+Subject: [BUGFIX] dm-crypt: Fix a bug of async cryption complete function
+Date: Fri, 27 Feb 2009 16:56:11 +0800
+Message-ID: <1235724971.6204.106.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-Mpy7IBeGMATwSM7UcNHh"
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:59737 "EHLO mx2.redhat.com"
+Received: from mga09.intel.com ([134.134.136.24]:50176 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752142AbZB0IlI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2009 03:41:08 -0500
-In-Reply-To: <20090227054147.GA22159@gondor.apana.org.au>
+	id S1752211AbZB0I4P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2009 03:56:15 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> On Fri, Feb 27, 2009 at 01:31:56PM +0800, Huang Ying wrote:
->> I had ever heard from you that the only thing guaranteed in the
->> completion function of async ablkcipher cryption is the req->data has
->> the value you set before. The request pointer itself may be changed. But
->> in dm-crypt, I found they rely on request pointer in completion
->> function: kcryptd_async_done. This makes my AES-NI cryptd usage panic.
->>
->> Do you think that is a bug?
-> 
-> Absolutely.
-> 
-> It should use cc->req instead.
 
-ok, I'll check it and try to fix that. 
+--=-Mpy7IBeGMATwSM7UcNHh
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Can you send me backtrace from that panic?
+In async cryption complete function (kcryptd_async_done), the
+crypto_async_request passed in may be different from the one passed to
+crypto_ablkcipher_encrypt/decrypt. Only crypto_async_request->data is
+guaranteed to be same as the passed in one. Current kcryptd_async_done
+uses passed in crypto_async_request directly, which may cause AES-NI
+based AES algorithm implementation panic.
 
-What's wrong in async callback now - mempool_free using async_req directly?
+This patch fix this bug by using crypto_async_request->data only,
+which point to dm_crypt_request, the crypto_async_request passed in
+and original data (convert_context) can be gotten from
+dm_crypt_request.
 
-(Btw in some previous discussuion I asked if cryptd can be used
-for some kind of parallel speedup for dm-crypt in async mode and response
-was that cryptd "is only meant to be a demo showing how an async
-implementation should be written".
+Signed-off-by: Huang Ying <ying.huang@intel.com>
 
-So this changed to real working thread for AES-NI?)
+---
+ drivers/md/dm-crypt.c |   14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Milan
---
-mbroz@redhat.com
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -60,6 +60,8 @@ struct dm_crypt_io {
+ };
+=20
+ struct dm_crypt_request {
++	struct ablkcipher_request *req;
++	struct convert_context *ctx;
+ 	struct scatterlist sg_in;
+ 	struct scatterlist sg_out;
+ };
+@@ -349,6 +351,8 @@ static int crypt_convert_block(struct cr
+ 	iv =3D (u8 *)ALIGN((unsigned long)(dmreq + 1),
+ 			 crypto_ablkcipher_alignmask(cc->tfm) + 1);
+=20
++	dmreq->req =3D req;
++	dmreq->ctx =3D ctx;
+ 	sg_init_table(&dmreq->sg_in, 1);
+ 	sg_set_page(&dmreq->sg_in, bv_in->bv_page, 1 << SECTOR_SHIFT,
+ 		    bv_in->bv_offset + ctx->offset_in);
+@@ -391,12 +395,15 @@ static void kcryptd_async_done(struct cr
+ static void crypt_alloc_req(struct crypt_config *cc,
+ 			    struct convert_context *ctx)
+ {
++	struct dm_crypt_request *dmreq;
++
+ 	if (!cc->req)
+ 		cc->req =3D mempool_alloc(cc->req_pool, GFP_NOIO);
+ 	ablkcipher_request_set_tfm(cc->req, cc->tfm);
++	dmreq =3D (struct dm_crypt_request *)((char *)cc->req + cc->dmreq_start);
+ 	ablkcipher_request_set_callback(cc->req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 					     CRYPTO_TFM_REQ_MAY_SLEEP,
+-					     kcryptd_async_done, ctx);
++					     kcryptd_async_done, dmreq);
+ }
+=20
+ /*
+@@ -821,7 +828,8 @@ static void kcryptd_crypt_read_convert(s
+ static void kcryptd_async_done(struct crypto_async_request *async_req,
+ 			       int error)
+ {
+-	struct convert_context *ctx =3D async_req->data;
++	struct dm_crypt_request *dmreq =3D async_req->data;
++	struct convert_context *ctx =3D dmreq->ctx;
+ 	struct dm_crypt_io *io =3D container_of(ctx, struct dm_crypt_io, ctx);
+ 	struct crypt_config *cc =3D io->target->private;
+=20
+@@ -830,7 +838,7 @@ static void kcryptd_async_done(struct cr
+ 		return;
+ 	}
+=20
+-	mempool_free(ablkcipher_request_cast(async_req), cc->req_pool);
++	mempool_free(dmreq->req, cc->req_pool);
+=20
+ 	if (!atomic_dec_and_test(&ctx->pending))
+ 		return;
+
+
+--=-Mpy7IBeGMATwSM7UcNHh
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkmnqqcACgkQKhFGF+eHlpgOhQCfYYPneGJgDtyBmjYWP4GrcZ0F
+ULkAnj6JYcFEl57wsArQUL6aog3zl/jm
+=AEIJ
+-----END PGP SIGNATURE-----
+
+--=-Mpy7IBeGMATwSM7UcNHh--
 
