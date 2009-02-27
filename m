@@ -1,65 +1,46 @@
-From: Christian Hohnstaedt <chohnstaedt@innominate.com>
-Subject: Re: [PATCH] ixp4xx_crypto panic with fragmented packets in
-	scatterlist
-Date: Fri, 27 Feb 2009 11:26:10 +0100
-Message-ID: <20090227102609.GD6283@elara.bln.innominate.local>
-References: <20090226121043.GA13749@gondor.apana.org.au> <49A6FB1D.2030807@hiramoto.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Bug of dm-crypt?
+Date: Fri, 27 Feb 2009 19:39:27 +0800
+Message-ID: <20090227113927.GA24024@gondor.apana.org.au>
+References: <1235712716.6204.100.camel@yhuang-dev.sh.intel.com> <20090227054147.GA22159@gondor.apana.org.au> <49A7A71E.50702@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	chohnstaedt@innominate.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.arm.linux.org.uk
-To: Karl Hiramoto <karl@hiramoto.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from home.innominate.com ([77.245.32.75]:33681 "EHLO
-	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753336AbZB0K0P (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:44035 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754696AbZB0Lje (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2009 05:26:15 -0500
+	Fri, 27 Feb 2009 06:39:34 -0500
 Content-Disposition: inline
-In-Reply-To: <49A6FB1D.2030807@hiramoto.org>
+In-Reply-To: <49A7A71E.50702@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 26, 2009 at 09:27:09PM +0100, Karl Hiramoto wrote:
-> Herbert Xu wrote:
->> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
->>  =20
->>> We can't merge this until _all_ of ARM has been fixed for walking
->>> scatterlist chains.
->>>    =20
->>
->> Right, this is definitely not the way to fix this bug.  Because
->> even if ARM completely supported chaining, you still have to fix
->> all the other architectures as well.
->>
->> So please just fix the driver to remove the chaining before doing
->> DMA.
->>
->>  =20
-> Is there an example of how to do this somewhere?=20
->
+On Fri, Feb 27, 2009 at 09:41:02AM +0100, Milan Broz wrote:
+> 
+> Can you send me backtrace from that panic?
+> 
+> What's wrong in async callback now - mempool_free using async_req directly?
 
-Not needed.
+The req you get in the completion function is not necessarily
+the req that you started with.  The only thing you can rely on
+is req->data.
 
-Now that I know the details about the different ways of chaining
-and their scope, I know how to fix my driver properly.
+> (Btw in some previous discussuion I asked if cryptd can be used
+> for some kind of parallel speedup for dm-crypt in async mode and response
+> was that cryptd "is only meant to be a demo showing how an async
+> implementation should be written".
+> 
+> So this changed to real working thread for AES-NI?)
 
-Patch follows, soon...
+Yes we changed it :) cryptd is no longer for fun only.
 
-best regards
-Christian
-
---=20
-The iMac is just evidence of how dangerous vi is. Obviously Steve came =
-up with
-the name by accident after forgetting he was *already* in insert mode.
- =E2=80=94 dagbrown on #emacs
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
