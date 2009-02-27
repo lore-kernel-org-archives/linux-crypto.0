@@ -1,54 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.29
-Date: Fri, 27 Feb 2009 12:30:35 +0800
-Message-ID: <20090227043035.GA21665@gondor.apana.org.au>
-References: <20080501102812.GA7151@gondor.apana.org.au> <20080727063659.GA936@gondor.apana.org.au> <20090115044020.GA29891@gondor.apana.org.au> <20090127061546.GA27962@gondor.apana.org.au> <20090209033924.GA31250@gondor.apana.org.au> <20090217121252.GA22812@gondor.apana.org.au> <20090223095428.GA11076@gondor.apana.org.au>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Bug of dm-crypt?
+Date: Fri, 27 Feb 2009 13:31:56 +0800
+Message-ID: <1235712716.6204.100.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-C8aD9h2TUTjVKanprVlB"
+Cc: Milan Broz <mbroz@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57828 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754798AbZB0Eaq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Feb 2009 23:30:46 -0500
-Content-Disposition: inline
-In-Reply-To: <20090223095428.GA11076@gondor.apana.org.au>
+Received: from mga01.intel.com ([192.55.52.88]:11018 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751735AbZB0FcA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2009 00:32:00 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
 
-This push fixes a 2.6.27 regression where the new test mechanism
-can cause the optimised AES implementation on s390 to hang on
-initial module load.  The same thing can affect the VIA PadLock,
-although modprobe alias ordering may have prevented it from
-occurring.
+--=-C8aD9h2TUTjVKanprVlB
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Please pull from
+Hi, Herbert,
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+I had ever heard from you that the only thing guaranteed in the
+completion function of async ablkcipher cryption is the req->data has
+the value you set before. The request pointer itself may be changed. But
+in dm-crypt, I found they rely on request pointer in completion
+function: kcryptd_async_done. This makes my AES-NI cryptd usage panic.
 
-or
+Do you think that is a bug?
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Best Regards,
+Huang Ying
 
 
-Herbert Xu (1):
-      crypto: api - Fix module load deadlock with fallback algorithms
+--=-C8aD9h2TUTjVKanprVlB
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
- arch/s390/crypto/aes_s390.c  |    2 +-
- crypto/api.c                 |   15 +++++++++++++--
- drivers/crypto/padlock-aes.c |    2 +-
- drivers/crypto/padlock-sha.c |    4 ++--
- 4 files changed, 17 insertions(+), 6 deletions(-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+iEYEABECAAYFAkmneskACgkQKhFGF+eHlphtiwCfQ9im6KaQMLtOzmVh3i++vMum
+KNEAn2iRukI6aTTMK19O6JcRkHW4GPQf
+=36Y9
+-----END PGP SIGNATURE-----
+
+--=-C8aD9h2TUTjVKanprVlB--
+
