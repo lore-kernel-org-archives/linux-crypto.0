@@ -1,86 +1,65 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: Bug of dm-crypt?
-Date: Fri, 27 Feb 2009 17:46:53 +0800
-Message-ID: <1235728013.6204.139.camel@yhuang-dev.sh.intel.com>
-References: <1235712716.6204.100.camel@yhuang-dev.sh.intel.com>
-	 <20090227054147.GA22159@gondor.apana.org.au>  <49A7A71E.50702@redhat.com>
+From: Christian Hohnstaedt <chohnstaedt@innominate.com>
+Subject: Re: [PATCH] ixp4xx_crypto panic with fragmented packets in
+	scatterlist
+Date: Fri, 27 Feb 2009 11:26:10 +0100
+Message-ID: <20090227102609.GD6283@elara.bln.innominate.local>
+References: <20090226121043.GA13749@gondor.apana.org.au> <49A6FB1D.2030807@hiramoto.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-ecLmkjQIuQlB3mvqbKe9"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Milan Broz <mbroz@redhat.com>
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	chohnstaedt@innominate.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.arm.linux.org.uk
+To: Karl Hiramoto <karl@hiramoto.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:56858 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754092AbZB0Jq5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2009 04:46:57 -0500
-In-Reply-To: <49A7A71E.50702@redhat.com>
+Received: from home.innominate.com ([77.245.32.75]:33681 "EHLO
+	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753336AbZB0K0P (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2009 05:26:15 -0500
+Content-Disposition: inline
+In-Reply-To: <49A6FB1D.2030807@hiramoto.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
---=-ecLmkjQIuQlB3mvqbKe9
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-Hi, Milan,
-
-On Fri, 2009-02-27 at 16:41 +0800, Milan Broz wrote:
+On Thu, Feb 26, 2009 at 09:27:09PM +0100, Karl Hiramoto wrote:
 > Herbert Xu wrote:
-> > On Fri, Feb 27, 2009 at 01:31:56PM +0800, Huang Ying wrote:
-> >> I had ever heard from you that the only thing guaranteed in the
-> >> completion function of async ablkcipher cryption is the req->data has
-> >> the value you set before. The request pointer itself may be changed. B=
-ut
-> >> in dm-crypt, I found they rely on request pointer in completion
-> >> function: kcryptd_async_done. This makes my AES-NI cryptd usage panic.
-> >>
-> >> Do you think that is a bug?
-> >=20
-> > Absolutely.
-> >=20
-> > It should use cc->req instead.
->=20
-> ok, I'll check it and try to fix that.=20
->=20
-> Can you send me backtrace from that panic?
+>> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+>>  =20
+>>> We can't merge this until _all_ of ARM has been fixed for walking
+>>> scatterlist chains.
+>>>    =20
+>>
+>> Right, this is definitely not the way to fix this bug.  Because
+>> even if ARM completely supported chaining, you still have to fix
+>> all the other architectures as well.
+>>
+>> So please just fix the driver to remove the chaining before doing
+>> DMA.
+>>
+>>  =20
+> Is there an example of how to do this somewhere?=20
+>
 
-The panic backtrace is just some random kernel page fault or general
-protection fault, because the freed pointer is not the allocated one.
+Not needed.
 
-> What's wrong in async callback now - mempool_free using async_req directl=
-y?
+Now that I know the details about the different ways of chaining
+and their scope, I know how to fix my driver properly.
 
-Yes. I have a fix by storing real allocated async_req in
-async_req->data. Can you help me to review that?
+Patch follows, soon...
 
-> (Btw in some previous discussuion I asked if cryptd can be used
-> for some kind of parallel speedup for dm-crypt in async mode and response
-> was that cryptd "is only meant to be a demo showing how an async
-> implementation should be written".
->=20
-> So this changed to real working thread for AES-NI?)
+best regards
+Christian
 
-Yes. Now AES-NI uses it. And because a Per-CPU thread implementation is
-used for cryptd, it can be used to speedup dm-crypt in some situation
-too I think.
-
-Best Regards,
-Huang Ying
-
-
---=-ecLmkjQIuQlB3mvqbKe9
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkmntoQACgkQKhFGF+eHlpgVrgCggyM7Vvd4YWPI5OT4kaIlBWqw
-nVEAn3EqEJt66bsM35Ew5zQCsmeIm4j0
-=+qbn
------END PGP SIGNATURE-----
-
---=-ecLmkjQIuQlB3mvqbKe9--
-
+--=20
+The iMac is just evidence of how dangerous vi is. Obviously Steve came =
+up with
+the name by accident after forgetting he was *already* in insert mode.
+ =E2=80=94 dagbrown on #emacs
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
