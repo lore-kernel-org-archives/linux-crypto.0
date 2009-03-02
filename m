@@ -1,147 +1,407 @@
-From: "Loc Ho" <lho@amcc.com>
-Subject: RE: [PATCH 1/1 v8] Add CryptoAPI User Interface Support v8
-Date: Mon, 23 Feb 2009 10:46:43 -0800
-Message-ID: <0CA0A16855646F4FA96D25A158E299D605E823E1@SDCEXCHANGE01.ad.amcc.com>
-References: <DB599F406D04E34389140B7D99C71B1B06F2B86C@SDCEXCHANGE01.ad.amcc.com> <20090128044634.GE13157@gondor.apana.org.au> <0CA0A16855646F4FA96D25A158E299D605D3F8FD@SDCEXCHANGE01.ad.amcc.com> <20090223093558.GC10515@gondor.apana.org.au>
+From: Christian Hohnstaedt <chohnstaedt@innominate.com>
+Subject: [PATCH] crypto: fix handling of sg buffers in ixp4xx driver
+Date: Mon, 2 Mar 2009 12:45:12 +0100
+Message-ID: <20090302114511.GE6283@elara.bln.innominate.local>
+References: <20090226232025.GE5811@n2100.arm.linux.org.uk> <20090227005033.GA20046@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1252"
-Content-Transfer-Encoding: 8BIT
-Cc: <linux-crypto@vger.kernel.org>,
-	"Evgeniy Polyakov" <zbr@ioremap.net>,
-	"Shasi Pulijala" <spulijala@amcc.com>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	karl@hiramoto.org, chohnstaedt@innominate.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.arm.linux.org.uk
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02.amcc.com ([198.137.200.73]:62263 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753996AbZBWSqq convert rfc822-to-8bit (ORCPT
+Received: from home.innominate.com ([77.245.32.75]:56759 "EHLO
+	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752126AbZCBLpR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Feb 2009 13:46:46 -0500
-Content-class: urn:content-classes:message
-In-Reply-To: <20090223093558.GC10515@gondor.apana.org.au>
+	Mon, 2 Mar 2009 06:45:17 -0500
+Content-Disposition: inline
+In-Reply-To: <20090227005033.GA20046@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
 
-See inline...
+ - keep dma functions away from chained scatterlists.
+   Use the existing scatterlist iteration inside the driver
+   to call dma_map_single() for each chunk and avoid dma_map_sg().
 
--Loc
+Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
+Tested-By:  Karl Hiramoto <karl@hiramoto.org>
 
-> 
-> struct crypto_type {
-> 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
-> 	int (*init)(struct crypto_tfm *tfm, u32 type, u32 mask);
-> 	void (*exit)(struct crypto_tfm *tfm);
-> 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
-> 	int (*uspace_setparam)(struct crypto_tfm *tfm, void *param, u32 param_size);
-> 	int (*uspace_op)(struct crypto_tfm *tfm, 
-> 			const struct iovec *iov, u32 iov_cnt,
-> 			crypto_completion_t cb, void *ctx);
-> };
+---
+ drivers/crypto/ixp4xx_crypto.c |  182 ++++++++++++++--------------------------
+ 1 files changed, 63 insertions(+), 119 deletions(-)
 
-I'd like to see a name field.  It's better to have user-space
-pass through a string for the type instead of an ID.
-
-The reason you want user-space to pass that through is so that
-you can locate the crypto_type object and then call crypto_alloc_tfm
-on it..
-
-[Loc Ho]
-The name field would not be known here. It will be at the cryptodev layer as it is the layer that create the tfm. In the above two functions, the parameter tfm has already been created.
-
-Also the other two functions should take a void * instead of
-crypto_tfm * since crypto_alloc_tfm now returns that.
-
-[Loc Ho]
-The function ctxsize, init, exit, and show already existed. For cryptodev, I added only uspace_setparam and uspace_op. We will change their first parameter to void *.
-
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index 2d637e0..fdcd0ab 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -101,6 +101,7 @@ struct buffer_desc {
+ 	u32 phys_addr;
+ 	u32 __reserved[4];
+ 	struct buffer_desc *next;
++	enum dma_data_direction dir;
+ };
  
-> struct uspace_session {
-> 	__u8 alg_name[64];
-> 	__u32 front_type; /* I don't believe we need this - leave for now */
-
-So instead of front_type I'd like to see front_type_name.
-
-[Loc Ho]
-Okay... Maybe you see some value having a front_type_name. But as of right now, I only see the need for alg_name, type, and mask. 
+ struct crypt_ctl {
+@@ -132,14 +133,10 @@ struct crypt_ctl {
+ struct ablk_ctx {
+ 	struct buffer_desc *src;
+ 	struct buffer_desc *dst;
+-	unsigned src_nents;
+-	unsigned dst_nents;
+ };
  
-> struct uspace_param {
-> 	__u16 size;		/* We need this parameter as I/O control is only one pointer */
-> 	__u8 data[0];	/* Variable size - parameters are crypto type specific */
-> };
-> 
-> struct uspace_param_ahash { /* This is the data field of struct uspace_param */
-> 	__u16 hmackey_size;
-> 	__u8	data[0];
-> };
-> 
-> struct uspace_param_aead { /* This is the data field of struct uspace_param */
-> 	__u16 key_size;
-> 	__u16 hmackey_size;
-> 	__u8	data[0];
-> };
-> 
-> /* Create crypto session */
-> #define CIOCGSESSION    _IOWR('c', 101, struct session_op)
-> /* Set algorithm parameters */
-> #define CIOCPARAM    	_IOWR('c', 102, struct key_op)
-> 
-> struct upsace_aead_op {	/* Per operation for aead type */
-> 	#define COP_NONE	0
-> 	#define COP_ENCRYPT	1
-> 	#define COP_DECRYPT	2
-> 	__u16		op;		/* i.e. COP_ENCRYPT */
-> 	__u16		flags;
-> 	__u16		iv_size;
-> 	__u16 	assoc_size;
-> 	__u8		data[0];	/* parameter for aead per operation */		
-> };
-
-OK, I presume the idea is to stuff this into the iov that's passed
-to uspace_op?
-
-[Loc Ho]
-Yes...
-
-I'm starting to think that write(2) isn't really what we want.  The
-reason is that each operation always has two types of data: obviously
-we have the data itself, plus ancillary information like this struct
-right here.
-
-So how about switching over to the socket interface:
-
-1. Create fd.
-
-	fd = socket(AF_ALGO, SOCK_DGRAM, 0);
-
-2. Allocate tfm, alg_name would be the uspace_session struct.
-
-	connect(fd, alg_name, alg_name_len);
-
-3. Set parameters.
-
-	setsockopt(fd, ..., param, param_len);
-
-4. Operate.
-
-	sendmsg(fd, msg, flags);
-[Loc Ho]
-Okay... This would requires the caller to call the recvmsg and make use of standard async/sync socket interface. For async interface, caller will have to call the recvmsg. A sendmsg will always returns success unless HW ring is full. For sync interface, the function will block until the operation completed. If we switch to this interface, are you going to stick with this interface and apply this - at least until there is a better reason to change? Even if there is a good reason to change, I would like to see a version available in the crypto tree if not Linux kernel release tree. We will also look at splice as well if time permit.
-
-Here struct msghdr provides for both the IOV array and space for
-ancillary information.
-
-Then the uspace_op function would just need to take a msg plus
-the callback stuff.
-
-Cheers,
+ struct aead_ctx {
+ 	struct buffer_desc *buffer;
+-	unsigned short assoc_nents;
+-	unsigned short src_nents;
+ 	struct scatterlist ivlist;
+ 	/* used when the hmac is not on one sg entry */
+ 	u8 *hmac_virt;
+@@ -312,7 +309,7 @@ static struct crypt_ctl *get_crypt_desc_emerg(void)
+ 	}
+ }
+ 
+-static void free_buf_chain(struct buffer_desc *buf, u32 phys)
++static void free_buf_chain(struct device *dev, struct buffer_desc *buf,u32 phys)
+ {
+ 	while (buf) {
+ 		struct buffer_desc *buf1;
+@@ -320,6 +317,7 @@ static void free_buf_chain(struct buffer_desc *buf, u32 phys)
+ 
+ 		buf1 = buf->next;
+ 		phys1 = buf->phys_next;
++		dma_unmap_single(dev, buf->phys_next, buf->buf_len, buf->dir);
+ 		dma_pool_free(buffer_pool, buf, phys);
+ 		buf = buf1;
+ 		phys = phys1;
+@@ -348,7 +346,6 @@ static void one_packet(dma_addr_t phys)
+ 	struct crypt_ctl *crypt;
+ 	struct ixp_ctx *ctx;
+ 	int failed;
+-	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
+ 
+ 	failed = phys & 0x1 ? -EBADMSG : 0;
+ 	phys &= ~0x3;
+@@ -358,13 +355,8 @@ static void one_packet(dma_addr_t phys)
+ 	case CTL_FLAG_PERFORM_AEAD: {
+ 		struct aead_request *req = crypt->data.aead_req;
+ 		struct aead_ctx *req_ctx = aead_request_ctx(req);
+-		dma_unmap_sg(dev, req->assoc, req_ctx->assoc_nents,
+-				DMA_TO_DEVICE);
+-		dma_unmap_sg(dev, &req_ctx->ivlist, 1, DMA_BIDIRECTIONAL);
+-		dma_unmap_sg(dev, req->src, req_ctx->src_nents,
+-				DMA_BIDIRECTIONAL);
+ 
+-		free_buf_chain(req_ctx->buffer, crypt->src_buf);
++		free_buf_chain(dev, req_ctx->buffer, crypt->src_buf);
+ 		if (req_ctx->hmac_virt) {
+ 			finish_scattered_hmac(crypt);
+ 		}
+@@ -374,16 +366,11 @@ static void one_packet(dma_addr_t phys)
+ 	case CTL_FLAG_PERFORM_ABLK: {
+ 		struct ablkcipher_request *req = crypt->data.ablk_req;
+ 		struct ablk_ctx *req_ctx = ablkcipher_request_ctx(req);
+-		int nents;
++
+ 		if (req_ctx->dst) {
+-			nents = req_ctx->dst_nents;
+-			dma_unmap_sg(dev, req->dst, nents, DMA_FROM_DEVICE);
+-			free_buf_chain(req_ctx->dst, crypt->dst_buf);
+-			src_direction = DMA_TO_DEVICE;
++			free_buf_chain(dev, req_ctx->dst, crypt->dst_buf);
+ 		}
+-		nents = req_ctx->src_nents;
+-		dma_unmap_sg(dev, req->src, nents, src_direction);
+-		free_buf_chain(req_ctx->src, crypt->src_buf);
++		free_buf_chain(dev, req_ctx->src, crypt->src_buf);
+ 		req->base.complete(&req->base, failed);
+ 		break;
+ 	}
+@@ -748,56 +735,35 @@ static int setup_cipher(struct crypto_tfm *tfm, int encrypt,
+ 	return 0;
+ }
+ 
+-static int count_sg(struct scatterlist *sg, int nbytes)
++static struct buffer_desc *chainup_buffers(struct device *dev,
++		struct scatterlist *sg,	unsigned nbytes,
++		struct buffer_desc *buf, gfp_t flags,
++		enum dma_data_direction dir)
+ {
+-	int i;
+-	for (i = 0; nbytes > 0; i++, sg = sg_next(sg))
+-		nbytes -= sg->length;
+-	return i;
+-}
+-
+-static struct buffer_desc *chainup_buffers(struct scatterlist *sg,
+-			unsigned nbytes, struct buffer_desc *buf, gfp_t flags)
+-{
+-	int nents = 0;
+-
+-	while (nbytes > 0) {
++	for (;nbytes > 0; sg = scatterwalk_sg_next(sg)) {
++		unsigned len = min(nbytes, sg->length);
+ 		struct buffer_desc *next_buf;
+ 		u32 next_buf_phys;
+-		unsigned len = min(nbytes, sg_dma_len(sg));
++		void *ptr;
+ 
+-		nents++;
+ 		nbytes -= len;
+-		if (!buf->phys_addr) {
+-			buf->phys_addr = sg_dma_address(sg);
+-			buf->buf_len = len;
+-			buf->next = NULL;
+-			buf->phys_next = 0;
+-			goto next;
+-		}
+-		/* Two consecutive chunks on one page may be handled by the old
+-		 * buffer descriptor, increased by the length of the new one
+-		 */
+-		if (sg_dma_address(sg) == buf->phys_addr + buf->buf_len) {
+-			buf->buf_len += len;
+-			goto next;
+-		}
++		ptr = page_address(sg_page(sg)) + sg->offset;
+ 		next_buf = dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
+-		if (!next_buf)
+-			return NULL;
++		if (!next_buf) {
++			buf = NULL;
++			break;
++		}
++		sg_dma_address(sg) = dma_map_single(dev, ptr, len, dir);
+ 		buf->next = next_buf;
+ 		buf->phys_next = next_buf_phys;
+-
+ 		buf = next_buf;
+-		buf->next = NULL;
+-		buf->phys_next = 0;
++
+ 		buf->phys_addr = sg_dma_address(sg);
+ 		buf->buf_len = len;
+-next:
+-		if (nbytes > 0) {
+-			sg = sg_next(sg);
+-		}
++		buf->dir = dir;
+ 	}
++	buf->next = NULL;
++	buf->phys_next = 0;
+ 	return buf;
+ }
+ 
+@@ -858,12 +824,12 @@ static int ablk_perform(struct ablkcipher_request *req, int encrypt)
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct ixp_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+ 	unsigned ivsize = crypto_ablkcipher_ivsize(tfm);
+-	int ret = -ENOMEM;
+ 	struct ix_sa_dir *dir;
+ 	struct crypt_ctl *crypt;
+-	unsigned int nbytes = req->nbytes, nents;
++	unsigned int nbytes = req->nbytes;
+ 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
+ 	struct ablk_ctx *req_ctx = ablkcipher_request_ctx(req);
++	struct buffer_desc src_hook;
+ 	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
+ 				GFP_KERNEL : GFP_ATOMIC;
+ 
+@@ -876,7 +842,7 @@ static int ablk_perform(struct ablkcipher_request *req, int encrypt)
+ 
+ 	crypt = get_crypt_desc();
+ 	if (!crypt)
+-		return ret;
++		return -ENOMEM;
+ 
+ 	crypt->data.ablk_req = req;
+ 	crypt->crypto_ctx = dir->npe_ctx_phys;
+@@ -889,53 +855,41 @@ static int ablk_perform(struct ablkcipher_request *req, int encrypt)
+ 	BUG_ON(ivsize && !req->info);
+ 	memcpy(crypt->iv, req->info, ivsize);
+ 	if (req->src != req->dst) {
++		struct buffer_desc dst_hook;
+ 		crypt->mode |= NPE_OP_NOT_IN_PLACE;
+-		nents = count_sg(req->dst, nbytes);
+ 		/* This was never tested by Intel
+ 		 * for more than one dst buffer, I think. */
+-		BUG_ON(nents != 1);
+-		req_ctx->dst_nents = nents;
+-		dma_map_sg(dev, req->dst, nents, DMA_FROM_DEVICE);
+-		req_ctx->dst = dma_pool_alloc(buffer_pool, flags,&crypt->dst_buf);
+-		if (!req_ctx->dst)
+-			goto unmap_sg_dest;
+-		req_ctx->dst->phys_addr = 0;
+-		if (!chainup_buffers(req->dst, nbytes, req_ctx->dst, flags))
++		BUG_ON(req->dst->length < nbytes);
++		req_ctx->dst = NULL;
++		if (!chainup_buffers(dev, req->dst, nbytes, &dst_hook,
++					flags, DMA_FROM_DEVICE))
+ 			goto free_buf_dest;
+ 		src_direction = DMA_TO_DEVICE;
++		req_ctx->dst = dst_hook.next;
++		crypt->dst_buf = dst_hook.phys_next;
+ 	} else {
+ 		req_ctx->dst = NULL;
+-		req_ctx->dst_nents = 0;
+ 	}
+-	nents = count_sg(req->src, nbytes);
+-	req_ctx->src_nents = nents;
+-	dma_map_sg(dev, req->src, nents, src_direction);
+-
+-	req_ctx->src = dma_pool_alloc(buffer_pool, flags, &crypt->src_buf);
+-	if (!req_ctx->src)
+-		goto unmap_sg_src;
+-	req_ctx->src->phys_addr = 0;
+-	if (!chainup_buffers(req->src, nbytes, req_ctx->src, flags))
++	req_ctx->src = NULL;
++	if (!chainup_buffers(dev, req->src, nbytes, &src_hook,
++				flags, src_direction))
+ 		goto free_buf_src;
+ 
++	req_ctx->src = src_hook.next;
++	crypt->src_buf = src_hook.phys_next;
+ 	crypt->ctl_flags |= CTL_FLAG_PERFORM_ABLK;
+ 	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+ 	BUG_ON(qmgr_stat_overflow(SEND_QID));
+ 	return -EINPROGRESS;
+ 
+ free_buf_src:
+-	free_buf_chain(req_ctx->src, crypt->src_buf);
+-unmap_sg_src:
+-	dma_unmap_sg(dev, req->src, req_ctx->src_nents, src_direction);
++	free_buf_chain(dev, req_ctx->src, crypt->src_buf);
+ free_buf_dest:
+ 	if (req->src != req->dst) {
+-		free_buf_chain(req_ctx->dst, crypt->dst_buf);
+-unmap_sg_dest:
+-		dma_unmap_sg(dev, req->src, req_ctx->dst_nents,
+-			DMA_FROM_DEVICE);
++		free_buf_chain(dev, req_ctx->dst, crypt->dst_buf);
+ 	}
+ 	crypt->ctl_flags = CTL_FLAG_UNUSED;
+-	return ret;
++	return -ENOMEM;
+ }
+ 
+ static int ablk_encrypt(struct ablkcipher_request *req)
+@@ -983,7 +937,7 @@ static int hmac_inconsistent(struct scatterlist *sg, unsigned start,
+ 			break;
+ 
+ 		offset += sg->length;
+-		sg = sg_next(sg);
++		sg = scatterwalk_sg_next(sg);
+ 	}
+ 	return (start + nbytes > offset + sg->length);
+ }
+@@ -995,11 +949,10 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 	struct ixp_ctx *ctx = crypto_aead_ctx(tfm);
+ 	unsigned ivsize = crypto_aead_ivsize(tfm);
+ 	unsigned authsize = crypto_aead_authsize(tfm);
+-	int ret = -ENOMEM;
+ 	struct ix_sa_dir *dir;
+ 	struct crypt_ctl *crypt;
+-	unsigned int cryptlen, nents;
+-	struct buffer_desc *buf;
++	unsigned int cryptlen;
++	struct buffer_desc *buf, src_hook;
+ 	struct aead_ctx *req_ctx = aead_request_ctx(req);
+ 	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
+ 				GFP_KERNEL : GFP_ATOMIC;
+@@ -1020,7 +973,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 	}
+ 	crypt = get_crypt_desc();
+ 	if (!crypt)
+-		return ret;
++		return -ENOMEM;
+ 
+ 	crypt->data.aead_req = req;
+ 	crypt->crypto_ctx = dir->npe_ctx_phys;
+@@ -1039,31 +992,27 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 		BUG(); /* -ENOTSUP because of my lazyness */
+ 	}
+ 
+-	req_ctx->buffer = dma_pool_alloc(buffer_pool, flags, &crypt->src_buf);
+-	if (!req_ctx->buffer)
+-		goto out;
+-	req_ctx->buffer->phys_addr = 0;
+ 	/* ASSOC data */
+-	nents = count_sg(req->assoc, req->assoclen);
+-	req_ctx->assoc_nents = nents;
+-	dma_map_sg(dev, req->assoc, nents, DMA_TO_DEVICE);
+-	buf = chainup_buffers(req->assoc, req->assoclen, req_ctx->buffer,flags);
++	buf = chainup_buffers(dev, req->assoc, req->assoclen, &src_hook,
++		flags, DMA_TO_DEVICE);
++	req_ctx->buffer = src_hook.next;
++	crypt->src_buf = src_hook.phys_next;
+ 	if (!buf)
+-		goto unmap_sg_assoc;
++		goto out;
+ 	/* IV */
+ 	sg_init_table(&req_ctx->ivlist, 1);
+ 	sg_set_buf(&req_ctx->ivlist, iv, ivsize);
+-	dma_map_sg(dev, &req_ctx->ivlist, 1, DMA_BIDIRECTIONAL);
+-	buf = chainup_buffers(&req_ctx->ivlist, ivsize, buf, flags);
++	buf = chainup_buffers(dev, &req_ctx->ivlist, ivsize, buf, flags,
++			DMA_BIDIRECTIONAL);
+ 	if (!buf)
+-		goto unmap_sg_iv;
++		goto free_chain;
+ 	if (unlikely(hmac_inconsistent(req->src, cryptlen, authsize))) {
+ 		/* The 12 hmac bytes are scattered,
+ 		 * we need to copy them into a safe buffer */
+ 		req_ctx->hmac_virt = dma_pool_alloc(buffer_pool, flags,
+ 				&crypt->icv_rev_aes);
+ 		if (unlikely(!req_ctx->hmac_virt))
+-			goto unmap_sg_iv;
++			goto free_chain;
+ 		if (!encrypt) {
+ 			scatterwalk_map_and_copy(req_ctx->hmac_virt,
+ 				req->src, cryptlen, authsize, 0);
+@@ -1073,33 +1022,28 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 		req_ctx->hmac_virt = NULL;
+ 	}
+ 	/* Crypt */
+-	nents = count_sg(req->src, cryptlen + authsize);
+-	req_ctx->src_nents = nents;
+-	dma_map_sg(dev, req->src, nents, DMA_BIDIRECTIONAL);
+-	buf = chainup_buffers(req->src, cryptlen + authsize, buf, flags);
++	buf = chainup_buffers(dev, req->src, cryptlen + authsize, buf, flags,
++			DMA_BIDIRECTIONAL);
+ 	if (!buf)
+-		goto unmap_sg_src;
++		goto free_hmac_virt;
+ 	if (!req_ctx->hmac_virt) {
+ 		crypt->icv_rev_aes = buf->phys_addr + buf->buf_len - authsize;
+ 	}
++
+ 	crypt->ctl_flags |= CTL_FLAG_PERFORM_AEAD;
+ 	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+ 	BUG_ON(qmgr_stat_overflow(SEND_QID));
+ 	return -EINPROGRESS;
+-unmap_sg_src:
+-	dma_unmap_sg(dev, req->src, req_ctx->src_nents, DMA_BIDIRECTIONAL);
++free_hmac_virt:
+ 	if (req_ctx->hmac_virt) {
+ 		dma_pool_free(buffer_pool, req_ctx->hmac_virt,
+ 				crypt->icv_rev_aes);
+ 	}
+-unmap_sg_iv:
+-	dma_unmap_sg(dev, &req_ctx->ivlist, 1, DMA_BIDIRECTIONAL);
+-unmap_sg_assoc:
+-	dma_unmap_sg(dev, req->assoc, req_ctx->assoc_nents, DMA_TO_DEVICE);
+-	free_buf_chain(req_ctx->buffer, crypt->src_buf);
++free_chain:
++	free_buf_chain(dev, req_ctx->buffer, crypt->src_buf);
+ out:
+ 	crypt->ctl_flags = CTL_FLAG_UNUSED;
+-	return ret;
++	return -ENOMEM;
+ }
+ 
+ static int aead_setup(struct crypto_aead *tfm, unsigned int authsize)
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1.6.0.3
+
