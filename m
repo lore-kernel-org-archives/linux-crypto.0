@@ -1,251 +1,383 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH 2/3] crypto: Add fpu template, a wrapper for blkcipher
-	touching FPU
-Date: Thu, 05 Mar 2009 10:25:41 +0800
-Message-ID: <1236219941.24215.38.camel@yhuang-dev.sh.intel.com>
+Subject: [PATCH 3/3] crypto: Add AES-NI support for more modes
+Date: Thu, 05 Mar 2009 10:25:49 +0800
+Message-ID: <1236219949.24215.39.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-fFx+Q5Idy06Pek/YlFVb"
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-aYElaYDaFlxxM+bgLHBx"
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:14426 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754832AbZCECZp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Mar 2009 21:25:45 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1756174AbZCEC03@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
---=-fFx+Q5Idy06Pek/YlFVb
+--=-aYElaYDaFlxxM+bgLHBx
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Blkcipher touching FPU need to be enclosed by kernel_fpu_begin() and
-kernel_fpu_end(). If they are invoked in cipher algorithm
-implementation, they will be invoked for each block, so that
-performance will be hurt, because they are "slow" operations. This
-patch implements "fpu" template, which makes these operations to be
-invoked for each request.
+Because kernel_fpu_begin() and kernel_fpu_end() operations are too
+slow, the performance gain of general mode implementation + aes-aesni
+is almost all compensated.
+
+The AES-NI support for more modes are implemented as follow:
+
+- Add a new AES algorithm implementation named __aes-aesni without
+  kernel_fpu_begin/end()
+
+- Use fpu(<mode>(AES)) to provide kenrel_fpu_begin/end() invoking
+
+- Add <mode>(AES) ablkcipher, which uses cryptd(fpu(<mode>(AES))) to
+  defer cryption to cryptd context in soft_irq context.
+
+Now the ctr, lrw, pcbc and xts support are added.
+
+Performance testing based on dm-crypt shows that cryption time can be
+reduced to 50% of general mode implementation + aes-aesni implementation.
 
 Signed-off-by: Huang Ying <ying.huang@intel.com>
 
 ---
- crypto/Kconfig  |    7 ++
- crypto/Makefile |    1=20
- crypto/fpu.c    |  166 +++++++++++++++++++++++++++++++++++++++++++++++++++=
+ arch/x86/crypto/aesni-intel_glue.c |  256 ++++++++++++++++++++++++++++++++=
 +++++
- 3 files changed, 174 insertions(+)
+ crypto/Kconfig                     |    1=20
+ 2 files changed, 257 insertions(+)
 
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -236,6 +236,13 @@ config CRYPTO_XTS
- 	  key size 256, 384 or 512 bits. This implementation currently
- 	  can't handle a sectorsize which is not a multiple of 16 bytes.
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -21,6 +21,22 @@
+ #include <asm/i387.h>
+ #include <asm/aes.h>
 =20
-+config CRYPTO_FPU
-+	tristate "FPU wrapper"
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_MANAGER
-+	help
-+	  FPU: Wrapper for blkcipher touching FPU.
++#if defined(CONFIG_CRYPTO_CTR) || defined(CONFIG_CRYPTO_CTR_MODULE)
++#define HAS_CTR
++#endif
 +
- comment "Hash modes"
++#if defined(CONFIG_CRYPTO_LRW) || defined(CONFIG_CRYPTO_LRW_MODULE)
++#define HAS_LRW
++#endif
++
++#if defined(CONFIG_CRYPTO_PCBC) || defined(CONFIG_CRYPTO_PCBC_MODULE)
++#define HAS_PCBC
++#endif
++
++#if defined(CONFIG_CRYPTO_XTS) || defined(CONFIG_CRYPTO_XTS_MODULE)
++#define HAS_XTS
++#endif
++
+ struct async_aes_ctx {
+ 	struct cryptd_ablkcipher *cryptd_tfm;
+ };
+@@ -137,6 +153,41 @@ static struct crypto_alg aesni_alg =3D {
+ 	}
+ };
 =20
- config CRYPTO_HMAC
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -51,6 +51,7 @@ obj-$(CONFIG_CRYPTO_PCBC) +=3D pcbc.o
- obj-$(CONFIG_CRYPTO_CTS) +=3D cts.o
- obj-$(CONFIG_CRYPTO_LRW) +=3D lrw.o
- obj-$(CONFIG_CRYPTO_XTS) +=3D xts.o
-+obj-$(CONFIG_CRYPTO_FPU) +=3D fpu.o
- obj-$(CONFIG_CRYPTO_CTR) +=3D ctr.o
- obj-$(CONFIG_CRYPTO_GCM) +=3D gcm.o
- obj-$(CONFIG_CRYPTO_CCM) +=3D ccm.o
---- /dev/null
-+++ b/crypto/fpu.c
-@@ -0,0 +1,166 @@
-+/*
-+ * FPU: Wrapper for blkcipher touching fpu
-+ *
-+ * Copyright (c) Intel Corp.
-+ *   Author: Huang Ying <ying.huang@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the F=
-ree
-+ * Software Foundation; either version 2 of the License, or (at your optio=
-n)
-+ * any later version.
-+ *
-+ */
++static void __aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
++{
++	struct crypto_aes_ctx *ctx =3D aes_ctx(crypto_tfm_ctx(tfm));
 +
-+#include <crypto/algapi.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <asm/i387.h>
++	aesni_enc(ctx, dst, src);
++}
 +
-+struct crypto_fpu_ctx {
-+	struct crypto_blkcipher *child;
++static void __aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
++{
++	struct crypto_aes_ctx *ctx =3D aes_ctx(crypto_tfm_ctx(tfm));
++
++	aesni_dec(ctx, dst, src);
++}
++
++static struct crypto_alg __aesni_alg =3D {
++	.cra_name		=3D "__aes-aesni",
++	.cra_driver_name	=3D "__driver-aes-aesni",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		=3D AES_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
++	.cra_alignmask		=3D 0,
++	.cra_module		=3D THIS_MODULE,
++	.cra_list		=3D LIST_HEAD_INIT(__aesni_alg.cra_list),
++	.cra_u	=3D {
++		.cipher	=3D {
++			.cia_min_keysize	=3D AES_MIN_KEY_SIZE,
++			.cia_max_keysize	=3D AES_MAX_KEY_SIZE,
++			.cia_setkey		=3D aes_set_key,
++			.cia_encrypt		=3D __aes_encrypt,
++			.cia_decrypt		=3D __aes_decrypt
++		}
++	}
 +};
 +
-+static int crypto_fpu_setkey(struct crypto_tfm *parent, const u8 *key,
-+			     unsigned int keylen)
+ static int ecb_encrypt(struct blkcipher_desc *desc,
+ 		       struct scatterlist *dst, struct scatterlist *src,
+ 		       unsigned int nbytes)
+@@ -411,6 +462,162 @@ static struct crypto_alg ablk_cbc_alg =3D=20
+ 	},
+ };
+=20
++#ifdef HAS_CTR
++static int ablk_ctr_init(struct crypto_tfm *tfm)
 +{
-+	struct crypto_fpu_ctx *ctx =3D crypto_tfm_ctx(parent);
-+	struct crypto_blkcipher *child =3D ctx->child;
-+	int err;
++	struct cryptd_ablkcipher *cryptd_tfm;
 +
-+	crypto_blkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_blkcipher_set_flags(child, crypto_tfm_get_flags(parent) &
-+				   CRYPTO_TFM_REQ_MASK);
-+	err =3D crypto_blkcipher_setkey(child, key, keylen);
-+	crypto_tfm_set_flags(parent, crypto_blkcipher_get_flags(child) &
-+				     CRYPTO_TFM_RES_MASK);
-+	return err;
-+}
-+
-+static int crypto_fpu_encrypt(struct blkcipher_desc *desc_in,
-+			      struct scatterlist *dst, struct scatterlist *src,
-+			      unsigned int nbytes)
-+{
-+	int err;
-+	struct crypto_fpu_ctx *ctx =3D crypto_blkcipher_ctx(desc_in->tfm);
-+	struct crypto_blkcipher *child =3D ctx->child;
-+	struct blkcipher_desc desc =3D {
-+		.tfm =3D child,
-+		.info =3D desc_in->info,
-+		.flags =3D desc_in->flags,
-+	};
-+
-+	kernel_fpu_begin();
-+	err =3D crypto_blkcipher_crt(desc.tfm)->encrypt(&desc, dst, src, nbytes);
-+	kernel_fpu_end();
-+	return err;
-+}
-+
-+static int crypto_fpu_decrypt(struct blkcipher_desc *desc_in,
-+			      struct scatterlist *dst, struct scatterlist *src,
-+			      unsigned int nbytes)
-+{
-+	int err;
-+	struct crypto_fpu_ctx *ctx =3D crypto_blkcipher_ctx(desc_in->tfm);
-+	struct crypto_blkcipher *child =3D ctx->child;
-+	struct blkcipher_desc desc =3D {
-+		.tfm =3D child,
-+		.info =3D desc_in->info,
-+		.flags =3D desc_in->flags,
-+	};
-+
-+	kernel_fpu_begin();
-+	err =3D crypto_blkcipher_crt(desc.tfm)->decrypt(&desc, dst, src, nbytes);
-+	kernel_fpu_end();
-+	return err;
-+}
-+
-+static int crypto_fpu_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst =3D crypto_tfm_alg_instance(tfm);
-+	struct crypto_spawn *spawn =3D crypto_instance_ctx(inst);
-+	struct crypto_fpu_ctx *ctx =3D crypto_tfm_ctx(tfm);
-+	struct crypto_blkcipher *cipher;
-+
-+	cipher =3D crypto_spawn_blkcipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
-+
-+	ctx->child =3D cipher;
++	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(ctr(__driver-aes-aesni))",
++					     0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++	ablk_init_common(tfm, cryptd_tfm);
 +	return 0;
 +}
 +
-+static void crypto_fpu_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_fpu_ctx *ctx =3D crypto_tfm_ctx(tfm);
-+	crypto_free_blkcipher(ctx->child);
-+}
-+
-+static struct crypto_instance *crypto_fpu_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+	struct crypto_alg *alg;
-+	int err;
-+
-+	err =3D crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	alg =3D crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_BLKCIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
-+	if (IS_ERR(alg))
-+		return ERR_CAST(alg);
-+
-+	inst =3D crypto_alloc_instance("fpu", alg);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	inst->alg.cra_flags =3D alg->cra_flags;
-+	inst->alg.cra_priority =3D alg->cra_priority;
-+	inst->alg.cra_blocksize =3D alg->cra_blocksize;
-+	inst->alg.cra_alignmask =3D alg->cra_alignmask;
-+	inst->alg.cra_type =3D alg->cra_type;
-+	inst->alg.cra_blkcipher.ivsize =3D alg->cra_blkcipher.ivsize;
-+	inst->alg.cra_blkcipher.min_keysize =3D alg->cra_blkcipher.min_keysize;
-+	inst->alg.cra_blkcipher.max_keysize =3D alg->cra_blkcipher.max_keysize;
-+	inst->alg.cra_ctxsize =3D sizeof(struct crypto_fpu_ctx);
-+	inst->alg.cra_init =3D crypto_fpu_init_tfm;
-+	inst->alg.cra_exit =3D crypto_fpu_exit_tfm;
-+	inst->alg.cra_blkcipher.setkey =3D crypto_fpu_setkey;
-+	inst->alg.cra_blkcipher.encrypt =3D crypto_fpu_encrypt;
-+	inst->alg.cra_blkcipher.decrypt =3D crypto_fpu_decrypt;
-+
-+out_put_alg:
-+	crypto_mod_put(alg);
-+	return inst;
-+}
-+
-+static void crypto_fpu_free(struct crypto_instance *inst)
-+{
-+	crypto_drop_spawn(crypto_instance_ctx(inst));
-+	kfree(inst);
-+}
-+
-+static struct crypto_template crypto_fpu_tmpl =3D {
-+	.name =3D "fpu",
-+	.alloc =3D crypto_fpu_alloc,
-+	.free =3D crypto_fpu_free,
-+	.module =3D THIS_MODULE,
++static struct crypto_alg ablk_ctr_alg =3D {
++	.cra_name		=3D "ctr(aes)",
++	.cra_driver_name	=3D "ctr-aes-aesni",
++	.cra_priority		=3D 400,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D AES_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_list		=3D LIST_HEAD_INIT(ablk_ctr_alg.cra_list),
++	.cra_init		=3D ablk_ctr_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D AES_MIN_KEY_SIZE,
++			.max_keysize	=3D AES_MAX_KEY_SIZE,
++			.ivsize		=3D AES_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
 +};
++#endif
 +
-+static int __init crypto_fpu_module_init(void)
++#ifdef HAS_LRW
++static int ablk_lrw_init(struct crypto_tfm *tfm)
 +{
-+	return crypto_register_template(&crypto_fpu_tmpl);
++	struct cryptd_ablkcipher *cryptd_tfm;
++
++	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(lrw(__driver-aes-aesni))",
++					     0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++	ablk_init_common(tfm, cryptd_tfm);
++	return 0;
 +}
 +
-+static void __exit crypto_fpu_module_exit(void)
++static struct crypto_alg ablk_lrw_alg =3D {
++	.cra_name		=3D "lrw(aes)",
++	.cra_driver_name	=3D "lrw-aes-aesni",
++	.cra_priority		=3D 400,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D AES_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_list		=3D LIST_HEAD_INIT(ablk_lrw_alg.cra_list),
++	.cra_init		=3D ablk_lrw_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D AES_MIN_KEY_SIZE,
++			.max_keysize	=3D AES_MAX_KEY_SIZE,
++			.ivsize		=3D AES_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++};
++#endif
++
++#ifdef HAS_PCBC
++static int ablk_pcbc_init(struct crypto_tfm *tfm)
 +{
-+	crypto_unregister_template(&crypto_fpu_tmpl);
++	struct cryptd_ablkcipher *cryptd_tfm;
++
++	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(pcbc(__driver-aes-aesni))",
++					     0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++	ablk_init_common(tfm, cryptd_tfm);
++	return 0;
 +}
 +
-+module_init(crypto_fpu_module_init);
-+module_exit(crypto_fpu_module_exit);
++static struct crypto_alg ablk_pcbc_alg =3D {
++	.cra_name		=3D "pcbc(aes)",
++	.cra_driver_name	=3D "pcbc-aes-aesni",
++	.cra_priority		=3D 400,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D AES_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_list		=3D LIST_HEAD_INIT(ablk_pcbc_alg.cra_list),
++	.cra_init		=3D ablk_pcbc_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D AES_MIN_KEY_SIZE,
++			.max_keysize	=3D AES_MAX_KEY_SIZE,
++			.ivsize		=3D AES_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++};
++#endif
 +
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("FPU block cipher wrapper");
++#ifdef HAS_XTS
++static int ablk_xts_init(struct crypto_tfm *tfm)
++{
++	struct cryptd_ablkcipher *cryptd_tfm;
++
++	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(xts(__driver-aes-aesni))",
++					     0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++	ablk_init_common(tfm, cryptd_tfm);
++	return 0;
++}
++
++static struct crypto_alg ablk_xts_alg =3D {
++	.cra_name		=3D "xts(aes)",
++	.cra_driver_name	=3D "xts-aes-aesni",
++	.cra_priority		=3D 400,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D AES_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_list		=3D LIST_HEAD_INIT(ablk_xts_alg.cra_list),
++	.cra_init		=3D ablk_xts_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D AES_MIN_KEY_SIZE,
++			.max_keysize	=3D AES_MAX_KEY_SIZE,
++			.ivsize		=3D AES_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++};
++#endif
++
+ static int __init aesni_init(void)
+ {
+ 	int err;
+@@ -421,6 +628,8 @@ static int __init aesni_init(void)
+ 	}
+ 	if ((err =3D crypto_register_alg(&aesni_alg)))
+ 		goto aes_err;
++	if ((err =3D crypto_register_alg(&__aesni_alg)))
++		goto __aes_err;
+ 	if ((err =3D crypto_register_alg(&blk_ecb_alg)))
+ 		goto blk_ecb_err;
+ 	if ((err =3D crypto_register_alg(&blk_cbc_alg)))
+@@ -429,9 +638,41 @@ static int __init aesni_init(void)
+ 		goto ablk_ecb_err;
+ 	if ((err =3D crypto_register_alg(&ablk_cbc_alg)))
+ 		goto ablk_cbc_err;
++#ifdef HAS_CTR
++	if ((err =3D crypto_register_alg(&ablk_ctr_alg)))
++		goto ablk_ctr_err;
++#endif
++#ifdef HAS_LRW
++	if ((err =3D crypto_register_alg(&ablk_lrw_alg)))
++		goto ablk_lrw_err;
++#endif
++#ifdef HAS_PCBC
++	if ((err =3D crypto_register_alg(&ablk_pcbc_alg)))
++		goto ablk_pcbc_err;
++#endif
++#ifdef HAS_XTS
++	if ((err =3D crypto_register_alg(&ablk_xts_alg)))
++		goto ablk_xts_err;
++#endif
+=20
+ 	return err;
+=20
++#ifdef HAS_XTS
++ablk_xts_err:
++#endif
++#ifdef HAS_PCBC
++	crypto_unregister_alg(&ablk_pcbc_alg);
++ablk_pcbc_err:
++#endif
++#ifdef HAS_LRW
++	crypto_unregister_alg(&ablk_lrw_alg);
++ablk_lrw_err:
++#endif
++#ifdef HAS_CTR
++	crypto_unregister_alg(&ablk_ctr_alg);
++ablk_ctr_err:
++#endif
++	crypto_unregister_alg(&ablk_cbc_alg);
+ ablk_cbc_err:
+ 	crypto_unregister_alg(&ablk_ecb_alg);
+ ablk_ecb_err:
+@@ -439,6 +680,8 @@ ablk_ecb_err:
+ blk_cbc_err:
+ 	crypto_unregister_alg(&blk_ecb_alg);
+ blk_ecb_err:
++	crypto_unregister_alg(&__aesni_alg);
++__aes_err:
+ 	crypto_unregister_alg(&aesni_alg);
+ aes_err:
+ 	return err;
+@@ -446,10 +689,23 @@ aes_err:
+=20
+ static void __exit aesni_exit(void)
+ {
++#ifdef HAS_XTS
++	crypto_unregister_alg(&ablk_xts_alg);
++#endif
++#ifdef HAS_PCBC
++	crypto_unregister_alg(&ablk_pcbc_alg);
++#endif
++#ifdef HAS_LRW
++	crypto_unregister_alg(&ablk_lrw_alg);
++#endif
++#ifdef HAS_CTR
++	crypto_unregister_alg(&ablk_ctr_alg);
++#endif
+ 	crypto_unregister_alg(&ablk_cbc_alg);
+ 	crypto_unregister_alg(&ablk_ecb_alg);
+ 	crypto_unregister_alg(&blk_cbc_alg);
+ 	crypto_unregister_alg(&blk_ecb_alg);
++	crypto_unregister_alg(&__aesni_alg);
+ 	crypto_unregister_alg(&aesni_alg);
+ }
+=20
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -488,6 +488,7 @@ config CRYPTO_AES_NI_INTEL
+ 	select CRYPTO_AES_X86_64
+ 	select CRYPTO_CRYPTD
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_FPU
+ 	help
+ 	  Use Intel AES-NI instructions for AES algorithm.
+=20
 
 
---=-fFx+Q5Idy06Pek/YlFVb
+--=-aYElaYDaFlxxM+bgLHBx
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEABECAAYFAkmvOCIACgkQKhFGF+eHlpipWACffhOMGyW5xLOUdLV+6MnI16Ql
-UAgAn1OYVjITGViAyK4coT0kMCXGZpWS
-=MKnu
+iEYEABECAAYFAkmvOCgACgkQKhFGF+eHlpiBKQCglaryqroSYuGJJwbFZh7Ec8H5
+oQsAoKh9gNDCJA19ByVRUegxqVKBOn7b
+=yocv
 -----END PGP SIGNATURE-----
 
---=-fFx+Q5Idy06Pek/YlFVb--
-
+--=-aYElaYDaFlxxM+bgLHBx--
