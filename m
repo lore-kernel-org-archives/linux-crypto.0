@@ -1,33 +1,31 @@
-From: Melchior FRANZ <mfranz@aon.at>
-Subject: dm/crypt oops in 2.6.28.5 ... but nvidia users aren't supposed to report?
-Date: Sat, 7 Mar 2009 01:35:28 +0100
-Message-ID: <200903070135.28847@rk-nord.at>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: Fix dead links.
+Date: Sat, 7 Mar 2009 18:45:39 +0800
+Message-ID: <20090307104539.GA8731@gondor.apana.org.au>
+References: <1235506239.2501.46.camel@localhost> <1235514146-7554-1-git-send-email-ken@codelabs.ch>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: bugme-admin@linux-foundation.org
+Content-Type: text/plain; charset=us-ascii
+Cc: joe@perches.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nat-warsl417-01.aon.at ([195.3.96.119]:31822 "EHLO email.aon.at"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752886AbZCGAfh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Mar 2009 19:35:37 -0500
-Received: from smarthub94.highway.telekom.at (HELO email.aon.at) ([172.18.5.236])
-          (envelope-sender <mfranz@aon.at>)
-          by fallback43.highway.telekom.at (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 7 Mar 2009 00:35:33 -0000
+Received: from rhun.apana.org.au ([64.62.148.172]:46289 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753053AbZCGKps (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 7 Mar 2009 05:45:48 -0500
 Content-Disposition: inline
+In-Reply-To: <1235514146-7554-1-git-send-email-ken@codelabs.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Tue, Feb 24, 2009 at 10:22:26PM +0000, Adrian-Ken Rueegsegger wrote:
+> 
+> Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
 
-I was about to report an oops in the crypt module (NULL pointer
-dereferencing), but when I was half-way through entering the bug
-in bugzilla, I read that people with nvidia tainted kernels aren't
-supposed to file bug reports.
-
-So the bug is going to remain unfixed!? Sounds like a smart move ...
-
-m.
+Applied to cryptodev.  Thanks!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
