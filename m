@@ -1,402 +1,55 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH -v2 3/3] crypto: Add AES-NI support for more modes
-Date: Mon, 09 Mar 2009 16:52:33 +0800
-Message-ID: <1236588753.24215.113.camel@yhuang-dev.sh.intel.com>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: Re: dm/crypt oops in 2.6.28.5 ... but nvidia users aren't supposed
+ to report?
+Date: Mon, 9 Mar 2009 10:13:49 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0903091013090.18346@vixen.sonytel.be>
+References: <200903070135.28847@rk-nord.at>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-h1TMsKAh4UMaYHWuhOXP"
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: bugme-admin@linux-foundation.org, linux-crypto@vger.kernel.org
+To: Melchior FRANZ <mfranz@aon.at>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:48143 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753625AbZCIIwh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2009 04:52:37 -0400
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:61312 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754117AbZCIJOE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2009 05:14:04 -0400
+In-Reply-To: <200903070135.28847@rk-nord.at>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Sat, 7 Mar 2009, Melchior FRANZ wrote:
+> I was about to report an oops in the crypt module (NULL pointer
+> dereferencing), but when I was half-way through entering the bug
+> in bugzilla, I read that people with nvidia tainted kernels aren't
+> supposed to file bug reports.
+>=20
+> So the bug is going to remain unfixed!? Sounds like a smart move ...
 
---=-h1TMsKAh4UMaYHWuhOXP
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Can you reproduce the problem if the proprietary modules are not loaded=
+?
+If yes, you can file a bug report.
 
-Because kernel_fpu_begin() and kernel_fpu_end() operations are too
-slow, the performance gain of general mode implementation + aes-aesni
-is almost all compensated.
+With kind regards,
 
-The AES-NI support for more modes are implemented as follow:
+Geert Uytterhoeven
+Software Architect
 
-- Add a new AES algorithm implementation named __aes-aesni without
-  kernel_fpu_begin/end()
+Sony Techsoft Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
 
-- Use fpu(<mode>(AES)) to provide kenrel_fpu_begin/end() invoking
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
 
-- Add <mode>(AES) ablkcipher, which uses cryptd(fpu(<mode>(AES))) to
-  defer cryption to cryptd context in soft_irq context.
-
-Now the ctr, lrw, pcbc and xts support are added.
-
-Performance testing based on dm-crypt shows that cryption time can be
-reduced to 50% of general mode implementation + aes-aesni implementation.
-
-v2: Add description of mode acceleration support in Kconfig
-
-Signed-off-by: Huang Ying <ying.huang@intel.com>
-
----
- arch/x86/crypto/aesni-intel_glue.c |  256 ++++++++++++++++++++++++++++++++=
-+++++
- crypto/Kconfig                     |    5=20
- 2 files changed, 261 insertions(+)
-
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -21,6 +21,22 @@
- #include <asm/i387.h>
- #include <asm/aes.h>
-=20
-+#if defined(CONFIG_CRYPTO_CTR) || defined(CONFIG_CRYPTO_CTR_MODULE)
-+#define HAS_CTR
-+#endif
-+
-+#if defined(CONFIG_CRYPTO_LRW) || defined(CONFIG_CRYPTO_LRW_MODULE)
-+#define HAS_LRW
-+#endif
-+
-+#if defined(CONFIG_CRYPTO_PCBC) || defined(CONFIG_CRYPTO_PCBC_MODULE)
-+#define HAS_PCBC
-+#endif
-+
-+#if defined(CONFIG_CRYPTO_XTS) || defined(CONFIG_CRYPTO_XTS_MODULE)
-+#define HAS_XTS
-+#endif
-+
- struct async_aes_ctx {
- 	struct cryptd_ablkcipher *cryptd_tfm;
- };
-@@ -137,6 +153,41 @@ static struct crypto_alg aesni_alg =3D {
- 	}
- };
-=20
-+static void __aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+{
-+	struct crypto_aes_ctx *ctx =3D aes_ctx(crypto_tfm_ctx(tfm));
-+
-+	aesni_enc(ctx, dst, src);
-+}
-+
-+static void __aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+{
-+	struct crypto_aes_ctx *ctx =3D aes_ctx(crypto_tfm_ctx(tfm));
-+
-+	aesni_dec(ctx, dst, src);
-+}
-+
-+static struct crypto_alg __aesni_alg =3D {
-+	.cra_name		=3D "__aes-aesni",
-+	.cra_driver_name	=3D "__driver-aes-aesni",
-+	.cra_priority		=3D 0,
-+	.cra_flags		=3D CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize		=3D AES_BLOCK_SIZE,
-+	.cra_ctxsize		=3D sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
-+	.cra_alignmask		=3D 0,
-+	.cra_module		=3D THIS_MODULE,
-+	.cra_list		=3D LIST_HEAD_INIT(__aesni_alg.cra_list),
-+	.cra_u	=3D {
-+		.cipher	=3D {
-+			.cia_min_keysize	=3D AES_MIN_KEY_SIZE,
-+			.cia_max_keysize	=3D AES_MAX_KEY_SIZE,
-+			.cia_setkey		=3D aes_set_key,
-+			.cia_encrypt		=3D __aes_encrypt,
-+			.cia_decrypt		=3D __aes_decrypt
-+		}
-+	}
-+};
-+
- static int ecb_encrypt(struct blkcipher_desc *desc,
- 		       struct scatterlist *dst, struct scatterlist *src,
- 		       unsigned int nbytes)
-@@ -411,6 +462,162 @@ static struct crypto_alg ablk_cbc_alg =3D=20
- 	},
- };
-=20
-+#ifdef HAS_CTR
-+static int ablk_ctr_init(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(ctr(__driver-aes-aesni))",
-+					     0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ablk_init_common(tfm, cryptd_tfm);
-+	return 0;
-+}
-+
-+static struct crypto_alg ablk_ctr_alg =3D {
-+	.cra_name		=3D "ctr(aes)",
-+	.cra_driver_name	=3D "ctr-aes-aesni",
-+	.cra_priority		=3D 400,
-+	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		=3D AES_BLOCK_SIZE,
-+	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
-+	.cra_alignmask		=3D 0,
-+	.cra_type		=3D &crypto_ablkcipher_type,
-+	.cra_module		=3D THIS_MODULE,
-+	.cra_list		=3D LIST_HEAD_INIT(ablk_ctr_alg.cra_list),
-+	.cra_init		=3D ablk_ctr_init,
-+	.cra_exit		=3D ablk_exit,
-+	.cra_u =3D {
-+		.ablkcipher =3D {
-+			.min_keysize	=3D AES_MIN_KEY_SIZE,
-+			.max_keysize	=3D AES_MAX_KEY_SIZE,
-+			.ivsize		=3D AES_BLOCK_SIZE,
-+			.setkey		=3D ablk_set_key,
-+			.encrypt	=3D ablk_encrypt,
-+			.decrypt	=3D ablk_decrypt,
-+		},
-+	},
-+};
-+#endif
-+
-+#ifdef HAS_LRW
-+static int ablk_lrw_init(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(lrw(__driver-aes-aesni))",
-+					     0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ablk_init_common(tfm, cryptd_tfm);
-+	return 0;
-+}
-+
-+static struct crypto_alg ablk_lrw_alg =3D {
-+	.cra_name		=3D "lrw(aes)",
-+	.cra_driver_name	=3D "lrw-aes-aesni",
-+	.cra_priority		=3D 400,
-+	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		=3D AES_BLOCK_SIZE,
-+	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
-+	.cra_alignmask		=3D 0,
-+	.cra_type		=3D &crypto_ablkcipher_type,
-+	.cra_module		=3D THIS_MODULE,
-+	.cra_list		=3D LIST_HEAD_INIT(ablk_lrw_alg.cra_list),
-+	.cra_init		=3D ablk_lrw_init,
-+	.cra_exit		=3D ablk_exit,
-+	.cra_u =3D {
-+		.ablkcipher =3D {
-+			.min_keysize	=3D AES_MIN_KEY_SIZE,
-+			.max_keysize	=3D AES_MAX_KEY_SIZE,
-+			.ivsize		=3D AES_BLOCK_SIZE,
-+			.setkey		=3D ablk_set_key,
-+			.encrypt	=3D ablk_encrypt,
-+			.decrypt	=3D ablk_decrypt,
-+		},
-+	},
-+};
-+#endif
-+
-+#ifdef HAS_PCBC
-+static int ablk_pcbc_init(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(pcbc(__driver-aes-aesni))",
-+					     0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ablk_init_common(tfm, cryptd_tfm);
-+	return 0;
-+}
-+
-+static struct crypto_alg ablk_pcbc_alg =3D {
-+	.cra_name		=3D "pcbc(aes)",
-+	.cra_driver_name	=3D "pcbc-aes-aesni",
-+	.cra_priority		=3D 400,
-+	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		=3D AES_BLOCK_SIZE,
-+	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
-+	.cra_alignmask		=3D 0,
-+	.cra_type		=3D &crypto_ablkcipher_type,
-+	.cra_module		=3D THIS_MODULE,
-+	.cra_list		=3D LIST_HEAD_INIT(ablk_pcbc_alg.cra_list),
-+	.cra_init		=3D ablk_pcbc_init,
-+	.cra_exit		=3D ablk_exit,
-+	.cra_u =3D {
-+		.ablkcipher =3D {
-+			.min_keysize	=3D AES_MIN_KEY_SIZE,
-+			.max_keysize	=3D AES_MAX_KEY_SIZE,
-+			.ivsize		=3D AES_BLOCK_SIZE,
-+			.setkey		=3D ablk_set_key,
-+			.encrypt	=3D ablk_encrypt,
-+			.decrypt	=3D ablk_decrypt,
-+		},
-+	},
-+};
-+#endif
-+
-+#ifdef HAS_XTS
-+static int ablk_xts_init(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm =3D cryptd_alloc_ablkcipher("fpu(xts(__driver-aes-aesni))",
-+					     0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ablk_init_common(tfm, cryptd_tfm);
-+	return 0;
-+}
-+
-+static struct crypto_alg ablk_xts_alg =3D {
-+	.cra_name		=3D "xts(aes)",
-+	.cra_driver_name	=3D "xts-aes-aesni",
-+	.cra_priority		=3D 400,
-+	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		=3D AES_BLOCK_SIZE,
-+	.cra_ctxsize		=3D sizeof(struct async_aes_ctx),
-+	.cra_alignmask		=3D 0,
-+	.cra_type		=3D &crypto_ablkcipher_type,
-+	.cra_module		=3D THIS_MODULE,
-+	.cra_list		=3D LIST_HEAD_INIT(ablk_xts_alg.cra_list),
-+	.cra_init		=3D ablk_xts_init,
-+	.cra_exit		=3D ablk_exit,
-+	.cra_u =3D {
-+		.ablkcipher =3D {
-+			.min_keysize	=3D AES_MIN_KEY_SIZE,
-+			.max_keysize	=3D AES_MAX_KEY_SIZE,
-+			.ivsize		=3D AES_BLOCK_SIZE,
-+			.setkey		=3D ablk_set_key,
-+			.encrypt	=3D ablk_encrypt,
-+			.decrypt	=3D ablk_decrypt,
-+		},
-+	},
-+};
-+#endif
-+
- static int __init aesni_init(void)
- {
- 	int err;
-@@ -421,6 +628,8 @@ static int __init aesni_init(void)
- 	}
- 	if ((err =3D crypto_register_alg(&aesni_alg)))
- 		goto aes_err;
-+	if ((err =3D crypto_register_alg(&__aesni_alg)))
-+		goto __aes_err;
- 	if ((err =3D crypto_register_alg(&blk_ecb_alg)))
- 		goto blk_ecb_err;
- 	if ((err =3D crypto_register_alg(&blk_cbc_alg)))
-@@ -429,9 +638,41 @@ static int __init aesni_init(void)
- 		goto ablk_ecb_err;
- 	if ((err =3D crypto_register_alg(&ablk_cbc_alg)))
- 		goto ablk_cbc_err;
-+#ifdef HAS_CTR
-+	if ((err =3D crypto_register_alg(&ablk_ctr_alg)))
-+		goto ablk_ctr_err;
-+#endif
-+#ifdef HAS_LRW
-+	if ((err =3D crypto_register_alg(&ablk_lrw_alg)))
-+		goto ablk_lrw_err;
-+#endif
-+#ifdef HAS_PCBC
-+	if ((err =3D crypto_register_alg(&ablk_pcbc_alg)))
-+		goto ablk_pcbc_err;
-+#endif
-+#ifdef HAS_XTS
-+	if ((err =3D crypto_register_alg(&ablk_xts_alg)))
-+		goto ablk_xts_err;
-+#endif
-=20
- 	return err;
-=20
-+#ifdef HAS_XTS
-+ablk_xts_err:
-+#endif
-+#ifdef HAS_PCBC
-+	crypto_unregister_alg(&ablk_pcbc_alg);
-+ablk_pcbc_err:
-+#endif
-+#ifdef HAS_LRW
-+	crypto_unregister_alg(&ablk_lrw_alg);
-+ablk_lrw_err:
-+#endif
-+#ifdef HAS_CTR
-+	crypto_unregister_alg(&ablk_ctr_alg);
-+ablk_ctr_err:
-+#endif
-+	crypto_unregister_alg(&ablk_cbc_alg);
- ablk_cbc_err:
- 	crypto_unregister_alg(&ablk_ecb_alg);
- ablk_ecb_err:
-@@ -439,6 +680,8 @@ ablk_ecb_err:
- blk_cbc_err:
- 	crypto_unregister_alg(&blk_ecb_alg);
- blk_ecb_err:
-+	crypto_unregister_alg(&__aesni_alg);
-+__aes_err:
- 	crypto_unregister_alg(&aesni_alg);
- aes_err:
- 	return err;
-@@ -446,10 +689,23 @@ aes_err:
-=20
- static void __exit aesni_exit(void)
- {
-+#ifdef HAS_XTS
-+	crypto_unregister_alg(&ablk_xts_alg);
-+#endif
-+#ifdef HAS_PCBC
-+	crypto_unregister_alg(&ablk_pcbc_alg);
-+#endif
-+#ifdef HAS_LRW
-+	crypto_unregister_alg(&ablk_lrw_alg);
-+#endif
-+#ifdef HAS_CTR
-+	crypto_unregister_alg(&ablk_ctr_alg);
-+#endif
- 	crypto_unregister_alg(&ablk_cbc_alg);
- 	crypto_unregister_alg(&ablk_ecb_alg);
- 	crypto_unregister_alg(&blk_cbc_alg);
- 	crypto_unregister_alg(&blk_ecb_alg);
-+	crypto_unregister_alg(&__aesni_alg);
- 	crypto_unregister_alg(&aesni_alg);
- }
-=20
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -491,6 +491,7 @@ config CRYPTO_AES_NI_INTEL
- 	select CRYPTO_AES_X86_64
- 	select CRYPTO_CRYPTD
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_FPU
- 	help
- 	  Use Intel AES-NI instructions for AES algorithm.
-=20
-@@ -510,6 +511,10 @@ config CRYPTO_AES_NI_INTEL
-=20
- 	  See <http://csrc.nist.gov/encryption/aes/> for more information.
-=20
-+	  In addition to AES cipher algorithm support, the
-+	  acceleration for some popular block cipher mode is supported
-+	  too, including ECB, CBC, CTR, LRW, PCBC, XTS.
-+
- config CRYPTO_ANUBIS
- 	tristate "Anubis cipher algorithm"
- 	select CRYPTO_ALGAPI
-
-
---=-h1TMsKAh4UMaYHWuhOXP
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkm02M0ACgkQKhFGF+eHlpiCTgCfX3JbevMdBWETqT65jJhijnd0
-R7MAniJJMTCe1YD39Ti4tH+E6b9KzFPw
-=6E6N
------END PGP SIGNATURE-----
-
---=-h1TMsKAh4UMaYHWuhOXP--
-
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
