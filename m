@@ -1,112 +1,183 @@
-From: Melchior FRANZ <melchior.franz@gmail.com>
-Subject: [2.6.28.5] dm/crypt oops: "unable to handle kernel NULL pointer dereference" (tainted)
-Date: Wed, 11 Mar 2009 13:19:43 +0100
-Message-ID: <200903111319.43778@rk-nord.at>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: Re: linux-next: Tree for March 10 (crypto & NLATTR)
+Date: Wed, 11 Mar 2009 13:25:09 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0903111324400.1040@vixen.sonytel.be>
+References: <49B6B821.5050302@oracle.com> <10f740e80903101256v2cfe08a8g410c297e019d8693@mail.gmail.com> <49B6C8BF.8010105@oracle.com> <20090310.131700.40129006.davem@davemloft.net> <20090311010705.GA17260@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nat-warsl417-02.aon.at ([195.3.96.120]:32366 "EHLO email.aon.at"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755511AbZCKMTx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2009 08:19:53 -0400
-Received: from smarthub94.highway.telekom.at (HELO email.aon.at) ([172.18.5.236])
-          (envelope-sender <melchior.franz@gmail.com>)
-          by fallback43.highway.telekom.at (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 11 Mar 2009 12:19:50 -0000
-Received: from 91-115-179-21.adsl.highway.telekom.at (HELO server.lan) ([91.115.179.21])
-          (envelope-sender <melchior.franz@gmail.com>)
-          by smarthub94.highway.telekom.at (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 11 Mar 2009 12:19:41 -0000
-Received: from localhost (localhost [IPv6:::1])
-	by server.lan (Postfix) with ESMTP id E5641160C4856
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 13:19:44 +0100 (CET)
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: David Miller <davem@davemloft.net>, randy.dunlap@oracle.com,
+	sfr@canb.auug.org.au, linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <20090311010705.GA17260@gondor.apana.org.au>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Wed, 11 Mar 2009, Herbert Xu wrote:
+> On Tue, Mar 10, 2009 at 01:17:00PM -0700, David Miller wrote:
+> > From: Randy Dunlap <randy.dunlap@oracle.com>
+> > Date: Tue, 10 Mar 2009 13:08:31 -0700
+> >=20
+> > > I'll have to let David or Herbert answer that.  From my quick loo=
+k
+> > > at the code, I don't see much use for nlattr.c when CONFIG_NET
+> > > is not enabled.
+> >=20
+> > We want to use the netlink attribute parsers even in non-networking
+> > code, that's what he's trying to do here.
+>=20
+> OK the nlattr construction code really wants to depend on NET
+> because they're skb-oriented.  We could either move them back
+> or just wrap them in ifdef CONFIG_NET.
+>=20
+> I think the latter is probably the simplest.
+>=20
+> How does this patch look? And Randy, does it fix the problem for
+> you?
+>=20
+> nlattr: Fix build error with NET off
+>=20
+> We moved the netlink attribute support from net to lib in order
+> for it to be available for general consumption.  However, parts
+> of the code (the bits that we don't need :) really depends on
+> NET because the target object is sk_buff.
+>=20
+> This patch fixes this by wrapping them in CONFIG_NET.
+>=20
+> Some EXPORTs have been moved to make this work.
+>=20
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-a few days ago I got an oops in the crypt module. This is with an
-nvidia-tainted kernel, so I didn't file a bugzilla report, but
-Geert and Milan suggested that I post it here if the oops isn't
-related to the nvidia driver. Of course, I can't be sure, but
-I've been using both nvidia-drivers and dm/crypt since years
-and never got this problem, and there's no indication in the bt
-that nvidia is any way involved.
+Thanks for taking care of this!
 
-I couldn't reproduce the problem with or without the nvidia
-driver (173.14.17 for an FX5500), nor can I say which of my
-input exactly caused it (done by a script), but it was when
-"destroying" a loop-mounted ~4GB file, ext3 formatted and aes
-encrypted, so one of these:
+Tested-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 
-  umount ...
-  cryptsetup remove ...
-  losetup -d ...
+> diff --git a/lib/nlattr.c b/lib/nlattr.c
+> index 56c3ce7..80009a2 100644
+> --- a/lib/nlattr.c
+> +++ b/lib/nlattr.c
+> @@ -281,6 +281,7 @@ int nla_strcmp(const struct nlattr *nla, const ch=
+ar *str)
+>  	return d;
+>  }
+> =20
+> +#ifdef CONFIG_NET
+>  /**
+>   * __nla_reserve - reserve room for attribute on the skb
+>   * @skb: socket buffer to reserve room on
+> @@ -305,6 +306,7 @@ struct nlattr *__nla_reserve(struct sk_buff *skb,=
+ int attrtype, int attrlen)
+> =20
+>  	return nla;
+>  }
+> +EXPORT_SYMBOL(__nla_reserve);
+> =20
+>  /**
+>   * __nla_reserve_nohdr - reserve room for attribute without header
+> @@ -325,6 +327,7 @@ void *__nla_reserve_nohdr(struct sk_buff *skb, in=
+t attrlen)
+> =20
+>  	return start;
+>  }
+> +EXPORT_SYMBOL(__nla_reserve_nohdr);
+> =20
+>  /**
+>   * nla_reserve - reserve room for attribute on the skb
+> @@ -345,6 +348,7 @@ struct nlattr *nla_reserve(struct sk_buff *skb, i=
+nt attrtype, int attrlen)
+> =20
+>  	return __nla_reserve(skb, attrtype, attrlen);
+>  }
+> +EXPORT_SYMBOL(nla_reserve);
+> =20
+>  /**
+>   * nla_reserve_nohdr - reserve room for attribute without header
+> @@ -363,6 +367,7 @@ void *nla_reserve_nohdr(struct sk_buff *skb, int =
+attrlen)
+> =20
+>  	return __nla_reserve_nohdr(skb, attrlen);
+>  }
+> +EXPORT_SYMBOL(nla_reserve_nohdr);
+> =20
+>  /**
+>   * __nla_put - Add a netlink attribute to a socket buffer
+> @@ -382,6 +387,7 @@ void __nla_put(struct sk_buff *skb, int attrtype,=
+ int attrlen,
+>  	nla =3D __nla_reserve(skb, attrtype, attrlen);
+>  	memcpy(nla_data(nla), data, attrlen);
+>  }
+> +EXPORT_SYMBOL(__nla_put);
+> =20
+>  /**
+>   * __nla_put_nohdr - Add a netlink attribute without header
+> @@ -399,6 +405,7 @@ void __nla_put_nohdr(struct sk_buff *skb, int att=
+rlen, const void *data)
+>  	start =3D __nla_reserve_nohdr(skb, attrlen);
+>  	memcpy(start, data, attrlen);
+>  }
+> +EXPORT_SYMBOL(__nla_put_nohdr);
+> =20
+>  /**
+>   * nla_put - Add a netlink attribute to a socket buffer
+> @@ -418,6 +425,7 @@ int nla_put(struct sk_buff *skb, int attrtype, in=
+t attrlen, const void *data)
+>  	__nla_put(skb, attrtype, attrlen, data);
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(nla_put);
+> =20
+>  /**
+>   * nla_put_nohdr - Add a netlink attribute without header
+> @@ -436,6 +444,7 @@ int nla_put_nohdr(struct sk_buff *skb, int attrle=
+n, const void *data)
+>  	__nla_put_nohdr(skb, attrlen, data);
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(nla_put_nohdr);
+> =20
+>  /**
+>   * nla_append - Add a netlink attribute without header or padding
+> @@ -454,20 +463,13 @@ int nla_append(struct sk_buff *skb, int attrlen=
+, const void *data)
+>  	memcpy(skb_put(skb, attrlen), data, attrlen);
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(nla_append);
+> +#endif
+> =20
+>  EXPORT_SYMBOL(nla_validate);
+>  EXPORT_SYMBOL(nla_parse);
+>  EXPORT_SYMBOL(nla_find);
+>  EXPORT_SYMBOL(nla_strlcpy);
+> -EXPORT_SYMBOL(__nla_reserve);
+> -EXPORT_SYMBOL(__nla_reserve_nohdr);
+> -EXPORT_SYMBOL(nla_reserve);
+> -EXPORT_SYMBOL(nla_reserve_nohdr);
+> -EXPORT_SYMBOL(__nla_put);
+> -EXPORT_SYMBOL(__nla_put_nohdr);
+> -EXPORT_SYMBOL(nla_put);
+> -EXPORT_SYMBOL(nla_put_nohdr);
+>  EXPORT_SYMBOL(nla_memcpy);
+>  EXPORT_SYMBOL(nla_memcmp);
+>  EXPORT_SYMBOL(nla_strcmp);
+> -EXPORT_SYMBOL(nla_append);
 
-This has worked for years, so it's probably not some recent
-user error. The next time I mounted/unmounted the file it
-worked flawlessly, as it used to. System:
+With kind regards,
 
-  Intel P4, 2.4G
-  Linux 2.6.28.5  (vanilla)
-  gcc 4.3.1  (openSuSE 11.0)
-  libc 2.8
+Geert Uytterhoeven
+Software Architect
 
-All modules compiled in, except for the nvidia module and
-scsi_wait_scan (for historic reasons).
+Sony Techsoft Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
 
-One thing might be of interest: I had the (desktop-)system
-hibernated a few times in a row (2 or 3 times?). Or maybe
-it was just bitflipping due to cosmic rays?  :-)
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
 
-
-
-BUG: unable to handle kernel NULL pointer dereference at 00000004
-IP: [<c0158a75>] mempool_free+0xd/0x9a
-*pde =3D 00000000
-Oops: 0000 [#1] PREEMPT
-last sysfs file: /sys/devices/virtual/block/dm-1/range
-Modules linked in: nvidia(P) scsi_wait_scan
-
-Pid: 19181, comm: loop1 Tainted: P           (2.6.28.5 #4) MS-6788
-EIP: 0060:[<c0158a75>] EFLAGS: 00010286 CPU: 0
-EIP is at mempool_free+0xd/0x9a
-EAX: d36af0d4 EBX: 00000000 ECX: 00000001 EDX: 00000000
-ESI: d36af0d4 EDI: 00000000 EBP: 00000000 ESP: f621bf58
- DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
-Process loop1 (pid: 19181, ti=3Df621a000 task=3Dd98537b0 task.ti=3Df621=
-a000)
-Stack:
- c03b3a94 c03b3bb6 00000000 c0198dfb f71a13f0 c032ca0a 00336000 0000000=
-0
- 00000000 f723dd08 f723dc00 c72c1780 00001000 00000001 00000001 0000000=
-0
- c032c570 00000000 00000000 00000000 f621bfb4 08005000 00000000 f723dc0=
-0
-Call Trace:
- [<c03b3a94>] crypt_dec_pending+0x28/0x4e
- [<c03b3bb6>] crypt_endio+0x0/0xde
- [<c0198dfb>] bio_endio+0x19/0x30
- [<c032ca0a>] loop_thread+0x2f6/0x42d
- [<c032c570>] do_lo_send_aops+0x0/0x1a4
- [<c032c714>] loop_thread+0x0/0x42d
- [<c0131c38>] kthread+0x37/0x5f
- [<c0131c01>] kthread+0x0/0x5f
- [<c0103d93>] kernel_thread_helper+0x7/0x14
-Code: 08 08 74 05 e8 79 45 37 00 8b 04 24 8b 50 0c 89 f0 8b 0c 24 ff 51=
- 14
-      31 c0 e9 90 fe ff ff 56 53 83 ec 04 89 c6 89 d3 85 c0 74 54 <8b> =
-42
-      04 3b 02 7d 6b 9c 59 fa 89 e0 25 00 e0 ff ff 83 40 14 01=C3=97
-EIP: [<c0158a75>] mempool_free+0xd/0x9a SS:ESP 0068:f621bf58
----[ end trace 916d6e0bbba638c2 ]---
-
-m.
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
