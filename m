@@ -1,161 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: Tree for March 10 (crypto & NLATTR)
-Date: Wed, 11 Mar 2009 09:07:05 +0800
-Message-ID: <20090311010705.GA17260@gondor.apana.org.au>
-References: <49B6B821.5050302@oracle.com> <10f740e80903101256v2cfe08a8g410c297e019d8693@mail.gmail.com> <49B6C8BF.8010105@oracle.com> <20090310.131700.40129006.davem@davemloft.net>
+From: "Shasi Pulijala" <spulijala@amcc.com>
+Subject: Openssl/Openssh Offload to Linux Crypto
+Date: Tue, 10 Mar 2009 19:46:34 -0700
+Message-ID: <DB599F406D04E34389140B7D99C71B1B0747FC81@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: randy.dunlap@oracle.com, geert@linux-m68k.org,
-	sfr@canb.auug.org.au, linux-next@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=Windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <herbert@gondor.apana.org.au>, "Loc Ho" <lho@amcc.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48997 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753647AbZCKBH1 (ORCPT
+Received: from sdcmail02.amcc.com ([198.137.200.73]:48677 "EHLO
+	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753244AbZCKCqk convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2009 21:07:27 -0400
-Content-Disposition: inline
-In-Reply-To: <20090310.131700.40129006.davem@davemloft.net>
+	Tue, 10 Mar 2009 22:46:40 -0400
+Content-class: urn:content-classes:message
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 10, 2009 at 01:17:00PM -0700, David Miller wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
-> Date: Tue, 10 Mar 2009 13:08:31 -0700
-> 
-> > I'll have to let David or Herbert answer that.  From my quick look
-> > at the code, I don't see much use for nlattr.c when CONFIG_NET
-> > is not enabled.
-> 
-> We want to use the netlink attribute parsers even in non-networking
-> code, that's what he's trying to do here.
+Hi,
 
-OK the nlattr construction code really wants to depend on NET
-because they're skb-oriented.  We could either move them back
-or just wrap them in ifdef CONFIG_NET.
+I am trying to use OpenSSH (which uses the Openssl lib with HW Offload =
+crypto engine support). I am using the patched version of OpenSSL that =
+I submitted. It uses the /dev/crypto interface that was provided by the=
+ patch [1] submitted to Opensource.=20
+       The interface is provided in such a way that one file descriptor=
+ per session is opened. On this fd we set the session, do cipher/hash o=
+perations and when done delete the session and close the fd. The proble=
+m arises after running this iteration (open, session set, operation and=
+ close) for several hundred times (over 500 times), the opening of file=
+ /dev/crypto fails with error -2 (no such file). I tried looking at the=
+ open system call implementation and found that =93inode =3D next.dentr=
+y->d_inode=94 is NULL in routine =93__link_path_walk=94 in fs/namei.c =A0=
+which is not the case when it is working.
 
-I think the latter is probably the simplest.
+Why would the opening of /dev/crypto fails only after several hundred i=
+teration?=A0I verified the cryptodev driver functionality and looked at=
+ the Openssl code but was not able to determine the cause of the proble=
+m. This is with Linux 2.6.28.3.
 
-How does this patch look? And Randy, does it fix the problem for
-you?
-
-nlattr: Fix build error with NET off
-
-We moved the netlink attribute support from net to lib in order
-for it to be available for general consumption.  However, parts
-of the code (the bits that we don't need :) really depends on
-NET because the target object is sk_buff.
-
-This patch fixes this by wrapping them in CONFIG_NET.
-
-Some EXPORTs have been moved to make this work.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/lib/nlattr.c b/lib/nlattr.c
-index 56c3ce7..80009a2 100644
---- a/lib/nlattr.c
-+++ b/lib/nlattr.c
-@@ -281,6 +281,7 @@ int nla_strcmp(const struct nlattr *nla, const char *str)
- 	return d;
- }
- 
-+#ifdef CONFIG_NET
- /**
-  * __nla_reserve - reserve room for attribute on the skb
-  * @skb: socket buffer to reserve room on
-@@ -305,6 +306,7 @@ struct nlattr *__nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
- 
- 	return nla;
- }
-+EXPORT_SYMBOL(__nla_reserve);
- 
- /**
-  * __nla_reserve_nohdr - reserve room for attribute without header
-@@ -325,6 +327,7 @@ void *__nla_reserve_nohdr(struct sk_buff *skb, int attrlen)
- 
- 	return start;
- }
-+EXPORT_SYMBOL(__nla_reserve_nohdr);
- 
- /**
-  * nla_reserve - reserve room for attribute on the skb
-@@ -345,6 +348,7 @@ struct nlattr *nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
- 
- 	return __nla_reserve(skb, attrtype, attrlen);
- }
-+EXPORT_SYMBOL(nla_reserve);
- 
- /**
-  * nla_reserve_nohdr - reserve room for attribute without header
-@@ -363,6 +367,7 @@ void *nla_reserve_nohdr(struct sk_buff *skb, int attrlen)
- 
- 	return __nla_reserve_nohdr(skb, attrlen);
- }
-+EXPORT_SYMBOL(nla_reserve_nohdr);
- 
- /**
-  * __nla_put - Add a netlink attribute to a socket buffer
-@@ -382,6 +387,7 @@ void __nla_put(struct sk_buff *skb, int attrtype, int attrlen,
- 	nla = __nla_reserve(skb, attrtype, attrlen);
- 	memcpy(nla_data(nla), data, attrlen);
- }
-+EXPORT_SYMBOL(__nla_put);
- 
- /**
-  * __nla_put_nohdr - Add a netlink attribute without header
-@@ -399,6 +405,7 @@ void __nla_put_nohdr(struct sk_buff *skb, int attrlen, const void *data)
- 	start = __nla_reserve_nohdr(skb, attrlen);
- 	memcpy(start, data, attrlen);
- }
-+EXPORT_SYMBOL(__nla_put_nohdr);
- 
- /**
-  * nla_put - Add a netlink attribute to a socket buffer
-@@ -418,6 +425,7 @@ int nla_put(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
- 	__nla_put(skb, attrtype, attrlen, data);
- 	return 0;
- }
-+EXPORT_SYMBOL(nla_put);
- 
- /**
-  * nla_put_nohdr - Add a netlink attribute without header
-@@ -436,6 +444,7 @@ int nla_put_nohdr(struct sk_buff *skb, int attrlen, const void *data)
- 	__nla_put_nohdr(skb, attrlen, data);
- 	return 0;
- }
-+EXPORT_SYMBOL(nla_put_nohdr);
- 
- /**
-  * nla_append - Add a netlink attribute without header or padding
-@@ -454,20 +463,13 @@ int nla_append(struct sk_buff *skb, int attrlen, const void *data)
- 	memcpy(skb_put(skb, attrlen), data, attrlen);
- 	return 0;
- }
-+EXPORT_SYMBOL(nla_append);
-+#endif
- 
- EXPORT_SYMBOL(nla_validate);
- EXPORT_SYMBOL(nla_parse);
- EXPORT_SYMBOL(nla_find);
- EXPORT_SYMBOL(nla_strlcpy);
--EXPORT_SYMBOL(__nla_reserve);
--EXPORT_SYMBOL(__nla_reserve_nohdr);
--EXPORT_SYMBOL(nla_reserve);
--EXPORT_SYMBOL(nla_reserve_nohdr);
--EXPORT_SYMBOL(__nla_put);
--EXPORT_SYMBOL(__nla_put_nohdr);
--EXPORT_SYMBOL(nla_put);
--EXPORT_SYMBOL(nla_put_nohdr);
- EXPORT_SYMBOL(nla_memcpy);
- EXPORT_SYMBOL(nla_memcmp);
- EXPORT_SYMBOL(nla_strcmp);
--EXPORT_SYMBOL(nla_append);
+Any thoughts/suggestions about what could be wrong would be highly appr=
+eciated.
 
 Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Shasi
+
+[1] Add CryptoAPI User Interface Support Patch v6
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
