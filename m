@@ -1,50 +1,63 @@
-From: "Shasi Pulijala" <spulijala@amcc.com>
-Subject: Openssl/Openssh Offload to Linux Crypto
-Date: Tue, 10 Mar 2009 19:46:34 -0700
-Message-ID: <DB599F406D04E34389140B7D99C71B1B0747FC81@SDCEXCHANGE01.ad.amcc.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Openssl/Openssh Offload to Linux Crypto
+Date: Wed, 11 Mar 2009 11:07:50 +0800
+Message-ID: <20090311030750.GA17900@gondor.apana.org.au>
+References: <DB599F406D04E34389140B7D99C71B1B0747FC81@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=Windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <herbert@gondor.apana.org.au>, "Loc Ho" <lho@amcc.com>
-To: <linux-crypto@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, Loc Ho <lho@amcc.com>,
+	netdev@vger.kernel.org
+To: Shasi Pulijala <spulijala@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sdcmail02.amcc.com ([198.137.200.73]:48677 "EHLO
-	sdcmail02.amcc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753244AbZCKCqk convert rfc822-to-8bit (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:47574 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753435AbZCKDHz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2009 22:46:40 -0400
-Content-class: urn:content-classes:message
+	Tue, 10 Mar 2009 23:07:55 -0400
+Content-Disposition: inline
+In-Reply-To: <DB599F406D04E34389140B7D99C71B1B0747FC81@SDCEXCHANGE01.ad.amcc.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Tue, Mar 10, 2009 at 07:46:34PM -0700, Shasi Pulijala wrote:
+>=20
+> I am trying to use OpenSSH (which uses the Openssl lib with HW Offloa=
+d crypto engine support). I am using the patched version of OpenSSL tha=
+t I submitted. It uses the /dev/crypto interface that was provided by t=
+he patch [1] submitted to Opensource.=20
+>        The interface is provided in such a way that one file descript=
+or per session is opened. On this fd we set the session, do cipher/hash=
+ operations and when done delete the session and close the fd. The prob=
+lem arises after running this iteration (open, session set, operation a=
+nd close) for several hundred times (over 500 times), the opening of fi=
+le /dev/crypto fails with error -2 (no such file). I tried looking at t=
+he open system call implementation and found that =E2=80=9Cinode =3D ne=
+xt.dentry->d_inode=E2=80=9D is NULL in routine =E2=80=9C__link_path_wal=
+k=E2=80=9D in fs/namei.c =C2=A0which is not the case when it is working=
+=2E
 
-I am trying to use OpenSSH (which uses the Openssl lib with HW Offload =
-crypto engine support). I am using the patched version of OpenSSL that =
-I submitted. It uses the /dev/crypto interface that was provided by the=
- patch [1] submitted to Opensource.=20
-       The interface is provided in such a way that one file descriptor=
- per session is opened. On this fd we set the session, do cipher/hash o=
-perations and when done delete the session and close the fd. The proble=
-m arises after running this iteration (open, session set, operation and=
- close) for several hundred times (over 500 times), the opening of file=
- /dev/crypto fails with error -2 (no such file). I tried looking at the=
- open system call implementation and found that =93inode =3D next.dentr=
-y->d_inode=94 is NULL in routine =93__link_path_walk=94 in fs/namei.c =A0=
-which is not the case when it is working.
+Loc can probably give a more specific answer to your question.
 
-Why would the opening of /dev/crypto fails only after several hundred i=
-teration?=A0I verified the cryptodev driver functionality and looked at=
- the Openssl code but was not able to determine the cause of the proble=
-m. This is with Linux 2.6.28.3.
+But I wanted to say something about SSL offload in general.  We've
+talked about this amongst the networking group and the consensus
+seems to be that we should be doing the SSL data path in the kernel.
 
-Any thoughts/suggestions about what could be wrong would be highly appr=
-eciated.
+So rather than using the crypto user-space API for SSL offload, we
+should really provide it as through the usual socket interface just
+as we do with IPsec.
 
-Thanks,
-Shasi
+The SSL control path however should remain in user-space, even if
+and when we add public key support to the kernel crypto system.
+Though that could and should be made available to user-space SSL
+through the crypto user-space API.
 
-[1] Add CryptoAPI User Interface Support Patch v6
+Cheers,
+--=20
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
 To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
  in
