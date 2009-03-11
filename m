@@ -1,41 +1,37 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Re: [2.6.28.5] dm/crypt oops: "unable to handle kernel NULL pointer
- dereference" (tainted)
-Date: Wed, 11 Mar 2009 21:42:26 +0100
-Message-ID: <49B82232.2090802@redhat.com>
-References: <200903111319.43778@rk-nord.at>
+From: Tobias Volk <mail@tobiasvolk.de>
+Subject: padlock hardware crypto for x86_64
+Date: Wed, 11 Mar 2009 22:41:22 +0100
+Message-ID: <49B83002.9040705@tobiasvolk.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>
-To: Melchior FRANZ <melchior.franz@gmail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:36944 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750779AbZCKUmg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2009 16:42:36 -0400
-In-Reply-To: <200903111319.43778@rk-nord.at>
+Received: from lnx141.hrz.tu-darmstadt.de ([130.83.156.236]:42480 "EHLO
+	lnx141.hrz.tu-darmstadt.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753096AbZCKVud (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Mar 2009 17:50:33 -0400
+Received: from lnx503.hrz.tu-darmstadt.de (lnx503.hrz.tu-darmstadt.de [130.83.156.232])
+	by lnx141.hrz.tu-darmstadt.de (8.13.8/8.13.8) with ESMTP id n2BLno6G000904
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:49:50 +0100
+	(envelope-from mail@tobiasvolk.de)
+Received: from paris.dvs.informatik.tu-darmstadt.de (paris2.dvs.informatik.tu-darmstadt.de [130.83.166.130])
+	by lnx503.hrz.tu-darmstadt.de (8.13.8/8.13.8/HRZ/PMX) with ESMTP id n2BLfOPV003822
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:41:24 +0100
+	(envelope-from mail@tobiasvolk.de)
+Received: from [1.33.7.2] (panama [130.83.166.249])
+	by paris.dvs.informatik.tu-darmstadt.de (Postfix) with ESMTP id 624AA1709
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:41:24 +0100 (CET)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Melchior FRANZ wrote:
-> 
->   umount ...
->   cryptsetup remove ...
->   losetup -d ...
-> 
-> BUG: unable to handle kernel NULL pointer dereference at 00000004
-> IP: [<c0158a75>] mempool_free+0xd/0x9a
-...
+Hi,
 
-Yes, I know about that problem and I am almost sure that
-it is fixed by patch I sent there http://lkml.org/lkml/2009/3/5/63
+i recently got a VIA VB8001 with their new "Nano" CPU. I just tried to
+build the 2.6.28.7 Kernel in 64bit mode with padlock support... but
+there seems to be none yet (i386 has the option).
 
-Something changed in timing so probability of hitting that
-bug apparently increased in the last kernel (the problem was there always:-)
+Is it planned to support this in the near future?
 
-I had asked Alasdair to queue that to dm queue for upstream...
-
-Milan
---
-mbroz@redhat.com
+- Tobias
