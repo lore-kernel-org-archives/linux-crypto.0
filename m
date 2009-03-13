@@ -1,37 +1,33 @@
-From: Tobias Volk <mail@tobiasvolk.de>
-Subject: padlock hardware crypto for x86_64
-Date: Wed, 11 Mar 2009 22:41:22 +0100
-Message-ID: <49B83002.9040705@tobiasvolk.de>
+From: Siemens Winners Alert <laquinta@yuma.twcbc.com>
+Subject: Final Notification!!
+Date: Thu, 12 Mar 2009 22:37:59 -0500
+Message-ID: <7h9gbp$cee40c@rrcs-agw-01b.hrndva.rr.com>
+Reply-To: contact_siemens@rocketmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <info@lotto.co.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lnx141.hrz.tu-darmstadt.de ([130.83.156.236]:42480 "EHLO
-	lnx141.hrz.tu-darmstadt.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753096AbZCKVud (ORCPT
+Received: from hrndva-commlb.mail.rr.com ([71.74.57.9]:56493 "EHLO
+	hrndva-commlb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751342AbZCMDiB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2009 17:50:33 -0400
-Received: from lnx503.hrz.tu-darmstadt.de (lnx503.hrz.tu-darmstadt.de [130.83.156.232])
-	by lnx141.hrz.tu-darmstadt.de (8.13.8/8.13.8) with ESMTP id n2BLno6G000904
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:49:50 +0100
-	(envelope-from mail@tobiasvolk.de)
-Received: from paris.dvs.informatik.tu-darmstadt.de (paris2.dvs.informatik.tu-darmstadt.de [130.83.166.130])
-	by lnx503.hrz.tu-darmstadt.de (8.13.8/8.13.8/HRZ/PMX) with ESMTP id n2BLfOPV003822
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:41:24 +0100
-	(envelope-from mail@tobiasvolk.de)
-Received: from [1.33.7.2] (panama [130.83.166.249])
-	by paris.dvs.informatik.tu-darmstadt.de (Postfix) with ESMTP id 624AA1709
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Mar 2009 22:41:24 +0100 (CET)
+	Thu, 12 Mar 2009 23:38:01 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+The sum of =A3750,000,00 GBP has been Awarded to your E-MAIL ID,Get bac=
+k to us with your info via (contact_siemens3@rocketmail.com)=20
+Names :=20
+Address:
+Country :=20
+Occupation :
+Age :
 
-i recently got a VIA VB8001 with their new "Nano" CPU. I just tried to
-build the 2.6.28.7 Kernel in 64bit mode with padlock support... but
-there seems to be none yet (i386 has the option).
-
-Is it planned to support this in the near future?
-
-- Tobias
+Mrs Mercy Bill
+(Information Officer)
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
