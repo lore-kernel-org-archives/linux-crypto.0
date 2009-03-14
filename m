@@ -1,52 +1,44 @@
-From: Ingo Molnar <mingo@elte.hu>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 Subject: Re: enable padlock on x86_64
-Date: Sat, 14 Mar 2009 12:47:32 +0100
-Message-ID: <20090314114732.GB3805@elte.hu>
-References: <49B83002.9040705@tobiasvolk.de> <1237029843-28076-1-git-send-email-sebastian@breakpoint.cc>
+Date: Sat, 14 Mar 2009 12:53:07 +0100
+Message-ID: <20090314115307.GA28235@Chamillionaire.breakpoint.cc>
+References: <49B83002.9040705@tobiasvolk.de> <1237029843-28076-1-git-send-email-sebastian@breakpoint.cc> <20090314114732.GB3805@elte.hu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-15
 Cc: linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
 	hpa@zytor.com, linux-kernel@vger.kernel.org,
 	herbert@gondor.apana.org.au, mail@tobiasvolk.de
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: Ingo Molnar <mingo@elte.hu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:42666 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754299AbZCNLsF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Mar 2009 07:48:05 -0400
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:47543 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752984AbZCNLxK (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 14 Mar 2009 07:53:10 -0400
 Content-Disposition: inline
-In-Reply-To: <1237029843-28076-1-git-send-email-sebastian@breakpoint.cc>
+In-Reply-To: <20090314114732.GB3805@elte.hu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+* Ingo Molnar | 2009-03-14 12:47:32 [+0100]:
 
-* Sebastian Andrzej Siewior <sebastian@breakpoint.cc> wrote:
+>thanks, looks good. We can apply #1 to -tip just fine - but a 
+>drivers/crypto/ change should go via the crypto tree. Can the 
+>crypto tree apply #2 without having #1 right away? [i.e. will it 
+>still build and boot fine - even though the padlock 
+>functionality might not be fully present on 32-bit? ]
 
-> To enable the padlock unit, two msr bits have to flipped. This is allready
-> done in the 32bit path and is missing in the other. Instead of copy paste
-> the code, I merged the 64bit part into the 32bit part. The things that
-> changed during the merge:
-> - the fixups from x86_64 (family 6, model >= 15) were not present in 32bit
->   path but are now. They might be usefull if this CPU is booted in 32bit
->   mode.
-> - the fixups which are executed via ->c_early_init() are now executed
->   again via ->c_init(). This was done in the 64bit path and without this I
->   lost the constant_tsc flag. However, tsc is not useable due to
-> | [    2.023006] Marking TSC unstable due to TSC halts in idle
-> | [    2.500082] Clocksource tsc unstable (delta = -326436711 ns)
-> 
-> The two patches are against the current tip tree. A version of 
-> patch 1 against current -rc8 is available at [0].
+Yep, it is fine.
+#1 in, #2 not will not result in any difference to what we have now.
+#2 in, #1 not will result in "padlock not detected" while loading the
+module and -ENODEV.
 
-thanks, looks good. We can apply #1 to -tip just fine - but a 
-drivers/crypto/ change should go via the crypto tree. Can the 
-crypto tree apply #2 without having #1 right away? [i.e. will it 
-still build and boot fine - even though the padlock 
-functionality might not be fully present on 32-bit? ]
+>Then in 2.6.30 once both the x86 tree and the crypto tree are 
+>merged we'll have both changes combined.
+>
+>Does that sound good?
+I'm fine with this, but last word is Herbert's :)
 
-Then in 2.6.30 once both the x86 tree and the crypto tree are 
-merged we'll have both changes combined.
+>	Ingo
 
-Does that sound good?
-
-	Ingo
+Sebastian
