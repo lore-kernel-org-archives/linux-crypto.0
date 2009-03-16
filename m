@@ -1,7 +1,7 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [RFC] [PATCH 2/4] cpu_chainiv: add percpu IV chain genarator
-Date: Mon, 16 Mar 2009 12:52:51 +0100
-Message-ID: <20090316115251.GP13998@secunet.com>
+Subject: [RFC] [PATCH 1/4] padata: generic interface for parallel processing
+Date: Mon, 16 Mar 2009 12:51:31 +0100
+Message-ID: <20090316115131.GO13998@secunet.com>
 References: <20090316114940.GN13998@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -9,57 +9,55 @@ Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:52462 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([213.68.205.161]:52463 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751960AbZCPMN5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Mar 2009 08:13:57 -0400
+	id S1752955AbZCPMN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Mar 2009 08:13:58 -0400
 Content-Disposition: inline
 In-Reply-To: <20090316114940.GN13998@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If the crypro requests of a crypto transformation are processed in
-parallel, the usual chain IV generator would serialize the crypto
-requests again. The percpu IV chain genarator allocates the IV as
-percpu data and generates percpu IV chains, so a crypro request
-does not need to wait for the completition of the IV generation
-from a previous request that runs on a different cpu.
+This patch introduces an interface to process data objects
+in parallel. On request it is possible to serialize again.
+The parallelized objects return after serialization in the
+same order as they were before the parallelization.
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/Makefile      |    1 +
- crypto/cpu_chainiv.c |  327 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 328 insertions(+), 0 deletions(-)
- create mode 100644 crypto/cpu_chainiv.c
+ include/linux/interrupt.h |    3 +-
+ include/linux/padata.h    |  116 +++++++++++
+ kernel/Makefile           |    2 +-
+ kernel/padata.c           |  490 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 609 insertions(+), 2 deletions(-)
+ create mode 100644 include/linux/padata.h
+ create mode 100644 kernel/padata.c
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 673d9f7..24f7279 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -19,6 +19,7 @@ crypto_blkcipher-objs := ablkcipher.o
- crypto_blkcipher-objs += blkcipher.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER2) += crypto_blkcipher.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER2) += chainiv.o
-+obj-$(CONFIG_CRYPTO_BLKCIPHER2) += cpu_chainiv.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER2) += eseqiv.o
- obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 9127f6b..e1af5d6 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -253,7 +253,8 @@ enum
+ 	TASKLET_SOFTIRQ,
+ 	SCHED_SOFTIRQ,
+ 	HRTIMER_SOFTIRQ,
+-	RCU_SOFTIRQ,	/* Preferable RCU should always be the last softirq */
++	PADATA_SOFTIRQ,
++	RCU_SOFTIRQ, 	/* Preferable RCU should always be the last softirq */
  
-diff --git a/crypto/cpu_chainiv.c b/crypto/cpu_chainiv.c
+ 	NR_SOFTIRQS
+ };
+diff --git a/include/linux/padata.h b/include/linux/padata.h
 new file mode 100644
-index 0000000..8acfc77
+index 0000000..469359f
 --- /dev/null
-+++ b/crypto/cpu_chainiv.c
-@@ -0,0 +1,327 @@
++++ b/include/linux/padata.h
+@@ -0,0 +1,116 @@
 +/*
-+ * cpu_chainiv - Per CPU Chain IV Generator
++ * padata.h - header for the padata parallelization interface
 + *
-+ * Generate IVs by using the last block of the previous encryption on
-+ * the local cpu. This is mainly useful for CBC with a parallel algorithm.
-+ *
-+ * Based on chainiv.c by Herbert Xu <herbert@gondor.apana.org.au>
-+ *
-+ * Copyright (C) 2009 secunet Security Networks AG
-+ * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ * Copyright (C) 2008, 2009 secunet Security Networks AG
++ * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -75,308 +73,611 @@ index 0000000..8acfc77
 + * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
 + */
 +
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/rng.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
++#ifndef PADATA_H
++#define PADATA_H
++
++#include <linux/interrupt.h>
++#include <linux/smp.h>
++#include <linux/list.h>
++
++enum
++{
++	NO_PADATA=0,
++	AEAD_ENC_PADATA,
++	AEAD_DEC_PADATA,
++	NR_PADATA
++};
++
++struct padata_priv {
++	struct list_head	list;
++	struct call_single_data	csd;
++	int			cb_cpu;
++	int			seq_nr;
++	unsigned int		nr;
++	int			info;
++	void                    (*parallel)(struct padata_priv *padata);
++	void                    (*serial)(struct padata_priv *padata);
++};
++
++struct padata_queue {
++	struct list_head        list;
++	atomic_t                num_obj;
++	int               	cpu_index;
++	spinlock_t              lock;
++};
++
++struct parallel_data {
++	struct work_struct	work;
++	struct padata_queue	*queue;
++	atomic_t		seq_nr;
++	atomic_t		queued_objects;
++	cpumask_t		cpu_map;
++	cpumask_t		new_cpu_map;
++	u8			flags;
++#define	PADATA_INIT			1
++#define	PADATA_FLUSH_HARD		2
++#define	PADATA_RESET_IN_PROGRESS	4
++	spinlock_t              lock;
++};
++
++#ifdef CONFIG_USE_GENERIC_SMP_HELPERS
++extern void __init padata_init(unsigned int nr, cpumask_t cpu_map);
++extern void padata_dont_wait(unsigned int nr, struct padata_priv *padata);
++extern int padata_do_parallel(unsigned int softirq_nr, unsigned int nr,
++			      struct padata_priv *padata, int cb_cpu);
++extern int padata_do_serial(unsigned int nr, struct padata_priv *padata);
++extern cpumask_t padata_get_cpumap(unsigned int nr);
++extern void padata_set_cpumap(unsigned int nr, cpumask_t cpu_map);
++extern void padata_add_cpu(unsigned int nr, int cpu);
++extern void padata_remove_cpu(unsigned int nr, int cpu);
++extern void padata_start(unsigned int nr);
++extern void padata_stop(unsigned int nr);
++#else
++static inline void padata_init(unsigned int nr,cpumask_t cpu_map)
++{
++}
++static inline void padata_dont_wait(unsigned int nr, struct padata_priv *padata)
++{
++}
++static inline int padata_do_parallel(unsigned int softirq_nr, unsigned int nr,
++				     struct padata_priv *padata, int cb_cpu)
++{
++	return 0;
++}
++static inline int padata_do_serial(unsigned int nr, struct padata_priv *padata)
++{
++	return 0;
++}
++static inline cpumask_t padata_get_cpumap(unsigned int nr)
++{
++	return cpu_online_map;
++}
++static inline void padata_set_cpumap(unsigned int nr, cpumask_t cpu_map)
++{
++}
++static inline padata_add_cpu(unsigned int nr, int cpu)
++{
++}
++static inline padata_remove_cpu(unsigned int nr, int cpu)
++{
++}
++static inline padata_start(unsigned int nr)
++{
++}
++static inline padata_stop(unsigned int nr)
++{
++}
++#endif
++#endif
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 170a921..1c11a14 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -40,7 +40,7 @@ obj-$(CONFIG_RT_MUTEXES) += rtmutex.o
+ obj-$(CONFIG_DEBUG_RT_MUTEXES) += rtmutex-debug.o
+ obj-$(CONFIG_RT_MUTEX_TESTER) += rtmutex-tester.o
+ obj-$(CONFIG_GENERIC_ISA_DMA) += dma.o
+-obj-$(CONFIG_USE_GENERIC_SMP_HELPERS) += smp.o
++obj-$(CONFIG_USE_GENERIC_SMP_HELPERS) += smp.o padata.o
+ ifneq ($(CONFIG_SMP),y)
+ obj-y += up.o
+ endif
+diff --git a/kernel/padata.c b/kernel/padata.c
+new file mode 100644
+index 0000000..192c9a6
+--- /dev/null
++++ b/kernel/padata.c
+@@ -0,0 +1,490 @@
++/*
++ * padata.c - generic interface to process data streams in parallel
++ *
++ * Copyright (C) 2008, 2009 secunet Security Networks AG
++ * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
 +#include <linux/module.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
++#include <linux/cpumask.h>
++#include <linux/err.h>
++#include <linux/padata.h>
 +
-+struct cpu_civ_ctx {
-+	spinlock_t	lock;
-+	char		*iv;
-+};
++#define MAX_SEQ_NR  1000000000
 +
-+static int cpu_civ_aead_givencrypt(struct aead_givcrypt_request *req)
++static struct parallel_data padata_vec[NR_PADATA];
++static struct padata_priv *padata_get_next(struct parallel_data *par_data);
++
++static void padata_flush_hard(struct parallel_data *par_data)
 +{
-+	struct crypto_aead *geniv = aead_givcrypt_reqtfm(req);
-+	struct cpu_civ_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_request *subreq = aead_givcrypt_reqctx(req);
-+	unsigned int ivsize;
-+	char *iv;
-+	int err;
++	int cpu;
++	struct padata_priv *padata;
++	struct padata_queue *queue;
 +
-+	aead_request_set_tfm(subreq, aead_geniv_base(geniv));
-+	aead_request_set_callback(subreq, req->areq.base.flags,
-+				  req->areq.base.complete,
-+				  req->areq.base.data);
-+	aead_request_set_crypt(subreq, req->areq.src, req->areq.dst,
-+			       req->areq.cryptlen, req->areq.iv);
-+	aead_request_set_assoc(subreq, req->areq.assoc, req->areq.assoclen);
++	for_each_cpu_mask(cpu, par_data->cpu_map) {
++		queue = per_cpu_ptr(par_data->queue, cpu);
 +
-+	local_bh_disable();
++		while(!list_empty(&queue->list)) {
++			padata = list_entry(queue->list.next, struct padata_priv, list);
 +
-+	ivsize = crypto_aead_ivsize(geniv);
++			spin_lock(&queue->lock);
++			list_del_init(&padata->list);
++			spin_unlock(&queue->lock);
 +
-+	iv = per_cpu_ptr(ctx->iv, smp_processor_id());
-+
-+	memcpy(req->giv, iv, ivsize);
-+	memcpy(subreq->iv, iv, ivsize);
-+
-+	err = crypto_aead_encrypt(subreq);
-+	if (err)
-+		goto unlock;
-+
-+	memcpy(iv, subreq->iv, ivsize);
-+
-+unlock:
-+	local_bh_enable();
-+
-+	return err;
++			atomic_dec(&par_data->queued_objects);
++			padata->serial(padata);
++		}
++	}
 +}
 +
-+static int cpu_civ_aead_givencrypt_first(struct aead_givcrypt_request *req)
++static void padata_flush_order(struct parallel_data *par_data)
 +{
-+	struct crypto_aead *geniv = aead_givcrypt_reqtfm(req);
-+	struct cpu_civ_ctx *ctx = crypto_aead_ctx(geniv);
-+	char *iv;
-+	int err = 0;
-+	int cpu;
++	struct padata_priv *padata;
 +
-+	spin_lock_bh(&ctx->lock);
-+	if (crypto_aead_crt(geniv)->givencrypt != cpu_civ_aead_givencrypt_first)
-+		goto unlock;
++	while (1) {
++		padata = padata_get_next(par_data);
 +
-+	crypto_aead_crt(geniv)->givencrypt = cpu_civ_aead_givencrypt;
-+
-+	for_each_possible_cpu(cpu) {
-+		iv = per_cpu_ptr(ctx->iv, cpu);
-+		err = crypto_rng_get_bytes(crypto_default_rng, iv,
-+					   crypto_aead_ivsize(geniv));
-+
-+		if (err)
++		if (padata && !IS_ERR(padata))
++			padata->serial(padata);
++		else
 +			break;
 +	}
 +
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
-+
-+	if (err)
-+		return err;
-+
-+	return cpu_civ_aead_givencrypt(req);
++	padata_flush_hard(par_data);
 +}
 +
-+static int cpu_civ_ablkcipher_givencrypt(struct skcipher_givcrypt_request *req)
++static void padata_reset_work(struct work_struct *work)
 +{
-+	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
-+	struct cpu_civ_ctx *ctx = crypto_ablkcipher_ctx(geniv);
-+	struct ablkcipher_request *subreq = skcipher_givcrypt_reqctx(req);
-+	unsigned int ivsize;
-+	char *iv;
-+	int err;
++	int cpu, cpu_index;
++	struct padata_queue *queue;
++	struct parallel_data *par_data;
 +
-+	ablkcipher_request_set_tfm(subreq, skcipher_geniv_cipher(geniv));
-+	ablkcipher_request_set_callback(subreq, req->creq.base.flags,
-+					req->creq.base.complete,
-+					req->creq.base.data);
-+	ablkcipher_request_set_crypt(subreq, req->creq.src, req->creq.dst,
-+				     req->creq.nbytes, req->creq.info);
++	par_data = container_of(work, struct parallel_data, work);
++
++	if (par_data->flags & (PADATA_INIT|PADATA_RESET_IN_PROGRESS))
++		return;
++
++	spin_lock_bh(&par_data->lock);
++	par_data->flags |= PADATA_RESET_IN_PROGRESS;
++
++	if (!(par_data->flags & PADATA_FLUSH_HARD))
++		padata_flush_order(par_data);
++	else
++		padata_flush_hard(par_data);
++
++	cpu_index = 0;
++
++	par_data->cpu_map = par_data->new_cpu_map;
++
++	for_each_cpu_mask(cpu, par_data->cpu_map) {
++		queue = per_cpu_ptr(par_data->queue, cpu);
++
++		atomic_set(&queue->num_obj, 0);
++		queue->cpu_index = cpu_index;
++		cpu_index++;
++	}
++	spin_unlock_bh(&par_data->lock);
++
++	atomic_set(&par_data->seq_nr, -1);
++	par_data->flags &= ~PADATA_RESET_IN_PROGRESS;
++	par_data->flags |= PADATA_INIT;
++}
++
++static struct padata_priv *padata_get_next(struct parallel_data *par_data)
++{
++	int cpu, num_cpus, empty;
++	int seq_nr, calc_seq_nr, next_nr;
++	struct padata_queue *queue, *next_queue;
++	struct padata_priv *padata;
++
++	empty = 0;
++	next_nr = -1;
++	next_queue = NULL;
++
++	num_cpus = cpus_weight(par_data->cpu_map);
++
++	for_each_cpu_mask(cpu, par_data->cpu_map) {
++		queue = per_cpu_ptr(par_data->queue, cpu);
++
++		/*
++		 * Calculate the seq_nr of the object that should be
++		 * next in this queue.
++		 */
++		calc_seq_nr = (atomic_read(&queue->num_obj) * num_cpus)
++			+ queue->cpu_index;
++
++		if (!list_empty(&queue->list)) {
++			padata = list_entry(queue->list.next,
++					    struct padata_priv, list);
++
++			seq_nr  = padata->seq_nr;
++
++			if (unlikely(calc_seq_nr != seq_nr)) {
++				par_data->flags &= ~PADATA_INIT;
++				par_data->flags |= PADATA_FLUSH_HARD;
++				padata = NULL;
++				goto out;
++			}
++		} else {
++			seq_nr = calc_seq_nr;
++			empty++;
++		}
++
++		if (next_nr < 0 || seq_nr < next_nr) {
++			next_nr = seq_nr;
++			next_queue = queue;
++		}
++	}
++
++	padata = NULL;
++
++	if (empty == num_cpus)
++		goto out;
++
++	if (!list_empty(&next_queue->list)) {
++		padata = list_entry(next_queue->list.next,
++				    struct padata_priv, list);
++
++		spin_lock(&next_queue->lock);
++		list_del_init(&padata->list);
++		spin_unlock(&next_queue->lock);
++
++		atomic_dec(&par_data->queued_objects);
++		atomic_inc(&next_queue->num_obj);
++
++		goto out;
++	}
++
++	if (next_nr % num_cpus == next_queue->cpu_index) {
++		padata = ERR_PTR(-ENODATA);
++		goto out;
++	}
++
++	padata = ERR_PTR(-EINPROGRESS);
++out:
++	return padata;
++}
++
++static void padata_action(struct softirq_action *h)
++{
++	struct list_head *cpu_list, local_list;
++
++	cpu_list = &__get_cpu_var(softirq_work_list[PADATA_SOFTIRQ]);
++
++	local_irq_disable();
++	list_replace_init(cpu_list, &local_list);
++	local_irq_enable();
++
++	while (!list_empty(&local_list)) {
++		struct padata_priv *padata;
++
++		padata = list_entry(local_list.next,
++				    struct padata_priv, csd.list);
++
++		list_del_init(&padata->csd.list);
++
++		padata->serial(padata);
++	}
++}
++
++static int padata_cpu_hash(unsigned int nr, struct padata_priv *padata)
++{
++	int cpu, target_cpu, this_cpu, cpu_index;
++
++	this_cpu = smp_processor_id();
++
++	if (padata->nr != 0)
++		return this_cpu;
++
++	if (!(padata_vec[nr].flags & PADATA_INIT))
++		return this_cpu;
++
++	padata->seq_nr = atomic_inc_return(&padata_vec[nr].seq_nr);
++
++	if (padata->seq_nr > MAX_SEQ_NR) {
++		padata_vec[nr].flags &= ~PADATA_INIT;
++		padata->seq_nr = 0;
++		schedule_work(&padata_vec[nr].work);
++		return this_cpu;
++	}
++
++	padata->nr = nr;
++
++	/*
++	 * Hash the sequence numbers to the cpus by taking
++	 * seq_nr mod. number of cpus in use.
++	 */
++	cpu_index =  padata->seq_nr % cpus_weight(padata_vec[nr].cpu_map);
++
++	target_cpu = first_cpu(padata_vec[nr].cpu_map);
++	for (cpu = 0; cpu < cpu_index; cpu++)
++		target_cpu = next_cpu(target_cpu, padata_vec[nr].cpu_map);
++
++	return target_cpu;
++}
++
++/*
++ * padata_dont_wait - must be called if an object that runs in parallel will
++ * not be serialized with padata_do_serial
++ *
++ * @nr: number of the padata instance
++ * @padata: object that will not be seen by padata_do_serial
++ */
++void padata_dont_wait(unsigned int nr, struct padata_priv *padata)
++{
++	struct padata_queue *queue;
++
++	if (!(padata_vec[nr].flags & PADATA_INIT))
++		return;
++
++	if (padata->nr == 0 || padata->nr != nr)
++		return;
++
++	queue = per_cpu_ptr(padata_vec[nr].queue, smp_processor_id());
++	atomic_inc(&queue->num_obj);
++
++	padata->nr = 0;
++	padata->seq_nr = 0;
++}
++EXPORT_SYMBOL(padata_dont_wait);
++
++/*
++ * padata_do_parallel - padata parallelization function
++ *
++ * @softirq_nr: number of the softirq that will do the parallelization
++ * @nr: number of the padata instance
++ * @padata: object to be parallelized
++ * @cb_cpu: cpu number on which the serialization callback function will run
++ */
++int padata_do_parallel(unsigned int softirq_nr, unsigned int nr,
++		       struct padata_priv *padata, int cb_cpu)
++{
++	int target_cpu;
++
++	padata->cb_cpu = cb_cpu;
 +
 +	local_bh_disable();
-+
-+	ivsize = crypto_ablkcipher_ivsize(geniv);
-+
-+	iv = per_cpu_ptr(ctx->iv, smp_processor_id());
-+
-+	memcpy(req->giv, iv, ivsize);
-+	memcpy(subreq->info, iv, ivsize);
-+
-+	err = crypto_ablkcipher_encrypt(subreq);
-+	if (err)
-+		goto unlock;
-+
-+	memcpy(iv, subreq->info, ivsize);
-+
-+unlock:
++	target_cpu = padata_cpu_hash(nr, padata);
 +	local_bh_enable();
 +
-+	return err;
++	send_remote_softirq(&padata->csd, target_cpu, softirq_nr);
++
++	return 1;
 +}
++EXPORT_SYMBOL(padata_do_parallel);
 +
-+static int cpu_civ_ablkcipher_givencrypt_first(
-+	struct skcipher_givcrypt_request *req)
++/*
++ * padata_do_serial - padata serialization function
++ *
++ * @nr: number of the padata instance
++ * @padata: object to be serialized
++ *
++ * returns 1 if the serialization callback function will be called
++ * from padata, 0 else
++ */
++int padata_do_serial(unsigned int nr, struct padata_priv *padata)
 +{
-+	struct crypto_ablkcipher *geniv = skcipher_givcrypt_reqtfm(req);
-+	struct cpu_civ_ctx *ctx = crypto_ablkcipher_ctx(geniv);
-+	char *iv;
-+	int err = 0;
 +	int cpu;
++	struct padata_queue *reorder_queue;
 +
-+	spin_lock_bh(&ctx->lock);
-+	if (crypto_ablkcipher_crt(geniv)->givencrypt !=
-+	    cpu_civ_ablkcipher_givencrypt_first)
-+		goto unlock;
++	if (!(padata_vec[nr].flags & PADATA_INIT))
++		return 0;
 +
-+	crypto_ablkcipher_crt(geniv)->givencrypt = cpu_civ_ablkcipher_givencrypt;
++	if (padata->nr != nr || padata->nr == 0) {
++		padata->serial(padata);
++		return 1;
++	}
++
++	cpu = smp_processor_id();
++
++	reorder_queue = per_cpu_ptr(padata_vec[nr].queue, cpu);
++
++	spin_lock(&reorder_queue->lock);
++	list_add_tail(&padata->list, &reorder_queue->list);
++	spin_unlock(&reorder_queue->lock);
++
++	atomic_inc(&padata_vec[nr].queued_objects);
++
++try_again:
++	if (!spin_trylock(&padata_vec[nr].lock))
++		goto out;
++
++	while(1) {
++		padata = padata_get_next(&padata_vec[nr]);
++
++		if (!padata || PTR_ERR(padata) == -EINPROGRESS)
++			break;
++		if (PTR_ERR(padata) == -ENODATA) {
++			spin_unlock(&padata_vec[nr].lock);
++			goto out;
++		}
++
++		send_remote_softirq(&padata->csd, padata->cb_cpu,
++				    PADATA_SOFTIRQ);
++	}
++
++	if (unlikely(!(padata_vec[nr].flags & PADATA_INIT))) {
++		spin_unlock(&padata_vec[nr].lock);
++		goto reset_out;
++	}
++
++	spin_unlock(&padata_vec[nr].lock);
++
++	if (atomic_read(&padata_vec[nr].queued_objects))
++		goto try_again;
++
++out:
++	return 1;
++reset_out:
++	schedule_work(&padata_vec[nr].work);
++	return 1;
++}
++EXPORT_SYMBOL(padata_do_serial);
++
++/*
++ * padata_get_cpumap - get the cpu map that is actually in use
++ *
++ * @nr: number of the padata instance
++ */
++cpumask_t padata_get_cpumap(unsigned int nr)
++{
++	return padata_vec[nr].cpu_map;
++}
++EXPORT_SYMBOL(padata_get_cpumap);
++
++/*
++ * padata_set_cpumap - set the cpu map that padata uses
++ *
++ * @nr: number of the padata instance
++ * @cpu_map: the cpu map to use
++ */
++void padata_set_cpumap(unsigned int nr, cpumask_t cpu_map)
++{
++	padata_vec[nr].new_cpu_map = cpu_map;
++	padata_vec[nr].flags &= ~PADATA_INIT;
++	padata_vec[nr].flags |= PADATA_FLUSH_HARD;
++
++	schedule_work(&padata_vec[nr].work);
++}
++EXPORT_SYMBOL(padata_set_cpumap);
++
++/*
++ * padata_add_cpu - add a cpu to the padata cpu map
++ *
++ * @nr: number of the padata instance
++ * @cpu: cpu to remove
++ */
++void padata_add_cpu(unsigned int nr, int cpu)
++{
++	cpumask_t cpu_map = padata_vec[nr].cpu_map;
++
++	cpu_set(cpu, cpu_map);
++	padata_set_cpumap(nr, cpu_map);
++}
++EXPORT_SYMBOL(padata_add_cpu);
++
++/*
++ * padata_remove_cpu - remove a cpu from the padata cpu map
++ *
++ * @nr: number of the padata instance
++ * @cpu: cpu to remove
++ */
++void padata_remove_cpu(unsigned int nr, int cpu)
++{
++	cpumask_t cpu_map = padata_vec[nr].cpu_map;
++
++	cpu_clear(cpu, cpu_map);
++	padata_set_cpumap(nr, cpu_map);
++}
++EXPORT_SYMBOL(padata_remove_cpu);
++
++/*
++ * padata_start - start the parallel processing
++ *
++ * @nr: number of the padata instance
++ */
++void padata_start(unsigned int nr)
++{
++	if (padata_vec[nr].flags & PADATA_INIT)
++		return;
++
++	schedule_work(&padata_vec[nr].work);
++}
++EXPORT_SYMBOL(padata_start);
++
++/*
++ * padata_stop - stop the parallel processing
++ *
++ * @nr: number of the padata instance
++ */
++void padata_stop(unsigned int nr)
++{
++	padata_vec[nr].flags &= ~PADATA_INIT;
++}
++EXPORT_SYMBOL(padata_stop);
++
++/*
++ * padata_init - initialize a padata instance
++ *
++ * @nr: number of the padata instance
++ * @cpu_map: map of the cpu set that padata uses for parallelization
++ */
++void __init padata_init(unsigned int nr, cpumask_t cpu_map)
++{
++	int cpu, cpu_index;
++	struct padata_queue *percpu_queue, *queue;
++
++	percpu_queue = alloc_percpu(struct padata_queue);
++
++	if (!percpu_queue) {
++		printk("padata_init: Failed to alloc the serialization"
++		       "queues for padata nr %d, exiting!\n", nr);
++		return;
++	}
++
++	cpu_index = 0;
 +
 +	for_each_possible_cpu(cpu) {
-+		iv = per_cpu_ptr(ctx->iv, cpu);
-+		err = crypto_rng_get_bytes(crypto_default_rng, iv,
-+					   crypto_ablkcipher_ivsize(geniv));
++		queue = per_cpu_ptr(percpu_queue, cpu);
 +
-+		if (err)
-+			break;
++		if (cpu_isset(cpu, cpu_map)) {
++			queue->cpu_index = cpu_index;
++			cpu_index++;
++		}
++
++		INIT_LIST_HEAD(&queue->list);
++		spin_lock_init(&queue->lock);
++		atomic_set(&queue->num_obj, 0);
 +	}
 +
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
++	INIT_WORK(&padata_vec[nr].work, padata_reset_work);
 +
-+	if (err)
-+		return err;
-+
-+	return cpu_civ_ablkcipher_givencrypt(req);
++	atomic_set(&padata_vec[nr].seq_nr, -1);
++	atomic_set(&padata_vec[nr].queued_objects, 0);
++	padata_vec[nr].cpu_map = cpu_map;
++	padata_vec[nr].new_cpu_map = cpu_map;
++	padata_vec[nr].queue = percpu_queue;
++	padata_vec[nr].flags = 0;
++	spin_lock_init(&padata_vec[nr].lock);
 +}
 +
-+static int cpu_civ_aead_init(struct crypto_tfm *tfm)
++static int __init padata_initcall(void)
 +{
-+	struct cpu_civ_ctx *ctx = crypto_tfm_ctx(tfm);
++	open_softirq(PADATA_SOFTIRQ, padata_action);
 +
-+	spin_lock_init(&ctx->lock);
-+	tfm->crt_aead.reqsize = sizeof(struct aead_request);
-+
-+	ctx->iv = __alloc_percpu(tfm->crt_aead.ivsize);
-+
-+	if (!ctx->iv)
-+		return -ENOMEM;
-+
-+	return aead_geniv_init(tfm);
++	return 0;
 +}
-+
-+void cpu_civ_aead_exit(struct crypto_tfm *tfm)
-+{
-+	struct cpu_civ_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	free_percpu(ctx->iv);
-+	aead_geniv_exit(tfm);
-+}
-+
-+static int cpu_civ_ablkcipher_init(struct crypto_tfm *tfm)
-+{
-+	struct cpu_civ_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	spin_lock_init(&ctx->lock);
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request);
-+
-+	ctx->iv = __alloc_percpu(tfm->crt_ablkcipher.ivsize);
-+
-+	if (!ctx->iv)
-+		return -ENOMEM;
-+
-+	return skcipher_geniv_init(tfm);
-+}
-+
-+void cpu_civ_ablkcipher_exit(struct crypto_tfm *tfm)
-+{
-+	struct cpu_civ_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	free_percpu(ctx->iv);
-+	skcipher_geniv_exit(tfm);
-+}
-+
-+static struct crypto_template cpu_civ_tmpl;
-+
-+static struct crypto_instance *cpu_civ_ablkcipher_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+
-+	inst = skcipher_geniv_alloc(&cpu_civ_tmpl, tb, 0, 0);
-+	if (IS_ERR(inst))
-+		goto out;
-+
-+	inst->alg.cra_ablkcipher.givencrypt = cpu_civ_ablkcipher_givencrypt_first;
-+
-+	inst->alg.cra_init = cpu_civ_ablkcipher_init;
-+	inst->alg.cra_exit = cpu_civ_ablkcipher_exit;
-+
-+out:
-+	return inst;
-+}
-+
-+static struct crypto_instance *cpu_civ_aead_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+
-+	inst = aead_geniv_alloc(&cpu_civ_tmpl, tb, 0, 0);
-+
-+	if (IS_ERR(inst))
-+		goto out;
-+
-+	inst->alg.cra_aead.givencrypt = cpu_civ_aead_givencrypt_first;
-+
-+	inst->alg.cra_init = cpu_civ_aead_init;
-+	inst->alg.cra_exit = cpu_civ_aead_exit;
-+
-+out:
-+	return inst;
-+}
-+
-+static struct crypto_instance *cpu_civ_alloc(struct rtattr **tb)
-+{
-+	struct crypto_attr_type *algt;
-+	struct crypto_instance *inst;
-+	int err;
-+
-+	algt = crypto_get_attr_type(tb);
-+	err = PTR_ERR(algt);
-+	if (IS_ERR(algt))
-+		return ERR_PTR(err);
-+
-+	err = crypto_get_default_rng();
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & CRYPTO_ALG_TYPE_MASK)
-+		inst = cpu_civ_ablkcipher_alloc(tb);
-+	else
-+		inst = cpu_civ_aead_alloc(tb);
-+
-+	if (IS_ERR(inst)) {
-+		crypto_put_default_rng();
-+		goto out;
-+	}
-+
-+	inst->alg.cra_ctxsize = sizeof(struct cpu_civ_ctx);
-+
-+out:
-+	return inst;
-+}
-+
-+static void cpu_civ_free(struct crypto_instance *inst)
-+{
-+	if ((inst->alg.cra_flags ^ CRYPTO_ALG_TYPE_AEAD) & CRYPTO_ALG_TYPE_MASK)
-+		skcipher_geniv_free(inst);
-+	else
-+		aead_geniv_free(inst);
-+
-+	crypto_put_default_rng();
-+}
-+
-+static struct crypto_template cpu_civ_tmpl = {
-+	.name = "cpu_chainiv",
-+	.alloc = cpu_civ_alloc,
-+	.free = cpu_civ_free,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init cpu_civ_module_init(void)
-+{
-+	return crypto_register_template(&cpu_civ_tmpl);
-+}
-+
-+static void cpu_civ_module_exit(void)
-+{
-+	crypto_unregister_template(&cpu_civ_tmpl);
-+}
-+
-+module_init(cpu_civ_module_init);
-+module_exit(cpu_civ_module_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Per CPU Chain IV Generator");
++subsys_initcall(padata_initcall);
 -- 
 1.5.4.2
 
