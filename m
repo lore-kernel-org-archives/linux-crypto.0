@@ -1,322 +1,316 @@
 From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: [PATCH 6/6] squashfs: Make SquashFS 4 use the new pcomp crypto
- interface
-Date: Tue, 17 Mar 2009 13:44:58 +0100 (CET)
-Message-ID: <alpine.LRH.2.00.0903171343500.7595@vixen.sonytel.be>
+Subject: [PATCH/RFC] crypto: compress - Add comp_request.total_out (was: Re:
+ [PATCH 6/6] squashfs: Make SquashFS 4 use the new pcomp crypto interface)
+Date: Tue, 17 Mar 2009 13:54:01 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be>
 References: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-3-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
- <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090307104637.GB8731@gondor.apana.org.au>
+ <49B36A18.5030506@lougher.demon.co.uk> <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Phillip Lougher <phillip@lougher.demon.co.uk>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Phillip Lougher <phillip@lougher.demon.co.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:40118 "EHLO
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:40301 "EHLO
 	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753119AbZCQMpD (ORCPT
+	by vger.kernel.org with ESMTP id S1754914AbZCQMyF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Mar 2009 08:45:03 -0400
-In-Reply-To: <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	Tue, 17 Mar 2009 08:54:05 -0400
+In-Reply-To: <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 25 Feb 2009, Geert Uytterhoeven wrote:
-> Modify SquashFS 4 to use the new "pcomp" crypto interface for decompr=
-ession,
-> instead of calling the underlying zlib library directly. This simplif=
-ies e.g.
-> the addition of support for hardware decompression and different deco=
-mpression
-> algorithms.
+On Wed, 11 Mar 2009, Geert Uytterhoeven wrote:
+> On Sun, 8 Mar 2009, Phillip Lougher wrote:
+> > Two API issues of concern (one major, one minor).  Both of these re=
+late to the
+> > way Squashfs drives the decompression code, where it repeatedly cal=
+ls it
+> > supplying additional input/output buffers, rather than using a "sin=
+gle-shot"
+> > approach where it calls the decompression code once supplying all t=
+he
+> > necessary input and output buffer space.
+> >=20
+> > 1. Minor issue -the lack of a stream.total_out field.  The current
+> > zlib_inflate code collects the total number of bytes decompressed o=
+ver the
+> > multiple calls into the stream.total_out field.
+> >=20
+> >    There is clearly no such field available in the cryto API, leadi=
+ng to the
+> > somewhat clumsy need to track it, i.e. it leads to the following ad=
+ditional
+> > code.
+>=20
+> If people feel the need for a total_out field, I can add it to struct
+> comp_request.
+>=20
+> BTW, what about total_in, which is also provided by plain zlib's z_st=
+ream?
+> Do people see a need for a similar field?
 
-This is an updated patch, to accomodate for the recent changes in Squas=
-hFS.
----
-=46rom 46b8e0ab105e9b414d455c0a7205a7c79f0517e8 Mon Sep 17 00:00:00 200=
+The patch below (on top of the updated one to convert SquashFS to pcomp=
+) adds
+comp_request.total_out, so you don't have to calculate and accumulate t=
+he
+decompressed output sizes in SquashFS.
+
+Notes:
+  - This required the addition of a `struct comp_request *' parameter t=
+o
+    crypto_{,de}compress_init()
+  - Still, there's one of the=20
+
+	produced =3D req.avail_out;
+	...
+	produced -=3D req.avail_out;
+
+    left, as this is part of the logic to discover the end of decompres=
+sion
+    (no bytes produced, no error returned).
+
+Perhaps it's better to instead make crypto_{,de}compress_{update,final}=
+()
+return the (positive) number of output bytes (of the current step)?
+
+Currently it returns zero (no error) or a negative error value.
+That would allow to get rid of both `produced =3D ... / produced -=3D .=
+=2E.'
+constructs, but the user would have to accumulate the total output size=
+ again
+(which is not such a big deal, IMHO).
+
+Thanks for your comments!
+
+=46rom e43f85baa75668be4cce340ae98a3b76e66a452a Mon Sep 17 00:00:00 200=
 1
 =46rom: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Date: Thu, 18 Dec 2008 14:35:22 +0100
-Subject: [PATCH] squashfs: Make SquashFS 4 use the new pcomp crypto int=
-erface
-
-Modify SquashFS 4 to use the new "pcomp" crypto interface for decompres=
-sion,
-instead of calling the underlying zlib library directly. This simplifie=
-s e.g.
-the addition of support for hardware decompression and different decomp=
-ression
-algorithms.
+Date: Mon, 16 Mar 2009 15:53:30 +0100
+Subject: [PATCH] crypto: compress - Add comp_request.total_out
 
 Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Cc: Phillip Lougher <phillip@lougher.demon.co.uk>
 ---
- fs/squashfs/Kconfig          |    3 +-
- fs/squashfs/block.c          |   70 ++++++++++++++++++++++++----------=
--------
- fs/squashfs/squashfs_fs_sb.h |    2 +-
- fs/squashfs/super.c          |   44 +++++++++++++++++++++-----
- 4 files changed, 80 insertions(+), 39 deletions(-)
+ crypto/testmgr.c          |    4 ++--
+ crypto/zlib.c             |   12 ++++++++++--
+ fs/squashfs/block.c       |   10 +++-------
+ include/crypto/compress.h |   17 +++++++++++------
+ 4 files changed, 26 insertions(+), 17 deletions(-)
 
-diff --git a/fs/squashfs/Kconfig b/fs/squashfs/Kconfig
-index 25a00d1..18e33a6 100644
---- a/fs/squashfs/Kconfig
-+++ b/fs/squashfs/Kconfig
-@@ -1,7 +1,8 @@
- config SQUASHFS
- 	tristate "SquashFS 4.0 - Squashed file system support"
- 	depends on BLOCK
--	select ZLIB_INFLATE
-+	select CRYPTO
-+	select CRYPTO_ZLIB
- 	help
- 	  Saying Y here includes support for SquashFS 4.0 (a Compressed
- 	  Read-Only File System).  Squashfs is a highly compressed read-only
-diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
-index 2a79603..6196821 100644
---- a/fs/squashfs/block.c
-+++ b/fs/squashfs/block.c
-@@ -32,7 +32,8 @@
- #include <linux/mutex.h>
- #include <linux/string.h>
- #include <linux/buffer_head.h>
--#include <linux/zlib.h>
-+
-+#include <crypto/compress.h>
-=20
- #include "squashfs_fs.h"
- #include "squashfs_fs_sb.h"
-@@ -153,7 +154,9 @@ int squashfs_read_data(struct super_block *sb, void=
- **buffer, u64 index,
- 	}
-=20
- 	if (compressed) {
--		int zlib_err =3D 0, zlib_init =3D 0;
-+		int error =3D 0, decomp_init =3D 0;
-+		struct comp_request req;
-+		unsigned int produced =3D 0;
-=20
- 		/*
- 		 * Uncompress block.
-@@ -161,12 +164,13 @@ int squashfs_read_data(struct super_block *sb, vo=
-id **buffer, u64 index,
-=20
- 		mutex_lock(&msblk->read_data_mutex);
-=20
--		msblk->stream.avail_out =3D 0;
--		msblk->stream.avail_in =3D 0;
-+		req.avail_out =3D 0;
-+		req.avail_in =3D 0;
-=20
- 		bytes =3D length;
-+		length =3D 0;
- 		do {
--			if (msblk->stream.avail_in =3D=3D 0 && k < b) {
-+			if (req.avail_in =3D=3D 0 && k < b) {
- 				avail =3D min(bytes, msblk->devblksize - offset);
- 				bytes -=3D avail;
- 				wait_on_buffer(bh[k]);
-@@ -179,45 +183,53 @@ int squashfs_read_data(struct super_block *sb, vo=
-id **buffer, u64 index,
- 					continue;
- 				}
-=20
--				msblk->stream.next_in =3D bh[k]->b_data + offset;
--				msblk->stream.avail_in =3D avail;
-+				req.next_in =3D bh[k]->b_data + offset;
-+				req.avail_in =3D avail;
- 				offset =3D 0;
- 			}
-=20
--			if (msblk->stream.avail_out =3D=3D 0 && page < pages) {
--				msblk->stream.next_out =3D buffer[page++];
--				msblk->stream.avail_out =3D PAGE_CACHE_SIZE;
-+			if (req.avail_out =3D=3D 0 && page < pages) {
-+				req.next_out =3D buffer[page++];
-+				req.avail_out =3D PAGE_CACHE_SIZE;
- 			}
-=20
--			if (!zlib_init) {
--				zlib_err =3D zlib_inflateInit(&msblk->stream);
--				if (zlib_err !=3D Z_OK) {
--					ERROR("zlib_inflateInit returned"
--						" unexpected result 0x%x,"
--						" srclength %d\n", zlib_err,
--						srclength);
-+			if (!decomp_init) {
-+				error =3D crypto_decompress_init(msblk->tfm);
-+				if (error) {
-+					ERROR("crypto_decompress_init "
-+						"returned %d, srclength %d\n",
-+						error, srclength);
- 					goto release_mutex;
- 				}
--				zlib_init =3D 1;
-+				decomp_init =3D 1;
-+			}
-+
-+			produced =3D req.avail_out;
-+			error =3D crypto_decompress_update(msblk->tfm, &req);
-+			if (error) {
-+				ERROR("crypto_decompress_update returned %d, "
-+					"data probably corrupt\n", error);
-+				goto release_mutex;
- 			}
-+			produced -=3D req.avail_out;
-=20
--			zlib_err =3D zlib_inflate(&msblk->stream, Z_SYNC_FLUSH);
-+			length +=3D produced;
-=20
--			if (msblk->stream.avail_in =3D=3D 0 && k < b)
-+			if (req.avail_in =3D=3D 0 && k < b)
- 				put_bh(bh[k++]);
--		} while (zlib_err =3D=3D Z_OK);
-+		} while (bytes || produced);
-=20
--		if (zlib_err !=3D Z_STREAM_END) {
--			ERROR("zlib_inflate error, data probably corrupt\n");
-+		produced =3D req.avail_out;
-+		error =3D crypto_decompress_final(msblk->tfm, &req);
-+		if (error) {
-+			ERROR("crypto_decompress_final returned %d, data "
-+				"probably corrupt\n", error);
- 			goto release_mutex;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b50c3c6..2b112ae 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -927,7 +927,7 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return error;
  		}
-+		produced -=3D req.avail_out;
-+
-+		length +=3D produced;
 =20
--		zlib_err =3D zlib_inflateEnd(&msblk->stream);
--		if (zlib_err !=3D Z_OK) {
--			ERROR("zlib_inflate error, data probably corrupt\n");
--			goto release_mutex;
--		}
--		length =3D msblk->stream.total_out;
- 		mutex_unlock(&msblk->read_data_mutex);
- 	} else {
- 		/*
-diff --git a/fs/squashfs/squashfs_fs_sb.h b/fs/squashfs/squashfs_fs_sb.=
-h
-index c8c6561..4eae75b 100644
---- a/fs/squashfs/squashfs_fs_sb.h
-+++ b/fs/squashfs/squashfs_fs_sb.h
-@@ -64,7 +64,7 @@ struct squashfs_sb_info {
- 	struct mutex		read_data_mutex;
- 	struct mutex		meta_index_mutex;
- 	struct meta_index	*meta_index;
--	z_stream		stream;
-+	struct crypto_pcomp	*tfm;
- 	__le64			*inode_lookup_table;
- 	u64			inode_table;
- 	u64			directory_table;
-diff --git a/fs/squashfs/super.c b/fs/squashfs/super.c
-index 681ec0d..2b63f54 100644
---- a/fs/squashfs/super.c
-+++ b/fs/squashfs/super.c
-@@ -37,11 +37,19 @@
- #include <linux/zlib.h>
- #include <linux/magic.h>
+-		error =3D crypto_compress_init(tfm);
++		error =3D crypto_compress_init(tfm, &req);
+ 		if (error) {
+ 			pr_err("alg: pcomp: compression init failed on test "
+ 			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+@@ -996,7 +996,7 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return error;
+ 		}
 =20
-+#include <crypto/compress.h>
-+
-+#include <net/netlink.h>
-+
- #include "squashfs_fs.h"
- #include "squashfs_fs_sb.h"
- #include "squashfs_fs_i.h"
- #include "squashfs.h"
-=20
-+
-+#define SQUASHFS_CRYPTO_ALG	"zlib"
-+
-+
- static struct file_system_type squashfs_fs_type;
- static struct super_operations squashfs_super_ops;
-=20
-@@ -75,6 +83,16 @@ static int squashfs_fill_super(struct super_block *s=
-b, void *data, int silent)
- 	unsigned short flags;
- 	unsigned int fragments;
- 	u64 lookup_table_start;
-+	struct {
-+		struct nlattr nla;
-+		int val;
-+	} params =3D {
-+		.nla =3D {
-+			.nla_len	=3D nla_attr_size(sizeof(int)),
-+			.nla_type	=3D ZLIB_DECOMP_WINDOWBITS,
-+		},
-+		.val			=3D DEF_WBITS,
-+	};
- 	int err;
-=20
- 	TRACE("Entered squashfs_fill_superblock\n");
-@@ -86,16 +104,25 @@ static int squashfs_fill_super(struct super_block =
-*sb, void *data, int silent)
- 	}
- 	msblk =3D sb->s_fs_info;
-=20
--	msblk->stream.workspace =3D kmalloc(zlib_inflate_workspacesize(),
--		GFP_KERNEL);
--	if (msblk->stream.workspace =3D=3D NULL) {
--		ERROR("Failed to allocate zlib workspace\n");
-+	msblk->tfm =3D crypto_alloc_pcomp(SQUASHFS_CRYPTO_ALG, 0,
-+					CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(msblk->tfm)) {
-+		ERROR("Failed to load %s crypto module\n",
-+		      SQUASHFS_CRYPTO_ALG);
-+		err =3D PTR_ERR(msblk->tfm);
-+		goto failed_pcomp;
-+	}
-+
-+	err =3D crypto_decompress_setup(msblk->tfm, &params, sizeof(params));
-+	if (err) {
-+		ERROR("Failed to set up decompression parameters\n");
- 		goto failure;
- 	}
-=20
- 	sblk =3D kzalloc(sizeof(*sblk), GFP_KERNEL);
- 	if (sblk =3D=3D NULL) {
- 		ERROR("Failed to allocate squashfs_super_block\n");
-+		err =3D -ENOMEM;
- 		goto failure;
- 	}
-=20
-@@ -284,17 +311,18 @@ failed_mount:
- 	kfree(msblk->inode_lookup_table);
- 	kfree(msblk->fragment_index);
- 	kfree(msblk->id_table);
--	kfree(msblk->stream.workspace);
-+	crypto_free_pcomp(msblk->tfm);
- 	kfree(sb->s_fs_info);
- 	sb->s_fs_info =3D NULL;
- 	kfree(sblk);
- 	return err;
-=20
- failure:
--	kfree(msblk->stream.workspace);
-+	crypto_free_pcomp(msblk->tfm);
-+failed_pcomp:
- 	kfree(sb->s_fs_info);
- 	sb->s_fs_info =3D NULL;
--	return -ENOMEM;
-+	return err;
+-		error =3D crypto_decompress_init(tfm);
++		error =3D crypto_decompress_init(tfm, &req);
+ 		if (error) {
+ 			pr_err("alg: pcomp: decompression init failed on test "
+ 			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+diff --git a/crypto/zlib.c b/crypto/zlib.c
+index 33609ba..93ec380 100644
+--- a/crypto/zlib.c
++++ b/crypto/zlib.c
+@@ -125,7 +125,8 @@ static int zlib_compress_setup(struct crypto_pcomp =
+*tfm, void *params,
+ 	return 0;
  }
 =20
+-static int zlib_compress_init(struct crypto_pcomp *tfm)
++static int zlib_compress_init(struct crypto_pcomp *tfm,
++			      struct comp_request *req)
+ {
+ 	int ret;
+ 	struct zlib_ctx *dctx =3D crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
+@@ -135,6 +136,7 @@ static int zlib_compress_init(struct crypto_pcomp *=
+tfm)
+ 	if (ret !=3D Z_OK)
+ 		return -EINVAL;
 =20
-@@ -333,7 +361,7 @@ static void squashfs_put_super(struct super_block *=
-sb)
- 		kfree(sbi->id_table);
- 		kfree(sbi->fragment_index);
- 		kfree(sbi->meta_index);
--		kfree(sbi->stream.workspace);
-+		crypto_free_pcomp(sbi->tfm);
- 		kfree(sb->s_fs_info);
- 		sb->s_fs_info =3D NULL;
- 	}
++	req->total_out =3D 0;
+ 	return 0;
+ }
+=20
+@@ -173,6 +175,7 @@ static int zlib_compress_update(struct crypto_pcomp=
+ *tfm,
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
++	req->total_out =3D stream->total_out;
+ 	return 0;
+ }
+=20
+@@ -203,6 +206,7 @@ static int zlib_compress_final(struct crypto_pcomp =
+*tfm,
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
++	req->total_out =3D stream->total_out;
+ 	return 0;
+ }
+=20
+@@ -239,7 +243,8 @@ static int zlib_decompress_setup(struct crypto_pcom=
+p *tfm, void *params,
+ 	return 0;
+ }
+=20
+-static int zlib_decompress_init(struct crypto_pcomp *tfm)
++static int zlib_decompress_init(struct crypto_pcomp *tfm,
++				struct comp_request *req)
+ {
+ 	int ret;
+ 	struct zlib_ctx *dctx =3D crypto_tfm_ctx(crypto_pcomp_tfm(tfm));
+@@ -249,6 +254,7 @@ static int zlib_decompress_init(struct crypto_pcomp=
+ *tfm)
+ 	if (ret !=3D Z_OK)
+ 		return -EINVAL;
+=20
++	req->total_out =3D 0;
+ 	return 0;
+ }
+=20
+@@ -288,6 +294,7 @@ static int zlib_decompress_update(struct crypto_pco=
+mp *tfm,
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
++	req->total_out =3D stream->total_out;
+ 	return 0;
+ }
+=20
+@@ -336,6 +343,7 @@ static int zlib_decompress_final(struct crypto_pcom=
+p *tfm,
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
++	req->total_out =3D stream->total_out;
+ 	return 0;
+ }
+=20
+diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
+index 6196821..11e19b6 100644
+--- a/fs/squashfs/block.c
++++ b/fs/squashfs/block.c
+@@ -168,7 +168,6 @@ int squashfs_read_data(struct super_block *sb, void=
+ **buffer, u64 index,
+ 		req.avail_in =3D 0;
+=20
+ 		bytes =3D length;
+-		length =3D 0;
+ 		do {
+ 			if (req.avail_in =3D=3D 0 && k < b) {
+ 				avail =3D min(bytes, msblk->devblksize - offset);
+@@ -194,7 +193,8 @@ int squashfs_read_data(struct super_block *sb, void=
+ **buffer, u64 index,
+ 			}
+=20
+ 			if (!decomp_init) {
+-				error =3D crypto_decompress_init(msblk->tfm);
++				error =3D crypto_decompress_init(msblk->tfm,
++							       &req);
+ 				if (error) {
+ 					ERROR("crypto_decompress_init "
+ 						"returned %d, srclength %d\n",
+@@ -213,22 +213,18 @@ int squashfs_read_data(struct super_block *sb, vo=
+id **buffer, u64 index,
+ 			}
+ 			produced -=3D req.avail_out;
+=20
+-			length +=3D produced;
+-
+ 			if (req.avail_in =3D=3D 0 && k < b)
+ 				put_bh(bh[k++]);
+ 		} while (bytes || produced);
+=20
+-		produced =3D req.avail_out;
+ 		error =3D crypto_decompress_final(msblk->tfm, &req);
+ 		if (error) {
+ 			ERROR("crypto_decompress_final returned %d, data "
+ 				"probably corrupt\n", error);
+ 			goto release_mutex;
+ 		}
+-		produced -=3D req.avail_out;
+=20
+-		length +=3D produced;
++		length =3D req.total_out;
+=20
+ 		mutex_unlock(&msblk->read_data_mutex);
+ 	} else {
+diff --git a/include/crypto/compress.h b/include/crypto/compress.h
+index 86163ef..d872c06 100644
+--- a/include/crypto/compress.h
++++ b/include/crypto/compress.h
+@@ -28,6 +28,7 @@ struct comp_request {
+ 	void *next_out;			/* next output byte */
+ 	unsigned int avail_in;		/* bytes available at next_in */
+ 	unsigned int avail_out;		/* bytes available at next_out */
++	size_t total_out;		/* total bytes output so far */
+ };
+=20
+ enum zlib_comp_params {
+@@ -57,14 +58,16 @@ struct crypto_pcomp {
+ struct pcomp_alg {
+ 	int (*compress_setup)(struct crypto_pcomp *tfm, void *params,
+ 			      unsigned int len);
+-	int (*compress_init)(struct crypto_pcomp *tfm);
++	int (*compress_init)(struct crypto_pcomp *tfm,
++			     struct comp_request *req);
+ 	int (*compress_update)(struct crypto_pcomp *tfm,
+ 			       struct comp_request *req);
+ 	int (*compress_final)(struct crypto_pcomp *tfm,
+ 			      struct comp_request *req);
+ 	int (*decompress_setup)(struct crypto_pcomp *tfm, void *params,
+ 				unsigned int len);
+-	int (*decompress_init)(struct crypto_pcomp *tfm);
++	int (*decompress_init)(struct crypto_pcomp *tfm,
++			       struct comp_request *req);
+ 	int (*decompress_update)(struct crypto_pcomp *tfm,
+ 				 struct comp_request *req);
+ 	int (*decompress_final)(struct crypto_pcomp *tfm,
+@@ -102,9 +105,10 @@ static inline int crypto_compress_setup(struct cry=
+pto_pcomp *tfm,
+ 	return crypto_pcomp_alg(tfm)->compress_setup(tfm, params, len);
+ }
+=20
+-static inline int crypto_compress_init(struct crypto_pcomp *tfm)
++static inline int crypto_compress_init(struct crypto_pcomp *tfm,
++				       struct comp_request *req)
+ {
+-	return crypto_pcomp_alg(tfm)->compress_init(tfm);
++	return crypto_pcomp_alg(tfm)->compress_init(tfm, req);
+ }
+=20
+ static inline int crypto_compress_update(struct crypto_pcomp *tfm,
+@@ -125,9 +129,10 @@ static inline int crypto_decompress_setup(struct c=
+rypto_pcomp *tfm,
+ 	return crypto_pcomp_alg(tfm)->decompress_setup(tfm, params, len);
+ }
+=20
+-static inline int crypto_decompress_init(struct crypto_pcomp *tfm)
++static inline int crypto_decompress_init(struct crypto_pcomp *tfm,
++					 struct comp_request *req)
+ {
+-	return crypto_pcomp_alg(tfm)->decompress_init(tfm);
++	return crypto_pcomp_alg(tfm)->decompress_init(tfm, req);
+ }
+=20
+ static inline int crypto_decompress_update(struct crypto_pcomp *tfm,
 --=20
 1.6.0.4
-
 
 With kind regards,
 
