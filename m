@@ -1,89 +1,52 @@
 From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: Re: [WIP/RFC] crypto: add support for Orion5X crypto engine
-Date: Wed, 18 Mar 2009 01:42:43 +0300
-Message-ID: <20090317224243.GA6290@ioremap.net>
-References: <20090317215844.GA23739@Chamillionaire.breakpoint.cc>
+Subject: Re: New kernel hifn795x driver does not play nice with luks
+Date: Wed, 18 Mar 2009 01:47:22 +0300
+Message-ID: <20090317224722.GB6290@ioremap.net>
+References: <20090317221703.562AE233FB@ws5-3.us4.outblaze.com> <20090317223332.GD1795@tatooine.rebelbase.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+To: infected@hellokitty.com, linux-crypto@nl.linux.org,
 	linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cet.com.ru ([195.178.208.66]:50617 "EHLO tservice.net.ru"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1751116AbZCQWm6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Mar 2009 18:42:58 -0400
+Received: from genesysrack.ru ([195.178.208.66]:43374 "EHLO tservice.net.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752465AbZCQWrZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Mar 2009 18:47:25 -0400
 Content-Disposition: inline
-In-Reply-To: <20090317215844.GA23739@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20090317223332.GD1795@tatooine.rebelbase.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi.
+On Tue, Mar 17, 2009 at 11:33:32PM +0100, markus reichelt (ml@mareichelt.de) wrote:
+> > I have encountered a problem with the new HiFn driver in 2.6.27,
+> > cryptsetup and luks.
+> 
+> the mailinglist you posted to mainly deals with loop-aes these days,
+> the dm-crypt/luks/mainline loop-crypto guys for some obscure reason
+> opted to start a mailinglist of the same name at
+> linux-crypto@vger.kernel.org, so you are better off asking there
+> (blame them for confusing people).
+> 
+> CC added, though I guess you need to subscribe to their holy shrine,
+> anyway. And keep in mind that dm-crypt/yada is still beta-code, it's
+> nowhere near stable.
+ 
+What was that?
+Also, ml@mareichelt.de email was not in the proper header, so it does not
+appear in copy list.
+ 
+> > I am able to unlock my luks devices fine, but attempting to mount
+> > the device will result in mount hanging forever (ps shows it as D+,
+> > presumably it's waiting for I/O from the card), forcing me to
+> > manually kill the process. If i then try to close the luks
+> > partition luksClose informs me that the drive is in use. The
+> > hifn_795x module will be locked as well in the process.
+> > 
+> > However, as soon as I disable/remove the hifn_795x module prior to
+> > mounting the device, everything works as it should yet again.
 
-On Tue, Mar 17, 2009 at 10:58:44PM +0100, Sebastian Andrzej Siewior (arm-kernel@ml.breakpoint.cc) wrote:
-> +struct crypto_priv {
-
-Please use less generic names over the file.
-
-> +	void __iomem *reg;
-> +	void __iomem *sram;
-> +	int irq;
-> +	struct task_struct *queue_th;
-> +
-> +	spinlock_t lock;
-> +	struct crypto_queue queue;
-> +	enum engine_status eng_st;
-> +	struct ablkcipher_request *cur_req;
-> +	struct req_progress p;
-> +};
-> +
-> +static struct crypto_priv *cpg;
-> +
-
-This rises several questions: why some of its fields are accessed under
-the lock and others are modified without. Some of them are only used in
-the kernel thread, while others are used in request context.
-Please document locking bits in the code.
-
-> +static void reg_write(void __iomem *mem, u32 val)
-> +{
-> +	__raw_writel(val, mem);
-> +}
-> +
-> +static u32 reg_read(void __iomem *mem)
-> +{
-> +	return __raw_readl(mem);
-> +}
-> +
-
-Seems like you do not like underscores otherwise you would use those
-functions directly.
-
-> +
-> +#define MAX_REQ_SIZE	(8000)
-> +
-
-Parentheses are not needed.
-
-> +irqreturn_t crypto_int(int irq, void *priv)
-> +{
-> +//	struct crypto_priv *cp = priv;
-> +	u32 val;
-> +
-> +	val = reg_read(cpg->reg + SEC_ACCEL_INT_STATUS);
-> +	reg_write(cpg->reg + SEC_ACCEL_INT_MASK, 0);
-
-Why do you ack interrupt before checking if interrupt belongs to
-this driver?
-
-> +	if (!(val & SEC_INT_ACCEL0_DONE))
-> +		return IRQ_NONE;
-> +
-> +	BUG_ON(cpg->eng_st != engine_busy);
-> +	cpg->eng_st = engine_w_dequeue;
-> +	wake_up_process(cpg->queue_th);
-> +	return IRQ_HANDLED;
-> +}
+Please send a dmesg output when card is blocked.
+Thank you.
 
 -- 
 	Evgeniy Polyakov
