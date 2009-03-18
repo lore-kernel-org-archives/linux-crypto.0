@@ -1,55 +1,68 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Accelerate GCM with PCLMULQDQ-NI
-Date: Wed, 18 Mar 2009 16:52:12 +0800
-Message-ID: <1237366332.24215.260.camel@yhuang-dev.sh.intel.com>
+From: Paulius Zaleckas <paulius.zaleckas@teltonika.lt>
+Subject: Re: [WIP/RFC] crypto: add support for Orion5X crypto engine
+Date: Wed, 18 Mar 2009 17:55:17 +0200
+Message-ID: <49C11965.9000200@teltonika.lt>
+References: <20090317215844.GA23739@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-EkkVgnBVuB/dPcXZpoic"
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1755323AbZCRIwe@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+ linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.arm.linux.org.uk>
+In-Reply-To: <20090317215844.GA23739@Chamillionaire.breakpoint.cc>
+List-Unsubscribe: <http://lists.arm.linux.org.uk/mailman/listinfo/linux-arm-kernel>,
+	<mailto:linux-arm-kernel-request@lists.arm.linux.org.uk?subject=unsubscribe>
+List-Archive: <http://lists.arm.linux.org.uk/lurker/list/linux-arm-kernel.html>
+List-Post: <mailto:linux-arm-kernel@lists.arm.linux.org.uk>
+List-Help: <mailto:linux-arm-kernel-request@lists.arm.linux.org.uk?subject=help>
+List-Subscribe: <http://lists.arm.linux.org.uk/mailman/listinfo/linux-arm-kernel>,
+	<mailto:linux-arm-kernel-request@lists.arm.linux.org.uk?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.arm.linux.org.uk
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org+linux-arm-kernel=m.gmane.org@lists.arm.linux.org.uk
 List-Id: linux-crypto.vger.kernel.org
 
+Sebastian Andrzej Siewior wrote:
+> This is version two of the the driver. New things:
+> - aes-ecb passes selftests
+> - aes-cbc passes selftests
+> 
+> The driver still does memcpy() from/to sram. To solve this, a dma driver
+> would be required but first I wanted to compare the performance between
+> now and nothing/generic aes. However I managed to crash cryptsetup with
+> luksOpen. Got look into this...
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+> ---
+>  drivers/crypto/Kconfig      |    9 +
+>  drivers/crypto/Makefile     |    1 +
+>  drivers/crypto/mav_crypto.c |  724 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 734 insertions(+), 0 deletions(-)
+>  create mode 100644 drivers/crypto/mav_crypto.c
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 01afd75..514fe78 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -157,6 +157,15 @@ config S390_PRNG
+>  	  ANSI X9.17 standard. The PRNG is usable via the char device
+>  	  /dev/prandom.
+>  
+> +config CRYPTO_DEV_MARVELL_CRYPTO_ENGINE
 
---=-EkkVgnBVuB/dPcXZpoic
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+CRYPTO_DEV...CRYPTO_ENGINE
+Maybe CRYPTO_DEV_MARVELL would be enough?
 
-Hi,
+> +	tristate "Marvell's Cryptographic Engine"
+> +	depends on PLAT_ORION
+> +	select CRYPTO_ALGAPI
+> +	select CRYPTO_AES
+> +	help
+> +	  This driver allows you utilize the cryptographic engine which can be
+> +	  found on certain SoC like QNAP's TS-209.
+> +
 
-In addition to AES-NI, Intel will provide PCLMULQDQ-NI (carry-less
-multiplication) in future CPU to accelerate GCM mode. The document can
-be found here:
-
-http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-=
-usage-for-computing-the-gcm-mode/
-
-It follows the same design as that of AES-NI, that is, XMM registers are
-used.
-
-To accelerate GCM with it, I make the following design:
-
-1. Implement ghash as an ahash algorithm, Use ghash in gcm
-implementation.
-2. Provide a new implementation of ghash with PCLMULQDQ-NI.
-
-What do you think about that?
-
-Best Regards,
-Huang Ying
-
-
---=-EkkVgnBVuB/dPcXZpoic
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAknAtjMACgkQKhFGF+eHlpgW2gCeOAf4TntXHaISbNu7uTqHvjKe
-oSMAoIw5qb2+9mA87+vqQYtEV5GvLsMa
-=9uRP
------END PGP SIGNATURE-----
-
---=-EkkVgnBVuB/dPcXZpoic--
+-------------------------------------------------------------------
+List admin: http://lists.arm.linux.org.uk/mailman/listinfo/linux-arm-kernel
+FAQ:        http://www.arm.linux.org.uk/mailinglists/faq.php
+Etiquette:  http://www.arm.linux.org.uk/mailinglists/etiquette.php
