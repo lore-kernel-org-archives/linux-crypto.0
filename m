@@ -1,107 +1,35 @@
-From: Sebastian Andrzej Siewior <arm-kernel@breakpoint.cc>
-Subject: Re: [WIP/RFC] crypto: add support for Orion5X crypto engine
-Date: Wed, 18 Mar 2009 22:57:34 +0100
-Message-ID: <20090318215734.GA1473@Chamillionaire.breakpoint.cc>
-References: <20090317215844.GA23739@Chamillionaire.breakpoint.cc> <20090317224243.GA6290@ioremap.net>
+From: "G.Muruganandam" <gmuruga@gdatech.com>
+Subject: Talitos on MPC8548
+Date: Thu, 19 Mar 2009 10:33:37 -0700
+Message-ID: <200903191736.n2JHaCu20819@sierra.gdatech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-arm-kernel@lists.arm.linux.org.uk,
-	linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <zbr@ioremap.net>
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:33526 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932124AbZCRV5j (ORCPT
+Received: from darwaza.gdatech.com ([66.237.41.98]:38821 "EHLO
+	darwaza.gdatech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755409AbZCSRwJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2009 17:57:39 -0400
-Content-Disposition: inline
-In-Reply-To: <20090317224243.GA6290@ioremap.net>
+	Thu, 19 Mar 2009 13:52:09 -0400
+Received: from spamcheck.gdatech.com (localhost.localdomain [127.0.0.1])
+	by spamcheck.gdatech.com (Postfix-out) with ESMTP id 98376328067
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2009 10:33:50 -0700 (PDT)
+Received: from sierra.gdatech.com (sierra.gdatech.com [192.168.200.112])
+	by spamcheck.gdatech.com (Postfix-out) with ESMTP id BBFEE6AC22C
+	for <linux-crypto@vger.kernel.org>;
+	Thu, 19 Mar 2009 10:33:49 -0700 (PDT)
+Received: from gmuruga.gdatech.com (muruga.gdatech.com [192.168.200.165])
+	by sierra.gdatech.com (8.11.6/8.11.6) with ESMTP id n2JHaCu20819
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2009 10:36:12 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Evgeniy Polyakov | 2009-03-18 01:42:43 [+0300]:
+Hello,
 
->Hi.
-Hi Evgeniy,
+I am new this forum and security testing.
+I would like to get a pointer to start testing talitos on the MPC8548 board.
+I have linux kernel 2.6.27.18 running on the custom designed MPC8548 board.
 
->On Tue, Mar 17, 2009 at 10:58:44PM +0100, Sebastian Andrzej Siewior (arm-kernel@ml.breakpoint.cc) wrote:
->> +struct crypto_priv {
->
->Please use less generic names over the file.
-will do.
+Thanks
+G.Muruganandam
 
->> +	void __iomem *reg;
->> +	void __iomem *sram;
->> +	int irq;
->> +	struct task_struct *queue_th;
->> +
->> +	spinlock_t lock;
->> +	struct crypto_queue queue;
->> +	enum engine_status eng_st;
->> +	struct ablkcipher_request *cur_req;
->> +	struct req_progress p;
->> +};
->> +
->> +static struct crypto_priv *cpg;
->> +
->
->This rises several questions: why some of its fields are accessed under
->the lock and others are modified without. Some of them are only used in
->the kernel thread, while others are used in request context.
->Please document locking bits in the code.
-Will do. Right now, I could switch to the _bh spinlock since it is only
-required to access the queue. Earlier I planned to enqueue the first
-request directly on the hw but then I got into the scatter walk.....
-
-
->> +static void reg_write(void __iomem *mem, u32 val)
->> +{
->> +	__raw_writel(val, mem);
->> +}
->> +
->> +static u32 reg_read(void __iomem *mem)
->> +{
->> +	return __raw_readl(mem);
->> +}
->> +
->
->Seems like you do not like underscores otherwise you would use those
->functions directly.
-Yes, I could do so. I wasn't sure whether those are the correct
-functions to access the memory. If there were for some reason I could
-replace them in one place. I switch to __.
-
->> +
->> +#define MAX_REQ_SIZE	(8000)
->> +
->
->Parentheses are not needed.
-yup.
-
->> +irqreturn_t crypto_int(int irq, void *priv)
->> +{
->> +//	struct crypto_priv *cp = priv;
->> +	u32 val;
->> +
->> +	val = reg_read(cpg->reg + SEC_ACCEL_INT_STATUS);
->> +	reg_write(cpg->reg + SEC_ACCEL_INT_MASK, 0);
->
->Why do you ack interrupt before checking if interrupt belongs to
->this driver?
-I don't know. I better fix this.
-
->> +	if (!(val & SEC_INT_ACCEL0_DONE))
->> +		return IRQ_NONE;
->> +
->> +	BUG_ON(cpg->eng_st != engine_busy);
->> +	cpg->eng_st = engine_w_dequeue;
->> +	wake_up_process(cpg->queue_th);
->> +	return IRQ_HANDLED;
->> +}
->
->-- 
->	Evgeniy Polyakov
-
-Thanks for looking over.
-
-Sebastian
