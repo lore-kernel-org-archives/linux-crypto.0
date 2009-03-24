@@ -1,178 +1,492 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.30
-Date: Tue, 24 Mar 2009 12:49:32 +0800
-Message-ID: <20090324044932.GA18245__17721.6213931844$1237870321$gmane$org@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH/RFC] crypto: compress - Return produced bytes in
+ crypto_{,de}compress_{update,final}() (was: Re: [PATCH/RFC] crypto: compress
+ - Add comp_request.total_out (was: Re: [PATCH 6/6] squashfs: Make SquashFS
+ 4 use the new pcomp crypto interface))
+Date: Tue, 24 Mar 2009 17:33:01 +0100 (CET)
+Message-ID: <alpine.LRH.2.00.0903241729540.4446@vixen.sonytel.be>
+References: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-3-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090307104637.GB8731@gondor.apana.org.au>
+ <49B36A18.5030506@lougher.demon.co.uk> <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be> <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:33382 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750721AbZCXEto (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Mar 2009 00:49:44 -0400
-Content-Disposition: inline
-In-Reply-To: <20081225002020.GA2912@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Phillip Lougher <phillip@lougher.demon.co.uk>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1763407AbZCXQdx@vger.kernel.org>
+In-Reply-To: <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Tue, 17 Mar 2009, Geert Uytterhoeven wrote:
+> On Wed, 11 Mar 2009, Geert Uytterhoeven wrote:
+> > On Sun, 8 Mar 2009, Phillip Lougher wrote:
+> > > Two API issues of concern (one major, one minor).  Both of these =
+relate to the
+> > > way Squashfs drives the decompression code, where it repeatedly c=
+alls it
+> > > supplying additional input/output buffers, rather than using a "s=
+ingle-shot"
+> > > approach where it calls the decompression code once supplying all=
+ the
+> > > necessary input and output buffer space.
+> > >=20
+> > > 1. Minor issue -the lack of a stream.total_out field.  The curren=
+t
+> > > zlib_inflate code collects the total number of bytes decompressed=
+ over the
+> > > multiple calls into the stream.total_out field.
+> > >=20
+> > >    There is clearly no such field available in the cryto API, lea=
+ding to the
+> > > somewhat clumsy need to track it, i.e. it leads to the following =
+additional
+> > > code.
+> >=20
+> > If people feel the need for a total_out field, I can add it to stru=
+ct
+> > comp_request.
+> >=20
+> > BTW, what about total_in, which is also provided by plain zlib's z_=
+stream?
+> > Do people see a need for a similar field?
+>=20
+> The patch below (on top of the updated one to convert SquashFS to pco=
+mp) adds
+> comp_request.total_out, so you don't have to calculate and accumulate=
+ the
+> decompressed output sizes in SquashFS.
+>=20
+> Notes:
+>   - This required the addition of a `struct comp_request *' parameter=
+ to
+>     crypto_{,de}compress_init()
+>   - Still, there's one of the=20
+>=20
+> 	produced =3D req.avail_out;
+> 	...
+> 	produced -=3D req.avail_out;
+>=20
+>     left, as this is part of the logic to discover the end of decompr=
+ession
+>     (no bytes produced, no error returned).
+>=20
+> Perhaps it's better to instead make crypto_{,de}compress_{update,fina=
+l}()
+> return the (positive) number of output bytes (of the current step)?
+>=20
+> Currently it returns zero (no error) or a negative error value.
+> That would allow to get rid of both `produced =3D ... / produced -=3D=
+ ...'
+> constructs, but the user would have to accumulate the total output si=
+ze again
+> (which is not such a big deal, IMHO).
 
-Here is the crypto update for 2.6.30:
+Here's an alternative patch, which does exactly that.
+Phillip, what do you think?
 
-* A new compression interface that supports "compress as you go".
- - This includes a patch to move nlattr from net into lib.
-* Support for the Intel AES instruction.
-* More shash algorithm conversions.
-* Multithreaded software crypto through cryptd.
-* AMCC crypto driver.
-* timeriomem RNG driver.
-* Random fixes.
+Thanks for your comments!
 
-Please pull from
+=46rom be7d630f96a85d3ce48716b8e328563ba217647b Mon Sep 17 00:00:00 200=
+1
+=46rom: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Date: Tue, 24 Mar 2009 17:19:05 +0100
+Subject: [PATCH] crypto: compress - Return produced bytes in crypto_{,d=
+e}compress_{update,final}()
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+If crypto_{,de}compress_{update,final}() succeed, return the actual num=
+ber of
+bytes produced instead of zero, so their users don't have to calculate =
+that
+theirselves.
 
-or
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+---
+ crypto/testmgr.c    |  117 ++++++++++++++++++++++++++++++-------------=
+-------
+ crypto/zlib.c       |   24 +++++-----
+ fs/squashfs/block.c |   33 ++++++---------
+ 3 files changed, 95 insertions(+), 79 deletions(-)
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b50c3c6..9cee018 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -914,24 +914,25 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 	const char *algo =3D crypto_tfm_alg_driver_name(crypto_pcomp_tfm(tfm)=
+);
+ 	unsigned int i;
+ 	char result[COMP_BUF_SIZE];
+-	int error;
++	int res;
+=20
+ 	for (i =3D 0; i < ctcount; i++) {
+ 		struct comp_request req;
++		unsigned int produced =3D 0;
+=20
+-		error =3D crypto_compress_setup(tfm, ctemplate[i].params,
+-					      ctemplate[i].paramsize);
+-		if (error) {
++		res =3D crypto_compress_setup(tfm, ctemplate[i].params,
++					    ctemplate[i].paramsize);
++		if (res) {
+ 			pr_err("alg: pcomp: compression setup failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+-		error =3D crypto_compress_init(tfm);
+-		if (error) {
++		res =3D crypto_compress_init(tfm);
++		if (res) {
+ 			pr_err("alg: pcomp: compression init failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+ 		memset(result, 0, sizeof(result));
+@@ -941,32 +942,37 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 		req.next_out =3D result;
+ 		req.avail_out =3D ctemplate[i].outlen / 2;
+=20
+-		error =3D crypto_compress_update(tfm, &req);
+-		if (error && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_compress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: compression update failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Add remaining input data */
+ 		req.avail_in +=3D (ctemplate[i].inlen + 1) / 2;
+=20
+-		error =3D crypto_compress_update(tfm, &req);
+-		if (error && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_compress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: compression update failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Provide remaining output space */
+ 		req.avail_out +=3D COMP_BUF_SIZE - ctemplate[i].outlen / 2;
+=20
+-		error =3D crypto_compress_final(tfm, &req);
+-		if (error) {
++		res =3D crypto_compress_final(tfm, &req);
++		if (res < 0) {
+ 			pr_err("alg: pcomp: compression final failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		produced +=3D res;
+=20
+ 		if (COMP_BUF_SIZE - req.avail_out !=3D ctemplate[i].outlen) {
+ 			pr_err("alg: comp: Compression test %d failed for %s: "
+@@ -976,6 +982,13 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return -EINVAL;
+ 		}
+=20
++		if (produced !=3D ctemplate[i].outlen) {
++			pr_err("alg: comp: Compression test %d failed for %s: "
++			       "returned len =3D %u (expected %d)\n", i + 1,
++			       algo, produced, ctemplate[i].outlen);
++			return -EINVAL;
++		}
++
+ 		if (memcmp(result, ctemplate[i].output, ctemplate[i].outlen)) {
+ 			pr_err("alg: pcomp: Compression test %d failed for "
+ 			       "%s\n", i + 1, algo);
+@@ -986,21 +999,21 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+=20
+ 	for (i =3D 0; i < dtcount; i++) {
+ 		struct comp_request req;
++		unsigned int produced =3D 0;
+=20
+-		error =3D crypto_decompress_setup(tfm, dtemplate[i].params,
+-						dtemplate[i].paramsize);
+-		if (error) {
++		res =3D crypto_decompress_setup(tfm, dtemplate[i].params,
++					      dtemplate[i].paramsize);
++		if (res) {
+ 			pr_err("alg: pcomp: decompression setup failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+-		error =3D crypto_decompress_init(tfm);
+-		if (error) {
++		res =3D crypto_decompress_init(tfm);
++		if (res) {
+ 			pr_err("alg: pcomp: decompression init failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+ 		memset(result, 0, sizeof(result));
+@@ -1010,35 +1023,38 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 		req.next_out =3D result;
+ 		req.avail_out =3D dtemplate[i].outlen / 2;
+=20
+-		error =3D crypto_decompress_update(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression update failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Add remaining input data */
+ 		req.avail_in +=3D (dtemplate[i].inlen + 1) / 2;
+=20
+-		error =3D crypto_decompress_update(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression update failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Provide remaining output space */
+ 		req.avail_out +=3D COMP_BUF_SIZE - dtemplate[i].outlen / 2;
+=20
+-		error =3D crypto_decompress_final(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_final(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression final failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		if (COMP_BUF_SIZE - req.avail_out !=3D dtemplate[i].outlen) {
+ 			pr_err("alg: comp: Decompression test %d failed for "
+@@ -1048,6 +1064,13 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return -EINVAL;
+ 		}
+=20
++		if (produced !=3D dtemplate[i].outlen) {
++			pr_err("alg: comp: Decompression test %d failed for "
++			       "%s: returned len =3D %u (expected %d)\n", i + 1,
++			       algo, produced, dtemplate[i].outlen);
++			return -EINVAL;
++		}
++
+ 		if (memcmp(result, dtemplate[i].output, dtemplate[i].outlen)) {
+ 			pr_err("alg: pcomp: Decompression test %d failed for "
+ 			       "%s\n", i + 1, algo);
+diff --git a/crypto/zlib.c b/crypto/zlib.c
+index 33609ba..c301573 100644
+--- a/crypto/zlib.c
++++ b/crypto/zlib.c
+@@ -165,15 +165,15 @@ static int zlib_compress_update(struct crypto_pco=
+mp *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+ static int zlib_compress_final(struct crypto_pcomp *tfm,
+@@ -195,15 +195,15 @@ static int zlib_compress_final(struct crypto_pcom=
+p *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+=20
+@@ -280,15 +280,15 @@ static int zlib_decompress_update(struct crypto_p=
+comp *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+ static int zlib_decompress_final(struct crypto_pcomp *tfm,
+@@ -328,15 +328,15 @@ static int zlib_decompress_final(struct crypto_pc=
+omp *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+=20
+diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
+index 6196821..433f065 100644
+--- a/fs/squashfs/block.c
++++ b/fs/squashfs/block.c
+@@ -154,9 +154,8 @@ int squashfs_read_data(struct super_block *sb, void=
+ **buffer, u64 index,
+ 	}
+=20
+ 	if (compressed) {
+-		int error =3D 0, decomp_init =3D 0;
++		int res =3D 0, decomp_init =3D 0;
+ 		struct comp_request req;
+-		unsigned int produced =3D 0;
+=20
+ 		/*
+ 		 * Uncompress block.
+@@ -194,41 +193,35 @@ int squashfs_read_data(struct super_block *sb, vo=
+id **buffer, u64 index,
+ 			}
+=20
+ 			if (!decomp_init) {
+-				error =3D crypto_decompress_init(msblk->tfm);
+-				if (error) {
++				res =3D crypto_decompress_init(msblk->tfm);
++				if (res) {
+ 					ERROR("crypto_decompress_init "
+ 						"returned %d, srclength %d\n",
+-						error, srclength);
++						res, srclength);
+ 					goto release_mutex;
+ 				}
+ 				decomp_init =3D 1;
+ 			}
+=20
+-			produced =3D req.avail_out;
+-			error =3D crypto_decompress_update(msblk->tfm, &req);
+-			if (error) {
++			res =3D crypto_decompress_update(msblk->tfm, &req);
++			if (res < 0) {
+ 				ERROR("crypto_decompress_update returned %d, "
+-					"data probably corrupt\n", error);
++					"data probably corrupt\n", res);
+ 				goto release_mutex;
+ 			}
+-			produced -=3D req.avail_out;
+-
+-			length +=3D produced;
++			length +=3D res;
+=20
+ 			if (req.avail_in =3D=3D 0 && k < b)
+ 				put_bh(bh[k++]);
+-		} while (bytes || produced);
++		} while (bytes || res);
+=20
+-		produced =3D req.avail_out;
+-		error =3D crypto_decompress_final(msblk->tfm, &req);
+-		if (error) {
++		res =3D crypto_decompress_final(msblk->tfm, &req);
++		if (res < 0) {
+ 			ERROR("crypto_decompress_final returned %d, data "
+-				"probably corrupt\n", error);
++				"probably corrupt\n", res);
+ 			goto release_mutex;
+ 		}
+-		produced -=3D req.avail_out;
+-
+-		length +=3D produced;
++		length +=3D res;
+=20
+ 		mutex_unlock(&msblk->read_data_mutex);
+ 	} else {
+--=20
+1.6.0.4
 
 
-Adrian-Ken Rueegsegger (1):
-      crypto: Fix dead links
+With kind regards,
 
-Alexander Clouter (1):
-      hwrng: timeriomem - New driver
+Geert Uytterhoeven
+Software Architect
 
-Geert Uytterhoeven (5):
-      netlink: Move netlink attribute parsing support to lib
-      crypto: compress - Add pcomp interface
-      crypto: testmgr - Add support for the pcomp interface
-      crypto: zlib - New zlib crypto module, using pcomp
-      crypto: testmgr - add zlib test
+Sony Techsoft Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
 
-Heiko Carstens (1):
-      hwrng: timeriomem - Breaks an allyesconfig build on s390:
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
 
-Herbert Xu (10):
-      crypto: shash - Remove superfluous check in init_tfm
-      crypto: shash - Add crypto_shash_blocksize
-      crypto: sha-s390 - Switch to shash
-      crypto: api - crypto_alg_mod_lookup either tested or untested
-      crypto: api - Fix crypto_alloc_tfm/create_create_tfm return convention
-      crypto: skcipher - Avoid infinite loop when cipher fails selftest
-      crypto: aead - Avoid infinite loop when nivaead fails selftest
-      crypto: testmgr - Test skciphers with no IVs
-      nlattr: Fix build error with NET off
-      crypto: sha512-s390 - Add missing block size
-
-Huang Ying (7):
-      crypto: aes - Move key_length in struct crypto_aes_ctx to be the last field
-      crypto: aes - Export x86 AES encrypt/decrypt functions
-      crypto: cryptd - Add support to access underlying blkcipher
-      crypto: aes-ni - Add support to Intel AES-NI instructions for x86_64 platform
-      crypto: api - Use dedicated workqueue for crypto subsystem
-      crypto: cryptd - Per-CPU thread implementation based on kcrypto_wq
-      crypto: chainiv - Use kcrypto_wq instead of keventd_wq
-
-James Hsiao (1):
-      crypto: amcc - Add crypt4xx driver
-
-Neil Horman (3):
-      crypto: ansi_cprng - Force reset on allocation
-      crypto: ansi_cprng - Panic on CPRNG test failure when in FIPS mode
-      crypto: ansi_cprng - Add maintainer
-
- MAINTAINERS                             |    6 +
- arch/powerpc/boot/dts/canyonlands.dts   |    7 +
- arch/powerpc/boot/dts/kilauea.dts       |    7 +
- arch/s390/crypto/sha.h                  |    6 +-
- arch/s390/crypto/sha1_s390.c            |   40 +-
- arch/s390/crypto/sha256_s390.c          |   40 +-
- arch/s390/crypto/sha512_s390.c          |   81 +-
- arch/s390/crypto/sha_common.c           |   20 +-
- arch/x86/crypto/Makefile                |    3 +
- arch/x86/crypto/aes-i586-asm_32.S       |   18 +-
- arch/x86/crypto/aes-x86_64-asm_64.S     |    6 +-
- arch/x86/crypto/aes_glue.c              |   20 +-
- arch/x86/crypto/aesni-intel_asm.S       |  896 +++++++++++++++++++++
- arch/x86/crypto/aesni-intel_glue.c      |  461 +++++++++++
- arch/x86/include/asm/aes.h              |   11 +
- arch/x86/include/asm/cpufeature.h       |    1 +
- crypto/Kconfig                          |   44 +
- crypto/Makefile                         |    5 +
- crypto/ablkcipher.c                     |   19 +
- crypto/aead.c                           |   16 +
- crypto/algboss.c                        |   20 +-
- crypto/ansi_cprng.c                     |   17 +-
- crypto/api.c                            |   17 +-
- crypto/blkcipher.c                      |    2 +-
- crypto/chainiv.c                        |    3 +-
- crypto/cryptd.c                         |  237 +++---
- crypto/crypto_wq.c                      |   38 +
- crypto/gf128mul.c                       |    2 +-
- crypto/internal.h                       |    6 +-
- crypto/pcompress.c                      |   97 +++
- crypto/sha256_generic.c                 |    2 +-
- crypto/shash.c                          |   20 +-
- crypto/tcrypt.c                         |    6 +-
- crypto/testmgr.c                        |  198 +++++
- crypto/testmgr.h                        |  147 ++++
- crypto/zlib.c                           |  378 +++++++++
- drivers/char/hw_random/Kconfig          |   14 +
- drivers/char/hw_random/Makefile         |    1 +
- drivers/char/hw_random/timeriomem-rng.c |  151 ++++
- drivers/crypto/Kconfig                  |   15 +-
- drivers/crypto/Makefile                 |    1 +
- drivers/crypto/amcc/Makefile            |    2 +
- drivers/crypto/amcc/crypto4xx_alg.c     |  293 +++++++
- drivers/crypto/amcc/crypto4xx_core.c    | 1310 +++++++++++++++++++++++++++++++
- drivers/crypto/amcc/crypto4xx_core.h    |  177 +++++
- drivers/crypto/amcc/crypto4xx_reg_def.h |  284 +++++++
- drivers/crypto/amcc/crypto4xx_sa.c      |  108 +++
- drivers/crypto/amcc/crypto4xx_sa.h      |  243 ++++++
- include/crypto/aes.h                    |    6 +-
- include/crypto/compress.h               |  145 ++++
- include/crypto/cryptd.h                 |   27 +
- include/crypto/crypto_wq.h              |    7 +
- include/crypto/hash.h                   |    5 +
- include/crypto/internal/compress.h      |   28 +
- include/linux/crypto.h                  |    4 +-
- include/linux/timeriomem-rng.h          |   21 +
- lib/Kconfig                             |    6 +
- lib/Makefile                            |    2 +
- net/netlink/attr.c => lib/nlattr.c      |   20 +-
- net/Kconfig                             |    1 +
- net/netlink/Makefile                    |    2 +-
- 61 files changed, 5506 insertions(+), 264 deletions(-)
- create mode 100644 arch/x86/crypto/aesni-intel_asm.S
- create mode 100644 arch/x86/crypto/aesni-intel_glue.c
- create mode 100644 arch/x86/include/asm/aes.h
- create mode 100644 crypto/crypto_wq.c
- create mode 100644 crypto/pcompress.c
- create mode 100644 crypto/zlib.c
- create mode 100644 drivers/char/hw_random/timeriomem-rng.c
- create mode 100644 drivers/crypto/amcc/Makefile
- create mode 100644 drivers/crypto/amcc/crypto4xx_alg.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_core.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_reg_def.h
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.c
- create mode 100644 drivers/crypto/amcc/crypto4xx_sa.h
- create mode 100644 include/crypto/compress.h
- create mode 100644 include/crypto/cryptd.h
- create mode 100644 include/crypto/crypto_wq.h
- create mode 100644 include/crypto/internal/compress.h
- create mode 100644 include/linux/timeriomem-rng.h
- rename net/netlink/attr.c => lib/nlattr.c (99%)
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
