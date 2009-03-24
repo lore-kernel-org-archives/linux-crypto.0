@@ -1,153 +1,178 @@
-From: "G.Muruganandam" <gmuruga@gdatech.com>
-Subject: Re: Talitos on MPC8548
-Date: Mon, 23 Mar 2009 18:05:39 -0700
-Message-ID: <200903240108.n2O185u14889@sierra.gdatech.com>
-References: <200903191736.n2JHaCu20819@sierra.gdatech.com>
-	<49C379E0.2090709@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 2.6.30
+Date: Tue, 24 Mar 2009 12:49:32 +0800
+Message-ID: <20090324044932.GA18245__17721.6213931844$1237870321$gmane$org@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Cc: <lee.nipper@gmail.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from darwaza.gdatech.com ([66.237.41.98]:53058 "EHLO
-	darwaza.gdatech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753183AbZCXBFm (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:33382 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750721AbZCXEto (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Mar 2009 21:05:42 -0400
-In-Reply-To: <49C379E0.2090709@gmail.com>
-References: <200903191736.n2JHaCu20819@sierra.gdatech.com>
-	<49C379E0.2090709@gmail.com>
+	Tue, 24 Mar 2009 00:49:44 -0400
+Content-Disposition: inline
+In-Reply-To: <20081225002020.GA2912@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Lee,
+Hi Linus:
 
-Thanks for the details on the talitos patch.
-I followed the steps and applied the patches.
-I am able to rebuild the kernel without any issues.
+Here is the crypto update for 2.6.30:
 
-After going through the docs and some googling,
-I am planning to use the following topologies using
-MPC8548 boards ( I have two boards )
-To start with, I'll use the topology I . Pl let me know
-your comments.
+* A new compression interface that supports "compress as you go".
+ - This includes a patch to move nlattr from net into lib.
+* Support for the Intel AES instruction.
+* More shash algorithm conversions.
+* Multithreaded software crypto through cryptd.
+* AMCC crypto driver.
+* timeriomem RNG driver.
+* Random fixes.
 
+Please pull from
 
-Topology -I:
-========
-                                           10.15.109.101 
-10.15.109.100
-Host A--------------------------MPC8548 -----------------------------Host B
-192.168.50.5         192.168.50.1
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
+or
 
-Topology-II:
-========
-                                      10.15.109.101     10.15.109.100
-Host----------------------MPC8548-1--------------------MPC8548-2-----------Host
-192.168.50.5     192.168.50.1 
-192.168.1.1        192.168.1.10
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
 
-Thanks
-G.Muruganandam
+Adrian-Ken Rueegsegger (1):
+      crypto: Fix dead links
 
+Alexander Clouter (1):
+      hwrng: timeriomem - New driver
 
-G.Muruganandam wrote:
+Geert Uytterhoeven (5):
+      netlink: Move netlink attribute parsing support to lib
+      crypto: compress - Add pcomp interface
+      crypto: testmgr - Add support for the pcomp interface
+      crypto: zlib - New zlib crypto module, using pcomp
+      crypto: testmgr - add zlib test
 
- >> 4) You should have better IPsec performance if you add the 
-talitos patches made since
- >>     2.6.27 which are in the mainline kernel tree. (Linux 
-2.6.29-rc8 includes 7 extra patches).
- >>     These could be added to 2.6.27.18 easily.
+Heiko Carstens (1):
+      hwrng: timeriomem - Breaks an allyesconfig build on s390:
 
- > I tried applying the patch that you mentioned above. But I am 
-encountering issue while
- > applying the same. Pl see below the command that I used and 
-corresponding output.
+Herbert Xu (10):
+      crypto: shash - Remove superfluous check in init_tfm
+      crypto: shash - Add crypto_shash_blocksize
+      crypto: sha-s390 - Switch to shash
+      crypto: api - crypto_alg_mod_lookup either tested or untested
+      crypto: api - Fix crypto_alloc_tfm/create_create_tfm return convention
+      crypto: skcipher - Avoid infinite loop when cipher fails selftest
+      crypto: aead - Avoid infinite loop when nivaead fails selftest
+      crypto: testmgr - Test skciphers with no IVs
+      nlattr: Fix build error with NET off
+      crypto: sha512-s390 - Add missing block size
 
- > [linux-2.6.27.18]$ patch -p1 -E --dry-run < patch-2.6.29-rc8
+Huang Ying (7):
+      crypto: aes - Move key_length in struct crypto_aes_ctx to be the last field
+      crypto: aes - Export x86 AES encrypt/decrypt functions
+      crypto: cryptd - Add support to access underlying blkcipher
+      crypto: aes-ni - Add support to Intel AES-NI instructions for x86_64 platform
+      crypto: api - Use dedicated workqueue for crypto subsystem
+      crypto: cryptd - Per-CPU thread implementation based on kcrypto_wq
+      crypto: chainiv - Use kcrypto_wq instead of keventd_wq
 
-That's not what I intended. patch-2.6.29-rc8 has more
-patches than you want.
-What I meant was to apply only the talitos patches since 2.6.27
-to a 2.6.27.18 kernel.
+James Hsiao (1):
+      crypto: amcc - Add crypt4xx driver
 
-It's easier if you use git, the SCM tool used by linux.
-The more you work with linux, the more valuable git skills will become.
+Neil Horman (3):
+      crypto: ansi_cprng - Force reset on allocation
+      crypto: ansi_cprng - Panic on CPRNG test failure when in FIPS mode
+      crypto: ansi_cprng - Add maintainer
 
-I am attaching an archive with the patches I had intended.
-You can apply the patches to the 2.6.27.18 kernel
-that you are working with.
+ MAINTAINERS                             |    6 +
+ arch/powerpc/boot/dts/canyonlands.dts   |    7 +
+ arch/powerpc/boot/dts/kilauea.dts       |    7 +
+ arch/s390/crypto/sha.h                  |    6 +-
+ arch/s390/crypto/sha1_s390.c            |   40 +-
+ arch/s390/crypto/sha256_s390.c          |   40 +-
+ arch/s390/crypto/sha512_s390.c          |   81 +-
+ arch/s390/crypto/sha_common.c           |   20 +-
+ arch/x86/crypto/Makefile                |    3 +
+ arch/x86/crypto/aes-i586-asm_32.S       |   18 +-
+ arch/x86/crypto/aes-x86_64-asm_64.S     |    6 +-
+ arch/x86/crypto/aes_glue.c              |   20 +-
+ arch/x86/crypto/aesni-intel_asm.S       |  896 +++++++++++++++++++++
+ arch/x86/crypto/aesni-intel_glue.c      |  461 +++++++++++
+ arch/x86/include/asm/aes.h              |   11 +
+ arch/x86/include/asm/cpufeature.h       |    1 +
+ crypto/Kconfig                          |   44 +
+ crypto/Makefile                         |    5 +
+ crypto/ablkcipher.c                     |   19 +
+ crypto/aead.c                           |   16 +
+ crypto/algboss.c                        |   20 +-
+ crypto/ansi_cprng.c                     |   17 +-
+ crypto/api.c                            |   17 +-
+ crypto/blkcipher.c                      |    2 +-
+ crypto/chainiv.c                        |    3 +-
+ crypto/cryptd.c                         |  237 +++---
+ crypto/crypto_wq.c                      |   38 +
+ crypto/gf128mul.c                       |    2 +-
+ crypto/internal.h                       |    6 +-
+ crypto/pcompress.c                      |   97 +++
+ crypto/sha256_generic.c                 |    2 +-
+ crypto/shash.c                          |   20 +-
+ crypto/tcrypt.c                         |    6 +-
+ crypto/testmgr.c                        |  198 +++++
+ crypto/testmgr.h                        |  147 ++++
+ crypto/zlib.c                           |  378 +++++++++
+ drivers/char/hw_random/Kconfig          |   14 +
+ drivers/char/hw_random/Makefile         |    1 +
+ drivers/char/hw_random/timeriomem-rng.c |  151 ++++
+ drivers/crypto/Kconfig                  |   15 +-
+ drivers/crypto/Makefile                 |    1 +
+ drivers/crypto/amcc/Makefile            |    2 +
+ drivers/crypto/amcc/crypto4xx_alg.c     |  293 +++++++
+ drivers/crypto/amcc/crypto4xx_core.c    | 1310 +++++++++++++++++++++++++++++++
+ drivers/crypto/amcc/crypto4xx_core.h    |  177 +++++
+ drivers/crypto/amcc/crypto4xx_reg_def.h |  284 +++++++
+ drivers/crypto/amcc/crypto4xx_sa.c      |  108 +++
+ drivers/crypto/amcc/crypto4xx_sa.h      |  243 ++++++
+ include/crypto/aes.h                    |    6 +-
+ include/crypto/compress.h               |  145 ++++
+ include/crypto/cryptd.h                 |   27 +
+ include/crypto/crypto_wq.h              |    7 +
+ include/crypto/hash.h                   |    5 +
+ include/crypto/internal/compress.h      |   28 +
+ include/linux/crypto.h                  |    4 +-
+ include/linux/timeriomem-rng.h          |   21 +
+ lib/Kconfig                             |    6 +
+ lib/Makefile                            |    2 +
+ net/netlink/attr.c => lib/nlattr.c      |   20 +-
+ net/Kconfig                             |    1 +
+ net/netlink/Makefile                    |    2 +-
+ 61 files changed, 5506 insertions(+), 264 deletions(-)
+ create mode 100644 arch/x86/crypto/aesni-intel_asm.S
+ create mode 100644 arch/x86/crypto/aesni-intel_glue.c
+ create mode 100644 arch/x86/include/asm/aes.h
+ create mode 100644 crypto/crypto_wq.c
+ create mode 100644 crypto/pcompress.c
+ create mode 100644 crypto/zlib.c
+ create mode 100644 drivers/char/hw_random/timeriomem-rng.c
+ create mode 100644 drivers/crypto/amcc/Makefile
+ create mode 100644 drivers/crypto/amcc/crypto4xx_alg.c
+ create mode 100644 drivers/crypto/amcc/crypto4xx_core.c
+ create mode 100644 drivers/crypto/amcc/crypto4xx_core.h
+ create mode 100644 drivers/crypto/amcc/crypto4xx_reg_def.h
+ create mode 100644 drivers/crypto/amcc/crypto4xx_sa.c
+ create mode 100644 drivers/crypto/amcc/crypto4xx_sa.h
+ create mode 100644 include/crypto/compress.h
+ create mode 100644 include/crypto/cryptd.h
+ create mode 100644 include/crypto/crypto_wq.h
+ create mode 100644 include/crypto/internal/compress.h
+ create mode 100644 include/linux/timeriomem-rng.h
+ rename net/netlink/attr.c => lib/nlattr.c (99%)
 
-Save the archive above your linux-2.6.7.18 directory, then apply
-the patches one at a time.  You can't use --dry-run because subsequent
-patches depend on previous ones.
-
-Here is how I would do it:
-
-lee $ tar zxf talitos-since-2.6.27.tar.gz
-lee $ cd linux-2.6.27.18
-linux-2.6.27.18 $ for file in ../talitos-since-2.6.27/*
- > do
- > patch -p1 -i $file
- > done
-patching file drivers/crypto/talitos.c
-patching file drivers/crypto/talitos.c
-patching file drivers/crypto/talitos.c
-patching file drivers/crypto/talitos.h
-patching file drivers/crypto/talitos.c
-patching file drivers/crypto/talitos.h
-patching file drivers/crypto/talitos.c
-patching file crypto/fcrypt.c
-patching file drivers/crypto/talitos.h
-patching file drivers/crypto/talitos.c
-linux-2.6.27.18 $
-
-After doing the above, your kernel directory
-has all the latest talitos patches applied.
-
-Hope your testing goes well.
-
--Lee
-
-
-
-
-
-At 04:11 AM 3/20/2009, Lee Nipper wrote:
->On Thu, Mar 19, 2009, G.Muruganandam <gmuruga@gdatech.com> wrote:
->
-> > I would like to get a pointer to start testing talitos on the 
-> MPC8548 board.
-> > I have linux kernel 2.6.27.18 running on the custom designed MPC8548 board.
->
->This is how I would approach it:
->
->1) Look at the custom board's .dts file
->     and make sure it has a crypto section with properties
->     which match those in arch/powerpc/boot/dts/mpc8548cds.dts
->     from 2.6.27.18.
->
->2) talitos in 2.6.27.18 implements only ESP IPsec algorithms.
->     So if you need h/w accelerated plain cipher or digest
->     algorithms,there are not there.
->
->3) If IPsec is what you are interested in using, talitos implements
->     aes-cbc and 3des-cbc encryption, and hmac-sha1 & -sha256
->     & -md5 authentication. You can try it in 2.6.27.18.
->     Turn on the necessary CRYPTO kernel options as well
->     as applicable IPsec options.
->
->4) For better IPsec performance, add the talitos patches made since
->     2.6.27 which are in the mainline kernel tree.
->     (Linux 2.6.29-rc8 includes 7 extra patches).
->     These could be added to 2.6.27.18 easily.
->
->Lee
->
->--
->To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
