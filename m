@@ -1,62 +1,76 @@
-From: Lee Nipper <lee.nipper@gmail.com>
-Subject: Re: [PATCH] crypto: talitos - protect against possible null ptr upon
-	error
-Date: Tue, 24 Mar 2009 23:06:16 -0500
-Message-ID: <eabe9a7b0903242106t14d11946ydd62e450f4803216@mail.gmail.com>
-References: <1237166510-7312-1-git-send-email-lee.nipper@gmail.com>
-	 <20090324162345.4b1b94d2.kim.phillips@freescale.com>
-Reply-To: lee.nipper@gmail.com
+From: Phillip Lougher <phillip@lougher.demon.co.uk>
+Subject: Re: [PATCH/RFC] crypto: compress - Return produced bytes in crypto_{,de}compress_{update,final}()
+ (was: Re: [PATCH/RFC] crypto: compress - Add comp_request.total_out
+Date: Wed, 25 Mar 2009 10:12:38 +0000
+Message-ID: <49CA0396.20705@lougher.demon.co.uk>
+References: <1235569394-15217-1-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-2-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-3-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090307104637.GB8731@gondor.apana.org.au> <49B36A18.5030506@lougher.demon.co.uk> <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be> <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be> <alpine.LRH.2.00.0903241729540.4446@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f169.google.com ([209.85.218.169]:37151 "EHLO
-	mail-bw0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750996AbZCYEGT (ORCPT
+Received: from anchor-post-1.mail.demon.net ([195.173.77.132]:64967 "EHLO
+	anchor-post-1.mail.demon.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753086AbZCYKMl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Mar 2009 00:06:19 -0400
-Received: by bwz17 with SMTP id 17so2499977bwz.37
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2009 21:06:16 -0700 (PDT)
-In-Reply-To: <20090324162345.4b1b94d2.kim.phillips@freescale.com>
+	Wed, 25 Mar 2009 06:12:41 -0400
+In-Reply-To: <alpine.LRH.2.00.0903241729540.4446@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 24, 2009 at 16:23, Kim Phillips <kim.phillips@freescale.com> wrote:
-> On Sun, 15 Mar 2009 20:21:47 -0500
-> Lee Nipper <lee.nipper@gmail.com> wrote:
->
->> Added test for null descriptor returned from current_desc.
->> Also removed the diagnostic from current_desc,
->> and added one instead in talitos_error
->> to report an EU error without finding the descriptor.
->
-> Hi Lee, thanks for this - I'm not clear on how the channel error gets
-> triggered, points to an EU, and all of this without a referencing a
-> current descriptor.
+Geert Uytterhoeven wrote:
+> On Tue, 17 Mar 2009, Geert Uytterhoeven wrote:
+>> On Wed, 11 Mar 2009, Geert Uytterhoeven wrote:
+>>> On Sun, 8 Mar 2009, Phillip Lougher wrote:
+>>>> Two API issues of concern (one major, one minor).  Both of these relate to the
+>>>> way Squashfs drives the decompression code, where it repeatedly calls it
+>>>> supplying additional input/output buffers, rather than using a "single-shot"
+>>>> approach where it calls the decompression code once supplying all the
+>>>> necessary input and output buffer space.
+>>>>
+>>>> 1. Minor issue -the lack of a stream.total_out field.  The current
+>>>> zlib_inflate code collects the total number of bytes decompressed over the
+>>>> multiple calls into the stream.total_out field.
+>>>>
+>>>>    There is clearly no such field available in the cryto API, leading to the
+>>>> somewhat clumsy need to track it, i.e. it leads to the following additional
+>>>> code.
+>>> If people feel the need for a total_out field, I can add it to struct
+>>> comp_request.
+>>>
+>>> BTW, what about total_in, which is also provided by plain zlib's z_stream?
+>>> Do people see a need for a similar field?
+>> The patch below (on top of the updated one to convert SquashFS to pcomp) adds
+>> comp_request.total_out, so you don't have to calculate and accumulate the
+>> decompressed output sizes in SquashFS.
+>>
+>> Notes:
+>>   - This required the addition of a `struct comp_request *' parameter to
+>>     crypto_{,de}compress_init()
+>>   - Still, there's one of the 
+>>
+>> 	produced = req.avail_out;
+>> 	...
+>> 	produced -= req.avail_out;
+>>
+>>     left, as this is part of the logic to discover the end of decompression
+>>     (no bytes produced, no error returned).
+>>
+>> Perhaps it's better to instead make crypto_{,de}compress_{update,final}()
+>> return the (positive) number of output bytes (of the current step)?
+>>
+>> Currently it returns zero (no error) or a negative error value.
+>> That would allow to get rid of both `produced = ... / produced -= ...'
+>> constructs, but the user would have to accumulate the total output size again
+>> (which is not such a big deal, IMHO).
+> 
+> Here's an alternative patch, which does exactly that.
+> Phillip, what do you think?
+> 
 
-I don't remember the exact case when I observed it,  but I did.
-In any case, it seemed the code needed the protection against the
-failed look up case (prevent null pointer use).
+ From a quick look, it looks OK :-)  I'm not ignoring this, but I'm trying to get a release of
+the 4.0 tools finished ASAP (now 2.6.29 is out).
 
-> How did you run into this case?
-
-I had a misconfigured descriptor (I think), and the problem case is
-not in the code.
-
-> Assuming one does
-> get propagated back, what error status does the callback receive?
-
-Ug.  If I were still at Freescale and had access to my logs, I could
-answer with detail,  But that's not the case.
-
-> afaict, interrupt mitigation should not be intervening in this case.
->
-
-That's right.
-The interrupt with error status was occurring, and it was handling it
-during the isr..
-
-Thanks,
-Lee
+Phillip
