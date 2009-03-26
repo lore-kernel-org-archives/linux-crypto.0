@@ -1,42 +1,40 @@
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: [PATCH] crypto: pcomp - pcompress.c should include <crypto/internal/compress.h>
-Date: Wed, 25 Mar 2009 16:17:18 +0100
-Message-ID: <1237994238-3545-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
-References: <1237994238-3545-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
-Cc: linux-crypto@vger.kernel.org,
-	Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Yehuda Sadeh <yehuda@hq.newdream.net>
+Subject: [PATCH] shash: fix unaligned calculation with short length
+Date: Thu, 26 Mar 2009 14:12:21 -0700
+Message-ID: <1238101941-12859-1-git-send-email-yehuda@hq.newdream.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Yehuda Sadeh <yehuda@hq.newdream.net>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:59401 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755135AbZCYPRW (ORCPT
+Received: from mail.hq.newdream.net ([66.33.206.127]:58985 "EHLO
+	mail.hq.newdream.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754109AbZCZV3f (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Mar 2009 11:17:22 -0400
-In-Reply-To: <1237994238-3545-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	Thu, 26 Mar 2009 17:29:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-make C=1:
-| crypto/pcompress.c:77:5: warning: symbol 'crypto_register_pcomp' was not declared. Should it be static?
-| crypto/pcompress.c:89:5: warning: symbol 'crypto_unregister_pcomp' was not declared. Should it be static?
+When the total length is shorter than the calculated number of unaligned bytes, the call to shash->update breaks. For example, calling crc32c on unaligned buffer with length of 1 can result in a system crash.
 
-Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Signed-off-by: Yehuda Sadeh <yehuda@hq.newdream.net>
 ---
- crypto/pcompress.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ crypto/shash.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/pcompress.c b/crypto/pcompress.c
-index ca9a4af..bcadc03 100644
---- a/crypto/pcompress.c
-+++ b/crypto/pcompress.c
-@@ -26,6 +26,7 @@
- #include <linux/string.h>
+diff --git a/crypto/shash.c b/crypto/shash.c
+index d5a2b61..6792a67 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -82,6 +82,9 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 	u8 buf[shash_align_buffer_size(unaligned_len, alignmask)]
+ 		__attribute__ ((aligned));
  
- #include <crypto/compress.h>
-+#include <crypto/internal/compress.h>
++	if (unaligned_len > len)
++		unaligned_len = len;
++
+ 	memcpy(buf, data, unaligned_len);
  
- #include "internal.h"
- 
+ 	return shash->update(desc, buf, unaligned_len) ?:
 -- 
-1.6.0.4
+1.5.6.5
 
