@@ -1,40 +1,31 @@
-From: Yehuda Sadeh <yehuda@hq.newdream.net>
-Subject: [PATCH] shash: fix unaligned calculation with short length
-Date: Thu, 26 Mar 2009 14:12:21 -0700
-Message-ID: <1238101941-12859-1-git-send-email-yehuda@hq.newdream.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Yehuda Sadeh <yehuda@hq.newdream.net>
-To: herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] shash: fix unaligned calculation with short length
+Date: Fri, 27 Mar 2009 13:04:25 +0800
+Message-ID: <20090327050424.GB26198@gondor.apana.org.au>
+References: <1238101941-12859-1-git-send-email-yehuda@hq.newdream.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Yehuda Sadeh <yehuda@hq.newdream.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.hq.newdream.net ([66.33.206.127]:58985 "EHLO
-	mail.hq.newdream.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754109AbZCZV3f (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:48213 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751702AbZC0FE2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Mar 2009 17:29:35 -0400
+	Fri, 27 Mar 2009 01:04:28 -0400
+Content-Disposition: inline
+In-Reply-To: <1238101941-12859-1-git-send-email-yehuda@hq.newdream.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When the total length is shorter than the calculated number of unaligned bytes, the call to shash->update breaks. For example, calling crc32c on unaligned buffer with length of 1 can result in a system crash.
+On Thu, Mar 26, 2009 at 02:12:21PM -0700, Yehuda Sadeh wrote:
+> When the total length is shorter than the calculated number of unaligned bytes, the call to shash->update breaks. For example, calling crc32c on unaligned buffer with length of 1 can result in a system crash.
+> 
+> Signed-off-by: Yehuda Sadeh <yehuda@hq.newdream.net>
 
-Signed-off-by: Yehuda Sadeh <yehuda@hq.newdream.net>
----
- crypto/shash.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
-
-diff --git a/crypto/shash.c b/crypto/shash.c
-index d5a2b61..6792a67 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -82,6 +82,9 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 	u8 buf[shash_align_buffer_size(unaligned_len, alignmask)]
- 		__attribute__ ((aligned));
- 
-+	if (unaligned_len > len)
-+		unaligned_len = len;
-+
- 	memcpy(buf, data, unaligned_len);
- 
- 	return shash->update(desc, buf, unaligned_len) ?:
+Ouch! Thanks for fixing this!  Applied to crpyto-2.6.
 -- 
-1.5.6.5
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
