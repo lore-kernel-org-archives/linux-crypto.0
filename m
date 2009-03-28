@@ -1,107 +1,42 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 4/5] crypto: talitos - containerof related codingstyle
-Date: Fri, 27 Mar 2009 22:57:42 -0500
-Message-ID: <20090327225742.2b923d8d.kim.phillips@freescale.com>
+Subject: [PATCH 5/5] crypto: talitos - avoid unnecessary decrypt check
+Date: Fri, 27 Mar 2009 22:57:54 -0500
+Message-ID: <20090327225754.06f8732a.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, Lee Nipper <lee.nipper@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:44990 "EHLO
+Received: from az33egw02.freescale.net ([192.88.158.103]:44991 "EHLO
 	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756399AbZC1DqS (ORCPT
+	with ESMTP id S1756793AbZC1Dqb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Mar 2009 23:46:18 -0400
+	Fri, 27 Mar 2009 23:46:31 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-no functional changes.
+the ICV check bit only gets set in decrypt entry points
 
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/talitos.c |   26 ++++++++++++++++----------
- 1 files changed, 16 insertions(+), 10 deletions(-)
+ drivers/crypto/talitos.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index a073e6b..1cc1c41 100644
+index 1cc1c41..c70775f 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -841,13 +841,14 @@ static void ipsec_esp_encrypt_done(struct device *dev,
- 				   int err)
- {
- 	struct aead_request *areq = context;
--	struct talitos_edesc *edesc =
--		 container_of(desc, struct talitos_edesc, desc);
- 	struct crypto_aead *authenc = crypto_aead_reqtfm(areq);
- 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct talitos_edesc *edesc;
- 	struct scatterlist *sg;
- 	void *icvdata;
+@@ -1010,8 +1010,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	} else {
+ 		sg_link_tbl_len = cryptlen;
  
-+	edesc = container_of(desc, struct talitos_edesc, desc);
-+
- 	ipsec_esp_unmap(dev, edesc, areq);
+-		if ((edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV) &&
+-			(edesc->desc.hdr & DESC_HDR_MODE0_ENCRYPT) == 0)
++		if (edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV)
+ 			sg_link_tbl_len = cryptlen + authsize;
  
- 	/* copy the generated ICV to dst */
-@@ -869,13 +870,14 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
- 					  void *context, int err)
- {
- 	struct aead_request *req = context;
--	struct talitos_edesc *edesc =
--		 container_of(desc, struct talitos_edesc, desc);
- 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
- 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct talitos_edesc *edesc;
- 	struct scatterlist *sg;
- 	void *icvdata;
- 
-+	edesc = container_of(desc, struct talitos_edesc, desc);
-+
- 	ipsec_esp_unmap(dev, edesc, req);
- 
- 	if (!err) {
-@@ -901,8 +903,9 @@ static void ipsec_esp_decrypt_hwauth_done(struct device *dev,
- 					  void *context, int err)
- {
- 	struct aead_request *req = context;
--	struct talitos_edesc *edesc =
--		 container_of(desc, struct talitos_edesc, desc);
-+	struct talitos_edesc *edesc;
-+
-+	edesc = container_of(desc, struct talitos_edesc, desc);
- 
- 	ipsec_esp_unmap(dev, edesc, req);
- 
-@@ -1308,8 +1311,9 @@ static void ablkcipher_done(struct device *dev,
- 			    int err)
- {
- 	struct ablkcipher_request *areq = context;
--	struct talitos_edesc *edesc =
--		 container_of(desc, struct talitos_edesc, desc);
-+	struct talitos_edesc *edesc;
-+
-+	edesc = container_of(desc, struct talitos_edesc, desc);
- 
- 	common_nonsnoop_unmap(dev, edesc, areq);
- 
-@@ -1686,12 +1690,14 @@ struct talitos_crypto_alg {
- static int talitos_cra_init(struct crypto_tfm *tfm)
- {
- 	struct crypto_alg *alg = tfm->__crt_alg;
--	struct talitos_crypto_alg *talitos_alg =
--		 container_of(alg, struct talitos_crypto_alg, crypto_alg);
-+	struct talitos_crypto_alg *talitos_alg;
- 	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-+	talitos_alg =  container_of(alg, struct talitos_crypto_alg, crypto_alg);
-+
- 	/* update context with ptr to dev */
- 	ctx->dev = talitos_alg->dev;
-+
- 	/* copy descriptor header template value */
- 	ctx->desc_hdr_template = talitos_alg->desc_hdr_template;
- 
+ 		sg_count = sg_to_link_tbl(areq->src, sg_count, sg_link_tbl_len,
 -- 
 1.6.1.3
 
