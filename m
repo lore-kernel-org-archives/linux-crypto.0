@@ -1,42 +1,45 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 5/5] crypto: talitos - avoid unnecessary decrypt check
-Date: Fri, 27 Mar 2009 22:57:54 -0500
-Message-ID: <20090327225754.06f8732a.kim.phillips@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCHv3][trivial] crypto: tcrypt - reduce stack size
+Date: Sun, 29 Mar 2009 15:19:50 +0800
+Message-ID: <20090329071950.GA11469@gondor.apana.org.au>
+References: <49A54C23.8090209@suse.de> <49A5549F.4070304@suse.de> <49A55B5A.70705@suse.de> <20090225153231.GA16691@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Lee Nipper <lee.nipper@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Frank Seidel <fseidel@suse.de>,
+	linux kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, akpm@linux-foundation.org,
+	"David S. Miller" <davem@davemloft.net>, lho@amcc.com,
+	kaber@trash.net, darrenrjenkins@gmail.com,
+	Frank Seidel <frank@f-seidel.de>
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:44991 "EHLO
-	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756793AbZC1Dqb (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:35260 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751304AbZC2HUK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Mar 2009 23:46:31 -0400
+	Sun, 29 Mar 2009 03:20:10 -0400
+Content-Disposition: inline
+In-Reply-To: <20090225153231.GA16691@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-the ICV check bit only gets set in decrypt entry points
+On Wed, Feb 25, 2009 at 10:32:31AM -0500, Neil Horman wrote:
+> On Wed, Feb 25, 2009 at 03:53:14PM +0100, Frank Seidel wrote:
+> > From: Frank Seidel <frank@f-seidel.de>
+> > 
+> > Applying kernel janitors todos (printk calls need KERN_*
+> > constants on linebeginnings, reduce stack footprint where
+> > possible) to tcrypts test_hash_speed (where stacks
+> > memory footprint was very high (on i386 1184 bytes to
+> > 160 now).
+> > 
+> > Signed-off-by: Frank Seidel <frank@f-seidel.de>
+> Looks good, thanks Frank
+> Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
- drivers/crypto/talitos.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 1cc1c41..c70775f 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1010,8 +1010,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	} else {
- 		sg_link_tbl_len = cryptlen;
- 
--		if ((edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV) &&
--			(edesc->desc.hdr & DESC_HDR_MODE0_ENCRYPT) == 0)
-+		if (edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV)
- 			sg_link_tbl_len = cryptlen + authsize;
- 
- 		sg_count = sg_to_link_tbl(areq->src, sg_count, sg_link_tbl_len,
+Patch applied to cryptodev.  Thanks!
 -- 
-1.6.1.3
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
