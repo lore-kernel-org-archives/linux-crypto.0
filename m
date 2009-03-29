@@ -1,38 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Accelerate GCM with PCLMULQDQ-NI
-Date: Sun, 29 Mar 2009 15:43:26 +0800
-Message-ID: <20090329074326.GB11735@gondor.apana.org.au>
-References: <1237366332.24215.260.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [PATCH] crypto: testmgr - Kill test_comp() sparse warnings
+Date: Sun, 29 Mar 2009 15:45:54 +0800
+Message-ID: <20090329074554.GC11735@gondor.apana.org.au>
+References: <1237994238-3545-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
+Cc: linux-crypto@vger.kernel.org
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45466 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:46352 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750938AbZC2Hnb (ORCPT
+	with ESMTP id S1751364AbZC2Hp6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Mar 2009 03:43:31 -0400
+	Sun, 29 Mar 2009 03:45:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1237366332.24215.260.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <1237994238-3545-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 18, 2009 at 04:52:12PM +0800, Huang Ying wrote:
->
-> To accelerate GCM with it, I make the following design:
+On Wed, Mar 25, 2009 at 04:17:17PM +0100, Geert Uytterhoeven wrote:
+> make C=1:
+> | crypto/testmgr.c:846:45: warning: incorrect type in argument 5 (different signedness)
+> | crypto/testmgr.c:846:45:    expected unsigned int *dlen
+> | crypto/testmgr.c:846:45:    got int *<noident>
+> | crypto/testmgr.c:878:47: warning: incorrect type in argument 5 (different signedness)
+> | crypto/testmgr.c:878:47:    expected unsigned int *dlen
+> | crypto/testmgr.c:878:47:    got int *<noident>
 > 
-> 1. Implement ghash as an ahash algorithm, Use ghash in gcm
-> implementation.
-> 2. Provide a new implementation of ghash with PCLMULQDQ-NI.
-> 
-> What do you think about that?
+> Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 
-Sounds OK to me.  I presume the choice of ahash instead of shash
-is due to the use of XMM registers, just like AES?
-
-Cheers,
+Both patches applied.  Thanks Geert!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
