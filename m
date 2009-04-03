@@ -1,60 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Update for 2.6.30
-Date: Thu, 2 Apr 2009 14:14:13 +0800
-Message-ID: <20090402061413.GA28925@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au>
+From: Jared Hulbert <jaredeh@gmail.com>
+Subject: Re: [PATCH 5/5] squashfs: Make SquashFS 4 use the new pcomp crypto
+	interface
+Date: Thu, 2 Apr 2009 23:00:36 -0700
+Message-ID: <6934efce0904022300if85bc59ue2945dc1674902c1@mail.gmail.com>
+References: <1234972402-24298-1-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-2-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-3-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-4-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-5-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <1234972402-24298-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
+	 <6934efce0902181624q57f3423dm50cda218781e4399@mail.gmail.com>
+	 <alpine.LRH.2.00.0902191415220.14749@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Phillip Lougher <phillip@lougher.demon.co.uk>
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59667 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751612AbZDBGOV (ORCPT
+Received: from yw-out-2324.google.com ([74.125.46.28]:37404 "EHLO
+	yw-out-2324.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751590AbZDCGAj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Apr 2009 02:14:21 -0400
-Content-Disposition: inline
-In-Reply-To: <20090324044932.GA18245@gondor.apana.org.au>
+	Fri, 3 Apr 2009 02:00:39 -0400
+In-Reply-To: <alpine.LRH.2.00.0902191415220.14749@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Sorry I just saw this email.  My kernel hacking time has been rudely
+interrupted by other important work.
 
-This push fixes three bugs/regressions:
+> How's AXFS going?
 
-* IO address handling fix in timeriomem.
-* Crash due to incorrect SG handling in ixp4xx.
-* Crypto API (shash) bug that can lead to a CRC32C crash.
- 
-Please pull from
+It's doing pretty well, we just haven't had time to push hard enough
+to get it out.  It's been fairly stable for us for a while.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Now I'm anxious to get it more widely tested.  I've got two vexing bug
+reports.  1) a mips consumer platform where the main app can't operate
+in XIP, but everything else can.  2) Just yesterday we found Android
+APK's don't like to be XIP.  These look more like flaws in the
+filemap_xip.c than AXFS bugs.  Fortunately there was bug fix that went
+out just a couple days ago.  I'm hoping it will fix our problems.
 
-or
+We've automated a great deal of the busy work associated with testing
+and deploying it, so now I just need to find a couple days a week for
+a few weeks.
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Our flagship customer went a different direction, so it's been hard to
+justify time to work on it.
 
+> BTW, you probably want to read the full patch series, including the
+> introduction :-)
 
-Alexander Clouter (1):
-      hwrng: timeriomem - Use phys address rather than virt
-
-Christian Hohnstaedt (1):
-      crypto: ixp4xx - Fix handling of chained sg buffers
-
-Yehuda Sadeh (1):
-      crypto: shash - Fix unaligned calculation with short length
-
- crypto/shash.c                          |    3 +
- drivers/char/hw_random/timeriomem-rng.c |   39 ++++++-
- drivers/crypto/ixp4xx_crypto.c          |  182 +++++++++++--------------------
- include/linux/timeriomem-rng.h          |    2 +-
- 4 files changed, 102 insertions(+), 124 deletions(-)
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yes, I saw that shortly after I clicked "send". :)
