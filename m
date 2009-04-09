@@ -1,37 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 2/4] cpu_chainiv: add percpu IV chain genarator
-Date: Thu, 9 Apr 2009 11:20:45 +0800
-Message-ID: <20090409032045.GA2232@gondor.apana.org.au>
-References: <20090316114940.GN13998@secunet.com> <20090316115251.GP13998@secunet.com> <20090327083615.GB27903@gondor.apana.org.au> <20090330115415.GC6791@secunet.com> <20090330131955.GA22604@gondor.apana.org.au> <20090408114014.GL6791@secunet.com>
+From: Karl Hiramoto <karl@hiramoto.org>
+Subject: Re: help for ixp4xx crypto panic
+Date: Thu, 09 Apr 2009 09:05:07 +0200
+Message-ID: <49DD9E23.9070101@hiramoto.org>
+References: <200904091256010463689@163.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 7bit
+Cc: hzlyc <hzlyc@tom.com>, linux-crypto@vger.kernel.org
+To: timenhhf <timenhhf@163.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48610 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757351AbZDIDUw (ORCPT
+Received: from hapkido.dreamhost.com ([66.33.216.122]:35697 "EHLO
+	hapkido.dreamhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754756AbZDIHGT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Apr 2009 23:20:52 -0400
-Content-Disposition: inline
-In-Reply-To: <20090408114014.GL6791@secunet.com>
+	Thu, 9 Apr 2009 03:06:19 -0400
+Received: from spunkymail-a7.g.dreamhost.com (balanced.mail.policyd.dreamhost.com [208.97.132.119])
+	by hapkido.dreamhost.com (Postfix) with ESMTP id 327AA17BA7F
+	for <linux-crypto@vger.kernel.org>; Thu,  9 Apr 2009 00:06:18 -0700 (PDT)
+In-Reply-To: <200904091256010463689@163.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 08, 2009 at 01:40:14PM +0200, Steffen Klassert wrote:
->
-> Actually I'm instantiate a crypto_nivaead_type algorithm and choose for
-> cpu_chainiv as the IV generator for that algorithm. If I want to do the
-> same with eseqiv it would require to add aead support to eseqiv.
-> Is this what you are thinking about, or is there a way to instantiate a
-> crypto_aead_type algorithm and notify the ablkcipher to choose for
-> eseqiv as it's default IV genarator?
+timenhhf wrote:
+> hi,
+> i read your mail list on net about ixp4xx_crypto panic.
+> i'm using linux kernel 2.6.28.9, but i can't make the IXP425 NPEs work
+> all right.
+> the steps i've done as followed:
+> (1) download "ixp4xx-microcode_2.4.orig.tar.gz" through the URL:
+> http://packages.debian.org/zh-cn/source/sid/ixp4xx-microcode
+I don't think that includes the crypto microcode. You have to get that
+from intel.
 
-You can allocate eseqiv(alg), e.g., eseqiv(cbc(aes)).
+> (2)tar -zxvf ixp4xx-microcode_2.4.orig.tar.gz
+> (3)cp ./IxNpeMicrocode.h ixp4xx-microcode/npeDl
+You have to modify the .h to select the crypto when you have correct code
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> (4)gcc -Wall IxNpeMicrocode.c -o IxNpeMicrocode
+> (5)./IxNpeMicrocode, can get NPE-B and NPE-C
+> (6)cp NPEs to /lib/firmware : cp -a NPE-* /lib/firmware/
+> echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+> /sbin/mdev -s
+> (7)set the NPE MAC address: ifconfig eth0 hw ether 00:03:05:06:07:08
+> (8)ifconfig eth0 192.168.1.1 netmask 255.255.255.0
+> after so many steps have done, i can't ping out any packet through
+> IXP425 mainboard.
+> could you give me some advice? thanks in advance.
+> best regards,
+
+It would probally be best if we made ixp4xx_crytpo BUG() or WARN_ON() if
+it does not have a crypto compatable microcode.
+
+--
+Karl
