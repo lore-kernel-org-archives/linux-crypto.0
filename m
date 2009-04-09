@@ -1,37 +1,96 @@
-From: Patrick McHardy <kaber@trash.net>
-Subject: Re: [2.6.30-rc1] device-mapper: table: 254:0: crypt: Error	allocating
- crypto tfm
-Date: Thu, 09 Apr 2009 15:22:43 +0200
-Message-ID: <49DDF6A3.5080304@trash.net>
-References: <8db1092f0904081235x58081f1by842ab45ad861e294@mail.gmail.com> <20090409021804.GA1756@gondor.apana.org.au> <20090409023547.GA1878@gondor.apana.org.au> <8db1092f0904090546j54ac6759i9c36f214ce1109bc@mail.gmail.com> <49DDF2AF.50308@trash.net> <20090409131805.GA2059@gondor.apana.org.au>
+From: Christian Hohnstaedt <christian@hohnstaedt.de>
+Subject: [PATCH] ixp4xx_crypto: check firmware for crypto support
+Date: Thu, 9 Apr 2009 15:46:34 +0200
+Message-ID: <20090409134634.GO21117@mail3.prorata.de>
+References: <200904091256010463689@163.com> <49DD9E23.9070101@hiramoto.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Maciej Rutecki <maciej.rutecki@gmail.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, arjan@linux.intel.com,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Jiri Slaby <jirislaby@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: timenhhf <timenhhf@163.com>, hzlyc <hzlyc@tom.com>,
+	linux-crypto@vger.kernel.org
+To: Karl Hiramoto <karl@hiramoto.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stinky.trash.net ([213.144.137.162]:52522 "EHLO
-	stinky.trash.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753241AbZDINWx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Apr 2009 09:22:53 -0400
-In-Reply-To: <20090409131805.GA2059@gondor.apana.org.au>
+Received: from mail3.prorata.de ([62.145.31.200]:50388 "EHLO mail3.prorata.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1764918AbZDINxV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Apr 2009 09:53:21 -0400
+Content-Disposition: inline
+In-Reply-To: <49DD9E23.9070101@hiramoto.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> On Thu, Apr 09, 2009 at 03:05:51PM +0200, Patrick McHardy wrote:
->> It also seems to fix a netfilter problem with modules not loaded
->> automatically anymore.
-> 
-> They should still autoload, but now you need to retry the operation
-> manually :)
+ - the loaded firmware may not support crypto at all or
+   only support DES and 3DES but not AES or
+   support DES, 3DES and AES.
 
-Right, the second attempt succeeded :)
+ - in case of no crypto support of the firmware, the module load will fail.
+ - in case of missing AES support, the AES algorithms are not registered
+   and a warning is printed during module load.
+
+Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
+---
+ drivers/crypto/ixp4xx_crypto.c |   33 ++++++++++++++++++++++++++++++++-
+ 1 files changed, 32 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index fdcd0ab..f72f414 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -415,6 +415,7 @@ static void crypto_done_action(unsigned long arg)
+ static int init_ixp_crypto(void)
+ {
+ 	int ret = -ENODEV;
++	u32 msg[2] = { 0, 0 };
+ 
+ 	if (! ( ~(*IXP4XX_EXP_CFG2) & (IXP4XX_FEATURE_HASH |
+ 				IXP4XX_FEATURE_AES | IXP4XX_FEATURE_DES))) {
+@@ -426,9 +427,35 @@ static int init_ixp_crypto(void)
+ 		return ret;
+ 
+ 	if (!npe_running(npe_c)) {
+-		npe_load_firmware(npe_c, npe_name(npe_c), dev);
++		ret = npe_load_firmware(npe_c, npe_name(npe_c), dev);
++		if (ret) {
++			return ret;
++		}
++		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
++			goto npe_error;
++	} else {
++		if (npe_send_message(npe_c, msg, "STATUS_MSG"))
++			goto npe_error;
++
++		if (npe_recv_message(npe_c, msg, "STATUS_MSG"))
++			goto npe_error;
+ 	}
+ 
++	switch ((msg[1]>>16) & 0xff) {
++	case 3:
++		printk(KERN_WARNING "Firmware of %s lacks AES support\n",
++				npe_name(npe_c));
++		support_aes = 0;
++		break;
++	case 4:
++	case 5:
++		support_aes = 1;
++		break;
++	default:
++		printk(KERN_ERR "Firmware of %s lacks crypto support\n",
++			npe_name(npe_c));
++		return -ENODEV;
++	}
+ 	/* buffer_pool will also be used to sometimes store the hmac,
+ 	 * so assure it is large enough
+ 	 */
+@@ -457,6 +484,10 @@ static int init_ixp_crypto(void)
+ 
+ 	qmgr_enable_irq(RECV_QID);
+ 	return 0;
++
++npe_error:
++	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
++	ret = -EIO;
+ err:
+ 	if (ctx_pool)
+ 		dma_pool_destroy(ctx_pool);
+-- 
+1.6.0.3
+
