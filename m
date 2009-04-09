@@ -1,67 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [2.6.30-rc1] device-mapper: table: 254:0: crypt: Error
-	allocating crypto tfm
-Date: Thu, 9 Apr 2009 10:35:47 +0800
-Message-ID: <20090409023547.GA1878@gondor.apana.org.au>
-References: <8db1092f0904081235x58081f1by842ab45ad861e294@mail.gmail.com> <20090409021804.GA1756@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH 2/4] cpu_chainiv: add percpu IV chain genarator
+Date: Thu, 9 Apr 2009 11:20:45 +0800
+Message-ID: <20090409032045.GA2232@gondor.apana.org.au>
+References: <20090316114940.GN13998@secunet.com> <20090316115251.GP13998@secunet.com> <20090327083615.GB27903@gondor.apana.org.au> <20090330115415.GC6791@secunet.com> <20090330131955.GA22604@gondor.apana.org.au> <20090408114014.GL6791@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, arjan@linux.intel.com,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Jiri Slaby <jirislaby@gmail.com>
-To: Maciej Rutecki <maciej.rutecki@gmail.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1757146AbZDICgT@vger.kernel.org>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:48610 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757351AbZDIDUw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Apr 2009 23:20:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20090409021804.GA1756@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20090408114014.GL6791@secunet.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 09, 2009 at 10:18:04AM +0800, Herbert Xu wrote:
+On Wed, Apr 08, 2009 at 01:40:14PM +0200, Steffen Klassert wrote:
 >
-> It looks like try_then_request_module has been broken such that it
-> returns without waiting for the module to complete loading.  I'm
-> looking into it.
+> Actually I'm instantiate a crypto_nivaead_type algorithm and choose for
+> cpu_chainiv as the IV generator for that algorithm. If I want to do the
+> same with eseqiv it would require to add aead support to eseqiv.
+> Is this what you are thinking about, or is there a way to instantiate a
+> crypto_aead_type algorithm and notify the ablkcipher to choose for
+> eseqiv as it's default IV genarator?
 
-OK, it's caused by
+You can allocate eseqiv(alg), e.g., eseqiv(cbc(aes)).
 
-commit acae05156551fd7528fbb616271e672789388e3c
-Author: Arjan van de Ven <arjan@linux.intel.com>
-Date:   Sun Feb 8 10:42:01 2009 -0800
-
-    module: create a request_module_nowait()
-
-This should fix it.
-
-module: try_then_request_module must wait
-
-Since the whole point of try_then_request_module is to retry
-the operation after a module has been loaded, we must wait for
-the module to fully load.
-
-Otherwise all sort of things start breaking, e.g., you won't
-be able to read your encrypted disks on the first attempt.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/kmod.h b/include/linux/kmod.h
-index d5fa565..384ca8b 100644
---- a/include/linux/kmod.h
-+++ b/include/linux/kmod.h
-@@ -34,7 +34,7 @@ extern int __request_module(bool wait, const char *name, ...) \
- #define request_module(mod...) __request_module(true, mod)
- #define request_module_nowait(mod...) __request_module(false, mod)
- #define try_then_request_module(x, mod...) \
--	((x) ?: (__request_module(false, mod), (x)))
-+	((x) ?: (__request_module(true, mod), (x)))
- #else
- static inline int request_module(const char *name, ...) { return -ENOSYS; }
- static inline int request_module_nowait(const char *name, ...) { return -ENOSYS; }
-
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
