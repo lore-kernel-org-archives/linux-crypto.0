@@ -1,60 +1,71 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] add self-tests for rfc4309(ccm(aes))
-Date: Thu, 9 Apr 2009 15:16:53 -0400
-Message-ID: <200904091516.57048.jarod@redhat.com>
-References: <200904091434.59639.jarod@redhat.com> <20090409185204.GA6758@hmsreliant.think-freely.org>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: GCM benchmark
+Date: Fri, 10 Apr 2009 09:51:28 +0800
+Message-ID: <1239328288.6384.69.camel@yhuang-dev.sh.intel.com>
+References: <1239263421.6384.41.camel@yhuang-dev.sh.intel.com>
+	 <20090409082152.GA4099@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert.xu@redhat.com>
-To: Neil Horman <nhorman@redhat.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S933109AbZDITR6@vger.kernel.org>
-In-Reply-To: <20090409185204.GA6758@hmsreliant.think-freely.org>
-Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-AE2TDQ5F4aSmGFi0ab+H"
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:20207 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753562AbZDJBva (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Apr 2009 21:51:30 -0400
+In-Reply-To: <20090409082152.GA4099@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 09 April 2009 14:52:04 Neil Horman wrote:
-> On Thu, Apr 09, 2009 at 02:34:59PM -0400, Jarod Wilson wrote:
-> > Patch is against current cryptodev-2.6 tree, successfully tested via
-> > 'modprobe tcrypt type=45'. The number of test vectors might be a bit
-> > excessive, but I tried to hit a wide range of combinations of varying
-> > key sizes, associate data lengths, input lengths and pass/fail.
-> > 
-> > Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> > 
-> >  
-> ><snip>
-> 
-> > +/*
-> > + * rfc4309 says section 8 contains test vectors, only, it doesn't, and NIST
-> > + * Special Publication 800-38C's test vectors use nonce lengths our rfc4309
-> > + * implementation doesn't support. The following are taken from fips cavs
-> > + * fax files on hand at Red Hat.
-> > + *
-> > + * nb: actual key lengths are (klen - 3), the last 3 bytes are actually
-> > + * part of the nonce which combine w/the iv, but need to be input this way.
-> > + */
-> 
-> RFC4309 section 8 actually says the test vectors you can use are here:
-> http://www.ietf.org/rfc/rfc3610.txt
-> in RFC3610 section 8.
 
-Oh, I'm dense, didn't correctly parse that 4309 was referring back to 3610
-for the actual test vectors. I'll see what I can do with those...
+--=-AE2TDQ5F4aSmGFi0ab+H
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> I don't think theres anything wrong with the vectors
-> your're using below, but you may want to add the vectors from 3610 just to
-> imrpove the testing.
+On Thu, 2009-04-09 at 16:21 +0800, Herbert Xu wrote:
+> On Thu, Apr 09, 2009 at 03:50:21PM +0800, Huang Ying wrote:
+> > Hi, Herbert,
+> >=20
+> > I am working on GCM acceleration with Intel new PCLMULQDQ instructions
+> > now. Can you tell me how to do GCM benchmark?
+>=20
+> We need to add the infrastructure for testing AEAD speed.  It can
+> be modelled after the cipher/hash speed testing code.
 
-I think I'd drop some of the ones in the initial patch in favor of adding
-some from 3610, rather than simply adding more. The coverage is already
-pretty good, increasing the number of vectors shouldn't really be necessary,
-but it would definitely be nice to have vectors that are already publicly
-published and verified.
+One issue here is that blkcipher testing infrastructure uses
+local_bh_disable()/local_irq_disable() to get more accurate result. But
+AEAD uses asynchronous interface, something like
+wait_for_completion_interruptable() will be used in test path. How to
+get more accurate result for testing asynchronous interface? Maybe it
+can be: test many times, select the one with best performance. What's
+your opinion?
 
--- 
-Jarod Wilson
-jarod@redhat.com
+> > BTW: Similar with AES-NI support, I use cryptd to defer requests in sof=
+t
+> > IRQ context. Now, cryptd uses crypto_hash instead of crypto_shash as
+> > child. I think we should change that. If you have not done that, I will
+> > do that.
+>=20
+> We need to complete the conversion of all hash algorithms to shash
+> first.
+
+Yes.
+
+Best Regards,
+Huang Ying
+
+
+--=-AE2TDQ5F4aSmGFi0ab+H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkneph4ACgkQKhFGF+eHlpjZdQCeN1YQbGWmiwSxOmYjfxIsN4RO
+YTkAoJluLPcdm7+8b2kr0x/Hp03oXzwI
+=f+Z1
+-----END PGP SIGNATURE-----
+
+--=-AE2TDQ5F4aSmGFi0ab+H--
+
