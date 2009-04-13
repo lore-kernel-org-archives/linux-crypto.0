@@ -1,39 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] ixp4xx_crypto: check firmware for crypto support
-Date: Sun, 12 Apr 2009 13:02:58 +0800
-Message-ID: <20090412050258.GA8883@gondor.apana.org.au>
-References: <200904091256010463689@163.com> <49DD9E23.9070101@hiramoto.org> <20090409134634.GO21117@mail3.prorata.de>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: [PATCH] add self-tests for rfc4309(ccm(aes))
+Date: Mon, 13 Apr 2009 17:03:48 -0400
+Message-ID: <200904131703.50196.jarod@redhat.com>
+References: <200904091434.59639.jarod@redhat.com> <200904091516.57048.jarod@redhat.com> <20090410023108.GA7933@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Karl Hiramoto <karl@hiramoto.org>, timenhhf <timenhhf@163.com>,
-	hzlyc <hzlyc@tom.com>, linux-crypto@vger.kernel.org
-To: Christian Hohnstaedt <christian@hohnstaedt.de>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, Herbert Xu <herbert.xu@redhat.com>
+To: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57022 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752019AbZDLFDY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 12 Apr 2009 01:03:24 -0400
+Received: from mx2.redhat.com ([66.187.237.31]:41529 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752463AbZDMVEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Apr 2009 17:04:33 -0400
+In-Reply-To: <20090410023108.GA7933@localhost.localdomain>
 Content-Disposition: inline
-In-Reply-To: <20090409134634.GO21117@mail3.prorata.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 09, 2009 at 01:46:34PM +0000, Christian Hohnstaedt wrote:
->  - the loaded firmware may not support crypto at all or
->    only support DES and 3DES but not AES or
->    support DES, 3DES and AES.
-> 
->  - in case of no crypto support of the firmware, the module load will fail.
->  - in case of missing AES support, the AES algorithms are not registered
->    and a warning is printed during module load.
-> 
-> Signed-off-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
+On Thursday 09 April 2009 22:31:08 Neil Horman wrote:
+> On Thu, Apr 09, 2009 at 03:16:53PM -0400, Jarod Wilson wrote:
+> > On Thursday 09 April 2009 14:52:04 Neil Horman wrote:
+> > > On Thu, Apr 09, 2009 at 02:34:59PM -0400, Jarod Wilson wrote:
+> > > > Patch is against current cryptodev-2.6 tree, successfully tested via
+> > > > 'modprobe tcrypt type=45'. The number of test vectors might be a bit
+> > > > excessive, but I tried to hit a wide range of combinations of varying
+> > > > key sizes, associate data lengths, input lengths and pass/fail.
+> > > > 
+> > > > Signed-off-by: Jarod Wilson <jarod@redhat.com>
 
-Applied to crypto-2.6 and I'll queue this up for stable as well.
-Thanks!
+Ugh. I clearly missed *something* when testing, there's no way the patch
+I sent actually fully passed. I have things working for real now though
+locally, including a back-port to a certain 2.6.18-based kernel. :)
+
+Updated patch or patches forthcoming... (probably tomorrow)
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jarod Wilson
+jarod@redhat.com
