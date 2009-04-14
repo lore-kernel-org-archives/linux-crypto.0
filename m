@@ -1,44 +1,42 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH v2] crypto: add self-tests for rfc4309(ccm(aes))
-Date: Tue, 14 Apr 2009 07:13:25 -0400
-Message-ID: <20090414111325.GA14305@hmsreliant.think-freely.org>
-References: <200904091434.59639.jarod@redhat.com> <20090410023108.GA7933@localhost.localdomain> <200904131703.50196.jarod@redhat.com> <200904131911.01596.jarod@redhat.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [RFC] [PATCH 2/4] cpu_chainiv: add percpu IV chain genarator
+Date: Tue, 14 Apr 2009 15:05:35 +0200
+Message-ID: <20090414130535.GM6791@secunet.com>
+References: <20090316114940.GN13998@secunet.com> <20090316115251.GP13998@secunet.com> <20090327083615.GB27903@gondor.apana.org.au> <20090330115415.GC6791@secunet.com> <20090330131955.GA22604@gondor.apana.org.au> <20090408114014.GL6791@secunet.com> <20090409032045.GA2232@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert.xu@redhat.com>
-To: Jarod Wilson <jarod@redhat.com>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:48152 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752087AbZDNLNf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Apr 2009 07:13:35 -0400
+Received: from a.mx.secunet.com ([213.68.205.161]:43909 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751833AbZDNNDf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Apr 2009 09:03:35 -0400
 Content-Disposition: inline
-In-Reply-To: <200904131911.01596.jarod@redhat.com>
+In-Reply-To: <20090409032045.GA2232@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 13, 2009 at 07:11:00PM -0400, Jarod Wilson wrote:
-> One more time, with feeling. Investigated using test vectors from rfc3610, but
-> they all use a 13-byte nonce, we only support 11-byte, so I'm sticking with
-> using the samples from a fips cavs example file I have on hand.
+On Thu, Apr 09, 2009 at 11:20:45AM +0800, Herbert Xu wrote:
 > 
-> I swear I tested the first version of the patch before submitting last time,
-> but upon further testing, don't know how it actually managed to run
-> correctly w/o some of the additional changes in this version.
+> You can allocate eseqiv(alg), e.g., eseqiv(cbc(aes)).
 > 
-> This version contains the same vectors, but some of them had incorrect klen's
-> in them last time. Additionally, null input and associated data should be
-> handled more appropriately, as well as the expected decryption verification
-> failure vectors.
-> 
-> This version of the patch has been tested on both 2.6.30-rc1-git5 +
-> cryptodev-2.6 and a Red Hat Enterprise Linux 5.x kernel, with some
-> extra debugging spew added to verify it really *is* working.
-> 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> 
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-> 
+Ok, that's possible. I missed this possibility, probaply because nobody
+is actually doing it this way. Thanks!
+
+Unfortunately eseqiv does not work out of the box if we do synchronous
+encryption. 
+
+If crypto_ablkcipher_encrypt() returns synchronous, eseqiv_complete2()
+is called even if req->giv is already the pointer to the generated IV.
+The generated IV is overwritten with some random data in this case.
+
+I fixed this by calling eseqiv_complete2() just in the case when an
+asynchronous algorithm would call eseqiv_complete() as the complete
+function. I'll send the patch with an extra mail.
+
+Now pcrypt runs fine together with eseqiv and the throughput
+results are very similar to the ones with cpu_chainiv.
+
+Steffen
