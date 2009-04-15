@@ -1,30 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: eseqiv - fix IV generation for sync algorithms
-Date: Wed, 15 Apr 2009 20:45:47 +0800
-Message-ID: <20090415124547.GA11006@gondor.apana.org.au>
-References: <20090414132351.GN6791@secunet.com> <20090415111549.GA10128@gondor.apana.org.au> <20090415121902.GO6791@secunet.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH 0/3] crypto: add testmgr support and self-tests for rfc4309
+Date: Wed, 15 Apr 2009 09:35:15 -0400
+Message-ID: <200904150935.15947.jarod@redhat.com>
+References: <200904091434.59639.jarod@redhat.com> <20090415112053.GA10188@gondor.apana.org.au> <200904150835.38818.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Neil Horman <nhorman@tuxdriver.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35609 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759355AbZDOMpu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Apr 2009 08:45:50 -0400
+Received: from mx2.redhat.com ([66.187.237.31]:39757 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752524AbZDONgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 Apr 2009 09:36:01 -0400
+In-Reply-To: <200904150835.38818.jarod@redhat.com>
 Content-Disposition: inline
-In-Reply-To: <20090415121902.GO6791@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 15, 2009 at 02:19:02PM +0200, Steffen Klassert wrote:
-> 
-> crypto: eseqiv - fix IV generation for sync algorithms
+This patch series adds necessary fix-ups and infrastructure additions to
+testmgr/tcrypt to support the inclusion of rfc4309(ccm(aes)) self-tests,
+and finally, the rfc4309 test vectors themselves.
 
-Applied to crypt-2.6.  Thanks a lot!
+[PATCH 1/3] crypto: properly handle null input and assoc data aead test vectors
+[PATCH 2/3] crypto: handle ccm dec test vectors expected to fail verification
+[PATCH 3/3] crypto: add self-tests for rfc4309(ccm(aes))
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jarod Wilson
+jarod@redhat.com
