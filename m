@@ -1,64 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: VIA Padlock driver no longer loads automatically
-Date: Tue, 21 Apr 2009 13:53:31 +0800
-Message-ID: <20090421055331.GA14062@gondor.apana.org.au>
-References: <20090420181402.2b0424f4@dhcp-100-2-144.bos.redhat.com>
+Date: Tue, 21 Apr 2009 13:56:13 +0800
+Message-ID: <20090421055613.GA14319@gondor.apana.org.au>
+References: <20090420181402.2b0424f4@dhcp-100-2-144.bos.redhat.com> <20090421055331.GA14062@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Chuck Ebbert <cebbert@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47232 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:41791 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751137AbZDUFxg (ORCPT
+	with ESMTP id S1752484AbZDUF4Q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Apr 2009 01:53:36 -0400
+	Tue, 21 Apr 2009 01:56:16 -0400
 Content-Disposition: inline
-In-Reply-To: <20090420181402.2b0424f4@dhcp-100-2-144.bos.redhat.com>
+In-Reply-To: <20090421055331.GA14062@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 20, 2009 at 06:14:02PM -0400, Chuck Ebbert wrote:
-> On x86 machines only aes_generic and aes_i586 get loaded automatically as of
-> kernel 2.6.29. Looks like this was caused by:
+On Tue, Apr 21, 2009 at 01:53:31PM +0800, Herbert Xu wrote:
 > 
->   commit a760a6656e6f00bb0144a42a048cf0266646e22c
->   crypto: api - Fix module load deadlock with fallback algorithms
+> Thanks for the report.  This patch should fix the problem.
 
-Thanks for the report.  This patch should fix the problem.
+In fact, padlock-aes shouldn't have been aes-all in the first
+place so I'm going to add tihs patch too.
 
-commit 37fc334cc8eb84f5fe0a5a1cbe6a6a68049e142a
+commit acd246b7494c629aa617da49716409566cf52149
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Apr 21 13:27:16 2009 +0800
+Date:   Tue Apr 21 13:55:20 2009 +0800
 
-    crypto: api - Fix algorithm module auto-loading
+    crypto: padlock - Revert aes-all alias to aes
     
-    The commit a760a6656e6f00bb0144a42a048cf0266646e22c (crypto:
-    api - Fix module load deadlock with fallback algorithms) broke
-    the auto-loading of algorithms that require fallbacks.  The
-    problem is that the fallback mask check is missing an and which
-    cauess bits that should be considered to interfere with the
-    result.
+    Since the padlock-aes driver doesn't require a fallback (it's
+    only padlock-sha that does), it should use the aes alias rather
+    than aes-all so that ones that do need a fallback can use it.
     
-    Reported-by: Chuck Ebbert <cebbert@redhat.com>
     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 314dab9..fd2545d 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -221,7 +221,8 @@ struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
+index 3f0fdd1..856b3cc 100644
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -489,4 +489,4 @@ MODULE_DESCRIPTION("VIA PadLock AES algorithm support");
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Michal Ludvig");
  
- 		request_module(name);
- 
--		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask) &&
-+		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
-+		      CRYPTO_ALG_NEED_FALLBACK) &&
- 		    snprintf(tmp, sizeof(tmp), "%s-all", name) < sizeof(tmp))
- 			request_module(tmp);
- 
-Cheers,
+-MODULE_ALIAS("aes-all");
++MODULE_ALIAS("aes");
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
