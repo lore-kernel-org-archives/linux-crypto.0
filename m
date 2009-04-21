@@ -1,33 +1,63 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH/RFC] crypto: compress - Return produced bytes in
-	crypto_{,de}compress_{update,final}() (was: Re: [PATCH/RFC] crypto:
-	compress - Add comp_request.total_out
-Date: Tue, 21 Apr 2009 08:09:09 +0800
-Message-ID: <20090421000909.GA11875@gondor.apana.org.au>
-References: <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090307104637.GB8731@gondor.apana.org.au> <49B36A18.5030506@lougher.demon.co.uk> <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be> <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be> <alpine.LRH.2.00.0903241729540.4446@vixen.sonytel.be> <20090420060313.GA891@gondor.apana.org.au> <alpine.LRH.2.00.0904200925290.11211@vixen.sonytel.be> <49ED090F.4050503@lougher.demon.co.uk>
+Subject: Re: VIA Padlock driver no longer loads automatically
+Date: Tue, 21 Apr 2009 13:53:31 +0800
+Message-ID: <20090421055331.GA14062@gondor.apana.org.au>
+References: <20090420181402.2b0424f4@dhcp-100-2-144.bos.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Phillip Lougher <phillip@lougher.demon.co.uk>
+Cc: linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Chuck Ebbert <cebbert@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34660 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:47232 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751142AbZDUAJQ (ORCPT
+	with ESMTP id S1751137AbZDUFxg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Apr 2009 20:09:16 -0400
+	Tue, 21 Apr 2009 01:53:36 -0400
 Content-Disposition: inline
-In-Reply-To: <49ED090F.4050503@lougher.demon.co.uk>
+In-Reply-To: <20090420181402.2b0424f4@dhcp-100-2-144.bos.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 21, 2009 at 12:45:19AM +0100, Phillip Lougher wrote:
->
-> Herbert, are the other cryto API patches in linux-next (or any other
-> git repository)?
+On Mon, Apr 20, 2009 at 06:14:02PM -0400, Chuck Ebbert wrote:
+> On x86 machines only aes_generic and aes_i586 get loaded automatically as of
+> kernel 2.6.29. Looks like this was caused by:
+> 
+>   commit a760a6656e6f00bb0144a42a048cf0266646e22c
+>   crypto: api - Fix module load deadlock with fallback algorithms
 
-They should be in Linus's tree.
+Thanks for the report.  This patch should fix the problem.
 
+commit 37fc334cc8eb84f5fe0a5a1cbe6a6a68049e142a
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Apr 21 13:27:16 2009 +0800
+
+    crypto: api - Fix algorithm module auto-loading
+    
+    The commit a760a6656e6f00bb0144a42a048cf0266646e22c (crypto:
+    api - Fix module load deadlock with fallback algorithms) broke
+    the auto-loading of algorithms that require fallbacks.  The
+    problem is that the fallback mask check is missing an and which
+    cauess bits that should be considered to interfere with the
+    result.
+    
+    Reported-by: Chuck Ebbert <cebbert@redhat.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/api.c b/crypto/api.c
+index 314dab9..fd2545d 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -221,7 +221,8 @@ struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+ 
+ 		request_module(name);
+ 
+-		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask) &&
++		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
++		      CRYPTO_ALG_NEED_FALLBACK) &&
+ 		    snprintf(tmp, sizeof(tmp), "%s-all", name) < sizeof(tmp))
+ 			request_module(tmp);
+ 
 Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
