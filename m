@@ -1,36 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH v2 0/4] Parallel IPsec
-Date: Sat, 25 Apr 2009 18:56:27 +0800
-Message-ID: <20090425105627.GA6243@gondor.apana.org.au>
-References: <20090424102451.GB12680@secunet.com> <20090425083849.GD26070@ioremap.net> <20090425092142.GA5830@gondor.apana.org.au> <20090425101019.GA28498@ioremap.net>
+From: =?iso-8859-1?B?qUdsb2JhbA==?= <wheelcovers@bellnet.ca>
+Subject: Winner
+Date: Sat, 25 Apr 2009 10:02:43 -0400
+Message-ID: <20090425140243.ONYU1670.simmts8-srv.bellnexxia.net@simip9-ac.srvr.bell.ca>
+Reply-To: jerry.smith33@onlineprocessingdept.co.uk
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Evgeniy Polyakov <zbr@ioremap.net>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <info@lotto.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49479 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752211AbZDYK4i (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 25 Apr 2009 06:56:38 -0400
-Content-Disposition: inline
-In-Reply-To: <20090425101019.GA28498@ioremap.net>
+Received: from simmts8-qfe0.srvr.bell.ca ([206.47.199.166]:47870 "EHLO
+	simmts8-srv.bellnexxia.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751850AbZDYOCp convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 25 Apr 2009 10:02:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Apr 25, 2009 at 02:10:19PM +0400, Evgeniy Polyakov wrote:
->
-> What's the deal PCI drivers have with CPUs data comes from/to?
-> They do not touch cache, just run DMA transfer and complete the request.
+The Global Award Programme.Therefore you have been approve for a lump s=
+um payout of (=A3950.000.00  GBP) by your E-ID send your details=20
 
-It's the same as NICs.  To set things up and to reap the result
-you need to synchronise.
+Name:.......................
+Address:....................
+Country:....................
+Occupation:................
+Phone Number:...............
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yours faithfully,
+Mrs Joan Thomas
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
