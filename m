@@ -1,38 +1,22 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH v2 2/4] pcrypt: Add pcrypt crypto parallelization
-	engine
-Date: Mon, 27 Apr 2009 16:56:20 +0800
-Message-ID: <20090427085620.GB21761@gondor.apana.org.au>
-References: <20090424102451.GB12680@secunet.com> <20090424102720.GD12680@secunet.com>
+From: Aaliyah Hatcher <webmaster@genie.dk>
+Subject: =?windows-1251?B?R3JlZW4gQ2FyZCBMb3R0ZXJ5?=
+Date: Mon, 27 Apr 2009 23:08:19 +0200
+Message-ID: <13792.1701105826$1240866542@news.gmane.org>
+Reply-To: Aaliyah Hatcher <19681koenerraymonde@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=windows-1251
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:56878 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753867AbZD0I40 (ORCPT
+Received: from 50.244-247-81.adsl-static.isp.belgacom.be ([81.247.244.50]:25565
+	"EHLO google.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751857AbZD0VIX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2009 04:56:26 -0400
-Content-Disposition: inline
-In-Reply-To: <20090424102720.GD12680@secunet.com>
+	Mon, 27 Apr 2009 17:08:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 24, 2009 at 12:27:20PM +0200, Steffen Klassert wrote:
->
-> +	alg = crypto_get_attr_alg(tb, algt->type,
-> +				  (algt->mask & CRYPTO_ALG_TYPE_MASK)
-> +				  | CRYPTO_ALG_PCRYPT);
-
-Do you really need to exclude pcrypt algorithms here? If the user
-wants to added another layer of pcrypt then we should obey.
-
-Otherwise this looks pretty good to me.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+WW91IGhhdmUgaGVhcmQgaXQgc28gbWFueSB0aW1lcyBiZWZvcmU6IHRoZSBVbml0ZWQgU3RhdGVzIGlzIHRoZSBjb3VudHJ5IHdoZXJlIHBlb3BsZSBhcmUgZnJlZSBhbmQgZHJlYW1zIGFyZSBmdWxmaWxsZWQuDQoNClRoZSBHcmVlbiBDYXJkIExvdHRlcnkgb25seSBoYXBwZW5zIG9uY2UgYSB5ZWFyLiBFdmVyeSB5ZWFyIHRoZSByZWd1bGF0aW9ucyBjaGFuZ2UgYW5kIHN1Y2ggY2hhbmdlcyBtYXkgYWN0dWFsbHkgYWZmZWN0IHlvdXIgZWxpZ2liaWxpdHkuIFlvdSBkb24ndCBoYXZlIHRvIGJlIGFtb25nIHRoZSBwZW9wbGUgdGhhdCBhcmUgZGlzcXVhbGlmaWVkIHNpbXBseSBiZWNhdXNlIHRoZWlyIGFwcGxpY2F0aW9uIGlzIGRlZW1lZCB1bmFjY2VwdGFibGUuDQoNCkV4cGVydHMgd2lsbCByZXZpZXcgeW91ciByZWdpc3RyYXRpb24gYW5kIHByb3ZpZGUgcHJvZmVzc2lvbmFsIGFzc2lzdGFuY2Ugd2hlbiBmaWxsaW5nIG91dCBhIEdyZWVuIENhcmQgTG90dGVyeSBhcHBsaWNhdGlvbi4NCg0KQ29uZmlybSB5b3VyIGludGVyZXN0IGF0IDE2MTd2YXJ2ZWwubWVsaW5kYUBnbWFpbC5jb20gdG8gcmVjZWl2ZSBmdXJ0aGVyIGluZm9ybWF0aW9uIGZyb20g
+ dXMuDQoNClVTQUdDIERWIExvdHRlcnkgU2VydmljZXMKCgoKCgoKCgoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBlbWFpbCBoYXMgYmVlbiB3cml0dGVuIGFuZCBwcm92ZWQgdG8gYmUgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSByZWNlbnRseSBlc3RhYmxpc2hlZCBjYW4tc3BhbSBhY3QgbGF3IGluIFVTLiBXZSBhcmUgbm90IHByb3Zva2luZyBvciBmb3JjaW5nIGFueSBwZXJzb24gaW4gYW55IHdheSB0byBwYXJ0aWNpcGF0ZSBpbiBvdXIgcHJvZ3JhbXMuIFRvIHBhcnRpY2lwYXRlIGlzIHlvdXIgb3duIGRlY2lzaW9uIGFuZCB5b3UgY2FycnkgdGhlIHJlc3BvbnNpYmlsaXR5IG9mIHRha2luZyBmdXJ0aGVyIHBhcnQgaW4gdGhpcyBwcm9tb3Rpb24uIEFueXdheSwgaWYgeW91IGRvbid0IHdhbnQgdG8gcmVjZWl2ZSBtb3JlIGdvb2Qgb2ZmZXJzIGZyb20gdXMsIHlvdSBjYW4gc2ltcGx5IFVuc3Vic2NyaWJlIGJ5IHNlbmRpbmcgdXMgYSBub3RpZmljYXRpb24gZW1haWwgdG8gb3V0X29mX3RoZV9saXN0QHlhaG9vLmNvbSB3aXRoIGEgbWFpbC1zdWJqZWN0IGFuZC
+ B0ZXh0ICJVbnN1YnNjcmliZSBtZSIsIGFuZCB3ZSB3aWxsIGdldCB5b3VyIGVtYWlsIG91dCBvZiBvdXIgbGlzdCB3aXRoaW4gMTAgZGF5cy4KClRoaXMgbWVzc2FnZSBpcyBTVFJJQ1RMWSBDT05GSURFTlRJQUwgYW5kIGlzIHNvbGVseSBmb3IgdGhlIGluZGl2aWR1YWwgb3Igb3JnYW5pc2F0aW9uIHRvIHdob20gaXQgaXMgYWRkcmVzc2VkLiBJdCBtYXkgY29udGFpbiBQUklWSUxFR0VEIGFuZCBDT05GSURFTlRJQUwgaW5mb3JtYXRpb24uIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHlvdSBhcmUgaGVyZWJ5IG5vdGlmaWVkIHRoYXQgYW55IGRpc3NlbWluYXRpb24sIGRpc3RyaWJ1dGlvbiBvciBjb3B5aW5nIG9mIHRoaXMgY29tbXVuaWNhdGlvbiBhbmQgaXRzIGNvbnRlbnRzIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQgeW91IHNob3VsZCBub3QgcmVhZCwgY29weSwgZGlzdHJpYnV0ZSwgZGlzY2xvc2Ugb3Igb3RoZXJ3aXNlIHVzZSB0aGUgaW5mb3JtYXRpb24gaW4gdGhpcyBlbWFpbC4gRW1haWwgbWF5IGJlIHN1c2NlcHRpYmxlIHRvIGRhdGEgY29ycnVw
+ dGlvbiwgaW50ZXJjZXB0aW9uIGFuZCB1bmF1dGhvcmlzZWQgYW1lbmRtZW50LCBhbmQgd2UgZG8gbm90IGFjY2VwdCBsaWFiaWxpdHkgZm9yIGFueSBzdWNoIGNvcnJ1cHRpb24sIGludGVyY2VwdGlvbiBvciBhbWVuZG1lbnQgb3IgdGhlIGNvbnNlcXVlbmNlcyB0aGVyZW9mIG9yIHlvdXIgcmVsaWFuY2Ugb24gYW55IGluZm9ybWF0aW9uIGNvbnRhaW5lZCB0aGVyZWluIGlmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQuIElmIHlvdSBhcmUgbm90IGludGVyZXN0ZWQgaW4gdGhlIG9mZmVyZWQgcHJvbW90aW9ucywgcGxlYXNlIGp1c3QgZG9uJ3QgYW5zd2VyLiBJZiB5b3UgdGhpbmsgeW91IGhhdmUgcmVjZWl2ZWQgdGhpcyBtZXNzYWdlIGFuZCBpdHMgY29udGVudHMgaW4gZXJyb3IsIHBsZWFzZSBkZWxldGUgaXQgZnJvbSB5b3VyIGNvbXB1dGVyLCBvciBmb2xsb3cgdGhlIHVuc3Vic2NyaWJpbmcgcHJvY2VkdXJlIHNob3duIGFib3ZlLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCQk=
