@@ -1,58 +1,41 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] crypto: print self-test pass notices in fips mode
-Date: Wed, 29 Apr 2009 09:24:10 -0400
-Message-ID: <200904290924.11005.jarod@redhat.com>
-References: <200904282121.35300.jarod@redhat.com> <20090429131817.GB17254@gondor.apana.org.au> <200904290921.54483.jarod@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: catch base cipher self-test failures in fips
+	mode
+Date: Wed, 29 Apr 2009 21:26:46 +0800
+Message-ID: <20090429132646.GA17481@gondor.apana.org.au>
+References: <200904282111.52074.jarod@redhat.com> <20090429131506.GA17254@gondor.apana.org.au> <200904290918.37623.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Neil Horman <nhorman@tuxdriver.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:57281 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755063AbZD2NZA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Apr 2009 09:25:00 -0400
-In-Reply-To: <200904290921.54483.jarod@redhat.com>
+Received: from rhun.apana.org.au ([64.62.148.172]:43702 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753109AbZD2N0t (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Apr 2009 09:26:49 -0400
 Content-Disposition: inline
+In-Reply-To: <200904290918.37623.jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 29 April 2009 09:21:53 Jarod Wilson wrote:
-> On Wednesday 29 April 2009 09:18:17 Herbert Xu wrote:
-> > On Tue, Apr 28, 2009 at 09:21:35PM -0400, Jarod Wilson wrote:
+On Wed, Apr 29, 2009 at 09:18:37AM -0400, Jarod Wilson wrote:
+> On Wednesday 29 April 2009 09:15:07 Herbert Xu wrote:
+> > On Tue, Apr 28, 2009 at 09:11:51PM -0400, Jarod Wilson wrote:
 > > >
-> > > diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> > > index 39ffa69..d0cc85c 100644
-> > > --- a/crypto/testmgr.c
-> > > +++ b/crypto/testmgr.c
-> > > @@ -2149,6 +2149,10 @@ notest:
-> > >  test_done:
-> > >  	if (fips_enabled && rc)
-> > >  		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
-> > > +	/* fips mode requires we print out self-test success notices */
-> > > +	if (fips_enabled && !rc && strncmp(alg, "ctr(aes", 7))
-> > > +		printk(KERN_INFO "alg: self-tests for %s (%s) passed\n",
-> > > +		       driver, alg);
+> > > +notest:
+> > > +	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
 > > 
-> > What is this strncmp crap for?
+> > Can notest ever get here with rc != 0?
 > 
-> To avoid claiming we successfully self-tested ctr(aes) when its
-> not actually directly testable. Was intended to go sort of hand
-> in hand with the other patch to suppress 'no self test' messages
-> for ctr(aes) when in fips mode. Of course, since at this point,
-> we've run ecb(aes), and that's what's suggested as the way to
-> test ctr(aes)[*], perhaps we don't need to
-> suppress it.
-> 
-> [*] well, along with the sign-off from the lab that the counter
-> code is acceptable
+> Nope.
 
-So this might actually be another argument in favor of adding a "this
-algo isn't really testable" flag as Neil suggested...
+So why do we need to move it?
 
+Cheers,
 -- 
-Jarod Wilson
-jarod@redhat.com
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
