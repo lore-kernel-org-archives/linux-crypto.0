@@ -1,65 +1,67 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH v2 3/4] xfrm: Add a netlink attribute for
-	software crypto accelerators
-Date: Tue, 28 Apr 2009 12:11:21 +0200
-Message-ID: <20090428101121.GC20366@secunet.com>
-References: <20090427085346.GA21761@gondor.apana.org.au>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto: catch base cipher self-test failures in fips mode
+Date: Tue, 28 Apr 2009 21:11:51 -0400
+Message-ID: <200904282111.52074.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Neil Horman <nhorman@tuxdriver.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:39187 "EHLO a.mx.secunet.com"
+Received: from mx2.redhat.com ([66.187.237.31]:34064 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753730AbZD1KJP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Apr 2009 06:09:15 -0400
+	id S1755367AbZD2BMA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 28 Apr 2009 21:12:00 -0400
 Content-Disposition: inline
-In-Reply-To: <20090427085346.GA21761@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 27, 2009 at 04:53:46PM +0800, Herbert Xu wrote:
-> 
-> While this should work for pcrypt, I'd like this to be solved
-> more generally.  The crux of the issue is that we can't specify
-> an arbitrary implementation of a given algorithm.  So the obvious
-> solution is to specify the driver name along with the algorithm
-> name.
+I think this might have already been posted by Neil Horman, and
+we already have it in the Red Hat Enterprise Linux 5.x kernels,
+but in fips mode, we need to panic on the base cipher self-tests
+failing as well as the later tests.
 
-So how general should it be? For the moment I would see pcrypt and maybe
-cryptd as possible candidates to use this mechanism. I'm just wondering
-if it is worth to set up a list of crypto templates that can be choosen
-from userspace, similar to the xfrm_algo_list.
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
 
-> 
-> This is in fact pretty much what you've done, but I'd just like
-> it to be generalised.  In particular, instead of having just a
-> single name per SA, we should allow one to be set for each algorithm
-> type.
+---
+ crypto/testmgr.c |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
 
-Just to get you right, do you think about adding a netlink attribute for
-each algorithm type?
-
-> 
-> On another note, I don't expect this to be the primary mechanism
-> for activating parallel processing.  Doing it manually on each
-> SA is just painful.  This should be used for testing or when you
-> want to specify it for a subset of SAs only.
-> 
-> When the admin wants to turn the entire system over to pcrypt,
-> it should be done at the crypto layer, by simply registering
-> the pcrypt version of the algorithm in question, and having it
-> as the default implementation of that algorithm.
-
-That's not really clear to me how to let the user register the pcrypt
-version of the algorithm, so what's the desired way do this.
-
-> 
-> In fact, this mechanism should then be able to allow specific
-> SAs to not use parallel processing, which means that it should
-> definitely not be called accl :)
-> 
-
-Yes, I think I'll find a better name :)
-
-Steffen
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 40c1078..5a50416 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2109,7 +2109,7 @@ static int alg_find_test(const char *alg)
+ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ {
+ 	int i;
+-	int rc;
++	int rc = 0;
+ 
+ 	if ((type & CRYPTO_ALG_TYPE_MASK) == CRYPTO_ALG_TYPE_CIPHER) {
+ 		char nalg[CRYPTO_MAX_ALG_NAME];
+@@ -2122,7 +2122,8 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 		if (i < 0)
+ 			goto notest;
+ 
+-		return alg_test_cipher(alg_test_descs + i, driver, type, mask);
++		rc = alg_test_cipher(alg_test_descs + i, driver, type, mask);
++		goto test_done;
+ 	}
+ 
+ 	i = alg_find_test(alg);
+@@ -2131,14 +2132,13 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 
+ 	rc = alg_test_descs[i].test(alg_test_descs + i, driver,
+ 				      type, mask);
++	goto test_done;
++notest:
++	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
++test_done:
+ 	if (fips_enabled && rc)
+ 		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
+-
+ 	return rc;
