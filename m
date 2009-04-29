@@ -1,37 +1,42 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH 2/2] add ansi_cprng test vectors
-Date: Wed, 29 Apr 2009 06:56:16 -0400
-Message-ID: <20090429105616.GF7227@hmsreliant.think-freely.org>
-References: <200904282127.33190.jarod@redhat.com> <200904282132.10884.jarod@redhat.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: [PATCH] crypto: catch base cipher self-test failures in fips mode
+Date: Wed, 29 Apr 2009 08:38:45 -0400
+Message-ID: <200904290838.45896.jarod@redhat.com>
+References: <200904282111.52074.jarod@redhat.com> <20090429103623.GB7227@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
-To: Jarod Wilson <jarod@redhat.com>
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:47646 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756444AbZD2K4Y (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Apr 2009 06:56:24 -0400
+Received: from mx2.redhat.com ([66.187.237.31]:42053 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756471AbZD2Mjd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 Apr 2009 08:39:33 -0400
+In-Reply-To: <20090429103623.GB7227@hmsreliant.think-freely.org>
 Content-Disposition: inline
-In-Reply-To: <200904282132.10884.jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 28, 2009 at 09:32:10PM -0400, Jarod Wilson wrote:
-> Add ANSI X9.31 Continuous Pseudo-Random Number Generator (AES mode),
-> aka 'ansi_cprng' test vectors, taken from Appendix B.2.9 and B.2.10
-> of the NIST RNGVS document, found here:
->     http://csrc.nist.gov/groups/STM/cavp/documents/rng/RNGVS.pdf
-> 
-> Successfully tested against both the cryptodev-2.6 tree and a Red
-> Hat Enterprise Linux 5.4 kernel, via 'modprobe tcrypt mode=150'.
-> 
-> The selection of 150 was semi-arbitrary, didn't seem like it should
-> go any place in particular, so I started a new range for rng tests.
-> 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> 
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
-> 
+On Wednesday 29 April 2009 06:36:23 Neil Horman wrote:
+> On Tue, Apr 28, 2009 at 09:11:51PM -0400, Jarod Wilson wrote:
+> > I think this might have already been posted by Neil Horman, and
+> > we already have it in the Red Hat Enterprise Linux 5.x kernels,
+> > but in fips mode, we need to panic on the base cipher self-tests
+> > failing as well as the later tests.
+> > 
+> > Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> > 
+> I did post it:
+> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg02307.html
+> looks like it somehow just never made it to Linus.  Thanks for noticing, Jarod.
+
+That part got committed, this is an additional piece, as I believe that
+wasn't quite complete. This patch adds another check for the rc of
+alg_test_cipher() (vs. only the check for alg_test_descs[i].test()).
+
+-- 
+Jarod Wilson
+jarod@redhat.com
