@@ -1,47 +1,20 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] crypto: catch base cipher self-test failures in fips mode
-Date: Wed, 29 Apr 2009 09:34:31 -0400
-Message-ID: <200904290934.32404.jarod@redhat.com>
-References: <200904282111.52074.jarod@redhat.com> <200904290918.37623.jarod@redhat.com> <20090429132646.GA17481@gondor.apana.org.au>
+From: "Arthur Lindsey" <jmrip@etp.es.blackberry.net>
+Subject: Jolie dresses down to undies.
+Date: Thu, 30 Apr 2009 06:03:01 +0100
+Message-ID: <20090430060301.1090408@etp.es.blackberry.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Neil Horman <nhorman@tuxdriver.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:40135 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756744AbZD2NfT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Apr 2009 09:35:19 -0400
-In-Reply-To: <20090429132646.GA17481@gondor.apana.org.au>
-Content-Disposition: inline
+Received: from host136-207-static.22-87-b.business.telecomitalia.it ([87.22.207.136]:4316
+	"HELO host136-207-static.22-87-b.business.telecomitalia.it"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751039AbZD3E1G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Apr 2009 00:27:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 29 April 2009 09:26:46 Herbert Xu wrote:
-> On Wed, Apr 29, 2009 at 09:18:37AM -0400, Jarod Wilson wrote:
-> > On Wednesday 29 April 2009 09:15:07 Herbert Xu wrote:
-> > > On Tue, Apr 28, 2009 at 09:11:51PM -0400, Jarod Wilson wrote:
-> > > >
-> > > > +notest:
-> > > > +	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
-> > > 
-> > > Can notest ever get here with rc != 0?
-> > 
-> > Nope.
-> 
-> So why do we need to move it?
+Are you ready to boost your self-esteem and start feeling great life? 
+http://yoz.transformationforgiving.com/
 
-Oh. Hrm. Upon looking a bit harder at it, I think the only reason
-would be if we wanted to print out a message claiming success in
-testing ctr(aes).
-
-There's also a devious ulterior motive for this patch, which is
-to make the cryptodev tree look identical(er) to the Red Hat
-Enterprise Linux 5.x kernel tree w/in alg_test()...
-
--- 
-Jarod Wilson
-jarod@redhat.com
