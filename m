@@ -1,82 +1,80 @@
-From: David Lamparter <lists@diac24.net>
-Subject: XTS cipher mode not using assembler AES implementation?
-Date: Thu, 30 Apr 2009 20:56:51 +0200
-Message-ID: <1241117811.8320.14.camel@arkology.n2.diac24.net>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH v2] crypto: catch base cipher self-test failures in fips mode
+Date: Thu, 30 Apr 2009 16:21:56 -0400
+Message-ID: <200904301621.57298.jarod@redhat.com>
+References: <200904282111.52074.jarod@redhat.com> <20090429132646.GA17481@gondor.apana.org.au> <200904290934.32404.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Neil Horman <nhorman@tuxdriver.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from spaceboyz.net ([87.106.131.203]:39280 "EHLO spaceboyz.net"
+Received: from mx2.redhat.com ([66.187.237.31]:54176 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751943AbZD3T1H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Apr 2009 15:27:07 -0400
-Received: from [2001:8d8:81:5c2:21b:fcff:fe4c:9e6f] (helo=jupiter.n2.diac24.net)
-	by spaceboyz.net with esmtps (TLSv1:AES256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <lists@diac24.net>)
-	id 1LzbRH-0002EN-0U
-	for linux-crypto@vger.kernel.org; Thu, 30 Apr 2009 20:56:55 +0200
-Received: from arkology.n2.diac24.net ([2001:8d8:81:5c2:219:dbff:feea:a8a8])
-	by jupiter.n2.diac24.net with esmtps (TLSv1:CAMELLIA256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <lists@diac24.net>)
-	id 1LzbRF-0007s0-31
-	for linux-crypto@vger.kernel.org; Thu, 30 Apr 2009 20:56:55 +0200
+	id S1753344AbZD3UWx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Apr 2009 16:22:53 -0400
+In-Reply-To: <200904290934.32404.jarod@redhat.com>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello linux-crypto list,
+On Wednesday 29 April 2009 09:34:31 Jarod Wilson wrote:
+> On Wednesday 29 April 2009 09:26:46 Herbert Xu wrote:
+> > On Wed, Apr 29, 2009 at 09:18:37AM -0400, Jarod Wilson wrote:
+> > > On Wednesday 29 April 2009 09:15:07 Herbert Xu wrote:
+> > > > On Tue, Apr 28, 2009 at 09:11:51PM -0400, Jarod Wilson wrote:
+> > > > >
+> > > > > +notest:
+> > > > > +	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
+> > > > 
+> > > > Can notest ever get here with rc != 0?
+> > > 
+> > > Nope.
+> > 
+> > So why do we need to move it?
+> 
+> Oh. Hrm. Upon looking a bit harder at it, I think the only reason
+> would be if we wanted to print out a message claiming success in
+> testing ctr(aes).
+> 
+> There's also a devious ulterior motive for this patch, which is
+> to make the cryptodev tree look identical(er) to the Red Hat
+> Enterprise Linux 5.x kernel tree w/in alg_test()...
+
+Version 2, streamlined and simplified, RHEL5 be damned.
+
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+
+---
+ crypto/testmgr.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 0161cc2..f39c148 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2220,7 +2220,8 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 		if (i < 0)
+ 			goto notest;
+ 
+-		return alg_test_cipher(alg_test_descs + i, driver, type, mask);
++		rc = alg_test_cipher(alg_test_descs + i, driver, type, mask);
++		goto test_done;
+ 	}
+ 
+ 	i = alg_find_test(alg);
+@@ -2229,6 +2230,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 
+ 	rc = alg_test_descs[i].test(alg_test_descs + i, driver,
+ 				      type, mask);
++test_done:
+ 	if (fips_enabled && rc)
+ 		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
+ 
 
 
-I beg pardon for bothering you with this, but I'm slightly irritated
-by /proc/crypto output on my box. It lists:
-
-name         : xts(aes)
-driver       : xts(aes-generic)
-module       : kernel
-priority     : 100
-refcnt       : 2
-[...]
-name         : aes
-driver       : aes-generic
-module       : kernel
-priority     : 100
-refcnt       : 4
-[...]
-name         : aes
-driver       : aes-asm
-module       : kernel
-priority     : 200
-refcnt       : 1
-
-[no xts(aes-asm) entry]
-
-So, basically, my dm-crypt (cipher: aes-xts-essiv:wp256) uses the
-generic AES implementation if I'm reading this right? What do I need to
-do to get it to use the aes-asm one?
-
-(In case it matters, I have the crypto stuff compiled into the kernel
-because my rootfs is on crypto, so I'm just booting a kernel with
-everything needed compiled in for ease of setup... maybe xts initializes
-before aes-asm does?)
-
-Thankful for any information, please Cc me as I'm not subscribed on
-linux-crypto,
-
-
-David Lamparter
-
-
-(# uname -a
-Linux jupiter 2.6.28.7-grsec-00001-gcd4f8cc #1 SMP Tue Mar 3 18:05:40
-CET 2009 x86_64 AMD Athlon(tm) Dual Core Processor 4450e AuthenticAMD
-GNU/Linux
-# gunzip -c /proc/config.gz | pcregrep '_AES|_XTS'
-CONFIG_CRYPTO_XTS=y
-CONFIG_CRYPTO_AES=y
-CONFIG_CRYPTO_AES_X86_64=y
-
-crypto device performance is 35 MB/s, underlying device does 200 MB/s)
-
-
+-- 
+Jarod Wilson
+jarod@redhat.com
