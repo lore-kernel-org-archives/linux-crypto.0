@@ -1,36 +1,44 @@
-From: Ravula Kishor <kishor_ravula@yahoo.com>
-Subject: talitos_probe hangs
-Date: Mon, 4 May 2009 23:01:23 -0700 (PDT)
-Message-ID: <728619.83165.qm@web50504.mail.re2.yahoo.com>
-Reply-To: kishor_ravula@yahoo.com
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: [PATCH] crypto: don't raise alarm for no ctr(aes*) tests in fips mode
+Date: Tue, 5 May 2009 09:04:49 -0400
+Message-ID: <200905050904.49945.jarod@redhat.com>
+References: <200904282118.22823.jarod@redhat.com> <49FFB644.5030201@redhat.com> <20090505052905.GA14477@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@redhat.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Neil Horman <nhorman@tuxdriver.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from web50504.mail.re2.yahoo.com ([206.190.38.80]:40316 "HELO
-	web50504.mail.re2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1753495AbZEEGIG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 May 2009 02:08:06 -0400
+Received: from mx2.redhat.com ([66.187.237.31]:60387 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752613AbZEENFi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2009 09:05:38 -0400
+In-Reply-To: <20090505052905.GA14477@gondor.apana.org.au>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tuesday 05 May 2009 01:29:05 Herbert Xu wrote:
+> On Mon, May 04, 2009 at 11:45:08PM -0400, Jarod Wilson wrote:
+> >
+> > Can't keep all the RFCs and SPs and whatnot straight in my head, and they
+> > aren't in front of me, but I thought I read that the basic counter increment
+> > routine wasn't mandated to be any specific way, the only mandate was to
+> > ensure unique values. Suggestions for how to do so were made though.
+> 
+> It doesn't matter what is or isn't specified for CTR, the thing
+> that we call "ctr" is the one that's used for RFC 3686, CCM, and
+> GCM.  It is completely pinned down and can be tested.
 
-Hi,
+There are two different "can be tested" contexts here. I completely
+agree that ctr(aes) is testable within the tcrypt/testmgr context,
+and sent a patch for such in this thread yesterday. The other
+context is FIPS CAVS testing, which NIST is saying can't be done,
+and I was attempting to understand why, which probably only served
+to muddy the waters. We can definitely do self-tests for ctr(aes).
 
-I am using ltib-20080811 (2.6.25 kernel) . I am porting it to custom board based on mcf5474. I observed that talitos_probe hangs during the kernel initialization.
-
-Is it a known issue. 
-
-Appreciate any pointers on this problem.
-
-Thanks,
-Kishor
-
-
-
-
-
-      
+-- 
+Jarod Wilson
+jarod@redhat.com
