@@ -1,44 +1,45 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] crypto: don't raise alarm for no ctr(aes*) tests in fips mode
-Date: Tue, 5 May 2009 09:04:49 -0400
-Message-ID: <200905050904.49945.jarod@redhat.com>
-References: <200904282118.22823.jarod@redhat.com> <49FFB644.5030201@redhat.com> <20090505052905.GA14477@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: add ctr(aes) test vectors
+Date: Tue, 5 May 2009 21:18:35 +0800
+Message-ID: <20090505131835.GA18659@gondor.apana.org.au>
+References: <200904282118.22823.jarod@redhat.com> <20090504111010.GA4991@gondor.apana.org.au> <200905041624.45060.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Neil Horman <nhorman@tuxdriver.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:60387 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752613AbZEENFi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 May 2009 09:05:38 -0400
-In-Reply-To: <20090505052905.GA14477@gondor.apana.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:52464 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750935AbZEENSj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2009 09:18:39 -0400
 Content-Disposition: inline
+In-Reply-To: <200905041624.45060.jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tuesday 05 May 2009 01:29:05 Herbert Xu wrote:
-> On Mon, May 04, 2009 at 11:45:08PM -0400, Jarod Wilson wrote:
-> >
-> > Can't keep all the RFCs and SPs and whatnot straight in my head, and they
-> > aren't in front of me, but I thought I read that the basic counter increment
-> > routine wasn't mandated to be any specific way, the only mandate was to
-> > ensure unique values. Suggestions for how to do so were made though.
-> 
-> It doesn't matter what is or isn't specified for CTR, the thing
-> that we call "ctr" is the one that's used for RFC 3686, CCM, and
-> GCM.  It is completely pinned down and can be tested.
+On Mon, May 04, 2009 at 04:24:44PM -0400, Jarod Wilson wrote:
+>
+> Indeed, the first enc/dec operation after we set the counter *is*
+> completely deterministic across all implementations, the AESAVS
+> is referring to tests with multiple operations, which aren't
+> possible, due to varying implementations of counter increment
+> routines. This patch adds test vectors for ctr(aes), using the
+> first block input values from Appendix F.5 of NIST Special Pub
+> 800-38A.
 
-There are two different "can be tested" contexts here. I completely
-agree that ctr(aes) is testable within the tcrypt/testmgr context,
-and sent a patch for such in this thread yesterday. The other
-context is FIPS CAVS testing, which NIST is saying can't be done,
-and I was attempting to understand why, which probably only served
-to muddy the waters. We can definitely do self-tests for ctr(aes).
+Well, our ctr(aes) must be completely deterministic as it is
+used as the base for CCM and GCM.  In fact, if it weren't so
+then you can't use it for anything since two implementations
+may produces different outputs.
 
+So if you could resend some vectors that test multiple blocks
+then I'll happily add them.
+
+Thanks,
 -- 
-Jarod Wilson
-jarod@redhat.com
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
