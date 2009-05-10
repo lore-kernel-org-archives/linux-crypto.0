@@ -1,40 +1,43 @@
-From: Chris Umphress <umphress@gmail.com>
-Subject: Re: pcomp for lzma for later use with squashfs
-Date: Fri, 8 May 2009 13:00:06 -0500
-Message-ID: <1f29b8940905081100i37bfe435rad2d50230cae8161@mail.gmail.com>
-References: <4A041EE5.4000008@hiramoto.org>
+From: Harald Welte <HaraldWelte@viatech.com>
+Subject: [PATCH] The VIA Hardware RNG driver is for the CPU, not Chipset
+Date: Sun, 10 May 2009 14:28:44 +0800
+Message-ID: <20090510062844.GD12152@prithivi.gnumonks.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>,
-	linux-crypto@vger.kernel.org, phillip@lougher.demon.co.uk
-To: Karl Hiramoto <karl@hiramoto.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ey-out-2122.google.com ([74.125.78.26]:56168 "EHLO
-	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753881AbZEHSAJ (ORCPT
+Received: from ganesha.gnumonks.org ([213.95.27.120]:60561 "EHLO
+	ganesha.gnumonks.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751510AbZEJHIn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 May 2009 14:00:09 -0400
-Received: by ey-out-2122.google.com with SMTP id 9so529079eyd.37
-        for <linux-crypto@vger.kernel.org>; Fri, 08 May 2009 11:00:07 -0700 (PDT)
-In-Reply-To: <4A041EE5.4000008@hiramoto.org>
+	Sun, 10 May 2009 03:08:43 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 8, 2009 at 7:00 AM, Karl Hiramoto <karl@hiramoto.org> wrote:
-> Hi Geert,
->
-> Was wondering if there are any patches for pcomp lzma. it it just a matter
-> of adding crypto/lzma to make the calls to lib/decompress_unlzma.c ?
->
-> I just started looking at this, my end goal is to use your pcomp patch for
-> squashfs and get lzma squahsfs.
+This is a cosmetic change, fixing the MODULE_DESCRIPTION() of via-rng.c
 
-I've just begun to look at this over the last couple days as well but
-have not yet been able to assess what is necessary to make this
-happen.
+Signed-off-by: Harald Welte <HaraldWelte@viatech.com>
+---
+ drivers/char/hw_random/via-rng.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-If you are interested in developing the patch, I'm willing to help.
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index eea0814..824f003 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -213,5 +213,5 @@ static void __exit mod_exit(void)
+ module_init(mod_init);
+ module_exit(mod_exit);
+ 
+-MODULE_DESCRIPTION("H/W RNG driver for VIA chipsets");
++MODULE_DESCRIPTION("H/W RNG driver for VIA CPU with PadLock");
+ MODULE_LICENSE("GPL");
+-- 
+1.5.6.5
 
 -- 
-Chris Umphress <http://www.epicvoyage.org>
+- Harald Welte <HaraldWelte@viatech.com>	    http://linux.via.com.tw/
+============================================================================
+VIA Open Source Liaison
