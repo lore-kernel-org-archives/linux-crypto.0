@@ -1,438 +1,361 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH] crypto: tcrypt: add option to not exit on success
-Date: Mon, 11 May 2009 10:06:32 -0400
-Message-ID: <200905111006.32675.jarod@redhat.com>
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: [PATCH] crypto: compress - Return produced bytes in
+ crypto_{,de}compress_{update,final}()
+Date: Mon, 11 May 2009 17:35:08 +0200 (CEST)
+Message-ID: <alpine.LRH.2.00.0905111731490.302@vixen.sonytel.be>
+References: <1235569394-15217-3-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-4-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-5-git-send-email-Geert.Uytterhoeven@sonycom.com> <1235569394-15217-6-git-send-email-Geert.Uytterhoeven@sonycom.com>
+ <1235569394-15217-7-git-send-email-Geert.Uytterhoeven@sonycom.com> <20090307104637.GB8731@gondor.apana.org.au> <49B36A18.5030506@lougher.demon.co.uk> <alpine.LRH.2.00.0903111830540.1040@vixen.sonytel.be> <alpine.LRH.2.00.0903171345040.7595@vixen.sonytel.be>
+ <alpine.LRH.2.00.0903241729540.4446@vixen.sonytel.be> <20090420060313.GA891@gondor.apana.org.au> <alpine.LRH.2.00.0904200925290.11211@vixen.sonytel.be> <alpine.LRH.2.00.0905051613070.21255@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Neil Horman <nhorman@tuxdriver.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Phillip Lougher <phillip@lougher.demon.co.uk>,
+	linux-crypto@vger.kernel.org,
+	Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:33531 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751778AbZEKOJr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2009 10:09:47 -0400
-Content-Disposition: inline
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:47099 "EHLO
+	pophost.sonytel.be" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751695AbZEKPfJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 May 2009 11:35:09 -0400
+In-Reply-To: <alpine.LRH.2.00.0905051613070.21255@vixen.sonytel.be>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-At present, the tcrypt module always exits with an -EAGAIN upon
-successfully completing all the tests its been asked to run. There
-are cases where it would be much simpler to verify all tests passed
-if tcrypt simply stayed loaded (i.e. returned 0). Specifically, in
-fips mode, all self-tests need to be run from the initrd, and its
-much simpler to check the ret from modprobe for success than to
-scrape dmesg. To make this doable, I've simply added a module param
-to allow this behavior, leaving the default behavior more or less
-the same as before, although now we're tracking all success/failure
-rets as well.
+If crypto_{,de}compress_{update,final}() succeed, return the actual num=
+ber of
+bytes produced instead of zero, so their users don't have to calculate =
+that
+theirselves.
 
-The tcrypt_test() portion of the patch is dependent on my earlier
-pair of patches that skip non-fips algs in fips mode, at least to
-achieve the fully intended behavior.
-
-Signed-off-by: Jarod Wilson <jarod@redhat.com>
-
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 ---
- crypto/tcrypt.c |  168 +++++++++++++++++++++++++++++++------------------------
- 1 files changed, 94 insertions(+), 74 deletions(-)
+As we're already at 2.6.30-rc5, I do not want to delay any longer this =
+API
+change for a new module introduced for 2.6.30.
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 9e4974e..dee729c 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -27,6 +27,7 @@
- #include <linux/timex.h>
- #include <linux/interrupt.h>
- #include "tcrypt.h"
-+#include "internal.h"
- 
- /*
-  * Need slab memory for testing (size in number of pages).
-@@ -45,6 +46,7 @@
- static unsigned int sec;
- 
- static int mode;
-+static int noexit;
- static char *tvmem[TVMEMSIZE];
- 
- static char *check[] = {
-@@ -468,248 +470,255 @@ static void test_available(void)
- 
- static inline int tcrypt_test(const char *alg)
- {
--	return alg_test(alg, alg, 0, 0);
-+	int ret;
+Herbert, please apply for 2.6.30.
+Thanks!
+
+ crypto/testmgr.c |  117 ++++++++++++++++++++++++++++++++--------------=
+--------
+ crypto/zlib.c    |   24 ++++++------
+ 2 files changed, 82 insertions(+), 59 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index bfee6e9..b55bccc 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -916,24 +916,25 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 	const char *algo =3D crypto_tfm_alg_driver_name(crypto_pcomp_tfm(tfm)=
+);
+ 	unsigned int i;
+ 	char result[COMP_BUF_SIZE];
+-	int error;
++	int res;
+=20
+ 	for (i =3D 0; i < ctcount; i++) {
+ 		struct comp_request req;
++		unsigned int produced =3D 0;
+=20
+-		error =3D crypto_compress_setup(tfm, ctemplate[i].params,
+-					      ctemplate[i].paramsize);
+-		if (error) {
++		res =3D crypto_compress_setup(tfm, ctemplate[i].params,
++					    ctemplate[i].paramsize);
++		if (res) {
+ 			pr_err("alg: pcomp: compression setup failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+-		error =3D crypto_compress_init(tfm);
+-		if (error) {
++		res =3D crypto_compress_init(tfm);
++		if (res) {
+ 			pr_err("alg: pcomp: compression init failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+ 		memset(result, 0, sizeof(result));
+@@ -943,32 +944,37 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 		req.next_out =3D result;
+ 		req.avail_out =3D ctemplate[i].outlen / 2;
+=20
+-		error =3D crypto_compress_update(tfm, &req);
+-		if (error && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_compress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: compression update failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Add remaining input data */
+ 		req.avail_in +=3D (ctemplate[i].inlen + 1) / 2;
+=20
+-		error =3D crypto_compress_update(tfm, &req);
+-		if (error && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_compress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: compression update failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Provide remaining output space */
+ 		req.avail_out +=3D COMP_BUF_SIZE - ctemplate[i].outlen / 2;
+=20
+-		error =3D crypto_compress_final(tfm, &req);
+-		if (error) {
++		res =3D crypto_compress_final(tfm, &req);
++		if (res < 0) {
+ 			pr_err("alg: pcomp: compression final failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		produced +=3D res;
+=20
+ 		if (COMP_BUF_SIZE - req.avail_out !=3D ctemplate[i].outlen) {
+ 			pr_err("alg: comp: Compression test %d failed for %s: "
+@@ -978,6 +984,13 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return -EINVAL;
+ 		}
+=20
++		if (produced !=3D ctemplate[i].outlen) {
++			pr_err("alg: comp: Compression test %d failed for %s: "
++			       "returned len =3D %u (expected %d)\n", i + 1,
++			       algo, produced, ctemplate[i].outlen);
++			return -EINVAL;
++		}
 +
-+	ret = alg_test(alg, alg, 0, 0);
-+	/* non-fips algs return -EINVAL in fips mode */
-+	if (fips_enabled && ret == -EINVAL)
-+		ret = 0;
+ 		if (memcmp(result, ctemplate[i].output, ctemplate[i].outlen)) {
+ 			pr_err("alg: pcomp: Compression test %d failed for "
+ 			       "%s\n", i + 1, algo);
+@@ -988,21 +1001,21 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+=20
+ 	for (i =3D 0; i < dtcount; i++) {
+ 		struct comp_request req;
++		unsigned int produced =3D 0;
+=20
+-		error =3D crypto_decompress_setup(tfm, dtemplate[i].params,
+-						dtemplate[i].paramsize);
+-		if (error) {
++		res =3D crypto_decompress_setup(tfm, dtemplate[i].params,
++					      dtemplate[i].paramsize);
++		if (res) {
+ 			pr_err("alg: pcomp: decompression setup failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+-		error =3D crypto_decompress_init(tfm);
+-		if (error) {
++		res =3D crypto_decompress_init(tfm);
++		if (res) {
+ 			pr_err("alg: pcomp: decompression init failed on test "
+-			       "%d for %s: error=3D%d\n", i + 1, algo, error);
+-			return error;
++			       "%d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
+=20
+ 		memset(result, 0, sizeof(result));
+@@ -1012,35 +1025,38 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 		req.next_out =3D result;
+ 		req.avail_out =3D dtemplate[i].outlen / 2;
+=20
+-		error =3D crypto_decompress_update(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression update failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Add remaining input data */
+ 		req.avail_in +=3D (dtemplate[i].inlen + 1) / 2;
+=20
+-		error =3D crypto_decompress_update(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_update(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression update failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		/* Provide remaining output space */
+ 		req.avail_out +=3D COMP_BUF_SIZE - dtemplate[i].outlen / 2;
+=20
+-		error =3D crypto_decompress_final(tfm, &req);
+-		if (error  && (error !=3D -EAGAIN || req.avail_in)) {
++		res =3D crypto_decompress_final(tfm, &req);
++		if (res < 0 && (res !=3D -EAGAIN || req.avail_in)) {
+ 			pr_err("alg: pcomp: decompression final failed on "
+-			       "test %d for %s: error=3D%d\n", i + 1, algo,
+-			       error);
+-			return error;
++			       "test %d for %s: error=3D%d\n", i + 1, algo, res);
++			return res;
+ 		}
++		if (res > 0)
++			produced +=3D res;
+=20
+ 		if (COMP_BUF_SIZE - req.avail_out !=3D dtemplate[i].outlen) {
+ 			pr_err("alg: comp: Decompression test %d failed for "
+@@ -1050,6 +1066,13 @@ static int test_pcomp(struct crypto_pcomp *tfm,
+ 			return -EINVAL;
+ 		}
+=20
++		if (produced !=3D dtemplate[i].outlen) {
++			pr_err("alg: comp: Decompression test %d failed for "
++			       "%s: returned len =3D %u (expected %d)\n", i + 1,
++			       algo, produced, dtemplate[i].outlen);
++			return -EINVAL;
++		}
++
+ 		if (memcmp(result, dtemplate[i].output, dtemplate[i].outlen)) {
+ 			pr_err("alg: pcomp: Decompression test %d failed for "
+ 			       "%s\n", i + 1, algo);
+diff --git a/crypto/zlib.c b/crypto/zlib.c
+index 33609ba..c301573 100644
+--- a/crypto/zlib.c
++++ b/crypto/zlib.c
+@@ -165,15 +165,15 @@ static int zlib_compress_update(struct crypto_pco=
+mp *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
 +	return ret;
  }
- 
--static void do_test(int m)
-+static int do_test(int m)
- {
- 	int i;
-+	int ret = 0;
- 
- 	switch (m) {
- 	case 0:
- 		for (i = 1; i < 200; i++)
--			do_test(i);
-+			ret += do_test(i);
- 		break;
- 
- 	case 1:
--		tcrypt_test("md5");
-+		ret += tcrypt_test("md5");
- 		break;
- 
- 	case 2:
--		tcrypt_test("sha1");
-+		ret += tcrypt_test("sha1");
- 		break;
- 
- 	case 3:
--		tcrypt_test("ecb(des)");
--		tcrypt_test("cbc(des)");
-+		ret += tcrypt_test("ecb(des)");
-+		ret += tcrypt_test("cbc(des)");
- 		break;
- 
- 	case 4:
--		tcrypt_test("ecb(des3_ede)");
--		tcrypt_test("cbc(des3_ede)");
-+		ret += tcrypt_test("ecb(des3_ede)");
-+		ret += tcrypt_test("cbc(des3_ede)");
- 		break;
- 
- 	case 5:
--		tcrypt_test("md4");
-+		ret += tcrypt_test("md4");
- 		break;
- 
- 	case 6:
--		tcrypt_test("sha256");
-+		ret += tcrypt_test("sha256");
- 		break;
- 
- 	case 7:
--		tcrypt_test("ecb(blowfish)");
--		tcrypt_test("cbc(blowfish)");
-+		ret += tcrypt_test("ecb(blowfish)");
-+		ret += tcrypt_test("cbc(blowfish)");
- 		break;
- 
- 	case 8:
--		tcrypt_test("ecb(twofish)");
--		tcrypt_test("cbc(twofish)");
-+		ret += tcrypt_test("ecb(twofish)");
-+		ret += tcrypt_test("cbc(twofish)");
- 		break;
- 
- 	case 9:
--		tcrypt_test("ecb(serpent)");
-+		ret += tcrypt_test("ecb(serpent)");
- 		break;
- 
- 	case 10:
--		tcrypt_test("ecb(aes)");
--		tcrypt_test("cbc(aes)");
--		tcrypt_test("lrw(aes)");
--		tcrypt_test("xts(aes)");
--		tcrypt_test("ctr(aes)");
--		tcrypt_test("rfc3686(ctr(aes))");
-+		ret += tcrypt_test("ecb(aes)");
-+		ret += tcrypt_test("cbc(aes)");
-+		ret += tcrypt_test("lrw(aes)");
-+		ret += tcrypt_test("xts(aes)");
-+		ret += tcrypt_test("ctr(aes)");
-+		ret += tcrypt_test("rfc3686(ctr(aes))");
- 		break;
- 
- 	case 11:
--		tcrypt_test("sha384");
-+		ret += tcrypt_test("sha384");
- 		break;
- 
- 	case 12:
--		tcrypt_test("sha512");
-+		ret += tcrypt_test("sha512");
- 		break;
- 
- 	case 13:
--		tcrypt_test("deflate");
-+		ret += tcrypt_test("deflate");
- 		break;
- 
- 	case 14:
--		tcrypt_test("ecb(cast5)");
-+		ret += tcrypt_test("ecb(cast5)");
- 		break;
- 
- 	case 15:
--		tcrypt_test("ecb(cast6)");
-+		ret += tcrypt_test("ecb(cast6)");
- 		break;
- 
- 	case 16:
--		tcrypt_test("ecb(arc4)");
-+		ret += tcrypt_test("ecb(arc4)");
- 		break;
- 
- 	case 17:
--		tcrypt_test("michael_mic");
-+		ret += tcrypt_test("michael_mic");
- 		break;
- 
- 	case 18:
--		tcrypt_test("crc32c");
-+		ret += tcrypt_test("crc32c");
- 		break;
- 
- 	case 19:
--		tcrypt_test("ecb(tea)");
-+		ret += tcrypt_test("ecb(tea)");
- 		break;
- 
- 	case 20:
--		tcrypt_test("ecb(xtea)");
-+		ret += tcrypt_test("ecb(xtea)");
- 		break;
- 
- 	case 21:
--		tcrypt_test("ecb(khazad)");
-+		ret += tcrypt_test("ecb(khazad)");
- 		break;
- 
- 	case 22:
--		tcrypt_test("wp512");
-+		ret += tcrypt_test("wp512");
- 		break;
- 
- 	case 23:
--		tcrypt_test("wp384");
-+		ret += tcrypt_test("wp384");
- 		break;
- 
- 	case 24:
--		tcrypt_test("wp256");
-+		ret += tcrypt_test("wp256");
- 		break;
- 
- 	case 25:
--		tcrypt_test("ecb(tnepres)");
-+		ret += tcrypt_test("ecb(tnepres)");
- 		break;
- 
- 	case 26:
--		tcrypt_test("ecb(anubis)");
--		tcrypt_test("cbc(anubis)");
-+		ret += tcrypt_test("ecb(anubis)");
-+		ret += tcrypt_test("cbc(anubis)");
- 		break;
- 
- 	case 27:
--		tcrypt_test("tgr192");
-+		ret += tcrypt_test("tgr192");
- 		break;
- 
- 	case 28:
- 
--		tcrypt_test("tgr160");
-+		ret += tcrypt_test("tgr160");
- 		break;
- 
- 	case 29:
--		tcrypt_test("tgr128");
-+		ret += tcrypt_test("tgr128");
- 		break;
- 
- 	case 30:
--		tcrypt_test("ecb(xeta)");
-+		ret += tcrypt_test("ecb(xeta)");
- 		break;
- 
- 	case 31:
--		tcrypt_test("pcbc(fcrypt)");
-+		ret += tcrypt_test("pcbc(fcrypt)");
- 		break;
- 
- 	case 32:
--		tcrypt_test("ecb(camellia)");
--		tcrypt_test("cbc(camellia)");
-+		ret += tcrypt_test("ecb(camellia)");
-+		ret += tcrypt_test("cbc(camellia)");
- 		break;
- 	case 33:
--		tcrypt_test("sha224");
-+		ret += tcrypt_test("sha224");
- 		break;
- 
- 	case 34:
--		tcrypt_test("salsa20");
-+		ret += tcrypt_test("salsa20");
- 		break;
- 
- 	case 35:
--		tcrypt_test("gcm(aes)");
-+		ret += tcrypt_test("gcm(aes)");
- 		break;
- 
- 	case 36:
--		tcrypt_test("lzo");
-+		ret += tcrypt_test("lzo");
- 		break;
- 
- 	case 37:
--		tcrypt_test("ccm(aes)");
-+		ret += tcrypt_test("ccm(aes)");
- 		break;
- 
- 	case 38:
--		tcrypt_test("cts(cbc(aes))");
-+		ret += tcrypt_test("cts(cbc(aes))");
- 		break;
- 
-         case 39:
--		tcrypt_test("rmd128");
-+		ret += tcrypt_test("rmd128");
- 		break;
- 
-         case 40:
--		tcrypt_test("rmd160");
-+		ret += tcrypt_test("rmd160");
- 		break;
- 
- 	case 41:
--		tcrypt_test("rmd256");
-+		ret += tcrypt_test("rmd256");
- 		break;
- 
- 	case 42:
--		tcrypt_test("rmd320");
-+		ret += tcrypt_test("rmd320");
- 		break;
- 
- 	case 43:
--		tcrypt_test("ecb(seed)");
-+		ret += tcrypt_test("ecb(seed)");
- 		break;
- 
- 	case 44:
--		tcrypt_test("zlib");
-+		ret += tcrypt_test("zlib");
- 		break;
- 
- 	case 45:
--		tcrypt_test("rfc4309(ccm(aes))");
-+		ret += tcrypt_test("rfc4309(ccm(aes))");
- 		break;
- 
- 	case 100:
--		tcrypt_test("hmac(md5)");
-+		ret += tcrypt_test("hmac(md5)");
- 		break;
- 
- 	case 101:
--		tcrypt_test("hmac(sha1)");
-+		ret += tcrypt_test("hmac(sha1)");
- 		break;
- 
- 	case 102:
--		tcrypt_test("hmac(sha256)");
-+		ret += tcrypt_test("hmac(sha256)");
- 		break;
- 
- 	case 103:
--		tcrypt_test("hmac(sha384)");
-+		ret += tcrypt_test("hmac(sha384)");
- 		break;
- 
- 	case 104:
--		tcrypt_test("hmac(sha512)");
-+		ret += tcrypt_test("hmac(sha512)");
- 		break;
- 
- 	case 105:
--		tcrypt_test("hmac(sha224)");
-+		ret += tcrypt_test("hmac(sha224)");
- 		break;
- 
- 	case 106:
--		tcrypt_test("xcbc(aes)");
-+		ret += tcrypt_test("xcbc(aes)");
- 		break;
- 
- 	case 107:
--		tcrypt_test("hmac(rmd128)");
-+		ret += tcrypt_test("hmac(rmd128)");
- 		break;
- 
- 	case 108:
--		tcrypt_test("hmac(rmd160)");
-+		ret += tcrypt_test("hmac(rmd160)");
- 		break;
- 
- 	case 150:
--		tcrypt_test("ansi_cprng");
-+		ret += tcrypt_test("ansi_cprng");
- 		break;
- 
- 	case 200:
-@@ -873,6 +882,8 @@ static void do_test(int m)
- 		test_available();
- 		break;
+=20
+ static int zlib_compress_final(struct crypto_pcomp *tfm,
+@@ -195,15 +195,15 @@ static int zlib_compress_final(struct crypto_pcom=
+p *tfm,
+ 		return -EINVAL;
  	}
-+
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
 +	return ret;
  }
- 
- static int __init tcrypt_mod_init(void)
-@@ -886,15 +897,21 @@ static int __init tcrypt_mod_init(void)
- 			goto err_free_tv;
+=20
+=20
+@@ -280,15 +280,15 @@ static int zlib_decompress_update(struct crypto_p=
+comp *tfm,
+ 		return -EINVAL;
  	}
- 
--	do_test(mode);
-+	err = do_test(mode);
-+	if (err) {
-+		printk(KERN_ERR "tcrypt: one or more tests failed!\n");
-+		goto err_free_tv;
-+	}
- 
--	/* We intentionaly return -EAGAIN to prevent keeping
--	 * the module. It does all its work from init()
--	 * and doesn't offer any runtime functionality 
-+	/* We intentionaly return -EAGAIN to prevent keeping the module,
-+	 * unless it was loaded w/the noexit param set. It does all its
-+	 * work from init() and doesn't offer any runtime functionality,
-+	 * but in some cases, checking for a successful load is helpful.
- 	 * => we don't need it in the memory, do we?
- 	 *                                        -- mludvig
- 	 */
--	err = -EAGAIN;
-+	if (!noexit)
-+		err = -EAGAIN;
- 
- err_free_tv:
- 	for (i = 0; i < TVMEMSIZE && tvmem[i]; i++)
-@@ -916,6 +933,9 @@ module_param(mode, int, 0);
- module_param(sec, uint, 0);
- MODULE_PARM_DESC(sec, "Length in seconds of speed tests "
- 		      "(defaults to zero which uses CPU cycles instead)");
-+module_param(noexit, int, 0);
-+MODULE_PARM_DESC(noexit, "Whether or not the module should simply exit "
-+		 "after running tests. (default is to exit).");
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Quick & dirty crypto testing module");
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+ static int zlib_decompress_final(struct crypto_pcomp *tfm,
+@@ -328,15 +328,15 @@ static int zlib_decompress_final(struct crypto_pc=
+omp *tfm,
+ 		return -EINVAL;
+ 	}
+=20
++	ret =3D req->avail_out - stream->avail_out;
+ 	pr_debug("avail_in %u, avail_out %u (consumed %u, produced %u)\n",
+ 		 stream->avail_in, stream->avail_out,
+-		 req->avail_in - stream->avail_in,
+-		 req->avail_out - stream->avail_out);
++		 req->avail_in - stream->avail_in, ret);
+ 	req->next_in =3D stream->next_in;
+ 	req->avail_in =3D stream->avail_in;
+ 	req->next_out =3D stream->next_out;
+ 	req->avail_out =3D stream->avail_out;
+-	return 0;
++	return ret;
+ }
+=20
+=20
+--=20
+1.6.2.4
 
 
--- 
-Jarod Wilson
-jarod@redhat.com
+With kind regards,
+
+Geert Uytterhoeven
+Software Architect
+Techsoft Centre
+
+Technology and Software Centre Europe
+The Corporate Village =B7 Da Vincilaan 7-D1 =B7 B-1935 Zaventem =B7 Bel=
+gium
+
+Phone:    +32 (0)2 700 8453
+=46ax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
+
+A division of Sony Europe (Belgium) N.V.
+VAT BE 0413.825.160 =B7 RPR Brussels
+=46ortis =B7 BIC GEBABEBB =B7 IBAN BE41293037680010
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
