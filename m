@@ -1,56 +1,40 @@
-From: =?KOI8-R?B?88XSx8XKIO3J0s/Oz9c=?= <ierton@gmail.com>
-Subject: understanding concept, async block ciphers
-Date: Tue, 12 May 2009 13:21:43 +0400
-Message-ID: <aa09d86e0905120221n2dadd1e5jd99a7adc11658e2f@mail.gmail.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH 1/2 v2] crypto: mark algs allowed in fips mode
+Date: Tue, 12 May 2009 15:08:23 -0400
+Message-ID: <20090512190823.GF5019@hmsreliant.think-freely.org>
+References: <200905110952.44273.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fk-out-0910.google.com ([209.85.128.189]:26037 "EHLO
-	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753022AbZELJVo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 May 2009 05:21:44 -0400
-Received: by fk-out-0910.google.com with SMTP id 18so1641114fkq.5
-        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2009 02:21:43 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jarod Wilson <jarod@redhat.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1755553AbZELTIx@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <200905110952.44273.jarod@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello. I'm developing driver for our crypto platform-device on
-arm-realview arch. Could you please help with understanding some
-CryptoAPI concepts?
+On Mon, May 11, 2009 at 09:52:43AM -0400, Jarod Wilson wrote:
+> Set the fips_allowed flag in testmgr.c's alg_test_descs[] for algs
+> that are allowed to be used when in fips mode.
+> 
+> One caveat: des isn't actually allowed anymore, but des (and thus also
+> ecb(des)) has to be permitted, because disallowing them results in
+> des3_ede being unable to properly register (see des module init func).
+> 
+> Also, crc32 isn't technically on the fips approved list, but I think
+> it gets used in various places that necessitate it being allowed.
+> 
+> This list is based on
+> http://csrc.nist.gov/groups/STM/cavp/index.html
+> 
+> Important note: allowed/approved here does NOT mean "validated", just
+> that its an alg that *could* be validated.
+> 
+> Resending with properly updated patch v2 tag.
+> 
+> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> 
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-Our device  is hw implementation of 3DES/AES cipher. it allows:
-- encrypt/decrypt 64-bit words   (slave mode, data exchange via
-registers, CBC/ECB controlled by driver)
-- encrypt/decrypt blocks of data   (master mode, data exchange via DMA
-transfers, CBC/ECB controlled by device)
-
-I've implemented CRYPTO_ALG_TYPE_CIPHER driver for "slave" mode (just
-as i in geode-aes driver). CBC and ECB templates are working fine. But
-for "master" mode i have a questions:
-
-1. Whats the difference between async crypto_alg's with
-    .cra_type = CRYPTO_ALG_TYPE_BLKCIPHER | CRYPTO_ALG_ASYNC
-and
-    .cra_type = CRYPTO_ALG_TYPE_ABLKCIPHER
-
-Seems, that both are async. What is typical use-cases for them?
-
-2. What are the rules for naming my alorithms?
-I looked in code, and think, that name is constructed like
-template_name1 ( template_name2 ( ... ( algorithm_name ) ... )
-
-For example (as i saw in tcrypt.c), if my crypto_alg has
-   .cra_flags = CRYPTO_ALG_TYPE_CIPHER ,
-   .cra_name =   "des3_ede"
-then it is possible to alloc CRYPTO_ALG_TYPE_BLKCIPHER request by
-names  "cbc(des3_ede)"  or "ecb(des3_ede)" and
-CRYPTO_ALG_TYPE_BLKCIPHER  | CRYPTO_ALG_ASYNC  request with
-"cryptd(cbc(des3_ede)))" ?   Am i right ?
-
-Thanks.
-
--- 
-Sergey
+> 
