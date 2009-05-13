@@ -1,110 +1,54 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [RFC] [PATCH 5/5] authenc: Add support for the pcrypt aead wrapper
-Date: Wed, 13 May 2009 15:10:37 +0200
-Message-ID: <20090513131037.GI20366@secunet.com>
-References: <20090513130618.GD20366@secunet.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: [PATCH] crypto: tcrypt: add option to not exit on success
+Date: Wed, 13 May 2009 09:12:46 -0400
+Message-ID: <200905130912.46965.jarod@redhat.com>
+References: <200905111006.32675.jarod@redhat.com> <20090513110826.GA16406@hmsreliant.think-freely.org> <20090513113819.GA15662@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:37529 "EHLO a.mx.secunet.com"
+Received: from mx2.redhat.com ([66.187.237.31]:33300 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760014AbZEMNIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 May 2009 09:08:23 -0400
+	id S1751146AbZEMNNi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 May 2009 09:13:38 -0400
+In-Reply-To: <20090513113819.GA15662@gondor.apana.org.au>
 Content-Disposition: inline
-In-Reply-To: <20090513130618.GD20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This adds support for aead wrapper templates. An aead wrapper
-can be coosen via a module parameter. For the moment only
-pcrypt is supported.
+On Wednesday 13 May 2009 07:38:19 Herbert Xu wrote:
+> On Wed, May 13, 2009 at 07:08:26AM -0400, Neil Horman wrote:
+> >
+> > Not really sure I agree with the logic here.  I agree that its pretty clear that
+> > its major value is for quickly testing all the algorithms in a system, but
+> > universally failing the loading of the module simply to save a few milliseconds
+> > seems like a poor choice.  In so doing you create an alias effect, as jarod
+> > noted between a non-existent module and a module that failed to load.  The
+> > aliasing can be resolved, if you want to parse dmesg, but if speed is the issue
+> > at hand, that parsing is a significant impact.  If you allow the module to load
+> > properly, then for the cost of an rmmod, you can tell simply from the exit code
+> > of modprobe:
+> > 1) If the module was found 
+> > 2) If the tests passed
+> 
+> As I said, tcrypt should no longer be used to test algorithms.
+> Algorithms are tested as they load, with the result available
+> in /proc/crypto.  tcrypt is just a relic that will be going away.
+> 
+> Do not rely on it.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/authenc.c |   33 +++++++++++++++++++++++++++++++--
- 1 files changed, 31 insertions(+), 2 deletions(-)
+Hm... FIPS has the requirement that we test all algs before we use any
+algs, self-tests on demand before first use for each alg is
+insufficient. At first blush, I'm not seeing how we ensure this
+happens. How can we trigger a cbc(des3_ede) self-test from userspace?
+I see that modprobe'ing des.ko runs the base des and des3_ede
+self-tests, but modprobe'ing cbc.ko doesn't lead to any self-tests
+being run.
 
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 5793b64..aaa0fcc 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -13,6 +13,7 @@
- #include <crypto/aead.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/internal/aead.h>
- #include <crypto/authenc.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
-@@ -23,6 +24,10 @@
- #include <linux/slab.h>
- #include <linux/spinlock.h>
- 
-+static char *wrapper = NULL;
-+module_param(wrapper, charp, 0);
-+MODULE_PARM_DESC(wrapper, "Wrapper template for AEAD algorithms");
-+
- struct authenc_instance_ctx {
- 	struct crypto_spawn auth;
- 	struct crypto_skcipher_spawn enc;
-@@ -157,15 +162,16 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
- 
- 	dstp = sg_page(dst);
- 	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
-+	cryptlen = req->cryptlen;
- 
--	if (ivsize) {
-+	if (ivsize && !(aead_request_flags(req) & CRYPTO_TFM_REQ_SG_HAS_IV)) {
- 		sg_init_table(cipher, 2);
- 		sg_set_buf(cipher, iv, ivsize);
- 		authenc_chain(cipher, dst, vdst == iv + ivsize);
- 		dst = cipher;
-+		cryptlen += ivsize;
- 	}
- 
--	cryptlen = req->cryptlen + ivsize;
- 	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
- 	if (IS_ERR(hash))
- 		return PTR_ERR(hash);
-@@ -369,6 +375,26 @@ static void crypto_authenc_exit_tfm(struct crypto_tfm *tfm)
- 	crypto_free_ablkcipher(ctx->enc);
- }
- 
-+static int crypto_authenc_set_wrapper(struct crypto_instance *inst)
-+{
-+	int err = 0;
-+
-+	if (!wrapper)
-+		goto out;
-+
-+	if (!strcmp(wrapper, "pcrypt")) {
-+		inst->alg.cra_type = &crypto_nivaead_type;
-+		inst->alg.cra_aead.geniv = "eseqiv";
-+		inst->alg.cra_aead.wrapper = "pcrypt";
-+
-+		goto out;
-+	}
-+
-+	err = -EINVAL;
-+out:
-+	return err;
-+}
-+
- static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
- {
- 	struct crypto_attr_type *algt;
-@@ -452,6 +478,9 @@ static struct crypto_instance *crypto_authenc_alloc(struct rtattr **tb)
- 	inst->alg.cra_aead.decrypt = crypto_authenc_decrypt;
- 	inst->alg.cra_aead.givencrypt = crypto_authenc_givencrypt;
- 
-+	if (crypto_authenc_set_wrapper(inst))
-+		goto err_drop_enc;
-+
- out:
- 	crypto_mod_put(auth);
- 	return inst;
 -- 
-1.5.4.2
-
+Jarod Wilson
+jarod@redhat.com
