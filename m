@@ -1,36 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt: add option to not exit on success
-Date: Thu, 14 May 2009 09:45:50 +1000
-Message-ID: <20090513234550.GA24792@gondor.apana.org.au>
-References: <200905111006.32675.jarod@redhat.com> <20090513132752.GA17262@gondor.apana.org.au> <20090513140224.GB16406@hmsreliant.think-freely.org> <200905131253.16977.jarod@redhat.com>
+From: <jolmills@nbnet.nb.ca>
+Subject: Contact Mr. Bryn Anderson
+Date: Thu, 14 May 2009 7:51:41 -0400
+Message-ID: <20090514115142.FHXU1670.simmts8-srv.bellnexxia.net@simip9-ac.srvr.bell.ca>
+Reply-To: bryn.anderson1@8u8.hk
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <info@winner.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:43652 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1762085AbZEMXpz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 May 2009 19:45:55 -0400
-Content-Disposition: inline
-In-Reply-To: <200905131253.16977.jarod@redhat.com>
+Received: from simmts8-qfe0.srvr.bell.ca ([206.47.199.166]:54021 "EHLO
+	simmts8-srv.bellnexxia.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752510AbZENLvl convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 May 2009 07:51:41 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 13, 2009 at 12:53:16PM -0400, Jarod Wilson wrote:
-> 
-> It would likely need a LOT of polish, and I'm not sure if its at all
-> close to what we have (Herbert has?) in mind.... At the moment, it
-> consists of:
+You were selected for the sum of  =A31,230,310.00 GBP . Verify this mai=
+l immediately by sending in your information. This will include your na=
+me, address, age, phone number etc to Mr Bryn Anderson
+bryn.anderson1@8u8.hk
 
-The interface I had in mind can be found in the recent discussions
-in the linux-crypto archives.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
