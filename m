@@ -1,19 +1,19 @@
-From: Neil Horman <nhorman@tuxdriver.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC PATCH] crypto: add buffer overflow checks to testmgr
-Date: Fri, 29 May 2009 15:27:36 -0400
-Message-ID: <20090529192736.GB4160@hmsreliant.think-freely.org>
+Date: Sat, 30 May 2009 08:10:55 +1000
+Message-ID: <20090529221055.GA17957@gondor.apana.org.au>
 References: <200905291132.55848.jarod@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	Neil Horman <nhorman@tuxdriver.com>
 To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:58280 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752123AbZE2T1q (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:49038 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752194AbZE2WK4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 May 2009 15:27:46 -0400
+	Fri, 29 May 2009 18:10:56 -0400
 Content-Disposition: inline
 In-Reply-To: <200905291132.55848.jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -46,91 +46,10 @@ On Fri, May 29, 2009 at 11:32:54AM -0400, Jarod Wilson wrote:
 > option 3 as the most viable alternative right now.
 > 
 > Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> 
 
-Given the rate at which test vectors are added to the testmgr, and the
-likelyhood one will be over a page in size, I think this is probably the best
-way forward.  Its saves memory/complexity until for now, and catches anyone
-trying to exceed the current 1 page size, at which point we can spend the time
-to modify the testmanager to make use of scatter/gather chains to handle the
-longer vectors.
-
-Neil
-
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
-
-> ---
->  crypto/testmgr.c |   34 ++++++++++++++++++++++++++++++++++
->  1 files changed, 34 insertions(+), 0 deletions(-)
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 376ea88..9483a2b 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -185,6 +185,13 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
->  
->  		hash_buff = xbuf[0];
->  
-> +		if (template[i].psize > PAGE_SIZE) {
-> +			printk(KERN_ERR "alg: hash: psize %u larger than "
-> +			       "contiguous buffer space\n", template[i].psize);
-> +			ret = -EOVERFLOW;
-> +			goto out;
-> +		}
-> +
->  		memcpy(hash_buff, template[i].plaintext, template[i].psize);
->  		sg_init_one(&sg[0], hash_buff, template[i].psize);
->  
-> @@ -357,6 +364,16 @@ static int test_aead(struct crypto_aead *tfm, int enc,
->  			input = xbuf[0];
->  			assoc = axbuf[0];
->  
-> +			if (template[i].ilen > PAGE_SIZE ||
-> +			    template[i].alen > PAGE_SIZE) {
-> +				printk(KERN_ERR "alg: aead: input larger than "
-> +				       "contiguous buffer space (ilen: %u, "
-> +				       "alen: %u)\n",
-> +				       template[i].ilen, template[i].alen);
-> +				ret = -EOVERFLOW;
-> +				goto out;
-> +			}
-> +
->  			memcpy(input, template[i].input, template[i].ilen);
->  			memcpy(assoc, template[i].assoc, template[i].alen);
->  			if (template[i].iv)
-> @@ -651,6 +668,14 @@ static int test_cipher(struct crypto_cipher *tfm, int enc,
->  		j++;
->  
->  		data = xbuf[0];
-> +
-> +		if (template[i].ilen > PAGE_SIZE) {
-> +			printk(KERN_ERR "alg: cipher: ilen %u larger than "
-> +			       "contiguous buffer space\n", template[i].ilen);
-> +			ret = -EOVERFLOW;
-> +			goto out;
-> +		}
-> +
->  		memcpy(data, template[i].input, template[i].ilen);
->  
->  		crypto_cipher_clear_flags(tfm, ~0);
-> @@ -742,6 +767,15 @@ static int test_skcipher(struct crypto_ablkcipher *tfm, int enc,
->  			j++;
->  
->  			data = xbuf[0];
-> +
-> +			if (template[i].ilen > PAGE_SIZE) {
-> +				printk(KERN_ERR "alg: skcipher: ilen %u larger "
-> +				       "than contiguous buffer space\n",
-> +				       template[i].ilen);
-> +				ret = -EOVERFLOW;
-> +				goto out;
-> +			}
-> +
->  			memcpy(data, template[i].input, template[i].ilen);
->  
->  			crypto_ablkcipher_clear_flags(tfm, ~0);
-> 
-> -- 
-> Jarod Wilson
-> jarod@redhat.com
-> 
+I just posted exactly the same thing yesterday :)
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
