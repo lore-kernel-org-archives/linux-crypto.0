@@ -1,100 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Martin Willi <martin@strongswan.org>
 Subject: Re: HMAC regression
-Date: Fri, 29 May 2009 16:23:35 +1000
-Message-ID: <20090529062335.GA10053@gondor.apana.org.au>
-References: <1243523348.30487.89.camel@martin.hsr.ch> <20090529061931.GA10003@gondor.apana.org.au>
+Date: Fri, 29 May 2009 12:04:32 +0200
+Message-ID: <1243591472.7473.169.camel@martin.hsr.ch>
+References: <1243523348.30487.89.camel@martin.hsr.ch>
+	 <20090529061931.GA10003@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47444 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752815AbZE2GXf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 May 2009 02:23:35 -0400
-Content-Disposition: inline
+Received: from zaes.ch ([213.133.111.41]:45376 "EHLO zaes.ch"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756300AbZE2KEi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 May 2009 06:04:38 -0400
 In-Reply-To: <20090529061931.GA10003@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 29, 2009 at 04:19:31PM +1000, Herbert Xu wrote:
+> > Switching the hash implementations to the new shash API introduced a
+> > regression. HMACs are created incorrectly if the data is scattered over
+> > multiple pages, resulting in very unreliable IPsec tunnels.
 > 
-> Here's a patch to detect this for future reference.
-> 
-> commit dfddf5dbe683cfdeb84bd218a1f819c09f5ea44a
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Fri May 29 16:05:42 2009 +1000
-> 
->     crypto: testmgr - Check all test vector lengths
+> What are the symptoms?
 
-I also needed this to actually test your vector.
+After doing further tests, it seems that this is additionally related to
+User-Mode-Linux and/or it's TUN/TAP network driver. I couldn't reproduce
+the issue on a x64 with e1000. 
+I think the bug is actually in the UML network code, but changing the
+scatterwalk logic by using the hash_walk functions triggered the issue.
 
-BTW, please reformat your test vector so that it doesn't exceed
-80 columns when you resubmit.
+I'll try to find out more...
 
-commit 35a20d2814525826700e25529cdbe361d685caf7
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri May 29 16:23:12 2009 +1000
 
-    crypto: testmgr - Allow hash test vectors longer than a page
-    
-    As it stands we will each test hash vector both linearly and as
-    a scatter list if applicable.  This means that we cannot have
-    vectors longer than a page, even with scatter lists.
-    
-    This patch fixes this by skipping test vectors with np != 0 when
-    testing linearly.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+More details to the issue I'm seeing on UML hosts:
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 8fcea70..e9e9d84 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -180,7 +180,12 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				   tcrypt_complete, &tresult);
- 
-+	j = 0;
- 	for (i = 0; i < tcount; i++) {
-+		if (template[i].np)
-+			continue;
-+
-+		j++;
- 		memset(result, 0, 64);
- 
- 		hash_buff = xbuf[0];
-@@ -198,7 +203,7 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 						  template[i].ksize);
- 			if (ret) {
- 				printk(KERN_ERR "alg: hash: setkey failed on "
--				       "test %d for %s: ret=%d\n", i + 1, algo,
-+				       "test %d for %s: ret=%d\n", j, algo,
- 				       -ret);
- 				goto out;
- 			}
-@@ -220,14 +225,14 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 			/* fall through */
- 		default:
- 			printk(KERN_ERR "alg: hash: digest failed on test %d "
--			       "for %s: ret=%d\n", i + 1, algo, -ret);
-+			       "for %s: ret=%d\n", j, algo, -ret);
- 			goto out;
- 		}
- 
- 		if (memcmp(result, template[i].digest,
- 			   crypto_ahash_digestsize(tfm))) {
- 			printk(KERN_ERR "alg: hash: Test %d failed for %s\n",
--			       i + 1, algo);
-+			       j, algo);
- 			hexdump(result, crypto_ahash_digestsize(tfm));
- 			ret = -EINVAL;
- 			goto out;
+Packets (non fragmented) laying on multiple pages are hashed incorrectly
+for HMAC calculation. This results in packet drops on HMAC secured
+tunnels (XfrmInStateProtoError's on the receiving end). Affected are at
+least 2.6.29, net-2.6, crypto-2.6 and cryptodev-2.6.
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+To reproduce this, try to send large packets (e.g. ping with -s 1400, or
+iperf with TCP) over a HMAC secured ESP tunnel.
+Only packets with data on page boundaries are affected. You'll have to
+try until the kernel allocates the packet on multiple pages, which is
+more likely with larger packets near MTU.
+
+Thanks
+Martin
+
