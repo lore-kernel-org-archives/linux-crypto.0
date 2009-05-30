@@ -1,61 +1,89 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [RFC PATCH] crypto: add buffer overflow checks to testmgr
-Date: Fri, 29 May 2009 21:12:15 -0400
-Message-ID: <4A2087EF.8000709@redhat.com>
-References: <200905291132.55848.jarod@redhat.com> <20090529221055.GA17957@gondor.apana.org.au>
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [patch 5/5] Apply the PG_sensitive flag to the CryptoAPI
+	subsystem
+Date: Sat, 30 May 2009 20:05:40 +0200
+Message-ID: <20090530180540.GE20013@elte.hu>
+References: <20090520190519.GE10756@oblivion.subreption.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Neil Horman <nhorman@tuxdriver.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:51563 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754773AbZE3BM3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 May 2009 21:12:29 -0400
-In-Reply-To: <20090529221055.GA17957@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@osdl.org>,
+	linux-mm@kvack.org, Ingo Molnar <mingo@redhat.com>,
+	pageexec@freemail.hu, linux-crypto@vger.kernel.org,
+	Pekka Enberg <penberg@cs.helsinki.fi>,
+	Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: "Larry H." <research@subreption.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20090520190519.GE10756@oblivion.subreption.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/29/2009 06:10 PM, Herbert Xu wrote:
-> On Fri, May 29, 2009 at 11:32:54AM -0400, Jarod Wilson wrote:
->> At present, its entirely possible to add a test vector to testmgr with
->> an input longer than a page in length w/o specifying a .np option, and
->> overflow the page of memory allocated to {a,}xbuf[0], silently
->> corrupting memory. I know, because I've accidentally done it. :)
->>
->> While this doesn't currently happen in practice w/the existing code,
->> due to all !np vectors being less than a 4k page in length (and the
->> page allocation loop often returns contiguous pages anyway), explicit
->> checks or a way to remove the 4k limit would be a good idea.
->>
->> A few ways to fix and/or work around this:
->>
->> 1) allocate some larger guaranteed contiguous buffers using
->> __get_free_pages() or kmalloc and use them in the !np case
->>
->> 2) catch the > PAGE_SIZE && !np case and then do things similar to how
->> they are done in the np case
->>
->> 3) catch the > PAGE_SIZE && !np case and simply exit with an error
->>
->> Since there currently aren't any test vectors that are actually larger
->> than a page and not tagged np, option 1 seems like a waste of memory
->> and option 2 sounds like unnecessary complexity, so I'd offer up
->> option 3 as the most viable alternative right now.
->>
->> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+
+* Larry H. <research@subreption.com> wrote:
+
+> This patch deploys the use of the PG_sensitive page allocator flag 
+> within the CryptoAPI subsystem, in all relevant locations where 
+> algorithm and key contexts are allocated.
 > 
-> I just posted exactly the same thing yesterday :)
+> Some calls to memset for zeroing the buffers have been removed to 
+> avoid duplication of the sanitizing process, since this is already 
+> taken care of by the allocator during page freeing.
+> 
+> The only noticeable impact on performance might be in the 
+> blkcipher modifications, although this is likely negligible and 
+> balanced with the security benefits of this patch in the long 
+> term.
 
-Oh, haha, serves me right for not looking first... Your variant seems to
-be a bit more complete too, as I didn't look at any of the possible cases
-where there might be overflows when using scatterlists. Cool, worksforme!
+I think there's a rather significant omission here: there's no 
+discussion about on-kernel-stack information leaking out.
 
-Thanks much,
+If a thread that does a crypto call happens to leave sensitive 
+on-stack data (this can happen easily as stack variables are not 
+cleared on return), or if a future variant or modification of a 
+crypto algorithm leaves such information around - then there's 
+nothing that keeps that data from potentially leaking out.
 
--- 
-Jarod Wilson
-jarod@redhat.com
+This is not academic and it happens all the time: only look at 
+various crash dumps on lkml. For example this crash shows such 
+leaked information:
 
+[   96.138788]  [<ffffffff810ab62e>] perf_counter_exit_task+0x10e/0x3f3
+[   96.145464]  [<ffffffff8104cf46>] do_exit+0x2e7/0x722
+[   96.150837]  [<ffffffff810630cf>] ? up_read+0x9/0xb
+[   96.156036]  [<ffffffff8151cc0b>] ? do_page_fault+0x27d/0x2a5
+[   96.162141]  [<ffffffff8104d3f4>] do_group_exit+0x73/0xa0
+[   96.167860]  [<ffffffff8104d433>] sys_exit_group+0x12/0x16
+[   96.173665]  [<ffffffff8100bb2b>] system_call_fastpath+0x16/0x1b
+
+The 'ffffffff8151cc0b' 64-bit word is actually a leftover from a 
+previous system context. ( And this is at the bottom of the stack 
+that gets cleared all the time - the top of the kernel stack is a 
+lot more more persistent in practice and crypto calls tend to have a 
+healthy stack footprint. )
+
+So IMO the GFP_SENSITIVE facility (beyond being misnomer - it should 
+be something like GFP_NON_PERSISTENT instead) actually results in 
+_worse_ security in the end: because people (and organizations) 
+'think' that their keys are safe against information leaks via this 
+space, while they are not. The kernel stack can be freed, be reused 
+by something else partially and then written out to disk (say as 
+part of hibernation) where it's recoverable from the disk image.
+
+So this whole facility probably only makes sense if all kernel 
+stacks that handle sensitive data are zeroed on free. But i havent 
+seen any kernel thread stack clearing functionality in this 
+patch-set - is it an intentional omission? (or have i missed some 
+aspect of the patch-set)
+
+Also, there's no discussion about long-lived threads keeping 
+sensitive information in there kernel stack indefinitely.
+
+Thanks,
+
+	Ingo
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
