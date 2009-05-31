@@ -1,37 +1,40 @@
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Subject: Re: [patch 5/5] Apply the PG_sensitive flag to the CryptoAPI
- subsystem
-Date: Sun, 31 May 2009 11:34:04 +0100
-Message-ID: <20090531113404.5051114d@lxorguk.ukuu.org.uk>
-References: <20090520190519.GE10756@oblivion.subreption.com>
-	<20090530180540.GE20013@elte.hu>
-	<4A225887.21178.1C8AE762@pageexec.freemail.hu>
+From: Martin Willi <martin@strongswan.org>
+Subject: Re: HMAC regression
+Date: Sun, 31 May 2009 15:01:19 +0200
+Message-ID: <1243774879.25453.25.camel@martin.hsr.ch>
+References: <1243523348.30487.89.camel@martin.hsr.ch>
+	 <20090529061931.GA10003@gondor.apana.org.au>
+	 <1243591472.7473.169.camel@martin.hsr.ch>
+	 <20090530011222.GA19425@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: "Larry H." <research@subreption.com>, Ingo Molnar <mingo@elte.hu>,
-        linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@osdl.org>,
-        linux-mm@kvack.org, Ingo Molnar <mingo@redhat.com>,
-        linux-crypto@vger.kernel.org, Pekka Enberg <penberg@cs.helsinki.fi>,
-        Peter
- Zijlstra <a.p.zijlstra@chello.nl>
-To: pageexec@freemail.hu
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <4A225887.21178.1C8AE762@pageexec.freemail.hu>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from zaes.ch ([213.133.111.41]:47325 "EHLO zaes.ch"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751131AbZEaNB0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 31 May 2009 09:01:26 -0400
+In-Reply-To: <20090530011222.GA19425@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> > Also, there's no discussion about long-lived threads keeping 
-> > sensitive information in there kernel stack indefinitely.
-> 
-> kernel stack clearing isn't hard to do, just do it on every syscall exit
-> and in the infinite loop for kernel threads.
+> You must getting an sg entry that crosses a page boundary, rather than
+> two sg entries that both stay within a page.
 
-Actually that is probably not as important. In most cases you would be
-leaking data between syscalls made by the same thread. 
+Yes.
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+> These things are very rare, and usually occurs as
+> a result of SLAB debugging causing kmalloc to return memory that
+> crosses page boundaries.
+
+Indeed, SLAB_DEBUG was enabled in my config. Disabling it resolves this
+issue.
+
+> Can you see if this patch fixes the problem?
+
+Yes, it fixes HMAC calculation with enabled SLAB debugging.
+
+Thanks for your help!
+
