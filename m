@@ -1,30 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: HMAC regression
-Date: Sun, 31 May 2009 23:13:04 +1000
-Message-ID: <20090531131304.GA530@gondor.apana.org.au>
-References: <1243523348.30487.89.camel@martin.hsr.ch> <20090529061931.GA10003@gondor.apana.org.au> <1243591472.7473.169.camel@martin.hsr.ch> <20090530011222.GA19425@gondor.apana.org.au> <1243774879.25453.25.camel@martin.hsr.ch>
+From: Rik van Riel <riel@redhat.com>
+Subject: Re: [PATCH] Use kzfree in crypto API context initialization and key/iv
+ handling
+Date: Sun, 31 May 2009 10:38:52 -0400
+Message-ID: <4A22967C.3080304@redhat.com>
+References: <20090531025720.GC9033@oblivion.subreption.com> <20090530.230213.73434433.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49448 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753736AbZEaNNE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 31 May 2009 09:13:04 -0400
-Content-Disposition: inline
-In-Reply-To: <1243774879.25453.25.camel@martin.hsr.ch>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: research@subreption.com, linux-kernel@vger.kernel.org,
+        pageexec@freemail.hu, linux-mm@kvack.org, torvalds@osdl.org,
+        alan@lxorguk.ukuu.org.uk, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au
+To: David Miller <davem@davemloft.net>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20090530.230213.73434433.davem@davemloft.net>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, May 31, 2009 at 03:01:19PM +0200, Martin Willi wrote:
->
-> Yes, it fixes HMAC calculation with enabled SLAB debugging.
+David Miller wrote:
+> From: "Larry H." <research@subreption.com>
+> Date: Sat, 30 May 2009 19:57:20 -0700
+> 
+>> [PATCH] Use kzfree in crypto API context initialization and key/iv handling
+> 
+> Thanks for not CC:ing the crypto list, and also not CC:'ing the
+> crypto maintainer.
+> 
+> Your submissions leave a lot to be desired, on every level.
 
-Thanks for confirming.  I'll push the fix through.
+That's a pretty roundabout way of saying "I have no
+technical objections" :)
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+All rights reversed.
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
