@@ -1,65 +1,48 @@
-From: Ben Hutchings <ben@decadent.org.uk>
-Subject: Re: linux-image-2.6.24-1-686: airo hang when loading because of aes
-Date: Mon, 01 Jun 2009 03:02:50 +0100
-Message-ID: <1243821770.14399.190.camel@deadeye>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] Use kzfree in crypto API context initialization and
+ key/iv handling
+Date: Sun, 31 May 2009 21:46:23 -0700 (PDT)
+Message-ID: <20090531.214623.76344831.davem@davemloft.net>
+References: <20090531025720.GC9033@oblivion.subreption.com>
+	<20090530.230213.73434433.davem@davemloft.net>
+	<4A22967C.3080304@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-6eUApQ/jnxhE39wrO8uO"
-To: 478166@bugs.debian.org, linux-crypto@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: research@subreption.com, linux-kernel@vger.kernel.org,
+	pageexec@freemail.hu, linux-mm@kvack.org, torvalds@osdl.org,
+	alan@lxorguk.ukuu.org.uk, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: riel@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:34539 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753206AbZFACCz (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:51211
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751093AbZFAEqX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 31 May 2009 22:02:55 -0400
+	Mon, 1 Jun 2009 00:46:23 -0400
+In-Reply-To: <4A22967C.3080304@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Rik van Riel <riel@redhat.com>
+Date: Sun, 31 May 2009 10:38:52 -0400
 
---=-6eUApQ/jnxhE39wrO8uO
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+> David Miller wrote:
+>> From: "Larry H." <research@subreption.com>
+>> Date: Sat, 30 May 2009 19:57:20 -0700
+>> 
+>>> [PATCH] Use kzfree in crypto API context initialization and key/iv
+>>> handling
+>> Thanks for not CC:ing the crypto list, and also not CC:'ing the
+>> crypto maintainer.
+>> Your submissions leave a lot to be desired, on every level.
+> 
+> That's a pretty roundabout way of saying "I have no
+> technical objections" :)
 
-matthieu castet <castet.matthieu@free.fr> wrote:
-> airo driver hang with 2.6.24-6 on a PIII.
-> It seems it it because it need aes crypto.
-> It will first try to load padlock-aes, but it fails to load
-> Then it load geode_aes which load, and airo hang (airo seems to use
-> geode_aes). [1]
-[...]
+One of those "levels" was technical.
 
-geode_aes is a PCI driver and should be automatically loaded if the PCI
-device it handles is present.  However, since it also declares the alias
-"aes", when the crypto system attempts to load the "aes" module it may
-load this module and then wait for up to a minute for it to initialise
-and register the "aes" algorithm.  geode_aes will never do this, since
-if there was a suitable device present it would already have been
-loaded.
-
-(The padlock modules don't seem to have the same problem because their
-module initialisation functions immediately return failure if the CPU
-doesn't support.)
-
-I believe geode_aes can be fixed by either (1) removing the MODULE_ALIAS
-declaration or (2) making the module initialisation function fail if the
-device is not present.  The latter behaviour is generally wrong for PCI
-drivers, but this device presumably cannot be hotplugged.
-
-Ben.
-
---=20
-Ben Hutchings
-Logic doesn't apply to the real world. - Marvin Minsky
-
---=-6eUApQ/jnxhE39wrO8uO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iD8DBQBKIzbG79ZNCRIGYgcRAqvHAKCJx7vR1QgVu4FNobf4Dfk55mT27ACg2iLW
-FqSaO/JiNTUoTeFBXdPQu/Y=
-=YKPM
------END PGP SIGNATURE-----
-
---=-6eUApQ/jnxhE39wrO8uO--
+I don't even want to think about what this does to IPSEC rule creation
+rates, that that matters heavily for cell phone networks where
+hundreds of thousands of nodes come in and out of the server and each
+such entry requires creating 4 IPSEC rules.
