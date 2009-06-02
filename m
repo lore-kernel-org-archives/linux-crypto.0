@@ -1,55 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
-Date: Tue, 2 Jun 2009 19:28:15 +1000
-Message-ID: <20090602092815.GA26832@gondor.apana.org.au>
-References: <20090513130618.GD20366@secunet.com> <20090513130818.GF20366@secunet.com> <20090602035041.GB22831@gondor.apana.org.au> <20090602092151.GJ20366@secunet.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: sha384 self-test failure oddity
+Date: Tue, 2 Jun 2009 09:01:42 -0400
+Message-ID: <200906020901.42920.jarod@redhat.com>
+References: <20090602051027.GA24415@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47711 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753185AbZFBJ2T (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Jun 2009 05:28:19 -0400
+Received: from mx2.redhat.com ([66.187.237.31]:34574 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751553AbZFBNCe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Jun 2009 09:02:34 -0400
+In-Reply-To: <20090602051027.GA24415@gondor.apana.org.au>
 Content-Disposition: inline
-In-Reply-To: <20090602092151.GJ20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 02, 2009 at 11:21:51AM +0200, Steffen Klassert wrote:
+On Tuesday 02 June 2009 01:10:27 Herbert Xu wrote:
+> Jarod Wilson <jarod@redhat.com> wrote:
+> > While doing a bit of testing of some other crypto code, I've repeatedly
+> > noticed a sha384 self-test failure. If you 'modprobe tcrypt', the
+> > sha384 self-test fails, then immediately after it, sha384-generic
+> > self-tests succeed. Something is awry w/sha384 initialization, as
+> > can be more plainly seen by the following after a reboot:
+> > 
+> > # modprobe tcrypt mode=11 (run sha384 self-test)
+> > 
+> > dmesg
+> > -----
+> > alg: hash: Failed to load transform for sha384: -2
 > 
-> The reason for the wrap work is to have a possibility to choose a
-> certain version of an algorithm as the system default. The advantage
-> e.g. for pcrypt is that we can turn over the whole system to pcrypt,
-> or we can choose for pcrypt by the algorithm name if we want to use
-> it just for a subset of transforms. In particular we have a possibility
-> to use pcrypt without touching other subsystems (like networking) and
-> userspace tools for now.
+> What kernel version
 
-Yes but what you're creating is a user-space API.  IMHO we don't
-want to have ad-hoc APIs such as this scattered around the place.
-pcrypt is certainly not the only algorithm that needs to be able
-to decide whether it should serve as the system default.
+Straight up clone of cryptodev-2.6 -- i.e., not linus' tree + cryptodev
+tacked on top. uname -r just says 2.6.29.
 
-So what I suggest is that you make pcrypt take a higher priority
-for now, so that it always is the default once instantiated.
-After all if you instantiate it then you probably want to use it
-as the default.
+> and config?
 
-We can then work on the generic user-space API to control crypto
-API algorithms, in particular, allow the user to change their
-priorities so as to determine the system default.
+Pretty much a dupe of the latest Fedora 11 kernel configs, run through
+make oldconfig.
 
-This has been on my todo list for years, but it has never risen
-to the top.  What I have in mind is a netlink protocol not unlike
-xfrm which controls crypto algorithm properties (and queries them
-so we can obsolete /proc/crypto).
+> I can't reproduce this with 2.6.30-rc7.
 
-Thanks,
+I'll rebase my cryptodev tree to 2.6.30-rcX and see if I can still
+reproduce the problem.
+
+> What does modinfo sha512_generic say?
+
+# modinfo sha512_generic
+filename:       /lib/modules/2.6.29/kernel/crypto/sha512_generic.ko
+alias:          sha512
+alias:          sha384
+description:    SHA-512 and SHA-384 Secure Hash Algorithms
+license:        GPL
+srcversion:     8709387FD8370A6569E17F3
+depends:        
+vermagic:       2.6.29 SMP mod_unload
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jarod Wilson
+jarod@redhat.com
