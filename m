@@ -1,35 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
-Date: Tue, 2 Jun 2009 13:50:41 +1000
-Message-ID: <20090602035041.GB22831@gondor.apana.org.au>
-References: <20090513130618.GD20366@secunet.com> <20090513130818.GF20366@secunet.com>
+Subject: Re: sha384 self-test failure oddity
+Date: Tue, 2 Jun 2009 15:10:27 +1000
+Message-ID: <20090602051027.GA24415@gondor.apana.org.au>
+References: <200905291435.50237.jarod@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50992 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:45769 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755440AbZFBDuo (ORCPT
+	with ESMTP id S1753198AbZFBFK2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2009 23:50:44 -0400
+	Tue, 2 Jun 2009 01:10:28 -0400
 Content-Disposition: inline
-In-Reply-To: <20090513130818.GF20366@secunet.com>
+In-Reply-To: <200905291435.50237.jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 13, 2009 at 03:08:18PM +0200, Steffen Klassert wrote:
-> This patch adds an interface to wrap aead algorithms with an
-> arbitrary crypto template. This is useful to make a certain
-> version of an aead algorithm the system default of that algorithm.
+Jarod Wilson <jarod@redhat.com> wrote:
+> While doing a bit of testing of some other crypto code, I've repeatedly
+> noticed a sha384 self-test failure. If you 'modprobe tcrypt', the
+> sha384 self-test fails, then immediately after it, sha384-generic
+> self-tests succeed. Something is awry w/sha384 initialization, as
+> can be more plainly seen by the following after a reboot:
 > 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> # modprobe tcrypt mode=11 (run sha384 self-test)
+> 
+> dmesg
+> -----
+> alg: hash: Failed to load transform for sha384: -2
 
-Hmm, it seems that this patch is completely intertwined into the
-rest of the patches so we can't just kill it.  Can you elaborate
-on the rationale behind this wrap work? I'm curious to find out
-what we gain by this over the much simpler patch you had in your
-previous set.
+What kernel version and config? I can't reproduce this with
+2.6.30-rc7.  What does modinfo sha512_generic say?
 
 Thanks,
 -- 
