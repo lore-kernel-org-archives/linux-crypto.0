@@ -1,34 +1,169 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
-Date: Wed, 3 Jun 2009 22:14:19 +1000
-Message-ID: <20090603121419.GA13672@gondor.apana.org.au>
-References: <20090513130618.GD20366@secunet.com> <20090513130818.GF20366@secunet.com> <20090602035041.GB22831@gondor.apana.org.au> <20090602092151.GJ20366@secunet.com> <20090602092815.GA26832@gondor.apana.org.au> <20090603093216.GK20366@secunet.com> <20090603094049.GA11356@gondor.apana.org.au> <20090603112353.GL20366@secunet.com> <20090603115931.GA13361@gondor.apana.org.au> <20090603121435.GN20366@secunet.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: [PATCH] crypto: add optional continuous repetition test to entropy
+	store based rngs
+Date: Thu, 4 Jun 2009 15:50:30 -0400
+Message-ID: <20090604195030.GA11300@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: nhorman@tuxdriver.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+To: mpm@selenic.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34613 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752385AbZFCMOW (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:33568 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752331AbZFDTue (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Jun 2009 08:14:22 -0400
+	Thu, 4 Jun 2009 15:50:34 -0400
 Content-Disposition: inline
-In-Reply-To: <20090603121435.GN20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 03, 2009 at 02:14:35PM +0200, Steffen Klassert wrote:
->
-> Aha, ok I see. So I will see whether I can instantiate pcrypt
-> with tcrypt as you suggested and drop the wrapper from the next
-> patchset.
+FIPS-140 requires that all random number generators implement continuous self
+tests in which each extracted block of data is compared against the last block
+for repetition.  The ansi_cprng implements such a test, but it would be nice if
+the hw rng's did the same thing.  Obviously its not something thats always
+needed, but it seems like it would be a nice feature to have on occasion.  I've
+written the below patch which allows individual entropy stores to be flagged as
+desiring a continuous test to be run on them as is extracted.  By default this
+option is off, but is enabled in the event that fips mode is selected during
+bootup.
 
-It should be straightforward as you just need to call crypto_has_alg.
+Neil
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+
+diff --git a/crypto/internal.h b/crypto/internal.h
+index fc76e1f..150d389 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -26,12 +26,6 @@
+ #include <linux/rwsem.h>
+ #include <linux/slab.h>
+ 
+-#ifdef CONFIG_CRYPTO_FIPS
+-extern int fips_enabled;
+-#else
+-#define fips_enabled 0
+-#endif
+-
+ /* Crypto notification events. */
+ enum {
+ 	CRYPTO_MSG_ALG_REQUEST,
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 8c74448..fbdfc70 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -250,6 +250,8 @@
+ #include <asm/irq.h>
+ #include <asm/io.h>
+ 
++#include <crypto/algapi.h>
++
+ /*
+  * Configuration information
+  */
+@@ -400,6 +402,7 @@ module_param(debug, bool, 0644);
+  **********************************************************************/
+ 
+ struct entropy_store;
++#define ENT_F_CONT_TEST 1
+ struct entropy_store {
+ 	/* read-only data: */
+ 	struct poolinfo *poolinfo;
+@@ -413,6 +416,8 @@ struct entropy_store {
+ 	unsigned add_ptr;
+ 	int entropy_count;
+ 	int input_rotate;
++	int flags;
++	__u8 *last_data;
+ };
+ 
+ static __u32 input_pool_data[INPUT_POOL_WORDS];
+@@ -424,7 +429,9 @@ static struct entropy_store input_pool = {
+ 	.name = "input",
+ 	.limit = 1,
+ 	.lock = __SPIN_LOCK_UNLOCKED(&input_pool.lock),
+-	.pool = input_pool_data
++	.pool = input_pool_data,
++	.flags = 0,
++	.last_data = NULL
+ };
+ 
+ static struct entropy_store blocking_pool = {
+@@ -433,7 +440,9 @@ static struct entropy_store blocking_pool = {
+ 	.limit = 1,
+ 	.pull = &input_pool,
+ 	.lock = __SPIN_LOCK_UNLOCKED(&blocking_pool.lock),
+-	.pool = blocking_pool_data
++	.pool = blocking_pool_data,
++	.flags = 0,
++	.last_data = NULL
+ };
+ 
+ static struct entropy_store nonblocking_pool = {
+@@ -441,7 +450,9 @@ static struct entropy_store nonblocking_pool = {
+ 	.name = "nonblocking",
+ 	.pull = &input_pool,
+ 	.lock = __SPIN_LOCK_UNLOCKED(&nonblocking_pool.lock),
+-	.pool = nonblocking_pool_data
++	.pool = nonblocking_pool_data,
++	.flags = 0,
++	.last_data = NULL
+ };
+ 
+ /*
+@@ -852,12 +863,21 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+ {
+ 	ssize_t ret = 0, i;
+ 	__u8 tmp[EXTRACT_SIZE];
++	unsigned long flags;
+ 
+ 	xfer_secondary_pool(r, nbytes);
+ 	nbytes = account(r, nbytes, min, reserved);
+ 
+ 	while (nbytes) {
+ 		extract_buf(r, tmp);
++
++		if (r->flags & ENT_F_CONT_TEST) {
++			spin_lock_irqsave(&r->lock, flags);
++			if (!memcmp(tmp, r->last_data, EXTRACT_SIZE))
++				panic("Hardware RNG duplicated output!\n");
++			memcpy(r->last_data, tmp, EXTRACT_SIZE);
++			spin_unlock_irqrestore(&r->lock, flags);
++		}
+ 		i = min_t(int, nbytes, EXTRACT_SIZE);
+ 		memcpy(buf, tmp, i);
+ 		nbytes -= i;
+@@ -940,6 +960,14 @@ static void init_std_data(struct entropy_store *r)
+ 	now = ktime_get_real();
+ 	mix_pool_bytes(r, &now, sizeof(now));
+ 	mix_pool_bytes(r, utsname(), sizeof(*(utsname())));
++	/* Enable continuous test in fips mode */
++	if (fips_enabled) {
++		r->last_data = kmalloc(EXTRACT_SIZE, GFP_KERNEL);
++		if (r->last_data)
++			r->flags |= ENT_F_CONT_TEST;
++		else
++			panic("Could not alloc data for rng test\n");
++	} 
+ }
+ 
+ static int rand_initialize(void)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 0105454..88e9535 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,6 +20,12 @@ struct module;
+ struct rtattr;
+ struct seq_file;
+ 
++#ifdef CONFIG_CRYPTO_FIPS
++extern int fips_enabled;
++#else
++#define fips_enabled 0
++#endif
++
+ struct crypto_type {
+ 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
+ 	unsigned int (*extsize)(struct crypto_alg *alg,
