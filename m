@@ -1,41 +1,47 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: add buffer overflow checks to testmgr
-Date: Fri, 5 Jun 2009 17:02:40 +1000
-Message-ID: <20090605070240.GA7650@gondor.apana.org.au>
-References: <200905291132.55848.jarod@redhat.com> <20090529221055.GA17957@gondor.apana.org.au> <200906041759.37762.jarod@redhat.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
+Date: Fri, 5 Jun 2009 11:20:30 +0200
+Message-ID: <20090605092030.GO20366@secunet.com>
+References: <20090513130618.GD20366@secunet.com> <20090513130818.GF20366@secunet.com> <20090602035041.GB22831@gondor.apana.org.au> <20090602092151.GJ20366@secunet.com> <20090602092815.GA26832@gondor.apana.org.au> <20090603093216.GK20366@secunet.com> <20090603094049.GA11356@gondor.apana.org.au> <20090603112353.GL20366@secunet.com> <20090603115931.GA13361@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Neil Horman <nhorman@tuxdriver.com>
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1755805AbZFEHCz@vger.kernel.org>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([213.68.205.161]:43560 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754327AbZFEJSF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Jun 2009 05:18:05 -0400
 Content-Disposition: inline
-In-Reply-To: <200906041759.37762.jarod@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20090603115931.GA13361@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 04, 2009 at 05:59:36PM -0400, Jarod Wilson wrote:
+On Wed, Jun 03, 2009 at 09:59:31PM +1000, Herbert Xu wrote:
 > 
-> One note... This is actually causing some new compile warnings to be
-> spit out, varies from arch to arch, dependent on page size... ppc64
-> with 64k pages is the worst offender:
+> When pcrypt instantiates an algorithm, it should set cra_name to
+> %s and cra_driver_name to pcrypt(%s).  So as long as the pcrypt
+> priority is higher than the underlying algorithm, it should all
+> work.
 > 
-> crypto/testmgr.c: In function 'test_nhash':
-> crypto/testmgr.c:194: warning: comparison is always false due to limited range of data type
-> crypto/testmgr.c: In function 'test_aead':
-> crypto/testmgr.c:374: warning: comparison is always false due to limited range of data type
-> crypto/testmgr.c:375: warning: comparison is always false due to limited range of data type
-> crypto/testmgr.c: In function 'test_cipher':
-> crypto/testmgr.c:676: warning: comparison is always false due to limited range of data type
-> crypto/testmgr.c: In function 'test_skcipher':
-> crypto/testmgr.c:771: warning: comparison is always false due to limited range of data type
 
-Don't worry, this warning will go away as soon as you move to a
-more up-to-date gcc :)
+As it is, I can instantiate pcrypt if the priority of pcrypt is lower
+than the priority of the underlying algorithm. If I do the priority
+check in crypto_alg_tested() the other way arround, I get it to work if
+pcrypt has a higher priority than the underlying algorithm. So I guess
+we need the patch below, right? If so, I would send a signed-off patch.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ 
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 56c62e2..2492e6c 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -255,7 +255,7 @@ found:
+ 			continue;
+ 
+ 		if (strcmp(alg->cra_driver_name, q->cra_driver_name) &&
+-		    q->cra_priority > alg->cra_priority)
++		    q->cra_priority < alg->cra_priority)
+ 			continue;
+ 
+ 		crypto_remove_spawns(&q->cra_users, &list, alg->cra_flags);
