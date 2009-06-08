@@ -1,55 +1,78 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [RFC] [PATCH 4/5] authenc: Check if the IV is already added to the
-	scatterlist
-Date: Mon, 8 Jun 2009 09:11:43 +0200
-Message-ID: <20090608071143.GV20366@secunet.com>
+Subject: [RFC] [PATCH 5/5] tcrypt: Test algorithms by name
+Date: Mon, 8 Jun 2009 09:12:46 +0200
+Message-ID: <20090608071246.GW20366@secunet.com>
 References: <20090608070749.GR20366@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:58247 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([213.68.205.161]:58259 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750955AbZFHHJQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Jun 2009 03:09:16 -0400
+	id S1751391AbZFHHKU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Jun 2009 03:10:20 -0400
 Content-Disposition: inline
 In-Reply-To: <20090608070749.GR20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-aead eseqiv needs to add the IV to the scatterlist itself.
-So check if the IV is already contained in the scatterlist
-and add it just if it is not already there.
+This adds the 'alg' module parameter to be able to test an
+algorithm by name. If the algorithm type is not ad-hoc
+clear for a algorithm (e.g. pcrypt, cryptd) it is possilbe
+to set the algorithm type with the 'type' module parameter.
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/authenc.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ crypto/tcrypt.c |   14 +++++++++++++-
+ 1 files changed, 13 insertions(+), 1 deletions(-)
 
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 5793b64..e11029a 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -157,15 +157,16 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index c3c9124..9d5b33c 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -44,6 +44,8 @@
+  */
+ static unsigned int sec;
  
- 	dstp = sg_page(dst);
- 	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
-+	cryptlen = req->cryptlen;
++static char *alg = NULL;
++static u32 type;
+ static int mode;
+ static char *tvmem[TVMEMSIZE];
  
--	if (ivsize) {
-+	if (ivsize && !(aead_request_flags(req) & CRYPTO_TFM_REQ_SG_HAS_IV)) {
- 		sg_init_table(cipher, 2);
- 		sg_set_buf(cipher, iv, ivsize);
- 		authenc_chain(cipher, dst, vdst == iv + ivsize);
- 		dst = cipher;
-+		cryptlen += ivsize;
+@@ -864,6 +866,11 @@ static void do_test(int m)
+ 	}
+ }
+ 
++static void do_alg_test(const char *alg, u32 type)
++{
++	crypto_has_alg(alg, type, CRYPTO_ALG_TYPE_MASK);
++}
++
+ static int __init tcrypt_mod_init(void)
+ {
+ 	int err = -ENOMEM;
+@@ -875,7 +882,10 @@ static int __init tcrypt_mod_init(void)
+ 			goto err_free_tv;
  	}
  
--	cryptlen = req->cryptlen + ivsize;
- 	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
- 	if (IS_ERR(hash))
- 		return PTR_ERR(hash);
+-	do_test(mode);
++	if (alg)
++		do_alg_test(alg, type);
++	else
++		do_test(mode);
+ 
+ 	/* We intentionaly return -EAGAIN to prevent keeping
+ 	 * the module. It does all its work from init()
+@@ -901,6 +911,8 @@ static void __exit tcrypt_mod_fini(void) { }
+ module_init(tcrypt_mod_init);
+ module_exit(tcrypt_mod_fini);
+ 
++module_param(alg, charp, 0);
++module_param(type, uint, 0);
+ module_param(mode, int, 0);
+ module_param(sec, uint, 0);
+ MODULE_PARM_DESC(sec, "Length in seconds of speed tests "
 -- 
 1.5.4.2
 
