@@ -1,78 +1,54 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [RFC] [PATCH 5/5] tcrypt: Test algorithms by name
-Date: Mon, 8 Jun 2009 09:12:46 +0200
-Message-ID: <20090608071246.GW20366@secunet.com>
-References: <20090608070749.GR20366@secunet.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto: s390 des3 - permit weak keys unless REQ_WEAK_KEY set
+Date: Mon, 8 Jun 2009 13:32:09 -0400
+Message-ID: <200906081332.10608.jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:58259 "EHLO a.mx.secunet.com"
+Received: from mx2.redhat.com ([66.187.237.31]:59324 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751391AbZFHHKU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Jun 2009 03:10:20 -0400
+	id S1750698AbZFHRdF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Jun 2009 13:33:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20090608070749.GR20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This adds the 'alg' module parameter to be able to test an
-algorithm by name. If the algorithm type is not ad-hoc
-clear for a algorithm (e.g. pcrypt, cryptd) it is possilbe
-to set the algorithm type with the 'type' module parameter.
+Just started running fips cavs test vectors through an s390x system
+for giggles, and discovered that I missed patching s390's arch-specific
+des3 implementation w/an earlier des3 patch to permit weak keys.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+This change adds the same flag tweaks as ad79cdd77fc1466e45cf923890f66bcfe7c43f12
+for s390's des3 implementation, yields expected test results now.
+
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+
 ---
- crypto/tcrypt.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ arch/s390/crypto/des_s390.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index c3c9124..9d5b33c 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -44,6 +44,8 @@
-  */
- static unsigned int sec;
+diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+index 4aba83b..2bc479a 100644
+--- a/arch/s390/crypto/des_s390.c
++++ b/arch/s390/crypto/des_s390.c
+@@ -250,8 +250,9 @@ static int des3_128_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	const u8 *temp_key = key;
+ 	u32 *flags = &tfm->crt_flags;
  
-+static char *alg = NULL;
-+static u32 type;
- static int mode;
- static char *tvmem[TVMEMSIZE];
- 
-@@ -864,6 +866,11 @@ static void do_test(int m)
+-	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE))) {
+-		*flags |= CRYPTO_TFM_RES_BAD_KEY_SCHED;
++	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE)) &&
++	    (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
++		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
+ 		return -EINVAL;
  	}
- }
+ 	for (i = 0; i < 2; i++, temp_key += DES_KEY_SIZE) {
+@@ -411,9 +412,9 @@ static int des3_192_setkey(struct crypto_tfm *tfm, const u8 *key,
  
-+static void do_alg_test(const char *alg, u32 type)
-+{
-+	crypto_has_alg(alg, type, CRYPTO_ALG_TYPE_MASK);
-+}
-+
- static int __init tcrypt_mod_init(void)
- {
- 	int err = -ENOMEM;
-@@ -875,7 +882,10 @@ static int __init tcrypt_mod_init(void)
- 			goto err_free_tv;
- 	}
- 
--	do_test(mode);
-+	if (alg)
-+		do_alg_test(alg, type);
-+	else
-+		do_test(mode);
- 
- 	/* We intentionaly return -EAGAIN to prevent keeping
- 	 * the module. It does all its work from init()
-@@ -901,6 +911,8 @@ static void __exit tcrypt_mod_fini(void) { }
- module_init(tcrypt_mod_init);
- module_exit(tcrypt_mod_fini);
- 
-+module_param(alg, charp, 0);
-+module_param(type, uint, 0);
- module_param(mode, int, 0);
- module_param(sec, uint, 0);
- MODULE_PARM_DESC(sec, "Length in seconds of speed tests "
--- 
-1.5.4.2
-
+ 	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE) &&
+ 	    memcmp(&key[DES_KEY_SIZE], &key[DES_KEY_SIZE * 2],
+-		   DES_KEY_SIZE))) {
