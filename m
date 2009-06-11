@@ -1,45 +1,51 @@
-From: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
-Subject: [PATCH] arm/orion5x: init the crypto device
-Date: Thu, 11 Jun 2009 22:27:20 +0200
-Message-ID: <20090611202720.GB11486@Chamillionaire.breakpoint.cc>
-References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc> <1244728999-8103-4-git-send-email-arm-kernel@ml.breakpoint.cc> <alpine.LFD.2.00.0906111518390.31536@xanadu.home>
+From: Nicolas Pitre <nico@cam.org>
+Subject: Re: [PATCH] arm/orion5x: add sram support for crypto
+Date: Thu, 11 Jun 2009 16:36:42 -0400 (EDT)
+Message-ID: <alpine.LFD.2.00.0906111625280.31536@xanadu.home>
+References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc>
+ <1244728999-8103-2-git-send-email-arm-kernel@ml.breakpoint.cc>
+ <alpine.LFD.2.00.0906111513420.31536@xanadu.home>
+ <20090611201530.GA11486@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Cc: linux-arm-kernel@lists.arm.linux.org.uk,
 	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: Nicolas Pitre <nico@cam.org>
+To: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48120 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751423AbZFKU1W (ORCPT
+Received: from relais.videotron.ca ([24.201.245.36]:56082 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751065AbZFKUhA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Jun 2009 16:27:22 -0400
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.00.0906111518390.31536@xanadu.home>
+	Thu, 11 Jun 2009 16:37:00 -0400
+Received: from xanadu.home ([66.131.194.97]) by VL-MH-MR001.ip.videotron.ca
+ (Sun Java(tm) System Messaging Server 6.3-4.01 (built Aug  3 2007; 32bit))
+ with ESMTP id <0KL300IRBD96JE40@VL-MH-MR001.ip.videotron.ca> for
+ linux-crypto@vger.kernel.org; Thu, 11 Jun 2009 16:36:43 -0400 (EDT)
+In-reply-to: <20090611201530.GA11486@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+On Thu, 11 Jun 2009, Sebastian Andrzej Siewior wrote:
 
-init & register the crypto device.
+> * Nicolas Pitre | 2009-06-11 15:17:09 [-0400]:
+> 
+> >This one is already merged in the Orion and ARM tree, with a minor fix 
+> >and device renamed to be more generic.  The equivalent registration for 
+> >Kirkwood is merged as well already.
+> 
+> Adding a revision history is good thing... I could not find the ARM tree
+> but I've rebased this patch against the orion tree [0].
 
-Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
----
- arch/arm/mach-orion5x/common.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Actually, I'm leaning towards the removal of such dynamic mappings 
+altogether and keep an unconditional static mapping instead, just like 
+Kirkwood does.
 
-diff --git a/arch/arm/mach-orion5x/common.c b/arch/arm/mach-orion5x/common.c
-index eafcc49..745af50 100644
---- a/arch/arm/mach-orion5x/common.c
-+++ b/arch/arm/mach-orion5x/common.c
-@@ -700,6 +700,7 @@ void __init orion5x_init(void)
- 	 * Register watchdog driver
- 	 */
- 	orion5x_wdt_init();
-+	orion5x_crypto_init();
- }
- 
- /*
--- 
-1.6.0.6
+> Since the driver got renamed, I'm going to send a delta if nothing else
+> comes up.
 
+What is your plan for this driver?  Submit it now and add incremental 
+improvements afterward or wait until it is more functional?
+
+
+Nicolas
