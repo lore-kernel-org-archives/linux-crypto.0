@@ -1,53 +1,43 @@
-From: Heiko Carstens <heiko.carstens@de.ibm.com>
-Subject: Re: [PATCH] crypto: s390 des3 - permit weak keys unless
-	REQ_WEAK_KEY set
-Date: Thu, 11 Jun 2009 15:38:59 +0200
-Message-ID: <20090611133859.GC3146@osiris.boeblingen.de.ibm.com>
-References: <200906081332.10608.jarod@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Jarod Wilson <jarod@redhat.com>
+From: arm-kernel@ml.breakpoint.cc
+Subject: [PATCH] arm/ts209: init crypto
+Date: Thu, 11 Jun 2009 16:03:19 +0200
+Message-ID: <1244728999-8103-4-git-send-email-arm-kernel@ml.breakpoint.cc>
+References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org, nico@cam.org,
+	herbert@gondor.apana.org.au,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: linux-arm-kernel@lists.arm.linux.org.uk
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mtagate3.de.ibm.com ([195.212.29.152]:56858 "EHLO
-	mtagate3.de.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833AbZFKNjI (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:52133 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751013AbZFKODT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Jun 2009 09:39:08 -0400
-Content-Disposition: inline
-In-Reply-To: <200906081332.10608.jarod@redhat.com>
+	Thu, 11 Jun 2009 10:03:19 -0400
+In-Reply-To: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 08, 2009 at 01:32:09PM -0400, Jarod Wilson wrote:
-> Just started running fips cavs test vectors through an s390x system
-> for giggles, and discovered that I missed patching s390's arch-specific
-> des3 implementation w/an earlier des3 patch to permit weak keys.
-> 
-> This change adds the same flag tweaks as ad79cdd77fc1466e45cf923890f66bcfe7c43f12
-> for s390's des3 implementation, yields expected test results now.
-> 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> 
-> ---
->  arch/s390/crypto/des_s390.c |   11 ++++++-----
->  1 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
-> index 4aba83b..2bc479a 100644
-> --- a/arch/s390/crypto/des_s390.c
-> +++ b/arch/s390/crypto/des_s390.c
-> @@ -250,8 +250,9 @@ static int des3_128_setkey(struct crypto_tfm *tfm, const u8 *key,
->  	const u8 *temp_key = key;
->  	u32 *flags = &tfm->crt_flags;
-> 
-> -	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE))) {
-> -		*flags |= CRYPTO_TFM_RES_BAD_KEY_SCHED;
-> +	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE)) &&
-> +	    (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
-> +		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
->  		return -EINVAL;
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-I think this should go in via crypt-dev. Herbert?
+use the new driver for the crypto engine
+
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ arch/arm/mach-orion5x/ts209-setup.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/arch/arm/mach-orion5x/ts209-setup.c b/arch/arm/mach-orion5x/ts209-setup.c
+index 9d68905..fbea307 100644
+--- a/arch/arm/mach-orion5x/ts209-setup.c
++++ b/arch/arm/mach-orion5x/ts209-setup.c
+@@ -302,6 +302,7 @@ static void __init qnap_ts209_init(void)
+ 	orion5x_uart0_init();
+ 	orion5x_uart1_init();
+ 	orion5x_xor_init();
++	orion5x_crypto_init();
+ 
+ 	platform_device_register(&qnap_ts209_button_device);
+ 
+-- 
+1.6.0.6
+
