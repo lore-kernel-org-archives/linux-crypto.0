@@ -1,148 +1,104 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.31
-Date: Sat, 13 Jun 2009 12:05:12 +1000
-Message-ID: <20090613020512.GA21024@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au>
+From: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
+Subject: Re: [PATCH] arm/orion5x: add sram support for crypto
+Date: Sat, 13 Jun 2009 12:07:26 +0200
+Message-ID: <20090613100726.GA31922@Chamillionaire.breakpoint.cc>
+References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc> <1244728999-8103-2-git-send-email-arm-kernel@ml.breakpoint.cc> <alpine.LFD.2.00.0906111513420.31536@xanadu.home> <20090611201530.GA11486@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111625280.31536@xanadu.home> <20090611210734.GA11920@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111712060.31536@xanadu.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Nicolas Pitre <nico@cam.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49307 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752767AbZFMCFR (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48901 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752477AbZFMKIJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Jun 2009 22:05:17 -0400
+	Sat, 13 Jun 2009 06:08:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20090324044932.GA18245@gondor.apana.org.au>
+In-Reply-To: <alpine.LFD.2.00.0906111712060.31536@xanadu.home>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+* Nicolas Pitre | 2009-06-11 17:19:22 [-0400]:
 
-Here is the crypto update for 2.6.31:
+>> >What is your plan for this driver?  Submit it now and add incremental 
+>> >improvements afterward or wait until it is more functional?
+>> I would like to get it squeezed into this merge window unless there are
+>> any objections and improve it afterwards.
+>> If you thing it is too early I can keep hacking in my own git tree until
+>> I get the dmac_flush_range() hack out or so.
+>
+>I have no problem with you submitting it now.  It is not complete yet 
+>but what is there is plenty functional.  However I'd prefer if you used 
+>the API based on sg_copy_buffer() which includes a call to 
+>flush_kernel_dcache_page() already for mainline inclusion, so to have 
+>good style up front. ( a patch to fix flush_kernel_dcache_page() on ARM 
+>is already queued).
+sg_copy_from_buffer() since the other one is static. I'm little unhappy
+with it because this forces me to have the entire buffer "ready". This
+is not a problem for dm-crypt because I get just one scatterlist entry
+with 512 bytes. I don't know about others but this will put a
+limitation / break them.
 
-* 64-bit VIA crypto/RNG support.
-* More operation modes added for Intel AES.
-* New test vectors for CCM/CTR/RNG.
-* Slight change to the compress API for squashfs.
-* Talitos fixes/clean-ups.
+It looks like sg_miter_start() which is exported doesn't provide the
+the required flush interface. What about:
+
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -259,12 +259,6 @@ static void dequeue_complete_req(void)
+ 		dst_copy = min(cpg->p.crypt_len, cpg->p.sg_dst_left);
+ 
+ 		memcpy(buf, cpg->sram + SRAM_DATA_OUT_START, dst_copy);
+-		/*
+-		 * XXX This is a temporary hack to flush data from cache back
+-		 * into phys ram so user space sees correct data. This goes
+-		 * away as soon as DMA support is added to this driver
+-		 */
+-		dmac_flush_range(buf, buf + dst_copy);
+ 
+ 		cpg->p.sg_dst_left -= dst_copy;
+ 		cpg->p.crypt_len -= dst_copy;
+@@ -309,7 +303,7 @@ static void mv_enqueue_new_req(struct ablkcipher_request *req)
+ 	sg_miter_start(&cpg->p.src_sg_it, req->src, num_sgs, 0);
+ 
+ 	num_sgs = count_sgs(req->dst, req->nbytes);
+-	sg_miter_start(&cpg->p.dst_sg_it, req->dst, num_sgs, 0);
++	sg_miter_start(&cpg->p.dst_sg_it, req->dst, num_sgs, SG_MITER_FLUSH_CACHE);
+ 	mv_process_current_q(1);
+ }
+ 
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index e599698..8f98450 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -242,6 +242,7 @@ size_t sg_copy_to_buffer(struct scatterlist *sgl, unsigned int nents,
+  */
+ 
+ #define SG_MITER_ATOMIC		(1 << 0)	 /* use kmap_atomic */
++#define SG_MITER_FLUSH_CACHE	(1 << 1)	 /* flash cache on unmap */
+ 
+ struct sg_mapping_iter {
+ 	/* the following three fields can be accessed directly */
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index a295e40..4b07f7a 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -394,6 +394,9 @@ void sg_miter_stop(struct sg_mapping_iter *miter)
+ 	if (miter->addr) {
+ 		miter->__offset += miter->consumed;
+ 
++		if (miter->__flags & SG_MITER_FLUSH_CACHE)
++			flush_kernel_dcache_page(miter->page);
++
+ 		if (miter->__flags & SG_MITER_ATOMIC) {
+ 			WARN_ON(!irqs_disabled());
+ 			kunmap_atomic(miter->addr, KM_BIO_SRC_IRQ);
+-- 
+1.6.0.6
 
 
-Please pull from
+>
+>
+>Nicolas
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Alex Riesen (1):
-      crypto: api - Use formatting of module name
-
-Alexander Clouter (1):
-      hwrng: timeriomem - Fix potential oops (request_mem_region/__devi=
-nit)
-
-=46rank Seidel (1):
-      crypto: tcrypt - Reduce stack size
-
-Geert Uytterhoeven (3):
-      crypto: testmgr - Kill test_comp() sparse warnings
-      crypto: pcomp - pcompress.c should include crypto/internal/compre=
-ss.h
-      crypto: compress - Return produced bytes in crypto_{,de}compress_=
-{update,final}
-
-Harald Welte (3):
-      hwrng: via_rng - The VIA Hardware RNG driver is for the CPU, not =
-Chipset
-      hwrng: via_rng - Support VIA Nano hardware RNG
-      hwrng: via_rng - Support VIA Nano hardware RNG on X86_64 builds
-
-Herbert Xu (4):
-      crypto: padlock - Restore dependency on x86
-      crypto: testmgr - Dynamically allocate xbuf and axbuf
-      crypto: testmgr - Check all test vector lengths
-      crypto: testmgr - Allow hash test vectors longer than a page
-
-Huang Ying (3):
-      crypto: cryptd - Use nivcipher in cryptd_alloc_ablkcipher
-      crypto: fpu - Add template for blkcipher touching FPU
-      crypto: aes-ni - Add support for more modes
-
-Jarod Wilson (10):
-      crypto: testmgr - Handle AEAD test vectors expected to fail verif=
-ication
-      crypto: testmgr - Add self-tests for rfc4309(ccm(aes))
-      crypto: testmgr - Add infrastructure for ansi_cprng self-tests
-      crypto: testmgr - Add ansi_cprng test vectors
-      crypto: testmgr - Catch base cipher self-test failures in fips mo=
-de
-      crypto: testmgr - Print self-test pass notices in fips mode
-      crypto: testmgr - Add ctr(aes) test vectors
-      crypto: testmgr - Mark algs allowed in fips mode
-      crypto: testmgr - Skip algs not flagged fips_allowed in fips mode
-      crypto: tcrypt - Do not exit on success in fips mode
-
-Johannes Weiner (1):
-      crypto: api - Use kzfree
-
-Kim Phillips (3):
-      crypto: talitos - Whitespace/codingstyle/overrun lines cleanup
-      crypto: talitos - containerof related codingstyle
-      crypto: talitos - Avoid unnecessary decrypt check
-
-Lee Nipper (2):
-      crypto: talitos - scaffolding for new algorithm types
-      crypto: talitos - Add ablkcipher algorithms
-
-Mike Frysinger (1):
-      crypto: hifn_795x - fix __dev{init,exit} markings
-
-Sebastian Andrzej Siewior (1):
-      crypto: padlock - Enable on x86_64
-
-Uwe Kleine-K=F6nig (1):
-      hwrng: omap - Move probe function to .devinit.text
-
- arch/x86/crypto/Makefile                |    2 +
- arch/x86/crypto/aesni-intel_glue.c      |  267 ++++++++++++-
- arch/x86/crypto/fpu.c                   |  166 +++++++
- crypto/Kconfig                          |   10 +
- crypto/algboss.c                        |   18 +-
- crypto/api.c                            |   14 +-
- crypto/cryptd.c                         |   14 +-
- crypto/internal.h                       |    3 -
- crypto/pcompress.c                      |    1 +
- crypto/tcrypt.c                         |  183 +++++----
- crypto/testmgr.c                        |  470 ++++++++++++++++-----
- crypto/testmgr.h                        |  645 +++++++++++++++++++++++=
-+++++-
- crypto/zlib.c                           |   24 +-
- drivers/char/hw_random/Kconfig          |    2 +-
- drivers/char/hw_random/omap-rng.c       |    2 +-
- drivers/char/hw_random/timeriomem-rng.c |   26 +-
- drivers/char/hw_random/via-rng.c        |   15 +-
- drivers/crypto/Kconfig                  |    2 +-
- drivers/crypto/hifn_795x.c              |    8 +-
- drivers/crypto/padlock-aes.c            |   13 +
- drivers/crypto/talitos.c                |  713 ++++++++++++++++++++++-=
---------
- 21 files changed, 2141 insertions(+), 457 deletions(-)
-=20
-Thanks,
---=20
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Sebastian
