@@ -1,48 +1,65 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: [BUGFIX 1/3] crypto: Fix AES-NI cbc mode IV saving
-Date: Mon, 15 Jun 2009 17:04:44 +0800
-Message-ID: <1245056684.5320.347.camel@yhuang-dev.sh.intel.com>
+Subject: [BUGFIX 2/3] crypto: Remove CRYPTO_TFM_REQ_MAY_SLEEP flag in
+ AES-NI accelerated ecb/cbc mode
+Date: Mon, 15 Jun 2009 17:04:57 +0800
+Message-ID: <1245056697.5320.350.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:27133 "EHLO mga11.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:37942 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751521AbZFOJEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2009 05:04:43 -0400
+	id S1751881AbZFOJE5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2009 05:04:57 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Original implementation of aesni_cbc_dec do not save IV if input
-length % 4 == 0. This will make decryption of next block failed.
+Because AES-NI instructions will touch XMM state, corresponding code
+must be enclosed within kernel_fpu_begin/end, which used
+preempt_disable/enable. So sleep should be prevented between
+kernel_fpu_begin/end.
 
 Signed-off-by: Huang Ying <ying.huang@intel.com>
 
 ---
- arch/x86/crypto/aesni-intel_asm.S |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -845,7 +845,7 @@ ENTRY(aesni_cbc_enc)
-  */
- ENTRY(aesni_cbc_dec)
- 	cmp $16, LEN
--	jb .Lcbc_dec_ret
-+	jb .Lcbc_dec_just_ret
- 	mov 480(KEYP), KLEN
- 	add $240, KEYP
- 	movups (IVP), IV
-@@ -891,6 +891,7 @@ ENTRY(aesni_cbc_dec)
- 	add $16, OUTP
- 	cmp $16, LEN
- 	jge .Lcbc_dec_loop1
--	movups IV, (IVP)
- .Lcbc_dec_ret:
-+	movups IV, (IVP)
-+.Lcbc_dec_just_ret:
- 	ret
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -198,6 +198,7 @@ static int ecb_encrypt(struct blkcipher_
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt(desc, &walk);
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+ 	kernel_fpu_begin();
+ 	while ((nbytes = walk.nbytes)) {
+@@ -221,6 +222,7 @@ static int ecb_decrypt(struct blkcipher_
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt(desc, &walk);
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+ 	kernel_fpu_begin();
+ 	while ((nbytes = walk.nbytes)) {
+@@ -266,6 +268,7 @@ static int cbc_encrypt(struct blkcipher_
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt(desc, &walk);
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+ 	kernel_fpu_begin();
+ 	while ((nbytes = walk.nbytes)) {
+@@ -289,6 +292,7 @@ static int cbc_decrypt(struct blkcipher_
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt(desc, &walk);
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+ 	kernel_fpu_begin();
+ 	while ((nbytes = walk.nbytes)) {
 
 
