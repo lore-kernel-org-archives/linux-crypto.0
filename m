@@ -1,49 +1,68 @@
-From: Erik Lotspeich <erik@lotspeich.org>
-Subject: Re: Question about error codes
-Date: Wed, 17 Jun 2009 00:56:23 -0500
-Message-ID: <4A388587.6010506@lotspeich.org>
-References: <4A37CC93.8040905@lotspeich.org> <20090616203406.GA19710@Chamillionaire.breakpoint.cc> <20090617015243.GA21685@gondor.apana.org.au>
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [RFC 6/7] x86: Move kernel_fpu_using to asm/i387.h
+Date: Wed, 17 Jun 2009 18:46:22 +0200
+Message-ID: <20090617164622.GB25357@elte.hu>
+References: <1244704236.5320.129.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.lotspeich.org ([75.76.192.54]:46094 "EHLO
-	starfish.lotspeich.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750846AbZFQF6P (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2009 01:58:15 -0400
-In-Reply-To: <20090617015243.GA21685@gondor.apana.org.au>
+Received: from mx3.mail.elte.hu ([157.181.1.138]:54410 "EHLO mx3.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752771AbZFQQqd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2009 12:46:33 -0400
+Content-Disposition: inline
+In-Reply-To: <1244704236.5320.129.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-Hi Herbert, Sebastian:
+* Huang Ying <ying.huang@intel.com> wrote:
 
-Thanks so much for your response; your answers were very helpful!
-
-Regards,
-
-Erik.
-
-Herbert Xu wrote:
-> On Tue, Jun 16, 2009 at 10:34:06PM +0200, Sebastian Andrzej Siewior wrote:
->>> Any help would be greatly appreciated.
->> I guess the number of bytes to decrypt/encrypt ist not always a modulos
->> of the blockmode.
+> This is used by AES-NI accelerated AES implementation and PCLMULQDQ
+> accelerated GHASH implementation.
 > 
-> Yes that's probably what it is.
+> Signed-off-by: Huang Ying <ying.huang@intel.com>
 > 
-> Thanks,
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.9 (GNU/Linux)
-Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c |    7 -------
+>  arch/x86/include/asm/i387.h        |    7 +++++++
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -59,13 +59,6 @@ asmlinkage void aesni_cbc_enc(struct cry
+>  asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
+>  			      const u8 *in, unsigned int len, u8 *iv);
+>  
+> -static inline int kernel_fpu_using(void)
+> -{
+> -	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
+> -		return 1;
+> -	return 0;
+> -}
+> -
+>  static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
+>  {
+>  	unsigned long addr = (unsigned long)raw_ctx;
+> --- a/arch/x86/include/asm/i387.h
+> +++ b/arch/x86/include/asm/i387.h
+> @@ -302,6 +302,13 @@ static inline void kernel_fpu_end(void)
+>  	preempt_enable();
+>  }
+>  
+> +static inline int kernel_fpu_using(void)
+> +{
+> +	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
+> +		return 1;
+> +	return 0;
+> +}
+> +
 
-iEYEARECAAYFAko4hYcACgkQY21D/n6bGwc6SACgu9Su2ba1BXJ/xh/+DpwzTpRi
-5jYAoKvs9INfBmAaY8ZQDn85j8eu7W3F
-=vNQ9
------END PGP SIGNATURE-----
+Looks sane to me. Herbert, do you ack it?
+
+	Ingo
