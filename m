@@ -1,61 +1,38 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [RFC 2/7] crypto: Use GHASH digest algorithm in GCM
-Date: Thu, 18 Jun 2009 10:09:33 +0800
-Message-ID: <1245290973.11965.202.camel@yhuang-dev.sh.intel.com>
-References: <1244704228.5320.125.camel@yhuang-dev.sh.intel.com>
-	 <20090617204736.GC28694@Chamillionaire.breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC 1/7] crypto: Add GHASH digest algorithm for GCM
+Date: Thu, 18 Jun 2009 10:43:49 +0800
+Message-ID: <20090618024349.GA1936@gondor.apana.org.au>
+References: <1244704226.5320.124.camel@yhuang-dev.sh.intel.com> <20090617200410.GB28694@Chamillionaire.breakpoint.cc> <1245290907.11965.201.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:12667 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755979AbZFRCJc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2009 22:09:32 -0400
-In-Reply-To: <20090617204736.GC28694@Chamillionaire.breakpoint.cc>
+Received: from rhun.apana.org.au ([64.62.148.172]:44177 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751962AbZFRCnv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2009 22:43:51 -0400
+Content-Disposition: inline
+In-Reply-To: <1245290907.11965.201.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2009-06-18 at 04:47 +0800, Sebastian Andrzej Siewior wrote:
-> * Huang Ying | 2009-06-11 15:10:28 [+0800]:
+On Thu, Jun 18, 2009 at 10:08:27AM +0800, Huang Ying wrote:
+>
+> > Unless I'm mistaken, this is called once on allocation and this ctx is
+> > allocated via kzalloc().
 > 
-> >Remove the dedicated GHASH implementation in GCM, and uses the GHASH
-> >digest algorithm instead. This will make GCM uses hardware accelerated
-> >GHASH implementation automatically if available.
-> >
-> >ahash instead of shash interface is used, because some hardware
-> >accelerated GHASH implementation needs asynchronous interface.
-> The outside interface is also async so this should work.
-> 
-> >Signed-off-by: Huang Ying <ying.huang@intel.com>
-> >
-> >@@ -796,14 +996,15 @@ static int __init crypto_gcm_module_init
-> > 	if (err)
-> > 		goto out_undo_gcm;
-> > 
-> >-out:
-> >-	return err;
-> >+	return 0;
-> > 
-> > out_undo_gcm:
-> > 	crypto_unregister_template(&crypto_gcm_tmpl);
-> > out_undo_base:
-> > 	crypto_unregister_template(&crypto_gcm_base_tmpl);
-> >-	goto out;
-> >+out:
-> >+	kfree(gcm_zeroes);
-> >+	return err;
-> > }
-> > 
-> > static void __exit crypto_gcm_module_exit(void)
-> here you are leaking gcm_zeroes
+> Yes. it is alloced via kzalloc. Can we just rely on this? Should we add
+> that assumption to somewhere such as document of comments.
 
-Yes. I will change this. Thank you.
+Yes you can rely on this.
 
-Best Regards,
-Huang Ying
-
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
