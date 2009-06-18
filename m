@@ -1,38 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 1/7] crypto: Add GHASH digest algorithm for GCM
-Date: Thu, 18 Jun 2009 10:43:49 +0800
-Message-ID: <20090618024349.GA1936@gondor.apana.org.au>
-References: <1244704226.5320.124.camel@yhuang-dev.sh.intel.com> <20090617200410.GB28694@Chamillionaire.breakpoint.cc> <1245290907.11965.201.camel@yhuang-dev.sh.intel.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC 6/7] x86: Move kernel_fpu_using to asm/i387.h
+Date: Wed, 17 Jun 2009 20:51:08 -0700
+Message-ID: <4A39B9AC.30807@zytor.com>
+References: <1244704236.5320.129.camel@yhuang-dev.sh.intel.com> <20090617164622.GB25357@elte.hu> <4A3922A4.1080300@zytor.com> <20090618014858.GA1368@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Ingo Molnar <mingo@elte.hu>, Huang Ying <ying.huang@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44177 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751962AbZFRCnv (ORCPT
+Received: from terminus.zytor.com ([198.137.202.10]:38810 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752748AbZFRDv2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2009 22:43:51 -0400
-Content-Disposition: inline
-In-Reply-To: <1245290907.11965.201.camel@yhuang-dev.sh.intel.com>
+	Wed, 17 Jun 2009 23:51:28 -0400
+In-Reply-To: <20090618014858.GA1368@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 18, 2009 at 10:08:27AM +0800, Huang Ying wrote:
->
-> > Unless I'm mistaken, this is called once on allocation and this ctx is
-> > allocated via kzalloc().
+Herbert Xu wrote:
+> On Wed, Jun 17, 2009 at 10:06:44AM -0700, H. Peter Anvin wrote:
 > 
-> Yes. it is alloced via kzalloc. Can we just rely on this? Should we add
-> that assumption to somewhere such as document of comments.
+>> Huang: if I recall correctly, these functions were originally designed
+>> to deal with the fact that VIA processors generate spurious #TS faults
+>> due to broken design of the Padlock instructions.  The AES and PCLMUL
+>> instructions actually use SSE registers and so will require different
+>> structure.
+> 
+> No irq_ts_save was the one designed for the VIA, the Intel stuff
+> does save the FPU state.
+> 
 
-Yes you can rely on this.
+Ah, sorry, misremembered.  Great!  Will apply.
 
-Cheers,
+	-hpa
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
+
