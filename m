@@ -1,38 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s390 des3 - permit weak keys unless
-	REQ_WEAK_KEY set
-Date: Thu, 18 Jun 2009 19:53:21 +0800
-Message-ID: <20090618115321.GE6596@gondor.apana.org.au>
-References: <200906081332.10608.jarod@redhat.com>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: [BUGFIX 2/3] crypto: Remove CRYPTO_TFM_REQ_MAY_SLEEP flag in
+ AES-NI accelerated ecb/cbc mode
+Date: Fri, 19 Jun 2009 08:55:20 +0800
+Message-ID: <1245372920.22246.15.camel@yhuang-dev.sh.intel.com>
+References: <1245056697.5320.350.camel@yhuang-dev.sh.intel.com>
+	 <20090618114032.GB6596@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35489 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756496AbZFRLxU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Jun 2009 07:53:20 -0400
-Content-Disposition: inline
-In-Reply-To: <200906081332.10608.jarod@redhat.com>
+Received: from mga11.intel.com ([192.55.52.93]:25121 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751081AbZFSAzT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Jun 2009 20:55:19 -0400
+In-Reply-To: <20090618114032.GB6596@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 08, 2009 at 01:32:09PM -0400, Jarod Wilson wrote:
-> Just started running fips cavs test vectors through an s390x system
-> for giggles, and discovered that I missed patching s390's arch-specific
-> des3 implementation w/an earlier des3 patch to permit weak keys.
+On Thu, 2009-06-18 at 19:40 +0800, Herbert Xu wrote:
+> On Mon, Jun 15, 2009 at 05:04:57PM +0800, Huang Ying wrote:
+> > Because AES-NI instructions will touch XMM state, corresponding code
+> > must be enclosed within kernel_fpu_begin/end, which used
+> > preempt_disable/enable. So sleep should be prevented between
+> > kernel_fpu_begin/end.
+> > 
+> > Signed-off-by: Huang Ying <ying.huang@intel.com>
 > 
-> This change adds the same flag tweaks as ad79cdd77fc1466e45cf923890f66bcfe7c43f12
-> for s390's des3 implementation, yields expected test results now.
+> I'll apply this for now.  But it would be much better to allow
+> sleeping in this case.
 > 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> Couldn't we simply move the kernel_fpu_begin/end inside the loop?
+> It shouldn't be too expensive when it runs the 2nd time since it
+> doesn't have to save anything, right?
 
-Patch applied to cryptodev.  Thanks Jarod!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I will test the performance difference.
+
+Best Regards,
+Huang Ying
+
+
