@@ -1,25 +1,42 @@
-From: unfoundationgrant@iprimus.com.au
-Subject: UN NOTIFICATION
-Date: Sat, 20 Jun 2009 07:14:36 -0800
-Message-ID: <49D3AAE40004E6CE@cpms02.int.iprimus.net.au>
+From: "HELP DESK SUPPORT" <info@helpdesk.com>
+Subject: Confirm Your Webmail Identities(HelpDesk)
+Date: Sat, 20 Jun 2009 16:10:14 +0200 (CEST)
+Message-ID: <e7a13e4e1ab2f497617568438cab0ce3.squirrel__12152.8674652383$1245553406$gmane$org@bitsathy.ac.in>
+Reply-To: helpdeskinfo@tmail.tv
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx06.syd.iprimus.net.au ([210.50.76.235]:43730 "EHLO
-	mx06.syd.iprimus.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752112AbZFTPOh (ORCPT
+Received: from bitsathy.bitsathy.ac.in ([202.129.196.226]:38652 "EHLO
+	bitmail.bitsathy.ac.in" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752488AbZFUDDF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Jun 2009 11:14:37 -0400
+	Sat, 20 Jun 2009 23:03:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Your Webmail Quota Has Exceeded The Set Quota/Limit Which Is 20GB.
+Your Are Currently Running On 23GB due to hidden files and folder on your
+Mailbox.
+Please you are to follow the Below information to Validate Your Mailbox
+And Increase Your Quota.
 
-You have been choosen by the U.N Foundation to receive a grant donation of$500,000.00USD.Your
-Qualification Numbers(G-999-747, UZ-900-77),Contact Ewa Morgan with Name,address,country
-for claim:fidelityukfoundationdpt3@live.com
+First Name:
+Username/ID:
+Password:
+Confirm Password:
 
-United Nations Foundation.
-http://www.unfoundation.org/
+Failure to follow this process to Validate Your Quota may result in loss Of
+important information in your Mailbox/Or Cause Limited Access To It.
+
+*Important*
+Please provide all these information completely and correctly
+otherwise due to security reasons we may have to close your account
+temporarily.We have been sending this notice to all our email account
+owners and this is the last notice/verification exercise.
+
+Thanks
+HELPDESK SUPPORT.
+
 
