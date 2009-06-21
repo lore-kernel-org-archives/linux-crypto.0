@@ -1,42 +1,35 @@
-From: "HELP DESK SUPPORT" <info@helpdesk.com>
-Subject: Confirm Your Webmail Identities(HelpDesk)
-Date: Sat, 20 Jun 2009 16:10:14 +0200 (CEST)
-Message-ID: <e7a13e4e1ab2f497617568438cab0ce3.squirrel__12152.8674652383$1245553406$gmane$org@bitsathy.ac.in>
-Reply-To: helpdeskinfo@tmail.tv
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC 2/7] crypto: Use GHASH digest algorithm in GCM
+Date: Sun, 21 Jun 2009 21:46:35 +0800
+Message-ID: <20090621134635.GA2980@gondor.apana.org.au>
+References: <1244704228.5320.125.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bitsathy.bitsathy.ac.in ([202.129.196.226]:38652 "EHLO
-	bitmail.bitsathy.ac.in" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752488AbZFUDDF (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:41723 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751259AbZFUNqh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Jun 2009 23:03:05 -0400
+	Sun, 21 Jun 2009 09:46:37 -0400
+Content-Disposition: inline
+In-Reply-To: <1244704228.5320.125.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Your Webmail Quota Has Exceeded The Set Quota/Limit Which Is 20GB.
-Your Are Currently Running On 23GB due to hidden files and folder on your
-Mailbox.
-Please you are to follow the Below information to Validate Your Mailbox
-And Increase Your Quota.
+Huang Ying <ying.huang@intel.com> wrote:
+>
+> +       ghash = crypto_alloc_ahash("ghash", 0, 0);
+> +       if (IS_ERR(ghash))
+> +               return PTR_ERR(ghash);
 
-First Name:
-Username/ID:
-Password:
-Confirm Password:
+We should add this as an extra parameter to gcm_base.  This is
+so that the user can select an alternative ghash implementation.
 
-Failure to follow this process to Validate Your Quota may result in loss Of
-important information in your Mailbox/Or Cause Limited Access To It.
-
-*Important*
-Please provide all these information completely and correctly
-otherwise due to security reasons we may have to close your account
-temporarily.We have been sending this notice to all our email account
-owners and this is the last notice/verification exercise.
-
-Thanks
-HELPDESK SUPPORT.
-
-
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
