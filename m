@@ -1,39 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 7/7] crypto: Add PCLMULQDQ accelerated GHASH
-	implementation
-Date: Sun, 21 Jun 2009 21:51:21 +0800
-Message-ID: <20090621135121.GA3153@gondor.apana.org.au>
-References: <1244704280.5320.131.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [PATCH 1/3] AMCC Crypto4xx Device Driver v7
+Date: Sun, 21 Jun 2009 21:53:11 +0800
+Message-ID: <20090621135311.GA3185@gondor.apana.org.au>
+References: <DB599F406D04E34389140B7D99C71B1B07D83E96@SDCEXCHANGE01.ad.amcc.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1754955AbZFUNvb@vger.kernel.org>
+Cc: kim.phillips@freescale.com, jwboyer@linux.vnet.ibm.com,
+	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
+To: Shasi Pulijala <spulijala@amcc.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:47582 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751854AbZFUNxg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 21 Jun 2009 09:53:36 -0400
 Content-Disposition: inline
-In-Reply-To: <1244704280.5320.131.camel@yhuang-dev.sh.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <DB599F406D04E34389140B7D99C71B1B07D83E96@SDCEXCHANGE01.ad.amcc.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Huang Ying <ying.huang@intel.com> wrote:
-> PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
-> carry-less multiplication. More information about PCLMULQDQ can be
-> found at:
-> 
-> http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
-> 
-> Because PCLMULQDQ changes XMM state, its usage must be enclosed with
-> kernel_fpu_begin/end, which can be used only in process context, the
-> acceleration is implemented as crypto_ahash. That is, request in soft
-> IRQ context will be deferred to the cryptd kernel thread.
-> 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
+Shasi Pulijala <spulijala@amcc.com> wrote:
+> Hi,
+>        I am re-sending this patch as a patch series of 3, I am assuming the earlier one did not go through the mailing lists
+> because it was over the size limit.
 
-All good.
+Actually the original patch came through the list and to me :)
 
-So once we fully convert everything to shash, this series can
-go in with the minor changes mentioned in this thread.
+However I'm not against splitting it up, but if you are going to
+do it please make sure that each patch compiles by itself since
+we want a bisectable tree.
 
-Thanks!
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
