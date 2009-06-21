@@ -1,36 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] AMCC Crypto4xx Device Driver v7
-Date: Sun, 21 Jun 2009 21:53:11 +0800
-Message-ID: <20090621135311.GA3185@gondor.apana.org.au>
-References: <DB599F406D04E34389140B7D99C71B1B07D83E96@SDCEXCHANGE01.ad.amcc.com>
+Subject: Crypto Fixes for 2.6.31
+Date: Sun, 21 Jun 2009 22:09:24 +0800
+Message-ID: <20090621140924.GA3305@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kim.phillips@freescale.com, jwboyer@linux.vnet.ibm.com,
-	linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
-To: Shasi Pulijala <spulijala@amcc.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47582 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:35369 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751854AbZFUNxg (ORCPT
+	with ESMTP id S1751914AbZFUOJ2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2009 09:53:36 -0400
+	Sun, 21 Jun 2009 10:09:28 -0400
 Content-Disposition: inline
-In-Reply-To: <DB599F406D04E34389140B7D99C71B1B07D83E96@SDCEXCHANGE01.ad.amcc.com>
+In-Reply-To: <20090613020512.GA21024@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Shasi Pulijala <spulijala@amcc.com> wrote:
-> Hi,
->        I am re-sending this patch as a patch series of 3, I am assuming the earlier one did not go through the mailing lists
-> because it was over the size limit.
+Hi Linus:
 
-Actually the original patch came through the list and to me :)
+This push fixes a number of regressions for hardware AES:
 
-However I'm not against splitting it up, but if you are going to
-do it please make sure that each patch compiles by itself since
-we want a bisectable tree.
+* Spurious page faults with AES on Via Nano.
+* Fix broken decryption with Intel AES.
+* Fix atomic sleep with Intel AES.
 
-Thanks,
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Chuck Ebbert (2):
+      crypto: padlock-aes - work around Nano CPU errata in ECB mode
+      crypto: padlock-aes - work around Nano CPU errata in CBC mode
+
+Huang Ying (3):
+      crypto: aes-ni - Fix cbc mode IV saving
+      crypto: aes-ni - Do not sleep when using the FPU
+      crypto: aes-ni - Remove CRYPTO_TFM_REQ_MAY_SLEEP from fpu template
+
+ arch/x86/crypto/aesni-intel_asm.S  |    5 +-
+ arch/x86/crypto/aesni-intel_glue.c |    4 +
+ arch/x86/crypto/fpu.c              |    4 +-
+ drivers/crypto/padlock-aes.c       |  138 +++++++++++++++++++++++++----------
+ 4 files changed, 107 insertions(+), 44 deletions(-)
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
