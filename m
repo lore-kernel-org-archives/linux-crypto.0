@@ -1,60 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 2.6.31
-Date: Sun, 21 Jun 2009 22:09:24 +0800
-Message-ID: <20090621140924.GA3305@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: [RFC 2/7] crypto: Use GHASH digest algorithm in GCM
+Date: Mon, 22 Jun 2009 09:41:16 +0800
+Message-ID: <1245634876.22246.320.camel@yhuang-dev.sh.intel.com>
+References: <20090621134635.GA2980@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:35369 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751914AbZFUOJ2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2009 10:09:28 -0400
-Content-Disposition: inline
-In-Reply-To: <20090613020512.GA21024@gondor.apana.org.au>
+Received: from mga02.intel.com ([134.134.136.20]:57299 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751170AbZFVBlP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 21 Jun 2009 21:41:15 -0400
+In-Reply-To: <20090621134635.GA2980@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Sun, 2009-06-21 at 21:46 +0800, Herbert Xu wrote:
+> Huang Ying <ying.huang@intel.com> wrote:
+> >
+> > +       ghash = crypto_alloc_ahash("ghash", 0, 0);
+> > +       if (IS_ERR(ghash))
+> > +               return PTR_ERR(ghash);
+> 
+> We should add this as an extra parameter to gcm_base.  This is
+> so that the user can select an alternative ghash implementation.
 
-This push fixes a number of regressions for hardware AES:
+Can crypto_alloc_ahash("ghash",...) select among different ghash
+implementation automatically based on priority? I think
+crypto_alloc_ablkcipher("cbc(aes)",...) can select among different AES
+implementation automatically. They are different?
 
-* Spurious page faults with AES on Via Nano.
-* Fix broken decryption with Intel AES.
-* Fix atomic sleep with Intel AES.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Best Regards,
+Huang Ying
 
 
-Chuck Ebbert (2):
-      crypto: padlock-aes - work around Nano CPU errata in ECB mode
-      crypto: padlock-aes - work around Nano CPU errata in CBC mode
-
-Huang Ying (3):
-      crypto: aes-ni - Fix cbc mode IV saving
-      crypto: aes-ni - Do not sleep when using the FPU
-      crypto: aes-ni - Remove CRYPTO_TFM_REQ_MAY_SLEEP from fpu template
-
- arch/x86/crypto/aesni-intel_asm.S  |    5 +-
- arch/x86/crypto/aesni-intel_glue.c |    4 +
- arch/x86/crypto/fpu.c              |    4 +-
- drivers/crypto/padlock-aes.c       |  138 +++++++++++++++++++++++++----------
- 4 files changed, 107 insertions(+), 44 deletions(-)
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
