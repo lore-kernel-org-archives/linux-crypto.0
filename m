@@ -1,33 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC 2/7] crypto: Use GHASH digest algorithm in GCM
-Date: Mon, 22 Jun 2009 10:19:26 +0800
-Message-ID: <20090622021926.GA8013@gondor.apana.org.au>
-References: <20090621134635.GA2980@gondor.apana.org.au> <1245634876.22246.320.camel@yhuang-dev.sh.intel.com> <20090622020305.GA7843@gondor.apana.org.au> <1245636447.22246.323.camel@yhuang-dev.sh.intel.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] tcrypt: Test algorithms by name
+Date: Tue, 23 Jun 2009 08:04:36 +0200
+Message-ID: <20090623060436.GZ20366@secunet.com>
+References: <20090608070749.GR20366@secunet.com> <20090608071246.GW20366@secunet.com> <20090619105325.GA17647@gondor.apana.org.au> <20090619105627.GA17781@gondor.apana.org.au> <20090619114058.GY20366@secunet.com> <20090619114737.GC17647@gondor.apana.org.au> <20090619123815.GA18826@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:41075 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751903AbZFVCTY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2009 22:19:24 -0400
+Received: from a.mx.secunet.com ([213.68.205.161]:37634 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751076AbZFWGCC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Jun 2009 02:02:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1245636447.22246.323.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <20090619123815.GA18826@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 22, 2009 at 10:07:27AM +0800, Huang Ying wrote:
->
-> Oh, I see. I will do this.
+On Fri, Jun 19, 2009 at 08:38:15PM +0800, Herbert Xu wrote:
+> > 
+> > That was quick :)
+> > 
+> > Patch applied.  Thanks a lot Steffen!
+> 
+> BTW, I added this on top so that modprobe doesn't complain about
+> the return code:
+> 
 
-Just to be clear, it should be added to gcm_base, not gcm.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ugh, I was a bit too quick. Thanks for fixing this up!
