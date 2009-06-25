@@ -1,62 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: skcipher - Fix request for sync algorithms
-Date: Thu, 25 Jun 2009 14:48:35 +0800
-Message-ID: <20090625064835.GA31834@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
+Date: Thu, 25 Jun 2009 14:51:12 +0800
+Message-ID: <20090625065112.GA31869@gondor.apana.org.au>
+References: <20090602092815.GA26832@gondor.apana.org.au> <20090603093216.GK20366@secunet.com> <20090603094049.GA11356@gondor.apana.org.au> <20090603112353.GL20366@secunet.com> <20090603115931.GA13361@gondor.apana.org.au> <20090605092030.GO20366@secunet.com> <20090605092021.GB8724@gondor.apana.org.au> <20090605093430.GP20366@secunet.com> <20090608052808.GB19826@gondor.apana.org.au> <20090608064518.GQ20366@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:54037 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:41506 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751273AbZFYGse (ORCPT
+	with ESMTP id S1751207AbZFYGvQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Jun 2009 02:48:34 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MJilA-0003nv-8s
-	for <linux-crypto@vger.kernel.org>; Thu, 25 Jun 2009 16:48:36 +1000
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1MJil9-0008Hj-K3
-	for linux-crypto@vger.kernel.org; Thu, 25 Jun 2009 14:48:35 +0800
+	Thu, 25 Jun 2009 02:51:16 -0400
 Content-Disposition: inline
+In-Reply-To: <20090608064518.GQ20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+On Mon, Jun 08, 2009 at 08:45:18AM +0200, Steffen Klassert wrote:
+>
+> Yes, I will send the full patchset including the tcrypt changes to
+> instantiate pcrypt.
 
-Found this while playing with pcrypt.
+OK, the patch I just posted to the list should fix the problem.
 
-commit 435578aeaad5859dda8657e3ed2c1a5bc1e524ec
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Thu Jun 25 14:46:31 2009 +0800
+I was able to test it suing
 
-    crypto: skcipher - Fix request for sync algorithms
-    
-    When a sync givcipher algorithm is requested, if an async version
-    of the same algorithm already exists, then we will loop forever
-    without ever constructing the sync version based on a blkcipher.
-    
-    This is because we did not include the requested type/mask when
-    getting a larval for the geniv algorithm that is to be constructed.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index e11ce37..43fc8fb 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -201,8 +201,9 @@ static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
- 	int err;
- 
- 	larval = crypto_larval_lookup(alg->cra_driver_name,
-+				      (type & ~CRYPTO_ALG_TYPE_MASK) |
- 				      CRYPTO_ALG_TYPE_GIVCIPHER,
--				      CRYPTO_ALG_TYPE_MASK);
-+				      mask | CRYPTO_ALG_TYPE_MASK);
- 	err = PTR_ERR(larval);
- 	if (IS_ERR(larval))
- 		goto out;
+modprobe tcrypt alg='pcrypt(authenc(hmac(sha1-generic),cbc(aes-generic)))' type=3
 
 Cheers,
 -- 
