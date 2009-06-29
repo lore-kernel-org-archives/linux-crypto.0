@@ -1,33 +1,48 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 3/5] eseqiv: Add support for aead algorithms
-Date: Mon, 29 Jun 2009 13:12:08 +0200
-Message-ID: <20090629111208.GF20366@secunet.com>
-References: <20090608070749.GR20366@secunet.com> <20090608071046.GU20366@secunet.com> <20090625104602.GA1528@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
+Date: Mon, 29 Jun 2009 19:59:50 +0800
+Message-ID: <20090629115950.GA6594@gondor.apana.org.au>
+References: <20090603094049.GA11356@gondor.apana.org.au> <20090603112353.GL20366@secunet.com> <20090603115931.GA13361@gondor.apana.org.au> <20090605092030.GO20366@secunet.com> <20090605092021.GB8724@gondor.apana.org.au> <20090605093430.GP20366@secunet.com> <20090608052808.GB19826@gondor.apana.org.au> <20090608064518.GQ20366@secunet.com> <20090625065112.GA31869@gondor.apana.org.au> <20090629110410.GE20366@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:58672 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751073AbZF2LJc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Jun 2009 07:09:32 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:59650 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751073AbZF2L7w (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Jun 2009 07:59:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20090625104602.GA1528@gondor.apana.org.au>
+In-Reply-To: <20090629110410.GE20366@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 25, 2009 at 06:46:02PM +0800, Herbert Xu wrote:
-> On Mon, Jun 08, 2009 at 09:10:46AM +0200, Steffen Klassert wrote:
-> > This adds eseqiv support for aead algorithms, this is usefull
-> > for aead algorithms that need eseqiv as it's default IV generator.
-> > 
-> > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+On Mon, Jun 29, 2009 at 01:04:10PM +0200, Steffen Klassert wrote:
+>
+> I applied your patch on top of the last pcrypt patchset, but
+> unfortunately it does not change anything here.
 > 
-> I'm going to change the default sync geniv to eseqiv for SMP.
-> That should render this patch unnecessary, right?
+> If I do
+> modprobe tcrypt alg='pcrypt(authenc(hmac(sha1-generic),cbc(aes-generic)))' type=3
 > 
+> it instantiates
+> 
+> authenc(hmac(sha1-generic),cbc(aes-generic))
+> 
+> but not 
+> 
+> pcrypt(authenc(hmac(sha1-generic),cbc(aes-generic)))
+> 
+> regardless your patch applied or not.
 
-Right, this would reduce the patchset to the padata and the pcrypt
-patch. I'll strip the patchset to these two patches as soon as I see
-your patch applied to cryptodev-2.6.
+OK.  Can you send me the patches you used against the current
+cryptodev tree (I only just pushed so give it an hour or so)?
+I'll see if I can reproduce it here.
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
