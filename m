@@ -1,7 +1,7 @@
 From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: [PATCH 1/2] crypto/ansi prng: use just a BH lock
-Date: Mon, 29 Jun 2009 23:44:30 +0200
-Message-ID: <20090629214430.GA29616@Chamillionaire.breakpoint.cc>
+Subject: [PATCH 2/2] crypto/ansi prng: alloc cipher just in in init()
+Date: Mon, 29 Jun 2009 23:45:08 +0200
+Message-ID: <20090629214508.GB29616@Chamillionaire.breakpoint.cc>
 References: <1246281425.3688.13.camel@queen> <20090629140704.GA25939@Chamillionaire.breakpoint.cc> <20090629152027.GA5022@hmsreliant.think-freely.org>
 Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
@@ -11,11 +11,11 @@ Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
 	davem@davemloft.net, Eric Sesterhenn <eric.sesterhenn@lsexperts.de>
 To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:42272 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:42277 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752976AbZF2Vob (ORCPT
+	by vger.kernel.org with ESMTP id S1752513AbZF2VpH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Jun 2009 17:44:31 -0400
+	Mon, 29 Jun 2009 17:45:07 -0400
 Content-Disposition: inline
 In-Reply-To: <20090629152027.GA5022@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -23,65 +23,61 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-the current code uses a mix of sping_lock() & spin_lock_irqsave(). This can
-lead to deadlock with the correct timming & cprng_get_random() + cprng_reset()
-sequence.
-I've converted them to bottom half locks since all three user grab just a BH
-lock so this runs probably in softirq :)
+As reported by Eric Sesterhenn the re-allocation of the cipher in reset leads
+to:
+|BUG: sleeping function called from invalid context at kernel/rwsem.c:21
+|in_atomic(): 1, irqs_disabled(): 0, pid: 4926, name: modprobe
+|INFO: lockdep is turned off.
+|Pid: 4926, comm: modprobe Tainted: G   M 2.6.31-rc1-22297-g5298976 #24
+|Call Trace:
+| [<c011dd93>] __might_sleep+0xf9/0x101
+| [<c0777aa0>] down_read+0x16/0x68
+| [<c048bf04>] crypto_alg_lookup+0x16/0x34
+| [<c048bf52>] crypto_larval_lookup+0x30/0xf9
+| [<c048c038>] crypto_alg_mod_lookup+0x1d/0x62
+| [<c048c13e>] crypto_alloc_base+0x1e/0x64
+| [<c04bf991>] reset_prng_context+0xab/0x13f
+| [<c04e5cfc>] ? __spin_lock_init+0x27/0x51
+| [<c04bfce1>] cprng_init+0x2a/0x42
+| [<c048bb4c>] __crypto_alloc_tfm+0xfa/0x128
+| [<c048c153>] crypto_alloc_base+0x33/0x64
+| [<c04933c9>] alg_test_cprng+0x30/0x1f4
+| [<c0493329>] alg_test+0x12f/0x19f
+| [<c0177f1f>] ? __alloc_pages_nodemask+0x14d/0x481
+| [<d09219e2>] do_test+0xf9d/0x163f [tcrypt]
+| [<d0920de6>] do_test+0x3a1/0x163f [tcrypt]
+| [<d0926035>] tcrypt_mod_init+0x35/0x7c [tcrypt]
+| [<c010113c>] _stext+0x54/0x12c
+| [<d0926000>] ? tcrypt_mod_init+0x0/0x7c [tcrypt]
+| [<c01398a3>] ? up_read+0x16/0x2b
+| [<c0139fc4>] ? __blocking_notifier_call_chain+0x40/0x4c
+| [<c014ee8d>] sys_init_module+0xa9/0x1bf
+| [<c010292b>] sysenter_do_call+0x12/0x32
+
+because a spin lock is held and crypto_alloc_base() may sleep.
+There is no reason to re-allocate the cipher, the state is resetted in
+->setkey(). This move it to init.
 
 Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 ---
- crypto/ansi_cprng.c |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
+ crypto/ansi_cprng.c |   18 +++++++-----------
+ 1 files changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index d80ed4c..ff00b58 100644
+index ff00b58..259d2de 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -187,7 +187,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx)
- /* Our exported functions */
- static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx)
- {
--	unsigned long flags;
- 	unsigned char *ptr = buf;
- 	unsigned int byte_count = (unsigned int)nbytes;
- 	int err;
-@@ -196,7 +195,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx)
- 	if (nbytes < 0)
- 		return -EINVAL;
+@@ -307,17 +307,6 @@ static int reset_prng_context(struct prng_context *ctx,
+ 	memset(ctx->rand_data, 0, DEFAULT_BLK_SZ);
+ 	memset(ctx->last_rand_data, 0, DEFAULT_BLK_SZ);
  
--	spin_lock_irqsave(&ctx->prng_lock, flags);
-+	spin_lock_bh(&ctx->prng_lock);
- 
- 	err = -EINVAL;
- 	if (ctx->flags & PRNG_NEED_RESET)
-@@ -268,7 +267,7 @@ empty_rbuf:
- 		goto remainder;
- 
- done:
--	spin_unlock_irqrestore(&ctx->prng_lock, flags);
-+	spin_unlock_bh(&ctx->prng_lock);
- 	dbgprint(KERN_CRIT "returning %d from get_prng_bytes in context %p\n",
- 		err, ctx);
- 	return err;
-@@ -287,7 +286,7 @@ static int reset_prng_context(struct prng_context *ctx,
- 	int rc = -EINVAL;
- 	unsigned char *prng_key;
- 
--	spin_lock(&ctx->prng_lock);
-+	spin_lock_bh(&ctx->prng_lock);
- 	ctx->flags |= PRNG_NEED_RESET;
- 
- 	prng_key = (key != NULL) ? key : (unsigned char *)DEFAULT_PRNG_KEY;
-@@ -332,7 +331,7 @@ static int reset_prng_context(struct prng_context *ctx,
- 	rc = 0;
- 	ctx->flags &= ~PRNG_NEED_RESET;
- out:
--	spin_unlock(&ctx->prng_lock);
-+	spin_unlock_bh(&ctx->prng_lock);
- 
- 	return rc;
- 
--- 
-1.6.3.3
-
+-	if (ctx->tfm)
+-		crypto_free_cipher(ctx->tfm);
+-
+-	ctx->tfm = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(ctx->tfm)) {
+-		dbgprint(KERN_CRIT "Failed to alloc tfm for context %p\n",
+-			ctx);
+-		ctx->tfm = NULL;
+-		goto out;
+-	}
