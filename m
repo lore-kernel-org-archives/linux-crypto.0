@@ -1,32 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto/ansi prng: alloc cipher just in in init()
-Date: Fri, 3 Jul 2009 12:11:22 +0800
-Message-ID: <20090703041122.GA23422@gondor.apana.org.au>
-References: <1246281425.3688.13.camel@queen> <20090629140704.GA25939@Chamillionaire.breakpoint.cc> <20090629152027.GA5022@hmsreliant.think-freely.org> <20090629214508.GB29616@Chamillionaire.breakpoint.cc> <20090630145150.GB13116@hmsreliant.think-freely.org> <20090630195517.GA4659@Chamillionaire.breakpoint.cc> <20090701000648.GA12326@localhost.localdomain> <20090701072517.GA9583@Chamillionaire.breakpoint.cc> <20090701103616.GB29601@hmsreliant.think-freely.org>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH] crypto: Update stdrng test name so that the testmgr
+	finds it properly
+Date: Fri, 3 Jul 2009 22:59:09 +0200
+Message-ID: <20090703205909.GA4227@Chamillionaire.breakpoint.cc>
+References: <20090701155219.GA31414@hmsreliant.think-freely.org> <20090702060255.GA18642@Chamillionaire.breakpoint.cc> <20090702083259.GA12884@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	Eric Sesterhenn <eric.sesterhenn@lsexperts.de>
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
+	davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59702 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750796AbZGCEL2 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:44556 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757121AbZGCU7M (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2009 00:11:28 -0400
+	Fri, 3 Jul 2009 16:59:12 -0400
 Content-Disposition: inline
-In-Reply-To: <20090701103616.GB29601@hmsreliant.think-freely.org>
+In-Reply-To: <20090702083259.GA12884@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 01, 2009 at 06:36:16AM -0400, Neil Horman wrote:
->
-> Herbert, can you pull this into cryptodev please?
+* Herbert Xu | 2009-07-02 16:32:59 [+0800]:
 
-Both patches applied.  Thanks everyone!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>--- a/crypto/testmgr.c
+>+++ b/crypto/testmgr.c
+>@@ -2365,14 +2366,22 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+> 	}
+> 
+> 	i = alg_find_test(alg);
+>-	if (i < 0)
+>+	j = alg_find_test(driver);
+>+	if (i < 0 && j < 0)
+> 		goto notest;
+> 
+>-	if (fips_enabled && !alg_test_descs[i].fips_allowed)
+>+	if (fips_enabled && ((i >= 0 && !alg_test_descs[i].fips_allowed) ||
+>+			     (j >= 0 && !alg_test_descs[j].fips_allowed)))
+> 		goto non_fips_alg;
+> 
+>-	rc = alg_test_descs[i].test(alg_test_descs + i, driver,
+>-				      type, mask);
+>+	rc = 0;
+>+	if (i >= 0)
+>+		rc |= alg_test_descs[i].test(alg_test_descs + i, driver,
+>+					     type, mask);
+>+	if (j >= 0)
+>+		rc |= alg_test_descs[j].test(alg_test_descs + j, driver,
+>+					     type, mask);
+
+Do you execute test2 if test1 failed on purpose?
+If not what about:
+
+	if (!rc && j >= 0)
+		rc = alg_test_descs[j].test(alg_test_descs + j, driver,
+					     type, mask);
+
+so there is return code mixup.
+
+Sebastian
