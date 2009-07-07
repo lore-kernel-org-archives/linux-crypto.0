@@ -1,44 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Update stdrng test name so that the testmgr
-	finds it properly
-Date: Sat, 4 Jul 2009 09:08:55 +0800
-Message-ID: <20090704010855.GA31752@gondor.apana.org.au>
-References: <20090701155219.GA31414@hmsreliant.think-freely.org> <20090702060255.GA18642@Chamillionaire.breakpoint.cc> <20090702083259.GA12884@gondor.apana.org.au> <20090703205909.GA4227@Chamillionaire.breakpoint.cc>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: [RFC 7/7] crypto: Add PCLMULQDQ accelerated GHASH
+ implementation
+Date: Tue, 07 Jul 2009 11:31:52 +0800
+Message-ID: <1246937512.5282.99.camel@yhuang-dev.sh.intel.com>
+References: <20090621135121.GA3153@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
-	davem@davemloft.net
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48554 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751535AbZGDBJA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Jul 2009 21:09:00 -0400
-Content-Disposition: inline
-In-Reply-To: <20090703205909.GA4227@Chamillionaire.breakpoint.cc>
+Received: from mga01.intel.com ([192.55.52.88]:53212 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753641AbZGGDbu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Jul 2009 23:31:50 -0400
+In-Reply-To: <20090621135121.GA3153@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 03, 2009 at 10:59:09PM +0200, Sebastian Andrzej Siewior wrote:
->
-> >-	rc = alg_test_descs[i].test(alg_test_descs + i, driver,
-> >-				      type, mask);
-> >+	rc = 0;
-> >+	if (i >= 0)
-> >+		rc |= alg_test_descs[i].test(alg_test_descs + i, driver,
-> >+					     type, mask);
-> >+	if (j >= 0)
-> >+		rc |= alg_test_descs[j].test(alg_test_descs + j, driver,
-> >+					     type, mask);
+Hi, Herbert,
+
+On Sun, 2009-06-21 at 21:51 +0800, Herbert Xu wrote:
+> Huang Ying <ying.huang@intel.com> wrote:
+> > PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
+> > carry-less multiplication. More information about PCLMULQDQ can be
+> > found at:
+> > 
+> > http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
+> > 
+> > Because PCLMULQDQ changes XMM state, its usage must be enclosed with
+> > kernel_fpu_begin/end, which can be used only in process context, the
+> > acceleration is implemented as crypto_ahash. That is, request in soft
+> > IRQ context will be deferred to the cryptd kernel thread.
+> > 
+> > Signed-off-by: Huang Ying <ying.huang@intel.com>
 > 
-> Do you execute test2 if test1 failed on purpose?
+> All good.
+> 
+> So once we fully convert everything to shash, this series can
+> go in with the minor changes mentioned in this thread.
 
-Yes that was intentional.  Not that it makes much of a differnce.
+What's your plan to convert everything to shash? For 2.6.32? How about
+the progress? What can I do to help?
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best Regards,
+Huang Ying
+
+
