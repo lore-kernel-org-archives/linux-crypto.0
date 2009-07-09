@@ -1,38 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 3/3] crypto: hmac - convert to ahash
-Date: Thu, 9 Jul 2009 12:48:14 +0800
-Message-ID: <20090709044814.GA20890@gondor.apana.org.au>
-References: <20090707072343.GC20288@secunet.com> <20090707072658.GF20288@secunet.com>
+Subject: [0/16] Convert hmac to shash
+Date: Thu, 9 Jul 2009 12:50:52 +0800
+Message-ID: <20090709045052.GA21092@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47635 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:47637 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750908AbZGIEsS (ORCPT
+	with ESMTP id S1751318AbZGIEuz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jul 2009 00:48:18 -0400
+	Thu, 9 Jul 2009 00:50:55 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1MOlav-0006Bd-SD
+	for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2009 14:50:53 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1MOlau-0005Ua-Vk
+	for linux-crypto@vger.kernel.org; Thu, 09 Jul 2009 12:50:53 +0800
 Content-Disposition: inline
-In-Reply-To: <20090707072658.GF20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 07, 2009 at 09:26:58AM +0200, Steffen Klassert wrote:
-> This converts hmac to the new ahash frontend.
-> Also the hashing of the ipaded and opaded key is done now with the
-> setkey function, this saves some bytes of hashing on each request.
-> 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Hi:
 
-This looks pretty good!
+This series adds the infrastructure required to turn hmac into an
+shash algorithm.  As this is the very first new-style algorithm
+type to do this it takes a bit more work than usual.
 
-I'll come back to it once we start the ahash conversion.
+At the end I've also added an optimisation to hmac to prehash
+the pads.
 
-For now I've cherry-picked the import/export bit (although not
-in its exact form).
-
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
