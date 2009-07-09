@@ -1,88 +1,91 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/16] crypto: shash - Add spawn support
-Date: Thu, 09 Jul 2009 12:53:50 +0800
-Message-ID: <E1MOldm-0005W8-Vm@gondolin.me.apana.org.au>
+Subject: [PATCH 8/16] crypto: shash - Add shash_register_instance
+Date: Thu, 09 Jul 2009 12:53:54 +0800
+Message-ID: <E1MOldq-0005WZ-7H@gondolin.me.apana.org.au>
 References: <20090709045052.GA21092@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:44860 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:44865 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751588AbZGIExw (ORCPT
+	with ESMTP id S1752083AbZGIExz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jul 2009 00:53:52 -0400
+	Thu, 9 Jul 2009 00:53:55 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MOldn-0006DX-9r
-	for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2009 14:53:51 +1000
+	id 1MOldq-0006EE-G8
+	for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2009 14:53:54 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: shash - Add spawn support
+crypto: shash - Add shash_register_instance
 
-This patch adds the functions needed to create and use shash
-spawns, i.e., to use shash algorithms in a template.
+This patch adds shash_register_instance so that shash instances
+can be registered without bypassing the shash checks applied to
+normal algorithms.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/shash.c                 |    9 +++++++++
- include/crypto/internal/hash.h |   14 ++++++++++++++
- 2 files changed, 23 insertions(+)
+ crypto/shash.c                 |   26 +++++++++++++++++++++++++-
+ include/crypto/internal/hash.h |    3 ++-
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/shash.c b/crypto/shash.c
-index 8f9d883..97f6c8b 100644
+index 21bcff6..3d24242 100644
 --- a/crypto/shash.c
 +++ b/crypto/shash.c
-@@ -509,5 +509,14 @@ void shash_free_instance(struct crypto_instance *inst)
+@@ -480,7 +480,7 @@ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
  }
- EXPORT_SYMBOL_GPL(shash_free_instance);
+ EXPORT_SYMBOL_GPL(crypto_alloc_shash);
  
-+int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
-+			    struct shash_alg *alg,
-+			    struct crypto_instance *inst)
-+{
-+	return crypto_init_spawn2(&spawn->base, &alg->base, inst,
-+				  &crypto_shash_type);
+-int crypto_register_shash(struct shash_alg *alg)
++static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+@@ -491,6 +491,17 @@ int crypto_register_shash(struct shash_alg *alg)
+ 	base->cra_type = &crypto_shash_type;
+ 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
+ 	base->cra_flags |= CRYPTO_ALG_TYPE_SHASH;
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_init_shash_spawn);
 +
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Synchronous cryptographic hash type");
++int crypto_register_shash(struct shash_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++	int err;
++
++	err = shash_prepare_alg(alg);
++	if (err)
++		return err;
+ 
+ 	return crypto_register_alg(base);
+ }
+@@ -502,6 +513,19 @@ int crypto_unregister_shash(struct shash_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_shash);
+ 
++int shash_register_instance(struct crypto_template *tmpl,
++			    struct shash_instance *inst)
++{
++	int err;
++
++	err = shash_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
++	return crypto_register_instance(tmpl, shash_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(shash_register_instance);
++
+ void shash_free_instance(struct crypto_instance *inst)
+ {
+ 	crypto_drop_spawn(crypto_instance_ctx(inst));
 diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 44d3bcd..6cc824b 100644
+index e2ab35a..fa5c9fb 100644
 --- a/include/crypto/internal/hash.h
 +++ b/include/crypto/internal/hash.h
-@@ -38,6 +38,10 @@ struct shash_instance {
- 	struct shash_alg alg;
- };
+@@ -53,7 +53,8 @@ int crypto_hash_walk_first_compat(struct hash_desc *hdesc,
  
-+struct crypto_shash_spawn {
-+	struct crypto_spawn base;
-+};
-+
- extern const struct crypto_type crypto_ahash_type;
- 
- int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err);
-@@ -52,6 +56,10 @@ int crypto_unregister_shash(struct shash_alg *alg);
- 
- void shash_free_instance(struct crypto_instance *inst);
- 
-+int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
-+			    struct shash_alg *alg,
-+			    struct crypto_instance *inst);
-+
- static inline void *crypto_ahash_ctx(struct crypto_ahash *tfm)
- {
- 	return crypto_tfm_ctx(&tfm->base);
-@@ -106,5 +114,11 @@ static inline struct shash_instance *shash_alloc_instance(
- 				      sizeof(struct shash_alg) - sizeof(*alg));
- }
- 
-+static inline struct crypto_shash *crypto_spawn_shash(
-+	struct crypto_shash_spawn *spawn)
-+{
-+	return crypto_spawn_tfm2(&spawn->base);
-+}
-+
- #endif	/* _CRYPTO_INTERNAL_HASH_H */
- 
+ int crypto_register_shash(struct shash_alg *alg);
+ int crypto_unregister_shash(struct shash_alg *alg);
