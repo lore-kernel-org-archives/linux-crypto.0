@@ -1,146 +1,142 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/10] crypto: sha256_generic - Use 64-bit counter like sha1
-Date: Sat, 11 Jul 2009 18:23:09 +0800
-Message-ID: <E1MPZjZ-0003q5-Vq@gondolin.me.apana.org.au>
+Subject: [PATCH 6/10] crypto: sha256_generic - Add export/import support
+Date: Sat, 11 Jul 2009 18:23:11 +0800
+Message-ID: <E1MPZjb-0003qE-20@gondolin.me.apana.org.au>
 References: <20090711101958.GA14642@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:54384 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:54385 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754053AbZGKKXL (ORCPT
+	with ESMTP id S1754199AbZGKKXM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Jul 2009 06:23:11 -0400
+	Sat, 11 Jul 2009 06:23:12 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MPZja-00064i-9f
-	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2009 20:23:10 +1000
+	id 1MPZjb-00064l-AM
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2009 20:23:11 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: sha256_generic - Use 64-bit counter like sha1
+crypto: sha256_generic - Add export/import support
 
-This patch replaces the two 32-bit counter code in sha256_generic
-with the simpler 64-bit counter code from sha1.
+This patch adds export/import support to sha256_generic.  The exported
+type is defined by struct sha256_state, which is basically the entire
+descriptor state of sha256_generic.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/sha256_generic.c |   65 ++++++++++++++++++++++--------------------------
- 1 file changed, 30 insertions(+), 35 deletions(-)
+ crypto/sha256_generic.c |   37 +++++++++++++++++++++++++------------
+ include/crypto/sha.h    |    6 ++++++
+ 2 files changed, 31 insertions(+), 12 deletions(-)
 
 diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-index 6349d83..e58c71b 100644
+index e58c71b..c48459e 100644
 --- a/crypto/sha256_generic.c
 +++ b/crypto/sha256_generic.c
-@@ -26,7 +26,7 @@
+@@ -25,12 +25,6 @@
+ #include <crypto/sha.h>
  #include <asm/byteorder.h>
  
- struct sha256_ctx {
--	u32 count[2];
-+	u64 count;
- 	u32 state[8];
- 	u8 buf[128];
- };
-@@ -231,8 +231,7 @@ static int sha224_init(struct shash_desc *desc)
- 	sctx->state[5] = SHA224_H5;
- 	sctx->state[6] = SHA224_H6;
- 	sctx->state[7] = SHA224_H7;
--	sctx->count[0] = 0;
--	sctx->count[1] = 0;
-+	sctx->count = 0;
+-struct sha256_ctx {
+-	u64 count;
+-	u32 state[8];
+-	u8 buf[128];
+-};
+-
+ static inline u32 Ch(u32 x, u32 y, u32 z)
+ {
+ 	return z ^ (x & (y ^ z));
+@@ -222,7 +216,7 @@ static void sha256_transform(u32 *state, const u8 *input)
  
- 	return 0;
- }
-@@ -248,7 +247,7 @@ static int sha256_init(struct shash_desc *desc)
- 	sctx->state[5] = SHA256_H5;
- 	sctx->state[6] = SHA256_H6;
- 	sctx->state[7] = SHA256_H7;
--	sctx->count[0] = sctx->count[1] = 0;
-+	sctx->count = 0;
+ static int sha224_init(struct shash_desc *desc)
+ {
+-	struct sha256_ctx *sctx = shash_desc_ctx(desc);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA224_H0;
+ 	sctx->state[1] = SHA224_H1;
+ 	sctx->state[2] = SHA224_H2;
+@@ -238,7 +232,7 @@ static int sha224_init(struct shash_desc *desc)
  
- 	return 0;
- }
-@@ -257,33 +256,30 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
+ static int sha256_init(struct shash_desc *desc)
+ {
+-	struct sha256_ctx *sctx = shash_desc_ctx(desc);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 	sctx->state[0] = SHA256_H0;
+ 	sctx->state[1] = SHA256_H1;
+ 	sctx->state[2] = SHA256_H2;
+@@ -255,7 +249,7 @@ static int sha256_init(struct shash_desc *desc)
+ static int sha256_update(struct shash_desc *desc, const u8 *data,
  			  unsigned int len)
  {
- 	struct sha256_ctx *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, part_len;
--
--	/* Compute number of bytes mod 128 */
--	index = (unsigned int)((sctx->count[0] >> 3) & 0x3f);
--
--	/* Update number of bits */
--	if ((sctx->count[0] += (len << 3)) < (len << 3)) {
--		sctx->count[1]++;
--		sctx->count[1] += (len >> 29);
-+	unsigned int partial, done;
-+	const u8 *src;
-+
-+	partial = sctx->count & 0x3f;
-+	sctx->count += len;
-+	done = 0;
-+	src = data;
-+
-+	if ((partial + len) > 63) {
-+		if (partial) {
-+			done = -partial;
-+			memcpy(sctx->buf + partial, data, done + 64);
-+			src = sctx->buf;
-+		}
-+
-+		do {
-+			sha256_transform(sctx->state, src);
-+			done += 64;
-+			src = data + done;
-+		} while (done + 63 < len);
-+
-+		partial = 0;
- 	}
--
--	part_len = 64 - index;
--
--	/* Transform as many times as possible. */
--	if (len >= part_len) {
--		memcpy(&sctx->buf[index], data, part_len);
--		sha256_transform(sctx->state, sctx->buf);
--
--		for (i = part_len; i + 63 < len; i += 64)
--			sha256_transform(sctx->state, &data[i]);
--		index = 0;
--	} else {
--		i = 0;
--	}
--
--	/* Buffer remaining input */
--	memcpy(&sctx->buf[index], &data[i], len-i);
-+	memcpy(sctx->buf + partial, src, len - done);
+-	struct sha256_ctx *sctx = shash_desc_ctx(desc);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 	unsigned int partial, done;
+ 	const u8 *src;
  
+@@ -286,7 +280,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
+ 
+ static int sha256_final(struct shash_desc *desc, u8 *out)
+ {
+-	struct sha256_ctx *sctx = shash_desc_ctx(desc);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 	__be32 *dst = (__be32 *)out;
+ 	__be64 bits;
+ 	unsigned int index, pad_len;
+@@ -326,12 +320,31 @@ static int sha224_final(struct shash_desc *desc, u8 *hash)
  	return 0;
  }
-@@ -292,22 +288,21 @@ static int sha256_final(struct shash_desc *desc, u8 *out)
- {
- 	struct sha256_ctx *sctx = shash_desc_ctx(desc);
- 	__be32 *dst = (__be32 *)out;
--	__be32 bits[2];
-+	__be64 bits;
- 	unsigned int index, pad_len;
- 	int i;
- 	static const u8 padding[64] = { 0x80, };
  
- 	/* Save number of bits */
--	bits[1] = cpu_to_be32(sctx->count[0]);
--	bits[0] = cpu_to_be32(sctx->count[1]);
-+	bits = cpu_to_be64(sctx->count << 3);
++static int sha256_export(struct shash_desc *desc, void *out)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(out, sctx, sizeof(*sctx));
++	return 0;
++}
++
++static int sha256_import(struct shash_desc *desc, const void *in)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(sctx, in, sizeof(*sctx));
++	return 0;
++}
++
+ static struct shash_alg sha256 = {
+ 	.digestsize	=	SHA256_DIGEST_SIZE,
+ 	.init		=	sha256_init,
+ 	.update		=	sha256_update,
+ 	.final		=	sha256_final,
+-	.descsize	=	sizeof(struct sha256_ctx),
++	.export		=	sha256_export,
++	.import		=	sha256_import,
++	.descsize	=	sizeof(struct sha256_state),
++	.statesize	=	sizeof(struct sha256_state),
+ 	.base		=	{
+ 		.cra_name	=	"sha256",
+ 		.cra_driver_name=	"sha256-generic",
+@@ -346,7 +359,7 @@ static struct shash_alg sha224 = {
+ 	.init		=	sha224_init,
+ 	.update		=	sha256_update,
+ 	.final		=	sha224_final,
+-	.descsize	=	sizeof(struct sha256_ctx),
++	.descsize	=	sizeof(struct sha256_state),
+ 	.base		=	{
+ 		.cra_name	=	"sha224",
+ 		.cra_driver_name=	"sha224-generic",
+diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+index 922a248..88ef5eb 100644
+--- a/include/crypto/sha.h
++++ b/include/crypto/sha.h
+@@ -70,4 +70,10 @@ struct sha1_state {
+ 	u8 buffer[SHA1_BLOCK_SIZE];
+ };
  
- 	/* Pad out to 56 mod 64. */
--	index = (sctx->count[0] >> 3) & 0x3f;
-+	index = sctx->count & 0x3f;
- 	pad_len = (index < 56) ? (56 - index) : ((64+56) - index);
- 	sha256_update(desc, padding, pad_len);
- 
- 	/* Append length (before padding) */
--	sha256_update(desc, (const u8 *)bits, sizeof(bits));
-+	sha256_update(desc, (const u8 *)&bits, sizeof(bits));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 8; i++)
++struct sha256_state {
++	u64 count;
++	u32 state[SHA256_DIGEST_SIZE / 4];
++	u8 buf[SHA256_BLOCK_SIZE];
++};
++
+ #endif
