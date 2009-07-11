@@ -1,142 +1,74 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/10] crypto: sha256_generic - Add export/import support
-Date: Sat, 11 Jul 2009 18:23:11 +0800
-Message-ID: <E1MPZjb-0003qE-20@gondolin.me.apana.org.au>
+Subject: [PATCH 7/10] crypto: sha1-s390 - Add export/import support
+Date: Sat, 11 Jul 2009 18:23:12 +0800
+Message-ID: <E1MPZjc-0003qN-4L@gondolin.me.apana.org.au>
 References: <20090711101958.GA14642@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:54385 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:54386 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754199AbZGKKXM (ORCPT
+	with ESMTP id S1754053AbZGKKXN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Jul 2009 06:23:12 -0400
+	Sat, 11 Jul 2009 06:23:13 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MPZjb-00064l-AM
-	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2009 20:23:11 +1000
+	id 1MPZjc-00064q-I5
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2009 20:23:12 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: sha256_generic - Add export/import support
+crypto: sha1-s390 - Add export/import support
 
-This patch adds export/import support to sha256_generic.  The exported
-type is defined by struct sha256_state, which is basically the entire
-descriptor state of sha256_generic.
+This patch adds export/import support to sha1-s390.  The exported
+type is defined by struct sha1_state, which is basically the entire
+descriptor state of sha1_generic.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/sha256_generic.c |   37 +++++++++++++++++++++++++------------
- include/crypto/sha.h    |    6 ++++++
- 2 files changed, 31 insertions(+), 12 deletions(-)
+ arch/s390/crypto/sha1_s390.c |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-index e58c71b..c48459e 100644
---- a/crypto/sha256_generic.c
-+++ b/crypto/sha256_generic.c
-@@ -25,12 +25,6 @@
- #include <crypto/sha.h>
- #include <asm/byteorder.h>
- 
--struct sha256_ctx {
--	u64 count;
--	u32 state[8];
--	u8 buf[128];
--};
--
- static inline u32 Ch(u32 x, u32 y, u32 z)
- {
- 	return z ^ (x & (y ^ z));
-@@ -222,7 +216,7 @@ static void sha256_transform(u32 *state, const u8 *input)
- 
- static int sha224_init(struct shash_desc *desc)
- {
--	struct sha256_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA224_H0;
- 	sctx->state[1] = SHA224_H1;
- 	sctx->state[2] = SHA224_H2;
-@@ -238,7 +232,7 @@ static int sha224_init(struct shash_desc *desc)
- 
- static int sha256_init(struct shash_desc *desc)
- {
--	struct sha256_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	sctx->state[0] = SHA256_H0;
- 	sctx->state[1] = SHA256_H1;
- 	sctx->state[2] = SHA256_H2;
-@@ -255,7 +249,7 @@ static int sha256_init(struct shash_desc *desc)
- static int sha256_update(struct shash_desc *desc, const u8 *data,
- 			  unsigned int len)
- {
--	struct sha256_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	unsigned int partial, done;
- 	const u8 *src;
- 
-@@ -286,7 +280,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
- 
- static int sha256_final(struct shash_desc *desc, u8 *out)
- {
--	struct sha256_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	__be32 *dst = (__be32 *)out;
- 	__be64 bits;
- 	unsigned int index, pad_len;
-@@ -326,12 +320,31 @@ static int sha224_final(struct shash_desc *desc, u8 *hash)
+diff --git a/arch/s390/crypto/sha1_s390.c b/arch/s390/crypto/sha1_s390.c
+index e85ba34..2c5ec79 100644
+--- a/arch/s390/crypto/sha1_s390.c
++++ b/arch/s390/crypto/sha1_s390.c
+@@ -46,12 +46,38 @@ static int sha1_init(struct shash_desc *desc)
  	return 0;
  }
  
-+static int sha256_export(struct shash_desc *desc, void *out)
++static int sha1_export(struct shash_desc *desc, void *out)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
++	struct sha1_state *octx = out;
 +
-+	memcpy(out, sctx, sizeof(*sctx));
++	octx->count = sctx->count;
++	memcpy(octx->state, sctx->state, sizeof(octx->state));
++	memcpy(octx->buffer, sctx->buf, sizeof(octx->buffer));
 +	return 0;
 +}
 +
-+static int sha256_import(struct shash_desc *desc, const void *in)
++static int sha1_import(struct shash_desc *desc, const u8 *in)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *ictx = in;
 +
-+	memcpy(sctx, in, sizeof(*sctx));
++	sctx->count = ictx->count;
++	memcpy(sctx->state, ictx->state, sizeof(ictx->state));
++	memcpy(sctx->buf, ictx->buffer, sizeof(ictx->buffer));
++	sctx->func = KIMD_SHA_1;
 +	return 0;
 +}
 +
- static struct shash_alg sha256 = {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
- 	.init		=	sha256_init,
- 	.update		=	sha256_update,
- 	.final		=	sha256_final,
--	.descsize	=	sizeof(struct sha256_ctx),
-+	.export		=	sha256_export,
-+	.import		=	sha256_import,
-+	.descsize	=	sizeof(struct sha256_state),
-+	.statesize	=	sizeof(struct sha256_state),
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_init,
+ 	.update		=	s390_sha_update,
+ 	.final		=	s390_sha_final,
++	.export		=	sha1_export,
++	.import		=	sha1_import,
+ 	.descsize	=	sizeof(struct s390_sha_ctx),
++	.statesize	=	sizeof(struct sha1_state),
  	.base		=	{
- 		.cra_name	=	"sha256",
- 		.cra_driver_name=	"sha256-generic",
-@@ -346,7 +359,7 @@ static struct shash_alg sha224 = {
- 	.init		=	sha224_init,
- 	.update		=	sha256_update,
- 	.final		=	sha224_final,
--	.descsize	=	sizeof(struct sha256_ctx),
-+	.descsize	=	sizeof(struct sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha224",
- 		.cra_driver_name=	"sha224-generic",
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index 922a248..88ef5eb 100644
---- a/include/crypto/sha.h
-+++ b/include/crypto/sha.h
-@@ -70,4 +70,10 @@ struct sha1_state {
- 	u8 buffer[SHA1_BLOCK_SIZE];
- };
- 
-+struct sha256_state {
-+	u64 count;
-+	u32 state[SHA256_DIGEST_SIZE / 4];
-+	u8 buf[SHA256_BLOCK_SIZE];
-+};
-+
- #endif
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name=	"sha1-s390",
