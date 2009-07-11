@@ -1,30 +1,42 @@
-From: "MITSUBISHI COMPANY UK" <info@mitsubishi.com>
-Subject: Your E-mail Attach To category\\"A\\" 870,000GBP&#8207;
-Date: Fri, 10 Jul 2009 20:30:03 +0800
-Message-ID: <20090710122911.M51719__43531.4686772928$1247227546$gmane$org@mitsubishi.com>
-Reply-To: infomitscombonanza@googlemail.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [1/9] Convert padlock sha to shash
+Date: Sat, 11 Jul 2009 18:19:58 +0800
+Message-ID: <20090711101958.GA14642@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset=big5
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 220-128-130-175.HINET-IP.hinet.net ([220.128.130.175]:35973
-	"EHLO mail.hbhousing.com.tw" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750983AbZGJMFA (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:54376 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752880AbZGKKUB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Jul 2009 08:05:00 -0400
+	Sat, 11 Jul 2009 06:20:01 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1MPZgV-00061n-Bg
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2009 20:19:59 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1MPZgU-0003ob-NP
+	for linux-crypto@vger.kernel.org; Sat, 11 Jul 2009 18:19:58 +0800
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-MITSUBISHI COMPANY UK.
-28 TANFIELD ROAD,LONDON, UK.
+Hi:
 
-You have just been awarded,the sum of  &pound;870.000.00 in the  MITSUBISHI COMPANY 
-Award 2009, Anniversary Bonanza. held in July.
+This series of patches converts the padlock-sha implementation to
+shash.  This is also the last legacy hash algorithm to be converted,
+apart from hmac which I had to revert as it would break padlock-sha
+unless the latter is converted.
 
-Names:............. Address:..............
-Country:................ Age:..........
-Phone Number............ Occupation.......Sex
+As I don't have the hardware supporting padlock-sha, could someone
+with access to it please test this for me? In particular, I'd like
+to see this tested with an actual IPsec connection.
 
-Regards.Felke Courtney.
-Online Co-ordinator.
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
