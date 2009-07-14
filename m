@@ -1,43 +1,42 @@
-From: MITSUBISHI COMPANY UK <info@mitsubihi.co.uk>
-Subject: Your E-mail Attach To 2009 Anniversary Bonanza
-Date: Sat, 11 Jul 2009 12:49:27 -0700
-Message-ID: <20090711124927.6ccdiapb40sookkg__49567.3216799789$1247363446$gmane$org@webmail.pdx.edu>
-Reply-To: infomitscombonanza@googlemail.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Bogus sha1 implementation in crypto4xx
+Date: Tue, 14 Jul 2009 21:06:00 +0800
+Message-ID: <20090714130600.GA11081@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1;
-	DelSp=Yes	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: James Hsiao <jhsiao@amcc.com>, Shasi Pulijala <spulijala@amcc.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hati.oit.pdx.edu ([131.252.120.59]:41401 "EHLO hati.oit.pdx.edu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751930AbZGLBuI convert rfc822-to-8bit (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:36140 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752335AbZGNNGD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Jul 2009 21:50:08 -0400
+	Tue, 14 Jul 2009 09:06:03 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi:
 
+I just noticed that the sha1 implementation in crypto4xx is
+fundamentally broken.  It stores the hash state in the context
+of the tfm, instead of the context of the request.
 
-MITSUBISHI COMPANY UK.
-28 TANFIELD ROAD,LONDON, UK.
+This means that at any one time you can only have one entity
+using the tfm, which is infeasible for an asynchronous hash.
 
-You have just been awarded,the sum of  =A3870.000.00 in the  MITSUBISHI=
- COMPANY
-Award 2009, Anniversary Bonanza. held in July.
+So I'm going to disable the sha1 part of crypto4xx until this
+is fixed.
 
-Names:............. Address:..............
-Country:................ Age:..........
-Phone Number............ Occupation.......Sex
+This hasn't caused a problem before because we haven't started
+using ahash yet, apart from tcrypt which is single-threaded.
+I'm currently in the process of converting authenc (hence IPsec)
+across, which means that we will soon rely on the fact that
+you can have multiple hash operations ongoing at once.
 
-Regards.Felke Courtney.
-Online Co-ordinator.
-
-
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
