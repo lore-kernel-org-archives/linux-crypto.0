@@ -1,41 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Bogus sha1 implementation in crypto4xx
-Date: Tue, 14 Jul 2009 22:43:44 +0800
-Message-ID: <20090714144344.GB12160@gondor.apana.org.au>
-References: <20090714130600.GA11081@gondor.apana.org.au> <20090714134629.GI20288@secunet.com>
+From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [1/9] Convert padlock sha to shash
+Date: Tue, 14 Jul 2009 22:26:15 +0200
+Message-ID: <20090714202615.GA21476@Chamillionaire.breakpoint.cc>
+References: <20090711101958.GA14642@gondor.apana.org.au>
+Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: James Hsiao <jhsiao@amcc.com>, Shasi Pulijala <spulijala@amcc.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47111 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754817AbZGNOnt (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:55536 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754543AbZGNU0R (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jul 2009 10:43:49 -0400
+	Tue, 14 Jul 2009 16:26:17 -0400
 Content-Disposition: inline
-In-Reply-To: <20090714134629.GI20288@secunet.com>
+In-Reply-To: <20090711101958.GA14642@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 14, 2009 at 03:46:29PM +0200, Steffen Klassert wrote:
->
-> As I pointed out already, I'm working on converting IPsec to ahash too.
-> So perhaps we can share the work to do not all the work twice.
-> I have ahash versions of authenc and ah4/ah6. The authenc ahash version
-> needs a hack in esp to be able to chain all scatterlist in authenc and I
-> wanted to look over it again before I post. 
-> 
-> Today I finished with ah4/ah6. This needs still some tests but I could post
-> these two in the next days if you have not converted them it yet.
+* Herbert Xu | 2009-07-11 18:19:58 [+0800]:
 
-Sure, go ahead.  I'm still redoing the ahash infrastructure to
-properly support finup and export/import.
+>As I don't have the hardware supporting padlock-sha, could someone
+>with access to it please test this for me? In particular, I'd like
+>to see this tested with an actual IPsec connection.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I have here a via nano so I should be able to test it.
+Do you have a particular test case in mind or should I just grab
+ipsec-tools, setup a tunnel and send a few packets?
+
+>Thanks,
+
+Sebastian
