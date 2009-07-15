@@ -1,33 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Bogus sha1 implementation in crypto4xx
-Date: Wed, 15 Jul 2009 13:37:51 +0800
-Message-ID: <20090715053751.GA18465@gondor.apana.org.au>
-References: <20090714130600.GA11081@gondor.apana.org.au> <20090714134629.GI20288@secunet.com> <20090714144344.GB12160@gondor.apana.org.au> <20090715053733.GJ20288@secunet.com>
+Subject: [PATCH 0/35] Converting ahash to new style
+Date: Wed, 15 Jul 2009 15:14:24 +0800
+Message-ID: <20090715071424.GA19023@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: James Hsiao <jhsiao@amcc.com>, Shasi Pulijala <spulijala@amcc.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50481 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53606 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751619AbZGOFh5 (ORCPT
+	with ESMTP id S1751163AbZGOHO0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2009 01:37:57 -0400
+	Wed, 15 Jul 2009 03:14:26 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
+	id 1MQyh7-0004ms-0W
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 17:14:25 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1MQyh6-0004xB-Az
+	for linux-crypto@vger.kernel.org; Wed, 15 Jul 2009 15:14:24 +0800
 Content-Disposition: inline
-In-Reply-To: <20090715053733.GJ20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 15, 2009 at 07:37:33AM +0200, Steffen Klassert wrote:
->
-> Ok, for a moment I thought we both working at the same thing :)
-> I'll finalize my work and send everything in the next days.
+Hi:
 
-I'm pretty much done with the ahash rework so whenever you're
-ready please send the authenc conversion out.
+This series of patches converts ahash to the new algorithm format
+just like shash.  Note that I've incorporated a couple of the
+previously posted patches (notably the padlock/hmac conversion)
+into it.
 
-Thanks,
+At this point all implementations are either shash or ahash.  So
+we can now move forward to convert users such as authenc over to
+ahash.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
