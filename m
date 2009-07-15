@@ -1,83 +1,64 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: ahash - Fix setkey crash
-Date: Wed, 15 Jul 2009 20:42:52 +0800
-Message-ID: <20090715124252.GA22403@gondor.apana.org.au>
+Subject: crypto: shash - Fix digest size offset
+Date: Wed, 15 Jul 2009 21:18:00 +0800
+Message-ID: <20090715131800.GA22807@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52511 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:47436 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752089AbZGONQu (ORCPT
+	with ESMTP id S1753922AbZGONSB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2009 09:16:50 -0400
+	Wed, 15 Jul 2009 09:18:01 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MR4Lo-0000i7-VI
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 23:16:49 +1000
+	id 1MR4My-0000jX-IP
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 23:18:00 +1000
 Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
 	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1MR4Lo-0005vm-PJ
-	for linux-crypto@vger.kernel.org; Wed, 15 Jul 2009 21:16:48 +0800
+	id 1MR4My-0005wM-9k
+	for linux-crypto@vger.kernel.org; Wed, 15 Jul 2009 21:18:00 +0800
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi:
 
-This patch fixes a crash caused by the new ahash code and hmac.
+This one fixes failures when using shash algorithms through
+ahash.
 
-commit a70c522520d967844c01fa01459edc698fc54544
+commit fa64966473830219fe74952029ddb0e981a87749
 Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Wed Jul 15 20:39:05 2009 +0800
+Date:   Wed Jul 15 21:16:05 2009 +0800
 
-    crypto: ahash - Fix setkey crash
+    crypto: shash - Fix digest size offset
     
-    When the alignment check was made unconditional for ahash we
-    may end up crashing on shash algorithms because we're always
-    calling alg->setkey instead of tfm->setkey.
+    When an shash algorithm is exported as ahash, ahash will access
+    its digest size through hash_alg_common.  That's why the shash
+    layout needs to match hash_alg_common.  This wasn't the case
+    because the alignment weren't identical.
     
-    This patch fixes it.
+    This patch fixes the problem.
     
     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index ac0798d..28a33d0 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -145,7 +145,6 @@ int crypto_hash_walk_first_compat(struct hash_desc *hdesc,
- static int ahash_setkey_unaligned(struct crypto_ahash *tfm, const u8 *key,
- 				unsigned int keylen)
- {
--	struct ahash_alg *ahash = crypto_ahash_alg(tfm);
- 	unsigned long alignmask = crypto_ahash_alignmask(tfm);
- 	int ret;
- 	u8 *buffer, *alignbuffer;
-@@ -158,7 +157,7 @@ static int ahash_setkey_unaligned(struct crypto_ahash *tfm, const u8 *key,
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 3e89ce1..26cb1eb 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -75,7 +75,8 @@ struct shash_alg {
+ 	unsigned int descsize;
  
- 	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
- 	memcpy(alignbuffer, key, keylen);
--	ret = ahash->setkey(tfm, alignbuffer, keylen);
-+	ret = tfm->setkey(tfm, alignbuffer, keylen);
- 	kzfree(buffer);
- 	return ret;
- }
-@@ -166,13 +165,12 @@ static int ahash_setkey_unaligned(struct crypto_ahash *tfm, const u8 *key,
- int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen)
- {
--	struct ahash_alg *ahash = crypto_ahash_alg(tfm);
- 	unsigned long alignmask = crypto_ahash_alignmask(tfm);
+ 	/* These fields must match hash_alg_common. */
+-	unsigned int digestsize;
++	unsigned int digestsize
++		__attribute__ ((aligned(__alignof__(struct hash_alg_common))));
+ 	unsigned int statesize;
  
- 	if ((unsigned long)key & alignmask)
- 		return ahash_setkey_unaligned(tfm, key, keylen);
- 
--	return ahash->setkey(tfm, key, keylen);
-+	return tfm->setkey(tfm, key, keylen);
- }
- EXPORT_SYMBOL_GPL(crypto_ahash_setkey);
+ 	struct crypto_alg base;
 
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
