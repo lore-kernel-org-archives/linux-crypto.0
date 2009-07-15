@@ -1,69 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: shash - Fix async finup handling of null digest
-Date: Wed, 15 Jul 2009 21:30:38 +0800
-Message-ID: <20090715133038.GA22980@gondor.apana.org.au>
+From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [1/9] Convert padlock sha to shash
+Date: Thu, 16 Jul 2009 00:06:06 +0200
+Message-ID: <20090715220606.GA30627@Chamillionaire.breakpoint.cc>
+References: <20090711101958.GA14642@gondor.apana.org.au> <20090714202615.GA21476@Chamillionaire.breakpoint.cc> <20090715004847.GA17017@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45215 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754397AbZGONak (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:45034 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753864AbZGOWGJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2009 09:30:40 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MR4ZD-0000to-7v
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 23:30:39 +1000
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1MR4ZC-0005z9-J2
-	for linux-crypto@vger.kernel.org; Wed, 15 Jul 2009 21:30:38 +0800
+	Wed, 15 Jul 2009 18:06:09 -0400
 Content-Disposition: inline
+In-Reply-To: <20090715004847.GA17017@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+* Herbert Xu | 2009-07-15 08:48:47 [+0800]:
 
-commit cbc86b9161b40f95caee0e56381b68956fc28cc4
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Wed Jul 15 21:26:41 2009 +0800
+>Yes, that should be enough.  You don't even ipsec-tools, just
+>a manual SA setup with ip xfrm should be good enough.
 
-    crypto: shash - Fix async finup handling of null digest
-    
-    When shash_ahash_finup encounters a null request, we end up not
-    calling the underlying final function.  This patch fixes that.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+I did not get that far:
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 834d9d2..7713b52 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -240,12 +240,17 @@ int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc)
- 	struct crypto_hash_walk walk;
- 	int nbytes;
- 
--	for (nbytes = crypto_hash_walk_first(req, &walk); nbytes > 0;
--	     nbytes = crypto_hash_walk_done(&walk, nbytes))
-+	nbytes = crypto_hash_walk_first(req, &walk);
-+	if (!nbytes)
-+		return crypto_shash_final(desc, req->result);
-+
-+	do {
- 		nbytes = crypto_hash_walk_last(&walk) ?
- 			 crypto_shash_finup(desc, walk.data, nbytes,
- 					    req->result) :
- 			 crypto_shash_update(desc, walk.data, nbytes);
-+		nbytes = crypto_hash_walk_done(&walk, nbytes);
-+	} while (nbytes > 0);
- 
- 	return nbytes;
- }
+|alg: hash: Chunking test 1 failed for sha1-padlock
+|00000000: e9 95 22 0c 1b d1 0f 5f f1 fa ee 74 7d 27 cd b2
+|00000010: 99 f2 ad 73
+|alg: hash: Chunking test 1 failed for sha256-padlock
+|00000000: 9e 49 25 fa b3 a8 45 de 53 e9 9f d0 e8 7d 2c 33
+|00000010: 09 51 6b 33 15 cb e0 4e 22 c0 04 1b 1e 25 ad c9
+|padlock: Using VIA PadLock ACE for SHA1/SHA256 algorithms.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Do you think that it is something obvious or should I dig into it?
+
+>Cheers,
+
+Sebastian
