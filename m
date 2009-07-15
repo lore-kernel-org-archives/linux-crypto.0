@@ -1,138 +1,74 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/35] crypto: sha1_generic - Add export/import support
-Date: Wed, 15 Jul 2009 15:15:55 +0800
-Message-ID: <E1MQyiZ-0004y4-Lm@gondolin.me.apana.org.au>
+Subject: [PATCH 6/35] crypto: sha1-s390 - Add export/import support
+Date: Wed, 15 Jul 2009 15:15:58 +0800
+Message-ID: <E1MQyic-0004yV-Tn@gondolin.me.apana.org.au>
 References: <20090715071424.GA19023@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:53611 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53615 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752525AbZGOHP5 (ORCPT
+	with ESMTP id S1752552AbZGOHQB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2009 03:15:57 -0400
+	Wed, 15 Jul 2009 03:16:01 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MQyiZ-0004o5-W0
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 17:15:56 +1000
+	id 1MQyid-0004oQ-9N
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 17:15:59 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: sha1_generic - Add export/import support
+crypto: sha1-s390 - Add export/import support
 
-This patch adds export/import support to sha1_generic.  The exported
+This patch adds export/import support to sha1-s390.  The exported
 type is defined by struct sha1_state, which is basically the entire
 descriptor state of sha1_generic.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/sha1_generic.c |   41 +++++++++++++++++++++++++----------------
- include/crypto/sha.h  |    8 ++++++++
- 2 files changed, 33 insertions(+), 16 deletions(-)
+ arch/s390/crypto/sha1_s390.c |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-index 9efef20..0416091 100644
---- a/crypto/sha1_generic.c
-+++ b/crypto/sha1_generic.c
-@@ -25,31 +25,21 @@
- #include <crypto/sha.h>
- #include <asm/byteorder.h>
- 
--struct sha1_ctx {
--        u64 count;
--        u32 state[5];
--        u8 buffer[64];
--};
--
- static int sha1_init(struct shash_desc *desc)
- {
--	struct sha1_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 
--	static const struct sha1_ctx initstate = {
--	  0,
--	  { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
--	  { 0, }
-+	*sctx = (struct sha1_state){
-+		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
- 	};
- 
--	*sctx = initstate;
--
- 	return 0;
- }
- 
- static int sha1_update(struct shash_desc *desc, const u8 *data,
- 			unsigned int len)
- {
--	struct sha1_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	unsigned int partial, done;
- 	const u8 *src;
- 
-@@ -85,7 +75,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
- /* Add padding and return the message digest. */
- static int sha1_final(struct shash_desc *desc, u8 *out)
- {
--	struct sha1_ctx *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	__be32 *dst = (__be32 *)out;
- 	u32 i, index, padlen;
- 	__be64 bits;
-@@ -111,12 +101,31 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
+diff --git a/arch/s390/crypto/sha1_s390.c b/arch/s390/crypto/sha1_s390.c
+index e85ba34..2c5ec79 100644
+--- a/arch/s390/crypto/sha1_s390.c
++++ b/arch/s390/crypto/sha1_s390.c
+@@ -46,12 +46,38 @@ static int sha1_init(struct shash_desc *desc)
  	return 0;
  }
  
 +static int sha1_export(struct shash_desc *desc, void *out)
 +{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
++	struct sha1_state *octx = out;
 +
-+	memcpy(out, sctx, sizeof(*sctx));
++	octx->count = sctx->count;
++	memcpy(octx->state, sctx->state, sizeof(octx->state));
++	memcpy(octx->buffer, sctx->buf, sizeof(octx->buffer));
 +	return 0;
 +}
 +
-+static int sha1_import(struct shash_desc *desc, const void *in)
++static int sha1_import(struct shash_desc *desc, const u8 *in)
 +{
 +	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *ictx = in;
 +
-+	memcpy(sctx, in, sizeof(*sctx));
++	sctx->count = ictx->count;
++	memcpy(sctx->state, ictx->state, sizeof(ictx->state));
++	memcpy(sctx->buf, ictx->buffer, sizeof(ictx->buffer));
++	sctx->func = KIMD_SHA_1;
 +	return 0;
 +}
 +
  static struct shash_alg alg = {
  	.digestsize	=	SHA1_DIGEST_SIZE,
  	.init		=	sha1_init,
- 	.update		=	sha1_update,
- 	.final		=	sha1_final,
--	.descsize	=	sizeof(struct sha1_ctx),
+ 	.update		=	s390_sha_update,
+ 	.final		=	s390_sha_final,
 +	.export		=	sha1_export,
 +	.import		=	sha1_import,
-+	.descsize	=	sizeof(struct sha1_state),
+ 	.descsize	=	sizeof(struct s390_sha_ctx),
 +	.statesize	=	sizeof(struct sha1_state),
  	.base		=	{
  		.cra_name	=	"sha1",
- 		.cra_driver_name=	"sha1-generic",
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index c0ccc2b..922a248 100644
---- a/include/crypto/sha.h
-+++ b/include/crypto/sha.h
-@@ -5,6 +5,8 @@
- #ifndef _CRYPTO_SHA_H
- #define _CRYPTO_SHA_H
- 
-+#include <linux/types.h>
-+
- #define SHA1_DIGEST_SIZE        20
- #define SHA1_BLOCK_SIZE         64
- 
-@@ -62,4 +64,10 @@
- #define SHA512_H6	0x1f83d9abfb41bd6bULL
- #define SHA512_H7	0x5be0cd19137e2179ULL
- 
-+struct sha1_state {
-+	u64 count;
-+	u32 state[SHA1_DIGEST_SIZE / 4];
-+	u8 buffer[SHA1_BLOCK_SIZE];
-+};
-+
- #endif
+ 		.cra_driver_name=	"sha1-s390",
