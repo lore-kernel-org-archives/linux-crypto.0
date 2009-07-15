@@ -1,58 +1,73 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 26/35] crypto: hash - Add helpers to free spawns
-Date: Wed, 15 Jul 2009 15:16:20 +0800
-Message-ID: <E1MQyiy-00051U-Hk@gondolin.me.apana.org.au>
+Subject: [PATCH 25/35] crypto: tcrypt - Add mask parameter
+Date: Wed, 15 Jul 2009 15:16:19 +0800
+Message-ID: <E1MQyix-00051L-FH@gondolin.me.apana.org.au>
 References: <20090715071424.GA19023@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:53654 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53651 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752700AbZGOHQ2 (ORCPT
+	with ESMTP id S1752694AbZGOHQ1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jul 2009 03:16:28 -0400
+	Wed, 15 Jul 2009 03:16:27 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by arnor.apana.org.au with esmtp (Exim 4.63 #1 (Debian))
-	id 1MQyiz-0004uM-M4
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 17:16:22 +1000
+	id 1MQyiy-0004u7-Gs
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2009 17:16:21 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: hash - Add helpers to free spawns
+crypto: tcrypt - Add mask parameter
 
-This patch adds the helpers crypto_drop_ahash and crypto_drop_shash
-so that these spawns can be dropped without ugly casts.
+This patch adds a mask parameter to complement the existing type
+parameter.  This is useful when instantiating algorithms that
+require a mask other than the default, e.g., ahash algorithms.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/crypto/internal/hash.h |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ crypto/tcrypt.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 34eda23..9d30316 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -69,6 +69,11 @@ int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
- 			    struct hash_alg_common *alg,
- 			    struct crypto_instance *inst);
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index a890a67..5a375e8 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -47,6 +47,7 @@ static unsigned int sec;
  
-+static inline void crypto_drop_ahash(struct crypto_ahash_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
- struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
+ static char *alg = NULL;
+ static u32 type;
++static u32 mask;
+ static int mode;
+ static char *tvmem[TVMEMSIZE];
  
- int crypto_register_shash(struct shash_alg *alg);
-@@ -81,6 +86,11 @@ int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
- 			    struct shash_alg *alg,
- 			    struct crypto_instance *inst);
+@@ -887,9 +888,10 @@ static int do_test(int m)
+ 	return ret;
+ }
  
-+static inline void crypto_drop_shash(struct crypto_shash_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
- struct shash_alg *shash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
+-static int do_alg_test(const char *alg, u32 type)
++static int do_alg_test(const char *alg, u32 type, u32 mask)
+ {
+-	return crypto_has_alg(alg, type, CRYPTO_ALG_TYPE_MASK) ? 0 : -ENOENT;
++	return crypto_has_alg(alg, type, mask ?: CRYPTO_ALG_TYPE_MASK) ?
++	       0 : -ENOENT;
+ }
  
- int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
+ static int __init tcrypt_mod_init(void)
+@@ -904,7 +906,7 @@ static int __init tcrypt_mod_init(void)
+ 	}
+ 
+ 	if (alg)
+-		err = do_alg_test(alg, type);
++		err = do_alg_test(alg, type, mask);
+ 	else
+ 		err = do_test(mode);
+ 
+@@ -941,6 +943,7 @@ module_exit(tcrypt_mod_fini);
+ 
+ module_param(alg, charp, 0);
+ module_param(type, uint, 0);
++module_param(mask, uint, 0);
+ module_param(mode, int, 0);
+ module_param(sec, uint, 0);
+ MODULE_PARM_DESC(sec, "Length in seconds of speed tests "
