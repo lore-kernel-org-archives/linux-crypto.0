@@ -1,26 +1,31 @@
 From: Shane Wang <shane.wang@intel.com>
 Subject: [RFC PATCH] Add VMAC(AES) to Linux for intel_txt support
-Date: Thu, 16 Jul 2009 23:05:40 +0800
-Message-ID: <4A5F41C4.3050808@intel.com>
+Date: Thu, 16 Jul 2009 23:11:23 +0800
+Message-ID: <4A5F431B.6060307@intel.com>
+References: <4A5F41C4.3050808@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: joseph.cihula@intel.com, shane.wang@intel.com
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc: "Cihula, Joseph" <joseph.cihula@intel.com>, shane.wang@intel.com
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60603 "EHLO mga11.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:65322 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757576AbZGPPFp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jul 2009 11:05:45 -0400
+	id S1757554AbZGPPLe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 Jul 2009 11:11:34 -0400
+In-Reply-To: <4A5F41C4.3050808@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+<Resend considering the wrap issue in the previous email, sorry for that>
+
 Hi community,
 
-The following VMAC(AES) patch, ported from http://fastcrypto.org/vmac, 
-is used to support S3 memory integrity verification for Intel(R) Trusted 
-Execution Technology (for more about Intel(R) TXT patches, see 
-http://lkml.org/lkml/2009/6/22/578), since the VMAC algorithm is very 
+The following VMAC(AES) patch, ported from http://fastcrypto.org/vmac,
+is used to support S3 memory integrity verification for Intel(R) Trusted
+Execution Technology (for more about Intel(R) TXT patches, see
+http://lkml.org/lkml/2009/6/22/578), since the VMAC algorithm is very
 fast to MAC the memory during S3 sleep, compared with other MAC algorithms.
 
 We request your feedback and suggestions.
@@ -30,7 +35,6 @@ Shane
 
 Signed-off-by: Shane Wang <shane.wang@intel.com>
 Signed-off-by: Joseph Cihula <joseph.cihula@intel.com>
-
 
 
 diff -r 973795c2770b crypto/Kconfig
@@ -138,26 +142,21 @@ diff -r 973795c2770b crypto/vmac.c
 + *
 + * This program is distributed in the hope it will be useful, but WITHOUT
 + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public 
-License for
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 + * more details.
 + *
-+ * You should have received a copy of the GNU General Public License 
-along with
-+ * this program; if not, write to the Free Software Foundation, Inc., 
-59 Temple
++ * You should have received a copy of the GNU General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 + * Place - Suite 330, Boston, MA 02111-1307 USA.
 + */
 +
-+/* 
---------------------------------------------------------------------------
++/* --------------------------------------------------------------------------
 + * VMAC and VHASH Implementation by Ted Krovetz (tdk@acm.org) and Wei Dai.
 + * This implementation is herby placed in the public domain.
 + * The authors offers no warranty. Use at your own risk.
 + * Please send bug reports to the authors.
 + * Last modified: 17 APR 08, 1700 PDT
-+ * 
------------------------------------------------------------------------ */
++ * ----------------------------------------------------------------------- */
 +
 +#include <linux/init.h>
 +#include <linux/types.h>
@@ -188,16 +187,11 @@ along with
 + * Constants and masks
 + */
 +#define UINT64_C(x) x##ULL
-+const uint64_t p64   = UINT64_C(0xfffffffffffffeff);  /* 2^64 - 257 
-prime  */
-+const uint64_t m62   = UINT64_C(0x3fffffffffffffff);  /* 62-bit mask 
-     */
-+const uint64_t m63   = UINT64_C(0x7fffffffffffffff);  /* 63-bit mask 
-     */
-+const uint64_t m64   = UINT64_C(0xffffffffffffffff);  /* 64-bit mask 
-     */
-+const uint64_t mpoly = UINT64_C(0x1fffffff1fffffff);  /* Poly key mask 
-     */
++const uint64_t p64   = UINT64_C(0xfffffffffffffeff);  /* 2^64 - 257 prime  */
++const uint64_t m62   = UINT64_C(0x3fffffffffffffff);  /* 62-bit mask       */
++const uint64_t m63   = UINT64_C(0x7fffffffffffffff);  /* 63-bit mask       */
++const uint64_t m64   = UINT64_C(0xffffffffffffffff);  /* 64-bit mask       */
++const uint64_t mpoly = UINT64_C(0x1fffffff1fffffff);  /* Poly key mask     */
 +
 +
 +#if (VMAC_ARCH_BIG_ENDIAN)
@@ -250,8 +244,7 @@ prime  */
 +	}								\
 +}
 +
-+#if (VMAC_NHBYTES >= 64) /* These versions do 64-bytes of message at a 
-time */
++#if (VMAC_NHBYTES >= 64) /* These versions do 64-bytes of message at a time */
 +#define nh_vmac_nhbytes(mp, kp, nw, rh, rl)				\
 +{	int i; uint64_t th, tl;						\
 +	rh = rl = 0;							\
@@ -835,26 +828,21 @@ diff -r 973795c2770b include/crypto/internal/vmac.h
 + *
 + * This program is distributed in the hope it will be useful, but WITHOUT
 + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public 
-License for
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 + * more details.
 + *
-+ * You should have received a copy of the GNU General Public License 
-along with
-+ * this program; if not, write to the Free Software Foundation, Inc., 
-59 Temple
++ * You should have received a copy of the GNU General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 + * Place - Suite 330, Boston, MA 02111-1307 USA.
 + */
 +
-+/* 
---------------------------------------------------------------------------
++/* --------------------------------------------------------------------------
 + * VMAC and VHASH Implementation by Ted Krovetz (tdk@acm.org) and Wei Dai.
 + * This implementation is herby placed in the public domain.
 + * The authors offers no warranty. Use at your own risk.
 + * Please send bug reports to the authors.
 + * Last modified: 17 APR 08, 1700 PDT
-+ * 
------------------------------------------------------------------------ */
++ * ----------------------------------------------------------------------- */
 +
 +#ifndef _CRYPTO_INTERNAL_VMAC_H
 +#define _CRYPTO_INTERNAL_VMAC_H
@@ -1030,29 +1018,24 @@ diff -r 973795c2770b include/crypto/vmac.h
 + *
 + * This program is distributed in the hope it will be useful, but WITHOUT
 + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public 
-License for
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 + * more details.
 + *
-+ * You should have received a copy of the GNU General Public License 
-along with
-+ * this program; if not, write to the Free Software Foundation, Inc., 
-59 Temple
++ * You should have received a copy of the GNU General Public License along with
++ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 + * Place - Suite 330, Boston, MA 02111-1307 USA.
 + */
 +
 +#ifndef __CRYPTO_VMAC_H
 +#define __CRYPTO_VMAC_H
 +
-+/* 
---------------------------------------------------------------------------
++/* --------------------------------------------------------------------------
 + * VMAC and VHASH Implementation by Ted Krovetz (tdk@acm.org) and Wei Dai.
 + * This implementation is herby placed in the public domain.
 + * The authors offers no warranty. Use at your own risk.
 + * Please send bug reports to the authors.
 + * Last modified: 17 APR 08, 1700 PDT
-+ * 
------------------------------------------------------------------------ */
++ * ----------------------------------------------------------------------- */
 +
 +/*
 + * User definable settings.
