@@ -1,44 +1,22 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 0/7] IPsec: convert to ahash
-Date: Thu, 16 Jul 2009 23:46:14 +0800
-Message-ID: <20090716154614.GA4389@gondor.apana.org.au>
-References: <20090716111548.GP20288@secunet.com>
+From: "Ramakesavan, Ramu" <ramu.ramakesavan@intel.com>
+Subject: quesiton on async cipher
+Date: Thu, 16 Jul 2009 12:44:50 -0700
+Message-ID: <51FE95B17FDB99418C84C914C13FB37D5A469250@orsmsx509.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:55822 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932456AbZGPPqQ (ORCPT
+Received: from mga09.intel.com ([134.134.136.24]:54183 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933126AbZGPTov convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jul 2009 11:46:16 -0400
-Content-Disposition: inline
-In-Reply-To: <20090716111548.GP20288@secunet.com>
+	Thu, 16 Jul 2009 15:44:51 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 16, 2009 at 01:15:48PM +0200, Steffen Klassert wrote:
->
-> Since the calls to the hash algorithms can now return asynchronous, I'd like
-> to avoid multiple calls to the hash update functions. I'd rather like to do
-> all the hashing with one call to crypto_ahash_digest(). As it is, this
-> requires chaining of all the involved scatterlists. Since we still can't use
-> sg_chain() to chain up the lists, I added an additional scatterlist entry to
-> the scatterlist of the assoc data (esp) to be able to chain later in the
-> crypto layer. To keep compatibility I set the termination bit at the first
-> entry and remove it later in authenc. In fact to rely on this additional
-> entry and just to remove the termintation bit later makes me a bit nervous
-> and I'm not sure whether this is acceptable, so better ideas are very welcome.
+I am new to Linux Crypto APIs. I can see usage of asynchronous cipher algorithms in testmgr.c. Is there a sample implementation for async cipher driver that uses crypto_ablkcipher or crypto_ahash? If there is one, pleas point me to it. 
+ 
 
-My suggestion would be to optimise for the common case, where
-assoc is a single-entry list.  So just put some space aside in
-the request context for a two-entry sg list and copy the assoc
-sg entry into it and chain it with the rest.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ramu
