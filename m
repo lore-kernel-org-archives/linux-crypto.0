@@ -1,31 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: quesiton on async cipher
-Date: Fri, 17 Jul 2009 14:26:35 +0800
-Message-ID: <20090717062635.GA11410@gondor.apana.org.au>
-References: <51FE95B17FDB99418C84C914C13FB37D5A469250@orsmsx509.amr.corp.intel.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [RFC] [PATCH 0/7] IPsec: convert to ahash
+Date: Fri, 17 Jul 2009 09:42:39 +0200
+Message-ID: <20090717074239.GY20288@secunet.com>
+References: <20090716111548.GP20288@secunet.com> <20090716154614.GA4389@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: "Ramakesavan, Ramu" <ramu.ramakesavan@intel.com>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45019 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S934092AbZGQG0i (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jul 2009 02:26:38 -0400
+Received: from a.mx.secunet.com ([213.68.205.161]:34429 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934157AbZGQHj6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Jul 2009 03:39:58 -0400
 Content-Disposition: inline
-In-Reply-To: <51FE95B17FDB99418C84C914C13FB37D5A469250@orsmsx509.amr.corp.intel.com>
+In-Reply-To: <20090716154614.GA4389@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ramakesavan, Ramu <ramu.ramakesavan@intel.com> wrote:
-> I am new to Linux Crypto APIs. I can see usage of asynchronous cipher algorithms in testmgr.c. Is there a sample implementation for async cipher driver that uses crypto_ablkcipher or crypto_ahash? If there is one, pleas point me to it. 
+On Thu, Jul 16, 2009 at 11:46:14PM +0800, Herbert Xu wrote:
+> 
+> My suggestion would be to optimise for the common case, where
+> assoc is a single-entry list.  So just put some space aside in
+> the request context for a two-entry sg list and copy the assoc
+> sg entry into it and chain it with the rest.
+> 
 
-Have a look under drivers/crypto.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ok, I updated the authenc part in this manner. The authenc part does
+not depend on networking changes anymore, so I'll resend it just to
+linux-crypto.
