@@ -1,32 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [1/9] Convert padlock sha to shash
-Date: Fri, 17 Jul 2009 08:48:14 +0800
-Message-ID: <20090717004814.GB9025@gondor.apana.org.au>
-References: <20090711101958.GA14642@gondor.apana.org.au> <20090714202615.GA21476@Chamillionaire.breakpoint.cc> <20090715004847.GA17017@gondor.apana.org.au> <20090715220606.GA30627@Chamillionaire.breakpoint.cc> <20090716021601.GA28776@gondor.apana.org.au> <20090716023413.GA28905@gondor.apana.org.au> <20090716073630.GA1294@Chamillionaire.breakpoint.cc> <20090716222345.GA7790@Chamillionaire.breakpoint.cc>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [RFC] [PATCH 0/7] IPsec: convert to ahash
+Date: Fri, 17 Jul 2009 08:11:14 +0200
+Message-ID: <20090717061114.GX20288@secunet.com>
+References: <20090716111548.GP20288@secunet.com> <20090716154614.GA4389@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49210 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933479AbZGQAsQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jul 2009 20:48:16 -0400
+Received: from a.mx.secunet.com ([213.68.205.161]:33705 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933895AbZGQGIe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Jul 2009 02:08:34 -0400
 Content-Disposition: inline
-In-Reply-To: <20090716222345.GA7790@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20090716154614.GA4389@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 17, 2009 at 12:23:45AM +0200, Sebastian Andrzej Siewior wrote:
->
-> Okay, Herbert it is working. I've setup a tunnel between two boxes and
-> was able to ping and copy stuff from /dev/zero on one box to /dev/null
-> on the other. 
+On Thu, Jul 16, 2009 at 11:46:14PM +0800, Herbert Xu wrote:
+> 
+> My suggestion would be to optimise for the common case, where
+> assoc is a single-entry list.  So just put some space aside in
+> the request context for a two-entry sg list and copy the assoc
+> sg entry into it and chain it with the rest.
+> 
 
-Awesome, thanks a lot for verifying this Sebastian!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sounds good. This would also have the advantage that all necessary
+changes are local to authenc. I'll give it a try.
+
+Any further comments on the rest of the patchset?
