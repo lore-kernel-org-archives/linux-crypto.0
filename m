@@ -1,29 +1,46 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] crypto: authenc - convert to ahash
-Date: Mon, 20 Jul 2009 10:39:53 +0200
-Message-ID: <20090720083953.GE20288@secunet.com>
-References: <20090717074709.GZ20288@secunet.com> <20090720065244.GA4026@gondor.apana.org.au> <20090720074956.GB20288@secunet.com> <20090720082224.GB4797@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
+Date: Mon, 20 Jul 2009 16:50:04 +0800
+Message-ID: <20090720085004.GA5018@gondor.apana.org.au>
+References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net> <20090720062643.GA20288@secunet.com> <20090720065514.GB4026@gondor.apana.org.au> <20090720075701.GC20288@secunet.com> <20090720082116.GA4797@gondor.apana.org.au> <20090720083640.GD20288@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, Jens Axboe <jens.axboe@oracle.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:50173 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751938AbZGTIhL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2009 04:37:11 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:42668 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751869AbZGTIuO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jul 2009 04:50:14 -0400
 Content-Disposition: inline
-In-Reply-To: <20090720082224.GB4797@gondor.apana.org.au>
+In-Reply-To: <20090720083640.GD20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 20, 2009 at 04:22:24PM +0800, Herbert Xu wrote:
+On Mon, Jul 20, 2009 at 10:36:40AM +0200, Steffen Klassert wrote:
 > 
-> Actually, you can assume that init is always sync since I'll
-> ensure that everything supports export/import before hmac is
-> converted to ahash (from shash).
-> 
+> For the crypto-layer it's just scatterwalk_sg_chain() that removes the
+> termination bit. 
 
-Ok, I'll update and resend the patch.
+The history behind this is that the crypto layer has used chaining
+way before generic chaining was invented.  When the generic code
+was added I tried to convert crypto over to that, however, that
+failed because generic chaining was not ported to every architecture.
 
-Thanks.
+So that's why the crypto layer still retains its own chaining.
+
+> For the block-layer it's blk_rq_map_integrity_sg() and two times in
+> blk_rq_map_sg().
+
+I suppose we should ask Jens whether he thinks this is worth adding
+an interface over?
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
