@@ -1,40 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: authenc - convert to ahash
-Date: Mon, 20 Jul 2009 14:52:44 +0800
-Message-ID: <20090720065244.GA4026@gondor.apana.org.au>
-References: <20090717074709.GZ20288@secunet.com>
+Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
+Date: Mon, 20 Jul 2009 14:55:14 +0800
+Message-ID: <20090720065514.GB4026@gondor.apana.org.au>
+References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net> <20090720062643.GA20288@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
 To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40630 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751020AbZGTGwq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2009 02:52:46 -0400
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20090717074709.GZ20288@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20090720062643.GA20288@secunet.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 17, 2009 at 09:47:10AM +0200, Steffen Klassert wrote:
+On Mon, Jul 20, 2009 at 08:26:43AM +0200, Steffen Klassert wrote:
 >
-> @@ -165,8 +219,16 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
->  		dst = cipher;
->  	}
->  
-> -	cryptlen = req->cryptlen + ivsize;
-> -	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
-> +	sg_init_table(asg, 2);
-> +	memcpy(asg, req->assoc, sizeof(struct scatterlist));
-> +	asg->page_link &= ~0x02;
-> +	authenc_chain(asg, dst, 0);
-> +	dst = asg;
+> We have sg_mark_end() which sets the termination bit on a sg list entry,
+> but we don't have an interface to remove the termination bit from a sg
+> list entry. 
 
-This is not quite right.  What I had in mind was to use the digest
-interface if the assoc SG list has a single entry in it.  Otherwise
-it should just fall back to doing update followed by finup.
+For the case at hand, as we've agreed to only do the chaining
+if there is only a single entry in the list, we don't need this
+at all.  All you need to do is copy the page pointer, offset and
+length without copying the raw scatterlist entry.
 
 Cheers,
 -- 
