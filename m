@@ -1,40 +1,48 @@
-From: David Miller <davem@davemloft.net>
+From: Steffen Klassert <steffen.klassert@secunet.com>
 Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
-Date: Fri, 17 Jul 2009 10:03:34 -0700 (PDT)
-Message-ID: <20090717.100334.160030992.davem@davemloft.net>
-References: <20090716111548.GP20288@secunet.com>
-	<20090716111747.GR20288@secunet.com>
+Date: Mon, 20 Jul 2009 08:26:43 +0200
+Message-ID: <20090720062643.GA20288@secunet.com>
+References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
 	netdev@vger.kernel.org
-To: steffen.klassert@secunet.com
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:33264
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933550AbZGQRDa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jul 2009 13:03:30 -0400
-In-Reply-To: <20090716111747.GR20288@secunet.com>
+Received: from a.mx.secunet.com ([213.68.205.161]:48904 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750807AbZGTGYC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jul 2009 02:24:02 -0400
+Content-Disposition: inline
+In-Reply-To: <20090717.100334.160030992.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Date: Thu, 16 Jul 2009 13:17:47 +0200
+On Fri, Jul 17, 2009 at 10:03:34AM -0700, David Miller wrote:
+> From: Steffen Klassert <steffen.klassert@secunet.com>
+> Date: Thu, 16 Jul 2009 13:17:47 +0200
+> 
+> > +	/* 
+> > +	 * head must be a scatterlist with two entries.
+> > +	 * We remove a potentially set termination bit
+> > +	 * on the first enty.
+> > +	 */
+> > +	head->page_link &= ~0x02;
+> > +
+> >  	if (chain) {
+> >  		head->length += sg->length;
+> 
+> Isn't there some interface to do this, rather than revealing the
+> implementation details of how the scatter list marking works?
 
-> +	/* 
-> +	 * head must be a scatterlist with two entries.
-> +	 * We remove a potentially set termination bit
-> +	 * on the first enty.
-> +	 */
-> +	head->page_link &= ~0x02;
-> +
->  	if (chain) {
->  		head->length += sg->length;
+We have sg_mark_end() which sets the termination bit on a sg list entry,
+but we don't have an interface to remove the termination bit from a sg
+list entry. 
 
-Isn't there some interface to do this, rather than revealing the
-implementation details of how the scatter list marking works?
+> 
+> If not, such an interface should be created and used here.  Otherwise
+> any change in that implementation will break this code.
 
-If not, such an interface should be created and used here.  Otherwise
-any change in that implementation will break this code.
+A grep over the kernel tree showed that just the block and the
+crypto-layer doing this to chain sg lists. So we could create
+sg_unmark_end() and use it there. If desired, I would do it.
