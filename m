@@ -1,30 +1,29 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
-Date: Mon, 20 Jul 2009 10:36:40 +0200
-Message-ID: <20090720083640.GD20288@secunet.com>
-References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net> <20090720062643.GA20288@secunet.com> <20090720065514.GB4026@gondor.apana.org.au> <20090720075701.GC20288@secunet.com> <20090720082116.GA4797@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: authenc - convert to ahash
+Date: Mon, 20 Jul 2009 10:39:53 +0200
+Message-ID: <20090720083953.GE20288@secunet.com>
+References: <20090717074709.GZ20288@secunet.com> <20090720065244.GA4026@gondor.apana.org.au> <20090720074956.GB20288@secunet.com> <20090720082224.GB4797@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:50152 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([213.68.205.161]:50173 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750856AbZGTId7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2009 04:33:59 -0400
+	id S1751938AbZGTIhL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jul 2009 04:37:11 -0400
 Content-Disposition: inline
-In-Reply-To: <20090720082116.GA4797@gondor.apana.org.au>
+In-Reply-To: <20090720082224.GB4797@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 20, 2009 at 04:21:16PM +0800, Herbert Xu wrote:
+On Mon, Jul 20, 2009 at 04:22:24PM +0800, Herbert Xu wrote:
 > 
-> Can you point me to the existing code?
+> Actually, you can assume that init is always sync since I'll
+> ensure that everything supports export/import before hmac is
+> converted to ahash (from shash).
 > 
 
-For the crypto-layer it's just scatterwalk_sg_chain() that removes the
-termination bit. 
+Ok, I'll update and resend the patch.
 
-For the block-layer it's blk_rq_map_integrity_sg() and two times in
-blk_rq_map_sg().
+Thanks.
