@@ -1,48 +1,44 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
-Date: Mon, 20 Jul 2009 08:26:43 +0200
-Message-ID: <20090720062643.GA20288@secunet.com>
-References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: authenc - convert to ahash
+Date: Mon, 20 Jul 2009 14:52:44 +0800
+Message-ID: <20090720065244.GA4026@gondor.apana.org.au>
+References: <20090717074709.GZ20288@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:48904 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750807AbZGTGYC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2009 02:24:02 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:40630 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751020AbZGTGwq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 20 Jul 2009 02:52:46 -0400
 Content-Disposition: inline
-In-Reply-To: <20090717.100334.160030992.davem@davemloft.net>
+In-Reply-To: <20090717074709.GZ20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 17, 2009 at 10:03:34AM -0700, David Miller wrote:
-> From: Steffen Klassert <steffen.klassert@secunet.com>
-> Date: Thu, 16 Jul 2009 13:17:47 +0200
-> 
-> > +	/* 
-> > +	 * head must be a scatterlist with two entries.
-> > +	 * We remove a potentially set termination bit
-> > +	 * on the first enty.
-> > +	 */
-> > +	head->page_link &= ~0x02;
-> > +
-> >  	if (chain) {
-> >  		head->length += sg->length;
-> 
-> Isn't there some interface to do this, rather than revealing the
-> implementation details of how the scatter list marking works?
+On Fri, Jul 17, 2009 at 09:47:10AM +0200, Steffen Klassert wrote:
+>
+> @@ -165,8 +219,16 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
+>  		dst = cipher;
+>  	}
+>  
+> -	cryptlen = req->cryptlen + ivsize;
+> -	hash = crypto_authenc_hash(req, flags, dst, cryptlen);
+> +	sg_init_table(asg, 2);
+> +	memcpy(asg, req->assoc, sizeof(struct scatterlist));
+> +	asg->page_link &= ~0x02;
+> +	authenc_chain(asg, dst, 0);
+> +	dst = asg;
 
-We have sg_mark_end() which sets the termination bit on a sg list entry,
-but we don't have an interface to remove the termination bit from a sg
-list entry. 
+This is not quite right.  What I had in mind was to use the digest
+interface if the assoc SG list has a single entry in it.  Otherwise
+it should just fall back to doing update followed by finup.
 
-> 
-> If not, such an interface should be created and used here.  Otherwise
-> any change in that implementation will break this code.
-
-A grep over the kernel tree showed that just the block and the
-crypto-layer doing this to chain sg lists. So we could create
-sg_unmark_end() and use it there. If desired, I would do it.
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
