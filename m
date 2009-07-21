@@ -1,44 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] [PATCH 2/7] crypto: authenc - convert to ahash
-Date: Mon, 20 Jul 2009 16:50:04 +0800
-Message-ID: <20090720085004.GA5018@gondor.apana.org.au>
-References: <20090716111548.GP20288@secunet.com> <20090716111747.GR20288@secunet.com> <20090717.100334.160030992.davem@davemloft.net> <20090720062643.GA20288@secunet.com> <20090720065514.GB4026@gondor.apana.org.au> <20090720075701.GC20288@secunet.com> <20090720082116.GA4797@gondor.apana.org.au> <20090720083640.GD20288@secunet.com>
+Subject: Re: [RFC] [PATCH 4/7] ah4: convert to ahash
+Date: Tue, 21 Jul 2009 14:53:16 +0800
+Message-ID: <20090721065316.GA15534@gondor.apana.org.au>
+References: <20090716111548.GP20288@secunet.com> <20090716111909.GT20288@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, Jens Axboe <jens.axboe@oracle.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
 To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:42668 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:56220 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751869AbZGTIuO (ORCPT
+	with ESMTP id S1754489AbZGUGxT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Jul 2009 04:50:14 -0400
+	Tue, 21 Jul 2009 02:53:19 -0400
 Content-Disposition: inline
-In-Reply-To: <20090720083640.GD20288@secunet.com>
+In-Reply-To: <20090716111909.GT20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 20, 2009 at 10:36:40AM +0200, Steffen Klassert wrote:
+On Thu, Jul 16, 2009 at 01:19:09PM +0200, Steffen Klassert wrote:
+> This patch converts ah4 to the new ahash interface.
 > 
-> For the crypto-layer it's just scatterwalk_sg_chain() that removes the
-> termination bit. 
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-The history behind this is that the crypto layer has used chaining
-way before generic chaining was invented.  When the generic code
-was added I tried to convert crypto over to that, however, that
-failed because generic chaining was not ported to every architecture.
+Looks good to me.
 
-So that's why the crypto layer still retains its own chaining.
-
-> For the block-layer it's blk_rq_map_integrity_sg() and two times in
-> blk_rq_map_sg().
-
-I suppose we should ask Jens whether he thinks this is worth adding
-an interface over?
-
-Cheers,
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
