@@ -1,36 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ahash - Use GFP_KERNEL on allocation if the
-	request can sleep
-Date: Wed, 22 Jul 2009 20:23:07 +0800
-Message-ID: <20090722122307.GA463@gondor.apana.org.au>
-References: <20090722095123.GL20288@secunet.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH] crypto: shash - Test for the algorithms import function
+	before exporting it
+Date: Wed, 22 Jul 2009 14:53:02 +0200
+Message-ID: <20090722125302.GM20288@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40194 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753712AbZGVMXI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2009 08:23:08 -0400
+Received: from a.mx.secunet.com ([213.68.205.161]:43964 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754491AbZGVMua (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Jul 2009 08:50:30 -0400
 Content-Disposition: inline
-In-Reply-To: <20090722095123.GL20288@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 22, 2009 at 11:51:23AM +0200, Steffen Klassert wrote:
-> ahash_op_unaligned() and ahash_def_finup() allocate memory atomically,
-> regardless whether the request can sleep or not. This patch changes
-> this to use GFP_KERNEL if the request can sleep.
-> 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+crypto_init_shash_ops_async() tests for setkey and not for import
+before exporting the algorithms import function to ahash.
+This patch fixes this.
 
-Doh, I don't know what I was thinking when I wrote that :)
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/shash.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Thanks for catching this, I'll apply the patch.
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 7713b52..d923c88 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -348,7 +348,7 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
+ 		crt->setkey = shash_async_setkey;
+ 	if (alg->export)
+ 		crt->export = shash_async_export;
+-	if (alg->setkey)
++	if (alg->import)
+ 		crt->import = shash_async_import;
+ 
+ 	crt->reqsize = sizeof(struct shash_desc) + crypto_shash_descsize(shash);
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.4.2
+
