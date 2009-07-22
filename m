@@ -1,43 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: authenc - convert to ahash
-Date: Wed, 22 Jul 2009 15:52:00 +0800
-Message-ID: <20090722075200.GA30364@gondor.apana.org.au>
-References: <20090721090217.GF20288@secunet.com> <20090722070259.GA29808@gondor.apana.org.au> <20090722073211.GI20288@secunet.com>
+From: iCandy Soaps <udesign@icandysoaps.com>
+Subject: RE: Picture, Event or Logo?
+Date: Wed, 22 Jul 2009 05:19:18 -0400
+Message-ID: <200907220519.23w9r9A__24914.390865206$1248252623$gmane$org@eastlink.ca>
+Reply-To: udesign@icandysoaps.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 7BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:58283 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753122AbZGVHwD (ORCPT
+Received: from smtpout.eastlink.ca ([24.222.0.30]:39711 "EHLO
+	smtpout.eastlink.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756340AbZGVItW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Jul 2009 03:52:03 -0400
-Content-Disposition: inline
-In-Reply-To: <20090722073211.GI20288@secunet.com>
+	Wed, 22 Jul 2009 04:49:22 -0400
+Received: from ip01.eastlink.ca ([24.222.39.10])
+ by mta01.eastlink.ca (Sun Java System Messaging Server 6.2-4.03 (built Sep 22
+ 2005)) with ESMTP id <0KN6008EYCG9RB93@mta01.eastlink.ca> for
+ linux-crypto@vger.kernel.org; Wed, 22 Jul 2009 05:19:21 -0300 (ADT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 22, 2009 at 09:32:11AM +0200, Steffen Klassert wrote:
-> On Wed, Jul 22, 2009 at 03:02:59PM +0800, Herbert Xu wrote:
-> > On Tue, Jul 21, 2009 at 11:02:17AM +0200, Steffen Klassert wrote:
-> > >
-> > > +	err = crypto_ahash_finup(ahreq);
-> > > +	if (err == -EINPROGRESS)
-> > > +		return;
-> > 
-> > This is redundant.  All completion functions must expect to be
-> > called with EINPROGRESS followed by the actual completion later.
-> 
-> I copied this from crypto_authenc_encrypt_done(), so this is probaply
-> redundant too. If so, I'd send a patch to remove the already existing
-> checks too and put the updated ahash convertion patch on top of it.
+Hello,
 
-Hmm this check doesn't exist in my tree.
+We can put your picture, event or logo in soap for promotional or personal purposes!  Please check out these cool cleaning options at http://www.icandysoaps.com and don't forget while you're there to enter our FREE giveaway for your chance to win your very own custom designed soaps!!!
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thank you for your time, and have a great day!
+
+Sincerely,
+Matthew
+www.icandysoaps.com
+udesign@icandysoaps.com
+
+*If you wish to unsubscribe from future mailings, please reply to this email leaving the subject line intact.
+
