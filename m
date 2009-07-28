@@ -1,16 +1,44 @@
-From: vivianofferplc013@mchsi.com
-Subject: (unknown)
-Date: Mon, 27 Jul 2009 16:23:28 +0000
-Message-ID: <072720091623.22303.4A6DD48000049FB90000571F223045151403010CD2079C080C03BFCCCECF0C049F9D0A000001020E07900790__953.574400819157$1248711876$gmane$org@mchsi.com>
-To: unlisted-recipients:; (no To-header on input)
+From: Nico Erfurth <ne@erfurth.eu>
+Subject: Padlock with VIA Nano still crashing
+Date: Tue, 28 Jul 2009 10:26:54 +0200
+Message-ID: <4A6EB64E.3040209@erfurth.eu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sccmmhc92.asp.att.net ([204.127.203.212]:52202 "EHLO
-	sccmmhc92.asp.att.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752001AbZG0QYU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Jul 2009 12:24:20 -0400
+Received: from mail.erfurth.eu ([89.107.64.155]:50946 "EHLO mail.erfurth.eu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751597AbZG1Iw4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 28 Jul 2009 04:52:56 -0400
+Received: from port-83-236-8-194.dynamic.qsc.de ([83.236.8.194] helo=[192.168.178.35])
+	by mail.erfurth.eu with esmtpsa (TLSv1:DHE-RSA-AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <ne@erfurth.eu>)
+	id 1MVi1P-0008Ew-9q
+	for linux-crypto@vger.kernel.org; Tue, 28 Jul 2009 10:26:59 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a Financial Service Announcement, we offer loan to all in need,ranging from $5000 to $800,000.00 USD. Our interest rate is 3% and our service and terms are dependable. any interested person should apply via email:lapoloanlender@gmail.com
+Hi,
 
+I've tried to setup a fileserver with a Via Nano board (Jetway 
+NF77-N1G6) to use it's Padlock encryption engine. All works fine with 
+the software encryption, but when I try to use the Padlock driver I get 
+sporadic crashes while reading and writing on my encrypted device.
+
+I can't provide the crashdump right now, because the machine itself is 
+not useable after the crash anymore. Whatever I try to do after the 
+kernel panic just results in another panic.
+
+But I've compared the message with the sourcecode and it seems to point 
+to the "repz xcrypt-ecb" command used by aes_encrypt.
+
+I've tried the latest cryptodev-2.6 and linux-2.6 (2.6.31-rc4) same 
+problem with both versions. (Which include fixes for the Via Nano)
+
+Does anybody have an idea how I could get the crashdump so I can send it 
+to the list? If there is no other way I'll write it down next time.
+
+Regards,
+Nico
