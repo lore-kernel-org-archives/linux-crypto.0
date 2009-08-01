@@ -1,53 +1,39 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Re: Re: NULL data pointer dereference in kcryptd
-Date: Sat, 01 Aug 2009 11:04:11 +0200
-Message-ID: <4A74050B.6080608@redhat.com>
-References: <200907312254.45630.mb@bu3sch.de>
-	<20090801002708.GA6292@gondor.apana.org.au>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+From: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
+Subject: Re: [PATCH] arm/orion5x: add sram support for crypto
+Date: Sat, 1 Aug 2009 11:38:03 +0200
+Message-ID: <20090801093803.GA2362@Chamillionaire.breakpoint.cc>
+References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc> <1244728999-8103-2-git-send-email-arm-kernel@ml.breakpoint.cc> <alpine.LFD.2.00.0906111513420.31536@xanadu.home> <20090611201530.GA11486@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111625280.31536@xanadu.home> <20090611210734.GA11920@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111712060.31536@xanadu.home>
+Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: device-mapper development <dm-devel@redhat.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Michael Buesch <mb@bu3sch.de>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20090801002708.GA6292@gondor.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Nicolas Pitre <nico@cam.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60474 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751505AbZHAJiS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 1 Aug 2009 05:38:18 -0400
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.00.0906111712060.31536@xanadu.home>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> On Fri, Jul 31, 2009 at 10:54:45PM +0200, Michael Buesch wrote:
->> [15577.988608] NIP [c0000000000b8034] .mempool_alloc+0x74/0x1a0
->> [15577.988614] LR [c000000000139bdc] .bio_alloc_bioset+0x4c/0x130
->> [15577.988616] Call Trace:
->> [15577.988619] [c0000001f022fb60] [c0000001f022fbf0] 0xc0000001f022fbf0 (unreliable)
->> [15577.988625] [c0000001f022fc40] [c000000000139bdc] .bio_alloc_bioset+0x4c/0x130
->> [15577.988632] [c0000001f022fcf0] [c0000000005334a0] .kcryptd_crypt+0x210/0x520
->> [15577.988637] [c0000001f022fde0] [c000000000068018] .worker_thread+0x248/0x3e0
->> [15577.988642] [c0000001f022ff00] [c00000000006e1e4] .kthread+0x84/0xe0
->> [15577.988648] [c0000001f022ff90] [c000000000021830] .kernel_thread+0x54/0x70
+* Nicolas Pitre | 2009-06-11 17:19:22 [-0400]:
 
-That seems like mempool is NULL in bio_alloc_bioset. That mempool/bioset is destroyed only
-when crypt mapping is destroyed, after workqueue is flushed, so it should not happen...
+>I have no problem with you submitting it now.  It is not complete yet 
+>but what is there is plenty functional.  However I'd prefer if you used 
+>the API based on sg_copy_buffer() which includes a call to 
+>flush_kernel_dcache_page() already for mainline inclusion, so to have 
+>good style up front. ( a patch to fix flush_kernel_dcache_page() on ARM 
+>is already queued).
+I just wanted to let you know, that since -rc5 I have the needful change
+in sg code [0]. On the other hand I have the IDMA somehow working so I
+probably should sit my ass down and make it work with cesa...
 
-Which command did you exactly run to trigger this? only sync & mkfs on existing
-LUKS device or there was also some cryptsetup luksClose (or something removing
-mapping) before?
+[0] http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=6de7e356faf54aa75de5b624bbce28a5b776dfa8
 
-> kcryptd actually belongs to drivers/md/dm-crypt.c.  So please post
-> to the DM list.
+>Nicolas
 
-yes, this is dm-crypt or block layer problem. But I read linux-crypto list too:-)
-
-Milan
---
-mbroz@redhat.com
+Sebastian
