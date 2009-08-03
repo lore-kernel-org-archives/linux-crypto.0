@@ -1,900 +1,840 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH -v2 2/5] crypto: Use GHASH digest algorithm in GCM
-Date: Mon,  3 Aug 2009 15:45:28 +0800
-Message-ID: <1249285531-22422-2-git-send-email-ying.huang@intel.com>
-References: <1249285531-22422-1-git-send-email-ying.huang@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Huang Ying <ying.huang@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1752966AbZHCHqd@vger.kernel.org>
-In-Reply-To: <1249285531-22422-1-git-send-email-ying.huang@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
+Subject: [PATCH v3] crypto: add support for Orion5X crypto engine
+Date: Mon, 3 Aug 2009 18:57:50 +0200
+Message-ID: <20090803165750.GB17083@Chamillionaire.breakpoint.cc>
+References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc> <1244728999-8103-2-git-send-email-arm-kernel@ml.breakpoint.cc> <alpine.LFD.2.00.0906111513420.31536@xanadu.home> <20090611201530.GA11486@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111625280.31536@xanadu.home> <20090611210734.GA11920@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111712060.31536@xanadu.home> <20090801093803.GA2362@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0908021008450.3066@xanadu.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=unknown-8bit
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+	linux-crypto@vger.kernel.org, Nicolas Pitre <nico@cam.org>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:42884 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754902AbZHCQ56 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2009 12:57:58 -0400
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.00.0908021008450.3066@xanadu.home>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the dedicated GHASH implementation in GCM, and uses the GHASH
-digest algorithm instead. This will make GCM uses hardware accelerated
-GHASH implementation automatically if available.
+=46rom: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-ahash instead of shash interface is used, because some hardware
-accelerated GHASH implementation needs asynchronous interface.
+This adds support for Marvell's Cryptographic Engines and Security
+Accelerator (CESA) which can be found on a few SoC.
+Tested with dm-crypt.
 
-v2:
- - Add parameter to gcm_base to choose ghash implementation.
- - Fix a memory leak about gcm_zeros (Thanks Sebastian)
- - Some minor fixes
-
-Signed-off-by: Huang Ying <ying.huang@intel.com>
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 ---
- crypto/Kconfig |    2 +-
- crypto/gcm.c   |  580 +++++++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 408 insertions(+), 174 deletions(-)
+* Nicolas Pitre | 2009-08-02 10:14:57 [-0400]:
+>Please submit it with the sg as is.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0ae170e..5105cf1 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -157,7 +157,7 @@ config CRYPTO_GCM
- 	tristate "GCM/GMAC support"
- 	select CRYPTO_CTR
- 	select CRYPTO_AEAD
--	select CRYPTO_GF128MUL
-+	select CRYPTO_GHASH
- 	help
- 	  Support for Galois/Counter Mode (GCM) and Galois Message
- 	  Authentication Code (GMAC). Required for IPSec.
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index e70afd0..5fc3292 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -11,7 +11,10 @@
- #include <crypto/gf128mul.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/internal/hash.h>
- #include <crypto/scatterwalk.h>
-+#include <crypto/hash.h>
-+#include "internal.h"
- #include <linux/completion.h>
- #include <linux/err.h>
- #include <linux/init.h>
-@@ -21,11 +24,12 @@
- 
- struct gcm_instance_ctx {
- 	struct crypto_skcipher_spawn ctr;
-+	struct crypto_ahash_spawn ghash;
- };
- 
- struct crypto_gcm_ctx {
- 	struct crypto_ablkcipher *ctr;
--	struct gf128mul_4k *gf128;
-+	struct crypto_ahash *ghash;
- };
- 
- struct crypto_rfc4106_ctx {
-@@ -34,10 +38,9 @@ struct crypto_rfc4106_ctx {
- };
- 
- struct crypto_gcm_ghash_ctx {
--	u32 bytes;
--	u32 flags;
--	struct gf128mul_4k *gf128;
--	u8 buffer[16];
-+	unsigned int cryptlen;
-+	struct scatterlist *src;
-+	crypto_completion_t complete;
- };
- 
- struct crypto_gcm_req_priv_ctx {
-@@ -45,8 +48,11 @@ struct crypto_gcm_req_priv_ctx {
- 	u8 iauth_tag[16];
- 	struct scatterlist src[2];
- 	struct scatterlist dst[2];
--	struct crypto_gcm_ghash_ctx ghash;
--	struct ablkcipher_request abreq;
-+	struct crypto_gcm_ghash_ctx ghash_ctx;
-+	union {
-+		struct ahash_request ahreq;
-+		struct ablkcipher_request abreq;
-+	} u;
- };
- 
- struct crypto_gcm_setkey_result {
-@@ -54,6 +60,8 @@ struct crypto_gcm_setkey_result {
- 	struct completion completion;
- };
- 
-+static void *gcm_zeroes;
+Okay, here it is. The change is really minimal: flush_dcache out,
+SG_MITER_FROM_SG & SG_MITER_TO_SG in. Those slipped in just before -rc5=
+=2E
+
+Herbert: are in good mood? Good enough to submit this new driver in 31?
+
+ drivers/crypto/Kconfig   |   13 +
+ drivers/crypto/Makefile  |    1 +
+ drivers/crypto/mv_cesa.c |  606 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+ drivers/crypto/mv_cesa.h |  119 +++++++++
+ 4 files changed, 739 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/crypto/mv_cesa.c
+ create mode 100644 drivers/crypto/mv_cesa.h
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 5b27692..c463896 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -157,6 +157,19 @@ config S390_PRNG
+ 	  ANSI X9.17 standard. The PRNG is usable via the char device
+ 	  /dev/prandom.
+=20
++config CRYPTO_DEV_MV_CESA
++	tristate "Marvell's Cryptographic Engine"
++	depends on PLAT_ORION
++	select CRYPTO_ALGAPI
++	select CRYPTO_AES
++	select CRYPTO_BLKCIPHER2
++	help
++	  This driver allows you utilize the Cryptographic Engines and Securi=
+ty
++	  Accelerator (CESA) which can be found on certain SoC like QNAP's
++	  TS-209.
 +
- static inline struct crypto_gcm_req_priv_ctx *crypto_gcm_reqctx(
- 	struct aead_request *req)
- {
-@@ -62,113 +70,6 @@ static inline struct crypto_gcm_req_priv_ctx *crypto_gcm_reqctx(
- 	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
- }
- 
--static void crypto_gcm_ghash_init(struct crypto_gcm_ghash_ctx *ctx, u32 flags,
--				  struct gf128mul_4k *gf128)
--{
--	ctx->bytes = 0;
--	ctx->flags = flags;
--	ctx->gf128 = gf128;
--	memset(ctx->buffer, 0, 16);
--}
--
--static void crypto_gcm_ghash_update(struct crypto_gcm_ghash_ctx *ctx,
--				    const u8 *src, unsigned int srclen)
--{
--	u8 *dst = ctx->buffer;
--
--	if (ctx->bytes) {
--		int n = min(srclen, ctx->bytes);
--		u8 *pos = dst + (16 - ctx->bytes);
--
--		ctx->bytes -= n;
--		srclen -= n;
--
--		while (n--)
--			*pos++ ^= *src++;
--
--		if (!ctx->bytes)
--			gf128mul_4k_lle((be128 *)dst, ctx->gf128);
--	}
--
--	while (srclen >= 16) {
--		crypto_xor(dst, src, 16);
--		gf128mul_4k_lle((be128 *)dst, ctx->gf128);
--		src += 16;
--		srclen -= 16;
--	}
--
--	if (srclen) {
--		ctx->bytes = 16 - srclen;
--		while (srclen--)
--			*dst++ ^= *src++;
--	}
--}
--
--static void crypto_gcm_ghash_update_sg(struct crypto_gcm_ghash_ctx *ctx,
--				       struct scatterlist *sg, int len)
--{
--	struct scatter_walk walk;
--	u8 *src;
--	int n;
--
--	if (!len)
--		return;
--
--	scatterwalk_start(&walk, sg);
--
--	while (len) {
--		n = scatterwalk_clamp(&walk, len);
--
--		if (!n) {
--			scatterwalk_start(&walk, scatterwalk_sg_next(walk.sg));
--			n = scatterwalk_clamp(&walk, len);
--		}
--
--		src = scatterwalk_map(&walk, 0);
--
--		crypto_gcm_ghash_update(ctx, src, n);
--		len -= n;
--
--		scatterwalk_unmap(src, 0);
--		scatterwalk_advance(&walk, n);
--		scatterwalk_done(&walk, 0, len);
--		if (len)
--			crypto_yield(ctx->flags);
--	}
--}
--
--static void crypto_gcm_ghash_flush(struct crypto_gcm_ghash_ctx *ctx)
--{
--	u8 *dst = ctx->buffer;
--
--	if (ctx->bytes) {
--		u8 *tmp = dst + (16 - ctx->bytes);
--
--		while (ctx->bytes--)
--			*tmp++ ^= 0;
--
--		gf128mul_4k_lle((be128 *)dst, ctx->gf128);
--	}
--
--	ctx->bytes = 0;
--}
--
--static void crypto_gcm_ghash_final_xor(struct crypto_gcm_ghash_ctx *ctx,
--				       unsigned int authlen,
--				       unsigned int cryptlen, u8 *dst)
--{
--	u8 *buf = ctx->buffer;
--	u128 lengths;
--
--	lengths.a = cpu_to_be64(authlen * 8);
--	lengths.b = cpu_to_be64(cryptlen * 8);
--
--	crypto_gcm_ghash_flush(ctx);
--	crypto_xor(buf, (u8 *)&lengths, 16);
--	gf128mul_4k_lle((be128 *)buf, ctx->gf128);
--	crypto_xor(dst, buf, 16);
--}
--
- static void crypto_gcm_setkey_done(struct crypto_async_request *req, int err)
- {
- 	struct crypto_gcm_setkey_result *result = req->data;
-@@ -184,6 +85,7 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 			     unsigned int keylen)
- {
- 	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
-+	struct crypto_ahash *ghash = ctx->ghash;
- 	struct crypto_ablkcipher *ctr = ctx->ctr;
- 	struct {
- 		be128 hash;
-@@ -233,13 +135,12 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 	if (err)
- 		goto out;
- 
--	if (ctx->gf128 != NULL)
--		gf128mul_free_4k(ctx->gf128);
--
--	ctx->gf128 = gf128mul_init_4k_lle(&data->hash);
--
--	if (ctx->gf128 == NULL)
--		err = -ENOMEM;
-+	crypto_ahash_clear_flags(ghash, CRYPTO_TFM_REQ_MASK);
-+	crypto_ahash_set_flags(ghash, crypto_aead_get_flags(aead) &
-+			       CRYPTO_TFM_REQ_MASK);
-+	err = crypto_ahash_setkey(ghash, (u8 *)&data->hash, sizeof(be128));
-+	crypto_aead_set_flags(aead, crypto_ahash_get_flags(ghash) &
-+			      CRYPTO_TFM_RES_MASK);
- 
- out:
- 	kfree(data);
-@@ -272,8 +173,6 @@ static void crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_gcm_ctx *ctx = crypto_aead_ctx(aead);
- 	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
--	u32 flags = req->base.tfm->crt_flags;
--	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
- 	struct scatterlist *dst;
- 	__be32 counter = cpu_to_be32(1);
- 
-@@ -296,108 +195,398 @@ static void crypto_gcm_init_crypt(struct ablkcipher_request *ablk_req,
- 	ablkcipher_request_set_crypt(ablk_req, pctx->src, dst,
- 				     cryptlen + sizeof(pctx->auth_tag),
- 				     req->iv);
-+}
++	  Currently the driver supports AES in ECB and CBC mode without DMA.
 +
-+static inline unsigned int gcm_remain(unsigned int len)
+ config CRYPTO_DEV_HIFN_795X
+ 	tristate "Driver HIFN 795x crypto accelerator chips"
+ 	select CRYPTO_DES
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 9bf4a2b..6ffcb3f 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -2,6 +2,7 @@ obj-$(CONFIG_CRYPTO_DEV_PADLOCK_AES) +=3D padlock-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_PADLOCK_SHA) +=3D padlock-sha.o
+ obj-$(CONFIG_CRYPTO_DEV_GEODE) +=3D geode-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) +=3D hifn_795x.o
++obj-$(CONFIG_CRYPTO_DEV_MV_CESA) +=3D mv_cesa.o
+ obj-$(CONFIG_CRYPTO_DEV_TALITOS) +=3D talitos.o
+ obj-$(CONFIG_CRYPTO_DEV_IXP4XX) +=3D ixp4xx_crypto.o
+ obj-$(CONFIG_CRYPTO_DEV_PPC4XX) +=3D amcc/
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+new file mode 100644
+index 0000000..f28502c
+--- /dev/null
++++ b/drivers/crypto/mv_cesa.c
+@@ -0,0 +1,606 @@
++/*
++ * Support for Marvell's crypto engine which can be found on some Orio=
+n5X
++ * boards.
++ *
++ * Author: Sebastian Andrzej Siewior < sebastian at breakpoint dot cc =
+>
++ * License: GPL
++ *
++ */
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <linux/crypto.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/kthread.h>
++#include <linux/platform_device.h>
++#include <linux/scatterlist.h>
++
++#include "mv_cesa.h"
++/*
++ * STM:
++ *   /---------------------------------------\
++ *   |					     | request complete
++ *  \./					     |
++ * IDLE -> new request -> BUSY -> done -> DEQUEUE
++ *                         /=C2=B0\               |
++ *			    |		     | more scatter entries
++ *			    \________________/
++ */
++enum engine_status {
++	ENGINE_IDLE,
++	ENGINE_BUSY,
++	ENGINE_W_DEQUEUE,
++};
++
++/**
++ * struct req_progress - used for every crypt request
++ * @src_sg_it:		sg iterator for src
++ * @dst_sg_it:		sg iterator for dst
++ * @sg_src_left:	bytes left in src to process (scatter list)
++ * @src_start:		offset to add to src start position (scatter list)
++ * @crypt_len:		length of current crypt process
++ * @sg_dst_left:	bytes left dst to process in this scatter list
++ * @dst_start:		offset to add to dst start position (scatter list)
++ * @total_req_bytes:	total number of bytes processed (request).
++ *
++ * sg helper are used to iterate over the scatterlist. Since the size =
+of the
++ * SRAM may be less than the scatter size, this struct struct is used =
+to keep
++ * track of progress within current scatterlist.
++ */
++struct req_progress {
++	struct sg_mapping_iter src_sg_it;
++	struct sg_mapping_iter dst_sg_it;
++
++	/* src mostly */
++	int sg_src_left;
++	int src_start;
++	int crypt_len;
++	/* dst mostly */
++	int sg_dst_left;
++	int dst_start;
++	int total_req_bytes;
++};
++
++struct crypto_priv {
++	void __iomem *reg;
++	void __iomem *sram;
++	int irq;
++	struct task_struct *queue_th;
++
++	/* the lock protects queue and eng_st */
++	spinlock_t lock;
++	struct crypto_queue queue;
++	enum engine_status eng_st;
++	struct ablkcipher_request *cur_req;
++	struct req_progress p;
++	int max_req_size;
++	int sram_size;
++};
++
++static struct crypto_priv *cpg;
++
++struct mv_ctx {
++	u8 aes_enc_key[AES_KEY_LEN];
++	u32 aes_dec_key[8];
++	int key_len;
++	u32 need_calc_aes_dkey;
++};
++
++enum crypto_op {
++	COP_AES_ECB,
++	COP_AES_CBC,
++};
++
++struct mv_req_ctx {
++	enum crypto_op op;
++	int decrypt;
++};
++
++static void compute_aes_dec_key(struct mv_ctx *ctx)
 +{
-+	len &= 0xfU;
-+	return len ? 16 - len : 0;
-+}
++	struct crypto_aes_ctx gen_aes_key;
++	int key_pos;
 +
-+static void gcm_hash_len_done(struct crypto_async_request *areq, int err);
-+static void gcm_hash_final_done(struct crypto_async_request *areq, int err);
- 
--	crypto_gcm_ghash_init(ghash, flags, ctx->gf128);
-+static int gcm_hash_update(struct aead_request *req,
-+			   struct crypto_gcm_req_priv_ctx *pctx,
-+			   crypto_completion_t complete,
-+			   struct scatterlist *src,
-+			   unsigned int len)
-+{
-+	struct ahash_request *ahreq = &pctx->u.ahreq;
- 
--	crypto_gcm_ghash_update_sg(ghash, req->assoc, req->assoclen);
--	crypto_gcm_ghash_flush(ghash);
-+	ahash_request_set_callback(ahreq, aead_request_flags(req),
-+				   complete, req);
-+	ahash_request_set_crypt(ahreq, src, NULL, len);
++	if (!ctx->need_calc_aes_dkey)
++		return;
 +
-+	return crypto_ahash_update(ahreq);
- }
- 
--static int crypto_gcm_hash(struct aead_request *req)
-+static int gcm_hash_remain(struct aead_request *req,
-+			   struct crypto_gcm_req_priv_ctx *pctx,
-+			   unsigned int remain,
-+			   crypto_completion_t complete)
- {
--	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct ahash_request *ahreq = &pctx->u.ahreq;
++	crypto_aes_expand_key(&gen_aes_key, ctx->aes_enc_key, ctx->key_len);
 +
-+	ahash_request_set_callback(ahreq, aead_request_flags(req),
-+				   complete, req);
-+	sg_init_one(pctx->src, gcm_zeroes, remain);
-+	ahash_request_set_crypt(ahreq, pctx->src, NULL, remain);
-+
-+	return crypto_ahash_update(ahreq);
-+}
-+
-+static int gcm_hash_len(struct aead_request *req,
-+			struct crypto_gcm_req_priv_ctx *pctx)
-+{
-+	struct ahash_request *ahreq = &pctx->u.ahreq;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+	u128 lengths;
-+
-+	lengths.a = cpu_to_be64(req->assoclen * 8);
-+	lengths.b = cpu_to_be64(gctx->cryptlen * 8);
-+	memcpy(pctx->iauth_tag, &lengths, 16);
-+	sg_init_one(pctx->src, pctx->iauth_tag, 16);
-+	ahash_request_set_callback(ahreq, aead_request_flags(req),
-+				   gcm_hash_len_done, req);
-+	ahash_request_set_crypt(ahreq, pctx->src,
-+				NULL, sizeof(lengths));
-+
-+	return crypto_ahash_update(ahreq);
-+}
-+
-+static int gcm_hash_final(struct aead_request *req,
-+			  struct crypto_gcm_req_priv_ctx *pctx)
-+{
-+	struct ahash_request *ahreq = &pctx->u.ahreq;
-+
-+	ahash_request_set_callback(ahreq, aead_request_flags(req),
-+				   gcm_hash_final_done, req);
-+	ahash_request_set_crypt(ahreq, NULL, pctx->iauth_tag, 0);
-+
-+	return crypto_ahash_final(ahreq);
-+}
-+
-+static void gcm_hash_final_done(struct crypto_async_request *areq,
-+				int err)
-+{
-+	struct aead_request *req = areq->data;
- 	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
--	u8 *auth_tag = pctx->auth_tag;
--	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+
-+	if (!err)
-+		crypto_xor(pctx->auth_tag, pctx->iauth_tag, 16);
- 
--	crypto_gcm_ghash_update_sg(ghash, req->dst, req->cryptlen);
--	crypto_gcm_ghash_final_xor(ghash, req->assoclen, req->cryptlen,
--				   auth_tag);
-+	gctx->complete(areq, err);
-+}
-+
-+static void gcm_hash_len_done(struct crypto_async_request *areq,
-+			      int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+
-+	if (!err) {
-+		err = gcm_hash_final(req, pctx);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
++	key_pos =3D ctx->key_len + 24;
++	memcpy(ctx->aes_dec_key, &gen_aes_key.key_enc[key_pos], 4 * 4);
++	switch (ctx->key_len) {
++	case AES_KEYSIZE_256:
++		key_pos -=3D 2;
++		/* fall */
++	case AES_KEYSIZE_192:
++		key_pos -=3D 2;
++		memcpy(&ctx->aes_dec_key[4], &gen_aes_key.key_enc[key_pos],
++				4 * 4);
++		break;
 +	}
-+
-+	gcm_hash_final_done(areq, err);
++	ctx->need_calc_aes_dkey =3D 0;
 +}
 +
-+static void gcm_hash_crypt_remain_done(struct crypto_async_request *areq,
-+				       int err)
++static int mv_setkey_aes(struct crypto_ablkcipher *cipher, const u8 *k=
+ey,
++		unsigned int len)
 +{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
++	struct crypto_tfm *tfm =3D crypto_ablkcipher_tfm(cipher);
++	struct mv_ctx *ctx =3D crypto_tfm_ctx(tfm);
 +
-+	if (!err) {
-+		err = gcm_hash_len(req, pctx);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
++	switch (len) {
++	case AES_KEYSIZE_128:
++	case AES_KEYSIZE_192:
++	case AES_KEYSIZE_256:
++		break;
++	default:
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
 +	}
++	ctx->key_len =3D len;
++	ctx->need_calc_aes_dkey =3D 1;
 +
-+	gcm_hash_len_done(areq, err);
-+}
-+
-+static void gcm_hash_crypt_done(struct crypto_async_request *areq,
-+				int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+	unsigned int remain;
-+
-+	if (!err) {
-+		remain = gcm_remain(gctx->cryptlen);
-+		BUG_ON(!remain);
-+		err = gcm_hash_remain(req, pctx, remain,
-+				      gcm_hash_crypt_remain_done);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
-+	}
-+
-+	gcm_hash_crypt_remain_done(areq, err);
-+}
-+
-+static void gcm_hash_assoc_remain_done(struct crypto_async_request *areq,
-+					   int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+	crypto_completion_t complete;
-+	unsigned int remain = 0;
-+
-+	if (!err && gctx->cryptlen) {
-+		remain = gcm_remain(gctx->cryptlen);
-+		complete = remain ? gcm_hash_crypt_done :
-+			gcm_hash_crypt_remain_done;
-+		err = gcm_hash_update(req, pctx, complete,
-+				      gctx->src, gctx->cryptlen);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
-+	}
-+
-+	if (remain)
-+		gcm_hash_crypt_done(areq, err);
-+	else
-+		gcm_hash_crypt_remain_done(areq, err);
-+}
-+
-+static void gcm_hash_assoc_done(struct crypto_async_request *areq,
-+				int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+	unsigned int remain;
-+
-+	if (!err) {
-+		remain = gcm_remain(req->assoclen);
-+		BUG_ON(!remain);
-+		err = gcm_hash_remain(req, pctx, remain,
-+				      gcm_hash_assoc_remain_done);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
-+	}
-+
-+	gcm_hash_assoc_remain_done(areq, err);
-+}
-+
-+static void gcm_hash_init_done(struct crypto_async_request *areq,
-+			       int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+	crypto_completion_t complete;
-+	unsigned int remain = 0;
-+
-+	if (!err && req->assoclen) {
-+		remain = gcm_remain(req->assoclen);
-+		complete = remain ? gcm_hash_assoc_done :
-+			gcm_hash_assoc_remain_done;
-+		err = gcm_hash_update(req, pctx, complete,
-+				      req->assoc, req->assoclen);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
-+	}
-+
-+	if (remain)
-+		gcm_hash_assoc_done(areq, err);
-+	else
-+		gcm_hash_assoc_remain_done(areq, err);
-+}
-+
-+static int gcm_hash(struct aead_request *req,
-+		    struct crypto_gcm_req_priv_ctx *pctx)
-+{
-+	struct ahash_request *ahreq = &pctx->u.ahreq;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+	struct crypto_gcm_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	unsigned int remain;
-+	crypto_completion_t complete;
-+	int err;
-+
-+	ahash_request_set_tfm(ahreq, ctx->ghash);
-+
-+	ahash_request_set_callback(ahreq, aead_request_flags(req),
-+				   gcm_hash_init_done, req);
-+	err = crypto_ahash_init(ahreq);
-+	if (err)
-+		return err;
-+	remain = gcm_remain(req->assoclen);
-+	complete = remain ? gcm_hash_assoc_done : gcm_hash_assoc_remain_done;
-+	err = gcm_hash_update(req, pctx, complete, req->assoc, req->assoclen);
-+	if (err)
-+		return err;
-+	if (remain) {
-+		err = gcm_hash_remain(req, pctx, remain,
-+				      gcm_hash_assoc_remain_done);
-+		if (err)
-+			return err;
-+	}
-+	remain = gcm_remain(gctx->cryptlen);
-+	complete = remain ? gcm_hash_crypt_done : gcm_hash_crypt_remain_done;
-+	err = gcm_hash_update(req, pctx, complete, gctx->src, gctx->cryptlen);
-+	if (err)
-+		return err;
-+	if (remain) {
-+		err = gcm_hash_remain(req, pctx, remain,
-+				      gcm_hash_crypt_remain_done);
-+		if (err)
-+			return err;
-+	}
-+	err = gcm_hash_len(req, pctx);
-+	if (err)
-+		return err;
-+	err = gcm_hash_final(req, pctx);
-+	if (err)
-+		return err;
-+
++	memcpy(ctx->aes_enc_key, key, AES_KEY_LEN);
 +	return 0;
 +}
 +
-+static void gcm_enc_copy_hash(struct aead_request *req,
-+			      struct crypto_gcm_req_priv_ctx *pctx)
++static void setup_data_in(struct ablkcipher_request *req)
 +{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	u8 *auth_tag = pctx->auth_tag;
- 
- 	scatterwalk_map_and_copy(auth_tag, req->dst, req->cryptlen,
- 				 crypto_aead_authsize(aead), 1);
--	return 0;
- }
- 
--static void crypto_gcm_encrypt_done(struct crypto_async_request *areq, int err)
-+static void gcm_enc_hash_done(struct crypto_async_request *areq,
-+				     int err)
- {
- 	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
- 
- 	if (!err)
--		err = crypto_gcm_hash(req);
-+		gcm_enc_copy_hash(req, pctx);
- 
- 	aead_request_complete(req, err);
- }
- 
-+static void gcm_encrypt_done(struct crypto_async_request *areq,
-+				     int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
++	int ret;
++	void *buf;
 +
-+	if (!err) {
-+		err = gcm_hash(req, pctx);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
++	if (!cpg->p.sg_src_left) {
++		ret =3D sg_miter_next(&cpg->p.src_sg_it);
++		BUG_ON(!ret);
++		cpg->p.sg_src_left =3D cpg->p.src_sg_it.length;
++		cpg->p.src_start =3D 0;
 +	}
 +
-+	gcm_enc_hash_done(areq, err);
++	cpg->p.crypt_len =3D min(cpg->p.sg_src_left, cpg->max_req_size);
++
++	buf =3D cpg->p.src_sg_it.addr;
++	buf +=3D cpg->p.src_start;
++
++	memcpy(cpg->sram + SRAM_DATA_IN_START, buf, cpg->p.crypt_len);
++
++	cpg->p.sg_src_left -=3D cpg->p.crypt_len;
++	cpg->p.src_start +=3D cpg->p.crypt_len;
 +}
 +
- static int crypto_gcm_encrypt(struct aead_request *req)
- {
- 	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
--	struct ablkcipher_request *abreq = &pctx->abreq;
-+	struct ablkcipher_request *abreq = &pctx->u.abreq;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
- 	int err;
- 
- 	crypto_gcm_init_crypt(abreq, req, req->cryptlen);
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
--					crypto_gcm_encrypt_done, req);
-+					gcm_encrypt_done, req);
++static void mv_process_current_q(int first_block)
++{
++	struct ablkcipher_request *req =3D cpg->cur_req;
++	struct mv_ctx *ctx =3D crypto_tfm_ctx(req->base.tfm);
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
++	struct sec_accel_config op;
 +
-+	gctx->src = req->dst;
-+	gctx->cryptlen = req->cryptlen;
-+	gctx->complete = gcm_enc_hash_done;
- 
- 	err = crypto_ablkcipher_encrypt(abreq);
- 	if (err)
- 		return err;
- 
--	return crypto_gcm_hash(req);
-+	err = gcm_hash(req, pctx);
-+	if (err)
-+		return err;
++	switch (req_ctx->op) {
++	case COP_AES_ECB:
++		op.config =3D CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_ECB;
++		break;
++	case COP_AES_CBC:
++		op.config =3D CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_CBC;
++		op.enc_iv =3D ENC_IV_POINT(SRAM_DATA_IV) |
++			ENC_IV_BUF_POINT(SRAM_DATA_IV_BUF);
++		if (first_block)
++			memcpy(cpg->sram + SRAM_DATA_IV, req->info, 16);
++		break;
++	}
++	if (req_ctx->decrypt) {
++		op.config |=3D CFG_DIR_DEC;
++		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_dec_key,
++				AES_KEY_LEN);
++	} else {
++		op.config |=3D CFG_DIR_ENC;
++		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_enc_key,
++				AES_KEY_LEN);
++	}
 +
-+	crypto_xor(pctx->auth_tag, pctx->iauth_tag, 16);
-+	gcm_enc_copy_hash(req, pctx);
++	switch (ctx->key_len) {
++	case AES_KEYSIZE_128:
++		op.config |=3D CFG_AES_LEN_128;
++		break;
++	case AES_KEYSIZE_192:
++		op.config |=3D CFG_AES_LEN_192;
++		break;
++	case AES_KEYSIZE_256:
++		op.config |=3D CFG_AES_LEN_256;
++		break;
++	}
++	op.enc_p =3D ENC_P_SRC(SRAM_DATA_IN_START) |
++		ENC_P_DST(SRAM_DATA_OUT_START);
++	op.enc_key_p =3D SRAM_DATA_KEY_P;
 +
++	setup_data_in(req);
++	op.enc_len =3D cpg->p.crypt_len;
++	memcpy(cpg->sram + SRAM_CONFIG, &op,
++			sizeof(struct sec_accel_config));
++
++	writel(SRAM_CONFIG, cpg->reg + SEC_ACCEL_DESC_P0);
++	/* GO */
++	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
++
++	/*
++	 * XXX: add timer if the interrupt does not occur for some mystery
++	 * reason
++	 */
++}
++
++static void mv_crypto_algo_completion(void)
++{
++	struct ablkcipher_request *req =3D cpg->cur_req;
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
++
++	if (req_ctx->op !=3D COP_AES_CBC)
++		return ;
++
++	memcpy(req->info, cpg->sram + SRAM_DATA_IV_BUF, 16);
++}
++
++static void dequeue_complete_req(void)
++{
++	struct ablkcipher_request *req =3D cpg->cur_req;
++	void *buf;
++	int ret;
++
++	cpg->p.total_req_bytes +=3D cpg->p.crypt_len;
++	do {
++		int dst_copy;
++
++		if (!cpg->p.sg_dst_left) {
++			ret =3D sg_miter_next(&cpg->p.dst_sg_it);
++			BUG_ON(!ret);
++			cpg->p.sg_dst_left =3D cpg->p.dst_sg_it.length;
++			cpg->p.dst_start =3D 0;
++		}
++
++		buf =3D cpg->p.dst_sg_it.addr;
++		buf +=3D cpg->p.dst_start;
++
++		dst_copy =3D min(cpg->p.crypt_len, cpg->p.sg_dst_left);
++
++		memcpy(buf, cpg->sram + SRAM_DATA_OUT_START, dst_copy);
++
++		cpg->p.sg_dst_left -=3D dst_copy;
++		cpg->p.crypt_len -=3D dst_copy;
++		cpg->p.dst_start +=3D dst_copy;
++	} while (cpg->p.crypt_len > 0);
++
++	BUG_ON(cpg->eng_st !=3D ENGINE_W_DEQUEUE);
++	if (cpg->p.total_req_bytes < req->nbytes) {
++		/* process next scatter list entry */
++		cpg->eng_st =3D ENGINE_BUSY;
++		mv_process_current_q(0);
++	} else {
++		sg_miter_stop(&cpg->p.src_sg_it);
++		sg_miter_stop(&cpg->p.dst_sg_it);
++		mv_crypto_algo_completion();
++		cpg->eng_st =3D ENGINE_IDLE;
++		req->base.complete(&req->base, 0);
++	}
++}
++
++static int count_sgs(struct scatterlist *sl, unsigned int total_bytes)
++{
++	int i =3D 0;
++
++	do {
++		total_bytes -=3D sl[i].length;
++		i++;
++
++	} while (total_bytes > 0);
++
++	return i;
++}
++
++static void mv_enqueue_new_req(struct ablkcipher_request *req)
++{
++	int num_sgs;
++
++	cpg->cur_req =3D req;
++	memset(&cpg->p, 0, sizeof(struct req_progress));
++
++	num_sgs =3D count_sgs(req->src, req->nbytes);
++	sg_miter_start(&cpg->p.src_sg_it, req->src, num_sgs, SG_MITER_FROM_SG=
+);
++
++	num_sgs =3D count_sgs(req->dst, req->nbytes);
++	sg_miter_start(&cpg->p.dst_sg_it, req->dst, num_sgs, SG_MITER_TO_SG);
++	mv_process_current_q(1);
++}
++
++static int queue_manag(void *data)
++{
++	cpg->eng_st =3D ENGINE_IDLE;
++	do {
++		struct ablkcipher_request *req;
++		struct crypto_async_request *async_req =3D NULL;
++		struct crypto_async_request *backlog;
++
++		__set_current_state(TASK_INTERRUPTIBLE);
++
++		if (cpg->eng_st =3D=3D ENGINE_W_DEQUEUE)
++			dequeue_complete_req();
++
++		spin_lock_irq(&cpg->lock);
++		if (cpg->eng_st =3D=3D ENGINE_IDLE) {
++			backlog =3D crypto_get_backlog(&cpg->queue);
++			async_req =3D crypto_dequeue_request(&cpg->queue);
++			if (async_req) {
++				BUG_ON(cpg->eng_st !=3D ENGINE_IDLE);
++				cpg->eng_st =3D ENGINE_BUSY;
++			}
++		}
++		spin_unlock_irq(&cpg->lock);
++
++		if (backlog) {
++			backlog->complete(backlog, -EINPROGRESS);
++			backlog =3D NULL;
++		}
++
++		if (async_req) {
++			req =3D container_of(async_req,
++					struct ablkcipher_request, base);
++			mv_enqueue_new_req(req);
++			async_req =3D NULL;
++		}
++
++		schedule();
++
++	} while (!kthread_should_stop());
 +	return 0;
- }
- 
--static int crypto_gcm_verify(struct aead_request *req)
-+static int crypto_gcm_verify(struct aead_request *req,
-+			     struct crypto_gcm_req_priv_ctx *pctx)
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
--	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
--	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
- 	u8 *auth_tag = pctx->auth_tag;
- 	u8 *iauth_tag = pctx->iauth_tag;
- 	unsigned int authsize = crypto_aead_authsize(aead);
- 	unsigned int cryptlen = req->cryptlen - authsize;
- 
--	crypto_gcm_ghash_final_xor(ghash, req->assoclen, cryptlen, auth_tag);
--
--	authsize = crypto_aead_authsize(aead);
-+	crypto_xor(auth_tag, iauth_tag, 16);
- 	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
- 	return memcmp(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
- }
- 
--static void crypto_gcm_decrypt_done(struct crypto_async_request *areq, int err)
-+static void gcm_decrypt_done(struct crypto_async_request *areq, int err)
- {
- 	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
- 
- 	if (!err)
--		err = crypto_gcm_verify(req);
-+		err = crypto_gcm_verify(req, pctx);
- 
- 	aead_request_complete(req, err);
- }
- 
-+static void gcm_dec_hash_done(struct crypto_async_request *areq, int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
-+	struct ablkcipher_request *abreq = &pctx->u.abreq;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
-+
-+	if (!err) {
-+		ablkcipher_request_set_callback(abreq, aead_request_flags(req),
-+						gcm_decrypt_done, req);
-+		crypto_gcm_init_crypt(abreq, req, gctx->cryptlen);
-+		err = crypto_ablkcipher_decrypt(abreq);
-+		if (err == -EINPROGRESS || err == -EBUSY)
-+			return;
-+	}
-+
-+	gcm_decrypt_done(areq, err);
 +}
 +
- static int crypto_gcm_decrypt(struct aead_request *req)
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_gcm_req_priv_ctx *pctx = crypto_gcm_reqctx(req);
--	struct ablkcipher_request *abreq = &pctx->abreq;
--	struct crypto_gcm_ghash_ctx *ghash = &pctx->ghash;
--	unsigned int cryptlen = req->cryptlen;
-+	struct ablkcipher_request *abreq = &pctx->u.abreq;
-+	struct crypto_gcm_ghash_ctx *gctx = &pctx->ghash_ctx;
- 	unsigned int authsize = crypto_aead_authsize(aead);
-+	unsigned int cryptlen = req->cryptlen;
- 	int err;
- 
- 	if (cryptlen < authsize)
- 		return -EINVAL;
- 	cryptlen -= authsize;
- 
--	crypto_gcm_init_crypt(abreq, req, cryptlen);
--	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
--					crypto_gcm_decrypt_done, req);
-+	gctx->src = req->src;
-+	gctx->cryptlen = cryptlen;
-+	gctx->complete = gcm_dec_hash_done;
- 
--	crypto_gcm_ghash_update_sg(ghash, req->src, cryptlen);
-+	err = gcm_hash(req, pctx);
-+	if (err)
-+		return err;
- 
-+	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
-+					gcm_decrypt_done, req);
-+	crypto_gcm_init_crypt(abreq, req, cryptlen);
- 	err = crypto_ablkcipher_decrypt(abreq);
- 	if (err)
- 		return err;
- 
--	return crypto_gcm_verify(req);
-+	return crypto_gcm_verify(req, pctx);
- }
- 
- static int crypto_gcm_init_tfm(struct crypto_tfm *tfm)
-@@ -406,43 +595,56 @@ static int crypto_gcm_init_tfm(struct crypto_tfm *tfm)
- 	struct gcm_instance_ctx *ictx = crypto_instance_ctx(inst);
- 	struct crypto_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct crypto_ablkcipher *ctr;
-+	struct crypto_ahash *ghash;
- 	unsigned long align;
- 	int err;
- 
-+	ghash = crypto_spawn_ahash(&ictx->ghash);
-+	if (IS_ERR(ghash))
-+		return PTR_ERR(ghash);
++static int mv_handle_req(struct ablkcipher_request *req)
++{
++	unsigned long flags;
++	int ret;
 +
- 	ctr = crypto_spawn_skcipher(&ictx->ctr);
- 	err = PTR_ERR(ctr);
- 	if (IS_ERR(ctr))
--		return err;
-+		goto err_free_hash;
- 
- 	ctx->ctr = ctr;
--	ctx->gf128 = NULL;
-+	ctx->ghash = ghash;
- 
- 	align = crypto_tfm_alg_alignmask(tfm);
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
- 	tfm->crt_aead.reqsize = align +
--				sizeof(struct crypto_gcm_req_priv_ctx) +
--				crypto_ablkcipher_reqsize(ctr);
-+		offsetof(struct crypto_gcm_req_priv_ctx, u) +
-+		max(sizeof(struct ablkcipher_request) +
-+		    crypto_ablkcipher_reqsize(ctr),
-+		    sizeof(struct ahash_request) +
-+		    crypto_ahash_reqsize(ghash));
- 
- 	return 0;
++	spin_lock_irqsave(&cpg->lock, flags);
++	ret =3D ablkcipher_enqueue_request(&cpg->queue, req);
++	spin_unlock_irqrestore(&cpg->lock, flags);
++	wake_up_process(cpg->queue_th);
++	return ret;
++}
 +
-+err_free_hash:
-+	crypto_free_ahash(ghash);
-+	return err;
- }
- 
- static void crypto_gcm_exit_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	if (ctx->gf128 != NULL)
--		gf128mul_free_4k(ctx->gf128);
--
-+	crypto_free_ahash(ctx->ghash);
- 	crypto_free_ablkcipher(ctx->ctr);
- }
- 
- static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
- 						       const char *full_name,
--						       const char *ctr_name)
-+						       const char *ctr_name,
-+						       const char *ghash_name)
- {
- 	struct crypto_attr_type *algt;
- 	struct crypto_instance *inst;
- 	struct crypto_alg *ctr;
-+	struct crypto_alg *ghash_alg;
-+	struct ahash_alg *ghash_ahash_alg;
- 	struct gcm_instance_ctx *ctx;
- 	int err;
- 
-@@ -454,17 +656,31 @@ static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
- 	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
- 		return ERR_PTR(-EINVAL);
- 
-+	ghash_alg = crypto_find_alg(ghash_name, &crypto_ahash_type,
-+				    CRYPTO_ALG_TYPE_HASH,
-+				    CRYPTO_ALG_TYPE_AHASH_MASK);
-+	err = PTR_ERR(ghash_alg);
-+	if (IS_ERR(ghash_alg))
-+		return ERR_PTR(err);
++static int mv_enc_aes_ecb(struct ablkcipher_request *req)
++{
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
 +
-+	err = -ENOMEM;
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
--		return ERR_PTR(-ENOMEM);
-+		goto out_put_ghash;
- 
- 	ctx = crypto_instance_ctx(inst);
-+	ghash_ahash_alg = container_of(ghash_alg, struct ahash_alg, halg.base);
-+	err = crypto_init_ahash_spawn(&ctx->ghash, &ghash_ahash_alg->halg,
-+				      inst);
-+	if (err)
-+		goto err_free_inst;
++	req_ctx->op =3D COP_AES_ECB;
++	req_ctx->decrypt =3D 0;
 +
- 	crypto_set_skcipher_spawn(&ctx->ctr, inst);
- 	err = crypto_grab_skcipher(&ctx->ctr, ctr_name, 0,
- 				   crypto_requires_sync(algt->type,
- 							algt->mask));
- 	if (err)
--		goto err_free_inst;
-+		goto err_drop_ghash;
- 
- 	ctr = crypto_skcipher_spawn_alg(&ctx->ctr);
- 
-@@ -479,7 +695,8 @@ static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
- 
- 	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
--		     "gcm_base(%s)", ctr->cra_driver_name) >=
-+		     "gcm_base(%s,%s)", ctr->cra_driver_name,
-+		     ghash_alg->cra_driver_name) >=
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto out_put_ctr;
- 
-@@ -502,12 +719,16 @@ static struct crypto_instance *crypto_gcm_alloc_common(struct rtattr **tb,
- 	inst->alg.cra_aead.decrypt = crypto_gcm_decrypt;
- 
- out:
-+	crypto_mod_put(ghash_alg);
- 	return inst;
- 
- out_put_ctr:
- 	crypto_drop_skcipher(&ctx->ctr);
-+err_drop_ghash:
-+	crypto_drop_ahash(&ctx->ghash);
- err_free_inst:
- 	kfree(inst);
-+out_put_ghash:
- 	inst = ERR_PTR(err);
- 	goto out;
- }
-@@ -532,7 +753,7 @@ static struct crypto_instance *crypto_gcm_alloc(struct rtattr **tb)
- 	    CRYPTO_MAX_ALG_NAME)
- 		return ERR_PTR(-ENAMETOOLONG);
- 
--	return crypto_gcm_alloc_common(tb, full_name, ctr_name);
-+	return crypto_gcm_alloc_common(tb, full_name, ctr_name, "ghash");
- }
- 
- static void crypto_gcm_free(struct crypto_instance *inst)
-@@ -540,6 +761,7 @@ static void crypto_gcm_free(struct crypto_instance *inst)
- 	struct gcm_instance_ctx *ctx = crypto_instance_ctx(inst);
- 
- 	crypto_drop_skcipher(&ctx->ctr);
-+	crypto_drop_ahash(&ctx->ghash);
- 	kfree(inst);
- }
- 
-@@ -554,6 +776,7 @@ static struct crypto_instance *crypto_gcm_base_alloc(struct rtattr **tb)
- {
- 	int err;
- 	const char *ctr_name;
-+	const char *ghash_name;
- 	char full_name[CRYPTO_MAX_ALG_NAME];
- 
- 	ctr_name = crypto_attr_alg_name(tb[1]);
-@@ -561,11 +784,16 @@ static struct crypto_instance *crypto_gcm_base_alloc(struct rtattr **tb)
- 	if (IS_ERR(ctr_name))
- 		return ERR_PTR(err);
- 
--	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "gcm_base(%s)",
--		     ctr_name) >= CRYPTO_MAX_ALG_NAME)
-+	ghash_name = crypto_attr_alg_name(tb[2]);
-+	err = PTR_ERR(ghash_name);
-+	if (IS_ERR(ghash_name))
-+		return ERR_PTR(err);
++	return mv_handle_req(req);
++}
 +
-+	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "gcm_base(%s,%s)",
-+		     ctr_name, ghash_name) >= CRYPTO_MAX_ALG_NAME)
- 		return ERR_PTR(-ENAMETOOLONG);
- 
--	return crypto_gcm_alloc_common(tb, full_name, ctr_name);
-+	return crypto_gcm_alloc_common(tb, full_name, ctr_name, ghash_name);
- }
- 
- static struct crypto_template crypto_gcm_base_tmpl = {
-@@ -784,6 +1012,10 @@ static int __init crypto_gcm_module_init(void)
- {
- 	int err;
- 
-+	gcm_zeroes = kzalloc(16, GFP_KERNEL);
-+	if (!gcm_zeroes)
++static int mv_dec_aes_ecb(struct ablkcipher_request *req)
++{
++	struct mv_ctx *ctx =3D crypto_tfm_ctx(req->base.tfm);
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
++
++	req_ctx->op =3D COP_AES_ECB;
++	req_ctx->decrypt =3D 1;
++
++	compute_aes_dec_key(ctx);
++	return mv_handle_req(req);
++}
++
++static int mv_enc_aes_cbc(struct ablkcipher_request *req)
++{
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
++
++	req_ctx->op =3D COP_AES_CBC;
++	req_ctx->decrypt =3D 0;
++
++	return mv_handle_req(req);
++}
++
++static int mv_dec_aes_cbc(struct ablkcipher_request *req)
++{
++	struct mv_ctx *ctx =3D crypto_tfm_ctx(req->base.tfm);
++	struct mv_req_ctx *req_ctx =3D ablkcipher_request_ctx(req);
++
++	req_ctx->op =3D COP_AES_CBC;
++	req_ctx->decrypt =3D 1;
++
++	compute_aes_dec_key(ctx);
++	return mv_handle_req(req);
++}
++
++static int mv_cra_init(struct crypto_tfm *tfm)
++{
++	tfm->crt_ablkcipher.reqsize =3D sizeof(struct mv_req_ctx);
++	return 0;
++}
++
++irqreturn_t crypto_int(int irq, void *priv)
++{
++	u32 val;
++
++	val =3D readl(cpg->reg + SEC_ACCEL_INT_STATUS);
++	if (!(val & SEC_INT_ACCEL0_DONE))
++		return IRQ_NONE;
++
++	val &=3D ~SEC_INT_ACCEL0_DONE;
++	writel(val, cpg->reg + FPGA_INT_STATUS);
++	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
++	BUG_ON(cpg->eng_st !=3D ENGINE_BUSY);
++	cpg->eng_st =3D ENGINE_W_DEQUEUE;
++	wake_up_process(cpg->queue_th);
++	return IRQ_HANDLED;
++}
++
++struct crypto_alg mv_aes_alg_ecb =3D {
++	.cra_name		=3D "ecb(aes)",
++	.cra_driver_name	=3D "mv-ecb-aes",
++	.cra_priority	=3D 300,
++	.cra_flags	=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize	=3D 16,
++	.cra_ctxsize	=3D sizeof(struct mv_ctx),
++	.cra_alignmask	=3D 0,
++	.cra_type	=3D &crypto_ablkcipher_type,
++	.cra_module	=3D THIS_MODULE,
++	.cra_init	=3D mv_cra_init,
++	.cra_u		=3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D	AES_MIN_KEY_SIZE,
++			.max_keysize	=3D	AES_MAX_KEY_SIZE,
++			.setkey		=3D	mv_setkey_aes,
++			.encrypt	=3D	mv_enc_aes_ecb,
++			.decrypt	=3D	mv_dec_aes_ecb,
++		},
++	},
++};
++
++struct crypto_alg mv_aes_alg_cbc =3D {
++	.cra_name		=3D "cbc(aes)",
++	.cra_driver_name	=3D "mv-cbc-aes",
++	.cra_priority	=3D 300,
++	.cra_flags	=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize	=3D AES_BLOCK_SIZE,
++	.cra_ctxsize	=3D sizeof(struct mv_ctx),
++	.cra_alignmask	=3D 0,
++	.cra_type	=3D &crypto_ablkcipher_type,
++	.cra_module	=3D THIS_MODULE,
++	.cra_init	=3D mv_cra_init,
++	.cra_u		=3D {
++		.ablkcipher =3D {
++			.ivsize		=3D	AES_BLOCK_SIZE,
++			.min_keysize	=3D	AES_MIN_KEY_SIZE,
++			.max_keysize	=3D	AES_MAX_KEY_SIZE,
++			.setkey		=3D	mv_setkey_aes,
++			.encrypt	=3D	mv_enc_aes_cbc,
++			.decrypt	=3D	mv_dec_aes_cbc,
++		},
++	},
++};
++
++static int mv_probe(struct platform_device *pdev)
++{
++	struct crypto_priv *cp;
++	struct resource *res;
++	int irq;
++	int ret;
++
++	if (cpg) {
++		printk(KERN_ERR "Second crypto dev?\n");
++		return -EEXIST;
++	}
++
++	res =3D platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
++	if (!res)
++		return -ENXIO;
++
++	cp =3D kzalloc(sizeof(*cp), GFP_KERNEL);
++	if (!cp)
 +		return -ENOMEM;
 +
- 	err = crypto_register_template(&crypto_gcm_base_tmpl);
- 	if (err)
- 		goto out;
-@@ -796,18 +1028,20 @@ static int __init crypto_gcm_module_init(void)
- 	if (err)
- 		goto out_undo_gcm;
- 
--out:
--	return err;
++	spin_lock_init(&cp->lock);
++	crypto_init_queue(&cp->queue, 50);
++	cp->reg =3D ioremap(res->start, res->end - res->start + 1);
++	if (!cp->reg) {
++		ret =3D -ENOMEM;
++		goto err;
++	}
++
++	res =3D platform_get_resource_byname(pdev, IORESOURCE_MEM, "sram");
++	if (!res) {
++		ret =3D -ENXIO;
++		goto err_unmap_reg;
++	}
++	cp->sram_size =3D res->end - res->start + 1;
++	cp->max_req_size =3D cp->sram_size - SRAM_CFG_SPACE;
++	cp->sram =3D ioremap(res->start, cp->sram_size);
++	if (!cp->sram) {
++		ret =3D -ENOMEM;
++		goto err_unmap_reg;
++	}
++
++	irq =3D platform_get_irq(pdev, 0);
++	if (irq < 0 || irq =3D=3D NO_IRQ) {
++		ret =3D irq;
++		goto err_unmap_sram;
++	}
++	cp->irq =3D irq;
++
++	platform_set_drvdata(pdev, cp);
++	cpg =3D cp;
++
++	cp->queue_th =3D kthread_run(queue_manag, cp, "mv_crypto");
++	if (IS_ERR(cp->queue_th)) {
++		ret =3D PTR_ERR(cp->queue_th);
++		goto err_thread;
++	}
++
++	ret =3D request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->d=
+ev),
++			cp);
++	if (ret)
++		goto err_unmap_sram;
++
++	writel(SEC_INT_ACCEL0_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
++	writel(SEC_CFG_STOP_DIG_ERR, cpg->reg + SEC_ACCEL_CFG);
++
++	ret =3D crypto_register_alg(&mv_aes_alg_ecb);
++	if (ret)
++		goto err_reg;
++
++	ret =3D crypto_register_alg(&mv_aes_alg_cbc);
++	if (ret)
++		goto err_unreg_ecb;
 +	return 0;
- 
- out_undo_gcm:
- 	crypto_unregister_template(&crypto_gcm_tmpl);
- out_undo_base:
- 	crypto_unregister_template(&crypto_gcm_base_tmpl);
--	goto out;
-+out:
-+	kfree(gcm_zeroes);
-+	return err;
- }
- 
- static void __exit crypto_gcm_module_exit(void)
- {
-+	kfree(gcm_zeroes);
- 	crypto_unregister_template(&crypto_rfc4106_tmpl);
- 	crypto_unregister_template(&crypto_gcm_tmpl);
- 	crypto_unregister_template(&crypto_gcm_base_tmpl);
--- 
-1.6.3.3
++err_unreg_ecb:
++	crypto_unregister_alg(&mv_aes_alg_ecb);
++err_thread:
++	free_irq(irq, cp);
++err_reg:
++	kthread_stop(cp->queue_th);
++err_unmap_sram:
++	iounmap(cp->sram);
++err_unmap_reg:
++	iounmap(cp->reg);
++err:
++	kfree(cp);
++	cpg =3D NULL;
++	platform_set_drvdata(pdev, NULL);
++	return ret;
++}
++
++static int mv_remove(struct platform_device *pdev)
++{
++	struct crypto_priv *cp =3D platform_get_drvdata(pdev);
++
++	crypto_unregister_alg(&mv_aes_alg_ecb);
++	crypto_unregister_alg(&mv_aes_alg_cbc);
++	kthread_stop(cp->queue_th);
++	free_irq(cp->irq, cp);
++	memset(cp->sram, 0, cp->sram_size);
++	iounmap(cp->sram);
++	iounmap(cp->reg);
++	kfree(cp);
++	cpg =3D NULL;
++	return 0;
++}
++
++static struct platform_driver marvell_crypto =3D {
++	.probe		=3D mv_probe,
++	.remove		=3D mv_remove,
++	.driver		=3D {
++		.owner	=3D THIS_MODULE,
++		.name	=3D "mv_crypto",
++	},
++};
++MODULE_ALIAS("platform:mv_crypto");
++
++static int __init mv_crypto_init(void)
++{
++	return platform_driver_register(&marvell_crypto);
++}
++module_init(mv_crypto_init);
++
++static void __exit mv_crypto_exit(void)
++{
++	platform_driver_unregister(&marvell_crypto);
++}
++module_exit(mv_crypto_exit);
++
++MODULE_AUTHOR("Sebastian Andrzej Siewior <sebastian@breakpoint.cc>");
++MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/crypto/mv_cesa.h b/drivers/crypto/mv_cesa.h
+new file mode 100644
+index 0000000..c3e25d3
+--- /dev/null
++++ b/drivers/crypto/mv_cesa.h
+@@ -0,0 +1,119 @@
++#ifndef __MV_CRYPTO_H__
++
++#define DIGEST_INITIAL_VAL_A	0xdd00
++#define DES_CMD_REG		0xdd58
++
++#define SEC_ACCEL_CMD		0xde00
++#define SEC_CMD_EN_SEC_ACCL0	(1 << 0)
++#define SEC_CMD_EN_SEC_ACCL1	(1 << 1)
++#define SEC_CMD_DISABLE_SEC	(1 << 2)
++
++#define SEC_ACCEL_DESC_P0	0xde04
++#define SEC_DESC_P0_PTR(x)	(x)
++
++#define SEC_ACCEL_DESC_P1	0xde14
++#define SEC_DESC_P1_PTR(x)	(x)
++
++#define SEC_ACCEL_CFG		0xde08
++#define SEC_CFG_STOP_DIG_ERR	(1 << 0)
++#define SEC_CFG_CH0_W_IDMA	(1 << 7)
++#define SEC_CFG_CH1_W_IDMA	(1 << 8)
++#define SEC_CFG_ACT_CH0_IDMA	(1 << 9)
++#define SEC_CFG_ACT_CH1_IDMA	(1 << 10)
++
++#define SEC_ACCEL_STATUS	0xde0c
++#define SEC_ST_ACT_0		(1 << 0)
++#define SEC_ST_ACT_1		(1 << 1)
++
++/*
++ * FPGA_INT_STATUS looks like a FPGA leftover and is documented only i=
+n Errata
++ * 4.12. It looks like that it was part of an IRQ-controller in FPGA a=
+nd
++ * someone forgot to remove  it while switching to the core and moving=
+ to
++ * SEC_ACCEL_INT_STATUS.
++ */
++#define FPGA_INT_STATUS		0xdd68
++#define SEC_ACCEL_INT_STATUS	0xde20
++#define SEC_INT_AUTH_DONE	(1 << 0)
++#define SEC_INT_DES_E_DONE	(1 << 1)
++#define SEC_INT_AES_E_DONE	(1 << 2)
++#define SEC_INT_AES_D_DONE	(1 << 3)
++#define SEC_INT_ENC_DONE	(1 << 4)
++#define SEC_INT_ACCEL0_DONE	(1 << 5)
++#define SEC_INT_ACCEL1_DONE	(1 << 6)
++#define SEC_INT_ACC0_IDMA_DONE	(1 << 7)
++#define SEC_INT_ACC1_IDMA_DONE	(1 << 8)
++
++#define SEC_ACCEL_INT_MASK	0xde24
++
++#define AES_KEY_LEN	(8 * 4)
++
++struct sec_accel_config {
++
++	u32 config;
++#define CFG_OP_MAC_ONLY		0
++#define CFG_OP_CRYPT_ONLY	1
++#define CFG_OP_MAC_CRYPT	2
++#define CFG_OP_CRYPT_MAC	3
++#define CFG_MACM_MD5		(4 << 4)
++#define CFG_MACM_SHA1		(5 << 4)
++#define CFG_MACM_HMAC_MD5	(6 << 4)
++#define CFG_MACM_HMAC_SHA1	(7 << 4)
++#define CFG_ENCM_DES		(1 << 8)
++#define CFG_ENCM_3DES		(2 << 8)
++#define CFG_ENCM_AES		(3 << 8)
++#define CFG_DIR_ENC		(0 << 12)
++#define CFG_DIR_DEC		(1 << 12)
++#define CFG_ENC_MODE_ECB	(0 << 16)
++#define CFG_ENC_MODE_CBC	(1 << 16)
++#define CFG_3DES_EEE		(0 << 20)
++#define CFG_3DES_EDE		(1 << 20)
++#define CFG_AES_LEN_128		(0 << 24)
++#define CFG_AES_LEN_192		(1 << 24)
++#define CFG_AES_LEN_256		(2 << 24)
++
++	u32 enc_p;
++#define ENC_P_SRC(x)		(x)
++#define ENC_P_DST(x)		((x) << 16)
++
++	u32 enc_len;
++#define ENC_LEN(x)		(x)
++
++	u32 enc_key_p;
++#define ENC_KEY_P(x)		(x)
++
++	u32 enc_iv;
++#define ENC_IV_POINT(x)		((x) << 0)
++#define ENC_IV_BUF_POINT(x)	((x) << 16)
++
++	u32 mac_src_p;
++#define MAC_SRC_DATA_P(x)	(x)
++#define MAC_SRC_TOTAL_LEN(x)	((x) << 16)
++
++	u32 mac_digest;
++	u32 mac_iv;
++}__attribute__ ((packed));
++	/*
++	 * /-----------\ 0
++	 * | ACCEL CFG |	4 * 8
++	 * |-----------| 0x20
++	 * | CRYPT KEY |	8 * 4
++	 * |-----------| 0x40
++	 * |  IV   IN  |	4 * 4
++	 * |-----------| 0x40 (inplace)
++	 * |  IV BUF   |	4 * 4
++	 * |-----------| 0x50
++	 * |  DATA IN  |	16 * x (max ->max_req_size)
++	 * |-----------| 0x50 (inplace operation)
++	 * |  DATA OUT |	16 * x (max ->max_req_size)
++	 * \-----------/ SRAM size
++	 */
++#define SRAM_CONFIG		0x00
++#define SRAM_DATA_KEY_P		0x20
++#define SRAM_DATA_IV		0x40
++#define SRAM_DATA_IV_BUF	0x40
++#define SRAM_DATA_IN_START	0x50
++#define SRAM_DATA_OUT_START	0x50
++
++#define SRAM_CFG_SPACE		0x50
++
++#endif
+--=20
+1.6.2.5
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
