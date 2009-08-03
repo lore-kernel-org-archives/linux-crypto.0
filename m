@@ -1,110 +1,120 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH -v2 3/5] crypto: cryptd: Add support to access underlaying shash
-Date: Mon,  3 Aug 2009 15:45:29 +0800
-Message-ID: <1249285531-22422-3-git-send-email-ying.huang@intel.com>
+Subject: [PATCH -v2 4/5] x86: Move kernel_fpu_using to irq_is_fpu_using in asm/i387.h
+Date: Mon,  3 Aug 2009 15:45:30 +0800
+Message-ID: <1249285531-22422-4-git-send-email-ying.huang@intel.com>
 References: <1249285531-22422-1-git-send-email-ying.huang@intel.com>
  <1249285531-22422-2-git-send-email-ying.huang@intel.com>
+ <1249285531-22422-3-git-send-email-ying.huang@intel.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Huang Ying <ying.huang@intel.com>
+	Huang Ying <ying.huang@intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:6657 "EHLO mga09.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:25442 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752776AbZHCHpg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2009 03:45:36 -0400
-In-Reply-To: <1249285531-22422-2-git-send-email-ying.huang@intel.com>
+	id S1752811AbZHCHph (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2009 03:45:37 -0400
+In-Reply-To: <1249285531-22422-3-git-send-email-ying.huang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-cryptd_alloc_ahash() will allocate a cryptd-ed ahash for specified
-algorithm name. The new allocated one is guaranteed to be cryptd-ed
-ahash, so the shash underlying can be gotten via cryptd_ahash_child().
+This is used by AES-NI accelerated AES implementation and PCLMULQDQ
+accelerated GHASH implementation.
+
+v2:
+ - Renamed to irq_is_fpu_using to reflect the real situation.
 
 Signed-off-by: Huang Ying <ying.huang@intel.com>
+CC: H. Peter Anvin <hpa@zytor.com>
 ---
- crypto/cryptd.c         |   35 +++++++++++++++++++++++++++++++++++
- include/crypto/cryptd.h |   17 +++++++++++++++++
- 2 files changed, 52 insertions(+), 0 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |   17 +++++------------
+ arch/x86/include/asm/i387.h        |   10 ++++++++++
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 2eb7058..3533582 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -682,6 +682,41 @@ void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm)
- }
- EXPORT_SYMBOL_GPL(cryptd_free_ablkcipher);
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index d3ec8d5..aa68a4d 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -59,13 +59,6 @@ asmlinkage void aesni_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
+ asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv);
  
-+struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
-+					u32 type, u32 mask)
-+{
-+	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_ahash *tfm;
-+
-+	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
-+		     "cryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-EINVAL);
-+	tfm = crypto_alloc_ahash(cryptd_alg_name, type, mask);
-+	if (IS_ERR(tfm))
-+		return ERR_CAST(tfm);
-+	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
-+		crypto_free_ahash(tfm);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	return __cryptd_ahash_cast(tfm);
-+}
-+EXPORT_SYMBOL_GPL(cryptd_alloc_ahash);
-+
-+struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm)
-+{
-+	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
-+
-+	return ctx->child;
-+}
-+EXPORT_SYMBOL_GPL(cryptd_ahash_child);
-+
-+void cryptd_free_ahash(struct cryptd_ahash *tfm)
-+{
-+	crypto_free_ahash(&tfm->base);
-+}
-+EXPORT_SYMBOL_GPL(cryptd_free_ahash);
-+
- static int __init cryptd_init(void)
+-static inline int kernel_fpu_using(void)
+-{
+-	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
+-		return 1;
+-	return 0;
+-}
+-
+ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
  {
- 	int err;
-diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
-index 55fa7bb..2f65a6e 100644
---- a/include/crypto/cryptd.h
-+++ b/include/crypto/cryptd.h
-@@ -7,6 +7,7 @@
+ 	unsigned long addr = (unsigned long)raw_ctx;
+@@ -89,7 +82,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
+ 		return -EINVAL;
+ 	}
  
- #include <linux/crypto.h>
- #include <linux/kernel.h>
-+#include <crypto/hash.h>
+-	if (kernel_fpu_using())
++	if (irq_is_fpu_using())
+ 		err = crypto_aes_expand_key(ctx, in_key, key_len);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -110,7 +103,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
  
- struct cryptd_ablkcipher {
- 	struct crypto_ablkcipher base;
-@@ -24,4 +25,20 @@ struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
- struct crypto_blkcipher *cryptd_ablkcipher_child(struct cryptd_ablkcipher *tfm);
- void cryptd_free_ablkcipher(struct cryptd_ablkcipher *tfm);
+-	if (kernel_fpu_using())
++	if (irq_is_fpu_using())
+ 		crypto_aes_encrypt_x86(ctx, dst, src);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -123,7 +116,7 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
  
-+struct cryptd_ahash {
-+	struct crypto_ahash base;
-+};
-+
-+static inline struct cryptd_ahash *__cryptd_ahash_cast(
-+	struct crypto_ahash *tfm)
+-	if (kernel_fpu_using())
++	if (irq_is_fpu_using())
+ 		crypto_aes_decrypt_x86(ctx, dst, src);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -349,7 +342,7 @@ static int ablk_encrypt(struct ablkcipher_request *req)
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+ 
+-	if (kernel_fpu_using()) {
++	if (irq_is_fpu_using()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 		memcpy(cryptd_req, req, sizeof(*req));
+@@ -370,7 +363,7 @@ static int ablk_decrypt(struct ablkcipher_request *req)
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+ 
+-	if (kernel_fpu_using()) {
++	if (irq_is_fpu_using()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 		memcpy(cryptd_req, req, sizeof(*req));
+diff --git a/arch/x86/include/asm/i387.h b/arch/x86/include/asm/i387.h
+index 175adf5..1d08300 100644
+--- a/arch/x86/include/asm/i387.h
++++ b/arch/x86/include/asm/i387.h
+@@ -301,6 +301,16 @@ static inline void kernel_fpu_end(void)
+ 	preempt_enable();
+ }
+ 
++static inline bool is_fpu_using(void)
 +{
-+	return (struct cryptd_ahash *)tfm;
++	return !(read_cr0() & X86_CR0_TS);
 +}
 +
-+/* alg_name should be algorithm to be cryptd-ed */
-+struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
-+					u32 type, u32 mask);
-+struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm);
-+void cryptd_free_ahash(struct cryptd_ahash *tfm);
++static inline bool irq_is_fpu_using(void)
++{
++	return in_interrupt() && is_fpu_using();
++}
 +
- #endif
+ /*
+  * Some instructions like VIA's padlock instructions generate a spurious
+  * DNA fault but don't modify SSE registers. And these instructions
 -- 
 1.6.3.3
 
