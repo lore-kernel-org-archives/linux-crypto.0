@@ -1,120 +1,585 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH -v2 4/5] x86: Move kernel_fpu_using to irq_is_fpu_using in asm/i387.h
-Date: Mon,  3 Aug 2009 15:45:30 +0800
-Message-ID: <1249285531-22422-4-git-send-email-ying.huang@intel.com>
+Subject: [PATCH -v2 5/5] crypto: Add PCLMULQDQ accelerated GHASH implementation
+Date: Mon,  3 Aug 2009 15:45:31 +0800
+Message-ID: <1249285531-22422-5-git-send-email-ying.huang@intel.com>
 References: <1249285531-22422-1-git-send-email-ying.huang@intel.com>
  <1249285531-22422-2-git-send-email-ying.huang@intel.com>
  <1249285531-22422-3-git-send-email-ying.huang@intel.com>
+ <1249285531-22422-4-git-send-email-ying.huang@intel.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Huang Ying <ying.huang@intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
+	Huang Ying <ying.huang@intel.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mga09.intel.com ([134.134.136.24]:25442 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752811AbZHCHph (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2009 03:45:37 -0400
-In-Reply-To: <1249285531-22422-3-git-send-email-ying.huang@intel.com>
+	id S1752776AbZHCHpj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2009 03:45:39 -0400
+In-Reply-To: <1249285531-22422-4-git-send-email-ying.huang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is used by AES-NI accelerated AES implementation and PCLMULQDQ
-accelerated GHASH implementation.
+PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
+carry-less multiplication. More information about PCLMULQDQ can be
+found at:
 
-v2:
- - Renamed to irq_is_fpu_using to reflect the real situation.
+http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
+
+Because PCLMULQDQ changes XMM state, its usage must be enclosed with
+kernel_fpu_begin/end, which can be used only in process context, the
+acceleration is implemented as crypto_ahash. That is, request in soft
+IRQ context will be defered to the cryptd kernel thread.
 
 Signed-off-by: Huang Ying <ying.huang@intel.com>
-CC: H. Peter Anvin <hpa@zytor.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c |   17 +++++------------
- arch/x86/include/asm/i387.h        |   10 ++++++++++
- 2 files changed, 15 insertions(+), 12 deletions(-)
+ arch/x86/crypto/Makefile                   |    3 +
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  |  118 ++++++++++
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |  329 ++++++++++++++++++++++++++++
+ arch/x86/include/asm/cpufeature.h          |    1 +
+ crypto/Kconfig                             |    8 +
+ crypto/cryptd.c                            |    7 +
+ include/crypto/cryptd.h                    |    1 +
+ 7 files changed, 467 insertions(+), 0 deletions(-)
+ create mode 100644 arch/x86/crypto/ghash-clmulni-intel_asm.S
+ create mode 100644 arch/x86/crypto/ghash-clmulni-intel_glue.c
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index d3ec8d5..aa68a4d 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -59,13 +59,6 @@ asmlinkage void aesni_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
- asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
- 			      const u8 *in, unsigned int len, u8 *iv);
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index cfb0010..1a58ad8 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -12,6 +12,7 @@ obj-$(CONFIG_CRYPTO_AES_X86_64) += aes-x86_64.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
+ obj-$(CONFIG_CRYPTO_SALSA20_X86_64) += salsa20-x86_64.o
+ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
++obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
  
--static inline int kernel_fpu_using(void)
--{
--	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
--		return 1;
--	return 0;
--}
--
- static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
- {
- 	unsigned long addr = (unsigned long)raw_ctx;
-@@ -89,7 +82,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
- 		return -EINVAL;
- 	}
+ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
  
--	if (kernel_fpu_using())
-+	if (irq_is_fpu_using())
- 		err = crypto_aes_expand_key(ctx, in_key, key_len);
- 	else {
- 		kernel_fpu_begin();
-@@ -110,7 +103,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+@@ -24,3 +25,5 @@ twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
+ salsa20-x86_64-y := salsa20-x86_64-asm_64.o salsa20_glue.o
  
--	if (kernel_fpu_using())
-+	if (irq_is_fpu_using())
- 		crypto_aes_encrypt_x86(ctx, dst, src);
- 	else {
- 		kernel_fpu_begin();
-@@ -123,7 +116,7 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
- 
--	if (kernel_fpu_using())
-+	if (irq_is_fpu_using())
- 		crypto_aes_decrypt_x86(ctx, dst, src);
- 	else {
- 		kernel_fpu_begin();
-@@ -349,7 +342,7 @@ static int ablk_encrypt(struct ablkcipher_request *req)
- 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 
--	if (kernel_fpu_using()) {
+ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
++
++ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+new file mode 100644
+index 0000000..841c4d1
+--- /dev/null
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -0,0 +1,118 @@
++/*
++ * Accelerated GHASH implementation with Intel PCLMULQDQ-NI
++ * instructions. This file contains accelerated gf128mul
++ * implementation.
++ *
++ * Copyright (c) 2009 Intel Corp.
++ *   Author: Huang Ying <ying.huang@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++
++.text
++
++.align 16
++.Lbswap_mask:
++	.octa 0x000102030405060708090a0b0c0d0e0f
++
++/* void clmul_gf128mul_lle(be128 *r, const be128 *b) */
++ENTRY(clmul_gf128mul_lle)
++	movups (%rdi), %xmm0	# A
++	movups (%rsi), %xmm1	# B
++	# convert from lle to ble
++	movaps .Lbswap_mask, %xmm6
++	pshufb %xmm6, %xmm0
++	pshufb %xmm6, %xmm1
++	movaps %xmm1, %xmm2
++	#pclmulqdq $0x00, %xmm0, %xmm2 # A0 * B0
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xd0, 0x00
++	movaps %xmm1, %xmm3
++	#pclmulqdq $0x01, %xmm0, %xmm3 # A0 * B1
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xd8, 0x01
++	movaps %xmm1, %xmm4
++	#pclmulqdq $0x10, %xmm0, %xmm4 # A1 * B0
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xe0, 0x10
++	#pclmulqdq $0x11, %xmm0, %xmm1 # A1 * B1
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xc8, 0x11
++	movaps %xmm3, %xmm5
++	pslldq $8, %xmm3
++	psrldq $8, %xmm5
++	movaps %xmm4, %xmm0
++	pslldq $8, %xmm0
++	psrldq $8, %xmm4
++	pxor %xmm5, %xmm1
++	pxor %xmm4, %xmm1
++	pxor %xmm3, %xmm0
++	pxor %xmm2, %xmm0
++
++	movaps %xmm0, %xmm3
++	psrldq $8, %xmm3
++	psrlq $63, %xmm3
++
++	movaps %xmm0, %xmm2
++	psllq $1, %xmm2
++	pslldq $8, %xmm0
++	psrlq $63, %xmm0
++	por %xmm2, %xmm0
++
++	movaps %xmm1, %xmm2
++	psllq $1, %xmm2
++	pslldq $8, %xmm1
++	psrlq $63, %xmm1
++	por %xmm2, %xmm1
++	por %xmm3, %xmm1
++
++/* reduce */
++
++	movl $0xe1, %eax
++	movd %eax, %xmm2
++	pslldq $15, %xmm2
++
++	movaps %xmm0, %xmm3
++	#pclmulqdq $0x11, %xmm2, %xmm0
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xc2, 0x11
++	#pclmulqdq $0x10, %xmm2, %xmm3
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xda, 0x10
++	movaps %xmm3, %xmm4
++	pslldq $8, %xmm3
++	psrldq $8, %xmm4
++	pxor %xmm4, %xmm0
++
++	movaps %xmm3, %xmm4
++	psrldq $8, %xmm4
++	psrlq $63, %xmm4
++
++	movaps %xmm3, %xmm5
++	psllq $1, %xmm5
++	pslldq $8, %xmm3
++	psrlq $63, %xmm3
++	por %xmm5, %xmm3
++
++	movaps %xmm0, %xmm5
++	psllq $1, %xmm5
++	pslldq $8, %xmm0
++	psrlq $63, %xmm0
++	por %xmm5, %xmm0
++	por %xmm4, %xmm0
++
++	pxor %xmm1, %xmm0
++
++	#pclmulqdq $0x11, %xmm2, %xmm3
++	.byte 0x66, 0x0f, 0x3a, 0x44, 0xda, 0x11
++
++	movaps %xmm3, %xmm4
++	psllq $1, %xmm4
++	pslldq $8, %xmm3
++	psrlq $63, %xmm3
++	por %xmm4, %xmm3
++
++	pxor %xmm3, %xmm0
++
++	# convert from ble to lle
++	pshufb %xmm6, %xmm0
++	movups %xmm0, (%rdi)
++	ret
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+new file mode 100644
+index 0000000..2825580
+--- /dev/null
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -0,0 +1,329 @@
++/*
++ * Accelerated GHASH implementation with Intel PCLMULQDQ-NI
++ * instructions. This file contains glue code.
++ *
++ * Copyright (c) 2009 Intel Corp.
++ *   Author: Huang Ying <ying.huang@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++#include <crypto/gf128mul.h>
++#include <crypto/internal/hash.h>
++#include <crypto/cryptd.h>
++#include <asm/i387.h>
++
++#define GHASH_BLOCK_SIZE	16
++#define GHASH_DIGEST_SIZE	16
++
++void clmul_gf128mul_lle(be128 *r, const be128 *b);
++
++struct ghash_async_ctx
++{
++	struct cryptd_ahash *cryptd_tfm;
++};
++
++struct ghash_ctx {
++	be128 hash;
++};
++
++struct ghash_desc_ctx {
++	u8 buffer[GHASH_BLOCK_SIZE];
++	u32 bytes;
++};
++
++static int ghash_init(struct shash_desc *desc)
++{
++	struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	memset(dctx, 0, sizeof(*dctx));
++
++	return 0;
++}
++
++static int ghash_setkey(struct crypto_shash *tfm,
++			const u8 *key, unsigned int keylen)
++{
++	struct ghash_ctx *ctx = crypto_shash_ctx(tfm);
++
++	if (keylen != GHASH_BLOCK_SIZE) {
++		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	memcpy(&ctx->hash, key, keylen);
++
++	return 0;
++}
++
++static int ghash_update(struct shash_desc *desc,
++			 const u8 *src, unsigned int srclen)
++{
++	struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++	struct ghash_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	u8 *dst = dctx->buffer;
++
++	kernel_fpu_begin();
++	if (dctx->bytes) {
++		int n = min(srclen, dctx->bytes);
++		u8 *pos = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
++
++		dctx->bytes -= n;
++		srclen -= n;
++
++		while (n--)
++			*pos++ ^= *src++;
++
++		if (!dctx->bytes)
++			clmul_gf128mul_lle((be128 *)dst, &ctx->hash);
++	}
++
++	while (srclen >= GHASH_BLOCK_SIZE) {
++		crypto_xor(dst, src, GHASH_BLOCK_SIZE);
++		clmul_gf128mul_lle((be128 *)dst, &ctx->hash);
++		src += GHASH_BLOCK_SIZE;
++		srclen -= GHASH_BLOCK_SIZE;
++	}
++	kernel_fpu_end();
++
++	if (srclen) {
++		dctx->bytes = GHASH_BLOCK_SIZE - srclen;
++		while (srclen--)
++			*dst++ ^= *src++;
++	}
++
++	return 0;
++}
++
++static void ghash_flush(struct ghash_ctx *ctx, struct ghash_desc_ctx *dctx)
++{
++	u8 *dst = dctx->buffer;
++
++	if (dctx->bytes) {
++		u8 *tmp = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
++
++		while (dctx->bytes--)
++			*tmp++ ^= 0;
++
++		kernel_fpu_begin();
++		gf128mul_lle((be128 *)dst, &ctx->hash);
++		kernel_fpu_end();
++	}
++
++	dctx->bytes = 0;
++}
++
++static int ghash_final(struct shash_desc *desc, u8 *dst)
++{
++	struct ghash_desc_ctx *dctx = shash_desc_ctx(desc);
++	struct ghash_ctx *ctx = crypto_shash_ctx(desc->tfm);
++	u8 *buf = dctx->buffer;
++
++	ghash_flush(ctx, dctx);
++	memcpy(dst, buf, GHASH_BLOCK_SIZE);
++
++	return 0;
++}
++
++static struct shash_alg ghash_alg = {
++	.digestsize	= GHASH_DIGEST_SIZE,
++	.init		= ghash_init,
++	.update		= ghash_update,
++	.final		= ghash_final,
++	.setkey		= ghash_setkey,
++	.descsize	= sizeof(struct ghash_desc_ctx),
++	.base		= {
++		.cra_name		= "__ghash",
++		.cra_driver_name	= "__ghash-pclmulqdqni",
++		.cra_priority		= 0,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		= GHASH_BLOCK_SIZE,
++		.cra_ctxsize		= sizeof(struct ghash_ctx),
++		.cra_module		= THIS_MODULE,
++		.cra_list		= LIST_HEAD_INIT(ghash_alg.base.cra_list),
++	},
++};
++
++static int ghash_async_init(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *cryptd_req = ahash_request_ctx(req);
++	struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
++
 +	if (irq_is_fpu_using()) {
- 		struct ablkcipher_request *cryptd_req =
- 			ablkcipher_request_ctx(req);
- 		memcpy(cryptd_req, req, sizeof(*req));
-@@ -370,7 +363,7 @@ static int ablk_decrypt(struct ablkcipher_request *req)
- 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 
--	if (kernel_fpu_using()) {
++		memcpy(cryptd_req, req, sizeof(*req));
++		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
++		return crypto_ahash_init(cryptd_req);
++	} else {
++		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
++		struct crypto_shash *child = cryptd_ahash_child(cryptd_tfm);
++
++		desc->tfm = child;
++		desc->flags = req->base.flags;
++		return crypto_shash_init(desc);
++	}
++}
++
++static int ghash_async_update(struct ahash_request *req)
++{
++	struct ahash_request *cryptd_req = ahash_request_ctx(req);
++
 +	if (irq_is_fpu_using()) {
- 		struct ablkcipher_request *cryptd_req =
- 			ablkcipher_request_ctx(req);
- 		memcpy(cryptd_req, req, sizeof(*req));
-diff --git a/arch/x86/include/asm/i387.h b/arch/x86/include/asm/i387.h
-index 175adf5..1d08300 100644
---- a/arch/x86/include/asm/i387.h
-+++ b/arch/x86/include/asm/i387.h
-@@ -301,6 +301,16 @@ static inline void kernel_fpu_end(void)
- 	preempt_enable();
++		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++		struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
++		struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
++
++		memcpy(cryptd_req, req, sizeof(*req));
++		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
++		return crypto_ahash_update(cryptd_req);
++	} else {
++		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
++		return shash_ahash_update(req, desc);
++	}
++}
++
++static int ghash_async_final(struct ahash_request *req)
++{
++	struct ahash_request *cryptd_req = ahash_request_ctx(req);
++
++	if (irq_is_fpu_using()) {
++		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++		struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
++		struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
++
++		memcpy(cryptd_req, req, sizeof(*req));
++		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
++		return crypto_ahash_final(cryptd_req);
++	} else {
++		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
++		return crypto_shash_final(desc, req->result);
++	}
++}
++
++static int ghash_async_digest(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *cryptd_req = ahash_request_ctx(req);
++	struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
++
++	if (irq_is_fpu_using()) {
++		memcpy(cryptd_req, req, sizeof(*req));
++		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
++		return crypto_ahash_digest(cryptd_req);
++	} else {
++		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
++		struct crypto_shash *child = cryptd_ahash_child(cryptd_tfm);
++
++		desc->tfm = child;
++		desc->flags = req->base.flags;
++		return shash_ahash_digest(req, desc);
++	}
++}
++
++static int ghash_async_setkey(struct crypto_ahash *tfm, const u8 *key,
++			      unsigned int keylen)
++{
++	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct crypto_ahash *child = &ctx->cryptd_tfm->base;
++	int err;
++
++	crypto_ahash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_ahash_set_flags(child, crypto_ahash_get_flags(tfm)
++			       & CRYPTO_TFM_REQ_MASK);
++	err = crypto_ahash_setkey(child, key, keylen);
++	crypto_ahash_set_flags(tfm, crypto_ahash_get_flags(child)
++			       & CRYPTO_TFM_RES_MASK);
++
++	return 0;
++}
++
++static int ghash_async_init_tfm(struct crypto_tfm *tfm)
++{
++	struct cryptd_ahash *cryptd_tfm;
++	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	cryptd_tfm = cryptd_alloc_ahash("__ghash-pclmulqdqni", 0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++	ctx->cryptd_tfm = cryptd_tfm;
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct ahash_request) +
++				 crypto_ahash_reqsize(&cryptd_tfm->base));
++
++	return 0;
++}
++
++static void ghash_async_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	cryptd_free_ahash(ctx->cryptd_tfm);
++}
++
++static struct ahash_alg ghash_async_alg = {
++	.init		= ghash_async_init,
++	.update		= ghash_async_update,
++	.final		= ghash_async_final,
++	.setkey		= ghash_async_setkey,
++	.digest		= ghash_async_digest,
++	.halg = {
++		.digestsize	= GHASH_DIGEST_SIZE,
++		.base = {
++			.cra_name		= "ghash",
++			.cra_driver_name	= "ghash-clmulni",
++			.cra_priority		= 400,
++			.cra_flags		= CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
++			.cra_blocksize		= GHASH_BLOCK_SIZE,
++			.cra_type		= &crypto_ahash_type,
++			.cra_module		= THIS_MODULE,
++			.cra_list		= LIST_HEAD_INIT(ghash_async_alg.halg.base.cra_list),
++			.cra_init		= ghash_async_init_tfm,
++			.cra_exit		= ghash_async_exit_tfm,
++		},
++	},
++};
++
++static int __init ghash_pclmulqdqni_mod_init(void)
++{
++	int err;
++
++	if (!cpu_has_pclmulqdq) {
++		printk(KERN_INFO "Intel PCLMULQDQ-NI instructions are not"
++		       " detected.\n");
++		return -ENODEV;
++	}
++
++	if ((err = crypto_register_shash(&ghash_alg)))
++		goto err_out;
++	if ((err = crypto_register_ahash(&ghash_async_alg)))
++		goto err_shash;
++
++	return 0;
++
++err_shash:
++	crypto_unregister_shash(&ghash_alg);
++err_out:
++	return err;
++}
++
++static void __exit ghash_pclmulqdqni_mod_exit(void)
++{
++	crypto_unregister_ahash(&ghash_async_alg);
++	crypto_unregister_shash(&ghash_alg);
++}
++
++module_init(ghash_pclmulqdqni_mod_init);
++module_exit(ghash_pclmulqdqni_mod_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("GHASH Message Digest Algorithm, acclerated by PCLMULQDQ-NI");
++MODULE_ALIAS("ghash");
+diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
+index 4a28d22..2c3b162 100644
+--- a/arch/x86/include/asm/cpufeature.h
++++ b/arch/x86/include/asm/cpufeature.h
+@@ -246,6 +246,7 @@ extern const char * const x86_power_flags[32];
+ #define cpu_has_x2apic		boot_cpu_has(X86_FEATURE_X2APIC)
+ #define cpu_has_xsave		boot_cpu_has(X86_FEATURE_XSAVE)
+ #define cpu_has_hypervisor	boot_cpu_has(X86_FEATURE_HYPERVISOR)
++#define cpu_has_pclmulqdq	boot_cpu_has(X86_FEATURE_PCLMULQDQ)
+ 
+ #if defined(CONFIG_X86_INVLPG) || defined(CONFIG_X86_64)
+ # define cpu_has_invlpg		1
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 5105cf1..e8356d3 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -427,6 +427,14 @@ config CRYPTO_WP512
+ 	  See also:
+ 	  <http://planeta.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html>
+ 
++config CRYPTO_GHASH_CLMUL_NI_INTEL
++	tristate "GHASH digest algorithm (CLMUL-NI accelerated)"
++	select CRYPTO_SHASH
++	select CRYPTO_CRYPTD
++	help
++	  GHASH is message digest algorithm for GCM (Galois/Counter Mode).
++	  The implementation is accelerated by CLMUL-NI of Intel.
++
+ comment "Ciphers"
+ 
+ config CRYPTO_AES
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 3533582..f8ae0d9 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -711,6 +711,13 @@ struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm)
  }
+ EXPORT_SYMBOL_GPL(cryptd_ahash_child);
  
-+static inline bool is_fpu_using(void)
++struct shash_desc *cryptd_shash_desc(struct ahash_request *req)
 +{
-+	return !(read_cr0() & X86_CR0_TS);
++	struct cryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	return &rctx->desc;
 +}
++EXPORT_SYMBOL_GPL(cryptd_shash_desc);
 +
-+static inline bool irq_is_fpu_using(void)
-+{
-+	return in_interrupt() && is_fpu_using();
-+}
-+
- /*
-  * Some instructions like VIA's padlock instructions generate a spurious
-  * DNA fault but don't modify SSE registers. And these instructions
+ void cryptd_free_ahash(struct cryptd_ahash *tfm)
+ {
+ 	crypto_free_ahash(&tfm->base);
+diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
+index 2f65a6e..1c96b25 100644
+--- a/include/crypto/cryptd.h
++++ b/include/crypto/cryptd.h
+@@ -39,6 +39,7 @@ static inline struct cryptd_ahash *__cryptd_ahash_cast(
+ struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
+ 					u32 type, u32 mask);
+ struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm);
++struct shash_desc *cryptd_shash_desc(struct ahash_request *req);
+ void cryptd_free_ahash(struct cryptd_ahash *tfm);
+ 
+ #endif
 -- 
 1.6.3.3
 
