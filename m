@@ -1,844 +1,125 @@
-From: Nicolas Pitre <nico@cam.org>
-Subject: Re: [PATCH v3] crypto: add support for Orion5X crypto engine
-Date: Mon, 03 Aug 2009 15:03:34 -0400 (EDT)
-Message-ID: <alpine.LFD.2.00.0908031453570.8735@xanadu.home>
-References: <1244728999-8103-1-git-send-email-arm-kernel@ml.breakpoint.cc>
- <1244728999-8103-2-git-send-email-arm-kernel@ml.breakpoint.cc>
- <alpine.LFD.2.00.0906111513420.31536@xanadu.home>
- <20090611201530.GA11486@Chamillionaire.breakpoint.cc>
- <alpine.LFD.2.00.0906111625280.31536@xanadu.home>
- <20090611210734.GA11920@Chamillionaire.breakpoint.cc>
- <alpine.LFD.2.00.0906111712060.31536@xanadu.home>
- <20090801093803.GA2362@Chamillionaire.breakpoint.cc>
- <alpine.LFD.2.00.0908021008450.3066@xanadu.home>
- <20090803165750.GB17083@Chamillionaire.breakpoint.cc>
+From: Peter Lieven <pl@dlh.net>
+Subject: kcryptd performance issues, write faster than read on raid0/lvm?!
+Date: Mon, 03 Aug 2009 21:41:07 +0200
+Message-ID: <4A773D53.5040907@dlh.net>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 7BIT
-Cc: herbert@gondor.apana.org.au,
-	linux-arm-kernel@lists.arm.linux.org.uk,
-	linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:45179 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753813AbZHCTDn (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Aug 2009 15:03:43 -0400
-Received: from xanadu.home ([66.130.28.92]) by VL-MO-MR005.ip.videotron.ca
- (Sun Java(tm) System Messaging Server 6.3-4.01 (built Aug  3 2007; 32bit))
- with ESMTP id <0KNT001G2DRDJU23@VL-MO-MR005.ip.videotron.ca> for
- linux-crypto@vger.kernel.org; Mon, 03 Aug 2009 14:52:29 -0400 (EDT)
-In-reply-to: <20090803165750.GB17083@Chamillionaire.breakpoint.cc>
+Received: from zion.dlh.net ([91.198.192.1]:42483 "EHLO mail.dlh.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752637AbZHCUIB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Aug 2009 16:08:01 -0400
+Received: from office1.dus1.de.inetbone.net ([213.203.192.254] helo=[192.168.253.26])
+	by mail.dlh.net with asmtp (Exim 3.36 #24 (Debian))
+	id 1MY3PB-0001yi-00
+	for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2009 21:41:09 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 3 Aug 2009, Sebastian Andrzej Siewior wrote:
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-> 
-> This adds support for Marvell's Cryptographic Engines and Security
-> Accelerator (CESA) which can be found on a few SoC.
-> Tested with dm-crypt.
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-> ---
-> * Nicolas Pitre | 2009-08-02 10:14:57 [-0400]:
-> >Please submit it with the sg as is.
-> 
-> Okay, here it is. The change is really minimal: flush_dcache out,
-> SG_MITER_FROM_SG & SG_MITER_TO_SG in. Those slipped in just before -rc5.
-> 
-> Herbert: are in good mood? Good enough to submit this new driver in 31?
-> 
->  drivers/crypto/Kconfig   |   13 +
->  drivers/crypto/Makefile  |    1 +
->  drivers/crypto/mv_cesa.c |  606 ++++++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/mv_cesa.h |  119 +++++++++
->  4 files changed, 739 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/crypto/mv_cesa.c
->  create mode 100644 drivers/crypto/mv_cesa.h
-> 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 5b27692..c463896 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -157,6 +157,19 @@ config S390_PRNG
->  	  ANSI X9.17 standard. The PRNG is usable via the char device
->  	  /dev/prandom.
->  
-> +config CRYPTO_DEV_MV_CESA
-> +	tristate "Marvell's Cryptographic Engine"
-> +	depends on PLAT_ORION
-> +	select CRYPTO_ALGAPI
-> +	select CRYPTO_AES
-> +	select CRYPTO_BLKCIPHER2
-> +	help
-> +	  This driver allows you utilize the Cryptographic Engines and Security
-> +	  Accelerator (CESA) which can be found on certain SoC like QNAP's
-> +	  TS-209.
+Hi Community,
 
-The TS-209 is not a sOC.  You should probably say "... the Marvell Orion 
-and Kirkwood SoCs, such as found in QNAP's TS-209" instead.
+I use an Atom 330 (Dual-Core) ION based system as work station at home.
+The rootfs is crypted with cryptsetup/luks.
 
-Other than that, you can add
+As the Atom 330 is rather weak in cryptographic speed and I realized th=
+at a single
+blockdevice is always handled by only one kcryptd thread, I tried out a=
+ tweak
+to spread the work to 2 CPU cores.
 
-Acked-by: Nicolas Pitre <nico@marvell.com>
+I have a volume group on the built-in SSD of the Nettop and I created t=
+wo
+equally-sized volumes. Each of the volumes is encrypted using cryptsetu=
+p.
+When both volumes are succesfully unlocked they form a raid-0 device.
+Since I work on an SSD this should not create a performance problem
+due to high amount of seeks.
 
-> +	  Currently the driver supports AES in ECB and CBC mode without DMA.
-> +
->  config CRYPTO_DEV_HIFN_795X
->  	tristate "Driver HIFN 795x crypto accelerator chips"
->  	select CRYPTO_DES
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index 9bf4a2b..6ffcb3f 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -2,6 +2,7 @@ obj-$(CONFIG_CRYPTO_DEV_PADLOCK_AES) += padlock-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_PADLOCK_SHA) += padlock-sha.o
->  obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
-> +obj-$(CONFIG_CRYPTO_DEV_MV_CESA) += mv_cesa.o
->  obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
->  obj-$(CONFIG_CRYPTO_DEV_IXP4XX) += ixp4xx_crypto.o
->  obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
-> diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-> new file mode 100644
-> index 0000000..f28502c
-> --- /dev/null
-> +++ b/drivers/crypto/mv_cesa.c
-> @@ -0,0 +1,606 @@
-> +/*
-> + * Support for Marvell's crypto engine which can be found on some Orion5X
-> + * boards.
-> + *
-> + * Author: Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
-> + * License: GPL
-> + *
-> + */
-> +#include <crypto/aes.h>
-> +#include <crypto/algapi.h>
-> +#include <linux/crypto.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/io.h>
-> +#include <linux/kthread.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/scatterlist.h>
-> +
-> +#include "mv_cesa.h"
-> +/*
-> + * STM:
-> + *   /---------------------------------------\
-> + *   |					     | request complete
-> + *  \./					     |
-> + * IDLE -> new request -> BUSY -> done -> DEQUEUE
-> + *                         /??\               |
-> + *			    |		     | more scatter entries
-> + *			    \________________/
-> + */
-> +enum engine_status {
-> +	ENGINE_IDLE,
-> +	ENGINE_BUSY,
-> +	ENGINE_W_DEQUEUE,
-> +};
-> +
-> +/**
-> + * struct req_progress - used for every crypt request
-> + * @src_sg_it:		sg iterator for src
-> + * @dst_sg_it:		sg iterator for dst
-> + * @sg_src_left:	bytes left in src to process (scatter list)
-> + * @src_start:		offset to add to src start position (scatter list)
-> + * @crypt_len:		length of current crypt process
-> + * @sg_dst_left:	bytes left dst to process in this scatter list
-> + * @dst_start:		offset to add to dst start position (scatter list)
-> + * @total_req_bytes:	total number of bytes processed (request).
-> + *
-> + * sg helper are used to iterate over the scatterlist. Since the size of the
-> + * SRAM may be less than the scatter size, this struct struct is used to keep
-> + * track of progress within current scatterlist.
-> + */
-> +struct req_progress {
-> +	struct sg_mapping_iter src_sg_it;
-> +	struct sg_mapping_iter dst_sg_it;
-> +
-> +	/* src mostly */
-> +	int sg_src_left;
-> +	int src_start;
-> +	int crypt_len;
-> +	/* dst mostly */
-> +	int sg_dst_left;
-> +	int dst_start;
-> +	int total_req_bytes;
-> +};
-> +
-> +struct crypto_priv {
-> +	void __iomem *reg;
-> +	void __iomem *sram;
-> +	int irq;
-> +	struct task_struct *queue_th;
-> +
-> +	/* the lock protects queue and eng_st */
-> +	spinlock_t lock;
-> +	struct crypto_queue queue;
-> +	enum engine_status eng_st;
-> +	struct ablkcipher_request *cur_req;
-> +	struct req_progress p;
-> +	int max_req_size;
-> +	int sram_size;
-> +};
-> +
-> +static struct crypto_priv *cpg;
-> +
-> +struct mv_ctx {
-> +	u8 aes_enc_key[AES_KEY_LEN];
-> +	u32 aes_dec_key[8];
-> +	int key_len;
-> +	u32 need_calc_aes_dkey;
-> +};
-> +
-> +enum crypto_op {
-> +	COP_AES_ECB,
-> +	COP_AES_CBC,
-> +};
-> +
-> +struct mv_req_ctx {
-> +	enum crypto_op op;
-> +	int decrypt;
-> +};
-> +
-> +static void compute_aes_dec_key(struct mv_ctx *ctx)
-> +{
-> +	struct crypto_aes_ctx gen_aes_key;
-> +	int key_pos;
-> +
-> +	if (!ctx->need_calc_aes_dkey)
-> +		return;
-> +
-> +	crypto_aes_expand_key(&gen_aes_key, ctx->aes_enc_key, ctx->key_len);
-> +
-> +	key_pos = ctx->key_len + 24;
-> +	memcpy(ctx->aes_dec_key, &gen_aes_key.key_enc[key_pos], 4 * 4);
-> +	switch (ctx->key_len) {
-> +	case AES_KEYSIZE_256:
-> +		key_pos -= 2;
-> +		/* fall */
-> +	case AES_KEYSIZE_192:
-> +		key_pos -= 2;
-> +		memcpy(&ctx->aes_dec_key[4], &gen_aes_key.key_enc[key_pos],
-> +				4 * 4);
-> +		break;
-> +	}
-> +	ctx->need_calc_aes_dkey = 0;
-> +}
-> +
-> +static int mv_setkey_aes(struct crypto_ablkcipher *cipher, const u8 *key,
-> +		unsigned int len)
-> +{
-> +	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-> +	struct mv_ctx *ctx = crypto_tfm_ctx(tfm);
-> +
-> +	switch (len) {
-> +	case AES_KEYSIZE_128:
-> +	case AES_KEYSIZE_192:
-> +	case AES_KEYSIZE_256:
-> +		break;
-> +	default:
-> +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> +		return -EINVAL;
-> +	}
-> +	ctx->key_len = len;
-> +	ctx->need_calc_aes_dkey = 1;
-> +
-> +	memcpy(ctx->aes_enc_key, key, AES_KEY_LEN);
-> +	return 0;
-> +}
-> +
-> +static void setup_data_in(struct ablkcipher_request *req)
-> +{
-> +	int ret;
-> +	void *buf;
-> +
-> +	if (!cpg->p.sg_src_left) {
-> +		ret = sg_miter_next(&cpg->p.src_sg_it);
-> +		BUG_ON(!ret);
-> +		cpg->p.sg_src_left = cpg->p.src_sg_it.length;
-> +		cpg->p.src_start = 0;
-> +	}
-> +
-> +	cpg->p.crypt_len = min(cpg->p.sg_src_left, cpg->max_req_size);
-> +
-> +	buf = cpg->p.src_sg_it.addr;
-> +	buf += cpg->p.src_start;
-> +
-> +	memcpy(cpg->sram + SRAM_DATA_IN_START, buf, cpg->p.crypt_len);
-> +
-> +	cpg->p.sg_src_left -= cpg->p.crypt_len;
-> +	cpg->p.src_start += cpg->p.crypt_len;
-> +}
-> +
-> +static void mv_process_current_q(int first_block)
-> +{
-> +	struct ablkcipher_request *req = cpg->cur_req;
-> +	struct mv_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +	struct sec_accel_config op;
-> +
-> +	switch (req_ctx->op) {
-> +	case COP_AES_ECB:
-> +		op.config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_ECB;
-> +		break;
-> +	case COP_AES_CBC:
-> +		op.config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_CBC;
-> +		op.enc_iv = ENC_IV_POINT(SRAM_DATA_IV) |
-> +			ENC_IV_BUF_POINT(SRAM_DATA_IV_BUF);
-> +		if (first_block)
-> +			memcpy(cpg->sram + SRAM_DATA_IV, req->info, 16);
-> +		break;
-> +	}
-> +	if (req_ctx->decrypt) {
-> +		op.config |= CFG_DIR_DEC;
-> +		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_dec_key,
-> +				AES_KEY_LEN);
-> +	} else {
-> +		op.config |= CFG_DIR_ENC;
-> +		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_enc_key,
-> +				AES_KEY_LEN);
-> +	}
-> +
-> +	switch (ctx->key_len) {
-> +	case AES_KEYSIZE_128:
-> +		op.config |= CFG_AES_LEN_128;
-> +		break;
-> +	case AES_KEYSIZE_192:
-> +		op.config |= CFG_AES_LEN_192;
-> +		break;
-> +	case AES_KEYSIZE_256:
-> +		op.config |= CFG_AES_LEN_256;
-> +		break;
-> +	}
-> +	op.enc_p = ENC_P_SRC(SRAM_DATA_IN_START) |
-> +		ENC_P_DST(SRAM_DATA_OUT_START);
-> +	op.enc_key_p = SRAM_DATA_KEY_P;
-> +
-> +	setup_data_in(req);
-> +	op.enc_len = cpg->p.crypt_len;
-> +	memcpy(cpg->sram + SRAM_CONFIG, &op,
-> +			sizeof(struct sec_accel_config));
-> +
-> +	writel(SRAM_CONFIG, cpg->reg + SEC_ACCEL_DESC_P0);
-> +	/* GO */
-> +	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
-> +
-> +	/*
-> +	 * XXX: add timer if the interrupt does not occur for some mystery
-> +	 * reason
-> +	 */
-> +}
-> +
-> +static void mv_crypto_algo_completion(void)
-> +{
-> +	struct ablkcipher_request *req = cpg->cur_req;
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +
-> +	if (req_ctx->op != COP_AES_CBC)
-> +		return ;
-> +
-> +	memcpy(req->info, cpg->sram + SRAM_DATA_IV_BUF, 16);
-> +}
-> +
-> +static void dequeue_complete_req(void)
-> +{
-> +	struct ablkcipher_request *req = cpg->cur_req;
-> +	void *buf;
-> +	int ret;
-> +
-> +	cpg->p.total_req_bytes += cpg->p.crypt_len;
-> +	do {
-> +		int dst_copy;
-> +
-> +		if (!cpg->p.sg_dst_left) {
-> +			ret = sg_miter_next(&cpg->p.dst_sg_it);
-> +			BUG_ON(!ret);
-> +			cpg->p.sg_dst_left = cpg->p.dst_sg_it.length;
-> +			cpg->p.dst_start = 0;
-> +		}
-> +
-> +		buf = cpg->p.dst_sg_it.addr;
-> +		buf += cpg->p.dst_start;
-> +
-> +		dst_copy = min(cpg->p.crypt_len, cpg->p.sg_dst_left);
-> +
-> +		memcpy(buf, cpg->sram + SRAM_DATA_OUT_START, dst_copy);
-> +
-> +		cpg->p.sg_dst_left -= dst_copy;
-> +		cpg->p.crypt_len -= dst_copy;
-> +		cpg->p.dst_start += dst_copy;
-> +	} while (cpg->p.crypt_len > 0);
-> +
-> +	BUG_ON(cpg->eng_st != ENGINE_W_DEQUEUE);
-> +	if (cpg->p.total_req_bytes < req->nbytes) {
-> +		/* process next scatter list entry */
-> +		cpg->eng_st = ENGINE_BUSY;
-> +		mv_process_current_q(0);
-> +	} else {
-> +		sg_miter_stop(&cpg->p.src_sg_it);
-> +		sg_miter_stop(&cpg->p.dst_sg_it);
-> +		mv_crypto_algo_completion();
-> +		cpg->eng_st = ENGINE_IDLE;
-> +		req->base.complete(&req->base, 0);
-> +	}
-> +}
-> +
-> +static int count_sgs(struct scatterlist *sl, unsigned int total_bytes)
-> +{
-> +	int i = 0;
-> +
-> +	do {
-> +		total_bytes -= sl[i].length;
-> +		i++;
-> +
-> +	} while (total_bytes > 0);
-> +
-> +	return i;
-> +}
-> +
-> +static void mv_enqueue_new_req(struct ablkcipher_request *req)
-> +{
-> +	int num_sgs;
-> +
-> +	cpg->cur_req = req;
-> +	memset(&cpg->p, 0, sizeof(struct req_progress));
-> +
-> +	num_sgs = count_sgs(req->src, req->nbytes);
-> +	sg_miter_start(&cpg->p.src_sg_it, req->src, num_sgs, SG_MITER_FROM_SG);
-> +
-> +	num_sgs = count_sgs(req->dst, req->nbytes);
-> +	sg_miter_start(&cpg->p.dst_sg_it, req->dst, num_sgs, SG_MITER_TO_SG);
-> +	mv_process_current_q(1);
-> +}
-> +
-> +static int queue_manag(void *data)
-> +{
-> +	cpg->eng_st = ENGINE_IDLE;
-> +	do {
-> +		struct ablkcipher_request *req;
-> +		struct crypto_async_request *async_req = NULL;
-> +		struct crypto_async_request *backlog;
-> +
-> +		__set_current_state(TASK_INTERRUPTIBLE);
-> +
-> +		if (cpg->eng_st == ENGINE_W_DEQUEUE)
-> +			dequeue_complete_req();
-> +
-> +		spin_lock_irq(&cpg->lock);
-> +		if (cpg->eng_st == ENGINE_IDLE) {
-> +			backlog = crypto_get_backlog(&cpg->queue);
-> +			async_req = crypto_dequeue_request(&cpg->queue);
-> +			if (async_req) {
-> +				BUG_ON(cpg->eng_st != ENGINE_IDLE);
-> +				cpg->eng_st = ENGINE_BUSY;
-> +			}
-> +		}
-> +		spin_unlock_irq(&cpg->lock);
-> +
-> +		if (backlog) {
-> +			backlog->complete(backlog, -EINPROGRESS);
-> +			backlog = NULL;
-> +		}
-> +
-> +		if (async_req) {
-> +			req = container_of(async_req,
-> +					struct ablkcipher_request, base);
-> +			mv_enqueue_new_req(req);
-> +			async_req = NULL;
-> +		}
-> +
-> +		schedule();
-> +
-> +	} while (!kthread_should_stop());
-> +	return 0;
-> +}
-> +
-> +static int mv_handle_req(struct ablkcipher_request *req)
-> +{
-> +	unsigned long flags;
-> +	int ret;
-> +
-> +	spin_lock_irqsave(&cpg->lock, flags);
-> +	ret = ablkcipher_enqueue_request(&cpg->queue, req);
-> +	spin_unlock_irqrestore(&cpg->lock, flags);
-> +	wake_up_process(cpg->queue_th);
-> +	return ret;
-> +}
-> +
-> +static int mv_enc_aes_ecb(struct ablkcipher_request *req)
-> +{
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +
-> +	req_ctx->op = COP_AES_ECB;
-> +	req_ctx->decrypt = 0;
-> +
-> +	return mv_handle_req(req);
-> +}
-> +
-> +static int mv_dec_aes_ecb(struct ablkcipher_request *req)
-> +{
-> +	struct mv_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +
-> +	req_ctx->op = COP_AES_ECB;
-> +	req_ctx->decrypt = 1;
-> +
-> +	compute_aes_dec_key(ctx);
-> +	return mv_handle_req(req);
-> +}
-> +
-> +static int mv_enc_aes_cbc(struct ablkcipher_request *req)
-> +{
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +
-> +	req_ctx->op = COP_AES_CBC;
-> +	req_ctx->decrypt = 0;
-> +
-> +	return mv_handle_req(req);
-> +}
-> +
-> +static int mv_dec_aes_cbc(struct ablkcipher_request *req)
-> +{
-> +	struct mv_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
-> +
-> +	req_ctx->op = COP_AES_CBC;
-> +	req_ctx->decrypt = 1;
-> +
-> +	compute_aes_dec_key(ctx);
-> +	return mv_handle_req(req);
-> +}
-> +
-> +static int mv_cra_init(struct crypto_tfm *tfm)
-> +{
-> +	tfm->crt_ablkcipher.reqsize = sizeof(struct mv_req_ctx);
-> +	return 0;
-> +}
-> +
-> +irqreturn_t crypto_int(int irq, void *priv)
-> +{
-> +	u32 val;
-> +
-> +	val = readl(cpg->reg + SEC_ACCEL_INT_STATUS);
-> +	if (!(val & SEC_INT_ACCEL0_DONE))
-> +		return IRQ_NONE;
-> +
-> +	val &= ~SEC_INT_ACCEL0_DONE;
-> +	writel(val, cpg->reg + FPGA_INT_STATUS);
-> +	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
-> +	BUG_ON(cpg->eng_st != ENGINE_BUSY);
-> +	cpg->eng_st = ENGINE_W_DEQUEUE;
-> +	wake_up_process(cpg->queue_th);
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +struct crypto_alg mv_aes_alg_ecb = {
-> +	.cra_name		= "ecb(aes)",
-> +	.cra_driver_name	= "mv-ecb-aes",
-> +	.cra_priority	= 300,
-> +	.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize	= 16,
-> +	.cra_ctxsize	= sizeof(struct mv_ctx),
-> +	.cra_alignmask	= 0,
-> +	.cra_type	= &crypto_ablkcipher_type,
-> +	.cra_module	= THIS_MODULE,
-> +	.cra_init	= mv_cra_init,
-> +	.cra_u		= {
-> +		.ablkcipher = {
-> +			.min_keysize	=	AES_MIN_KEY_SIZE,
-> +			.max_keysize	=	AES_MAX_KEY_SIZE,
-> +			.setkey		=	mv_setkey_aes,
-> +			.encrypt	=	mv_enc_aes_ecb,
-> +			.decrypt	=	mv_dec_aes_ecb,
-> +		},
-> +	},
-> +};
-> +
-> +struct crypto_alg mv_aes_alg_cbc = {
-> +	.cra_name		= "cbc(aes)",
-> +	.cra_driver_name	= "mv-cbc-aes",
-> +	.cra_priority	= 300,
-> +	.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize	= AES_BLOCK_SIZE,
-> +	.cra_ctxsize	= sizeof(struct mv_ctx),
-> +	.cra_alignmask	= 0,
-> +	.cra_type	= &crypto_ablkcipher_type,
-> +	.cra_module	= THIS_MODULE,
-> +	.cra_init	= mv_cra_init,
-> +	.cra_u		= {
-> +		.ablkcipher = {
-> +			.ivsize		=	AES_BLOCK_SIZE,
-> +			.min_keysize	=	AES_MIN_KEY_SIZE,
-> +			.max_keysize	=	AES_MAX_KEY_SIZE,
-> +			.setkey		=	mv_setkey_aes,
-> +			.encrypt	=	mv_enc_aes_cbc,
-> +			.decrypt	=	mv_dec_aes_cbc,
-> +		},
-> +	},
-> +};
-> +
-> +static int mv_probe(struct platform_device *pdev)
-> +{
-> +	struct crypto_priv *cp;
-> +	struct resource *res;
-> +	int irq;
-> +	int ret;
-> +
-> +	if (cpg) {
-> +		printk(KERN_ERR "Second crypto dev?\n");
-> +		return -EEXIST;
-> +	}
-> +
-> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
-> +	if (!res)
-> +		return -ENXIO;
-> +
-> +	cp = kzalloc(sizeof(*cp), GFP_KERNEL);
-> +	if (!cp)
-> +		return -ENOMEM;
-> +
-> +	spin_lock_init(&cp->lock);
-> +	crypto_init_queue(&cp->queue, 50);
-> +	cp->reg = ioremap(res->start, res->end - res->start + 1);
-> +	if (!cp->reg) {
-> +		ret = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "sram");
-> +	if (!res) {
-> +		ret = -ENXIO;
-> +		goto err_unmap_reg;
-> +	}
-> +	cp->sram_size = res->end - res->start + 1;
-> +	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
-> +	cp->sram = ioremap(res->start, cp->sram_size);
-> +	if (!cp->sram) {
-> +		ret = -ENOMEM;
-> +		goto err_unmap_reg;
-> +	}
-> +
-> +	irq = platform_get_irq(pdev, 0);
-> +	if (irq < 0 || irq == NO_IRQ) {
-> +		ret = irq;
-> +		goto err_unmap_sram;
-> +	}
-> +	cp->irq = irq;
-> +
-> +	platform_set_drvdata(pdev, cp);
-> +	cpg = cp;
-> +
-> +	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
-> +	if (IS_ERR(cp->queue_th)) {
-> +		ret = PTR_ERR(cp->queue_th);
-> +		goto err_thread;
-> +	}
-> +
-> +	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
-> +			cp);
-> +	if (ret)
-> +		goto err_unmap_sram;
-> +
-> +	writel(SEC_INT_ACCEL0_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
-> +	writel(SEC_CFG_STOP_DIG_ERR, cpg->reg + SEC_ACCEL_CFG);
-> +
-> +	ret = crypto_register_alg(&mv_aes_alg_ecb);
-> +	if (ret)
-> +		goto err_reg;
-> +
-> +	ret = crypto_register_alg(&mv_aes_alg_cbc);
-> +	if (ret)
-> +		goto err_unreg_ecb;
-> +	return 0;
-> +err_unreg_ecb:
-> +	crypto_unregister_alg(&mv_aes_alg_ecb);
-> +err_thread:
-> +	free_irq(irq, cp);
-> +err_reg:
-> +	kthread_stop(cp->queue_th);
-> +err_unmap_sram:
-> +	iounmap(cp->sram);
-> +err_unmap_reg:
-> +	iounmap(cp->reg);
-> +err:
-> +	kfree(cp);
-> +	cpg = NULL;
-> +	platform_set_drvdata(pdev, NULL);
-> +	return ret;
-> +}
-> +
-> +static int mv_remove(struct platform_device *pdev)
-> +{
-> +	struct crypto_priv *cp = platform_get_drvdata(pdev);
-> +
-> +	crypto_unregister_alg(&mv_aes_alg_ecb);
-> +	crypto_unregister_alg(&mv_aes_alg_cbc);
-> +	kthread_stop(cp->queue_th);
-> +	free_irq(cp->irq, cp);
-> +	memset(cp->sram, 0, cp->sram_size);
-> +	iounmap(cp->sram);
-> +	iounmap(cp->reg);
-> +	kfree(cp);
-> +	cpg = NULL;
-> +	return 0;
-> +}
-> +
-> +static struct platform_driver marvell_crypto = {
-> +	.probe		= mv_probe,
-> +	.remove		= mv_remove,
-> +	.driver		= {
-> +		.owner	= THIS_MODULE,
-> +		.name	= "mv_crypto",
-> +	},
-> +};
-> +MODULE_ALIAS("platform:mv_crypto");
-> +
-> +static int __init mv_crypto_init(void)
-> +{
-> +	return platform_driver_register(&marvell_crypto);
-> +}
-> +module_init(mv_crypto_init);
-> +
-> +static void __exit mv_crypto_exit(void)
-> +{
-> +	platform_driver_unregister(&marvell_crypto);
-> +}
-> +module_exit(mv_crypto_exit);
-> +
-> +MODULE_AUTHOR("Sebastian Andrzej Siewior <sebastian@breakpoint.cc>");
-> +MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/crypto/mv_cesa.h b/drivers/crypto/mv_cesa.h
-> new file mode 100644
-> index 0000000..c3e25d3
-> --- /dev/null
-> +++ b/drivers/crypto/mv_cesa.h
-> @@ -0,0 +1,119 @@
-> +#ifndef __MV_CRYPTO_H__
-> +
-> +#define DIGEST_INITIAL_VAL_A	0xdd00
-> +#define DES_CMD_REG		0xdd58
-> +
-> +#define SEC_ACCEL_CMD		0xde00
-> +#define SEC_CMD_EN_SEC_ACCL0	(1 << 0)
-> +#define SEC_CMD_EN_SEC_ACCL1	(1 << 1)
-> +#define SEC_CMD_DISABLE_SEC	(1 << 2)
-> +
-> +#define SEC_ACCEL_DESC_P0	0xde04
-> +#define SEC_DESC_P0_PTR(x)	(x)
-> +
-> +#define SEC_ACCEL_DESC_P1	0xde14
-> +#define SEC_DESC_P1_PTR(x)	(x)
-> +
-> +#define SEC_ACCEL_CFG		0xde08
-> +#define SEC_CFG_STOP_DIG_ERR	(1 << 0)
-> +#define SEC_CFG_CH0_W_IDMA	(1 << 7)
-> +#define SEC_CFG_CH1_W_IDMA	(1 << 8)
-> +#define SEC_CFG_ACT_CH0_IDMA	(1 << 9)
-> +#define SEC_CFG_ACT_CH1_IDMA	(1 << 10)
-> +
-> +#define SEC_ACCEL_STATUS	0xde0c
-> +#define SEC_ST_ACT_0		(1 << 0)
-> +#define SEC_ST_ACT_1		(1 << 1)
-> +
-> +/*
-> + * FPGA_INT_STATUS looks like a FPGA leftover and is documented only in Errata
-> + * 4.12. It looks like that it was part of an IRQ-controller in FPGA and
-> + * someone forgot to remove  it while switching to the core and moving to
-> + * SEC_ACCEL_INT_STATUS.
-> + */
-> +#define FPGA_INT_STATUS		0xdd68
-> +#define SEC_ACCEL_INT_STATUS	0xde20
-> +#define SEC_INT_AUTH_DONE	(1 << 0)
-> +#define SEC_INT_DES_E_DONE	(1 << 1)
-> +#define SEC_INT_AES_E_DONE	(1 << 2)
-> +#define SEC_INT_AES_D_DONE	(1 << 3)
-> +#define SEC_INT_ENC_DONE	(1 << 4)
-> +#define SEC_INT_ACCEL0_DONE	(1 << 5)
-> +#define SEC_INT_ACCEL1_DONE	(1 << 6)
-> +#define SEC_INT_ACC0_IDMA_DONE	(1 << 7)
-> +#define SEC_INT_ACC1_IDMA_DONE	(1 << 8)
-> +
-> +#define SEC_ACCEL_INT_MASK	0xde24
-> +
-> +#define AES_KEY_LEN	(8 * 4)
-> +
-> +struct sec_accel_config {
-> +
-> +	u32 config;
-> +#define CFG_OP_MAC_ONLY		0
-> +#define CFG_OP_CRYPT_ONLY	1
-> +#define CFG_OP_MAC_CRYPT	2
-> +#define CFG_OP_CRYPT_MAC	3
-> +#define CFG_MACM_MD5		(4 << 4)
-> +#define CFG_MACM_SHA1		(5 << 4)
-> +#define CFG_MACM_HMAC_MD5	(6 << 4)
-> +#define CFG_MACM_HMAC_SHA1	(7 << 4)
-> +#define CFG_ENCM_DES		(1 << 8)
-> +#define CFG_ENCM_3DES		(2 << 8)
-> +#define CFG_ENCM_AES		(3 << 8)
-> +#define CFG_DIR_ENC		(0 << 12)
-> +#define CFG_DIR_DEC		(1 << 12)
-> +#define CFG_ENC_MODE_ECB	(0 << 16)
-> +#define CFG_ENC_MODE_CBC	(1 << 16)
-> +#define CFG_3DES_EEE		(0 << 20)
-> +#define CFG_3DES_EDE		(1 << 20)
-> +#define CFG_AES_LEN_128		(0 << 24)
-> +#define CFG_AES_LEN_192		(1 << 24)
-> +#define CFG_AES_LEN_256		(2 << 24)
-> +
-> +	u32 enc_p;
-> +#define ENC_P_SRC(x)		(x)
-> +#define ENC_P_DST(x)		((x) << 16)
-> +
-> +	u32 enc_len;
-> +#define ENC_LEN(x)		(x)
-> +
-> +	u32 enc_key_p;
-> +#define ENC_KEY_P(x)		(x)
-> +
-> +	u32 enc_iv;
-> +#define ENC_IV_POINT(x)		((x) << 0)
-> +#define ENC_IV_BUF_POINT(x)	((x) << 16)
-> +
-> +	u32 mac_src_p;
-> +#define MAC_SRC_DATA_P(x)	(x)
-> +#define MAC_SRC_TOTAL_LEN(x)	((x) << 16)
-> +
-> +	u32 mac_digest;
-> +	u32 mac_iv;
-> +}__attribute__ ((packed));
-> +	/*
-> +	 * /-----------\ 0
-> +	 * | ACCEL CFG |	4 * 8
-> +	 * |-----------| 0x20
-> +	 * | CRYPT KEY |	8 * 4
-> +	 * |-----------| 0x40
-> +	 * |  IV   IN  |	4 * 4
-> +	 * |-----------| 0x40 (inplace)
-> +	 * |  IV BUF   |	4 * 4
-> +	 * |-----------| 0x50
-> +	 * |  DATA IN  |	16 * x (max ->max_req_size)
-> +	 * |-----------| 0x50 (inplace operation)
-> +	 * |  DATA OUT |	16 * x (max ->max_req_size)
-> +	 * \-----------/ SRAM size
-> +	 */
-> +#define SRAM_CONFIG		0x00
-> +#define SRAM_DATA_KEY_P		0x20
-> +#define SRAM_DATA_IV		0x40
-> +#define SRAM_DATA_IV_BUF	0x40
-> +#define SRAM_DATA_IN_START	0x50
-> +#define SRAM_DATA_OUT_START	0x50
-> +
-> +#define SRAM_CFG_SPACE		0x50
-> +
-> +#endif
-> -- 
-> 1.6.2.5
-> 
+And here is what is totally strange:
+When I read from this raid, I get a throughput of about 24MB/s (what is
+about the amount an Atom Core @1.6GHz (aes_x86) can decrypt per second.=
+ Looking
+at the 2 kcryptd processes I find that each is using nearly 50% cpu
+time. As if they where running only on a single core and/or waiting
+for each other?!
+
+lieven@dozer64-ssd:~$ sh speedtest-read.sh
+Sa 1. Aug 21:52:19 CEST 2009
+1024+0 Datens=E4tze ein
+1024+0 Datens=E4tze aus
+1073741824 Bytes (1,1 GB) kopiert, 43,661 s, 24,6 MB/s
+Sa 1. Aug 21:53:03 CEST 2009
+
+# 1024MB / 44 sec =3D 23,2 MB/sec
+
+lieven@dozer64-ssd:~$ cat speedtest-read.sh
+#!/bin/sh
+sync
+date
+dd if=3D/home/lieven/speedtest.dat of=3D/dev/null bs=3D1M
+sync
+date
+
+hdparm outputs about the same performance:
+lieven@dozer64-ssd:~$ sudo hdparm -tT /dev/md0
+
+/dev/md0:
+ Timing cached reads:   1244 MB in  2.00 seconds =3D 621.48 MB/sec
+ Timing buffered disk reads:   70 MB in  3.04 seconds =3D  23.01 MB/sec
+
+But, when I write to /dev/md0 I get a significantly better performance:
+
+lieven@dozer64-ssd:~$ sh speedtest-write.sh
+Sa 1. Aug 22:19:04 CEST 2009
+1024+0 Datens=E4tze ein
+1024+0 Datens=E4tze aus
+1073741824 Bytes (1,1 GB) kopiert, 27,2655 s, 39,4 MB/s
+Sa 1. Aug 22:19:36 CEST 2009
+
+# 1024 MB / 32 sec =3D 32 MB / sec
+
+lieven@dozer64-ssd:~$ cat speedtest-write.sh
+#!/bin/sh
+sync
+date
+dd if=3D/dev/zero of=3D/home/lieven/speedtest.dat bs=3D1M count=3D1024
+sync
+date
+
+If I look at the both kcryptd processes I see that both are using
+roughly 100% of one CPU core each when i write to /dev/md0.
+
+Before I made this setup, I tried it on an unencrypted volume
+with 2 files mounted via loop, crypted and then added to raid.
+In this case, the read performance is as expected (about 45MB/s).
+
+I tried with ubuntu jaunty kernel 2.6.28-13 and I also tried
+2.6.30.4 as I read about the kcrypt workqueue patch that was
+added recently.
+
+Does anyone have an explaination for this?
+
+Thanks,
+Peter
+
+
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkp3PVMACgkQO/ibohXUOnKYXQCcDrZ0qmnfsn+IkBoAmnEZXkVN
+rWAAoL0NYiPYeawhMMP2zvbslftyhNeZ
+=3DIfDQ
+-----END PGP SIGNATURE-----
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
