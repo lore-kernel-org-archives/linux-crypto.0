@@ -1,69 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUGFIX] crypto: Fix ctr(aes) testing by specifying geniv
-Date: Wed, 5 Aug 2009 19:45:06 +1000
-Message-ID: <20090805094506.GA12528@gondor.apana.org.au>
-References: <1249285483-22286-1-git-send-email-ying.huang@intel.com>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: [dm-crypt] cryptsetup with arc4 cipher
+Date: Wed, 05 Aug 2009 15:09:59 +0200
+Message-ID: <4A7984A7.40109@redhat.com>
+References: <87zlaf3zl0.wl@obsidian.enotty.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: dm-crypt@saout.de, linux-crypto@vger.kernel.org
+To: Stelios Bounanos <sb-lst@enotty.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46568 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932956AbZHEJpI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Aug 2009 05:45:08 -0400
-Content-Disposition: inline
-In-Reply-To: <1249285483-22286-1-git-send-email-ying.huang@intel.com>
+Received: from mx2.redhat.com ([66.187.237.31]:60922 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932737AbZHENKa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Aug 2009 09:10:30 -0400
+In-Reply-To: <87zlaf3zl0.wl@obsidian.enotty.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 03, 2009 at 03:44:43PM +0800, Huang Ying wrote:
-> When doing "modeprobe tcrypt mode=10", the following error will show
-> in dmesg.
+Stelios Bounanos wrote:
+> I was surprised to see arc4 perform so badly, particularly since
+> "openssl speed" results tell a very different story.  I decided to do
+> some simple benchmarking of my own but I can't seem to get cryptsetup to
+> work with arc4:
 > 
-> alg: skcipher: Failed to load transform for ctr(aes): -22
-> alg: skcipher: Failed to load transform for ctr(aes): -22
-> tcrypt: one or more tests failed!
-
-I can't reproduce it here:
-
-etch1:~# modprobe tcrypt mode=10
-FATAL: Error inserting tcrypt (/lib/modules/2.6.30/kernel/crypto/tcrypt.ko): Resource temporarily unavailable
-etch1:~# dmesg|tail
-alg: No test for digest_null (digest_null-generic)
-alg: No test for compress_null (compress_null-generic)
-padlock: VIA PadLock Hash Engine not detected.
-padlock: VIA PadLock Hash Engine not detected.
-eth0: link up, 100Mbps, full-duplex, lpa 0x05E1
-Initializing XFRM netlink socket
-NET: Registered protocol family 17
-NET: Registered protocol family 10
-lo: Disabled Privacy Extensions
-eth0: no IPv6 routers present
-etch1:~# 
-
-The tcrypt test shouldn't use geniv at all.
-
-What kernel version was this?
-
-> Because ctr(aes) testing code will allocate ctr(aes) with geniv, but
-> defualt geniv mode may not work with ctr(aes). As that of rfc3686,
-> this is fixed via specifying geniv mode to "seqiv".
+>   # cryptsetup luksFormat --align-payload=512 -q -c arc4 /dev/sda4 key
+>   # cryptsetup luksOpen -d key /dev/sda4 ctest
+>     Command failed: No key available with this passphrase.
 > 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
+> The above commands work fine with aes.  I can see arc4 in /proc/crypto.
+> 
+> Any ideas?
 
-I think this patch makes sense as the default IV generator is not
-designed to guarantee uniqueness (although repetitions would be
-very rare).
+There is apparently some problem in kernel, not sure if dm-crypt or crypto
+api one, This ARC4 configuration is allowed (no errors) but produces something
+more like random generator:-)
 
-But I'd like to get to the bottom of the failure that you were
-seeing so that we don't commit this with a potentially misleading
-message.
+one sector device:
+# dmsetup create x --table "0 1 crypt arc4-cbc-plain 0123456789abcdef 0 /dev/sdb 0"
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+# sha256sum /dev/mapper/x
+d37afeeb57a60b69715edd99f2a1523e77f6be51a1c61c56efc91ed691c90dfc  /dev/mapper/x
+
+# sha256sum /dev/mapper/x
+fdc87e8e9f158d26e58c5b48c80375b56cc24d0c088872f4aacc7e19fb5c5599  /dev/mapper/x
+
+Not sure what's wrong yet...
+
+Milan
+--
+mbroz@redhat.com
