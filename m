@@ -1,54 +1,60 @@
-From: Milan Broz <mbroz@redhat.com>
+From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Subject: Re: [dm-crypt] cryptsetup with arc4 cipher
-Date: Thu, 06 Aug 2009 09:46:59 +0200
-Message-ID: <4A7A8A73.706@redhat.com>
-References: <87zlaf3zl0.wl@obsidian.enotty.net> <4A7984A7.40109@redhat.com> <20090805203017.GA5875@Chamillionaire.breakpoint.cc>
+Date: Thu, 6 Aug 2009 10:38:05 +0200
+Message-ID: <20090806083805.GA9736@Chamillionaire.breakpoint.cc>
+References: <87zlaf3zl0.wl@obsidian.enotty.net> <4A7984A7.40109@redhat.com> <20090805203017.GA5875@Chamillionaire.breakpoint.cc> <4A7A8A73.706@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: Stelios Bounanos <sb-lst@enotty.net>, dm-crypt@saout.de,
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Milan Broz <mbroz@redhat.com>,
+	Stelios Bounanos <sb-lst@enotty.net>, dm-crypt@saout.de,
 	linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:47296 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752219AbZHFHrj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Aug 2009 03:47:39 -0400
-In-Reply-To: <20090805203017.GA5875@Chamillionaire.breakpoint.cc>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:47534 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751930AbZHFIiZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Aug 2009 04:38:25 -0400
+Content-Disposition: inline
+In-Reply-To: <4A7A8A73.706@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+* Milan Broz | 2009-08-06 09:46:59 [+0200]:
 
-Sebastian Andrzej Siewior wrote:
-> Don't use this as a block cipher in dm-crypt, it is a bad idea.
-> 
-> The long story:
-> ARC4 is a stream cipher and not a block cipher. Its internal state is
-> reseted in setkey() and every crypto request (encrypt/decrypt don't
-> matter) update the internal state of the stream cipher. That's why you
-> get a different result every time you read the same block.
-> 
-> If you want to use this stream cipher in dm-crypt you would have to
-> setup it up in ECB mode and use a key like "passphrase-IV". You have to
-> set this key before a requests and wait until its done until you
-> issue another crypto request (which includes setkey).
+>yes, I understand why this happens. I do not want to use stream cipher,
+>but apparently users will do that:-)
+So once they discover that they have salsa20 in kernel they see another
+problem.
 
-yes, I understand why this happens. I do not want to use stream cipher,
-but apparently users will do that:-)
+>My question was why crypto allows this setting?
+Well, WLAN is afaik the only user and they use it that way. So it
+is okay as long as you now what you do :)
 
-My question was why crypto allows this setting?
-Or maybe what to do in dm-crypt to not allow user set such cipher
-mapping (because it cannot produce anything useful).
+>Or maybe what to do in dm-crypt to not allow user set such cipher
+>mapping (because it cannot produce anything useful).
+You could encrypt one block twice and compare the result. This sounds
+like a dirty hack.
 
-IMHO it will not work even in ECB mode here for dm-crypt.
-(also dm-crypt uses own IV function generators, but it is another story)
+>IMHO it will not work even in ECB mode here for dm-crypt.
+You could make it work but it is not worth it.
 
-> CBC will not work because one of its requirements is that the cipher
-> provides an inverse function which ARC4 simply does not have.
+>> CBC will not work because one of its requirements is that the cipher
+>> provides an inverse function which ARC4 simply does not have.
+>
+>Again, why crypto API allows to use it and do not produce error then?
+WLAN folks are the only user of arc4 afaik and they probably hacked it
+quick together. Since stream cipher don't provide an inverse function it
+is an abuse of the API because encrypt/decrypt don't do what one would
+expect.
 
-Again, why crypto API allows to use it and do not produce error then?
+Herbert, any concern to inroduce 
+ #define CRYPTO_ALG_TYPE_STREAM_CIPHER      0x00000007
+and split block cipher from stream cipher?
+So no one would mix them up since dm-crypt for instance will look just
+for block ciphers. Unless you prefer that the user knows what he is
+doing :)
 
-Milan
---
-mbroz@redhat.com
+>Milan
 
+Sebastian
