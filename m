@@ -1,48 +1,54 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [PATCH -v2 5/5] crypto: Add PCLMULQDQ accelerated GHASH
- implementation
-Date: Thu, 06 Aug 2009 15:20:23 +0800
-Message-ID: <1249543224.20937.0.camel@yhuang-dev.sh.intel.com>
-References: <1249285531-22422-1-git-send-email-ying.huang@intel.com>
-	 <1249285531-22422-2-git-send-email-ying.huang@intel.com>
-	 <1249285531-22422-3-git-send-email-ying.huang@intel.com>
-	 <1249285531-22422-4-git-send-email-ying.huang@intel.com>
-	 <1249285531-22422-5-git-send-email-ying.huang@intel.com>
-	 <20090806071741.GB25065@gondor.apana.org.au>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: [dm-crypt] cryptsetup with arc4 cipher
+Date: Thu, 06 Aug 2009 09:46:59 +0200
+Message-ID: <4A7A8A73.706@redhat.com>
+References: <87zlaf3zl0.wl@obsidian.enotty.net> <4A7984A7.40109@redhat.com> <20090805203017.GA5875@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Stelios Bounanos <sb-lst@enotty.net>, dm-crypt@saout.de,
+	linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:39541 "EHLO mga01.intel.com"
+Received: from mx2.redhat.com ([66.187.237.31]:47296 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752638AbZHFHUZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Aug 2009 03:20:25 -0400
-In-Reply-To: <20090806071741.GB25065@gondor.apana.org.au>
+	id S1752219AbZHFHrj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Aug 2009 03:47:39 -0400
+In-Reply-To: <20090805203017.GA5875@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2009-08-06 at 15:17 +0800, Herbert Xu wrote:
-> On Mon, Aug 03, 2009 at 03:45:31PM +0800, Huang Ying wrote:
-> > PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
-> > carry-less multiplication. More information about PCLMULQDQ can be
-> > found at:
-> > 
-> > http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
-> > 
-> > Because PCLMULQDQ changes XMM state, its usage must be enclosed with
-> > kernel_fpu_begin/end, which can be used only in process context, the
-> > acceleration is implemented as crypto_ahash. That is, request in soft
-> > IRQ context will be defered to the cryptd kernel thread.
-> > 
-> > Signed-off-by: Huang Ying <ying.huang@intel.com>
+
+Sebastian Andrzej Siewior wrote:
+> Don't use this as a block cipher in dm-crypt, it is a bad idea.
 > 
-> Please resubmit this patch once irq_is_fpu_using() hits mainline.
+> The long story:
+> ARC4 is a stream cipher and not a block cipher. Its internal state is
+> reseted in setkey() and every crypto request (encrypt/decrypt don't
+> matter) update the internal state of the stream cipher. That's why you
+> get a different result every time you read the same block.
+> 
+> If you want to use this stream cipher in dm-crypt you would have to
+> setup it up in ECB mode and use a key like "passphrase-IV". You have to
+> set this key before a requests and wait until its done until you
+> issue another crypto request (which includes setkey).
 
-OK. I will do that.
+yes, I understand why this happens. I do not want to use stream cipher,
+but apparently users will do that:-)
 
-Best Regards,
-Huang Ying
+My question was why crypto allows this setting?
+Or maybe what to do in dm-crypt to not allow user set such cipher
+mapping (because it cannot produce anything useful).
+
+IMHO it will not work even in ECB mode here for dm-crypt.
+(also dm-crypt uses own IV function generators, but it is another story)
+
+> CBC will not work because one of its requirements is that the cipher
+> provides an inverse function which ARC4 simply does not have.
+
+Again, why crypto API allows to use it and do not produce error then?
+
+Milan
+--
+mbroz@redhat.com
 
