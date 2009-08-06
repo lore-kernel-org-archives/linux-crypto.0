@@ -1,37 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -v2 4/5] x86: Move kernel_fpu_using to irq_is_fpu_using
-	in asm/i387.h
-Date: Thu, 6 Aug 2009 17:16:47 +1000
-Message-ID: <20090806071647.GA25065@gondor.apana.org.au>
-References: <1249285531-22422-1-git-send-email-ying.huang@intel.com> <1249285531-22422-2-git-send-email-ying.huang@intel.com> <1249285531-22422-3-git-send-email-ying.huang@intel.com> <1249285531-22422-4-git-send-email-ying.huang@intel.com> <20090806053719.GD23557@gondor.apana.org.au> <4A7A77B6.9050306@zytor.com>
+Subject: Re: [PATCH -v2 5/5] crypto: Add PCLMULQDQ accelerated GHASH
+	implementation
+Date: Thu, 6 Aug 2009 17:17:41 +1000
+Message-ID: <20090806071741.GB25065@gondor.apana.org.au>
+References: <1249285531-22422-1-git-send-email-ying.huang@intel.com> <1249285531-22422-2-git-send-email-ying.huang@intel.com> <1249285531-22422-3-git-send-email-ying.huang@intel.com> <1249285531-22422-4-git-send-email-ying.huang@intel.com> <1249285531-22422-5-git-send-email-ying.huang@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59301 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:54112 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752219AbZHFHQw (ORCPT
+	with ESMTP id S1752608AbZHFHRm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Aug 2009 03:16:52 -0400
+	Thu, 6 Aug 2009 03:17:42 -0400
 Content-Disposition: inline
-In-Reply-To: <4A7A77B6.9050306@zytor.com>
+In-Reply-To: <1249285531-22422-5-git-send-email-ying.huang@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 05, 2009 at 11:27:02PM -0700, H. Peter Anvin wrote:
-> Herbert Xu wrote:
->>
->> Peter, do you want to apply this patch in your tree or would
->> you prefer for it to go through my tree along with the rest of
->> the series?
->>
->
-> I'll take it tomorrow... want to double-check that we don't have any  
-> real issues w.r.t. corruption there.
+On Mon, Aug 03, 2009 at 03:45:31PM +0800, Huang Ying wrote:
+> PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
+> carry-less multiplication. More information about PCLMULQDQ can be
+> found at:
+> 
+> http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
+> 
+> Because PCLMULQDQ changes XMM state, its usage must be enclosed with
+> kernel_fpu_begin/end, which can be used only in process context, the
+> acceleration is implemented as crypto_ahash. That is, request in soft
+> IRQ context will be defered to the cryptd kernel thread.
+> 
+> Signed-off-by: Huang Ying <ying.huang@intel.com>
 
-Thanks!
+Please resubmit this patch once irq_is_fpu_using() hits mainline.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
