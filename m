@@ -1,46 +1,37 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH] typo in crypto/rng.c
-Date: Sat, 8 Aug 2009 07:22:08 -0400
-Message-ID: <20090808112208.GA18518@localhost.localdomain>
-References: <alpine.DEB.2.01.0908072346000.5831@bogon.housecafe.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4] crypto: add support for Orion5X crypto engine
+Date: Mon, 10 Aug 2009 12:50:23 +1000
+Message-ID: <20090810025023.GA28837@gondor.apana.org.au>
+References: <alpine.LFD.2.00.0906111513420.31536@xanadu.home> <20090611201530.GA11486@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111625280.31536@xanadu.home> <20090611210734.GA11920@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0906111712060.31536@xanadu.home> <20090801093803.GA2362@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0908021008450.3066@xanadu.home> <20090803165750.GB17083@Chamillionaire.breakpoint.cc> <alpine.LFD.2.00.0908031453570.8735@xanadu.home> <20090805072425.GA32367@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-To: Christian Kujau <lists@nerdbynature.de>
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+	Nicolas Pitre <nico@cam.org>, linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <arm-kernel@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:47662 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932737AbZHHLWR (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:51887 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751899AbZHJCvR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Aug 2009 07:22:17 -0400
+	Sun, 9 Aug 2009 22:51:17 -0400
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.01.0908072346000.5831@bogon.housecafe.de>
+In-Reply-To: <20090805072425.GA32367@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 07, 2009 at 11:49:20PM -0700, Christian Kujau wrote:
+On Wed, Aug 05, 2009 at 09:24:25AM +0200, Sebastian Andrzej Siewior wrote:
+> From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 > 
-> Correct a typo in crypto/rng.c
+> This adds support for Marvell's Cryptographic Engines and Security
+> Accelerator (CESA) which can be found on a few SoC.
+> Tested with dm-crypt.
 > 
-> Signed-off-by: Christian Kujau <lists@nerdbynature.de>
-> 
-> --- linux-2.6-git/crypto/rng.c.orig	2009-08-08 08:43:49.227693375 +0200
-> +++ linux-2.6-git/crypto/rng.c	2009-08-08 08:44:54.735426448 +0200
-> @@ -123,4 +123,4 @@ void crypto_put_default_rng(void)
->  EXPORT_SYMBOL_GPL(crypto_put_default_rng);
->  
->  MODULE_LICENSE("GPL");
-> -MODULE_DESCRIPTION("Random Number Genertor");
-> +MODULE_DESCRIPTION("Random Number Generator");
-> 
-> -- 
-> BOFH excuse #229:
-> 
-> wrong polarity of neutron flow
-> 
+> Acked-by: Nicolas Pitre <nico@marvell.com>
+> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-Thanks!
-
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
-
+Patch applied.  Thanks Sebastian!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
