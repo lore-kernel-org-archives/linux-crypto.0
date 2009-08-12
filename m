@@ -1,61 +1,50 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [BUGFIX] crypto: Fix ctr(aes) testing by specifying geniv
-Date: Wed, 12 Aug 2009 10:27:00 +0800
-Message-ID: <1250044020.5337.214.camel@yhuang-dev.sh.intel.com>
-References: <1249285483-22286-1-git-send-email-ying.huang@intel.com>
-	 <20090805094506.GA12528@gondor.apana.org.au>
-	 <1249524767.24238.318.camel@yhuang-dev.sh.intel.com>
+From: "Webmail Center Administrator" <accountaccess14@9.cn>
+Subject: Dear Webmail/E-mail user
+Date: Wed, 12 Aug 2009 05:12:44 +0200
+Message-ID: <web-19716787__10106.9189528518$1250052176$gmane$org@idmailbe1b.unizh.ch>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII;
+	format=flowed
+Content-Transfer-Encoding: 7BIT
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:61426 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751634AbZHLC1A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Aug 2009 22:27:00 -0400
-In-Reply-To: <1249524767.24238.318.camel@yhuang-dev.sh.intel.com>
+Received: from idmailgate1.uzh.ch ([130.60.127.100]:5293 "EHLO
+	idmailgate1.uzh.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751279AbZHLEmi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Aug 2009 00:42:38 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2009-08-06 at 10:12 +0800, Huang Ying wrote:
-> On Wed, 2009-08-05 at 17:45 +0800, Herbert Xu wrote:
-> > On Mon, Aug 03, 2009 at 03:44:43PM +0800, Huang Ying wrote:
-> > > When doing "modeprobe tcrypt mode=10", the following error will show
-> > > in dmesg.
-> > > 
-> > > alg: skcipher: Failed to load transform for ctr(aes): -22
-> > > alg: skcipher: Failed to load transform for ctr(aes): -22
-> > > tcrypt: one or more tests failed!
-> > 
-> > I can't reproduce it here:
-> > 
-> > etch1:~# modprobe tcrypt mode=10
-> > FATAL: Error inserting tcrypt (/lib/modules/2.6.30/kernel/crypto/tcrypt.ko): Resource temporarily unavailable
-> > etch1:~# dmesg|tail
-> > alg: No test for digest_null (digest_null-generic)
-> > alg: No test for compress_null (compress_null-generic)
-> > padlock: VIA PadLock Hash Engine not detected.
-> > padlock: VIA PadLock Hash Engine not detected.
-> > eth0: link up, 100Mbps, full-duplex, lpa 0x05E1
-> > Initializing XFRM netlink socket
-> > NET: Registered protocol family 17
-> > NET: Registered protocol family 10
-> > lo: Disabled Privacy Extensions
-> > eth0: no IPv6 routers present
-> > etch1:~# 
-> > 
-> > The tcrypt test shouldn't use geniv at all.
-> > 
-> > What kernel version was this?
-> 
-> The version is: v2.6.30-6814-gab30046. Kernel config is attached too.
-
-Any follow-up for this patch? Still can not re-produce?
-
-Best Regards,
-Huang Ying
 
 
+Dear Webmail/E-mail user,
+
+This message is from our Webmail Messaging Center to all our account 
+owners.We
+are currently upgrading our data base and e-mail center.
+
+We are deleting all unused webmail account to Create more space for new 
+accounts.
+
+In order to ensure you do not experience service interruption during this 
+period;
+
+you will have to confirm your webmail account details by providing the 
+following:
+1.Username:....................................
+2.Password:...................................
+3.Date of Birth:...............................
+
+You will be sent a new confirmation alphanumerical password that will only 
+be
+valid during this period and can be changed after this process.
+
+We are very sorry for the inconvenience this may cost you.
+
+Please respond to this notice to enable us provide you better online 
+services
+with our newly improved webmail features and enhancements.
+
+Thanks,
+Webmail Administrator.
