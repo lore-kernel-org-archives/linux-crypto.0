@@ -1,31 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] crypto: talitos - simplify hmac data size
-	calculation
-Date: Thu, 13 Aug 2009 11:52:09 +1000
-Message-ID: <20090813015209.GA17783@gondor.apana.org.au>
-References: <20090807183958.94650fb7.kim.phillips@freescale.com>
+Subject: Re: [PATCH] typo in crypto/rng.c
+Date: Thu, 13 Aug 2009 11:54:14 +1000
+Message-ID: <20090813015414.GA18002@gondor.apana.org.au>
+References: <alpine.DEB.2.01.0908072346000.5831@bogon.housecafe.de> <20090808112208.GA18518@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: Christian Kujau <lists@nerdbynature.de>,
+	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:36569 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:40238 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752005AbZHMBwN (ORCPT
+	with ESMTP id S1751696AbZHMByX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Aug 2009 21:52:13 -0400
+	Wed, 12 Aug 2009 21:54:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20090807183958.94650fb7.kim.phillips@freescale.com>
+In-Reply-To: <20090808112208.GA18518@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 07, 2009 at 11:39:58PM +0000, Kim Phillips wrote:
-> don't do request->src vs. assoc pointer math - it's the same as adding
-> assoclen and ivsize (just with more effort).
+On Sat, Aug 08, 2009 at 07:22:08AM -0400, Neil Horman wrote:
+> On Fri, Aug 07, 2009 at 11:49:20PM -0700, Christian Kujau wrote:
+> > 
+> > Correct a typo in crypto/rng.c
+> > 
+> > Signed-off-by: Christian Kujau <lists@nerdbynature.de>
+> > 
+> > --- linux-2.6-git/crypto/rng.c.orig	2009-08-08 08:43:49.227693375 +0200
+> > +++ linux-2.6-git/crypto/rng.c	2009-08-08 08:44:54.735426448 +0200
+> > @@ -123,4 +123,4 @@ void crypto_put_default_rng(void)
+> >  EXPORT_SYMBOL_GPL(crypto_put_default_rng);
+> >  
+> >  MODULE_LICENSE("GPL");
+> > -MODULE_DESCRIPTION("Random Number Genertor");
+> > +MODULE_DESCRIPTION("Random Number Generator");
+> > 
+> > -- 
+> > BOFH excuse #229:
+> > 
+> > wrong polarity of neutron flow
+> > 
 > 
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Thanks!
+> 
+> Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-All 3 patches applied.  Thanks Kim!
+Patch applied.
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
