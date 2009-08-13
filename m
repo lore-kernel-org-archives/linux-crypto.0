@@ -1,51 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] typo in crypto/rng.c
-Date: Thu, 13 Aug 2009 11:54:14 +1000
-Message-ID: <20090813015414.GA18002@gondor.apana.org.au>
-References: <alpine.DEB.2.01.0908072346000.5831@bogon.housecafe.de> <20090808112208.GA18518@localhost.localdomain>
+Subject: Re: [BUGFIX] crypto: Fix ctr(aes) testing by specifying geniv
+Date: Thu, 13 Aug 2009 14:53:00 +1000
+Message-ID: <20090813045300.GA19993@gondor.apana.org.au>
+References: <1249285483-22286-1-git-send-email-ying.huang@intel.com> <20090805094506.GA12528@gondor.apana.org.au> <1249524767.24238.318.camel@yhuang-dev.sh.intel.com> <1250044020.5337.214.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Christian Kujau <lists@nerdbynature.de>,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40238 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53666 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751696AbZHMByX (ORCPT
+	with ESMTP id S1751418AbZHMExC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Aug 2009 21:54:23 -0400
+	Thu, 13 Aug 2009 00:53:02 -0400
 Content-Disposition: inline
-In-Reply-To: <20090808112208.GA18518@localhost.localdomain>
+In-Reply-To: <1250044020.5337.214.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Aug 08, 2009 at 07:22:08AM -0400, Neil Horman wrote:
-> On Fri, Aug 07, 2009 at 11:49:20PM -0700, Christian Kujau wrote:
-> > 
-> > Correct a typo in crypto/rng.c
-> > 
-> > Signed-off-by: Christian Kujau <lists@nerdbynature.de>
-> > 
-> > --- linux-2.6-git/crypto/rng.c.orig	2009-08-08 08:43:49.227693375 +0200
-> > +++ linux-2.6-git/crypto/rng.c	2009-08-08 08:44:54.735426448 +0200
-> > @@ -123,4 +123,4 @@ void crypto_put_default_rng(void)
-> >  EXPORT_SYMBOL_GPL(crypto_put_default_rng);
-> >  
-> >  MODULE_LICENSE("GPL");
-> > -MODULE_DESCRIPTION("Random Number Genertor");
-> > +MODULE_DESCRIPTION("Random Number Generator");
-> > 
-> > -- 
-> > BOFH excuse #229:
-> > 
-> > wrong polarity of neutron flow
-> > 
-> 
-> Thanks!
-> 
-> Acked-by: Neil Horman <nhorman@tuxdriver.com>
+On Wed, Aug 12, 2009 at 10:27:00AM +0800, Huang Ying wrote:
+>
+> Any follow-up for this patch? Still can not re-produce?
 
-Patch applied.
+I can now that I'm on a 32-bit machine.  I wonder if it's 32-bit
+specific or perhaps I was just using an old kernel.
+
+I'll look into it.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
