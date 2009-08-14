@@ -1,47 +1,183 @@
 From: "Sebastian A. Siewior" <arm-kernel@ml.breakpoint.cc>
-Subject: [RFC 0/2] first IDMA support for the Orion/CESA engine
-Date: Fri, 14 Aug 2009 21:09:48 +0200
-Message-ID: <1250276990-28006-1-git-send-email-arm-kernel@ml.breakpoint.cc>
-Cc: linux-arm-kernel@lists.arm.linux.org.uk
+Subject: [RFC 2/2] crypto/mv-cesa: use threaded interrupts
+Date: Fri, 14 Aug 2009 21:09:50 +0200
+Message-ID: <1250276990-28006-3-git-send-email-arm-kernel@ml.breakpoint.cc>
+References: <1250276990-28006-1-git-send-email-arm-kernel@ml.breakpoint.cc>
+Cc: linux-arm-kernel@lists.arm.linux.org.uk,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:57741 "EHLO
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:57745 "EHLO
 	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754215AbZHNTKA (ORCPT
+	by vger.kernel.org with ESMTP id S1756915AbZHNTKM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Aug 2009 15:10:00 -0400
+	Fri, 14 Aug 2009 15:10:12 -0400
+In-Reply-To: <1250276990-28006-1-git-send-email-arm-kernel@ml.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is the first shot of DMA support for CESA on Orion. Right now, the
-IDMA engine is used as memcpy(), no descriptors are used yet. The DMA
-support seems to work fine so far. However it seems not to improve the
-performance that much I hoped in first place.
-The second patch replaces the driver thread with an interrupt thread. I
-hacked it very quick together, it compiled and dm-crypt didn't complain.
-I hope that the latency between "interrupt" and "copy back" is as short
-as possible and maybe the performance improves a little :) I want to
-avoid to push everything into the raw interrupt handler.
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-The next step would be to implement correct DMA-descriptor support and
-let IDMA trigger CESA. Since CESA's ch0 has to work with IDMA's ch0 I
-don't think it makes much sense to go through the dmaengine framework.
-That's why I moved it to the crypto folder. IDMA's ch2 and ch3 could be
-exposed to the dmaengine framework if one likes but the XOR engine
-provides the same functionality.
+this patch converts the cesa-thread into a threaded-interrupt.
 
-Does someone have any objections on the idma-cesa mix? I probably should
-add some hooks for the dma engine in case Kirkwood's and Orion's HW is
-different here.
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ drivers/crypto/mv_cesa.c |   79 ++++++++++++++++-----------------------------
+ 1 files changed, 28 insertions(+), 51 deletions(-)
 
-I'm off the radar for the next weeks so I can't reply.
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index ef3404b..6943597 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -60,7 +60,6 @@ struct crypto_priv {
+ 	void __iomem *sram;
+ 	u32 sram_phys;
+ 	int irq;
+-	struct task_struct *queue_th;
+ 
+ 	/* the lock protects queue and eng_st */
+ 	spinlock_t lock;
+@@ -317,52 +316,41 @@ static void mv_enqueue_new_req(struct ablkcipher_request *req)
+ 	mv_process_current_q(1);
+ }
+ 
+-static int queue_manag(void *data)
++static irqreturn_t queue_manag(int irq, void *data)
+ {
+-	cpg->eng_st = ENGINE_IDLE;
+-	do {
+-		struct ablkcipher_request *req;
+-		struct crypto_async_request *async_req = NULL;
+-		struct crypto_async_request *backlog;
+-
+-		__set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (cpg->eng_st == ENGINE_W_DEQUEUE)
+-			dequeue_complete_req();
+-
+-		spin_lock_irq(&cpg->lock);
+-		if (cpg->eng_st == ENGINE_IDLE) {
+-			backlog = crypto_get_backlog(&cpg->queue);
+-			async_req = crypto_dequeue_request(&cpg->queue);
+-			if (async_req) {
+-				BUG_ON(cpg->eng_st != ENGINE_IDLE);
+-				cpg->eng_st = ENGINE_BUSY;
+-			}
+-		}
+-		spin_unlock_irq(&cpg->lock);
++	struct ablkcipher_request *req;
++	struct crypto_async_request *async_req = NULL;
++	struct crypto_async_request *backlog = NULL;
+ 
+-		if (backlog) {
+-			backlog->complete(backlog, -EINPROGRESS);
+-			backlog = NULL;
+-		}
++	if (cpg->eng_st == ENGINE_W_DEQUEUE)
++		dequeue_complete_req();
+ 
++	spin_lock_bh(&cpg->lock);
++	if (cpg->eng_st == ENGINE_IDLE) {
++		backlog = crypto_get_backlog(&cpg->queue);
++		async_req = crypto_dequeue_request(&cpg->queue);
+ 		if (async_req) {
+-			req = container_of(async_req,
+-					struct ablkcipher_request, base);
+-			mv_enqueue_new_req(req);
+-			async_req = NULL;
++			BUG_ON(cpg->eng_st != ENGINE_IDLE);
++			cpg->eng_st = ENGINE_BUSY;
+ 		}
++	}
++	spin_unlock_bh(&cpg->lock);
+ 
+-		schedule();
++	if (backlog)
++		backlog->complete(backlog, -EINPROGRESS);
+ 
+-	} while (!kthread_should_stop());
+-	return 0;
++	if (async_req) {
++		req = container_of(async_req,
++				struct ablkcipher_request, base);
++		mv_enqueue_new_req(req);
++	}
++
++	return IRQ_HANDLED;
+ }
+ 
+ static int mv_handle_req(struct ablkcipher_request *req)
+ {
+ 	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+-	unsigned long flags;
+ 	unsigned int n_sgs;
+ 	int ret;
+ 	int enqueue_plz = 0;
+@@ -408,7 +396,7 @@ static int mv_handle_req(struct ablkcipher_request *req)
+ 		req_ctx->sg_dst_left = sg_dma_len(req->dst);
+ 	}
+ 
+-	spin_lock_irqsave(&cpg->lock, flags);
++	spin_lock_bh(&cpg->lock);
+ 	/* If the engine is idle, we enqueue it on HW start processing. In the
+ 	 * other case we put in in the queue and enqueue it once we dequeue the
+ 	 * earlier request.
+@@ -420,7 +408,7 @@ static int mv_handle_req(struct ablkcipher_request *req)
+ 	} else {
+ 		ret = ablkcipher_enqueue_request(&cpg->queue, req);
+ 	}
+-	spin_unlock_irqrestore(&cpg->lock, flags);
++	spin_unlock_bh(&cpg->lock);
+ 
+ 	if (enqueue_plz)
+ 		mv_enqueue_new_req(req);
+@@ -491,8 +479,7 @@ irqreturn_t crypto_int(int irq, void *priv)
+ 	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
+ 	BUG_ON(cpg->eng_st != ENGINE_BUSY);
+ 	cpg->eng_st = ENGINE_W_DEQUEUE;
+-	wake_up_process(cpg->queue_th);
+-	return IRQ_HANDLED;
++	return IRQ_WAKE_THREAD;
+ }
+ 
+ struct crypto_alg mv_aes_alg_ecb = {
+@@ -591,15 +578,8 @@ static int mv_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, cp);
+ 	cpg = cp;
+-
+-	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
+-	if (IS_ERR(cp->queue_th)) {
+-		ret = PTR_ERR(cp->queue_th);
+-		goto err_thread;
+-	}
+-
+-	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
+-			cp);
++	ret = request_threaded_irq(irq, crypto_int, queue_manag, 0,
++			dev_name(&pdev->dev), cp);
+ 	if (ret)
+ 		goto err_unmap_sram;
+ 
+@@ -616,10 +596,8 @@ static int mv_probe(struct platform_device *pdev)
+ 	return 0;
+ err_unreg_ecb:
+ 	crypto_unregister_alg(&mv_aes_alg_ecb);
+-err_thread:
+ 	free_irq(irq, cp);
+ err_reg:
+-	kthread_stop(cp->queue_th);
+ err_unmap_sram:
+ 	iounmap(cp->sram);
+ err_unmap_reg:
+@@ -637,7 +615,6 @@ static int mv_remove(struct platform_device *pdev)
+ 
+ 	crypto_unregister_alg(&mv_aes_alg_ecb);
+ 	crypto_unregister_alg(&mv_aes_alg_cbc);
+-	kthread_stop(cp->queue_th);
+ 	free_irq(cp->irq, cp);
+ 	memset(cp->sram, 0, cp->sram_size);
+ 	iounmap(cp->sram);
+-- 
+1.6.2.5
 
-- [RFC 1/2] crypto/cesa: add idma for Orion5X support
-  also in branch orion_dma at [0]
-
-- [RFC 2/2] crypto/mv-cesa: use threaded interrupts
-  also available in branch orion_threaded_irq at [0]
-
-[0] git://git.breakpoint.cc/bigeasy/linux.git
-
-Sebastian
