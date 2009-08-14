@@ -1,45 +1,38 @@
-From: "Wang, Shane" <shane.wang@intel.com>
-Subject: RE: [RFC PATCH v2] Add VMAC(AES) to Linux for intel_txt support
-Date: Fri, 14 Aug 2009 16:32:57 +0800
-Message-ID: <037F493892196B458CD3E193E8EBAD4F01EAB64820@pdsmsx502.ccr.corp.intel.com>
-References: <4A5F41C4.3050808@intel.com> <4A5F431B.6060307@intel.com>
- <4A805375.4030902@intel.com> <20090814032201.GA2544@gondor.apana.org.au>
+From: Neil Horman <nhorman@redhat.com>
+Subject: Re: crypto: ansi_cprng - Do not select FIPS
+Date: Fri, 14 Aug 2009 06:58:29 -0400
+Message-ID: <20090814105829.GB20601@hmsreliant.think-freely.org>
+References: <20090619123400.GA18778@gondor.apana.org.au> <20090619125500.GA18153@hmsreliant.think-freely.org> <20090813112955.GA25239@gondor.apana.org.au> <20090813144156.GA31826@shamino.rdu.redhat.com> <20090814031340.GA2380@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Cihula, Joseph" <joseph.cihula@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:40243 "EHLO mga02.intel.com"
+Received: from mx2.redhat.com ([66.187.237.31]:55845 "EHLO mx2.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752578AbZHNIeu convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Aug 2009 04:34:50 -0400
-In-Reply-To: <20090814032201.GA2544@gondor.apana.org.au>
-Content-Language: en-US
+	id S1753440AbZHNK6c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Aug 2009 06:58:32 -0400
+Content-Disposition: inline
+In-Reply-To: <20090814031340.GA2380@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> On Tue, Aug 11, 2009 at 01:05:57AM +0800, Shane Wang wrote:
->> 
->> For the comment
->>> This is unnecessary.  Please use the standard kernel helpers
->>> from asm/byteorder.h (which you get by including linux/kernel.h).
->> The current code distinguishes some macro implementations according
->> to different platforms to improve the MACing speed, which is one of
->> the reasons VMAC is very fast for MACing. Do we need to give these
->> up? 
+On Fri, Aug 14, 2009 at 01:13:40PM +1000, Herbert Xu wrote:
+> On Thu, Aug 13, 2009 at 10:41:56AM -0400, Neil Horman wrote:
+> >
+> > Is there a good way to select a tristate from a bool?  The logic is the right
+> > thing to do above, it just seems the mechanism comes up a bit short
 > 
-> I'm talking about your macros such as get64BE/get64LE.  We have
-> identical standard kernel helpers be64_to_cpu/le64_to_cpu which
-> should already be optimal.
+> I suppose you could turn FIPS itself into a tristate.  As it
+> should be used in just one spot, that would be easy to fix up.
 > 
 > Cheers,
+Yeah, I suppose, it just seemed like a hack to me, since it really is a logical
+boolean, and we use it as such.  Ok, I'll look at fixing this soon.  Thanks!
+Neil
 
-OK, I will update.
-
-Thanks for the comment.
-
-Shane
+> -- 
+> Visit Openswan at http://www.openswan.org/
+> Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
