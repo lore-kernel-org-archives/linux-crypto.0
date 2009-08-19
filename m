@@ -1,36 +1,49 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
-Date: Wed, 19 Aug 2009 09:15:49 +0200
-Message-ID: <20090819071549.GB14755@secunet.com>
-References: <20090603115931.GA13361@gondor.apana.org.au> <20090605092030.GO20366@secunet.com> <20090605092021.GB8724@gondor.apana.org.au> <20090605093430.GP20366@secunet.com> <20090608052808.GB19826@gondor.apana.org.au> <20090608064518.GQ20366@secunet.com> <20090625065112.GA31869@gondor.apana.org.au> <20090629110410.GE20366@secunet.com> <20090629115950.GA6594@gondor.apana.org.au> <20090629135257.GG20366@secunet.com>
+From: "CEVAN Ondrej" <Ondrej.CEVAN@frequentis.com>
+Subject: Talitos input data format
+Date: Wed, 19 Aug 2009 13:19:54 +0200
+Message-ID: <085C99672E8EFD479528708F30B80A090366E629@VIECLEX01.frequentis.frq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:56873 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750925AbZHSHNC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Aug 2009 03:13:02 -0400
-Content-Disposition: inline
-In-Reply-To: <20090629135257.GG20366@secunet.com>
+Received: from mail1.frequentis.com ([212.186.194.131]:37474 "EHLO
+	mail1.frequentis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751499AbZHSLbV convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Aug 2009 07:31:21 -0400
+Content-class: urn:content-classes:message
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 29, 2009 at 03:52:57PM +0200, Steffen Klassert wrote:
-> On Mon, Jun 29, 2009 at 07:59:50PM +0800, Herbert Xu wrote:
-> > 
-> > OK.  Can you send me the patches you used against the current
-> > cryptodev tree (I only just pushed so give it an hour or so)?
-> > I'll see if I can reproduce it here.
-> > 
-> 
-> I'll send the remaining two patches in reply to this mail.
-> The strange thing is that I can instantiate pcrypt if the priority is
-> lower than the priority of authenc, but not if it's equal or higher.
+Hello everybody,
 
-Any ideas why it's not possible to instantiate pcrypt?
+according to the function call in drivers/crypto/talitos.c (Linux version
+2.6.29) in function ipsec_esp():
 
-In between I updated padata to use the dynamic percpu allocator,
-so the instantiating of pcrypt is the last issue I know of for the
-moment.
+/*hmac data*/
+map_single_talitos_ptr(dev, &desc->ptr[1], sg_virt(areq->src) -
+sg_virt(areq->assoc), sg_virt(areq->assoc), 0, DMA_TO_DEVICE);
+
+if initialization vector (IV) should be included for HMAC computation, it
+must be in the memory after the associated data (ASSOC) and after ASSOC and
+IV the areq->src data must follow. Thus in memory it should look like: 
++---------+------+-------------------------+
+|  ASSOC  |  IV  | DATA to encrypt/decrypt |
++---------+------+-------------------------+
+
+Is my assumption right? Well my code is working but I want to ask you if it
+is really a requirement that is hopefully somewhere specified. Where could I
+find such information? My searching in Documentation dir and Google was
+without success.  
+
+Also, how does it work when I do not want to use ASSOC but still the IV
+should be included in HMAC computation? Is it then intended that the pointer
+areq->assoc points on the IV? Or am I not in the right ballpark?
+
+Thanks a lot for your answer!
+
+Ondrej
+
+
