@@ -1,68 +1,39 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: Talitos input data format
-Date: Wed, 19 Aug 2009 11:43:04 -0500
-Message-ID: <20090819114304.e56153d8.kim.phillips@freescale.com>
-References: <085C99672E8EFD479528708F30B80A090366E629@VIECLEX01.frequentis.frq>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto: ansi_cprng - Do not select FIPS
+Date: Thu, 20 Aug 2009 17:54:37 +1000
+Message-ID: <20090820075437.GA30878@gondor.apana.org.au>
+References: <20090619123400.GA18778@gondor.apana.org.au> <20090619125500.GA18153@hmsreliant.think-freely.org> <20090813112955.GA25239@gondor.apana.org.au> <20090813144156.GA31826@shamino.rdu.redhat.com> <20090814031340.GA2380@gondor.apana.org.au> <20090814105829.GB20601@hmsreliant.think-freely.org> <20090814111355.GA5908@gondor.apana.org.au> <20090814153930.GC20601@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: "CEVAN Ondrej" <Ondrej.CEVAN@frequentis.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Neil Horman <nhorman@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:59233 "EHLO
-	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751971AbZHSQnM (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:41444 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750744AbZHTHyi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Aug 2009 12:43:12 -0400
-In-Reply-To: <085C99672E8EFD479528708F30B80A090366E629@VIECLEX01.frequentis.frq>
+	Thu, 20 Aug 2009 03:54:38 -0400
+Content-Disposition: inline
+In-Reply-To: <20090814153930.GC20601@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 19 Aug 2009 13:19:54 +0200
-"CEVAN Ondrej" <Ondrej.CEVAN@frequentis.com> wrote:
-
-> Hello everybody,
+On Fri, Aug 14, 2009 at 11:39:30AM -0400, Neil Horman wrote:
 > 
-> according to the function call in drivers/crypto/talitos.c (Linux version
-> 2.6.29) in function ipsec_esp():
+> What about something like this?  It defaults the CPRNG to m and makes FIPS
+> dependent on the CPRNG.  That way you get a module build by default, but you can
+> change it to y manually during config and still satisfy the dependency, and if
+> you select N it disables FIPS as well.  I rather like that better than making
+> FIPS a tristate.  I just tested it out here and it seems to work well.  Let me
+> know what you think
 > 
-> /*hmac data*/
-> map_single_talitos_ptr(dev, &desc->ptr[1], sg_virt(areq->src) -
-> sg_virt(areq->assoc), sg_virt(areq->assoc), 0, DMA_TO_DEVICE);
-> 
-> if initialization vector (IV) should be included for HMAC computation, it
-> must be in the memory after the associated data (ASSOC) and after ASSOC and
-> IV the areq->src data must follow. Thus in memory it should look like: 
-> +---------+------+-------------------------+
-> |  ASSOC  |  IV  | DATA to encrypt/decrypt |
-> +---------+------+-------------------------+
-> 
-> Is my assumption right? Well my code is working but I want to ask you if it
+> Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
 
-yes, I recently posted a patch to change the above (assoc - src) pointer
-math, to an (assoclen + ivsize) calculation.
+Looks good to me.  Patch applied.
 
-> is really a requirement that is hopefully somewhere specified. Where could I
-> find such information? My searching in Documentation dir and Google was
-> without success.  
-
-it's specified in the code :)
-
-It's a requirement for IPSec ESP, of which a good guide can be found
-here:
-
-http://unixwiz.net/techtips/iguide-ipsec.html
-
-> Also, how does it work when I do not want to use ASSOC but still the IV
-> should be included in HMAC computation? Is it then intended that the pointer
-> areq->assoc points on the IV? Or am I not in the right ballpark?
-
-yes, I imagine the request would come in with its 'assoc' pointer equal
-to its 'giv'.
-
-For an authenc request for IPsec ESP, req->assoc points to the ESP
-header (SPI+seq.num), req->giv points after the ESP header to the IV,
-and req->src points to the data to be ciphered (which directly follows
-the IV).
-
-Kim
+Thanks Neil,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
