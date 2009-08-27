@@ -1,81 +1,168 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
- dependencies broken
-Date: Thu, 27 Aug 2009 12:34:01 -0700
-Message-ID: <20090827123401.86cd4319.randy.dunlap@oracle.com>
-References: <20090825195852.1dfacb6c.celejar@gmail.com>
-	<20090827095516.6817be1e.randy.dunlap@oracle.com>
-	<20090827183500.GC24973@resivo.wgnet.de>
+From: "Brad Bosch" <bradbosch@comcast.net>
+Subject: Crypto oops in async_chainiv_do_postponed
+Date: Thu, 27 Aug 2009 17:13:04 -0500
+Message-ID: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: 541835@bugs.debian.org, Celejar <celejar@gmail.com>,
-	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Jonas Meurer <jonas@freesources.org>
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from acsinet11.oracle.com ([141.146.126.233]:22995 "EHLO
-	acsinet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751830AbZH0TcH (ORCPT
+Received: from qmta10.westchester.pa.mail.comcast.net ([76.96.62.17]:38905
+	"EHLO QMTA10.westchester.pa.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751899AbZH0WTM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Aug 2009 15:32:07 -0400
-In-Reply-To: <20090827183500.GC24973@resivo.wgnet.de>
+	Thu, 27 Aug 2009 18:19:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 27 Aug 2009 20:35:01 +0200 Jonas Meurer wrote:
+Herbert,
 
-> hey,
-> 
-> On 27/08/2009 Randy Dunlap wrote:
-> > On Tue, 25 Aug 2009 19:58:52 -0400 Celejar wrote:
-> > 
-> > > I'm having a pretty bizarre problem with my kernel crypto
-> > > configuration.  I need support for a bog standard LUKS (aes /
-> > > cbc-essiv:sha256) / cryptsetup installation, but even after I enable
-> > > virtually everything in the crypto section of the kernel configs, cbc
-> > > fails to load.  All the relevant modules are exist (dm-mod, dm-crypt,
-> > > crypto_blkcipher, crypto_algapi, crypto_hash, aes_generic,
-> > > sha256_generic), but even after modprobing / insmoding
-> > > everything, /proc/crypto shows that aes and sha is there, but not cbc.
-> > > 
-> > > The problem has been reproduced (using my kernel config) by Jonas
-> > > Meurer, the Debian cryptsetup maintainer, so it's not just me ;).
-> > > We've tried numerous different kernel versions in the .30 / .31 range.
-> > > 
-> > > http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541835
-> > > 
-> > > Does this mean that something else somewhere in the kernel needs to be
-> > > configured but isn't, and the necessary dependency isn't properly
-> > > declared?
-> > > 
-> > > My config is at:
-> > > http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=45;filename=config-2.6.31-rc6-lizzie-00042-gb2add73;att=1;bug=541835
-> > > 
-> > > [I'm not subscribed to lkml; please cc me on responses]
-> > 
-> > 
-> > You could try/test a patch that was just posted:
-> >   http://lkml.org/lkml/2009/8/27/249
-> 
-> that patch seems to be for ecryptfs only, while Celejar uses dm-crypt.
-> second, the patch just ensures that CRYPTO_ECB and CRYPTO_CBC are
-> selected along with ECRYPT_FS. but Celejar does have both CRYPTO_ECB and
-> CRYPTO_CBC selected.
+I seem to have found a bug in chainiv.c.  The following oops occured
+while using blowfish and hmac-sha with UDP.  The patch (against
+2.6.27.30) after the oops output below is an completely untested
+possible fix.  We will be testing this fix starting tomorrow.
 
-ack.
+The null dereference occurs when subreq is dereferenced in
+async_chainiv_do_postponed().  My guess is that the
+skcipher_givcrypt_request block has been freed and subsequently
+overwritten by the time the postponed request is processed.  This
+could happen if chainiv_givencrypt() returns anything other than
+-EINPROGRESS after postponing the request.  From what I can see, this
+could indeed happen since the same err field in async_chainiv_ctx is
+used both when the request is postponed and also when it is later
+processed by the worker thread.  Neither the lock, nor the
+CHAINIV_STATE_INUSE bit in ctx->state will prevent this race which
+results in the -EINPROGRESS err being overwritten between the time it
+is placed in ctx->err in async_chainiv_postpone_request() and when it
+is read back out in async_chainiv_schedule_work().  I am curious why
+this method of returning the error code was used in the first place.
 
-> the problem rather is that loading the cbc blockcipher module simply
-> does nothing. the module is listed in /proc/modules, but the blockcipher
-> is still missing from /proc/crypto.
-> 
-> the problem is not reproducible with a debian/unstable 2.6.30.6 kernel,
-> even though it has cbc compiled as module as well. but if I recompile
-> the same kernel sources with Celejars kernel .config, the problem
-> occurs. thus it must be related to the kernel config in some way.
+Please let me know if this change looks OK and I will follow up after I test
+this patch.
 
-add cc: linux-crypto@vger.kernel.org -- maybe someone there can help out.
+Thanks!
+
+--Brad
+
+BUG: unable to handle kernel NULL pointer dereference at 0000003c
+IP: [<c054994b>] async_chainiv_do_postponed+0x38/0x5d
+*pde = 00000000 
+Oops: 0002 [#1] PREEMPT SMP 
+Modules linked in: loop
+
+Pid: 19, comm: events/0 Not tainted (2.6.27.31-wmspt #1)
+EIP: 0060:[<c054994b>] EFLAGS: 00010286 CPU: 0
+EIP is at async_chainiv_do_postponed+0x38/0x5d
+EAX: f78c2000 EBX: fffffff0 ECX: 00000000 EDX: 00000000
+ESI: f4f5bdf4 EDI: 00000000 EBP: f4f5bdf0 ESP: f78c3f5c
+ DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+Process events/0 (pid: 19, ti=f78c2000 task=f78ae430 task.ti=f78c2000)
+Stack: f4f5be14 f789bd40 f4f5be10 c0549913 c042c7e9 f789bd40 f78c3f98 f78c3fb8 
+       00000005 c042c8fc 00000000 f78ae430 c042f33e f78c3fb0 f78c3fb0 c0928a80 
+       c041baf3 00000000 00000000 f78ae430 c042f33e f78c3fb0 f78c3fb0 00000000 
+Call Trace:
+ [<c0549913>] async_chainiv_do_postponed+0x0/0x5d
+ [<c042c7e9>] run_workqueue+0x72/0xf8
+ [<c042c8fc>] worker_thread+0x8d/0x99
+ [<c042f33e>] autoremove_wake_function+0x0/0x2d
+ [<c041baf3>] __wake_up_common+0x37/0x61
+ [<c042f33e>] autoremove_wake_function+0x0/0x2d
+ [<c041bbdb>] complete+0x28/0x36
+ [<c042c86f>] worker_thread+0x0/0x99
+ [<c042ee53>] kthread+0x34/0x55
+ [<c042ee1f>] kthread+0x0/0x55
+ [<c04037df>] kernel_thread_helper+0x7/0x10
+ =======================
+Code: eb 14 89 f0 e8 92 16 23 00 89 d8 e8 c2 df ff ff 8d 58 f0 89 c7 89 f0 e8 15 18 23 00 85 db 75 0b 5b 89 e8 5e 5f 5d e9 00 fe ff ff <81> 4f 3c 00 02 00 00 89 d8 e8 6f fe ff ff 89 c3 e8 c4 9e ed ff 
+EIP: [<c054994b>] async_chainiv_do_postponed+0x38/0x5d SS:ESP 0068:f78c3f5c
+---[ end trace daceb93ad89f6e25 ]---
 
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Index: chainiv.c
+===================================================================
+RCS file: /share/cvs/sdg/kernels/kernel.wms/kernel_2_6_27/src/crypto/chainiv.c,v
+retrieving revision 1.1.1.1.4.2
+diff -u -r1.1.1.1.4.2 chainiv.c
+--- chainiv.c	10 Mar 2009 05:16:24 -0000	1.1.1.1.4.2
++++ chainiv.c	27 Aug 2009 19:40:27 -0000
+@@ -36,7 +36,6 @@
+ 	unsigned long state;
+ 
+ 	spinlock_t lock;
+-	int err;
+ 
+ 	struct crypto_queue queue;
+ 	struct work_struct postponed;
+@@ -114,10 +113,9 @@
+ 	return chainiv_init_common(tfm);
+ }
+ 
+-static int async_chainiv_schedule_work(struct async_chainiv_ctx *ctx)
++static void async_chainiv_schedule_work(struct async_chainiv_ctx *ctx)
+ {
+ 	int queued;
+-	int err = ctx->err;
+ 
+ 	if (!ctx->queue.qlen) {
+ 		smp_mb__before_clear_bit();
+@@ -125,14 +123,11 @@
+ 
+ 		if (!ctx->queue.qlen ||
+ 		    test_and_set_bit(CHAINIV_STATE_INUSE, &ctx->state))
+-			goto out;
++			return;
+ 	}
+ 
+ 	queued = schedule_work(&ctx->postponed);
+ 	BUG_ON(!queued);
+-
+-out:
+-	return err;
+ }
+ 
+ static int async_chainiv_postpone_request(struct skcipher_givcrypt_request *req)
+@@ -148,8 +143,8 @@
+ 	if (test_and_set_bit(CHAINIV_STATE_INUSE, &ctx->state))
+ 		return err;
+ 
+-	ctx->err = err;
+-	return async_chainiv_schedule_work(ctx);
++	async_chainiv_schedule_work(ctx);
++	return err;
+ }
+ 
+ static int async_chainiv_givencrypt_tail(struct skcipher_givcrypt_request *req)
+@@ -158,18 +153,20 @@
+ 	struct async_chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
+ 	struct ablkcipher_request *subreq = skcipher_givcrypt_reqctx(req);
+ 	unsigned int ivsize = crypto_ablkcipher_ivsize(geniv);
++	int err;
+ 
+ 	memcpy(req->giv, ctx->iv, ivsize);
+ 	memcpy(subreq->info, ctx->iv, ivsize);
+ 
+-	ctx->err = crypto_ablkcipher_encrypt(subreq);
+-	if (ctx->err)
++	err = crypto_ablkcipher_encrypt(subreq);
++	if (err)
+ 		goto out;
+ 
+ 	memcpy(ctx->iv, subreq->info, ivsize);
+ 
+ out:
+-	return async_chainiv_schedule_work(ctx);
++	async_chainiv_schedule_work(ctx);
++	return err;
+ }
+ 
+ static int async_chainiv_givencrypt(struct skcipher_givcrypt_request *req)
+@@ -236,7 +233,7 @@
+ 	spin_unlock_bh(&ctx->lock);
+ 
+ 	if (!req) {
+-		async_chainiv_schedule_work(ctx);
++	    async_chainiv_schedule_work(ctx);
+ 		return;
+ 	}
+ 
