@@ -1,68 +1,46 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
-	dependencies broken
-Date: Fri, 28 Aug 2009 10:00:56 +0200
-Message-ID: <20090828080056.GA3204@Chamillionaire.breakpoint.cc>
-References: <20090825195852.1dfacb6c.celejar@gmail.com> <20090827095516.6817be1e.randy.dunlap@oracle.com> <20090827183500.GC24973@resivo.wgnet.de> <20090827123401.86cd4319.randy.dunlap@oracle.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH v2] crypto: Add VMAC(AES) to Linux for intel_txt
+	support
+Date: Sat, 29 Aug 2009 17:34:51 +1000
+Message-ID: <20090829073451.GA12104@gondor.apana.org.au>
+References: <4A5F41C4.3050808@intel.com> <4A5F431B.6060307@intel.com> <4A805375.4030902@intel.com> <20090814032201.GA2544@gondor.apana.org.au> <4A85955F.3040807@intel.com> <20090820100949.GA31928@gondor.apana.org.au> <4A8FEC65.1080806@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Jonas Meurer <jonas@freesources.org>, 541835@bugs.debian.org,
-	Celejar <celejar@gmail.com>, lkml <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Randy Dunlap <randy.dunlap@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Cihula, Joseph" <joseph.cihula@intel.com>
+To: Shane Wang <shane.wang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:43715 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752174AbZH1IBB (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:36764 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751843AbZH2Hew (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Aug 2009 04:01:01 -0400
+	Sat, 29 Aug 2009 03:34:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20090827123401.86cd4319.randy.dunlap@oracle.com>
+In-Reply-To: <4A8FEC65.1080806@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Randy Dunlap | 2009-08-27 12:34:01 [-0700]:
+On Sat, Aug 22, 2009 at 09:02:29PM +0800, Shane Wang wrote:
+>
+> Resend:
+> This patch adds VMAC (a fast MAC) support into crypto framework.
 
->> On 27/08/2009 Randy Dunlap wrote:
->> > On Tue, 25 Aug 2009 19:58:52 -0400 Celejar wrote:
->> > 
->> > > I'm having a pretty bizarre problem with my kernel crypto
->> > > configuration.  I need support for a bog standard LUKS (aes /
->> > > cbc-essiv:sha256) / cryptsetup installation, but even after I enable
->> > > virtually everything in the crypto section of the kernel configs, cbc
->> > > fails to load.  All the relevant modules are exist (dm-mod, dm-crypt,
->> > > crypto_blkcipher, crypto_algapi, crypto_hash, aes_generic,
->> > > sha256_generic), but even after modprobing / insmoding
->> > > everything, /proc/crypto shows that aes and sha is there, but not cbc.
->> > > 
->> > > The problem has been reproduced (using my kernel config) by Jonas
->> > > Meurer, the Debian cryptsetup maintainer, so it's not just me ;).
->> > > We've tried numerous different kernel versions in the .30 / .31 range.
->> > > 
->> > > http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541835
->> > > 
->> > > Does this mean that something else somewhere in the kernel needs to be
->> > > configured but isn't, and the necessary dependency isn't properly
->> > > declared?
->> > > 
->> > > My config is at:
->> > > http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=45;filename=config-2.6.31-rc6-lizzie-00042-gb2add73;att=1;bug=541835
->> > > 
->> > > [I'm not subscribed to lkml; please cc me on responses]
->> the problem rather is that loading the cbc blockcipher module simply
->> does nothing. the module is listed in /proc/modules, but the blockcipher
->> is still missing from /proc/crypto.
-Yes. cbc(aes) is auto-generated once someone requests such a cipher. The
-block modes are not listed.
+I was going to apply this but it doesn't apply:
 
->> the problem is not reproducible with a debian/unstable 2.6.30.6 kernel,
->> even though it has cbc compiled as module as well. but if I recompile
->> the same kernel sources with Celejars kernel .config, the problem
->> occurs. thus it must be related to the kernel config in some way.
-It must be the kernel confing since I run .30.stable and it works. I try
-to look at it later.
+$ git apply ~/p
+error: patch failed: crypto/Kconfig:267
+error: crypto/Kconfig: patch does not apply
+error: patch failed: crypto/Makefile:32
+error: crypto/Makefile: patch does not apply
+error: patch failed: crypto/testmgr.h:1652
+error: crypto/testmgr.h: patch does not apply
+$ 
 
->---
->~Randy
+Please rebase your patch against the current cryptodev tree.
 
-Sebastian
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
