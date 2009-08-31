@@ -1,89 +1,173 @@
-From: Jonas Meurer <jonas@freesources.org>
-Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
- dependencies broken
-Date: Mon, 31 Aug 2009 17:52:00 +0200
-Message-ID: <20090831155200.GD7678@resivo.wgnet.de>
-References: <20090825195852.1dfacb6c.celejar@gmail.com>
- <20090827095516.6817be1e.randy.dunlap@oracle.com>
- <20090827183500.GC24973@resivo.wgnet.de>
- <20090827123401.86cd4319.randy.dunlap@oracle.com>
- <20090828080056.GA3204@Chamillionaire.breakpoint.cc>
- <20090830153722.GA28497@Chamillionaire.breakpoint.cc>
+From: "Brad Bosch" <bradbosch@comcast.net>
+Subject: Re: Crypto oops in async_chainiv_do_postponed
+Date: Mon, 31 Aug 2009 11:11:42 -0500
+Message-ID: <19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
+References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
+	<20090829104606.GA13141@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Celejar <celejar@gmail.com>,
-	Randy Dunlap <randy.dunlap@oracle.com>, 541835@bugs.debian.org,
-	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <sebastian@ml.breakpoint.cc>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753046AbZHaPwZ@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20090830153722.GA28497@Chamillionaire.breakpoint.cc>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: Brad Bosch <bradbosch@comcast.net>, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, offbase0@gmail.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from qmta06.emeryville.ca.mail.comcast.net ([76.96.30.56]:44407 "EHLO
+	QMTA06.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752489AbZHaQMI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 31 Aug 2009 12:12:08 -0400
+In-Reply-To: <20090829104606.GA13141@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-hey,
+Herbert Xu writes:
+ > Thanks for the detailed analysis and patch!
 
-On 30/08/2009 Sebastian Andrzej Siewior wrote:
-> * Sebastian Andrzej Siewior | 2009-08-28 10:00:56 [+0200]:
-> 
-> >>> the problem is not reproducible with a debian/unstable 2.6.30.6 kernel,
-> >>> even though it has cbc compiled as module as well. but if I recompile
-> >>> the same kernel sources with Celejars kernel .config, the problem
-> >>> occurs. thus it must be related to the kernel config in some way.
-> >It must be the kernel confing since I run .30.stable and it works. I try
-> >to look at it later.
-> 
-> Your kernel config is fine, the problem is that the initramfs tools do
-> not copy all of the required modules into the initramfs. The missing
-> modles are:
-> - cryptomgr: that one is responsible to load the cbc and aes module and
->   bind them to cbc(aes)
-> - chainiv: that one creates IVs if the "user" does not specify one.
->   dm-crypt probably does not use that one but is required due to the way
->   crypto works atm.
-> - krng: provides random numbers and is required by chainiv.
-> 
-> If you add those three to /etc/initramfs/modules than it should work.
-> 
-> Could someone please look at initramfs to figure out why those three
-> modules are not copied in this reduced setup?
+No problem, thanks for looking at it!
 
-the reason is simply that no other crypto modules define depends on the
-listed ones:
+ > 
+ > > The null dereference occurs when subreq is dereferenced in
+ > > async_chainiv_do_postponed().  My guess is that the
+ > > skcipher_givcrypt_request block has been freed and subsequently
+ > > overwritten by the time the postponed request is processed.  This
+ > > could happen if chainiv_givencrypt() returns anything other than
+ > > -EINPROGRESS after postponing the request.  From what I can see, this
+ > > could indeed happen since the same err field in async_chainiv_ctx is
+ > > used both when the request is postponed and also when it is later
+ > > processed by the worker thread.  Neither the lock, nor the
+ > > CHAINIV_STATE_INUSE bit in ctx->state will prevent this race which
+ > > results in the -EINPROGRESS err being overwritten between the time it
+ > > is placed in ctx->err in async_chainiv_postpone_request() and when it
+ > > is read back out in async_chainiv_schedule_work().  I am curious why
+ > > this method of returning the error code was used in the first place.
+ > 
+ > Actually I think the problem is much less subtle than that :)
 
-# modinfo -F depends dm-crypt
-dm-mod,crypto_blkcipher
+OK.  I was looking for something subtle because the crash takes a long
+time to happen.  But do you agree that the race I described above also
+a real bug?
 
-# modinfo -F aes_generic sha256_generic cbc
-crypto_algapi
-crypto_hash
-crypto_algapi,crypto_blkcipher
+ > 
+ > The problem is that whenever crypto_dequeue_request returns NULL,
+ > chainiv will never see the NULL pointer because we end up converting
+ > the pointer to skcipher_givcrypt_request which would have the value
+ > (NULL - off) where off is non-zero.
 
-# modinfo -F crypto_blkcipher crypto_hash
-crypto_algapi
-crypto_algapi
+Yes, I see that this bug must be the bug we would likely encounter first.
+Apparently, async_chainiv_do_postponed was never tested?  But I don't
+see how the patch you proposed below helps.  We still don't seem to be
+returning NULL from skcipher_dequeue_givcrypt when we reach the end of
+the queue because __crypto_dequeue_request is not checking for NULL
+before it subtracts offset.
 
-and even the new modules don't depend on each other:
+Wouldn't the following (simpler, but untested) patch work?
 
-# modinfo -F cryptomgr
-crypto_hash,crypto_algapi,crypto_blkcipher,aead,pcompress
+Index: skcipher.h
+===================================================================
+RCS file: /share/cvs/sdg/kernels/kernel.wms/kernel_2_6_27/src/include/crypto/internal/skcipher.h,v
+retrieving revision 1.1.1.1.4.2
+diff -u -r1.1.1.1.4.2 skcipher.h
+--- skcipher.h	10 Mar 2009 05:25:25 -0000	1.1.1.1.4.2
++++ skcipher.h	31 Aug 2009 15:56:50 -0000
+@@ -85,8 +85,9 @@
+ static inline struct skcipher_givcrypt_request *skcipher_dequeue_givcrypt(
+ 	struct crypto_queue *queue)
+ {
+-	return container_of(ablkcipher_dequeue_request(queue),
+-			    struct skcipher_givcrypt_request, creq);
++	struct ablkcipher_request *req = ablkcipher_dequeue_request(queue);
++	return req ? container_of(req, struct skcipher_givcrypt_request, creq)
++		: NULL;
+ }
+ 
+ static inline void *skcipher_givcrypt_reqctx(
 
-# modinfo -F chainiv
-crypto_algapi,rng,crypto_wq,crypto_blkcipher
 
-# modinfo -F krng
-rng,crypto_algapi
+Thanks!
 
-so the following depends should be added/changed:
+--Brad
 
-- chainiv should depend o 'krng' instead of 'rng' at least
-- maybe cipher modules like aes,serpent,... should depend on 'cryptomgr'
-  instead of 'crypto_algapi'
-- crypto_algapi should depend on chainiv
-
-these changes are pure guesses, i don't know the details. but at least
-additional depends need to be defined for crypto modules, don't you
-think so?
-
-greetings,
- jonas
+ > 
+ > Please let me know if this patch fixes the crash for you.
+ > 
+ > commit 0c7d400fafaeab6014504a6a6249f01bac7f7db4
+ > Author: Herbert Xu <herbert@gondor.apana.org.au>
+ > Date:   Sat Aug 29 20:44:04 2009 +1000
+ > 
+ >     crypto: skcipher - Fix skcipher_dequeue_givcrypt NULL test
+ >     
+ >     As struct skcipher_givcrypt_request includes struct crypto_request
+ >     at a non-zero offset, testing for NULL after converting the pointer
+ >     returned by crypto_dequeue_request does not work.  This can result
+ >     in IPsec crashes when the queue is depleted.
+ >     
+ >     This patch fixes it by doing the pointer conversion only when the
+ >     return value is non-NULL.  In particular, we create a new function
+ >     __crypto_dequeue_request that does the pointer conversion.
+ >     
+ >     Reported-by: Brad Bosch <bradbosch@comcast.net>
+ >     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+ > 
+ > diff --git a/crypto/algapi.c b/crypto/algapi.c
+ > index 56c62e2..df0863d 100644
+ > --- a/crypto/algapi.c
+ > +++ b/crypto/algapi.c
+ > @@ -692,7 +692,7 @@ out:
+ >  }
+ >  EXPORT_SYMBOL_GPL(crypto_enqueue_request);
+ >  
+ > -struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue)
+ > +void *__crypto_dequeue_request(struct crypto_queue *queue, unsigned int offset)
+ >  {
+ >  	struct list_head *request;
+ >  
+ > @@ -707,7 +707,14 @@ struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue)
+ >  	request = queue->list.next;
+ >  	list_del(request);
+ >  
+ > -	return list_entry(request, struct crypto_async_request, list);
+ > +	return (char *)list_entry(request, struct crypto_async_request, list) -
+ > +	       offset;
+ > +}
+ > +EXPORT_SYMBOL_GPL(__crypto_dequeue_request);
+ > +
+ > +struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue)
+ > +{
+ > +	return __crypto_dequeue_request(queue, 0);
+ >  }
+ >  EXPORT_SYMBOL_GPL(crypto_dequeue_request);
+ >  
+ > diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+ > index 0105454..5a2bd1c 100644
+ > --- a/include/crypto/algapi.h
+ > +++ b/include/crypto/algapi.h
+ > @@ -137,6 +137,7 @@ struct crypto_instance *crypto_alloc_instance(const char *name,
+ >  void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen);
+ >  int crypto_enqueue_request(struct crypto_queue *queue,
+ >  			   struct crypto_async_request *request);
+ > +void *__crypto_dequeue_request(struct crypto_queue *queue, unsigned int offset);
+ >  struct crypto_async_request *crypto_dequeue_request(struct crypto_queue *queue);
+ >  int crypto_tfm_in_queue(struct crypto_queue *queue, struct crypto_tfm *tfm);
+ >  
+ > diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+ > index 2ba42cd..3a748a6 100644
+ > --- a/include/crypto/internal/skcipher.h
+ > +++ b/include/crypto/internal/skcipher.h
+ > @@ -79,8 +79,8 @@ static inline int skcipher_enqueue_givcrypt(
+ >  static inline struct skcipher_givcrypt_request *skcipher_dequeue_givcrypt(
+ >  	struct crypto_queue *queue)
+ >  {
+ > -	return container_of(ablkcipher_dequeue_request(queue),
+ > -			    struct skcipher_givcrypt_request, creq);
+ > +	return __crypto_dequeue_request(
+ > +		queue, offsetof(struct skcipher_givcrypt_request, creq.base));
+ >  }
+ >  
+ >  static inline void *skcipher_givcrypt_reqctx(
+ > 
+ > Cheers,
+ > -- 
+ > Visit Openswan at http://www.openswan.org/
+ > Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+ > Home Page: http://gondor.apana.org.au/~herbert/
+ > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
