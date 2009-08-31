@@ -1,68 +1,121 @@
-From: Celejar <celejar@gmail.com>
-Subject: Bug#541835: [pkg-cryptsetup-devel] Bug#541835: crypto configuration / dependencies broken
-Date: Sun, 30 Aug 2009 20:06:56 -0400
-Message-ID: <20090830200656.dbd56f89.celejar@gmail.com>
-References: <20090825195852.1dfacb6c.celejar@gmail.com>
-	<20090827095516.6817be1e.randy.dunlap@oracle.com>
-	<20090827183500.GC24973@resivo.wgnet.de>
-	<20090827123401.86cd4319.randy.dunlap@oracle.com>
-	<20090828080056.GA3204@Chamillionaire.breakpoint.cc>
-	<20090830153722.GA28497@Chamillionaire.breakpoint.cc>
-Reply-To: Celejar <celejar@gmail.com>, 541835@bugs.debian.org
+From: Huang Ying <ying.huang@intel.com>
+Subject: [PATCH -v3] x86: Move kernel_fpu_using to irq_fpu_usable in
+ asm/i387.h
+Date: Mon, 31 Aug 2009 13:11:54 +0800
+Message-ID: <1251695514.14648.344.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Jonas Meurer
- <jonas@freesources.org>, 541835@bugs.debian.org, lkml
- <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <sebastian@ml.breakpoint.cc>
-Return-path: <bounce-debian-bugs-dist=glddb-debian-bugs-dist=m.gmane.org@lists.debian.org>
-Resent-Message-ID: <handler.541835.B541835.12516772252835@bugs.debian.org>
-In-Reply-To: <20090830153722.GA28497@Chamillionaire.breakpoint.cc>
-List-Post: <mailto:debian-bugs-dist@lists.debian.org>
-List-Help: <mailto:debian-bugs-dist-request@lists.debian.org?subject=help>
-List-Subscribe: <mailto:debian-bugs-dist-request@lists.debian.org?subject=subscribe>
-List-Unsubscribe: <mailto:debian-bugs-dist-request@lists.debian.org?subject=unsubscribe>
-List-Id: linux-crypto.vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:48641 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752900AbZHaFL4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 31 Aug 2009 01:11:56 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 30 Aug 2009 17:37:22 +0200
-Sebastian Andrzej Siewior <sebastian@ml.breakpoint.cc> wrote:
+This function measures whether the FPU/SSE state can be touched in
+interrupt context. If the interrupted code is in user space or has no
+valid FPU/SSE context (CR0.TS == 1), FPU/SSE state can be used in IRQ
+or soft_irq context too.
 
-> * Sebastian Andrzej Siewior | 2009-08-28 10:00:56 [+0200]:
-> 
-> >>> the problem is not reproducible with a debian/unstable 2.6.30.6 kernel,
-> >>> even though it has cbc compiled as module as well. but if I recompile
-> >>> the same kernel sources with Celejars kernel .config, the problem
-> >>> occurs. thus it must be related to the kernel config in some way.
-> >It must be the kernel confing since I run .30.stable and it works. I try
-> >to look at it later.
-> 
-> Your kernel config is fine, the problem is that the initramfs tools do
-> not copy all of the required modules into the initramfs. The missing
-> modles are:
-> - cryptomgr: that one is responsible to load the cbc and aes module and
->   bind them to cbc(aes)
-> - chainiv: that one creates IVs if the "user" does not specify one.
->   dm-crypt probably does not use that one but is required due to the way
->   crypto works atm.
-> - krng: provides random numbers and is required by chainiv.
-> 
-> If you add those three to /etc/initramfs/modules than it should work.
+This is used by AES-NI accelerated AES implementation and PCLMULQDQ
+accelerated GHASH implementation.
 
-Right your are!  It now works, thanks very much.  I guess the catch was
-that the working (stock Debian) kernel config built cryptomgr
-(CRYPTO_MANAGER and CRYPTO_MANAGER2) and krng (CRYPTO_RNG2, although
-not CRYPTO_RNG) and chainiv (CRYPTO_BLKCIPHER2, although not
-CRYPTO_BLKCIPHER - I have the impression that chainiv is now
-controlled by the BLKCIPHER options?) into the kernel, not as modules,
-so I wasn't hit by the initramfs failure until I built them as modules
-(I have a bit of a fetish for building everything as a module,
-especially when using initrd's :/).
+v3:
+ - Renamed to irq_fpu_usable to reflect the purpose of the function.
 
-> Could someone please look at initramfs to figure out why those three
-> modules are not copied in this reduced setup?
+v2:
+ - Renamed to irq_is_fpu_using to reflect the real situation.
 
-Celejar
--- 
-mailmin.sourceforge.net - remote access via secure (OpenPGP) email
-ssuds.sourceforge.net - A Simple Sudoku Solver and Generator
+Signed-off-by: Huang Ying <ying.huang@intel.com>
+CC: H. Peter Anvin <hpa@zytor.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c |   17 +++++------------
+ arch/x86/include/asm/i387.h        |    8 ++++++++
+ 2 files changed, 13 insertions(+), 12 deletions(-)
+
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -59,13 +59,6 @@ asmlinkage void aesni_cbc_enc(struct cry
+ asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv);
+ 
+-static inline int kernel_fpu_using(void)
+-{
+-	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
+-		return 1;
+-	return 0;
+-}
+-
+ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
+ {
+ 	unsigned long addr = (unsigned long)raw_ctx;
+@@ -89,7 +82,7 @@ static int aes_set_key_common(struct cry
+ 		return -EINVAL;
+ 	}
+ 
+-	if (kernel_fpu_using())
++	if (irq_fpu_usable())
+ 		err = crypto_aes_expand_key(ctx, in_key, key_len);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -110,7 +103,7 @@ static void aes_encrypt(struct crypto_tf
+ {
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+ 
+-	if (kernel_fpu_using())
++	if (irq_fpu_usable())
+ 		crypto_aes_encrypt_x86(ctx, dst, src);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -123,7 +116,7 @@ static void aes_decrypt(struct crypto_tf
+ {
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+ 
+-	if (kernel_fpu_using())
++	if (irq_fpu_usable())
+ 		crypto_aes_decrypt_x86(ctx, dst, src);
+ 	else {
+ 		kernel_fpu_begin();
+@@ -349,7 +342,7 @@ static int ablk_encrypt(struct ablkciphe
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+ 
+-	if (kernel_fpu_using()) {
++	if (irq_fpu_usable()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 		memcpy(cryptd_req, req, sizeof(*req));
+@@ -370,7 +363,7 @@ static int ablk_decrypt(struct ablkciphe
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+ 
+-	if (kernel_fpu_using()) {
++	if (irq_fpu_usable()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 		memcpy(cryptd_req, req, sizeof(*req));
+--- a/arch/x86/include/asm/i387.h
++++ b/arch/x86/include/asm/i387.h
+@@ -301,6 +301,14 @@ static inline void kernel_fpu_end(void)
+ 	preempt_enable();
+ }
+ 
++static inline bool irq_fpu_usable(void)
++{
++	struct pt_regs *regs;
++
++	return !in_interrupt() || !(regs = get_irq_regs()) || \
++		user_mode(regs) || (read_cr0() & X86_CR0_TS);
++}
++
+ /*
+  * Some instructions like VIA's padlock instructions generate a spurious
+  * DNA fault but don't modify SSE registers. And these instructions
+
+
