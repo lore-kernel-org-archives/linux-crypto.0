@@ -1,31 +1,72 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
-Date: Mon, 31 Aug 2009 10:45:39 +0200
-Message-ID: <20090831084539.GA32705@secunet.com>
-References: <20090605092021.GB8724@gondor.apana.org.au> <20090605093430.GP20366@secunet.com> <20090608052808.GB19826@gondor.apana.org.au> <20090608064518.GQ20366@secunet.com> <20090625065112.GA31869@gondor.apana.org.au> <20090629110410.GE20366@secunet.com> <20090629115950.GA6594@gondor.apana.org.au> <20090629135257.GG20366@secunet.com> <20090819071549.GB14755@secunet.com> <20090831055816.GA26693@gondor.apana.org.au>
+Subject: [PATCH 0/2] Parallel crypto/IPsec v5
+Date: Mon, 31 Aug 2009 11:11:45 +0200
+Message-ID: <20090831091145.GB32705@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:36605 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([213.68.205.161]:56414 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751983AbZHaImx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Aug 2009 04:42:53 -0400
+	id S1752743AbZHaJIy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 31 Aug 2009 05:08:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20090831055816.GA26693@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 31, 2009 at 03:58:16PM +1000, Herbert Xu wrote:
-> 
-> In fact it was being instantiated, it was just getting killed
-> immediately after completing its self-test :)
-> 
-> Please let me know if this fixes it for you.
-> 
+This patchset adds the 'pcrypt' parallel crypto template. With this template it
+is possible to process the crypto requests of a transform in parallel without
+getting request reorder. This is in particular interesting for IPsec.
 
-Yes, it fixes it. Thanks a lot!
+The parallel crypto template is based on a generic parallelization/serialization
+method. This method uses the remote softirq invocation infrastructure for
+parallelization and serialization. With this method data objects can be
+processed in parallel, starting at some given point.
+After doing some expensive operations in parallel, it is possible to serialize
+again. The parallelized data objects return after serialization in the order as
+they were before the parallelization. In the case of IPsec, this makes it
+possible to run the expensive parts in parallel without getting packet
+reordering.
 
-So pcrypt would be ready to use from my point of view.
-I'll send a next version of pcrypt and padata later.
+Changes from v4:
+
+- Use the dynamic percpu allocator
+
+- Drop of the obsolete eseqiv changes (eseqiv is the default IV generator
+  for blockcipher algorithms on smp machines now).
+
+Changes from v3:
+
+- The generic aead wrapper is dropped.
+
+- tcrypt is extended to test algorithms by name. So it is possible to
+  instantiate pcrypt by doing e.g.:
+  modprobe tcrypt alg="pcrypt(authenc(hmac(sha1),cbc(aes)))" type=3
+
+Changes from v2:
+
+- The xfrm netlink configuration code is dropped,
+  this will be an extra patchset.
+
+- Add generic aead wrapper interface to be able to wrap an aead algorithm
+  with an arbitrary crypto template. 
+
+- Convert pcrypt to use the generic aead wrapper.
+
+- Add support for aead algorithms to eseqiv.
+
+- Add support for the pcrypt aead wrapper to authenc. It's now possible to
+  choose for pcrypt as the default authenc wrapper with a module parameter.
+
+- Patchset applies to linux-2.6 git current.
+
+Changes from v1:
+
+- cpu_chainiv is dropped, pcrypt uses eseqiv as it's IV generator now.
+
+- Add a xfrm netlink message to be able to choose for pcrypt from userspace.
+
+- Use pcrypt just if it is selected from userspace.
+
+Steffen
