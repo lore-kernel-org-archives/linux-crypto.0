@@ -1,121 +1,184 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH -v3] x86: Move kernel_fpu_using to irq_fpu_usable in
- asm/i387.h
-Date: Mon, 31 Aug 2009 13:11:54 +0800
-Message-ID: <1251695514.14648.344.camel@yhuang-dev.sh.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH 2/5] aead: Add generic aead wrapper interface
+Date: Mon, 31 Aug 2009 15:58:16 +1000
+Message-ID: <20090831055816.GA26693@gondor.apana.org.au>
+References: <20090605092030.GO20366@secunet.com> <20090605092021.GB8724@gondor.apana.org.au> <20090605093430.GP20366@secunet.com> <20090608052808.GB19826@gondor.apana.org.au> <20090608064518.GQ20366@secunet.com> <20090625065112.GA31869@gondor.apana.org.au> <20090629110410.GE20366@secunet.com> <20090629115950.GA6594@gondor.apana.org.au> <20090629135257.GG20366@secunet.com> <20090819071549.GB14755@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:48641 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752900AbZHaFL4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Aug 2009 01:11:56 -0400
+Received: from rhun.apana.org.au ([64.62.148.172]:33815 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754385AbZHaF6W (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 31 Aug 2009 01:58:22 -0400
+Content-Disposition: inline
+In-Reply-To: <20090819071549.GB14755@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This function measures whether the FPU/SSE state can be touched in
-interrupt context. If the interrupted code is in user space or has no
-valid FPU/SSE context (CR0.TS == 1), FPU/SSE state can be used in IRQ
-or soft_irq context too.
+On Wed, Aug 19, 2009 at 09:15:49AM +0200, Steffen Klassert wrote:
+> 
+> Any ideas why it's not possible to instantiate pcrypt?
 
-This is used by AES-NI accelerated AES implementation and PCLMULQDQ
-accelerated GHASH implementation.
+Sorry for the late response.
 
-v3:
- - Renamed to irq_fpu_usable to reflect the purpose of the function.
+In fact it was being instantiated, it was just getting killed
+immediately after completing its self-test :)
 
-v2:
- - Renamed to irq_is_fpu_using to reflect the real situation.
+Please let me know if this fixes it for you.
 
-Signed-off-by: Huang Ying <ying.huang@intel.com>
-CC: H. Peter Anvin <hpa@zytor.com>
----
- arch/x86/crypto/aesni-intel_glue.c |   17 +++++------------
- arch/x86/include/asm/i387.h        |    8 ++++++++
- 2 files changed, 13 insertions(+), 12 deletions(-)
+commit 2bf2901669a564b402cd0e40eb3f941c391e64c4
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Aug 31 15:56:54 2009 +1000
 
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -59,13 +59,6 @@ asmlinkage void aesni_cbc_enc(struct cry
- asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
- 			      const u8 *in, unsigned int len, u8 *iv);
- 
--static inline int kernel_fpu_using(void)
--{
--	if (in_interrupt() && !(read_cr0() & X86_CR0_TS))
--		return 1;
--	return 0;
--}
--
- static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
- {
- 	unsigned long addr = (unsigned long)raw_ctx;
-@@ -89,7 +82,7 @@ static int aes_set_key_common(struct cry
- 		return -EINVAL;
- 	}
- 
--	if (kernel_fpu_using())
-+	if (irq_fpu_usable())
- 		err = crypto_aes_expand_key(ctx, in_key, key_len);
- 	else {
- 		kernel_fpu_begin();
-@@ -110,7 +103,7 @@ static void aes_encrypt(struct crypto_tf
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
- 
--	if (kernel_fpu_using())
-+	if (irq_fpu_usable())
- 		crypto_aes_encrypt_x86(ctx, dst, src);
- 	else {
- 		kernel_fpu_begin();
-@@ -123,7 +116,7 @@ static void aes_decrypt(struct crypto_tf
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
- 
--	if (kernel_fpu_using())
-+	if (irq_fpu_usable())
- 		crypto_aes_decrypt_x86(ctx, dst, src);
- 	else {
- 		kernel_fpu_begin();
-@@ -349,7 +342,7 @@ static int ablk_encrypt(struct ablkciphe
- 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 
--	if (kernel_fpu_using()) {
-+	if (irq_fpu_usable()) {
- 		struct ablkcipher_request *cryptd_req =
- 			ablkcipher_request_ctx(req);
- 		memcpy(cryptd_req, req, sizeof(*req));
-@@ -370,7 +363,7 @@ static int ablk_decrypt(struct ablkciphe
- 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 
--	if (kernel_fpu_using()) {
-+	if (irq_fpu_usable()) {
- 		struct ablkcipher_request *cryptd_req =
- 			ablkcipher_request_ctx(req);
- 		memcpy(cryptd_req, req, sizeof(*req));
---- a/arch/x86/include/asm/i387.h
-+++ b/arch/x86/include/asm/i387.h
-@@ -301,6 +301,14 @@ static inline void kernel_fpu_end(void)
- 	preempt_enable();
+    crypto: api - Do not displace newly registered algorithms
+    
+    We have a mechanism where newly registered algorithms of a higher
+    priority can displace existing instances that use a different
+    implementation of the same algorithm with a lower priority.
+    
+    Unfortunately the same mechanism can cause a newly registered
+    algorithm to displace itself if it depends on an existing version
+    of the same algorithm.
+    
+    This patch fixes this by keeping all algorithms that the newly
+    reigstered algorithm depends on, thus protecting them from being
+    removed.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 6a98076..feb77e4 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -81,16 +81,35 @@ static void crypto_destroy_instance(struct crypto_alg *alg)
+ 	crypto_tmpl_put(tmpl);
  }
  
-+static inline bool irq_fpu_usable(void)
++static struct list_head *crypto_more_spawns(struct crypto_alg *alg,
++					    struct list_head *stack,
++					    struct list_head *top,
++					    struct list_head *secondary_spawns)
 +{
-+	struct pt_regs *regs;
++	struct crypto_spawn *spawn, *n;
 +
-+	return !in_interrupt() || !(regs = get_irq_regs()) || \
-+		user_mode(regs) || (read_cr0() & X86_CR0_TS);
++	if (list_empty(stack))
++		return NULL;
++
++	spawn = list_first_entry(stack, struct crypto_spawn, list);
++	n = list_entry(spawn->list.next, struct crypto_spawn, list);
++
++	if (spawn->alg && &n->list != stack && !n->alg)
++		n->alg = (n->list.next == stack) ? alg :
++			 &list_entry(n->list.next, struct crypto_spawn,
++				     list)->inst->alg;
++
++	list_move(&spawn->list, secondary_spawns);
++
++	return &n->list == stack ? top : &n->inst->alg.cra_users;
 +}
 +
- /*
-  * Some instructions like VIA's padlock instructions generate a spurious
-  * DNA fault but don't modify SSE registers. And these instructions
+ static void crypto_remove_spawn(struct crypto_spawn *spawn,
+-				struct list_head *list,
+-				struct list_head *secondary_spawns)
++				struct list_head *list)
+ {
+ 	struct crypto_instance *inst = spawn->inst;
+ 	struct crypto_template *tmpl = inst->tmpl;
+ 
+-	list_del_init(&spawn->list);
+-	spawn->alg = NULL;
+-
+ 	if (crypto_is_dead(&inst->alg))
+ 		return;
+ 
+@@ -106,25 +125,55 @@ static void crypto_remove_spawn(struct crypto_spawn *spawn,
+ 	hlist_del(&inst->list);
+ 	inst->alg.cra_destroy = crypto_destroy_instance;
+ 
+-	list_splice(&inst->alg.cra_users, secondary_spawns);
++	BUG_ON(!list_empty(&inst->alg.cra_users));
+ }
+ 
+-static void crypto_remove_spawns(struct list_head *spawns,
+-				 struct list_head *list, u32 new_type)
++static void crypto_remove_spawns(struct crypto_alg *alg,
++				 struct list_head *list,
++				 struct crypto_alg *nalg)
+ {
++	u32 new_type = (nalg ?: alg)->cra_flags;
+ 	struct crypto_spawn *spawn, *n;
+ 	LIST_HEAD(secondary_spawns);
++	struct list_head *spawns;
++	LIST_HEAD(stack);
++	LIST_HEAD(top);
+ 
++	spawns = &alg->cra_users;
+ 	list_for_each_entry_safe(spawn, n, spawns, list) {
+ 		if ((spawn->alg->cra_flags ^ new_type) & spawn->mask)
+ 			continue;
+ 
+-		crypto_remove_spawn(spawn, list, &secondary_spawns);
++		list_move(&spawn->list, &top);
+ 	}
+ 
+-	while (!list_empty(&secondary_spawns)) {
+-		list_for_each_entry_safe(spawn, n, &secondary_spawns, list)
+-			crypto_remove_spawn(spawn, list, &secondary_spawns);
++	spawns = &top;
++	do {
++		while (!list_empty(spawns)) {
++			struct crypto_instance *inst;
++
++			spawn = list_first_entry(spawns, struct crypto_spawn,
++						 list);
++			inst = spawn->inst;
++
++			BUG_ON(&inst->alg == alg);
++
++			list_move(&spawn->list, &stack);
++
++			if (&inst->alg == nalg)
++				break;
++
++			spawn->alg = NULL;
++			spawns = &inst->alg.cra_users;
++		}
++	} while ((spawns = crypto_more_spawns(alg, &stack, &top,
++					      &secondary_spawns)));
++
++	list_for_each_entry_safe(spawn, n, &secondary_spawns, list) {
++		if (spawn->alg)
++			list_move(&spawn->list, &spawn->alg->cra_users);
++		else
++			crypto_remove_spawn(spawn, list);
+ 	}
+ }
+ 
+@@ -258,7 +307,7 @@ found:
+ 		    q->cra_priority > alg->cra_priority)
+ 			continue;
+ 
+-		crypto_remove_spawns(&q->cra_users, &list, alg->cra_flags);
++		crypto_remove_spawns(q, &list, alg);
+ 	}
+ 
+ complete:
+@@ -330,7 +379,7 @@ static int crypto_remove_alg(struct crypto_alg *alg, struct list_head *list)
+ 
+ 	crypto_notify(CRYPTO_MSG_ALG_UNREGISTER, alg);
+ 	list_del_init(&alg->cra_list);
+-	crypto_remove_spawns(&alg->cra_users, list, alg->cra_flags);
++	crypto_remove_spawns(alg, list, NULL);
+ 
+ 	return 0;
+ }
 
-
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
