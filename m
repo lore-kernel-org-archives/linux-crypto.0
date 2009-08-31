@@ -1,674 +1,89 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 2/2] crypto: pcrypt - Add pcrypt crypto parallelization
-	wrapper
-Date: Mon, 31 Aug 2009 11:14:42 +0200
-Message-ID: <20090831091442.GD32705@secunet.com>
-References: <20090831091145.GB32705@secunet.com>
+From: Jonas Meurer <jonas@freesources.org>
+Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
+ dependencies broken
+Date: Mon, 31 Aug 2009 17:52:00 +0200
+Message-ID: <20090831155200.GD7678@resivo.wgnet.de>
+References: <20090825195852.1dfacb6c.celejar@gmail.com>
+ <20090827095516.6817be1e.randy.dunlap@oracle.com>
+ <20090827183500.GC24973@resivo.wgnet.de>
+ <20090827123401.86cd4319.randy.dunlap@oracle.com>
+ <20090828080056.GA3204@Chamillionaire.breakpoint.cc>
+ <20090830153722.GA28497@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([213.68.205.161]:49426 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751074AbZHaJLx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Aug 2009 05:11:53 -0400
+Cc: Celejar <celejar@gmail.com>,
+	Randy Dunlap <randy.dunlap@oracle.com>, 541835@bugs.debian.org,
+	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <sebastian@ml.breakpoint.cc>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753046AbZHaPwZ@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20090831091145.GB32705@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20090830153722.GA28497@Chamillionaire.breakpoint.cc>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch adds a parallel crypto template that takes a crypto
-algorithm and converts it to process the crypto transforms in
-parallel. For the moment only aead is supported.
+hey,
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/Kconfig            |   13 ++
- crypto/Makefile           |    2 +
- crypto/pcrypt.c           |  409 +++++++++++++++++++++++++++++++++++++++++++++
- crypto/pcrypt_core.c      |  106 ++++++++++++
- include/crypto/pcrypt.h   |   51 ++++++
- include/linux/interrupt.h |    2 +
- 6 files changed, 583 insertions(+), 0 deletions(-)
- create mode 100644 crypto/pcrypt.c
- create mode 100644 crypto/pcrypt_core.c
- create mode 100644 include/crypto/pcrypt.h
+On 30/08/2009 Sebastian Andrzej Siewior wrote:
+> * Sebastian Andrzej Siewior | 2009-08-28 10:00:56 [+0200]:
+> 
+> >>> the problem is not reproducible with a debian/unstable 2.6.30.6 kernel,
+> >>> even though it has cbc compiled as module as well. but if I recompile
+> >>> the same kernel sources with Celejars kernel .config, the problem
+> >>> occurs. thus it must be related to the kernel config in some way.
+> >It must be the kernel confing since I run .30.stable and it works. I try
+> >to look at it later.
+> 
+> Your kernel config is fine, the problem is that the initramfs tools do
+> not copy all of the required modules into the initramfs. The missing
+> modles are:
+> - cryptomgr: that one is responsible to load the cbc and aes module and
+>   bind them to cbc(aes)
+> - chainiv: that one creates IVs if the "user" does not specify one.
+>   dm-crypt probably does not use that one but is required due to the way
+>   crypto works atm.
+> - krng: provides random numbers and is required by chainiv.
+> 
+> If you add those three to /etc/initramfs/modules than it should work.
+> 
+> Could someone please look at initramfs to figure out why those three
+> modules are not copied in this reduced setup?
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 7623442..dbb1ec0 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -114,6 +114,19 @@ config CRYPTO_NULL
- 	help
- 	  These are 'Null' algorithms, used by IPsec, which do nothing.
- 
-+config CRYPTO_PCRYPT_CORE
-+	bool
-+
-+config CRYPTO_PCRYPT
-+	tristate "Parallel crypto engine (EXPERIMENTAL)"
-+	depends on USE_GENERIC_SMP_HELPERS && EXPERIMENTAL
-+	select CRYPTO_MANAGER
-+	select CRYPTO_PCRYPT_CORE
-+	select CRYPTO_AEAD
-+	help
-+	  This converts an arbitrary crypto algorithm into a parallel
-+	  algorithm that is executed in a softirq.
-+
- config CRYPTO_WORKQUEUE
-        tristate
- 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index c2ca721..48345da 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -55,6 +55,8 @@ obj-$(CONFIG_CRYPTO_XTS) += xts.o
- obj-$(CONFIG_CRYPTO_CTR) += ctr.o
- obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
-+obj-$(CONFIG_CRYPTO_PCRYPT_CORE) += pcrypt_core.o
-+obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
- obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
- obj-$(CONFIG_CRYPTO_DES) += des_generic.o
- obj-$(CONFIG_CRYPTO_FCRYPT) += fcrypt.o
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-new file mode 100644
-index 0000000..26b6ec1
---- /dev/null
-+++ b/crypto/pcrypt.c
-@@ -0,0 +1,409 @@
-+/*
-+ * pcrypt - Parallel crypto wrapper.
-+ *
-+ * Copyright (C) 2009 secunet Security Networks AG
-+ * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program; if not, write to the Free Software Foundation, Inc.,
-+ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-+ */
-+
-+#include <crypto/algapi.h>
-+#include <crypto/internal/aead.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <crypto/pcrypt.h>
-+
-+struct pcrypt_instance_ctx {
-+	struct crypto_spawn spawn;
-+	unsigned int tfm_count;
-+};
-+
-+struct pcrypt_aead_ctx {
-+	struct crypto_aead *child;
-+	unsigned int tfm_nr;
-+};
-+
-+static int pcrypt_do_parallel(struct padata_priv *padata, unsigned int tfm_nr,
-+			      unsigned int softirq, unsigned int padata_nr)
-+{
-+	unsigned int cpu_index, num_cpus, cb_cpu;
-+
-+	num_cpus = padata_cpumask_weight(padata_nr);
-+	if (!num_cpus)
-+		return 0;
-+		
-+	cpu_index = tfm_nr % num_cpus;
-+
-+	cb_cpu = padata_index_to_cpu(padata_nr, cpu_index);
-+
-+	return padata_do_parallel(softirq, padata_nr, padata, cb_cpu);
-+}
-+
-+static int pcrypt_aead_setkey(struct crypto_aead *parent,
-+			      const u8 *key, unsigned int keylen)
-+{
-+	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(parent);
-+
-+	return crypto_aead_setkey(ctx->child, key, keylen);
-+}
-+
-+static int pcrypt_aead_setauthsize(struct crypto_aead *parent,
-+				   unsigned int authsize)
-+{
-+	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(parent);
-+
-+	return crypto_aead_setauthsize(ctx->child, authsize);
-+}
-+
-+static void pcrypt_aead_serial(struct padata_priv *padata)
-+{
-+	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-+	struct aead_request *req = pcrypt_request_ctx(preq);
-+
-+	aead_request_complete(req->base.data, padata->info);
-+}
-+
-+static void pcrypt_aead_giv_serial(struct padata_priv *padata)
-+{
-+	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-+	struct aead_givcrypt_request *req = pcrypt_request_ctx(preq);
-+
-+	aead_request_complete(req->areq.base.data, padata->info);
-+}
-+
-+static void pcrypt_aead_done(struct crypto_async_request *areq, int err)
-+{
-+	struct aead_request *req = areq->data;
-+	struct pcrypt_request *preq = aead_request_ctx(req);
-+	struct padata_priv *padata = pcrypt_request_padata(preq);
-+
-+	padata->info = err;
-+	req->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	local_bh_disable();
-+	if (padata_do_serial(padata->nr, padata))
-+		goto out;
-+
-+	aead_request_complete(req, padata->info);
-+
-+out:
-+	local_bh_enable();
-+}
-+
-+static void pcrypt_aead_enc(struct padata_priv *padata)
-+{
-+	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-+	struct aead_request *req = pcrypt_request_ctx(preq);
-+
-+	padata->info = crypto_aead_encrypt(req);
-+
-+	if (padata->info)
-+		return;
-+
-+	if (padata_do_serial(AEAD_ENC_PADATA, padata))
-+		return;
-+
-+	aead_request_complete(req->base.data, padata->info);
-+}
-+
-+static int pcrypt_aead_encrypt(struct aead_request *req)
-+{
-+	int err;
-+	struct pcrypt_request *preq = aead_request_ctx(req);
-+	struct aead_request *creq = pcrypt_request_ctx(preq);
-+	struct padata_priv *padata = pcrypt_request_padata(preq);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
-+	u32 flags = aead_request_flags(req);
-+
-+	memset(padata, 0, sizeof(struct padata_priv));
-+
-+	padata->parallel = pcrypt_aead_enc;
-+	padata->serial = pcrypt_aead_serial;
-+
-+	aead_request_set_tfm(creq, ctx->child);
-+	aead_request_set_callback(creq, flags & ~CRYPTO_TFM_REQ_MAY_SLEEP,
-+				  pcrypt_aead_done, req);
-+	aead_request_set_crypt(creq, req->src, req->dst,
-+			       req->cryptlen, req->iv);
-+	aead_request_set_assoc(creq, req->assoc, req->assoclen);
-+
-+	if (pcrypt_do_parallel(padata, ctx->tfm_nr, AEAD_ENC_SOFTIRQ,
-+			       AEAD_ENC_PADATA))
-+		err = -EINPROGRESS;
-+	else
-+		err = crypto_aead_encrypt(creq);
-+
-+	return err;
-+}
-+
-+static void pcrypt_aead_dec(struct padata_priv *padata)
-+{
-+	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-+	struct aead_request *req = pcrypt_request_ctx(preq);
-+
-+	padata->info = crypto_aead_decrypt(req);
-+
-+	if (padata->info)
-+		return;
-+
-+	if (padata_do_serial(AEAD_DEC_PADATA, padata))
-+		return;
-+
-+	aead_request_complete(req->base.data, padata->info);
-+}
-+
-+static int pcrypt_aead_decrypt(struct aead_request *req)
-+{
-+	int err;
-+	struct pcrypt_request *preq = aead_request_ctx(req);
-+	struct aead_request *creq = pcrypt_request_ctx(preq);
-+	struct padata_priv *padata = pcrypt_request_padata(preq);
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
-+	u32 flags = aead_request_flags(req);
-+
-+	memset(padata, 0, sizeof(struct padata_priv));
-+
-+	padata->parallel = pcrypt_aead_dec;
-+	padata->serial = pcrypt_aead_serial;
-+
-+	aead_request_set_tfm(creq, ctx->child);
-+	aead_request_set_callback(creq, flags & ~CRYPTO_TFM_REQ_MAY_SLEEP,
-+				  pcrypt_aead_done, req);
-+	aead_request_set_crypt(creq, req->src, req->dst,
-+			       req->cryptlen, req->iv);
-+	aead_request_set_assoc(creq, req->assoc, req->assoclen);
-+
-+	if (pcrypt_do_parallel(padata, ctx->tfm_nr, AEAD_DEC_SOFTIRQ,
-+			       AEAD_DEC_PADATA))
-+		err = -EINPROGRESS;
-+	else
-+		err = crypto_aead_decrypt(creq);
-+
-+	return err;
-+}
-+
-+static void pcrypt_aead_givenc(struct padata_priv *padata)
-+{
-+	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-+	struct aead_givcrypt_request *req = pcrypt_request_ctx(preq);
-+
-+	padata->info = crypto_aead_givencrypt(req);
-+
-+	if (padata->info)
-+		return;
-+
-+	if (padata_do_serial(AEAD_ENC_PADATA, padata))
-+		return;
-+
-+	aead_request_complete(req->areq.base.data, padata->info);
-+}
-+
-+static int pcrypt_aead_givencrypt(struct aead_givcrypt_request *req)
-+{
-+	int err;
-+	struct aead_request *areq = &req->areq;
-+	struct pcrypt_request *preq = aead_request_ctx(areq);
-+	struct aead_givcrypt_request *creq = pcrypt_request_ctx(preq);
-+	struct padata_priv *padata = pcrypt_request_padata(preq);
-+	struct crypto_aead *aead = aead_givcrypt_reqtfm(req);
-+	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
-+	u32 flags = aead_request_flags(areq);
-+
-+	memset(padata, 0, sizeof(struct padata_priv));
-+
-+	padata->parallel = pcrypt_aead_givenc;
-+	padata->serial = pcrypt_aead_giv_serial;
-+
-+	aead_givcrypt_set_tfm(creq, ctx->child);
-+	aead_givcrypt_set_callback(creq, flags & ~CRYPTO_TFM_REQ_MAY_SLEEP,
-+				   pcrypt_aead_done, areq);
-+	aead_givcrypt_set_crypt(creq, areq->src, areq->dst,
-+				areq->cryptlen, areq->iv);
-+	aead_givcrypt_set_assoc(creq, areq->assoc, areq->assoclen);
-+	aead_givcrypt_set_giv(creq, req->giv, req->seq);
-+
-+
-+	if (pcrypt_do_parallel(padata, ctx->tfm_nr, AEAD_ENC_SOFTIRQ,
-+			       AEAD_ENC_PADATA))
-+		err = -EINPROGRESS;
-+	else
-+		err = crypto_aead_givencrypt(creq);
-+
-+	return err;
-+}
-+
-+static int pcrypt_aead_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct pcrypt_instance_ctx *ictx = crypto_instance_ctx(inst);
-+	struct pcrypt_aead_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_aead *cipher;
-+	
-+	ictx->tfm_count++;
-+	ctx->tfm_nr = ictx->tfm_count;
-+
-+	cipher = crypto_spawn_aead(crypto_instance_ctx(inst));
-+
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
-+
-+	ctx->child = cipher;
-+	tfm->crt_aead.reqsize = sizeof(struct pcrypt_request)
-+		+ sizeof(struct aead_givcrypt_request)
-+		+ crypto_aead_reqsize(cipher);
-+
-+	return 0;
-+}
-+
-+static void pcrypt_aead_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct pcrypt_aead_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_aead(ctx->child);
-+}
-+
-+static struct crypto_instance *pcrypt_alloc_instance(struct crypto_alg *alg)
-+{
-+	struct crypto_instance *inst;
-+	struct pcrypt_instance_ctx *ctx;
-+	int err;
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
-+	if (!inst) {
-+		inst = ERR_PTR(-ENOMEM);
-+		goto out;
-+	}
-+
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto out_free_inst;
-+
-+	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
-+
-+	ctx = crypto_instance_ctx(inst);
-+	err = crypto_init_spawn(&ctx->spawn, alg, inst,
-+				CRYPTO_ALG_TYPE_MASK);
-+	if (err)
-+		goto out_free_inst;
-+
-+	inst->alg.cra_priority = alg->cra_priority + 100;
-+	inst->alg.cra_blocksize = alg->cra_blocksize;
-+	inst->alg.cra_alignmask = alg->cra_alignmask;
-+
-+out:
-+	return inst;
-+
-+out_free_inst:
-+	kfree(inst);
-+	inst = ERR_PTR(err);
-+	goto out;
-+}
-+
-+static struct crypto_instance *pcrypt_alloc_aead(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+	struct crypto_alg *alg;
-+	struct crypto_attr_type *algt;
-+
-+	algt = crypto_get_attr_type(tb);
-+
-+	alg = crypto_get_attr_alg(tb, algt->type,
-+				  (algt->mask & CRYPTO_ALG_TYPE_MASK));
-+	if (IS_ERR(alg))
-+		return ERR_CAST(alg);
-+
-+	inst = pcrypt_alloc_instance(alg);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC; 
-+	inst->alg.cra_type = &crypto_aead_type;
-+
-+	inst->alg.cra_aead.ivsize = alg->cra_aead.ivsize;
-+	inst->alg.cra_aead.geniv = alg->cra_aead.geniv;
-+	inst->alg.cra_aead.maxauthsize = alg->cra_aead.maxauthsize;
-+
-+	inst->alg.cra_ctxsize = sizeof(struct pcrypt_aead_ctx);
-+
-+	inst->alg.cra_init = pcrypt_aead_init_tfm;
-+	inst->alg.cra_exit = pcrypt_aead_exit_tfm;
-+
-+	inst->alg.cra_aead.setkey = pcrypt_aead_setkey;
-+	inst->alg.cra_aead.setauthsize = pcrypt_aead_setauthsize;
-+	inst->alg.cra_aead.encrypt = pcrypt_aead_encrypt;
-+	inst->alg.cra_aead.decrypt = pcrypt_aead_decrypt;
-+	inst->alg.cra_aead.givencrypt = pcrypt_aead_givencrypt;
-+
-+out_put_alg:
-+	crypto_mod_put(alg);
-+	return inst;
-+}
-+
-+static struct crypto_instance *pcrypt_alloc(struct rtattr **tb)
-+{
-+	struct crypto_attr_type *algt;
-+
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return ERR_CAST(algt);
-+
-+	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
-+	case CRYPTO_ALG_TYPE_AEAD:
-+		return pcrypt_alloc_aead(tb);
-+	}
-+
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static void pcrypt_free(struct crypto_instance *inst)
-+{
-+	struct pcrypt_instance_ctx *ctx = crypto_instance_ctx(inst);
-+
-+	crypto_drop_spawn(&ctx->spawn);
-+	kfree(inst);
-+}
-+
-+static struct crypto_template pcrypt_tmpl = {
-+	.name = "pcrypt",
-+	.alloc = pcrypt_alloc,
-+	.free = pcrypt_free,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init pcrypt_init(void)
-+{
-+	padata_start(AEAD_ENC_PADATA);
-+	padata_start(AEAD_DEC_PADATA);
-+
-+	return crypto_register_template(&pcrypt_tmpl);
-+}
-+
-+static void __exit pcrypt_exit(void)
-+{
-+	padata_stop(AEAD_ENC_PADATA);
-+	padata_stop(AEAD_DEC_PADATA);
-+
-+	crypto_unregister_template(&pcrypt_tmpl);
-+}
-+
-+module_init(pcrypt_init);
-+module_exit(pcrypt_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Parallel crypto engine");
-diff --git a/crypto/pcrypt_core.c b/crypto/pcrypt_core.c
-new file mode 100644
-index 0000000..065d0a3
---- /dev/null
-+++ b/crypto/pcrypt_core.c
-@@ -0,0 +1,106 @@
-+/*
-+ * pcrypt_core.c - Core functions for the pcrypt crypto parallelization
-+ *
-+ * Copyright (C) 2009 secunet Security Networks AG
-+ * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program; if not, write to the Free Software Foundation, Inc.,
-+ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/cpu.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <crypto/pcrypt.h>
-+
-+static void aead_enc_action(struct softirq_action *h)
-+{
-+	struct list_head *cpu_list, local_list;
-+
-+	cpu_list = &__get_cpu_var(softirq_work_list[AEAD_ENC_SOFTIRQ]);
-+
-+	local_irq_disable();
-+	list_replace_init(cpu_list, &local_list);
-+	local_irq_enable();
-+
-+	while (!list_empty(&local_list)) {
-+		struct padata_priv *padata;
-+
-+		padata = list_entry(local_list.next, struct padata_priv,
-+				    csd.list);
-+
-+		list_del_init(&padata->csd.list);
-+
-+		padata->parallel(padata);
-+	}
-+}
-+
-+static void aead_dec_action(struct softirq_action *h)
-+{
-+	struct list_head *cpu_list, local_list;
-+
-+	cpu_list = &__get_cpu_var(softirq_work_list[AEAD_DEC_SOFTIRQ]);
-+
-+	local_irq_disable();
-+	list_replace_init(cpu_list, &local_list);
-+	local_irq_enable();
-+
-+	while (!list_empty(&local_list)) {
-+		struct padata_priv *padata;
-+
-+		padata = list_entry(local_list.next, struct padata_priv,
-+				    csd.list);
-+
-+		list_del_init(&padata->csd.list);
-+
-+		padata->parallel(padata);
-+	}
-+}
-+
-+static int __devinit pcrypt_cpu_callback(struct notifier_block *nfb,
-+					 unsigned long action, void *hcpu)
-+{
-+	int cpu = (unsigned long)hcpu;
-+
-+	switch (action) {
-+	case CPU_ONLINE:
-+	case CPU_ONLINE_FROZEN:
-+		padata_add_cpu(AEAD_ENC_PADATA, cpu);
-+		padata_add_cpu(AEAD_DEC_PADATA, cpu);
-+		break;
-+
-+	case CPU_DEAD:
-+	case CPU_DEAD_FROZEN:
-+		padata_remove_cpu(AEAD_ENC_PADATA, cpu);
-+		padata_remove_cpu(AEAD_DEC_PADATA, cpu);
-+
-+		break;
-+	}
-+
-+	return NOTIFY_OK;
-+}
-+
-+static int __init pcrypt_init_padata(void)
-+{
-+	open_softirq(AEAD_ENC_SOFTIRQ, aead_enc_action);
-+	open_softirq(AEAD_DEC_SOFTIRQ, aead_dec_action);
-+
-+	padata_init(AEAD_ENC_PADATA, cpu_online_mask);
-+	padata_init(AEAD_DEC_PADATA, cpu_online_mask);
-+
-+	hotcpu_notifier(pcrypt_cpu_callback, 0);
-+
-+	return 0;
-+}
-+subsys_initcall(pcrypt_init_padata);
-diff --git a/include/crypto/pcrypt.h b/include/crypto/pcrypt.h
-new file mode 100644
-index 0000000..d7d8bd8
---- /dev/null
-+++ b/include/crypto/pcrypt.h
-@@ -0,0 +1,51 @@
-+/*
-+ * pcrypt - Parallel crypto engine.
-+ *
-+ * Copyright (C) 2009 secunet Security Networks AG
-+ * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program; if not, write to the Free Software Foundation, Inc.,
-+ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-+ */
-+
-+#ifndef _CRYPTO_PCRYPT_H
-+#define _CRYPTO_PCRYPT_H
-+
-+#include <linux/crypto.h>
-+#include <linux/kernel.h>
-+#include <linux/padata.h>
-+
-+struct pcrypt_request {
-+	struct padata_priv	padata;
-+	void			*data;
-+	void			*__ctx[] CRYPTO_MINALIGN_ATTR;
-+};
-+
-+static inline void *pcrypt_request_ctx(struct pcrypt_request *req)
-+{
-+	return req->__ctx;
-+}
-+
-+static inline
-+struct padata_priv *pcrypt_request_padata(struct pcrypt_request *req)
-+{
-+	return &req->padata;
-+}
-+
-+static inline
-+struct pcrypt_request *pcrypt_padata_request(struct padata_priv *padata)
-+{
-+	return container_of(padata, struct pcrypt_request, padata);
-+}
-+
-+#endif
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index b648cca..41ef14b 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -347,6 +347,8 @@ enum
- 	TASKLET_SOFTIRQ,
- 	SCHED_SOFTIRQ,
- 	HRTIMER_SOFTIRQ,
-+	AEAD_ENC_SOFTIRQ,
-+	AEAD_DEC_SOFTIRQ,
- 	PADATA_SOFTIRQ,
- 	RCU_SOFTIRQ, 	/* Preferable RCU should always be the last softirq */
- 
--- 
-1.5.4.2
+the reason is simply that no other crypto modules define depends on the
+listed ones:
 
+# modinfo -F depends dm-crypt
+dm-mod,crypto_blkcipher
+
+# modinfo -F aes_generic sha256_generic cbc
+crypto_algapi
+crypto_hash
+crypto_algapi,crypto_blkcipher
+
+# modinfo -F crypto_blkcipher crypto_hash
+crypto_algapi
+crypto_algapi
+
+and even the new modules don't depend on each other:
+
+# modinfo -F cryptomgr
+crypto_hash,crypto_algapi,crypto_blkcipher,aead,pcompress
+
+# modinfo -F chainiv
+crypto_algapi,rng,crypto_wq,crypto_blkcipher
+
+# modinfo -F krng
+rng,crypto_algapi
+
+so the following depends should be added/changed:
+
+- chainiv should depend o 'krng' instead of 'rng' at least
+- maybe cipher modules like aes,serpent,... should depend on 'cryptomgr'
+  instead of 'crypto_algapi'
+- crypto_algapi should depend on chainiv
+
+these changes are pure guesses, i don't know the details. but at least
+additional depends need to be defined for crypto modules, don't you
+think so?
+
+greetings,
+ jonas
