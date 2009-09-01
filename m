@@ -1,158 +1,134 @@
-From: "Brad Bosch" <bradbosch@comcast.net>
-Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Tue, 1 Sep 2009 10:42:44 -0500
-Message-ID: <19101.16628.347039.619378@waldo.imnotcreative.homeip.net>
-References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
-	<20090829104606.GA13141@gondor.apana.org.au>
-	<19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
-	<20090831220459.GA15713@gondor.apana.org.au>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
+	dependencies broken
+Date: Tue, 1 Sep 2009 23:11:55 +0200
+Message-ID: <20090901211155.GA13979@Chamillionaire.breakpoint.cc>
+References: <20090825195852.1dfacb6c.celejar@gmail.com> <20090827095516.6817be1e.randy.dunlap@oracle.com> <20090827183500.GC24973@resivo.wgnet.de> <20090827123401.86cd4319.randy.dunlap@oracle.com> <20090828080056.GA3204@Chamillionaire.breakpoint.cc> <20090830153722.GA28497@Chamillionaire.breakpoint.cc> <20090831155200.GD7678@resivo.wgnet.de> <20090831211639.GA4675@Chamillionaire.breakpoint.cc> <20090901005120.GB22049@resivo.wgnet.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	offbase0@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Celejar <celejar@gmail.com>,
+	Randy Dunlap <randy.dunlap@oracle.com>, 541835@bugs.debian.org,
+	lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Jonas Meurer <jonas@freesources.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from qmta09.emeryville.ca.mail.comcast.net ([76.96.30.96]:38568 "EHLO
-	QMTA09.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752817AbZIAPnH (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:43261 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752055AbZIAVL6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Sep 2009 11:43:07 -0400
-In-Reply-To: <20090831220459.GA15713@gondor.apana.org.au>
+	Tue, 1 Sep 2009 17:11:58 -0400
+Content-Disposition: inline
+In-Reply-To: <20090901005120.GB22049@resivo.wgnet.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu writes:
- > On Mon, Aug 31, 2009 at 11:11:42AM -0500, Brad Bosch wrote:
- > >
- > > OK.  I was looking for something subtle because the crash takes a long
- > > time to happen.  But do you agree that the race I described above also
- > > a real bug?
- > 
- > No I don't think it is.  CHAINV_STATE_INUSE guarantees that only
- > one entity can use ctx->err at any time.
+* Jonas Meurer | 2009-09-01 02:51:20 [+0200]:
 
-I don't see how you are protecting ctx->err with the INUSE flag.  For
-example:
+>as you already discovered, that's because the initramfs hook script for
+>cryptroot adds some crypto modules manually in debian. currently these
+>are dm-mod, dm-crypt, cbc, aes, sha256 and all the modules they depend
+>on.
 
-If two threads enter async_chainiv_givencrypt at the same time, one
-thread will call async_chainiv_postpone_request (INUSE will be clear
-until set by async_chainiv_postpone_request) and the other thread will
-call async_chainiv_givencrypt_tail (INUSE may or may not be set yet).
+You could add something like
+|for dev in $rootdev $resumedevs; do
+|       info="$(cryptsetup luksDump $rootdev)"
+|       if [ $? -ne 0]; then
+|               # Partition is now encrypted
+|               continue
+|       fi
+|       cipher="$(cryptsetup luksDump /dev/md1 |grep "Cipher name:" | \
+|            sed 's@^Cipher name:\s\+@@')"
+|       add_crypto_modules $cipher
+|       mode="$(cryptsetup luksDump /dev/md1 |grep "Cipher name:")"
+|       echo "$mode" | sed \
+|               -e 's@^Cipher name:\s\+@@') \
+|               -e 's@-@ @' \
+|               -e 's@:@ @'
+|       # mode is now "<block_mode> <IV_mode> <hash>"
+|       blk_mode=$(echo $mode | awk '{print $1}'
+|       hash=$(echo $mode | awk '{print $3})'
+|       add_crypto_modules $blk_mode
+|       add_crypto_modules $hash
+|done       
+instead of hardcoding cbc, aes & sha256
 
-Now, ctx-err may be used by both async_chainiv_postpone_request to
-store the return value from skcipher_enqueue_givcrypt and by
-async_chainiv_givencrypt_tail to store the return value from
-crypto_ablkcipher_encrypt at the same time.  This can cause the
-calling function to think async_chainiv_givencrypt has completed it's
-work, when in fact, the work was defered.
+>> So this brings me to the following question: Why are you so picky and you
+>> don't take all of the modules? sh 2.6.30-1 on various debian archs:
+>> du -sh              x86_64  i386  powerpc  s390x   mips(r5k-ip32)
+>> crypto              720K    636K  1.1M     804K    968K
+>> arch/<arch>/crypto  72K     36K   0        92K     0
+>> driver/crypto       32K     60K   60K      0       52K
+>> Total               824K    732K  1.2M     896K    1020
+>> 
+>> So all modules together have an average footprint of 941.0K. This isn't
+>> that much. There is no size limit on initrd unless you are on a system
+>> with has 32MiB or something like that :)
+>> With *all* those crypto modules which are selected and built you are
+>> able to cover all corner cases.
+>> I took a look at hooks/cryptroot and really and only a few modules are
+>> included. Right now you don't include HW cipher e.g. VIA's padlock or
+>> AMD's geode. If you don't load those module while openning the root
+>> partition (the first request), then the module is never loaded / used.
+>> The other unhandled case are non default ciphers like xts(aes) which one
+>> might use. The brand new aes implementation aesni-intel is also not be
+>> considered. Most modules have _generic in their name if there is
+>> another implementation available and <name>-arch if there is an assembly
+>> variant but I would prefer that this does not become part of an ABI
+>> where one can rely on.
+>> 
+>> Would it be okay for you to change the way the crypto modules are picked
+>> and include the full set?
+>
+>i don't like the idea to add _all_ crypto modules into the initramfs per
+>default. the size of crypto and arch/<arch>/crypto will keep on growing
+>for kernels which do have ship all available modules for ciphers and
+>implementations. i think that the initramfs should be a _minimal_
+>system, and detecting the required crypto modules should be possible.
+Why is a minimal initramsfs here a good thing here? 1 MiB isn't that
+huge and with gzip it does not grow much. Here is an example on my amd64
+with current initramfs as of 2.6.30-1-amd64:
+picky       : 10511917 bytes / 11 MiB
+full crypto : 10729154 bytes / 11 MiB / + 2.1%
 
-The patch I proposed earlier (included again below) avoids this and
-also makes the error handling simpler and more direct without
-requiring ctx->err at all.  I still don't understand why ctx->err was
-required in the first place.
+So. On AMD64 we are talking here about 200KiB or 2% of the whole image
+size.
+If arch/*/crypto grows than just because there is more support and this
+is a good thing not bad.
 
-Did I miss something with regard to the use of ctx->err?
+>alternative crypto cipher and blockcipher modules are already detected
+>if required, as information about these are available from the cryptroot
+>configuration (either luks header or cmdline options given to cryptsetup).
+ah so my little script was not required. What about d-i? AFAIK that one
+runs from initramfs and relies on modules which are selected here. Isn't
+this the case?
 
-Now, as to the other bug...
+>i added cryptomgr, chainiv and krng to the list of required modules in
+>/usr/share/initramfs-tools/hooks/cryptroot for now.
+And in .32 you have work again because you need eseqiv.
 
- > 
- > Where we subtract the offset the pointer can never be NULL.  Please
- > try my patch.
+>still i see the point that this solution has it's drawbacks. modules for
+>crypto hardware and cipher implementations not following the convention to
+>call modules <cipher>_generic and <cipher>-alias aren't detected by the
+>current system.
+exactly. Plus runtime dependency.
 
-OK.  I see now that your offset patch should indeed solve that
-problem.  But why did you choose to fix it in a complex way?  My
-suggestion just adds a single test while yours adds new parameters, a
-new function and an extra function call.
+>i guess the best solution would be to improve the module dependency
+>system. cipher meta-modules like 'aes' should depend on all available
+>implementations. same for ivciphers, hashs, rng implementations etc.
+>
+>what do you think about it?
+I don't the like extra work for 2%. Even if someone does this, you still
+have lets say the geode, via-padlock and the hfin driver on a 486 system
+which can't use all of them and relies on pure SW. No benefit there.
 
-Thanks for your help.
+Okay. You put the crypto modules in initramfs in case the root partition
+and or swap is encrypted. In case just /data is encrypted you don't need
+those modules at all. So d-i needs all them in case the user might want
+to xts(twofish) and not just the standard thing. The user-initramfs
+script could take the full set of crypto modules if it is building a new
+initramfs and grab the list of required modules from lsmod if the
+initramfs is updated and the kernel is running.
 
---Brad
+>greetings,
+> jonas
 
-Index: chainiv.c
-===================================================================
-RCS file: /share/cvs/sdg/kernels/kernel.wms/kernel_2_6_27/src/crypto/chainiv.c,v
-retrieving revision 1.1.1.1.4.2
-diff -u -r1.1.1.1.4.2 chainiv.c
---- chainiv.c	10 Mar 2009 05:16:24 -0000	1.1.1.1.4.2
-+++ chainiv.c	27 Aug 2009 19:40:27 -0000
-@@ -36,7 +36,6 @@
- 	unsigned long state;
- 
- 	spinlock_t lock;
--	int err;
- 
- 	struct crypto_queue queue;
- 	struct work_struct postponed;
-@@ -114,10 +113,9 @@
- 	return chainiv_init_common(tfm);
- }
- 
--static int async_chainiv_schedule_work(struct async_chainiv_ctx *ctx)
-+static void async_chainiv_schedule_work(struct async_chainiv_ctx *ctx)
- {
- 	int queued;
--	int err = ctx->err;
- 
- 	if (!ctx->queue.qlen) {
- 		smp_mb__before_clear_bit();
-@@ -125,14 +123,11 @@
- 
- 		if (!ctx->queue.qlen ||
- 		    test_and_set_bit(CHAINIV_STATE_INUSE, &ctx->state))
--			goto out;
-+			return;
- 	}
- 
- 	queued = schedule_work(&ctx->postponed);
- 	BUG_ON(!queued);
--
--out:
--	return err;
- }
- 
- static int async_chainiv_postpone_request(struct skcipher_givcrypt_request *req)
-@@ -148,8 +143,8 @@
- 	if (test_and_set_bit(CHAINIV_STATE_INUSE, &ctx->state))
- 		return err;
- 
--	ctx->err = err;
--	return async_chainiv_schedule_work(ctx);
-+	async_chainiv_schedule_work(ctx);
-+	return err;
- }
- 
- static int async_chainiv_givencrypt_tail(struct skcipher_givcrypt_request *req)
-@@ -158,18 +153,20 @@
- 	struct async_chainiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
- 	struct ablkcipher_request *subreq = skcipher_givcrypt_reqctx(req);
- 	unsigned int ivsize = crypto_ablkcipher_ivsize(geniv);
-+	int err;
- 
- 	memcpy(req->giv, ctx->iv, ivsize);
- 	memcpy(subreq->info, ctx->iv, ivsize);
- 
--	ctx->err = crypto_ablkcipher_encrypt(subreq);
--	if (ctx->err)
-+	err = crypto_ablkcipher_encrypt(subreq);
-+	if (err)
- 		goto out;
- 
- 	memcpy(ctx->iv, subreq->info, ivsize);
- 
- out:
--	return async_chainiv_schedule_work(ctx);
-+	async_chainiv_schedule_work(ctx);
-+	return err;
- }
- 
- static int async_chainiv_givencrypt(struct skcipher_givcrypt_request *req)
-@@ -236,7 +233,7 @@
- 	spin_unlock_bh(&ctx->lock);
- 
- 	if (!req) {
--		async_chainiv_schedule_work(ctx);
-+	    async_chainiv_schedule_work(ctx);
- 		return;
- 	}
- 
+Sebastian
