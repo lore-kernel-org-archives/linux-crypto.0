@@ -1,41 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Tue, 1 Sep 2009 08:04:59 +1000
-Message-ID: <20090831220459.GA15713@gondor.apana.org.au>
-References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net> <20090829104606.GA13141@gondor.apana.org.au> <19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: Does ESP support 64 bit sequence numbering for authentication
+	hash ?
+Date: Tue, 1 Sep 2009 14:09:15 +0200
+Message-ID: <20090901120915.GA12646@secunet.com>
+References: <1231943033.7937.120.camel@libdev3.mvista.co.uk> <20090115055644.GA30626@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	offbase0@gmail.com
-To: Brad Bosch <bradbosch@comcast.net>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: djenkins@mvista.com, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([213.68.205.161]:36840 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754196AbZIAMGX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Sep 2009 08:06:23 -0400
 Content-Disposition: inline
-In-Reply-To: <19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20090115055644.GA30626@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 31, 2009 at 11:11:42AM -0500, Brad Bosch wrote:
->
-> OK.  I was looking for something subtle because the crash takes a long
-> time to happen.  But do you agree that the race I described above also
-> a real bug?
+On Thu, Jan 15, 2009 at 04:56:44PM +1100, Herbert Xu wrote:
+> Dean Jenkins <djenkins@mvista.com> wrote:
+> > 
+> > Does ESP support 64 bit sequence numbering for use with the
+> > authentication HMAC ?
+> 
+> We don't support 64-bit sequence numbers yet.  If you look at
+> struct xfrm_replay_state which is where we store the sequence
+> number internally you'll find that it uses u32s.
+> 
+> Patches for 64-bit support are welcome of course.
+> 
 
-No I don't think it is.  CHAINV_STATE_INUSE guarantees that only
-one entity can use ctx->err at any time.
-
-> Yes, I see that this bug must be the bug we would likely encounter first.
-> Apparently, async_chainiv_do_postponed was never tested?  But I don't
-> see how the patch you proposed below helps.  We still don't seem to be
-> returning NULL from skcipher_dequeue_givcrypt when we reach the end of
-> the queue because __crypto_dequeue_request is not checking for NULL
-> before it subtracts offset.
-
-Where we subtract the offset the pointer can never be NULL.  Please
-try my patch.
-
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Is there actually anybody working on 64-bit sequence number support?
+If not, I'd start to look at it.
