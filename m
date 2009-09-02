@@ -1,46 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Wed, 2 Sep 2009 08:17:21 +1000
-Message-ID: <20090901221721.GA1964@gondor.apana.org.au>
-References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net> <20090829104606.GA13141@gondor.apana.org.au> <19099.63038.425414.514063@waldo.imnotcreative.homeip.net> <20090831220459.GA15713@gondor.apana.org.au> <19101.16628.347039.619378@waldo.imnotcreative.homeip.net>
+Subject: Re: [PATCH] crypto: Add VMAC(AES) to kernel for intel_txt support
+	(resend)
+Date: Wed, 2 Sep 2009 20:06:31 +1000
+Message-ID: <20090902100630.GA7404@gondor.apana.org.au>
+References: <4A9D1C83.5020806@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	offbase0@gmail.com
-To: Brad Bosch <bradbosch@comcast.net>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Shane Wang <shane.wang@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:42687 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751071AbZIBKGa (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 2 Sep 2009 06:06:30 -0400
 Content-Disposition: inline
-In-Reply-To: <19101.16628.347039.619378@waldo.imnotcreative.homeip.net>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <4A9D1C83.5020806@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 01, 2009 at 10:42:44AM -0500, Brad Bosch wrote:
-> 
-> Now, ctx-err may be used by both async_chainiv_postpone_request to
-> store the return value from skcipher_enqueue_givcrypt and by
-> async_chainiv_givencrypt_tail to store the return value from
-> crypto_ablkcipher_encrypt at the same time.  This can cause the
-> calling function to think async_chainiv_givencrypt has completed it's
-> work, when in fact, the work was defered.
+On Tue, Sep 01, 2009 at 09:07:15PM +0800, Shane Wang wrote:
+>
+> I am wondering whether the email system converts tab indent into spaces.
+> Please use the attached file (it is the same as the plain text below).
+> This patch is based on the latest  
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
 
-async_chainiv_postpone_request never touches ctx->err unless
-it can obtain the INUSE bit lock.  On the other hand, the normal
-patch async_chainiv_givencrypt_tail never relinquishes the INUSE
-bit until it is finisehd with ctx->err.
- 
-> OK.  I see now that your offset patch should indeed solve that
-> problem.  But why did you choose to fix it in a complex way?  My
-> suggestion just adds a single test while yours adds new parameters, a
-> new function and an extra function call.
-
-Because that introduces two NULL checks where the second one is
-useless.  Not a big deal but then again, my patch wasn't that
-complicated either :)
-
-Please let me know whether it actually fixes your problem though
-so I can get this upstream.
-
-Thanks,
+Patch applied.  Thanks a lot Shane!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
