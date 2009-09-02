@@ -1,7 +1,7 @@
 From: "Brad Bosch" <bradbosch@comcast.net>
 Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Wed, 2 Sep 2009 09:08:38 -0500
-Message-ID: <19102.31846.180030.843571@waldo.imnotcreative.homeip.net>
+Date: Wed, 2 Sep 2009 09:23:39 -0500
+Message-ID: <19102.32747.302331.693874@waldo.imnotcreative.homeip.net>
 References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
 	<20090829104606.GA13141@gondor.apana.org.au>
 	<19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
@@ -11,19 +11,20 @@ References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Brad Bosch <bradbosch@comcast.net>, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, offbase0@gmail.com
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	offbase0@gmail.com
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from qmta11.westchester.pa.mail.comcast.net ([76.96.59.211]:52032
-	"EHLO QMTA11.westchester.pa.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752395AbZIBOPD (ORCPT
+Received: from qmta04.westchester.pa.mail.comcast.net ([76.96.62.40]:42293
+	"EHLO QMTA04.westchester.pa.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752447AbZIBOYB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Sep 2009 10:15:03 -0400
+	Wed, 2 Sep 2009 10:24:01 -0400
 In-Reply-To: <20090901221721.GA1964@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+(resent due to bounce notification for vger)
 Herbert Xu writes:
  > On Tue, Sep 01, 2009 at 10:42:44AM -0500, Brad Bosch wrote:
  > > 
