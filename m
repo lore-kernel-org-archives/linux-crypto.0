@@ -1,91 +1,60 @@
-From: "Brad Bosch" <bradbosch@comcast.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Wed, 2 Sep 2009 18:47:49 -0500
-Message-ID: <19103.1061.50828.809996@waldo.imnotcreative.homeip.net>
-References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net>
-	<20090829104606.GA13141@gondor.apana.org.au>
-	<19099.63038.425414.514063@waldo.imnotcreative.homeip.net>
-	<20090831220459.GA15713@gondor.apana.org.au>
-	<19101.16628.347039.619378@waldo.imnotcreative.homeip.net>
-	<20090901221721.GA1964@gondor.apana.org.au>
-	<19102.31846.180030.843571@waldo.imnotcreative.homeip.net>
-	<20090902215712.GA16941@gondor.apana.org.au>
+Date: Thu, 3 Sep 2009 11:53:44 +1000
+Message-ID: <20090903015344.GA18313@gondor.apana.org.au>
+References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net> <20090829104606.GA13141@gondor.apana.org.au> <19099.63038.425414.514063@waldo.imnotcreative.homeip.net> <20090831220459.GA15713@gondor.apana.org.au> <19101.16628.347039.619378@waldo.imnotcreative.homeip.net> <20090901221721.GA1964@gondor.apana.org.au> <19102.31846.180030.843571@waldo.imnotcreative.homeip.net> <20090902215712.GA16941@gondor.apana.org.au> <19103.1061.50828.809996@waldo.imnotcreative.homeip.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: Brad Bosch <bradbosch@comcast.net>, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, offbase0@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20090902215712.GA16941@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	offbase0@gmail.com
+To: Brad Bosch <bradbosch@comcast.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:37081 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752959AbZICBxr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 2 Sep 2009 21:53:47 -0400
+Content-Disposition: inline
+In-Reply-To: <19103.1061.50828.809996@waldo.imnotcreative.homeip.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu writes:
- > On Wed, Sep 02, 2009 at 09:08:38AM -0500, Brad Bosch wrote:
- > > 
- > > Assume the worker thread is executing between the dequeue in
- > > async_chainiv_do_postponed and the clear_bit call in
- > > async_chainiv_schedule_work.  Further assume that we are processing
- > 
- > It cannot.  The worker thread can only execute when it owns
- > the INUSE bit.  In that case do_postponed will never call the
- > schedule_work function.
+On Wed, Sep 02, 2009 at 06:47:49PM -0500, Brad Bosch wrote:
+>
+> Assume the worker thread is executing between the dequeue in
+> async_chainiv_do_postponed and the clear_bit call in
+> async_chainiv_schedule_work.  Further assume that we are processing
+> the last item on the queue so durring this time, ctx->queue.qlen =
+> 0.  **INUSE is still set at this point.
+> 
+> Meanwhile, three threads enter async_chainiv_givencrypt for the same
+> ctx at about the same time.
+> 
+> Thread one calls test_and_set_bit which returns 1 and calls
+> async_cahiniv_postpone_request but suppose it has not yet enqueued.
+> Now INUSE is set and qlen=0.
+> 
+> Next, the worker thread calls clear_bit in async_chainiv_schedule_work
+> but it is interrupted before it can call test_and_set_bit.  Now INUSE
+> is clear and qlen=0
+> 
+> The test_and_set_bit in thread two is called at this moment and
+> returns 0 and then calls async_chainiv_givencrypt_tail.  Now INUSE is
+> set and qlen=0.
+> 
+> Thread one now locks the ctx and calls skcipher_enqueue_givcrypt and
+> unlocks.  Now INUSE is set and qlen=1.
+> 
+> Thread three calls test_and_set_bit which returns 1 and then it clears
+> INUSE since qlen=1 and it calls postpone with INUSE clear and qlen=1
 
-In the example I cited (one entry in the queue when the worker
-function starts), async_chainiv_schedule_work is indeed executed.
-(indirectly) by async_chainiv_givencrypt_tail from the worker thread.
-I'm sorry I didn't make it more clear that it is that code path I was
-talking about.
+How can thread three clear INUSE if test_and_set_bit returned 1?
+If thread three sees it set then it will postpone.  It can only
+clear it if it was not set originally.
 
- > 
- > Perhaps you were misled by the clear_bit call in schedule_work.
- > That is only used if we end up not scheduling the work.
-
-No, I was not misled.  But apparently, I was not clear.  I do
-understand how you use the INUSE bit.  I did not say above that
-INUSE is not set when the worker thread is running (at least not for
-the first part of my example).  If you had read further, you might
-have noticed that the following paragraphs showed that indeed I do
-understand that INUSE is set in the worker thread as evidenced by
-"thread one calls test_and_set_bit which returns 1" I have added one
-sentence (marked by **) to my event description below to make my
-understanding more clear.  Please read on.
-
-Assume the worker thread is executing between the dequeue in
-async_chainiv_do_postponed and the clear_bit call in
-async_chainiv_schedule_work.  Further assume that we are processing
-the last item on the queue so durring this time, ctx->queue.qlen =
-0.  **INUSE is still set at this point.
-
-Meanwhile, three threads enter async_chainiv_givencrypt for the same
-ctx at about the same time.
-
-Thread one calls test_and_set_bit which returns 1 and calls
-async_cahiniv_postpone_request but suppose it has not yet enqueued.
-Now INUSE is set and qlen=0.
-
-Next, the worker thread calls clear_bit in async_chainiv_schedule_work
-but it is interrupted before it can call test_and_set_bit.  Now INUSE
-is clear and qlen=0
-
-The test_and_set_bit in thread two is called at this moment and
-returns 0 and then calls async_chainiv_givencrypt_tail.  Now INUSE is
-set and qlen=0.
-
-Thread one now locks the ctx and calls skcipher_enqueue_givcrypt and
-unlocks.  Now INUSE is set and qlen=1.
-
-Thread three calls test_and_set_bit which returns 1 and then it clears
-INUSE since qlen=1 and it calls postpone with INUSE clear and qlen=1
-
-Now thread three will use ctx->err to hold the return value of
-skcipher_enqueue_givcrypt at the same time as thread two uses ctx->err
-to hold the return value of crypto_ablkcipher_encrypt!
-
-Did I make a mistake above?  I suspect more bad things can happen as
-well in this scenario, but I'm just focusing on the use of ctx->err here.
-
-Thanks
-
---Brad
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
