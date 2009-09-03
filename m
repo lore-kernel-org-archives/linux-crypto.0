@@ -1,56 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto oops in async_chainiv_do_postponed
-Date: Thu, 3 Sep 2009 11:53:44 +1000
-Message-ID: <20090903015344.GA18313@gondor.apana.org.au>
-References: <19095.1264.682820.125602@waldo.imnotcreative.homeip.net> <20090829104606.GA13141@gondor.apana.org.au> <19099.63038.425414.514063@waldo.imnotcreative.homeip.net> <20090831220459.GA15713@gondor.apana.org.au> <19101.16628.347039.619378@waldo.imnotcreative.homeip.net> <20090901221721.GA1964@gondor.apana.org.au> <19102.31846.180030.843571@waldo.imnotcreative.homeip.net> <20090902215712.GA16941@gondor.apana.org.au> <19103.1061.50828.809996@waldo.imnotcreative.homeip.net>
+Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
+	dependencies broken
+Date: Thu, 3 Sep 2009 13:22:06 +1000
+Message-ID: <20090903032206.GA18883@gondor.apana.org.au>
+References: <20090901005120.GB22049@resivo.wgnet.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	offbase0@gmail.com
-To: Brad Bosch <bradbosch@comcast.net>
+Cc: sebastian@breakpoint.cc, celejar@gmail.com,
+	randy.dunlap@oracle.com, 541835@bugs.debian.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	control@bugs.debian.org
+To: Jonas Meurer <jonas@freesources.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:37081 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:42344 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752959AbZICBxr (ORCPT
+	with ESMTP id S1754130AbZICDW1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Sep 2009 21:53:47 -0400
+	Wed, 2 Sep 2009 23:22:27 -0400
 Content-Disposition: inline
-In-Reply-To: <19103.1061.50828.809996@waldo.imnotcreative.homeip.net>
+In-Reply-To: <20090901005120.GB22049@resivo.wgnet.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 02, 2009 at 06:47:49PM -0500, Brad Bosch wrote:
->
-> Assume the worker thread is executing between the dequeue in
-> async_chainiv_do_postponed and the clear_bit call in
-> async_chainiv_schedule_work.  Further assume that we are processing
-> the last item on the queue so durring this time, ctx->queue.qlen =
-> 0.  **INUSE is still set at this point.
+Jonas Meurer <jonas@freesources.org> wrote:
 > 
-> Meanwhile, three threads enter async_chainiv_givencrypt for the same
-> ctx at about the same time.
-> 
-> Thread one calls test_and_set_bit which returns 1 and calls
-> async_cahiniv_postpone_request but suppose it has not yet enqueued.
-> Now INUSE is set and qlen=0.
-> 
-> Next, the worker thread calls clear_bit in async_chainiv_schedule_work
-> but it is interrupted before it can call test_and_set_bit.  Now INUSE
-> is clear and qlen=0
-> 
-> The test_and_set_bit in thread two is called at this moment and
-> returns 0 and then calls async_chainiv_givencrypt_tail.  Now INUSE is
-> set and qlen=0.
-> 
-> Thread one now locks the ctx and calls skcipher_enqueue_givcrypt and
-> unlocks.  Now INUSE is set and qlen=1.
-> 
-> Thread three calls test_and_set_bit which returns 1 and then it clears
-> INUSE since qlen=1 and it calls postpone with INUSE clear and qlen=1
+> i guess the best solution would be to improve the module dependency
+> system. cipher meta-modules like 'aes' should depend on all available
+> implementations. same for ivciphers, hashs, rng implementations etc.
 
-How can thread three clear INUSE if test_and_set_bit returned 1?
-If thread three sees it set then it will postpone.  It can only
-clear it if it was not set originally.
+We already do that for algorithms at least, they should all have
+aliases of the form "ALG" or "ALG-all".
+
+Things like chainiv/eseqiv should just be included always.  There
+are unlikely to be any new algorithms of that type.
 
 Cheers,
 -- 
