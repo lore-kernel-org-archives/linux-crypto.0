@@ -1,42 +1,19 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [pkg-cryptsetup-devel] Bug#541835: crypto configuration /
-	dependencies broken
-Date: Thu, 3 Sep 2009 13:22:06 +1000
-Message-ID: <20090903032206.GA18883@gondor.apana.org.au>
-References: <20090901005120.GB22049@resivo.wgnet.de>
+From: "Sylvester Mcdaniel" <aviomar@cff.org>
+Subject: What's your hobby
+Date: Mon, 7 Sep 2009 21:12:51 +0100
+Message-ID: <20090907211251.4000804@cff.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: sebastian@breakpoint.cc, celejar@gmail.com,
-	randy.dunlap@oracle.com, 541835@bugs.debian.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	control@bugs.debian.org
-To: Jonas Meurer <jonas@freesources.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:42344 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754130AbZICDW1 (ORCPT
+Received: from 236.Red-88-25-232.staticIP.rima-tde.net ([88.25.232.236]:1557
+	"HELO 236.Red-88-25-232.staticIP.rima-tde.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1751988AbZIGTPj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Sep 2009 23:22:27 -0400
-Content-Disposition: inline
-In-Reply-To: <20090901005120.GB22049@resivo.wgnet.de>
+	Mon, 7 Sep 2009 15:15:39 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Jonas Meurer <jonas@freesources.org> wrote:
-> 
-> i guess the best solution would be to improve the module dependency
-> system. cipher meta-modules like 'aes' should depend on all available
-> implementations. same for ivciphers, hashs, rng implementations etc.
+Life is pleasure with right antiEds http://wie.suffixevery.com/
 
-We already do that for algorithms at least, they should all have
-aliases of the form "ALG" or "ALG-all".
-
-Things like chainiv/eseqiv should just be included always.  There
-are unlikely to be any new algorithms of that type.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
