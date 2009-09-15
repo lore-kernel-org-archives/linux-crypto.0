@@ -1,53 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Octavian Purdila <opurdila@ixiacom.com>
 Subject: Re: ESP hardware acceleration
-Date: Tue, 15 Sep 2009 12:12:52 -0500
-Message-ID: <20090915171252.GA30986@gondor.apana.org.au>
-References: <200909151754.15716.opurdila@ixiacom.com>
+Date: Tue, 15 Sep 2009 20:57:56 +0300
+Message-ID: <200909152057.56987.opurdila@ixiacom.com>
+References: <20090915171252.GA30986@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: dimitris@siganos.org, linux-crypto@vger.kernel.org,
 	abadea@ixiacom.com, ddogaru@ixiacom.com
-To: Octavian Purdila <opurdila@ixiacom.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40884 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751668AbZIORMv (ORCPT
+Received: from ixro-out-rtc.ixiacom.com ([92.87.192.98]:18852 "EHLO
+	ixro-ex1.ixiacom.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754467AbZIOSAZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Sep 2009 13:12:51 -0400
-Content-Disposition: inline
-In-Reply-To: <200909151754.15716.opurdila@ixiacom.com>
+	Tue, 15 Sep 2009 14:00:25 -0400
+In-Reply-To: <20090915171252.GA30986@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Octavian Purdila <opurdila@ixiacom.com> wrote:
->
-> AFAK, the crypto interface is asynchronous but the hashing interface (as used 
-> in IPSec) is synchronous.
+On Tuesday 15 September 2009 20:12:52 you wrote:
+
+> > However, I think that the best results for hw accel will be obtained if
+> > you accelerate the AEAD interface.
 > 
-> There are two patches I've recently seen on the list, one for converting to 
-> async hashing and one for parallel crypto/ipsec which will probably get in 
-> 2.6.32.
+> If your driver benefits from seeing both the hashing request and the
+> cipher request at the same time then by all means go for the AEAD
+> interface.  But don't feel compelled to use it just because it's
+> there :)
 
-Yes they're now in Linus's tree so both hsahing and ciphers are
-now async.
+I think this interface has the advantage of doing only one DMA transfer per 
+ESP packet instead of two such transfers required when using separate encr + 
+auth. (of course this may not matter at all on some architectures)
 
-> However, I think that the best results for hw accel will be obtained if you 
-> accelerate the AEAD interface.
+> > Speaking of hw accel, we are also playing with it and we got moderately
+> > good results. We are now running into two major software bottlenecks:
+> > memcpy (because of the copy required by TCP traffic) and CRC computation.
+> 
+> What platform is this? 
+> 
 
-If your driver benefits from seeing both the hashing request and the
-cipher request at the same time then by all means go for the AEAD
-interface.  But don't feel compelled to use it just because it's
-there :)
+Its a ppc750 CPU clocked at 1GHz - pretty low end compared with today's 
+hardware. We were able to get about 360Mbits L2 throughput (TCP traffic) with 
+our hw accel engine although theoretically the hw engine can go up much higher 
+(and profiling the the hw engine itself shows that it is significantly idle).
 
-> Speaking of hw accel, we are also playing with it and we got moderately good 
-> results. We are now running into two major software bottlenecks: memcpy 
-> (because of the copy required by TCP traffic) and CRC computation.
+>  And where does CRC come into this?
 
-What platform is this? And where does CRC come into this?
+Sorry, what I meant was TCP checksum. 
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+tavi
+
+
+
+
+
