@@ -1,30 +1,57 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [PATCH]: fix repetition test for hardware RNG to be FIPS
- compliant (v2)
-Date: Tue, 15 Sep 2009 20:54:07 +0200
-Message-ID: <20090915185407.GA9681@Chamillionaire.breakpoint.cc>
-References: <20090912164411.GA4735@localhost.localdomain>
- <20090913121734.GA23157@Chamillionaire.breakpoint.cc>
- <20090914163043.GA27507@hmsreliant.think-freely.org>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: [PATCH -v3] crypto: Add PCLMULQDQ accelerated GHASH
+ implementation
+Date: Wed, 16 Sep 2009 09:20:32 +0800
+Message-ID: <1253064032.15717.369.camel@yhuang-dev.sh.intel.com>
+References: <1252993367.15717.340.camel@yhuang-dev.sh.intel.com>
+	 <1253025731.11643.333.camel@desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Daniel Walker <dwalker@fifo99.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40388 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752963AbZIOSyG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Sep 2009 14:54:06 -0400
-Content-Disposition: inline
-In-Reply-To: <20090914163043.GA27507@hmsreliant.think-freely.org>
+Received: from mga01.intel.com ([192.55.52.88]:15572 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752077AbZIPBUa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Sep 2009 21:20:30 -0400
+In-Reply-To: <1253025731.11643.333.camel@desktop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Neil Horman | 2009-09-14 12:30:43 [-0400]:
+On Tue, 2009-09-15 at 22:42 +0800, Daniel Walker wrote: 
+> On Tue, 2009-09-15 at 13:42 +0800, Huang Ying wrote:
+> > Hi, Herbert,
+> > 
+> > The dependency to irq_fpu_usable has been merged by linus' tree.
+> > 
+> > Best Regards,
+> > Huang Ying
+> > -------------------------------------------------------------------------->
+> > PCLMULQDQ is used to accelerate the most time-consuming part of GHASH,
+> > carry-less multiplication. More information about PCLMULQDQ can be
+> > found at:
+> > 
+> > http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
+> > 
+> > Because PCLMULQDQ changes XMM state, its usage must be enclosed with
+> > kernel_fpu_begin/end, which can be used only in process context, the
+> > acceleration is implemented as crypto_ahash. That is, request in soft
+> > IRQ context will be defered to the cryptd kernel thread.
+> > 
+> > v3:
+> >  - Revise GHASH implementation, performance increase about 2x.
+> 
+> 
+> You have three style issues in this patch, for instance you shouldn't
+> set values inside if() statements .. If you run checkpatch on this it
+> will tell you all the style problems. Could you run this through
+> checkpatch and fix any errors it's find ?
 
->Ok, version 2 of the patch, taking comments into account
-looks good.
+Thanks, I will fix them.
 
-Sebastian
+Best Regards,
+Huang Ying
+
