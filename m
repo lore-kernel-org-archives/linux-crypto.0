@@ -1,36 +1,38 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH 1/1] add fips(ansi_cprng) (v2)
-Date: Fri, 18 Sep 2009 21:12:49 -0400
-Message-ID: <4AB43011.3010003@redhat.com>
-References: <20090916160456.GC11163@hmsreliant.think-freely.org> <20090918183254.GA28540@hmsreliant.think-freely.org> <20090918183446.GB28540@hmsreliant.think-freely.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] padata: generic interface for parallel processing
+Date: Sat, 19 Sep 2009 16:19:59 -0700
+Message-ID: <20090919231958.GA8097@gondor.apana.org.au>
+References: <20090831091145.GB32705@secunet.com> <20090831091249.GC32705@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:13978 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751353AbZISBNC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Sep 2009 21:13:02 -0400
-In-Reply-To: <20090918183446.GB28540@hmsreliant.think-freely.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:36341 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752769AbZISXUD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 19 Sep 2009 19:20:03 -0400
+Content-Disposition: inline
+In-Reply-To: <20090831091249.GC32705@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/18/2009 02:34 PM, Neil Horman wrote:
-> Patch to add fips(ansi_cprng) alg, which is ansi_cprng plus a continuous test
+On Mon, Aug 31, 2009 at 11:12:49AM +0200, Steffen Klassert wrote:
+> This patch introduces an interface to process data objects
+> in parallel. On request it is possible to serialize again.
+> The parallelized objects return after serialization in the
+> same order as they were before the parallelization.
 > 
-> Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-That turned out to be a lot less messy than my puny mind was thinking it might be.
-The solution actually looks quite elegant, especially like how much cleaner the
-priming of the continuity test in fips mode is.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Acked-by: Jarod Wilson <jarod@redhat.com>
+Looks good to me.  Dave, do you want to pick this one up?
 
-
+Thanks,
 -- 
-Jarod Wilson
-jarod@redhat.com
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
