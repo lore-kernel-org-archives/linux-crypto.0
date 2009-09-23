@@ -1,50 +1,40 @@
-From: =?ISO-8859-1?Q?S=E9guier_R=E9gis?= <rseguier@e-teleport.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Padlock SHA1 failed at boot time
-Date: Tue, 22 Sep 2009 19:34:17 +0200
-Message-ID: <4AB90A99.6040008@e-teleport.net>
-References: <20090922171716.GA2977@gondor.apana.org.au>
+Date: Tue, 22 Sep 2009 22:27:59 -0700
+Message-ID: <20090923052759.GA7592@gondor.apana.org.au>
+References: <20090922171716.GA2977@gondor.apana.org.au> <4AB90A99.6040008@e-teleport.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1;
-	format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: =?iso-8859-1?Q?S=E9guier_R=E9gis?= <rseguier@e-teleport.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.e-teleport.net ([213.190.64.162]:47000 "EHLO
-	smtp.e-teleport.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752033AbZIVReR (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:57739 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751594AbZIWF16 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Sep 2009 13:34:17 -0400
-In-Reply-To: <20090922171716.GA2977@gondor.apana.org.au>
+	Wed, 23 Sep 2009 01:27:58 -0400
+Content-Disposition: inline
+In-Reply-To: <4AB90A99.6040008@e-teleport.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu a =E9crit :
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
->  =20
->> crypto: padlock-sha - Fix stack alignment
->>
->> The PadLock hardware requires the output buffer for SHA to be
->> 128-bit aligned.  We currentply place the buffer on the stack,
->> and ask gcc to align it to 128 bits.  That doesn't work on i386
->> because the kernel stack is only aligned to 32 bits.  This patch
->> changes the code to align the buffer by hand so that the hardware
->> doesn't fault on unaligned buffers.
->>
->> Reported-by: S=E9guier R=E9gis <rguier@e-teleport.net>
->> Tested-by: S=E9guier R=E9gis <rguier@e-teleport.net>
->> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->>    =20
+On Tue, Sep 22, 2009 at 07:34:17PM +0200, S=E9guier R=E9gis wrote:
 >
-> For the record I modified the patch slightly to ensure that
-> we get the minimum alignment from gcc
-Ok, tested, good for me.
+> Ok, tested, good for me.
 
-Just, not important, my mail is not rguier@e-teleport.net but=20
-rseguier@e-teleport.net for the changelog.
+Thanks!
 
+> Just, not important, my mail is not rguier@e-teleport.net but =20
+> rseguier@e-teleport.net for the changelog.
+
+Sorry! But look on the bright side, at least you won't get spammed
+because of this :)
 --=20
-R=E9gis S=E9guier
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 --
 To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
  in
