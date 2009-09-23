@@ -1,42 +1,18 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Padlock SHA1 failed at boot time
-Date: Tue, 22 Sep 2009 22:27:59 -0700
-Message-ID: <20090923052759.GA7592@gondor.apana.org.au>
-References: <20090922171716.GA2977@gondor.apana.org.au> <4AB90A99.6040008@e-teleport.net>
+From: "Philip Mullins" <serge.lloan@ehimegw.dpc.ehime-u.ac.jp>
+Subject: Control your life.
+Date: Wed, 23 Sep 2009 15:04:43 +0100
+Message-ID: <20090923150443.9040409@ehimegw.dpc.ehime-u.ac.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: =?iso-8859-1?Q?S=E9guier_R=E9gis?= <rseguier@e-teleport.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57739 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751594AbZIWF16 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Sep 2009 01:27:58 -0400
-Content-Disposition: inline
-In-Reply-To: <4AB90A99.6040008@e-teleport.net>
+Received: from host19-236-dynamic.51-79-r.retail.telecomitalia.it ([79.51.236.19]:2359
+	"HELO wergvan" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1751230AbZIWNL1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Sep 2009 09:11:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 22, 2009 at 07:34:17PM +0200, S=E9guier R=E9gis wrote:
->
-> Ok, tested, good for me.
+300% bonus for everyone http://uto.shelllaugh.com/
 
-Thanks!
-
-> Just, not important, my mail is not rguier@e-teleport.net but =20
-> rseguier@e-teleport.net for the changelog.
-
-Sorry! But look on the bright side, at least you won't get spammed
-because of this :)
---=20
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
