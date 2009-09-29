@@ -1,25 +1,19 @@
-From: Dimitrios Siganos <dimitris@siganos.org>
-Subject: ARM TrustZone
-Date: Mon, 28 Sep 2009 17:35:58 +0100
-Message-ID: <4AC0E5EE.5070402@siganos.org>
+From: "Toby Braun" <janez.zupan1@telenet.be>
+Subject: Get smashing love power
+Date: Mon, 28 Sep 2009 21:55:25 -0300
+Message-ID: <20090928215525.9010506@telenet.be>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lvps212-241-214-128.vps.webfusion.co.uk ([212.241.214.128]:40667
-	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752862AbZI1QgG (ORCPT
+Received: from 187-032-220-066.static.ctbctelecom.com.br ([187.32.220.66]:4272
+	"HELO 187-032-220-066.static.ctbctelecom.com.br" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1753689AbZI2A4X (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Sep 2009 12:36:06 -0400
+	Mon, 28 Sep 2009 20:56:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Save up to 70% off retails http://wf.exyvuyzix.com/
 
-I am using an ARM based CPU which has the ARM TrustZone feature.
-
-Does Linux use TrustZone features at all or does it completely ignore it?
-
-Regards,
-Dimitrios Siganos
