@@ -1,42 +1,44 @@
-From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
-Subject: Re: question about sha1 driver
-Date: Wed, 7 Oct 2009 20:35:30 +0200
-Message-ID: <20091007183529.GA6095@Chamillionaire.breakpoint.cc>
-References: <311e0d1f0909210158k5feca8b9gc3b9d187e13ba6ff@mail.gmail.com>
- <20090922031705.GA27429@gondor.apana.org.au>
- <311e0d1f0909220617r66cc96b3s52ee3ab99bcbd6e3@mail.gmail.com>
- <20090922142059.GC694@gondor.apana.org.au>
- <311e0d1f0909280831j5e12671na709db1eaed5e393@mail.gmail.com>
- <311e0d1f0909300028n4e53d11ep985f7179684146d8@mail.gmail.com>
-Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] padata: generic interface for parallel processing
+Date: Wed, 07 Oct 2009 13:44:04 -0700 (PDT)
+Message-ID: <20091007.134404.09793111.davem@davemloft.net>
+References: <20090831091249.GC32705@secunet.com>
+	<20090919231958.GA8097@gondor.apana.org.au>
+	<20091007142241.GF15653@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: avital sela <avitalsela95@gmail.com>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: steffen.klassert@secunet.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:54057 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S934367AbZJGSgI (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:32983
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754374AbZJGUoJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Oct 2009 14:36:08 -0400
-Content-Disposition: inline
-In-Reply-To: <311e0d1f0909300028n4e53d11ep985f7179684146d8@mail.gmail.com>
+	Wed, 7 Oct 2009 16:44:09 -0400
+In-Reply-To: <20091007142241.GF15653@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* avital sela | 2009-09-30 09:28:01 [+0200]:
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Date: Wed, 7 Oct 2009 16:22:41 +0200
 
->On Mon, Sep 28, 2009 at 5:31 PM, avital sela <avitalsela95@gmail.com> wrote:
->> Attached below is the source code for the sha driver.? Like I said previously, if I add printk-s or delays in testmgr then the test passes and all subsequent sha1 crypto operations are successful.
+> On Sat, Sep 19, 2009 at 04:19:59PM -0700, Herbert Xu wrote:
+>> On Mon, Aug 31, 2009 at 11:12:49AM +0200, Steffen Klassert wrote:
+>> > This patch introduces an interface to process data objects
+>> > in parallel. On request it is possible to serialize again.
+>> > The parallelized objects return after serialization in the
+>> > same order as they were before the parallelization.
+>> > 
+>> > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+>> 
+>> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> 
+>> Looks good to me.  Dave, do you want to pick this one up?
+>> 
+> 
+> I plan to send a rebased patchset tomorrow,
+> so who wants to take this one?
 
-This isn't the complete source code. I have no idea what hides behind
-SHA_DATA_BUFFER.
-Anyway if it works with delays and you are making a HW driver than I
-would say that you forgot to flush the data from cache to physical
-memory after / before your memcpy().
-
->>
->> Thanks for your help,
->> Avital
-
-Sebastian
+I'll take the padata change, as I agreed with Herbert to do.
+But the rest goes to Herbert.
