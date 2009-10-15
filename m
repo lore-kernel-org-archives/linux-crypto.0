@@ -1,110 +1,89 @@
-From: David McCullough <David_Mccullough@securecomputing.com>
-Subject: Re: Questions For Linux Crypto API
-Date: Thu, 15 Oct 2009 13:02:22 +1000
-Message-ID: <20091015030222.GC31655@securecomputing.com>
-References: <EC64E4604C8024438259B683BB2514E1077BB35162@SC-VEXCH1.marvell.com> <20091014114404.GA4435@securecomputing.com> <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
+From: Leo Yan <leoy@marvell.com>
+Subject: RE: Questions For Linux Crypto API
+Date: Wed, 14 Oct 2009 22:12:40 -0700
+Message-ID: <EC64E4604C8024438259B683BB2514E1077BB35473@SC-VEXCH1.marvell.com>
+References: <EC64E4604C8024438259B683BB2514E1077BB35162@SC-VEXCH1.marvell.com>
+ <20091014114404.GA4435@securecomputing.com>
+ <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
+ <20091015030222.GC31655@securecomputing.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Leo Yan <leoy@marvell.com>
+To: David McCullough <David_Mccullough@securecomputing.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dalsmrelay2.nai.com ([205.227.136.216]:51335 "HELO
-	dalsmrelay2.nai.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752192AbZJODEo (ORCPT
+Received: from dakia2.marvell.com ([65.219.4.35]:45828 "EHLO
+	dakia2.marvell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751951AbZJOFNU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2009 23:04:44 -0400
-Content-Disposition: inline
-In-Reply-To: <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
+	Thu, 15 Oct 2009 01:13:20 -0400
+In-Reply-To: <20091015030222.GC31655@securecomputing.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-Jivin Leo Yan lays it down ...
->  
-> hi, David
-> 
-> Very appreciate for your answer. :-)
-> 
-> Please see my inline comments.
->  
-> Best Regards,
-> Leo Yan
-> 
-> 
-> -----Original Message-----
-> From: David McCullough [mailto:David_Mccullough@securecomputing.com] 
-> Sent: 2009?10?14? 19:44
-> To: Leo Yan
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: Questions For Linux Crypto API
-> 
-> 
-> Jivin Leo Yan lays it down ...
-> > 
-> > Hi, all
-> > 
-> > I am a newbie for Linux crypto.
-> > Recently I am warming up on Linux Crypto APIs and have some questions.
-> > Would you kindly give me some hints about it J ?
-> > 
-> > 1. Does Linux Crypto API now support user space or not? 
-> > I have googled the mailing list, and find some guys have committed some patches for it.
-> > But so far, in the Linux mainline (2.6.31) do not merge it. 
-> > So Linux Crypto API will support user space or not?
-> 
-> Someone else will know more about this.  People are working on it I think but it's not there yet.
-> 
-> > 2. OCF has been ported to Linux, so will OCF integrate with Linux Crypto API or not?
-> 
-> OCF has a driver called cryptosoft that uses the linux crypto API.
-> 
-> [leo]: thanks a lot. I got it.
-> 
-> > If Linux Crypto API will support the user space and provide the user 
-> > space APIs, then OpenBSD Cryptographics Framework will directly use 
-> > the Linux Crypto APIs or not? Otherwise
-> 
-> Once linux has it's own user space API you will not need OCF to provide one, but you will need to add/wait for support for applications like openssl etc to use the linux API.
-> 
-> [leo]: 
-> This user space API you referred is the standard API on Linux, or the POSIX APIs? I googled and can NOT find it.
-> Can you give me further more guide for it?
-
-A linux native interface for userspace to kernel crypto doesn't "completely"
-exist yet,  So there is nothing to find (other than patches to this list
-IIRC).
-
-It has nothing to do with posix or or standard API's at this point.
-
-OCF will give you such an interface,  some people are working on another one
-just for linux,
-
-Cheers,
-Davidm
-
-
-
-> So i think the framework looks like below, is it right?
-> |-------------------------------------------------|
-> | Linux User space Crypto API             |                                                                              User Space
-> |-------------------------------------------------|
->                                ^
-> ------------------------|---------------------------------------------------------------------------------------
->                                v
-> |-------------------------------------------------|------------------------------------------- |                   Kernel Space
-> | Dedicated Device Driver for it            |Linux Crypto API                           | => this is the API maintained by Herbert in kernel space
-> |-------------------------------------------------|--------------------------------------------|
-> 
-> 
-> Cheers,
-> Davidm
-> 
-> --
-> David McCullough,  david_mccullough@securecomputing.com,  Ph:+61 734352815
-> McAfee - SnapGear  http://www.snapgear.com                http://www.uCdot.org
-> 
-> 
-
--- 
-David McCullough,  david_mccullough@securecomputing.com,  Ph:+61 734352815
-McAfee - SnapGear  http://www.snapgear.com                http://www.uCdot.org
+aGksIERhdmlkDQoNClRoYW5rcyBhIGxvdC4gOi0pDQoNCkJlc3QgUmVnYXJkcywNCkxlbyBZYW4N
+Cg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogRGF2aWQgTWNDdWxsb3VnaCBb
+bWFpbHRvOkRhdmlkX01jY3VsbG91Z2hAc2VjdXJlY29tcHV0aW5nLmNvbV0gDQpTZW50OiAyMDA5
+xOoxMNTCMTXI1SAxMTowMg0KVG86IExlbyBZYW4NCkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJu
+ZWwub3JnDQpTdWJqZWN0OiBSZTogUXVlc3Rpb25zIEZvciBMaW51eCBDcnlwdG8gQVBJDQoNCg0K
+Sml2aW4gTGVvIFlhbiBsYXlzIGl0IGRvd24gLi4uDQo+ICANCj4gaGksIERhdmlkDQo+IA0KPiBW
+ZXJ5IGFwcHJlY2lhdGUgZm9yIHlvdXIgYW5zd2VyLiA6LSkNCj4gDQo+IFBsZWFzZSBzZWUgbXkg
+aW5saW5lIGNvbW1lbnRzLg0KPiAgDQo+IEJlc3QgUmVnYXJkcywNCj4gTGVvIFlhbg0KPiANCj4g
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IERhdmlkIE1jQ3VsbG91Z2gg
+W21haWx0bzpEYXZpZF9NY2N1bGxvdWdoQHNlY3VyZWNvbXB1dGluZy5jb21dDQo+IFNlbnQ6IDIw
+MDk/MTA/MTQ/IDE5OjQ0DQo+IFRvOiBMZW8gWWFuDQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5r
+ZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBRdWVzdGlvbnMgRm9yIExpbnV4IENyeXB0byBBUEkN
+Cj4gDQo+IA0KPiBKaXZpbiBMZW8gWWFuIGxheXMgaXQgZG93biAuLi4NCj4gPiANCj4gPiBIaSwg
+YWxsDQo+ID4gDQo+ID4gSSBhbSBhIG5ld2JpZSBmb3IgTGludXggY3J5cHRvLg0KPiA+IFJlY2Vu
+dGx5IEkgYW0gd2FybWluZyB1cCBvbiBMaW51eCBDcnlwdG8gQVBJcyBhbmQgaGF2ZSBzb21lIHF1
+ZXN0aW9ucy4NCj4gPiBXb3VsZCB5b3Uga2luZGx5IGdpdmUgbWUgc29tZSBoaW50cyBhYm91dCBp
+dCBKID8NCj4gPiANCj4gPiAxLiBEb2VzIExpbnV4IENyeXB0byBBUEkgbm93IHN1cHBvcnQgdXNl
+ciBzcGFjZSBvciBub3Q/IA0KPiA+IEkgaGF2ZSBnb29nbGVkIHRoZSBtYWlsaW5nIGxpc3QsIGFu
+ZCBmaW5kIHNvbWUgZ3V5cyBoYXZlIGNvbW1pdHRlZCBzb21lIHBhdGNoZXMgZm9yIGl0Lg0KPiA+
+IEJ1dCBzbyBmYXIsIGluIHRoZSBMaW51eCBtYWlubGluZSAoMi42LjMxKSBkbyBub3QgbWVyZ2Ug
+aXQuIA0KPiA+IFNvIExpbnV4IENyeXB0byBBUEkgd2lsbCBzdXBwb3J0IHVzZXIgc3BhY2Ugb3Ig
+bm90Pw0KPiANCj4gU29tZW9uZSBlbHNlIHdpbGwga25vdyBtb3JlIGFib3V0IHRoaXMuICBQZW9w
+bGUgYXJlIHdvcmtpbmcgb24gaXQgSSB0aGluayBidXQgaXQncyBub3QgdGhlcmUgeWV0Lg0KPiAN
+Cj4gPiAyLiBPQ0YgaGFzIGJlZW4gcG9ydGVkIHRvIExpbnV4LCBzbyB3aWxsIE9DRiBpbnRlZ3Jh
+dGUgd2l0aCBMaW51eCBDcnlwdG8gQVBJIG9yIG5vdD8NCj4gDQo+IE9DRiBoYXMgYSBkcml2ZXIg
+Y2FsbGVkIGNyeXB0b3NvZnQgdGhhdCB1c2VzIHRoZSBsaW51eCBjcnlwdG8gQVBJLg0KPiANCj4g
+W2xlb106IHRoYW5rcyBhIGxvdC4gSSBnb3QgaXQuDQo+IA0KPiA+IElmIExpbnV4IENyeXB0byBB
+UEkgd2lsbCBzdXBwb3J0IHRoZSB1c2VyIHNwYWNlIGFuZCBwcm92aWRlIHRoZSB1c2VyIA0KPiA+
+IHNwYWNlIEFQSXMsIHRoZW4gT3BlbkJTRCBDcnlwdG9ncmFwaGljcyBGcmFtZXdvcmsgd2lsbCBk
+aXJlY3RseSB1c2UgDQo+ID4gdGhlIExpbnV4IENyeXB0byBBUElzIG9yIG5vdD8gT3RoZXJ3aXNl
+DQo+IA0KPiBPbmNlIGxpbnV4IGhhcyBpdCdzIG93biB1c2VyIHNwYWNlIEFQSSB5b3Ugd2lsbCBu
+b3QgbmVlZCBPQ0YgdG8gcHJvdmlkZSBvbmUsIGJ1dCB5b3Ugd2lsbCBuZWVkIHRvIGFkZC93YWl0
+IGZvciBzdXBwb3J0IGZvciBhcHBsaWNhdGlvbnMgbGlrZSBvcGVuc3NsIGV0YyB0byB1c2UgdGhl
+IGxpbnV4IEFQSS4NCj4gDQo+IFtsZW9dOiANCj4gVGhpcyB1c2VyIHNwYWNlIEFQSSB5b3UgcmVm
+ZXJyZWQgaXMgdGhlIHN0YW5kYXJkIEFQSSBvbiBMaW51eCwgb3IgdGhlIFBPU0lYIEFQSXM/IEkg
+Z29vZ2xlZCBhbmQgY2FuIE5PVCBmaW5kIGl0Lg0KPiBDYW4geW91IGdpdmUgbWUgZnVydGhlciBt
+b3JlIGd1aWRlIGZvciBpdD8NCg0KQSBsaW51eCBuYXRpdmUgaW50ZXJmYWNlIGZvciB1c2Vyc3Bh
+Y2UgdG8ga2VybmVsIGNyeXB0byBkb2Vzbid0ICJjb21wbGV0ZWx5Ig0KZXhpc3QgeWV0LCAgU28g
+dGhlcmUgaXMgbm90aGluZyB0byBmaW5kIChvdGhlciB0aGFuIHBhdGNoZXMgdG8gdGhpcyBsaXN0
+IElJUkMpLg0KDQpJdCBoYXMgbm90aGluZyB0byBkbyB3aXRoIHBvc2l4IG9yIG9yIHN0YW5kYXJk
+IEFQSSdzIGF0IHRoaXMgcG9pbnQuDQoNCk9DRiB3aWxsIGdpdmUgeW91IHN1Y2ggYW4gaW50ZXJm
+YWNlLCAgc29tZSBwZW9wbGUgYXJlIHdvcmtpbmcgb24gYW5vdGhlciBvbmUganVzdCBmb3IgbGlu
+dXgsDQoNCkNoZWVycywNCkRhdmlkbQ0KDQoNCg0KPiBTbyBpIHRoaW5rIHRoZSBmcmFtZXdvcmsg
+bG9va3MgbGlrZSBiZWxvdywgaXMgaXQgcmlnaHQ/DQo+IHwtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfA0KPiB8IExpbnV4IFVzZXIgc3BhY2UgQ3J5cHRv
+IEFQSSAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVXNlciBTcGFjZQ0KPiB8LS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLXwNCj4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4NCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAtLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2DQo+IHwtLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0gfCAgICAgICAgICAgICAgICAgICBLZXJuZWwgU3BhY2UNCj4g
+fCBEZWRpY2F0ZWQgRGV2aWNlIERyaXZlciBmb3IgaXQgICAgICAgICAgICB8TGludXggQ3J5cHRv
+IEFQSSAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgPT4gdGhpcyBpcyB0aGUgQVBJIG1haW50
+YWluZWQgYnkgSGVyYmVydCBpbiBrZXJuZWwgc3BhY2UNCj4gfC0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS18DQo+IA0KPiANCj4gQ2hlZXJzLA0KPiBEYXZpZG0NCj4gDQo+IC0t
+DQo+IERhdmlkIE1jQ3VsbG91Z2gsICBkYXZpZF9tY2N1bGxvdWdoQHNlY3VyZWNvbXB1dGluZy5j
+b20sICBQaDorNjEgNzM0MzUyODE1DQo+IE1jQWZlZSAtIFNuYXBHZWFyICBodHRwOi8vd3d3LnNu
+YXBnZWFyLmNvbSAgICAgICAgICAgICAgICBodHRwOi8vd3d3LnVDZG90Lm9yZw0KPiANCj4gDQoN
+Ci0tDQpEYXZpZCBNY0N1bGxvdWdoLCAgZGF2aWRfbWNjdWxsb3VnaEBzZWN1cmVjb21wdXRpbmcu
+Y29tLCAgUGg6KzYxIDczNDM1MjgxNQ0KTWNBZmVlIC0gU25hcEdlYXIgIGh0dHA6Ly93d3cuc25h
+cGdlYXIuY29tICAgICAgICAgICAgICAgIGh0dHA6Ly93d3cudUNkb3Qub3JnDQo=
