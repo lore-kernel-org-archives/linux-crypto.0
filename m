@@ -1,89 +1,55 @@
-From: Leo Yan <leoy@marvell.com>
-Subject: RE: Questions For Linux Crypto API
-Date: Wed, 14 Oct 2009 22:12:40 -0700
-Message-ID: <EC64E4604C8024438259B683BB2514E1077BB35473@SC-VEXCH1.marvell.com>
-References: <EC64E4604C8024438259B683BB2514E1077BB35162@SC-VEXCH1.marvell.com>
- <20091014114404.GA4435@securecomputing.com>
- <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
- <20091015030222.GC31655@securecomputing.com>
+From: Vishnu Suresh <Vishnu@freescale.com>
+Subject: [PATCH v0 1/2] DMA: fsldma: Disable DMA_INTERRUPT when Async_tx
+	enabled
+Date: Thu, 15 Oct 2009 12:11:05 +0530
+Message-ID: <1255588866-4133-1-git-send-email-Vishnu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: David McCullough <David_Mccullough@securecomputing.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dakia2.marvell.com ([65.219.4.35]:45828 "EHLO
-	dakia2.marvell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751951AbZJOFNU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Oct 2009 01:13:20 -0400
-In-Reply-To: <20091015030222.GC31655@securecomputing.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Vishnu Suresh <Vishnu@freescale.com>
+To: linuxppc-dev@ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	herbert@gondor.apana.org.au, dan.j.williams@intel.com
+Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Sender: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
+Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
+List-Id: linux-crypto.vger.kernel.org
 
-aGksIERhdmlkDQoNClRoYW5rcyBhIGxvdC4gOi0pDQoNCkJlc3QgUmVnYXJkcywNCkxlbyBZYW4N
-Cg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogRGF2aWQgTWNDdWxsb3VnaCBb
-bWFpbHRvOkRhdmlkX01jY3VsbG91Z2hAc2VjdXJlY29tcHV0aW5nLmNvbV0gDQpTZW50OiAyMDA5
-xOoxMNTCMTXI1SAxMTowMg0KVG86IExlbyBZYW4NCkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJu
-ZWwub3JnDQpTdWJqZWN0OiBSZTogUXVlc3Rpb25zIEZvciBMaW51eCBDcnlwdG8gQVBJDQoNCg0K
-Sml2aW4gTGVvIFlhbiBsYXlzIGl0IGRvd24gLi4uDQo+ICANCj4gaGksIERhdmlkDQo+IA0KPiBW
-ZXJ5IGFwcHJlY2lhdGUgZm9yIHlvdXIgYW5zd2VyLiA6LSkNCj4gDQo+IFBsZWFzZSBzZWUgbXkg
-aW5saW5lIGNvbW1lbnRzLg0KPiAgDQo+IEJlc3QgUmVnYXJkcywNCj4gTGVvIFlhbg0KPiANCj4g
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IERhdmlkIE1jQ3VsbG91Z2gg
-W21haWx0bzpEYXZpZF9NY2N1bGxvdWdoQHNlY3VyZWNvbXB1dGluZy5jb21dDQo+IFNlbnQ6IDIw
-MDk/MTA/MTQ/IDE5OjQ0DQo+IFRvOiBMZW8gWWFuDQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5r
-ZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBRdWVzdGlvbnMgRm9yIExpbnV4IENyeXB0byBBUEkN
-Cj4gDQo+IA0KPiBKaXZpbiBMZW8gWWFuIGxheXMgaXQgZG93biAuLi4NCj4gPiANCj4gPiBIaSwg
-YWxsDQo+ID4gDQo+ID4gSSBhbSBhIG5ld2JpZSBmb3IgTGludXggY3J5cHRvLg0KPiA+IFJlY2Vu
-dGx5IEkgYW0gd2FybWluZyB1cCBvbiBMaW51eCBDcnlwdG8gQVBJcyBhbmQgaGF2ZSBzb21lIHF1
-ZXN0aW9ucy4NCj4gPiBXb3VsZCB5b3Uga2luZGx5IGdpdmUgbWUgc29tZSBoaW50cyBhYm91dCBp
-dCBKID8NCj4gPiANCj4gPiAxLiBEb2VzIExpbnV4IENyeXB0byBBUEkgbm93IHN1cHBvcnQgdXNl
-ciBzcGFjZSBvciBub3Q/IA0KPiA+IEkgaGF2ZSBnb29nbGVkIHRoZSBtYWlsaW5nIGxpc3QsIGFu
-ZCBmaW5kIHNvbWUgZ3V5cyBoYXZlIGNvbW1pdHRlZCBzb21lIHBhdGNoZXMgZm9yIGl0Lg0KPiA+
-IEJ1dCBzbyBmYXIsIGluIHRoZSBMaW51eCBtYWlubGluZSAoMi42LjMxKSBkbyBub3QgbWVyZ2Ug
-aXQuIA0KPiA+IFNvIExpbnV4IENyeXB0byBBUEkgd2lsbCBzdXBwb3J0IHVzZXIgc3BhY2Ugb3Ig
-bm90Pw0KPiANCj4gU29tZW9uZSBlbHNlIHdpbGwga25vdyBtb3JlIGFib3V0IHRoaXMuICBQZW9w
-bGUgYXJlIHdvcmtpbmcgb24gaXQgSSB0aGluayBidXQgaXQncyBub3QgdGhlcmUgeWV0Lg0KPiAN
-Cj4gPiAyLiBPQ0YgaGFzIGJlZW4gcG9ydGVkIHRvIExpbnV4LCBzbyB3aWxsIE9DRiBpbnRlZ3Jh
-dGUgd2l0aCBMaW51eCBDcnlwdG8gQVBJIG9yIG5vdD8NCj4gDQo+IE9DRiBoYXMgYSBkcml2ZXIg
-Y2FsbGVkIGNyeXB0b3NvZnQgdGhhdCB1c2VzIHRoZSBsaW51eCBjcnlwdG8gQVBJLg0KPiANCj4g
-W2xlb106IHRoYW5rcyBhIGxvdC4gSSBnb3QgaXQuDQo+IA0KPiA+IElmIExpbnV4IENyeXB0byBB
-UEkgd2lsbCBzdXBwb3J0IHRoZSB1c2VyIHNwYWNlIGFuZCBwcm92aWRlIHRoZSB1c2VyIA0KPiA+
-IHNwYWNlIEFQSXMsIHRoZW4gT3BlbkJTRCBDcnlwdG9ncmFwaGljcyBGcmFtZXdvcmsgd2lsbCBk
-aXJlY3RseSB1c2UgDQo+ID4gdGhlIExpbnV4IENyeXB0byBBUElzIG9yIG5vdD8gT3RoZXJ3aXNl
-DQo+IA0KPiBPbmNlIGxpbnV4IGhhcyBpdCdzIG93biB1c2VyIHNwYWNlIEFQSSB5b3Ugd2lsbCBu
-b3QgbmVlZCBPQ0YgdG8gcHJvdmlkZSBvbmUsIGJ1dCB5b3Ugd2lsbCBuZWVkIHRvIGFkZC93YWl0
-IGZvciBzdXBwb3J0IGZvciBhcHBsaWNhdGlvbnMgbGlrZSBvcGVuc3NsIGV0YyB0byB1c2UgdGhl
-IGxpbnV4IEFQSS4NCj4gDQo+IFtsZW9dOiANCj4gVGhpcyB1c2VyIHNwYWNlIEFQSSB5b3UgcmVm
-ZXJyZWQgaXMgdGhlIHN0YW5kYXJkIEFQSSBvbiBMaW51eCwgb3IgdGhlIFBPU0lYIEFQSXM/IEkg
-Z29vZ2xlZCBhbmQgY2FuIE5PVCBmaW5kIGl0Lg0KPiBDYW4geW91IGdpdmUgbWUgZnVydGhlciBt
-b3JlIGd1aWRlIGZvciBpdD8NCg0KQSBsaW51eCBuYXRpdmUgaW50ZXJmYWNlIGZvciB1c2Vyc3Bh
-Y2UgdG8ga2VybmVsIGNyeXB0byBkb2Vzbid0ICJjb21wbGV0ZWx5Ig0KZXhpc3QgeWV0LCAgU28g
-dGhlcmUgaXMgbm90aGluZyB0byBmaW5kIChvdGhlciB0aGFuIHBhdGNoZXMgdG8gdGhpcyBsaXN0
-IElJUkMpLg0KDQpJdCBoYXMgbm90aGluZyB0byBkbyB3aXRoIHBvc2l4IG9yIG9yIHN0YW5kYXJk
-IEFQSSdzIGF0IHRoaXMgcG9pbnQuDQoNCk9DRiB3aWxsIGdpdmUgeW91IHN1Y2ggYW4gaW50ZXJm
-YWNlLCAgc29tZSBwZW9wbGUgYXJlIHdvcmtpbmcgb24gYW5vdGhlciBvbmUganVzdCBmb3IgbGlu
-dXgsDQoNCkNoZWVycywNCkRhdmlkbQ0KDQoNCg0KPiBTbyBpIHRoaW5rIHRoZSBmcmFtZXdvcmsg
-bG9va3MgbGlrZSBiZWxvdywgaXMgaXQgcmlnaHQ/DQo+IHwtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfA0KPiB8IExpbnV4IFVzZXIgc3BhY2UgQ3J5cHRv
-IEFQSSAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVXNlciBTcGFjZQ0KPiB8LS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLXwNCj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4NCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAtLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2DQo+IHwtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0gfCAgICAgICAgICAgICAgICAgICBLZXJuZWwgU3BhY2UNCj4g
-fCBEZWRpY2F0ZWQgRGV2aWNlIERyaXZlciBmb3IgaXQgICAgICAgICAgICB8TGludXggQ3J5cHRv
-IEFQSSAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgPT4gdGhpcyBpcyB0aGUgQVBJIG1haW50
-YWluZWQgYnkgSGVyYmVydCBpbiBrZXJuZWwgc3BhY2UNCj4gfC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS18DQo+IA0KPiANCj4gQ2hlZXJzLA0KPiBEYXZpZG0NCj4gDQo+IC0t
-DQo+IERhdmlkIE1jQ3VsbG91Z2gsICBkYXZpZF9tY2N1bGxvdWdoQHNlY3VyZWNvbXB1dGluZy5j
-b20sICBQaDorNjEgNzM0MzUyODE1DQo+IE1jQWZlZSAtIFNuYXBHZWFyICBodHRwOi8vd3d3LnNu
-YXBnZWFyLmNvbSAgICAgICAgICAgICAgICBodHRwOi8vd3d3LnVDZG90Lm9yZw0KPiANCj4gDQoN
-Ci0tDQpEYXZpZCBNY0N1bGxvdWdoLCAgZGF2aWRfbWNjdWxsb3VnaEBzZWN1cmVjb21wdXRpbmcu
-Y29tLCAgUGg6KzYxIDczNDM1MjgxNQ0KTWNBZmVlIC0gU25hcEdlYXIgIGh0dHA6Ly93d3cuc25h
-cGdlYXIuY29tICAgICAgICAgICAgICAgIGh0dHA6Ly93d3cudUNkb3Qub3JnDQo=
+This patch disables the use of DMA_INTERRUPT capability with Async_tx
+
+The fsldma produces a null transfer with DMA_INTERRUPT
+capability when used with Async_tx. When RAID devices queue
+a transaction via Async_tx, this  results in a hang.
+
+Signed-off-by: Vishnu Suresh <Vishnu@freescale.com>
+---
+ drivers/dma/fsldma.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
+index 296f9e7..66d9b39 100644
+--- a/drivers/dma/fsldma.c
++++ b/drivers/dma/fsldma.c
+@@ -1200,7 +1200,13 @@ static int __devinit of_fsl_dma_probe(struct of_device *dev,
+ 						- fdev->reg.start + 1);
+ 
+ 	dma_cap_set(DMA_MEMCPY, fdev->common.cap_mask);
++#ifndef CONFIG_ASYNC_CORE
++	/*
++	 * The DMA_INTERRUPT async_tx is a NULL transfer, which will
++	 * triger a PE interrupt.
++	 */
+ 	dma_cap_set(DMA_INTERRUPT, fdev->common.cap_mask);
++#endif
+ 	dma_cap_set(DMA_SLAVE, fdev->common.cap_mask);
+ 	fdev->common.device_alloc_chan_resources = fsl_dma_alloc_chan_resources;
+ 	fdev->common.device_free_chan_resources = fsl_dma_free_chan_resources;
+-- 
+1.6.4.2
