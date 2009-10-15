@@ -1,71 +1,110 @@
-From: Leo Yan <leoy@marvell.com>
-Subject: RE: Questions For Linux Crypto API
-Date: Wed, 14 Oct 2009 18:46:56 -0700
-Message-ID: <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
-References: <EC64E4604C8024438259B683BB2514E1077BB35162@SC-VEXCH1.marvell.com>
- <20091014114404.GA4435@securecomputing.com>
+From: David McCullough <David_Mccullough@securecomputing.com>
+Subject: Re: Questions For Linux Crypto API
+Date: Thu, 15 Oct 2009 13:02:22 +1000
+Message-ID: <20091015030222.GC31655@securecomputing.com>
+References: <EC64E4604C8024438259B683BB2514E1077BB35162@SC-VEXCH1.marvell.com> <20091014114404.GA4435@securecomputing.com> <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Leo Yan <leoy@marvell.com>
-To: David McCullough <David_Mccullough@securecomputing.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Leo Yan <leoy@marvell.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dakia2.marvell.com ([65.219.4.35]:35604 "EHLO
-	dakia2.marvell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754611AbZJOBrg (ORCPT
+Received: from dalsmrelay2.nai.com ([205.227.136.216]:51335 "HELO
+	dalsmrelay2.nai.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752192AbZJODEo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Oct 2009 21:47:36 -0400
-In-Reply-To: <20091014114404.GA4435@securecomputing.com>
-Content-Language: en-US
+	Wed, 14 Oct 2009 23:04:44 -0400
+Content-Disposition: inline
+In-Reply-To: <EC64E4604C8024438259B683BB2514E1077BB35417@SC-VEXCH1.marvell.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-IA0KaGksIERhdmlkDQoNClZlcnkgYXBwcmVjaWF0ZSBmb3IgeW91ciBhbnN3ZXIuIDotKQ0KDQpQ
-bGVhc2Ugc2VlIG15IGlubGluZSBjb21tZW50cy4NCiANCkJlc3QgUmVnYXJkcywNCkxlbyBZYW4N
-Cg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogRGF2aWQgTWNDdWxsb3VnaCBb
-bWFpbHRvOkRhdmlkX01jY3VsbG91Z2hAc2VjdXJlY29tcHV0aW5nLmNvbV0gDQpTZW50OiAyMDA5
-xOoxMNTCMTTI1SAxOTo0NA0KVG86IExlbyBZYW4NCkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJu
-ZWwub3JnDQpTdWJqZWN0OiBSZTogUXVlc3Rpb25zIEZvciBMaW51eCBDcnlwdG8gQVBJDQoNCg0K
-Sml2aW4gTGVvIFlhbiBsYXlzIGl0IGRvd24gLi4uDQo+IA0KPiBIaSwgYWxsDQo+IA0KPiBJIGFt
-IGEgbmV3YmllIGZvciBMaW51eCBjcnlwdG8uDQo+IFJlY2VudGx5IEkgYW0gd2FybWluZyB1cCBv
-biBMaW51eCBDcnlwdG8gQVBJcyBhbmQgaGF2ZSBzb21lIHF1ZXN0aW9ucy4NCj4gV291bGQgeW91
-IGtpbmRseSBnaXZlIG1lIHNvbWUgaGludHMgYWJvdXQgaXQgSiA/DQo+IA0KPiAxLiBEb2VzIExp
-bnV4IENyeXB0byBBUEkgbm93IHN1cHBvcnQgdXNlciBzcGFjZSBvciBub3Q/IA0KPiBJIGhhdmUg
-Z29vZ2xlZCB0aGUgbWFpbGluZyBsaXN0LCBhbmQgZmluZCBzb21lIGd1eXMgaGF2ZSBjb21taXR0
-ZWQgc29tZSBwYXRjaGVzIGZvciBpdC4NCj4gQnV0IHNvIGZhciwgaW4gdGhlIExpbnV4IG1haW5s
-aW5lICgyLjYuMzEpIGRvIG5vdCBtZXJnZSBpdC4gDQo+IFNvIExpbnV4IENyeXB0byBBUEkgd2ls
-bCBzdXBwb3J0IHVzZXIgc3BhY2Ugb3Igbm90Pw0KDQpTb21lb25lIGVsc2Ugd2lsbCBrbm93IG1v
-cmUgYWJvdXQgdGhpcy4gIFBlb3BsZSBhcmUgd29ya2luZyBvbiBpdCBJIHRoaW5rIGJ1dCBpdCdz
-IG5vdCB0aGVyZSB5ZXQuDQoNCj4gMi4gT0NGIGhhcyBiZWVuIHBvcnRlZCB0byBMaW51eCwgc28g
-d2lsbCBPQ0YgaW50ZWdyYXRlIHdpdGggTGludXggQ3J5cHRvIEFQSSBvciBub3Q/DQoNCk9DRiBo
-YXMgYSBkcml2ZXIgY2FsbGVkIGNyeXB0b3NvZnQgdGhhdCB1c2VzIHRoZSBsaW51eCBjcnlwdG8g
-QVBJLg0KDQpbbGVvXTogdGhhbmtzIGEgbG90LiBJIGdvdCBpdC4NCg0KPiBJZiBMaW51eCBDcnlw
-dG8gQVBJIHdpbGwgc3VwcG9ydCB0aGUgdXNlciBzcGFjZSBhbmQgcHJvdmlkZSB0aGUgdXNlciAN
-Cj4gc3BhY2UgQVBJcywgdGhlbiBPcGVuQlNEIENyeXB0b2dyYXBoaWNzIEZyYW1ld29yayB3aWxs
-IGRpcmVjdGx5IHVzZSANCj4gdGhlIExpbnV4IENyeXB0byBBUElzIG9yIG5vdD8gT3RoZXJ3aXNl
-DQoNCk9uY2UgbGludXggaGFzIGl0J3Mgb3duIHVzZXIgc3BhY2UgQVBJIHlvdSB3aWxsIG5vdCBu
-ZWVkIE9DRiB0byBwcm92aWRlIG9uZSwgYnV0IHlvdSB3aWxsIG5lZWQgdG8gYWRkL3dhaXQgZm9y
-IHN1cHBvcnQgZm9yIGFwcGxpY2F0aW9ucyBsaWtlIG9wZW5zc2wgZXRjIHRvIHVzZSB0aGUgbGlu
-dXggQVBJLg0KDQpbbGVvXTogDQpUaGlzIHVzZXIgc3BhY2UgQVBJIHlvdSByZWZlcnJlZCBpcyB0
-aGUgc3RhbmRhcmQgQVBJIG9uIExpbnV4LCBvciB0aGUgUE9TSVggQVBJcz8gSSBnb29nbGVkIGFu
-ZCBjYW4gTk9UIGZpbmQgaXQuDQpDYW4geW91IGdpdmUgbWUgZnVydGhlciBtb3JlIGd1aWRlIGZv
-ciBpdD8NCg0KU28gaSB0aGluayB0aGUgZnJhbWV3b3JrIGxvb2tzIGxpa2UgYmVsb3csIGlzIGl0
-IHJpZ2h0Pw0KfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS18DQp8IExpbnV4IFVzZXIgc3BhY2UgQ3J5cHRvIEFQSSAgICAgICAgICAgICB8ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgVXNlciBTcGFjZQ0KfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS18DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHYNCnwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0gfCAgICAgICAgICAgICAgICAgICBLZXJuZWwgU3BhY2UNCnwgRGVkaWNhdGVk
-IERldmljZSBEcml2ZXIgZm9yIGl0ICAgICAgICAgICAgfExpbnV4IENyeXB0byBBUEkgICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8ID0+IHRoaXMgaXMgdGhlIEFQSSBtYWludGFpbmVkIGJ5IEhl
-cmJlcnQgaW4ga2VybmVsIHNwYWNlDQp8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLXwNCg0KDQpDaGVlcnMsDQpEYXZpZG0NCg0KLS0NCkRhdmlkIE1jQ3VsbG91Z2gsICBkYXZp
-ZF9tY2N1bGxvdWdoQHNlY3VyZWNvbXB1dGluZy5jb20sICBQaDorNjEgNzM0MzUyODE1DQpNY0Fm
-ZWUgLSBTbmFwR2VhciAgaHR0cDovL3d3dy5zbmFwZ2Vhci5jb20gICAgICAgICAgICAgICAgaHR0
-cDovL3d3dy51Q2RvdC5vcmcNCg==
+
+Jivin Leo Yan lays it down ...
+>  
+> hi, David
+> 
+> Very appreciate for your answer. :-)
+> 
+> Please see my inline comments.
+>  
+> Best Regards,
+> Leo Yan
+> 
+> 
+> -----Original Message-----
+> From: David McCullough [mailto:David_Mccullough@securecomputing.com] 
+> Sent: 2009?10?14? 19:44
+> To: Leo Yan
+> Cc: linux-crypto@vger.kernel.org
+> Subject: Re: Questions For Linux Crypto API
+> 
+> 
+> Jivin Leo Yan lays it down ...
+> > 
+> > Hi, all
+> > 
+> > I am a newbie for Linux crypto.
+> > Recently I am warming up on Linux Crypto APIs and have some questions.
+> > Would you kindly give me some hints about it J ?
+> > 
+> > 1. Does Linux Crypto API now support user space or not? 
+> > I have googled the mailing list, and find some guys have committed some patches for it.
+> > But so far, in the Linux mainline (2.6.31) do not merge it. 
+> > So Linux Crypto API will support user space or not?
+> 
+> Someone else will know more about this.  People are working on it I think but it's not there yet.
+> 
+> > 2. OCF has been ported to Linux, so will OCF integrate with Linux Crypto API or not?
+> 
+> OCF has a driver called cryptosoft that uses the linux crypto API.
+> 
+> [leo]: thanks a lot. I got it.
+> 
+> > If Linux Crypto API will support the user space and provide the user 
+> > space APIs, then OpenBSD Cryptographics Framework will directly use 
+> > the Linux Crypto APIs or not? Otherwise
+> 
+> Once linux has it's own user space API you will not need OCF to provide one, but you will need to add/wait for support for applications like openssl etc to use the linux API.
+> 
+> [leo]: 
+> This user space API you referred is the standard API on Linux, or the POSIX APIs? I googled and can NOT find it.
+> Can you give me further more guide for it?
+
+A linux native interface for userspace to kernel crypto doesn't "completely"
+exist yet,  So there is nothing to find (other than patches to this list
+IIRC).
+
+It has nothing to do with posix or or standard API's at this point.
+
+OCF will give you such an interface,  some people are working on another one
+just for linux,
+
+Cheers,
+Davidm
+
+
+
+> So i think the framework looks like below, is it right?
+> |-------------------------------------------------|
+> | Linux User space Crypto API             |                                                                              User Space
+> |-------------------------------------------------|
+>                                ^
+> ------------------------|---------------------------------------------------------------------------------------
+>                                v
+> |-------------------------------------------------|------------------------------------------- |                   Kernel Space
+> | Dedicated Device Driver for it            |Linux Crypto API                           | => this is the API maintained by Herbert in kernel space
+> |-------------------------------------------------|--------------------------------------------|
+> 
+> 
+> Cheers,
+> Davidm
+> 
+> --
+> David McCullough,  david_mccullough@securecomputing.com,  Ph:+61 734352815
+> McAfee - SnapGear  http://www.snapgear.com                http://www.uCdot.org
+> 
+> 
+
+-- 
+David McCullough,  david_mccullough@securecomputing.com,  Ph:+61 734352815
+McAfee - SnapGear  http://www.snapgear.com                http://www.uCdot.org
