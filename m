@@ -1,29 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] add fips(ansi_cprng) (v2)
-Date: Mon, 19 Oct 2009 11:56:10 +0900
-Message-ID: <20091019025610.GB26624@gondor.apana.org.au>
-References: <20090916160456.GC11163@hmsreliant.think-freely.org> <20090918183254.GA28540@hmsreliant.think-freely.org> <20090918183446.GB28540@hmsreliant.think-freely.org>
+Subject: Re: [PATCH 0/3] Remove dangling pieces of old digest/hash
+	implementation
+Date: Mon, 19 Oct 2009 12:59:39 +0900
+Message-ID: <20091019035938.GA27342@gondor.apana.org.au>
+References: <1255038065-3113-1-git-send-email-bgilbert@cs.cmu.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, jarod@redhat.com, davem@davemloft.net
-To: Neil Horman <nhorman@tuxdriver.com>
+Cc: linux-crypto@vger.kernel.org
+To: Benjamin Gilbert <bgilbert@cs.cmu.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:36999 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:60692 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755729AbZJSC4J (ORCPT
+	with ESMTP id S1755834AbZJSD7j (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Oct 2009 22:56:09 -0400
+	Sun, 18 Oct 2009 23:59:39 -0400
 Content-Disposition: inline
-In-Reply-To: <20090918183446.GB28540@hmsreliant.think-freely.org>
+In-Reply-To: <1255038065-3113-1-git-send-email-bgilbert@cs.cmu.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 18, 2009 at 02:34:46PM -0400, Neil Horman wrote:
-> Patch to add fips(ansi_cprng) alg, which is ansi_cprng plus a continuous test
+On Thu, Oct 08, 2009 at 05:41:02PM -0400, Benjamin Gilbert wrote:
 > 
-> Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+> This series removes several unused bits of code associated with the legacy
+> digest/hash implementation.  It also fixes one bug: out-of-tree algorithm
+> implementations which still use the legacy interface will build
+> successfully against 2.6.32-rc but oops when they are loaded.  Patch 3/3
+> causes such modules to FTBFS instead.
+> 
+> Compile-tested with allmodconfig.
 
-Patch applied to cryptodev.  Thanks!
+All applied.  Thanks a lot!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
