@@ -1,176 +1,76 @@
-From: "Suresh Vishnu-B05022" <Vishnu@freescale.com>
-Subject: RE: [PATCH v0 1/2] DMA: fsldma: Disable DMA_INTERRUPT when Async_tx
-	enabled
-Date: Tue, 20 Oct 2009 18:39:53 +0530
-Message-ID: <76952DF81420A349876E087D089DF03438B8C1@zin33exm21.fsl.freescale.net>
-References: <1255588866-4133-1-git-send-email-Vishnu@freescale.com>
-	<e9c3a7c20910151825o67cd2712id91aead70f84987c@mail.gmail.com>
-	<20091016153334.GA27401@ovro.caltech.edu>
+From: =?KOI8-R?B?88XSx8XKIO3J0s/Oz9c=?= <ierton@gmail.com>
+Subject: [QUESTION] blkcipher_walk_phys and memory
+Date: Tue, 20 Oct 2009 18:28:34 +0400
+Message-ID: <aa09d86e0910200728g43adb80mb73fc3a694e0453c@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, linuxppc-dev@ozlabs.org,
-	linux-crypto@vger.kernel.org, Tabi Timur-B04825 <timur@freescale.com>
-To: "Ira W. Snyder" <iws@ovro.caltech.edu>,
-	"Dan Williams" <dan.j.williams@intel.com>
-Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
-Content-class: urn:content-classes:message
-In-Reply-To: <20091016153334.GA27401@ovro.caltech.edu>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Sender: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-fx0-f218.google.com ([209.85.220.218]:51592 "EHLO
+	mail-fx0-f218.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751599AbZJTO2a (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Oct 2009 10:28:30 -0400
+Received: by fxm18 with SMTP id 18so6487486fxm.37
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2009 07:28:34 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> -----Original Message-----
-> From: Ira W. Snyder [mailto:iws@ovro.caltech.edu] =
+Dear all, I have a couple of questions about crypto internals, please
+help me to understand some concepts. My drivers implements
+CRYPTO_ALG_TYPE_BLKCIPHER algorithm and has to perform encryption via
+DMA transfers.
+I decided to use blkcipher_walk_phys() and blkcipher_walk_done()
+functions. These functions take scatterlist and return one or more
+struct page's and offsets. Then i pass those to dma_map_page() which
+returns  dma_addr_t  to send to my device's DMA engine.
+Everything seems to work (on ARM) but i have several questions:
 
-> Sent: Friday, October 16, 2009 9:04 PM
-> To: Dan Williams
-> Cc: Suresh Vishnu-B05022; herbert@gondor.apana.org.au; =
+1. Is it generally correct to do this? (see *_encrypt() handler below)
+2. Article at http://linux-mm.org/DeviceDriverMmap
+says "You may be tempted to call virt_to_page(addr) to get a struct
+page pointer for a kmalloced address, but this is a violation of the
+abstraction: kmalloc does not return pages, it returns another type of
+memory object."
+And blkcipher_walk_init() internally calls virt_to_page() on a pointer
+allocated from unknown location (for example, in tcrypt.c there is
+statically allocated buffer, but it is just one case of many). Is it
+correct and how to think about it?
 
-> linux-kernel@vger.kernel.org; linux-raid@vger.kernel.org; =
 
-> linuxppc-dev@ozlabs.org; linux-crypto@vger.kernel.org; Tabi =
+static int mcrypto_3des_ecb_encrypt(struct blkcipher_desc *desc,
+    struct scatterlist *dst, struct scatterlist *src, unsigned int nbytes)
+{
+    struct mcrypto_device *device = &g_mcrypto_device;
+    struct mcrypto_3des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+    struct blkcipher_walk walk;
+    int err;
 
-> Timur-B04825
-> Subject: Re: [PATCH v0 1/2] DMA: fsldma: Disable =
+    blkcipher_walk_init(&walk, dst, src, nbytes);
+    err = blkcipher_walk_phys(desc, &walk);
+    ctx->mode = mcrypto_encrypt;
 
-> DMA_INTERRUPT when Async_tx enabled
-> =
+    while((nbytes = walk.nbytes)) {
+        dma_addr_t src_dma, dst_dma;
+        size_t size = nbytes - (nbytes % DES3_EDE_MIN_BLOCK_SIZE);
 
-> On Thu, Oct 15, 2009 at 06:25:14PM -0700, Dan Williams wrote:
-> > [ added Leo and Timur to the Cc ]
-> > =
+        src_dma = dma_map_page(device->dev, walk.src.phys.page,
+            walk.src.phys.offset, size, DMA_TO_DEVICE);
+        dst_dma = dma_map_page(device->dev, walk.dst.phys.page,
+            walk.dst.phys.offset, size, DMA_FROM_DEVICE);
 
-> > On Wed, Oct 14, 2009 at 11:41 PM, Vishnu Suresh =
+        /* Performs actual DMA transfers and waits for completion */
+        mcrypto_3des_dmacrypt(device, ctx, src_dma, dst_dma, size);
 
-> <Vishnu@freescale.com> wrote:
-> > > This patch disables the use of DMA_INTERRUPT capability with =
+        dma_unmap_page(device->dev, dst_dma, size, DMA_FROM_DEVICE);
+        dma_unmap_page(device->dev, src_dma, size, DMA_TO_DEVICE);
 
-> > > Async_tx
-> > >
-> > > The fsldma produces a null transfer with DMA_INTERRUPT capability =
+        err = blkcipher_walk_done(desc, &walk, nbytes-size);
+    }
+    return err;
+}
 
-> > > when used with Async_tx. When RAID devices queue a =
 
-> transaction via =
-
-> > > Async_tx, this =A0results in a hang.
-> > >
-> > > Signed-off-by: Vishnu Suresh <Vishnu@freescale.com>
-> > > ---
-> > > =A0drivers/dma/fsldma.c | =A0 =A06 ++++++
-> > > =A01 files changed, 6 insertions(+), 0 deletions(-)
-> > >
-> > > diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c index =
-
-> > > 296f9e7..66d9b39 100644
-> > > --- a/drivers/dma/fsldma.c
-> > > +++ b/drivers/dma/fsldma.c
-> > > @@ -1200,7 +1200,13 @@ static int __devinit =
-
-> of_fsl_dma_probe(struct =
-
-> > > of_device *dev,
-> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 =A0 =A0- =
-
-> fdev->reg.start + =
-
-> > > 1);
-> > >
-> > > =A0 =A0 =A0 =A0dma_cap_set(DMA_MEMCPY, fdev->common.cap_mask);
-> > > +#ifndef CONFIG_ASYNC_CORE
-> > > + =A0 =A0 =A0 /*
-> > > + =A0 =A0 =A0 =A0* The DMA_INTERRUPT async_tx is a NULL transfer, =
-
-> which will
-> > > + =A0 =A0 =A0 =A0* triger a PE interrupt.
-> > > + =A0 =A0 =A0 =A0*/
-> > > =A0 =A0 =A0 =A0dma_cap_set(DMA_INTERRUPT, fdev->common.cap_mask);
-> > > +#endif
-> > > =A0 =A0 =A0 =A0dma_cap_set(DMA_SLAVE, fdev->common.cap_mask);
-> > > =A0 =A0 =A0 =A0fdev->common.device_alloc_chan_resources =3D =
-
-> > > fsl_dma_alloc_chan_resources;
-> > > =A0 =A0 =A0 =A0fdev->common.device_free_chan_resources =3D =
-
-> > > fsl_dma_free_chan_resources;
-> > =
-
-> > You are basically saying that fsl_dma_prep_interrupt() is =
-
-> buggy.  Can =
-
-> > that routine be fixed rather than this piecemeal solution?  If it =
-
-> > cannot be fixed (i.e. hardware issue) then fsl_dma_prep_interrupt() =
-
-> > should just be disabled/deleted altogether.
-We are working to fix this issue.
-> > =
-
-> =
-
-> For what it's worth, I've used the following code in the =
-
-> recent past, without any issues. This was on an 83xx, within =
-
-> the last few kernel releases. I haven't tried it on the latest -rc.
-This works fine as long as only DMA_MEMCPY is being used.
-The async_tx_channel_switch does not occur and the =
-
-device_prep_dma_interrupt is not called. =
-
-However, when a DMA_XOR capable device is exposed, =
-
-which is differnet from the DMA_MEMCPY/INTERRUPT device, this path is hit.
-
-Is it proper to schedule a dma_interrupt from the channel switch call, =
-
-even when the depend_tx and tx channels correspond to different devices?
-
-> =
-
-> Using device_prep_dma_memcpy() can trigger a callback as =
-
-> well, so the interrupt feature isn't strictly needed. Just =
-
-> attach the callback to the last memcpy operation.
-> =
-
-> static dma_cookie_t dma_async_interrupt(struct dma_chan *chan,
->                                         dma_async_tx_callback =
-
-> callback,
->                                         void *data) {
->         struct dma_device *dev =3D chan->device;
->         struct dma_async_tx_descriptor *tx; =
-
-> =
-
->         /* Set up the DMA */
->         tx =3D dev->device_prep_dma_interrupt(chan, DMA_PREP_INTERRUPT);
->         if (!tx)
->                 return -ENOMEM;
-> =
-
->         tx->callback =3D callback;
->         tx->callback_param =3D data;
-> =
-
->         return tx->tx_submit(tx);
-> }
-> =
-
-> Ira
-> =
-
-> =
+-- 
+Thanks,
+Sergey
