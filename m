@@ -1,33 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Fix test in get_prng_bytes()
-Date: Tue, 27 Oct 2009 18:52:00 +0800
-Message-ID: <20091027105159.GA5418@gondor.apana.org.au>
-References: <4AD32A75.5030706@gmail.com> <20091012135142.GB8885@hmsreliant.think-freely.org> <20091012140753.GA30300@gondor.apana.org.au> <4AD33B8D.4030708@gmail.com> <20091012142908.GD8885@hmsreliant.think-freely.org>
+From: Chuck Ebbert <cebbert@redhat.com>
+Subject: [PATCH] crypto: padlock-aes: Use the correct mask when checking
+ whether copying is required
+Date: Tue, 27 Oct 2009 19:25:33 -0400
+Message-ID: <200910272325.n9RNPYfr002918@int-mx08.intmail.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Roel Kluin <roel.kluin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:47244 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753110AbZJ0KwJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Oct 2009 06:52:09 -0400
-Content-Disposition: inline
-In-Reply-To: <20091012142908.GD8885@hmsreliant.think-freely.org>
+Received: from mx1.redhat.com ([209.132.183.28]:11915 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756621AbZJ0X0L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Oct 2009 19:26:11 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 12, 2009 at 10:29:08AM -0400, Neil Horman wrote:
->
-> Acked-by: Neil Horman <nhorman@tuxdriver.com>
+crypto: padlock-aes: Use the correct mask when checking whether copying is required
 
-Patch applied to cryptodev.  Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Masking with PAGE_SIZE is just wrong... and there's no need for the braces and return
+statement either.
+
+Signed-off-by: Chuck Ebbert <cebbert@redhat.com>
+
+---
+Can we get this in 2.6.32 and -stable? It fixes a fatal oops in the driver.
+
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -236,19 +236,17 @@ static inline void ecb_crypt(const u8 *i
+ 	/* Padlock in ECB mode fetches at least ecb_fetch_bytes of data.
+ 	 * We could avoid some copying here but it's probably not worth it.
+ 	 */
+-	if (unlikely(((unsigned long)in & PAGE_SIZE) + ecb_fetch_bytes > PAGE_SIZE)) {
++	if (unlikely(((unsigned long)in & ~PAGE_MASK) + ecb_fetch_bytes > PAGE_SIZE))
+ 		ecb_crypt_copy(in, out, key, cword, count);
+-		return;
+-	}
