@@ -1,70 +1,47 @@
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH -v4] crypto: Add PCLMULQDQ accelerated GHASH
-	implementation
-Date: Mon, 2 Nov 2009 16:46:04 +0100
-Message-ID: <20091102154604.GA26453@elte.hu>
-References: <1253064946.15717.372.camel@yhuang-dev.sh.intel.com> <20091019025332.GA26624@gondor.apana.org.au> <20091031173015.69e8e9f8.akpm@linux-foundation.org> <20091101175043.GA25257@gondor.apana.org.au> <20091102075039.GA15942@elte.hu> <20091102142824.GA31981@gondor.apana.org.au> <20091102143258.GA23776@elte.hu> <20091102144621.GA32164@gondor.apana.org.au>
+From: Chuck Ebbert <cebbert@redhat.com>
+Subject: Re: [PATCH] crypto: padlock-aes: Use the correct mask when checking
+ whether copying is required
+Date: Mon, 2 Nov 2009 17:26:50 -0500
+Message-ID: <20091102172650.6af2d177@katamari.usersys.redhat.com>
+References: <200910272325.n9RNPYfr002918@int-mx08.intmail.prod.int.phx2.redhat.com>
+	<20091028072559.GA15131@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Huang Ying <ying.huang@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Daniel Walker <dwalker@fifo99.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:44224 "EHLO mx3.mail.elte.hu"
+Received: from mx1.redhat.com ([209.132.183.28]:43854 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755009AbZKBPqP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Nov 2009 10:46:15 -0500
-Content-Disposition: inline
-In-Reply-To: <20091102144621.GA32164@gondor.apana.org.au>
+	id S932277AbZKBW2S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Nov 2009 17:28:18 -0500
+In-Reply-To: <20091028072559.GA15131@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+crypto: padlock-aes: Use the correct mask when checking whether copying is required
 
-* Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Masking with PAGE_SIZE is just wrong...
 
-> On Mon, Nov 02, 2009 at 03:32:58PM +0100, Ingo Molnar wrote:
-> > 
-> > Please use the standard construct and put an #ifndef __ASSEMBLY__ around 
-> > it.
-> 
-> You mean like this?
-> 
-> diff --git a/arch/x86/include/asm/i387.h b/arch/x86/include/asm/i387.h
-> index 0b20bbb..e22d237 100644
-> --- a/arch/x86/include/asm/i387.h
-> +++ b/arch/x86/include/asm/i387.h
-> @@ -10,6 +10,13 @@
->  #ifndef _ASM_X86_I387_H
->  #define _ASM_X86_I387_H
->  
-> +#ifdef __ASSEMBLY__
-> +
-> +#define PSHUFB_XMM5_XMM0 .byte 0x66, 0x0f, 0x38, 0x00, 0xc5
-> +#define PSHUFB_XMM5_XMM6 .byte 0x66, 0x0f, 0x38, 0x00, 0xf5
-> +
-> +#else
-> +
->  #include <linux/sched.h>
->  #include <linux/kernel_stat.h>
->  #include <linux/regset.h>
-> @@ -411,4 +418,5 @@ static inline unsigned short get_fpu_mxcsr(struct task_struct *tsk)
->  	}
->  }
->  
-> +#endif /* __ASSEMBLY__ */
->  #endif /* _ASM_X86_I387_H */
+Signed-off-by: Chuck Ebbert <cebbert@redhat.com>
 
-Yeah. Or just a single block of:
-
-
-  #ifndef __ASSEMBLY__
-  ...
-  #endif /* __ASSEMBLY__ */
-
-around the C bits - anything outside that is good for assembly as well. 
-
-	Ingo
+--- vanilla-2.6.31.orig/drivers/crypto/padlock-aes.c
++++ vanilla-2.6.31/drivers/crypto/padlock-aes.c
+@@ -236,7 +236,7 @@ static inline void ecb_crypt(const u8 *i
+ 	/* Padlock in ECB mode fetches at least ecb_fetch_bytes of data.
+ 	 * We could avoid some copying here but it's probably not worth it.
+ 	 */
+-	if (unlikely(((unsigned long)in & PAGE_SIZE) + ecb_fetch_bytes > PAGE_SIZE)) {
++	if (unlikely(((unsigned long)in & ~PAGE_MASK) + ecb_fetch_bytes > PAGE_SIZE)) {
+ 		ecb_crypt_copy(in, out, key, cword, count);
+ 		return;
+ 	}
+@@ -248,7 +248,7 @@ static inline u8 *cbc_crypt(const u8 *in
+ 			    u8 *iv, struct cword *cword, int count)
+ {
+ 	/* Padlock in CBC mode fetches at least cbc_fetch_bytes of data. */
+-	if (unlikely(((unsigned long)in & PAGE_SIZE) + cbc_fetch_bytes > PAGE_SIZE))
++	if (unlikely(((unsigned long)in & ~PAGE_MASK) + cbc_fetch_bytes > PAGE_SIZE))
+ 		return cbc_crypt_copy(in, out, key, iv, cword, count);
+ 
+ 	return rep_xcrypt_cbc(in, out, key, iv, cword, count);
