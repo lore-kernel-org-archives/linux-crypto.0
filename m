@@ -1,138 +1,135 @@
-From: Ingo Molnar <mingo@elte.hu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH -v4] crypto: Add PCLMULQDQ accelerated GHASH
 	implementation
-Date: Tue, 3 Nov 2009 10:03:22 +0100
-Message-ID: <20091103090322.GA11988@elte.hu>
-References: <1253064946.15717.372.camel@yhuang-dev.sh.intel.com> <20091019025332.GA26624@gondor.apana.org.au> <20091031173015.69e8e9f8.akpm@linux-foundation.org> <20091101175043.GA25257@gondor.apana.org.au> <20091102075039.GA15942@elte.hu> <20091102142824.GA31981@gondor.apana.org.au> <20091102143258.GA23776@elte.hu> <1257227236.30470.1192.camel@yhuang-dev.sh.intel.com>
+Date: Tue, 3 Nov 2009 09:12:34 -0500
+Message-ID: <20091103141234.GA8609@gondor.apana.org.au>
+References: <1253064946.15717.372.camel@yhuang-dev.sh.intel.com> <20091019025332.GA26624@gondor.apana.org.au> <20091031173015.69e8e9f8.akpm@linux-foundation.org> <20091101175043.GA25257@gondor.apana.org.au> <20091102075039.GA15942@elte.hu> <20091102142824.GA31981@gondor.apana.org.au> <20091102143258.GA23776@elte.hu> <20091102144621.GA32164@gondor.apana.org.au> <20091102154604.GA26453@elte.hu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>,
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Huang Ying <ying.huang@intel.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	Daniel Walker <dwalker@fifo99.com>,
 	"H. Peter Anvin" <hpa@zytor.com>
-To: Huang Ying <ying.huang@intel.com>
+To: Ingo Molnar <mingo@elte.hu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:60631 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754731AbZKCJD3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Nov 2009 04:03:29 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:56562 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751426AbZKCOMv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Nov 2009 09:12:51 -0500
 Content-Disposition: inline
-In-Reply-To: <1257227236.30470.1192.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <20091102154604.GA26453@elte.hu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-* Huang Ying <ying.huang@intel.com> wrote:
-
-> On Mon, 2009-11-02 at 22:32 +0800, Ingo Molnar wrote: 
-> > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > 
-> > > On Mon, Nov 02, 2009 at 08:50:39AM +0100, Ingo Molnar wrote:
-> > > > 
-> > > > A cleanup request: mind creating two macros for this PSHUFB MMX/SSE 
-> > > > instruction in arch/x86/include/asm/i387.h, instead of open-coding the 
-> > > > .byte sequences in ~6 places?
-> > > 
-> > > I had a go at doing that, but it seems that i387.h isn't really meant 
-> > > to be included in an asm file at this point :)
-> > 
-> > Please use the standard construct and put an #ifndef __ASSEMBLY__ around 
-> > it.
-> > 
-> > > > ( After the .33 merge window we'll collect such instruction format 
-> > > >   knowledge in arch/x86/include/asm/inst.h. That file is not upstream 
-> > > >   yet so i387.h will do for now for FPU/SSE instructions. )
-> > > 
-> > > I'm happy to revisit this once inst.h exists.
-> > 
-> > No reason to not do most of the change first though, the way i suggested 
-> > it.
+On Mon, Nov 02, 2009 at 04:46:04PM +0100, Ingo Molnar wrote:
 > 
-> How about something as below? But it seems not appropriate to put these
-> bits into i387.h, that is, to combine C and gas syntax.
+> Yeah. Or just a single block of:
 > 
-> Best Regards,
-> Huang Ying
 > 
-> .macro xmm_num opd xmm
-> .ifc \xmm,%xmm0
-> \opd = 0
-> .endif
-> .ifc \xmm,%xmm1
-> \opd = 1
-> .endif
-> .ifc \xmm,%xmm2
-> \opd = 2
-> .endif
-> .ifc \xmm,%xmm3
-> \opd = 3
-> .endif
-> .ifc \xmm,%xmm4
-> \opd = 4
-> .endif
-> .ifc \xmm,%xmm5
-> \opd = 5
-> .endif
-> .ifc \xmm,%xmm6
-> \opd = 6
-> .endif
-> .ifc \xmm,%xmm7
-> \opd = 7
-> .endif
-> .ifc \xmm,%xmm8
-> \opd = 8
-> .endif
-> .ifc \xmm,%xmm9
-> \opd = 9
-> .endif
-> .ifc \xmm,%xmm10
-> \opd = 10
-> .endif
-> .ifc \xmm,%xmm11
-> \opd = 11
-> .endif
-> .ifc \xmm,%xmm12
-> \opd = 12
-> .endif
-> .ifc \xmm,%xmm13
-> \opd = 13
-> .endif
-> .ifc \xmm,%xmm14
-> \opd = 14
-> .endif
-> .ifc \xmm,%xmm15
-> \opd = 15
-> .endif
-> .endm
+>   #ifndef __ASSEMBLY__
+>   ...
+>   #endif /* __ASSEMBLY__ */
 > 
-> .macro PSHUFB_XMM xmm1 xmm2
-> xmm_num pshufb_opd1 \xmm1
-> xmm_num pshufb_opd2 \xmm2
-> .if (pshufb_opd1 < 8) && (pshufb_opd2 < 8)
-> .byte 0x66, 0x0f, 0x38, 0x00, 0xc0 | pshufb_opd1 | (pshufb_opd2<<3)
-> .elseif (pshufb_opd1 >= 8) && (pshufb_opd2 < 8)
-> .byte 0x66, 0x41, 0x0f, 0x38, 0x00, 0xc0 | (pshufb_opd1-8) | (pshufb_opd2<<3)
-> .elseif (pshufb_opd1 < 8) && (pshufb_opd2 >= 8)
-> .byte 0x66, 0x44, 0x0f, 0x38, 0x00, 0xc0 | pshufb_opd1 | ((pshufb_opd2-8)<<3)
-> .else
-> .byte 0x66, 0x45, 0x0f, 0x38, 0x00, 0xc0 | (pshufb_opd1-8) | ((pshufb_opd2-8)<<3)
-> .endif
-> .endm
+> around the C bits - anything outside that is good for assembly as well. 
 
-Looks far too clever, i like it :-) We have quite a few assembly macros 
-in arch/x86/include/asm/. The above one could be put into calling.h for 
-example.
+OK I'll throw this into cryptodev:
 
-But the simpler .byte solution in i387.h would be fine too.
+commit 3b0d65969b549b796abc6f0230f6142fed365d49
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Nov 3 09:11:15 2009 -0500
 
-If you guys want to put helper define into arch/x86/include/asm/ into 
-the crypto tree, feel free:
+    crypto: ghash-intel - Add PSHUFB macros
+    
+    Add PSHUFB macros instead of repeating byte sequences, suggested
+    by Ingo.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Acked-by: Ingo Molnar <mingo@elte.hu>
 
-  Acked-by: Ingo Molnar <mingo@elte.hu>
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 71768d5..5958498 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include <linux/linkage.h>
++#include <asm/i387.h>
+ 
+ .align 16
+ .Lbswap_mask:
+@@ -101,7 +102,7 @@ ENTRY(clmul_ghash_mul)
+ 	movups (%rsi), SHASH
+ 	movaps .Lbswap_mask, BSWAP
+ 	# pshufb BSWAP, DATA
+-	.byte 0x66, 0x0f, 0x38, 0x00, 0xc5
++	PSHUFB_XMM5_XMM0
+ 	call __clmul_gf128mul_ble
+ 	# pshufb BSWAP, DATA
+ 	.byte 0x66, 0x0f, 0x38, 0x00, 0xc5
+@@ -119,12 +120,12 @@ ENTRY(clmul_ghash_update)
+ 	movups (%rdi), DATA
+ 	movups (%rcx), SHASH
+ 	# pshufb BSWAP, DATA
+-	.byte 0x66, 0x0f, 0x38, 0x00, 0xc5
++	PSHUFB_XMM5_XMM0
+ .align 4
+ .Lupdate_loop:
+ 	movups (%rsi), IN1
+ 	# pshufb BSWAP, IN1
+-	.byte 0x66, 0x0f, 0x38, 0x00, 0xf5
++	PSHUFB_XMM5_XMM6
+ 	pxor IN1, DATA
+ 	call __clmul_gf128mul_ble
+ 	sub $16, %rdx
+@@ -132,7 +133,7 @@ ENTRY(clmul_ghash_update)
+ 	cmp $16, %rdx
+ 	jge .Lupdate_loop
+ 	# pshufb BSWAP, DATA
+-	.byte 0x66, 0x0f, 0x38, 0x00, 0xc5
++	PSHUFB_XMM5_XMM0
+ 	movups DATA, (%rdi)
+ .Lupdate_just_ret:
+ 	ret
+@@ -146,7 +147,7 @@ ENTRY(clmul_ghash_setkey)
+ 	movaps .Lbswap_mask, BSWAP
+ 	movups (%rsi), %xmm0
+ 	# pshufb BSWAP, %xmm0
+-	.byte 0x66, 0x0f, 0x38, 0x00, 0xc5
++	PSHUFB_XMM5_XMM0
+ 	movaps %xmm0, %xmm1
+ 	psllq $1, %xmm0
+ 	psrlq $63, %xmm1
+diff --git a/arch/x86/include/asm/i387.h b/arch/x86/include/asm/i387.h
+index 0b20bbb..ebfb8a9 100644
+--- a/arch/x86/include/asm/i387.h
++++ b/arch/x86/include/asm/i387.h
+@@ -10,6 +10,8 @@
+ #ifndef _ASM_X86_I387_H
+ #define _ASM_X86_I387_H
+ 
++#ifndef __ASSEMBLY__
++
+ #include <linux/sched.h>
+ #include <linux/kernel_stat.h>
+ #include <linux/regset.h>
+@@ -411,4 +413,9 @@ static inline unsigned short get_fpu_mxcsr(struct task_struct *tsk)
+ 	}
+ }
+ 
++#endif /* __ASSEMBLY__ */
++
++#define PSHUFB_XMM5_XMM0 .byte 0x66, 0x0f, 0x38, 0x00, 0xc5
++#define PSHUFB_XMM5_XMM6 .byte 0x66, 0x0f, 0x38, 0x00, 0xf5
++
+ #endif /* _ASM_X86_I387_H */
 
-it would be clumsy to keep it separately in the x86 tree. Just dont 
-spread raw .byte sequences in .S files please ...
-
-	Ingo
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
