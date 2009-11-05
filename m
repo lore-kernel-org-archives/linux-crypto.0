@@ -1,8 +1,7 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH 1/2] x86, crypto, Generate .byte code for some new
- instructions via gas macro
-Date: Thu, 05 Nov 2009 14:44:15 +0800
-Message-ID: <1257403455.22519.249.camel@yhuang-dev.sh.intel.com>
+Subject: [PATCH 2/2] x86, crypto, Use gas macro for AES-NI instructions
+Date: Thu, 05 Nov 2009 14:44:17 +0800
+Message-ID: <1257403457.22519.250.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
@@ -12,185 +11,697 @@ To: Ingo Molnar <mingo@elte.hu>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:20332 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:17612 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756168AbZKEGoL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Nov 2009 01:44:11 -0500
+	id S1756318AbZKEGoP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Nov 2009 01:44:15 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It will take some time for binutils (gas) to support some newly added
-instructions, such as SSE4.1 instructions or the AES-NI instructions
-found in upcoming Intel CPU.
+Old binutils do not support AES-NI instructions, to make kernel can be
+compiled by them, .byte code is used instead of AES-NI assembly
+instructions. But the readability and flexibility of raw .byte code is
+not good.
 
-To make the source code can be compiled by old binutils, .byte code is
-used instead of the assembly instruction. But the readability and
-flexibility of raw .byte code is not good.
-
-This patch solves the issue of raw .byte code via generating it via
-assembly instruction like gas macro. The syntax is as close as
-possible to real assembly instruction.
-
-Some helper macros such as MODRM is not a full feature
-implementation. It can be extended when necessary.
+So corresponding assembly instruction like gas macro is used instead.
 
 Signed-off-by: Huang Ying <ying.huang@intel.com>
 ---
- arch/x86/include/asm/inst.h |  150 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 150 insertions(+)
+ arch/x86/crypto/aesni-intel_asm.S |  517 ++++++++++++--------------------------
+ 1 file changed, 173 insertions(+), 344 deletions(-)
 
---- /dev/null
-+++ b/arch/x86/include/asm/inst.h
-@@ -0,0 +1,150 @@
-+/*
-+ * Generate .byte code for some instructions not supported by old
-+ * binutils.
-+ */
-+#ifndef X86_ASM_INST_H
-+#define X86_ASM_INST_H
-+
-+#ifdef __ASSEMBLY__
-+
-+	.macro XMM_NUM opd xmm
-+	.ifc \xmm,%xmm0
-+	\opd = 0
-+	.endif
-+	.ifc \xmm,%xmm1
-+	\opd = 1
-+	.endif
-+	.ifc \xmm,%xmm2
-+	\opd = 2
-+	.endif
-+	.ifc \xmm,%xmm3
-+	\opd = 3
-+	.endif
-+	.ifc \xmm,%xmm4
-+	\opd = 4
-+	.endif
-+	.ifc \xmm,%xmm5
-+	\opd = 5
-+	.endif
-+	.ifc \xmm,%xmm6
-+	\opd = 6
-+	.endif
-+	.ifc \xmm,%xmm7
-+	\opd = 7
-+	.endif
-+	.ifc \xmm,%xmm8
-+	\opd = 8
-+	.endif
-+	.ifc \xmm,%xmm9
-+	\opd = 9
-+	.endif
-+	.ifc \xmm,%xmm10
-+	\opd = 10
-+	.endif
-+	.ifc \xmm,%xmm11
-+	\opd = 11
-+	.endif
-+	.ifc \xmm,%xmm12
-+	\opd = 12
-+	.endif
-+	.ifc \xmm,%xmm13
-+	\opd = 13
-+	.endif
-+	.ifc \xmm,%xmm14
-+	\opd = 14
-+	.endif
-+	.ifc \xmm,%xmm15
-+	\opd = 15
-+	.endif
-+	.endm
-+
-+	.macro PFX_OPD_SIZE
-+	.byte 0x66
-+	.endm
-+
-+	.macro PFX_REX opd1 opd2
-+	.if (\opd1 | \opd2) & 8
-+	.byte 0x40 | ((\opd1 & 8) >> 3) | ((\opd2 & 8) >> 1)
-+	.endif
-+	.endm
-+
-+	.macro MODRM mod opd1 opd2
-+	.byte \mod | (\opd1 & 7) | ((\opd2 & 7) << 3)
-+	.endm
-+
-+	.macro PSHUFB_XMM xmm1 xmm2
-+	XMM_NUM pshufb_opd1 \xmm1
-+	XMM_NUM pshufb_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX pshufb_opd1 pshufb_opd2
-+	.byte 0x0f, 0x38, 0x00
-+	MODRM 0xc0 pshufb_opd1 pshufb_opd2
-+	.endm
-+
-+	.macro PCLMULQDQ imm8 xmm1 xmm2
-+	XMM_NUM clmul_opd1 \xmm1
-+	XMM_NUM clmul_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX clmul_opd1 clmul_opd2
-+	.byte 0x0f, 0x3a, 0x44
-+	MODRM 0xc0 clmul_opd1 clmul_opd2
-+	.byte \imm8
-+	.endm
-+
-+	.macro AESKEYGENASSIST rcon xmm1 xmm2
-+	XMM_NUM aeskeygen_opd1 \xmm1
-+	XMM_NUM aeskeygen_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aeskeygen_opd1 aeskeygen_opd2
-+	.byte 0x0f, 0x3a, 0xdf
-+	MODRM 0xc0 aeskeygen_opd1 aeskeygen_opd2
-+	.byte \rcon
-+	.endm
-+
-+	.macro AESIMC xmm1 xmm2
-+	XMM_NUM aesimc_opd1 \xmm1
-+	XMM_NUM aesimc_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aesimc_opd1 aesimc_opd2
-+	.byte 0x0f, 0x38, 0xdb
-+	MODRM 0xc0 aesimc_opd1 aesimc_opd2
-+	.endm
-+
-+	.macro AESENC xmm1 xmm2
-+	XMM_NUM aesenc_opd1 \xmm1
-+	XMM_NUM aesenc_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aesenc_opd1 aesenc_opd2
-+	.byte 0x0f, 0x38, 0xdc
-+	MODRM 0xc0 aesenc_opd1 aesenc_opd2
-+	.endm
-+
-+	.macro AESENCLAST xmm1 xmm2
-+	XMM_NUM aesenclast_opd1 \xmm1
-+	XMM_NUM aesenclast_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aesenclast_opd1 aesenclast_opd2
-+	.byte 0x0f, 0x38, 0xdd
-+	MODRM 0xc0 aesenclast_opd1 aesenclast_opd2
-+	.endm
-+
-+	.macro AESDEC xmm1 xmm2
-+	XMM_NUM aesdec_opd1 \xmm1
-+	XMM_NUM aesdec_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aesdec_opd1 aesdec_opd2
-+	.byte 0x0f, 0x38, 0xde
-+	MODRM 0xc0 aesdec_opd1 aesdec_opd2
-+	.endm
-+
-+	.macro AESDECLAST xmm1 xmm2
-+	XMM_NUM aesdeclast_opd1 \xmm1
-+	XMM_NUM aesdeclast_opd2 \xmm2
-+	PFX_OPD_SIZE
-+	PFX_REX aesdeclast_opd1 aesdeclast_opd2
-+	.byte 0x0f, 0x38, 0xdf
-+	MODRM 0xc0 aesdeclast_opd1 aesdeclast_opd2
-+	.endm
-+#endif
-+
-+#endif
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -16,6 +16,7 @@
+  */
+ 
+ #include <linux/linkage.h>
++#include <asm/inst.h>
+ 
+ .text
+ 
+@@ -122,103 +123,72 @@ ENTRY(aesni_set_key)
+ 	movups 0x10(%rsi), %xmm2	# other user key
+ 	movaps %xmm2, (%rcx)
+ 	add $0x10, %rcx
+-	# aeskeygenassist $0x1, %xmm2, %xmm1	# round 1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x01
++	AESKEYGENASSIST 0x1 %xmm2 %xmm1		# round 1
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x1, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x01
++	AESKEYGENASSIST 0x1 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x2, %xmm2, %xmm1	# round 2
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x02
++	AESKEYGENASSIST 0x2 %xmm2 %xmm1		# round 2
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x2, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x02
++	AESKEYGENASSIST 0x2 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x4, %xmm2, %xmm1	# round 3
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x04
++	AESKEYGENASSIST 0x4 %xmm2 %xmm1		# round 3
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x4, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x04
++	AESKEYGENASSIST 0x4 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x8, %xmm2, %xmm1	# round 4
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x08
++	AESKEYGENASSIST 0x8 %xmm2 %xmm1		# round 4
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x8, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x08
++	AESKEYGENASSIST 0x8 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x10, %xmm2, %xmm1	# round 5
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x10
++	AESKEYGENASSIST 0x10 %xmm2 %xmm1	# round 5
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x10, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x10
++	AESKEYGENASSIST 0x10 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x20, %xmm2, %xmm1	# round 6
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x20
++	AESKEYGENASSIST 0x20 %xmm2 %xmm1	# round 6
+ 	call _key_expansion_256a
+-	# aeskeygenassist $0x20, %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x20
++	AESKEYGENASSIST 0x20 %xmm0 %xmm1
+ 	call _key_expansion_256b
+-	# aeskeygenassist $0x40, %xmm2, %xmm1	# round 7
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x40
++	AESKEYGENASSIST 0x40 %xmm2 %xmm1	# round 7
+ 	call _key_expansion_256a
+ 	jmp .Ldec_key
+ .Lenc_key192:
+ 	movq 0x10(%rsi), %xmm2		# other user key
+-	# aeskeygenassist $0x1, %xmm2, %xmm1	# round 1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x01
++	AESKEYGENASSIST 0x1 %xmm2 %xmm1		# round 1
+ 	call _key_expansion_192a
+-	# aeskeygenassist $0x2, %xmm2, %xmm1	# round 2
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x02
++	AESKEYGENASSIST 0x2 %xmm2 %xmm1		# round 2
+ 	call _key_expansion_192b
+-	# aeskeygenassist $0x4, %xmm2, %xmm1	# round 3
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x04
++	AESKEYGENASSIST 0x4 %xmm2 %xmm1		# round 3
+ 	call _key_expansion_192a
+-	# aeskeygenassist $0x8, %xmm2, %xmm1	# round 4
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x08
++	AESKEYGENASSIST 0x8 %xmm2 %xmm1		# round 4
+ 	call _key_expansion_192b
+-	# aeskeygenassist $0x10, %xmm2, %xmm1	# round 5
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x10
++	AESKEYGENASSIST 0x10 %xmm2 %xmm1	# round 5
+ 	call _key_expansion_192a
+-	# aeskeygenassist $0x20, %xmm2, %xmm1	# round 6
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x20
++	AESKEYGENASSIST 0x20 %xmm2 %xmm1	# round 6
+ 	call _key_expansion_192b
+-	# aeskeygenassist $0x40, %xmm2, %xmm1	# round 7
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x40
++	AESKEYGENASSIST 0x40 %xmm2 %xmm1	# round 7
+ 	call _key_expansion_192a
+-	# aeskeygenassist $0x80, %xmm2, %xmm1	# round 8
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xca, 0x80
++	AESKEYGENASSIST 0x80 %xmm2 %xmm1	# round 8
+ 	call _key_expansion_192b
+ 	jmp .Ldec_key
+ .Lenc_key128:
+-	# aeskeygenassist $0x1, %xmm0, %xmm1	# round 1
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x01
++	AESKEYGENASSIST 0x1 %xmm0 %xmm1		# round 1
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x2, %xmm0, %xmm1	# round 2
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x02
++	AESKEYGENASSIST 0x2 %xmm0 %xmm1		# round 2
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x4, %xmm0, %xmm1	# round 3
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x04
++	AESKEYGENASSIST 0x4 %xmm0 %xmm1		# round 3
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x8, %xmm0, %xmm1	# round 4
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x08
++	AESKEYGENASSIST 0x8 %xmm0 %xmm1		# round 4
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x10, %xmm0, %xmm1	# round 5
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x10
++	AESKEYGENASSIST 0x10 %xmm0 %xmm1	# round 5
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x20, %xmm0, %xmm1	# round 6
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x20
++	AESKEYGENASSIST 0x20 %xmm0 %xmm1	# round 6
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x40, %xmm0, %xmm1	# round 7
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x40
++	AESKEYGENASSIST 0x40 %xmm0 %xmm1	# round 7
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x80, %xmm0, %xmm1	# round 8
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x80
++	AESKEYGENASSIST 0x80 %xmm0 %xmm1	# round 8
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x1b, %xmm0, %xmm1	# round 9
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x1b
++	AESKEYGENASSIST 0x1b %xmm0 %xmm1	# round 9
+ 	call _key_expansion_128
+-	# aeskeygenassist $0x36, %xmm0, %xmm1	# round 10
+-	.byte 0x66, 0x0f, 0x3a, 0xdf, 0xc8, 0x36
++	AESKEYGENASSIST 0x36 %xmm0 %xmm1	# round 10
+ 	call _key_expansion_128
+ .Ldec_key:
+ 	sub $0x10, %rcx
+@@ -231,8 +201,7 @@ ENTRY(aesni_set_key)
+ .align 4
+ .Ldec_key_loop:
+ 	movaps (%rdi), %xmm0
+-	# aesimc %xmm0, %xmm1
+-	.byte 0x66, 0x0f, 0x38, 0xdb, 0xc8
++	AESIMC %xmm0 %xmm1
+ 	movaps %xmm1, (%rsi)
+ 	add $0x10, %rdi
+ 	sub $0x10, %rsi
+@@ -274,51 +243,37 @@ _aesni_enc1:
+ 	je .Lenc192
+ 	add $0x20, TKEYP
+ 	movaps -0x60(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps -0x50(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ .align 4
+ .Lenc192:
+ 	movaps -0x40(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps -0x30(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ .align 4
+ .Lenc128:
+ 	movaps -0x20(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps -0x10(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps (TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x10(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x20(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x30(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x40(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x50(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x60(TKEYP), KEY
+-	# aesenc KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
++	AESENC KEY STATE
+ 	movaps 0x70(TKEYP), KEY
+-	# aesenclast KEY, STATE	# last round
+-	.byte 0x66, 0x0f, 0x38, 0xdd, 0xc2
++	AESENCLAST KEY STATE
+ 	ret
+ 
+ /*
+@@ -353,135 +308,79 @@ _aesni_enc4:
+ 	je .L4enc192
+ 	add $0x20, TKEYP
+ 	movaps -0x60(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps -0x50(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ #.align 4
+ .L4enc192:
+ 	movaps -0x40(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3Subject: x86, Generate .byte code for some new instructions via gas macro
+
+
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps -0x30(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ #.align 4
+ .L4enc128:
+ 	movaps -0x20(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps -0x10(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps (TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x10(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x20(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x30(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x40(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x50(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x60(TKEYP), KEY
+-	# aesenc KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xc2
+-	# aesenc KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xe2
+-	# aesenc KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xea
+-	# aesenc KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdc, 0xf2
++	AESENC KEY STATE1
++	AESENC KEY STATE2
++	AESENC KEY STATE3
++	AESENC KEY STATE4
+ 	movaps 0x70(TKEYP), KEY
+-	# aesenclast KEY, STATE1	# last round
+-	.byte 0x66, 0x0f, 0x38, 0xdd, 0xc2
+-	# aesenclast KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdd, 0xe2
+-	# aesenclast KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdd, 0xea
+-	# aesenclast KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdd, 0xf2
++	AESENCLAST KEY STATE1		# last round
++	AESENCLAST KEY STATE2
++	AESENCLAST KEY STATE3
++	AESENCLAST KEY STATE4
+ 	ret
+ 
+ /*
+@@ -518,51 +417,37 @@ _aesni_dec1:
+ 	je .Ldec192
+ 	add $0x20, TKEYP
+ 	movaps -0x60(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps -0x50(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ .align 4
+ .Ldec192:
+ 	movaps -0x40(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps -0x30(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ .align 4
+ .Ldec128:
+ 	movaps -0x20(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps -0x10(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps (TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x10(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x20(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x30(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x40(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x50(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x60(TKEYP), KEY
+-	# aesdec KEY, STATE
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
++	AESDEC KEY STATE
+ 	movaps 0x70(TKEYP), KEY
+-	# aesdeclast KEY, STATE		# last round
+-	.byte 0x66, 0x0f, 0x38, 0xdf, 0xc2
++	AESDECLAST KEY STATE
+ 	ret
+ 
+ /*
+@@ -597,135 +482,79 @@ _aesni_dec4:
+ 	je .L4dec192
+ 	add $0x20, TKEYP
+ 	movaps -0x60(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps -0x50(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ .align 4
+ .L4dec192:
+ 	movaps -0x40(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps -0x30(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ .align 4
+ .L4dec128:
+ 	movaps -0x20(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps -0x10(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps (TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x10(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x20(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x30(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x40(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x50(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x60(TKEYP), KEY
+-	# aesdec KEY, STATE1
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xc2
+-	# aesdec KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xe2
+-	# aesdec KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xea
+-	# aesdec KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xde, 0xf2
++	AESDEC KEY STATE1
++	AESDEC KEY STATE2
++	AESDEC KEY STATE3
++	AESDEC KEY STATE4
+ 	movaps 0x70(TKEYP), KEY
+-	# aesdeclast KEY, STATE1	# last round
+-	.byte 0x66, 0x0f, 0x38, 0xdf, 0xc2
+-	# aesdeclast KEY, STATE2
+-	.byte 0x66, 0x0f, 0x38, 0xdf, 0xe2
+-	# aesdeclast KEY, STATE3
+-	.byte 0x66, 0x0f, 0x38, 0xdf, 0xea
+-	# aesdeclast KEY, STATE4
+-	.byte 0x66, 0x0f, 0x38, 0xdf, 0xf2
++	AESDECLAST KEY STATE1		# last round
++	AESDECLAST KEY STATE2
++	AESDECLAST KEY STATE3
++	AESDECLAST KEY STATE4
+ 	ret
+ 
+ /*
 
 
