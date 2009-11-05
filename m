@@ -1,57 +1,196 @@
 From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [BUGFIX for .32] crypto, gcm, fix another complete call in
- complete fuction
-Date: Wed, 04 Nov 2009 10:23:43 +0800
-Message-ID: <1257301423.22519.172.camel@yhuang-dev.sh.intel.com>
-References: <1257216017.30470.1183.camel@yhuang-dev.sh.intel.com>
-	 <20091103155339.GC9186@gondor.apana.org.au>
+Subject: [PATCH 1/2] x86, crypto, Generate .byte code for some new
+ instructions via gas macro
+Date: Thu, 05 Nov 2009 14:44:15 +0800
+Message-ID: <1257403455.22519.249.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ingo Molnar <mingo@elte.hu>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:15416 "EHLO mga09.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:20332 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751012AbZKDCXl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Nov 2009 21:23:41 -0500
-In-Reply-To: <20091103155339.GC9186@gondor.apana.org.au>
+	id S1756168AbZKEGoL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Nov 2009 01:44:11 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2009-11-03 at 23:53 +0800, Herbert Xu wrote: 
-> On Tue, Nov 03, 2009 at 10:40:17AM +0800, Huang Ying wrote:
-> > The flow of the complete function (xxx_done) in gcm.c is as follow:
-> > 
-> > void complete(struct crypto_async_request *areq, int err)
-> > {
-> > 	if (!err) {
-> > 		err = async_next_step();
-> > 		if (err == -EINPROGRESS || err == -EBUSY)
-> > 			return;
-> > 	}
-> > 
-> > 	complete_for_next_step(areq, err);
-> > }
-> > 
-> > But *areq may be destroyed in async_next_step(), this makes
-> > complete_for_next_step() can not work properly. To fix this, one of
-> > following methods is used for each complete function.
-> 
-> So why is async_next_step destroying areq? Can you give me a
-> concrete example?
+It will take some time for binutils (gas) to support some newly added
+instructions, such as SSE4.1 instructions or the AES-NI instructions
+found in upcoming Intel CPU.
 
-I have seen one example, in gcm_encrypt_done, which is called when
-encryption phase finished in asynchronous mode. The areq passed in may
-be in the context of pctx->u.abreq (due to cryptd etc). Then hash phase
-begin, and ghash is called, which operates on pctx->u.ahreq (share same
-memory of pctx->u.abreq) and its context. Now, *areq may be destroyed.
+To make the source code can be compiled by old binutils, .byte code is
+used instead of the assembly instruction. But the readability and
+flexibility of raw .byte code is not good.
 
-To avoid similar issue in the future, I add protective processing in
-every xxx_done function. Let complete_for_next_step() uses areq setup
-for async_next_step().
+This patch solves the issue of raw .byte code via generating it via
+assembly instruction like gas macro. The syntax is as close as
+possible to real assembly instruction.
 
-Best Regards,
-Huang Ying
+Some helper macros such as MODRM is not a full feature
+implementation. It can be extended when necessary.
+
+Signed-off-by: Huang Ying <ying.huang@intel.com>
+---
+ arch/x86/include/asm/inst.h |  150 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 150 insertions(+)
+
+--- /dev/null
++++ b/arch/x86/include/asm/inst.h
+@@ -0,0 +1,150 @@
++/*
++ * Generate .byte code for some instructions not supported by old
++ * binutils.
++ */
++#ifndef X86_ASM_INST_H
++#define X86_ASM_INST_H
++
++#ifdef __ASSEMBLY__
++
++	.macro XMM_NUM opd xmm
++	.ifc \xmm,%xmm0
++	\opd = 0
++	.endif
++	.ifc \xmm,%xmm1
++	\opd = 1
++	.endif
++	.ifc \xmm,%xmm2
++	\opd = 2
++	.endif
++	.ifc \xmm,%xmm3
++	\opd = 3
++	.endif
++	.ifc \xmm,%xmm4
++	\opd = 4
++	.endif
++	.ifc \xmm,%xmm5
++	\opd = 5
++	.endif
++	.ifc \xmm,%xmm6
++	\opd = 6
++	.endif
++	.ifc \xmm,%xmm7
++	\opd = 7
++	.endif
++	.ifc \xmm,%xmm8
++	\opd = 8
++	.endif
++	.ifc \xmm,%xmm9
++	\opd = 9
++	.endif
++	.ifc \xmm,%xmm10
++	\opd = 10
++	.endif
++	.ifc \xmm,%xmm11
++	\opd = 11
++	.endif
++	.ifc \xmm,%xmm12
++	\opd = 12
++	.endif
++	.ifc \xmm,%xmm13
++	\opd = 13
++	.endif
++	.ifc \xmm,%xmm14
++	\opd = 14
++	.endif
++	.ifc \xmm,%xmm15
++	\opd = 15
++	.endif
++	.endm
++
++	.macro PFX_OPD_SIZE
++	.byte 0x66
++	.endm
++
++	.macro PFX_REX opd1 opd2
++	.if (\opd1 | \opd2) & 8
++	.byte 0x40 | ((\opd1 & 8) >> 3) | ((\opd2 & 8) >> 1)
++	.endif
++	.endm
++
++	.macro MODRM mod opd1 opd2
++	.byte \mod | (\opd1 & 7) | ((\opd2 & 7) << 3)
++	.endm
++
++	.macro PSHUFB_XMM xmm1 xmm2
++	XMM_NUM pshufb_opd1 \xmm1
++	XMM_NUM pshufb_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX pshufb_opd1 pshufb_opd2
++	.byte 0x0f, 0x38, 0x00
++	MODRM 0xc0 pshufb_opd1 pshufb_opd2
++	.endm
++
++	.macro PCLMULQDQ imm8 xmm1 xmm2
++	XMM_NUM clmul_opd1 \xmm1
++	XMM_NUM clmul_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX clmul_opd1 clmul_opd2
++	.byte 0x0f, 0x3a, 0x44
++	MODRM 0xc0 clmul_opd1 clmul_opd2
++	.byte \imm8
++	.endm
++
++	.macro AESKEYGENASSIST rcon xmm1 xmm2
++	XMM_NUM aeskeygen_opd1 \xmm1
++	XMM_NUM aeskeygen_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aeskeygen_opd1 aeskeygen_opd2
++	.byte 0x0f, 0x3a, 0xdf
++	MODRM 0xc0 aeskeygen_opd1 aeskeygen_opd2
++	.byte \rcon
++	.endm
++
++	.macro AESIMC xmm1 xmm2
++	XMM_NUM aesimc_opd1 \xmm1
++	XMM_NUM aesimc_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aesimc_opd1 aesimc_opd2
++	.byte 0x0f, 0x38, 0xdb
++	MODRM 0xc0 aesimc_opd1 aesimc_opd2
++	.endm
++
++	.macro AESENC xmm1 xmm2
++	XMM_NUM aesenc_opd1 \xmm1
++	XMM_NUM aesenc_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aesenc_opd1 aesenc_opd2
++	.byte 0x0f, 0x38, 0xdc
++	MODRM 0xc0 aesenc_opd1 aesenc_opd2
++	.endm
++
++	.macro AESENCLAST xmm1 xmm2
++	XMM_NUM aesenclast_opd1 \xmm1
++	XMM_NUM aesenclast_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aesenclast_opd1 aesenclast_opd2
++	.byte 0x0f, 0x38, 0xdd
++	MODRM 0xc0 aesenclast_opd1 aesenclast_opd2
++	.endm
++
++	.macro AESDEC xmm1 xmm2
++	XMM_NUM aesdec_opd1 \xmm1
++	XMM_NUM aesdec_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aesdec_opd1 aesdec_opd2
++	.byte 0x0f, 0x38, 0xde
++	MODRM 0xc0 aesdec_opd1 aesdec_opd2
++	.endm
++
++	.macro AESDECLAST xmm1 xmm2
++	XMM_NUM aesdeclast_opd1 \xmm1
++	XMM_NUM aesdeclast_opd2 \xmm2
++	PFX_OPD_SIZE
++	PFX_REX aesdeclast_opd1 aesdeclast_opd2
++	.byte 0x0f, 0x38, 0xdf
++	MODRM 0xc0 aesdeclast_opd1 aesdeclast_opd2
++	.endm
++#endif
++
++#endif
+
 
