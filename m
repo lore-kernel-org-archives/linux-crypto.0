@@ -1,40 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] x86, crypto, Use gas macro for AES-NI instructions
-Date: Mon, 9 Nov 2009 13:56:10 -0500
-Message-ID: <20091109185609.GB9588@gondor.apana.org.au>
-References: <1257403457.22519.250.camel@yhuang-dev.sh.intel.com>
+Subject: Re: [BUGFIX -v2 for .32] crypto, gcm, fix another complete call in
+	complete fuction
+Date: Mon, 9 Nov 2009 14:02:50 -0500
+Message-ID: <20091109190250.GC9588@gondor.apana.org.au>
+References: <1257751454.22519.2287.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34418 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:47200 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751814AbZKIS4Q (ORCPT
+	with ESMTP id S1750863AbZKITCq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Nov 2009 13:56:16 -0500
+	Mon, 9 Nov 2009 14:02:46 -0500
 Content-Disposition: inline
-In-Reply-To: <1257403457.22519.250.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <1257751454.22519.2287.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 05, 2009 at 02:44:17PM +0800, Huang Ying wrote:
-> Old binutils do not support AES-NI instructions, to make kernel can be
-> compiled by them, .byte code is used instead of AES-NI assembly
-> instructions. But the readability and flexibility of raw .byte code is
-> not good.
-> 
-> So corresponding assembly instruction like gas macro is used instead.
-> 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
+On Mon, Nov 09, 2009 at 03:24:14PM +0800, Huang Ying wrote:
+> The flow of the complete function (xxx_done) in gcm.c is as follow:
 
-Sorry, but this doesn't apply:
+Thanks the patch looks pretty good overall.
 
-$ git apply ~/p
-fatal: patch fragment without header at line 428: @@ -518,51 +417,37 @@ _aesni_dec1:
-$
+> -static void gcm_hash_final_done(struct crypto_async_request *areq,
+> -				int err)
+> +static void __gcm_hash_final_done(struct aead_request *req,
+> +				  struct crypto_gcm_req_priv_ctx *pctx,
+> +				  int err)
+
+Just one nit though, do we really need to carry this pctx around
+everywhere? It seems to me that it's always crypto_gcm_reqctx(req),
+no?
 
 Cheers,
 -- 
