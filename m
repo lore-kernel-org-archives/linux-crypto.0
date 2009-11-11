@@ -1,48 +1,47 @@
-From: Sergey Mironov <ierton@gmail.com>
-Subject: Bug in geode-aes.c ?
-Date: Tue, 10 Nov 2009 17:00:31 +0300
-Message-ID: <aa09d86e0911100600x79617b85je8e4bd52df37b0a3@mail.gmail.com>
+From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: Bug in geode-aes.c ?
+Date: Wed, 11 Nov 2009 23:08:32 +0100
+Message-ID: <20091111220832.GC18452@Chamillionaire.breakpoint.cc>
+References: <aa09d86e0911100600x79617b85je8e4bd52df37b0a3@mail.gmail.com>
+Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+Cc: linux-crypto@vger.kernel.org
+To: Sergey Mironov <ierton@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f221.google.com ([209.85.220.221]:59510 "EHLO
-	mail-fx0-f221.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752213AbZKJOA1 (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:42698 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758868AbZKKWI1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Nov 2009 09:00:27 -0500
-Received: by fxm21 with SMTP id 21so37223fxm.21
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2009 06:00:32 -0800 (PST)
+	Wed, 11 Nov 2009 17:08:27 -0500
+Content-Disposition: inline
+In-Reply-To: <aa09d86e0911100600x79617b85je8e4bd52df37b0a3@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello. I noticed strange thing in drivers/crypto/geode-aes.c (
-function geode_setkey_cip() )
+* Sergey Mironov | 2009-11-10 17:00:31 [+0300]:
 
-This code still the same in git://linux-arm.org/linux-2.6-stable.git
-(tag v2.6.28-arm2)
+> 116 static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
+> 117                 unsigned int len)
+> 118 {
+>...
+>
+>/** BUG? Should it be 'op->fallback.cip' instead of 'op->fallback.blk' ?  **/
+>
+> 138         op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
+> 139         op->fallback.blk->base.crt_flags |= (tfm->crt_flags &
+>CRYPTO_TFM_REQ_MASK);
+>
+>...
+>
+> 144                 tfm->crt_flags |=
+>(op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
+> 145         }
+> 146         return ret;
 
-Please, check.
+Yup, good catch. It has to be cip instead of blk. I've copy/pasted it
+and the same bug is in s390's crypto driver. No one noticed it because
+both structs are equal, just the name / type is different.
+Do you mind sending a patch?
 
-
- 116 static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
- 117                 unsigned int len)
- 118 {
-...
-
-/** BUG? Should it be 'op->fallback.cip' instead of 'op->fallback.blk' ?  **/
-
- 138         op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
- 139         op->fallback.blk->base.crt_flags |= (tfm->crt_flags &
-CRYPTO_TFM_REQ_MASK);
-
-...
-
- 144                 tfm->crt_flags |=
-(op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
- 145         }
- 146         return ret;
-
--- 
-Thanks,
-Sergey
+Sebastian
