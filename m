@@ -1,58 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUGFIX -v3 for .32] crypto, gcm, fix another complete call in
-	complete fuction
-Date: Mon, 16 Nov 2009 21:52:59 +0800
-Message-ID: <20091116135258.GA4798@gondor.apana.org.au>
-References: <1257838751.22519.2513.camel@yhuang-dev.sh.intel.com>
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: [PATCH -next] crypto: ghash - put proper .data section in place
+Date: Wed, 18 Nov 2009 17:15:44 +0100 (CET)
+Message-ID: <alpine.LSU.2.00.0911181713200.15039@wotan.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Huang Ying <ying.huang@intel.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:49971 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750788AbZKPNw4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Nov 2009 08:52:56 -0500
-Content-Disposition: inline
-In-Reply-To: <1257838751.22519.2513.camel@yhuang-dev.sh.intel.com>
+Received: from cantor2.suse.de ([195.135.220.15]:37363 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757491AbZKRQPk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Nov 2009 11:15:40 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 10, 2009 at 03:39:11PM +0800, Huang Ying wrote:
-> The flow of the complete function (xxx_done) in gcm.c is as follow:
-> 
-> void complete(struct crypto_async_request *areq, int err)
-> {
-> 	struct aead_request *req = areq->data;
-> 
-> 	if (!err) {
-> 		err = async_next_step();
-> 		if (err == -EINPROGRESS || err == -EBUSY)
-> 			return;
-> 	}
-> 
-> 	complete_for_next_step(areq, err);
-> }
-> 
-> But *areq may be destroyed in async_next_step(), this makes
-> complete_for_next_step() can not work properly. To fix this, one of
-> following methods is used for each complete function.
-> 
-> - Add a __complete() for each complete(), which accept struct
->   aead_request *req instead of areq, so avoid using areq after it is
->   destroyed.
-> 
-> - Expand complete_for_next_step().
-> 
-> The fixing method is based on the idea of Herbert Xu.
-> 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
+Lbswap_mask, Lpoly and Ltwo_one should clearly belong to
+.data section, not .text.
 
-Applied to crypto-2.6.  Thanks a lot!
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ arch/x86/crypto/ghash-clmulni-intel_asm.S |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 5958498..24f84e1 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -19,6 +19,8 @@
+ #include <linux/linkage.h>
+ #include <asm/i387.h>
+ 
++.data
++
+ .align 16
+ .Lbswap_mask:
+ 	.octa 0x000102030405060708090a0b0c0d0e0f
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.6
