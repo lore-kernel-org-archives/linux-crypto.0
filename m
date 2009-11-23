@@ -1,52 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: move fips_cprng_get_random and
-	fips_cprng_reset to CONFIG_CRYPTO_FIPS
-Date: Mon, 23 Nov 2009 20:26:09 +0800
-Message-ID: <20091123122609.GF6424@gondor.apana.org.au>
-References: <1258725019.3562.3.camel@ht.satnam> <20091120153801.GB21197@hmsreliant.think-freely.org>
+From: "H Hartley Sweeten" <hartleys@visionengravers.com>
+Subject: drivers/crypto/mv_cesa.c: use resource_size()
+Date: Mon, 23 Nov 2009 12:48:36 -0500
+Message-ID: <BD79186B4FD85F4B8E60E381CAEE190901EE5BE5@mi8nycmail19.Mi8.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jaswinder Singh Rajput <jaswinder@kernel.org>,
-	Jarod Wilson <jarod@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Neil Horman <nhorman@tuxdriver.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57074 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756997AbZKWM0T (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Nov 2009 07:26:19 -0500
-Content-Disposition: inline
-In-Reply-To: <20091120153801.GB21197@hmsreliant.think-freely.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: <sebastian@breakpoint.cc>
+To: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753818AbZKWRsd@vger.kernel.org>
+Content-class: urn:content-classes:message
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 20, 2009 at 10:38:01AM -0500, Neil Horman wrote:
-> On Fri, Nov 20, 2009 at 07:20:19PM +0530, Jaswinder Singh Rajput wrot=
-e:
-> >=20
-> > fips_cprng_get_random and fips_cprng_reset is used only by
-> > CONFIG_CRYPTO_FIPS. This also fixes compilation warnings:
-> >=20
-> >  crypto/ansi_cprng.c:360: warning: =E2=80=98fips_cprng_get_random=E2=
-=80=99 defined but not used
-> >  crypto/ansi_cprng.c:393: warning: =E2=80=98fips_cprng_reset=E2=80=99=
- defined but not used
-> >=20
-> > Signed-off-by: Jaswinder Singh Rajput <jaswinderrajput@gmail.com>
-> Yeah, looks good to me, thanks!
-> Acked-by: Neil Horman <nhorman@tuxdriver.com>
+Use resource_size() for ioremap.
 
-Patch applied.  Thanks!
---=20
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: H Hartley Sweeten <hsweeten@visionengravers.com>
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+
+---
+
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index b21ef63..b8770e9 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -495,7 +495,7 @@ static int mv_probe(struct platform_device *pdev)
+ 
+ 	spin_lock_init(&cp->lock);
+ 	crypto_init_queue(&cp->queue, 50);
+-	cp->reg = ioremap(res->start, res->end - res->start + 1);
++	cp->reg = ioremap(res->start, resource_size(res));
+ 	if (!cp->reg) {
+ 		ret = -ENOMEM;
+ 		goto err;
+@@ -506,7 +506,7 @@ static int mv_probe(struct platform_device *pdev)
+ 		ret = -ENXIO;
+ 		goto err_unmap_reg;
+ 	}
+-	cp->sram_size = res->end - res->start + 1;
++	cp->sram_size = resource_size(res);
+ 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
+ 	cp->sram = ioremap(res->start, cp->sram_size);
+ 	if (!cp->sram) { 
