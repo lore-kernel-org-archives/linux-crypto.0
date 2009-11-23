@@ -1,45 +1,33 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH] crypto: move fips_cprng_get_random and
-	fips_cprng_reset to CONFIG_CRYPTO_FIPS
-Date: Fri, 20 Nov 2009 10:38:01 -0500
-Message-ID: <20091120153801.GB21197@hmsreliant.think-freely.org>
-References: <1258725019.3562.3.camel@ht.satnam>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] x86, crypto, Use gas macro for PCLMULQDQ-NI and
+	PSHUFB
+Date: Mon, 23 Nov 2009 19:55:53 +0800
+Message-ID: <20091123115553.GA6424@gondor.apana.org.au>
+References: <1257839041.22519.2523.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Jarod Wilson <jarod@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Jaswinder Singh Rajput <jaswinder@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:50400 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752821AbZKTPiV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Nov 2009 10:38:21 -0500
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Huang Ying <ying.huang@intel.com>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1757375AbZKWLzw@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1258725019.3562.3.camel@ht.satnam>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1257839041.22519.2523.camel@yhuang-dev.sh.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 20, 2009 at 07:20:19PM +0530, Jaswinder Singh Rajput wrote:
->=20
-> fips_cprng_get_random and fips_cprng_reset is used only by
-> CONFIG_CRYPTO_FIPS. This also fixes compilation warnings:
->=20
->  crypto/ansi_cprng.c:360: warning: =E2=80=98fips_cprng_get_random=E2=80=
-=99 defined but not used
->  crypto/ansi_cprng.c:393: warning: =E2=80=98fips_cprng_reset=E2=80=99=
- defined but not used
->=20
-> Signed-off-by: Jaswinder Singh Rajput <jaswinderrajput@gmail.com>
-Yeah, looks good to me, thanks!
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
+On Tue, Nov 10, 2009 at 03:44:01PM +0800, Huang Ying wrote:
+> Old binutils do not support PCLMULQDQ-NI and PSHUFB, to make kernel
+> can be compiled by them, .byte code is used instead of assembly
+> instructions. But the readability and flexibility of raw .byte code is
+> not good.
+> 
+> So corresponding assembly instruction like gas macro is used instead.
+> 
+> Signed-off-by: Huang Ying <ying.huang@intel.com>
 
->=20
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Both patches applied.  Thanks a lot!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
