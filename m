@@ -1,70 +1,41 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: [PATCH] xfrm: Add SHA384 and SHA512 HMAC authentication algorithms to XFRM
-Date: Wed, 25 Nov 2009 11:58:39 +0100
-Message-ID: <1259146719-16359-1-git-send-email-martin@strongswan.org>
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] xfrm: Custom truncation lengths for authentication
+	algorithms
+Date: Wed, 25 Nov 2009 20:10:39 +0800
+Message-ID: <20091125121038.GA28385@gondor.apana.org.au>
+References: <cover.1259142145.git.martin@strongswan.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zaes.ch ([213.133.111.41]:46185 "EHLO zaes.ch"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752375AbZKYK6i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Nov 2009 05:58:38 -0500
+Received: from rhun.apana.org.au ([64.62.148.172]:39388 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758698AbZKYMKf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Nov 2009 07:10:35 -0500
+Content-Disposition: inline
+In-Reply-To: <cover.1259142145.git.martin@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These algorithms use a truncation of 192/256 bits, as specified
-in RFC4868.
+On Wed, Nov 25, 2009 at 11:29:50AM +0100, Martin Willi wrote:
+> The following patchset adds support for defining truncation lengths
+> for authentication algorithms in userspace. The main purpose for this
+> is to support SHA256 in IPsec using the standardized 128 bit
+> instead of the currently used 96 bit truncation.
+> 
+> Martin Willi (3):
+>   xfrm: Define new XFRM netlink auth attribute with specified
+>     truncation bits
+>   xfrm: Store aalg in xfrm_state with a user specified truncation
+>     length
+>   xfrm: Use the user specified truncation length in ESP and AH
 
-Signed-off-by: Martin Willi <martin@strongswan.org>
----
- net/xfrm/xfrm_algo.c |   34 ++++++++++++++++++++++++++++++++++
- 1 files changed, 34 insertions(+), 0 deletions(-)
-
-diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
-index faf54c6..480afda 100644
---- a/net/xfrm/xfrm_algo.c
-+++ b/net/xfrm/xfrm_algo.c
-@@ -200,6 +200,40 @@ static struct xfrm_algo_desc aalg_list[] = {
- 	}
- },
- {
-+	.name = "hmac(sha384)",
-+
-+	.uinfo = {
-+		.auth = {
-+			.icv_truncbits = 192,
-+			.icv_fullbits = 384,
-+		}
-+	},
-+
-+	.desc = {
-+		.sadb_alg_id = SADB_X_AALG_SHA2_384HMAC,
-+		.sadb_alg_ivlen = 0,
-+		.sadb_alg_minbits = 384,
-+		.sadb_alg_maxbits = 384
-+	}
-+},
-+{
-+	.name = "hmac(sha512)",
-+
-+	.uinfo = {
-+		.auth = {
-+			.icv_truncbits = 256,
-+			.icv_fullbits = 512,
-+		}
-+	},
-+
-+	.desc = {
-+		.sadb_alg_id = SADB_X_AALG_SHA2_512HMAC,
-+		.sadb_alg_ivlen = 0,
-+		.sadb_alg_minbits = 512,
-+		.sadb_alg_maxbits = 512
-+	}
-+},
-+{
- 	.name = "hmac(rmd160)",
- 	.compat = "rmd160",
- 
+Looks great to me.  Thanks Martin!
 -- 
-1.6.3.3
-
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
