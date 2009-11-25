@@ -1,43 +1,80 @@
-From: "H Hartley Sweeten" <hartleys@visionengravers.com>
-Subject: drivers/crypto/mv_cesa.c: use resource_size()
-Date: Mon, 23 Nov 2009 12:48:36 -0500
-Message-ID: <BD79186B4FD85F4B8E60E381CAEE190901EE5BE5@mi8nycmail19.Mi8.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: <sebastian@breakpoint.cc>
-To: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753818AbZKWRsd@vger.kernel.org>
-Content-class: urn:content-classes:message
-Sender: linux-kernel-owner@vger.kernel.org
+From: Martin Willi <martin@strongswan.org>
+Subject: [PATCH 3/3] xfrm: Use the user specified truncation length in ESP and AH
+Date: Wed, 25 Nov 2009 11:29:53 +0100
+Message-ID: <c3215dad8a657aff32ef983ae935e435127d3e48.1259142145.git.martin@strongswan.org>
+References: <cover.1259142145.git.martin@strongswan.org>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <cover.1259142145.git.martin@strongswan.org>
+In-Reply-To: <cover.1259142145.git.martin@strongswan.org>
+References: <cover.1259142145.git.martin@strongswan.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Use resource_size() for ioremap.
+Instead of using the hardcoded truncation for authentication
+algorithms, use the truncation length specified on xfrm_state.
 
-Signed-off-by: H Hartley Sweeten <hsweeten@visionengravers.com>
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-
+Signed-off-by: Martin Willi <martin@strongswan.org>
 ---
+ net/ipv4/ah4.c  |    2 +-
+ net/ipv4/esp4.c |    2 +-
+ net/ipv6/ah6.c  |    2 +-
+ net/ipv6/esp6.c |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index b21ef63..b8770e9 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -495,7 +495,7 @@ static int mv_probe(struct platform_device *pdev)
- 
- 	spin_lock_init(&cp->lock);
- 	crypto_init_queue(&cp->queue, 50);
--	cp->reg = ioremap(res->start, res->end - res->start + 1);
-+	cp->reg = ioremap(res->start, resource_size(res));
- 	if (!cp->reg) {
- 		ret = -ENOMEM;
- 		goto err;
-@@ -506,7 +506,7 @@ static int mv_probe(struct platform_device *pdev)
- 		ret = -ENXIO;
- 		goto err_unmap_reg;
+diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
+index 5c66270..b7be5ed 100644
+--- a/net/ipv4/ah4.c
++++ b/net/ipv4/ah4.c
+@@ -261,7 +261,7 @@ static int ah_init_state(struct xfrm_state *x)
  	}
--	cp->sram_size = res->end - res->start + 1;
-+	cp->sram_size = resource_size(res);
- 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
- 	cp->sram = ioremap(res->start, cp->sram_size);
- 	if (!cp->sram) { 
+ 
+ 	ahp->icv_full_len = aalg_desc->uinfo.auth.icv_fullbits/8;
+-	ahp->icv_trunc_len = aalg_desc->uinfo.auth.icv_truncbits/8;
++	ahp->icv_trunc_len = x->aalg->alg_trunc_len/8;
+ 
+ 	BUG_ON(ahp->icv_trunc_len > MAX_AH_AUTH_LEN);
+ 
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 12f7287..1948895 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -530,7 +530,7 @@ static int esp_init_authenc(struct xfrm_state *x)
+ 		}
+ 
+ 		err = crypto_aead_setauthsize(
+-			aead, aalg_desc->uinfo.auth.icv_truncbits / 8);
++			aead, x->aalg->alg_trunc_len / 8);
+ 		if (err)
+ 			goto free_key;
+ 	}
+diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
+index c1589e2..0c2ae68 100644
+--- a/net/ipv6/ah6.c
++++ b/net/ipv6/ah6.c
+@@ -469,7 +469,7 @@ static int ah6_init_state(struct xfrm_state *x)
+ 	}
+ 
+ 	ahp->icv_full_len = aalg_desc->uinfo.auth.icv_fullbits/8;
+-	ahp->icv_trunc_len = aalg_desc->uinfo.auth.icv_truncbits/8;
++	ahp->icv_trunc_len = x->aalg->alg_trunc_len/8;
+ 
+ 	BUG_ON(ahp->icv_trunc_len > MAX_AH_AUTH_LEN);
+ 
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index af597c7..668a46b 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -473,7 +473,7 @@ static int esp_init_authenc(struct xfrm_state *x)
+ 		}
+ 
+ 		err = crypto_aead_setauthsize(
+-			aead, aalg_desc->uinfo.auth.icv_truncbits / 8);
++			aead, x->aalg->alg_trunc_len / 8);
+ 		if (err)
+ 			goto free_key;
+ 	}
+-- 
+1.6.3.3
+
