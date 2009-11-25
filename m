@@ -1,29 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] xfrm: Add SHA384 and SHA512 HMAC authentication
-	algorithms to XFRM
-Date: Wed, 25 Nov 2009 20:11:40 +0800
-Message-ID: <20091125121140.GB28385@gondor.apana.org.au>
-References: <1259146719-16359-1-git-send-email-martin@strongswan.org>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 0/3] xfrm: Custom truncation lengths for authentication
+ algorithms
+Date: Wed, 25 Nov 2009 15:48:54 -0800 (PST)
+Message-ID: <20091125.154854.99590537.davem@davemloft.net>
+References: <cover.1259142145.git.martin@strongswan.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Martin Willi <martin@strongswan.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1259146719-16359-1-git-send-email-martin@strongswan.org>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+To: martin@strongswan.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:43177
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759955AbZKYXsg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Nov 2009 18:48:36 -0500
+In-Reply-To: <cover.1259142145.git.martin@strongswan.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 25, 2009 at 11:58:39AM +0100, Martin Willi wrote:
-> These algorithms use a truncation of 192/256 bits, as specified
-> in RFC4868.
+From: Martin Willi <martin@strongswan.org>
+Date: Wed, 25 Nov 2009 11:29:50 +0100
+
+> The following patchset adds support for defining truncation lengths
+> for authentication algorithms in userspace. The main purpose for this
+> is to support SHA256 in IPsec using the standardized 128 bit
+> instead of the currently used 96 bit truncation.
 > 
-> Signed-off-by: Martin Willi <martin@strongswan.org>
+> Martin Willi (3):
+>   xfrm: Define new XFRM netlink auth attribute with specified
+>     truncation bits
+>   xfrm: Store aalg in xfrm_state with a user specified truncation
+>     length
+>   xfrm: Use the user specified truncation length in ESP and AH
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+All applied to net-next-2.6, thanks!
