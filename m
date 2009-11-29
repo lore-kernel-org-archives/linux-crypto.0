@@ -1,30 +1,29 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] xfrm: Add SHA384 and SHA512 HMAC authentication
- algorithms to XFRM
-Date: Wed, 25 Nov 2009 15:49:02 -0800 (PST)
-Message-ID: <20091125.154902.139476687.davem@davemloft.net>
-References: <1259146719-16359-1-git-send-email-martin@strongswan.org>
-	<20091125121140.GB28385@gondor.apana.org.au>
+From: "RubyRoyale Gambling" <twrfjvakhdxpwv@abwabna.com>
+Subject: ditt gyllene mynt har blivit krediterat
+Date: Sun, 29 Nov 2009 13:08:43 +0100
+Message-ID: <000e01ca70ec$b2421b30$00426138@fsuuthpo>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: martin@strongswan.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20091125121140.GB28385@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 251.222-136-217.adsl-static.isp.belgacom.be ([217.136.222.251]:54407
+	"EHLO 251.222-136-217.adsl-static.isp.belgacom.be"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753485AbZK2MIj convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 29 Nov 2009 07:08:39 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 25 Nov 2009 20:11:40 +0800
+Jag och mina v=E4nner =E4lskar det h=E4r st=E4llet, du f=E5r 750 Gratis=
+ och sedan en timme p=E5 dig att tj=E4na din F=F6rm=F6genhet och det b=E4=
+sta =E4r att du f=E5r beh=E5lla pengarna du vinner.
 
-> On Wed, Nov 25, 2009 at 11:58:39AM +0100, Martin Willi wrote:
->> These algorithms use a truncation of 192/256 bits, as specified
->> in RFC4868.
->> 
->> Signed-off-by: Martin Willi <martin@strongswan.org>
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+http://www.gamezroyalruby.net/sv/
 
-Applied to net-next-2.6
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
