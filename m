@@ -1,39 +1,56 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: gmac - Add RFC4543 wrapper for GCM
-Date: Wed, 2 Dec 2009 08:53:29 +0800
-Message-ID: <20091202005329.GB1828@gondor.apana.org.au>
-References: <4B154918.7070008@strongswan.org> <20091201.155141.147973233.davem@davemloft.net>
+Date: Thu, 3 Dec 2009 11:50:13 +0800
+Message-ID: <20091203035013.GA15252@gondor.apana.org.au>
+References: <4B154918.7070008@strongswan.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tobias@strongswan.org, netdev@vger.kernel.org,
+Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Tobias Brunner <tobias@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46006 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:60743 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754929AbZLBAx2 (ORCPT
+	with ESMTP id S1753089AbZLCDuQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Dec 2009 19:53:28 -0500
+	Wed, 2 Dec 2009 22:50:16 -0500
 Content-Disposition: inline
-In-Reply-To: <20091201.155141.147973233.davem@davemloft.net>
+In-Reply-To: <4B154918.7070008@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 01, 2009 at 03:51:41PM -0800, David Miller wrote:
-> From: Tobias Brunner <tobias@strongswan.org>
-> Date: Tue, 01 Dec 2009 17:49:28 +0100
+On Tue, Dec 01, 2009 at 05:49:28PM +0100, Tobias Brunner wrote:
+> This patch adds the RFC4543 (GMAC) wrapper for GCM similar to the
+> existing RFC4106 wrapper. The main differences between GCM and GMAC are
+> the contents of the AAD and that the plaintext is empty for the latter.
 > 
-> > This patch adds the RFC4543 (GMAC) wrapper for GCM similar to the
-> > existing RFC4106 wrapper. The main differences between GCM and GMAC are
-> > the contents of the AAD and that the plaintext is empty for the latter.
-> > 
-> > Signed-off-by: Tobias Brunner <tobias@strongswan.org>
+> Signed-off-by: Tobias Brunner <tobias@strongswan.org>
+> ---
+>  crypto/gcm.c            |  275 +++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/pfkeyv2.h |    1 +
+>  net/xfrm/xfrm_algo.c    |   16 +++
+>  3 files changed, 292 insertions(+), 0 deletions(-)
 > 
-> Herbert, you got this one?
+> diff --git a/crypto/gcm.c b/crypto/gcm.c
+> index 5fc3292..b097eb4 100644
+> --- a/crypto/gcm.c
+> +++ b/crypto/gcm.c
+> @@ -37,6 +37,15 @@ struct crypto_rfc4106_ctx {
+>  	u8 nonce[4];
+>  };
+>  
+> +struct crypto_rfc4543_ctx {
+> +	struct crypto_aead *child;
+> +	u8 nonce[4];
+> +	u8 auth_tag[16];
 
-Sure I'll pick it up.
+This field needs to be aligned to whatever alignment needed by
+the underlying cipher algorithm (currently the biggest is padlock
+which needs 16-byte alignment).
 
-Thanks,
+See for example how rfc4543/gcm handles it.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
