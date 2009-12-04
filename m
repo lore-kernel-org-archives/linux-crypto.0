@@ -1,56 +1,108 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: gmac - Add RFC4543 wrapper for GCM
-Date: Thu, 3 Dec 2009 11:50:13 +0800
-Message-ID: <20091203035013.GA15252@gondor.apana.org.au>
-References: <4B154918.7070008@strongswan.org>
+Subject: Crypto Update for 2.6.33
+Date: Fri, 4 Dec 2009 21:55:30 +0800
+Message-ID: <20091204135530.GA29371@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Tobias Brunner <tobias@strongswan.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:60743 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:40864 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753089AbZLCDuQ (ORCPT
+	with ESMTP id S1751024AbZLDNzb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Dec 2009 22:50:16 -0500
+	Fri, 4 Dec 2009 08:55:31 -0500
 Content-Disposition: inline
-In-Reply-To: <4B154918.7070008@strongswan.org>
+In-Reply-To: <20090324044932.GA18245@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 01, 2009 at 05:49:28PM +0100, Tobias Brunner wrote:
-> This patch adds the RFC4543 (GMAC) wrapper for GCM similar to the
-> existing RFC4106 wrapper. The main differences between GCM and GMAC are
-> the contents of the AAD and that the plaintext is empty for the latter.
-> 
-> Signed-off-by: Tobias Brunner <tobias@strongswan.org>
-> ---
->  crypto/gcm.c            |  275 +++++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/pfkeyv2.h |    1 +
->  net/xfrm/xfrm_algo.c    |   16 +++
->  3 files changed, 292 insertions(+), 0 deletions(-)
-> 
-> diff --git a/crypto/gcm.c b/crypto/gcm.c
-> index 5fc3292..b097eb4 100644
-> --- a/crypto/gcm.c
-> +++ b/crypto/gcm.c
-> @@ -37,6 +37,15 @@ struct crypto_rfc4106_ctx {
->  	u8 nonce[4];
->  };
->  
-> +struct crypto_rfc4543_ctx {
-> +	struct crypto_aead *child;
-> +	u8 nonce[4];
-> +	u8 auth_tag[16];
+Hi Linus:
 
-This field needs to be aligned to whatever alignment needed by
-the underlying cipher algorithm (currently the biggest is padlock
-which needs 16-byte alignment).
+Here is the crypto update for 2.6.33:
 
-See for example how rfc4543/gcm handles it.
+* Removal of legacy hash code.
+* New ghash (part of GCM) driver using Intel hardware support.
+* Hardware RNG driver API update.
+* Random fixes.
 
-Cheers,
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Benjamin Gilbert (3):
+      crypto: hash - Remove legacy hash/digest code
+      crypto: api - Remove digest case from procfs show handler
+      crypto: hash - Remove cra_u.{digest,hash}
+
+Felipe Contreras (1):
+      crypto: testmgr - Fix warning
+
+Herbert Xu (2):
+      crypto: ghash-intel - Hard-code pshufb
+      crypto: ghash-intel - Add PSHUFB macros
+
+Huang Ying (6):
+      crypto: ghash - Add PCLMULQDQ accelerated implementation
+      crypto: ghash-intel - Fix building failure on x86_32
+      crypto: ghash-intel - Fix irq_fpu_usable usage
+      x86: Generate .byte code for some new instructions via gas macro
+      crypto: aesni-intel - Use gas macro for AES-NI instructions
+      crypto: ghash-clmulni-intel - Use gas macro for PCLMULQDQ-NI and PSHUFB
+
+Ian Molton (3):
+      hwrng: virtio-rng - Convert to new API
+      hwrng: core - Prevent too-small buffer sizes
+      hwrng: core - Replace u32 in driver API with byte array
+
+Jaswinder Singh Rajput (1):
+      crypto: ansi_cprng - Move FIPS functions under CONFIG_CRYPTO_FIPS
+
+Jiri Kosina (1):
+      crypto: ghash-clmulni-intel - Put proper .data section in place
+
+Neil Horman (1):
+      crypto: ansi_cprng - Add FIPS wrapper
+
+Roel Kluin (1):
+      crypto: ansi_cprng - Fix test in get_prng_bytes
+
+Youquan, Song (1):
+      crypto: testmgr - Add ghash algorithm test before provide to users
+
+ arch/x86/crypto/Makefile                   |    3 
+ arch/x86/crypto/aesni-intel_asm.S          |  517 +++++++++--------------------
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  |  157 ++++++++
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |  333 ++++++++++++++++++
+ arch/x86/include/asm/cpufeature.h          |    1 
+ arch/x86/include/asm/i387.h                |    7 
+ arch/x86/include/asm/inst.h                |  150 ++++++++
+ crypto/Kconfig                             |    9 
+ crypto/ansi_cprng.c                        |   82 +++-
+ crypto/cryptd.c                            |    7 
+ crypto/digest.c                            |  240 -------------
+ crypto/hash.c                              |  183 ----------
+ crypto/proc.c                              |    7 
+ crypto/testmgr.c                           |   11 
+ crypto/testmgr.h                           |   15 
+ drivers/char/hw_random/core.c              |  110 +++---
+ drivers/char/hw_random/virtio-rng.c        |   78 +---
+ include/crypto/algapi.h                    |    1 
+ include/crypto/cryptd.h                    |    1 
+ include/linux/crypto.h                     |   27 -
+ include/linux/hw_random.h                  |    7 
+ 21 files changed, 1034 insertions(+), 912 deletions(-)
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
