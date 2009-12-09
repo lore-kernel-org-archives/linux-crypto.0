@@ -1,51 +1,41 @@
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: [PATCH] crypto/testmgr: fix uninitialized warning from gcc
-Date: Wed,  9 Dec 2009 06:52:04 -0500
-Message-ID: <1260359524-15515-1-git-send-email-vapier@gentoo.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: Martin Willi <martin@strongswan.org>
+Subject: [PATCH] xfrm: Fix truncation length of authentication algorithms installed via PF_KEY
+Date: Wed,  9 Dec 2009 17:11:15 +0100
+Message-ID: <1260375075-16187-1-git-send-email-martin@strongswan.org>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:48717 "EHLO smtp.gentoo.org"
+Received: from zaes.ch ([213.133.111.41]:59257 "EHLO zaes.ch"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755289AbZLILv7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Dec 2009 06:51:59 -0500
+	id S1756117AbZLIQLW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 9 Dec 2009 11:11:22 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since err is not set to a value if tcount is 0, gcc issues a warning:
-crypto/testmgr.c: In function =E2=80=98test_cprng=E2=80=99:
-crypto/testmgr.c:1204: warning: =E2=80=98err=E2=80=99 may be used unini=
-tialized in this function
+Commit 4447bb33f09444920a8f1d89e1540137429351b6 breaks installation of
+authentication algorithms via PF_KEY, as the state specific truncation
+length is not installed with the algorithms default truncation length.
+This patch initializes state properly to the default if installed via
+PF_KEY.
 
-Since this is test code, forcing initialized sanity should be fine.
-
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+Signed-off-by: Martin Willi <martin@strongswan.org>
 ---
- crypto/testmgr.c |    1 +
+ net/key/af_key.c |    1 +
  1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 7620bfc..90c4254 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1214,6 +1214,7 @@ static int test_cprng(struct crypto_rng *tfm, str=
-uct cprng_testvec *template,
- 		return -ENOMEM;
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index 84209fb..76fa6fe 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -1193,6 +1193,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
+ 			x->aalg->alg_key_len = key->sadb_key_bits;
+ 			memcpy(x->aalg->alg_key, key+1, keysize);
+ 		}
++		x->aalg->alg_trunc_len = a->uinfo.auth.icv_truncbits;
+ 		x->props.aalgo = sa->sadb_sa_auth;
+ 		/* x->algo.flags = sa->sadb_sa_flags; */
  	}
-=20
-+	err =3D 0; /* sanity in case tcount is 0 */
- 	for (i =3D 0; i < tcount; i++) {
- 		memset(result, 0, 32);
-=20
---=20
-1.6.5.5
+-- 
+1.6.3.3
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
