@@ -1,41 +1,60 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: [PATCH] xfrm: Fix truncation length of authentication algorithms installed via PF_KEY
-Date: Wed,  9 Dec 2009 17:11:15 +0100
-Message-ID: <1260375075-16187-1-git-send-email-martin@strongswan.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zaes.ch ([213.133.111.41]:59257 "EHLO zaes.ch"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756117AbZLIQLW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Dec 2009 11:11:22 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Julia Lawall <julia@diku.dk>
+Subject: [PATCH 3/12] crypto: Correct size given to memset
+Date: Wed, 9 Dec 2009 20:23:09 +0100 (CET)
+Message-ID: <Pine.LNX.4.64.0912092022500.1870@ask.diku.dk>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1757351AbZLITXL@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Commit 4447bb33f09444920a8f1d89e1540137429351b6 breaks installation of
-authentication algorithms via PF_KEY, as the state specific truncation
-length is not installed with the algorithms default truncation length.
-This patch initializes state properly to the default if installed via
-PF_KEY.
+From: Julia Lawall <julia@diku.dk>
 
-Signed-off-by: Martin Willi <martin@strongswan.org>
+Memset should be given the size of the structure, not the size of the pointer.
+
+The semantic patch that makes this change is as follows:
+(http://coccinelle.lip6.fr/)
+
+// <smpl>
+@@
+type T;
+T *x;
+expression E;
+@@
+
+memset(x, E, sizeof(
++ *
+ x))
+// </smpl>
+
+Signed-off-by: Julia Lawall <julia@diku.dk>
+
 ---
- net/key/af_key.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ crypto/gf128mul.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index 84209fb..76fa6fe 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -1193,6 +1193,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
- 			x->aalg->alg_key_len = key->sadb_key_bits;
- 			memcpy(x->aalg->alg_key, key+1, keysize);
- 		}
-+		x->aalg->alg_trunc_len = a->uinfo.auth.icv_truncbits;
- 		x->props.aalgo = sa->sadb_sa_auth;
- 		/* x->algo.flags = sa->sadb_sa_flags; */
- 	}
--- 
-1.6.3.3
-
+diff -u -p a/crypto/gf128mul.c b/crypto/gf128mul.c
+--- a/crypto/gf128mul.c
++++ b/crypto/gf128mul.c
+@@ -182,7 +182,7 @@ void gf128mul_lle(be128 *r, const be128 
+ 	for (i = 0; i < 7; ++i)
+ 		gf128mul_x_lle(&p[i + 1], &p[i]);
+ 
+-	memset(r, 0, sizeof(r));
++	memset(r, 0, sizeof(*r));
+ 	for (i = 0;;) {
+ 		u8 ch = ((u8 *)b)[15 - i];
+ 
+@@ -220,7 +220,7 @@ void gf128mul_bbe(be128 *r, const be128 
+ 	for (i = 0; i < 7; ++i)
+ 		gf128mul_x_bbe(&p[i + 1], &p[i]);
+ 
+-	memset(r, 0, sizeof(r));
++	memset(r, 0, sizeof(*r));
+ 	for (i = 0;;) {
+ 		u8 ch = ((u8 *)b)[i];
+ 
