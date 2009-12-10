@@ -1,60 +1,18 @@
-From: Julia Lawall <julia@diku.dk>
-Subject: [PATCH 3/12] crypto: Correct size given to memset
-Date: Wed, 9 Dec 2009 20:23:09 +0100 (CET)
-Message-ID: <Pine.LNX.4.64.0912092022500.1870@ask.diku.dk>
+From: "Amabel Baker" <agencyinfinity@sber.com>
+Subject: Please reply
+Date: Thu, 10 Dec 2009 21:25:33 +0900
+Message-ID: <20091210212533.7010906@sber.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1757351AbZLITXL@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [121.166.181.25] ([121.166.181.25]:1129 "HELO wergvan"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+	id S1754492AbZLJMaz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Dec 2009 07:30:55 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+Your xxx life needs imrovement? http://ooddid.ibgeypma.com/
 
-Memset should be given the size of the structure, not the size of the pointer.
-
-The semantic patch that makes this change is as follows:
-(http://coccinelle.lip6.fr/)
-
-// <smpl>
-@@
-type T;
-T *x;
-expression E;
-@@
-
-memset(x, E, sizeof(
-+ *
- x))
-// </smpl>
-
-Signed-off-by: Julia Lawall <julia@diku.dk>
-
----
- crypto/gf128mul.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff -u -p a/crypto/gf128mul.c b/crypto/gf128mul.c
---- a/crypto/gf128mul.c
-+++ b/crypto/gf128mul.c
-@@ -182,7 +182,7 @@ void gf128mul_lle(be128 *r, const be128 
- 	for (i = 0; i < 7; ++i)
- 		gf128mul_x_lle(&p[i + 1], &p[i]);
- 
--	memset(r, 0, sizeof(r));
-+	memset(r, 0, sizeof(*r));
- 	for (i = 0;;) {
- 		u8 ch = ((u8 *)b)[15 - i];
- 
-@@ -220,7 +220,7 @@ void gf128mul_bbe(be128 *r, const be128 
- 	for (i = 0; i < 7; ++i)
- 		gf128mul_x_bbe(&p[i + 1], &p[i]);
- 
--	memset(r, 0, sizeof(r));
-+	memset(r, 0, sizeof(*r));
- 	for (i = 0;;) {
- 		u8 ch = ((u8 *)b)[i];
- 
