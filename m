@@ -1,35 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] geode: PTR_ERR return of wrong pointer in
-	fallback_init_cip()
-Date: Fri, 11 Dec 2009 23:03:49 +0800
-Message-ID: <20091211150349.GA736@gondor.apana.org.au>
-References: <4B1D02F7.2020505@gmail.com> <20091207134012.GA21388@Chamillionaire.breakpoint.cc> <4B1D0DC9.5000908@gmail.com>
+Subject: Re: [PATCH 3/12] crypto: Correct size given to memset
+Date: Fri, 11 Dec 2009 23:09:19 +0800
+Message-ID: <20091211150919.GB736@gondor.apana.org.au>
+References: <Pine.LNX.4.64.0912092022500.1870@ask.diku.dk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Sergey Mironov <ierton@gmail.com>
-To: Roel Kluin <roel.kluin@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+To: Julia Lawall <julia@diku.dk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:48306 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:45409 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754127AbZLKPEE (ORCPT
+	with ESMTP id S1757923AbZLKPJR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Dec 2009 10:04:04 -0500
+	Fri, 11 Dec 2009 10:09:17 -0500
 Content-Disposition: inline
-In-Reply-To: <4B1D0DC9.5000908@gmail.com>
+In-Reply-To: <Pine.LNX.4.64.0912092022500.1870@ask.diku.dk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 07, 2009 at 03:14:33PM +0100, Roel Kluin wrote:
-> Return the PTR_ERR of the correct pointer.
+On Wed, Dec 09, 2009 at 08:23:09PM +0100, Julia Lawall wrote:
+> From: Julia Lawall <julia@diku.dk>
 > 
-> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+> Memset should be given the size of the structure, not the size of the pointer.
+> 
+> The semantic patch that makes this change is as follows:
+> (http://coccinelle.lip6.fr/)
+> 
+> // <smpl>
+> @@
+> type T;
+> T *x;
+> expression E;
+> @@
+> 
+> memset(x, E, sizeof(
+> + *
+>  x))
+> // </smpl>
+> 
+> Signed-off-by: Julia Lawall <julia@diku.dk>
 
-Patch applied.  Thank you.
+Luckily these functions aren't used by anything.  Perhaps we
+should get rid of them altogether.
+
+Anyway, I've applied your patch.  Thanks!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
