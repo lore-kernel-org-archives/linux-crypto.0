@@ -1,38 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Question About Asymmetric Crypto
-Date: Fri, 11 Dec 2009 14:31:59 +0800
-Message-ID: <20091211063159.GA29051@gondor.apana.org.au>
-References: <EC64E4604C8024438259B683BB2514E10780B3A772@SC-VEXCH1.marvell.com>
+Subject: Re: [PATCH] geode: PTR_ERR return of wrong pointer in
+	fallback_init_cip()
+Date: Fri, 11 Dec 2009 23:03:49 +0800
+Message-ID: <20091211150349.GA736@gondor.apana.org.au>
+References: <4B1D02F7.2020505@gmail.com> <20091207134012.GA21388@Chamillionaire.breakpoint.cc> <4B1D0DC9.5000908@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, dlv@marvell.com
-To: Leo Yan <leoy@marvell.com>
+Cc: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Sergey Mironov <ierton@gmail.com>
+To: Roel Kluin <roel.kluin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:42871 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:48306 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757305AbZLKGb4 (ORCPT
+	with ESMTP id S1754127AbZLKPEE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Dec 2009 01:31:56 -0500
+	Fri, 11 Dec 2009 10:04:04 -0500
 Content-Disposition: inline
-In-Reply-To: <EC64E4604C8024438259B683BB2514E10780B3A772@SC-VEXCH1.marvell.com>
+In-Reply-To: <4B1D0DC9.5000908@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Leo Yan <leoy@marvell.com> wrote:
+On Mon, Dec 07, 2009 at 03:14:33PM +0100, Roel Kluin wrote:
+> Return the PTR_ERR of the correct pointer.
 > 
-> So question is: Does Linux CryptoAPI will be a general crypto engine accelerator framework for Linux platform, or just only dedicated for Linux Kernel?
-> Like the thread has discussed, http://osdir.com/ml/linux.kernel.cryptoapi/2007/msg00307.html,
-> Some guys think that nobody wants to use RSA in the kernel, but if Linux CryptoAPI wants support user space (As Herbert has mentioned it in the September's conference), then the scenario is changing.
-> For example, if the browsers use the OpenSSL, and OpenSSL can call the Linux CryptoAPI to get the HW acceleration, and eventually optimize its performance.
+> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
 
-I have nothing against having asymmetric crypto per se.  However,
-until the user-space API exists there is no point in adding any
-asymmetric infrastructure in the kernel as we have no in-kernel
-users for them.
-
-So please help in creating the user-space API first.
-
-Thanks,
+Patch applied.  Thank you.
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
