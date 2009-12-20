@@ -1,69 +1,48 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 2/2] Crypto: Talitos: Support for Async_tx XOR offload
-Date: Fri, 18 Dec 2009 15:17:42 -0700
-Message-ID: <e9c3a7c20912181417v2b8155e5w23fb3cee02b9a4c9@mail.gmail.com>
-References: <1260977698-4076-1-git-send-email-Vishnu@freescale.com>
-	<20091216164144.daff5468.kim.phillips@freescale.com>
-	<2868C8CF-584B-4FA7-9C3B-2FACEF77527E@kernel.crashing.org>
-	<4B296394.9010709@intel.com> <20091217170958.GE18271@ovro.caltech.edu>
-	<4B2A6DFA.6000504@intel.com>
-	<3A45394FD742FA419B760BB8D398F9ED01059526@zch01exm26.fsl.freescale.net>
+From: "Aseem Rastogi" <arastogi@cs.sunysb.edu>
+Subject: PATCH crypto/zlib: Allow Z_OK return value from zlib_deflate
+Date: Sun, 20 Dec 2009 14:34:09 -0500
+Message-ID: <20091220192122.M17448@cs.sunysb.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: herbert@gondor.apana.org.au, "Ira W. Snyder" <iws@ovro.caltech.edu>,
-	Suresh Vishnu-B05022 <B05022@freescale.com>,
-	Tabi Timur-B04825 <B04825@freescale.com>,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linuxppc-dev@ozlabs.org, linux-crypto@vger.kernel.org,
-	Gupta Maneesh-B18878 <B18878@freescale.com>,
-	Dudhat Dipen-B09055 <B09055@freescale.com>
-To: Li Yang-R58472 <r58472@freescale.com>
-Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <3A45394FD742FA419B760BB8D398F9ED01059526@zch01exm26.fsl.freescale.net>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Sender: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain;
+	charset=iso-8859-1
+Cc: vtaras@cs.sunysb.edu
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sbcs.cs.sunysb.edu ([130.245.1.15]:44597 "EHLO
+	sbcs.cs.sunysb.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753204AbZLTUPM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Dec 2009 15:15:12 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 18, 2009 at 8:02 AM, Li Yang-R58472 <r58472@freescale.com> wrot=
-e:
->
->>Subject: Re: [PATCH v2 2/2] Crypto: Talitos: Support for
->>Async_tx XOR offload
->>
->>Ira W. Snyder wrote:
->>> Yes, I have used the device_prep_dma_interrupt()
->>functionality quite a
->>> while back. However, I found it to be pretty much useless.
->>
->>The specific case it is needed for Talitos/raid is a channel
->>switch interrupt. =A0The interrupt causes the cleanup operation
->>to be run which will kick off any pending dependent operations
->>on the xor channel. =A0In the raid case we only have callbacks
->>at the end of a chain, so we need the interrupt to kick the
->>engine in an operation chain like
->>xor->copy->xor->callback.
->
-> I am wondering if can use more callbacks to kick off pending dependent op=
-erations?
-> Like xor->callback->copy->callback->xor->callback?
->
+From: Aseem Rastogi
 
-No, the callback field is reserved for clients of the api.  What you want i=
-s:
+crypto/zlib: When zlib_deflate is called with Z_FINISH flag, it should be
+considered valid if it returns Z_OK instead of Z_STREAM_END.
 
-xor->cleanupT->copy->cleanupF->xor->cleanupT->callback
+zlib_defalte allows callers to call it with Z_FINISH flag multiple times. This
+is useful if output buffer did not have enough space first time zlib_deflate
+was called with Z_FINISH set. zlib_deflate returns Z_OK in that case and
+expects that caller will invoke it again with Z_FINISH set to collect
+remaining data. So, return value from zlib_deflate can be Z_OK OR
+Z_STREAM_END. zlib_compress_final is modified to allow return value of Z_OK.
 
-Where cleanupT is the Talitos descriptor cleanup routine and cleanupF
-is from fsldma.  The assumption is that the interrupt kicks the
-cleanup routine and that calls dma_run_dependencies().
+Signed-off-by: Aseem Rastogi <arastogi@cs.sunysb.edu>
+Tested-by: Aseem Rastogi <arastogi@cs.sunysb.edu>
+Reviewed-by: Vasily Tarasov <vtaras@cs.sunysb.edu>
 
---
-Dan
+diff --git a/crypto/zlib.c b/crypto/zlib.c
+index c301573..c63c520 100644
+--- a/crypto/zlib.c
++++ b/crypto/zlib.c
+@@ -190,7 +190,7 @@ static int zlib_compress_final(struct crypto_pcomp *tfm,
+ 	stream->avail_out = req->avail_out;
+ 
+ 	ret = zlib_deflate(stream, Z_FINISH);
+-	if (ret != Z_STREAM_END) {
++	if ((ret != Z_STREAM_END) && (ret != Z_OK)) {
+ 		pr_debug("zlib_deflate failed %d\n", ret);
+ 		return -EINVAL;
+ 	}
