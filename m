@@ -1,96 +1,87 @@
-From: "Ira W. Snyder" <iws@ovro.caltech.edu>
-Subject: Re: [PATCH v2 2/2] Crypto: Talitos: Support for Async_tx XOR offload
-Date: Sat, 26 Dec 2009 13:41:46 -0800
-Message-ID: <20091226214146.GA4904@ovro.caltech.edu>
-References: <1260977698-4076-1-git-send-email-Vishnu@freescale.com>
-	<20091216164144.daff5468.kim.phillips@freescale.com>
-	<2868C8CF-584B-4FA7-9C3B-2FACEF77527E@kernel.crashing.org>
-	<4B296394.9010709@intel.com>
-	<20091217170958.GE18271@ovro.caltech.edu>
-	<4B2A6DFA.6000504@intel.com>
-	<3A45394FD742FA419B760BB8D398F9ED01059526@zch01exm26.fsl.freescale.net>
-	<e9c3a7c20912181417v2b8155e5w23fb3cee02b9a4c9@mail.gmail.com>
+From: Krzysztof Halasa <khc@pm.waw.pl>
+Subject: Crypto test results unused?
+Date: Mon, 28 Dec 2009 19:12:50 +0100
+Message-ID: <m3ws07q865.fsf@intrepid.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: herbert@gondor.apana.org.au, Suresh Vishnu-B05022 <B05022@freescale.com>,
-	Tabi Timur-B04825 <B04825@freescale.com>,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linuxppc-dev@ozlabs.org, linux-crypto@vger.kernel.org,
-	Gupta Maneesh-B18878 <B18878@freescale.com>,
-	Dudhat Dipen-B09055 <B09055@freescale.com>,
-	Li Yang-R58472 <r58472@freescale.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Return-path: <linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org>
-Content-Disposition: inline
-In-Reply-To: <e9c3a7c20912181417v2b8155e5w23fb3cee02b9a4c9@mail.gmail.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Sender: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-Errors-To: linuxppc-dev-bounces+glppd-linuxppc64-dev=m.gmane.org@lists.ozlabs.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: lkml <linux-kernel@vger.kernel.org>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from khc.piap.pl ([195.187.100.11]:56026 "EHLO khc.piap.pl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751192AbZL1SMx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Dec 2009 13:12:53 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 18, 2009 at 03:17:42PM -0700, Dan Williams wrote:
-> On Fri, Dec 18, 2009 at 8:02 AM, Li Yang-R58472 <r58472@freescale.com> wr=
-ote:
-> >
-> >>Subject: Re: [PATCH v2 2/2] Crypto: Talitos: Support for
-> >>Async_tx XOR offload
-> >>
-> >>Ira W. Snyder wrote:
-> >>> Yes, I have used the device_prep_dma_interrupt()
-> >>functionality quite a
-> >>> while back. However, I found it to be pretty much useless.
-> >>
-> >>The specific case it is needed for Talitos/raid is a channel
-> >>switch interrupt. =A0The interrupt causes the cleanup operation
-> >>to be run which will kick off any pending dependent operations
-> >>on the xor channel. =A0In the raid case we only have callbacks
-> >>at the end of a chain, so we need the interrupt to kick the
-> >>engine in an operation chain like
-> >>xor->copy->xor->callback.
-> >
-> > I am wondering if can use more callbacks to kick off pending dependent =
-operations?
-> > Like xor->callback->copy->callback->xor->callback?
-> >
-> =
+Hi,
 
-> No, the callback field is reserved for clients of the api.  What you want=
- is:
-> =
+is the core crypto code supposed to "kill" algorithms which fail the
+test?
 
-> xor->cleanupT->copy->cleanupF->xor->cleanupT->callback
-> =
+On little-endian IXP4xx 3 hardware-assisted algorithms fail (due to
+apparently unrelated bug which I will take care of). It seems the kernel
+is still using these failing algorithms (my debugging code adds extra
+fields to the /proc output):
 
-> Where cleanupT is the Talitos descriptor cleanup routine and cleanupF
-> is from fsldma.  The assumption is that the interrupt kicks the
-> cleanup routine and that calls dma_run_dependencies().
-> =
+alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
+00000000: 01 23 45 67 89 ab cd e7
+alg: skcipher: Test 1 failed on encryption for ecb(des3_ede)-ixp4xx
+00000000: 73 6f 6d 65 64 61 74 61
+alg: skcipher: Test 1 failed on encryption for ecb(aes)-ixp4xx
+00000000: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
 
+# grep 'ecb(des)-ixp4xx\|ecb(des3_ede)-ixp4xx\|ecb(aes)-ixp4xx' /proc/cryp
+to -A 6
+driver       : ecb(aes)-ixp4xx
+module       : ixp4xx_crypto
+priority     : 300
+refcnt       : 1
+flags        : 0x85
+ptr          : 0xbf020074
+selftest     : unknown
+^^^^^^^^^^^^^^^^^^^^^^
+--
+driver       : ecb(des3_ede)-ixp4xx
+module       : ixp4xx_crypto
+priority     : 300
+refcnt       : 1
+flags        : 0x85
+ptr          : 0xbf01fe94
+selftest     : unknown
+--
+driver       : ecb(des)-ixp4xx
+module       : ixp4xx_crypto
+priority     : 300
+refcnt       : 1
+flags        : 0x85
+ptr          : 0xbf01fcb4
+selftest     : unknown
 
-Hello Dan,
+I traced the problem to crypto/algapi.c:
 
-I guess it is not clear to driver authors that they should call
-dma_run_dependencies() for each dma_async_tx_descriptor that is
-processed. Without a careful re-reading of this email, I would not have
-known. I guess anyone reviewing the driver missed it too. Judging by the
-code in other drivers, it should be called immediately after calling the
-callback function. The fsldma driver doesn't even call the function at
-the moment.
+int crypto_register_alg(struct crypto_alg *alg)
+{
+	struct crypto_larval *larval;
+	int err;
 
-To the people testing fsldma with talitos: you should probably try
-adding a call to dma_run_dependencies() in the fsl_chan_ld_cleanup()
-function. Then run your tests again, and see if the interoperability
-problems are fixed.
+	err = crypto_check_alg(alg);
+	if (err)
+		return err;
 
-I'm still working through a cleanup patch series. There are some places
-where the locking doesn't seem right to me, and I'll be attempting to
-fix those as I go through the driver.
+	down_write(&crypto_alg_sem);
+	larval = __crypto_register_alg(alg);
+	up_write(&crypto_alg_sem);
 
-Ira
+	if (IS_ERR(larval))
+		return PTR_ERR(larval);
+
+	crypto_wait_for_test(larval);
+
+At this point alg->cra_flags includes CRYPTO_ALG_DEAD (due to failed
+test), but larval->alg.cra_flags has only the original flags (0x85).
+
+I'm not sure what's the best fix.
+Currently 2.6.31.9, seems to be present in 2.6.32, too.
+-- 
+Krzysztof Halasa
