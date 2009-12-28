@@ -1,333 +1,1158 @@
 From: Max Vozeler <max@hinterhof.net>
-Subject: [PATCH 2/4] dm-crypt: multi tfm mode
-Date: Mon, 28 Dec 2009 19:59:13 +0100
-Message-ID: <1262026755-23056-3-git-send-email-max@hinterhof.net>
+Subject: [PATCH 4/4] crypto: lmk2/lmk3 cipher block modes
+Date: Mon, 28 Dec 2009 19:59:15 +0100
+Message-ID: <1262026755-23056-5-git-send-email-max@hinterhof.net>
 References: <1262026755-23056-1-git-send-email-max@hinterhof.net>
 Cc: linux-crypto@nl.linux.org, Max Vozeler <max@hinterhof.net>,
-	Milan Broz <mbroz@redhat.com>,
 	Jari Ruusu <jariruusu@users.sourceforge.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.nusquama.org ([85.131.211.20]:32862 "EHLO
+Received: from mail.nusquama.org ([85.131.211.20]:38753 "EHLO
 	mail.nusquama.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751253AbZL1Tcz (ORCPT
+	with ESMTP id S1751326AbZL1Tcz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Mon, 28 Dec 2009 14:32:55 -0500
 In-Reply-To: <1262026755-23056-1-git-send-email-max@hinterhof.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Introduces a mode for dm-crypt which uses multiple
-encryption keys (and thus tfms) alternating based on
-the sector number and the number of keys.
+This is a compatible implementation of the block chaining
+modes used by the Loop-AES block device encryption system
+(http://loop-aes.sf.net/).
 
-This change is needed to support loop-AES compatible
-block chaining modes, which use "multi:64".
+It implements two modes: lmk2 and lmk3. They correspond to
+the modes used in Loop-AES v2.x and Loop-AES v3.x and are
+intended to be full compatible.
+
+Both modes operate on full 512 byte sectors. They use CBC
+with an IV derived from the sector number, the data and (for
+lmk3 only) an extra 128-bit IV seed.
 
 Signed-off-by: Max Vozeler <max@hinterhof.net>
-Cc: Milan Broz <mbroz@redhat.com>
 Cc: Jari Ruusu <jariruusu@users.sourceforge.net>
 ---
- Documentation/device-mapper/dm-crypt.txt |    3 +-
- drivers/md/dm-crypt.c                    |  138 +++++++++++++++++++++++++----
- 2 files changed, 121 insertions(+), 20 deletions(-)
+ MAINTAINERS      |    6 +
+ crypto/Kconfig   |   17 ++
+ crypto/Makefile  |    1 +
+ crypto/lmk.c     |  434 +++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c |   30 +++
+ crypto/testmgr.h |  564 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 1052 insertions(+), 0 deletions(-)
+ create mode 100644 crypto/lmk.c
 
-diff --git a/Documentation/device-mapper/dm-crypt.txt b/Documentation/device-mapper/dm-crypt.txt
-index 6680cab..0d57442 100644
---- a/Documentation/device-mapper/dm-crypt.txt
-+++ b/Documentation/device-mapper/dm-crypt.txt
-@@ -8,11 +8,12 @@ Parameters: <cipher> <key> <iv_offset> <device path> <offset>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index efd2ef2..370efcd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4611,6 +4611,12 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-testing.g
+ S:	Maintained
+ F:	drivers/net/wireless/rtl818x/rtl8187*
  
- <cipher>
-     Encryption cipher and an optional IV generation mode.
--    (In format cipher-chainmode-ivopts:ivmode).
-+    (In format cipher-chainmode-ivopts:ivmode-multi:nkeys).
-     Examples:
-        des
-        aes-cbc-essiv:sha256
-        twofish-ecb
-+       aes-lmk3-plain64-multi:64
- 
-     /proc/crypto contains supported crypto modes
- 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index e783f93..a7c7c22 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -22,6 +22,7 @@
- #include <linux/scatterlist.h>
- #include <asm/page.h>
- #include <asm/unaligned.h>
-+#include <asm/div64.h>
- 
- #include <linux/device-mapper.h>
- 
-@@ -120,6 +121,12 @@ struct crypt_config {
- 	unsigned int iv_size;
- 
- 	/*
-+	 * crypto context selection
-+	 */
-+	struct crypto_ablkcipher **tfms;
-+	unsigned long numtfms;
++LMK BLOCK CHAINING MODE
++P:	Max Vozeler
++M:	max@hinterhof.net
++S:	Maintained
++F:	crypto/lmk.c
 +
-+	/*
- 	 * Layout of each crypto request:
- 	 *
- 	 *   struct ablkcipher_request
-@@ -137,7 +144,6 @@ struct crypt_config {
+ S3 SAVAGE FRAMEBUFFER DRIVER
+ M:	Antonino Daplas <adaplas@gmail.com>
+ L:	linux-fbdev@vger.kernel.org
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 81c185a..00d5413 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -243,6 +243,23 @@ config CRYPTO_XTS
+ 	  key size 256, 384 or 512 bits. This implementation currently
+ 	  can't handle a sectorsize which is not a multiple of 16 bytes.
  
- 	char cipher[CRYPTO_MAX_ALG_NAME];
- 	char chainmode[CRYPTO_MAX_ALG_NAME];
--	struct crypto_ablkcipher *tfm;
- 	unsigned long flags;
- 	unsigned int key_size;
- 	u8 key[0];
-@@ -273,7 +279,7 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
- 		goto bad;
- 	}
- 	if (crypto_cipher_blocksize(essiv_tfm) !=
--	    crypto_ablkcipher_ivsize(cc->tfm)) {
-+	    crypto_ablkcipher_ivsize(cc->tfms[0])) {
- 		ti->error = "Block size of ESSIV cipher does "
- 			    "not match IV size of block cipher";
- 		err = -EINVAL;
-@@ -306,7 +312,7 @@ static int crypt_iv_essiv_gen(struct crypt_config *cc, u8 *iv, sector_t sector)
- static int crypt_iv_benbi_ctr(struct crypt_config *cc, struct dm_target *ti,
- 			      const char *opts)
- {
--	unsigned bs = crypto_ablkcipher_blocksize(cc->tfm);
-+	unsigned bs = crypto_ablkcipher_blocksize(cc->tfms[0]);
- 	int log = ilog2(bs);
- 
- 	/* we need to calculate how far we must shift the sector count
-@@ -376,6 +382,56 @@ static struct crypt_iv_operations crypt_iv_null_ops = {
- 	.generator = crypt_iv_null_gen
- };
- 
-+static void crypt_free_tfms(struct crypt_config *cc)
++config CRYPTO_LMK
++	tristate "LMK support (EXPERIMENTAL)"
++	depends on EXPERIMENTAL
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_MANAGER
++	select CRYPTO_MD5
++	help
++	  LMK block cipher modes (lmk2/lmk3).
++
++	  These modes are compatible with Loop-AES. Use them with a 
++	  dm-crypt cipher string aes-lmk2-plain64-multi:64 (for Loop-AES
++	  v2.x) or aes-lmk2-plain64-multi:64 (for Loop-AES v3.x).
++
++	  The key for lmk3 must be 256, 320 or 384 bits. The first 128,
++	  192 or 256 bits in the key are used for the cipher, the rest
++	  is used as an extra input to the IV calculation.
++
+ config CRYPTO_FPU
+ 	tristate
+ 	select CRYPTO_BLKCIPHER
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 9e8f619..547a5b0 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -53,6 +53,7 @@ obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+ obj-$(CONFIG_CRYPTO_CTS) += cts.o
+ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_XTS) += xts.o
++obj-$(CONFIG_CRYPTO_LMK) += lmk.o
+ obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+diff --git a/crypto/lmk.c b/crypto/lmk.c
+new file mode 100644
+index 0000000..f7577cd
+--- /dev/null
++++ b/crypto/lmk.c
+@@ -0,0 +1,434 @@
++/*
++ * Loop-AES compatible block chaining modes (lmk2, lmk3)
++ *
++ * Copyright (c) 2009 Max Vozeler <max@hinterhof.net>
++ *
++ * With inspiration and code from cbc.c and xts.c
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of
++ * the License, or (at your option) any later version.
++ *
++ */
++
++#include <crypto/algapi.h>
++#include <crypto/hash.h>
++#include <crypto/md5.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++
++#define LMK_BLOCK_SIZE 512
++#define LMK3_IVSEED_SIZE 16
++
++struct lmk_ctx {
++	struct crypto_cipher *child;
++	struct crypto_shash *hash;
++	u8 ivseed[LMK3_IVSEED_SIZE];
++	size_t ivseedsize;
++};
++
++static int setkey(struct crypto_tfm *parent, const u8 *key,
++			     unsigned int keylen)
 +{
-+	int i;
++	struct lmk_ctx *ctx = crypto_tfm_ctx(parent);
++	struct crypto_cipher *child = ctx->child;
++	int err;
 +
-+	for (i=0; i < cc->numtfms; i++)
-+		if (cc->tfms[i])
-+			crypto_free_ablkcipher(cc->tfms[i]);
++	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_cipher_set_flags(child, crypto_tfm_get_flags(parent) &
++				       CRYPTO_TFM_REQ_MASK);
 +
-+	kfree(cc->tfms);
-+}
++	err = crypto_cipher_setkey(child, key, keylen - ctx->ivseedsize);
 +
-+static int crypt_alloc_tfms(struct crypt_config *cc, struct dm_target *ti, char *ciphermode)
-+{
-+	struct crypto_ablkcipher **tfms;
-+	int i;
++	crypto_tfm_set_flags(parent, crypto_cipher_get_flags(child) &
++				     CRYPTO_TFM_RES_MASK);
 +
-+	tfms = kcalloc(cc->numtfms, sizeof(*tfms), GFP_KERNEL);
-+	if (!tfms)
-+		return -ENOMEM;
++	if (!err && ctx->ivseedsize) {
++		if (keylen < ctx->ivseedsize)
++			return -EINVAL;
 +
-+	for (i=0; i < cc->numtfms; i++) {
-+		struct crypto_ablkcipher *tfm;
-+
-+		tfm = crypto_alloc_ablkcipher(ciphermode, 0, 0);
-+		if (IS_ERR(tfm)) {
-+			crypt_free_tfms(cc);
-+
-+			ti->error = "Error allocating crypto tfm";
-+			return PTR_ERR(tfm);
-+		}
-+
-+		tfms[i] = tfm;
-+	}
-+
-+	cc->tfms = tfms;
-+
-+	return 0;
-+}
-+
-+static struct crypto_ablkcipher *crypt_select_tfm(struct crypt_config *cc,
-+						  struct convert_context *ctx)
-+{
-+	if (cc->numtfms == 1)
-+		return cc->tfms[0];
-+	else {
-+		sector_t tmp = ctx->sector;
-+		return cc->tfms[do_div(tmp, cc->numtfms)];
-+	}
-+}
-+
- static void crypt_convert_init(struct crypt_config *cc,
- 			       struct convert_context *ctx,
- 			       struct bio *bio_out, struct bio *bio_in,
-@@ -415,7 +471,7 @@ static int crypt_convert_block(struct crypt_config *cc,
- 
- 	dmreq = dmreq_of_req(cc, req);
- 	iv = (u8 *)ALIGN((unsigned long)(dmreq + 1),
--			 crypto_ablkcipher_alignmask(cc->tfm) + 1);
-+			 crypto_ablkcipher_alignmask(cc->tfms[0]) + 1);
- 
- 	dmreq->ctx = ctx;
- 	sg_init_table(&dmreq->sg_in, 1);
-@@ -460,9 +516,15 @@ static void kcryptd_async_done(struct crypto_async_request *async_req,
- static void crypt_alloc_req(struct crypt_config *cc,
- 			    struct convert_context *ctx)
- {
-+	struct crypto_ablkcipher *tfm;
-+
- 	if (!cc->req)
- 		cc->req = mempool_alloc(cc->req_pool, GFP_NOIO);
--	ablkcipher_request_set_tfm(cc->req, cc->tfm);
-+
-+	tfm = crypt_select_tfm(cc, ctx);
-+
-+	ablkcipher_request_set_tfm(cc->req, tfm);
-+
- 	ablkcipher_request_set_callback(cc->req, CRYPTO_TFM_REQ_MAY_BACKLOG |
- 					CRYPTO_TFM_REQ_MAY_SLEEP,
- 					kcryptd_async_done,
-@@ -974,6 +1036,21 @@ static void crypt_encode_key(char *hex, u8 *key, unsigned int size)
- 	}
- }
- 
-+static int crypt_set_subkeys(struct crypt_config *cc, const u8 *key)
-+{
-+	int i, err = 0;
-+	unsigned subkey_size = cc->key_size / cc->numtfms;
-+
-+	for (i=0; i < cc->numtfms; i++) {
-+		err = crypto_ablkcipher_setkey(cc->tfms[i],
-+				cc->key + (i * subkey_size), subkey_size);
-+		if (err)
-+			break;
++		memcpy(ctx->ivseed, key + keylen - ctx->ivseedsize,
++				ctx->ivseedsize);
 +	}
 +
 +	return err;
 +}
 +
- static int crypt_set_key(struct crypt_config *cc, char *key)
- {
- 	unsigned key_size = strlen(key) >> 1;
-@@ -989,14 +1066,15 @@ static int crypt_set_key(struct crypt_config *cc, char *key)
- 
- 	set_bit(DM_CRYPT_KEY_VALID, &cc->flags);
- 
--	return crypto_ablkcipher_setkey(cc->tfm, cc->key, cc->key_size);
-+	return crypt_set_subkeys(cc, cc->key);
- }
- 
- static int crypt_wipe_key(struct crypt_config *cc)
- {
- 	clear_bit(DM_CRYPT_KEY_VALID, &cc->flags);
- 	memset(&cc->key, 0, cc->key_size * sizeof(u8));
--	return crypto_ablkcipher_setkey(cc->tfm, cc->key, cc->key_size);
++static inline void cpu_to_le32_array(u32 *buf, unsigned int words)
++{
++	while (words--) {
++		__cpu_to_le32s(buf);
++		buf++;
++	}
++}
 +
-+	return crypt_set_subkeys(cc, cc->key);
- }
- 
- /*
-@@ -1006,12 +1084,13 @@ static int crypt_wipe_key(struct crypt_config *cc)
- static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- {
- 	struct crypt_config *cc;
--	struct crypto_ablkcipher *tfm;
- 	char *tmp;
- 	char *cipher;
- 	char *chainmode;
- 	char *ivmode;
- 	char *ivopts;
-+	char *tfmmode;
-+	char *tfmopts;
- 	unsigned int key_size;
- 	unsigned long long tmpll;
- 	char ciphermode[CRYPTO_MAX_ALG_NAME];
-@@ -1026,6 +1105,8 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	chainmode = strsep(&tmp, "-");
- 	ivopts = strsep(&tmp, "-");
- 	ivmode = strsep(&ivopts, ":");
-+	tfmopts = strsep(&tmp, "-");
-+	tfmmode = strsep(&tfmopts, ":");
- 
- 	if (tmp)
- 		DMWARN("Unexpected additional cipher options");
-@@ -1056,15 +1137,32 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		goto bad_cipher;
- 	}
- 
--	tfm = crypto_alloc_ablkcipher(ciphermode, 0, 0);
--	if (IS_ERR(tfm)) {
--		ti->error = "Error allocating crypto tfm";
-+	strcpy(cc->cipher, cipher);
-+	strcpy(cc->chainmode, chainmode);
++static int tweakiv_seed(struct shash_desc *desc, u8 *ivseed, size_t ivseedsize)
++{
++	u8 buf[64];
++	int err = 0;
++
++	memcpy(buf, ivseed, ivseedsize);
++	memset(buf + ivseedsize, 0, sizeof(buf) - ivseedsize);
++
++	err = crypto_shash_update(desc, buf, sizeof(buf));
++
++	memset(buf, 0, sizeof(buf));
++
++	return err;
++}
++
++static int tweakiv(struct lmk_ctx *ctx,
++		    u8 *ivout, const u8 *ivin,
++		    const u8 *data, size_t datalen)
++{
++	u64 iv;
++	u32 tmp[16];
++	int err = 0;
++	struct {
++		struct shash_desc desc;
++		char ctx[crypto_shash_descsize(ctx->hash)];
++	} sdesc;
++	struct md5_state md5state;
++
++	sdesc.desc.tfm = ctx->hash;
++	sdesc.desc.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++
++	err = crypto_shash_init(&sdesc.desc);
++	if (err)
++		goto cleanup;
++
++	if (ctx->ivseedsize) {
++		err = tweakiv_seed(&sdesc.desc, ctx->ivseed, ctx->ivseedsize);
++		if (err)
++			goto cleanup;
++	}
++
++	/* Add data blocks 1-28 */
++	err = crypto_shash_update(&sdesc.desc, data + 16, 16*28);
++	if (err)
++		goto cleanup;
++
++	/* Truncate inputiv to 56-bits. */
++	iv = le64_to_cpup((__le64 *)ivin);
++	iv &= ~((u64) 255 << 56);
++
++	/* Add buffer of data blocks 29-31, inputiv, format magic */
++	memcpy(tmp, data + 16*29, 16*3);
++
++	tmp[12] = iv & 0xffffffff;
++	tmp[13] = (iv >> 32 & 0xffffffff) | 0x80000000;
++	tmp[14] = 4024; /* format magic for lmk2 and lmk3 */
++	tmp[15] = 0;
++	cpu_to_le32_array(tmp + 12, 4);
++
++	err = crypto_shash_update(&sdesc.desc, (u8 *)tmp, sizeof(tmp));
++	if (err)
++		goto cleanup;
 +
 +	/*
-+	 * Choose multi key mode. Valid modes: "single", "multi:<n>"
++	 * This mode uses md5 without padding, so we need _export()
++	 * rather than final().
 +	 */
 +
-+	if (tfmmode == NULL || strcmp(tfmmode, "single") == 0)
-+		cc->numtfms =  1;
-+	else if (strcmp(tfmmode, "multi") == 0) {
-+		if (tfmopts == NULL) {
-+			ti->error = "Number of keys missing for multi-tfm mode";
-+			return -EINVAL;
++	err = crypto_shash_export(&sdesc.desc, &md5state);
++	if (err)
++		goto cleanup;
++
++	cpu_to_le32_array(md5state.hash, sizeof(md5state.hash) / sizeof(u32));
++	memcpy(ivout, &md5state.hash, sizeof(md5state.hash));
++
++cleanup:
++	memset(tmp, 0, sizeof(tmp));
++
++	return err;
++}
++
++static int encrypt_segment(struct crypto_blkcipher *tfm,
++			   struct blkcipher_walk *walk)
++{
++	int err;
++	struct lmk_ctx *ctx = crypto_blkcipher_ctx(tfm);
++	struct crypto_cipher *child = ctx->child;
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(child)->cia_encrypt;
++
++	unsigned int bsize = crypto_cipher_blocksize(child);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++
++	u8 iv[bsize];
++
++	err = tweakiv(ctx, iv, walk->iv, src, nbytes);
++	if (err)
++		return err;
++
++	do {
++		crypto_xor(iv, src, bsize);
++		fn(crypto_cipher_tfm(child), dst, iv);
++
++		memcpy(iv, dst, bsize);
++
++		src += bsize;
++		dst += bsize;
++	} while ((nbytes -= bsize) >= bsize);
++
++	return 0;
++}
++
++static int decrypt_segment(struct crypto_blkcipher *tfm,
++			   struct blkcipher_walk *walk)
++{
++	int err;
++
++	struct lmk_ctx *ctx = crypto_blkcipher_ctx(tfm);
++	struct crypto_cipher *child = ctx->child;
++	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
++		crypto_cipher_alg(child)->cia_decrypt;
++
++	unsigned int bsize = crypto_cipher_blocksize(child);
++	unsigned int nbytes = walk->nbytes;
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	unsigned long offset;
++
++	u8 iv[bsize];
++
++	memcpy(iv, src, bsize);
++	offset = bsize;
++	do {
++		u8 tmpiv[bsize];
++		memcpy(tmpiv, src+offset, bsize);
++
++		fn(crypto_cipher_tfm(child), dst+offset, src+offset);
++		crypto_xor(dst+offset, iv, bsize);
++
++		memcpy(iv, tmpiv, bsize);
++
++		offset += bsize;
++	} while ((nbytes -= bsize) >= (2*bsize));
++
++	err = tweakiv(ctx, iv, walk->iv, dst, walk->nbytes);
++	if (err)
++		return err;
++
++	fn(crypto_cipher_tfm(child), dst, src);
++	crypto_xor(dst, iv, bsize);
++
++	memcpy(walk->iv, iv, bsize);
++	return 0;
++}
++
++static int crypt(struct blkcipher_desc *desc,
++		 struct scatterlist *dst,
++		 struct scatterlist *src,
++		 unsigned int nbytes,
++		 int (*fn)(struct crypto_blkcipher *, struct blkcipher_walk *))
++{
++	struct blkcipher_walk walk;
++	struct crypto_blkcipher *tfm = desc->tfm;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++
++	err = blkcipher_walk_virt(desc, &walk);
++	if (!walk.nbytes)
++		return err;
++
++	while ((nbytes = walk.nbytes)) {
++		err = fn(tfm, &walk);
++		if (err)
++			return err;
++
++		err = blkcipher_walk_done(desc, &walk, 0);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static int encrypt(struct blkcipher_desc *desc,
++	    struct scatterlist *dst, struct scatterlist *src,
++	    unsigned int nbytes)
++{
++	return crypt(desc, dst, src, nbytes, encrypt_segment);
++}
++
++static int decrypt(struct blkcipher_desc *desc,
++		   struct scatterlist *dst, struct scatterlist *src,
++		   unsigned int nbytes)
++{
++	return crypt(desc, dst, src, nbytes, decrypt_segment);
++}
++
++static int init_tfm(struct crypto_tfm *tfm, size_t ivseedsize)
++{
++	struct crypto_instance *inst = (void *)tfm->__crt_alg;
++	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
++	struct lmk_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_cipher *cipher;
++	struct crypto_shash *hash;
++	u32 *flags = &tfm->crt_flags;
++
++	cipher = crypto_spawn_cipher(spawn);
++	if (IS_ERR(cipher))
++		return PTR_ERR(cipher);
++
++	if (crypto_cipher_blocksize(cipher) != 16) {
++		*flags |= CRYPTO_TFM_RES_BAD_BLOCK_LEN;
++		crypto_free_cipher(cipher);
++		return -EINVAL;
++	}
++
++	ctx->child = cipher;
++
++	hash = crypto_alloc_shash("md5", 0, 0);
++	if (IS_ERR(hash)) {
++		crypto_free_cipher(cipher);
++		return PTR_ERR(hash);
++	}
++
++	ctx->hash = hash;
++	ctx->ivseedsize = ivseedsize;
++
++	return 0;
++}
++
++static int lmk2_init_tfm(struct crypto_tfm *tfm)
++{
++	return init_tfm(tfm, 0);
++}
++
++static int lmk3_init_tfm(struct crypto_tfm *tfm)
++{
++	return init_tfm(tfm, LMK3_IVSEED_SIZE);
++}
++
++static void exit_tfm(struct crypto_tfm *tfm)
++{
++	struct lmk_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	memset(ctx->ivseed, 0, sizeof(ctx->ivseed));
++
++	crypto_free_cipher(ctx->child);
++	crypto_free_shash(ctx->hash);
++}
++
++static struct crypto_instance *alloc(struct rtattr **tb, const char *name,
++				     size_t ivseedsize,
++				     int (*init_tfm_func)(struct crypto_tfm *))
++{
++	struct crypto_instance *inst;
++	struct crypto_alg *alg;
++	int err;
++
++	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
++	if (err)
++		return ERR_PTR(err);
++
++	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
++				  CRYPTO_ALG_TYPE_MASK);
++	if (IS_ERR(alg))
++		return ERR_CAST(alg);
++
++	inst = ERR_PTR(-EINVAL);
++	if (!is_power_of_2(alg->cra_blocksize))
++		goto out_put_alg;
++
++	inst = crypto_alloc_instance(name, alg);
++	if (IS_ERR(inst))
++		goto out_put_alg;
++
++	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
++	inst->alg.cra_priority = alg->cra_priority;
++	inst->alg.cra_blocksize = LMK_BLOCK_SIZE;
++	inst->alg.cra_alignmask = alg->cra_alignmask;
++	inst->alg.cra_type = &crypto_blkcipher_type;
++
++	/* We access the data as u32s when xoring. */
++	inst->alg.cra_alignmask |= __alignof__(u32) - 1;
++
++	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
++
++	/* Key size includes IV tweak key for lmk3 */
++	inst->alg.cra_blkcipher.min_keysize =
++		alg->cra_cipher.cia_min_keysize + ivseedsize;
++	inst->alg.cra_blkcipher.max_keysize =
++		alg->cra_cipher.cia_max_keysize + ivseedsize;
++
++	inst->alg.cra_ctxsize = sizeof(struct lmk_ctx);
++
++	inst->alg.cra_init = init_tfm_func;
++	inst->alg.cra_exit = exit_tfm;
++
++	inst->alg.cra_blkcipher.setkey = setkey;
++	inst->alg.cra_blkcipher.encrypt = encrypt;
++	inst->alg.cra_blkcipher.decrypt = decrypt;
++
++out_put_alg:
++	crypto_mod_put(alg);
++	return inst;
++}
++
++static struct crypto_instance *lmk2_alloc(struct rtattr **tb)
++{
++	return alloc(tb, "lmk2", 0, lmk2_init_tfm);
++}
++
++static struct crypto_instance *lmk3_alloc(struct rtattr **tb)
++{
++	return alloc(tb, "lmk3", LMK3_IVSEED_SIZE, lmk3_init_tfm);
++}
++
++static void free(struct crypto_instance *inst)
++{
++	crypto_drop_spawn(crypto_instance_ctx(inst));
++	kfree(inst);
++}
++
++static struct crypto_template lmk2_tmpl = {
++	.name = "lmk2",
++	.alloc = lmk2_alloc,
++	.free = free,
++	.module = THIS_MODULE,
++};
++
++static struct crypto_template lmk3_tmpl = {
++	.name = "lmk3",
++	.alloc = lmk3_alloc,
++	.free = free,
++	.module = THIS_MODULE,
++};
++
++static int __init crypto_module_init(void)
++{
++	int err;
++
++	err = crypto_register_template(&lmk2_tmpl);
++	if (err)
++		return err;
++
++	err = crypto_register_template(&lmk3_tmpl);
++	if (err)
++		crypto_unregister_template(&lmk2_tmpl);
++
++	return err;
++}
++
++static void __exit crypto_module_exit(void)
++{
++	crypto_unregister_template(&lmk2_tmpl);
++	crypto_unregister_template(&lmk3_tmpl);
++}
++
++module_init(crypto_module_init);
++module_exit(crypto_module_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("LMK block cipher chaining algorithm");
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c494d76..8de7196 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2113,6 +2113,36 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "lmk2(aes)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = {
++				.enc = {
++					.vecs = aes_lmk2_enc_tv_template,
++					.count = AES_LMK2_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = aes_lmk2_dec_tv_template,
++					.count = AES_LMK2_DEC_TEST_VECTORS
++				}
++			}
 +		}
-+
-+		if (strict_strtoul(tfmopts, 10, &cc->numtfms) < 0) {
-+			ti->error = "Number of keys badly formatted";
-+			return -EINVAL;
++	}, {
++		.alg = "lmk3(aes)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = {
++				.enc = {
++					.vecs = aes_lmk3_enc_tv_template,
++					.count = AES_LMK3_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = aes_lmk3_dec_tv_template,
++					.count = AES_LMK3_DEC_TEST_VECTORS
++				}
++			}
 +		}
-+	} else {
-+		ti->error = "Invalid tfm mode";
- 		goto bad_cipher;
- 	}
++	}, {
+ 		.alg = "lrw(aes)",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index fb76517..13177fd 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -3134,6 +3134,570 @@ static struct cipher_testvec aes_cbc_dec_tv_template[] = {
+ 	},
+ };
  
--	strcpy(cc->cipher, cipher);
--	strcpy(cc->chainmode, chainmode);
--	cc->tfm = tfm;
-+	if (crypt_alloc_tfms(cc, ti, ciphermode) < 0)
-+		goto bad_cipher;
- 
- 	if (crypt_set_key(cc, argv[1]) < 0) {
- 		ti->error = "Error decoding and setting key";
-@@ -1103,7 +1201,7 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		goto bad_slab_pool;
- 	}
- 
--	cc->iv_size = crypto_ablkcipher_ivsize(tfm);
-+	cc->iv_size = crypto_ablkcipher_ivsize(cc->tfms[0]);
- 	if (cc->iv_size)
- 		/* at least a 64 bit sector number should fit in our buffer */
- 		cc->iv_size = max(cc->iv_size,
-@@ -1124,9 +1222,9 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	}
- 
- 	cc->dmreq_start = sizeof(struct ablkcipher_request);
--	cc->dmreq_start += crypto_ablkcipher_reqsize(tfm);
-+	cc->dmreq_start += crypto_ablkcipher_reqsize(cc->tfms[0]);
- 	cc->dmreq_start = ALIGN(cc->dmreq_start, crypto_tfm_ctx_alignment());
--	cc->dmreq_start += crypto_ablkcipher_alignmask(tfm) &
-+	cc->dmreq_start += crypto_ablkcipher_alignmask(cc->tfms[0]) &
- 			   ~(crypto_tfm_ctx_alignment() - 1);
- 
- 	cc->req_pool = mempool_create_kmalloc_pool(MIN_IOS, cc->dmreq_start +
-@@ -1213,7 +1311,7 @@ bad_slab_pool:
- 	if (cc->iv_gen_ops && cc->iv_gen_ops->dtr)
- 		cc->iv_gen_ops->dtr(cc);
- bad_ivmode:
--	crypto_free_ablkcipher(tfm);
-+	crypt_free_tfms(cc);
- bad_cipher:
- 	/* Must zero key material before freeing */
- 	kzfree(cc);
-@@ -1238,7 +1336,9 @@ static void crypt_dtr(struct dm_target *ti)
- 	kfree(cc->iv_mode);
- 	if (cc->iv_gen_ops && cc->iv_gen_ops->dtr)
- 		cc->iv_gen_ops->dtr(cc);
--	crypto_free_ablkcipher(cc->tfm);
++#define AES_LMK2_ENC_TEST_VECTORS 1
++#define AES_LMK2_DEC_TEST_VECTORS 1
 +
-+	crypt_free_tfms(cc);
++static struct cipher_testvec aes_lmk2_enc_tv_template[] = {
++	{
++		.key    = zeroed_string,
++		.klen   = 16,
++		.iv     = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.input  = "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ilen   = 512,
++		.result = "\x5f\xde\xa5\x1e\x9c\x0c\xae\x48"
++			  "\x70\xd0\x28\x11\x71\xc0\xf9\x9b"
++			  "\x0d\x8f\x16\x23\x99\x15\x0e\xac"
++			  "\x13\x5d\x6e\xcc\x5f\x10\x1c\xd1"
++			  "\x9e\x08\xbf\xf3\x5a\xb5\x4a\x90"
++			  "\xc0\x3f\xa7\x45\xf4\x17\x21\xb3"
++			  "\x36\xea\x7e\xea\xe8\xdc\x51\xf4"
++			  "\x0e\xc8\xe3\x43\x08\x3e\xa2\x29"
++			  "\x54\x5c\x75\xa7\xc1\xf7\x7e\x1f"
++			  "\x5b\xdf\x54\xa0\xce\xf9\xb2\x3f"
++			  "\x2c\x02\x21\xd2\x20\x48\x62\xf4"
++			  "\x6a\x31\x94\x23\xff\xfe\xe2\x11"
++			  "\xeb\xe3\x1d\x40\xcc\x70\xca\xe8"
++			  "\xaa\xbc\x51\x64\x9f\x87\xde\x08"
++			  "\xc0\xd3\x3c\x2b\x5f\x65\x6e\x72"
++			  "\xd7\x33\x9a\x28\x99\x41\x30\x07"
++			  "\xce\x37\xc9\x7c\x04\x42\xdb\x9e"
++			  "\x20\xb1\x7f\xd1\x6c\x38\x2d\x64"
++			  "\xa5\x82\xba\xa8\x03\xda\xb4\xe2"
++			  "\x33\xb5\x1b\x38\x82\xc7\xa7\x4b"
++			  "\xfc\x3f\x50\x13\x36\x8d\x6f\x20"
++			  "\x05\xca\xc2\x3c\x3f\x1c\xfa\x92"
++			  "\x0c\xb1\x27\x3d\xc6\x86\x95\xec"
++			  "\xee\xa1\xf2\xae\xf4\xd9\x0d\xb0"
++			  "\xa5\x1d\x85\xe6\x8b\xca\x93\x28"
++			  "\x5e\xdf\xa5\x21\xfe\x2a\xf2\xe1"
++			  "\x10\x56\x76\x76\xb4\x52\x6f\x11"
++			  "\x17\x4f\x10\x38\xe2\x41\x09\x89"
++			  "\xcb\x87\x03\x97\xcd\x8f\xe2\x9b"
++			  "\xaa\xa4\x0d\xb7\x38\x46\x80\xc0"
++			  "\x54\x77\xf4\xb9\xd5\x3c\xa8\xbd"
++			  "\x28\x1a\x8d\x43\xbf\xe6\x7b\x36"
++			  "\x01\xb4\x10\x9c\x60\x7a\x2b\x4b"
++			  "\xd0\x7b\xad\xe1\x1f\xa5\x84\xbc"
++			  "\x6a\x31\x8e\x56\xdf\xce\x3a\xb4"
++			  "\xed\x62\xb7\xf3\xa7\xc0\x11\x2b"
++			  "\xce\xa4\x55\xaf\x57\x40\xf5\x30"
++			  "\x8f\xce\x01\xe9\xf6\x80\xba\x97"
++			  "\x5f\x0d\x61\x3a\x72\xd1\x4a\x65"
++			  "\x5f\xcf\x35\xd2\x73\x80\x6c\xa1"
++			  "\xfa\x42\xda\x6a\xf8\xcc\x0b\xc5"
++			  "\x8e\x92\xf3\x10\xe3\xf7\x8a\xa9"
++			  "\xe6\xb8\x70\x23\xaf\xdb\x18\x38"
++			  "\xea\x5f\xbb\x50\xc8\xc3\xa5\x76"
++			  "\x15\xe3\x8e\x3a\x79\x73\x28\x3b"
++			  "\xb3\xc2\xb2\xe5\x27\x29\xb5\x6a"
++			  "\xd7\xcc\x11\xb7\x37\xb4\xf1\x86"
++			  "\x55\xc5\x78\xa4\x8d\xf5\xcb\xfe"
++			  "\x6b\x6d\xf0\x09\xae\x47\xcd\xdf"
++			  "\x9c\x8d\x57\xb0\x53\xb5\xc2\x09"
++			  "\x55\xcf\x5b\xb6\x12\xce\x64\xf6"
++			  "\xf4\x61\x03\x7d\xd2\xc8\x9a\x8d"
++			  "\xeb\x4f\xbd\x35\x65\x62\xbe\x30"
++			  "\xcd\xf4\xf1\x06\xe9\x17\x34\x11"
++			  "\xea\x65\x1b\x54\x28\x4c\x3a\x1a"
++			  "\xd3\x66\x45\x01\xd5\xfe\xbd\x67"
++			  "\xfe\x12\x84\x40\x47\xaa\xc1\x37"
++			  "\xa5\xe6\x24\xfd\x7e\x8f\x3f\x9b"
++			  "\x92\x5f\x89\xf0\x5e\xc9\x45\x18"
++			  "\xe1\x45\x5f\x58\xe9\xc0\x57\xcd"
++			  "\x44\x0e\x89\x08\x74\xfc\x32\xd5"
++			  "\x10\xe6\xd6\xec\x30\xd9\xd5\xe4"
++			  "\xc6\x0a\x83\x9f\xa2\x81\x94\xa6"
++			  "\xda\x56\x06\x9e\x8a\x92\x7e\x7d",
++		.rlen   = 512,
++	}
++};
 +
- 	dm_put_device(ti, cc->dev);
- 
- 	/* Must zero key material before freeing */
++static struct cipher_testvec aes_lmk2_dec_tv_template[] = {
++	{
++		.key    = zeroed_string,
++		.klen   = 16,
++		.iv     = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.input  = "\x5f\xde\xa5\x1e\x9c\x0c\xae\x48"
++			  "\x70\xd0\x28\x11\x71\xc0\xf9\x9b"
++			  "\x0d\x8f\x16\x23\x99\x15\x0e\xac"
++			  "\x13\x5d\x6e\xcc\x5f\x10\x1c\xd1"
++			  "\x9e\x08\xbf\xf3\x5a\xb5\x4a\x90"
++			  "\xc0\x3f\xa7\x45\xf4\x17\x21\xb3"
++			  "\x36\xea\x7e\xea\xe8\xdc\x51\xf4"
++			  "\x0e\xc8\xe3\x43\x08\x3e\xa2\x29"
++			  "\x54\x5c\x75\xa7\xc1\xf7\x7e\x1f"
++			  "\x5b\xdf\x54\xa0\xce\xf9\xb2\x3f"
++			  "\x2c\x02\x21\xd2\x20\x48\x62\xf4"
++			  "\x6a\x31\x94\x23\xff\xfe\xe2\x11"
++			  "\xeb\xe3\x1d\x40\xcc\x70\xca\xe8"
++			  "\xaa\xbc\x51\x64\x9f\x87\xde\x08"
++			  "\xc0\xd3\x3c\x2b\x5f\x65\x6e\x72"
++			  "\xd7\x33\x9a\x28\x99\x41\x30\x07"
++			  "\xce\x37\xc9\x7c\x04\x42\xdb\x9e"
++			  "\x20\xb1\x7f\xd1\x6c\x38\x2d\x64"
++			  "\xa5\x82\xba\xa8\x03\xda\xb4\xe2"
++			  "\x33\xb5\x1b\x38\x82\xc7\xa7\x4b"
++			  "\xfc\x3f\x50\x13\x36\x8d\x6f\x20"
++			  "\x05\xca\xc2\x3c\x3f\x1c\xfa\x92"
++			  "\x0c\xb1\x27\x3d\xc6\x86\x95\xec"
++			  "\xee\xa1\xf2\xae\xf4\xd9\x0d\xb0"
++			  "\xa5\x1d\x85\xe6\x8b\xca\x93\x28"
++			  "\x5e\xdf\xa5\x21\xfe\x2a\xf2\xe1"
++			  "\x10\x56\x76\x76\xb4\x52\x6f\x11"
++			  "\x17\x4f\x10\x38\xe2\x41\x09\x89"
++			  "\xcb\x87\x03\x97\xcd\x8f\xe2\x9b"
++			  "\xaa\xa4\x0d\xb7\x38\x46\x80\xc0"
++			  "\x54\x77\xf4\xb9\xd5\x3c\xa8\xbd"
++			  "\x28\x1a\x8d\x43\xbf\xe6\x7b\x36"
++			  "\x01\xb4\x10\x9c\x60\x7a\x2b\x4b"
++			  "\xd0\x7b\xad\xe1\x1f\xa5\x84\xbc"
++			  "\x6a\x31\x8e\x56\xdf\xce\x3a\xb4"
++			  "\xed\x62\xb7\xf3\xa7\xc0\x11\x2b"
++			  "\xce\xa4\x55\xaf\x57\x40\xf5\x30"
++			  "\x8f\xce\x01\xe9\xf6\x80\xba\x97"
++			  "\x5f\x0d\x61\x3a\x72\xd1\x4a\x65"
++			  "\x5f\xcf\x35\xd2\x73\x80\x6c\xa1"
++			  "\xfa\x42\xda\x6a\xf8\xcc\x0b\xc5"
++			  "\x8e\x92\xf3\x10\xe3\xf7\x8a\xa9"
++			  "\xe6\xb8\x70\x23\xaf\xdb\x18\x38"
++			  "\xea\x5f\xbb\x50\xc8\xc3\xa5\x76"
++			  "\x15\xe3\x8e\x3a\x79\x73\x28\x3b"
++			  "\xb3\xc2\xb2\xe5\x27\x29\xb5\x6a"
++			  "\xd7\xcc\x11\xb7\x37\xb4\xf1\x86"
++			  "\x55\xc5\x78\xa4\x8d\xf5\xcb\xfe"
++			  "\x6b\x6d\xf0\x09\xae\x47\xcd\xdf"
++			  "\x9c\x8d\x57\xb0\x53\xb5\xc2\x09"
++			  "\x55\xcf\x5b\xb6\x12\xce\x64\xf6"
++			  "\xf4\x61\x03\x7d\xd2\xc8\x9a\x8d"
++			  "\xeb\x4f\xbd\x35\x65\x62\xbe\x30"
++			  "\xcd\xf4\xf1\x06\xe9\x17\x34\x11"
++			  "\xea\x65\x1b\x54\x28\x4c\x3a\x1a"
++			  "\xd3\x66\x45\x01\xd5\xfe\xbd\x67"
++			  "\xfe\x12\x84\x40\x47\xaa\xc1\x37"
++			  "\xa5\xe6\x24\xfd\x7e\x8f\x3f\x9b"
++			  "\x92\x5f\x89\xf0\x5e\xc9\x45\x18"
++			  "\xe1\x45\x5f\x58\xe9\xc0\x57\xcd"
++			  "\x44\x0e\x89\x08\x74\xfc\x32\xd5"
++			  "\x10\xe6\xd6\xec\x30\xd9\xd5\xe4"
++			  "\xc6\x0a\x83\x9f\xa2\x81\x94\xa6"
++			  "\xda\x56\x06\x9e\x8a\x92\x7e\x7d",
++		.ilen   = 512,
++		.result = "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.rlen   = 512,
++	}
++};
++
++#define AES_LMK3_ENC_TEST_VECTORS 1
++#define AES_LMK3_DEC_TEST_VECTORS 1
++
++static struct cipher_testvec aes_lmk3_enc_tv_template[] = {
++	{
++		.key    = "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA"
++			  "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA"
++			  "\xBB\xBB\xBB\xBB\xBB\xBB\xBB\xBB"
++			  "\xBB\xBB\xBB\xBB\xBB\xBB\xBB\xBB",
++		.klen   = 16 + 16,
++		.iv     = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.input  = "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ilen   = 512,
++		.result = "\xd6\x2a\x8d\xa1\x87\x84\x35\x07"
++			  "\x6e\x82\x3f\x8a\x1b\x9d\xe9\x12"
++			  "\x66\x19\x18\x70\x01\xaa\x48\x08"
++			  "\x6c\x62\x87\xc8\x68\x82\xd0\xff"
++			  "\xc4\x87\xcd\xfa\xc1\x30\x0c\x67"
++			  "\xb1\x58\xfc\x91\xc6\x39\x9e\x50"
++			  "\xfe\x44\x0f\x59\x7d\x75\x4b\x64"
++			  "\x8a\x94\xf6\x2b\x78\xa3\xd2\x2b"
++			  "\x23\x4b\xad\x0f\xf4\xb9\x3a\x5b"
++			  "\x0b\xdf\x56\x36\x18\x9a\x9d\xb4"
++			  "\x0d\x83\x24\x05\x67\x30\xbc\xe1"
++			  "\x8a\x71\x8a\x3f\x90\x92\x2c\xfb"
++			  "\x31\x0e\xf8\xba\xdc\x44\xce\x84"
++			  "\x63\xd8\x99\x4c\x11\x4c\xe3\x8f"
++			  "\xef\x48\x01\x82\x54\x10\xf2\x9a"
++			  "\xd8\x6d\x73\x41\xe4\x77\x58\x42"
++			  "\x5b\x68\x97\x0f\x50\x20\xbf\x9e"
++			  "\x2b\xdd\x1e\x10\x0a\xbd\x6a\xb4"
++			  "\x0d\x5a\x41\xd3\xda\x2c\x0b\x0f"
++			  "\xff\x04\xae\x2c\x1a\x3b\x85\x03"
++			  "\x57\xc7\x53\x22\x9a\xee\x42\x5c"
++			  "\x2e\xe3\xe2\xb7\x22\xaa\x19\x68"
++			  "\x77\xce\x60\x0a\x0d\xea\x92\xf3"
++			  "\xab\x1b\x70\x4c\x24\x13\xa9\x23"
++			  "\x33\x39\x5a\x76\x39\x73\xfb\x0f"
++			  "\x1a\x52\x8d\xb6\x48\xbe\x12\x0e"
++			  "\xf1\x8b\x26\x45\x40\xac\xc7\xb1"
++			  "\x30\x4f\xfa\xbc\xa4\xce\x0b\xe1"
++			  "\x42\xc1\x61\x31\x48\x9b\x45\x57"
++			  "\xf3\x93\x8a\xce\xea\x16\xb6\x75"
++			  "\xd3\x63\xc5\x02\x7b\xe5\x19\xae"
++			  "\x45\x53\xad\xfc\x6f\xdd\x67\xb0"
++			  "\x3c\x75\x14\xf5\xab\x3c\xd2\x1b"
++			  "\x47\x2d\x54\x2e\x53\x4d\xb7\x27"
++			  "\x76\x62\x7c\x9a\xd9\x13\x59\x7c"
++			  "\x87\x08\x09\xee\x8a\x4c\x77\x62"
++			  "\xc3\xcd\x50\x05\x9d\x48\x85\xf9"
++			  "\xc9\xfc\x20\xb0\x67\x96\xad\xc8"
++			  "\x7b\x69\x91\x13\x0d\x2c\x73\x81"
++			  "\x2e\x2e\x79\x96\x0b\xa2\x95\x5f"
++			  "\x05\xe6\xdc\xac\x94\x64\xcc\xae"
++			  "\x78\x5a\x47\x86\x54\xf6\x27\xb5"
++			  "\xbf\x4d\x1c\xef\x0a\xc8\xa2\x6e"
++			  "\xde\xdb\x2f\x9a\x0e\x38\xef\x84"
++			  "\xe0\x7d\xa9\xc9\xc3\x63\xfe\xcb"
++			  "\x1f\x23\xf1\x8b\x4a\x0d\x5c\x71"
++			  "\x8c\xe0\xc6\x91\x17\xbc\xbf\x17"
++			  "\x32\x9d\x5b\x5c\xeb\xfc\xc9\x75"
++			  "\x23\x9a\x3d\x76\xc3\x02\xf3\x61"
++			  "\x57\x40\xc6\x52\x8e\x1d\x44\xdc"
++			  "\xbf\xd7\x23\x0b\x4a\xd6\xf1\xe6"
++			  "\x4a\xff\x75\x14\x95\x3a\xf1\x0f"
++			  "\x5a\x7e\xf7\x0e\x58\x8a\xaa\x29"
++			  "\x1e\xae\xf1\x86\x03\xc4\x93\x43"
++			  "\x8a\xe2\x9e\x95\x28\x1c\x68\x51"
++			  "\xb5\x7c\xd5\xc3\xec\x03\x0d\x40"
++			  "\xb4\xf7\xa7\xb2\x62\x29\xff\x5b"
++			  "\xd3\x57\x5b\x3d\x27\xfb\x79\xdc"
++			  "\x3d\x31\x0e\x87\xf4\x20\xea\x16"
++			  "\x54\xde\xa2\xdd\x49\xfd\x8f\x74"
++			  "\xf4\xcd\x91\x1f\xdd\x68\x86\x82"
++			  "\x9b\x1f\x43\x7d\x43\xf4\xf6\xaa"
++			  "\x8b\x81\xc8\xb8\x14\x3b\x06\xfc"
++			  "\x91\xa6\x1c\x30\xc9\x55\xd1\xae",
++		.rlen   = 512,
++	},
++};
++
++static struct cipher_testvec aes_lmk3_dec_tv_template[] = {
++	{
++		.key    = "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA"
++			  "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA"
++			  "\xBB\xBB\xBB\xBB\xBB\xBB\xBB\xBB"
++			  "\xBB\xBB\xBB\xBB\xBB\xBB\xBB\xBB",
++		.klen   = 16 + 16,
++		.iv     = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.input  = "\xd6\x2a\x8d\xa1\x87\x84\x35\x07"
++			  "\x6e\x82\x3f\x8a\x1b\x9d\xe9\x12"
++			  "\x66\x19\x18\x70\x01\xaa\x48\x08"
++			  "\x6c\x62\x87\xc8\x68\x82\xd0\xff"
++			  "\xc4\x87\xcd\xfa\xc1\x30\x0c\x67"
++			  "\xb1\x58\xfc\x91\xc6\x39\x9e\x50"
++			  "\xfe\x44\x0f\x59\x7d\x75\x4b\x64"
++			  "\x8a\x94\xf6\x2b\x78\xa3\xd2\x2b"
++			  "\x23\x4b\xad\x0f\xf4\xb9\x3a\x5b"
++			  "\x0b\xdf\x56\x36\x18\x9a\x9d\xb4"
++			  "\x0d\x83\x24\x05\x67\x30\xbc\xe1"
++			  "\x8a\x71\x8a\x3f\x90\x92\x2c\xfb"
++			  "\x31\x0e\xf8\xba\xdc\x44\xce\x84"
++			  "\x63\xd8\x99\x4c\x11\x4c\xe3\x8f"
++			  "\xef\x48\x01\x82\x54\x10\xf2\x9a"
++			  "\xd8\x6d\x73\x41\xe4\x77\x58\x42"
++			  "\x5b\x68\x97\x0f\x50\x20\xbf\x9e"
++			  "\x2b\xdd\x1e\x10\x0a\xbd\x6a\xb4"
++			  "\x0d\x5a\x41\xd3\xda\x2c\x0b\x0f"
++			  "\xff\x04\xae\x2c\x1a\x3b\x85\x03"
++			  "\x57\xc7\x53\x22\x9a\xee\x42\x5c"
++			  "\x2e\xe3\xe2\xb7\x22\xaa\x19\x68"
++			  "\x77\xce\x60\x0a\x0d\xea\x92\xf3"
++			  "\xab\x1b\x70\x4c\x24\x13\xa9\x23"
++			  "\x33\x39\x5a\x76\x39\x73\xfb\x0f"
++			  "\x1a\x52\x8d\xb6\x48\xbe\x12\x0e"
++			  "\xf1\x8b\x26\x45\x40\xac\xc7\xb1"
++			  "\x30\x4f\xfa\xbc\xa4\xce\x0b\xe1"
++			  "\x42\xc1\x61\x31\x48\x9b\x45\x57"
++			  "\xf3\x93\x8a\xce\xea\x16\xb6\x75"
++			  "\xd3\x63\xc5\x02\x7b\xe5\x19\xae"
++			  "\x45\x53\xad\xfc\x6f\xdd\x67\xb0"
++			  "\x3c\x75\x14\xf5\xab\x3c\xd2\x1b"
++			  "\x47\x2d\x54\x2e\x53\x4d\xb7\x27"
++			  "\x76\x62\x7c\x9a\xd9\x13\x59\x7c"
++			  "\x87\x08\x09\xee\x8a\x4c\x77\x62"
++			  "\xc3\xcd\x50\x05\x9d\x48\x85\xf9"
++			  "\xc9\xfc\x20\xb0\x67\x96\xad\xc8"
++			  "\x7b\x69\x91\x13\x0d\x2c\x73\x81"
++			  "\x2e\x2e\x79\x96\x0b\xa2\x95\x5f"
++			  "\x05\xe6\xdc\xac\x94\x64\xcc\xae"
++			  "\x78\x5a\x47\x86\x54\xf6\x27\xb5"
++			  "\xbf\x4d\x1c\xef\x0a\xc8\xa2\x6e"
++			  "\xde\xdb\x2f\x9a\x0e\x38\xef\x84"
++			  "\xe0\x7d\xa9\xc9\xc3\x63\xfe\xcb"
++			  "\x1f\x23\xf1\x8b\x4a\x0d\x5c\x71"
++			  "\x8c\xe0\xc6\x91\x17\xbc\xbf\x17"
++			  "\x32\x9d\x5b\x5c\xeb\xfc\xc9\x75"
++			  "\x23\x9a\x3d\x76\xc3\x02\xf3\x61"
++			  "\x57\x40\xc6\x52\x8e\x1d\x44\xdc"
++			  "\xbf\xd7\x23\x0b\x4a\xd6\xf1\xe6"
++			  "\x4a\xff\x75\x14\x95\x3a\xf1\x0f"
++			  "\x5a\x7e\xf7\x0e\x58\x8a\xaa\x29"
++			  "\x1e\xae\xf1\x86\x03\xc4\x93\x43"
++			  "\x8a\xe2\x9e\x95\x28\x1c\x68\x51"
++			  "\xb5\x7c\xd5\xc3\xec\x03\x0d\x40"
++			  "\xb4\xf7\xa7\xb2\x62\x29\xff\x5b"
++			  "\xd3\x57\x5b\x3d\x27\xfb\x79\xdc"
++			  "\x3d\x31\x0e\x87\xf4\x20\xea\x16"
++			  "\x54\xde\xa2\xdd\x49\xfd\x8f\x74"
++			  "\xf4\xcd\x91\x1f\xdd\x68\x86\x82"
++			  "\x9b\x1f\x43\x7d\x43\xf4\xf6\xaa"
++			  "\x8b\x81\xc8\xb8\x14\x3b\x06\xfc"
++			  "\x91\xa6\x1c\x30\xc9\x55\xd1\xae",
++		.ilen   = 512,
++		.result = "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.rlen   = 512,
++	}
++};
++
+ static struct cipher_testvec aes_lrw_enc_tv_template[] = {
+ 	/* from http://grouper.ieee.org/groups/1619/email/pdf00017.pdf */
+ 	{ /* LRW-32-AES 1 */
 -- 
 1.6.5.4
 
