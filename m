@@ -1,64 +1,37 @@
-From: Krzysztof Halasa <khc@pm.waw.pl>
-Subject: Re: Crypto test results unused?
-Date: Mon, 28 Dec 2009 21:14:17 +0100
-Message-ID: <m37hs6rh46.fsf@intrepid.localdomain>
-References: <m3ws07q865.fsf@intrepid.localdomain>
+From: Richard Zidlicky <rz@linux-m68k.org>
+Subject: Re: [PATCH 4/4] crypto: lmk2/lmk3 cipher block modes
+Date: Tue, 29 Dec 2009 02:18:21 +0100
+Message-ID: <20091229011821.GC1348@linux-m68k.org>
+References: <1262026755-23056-1-git-send-email-max@hinterhof.net> <1262026755-23056-5-git-send-email-max@hinterhof.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: lkml <linux-kernel@vger.kernel.org>
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-crypto@nl.linux.org,
+	Jari Ruusu <jariruusu@users.sourceforge.net>
+To: Max Vozeler <max@hinterhof.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from khc.piap.pl ([195.187.100.11]:55106 "EHLO khc.piap.pl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750995AbZL1UOT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Dec 2009 15:14:19 -0500
-In-Reply-To: <m3ws07q865.fsf@intrepid.localdomain> (Krzysztof Halasa's message
-	of "Mon, 28 Dec 2009 19:12:50 +0100")
+Received: from mail-ew0-f219.google.com ([209.85.219.219]:45275 "EHLO
+	mail-ew0-f219.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752238AbZL2BR7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Dec 2009 20:17:59 -0500
+Received: by ewy19 with SMTP id 19so2330046ewy.21
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Dec 2009 17:17:57 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1262026755-23056-5-git-send-email-max@hinterhof.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Krzysztof Halasa <khc@pm.waw.pl> writes:
+On Mon, Dec 28, 2009 at 07:59:15PM +0100, Max Vozeler wrote:
 
-> is the core crypto code supposed to "kill" algorithms which fail the
-> test?
->
-> On little-endian IXP4xx 3 hardware-assisted algorithms fail (due to
-> apparently unrelated bug which I will take care of). It seems the kernel
-> is still using these failing algorithms (my debugging code adds extra
-> fields to the /proc output):
->
-> alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
-> 00000000: 01 23 45 67 89 ab cd e7
-> alg: skcipher: Test 1 failed on encryption for ecb(des3_ede)-ixp4xx
-> 00000000: 73 6f 6d 65 64 61 74 61
-> alg: skcipher: Test 1 failed on encryption for ecb(aes)-ixp4xx
-> 00000000: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
->
-> # grep 'ecb(des)-ixp4xx\|ecb(des3_ede)-ixp4xx\|ecb(aes)-ixp4xx' /proc/cryp
-> to -A 6
-> driver       : ecb(aes)-ixp4xx
-> module       : ixp4xx_crypto
-> priority     : 300
-> refcnt       : 1
-> flags        : 0x85
-> ptr          : 0xbf020074
-> selftest     : unknown
-> ^^^^^^^^^^^^^^^^^^^^^^
+> +	help
+> +	  LMK block cipher modes (lmk2/lmk3).
+> +
+> +	  These modes are compatible with Loop-AES. Use them with a 
+> +	  dm-crypt cipher string aes-lmk2-plain64-multi:64 (for Loop-AES
+> +	  v2.x) or aes-lmk2-plain64-multi:64 (for Loop-AES v3.x).
+                       ^^^^
+should that be lmk3 ?
 
-I think probably crypto_alg_tested() should mark the failing algorithm
-somehow?
-void crypto_alg_tested(const char *name, int err)
-{
-	...
-found:
-	q->cra_flags |= CRYPTO_ALG_DEAD;
-	alg = test->adult;
+Too tired to look further..
 
-  >>>>>>>>>>>>> maybe here? if (err) mark_as_failed(alg); <<<<<<<<<<<<<<<<
-
-	if (err || list_empty(&alg->cra_list))
-		goto complete;
-
-	alg->cra_flags |= CRYPTO_ALG_TESTED;
--- 
-Krzysztof Halasa
+Richard
