@@ -1,40 +1,49 @@
-From: "Bhaskara Peela" <bhaskara.peela@broadcom.com>
-Subject: RE: How to use Linux Crypto API when we already registered with
- Hardware Crypto API
-Date: Tue, 5 Jan 2010 11:34:14 -0800
-Message-ID: <197D517E3C8D504283188E2A751290E86F05B54D15@IRVEXCHCCR02.corp.ad.broadcom.com>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH] geode: PTR_ERR return of wrong pointer in
+ fallback_init_cip()
+Date: Wed, 6 Jan 2010 19:07:36 +0100
+Message-ID: <20100106180736.GA9625@Chamillionaire.breakpoint.cc>
+References: <4B1D02F7.2020505@gmail.com>
+ <20091207134012.GA21388@Chamillionaire.breakpoint.cc>
+ <4B1D0DC9.5000908@gmail.com>
+ <20091211150349.GA736@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Roel Kluin <roel.kluin@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Sergey Mironov <ierton@gmail.com>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mms3.broadcom.com ([216.31.210.19]:1237 "EHLO MMS3.broadcom.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755316Ab0AETeY convert rfc822-to-8bit (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60104 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932488Ab0AFSHn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jan 2010 14:34:24 -0500
-Content-Language: en-US
+	Wed, 6 Jan 2010 13:07:43 -0500
+Content-Disposition: inline
+In-Reply-To: <20091211150349.GA736@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+* Herbert Xu | 2009-12-11 23:03:49 [+0800]:
 
-My apologies for resposting this issue.  Can any one suggest some mechanism to do this?
+>On Mon, Dec 07, 2009 at 03:14:33PM +0100, Roel Kluin wrote:
+>> Return the PTR_ERR of the correct pointer.
+>> 
+>> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+>
+>Patch applied.  Thank you.
 
-thanks
+Martin picked an earlier version of this patch [0] which is allready in
+Linus' tree as b59cdcb33 ("[S390] crypto: use more descriptive function
+names for init/exit routines.") and I don't see this in the cryptodev or
+crypto tree.
+Herbert, do you want me to rebase this patch on top of Linus' tree or
+do you have allready plans for this?
 
------Original Message-----
-From: Bhaskara Peela 
-Sent: Wednesday, December 30, 2009 12:24 PM
-To: 'linux-crypto@vger.kernel.org'
-Subject: How to use Linux Crypto API when we already registered with Hardware Crypto API
+[0] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg03919.html
 
-Hi,
- 
-I am using 2.6.30 kernel.  I have registered some IPSec crypto/auth algorithms(ex: 3DES/MD5) supported by hardware with linux.  I want to verify the hardware crypto/authentication output with that of linux Crypto API.  To do this, I want to send same kind of IPSec packet to hardware crypto engine and linux Crypto API and compare the output.
- 
-I know, I can do this, by building two images one with hardware acceleration and one without it.   But, I want to do this run time so that it can be fast and i can use single image.  Can you suggest a way to do this in esp4.c ?
- 
-thanks
-bhaskara
+Sebastian
