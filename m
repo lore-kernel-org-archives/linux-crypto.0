@@ -1,14 +1,11 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] geode: PTR_ERR return of wrong pointer in
- fallback_init_cip()
-Date: Wed, 6 Jan 2010 19:07:36 +0100
-Message-ID: <20100106180736.GA9625@Chamillionaire.breakpoint.cc>
-References: <4B1D02F7.2020505@gmail.com>
- <20091207134012.GA21388@Chamillionaire.breakpoint.cc>
- <4B1D0DC9.5000908@gmail.com>
- <20091211150349.GA736@gondor.apana.org.au>
+	fallback_init_cip()
+Date: Thu, 7 Jan 2010 11:50:28 +1100
+Message-ID: <20100107005028.GA32421@gondor.apana.org.au>
+References: <4B1D02F7.2020505@gmail.com> <20091207134012.GA21388@Chamillionaire.breakpoint.cc> <4B1D0DC9.5000908@gmail.com> <20091211150349.GA736@gondor.apana.org.au> <20100106180736.GA9625@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=us-ascii
 Cc: Roel Kluin <roel.kluin@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
@@ -16,34 +13,28 @@ Cc: Roel Kluin <roel.kluin@gmail.com>,
 	LKML <linux-kernel@vger.kernel.org>,
 	Sergey Mironov <ierton@gmail.com>,
 	Martin Schwidefsky <schwidefsky@de.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:60104 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932488Ab0AFSHn (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:59070 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756245Ab0AGAuz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Jan 2010 13:07:43 -0500
+	Wed, 6 Jan 2010 19:50:55 -0500
 Content-Disposition: inline
-In-Reply-To: <20091211150349.GA736@gondor.apana.org.au>
+In-Reply-To: <20100106180736.GA9625@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Herbert Xu | 2009-12-11 23:03:49 [+0800]:
-
->On Mon, Dec 07, 2009 at 03:14:33PM +0100, Roel Kluin wrote:
->> Return the PTR_ERR of the correct pointer.
->> 
->> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+On Wed, Jan 06, 2010 at 07:07:36PM +0100, Sebastian Andrzej Siewior wrote:
 >
->Patch applied.  Thank you.
+> Herbert, do you want me to rebase this patch on top of Linus' tree or
+> do you have allready plans for this?
+> 
+> [0] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg03919.html
 
-Martin picked an earlier version of this patch [0] which is allready in
-Linus' tree as b59cdcb33 ("[S390] crypto: use more descriptive function
-names for init/exit routines.") and I don't see this in the cryptodev or
-crypto tree.
-Herbert, do you want me to rebase this patch on top of Linus' tree or
-do you have allready plans for this?
-
-[0] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg03919.html
-
-Sebastian
+Plesae repost.  Thanks!
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
