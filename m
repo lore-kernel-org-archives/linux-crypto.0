@@ -1,48 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto/geode_aes: access .cip instead of .blk in
-	cipher mode
-Date: Fri, 8 Jan 2010 14:19:33 +1100
-Message-ID: <20100108031933.GA18599@gondor.apana.org.au>
-References: <4B1D02F7.2020505@gmail.com> <20091207134012.GA21388@Chamillionaire.breakpoint.cc> <4B1D0DC9.5000908@gmail.com> <20091211150349.GA736@gondor.apana.org.au> <20100106180736.GA9625@Chamillionaire.breakpoint.cc> <20100107005028.GA32421@gondor.apana.org.au> <20100107211702.GB20258@Chamillionaire.breakpoint.cc>
+From: VK <noreply@vk.com>
+Subject: =?UTF-8?Q?Irina_Zolotova_pievienoja_J=C5=ABs_draugiem_m=C4=81jaslap=C4=81?=
+ =?UTF-8?Q?_vk.com?=
+Date: Sat, 9 Jan 2010 11:10:22 +0300
+Message-ID: <89197fd842dd5b5cd1b04e4ce5ebd854@localhost.localdomain>
+Reply-To: VK <noreply@vk.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Roel Kluin <roel.kluin@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Sergey Mironov <ierton@gmail.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: =?UTF-8?Q?Sveicin=C4=81ti?= <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:52444 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753408Ab0AHDT4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Jan 2010 22:19:56 -0500
-Content-Disposition: inline
-In-Reply-To: <20100107211702.GB20258@Chamillionaire.breakpoint.cc>
+Received: from cs120.vk.com ([93.186.224.120]:52467 "EHLO vk.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751028Ab0AJD4c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 9 Jan 2010 22:56:32 -0500
+Received: from localhost
+	([127.0.0.1] helo=localhost.localdomain ident=www-data)
+	by vk.com with esmtp (Exim 4.69)
+	(envelope-from <noreply@vk.com>)
+	id 1NTWOs-0008LH-S1
+	for linux-crypto@vger.kernel.org; Sat, 09 Jan 2010 11:10:23 +0300
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 07, 2010 at 10:17:02PM +0100, Sebastian Andrzej Siewior wrote:
-> >From caa5c9a662be92aa79b2ef1d14a509391cfa9254 Mon Sep 17 00:00:00 2001
-> From: Roel Kluin <roel.kluin@gmail.com>
-> Date: Thu, 7 Jan 2010 22:00:26 +0100
-> 
-> The fallback code in cipher mode touch the union fallback.blk instead
-> of fallback.cip. This is wrong because we use the cipher and not the
-> blockcipher. This did not show any side effects yet because both types /
-> structs contain the same element right now.
-> 
-> [bigeasy@breakpoint: different commit message, split the patch in two]
-> 
-> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
-> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Sveicin=C4=81ti,
 
-All applied.  Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Irina Zolotova pievienoja J=C5=ABs draugiem m=C4=81jaslap=C4=81 vk.com
+
+J=C5=ABs varat ieiet m=C4=81jaslap=C4=81 un un redz=C4=93t j=C5=ABsu dr=
+augu person=C4=ABg=C4=81s lapas, izmantojot
+J=C5=ABsu e-mail un autom=C4=81tiski izveidoto paroli: bbA4eNrT
+
+Vkontakte.ru - m=C4=81jaslapa, kura pal=C4=ABdz miljoniem cilv=C4=93ku =
+atrast vecos draugus un uztur=C4=93t ar tiem kontaktus, dal=C4=ABties a=
+r fotogr=C4=81fij=C4=81m un notikumiem no dz=C4=ABves.
+
+Lai ieietu m=C4=81jaslap=C4=81, ievadiet http://vkontakte.ru/login.php
+Email, uz kuru J=C5=ABs sa=C5=86em=C4=81t =C5=A1o uzaicin=C4=81jumu,un =
+paroli.
+Paroli J=C5=ABs varat izmain=C4=ABt uzst=C4=81d=C4=ABjumos.
+
+Uzman=C4=ABbu: J=C5=ABsu re=C4=A3istr=C4=81cija neb=C5=ABs aktiviz=C4=93=
+ta, ja J=C5=ABs ignor=C4=93siet =C5=A1o uzaicin=C4=81jumu.
+
+V=C4=93lam veiksmi!
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
