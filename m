@@ -1,7 +1,7 @@
 From: Krzysztof Halasa <khc@pm.waw.pl>
-Subject: IXP4xx: Fix ixp4xx_crypto sparse warnings.
-Date: Sun, 10 Jan 2010 18:32:14 +0100
-Message-ID: <m3r5px3ly9.fsf@intrepid.localdomain>
+Subject: IXP4xx: Simplify get_crypt_desc() and get_crypt_desc_emerg() in ixp4xx_crypto.
+Date: Sun, 10 Jan 2010 18:32:53 +0100
+Message-ID: <m3my0l3lx6.fsf@intrepid.localdomain>
 References: <m34omu3rf7.fsf@intrepid.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -10,11 +10,11 @@ Cc: Christian Hohnstaedt <chohnstaedt@innominate.com>,
 	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from khc.piap.pl ([195.187.100.11]:37740 "EHLO khc.piap.pl"
+Received: from khc.piap.pl ([195.187.100.11]:53286 "EHLO khc.piap.pl"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753481Ab0AJRcQ convert rfc822-to-8bit (ORCPT
+	id S1751350Ab0AJRcz convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Jan 2010 12:32:16 -0500
+	Sun, 10 Jan 2010 12:32:55 -0500
 In-Reply-To: <m34omu3rf7.fsf@intrepid.localdomain> (Krzysztof Halasa's message
 	of "Sun, 10 Jan 2010 16:35:38 +0100")
 Sender: linux-crypto-owner@vger.kernel.org
@@ -24,57 +24,62 @@ Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
 
 diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_cry=
 pto.c
-index cac026a..99f06e1 100644
+index 99f06e1..0c7e4f5 100644
 --- a/drivers/crypto/ixp4xx_crypto.c
 +++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -402,7 +402,7 @@ static void one_packet(dma_addr_t phys)
- 		break;
- 	case CTL_FLAG_GEN_REVAES:
- 		ctx =3D crypto_tfm_ctx(crypt->data.tfm);
--		*(u32*)ctx->decrypt.npe_ctx &=3D cpu_to_be32(~CIPH_ENCR);
-+		*(__be32 *)ctx->decrypt.npe_ctx &=3D cpu_to_be32(~CIPH_ENCR);
- 		if (atomic_dec_and_test(&ctx->configuring))
- 			complete(&ctx->completion);
- 		break;
-@@ -641,7 +641,7 @@ static int register_chain_var(struct crypto_tfm *tf=
-m, u8 xpad, u32 target,
- 	crypt->init_len =3D init_len;
- 	crypt->ctl_flags |=3D CTL_FLAG_GEN_ICV;
+@@ -277,26 +277,25 @@ static struct crypt_ctl *get_crypt_desc(void)
+ 	int i;
+ 	static int idx =3D 0;
+ 	unsigned long flags;
++	struct crypt_ctl *desc =3D NULL;
 =20
--	buf->next =3D 0;
-+	buf->next =3D NULL;
- 	buf->buf_len =3D HMAC_PAD_BLOCKLEN;
- 	buf->pkt_len =3D 0;
- 	buf->phys_addr =3D pad_phys;
-@@ -672,7 +672,7 @@ static int setup_auth(struct crypto_tfm *tfm, int e=
-ncrypt, unsigned authsize,
- #ifndef __ARMEB__
- 	cfgword ^=3D 0xAA000000; /* change the "byte swap" flags */
- #endif
--	*(u32*)cinfo =3D cpu_to_be32(cfgword);
-+	*(__be32 *)cinfo =3D cpu_to_be32(cfgword);
- 	cinfo +=3D sizeof(cfgword);
+ 	spin_lock_irqsave(&desc_lock, flags);
 =20
- 	/* write ICV to cryptinfo */
-@@ -709,7 +709,7 @@ static int gen_rev_aes_key(struct crypto_tfm *tfm)
- 	if (!crypt) {
- 		return -EAGAIN;
+ 	if (unlikely(!crypt_virt))
+ 		setup_crypt_desc();
+-	if (unlikely(!crypt_virt)) {
+-		spin_unlock_irqrestore(&desc_lock, flags);
+-		return NULL;
+-	}
++	if (unlikely(!crypt_virt))
++		goto out;
++
+ 	i =3D idx;
+ 	if (crypt_virt[i].ctl_flags =3D=3D CTL_FLAG_UNUSED) {
+ 		if (++idx >=3D NPE_QLEN)
+ 			idx =3D 0;
+ 		crypt_virt[i].ctl_flags =3D CTL_FLAG_USED;
+-		spin_unlock_irqrestore(&desc_lock, flags);
+-		return crypt_virt +i;
+-	} else {
+-		spin_unlock_irqrestore(&desc_lock, flags);
+-		return NULL;
++		desc =3D crypt_virt + i;
  	}
--	*(u32*)dir->npe_ctx |=3D cpu_to_be32(CIPH_ENCR);
-+	*(__be32 *)dir->npe_ctx |=3D cpu_to_be32(CIPH_ENCR);
++out:
++	spin_unlock_irqrestore(&desc_lock, flags);
++	return desc;
+ }
 =20
- 	crypt->data.tfm =3D tfm;
- 	crypt->crypt_offs =3D 0;
-@@ -771,7 +771,7 @@ static int setup_cipher(struct crypto_tfm *tfm, int=
- encrypt,
- 		}
+ static spinlock_t emerg_lock;
+@@ -319,12 +318,10 @@ static struct crypt_ctl *get_crypt_desc_emerg(voi=
+d)
+ 		if (++idx >=3D NPE_QLEN_TOTAL)
+ 			idx =3D NPE_QLEN;
+ 		crypt_virt[i].ctl_flags =3D CTL_FLAG_USED;
+-		spin_unlock_irqrestore(&emerg_lock, flags);
+-		return crypt_virt +i;
+-	} else {
+-		spin_unlock_irqrestore(&emerg_lock, flags);
+-		return NULL;
++		desc =3D crypt_virt +i;
  	}
- 	/* write cfg word to cryptinfo */
--	*(u32*)cinfo =3D cpu_to_be32(cipher_cfg);
-+	*(__be32 *)cinfo =3D cpu_to_be32(cipher_cfg);
- 	cinfo +=3D sizeof(cipher_cfg);
++	spin_unlock_irqrestore(&emerg_lock, flags);
++	return desc;
+ }
 =20
- 	/* write cipher key to cryptinfo */
+ static void free_buf_chain(struct device *dev, struct buffer_desc *buf=
+,u32 phys)
 --
 To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
  in
