@@ -1,46 +1,118 @@
-From: Krzysztof Halasa <khc@pm.waw.pl>
-Subject: ixp4xx_crypto: Fix possible NULL ptr dereference.
-Date: Sun, 10 Jan 2010 18:37:25 +0100
-Message-ID: <m3eilx3lpm.fsf@intrepid.localdomain>
+From: Christian Hohnstaedt <chohnstaedt@innominate.com>
+Subject: Re: [6 PATCHes] IXP4xx crypto driver fixes.
+Date: Mon, 11 Jan 2010 10:07:12 +0100
+Message-ID: <20100111090712.GA3056@elara.bln.innominate.local>
 References: <m34omu3rf7.fsf@intrepid.localdomain>
+ <m3vdf93m0i.fsf@intrepid.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Christian Hohnstaedt <chohnstaedt@innominate.com>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Christian Hohnstaedt <chohnstaedt@innominate.com>,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Krzysztof Halasa <khc@pm.waw.pl>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from khc.piap.pl ([195.187.100.11]:38136 "EHLO khc.piap.pl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753691Ab0AJRh2 convert rfc822-to-8bit (ORCPT
+Received: from host2.bln.innominate.com ([77.245.32.75]:59062 "EHLO
+	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752315Ab0AKJIi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Jan 2010 12:37:28 -0500
-In-Reply-To: <m34omu3rf7.fsf@intrepid.localdomain> (Krzysztof Halasa's message
-	of "Sun, 10 Jan 2010 16:35:38 +0100")
+	Mon, 11 Jan 2010 04:08:38 -0500
+Content-Disposition: inline
+In-Reply-To: <m3vdf93m0i.fsf@intrepid.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
+On Sun, Jan 10, 2010 at 06:30:53PM +0100, Krzysztof Halasa wrote:
+> IXP4xx: Fix ixp4xx_crypto little-endian operation.
+>=20
+> Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
+Acked-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_cry=
-pto.c
-index f8f6515..2ae7148 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -786,10 +786,8 @@ static struct buffer_desc *chainup_buffers(struct =
-device *dev,
- 		nbytes -=3D len;
- 		ptr =3D page_address(sg_page(sg)) + sg->offset;
- 		next_buf =3D dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
--		if (!next_buf) {
--			buf =3D NULL;
--			break;
--		}
-+		if (!next_buf)
-+			return NULL;
- 		sg_dma_address(sg) =3D dma_map_single(dev, ptr, len, dir);
- 		buf->next =3D next_buf;
- 		buf->phys_next =3D next_buf_phys;
+>=20
+> Fixes the following on IXP425 little-endian:
+>=20
+> NPE-C: firmware functionality 0x5, revision 0x2:1
+> alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
+> 00000000: 01 23 45 67 89 ab cd e7
+> alg: skcipher: Test 1 failed on encryption for ecb(des3_ede)-ixp4xx
+> 00000000: 73 6f 6d 65 64 61 74 61
+> alg: skcipher: Test 1 failed on encryption for ecb(aes)-ixp4xx
+> 00000000: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
+>=20
+> diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_c=
+rypto.c
+> index 6c6656d..cac026a 100644
+> --- a/drivers/crypto/ixp4xx_crypto.c
+> +++ b/drivers/crypto/ixp4xx_crypto.c
+> @@ -96,8 +96,13 @@
+> =20
+>  struct buffer_desc {
+>  	u32 phys_next;
+> +#ifdef __ARMEB__
+>  	u16 buf_len;
+>  	u16 pkt_len;
+> +#else
+> +	u16 pkt_len;
+> +	u16 buf_len;
+> +#endif
+>  	u32 phys_addr;
+>  	u32 __reserved[4];
+>  	struct buffer_desc *next;
+> @@ -105,17 +110,30 @@ struct buffer_desc {
+>  };
+> =20
+>  struct crypt_ctl {
+> +#ifdef __ARMEB__
+>  	u8 mode;		/* NPE_OP_*  operation mode */
+>  	u8 init_len;
+>  	u16 reserved;
+> +#else
+> +	u16 reserved;
+> +	u8 init_len;
+> +	u8 mode;		/* NPE_OP_*  operation mode */
+> +#endif
+>  	u8 iv[MAX_IVLEN];	/* IV for CBC mode or CTR IV for CTR mode */
+>  	u32 icv_rev_aes;	/* icv or rev aes */
+>  	u32 src_buf;
+>  	u32 dst_buf;
+> +#ifdef __ARMEB__
+>  	u16 auth_offs;		/* Authentication start offset */
+>  	u16 auth_len;		/* Authentication data length */
+>  	u16 crypt_offs;		/* Cryption start offset */
+>  	u16 crypt_len;		/* Cryption data length */
+> +#else
+> +	u16 auth_len;		/* Authentication data length */
+> +	u16 auth_offs;		/* Authentication start offset */
+> +	u16 crypt_len;		/* Cryption data length */
+> +	u16 crypt_offs;		/* Cryption start offset */
+> +#endif
+>  	u32 aadAddr;		/* Additional Auth Data Addr for CCM mode */
+>  	u32 crypto_ctx;		/* NPE Crypto Param structure address */
+> =20
+> @@ -651,6 +669,9 @@ static int setup_auth(struct crypto_tfm *tfm, int=
+ encrypt, unsigned authsize,
+> =20
+>  	/* write cfg word to cryptinfo */
+>  	cfgword =3D algo->cfgword | ( authsize << 6); /* (authsize/4) << 8 =
+*/
+> +#ifndef __ARMEB__
+> +	cfgword ^=3D 0xAA000000; /* change the "byte swap" flags */
+> +#endif
+>  	*(u32*)cinfo =3D cpu_to_be32(cfgword);
+>  	cinfo +=3D sizeof(cfgword);
+> =20
+Christian Hohnstaedt
+
+--=20
+Christian Hohnstaedt / Project Manager Hardware and Manufacturing
+
+Innominate Security Technologies AG / protecting industrial networks
+tel: +49.30.921028.208 / fax: +49.30.921028.020
+Rudower Chaussee 13, D-12489 Berlin / http://www.innominate.com
+
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald
+Chairman of the Supervisory Board: Volker Bibelhausen
 --
 To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
  in
