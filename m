@@ -1,9 +1,9 @@
 From: Christian Hohnstaedt <chohnstaedt@innominate.com>
-Subject: Re: [6 PATCHes] IXP4xx crypto driver fixes.
-Date: Mon, 11 Jan 2010 10:07:12 +0100
-Message-ID: <20100111090712.GA3056@elara.bln.innominate.local>
+Subject: Re: ixp4xx_crypto: Fix possible NULL ptr dereference.
+Date: Mon, 11 Jan 2010 11:07:10 +0100
+Message-ID: <20100111100710.GB3056@elara.bln.innominate.local>
 References: <m34omu3rf7.fsf@intrepid.localdomain>
- <m3vdf93m0i.fsf@intrepid.localdomain>
+ <m3eilx3lpm.fsf@intrepid.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -12,95 +12,82 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
 To: Krzysztof Halasa <khc@pm.waw.pl>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from host2.bln.innominate.com ([77.245.32.75]:59062 "EHLO
+Received: from home.innominate.com ([77.245.32.75]:50293 "EHLO
 	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752315Ab0AKJIi (ORCPT
+	with ESMTP id S1752897Ab0AKKHN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Jan 2010 04:08:38 -0500
+	Mon, 11 Jan 2010 05:07:13 -0500
 Content-Disposition: inline
-In-Reply-To: <m3vdf93m0i.fsf@intrepid.localdomain>
+In-Reply-To: <m3eilx3lpm.fsf@intrepid.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 10, 2010 at 06:30:53PM +0100, Krzysztof Halasa wrote:
-> IXP4xx: Fix ixp4xx_crypto little-endian operation.
->=20
+On Sun, Jan 10, 2010 at 06:37:25PM +0100, Krzysztof Halasa wrote:
 > Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
-Acked-by: Christian Hohnstaedt <chohnstaedt@innominate.com>
-
->=20
-> Fixes the following on IXP425 little-endian:
->=20
-> NPE-C: firmware functionality 0x5, revision 0x2:1
-> alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
-> 00000000: 01 23 45 67 89 ab cd e7
-> alg: skcipher: Test 1 failed on encryption for ecb(des3_ede)-ixp4xx
-> 00000000: 73 6f 6d 65 64 61 74 61
-> alg: skcipher: Test 1 failed on encryption for ecb(aes)-ixp4xx
-> 00000000: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff
 >=20
 > diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_c=
 rypto.c
-> index 6c6656d..cac026a 100644
+> index f8f6515..2ae7148 100644
 > --- a/drivers/crypto/ixp4xx_crypto.c
 > +++ b/drivers/crypto/ixp4xx_crypto.c
-> @@ -96,8 +96,13 @@
-> =20
->  struct buffer_desc {
->  	u32 phys_next;
-> +#ifdef __ARMEB__
->  	u16 buf_len;
->  	u16 pkt_len;
-> +#else
-> +	u16 pkt_len;
-> +	u16 buf_len;
-> +#endif
->  	u32 phys_addr;
->  	u32 __reserved[4];
->  	struct buffer_desc *next;
-> @@ -105,17 +110,30 @@ struct buffer_desc {
->  };
-> =20
->  struct crypt_ctl {
-> +#ifdef __ARMEB__
->  	u8 mode;		/* NPE_OP_*  operation mode */
->  	u8 init_len;
->  	u16 reserved;
-> +#else
-> +	u16 reserved;
-> +	u8 init_len;
-> +	u8 mode;		/* NPE_OP_*  operation mode */
-> +#endif
->  	u8 iv[MAX_IVLEN];	/* IV for CBC mode or CTR IV for CTR mode */
->  	u32 icv_rev_aes;	/* icv or rev aes */
->  	u32 src_buf;
->  	u32 dst_buf;
-> +#ifdef __ARMEB__
->  	u16 auth_offs;		/* Authentication start offset */
->  	u16 auth_len;		/* Authentication data length */
->  	u16 crypt_offs;		/* Cryption start offset */
->  	u16 crypt_len;		/* Cryption data length */
-> +#else
-> +	u16 auth_len;		/* Authentication data length */
-> +	u16 auth_offs;		/* Authentication start offset */
-> +	u16 crypt_len;		/* Cryption data length */
-> +	u16 crypt_offs;		/* Cryption start offset */
-> +#endif
->  	u32 aadAddr;		/* Additional Auth Data Addr for CCM mode */
->  	u32 crypto_ctx;		/* NPE Crypto Param structure address */
-> =20
-> @@ -651,6 +669,9 @@ static int setup_auth(struct crypto_tfm *tfm, int=
- encrypt, unsigned authsize,
-> =20
->  	/* write cfg word to cryptinfo */
->  	cfgword =3D algo->cfgword | ( authsize << 6); /* (authsize/4) << 8 =
-*/
-> +#ifndef __ARMEB__
-> +	cfgword ^=3D 0xAA000000; /* change the "byte swap" flags */
-> +#endif
->  	*(u32*)cinfo =3D cpu_to_be32(cfgword);
->  	cinfo +=3D sizeof(cfgword);
-> =20
+> @@ -786,10 +786,8 @@ static struct buffer_desc *chainup_buffers(struc=
+t device *dev,
+>  		nbytes -=3D len;
+>  		ptr =3D page_address(sg_page(sg)) + sg->offset;
+>  		next_buf =3D dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
+> -		if (!next_buf) {
+> -			buf =3D NULL;
+> -			break;
+> -		}
+> +		if (!next_buf)
+> +			return NULL;
+
+This leaves buf->next uninitialized, but
+free_buf_chain() iterates over buf->next.
+
+We need:
+
+	if (!next_buf) {
+		buf->next =3D NULL;
+		return NULL;
+	}
+
+Or get rid of next_buf and next_buf_phys:
+
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_cry=
+pto.c
+index b8cc714..c961b0f 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -794,21 +794,15 @@ static struct buffer_desc *chainup_buffers(struct=
+ device *dev,
+ {
+ 	for (;nbytes > 0; sg =3D scatterwalk_sg_next(sg)) {
+ 		unsigned len =3D min(nbytes, sg->length);
+-		struct buffer_desc *next_buf;
+-		u32 next_buf_phys;
+ 		void *ptr;
+=20
+ 		nbytes -=3D len;
+ 		ptr =3D page_address(sg_page(sg)) + sg->offset;
+-		next_buf =3D dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
+-		if (!next_buf) {
+-			buf =3D NULL;
+-			break;
+-		}
++		buf->next =3D dma_pool_alloc(buffer_pool, flags, &buf->phys_next);
++		if (!buf->next)
++			return NULL;
+ 		sg_dma_address(sg) =3D dma_map_single(dev, ptr, len, dir);
+-		buf->next =3D next_buf;
+-		buf->phys_next =3D next_buf_phys;
+-		buf =3D next_buf;
++		buf =3D buf->next;
+=20
+ 		buf->phys_addr =3D sg_dma_address(sg);
+ 		buf->buf_len =3D len;
+
+
 Christian Hohnstaedt
 
 --=20
