@@ -1,107 +1,100 @@
-From: Christian Hohnstaedt <chohnstaedt@innominate.com>
-Subject: Re: ixp4xx_crypto: Fix possible NULL ptr dereference.
-Date: Mon, 11 Jan 2010 11:07:10 +0100
-Message-ID: <20100111100710.GB3056@elara.bln.innominate.local>
-References: <m34omu3rf7.fsf@intrepid.localdomain>
- <m3eilx3lpm.fsf@intrepid.localdomain>
+From: Richard Zidlicky <rz@linux-m68k.org>
+Subject: Re: [PATCH 1/4] dm-crypt: clarify cipher vs. cipher mode
+Date: Mon, 11 Jan 2010 22:28:39 +0100
+Message-ID: <20100111212839.GA29008@linux-m68k.org>
+References: <1262026755-23056-1-git-send-email-max@hinterhof.net> <1262026755-23056-2-git-send-email-max@hinterhof.net> <4B390907.8010609@redhat.com> <20091229014639.GC26723@chaos.nusquama.org> <20100104152542.GA5388@quark.vpn.nusquama.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Christian Hohnstaedt <chohnstaedt@innominate.com>,
-	linux-crypto@vger.kernel.org
-To: Krzysztof Halasa <khc@pm.waw.pl>
+Content-Type: text/plain; charset=us-ascii
+Cc: Milan Broz <mbroz@redhat.com>, linux-crypto@vger.kernel.org,
+	linux-crypto@nl.linux.org,
+	Jari Ruusu <jariruusu@users.sourceforge.net>,
+	Alasdair G Kergon <agk@redhat.com>
+To: Max Vozeler <max@hinterhof.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from home.innominate.com ([77.245.32.75]:50293 "EHLO
-	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752897Ab0AKKHN (ORCPT
+Received: from fg-out-1718.google.com ([72.14.220.152]:60501 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752974Ab0AKV21 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Jan 2010 05:07:13 -0500
+	Mon, 11 Jan 2010 16:28:27 -0500
+Received: by fg-out-1718.google.com with SMTP id 22so925811fge.1
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Jan 2010 13:28:25 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <m3eilx3lpm.fsf@intrepid.localdomain>
+In-Reply-To: <20100104152542.GA5388@quark.vpn.nusquama.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 10, 2010 at 06:37:25PM +0100, Krzysztof Halasa wrote:
-> Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
->=20
-> diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_c=
-rypto.c
-> index f8f6515..2ae7148 100644
-> --- a/drivers/crypto/ixp4xx_crypto.c
-> +++ b/drivers/crypto/ixp4xx_crypto.c
-> @@ -786,10 +786,8 @@ static struct buffer_desc *chainup_buffers(struc=
-t device *dev,
->  		nbytes -=3D len;
->  		ptr =3D page_address(sg_page(sg)) + sg->offset;
->  		next_buf =3D dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
-> -		if (!next_buf) {
-> -			buf =3D NULL;
-> -			break;
-> -		}
-> +		if (!next_buf)
-> +			return NULL;
-
-This leaves buf->next uninitialized, but
-free_buf_chain() iterates over buf->next.
-
-We need:
-
-	if (!next_buf) {
-		buf->next =3D NULL;
-		return NULL;
-	}
-
-Or get rid of next_buf and next_buf_phys:
-
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_cry=
-pto.c
-index b8cc714..c961b0f 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -794,21 +794,15 @@ static struct buffer_desc *chainup_buffers(struct=
- device *dev,
- {
- 	for (;nbytes > 0; sg =3D scatterwalk_sg_next(sg)) {
- 		unsigned len =3D min(nbytes, sg->length);
--		struct buffer_desc *next_buf;
--		u32 next_buf_phys;
- 		void *ptr;
-=20
- 		nbytes -=3D len;
- 		ptr =3D page_address(sg_page(sg)) + sg->offset;
--		next_buf =3D dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
--		if (!next_buf) {
--			buf =3D NULL;
--			break;
--		}
-+		buf->next =3D dma_pool_alloc(buffer_pool, flags, &buf->phys_next);
-+		if (!buf->next)
-+			return NULL;
- 		sg_dma_address(sg) =3D dma_map_single(dev, ptr, len, dir);
--		buf->next =3D next_buf;
--		buf->phys_next =3D next_buf_phys;
--		buf =3D next_buf;
-+		buf =3D buf->next;
-=20
- 		buf->phys_addr =3D sg_dma_address(sg);
- 		buf->buf_len =3D len;
+On Mon, Jan 04, 2010 at 04:25:42PM +0100, Max Vozeler wrote:
 
 
-Christian Hohnstaedt
+> +
+> +These modes have two main characteristics compared to regular CBC
+> +with sector IV. The first is implemented in dm-crypt, the second
+> +is implemented in the lmk2 and lmk3 blkciphers.
 
---=20
-Christian Hohnstaedt / Project Manager Hardware and Manufacturing
+the formulation is not very clear. Possibly better wording -
 
-Innominate Security Technologies AG / protecting industrial networks
-tel: +49.30.921028.208 / fax: +49.30.921028.020
-Rudower Chaussee 13, D-12489 Berlin / http://www.innominate.com
++ There are two main differences distinguishing the lmk2 and lmk3 modes 
++ from the blok cipher implemented in dm-crypt:
 
-Register Court: AG Charlottenburg, HR B 81603
-Management Board: Dirk Seewald
-Chairman of the Supervisory Board: Volker Bibelhausen
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+> +1) Use of 64 independent keys which are alternatingly applied to
+> +different sectors.
+> +
+> +  key = keys[sectornum % 64]
+
+not really "alternating" when there is more than 2, my try
+"different sectors are encrypted with 64 independent keys selected by the
+following rule"
++  key = keys[sectornum % 64]
+
+> +2) IV derivation from an MD5 digest of the sector number, parts
+> +of the plaintext data and a mode specific format constant. The
+> +multi-key-v3 mode additionally uses a 128-bit IV seed.
+
+slightly rephrased:
+
++2) IVs are derived from an MD5 digest of the sector number, parts
++of the plaintext data and a mode specific format constant. The
++multi-key-v3 mode additionally uses a 128-bit IV seed.
+
+> +  v2IV = MD5(plaintext[16..511] ||
+> +  	     truncated-sector-number ||
+> +	     format-magic)
+> +
+> +  v3IV = MD5(ivseed ||
+> +	     plaintext[16..511] ||
+> +  	     truncated-sector-number ||
+> +	     format-magic)
+
+that seems different than what is described here -
+ http://mail.nl.linux.org/linux-crypto/2006-01/msg00006.html
+
+so is it compatible after all? Or where is format-magic' equivalent
+hidden in Jari's description?
+
+> +The format-magic for both modes is fixed at the value 4024
+> +encoded as 32-bit little endian.
+
+I am not familiar with this detail and the description does not make it
+completely clear, it appears to refer to some magic value of the on disk 
+representation?
+
+> +Encryption:
+> +
+> +  IV = IVFUNC(optional-ivseed,
+> +  	   plaintext[16..511],
+> +  	   truncated-sector-number,
+> +	   format-magic)
+
+optional first argument in formalism makes it hard to relate to above decriptions.
+So maybe introduce IVFUNC where you describe them above, including ivseed which is
+simply unused in one variant.
+
+> +  ciphertext[0..511] = CBC-ENCRYPT(key, IV, plaintext[0..511])
+
+I know that key=key_table[sector_number & 63] is mentioned further above but
+might be "too far back" for many readers as it is one of the things that are 
+special about this encryption modes.
+
+Richard
+
