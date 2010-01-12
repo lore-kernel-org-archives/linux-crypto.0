@@ -1,86 +1,81 @@
 From: Krzysztof Halasa <khc@pm.waw.pl>
-Subject: Re: Crypto test results unused?
-Date: Tue, 12 Jan 2010 18:55:07 +0100
-Message-ID: <m37hrn1a4k.fsf@intrepid.localdomain>
-References: <20100112111439.GA31504@gondor.apana.org.au>
+Subject: Re: IXP4xx: Fix whitespace problems in ixp4xx_crypto.
+Date: Tue, 12 Jan 2010 19:09:19 +0100
+Message-ID: <m33a2b19gw.fsf@intrepid.localdomain>
+References: <m34omu3rf7.fsf@intrepid.localdomain>
+	<m3iqb93lvy.fsf@intrepid.localdomain>
+	<20100112171159.GI3056@elara.bln.innominate.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: Christian Hohnstaedt <chohnstaedt@innominate.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from khc.piap.pl ([195.187.100.11]:33570 "EHLO khc.piap.pl"
+Received: from khc.piap.pl ([195.187.100.11]:54806 "EHLO khc.piap.pl"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932067Ab0ALRzL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2010 12:55:11 -0500
-In-Reply-To: <20100112111439.GA31504@gondor.apana.org.au> (Herbert Xu's
-	message of "Tue, 12 Jan 2010 22:14:39 +1100")
+	id S1750929Ab0ALSJW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jan 2010 13:09:22 -0500
+In-Reply-To: <20100112171159.GI3056@elara.bln.innominate.local> (Christian
+	Hohnstaedt's message of "Tue, 12 Jan 2010 18:12:00 +0100")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+Christian Hohnstaedt <chohnstaedt@innominate.com> writes:
 
->> On little-endian IXP4xx 3 hardware-assisted algorithms fail (due to
->> apparently unrelated bug which I will take care of). It seems the kernel
->> is still using these failing algorithms (my debugging code adds extra
->> fields to the /proc output):
+>>  static struct npe *npe_c;
+>> -static struct dma_pool *buffer_pool = NULL;
+>> -static struct dma_pool *ctx_pool = NULL;
+>> +static struct dma_pool *buffer_pool;
+>> +static struct dma_pool *ctx_pool;
+>>  
+>> -static struct crypt_ctl *crypt_virt = NULL;
+>> +static struct crypt_ctl *crypt_virt;
 >
-> How did you determine that it was still being used? When a kernel
-> user requests for an algorithm the system is supposed to skip
-> anything which failed the self-test.
+> This is not a whitespace-fix.
 
-cat /proc/crypto shows "selftest: unknown" for those failed tests. I
-don't know if that means it's used, but I'd expect "failed" or something
-like that. Maybe it's simply a problem in /proc/crypto output.
+Right, that's trivial non-whitespace fix :-)
 
-> CRYPTO_ALG_DEAD is used to mark algorithms deleted from the
-> system.  However, we don't delete algorithms just because they
-> fail the self-test.  They remain in the system so you can come
-> back and diagnose the problem.  They just aren't used by anyone.
+> The error-path in init_ixp_crypto() depends on them being either NULL
+> or correctly allocated.
+>
+> Or is it guaranteed that static variables are always initially zero ?
 
-Great.
+Yes, the BSS is cleared at boot (modprobe etc). This simply makes the
+on-disk image a bit smaller.
 
-Currently the /proc/crypto contains:
+>>  static dma_addr_t crypt_phys;
+>>  
+>>  static int support_aes = 1;
+>
+> But this initialization is superflous, since it will be initialized
+> before use.
 
-- for passed tests: "selftest: passed" (which is of course right)
+I didn't touch it, but will remove the initialization if it's unneeded,
+of course.
 
-- for failed tests: "selftest: unknown" (which is a surprise for me):
+>> -	static int idx = 0;
+>> +	static int idx;
+>
+> This static index must be initialized with 0.
 
-alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
-00000000: 01 23 45 67 89 ab cd e7
+It is, same as the crypt_virt and co.
 
-name         : ecb(des)
-driver       : ecb(des)-ixp4xx
-module       : ixp4xx_crypto
-priority     : 300
-refcnt       : 1
-selftest     : unknown
-type         : ablkcipher
-async        : yes
-blocksize    : 8
-min keysize  : 8
-max keysize  : 8
-ivsize       : 0
-geniv        : <default>
+>> -static void free_buf_chain(struct device *dev, struct buffer_desc *buf,u32 phys)
+>> +static void free_buf_chain(struct device *dev, struct buffer_desc *buf, u32 phys)
+>
+> Introduces a line-length > 80.
 
-- for routines without a test: "selftest: passed" (which isn't true
-  either)
+This limit has been lifted recently :-)
 
-alg: No test for authenc(hmac(md5),cbc(des)) (authenc(hmac(md5),cbc(des))-ixp4xx)
+>>  	int num = ARRAY_SIZE(ixp4xx_algos);
+>> -	int i,err ;
+>> +	int i, err ;
+>
+> Missed one before the ;
 
-name         : authenc(hmac(md5),cbc(des))
-driver       : authenc(hmac(md5),cbc(des))-ixp4xx
-module       : ixp4xx_crypto
-priority     : 300
-refcnt       : 1
-selftest     : passed
-type         : aead
-async        : yes
-blocksize    : 8
-ivsize       : 8
-maxauthsize  : 16
-geniv        : <built-in>
+Right.
 
-I think we need a way to differentiate between "really unknown" and
-"failed", do we need another flag for it?
+
+I will fix/change these, not today but soon. Thanks for looking.
 -- 
 Krzysztof Halasa
