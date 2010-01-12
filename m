@@ -1,36 +1,67 @@
-From: Linus Walleij <linus.ml.walleij@gmail.com>
-Subject: Userspace API /dev/crypto
-Date: Tue, 12 Jan 2010 21:37:31 +0100
-Message-ID: <63386a3d1001121237s3e7c4b19g82ead5dc9dc7f63c@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto test results unused?
+Date: Wed, 13 Jan 2010 09:44:05 +1100
+Message-ID: <20100112224404.GA5480@gondor.apana.org.au>
+References: <20100112111439.GA31504@gondor.apana.org.au> <m37hrn1a4k.fsf@intrepid.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Krzysztof Halasa <khc@pm.waw.pl>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f227.google.com ([209.85.218.227]:62930 "EHLO
-	mail-bw0-f227.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750944Ab0ALUhe (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:57131 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750757Ab0ALWoI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2010 15:37:34 -0500
-Received: by bwz27 with SMTP id 27so1488211bwz.21
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Jan 2010 12:37:32 -0800 (PST)
+	Tue, 12 Jan 2010 17:44:08 -0500
+Content-Disposition: inline
+In-Reply-To: <m37hrn1a4k.fsf@intrepid.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Tue, Jan 12, 2010 at 06:55:07PM +0100, Krzysztof Halasa wrote:
+>
+> Currently the /proc/crypto contains:
+> 
+> - for passed tests: "selftest: passed" (which is of course right)
+> 
+> - for failed tests: "selftest: unknown" (which is a surprise for me):
+> 
+> alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
+> 00000000: 01 23 45 67 89 ab cd e7
+> 
+> name         : ecb(des)
+> driver       : ecb(des)-ixp4xx
+> module       : ixp4xx_crypto
+> priority     : 300
+> refcnt       : 1
+> selftest     : unknown
+> type         : ablkcipher
+> async        : yes
+> blocksize    : 8
+> min keysize  : 8
+> max keysize  : 8
+> ivsize       : 0
+> geniv        : <default>
 
-IMO the design discussion of a user space API in:
-http://marc.info/?l=linux-crypto-vger&m=121088311223921&w=2
-"Userspace API proposal"
+This is fine.
 
-And the consequent attempt at a patch for OpenSSL in:
-http://marc.info/?l=linux-crypto-vger&m=121822090729047&w=2
-"OpenSSL patch to support Linux CryptoAPI"
+> - for routines without a test: "selftest: passed" (which isn't true
+>   either)
+> 
+> alg: No test for authenc(hmac(md5),cbc(des)) (authenc(hmac(md5),cbc(des))-ixp4xx)
 
-Was a first nice draft of a desirable userspace API for various crypto/hash
-acceleration.
+This should be fixed by adding some code to test authenc algorithms
+by combining the test vectors of its components.
+ 
+> I think we need a way to differentiate between "really unknown" and
+> "failed", do we need another flag for it?
 
-Has there been some/any progress on the userspace API since, or
-is this up for grabs?
+It doesn't matter.  We test all algorithms at registration time.
+So unknown means failed except during registration.
 
-Yours,
-Linus Walleij
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
