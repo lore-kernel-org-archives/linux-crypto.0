@@ -1,100 +1,98 @@
-From: Richard Zidlicky <rz@linux-m68k.org>
-Subject: Re: [PATCH 1/4] dm-crypt: clarify cipher vs. cipher mode
-Date: Mon, 11 Jan 2010 22:28:39 +0100
-Message-ID: <20100111212839.GA29008@linux-m68k.org>
-References: <1262026755-23056-1-git-send-email-max@hinterhof.net> <1262026755-23056-2-git-send-email-max@hinterhof.net> <4B390907.8010609@redhat.com> <20091229014639.GC26723@chaos.nusquama.org> <20100104152542.GA5388@quark.vpn.nusquama.org>
+From: =?UTF-8?B?TsOpbWV0aCBNw6FydG9u?= <nm127@freemail.hu>
+Subject: [PATCH] crypto: make Open Firmware device id constant
+Date: Tue, 12 Jan 2010 09:01:45 +0100
+Message-ID: <4B4C2C69.9000804@freemail.hu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Milan Broz <mbroz@redhat.com>, linux-crypto@vger.kernel.org,
-	linux-crypto@nl.linux.org,
-	Jari Ruusu <jariruusu@users.sourceforge.net>,
-	Alasdair G Kergon <agk@redhat.com>
-To: Max Vozeler <max@hinterhof.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.152]:60501 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752974Ab0AKV21 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Jan 2010 16:28:27 -0500
-Received: by fg-out-1718.google.com with SMTP id 22so925811fge.1
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Jan 2010 13:28:25 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <20100104152542.GA5388@quark.vpn.nusquama.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-crypto@vger.kernel.org, cocci@diku.dk,
+	LKML <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <cocci-bounces@diku.dk>
+List-Unsubscribe: <http://lists.diku.dk/mailman/listinfo/cocci>,
+	<mailto:cocci-request@diku.dk?subject=unsubscribe>
+List-Archive: <http://lists.diku.dk/pipermail/cocci>
+List-Post: <mailto:cocci@diku.dk>
+List-Help: <mailto:cocci-request@diku.dk?subject=help>
+List-Subscribe: <http://lists.diku.dk/mailman/listinfo/cocci>,
+	<mailto:cocci-request@diku.dk?subject=subscribe>
+Sender: cocci-bounces@diku.dk
+Errors-To: cocci-bounces@diku.dk
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 04, 2010 at 04:25:42PM +0100, Max Vozeler wrote:
+From: M=C3=A1rton N=C3=A9meth <nm127@freemail.hu>
 
+The match_table field of the struct of_device_id is constant in <linux/of=
+_platform.h>
+so it is worth to make the initialization data also constant.
 
-> +
-> +These modes have two main characteristics compared to regular CBC
-> +with sector IV. The first is implemented in dm-crypt, the second
-> +is implemented in the lmk2 and lmk3 blkciphers.
+The semantic match that finds this kind of pattern is as follows:
+(http://coccinelle.lip6.fr/)
 
-the formulation is not very clear. Possibly better wording -
+// <smpl>
+@r@
+disable decl_init,const_decl_init;
+identifier I1, I2, x;
+@@
+	struct I1 {
+	  ...
+	  const struct I2 *x;
+	  ...
+	};
+@s@
+identifier r.I1, y;
+identifier r.x, E;
+@@
+	struct I1 y =3D {
+	  .x =3D E,
+	};
+@c@
+identifier r.I2;
+identifier s.E;
+@@
+	const struct I2 E[] =3D ... ;
+@depends on !c@
+identifier r.I2;
+identifier s.E;
+@@
++	const
+	struct I2 E[] =3D ...;
+// </smpl>
 
-+ There are two main differences distinguishing the lmk2 and lmk3 modes 
-+ from the blok cipher implemented in dm-crypt:
+Signed-off-by: M=C3=A1rton N=C3=A9meth <nm127@freemail.hu>
+Cc: Julia Lawall <julia@diku.dk>
+Cc: cocci@diku.dk
+---
+diff -u -p a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+--- a/drivers/crypto/talitos.c 2009-12-03 04:51:21.000000000 +0100
++++ b/drivers/crypto/talitos.c 2010-01-08 14:16:24.000000000 +0100
+@@ -1958,7 +1958,7 @@ err_out:
+ 	return err;
+ }
 
+-static struct of_device_id talitos_match[] =3D {
++static const struct of_device_id talitos_match[] =3D {
+ 	{
+ 		.compatible =3D "fsl,sec2.0",
+ 	},
+diff -u -p a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/c=
+rypto4xx_core.c
+--- a/drivers/crypto/amcc/crypto4xx_core.c 2009-12-03 04:51:21.000000000 =
++0100
++++ b/drivers/crypto/amcc/crypto4xx_core.c 2010-01-08 14:16:45.000000000 =
++0100
+@@ -1274,7 +1274,7 @@ static int __exit crypto4xx_remove(struc
+ 	return 0;
+ }
 
-> +1) Use of 64 independent keys which are alternatingly applied to
-> +different sectors.
-> +
-> +  key = keys[sectornum % 64]
-
-not really "alternating" when there is more than 2, my try
-"different sectors are encrypted with 64 independent keys selected by the
-following rule"
-+  key = keys[sectornum % 64]
-
-> +2) IV derivation from an MD5 digest of the sector number, parts
-> +of the plaintext data and a mode specific format constant. The
-> +multi-key-v3 mode additionally uses a 128-bit IV seed.
-
-slightly rephrased:
-
-+2) IVs are derived from an MD5 digest of the sector number, parts
-+of the plaintext data and a mode specific format constant. The
-+multi-key-v3 mode additionally uses a 128-bit IV seed.
-
-> +  v2IV = MD5(plaintext[16..511] ||
-> +  	     truncated-sector-number ||
-> +	     format-magic)
-> +
-> +  v3IV = MD5(ivseed ||
-> +	     plaintext[16..511] ||
-> +  	     truncated-sector-number ||
-> +	     format-magic)
-
-that seems different than what is described here -
- http://mail.nl.linux.org/linux-crypto/2006-01/msg00006.html
-
-so is it compatible after all? Or where is format-magic' equivalent
-hidden in Jari's description?
-
-> +The format-magic for both modes is fixed at the value 4024
-> +encoded as 32-bit little endian.
-
-I am not familiar with this detail and the description does not make it
-completely clear, it appears to refer to some magic value of the on disk 
-representation?
-
-> +Encryption:
-> +
-> +  IV = IVFUNC(optional-ivseed,
-> +  	   plaintext[16..511],
-> +  	   truncated-sector-number,
-> +	   format-magic)
-
-optional first argument in formalism makes it hard to relate to above decriptions.
-So maybe introduce IVFUNC where you describe them above, including ivseed which is
-simply unused in one variant.
-
-> +  ciphertext[0..511] = CBC-ENCRYPT(key, IV, plaintext[0..511])
-
-I know that key=key_table[sector_number & 63] is mentioned further above but
-might be "too far back" for many readers as it is one of the things that are 
-special about this encryption modes.
-
-Richard
-
+-static struct of_device_id crypto4xx_match[] =3D {
++static const struct of_device_id crypto4xx_match[] =3D {
+ 	{ .compatible      =3D "amcc,ppc4xx-crypto",},
+ 	{ },
+ };
+_______________________________________________
+Cocci mailing list
+Cocci@diku.dk
+http://lists.diku.dk/mailman/listinfo/cocci
+(Web access from inside DIKUs LAN only)
