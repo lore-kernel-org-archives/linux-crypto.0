@@ -1,198 +1,86 @@
-From: Christian Hohnstaedt <chohnstaedt@innominate.com>
-Subject: Re: IXP4xx: Fix whitespace problems in ixp4xx_crypto.
-Date: Tue, 12 Jan 2010 18:12:00 +0100
-Message-ID: <20100112171159.GI3056@elara.bln.innominate.local>
-References: <m34omu3rf7.fsf@intrepid.localdomain>
- <m3iqb93lvy.fsf@intrepid.localdomain>
+From: Krzysztof Halasa <khc@pm.waw.pl>
+Subject: Re: Crypto test results unused?
+Date: Tue, 12 Jan 2010 18:55:07 +0100
+Message-ID: <m37hrn1a4k.fsf@intrepid.localdomain>
+References: <20100112111439.GA31504@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Christian Hohnstaedt <chohnstaedt@innominate.com>,
-	linux-crypto@vger.kernel.org
-To: Krzysztof Halasa <khc@pm.waw.pl>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from host2.bln.innominate.com ([77.245.32.75]:34228 "EHLO
-	home.innominate.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750929Ab0ALRMD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2010 12:12:03 -0500
-Content-Disposition: inline
-In-Reply-To: <m3iqb93lvy.fsf@intrepid.localdomain>
+Received: from khc.piap.pl ([195.187.100.11]:33570 "EHLO khc.piap.pl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932067Ab0ALRzL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jan 2010 12:55:11 -0500
+In-Reply-To: <20100112111439.GA31504@gondor.apana.org.au> (Herbert Xu's
+	message of "Tue, 12 Jan 2010 22:14:39 +1100")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 10, 2010 at 06:33:37PM +0100, Krzysztof Halasa wrote:
-> Signed-off-by: Krzysztof Ha=C5=82asa <khc@pm.waw.pl>
->=20
-> diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_c=
-rypto.c
-> index 0c7e4f5..f8f6515 100644
-> --- a/drivers/crypto/ixp4xx_crypto.c
-> +++ b/drivers/crypto/ixp4xx_crypto.c
-> @@ -64,7 +64,7 @@
-> =20
->  #define MOD_DES     0x0000
->  #define MOD_TDEA2   0x0100
-> -#define MOD_3DES   0x0200
-> +#define MOD_3DES    0x0200
->  #define MOD_AES     0x0800
->  #define MOD_AES128  (0x0800 | KEYLEN_128)
->  #define MOD_AES192  (0x0900 | KEYLEN_192)
-> @@ -137,7 +137,7 @@ struct crypt_ctl {
->  	u32 aadAddr;		/* Additional Auth Data Addr for CCM mode */
->  	u32 crypto_ctx;		/* NPE Crypto Param structure address */
-> =20
-> -	/* Used by Host: 4*4 bytes*/
-> +	/* Used only by host: 4 * 4 bytes */
->  	unsigned ctl_flags;
->  	union {
->  		struct ablkcipher_request *ablk_req;
-> @@ -208,10 +208,10 @@ static const struct ix_hash_algo hash_alg_sha1 =
-=3D {
->  };
-> =20
->  static struct npe *npe_c;
-> -static struct dma_pool *buffer_pool =3D NULL;
-> -static struct dma_pool *ctx_pool =3D NULL;
-> +static struct dma_pool *buffer_pool;
-> +static struct dma_pool *ctx_pool;
-> =20
-> -static struct crypt_ctl *crypt_virt =3D NULL;
-> +static struct crypt_ctl *crypt_virt;
+Herbert Xu <herbert@gondor.apana.org.au> writes:
 
-This is not a whitespace-fix.
-The error-path in init_ixp_crypto() depends on them being either NULL
-or correctly allocated.
+>> On little-endian IXP4xx 3 hardware-assisted algorithms fail (due to
+>> apparently unrelated bug which I will take care of). It seems the kernel
+>> is still using these failing algorithms (my debugging code adds extra
+>> fields to the /proc output):
+>
+> How did you determine that it was still being used? When a kernel
+> user requests for an algorithm the system is supposed to skip
+> anything which failed the self-test.
 
-Or is it guaranteed that static variables are always initially zero ?
+cat /proc/crypto shows "selftest: unknown" for those failed tests. I
+don't know if that means it's used, but I'd expect "failed" or something
+like that. Maybe it's simply a problem in /proc/crypto output.
 
->  static dma_addr_t crypt_phys;
-> =20
->  static int support_aes =3D 1;
+> CRYPTO_ALG_DEAD is used to mark algorithms deleted from the
+> system.  However, we don't delete algorithms just because they
+> fail the self-test.  They remain in the system so you can come
+> back and diagnose the problem.  They just aren't used by anyone.
 
-But this initialization is superflous, since it will be initialized bef=
-ore use.
+Great.
 
-> @@ -246,12 +246,12 @@ static inline struct crypt_ctl *crypt_phys2virt=
-(dma_addr_t phys)
-> =20
->  static inline u32 cipher_cfg_enc(struct crypto_tfm *tfm)
->  {
-> -	return container_of(tfm->__crt_alg, struct ixp_alg,crypto)->cfg_enc=
-;
-> +	return container_of(tfm->__crt_alg, struct ixp_alg, crypto)->cfg_en=
-c;
->  }
-> =20
->  static inline u32 cipher_cfg_dec(struct crypto_tfm *tfm)
->  {
-> -	return container_of(tfm->__crt_alg, struct ixp_alg,crypto)->cfg_dec=
-;
-> +	return container_of(tfm->__crt_alg, struct ixp_alg, crypto)->cfg_de=
-c;
->  }
-> =20
->  static inline const struct ix_hash_algo *ix_hash(struct crypto_tfm *=
-tfm)
-> @@ -275,7 +275,7 @@ static spinlock_t desc_lock;
->  static struct crypt_ctl *get_crypt_desc(void)
->  {
->  	int i;
-> -	static int idx =3D 0;
-> +	static int idx;
+Currently the /proc/crypto contains:
 
-This static index must be initialized with 0.
+- for passed tests: "selftest: passed" (which is of course right)
 
->  	unsigned long flags;
->  	struct crypt_ctl *desc =3D NULL;
-> =20
-> @@ -318,13 +318,13 @@ static struct crypt_ctl *get_crypt_desc_emerg(v=
-oid)
->  		if (++idx >=3D NPE_QLEN_TOTAL)
->  			idx =3D NPE_QLEN;
->  		crypt_virt[i].ctl_flags =3D CTL_FLAG_USED;
-> -		desc =3D crypt_virt +i;
-> +		desc =3D crypt_virt + i;
->  	}
->  	spin_unlock_irqrestore(&emerg_lock, flags);
->  	return desc;
->  }
-> =20
-> -static void free_buf_chain(struct device *dev, struct buffer_desc *b=
-uf,u32 phys)
-> +static void free_buf_chain(struct device *dev, struct buffer_desc *b=
-uf, u32 phys)
+- for failed tests: "selftest: unknown" (which is a surprise for me):
 
-Introduces a line-length > 80.
+alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
+00000000: 01 23 45 67 89 ab cd e7
 
->  {
->  	while (buf) {
->  		struct buffer_desc *buf1;
-> @@ -349,10 +349,9 @@ static void finish_scattered_hmac(struct crypt_c=
-tl *crypt)
->  	int authsize =3D crypto_aead_authsize(tfm);
+name         : ecb(des)
+driver       : ecb(des)-ixp4xx
+module       : ixp4xx_crypto
+priority     : 300
+refcnt       : 1
+selftest     : unknown
+type         : ablkcipher
+async        : yes
+blocksize    : 8
+min keysize  : 8
+max keysize  : 8
+ivsize       : 0
+geniv        : <default>
 
-[ snip ]
+- for routines without a test: "selftest: passed" (which isn't true
+  either)
 
-> @@ -1416,7 +1393,7 @@ static struct ixp_alg ixp4xx_algos[] =3D {
->  static int __init ixp_module_init(void)
->  {
->  	int num =3D ARRAY_SIZE(ixp4xx_algos);
-> -	int i,err ;
-> +	int i, err ;
+alg: No test for authenc(hmac(md5),cbc(des)) (authenc(hmac(md5),cbc(des))-ixp4xx)
 
-Missed one before the ;
+name         : authenc(hmac(md5),cbc(des))
+driver       : authenc(hmac(md5),cbc(des))-ixp4xx
+module       : ixp4xx_crypto
+priority     : 300
+refcnt       : 1
+selftest     : passed
+type         : aead
+async        : yes
+blocksize    : 8
+ivsize       : 8
+maxauthsize  : 16
+geniv        : <built-in>
 
-> =20
->  	if (platform_device_register(&pseudo_dev))
->  		return -ENODEV;
-> @@ -1429,18 +1406,14 @@ static int __init ixp_module_init(void)
->  		platform_device_unregister(&pseudo_dev);
->  		return err;
->  	}
-> -	for (i=3D0; i< num; i++) {
-> +	for (i =3D 0; i < num; i++) {
->  		struct crypto_alg *cra =3D &ixp4xx_algos[i].crypto;
-> =20
->  		if (snprintf(cra->cra_driver_name, CRYPTO_MAX_ALG_NAME,
-> -			"%s"IXP_POSTFIX, cra->cra_name) >=3D
-> -			CRYPTO_MAX_ALG_NAME)
-> -		{
-> +			"%s"IXP_POSTFIX, cra->cra_name) >=3D CRYPTO_MAX_ALG_NAME)
->  			continue;
-> -		}
-> -		if (!support_aes && (ixp4xx_algos[i].cfg_enc & MOD_AES)) {
-> +		if (!support_aes && (ixp4xx_algos[i].cfg_enc & MOD_AES))
->  			continue;
-> -		}
->  		if (!ixp4xx_algos[i].hash) {
->  			/* block ciphers */
->  			cra->cra_type =3D &crypto_ablkcipher_type;
-> @@ -1484,7 +1457,7 @@ static void __exit ixp_module_exit(void)
->  	int num =3D ARRAY_SIZE(ixp4xx_algos);
->  	int i;
-> =20
-> -	for (i=3D0; i< num; i++) {
-> +	for (i =3D 0; i < num; i++) {
->  		if (ixp4xx_algos[i].registered)
->  			crypto_unregister_alg(&ixp4xx_algos[i].crypto);
->  	}
-
-Christian Hohnstaedt
-
---=20
-Christian Hohnstaedt / Project Manager Hardware and Manufacturing
-
-Innominate Security Technologies AG / protecting industrial networks
-tel: +49.30.921028.208 / fax: +49.30.921028.020
-Rudower Chaussee 13, D-12489 Berlin / http://www.innominate.com
-
-Register Court: AG Charlottenburg, HR B 81603
-Management Board: Dirk Seewald
-Chairman of the Supervisory Board: Volker Bibelhausen
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I think we need a way to differentiate between "really unknown" and
+"failed", do we need another flag for it?
+-- 
+Krzysztof Halasa
