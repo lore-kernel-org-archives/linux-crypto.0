@@ -1,40 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/4] crypto: md5 - Add export support
-Date: Wed, 13 Jan 2010 20:52:39 +1100
-Message-ID: <20100113095239.GA11568@gondor.apana.org.au>
-References: <1262026755-23056-1-git-send-email-max@hinterhof.net> <1262026755-23056-4-git-send-email-max@hinterhof.net>
+From: Krzysztof Halasa <khc@pm.waw.pl>
+Subject: Re: Crypto test results unused?
+Date: Wed, 13 Jan 2010 16:07:02 +0100
+Message-ID: <m3vdf66o2x.fsf@intrepid.localdomain>
+References: <20100112111439.GA31504@gondor.apana.org.au>
+	<m37hrn1a4k.fsf@intrepid.localdomain>
+	<20100112224404.GA5480@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-crypto@nl.linux.org,
-	Jari Ruusu <jariruusu@users.sourceforge.net>
-To: Max Vozeler <max@hinterhof.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:40518 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753779Ab0AMJwo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jan 2010 04:52:44 -0500
-Content-Disposition: inline
-In-Reply-To: <1262026755-23056-4-git-send-email-max@hinterhof.net>
+Received: from khc.piap.pl ([195.187.100.11]:43949 "EHLO khc.piap.pl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755739Ab0AMPHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Jan 2010 10:07:05 -0500
+In-Reply-To: <20100112224404.GA5480@gondor.apana.org.au> (Herbert Xu's message
+	of "Wed, 13 Jan 2010 09:44:05 +1100")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 28, 2009 at 06:59:14PM +0000, Max Vozeler wrote:
-> This patch adds export support to md5.  The exported type is
-> defined by struct md5_state.
-> 
-> This is modeled after the equivalent change to sha1_generic,
-> except only export is added for now.
-> 
-> Signed-off-by: Max Vozeler <max@hinterhof.net>
-> Cc: Jari Ruusu <jariruusu@users.sourceforge.net>
+Herbert Xu <herbert@gondor.apana.org.au> writes:
 
-Please add an import function as the shash API requires import
-to be present if export is present.
+>> I think we need a way to differentiate between "really unknown" and
+>> "failed", do we need another flag for it?
+>
+> It doesn't matter.  We test all algorithms at registration time.
+> So unknown means failed except during registration.
 
-Thanks,
+So should we change "selftest: unknown" to "failed" then?
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Krzysztof Halasa
