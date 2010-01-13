@@ -1,67 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto test results unused?
-Date: Wed, 13 Jan 2010 09:44:05 +1100
-Message-ID: <20100112224404.GA5480@gondor.apana.org.au>
-References: <20100112111439.GA31504@gondor.apana.org.au> <m37hrn1a4k.fsf@intrepid.localdomain>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Crypto API
+Date: Wed, 13 Jan 2010 08:28:56 +0200
+Message-ID: <4B4D6828.9000506@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Krzysztof Halasa <khc@pm.waw.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57131 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750757Ab0ALWoI (ORCPT
+Received: from smtp.nokia.com ([192.100.122.230]:40680 "EHLO
+	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751191Ab0AMG3u (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jan 2010 17:44:08 -0500
-Content-Disposition: inline
-In-Reply-To: <m37hrn1a4k.fsf@intrepid.localdomain>
+	Wed, 13 Jan 2010 01:29:50 -0500
+Received: from vaebh105.NOE.Nokia.com (vaebh105.europe.nokia.com [10.160.244.31])
+	by mgw-mx03.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o0D6TKfe007924
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Jan 2010 08:29:47 +0200
+Received: from [172.21.41.3] (kds.research.nokia.com [172.21.41.3])
+	by mgw-da01.ext.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o0D6SuBE002431
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Jan 2010 08:28:57 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 12, 2010 at 06:55:07PM +0100, Krzysztof Halasa wrote:
->
-> Currently the /proc/crypto contains:
-> 
-> - for passed tests: "selftest: passed" (which is of course right)
-> 
-> - for failed tests: "selftest: unknown" (which is a surprise for me):
-> 
-> alg: skcipher: Test 1 failed on encryption for ecb(des)-ixp4xx
-> 00000000: 01 23 45 67 89 ab cd e7
-> 
-> name         : ecb(des)
-> driver       : ecb(des)-ixp4xx
-> module       : ixp4xx_crypto
-> priority     : 300
-> refcnt       : 1
-> selftest     : unknown
-> type         : ablkcipher
-> async        : yes
-> blocksize    : 8
-> min keysize  : 8
-> max keysize  : 8
-> ivsize       : 0
-> geniv        : <default>
+Hi,
 
-This is fine.
+I develop some drivers for crypto HW and met some difficulties.
+Some algorithm functions are called behind crypto_kmap()
 
-> - for routines without a test: "selftest: passed" (which isn't true
->   either)
-> 
-> alg: No test for authenc(hmac(md5),cbc(des)) (authenc(hmac(md5),cbc(des))-ixp4xx)
+data = crypto_kmap(sg_page(sg), 0);
 
-This should be fixed by adding some code to test authenc algorithms
-by combining the test vectors of its components.
- 
-> I think we need a way to differentiate between "really unknown" and
-> "failed", do we need another flag for it?
+It will do inc_preempt_count();
 
-It doesn't matter.  We test all algorithms at registration time.
-So unknown means failed except during registration.
+I try to use DMA controller to perform memory transfers and try to use
+wait_for_completion()
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+But of course  it gives
+
+BUG: sleeping function called from invalid context at kernel/sched.c:5786
+
+What is the best way to handle such case?
+
+Thanks,
+Dmitry
+
+
