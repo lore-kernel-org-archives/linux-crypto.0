@@ -1,41 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: make Open Firmware device id constant
-Date: Sun, 17 Jan 2010 21:54:19 +1100
-Message-ID: <20100117105419.GB32270@gondor.apana.org.au>
-References: <4B4C2C69.9000804@freemail.hu>
+Subject: Re: [PATCH 3/4] crypto: md5 - Add export support
+Date: Sun, 17 Jan 2010 21:55:52 +1100
+Message-ID: <20100117105552.GA32505@gondor.apana.org.au>
+References: <1262026755-23056-1-git-send-email-max@hinterhof.net> <1262026755-23056-4-git-send-email-max@hinterhof.net> <20100113095239.GA11568@gondor.apana.org.au> <20100113173706.GB29443@quark.vpn.nusquama.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Julia Lawall <julia@diku.dk>, cocci@diku.dk
-To: =?iso-8859-1?Q?N=E9meth_M=E1rton?= <nm127@freemail.hu>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org, linux-crypto@nl.linux.org,
+	Jari Ruusu <jariruusu@users.sourceforge.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:33262 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:33268 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750953Ab0AQKyY (ORCPT
+	with ESMTP id S1750783Ab0AQKz4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Jan 2010 05:54:24 -0500
+	Sun, 17 Jan 2010 05:55:56 -0500
 Content-Disposition: inline
-In-Reply-To: <4B4C2C69.9000804@freemail.hu>
+In-Reply-To: <20100113173706.GB29443@quark.vpn.nusquama.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 12, 2010 at 09:01:45AM +0100, N=E9meth M=E1rton wrote:
-> From: M=E1rton N=E9meth <nm127@freemail.hu>
->=20
-> The match_table field of the struct of_device_id is constant in <linu=
-x/of_platform.h>
-> so it is worth to make the initialization data also constant.
+On Wed, Jan 13, 2010 at 06:37:06PM +0100, Max Vozeler wrote:
+>
+> This patch adds export/import support to md5. The exported type is
+> defined by struct md5_state.
+> 
+> This is modeled after the equivalent change to sha1_generic.
 
-Applied to cryptodev.  Thanks.
---=20
+Applied to cryptodev.
+-- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
