@@ -1,26 +1,48 @@
-From: "Leopoldo trellis" <footsmith_36@gmail.com>
-Subject: I have a list of 5 million New businesses in the USA
-Date: Fri, 22 Jan 2010 00:43:30 +0100
-Message-ID: <201001212343.o0LNhUSx000348@mailgate3.smatorino.it>
-Reply-To: dontsendemailhere@gmail.com
-To: katjakatja@powerbroker-pr.de, katjakeeling@hotmail.com,
-	kevin@bcwheelchairsports.com, lioninvestigations@hotmail.com
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Async Crypto API
+Date: Fri, 22 Jan 2010 10:45:34 +0200
+Message-ID: <4B5965AE.9060202@nokia.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fwlinux.smatorino.it ([89.184.108.4]:59781 "EHLO
-	mailgate3.smatorino.it" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755317Ab0AUXlA (ORCPT
+Received: from smtp.nokia.com ([192.100.122.233]:25741 "EHLO
+	mgw-mx06.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751554Ab0AVIqH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Jan 2010 18:41:00 -0500
+	Fri, 22 Jan 2010 03:46:07 -0500
+Received: from vaebh105.NOE.Nokia.com (vaebh105.europe.nokia.com [10.160.244.31])
+	by mgw-mx06.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o0M8jrQu019851
+	for <linux-crypto@vger.kernel.org>; Fri, 22 Jan 2010 10:46:04 +0200
+Received: from [172.21.41.3] (kds.research.nokia.com [172.21.41.3])
+	by mgw-da01.ext.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o0M8jZ92030086
+	for <linux-crypto@vger.kernel.org>; Fri, 22 Jan 2010 10:45:35 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hello,
 
+I have one question about async api.
 
-Many of these lists are on sale too. Just email me here:  Chelsea.Beard@highpowerlists.net
+I work on AHASH driver and wonder about one thing.
 
-  
+while calculating hash, client might call many times
 
+ahash_request_set_crypt(req, &sg, sha1, len);
+crypto_ahash_update(req);
+..
+..
+ahash_request_set_crypt(req, &sg, sha1, len);
+crypto_ahash_finup(req);
 
+right?
 
+But because it is async and driver does not wait_for_completion,
+ previous request may not be completed before client will call next update.
 
-To invoke no further correspondence status please send an email to disappear@highpowerlists.net
+But what should be the behavior of the driver?
+
+Thanks,
+Dmitry
+
