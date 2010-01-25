@@ -1,41 +1,147 @@
-From: Milan Broz <mbroz@redhat.com>
+From: Mikulas Patocka <mpatocka@redhat.com>
 Subject: Re: [PATCH] dm-crypt: disable block encryption with arc4
-Date: Mon, 25 Jan 2010 19:39:11 +0100
-Message-ID: <4B5DE54F.7050206@redhat.com>
+Date: Mon, 25 Jan 2010 13:39:48 -0500 (EST)
+Message-ID: <Pine.LNX.4.64.1001251336311.18309@hs20-bc2-1.build.redhat.com>
 References: <Pine.LNX.4.64.1001251324310.18309@hs20-bc2-1.build.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: dm-devel@redhat.com, Alasdair G Kergon <agk@redhat.com>,
+Content-Type: MULTIPART/MIXED; BOUNDARY="279731514-2096129439-1264444788=:18309"
+Cc: Milan Broz <mbroz@redhat.com>, Alasdair G Kergon <agk@redhat.com>,
 	linux-crypto@vger.kernel.org
-To: Mikulas Patocka <mpatocka@redhat.com>
+To: dm-devel@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32209 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:11225 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752940Ab0AYSjT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Jan 2010 13:39:19 -0500
-Received: from int-mx08.intmail.prod.int.phx2.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by mx1.redhat.com (8.13.8/8.13.8) with ESMTP id o0PIdIaW032444
+	id S1753165Ab0AYSj4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jan 2010 13:39:56 -0500
+Received: from int-mx01.intmail.prod.int.phx2.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+	by mx1.redhat.com (8.13.8/8.13.8) with ESMTP id o0PIdtMQ011275
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2010 13:39:18 -0500
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2010 13:39:55 -0500
 In-Reply-To: <Pine.LNX.4.64.1001251324310.18309@hs20-bc2-1.build.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/25/2010 07:29 PM, Mikulas Patocka wrote:
-> Hi
-> 
-> When using arc4 to encrypt a block device, the resulting device is 
-> unreliable. It reads garbage. That's because arc4 is a stream cipher, if 
-> you write something, it advances its state and if you attempt to decrypt 
-> the same sector, it uses new state that is different.
-> 
-> This patch disables the use of arc4 on block devices.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-arc4 again. it is simply not a block cipher:-)
+--279731514-2096129439-1264444788=:18309
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 
-This should be solved inside cryptoAPI and not blacklist it in dm-crypt,
-see that thread
-http://article.gmane.org/gmane.linux.kernel.cryptoapi/3441
+BTW. I created a script that tests all possible ciphers, keysizes, 
+chaining modes and iv modes for dm-crypt. arc4 is the only one that fails. 
+You can add it your regression testsuite if you want.
 
-Milan
+Mikulas
+--279731514-2096129439-1264444788=:18309
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=test-cipher
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.64.1001251339480.18309@hs20-bc2-1.build.redhat.com>
+Content-Description: test-cipher
+Content-Disposition: attachment; filename=test-cipher
+
+IyEvYmluL3NoDQpkbXNldHVwIHJlbW92ZSBjcjANCnNldCAtZQ0KY2lwaGVy
+PSIkQCINCmNyeXB0c2V0dXAgLWQga2V5ICRjaXBoZXIgY3JlYXRlIGNyMCAv
+ZGV2L3JhbTANCm1rZnMuZXh0MyAtYiAxMDI0IC9kZXYvbWFwcGVyL2NyMA0K
+ZnNjay5leHQyIC1mbiAvZGV2L21hcHBlci9jcjANCmRtc2V0dXAgcmVtb3Zl
+IGNyMA0KY3J5cHRzZXR1cCAtZCBrZXkgJGNpcGhlciBjcmVhdGUgY3IwIC9k
+ZXYvcmFtMA0KZnNjay5leHQyIC1mbiAvZGV2L21hcHBlci9jcjANCmRtc2V0
+dXAgcmVtb3ZlIGNyMA0K
+
+--279731514-2096129439-1264444788=:18309
+Content-Type: TEXT/PLAIN; charset=US-ASCII; name=cryptest
+Content-Transfer-Encoding: BASE64
+Content-ID: <Pine.LNX.4.64.1001251339481.18309@hs20-bc2-1.build.redhat.com>
+Content-Description: cryptest
+Content-Disposition: attachment; filename=cryptest
+
+IyEvYmluL3NoDQpzZXQgLWUNCj5sb2cNCiMgYXJjNCAtIGRvZXNuJ3Qgd29y
+aw0KZm9yIGNpcGhlciBpbiBhZXMgYW51YmlzIGJsb3dmaXNoIGNhbWVsbGlh
+IGNhc3Q1IGNhc3Q2IGRlcyBkZXMzX2VkZSBmY3J5cHQga2hhemFkIHNlZWQg
+c2VycGVudCB0bmVwcmVzIHRlYSB4dGVhIHhldGE7IGRvDQoJaWYgWyAtbiAi
+JDEiIC1hICIkY2lwaGVyIiAhPSAiJDEiIF07IHRoZW4NCgkJY29udGludWUN
+CglmaQ0KCWlmIFsgJGNpcGhlciA9IGFlcyBdOyB0aGVuDQoJCWtleXNpemVz
+PSIxMjggMTkyIDI1NiINCgkJYmxvY2tzaXplPTEyOA0KCWVsaWYgWyAkY2lw
+aGVyID0gYW51YmlzIF07IHRoZW4NCgkJa2V5c2l6ZXM9ImBzZXEgMTI4IDMy
+IDMyMGAiDQoJCWJsb2Nrc2l6ZT0xMjgNCgllbGlmIFsgJGNpcGhlciA9IGFy
+YzQgXTsgdGhlbg0KCQlrZXlzaXplcz0iYHNlcSA4IDI1NiAyMDQ4YCAyMDQ4
+Ig0KCQlibG9ja3NpemU9MQ0KCWVsaWYgWyAkY2lwaGVyID0gYmxvd2Zpc2gg
+XTsgdGhlbg0KCQlrZXlzaXplcz0iYHNlcSAzMiA4IDQ0OGAiDQoJCWJsb2Nr
+c2l6ZT02NA0KCWVsaWYgWyAkY2lwaGVyID0gY2FtZWxsaWEgXTsgdGhlbg0K
+CQlrZXlzaXplcz0iMTI4IDE5MiAyNTYiDQoJCWJsb2Nrc2l6ZT0xMjgNCgll
+bGlmIFsgJGNpcGhlciA9IGNhc3Q1IF07IHRoZW4NCgkJa2V5c2l6ZXM9ImBz
+ZXEgNDAgOCAxMjhgIg0KCQlibG9ja3NpemU9NjQNCgllbGlmIFsgJGNpcGhl
+ciA9IGNhc3Q2IF07IHRoZW4NCgkJa2V5c2l6ZXM9ImBzZXEgMTI4IDMyIDI1
+NmAiDQoJCWJsb2Nrc2l6ZT0xMjgNCgllbGlmIFsgJGNpcGhlciA9IGRlcyBd
+OyB0aGVuDQoJCWtleXNpemVzPTY0DQoJCWJsb2Nrc2l6ZT02NA0KCWVsaWYg
+WyAkY2lwaGVyID0gZGVzM19lZGUgXTsgdGhlbg0KCQlrZXlzaXplcz0xOTIN
+CgkJYmxvY2tzaXplPTY0DQoJZWxpZiBbICRjaXBoZXIgPSBmY3J5cHQgXTsg
+dGhlbg0KCQlrZXlzaXplcz02NA0KCQlibG9ja3NpemU9NjQNCgllbGlmIFsg
+JGNpcGhlciA9IGtoYXphZCBdOyB0aGVuDQoJCWtleXNpemVzPTEyOA0KCQli
+bG9ja3NpemU9NjQNCgllbGlmIFsgJGNpcGhlciA9IHNlZWQgXTsgdGhlbg0K
+CQlrZXlzaXplcz0xMjgNCgkJYmxvY2tzaXplPTEyOA0KCWVsaWYgWyAkY2lw
+aGVyID0gc2VycGVudCAtbyAkY2lwaGVyID0gdG5lcHJlcyBdOyB0aGVuDQoJ
+CWtleXNpemVzPSJgc2VxIDAgOCAyNTZgIg0KCQlibG9ja3NpemU9MTI4DQoJ
+ZWxpZiBbICRjaXBoZXIgPSB0ZWEgLW8gJGNpcGhlciA9IHh0ZWEgLW8gJGNp
+cGhlciA9IHhldGEgXTsgdGhlbg0KCQlrZXlzaXplcz0xMjgNCgkJYmxvY2tz
+aXplPTY0DQoJZWxpZiBbICRjaXBoZXIgPSB0d29maXNoIF07IHRoZW4NCgkJ
+a2V5c2l6ZXM9IjEyOCAxOTIgMjU2Ig0KCQlibG9ja3NpemU9MTI4DQoJZWxz
+ZQ0KCQllY2hvIFVOS05PV04gQ0lQSEVSDQoJCWV4aXQgMQ0KCWZpDQoJZm9y
+IGtleXNpemUgaW4gJGtleXNpemVzOyBkbw0KCQkjIGlmICEgZWNobyAka2V5
+c2l6ZXMgfCBncmVwIC1xdyAka2V5c2l6ZSQ7IHRoZW4gY29udGludWU7IGZp
+DQoJCWZvciBjaGFpbmluZyBpbiBjYmMgY3RyIGVjYiBscncgcGNiYyB4dHM7
+IGRvDQoJCQljaGFpbmluZ19rZXlzaXplPSRrZXlzaXplDQoJCQlpZiBbICRj
+aGFpbmluZyA9IHh0cyBdOyB0aGVuDQoJCQkJY2hhaW5pbmdfa2V5c2l6ZT1g
+ZXhwciAkY2hhaW5pbmdfa2V5c2l6ZSBcKiAyIHwgY2F0YDsNCgkJCQlpZiBb
+ICRibG9ja3NpemUgIT0gMTI4IF07IHRoZW4gY29udGludWU7IGZpDQoJCQlm
+aQ0KCQkJaWYgWyAkY2hhaW5pbmcgPSBscncgXTsgdGhlbg0KCQkJCWNoYWlu
+aW5nX2tleXNpemU9YGV4cHIgJGNoYWluaW5nX2tleXNpemUgKyAkYmxvY2tz
+aXplIHwgY2F0YA0KCQkJCWlmIFsgJGJsb2Nrc2l6ZSAhPSAxMjggXTsgdGhl
+biBjb250aW51ZTsgZmkNCgkJCWZpDQoJCQlmb3IgaXYgaW4gbnVsbCBwbGFp
+biBiZW5iaSBlc3NpdjptZDQgZXNzaXY6bWQ1IGVzc2l2Om1pY2hhZWxfbWlj
+IGVzc2l2OnJtZDEyOCBlc3NpdjpybWQxNjAgZXNzaXY6cm1kMjU2IGVzc2l2
+OnJtZDMyMCBlc3NpdjpzaGExIGVzc2l2OnNoYTIyNCBlc3NpdjpzaGEyNTYg
+ZXNzaXY6c2hhMzg0IGVzc2l2OnNoYTUxMiBlc3Npdjp0Z3IxMjggZXNzaXY6
+dGdyMTYwIGVzc2l2OnRncjE5MiBlc3Npdjp3cDI1NiBlc3Npdjp3cDM4NCBl
+c3Npdjp3cDUxMjsgZG8NCgkJCQlpZiBbICRjaGFpbmluZyA9IGVjYiBdICYm
+IGVjaG8gIiRpdiIgfCBncmVwIC1xIF5lc3NpdjsgdGhlbiBjb250aW51ZTsg
+ZmkNCgkJCQlpZiBbICRpdiA9IGVzc2l2Om1kNCBdICYmICEgZWNobyAka2V5
+c2l6ZXMgfCBncmVwIC1xdyAxMjg7IHRoZW4gY29udGludWU7IGZpDQoJCQkJ
+aWYgWyAkaXYgPSBlc3NpdjptZDUgXSAmJiAhIGVjaG8gJGtleXNpemVzIHwg
+Z3JlcCAtcXcgMTI4OyB0aGVuIGNvbnRpbnVlOyBmaQ0KCQkJCWlmIFsgJGl2
+ID0gZXNzaXY6bWljaGFlbF9taWMgXSAmJiAhIGVjaG8gJGtleXNpemVzIHwg
+Z3JlcCAtcXcgNjQ7IHRoZW4gY29udGludWU7IGZpDQoJCQkJaWYgWyAkaXYg
+PSBlc3NpdjpybWQxMjggXSAmJiAhIGVjaG8gJGtleXNpemVzIHwgZ3JlcCAt
+cXcgMTI4OyB0aGVuIGNvbnRpbnVlOyBmaQ0KCQkJCWlmIFsgJGl2ID0gZXNz
+aXY6cm1kMTYwIF0gJiYgISBlY2hvICRrZXlzaXplcyB8IGdyZXAgLXF3IDE2
+MDsgdGhlbiBjb250aW51ZTsgZmkNCgkJCQlpZiBbICRpdiA9IGVzc2l2OnJt
+ZDI1NiBdICYmICEgZWNobyAka2V5c2l6ZXMgfCBncmVwIC1xdyAyNTY7IHRo
+ZW4gY29udGludWU7IGZpDQoJCQkJaWYgWyAkaXYgPSBlc3NpdjpybWQzMjAg
+XSAmJiAhIGVjaG8gJGtleXNpemVzIHwgZ3JlcCAtcXcgMzIwOyB0aGVuIGNv
+bnRpbnVlOyBmaQ0KCQkJCWlmIFsgJGl2ID0gZXNzaXY6c2hhMSBdICYmICEg
+ZWNobyAka2V5c2l6ZXMgfCBncmVwIC1xdyAxNjA7IHRoZW4gY29udGludWU7
+IGZpDQoJCQkJaWYgWyAkaXYgPSBlc3NpdjpzaGEyMjQgXSAmJiAhIGVjaG8g
+JGtleXNpemVzIHwgZ3JlcCAtcXcgMjI0OyB0aGVuIGNvbnRpbnVlOyBmaQ0K
+CQkJCWlmIFsgJGl2ID0gZXNzaXY6c2hhMjU2IF0gJiYgISBlY2hvICRrZXlz
+aXplcyB8IGdyZXAgLXF3IDI1NjsgdGhlbiBjb250aW51ZTsgZmkNCgkJCQlp
+ZiBbICRpdiA9IGVzc2l2OnNoYTM4NCBdICYmICEgZWNobyAka2V5c2l6ZXMg
+fCBncmVwIC1xdyAzODQ7IHRoZW4gY29udGludWU7IGZpDQoJCQkJaWYgWyAk
+aXYgPSBlc3NpdjpzaGE1MTIgXSAmJiAhIGVjaG8gJGtleXNpemVzIHwgZ3Jl
+cCAtcXcgNTEyOyB0aGVuIGNvbnRpbnVlOyBmaQ0KCQkJCWlmIFsgJGl2ID0g
+ZXNzaXY6dGdyMTI4IF0gJiYgISBlY2hvICRrZXlzaXplcyB8IGdyZXAgLXF3
+IDEyODsgdGhlbiBjb250aW51ZTsgZmkNCgkJCQlpZiBbICRpdiA9IGVzc2l2
+OnRncjE2MCBdICYmICEgZWNobyAka2V5c2l6ZXMgfCBncmVwIC1xdyAxNjA7
+IHRoZW4gY29udGludWU7IGZpDQoJCQkJaWYgWyAkaXYgPSBlc3Npdjp0Z3Ix
+OTIgXSAmJiAhIGVjaG8gJGtleXNpemVzIHwgZ3JlcCAtcXcgMTkyOyB0aGVu
+IGNvbnRpbnVlOyBmaQ0KCQkJCWlmIFsgJGl2ID0gZXNzaXY6d3AyNTYgXSAm
+JiAhIGVjaG8gJGtleXNpemVzIHwgZ3JlcCAtcXcgMjU2OyB0aGVuIGNvbnRp
+bnVlOyBmaQ0KCQkJCWlmIFsgJGl2ID0gZXNzaXY6d3AzODQgXSAmJiAhIGVj
+aG8gJGtleXNpemVzIHwgZ3JlcCAtcXcgMzg0OyB0aGVuIGNvbnRpbnVlOyBm
+aQ0KCQkJCWlmIFsgJGl2ID0gZXNzaXY6d3A1MTIgXSAmJiAhIGVjaG8gJGtl
+eXNpemVzIHwgZ3JlcCAtcXcgNTEyOyB0aGVuIGNvbnRpbnVlOyBmaQ0KCQkJ
+CWVjaG8gVEVTVElORzogQ0lQSEVSICRjaXBoZXIsIEtFWVNJWkUgJGNoYWlu
+aW5nX2tleXNpemUsIENIQUlOSU5HICRjaGFpbmluZywgSVYgJGl2IHwgdGVl
+IC1hIGxvZw0KCQkJCS4vdGVzdC1jaXBoZXIgLXMgJGNoYWluaW5nX2tleXNp
+emUgLWMgJGNpcGhlci0kY2hhaW5pbmctJGl2DQoJCQlkb25lDQoJCWRvbmUN
+Cglkb25lDQpkb25lDQplY2hvIFBBU1NFRA0K
+
+--279731514-2096129439-1264444788=:18309--
