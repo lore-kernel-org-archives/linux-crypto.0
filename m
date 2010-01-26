@@ -1,43 +1,48 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Re: how the key is generated?
-Date: Tue, 26 Jan 2010 09:58:24 +0100
-Message-ID: <4B5EAEB0.9040205@redhat.com>
-References: <f3566d61001260041s13286706ra5c032ea2b4ce1d6@mail.gmail.com>
+From: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Subject: Re: [PATCH] dm-crypt: disable block encryption with arc4
+Date: Tue, 26 Jan 2010 10:22:34 +0100
+Message-ID: <20100126092234.GA3304@Chamillionaire.breakpoint.cc>
+References: <Pine.LNX.4.64.1001251324310.18309@hs20-bc2-1.build.redhat.com>
+ <4B5DE54F.7050206@redhat.com>
+Reply-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Bai Shuwei <baishuwei@gmail.com>
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Mikulas Patocka <mpatocka@redhat.com>, dm-devel@redhat.com,
+	Alasdair G Kergon <agk@redhat.com>,
+	linux-crypto@vger.kernel.org
+To: Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:9907 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752050Ab0AZI61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2010 03:58:27 -0500
-In-Reply-To: <f3566d61001260041s13286706ra5c032ea2b4ce1d6@mail.gmail.com>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:48834 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752378Ab0AZJWg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2010 04:22:36 -0500
+Content-Disposition: inline
+In-Reply-To: <4B5DE54F.7050206@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/26/2010 09:41 AM, Bai Shuwei wrote:
-> Hello, everyone:
->     i add one line in the setkey function which is in xts.c file to
-> print the in_key value. I find the key value not same i set in the
-> keyfile by cryptsetup
-> 
->    my command is
-> #   cryptsetup luksFormat -d my_keyfile -c xts-aes-plain -s 256 /dev/loop0
+* Milan Broz | 2010-01-25 19:39:11 [+0100]:
 
--d is key file for key slot (passphrase), volume (master) key for encryption
-is generated using RNG during luksFormat inside cryptsetup.
+>On 01/25/2010 07:29 PM, Mikulas Patocka wrote:
+>> Hi
+>> 
+>> When using arc4 to encrypt a block device, the resulting device is 
+>> unreliable. It reads garbage. That's because arc4 is a stream cipher, if 
+>> you write something, it advances its state and if you attempt to decrypt 
+>> the same sector, it uses new state that is different.
+>> 
+>> This patch disables the use of arc4 on block devices.
+>
+>arc4 again. it is simply not a block cipher:-)
+>
+>This should be solved inside cryptoAPI and not blacklist it in dm-crypt,
+>see that thread
+>http://article.gmane.org/gmane.linux.kernel.cryptoapi/3441
 
-You can use pre-generated master key using --master-key-file in cryptsetup 1.1.x
-(but note it reads raw input, not hexa encoding). See man page.
+I some how remember Herbert saying to test for block size > 1. Wouldn't
+this be acceptable to block all stream cipher in one go?
 
-You do not need to modify xts.c btw, try "dmsetup table --showkeys" for active
-dm-crypt mappings to show used volume key.
+>Milan
 
-(and also better use dm-crypt@saout.de mailing list for questions related to
-userspace cryptsetup)
-
-Milan
---
-mbroz@redhat.com
+Sebastian
