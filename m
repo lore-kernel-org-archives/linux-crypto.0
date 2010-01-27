@@ -1,61 +1,82 @@
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [PATCH] dm-crypt: disable block encryption with arc4
-Date: Tue, 26 Jan 2010 12:11:52 -0500 (EST)
-Message-ID: <Pine.LNX.4.64.1001261203220.10059@hs20-bc2-1.build.redhat.com>
-References: <Pine.LNX.4.64.1001251324310.18309@hs20-bc2-1.build.redhat.com>
- <4B5DE54F.7050206@redhat.com> <20100126092234.GA3304@Chamillionaire.breakpoint.cc>
- <4B5EC897.5050102@redhat.com> <Pine.LNX.4.64.1001260722080.20780@hs20-bc2-1.build.redhat.com>
- <20100126133413.GA5511@Chamillionaire.breakpoint.cc>
+From: Bai Shuwei <baishuwei@gmail.com>
+Subject: Re: how the key is generated?
+Date: Wed, 27 Jan 2010 11:21:12 +0800
+Message-ID: <f3566d61001261921v2a7f319bgddb3a3bc971eea10@mail.gmail.com>
+References: <f3566d61001260041s13286706ra5c032ea2b4ce1d6@mail.gmail.com>
+	 <4B5EAEB0.9040205@redhat.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Milan Broz <mbroz@redhat.com>, dm-devel@redhat.com,
-	Alasdair G Kergon <agk@redhat.com>,
-	linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37972 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751367Ab0AZRMQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jan 2010 12:12:16 -0500
-In-Reply-To: <20100126133413.GA5511@Chamillionaire.breakpoint.cc>
+Received: from mail-px0-f182.google.com ([209.85.216.182]:48590 "EHLO
+	mail-px0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752217Ab0A0DVM convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Jan 2010 22:21:12 -0500
+Received: by pxi12 with SMTP id 12so4048340pxi.33
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jan 2010 19:21:12 -0800 (PST)
+In-Reply-To: <4B5EAEB0.9040205@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 26 Jan 2010, Sebastian Andrzej Siewior wrote:
+On Tue, Jan 26, 2010 at 4:58 PM, Milan Broz <mbroz@redhat.com> wrote:
+> On 01/26/2010 09:41 AM, Bai Shuwei wrote:
+>> Hello, everyone:
+>> =A0 =A0 i add one line in the setkey function which is in xts.c file=
+ to
+>> print the in_key value. I find the key value not same i set in the
+>> keyfile by cryptsetup
+>>
+>> =A0 =A0my command is
+>> # =A0 cryptsetup luksFormat -d my_keyfile -c xts-aes-plain -s 256 /d=
+ev/loop0
+>
+> -d is key file for key slot (passphrase), volume (master) key for enc=
+ryption
+> is generated using RNG during luksFormat inside cryptsetup.
+>
+> You can use pre-generated master key using --master-key-file in crypt=
+setup 1.1.x
+> (but note it reads raw input, not hexa encoding). See man page.
+>
+> You do not need to modify xts.c btw, try "dmsetup table --showkeys" f=
+or active
+> dm-crypt mappings to show used volume key.
+>
+> (and also better use dm-crypt@saout.de mailing list for questions rel=
+ated to
+> userspace cryptsetup)
+>
+> Milan
+> --
+> mbroz@redhat.com
+>
 
-> * Mikulas Patocka | 2010-01-26 07:27:18 [-0500]:
-> 
-> >> yes, I think it is better.
-> >> (...and I just forgot to add that test to dm-crypt after that suggestion.)
-> >> 
-> >> Milan
-> >
-> >Hmm, there is salsa20 that has block size 1, larger initialization 
-> >vectors, and can be used to encrypt disks (although salsa20 doesn't 
-> >currently work with dm-crypt, because it doesn't accept "ecb(), cbc(), 
-> >etc." chaining modes --- but if you remove the chaining mode manually, it 
-> >works).
-> >
-> >You should rather add a flag CRYPTO_ALG_CHANGES_STATE to determine that a 
-> >cipher can't be used to encrypt disks.
-> 
-> Just because it will work does not make it a good idea.
-> 
-> SALSA20 is a stream cipher not a block cipher.
-> Block ciphers are used to encrypt data.
-> Stream ciphers are used to create one time pads, a set of encryption
-> keys, ...
-> There are block modes like CTR which can turn a block cipher into a
-> stream cipher. Those should not be used for disk encryption as well.
+Hi, thanks Milan firstly!
+I use "dmsetup table --showkeys" get the bellow information.
 
-Salsa20 is unsuitable for disk encryption in most cases. It would be 
-suitable if we knew that the attacker can obtain the image of encrypted 
-device at most once --- it is OK to protect against laptop theft (it 
-happens just once), but it is not OK to protect against support technician 
-spying on your data (he can read them multiple times, if you have multiple 
-support requests).
+disk$ sudo dmsetup table --showkeys /dev/mapper/dsi0
+0 2040 crypt aes-xts-plain
+3131313131313131313131313131313131313131313131313131313131313131 0 7:0
+2056
 
-Anyway, what I wanted to say, is that block_size <= 1 test is no less 
-hacky than !strcmp(cipher, "arc4") test.
+If i forget the passphase, can i use the above information/key to
+recovery my disk?
 
-Mikulas
+Best Regards
+
+Bai Shuwei
+
+
+--=20
+Love other people, as same as love yourself!
+Don't think all the time, do it by your hands!
+
+E-Mail: baishuwei@gmail.com
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
