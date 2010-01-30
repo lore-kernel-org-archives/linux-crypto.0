@@ -1,51 +1,85 @@
-From: Roel Kluin <roel.kluin@gmail.com>
-Subject: Re: [PATCH] geode: Fix cip/blk confusion
-Date: Sat, 30 Jan 2010 16:48:19 +0100
-Message-ID: <4B6454C3.1030606@gmail.com>
-References: <4B62E388.1070707@gmail.com> <20100129145152.GA31953@Chamillionaire.breakpoint.cc> <25e057c01001290720k529a5ee3i6bef74c9217abbf8@mail.gmail.com> <20100129203008.GA5828@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: 2.6.32: padlock_sha1 and hmac broken?
+Date: Sun, 31 Jan 2010 09:17:31 +1100
+Message-ID: <20100130221731.GA18982@gondor.apana.org.au>
+References: <201001300044.15769.wolfgang.walter@stwm.de> <20100130022721.GA8324@gondor.apana.org.au> <201001301734.46003.wolfgang.walter@stwm.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Sergey Mironov <ierton@gmail.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ew0-f228.google.com ([209.85.219.228]:55564 "EHLO
-	mail-ew0-f228.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752291Ab0A3PmZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 30 Jan 2010 10:42:25 -0500
-In-Reply-To: <20100129203008.GA5828@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Wolfgang Walter <wolfgang.walter@stwm.de>
+Return-path: <linux-kernel-owner+glk-linux-kernel-3=40m.gmane.org-S1753973Ab0A3WRh@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <201001301734.46003.wolfgang.walter@stwm.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-a crypto_cipher cip member was set where a crypto_cipher blk members
-should have been.
-
-Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
----
->> I think my previous patch missed one
->> blk to cip conversion in geode_setkey_cip():
+On Sat, Jan 30, 2010 at 05:34:45PM +0100, Wolfgang Walter wrote:
+>
+> > Please also try "modprobe tcrypt mode=101".
 > 
-> Please send an incremental patch.  Thanks!
+> [  474.947508] alg: hash: Failed to load transform for hmac(sha1): -2
+> [  474.952660] alg: hash: Failed to load transform for hmac(sha1): -2
+> [  474.952737] tcrypt: one or more tests failed!
 
-Ok, here's the missing part
+Oops, it looks like this has been broken ever since we added
+prehashing to hmac.
 
-diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-index 03e71b1..c7a5a43 100644
---- a/drivers/crypto/geode-aes.c
-+++ b/drivers/crypto/geode-aes.c
-@@ -141,7 +141,7 @@ static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
- 	ret = crypto_cipher_setkey(op->fallback.cip, key, len);
- 	if (ret) {
- 		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
--		tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
-+		tfm->crt_flags |= (op->fallback.cip->base.crt_flags & CRYPTO_TFM_RES_MASK);
- 	}
- 	return ret;
+Please try this patch and let me know whether it makes it work
+again.
+
+diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
+index 0af8057..a1180ca 100644
+--- a/drivers/crypto/padlock-sha.c
++++ b/drivers/crypto/padlock-sha.c
+@@ -57,6 +57,20 @@ static int padlock_sha_update(struct shash_desc *desc,
+ 	return crypto_shash_update(&dctx->fallback, data, length);
  }
+ 
++static int padlock_sha_export(struct shash_desc *desc, void *out)
++{
++	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
++
++	return crypto_shash_export(&dctx->fallback, out);
++}
++
++static int padlock_sha_import(struct shash_desc *desc, const void *in)
++{
++	struct padlock_sha_desc *dctx = shash_desc_ctx(desc);
++
++	return crypto_shash_import(&dctx->fallback, in);
++}
++
+ static inline void padlock_output_block(uint32_t *src,
+ 		 	uint32_t *dst, size_t count)
+ {
+@@ -235,7 +249,10 @@ static struct shash_alg sha1_alg = {
+ 	.update 	=	padlock_sha_update,
+ 	.finup  	=	padlock_sha1_finup,
+ 	.final  	=	padlock_sha1_final,
++	.export		=	padlock_sha_export,
++	.import		=	padlock_sha_import,
+ 	.descsize	=	sizeof(struct padlock_sha_desc),
++	.statesize	=	sizeof(struct sha1_state),
+ 	.base		=	{
+ 		.cra_name		=	"sha1",
+ 		.cra_driver_name	=	"sha1-padlock",
+@@ -256,7 +273,10 @@ static struct shash_alg sha256_alg = {
+ 	.update 	=	padlock_sha_update,
+ 	.finup  	=	padlock_sha256_finup,
+ 	.final  	=	padlock_sha256_final,
++	.export		=	padlock_sha_export,
++	.import		=	padlock_sha_import,
+ 	.descsize	=	sizeof(struct padlock_sha_desc),
++	.statesize	=	sizeof(struct sha256_state),
+ 	.base		=	{
+ 		.cra_name		=	"sha256",
+ 		.cra_driver_name	=	"sha256-padlock",
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
