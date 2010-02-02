@@ -1,56 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.33
-Date: Tue, 2 Feb 2010 06:52:04 +1100
-Message-ID: <20100201195204.GA6953__42515.9805141904$1265053962$gmane$org@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Re: Async Crypto API
+Date: Tue, 02 Feb 2010 14:17:51 +0200
+Message-ID: <4B6817EF.7060307@nokia.com>
+References: <20100123032039.GA5551@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: ext Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:57751 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756004Ab0BATwL (ORCPT
+Received: from smtp.nokia.com ([192.100.105.134]:21861 "EHLO
+	mgw-mx09.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751046Ab0BBMXK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Feb 2010 14:52:11 -0500
-Content-Disposition: inline
-In-Reply-To: <20091230021253.GA17067@gondor.apana.org.au>
+	Tue, 2 Feb 2010 07:23:10 -0500
+In-Reply-To: <20100123032039.GA5551@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hi,
 
-This push fixes a couple of serious bugs:
+In the case when finup() is not used, just update/update/../final
+driver finalize calculation from the final function.
 
-* UBIFS assertion failure caused by /dev/random (since forever)
-* Broken hmac support in padlock-sha (since 2.6.32)
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (2):
-      crypto: padlock-sha - Add import/export support
-      random: Remove unused inode variable
-
-Matt Mackall (1):
-      random: drop weird m_time/a_time manipulation
-
- drivers/char/random.c        |    9 ---------
- drivers/crypto/padlock-sha.c |   23 +++++++++++++++++++++++
- 2 files changed, 23 insertions(+), 9 deletions(-)
+It takes a time and if it may not sleep, can final() also return
+EINPROGRESS?
 
 Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Dmitry
+
+
+ext Herbert Xu wrote:
+> Dmitry Kasatkin <dmitry.kasatkin@nokia.com> wrote:
+>   
+>> Hello,
+>>
+>> I have one question about async api.
+>>
+>> I work on AHASH driver and wonder about one thing.
+>>
+>> while calculating hash, client might call many times
+>>
+>> ahash_request_set_crypt(req, &sg, sha1, len);
+>> crypto_ahash_update(req);
+>> ..
+>> ..
+>> ahash_request_set_crypt(req, &sg, sha1, len);
+>> crypto_ahash_finup(req);
+>>
+>> right?
+>>
+>> But because it is async and driver does not wait_for_completion,
+>> previous request may not be completed before client will call next update.
+>>
+>> But what should be the behavior of the driver?
+>>     
+>
+> If any async operation returns EINPROGRESS, the client must not
+> proceed until that operation has completed.
+>
+> Cheers,
+>   
