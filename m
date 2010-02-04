@@ -1,43 +1,38 @@
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: Re: LZO irreversible output?
-Date: Wed, 3 Feb 2010 23:54:11 +0100
-Message-ID: <201002032354.11284.rjw@sisk.pl>
-References: <4B69ECE5.5060505@crca.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] geode: Fix cip/blk confusion
+Date: Thu, 4 Feb 2010 11:39:36 +1100
+Message-ID: <20100204003936.GA28890@gondor.apana.org.au>
+References: <4B62E388.1070707@gmail.com> <20100129145152.GA31953@Chamillionaire.breakpoint.cc> <25e057c01001290720k529a5ee3i6bef74c9217abbf8@mail.gmail.com> <20100129203008.GA5828@gondor.apana.org.au> <4B6454C3.1030606@gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-2"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	TuxOnIce Devel List <tuxonice-devel@lists.tuxonice.net>,
-	LKML <linux-kernel@vger.kernel.org>
-To: Nigel Cunningham <ncunningham@crca.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Sergey Mironov <ierton@gmail.com>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Roel Kluin <roel.kluin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ogre.sisk.pl ([217.79.144.158]:41218 "EHLO ogre.sisk.pl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754668Ab0BCWxc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2010 17:53:32 -0500
-In-Reply-To: <4B69ECE5.5060505@crca.org.au>
+Received: from rhun.apana.org.au ([64.62.148.172]:43896 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756225Ab0BDAkG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Feb 2010 19:40:06 -0500
+Content-Disposition: inline
+In-Reply-To: <4B6454C3.1030606@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 03 February 2010, Nigel Cunningham wrote:
-> Hi all.
+On Sat, Jan 30, 2010 at 04:48:19PM +0100, Roel Kluin wrote:
+> a crypto_cipher cip member was set where a crypto_cipher blk members
+> should have been.
 > 
-> (Not sent to LKML yesterday; no reply from linux-crypto yet, so resending).
-> 
-> A while back now, I stopped supplying the LZF compression algorithm with
-> TuxOnIce and made LZO the default algorithm. Around the same time, we
-> started getting occasional errors when reading images; decompression
-> failures.
-> 
-> I've finally managed to find the time to properly look at this, and have
-> managed to find a data page that LZO compresses, but seems to be unable
-> to decompress back to the original contents. I'm wondering whether this
-> is because I'm doing something wrong, or because there really is some
-> data the LZO (or the kernel implementation) can't do reversible
-> compression on.
+> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
 
-Well, FWIW, we have never had any problems with the userland LZO in s2disk,
-so if anything is wrong with LZO here, I guess it's the kernel code.
-
-Rafael
+Patch applied.  Thank you.
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
