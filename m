@@ -1,43 +1,46 @@
-From: Edward Ebii II <ebi_edii@yahoo.com.hk>
-Subject: Hi Waiting
-Date: Wed, 03 Feb 2010 20:05:24 -0500
-Message-ID: <20100203200524.5lrf618fms0oco84__47951.6783183955$1265246679$gmane$org@webmail.hawk-security.net>
+From: Nigel Cunningham <ncunningham@crca.org.au>
+Subject: Re: LZO irreversible output?
+Date: Thu, 04 Feb 2010 15:37:27 +1100
+Message-ID: <4B6A4F07.3090509@crca.org.au>
+References: <4B69ECE5.5060505@crca.org.au> <201002032354.11284.rjw@sisk.pl>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helsinki.clusterspan.net ([70.33.246.80]:42460 "EHLO
-	helsinki.clusterspan.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758064Ab0BDBYd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2010 20:24:33 -0500
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	TuxOnIce Devel List <tuxonice-devel@lists.tuxonice.net>,
+	LKML <linux-kernel@vger.kernel.org>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <201002032354.11284.rjw@sisk.pl>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Hi Rafael.
 
+Rafael J. Wysocki wrote:
+> On Wednesday 03 February 2010, Nigel Cunningham wrote:
+>> Hi all.
+>>
+>> (Not sent to LKML yesterday; no reply from linux-crypto yet, so resending).
+>>
+>> A while back now, I stopped supplying the LZF compression algorithm with
+>> TuxOnIce and made LZO the default algorithm. Around the same time, we
+>> started getting occasional errors when reading images; decompression
+>> failures.
+>>
+>> I've finally managed to find the time to properly look at this, and have
+>> managed to find a data page that LZO compresses, but seems to be unable
+>> to decompress back to the original contents. I'm wondering whether this
+>> is because I'm doing something wrong, or because there really is some
+>> data the LZO (or the kernel implementation) can't do reversible
+>> compression on.
+> 
+> Well, FWIW, we have never had any problems with the userland LZO in s2disk,
+> so if anything is wrong with LZO here, I guess it's the kernel code.
 
-Dear Friend,
-
-Greetings and how are you doing today?
-
-By summarized profile,I am Edward Ebi II, an International Business
-Consultants.I have a reputable client in my custody who
-inherited US$18.2M and wish to invest the sum in your custody
-but our problem remains we are novice to international business/
-any lucrative project to invest the fund hence we contact you.
-
-
-More importantly, we intend to make you our fund manager because
-you are in a much better position to guide us with your country's
-regulatory policies to investment and receival of funds in your
-nominated account for safety.
-
-Thanks as we look forward to your earliest response.
+Okay. Guess I have to start shipping LZF again and make it the default
+again then.
 
 Regards,
-Edward Ebi II
+
+Nigel
