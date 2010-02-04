@@ -1,36 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] geode: Fix cip/blk confusion
-Date: Thu, 4 Feb 2010 11:39:36 +1100
-Message-ID: <20100204003936.GA28890@gondor.apana.org.au>
-References: <4B62E388.1070707@gmail.com> <20100129145152.GA31953@Chamillionaire.breakpoint.cc> <25e057c01001290720k529a5ee3i6bef74c9217abbf8@mail.gmail.com> <20100129203008.GA5828@gondor.apana.org.au> <4B6454C3.1030606@gmail.com>
+Subject: Re: [PATCH] crypto: pcrypt - call the complete function on error
+Date: Thu, 4 Feb 2010 11:40:33 +1100
+Message-ID: <20100204004033.GB28890@gondor.apana.org.au>
+References: <20100201093937.GH6619@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Sergey Mironov <ierton@gmail.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>
-To: Roel Kluin <roel.kluin@gmail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:43896 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:43902 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756225Ab0BDAkG (ORCPT
+	with ESMTP id S1756225Ab0BDAkg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Feb 2010 19:40:06 -0500
+	Wed, 3 Feb 2010 19:40:36 -0500
 Content-Disposition: inline
-In-Reply-To: <4B6454C3.1030606@gmail.com>
+In-Reply-To: <20100201093937.GH6619@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jan 30, 2010 at 04:48:19PM +0100, Roel Kluin wrote:
-> a crypto_cipher cip member was set where a crypto_cipher blk members
-> should have been.
+On Mon, Feb 01, 2010 at 10:39:37AM +0100, Steffen Klassert wrote:
+> This fixes three forgotten calls to the complete function
+> in the error case.
 > 
-> Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-Patch applied.  Thank you.
+Applied.  Thanks!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
