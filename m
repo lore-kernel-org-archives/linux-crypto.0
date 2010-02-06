@@ -1,46 +1,45 @@
-From: Nigel Cunningham <ncunningham@crca.org.au>
-Subject: Re: LZO irreversible output?
-Date: Thu, 04 Feb 2010 15:37:27 +1100
-Message-ID: <4B6A4F07.3090509@crca.org.au>
-References: <4B69ECE5.5060505@crca.org.au> <201002032354.11284.rjw@sisk.pl>
+From: Bai Shuwei <baishuwei@gmail.com>
+Subject: device-mapper: remove ioctl failed: device or resource busy
+Date: Sat, 6 Feb 2010 11:32:35 +0800
+Message-ID: <f3566d61002051932n4f2a30cx4e4f0e962af25a37@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	TuxOnIce Devel List <tuxonice-devel@lists.tuxonice.net>,
-	LKML <linux-kernel@vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <201002032354.11284.rjw@sisk.pl>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pz0-f187.google.com ([209.85.222.187]:45223 "EHLO
+	mail-pz0-f187.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751914Ab0BFDjN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Feb 2010 22:39:13 -0500
+Received: by pzk17 with SMTP id 17so391093pzk.4
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Feb 2010 19:39:13 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Rafael.
+Hi, All:
+   I port the xts-aes algorithm to FPGA board and use it to
+encrypt/decrypt the disc.  i will get the bellow information
 
-Rafael J. Wysocki wrote:
-> On Wednesday 03 February 2010, Nigel Cunningham wrote:
->> Hi all.
->>
->> (Not sent to LKML yesterday; no reply from linux-crypto yet, so resending).
->>
->> A while back now, I stopped supplying the LZF compression algorithm with
->> TuxOnIce and made LZO the default algorithm. Around the same time, we
->> started getting occasional errors when reading images; decompression
->> failures.
->>
->> I've finally managed to find the time to properly look at this, and have
->> managed to find a data page that LZO compresses, but seems to be unable
->> to decompress back to the original contents. I'm wondering whether this
->> is because I'm doing something wrong, or because there really is some
->> data the LZO (or the kernel implementation) can't do reversible
->> compression on.
-> 
-> Well, FWIW, we have never had any problems with the userland LZO in s2disk,
-> so if anything is wrong with LZO here, I guess it's the kernel code.
+   But when excute the bellow commands
+   cryptsetup luksFormat -c aes-xts-plain -s 256 /dev/loop0
+  or
+   cryptsetup luksOpen /dev/loop0 test0
 
-Okay. Guess I have to start shipping LZF again and make it the default
-again then.
+   I get the bellow information
+   ....
+   device-mapper: remove ioctl failed: device or resource busy
+   ....
 
-Regards,
+   But others are all fine! I can format and mount test0. So i want to
+know why the message is printed? Thanks!
 
-Nigel
+Best REgards
+
+
+Bai Shuwei
+
+-- 
+Love other people, as same as love yourself!
+Don't think all the time, do it by your hands!
+
+E-Mail: baishuwei@gmail.com
