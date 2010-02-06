@@ -1,45 +1,45 @@
-From: Bai Shuwei <baishuwei@gmail.com>
-Subject: device-mapper: remove ioctl failed: device or resource busy
-Date: Sat, 6 Feb 2010 11:32:35 +0800
-Message-ID: <f3566d61002051932n4f2a30cx4e4f0e962af25a37@mail.gmail.com>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: device-mapper: remove ioctl failed: device or resource busy
+Date: Sat, 06 Feb 2010 21:13:12 +0100
+Message-ID: <4B6DCD58.5010102@redhat.com>
+References: <f3566d61002051932n4f2a30cx4e4f0e962af25a37@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Bai Shuwei <baishuwei@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pz0-f187.google.com ([209.85.222.187]:45223 "EHLO
-	mail-pz0-f187.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751914Ab0BFDjN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Feb 2010 22:39:13 -0500
-Received: by pzk17 with SMTP id 17so391093pzk.4
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Feb 2010 19:39:13 -0800 (PST)
+Received: from mx1.redhat.com ([209.132.183.28]:31904 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755858Ab0BFUNQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Feb 2010 15:13:16 -0500
+In-Reply-To: <f3566d61002051932n4f2a30cx4e4f0e962af25a37@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, All:
-   I port the xts-aes algorithm to FPGA board and use it to
-encrypt/decrypt the disc.  i will get the bellow information
-
-   But when excute the bellow commands
-   cryptsetup luksFormat -c aes-xts-plain -s 256 /dev/loop0
-  or
-   cryptsetup luksOpen /dev/loop0 test0
-
-   I get the bellow information
-   ....
-   device-mapper: remove ioctl failed: device or resource busy
-   ....
-
-   But others are all fine! I can format and mount test0. So i want to
-know why the message is printed? Thanks!
-
-Best REgards
+On 02/06/2010 04:32 AM, Bai Shuwei wrote:
+>    I port the xts-aes algorithm to FPGA board and use it to
+> encrypt/decrypt the disc.  i will get the bellow information
+> 
+>    But when excute the bellow commands
+>    cryptsetup luksFormat -c aes-xts-plain -s 256 /dev/loop0
+>   or
+>    cryptsetup luksOpen /dev/loop0 test0
+> 
+>    I get the bellow information
+>    ....
+>    device-mapper: remove ioctl failed: device or resource busy
 
 
-Bai Shuwei
+Probably some udev rule triggers scan on temporary keyslot device.
+This is known problem with some badly written udev rules and old versions
+of DevKit-disks (recent version should not touch these internal devices at all).
 
--- 
-Love other people, as same as love yourself!
-Don't think all the time, do it by your hands!
+Use cryptsetup 1.1.0 and run it with --debug to get more info, also see syslog (there
+will be exact information which device was busy, I expect temp-cryptsetup*...)
+(It will retry after 1 sec anyway, so it usually works - see that debug log.)
 
-E-Mail: baishuwei@gmail.com
+This is not kernel problem at all, just userspace race between some asynchronous
+device scan triggered from udev (usually blkid check) and cryptsetup.
+
+Milan
