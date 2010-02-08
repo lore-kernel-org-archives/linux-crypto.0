@@ -1,51 +1,45 @@
-From: Bill Davidsen <davidsen@tmr.com>
+From: Nigel Cunningham <ncunningham@crca.org.au>
 Subject: Re: LZO irreversible output?
-Date: Sun, 07 Feb 2010 17:23:39 -0500
-Message-ID: <hkneh9$djl$1@ger.gmane.org>
-References: <4B69ECE5.5060505@crca.org.au> <201002032354.11284.rjw@sisk.pl> <4B6A4F07.3090509@crca.org.au>
+Date: Mon, 08 Feb 2010 19:33:11 +1100
+Message-ID: <4B6FCC47.2030705@crca.org.au>
+References: <4B69ECE5.5060505@crca.org.au> <201002032354.11284.rjw@sisk.pl> <4B6A4F07.3090509@crca.org.au> <hkneh9$djl$1@ger.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, tuxonice-devel@lists.tuxonice.net
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4B6A4F07.3090509@crca.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	tuxonice-devel@lists.tuxonice.net
+To: Bill Davidsen <davidsen@tmr.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.crca.org.au ([67.207.131.56]:40513 "EHLO crca.org.au"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751066Ab0BHIbG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Feb 2010 03:31:06 -0500
+In-Reply-To: <hkneh9$djl$1@ger.gmane.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Nigel Cunningham wrote:
-> Hi Rafael.
-> 
-> Rafael J. Wysocki wrote:
->> On Wednesday 03 February 2010, Nigel Cunningham wrote:
->>> Hi all.
->>>
->>> (Not sent to LKML yesterday; no reply from linux-crypto yet, so resending).
->>>
->>> A while back now, I stopped supplying the LZF compression algorithm with
->>> TuxOnIce and made LZO the default algorithm. Around the same time, we
->>> started getting occasional errors when reading images; decompression
->>> failures.
->>>
->>> I've finally managed to find the time to properly look at this, and have
->>> managed to find a data page that LZO compresses, but seems to be unable
->>> to decompress back to the original contents. I'm wondering whether this
->>> is because I'm doing something wrong, or because there really is some
->>> data the LZO (or the kernel implementation) can't do reversible
->>> compression on.
->> Well, FWIW, we have never had any problems with the userland LZO in s2disk,
->> so if anything is wrong with LZO here, I guess it's the kernel code.
-> 
-> Okay. Guess I have to start shipping LZF again and make it the default
-> again then.
-> 
-I would hope someone will look at the real problem, though, that LZO isn't 
-working properly. I have to assume that either the kernel decompress is broken 
-or that the page you have given is invalid, and the error lies in the compression.
+Hi Bill.
 
-It doesn't look as if you are doing something wrong, it looks broken.
+Bill Davidsen wrote:
+> I would hope someone will look at the real problem, though, that LZO
+> isn't working properly. I have to assume that either the kernel
+> decompress is broken or that the page you have given is invalid, and the
+> error lies in the compression.
+> 
+> It doesn't look as if you are doing something wrong, it looks broken.
 
--- 
-Bill Davidsen <davidsen@tmr.com>
-   "We have more to fear from the bungling of the incompetent than from
-the machinations of the wicked."  - from Slashdot
+I did get hold of Richard Purdie and Nitin Gupta, who were the guys in
+the know. We discovered that LZO is expecting decomp_size to be
+initialised to the amount of available space when the decompression code
+is called, so there was a bug in my testing code. Nitin was talking
+about sending a patch to the documentation to make this requirement clearer.
+
+That said, the actual code that TuxOnIce uses does already initialise
+the variable to PAGE_SIZE, so it seems that I might just have to run
+with the checking code enabled (with this fix) for a while, until the
+issue is found.
+
+Regards,
+
+Nigel
+
