@@ -1,54 +1,37 @@
-From: Sebastian Andrzej Siewior <sebatian@breakpoint.cc>
-Subject: Re: [PATCH] dm-crypt: disable block encryption with arc4
-Date: Tue, 9 Feb 2010 15:57:05 +0100
-Message-ID: <20100209145705.GA20421@Chamillionaire.breakpoint.cc>
-References: <Pine.LNX.4.64.1001260722080.20780@hs20-bc2-1.build.redhat.com>
- <20100209073718.GA17612@gondor.apana.org.au>
+From: Nix <nix@esperi.org.uk>
+Subject: Re: LZO irreversible output?
+Date: Tue, 09 Feb 2010 17:32:27 +0000
+Message-ID: <874olq1fis.fsf@spindle.srvr.nix>
+References: <4B69ECE5.5060505@crca.org.au> <201002032354.11284.rjw@sisk.pl>
+	<4B6A4F07.3090509@crca.org.au> <hkneh9$djl$1@ger.gmane.org>
+	<4B6FCC47.2030705@crca.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Mikulas Patocka <mpatocka@redhat.com>, mbroz@redhat.com,
-	linux-crypto@ml.breakpoint.cc, dm-devel@redhat.com, agk@redhat.com,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:33802 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753335Ab0BIO5M (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 09:57:12 -0500
-Content-Disposition: inline
-In-Reply-To: <20100209073718.GA17612@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: tuxonice-devel@lists.tuxonice.net, Bill Davidsen <davidsen@tmr.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Nigel Cunningham <ncunningham@crca.org.au>
+Return-path: <tuxonice-devel-bounces@lists.tuxonice.net>
+In-Reply-To: <4B6FCC47.2030705@crca.org.au> (Nigel Cunningham's message of
+	"Mon, 08 Feb 2010 19:33:11 +1100")
+List-Unsubscribe: <http://lists.tuxonice.net/options/tuxonice-devel>,
+	<mailto:tuxonice-devel-request@lists.tuxonice.net?subject=unsubscribe>
+List-Archive: <http://lists.tuxonice.net/pipermail/tuxonice-devel>
+List-Post: <mailto:tuxonice-devel@lists.tuxonice.net>
+List-Help: <mailto:tuxonice-devel-request@lists.tuxonice.net?subject=help>
+List-Subscribe: <http://lists.tuxonice.net/listinfo/tuxonice-devel>,
+	<mailto:tuxonice-devel-request@lists.tuxonice.net?subject=subscribe>
+Sender: tuxonice-devel-bounces@lists.tuxonice.net
+Errors-To: tuxonice-devel-bounces@lists.tuxonice.net
+List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2010-02-09 18:37:18 [+1100]:
+On 8 Feb 2010, Nigel Cunningham verbalised:
+> That said, the actual code that TuxOnIce uses does already initialise
+> the variable to PAGE_SIZE, so it seems that I might just have to run
+> with the checking code enabled (with this fix) for a while, until the
+> issue is found.
 
->Mikulas Patocka <mpatocka@redhat.com> wrote:
->> 
->> You should rather add a flag CRYPTO_ALG_CHANGES_STATE to determine that a 
->> cipher can't be used to encrypt disks.
->
->No, please see my reply in the previous thread.  What we should
->do is fix arc4.  I just haven't got around to doing it yet.
->
->As to blacklisting algorithms not suitable for disk encryption,
->that is up to the dm-crypt maintainers to decide.
-
-Herbert, what happend to the "check for streamcipher" idea you had? Is
-it gone? On the other hand it wouldn't be probably that bad to have a
-seprate interface to grab a block cipher _or_ a stream cipher. So
-something like this wouldn't happen. This is basically the "check for
-stream cipher" without encrypt = decrypt plus with a struct the cra_u
-union.
-I can't imaging how you want to fix arc4 that it will work in dm-crypt.
-The algorithm relies more or less on the fact that it envolves itself
-during processing of data.
-Salsa works with dm-crypt because the internal state is taken from the
-IV and is never written back. dm-crypt always encrypts/decrypts a 512
-block in one go. Splitting it in two and requesting two 256 block
-encryptions would work with _every_ other block cipher but break salsa.
-
->
->Cheers,
-
-Sebastian
+If you push the fix somewhere I'll run with it as well and see if I can
+make this problem happen again. (So far I've only seen it with both
+compression and max_workers > 1, but I haven't done a systematic check
+for this so it could be an illusion.)
