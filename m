@@ -1,43 +1,166 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/3] SCRIPTS: Better error message for checkpath.pl
-Date: Wed, 10 Feb 2010 01:40:52 +0100
-Message-ID: <1265762453-21083-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 2/3] SCRIPTS: s/should/must/ for all ERRORs
+Date: Wed, 10 Feb 2010 01:41:03 +0100
+Message-ID: <1265762465-21114-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Andy Whitcroft <apw@canonical.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Daniel Walker <dwalker@fifo99.com>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:48883 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752273Ab0BJAla (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:41:30 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-If the input file for checkpatch.pl is not a patch, print an error message
-that suggets -f.
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- scripts/checkpatch.pl |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/checkpatch.pl |   32 ++++++++++++++++----------------
+ 1 files changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 3257d3d..d5405aa 100755
+index d5405aa..96ca9f0 100755
 --- a/scripts/checkpatch.pl
 +++ b/scripts/checkpatch.pl
-@@ -2693,7 +2693,7 @@ sub process {
- 	}
+@@ -1355,7 +1355,7 @@ sub process {
+ 			my $ptr = substr($blank, 0, length($utf8_prefix)) . "^";
+ 			my $hereptr = "$hereline$ptr\n";
  
- 	if (!$is_patch) {
--		ERROR("Does not appear to be a unified-diff format patch\n");
-+		ERROR("Does not appear to be a unified-diff format patch. Add -f?\n");
- 	}
- 	if ($is_patch && $chk_signoff && $signoff == 0) {
- 		ERROR("Missing Signed-off-by: line(s)\n");
+-			ERROR("Invalid UTF-8, patch and commit message should be encoded in UTF-8\n" . $hereptr);
++			ERROR("Invalid UTF-8, patch and commit message must be encoded in UTF-8\n" . $hereptr);
+ 		}
+ 
+ # ignore non-hunk lines and lines being removed
+@@ -1408,7 +1408,7 @@ sub process {
+ 		if ($rawline =~ /^\+\s* \t\s*\S/ ||
+ 		    $rawline =~ /^\+\s*        \s*/) {
+ 			my $herevet = "$here\n" . cat_vet($rawline) . "\n";
+-			ERROR("code indent should use tabs where possible\n" . $herevet);
++			ERROR("code indent must use tabs where possible\n" . $herevet);
+ 		}
+ 
+ # check we are in a valid C source file if not then ignore this hunk
+@@ -1515,7 +1515,7 @@ sub process {
+ 				}
+ 			}
+ 			if ($err ne '') {
+-				ERROR("switch and case should be at the same indent\n$hereline$err");
++				ERROR("switch and case must be at the same indent\n$hereline$err");
+ 			}
+ 		}
+ 
+@@ -1543,7 +1543,7 @@ sub process {
+ 			#print "pre<$pre_ctx>\nline<$line>\nctx<$ctx>\nnext<$lines[$ctx_ln - 1]>\n";
+ 
+ 			if ($ctx !~ /{\s*/ && defined($lines[$ctx_ln -1]) && $lines[$ctx_ln - 1] =~ /^\+\s*{/) {
+-				ERROR("that open brace { should be on the previous line\n" .
++				ERROR("that open brace { must be on the previous line\n" .
+ 					"$here\n$ctx\n$lines[$ctx_ln - 1]\n");
+ 			}
+ 			if ($level == 0 && $pre_ctx !~ /}\s*while\s*\($/ &&
+@@ -1682,7 +1682,7 @@ sub process {
+ # check for initialisation to aggregates open brace on the next line
+ 		if ($line =~ /^.\s*{/ &&
+ 		    $prevline =~ /(?:^|[^=])=\s*$/) {
+-			ERROR("that open brace { should be on the previous line\n" . $hereprev);
++			ERROR("that open brace { must be on the previous line\n" . $hereprev);
+ 		}
+ 
+ #
+@@ -1777,7 +1777,7 @@ sub process {
+ 
+ 			#print "from<$from> to<$to>\n";
+ 			if ($from ne $to) {
+-				ERROR("\"(foo$from)\" should be \"(foo$to)\"\n" .  $herecurr);
++				ERROR("\"(foo$from)\" must be \"(foo$to)\"\n" .  $herecurr);
+ 			}
+ 		} elsif ($line =~ m{\b$NonptrType(\s*(?:$Modifier\b\s*|\*\s*)+)($Ident)}) {
+ 			my ($from, $to, $ident) = ($1, $1, $2);
+@@ -1794,7 +1794,7 @@ sub process {
+ 
+ 			#print "from<$from> to<$to> ident<$ident>\n";
+ 			if ($from ne $to && $ident !~ /^$Modifier$/) {
+-				ERROR("\"foo${from}bar\" should be \"foo${to}bar\"\n" .  $herecurr);
++				ERROR("\"foo${from}bar\" must be \"foo${to}bar\"\n" .  $herecurr);
+ 			}
+ 		}
+ 
+@@ -2188,7 +2188,7 @@ sub process {
+ 					$stat_real = "[...]\n$stat_real";
+ 				}
+ 
+-				ERROR("trailing statements should be on next line\n" . $herecurr . $stat_real);
++				ERROR("trailing statements must be on next line\n" . $herecurr . $stat_real);
+ 			}
+ 		}
+ 
+@@ -2212,12 +2212,12 @@ sub process {
+ 			my $s = $1;
+ 			$s =~ s/$;//g; 	# Remove any comments
+ 			if ($s !~ /^\s*(?:\sif|(?:{|)\s*\\?\s*$)/) {
+-				ERROR("trailing statements should be on next line\n" . $herecurr);
++				ERROR("trailing statements must be on next line\n" . $herecurr);
+ 			}
+ 		}
+ # if should not continue a brace
+ 		if ($line =~ /}\s*if\b/) {
+-			ERROR("trailing statements should be on next line\n" .
++			ERROR("trailing statements must be on next line\n" .
+ 				$herecurr);
+ 		}
+ # case and default should not have general statements after them
+@@ -2227,14 +2227,14 @@ sub process {
+ 			\s*return\s+
+ 		    )/xg)
+ 		{
+-			ERROR("trailing statements should be on next line\n" . $herecurr);
++			ERROR("trailing statements must be on next line\n" . $herecurr);
+ 		}
+ 
+ 		# Check for }<nl>else {, these must be at the same
+ 		# indent level to be relevant to each other.
+ 		if ($prevline=~/}\s*$/ and $line=~/^.\s*else\s*/ and
+ 						$previndent == $indent) {
+-			ERROR("else should follow close brace '}'\n" . $hereprev);
++			ERROR("else must follow close brace '}'\n" . $hereprev);
+ 		}
+ 
+ 		if ($prevline=~/}\s*$/ and $line=~/^.\s*while\s*/ and
+@@ -2247,7 +2247,7 @@ sub process {
+ 			$s =~ s/\n.*//g;
+ 
+ 			if ($s =~ /^\s*;/) {
+-				ERROR("while should follow close brace '}'\n" . $hereprev);
++				ERROR("while must follow close brace '}'\n" . $hereprev);
+ 			}
+ 		}
+ 
+@@ -2356,7 +2356,7 @@ sub process {
+ 				if ($rest !~ /while\s*\(/ &&
+ 				    $dstat !~ /$exceptions/)
+ 				{
+-					ERROR("Macros with multiple statements should be enclosed in a do - while loop\n" . "$here\n$ctx\n");
++					ERROR("Macros with multiple statements must be enclosed in a do - while loop\n" . "$here\n$ctx\n");
+ 				}
+ 
+ 			} elsif ($ctx !~ /;/) {
+@@ -2366,7 +2366,7 @@ sub process {
+ 				    $dstat !~ /^\.$Ident\s*=/ &&
+ 				    $dstat =~ /$Operators/)
+ 				{
+-					ERROR("Macros with complex values should be enclosed in parenthesis\n" . "$here\n$ctx\n");
++					ERROR("Macros with complex values must be enclosed in parenthesis\n" . "$here\n$ctx\n");
+ 				}
+ 			}
+ 		}
+@@ -2564,7 +2564,7 @@ sub process {
+ # storage class and type.
+ 		if ($line =~ /\b$Type\s+$Inline\b/ ||
+ 		    $line =~ /\b$Inline\s+$Storage\b/) {
+-			ERROR("inline keyword should sit between storage class and type\n" . $herecurr);
++			ERROR("inline keyword must sit between storage class and type\n" . $herecurr);
+ 		}
+ 
+ # Check for __inline__ and __inline, prefer inline
 -- 
 1.6.6.1
-
