@@ -1,58 +1,72 @@
-From: richih.mailinglist@gmail.com
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in arc4.c
-Date: Wed, 10 Feb 2010 02:17:39 +0100
-Message-ID: <1265764660-23178-1-git-send-email-richih.mailinglist@gmail.com>
+From: Richard Hartmann <richih.mailinglist@gmail.com>
+Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in authenc.c
+Date: Wed, 10 Feb 2010 02:20:45 +0100
+Message-ID: <1265764847-23516-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: richih.mailinglist@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f220.google.com ([209.85.220.220]:44859 "EHLO
-	mail-fx0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754300Ab0BJBS1 (ORCPT
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:41794 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754818Ab0BJBVi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 20:18:27 -0500
+	Tue, 9 Feb 2010 20:21:38 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
-
-From: Richard Hartmann <richih.mailinglist@gmail.com>
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/arc4.c |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
+ crypto/authenc.c |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-index 8be47e1..8a61fa2 100644
---- a/crypto/arc4.c
-+++ b/crypto/arc4.c
-@@ -1,4 +1,4 @@
--/* 
-+/*
-  * Cryptographic API
-  *
-  * ARC4 Cipher Algorithm
-@@ -33,16 +33,15 @@ static int arc4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	ctx->x = 1;
- 	ctx->y = 0;
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 4d6f49a..1887090 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -194,7 +194,7 @@ static void authenc_verify_ahash_update_done(struct crypto_async_request *areq,
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
  
--	for(i = 0; i < 256; i++)
-+	for (i = 0; i < 256; i++)
- 		ctx->S[i] = i;
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG: 0;
++	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
  
--	for(i = 0; i < 256; i++)
--	{
-+	for (i = 0; i < 256; i++) {
- 		u8 a = ctx->S[i];
- 		j = (j + in_key[k] + a) & 0xff;
- 		ctx->S[i] = ctx->S[j];
- 		ctx->S[j] = a;
--		if(++k >= key_len)
-+		if (++k >= key_len)
- 			k = 0;
- 	}
+@@ -231,7 +231,7 @@ static void authenc_verify_ahash_done(struct crypto_async_request *areq,
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
  
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG: 0;
++	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -464,7 +464,7 @@ static int crypto_authenc_verify(struct aead_request *req,
+ 	ihash = ohash + authsize;
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+-	return memcmp(ihash, ohash, authsize) ? -EBADMSG: 0;
++	return memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
+ }
+ 
+ static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
+@@ -557,11 +557,11 @@ static int crypto_authenc_init_tfm(struct crypto_tfm *tfm)
+ 
+ 	ctx->auth = auth;
+ 	ctx->enc = enc;
+-	
++
+ 	tfm->crt_aead.reqsize = max_t(unsigned int,
+ 				crypto_ahash_reqsize(auth) + ctx->reqoff +
+ 				sizeof(struct authenc_request_ctx) +
+-				sizeof(struct ahash_request), 
++				sizeof(struct ahash_request),
+ 				sizeof(struct skcipher_givcrypt_request) +
+ 				crypto_ablkcipher_reqsize(enc) +
+ 				crypto_ablkcipher_ivsize(enc));
 -- 
 1.6.6.1
 
