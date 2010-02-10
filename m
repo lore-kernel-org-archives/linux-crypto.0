@@ -1,47 +1,40 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors in ablkcipher.c
-Date: Wed, 10 Feb 2010 01:25:40 +0100
-Message-ID: <1265761540-20767-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 1/1] SCRIPTS: Fix whitespace in get_maintainer output
+Date: Wed, 10 Feb 2010 01:37:01 +0100
+Message-ID: <1265762223-21006-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+	Joe Perches <joe@perches.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:40594 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751596Ab0BJA0P (ORCPT
+Received: from mail-fx0-f220.google.com ([209.85.220.220]:33312 "EHLO
+	mail-fx0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752499Ab0BJAiO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:26:15 -0500
+	Tue, 9 Feb 2010 19:38:14 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/ablkcipher.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/get_maintainer.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index f6f0833..fe980da 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -1,6 +1,6 @@
- /*
-  * Asynchronous block chaining cipher operations.
-- * 
-+ *
-  * This is the asynchronous version of blkcipher.c indicating completion
-  * via a callback.
-  *
-@@ -8,7 +8,7 @@
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-  */
+diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+index 2f3230d..430928e 100755
+--- a/scripts/get_maintainer.pl
++++ b/scripts/get_maintainer.pl
+@@ -278,7 +278,7 @@ foreach my $file (@ARGV) {
+ 	}
+ 	close(PATCH);
+ 	if ($file_cnt == @files) {
+-	    warn "$P: file '${file}' doesn't appear to be a patch.  "
++	    warn "$P: file '${file}' doesn't appear to be a patch. "
+ 		. "Add -f to options?\n";
+ 	}
+ 	@files = sort_and_uniq(@files);
 -- 
-1.6.5.7
+1.6.6.1
 
