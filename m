@@ -1,48 +1,35 @@
-From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors in aead.c
-Date: Wed, 10 Feb 2010 01:42:27 +0100
-Message-ID: <1265762548-21458-1-git-send-email-richih.mailinglist@gmail.com>
-Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH 1/1] SCRIPTS: Fix whitespace in get_maintainer output
+Date: Tue, 09 Feb 2010 16:47:19 -0800
+Message-ID: <1265762839.2131.46.camel@Joe-Laptop.home>
+References: <1265762223-21006-1-git-send-email-richih.mailinglist@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+To: Richard Hartmann <richih.mailinglist@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.158]:21451 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754369Ab0BJAnG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:43:06 -0500
+Received: from mail.perches.com ([173.55.12.10]:1927 "EHLO mail.perches.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751508Ab0BJArU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Feb 2010 19:47:20 -0500
+In-Reply-To: <1265762223-21006-1-git-send-email-richih.mailinglist@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, 2010-02-10 at 01:37 +0100, Richard Hartmann wrote:
+> -	    warn "$P: file '${file}' doesn't appear to be a patch.  "
+> +	    warn "$P: file '${file}' doesn't appear to be a patch. "
 
-Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
----
- crypto/aead.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+One space not two after periods?  Horrors.
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 0a55da7..6729e8f 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -1,13 +1,13 @@
- /*
-  * AEAD: Authenticated Encryption with Associated Data
-- * 
-+ *
-  * This file provides API support for AEAD algorithms.
-  *
-  * Copyright (c) 2007 Herbert Xu <herbert@gondor.apana.org.au>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-  */
--- 
-1.6.6.1
+Well if you like, but that's not what I like.
+
+Not-acked-by-but-not-specifically-rejected-by etc.
+
+cheers, Joe
+
+FULL STOP
 
