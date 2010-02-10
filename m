@@ -1,50 +1,89 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in algapi.c
-Date: Wed, 10 Feb 2010 01:49:58 +0100
-Message-ID: <1265762999-22112-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in anubis.c
+Date: Wed, 10 Feb 2010 01:53:06 +0100
+Message-ID: <1265763187-22417-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Brad Bosch <bradbosch@comcast.net>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:53659 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752472Ab0BJAuz (ORCPT
+Received: from mail-fx0-f220.google.com ([209.85.220.220]:50137 "EHLO
+	mail-fx0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751672Ab0BJAx4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:50:55 -0500
+	Tue, 9 Feb 2010 19:53:56 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/algapi.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ crypto/anubis.c |   22 +++++++++++-----------
+ 1 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index f149b1c..3e4524e 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -230,7 +230,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- 	list_add(&alg->cra_list, &crypto_alg_list);
- 	list_add(&larval->alg.cra_list, &crypto_alg_list);
+diff --git a/crypto/anubis.c b/crypto/anubis.c
+index e42c3a8..77530d5 100644
+--- a/crypto/anubis.c
++++ b/crypto/anubis.c
+@@ -469,14 +469,13 @@ static int anubis_setkey(struct crypto_tfm *tfm, const u8 *in_key,
+ 	u32 kappa[ANUBIS_MAX_N];
+ 	u32 inter[ANUBIS_MAX_N];
  
--out:	
-+out:
- 	return larval;
+-	switch (key_len)
+-	{
++	switch (key_len) {
+ 		case 16: case 20: case 24: case 28:
+ 		case 32: case 36: case 40:
+ 			break;
+ 		default:
+ 			*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+-			return - EINVAL;
++			return -EINVAL;
+ 	}
  
- free_larval:
-@@ -388,7 +388,7 @@ int crypto_unregister_alg(struct crypto_alg *alg)
+ 	ctx->key_len = key_len * 8;
+@@ -530,23 +529,24 @@ static int anubis_setkey(struct crypto_tfm *tfm, const u8 *in_key,
+ 		/*
+ 		 * compute kappa^{r+1} from kappa^r:
+ 		 */
+-		if (r == R) {
++		if (r == R)
+ 			break;
+-		}
+ 		for (i = 0; i < N; i++) {
+ 			int j = i;
+ 			inter[i]  = T0[(kappa[j--] >> 24)       ];
+-			if (j < 0) j = N - 1;
++			if (j < 0)
++				j = N - 1;
+ 			inter[i] ^= T1[(kappa[j--] >> 16) & 0xff];
+-			if (j < 0) j = N - 1;
++			if (j < 0)
++				j = N - 1;
+ 			inter[i] ^= T2[(kappa[j--] >>  8) & 0xff];
+-			if (j < 0) j = N - 1;
++			if (j < 0)
++				j = N - 1;
+ 			inter[i] ^= T3[(kappa[j  ]      ) & 0xff];
+ 		}
+ 		kappa[0] = inter[0] ^ rc[r];
+-		for (i = 1; i < N; i++) {
++		for (i = 1; i < N; i++)
+ 			kappa[i] = inter[i];
+-		}
+ 	}
+ 
+ 	/*
+@@ -690,7 +690,7 @@ static struct crypto_alg anubis_alg = {
+ static int __init anubis_mod_init(void)
  {
- 	int ret;
- 	LIST_HEAD(list);
+ 	int ret = 0;
 -	
 +
- 	down_write(&crypto_alg_sem);
- 	ret = crypto_remove_alg(alg, &list);
- 	up_write(&crypto_alg_sem);
+ 	ret = crypto_register_alg(&anubis_alg);
+ 	return ret;
+ }
 -- 
 1.6.6.1
 
