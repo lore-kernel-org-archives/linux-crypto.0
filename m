@@ -1,89 +1,84 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in anubis.c
-Date: Wed, 10 Feb 2010 01:53:06 +0100
-Message-ID: <1265763187-22417-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in api.c
+Date: Wed, 10 Feb 2010 01:53:55 +0100
+Message-ID: <1265763235-22739-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Pekka Enberg <penberg@cs.helsinki.fi>,
+	Chuck Ebbert <cebbert@redhat.com>, linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f220.google.com ([209.85.220.220]:50137 "EHLO
-	mail-fx0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751672Ab0BJAx4 (ORCPT
+Received: from fg-out-1718.google.com ([72.14.220.156]:51537 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751672Ab0BJAy2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:53:56 -0500
+	Tue, 9 Feb 2010 19:54:28 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/anubis.c |   22 +++++++++++-----------
- 1 files changed, 11 insertions(+), 11 deletions(-)
+ crypto/api.c |   13 ++++++-------
+ 1 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/anubis.c b/crypto/anubis.c
-index e42c3a8..77530d5 100644
---- a/crypto/anubis.c
-+++ b/crypto/anubis.c
-@@ -469,14 +469,13 @@ static int anubis_setkey(struct crypto_tfm *tfm, const u8 *in_key,
- 	u32 kappa[ANUBIS_MAX_N];
- 	u32 inter[ANUBIS_MAX_N];
+diff --git a/crypto/api.c b/crypto/api.c
+index 798526d..033a714 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -10,7 +10,7 @@
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option) 
++ * Software Foundation; either version 2 of the License, or (at your option)
+  * any later version.
+  *
+  */
+@@ -288,11 +288,11 @@ static int crypto_init_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
  
--	switch (key_len)
--	{
-+	switch (key_len) {
- 		case 16: case 20: case 24: case 28:
- 		case 32: case 36: case 40:
- 			break;
- 		default:
- 			*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
--			return - EINVAL;
-+			return -EINVAL;
- 	}
- 
- 	ctx->key_len = key_len * 8;
-@@ -530,23 +529,24 @@ static int anubis_setkey(struct crypto_tfm *tfm, const u8 *in_key,
- 		/*
- 		 * compute kappa^{r+1} from kappa^r:
- 		 */
--		if (r == R) {
-+		if (r == R)
- 			break;
--		}
- 		for (i = 0; i < N; i++) {
- 			int j = i;
- 			inter[i]  = T0[(kappa[j--] >> 24)       ];
--			if (j < 0) j = N - 1;
-+			if (j < 0)
-+				j = N - 1;
- 			inter[i] ^= T1[(kappa[j--] >> 16) & 0xff];
--			if (j < 0) j = N - 1;
-+			if (j < 0)
-+				j = N - 1;
- 			inter[i] ^= T2[(kappa[j--] >>  8) & 0xff];
--			if (j < 0) j = N - 1;
-+			if (j < 0)
-+				j = N - 1;
- 			inter[i] ^= T3[(kappa[j  ]      ) & 0xff];
- 		}
- 		kappa[0] = inter[0] ^ rc[r];
--		for (i = 1; i < N; i++) {
-+		for (i = 1; i < N; i++)
- 			kappa[i] = inter[i];
--		}
- 	}
- 
- 	/*
-@@ -690,7 +690,7 @@ static struct crypto_alg anubis_alg = {
- static int __init anubis_mod_init(void)
- {
- 	int ret = 0;
+ 	case CRYPTO_ALG_TYPE_COMPRESS:
+ 		return crypto_init_compress_ops(tfm);
 -	
 +
- 	ret = crypto_register_alg(&anubis_alg);
+ 	default:
+ 		break;
+ 	}
+-	
++
+ 	BUG();
+ 	return -EINVAL;
+ }
+@@ -315,10 +315,9 @@ static void crypto_exit_ops(struct crypto_tfm *tfm)
+ 	case CRYPTO_ALG_TYPE_COMPRESS:
+ 		crypto_exit_compress_ops(tfm);
+ 		break;
+-	
++
+ 	default:
+ 		BUG();
+-		
+ 	}
+ }
+ 
+@@ -593,12 +592,12 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+ {
+ 	int ret = 0;
+ 	struct crypto_alg *alg = crypto_alg_mod_lookup(name, type, mask);
+-	
++
+ 	if (!IS_ERR(alg)) {
+ 		crypto_mod_put(alg);
+ 		ret = 1;
+ 	}
+-	
++
  	return ret;
  }
+ EXPORT_SYMBOL_GPL(crypto_has_alg);
 -- 
 1.6.6.1
 
