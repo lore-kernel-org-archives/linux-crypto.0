@@ -1,84 +1,42 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in api.c
-Date: Wed, 10 Feb 2010 01:53:55 +0100
-Message-ID: <1265763235-22739-1-git-send-email-richih.mailinglist@gmail.com>
-Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH 1/1] SCRIPTS: Fix whitespace in get_maintainer output
+Date: Wed, 10 Feb 2010 02:00:52 +0100
+Message-ID: <2d460de71002091700k1d48b5d3oec7be8a3e597d89f@mail.gmail.com>
+References: <1265762223-21006-1-git-send-email-richih.mailinglist@gmail.com>
+	 <1265762839.2131.46.camel@Joe-Laptop.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Pekka Enberg <penberg@cs.helsinki.fi>,
-	Chuck Ebbert <cebbert@redhat.com>, linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+	linux-kernel@vger.kernel.org
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.156]:51537 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751672Ab0BJAy2 (ORCPT
+Received: from mail-ew0-f228.google.com ([209.85.219.228]:60914 "EHLO
+	mail-ew0-f228.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754203Ab0BJBAy convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Feb 2010 19:54:28 -0500
+	Tue, 9 Feb 2010 20:00:54 -0500
+In-Reply-To: <1265762839.2131.46.camel@Joe-Laptop.home>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Feb 10, 2010 at 01:47, Joe Perches <joe@perches.com> wrote:
 
-Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
----
- crypto/api.c |   13 ++++++-------
- 1 files changed, 6 insertions(+), 7 deletions(-)
+> One space not two after periods? =C2=A0Horrors.
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 798526d..033a714 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -10,7 +10,7 @@
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-  */
-@@ -288,11 +288,11 @@ static int crypto_init_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
- 
- 	case CRYPTO_ALG_TYPE_COMPRESS:
- 		return crypto_init_compress_ops(tfm);
--	
-+
- 	default:
- 		break;
- 	}
--	
-+
- 	BUG();
- 	return -EINVAL;
- }
-@@ -315,10 +315,9 @@ static void crypto_exit_ops(struct crypto_tfm *tfm)
- 	case CRYPTO_ALG_TYPE_COMPRESS:
- 		crypto_exit_compress_ops(tfm);
- 		break;
--	
-+
- 	default:
- 		BUG();
--		
- 	}
- }
- 
-@@ -593,12 +592,12 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
- {
- 	int ret = 0;
- 	struct crypto_alg *alg = crypto_alg_mod_lookup(name, type, mask);
--	
-+
- 	if (!IS_ERR(alg)) {
- 		crypto_mod_put(alg);
- 		ret = 1;
- 	}
--	
-+
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(crypto_has_alg);
--- 
-1.6.6.1
+Not quite, but still wrong and worthy of a fix :)
 
+=46or what it's worth, applying it would take less time than the
+sending and reading of these two emails ;)
+
+
+Still, any feedback is good feedback.
+
+Thanks,
+Richard
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
