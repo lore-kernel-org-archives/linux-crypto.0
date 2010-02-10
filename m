@@ -1,56 +1,32 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Re: crypto_shash_update & CRYPTO_TFM_REQ_MAY_SLEEP
-Date: Wed, 10 Feb 2010 14:16:36 +0200
-Message-ID: <4B72A3A4.4050700@nokia.com>
-References: <20100209074146.GA17681@gondor.apana.org.au>
+From: Richard Hartmann <richih.mailinglist@gmail.com>
+Subject: Re: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in arc4.c
+Date: Wed, 10 Feb 2010 14:47:33 +0100
+Message-ID: <2d460de71002100547g481e6256nc061c07758f4f1ba@mail.gmail.com>
+References: <1265764660-23178-1-git-send-email-richih.mailinglist@gmail.com>
+	 <20100210092854.GA26727@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: ext Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.230]:56531 "EHLO
-	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755425Ab0BJMRm (ORCPT
+Received: from ey-out-2122.google.com ([74.125.78.27]:47528 "EHLO
+	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750933Ab0BJNrh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Feb 2010 07:17:42 -0500
-In-Reply-To: <20100209074146.GA17681@gondor.apana.org.au>
+	Wed, 10 Feb 2010 08:47:37 -0500
+In-Reply-To: <20100210092854.GA26727@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Wed, Feb 10, 2010 at 10:28, Sebastian Andrzej Siewior
+<sebatian@breakpoint.cc> wrote:
 
-Anyway, crypto driver is called with CRYPTO_TFM_REQ_MAY_SLEEP flag set.
-It basically mean it can sleep.
-But it is not because of kmap_atomic()
+> I've made this whitespace fixes and a few others while re-writting it
+> yesterday. So I've taken care of this allready.
 
-So no possibility to know if to use GFP_KERNEL or GFP_ATOMIC.
-
-I guess that is not correct way.
-
-If driver cannot sleep then CRYPTO_TFM_REQ_MAY_SLEEP should not be set
-when calling it.
-
-Even sync implementation might use HW and sleep a bit while HW is doing
-calculation...
+OK. Thanks for getting back to me :)
 
 
-- Dmitry
-
-ext Herbert Xu wrote:
-> Dmitry Kasatkin <dmitry.kasatkin@nokia.com> wrote:
->   
->> One interesting issue
->>
->> Many clients in the kernel set CRYPTO_TFM_REQ_MAY_SLEEP to desc.flags.
->> It is used by crypto_yeld().
->>     
->
-> That flag is really only meaningful for synchronous implementations.
->
-> For hardware crypto that is asynchronous, you can simply ignore it
-> in most cases (exceptions include invoking a syncrhonous backup, for
-> example).
->
-> Cheers,
->   
+Richard
