@@ -1,46 +1,27 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [PATCH] crypto/arc4: convert this stream cipher into a block
- cipher
-Date: Fri, 12 Feb 2010 10:57:28 +0100
-Message-ID: <20100212095728.GA2166@Chamillionaire.breakpoint.cc>
-References: <Pine.LNX.4.64.1001260722080.20780@hs20-bc2-1.build.redhat.com>
- <20100209073718.GA17612@gondor.apana.org.au>
- <20100209145705.GA20421@Chamillionaire.breakpoint.cc>
- <20100209204519.GC26258@gondor.apana.org.au>
- <20100209211238.GC21548@Chamillionaire.breakpoint.cc>
- <20100209214522.GA27002@gondor.apana.org.au>
- <20100212084228.GA1535@Chamillionaire.breakpoint.cc>
- <4B7520A3.9010109@codelabs.ch>
+From: "Bhaskara Peela" <bhaskara.peela@broadcom.com>
+Subject: Async IPSec in AH4 mode
+Date: Fri, 12 Feb 2010 17:33:44 -0800
+Message-ID: <197D517E3C8D504283188E2A751290E86F23A1E1D8@IRVEXCHCCR02.corp.ad.broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Mikulas Patocka <mpatocka@redhat.com>, mbroz@redhat.com,
-	dm-devel@redhat.com, agk@redhat.com, linux-crypto@vger.kernel.org
-To: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+Content-Type: text/plain;
+ charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:40788 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750969Ab0BLJ5c (ORCPT
+Received: from mms1.broadcom.com ([216.31.210.17]:1364 "EHLO mms1.broadcom.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752615Ab0BMBd5 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Feb 2010 04:57:32 -0500
-Content-Disposition: inline
-In-Reply-To: <4B7520A3.9010109@codelabs.ch>
+	Fri, 12 Feb 2010 20:33:57 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Adrian-Ken Rueegsegger | 2010-02-12 10:34:27 [+0100]:
-
->Hi,
 Hi,
-
->Sebastian Andrzej Siewior schrieb:
->> The name is still ecb(aes) but since this is provided by the blkcipher itself,
->Just to avoid any confusion you meant ecb(arc4) not ecb(aes) here right?
-
-Yes, I do. Not sure how I got aes in there. I did not mix it up in the
-patch :)
-
->
->-Adrian
-
-Sebastian
+ 
+I want to provide asynchronous AH4 IPSec processing for 2.6.30 kernel version.   I am planning to port asynchronous IPSec in AH mode from kernel version 2.6.33.rc6 to 2.6.30.  This involves changes in async hashing in crypto api and net/ipv4/ah4.c.  I am going through the changes between these two versions and I am not able to accurately figure out the minimum changes for AH mode between these two kernel versions.
+ 
+Can you please guide me on dependencies that are required to support IPSec AH4 for kernel version 2.6.30?
+ 
+thanks
+bhaskara
