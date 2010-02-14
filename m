@@ -1,27 +1,50 @@
-From: "Bhaskara Peela" <bhaskara.peela@broadcom.com>
-Subject: Async IPSec in AH4 mode
-Date: Fri, 12 Feb 2010 17:33:44 -0800
-Message-ID: <197D517E3C8D504283188E2A751290E86F23A1E1D8@IRVEXCHCCR02.corp.ad.broadcom.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Possible bug: blkcipher_walk_done()
+Date: Sun, 14 Feb 2010 13:47:56 +0800
+Message-ID: <20100214054756.GA9688@gondor.apana.org.au>
+References: <4B727F75.20305@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mms1.broadcom.com ([216.31.210.17]:1364 "EHLO mms1.broadcom.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752615Ab0BMBd5 convert rfc822-to-8bit (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:47818 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751425Ab0BNFsA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Feb 2010 20:33:57 -0500
-Content-Language: en-US
+	Sun, 14 Feb 2010 00:48:00 -0500
+Content-Disposition: inline
+In-Reply-To: <4B727F75.20305@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
- 
-I want to provide asynchronous AH4 IPSec processing for 2.6.30 kernel version.   I am planning to port asynchronous IPSec in AH mode from kernel version 2.6.33.rc6 to 2.6.30.  This involves changes in async hashing in crypto api and net/ipv4/ah4.c.  I am going through the changes between these two versions and I am not able to accurately figure out the minimum changes for AH mode between these two kernel versions.
- 
-Can you please guide me on dependencies that are required to support IPSec AH4 for kernel version 2.6.30?
- 
-thanks
-bhaskara
+On Wed, Feb 10, 2010 at 09:42:13AM +0000, Dmitry Kasatkin wrote:
+> Hi,
+> 
+> It seems that there is a mistake in the implementation of
+> 
+> int blkcipher_walk_done(struct blkcipher_desc *desc,
+>             struct blkcipher_walk *walk, int err)
+> 
+> blkcipher_walk_virt() will call crypto_kmap() to map page.
+> 
+> But in the case then err argument is < 0 and we cannot continue then
+> blkcipher_walk_done() will not
+> unmap the page.
+> 
+> What do you think?
+
+Only blkcipher.c itself calls blkcipher_walk_done with err < 0.
+Algorithms are not supposed to do that as this interface is only
+for synchronous implementations.
+
+When blkcipher.c uses it with err < 0 the pages are never mapped.
+
+Do you need to be able to fail with a synchronous algorithm?
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
