@@ -1,64 +1,88 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Re: Possible bug: blkcipher_walk_done()
-Date: Mon, 15 Feb 2010 21:02:35 +0200
-Message-ID: <4B799A4B.4040904@nokia.com>
-References: <4B727F75.20305@nokia.com> <20100214054756.GA9688@gondor.apana.org.au>
+Subject: Re: crypto_shash_update & CRYPTO_TFM_REQ_MAY_SLEEP
+Date: Mon, 15 Feb 2010 21:20:35 +0200
+Message-ID: <4B799E83.5000700@nokia.com>
+References: <20100209074146.GA17681@gondor.apana.org.au> <4B72A3A4.4050700@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: ext Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.230]:26896 "EHLO
-	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755867Ab0BOTCv (ORCPT
+Received: from smtp.nokia.com ([192.100.105.134]:43003 "EHLO
+	mgw-mx09.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756031Ab0BOTUz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Feb 2010 14:02:51 -0500
-In-Reply-To: <20100214054756.GA9688@gondor.apana.org.au>
+	Mon, 15 Feb 2010 14:20:55 -0500
+In-Reply-To: <4B72A3A4.4050700@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi,
 
-Strange what you say.... if err < 0 the page are never mapped...
+Alg code and drivers uses req/desc->flags to use GFP_KERNEL or GFP_ATOMIC.
 
-Pages mapped before... and they are not unmapped and mapped again...
-So they left mapped..
-And yes... if HW fails then it need to break the function and unmap
-previously mapped pages.
+crypto_kmap() -> Does not it make a sense to also use kmap/kmap_atomic
+instead of just kmap_atomic()?
 
-I will submit patches for review soon to this list.
+-----------------------------------
+static inline void *crypto_kmap(struct page *page, int out)
+{
+    return kmap_atomic(page, crypto_kmap_type(out));
+}
+-------------------------------------------------
 
-Thanks for your discussion!
+It is now not only about sync but also async code.
+Would be nice to "wait" for hash completion in some cases...
+
+What do you think?
+What is the reason to have only kmap_atomic()?
 
 - Dmitry
 
-ext Herbert Xu wrote:
-> On Wed, Feb 10, 2010 at 09:42:13AM +0000, Dmitry Kasatkin wrote:
+
+Kasatkin Dmitry (Nokia-D/Helsinki) wrote:
+> Hi,
+>
+> Anyway, crypto driver is called with CRYPTO_TFM_REQ_MAY_SLEEP flag set.
+> It basically mean it can sleep.
+> But it is not because of kmap_atomic()
+>
+> So no possibility to know if to use GFP_KERNEL or GFP_ATOMIC.
+>
+> I guess that is not correct way.
+>
+> If driver cannot sleep then CRYPTO_TFM_REQ_MAY_SLEEP should not be set
+> when calling it.
+>
+> Even sync implementation might use HW and sleep a bit while HW is doing
+> calculation...
+>
+>
+> - Dmitry
+>
+> ext Herbert Xu wrote:
 >   
->> Hi,
->>
->> It seems that there is a mistake in the implementation of
->>
->> int blkcipher_walk_done(struct blkcipher_desc *desc,
->>             struct blkcipher_walk *walk, int err)
->>
->> blkcipher_walk_virt() will call crypto_kmap() to map page.
->>
->> But in the case then err argument is < 0 and we cannot continue then
->> blkcipher_walk_done() will not
->> unmap the page.
->>
->> What do you think?
+>> Dmitry Kasatkin <dmitry.kasatkin@nokia.com> wrote:
+>>   
 >>     
->
-> Only blkcipher.c itself calls blkcipher_walk_done with err < 0.
-> Algorithms are not supposed to do that as this interface is only
-> for synchronous implementations.
->
-> When blkcipher.c uses it with err < 0 the pages are never mapped.
->
-> Do you need to be able to fail with a synchronous algorithm?
->
-> Cheers,
+>>> One interesting issue
+>>>
+>>> Many clients in the kernel set CRYPTO_TFM_REQ_MAY_SLEEP to desc.flags.
+>>> It is used by crypto_yeld().
+>>>     
+>>>       
+>> That flag is really only meaningful for synchronous implementations.
+>>
+>> For hardware crypto that is asynchronous, you can simply ignore it
+>> in most cases (exceptions include invoking a syncrhonous backup, for
+>> example).
+>>
+>> Cheers,
+>>   
+>>     
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >   
