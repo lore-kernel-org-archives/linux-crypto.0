@@ -1,43 +1,42 @@
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: crypto_remove_spawns: BUG: unable to handle kernel NULL pointer
-	dereference at 0000000000000018
-Date: Mon, 15 Feb 2010 10:14:08 +0200
-Message-ID: <b6fcc0a1002150014j43415772mea21790c0667a32b@mail.gmail.com>
-References: <20100214174507.GA8688@x200>
-	 <20100215052729.GA17156@gondor.apana.org.au>
-	 <b6fcc0a1002142347n1aff4326p3275e70b0ecea0e3@mail.gmail.com>
-	 <20100215081155.GA18566@gondor.apana.org.au>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH] crypto/arc4: convert this stream cipher into a block
+ cipher
+Date: Mon, 15 Feb 2010 09:49:31 +0100
+Message-ID: <20100215084931.GA22637@Chamillionaire.breakpoint.cc>
+References: <Pine.LNX.4.64.1001260722080.20780@hs20-bc2-1.build.redhat.com>
+ <20100209073718.GA17612@gondor.apana.org.au>
+ <20100209145705.GA20421@Chamillionaire.breakpoint.cc>
+ <20100209204519.GC26258@gondor.apana.org.au>
+ <20100209211238.GC21548@Chamillionaire.breakpoint.cc>
+ <20100209214522.GA27002@gondor.apana.org.au>
+ <20100212084228.GA1535@Chamillionaire.breakpoint.cc>
+ <20100214204253.GA19275@Chamillionaire.breakpoint.cc>
+ <20100215001008.GA15437@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+Cc: Mikulas Patocka <mpatocka@redhat.com>, mbroz@redhat.com,
+	dm-devel@redhat.com, agk@redhat.com, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iw0-f201.google.com ([209.85.223.201]:50973 "EHLO
-	mail-iw0-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752404Ab0BOIOJ (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:38310 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752917Ab0BOItf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Feb 2010 03:14:09 -0500
-Received: by iwn39 with SMTP id 39so1943051iwn.1
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Feb 2010 00:14:08 -0800 (PST)
-In-Reply-To: <20100215081155.GA18566@gondor.apana.org.au>
+	Mon, 15 Feb 2010 03:49:35 -0500
+Content-Disposition: inline
+In-Reply-To: <20100215001008.GA15437@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 15, 2010 at 10:11 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Mon, Feb 15, 2010 at 09:47:25AM +0200, Alexey Dobriyan wrote:
->> On Mon, Feb 15, 2010 at 7:27 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->> > Is this reproducible every time you unload aes_x86_64 after boot?
->>
->> No, what I do is
->>
->> 1. setup ipcomp in tunnel mode _in fresh netns_ and immediately exit
->> 2. modprobe/rmmod all modules (not much)
->>
->> ~1 hour of this workload and it hits sometimes with aes_x86_64,
->> sometimes with aes_generic.
->
-> Was this with that IPCOMP bug fixed?
+* Herbert Xu | 2010-02-15 08:10:08 [+0800]:
 
-Yes, ipcomp bug triggers almost immediately.
-Anyway, this is just description of what I do.
+>How about we just remove it? It's not on a hot path anyway.
+Sure.
+
+>I can do this when integrating the patch so you don't have to
+>resend.
+Okay, thanks.
+
+>Thanks,
+
+Sebastian
