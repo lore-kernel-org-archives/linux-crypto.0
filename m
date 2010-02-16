@@ -1,51 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto_remove_spawns: BUG: unable to handle kernel NULL
-	pointer dereference at 0000000000000018
-Date: Tue, 16 Feb 2010 20:02:03 +0800
-Message-ID: <20100216120203.GA32264@gondor.apana.org.au>
-References: <20100214174507.GA8688@x200> <20100215052729.GA17156@gondor.apana.org.au> <b6fcc0a1002142347n1aff4326p3275e70b0ecea0e3@mail.gmail.com> <20100215081155.GA18566@gondor.apana.org.au> <b6fcc0a1002150014j43415772mea21790c0667a32b@mail.gmail.com>
+From: Richard Hartmann <richih.mailinglist@gmail.com>
+Subject: Re: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in cipher.c
+Date: Tue, 16 Feb 2010 13:06:27 +0100
+Message-ID: <2d460de71002160406q6712b70fu6e49a36f4ae0eeff@mail.gmail.com>
+References: <1265765446-24958-1-git-send-email-richih.mailinglist@gmail.com>
+	 <2d460de71002091821h7b6e99b0gb8f134355f64c65a@mail.gmail.com>
+	 <20100211044604.GA12146@gondor.apana.org.au>
+	 <2d460de71002160356l6c26d513qba7d0cece32daddd@mail.gmail.com>
+	 <20100216120009.GA32197@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Alexey Dobriyan <adobriyan@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:46934 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754345Ab0BPMCI (ORCPT
+Received: from mail-bw0-f219.google.com ([209.85.218.219]:35184 "EHLO
+	mail-bw0-f219.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754345Ab0BPMG3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2010 07:02:08 -0500
-Content-Disposition: inline
-In-Reply-To: <b6fcc0a1002150014j43415772mea21790c0667a32b@mail.gmail.com>
+	Tue, 16 Feb 2010 07:06:29 -0500
+In-Reply-To: <20100216120009.GA32197@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 15, 2010 at 10:14:08AM +0200, Alexey Dobriyan wrote:
-> 
-> Yes, ipcomp bug triggers almost immediately.
-> Anyway, this is just description of what I do.
+On Tue, Feb 16, 2010 at 13:00, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Can you see if this patch makes it go away?
+> For the crypto tree at least I've got all your patches so you
+> don't have to resend.
 
-This can happen when you're unloading aes just as an algorithm
-that uses aes (such as cbc(aes)) is being created.
+OK, thank you very much. Expect more patches, in this case :)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index f149b1c..88c5f6c 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -165,6 +165,8 @@ static void crypto_remove_spawns(struct crypto_alg *alg,
- 
- 			spawn->alg = NULL;
- 			spawns = &inst->alg.cra_users;
-+			if (!spawns->next)
-+				break;
- 		}
- 	} while ((spawns = crypto_more_spawns(alg, &stack, &top,
- 					      &secondary_spawns)));
+One more question on workflow, though.. I have been checking
+http://git.kernel.org/?p=linux/kernel/git/herbert/crypto-2.6.git;a=summary
+for updates, but obviously, this was the wrong place.
+
+Where should I look for your commits so I don't have to have you
+waste your time answering emails?
+
 
 Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Richard
