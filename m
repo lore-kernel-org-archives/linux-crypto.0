@@ -1,57 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/arc4: convert this stream cipher into a block
-	cipher
-Date: Tue, 16 Feb 2010 20:51:25 +0800
-Message-ID: <20100216125125.GA390@gondor.apana.org.au>
-References: <Pine.LNX.4.64.1001260722080.20780@hs20-bc2-1.build.redhat.com> <20100209073718.GA17612@gondor.apana.org.au> <20100209145705.GA20421@Chamillionaire.breakpoint.cc> <20100209204519.GC26258@gondor.apana.org.au> <20100209211238.GC21548@Chamillionaire.breakpoint.cc> <20100209214522.GA27002@gondor.apana.org.au> <20100212084228.GA1535@Chamillionaire.breakpoint.cc>
+From: avital sela <avitalsela95@gmail.com>
+Subject: converting sync driver to async
+Date: Tue, 16 Feb 2010 18:06:37 +0200
+Message-ID: <311e0d1f1002160806j37c8d358xe3bc83805adee176@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Mikulas Patocka <mpatocka@redhat.com>, mbroz@redhat.com,
-	dm-devel@redhat.com, agk@redhat.com, linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:45929 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755782Ab0BPMve (ORCPT
+Received: from mail-bw0-f219.google.com ([209.85.218.219]:56306 "EHLO
+	mail-bw0-f219.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756244Ab0BPQLz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2010 07:51:34 -0500
-Content-Disposition: inline
-In-Reply-To: <20100212084228.GA1535@Chamillionaire.breakpoint.cc>
+	Tue, 16 Feb 2010 11:11:55 -0500
+Received: by bwz19 with SMTP id 19so4518260bwz.28
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Feb 2010 08:11:53 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 12, 2010 at 09:42:28AM +0100, Sebastian Andrzej Siewior wrote:
->
-> -static void arc4_crypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-> +static void arc4_ivsetup(struct arc4_ctx *ctx, u8 *iv)
->  {
-> -	struct arc4_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	if (unlikely(!ctx->new_key))
-> +		return;
-> +	memcpy(iv, &ctx->iv, sizeof(ctx->iv));
-> +	ctx->new_key = 0;
+Hello,
 
-Sorry, but this doesn't work.
+I have written sha and aes HW accelerator drivers for our custom
+drivers (thanks for your patient help) and they work great.
+To exploit the full potential of the HW I want to port them to the
+ASYNC interface and have some questions.
+1. Using my current setup I see the following results (measured with iperf)
+no ipsec  -85 mbits
+ESP in tunnel mode with null algs  - 45 mbits
+ESP in tunnel mode with aes and sha1 - 32 mbits
+Is it reasonable to have the throughput drop so much even without any
+actual crypto going on? Can this mostly be attributed to the bigger
+packets ?
+My understanding of the results is that the maximum throughput I can
+hope to achieve on this systen by only improving the crypto drivers is
+45 mbits?
+2. Is there any comparison somewhere between OCF performance and Acrypto?
+3. Using drivers/crypto/talitos as a reference I am setting the alg
+name to "authenc(hmac(sha1),cbc(aes))",cra_flags to
+CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC;
+   and cra_type to &crypto_aead_type. My existing driver had a
+cra_list field. Is that required for this type of driver as well?
 
-A ctx is supposed to be reentrant.  That is, while one thread
-is working away with a given ctx I should be able to use that
-same ctx in a different thread without them clobbering each
-other.
-
-So that means (in general) you must not modify the ctx in any
-function other than setkey.
-
-This also brings up the bigger question of how we transition to
-this new arc4.  I don't think we need to maintain exactly the
-same behaviour as the existing ecb(arc4).
-
-So what we could do is simply add a new blkcipher arc4, alongside
-the existing cipher arc4.  Then we can convert the existing users
-across, and finally remove the old arc4.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Avital
