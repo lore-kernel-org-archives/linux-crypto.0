@@ -1,39 +1,70 @@
-From: "MailScanner" <postmaster@mail.ccihr.ro>
-Subject: Warning: E-mail viruses detected
-Date: Tue, 16 Feb 2010 18:51:16 +0200
-Message-ID: <201002161651.o1GGpGMZ012874@mail.ccihr.ro>
-To: linux-crypto@vger.kernel.org
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: Re: crypto_remove_spawns: BUG: unable to handle kernel NULL
+ pointer dereference at 0000000000000018
+Date: Tue, 16 Feb 2010 21:31:39 +0200
+Message-ID: <20100216193139.GA5512@x200>
+References: <20100214174507.GA8688@x200>
+ <20100215052729.GA17156@gondor.apana.org.au>
+ <b6fcc0a1002142347n1aff4326p3275e70b0ecea0e3@mail.gmail.com>
+ <20100215081155.GA18566@gondor.apana.org.au>
+ <b6fcc0a1002150014j43415772mea21790c0667a32b@mail.gmail.com>
+ <20100216120203.GA32264@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.ccihr.ro ([86.35.247.208]:44376 "EHLO mail.ccihr.ro"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757015Ab0BPQvW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2010 11:51:22 -0500
-Received: from mail.ccihr.ro (mail.ccihr.ro [127.0.0.1])
-	by mail.ccihr.ro (8.14.3/8.14.3) with ESMTP id o1GGpGKo012876
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Feb 2010 18:51:16 +0200
+Received: from mail-fx0-f215.google.com ([209.85.220.215]:36436 "EHLO
+	mail-fx0-f215.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932757Ab0BPTbq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Feb 2010 14:31:46 -0500
+Received: by fxm7 with SMTP id 7so7619249fxm.28
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Feb 2010 11:31:43 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20100216120203.GA32264@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Our e-mail content detector has just been triggered by a message you sent:
-  To: office@ccihr.ro
-  Subject: Re: Notify
-  Date: Tue Feb 16 18:51:12 2010
+On Tue, Feb 16, 2010 at 08:02:03PM +0800, Herbert Xu wrote:
+> On Mon, Feb 15, 2010 at 10:14:08AM +0200, Alexey Dobriyan wrote:
+> > 
+> > Yes, ipcomp bug triggers almost immediately.
+> > Anyway, this is just description of what I do.
+> 
+> Can you see if this patch makes it go away?
+> 
+> This can happen when you're unloading aes just as an algorithm
+> that uses aes (such as cbc(aes)) is being created.
 
-One or more of the attachments (data.rtf.scr, document.zip) are on
-the list of unacceptable attachments for this site and will not have
-been delivered.
+Which codepath exactly?
+I'd say try_module_get() should fail somewhere.
 
-Consider renaming the files to avoid this constraint.
+BTW, CBC or AES aren't used, just loaded.
 
-The virus detector said this about the message:
-Report: Report: MailScanner: Windows Screensavers are often used to hide viruses (data.rtf.scr)
-Report: No programs allowed (data.rtf.scr)
+Here is setkey script:
 
-
--- 
-MailScanner
-Email Virus Scanner
-Camera de Comert si Industrie Harghita
-www.ccihr.ro
-
-For all your IT requirements visit: http://www.transtec.co.uk
+	#!/usr/sbin/setkey -f
+	flush;
+	spdflush;
+	
+	add A B ipcomp 44 -m tunnel -C deflate;
+	add B A ipcomp 45 -m tunnel -C deflate;
+	
+	spdadd A B any -P in ipsec
+	        ipcomp/tunnel/192.168.1.2-192.168.1.3/use;
+	
+	spdadd B A any -P out ipsec
+	        ipcomp/tunnel/192.168.1.3-192.168.1.2/use;
+ 
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -165,6 +165,8 @@ static void crypto_remove_spawns(struct crypto_alg *alg,
+>  
+>  			spawn->alg = NULL;
+>  			spawns = &inst->alg.cra_users;
+> +			if (!spawns->next)
+> +				break;
+>  		}
+>  	} while ((spawns = crypto_more_spawns(alg, &stack, &top,
+>  					      &secondary_spawns)));
