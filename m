@@ -1,59 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: converting sync driver to async
-Date: Wed, 17 Feb 2010 08:08:17 +0800
-Message-ID: <20100217000817.GA11975@gondor.apana.org.au>
-References: <311e0d1f1002160806j37c8d358xe3bc83805adee176@mail.gmail.com>
+Subject: Re: crypto_remove_spawns: BUG: unable to handle kernel NULL
+	pointer dereference at 0000000000000018
+Date: Wed, 17 Feb 2010 08:37:35 +0800
+Message-ID: <20100217003735.GB11975@gondor.apana.org.au>
+References: <20100214174507.GA8688@x200> <20100215052729.GA17156@gondor.apana.org.au> <b6fcc0a1002142347n1aff4326p3275e70b0ecea0e3@mail.gmail.com> <20100215081155.GA18566@gondor.apana.org.au> <b6fcc0a1002150014j43415772mea21790c0667a32b@mail.gmail.com> <20100216120203.GA32264@gondor.apana.org.au> <20100216193139.GA5512@x200>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: avital sela <avitalsela95@gmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Alexey Dobriyan <adobriyan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:59402 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:44311 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933630Ab0BQAIT (ORCPT
+	with ESMTP id S933726Ab0BQAhq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Feb 2010 19:08:19 -0500
+	Tue, 16 Feb 2010 19:37:46 -0500
 Content-Disposition: inline
-In-Reply-To: <311e0d1f1002160806j37c8d358xe3bc83805adee176@mail.gmail.com>
+In-Reply-To: <20100216193139.GA5512@x200>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 16, 2010 at 06:06:37PM +0200, avital sela wrote:
-> Hello,
-> 
-> I have written sha and aes HW accelerator drivers for our custom
-> drivers (thanks for your patient help) and they work great.
-> To exploit the full potential of the HW I want to port them to the
-> ASYNC interface and have some questions.
-> 1. Using my current setup I see the following results (measured with iperf)
-> no ipsec  -85 mbits
-> ESP in tunnel mode with null algs  - 45 mbits
-> ESP in tunnel mode with aes and sha1 - 32 mbits
-> Is it reasonable to have the throughput drop so much even without any
-> actual crypto going on? Can this mostly be attributed to the bigger
-> packets ?
+On Tue, Feb 16, 2010 at 09:31:39PM +0200, Alexey Dobriyan wrote:
+>
+> Which codepath exactly?
 
-That should be easy to tell.  Just disable GSO/SG/checksum offload
-on the physical interface and retest with no ipsec.
+When a spawn is created the instance associated with it will have
+a zero-initialised cra_users entry.
 
-> My understanding of the results is that the maximum throughput I can
-> hope to achieve on this systen by only improving the crypto drivers is
-> 45 mbits?
+> BTW, CBC or AES aren't used, just loaded.
 
-Yes.
-
-> 2. Is there any comparison somewhere between OCF performance and Acrypto?
-
-Not that I'm aware unfortunately.
-
-> 3. Using drivers/crypto/talitos as a reference I am setting the alg
-> name to "authenc(hmac(sha1),cbc(aes))",cra_flags to
-> CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC;
->    and cra_type to &crypto_aead_type. My existing driver had a
-> cra_list field. Is that required for this type of driver as well?
-
-The cra_list field does not have to be initialised so no you
-don't need to make it explicit.
+Can you boot without aes/cbc loaded and see if it gets automatically
+loaded? PF_KEY users tend to load all possible algorithms when
+they start up.
 
 Cheers,
 -- 
