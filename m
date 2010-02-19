@@ -1,133 +1,79 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 02/19] crypto: khazad - Fix checkpatch errors
-Date: Fri, 19 Feb 2010 01:21:41 +0100
-Message-ID: <1266538903-3145-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 05/19] crypto: proc - Fix checkpatch errors
+Date: Fri, 19 Feb 2010 01:22:03 +0100
+Message-ID: <1266538925-3245-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Benjamin Gilbert <bgilbert@cs.cmu.edu>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bw0-f209.google.com ([209.85.218.209]:44202 "EHLO
+	mail-bw0-f209.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753169Ab0BSAWX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Feb 2010 19:22:23 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/khazad.c |   71 +++++++++++++++++++++++++++----------------------------
- 1 files changed, 35 insertions(+), 36 deletions(-)
+ crypto/proc.c |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/khazad.c b/crypto/khazad.c
-index 527e4e3..5b23532 100644
---- a/crypto/khazad.c
-+++ b/crypto/khazad.c
-@@ -768,30 +768,30 @@ static int khazad_setkey(struct crypto_tfm *tfm, const u8 *in_key,
- 
- 	/* setup the encrypt key */
- 	for (r = 0; r <= KHAZAD_ROUNDS; r++) {
--		ctx->E[r] = T0[(int)(K1 >> 56)       ] ^
--			    T1[(int)(K1 >> 48) & 0xff] ^
--			    T2[(int)(K1 >> 40) & 0xff] ^
--			    T3[(int)(K1 >> 32) & 0xff] ^
--			    T4[(int)(K1 >> 24) & 0xff] ^
--			    T5[(int)(K1 >> 16) & 0xff] ^
--			    T6[(int)(K1 >>  8) & 0xff] ^
--			    T7[(int)(K1      ) & 0xff] ^
-+		ctx->E[r] = T0[(int)(K1 >> 56)] ^
-+			    T1[(int)(K1 >> 48)&0xff] ^
-+			    T2[(int)(K1 >> 40)&0xff] ^
-+			    T3[(int)(K1 >> 32)&0xff] ^
-+			    T4[(int)(K1 >> 24)&0xff] ^
-+			    T5[(int)(K1 >> 16)&0xff] ^
-+			    T6[(int)(K1 >>  8)&0xff] ^
-+			    T7[(int)(K1      )&0xff] ^
- 			    c[r] ^ K2;
--		K2 = K1; 
-+		K2 = K1;
- 		K1 = ctx->E[r];
- 	}
- 	/* Setup the decrypt key */
- 	ctx->D[0] = ctx->E[KHAZAD_ROUNDS];
- 	for (r = 1; r < KHAZAD_ROUNDS; r++) {
- 		K1 = ctx->E[KHAZAD_ROUNDS - r];
--		ctx->D[r] = T0[(int)S[(int)(K1 >> 56)       ] & 0xff] ^
--			    T1[(int)S[(int)(K1 >> 48) & 0xff] & 0xff] ^
--			    T2[(int)S[(int)(K1 >> 40) & 0xff] & 0xff] ^
--			    T3[(int)S[(int)(K1 >> 32) & 0xff] & 0xff] ^
--			    T4[(int)S[(int)(K1 >> 24) & 0xff] & 0xff] ^
--			    T5[(int)S[(int)(K1 >> 16) & 0xff] & 0xff] ^
--			    T6[(int)S[(int)(K1 >>  8) & 0xff] & 0xff] ^
--			    T7[(int)S[(int)(K1      ) & 0xff] & 0xff];
-+		ctx->D[r] = T0[(int)S[(int)(K1 >> 56)] & 0xff] ^
-+			    T1[(int)S[(int)(K1 >> 48)&0xff]&0xff] ^
-+			    T2[(int)S[(int)(K1 >> 40)&0xff]&0xff] ^
-+			    T3[(int)S[(int)(K1 >> 32)&0xff]&0xff] ^
-+			    T4[(int)S[(int)(K1 >> 24)&0xff]&0xff] ^
-+			    T5[(int)S[(int)(K1 >> 16)&0xff]&0xff] ^
-+			    T6[(int)S[(int)(K1 >>  8)&0xff]&0xff] ^
-+			    T7[(int)S[(int)(K1      )&0xff]&0xff];
- 	}
- 	ctx->D[KHAZAD_ROUNDS] = ctx->E[0];
- 
-@@ -810,25 +810,25 @@ static void khazad_crypt(const u64 roundKey[KHAZAD_ROUNDS + 1],
- 	state = be64_to_cpu(*src) ^ roundKey[0];
- 
- 	for (r = 1; r < KHAZAD_ROUNDS; r++) {
--		state = T0[(int)(state >> 56)       ] ^
--			T1[(int)(state >> 48) & 0xff] ^
--			T2[(int)(state >> 40) & 0xff] ^
--			T3[(int)(state >> 32) & 0xff] ^
--			T4[(int)(state >> 24) & 0xff] ^
--			T5[(int)(state >> 16) & 0xff] ^
--			T6[(int)(state >>  8) & 0xff] ^
--			T7[(int)(state      ) & 0xff] ^
-+		state = T0[(int)(state >> 56)] ^
-+			T1[(int)(state >> 48)&0xff] ^
-+			T2[(int)(state >> 40)&0xff] ^
-+			T3[(int)(state >> 32)&0xff] ^
-+			T4[(int)(state >> 24)&0xff] ^
-+			T5[(int)(state >> 16)&0xff] ^
-+			T6[(int)(state >>  8)&0xff] ^
-+			T7[(int)(state      )&0xff] ^
- 			roundKey[r];
--    	}
-+		}
- 
--	state = (T0[(int)(state >> 56)       ] & 0xff00000000000000ULL) ^
--		(T1[(int)(state >> 48) & 0xff] & 0x00ff000000000000ULL) ^
--		(T2[(int)(state >> 40) & 0xff] & 0x0000ff0000000000ULL) ^
--		(T3[(int)(state >> 32) & 0xff] & 0x000000ff00000000ULL) ^
--		(T4[(int)(state >> 24) & 0xff] & 0x00000000ff000000ULL) ^
--		(T5[(int)(state >> 16) & 0xff] & 0x0000000000ff0000ULL) ^
--		(T6[(int)(state >>  8) & 0xff] & 0x000000000000ff00ULL) ^
--		(T7[(int)(state      ) & 0xff] & 0x00000000000000ffULL) ^
-+	state = (T0[(int)(state >> 56)]&0xff00000000000000ULL) ^
-+		(T1[(int)(state >> 48)&0xff]&0x00ff000000000000ULL) ^
-+		(T2[(int)(state >> 40)&0xff]&0x0000ff0000000000ULL) ^
-+		(T3[(int)(state >> 32)&0xff]&0x000000ff00000000ULL) ^
-+		(T4[(int)(state >> 24)&0xff]&0x00000000ff000000ULL) ^
-+		(T5[(int)(state >> 16)&0xff]&0x0000000000ff0000ULL) ^
-+		(T6[(int)(state >>  8)&0xff]&0x000000000000ff00ULL) ^
-+		(T7[(int)(state      )&0xff]&0x00000000000000ffULL) ^
- 		roundKey[KHAZAD_ROUNDS];
- 
- 	*dst = cpu_to_be64(state);
-@@ -850,7 +850,7 @@ static struct crypto_alg khazad_alg = {
- 	.cra_name		=	"khazad",
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	KHAZAD_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof (struct khazad_ctx),
-+	.cra_ctxsize		=	sizeof(struct khazad_ctx),
- 	.cra_alignmask		=	7,
- 	.cra_module		=	THIS_MODULE,
- 	.cra_list		=	LIST_HEAD_INIT(khazad_alg.cra_list),
-@@ -865,7 +865,6 @@ static struct crypto_alg khazad_alg = {
- static int __init khazad_mod_init(void)
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 58fef67..56a3c64 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -8,7 +8,7 @@
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option) 
++ * Software Foundation; either version 2 of the License, or (at your option)
+  * any later version.
+  *
+  */
+@@ -79,15 +79,15 @@ static void c_stop(struct seq_file *m, void *p)
+ static int c_show(struct seq_file *m, void *p)
  {
- 	int ret = 0;
+ 	struct crypto_alg *alg = list_entry(p, struct crypto_alg, cra_list);
 -	
- 	ret = crypto_register_alg(&khazad_alg);
- 	return ret;
++
+ 	seq_printf(m, "name         : %s\n", alg->cra_name);
+ 	seq_printf(m, "driver       : %s\n", alg->cra_driver_name);
+ 	seq_printf(m, "module       : %s\n", module_name(alg->cra_module));
+ 	seq_printf(m, "priority     : %d\n", alg->cra_priority);
+ 	seq_printf(m, "refcnt       : %d\n", atomic_read(&alg->cra_refcnt));
+ 	seq_printf(m, "selftest     : %s\n",
+-		   (alg->cra_flags & CRYPTO_ALG_TESTED) ?
+-		   "passed" : "unknown");
++	           (alg->cra_flags & CRYPTO_ALG_TESTED) ?
++	           "passed" : "unknown");
+ 
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+ 		seq_printf(m, "type         : larval\n");
+@@ -99,7 +99,7 @@ static int c_show(struct seq_file *m, void *p)
+ 		alg->cra_type->show(m, alg);
+ 		goto out;
+ 	}
+-	
++
+ 	switch (alg->cra_flags & (CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_LARVAL)) {
+ 	case CRYPTO_ALG_TYPE_CIPHER:
+ 		seq_printf(m, "type         : cipher\n");
+@@ -133,7 +133,7 @@ static int crypto_info_open(struct inode *inode, struct file *file)
+ {
+ 	return seq_open(file, &crypto_seq_ops);
  }
+-        
++
+ static const struct file_operations proc_crypto_ops = {
+ 	.open		= crypto_info_open,
+ 	.read		= seq_read,
 -- 
 1.6.6.1
+
