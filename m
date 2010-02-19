@@ -1,7 +1,7 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 04/19] crypto: md5 - Fix checkpatch errors
-Date: Fri, 19 Feb 2010 01:21:56 +0100
-Message-ID: <1266538917-3212-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 06/19] crypto: salsa20_generic - Fix checkpatch errors
+Date: Fri, 19 Feb 2010 01:22:08 +0100
+Message-ID: <1266538929-3278-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -14,40 +14,48 @@ List-Id: linux-crypto.vger.kernel.org
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/md5.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ crypto/salsa20_generic.c |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/md5.c b/crypto/md5.c
-index 83eb529..d7cc5f8 100644
---- a/crypto/md5.c
-+++ b/crypto/md5.c
-@@ -1,4 +1,4 @@
--/* 
-+/*
-  * Cryptographic API.
-  *
-  * MD5 Message Digest Algorithm (RFC1321).
-@@ -8,10 +8,10 @@
-  *
-  * Copyright (c) Cryptoapi developers.
-  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
-- * 
-+ *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-  */
-@@ -201,7 +201,7 @@ static int md5_final(struct shash_desc *desc, u8 *out)
+diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
+index eac10c1..31f03bb 100644
+--- a/crypto/salsa20_generic.c
++++ b/crypto/salsa20_generic.c
+@@ -50,8 +50,7 @@ Public domain.
+ 	(((u32)((p)[0])      ) | ((u32)((p)[1]) <<  8) | \
+ 	 ((u32)((p)[2]) << 16) | ((u32)((p)[3]) << 24)   )
  
- 	*p++ = 0x80;
- 	if (padding < 0) {
--		memset(p, 0x00, padding + sizeof (u64));
-+		memset(p, 0x00, padding + sizeof(u64));
- 		md5_transform_helper(mctx);
- 		p = (char *)mctx->block;
- 		padding = 56;
+-struct salsa20_ctx
+-{
++struct salsa20_ctx {
+ 	u32 input[16];
+ };
+ 
+@@ -98,7 +97,7 @@ static void salsa20_wordtobyte(u8 output[64], const u32 input[16])
+ 	for (i = 0; i < 16; ++i)
+ 		x[i] += input[i];
+ 	for (i = 0; i < 16; ++i)
+-		U32TO8_LITTLE(output + 4 * i,x[i]);
++		U32TO8_LITTLE(output + 4 * i, x[i]);
+ }
+ 
+ static const char sigma[16] = "expand 32-byte k";
+@@ -188,8 +187,7 @@ static int encrypt(struct blkcipher_desc *desc,
+ 
+ 	salsa20_ivsetup(ctx, walk.iv);
+ 
+-	if (likely(walk.nbytes == nbytes))
+-	{
++	if (likely(walk.nbytes == nbytes)) {
+ 		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
+ 				      walk.src.virt.addr, nbytes);
+ 		return blkcipher_walk_done(desc, &walk, 0);
+@@ -248,5 +246,5 @@ module_init(salsa20_generic_mod_init);
+ module_exit(salsa20_generic_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm");
++MODULE_DESCRIPTION("Salsa20 stream cipher algorithm");
+ MODULE_ALIAS("salsa20");
 -- 
 1.6.6.1
