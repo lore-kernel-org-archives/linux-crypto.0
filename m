@@ -1,478 +1,378 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 18/19] crypto: wp512 - Fix checkpatch errors
-Date: Fri, 19 Feb 2010 01:23:47 +0100
-Message-ID: <1266539029-3682-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 11/19] crypto: sha256_generic - Fix checkpatch errors
+Date: Fri, 19 Feb 2010 01:22:39 +0100
+Message-ID: <1266538961-3443-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	Adrian-Ken Rueegsegger <ken@codelabs.ch>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qy0-f202.google.com ([209.85.221.202]:47858 "EHLO
+	mail-qy0-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753514Ab0BSAXG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Feb 2010 19:23:06 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/wp512.c |  372 ++++++++++++++++++++++++++++----------------------------
- 1 files changed, 185 insertions(+), 187 deletions(-)
+ crypto/sha256_generic.c |  306 +++++++++++++++++++++++-----------------------
+ 1 files changed, 153 insertions(+), 153 deletions(-)
 
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index 7234272..a8e4c94 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -773,7 +773,8 @@ static const u64 rc[WHIRLPOOL_ROUNDS + 1] = {
-  * The core Whirlpool transform.
+diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+index c48459e..c724886 100644
+--- a/crypto/sha256_generic.c
++++ b/crypto/sha256_generic.c
+@@ -13,7 +13,7 @@
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option) 
++ * Software Foundation; either version 2 of the License, or (at your option)
+  * any later version.
+  *
   */
- 
--static void wp512_process_buffer(struct wp512_ctx *wctx) {
-+static void wp512_process_buffer(struct wp512_ctx *wctx)
-+{
- 	int i, r;
- 	u64 K[8];        /* the round key */
- 	u64 block[8];    /* mu(buffer) */
-@@ -795,78 +796,78 @@ static void wp512_process_buffer(struct wp512_ctx *wctx) {
- 
- 	for (r = 1; r <= WHIRLPOOL_ROUNDS; r++) {
- 
--		L[0] = C0[(int)(K[0] >> 56)       ] ^
--			   C1[(int)(K[7] >> 48) & 0xff] ^
--			   C2[(int)(K[6] >> 40) & 0xff] ^
--			   C3[(int)(K[5] >> 32) & 0xff] ^
--			   C4[(int)(K[4] >> 24) & 0xff] ^
--			   C5[(int)(K[3] >> 16) & 0xff] ^
--			   C6[(int)(K[2] >>  8) & 0xff] ^
--			   C7[(int)(K[1]      ) & 0xff] ^
--			   rc[r];
--
--		L[1] = C0[(int)(K[1] >> 56)       ] ^
--			   C1[(int)(K[0] >> 48) & 0xff] ^
--			   C2[(int)(K[7] >> 40) & 0xff] ^
--			   C3[(int)(K[6] >> 32) & 0xff] ^
--			   C4[(int)(K[5] >> 24) & 0xff] ^
--			   C5[(int)(K[4] >> 16) & 0xff] ^
--			   C6[(int)(K[3] >>  8) & 0xff] ^
--			   C7[(int)(K[2]      ) & 0xff];
--
--		L[2] = C0[(int)(K[2] >> 56)       ] ^
--			   C1[(int)(K[1] >> 48) & 0xff] ^
--			   C2[(int)(K[0] >> 40) & 0xff] ^
--			   C3[(int)(K[7] >> 32) & 0xff] ^
--			   C4[(int)(K[6] >> 24) & 0xff] ^
--			   C5[(int)(K[5] >> 16) & 0xff] ^
--			   C6[(int)(K[4] >>  8) & 0xff] ^
--			   C7[(int)(K[3]      ) & 0xff];
--
--		L[3] = C0[(int)(K[3] >> 56)       ] ^
--			   C1[(int)(K[2] >> 48) & 0xff] ^
--			   C2[(int)(K[1] >> 40) & 0xff] ^
--			   C3[(int)(K[0] >> 32) & 0xff] ^
--			   C4[(int)(K[7] >> 24) & 0xff] ^
--			   C5[(int)(K[6] >> 16) & 0xff] ^
--			   C6[(int)(K[5] >>  8) & 0xff] ^
--			   C7[(int)(K[4]      ) & 0xff];
--
--		L[4] = C0[(int)(K[4] >> 56)       ] ^
--			   C1[(int)(K[3] >> 48) & 0xff] ^
--			   C2[(int)(K[2] >> 40) & 0xff] ^
--			   C3[(int)(K[1] >> 32) & 0xff] ^
--			   C4[(int)(K[0] >> 24) & 0xff] ^
--			   C5[(int)(K[7] >> 16) & 0xff] ^
--			   C6[(int)(K[6] >>  8) & 0xff] ^
--			   C7[(int)(K[5]      ) & 0xff];
--
--		L[5] = C0[(int)(K[5] >> 56)       ] ^
--			   C1[(int)(K[4] >> 48) & 0xff] ^
--			   C2[(int)(K[3] >> 40) & 0xff] ^
--			   C3[(int)(K[2] >> 32) & 0xff] ^
--			   C4[(int)(K[1] >> 24) & 0xff] ^
--			   C5[(int)(K[0] >> 16) & 0xff] ^
--			   C6[(int)(K[7] >>  8) & 0xff] ^
--			   C7[(int)(K[6]      ) & 0xff];
--
--		L[6] = C0[(int)(K[6] >> 56)       ] ^
--			   C1[(int)(K[5] >> 48) & 0xff] ^
--			   C2[(int)(K[4] >> 40) & 0xff] ^
--			   C3[(int)(K[3] >> 32) & 0xff] ^
--			   C4[(int)(K[2] >> 24) & 0xff] ^
--			   C5[(int)(K[1] >> 16) & 0xff] ^
--			   C6[(int)(K[0] >>  8) & 0xff] ^
--			   C7[(int)(K[7]      ) & 0xff];
--
--		L[7] = C0[(int)(K[7] >> 56)       ] ^
--			   C1[(int)(K[6] >> 48) & 0xff] ^
--			   C2[(int)(K[5] >> 40) & 0xff] ^
--			   C3[(int)(K[4] >> 32) & 0xff] ^
--			   C4[(int)(K[3] >> 24) & 0xff] ^
--			   C5[(int)(K[2] >> 16) & 0xff] ^
--			   C6[(int)(K[1] >>  8) & 0xff] ^
--			   C7[(int)(K[0]      ) & 0xff];
-+		L[0] = C0[(int)(K[0] >> 56)] ^
-+		       C1[(int)(K[7] >> 48) & 0xff] ^
-+		       C2[(int)(K[6] >> 40) & 0xff] ^
-+		       C3[(int)(K[5] >> 32) & 0xff] ^
-+		       C4[(int)(K[4] >> 24) & 0xff] ^
-+		       C5[(int)(K[3] >> 16) & 0xff] ^
-+		       C6[(int)(K[2] >>  8) & 0xff] ^
-+		       C7[(int)(K[1]) & 0xff] ^
-+		       rc[r];
-+
-+		L[1] = C0[(int)(K[1] >> 56)] ^
-+		       C1[(int)(K[0] >> 48) & 0xff] ^
-+		       C2[(int)(K[7] >> 40) & 0xff] ^
-+		       C3[(int)(K[6] >> 32) & 0xff] ^
-+		       C4[(int)(K[5] >> 24) & 0xff] ^
-+		       C5[(int)(K[4] >> 16) & 0xff] ^
-+		       C6[(int)(K[3] >>  8) & 0xff] ^
-+		       C7[(int)(K[2]) & 0xff];
-+
-+		L[2] = C0[(int)(K[2] >> 56)] ^
-+		       C1[(int)(K[1] >> 48) & 0xff] ^
-+		       C2[(int)(K[0] >> 40) & 0xff] ^
-+		       C3[(int)(K[7] >> 32) & 0xff] ^
-+		       C4[(int)(K[6] >> 24) & 0xff] ^
-+		       C5[(int)(K[5] >> 16) & 0xff] ^
-+		       C6[(int)(K[4] >>  8) & 0xff] ^
-+		       C7[(int)(K[3]) & 0xff];
-+
-+		L[3] = C0[(int)(K[3] >> 56)] ^
-+		       C1[(int)(K[2] >> 48) & 0xff] ^
-+		       C2[(int)(K[1] >> 40) & 0xff] ^
-+		       C3[(int)(K[0] >> 32) & 0xff] ^
-+		       C4[(int)(K[7] >> 24) & 0xff] ^
-+		       C5[(int)(K[6] >> 16) & 0xff] ^
-+		       C6[(int)(K[5] >>  8) & 0xff] ^
-+		       C7[(int)(K[4]) & 0xff];
-+
-+		L[4] = C0[(int)(K[4] >> 56)] ^
-+		       C1[(int)(K[3] >> 48) & 0xff] ^
-+		       C2[(int)(K[2] >> 40) & 0xff] ^
-+		       C3[(int)(K[1] >> 32) & 0xff] ^
-+		       C4[(int)(K[0] >> 24) & 0xff] ^
-+		       C5[(int)(K[7] >> 16) & 0xff] ^
-+		       C6[(int)(K[6] >>  8) & 0xff] ^
-+		       C7[(int)(K[5]) & 0xff];
-+
-+		L[5] = C0[(int)(K[5] >> 56)] ^
-+		       C1[(int)(K[4] >> 48) & 0xff] ^
-+		       C2[(int)(K[3] >> 40) & 0xff] ^
-+		       C3[(int)(K[2] >> 32) & 0xff] ^
-+		       C4[(int)(K[1] >> 24) & 0xff] ^
-+		       C5[(int)(K[0] >> 16) & 0xff] ^
-+		       C6[(int)(K[7] >>  8) & 0xff] ^
-+		       C7[(int)(K[6]) & 0xff];
-+
-+		L[6] = C0[(int)(K[6] >> 56)] ^
-+		       C1[(int)(K[5] >> 48) & 0xff] ^
-+		       C2[(int)(K[4] >> 40) & 0xff] ^
-+		       C3[(int)(K[3] >> 32) & 0xff] ^
-+		       C4[(int)(K[2] >> 24) & 0xff] ^
-+		       C5[(int)(K[1] >> 16) & 0xff] ^
-+		       C6[(int)(K[0] >>  8) & 0xff] ^
-+		       C7[(int)(K[7]) & 0xff];
-+
-+		L[7] = C0[(int)(K[7] >> 56)] ^
-+		       C1[(int)(K[6] >> 48) & 0xff] ^
-+		       C2[(int)(K[5] >> 40) & 0xff] ^
-+		       C3[(int)(K[4] >> 32) & 0xff] ^
-+		       C4[(int)(K[3] >> 24) & 0xff] ^
-+		       C5[(int)(K[2] >> 16) & 0xff] ^
-+		       C6[(int)(K[1] >>  8) & 0xff] ^
-+		       C7[(int)(K[0]) & 0xff];
- 
- 		K[0] = L[0];
- 		K[1] = L[1];
-@@ -877,85 +878,85 @@ static void wp512_process_buffer(struct wp512_ctx *wctx) {
- 		K[6] = L[6];
- 		K[7] = L[7];
- 
--		L[0] = C0[(int)(state[0] >> 56)       ] ^
--			   C1[(int)(state[7] >> 48) & 0xff] ^
--			   C2[(int)(state[6] >> 40) & 0xff] ^
--			   C3[(int)(state[5] >> 32) & 0xff] ^
--			   C4[(int)(state[4] >> 24) & 0xff] ^
--			   C5[(int)(state[3] >> 16) & 0xff] ^
--			   C6[(int)(state[2] >>  8) & 0xff] ^
--			   C7[(int)(state[1]      ) & 0xff] ^
--			   K[0];
--
--		L[1] = C0[(int)(state[1] >> 56)       ] ^
--			   C1[(int)(state[0] >> 48) & 0xff] ^
--			   C2[(int)(state[7] >> 40) & 0xff] ^
--			   C3[(int)(state[6] >> 32) & 0xff] ^
--			   C4[(int)(state[5] >> 24) & 0xff] ^
--			   C5[(int)(state[4] >> 16) & 0xff] ^
--			   C6[(int)(state[3] >>  8) & 0xff] ^
--			   C7[(int)(state[2]      ) & 0xff] ^
--			   K[1];
--
--		L[2] = C0[(int)(state[2] >> 56)       ] ^
--			   C1[(int)(state[1] >> 48) & 0xff] ^
--			   C2[(int)(state[0] >> 40) & 0xff] ^
--			   C3[(int)(state[7] >> 32) & 0xff] ^
--			   C4[(int)(state[6] >> 24) & 0xff] ^
--			   C5[(int)(state[5] >> 16) & 0xff] ^
--			   C6[(int)(state[4] >>  8) & 0xff] ^
--			   C7[(int)(state[3]      ) & 0xff] ^
--			   K[2];
--
--		L[3] = C0[(int)(state[3] >> 56)       ] ^
--			   C1[(int)(state[2] >> 48) & 0xff] ^
--			   C2[(int)(state[1] >> 40) & 0xff] ^
--			   C3[(int)(state[0] >> 32) & 0xff] ^
--			   C4[(int)(state[7] >> 24) & 0xff] ^
--			   C5[(int)(state[6] >> 16) & 0xff] ^
--			   C6[(int)(state[5] >>  8) & 0xff] ^
--			   C7[(int)(state[4]      ) & 0xff] ^
--			   K[3];
--
--		L[4] = C0[(int)(state[4] >> 56)       ] ^
--			   C1[(int)(state[3] >> 48) & 0xff] ^
--			   C2[(int)(state[2] >> 40) & 0xff] ^
--			   C3[(int)(state[1] >> 32) & 0xff] ^
--			   C4[(int)(state[0] >> 24) & 0xff] ^
--			   C5[(int)(state[7] >> 16) & 0xff] ^
--			   C6[(int)(state[6] >>  8) & 0xff] ^
--			   C7[(int)(state[5]      ) & 0xff] ^
--			   K[4];
--
--		L[5] = C0[(int)(state[5] >> 56)       ] ^
--			   C1[(int)(state[4] >> 48) & 0xff] ^
--			   C2[(int)(state[3] >> 40) & 0xff] ^
--			   C3[(int)(state[2] >> 32) & 0xff] ^
--			   C4[(int)(state[1] >> 24) & 0xff] ^
--			   C5[(int)(state[0] >> 16) & 0xff] ^
--			   C6[(int)(state[7] >>  8) & 0xff] ^
--			   C7[(int)(state[6]      ) & 0xff] ^
--			   K[5];
--
--		L[6] = C0[(int)(state[6] >> 56)       ] ^
--			   C1[(int)(state[5] >> 48) & 0xff] ^
--			   C2[(int)(state[4] >> 40) & 0xff] ^
--			   C3[(int)(state[3] >> 32) & 0xff] ^
--			   C4[(int)(state[2] >> 24) & 0xff] ^
--			   C5[(int)(state[1] >> 16) & 0xff] ^
--			   C6[(int)(state[0] >>  8) & 0xff] ^
--			   C7[(int)(state[7]      ) & 0xff] ^
--			   K[6];
--
--		L[7] = C0[(int)(state[7] >> 56)       ] ^
--			   C1[(int)(state[6] >> 48) & 0xff] ^
--			   C2[(int)(state[5] >> 40) & 0xff] ^
--			   C3[(int)(state[4] >> 32) & 0xff] ^
--			   C4[(int)(state[3] >> 24) & 0xff] ^
--			   C5[(int)(state[2] >> 16) & 0xff] ^
--			   C6[(int)(state[1] >>  8) & 0xff] ^
--			   C7[(int)(state[0]      ) & 0xff] ^
--			   K[7];
-+		L[0] = C0[(int)(state[0] >> 56)] ^
-+		       C1[(int)(state[7] >> 48) & 0xff] ^
-+		       C2[(int)(state[6] >> 40) & 0xff] ^
-+		       C3[(int)(state[5] >> 32) & 0xff] ^
-+		       C4[(int)(state[4] >> 24) & 0xff] ^
-+		       C5[(int)(state[3] >> 16) & 0xff] ^
-+		       C6[(int)(state[2] >>  8) & 0xff] ^
-+		       C7[(int)(state[1]) & 0xff] ^
-+		       K[0];
-+
-+		L[1] = C0[(int)(state[1] >> 56)] ^
-+		           C1[(int)(state[0] >> 48) & 0xff] ^
-+		           C2[(int)(state[7] >> 40) & 0xff] ^
-+		           C3[(int)(state[6] >> 32) & 0xff] ^
-+		           C4[(int)(state[5] >> 24) & 0xff] ^
-+		           C5[(int)(state[4] >> 16) & 0xff] ^
-+		           C6[(int)(state[3] >>  8) & 0xff] ^
-+		           C7[(int)(state[2]) & 0xff] ^
-+		           K[1];
-+
-+		L[2] = C0[(int)(state[2] >> 56)] ^
-+		           C1[(int)(state[1] >> 48) & 0xff] ^
-+		           C2[(int)(state[0] >> 40) & 0xff] ^
-+		           C3[(int)(state[7] >> 32) & 0xff] ^
-+		           C4[(int)(state[6] >> 24) & 0xff] ^
-+		           C5[(int)(state[5] >> 16) & 0xff] ^
-+		           C6[(int)(state[4] >>  8) & 0xff] ^
-+		           C7[(int)(state[3]) & 0xff] ^
-+		           K[2];
-+
-+		L[3] = C0[(int)(state[3] >> 56)] ^
-+		           C1[(int)(state[2] >> 48) & 0xff] ^
-+		           C2[(int)(state[1] >> 40) & 0xff] ^
-+		           C3[(int)(state[0] >> 32) & 0xff] ^
-+		           C4[(int)(state[7] >> 24) & 0xff] ^
-+		           C5[(int)(state[6] >> 16) & 0xff] ^
-+		           C6[(int)(state[5] >>  8) & 0xff] ^
-+		           C7[(int)(state[4]) & 0xff] ^
-+		           K[3];
-+
-+		L[4] = C0[(int)(state[4] >> 56)] ^
-+		           C1[(int)(state[3] >> 48) & 0xff] ^
-+		           C2[(int)(state[2] >> 40) & 0xff] ^
-+		           C3[(int)(state[1] >> 32) & 0xff] ^
-+		           C4[(int)(state[0] >> 24) & 0xff] ^
-+		           C5[(int)(state[7] >> 16) & 0xff] ^
-+		           C6[(int)(state[6] >>  8) & 0xff] ^
-+		           C7[(int)(state[5]) & 0xff] ^
-+		           K[4];
-+
-+		L[5] = C0[(int)(state[5] >> 56)] ^
-+		           C1[(int)(state[4] >> 48) & 0xff] ^
-+		           C2[(int)(state[3] >> 40) & 0xff] ^
-+		           C3[(int)(state[2] >> 32) & 0xff] ^
-+		           C4[(int)(state[1] >> 24) & 0xff] ^
-+		           C5[(int)(state[0] >> 16) & 0xff] ^
-+		           C6[(int)(state[7] >>  8) & 0xff] ^
-+		           C7[(int)(state[6]) & 0xff] ^
-+		           K[5];
-+
-+		L[6] = C0[(int)(state[6] >> 56)] ^
-+		           C1[(int)(state[5] >> 48) & 0xff] ^
-+		           C2[(int)(state[4] >> 40) & 0xff] ^
-+		           C3[(int)(state[3] >> 32) & 0xff] ^
-+		           C4[(int)(state[2] >> 24) & 0xff] ^
-+		           C5[(int)(state[1] >> 16) & 0xff] ^
-+		           C6[(int)(state[0] >>  8) & 0xff] ^
-+		           C7[(int)(state[7]) & 0xff] ^
-+		           K[6];
-+
-+		L[7] = C0[(int)(state[7] >> 56)] ^
-+		           C1[(int)(state[6] >> 48) & 0xff] ^
-+		           C2[(int)(state[5] >> 40) & 0xff] ^
-+		           C3[(int)(state[4] >> 32) & 0xff] ^
-+		           C4[(int)(state[3] >> 24) & 0xff] ^
-+		           C5[(int)(state[2] >> 16) & 0xff] ^
-+		           C6[(int)(state[1] >>  8) & 0xff] ^
-+		           C7[(int)(state[0]) & 0xff] ^
-+		           K[7];
- 
- 		state[0] = L[0];
- 		state[1] = L[1];
-@@ -980,26 +981,26 @@ static void wp512_process_buffer(struct wp512_ctx *wctx) {
- 
+@@ -35,14 +35,14 @@ static inline u32 Maj(u32 x, u32 y, u32 z)
+ 	return (x & y) | (z & (x | y));
  }
  
--static int wp512_init(struct shash_desc *desc) {
-+static int wp512_init(struct shash_desc *desc)
-+{
- 	struct wp512_ctx *wctx = shash_desc_ctx(desc);
- 	int i;
+-#define e0(x)       (ror32(x, 2) ^ ror32(x,13) ^ ror32(x,22))
+-#define e1(x)       (ror32(x, 6) ^ ror32(x,11) ^ ror32(x,25))
+-#define s0(x)       (ror32(x, 7) ^ ror32(x,18) ^ (x >> 3))
+-#define s1(x)       (ror32(x,17) ^ ror32(x,19) ^ (x >> 10))
++#define e0(x)       (ror32(x,  2) ^ ror32(x, 13) ^ ror32(x, 22))
++#define e1(x)       (ror32(x,  6) ^ ror32(x, 11) ^ ror32(x, 25))
++#define s0(x)       (ror32(x,  7) ^ ror32(x, 18) ^ (x >> 3))
++#define s1(x)       (ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10))
  
- 	memset(wctx->bitLength, 0, 32);
- 	wctx->bufferBits = wctx->bufferPos = 0;
- 	wctx->buffer[0] = 0;
--	for (i = 0; i < 8; i++) {
-+	for (i = 0; i < 8; i++)
- 		wctx->hash[i] = 0L;
--	}
- 
- 	return 0;
- }
- 
- static int wp512_update(struct shash_desc *desc, const u8 *source,
--			 unsigned int len)
-+                        unsigned int len)
+ static inline void LOAD_OP(int I, u32 *W, const u8 *input)
  {
- 	struct wp512_ctx *wctx = shash_desc_ctx(desc);
- 	int sourcePos    = 0;
--	unsigned int bits_len = len * 8; // convert to number of bits
-+	unsigned int bits_len = len * 8; /* convert to number of bits */
- 	int sourceGap    = (8 - ((int)bits_len & 7)) & 7;
- 	int bufferRem    = wctx->bufferBits & 7;
- 	int i;
-@@ -1060,33 +1061,32 @@ static int wp512_final(struct shash_desc *desc, u8 *out)
- {
- 	struct wp512_ctx *wctx = shash_desc_ctx(desc);
- 	int i;
--   	u8 *buffer      = wctx->buffer;
--   	u8 *bitLength   = wctx->bitLength;
--   	int bufferBits  = wctx->bufferBits;
--   	int bufferPos   = wctx->bufferPos;
-+	u8 *buffer      = wctx->buffer;
-+	u8 *bitLength   = wctx->bitLength;
-+	int bufferBits  = wctx->bufferBits;
-+	int bufferPos   = wctx->bufferPos;
- 	__be64 *digest  = (__be64 *)out;
- 
--   	buffer[bufferPos] |= 0x80U >> (bufferBits & 7);
--   	bufferPos++;
--   	if (bufferPos > WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
--   		if (bufferPos < WP512_BLOCK_SIZE) {
--	   	memset(&buffer[bufferPos], 0, WP512_BLOCK_SIZE - bufferPos);
--   		}
--   		wp512_process_buffer(wctx);
--   		bufferPos = 0;
--   	}
--   	if (bufferPos < WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
--   		memset(&buffer[bufferPos], 0,
--			  (WP512_BLOCK_SIZE - WP512_LENGTHBYTES) - bufferPos);
--   	}
--   	bufferPos = WP512_BLOCK_SIZE - WP512_LENGTHBYTES;
--   	memcpy(&buffer[WP512_BLOCK_SIZE - WP512_LENGTHBYTES],
-+	buffer[bufferPos] |= 0x80U >> (bufferBits & 7);
-+	bufferPos++;
-+	if (bufferPos > WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
-+		if (bufferPos < WP512_BLOCK_SIZE)
-+			memset(&buffer[bufferPos], 0, WP512_BLOCK_SIZE - bufferPos);
-+		wp512_process_buffer(wctx);
-+		bufferPos = 0;
-+	}
-+	if (bufferPos < WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
-+		memset(&buffer[bufferPos], 0,
-+			(WP512_BLOCK_SIZE - WP512_LENGTHBYTES) - bufferPos);
-+	}
-+	bufferPos = WP512_BLOCK_SIZE - WP512_LENGTHBYTES;
-+	memcpy(&buffer[WP512_BLOCK_SIZE - WP512_LENGTHBYTES],
- 		   bitLength, WP512_LENGTHBYTES);
--   	wp512_process_buffer(wctx);
-+	wp512_process_buffer(wctx);
- 	for (i = 0; i < WP512_DIGEST_SIZE/8; i++)
- 		digest[i] = cpu_to_be64(wctx->hash[i]);
--   	wctx->bufferBits   = bufferBits;
--   	wctx->bufferPos    = bufferPos;
-+	wctx->bufferBits   = bufferBits;
-+	wctx->bufferPos    = bufferPos;
- 
- 	return 0;
+-	W[I] = __be32_to_cpu( ((__be32*)(input))[I] );
++	W[I] = __be32_to_cpu(((__be32 *)(input))[I]);
  }
-@@ -1096,8 +1096,8 @@ static int wp384_final(struct shash_desc *desc, u8 *out)
- 	u8 D[64];
  
- 	wp512_final(desc, D);
--	memcpy (out, D, WP384_DIGEST_SIZE);
--	memset (D, 0, WP512_DIGEST_SIZE);
-+	memcpy(out, D, WP384_DIGEST_SIZE);
-+	memset(D, 0, WP512_DIGEST_SIZE);
+ static inline void BLEND_OP(int I, u32 *W)
+@@ -65,145 +65,145 @@ static void sha256_transform(u32 *state, const u8 *input)
+ 		BLEND_OP(i, W);
  
- 	return 0;
- }
-@@ -1107,8 +1107,8 @@ static int wp256_final(struct shash_desc *desc, u8 *out)
- 	u8 D[64];
+ 	/* load the state into our registers */
+-	a=state[0];  b=state[1];  c=state[2];  d=state[3];
+-	e=state[4];  f=state[5];  g=state[6];  h=state[7];
++	a = state[0];  b = state[1];  c = state[2];  d = state[3];
++	e = state[4];  f = state[5];  g = state[6];  h = state[7];
  
- 	wp512_final(desc, D);
--	memcpy (out, D, WP256_DIGEST_SIZE);
--	memset (D, 0, WP512_DIGEST_SIZE);
-+	memcpy(out, D, WP256_DIGEST_SIZE);
-+	memset(D, 0, WP512_DIGEST_SIZE);
+ 	/* now iterate */
+-	t1 = h + e1(e) + Ch(e,f,g) + 0x428a2f98 + W[ 0];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0x71374491 + W[ 1];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0xb5c0fbcf + W[ 2];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0xe9b5dba5 + W[ 3];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x3956c25b + W[ 4];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0x59f111f1 + W[ 5];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x923f82a4 + W[ 6];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0xab1c5ed5 + W[ 7];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0xd807aa98 + W[ 8];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0x12835b01 + W[ 9];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0x243185be + W[10];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0x550c7dc3 + W[11];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x72be5d74 + W[12];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0x80deb1fe + W[13];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x9bdc06a7 + W[14];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0xc19bf174 + W[15];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0xe49b69c1 + W[16];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0xefbe4786 + W[17];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0x0fc19dc6 + W[18];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0x240ca1cc + W[19];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x2de92c6f + W[20];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0x4a7484aa + W[21];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x5cb0a9dc + W[22];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0x76f988da + W[23];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0x983e5152 + W[24];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0xa831c66d + W[25];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0xb00327c8 + W[26];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0xbf597fc7 + W[27];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0xc6e00bf3 + W[28];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0xd5a79147 + W[29];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x06ca6351 + W[30];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0x14292967 + W[31];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0x27b70a85 + W[32];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0x2e1b2138 + W[33];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0x4d2c6dfc + W[34];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0x53380d13 + W[35];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x650a7354 + W[36];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0x766a0abb + W[37];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x81c2c92e + W[38];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0x92722c85 + W[39];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0xa2bfe8a1 + W[40];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0xa81a664b + W[41];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0xc24b8b70 + W[42];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0xc76c51a3 + W[43];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0xd192e819 + W[44];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0xd6990624 + W[45];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0xf40e3585 + W[46];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0x106aa070 + W[47];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0x19a4c116 + W[48];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0x1e376c08 + W[49];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0x2748774c + W[50];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0x34b0bcb5 + W[51];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x391c0cb3 + W[52];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0x4ed8aa4a + W[53];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0x5b9cca4f + W[54];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0x682e6ff3 + W[55];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
+-
+-	t1 = h + e1(e) + Ch(e,f,g) + 0x748f82ee + W[56];
+-	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
+-	t1 = g + e1(d) + Ch(d,e,f) + 0x78a5636f + W[57];
+-	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
+-	t1 = f + e1(c) + Ch(c,d,e) + 0x84c87814 + W[58];
+-	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
+-	t1 = e + e1(b) + Ch(b,c,d) + 0x8cc70208 + W[59];
+-	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
+-	t1 = d + e1(a) + Ch(a,b,c) + 0x90befffa + W[60];
+-	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
+-	t1 = c + e1(h) + Ch(h,a,b) + 0xa4506ceb + W[61];
+-	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
+-	t1 = b + e1(g) + Ch(g,h,a) + 0xbef9a3f7 + W[62];
+-	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
+-	t1 = a + e1(f) + Ch(f,g,h) + 0xc67178f2 + W[63];
+-	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
++	t1 = h + e1(e) + Ch(e, f, g) + 0x428a2f98 + W[ 0];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0x71374491 + W[ 1];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0xb5c0fbcf + W[ 2];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0xe9b5dba5 + W[ 3];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x3956c25b + W[ 4];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0x59f111f1 + W[ 5];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x923f82a4 + W[ 6];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0xab1c5ed5 + W[ 7];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0xd807aa98 + W[ 8];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0x12835b01 + W[ 9];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0x243185be + W[10];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0x550c7dc3 + W[11];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x72be5d74 + W[12];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0x80deb1fe + W[13];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x9bdc06a7 + W[14];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0xc19bf174 + W[15];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0xe49b69c1 + W[16];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0xefbe4786 + W[17];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0x0fc19dc6 + W[18];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0x240ca1cc + W[19];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x2de92c6f + W[20];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0x4a7484aa + W[21];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x5cb0a9dc + W[22];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0x76f988da + W[23];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0x983e5152 + W[24];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0xa831c66d + W[25];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0xb00327c8 + W[26];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0xbf597fc7 + W[27];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0xc6e00bf3 + W[28];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0xd5a79147 + W[29];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x06ca6351 + W[30];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0x14292967 + W[31];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0x27b70a85 + W[32];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0x2e1b2138 + W[33];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0x4d2c6dfc + W[34];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0x53380d13 + W[35];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x650a7354 + W[36];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0x766a0abb + W[37];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x81c2c92e + W[38];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0x92722c85 + W[39];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0xa2bfe8a1 + W[40];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0xa81a664b + W[41];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0xc24b8b70 + W[42];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0xc76c51a3 + W[43];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0xd192e819 + W[44];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0xd6990624 + W[45];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0xf40e3585 + W[46];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0x106aa070 + W[47];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0x19a4c116 + W[48];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0x1e376c08 + W[49];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0x2748774c + W[50];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0x34b0bcb5 + W[51];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x391c0cb3 + W[52];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0x4ed8aa4a + W[53];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0x5b9cca4f + W[54];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0x682e6ff3 + W[55];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
++
++	t1 = h + e1(e) + Ch(e, f, g) + 0x748f82ee + W[56];
++	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
++	t1 = g + e1(d) + Ch(d, e, f) + 0x78a5636f + W[57];
++	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
++	t1 = f + e1(c) + Ch(c, d, e) + 0x84c87814 + W[58];
++	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
++	t1 = e + e1(b) + Ch(b, c, d) + 0x8cc70208 + W[59];
++	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
++	t1 = d + e1(a) + Ch(a, b, c) + 0x90befffa + W[60];
++	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
++	t1 = c + e1(h) + Ch(h, a, b) + 0xa4506ceb + W[61];
++	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
++	t1 = b + e1(g) + Ch(g, h, a) + 0xbef9a3f7 + W[62];
++	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
++	t1 = a + e1(f) + Ch(f, g, h) + 0xc67178f2 + W[63];
++	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
  
- 	return 0;
- }
-@@ -1165,15 +1165,13 @@ static int __init wp512_mod_init(void)
- 		goto out;
- 
- 	ret = crypto_register_shash(&wp384);
--	if (ret < 0)
--	{
-+	if (ret < 0) {
- 		crypto_unregister_shash(&wp512);
- 		goto out;
+ 	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
+ 	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+@@ -346,11 +346,11 @@ static struct shash_alg sha256 = {
+ 	.descsize	=	sizeof(struct sha256_state),
+ 	.statesize	=	sizeof(struct sha256_state),
+ 	.base		=	{
+-		.cra_name	=	"sha256",
+-		.cra_driver_name=	"sha256-generic",
+-		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
+-		.cra_blocksize	=	SHA256_BLOCK_SIZE,
+-		.cra_module	=	THIS_MODULE,
++		.cra_name		=	"sha256",
++		.cra_driver_name	=	"sha256-generic",
++		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		=	SHA256_BLOCK_SIZE,
++		.cra_module		=	THIS_MODULE,
  	}
+ };
  
- 	ret = crypto_register_shash(&wp256);
--	if (ret < 0)
--	{
-+	if (ret < 0) {
- 		crypto_unregister_shash(&wp512);
- 		crypto_unregister_shash(&wp384);
+@@ -361,11 +361,11 @@ static struct shash_alg sha224 = {
+ 	.final		=	sha224_final,
+ 	.descsize	=	sizeof(struct sha256_state),
+ 	.base		=	{
+-		.cra_name	=	"sha224",
+-		.cra_driver_name=	"sha224-generic",
+-		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
+-		.cra_blocksize	=	SHA224_BLOCK_SIZE,
+-		.cra_module	=	THIS_MODULE,
++		.cra_name		=	"sha224",
++		.cra_driver_name	=	"sha224-generic",
++		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		=	SHA224_BLOCK_SIZE,
++		.cra_module		=	THIS_MODULE,
  	}
+ };
+ 
 -- 
 1.6.6.1
+
