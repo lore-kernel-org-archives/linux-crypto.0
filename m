@@ -1,47 +1,36 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 1/1] CRYPTO: Fix checkpatch errors & warnings in aes_generic
-Date: Fri, 19 Feb 2010 01:21:24 +0100
-Message-ID: <1266538885-3079-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 01/19] crypto: internal - Fix checkpatch errors
+Date: Fri, 19 Feb 2010 01:21:33 +0100
+Message-ID: <1266538894-3112-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Phil Carmody <ext-phil.2.carmody@nokia.com>,
-	linux-kernel@vger.kernel.org
+	Neil Horman <nhorman@tuxdriver.com>,
+	Shasi Pulijala <spulijala@amcc.com>,
+	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:63509 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752674Ab0BSAVr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Feb 2010 19:21:47 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/aes_generic.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ crypto/internal.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index e78b7ee..a68c73d 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -1,4 +1,4 @@
--/* 
-+/*
-  * Cryptographic API.
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 2d22636..d4384b0 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -6,7 +6,7 @@
   *
-  * AES Cipher Algorithm.
-@@ -1127,7 +1127,7 @@ EXPORT_SYMBOL_GPL(crypto_il_tab);
- 
- #define star_x(x) (((x) & 0x7f7f7f7f) << 1) ^ ((((x) & 0x80808080) >> 7) * 0x1b)
- 
--#define imix_col(y,x)	do {		\
-+#define imix_col(y, x)	do {		\
- 	u	= star_x(x);		\
- 	v	= star_x(u);		\
- 	w	= star_x(v);		\
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option) 
++ * Software Foundation; either version 2 of the License, or (at your option)
+  * any later version.
+  *
+  */
 -- 
 1.6.6.1
-
