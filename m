@@ -1,378 +1,655 @@
 From: Richard Hartmann <richih.mailinglist@gmail.com>
-Subject: [PATCH 11/19] crypto: sha256_generic - Fix checkpatch errors
-Date: Fri, 19 Feb 2010 01:22:39 +0100
-Message-ID: <1266538961-3443-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: [PATCH 09/19] crypto: serpent - Fix checkpatch errors
+Date: Fri, 19 Feb 2010 01:22:26 +0100
+Message-ID: <1266538947-3377-1-git-send-email-richih.mailinglist@gmail.com>
 Cc: Richard Hartmann <richih.mailinglist@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>,
 	linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qy0-f202.google.com ([209.85.221.202]:47858 "EHLO
-	mail-qy0-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753514Ab0BSAXG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Feb 2010 19:23:06 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Thank $deity for diff -w; else I would not have dared to submit
+this.
 
 Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 ---
- crypto/sha256_generic.c |  306 +++++++++++++++++++++++-----------------------
- 1 files changed, 153 insertions(+), 153 deletions(-)
+ crypto/serpent.c |  430 +++++++++++++++++++++++++++---------------------------
+ 1 files changed, 215 insertions(+), 215 deletions(-)
 
-diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-index c48459e..c724886 100644
---- a/crypto/sha256_generic.c
-+++ b/crypto/sha256_generic.c
-@@ -13,7 +13,7 @@
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
+diff --git a/crypto/serpent.c b/crypto/serpent.c
+index b651a55..03a75c1 100644
+--- a/crypto/serpent.c
++++ b/crypto/serpent.c
+@@ -26,27 +26,27 @@
+  * Any key length <= 256 bits (32 bytes) is allowed by the algorithm.
   */
-@@ -35,14 +35,14 @@ static inline u32 Maj(u32 x, u32 y, u32 z)
- 	return (x & y) | (z & (x | y));
+ 
+-#define SERPENT_MIN_KEY_SIZE		  0
+-#define SERPENT_MAX_KEY_SIZE		 32
+-#define SERPENT_EXPKEY_WORDS		132
+-#define SERPENT_BLOCK_SIZE		 16
++#define SERPENT_MIN_KEY_SIZE   0
++#define SERPENT_MAX_KEY_SIZE  32
++#define SERPENT_EXPKEY_WORDS 132
++#define SERPENT_BLOCK_SIZE    16
+ 
+ #define PHI 0x9e3779b9UL
+ 
+-#define keyiter(a,b,c,d,i,j) \
+-        b ^= d; b ^= c; b ^= a; b ^= PHI ^ i; b = rol32(b,11); k[j] = b;
++#define keyiter(a, b, c, d, i, j) \
++	b ^= d; b ^= c; b ^= a; b ^= PHI ^ i; b = rol32(b, 11); k[j] = b;
+ 
+-#define loadkeys(x0,x1,x2,x3,i) \
+-	x0=k[i]; x1=k[i+1]; x2=k[i+2]; x3=k[i+3];
++#define loadkeys(x0, x1, x2, x3, i) \
++	x0 = k[i]; x1 = k[i+1]; x2 = k[i+2]; x3 = k[i+3];
+ 
+-#define storekeys(x0,x1,x2,x3,i) \
+-	k[i]=x0; k[i+1]=x1; k[i+2]=x2; k[i+3]=x3;
++#define storekeys(x0, x1, x2, x3, i) \
++	k[i] = x0; k[i+1] = x1; k[i+2] = x2; k[i+3] = x3;
+ 
+-#define K(x0,x1,x2,x3,i)				\
++#define K(x0, x1, x2, x3, i)				\
+ 	x3 ^= k[4*(i)+3];        x2 ^= k[4*(i)+2];	\
+ 	x1 ^= k[4*(i)+1];        x0 ^= k[4*(i)+0];
+ 
+-#define LK(x0,x1,x2,x3,x4,i)				\
++#define LK(x0, x1, x2, x3, x4, i)			\
+ 					x0=rol32(x0,13);\
+ 	x2=rol32(x2,3);	x1 ^= x0;	x4  = x0 << 3;	\
+ 	x3 ^= x2;	x1 ^= x2;			\
+@@ -54,19 +54,19 @@
+ 	x3=rol32(x3,7);	x4  = x1;			\
+ 	x0 ^= x1;	x4 <<= 7;	x2 ^= x3;	\
+ 	x0 ^= x3;	x2 ^= x4;	x3 ^= k[4*i+3];	\
+-	x1 ^= k[4*i+1];	x0=rol32(x0,5);	x2=rol32(x2,22);\
++	x1 ^= k[4*i+1];	x0=rol32(x0, 5);x2=rol32(x2,22);\
+ 	x0 ^= k[4*i+0];	x2 ^= k[4*i+2];
+ 
+-#define KL(x0,x1,x2,x3,x4,i)				\
++#define KL(x0, x1, x2, x3, x4, i)			\
+ 	x0 ^= k[4*i+0];	x1 ^= k[4*i+1];	x2 ^= k[4*i+2];	\
+-	x3 ^= k[4*i+3];	x0=ror32(x0,5);	x2=ror32(x2,22);\
++	x3 ^= k[4*i+3];	x0=ror32(x0, 5);x2=ror32(x2,22);\
+ 	x4 =  x1;	x2 ^= x3;	x0 ^= x3;	\
+ 	x4 <<= 7;	x0 ^= x1;	x1=ror32(x1,1);	\
+-	x2 ^= x4;	x3=ror32(x3,7);	x4 = x0 << 3;	\
++	x2 ^= x4;	x3=ror32(x3, 7);x4 = x0 << 3;	\
+ 	x1 ^= x0;	x3 ^= x4;	x0=ror32(x0,13);\
+ 	x1 ^= x2;	x3 ^= x2;	x2=ror32(x2,3);
+ 
+-#define S0(x0,x1,x2,x3,x4)				\
++#define S0(x0, x1, x2, x3, x4)				\
+ 					x4  = x3;	\
+ 	x3 |= x0;	x0 ^= x4;	x4 ^= x2;	\
+ 	x4 =~ x4;	x3 ^= x1;	x1 &= x0;	\
+@@ -75,7 +75,7 @@
+ 	x3 ^= x2;	x1 =~ x1;	x2 ^= x4;	\
+ 	x1 ^= x2;
+ 
+-#define S1(x0,x1,x2,x3,x4)				\
++#define S1(x0, x1, x2, x3, x4)				\
+ 					x4  = x1;	\
+ 	x1 ^= x0;	x0 ^= x3;	x3 =~ x3;	\
+ 	x4 &= x1;	x0 |= x1;	x3 ^= x2;	\
+@@ -84,7 +84,7 @@
+ 	x2 ^= x1;	x1 |= x0;	x0 =~ x0;	\
+ 	x0 ^= x2;	x4 ^= x1;
+ 
+-#define S2(x0,x1,x2,x3,x4)				\
++#define S2(x0, x1, x2, x3, x4)				\
+ 					x3 =~ x3;	\
+ 	x1 ^= x0;	x4  = x0;	x0 &= x2;	\
+ 	x0 ^= x3;	x3 |= x4;	x2 ^= x1;	\
+@@ -93,7 +93,7 @@
+ 	x3 ^= x0;	x4 ^= x0;	x0 ^= x2;	\
+ 	x1 |= x2;
+ 
+-#define S3(x0,x1,x2,x3,x4)				\
++#define S3(x0, x1, x2, x3, x4)				\
+ 					x4  = x1;	\
+ 	x1 ^= x3;	x3 |= x0;	x4 &= x0;	\
+ 	x0 ^= x2;	x2 ^= x1;	x1 &= x3;	\
+@@ -102,7 +102,7 @@
+ 	x3 ^= x2;	x4 |= x1;	x2 &= x1;	\
+ 	x4 ^= x3;	x0 ^= x3;	x3 ^= x2;
+ 
+-#define S4(x0,x1,x2,x3,x4)				\
++#define S4(x0, x1, x2, x3, x4)				\
+ 					x4  = x3;	\
+ 	x3 &= x0;	x0 ^= x4;			\
+ 	x3 ^= x2;	x2 |= x4;	x0 ^= x1;	\
+@@ -112,7 +112,7 @@
+ 	x4 ^= x0;	x3 |= x1;	x1 =~ x1;	\
+ 	x3 ^= x0;
+ 
+-#define S5(x0,x1,x2,x3,x4)				\
++#define S5(x0, x1, x2, x3, x4)				\
+ 	x4  = x1;	x1 |= x0;			\
+ 	x2 ^= x1;	x3 =~ x3;	x4 ^= x0;	\
+ 	x0 ^= x2;	x1 &= x4;	x4 |= x3;	\
+@@ -121,7 +121,7 @@
+ 	x1 ^= x2;	x2 &= x0;			\
+ 	x3 ^= x2;
+ 
+-#define S6(x0,x1,x2,x3,x4)				\
++#define S6(x0, x1, x2, x3, x4)				\
+ 					x4  = x1;	\
+ 	x3 ^= x0;	x1 ^= x2;	x2 ^= x0;	\
+ 	x0 &= x3;	x1 |= x3;	x4 =~ x4;	\
+@@ -130,7 +130,7 @@
+ 	x4 ^= x1;	x2 ^= x3;	x3 &= x1;	\
+ 	x3 ^= x0;	x1 ^= x2;
+ 
+-#define S7(x0,x1,x2,x3,x4)				\
++#define S7(x0, x1, x2, x3, x4)				\
+ 					x1 =~ x1;	\
+ 	x4  = x1;	x0 =~ x0;	x1 &= x2;	\
+ 	x1 ^= x3;	x3 |= x4;	x4 ^= x2;	\
+@@ -140,7 +140,7 @@
+ 	x2 ^= x4;	x3 ^= x1;	x4 |= x0;	\
+ 	x4 ^= x1;
+ 
+-#define SI0(x0,x1,x2,x3,x4)				\
++#define SI0(x0, x1, x2, x3, x4)				\
+ 			x4  = x3;	x1 ^= x0;	\
+ 	x3 |= x1;	x4 ^= x1;	x0 =~ x0;	\
+ 	x2 ^= x3;	x3 ^= x0;	x0 &= x1;	\
+@@ -148,7 +148,7 @@
+ 	x2 ^= x3;	x1 ^= x3;	x3 &= x0;	\
+ 	x1 ^= x0;	x0 ^= x2;	x4 ^= x3;
+ 
+-#define SI1(x0,x1,x2,x3,x4)				\
++#define SI1(x0, x1, x2, x3, x4)				\
+ 	x1 ^= x3;	x4  = x0;			\
+ 	x0 ^= x2;	x2 =~ x2;	x4 |= x1;	\
+ 	x4 ^= x3;	x3 &= x1;	x1 ^= x2;	\
+@@ -157,7 +157,7 @@
+ 	x2 ^= x4;	x1 ^= x0;			\
+ 	x4 ^= x1;
+ 
+-#define SI2(x0,x1,x2,x3,x4)				\
++#define SI2(x0, x1, x2, x3, x4)				\
+ 	x2 ^= x1;	x4  = x3;	x3 =~ x3;	\
+ 	x3 |= x2;	x2 ^= x4;	x4 ^= x0;	\
+ 	x3 ^= x1;	x1 |= x2;	x2 ^= x0;	\
+@@ -165,7 +165,7 @@
+ 	x4 ^= x2;	x2 &= x1;			\
+ 	x2 ^= x3;	x3 ^= x4;	x4 ^= x0;
+ 
+-#define SI3(x0,x1,x2,x3,x4)				\
++#define SI3(x0, x1, x2, x3, x4)				\
+ 					x2 ^= x1;	\
+ 	x4  = x1;	x1 &= x2;			\
+ 	x1 ^= x0;	x0 |= x4;	x4 ^= x3;	\
+@@ -174,7 +174,7 @@
+ 	x3 &= x1;	x1 ^= x0;	x0 &= x2;	\
+ 	x4 ^= x3;	x3 ^= x0;	x0 ^= x1;
+ 
+-#define SI4(x0,x1,x2,x3,x4)				\
++#define SI4(x0, x1, x2, x3, x4)				\
+ 	x2 ^= x3;	x4  = x0;	x0 &= x1;	\
+ 	x0 ^= x2;	x2 |= x3;	x4 =~ x4;	\
+ 	x1 ^= x0;	x0 ^= x2;	x2 &= x4;	\
+@@ -183,7 +183,7 @@
+ 	x4 ^= x3;	x3 ^= x1;	x1 &= x0;	\
+ 	x4 ^= x1;	x0 ^= x3;
+ 
+-#define SI5(x0,x1,x2,x3,x4)				\
++#define SI5(x0, x1, x2, x3, x4)				\
+ 			x4  = x1;	x1 |= x2;	\
+ 	x2 ^= x4;	x1 ^= x3;	x3 &= x4;	\
+ 	x2 ^= x3;	x3 |= x0;	x0 =~ x0;	\
+@@ -192,7 +192,7 @@
+ 	x1 ^= x3;	x0 &= x2;	x2 ^= x3;	\
+ 	x0 ^= x2;	x2 ^= x4;	x4 ^= x3;
+ 
+-#define SI6(x0,x1,x2,x3,x4)				\
++#define SI6(x0, x1, x2, x3, x4)				\
+ 			x0 ^= x2;			\
+ 	x4  = x0;	x0 &= x3;	x2 ^= x3;	\
+ 	x0 ^= x2;	x3 ^= x1;	x2 |= x4;	\
+@@ -201,7 +201,7 @@
+ 	x3 ^= x4;	x4 ^= x2;	x0 ^= x1;	\
+ 	x2 ^= x0;
+ 
+-#define SI7(x0,x1,x2,x3,x4)				\
++#define SI7(x0, x1, x2, x3, x4)				\
+ 	x4  = x3;	x3 &= x0;	x0 ^= x2;	\
+ 	x2 |= x4;	x4 ^= x1;	x0 =~ x0;	\
+ 	x1 |= x3;	x4 ^= x0;	x0 &= x2;	\
+@@ -221,7 +221,7 @@ static int serpent_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	struct serpent_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	u32 *k = ctx->expkey;
+ 	u8  *k8 = (u8 *)k;
+-	u32 r0,r1,r2,r3,r4;
++	u32 r0, r1, r2, r3, r4;
+ 	int i;
+ 
+ 	/* Copy key, add padding */
+@@ -241,121 +241,121 @@ static int serpent_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	r3 = le32_to_cpu(k[6]);
+ 	r4 = le32_to_cpu(k[7]);
+ 
+-	keyiter(le32_to_cpu(k[0]),r0,r4,r2,0,0);
+-	keyiter(le32_to_cpu(k[1]),r1,r0,r3,1,1);
+-	keyiter(le32_to_cpu(k[2]),r2,r1,r4,2,2);
+-	keyiter(le32_to_cpu(k[3]),r3,r2,r0,3,3);
+-	keyiter(le32_to_cpu(k[4]),r4,r3,r1,4,4);
+-	keyiter(le32_to_cpu(k[5]),r0,r4,r2,5,5);
+-	keyiter(le32_to_cpu(k[6]),r1,r0,r3,6,6);
+-	keyiter(le32_to_cpu(k[7]),r2,r1,r4,7,7);
+-
+-	keyiter(k[  0],r3,r2,r0,  8,  8); keyiter(k[  1],r4,r3,r1,  9,  9);
+-	keyiter(k[  2],r0,r4,r2, 10, 10); keyiter(k[  3],r1,r0,r3, 11, 11);
+-	keyiter(k[  4],r2,r1,r4, 12, 12); keyiter(k[  5],r3,r2,r0, 13, 13);
+-	keyiter(k[  6],r4,r3,r1, 14, 14); keyiter(k[  7],r0,r4,r2, 15, 15);
+-	keyiter(k[  8],r1,r0,r3, 16, 16); keyiter(k[  9],r2,r1,r4, 17, 17);
+-	keyiter(k[ 10],r3,r2,r0, 18, 18); keyiter(k[ 11],r4,r3,r1, 19, 19);
+-	keyiter(k[ 12],r0,r4,r2, 20, 20); keyiter(k[ 13],r1,r0,r3, 21, 21);
+-	keyiter(k[ 14],r2,r1,r4, 22, 22); keyiter(k[ 15],r3,r2,r0, 23, 23);
+-	keyiter(k[ 16],r4,r3,r1, 24, 24); keyiter(k[ 17],r0,r4,r2, 25, 25);
+-	keyiter(k[ 18],r1,r0,r3, 26, 26); keyiter(k[ 19],r2,r1,r4, 27, 27);
+-	keyiter(k[ 20],r3,r2,r0, 28, 28); keyiter(k[ 21],r4,r3,r1, 29, 29);
+-	keyiter(k[ 22],r0,r4,r2, 30, 30); keyiter(k[ 23],r1,r0,r3, 31, 31);
++	keyiter(le32_to_cpu(k[0]), r0, r4, r2, 0, 0);
++	keyiter(le32_to_cpu(k[1]), r1, r0, r3, 1, 1);
++	keyiter(le32_to_cpu(k[2]), r2, r1, r4, 2, 2);
++	keyiter(le32_to_cpu(k[3]), r3, r2, r0, 3, 3);
++	keyiter(le32_to_cpu(k[4]), r4, r3, r1, 4, 4);
++	keyiter(le32_to_cpu(k[5]), r0, r4, r2, 5, 5);
++	keyiter(le32_to_cpu(k[6]), r1, r0, r3, 6, 6);
++	keyiter(le32_to_cpu(k[7]), r2, r1, r4, 7, 7);
++
++	keyiter(k[  0], r3, r2, r0,  8,  8); keyiter(k[  1], r4, r3, r1,  9,  9);
++	keyiter(k[  2], r0, r4, r2, 10, 10); keyiter(k[  3], r1, r0, r3, 11, 11);
++	keyiter(k[  4], r2, r1, r4, 12, 12); keyiter(k[  5], r3, r2, r0, 13, 13);
++	keyiter(k[  6], r4, r3, r1, 14, 14); keyiter(k[  7], r0, r4, r2, 15, 15);
++	keyiter(k[  8], r1, r0, r3, 16, 16); keyiter(k[  9], r2, r1, r4, 17, 17);
++	keyiter(k[ 10], r3, r2, r0, 18, 18); keyiter(k[ 11], r4, r3, r1, 19, 19);
++	keyiter(k[ 12], r0, r4, r2, 20, 20); keyiter(k[ 13], r1, r0, r3, 21, 21);
++	keyiter(k[ 14], r2, r1, r4, 22, 22); keyiter(k[ 15], r3, r2, r0, 23, 23);
++	keyiter(k[ 16], r4, r3, r1, 24, 24); keyiter(k[ 17], r0, r4, r2, 25, 25);
++	keyiter(k[ 18], r1, r0, r3, 26, 26); keyiter(k[ 19], r2, r1, r4, 27, 27);
++	keyiter(k[ 20], r3, r2, r0, 28, 28); keyiter(k[ 21], r4, r3, r1, 29, 29);
++	keyiter(k[ 22], r0, r4, r2, 30, 30); keyiter(k[ 23], r1, r0, r3, 31, 31);
+ 
+ 	k += 50;
+ 
+-	keyiter(k[-26],r2,r1,r4, 32,-18); keyiter(k[-25],r3,r2,r0, 33,-17);
+-	keyiter(k[-24],r4,r3,r1, 34,-16); keyiter(k[-23],r0,r4,r2, 35,-15);
+-	keyiter(k[-22],r1,r0,r3, 36,-14); keyiter(k[-21],r2,r1,r4, 37,-13);
+-	keyiter(k[-20],r3,r2,r0, 38,-12); keyiter(k[-19],r4,r3,r1, 39,-11);
+-	keyiter(k[-18],r0,r4,r2, 40,-10); keyiter(k[-17],r1,r0,r3, 41, -9);
+-	keyiter(k[-16],r2,r1,r4, 42, -8); keyiter(k[-15],r3,r2,r0, 43, -7);
+-	keyiter(k[-14],r4,r3,r1, 44, -6); keyiter(k[-13],r0,r4,r2, 45, -5);
+-	keyiter(k[-12],r1,r0,r3, 46, -4); keyiter(k[-11],r2,r1,r4, 47, -3);
+-	keyiter(k[-10],r3,r2,r0, 48, -2); keyiter(k[ -9],r4,r3,r1, 49, -1);
+-	keyiter(k[ -8],r0,r4,r2, 50,  0); keyiter(k[ -7],r1,r0,r3, 51,  1);
+-	keyiter(k[ -6],r2,r1,r4, 52,  2); keyiter(k[ -5],r3,r2,r0, 53,  3);
+-	keyiter(k[ -4],r4,r3,r1, 54,  4); keyiter(k[ -3],r0,r4,r2, 55,  5);
+-	keyiter(k[ -2],r1,r0,r3, 56,  6); keyiter(k[ -1],r2,r1,r4, 57,  7);
+-	keyiter(k[  0],r3,r2,r0, 58,  8); keyiter(k[  1],r4,r3,r1, 59,  9);
+-	keyiter(k[  2],r0,r4,r2, 60, 10); keyiter(k[  3],r1,r0,r3, 61, 11);
+-	keyiter(k[  4],r2,r1,r4, 62, 12); keyiter(k[  5],r3,r2,r0, 63, 13);
+-	keyiter(k[  6],r4,r3,r1, 64, 14); keyiter(k[  7],r0,r4,r2, 65, 15);
+-	keyiter(k[  8],r1,r0,r3, 66, 16); keyiter(k[  9],r2,r1,r4, 67, 17);
+-	keyiter(k[ 10],r3,r2,r0, 68, 18); keyiter(k[ 11],r4,r3,r1, 69, 19);
+-	keyiter(k[ 12],r0,r4,r2, 70, 20); keyiter(k[ 13],r1,r0,r3, 71, 21);
+-	keyiter(k[ 14],r2,r1,r4, 72, 22); keyiter(k[ 15],r3,r2,r0, 73, 23);
+-	keyiter(k[ 16],r4,r3,r1, 74, 24); keyiter(k[ 17],r0,r4,r2, 75, 25);
+-	keyiter(k[ 18],r1,r0,r3, 76, 26); keyiter(k[ 19],r2,r1,r4, 77, 27);
+-	keyiter(k[ 20],r3,r2,r0, 78, 28); keyiter(k[ 21],r4,r3,r1, 79, 29);
+-	keyiter(k[ 22],r0,r4,r2, 80, 30); keyiter(k[ 23],r1,r0,r3, 81, 31);
++	keyiter(k[-26], r2, r1, r4, 32,-18); keyiter(k[-25], r3, r2, r0, 33,-17);
++	keyiter(k[-24], r4, r3, r1, 34,-16); keyiter(k[-23], r0, r4, r2, 35,-15);
++	keyiter(k[-22], r1, r0, r3, 36,-14); keyiter(k[-21], r2, r1, r4, 37,-13);
++	keyiter(k[-20], r3, r2, r0, 38,-12); keyiter(k[-19], r4, r3, r1, 39,-11);
++	keyiter(k[-18], r0, r4, r2, 40,-10); keyiter(k[-17], r1, r0, r3, 41, -9);
++	keyiter(k[-16], r2, r1, r4, 42, -8); keyiter(k[-15], r3, r2, r0, 43, -7);
++	keyiter(k[-14], r4, r3, r1, 44, -6); keyiter(k[-13], r0, r4, r2, 45, -5);
++	keyiter(k[-12], r1, r0, r3, 46, -4); keyiter(k[-11], r2, r1, r4, 47, -3);
++	keyiter(k[-10], r3, r2, r0, 48, -2); keyiter(k[ -9], r4, r3, r1, 49, -1);
++	keyiter(k[ -8], r0, r4, r2, 50,  0); keyiter(k[ -7], r1, r0, r3, 51,  1);
++	keyiter(k[ -6], r2, r1, r4, 52,  2); keyiter(k[ -5], r3, r2, r0, 53,  3);
++	keyiter(k[ -4], r4, r3, r1, 54,  4); keyiter(k[ -3], r0, r4, r2, 55,  5);
++	keyiter(k[ -2], r1, r0, r3, 56,  6); keyiter(k[ -1], r2, r1, r4, 57,  7);
++	keyiter(k[  0], r3, r2, r0, 58,  8); keyiter(k[  1], r4, r3, r1, 59,  9);
++	keyiter(k[  2], r0, r4, r2, 60, 10); keyiter(k[  3], r1, r0, r3, 61, 11);
++	keyiter(k[  4], r2, r1, r4, 62, 12); keyiter(k[  5], r3, r2, r0, 63, 13);
++	keyiter(k[  6], r4, r3, r1, 64, 14); keyiter(k[  7], r0, r4, r2, 65, 15);
++	keyiter(k[  8], r1, r0, r3, 66, 16); keyiter(k[  9], r2, r1, r4, 67, 17);
++	keyiter(k[ 10], r3, r2, r0, 68, 18); keyiter(k[ 11], r4, r3, r1, 69, 19);
++	keyiter(k[ 12], r0, r4, r2, 70, 20); keyiter(k[ 13], r1, r0, r3, 71, 21);
++	keyiter(k[ 14], r2, r1, r4, 72, 22); keyiter(k[ 15], r3, r2, r0, 73, 23);
++	keyiter(k[ 16], r4, r3, r1, 74, 24); keyiter(k[ 17], r0, r4, r2, 75, 25);
++	keyiter(k[ 18], r1, r0, r3, 76, 26); keyiter(k[ 19], r2, r1, r4, 77, 27);
++	keyiter(k[ 20], r3, r2, r0, 78, 28); keyiter(k[ 21], r4, r3, r1, 79, 29);
++	keyiter(k[ 22], r0, r4, r2, 80, 30); keyiter(k[ 23], r1, r0, r3, 81, 31);
+ 
+ 	k += 50;
+ 
+-	keyiter(k[-26],r2,r1,r4, 82,-18); keyiter(k[-25],r3,r2,r0, 83,-17);
+-	keyiter(k[-24],r4,r3,r1, 84,-16); keyiter(k[-23],r0,r4,r2, 85,-15);
+-	keyiter(k[-22],r1,r0,r3, 86,-14); keyiter(k[-21],r2,r1,r4, 87,-13);
+-	keyiter(k[-20],r3,r2,r0, 88,-12); keyiter(k[-19],r4,r3,r1, 89,-11);
+-	keyiter(k[-18],r0,r4,r2, 90,-10); keyiter(k[-17],r1,r0,r3, 91, -9);
+-	keyiter(k[-16],r2,r1,r4, 92, -8); keyiter(k[-15],r3,r2,r0, 93, -7);
+-	keyiter(k[-14],r4,r3,r1, 94, -6); keyiter(k[-13],r0,r4,r2, 95, -5);
+-	keyiter(k[-12],r1,r0,r3, 96, -4); keyiter(k[-11],r2,r1,r4, 97, -3);
+-	keyiter(k[-10],r3,r2,r0, 98, -2); keyiter(k[ -9],r4,r3,r1, 99, -1);
+-	keyiter(k[ -8],r0,r4,r2,100,  0); keyiter(k[ -7],r1,r0,r3,101,  1);
+-	keyiter(k[ -6],r2,r1,r4,102,  2); keyiter(k[ -5],r3,r2,r0,103,  3);
+-	keyiter(k[ -4],r4,r3,r1,104,  4); keyiter(k[ -3],r0,r4,r2,105,  5);
+-	keyiter(k[ -2],r1,r0,r3,106,  6); keyiter(k[ -1],r2,r1,r4,107,  7);
+-	keyiter(k[  0],r3,r2,r0,108,  8); keyiter(k[  1],r4,r3,r1,109,  9);
+-	keyiter(k[  2],r0,r4,r2,110, 10); keyiter(k[  3],r1,r0,r3,111, 11);
+-	keyiter(k[  4],r2,r1,r4,112, 12); keyiter(k[  5],r3,r2,r0,113, 13);
+-	keyiter(k[  6],r4,r3,r1,114, 14); keyiter(k[  7],r0,r4,r2,115, 15);
+-	keyiter(k[  8],r1,r0,r3,116, 16); keyiter(k[  9],r2,r1,r4,117, 17);
+-	keyiter(k[ 10],r3,r2,r0,118, 18); keyiter(k[ 11],r4,r3,r1,119, 19);
+-	keyiter(k[ 12],r0,r4,r2,120, 20); keyiter(k[ 13],r1,r0,r3,121, 21);
+-	keyiter(k[ 14],r2,r1,r4,122, 22); keyiter(k[ 15],r3,r2,r0,123, 23);
+-	keyiter(k[ 16],r4,r3,r1,124, 24); keyiter(k[ 17],r0,r4,r2,125, 25);
+-	keyiter(k[ 18],r1,r0,r3,126, 26); keyiter(k[ 19],r2,r1,r4,127, 27);
+-	keyiter(k[ 20],r3,r2,r0,128, 28); keyiter(k[ 21],r4,r3,r1,129, 29);
+-	keyiter(k[ 22],r0,r4,r2,130, 30); keyiter(k[ 23],r1,r0,r3,131, 31);
++	keyiter(k[-26], r2, r1, r4, 82,-18); keyiter(k[-25], r3, r2, r0, 83,-17);
++	keyiter(k[-24], r4, r3, r1, 84,-16); keyiter(k[-23], r0, r4, r2, 85,-15);
++	keyiter(k[-22], r1, r0, r3, 86,-14); keyiter(k[-21], r2, r1, r4, 87,-13);
++	keyiter(k[-20], r3, r2, r0, 88,-12); keyiter(k[-19], r4, r3, r1, 89,-11);
++	keyiter(k[-18], r0, r4, r2, 90,-10); keyiter(k[-17], r1, r0, r3, 91, -9);
++	keyiter(k[-16], r2, r1, r4, 92, -8); keyiter(k[-15], r3, r2, r0, 93, -7);
++	keyiter(k[-14], r4, r3, r1, 94, -6); keyiter(k[-13], r0, r4, r2, 95, -5);
++	keyiter(k[-12], r1, r0, r3, 96, -4); keyiter(k[-11], r2, r1, r4, 97, -3);
++	keyiter(k[-10], r3, r2, r0, 98, -2); keyiter(k[ -9], r4, r3, r1, 99, -1);
++	keyiter(k[ -8], r0, r4, r2,100,  0); keyiter(k[ -7], r1, r0, r3,101,  1);
++	keyiter(k[ -6], r2, r1, r4,102,  2); keyiter(k[ -5], r3, r2, r0,103,  3);
++	keyiter(k[ -4], r4, r3, r1,104,  4); keyiter(k[ -3], r0, r4, r2,105,  5);
++	keyiter(k[ -2], r1, r0, r3,106,  6); keyiter(k[ -1], r2, r1, r4,107,  7);
++	keyiter(k[  0], r3, r2, r0,108,  8); keyiter(k[  1], r4, r3, r1,109,  9);
++	keyiter(k[  2], r0, r4, r2,110, 10); keyiter(k[  3], r1, r0, r3,111, 11);
++	keyiter(k[  4], r2, r1, r4,112, 12); keyiter(k[  5], r3, r2, r0,113, 13);
++	keyiter(k[  6], r4, r3, r1,114, 14); keyiter(k[  7], r0, r4, r2,115, 15);
++	keyiter(k[  8], r1, r0, r3,116, 16); keyiter(k[  9], r2, r1, r4,117, 17);
++	keyiter(k[ 10], r3, r2, r0,118, 18); keyiter(k[ 11], r4, r3, r1,119, 19);
++	keyiter(k[ 12], r0, r4, r2,120, 20); keyiter(k[ 13], r1, r0, r3,121, 21);
++	keyiter(k[ 14], r2, r1, r4,122, 22); keyiter(k[ 15], r3, r2, r0,123, 23);
++	keyiter(k[ 16], r4, r3, r1,124, 24); keyiter(k[ 17], r0, r4, r2,125, 25);
++	keyiter(k[ 18], r1, r0, r3,126, 26); keyiter(k[ 19], r2, r1, r4,127, 27);
++	keyiter(k[ 20], r3, r2, r0,128, 28); keyiter(k[ 21], r4, r3, r1,129, 29);
++	keyiter(k[ 22], r0, r4, r2,130, 30); keyiter(k[ 23], r1, r0, r3,131, 31);
+ 
+ 	/* Apply S-boxes */
+ 
+-	S3(r3,r4,r0,r1,r2); storekeys(r1,r2,r4,r3, 28); loadkeys(r1,r2,r4,r3, 24);
+-	S4(r1,r2,r4,r3,r0); storekeys(r2,r4,r3,r0, 24); loadkeys(r2,r4,r3,r0, 20);
+-	S5(r2,r4,r3,r0,r1); storekeys(r1,r2,r4,r0, 20); loadkeys(r1,r2,r4,r0, 16);
+-	S6(r1,r2,r4,r0,r3); storekeys(r4,r3,r2,r0, 16); loadkeys(r4,r3,r2,r0, 12);
+-	S7(r4,r3,r2,r0,r1); storekeys(r1,r2,r0,r4, 12); loadkeys(r1,r2,r0,r4,  8);
+-	S0(r1,r2,r0,r4,r3); storekeys(r0,r2,r4,r1,  8); loadkeys(r0,r2,r4,r1,  4);
+-	S1(r0,r2,r4,r1,r3); storekeys(r3,r4,r1,r0,  4); loadkeys(r3,r4,r1,r0,  0);
+-	S2(r3,r4,r1,r0,r2); storekeys(r2,r4,r3,r0,  0); loadkeys(r2,r4,r3,r0, -4);
+-	S3(r2,r4,r3,r0,r1); storekeys(r0,r1,r4,r2, -4); loadkeys(r0,r1,r4,r2, -8);
+-	S4(r0,r1,r4,r2,r3); storekeys(r1,r4,r2,r3, -8); loadkeys(r1,r4,r2,r3,-12);
+-	S5(r1,r4,r2,r3,r0); storekeys(r0,r1,r4,r3,-12); loadkeys(r0,r1,r4,r3,-16);
+-	S6(r0,r1,r4,r3,r2); storekeys(r4,r2,r1,r3,-16); loadkeys(r4,r2,r1,r3,-20);
+-	S7(r4,r2,r1,r3,r0); storekeys(r0,r1,r3,r4,-20); loadkeys(r0,r1,r3,r4,-24);
+-	S0(r0,r1,r3,r4,r2); storekeys(r3,r1,r4,r0,-24); loadkeys(r3,r1,r4,r0,-28);
++	S3(r3, r4, r0, r1, r2); storekeys(r1, r2, r4, r3, 28); loadkeys(r1, r2, r4, r3, 24);
++	S4(r1, r2, r4, r3, r0); storekeys(r2, r4, r3, r0, 24); loadkeys(r2, r4, r3, r0, 20);
++	S5(r2, r4, r3, r0, r1); storekeys(r1, r2, r4, r0, 20); loadkeys(r1, r2, r4, r0, 16);
++	S6(r1, r2, r4, r0, r3); storekeys(r4, r3, r2, r0, 16); loadkeys(r4, r3, r2, r0, 12);
++	S7(r4, r3, r2, r0, r1); storekeys(r1, r2, r0, r4, 12); loadkeys(r1, r2, r0, r4,  8);
++	S0(r1, r2, r0, r4, r3); storekeys(r0, r2, r4, r1,  8); loadkeys(r0, r2, r4, r1,  4);
++	S1(r0, r2, r4, r1, r3); storekeys(r3, r4, r1, r0,  4); loadkeys(r3, r4, r1, r0,  0);
++	S2(r3, r4, r1, r0, r2); storekeys(r2, r4, r3, r0,  0); loadkeys(r2, r4, r3, r0, -4);
++	S3(r2, r4, r3, r0, r1); storekeys(r0, r1, r4, r2, -4); loadkeys(r0, r1, r4, r2, -8);
++	S4(r0, r1, r4, r2, r3); storekeys(r1, r4, r2, r3, -8); loadkeys(r1, r4, r2, r3,-12);
++	S5(r1, r4, r2, r3, r0); storekeys(r0, r1, r4, r3,-12); loadkeys(r0, r1, r4, r3,-16);
++	S6(r0, r1, r4, r3, r2); storekeys(r4, r2, r1, r3,-16); loadkeys(r4, r2, r1, r3,-20);
++	S7(r4, r2, r1, r3, r0); storekeys(r0, r1, r3, r4,-20); loadkeys(r0, r1, r3, r4,-24);
++	S0(r0, r1, r3, r4, r2); storekeys(r3, r1, r4, r0,-24); loadkeys(r3, r1, r4, r0,-28);
+ 	k -= 50;
+-	S1(r3,r1,r4,r0,r2); storekeys(r2,r4,r0,r3, 22); loadkeys(r2,r4,r0,r3, 18);
+-	S2(r2,r4,r0,r3,r1); storekeys(r1,r4,r2,r3, 18); loadkeys(r1,r4,r2,r3, 14);
+-	S3(r1,r4,r2,r3,r0); storekeys(r3,r0,r4,r1, 14); loadkeys(r3,r0,r4,r1, 10);
+-	S4(r3,r0,r4,r1,r2); storekeys(r0,r4,r1,r2, 10); loadkeys(r0,r4,r1,r2,  6);
+-	S5(r0,r4,r1,r2,r3); storekeys(r3,r0,r4,r2,  6); loadkeys(r3,r0,r4,r2,  2);
+-	S6(r3,r0,r4,r2,r1); storekeys(r4,r1,r0,r2,  2); loadkeys(r4,r1,r0,r2, -2);
+-	S7(r4,r1,r0,r2,r3); storekeys(r3,r0,r2,r4, -2); loadkeys(r3,r0,r2,r4, -6);
+-	S0(r3,r0,r2,r4,r1); storekeys(r2,r0,r4,r3, -6); loadkeys(r2,r0,r4,r3,-10);
+-	S1(r2,r0,r4,r3,r1); storekeys(r1,r4,r3,r2,-10); loadkeys(r1,r4,r3,r2,-14);
+-	S2(r1,r4,r3,r2,r0); storekeys(r0,r4,r1,r2,-14); loadkeys(r0,r4,r1,r2,-18);
+-	S3(r0,r4,r1,r2,r3); storekeys(r2,r3,r4,r0,-18); loadkeys(r2,r3,r4,r0,-22);
++	S1(r3, r1, r4, r0, r2); storekeys(r2, r4, r0, r3, 22); loadkeys(r2, r4, r0, r3, 18);
++	S2(r2, r4, r0, r3, r1); storekeys(r1, r4, r2, r3, 18); loadkeys(r1, r4, r2, r3, 14);
++	S3(r1, r4, r2, r3, r0); storekeys(r3, r0, r4, r1, 14); loadkeys(r3, r0, r4, r1, 10);
++	S4(r3, r0, r4, r1, r2); storekeys(r0, r4, r1, r2, 10); loadkeys(r0, r4, r1, r2,  6);
++	S5(r0, r4, r1, r2, r3); storekeys(r3, r0, r4, r2,  6); loadkeys(r3, r0, r4, r2,  2);
++	S6(r3, r0, r4, r2, r1); storekeys(r4, r1, r0, r2,  2); loadkeys(r4, r1, r0, r2, -2);
++	S7(r4, r1, r0, r2, r3); storekeys(r3, r0, r2, r4, -2); loadkeys(r3, r0, r2, r4, -6);
++	S0(r3, r0, r2, r4, r1); storekeys(r2, r0, r4, r3, -6); loadkeys(r2, r0, r4, r3,-10);
++	S1(r2, r0, r4, r3, r1); storekeys(r1, r4, r3, r2,-10); loadkeys(r1, r4, r3, r2,-14);
++	S2(r1, r4, r3, r2, r0); storekeys(r0, r4, r1, r2,-14); loadkeys(r0, r4, r1, r2,-18);
++	S3(r0, r4, r1, r2, r3); storekeys(r2, r3, r4, r0,-18); loadkeys(r2, r3, r4, r0,-22);
+ 	k -= 50;
+-	S4(r2,r3,r4,r0,r1); storekeys(r3,r4,r0,r1, 28); loadkeys(r3,r4,r0,r1, 24);
+-	S5(r3,r4,r0,r1,r2); storekeys(r2,r3,r4,r1, 24); loadkeys(r2,r3,r4,r1, 20);
+-	S6(r2,r3,r4,r1,r0); storekeys(r4,r0,r3,r1, 20); loadkeys(r4,r0,r3,r1, 16);
+-	S7(r4,r0,r3,r1,r2); storekeys(r2,r3,r1,r4, 16); loadkeys(r2,r3,r1,r4, 12);
+-	S0(r2,r3,r1,r4,r0); storekeys(r1,r3,r4,r2, 12); loadkeys(r1,r3,r4,r2,  8);
+-	S1(r1,r3,r4,r2,r0); storekeys(r0,r4,r2,r1,  8); loadkeys(r0,r4,r2,r1,  4);
+-	S2(r0,r4,r2,r1,r3); storekeys(r3,r4,r0,r1,  4); loadkeys(r3,r4,r0,r1,  0);
+-	S3(r3,r4,r0,r1,r2); storekeys(r1,r2,r4,r3,  0);
++	S4(r2, r3, r4, r0, r1); storekeys(r3, r4, r0, r1, 28); loadkeys(r3, r4, r0, r1, 24);
++	S5(r3, r4, r0, r1, r2); storekeys(r2, r3, r4, r1, 24); loadkeys(r2, r3, r4, r1, 20);
++	S6(r2, r3, r4, r1, r0); storekeys(r4, r0, r3, r1, 20); loadkeys(r4, r0, r3, r1, 16);
++	S7(r4, r0, r3, r1, r2); storekeys(r2, r3, r1, r4, 16); loadkeys(r2, r3, r1, r4, 12);
++	S0(r2, r3, r1, r4, r0); storekeys(r1, r3, r4, r2, 12); loadkeys(r1, r3, r4, r2,  8);
++	S1(r1, r3, r4, r2, r0); storekeys(r0, r4, r2, r1,  8); loadkeys(r0, r4, r2, r1,  4);
++	S2(r0, r4, r2, r1, r3); storekeys(r3, r4, r0, r1,  4); loadkeys(r3, r4, r0, r1,  0);
++	S3(r3, r4, r0, r1, r2); storekeys(r1, r2, r4, r3,  0);
+ 
+ 	return 0;
  }
+@@ -379,39 +379,39 @@ static void serpent_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	r2 = le32_to_cpu(s[2]);
+ 	r3 = le32_to_cpu(s[3]);
  
--#define e0(x)       (ror32(x, 2) ^ ror32(x,13) ^ ror32(x,22))
--#define e1(x)       (ror32(x, 6) ^ ror32(x,11) ^ ror32(x,25))
--#define s0(x)       (ror32(x, 7) ^ ror32(x,18) ^ (x >> 3))
--#define s1(x)       (ror32(x,17) ^ ror32(x,19) ^ (x >> 10))
-+#define e0(x)       (ror32(x,  2) ^ ror32(x, 13) ^ ror32(x, 22))
-+#define e1(x)       (ror32(x,  6) ^ ror32(x, 11) ^ ror32(x, 25))
-+#define s0(x)       (ror32(x,  7) ^ ror32(x, 18) ^ (x >> 3))
-+#define s1(x)       (ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10))
+-				 K(r0,r1,r2,r3,0);
+-	S0(r0,r1,r2,r3,r4);	LK(r2,r1,r3,r0,r4,1);
+-	S1(r2,r1,r3,r0,r4);	LK(r4,r3,r0,r2,r1,2);
+-	S2(r4,r3,r0,r2,r1);	LK(r1,r3,r4,r2,r0,3);
+-	S3(r1,r3,r4,r2,r0);	LK(r2,r0,r3,r1,r4,4);
+-	S4(r2,r0,r3,r1,r4);	LK(r0,r3,r1,r4,r2,5);
+-	S5(r0,r3,r1,r4,r2);	LK(r2,r0,r3,r4,r1,6);
+-	S6(r2,r0,r3,r4,r1);	LK(r3,r1,r0,r4,r2,7);
+-	S7(r3,r1,r0,r4,r2);	LK(r2,r0,r4,r3,r1,8);
+-	S0(r2,r0,r4,r3,r1);	LK(r4,r0,r3,r2,r1,9);
+-	S1(r4,r0,r3,r2,r1);	LK(r1,r3,r2,r4,r0,10);
+-	S2(r1,r3,r2,r4,r0);	LK(r0,r3,r1,r4,r2,11);
+-	S3(r0,r3,r1,r4,r2);	LK(r4,r2,r3,r0,r1,12);
+-	S4(r4,r2,r3,r0,r1);	LK(r2,r3,r0,r1,r4,13);
+-	S5(r2,r3,r0,r1,r4);	LK(r4,r2,r3,r1,r0,14);
+-	S6(r4,r2,r3,r1,r0);	LK(r3,r0,r2,r1,r4,15);
+-	S7(r3,r0,r2,r1,r4);	LK(r4,r2,r1,r3,r0,16);
+-	S0(r4,r2,r1,r3,r0);	LK(r1,r2,r3,r4,r0,17);
+-	S1(r1,r2,r3,r4,r0);	LK(r0,r3,r4,r1,r2,18);
+-	S2(r0,r3,r4,r1,r2);	LK(r2,r3,r0,r1,r4,19);
+-	S3(r2,r3,r0,r1,r4);	LK(r1,r4,r3,r2,r0,20);
+-	S4(r1,r4,r3,r2,r0);	LK(r4,r3,r2,r0,r1,21);
+-	S5(r4,r3,r2,r0,r1);	LK(r1,r4,r3,r0,r2,22);
+-	S6(r1,r4,r3,r0,r2);	LK(r3,r2,r4,r0,r1,23);
+-	S7(r3,r2,r4,r0,r1);	LK(r1,r4,r0,r3,r2,24);
+-	S0(r1,r4,r0,r3,r2);	LK(r0,r4,r3,r1,r2,25);
+-	S1(r0,r4,r3,r1,r2);	LK(r2,r3,r1,r0,r4,26);
+-	S2(r2,r3,r1,r0,r4);	LK(r4,r3,r2,r0,r1,27);
+-	S3(r4,r3,r2,r0,r1);	LK(r0,r1,r3,r4,r2,28);
+-	S4(r0,r1,r3,r4,r2);	LK(r1,r3,r4,r2,r0,29);
+-	S5(r1,r3,r4,r2,r0);	LK(r0,r1,r3,r2,r4,30);
+-	S6(r0,r1,r3,r2,r4);	LK(r3,r4,r1,r2,r0,31);
+-	S7(r3,r4,r1,r2,r0);	 K(r0,r1,r2,r3,32);
++				 K(r0, r1, r2, r3, 0);
++	S0(r0, r1, r2, r3, r4); LK(r2, r1, r3, r0, r4, 1);
++	S1(r2, r1, r3, r0, r4); LK(r4, r3, r0, r2, r1, 2);
++	S2(r4, r3, r0, r2, r1); LK(r1, r3, r4, r2, r0, 3);
++	S3(r1, r3, r4, r2, r0); LK(r2, r0, r3, r1, r4, 4);
++	S4(r2, r0, r3, r1, r4); LK(r0, r3, r1, r4, r2, 5);
++	S5(r0, r3, r1, r4, r2); LK(r2, r0, r3, r4, r1, 6);
++	S6(r2, r0, r3, r4, r1); LK(r3, r1, r0, r4, r2, 7);
++	S7(r3, r1, r0, r4, r2); LK(r2, r0, r4, r3, r1, 8);
++	S0(r2, r0, r4, r3, r1); LK(r4, r0, r3, r2, r1, 9);
++	S1(r4, r0, r3, r2, r1); LK(r1, r3, r2, r4, r0, 10);
++	S2(r1, r3, r2, r4, r0); LK(r0, r3, r1, r4, r2, 11);
++	S3(r0, r3, r1, r4, r2); LK(r4, r2, r3, r0, r1, 12);
++	S4(r4, r2, r3, r0, r1); LK(r2, r3, r0, r1, r4, 13);
++	S5(r2, r3, r0, r1, r4); LK(r4, r2, r3, r1, r0, 14);
++	S6(r4, r2, r3, r1, r0); LK(r3, r0, r2, r1, r4, 15);
++	S7(r3, r0, r2, r1, r4); LK(r4, r2, r1, r3, r0, 16);
++	S0(r4, r2, r1, r3, r0); LK(r1, r2, r3, r4, r0, 17);
++	S1(r1, r2, r3, r4, r0); LK(r0, r3, r4, r1, r2, 18);
++	S2(r0, r3, r4, r1, r2); LK(r2, r3, r0, r1, r4, 19);
++	S3(r2, r3, r0, r1, r4); LK(r1, r4, r3, r2, r0, 20);
++	S4(r1, r4, r3, r2, r0); LK(r4, r3, r2, r0, r1, 21);
++	S5(r4, r3, r2, r0, r1); LK(r1, r4, r3, r0, r2, 22);
++	S6(r1, r4, r3, r0, r2); LK(r3, r2, r4, r0, r1, 23);
++	S7(r3, r2, r4, r0, r1); LK(r1, r4, r0, r3, r2, 24);
++	S0(r1, r4, r0, r3, r2); LK(r0, r4, r3, r1, r2, 25);
++	S1(r0, r4, r3, r1, r2); LK(r2, r3, r1, r0, r4, 26);
++	S2(r2, r3, r1, r0, r4); LK(r4, r3, r2, r0, r1, 27);
++	S3(r4, r3, r2, r0, r1); LK(r0, r1, r3, r4, r2, 28);
++	S4(r0, r1, r3, r4, r2); LK(r1, r3, r4, r2, r0, 29);
++	S5(r1, r3, r4, r2, r0); LK(r0, r1, r3, r2, r4, 30);
++	S6(r0, r1, r3, r2, r4); LK(r3, r4, r1, r2, r0, 31);
++	S7(r3, r4, r1, r2, r0);  K(r0, r1, r2, r3, 32);
  
- static inline void LOAD_OP(int I, u32 *W, const u8 *input)
+ 	d[0] = cpu_to_le32(r0);
+ 	d[1] = cpu_to_le32(r1);
+@@ -433,39 +433,39 @@ static void serpent_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	r2 = le32_to_cpu(s[2]);
+ 	r3 = le32_to_cpu(s[3]);
+ 
+-				K(r0,r1,r2,r3,32);
+-	SI7(r0,r1,r2,r3,r4);	KL(r1,r3,r0,r4,r2,31);
+-	SI6(r1,r3,r0,r4,r2);	KL(r0,r2,r4,r1,r3,30);
+-	SI5(r0,r2,r4,r1,r3);	KL(r2,r3,r0,r4,r1,29);
+-	SI4(r2,r3,r0,r4,r1);	KL(r2,r0,r1,r4,r3,28);
+-	SI3(r2,r0,r1,r4,r3);	KL(r1,r2,r3,r4,r0,27);
+-	SI2(r1,r2,r3,r4,r0);	KL(r2,r0,r4,r3,r1,26);
+-	SI1(r2,r0,r4,r3,r1);	KL(r1,r0,r4,r3,r2,25);
+-	SI0(r1,r0,r4,r3,r2);	KL(r4,r2,r0,r1,r3,24);
+-	SI7(r4,r2,r0,r1,r3);	KL(r2,r1,r4,r3,r0,23);
+-	SI6(r2,r1,r4,r3,r0);	KL(r4,r0,r3,r2,r1,22);
+-	SI5(r4,r0,r3,r2,r1);	KL(r0,r1,r4,r3,r2,21);
+-	SI4(r0,r1,r4,r3,r2);	KL(r0,r4,r2,r3,r1,20);
+-	SI3(r0,r4,r2,r3,r1);	KL(r2,r0,r1,r3,r4,19);
+-	SI2(r2,r0,r1,r3,r4);	KL(r0,r4,r3,r1,r2,18);
+-	SI1(r0,r4,r3,r1,r2);	KL(r2,r4,r3,r1,r0,17);
+-	SI0(r2,r4,r3,r1,r0);	KL(r3,r0,r4,r2,r1,16);
+-	SI7(r3,r0,r4,r2,r1);	KL(r0,r2,r3,r1,r4,15);
+-	SI6(r0,r2,r3,r1,r4);	KL(r3,r4,r1,r0,r2,14);
+-	SI5(r3,r4,r1,r0,r2);	KL(r4,r2,r3,r1,r0,13);
+-	SI4(r4,r2,r3,r1,r0);	KL(r4,r3,r0,r1,r2,12);
+-	SI3(r4,r3,r0,r1,r2);	KL(r0,r4,r2,r1,r3,11);
+-	SI2(r0,r4,r2,r1,r3);	KL(r4,r3,r1,r2,r0,10);
+-	SI1(r4,r3,r1,r2,r0);	KL(r0,r3,r1,r2,r4,9);
+-	SI0(r0,r3,r1,r2,r4);	KL(r1,r4,r3,r0,r2,8);
+-	SI7(r1,r4,r3,r0,r2);	KL(r4,r0,r1,r2,r3,7);
+-	SI6(r4,r0,r1,r2,r3);	KL(r1,r3,r2,r4,r0,6);
+-	SI5(r1,r3,r2,r4,r0);	KL(r3,r0,r1,r2,r4,5);
+-	SI4(r3,r0,r1,r2,r4);	KL(r3,r1,r4,r2,r0,4);
+-	SI3(r3,r1,r4,r2,r0);	KL(r4,r3,r0,r2,r1,3);
+-	SI2(r4,r3,r0,r2,r1);	KL(r3,r1,r2,r0,r4,2);
+-	SI1(r3,r1,r2,r0,r4);	KL(r4,r1,r2,r0,r3,1);
+-	SI0(r4,r1,r2,r0,r3);	K(r2,r3,r1,r4,0);
++				 K (r0, r1, r2, r3, 32);
++	SI7(r0, r1, r2, r3, r4); KL(r1, r3, r0, r4, r2, 31);
++	SI6(r1, r3, r0, r4, r2); KL(r0, r2, r4, r1, r3, 30);
++	SI5(r0, r2, r4, r1, r3); KL(r2, r3, r0, r4, r1, 29);
++	SI4(r2, r3, r0, r4, r1); KL(r2, r0, r1, r4, r3, 28);
++	SI3(r2, r0, r1, r4, r3); KL(r1, r2, r3, r4, r0, 27);
++	SI2(r1, r2, r3, r4, r0); KL(r2, r0, r4, r3, r1, 26);
++	SI1(r2, r0, r4, r3, r1); KL(r1, r0, r4, r3, r2, 25);
++	SI0(r1, r0, r4, r3, r2); KL(r4, r2, r0, r1, r3, 24);
++	SI7(r4, r2, r0, r1, r3); KL(r2, r1, r4, r3, r0, 23);
++	SI6(r2, r1, r4, r3, r0); KL(r4, r0, r3, r2, r1, 22);
++	SI5(r4, r0, r3, r2, r1); KL(r0, r1, r4, r3, r2, 21);
++	SI4(r0, r1, r4, r3, r2); KL(r0, r4, r2, r3, r1, 20);
++	SI3(r0, r4, r2, r3, r1); KL(r2, r0, r1, r3, r4, 19);
++	SI2(r2, r0, r1, r3, r4); KL(r0, r4, r3, r1, r2, 18);
++	SI1(r0, r4, r3, r1, r2); KL(r2, r4, r3, r1, r0, 17);
++	SI0(r2, r4, r3, r1, r0); KL(r3, r0, r4, r2, r1, 16);
++	SI7(r3, r0, r4, r2, r1); KL(r0, r2, r3, r1, r4, 15);
++	SI6(r0, r2, r3, r1, r4); KL(r3, r4, r1, r0, r2, 14);
++	SI5(r3, r4, r1, r0, r2); KL(r4, r2, r3, r1, r0, 13);
++	SI4(r4, r2, r3, r1, r0); KL(r4, r3, r0, r1, r2, 12);
++	SI3(r4, r3, r0, r1, r2); KL(r0, r4, r2, r1, r3, 11);
++	SI2(r0, r4, r2, r1, r3); KL(r4, r3, r1, r2, r0, 10);
++	SI1(r4, r3, r1, r2, r0); KL(r0, r3, r1, r2, r4, 9);
++	SI0(r0, r3, r1, r2, r4); KL(r1, r4, r3, r0, r2, 8);
++	SI7(r1, r4, r3, r0, r2); KL(r4, r0, r1, r2, r3, 7);
++	SI6(r4, r0, r1, r2, r3); KL(r1, r3, r2, r4, r0, 6);
++	SI5(r1, r3, r2, r4, r0); KL(r3, r0, r1, r2, r4, 5);
++	SI4(r3, r0, r1, r2, r4); KL(r3, r1, r4, r2, r0, 4);
++	SI3(r3, r1, r4, r2, r0); KL(r4, r3, r0, r2, r1, 3);
++	SI2(r4, r3, r0, r2, r1); KL(r3, r1, r2, r0, r4, 2);
++	SI1(r3, r1, r2, r0, r4); KL(r4, r1, r2, r0, r3, 1);
++	SI0(r4, r1, r2, r0, r3); K (r2, r3, r1, r4, 0);
+ 
+ 	d[0] = cpu_to_le32(r2);
+ 	d[1] = cpu_to_le32(r3);
+@@ -482,22 +482,22 @@ static struct crypto_alg serpent_alg = {
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+-	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
+-	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
+-	.cia_setkey   		= 	serpent_setkey,
+-	.cia_encrypt 		=	serpent_encrypt,
+-	.cia_decrypt  		=	serpent_decrypt } }
++		.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
++		.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
++		.cia_setkey		=	serpent_setkey,
++		.cia_encrypt		=	serpent_encrypt,
++		.cia_decrypt		=	serpent_decrypt } }
+ };
+ 
+ static int tnepres_setkey(struct crypto_tfm *tfm, const u8 *key,
+-			  unsigned int keylen)
++                          unsigned int keylen)
  {
--	W[I] = __be32_to_cpu( ((__be32*)(input))[I] );
-+	W[I] = __be32_to_cpu(((__be32 *)(input))[I]);
+ 	u8 rev_key[SERPENT_MAX_KEY_SIZE];
+ 	int i;
+ 
+ 	for (i = 0; i < keylen; ++i)
+ 		rev_key[keylen - i - 1] = key[i];
+- 
++
+ 	return serpent_setkey(tfm, rev_key, keylen);
  }
  
- static inline void BLEND_OP(int I, u32 *W)
-@@ -65,145 +65,145 @@ static void sha256_transform(u32 *state, const u8 *input)
- 		BLEND_OP(i, W);
- 
- 	/* load the state into our registers */
--	a=state[0];  b=state[1];  c=state[2];  d=state[3];
--	e=state[4];  f=state[5];  g=state[6];  h=state[7];
-+	a = state[0];  b = state[1];  c = state[2];  d = state[3];
-+	e = state[4];  f = state[5];  g = state[6];  h = state[7];
- 
- 	/* now iterate */
--	t1 = h + e1(e) + Ch(e,f,g) + 0x428a2f98 + W[ 0];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0x71374491 + W[ 1];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0xb5c0fbcf + W[ 2];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0xe9b5dba5 + W[ 3];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x3956c25b + W[ 4];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0x59f111f1 + W[ 5];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x923f82a4 + W[ 6];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0xab1c5ed5 + W[ 7];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0xd807aa98 + W[ 8];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0x12835b01 + W[ 9];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0x243185be + W[10];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0x550c7dc3 + W[11];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x72be5d74 + W[12];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0x80deb1fe + W[13];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x9bdc06a7 + W[14];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0xc19bf174 + W[15];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0xe49b69c1 + W[16];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0xefbe4786 + W[17];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0x0fc19dc6 + W[18];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0x240ca1cc + W[19];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x2de92c6f + W[20];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0x4a7484aa + W[21];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x5cb0a9dc + W[22];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0x76f988da + W[23];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0x983e5152 + W[24];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0xa831c66d + W[25];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0xb00327c8 + W[26];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0xbf597fc7 + W[27];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0xc6e00bf3 + W[28];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0xd5a79147 + W[29];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x06ca6351 + W[30];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0x14292967 + W[31];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0x27b70a85 + W[32];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0x2e1b2138 + W[33];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0x4d2c6dfc + W[34];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0x53380d13 + W[35];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x650a7354 + W[36];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0x766a0abb + W[37];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x81c2c92e + W[38];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0x92722c85 + W[39];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0xa2bfe8a1 + W[40];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0xa81a664b + W[41];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0xc24b8b70 + W[42];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0xc76c51a3 + W[43];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0xd192e819 + W[44];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0xd6990624 + W[45];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0xf40e3585 + W[46];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0x106aa070 + W[47];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0x19a4c116 + W[48];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0x1e376c08 + W[49];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0x2748774c + W[50];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0x34b0bcb5 + W[51];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x391c0cb3 + W[52];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0x4ed8aa4a + W[53];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0x5b9cca4f + W[54];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0x682e6ff3 + W[55];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
--
--	t1 = h + e1(e) + Ch(e,f,g) + 0x748f82ee + W[56];
--	t2 = e0(a) + Maj(a,b,c);    d+=t1;    h=t1+t2;
--	t1 = g + e1(d) + Ch(d,e,f) + 0x78a5636f + W[57];
--	t2 = e0(h) + Maj(h,a,b);    c+=t1;    g=t1+t2;
--	t1 = f + e1(c) + Ch(c,d,e) + 0x84c87814 + W[58];
--	t2 = e0(g) + Maj(g,h,a);    b+=t1;    f=t1+t2;
--	t1 = e + e1(b) + Ch(b,c,d) + 0x8cc70208 + W[59];
--	t2 = e0(f) + Maj(f,g,h);    a+=t1;    e=t1+t2;
--	t1 = d + e1(a) + Ch(a,b,c) + 0x90befffa + W[60];
--	t2 = e0(e) + Maj(e,f,g);    h+=t1;    d=t1+t2;
--	t1 = c + e1(h) + Ch(h,a,b) + 0xa4506ceb + W[61];
--	t2 = e0(d) + Maj(d,e,f);    g+=t1;    c=t1+t2;
--	t1 = b + e1(g) + Ch(g,h,a) + 0xbef9a3f7 + W[62];
--	t2 = e0(c) + Maj(c,d,e);    f+=t1;    b=t1+t2;
--	t1 = a + e1(f) + Ch(f,g,h) + 0xc67178f2 + W[63];
--	t2 = e0(b) + Maj(b,c,d);    e+=t1;    a=t1+t2;
-+	t1 = h + e1(e) + Ch(e, f, g) + 0x428a2f98 + W[ 0];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0x71374491 + W[ 1];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0xb5c0fbcf + W[ 2];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0xe9b5dba5 + W[ 3];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x3956c25b + W[ 4];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0x59f111f1 + W[ 5];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x923f82a4 + W[ 6];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0xab1c5ed5 + W[ 7];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0xd807aa98 + W[ 8];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0x12835b01 + W[ 9];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0x243185be + W[10];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0x550c7dc3 + W[11];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x72be5d74 + W[12];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0x80deb1fe + W[13];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x9bdc06a7 + W[14];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0xc19bf174 + W[15];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0xe49b69c1 + W[16];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0xefbe4786 + W[17];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0x0fc19dc6 + W[18];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0x240ca1cc + W[19];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x2de92c6f + W[20];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0x4a7484aa + W[21];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x5cb0a9dc + W[22];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0x76f988da + W[23];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0x983e5152 + W[24];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0xa831c66d + W[25];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0xb00327c8 + W[26];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0xbf597fc7 + W[27];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0xc6e00bf3 + W[28];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0xd5a79147 + W[29];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x06ca6351 + W[30];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0x14292967 + W[31];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0x27b70a85 + W[32];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0x2e1b2138 + W[33];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0x4d2c6dfc + W[34];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0x53380d13 + W[35];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x650a7354 + W[36];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0x766a0abb + W[37];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x81c2c92e + W[38];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0x92722c85 + W[39];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0xa2bfe8a1 + W[40];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0xa81a664b + W[41];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0xc24b8b70 + W[42];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0xc76c51a3 + W[43];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0xd192e819 + W[44];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0xd6990624 + W[45];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0xf40e3585 + W[46];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0x106aa070 + W[47];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0x19a4c116 + W[48];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0x1e376c08 + W[49];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0x2748774c + W[50];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0x34b0bcb5 + W[51];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x391c0cb3 + W[52];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0x4ed8aa4a + W[53];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0x5b9cca4f + W[54];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0x682e6ff3 + W[55];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
-+
-+	t1 = h + e1(e) + Ch(e, f, g) + 0x748f82ee + W[56];
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1+t2;
-+	t1 = g + e1(d) + Ch(d, e, f) + 0x78a5636f + W[57];
-+	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1+t2;
-+	t1 = f + e1(c) + Ch(c, d, e) + 0x84c87814 + W[58];
-+	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1+t2;
-+	t1 = e + e1(b) + Ch(b, c, d) + 0x8cc70208 + W[59];
-+	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1+t2;
-+	t1 = d + e1(a) + Ch(a, b, c) + 0x90befffa + W[60];
-+	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1+t2;
-+	t1 = c + e1(h) + Ch(h, a, b) + 0xa4506ceb + W[61];
-+	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1+t2;
-+	t1 = b + e1(g) + Ch(g, h, a) + 0xbef9a3f7 + W[62];
-+	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1+t2;
-+	t1 = a + e1(f) + Ch(f, g, h) + 0xc67178f2 + W[63];
-+	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1+t2;
- 
- 	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
- 	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
-@@ -346,11 +346,11 @@ static struct shash_alg sha256 = {
- 	.descsize	=	sizeof(struct sha256_state),
- 	.statesize	=	sizeof(struct sha256_state),
- 	.base		=	{
--		.cra_name	=	"sha256",
--		.cra_driver_name=	"sha256-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA256_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
-+		.cra_name		=	"sha256",
-+		.cra_driver_name	=	"sha256-generic",
-+		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		=	SHA256_BLOCK_SIZE,
-+		.cra_module		=	THIS_MODULE,
- 	}
+@@ -550,11 +550,11 @@ static struct crypto_alg tnepres_alg = {
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+-	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
+-	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
+-	.cia_setkey   		= 	tnepres_setkey,
+-	.cia_encrypt 		=	tnepres_encrypt,
+-	.cia_decrypt  		=	tnepres_decrypt } }
++		.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
++		.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
++		.cia_setkey		=	tnepres_setkey,
++		.cia_encrypt		=	tnepres_encrypt,
++		.cia_decrypt		=	tnepres_decrypt } }
  };
  
-@@ -361,11 +361,11 @@ static struct shash_alg sha224 = {
- 	.final		=	sha224_final,
- 	.descsize	=	sizeof(struct sha256_state),
- 	.base		=	{
--		.cra_name	=	"sha224",
--		.cra_driver_name=	"sha224-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA224_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
-+		.cra_name		=	"sha224",
-+		.cra_driver_name	=	"sha224-generic",
-+		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		=	SHA224_BLOCK_SIZE,
-+		.cra_module		=	THIS_MODULE,
- 	}
- };
- 
+ static int __init serpent_mod_init(void)
 -- 
 1.6.6.1
-
