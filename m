@@ -1,59 +1,28 @@
-From: Szilveszter Ordog <slipszi@gmail.com>
-Subject: [PATCH] crypto: ahash - Fix handling of unaligned buffers
-Date: Tue, 23 Feb 2010 12:50:01 +0100
-Message-ID: <ac67d9131002230350o9618b9apd111f0da1bba15b1@mail.gmail.com>
+From: Roel Kluin <roel.kluin@gmail.com>
+Subject: Is kernel optimized with dead store removal?
+Date: Wed, 24 Feb 2010 23:13:50 +0100
+Message-ID: <4B85A49E.6000803@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+To: "lkml" <linux-kernel@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.155]:26131 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751712Ab0BWLuD convert rfc822-to-8bit (ORCPT
+Received: from mail-ew0-f212.google.com ([209.85.219.212]:42312 "EHLO
+	mail-ew0-f212.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758311Ab0BXWF6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Feb 2010 06:50:03 -0500
-Received: by fg-out-1718.google.com with SMTP id e21so746732fga.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Feb 2010 03:50:01 -0800 (PST)
+	Wed, 24 Feb 2010 17:05:58 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The correct way to calculate the start of the aligned part of an
-unaligned buffer is:
+According to http://cwe.mitre.org/data/slices/2000.html#14 due to optimization
+A call to memset() can be removed as a dead store when the buffer is not used
+after its value is overwritten. Does this optimization also occur during
+compilation of the Linux kernel? Then I think I may have found some
+vulnerabilities. One is sha1_update() where memset(temp, 0, sizeof(temp)); may
+be removed.
 
-  offset =3D ALIGN(offset, alignmask + 1);
-
-However, crypto_hash_walk_done() has:
-
-  offset +=3D alignmask - 1;
-  offset =3D ALIGN(offset, alignmask + 1);
-
-which actually skips a whole block unless offset % (alignmask + 1) =3D=3D=
- 1.
-
-This patch fixes the problem.
-
-Signed-off-by: Szilveszter =D6rd=F6g <slipszi@gmail.com>
----
- crypto/ahash.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
-
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index f347637..db42202 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -65,7 +65,6 @@ int crypto_hash_walk_done(struct crypto_hash_walk
-*walk, int err)
- 	walk->data -=3D walk->offset;
-
- 	if (nbytes && walk->offset & alignmask && !err) {
--		walk->offset +=3D alignmask - 1;
- 		walk->offset =3D ALIGN(walk->offset, alignmask + 1);
- 		walk->data +=3D walk->offset;
-
---=20
-1.5.5.6
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Roel
