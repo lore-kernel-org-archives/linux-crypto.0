@@ -1,68 +1,84 @@
-From: Mikael Pettersson <mikpe@it.uu.se>
+From: roel kluin <roel.kluin@gmail.com>
 Subject: Re: [PATCH] sha: prevent removal of memset as dead store in
 	sha1_update()
-Date: Thu, 25 Feb 2010 17:29:16 +0100
-Message-ID: <19334.42332.984074.920727@pilspetsen.it.uu.se>
-References: <4B8692E3.9030509@gmail.com>
-	<19334.40337.651079.440912@pilspetsen.it.uu.se>
+Date: Thu, 25 Feb 2010 17:33:03 +0100
+Message-ID: <25e057c01002250833n1e13391drfcc806df369c5a55@mail.gmail.com>
+References: <4B8692E3.9030509@gmail.com> <19334.40337.651079.440912@pilspetsen.it.uu.se>
 	<84144f021002250816o2c2cef0fke484c7e43256dba4@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Mikael Pettersson <mikpe@it.uu.se>,
-	Roel Kluin <roel.kluin@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>,
 	LKML <linux-kernel@vger.kernel.org>
 To: Pekka Enberg <penberg@cs.helsinki.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fanny.its.uu.se ([130.238.4.241]:55810 "EHLO fanny.its.uu.se"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932877Ab0BYQ30 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Feb 2010 11:29:26 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <84144f021002250816o2c2cef0fke484c7e43256dba4@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Pekka Enberg writes:
- > On Thu, Feb 25, 2010 at 5:56 PM, Mikael Pettersson <mikpe@it.uu.se> =
+On Thu, Feb 25, 2010 at 5:16 PM, Pekka Enberg <penberg@cs.helsinki.fi> =
 wrote:
- > > I fear that the only portable (across compiler versions) and safe
- > > solution is to invoke an assembly-coded dummy function with protot=
-ype
- > >
- > > =A0 =A0 =A0 =A0void use(void *p);
- > >
- > > and rewrite the code above as
- > >
- > > =A0 =A0 =A0 =A0{
- > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0u32 temp[...];
- > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0...
- > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0memset(temp, 0, sizeof temp);
- > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0use(temp);
- > > =A0 =A0 =A0 =A0}
- > >
- > > This forces the compiler to consider the buffer live after the
- > > memset, so the memset cannot be eliminated.
- >=20
- > So is there some "do not optimize" GCC magic that we could use for a
- > memzero_secret() helper function?
+> On Thu, Feb 25, 2010 at 5:56 PM, Mikael Pettersson <mikpe@it.uu.se> w=
+rote:
+>> I fear that the only portable (across compiler versions) and safe
+>> solution is to invoke an assembly-coded dummy function with prototyp=
+e
+>>
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0void use(void *p);
+>>
+>> and rewrite the code above as
+>>
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0{
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u32 temp[...]=
+;
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0...
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memset(temp, =
+0, sizeof temp);
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0use(temp);
+>> =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+>>
+>> This forces the compiler to consider the buffer live after the
+>> memset, so the memset cannot be eliminated.
+>
+> So is there some "do not optimize" GCC magic that we could use for a
+> memzero_secret() helper function?
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0Pekka
+>
 
-I guess there's some -fno-builtin-... that might achieve this effect,
-but that would disable all memset optimizations, not just those affecti=
-ng
-sensitive data.
+        *(volatile char *)p =3D *(volatile char *)p;
 
-You'd want a function attribute or magic type annotation and apply it
-only to the specific cases where it's needed. Alas, I know of no such
-attribute or annotation. ('volatile' doesn't work, I tried that.)
+appears to work when called after the memset:
 
-Ask on gcc@gcc.gnu.org.
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---
+inline void ensure_memset(void* p)
+{
+        *(volatile char *)p =3D *(volatile char *)p;
+}
+
+void foo()
+{
+        char password[] =3D "secret";
+        password[0]=3D'S';
+        printf ("Don't show again: %s\n", password);
+        memset(password, 0, sizeof(password));
+        ensure_memset(password);
+}
+
+int main(int argc, char* argv[])
+{
+
+        foo();
+        int i;
+        char foo3[] =3D "";
+        char* bar =3D &foo3[0];
+        for (i =3D -50; i < 50; i++)
+                printf ("%c.", bar[i]);
+        printf("\n");
+        return 0;
+}
