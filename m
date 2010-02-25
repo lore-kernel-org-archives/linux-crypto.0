@@ -1,108 +1,45 @@
-From: roel kluin <roel.kluin@gmail.com>
+From: Mikael Pettersson <mikpe@it.uu.se>
 Subject: Re: [PATCH] sha: prevent removal of memset as dead store in
 	sha1_update()
-Date: Thu, 25 Feb 2010 18:06:51 +0100
-Message-ID: <25e057c01002250906x6267a3b6xe661abfa12f913cb@mail.gmail.com>
-References: <4B8692E3.9030509@gmail.com> <19334.40337.651079.440912@pilspetsen.it.uu.se>
-	<84144f021002250816o2c2cef0fke484c7e43256dba4@mail.gmail.com>
-	<25e057c01002250833n1e13391drfcc806df369c5a55@mail.gmail.com>
+Date: Thu, 25 Feb 2010 18:09:36 +0100
+Message-ID: <19334.44752.357207.382349@pilspetsen.it.uu.se>
+References: <4B8692E3.9030509@gmail.com>
+	<19334.40337.651079.440912@pilspetsen.it.uu.se>
+	<73c1f2161002250833n120cda05s9371e5ce13cc0aac@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Cc: Mikael Pettersson <mikpe@it.uu.se>,
+	Roel Kluin <roel.kluin@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>,
 	LKML <linux-kernel@vger.kernel.org>
-To: Pekka Enberg <penberg@cs.helsinki.fi>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <25e057c01002250833n1e13391drfcc806df369c5a55@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Brian Gerst <brgerst@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from fanny.its.uu.se ([130.238.4.241]:61578 "EHLO fanny.its.uu.se"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759333Ab0BYRJm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Feb 2010 12:09:42 -0500
+In-Reply-To: <73c1f2161002250833n120cda05s9371e5ce13cc0aac@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 25, 2010 at 5:33 PM, roel kluin <roel.kluin@gmail.com> wrot=
-e:
-> On Thu, Feb 25, 2010 at 5:16 PM, Pekka Enberg <penberg@cs.helsinki.fi=
-> wrote:
->> On Thu, Feb 25, 2010 at 5:56 PM, Mikael Pettersson <mikpe@it.uu.se> =
-wrote:
->>> I fear that the only portable (across compiler versions) and safe
->>> solution is to invoke an assembly-coded dummy function with prototy=
-pe
->>>
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0void use(void *p);
->>>
->>> and rewrite the code above as
->>>
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0{
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u32 temp[...=
-];
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0...
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memset(temp,=
- 0, sizeof temp);
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0use(temp);
->>> =C2=A0 =C2=A0 =C2=A0 =C2=A0}
->>>
->>> This forces the compiler to consider the buffer live after the
->>> memset, so the memset cannot be eliminated.
->>
->> So is there some "do not optimize" GCC magic that we could use for a
->> memzero_secret() helper function?
->>
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0Pekka
->>
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0*(volatile char *)p =3D *(volatile char *)=
-p;
->
-> appears to work when called after the memset:
+Brian Gerst wrote:
+> Would barrier() (which is a simple memory clobber) after the memset work?
 
-Or similar to suggested here:
+I don't know. It's implemented as an asm with a "memory" clobber,
+but I wouldn't bet on that forcing previous writes to a dying object
+to actally be performed (it would have to have a data-dependency on
+the dying object, but I don't think there is one).
 
-https://www.securecoding.cert.org/confluence/display/cplusplus/MSC06-CP=
-P.+Be+aware+of+compiler+optimization+when+dealing+with+sensitive+data
-
-This memzero_secret() appears to work:
-
-void *memzero_secret(void *v, size_t n) {
-        volatile unsigned char *p =3D v;
-        while (n--)
-                *p++ =3D 0;
-
-        return v;
-}
----
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-void *memzero_secret(void *v, size_t n) {
-	volatile unsigned char *p =3D v;
-	while (n--)
-		*p++ =3D 0;
-
-	return v;
-}
-
-void foo()
+void secure_bzero(void *p, size_t n)
 {
-	char password[] =3D "secret";
-	password[0]=3D'S';
-	printf ("Don't show again: %s\n", password);
-	memzero_secret(password, sizeof(password));
-	//memset(password, 0, sizeof(password));
+	memset(p, 0, n);
+	asm("" : : "m"(*(char*)p));
 }
 
-int main(int argc, char* argv[])
-{
-	foo();
-	int i;
-	char foo3[] =3D "";
-	char* bar =3D &foo3[0];
-	for (i =3D -50; i < 50; i++)
-		printf ("%c.", bar[i]);
-	printf("\n");
-	return 0;
-}
+seems to work, but as the object in general will be larger than a
+single byte, I'd like to see some confirmation from the gcc folks
+first that this will in fact work.
