@@ -1,35 +1,124 @@
-From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: Re: hifn_795x module on a 64 bit system
-Date: Sat, 27 Feb 2010 20:32:33 +0300
-Message-ID: <20100227173233.GA20108@ioremap.net>
-References: <da90d1f21002270604q771dfacj28071771bca33ebe@mail.gmail.com>
+From: Roel Kluin <roel.kluin@gmail.com>
+Subject: [PATCH v1] compiler: prevent dead store elimination
+Date: Sat, 27 Feb 2010 21:47:42 +0100
+Message-ID: <4B8984EE.8090605@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Michael Bohn <bohn75@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: "David S. Miller" <davem@davemloft.net>,
+	Mikael Pettersson <mikpe@it.uu.se>, penberg@cs.helsinki.fi,
+	Brian Gerst <brgerst@gmail.com>, andi@firstfloor.org,
+	Andrew Morton <akpm@linux-fo
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cet.com.ru ([195.178.208.66]:56671 "EHLO tservice.net.ru"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1030250Ab0B0Rcg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Feb 2010 12:32:36 -0500
-Content-Disposition: inline
-In-Reply-To: <da90d1f21002270604q771dfacj28071771bca33ebe@mail.gmail.com>
+Received: from mail-ew0-f220.google.com ([209.85.219.220]:63893 "EHLO
+	mail-ew0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030834Ab0B0Ure (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 27 Feb 2010 15:47:34 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Feb 27, 2010 at 03:04:13PM +0100, Michael Bohn (bohn75@googlemail.com) wrote:
-> is there a way to use the hifn_795x  module on a 64 bit system. ( with
-> 4GB  RAM ) ?
-> 
-> I get this error message if I try to load this module.
-> 
-> [    3.466307] HIFN supports only 32-bit addresses.
-> [ 1147.645181] HIFN supports only 32-bit addresses.
+Due to optimization A call to memset() may be removed as a dead store when
+the buffer is not used after its value is overwritten. The new function
+secure_bzero() ensures a section of memory is padded with zeroes.
 
-That's it - card only works in 32bit mode, it is limited by descriptor
-registers. The only way is to work this around is to allocate temporal
-buffer and copy data here and there, which is unlikely to be faster than
-software encryption.
+>From the GCC manual, section 5.37:
+If your assembler instructions access memory in an unpredictable
+fashion, add `memory' to the list of clobbered registers. This will
+cause GCC to not keep memory values cached in registers across the
+assembler instruction and not optimize stores or loads to that memory.
 
--- 
-	Evgeniy Polyakov
+Every byte in the [p,p+n[ range must be used. If you only use the
+first byte, via e.g. asm("" :: "m"(*(char*)p)), then the compiler
+_will_ skip scrubbing bytes beyond the first. This works with
+gcc-3.2.3 up to gcc-4.4.3.
+
+Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+---
+ include/linux/compiler-gcc.h   |   11 +++++++++++
+ include/linux/compiler-intel.h |    2 ++
+ include/linux/string.h         |    1 +
+ lib/string.c                   |   13 +++++++++++++
+ 4 files changed, 27 insertions(+), 0 deletions(-)
+
+Thanks all for the required information, checkpatch.pl and compile
+tested. In my (non-kernel) testcase this prevents dead store elimination.
+Comments?
+
+Roel
+
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index 73dcf80..0799938 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -12,6 +12,17 @@
+ #define barrier() __asm__ __volatile__("": : :"memory")
+ 
+ /*
++ * Dead store elimination (DSE) is an optimization that may remove a write to
++ * a buffer that is not used anymore. Use ARRAY_PREVENT_DSE after a write when
++ * the scrub is required for security reasons.
++ */
++#define ARRAY_PREVENT_DSE(p, n)				\
++	do {						\
++		struct __scrub { char c[n]; };		\
++		asm("" : : "m"(*(struct __scrub *)p));	\
++	} while (0)
++
++/*
+  * This macro obfuscates arithmetic on a variable address so that gcc
+  * shouldn't recognize the original var, and make assumptions about it.
+  *
+diff --git a/include/linux/compiler-intel.h b/include/linux/compiler-intel.h
+index d8e636e..e8e11f3 100644
+--- a/include/linux/compiler-intel.h
++++ b/include/linux/compiler-intel.h
+@@ -14,9 +14,11 @@
+  * It uses intrinsics to do the equivalent things.
+  */
+ #undef barrier
++#undef ARRAY_PREVENT_DSE
+ #undef RELOC_HIDE
+ 
+ #define barrier() __memory_barrier()
++#define ARRAY_PREVENT_DSE(p, n)
+ 
+ #define RELOC_HIDE(ptr, off)					\
+   ({ unsigned long __ptr;					\
+diff --git a/include/linux/string.h b/include/linux/string.h
+index a716ee2..36213e6 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -118,6 +118,7 @@ extern void * memchr(const void *,int,__kernel_size_t);
+ extern char *kstrdup(const char *s, gfp_t gfp);
+ extern char *kstrndup(const char *s, size_t len, gfp_t gfp);
+ extern void *kmemdup(const void *src, size_t len, gfp_t gfp);
++extern void secure_bzero(void *, __kernel_size_t);
+ 
+ extern char **argv_split(gfp_t gfp, const char *str, int *argcp);
+ extern void argv_free(char **argv);
+diff --git a/lib/string.c b/lib/string.c
+index a1cdcfc..588ac31 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -559,6 +559,19 @@ void *memset(void *s, int c, size_t count)
+ EXPORT_SYMBOL(memset);
+ #endif
+ 
++/**
++ * secure_bzero - Call memset to fill a region of memory with zeroes and
++ * ensure this memset is not removed due to dead store elimination.
++ * @p: Pointer to the start of the area.
++ * @n: The size of the area.
++ */
++void secure_bzero(void *p, size_t n)
++{
++	memset(p, 0, n);
++	ARRAY_PREVENT_DSE(p, n);
++}
++EXPORT_SYMBOL(secure_bzero);
++
+ #ifndef __HAVE_ARCH_MEMCPY
+ /**
+  * memcpy - Copy one area of memory to another
+
