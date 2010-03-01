@@ -1,239 +1,109 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: [PATCH] crypto, Speed testing support for ghash
-Date: Mon, 01 Mar 2010 16:06:44 +0800
-Message-ID: <1267430804.1640.85.camel@yhuang-dev.sh.intel.com>
+From: Mikael Pettersson <mikpe@it.uu.se>
+Subject: Re: [PATCH v2] compiler: prevent dead store elimination
+Date: Mon, 1 Mar 2010 10:29:44 +0100
+Message-ID: <19339.35080.637800.292674@pilspetsen.it.uu.se>
+References: <4B8984EE.8090605@gmail.com>
+	<20100228095520.GA29531@one.firstfloor.org>
+	<4B8A8D17.2040208@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Andi Kleen <andi@firstfloor.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mikael Pettersson <mikpe@it.uu.se>, penberg@cs.helsinki.fi,
+	Brian Gerst <brgerst@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Herbert@gondor.apana.org.au
+To: Roel Kluin <roel.kluin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:62073 "EHLO mga14.intel.com"
+Received: from fanny.its.uu.se ([130.238.4.241]:8176 "EHLO fanny.its.uu.se"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750717Ab0CAIGr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Mar 2010 03:06:47 -0500
+	id S1750705Ab0CAJ35 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Mar 2010 04:29:57 -0500
+In-Reply-To: <4B8A8D17.2040208@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Because ghash needs setkey, the setkey and keysize template support
-for test_hash_speed is added.
+Roel Kluin writes:
+ > Due to optimization A call to memset() may be removed as a dead store when
 
-Signed-off-by: Huang Ying <ying.huang@intel.com>
----
- crypto/tcrypt.c |  122 +++++++++++++++++++++++++++++++++++---------------------
- crypto/tcrypt.h |    1 
- 2 files changed, 78 insertions(+), 45 deletions(-)
+_______________________^ lower-case a
 
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -395,12 +395,13 @@ out:
- }
- 
- static void test_hash_speed(const char *algo, unsigned int sec,
--			    struct hash_speed *speed)
-+			    struct hash_speed *speed, u8 *keysize)
- {
- 	struct scatterlist sg[TVMEMSIZE];
- 	struct crypto_hash *tfm;
- 	struct hash_desc desc;
- 	static char output[1024];
-+	static u8 null_keysize[] = {0, 0};
- 	int i;
- 	int ret;
- 
-@@ -423,36 +424,47 @@ static void test_hash_speed(const char *
- 		goto out;
- 	}
- 
--	sg_init_table(sg, TVMEMSIZE);
--	for (i = 0; i < TVMEMSIZE; i++) {
--		sg_set_buf(sg + i, tvmem[i], PAGE_SIZE);
--		memset(tvmem[i], 0xff, PAGE_SIZE);
--	}
--
--	for (i = 0; speed[i].blen != 0; i++) {
--		if (speed[i].blen > TVMEMSIZE * PAGE_SIZE) {
--			printk(KERN_ERR
--			       "template (%u) too big for tvmem (%lu)\n",
--			       speed[i].blen, TVMEMSIZE * PAGE_SIZE);
--			goto out;
-+	keysize = keysize ? keysize : null_keysize;
-+	do {
-+		sg_init_table(sg, TVMEMSIZE);
-+		for (i = 0; i < TVMEMSIZE; i++) {
-+			sg_set_buf(sg + i, tvmem[i], PAGE_SIZE);
-+			memset(tvmem[i], 0xff, PAGE_SIZE);
- 		}
- 
--		printk(KERN_INFO "test%3u "
--		       "(%5u byte blocks,%5u bytes per update,%4u updates): ",
--		       i, speed[i].blen, speed[i].plen, speed[i].blen / speed[i].plen);
--
--		if (sec)
--			ret = test_hash_jiffies(&desc, sg, speed[i].blen,
--						speed[i].plen, output, sec);
--		else
--			ret = test_hash_cycles(&desc, sg, speed[i].blen,
--					       speed[i].plen, output);
--
--		if (ret) {
--			printk(KERN_ERR "hashing failed ret=%d\n", ret);
--			break;
-+		for (i = 0; speed[i].blen != 0; i++) {
-+			if (speed[i].blen > TVMEMSIZE * PAGE_SIZE) {
-+				printk(KERN_ERR
-+				"template (%u) too big for tvmem (%lu)\n",
-+				       speed[i].blen, TVMEMSIZE * PAGE_SIZE);
-+				goto out;
-+			}
-+
-+			if (*keysize)
-+				crypto_hash_setkey(tfm, tvmem[0], *keysize);
-+
-+			printk(KERN_INFO "test%3u (%5u byte blocks,"
-+			       "%5u bytes per update,%4u updates): ",
-+			       i, speed[i].blen, speed[i].plen,
-+			       speed[i].blen / speed[i].plen);
-+
-+			if (sec)
-+				ret = test_hash_jiffies(&desc, sg,
-+							speed[i].blen,
-+							speed[i].plen,
-+							output, sec);
-+			else
-+				ret = test_hash_cycles(&desc, sg,
-+						       speed[i].blen,
-+						       speed[i].plen, output);
-+
-+			if (ret) {
-+				printk(KERN_ERR "hashing failed ret=%d\n", ret);
-+				break;
-+			}
- 		}
--	}
-+		keysize++;
-+	} while (*keysize);
- 
- out:
- 	crypto_free_hash(tfm);
-@@ -814,71 +826,91 @@ static int do_test(int m)
- 		/* fall through */
- 
- 	case 301:
--		test_hash_speed("md4", sec, generic_hash_speed_template);
-+		test_hash_speed("md4", sec, generic_hash_speed_template, NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 302:
--		test_hash_speed("md5", sec, generic_hash_speed_template);
-+		test_hash_speed("md5", sec, generic_hash_speed_template, NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 303:
--		test_hash_speed("sha1", sec, generic_hash_speed_template);
-+		test_hash_speed("sha1", sec, generic_hash_speed_template, NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 304:
--		test_hash_speed("sha256", sec, generic_hash_speed_template);
-+		test_hash_speed("sha256", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 305:
--		test_hash_speed("sha384", sec, generic_hash_speed_template);
-+		test_hash_speed("sha384", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 306:
--		test_hash_speed("sha512", sec, generic_hash_speed_template);
-+		test_hash_speed("sha512", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 307:
--		test_hash_speed("wp256", sec, generic_hash_speed_template);
-+		test_hash_speed("wp256", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 308:
--		test_hash_speed("wp384", sec, generic_hash_speed_template);
-+		test_hash_speed("wp384", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 309:
--		test_hash_speed("wp512", sec, generic_hash_speed_template);
-+		test_hash_speed("wp512", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 310:
--		test_hash_speed("tgr128", sec, generic_hash_speed_template);
-+		test_hash_speed("tgr128", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 311:
--		test_hash_speed("tgr160", sec, generic_hash_speed_template);
-+		test_hash_speed("tgr160", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 312:
--		test_hash_speed("tgr192", sec, generic_hash_speed_template);
-+		test_hash_speed("tgr192", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 313:
--		test_hash_speed("sha224", sec, generic_hash_speed_template);
-+		test_hash_speed("sha224", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 314:
--		test_hash_speed("rmd128", sec, generic_hash_speed_template);
-+		test_hash_speed("rmd128", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 315:
--		test_hash_speed("rmd160", sec, generic_hash_speed_template);
-+		test_hash_speed("rmd160", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 316:
--		test_hash_speed("rmd256", sec, generic_hash_speed_template);
-+		test_hash_speed("rmd256", sec, generic_hash_speed_template,
-+				NULL);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 317:
--		test_hash_speed("rmd320", sec, generic_hash_speed_template);
-+		test_hash_speed("rmd320", sec, generic_hash_speed_template,
-+				NULL);
-+		if (mode > 300 && mode < 400) break;
-+
-+	case 318:
-+		test_hash_speed("ghash-generic", sec,
-+				generic_hash_speed_template,
-+				speed_template_16);
- 		if (mode > 300 && mode < 400) break;
- 
- 	case 399:
---- a/crypto/tcrypt.h
-+++ b/crypto/tcrypt.h
-@@ -45,6 +45,7 @@ static struct cipher_speed_template des3
-  * Cipher speed tests
-  */
- static u8 speed_template_8[] = {8, 0};
-+static u8 speed_template_16[] = {16, 0};
- static u8 speed_template_24[] = {24, 0};
- static u8 speed_template_8_32[] = {8, 32, 0};
- static u8 speed_template_16_32[] = {16, 32, 0};
+ > the buffer is not used after its value is overwritten. The new function
+ > secure_bzero() ensures a section of memory is padded with zeroes.
+ > 
+ > >From the GCC manual, section 5.37:
+ > If your assembler instructions access memory in an unpredictable
+ > fashion, add `memory' to the list of clobbered registers. This will
+ > cause GCC to not keep memory values cached in registers across the
+ > assembler instruction and not optimize stores or loads to that memory.
 
+This paragraph, while accurate, is unrelated to the contents of this
+patch. Note that in an asm(), a "memory" clobber (see barrier()) is
+not at all the same thing as a memory operand "m"(...), which is what
+we're using here. Just drop this bit.
 
+ > Every byte in the [p,p+n[ range must be used. If you only use the
+ > first byte, via e.g. asm("" :: "m"(*(char*)p)), then the compiler
+ > _will_ skip scrubbing bytes beyond the first.
+and then
+ > This works with
+ > gcc-3.2.3 up to gcc-4.4.3.
+
+You've edited my comments and put them together in a way that doesn't
+quite make sense. In particular, "This works" doesn't refer to the
+previous text but the local-struct-of-variable-size trick. The text
+should read something like:
+
+To prevent a memset() from being eliminated, the compiler must belive
+that the memory area is used after the memset(). Also, every byte in
+the memory area must be used. If only the first byte is used, via e.g.
+asm("" :: "m"(*(char*)p)), then the compiler _will_ skip scrubbing
+bytes beyond the first.
+
+The trick is to define a local type of the same size as the memory
+area, and use it for the "m" operand in a dummy asm():
+
+	static inline void fake_memory_use(void *p, size_t n)
+	{
+		struct __scrub { char c[n]; }
+		asm("" : : "m"(*(struct __scrub *)p));
+	}
+
+This looks strange, n being a variable, but has been confirmed to
+work with gcc-3.2.3 up to gcc-4.4.3.
+
+ > diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+ > index 188fcae..2f14199 100644
+ > --- a/include/linux/compiler.h
+ > +++ b/include/linux/compiler.h
+ > @@ -302,4 +302,15 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
+ >   */
+ >  #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
+ >  
+ > +/*
+ > + * Dead store elimination is an optimization that may remove a write to a
+ > + * buffer that is not used anymore. Use ARRAY_KEEP_STORE after a write when
+ > + * the scrub is required for security reasons.
+ > + */
+ > +#define ARRAY_KEEP_STORE(p, n)				\
+
+1. This doesn't need to be a macro. Please make it a static inline function.
+2. Its function is to "fake" a use of a memory area, which allows us to prevent
+   unwanted DSE elsewhere. So this should be fake_memory_use() or something.
+
+ > +	do {						\
+ > +		struct __scrub { typeof(*p) c[n]; };	\
+
+The typeof(*p) suggestion doesn't work. It would require p to always be
+a pointer type with an accurate (for memset) sizeof(*p). In general however
+we'll memset some array described by a void*/size_t pair, and typeof in
+that case is useless. The original'struct __scrub { char c[n]; };' was Ok.
+
+ >  extern char *kstrndup(const char *s, size_t len, gfp_t gfp);
+ >  extern void *kmemdup(const void *src, size_t len, gfp_t gfp);
+ > +extern void secure_bzero(void *, __kernel_size_t);
+
+Why is this __kernel_size_t and not just plain size_t? It's not
+a user-space API.
