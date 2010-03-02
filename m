@@ -1,51 +1,57 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: authenc - move saved IV in front of the
-	ablkcipher request
-Date: Tue, 2 Mar 2010 22:10:49 +0800
-Message-ID: <20100302141049.GB3808@gondor.apana.org.au>
-References: <20100223062109.GD29013@secunet.com> <20100223062237.GE29013@secunet.com>
+Subject: Re: Async hash reentrancy
+Date: Tue, 2 Mar 2010 22:25:04 +0800
+Message-ID: <20100302142504.GA3995@gondor.apana.org.au>
+References: <DDB181A6E7B893429D83CAC8DDBA74F1076A199007@VMBX108.ihostexchange.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Uri Simchoni <uris@ctera.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:42868 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53519 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751352Ab0CBOKv (ORCPT
+	with ESMTP id S1752362Ab0CBOZJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Mar 2010 09:10:51 -0500
+	Tue, 2 Mar 2010 09:25:09 -0500
 Content-Disposition: inline
-In-Reply-To: <20100223062237.GE29013@secunet.com>
+In-Reply-To: <DDB181A6E7B893429D83CAC8DDBA74F1076A199007@VMBX108.ihostexchange.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 23, 2010 at 07:22:37AM +0100, Steffen Klassert wrote:
->
-> @@ -558,13 +556,18 @@ static int crypto_authenc_init_tfm(struct crypto_tfm *tfm)
->  	ctx->auth = auth;
->  	ctx->enc = enc;
->  
-> -	tfm->crt_aead.reqsize = max_t(unsigned int,
-> -				crypto_ahash_reqsize(auth) + ctx->reqoff +
-> -				sizeof(struct authenc_request_ctx) +
-> +	ctx->reqoff = ALIGN(2 * crypto_ahash_digestsize(auth) +
-> +			    crypto_ahash_alignmask(auth),
-> +			    crypto_ahash_alignmask(auth) + 1) +
-> +		      crypto_ablkcipher_ivsize(enc);
-> +
-> +	tfm->crt_aead.reqsize = sizeof(struct authenc_request_ctx) +
-> +				ctx->reqoff +
-> +				max_t(unsigned int,
-> +				crypto_ahash_reqsize(auth) +
->  				sizeof(struct ahash_request),
->  				sizeof(struct skcipher_givcrypt_request) +
-> -				crypto_ablkcipher_reqsize(enc) +
-> -				crypto_ablkcipher_ivsize(enc));
-> +				crypto_ablkcipher_reqsize(enc));
+Uri Simchoni <uris@ctera.com> wrote:
+> Hi,
+> 
+> I'd like to add sha1/hmac-sha1 support to the Marvell CESA driver. I couldn't see an ahash driver that I can use as a reference. Is there such a driver?
 
-Hmm, I just noticed that both before and after the patch we're
-only including the hash request size for the encrypt case, and
-not the givencrypt case.  Is there a reason for this?
+We did have an implementation but it had to be removed because
+it wasn't reentrant so it's not a good model for you to follow
+anyway.
+
+> Assuming the client code is using the init->update->final sequence (and not just the digest call):
+> - Should it be using it on the same ahash_request object? (probably yes - that's the whole point...)
+
+Yes.
+
+> - If the same ahash_request object is used, it means the driver has to save the SG info per such call, it cannot simply queue the ahash_request as is often done in crypto drivers, right? I mean, the req->src is changing between crypto_ahash_update() calls.
+
+First of all to support init/update/final at all, your hardware
+must be able to provide partial hash results in a "standard"
+format.  See the export/import interface in sha1 for how that
+should work.
+
+Now if your hardware is only able to produce a final result, then
+you should simply implement finup + digest, and do the update
+operations using a software fallback.
+
+To answer your actual question, a single request supports only one
+outstanding operation at a time.  So it is illegal for the user
+to issue a new update operation prior to the previous completing.
+
+IOW you have nothing to worry about.
+
+> - Same for callback? (.complete pointer)
+
+Ditto.
 
 Cheers,
 -- 
