@@ -1,48 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto, Speed testing support for ghash
-Date: Tue, 2 Mar 2010 19:34:08 +0800
-Message-ID: <20100302113408.GA1824@gondor.apana.org.au>
-References: <1267430804.1640.85.camel@yhuang-dev.sh.intel.com>
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH v2] compiler: prevent dead store elimination
+Date: Tue, 2 Mar 2010 13:17:02 +0100
+Message-ID: <20100302121701.GA19208@basil.fritz.box>
+References: <4B8984EE.8090605@gmail.com> <20100228095520.GA29531@one.firstfloor.org> <4B8A8D17.2040208@gmail.com> <19339.35080.637800.292674@pilspetsen.it.uu.se>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
+Cc: Roel Kluin <roel.kluin@gmail.com>,
+	Andi Kleen <andi@firstfloor.org>,
+	"David S. Miller" <davem@davemloft.net>, penberg@cs.helsinki.fi,
+	Brian Gerst <brgerst@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Herbert@gondor.apana.org.au
+To: Mikael Pettersson <mikpe@it.uu.se>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:33952 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752163Ab0CBLeL (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:44339 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751998Ab0CBMRJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Mar 2010 06:34:11 -0500
+	Tue, 2 Mar 2010 07:17:09 -0500
 Content-Disposition: inline
-In-Reply-To: <1267430804.1640.85.camel@yhuang-dev.sh.intel.com>
+In-Reply-To: <19339.35080.637800.292674@pilspetsen.it.uu.se>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 01, 2010 at 04:06:44PM +0800, Huang Ying wrote:
-> Because ghash needs setkey, the setkey and keysize template support
-> for test_hash_speed is added.
+>  > +	do {						\
+>  > +		struct __scrub { typeof(*p) c[n]; };	\
 > 
-> Signed-off-by: Huang Ying <ying.huang@intel.com>
-> ---
->  crypto/tcrypt.c |  122 +++++++++++++++++++++++++++++++++++---------------------
->  crypto/tcrypt.h |    1 
->  2 files changed, 78 insertions(+), 45 deletions(-)
-> 
-> --- a/crypto/tcrypt.c
-> +++ b/crypto/tcrypt.c
-> @@ -395,12 +395,13 @@ out:
->  }
->  
->  static void test_hash_speed(const char *algo, unsigned int sec,
-> -			    struct hash_speed *speed)
-> +			    struct hash_speed *speed, u8 *keysize)
+> The typeof(*p) suggestion doesn't work. It would require p to always be
+> a pointer type with an accurate (for memset) sizeof(*p). In general however
+> we'll memset some array described by a void*/size_t pair, and typeof in
+> that case is useless. The original'struct __scrub { char c[n]; };' was Ok.
 
-Can we possibly move keysize into struct hash_speed to reduce
-the churn?
+I just suggested it because of the original array name of the macro
+and without it it would have only worked for char arrays. With the new
+naming it's ok I guess.
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+It could be made to work with macros and builtin_type_match I guess,
+but it would be fairly ugly and not worth it.
+
+-Andi
+
