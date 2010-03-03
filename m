@@ -1,103 +1,149 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: hmac(sha1)
-Date: Wed, 3 Mar 2010 16:59:01 -0600
-Message-ID: <20100303165901.df36c9ca.kim.phillips@freescale.com>
-References: <4B8DD78D.6080707@siganos.org>
-	<4B8EC3C0.60502@siganos.org>
+From: Roel Kluin <roel.kluin@gmail.com>
+Subject: [PATCH v3] compiler: prevent dead store elimination
+Date: Thu, 04 Mar 2010 00:16:35 +0100
+Message-ID: <4B8EEDD3.9040201@gmail.com>
+References: <4B8984EE.8090605@gmail.com>	<20100228095520.GA29531@one.firstfloor.org>	<4B8A8D17.2040208@gmail.com> <19339.35080.637800.292674@pilspetsen.it.uu.se>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Dimitrios Siganos <dimitris@siganos.org>
+Cc: Andi Kleen <andi@firstfloor.org>,
+	"David S. Miller" <davem@davemloft.net>, penberg@cs.helsinki.fi,
+	Brian Gerst <brgerst@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Herbert@gondor.apana.org.au
+To: Mikael Pettersson <mikpe@it.uu.se>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from az33egw02.freescale.net ([192.88.158.103]:56919 "EHLO
-	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751487Ab0CCWyr (ORCPT
+Received: from mail-ew0-f212.google.com ([209.85.219.212]:43187 "EHLO
+	mail-ew0-f212.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754185Ab0CCXQI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Mar 2010 17:54:47 -0500
-Received: from de01smr02.am.mot.com (de01smr02.freescale.net [10.208.0.151])
-	by az33egw02.freescale.net (8.14.3/az33egw02) with ESMTP id o23Msadk023838
-	for <linux-crypto@vger.kernel.org>; Wed, 3 Mar 2010 15:54:36 -0700 (MST)
-Received: from az33exm22.fsl.freescale.net (az33exm22.am.freescale.net [10.64.32.10])
-	by de01smr02.am.mot.com (8.13.1/8.13.0) with ESMTP id o23N2g3T010852
-	for <linux-crypto@vger.kernel.org>; Wed, 3 Mar 2010 17:02:43 -0600 (CST)
-In-Reply-To: <4B8EC3C0.60502@siganos.org>
+	Wed, 3 Mar 2010 18:16:08 -0500
+In-Reply-To: <19339.35080.637800.292674@pilspetsen.it.uu.se>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 3 Mar 2010 20:17:04 +0000
-Dimitrios Siganos <dimitris@siganos.org> wrote:
+Due to optimization a call to memset() may be removed as a dead store when
+the buffer is not used after its value is overwritten. The new function
+secure_bzero() ensures a section of memory is padded with zeroes.
 
-> Dimitrios Siganos wrote:
-> > Hi,
-> >
-> > I am trying to write a hmac(sha1) algorithm and I have a few 
-> > questions. I have a HW crypto accelerator that does the actual crypto 
-> > work. I have already successfully implemented sha1 by creating a 
-> > CRYPTO_ALG_TYPE_DIGEST algorithm.
-> >
-> > 1) Can I implement hmac(sha1) as a CRYPTO_ALG_TYPE_DIGEST algorithm 
-> > (i.e. use very similar code to sha1)?
-> >
-> > 2) Do I need to create a CRYPTO_ALG_TYPE_HASH algorithm?
-> >
-> > 3) Is it possible to implement hmac(sha1) as both 
-> > CRYPTO_ALG_TYPE_DIGEST and CRYPTO_ALG_TYPE_HASH?
-> >
-> > 4) If I use a CRYPTO_ALG_TYPE_HASH, I need to understand the 
-> > scatterwalk api, is there any help on the subject?
-> >
-> The answer to 1) is yes because I just did it and seems to work. 
-> Therefore the answer is to 2) is: No, it is not needed.
-> 
-> I believe the answer to 3) is: yes. I believe it is possible to 
-> implement hmac(sha1) as both CRYPTO_ALG_TYPE_DIGEST and 
-> CRYPTO_ALG_TYPE_HASH.
-> 
-> I would like to implement hmac(sha1) as a CRYPTO_ALG_TYPE_HASH but I do 
-> yet understand how to convert the scatterlists into virtual addresses. 
-> The HW crypto api that I use, hides the DMA details from me and expects 
-> me to pass it virtual addresses only. I can't see any examples of 
-> converting scatterlists to virtual addresses in a way that is safe for 
-> IPsec use (i.e. safe to be called from softirq context). Any help on 
-> this will be appreciated.
+To prevent a memset() from being eliminated, the compiler must belive
+that the memory area is used after the memset(). Also, every byte in
+the memory area must be used. If only the first byte is used, via e.g.
+asm("" :: "m"(*(char*)p)), then the compiler _will_ skip scrubbing
+bytes beyond the first.
 
-not sure I understand; scatterlists come populated with virtual
-addresses at the driver entry point (e.g. aead_givencrypt).  talitos
-uses a combination of dma_map_sg and sg_dma_address to map the list of
-virt. addresses into dma-able addresses (because that's what the h/w
-wants).
+The trick is to define a local type of the same size as the memory
+area, and use it for the "m" operand in a dummy asm():
 
-the sg_virt helper fn should be used to extract the virtual address
-of each sg entry, which sounds like what you want in your case.
+	static inline void fake_memory_use(void *p, size_t n)
+	{
+		struct __scrub { char c[n]; }
+		asm("" : : "m"(*(struct __scrub *)p));
+	}
 
-> The ultimate goal of the project is to implement a authenc(hmac(sha1), 
-> cbc(aes)) algorithm (for IPsec use) that will offload the work to a HW 
-> crypto chip. In order to understand what I am doing, I am building 
-> slowly upwards. I have build aes as a CIPHER, cbc(aes) as a BLKCIPHER, 
-> sha1 as a digest and hmac(sha1) as a digest.
-> 
-> My next steps are to implement cbc(aes) using ABLKCIPHER and hmac(sha1) 
-> using HASH and AHASH. I am using linux version 2.6.28. I can see that 
-> the talitos driver implements algorithms at the authenc level but I 
-> don't completely understand the driver and I am hoping that after going 
-> through the exercise of building the smaller blocks I will understand 
-> the operation of the talitos driver.
+This looks strange, n being a variable, but has been confirmed to
+work with gcc-3.2.3 up to gcc-4.4.3.
 
-for talitos, the hardware does the cipher+hash in one go (via in-
-and out-snooping between the execution units), so it's more optimal
-than splitting it into two separate operations - the only downside is
-that talitos doesn't currently support IPsec AH.  wrt the crypto api,
-the main difference is that the aead request comes as an overlapping
-cipher and hash request.
+Many thanks to Mikael Pettersson and Andi Kleen.
 
-> Any help, especially pointers to relevant documentation or examples, 
-> will be appreciated.
+Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+---
+I used a trick to prevent the assembly for Itanium, defining
+fake_memory_use in instrinsics.h and checking its definition
+in string.c, but maybe there's a better way to do this?
 
-wrt sg: Documentation/DMA-API.txt, lib/scatterlist.c,
-arch/$ARCH/include/asm/scatterlist.h
+To provide a memory clobber for Itanium it appears we could use
+the pragma directive to set the optimization level [1]. Only when
+optimization level is greater than 3, dead store removal occurs[2].
+But this will be ugly:
 
-wrt authenc/aead request offsets:
-http://unixwiz.net/techtips/iguide-ipsec.html
+inline void secure_bzero(void *p, size_t n)
+{
+#ifdef _ASM_IA64_INTRINSICS_H
+#pragma OPT_LEVEL 2
+	memset(p, 0, n);
+#pragma OPT_LEVEL INITIAL
+#else
+	memset(p, 0, n);
+	fake_memory_use(p, n);
+#endif /* _ASM_IA64_INTRINSICS_H */
+}
 
-Kim
+Do we want this?
+
+Thanks, Roel
+
+[1] http://docs.hp.com/en/B3901-90030/ch03s04.html
+[2] http://h21007.www2.hp.com/portal/download/files/unprot/Itanium/OptimizingApps-ItaniumV9-1.pdf
+(page 6)
+
+ arch/ia64/include/asm/intrinsics.h |    3 +++
+ include/linux/string.h             |    1 +
+ lib/string.c                       |   27 +++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+), 0 deletions(-)
+
+diff --git a/arch/ia64/include/asm/intrinsics.h b/arch/ia64/include/asm/intrinsics.h
+index 111ed52..51d8035 100644
+--- a/arch/ia64/include/asm/intrinsics.h
++++ b/arch/ia64/include/asm/intrinsics.h
+@@ -241,6 +241,9 @@ extern long ia64_cmpxchg_called_with_bad_pointer (void);
+ 	IA64_INTRINSIC_API(intrin_local_irq_restore)
+ #define ia64_set_rr0_to_rr4		IA64_INTRINSIC_API(set_rr0_to_rr4)
+ 
++/* FIXME: define fake_memory_use as a memory clobber for Itanium */
++#define fake_memory_use
++
+ #endif /* !__ASSEMBLY__ */
+ 
+ #endif /* _ASM_IA64_INTRINSICS_H */
+diff --git a/include/linux/string.h b/include/linux/string.h
+index a716ee2..be68efb 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -118,6 +118,7 @@ extern void * memchr(const void *,int,__kernel_size_t);
+ extern char *kstrdup(const char *s, gfp_t gfp);
+ extern char *kstrndup(const char *s, size_t len, gfp_t gfp);
+ extern void *kmemdup(const void *src, size_t len, gfp_t gfp);
++extern void secure_bzero(void *, size_t);
+ 
+ extern char **argv_split(gfp_t gfp, const char *str, int *argcp);
+ extern void argv_free(char **argv);
+diff --git a/lib/string.c b/lib/string.c
+index a1cdcfc..cbc32d4 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -559,6 +559,33 @@ void *memset(void *s, int c, size_t count)
+ EXPORT_SYMBOL(memset);
+ #endif
+ 
++#ifndef fake_memory_use
++/*
++ * Dead store elimination is an optimization that may remove a write to a
++ * buffer that is not used anymore. To prevent this, e.g. for security
++ * reasons, the compiler must believe that every byte in this memory area
++ * is used after the last write.
++ */
++static inline void fake_memory_use(void *p, size_t n)
++{
++	struct __scrub { char c[n]; }
++	asm("" : : "m"(*(struct __scrub *)p));
++}
++#endif /* fake_memory_use */
++
++/**
++ * secure_bzero - Call memset to fill a region of memory with zeroes and
++ * ensure this memset is not removed due to dead store elimination.
++ * @p: Pointer to the start of the area.
++ * @n: The size of the area.
++ */
++inline void secure_bzero(void *p, size_t n)
++{
++	memset(p, 0, n);
++	fake_memory_use(p, n);
++}
++EXPORT_SYMBOL(secure_bzero);
++
+ #ifndef __HAVE_ARCH_MEMCPY
+ /**
+  * memcpy - Copy one area of memory to another
