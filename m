@@ -1,59 +1,78 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: tip: origin tree boot crash
-Date: Wed, 3 Mar 2010 22:42:40 +0800
-Message-ID: <20100303144240.GA14373@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100301075024.GA4753@elte.hu> <20100301145519.GB20729@secunet.com>
+From: Dimitrios Siganos <dimitris@siganos.org>
+Subject: Re: hmac(sha1)
+Date: Wed, 03 Mar 2010 20:17:04 +0000
+Message-ID: <4B8EC3C0.60502@siganos.org>
+References: <4B8DD78D.6080707@siganos.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ingo Molnar <mingo@elte.hu>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:54388 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754424Ab0CCOnF (ORCPT
+Received: from lvps94-136-60-187.vps.webfusion.co.uk ([94.136.60.187]:36644
+	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752860Ab0CCUQr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Mar 2010 09:43:05 -0500
-Content-Disposition: inline
-In-Reply-To: <20100301145519.GB20729@secunet.com>
+	Wed, 3 Mar 2010 15:16:47 -0500
+In-Reply-To: <4B8DD78D.6080707@siganos.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 01, 2010 at 03:55:19PM +0100, Steffen Klassert wrote:
-> 
-> On Mon, Mar 01, 2010 at 08:50:24AM +0100, Ingo Molnar wrote:
-> > 
-> > * Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > 
-> > >       crypto: pcrypt - Add pcrypt crypto parallelization wrapper
-> > 
-> > -tip testing started triggering the following frequent boot crash yesterday, 
-> > on 64-bit x86:
-> > 
-> >  |  calling  pcrypt_init+0x0/0xee @ 1
-> >  |  BUG: unable to handle kernel NULL pointer dereference at (null)
-> >  |  IP: [<ffffffff8126550b>] memcpy+0xb/0xb0
-> >  |  Call Trace:
-> >  |   [<ffffffff810c2f38>] ? padata_alloc+0x98/0x150
-> >  |   [<ffffffff82158c51>] ? pcrypt_init+0x0/0xee
-> >  |   [<ffffffff82158ccc>] pcrypt_init+0x7b/0xee
-> > 
-> 
-> Ugh, it seems that I forgot to allocate one of the cpumasks. Looking at the
-> configs of my test systems I noticed, that CONFIG_CPUMASK_OFFSTACK was
-> not set on all the configs, so I did not notice it.
-> 
-> The patch below fixes the boot crash if CONFIG_CPUMASK_OFFSTACK is
-> enabled on my test systems. Does the patch fix it for you too?
+Dimitrios Siganos wrote:
+> Hi,
+>
+> I am trying to write a hmac(sha1) algorithm and I have a few 
+> questions. I have a HW crypto accelerator that does the actual crypto 
+> work. I have already successfully implemented sha1 by creating a 
+> CRYPTO_ALG_TYPE_DIGEST algorithm.
+>
+> 1) Can I implement hmac(sha1) as a CRYPTO_ALG_TYPE_DIGEST algorithm 
+> (i.e. use very similar code to sha1)?
+>
+> 2) Do I need to create a CRYPTO_ALG_TYPE_HASH algorithm?
+>
+> 3) Is it possible to implement hmac(sha1) as both 
+> CRYPTO_ALG_TYPE_DIGEST and CRYPTO_ALG_TYPE_HASH?
+>
+> 4) If I use a CRYPTO_ALG_TYPE_HASH, I need to understand the 
+> scatterwalk api, is there any help on the subject?
+>
+> Regards,
+> Dimitris
+>
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The answer to 1) is yes because I just did it and seems to work. 
+Therefore the answer is to 2) is: No, it is not needed.
 
-Ingo, any luck with this patch from Steffen?
+I believe the answer to 3) is: yes. I believe it is possible to 
+implement hmac(sha1) as both CRYPTO_ALG_TYPE_DIGEST and 
+CRYPTO_ALG_TYPE_HASH.
 
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I would like to implement hmac(sha1) as a CRYPTO_ALG_TYPE_HASH but I do 
+yet understand how to convert the scatterlists into virtual addresses. 
+The HW crypto api that I use, hides the DMA details from me and expects 
+me to pass it virtual addresses only. I can't see any examples of 
+converting scatterlists to virtual addresses in a way that is safe for 
+IPsec use (i.e. safe to be called from softirq context). Any help on 
+this will be appreciated.
+
+The ultimate goal of the project is to implement a authenc(hmac(sha1), 
+cbc(aes)) algorithm (for IPsec use) that will offload the work to a HW 
+crypto chip. In order to understand what I am doing, I am building 
+slowly upwards. I have build aes as a CIPHER, cbc(aes) as a BLKCIPHER, 
+sha1 as a digest and hmac(sha1) as a digest.
+
+My next steps are to implement cbc(aes) using ABLKCIPHER and hmac(sha1) 
+using HASH and AHASH. I am using linux version 2.6.28. I can see that 
+the talitos driver implements algorithms at the authenc level but I 
+don't completely understand the driver and I am hoping that after going 
+through the exercise of building the smaller blocks I will understand 
+the operation of the talitos driver.
+
+Any help, especially pointers to relevant documentation or examples, 
+will be appreciated.
+
+Dimitris
