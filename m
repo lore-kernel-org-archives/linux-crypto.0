@@ -1,71 +1,29 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 2.6.34
-Date: Fri, 5 Mar 2010 15:10:43 +0800
-Message-ID: <20100305071043.GA3548__3668.78866120732$1267778059$gmane$org@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au>
+From: Dimitrios Siganos <dimitris@siganos.org>
+Subject: Re: hmac(sha1)
+Date: Fri, 05 Mar 2010 16:17:16 +0000
+Message-ID: <4B912E8C.4010009@siganos.org>
+References: <20100305073204.GA3745@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34001 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753882Ab0CEHKu (ORCPT
+Received: from lvps94-136-60-187.vps.webfusion.co.uk ([94.136.60.187]:45942
+	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752640Ab0CEQRS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Mar 2010 02:10:50 -0500
-Content-Disposition: inline
-In-Reply-To: <20100201195204.GA6953@gondor.apana.org.au>
+	Fri, 5 Mar 2010 11:17:18 -0500
+In-Reply-To: <20100305073204.GA3745@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
-
-This push fixes three regressions and an older bug:
-
-* The new padata system crashes during init on certain configurations.
-* Fixed hmac(md5) broken by recent md5 update.
-* Fixed authenc broken by ahash conversion.
-* Fixed handling of unaligned buffers in hash API.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (1):
-      crypto: md5 - Set statesize
-
-Steffen Klassert (3):
-      crypto: authenc - Use correct ahash complete functions
-      crypto: authenc - Move saved IV in front of the ablkcipher reques=
-t
-      padata: Allocate the cpumask for the padata instance
-
-Szilveszter =D6rd=F6g (1):
-      crypto: hash - Fix handling of unaligned buffers
-
- crypto/ahash.c   |    1 -
- crypto/authenc.c |   27 +++++++++++++++------------
- crypto/md5.c     |    1 +
- kernel/padata.c  |    8 +++++++-
- 4 files changed, 23 insertions(+), 14 deletions(-)
-
-Thanks,
---=20
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Herbert Xu wrote:
+> Dimitrios Siganos <dimitris@siganos.org> wrote:
+>   
+> Note that we don't currently have a working asynchronous hash
+> driver so in a way you'll need to write things from scratch.
+> However, we're all happy to assist you in this process.
+>   
+I am using linux 2.6.28, and in that version, the crc32 implementation 
+is of type AHASH. According to git, crc32 was converted to SHASH on 25 
+Dec 2008. I am basing my AHASH implementation on the crc32 AHASH.
