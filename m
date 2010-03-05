@@ -1,48 +1,39 @@
-From: Dimitrios Siganos <dimitris@siganos.org>
-Subject: Question about async operations
-Date: Thu, 04 Mar 2010 17:38:51 +0000
-Message-ID: <4B8FF02B.5090600@siganos.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Question about async operations
+Date: Fri, 5 Mar 2010 15:33:05 +0800
+Message-ID: <20100305073305.GA3794@gondor.apana.org.au>
+References: <4B8FF02B.5090600@siganos.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Dimitrios Siganos <dimitris@siganos.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lvps94-136-60-187.vps.webfusion.co.uk ([94.136.60.187]:47516
-	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752276Ab0CDRiz (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:52212 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751146Ab0CEHdH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Mar 2010 12:38:55 -0500
+	Fri, 5 Mar 2010 02:33:07 -0500
+Content-Disposition: inline
+In-Reply-To: <4B8FF02B.5090600@siganos.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Dimitrios Siganos <dimitris@siganos.org> wrote:
+> Hi,
+> 
+> I have a question about the asynchronous characteristics of the crypto api.
+> 
+> 1) crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC), does this code create 
+> an asynchronous sha1 transform?
 
-I have a question about the asynchronous characteristics of the crypto api.
+crypto_alloc_hash is obsolete.  New code should either use shash
+or ahash.  Only the latter supports async operations.
 
-1) crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC), does this code create 
-an asynchronous sha1 transform?
+You can look at crypto/authenc.c for an example of how it's used.
 
-2) crypto_alloc_hash("sha1", 0, 0), does this code create a synchronous 
-sha1 transform?
-
-3) Is synchronous taken to mean the follwoing? When the function returns 
-(and is successful) the result is already computed and placed at the 
-destination.
-
-4) Is asynchronous taken to mean the following?  "When the function 
-returns (and is successful) we know that a request has been posted for 
-the operation to take place but we have no guarantees that the operation 
-has completed.
-
-5) If the answer to the above is yes then how can the following style of 
-code work? I see such code in many places:
-    crypto_alloc_hash("sha1", 0, CRYPTO_ALG_ASYNC);
-    crypto_hash_init(&desc);
-    rc = crypto_hash_update(&desc, &sg, len);
-    rc = crypto_hash_final(&desc, dst);
-    now_use_dst(dst);
-How can we know that the dst has the right contents when we call 
-"now_use_dst(dst)"? Is there something that I am missing?
-
-Regards,
-Dimitris
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
