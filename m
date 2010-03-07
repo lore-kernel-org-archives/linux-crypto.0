@@ -1,29 +1,61 @@
-From: Dimitrios Siganos <dimitris@siganos.org>
-Subject: Re: hmac(sha1)
-Date: Fri, 05 Mar 2010 16:17:16 +0000
-Message-ID: <4B912E8C.4010009@siganos.org>
-References: <20100305073204.GA3745@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lvps94-136-60-187.vps.webfusion.co.uk ([94.136.60.187]:45942
-	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752640Ab0CEQRS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Mar 2010 11:17:18 -0500
-In-Reply-To: <20100305073204.GA3745@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stewart Malik <mali0037@gmail.com>
+Subject: [PATCH] CRYPTO: Blowfish: Converted spaces to tabs in crypto/blowfish.c
+Date: Sun,  7 Mar 2010 18:01:06 +1030
+Message-ID: <1267947066-22399-1-git-send-email-mali0037@gmail.com>
+Cc: richih.mailinglist@gmail.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Stewart Malik <mali0037@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Herbert Xu wrote:
-> Dimitrios Siganos <dimitris@siganos.org> wrote:
->   
-> Note that we don't currently have a working asynchronous hash
-> driver so in a way you'll need to write things from scratch.
-> However, we're all happy to assist you in this process.
->   
-I am using linux 2.6.28, and in that version, the crc32 implementation 
-is of type AHASH. According to git, crc32 was converted to SHASH on 25 
-Dec 2008. I am basing my AHASH implementation on the crc32 AHASH.
+---
+ crypto/blowfish.c |   20 ++++++++++++--------
+ 1 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/crypto/blowfish.c b/crypto/blowfish.c
+index a67d52e..29c5389 100644
+--- a/crypto/blowfish.c
++++ b/crypto/blowfish.c
+@@ -309,9 +309,13 @@ static const u32 bf_sbox[256 * 4] = {
+ #define GET32_0(x) (((x) >> (24)) & (0xff))
+ 
+ #define bf_F(x) (((S[GET32_0(x)] + S[256 + GET32_1(x)]) ^ \
+-          S[512 + GET32_2(x)]) + S[768 + GET32_3(x)])
++		S[512 + GET32_2(x)]) + S[768 + GET32_3(x)])
+ 
+-#define ROUND(a, b, n)  b ^= P[n]; a ^= bf_F (b)
++#define ROUND(a, b, n)
++	do {
++		b ^= P[n];
++		a ^= bf_F(b);
++	} while (0)
+ 
+ /*
+  * The blowfish encipher, processes 64-bit blocks.
+@@ -452,17 +456,17 @@ static int bf_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
+ static struct crypto_alg alg = {
+ 	.cra_name		=	"blowfish",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize		=	BF_BLOCK_SIZE,
+-	.cra_ctxsize		=	sizeof(struct bf_ctx),
+-	.cra_alignmask		=	3,
++	.cra_blocksize	=	BF_BLOCK_SIZE,
++	.cra_ctxsize	=	sizeof(struct bf_ctx),
++	.cra_alignmask	=	3,
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_list		=	LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	BF_MIN_KEY_SIZE,
+ 	.cia_max_keysize	=	BF_MAX_KEY_SIZE,
+-	.cia_setkey   		= 	bf_setkey,
+-	.cia_encrypt 		=	bf_encrypt,
+-	.cia_decrypt  		=	bf_decrypt } }
++	.cia_setkey		=	bf_setkey,
++	.cia_encrypt	=	bf_encrypt,
++	.cia_decrypt	=	bf_decrypt } }
+ };
+ 
+ static int __init blowfish_mod_init(void)
+-- 
+1.6.0.4
