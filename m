@@ -1,39 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] CRYPTO: Blowfish: Converted spaces to tabs in
-	crypto/blowfish.c
-Date: Sun, 7 Mar 2010 23:20:07 +0800
-Message-ID: <20100307152007.GA24260@gondor.apana.org.au>
-References: <1267947066-22399-1-git-send-email-mali0037@gmail.com>
+Subject: Re: hmac(sha1)
+Date: Tue, 9 Mar 2010 11:08:52 +0800
+Message-ID: <20100309030852.GA8153@gondor.apana.org.au>
+References: <4B912E8C.4010009@siganos.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, richih.mailinglist@gmail.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stewart Malik <mali0037@gmail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Dimitrios Siganos <dimitris@siganos.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:34964 "EHLO
+Received: from rhun.apana.org.au ([64.62.148.172]:53863 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754378Ab0CGPUO (ORCPT
+	with ESMTP id S1756634Ab0CIDI4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Mar 2010 10:20:14 -0500
+	Mon, 8 Mar 2010 22:08:56 -0500
 Content-Disposition: inline
-In-Reply-To: <1267947066-22399-1-git-send-email-mali0037@gmail.com>
+In-Reply-To: <4B912E8C.4010009@siganos.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 07, 2010 at 06:01:06PM +1030, Stewart Malik wrote:
+Dimitrios Siganos <dimitris@siganos.org> wrote:
 >
-> @@ -452,17 +456,17 @@ static int bf_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
->  static struct crypto_alg alg = {
->  	.cra_name		=	"blowfish",
->  	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
-> -	.cra_blocksize		=	BF_BLOCK_SIZE,
-> -	.cra_ctxsize		=	sizeof(struct bf_ctx),
-> -	.cra_alignmask		=	3,
-> +	.cra_blocksize	=	BF_BLOCK_SIZE,
-> +	.cra_ctxsize	=	sizeof(struct bf_ctx),
-> +	.cra_alignmask	=	3,
+> I am using linux 2.6.28, and in that version, the crc32 implementation 
+> is of type AHASH. According to git, crc32 was converted to SHASH on 25 
+> Dec 2008. I am basing my AHASH implementation on the crc32 AHASH.
 
-What's this bit for?
+Unless you're implementing a software async driver, I don't think
+crc32c is going to be of that much help.
+
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
