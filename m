@@ -1,68 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 02/19] crypto: khazad - Fix checkpatch errors
-Date: Wed, 10 Mar 2010 18:27:23 +0800
-Message-ID: <20100310102723.GB23298@gondor.apana.org.au>
-References: <1266538903-3145-1-git-send-email-richih.mailinglist@gmail.com>
+Subject: Re: [PATCH 01/19] crypto: internal - Fix checkpatch errors
+Date: Wed, 10 Mar 2010 18:26:01 +0800
+Message-ID: <20100310102601.GA23298@gondor.apana.org.au>
+References: <1266538894-3112-1-git-send-email-richih.mailinglist@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
+	Neil Horman <nhorman@tuxdriver.com>,
+	Shasi Pulijala <spulijala@amcc.com>,
+	Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org
 To: Richard Hartmann <richih.mailinglist@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rhun.apana.org.au ([64.62.148.172]:46991 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753057Ab0CJK00 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Mar 2010 05:26:26 -0500
 Content-Disposition: inline
-In-Reply-To: <1266538903-3145-1-git-send-email-richih.mailinglist@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1266538894-3112-1-git-send-email-richih.mailinglist@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 19, 2010 at 01:21:41AM +0100, Richard Hartmann wrote:
+On Fri, Feb 19, 2010 at 01:21:33AM +0100, Richard Hartmann wrote:
 > 
 > Signed-off-by: Richard Hartmann <richih.mailinglist@gmail.com>
 > ---
->  crypto/khazad.c |   71 +++++++++++++++++++++++++++----------------------------
->  1 files changed, 35 insertions(+), 36 deletions(-)
->
-> @@ -810,25 +810,25 @@ static void khazad_crypt(const u64 roundKey[KHAZAD_ROUNDS + 1],
->  	state = be64_to_cpu(*src) ^ roundKey[0];
->  
->  	for (r = 1; r < KHAZAD_ROUNDS; r++) {
-> -		state = T0[(int)(state >> 56)       ] ^
-> -			T1[(int)(state >> 48) & 0xff] ^
-> -			T2[(int)(state >> 40) & 0xff] ^
-> -			T3[(int)(state >> 32) & 0xff] ^
-> -			T4[(int)(state >> 24) & 0xff] ^
-> -			T5[(int)(state >> 16) & 0xff] ^
-> -			T6[(int)(state >>  8) & 0xff] ^
-> -			T7[(int)(state      ) & 0xff] ^
-> +		state = T0[(int)(state >> 56)] ^
-> +			T1[(int)(state >> 48)&0xff] ^
-> +			T2[(int)(state >> 40)&0xff] ^
-> +			T3[(int)(state >> 32)&0xff] ^
-> +			T4[(int)(state >> 24)&0xff] ^
-> +			T5[(int)(state >> 16)&0xff] ^
-> +			T6[(int)(state >>  8)&0xff] ^
-> +			T7[(int)(state      )&0xff] ^
->  			roundKey[r];
-> -    	}
-> +		}
+>  crypto/internal.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/crypto/internal.h b/crypto/internal.h
+> index 2d22636..d4384b0 100644
+> --- a/crypto/internal.h
+> +++ b/crypto/internal.h
+> @@ -6,7 +6,7 @@
+>   *
+>   * This program is free software; you can redistribute it and/or modify it
+>   * under the terms of the GNU General Public License as published by the Free
+> - * Software Foundation; either version 2 of the License, or (at your option) 
+> + * Software Foundation; either version 2 of the License, or (at your option)
+>   * any later version.
+>   *
+>   */
 
-This indentation change is bogus.
-
-> @@ -865,7 +865,6 @@ static struct crypto_alg khazad_alg = {
->  static int __init khazad_mod_init(void)
->  {
->  	int ret = 0;
-> -	
->  	ret = crypto_register_alg(&khazad_alg);
->  	return ret;
->  }
-
-What's this for?
-
-Please review the all the rest of the patches for similar errors
-and resubmit.
-
-Cheers,
+Patch applied.
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
