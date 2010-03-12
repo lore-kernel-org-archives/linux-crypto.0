@@ -1,39 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Add AES-NI accelerated CTR mode
-Date: Fri, 12 Mar 2010 08:19:51 +0800
-Message-ID: <20100312001950.GA9928@gondor.apana.org.au>
-References: <1267424076.1640.82.camel@yhuang-dev.sh.intel.com> <20100311121510.80a16ec4.akpm@linux-foundation.org>
+From: Pavel Roskin <proski@gnu.org>
+Subject: Converting mac80211 CCMP to packet-at-a-time processing
+Date: Fri, 12 Mar 2010 00:29:22 -0500
+Message-ID: <1268371762.6763.26.camel@mj>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rhun.apana.org.au ([64.62.148.172]:50256 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753365Ab0CLAT4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Mar 2010 19:19:56 -0500
-Content-Disposition: inline
-In-Reply-To: <20100311121510.80a16ec4.akpm@linux-foundation.org>
+Received: from c60.cesmail.net ([216.154.195.49]:11043 "EHLO c60.cesmail.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751517Ab0CLF3X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Mar 2010 00:29:23 -0500
+Received: from [192.168.0.22] (static-72-92-88-10.phlapa.fios.verizon.net [72.92.88.10])
+	by smtprelay2.cesmail.net (Postfix) with ESMTPSA id BE9DC34C6A
+	for <linux-crypto@vger.kernel.org>; Fri, 12 Mar 2010 00:30:01 -0500 (EST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 11, 2010 at 12:15:10PM -0800, Andrew Morton wrote:
->
-> > +	movq TCTR_LOW, INC
-> > +	movq CTR, TCTR_LOW
-> 
-> ^^ these two lines don't assemble with gas 2.16.1:
-> 
-> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-> arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
-> arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
+Hello!
 
-I guess we will have to hard code this.  Thanks for reporting
-this Andrew.
+The CCMP encryption in mac80211 uses crypto API to encrypt 16 bytes at a
+time.  I believe this is not the best approach if hardware acceleration
+is used.  The ixp4xx_crypto driver doesn't even provide the "aes"
+ciphers.  It only provides block ciphers, such as "cbc(des)".
+
+It would be much better if mac80211 could encrypt the whole packet at a
+time.  Actually, that's what the WEP code is doing.
+
+I realize that CCMP is a more sophisticated cipher, so maybe it's not so
+easy.  "ccm(aes)" is probably the closest thing to what is needed, but
+it's not even a block cipher, it's an AEAD.
+
+Unfortunately, I don't see any examples of AEAD use in the kernel other
+than the crypto testing module.  And I'm not even sure if "ccm(aes)" is
+the right choice for CCMP.
+
+I'll appreciate if somebody with a cryptographic background could have a
+look at net/mac80211/aes_ccm.c and suggest whether it could be converted
+to packet-at-a-time processing.
+
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Pavel Roskin
