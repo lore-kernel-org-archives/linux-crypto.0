@@ -1,38 +1,36 @@
-From: Dimitrios Siganos <dimitris@siganos.org>
-Subject: ABLKCIPHER
-Date: Fri, 12 Mar 2010 13:36:35 +0000
-Message-ID: <4B9A4363.1080706@siganos.org>
+From: Pavel Roskin <proski@gnu.org>
+Subject: Re: Converting mac80211 CCMP to packet-at-a-time processing
+Date: Fri, 12 Mar 2010 22:42:58 -0500
+Message-ID: <1268451778.9161.5.camel@mj>
+References: <201003121149.55037.roberto.sassu@polito.it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Roberto Sassu <roberto.sassu@polito.it>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lvps94-136-60-187.vps.webfusion.co.uk ([94.136.60.187]:56874
-	"EHLO siganos.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755195Ab0CLNgm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Mar 2010 08:36:42 -0500
+Received: from c60.cesmail.net ([216.154.195.49]:7091 "EHLO c60.cesmail.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755698Ab0CMDnO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Mar 2010 22:43:14 -0500
+In-Reply-To: <201003121149.55037.roberto.sassu@polito.it>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Fri, 2010-03-12 at 11:49 +0100, Roberto Sassu wrote:
+> Hello
+> 
+> i'm not expert with cryptographic modules, but i played sometime with the 
+> "authenc" module, which is AEAD, and i applied it to the filesystem "ecryptfs".
+> In the forwarded message i added a brief description of what i do and i hope 
+> this can be a useful example for you. 
 
-I am trying to write an ABLKCIPHER algorithm for my hardware crypto 
-engine and I have a few questions:
+Thank you!  That's indeed a useful example.
 
-1) In struct ablkcipher_alg, what do these fields do? I see some 
-implementations use them and some not. Do I need to implement them?
-    int (*givencrypt)(struct skcipher_givcrypt_request *req);
-    int (*givdecrypt)(struct skcipher_givcrypt_request *req);
-    const char *geniv;
+However, it's disappointing that the caller needs to deal explicitly
+with completions.  The blkcipher API is much simpler.  I would have hard
+time advocating a patch to CCMP that makes the code more complicated.
 
-2) What is a CRYPTO_ALG_TYPE_GIVCIPHER? What does it do and how does it 
-interface to other algorithms?
-
-In case, it is important; we are using linux-2.6.28 but we will soon 
-move to linux-2.6.31. The ultimate goal is to accelerate 
-authenc(cbc(aes),hmac(sha1)) and I am currently implementing the simpler 
-algorithms as a learning exercise.
-
+-- 
 Regards,
-Dimitris
+Pavel Roskin
