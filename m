@@ -1,36 +1,43 @@
-From: Pavel Roskin <proski@gnu.org>
-Subject: Re: Converting mac80211 CCMP to packet-at-a-time processing
-Date: Fri, 12 Mar 2010 22:42:58 -0500
-Message-ID: <1268451778.9161.5.camel@mj>
-References: <201003121149.55037.roberto.sassu@polito.it>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [BUGFIX] Fix AES-NI CTR optimization compiling failure with
+	gas 2.16.1
+Date: Sat, 13 Mar 2010 16:29:06 +0800
+Message-ID: <20100313082906.GA24675@gondor.apana.org.au>
+References: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Roberto Sassu <roberto.sassu@polito.it>
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from c60.cesmail.net ([216.154.195.49]:7091 "EHLO c60.cesmail.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755698Ab0CMDnO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Mar 2010 22:43:14 -0500
-In-Reply-To: <201003121149.55037.roberto.sassu@polito.it>
+Received: from rhun.apana.org.au ([64.62.148.172]:47066 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758910Ab0CMI3M (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 13 Mar 2010 03:29:12 -0500
+Content-Disposition: inline
+In-Reply-To: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2010-03-12 at 11:49 +0100, Roberto Sassu wrote:
-> Hello
+On Fri, Mar 12, 2010 at 03:01:47PM +0800, Huang Ying wrote:
+> Andrew Morton reported that AES-NI CTR optimization failed to compile
+> with gas 2.16.1, the error message is as follow:
 > 
-> i'm not expert with cryptographic modules, but i played sometime with the 
-> "authenc" module, which is AEAD, and i applied it to the filesystem "ecryptfs".
-> In the forwarded message i added a brief description of what i do and i hope 
-> this can be a useful example for you. 
+> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+> arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
+> arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
+> 
+> To fix this, a gas macro is defined to assemble movq with 64bit
+> general purpose registers and XMM registers. The macro will generate
+> the raw .byte sequence for needed instructions.
+> 
+> Reported-by: Andrew Morton <akpm@linux-foundation.org>
+> Signed-off-by: Huang Ying <ying.huang@intel.com>
 
-Thank you!  That's indeed a useful example.
-
-However, it's disappointing that the caller needs to deal explicitly
-with completions.  The blkcipher API is much simpler.  I would have hard
-time advocating a patch to CCMP that makes the code more complicated.
-
+Patch applied.  Thanks a lot!
 -- 
-Regards,
-Pavel Roskin
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
