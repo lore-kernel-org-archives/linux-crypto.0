@@ -1,51 +1,58 @@
-From: "Mr.Patrick Adams" <mrpatrick.adams@gmail.com>
-Subject: Winning Notification
-Date: Wed, 17 Mar 2010 18:17:23 -0300
-Message-ID: <20100317181723.88480b88s77mrbvn__39613.4604969577$1268861191$gmane$org@mail.buenosaires.gob.ar>
-Reply-To: mrpatrick.adams47@gmail.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Converting mac80211 CCMP to packet-at-a-time processing
+Date: Thu, 18 Mar 2010 16:19:26 +0800
+Message-ID: <20100318081926.GA11566@gondor.apana.org.au>
+References: <1268720474.26820.36.camel@mj>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1;
-	DelSp=Yes	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=us-ascii
+Cc: roberto.sassu@polito.it, linux-crypto@vger.kernel.org
+To: Pavel Roskin <proski@gnu.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtpgcba1.buenosaires.gob.ar ([200.89.135.225]:49086 "EHLO
-	smtpgcba1.buenosaires.gob.ar" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754845Ab0CQV0S (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:32934 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750835Ab0CRIUN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Mar 2010 17:26:18 -0400
+	Thu, 18 Mar 2010 04:20:13 -0400
 Content-Disposition: inline
+In-Reply-To: <1268720474.26820.36.camel@mj>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Pavel Roskin <proski@gnu.org> wrote:
+>
+>> You won't have to deal with completions if you allocate your
+>> algorithm with the CRYPTO_ALG_ASYNC bit off.  Of course you won't
+>> be able to use most hardware accelerations either.
+> 
+> Actually, I thought using CRYPTO_ALG_ASYNC in the mask meant to
+> _exclude_ asynchronous algorithms.
 
+That's what I just said, no?
 
-  Dear E-mail User,
-Your  email has just won the sum of =A3750,000.00 GBP in cash credited =
-=20
-to a file in the just concluded Irish Lottery International Award =20
-Programme held 10th of march,2010
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Your  e-mail address attached to:
-Winner Pin No:5388/10.
-Secret No:089188/10
-Winning Date: 10th of march,2010
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-1. Full Name 2. Address: 3.Age/Gender 4. Occupation 5.Nationality =20
-6.Phone Number 7. Have you won a lotttery before?(YES/NO)8.Amount Won?
-Send details to Fiduciary Agent: Dr.Culverton Humphery
-Tel: +44(0)703 595 7792
-Email:mrpatrick.adams47@gmail.com
+> Is there any documentation for Linux crypto API that documents use of
+> CRYPTO_ALG_ASYNC?  Also, I'd like to know meanings of
+> CRYPTO_TFM_REQ_MAY_BACKLOG and CRYPTO_TFM_REQ_MAY_SLEEP.
 
-Note:All Reponses should be sent to Agent via =20
-email:mrpatrick.adams47@gmail.com
-Online Co-Ordinator
-Mr.Patrick Adams
+Normally an async driver will simply drop requests and return
+EBUSY when the hardware queue is full.  MAY_BACKLOG allows the
+caller to place a single request on a backlog queue.  When that
+request moves onto the hardware queue the caller will be notified
+through the completion function with err set to EINPROGRESS.
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This is used by drivers/md/dm-crypt.
+
+MAY_SLEEP is only relevant for synchronous algorithms, it allows
+the API to sleep which is useful if you are making a single large
+request which would take an extended period of time to process.
+
+> The crypto API feels like a minefield to me - I should check everything
+> in the code or even experiment to figure out how the public API works.
+
+Well patches to improve the API and/or documentation are welcome.
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
