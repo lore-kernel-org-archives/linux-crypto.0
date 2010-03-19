@@ -1,40 +1,40 @@
-From: michael-dev@fami-braun.de
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Thu, 18 Mar 2010 22:24:41 +0100
-Message-ID: <4BA29A19.2050307@fami-braun.de>
-References: <4B9E38AF.70309@fami-braun.de> <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com>
+Date: Fri, 19 Mar 2010 08:33:51 +0800
+Message-ID: <20100319003351.GC20227@gondor.apana.org.au>
+References: <4B9E38AF.70309@fami-braun.de> <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com> <4BA29A19.2050307@fami-braun.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Pekka Enberg <penberg@cs.helsinki.fi>
+Content-Type: text/plain; charset=us-ascii
+Cc: Pekka Enberg <penberg@cs.helsinki.fi>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Matt Mackall <mpm@selenic.com>
+To: michael-dev@fami-braun.de
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.10]:53504 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751492Ab0CRVY4 (ORCPT
+Received: from rhun.apana.org.au ([64.62.148.172]:54589 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751867Ab0CSAeB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Mar 2010 17:24:56 -0400
-In-Reply-To: <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com>
+	Thu, 18 Mar 2010 20:34:01 -0400
+Content-Disposition: inline
+In-Reply-To: <4BA29A19.2050307@fami-braun.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Thu, Mar 18, 2010 at 10:24:41PM +0100, michael-dev@fami-braun.de wrote:
+> 
+> Pekka Enberg schrieb:
+> > Even with CONFIG_DEBUG_SLAB enabled or with CONFIG_SLUB and
+> > CONFIG_SLUB_DEBUG_ON?
+> 
+> no, these options have not been / are not enabled.
 
-Pekka Enberg schrieb:
-> Even with CONFIG_DEBUG_SLAB enabled or with CONFIG_SLUB and
-> CONFIG_SLUB_DEBUG_ON?
+Can you please try it with those options enabled? That will tell
+us if there is some latent bug in the crypto layer that only shows
+up right away under SLOB.
 
-no, these options have not been / are not enabled.
-
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkuimhkACgkQ+6sI4XSM4u1jtACfS9YfQfKZ/Pu/n62lT50xSise
-RdAAmgMfVmKXPFRT2hz7bSWAMIor9zTo
-=gMEL
------END PGP SIGNATURE-----
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
