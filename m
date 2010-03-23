@@ -1,46 +1,46 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [patch v3] pcrypt: handle crypto_get_attr_type() errors
-Date: Tue, 23 Mar 2010 11:34:31 +0100
-Message-ID: <20100323103431.GA27822@secunet.com>
-References: <20100321092847.GJ5331@bicker>
- <20100322132342.GJ20508@secunet.com>
- <20100322135319.GQ21571@bicker>
- <20100322145357.GK20508@secunet.com>
- <20100322152845.GT21571@bicker>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
+Date: Tue, 23 Mar 2010 19:32:39 +0800
+Message-ID: <20100323113239.GA29837@gondor.apana.org.au>
+References: <cover.1268830685.git.dmitry.kasatkin@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Dan Carpenter <error27@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kern
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [216.59.3.182] ([216.59.3.182]:43546 "EHLO arnor.apana.org.au"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752019Ab0CWMNa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Mar 2010 08:13:30 -0400
 Content-Disposition: inline
-In-Reply-To: <20100322152845.GT21571@bicker>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <cover.1268830685.git.dmitry.kasatkin@nokia.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 22, 2010 at 06:28:45PM +0300, Dan Carpenter wrote:
-> I was concerned about the error handling for crypto_get_attr_type() in
-> pcrypt_alloc_aead().  Steffen Klassert pointed out that we could simply
-> avoid calling crypto_get_attr_type() if we passed the type and mask as a
-> parameters.
+On Wed, Mar 17, 2010 at 03:12:49PM +0200, Dmitry Kasatkin wrote:
+> Earlier kernel contained omap sha1 and md5 driver, which was not maintained,
+> was not ported to new crypto APIs and removed from the source tree.
 > 
-> Signed-off-by: Dan Carpenter <error27@gmail.com>
-
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
-
-Thanks a lot!
-
-> ---
-> All three versions have basically been the same except for style issues.
-> I will confess that this (hopefully final :P) version looks much nicer 
-> than the earlier ones.
+> This driver implements async and sync crypto API.
 > 
+> It still contains pr_debug() for debugging purpose.
+> Will be remove for integration.
+> 
+> Dmitry Kasatkin (2):
+>   sec: omap sha1 & md5 driver
+>   sec: Makefile/Kconfig update for omap sha1 md5 driver
 
-It's not only style issues. We also got some additional benefit from
-this version. We got rid of a superfluous call to crypto_get_attr_type
-and we are able to change type and mask before we pass it to
-pcrypt_alloc_aead if this becomes necessary.
+It looks good to me as far as the Crypto API is concerned.
 
-Steffen
+My only question is what's your plan with respect to HMAC? If
+you're going to do it in hardware then it's fine as it is.
+
+Otherwise you need to implement export/import and we also need
+to add ahash support to hmac.c.
+
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
