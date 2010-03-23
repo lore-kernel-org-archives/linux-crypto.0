@@ -1,46 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Tue, 23 Mar 2010 19:32:39 +0800
-Message-ID: <20100323113239.GA29837@gondor.apana.org.au>
-References: <cover.1268830685.git.dmitry.kasatkin@nokia.com>
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [BUGFIX] Fix AES-NI CTR optimization compiling failure with gas
+ 2.16.1
+Date: Tue, 23 Mar 2010 14:23:24 -0700
+Message-ID: <20100323142324.a53b20de.akpm@linux-foundation.org>
+References: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [216.59.3.182] ([216.59.3.182]:43546 "EHLO arnor.apana.org.au"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752019Ab0CWMNa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Mar 2010 08:13:30 -0400
-Content-Disposition: inline
-In-Reply-To: <cover.1268830685.git.dmitry.kasatkin@nokia.com>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:37762 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751952Ab0CWVYh (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Mar 2010 17:24:37 -0400
+In-Reply-To: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 17, 2010 at 03:12:49PM +0200, Dmitry Kasatkin wrote:
-> Earlier kernel contained omap sha1 and md5 driver, which was not maintained,
-> was not ported to new crypto APIs and removed from the source tree.
+On Fri, 12 Mar 2010 15:01:47 +0800
+Huang Ying <ying.huang@intel.com> wrote:
+
+> Andrew Morton reported that AES-NI CTR optimization failed to compile
+> with gas 2.16.1, the error message is as follow:
 > 
-> This driver implements async and sync crypto API.
+> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+> arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
+> arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
 > 
-> It still contains pr_debug() for debugging purpose.
-> Will be remove for integration.
+> To fix this, a gas macro is defined to assemble movq with 64bit
+> general purpose registers and XMM registers. The macro will generate
+> the raw .byte sequence for needed instructions.
 > 
-> Dmitry Kasatkin (2):
->   sec: omap sha1 & md5 driver
->   sec: Makefile/Kconfig update for omap sha1 md5 driver
 
-It looks good to me as far as the Crypto API is concerned.
+Still no go.
 
-My only question is what's your plan with respect to HMAC? If
-you're going to do it in hardware then it's fine as it is.
+arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+arch/x86/crypto/aesni-intel_asm.S:752: Error: bad expression
+arch/x86/crypto/aesni-intel_asm.S:752: Error: junk at end of line, first unrecognized character is `1'
+arch/x86/crypto/aesni-intel_asm.S:753: Error: bad expression
+arch/x86/crypto/aesni-intel_asm.S:753: Error: junk at end of line, first unrecognized character is `1'
 
-Otherwise you need to implement export/import and we also need
-to add ahash support to hmac.c.
+it doesn't like this:
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+        REG_TYPE movq_r64_xmm_opd1_type \opd1
+
