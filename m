@@ -1,98 +1,62 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [BUGFIX] Fix AES-NI CTR optimization compiling failure with
- gas 2.16.1
-Date: Wed, 24 Mar 2010 14:24:18 +0800
-Message-ID: <1269411858.23970.26.camel@yhuang-dev.sh.intel.com>
-References: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
-	 <20100323142324.a53b20de.akpm@linux-foundation.org>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
+Date: Wed, 24 Mar 2010 09:31:51 +0200
+Message-ID: <4BA9BFE7.3080209@nokia.com>
+References: <cover.1268830685.git.dmitry.kasatkin@nokia.com> <20100323113239.GA29837@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
+To: ext Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:32788 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754309Ab0CXGYm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Mar 2010 02:24:42 -0400
-In-Reply-To: <20100323142324.a53b20de.akpm@linux-foundation.org>
+Received: from smtp.nokia.com ([192.100.122.230]:53734 "EHLO
+	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751711Ab0CXHnc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Mar 2010 03:43:32 -0400
+In-Reply-To: <20100323113239.GA29837@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, Andrew,
 
-On Wed, 2010-03-24 at 05:23 +0800, Andrew Morton wrote:
-> On Fri, 12 Mar 2010 15:01:47 +0800
-> Huang Ying <ying.huang@intel.com> wrote:
-> 
-> > Andrew Morton reported that AES-NI CTR optimization failed to compile
-> > with gas 2.16.1, the error message is as follow:
-> > 
-> > arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-> > arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
-> > arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
-> > 
-> > To fix this, a gas macro is defined to assemble movq with 64bit
-> > general purpose registers and XMM registers. The macro will generate
-> > the raw .byte sequence for needed instructions.
-> > 
-> 
-> Still no go.
-> 
-> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-> arch/x86/crypto/aesni-intel_asm.S:752: Error: bad expression
-> arch/x86/crypto/aesni-intel_asm.S:752: Error: junk at end of line, first unrecognized character is `1'
-> arch/x86/crypto/aesni-intel_asm.S:753: Error: bad expression
-> arch/x86/crypto/aesni-intel_asm.S:753: Error: junk at end of line, first unrecognized character is `1'
-> 
-> it doesn't like this:
-> 
->         REG_TYPE movq_r64_xmm_opd1_type \opd1
 
-Try to compile the latest kernel with binutils 2.16.1 this time to debug
-and verify my fix. Now, with patch followed, aesni-intel_asm.S can be
-compiled. But I failed to compile whole kernel with binutils 2.16.1.
-First ld report unknown options, after use latest ld instead of that of
-2.16.1, "as" reports errors as follow:
+On 23/03/10 13:32, ext Herbert Xu wrote:
+> On Wed, Mar 17, 2010 at 03:12:49PM +0200, Dmitry Kasatkin wrote:
+>    
+>> Earlier kernel contained omap sha1 and md5 driver, which was not maintained,
+>> was not ported to new crypto APIs and removed from the source tree.
+>>
+>> This driver implements async and sync crypto API.
+>>
+>> It still contains pr_debug() for debugging purpose.
+>> Will be remove for integration.
+>>
+>> Dmitry Kasatkin (2):
+>>    sec: omap sha1&  md5 driver
+>>    sec: Makefile/Kconfig update for omap sha1 md5 driver
+>>      
+> It looks good to me as far as the Crypto API is concerned.
+>
+> My only question is what's your plan with respect to HMAC? If
+> you're going to do it in hardware then it's fine as it is.
+>
+> Otherwise you need to implement export/import and we also need
+> to add ahash support to hmac.c.
+>
+> Thanks,
+>    
 
-AS      arch/x86/kernel/acpi/realmode/wakeup.o
-cc1: error: CPU you selected does not support x86-64 instruction set
-cc1: error: CPU you selected does not support x86-64 instruction set
-cc1: warning: -mregparm is ignored in 64-bit mode
+Hello,
 
-Can you tell me how to setup the building environment with binutils
-2.16.1? I just build it by hand and make the installed bin directory the
-first one in $PATH.
+Thanks for looking to it.
 
-Best Regards,
-Huang Ying
------------------------------------------------------------------------->
-Subject: [BUGFIX] Fix another AES-NI CTR optimization compiling failure with gas 2.16.1
+No hw is not doing hmac.
+I need to look to this then.
 
-The previous AES-NI CTR optimization compiling failure gas 2.16.1 fix
-introduces another compiling failure by itself. This patch fixes that.
+Will comeback in a while.
 
-Reported-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Huang Ying <ying.huang@intel.com>
----
- arch/x86/include/asm/inst.h |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+- Dmitry
 
---- a/arch/x86/include/asm/inst.h
-+++ b/arch/x86/include/asm/inst.h
-@@ -120,9 +120,9 @@
- 	.macro REG_TYPE type reg
- 	R64_NUM reg_type_r64 \reg
- 	XMM_NUM reg_type_xmm \reg
--	.if reg_type_r64 != REG_NUM_INVALID
-+	.if reg_type_r64 <> REG_NUM_INVALID
- 	\type = REG_TYPE_R64
--	.elseif reg_type_xmm != REG_NUM_INVALID
-+	.elseif reg_type_xmm <> REG_NUM_INVALID
- 	\type = REG_TYPE_XMM
- 	.else
- 	\type = REG_TYPE_INVALID
 
 
