@@ -1,49 +1,98 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [BUGFIX] Fix AES-NI CTR optimization compiling failure with gas
- 2.16.1
-Date: Tue, 23 Mar 2010 14:23:24 -0700
-Message-ID: <20100323142324.a53b20de.akpm@linux-foundation.org>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: [BUGFIX] Fix AES-NI CTR optimization compiling failure with
+ gas 2.16.1
+Date: Wed, 24 Mar 2010 14:24:18 +0800
+Message-ID: <1269411858.23970.26.camel@yhuang-dev.sh.intel.com>
 References: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
+	 <20100323142324.a53b20de.akpm@linux-foundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Huang Ying <ying.huang@intel.com>
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:37762 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751952Ab0CWVYh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Mar 2010 17:24:37 -0400
-In-Reply-To: <1268377307.1640.491.camel@yhuang-dev.sh.intel.com>
+Received: from mga11.intel.com ([192.55.52.93]:32788 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754309Ab0CXGYm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Mar 2010 02:24:42 -0400
+In-Reply-To: <20100323142324.a53b20de.akpm@linux-foundation.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 12 Mar 2010 15:01:47 +0800
-Huang Ying <ying.huang@intel.com> wrote:
+Hi, Andrew,
 
-> Andrew Morton reported that AES-NI CTR optimization failed to compile
-> with gas 2.16.1, the error message is as follow:
+On Wed, 2010-03-24 at 05:23 +0800, Andrew Morton wrote:
+> On Fri, 12 Mar 2010 15:01:47 +0800
+> Huang Ying <ying.huang@intel.com> wrote:
+> 
+> > Andrew Morton reported that AES-NI CTR optimization failed to compile
+> > with gas 2.16.1, the error message is as follow:
+> > 
+> > arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+> > arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
+> > arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
+> > 
+> > To fix this, a gas macro is defined to assemble movq with 64bit
+> > general purpose registers and XMM registers. The macro will generate
+> > the raw .byte sequence for needed instructions.
+> > 
+> 
+> Still no go.
 > 
 > arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-> arch/x86/crypto/aesni-intel_asm.S:752: Error: suffix or operands invalid for `movq'
-> arch/x86/crypto/aesni-intel_asm.S:753: Error: suffix or operands invalid for `movq'
+> arch/x86/crypto/aesni-intel_asm.S:752: Error: bad expression
+> arch/x86/crypto/aesni-intel_asm.S:752: Error: junk at end of line, first unrecognized character is `1'
+> arch/x86/crypto/aesni-intel_asm.S:753: Error: bad expression
+> arch/x86/crypto/aesni-intel_asm.S:753: Error: junk at end of line, first unrecognized character is `1'
 > 
-> To fix this, a gas macro is defined to assemble movq with 64bit
-> general purpose registers and XMM registers. The macro will generate
-> the raw .byte sequence for needed instructions.
+> it doesn't like this:
 > 
+>         REG_TYPE movq_r64_xmm_opd1_type \opd1
 
-Still no go.
+Try to compile the latest kernel with binutils 2.16.1 this time to debug
+and verify my fix. Now, with patch followed, aesni-intel_asm.S can be
+compiled. But I failed to compile whole kernel with binutils 2.16.1.
+First ld report unknown options, after use latest ld instead of that of
+2.16.1, "as" reports errors as follow:
 
-arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-arch/x86/crypto/aesni-intel_asm.S:752: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:752: Error: junk at end of line, first unrecognized character is `1'
-arch/x86/crypto/aesni-intel_asm.S:753: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:753: Error: junk at end of line, first unrecognized character is `1'
+AS      arch/x86/kernel/acpi/realmode/wakeup.o
+cc1: error: CPU you selected does not support x86-64 instruction set
+cc1: error: CPU you selected does not support x86-64 instruction set
+cc1: warning: -mregparm is ignored in 64-bit mode
 
-it doesn't like this:
+Can you tell me how to setup the building environment with binutils
+2.16.1? I just build it by hand and make the installed bin directory the
+first one in $PATH.
 
-        REG_TYPE movq_r64_xmm_opd1_type \opd1
+Best Regards,
+Huang Ying
+------------------------------------------------------------------------>
+Subject: [BUGFIX] Fix another AES-NI CTR optimization compiling failure with gas 2.16.1
+
+The previous AES-NI CTR optimization compiling failure gas 2.16.1 fix
+introduces another compiling failure by itself. This patch fixes that.
+
+Reported-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Huang Ying <ying.huang@intel.com>
+---
+ arch/x86/include/asm/inst.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/arch/x86/include/asm/inst.h
++++ b/arch/x86/include/asm/inst.h
+@@ -120,9 +120,9 @@
+ 	.macro REG_TYPE type reg
+ 	R64_NUM reg_type_r64 \reg
+ 	XMM_NUM reg_type_xmm \reg
+-	.if reg_type_r64 != REG_NUM_INVALID
++	.if reg_type_r64 <> REG_NUM_INVALID
+ 	\type = REG_TYPE_R64
+-	.elseif reg_type_xmm != REG_NUM_INVALID
++	.elseif reg_type_xmm <> REG_NUM_INVALID
+ 	\type = REG_TYPE_XMM
+ 	.else
+ 	\type = REG_TYPE_INVALID
+
 
