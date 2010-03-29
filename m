@@ -1,38 +1,30 @@
-From: Gilles Espinasse <g.esp@free.fr>
-Subject: [PATCH] Fix requr typo on crypto/Kconfig
-Date: Sun, 28 Mar 2010 19:28:25 +0200
-Message-ID: <1269797305-4689-1-git-send-email-g.esp@free.fr>
-References: <?>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Gilles Espinasse <g.esp@free.fr>
-To: jkosina@suse.cz
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: Re: [PATCH] Fix requr typo on crypto/Kconfig
+Date: Mon, 29 Mar 2010 15:34:46 +0200 (CEST)
+Message-ID: <alpine.LNX.2.00.1003291534260.24576@pobox.suse.cz>
+References: <?> <1269797305-4689-1-git-send-email-g.esp@free.fr>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Gilles Espinasse <g.esp@free.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1-g21.free.fr ([212.27.42.1]:45262 "EHLO smtp1-g21.free.fr"
+Received: from cantor.suse.de ([195.135.220.2]:36049 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754819Ab0C1R3L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Mar 2010 13:29:11 -0400
-In-Reply-To: <?>
+	id S1750753Ab0C2Nes (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Mar 2010 09:34:48 -0400
+In-Reply-To: <1269797305-4689-1-git-send-email-g.esp@free.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Gilles Espinasse <g.esp@free.fr>
----
- crypto/Kconfig |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Sun, 28 Mar 2010, Gilles Espinasse wrote:
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 403857a..9d9434f 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -28,7 +28,7 @@ config CRYPTO_FIPS
- 	  This options enables the fips boot option which is
- 	  required if you want to system to operate in a FIPS 200
- 	  certification.  You should say no unless you know what
--	  this is. Note that CRYPTO_ANSI_CPRNG is requred if this
-+	  this is. Note that CRYPTO_ANSI_CPRNG is required if this
- 	  option is selected
- 
- config CRYPTO_ALGAPI
+> Signed-off-by: Gilles Espinasse <g.esp@free.fr>
+
+I have condensed all your three patches into one larger one and applied 
+it.
+
+Thanks,
+
 -- 
-1.6.4.4
-
+Jiri Kosina
+SUSE Labs, Novell Inc.
