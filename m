@@ -1,171 +1,133 @@
-From: Paul Walmsley <paul@pwsan.com>
-Subject: Re: [PATCHv2 1/2] crypto: updates omap sham device related platform
- code
-Date: Tue, 30 Mar 2010 03:41:30 -0600 (MDT)
-Message-ID: <alpine.DEB.2.00.1003300334110.14474@utopia.booyaka.com>
-References: <cover.1269524804.git.dmitry.kasatkin@nokia.com> <9e97cb8f5ee608a70bb9c04bc2c22f0d6b749d98.1269524804.git.dmitry.kasatkin@nokia.com>
+From: Brandon Philips <brandon@ifup.org>
+Subject: Re: Fixing gave up waiting for init of module libcrc32c.
+Date: Tue, 30 Mar 2010 09:50:09 -0700
+Message-ID: <20100330165009.GP21087@jenkins.home.ifup.org>
+References: <20100320010849.GA30654@gondor.apana.org.au>
+ <20100320042103.GB5127@jenkins>
+ <20100320042434.GA32294@gondor.apana.org.au>
+ <20100319.222325.260105122.davem@davemloft.net>
+ <20100320122959.GA1930@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: tony@atomide.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	rusty@rustcorp.com.au, Kay Sievers <kay.sievers@vrfy.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from utopia.booyaka.com ([72.9.107.138]:50302 "EHLO
-	utopia.booyaka.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752794Ab0C3Jla (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:56538 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753591Ab0C3RRU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Mar 2010 05:41:30 -0400
-In-Reply-To: <9e97cb8f5ee608a70bb9c04bc2c22f0d6b749d98.1269524804.git.dmitry.kasatkin@nokia.com>
+	Tue, 30 Mar 2010 13:17:20 -0400
+Received: by pva18 with SMTP id 18so2900794pva.19
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Mar 2010 10:17:19 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20100320122959.GA1930@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Dmitry,
-
-a few comments:
-
-On Thu, 25 Mar 2010, Dmitry Kasatkin wrote:
-
-> - registration
-> - clocks
+On 20:29 Sat 20 Mar 2010, Herbert Xu wrote:
+> On Fri, Mar 19, 2010 at 10:23:25PM -0700, David Miller wrote:
+> >
+> > I hear what you're saying Herbert, but thinking about this a bit I
+> > really think we should make this situation work instead of fail.
 > 
-> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-> ---
->  arch/arm/mach-omap2/clock2420_data.c       |    2 +-
->  arch/arm/mach-omap2/clock2430_data.c       |    2 +-
->  arch/arm/mach-omap2/clock3xxx_data.c       |    2 +-
->  arch/arm/mach-omap2/devices.c              |   26 ++++++++++++++++++++++++--
->  arch/arm/plat-omap/include/plat/omap34xx.h |    5 +++++
->  5 files changed, 32 insertions(+), 5 deletions(-)
+> I think the initial report perhaps painted this in a slight
+> different fashion than what it really is.  The code that was
+> looping in module.c is not trying to load libcrc32c, but rather
+> it is trying to get a reference on the already-loaded libcrc32c
+> module.
+
+You are correct. Sorry for the confusion.
+
+> AFAICS the only way to make it "work" would be to reload the
+> module in question when we can't get a reference on it.  But
+> that would entail recursively loading a module during the process
+> of loading another module.
 > 
-> diff --git a/arch/arm/mach-omap2/clock2420_data.c b/arch/arm/mach-omap2/clock2420_data.c
-> index d932b14..1820a55 100644
-> --- a/arch/arm/mach-omap2/clock2420_data.c
-> +++ b/arch/arm/mach-omap2/clock2420_data.c
-> @@ -1836,7 +1836,7 @@ static struct omap_clk omap2420_clks[] = {
->  	CLK(NULL,	"vlynq_ick",	&vlynq_ick,	CK_242X),
->  	CLK(NULL,	"vlynq_fck",	&vlynq_fck,	CK_242X),
->  	CLK(NULL,	"des_ick",	&des_ick,	CK_242X),
-> -	CLK(NULL,	"sha_ick",	&sha_ick,	CK_242X),
-> +	CLK("omap-sham",	"ick",	&sha_ick,	CK_242X),
->  	CLK("omap_rng",	"ick",		&rng_ick,	CK_242X),
->  	CLK(NULL,	"aes_ick",	&aes_ick,	CK_242X),
->  	CLK(NULL,	"pka_ick",	&pka_ick,	CK_242X),
-> diff --git a/arch/arm/mach-omap2/clock2430_data.c b/arch/arm/mach-omap2/clock2430_data.c
-> index 0438b6e..5884ac6 100644
-> --- a/arch/arm/mach-omap2/clock2430_data.c
-> +++ b/arch/arm/mach-omap2/clock2430_data.c
-> @@ -1924,7 +1924,7 @@ static struct omap_clk omap2430_clks[] = {
->  	CLK(NULL,	"sdma_ick",	&sdma_ick,	CK_243X),
->  	CLK(NULL,	"sdrc_ick",	&sdrc_ick,	CK_243X),
->  	CLK(NULL,	"des_ick",	&des_ick,	CK_243X),
-> -	CLK(NULL,	"sha_ick",	&sha_ick,	CK_243X),
-> +	CLK("omap-sham",	"ick",	&sha_ick,	CK_243X),
->  	CLK("omap_rng",	"ick",		&rng_ick,	CK_243X),
->  	CLK(NULL,	"aes_ick",	&aes_ick,	CK_243X),
->  	CLK(NULL,	"pka_ick",	&pka_ick,	CK_243X),
-> diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
-> index d5153b6..5a974dc 100644
-> --- a/arch/arm/mach-omap2/clock3xxx_data.c
-> +++ b/arch/arm/mach-omap2/clock3xxx_data.c
-> @@ -3360,7 +3360,7 @@ static struct omap_clk omap3xxx_clks[] = {
->  	CLK("mmci-omap-hs.2",	"ick",	&mmchs3_ick,	CK_3430ES2 | CK_AM35XX),
->  	CLK(NULL,	"icr_ick",	&icr_ick,	CK_343X),
->  	CLK(NULL,	"aes2_ick",	&aes2_ick,	CK_343X),
-> -	CLK(NULL,	"sha12_ick",	&sha12_ick,	CK_343X),
-> +	CLK("omap-sham",	"ick",	&sha12_ick,	CK_343X),
->  	CLK(NULL,	"des2_ick",	&des2_ick,	CK_343X),
->  	CLK("mmci-omap-hs.1",	"ick",	&mmchs2_ick,	CK_3XXX),
->  	CLK("mmci-omap-hs.0",	"ick",	&mmchs1_ick,	CK_3XXX),
-
-The above changes are all
-
-Acked-by: Paul Walmsley <paul@pwsan.com>
-
-... but ...
-
-> diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
-> index 23e4d77..3e20b9c 100644
-> --- a/arch/arm/mach-omap2/devices.c
-> +++ b/arch/arm/mach-omap2/devices.c
-> @@ -26,6 +26,7 @@
->  #include <plat/mux.h>
->  #include <mach/gpio.h>
->  #include <plat/mmc.h>
-> +#include <plat/dma.h>
->  
->  #include "mux.h"
->  
-> @@ -453,7 +454,9 @@ static void omap_init_mcspi(void)
->  static inline void omap_init_mcspi(void) {}
->  #endif
->  
-> -#ifdef CONFIG_OMAP_SHA1_MD5
-> +#if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
-> +
-> +#ifdef CONFIG_ARCH_OMAP2
->  static struct resource sha1_md5_resources[] = {
->  	{
->  		.start	= OMAP24XX_SEC_SHA1MD5_BASE,
-> @@ -465,9 +468,28 @@ static struct resource sha1_md5_resources[] = {
->  		.flags	= IORESOURCE_IRQ,
->  	}
->  };
-> +#endif
-> +
-> +#ifdef CONFIG_ARCH_OMAP3
-> +static struct resource sha1_md5_resources[] = {
-> +	{
-> +		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
-> +		.end	= OMAP34XX_SEC_SHA1MD5_BASE + 0x64,
-> +		.flags	= IORESOURCE_MEM,
-> +	},
-> +	{
-> +		.start	= INT_34XX_SHA1MD52_IRQ,
-> +		.flags	= IORESOURCE_IRQ,
-> +	},
-> +	{
-> +		.start	= OMAP34XX_DMA_SHA1MD5_RX,
-> +		.flags	= IORESOURCE_DMA,
-> +	}
-> +};
-> +#endif
-
-The above will break multi-OMAP2 kernels.  Please change the above to make 
-the variable names unique on a per-SoC basis (e.g., 
-omap3_sha1_md5_resources) and modify the SHA1/MD5 device registration code 
-to use the appropriate struct resource array at runtime.  For an example, 
-see mach-omap2/devices.c:omap_init_mbox().
-
->  
->  static struct platform_device sha1_md5_device = {
-> -	.name		= "OMAP SHA1/MD5",
-> +	.name		= "omap-sham",
->  	.id		= -1,
->  	.num_resources	= ARRAY_SIZE(sha1_md5_resources),
->  	.resource	= sha1_md5_resources,
-> diff --git a/arch/arm/plat-omap/include/plat/omap34xx.h b/arch/arm/plat-omap/include/plat/omap34xx.h
-> index 2845fdc..98fc8b4 100644
-> --- a/arch/arm/plat-omap/include/plat/omap34xx.h
-> +++ b/arch/arm/plat-omap/include/plat/omap34xx.h
-> @@ -82,5 +82,10 @@
->  
->  #define OMAP34XX_MAILBOX_BASE		(L4_34XX_BASE + 0x94000)
->  
-> +/* Security */
-> +#define OMAP34XX_SEC_BASE	(L4_34XX_BASE + 0xA0000)
-> +#define OMAP34XX_SEC_SHA1MD5_BASE	(OMAP34XX_SEC_BASE + 0x23000)
-> +#define OMAP34XX_SEC_AES_BASE	(OMAP34XX_SEC_BASE + 0x25000)
-> +
->  #endif /* __ASM_ARCH_OMAP3_H */
->  
-> -- 
-> 1.6.3.3
+> Rusty can chime in on whether this is doable.
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-omap" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I think I have a good guess as to why this problem is occuring
+> for Brandon.  It is probably the result of two near-simultaneous
+> modprobes, one issued against libcrc32c and one against bnx2x.
 > 
+> So if Suse were doing some kind of parallel booting where multiple
+> modules may be loaded together then this could occur.
 
+It is actually due to two nearly simultaneous modprobes of bnx2x from
+udev since there are two devices:
 
-- Paul
+02:00.0 Ethernet controller [0200]: Broadcom Corporation NetXtreme II
+BCM5709 Gigabit Ethernet [14e4:1639] (rev 01)
+02:00.1 Ethernet controller [0200]: Broadcom Corporation NetXtreme II
+BCM5709 Gigabit Ethernet [14e4:1639] (rev 01)
+
+Output from my modprobe strace wrappers:
+
+Process 4589 (first to get to libcrc32c)
+------------
+
+4589  execve("/sbin/modprobe.bin", ["/sbin/modprobe.bin", "pci:v000014E4d00001639sv00001014"...], [/* 14 vars */]) = 0
+
+...
+
+4589  open("/lib/modules/2.6.32.9-debug/kernel/lib/libcrc32c.ko", O_RDONLY) = 3
+4589  stat("/sys/module", {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+4589  stat("/sys/module/libcrc32c", 0x7fff3d03bef0) = -1 ENOENT (No such file or directory)
+4589  read(3, "\177E", 2)               = 2
+4589  lseek(3, 0, SEEK_SET)             = 0
+4589  fstat(3, {st_mode=S_IFREG|0644, st_size=90482, ...}) = 0
+4589  mmap(NULL, 90482, PROT_READ|PROT_WRITE, MAP_PRIVATE, 3, 0) = 0x7f7963d49000
+4589  init_module(0x7f7963d49000, 90482, "") = 0
+4589  munmap(0x7f7963d49000, 90482)     = 0
+4589  close(3)                          = 0
+4589  open("/lib/modules/2.6.32.9-debug/kernel/drivers/net/bnx2.ko", O_RDONLY) = 3
+4589  stat("/sys/module", {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+4589  stat("/sys/module/bnx2", 0x7fff3d03bf90) = -1 ENOENT (No such file or directory)
+4589  read(3, "\177E", 2)               = 2
+4589  lseek(3, 0, SEEK_SET)             = 0
+4589  fstat(3, {st_mode=S_IFREG|0644, st_size=950325, ...}) = 0
+4589  mmap(NULL, 950325, PROT_READ|PROT_WRITE, MAP_PRIVATE, 3, 0) = 0x7f7963c4c000
+4589  init_module(0x7f7963c4c000, 950325, "") = 0
+
+Process 4590 (loses out on libcrc32c and gets stuck)
+------------
+
+4590  execve("/sbin/modprobe.bin", ["/sbin/modprobe.bin", "pci:v000014E4d00001639sv00001014"...], [/* 14 vars */]) = 0
+
+....
+
+4590  open("/lib/modules/2.6.32.9-debug/kernel/lib/libcrc32c.ko",O_RDONLY) = 3
+4590  stat("/sys/module", {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+4590  stat("/sys/module/libcrc32c", 0x7ffff52a0ef0) = -1 ENOENT (No such file or directory)
+4590  read(3, "\177E", 2)               = 2
+4590  lseek(3, 0, SEEK_SET)             = 0
+4590  fstat(3, {st_mode=S_IFREG|0644, st_size=90482, ...}) = 0
+4590  mmap(NULL, 90482, PROT_READ|PROT_WRITE, MAP_PRIVATE, 3, 0) = 0x7f1397a1b000
+4590  init_module(0x7f1397a1b000, 90482, "") = -1 EEXIST (File exists)
+4590  close(3)                          = 0
+4590  open("/lib/modules/2.6.32.9-debug/kernel/drivers/net/bnx2.ko", O_RDONLY) = 3
+4590  stat("/sys/module", {st_mode=S_IFDIR|0755, st_size=0, ...}) = 0
+4590  stat("/sys/module/bnx2", 0x7ffff52a0f90) = -1 ENOENT (No such file or directory)
+4590  read(3, "\177E", 2)               = 2
+4590  lseek(3, 0, SEEK_SET)             = 0
+4590  fstat(3, {st_mode=S_IFREG|0644, st_size=950325, ...}) = 0
+4590  mmap(NULL, 950325, PROT_READ|PROT_WRITE, MAP_PRIVATE, 3, 0) = 0x7f139791e000
+4590  init_module(0x7f139791e000, 950325, "") = -1 ENOENT (No such file or directory)
+4590  write(2, "FATAL: Error inserting bnx2 (/li"..., 145) = 145
+
+As you can see 4589 inserts libcrc32c and the other starts inserting
+bnx2 after seeing libcrc32c was loaded. Creating our situation. Phew,
+took me a bit to see what was really going on :)
+
+Side note: Intially I thought that modprobe was forking for each
+module dependency but that was incorrect after looking at the
+code. udev is forking off two modprobes almost at the same time for
+each bnx2x device alias when udevadm trigger is called during the boot
+sequence.
+
+FWIW, I don't think this is a SUSE thing as our udev is pretty lightly
+patched.
+
+Cheers,
+
+	Brandon
