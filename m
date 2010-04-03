@@ -1,101 +1,108 @@
 From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: [PATCH 7/7] net/ppp_mppe: convert from arc4 to arc4blk
-Date: Sat,  3 Apr 2010 09:49:29 +0200
-Message-ID: <1270280969-11357-8-git-send-email-sebastian@breakpoint.cc>
+Subject: [PATCH 4/7] net/wireless: switch lib80211_crypt_tkip from arc4 to arc4blk
+Date: Sat,  3 Apr 2010 09:49:26 +0200
+Message-ID: <1270280969-11357-5-git-send-email-sebastian@breakpoint.cc>
 References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc>
 Cc: linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	<linux-ppp@vger.kernel.org>
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-ppp-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:53101 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752379Ab0DCHtk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 3 Apr 2010 03:49:40 -0400
 In-Reply-To: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc>
-Sender: linux-ppp-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-ecb(arc4) is getting replaced by arc4 which is a blkcipher by itself
+ecb(arc4) is getting replaced by arc4 which is a blkcipher by itself. The
+required selects are now pulled in by LIB80211_CRYPT_TKIP instead of
+selecting it by every driver.
 
-Cc: <linux-ppp@vger.kernel.org>
 Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 ---
- drivers/net/Kconfig    |    3 +--
- drivers/net/ppp_mppe.c |   12 ++++++------
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ net/wireless/Kconfig               |    2 ++
+ net/wireless/lib80211_crypt_tkip.c |   11 +++++++----
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index dd9a09c..4b5dd86 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -3075,8 +3075,7 @@ config PPP_MPPE
-        depends on PPP && EXPERIMENTAL
-        select CRYPTO
-        select CRYPTO_SHA1
--       select CRYPTO_ARC4
--       select CRYPTO_ECB
-+       select CRYPTO_ARC4BLK
-        ---help---
-          Support for the MPPE Encryption protocol, as employed by the
- 	 Microsoft Point-to-Point Tunneling Protocol.
-diff --git a/drivers/net/ppp_mppe.c b/drivers/net/ppp_mppe.c
-index 6d1a1b8..4deaf70 100644
---- a/drivers/net/ppp_mppe.c
-+++ b/drivers/net/ppp_mppe.c
-@@ -42,7 +42,6 @@
-  *                    MOD_DEC_USAGE_COUNT/MOD_INC_USAGE_COUNT which are
-  *                    deprecated in 2.6
-  */
--
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
-@@ -55,6 +54,7 @@
- #include <linux/ppp_defs.h>
- #include <linux/ppp-comp.h>
- #include <linux/scatterlist.h>
+diff --git a/net/wireless/Kconfig b/net/wireless/Kconfig
+index 90e93a5..119f1eb 100644
+--- a/net/wireless/Kconfig
++++ b/net/wireless/Kconfig
+@@ -147,6 +147,8 @@ config LIB80211_CRYPT_CCMP
+ 	tristate
+ 
+ config LIB80211_CRYPT_TKIP
++	select CRYPTO
++	select CRYPTO_ARC4BLK
+ 	tristate
+ 
+ config LIB80211_DEBUG
+diff --git a/net/wireless/lib80211_crypt_tkip.c b/net/wireless/lib80211_crypt_tkip.c
+index c362873..089f84f 100644
+--- a/net/wireless/lib80211_crypt_tkip.c
++++ b/net/wireless/lib80211_crypt_tkip.c
+@@ -28,6 +28,7 @@
+ #include <net/iw_handler.h>
+ 
+ #include <linux/crypto.h>
 +#include <crypto/arc4.h>
+ #include <linux/crc32.h>
  
- #include "ppp_mppe.h"
+ #include <net/lib80211.h>
+@@ -94,7 +95,7 @@ static void *lib80211_tkip_init(int key_idx)
  
-@@ -162,11 +162,11 @@ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
- {
- 	struct scatterlist sg_in[1], sg_out[1];
- 	struct blkcipher_desc desc = { .tfm = state->arc4 };
-+	struct arc4_iv *iv = crypto_blkcipher_crt(state->arc4)->iv;
+ 	priv->key_idx = key_idx;
  
- 	get_new_key_from_sha(state);
- 	if (!initial_key) {
--		crypto_blkcipher_setkey(state->arc4, state->sha1_digest,
--					state->keylen);
-+		arc4_setup_iv(iv, state->sha1_digest, state->keylen);
- 		sg_init_table(sg_in, 1);
- 		sg_init_table(sg_out, 1);
- 		setup_sg(sg_in, state->sha1_digest, state->keylen);
-@@ -184,7 +184,7 @@ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
- 		state->session_key[1] = 0x26;
- 		state->session_key[2] = 0x9e;
+-	priv->tx_tfm_arc4 = crypto_alloc_blkcipher("ecb(arc4)", 0,
++	priv->tx_tfm_arc4 = crypto_alloc_blkcipher("arc4", 0,
+ 						CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(priv->tx_tfm_arc4)) {
+ 		printk(KERN_DEBUG "lib80211_crypt_tkip: could not allocate "
+@@ -112,7 +113,7 @@ static void *lib80211_tkip_init(int key_idx)
+ 		goto fail;
  	}
--	crypto_blkcipher_setkey(state->arc4, state->session_key, state->keylen);
-+	arc4_setup_iv(iv, state->session_key, state->keylen);
- }
  
- /*
-@@ -204,7 +204,7 @@ static void *mppe_alloc(unsigned char *options, int optlen)
- 		goto out;
- 
- 
--	state->arc4 = crypto_alloc_blkcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
-+	state->arc4 = crypto_alloc_blkcipher("arc4", 0, CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(state->arc4)) {
- 		state->arc4 = NULL;
- 		goto out_free;
-@@ -712,7 +712,7 @@ static struct compressor ppp_mppe = {
- static int __init ppp_mppe_init(void)
+-	priv->rx_tfm_arc4 = crypto_alloc_blkcipher("ecb(arc4)", 0,
++	priv->rx_tfm_arc4 = crypto_alloc_blkcipher("arc4", 0,
+ 						CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(priv->rx_tfm_arc4)) {
+ 		printk(KERN_DEBUG "lib80211_crypt_tkip: could not allocate "
+@@ -360,6 +361,7 @@ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
  {
- 	int answer;
--	if (!(crypto_has_blkcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC) &&
-+	if (!(crypto_has_blkcipher("arc4", 0, CRYPTO_ALG_ASYNC) &&
- 	      crypto_has_hash("sha1", 0, CRYPTO_ALG_ASYNC)))
- 		return -ENODEV;
+ 	struct lib80211_tkip_data *tkey = priv;
+ 	struct blkcipher_desc desc = { .tfm = tkey->tx_tfm_arc4 };
++	struct arc4_iv *iv = crypto_blkcipher_crt(tkey->tx_tfm_arc4)->iv;
+ 	int len;
+ 	u8 rc4key[16], *pos, *icv;
+ 	u32 crc;
+@@ -392,7 +394,7 @@ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ 	icv[2] = crc >> 16;
+ 	icv[3] = crc >> 24;
  
+-	crypto_blkcipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
++	arc4_setup_iv(iv, rc4key, 16);
+ 	sg_init_one(&sg, pos, len + 4);
+ 	return crypto_blkcipher_encrypt(&desc, &sg, &sg, len + 4);
+ }
+@@ -414,6 +416,7 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ {
+ 	struct lib80211_tkip_data *tkey = priv;
+ 	struct blkcipher_desc desc = { .tfm = tkey->rx_tfm_arc4 };
++	struct arc4_iv *iv = crypto_blkcipher_crt(tkey->rx_tfm_arc4)->iv;
+ 	u8 rc4key[16];
+ 	u8 keyidx, *pos;
+ 	u32 iv32;
+@@ -485,7 +488,7 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ 
+ 	plen = skb->len - hdr_len - 12;
+ 
+-	crypto_blkcipher_setkey(tkey->rx_tfm_arc4, rc4key, 16);
++	arc4_setup_iv(iv, rc4key, 16);
+ 	sg_init_one(&sg, pos, plen + 4);
+ 	if (crypto_blkcipher_decrypt(&desc, &sg, &sg, plen + 4)) {
+ 		if (net_ratelimit()) {
 -- 
 1.6.6
 
