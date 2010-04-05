@@ -1,34 +1,36 @@
-From: "John W. Linville" <linville-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>
-Subject: Re: [PATCH 4/7] net/wireless: switch lib80211_crypt_tkip from arc4
+From: "John W. Linville" <linville@tuxdriver.com>
+Subject: Re: [PATCH 5/7] net/wireless: switch lib80211_crypt_wep from arc4
 	to arc4blk
-Date: Mon, 5 Apr 2010 13:13:19 -0400
-Message-ID: <20100405171319.GA29596@tuxdriver.com>
-References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc> <1270280969-11357-5-git-send-email-sebastian@breakpoint.cc>
+Date: Mon, 5 Apr 2010 13:13:36 -0400
+Message-ID: <20100405171336.GB29596@tuxdriver.com>
+References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc> <1270280969-11357-6-git-send-email-sebastian@breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sebastian Andrzej Siewior <sebastian-E0PNVn5OA6ohrxcnuTQ+TQ@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:45727 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755289Ab0DERPJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 5 Apr 2010 13:15:09 -0400
 Content-Disposition: inline
-In-Reply-To: <1270280969-11357-5-git-send-email-sebastian-E0PNVn5OA6ohrxcnuTQ+TQ@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1270280969-11357-6-git-send-email-sebastian@breakpoint.cc>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Apr 03, 2010 at 09:49:26AM +0200, Sebastian Andrzej Siewior wrote:
+On Sat, Apr 03, 2010 at 09:49:27AM +0200, Sebastian Andrzej Siewior wrote:
 > ecb(arc4) is getting replaced by arc4 which is a blkcipher by itself. The
-> required selects are now pulled in by LIB80211_CRYPT_TKIP instead of
-> selecting it by every driver.
+> required selects are now pulled in by LIB80211_CRYPT_WEP instead of
+> selecting it by every driver. Since there is no dependency on ecb and arc4
+> therr are removed from the idividual driver.
 > 
-> Signed-off-by: Sebastian Andrzej Siewior <sebastian-E0PNVn5OA6ohrxcnuTQ+TQ@public.gmane.org>
+> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
 Fine by me...
 
 John
 -- 
 John W. Linville		Someday the world will need a hero, and you
-linville-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org			might be all we have.  Be ready.
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+linville@tuxdriver.com			might be all we have.  Be ready.
