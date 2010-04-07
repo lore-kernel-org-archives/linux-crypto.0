@@ -1,46 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: add blkcipher implementation of ARC4
-Date: Wed, 7 Apr 2010 17:25:01 +0800
-Message-ID: <20100407092501.GA29993@gondor.apana.org.au>
-References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc> <1270280969-11357-3-git-send-email-sebastian@breakpoint.cc> <20100405084209.GA16788@gondor.apana.org.au> <20100405170406.GA24215@Chamillionaire.breakpoint.cc> <20100406124412.GA24488@gondor.apana.org.au> <20100406203002.GA1842@Chamillionaire.breakpoint.cc> <20100407003109.GA27617@gondor.apana.org.au> <20100407082300.GB6619@Chamillionaire.breakpoint.cc>
+Subject: Re: [PATCH 3/7] crypto/testmgr: add testing for arc4 based on
+	ecb(arc4)
+Date: Wed, 7 Apr 2010 17:29:07 +0800
+Message-ID: <20100407092907.GB29993@gondor.apana.org.au>
+References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc> <1270280969-11357-4-git-send-email-sebastian@breakpoint.cc> <1270621793.31184.50.camel@mj>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Return-path: <linux-ppp-owner@vger.kernel.org>
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
+	linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org
+To: Pavel Roskin <proski@gnu.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:57348 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752963Ab0DGJ3V (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Apr 2010 05:29:21 -0400
 Content-Disposition: inline
-In-Reply-To: <20100407082300.GB6619@Chamillionaire.breakpoint.cc>
-Sender: linux-ppp-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1270621793.31184.50.camel@mj>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 07, 2010 at 10:23:00AM +0200, Sebastian Andrzej Siewior wrote:
+On Wed, Apr 07, 2010 at 02:29:53AM -0400, Pavel Roskin wrote:
 >
-> So arc4_setup_iv() should do what the internal arc4_ivsetup() does and
-> we change void to int and check the keysize in there right? The problem
-> here is that we are bounded to *this* implementation of the algorithm
-> and are not able to replace it with a different implementation. Not that
-> this is likely to happen for RC4 but it may be true for other stream
-> ciphers.
+> Can we avoid those special cases?  If the goal is "to make arc4
+> compliant with the crypto API", this looks like a step in a wrong
+> direction.
+> 
+> The same applies to many other changes in the series.
+> 
+> I do realize that the original arc4 is not a block cipher at all.
 
-By setting an IV we're already requiring the other implementations
-use the IV format used by our arc4.  So they would always work with
-this arc4_ivsetup anyway.
+I don't like this bit either.
 
-If and when we do have a piece of hardware that cannot do this
-(which I doubt would ever happen, considering how fast arc4 is
-already), then we can talk about changing this.
+Sebastian, how about precomputing the IV and provide them directly
+as a hex array?
 
-> >I'm pretty sure testmgr will call setkey even for keylen == 0, no?
-> Prior patch #3 it has no test case so it should not test it at all.
-> Patch #3 adds a flag in order to distinguish it. You want to look at
-> patch #3 now :)
+To test arc4_setup_iv itself, you can add an alg_test_arc4 function
+(like alg_test_crc32) that tests IV generation specifically.
 
-I see.
-
-But still we should at least not crash when crypto_blkcipher_setkey
-is called.  This might happen in future when we get a user-space
-API.
+Alternatively, just add an alg_test_arc4 that computes the IV
+before calling alg_test_skcipher.
 
 Cheers,
 -- 
