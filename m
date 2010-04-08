@@ -1,40 +1,185 @@
-From: Sebastian Andrzej Siewior <sebastian-E0PNVn5OA6ohrxcnuTQ+TQ@public.gmane.org>
-Subject: Re: [PATCH 3/7] crypto/testmgr: add testing for arc4 based on
- ecb(arc4)
-Date: Thu, 8 Apr 2010 09:58:10 +0200
-Message-ID: <20100408075810.GA9722@Chamillionaire.breakpoint.cc>
-References: <1270280969-11357-1-git-send-email-sebastian@breakpoint.cc>
- <1270280969-11357-4-git-send-email-sebastian@breakpoint.cc>
- <1270621793.31184.50.camel@mj>
- <20100407092907.GB29993@gondor.apana.org.au>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Re: [PATCHv2 1/2] crypto: updates omap sham device related platform
+ code
+Date: Thu, 08 Apr 2010 15:49:03 +0300
+Message-ID: <4BBDD0BF.6050307@nokia.com>
+References: <cover.1269524804.git.dmitry.kasatkin@nokia.com> <9e97cb8f5ee608a70bb9c04bc2c22f0d6b749d98.1269524804.git.dmitry.kasatkin@nokia.com> <alpine.DEB.2.00.1003300334110.14474@utopia.booyaka.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Cc: Pavel Roskin <proski-mXXj517/zsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20100407092907.GB29993-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "tony@atomide.com" <tony@atomide.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.hengli.com.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
+To: ext Paul Walmsley <paul@pwsan.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.00.1003300334110.14474@utopia.booyaka.com>
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Herbert Xu | 2010-04-07 17:29:07 [+0800]:
+Hi,
 
->Sebastian, how about precomputing the IV and provide them directly
->as a hex array?
+BTW..
+
+How will it work if those resource structures anyway conditionally 
+compiled for OMAP2 or 3 or 4?
+only one structure will be compiled at once.
+
+- Dmitry
+
+
+On 30/03/10 12:41, ext Paul Walmsley wrote:
+> Hi Dmitry,
 >
->To test arc4_setup_iv itself, you can add an alg_test_arc4 function
->(like alg_test_crc32) that tests IV generation specifically.
+> a few comments:
 >
->Alternatively, just add an alg_test_arc4 that computes the IV
->before calling alg_test_skcipher.
-
-I take a look at this.
-
->Cheers,
-
-Sebastian
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On Thu, 25 Mar 2010, Dmitry Kasatkin wrote:
+>
+>    
+>> - registration
+>> - clocks
+>>
+>> Signed-off-by: Dmitry Kasatkin<dmitry.kasatkin@nokia.com>
+>> ---
+>>   arch/arm/mach-omap2/clock2420_data.c       |    2 +-
+>>   arch/arm/mach-omap2/clock2430_data.c       |    2 +-
+>>   arch/arm/mach-omap2/clock3xxx_data.c       |    2 +-
+>>   arch/arm/mach-omap2/devices.c              |   26 ++++++++++++++++++++++++--
+>>   arch/arm/plat-omap/include/plat/omap34xx.h |    5 +++++
+>>   5 files changed, 32 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm/mach-omap2/clock2420_data.c b/arch/arm/mach-omap2/clock2420_data.c
+>> index d932b14..1820a55 100644
+>> --- a/arch/arm/mach-omap2/clock2420_data.c
+>> +++ b/arch/arm/mach-omap2/clock2420_data.c
+>> @@ -1836,7 +1836,7 @@ static struct omap_clk omap2420_clks[] = {
+>>   	CLK(NULL,	"vlynq_ick",	&vlynq_ick,	CK_242X),
+>>   	CLK(NULL,	"vlynq_fck",	&vlynq_fck,	CK_242X),
+>>   	CLK(NULL,	"des_ick",	&des_ick,	CK_242X),
+>> -	CLK(NULL,	"sha_ick",	&sha_ick,	CK_242X),
+>> +	CLK("omap-sham",	"ick",	&sha_ick,	CK_242X),
+>>   	CLK("omap_rng",	"ick",		&rng_ick,	CK_242X),
+>>   	CLK(NULL,	"aes_ick",	&aes_ick,	CK_242X),
+>>   	CLK(NULL,	"pka_ick",	&pka_ick,	CK_242X),
+>> diff --git a/arch/arm/mach-omap2/clock2430_data.c b/arch/arm/mach-omap2/clock2430_data.c
+>> index 0438b6e..5884ac6 100644
+>> --- a/arch/arm/mach-omap2/clock2430_data.c
+>> +++ b/arch/arm/mach-omap2/clock2430_data.c
+>> @@ -1924,7 +1924,7 @@ static struct omap_clk omap2430_clks[] = {
+>>   	CLK(NULL,	"sdma_ick",	&sdma_ick,	CK_243X),
+>>   	CLK(NULL,	"sdrc_ick",	&sdrc_ick,	CK_243X),
+>>   	CLK(NULL,	"des_ick",	&des_ick,	CK_243X),
+>> -	CLK(NULL,	"sha_ick",	&sha_ick,	CK_243X),
+>> +	CLK("omap-sham",	"ick",	&sha_ick,	CK_243X),
+>>   	CLK("omap_rng",	"ick",		&rng_ick,	CK_243X),
+>>   	CLK(NULL,	"aes_ick",	&aes_ick,	CK_243X),
+>>   	CLK(NULL,	"pka_ick",	&pka_ick,	CK_243X),
+>> diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
+>> index d5153b6..5a974dc 100644
+>> --- a/arch/arm/mach-omap2/clock3xxx_data.c
+>> +++ b/arch/arm/mach-omap2/clock3xxx_data.c
+>> @@ -3360,7 +3360,7 @@ static struct omap_clk omap3xxx_clks[] = {
+>>   	CLK("mmci-omap-hs.2",	"ick",	&mmchs3_ick,	CK_3430ES2 | CK_AM35XX),
+>>   	CLK(NULL,	"icr_ick",	&icr_ick,	CK_343X),
+>>   	CLK(NULL,	"aes2_ick",	&aes2_ick,	CK_343X),
+>> -	CLK(NULL,	"sha12_ick",	&sha12_ick,	CK_343X),
+>> +	CLK("omap-sham",	"ick",	&sha12_ick,	CK_343X),
+>>   	CLK(NULL,	"des2_ick",	&des2_ick,	CK_343X),
+>>   	CLK("mmci-omap-hs.1",	"ick",	&mmchs2_ick,	CK_3XXX),
+>>   	CLK("mmci-omap-hs.0",	"ick",	&mmchs1_ick,	CK_3XXX),
+>>      
+> The above changes are all
+>
+> Acked-by: Paul Walmsley<paul@pwsan.com>
+>
+> ... but ...
+>
+>    
+>> diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+>> index 23e4d77..3e20b9c 100644
+>> --- a/arch/arm/mach-omap2/devices.c
+>> +++ b/arch/arm/mach-omap2/devices.c
+>> @@ -26,6 +26,7 @@
+>>   #include<plat/mux.h>
+>>   #include<mach/gpio.h>
+>>   #include<plat/mmc.h>
+>> +#include<plat/dma.h>
+>>
+>>   #include "mux.h"
+>>
+>> @@ -453,7 +454,9 @@ static void omap_init_mcspi(void)
+>>   static inline void omap_init_mcspi(void) {}
+>>   #endif
+>>
+>> -#ifdef CONFIG_OMAP_SHA1_MD5
+>> +#if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
+>> +
+>> +#ifdef CONFIG_ARCH_OMAP2
+>>   static struct resource sha1_md5_resources[] = {
+>>   	{
+>>   		.start	= OMAP24XX_SEC_SHA1MD5_BASE,
+>> @@ -465,9 +468,28 @@ static struct resource sha1_md5_resources[] = {
+>>   		.flags	= IORESOURCE_IRQ,
+>>   	}
+>>   };
+>> +#endif
+>> +
+>> +#ifdef CONFIG_ARCH_OMAP3
+>> +static struct resource sha1_md5_resources[] = {
+>> +	{
+>> +		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
+>> +		.end	= OMAP34XX_SEC_SHA1MD5_BASE + 0x64,
+>> +		.flags	= IORESOURCE_MEM,
+>> +	},
+>> +	{
+>> +		.start	= INT_34XX_SHA1MD52_IRQ,
+>> +		.flags	= IORESOURCE_IRQ,
+>> +	},
+>> +	{
+>> +		.start	= OMAP34XX_DMA_SHA1MD5_RX,
+>> +		.flags	= IORESOURCE_DMA,
+>> +	}
+>> +};
+>> +#endif
+>>      
+> The above will break multi-OMAP2 kernels.  Please change the above to make
+> the variable names unique on a per-SoC basis (e.g.,
+> omap3_sha1_md5_resources) and modify the SHA1/MD5 device registration code
+> to use the appropriate struct resource array at runtime.  For an example,
+> see mach-omap2/devices.c:omap_init_mbox().
+>
+>    
+>>
+>>   static struct platform_device sha1_md5_device = {
+>> -	.name		= "OMAP SHA1/MD5",
+>> +	.name		= "omap-sham",
+>>   	.id		= -1,
+>>   	.num_resources	= ARRAY_SIZE(sha1_md5_resources),
+>>   	.resource	= sha1_md5_resources,
+>> diff --git a/arch/arm/plat-omap/include/plat/omap34xx.h b/arch/arm/plat-omap/include/plat/omap34xx.h
+>> index 2845fdc..98fc8b4 100644
+>> --- a/arch/arm/plat-omap/include/plat/omap34xx.h
+>> +++ b/arch/arm/plat-omap/include/plat/omap34xx.h
+>> @@ -82,5 +82,10 @@
+>>
+>>   #define OMAP34XX_MAILBOX_BASE		(L4_34XX_BASE + 0x94000)
+>>
+>> +/* Security */
+>> +#define OMAP34XX_SEC_BASE	(L4_34XX_BASE + 0xA0000)
+>> +#define OMAP34XX_SEC_SHA1MD5_BASE	(OMAP34XX_SEC_BASE + 0x23000)
+>> +#define OMAP34XX_SEC_AES_BASE	(OMAP34XX_SEC_BASE + 0x25000)
+>> +
+>>   #endif /* __ASM_ARCH_OMAP3_H */
+>>
+>> -- 
+>> 1.6.3.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-omap" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>      
+>
+> - Paul
+>    
