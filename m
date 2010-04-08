@@ -1,73 +1,71 @@
 From: Uri Simchoni <uri@jdland.co.il>
-Subject: [PATCHv2 6/10] crypto mv_cesa : Rename a variable to a more suitable
- name
-Date: Thu, 08 Apr 2010 19:29:16 +0300
-Message-ID: <4BBE045C.5000900@jdland.co.il>
+Subject: [PATCHv2 7/10] crypto mv_cesa : Execute some code via function pointers
+ rathr than direct calls
+Date: Thu, 08 Apr 2010 19:30:19 +0300
+Message-ID: <4BBE049B.7080905@jdland.co.il>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www011.intervision.co.il ([80.244.168.31]:36918 "EHLO
+Received: from www011.intervision.co.il ([80.244.168.31]:36937 "EHLO
 	www011.intervision.co.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754547Ab0DHQ3a (ORCPT
+	with ESMTP id S1758818Ab0DHQac (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Apr 2010 12:29:30 -0400
+	Thu, 8 Apr 2010 12:30:32 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rename a variable to a more suitable name
+Execute some code via function pointers rathr than direct calls
+(to allow customization in the hashing request)
 
 Signed-off-by: Uri Simchoni <uri@jdland.co.il>
 ---
-diff -upr linux-2.6.32.8_p5/drivers/crypto/mv_cesa.c linux-2.6.32.8_p6/drivers/crypto/mv_cesa.c
---- linux-2.6.32.8_p5/drivers/crypto/mv_cesa.c	2010-03-16 11:43:37.443646086 +0200
-+++ linux-2.6.32.8_p6/drivers/crypto/mv_cesa.c	2010-03-16 11:51:56.372211208 +0200
-@@ -42,7 +42,7 @@ enum engine_status {
-  * @hw_nbytes:		total bytes to process in hw for this request
-  * @sg_dst_left:	bytes left dst to process in this scatter list
-  * @dst_start:		offset to add to dst start position (scatter list)
-- * @total_req_bytes:	total number of bytes processed (request).
-+ * @hw_processed_bytes:	number of bytes processed by hw (request).
-  *
-  * sg helper are used to iterate over the scatterlist. Since the size of the
-  * SRAM may be less than the scatter size, this struct struct is used to keep
-@@ -60,7 +60,7 @@ struct req_progress {
- 	/* dst mostly */
- 	int sg_dst_left;
- 	int dst_start;
--	int total_req_bytes;
-+	int hw_processed_bytes;
- };
+diff -upr linux-2.6.32.8_p6/drivers/crypto/mv_cesa.c linux-2.6.32.8_p7/drivers/crypto/mv_cesa.c
+--- linux-2.6.32.8_p6/drivers/crypto/mv_cesa.c	2010-03-16 11:51:56.372211208 +0200
++++ linux-2.6.32.8_p7/drivers/crypto/mv_cesa.c	2010-03-16 12:07:31.147897717 +0200
+@@ -51,6 +51,8 @@ enum engine_status {
+ struct req_progress {
+ 	struct sg_mapping_iter src_sg_it;
+ 	struct sg_mapping_iter dst_sg_it;
++	void (*complete) (void);
++	void (*process) (int is_first);
  
- struct crypto_priv {
-@@ -181,7 +181,7 @@ static void setup_data_in(void)
- {
- 	struct req_progress *p = &cpg->p;
- 	p->crypt_len =
--	    min(p->hw_nbytes - p->total_req_bytes, cpg->max_req_size);
-+	    min(p->hw_nbytes - p->hw_processed_bytes, cpg->max_req_size);
- 	copy_src_to_buf(p, cpg->sram + SRAM_DATA_IN_START,
- 			p->crypt_len);
- }
-@@ -265,7 +265,7 @@ static void dequeue_complete_req(void)
- 	int need_copy_len = cpg->p.crypt_len;
- 	int sram_offset = 0;
+ 	/* src mostly */
+ 	int sg_src_left;
+@@ -251,6 +253,9 @@ static void mv_crypto_algo_completion(vo
+ 	struct ablkcipher_request *req = ablkcipher_request_cast(cpg->cur_req);
+ 	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
  
--	cpg->p.total_req_bytes += cpg->p.crypt_len;
-+	cpg->p.hw_processed_bytes += cpg->p.crypt_len;
- 	do {
- 		int dst_copy;
++	sg_miter_stop(&cpg->p.src_sg_it);
++	sg_miter_stop(&cpg->p.dst_sg_it);
++
+ 	if (req_ctx->op != COP_AES_CBC)
+ 		return ;
  
-@@ -291,7 +291,7 @@ static void dequeue_complete_req(void)
- 	} while (need_copy_len > 0);
- 
- 	BUG_ON(cpg->eng_st != ENGINE_W_DEQUEUE);
--	if (cpg->p.total_req_bytes < cpg->p.hw_nbytes) {
-+	if (cpg->p.hw_processed_bytes < cpg->p.hw_nbytes) {
+@@ -294,11 +299,9 @@ static void dequeue_complete_req(void)
+ 	if (cpg->p.hw_processed_bytes < cpg->p.hw_nbytes) {
  		/* process next scatter list entry */
  		cpg->eng_st = ENGINE_BUSY;
- 		mv_process_current_q(0);
+-		mv_process_current_q(0);
++		cpg->p.process(0);
+ 	} else {
+-		sg_miter_stop(&cpg->p.src_sg_it);
+-		sg_miter_stop(&cpg->p.dst_sg_it);
+-		mv_crypto_algo_completion();
++		cpg->p.complete();
+ 		cpg->eng_st = ENGINE_IDLE;
+ 		local_bh_disable();
+ 		req->complete(req, 0);
+@@ -331,6 +334,8 @@ static void mv_enqueue_new_req(struct ab
+ 	cpg->cur_req = &req->base;
+ 	memset(p, 0, sizeof(struct req_progress));
+ 	p->hw_nbytes = req->nbytes;
++	p->complete = mv_crypto_algo_completion;
++	p->process = mv_process_current_q;
+ 
+ 	num_sgs = count_sgs(req->src, req->nbytes);
+ 	sg_miter_start(&p->src_sg_it, req->src, num_sgs, SG_MITER_FROM_SG);
 
 
