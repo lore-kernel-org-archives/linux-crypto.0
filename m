@@ -1,31 +1,38 @@
 From: Uri Simchoni <uri@jdland.co.il>
-Subject: [PATCHv2 0/10] crypto mv_cesa : Add sha1 and hmac(sha1) support to
- the mv_cesa driver
-Date: Thu, 08 Apr 2010 19:25:15 +0300
-Message-ID: <4BBE036B.8010001@jdland.co.il>
+Subject: [PATCHv2 1/10] crypto mv_cesa : Invoke the user callback from a softirq
+ context
+Date: Thu, 08 Apr 2010 19:25:37 +0300
+Message-ID: <4BBE0381.6080002@jdland.co.il>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www011.intervision.co.il ([80.244.168.31]:36857 "EHLO
+Received: from www011.intervision.co.il ([80.244.168.31]:36862 "EHLO
 	www011.intervision.co.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932849Ab0DHQZe (ORCPT
+	with ESMTP id S932887Ab0DHQZu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Apr 2010 12:25:34 -0400
+	Thu, 8 Apr 2010 12:25:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a resubmission of a patchset I set a while ago, and that was corrupted by my email client.
+Invoke the user callback from a softirq context
 
-The following patchset adds async hashing (sha1 and hmac-sha1) to the mv_cesa crypto driver. This driver utilizes the Marvell CESA crypto accelerator that exists in some Marvell CPU's (Orion and Kirkwood). The existing driver has AES crypto support.
+Signed-off-by: Uri Simchoni <uri@jdland.co.il>
+---
+diff -upr linux-2.6.32.8_orig/drivers/crypto/mv_cesa.c linux-2.6.32.8_p1/drivers/crypto/mv_cesa.c
+--- linux-2.6.32.8_orig/drivers/crypto/mv_cesa.c	2010-02-09 14:57:19.000000000 +0200
++++ linux-2.6.32.8_p1/drivers/crypto/mv_cesa.c	2010-03-16 08:59:12.074583163 +0200
+@@ -275,7 +275,9 @@ static void dequeue_complete_req(void)
+ 		sg_miter_stop(&cpg->p.dst_sg_it);
+ 		mv_crypto_algo_completion();
+ 		cpg->eng_st = ENGINE_IDLE;
++		local_bh_disable();
+ 		req->base.complete(&req->base, 0);
++		local_bh_enable();
+ 	}
+ }
+ 
 
-Compared to SW hashing on a 1.2GHz Kirkwood, the HW acceleration is about 20% faster, but more importantly, at reduced CPU utilization.
 
-The patchset is divided as follows:
-- patches 1-4 are bug/warning fixes to the existing driver
-- patches 5-9 refactor the existing driver with no functional change to accommodate the added functionality
-- patch 10 adds the sha1 and hmac-sha1 support.
-
-The driver requires the sha1 and hmac sw drivers in order to handle some corner cases (i.e. it never falls back on a complete request but sometimes it hashes the last 64 bytes in sw)
