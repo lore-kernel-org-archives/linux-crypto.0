@@ -1,46 +1,31 @@
-From: Paul Walmsley <paul@pwsan.com>
-Subject: Re: [PATCHv2 1/2] crypto: updates omap sham device related platform
- code
-Date: Thu, 8 Apr 2010 07:11:47 -0600 (MDT)
-Message-ID: <alpine.DEB.2.00.1004080700300.14871@utopia.booyaka.com>
-References: <cover.1269524804.git.dmitry.kasatkin@nokia.com> <9e97cb8f5ee608a70bb9c04bc2c22f0d6b749d98.1269524804.git.dmitry.kasatkin@nokia.com> <alpine.DEB.2.00.1003300334110.14474@utopia.booyaka.com> <4BBDD0BF.6050307@nokia.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
+Date: Thu, 8 Apr 2010 22:04:21 +0800
+Message-ID: <20100408140421.GA25093@gondor.apana.org.au>
+References: <cover.1268830685.git.dmitry.kasatkin@nokia.com> <20100323113239.GA29837@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: "tony@atomide.com" <tony@atomide.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.hengli.com.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
 To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from utopia.booyaka.com ([72.9.107.138]:49319 "EHLO
-	utopia.booyaka.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758714Ab0DHNLs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Apr 2010 09:11:48 -0400
-In-Reply-To: <4BBDD0BF.6050307@nokia.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20100323113239.GA29837@gondor.apana.org.au>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 8 Apr 2010, Dmitry Kasatkin wrote:
-
-> Hi,
+On Tue, Mar 23, 2010 at 07:32:39PM +0800, Herbert Xu wrote:
+>
+> My only question is what's your plan with respect to HMAC? If
+> you're going to do it in hardware then it's fine as it is.
 > 
-> BTW..
-> 
-> How will it work if those resource structures anyway conditionally compiled
-> for OMAP2 or 3 or 4?
-> only one structure will be compiled at once.
+> Otherwise you need to implement export/import and we also need
+> to add ahash support to hmac.c.
 
-Hi Dmitry,
+Dmitry, did you answer this before or did it get lost in the mail :)
 
-it is possible to build a kernel that will run on both OMAP2 and OMAP3 
-(for example).  We call these kernels 'multi-OMAP' kernels.  In such a 
-case, there will be multiple CONFIG_ARCH_OMAP* symbols defined, so 
-multiple structure records will be included in the kernel image.  Also 
-when this happens, the 'cpu_is_omap*' macros will be defined to something 
-that is evaluated at kernel run-time, rather than compile-time (as would 
-be the case with single-OMAP kernels). So then the appropriate structure 
-can be passed at run-time to some device registration code.
-
-
-- Paul
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
