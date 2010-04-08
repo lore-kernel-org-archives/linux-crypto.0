@@ -1,51 +1,27 @@
-From: Bai Shuwei <baishuwei@gmail.com>
-Subject: where the tweak routine point to?
-Date: Fri, 9 Apr 2010 09:09:21 +0800
-Message-ID: <w2wf3566d61004081809k9eeff7e0h2099683ea276ad1e@mail.gmail.com>
-References: <p2hf3566d61004070411va4a69863l849564c576d80df1@mail.gmail.com>
+From: "Felix Wilson" <degoal1970@gmail.com>
+Subject: YOUR ATM CARD
+Date: Thu, 8 Apr 2010 23:17:56 +0600 (ALMT)
+Message-ID: <21031.41.194.53.238.1270747076.squirrel@mail.sam.kz>
+Reply-To: atmdebtcard1@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain;charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iw0-f197.google.com ([209.85.223.197]:61467 "EHLO
-	mail-iw0-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750717Ab0DIBJW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Apr 2010 21:09:22 -0400
-Received: by iwn35 with SMTP id 35so1858824iwn.21
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Apr 2010 18:09:22 -0700 (PDT)
-In-Reply-To: <p2hf3566d61004070411va4a69863l849564c576d80df1@mail.gmail.com>
+Received: from mail.sam.kz ([217.15.181.250]:38082 "EHLO mail.sam.kz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751836Ab0DJAK6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Apr 2010 20:10:58 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, All:
-  When i use the cryptsetup command to set the aes-xts-plain
-encryption, the system will entry the crypt() routine which defined in
-the xts.c file. I find the routine will call two important routines:
-tw and fn. I think the fn will point to the aes_encrypt/decrypt
-routine. But i want to know which routine the tw will point to for
-aes-xts-plain encryption? and where i can find its source code? I put
-the segment where the tw routine will be called in the bellow.
+I am directed to inform you that your payment verification and
+confirmations is OK.Your ATM Card Numbers is : 4001010257172299,Your
+Secret PIN Number is 8342. The ATM Card Value is $8.5M USD Only. Respond
+immediately with your full name as you want them on the card and your
+delivery
+address/Phone Number.
 
-       wsrc = w->src.virt.addr;
-       wdst = w->dst.virt.addr;
-
-       /* calculate first value of T */
-       tw(crypto_cipher_tfm(ctx->tweak), w->iv, w->iv);
-
-       goto first;
-
-       for (;;) {
-               do {
-
-
-Thanks all!
-
-Best Regards
-
-Bai Shuweiv
--- 
-Love other people, as same as love yourself!
-Don't think all the time, do it by your hands!
-
-E-Mail: baishuwei@gmail.com
+Congratulations once again
+Dr. Felix Wilson,
+Director ATM Unit
