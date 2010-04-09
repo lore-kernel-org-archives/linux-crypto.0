@@ -1,57 +1,51 @@
-From: <Dmitry.Kasatkin@nokia.com>
-Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Thu, 8 Apr 2010 18:35:33 +0200
-Message-ID: <1270744533.1666.9.camel@Nokia-N900>
-Reply-To: <Dmitry.Kasatkin@nokia.com>
+From: Bai Shuwei <baishuwei@gmail.com>
+Subject: where the tweak routine point to?
+Date: Fri, 9 Apr 2010 09:09:21 +0800
+Message-ID: <w2wf3566d61004081809k9eeff7e0h2099683ea276ad1e@mail.gmail.com>
+References: <p2hf3566d61004070411va4a69863l849564c576d80df1@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: <linux-crypto@vger.kernel.org>
-To: <herbert@gondor.hengli.com.au>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.230]:34897 "EHLO
-	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758686Ab0DHQla (ORCPT
+Received: from mail-iw0-f197.google.com ([209.85.223.197]:61467 "EHLO
+	mail-iw0-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750717Ab0DIBJW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Apr 2010 12:41:30 -0400
-Content-Language: en-US
+	Thu, 8 Apr 2010 21:09:22 -0400
+Received: by iwn35 with SMTP id 35so1858824iwn.21
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Apr 2010 18:09:22 -0700 (PDT)
+In-Reply-To: <p2hf3566d61004070411va4a69863l849564c576d80df1@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-LS0tLS0gT3JpZ2luYWwgbWVzc2FnZSAtLS0tLQ0KPiBIaToNCj4gDQo+IE9LIHNvIHlvdSBkaWQg
-YW5zd2VyIG15IHF1ZXN0aW9uIDopDQo+IA0KPiBEbWl0cnkgS2FzYXRraW4gPGRtaXRyeS5rYXNh
-dGtpbkBub2tpYS5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IEludGVyZXN0aW5nIGNhc2Ugd2l0aCBo
-bWFjLg0KPiA+IA0KPiA+IHJldHVybiBjcnlwdG9fc2hhc2hfaW5pdCgmZGVzYy5zaGFzaCkgPzoN
-Cj4gPiBjcnlwdG9fc2hhc2hfdXBkYXRlKCZkZXNjLnNoYXNoLCBpcGFkLCBicykgPzoNCj4gPiBj
-cnlwdG9fc2hhc2hfZXhwb3J0KCZkZXNjLnNoYXNoLCBpcGFkKSA/Og0KPiA+IGNyeXB0b19zaGFz
-aF9pbml0KCZkZXNjLnNoYXNoKSA/Og0KPiA+IGNyeXB0b19zaGFzaF91cGRhdGUoJmRlc2Muc2hh
-c2gsIG9wYWQsIGJzKSA/Og0KPiA+IGNyeXB0b19zaGFzaF9leHBvcnQoJmRlc2Muc2hhc2gsIG9w
-YWQpOw0KPiA+IA0KPiA+IEJhc2ljYWxseSBpdCBkb2VzIG5vdCBjYWxsIGZpbmFsLg0KPiA+IFRo
-ZW4gY2FsbCBpbml0IGFnYWluLg0KPiA+IA0KPiA+IGh3IGhhcyBjZXJ0YWluIGxpbWl0YXRpb24g
-dGhhdCBpdCByZXF1aXJlcyB0byBwcm9jZXNzIGxhc3QgYmxvY2sgd2l0aCANCj4gPiBzb21lIGJp
-dCBzZXQuDQo+ID4gV0hlbiB1cGRhdGUgaXMgY2FsbGVkIHRoZXJlIGlzIG5vIHBvc3NpYmlsaXR5
-IHRvIGtub3cgdGhhdCBubyBtb3JlIA0KPiA+IHVwZGF0ZSgpIHdpbGwgY29tZS4NCj4gPiBTbyBw
-b3NzaWJsZSBsYXN0IGJsb2NrIGlzIHN0b3JlZCBhbmQgdGhlbiBoYXNoZWQgb3V0IGZyb20gdGhl
-IGZpbmFsLg0KPiA+IA0KPiA+IEkgc2VlIHRoYXQgYWJvdmUgY29kZSB3aWxsIG5vdCB3b3JrIHdp
-dGggdGhlIGRyaXZlci4NCj4gPiBJIHdvbmRlciBob3cgaW50ZXJtZWRpYXRlIGV4cG9ydC9pbXBv
-cnQgY291bGQgYmUgZG9uZSB3aXRoIG9tYXAgaHcuDQo+ID4gDQo+ID4gQnV0IGlmIGl0J3Mgbm90
-IHBvc3NpYmxlLCB0aGVuIHdoeSBub3QgdG8gaGF2ZSBobWFjKHNoYTEpIGFzIGp1c3Qgc3cuDQo+
-ID4gQW55d2F5IGhtYWMgc2hvdWxkIG5vdCBwcm9jZXNzIGFzIGh1Z2UgYW1vdW50IG9mIGRhdGEg
-YXMgaGFzaCBpdHNlbGYuDQo+ID4gDQo+ID4gV2hhdCBpcyB5b3VyIG9waW5pb24vYWR2aWNlPw0K
-PiANCj4gQSBzaGExLW9ubHkgZHJpdmVyIGlzIG5vdCB2ZXJ5IHVzZWZ1bCBzaW5jZSB0aGUgYmln
-Z2VzdCBwb3RlbnRpYWwNCj4gdXNlciBJUHNlYyB1c2VzIGhtYWMoc2hhMSkuDQo+IA0KPiBJcyB0
-aGUgb21hcCBodyBkb2N1bWVudGF0aW9uIGF2YWlsYWJsZSBwdWJsaWNseT8NCj4gDQo+IFRoYW5r
-cywNCj4gLS0gDQo+IFZpc2l0IE9wZW5zd2FuIGF0IGh0dHA6Ly93d3cub3BlbnN3YW4ub3JnLw0K
-PiBFbWFpbDogSGVyYmVydCBYdSB+e1BtVj5ISX59IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcu
-YXU+DQo+IEhvbWUgUGFnZTogaHR0cDovL2dvbmRvci5hcGFuYS5vcmcuYXUvfmhlcmJlcnQvDQo+
-IFBHUCBLZXk6IGh0dHA6Ly9nb25kb3IuYXBhbmEub3JnLmF1L35oZXJiZXJ0L3B1YmtleS50eHQN
-Cj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
-c3Vic2NyaWJlIGxpbnV4LWNyeXB0byINCj4gaW4NCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRv
-IG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdMKgICBo
-dHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCj4gDQogDQpIaS4NCg0K
-U2hhMSBvbmx5IGlzIGFsc28gdmVyeSB1c2VmdWwuIFdlIGNhbGNsdWF0ZSBoYXNoZXMgb2YgYWxs
-IGJpbmFyaWVzIGZvciBpbnRlZ3JpdHkgdmVyaWZpY2F0aW9uLiBXZSBkbyBub3QgbmVlZCBobWFj
-IHRoZXJlLg0KDQpCdXQgaW4gZ2VuZXJhbCBpdCBpcyBwb3NzaWJsZSBkbyBhZGQgYWxnbyBobWFj
-KHNoYTEpIHRvIHRoZSBkcml2ZXIgYW5kIGltcGxlbWVudCBpdCBpbnRlcm5hbGx5IHdpdGhvdXQg
-aW1wb3J0L2V4cG9ydC4NCg0KSSBoYXZlIHRvIGNoZWNrIG9uIGRvY3VtZW50YXRpb24gcHVibGlj
-aXR5Lg0KDQpCciwNCkRtaXRyeQ0K
+Hi, All:
+  When i use the cryptsetup command to set the aes-xts-plain
+encryption, the system will entry the crypt() routine which defined in
+the xts.c file. I find the routine will call two important routines:
+tw and fn. I think the fn will point to the aes_encrypt/decrypt
+routine. But i want to know which routine the tw will point to for
+aes-xts-plain encryption? and where i can find its source code? I put
+the segment where the tw routine will be called in the bellow.
+
+       wsrc = w->src.virt.addr;
+       wdst = w->dst.virt.addr;
+
+       /* calculate first value of T */
+       tw(crypto_cipher_tfm(ctx->tweak), w->iv, w->iv);
+
+       goto first;
+
+       for (;;) {
+               do {
+
+
+Thanks all!
+
+Best Regards
+
+Bai Shuweiv
+-- 
+Love other people, as same as love yourself!
+Don't think all the time, do it by your hands!
+
+E-Mail: baishuwei@gmail.com
