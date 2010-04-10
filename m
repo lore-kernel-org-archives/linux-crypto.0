@@ -1,27 +1,48 @@
-From: "Felix Wilson" <degoal1970@gmail.com>
-Subject: YOUR ATM CARD
-Date: Thu, 8 Apr 2010 23:17:56 +0600 (ALMT)
-Message-ID: <21031.41.194.53.238.1270747076.squirrel@mail.sam.kz>
-Reply-To: atmdebtcard1@gmail.com
+From: Bai Shuwei <baishuwei@gmail.com>
+Subject: where does tw routine point to in xts.c?
+Date: Sat, 10 Apr 2010 11:20:45 +0800
+Message-ID: <j2sf3566d61004092020p21210b27u46b401073a8672e3@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;charset=UTF-8
-Content-Transfer-Encoding: 8bit
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.sam.kz ([217.15.181.250]:38082 "EHLO mail.sam.kz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751836Ab0DJAK6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Apr 2010 20:10:58 -0400
+Received: from mail-iw0-f197.google.com ([209.85.223.197]:41668 "EHLO
+	mail-iw0-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755440Ab0DJDUq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Apr 2010 23:20:46 -0400
+Received: by iwn35 with SMTP id 35so52126iwn.21
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Apr 2010 20:20:45 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I am directed to inform you that your payment verification and
-confirmations is OK.Your ATM Card Numbers is : 4001010257172299,Your
-Secret PIN Number is 8342. The ATM Card Value is $8.5M USD Only. Respond
-immediately with your full name as you want them on the card and your
-delivery
-address/Phone Number.
+Hi, All:
+  When i use the cryptsetup command to set the aes-xts-plain
+encryption, the system will entry the crypt() routine which defined in
+the xts.c file. I find the routine will call two important routines:
+tw and fn. I think the fn will point to the aes_encrypt/decrypt
+routine. But i want to know which routine the tw will point to for
+aes-xts-plain encryption? and where i can find its source code? I put
+the segment where the tw routine will be called in the bellow.
 
-Congratulations once again
-Dr. Felix Wilson,
-Director ATM Unit
+       wsrc = w->src.virt.addr;
+       wdst = w->dst.virt.addr;
+
+       /* calculate first value of T */
+       tw(crypto_cipher_tfm(ctx->tweak), w->iv, w->iv);
+
+       goto first;
+
+       for (;;) {
+               do {
+
+
+Thanks all!
+
+Best Regards
+
+-- 
+Love other people, as same as love yourself!
+Don't think all the time, do it by your hands!
+
+E-Mail: baishuwei@gmail.com
