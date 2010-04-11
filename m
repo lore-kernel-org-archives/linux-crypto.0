@@ -1,38 +1,43 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: cryptodev support
-Date: Sun, 11 Apr 2010 14:28:41 +0200
-Message-ID: <4BC1C079.5020909@gnutls.org>
-References: <4BA0CFFD.7080705@gnutls.org> <1268831320.2901.21.camel@ec>	 <4BA0DC7F.3010407@gnutls.org> <1268834378.2901.23.camel@ec>
+From: john terragon <terragonjohn@yahoo.com>
+Subject: aesni-intel slower than aes-x86_64
+Date: Sun, 11 Apr 2010 15:52:20 -0700 (PDT)
+Message-ID: <693236.82640.qm@web45101.mail.sp1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Emanuele Cesena <emanuele.cesena@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ew0-f220.google.com ([209.85.219.220]:55030 "EHLO
-	mail-ew0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751065Ab0DKM2o (ORCPT
+Received: from web45101.mail.sp1.yahoo.com ([68.180.197.49]:40210 "HELO
+	web45101.mail.sp1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1753155Ab0DKW7F (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 Apr 2010 08:28:44 -0400
-Received: by ewy20 with SMTP id 20so1672877ewy.1
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Apr 2010 05:28:43 -0700 (PDT)
-In-Reply-To: <1268834378.2901.23.camel@ec>
+	Sun, 11 Apr 2010 18:59:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Emanuele Cesena wrote:
-> On Wed, 2010-03-17 at 14:43 +0100, Nikos Mavrogiannopoulos wrote:
->> It is one way that
->> few other OS's support as well. For this reason it is the best from the
->> user-space developer point of view to have a single API across many OS'.
-> This is really good, in my opinion.
-> What the others think?
+Hi.
+My system has a core i5 520M and supports AES-NI. I wanted to do a
+rude performance test and so I ran these commands on a small (4GB) partition and on the dm-crypt device backed by it:
 
-Hello,
- For anyone interested in the /dev/crypto for linux I've setup a website
-and made a beta release of the cryptodev module. It can be found at:
-http://home.gna.org/cryptodev-linux/
+1) using the aesni-intel module: dd if=/dev/dev/mapper/vol of=/dev/null bs=4k
+2) using only the generic aes-x86_64 module: dd if=/dev/dev/mapper/vol
+of=/dev/null bs=4k
+3) dd if=/dev/sda4 of=/dev/null bs=4k 
+
+What I got kind of surprised me:
+1) ~ 67 MB/sec, with a low cpu load by kcryptd
+2) ~ 79 MB/sec, with a higher cpu load by kcryptd
+3) ~ 81 MB/sec
+
+So aesni-intel seems to be quite slower than the generic aes-x86_64 (although with a lower cpu load). 
+Is this to be expected? Am I missing something?
+
+The kernel is the "official" 2.6.32.something (AMD64) from debian sid.
+
+Thanks
+
+John
 
 
-regards,
-Nikos
+
+
+      
