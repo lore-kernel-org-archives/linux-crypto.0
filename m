@@ -1,48 +1,38 @@
-From: Bai Shuwei <baishuwei@gmail.com>
-Subject: where does tw routine point to in xts.c?
-Date: Sat, 10 Apr 2010 11:20:45 +0800
-Message-ID: <j2sf3566d61004092020p21210b27u46b401073a8672e3@mail.gmail.com>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: cryptodev support
+Date: Sun, 11 Apr 2010 14:28:41 +0200
+Message-ID: <4BC1C079.5020909@gnutls.org>
+References: <4BA0CFFD.7080705@gnutls.org> <1268831320.2901.21.camel@ec>	 <4BA0DC7F.3010407@gnutls.org> <1268834378.2901.23.camel@ec>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Emanuele Cesena <emanuele.cesena@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iw0-f197.google.com ([209.85.223.197]:41668 "EHLO
-	mail-iw0-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755440Ab0DJDUq (ORCPT
+Received: from mail-ew0-f220.google.com ([209.85.219.220]:55030 "EHLO
+	mail-ew0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751065Ab0DKM2o (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Apr 2010 23:20:46 -0400
-Received: by iwn35 with SMTP id 35so52126iwn.21
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Apr 2010 20:20:45 -0700 (PDT)
+	Sun, 11 Apr 2010 08:28:44 -0400
+Received: by ewy20 with SMTP id 20so1672877ewy.1
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Apr 2010 05:28:43 -0700 (PDT)
+In-Reply-To: <1268834378.2901.23.camel@ec>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, All:
-  When i use the cryptsetup command to set the aes-xts-plain
-encryption, the system will entry the crypt() routine which defined in
-the xts.c file. I find the routine will call two important routines:
-tw and fn. I think the fn will point to the aes_encrypt/decrypt
-routine. But i want to know which routine the tw will point to for
-aes-xts-plain encryption? and where i can find its source code? I put
-the segment where the tw routine will be called in the bellow.
+Emanuele Cesena wrote:
+> On Wed, 2010-03-17 at 14:43 +0100, Nikos Mavrogiannopoulos wrote:
+>> It is one way that
+>> few other OS's support as well. For this reason it is the best from the
+>> user-space developer point of view to have a single API across many OS'.
+> This is really good, in my opinion.
+> What the others think?
 
-       wsrc = w->src.virt.addr;
-       wdst = w->dst.virt.addr;
-
-       /* calculate first value of T */
-       tw(crypto_cipher_tfm(ctx->tweak), w->iv, w->iv);
-
-       goto first;
-
-       for (;;) {
-               do {
+Hello,
+ For anyone interested in the /dev/crypto for linux I've setup a website
+and made a beta release of the cryptodev module. It can be found at:
+http://home.gna.org/cryptodev-linux/
 
 
-Thanks all!
-
-Best Regards
-
--- 
-Love other people, as same as love yourself!
-Don't think all the time, do it by your hands!
-
-E-Mail: baishuwei@gmail.com
+regards,
+Nikos
