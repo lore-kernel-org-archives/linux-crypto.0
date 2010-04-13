@@ -1,48 +1,61 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Tue, 13 Apr 2010 20:02:43 +0800
-Message-ID: <20100413120243.GA10822@gondor.apana.org.au>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC443DB.1030602@nokia.com>
+Date: Tue, 13 Apr 2010 20:10:04 +0800
+Message-ID: <20100413121004.GB10822@gondor.apana.org.au>
+References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Uri Simchoni <uri@jdland.co.il>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:52071 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:48184 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750932Ab0DMMCw (ORCPT
+	with ESMTP id S1751567Ab0DMMKO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 08:02:52 -0400
+	Tue, 13 Apr 2010 08:10:14 -0400
 Content-Disposition: inline
-In-Reply-To: <4BC443DB.1030602@nokia.com>
+In-Reply-To: <4BC44446.2010405@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 13, 2010 at 01:13:47PM +0300, Dmitry Kasatkin wrote:
+On Tue, Apr 13, 2010 at 01:15:34PM +0300, Dmitry Kasatkin wrote:
 >
-> As I can see from the patch initial vectors calculated with SW shash
-> Rest is done in hw, basically sha1.
+> But anyway hmac does not support ahash now. right?
+> So the only way currently is to add to the driver.
 
-Ideally that code shouldn't be duplicated either, but honestly
-that doesn't matter when it comes to whether the hardware can
-do HMAC directly.
+No the only way is to add an ahash version of hmac.
 
-You only compute the IVs once for each key, so whether it's done
-in software or hardware doesn't matter.
+Anyway, the fact that you can't easily implement import/export
+is not just a question of supporting hmac.  It is in fact a sign
+that your driver breaks the crypto API.
 
-> The same can be done with omap driver.
-> Just in addition to finalize as done in hmac_final().
+The fundamental requirement for the ahash interface is that you
+must be able to launch multiple operations, which means that all
+state must be stored in the request and not held in hardware
+(except as a cache).
 
-If you do hmac_final in software, then this is no longer a hw
-HMAC implementation and we should instead implement an ahash
-version of hmac.
+IOW, you must be able to support
 
-The difference here is that ipad/opad is computed only once for
-a key, while final happens many times over the lifetime of that
-key.
+	crypto_ahash_update(&reqa);
 
-Cheers,
+	...
+
+	crypto_ahash_update(&reqb);
+
+	...
+
+	ahash_request_set_crypt(&reqa, ...);
+	crypto_ahash_finup(&reqa);
+
+	...
+
+	ahash_request_set_crypt(&reqb, ...);
+	crypto_ahash_finup(&reqb);
+
+AFAICS your driver cannot do this correctly in its current form.
+
+Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
