@@ -1,43 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Uri Simchoni <uri@jdland.co.il>
 Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Tue, 13 Apr 2010 22:48:43 +0800
-Message-ID: <20100413144843.GD12695@gondor.apana.org.au>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com> <20100413121004.GB10822@gondor.apana.org.au> <4BC47543.1020508@nokia.com>
+Date: Tue, 13 Apr 2010 18:16:49 +0300
+Message-ID: <4BC48AE1.4010103@jdland.co.il>
+References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC443DB.1030602@nokia.com> <20100413120243.GA10822@gondor.apana.org.au> <4BC46ADB.3000501@nokia.com> <20100413144527.GC12695@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Uri Simchoni <uri@jdland.co.il>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:52447 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751642Ab0DMOsx (ORCPT
+Received: from www011.intervision.co.il ([80.244.168.31]:35283 "EHLO
+	www011.intervision.co.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752157Ab0DMPRH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 10:48:53 -0400
-Content-Disposition: inline
-In-Reply-To: <4BC47543.1020508@nokia.com>
+	Tue, 13 Apr 2010 11:17:07 -0400
+In-Reply-To: <20100413144527.GC12695@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 13, 2010 at 04:44:35PM +0300, Dmitry Kasatkin wrote:
->
-> Well it can... if reqa occupied hw all other requests will fallback to  
-> sw sha1.
+Doing step 3 using sw is probably faster than by hw (because it's short=
+ and avoid all the hw setup), so the suggested approach is probably fas=
+ter than generic async hmac.
 
-That is unacceptable.  If we had a user-space API that would
-mean a single request can tie up the hardware indefinitely.
+On 4/13/2010 5:45 PM, Herbert Xu wrote:
+> On Tue, Apr 13, 2010 at 04:00:11PM +0300, Dmitry Kasatkin wrote:
+>>
+>> I would also:
+>> 1. calc hash(opad) using sw, export
+>> 2. hash(ipad =E2=88=A5 message) using hw
+>> 3. then import and finup hash from step 1 with results of step 2 (us=
+ing sw)
+>=20
+> Step 3 is the problem.  If you perform step 3 in software then
+> there is no point in exporting a hmac(sha1) object.
+>=20
+> We should instead add ahash support to hmac and use that.
+>=20
+> Cheers,
 
-If your hardware is not able to produce a non-finalised hash,
-then you should only do finup/final in hardware, and use a software
-fallback to implement the rest.
-
-If your hardware is also not able to accept an initial state,
-then the only thing you can implement is digest.  The rest would
-have to fall back to software.
-
-Cheers,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
