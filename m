@@ -1,75 +1,92 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Tue, 13 Apr 2010 16:00:11 +0300
-Message-ID: <4BC46ADB.3000501@nokia.com>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC443DB.1030602@nokia.com> <20100413120243.GA10822@gondor.apana.org.au>
+Date: Tue, 13 Apr 2010 16:44:35 +0300
+Message-ID: <4BC47543.1020508@nokia.com>
+References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com> <20100413121004.GB10822@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: Uri Simchoni <uri@jdland.co.il>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: ext Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.233]:41726 "EHLO
+Received: from smtp.nokia.com ([192.100.122.233]:45936 "EHLO
 	mgw-mx06.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750776Ab0DMNAv (ORCPT
+	with ESMTP id S1751356Ab0DMNuy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 09:00:51 -0400
-In-Reply-To: <20100413120243.GA10822@gondor.apana.org.au>
+	Tue, 13 Apr 2010 09:50:54 -0400
+Received: from esebh105.NOE.Nokia.com (esebh105.ntc.nokia.com [172.21.138.211])
+	by mgw-mx06.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o3DDclSV009178
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Apr 2010 16:50:51 +0300
+In-Reply-To: <20100413121004.GB10822@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 13/04/10 15:02, ext Herbert Xu wrote:
-> On Tue, Apr 13, 2010 at 01:13:47PM +0300, Dmitry Kasatkin wrote:
->   =20
->> As I can see from the patch initial vectors calculated with SW shash
->> Rest is done in hw, basically sha1.
->>     =20
-> Ideally that code shouldn't be duplicated either, but honestly
-> that doesn't matter when it comes to whether the hardware can
-> do HMAC directly.
+Please see inline. Nice to clarify it.
+
+On 13/04/10 15:10, ext Herbert Xu wrote:
+> On Tue, Apr 13, 2010 at 01:15:34PM +0300, Dmitry Kasatkin wrote:
+>    
+>> But anyway hmac does not support ahash now. right?
+>> So the only way currently is to add to the driver.
+>>      
+> No the only way is to add an ahash version of hmac.
 >
-> You only compute the IVs once for each key, so whether it's done
-> in software or hardware doesn't matter.
+> Anyway, the fact that you can't easily implement import/export
+> is not just a question of supporting hmac.  It is in fact a sign
+> that your driver breaks the crypto API.
 >
->   =20
->> The same can be done with omap driver.
->> Just in addition to finalize as done in hmac_final().
->>     =20
-> If you do hmac_final in software, then this is no longer a hw
-> HMAC implementation and we should instead implement an ahash
-> version of hmac.
+> The fundamental requirement for the ahash interface is that you
+> must be able to launch multiple operations, which means that all
+> state must be stored in the request and not held in hardware
+> (except as a cache).
 >
-> The difference here is that ipad/opad is computed only once for
-> a key, while final happens many times over the lifetime of that
-> key.
+> IOW, you must be able to support
 >
->   =20
-I do not see your point.
-As stated by Uri Simchoni, hw hmac(sha1) in mv_cesa case requires sw=20
-sha1 driver.
-Initial vectors are calculated per key by sw.
-So it is no longer hw HMAC implementation.
+> 	crypto_ahash_update(&reqa);
+>
+> 	...
+>
+> 	crypto_ahash_update(&reqb);
+>
+> 	...
+>
+> 	ahash_request_set_crypt(&reqa, ...);
+> 	crypto_ahash_finup(&reqa);
+>
+> 	...
+>
+> 	ahash_request_set_crypt(&reqb, ...);
+> 	crypto_ahash_finup(&reqb);
+>
+> AFAICS your driver cannot do this correctly in its current form.
+>
+>    
+Well it can... if reqa occupied hw all other requests will fallback to 
+sw sha1.
 
-I just want to understand what make it defferent from mv_cesa if in=20
-omap-sham case
+But if to do only hw and to follow above algorithm then it is necessary 
+to remove shash support completely from the driver.
+And have a queue as I have with aes driver..
+err = ablkcipher_enqueue_request(&dd->queue, req);
 
-hash(opad =E2=88=A5 hash(ipad =E2=88=A5 message))
+I see there is ahash_enqueue_request() which is in 
+crypto/internal/hash.h and NEVER called.
 
-I would also:
-1. calc hash(opad) using sw, export
-2. hash(ipad =E2=88=A5 message) using hw
-3. then import and finup hash from step 1 with results of step 2 (using=
- sw)
+Also in one of your earlier emails you said that it is not possible to 
+call crypto_ahash_update() before completion.
+But with having a queue it does not really matter.
+Possible to queue several update request from the same tfm.
 
-What makes it different from mc_cesa case?
+The only need to wait_for_completion is to export/get results...
+
+Can you confirm my understanding?
+
+Thanks
 
 
-> Cheers,
->   =20
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Well. not like that.
+
+> Thanks,
+>    
