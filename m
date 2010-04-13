@@ -1,39 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv2 0/10] crypto mv_cesa : Add sha1 and hmac(sha1)
-	support to the mv_cesa driver
-Date: Tue, 13 Apr 2010 16:54:27 +0800
-Message-ID: <20100413085427.GA8888@gondor.apana.org.au>
-References: <4BBE036B.8010001@jdland.co.il>
+Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
+Date: Tue, 13 Apr 2010 16:59:21 +0800
+Message-ID: <20100413085921.GA8988@gondor.apana.org.au>
+References: <1270744533.1666.9.camel@Nokia-N900>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Uri Simchoni <uri@jdland.co.il>
+To: Dmitry.Kasatkin@nokia.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:32984 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:36105 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752567Ab0DMIyc (ORCPT
+	with ESMTP id S1751848Ab0DMI7Y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 04:54:32 -0400
+	Tue, 13 Apr 2010 04:59:24 -0400
 Content-Disposition: inline
-In-Reply-To: <4BBE036B.8010001@jdland.co.il>
+In-Reply-To: <1270744533.1666.9.camel@Nokia-N900>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 08, 2010 at 07:25:15PM +0300, Uri Simchoni wrote:
-> This is a resubmission of a patchset I set a while ago, and that was corrupted by my email client.
+On Thu, Apr 08, 2010 at 06:35:33PM +0200, Dmitry.Kasatkin@nokia.com wrote:
 > 
-> The following patchset adds async hashing (sha1 and hmac-sha1) to the mv_cesa crypto driver. This driver utilizes the Marvell CESA crypto accelerator that exists in some Marvell CPU's (Orion and Kirkwood). The existing driver has AES crypto support.
-> 
-> Compared to SW hashing on a 1.2GHz Kirkwood, the HW acceleration is about 20% faster, but more importantly, at reduced CPU utilization.
-> 
-> The patchset is divided as follows:
-> - patches 1-4 are bug/warning fixes to the existing driver
-> - patches 5-9 refactor the existing driver with no functional change to accommodate the added functionality
-> - patch 10 adds the sha1 and hmac-sha1 support.
-> 
-> The driver requires the sha1 and hmac sw drivers in order to handle some corner cases (i.e. it never falls back on a complete request but sometimes it hashes the last 64 bytes in sw)
+> Sha1 only is also very useful. We calcluate hashes of all binaries for integrity verification. We do not need hmac there.
 
-All applied to cryptodev.  Thanks a lot!
+But do we do that in the Linux kernel?
+
+Of course it would be useful if we had a user-space API, but
+that is still on the TODO list.
+
+> But in general it is possible do add algo hmac(sha1) to the driver and implement it internally without import/export.
+
+No we don't want to add hmac to every single driver that does
+sha1.  So this would not be a good precedent.  In any case,
+some form of import/export must be possible (maybe not in our
+current format) because our API requires the ability to perform
+a partial update and postpone the finalisation indefinitely.
+
+If you couldn't import/export, that would imply that the hardware
+must have infinite memory.
+
+> I have to check on documentation publicity.
+
+Thanks!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
