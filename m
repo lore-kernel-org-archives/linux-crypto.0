@@ -1,61 +1,43 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Tue, 13 Apr 2010 18:48:42 +0300
-Message-ID: <4BC4925A.4010109@nokia.com>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com> <20100413121004.GB10822@gondor.apana.org.au> <4BC47543.1020508@nokia.com> <20100413144843.GD12695@gondor.apana.org.au>
+Date: Wed, 14 Apr 2010 08:44:53 +0800
+Message-ID: <20100414004453.GA18044@gondor.apana.org.au>
+References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC443DB.1030602@nokia.com> <20100413120243.GA10822@gondor.apana.org.au> <4BC46ADB.3000501@nokia.com> <20100413144527.GC12695@gondor.apana.org.au> <4BC48AE1.4010103@jdland.co.il> <4BC48C08.7040608@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Uri Simchoni <uri@jdland.co.il>,
+Content-Type: text/plain; charset=us-ascii
+Cc: ext Uri Simchoni <uri@jdland.co.il>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: ext Herbert Xu <herbert@gondor.hengli.com.au>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.233]:56367 "EHLO
-	mgw-mx06.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752863Ab0DMPs5 (ORCPT
+Received: from ringil.hengli.com.au ([216.59.3.182]:44087 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751883Ab0DNApF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 11:48:57 -0400
-In-Reply-To: <20100413144843.GD12695@gondor.apana.org.au>
+	Tue, 13 Apr 2010 20:45:05 -0400
+Content-Disposition: inline
+In-Reply-To: <4BC48C08.7040608@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-About import/export.
-
-The problem with HW is that it always handles 64 byte blocks except last 
-one.
-So until finup/final it is not known if it is the last data. So some 
-buffer is kept in context.
-
-With DMA it is very inefficient to have small buffer.
-I use page 4k for that.
-So after a certain update there is a data in the cache.
-
-Doing export means that we need to get out intermediate hash and that 
-buffer.
-
-Any suggestion?
-
-Thanks
-
-
-On 13/04/10 17:48, ext Herbert Xu wrote:
-> On Tue, Apr 13, 2010 at 04:44:35PM +0300, Dmitry Kasatkin wrote:
->    
->> Well it can... if reqa occupied hw all other requests will fallback to
->> sw sha1.
->>      
-> That is unacceptable.  If we had a user-space API that would
-> mean a single request can tie up the hardware indefinitely.
+On Tue, Apr 13, 2010 at 06:21:44PM +0300, Dmitry Kasatkin wrote:
 >
-> If your hardware is not able to produce a non-finalised hash,
-> then you should only do finup/final in hardware, and use a software
-> fallback to implement the rest.
 >
->    
-> If your hardware is also not able to accept an initial state,
-> then the only thing you can implement is digest.  The rest would
-> have to fall back to software.
->
-> Cheers,
->    
+> On 13/04/10 18:16, ext Uri Simchoni wrote:
+>> Doing step 3 using sw is probably faster than by hw (because it's short and avoid all the hw setup), so the suggested approach is probably faster than generic async hmac.
+>>
+>>    
+> Yes. that is exactly what happens in hw - it is much slower.
+> And I do not see any problems as well with finishing it with sw.
+
+I never said that you can't do it in software.  I just don't
+want every driver to write its own copy of hmac in software.
+
+If you're going to do it in software, then let's make an ahash
+version of hmac.
+
+Cheers,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
