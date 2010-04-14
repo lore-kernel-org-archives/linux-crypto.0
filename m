@@ -1,48 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Wed, 14 Apr 2010 08:50:02 +0800
-Message-ID: <20100414005001.GC18044@gondor.apana.org.au>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com> <20100413121004.GB10822@gondor.apana.org.au> <4BC47543.1020508@nokia.com> <20100413144843.GD12695@gondor.apana.org.au> <4BC4925A.4010109@nokia.com>
+Subject: Re: [PATCHv3 2/2] crypto: omap-sham - omap sha1 & md5 driver
+Date: Wed, 14 Apr 2010 14:20:52 +0800
+Message-ID: <20100414062052.GA20395@gondor.apana.org.au>
+References: <a5a7f43a44753854ac0e9bc7dceb95bde31c2bb0.1271145726.git.dmitry.kasatkin@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Uri Simchoni <uri@jdland.co.il>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc: tony@atomide.com, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org
 To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:44271 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:38419 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752071Ab0DNAuM (ORCPT
+	with ESMTP id S1753469Ab0DNGU6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 20:50:12 -0400
+	Wed, 14 Apr 2010 02:20:58 -0400
 Content-Disposition: inline
-In-Reply-To: <4BC4925A.4010109@nokia.com>
+In-Reply-To: <a5a7f43a44753854ac0e9bc7dceb95bde31c2bb0.1271145726.git.dmitry.kasatkin@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 13, 2010 at 06:48:42PM +0300, Dmitry Kasatkin wrote:
->
-> About import/export.
->
-> The problem with HW is that it always handles 64 byte blocks except last  
-> one.
-> So until finup/final it is not known if it is the last data. So some  
-> buffer is kept in context.
->
-> With DMA it is very inefficient to have small buffer.
-> I use page 4k for that.
-> So after a certain update there is a data in the cache.
->
-> Doing export means that we need to get out intermediate hash and that  
-> buffer.
->
-> Any suggestion?
+Dmitry Kasatkin <dmitry.kasatkin@nokia.com> wrote:
+> Earlier kernel contained omap sha1 and md5 driver, which was not maintained,
+> was not ported to new crypto APIs and removed from the source tree.
+> 
+> - implements async and sync crypto API using dma and cpu.
+> - supports multiple sham instances if available
+> 
+> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 
-There is no need to buffer extra data in the driver.  If we need
-to do that that should be done in the upper layer.
+You have not addressed my objections raised earlier.
 
-So my suggestion would be to feed everything you get in update to
-the hardware immediately, unless of course if it's less than a
-single block.
+Also, why are you exporting a shash object? You cannot sleep during
+shash operations (except for setkey).
 
 Cheers,
 -- 
