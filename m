@@ -1,39 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/2] crypto: omap-sha1-md5: OMAP3 SHA1 & MD5 driver
-Date: Wed, 14 Apr 2010 08:44:53 +0800
-Message-ID: <20100414004453.GA18044@gondor.apana.org.au>
-References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC443DB.1030602@nokia.com> <20100413120243.GA10822@gondor.apana.org.au> <4BC46ADB.3000501@nokia.com> <20100413144527.GC12695@gondor.apana.org.au> <4BC48AE1.4010103@jdland.co.il> <4BC48C08.7040608@nokia.com>
+Date: Wed, 14 Apr 2010 08:47:14 +0800
+Message-ID: <20100414004714.GB18044@gondor.apana.org.au>
+References: <1270744533.1666.9.camel@Nokia-N900> <20100413085921.GA8988@gondor.apana.org.au> <4BC43BEB.90901@nokia.com> <20100413100308.GA9600@gondor.apana.org.au> <4BC44446.2010405@nokia.com> <20100413121004.GB10822@gondor.apana.org.au> <4BC47543.1020508@nokia.com> <4BC48178.4020104@nokia.com> <20100413144250.GB12695@gondor.apana.org.au> <4BC48EE7.5000306@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ext Uri Simchoni <uri@jdland.co.il>,
+Cc: Uri Simchoni <uri@jdland.co.il>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:44087 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:44092 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751883Ab0DNApF (ORCPT
+	with ESMTP id S1752071Ab0DNArX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Apr 2010 20:45:05 -0400
+	Tue, 13 Apr 2010 20:47:23 -0400
 Content-Disposition: inline
-In-Reply-To: <4BC48C08.7040608@nokia.com>
+In-Reply-To: <4BC48EE7.5000306@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 13, 2010 at 06:21:44PM +0300, Dmitry Kasatkin wrote:
+On Tue, Apr 13, 2010 at 06:33:59PM +0300, Dmitry Kasatkin wrote:
 >
->
-> On 13/04/10 18:16, ext Uri Simchoni wrote:
->> Doing step 3 using sw is probably faster than by hw (because it's short and avoid all the hw setup), so the suggested approach is probably faster than generic async hmac.
->>
->>    
-> Yes. that is exactly what happens in hw - it is much slower.
-> And I do not see any problems as well with finishing it with sw.
+> Then state must be kept in req ctx, not tfm ctx.
+> Right?
 
-I never said that you can't do it in software.  I just don't
-want every driver to write its own copy of hmac in software.
+Correct, the same thing applies to both shash and ahash.
 
-If you're going to do it in software, then let's make an ahash
-version of hmac.
+> Then when handling different request HW must be re-initialized.
+> If handling the same request then no need to reinitialize.
+
+Yes, you're allowed to cache state in the HW so that two requests
+in a row that use the same state can avoid reinitialisation.
+
+> Also not possible to call update(reqa) until previous completed.
+> Otherwise it will mess up data in reqa.
+
+That is up to the user to enforce.  You just need to ensure that
+the hardware remains in a sane state even if the user screws up.
 
 Cheers,
 -- 
