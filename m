@@ -1,26 +1,48 @@
-From: "Chadwick eng" <jenifferknowles@81-208-25-124.ip.fastwebnet.it>
-Subject: business mail list
-Date: Mon, 26 Apr 2010 22:31:41 -0400
-Message-ID: <1272335389101531789@mailserver>
-Reply-To: jenifferknowles@81-208-25-124.ip.fastwebnet.it
-To: linux-crypto@vger.kernel.org, morgan@morganstrebler.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 2.6.34
+Date: Tue, 27 Apr 2010 21:55:47 +0800
+Message-ID: <20100427135547.GA4008@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 81-208-25-124.ip.fastwebnet.it ([81.208.25.124]:55841 "EHLO
-	mailserver.cidimi.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753363Ab0D0Cbl (ORCPT
+Received: from ringil.hengli.com.au ([216.59.3.182]:37233 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753416Ab0D0Nz4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 Apr 2010 22:31:41 -0400
+	Tue, 27 Apr 2010 09:55:56 -0400
+Content-Disposition: inline
+In-Reply-To: <20100305071043.GA3548@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I have many good quality American Contact Lists at much lower prices than most sites. Contact me here:  successtools@gmx.com for a complete catalogue of what we have.
+Hi Linus:
 
-Best Regards
+This push fixes an IPsec crash when an async hash driver is used.
 
 
-Alice Daniel
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (1):
+      crypto: authenc - Add EINPROGRESS check
+
+ crypto/authenc.c |   16 +++++++++++-----
+ 1 files changed, 11 insertions(+), 5 deletions(-)
  
-  
-
-
-to stop this email in future email us at 
+Thanks,
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
