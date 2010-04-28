@@ -1,48 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.34
-Date: Tue, 27 Apr 2010 21:55:47 +0800
-Message-ID: <20100427135547.GA4008@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au>
+From: Dan Carpenter <error27@gmail.com>
+Subject: [patch] crypto: cleanup: remove unneeded null check
+Date: Wed, 28 Apr 2010 10:55:15 +0200
+Message-ID: <20100428085515.GE29093@bicker>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Brad Bosch <bradbosch@comcast.net>,
+	Richard Hartmann <richih.mailinglist@gmail.com>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:37233 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753416Ab0D0Nz4 (ORCPT
+Received: from mail-ew0-f220.google.com ([209.85.219.220]:37020 "EHLO
+	mail-ew0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752485Ab0D1Izg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Apr 2010 09:55:56 -0400
+	Wed, 28 Apr 2010 04:55:36 -0400
 Content-Disposition: inline
-In-Reply-To: <20100305071043.GA3548@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+We don't check "frontend" consistently in crypto_init_spawn2().  We
+check it at the start of the function but then we dereference it 
+unconditionally in the parameter list when we call crypto_init_spawn().
 
-This push fixes an IPsec crash when an async hash driver is used.
+I looked at the places that call crypto_init_spawn2() and "frontend" is
+always a valid pointer so I removed the check for null.
 
+Signed-off-by: Dan Carpenter <error27@gmail.com>
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (1):
-      crypto: authenc - Add EINPROGRESS check
-
- crypto/authenc.c |   16 +++++++++++-----
- 1 files changed, 11 insertions(+), 5 deletions(-)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 76fae27..c3cf1a6 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -544,7 +544,7 @@ int crypto_init_spawn2(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ {
+ 	int err = -EINVAL;
  
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-	if (frontend && (alg->cra_flags ^ frontend->type) & frontend->maskset)
++	if ((alg->cra_flags ^ frontend->type) & frontend->maskset)
+ 		goto out;
+ 
+ 	spawn->frontend = frontend;
