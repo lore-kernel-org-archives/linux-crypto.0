@@ -1,161 +1,180 @@
-From: lee.nipper@gmail.com
-Subject: [PATCH 2/3] crypto: talitos - second prepare step for adding ahash algorithms
-Date: Wed, 28 Apr 2010 05:33:54 -0700 (PDT)
-Message-ID: <4bd82b32.0e0bca0a.3ac0.ffffa3a9@mx.google.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:53033 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752486Ab0D1Mdz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Apr 2010 08:33:55 -0400
-Received: by gyg13 with SMTP id 13so7220499gyg.19
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Apr 2010 05:33:54 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: [PATCH 1/2] crypto: updates omap sham device related platform code
+Date: Wed, 28 Apr 2010 17:18:06 +0300
+Message-ID: <23d006d3ff783db3a57baa9d3895ebb5ee51d1ac.1272464135.git.dmitry.kasatkin@nokia.com>
+References: <cover.1272464135.git.dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: herbert@gondor.hengli.com.au
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <cover.1272464135.git.dmitry.kasatkin@nokia.com>
+In-Reply-To: <cover.1272464135.git.dmitry.kasatkin@nokia.com>
+References: <cover.1272464135.git.dmitry.kasatkin@nokia.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Used talitos_alg_template in talitos_crypto_alg
-so that it will accommodate ahash algorithms.
-Added some preparation code for ahash allocation and removal.
-No actual algorithms yet.
+- registration with multi OMAP kernels support
+- clocks
 
-Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
- drivers/crypto/talitos.c |   55 ++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 43 insertions(+), 12 deletions(-)
+ arch/arm/mach-omap2/clock2420_data.c       |    2 +-
+ arch/arm/mach-omap2/clock2430_data.c       |    2 +-
+ arch/arm/mach-omap2/clock3xxx_data.c       |    2 +-
+ arch/arm/mach-omap2/devices.c              |   58 +++++++++++++++++++++++-----
+ arch/arm/plat-omap/include/plat/omap34xx.h |    5 ++
+ 5 files changed, 56 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 602387d..9d52d43 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -45,6 +45,8 @@
- #include <crypto/aead.h>
- #include <crypto/authenc.h>
- #include <crypto/skcipher.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
- #include <crypto/scatterwalk.h>
+diff --git a/arch/arm/mach-omap2/clock2420_data.c b/arch/arm/mach-omap2/clock2420_data.c
+index d932b14..1820a55 100644
+--- a/arch/arm/mach-omap2/clock2420_data.c
++++ b/arch/arm/mach-omap2/clock2420_data.c
+@@ -1836,7 +1836,7 @@ static struct omap_clk omap2420_clks[] = {
+ 	CLK(NULL,	"vlynq_ick",	&vlynq_ick,	CK_242X),
+ 	CLK(NULL,	"vlynq_fck",	&vlynq_fck,	CK_242X),
+ 	CLK(NULL,	"des_ick",	&des_ick,	CK_242X),
+-	CLK(NULL,	"sha_ick",	&sha_ick,	CK_242X),
++	CLK("omap-sham",	"ick",	&sha_ick,	CK_242X),
+ 	CLK("omap_rng",	"ick",		&rng_ick,	CK_242X),
+ 	CLK(NULL,	"aes_ick",	&aes_ick,	CK_242X),
+ 	CLK(NULL,	"pka_ick",	&pka_ick,	CK_242X),
+diff --git a/arch/arm/mach-omap2/clock2430_data.c b/arch/arm/mach-omap2/clock2430_data.c
+index 0438b6e..5884ac6 100644
+--- a/arch/arm/mach-omap2/clock2430_data.c
++++ b/arch/arm/mach-omap2/clock2430_data.c
+@@ -1924,7 +1924,7 @@ static struct omap_clk omap2430_clks[] = {
+ 	CLK(NULL,	"sdma_ick",	&sdma_ick,	CK_243X),
+ 	CLK(NULL,	"sdrc_ick",	&sdrc_ick,	CK_243X),
+ 	CLK(NULL,	"des_ick",	&des_ick,	CK_243X),
+-	CLK(NULL,	"sha_ick",	&sha_ick,	CK_243X),
++	CLK("omap-sham",	"ick",	&sha_ick,	CK_243X),
+ 	CLK("omap_rng",	"ick",		&rng_ick,	CK_243X),
+ 	CLK(NULL,	"aes_ick",	&aes_ick,	CK_243X),
+ 	CLK(NULL,	"pka_ick",	&pka_ick,	CK_243X),
+diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
+index 9cba556..52638df 100644
+--- a/arch/arm/mach-omap2/clock3xxx_data.c
++++ b/arch/arm/mach-omap2/clock3xxx_data.c
+@@ -3360,7 +3360,7 @@ static struct omap_clk omap3xxx_clks[] = {
+ 	CLK("mmci-omap-hs.2",	"ick",	&mmchs3_ick,	CK_3430ES2 | CK_AM35XX),
+ 	CLK(NULL,	"icr_ick",	&icr_ick,	CK_343X),
+ 	CLK(NULL,	"aes2_ick",	&aes2_ick,	CK_343X),
+-	CLK(NULL,	"sha12_ick",	&sha12_ick,	CK_343X),
++	CLK("omap-sham",	"ick",	&sha12_ick,	CK_343X),
+ 	CLK(NULL,	"des2_ick",	&des2_ick,	CK_343X),
+ 	CLK("mmci-omap-hs.1",	"ick",	&mmchs2_ick,	CK_3XXX),
+ 	CLK("mmci-omap-hs.0",	"ick",	&mmchs1_ick,	CK_3XXX),
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index 2271b9b..beac46c 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -26,6 +26,7 @@
+ #include <plat/mux.h>
+ #include <mach/gpio.h>
+ #include <plat/mmc.h>
++#include <plat/dma.h>
  
- #include "talitos.h"
-@@ -1481,6 +1483,7 @@ struct talitos_alg_template {
- 	u32 type;
- 	union {
- 		struct crypto_alg crypto;
-+		struct ahash_alg hash;
- 	} alg;
- 	__be32 desc_hdr_template;
- };
-@@ -1697,8 +1700,7 @@ static struct talitos_alg_template driver_algs[] = {
- struct talitos_crypto_alg {
- 	struct list_head entry;
- 	struct device *dev;
--	__be32 desc_hdr_template;
--	struct crypto_alg crypto_alg;
-+	struct talitos_alg_template algt;
- };
+ #include "mux.h"
  
- static int talitos_cra_init(struct crypto_tfm *tfm)
-@@ -1707,13 +1709,14 @@ static int talitos_cra_init(struct crypto_tfm *tfm)
- 	struct talitos_crypto_alg *talitos_alg;
- 	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -453,8 +454,10 @@ static void omap_init_mcspi(void)
+ static inline void omap_init_mcspi(void) {}
+ #endif
  
--	talitos_alg =  container_of(alg, struct talitos_crypto_alg, crypto_alg);
-+	talitos_alg =  container_of(alg, struct talitos_crypto_alg,
-+				    algt.alg.crypto);
- 
- 	/* update context with ptr to dev */
- 	ctx->dev = talitos_alg->dev;
- 
- 	/* copy descriptor header template value */
--	ctx->desc_hdr_template = talitos_alg->desc_hdr_template;
-+	ctx->desc_hdr_template = talitos_alg->algt.desc_hdr_template;
- 
- 	/* random first IV */
- 	get_random_bytes(ctx->iv, TALITOS_MAX_IV_LENGTH);
-@@ -1749,7 +1752,15 @@ static int talitos_remove(struct of_device *ofdev)
- 	int i;
- 
- 	list_for_each_entry_safe(t_alg, n, &priv->alg_list, entry) {
--		crypto_unregister_alg(&t_alg->crypto_alg);
-+		switch (t_alg->algt.type) {
-+		case CRYPTO_ALG_TYPE_ABLKCIPHER:
-+		case CRYPTO_ALG_TYPE_AEAD:
-+			crypto_unregister_alg(&t_alg->algt.alg.crypto);
-+			break;
-+		case CRYPTO_ALG_TYPE_AHASH:
-+			crypto_unregister_ahash(&t_alg->algt.alg.hash);
-+			break;
-+		}
- 		list_del(&t_alg->entry);
- 		kfree(t_alg);
- 	}
-@@ -1790,8 +1801,16 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 	if (!t_alg)
- 		return ERR_PTR(-ENOMEM);
- 
--	alg = &t_alg->crypto_alg;
--	*alg = template->alg.crypto;
-+	t_alg->algt = *template;
+-#ifdef CONFIG_OMAP_SHA1_MD5
+-static struct resource sha1_md5_resources[] = {
++#if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
 +
-+	switch (t_alg->algt.type) {
-+	case CRYPTO_ALG_TYPE_ABLKCIPHER:
-+	case CRYPTO_ALG_TYPE_AEAD:
-+		alg = &t_alg->algt.alg.crypto;
-+		break;
-+	case CRYPTO_ALG_TYPE_AHASH:
-+		alg = &t_alg->algt.alg.hash.halg.base;
-+	}
- 
- 	alg->cra_module = THIS_MODULE;
- 	alg->cra_init = talitos_cra_init;
-@@ -1799,7 +1818,6 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 	alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
- 
--	t_alg->desc_hdr_template = template->desc_hdr_template;
- 	t_alg->dev = dev;
- 
- 	return t_alg;
-@@ -1933,6 +1951,7 @@ static int talitos_probe(struct of_device *ofdev,
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
- 		if (hw_supports(dev, driver_algs[i].desc_hdr_template)) {
- 			struct talitos_crypto_alg *t_alg;
-+			char *name = NULL;
- 
- 			t_alg = talitos_alg_alloc(dev, &driver_algs[i]);
- 			if (IS_ERR(t_alg)) {
-@@ -1940,15 +1959,27 @@ static int talitos_probe(struct of_device *ofdev,
- 				goto err_out;
- 			}
- 
--			err = crypto_register_alg(&t_alg->crypto_alg);
-+			switch (t_alg->algt.type) {
-+			case CRYPTO_ALG_TYPE_ABLKCIPHER:
-+			case CRYPTO_ALG_TYPE_AEAD:
-+				err = crypto_register_alg(
-+						&t_alg->algt.alg.crypto);
-+				name = t_alg->algt.alg.crypto.cra_driver_name;
-+				break;
-+			case CRYPTO_ALG_TYPE_AHASH:
-+				err = crypto_register_ahash(
-+						&t_alg->algt.alg.hash);
-+				name =
-+				 t_alg->algt.alg.hash.halg.base.cra_driver_name;
-+				break;
-+			}
- 			if (err) {
- 				dev_err(dev, "%s alg registration failed\n",
--					t_alg->crypto_alg.cra_driver_name);
-+					name);
- 				kfree(t_alg);
- 			} else {
- 				list_add_tail(&t_alg->entry, &priv->alg_list);
--				dev_info(dev, "%s\n",
--					 t_alg->crypto_alg.cra_driver_name);
-+				dev_info(dev, "%s\n", name);
- 			}
- 		}
++#ifdef CONFIG_ARCH_OMAP24XX
++static struct resource omap2_sham_resources[] = {
+ 	{
+ 		.start	= OMAP24XX_SEC_SHA1MD5_BASE,
+ 		.end	= OMAP24XX_SEC_SHA1MD5_BASE + 0x64,
+@@ -465,20 +468,55 @@ static struct resource sha1_md5_resources[] = {
+ 		.flags	= IORESOURCE_IRQ,
  	}
+ };
++static int omap2_sham_resources_sz = ARRAY_SIZE(omap2_sham_resources);
++#else
++#define omap2_sham_resources		NULL
++#define omap2_sham_resources_sz		0
++#endif
+ 
+-static struct platform_device sha1_md5_device = {
+-	.name		= "OMAP SHA1/MD5",
++#ifdef CONFIG_ARCH_OMAP34XX
++static struct resource omap3_sham_resources[] = {
++	{
++		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
++		.end	= OMAP34XX_SEC_SHA1MD5_BASE + 0x64,
++		.flags	= IORESOURCE_MEM,
++	},
++	{
++		.start	= INT_34XX_SHA1MD52_IRQ,
++		.flags	= IORESOURCE_IRQ,
++	},
++	{
++		.start	= OMAP34XX_DMA_SHA1MD5_RX,
++		.flags	= IORESOURCE_DMA,
++	}
++};
++static int omap3_sham_resources_sz = ARRAY_SIZE(omap3_sham_resources);
++#else
++#define omap3_sham_resources		NULL
++#define omap3_sham_resources_sz		0
++#endif
++
++static struct platform_device sham_device = {
++	.name		= "omap-sham",
+ 	.id		= -1,
+-	.num_resources	= ARRAY_SIZE(sha1_md5_resources),
+-	.resource	= sha1_md5_resources,
+ };
+ 
+-static void omap_init_sha1_md5(void)
++static void omap_init_sham(void)
+ {
+-	platform_device_register(&sha1_md5_device);
++	if (cpu_is_omap24xx()) {
++		sham_device.resource = omap2_sham_resources;
++		sham_device.num_resources = omap2_sham_resources_sz;
++	} else if (cpu_is_omap34xx()) {
++		sham_device.resource = omap3_sham_resources;
++		sham_device.num_resources = omap3_sham_resources_sz;
++	} else {
++		pr_err("%s: platform not supported\n", __func__);
++		return;
++	}
++	platform_device_register(&sham_device);
+ }
+ #else
+-static inline void omap_init_sha1_md5(void) { }
++static inline void omap_init_sham(void) { }
+ #endif
+ 
+ /*-------------------------------------------------------------------------*/
+@@ -799,7 +837,7 @@ static int __init omap2_init_devices(void)
+ 	omap_init_mcspi();
+ 	omap_hdq_init();
+ 	omap_init_sti();
+-	omap_init_sha1_md5();
++	omap_init_sham();
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm/plat-omap/include/plat/omap34xx.h b/arch/arm/plat-omap/include/plat/omap34xx.h
+index 2845fdc..98fc8b4 100644
+--- a/arch/arm/plat-omap/include/plat/omap34xx.h
++++ b/arch/arm/plat-omap/include/plat/omap34xx.h
+@@ -82,5 +82,10 @@
+ 
+ #define OMAP34XX_MAILBOX_BASE		(L4_34XX_BASE + 0x94000)
+ 
++/* Security */
++#define OMAP34XX_SEC_BASE	(L4_34XX_BASE + 0xA0000)
++#define OMAP34XX_SEC_SHA1MD5_BASE	(OMAP34XX_SEC_BASE + 0x23000)
++#define OMAP34XX_SEC_AES_BASE	(OMAP34XX_SEC_BASE + 0x25000)
++
+ #endif /* __ASM_ARCH_OMAP3_H */
+ 
 -- 
-1.6.0.4
+1.6.3.3
 
