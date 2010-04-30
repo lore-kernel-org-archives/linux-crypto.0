@@ -1,46 +1,61 @@
-From: Lee Nipper <lee.nipper@gmail.com>
-Subject: Re: [PATCH][RFC] crypto: talitos - add hmac algorithms
-Date: Wed, 28 Apr 2010 16:44:08 -0500
-Message-ID: <x2oeabe9a7b1004281444pdd22136am212e75ed06df72a3@mail.gmail.com>
-References: <4bd82b35.064c640a.62c0.4de1@mx.google.com>
-Reply-To: lee.nipper@gmail.com
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: Bug#552270: Marvell CESA driver and Kirkwood
+Date: Fri, 30 Apr 2010 11:20:09 +0200
+Message-ID: <20100430092009.GA22852@Chamillionaire.breakpoint.cc>
+References: <20091130211531.GK18101@deprecation.cyrius.com>
+	<4B144627.7060901@gmail.com>
+	<20091204212847.GC28480@deprecation.cyrius.com>
+	<4BCB4009.70707@gmail.com>
+	<20100418191719.GA2508@Chamillionaire.breakpoint.cc>
+	<4BCE125F.30200@gmail.com>
+	<20100421081302.GB31506@Chamillionaire.breakpoint.cc>
+	<4BCFC120.5010306@jdland.co.il>
+	<20100424151207.GB9057@Chamillionaire.breakpoint.cc>
+	<4BD33BD7.80400@jdland.co.il>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qy0-f179.google.com ([209.85.221.179]:60428 "EHLO
-	mail-qy0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753045Ab0D1VoM convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Apr 2010 17:44:12 -0400
-Received: by qyk9 with SMTP id 9so21937449qyk.1
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Apr 2010 14:44:09 -0700 (PDT)
-In-Reply-To: <4bd82b35.064c640a.62c0.4de1@mx.google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "L.C." <lucorsel@gmail.com>, Martin Michlmayr <tbm@cyrius.com>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Uri Simchoni <uri@jdland.co.il>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <4BD33BD7.80400@jdland.co.il>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+	<mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+	<mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 28, 2010 at 07:33,  <lee.nipper@gmail.com> wrote:
-> Add the these hmac algorithms to talitos:
-> =A0 =A0hmac(md5),
-> =A0 =A0hmac(sha1),
-> =A0 =A0hmac(sha256),
-> =A0 =A0hmac(sha384),
-> =A0 =A0hmac(sha512).
-> These are all type ahash.
->
+* Uri Simchoni | 2010-04-24 21:43:35 [+0300]:
 
-This patch jumped in front of the 3rd patch in the series of 3 in the
-message order.
-The hmac patch should be applied _after_ the 3 patches in the series fo=
-r ahash.
-I wanted to clarify that for the record.
+Sorry for the late reply.
 
-Thanks.
+>> I enabled list and sg debugging and a flood ping triggered a couple of
+>> warning. Could you please look at this?
+>Sure.
+It seems that everything is working now.
 
--Lee
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> IPsec requests authenc(hmac(sha1),cbc(aes)) so right now it reqeusts two
+>> cesa provided algorithms. A single ping results in around 30ms RTT.
+>Since the CESA does each operation faster than sw (at least when the packet size exceeds some threshold), I see no reason for it to slow the process down. The slowness probably is somehow caused by the same thing that causes the oops, or by debug warning prints.
+Yup looks like it.
+
+>> Disabling hmac(sha1) gives me less than 1ms.
+>> Implementing authenc() for IPsec should speed things up. Right I'm stuck
+>> with hacking DMA support.
+>Well, so far I wasn't able to figure out how it all fits together - sure, the CESA can do AES-CBC+HMAC-SHA1 in one run, but I'm not sure it's suitable for IPSec, or that the crypto infrastructure supports a HW driver for combined operation. (the CESA is probably not suitable for SSL because of alignment problems, IPSec is better in that respect).
+
+It does, AEAD is just for this purpose. The FSL talitos driver does
+this. Not sure if it is the only one.
+I try to hack DMA support before I focus on this.
+ 
+>>> Thanks,
+>>> Uri.
+
+Sebastian
