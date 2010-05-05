@@ -1,48 +1,47 @@
-From: Manuel Lauss <manuel.lauss@googlemail.com>
-Subject: Re: Test tools for crypt accelerators?
-Date: Wed, 5 May 2010 14:45:35 +0200
-Message-ID: <k2mf861ec6f1005050545neeff3d7p3642ba47e0422ab5@mail.gmail.com>
-References: <q2uf861ec6f1005050502hf443a7d6mf58f68d97ce38875@mail.gmail.com>
-	 <20100505123145.GA6878@Chamillionaire.breakpoint.cc>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCHv4 0/2] omap-sham: OMAP SHA1/MD5 driver
+Date: Wed, 5 May 2010 11:38:50 -0700
+Message-ID: <20100505183849.GB29604@atomide.com>
+References: <cover.1272464135.git.dmitry.kasatkin@nokia.com>
+ <20100503031139.GA31376@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <linux-crypto@ml.breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
+	linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:35784 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934711Ab0EEMpg convert rfc822-to-8bit (ORCPT
+Received: from mho-01-ewr.mailhop.org ([204.13.248.71]:61187 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754593Ab0EESjA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 May 2010 08:45:36 -0400
-Received: by fxm10 with SMTP id 10so4174321fxm.19
-        for <linux-crypto@vger.kernel.org>; Wed, 05 May 2010 05:45:35 -0700 (PDT)
-In-Reply-To: <20100505123145.GA6878@Chamillionaire.breakpoint.cc>
+	Wed, 5 May 2010 14:39:00 -0400
+Content-Disposition: inline
+In-Reply-To: <20100503031139.GA31376@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 5, 2010 at 2:31 PM, Sebastian Andrzej Siewior
-<linux-crypto@ml.breakpoint.cc> wrote:
-> * Manuel Lauss | 2010-05-05 14:02:15 [+0200]:
->
->>I've written a prototype driver for an AES accelerator; I'd like to t=
-est it
->>now. =A0Are there any userspace tools available for this?
-> modprobe tcrypt mode=3D10
+* Herbert Xu <herbert@gondor.apana.org.au> [100502 20:07]:
+> On Wed, Apr 28, 2010 at 05:18:05PM +0300, Dmitry Kasatkin wrote:
+> > Changes to v4:
+> > - concurrent requests support via queue
+> > - hmac
+> > - shash support removed
+> > 
+> > Dmitry Kasatkin (2):
+> >   crypto: updates omap sham device related platform code
+> >   crypto: omap-sham - omap sha1 & md5 driver
+> 
+> Both patches applied.  Thanks for all your hard work Dmitry!
 
-Thanks, that's what I was looking for.
-Unfortunately tcrypt oopses when it's loaded.
+Just noticed that the first patch should be updated:
 
+CONFIG_ARCH_OMAP2 instead of CONFIG_ARCH_OMAP24XX
+CONFIG_ARCH_OMAP3 instead of CONFIG_ARCH_OMAP34XX
 
-> will test varios blockmodes. There is no userland interface for hw
-> driver atm.
+BTW, chances are that this part will conflict with other
+omap patches. But if that happens, we can move it to
+the omap for-next.
 
-That's okay, I just need something to throw data at it.
+Regards,
 
-Thanks!
-     Manuel Lauss
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Tony
