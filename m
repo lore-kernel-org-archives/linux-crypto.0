@@ -1,50 +1,67 @@
-From: Western Union Department <cpeme@efn.uncor.edu>
-Subject: Call For Confirmation Tel: +(44) 702 4098910,
-Date: Mon, 10 May 2010 09:06:05 -0300
-Message-ID: <20100510090605.63321xpo4mx7zctc__31523.5017253601$1273496310$gmane$org@gtwing.efn.uncor.edu>
-Reply-To: westeruniondepartment@ws.tc
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 1/1] omap-sham: OMAP macros corrected
+Date: Mon, 10 May 2010 10:03:29 -0700
+Message-ID: <20100510170328.GD16460@atomide.com>
+References: <948fcc79dd3d31f4930d4b62bb7ca7a19949fd9a.1273493232.git.dmitry.kasatkin@nokia.com>
+ <20100510121416.GA12769@gondor.apana.org.au>
+ <4BE800F3.2070602@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from host1.efn.uncor.edu ([200.16.19.1]:47637 "EHLO
-	gtwing.efn.uncor.edu" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1754068Ab0EJM6F (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 May 2010 08:58:05 -0400
+Content-Type: text/plain; charset=us-ascii
+Cc: ext Herbert Xu <herbert@gondor.hengli.com.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <4BE800F3.2070602@nokia.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+* Dmitry Kasatkin <dmitry.kasatkin@nokia.com> [100510 05:45]:
+> 
+> On 10/05/10 15:14, ext Herbert Xu wrote:
+> > On Mon, May 10, 2010 at 03:07:55PM +0300, Dmitry Kasatkin wrote:
+> >   
+> >> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+> >> ---
+> >>  arch/arm/mach-omap2/devices.c |    4 ++--
+> >>  1 files changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+> >> index beac46c..79dbf04 100644
+> >> --- a/arch/arm/mach-omap2/devices.c
+> >> +++ b/arch/arm/mach-omap2/devices.c
+> >> @@ -456,7 +456,7 @@ static inline void omap_init_mcspi(void) {}
+> >>  
+> >>  #if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
+> >>  
+> >> -#ifdef CONFIG_ARCH_OMAP24XX
+> >> +#ifdef CONFIG_ARCH_OMAP2
+> >>  static struct resource omap2_sham_resources[] = {
+> >>  	{
+> >>  		.start	= OMAP24XX_SEC_SHA1MD5_BASE,
+> >> @@ -474,7 +474,7 @@ static int omap2_sham_resources_sz = ARRAY_SIZE(omap2_sham_resources);
+> >>  #define omap2_sham_resources_sz		0
+> >>  #endif
+> >>  
+> >> -#ifdef CONFIG_ARCH_OMAP34XX
+> >> +#ifdef CONFIG_ARCH_OMAP3
+> >>  static struct resource omap3_sham_resources[] = {
+> >>  	{
+> >>  		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
+> >>     
+> > Hi Tony:
+> >
+> > If I add this patch to cryptodev, is this going to cause any
+> > problems for you?
+> >
+> > Thbanks,
+> >   
+> Hi,
+> 
+> I should not be any problem, because it indeed needs to be like that.
 
+Yeah please go ahead and add it. If we run into merge problems with
+devices.c, we move some patches into omap for-next branch.
 
-My associate has helped me to send your first payment of US$7,500 to you
-as instructed by Mr.James Gordon Brown the United Kingdom prime minister
-after the last G20 meeting that was held on April 2nd in United Kindom,
-making you one of the beneficaries. Here is the information below.
-
-MONEY TRANSFER CONTROL NUMBER: 8309124803
-SENDER NAME: Mr.Solomon Daniel.Q
-AMOUNT: US$7,500
-
-I told him to keep sending you US$7,500 twice a week until the FULL
-payment of (US $360,000.00 Dollars) is completed within 6 (six) Months.
-A certificate will be made to change the Reciever Name as stated by the
-British prime minister, send your Full Names and address via Email to:
-Mr Garry Moore
-
-The money will not reflect untill the clearance certificate is issue to
-you by the G20 commitee.
-
-E-mail: westeruniondepartment@ws.tc
-
-Tel: +(44) 702 4098910,
-
-----------------------------------------------------------------
-This message was sent using IMP, the Internet Messaging Program.
-
-
+Acked-by: Tony Lindgren <tony@atomide.com>
