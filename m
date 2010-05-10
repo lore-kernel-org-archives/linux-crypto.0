@@ -1,59 +1,40 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Re: [PATCHv4 0/2] omap-sham: OMAP SHA1/MD5 driver
-Date: Mon, 10 May 2010 14:40:53 +0300
-Message-ID: <4BE7F0C5.6040904@nokia.com>
-References: <cover.1272464135.git.dmitry.kasatkin@nokia.com> <20100503031139.GA31376@gondor.apana.org.au> <20100505183849.GB29604@atomide.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
-To: ext Tony Lindgren <tony@atomide.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.233]:43663 "EHLO
-	mgw-mx06.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756831Ab0EJLlY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 May 2010 07:41:24 -0400
-In-Reply-To: <20100505183849.GB29604@atomide.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: [PATCH 1/1] omap-sham: OMAP macros corrected
+Date: Mon, 10 May 2010 15:07:55 +0300
+Message-ID: <948fcc79dd3d31f4930d4b62bb7ca7a19949fd9a.1273493232.git.dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: herbert@gondor.hengli.com.au
+Return-path: <linux-omap-owner@vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+---
+ arch/arm/mach-omap2/devices.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Hmm.. yes. in my first patch I had OMAP3 and 2
-Should I send updated patch above that?
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index beac46c..79dbf04 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -456,7 +456,7 @@ static inline void omap_init_mcspi(void) {}
+ 
+ #if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
+ 
+-#ifdef CONFIG_ARCH_OMAP24XX
++#ifdef CONFIG_ARCH_OMAP2
+ static struct resource omap2_sham_resources[] = {
+ 	{
+ 		.start	= OMAP24XX_SEC_SHA1MD5_BASE,
+@@ -474,7 +474,7 @@ static int omap2_sham_resources_sz = ARRAY_SIZE(omap2_sham_resources);
+ #define omap2_sham_resources_sz		0
+ #endif
+ 
+-#ifdef CONFIG_ARCH_OMAP34XX
++#ifdef CONFIG_ARCH_OMAP3
+ static struct resource omap3_sham_resources[] = {
+ 	{
+ 		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
+-- 
+1.7.0.4
 
-- Dmitry
-
-
-On 05/05/10 21:38, ext Tony Lindgren wrote:
-> * Herbert Xu <herbert@gondor.apana.org.au> [100502 20:07]:
->   
->> On Wed, Apr 28, 2010 at 05:18:05PM +0300, Dmitry Kasatkin wrote:
->>     
->>> Changes to v4:
->>> - concurrent requests support via queue
->>> - hmac
->>> - shash support removed
->>>
->>> Dmitry Kasatkin (2):
->>>   crypto: updates omap sham device related platform code
->>>   crypto: omap-sham - omap sha1 & md5 driver
->>>       
->> Both patches applied.  Thanks for all your hard work Dmitry!
->>     
-> Just noticed that the first patch should be updated:
->
-> CONFIG_ARCH_OMAP2 instead of CONFIG_ARCH_OMAP24XX
-> CONFIG_ARCH_OMAP3 instead of CONFIG_ARCH_OMAP34XX
->
-> BTW, chances are that this part will conflict with other
-> omap patches. But if that happens, we can move it to
-> the omap for-next.
->
-> Regards,
->
-> Tony
->   
