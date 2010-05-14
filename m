@@ -1,33 +1,135 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mv_cesa - Use resource_size
-Date: Fri, 14 May 2010 14:58:17 +1000
-Message-ID: <20100514045817.GB26117@gondor.apana.org.au>
-References: <1273561064-3530-1-git-send-email-tklauser@distanz.ch>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH 1/4] padata: Use a timer to handle remaining objects in the
+ reorder queues
+Date: Fri, 14 May 2010 13:43:36 +0200
+Message-ID: <20100514114336.GB2184@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	kernel-janitors@vger.kernel.org
-To: Tobias Klauser <tklauser@distanz.ch>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:34966 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752332Ab0ENE6q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 May 2010 00:58:46 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:51840 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754512Ab0ENLpw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 May 2010 07:45:52 -0400
 Content-Disposition: inline
-In-Reply-To: <1273561064-3530-1-git-send-email-tklauser@distanz.ch>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 11, 2010 at 08:57:44AM +0200, Tobias Klauser wrote:
-> Use the resource_size function instead of manually calculating the
-> resource size. This reduces the chance of introducing off-by-one errors.
-> 
-> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+padata_get_next needs to check whether the next object that
+need serialization must be parallel processed by the local cpu.
+This check was wrong implemented and returned always true,
+so the try_again loop in padata_reorder was never taken. This
+can lead to object leaks in some rare cases due to a race that
+appears with the trylock in padata_reorder. The try_again loop
+was not a good idea after all, because a cpu could take that
+loop frequently, so we handle this with a timer instead.
 
-Patch applied.  Thanks!
+This patch adds a timer to handle the race that appears with
+the trylock. If cpu1 queues an object to the reorder queue while
+cpu2 holds the pd->lock but left the while loop in padata_reorder
+already, cpu2 can't care for this object and cpu1 exits because
+it can't get the lock. Usually the next cpu that takes the lock
+cares for this object too. We need the timer just if this object
+was the last one that arrives to the reorder queues. The timer
+function sends it out in this case.
+
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ include/linux/padata.h |    2 ++
+ kernel/padata.c        |   25 ++++++++++++++++++-------
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 51611da..64836a6 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -24,6 +24,7 @@
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+ #include <linux/list.h>
++#include <linux/timer.h>
+ 
+ struct padata_priv {
+ 	struct list_head	list;
+@@ -60,6 +61,7 @@ struct parallel_data {
+ 	unsigned int		max_seq_nr;
+ 	cpumask_var_t		cpumask;
+ 	spinlock_t              lock;
++	struct timer_list       timer;
+ };
+ 
+ struct padata_instance {
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 82958e0..6d7ea48 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -231,7 +231,8 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 		goto out;
+ 	}
+ 
+-	if (next_nr % num_cpus == next_queue->cpu_index) {
++	queue = per_cpu_ptr(pd->queue, smp_processor_id());
++	if (queue->cpu_index == next_queue->cpu_index) {
+ 		padata = ERR_PTR(-ENODATA);
+ 		goto out;
+ 	}
+@@ -247,9 +248,8 @@ static void padata_reorder(struct parallel_data *pd)
+ 	struct padata_queue *queue;
+ 	struct padata_instance *pinst = pd->pinst;
+ 
+-try_again:
+ 	if (!spin_trylock_bh(&pd->lock))
+-		goto out;
++		return;
+ 
+ 	while (1) {
+ 		padata = padata_get_next(pd);
+@@ -258,8 +258,9 @@ try_again:
+ 			break;
+ 
+ 		if (PTR_ERR(padata) == -ENODATA) {
++			del_timer(&pd->timer);
+ 			spin_unlock_bh(&pd->lock);
+-			goto out;
++			return;
+ 		}
+ 
+ 		queue = per_cpu_ptr(pd->queue, padata->cb_cpu);
+@@ -273,13 +274,22 @@ try_again:
+ 
+ 	spin_unlock_bh(&pd->lock);
+ 
+-	if (atomic_read(&pd->reorder_objects))
+-		goto try_again;
++	if (atomic_read(&pd->reorder_objects)
++			&& !(pinst->flags & PADATA_RESET))
++		mod_timer(&pd->timer, jiffies + HZ);
++	else
++		del_timer(&pd->timer);
+ 
+-out:
+ 	return;
+ }
+ 
++static void padata_reorder_timer(unsigned long arg)
++{
++	struct parallel_data *pd = (struct parallel_data *)arg;
++
++	padata_reorder(pd);
++}
++
+ static void padata_serial_worker(struct work_struct *work)
+ {
+ 	struct padata_queue *queue;
+@@ -383,6 +393,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+ 	num_cpus = cpumask_weight(pd->cpumask);
+ 	pd->max_seq_nr = (MAX_SEQ_NR / num_cpus) * num_cpus - 1;
+ 
++	setup_timer(&pd->timer, padata_reorder_timer, (unsigned long)pd);
+ 	atomic_set(&pd->seq_nr, -1);
+ 	atomic_set(&pd->reorder_objects, 0);
+ 	atomic_set(&pd->refcnt, 0);
 -- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.6.5
