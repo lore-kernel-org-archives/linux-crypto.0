@@ -1,28 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] omap-sham: OMAP macros corrected
-Date: Fri, 14 May 2010 14:46:05 +1000
-Message-ID: <20100514044605.GA26117@gondor.apana.org.au>
-References: <948fcc79dd3d31f4930d4b62bb7ca7a19949fd9a.1273493232.git.dmitry.kasatkin@nokia.com> <20100510121416.GA12769@gondor.apana.org.au> <4BE800F3.2070602@nokia.com> <20100510170328.GD16460@atomide.com>
+Subject: Re: [PATCH] crypto: mv_cesa - Use resource_size
+Date: Fri, 14 May 2010 14:58:17 +1000
+Message-ID: <20100514045817.GB26117@gondor.apana.org.au>
+References: <1273561064-3530-1-git-send-email-tklauser@distanz.ch>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>
-To: Tony Lindgren <tony@atomide.com>
-Return-path: <linux-omap-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	kernel-janitors@vger.kernel.org
+To: Tobias Klauser <tklauser@distanz.ch>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([216.59.3.182]:34966 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752332Ab0ENE6q (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 May 2010 00:58:46 -0400
 Content-Disposition: inline
-In-Reply-To: <20100510170328.GD16460@atomide.com>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1273561064-3530-1-git-send-email-tklauser@distanz.ch>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 10, 2010 at 10:03:29AM -0700, Tony Lindgren wrote:
->
-> Yeah please go ahead and add it. If we run into merge problems with
-> devices.c, we move some patches into omap for-next branch.
+On Tue, May 11, 2010 at 08:57:44AM +0200, Tobias Klauser wrote:
+> Use the resource_size function instead of manually calculating the
+> resource size. This reduces the chance of introducing off-by-one errors.
 > 
-> Acked-by: Tony Lindgren <tony@atomide.com>
+> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
 
-Applied to cryptodev.  Thanks everyone!
+Patch applied.  Thanks!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
