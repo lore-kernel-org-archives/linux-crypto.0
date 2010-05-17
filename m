@@ -1,61 +1,54 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH 3/4] padata: Add some code comments
-Date: Mon, 17 May 2010 09:02:46 +0200
-Message-ID: <20100517070246.GG2184@secunet.com>
-References: <20100514114336.GB2184@secunet.com>
- <20100514114606.GD2184@secunet.com>
- <20100514091857.cd576ed2.randy.dunlap@oracle.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [BUG] SLOB breaks Crypto
+Date: Mon, 17 May 2010 18:17:14 +0200
+Message-ID: <AANLkTilPEnh3ewTb-KDsReBpjcszh1wkbfZohIaPXBKe@mail.gmail.com>
+References: <4B9E38AF.70309@fami-braun.de>
+	 <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com>
+	 <4BA29A19.2050307@fami-braun.de>
+	 <20100319003351.GC20227@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:47489 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751588Ab0EQHEq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 May 2010 03:04:46 -0400
-Content-Disposition: inline
-In-Reply-To: <20100514091857.cd576ed2.randy.dunlap@oracle.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: michael-dev@fami-braun.de, Pekka Enberg <penberg@cs.helsinki.fi>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Matt Mackall <mpm@selenic.com>,
+	Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20100319003351.GC20227@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Randy,
+On Fri, Mar 19, 2010 at 02:33, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Mar 18, 2010 at 10:24:41PM +0100, michael-dev@fami-braun.de wrote:
+>>
+>> Pekka Enberg schrieb:
+>> > Even with CONFIG_DEBUG_SLAB enabled or with CONFIG_SLUB and
+>> > CONFIG_SLUB_DEBUG_ON?
+>>
+>> no, these options have not been / are not enabled.
+>
+> Can you please try it with those options enabled? That will tell
+> us if there is some latent bug in the crypto layer that only shows
+> up right away under SLOB.
 
-On Fri, May 14, 2010 at 09:18:57AM -0700, Randy Dunlap wrote:
-> 
-> Hi Steffen,
-> 
-> These comments are roughly 90% of the way to being kernel-doc notation,
-> so how about going the rest of the way, please?
-> 
+After seeing a posting from Nemoto-san on the linux-mips list (should
+show up soon on
+http://www.linux-mips.org/archives/linux-mips/2010-05/threads.html),
+I'm wondering if these defaults are the culprit;
 
-yes of course we can. I read Documentation/kernel-doc-nano-HOWTO.txt,
-so I need to use /** for all comments that I want to add to kernel-doc.
-Anything else to do?
+mm/slab.c:#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
+mm/slob.c:#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long)
+mm/slub.c:#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
 
-> 
-> Use:
-> /**
-> in multiple places.
-> 
+Note that some platforms override this.
 
-I wondered several times why some comments start with /** while
-others start with /*. Anyway, I did not pay too much attention
-to this, because it was just the beginning line of a comment.
-Now I know the difference :)
+Gr{oetje,eeting}s,
 
+						Geert
 
-> /**
-> 
-> > + * padata_get_next - Get the next object that needs serialization.
-> 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-This one is a static function, I would not mind to add it to kernel-doc
-too, but that's probaply not needed.
-
-I'll resend this one with the suggested changes,
-thanks for pointing this out.
-
-Steffen
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
