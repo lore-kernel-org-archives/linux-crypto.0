@@ -1,78 +1,61 @@
-From: Andre Bubel <news@andre-bubel.de>
-Subject: Re: VIA Padlock: +30% XTS Performance by using ECB
-Date: Sun, 16 May 2010 19:34:46 +0200
-Message-ID: <4BF02CB6.5020707@andre-bubel.de>
-References: <20100423154449.GA1138@darkside.12.kls.lan>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 3/4] padata: Add some code comments
+Date: Mon, 17 May 2010 09:02:46 +0200
+Message-ID: <20100517070246.GG2184@secunet.com>
+References: <20100514114336.GB2184@secunet.com>
+ <20100514114606.GD2184@secunet.com>
+ <20100514091857.cd576ed2.randy.dunlap@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Mario.Holbe@TU-Ilmenau.DE
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:49896 "EHLO lo.gmane.org"
+Received: from a.mx.secunet.com ([195.81.216.161]:47489 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754124Ab0EPRpI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 16 May 2010 13:45:08 -0400
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <glkc-linux-crypto@m.gmane.org>)
-	id 1ODhtg-0000GC-38
-	for linux-crypto@vger.kernel.org; Sun, 16 May 2010 19:45:04 +0200
-Received: from tor-84-23-64-114.anonymisierung.tor.anon1984.de ([84.23.64.114])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Sun, 16 May 2010 19:45:04 +0200
-Received: from news by tor-84-23-64-114.anonymisierung.tor.anon1984.de with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Sun, 16 May 2010 19:45:04 +0200
-In-Reply-To: <20100423154449.GA1138@darkside.12.kls.lan>
+	id S1751588Ab0EQHEq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 17 May 2010 03:04:46 -0400
+Content-Disposition: inline
+In-Reply-To: <20100514091857.cd576ed2.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 23.04.2010 17:44, Mario 'BitKoenig' Holbe wrote:
-> Hello,
+Hi Randy,
 
-Hi Mario,
+On Fri, May 14, 2010 at 09:18:57AM -0700, Randy Dunlap wrote:
+> 
+> Hi Steffen,
+> 
+> These comments are roughly 90% of the way to being kernel-doc notation,
+> so how about going the rest of the way, please?
+> 
 
-> the VIA Padlock engine comes without native XTS-AES support, thus
-> compared to CBC-AES or ECB-AES XTS-AES performs quite bad on VIA CPUs
-> because it calls the Padlock ACE for each single AESenc() operation.
-> Using the Padlock's ECB-AES saves calls to the Padlock ACE and improv=
-es
-> the XTS-AES performance by 30% and more even in a naive proof-of-conc=
-ept
-> implementation.
-> The idea comes from DiskCryptor which does this since v0.9.583.106.
+yes of course we can. I read Documentation/kernel-doc-nano-HOWTO.txt,
+so I need to use /** for all comments that I want to add to kernel-doc.
+Anything else to do?
 
-The same problem exists with the mv_cesa driver. I really like to have =
-a=20
-solution for this as the performance of the system is mainly cripled by=
-=20
-the hard disk encryption.
+> 
+> Use:
+> /**
+> in multiple places.
+> 
 
-> I have no idea where this should finally be implemented, since it slo=
-ws
-> down XTS on non-accelerated CPUs. Maybe a seperate xts-aes-padlock
-> driver would make sense depending on how specific this is to VIA
-> Padlock, i.e. how it performs on other non-XTS-capable accelerators.
+I wondered several times why some comments start with /** while
+others start with /*. Anyway, I did not pay too much attention
+to this, because it was just the beginning line of a comment.
+Now I know the difference :)
 
-I'm currently trying to get an understanding of the kernel crypto code,=
-=20
-but my impression is that instead of breaking support with the=20
-synchronous API the better way would be to introduce asynchronous=20
-ciphers (e.g. acipher) that can be used transparently by crypto_templat=
-e=20
-implementations to form an ablkcipher. In that way all crypto modes=20
-would be supported and accelerated through hardware, even if it doesn't=
-=20
-provide an in-hardware implementation.
 
-As I mentioned I'm new to the kernel API, so what is the opinion of=20
-experienced developers on this? Is that in reach of the current API=20
-architecture?
+> /**
+> 
+> > + * padata_get_next - Get the next object that needs serialization.
+> 
 
-> Please CC: me in replies, I'm not a member of the list. Mail-F'up2
-> should be set correctly.
+This one is a static function, I would not mind to add it to kernel-doc
+too, but that's probaply not needed.
 
-Best regards,
-Andr=E9 Bubel
+I'll resend this one with the suggested changes,
+thanks for pointing this out.
+
+Steffen
