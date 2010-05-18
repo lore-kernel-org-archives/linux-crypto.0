@@ -1,32 +1,38 @@
-From: Pekka Enberg <penberg@cs.helsinki.fi>
+From: Matt Mackall <mpm@selenic.com>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Tue, 18 May 2010 17:02:18 +0300
-Message-ID: <4BF29DEA.6030001@cs.helsinki.fi>
-References: <4B9E38AF.70309@fami-braun.de> <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com> <4BA29A19.2050307@fami-braun.de> <20100319003351.GC20227@gondor.apana.org.au> <AANLkTilPEnh3ewTb-KDsReBpjcszh1wkbfZohIaPXBKe@mail.gmail.com> <4BF1BA0E.4010402@codelabs.ch> <1274135869.11603.473.camel@calx> <4BF24D1F.6010005@codelabs.ch> <20100518102701.GA7293@gondor.apana.org.au>
+Date: Tue, 18 May 2010 14:06:20 -0500
+Message-ID: <1274209580.11603.1198.camel@calx>
+References: <4B9E38AF.70309@fami-braun.de>
+	 <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com>
+	 <4BA29A19.2050307@fami-braun.de>
+	 <20100319003351.GC20227@gondor.apana.org.au>
+	 <AANLkTilPEnh3ewTb-KDsReBpjcszh1wkbfZohIaPXBKe@mail.gmail.com>
+	 <4BF1BA0E.4010402@codelabs.ch> <1274135869.11603.473.camel@calx>
+	 <4BF24D1F.6010005@codelabs.ch>  <20100518102701.GA7293@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Cc: Adrian-Ken Rueegsegger <ken@codelabs.ch>,
-	Matt Mackall <mpm@selenic.com>,
 	Geert Uytterhoeven <geert@linux-m68k.org>,
-	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Atsushi Nemoto <anemo@mba.ocn.ne.jp>,
+	michael-dev@fami-braun.de, Pekka Enberg <penberg@cs.helsinki.fi>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Atsushi Nemoto <anemo@mba.ocn.ne.jp>,
 	"David S. Miller" <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from courier.cs.helsinki.fi ([128.214.9.1]:42186 "EHLO
-	mail.cs.helsinki.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757739Ab0EROCn (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 May 2010 10:02:43 -0400
+Received: from waste.org ([173.11.57.241]:56648 "EHLO waste.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757602Ab0ERTG3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 18 May 2010 15:06:29 -0400
 In-Reply-To: <20100518102701.GA7293@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
+On Tue, 2010-05-18 at 20:27 +1000, Herbert Xu wrote:
 > On Tue, May 18, 2010 at 10:17:35AM +0200, Adrian-Ken Rueegsegger wrote:
->> As noted in my other mail [1] it seems like the HMAC tests trigger these
->> errors.
+> > 
+> > As noted in my other mail [1] it seems like the HMAC tests trigger these
+> > errors.
 > 
 > Thanks for all the detective work!
 > 
@@ -70,11 +76,13 @@ Herbert Xu wrote:
 > 
 > So evidently the assumption made in this change does not work on
 > SLOB since it only guarantees __alignof__(unsigned long).
-> 
-> I think the simplest fix is to revert this changeset.
 
-Sounds good to me.
+Bingo. Feel free to stick this on your revert:
 
-Acked-by: Pekka Enberg <penberg@cs.helsinki.fi>
+Acked-by: Matt Mackall <mpm@selenic.com>
 
-			Pekka
+Looks like we should ensure that ARCH_KMALLOC_MINALIGN is always
+defined.
+
+-- 
+Mathematics is the supreme nostalgia of our time.
