@@ -1,70 +1,89 @@
-From: David Miller <davem@davemloft.net>
+From: Paul Mundt <lethal@linux-sh.org>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Tue, 18 May 2010 14:20:21 -0700 (PDT)
-Message-ID: <20100518.142021.135951273.davem@davemloft.net>
-References: <1274211235.11603.1205.camel@calx>
-	<20100518.135945.180391159.davem@davemloft.net>
-	<AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com>
+Date: Wed, 19 May 2010 07:35:10 +0900
+Message-ID: <20100518223507.GB5933@linux-sh.org>
+References: <1274211235.11603.1205.camel@calx> <20100518.135945.180391159.davem@davemloft.net> <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com> <20100518.142021.135951273.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au, ken@codelabs.ch,
-	geert@linux-m68k.org, michael-dev@fami-braun.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	anemo@mba.ocn.ne.jp
-To: penberg@cs.helsinki.fi
+Content-Type: text/plain; charset=us-ascii
+Cc: penberg@cs.helsinki.fi, mpm@selenic.com,
+	herbert@gondor.apana.org.au, ken@codelabs.ch, geert@linux-m68k.org,
+	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:59292
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753691Ab0ERVUN (ORCPT
+Received: from 124x34x33x190.ap124.ftth.ucom.ne.jp ([124.34.33.190]:60303 "EHLO
+	master.linux-sh.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753549Ab0ERWgI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 May 2010 17:20:13 -0400
-In-Reply-To: <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com>
+	Tue, 18 May 2010 18:36:08 -0400
+Content-Disposition: inline
+In-Reply-To: <20100518.142021.135951273.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Pekka Enberg <penberg@cs.helsinki.fi>
-Date: Wed, 19 May 2010 00:15:46 +0300
-
-> On Tue, May 18, 2010 at 11:59 PM, David Miller <davem@davemloft.net> wrote:
->> From: Matt Mackall <mpm@selenic.com>
->> Date: Tue, 18 May 2010 14:33:55 -0500
->>
->>> SLOB honors ARCH_KMALLOC_MINALIGN. If your arch has alignment
->>> requirements, I recommend you set it.
->>
->> I recommend that the alignment provided by the allocator is not
->> determined by which allocator I happen to have enabled.
->>
->> The values and ifdef'ery should be identical in all of our
->> allocators.
+On Tue, May 18, 2010 at 02:20:21PM -0700, David Miller wrote:
+> From: Pekka Enberg <penberg@cs.helsinki.fi>
+> Date: Wed, 19 May 2010 00:15:46 +0300
 > 
-> Why? It doesn't make much sense for SLOB, which tries to be as space
-> efficient as possible, as a default. If things break on sparc, it
-> really needs to set ARCH_KMALLOC_MINALIGN as slab default alignment is
-> not something you really want to depend on.
+> > On Tue, May 18, 2010 at 11:59 PM, David Miller <davem@davemloft.net> wrote:
+> >> From: Matt Mackall <mpm@selenic.com>
+> >> Date: Tue, 18 May 2010 14:33:55 -0500
+> >>
+> >>> SLOB honors ARCH_KMALLOC_MINALIGN. If your arch has alignment
+> >>> requirements, I recommend you set it.
+> >>
+> >> I recommend that the alignment provided by the allocator is not
+> >> determined by which allocator I happen to have enabled.
+> >>
+> >> The values and ifdef'ery should be identical in all of our
+> >> allocators.
+> > 
+> > Why? It doesn't make much sense for SLOB, which tries to be as space
+> > efficient as possible, as a default. If things break on sparc, it
+> > really needs to set ARCH_KMALLOC_MINALIGN as slab default alignment is
+> > not something you really want to depend on.
+> 
+> I think it does make sense to expect that, whatever my architecture
+> defines or does not define, I can expect the allocators to provide the
+> same minimum alignment guarentee.  Otherwise it is no guarantee at all.
+> 
+SLAB/SLUB/SLOB all used to have the same BYTES_PER_WORD alignment
+guarantee, with SLAB and SLUB having moved away from this to unsigned
+long long in b46b8f19 and 47bfdc0d respectively. This was due to mixing
+64-bit integers in data structures, which in the SLAB case resulted in
+misaligned structures and also broke redzoning (architecture overrides
+also disabled it completely). The SLUB change was made a couple of days
+earlier for the same structure misalignment reasons (64-bit integers on
+32-bit platforms).
 
-I think it does make sense to expect that, whatever my architecture
-defines or does not define, I can expect the allocators to provide the
-same minimum alignment guarentee.  Otherwise it is no guarantee at all.
+The default changes in SLAB/SLUB at least assume that 32-bit
+architectures can only address 64-bit values on a 64-bit boundary. While
+this is true for most cases, these have always been handled through the
+bumping of the architecture minalign values in the past. Indeed, this was
+the rationale I had for adding the architecture-specific slab minalign
+override in the first place. The kmalloc one on the other hand is largely
+just overriden for platforms with DMA requirements -- usually a
+cacheline boundary.
 
-It's already obvious from these reports that such dependencies do
-exist.
+> It's already obvious from these reports that such dependencies do
+> exist.
+> 
+These dependencies were then introduced after SLAB/SLUB changed the
+rules, suggesting that not enough testing was done.
 
-I'll add the define for sparc, but saying "sparc's fault" is bogus
-because I defined what was necessary to get SLAB/SLUB to provide the
-necessary alignment.  SLOB pays for choosing not to use the same
-calculations for minimum alignment as the other allocators, and
-therefore pays for being different in this regard.
+> So one of two things should happen:
+> 
+> 1) SLOB conforms to SLAB/SLUB in it's test
+> 
+> 2) SLAB/SLUB conforms to SLOB in it's test
+> 
+> And yes this is an either-or, you can't say they are both valid.
 
-And in fact I do know that the ifdef'ery in SLAB/SLUB is derived from
-a change long ago that was specifically added to handle platforms like
-sparc.
+I don't see any reason to punish SLOB for the assumptions that SLAB/SLUB
+arbitrarily took up, presumably on an architecture that should have
+specified its own alignment requirements and simply couldn't be bothered.
+Making SLAB redzoning work with arbitrary alignment is another matter
+entirely, and something that should probably be revisited.
 
-So one of two things should happen:
-
-1) SLOB conforms to SLAB/SLUB in it's test
-
-2) SLAB/SLUB conforms to SLOB in it's test
-
-And yes this is an either-or, you can't say they are both valid.
+Anything that assumes more than BYTES_PER_WORD is simply broken and
+should be reverted.
