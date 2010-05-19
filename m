@@ -1,121 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 2.6.35
-Date: Wed, 19 May 2010 12:06:03 +1000
-Message-ID: <20100519020603.GA19654@gondor.apana.org.au>
-References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au>
+Subject: Re: [PATCH 3/4 v2] padata: Add some code comments
+Date: Wed, 19 May 2010 13:45:53 +1000
+Message-ID: <20100519034552.GB20887@gondor.apana.org.au>
+References: <20100514114336.GB2184@secunet.com> <20100514114606.GD2184@secunet.com> <20100514091857.cd576ed2.randy.dunlap@oracle.com> <20100518054912.GK2184@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Cc: Randy Dunlap <randy.dunlap@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:49413 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:55303 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753683Ab0ESCGL (ORCPT
+	with ESMTP id S1751915Ab0ESDqK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 May 2010 22:06:11 -0400
+	Tue, 18 May 2010 23:46:10 -0400
 Content-Disposition: inline
-In-Reply-To: <20100226004914.GA20812@gondor.apana.org.au>
+In-Reply-To: <20100518054912.GK2184@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Tue, May 18, 2010 at 07:49:12AM +0200, Steffen Klassert wrote:
+> 
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-Here is the crypto update for 2.6.35:
-
-* Hardware hash support in mv_cesa.
-* Hardware hash support in omap.
-* VMAC now works on big-endian.
-* Random fixes.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Chihau Chau (1):
-      crypto: geode-aes - Fix some code style issues
-
-Dan Carpenter (2):
-      crypto: pcrypt - Handle crypto_get_attr_type errors
-      crypto: algapi - Remove unneeded null check
-
-Dmitry Kasatkin (3):
-      crypto: omap - Updates omap sham device related platform code
-      crypto: omap - sha1 & md5 driver
-      crypto: omap - OMAP macros corrected
-
-Henrik Kretzschmar (1):
-      padata: Section cleanup
-
-Herbert Xu (1):
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6
-
-Huang Ying (4):
-      crypto: aesni-intel - Add AES-NI accelerated CTR mode
-      crypto: tcrypt - Speed testing support for ghash
-      crypto: aesni-intel - Fix CTR optimization build failure with gas 2.16.1
-      crypto: aesni-intel - Fix another CTR build failure with gas 2.16.1
-
-Richard Hartmann (1):
-      crypto: internal - Fix checkpatch errors
-
-Shane Wang (1):
-      crypto: vmac - Fix big-endian support
-
-Steffen Klassert (5):
-      padata: Dont scale the parallel objects with the cpus
-      padata: cpu hotplug code should depend on CONFIG_HOTPLUG_CPU
-      padata: Remove superfluous might_sleep
-      padata: Initialize the padata queues only for the used cpus
-      padata: Use get_online_cpus/put_online_cpus
-
-Tobias Klauser (1):
-      crypto: mv_cesa - Use resource_size
-
-Uri Simchoni (10):
-      crypto: mv_cesa - Invoke the user callback from a softirq context
-      crypto: mv_cesa - Remove compiler warning in mv_cesa driver
-      crypto: mv_cesa - Fix situation where the dest sglist is organized differently than the source sglist
-      crypto: mv_cesa - Fix situations where the src sglist spans more data than the request asks for
-      crypto: mv_cesa - Enqueue generic async requests
-      crypto: mv_cesa - Rename a variable to a more suitable name
-      crypto: mv_cesa - Execute some code via function pointers rathr than direct calls
-      crypto: mv_cesa - Make the copy-back of data optional
-      crypto: mv_cesa - Support processing of data from previous requests
-      crypto: mv_cesa - Add sha1 and hmac(sha1) async hash drivers
-
- arch/arm/mach-omap2/clock2420_data.c       |    2 +-
- arch/arm/mach-omap2/clock2430_data.c       |    2 +-
- arch/arm/mach-omap2/clock3xxx_data.c       |    2 +-
- arch/arm/mach-omap2/devices.c              |   58 ++-
- arch/arm/plat-omap/include/plat/omap34xx.h |    5 +
- arch/x86/crypto/aesni-intel_asm.S          |  115 +++
- arch/x86/crypto/aesni-intel_glue.c         |  130 +++-
- arch/x86/include/asm/inst.h                |   96 ++-
- crypto/algapi.c                            |    2 +-
- crypto/internal.h                          |    2 +-
- crypto/pcrypt.c                            |   11 +-
- crypto/tcrypt.c                            |    7 +
- crypto/tcrypt.h                            |   29 +
- crypto/testmgr.h                           |   64 ++-
- crypto/vmac.c                              |   75 +-
- drivers/crypto/Kconfig                     |    9 +
- drivers/crypto/Makefile                    |    2 +
- drivers/crypto/geode-aes.c                 |   36 +-
- drivers/crypto/mv_cesa.c                   |  692 ++++++++++++++--
- drivers/crypto/mv_cesa.h                   |   40 +-
- drivers/crypto/omap-sham.c                 | 1259 ++++++++++++++++++++++++++++
- kernel/padata.c                            |   56 +-
- 22 files changed, 2497 insertions(+), 197 deletions(-)
-
-Thanks,
+All four patches applied.  Thanks a lot!
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
