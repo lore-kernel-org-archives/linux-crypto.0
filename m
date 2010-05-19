@@ -1,41 +1,105 @@
-From: David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH 1/4] mm: Move ARCH_SLAB_MINALIGN and
- ARCH_KMALLOC_MINALIGN to <linux/slab_def.h>
-Date: Wed, 19 May 2010 19:10:38 +0100
-Message-ID: <1274292638.6930.10394.camel@macbook.infradead.org>
-References: <1274266725.6930.9823.camel@macbook.infradead.org>
-	 <1274266902.6930.9834.camel@macbook.infradead.org>
-	 <20100519133028.GA26659@sig21.net>  <4BF427D4.40600@colorfullife.com>
+From: Pekka Enberg <penberg@cs.helsinki.fi>
+Subject: Re: [PATCH 1/4] mm: Move ARCH_SLAB_MINALIGN and ARCH_KMALLOC_MINALIGN
+ to <linux/slab_def.h>
+Date: Wed, 19 May 2010 22:11:38 +0300
+Message-ID: <4BF437EA.9010904@cs.helsinki.fi>
+References: <1274266725.6930.9823.camel@macbook.infradead.org> <1274266902.6930.9834.camel@macbook.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Johannes Stezenbach <js@sig21.net>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
-	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
-	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
-To: Manfred Spraul <manfred@colorfullife.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, manfred@colorfullife.com,
+	David Miller <davem@davemloft.net>, mpm@selenic.com,
+	ken@codelabs.ch, geert@linux-m68k.org, michael-dev@fami-braun.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	anemo@mba.ocn.ne.jp, cl@linux-foundation.org
+To: David Woodhouse <dwmw2@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:43164 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752529Ab0ESSLI (ORCPT
+Received: from courier.cs.helsinki.fi ([128.214.9.1]:40352 "EHLO
+	mail.cs.helsinki.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752961Ab0ESTMG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 14:11:08 -0400
-In-Reply-To: <4BF427D4.40600@colorfullife.com>
+	Wed, 19 May 2010 15:12:06 -0400
+In-Reply-To: <1274266902.6930.9834.camel@macbook.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2010-05-19 at 20:03 +0200, Manfred Spraul wrote:
-> Is this text better?
+David Woodhouse wrote:
+> Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
 
-Not really...
+I applied patches 1-4. Thanks David!
 
-> * Unless debug options are enabled, the kernel uses cache_line_size() 
-> automatically.
-
-... that's a lie.
-
--- 
-David Woodhouse                            Open Source Technology Centre
-David.Woodhouse@intel.com                              Intel Corporation
+> ---
+>  include/linux/slab_def.h |   24 ++++++++++++++++++++++++
+>  mm/slab.c                |   24 ------------------------
+>  2 files changed, 24 insertions(+), 24 deletions(-)
+> 
+> diff --git a/include/linux/slab_def.h b/include/linux/slab_def.h
+> index ca6b2b3..1812dac 100644
+> --- a/include/linux/slab_def.h
+> +++ b/include/linux/slab_def.h
+> @@ -16,6 +16,30 @@
+>  #include <linux/compiler.h>
+>  #include <linux/kmemtrace.h>
+>  
+> +#ifndef ARCH_KMALLOC_MINALIGN
+> +/*
+> + * Enforce a minimum alignment for the kmalloc caches.
+> + * Usually, the kmalloc caches are cache_line_size() aligned, except when
+> + * DEBUG and FORCED_DEBUG are enabled, then they are BYTES_PER_WORD aligned.
+> + * Some archs want to perform DMA into kmalloc caches and need a guaranteed
+> + * alignment larger than the alignment of a 64-bit integer.
+> + * ARCH_KMALLOC_MINALIGN allows that.
+> + * Note that increasing this value may disable some debug features.
+> + */
+> +#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
+> +#endif
+> +
+> +#ifndef ARCH_SLAB_MINALIGN
+> +/*
+> + * Enforce a minimum alignment for all caches.
+> + * Intended for archs that get misalignment faults even for BYTES_PER_WORD
+> + * aligned buffers. Includes ARCH_KMALLOC_MINALIGN.
+> + * If possible: Do not enable this flag for CONFIG_DEBUG_SLAB, it disables
+> + * some debug features.
+> + */
+> +#define ARCH_SLAB_MINALIGN 0
+> +#endif
+> +
+>  /*
+>   * struct kmem_cache
+>   *
+> diff --git a/mm/slab.c b/mm/slab.c
+> index bac0f4f..7401ddc 100644
+> --- a/mm/slab.c
+> +++ b/mm/slab.c
+> @@ -144,30 +144,6 @@
+>  #define	BYTES_PER_WORD		sizeof(void *)
+>  #define	REDZONE_ALIGN		max(BYTES_PER_WORD, __alignof__(unsigned long long))
+>  
+> -#ifndef ARCH_KMALLOC_MINALIGN
+> -/*
+> - * Enforce a minimum alignment for the kmalloc caches.
+> - * Usually, the kmalloc caches are cache_line_size() aligned, except when
+> - * DEBUG and FORCED_DEBUG are enabled, then they are BYTES_PER_WORD aligned.
+> - * Some archs want to perform DMA into kmalloc caches and need a guaranteed
+> - * alignment larger than the alignment of a 64-bit integer.
+> - * ARCH_KMALLOC_MINALIGN allows that.
+> - * Note that increasing this value may disable some debug features.
+> - */
+> -#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
+> -#endif
+> -
+> -#ifndef ARCH_SLAB_MINALIGN
+> -/*
+> - * Enforce a minimum alignment for all caches.
+> - * Intended for archs that get misalignment faults even for BYTES_PER_WORD
+> - * aligned buffers. Includes ARCH_KMALLOC_MINALIGN.
+> - * If possible: Do not enable this flag for CONFIG_DEBUG_SLAB, it disables
+> - * some debug features.
+> - */
+> -#define ARCH_SLAB_MINALIGN 0
+> -#endif
+> -
+>  #ifndef ARCH_KMALLOC_FLAGS
+>  #define ARCH_KMALLOC_FLAGS SLAB_HWCACHE_ALIGN
+>  #endif
