@@ -1,43 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] Add Niagara2 crypto driver
-Date: Wed, 19 May 2010 14:15:44 +1000
-Message-ID: <20100519041544.GA21601@gondor.apana.org.au>
-References: <20100517.222226.42804224.davem@davemloft.net>
+Subject: Re: VIA Padlock: +30% XTS Performance by using ECB
+Date: Wed, 19 May 2010 15:07:14 +1000
+Message-ID: <20100519050714.GA22114@gondor.apana.org.au>
+References: <20100423154449.GA1138@darkside.12.kls.lan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Mario 'BitKoenig' Holbe <Mario.Holbe@TU-Ilmenau.DE>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:33639 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:54272 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750713Ab0ESEPr (ORCPT
+	with ESMTP id S1751341Ab0ESFHT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 00:15:47 -0400
+	Wed, 19 May 2010 01:07:19 -0400
 Content-Disposition: inline
-In-Reply-To: <20100517.222226.42804224.davem@davemloft.net>
+In-Reply-To: <20100423154449.GA1138@darkside.12.kls.lan>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 17, 2010 at 10:22:26PM -0700, David Miller wrote:
-> 
-> These patches do the work necessary to add the Niagara2 crypto
-> driver.
-> 
-> The main enablers are a set of generic ablkcipher_walk helpers, and
-> testing support for async hash algorithms.
-> 
-> Some work still remains, in particular tcrypt still can't perf test
-> async ciphers :-/
-> 
-> These changes are also available from the GIT tree at:
-> 
-> 	master.kernel.org:/pub/scm/linux/kernel/git/davem/cryptodev-2.6.git
+Mario 'BitKoenig' Holbe <Mario.Holbe@tu-ilmenau.de> wrote:
+>
+> I have no idea where this should finally be implemented, since it slows
+> down XTS on non-accelerated CPUs. Maybe a seperate xts-aes-padlock
+> driver would make sense depending on how specific this is to VIA
+> Padlock, i.e. how it performs on other non-XTS-capable accelerators.
 
-All applied to cryptodev.  This is truely awesome as it is probably
-the first piece of async driver in our tree that is capable of doing
-IPsec at 10Gb/s!
+We can solve that by instantiating both the ECB-based XTS and the
+current XTS, but by increasing the current XTS's priority value.
 
-Thanks,
+Cheers,
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
