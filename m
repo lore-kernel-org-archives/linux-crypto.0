@@ -1,143 +1,72 @@
-From: Shikhar <shikhark@gmail.com>
-Subject: Possible bug in AUTHENC
-Date: Wed, 19 May 2010 15:24:24 +0200
-Message-ID: <AANLkTiltCjRr91OASbzzDplRp3zl5yaUnM0RKwzg3S_G@mail.gmail.com>
+From: Johannes Stezenbach <js@sig21.net>
+Subject: Re: [PATCH 1/4] mm: Move ARCH_SLAB_MINALIGN and
+ ARCH_KMALLOC_MINALIGN to <linux/slab_def.h>
+Date: Wed, 19 May 2010 15:30:28 +0200
+Message-ID: <20100519133028.GA26659@sig21.net>
+References: <1274266725.6930.9823.camel@macbook.infradead.org>
+ <1274266902.6930.9834.camel@macbook.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: herbert@gondor.apana.org.au
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, manfred@colorfullife.com,
+	David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
+	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
+	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
+To: David Woodhouse <dwmw2@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:61203 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751041Ab0ESNYq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 09:24:46 -0400
-Received: by wyg36 with SMTP id 36so417339wyg.19
-        for <linux-crypto@vger.kernel.org>; Wed, 19 May 2010 06:24:44 -0700 (PDT)
+Received: from bar.sig21.net ([80.81.252.164]:39980 "EHLO bar.sig21.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751020Ab0ESNbU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 May 2010 09:31:20 -0400
+Content-Disposition: inline
+In-Reply-To: <1274266902.6930.9834.camel@macbook.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi,
 
-I am currently working on a driver for our crypto HW and the initial
-aim was to offload IPSec (ESP for now) to HW. I did this by
-registering the cipher and hash algorithms (both asynchronous)
-separately (AES-CBC, HMAC-SHA1 only for now) and let the API handle
-the request using the AUTHENC interface.
+I have some comments/questions, I hope it's not too silly:
 
-The problem seems to be after the asynchronous hash request is
-completed, the length of the ABLKCIPHER decrypt request is not
-calculated correctly in "authenc_verify_ahash_update_done()" and
-"authenc_verify_ahash_done()". The length should be subtracted by
-"authsize" as done in "crypto_authenc_decrypt()".
+On Wed, May 19, 2010 at 12:01:42PM +0100, David Woodhouse wrote:
+> +#ifndef ARCH_KMALLOC_MINALIGN
+> +/*
+> + * Enforce a minimum alignment for the kmalloc caches.
+> + * Usually, the kmalloc caches are cache_line_size() aligned, except when
+> + * DEBUG and FORCED_DEBUG are enabled, then they are BYTES_PER_WORD aligned.
+> + * Some archs want to perform DMA into kmalloc caches and need a guaranteed
+> + * alignment larger than the alignment of a 64-bit integer.
+> + * ARCH_KMALLOC_MINALIGN allows that.
+> + * Note that increasing this value may disable some debug features.
+> + */
+> +#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
+> +#endif
 
-The following patch (applied against 2.6.34) should fix it. I hope I
-didn't miss anything.
+I think the comment is confusing.  IIRC kmalloc() API guarantees that
+the allocated buffer is suitable for DMA, so if cache coherence is not
+handled by hardware the arch might need to set this to the cache line size,
+and that's what ARCH_KMALLOC_MINALIGN is about. Nothing else.
 
-Thanks,
-Shikhar
+I'm not sure if kmalloc() API makes any guarantee regarding alignment,
+like 32bit or 64bit or sizeof(void *) ...?  At least I cannot find
+any documentation about this.
 
---------
-diff -pu linux-2.6.34/crypto/authenc.c linux-2.6.34_mod/crypto/authenc.c
 
---- linux-2.6.34/crypto/authenc.c	2010-05-16 23:17:36.000000000 +0200
-+++ linux-2.6.34_mod/crypto/authenc.c	2010-05-19 14:32:51.000000000 +0200
-@@ -181,6 +181,7 @@ static void authenc_verify_ahash_update_
- 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
- 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
-+	unsigned int cryptlen = req->cryptlen;
+> +#ifndef ARCH_SLAB_MINALIGN
+> +/*
+> + * Enforce a minimum alignment for all caches.
+> + * Intended for archs that get misalignment faults even for BYTES_PER_WORD
+> + * aligned buffers. Includes ARCH_KMALLOC_MINALIGN.
+> + * If possible: Do not enable this flag for CONFIG_DEBUG_SLAB, it disables
+> + * some debug features.
+> + */
+> +#define ARCH_SLAB_MINALIGN 0
+> +#endif
 
- 	if (err)
- 		goto out;
-@@ -196,6 +197,7 @@ static void authenc_verify_ahash_update_
- 		goto out;
+Why is this needed at all?  If code calls kmem_cache_create()
+with wrong align parameter, or has wrong expectations wrt kmalloc()
+alignment guarantees, this code needs to be fixed?
+I mean, portable code cannot assume that unaligned accesses work?
 
- 	authsize = crypto_aead_authsize(authenc);
-+	cryptlen -= authsize;
- 	ihash = ahreq->result + authsize;
- 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
- 				 authsize, 0);
-@@ -209,7 +211,7 @@ static void authenc_verify_ahash_update_
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
- 					req->base.complete, req->base.data);
- 	ablkcipher_request_set_crypt(abreq, req->src, req->dst,
--				     req->cryptlen, req->iv);
-+				     cryptlen, req->iv);
 
- 	err = crypto_ablkcipher_decrypt(abreq);
-
-@@ -228,11 +230,13 @@ static void authenc_verify_ahash_done(st
- 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
- 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
-+	unsigned int cryptlen = req->cryptlen;
-
- 	if (err)
- 		goto out;
-
- 	authsize = crypto_aead_authsize(authenc);
-+	cryptlen -= authsize;
- 	ihash = ahreq->result + authsize;
- 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
- 				 authsize, 0);
-@@ -246,7 +250,7 @@ static void authenc_verify_ahash_done(st
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
- 					req->base.complete, req->base.data);
- 	ablkcipher_request_set_crypt(abreq, req->src, req->dst,
--				     req->cryptlen, req->iv);
-+				     cryptlen, req->iv);
-
- 	err = crypto_ablkcipher_decrypt(abreq);
-
---- linux-2.6.34/crypto/authenc.c	2010-05-16 23:17:36.000000000 +0200
-+++ linux-2.6.34_mod/crypto/authenc.c	2010-05-19 14:32:51.000000000 +0200
-@@ -181,6 +181,7 @@ static void authenc_verify_ahash_update_
- 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
- 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
-+	unsigned int cryptlen = req->cryptlen;
-
- 	if (err)
- 		goto out;
-@@ -196,6 +197,7 @@ static void authenc_verify_ahash_update_
- 		goto out;
-
- 	authsize = crypto_aead_authsize(authenc);
-+	cryptlen -= authsize;
- 	ihash = ahreq->result + authsize;
- 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
- 				 authsize, 0);
-@@ -209,7 +211,7 @@ static void authenc_verify_ahash_update_
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
- 					req->base.complete, req->base.data);
- 	ablkcipher_request_set_crypt(abreq, req->src, req->dst,
--				     req->cryptlen, req->iv);
-+				     cryptlen, req->iv);
-
- 	err = crypto_ablkcipher_decrypt(abreq);
-
-@@ -228,11 +230,13 @@ static void authenc_verify_ahash_done(st
- 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct authenc_request_ctx *areq_ctx = aead_request_ctx(req);
- 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ctx->reqoff);
-+	unsigned int cryptlen = req->cryptlen;
-
- 	if (err)
- 		goto out;
-
- 	authsize = crypto_aead_authsize(authenc);
-+	cryptlen -= authsize;
- 	ihash = ahreq->result + authsize;
- 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
- 				 authsize, 0);
-@@ -246,7 +250,7 @@ static void authenc_verify_ahash_done(st
- 	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
- 					req->base.complete, req->base.data);
- 	ablkcipher_request_set_crypt(abreq, req->src, req->dst,
--				     req->cryptlen, req->iv);
-+				     cryptlen, req->iv);
-
- 	err = crypto_ablkcipher_decrypt(abreq);
-
- --------
+Thanks
+Johannes
