@@ -1,30 +1,40 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 2/6] crypto: Fix scatterwalk_done() test.
-Date: Tue, 18 May 2010 22:54:29 -0700 (PDT)
-Message-ID: <20100518.225429.233860122.davem@davemloft.net>
-References: <20100517.222237.232897853.davem@davemloft.net>
-	<20100519040513.GC20887@gondor.apana.org.au>
+From: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [BUG] SLOB breaks Crypto
+Date: Wed, 19 May 2010 08:14:28 +0100
+Message-ID: <1274253269.6930.9325.camel@macbook.infradead.org>
+References: <1274211235.11603.1205.camel@calx>
+	 <20100518.135945.180391159.davem@davemloft.net>
+	 <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com>
+	 <20100518.142021.135951273.davem@davemloft.net>
+	 <1274224834.6930.8361.camel@macbook.infradead.org>
+	 <20100519010524.GB18813@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Cc: David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
+	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
+	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:56769
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752122Ab0ESFyU (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:40820 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752146Ab0ESHPH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 01:54:20 -0400
-In-Reply-To: <20100519040513.GC20887@gondor.apana.org.au>
+	Wed, 19 May 2010 03:15:07 -0400
+In-Reply-To: <20100519010524.GB18813@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 19 May 2010 14:05:13 +1000
+On Wed, 2010-05-19 at 11:05 +1000, Herbert Xu wrote:
+> While this problem wouldn't have occurred, we would instead have
+> data corruption/alignment faults on architectures such as sparc32
+> or ARM that require 64-bit alignment for 64-bit objects.
 
-> So I'm going to commit this patch instead.  Let me know if you
-> see any other issues with it.
+Yeah, but that's what ARCH_SLAB_MINALIGN is for.
 
-Looks good:
+ARM gets this right, and Dave has already said he's going to fix sparc.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+-- 
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
