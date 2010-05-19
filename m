@@ -1,72 +1,62 @@
-From: Johannes Stezenbach <js@sig21.net>
-Subject: Re: [PATCH 1/4] mm: Move ARCH_SLAB_MINALIGN and
- ARCH_KMALLOC_MINALIGN to <linux/slab_def.h>
-Date: Wed, 19 May 2010 15:30:28 +0200
-Message-ID: <20100519133028.GA26659@sig21.net>
-References: <1274266725.6930.9823.camel@macbook.infradead.org>
- <1274266902.6930.9834.camel@macbook.infradead.org>
+From: David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 5/4] Provide __dma_aligned macro
+Date: Wed, 19 May 2010 14:49:08 +0100
+Message-ID: <1274276948.6930.10117.camel@macbook.infradead.org>
+References: <1274211235.11603.1205.camel@calx>
+	 <20100518.135945.180391159.davem@davemloft.net>
+	 <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com>
+	 <20100518.142021.135951273.davem@davemloft.net>
+	 <1274224834.6930.8361.camel@macbook.infradead.org>
+	 <20100519010524.GB18813@gondor.apana.org.au>
+	 <1274266725.6930.9823.camel@macbook.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, manfred@colorfullife.com,
-	David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
 	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
 	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
-To: David Woodhouse <dwmw2@infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Mike Frysinger <vapier@gentoo.org>,
+	Nick Piggin <npiggin@suse.de>, os@emlix.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bar.sig21.net ([80.81.252.164]:39980 "EHLO bar.sig21.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751020Ab0ESNbU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 09:31:20 -0400
-Content-Disposition: inline
-In-Reply-To: <1274266902.6930.9834.camel@macbook.infradead.org>
+Received: from casper.infradead.org ([85.118.1.10]:49797 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751441Ab0ESNtn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 May 2010 09:49:43 -0400
+In-Reply-To: <1274266725.6930.9823.camel@macbook.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Commit 3843384a055496dfed3c93ae883d964d8290fdab ("Input: ad7877 - keep
+dma rx buffers in seperate cache lines")[sic] introduced the use of
+____cacheline_aligned to ensure that buffers used for DMA as part of a
+structure were suitably separated from the rest of the structure.
 
-I have some comments/questions, I hope it's not too silly:
+However, aligning to the cache line size isn't necessary on
+cache-coherent architectures. To avoid wasting space, the correct value
+to use for the alignment is ARCH_KMALLOC_MINALIGN.
 
-On Wed, May 19, 2010 at 12:01:42PM +0100, David Woodhouse wrote:
-> +#ifndef ARCH_KMALLOC_MINALIGN
-> +/*
-> + * Enforce a minimum alignment for the kmalloc caches.
-> + * Usually, the kmalloc caches are cache_line_size() aligned, except when
-> + * DEBUG and FORCED_DEBUG are enabled, then they are BYTES_PER_WORD aligned.
-> + * Some archs want to perform DMA into kmalloc caches and need a guaranteed
-> + * alignment larger than the alignment of a 64-bit integer.
-> + * ARCH_KMALLOC_MINALIGN allows that.
-> + * Note that increasing this value may disable some debug features.
-> + */
-> +#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
-> +#endif
+This patch provides a __dma_aligned macro which does the right thing.
 
-I think the comment is confusing.  IIRC kmalloc() API guarantees that
-the allocated buffer is suitable for DMA, so if cache coherence is not
-handled by hardware the arch might need to set this to the cache line size,
-and that's what ARCH_KMALLOC_MINALIGN is about. Nothing else.
+Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
 
-I'm not sure if kmalloc() API makes any guarantee regarding alignment,
-like 32bit or 64bit or sizeof(void *) ...?  At least I cannot find
-any documentation about this.
+diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+index ca32ed7..4487cf3 100644
+--- a/include/linux/dma-mapping.h
++++ b/include/linux/dma-mapping.h
+@@ -5,6 +5,9 @@
+ #include <linux/err.h>
+ #include <linux/dma-attrs.h>
+ #include <linux/scatterlist.h>
++#include <linux/slab.h>
++
++#define __dma_aligned __attribute__((__aligned__(ARCH_KMALLOC_MINALIGN)))
+ 
+ /* These definitions mirror those in pci.h, so they can be used
+  * interchangeably with their PCI_ counterparts */
 
-
-> +#ifndef ARCH_SLAB_MINALIGN
-> +/*
-> + * Enforce a minimum alignment for all caches.
-> + * Intended for archs that get misalignment faults even for BYTES_PER_WORD
-> + * aligned buffers. Includes ARCH_KMALLOC_MINALIGN.
-> + * If possible: Do not enable this flag for CONFIG_DEBUG_SLAB, it disables
-> + * some debug features.
-> + */
-> +#define ARCH_SLAB_MINALIGN 0
-> +#endif
-
-Why is this needed at all?  If code calls kmem_cache_create()
-with wrong align parameter, or has wrong expectations wrt kmalloc()
-alignment guarantees, this code needs to be fixed?
-I mean, portable code cannot assume that unaligned accesses work?
-
-
-Thanks
-Johannes
+-- 
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
