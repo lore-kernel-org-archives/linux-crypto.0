@@ -1,70 +1,44 @@
-From: David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 3/4] mm: Move ARCH_SLAB_MINALIGN and ARCH_KMALLOC_MINALIGN
- to <linux/slub_def.h>
-Date: Wed, 19 May 2010 12:02:14 +0100
-Message-ID: <1274266934.6930.9840.camel@macbook.infradead.org>
-References: <1274266725.6930.9823.camel@macbook.infradead.org>
+From: Pekka Enberg <penberg@cs.helsinki.fi>
+Subject: Re: [BUG] SLOB breaks Crypto
+Date: Wed, 19 May 2010 14:08:41 +0300
+Message-ID: <AANLkTikLhmQ2oYnYS2KblEayg6x1ZAmUnBvYfNu0yFh9@mail.gmail.com>
+References: <1274211235.11603.1205.camel@calx>
+	 <20100518.135945.180391159.davem@davemloft.net>
+	 <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com>
+	 <20100518.142021.135951273.davem@davemloft.net>
+	 <1274224834.6930.8361.camel@macbook.infradead.org>
+	 <20100519010524.GB18813@gondor.apana.org.au>
+	 <1274266725.6930.9823.camel@macbook.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
-	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
-	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
-To: Herbert Xu <herbert@gondor.apana.org.au>, christoph@lameter.com
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>, mpm@selenic.com,
+	ken@codelabs.ch, geert@linux-m68k.org, michael-dev@fami-braun.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	anemo@mba.ocn.ne.jp
+To: David Woodhouse <dwmw2@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:42954 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757197Ab0ESLC3 (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:54909 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753364Ab0ESLIo convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 07:02:29 -0400
+	Wed, 19 May 2010 07:08:44 -0400
 In-Reply-To: <1274266725.6930.9823.camel@macbook.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
----
- include/linux/slub_def.h |    8 ++++++++
- mm/slub.c                |    8 --------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+On Wed, May 19, 2010 at 1:58 PM, David Woodhouse <dwmw2@infradead.org> =
+wrote:
+> On Wed, 2010-05-19 at 11:05 +1000, Herbert Xu wrote:
+>> So no getting rid of them isn't going to fix things either. =A0Of
+>> course I have no objections to moving this into slab.h or a similar
+>> location should anyone be willing to do the hard work.
+>
+> http://git.infradead.org/users/dwmw2/minalign-2.6.git
+> git://git.infradead.org/users/dwmw2/minalign-2.6.git
 
-diff --git a/include/linux/slub_def.h b/include/linux/slub_def.h
-index 0249d41..55695c8 100644
---- a/include/linux/slub_def.h
-+++ b/include/linux/slub_def.h
-@@ -116,6 +116,14 @@ struct kmem_cache {
- 
- #define KMALLOC_SHIFT_LOW ilog2(KMALLOC_MIN_SIZE)
- 
-+#ifndef ARCH_KMALLOC_MINALIGN
-+#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
-+#endif
-+
-+#ifndef ARCH_SLAB_MINALIGN
-+#define ARCH_SLAB_MINALIGN __alignof__(unsigned long long)
-+#endif
-+
- /*
-  * Maximum kmalloc object size handled by SLUB. Larger object allocations
-  * are passed through to the page allocator. The page allocator "fastpath"
-diff --git a/mm/slub.c b/mm/slub.c
-index d2a54fe..c874c3e 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -157,14 +157,6 @@
- #define SLUB_MERGE_SAME (SLAB_DEBUG_FREE | SLAB_RECLAIM_ACCOUNT | \
- 		SLAB_CACHE_DMA | SLAB_NOTRACK)
- 
--#ifndef ARCH_KMALLOC_MINALIGN
--#define ARCH_KMALLOC_MINALIGN __alignof__(unsigned long long)
--#endif
--
--#ifndef ARCH_SLAB_MINALIGN
--#define ARCH_SLAB_MINALIGN __alignof__(unsigned long long)
--#endif
--
- #define OO_SHIFT	16
- #define OO_MASK		((1 << OO_SHIFT) - 1)
- #define MAX_OBJS_PER_PAGE	65535 /* since page.objects is u16 */
--- 
-1.6.6.1
+Acked-by: Pekka Enberg <penberg@cs.helsinki.fi>
+
+Are you sending the patches to Linus or do you want me to pull them in =
+slab.git?
