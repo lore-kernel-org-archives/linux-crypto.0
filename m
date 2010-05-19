@@ -1,41 +1,41 @@
 From: David Miller <davem@davemloft.net>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Wed, 19 May 2010 12:51:16 -0700 (PDT)
-Message-ID: <20100519.125116.134094842.davem@davemloft.net>
-References: <20100519114609.GA26610@gondor.apana.org.au>
-	<AANLkTiky-saTpv6Vq2ipIWC39b5eox92qQGE0QcACEBR@mail.gmail.com>
-	<20100519125903.GA27496@gondor.apana.org.au>
+Date: Wed, 19 May 2010 12:56:30 -0700 (PDT)
+Message-ID: <20100519.125630.121263182.davem@davemloft.net>
+References: <20100518223507.GB5933@linux-sh.org>
+	<20100518223739.GC5933@linux-sh.org>
+	<alpine.DEB.2.00.1005191017290.4592@router.home>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: penberg@cs.helsinki.fi, dwmw2@infradead.org, mpm@selenic.com,
-	ken@codelabs.ch, geert@linux-m68k.org, michael-dev@fami-braun.de,
+Cc: lethal@linux-sh.org, penberg@cs.helsinki.fi, mpm@selenic.com,
+	herbert@gondor.hengli.com.au, ken@codelabs.ch,
+	geert@linux-m68k.org, michael-dev@fami-braun.de,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	anemo@mba.ocn.ne.jp
-To: herbert@gondor.apana.org.au
+	anemo@mba.ocn.ne.jp, dwmw2@infradead.org
+To: cl@linux.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:44771
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:32879
 	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751189Ab0ESTvH (ORCPT
+	by vger.kernel.org with ESMTP id S1753245Ab0EST4V (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 15:51:07 -0400
-In-Reply-To: <20100519125903.GA27496@gondor.apana.org.au>
+	Wed, 19 May 2010 15:56:21 -0400
+In-Reply-To: <alpine.DEB.2.00.1005191017290.4592@router.home>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 19 May 2010 22:59:03 +1000
+From: Christoph Lameter <cl@linux.com>
+Date: Wed, 19 May 2010 10:19:33 -0500 (CDT)
 
-> On Wed, May 19, 2010 at 03:54:43PM +0300, Pekka Enberg wrote:
->>
->> OK, I'll pick up David's patches and just wait for sparc changes to
->> hit Linus' tree first. Herbert, do I have your ACK for the crypto
->> patches?
-> 
-> Of course:
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> The assumptions are not arbitrary. It is reasonable to assume that
+> structures managed by the slab allocators may contain long long variables
+> and that therefore a unsigned long long alignment is required by the
+> allocator. It is the *compiler* who tells us that long long needs to be
+> aligned at double word boundaries. If an arch does not require long long
+> alignment on double word boundaries then the *compiler* should tell us
+> that and then the allocators will align on word boundaries.
 
-I just sent Linus a pull request and:
+That is a good point.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+So really, __alignof__(unsigned long long) is technically always right.
+Because it should evaluate to "4" on x86-32, for example.
