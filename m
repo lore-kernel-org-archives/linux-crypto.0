@@ -1,37 +1,62 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Wed, 19 May 2010 11:05:24 +1000
-Message-ID: <20100519010524.GB18813@gondor.apana.org.au>
-References: <1274211235.11603.1205.camel@calx> <20100518.135945.180391159.davem@davemloft.net> <AANLkTik3tKpPvilnWV6eVIm5_rUPeuCzXBDwmnZl9N6o@mail.gmail.com> <20100518.142021.135951273.davem@davemloft.net> <1274224834.6930.8361.camel@macbook.infradead.org>
+Date: Wed, 19 May 2010 11:51:54 +1000
+Message-ID: <20100519015154.GA19450@gondor.apana.org.au>
+References: <4B9E38AF.70309@fami-braun.de> <84144f021003180930s44e239dfmb38183096f07c8a8@mail.gmail.com> <4BA29A19.2050307@fami-braun.de> <20100319003351.GC20227@gondor.apana.org.au> <AANLkTilPEnh3ewTb-KDsReBpjcszh1wkbfZohIaPXBKe@mail.gmail.com> <4BF1BA0E.4010402@codelabs.ch> <1274135869.11603.473.camel@calx> <4BF24D1F.6010005@codelabs.ch> <20100518102701.GA7293@gondor.apana.org.au> <4BF2EB66.4020207@codelabs.ch>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, penberg@cs.helsinki.fi,
-	mpm@selenic.com, ken@codelabs.ch, geert@linux-m68k.org,
-	michael-dev@fami-braun.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, anemo@mba.ocn.ne.jp
-To: David Woodhouse <dwmw2@infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	michael-dev@fami-braun.de, Pekka Enberg <penberg@cs.helsinki.fi>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Atsushi Nemoto <anemo@mba.ocn.ne.jp>,
+	"David S. Miller" <davem@davemloft.net>
+To: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([216.59.3.182]:58186 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752338Ab0ESBwO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 18 May 2010 21:52:14 -0400
 Content-Disposition: inline
-In-Reply-To: <1274224834.6930.8361.camel@macbook.infradead.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <4BF2EB66.4020207@codelabs.ch>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 19, 2010 at 12:20:34AM +0100, David Woodhouse wrote:
+On Tue, May 18, 2010 at 09:32:54PM +0200, Adrian-Ken Rueegsegger wrote:
 > 
-> It would be better if the minimum alignment was exposed to generic code
-> though -- you're right that the CPP tests in linux/crypto.h really
-> shouldn't have to exist. If it wasn't for that, then the crypto problem
-> wouldn't have occurred.
+> When doing the revert it is necessary to either have
+> ARCH_KMALLOC_MINALIGN defined or explicitly define CRYPTO_MINALIGN in
+> the case where it is not. Otherwise shash compilation fails because it
+> needs CRYPTO_MINALIGN.
 
-While this problem wouldn't have occurred, we would instead have
-data corruption/alignment faults on architectures such as sparc32
-or ARM that require 64-bit alignment for 64-bit objects.
+I've added the following patch.  Thanks!
 
-So no getting rid of them isn't going to fix things either.  Of
-course I have no objections to moving this into slab.h or a similar
-location should anyone be willing to do the hard work.
+commit 18eb8ea6ee4cc9ed39b45f95b734f523bcfb586b
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Wed May 19 11:50:58 2010 +1000
 
-Thanks,
+    crypto: shash - Remove usage of CRYPTO_MINALIGN
+    
+    The macro CRYPTO_MINALIGN is not meant to be used directly.  This
+    patch replaces it with crypto_tfm_ctx_alignment.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 91f7b9d..22fd943 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -37,7 +37,7 @@ static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
+ 	u8 *buffer, *alignbuffer;
+ 	int err;
+ 
+-	absize = keylen + (alignmask & ~(CRYPTO_MINALIGN - 1));
++	absize = keylen + (alignmask & ~(crypto_tfm_ctx_alignment() - 1));
+ 	buffer = kmalloc(absize, GFP_KERNEL);
+ 	if (!buffer)
+ 		return -ENOMEM;
+
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
