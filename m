@@ -1,41 +1,41 @@
-From: David Miller <davem@davemloft.net>
+From: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
 Subject: Re: [BUG] SLOB breaks Crypto
-Date: Wed, 19 May 2010 12:56:30 -0700 (PDT)
-Message-ID: <20100519.125630.121263182.davem@davemloft.net>
-References: <20100518223507.GB5933@linux-sh.org>
-	<20100518223739.GC5933@linux-sh.org>
-	<alpine.DEB.2.00.1005191017290.4592@router.home>
+Date: Thu, 20 May 2010 12:38:01 +0900
+Message-ID: <20100520124026G.fujita.tomonori@lab.ntt.co.jp>
+References: <AANLkTikZyfxBjXdvNzuVT2N9XIyJmY6JDiKRMRtAykeC@mail.gmail.com>
+	<1274278307.11603.1264.camel@calx>
+	<20100519.123325.123438307.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: lethal@linux-sh.org, penberg@cs.helsinki.fi, mpm@selenic.com,
-	herbert@gondor.hengli.com.au, ken@codelabs.ch,
-	geert@linux-m68k.org, michael-dev@fami-braun.de,
+Cc: mpm@selenic.com, geert@linux-m68k.org, dwmw2@infradead.org,
+	herbert@gondor.hengli.com.au, penberg@cs.helsinki.fi,
+	ken@codelabs.ch, michael-dev@fami-braun.de,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	anemo@mba.ocn.ne.jp, dwmw2@infradead.org
-To: cl@linux.com
+	anemo@mba.ocn.ne.jp
+To: davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:32879
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753245Ab0EST4V (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 May 2010 15:56:21 -0400
-In-Reply-To: <alpine.DEB.2.00.1005191017290.4592@router.home>
+Received: from sh.osrg.net ([192.16.179.4]:43585 "EHLO sh.osrg.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753258Ab0ETDnE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 May 2010 23:43:04 -0400
+In-Reply-To: <20100519.123325.123438307.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Christoph Lameter <cl@linux.com>
-Date: Wed, 19 May 2010 10:19:33 -0500 (CDT)
+On Wed, 19 May 2010 12:33:25 -0700 (PDT)
+David Miller <davem@davemloft.net> wrote:
 
-> The assumptions are not arbitrary. It is reasonable to assume that
-> structures managed by the slab allocators may contain long long variables
-> and that therefore a unsigned long long alignment is required by the
-> allocator. It is the *compiler* who tells us that long long needs to be
-> aligned at double word boundaries. If an arch does not require long long
-> alignment on double word boundaries then the *compiler* should tell us
-> that and then the allocators will align on word boundaries.
+> From: Matt Mackall <mpm@selenic.com>
+> Date: Wed, 19 May 2010 09:11:47 -0500
+> 
+> > I still think we should add it to all of them as positive documentation
+> > that this issue has been considered. And then make the kernel not
+> > compile without it so new arch implementors can't miss it.
+> 
+> I agree and would even go so far as to suggest that we break all
+> architectures not setting it now.
 
-That is a good point.
-
-So really, __alignof__(unsigned long long) is technically always right.
-Because it should evaluate to "4" on x86-32, for example.
+About documentation, I think that ARCH_KMALLOC_MINALIGN description
+would fit in "Platform Issues" section in DMA-API-HOWTO. I'll add it
+later.
