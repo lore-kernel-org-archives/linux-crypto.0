@@ -1,174 +1,42 @@
-From: James Morris <jmorris@namei.org>
-Subject: [ANN] Linux Security Summit 2010 - Announcement and CFP
-Date: Sat, 22 May 2010 08:44:58 +1000 (EST)
-Message-ID: <alpine.LRH.2.00.1005220826560.10931@tundra.namei.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] net/ipsec: don't treat EINPROGRESS as a regular error
+Date: Sat, 22 May 2010 09:41:43 +1000
+Message-ID: <20100521234143.GA7752@gondor.apana.org.au>
+References: <20091204212847.GC28480@deprecation.cyrius.com> <4BCB4009.70707@gmail.com> <20100418191719.GA2508@Chamillionaire.breakpoint.cc> <4BCE125F.30200@gmail.com> <20100424144215.GA9057@Chamillionaire.breakpoint.cc> <20100425011821.GA5284@gondor.apana.org.au> <20100425152928.GA14489@Chamillionaire.breakpoint.cc> <20100426011711.GA19734@gondor.apana.org.au> <20100426181142.GA22245@Chamillionaire.breakpoint.cc> <20100521185905.GB1697@jirafa.cyrius.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-kernel@vger.kernel.org, lwn@lwn.net,
-	fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
-	"C. Craig Ross" <ccr@linuxfoundation.org>,
-	ubuntu-hardened@lists.ubuntu.com,
-	tomoyo-users-en@lists.sourceforge.jp,
-	netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Audit-ML <linux-audit@redhat.com>, lss-pc@ext.namei.org,
-	gentoo-hardened@gentoo.org
-To: linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
+	"L.C." <lucorsel@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Martin Michlmayr <tbm@cyrius.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tundra.namei.org ([65.99.196.166]:54336 "EHLO tundra.namei.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754616Ab0EUWqT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 May 2010 18:46:19 -0400
+Received: from ringil.hengli.com.au ([216.59.3.182]:55653 "EHLO
+	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758779Ab0EUXmH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 May 2010 19:42:07 -0400
+Content-Disposition: inline
+In-Reply-To: <20100521185905.GB1697@jirafa.cyrius.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-==========================================================================
+On Fri, May 21, 2010 at 07:59:05PM +0100, Martin Michlmayr wrote:
+> * Sebastian Andrzej Siewior <sebastian@breakpoint.cc> [2010-04-26 20:11]:
+> > >OK that was my fault.  Steffen had all the requisite EINPROGRESS
+> > >checks in place but I told him to get rid of them.
+> > >
+> > >This patch should fix it.
+> > Excellent job Herbert, it does solve the problem.
+> 
+> Herbert, this bug was originally reported with 2.6.32 so can you
+> please ensure that the fix will land in -stable.
+> 
+> http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=180ce7e81030e1ef763d58f97f9ab840ff57d848
 
-                  ANNOUNCEMENT AND CALL FOR PARTICIPATION                
-
-                        LINUX SECURITY SUMMIT 2010      
-
-==========================================================================
-
-
-DESCRIPTION
-
-  The Linux Security Summit is a technical forum for collaboration
-  between Linux developers, researchers, and end users.  Its primary aim
-  is to foster community efforts in analyzing and solving Linux security
-  challenges.
-
-  The format of the summit will be:
-  
-    * Selected brief presentations
-    * Lightning talks
-    * Q&A panel sessions 
-  
-
-DATES / LOCATION
-
-  The Linux Security Summit for 2010 will be held on the 9th of August in
-  Boston, USA.  It will be co-located with LinuxCon [1], at the
-  Renaissance Boston Waterfront.
-  
-  Note that Linux Security Summit attendees must be registered to attend
-  LinuxCon.  See the LinuxCon site for details on registration, travel,
-  and accommodation.
-  
-    http://events.linuxfoundation.org/events/linuxcon
-
-  The CFP is currently open, and will close on 4th of June (see below).
-  
-  Accepted speakers will be notified by 9th of June.
-
-
-WHO SHOULD ATTEND
-
-  The event is open to all registered LinuxCon attendees.
-  
-  You do not have to be a "security person" to attend -- we're seeking a
-  diverse range of attendees, and welcome the participation of general
-  developers, researchers, operations, and end-users.
-
-  There will be several panel sessions in addition to brief, selected
-  presentations, with a strong focus on discussion.
-
-
-CALL FOR PARTICIPATION
-
-  The program committee currently seeks proposals for:
-
-  Presentations:
-  
-    Brief technical talks in 30 minute slots, including at least 10
-    minutes of discussion (i.e.  the maximum length of the presentation
-    alone is 20 minutes).  Papers are encouraged, and slides should be
-    minimal.
-    
-    Presentation abstracts should be approximately 150 words in length.
-
-
-  Panel discussion topics:
-  
-    If you'd like to see an issue discussed in a Q&A style panel, send it
-    in.  Note that this may result in you volunteering to participate in
-    a panel.
-
-    
-  Topic areas include, but are not limited to:
-  
-    * System hardening
-    * Access control
-    * Cryptography
-    * Integrity control
-    * Hardware security
-    * Networking
-    * Storage
-    * Virtualization
-    * Desktop
-    * Tools
-    * Management
-    * Case studies
-    * Emerging technologies, threats & techniques 
-    
-  Proposals must be submitted before the end of June 4th, 2010.
-  
-  (That's not far away!)
-  
-  Accepted speakers will be notified by June 9th, 2010.
-  
-  We will probably receive more proposals than can be accommodated.  If
-  your talk is not accepted, you may wish to give a lightning talk or
-  raise a topic in a discussion panel.
-  
-  Lightning talks and discussion panel agendas will be coordinated closer
-  to the event on the event mailing list, and on-site.
-
-  Proposals should be submitted in plain text via email to the program
-  committee at:  lss-pc (_at_) ext.namei.org
-
-
-MAILING LIST
-
-  Everyone planning to attend should join the event mailing list:
-  
-     https://ext.namei.org/mailman/listinfo/linux-security-summit
-     
-  Coordination of panel discussions and lightning talks will occur on the
-  list.  Updates and announcements about the event will also be sent to
-  the list.
-  
-
-WEB SITE
-
-  Please also note the Linux Security Summit web site:
-  
-    https://security.wiki.kernel.org/index.php/LinuxSecuritySummit2010  
- 
-  which will be kept updated with all available information on the event.
-
-
-PROGRAM COMMITTEE
-
-  The Linux Security Summit for 2010 is organized by:
-
-    * James Morris, Red Hat
-    * Serge Hallyn, IBM
-    * Paul Moore, HP
-    * Stephen Smalley, NSA
-    * Joshua Brindle, Tresys
-    * Tetsuo Handa, NTT Data
-    * Herbert Xu, Red Hat
-    * John Johansen, Canonical
-    * Andrew G. Morgan, Google
-    * Kees Cook, Canonical
-    * Casey Schaufler, Smack Project 
-
-  
-  The program committee may be contacted as a group via email:
-
-     lss-pc (_at_) ext.namei.org
-   
-
-REFERENCES  
-
-  [1] LinuxCon: http://events.linuxfoundation.org/events/linuxcon
+Thanks, I will forward it to stable.
+-- 
+Visit Openswan at http://www.openswan.org/
+Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
