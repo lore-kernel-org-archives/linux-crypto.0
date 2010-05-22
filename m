@@ -1,42 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] net/ipsec: don't treat EINPROGRESS as a regular error
-Date: Sat, 22 May 2010 09:41:43 +1000
-Message-ID: <20100521234143.GA7752@gondor.apana.org.au>
-References: <20091204212847.GC28480@deprecation.cyrius.com> <4BCB4009.70707@gmail.com> <20100418191719.GA2508@Chamillionaire.breakpoint.cc> <4BCE125F.30200@gmail.com> <20100424144215.GA9057@Chamillionaire.breakpoint.cc> <20100425011821.GA5284@gondor.apana.org.au> <20100425152928.GA14489@Chamillionaire.breakpoint.cc> <20100426011711.GA19734@gondor.apana.org.au> <20100426181142.GA22245@Chamillionaire.breakpoint.cc> <20100521185905.GB1697@jirafa.cyrius.com>
+From: Julia Lawall <julia@diku.dk>
+Subject: [PATCH 2/8] crypto: Use ERR_CAST
+Date: Sat, 22 May 2010 11:59:48 +0200 (CEST)
+Message-ID: <Pine.LNX.4.64.1005221159290.13021@ask.diku.dk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	"L.C." <lucorsel@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Martin Michlmayr <tbm@cyrius.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:55653 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758779Ab0EUXmH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 May 2010 19:42:07 -0400
-Content-Disposition: inline
-In-Reply-To: <20100521185905.GB1697@jirafa.cyrius.com>
+Received: from mgw2.diku.dk ([130.225.96.92]:35913 "EHLO mgw2.diku.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751475Ab0EVJ7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 May 2010 05:59:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 21, 2010 at 07:59:05PM +0100, Martin Michlmayr wrote:
-> * Sebastian Andrzej Siewior <sebastian@breakpoint.cc> [2010-04-26 20:11]:
-> > >OK that was my fault.  Steffen had all the requisite EINPROGRESS
-> > >checks in place but I told him to get rid of them.
-> > >
-> > >This patch should fix it.
-> > Excellent job Herbert, it does solve the problem.
-> 
-> Herbert, this bug was originally reported with 2.6.32 so can you
-> please ensure that the fix will land in -stable.
-> 
-> http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=180ce7e81030e1ef763d58f97f9ab840ff57d848
+From: Julia Lawall <julia@diku.dk>
 
-Thanks, I will forward it to stable.
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Use ERR_CAST(x) rather than ERR_PTR(PTR_ERR(x)).  The former makes more
+clear what is the purpose of the operation, which otherwise looks like a
+no-op.
+
+The semantic patch that makes this change is as follows:
+(http://coccinelle.lip6.fr/)
+
+// <smpl>
+@@
+type T;
+T x;
+identifier f;
+@@
+
+T f (...) { <+...
+- ERR_PTR(PTR_ERR(x))
++ x
+ ...+> }
+
+@@
+expression x;
+@@
+
+- ERR_PTR(PTR_ERR(x))
++ ERR_CAST(x)
+// </smpl>
+
+Signed-off-by: Julia Lawall <julia@diku.dk>
+
+---
+ crypto/authenc.c |    2 +-
+ crypto/ctr.c     |    2 +-
+ crypto/xts.c     |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff -u -p a/crypto/authenc.c b/crypto/authenc.c
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -612,7 +612,7 @@ static struct crypto_instance *crypto_au
+ 	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
+ 			       CRYPTO_ALG_TYPE_AHASH_MASK);
+ 	if (IS_ERR(auth))
+-		return ERR_PTR(PTR_ERR(auth));
++		return ERR_CAST(auth);
+ 
+ 	auth_base = &auth->base;
+ 
+diff -u -p a/crypto/ctr.c b/crypto/ctr.c
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -185,7 +185,7 @@ static struct crypto_instance *crypto_ct
+ 	alg = crypto_attr_alg(tb[1], CRYPTO_ALG_TYPE_CIPHER,
+ 				  CRYPTO_ALG_TYPE_MASK);
+ 	if (IS_ERR(alg))
+-		return ERR_PTR(PTR_ERR(alg));
++		return ERR_CAST(alg);
+ 
+ 	/* Block size must be >= 4 bytes. */
+ 	err = -EINVAL;
+diff -u -p a/crypto/xts.c b/crypto/xts.c
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -224,7 +224,7 @@ static struct crypto_instance *alloc(str
+ 	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
+ 				  CRYPTO_ALG_TYPE_MASK);
+ 	if (IS_ERR(alg))
+-		return ERR_PTR(PTR_ERR(alg));
++		return ERR_CAST(alg);
+ 
+ 	inst = crypto_alloc_instance("xts", alg);
+ 	if (IS_ERR(inst))
