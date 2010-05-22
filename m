@@ -1,91 +1,39 @@
-From: Julia Lawall <julia@diku.dk>
-Subject: [PATCH 2/8] crypto: Use ERR_CAST
-Date: Sat, 22 May 2010 11:59:48 +0200 (CEST)
-Message-ID: <Pine.LNX.4.64.1005221159290.13021@ask.diku.dk>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
+From: Huang Weiyi <weiyi.huang@gmail.com>
+Subject: [PATCH 05/12] crypto: omap: remove unused #include <linux/version.h>
+Date: Sun, 23 May 2010 01:12:15 +0800
+Message-ID: <1274548335-2656-1-git-send-email-weiyi.huang@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Huang Weiyi <weiyi.huang@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:35913 "EHLO mgw2.diku.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751475Ab0EVJ7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 22 May 2010 05:59:53 -0400
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:39406 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755756Ab0EVRMU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 May 2010 13:12:20 -0400
+Received: by mail-pw0-f46.google.com with SMTP id 5so874903pwi.19
+        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2010 10:12:19 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <julia@diku.dk>
+Remove unused #include <linux/version.h>('s) in
+  drivers/crypto/omap-sham.c
 
-Use ERR_CAST(x) rather than ERR_PTR(PTR_ERR(x)).  The former makes more
-clear what is the purpose of the operation, which otherwise looks like a
-no-op.
-
-The semantic patch that makes this change is as follows:
-(http://coccinelle.lip6.fr/)
-
-// <smpl>
-@@
-type T;
-T x;
-identifier f;
-@@
-
-T f (...) { <+...
-- ERR_PTR(PTR_ERR(x))
-+ x
- ...+> }
-
-@@
-expression x;
-@@
-
-- ERR_PTR(PTR_ERR(x))
-+ ERR_CAST(x)
-// </smpl>
-
-Signed-off-by: Julia Lawall <julia@diku.dk>
-
+Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
 ---
- crypto/authenc.c |    2 +-
- crypto/ctr.c     |    2 +-
- crypto/xts.c     |    2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/omap-sham.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff -u -p a/crypto/authenc.c b/crypto/authenc.c
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -612,7 +612,7 @@ static struct crypto_instance *crypto_au
- 	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
- 			       CRYPTO_ALG_TYPE_AHASH_MASK);
- 	if (IS_ERR(auth))
--		return ERR_PTR(PTR_ERR(auth));
-+		return ERR_CAST(auth);
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 8b03433..7d14856 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -15,7 +15,6 @@
  
- 	auth_base = &auth->base;
+ #define pr_fmt(fmt) "%s: " fmt, __func__
  
-diff -u -p a/crypto/ctr.c b/crypto/ctr.c
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -185,7 +185,7 @@ static struct crypto_instance *crypto_ct
- 	alg = crypto_attr_alg(tb[1], CRYPTO_ALG_TYPE_CIPHER,
- 				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
--		return ERR_PTR(PTR_ERR(alg));
-+		return ERR_CAST(alg);
- 
- 	/* Block size must be >= 4 bytes. */
- 	err = -EINVAL;
-diff -u -p a/crypto/xts.c b/crypto/xts.c
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -224,7 +224,7 @@ static struct crypto_instance *alloc(str
- 	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
- 				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
--		return ERR_PTR(PTR_ERR(alg));
-+		return ERR_CAST(alg);
- 
- 	inst = crypto_alloc_instance("xts", alg);
- 	if (IS_ERR(inst))
+-#include <linux/version.h>
+ #include <linux/err.h>
+ #include <linux/device.h>
+ #include <linux/module.h>
+-- 
+1.6.1.3
