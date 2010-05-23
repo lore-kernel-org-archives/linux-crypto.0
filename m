@@ -1,39 +1,41 @@
-From: Huang Weiyi <weiyi.huang@gmail.com>
-Subject: [PATCH 05/12] crypto: omap: remove unused #include <linux/version.h>
-Date: Sun, 23 May 2010 01:12:15 +0800
-Message-ID: <1274548335-2656-1-git-send-email-weiyi.huang@gmail.com>
-Cc: linux-crypto@vger.kernel.org, Huang Weiyi <weiyi.huang@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Andrea Gelmini <andrea.gelmini@gelma.net>
+Subject: [PATCH 178/199] arch/s390/crypto/crypto_des.h: Checkpatch cleanup
+Date: Sun, 23 May 2010 22:02:05 +0200
+Message-ID: <1274644930-26600-21-git-send-email-andrea.gelmini@gelma.net>
+References: <1274644930-26600-1-git-send-email-andrea.gelmini@gelma.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Heiko Carstens <heiko.carstens@de.ibm.com>,
+	linux390@de.ibm.com, linux-crypto@vger.kernel.org,
+	linux-s390@vger.kernel.org
+To: andrea.gelmini@gelma.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:39406 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755756Ab0EVRMU (ORCPT
+Received: from fg-out-1718.google.com ([72.14.220.153]:10127 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753676Ab0EWUCz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 22 May 2010 13:12:20 -0400
-Received: by mail-pw0-f46.google.com with SMTP id 5so874903pwi.19
-        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2010 10:12:19 -0700 (PDT)
+	Sun, 23 May 2010 16:02:55 -0400
+In-Reply-To: <1274644930-26600-1-git-send-email-andrea.gelmini@gelma.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove unused #include <linux/version.h>('s) in
-  drivers/crypto/omap-sham.c
+arch/s390/crypto/crypto_des.h:18: ERROR: do not use C99 // comments
 
-Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
+Signed-off-by: Andrea Gelmini <andrea.gelmini@gelma.net>
 ---
- drivers/crypto/omap-sham.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ arch/s390/crypto/crypto_des.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 8b03433..7d14856 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -15,7 +15,6 @@
+diff --git a/arch/s390/crypto/crypto_des.h b/arch/s390/crypto/crypto_des.h
+index c964b64..6210457 100644
+--- a/arch/s390/crypto/crypto_des.h
++++ b/arch/s390/crypto/crypto_des.h
+@@ -15,4 +15,4 @@
  
- #define pr_fmt(fmt) "%s: " fmt, __func__
+ extern int crypto_des_check_key(const u8*, unsigned int, u32*);
  
--#include <linux/version.h>
- #include <linux/err.h>
- #include <linux/device.h>
- #include <linux/module.h>
+-#endif //__CRYPTO_DES_H__
++#endif /*__CRYPTO_DES_H__*/
 -- 
-1.6.1.3
+1.7.1.251.gf80a2
