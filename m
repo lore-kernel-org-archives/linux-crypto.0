@@ -1,37 +1,71 @@
-From: Alexander Shishkin <virtuoso@slind.org>
-Subject: Re: [RFC][PATCH] crypto: disable tests when they are not enabled
-Date: Mon, 24 May 2010 15:20:50 +0300
-Message-ID: <20100524122050.GB27432@shisha.kicks-ass.net>
-References: <1274693724-23831-1-git-send-email-virtuoso@slind.org>
- <20100524112726.GB29848@gondor.apana.org.au>
+From: Dan Carpenter <error27@gmail.com>
+Subject: [patch] mv_cesa: fixup error handling in mv_probe()
+Date: Tue, 25 May 2010 11:49:47 +0200
+Message-ID: <20100525094947.GF22515@bicker>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Uri Simchoni <uri@jdland.co.il>,
+	Nicolas Pitre <nico@marvell.com>, Tejun Heo <tj@kernel.org>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ww0-f46.google.com ([74.125.82.46]:63438 "EHLO
+	mail-ww0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750851Ab0EYJua (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 May 2010 05:50:30 -0400
 Content-Disposition: inline
-In-Reply-To: <20100524112726.GB29848@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 24, 2010 at 09:27:26 +1000, Herbert Xu wrote:
-> On Mon, May 24, 2010 at 12:35:24PM +0300, Alexander Shishkin wrote:
-> > Don't compile in and don't schedule cryptomanager's tests when
-> > CONFIG_CRYPTO_TESTS is not set. This saves quite some time during
-> > kernel initialization.
-> 
-> You're disabling the self-testing infrastructure.  This is not
-> the same thing as the tcrypt module.
+The error handling in mv_probe() was a bit messed up.  There were some 
+gotos to the wrong labels so it ended up releasing stuff that that hadn't
+been aquired and not releasing stuff that was meant to be released.  I
+shuffled it around a bit to fix it and make it clearer.
 
-It is my intention to disable these tests since in my running them at
-every boot doesn't add any value. I thought about adding a separate
-Kconfig option for that, too. I want to make sure it's a sensible thing
-to do.
+Signed-off-by: Dan Carpenter <error27@gmail.com>
+---
+I'm afraid that I don't have a cross compile environment set up so I
+can't even compile this.  I'm very sorry about that.
 
-> Is this for fast booting?
-
-Yes, it saves ~180 miliseconds for me at prng_mod_init(), for example.
-
-Regards,
---
-Alex
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index e095422..7d279e5 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1055,20 +1055,20 @@ static int mv_probe(struct platform_device *pdev)
+ 	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
+ 	if (IS_ERR(cp->queue_th)) {
+ 		ret = PTR_ERR(cp->queue_th);
+-		goto err_thread;
++		goto err_unmap_sram;
+ 	}
+ 
+ 	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
+ 			cp);
+ 	if (ret)
+-		goto err_unmap_sram;
++		goto err_thread;
+ 
+ 	writel(SEC_INT_ACCEL0_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
+ 	writel(SEC_CFG_STOP_DIG_ERR, cpg->reg + SEC_ACCEL_CFG);
+ 
+ 	ret = crypto_register_alg(&mv_aes_alg_ecb);
+ 	if (ret)
+-		goto err_reg;
++		goto err_irq;
+ 
+ 	ret = crypto_register_alg(&mv_aes_alg_cbc);
+ 	if (ret)
+@@ -1091,9 +1091,9 @@ static int mv_probe(struct platform_device *pdev)
+ 	return 0;
+ err_unreg_ecb:
+ 	crypto_unregister_alg(&mv_aes_alg_ecb);
+-err_thread:
++err_irq:
+ 	free_irq(irq, cp);
+-err_reg:
++err_thread:
+ 	kthread_stop(cp->queue_th);
+ err_unmap_sram:
+ 	iounmap(cp->sram);
