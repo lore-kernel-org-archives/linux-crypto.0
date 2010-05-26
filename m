@@ -1,50 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: twofish: rename twofish to twofish_generic and
-	add an alias
-Date: Wed, 26 May 2010 10:42:52 +1000
-Message-ID: <20100526004252.GD20073@gondor.apana.org.au>
-References: <4BFA3D24.4020700@freenet.de>
+From: David Miller <davem@davemloft.net>
+Subject: [PATCH 0/7]: N2CRYPTO fixes and HMAC support
+Date: Tue, 25 May 2010 17:43:29 -0700 (PDT)
+Message-ID: <20100525.174329.59682635.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Joachim Fritschi <jfritschi@freenet.de>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:52030 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750800Ab0EZAmz (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:37711
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751567Ab0EZAnT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 May 2010 20:42:55 -0400
-Content-Disposition: inline
-In-Reply-To: <4BFA3D24.4020700@freenet.de>
+	Tue, 25 May 2010 20:43:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 24, 2010 at 10:47:32AM +0200, Joachim Fritschi wrote:
-> This fixes the broken autoloading of the corresponding twofish
-> assembler ciphers on x86 and x86_64 if they are available. The module
-> name of the generic implementation was in conflict with the alias in the  
-> assembler modules.
-> The generic twofish c implementation is renamed to twofish_generic
-> according to the other algorithms with assembler implementations and an  
-> module alias is added for 'twofish'.
-> You can now load 'twofish' giving you the best implementation by
-> priority, 'twofish-generic' to get the c implementation or 'twofish-asm'  
-> to get the assembler version of cipher.
->
-> Signed-off-by: Joachim Fritschi jfritschi@freenet.de
 
-Sorry, patch doesn't apply:
+As we discussed side-band the n2crypto driver plumbed async hash
+requests to fallbacks incorrectly.  And along the way I found
+several other bugs as well.
 
-1 out of 1 hunk FAILED -- saving rejects to file crypto/Makefile.rej
-patch: **** malformed patch at line 55: * have put this under the GNU General Public License.
+The recent of_device/of_platform_driver infrastructure changes
+criss-crossed the n2_crypto driver addition, so some fixups
+were needed to restore the build.
 
-BTW, when you regenerate your patch please use the -M option
-to git diff.
+Finally, HMAC support because really easy to add once the async
+hash fallback stuff was fixed properly, so here it is :-)
 
-Thanks,
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Please pull, thanks a lot.
+
+The following changes since commit b1cdc4670b9508fcd47a15fbd12f70d269880b37:
+  Linus Torvalds (1):
+        Merge git://git.kernel.org/.../davem/net-2.6
+
+are available in the git repository at:
+
+  master.kernel.org:/pub/scm/linux/kernel/git/davem/crypto-2.6.git master
+
+David S. Miller (7):
+      n2_crypto: Fix build after of_device/of_platform_driver changes.
+      n2_crypto: Fix MAU kmem_cache name.
+      n2_crypto: Plumb fallback ahash requests properly.
+      n2_crypto: Kill n2_base_ctx and helpers.
+      n2_crypto: Log algorithm success/failure in kernel log.
+      n2_crypto: Make ahash parameterization explicit.
+      n2_crypto: Add HMAC support.
+
+ drivers/crypto/n2_core.c |  520 +++++++++++++++++++++++++++++++---------------
+ 1 files changed, 352 insertions(+), 168 deletions(-)
