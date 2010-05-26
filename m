@@ -1,115 +1,63 @@
-From: Alexander Shishkin <virtuoso@slind.org>
-Subject: [PATCH] crypto: add an option to disable cryptoalgos' self-tests
-Date: Wed, 26 May 2010 12:28:34 +0300
-Message-ID: <1274866114-15817-1-git-send-email-virtuoso@slind.org>
-References: <20100526004357.GE20073@gondor.apana.org.au>
-Cc: Alexander Shishkin <virtuoso@slind.org>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+From: Joachim Fritschi <jfritschi@freenet.de>
+Subject: [RESEND][PATCH] crypto: twofish: Rename twofish to twofish_generic
+ and add an alias
+Date: Wed, 26 May 2010 22:41:01 +0200
+Message-ID: <4BFD875D.2090709@freenet.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.105.134]:60094 "EHLO
-	mgw-mx09.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752851Ab0EZJ3x (ORCPT
+Received: from lnx503.hrz.tu-darmstadt.de ([130.83.156.232]:51120 "EHLO
+	lnx503.hrz.tu-darmstadt.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757672Ab0EZUlO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 May 2010 05:29:53 -0400
-In-Reply-To: <20100526004357.GE20073@gondor.apana.org.au>
+	Wed, 26 May 2010 16:41:14 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-By default, CONFIG_CRYPTO_MANAGER_TESTS will be enabled and thus
-self-tests will still run, but it is now possible to disable them
-to gain some time during bootup.
+This fixes the broken autoloading of the corresponding twofish assembler
+ciphers on x86 and x86_64 if they are available. The module name of the
+generic implementation was in conflict with the alias in the assembler
+modules. The generic twofish c implementation is renamed to
+twofish_generic according to the other algorithms with assembler
+implementations and an module alias is added for 'twofish'. You can now
+load 'twofish' giving you the best implementation by priority,
+'twofish-generic' to get the c implementation or 'twofish-asm' to get
+the assembler version of cipher.
 
-Signed-off-by: Alexander Shishkin <virtuoso@slind.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: linux-kernel@vger.kernel.org
-CC: linux-crypto@vger.kernel.org
+Signed-off-by: Joachim Fritschi jfritschi@freenet.de
 ---
- crypto/Kconfig   |    8 ++++++++
- crypto/algboss.c |    4 ++++
- crypto/testmgr.c |   14 ++++++++++++++
- 3 files changed, 26 insertions(+), 0 deletions(-)
+  crypto/Makefile                         |    2 +-
+  crypto/{twofish.c => twofish_generic.c} |    1 +
+  2 files changed, 2 insertions(+), 1 deletions(-)
+  rename crypto/{twofish.c => twofish_generic.c} (99%)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 9d9434f..df332c1 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -96,6 +96,14 @@ config CRYPTO_MANAGER2
- 	select CRYPTO_BLKCIPHER2
- 	select CRYPTO_PCOMP
- 
-+config CRYPTO_MANAGER_TESTS
-+	bool "Run algolithms' self-tests"
-+	default y
-+	depends on CRYPTO_MANAGER2
-+	help
-+	  Run cryptomanager's tests for the new crypto algorithms being
-+	  registered.
-+
- config CRYPTO_GF128MUL
- 	tristate "GF(2^128) multiplication functions (EXPERIMENTAL)"
- 	depends on EXPERIMENTAL
-diff --git a/crypto/algboss.c b/crypto/algboss.c
-index c3c196b..40bd391 100644
---- a/crypto/algboss.c
-+++ b/crypto/algboss.c
-@@ -206,6 +206,7 @@ err:
- 	return NOTIFY_OK;
- }
- 
-+#ifdef CONFIG_CRYPTO_MANAGER_TESTS
- static int cryptomgr_test(void *data)
- {
- 	struct crypto_test_param *param = data;
-@@ -266,6 +267,7 @@ err_put_module:
- err:
- 	return NOTIFY_OK;
- }
-+#endif /* CONFIG_CRYPTO_MANAGER_TESTS */
- 
- static int cryptomgr_notify(struct notifier_block *this, unsigned long msg,
- 			    void *data)
-@@ -273,8 +275,10 @@ static int cryptomgr_notify(struct notifier_block *this, unsigned long msg,
- 	switch (msg) {
- 	case CRYPTO_MSG_ALG_REQUEST:
- 		return cryptomgr_schedule_probe(data);
-+#ifdef CONFIG_CRYPTO_MANAGER_TESTS
- 	case CRYPTO_MSG_ALG_REGISTER:
- 		return cryptomgr_schedule_test(data);
-+#endif
- 	}
- 
- 	return NOTIFY_DONE;
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 5c8aaa0..abd980c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -22,6 +22,17 @@
- #include <crypto/rng.h>
- 
- #include "internal.h"
-+
-+#ifndef CONFIG_CRYPTO_MANAGER_TESTS
-+
-+/* a perfect nop */
-+int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
-+{
-+	return 0;
-+}
-+
-+#else
-+
- #include "testmgr.h"
- 
- /*
-@@ -2530,4 +2541,7 @@ notest:
- non_fips_alg:
- 	return -EINVAL;
- }
-+
-+#endif /* CONFIG_CRYPTO_MANAGER_TESTS */
-+
- EXPORT_SYMBOL_GPL(alg_test);
+diff --git a/crypto/Makefile b/crypto/Makefile
+index d7e6441..d719716 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -61,7 +61,7 @@ obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
+  obj-$(CONFIG_CRYPTO_DES) += des_generic.o
+  obj-$(CONFIG_CRYPTO_FCRYPT) += fcrypt.o
+  obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish.o
+-obj-$(CONFIG_CRYPTO_TWOFISH) += twofish.o
++obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
+  obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
+  obj-$(CONFIG_CRYPTO_SERPENT) += serpent.o
+  obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
+diff --git a/crypto/twofish.c b/crypto/twofish_generic.c
+similarity index 99%
+rename from crypto/twofish.c
+rename to crypto/twofish_generic.c
+index dfcda23..1f07b84 100644
+--- a/crypto/twofish.c
++++ b/crypto/twofish_generic.c
+@@ -212,3 +212,4 @@ module_exit(twofish_mod_fini);
+   MODULE_LICENSE("GPL");
+  MODULE_DESCRIPTION ("Twofish Cipher Algorithm");
++MODULE_ALIAS("twofish");
 -- 
-1.5.6.5
+1.6.4.4
