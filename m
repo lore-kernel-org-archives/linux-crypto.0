@@ -1,33 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/8] crypto: Use ERR_CAST
-Date: Wed, 26 May 2010 10:37:02 +1000
-Message-ID: <20100526003701.GA20073@gondor.apana.org.au>
-References: <Pine.LNX.4.64.1005221159290.13021@ask.diku.dk>
+Subject: Re: [PATCH 05/12] crypto: omap: remove unused #include
+	<linux/version.h>
+Date: Wed, 26 May 2010 10:38:11 +1000
+Message-ID: <20100526003811.GB20073@gondor.apana.org.au>
+References: <1274548335-2656-1-git-send-email-weiyi.huang@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Julia Lawall <julia@diku.dk>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Huang Weiyi <weiyi.huang@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:47126 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:47132 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1758448Ab0EZAhK (ORCPT
+	with ESMTP id S1756664Ab0EZAiR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 May 2010 20:37:10 -0400
+	Tue, 25 May 2010 20:38:17 -0400
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.1005221159290.13021@ask.diku.dk>
+In-Reply-To: <1274548335-2656-1-git-send-email-weiyi.huang@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, May 22, 2010 at 11:59:48AM +0200, Julia Lawall wrote:
-> From: Julia Lawall <julia@diku.dk>
+On Sun, May 23, 2010 at 01:12:15AM +0800, Huang Weiyi wrote:
+> Remove unused #include <linux/version.h>('s) in
+>   drivers/crypto/omap-sham.c
 > 
-> Use ERR_CAST(x) rather than ERR_PTR(PTR_ERR(x)).  The former makes more
-> clear what is the purpose of the operation, which otherwise looks like a
-> no-op.
+> Signed-off-by: Huang Weiyi <weiyi.huang@gmail.com>
 
-Patch applied.  Thanks Julia.
+Patch applied.  Thank you.
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
