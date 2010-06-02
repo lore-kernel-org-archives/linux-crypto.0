@@ -1,30 +1,34 @@
-From: y@vger.kernel.org
+From: y@ozlabs.org
 Subject: [PATCH] of/crypto: n2_core.c: Fix build failures
 Date: Thu,  3 Jun 2010 01:35:41 +0200
-Message-ID: <5638.25094509429$1275521774@news.gmane.org>
-Cc: devicetree-discuss@lists.ozlabs.org,
-	Grant Likely <grant.likely@secretlab.ca>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Anatolij Gustschin <agust@denx.de>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:34698 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932518Ab0FBXgJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Jun 2010 19:36:09 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Message-ID: <44197.6351234645$1275521782@news.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree-discuss-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/devicetree-discuss>,
+	<mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/devicetree-discuss>
+List-Post: <mailto:devicetree-discuss-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+List-Help: <mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/devicetree-discuss>,
+	<mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=subscribe>
+Sender: devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+Errors-To: devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Anatolij Gustschin <agust@denx.de>
+From: Anatolij Gustschin <agust-ynQEQJNshbs@public.gmane.org>
 
 Fixes build errors caused by the:
 - OF device_node pointer being moved into struct device
 - removal of the match_table and name fields from
   struct of_platform_driver
 
-Signed-off-by: Anatolij Gustschin <agust@denx.de>
+Signed-off-by: Anatolij Gustschin <agust-ynQEQJNshbs@public.gmane.org>
 ---
  drivers/crypto/n2_core.c |   24 ++++++++++++++----------
  1 files changed, 14 insertions(+), 10 deletions(-)
