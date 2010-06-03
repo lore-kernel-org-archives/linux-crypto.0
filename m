@@ -1,41 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] of/crypto: n2_core: fix build breakage
-Date: Thu, 3 Jun 2010 20:03:09 +1000
-Message-ID: <20100603100309.GA30618@gondor.apana.org.au>
-References: <AANLkTikNcAvyHf1yHPweNBVSCSPNmq-JaEOgYW2FYUGJ@mail.gmail.com> <1275537827-28921-2-git-send-email-w.sang@pengutronix.de> <20100603.024902.139551876.davem@davemloft.net>
+Subject: Crypto Fixes for 2.6.35
+Date: Thu, 3 Jun 2010 20:05:50 +1000
+Message-ID: <20100603100550.GA30681@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: w.sang@pengutronix.de, devicetree-discuss@ozlabs.org,
-	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-	grant.likely@secretlab.ca, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:35507 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:35517 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752507Ab0FCKD2 (ORCPT
+	with ESMTP id S1758397Ab0FCKF5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jun 2010 06:03:28 -0400
+	Thu, 3 Jun 2010 06:05:57 -0400
 Content-Disposition: inline
-In-Reply-To: <20100603.024902.139551876.davem@davemloft.net>
+In-Reply-To: <20100427135547.GA4008@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 03, 2010 at 02:49:02AM -0700, David Miller wrote:
-> From: Wolfram Sang <w.sang@pengutronix.de>
-> Date: Thu,  3 Jun 2010 06:03:47 +0200
-> 
-> > Signed-off-by: Wolfram Sang <w.sang@pengutronix.de>
-> > Cc: Grant Likely <grant.likely@secretlab.ca>
-> 
-> Herbert you really need to push your pending crypto tree stuff to
-> Linus, this is the second time this build fix has been posted just
-> today alone and it's in your tree since last week :-)
+Hi Linus:
 
-Sorry, I hadn't realised that the breakage was in the main tree
-as opposed to linux-next.
+This push fixes build failures for of_device drivers as well as
+a couple of bugs in the n2 driver.
 
-I'll push it out now.
 
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Anatolij Gustschin (1):
+      crypto: crypto4xx - Fix build breakage
+
+David S. Miller (3):
+      n2_crypto: Fix build after of_device/of_platform_driver changes.
+      n2_crypto: Fix MAU kmem_cache name.
+      n2_crypto: Plumb fallback ahash requests properly.
+
+ drivers/crypto/amcc/crypto4xx_core.c |    6 +-
+ drivers/crypto/n2_core.c             |  123 ++++++++++++++++++----------------
+ 2 files changed, 68 insertions(+), 61 deletions(-)
+  
 Thanks,
 -- 
 Visit Openswan at http://www.openswan.org/
