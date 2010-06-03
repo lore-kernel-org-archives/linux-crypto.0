@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: add an option to disable cryptoalgos'
-	self-tests
-Date: Thu, 3 Jun 2010 20:53:56 +1000
-Message-ID: <20100603105356.GC31063@gondor.apana.org.au>
-References: <20100526004357.GE20073@gondor.apana.org.au> <1274866114-15817-1-git-send-email-virtuoso@slind.org>
+Subject: Re: [RESEND][PATCH] crypto: twofish: Rename twofish to
+	twofish_generic and add an alias
+Date: Thu, 3 Jun 2010 21:03:47 +1000
+Message-ID: <20100603110347.GD31063@gondor.apana.org.au>
+References: <4BFD875D.2090709@freenet.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Alexander Shishkin <virtuoso@slind.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Joachim Fritschi <jfritschi@freenet.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:56567 "EHLO
+Received: from ringil.hengli.com.au ([216.59.3.182]:38870 "EHLO
 	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750845Ab0FCKx7 (ORCPT
+	with ESMTP id S1752618Ab0FCLDz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jun 2010 06:53:59 -0400
+	Thu, 3 Jun 2010 07:03:55 -0400
 Content-Disposition: inline
-In-Reply-To: <1274866114-15817-1-git-send-email-virtuoso@slind.org>
+In-Reply-To: <4BFD875D.2090709@freenet.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 26, 2010 at 12:28:34PM +0300, Alexander Shishkin wrote:
-> By default, CONFIG_CRYPTO_MANAGER_TESTS will be enabled and thus
-> self-tests will still run, but it is now possible to disable them
-> to gain some time during bootup.
-> 
-> Signed-off-by: Alexander Shishkin <virtuoso@slind.org>
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: linux-kernel@vger.kernel.org
-> CC: linux-crypto@vger.kernel.org
+On Wed, May 26, 2010 at 10:41:01PM +0200, Joachim Fritschi wrote:
+> This fixes the broken autoloading of the corresponding twofish assembler
+> ciphers on x86 and x86_64 if they are available. The module name of the
+> generic implementation was in conflict with the alias in the assembler
+> modules. The generic twofish c implementation is renamed to
+> twofish_generic according to the other algorithms with assembler
+> implementations and an module alias is added for 'twofish'. You can now
+> load 'twofish' giving you the best implementation by priority,
+> 'twofish-generic' to get the c implementation or 'twofish-asm' to get
+> the assembler version of cipher.
+>
+> Signed-off-by: Joachim Fritschi jfritschi@freenet.de
 
-Patch applied.  Thanks a lot!
+I had to fix up your patch by hand becaus it was white space
+damaged.  Also you should put angle brackets around your email
+address on the sign-off line.
+
+Anyway I've applied your patch.  Thanks.
 -- 
 Visit Openswan at http://www.openswan.org/
 Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
