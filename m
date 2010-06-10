@@ -1,45 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.35
-Date: Fri, 4 Jun 2010 07:56:48 +1000
-Message-ID: <20100603215648.GA5013@gondor.apana.org.au>
-References: <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <alpine.LFD.2.00.1006030925210.8175@i5.linux-foundation.org>
+From: Phil Sutter <phil@nwl.cc>
+Subject: RFC: kcrypto - (yet another) user space interface
+Date: Thu, 10 Jun 2010 20:22:29 +0200
+Message-ID: <20100610182237.1B48E4CD45@orbit.nwl.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Nico Erfurth <nico.erfurth@viprinet.com>,
+	Simon Kissel <simon.kissel@viprinet.com>,
+	Sebastian Siewior <bigeasy@breakpoint.cc>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([216.59.3.182]:57434 "EHLO
-	arnor.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754430Ab0FCV44 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jun 2010 17:56:56 -0400
+Received: from orbit.nwl.cc ([91.121.169.95]:37898 "EHLO orbit.nwl.cc"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752841Ab0FJSbc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Jun 2010 14:31:32 -0400
 Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.00.1006030925210.8175@i5.linux-foundation.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 03, 2010 at 09:26:38AM -0700, Linus Torvalds wrote:
-> 
-> 
-> On Thu, 3 Jun 2010, Herbert Xu wrote:
-> > 
-> > Please pull from
-> > 
-> > git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-> 
-> "Already up-to-date." Forgot to push? (I also checked master, so it's not 
-> that mirroring is slow)
+Hello everyone,
 
-Sorry, I pushed my tree to my home directory on master but not
-to /pub :)
+my employer wants to have a lightweight, zero-copy user space interface
+to the Crypto-API and I *think* I'm on the right way to realising this.
 
-Should work now.
+What I've got so far is just a proof-of-concept, tested only with
+cbc(aes), merely as generic as I'd like it to be, but with zero-copy of
+the actual data buffers (which reside in user space) and asynchronous
+operation.
 
-Thanks!
--- 
-Visit Openswan at http://www.openswan.org/
-Email: Herbert Xu ~{PmV>HI~} <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+You can check it out via git://nwl.cc/~n0-1/kcrypto.git or simply have a
+look at http://nwl.cc/cgi-bin/git/gitweb.cgi?p=kcrypto.git;a=summary. If
+you do so, you may in return flame me as much as you like to. :)
+
+I know that it's far from being ready for use as the sole crypto API
+user space interface, but I'm convinced as well that it will never be
+unless someone with Crypto-API skills points out at least the very basic
+design flaws I've already created.
+
+As this is not yet being used in production (of course), I'm totally
+open to changes. So taking this as start of a collaborative project
+would be perfect for me, too.
+
+Greetings (and sorry for yet another interface approach),
+Phil
