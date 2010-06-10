@@ -1,44 +1,40 @@
-From: Phil Sutter <phil@nwl.cc>
-Subject: RFC: kcrypto - (yet another) user space interface
-Date: Thu, 10 Jun 2010 20:22:29 +0200
-Message-ID: <20100610182237.1B48E4CD45@orbit.nwl.cc>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: RFC: kcrypto - (yet another) user space interface
+Date: Thu, 10 Jun 2010 23:14:33 +0200
+Message-ID: <20100610211433.GA25864@Chamillionaire.breakpoint.cc>
+References: <20100610182237.1B48E4CD45@orbit.nwl.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Nico Erfurth <nico.erfurth@viprinet.com>,
-	Simon Kissel <simon.kissel@viprinet.com>,
-	Sebastian Siewior <bigeasy@breakpoint.cc>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+To: linux-crypto@vger.kernel.org,
+	Nico Erfurth <nico.erfurth@viprinet.com>,
+	Simon Kissel <simon.kissel@viprinet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.169.95]:37898 "EHLO orbit.nwl.cc"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752841Ab0FJSbc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Jun 2010 14:31:32 -0400
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:41996 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752453Ab0FJVOe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Jun 2010 17:14:34 -0400
 Content-Disposition: inline
+In-Reply-To: <20100610182237.1B48E4CD45@orbit.nwl.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello everyone,
+* Phil Sutter | 2010-06-10 20:22:29 [+0200]:
 
-my employer wants to have a lightweight, zero-copy user space interface
-to the Crypto-API and I *think* I'm on the right way to realising this.
+>Hello everyone,
+Hi Phil,
 
-What I've got so far is just a proof-of-concept, tested only with
-cbc(aes), merely as generic as I'd like it to be, but with zero-copy of
-the actual data buffers (which reside in user space) and asynchronous
-operation.
+please take look at [0] and [1]. From README I can tell that those two
+posts are different from you have so far.
+You might want to take a look at AF_PACKET interface. It does zero copy
+via a ring buffer interface of pre-mmaped user memory. So no
+get_user_pages() then :)
 
-You can check it out via git://nwl.cc/~n0-1/kcrypto.git or simply have a
-look at http://nwl.cc/cgi-bin/git/gitweb.cgi?p=kcrypto.git;a=summary. If
-you do so, you may in return flame me as much as you like to. :)
+I think that is the way to go.
 
-I know that it's far from being ready for use as the sole crypto API
-user space interface, but I'm convinced as well that it will never be
-unless someone with Crypto-API skills points out at least the very basic
-design flaws I've already created.
+[0] http://article.gmane.org/gmane.linux.kernel.cryptoapi/2656
+[1] http://article.gmane.org/gmane.linux.kernel.cryptoapi/2658
 
-As this is not yet being used in production (of course), I'm totally
-open to changes. So taking this as start of a collaborative project
-would be perfect for me, too.
+>Phil
 
-Greetings (and sorry for yet another interface approach),
-Phil
+Sebastian
