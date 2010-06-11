@@ -1,63 +1,73 @@
 From: Phil Sutter <phil@nwl.cc>
 Subject: Re: RFC: kcrypto - (yet another) user space interface
-Date: Fri, 11 Jun 2010 12:51:34 +0200
-Message-ID: <20100611105142.230FC4CD45@orbit.nwl.cc>
+Date: Fri, 11 Jun 2010 19:00:51 +0200
+Message-ID: <20100611170058.A9A7F4CD45@orbit.nwl.cc>
 References: <20100610182237.1B48E4CD45@orbit.nwl.cc>
  <20100610211433.GA25864@Chamillionaire.breakpoint.cc>
- <4C11EA03.50505@gnutls.org>
- <20100611090856.GA31092@Chamillionaire.breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-	linux-crypto@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org,
 	Nico Erfurth <nico.erfurth@viprinet.com>,
 	Simon Kissel <simon.kissel@viprinet.com>
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>, g@nwl.cc
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.169.95]:45223 "EHLO orbit.nwl.cc"
+Received: from orbit.nwl.cc ([91.121.169.95]:52477 "EHLO orbit.nwl.cc"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753549Ab0FKKvn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jun 2010 06:51:43 -0400
+	id S1754303Ab0FKRA7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jun 2010 13:00:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20100611090856.GA31092@Chamillionaire.breakpoint.cc>
+In-Reply-To: <20100610211433.GA25864@Chamillionaire.breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey,
+Hey Bigeasy,
 
-Seems like I'm stabbing into open wounds. :) First of all, thanks a lot
-for your comments.
+On Thu, Jun 10, 2010 at 11:14:33PM +0200, Sebastian Andrzej Siewior wrote:
+> please take look at [0] and [1]. From README I can tell that those two
+> posts are different from you have so far.
 
-On Fri, Jun 11, 2010 at 11:08:56AM +0200, Sebastian Andrzej Siewior wrote:
-> * Nikos Mavrogiannopoulos | 2010-06-11 09:47:15 [+0200]:
+Hmm. Indeed, using something like AF_CRYPTO didn't come to my mind so
+far. Though I'm not sure if this is good or bad - what's the big
+advantage in introducing an address family for something which doesn't
+even know addressing as such? No offense here, but all I have is a bunch
+of bytes which should be transformed by the kernel. Using socket(),
+connect() and sendmsg() for just that purpose seems a bit too fancy to
+me.
+
+> You might want to take a look at AF_PACKET interface. It does zero copy
+> via a ring buffer interface of pre-mmaped user memory. So no
+> get_user_pages() then :)
+
+Yes, I've already thought about using just mmap() for the buffer
+exchange. But what I don't like about it is that the shared buffer is
+allocated from within the kernel, leading to two preconditions:
+
+1) Unless the user anyway has to fill a locally allocated buffer with
+the data to transform, at least a single copy is needed to get the data
+into the kernel buffer. Although get_user_pages() is quite ugly to use,
+it's flexible enough to take any buffer directly from user space to
+operate on. (Page alignment constraints, especially with hardware crypto
+engines, should be another interesting topic in this context.)
+
+2) Space constraints. I can take a hundred 1.5k buffers along with a
+single, 64M one. Despite that my PoC actually doesn't work with buffers
+above 64k, using only an in-kernel buffer would make things quite a bit
+more complicated.
+
 > 
-> >Sebastian Andrzej Siewior wrote:
-> >> * Phil Sutter | 2010-06-10 20:22:29 [+0200]:
-> >
-> >The problem with right or wrong is that they are only known afterwards.
-> >For me the right way to go is _to go_. I can see discussions in this
-> >least, years ago on talks about the "perfect" userspace crypto api and
-> >rejections implementations because they are not perfect enough. I don't
-> >believe there is such thing as a perfect crypto api. Other operating
-> >systems have a userspace crypto API (maybe not perfect) but linux
-> >hasn't. I don't think this is the way to go.
+> I think that is the way to go.
 > 
-> Phil asked me for my opinion and he got it. The fundumention problems
-> from what I've seen was the interface:
-> - kernel structs which are exposed to userland which limit the
->   parameters. For instance the iv was limited to 16 bytes while we have
->   allready algos with a much longer iv.
-> - the interface was using write()/poll()/read() and get_user_pages(). I
->   pointed out Herbert's opinion about this and the alternative. So this
->   _was_ allready discsussed.
+> [0] http://article.gmane.org/gmane.linux.kernel.cryptoapi/2656
+> [1] http://article.gmane.org/gmane.linux.kernel.cryptoapi/2658
 
-For me, this project is a rather pragmatical one - this just needs to
-get done, and it has to be just perfect enough so my employer finds it
-usable. Nice to have if I happen to create the perfect CryptoAPI user
-space interface ever (yeah, right ...) but this is unlikely to happen.
-For me it's enough to first get the concept right and next make it
-stable and functional. After that I'm sure we all can tell better if
-it's worth pushing it towards the kernel or leave it as (yet another)
-niche product.
+Reading a bit further from there, splice() is mentioned as another way
+of exchanging the data buffers. But despite that it's doing about what
+I've implemented (i.e., using get_user_pages() to fetch the userspace
+data), there seems to be now sane way back, at least not according to
+the comments in fs/splice.c.
+
+This is actually a limitation of my implementation: all data
+transformation is done in situ. Fine for stream ciphers, acceptable for
+block ciphers, but probably FUBAR for hashes, I guess.
 
 Greetings, Phil
