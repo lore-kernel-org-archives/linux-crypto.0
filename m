@@ -1,33 +1,35 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Crypto API from user space
-Date: Tue, 15 Jun 2010 17:19:36 +0300
-Message-ID: <4C178BF8.8020604@nokia.com>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: Crypto API from user space
+Date: Tue, 15 Jun 2010 18:24:43 +0200
+Message-ID: <4C17A94B.7060906@gnutls.org>
+References: <4C178BF8.8020604@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.122.230]:20464 "EHLO
-	mgw-mx03.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757762Ab0FOOUl (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:61252 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752410Ab0FOQYr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Jun 2010 10:20:41 -0400
-Received: from vaebh105.NOE.Nokia.com (vaebh105.europe.nokia.com [10.160.244.31])
-	by mgw-mx03.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o5FEKMdh006746
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Jun 2010 17:20:38 +0300
-Received: from [172.21.40.83] (esdhcp04083.research.nokia.com [172.21.40.83])
-	by mgw-da01.ext.nokia.com (Switch-3.3.3/Switch-3.3.3) with ESMTP id o5FEJOaW004255
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Jun 2010 17:19:26 +0300
+	Tue, 15 Jun 2010 12:24:47 -0400
+Received: by fxm10 with SMTP id 10so281357fxm.19
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Jun 2010 09:24:45 -0700 (PDT)
+In-Reply-To: <4C178BF8.8020604@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Dmitry Kasatkin wrote:
+> Hi,
+> 
+> Can I use kernel Crypto API from user space?
+> I remember 2 or 3 projects about it.
+> 
+> But what is the one and only one I need? :)
 
-Can I use kernel Crypto API from user space?
-I remember 2 or 3 projects about it.
+I don't know which is the one you need, but I know the one I use. Check
+http://home.gna.org/cryptodev-linux/
 
-But what is the one and only one I need? :)
-
-Thanks,
-Dmitry
+regards,
+Nikos
