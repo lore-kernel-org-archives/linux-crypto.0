@@ -1,28 +1,35 @@
-From: "Dee Michaud" <adam@mail.amcom.com.tw>
-Subject: American Business email lists
-Date: 18 Jun 2010 04:43:18 +0800
-Message-ID: <MAILrvzr0dSHpVyLrid000020ab@amcom.com.tw>
-Reply-To: adam@mail.amcom.com.tw
-To: georgiebushy@gmx.com, brian@leadspinner.com,
-	ebarney@camden.rutgers.edu, mascots@gwu.edu, feltonsadle@live.com
+From: "Acosta ( Cara" <adam@smtp.hq.iskhus.co.za>
+Subject: b2b mailing lists
+Date: Thu, 17 Jun 2010 18:22:36 -0400
+Message-ID: <0867EDF9-FCAD-456C-BFC9-E7722D32D739@smtp.hq.iskhus.co.za>
+Reply-To: adam@smtp.hq.iskhus.co.za
+To: georgiebushy@gmx.com, georgiebushy@gmx.com, georgiebushy@gmx.com,
+	georgiebushy@gmx.com, georgiebushy@gmx.com, georgiebushy@gmx.com,
+	georgiebushy@gmx.com, kylkaren@mit.edu, pknfzvad@qrpznngb.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.amcom.com.tw ([61.221.35.215]:33949 "EHLO amcom.com.tw"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933435Ab0FQUld (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jun 2010 16:41:33 -0400
+Received: from smtp.hq.iskhus.co.za ([196.211.151.194]:55512 "HELO
+	smtp.hq.iskhus.co.za" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1759560Ab0FQWWg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jun 2010 18:22:36 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Here's a list package on sale this week only:
 
-Manufacturers Database - 1,057,119 records with 476,509 emails
-Medical Equipment Suppliers - 167,425 total records with 6,940 emails and 5,812 fax numbers
-Pharmaceutical Companies - Email only list 47,000 emails of pharma company employees
+Consumer List Package
 
-All complete lists above: $278
 
-There are more list packages also available for consumer, healthcare, business and more. Contact me here for more info or to get samples: Lori.Bentley@listgenius.info
+Credit Inquiries Database - 1 million Full Data Records all with emails
+American Consumer Database - 1,300,000 records all with emails
+American Homeowners - 1 million Full Data Records all with emails
+
+All complete lists above: $295
+
+
+There are more packages and not just for consumers. we also have lists for healthcare, business and more. Contact me here for more info or to get samples: Rowena.Sylvester@listgenius.info
+
   
 
 
-for immediate expungement go here please email disappear@listgenius.info 
+to get off please email disappear@listgenius.info
