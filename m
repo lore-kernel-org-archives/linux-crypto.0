@@ -1,35 +1,59 @@
-From: "Acosta ( Cara" <adam@smtp.hq.iskhus.co.za>
-Subject: b2b mailing lists
-Date: Thu, 17 Jun 2010 18:22:36 -0400
-Message-ID: <0867EDF9-FCAD-456C-BFC9-E7722D32D739@smtp.hq.iskhus.co.za>
-Reply-To: adam@smtp.hq.iskhus.co.za
-To: georgiebushy@gmx.com, georgiebushy@gmx.com, georgiebushy@gmx.com,
-	georgiebushy@gmx.com, georgiebushy@gmx.com, georgiebushy@gmx.com,
-	georgiebushy@gmx.com, kylkaren@mit.edu, pknfzvad@qrpznngb.com
+From: Dwi Sasongko Supriyadi <ruckuus@gmail.com>
+Subject: Re: Crypto API from user space
+Date: Fri, 18 Jun 2010 12:01:57 +0700
+Message-ID: <AANLkTinsnTCMubAlGlwR9adUI_iKY3C3h-AzhE-TeE_V@mail.gmail.com>
+References: <4C178BF8.8020604@nokia.com>
+	<4C17A94B.7060906@gnutls.org>
+	<4C188EAF.2020004@nokia.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: ext Herbert Xu <herbert@gondor.hengli.com.au>,
+	ext Nikos Mavrogiannopoulos <nmav@gnutls.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.hq.iskhus.co.za ([196.211.151.194]:55512 "HELO
-	smtp.hq.iskhus.co.za" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1759560Ab0FQWWg (ORCPT
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:34951 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752119Ab0FRFB6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jun 2010 18:22:36 -0400
+	Fri, 18 Jun 2010 01:01:58 -0400
+Received: by mail-gy0-f174.google.com with SMTP id 5so524527gye.19
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2010 22:01:57 -0700 (PDT)
+In-Reply-To: <4C188EAF.2020004@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Here's a list package on sale this week only:
+On Wed, Jun 16, 2010 at 3:43 PM, Dmitry Kasatkin
+<dmitry.kasatkin@nokia.com> wrote:
+> Hi,
+>
+> BTW.
+>
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+>
+> Has this kernel anything about cryptodev as well?
+>
+> Thanks,
+> - Dmitry
+>
+> On 15/06/10 19:24, ext Nikos Mavrogiannopoulos wrote:
+>> Dmitry Kasatkin wrote:
+>>
+>>> Hi,
+>>>
+>>> Can I use kernel Crypto API from user space?
+>>> I remember 2 or 3 projects about it.
+>>>
+>>> But what is the one and only one I need? :)
+>>>
+>> I don't know which is the one you need, but I know the one I use. Check
+>> http://home.gna.org/cryptodev-linux/
+>>
 
-Consumer List Package
+Thanks for this link, I never know about it.
 
+So far, I wrote my own driver to access kernel crypto API with certain
+fops (read/write/ioctls).
 
-Credit Inquiries Database - 1 million Full Data Records all with emails
-American Consumer Database - 1,300,000 records all with emails
-American Homeowners - 1 million Full Data Records all with emails
-
-All complete lists above: $295
-
-
-There are more packages and not just for consumers. we also have lists for healthcare, business and more. Contact me here for more info or to get samples: Rowena.Sylvester@listgenius.info
-
-  
-
-
-to get off please email disappear@listgenius.info
+Regards,
+DWI
