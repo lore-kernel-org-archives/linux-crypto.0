@@ -1,59 +1,49 @@
-From: Dwi Sasongko Supriyadi <ruckuus@gmail.com>
-Subject: Re: Crypto API from user space
-Date: Fri, 18 Jun 2010 12:01:57 +0700
-Message-ID: <AANLkTinsnTCMubAlGlwR9adUI_iKY3C3h-AzhE-TeE_V@mail.gmail.com>
-References: <4C178BF8.8020604@nokia.com>
-	<4C17A94B.7060906@gnutls.org>
-	<4C188EAF.2020004@nokia.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [RFC 9/9] crypto: Add Samsung crypto engine driver
+Date: Sat, 26 Jun 2010 21:07:28 -0700 (PDT)
+Message-ID: <20100626.210728.90806559.davem@davemloft.net>
+References: <cover.1276284559.git.mcuelenaere@gmail.com>
+	<4C129341.2060407@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: ext Herbert Xu <herbert@gondor.hengli.com.au>,
-	ext Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-samsung-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: mcuelenaere@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:34951 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752119Ab0FRFB6 (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:34755
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750707Ab0F0EHR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jun 2010 01:01:58 -0400
-Received: by mail-gy0-f174.google.com with SMTP id 5so524527gye.19
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2010 22:01:57 -0700 (PDT)
-In-Reply-To: <4C188EAF.2020004@nokia.com>
+	Sun, 27 Jun 2010 00:07:17 -0400
+In-Reply-To: <4C129341.2060407@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 16, 2010 at 3:43 PM, Dmitry Kasatkin
-<dmitry.kasatkin@nokia.com> wrote:
-> Hi,
->
-> BTW.
->
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
->
-> Has this kernel anything about cryptodev as well?
->
-> Thanks,
-> - Dmitry
->
-> On 15/06/10 19:24, ext Nikos Mavrogiannopoulos wrote:
->> Dmitry Kasatkin wrote:
->>
->>> Hi,
->>>
->>> Can I use kernel Crypto API from user space?
->>> I remember 2 or 3 projects about it.
->>>
->>> But what is the one and only one I need? :)
->>>
->> I don't know which is the one you need, but I know the one I use. Check
->> http://home.gna.org/cryptodev-linux/
->>
+From: Maurus Cuelenaere <mcuelenaere@gmail.com>
+Date: Fri, 11 Jun 2010 21:49:21 +0200
 
-Thanks for this link, I never know about it.
+> This patch adds support for the Samsung crypto engine driver available in the
+> S3C64XX and S5PC100 SoCs. Currently this supports AES and (T)DES with ECB and
+> CBC block ciphers (also CTR for AES). Support for (HMAC)-SHA1 acceleration is
+> also available in this engine, but isn't used in the driver yet.
+> 
+> Support for DMA has been added in the code but is currently disabled due to
+> issues with data transfers.
+> 
+> Signed-off-by: Maurus Cuelenaere <mcuelenaere@gmail.com>
 
-So far, I wrote my own driver to access kernel crypto API with certain
-fops (read/write/ioctls).
+I would personally queue up new crypto requests directly when there are
+no queued up requests and ->cur_req is NULL, instead of doing all of
+that work to do the submission in the tasklet.  I would also do the
+completion and queue running directly in the hw IRQ handler.
 
-Regards,
-DWI
+The tasklet is just pure overhead.
+
+Basically, when doing async crypto, every cycle that is consumed just
+to implement crypto job submission and completion takes away from the
+gains you get by doing it in hw at all.
+
+You can see this clearly if you do performance comparisons between the
+synchronous crypto routines and your async ones done in HW.
