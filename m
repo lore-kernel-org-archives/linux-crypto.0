@@ -1,34 +1,46 @@
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-Subject: Re: [PATCH]crypto:hifn_795x.c Fix warning: variable 'ctx' set but
- not used
-Date: Tue, 06 Jul 2010 10:19:33 -0700
-Message-ID: <4C3365A5.5010605@gmail.com>
-References: <20100706070355.GA14626@gondor.apana.org.au>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH v2]crypto:hifn_795x.c Fix warning: variable 'ctx' set
+ but not used
+Date: Tue, 6 Jul 2010 12:51:08 -0500
+Message-ID: <20100706125108.fc4dffb4.kim.phillips@freescale.com>
+References: <1278435578-3638-1-git-send-email-justinmattock@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, jkosina@suse.cz,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.hengli.com.au,
+	davem@davemloft.net, jkosina@suse.cz
+To: "Justin P. Mattock" <justinmattock@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:50852 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753130Ab0GFRYu (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:36036 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752907Ab0GFRvM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Jul 2010 13:24:50 -0400
-In-Reply-To: <20100706070355.GA14626@gondor.apana.org.au>
+	Tue, 6 Jul 2010 13:51:12 -0400
+Received: from az33smr01.freescale.net (az33smr01.freescale.net [10.64.34.199])
+	by az33egw02.freescale.net (8.14.3/az33egw02) with ESMTP id o66Hp9We009896
+	for <linux-crypto@vger.kernel.org>; Tue, 6 Jul 2010 10:51:11 -0700 (MST)
+Received: from az33exm22.fsl.freescale.net (az33exm22.am.freescale.net [10.64.32.10])
+	by az33smr01.freescale.net (8.13.1/8.13.0) with ESMTP id o66I1aEn024519
+	for <linux-crypto@vger.kernel.org>; Tue, 6 Jul 2010 13:01:36 -0500 (CDT)
+In-Reply-To: <1278435578-3638-1-git-send-email-justinmattock@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, 6 Jul 2010 09:59:38 -0700
+"Justin P. Mattock" <justinmattock@gmail.com> wrote:
 
-> This certainly does not look right! Returning with IRQs disabled
-> is considered to be rude.
->
-> I believe the right answer is to delete the line initialising ctx.
->
-> Thanks,
+> @@ -2035,7 +2034,7 @@ static void hifn_flush(struct hifn_device *dev)
+>  
+>  	spin_lock_irqsave(&dev->lock, flags);
+>  	while ((async_req = crypto_dequeue_request(&dev->queue))) {
+> -		ctx = crypto_tfm_ctx(async_req->tfm);
+> +		crypto_tfm_ctx(async_req->tfm);
 
-o.k. hopefully this is correct this time, resent with the following 
-change. let me know if it's legit or not..
+delete the entire line.
 
-Justin P. Mattock
+> -		ctx = crypto_tfm_ctx(async_req->tfm);
+> +		crypto_tfm_ctx(async_req->tfm);
+
+here too.
+
+Kim
