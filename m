@@ -1,7 +1,8 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 2/6] padata: Block until the instance is unused on stop
-Date: Wed, 7 Jul 2010 15:30:47 +0200
-Message-ID: <20100707133047.GX10072@secunet.com>
+Subject: [PATCH 4/6] padata: make padata_do_parallel to return zero on
+ success
+Date: Wed, 7 Jul 2010 15:32:02 +0200
+Message-ID: <20100707133202.GZ10072@secunet.com>
 References: <20100707132915.GV10072@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -10,77 +11,103 @@ Cc: Dan Kruchinin <dkruchinin@acm.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:47320 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:47343 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755849Ab0GGN2q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Jul 2010 09:28:46 -0400
+	id S1755222Ab0GGNaD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Jul 2010 09:30:03 -0400
 Content-Disposition: inline
 In-Reply-To: <20100707132915.GV10072@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch makes padata_stop to block until the padata
-instance is unused. Also we split padata_stop to a locked
-and a unlocked version. This is in preparation to be able
-to change the cpumask after a call to patata stop.
+To return -EINPROGRESS on success in padata_do_parallel was
+considered to be odd. This patch changes this to return zero
+on success. Also the only user of padata, pcrypt is adapted to
+convert a return of zero to -EINPROGRESS within the crypto layer.
+This also removes the pcrypt fallback if padata_do_parallel
+was called on a not running padata instance as we can't handle it
+anymore. This fallback was unused, so it's save to remove it.
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- kernel/padata.c |   24 ++++++++++++++++--------
- 1 files changed, 16 insertions(+), 8 deletions(-)
+ crypto/pcrypt.c |   18 ++++++------------
+ kernel/padata.c |   11 +++++------
+ 2 files changed, 11 insertions(+), 18 deletions(-)
 
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 71ae2b2..6036b6d 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -143,10 +143,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+ 	aead_request_set_assoc(creq, req->assoc, req->assoclen);
+ 
+ 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_enc_padata);
+-	if (err)
+-		return err;
+-	else
+-		err = crypto_aead_encrypt(creq);
++	if (!err)
++		return -EINPROGRESS;
+ 
+ 	return err;
+ }
+@@ -187,10 +185,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 	aead_request_set_assoc(creq, req->assoc, req->assoclen);
+ 
+ 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_dec_padata);
+-	if (err)
+-		return err;
+-	else
+-		err = crypto_aead_decrypt(creq);
++	if (!err)
++		return -EINPROGRESS;
+ 
+ 	return err;
+ }
+@@ -233,10 +229,8 @@ static int pcrypt_aead_givencrypt(struct aead_givcrypt_request *req)
+ 	aead_givcrypt_set_giv(creq, req->giv, req->seq);
+ 
+ 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_enc_padata);
+-	if (err)
+-		return err;
+-	else
+-		err = crypto_aead_givencrypt(creq);
++	if (!err)
++		return -EINPROGRESS;
+ 
+ 	return err;
+ }
 diff --git a/kernel/padata.c b/kernel/padata.c
-index e7d723a..9e18dfa 100644
+index 57ec4eb..ae8defc 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -490,6 +490,20 @@ static void __padata_start(struct padata_instance *pinst)
- 	pinst->flags |= PADATA_INIT;
- }
+@@ -111,10 +111,13 @@ int padata_do_parallel(struct padata_instance *pinst,
  
-+static void __padata_stop(struct padata_instance *pinst)
-+{
-+	if (!(pinst->flags & PADATA_INIT))
-+		return;
-+
-+	pinst->flags &= ~PADATA_INIT;
-+
-+	synchronize_rcu();
-+
-+	get_online_cpus();
-+	padata_flush_queues(pinst->pd);
-+	put_online_cpus();
-+}
-+
- /* Replace the internal control stucture with a new one. */
- static void padata_replace(struct padata_instance *pinst,
- 			   struct parallel_data *pd_new)
-@@ -649,7 +663,7 @@ EXPORT_SYMBOL(padata_start);
- void padata_stop(struct padata_instance *pinst)
- {
- 	mutex_lock(&pinst->lock);
--	pinst->flags &= ~PADATA_INIT;
-+	__padata_stop(pinst);
- 	mutex_unlock(&pinst->lock);
- }
- EXPORT_SYMBOL(padata_stop);
-@@ -770,17 +784,11 @@ EXPORT_SYMBOL(padata_alloc);
-  */
- void padata_free(struct padata_instance *pinst)
- {
--	padata_stop(pinst);
--
--	synchronize_rcu();
--
- #ifdef CONFIG_HOTPLUG_CPU
- 	unregister_hotcpu_notifier(&pinst->cpu_notifier);
- #endif
--	get_online_cpus();
--	padata_flush_queues(pinst->pd);
--	put_online_cpus();
+ 	pd = rcu_dereference(pinst->pd);
  
-+	padata_stop(pinst);
- 	padata_free_pd(pinst->pd);
- 	free_cpumask_var(pinst->cpumask);
- 	kfree(pinst);
+-	err = 0;
++	err = -EINVAL;
+ 	if (!(pinst->flags & PADATA_INIT))
+ 		goto out;
+ 
++	if (!cpumask_test_cpu(cb_cpu, pd->cpumask))
++		goto out;
++
+ 	err =  -EBUSY;
+ 	if ((pinst->flags & PADATA_RESET))
+ 		goto out;
+@@ -122,11 +125,7 @@ int padata_do_parallel(struct padata_instance *pinst,
+ 	if (atomic_read(&pd->refcnt) >= MAX_OBJ_NUM)
+ 		goto out;
+ 
+-	err = -EINVAL;
+-	if (!cpumask_test_cpu(cb_cpu, pd->cpumask))
+-		goto out;
+-
+-	err = -EINPROGRESS;
++	err = 0;
+ 	atomic_inc(&pd->refcnt);
+ 	padata->pd = pd;
+ 	padata->cb_cpu = cb_cpu;
 -- 
 1.5.6.5
