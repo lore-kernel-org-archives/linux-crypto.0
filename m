@@ -1,113 +1,69 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 4/6] padata: make padata_do_parallel to return zero on
- success
-Date: Wed, 7 Jul 2010 15:32:02 +0200
-Message-ID: <20100707133202.GZ10072@secunet.com>
+Subject: [PATCH 6/6] padata: update documentation
+Date: Wed, 7 Jul 2010 15:34:03 +0200
+Message-ID: <20100707133403.GB10072@secunet.com>
 References: <20100707132915.GV10072@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Dan Kruchinin <dkruchinin@acm.org>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:47343 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755222Ab0GGNaD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Jul 2010 09:30:03 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <20100707132915.GV10072@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-To return -EINPROGRESS on success in padata_do_parallel was
-considered to be odd. This patch changes this to return zero
-on success. Also the only user of padata, pcrypt is adapted to
-convert a return of zero to -EINPROGRESS within the crypto layer.
-This also removes the pcrypt fallback if padata_do_parallel
-was called on a not running padata instance as we can't handle it
-anymore. This fallback was unused, so it's save to remove it.
+This patch updates the padata documentation to the changed
+API of padata_start/padata_stop and padata_do parallel.
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/pcrypt.c |   18 ++++++------------
- kernel/padata.c |   11 +++++------
- 2 files changed, 11 insertions(+), 18 deletions(-)
+ Documentation/padata.txt |   21 +++++++++++----------
+ 1 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 71ae2b2..6036b6d 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -143,10 +143,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
- 	aead_request_set_assoc(creq, req->assoc, req->assoclen);
+diff --git a/Documentation/padata.txt b/Documentation/padata.txt
+index 269d7d0..3d77d09 100644
+--- a/Documentation/padata.txt
++++ b/Documentation/padata.txt
+@@ -22,12 +22,15 @@ actually be done; it should be a multithreaded queue, naturally.
  
- 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_enc_padata);
--	if (err)
--		return err;
--	else
--		err = crypto_aead_encrypt(creq);
-+	if (!err)
-+		return -EINPROGRESS;
+ There are functions for enabling and disabling the instance:
  
- 	return err;
- }
-@@ -187,10 +185,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
- 	aead_request_set_assoc(creq, req->assoc, req->assoclen);
+-    void padata_start(struct padata_instance *pinst);
++    int padata_start(struct padata_instance *pinst);
+     void padata_stop(struct padata_instance *pinst);
  
- 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_dec_padata);
--	if (err)
--		return err;
--	else
--		err = crypto_aead_decrypt(creq);
-+	if (!err)
-+		return -EINPROGRESS;
+-These functions literally do nothing beyond setting or clearing the
+-"padata_start() was called" flag; if that flag is not set, other functions
+-will refuse to work.
++These functions are setting or clearing the "PADATA_INIT" flag;
++if that flag is not set, other functions will refuse to work.
++padata_start returns zero on success (flag set) or -EINVAL if the
++padata cpumask contains no active cpu (flag not set).
++padata_stop clears the flag and blocks until the padata instance
++is unused. 
  
- 	return err;
- }
-@@ -233,10 +229,8 @@ static int pcrypt_aead_givencrypt(struct aead_givcrypt_request *req)
- 	aead_givcrypt_set_giv(creq, req->giv, req->seq);
+ The list of CPUs to be used can be adjusted with these functions:
  
- 	err = pcrypt_do_parallel(padata, &ctx->cb_cpu, pcrypt_enc_padata);
--	if (err)
--		return err;
--	else
--		err = crypto_aead_givencrypt(creq);
-+	if (!err)
-+		return -EINPROGRESS;
+@@ -63,12 +66,10 @@ The submission of work is done with:
+ The pinst and padata structures must be set up as described above; cb_cpu
+ specifies which CPU will be used for the final callback when the work is
+ done; it must be in the current instance's CPU mask.  The return value from
+-padata_do_parallel() is a little strange; zero is an error return
+-indicating that the caller forgot the padata_start() formalities.  -EBUSY
+-means that somebody, somewhere else is messing with the instance's CPU
+-mask, while -EINVAL is a complaint about cb_cpu not being in that CPU mask.
+-If all goes well, this function will return -EINPROGRESS, indicating that
+-the work is in progress.
++padata_do_parallel() is zero on success, indicating that the work is in
++progress. -EBUSY means that somebody, somewhere else is messing with the
++instance's CPU mask, while -EINVAL is a complaint about cb_cpu not being
++in that CPU mask or about a not running instance.
  
- 	return err;
- }
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 57ec4eb..ae8defc 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -111,10 +111,13 @@ int padata_do_parallel(struct padata_instance *pinst,
- 
- 	pd = rcu_dereference(pinst->pd);
- 
--	err = 0;
-+	err = -EINVAL;
- 	if (!(pinst->flags & PADATA_INIT))
- 		goto out;
- 
-+	if (!cpumask_test_cpu(cb_cpu, pd->cpumask))
-+		goto out;
-+
- 	err =  -EBUSY;
- 	if ((pinst->flags & PADATA_RESET))
- 		goto out;
-@@ -122,11 +125,7 @@ int padata_do_parallel(struct padata_instance *pinst,
- 	if (atomic_read(&pd->refcnt) >= MAX_OBJ_NUM)
- 		goto out;
- 
--	err = -EINVAL;
--	if (!cpumask_test_cpu(cb_cpu, pd->cpumask))
--		goto out;
--
--	err = -EINPROGRESS;
-+	err = 0;
- 	atomic_inc(&pd->refcnt);
- 	padata->pd = pd;
- 	padata->cb_cpu = cb_cpu;
+ Each task submitted to padata_do_parallel() will, in turn, be passed to
+ exactly one call to the above-mentioned parallel() function, on one CPU, so
 -- 
 1.5.6.5
