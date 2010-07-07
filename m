@@ -1,36 +1,53 @@
-From: Evgeniy Polyakov <zbr@ioremap.net>
-Subject: Re: [PATCH v3]crypto:hifn_795x.c Fix warning: variable 'ctx' set but not used
-Date: Tue, 6 Jul 2010 22:58:53 +0400
-Message-ID: <20100706185853.GA27664@ioremap.net>
-References: <1278441397-10960-1-git-send-email-justinmattock@gmail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH 0/6] padata: updates
+Date: Wed, 7 Jul 2010 15:29:15 +0200
+Message-ID: <20100707132915.GV10072@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, jkosina@suse.cz, kim.phillips@freescale.com
-To: "Justin P. Mattock" <justinmattock@gmail.com>
+Cc: Dan Kruchinin <dkruchinin@acm.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from matrixpower.ru ([195.178.208.66]:39462 "EHLO tservice.net.ru"
+Received: from a.mx.secunet.com ([195.81.216.161]:47277 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753541Ab0GFTcv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Jul 2010 15:32:51 -0400
+	id S1754312Ab0GGN1Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Jul 2010 09:27:25 -0400
 Content-Disposition: inline
-In-Reply-To: <1278441397-10960-1-git-send-email-justinmattock@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 06, 2010 at 11:36:37AM -0700, Justin P. Mattock (justinmattock@gmail.com) wrote:
-> The below patch gets rid of an unused variable ctx reported by
-> GCC when building the kernel.
->   CC [M]  drivers/crypto/hifn_795x.o
-> drivers/crypto/hifn_795x.c: In function 'hifn_flush':
-> drivers/crypto/hifn_795x.c:2021:23: warning: variable 'ctx' set but not used
-> drivers/crypto/hifn_795x.c: In function 'hifn_process_queue':
-> drivers/crypto/hifn_795x.c:2142:23: warning: variable 'ctx' set but not used
-> 
->  Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+This patchset contains the following changes:
 
-Looks good, thank you.
-I can only wonder how I wanted to use it in that context...
+1. Add a flag to mark the padata instance as invalid.
+We will use this to mark the padata instace as invalid
+if the padata cpumask contains no active cpu.
 
--- 
-	Evgeniy Polyakov
+2. Make padata_stop to block until the padata instance is
+unused. So it's save to change the cpumask after a call to
+padata_stop.
+
+3. Add a possibility to handle empty padata cpumasks.
+The first three patches address a bug, found by Dan Kruchinin.
+When the padata cpumask does not intersect with the active
+cpumask we get a division by zero in padata_alloc_pd and we
+end up with a useless padata instance. It's not possible to
+trigger this bug by now, but Dan has patches that let the
+cpumask change from userspace. So this bug has to be fixed
+before these patches can go in.
+
+4. Make padata_do_parallel to return zero on success.
+To return -EINPROGRESS on success was considered to be odd,
+so we change the API to return zero instead. Users are updated
+accordingly.
+
+5. Simplify the serialization mechanism.
+As it is, we go through all the percpu reorder queues to calculate
+the sequence number of the next object that needs serialization. 
+This patch avoids this and minimalizes the accesses of foreign
+memory. This gives some performance inprovements, in particular
+on machines with many cpus.
+
+6. Update the padata documentation.
+
+Steffen
