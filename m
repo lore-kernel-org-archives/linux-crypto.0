@@ -1,183 +1,45 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 5/6] padata: simplify serialization mechanism
-Date: Wed, 7 Jul 2010 15:32:39 +0200
-Message-ID: <20100707133239.GA10072@secunet.com>
-References: <20100707132915.GV10072@secunet.com>
+From: Mrs Rebecca Ault <4runner@ufo.tc>
+Subject: Your Well Deserved Compensation
+Date: Fri, 09 Jul 2010 20:21:36 +0200
+Message-ID: <ec75228a74d8dfb095da2a1d12b85c29@mail.ic.cz>
+Reply-To: mrsrebecca@ankara.tc
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Dan Kruchinin <dkruchinin@acm.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20100707132915.GV10072@secunet.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ic01.ic.cz ([88.86.103.244]:33596 "EHLO ic01.ic.cz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751186Ab0GJBEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Jul 2010 21:04:33 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-We count the number of processed objects on a percpu basis,
-so we need to go through all the percpu reorder queues to calculate
-the sequence number of the next object that needs serialization.
-This patch changes this to count the number of processed objects
-global. So we can calculate the sequence number and the percpu
-reorder queue of the next object that needs serialization without
-searching through the percpu reorder queues. This avoids some
-accesses to memory of foreign cpus.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- include/linux/padata.h |    6 ++--
- kernel/padata.c        |   71 +++++++++++++-----------------------------------
- 2 files changed, 22 insertions(+), 55 deletions(-)
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index e4c17f9..8844b85 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -67,7 +67,6 @@ struct padata_list {
-  * @pwork: work struct for parallelization.
-  * @swork: work struct for serialization.
-  * @pd: Backpointer to the internal control structure.
-- * @num_obj: Number of objects that are processed by this cpu.
-  * @cpu_index: Index of the cpu.
-  */
- struct padata_queue {
-@@ -77,7 +76,6 @@ struct padata_queue {
- 	struct work_struct	pwork;
- 	struct work_struct	swork;
- 	struct parallel_data    *pd;
--	atomic_t		num_obj;
- 	int			cpu_index;
- };
- 
-@@ -93,6 +91,7 @@ struct padata_queue {
-  * @max_seq_nr:  Maximal used sequence number.
-  * @cpumask: cpumask in use.
-  * @lock: Reorder lock.
-+ * @processed: Number of already processed objects.
-  * @timer: Reorder timer.
-  */
- struct parallel_data {
-@@ -103,7 +102,8 @@ struct parallel_data {
- 	atomic_t                refcnt;
- 	unsigned int		max_seq_nr;
- 	cpumask_var_t		cpumask;
--	spinlock_t              lock;
-+	spinlock_t              lock ____cacheline_aligned;
-+	unsigned int            processed;
- 	struct timer_list       timer;
- };
- 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index ae8defc..450d67d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -170,79 +170,47 @@ EXPORT_SYMBOL(padata_do_parallel);
-  */
- static struct padata_priv *padata_get_next(struct parallel_data *pd)
- {
--	int cpu, num_cpus, empty, calc_seq_nr;
--	int seq_nr, next_nr, overrun, next_overrun;
-+	int cpu, num_cpus;
-+	int next_nr, next_index;
- 	struct padata_queue *queue, *next_queue;
- 	struct padata_priv *padata;
- 	struct padata_list *reorder;
- 
--	empty = 0;
--	next_nr = -1;
--	next_overrun = 0;
--	next_queue = NULL;
--
- 	num_cpus = cpumask_weight(pd->cpumask);
- 
--	for_each_cpu(cpu, pd->cpumask) {
--		queue = per_cpu_ptr(pd->queue, cpu);
--		reorder = &queue->reorder;
--
--		/*
--		 * Calculate the seq_nr of the object that should be
--		 * next in this reorder queue.
--		 */
--		overrun = 0;
--		calc_seq_nr = (atomic_read(&queue->num_obj) * num_cpus)
--			       + queue->cpu_index;
--
--		if (unlikely(calc_seq_nr > pd->max_seq_nr)) {
--			calc_seq_nr = calc_seq_nr - pd->max_seq_nr - 1;
--			overrun = 1;
--		}
--
--		if (!list_empty(&reorder->list)) {
--			padata = list_entry(reorder->list.next,
--					    struct padata_priv, list);
--
--			seq_nr  = padata->seq_nr;
--			BUG_ON(calc_seq_nr != seq_nr);
--		} else {
--			seq_nr = calc_seq_nr;
--			empty++;
--		}
--
--		if (next_nr < 0 || seq_nr < next_nr
--		    || (next_overrun && !overrun)) {
--			next_nr = seq_nr;
--			next_overrun = overrun;
--			next_queue = queue;
--		}
-+	/*
-+	 * Calculate the percpu reorder queue and the sequence
-+	 * number of the next object.
-+	 */
-+	next_nr = pd->processed;
-+	next_index = next_nr % num_cpus;
-+	cpu = padata_index_to_cpu(pd, next_index);
-+	next_queue = per_cpu_ptr(pd->queue, cpu);
-+
-+	if (unlikely(next_nr > pd->max_seq_nr)) {
-+		next_nr = next_nr - pd->max_seq_nr - 1;
-+		next_index = next_nr % num_cpus;
-+		cpu = padata_index_to_cpu(pd, next_index);
-+		next_queue = per_cpu_ptr(pd->queue, cpu);
-+		pd->processed = 0;
- 	}
- 
- 	padata = NULL;
- 
--	if (empty == num_cpus)
--		goto out;
--
- 	reorder = &next_queue->reorder;
- 
- 	if (!list_empty(&reorder->list)) {
- 		padata = list_entry(reorder->list.next,
- 				    struct padata_priv, list);
- 
--		if (unlikely(next_overrun)) {
--			for_each_cpu(cpu, pd->cpumask) {
--				queue = per_cpu_ptr(pd->queue, cpu);
--				atomic_set(&queue->num_obj, 0);
--			}
--		}
-+		BUG_ON(next_nr != padata->seq_nr);
- 
- 		spin_lock(&reorder->lock);
- 		list_del_init(&padata->list);
- 		atomic_dec(&pd->reorder_objects);
- 		spin_unlock(&reorder->lock);
- 
--		atomic_inc(&next_queue->num_obj);
-+		pd->processed++;
- 
- 		goto out;
- 	}
-@@ -430,7 +398,6 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
- 
- 		INIT_WORK(&queue->pwork, padata_parallel_worker);
- 		INIT_WORK(&queue->swork, padata_serial_worker);
--		atomic_set(&queue->num_obj, 0);
- 	}
- 
- 	num_cpus = cpumask_weight(pd->cpumask);
--- 
-1.5.6.5
+Hello Dear Friend, =0D
+=0D
+I did not forgot your past efforts and attempts to assist me, now I=E2=80=
+=99m=0D
+happy to inform you that I have succeeded in getting those funds=0D
+transferred into my new partner's account.  Now Contact my secretary as=
+k=0D
+him for US$2.700, 000.00 (In Certified Draft) being your compensation. =
+His=0D
+Name is : Mr. Paul Flink. his contact information is as given below. =0D
+=0D
+Name :Mr Paul Flink =0D
+E-mail: paul.flink@turk.tc=0D
+Phone: +229 93816266=0D
+  =0D
+Also proceed to reconfirm your personal information as below: =0D
+  =0D
+You=E2=80=99re full Name: __________________ =0D
+Delivery address: __________________ =0D
+Mobile Telephone __________________ =0D
+Age: _____________________________ =0D
+Sex: ______________________________ =0D
+Occupation: ________________________ =0D
+E-Mail ____________________________=0D
+=0D
+Regards =0D
+Mrs. Rebecca Ault
