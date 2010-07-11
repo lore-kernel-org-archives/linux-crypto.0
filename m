@@ -1,45 +1,55 @@
-From: Mrs Rebecca Ault <4runner@ufo.tc>
-Subject: Your Well Deserved Compensation
-Date: Fri, 09 Jul 2010 20:21:36 +0200
-Message-ID: <ec75228a74d8dfb095da2a1d12b85c29@mail.ic.cz>
-Reply-To: mrsrebecca@ankara.tc
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+From: Lee Nipper <lee.nipper@gmail.com>
+Subject: [PATCH] crypto: talitos - fix bug in sg_copy_end_to_buffer
+Date: Sun, 11 Jul 2010 15:24:06 -0500
+Message-ID: <1278879846-29701-1-git-send-email-lee.nipper@gmail.com>
+Cc: Lee Nipper <lee.nipper@gmail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ic01.ic.cz ([88.86.103.244]:33596 "EHLO ic01.ic.cz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751186Ab0GJBEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Jul 2010 21:04:33 -0400
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:56577 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753522Ab0GKUYM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 11 Jul 2010 16:24:12 -0400
+Received: by gwj18 with SMTP id 18so1763284gwj.19
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Jul 2010 13:24:11 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+In function sg_copy_end_to_buffer, too much data
+is copied when a segment in the scatterlist
+has .length greater than the requested copy length.
 
-Hello Dear Friend, =0D
-=0D
-I did not forgot your past efforts and attempts to assist me, now I=E2=80=
-=99m=0D
-happy to inform you that I have succeeded in getting those funds=0D
-transferred into my new partner's account.  Now Contact my secretary as=
-k=0D
-him for US$2.700, 000.00 (In Certified Draft) being your compensation. =
-His=0D
-Name is : Mr. Paul Flink. his contact information is as given below. =0D
-=0D
-Name :Mr Paul Flink =0D
-E-mail: paul.flink@turk.tc=0D
-Phone: +229 93816266=0D
-  =0D
-Also proceed to reconfirm your personal information as below: =0D
-  =0D
-You=E2=80=99re full Name: __________________ =0D
-Delivery address: __________________ =0D
-Mobile Telephone __________________ =0D
-Age: _____________________________ =0D
-Sex: ______________________________ =0D
-Occupation: ________________________ =0D
-E-Mail ____________________________=0D
-=0D
-Regards =0D
-Mrs. Rebecca Ault
+This patch adds the limit checks to fix this bug of over copying,
+which affected only the ahash algorithms.
+
+Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
+---
+Kim, this corrects the problem causing exceptions
+for tcrypt tests 402, 403, and 404.
+With this patch the tcrypt tests run through ok.
+
+ drivers/crypto/talitos.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 0f2483e..e058987 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1183,10 +1183,14 @@ static size_t sg_copy_end_to_buffer(struct scatterlist *sgl, unsigned int nents,
+ 				/* Copy part of this segment */
+ 				ignore = skip - offset;
+ 				len = miter.length - ignore;
++				if ((boffset + len) > buflen)
++					len = buflen - boffset;
+ 				memcpy(buf + boffset, miter.addr + ignore, len);
+ 			} else {
+-				/* Copy all of this segment */
++				/* Copy all of this segment (up to buflen) */
+ 				len = miter.length;
++				if ((boffset + len) > buflen)
++					len = buflen - boffset;
+ 				memcpy(buf + boffset, miter.addr, len);
+ 			}
+ 			boffset += len;
+-- 
+1.6.0.4
