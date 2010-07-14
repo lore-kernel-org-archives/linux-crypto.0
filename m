@@ -1,30 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] padata: updates
-Date: Wed, 14 Jul 2010 20:30:56 +0800
-Message-ID: <20100714123055.GA11394@gondor.apana.org.au>
-References: <20100707132915.GV10072@secunet.com>
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+Subject: Re: [PATCH v3]crypto:hifn_795x.c Fix warning: variable 'ctx' set
+ but not used
+Date: Wed, 14 Jul 2010 06:35:59 -0700
+Message-ID: <4C3DBD3F.3010808@gmail.com>
+References: <1278441397-10960-1-git-send-email-justinmattock@gmail.com> <20100714121204.GA11194@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Dan Kruchinin <dkruchinin@acm.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, jkosina@suse.cz,
+	kim.phillips@freescale.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35878 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752454Ab0GNMbJ (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:38698 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753161Ab0GNNgC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jul 2010 08:31:09 -0400
-Content-Disposition: inline
-In-Reply-To: <20100707132915.GV10072@secunet.com>
+	Wed, 14 Jul 2010 09:36:02 -0400
+Received: by pvc7 with SMTP id 7so2724997pvc.19
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2010 06:36:02 -0700 (PDT)
+In-Reply-To: <20100714121204.GA11194@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 07, 2010 at 03:29:15PM +0200, Steffen Klassert wrote:
-> This patchset contains the following changes:
+On 07/14/2010 05:12 AM, Herbert Xu wrote:
+> On Tue, Jul 06, 2010 at 11:36:37AM -0700, Justin P. Mattock wrote:
+>> The below patch gets rid of an unused variable ctx reported by
+>> GCC when building the kernel.
+>>    CC [M]  drivers/crypto/hifn_795x.o
+>> drivers/crypto/hifn_795x.c: In function 'hifn_flush':
+>> drivers/crypto/hifn_795x.c:2021:23: warning: variable 'ctx' set but not used
+>> drivers/crypto/hifn_795x.c: In function 'hifn_process_queue':
+>> drivers/crypto/hifn_795x.c:2142:23: warning: variable 'ctx' set but not used
+>>
+>>   Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
+>
+> Patch applied.  Thanks Justin!
 
-All applied to cryptodev.  Thanks Steffen!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+o.k.!!
+
+cheers,
+
+Justin P. Mattock
