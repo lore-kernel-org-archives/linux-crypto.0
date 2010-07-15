@@ -1,38 +1,50 @@
-From: Dan Carpenter <error27@gmail.com>
-Subject: [patch] crypto/ablkcipher: missing return statement
-Date: Thu, 15 Jul 2010 09:57:36 +0200
-Message-ID: <20100715075736.GC5164@bicker>
+From: Peter Huewe <PeterHuewe@gmx.de>
+Subject: [PATCH 16/25] crypto: Convert pci_table entries to PCI_VDEVICE (if PCI_ANY_ID is used)
+Date: Thu, 15 Jul 2010 21:00:41 +0200
+Message-ID: <201007152100.42276.PeterHuewe@gmx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Richard Hartmann <richih.mailinglist@gmail.com>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Roel Kluin <roel.kluin@gmail.com>,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
+	Chihau Chau <chihau@gmail.com>,
+	linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Kernel Janitors <kernel-janitors@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:45790 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932618Ab0GOH7D (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Jul 2010 03:59:03 -0400
-Content-Disposition: inline
+Received: from mail.gmx.net ([213.165.64.20]:28644 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S934314Ab0GOTAu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 Jul 2010 15:00:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The intent was to return here.  In the original an allocation failure
-would lead to a NULL dereference.
+From: Peter Huewe <peterhuewe@gmx.de>
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+This patch converts pci_table entries, where .subvendor=PCI_ANY_ID and
+.subdevice=PCI_ANY_ID, .class=0 and .class_mask=0, to use the
+PCI_VDEVICE macro, and thus improves readability.
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index 98a6610..a854df2 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -165,7 +165,7 @@ static inline int ablkcipher_next_slow(struct ablkcipher_request *req,
+Signed-off-by: Peter Huewe <peterhuewe@gmx.de>
+---
+ drivers/crypto/geode-aes.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+index 09389dd..219d09c 100644
+--- a/drivers/crypto/geode-aes.c
++++ b/drivers/crypto/geode-aes.c
+@@ -573,7 +573,7 @@ geode_aes_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ }
  
- 	p = kmalloc(n, GFP_ATOMIC);
- 	if (!p)
--		ablkcipher_walk_done(req, walk, -ENOMEM);
-+		return ablkcipher_walk_done(req, walk, -ENOMEM);
+ static struct pci_device_id geode_aes_tbl[] = {
+-	{ PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_LX_AES, PCI_ANY_ID, PCI_ANY_ID} ,
++	{ PCI_VDEVICE(AMD, PCI_DEVICE_ID_AMD_LX_AES), } ,
+ 	{ 0, }
+ };
  
- 	base = p + 1;
- 
+-- 
+1.7.1
