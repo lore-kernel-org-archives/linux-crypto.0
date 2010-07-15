@@ -1,43 +1,38 @@
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-Subject: Re: [PATCH v3]crypto:hifn_795x.c Fix warning: variable 'ctx' set
- but not used
-Date: Wed, 14 Jul 2010 06:35:59 -0700
-Message-ID: <4C3DBD3F.3010808@gmail.com>
-References: <1278441397-10960-1-git-send-email-justinmattock@gmail.com> <20100714121204.GA11194@gondor.apana.org.au>
+From: Dan Carpenter <error27@gmail.com>
+Subject: [patch] crypto/ablkcipher: missing return statement
+Date: Thu, 15 Jul 2010 09:57:36 +0200
+Message-ID: <20100715075736.GC5164@bicker>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, jkosina@suse.cz,
-	kim.phillips@freescale.com
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Richard Hartmann <richih.mailinglist@gmail.com>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:38698 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753161Ab0GNNgC (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:45790 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932618Ab0GOH7D (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jul 2010 09:36:02 -0400
-Received: by pvc7 with SMTP id 7so2724997pvc.19
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2010 06:36:02 -0700 (PDT)
-In-Reply-To: <20100714121204.GA11194@gondor.apana.org.au>
+	Thu, 15 Jul 2010 03:59:03 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/14/2010 05:12 AM, Herbert Xu wrote:
-> On Tue, Jul 06, 2010 at 11:36:37AM -0700, Justin P. Mattock wrote:
->> The below patch gets rid of an unused variable ctx reported by
->> GCC when building the kernel.
->>    CC [M]  drivers/crypto/hifn_795x.o
->> drivers/crypto/hifn_795x.c: In function 'hifn_flush':
->> drivers/crypto/hifn_795x.c:2021:23: warning: variable 'ctx' set but not used
->> drivers/crypto/hifn_795x.c: In function 'hifn_process_queue':
->> drivers/crypto/hifn_795x.c:2142:23: warning: variable 'ctx' set but not used
->>
->>   Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
->
-> Patch applied.  Thanks Justin!
+The intent was to return here.  In the original an allocation failure
+would lead to a NULL dereference.
 
-o.k.!!
+Signed-off-by: Dan Carpenter <error27@gmail.com>
 
-cheers,
-
-Justin P. Mattock
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index 98a6610..a854df2 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -165,7 +165,7 @@ static inline int ablkcipher_next_slow(struct ablkcipher_request *req,
+ 
+ 	p = kmalloc(n, GFP_ATOMIC);
+ 	if (!p)
+-		ablkcipher_walk_done(req, walk, -ENOMEM);
++		return ablkcipher_walk_done(req, walk, -ENOMEM);
+ 
+ 	base = p + 1;
+ 
