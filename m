@@ -1,36 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch] crypto/ablkcipher: missing return statement
-Date: Fri, 16 Jul 2010 10:23:11 +0800
-Message-ID: <20100716022311.GA28155@gondor.apana.org.au>
-References: <20100715075736.GC5164@bicker> <20100715.192141.242121343.davem@davemloft.net>
+Subject: Re: Crypto Fixes for 2.6.35
+Date: Fri, 16 Jul 2010 10:26:48 +0800
+Message-ID: <20100716022648.GA28219@gondor.apana.org.au>
+References: <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: error27@gmail.com, richih.mailinglist@gmail.com,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:58472 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:55553 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935279Ab0GPCXU (ORCPT
+	with ESMTP id S935263Ab0GPC04 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Jul 2010 22:23:20 -0400
+	Thu, 15 Jul 2010 22:26:56 -0400
 Content-Disposition: inline
-In-Reply-To: <20100715.192141.242121343.davem@davemloft.net>
+In-Reply-To: <20100603100550.GA30681@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 15, 2010 at 07:21:41PM -0700, David Miller wrote:
-> From: Dan Carpenter <error27@gmail.com>
-> Date: Thu, 15 Jul 2010 09:57:36 +0200
-> 
-> > The intent was to return here.  In the original an allocation failure
-> > would lead to a NULL dereference.
-> > 
-> > Signed-off-by: Dan Carpenter <error27@gmail.com>
-> 
-> Acked-by: David S. Miller <davem@davemloft.net>
+Hi Linus:
 
-Thanks, applied to crypto-2.6.
+This push fixes a crash in the new ablkcipher walking code used by
+async block ciphers.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Jiri Slaby (1):
+      crypto: skcipher - avoid NULL dereference
+
+ crypto/ablkcipher.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
