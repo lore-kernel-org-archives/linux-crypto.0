@@ -1,36 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: talitos - fix bug in sg_copy_end_to_buffer
-Date: Mon, 19 Jul 2010 14:12:01 +0800
-Message-ID: <20100719061201.GA19903@gondor.apana.org.au>
-References: <1279066287-11349-1-git-send-email-lee.nipper@gmail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 0/3] padata: cpumasks
+Date: Mon, 19 Jul 2010 08:40:50 +0200
+Message-ID: <20100719064050.GA11081@secunet.com>
+References: <20100714142951.22817d0c@leibniz>
+ <20100719060426.GA19696@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Lee Nipper <lee.nipper@gmail.com>
+Cc: Dan Kruchinin <dkruchinin@acm.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40483 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753623Ab0GSGME (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jul 2010 02:12:04 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:45313 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754199Ab0GSGh4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 Jul 2010 02:37:56 -0400
 Content-Disposition: inline
-In-Reply-To: <1279066287-11349-1-git-send-email-lee.nipper@gmail.com>
+In-Reply-To: <20100719060426.GA19696@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 14, 2010 at 12:11:27AM +0000, Lee Nipper wrote:
-> In function sg_copy_end_to_buffer, too much data
-> is copied when a segment in the scatterlist
-> has .length greater than the requested copy length.
+On Mon, Jul 19, 2010 at 02:04:26PM +0800, Herbert Xu wrote:
 > 
-> This patch adds the limit checks to fix this bug of over copying,
-> which affected only the ahash algorithms.
-> 
-> Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
-> Acked-by: Kim Phillips <kim.phillips@freescale.com>
+> All applied.  Thanks!
 
-Applied to crypto-2.6.  Thanks Lee!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hm, I was just about to write some comments on these patches,
+they still have some issues. For example, handling empty cpumasks
+is broken again (NULL pointer dereference in padata_replace).
+The cpu_index is zero for all cpus now, so can we leak objects
+on cpu hotplug etc. Also I'm not that happy with some of the
+API changes. I'll try to fix this up with some patches.
+
+Steffen
