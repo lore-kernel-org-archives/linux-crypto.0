@@ -1,40 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 16/25] crypto: Convert pci_table entries to PCI_VDEVICE
-	(if PCI_ANY_ID is used)
-Date: Mon, 19 Jul 2010 14:05:59 +0800
-Message-ID: <20100719060559.GA19793@gondor.apana.org.au>
-References: <201007152100.42276.PeterHuewe@gmx.de>
+Subject: Re: [PATCH v2] crypto: talitos - fix bug in sg_copy_end_to_buffer
+Date: Mon, 19 Jul 2010 14:12:01 +0800
+Message-ID: <20100719061201.GA19903@gondor.apana.org.au>
+References: <1279066287-11349-1-git-send-email-lee.nipper@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Kernel Janitors <kernel-janitors@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Roel Kluin <roel.kluin@gmail.com>,
-	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>,
-	Chihau Chau <chihau@gmail.com>,
-	linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Peter Huewe <PeterHuewe@gmx.de>
+Cc: linux-crypto@vger.kernel.org
+To: Lee Nipper <lee.nipper@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:55177 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40483 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753205Ab0GSGGT (ORCPT
+	with ESMTP id S1753623Ab0GSGME (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jul 2010 02:06:19 -0400
+	Mon, 19 Jul 2010 02:12:04 -0400
 Content-Disposition: inline
-In-Reply-To: <201007152100.42276.PeterHuewe@gmx.de>
+In-Reply-To: <1279066287-11349-1-git-send-email-lee.nipper@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 15, 2010 at 09:00:41PM +0200, Peter Huewe wrote:
-> From: Peter Huewe <peterhuewe@gmx.de>
+On Wed, Jul 14, 2010 at 12:11:27AM +0000, Lee Nipper wrote:
+> In function sg_copy_end_to_buffer, too much data
+> is copied when a segment in the scatterlist
+> has .length greater than the requested copy length.
 > 
-> This patch converts pci_table entries, where .subvendor=PCI_ANY_ID and
-> .subdevice=PCI_ANY_ID, .class=0 and .class_mask=0, to use the
-> PCI_VDEVICE macro, and thus improves readability.
+> This patch adds the limit checks to fix this bug of over copying,
+> which affected only the ahash algorithms.
 > 
-> Signed-off-by: Peter Huewe <peterhuewe@gmx.de>
+> Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
+> Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
-Patch applied.  Thanks.
+Applied to crypto-2.6.  Thanks Lee!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
