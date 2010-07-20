@@ -1,28 +1,44 @@
-From: "Sonia Porter" <sporter@jusd.k12.ca.us>
-Subject: Dear Webmail User
-Date: Mon, 19 Jul 2010 18:26:37 -0700
-Message-ID: <8A78544F83994B468EAC5A3D242C1E34C79054__43826.1385345415$1279590178$gmane$org@exchsrv02.jusd.dom>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH 0/4] padata/pcrypt: fixes
+Date: Tue, 20 Jul 2010 08:47:36 +0200
+Message-ID: <20100720064736.GB11081@secunet.com>
+References: <20100714142951.22817d0c@leibniz>
+ <20100719060426.GA19696@gondor.apana.org.au>
+ <20100719064050.GA11081@secunet.com>
+ <20100719073255.GA20403@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: <info@upgrade.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.jusd.k12.ca.us ([204.100.155.6]:43451 "EHLO
-	mail.jusd.k12.ca.us" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932088Ab0GTBma convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jul 2010 21:42:30 -0400
-Content-class: urn:content-classes:message
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Dan Kruchinin <dkruchinin@acm.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20100719073255.GA20403@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This message was sent automatically by a program on Web mail which periodically checks the size of in boxes, where new messages are received.The program is run weekly to ensure no one's in box grows too large. If your in box becomes too large,you will be unable to receive new email. Just before this message was sent,you had 18 Mega bytes (MB) or more of messages stored in your in box on your Web mail. To help's re-set your SPACE on our database prior to maintain your IN BOX.
- 
-YOU MUST COPY AND PAST THE BELOW LINK TO INCREASE YOUR INBOX QUOTA AND UPGRADE YOUR WEBMAIL ACCOUNT
+This patchset contains the following fixes:
 
-http://www.eformit.com/eform.aspx?webmasterupgradesystem 
- 
- You will continue to receive this warning message periodically if your inbox size continues to be between 18 and 20 MB. If your in box size grows to 20MB,then a program on the Web mail will move your oldest email to a folder in your home directory to ensure that you will continue to be able to receive incoming email. You will be notified by email that this has taken place. If your in box grows to 25 MB, you will be unable to receive new email as it will be returned to the sender.After you read a message,it is best to REPLY and SAVE a copy.
- 
-Thanks.
-Web mail Help Desk
+1. padata - Fix a potential hang of the parallel worker threads on
+cpu hotplug.
+
+2. padata - Fix two NULL pointer dereference crashes if one of the
+padata cpumasks is empty. The crashes can be triggered by doing
+echo 0 > /sys/kernel/pcrypt/pencrypt/[parallel_cpumask/serial_cpumask]
+
+3. padata - Fix a division by zero crash if the parallel cpumask
+contains no active cpu. Can be triggered by doing
+echo 0 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+
+4. pcrypt - Fix division by zero crash if the callback cpumask
+is empty. Can be triggered by doing
+echo 0 > /sys/kernel/pcrypt/pencrypt/serial_cpumask
+
+I ran a script that does cpumask changes and cpu hotplugs as fast as
+possible while sending IPsec packets on maximal rate with pcrypt.
+It showed no furter crashes overnight, so I hope I've got them all.
+
+padata API corrections and some minor fixes/cleanups are comming later.
+
+Steffen
