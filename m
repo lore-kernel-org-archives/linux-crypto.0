@@ -1,69 +1,60 @@
-From: Lee Nipper <lee.nipper@gmail.com>
-Subject: Re: Crypto Fixes for 2.6.35
-Date: Fri, 23 Jul 2010 00:17:59 -0500
-Message-ID: <AANLkTimqQXuiwgQep4uUrKDIAO2idw51Eu6XiZgs0HsR@mail.gmail.com>
-References: <20090324044932.GA18245@gondor.apana.org.au>
-	<20090613020512.GA21024@gondor.apana.org.au>
-	<20090910141905.GA17948@gondor.apana.org.au>
-	<20091020065442.GA5947@gondor.apana.org.au>
-	<20091230021253.GA17067@gondor.apana.org.au>
-	<20100201195204.GA6953@gondor.apana.org.au>
-	<20100305071043.GA3548@gondor.apana.org.au>
-	<20100427135547.GA4008@gondor.apana.org.au>
-	<20100603100550.GA30681@gondor.apana.org.au>
-	<20100716022648.GA28219@gondor.apana.org.au>
-	<20100722055043.GA25689@gondor.apana.org.au>
-Reply-To: lee.nipper@gmail.com
+From: Stefan Roese <sr@denx.de>
+Subject: Re: [PATCH] Adding ADMA support for PPC460EX DMA engine.
+Date: Fri, 23 Jul 2010 08:15:14 +0200
+Message-ID: <201007230815.14464.sr@denx.de>
+References: <1279846638-22323-1-git-send-email-tmarri@amcc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:34209 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752238Ab0GWFSA convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jul 2010 01:18:00 -0400
-Received: by qwh6 with SMTP id 6so3322337qwh.19
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jul 2010 22:17:59 -0700 (PDT)
-In-Reply-To: <20100722055043.GA25689@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-raid@vger.kernel.org, dan.j.williams@intel.com,
+	linux-crypto@vger.kernel.org, tmarri@amcc.com
+To: linuxppc-dev@lists.ozlabs.org
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1279846638-22323-1-git-send-email-tmarri@amcc.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 22, 2010 at 00:50, Herbert Xu <herbert@gondor.apana.org.au>=
- wrote:
-> Hi Linus:
->
-> This push fixes a bug in the talito hash driver that causes too
-> much data to be copied.
->
->
-> Please pull from
->
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
->
-> or
->
-> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
->
->
-> Lee Nipper (1):
-> =A0 =A0 =A0crypto: talitos - fix bug in sg_copy_end_to_buffer
->
-> =A0drivers/crypto/talitos.c | =A0 =A06 +++++-
-> =A01 files changed, 5 insertions(+), 1 deletions(-)
->
+Hi Marri,
 
-Thanks Herbert.
+On Friday 23 July 2010 02:57:18 tmarri@amcc.com wrote:
+> From: Tirumala Marri <tmarri@amcc.com>
+> 
+>   This patch will add ADMA support for DMA engine and HW offload for
+>   XOR/ADG (RAID-5/6) functionalities.
+>   1. It supports memcpy, xor, GF(2) based RAID-6.
+>   2. It supports interrupt based DMA completions.
+>   3. Also supports memcpy in RAID-1 case.
+> 
+>   Kernel version: 2.6.35-rc5
+> 
+>   Testing:
+>     Created RAID-5/6 arrays usign mdadm.
+>     And ran raw IO and filesystem IO to the RAID array.
+>     Chunk size 4k,64k was tested.
+>     RAID rebuild , disk fail, resync tested.
+> 
+>   File names:
+>     This code is similar to ppc440spe . So I named the files as
+>     drivers/dma/ppc4xx/adma1.c and drivers/dma/ppc4xx/adma1.h
 
-But I am curious why this patch
+As you describe above, a lot of the code seems to be copied from 
+drivers/dma/ppc4xx/adma.c/h. Wouldn't it make more sense to factor out the 
+common code instead of duplicating it?
+ 
+Thanks.
 
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg04660.html
+Cheers,
+Stefan
 
-wasn't nudged along too.  It also fixed a talitos problem with ahash.
-I don't mind if it needs to wait until later;  I'm just curious.
-
-Thanks again,
-
-Lee
+--
+DENX Software Engineering GmbH,      MD: Wolfgang Denk & Detlev Zundel
+HRB 165235 Munich,  Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-0 Fax: (+49)-8142-66989-80 Email: office@denx.de
