@@ -1,42 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Lee Nipper <lee.nipper@gmail.com>
 Subject: Re: Crypto Fixes for 2.6.35
-Date: Fri, 23 Jul 2010 15:27:46 +0800
-Message-ID: <20100723072746.GB4267@gondor.apana.org.au>
-References: <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <AANLkTimqQXuiwgQep4uUrKDIAO2idw51Eu6XiZgs0HsR@mail.gmail.com>
+Date: Fri, 23 Jul 2010 08:17:59 -0500
+Message-ID: <AANLkTik2eu0EUViJRHRwt2=2W=punHbswWK-AS6Qr_2S@mail.gmail.com>
+References: <20090910141905.GA17948@gondor.apana.org.au>
+	<20091020065442.GA5947@gondor.apana.org.au>
+	<20091230021253.GA17067@gondor.apana.org.au>
+	<20100201195204.GA6953@gondor.apana.org.au>
+	<20100305071043.GA3548@gondor.apana.org.au>
+	<20100427135547.GA4008@gondor.apana.org.au>
+	<20100603100550.GA30681@gondor.apana.org.au>
+	<20100716022648.GA28219@gondor.apana.org.au>
+	<20100722055043.GA25689@gondor.apana.org.au>
+	<AANLkTimqQXuiwgQep4uUrKDIAO2idw51Eu6XiZgs0HsR@mail.gmail.com>
+	<20100723072746.GB4267@gondor.apana.org.au>
+Reply-To: lee.nipper@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-crypto@vger.kernel.org
-To: Lee Nipper <lee.nipper@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40852 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751386Ab0GWH1u (ORCPT
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:35383 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753569Ab0GWNSB convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jul 2010 03:27:50 -0400
-Content-Disposition: inline
-In-Reply-To: <AANLkTimqQXuiwgQep4uUrKDIAO2idw51Eu6XiZgs0HsR@mail.gmail.com>
+	Fri, 23 Jul 2010 09:18:01 -0400
+Received: by vws3 with SMTP id 3so205871vws.19
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Jul 2010 06:18:00 -0700 (PDT)
+In-Reply-To: <20100723072746.GB4267@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 23, 2010 at 12:17:59AM -0500, Lee Nipper wrote:
+On Fri, Jul 23, 2010 at 02:27, Herbert Xu <herbert@gondor.apana.org.au>=
+ wrote:
+> If it causes a crash or has other serious implications then I will
+> push it. =A0However, if it simply results in a broken hash computatio=
+n,
+> a failure that should be fairly obvious, then it can wait til the
+> next cycle.
 >
-> But I am curious why this patch
-> 
-> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg04660.html
-> 
-> wasn't nudged along too.  It also fixed a talitos problem with ahash.
-> I don't mind if it needs to wait until later;  I'm just curious.
+> When I looked at it previously I thought it fell into the latter
+> category, but I might be mistaken.
 
-If it causes a crash or has other serious implications then I will
-push it.  However, if it simply results in a broken hash computation,
-a failure that should be fairly obvious, then it can wait til the
-next cycle.
+That's right.  It's just a hash thing.
+Thanks,
 
-When I looked at it previously I thought it fell into the latter
-category, but I might be mistaken.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Lee
