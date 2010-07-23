@@ -1,48 +1,58 @@
-From: Lee Nipper <lee.nipper@gmail.com>
-Subject: Re: Crypto Fixes for 2.6.35
-Date: Fri, 23 Jul 2010 08:17:59 -0500
-Message-ID: <AANLkTik2eu0EUViJRHRwt2=2W=punHbswWK-AS6Qr_2S@mail.gmail.com>
-References: <20090910141905.GA17948@gondor.apana.org.au>
-	<20091020065442.GA5947@gondor.apana.org.au>
-	<20091230021253.GA17067@gondor.apana.org.au>
-	<20100201195204.GA6953@gondor.apana.org.au>
-	<20100305071043.GA3548@gondor.apana.org.au>
-	<20100427135547.GA4008@gondor.apana.org.au>
-	<20100603100550.GA30681@gondor.apana.org.au>
-	<20100716022648.GA28219@gondor.apana.org.au>
-	<20100722055043.GA25689@gondor.apana.org.au>
-	<AANLkTimqQXuiwgQep4uUrKDIAO2idw51Eu6XiZgs0HsR@mail.gmail.com>
-	<20100723072746.GB4267@gondor.apana.org.au>
-Reply-To: lee.nipper@gmail.com
+From: Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH] Adding ADMA support for PPC460EX DMA engine.
+Date: Fri, 23 Jul 2010 12:21:08 -0700
+Message-ID: <AANLkTi=M1L3xPiA1zyvDkA3403B=OpXdWfhMEP7mahrW@mail.gmail.com>
+References: <1279846638-22323-1-git-send-email-tmarri@amcc.com>
+	<201007230815.14464.sr@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:35383 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753569Ab0GWNSB convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jul 2010 09:18:01 -0400
-Received: by vws3 with SMTP id 3so205871vws.19
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Jul 2010 06:18:00 -0700 (PDT)
-In-Reply-To: <20100723072746.GB4267@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linuxppc-dev@lists.ozlabs.org, tmarri@amcc.com,
+	linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: Stefan Roese <sr@denx.de>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <201007230815.14464.sr@denx.de>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 23, 2010 at 02:27, Herbert Xu <herbert@gondor.apana.org.au>=
- wrote:
-> If it causes a crash or has other serious implications then I will
-> push it. =A0However, if it simply results in a broken hash computatio=
-n,
-> a failure that should be fairly obvious, then it can wait til the
-> next cycle.
+On Thu, Jul 22, 2010 at 11:15 PM, Stefan Roese <sr@denx.de> wrote:
+> Hi Marri,
 >
-> When I looked at it previously I thought it fell into the latter
-> category, but I might be mistaken.
+> On Friday 23 July 2010 02:57:18 tmarri@amcc.com wrote:
+>> From: Tirumala Marri <tmarri@amcc.com>
+>>
+>> =A0 This patch will add ADMA support for DMA engine and HW offload f=
+or
+>> =A0 XOR/ADG (RAID-5/6) functionalities.
+>> =A0 1. It supports memcpy, xor, GF(2) based RAID-6.
+>> =A0 2. It supports interrupt based DMA completions.
+>> =A0 3. Also supports memcpy in RAID-1 case.
+>>
+>> =A0 Kernel version: 2.6.35-rc5
+>>
+>> =A0 Testing:
+>> =A0 =A0 Created RAID-5/6 arrays usign mdadm.
+>> =A0 =A0 And ran raw IO and filesystem IO to the RAID array.
+>> =A0 =A0 Chunk size 4k,64k was tested.
+>> =A0 =A0 RAID rebuild , disk fail, resync tested.
+>>
+>> =A0 File names:
+>> =A0 =A0 This code is similar to ppc440spe . So I named the files as
+>> =A0 =A0 drivers/dma/ppc4xx/adma1.c and drivers/dma/ppc4xx/adma1.h
+>
+> As you describe above, a lot of the code seems to be copied from
+> drivers/dma/ppc4xx/adma.c/h. Wouldn't it make more sense to factor ou=
+t the
+> common code instead of duplicating it?
+>
 
-That's right.  It's just a hash thing.
-Thanks,
+Yes, and you might look to drivers/dma/iop-adma.c as an example of a
+way to support similar hardware with a single code base.
 
-Lee
+--
+Dan
+--
+To unsubscribe from this list: send the line "unsubscribe linux-raid" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
