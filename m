@@ -1,35 +1,30 @@
-From: Tirumala Marri <tmarri@apm.com>
-Subject: RE: [PATCH] Adding ADMA support for PPC460EX DMA engine.
-Date: Fri, 23 Jul 2010 14:39:24 -0700
-Message-ID: <8c2fc4da25db867b7daa7c4f618230b0@mail.gmail.com>
-References: <1279846638-22323-1-git-send-email-tmarri@amcc.com>
-	<201007230815.14464.sr@denx.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/4] padata/pcrypt: fixes
+Date: Mon, 26 Jul 2010 14:16:53 +0800
+Message-ID: <20100726061653.GA27848@gondor.apana.org.au>
+References: <20100714142951.22817d0c@leibniz> <20100719060426.GA19696@gondor.apana.org.au> <20100719064050.GA11081@secunet.com> <20100719073255.GA20403@gondor.apana.org.au> <20100720064736.GB11081@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: tmarri@amcc.com, linux-crypto@vger.kernel.org,
-	linux-raid@vger.kernel.org, dan.j.williams@intel.com
-To: Stefan Roese <sr@denx.de>, linuxppc-dev@lists.ozlabs.org
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <201007230815.14464.sr@denx.de>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Dan Kruchinin <dkruchinin@acm.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:37217 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753248Ab0GZGRF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 26 Jul 2010 02:17:05 -0400
+Content-Disposition: inline
+In-Reply-To: <20100720064736.GB11081@secunet.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
->As you describe above, a lot of the code seems to be copied from
->drivers/dma/ppc4xx/adma.c/h. Wouldn't it make more sense to factor out
-the
->common code instead of duplicating it?
+On Tue, Jul 20, 2010 at 08:47:36AM +0200, Steffen Klassert wrote:
+> This patchset contains the following fixes:
 
-
-
-  Hi Stefan,
-     Thanks for the review. There are definitely some functions can be
-moved to a common file.
-
-  Hi Dan,
- Could you also please review and see if there are any changes needed, so
-I can include some changes as
-Well in the modified patch.
-
-
-Regards,
-Marri
+All applied.  Thanks Steffen!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
