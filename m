@@ -1,30 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] padata/pcrypt: fixes
-Date: Mon, 26 Jul 2010 14:16:53 +0800
-Message-ID: <20100726061653.GA27848@gondor.apana.org.au>
-References: <20100714142951.22817d0c@leibniz> <20100719060426.GA19696@gondor.apana.org.au> <20100719064050.GA11081@secunet.com> <20100719073255.GA20403@gondor.apana.org.au> <20100720064736.GB11081@secunet.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH 0/7] padata/pcrypt: cleanups
+Date: Tue, 27 Jul 2010 07:13:47 +0200
+Message-ID: <20100727051347.GI11081@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Dan Kruchinin <dkruchinin@acm.org>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37217 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753248Ab0GZGRF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 Jul 2010 02:17:05 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:45536 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750985Ab0G0FKU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Jul 2010 01:10:20 -0400
 Content-Disposition: inline
-In-Reply-To: <20100720064736.GB11081@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 20, 2010 at 08:47:36AM +0200, Steffen Klassert wrote:
-> This patchset contains the following fixes:
+This patchset contains the following changes:
 
-All applied.  Thanks Steffen!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1. padata - Rename padata_alloc functions to not export underlined functions.
+
+2. padata - Rearrange set_cpumask functions to have proper locking for all
+these functions and to avoid to export underlined functions.
+
+3. padata - Pass the padata cpumasks to the cpumask_change_notifier chain, so
+users can access them without the need of a padata_get_cpumask function.
+
+4. pcrypt - Rename the stuct pcrypt_instance. An instance refers usually to a
+crypto instance in the crypto-layer, the struct pcrypt_instance is not related
+to a crypto instance, so we rename it.
+
+5. pcrypt - Update pcrypt cpumask acording to the padata cpumask notifier.
+The padata cpumask change notifier passes a padata_cpumask to the
+notifier chain, so we use this to update the pcrypt cpumask.
+
+6. padata - Remove padata_get_cpumask. This function is a bit error prone
+because the cpumask can change at any time, so we can't be sure to get the
+right cpumask from that function.
+
+7. padata - Update the API documentation.
+
+Steffen
