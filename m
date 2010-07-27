@@ -1,7 +1,8 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 4/7] crypto: pcrypt - Rename pcrypt_instance
-Date: Tue, 27 Jul 2010 07:16:33 +0200
-Message-ID: <20100727051633.GM11081@secunet.com>
+Subject: [PATCH 5/7] crypto: pcrypt - Update pcrypt cpumask according to
+ the padata cpumask notifier
+Date: Tue, 27 Jul 2010 07:18:46 +0200
+Message-ID: <20100727051846.GN11081@secunet.com>
 References: <20100727051347.GI11081@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -10,134 +11,90 @@ Cc: Dan Kruchinin <dkruchinin@acm.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:45586 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:33223 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751051Ab0G0FNB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Jul 2010 01:13:01 -0400
+	id S1751051Ab0G0FPN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Jul 2010 01:15:13 -0400
 Content-Disposition: inline
 In-Reply-To: <20100727051347.GI11081@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In the crypto-layer an instance refers usually to a crypto instance.
-The struct pcrypt_instance is not related to a crypto instance.
-It rather contains the padata informations, so we rename it to
-padata_pcrypt. The functions that handle this struct are renamed
-accordingly.
+The padata cpumask change notifier passes a padata_cpumask to the
+notifier chain. So we use this cpumask instead of asking padata for
+the cpumask.
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/pcrypt.c |   30 ++++++++++++++----------------
- 1 files changed, 14 insertions(+), 16 deletions(-)
+ crypto/pcrypt.c |   13 +++++++++++--
+ 1 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 5546083..7742553 100644
+index 7742553..de30782 100644
 --- a/crypto/pcrypt.c
 +++ b/crypto/pcrypt.c
-@@ -28,8 +28,7 @@
+@@ -26,6 +26,7 @@
+ #include <linux/slab.h>
+ #include <linux/notifier.h>
  #include <linux/kobject.h>
++#include <linux/cpu.h>
  #include <crypto/pcrypt.h>
  
--struct pcrypt_instance {
--	const char *name;
-+struct padata_pcrypt {
- 	struct padata_instance *pinst;
- 	struct workqueue_struct *wq;
- 
-@@ -55,8 +54,8 @@ struct pcrypt_instance {
- 	struct notifier_block nblock;
- };
- 
--static struct pcrypt_instance pencrypt;
--static struct pcrypt_instance pdecrypt;
-+static struct padata_pcrypt pencrypt;
-+static struct padata_pcrypt pdecrypt;
- static struct kset           *pcrypt_kset;
- 
- struct pcrypt_instance_ctx {
-@@ -70,7 +69,7 @@ struct pcrypt_aead_ctx {
- };
- 
- static int pcrypt_do_parallel(struct padata_priv *padata, unsigned int *cb_cpu,
--			      struct pcrypt_instance *pcrypt)
-+			      struct padata_pcrypt *pcrypt)
+ struct padata_pcrypt {
+@@ -409,6 +410,7 @@ static int pcrypt_cpumask_change_notify(struct notifier_block *self,
  {
- 	unsigned int cpu_index, cpu, i;
- 	struct pcrypt_cpumask *cpumask;
-@@ -408,13 +407,13 @@ static void pcrypt_free(struct crypto_instance *inst)
- static int pcrypt_cpumask_change_notify(struct notifier_block *self,
- 					unsigned long val, void *data)
- {
--	struct pcrypt_instance *pcrypt;
-+	struct padata_pcrypt *pcrypt;
+ 	struct padata_pcrypt *pcrypt;
  	struct pcrypt_cpumask *new_mask, *old_mask;
++	struct padata_cpumask *cpumask = (struct padata_cpumask *)data;
  
  	if (!(val & PADATA_CPU_SERIAL))
  		return 0;
+@@ -424,7 +426,7 @@ static int pcrypt_cpumask_change_notify(struct notifier_block *self,
  
--	pcrypt = container_of(self, struct pcrypt_instance, nblock);
-+	pcrypt = container_of(self, struct padata_pcrypt, nblock);
- 	new_mask = kmalloc(sizeof(*new_mask), GFP_KERNEL);
- 	if (!new_mask)
- 		return -ENOMEM;
-@@ -446,13 +445,12 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
- 	return ret;
- }
+ 	old_mask = pcrypt->cb_cpumask;
  
--static int __pcrypt_init_instance(struct pcrypt_instance *pcrypt,
--				  const char *name)
-+static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
-+			      const char *name)
- {
+-	padata_get_cpumask(pcrypt->pinst, PADATA_CPU_SERIAL, new_mask->mask);
++	cpumask_copy(new_mask->mask, cpumask->cbcpu);
+ 	rcu_assign_pointer(pcrypt->cb_cpumask, new_mask);
+ 	synchronize_rcu_bh();
+ 
+@@ -451,6 +453,8 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
  	int ret = -ENOMEM;
  	struct pcrypt_cpumask *mask;
  
--	pcrypt->name = name;
++	get_online_cpus();
++
  	pcrypt->wq = create_workqueue(name);
  	if (!pcrypt->wq)
  		goto err;
-@@ -495,7 +493,7 @@ err:
+@@ -467,7 +471,7 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
+ 		goto err_free_padata;
+ 	}
+ 
+-	padata_get_cpumask(pcrypt->pinst, PADATA_CPU_SERIAL, mask->mask);
++	cpumask_and(mask->mask, cpu_possible_mask, cpu_active_mask);
+ 	rcu_assign_pointer(pcrypt->cb_cpumask, mask);
+ 
+ 	pcrypt->nblock.notifier_call = pcrypt_cpumask_change_notify;
+@@ -479,7 +483,10 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
+ 	if (ret)
+ 		goto err_unregister_notifier;
+ 
++	put_online_cpus();
++
+ 	return ret;
++
+ err_unregister_notifier:
+ 	padata_unregister_cpumask_notifier(pcrypt->pinst, &pcrypt->nblock);
+ err_free_cpumask:
+@@ -490,6 +497,8 @@ err_free_padata:
+ err_destroy_workqueue:
+ 	destroy_workqueue(pcrypt->wq);
+ err:
++	put_online_cpus();
++
  	return ret;
  }
  
--static void __pcrypt_deinit_instance(struct pcrypt_instance *pcrypt)
-+static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
- {
- 	kobject_put(&pcrypt->pinst->kobj);
- 	free_cpumask_var(pcrypt->cb_cpumask->mask);
-@@ -522,11 +520,11 @@ static int __init pcrypt_init(void)
- 	if (!pcrypt_kset)
- 		goto err;
- 
--	err = __pcrypt_init_instance(&pencrypt, "pencrypt");
-+	err = pcrypt_init_padata(&pencrypt, "pencrypt");
- 	if (err)
- 		goto err_unreg_kset;
- 
--	err = __pcrypt_init_instance(&pdecrypt, "pdecrypt");
-+	err = pcrypt_init_padata(&pdecrypt, "pdecrypt");
- 	if (err)
- 		goto err_deinit_pencrypt;
- 
-@@ -536,7 +534,7 @@ static int __init pcrypt_init(void)
- 	return crypto_register_template(&pcrypt_tmpl);
- 
- err_deinit_pencrypt:
--	__pcrypt_deinit_instance(&pencrypt);
-+	pcrypt_fini_padata(&pencrypt);
- err_unreg_kset:
- 	kset_unregister(pcrypt_kset);
- err:
-@@ -545,8 +543,8 @@ err:
- 
- static void __exit pcrypt_exit(void)
- {
--	__pcrypt_deinit_instance(&pencrypt);
--	__pcrypt_deinit_instance(&pdecrypt);
-+	pcrypt_fini_padata(&pencrypt);
-+	pcrypt_fini_padata(&pdecrypt);
- 
- 	kset_unregister(pcrypt_kset);
- 	crypto_unregister_template(&pcrypt_tmpl);
 -- 
 1.5.6.5
