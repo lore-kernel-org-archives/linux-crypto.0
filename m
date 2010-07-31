@@ -1,30 +1,25 @@
-From: shirishpargaonkar@gmail.com
-Subject: [linux-cifs-client][PATCH] Enable signing for ntlmv2 within NTLMSSP using kernel crypto APIs
-Date: Sat, 31 Jul 2010 14:34:26 -0500
-Message-ID: <1280604866-9505-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linx-cifs@vger.kernel.org, samba-technical@samba.org,
-	linux-crypto@vger.kernel.org,
-	Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-To: smfrench@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:32826 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754539Ab0GaTik (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 31 Jul 2010 15:38:40 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [linux-cifs-client][PATCH] (resend) Enable signing for ntlmv2 within NTLMSSP using kernel crypto APIs
+Date: Sat, 31 Jul 2010 15:50:32 -0500
+Message-ID: <1280609432-10439-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
 Enable signing for ntlmv2 auth mech within NTLMSSP.
 Changed most of the crypto routines used by cifs to the kernel crypto apis.
 
 
 >From 11024eb79977a70502468a997744aca1e4ad81d0 Mon Sep 17 00:00:00 2001
-From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Date: Sat, 31 Jul 2010 14:18:02 -0500
 Subject: [PATCH] enable signing for ntlmv2 within NTLMSSP
 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
  fs/cifs/cifsencrypt.c |  332 +++++++++++++++++++++++++++++++------------------
  fs/cifs/cifsglob.h    |   12 ++
