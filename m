@@ -1,49 +1,69 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [linux-cifs-client][PATCH] Enable signing for ntlmv2 within
-	NTLMSSP using kernel crypto APIs
-Date: Wed, 4 Aug 2010 14:58:41 +0800
-Message-ID: <20100804065841.GA370@gondor.apana.org.au>
-References: <1280604866-9505-1-git-send-email-shirishpargaonkar@gmail.com> <20100802065508.GA8431@gondor.apana.org.au> <AANLkTimtgejfxW8P_GvGqD3muu2Wh6BfC-xPTpNtJb9+@mail.gmail.com> <20100803083330.GA15074@gondor.apana.org.au> <AANLkTimE0CgvYtrTSxsL5Z-kg5C9k9Lf3pDmW8gkRg7S@mail.gmail.com>
+Subject: Re: [PATCH] crypto: hash - Fix handling of small unaligned buffers
+Date: Wed, 4 Aug 2010 21:48:51 +0800
+Message-ID: <20100804134851.GA3884@gondor.apana.org.au>
+References: <AANLkTinj0tPGa1ZVEs2JZ1Hvg9YOq7qx56LZJrOs4WPc@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Szilveszter =?iso-8859-1?B?1nJk9mc=?= <slipszi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42961 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:58449 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758259Ab0HDG6n (ORCPT
+	with ESMTP id S932506Ab0HDNsy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Aug 2010 02:58:43 -0400
+	Wed, 4 Aug 2010 09:48:54 -0400
 Content-Disposition: inline
-In-Reply-To: <AANLkTimE0CgvYtrTSxsL5Z-kg5C9k9Lf3pDmW8gkRg7S@mail.gmail.com>
+In-Reply-To: <AANLkTinj0tPGa1ZVEs2JZ1Hvg9YOq7qx56LZJrOs4WPc@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 03, 2010 at 09:48:14PM -0500, Shirish Pargaonkar wrote:
->
-> @@ -42,21 +43,38 @@ extern void SMBencrypt(unsigned char *passwd, const unsigned char *c8,
->  		       unsigned char *p24);
->  
->  static int cifs_calculate_signature(const struct smb_hdr *cifs_pdu,
-> -				    const struct mac_key *key, char *signature)
-> +			struct TCP_Server_Info *server, char *signature)
->  {
-> -	struct	MD5Context context;
-> +	int rc = 0;
-> +	struct shash_desc desc;
+On Mon, Aug 02, 2010 at 02:45:37PM +0200, Szilveszter =D6rd=F6g wrote:
+> If a scatterwalk chain contains an entry with an unaligned offset the=
+n
+> hash_walk_next() will cut off the next step at the next alignment poi=
+nt.
+>=20
+> However, if the entry ends before the next alignment point then we wi=
+ll want to
+> process more data than it is available.
+>=20
+> Fix this by checking whether the next aligment point is before the en=
+d of the
+> current entry.
+> ---
+>  crypto/ahash.c |    7 +++++--
+>  1 files changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/crypto/ahash.c b/crypto/ahash.c
+> index b8c59b8..f669822 100644
+> --- a/crypto/ahash.c
+> +++ b/crypto/ahash.c
+> @@ -47,8 +47,11 @@ static int hash_walk_next(struct crypto_hash_walk =
+*walk)
+>  	walk->data =3D crypto_kmap(walk->pg, 0);
+>  	walk->data +=3D offset;
+>=20
+> -	if (offset & alignmask)
+> -		nbytes =3D alignmask + 1 - (offset & alignmask);
+> +	if (offset & alignmask) {
+> +		unsigned int unaligned =3D alignmask + 1 - (offset & alignmask);
+> +		if (nbytes > unaligned)
+> +			nbytes =3D unaligned;
+> +	}
+>=20
+>  	walk->entrylen -=3D nbytes;
+>  	return nbytes;
 
-That's your problem.  You need to allocate space for the actual
-descriptor:
+The patch looks OK to me.  Dave, what do you think?
 
-	struct {
-		struct shash_desc shash;
-		char ctx[crypto_shash_descsize(tfm)];
-	} sdesc;
+But you forgot to attach a Signed-off-by line.  Please resend
+with one attached.
 
-See crypto/testmgr.c for an actual example.
-
-Cheers,
--- 
+Thanks!
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
