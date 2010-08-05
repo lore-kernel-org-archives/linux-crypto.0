@@ -1,54 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [linux-cifs-client][patch] Make NTLMv2 as auth mech withing
-	NTLMSSP and enable signing using crypto shash APIs
-Date: Thu, 5 Aug 2010 12:44:30 +0800
-Message-ID: <20100805044430.GA11845@gondor.apana.org.au>
-References: <1280975679-9096-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] Documentation/padata.txt: fix typos etc.
+Date: Thu, 5 Aug 2010 08:21:06 +0200
+Message-ID: <20100805062106.GA16904@secunet.com>
+References: <20100804201452.647aac63.randy.dunlap@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org,
-	samba-technical@samba.org, linux-crypto@vger.kernel.org,
-	shirishpargaonkar@gmail.com
-To: shirishpargaonkar@gmail.com
+Cc: lkml <linux-kernel@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org, Dan Kruchinin <dkruchinin@acm.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41303 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750725Ab0HEEod (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Aug 2010 00:44:33 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:58456 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758848Ab0HEGQw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Aug 2010 02:16:52 -0400
 Content-Disposition: inline
-In-Reply-To: <1280975679-9096-1-git-send-email-shirishpargaonkar@gmail.com>
+In-Reply-To: <20100804201452.647aac63.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-shirishpargaonkar@gmail.com wrote:
-> Make ntlmv2 as an authentication mechanism within ntlmssp
-> instead of ntlmv1.
-> Parse type 2 response in ntlmssp negotiation to pluck
-> AV pairs and use them to calculate ntlmv2 response token.
-> Also, assign domain name from the sever response in type 2
-> packet of ntlmssp and use that (netbios) domain name in
-> calculation of response.
+On Wed, Aug 04, 2010 at 08:14:52PM -0700, Randy Dunlap wrote:
+> From: Randy Dunlap <randy.dunlap@oracle.com>
 > 
-> Enable cifs/smb signing using rc4 and md5.
+> Fix typos & grammar.
+> Use CPU instead of cpu in text.
 > 
-> Changed name of the structure mac_key to session_key to reflect
-> the type of key it holds.
-> 
-> Use kernel crypto_shash_* APIs instead of the equivalent cifs functions.
-> 
-> 
-> From 6ab552fd60804f3c708e1745ca936112fc9f9821 Mon Sep 17 00:00:00 2001
-> From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-> Date: Wed, 4 Aug 2010 17:24:07 -0500
-> Subject: [PATCH] Make ntlmv2 as auth mech and enable signing using crypto_shash APIs
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Steffen
