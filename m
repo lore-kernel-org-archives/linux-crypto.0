@@ -1,60 +1,83 @@
-From: =?ISO-8859-1?Q?Szilveszter_=D6rd=F6g?= <slipszi@gmail.com>
-Subject: [PATCH] crypto: hash - Fix handling of small unaligned buffers
-Date: Thu, 5 Aug 2010 12:05:49 +0200
-Message-ID: <AANLkTinw0a9NJNwLRg7d_HQWSFayRdRQH1cULKmmWEFP@mail.gmail.com>
+From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+Subject: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
+Date: Thu,  5 Aug 2010 22:17:53 +0200
+Message-ID: <1281039477-29703-1-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Neil Horman <nhorman@redhat.com>,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:37660 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760079Ab0HEKFu convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Aug 2010 06:05:50 -0400
-Received: by gxk23 with SMTP id 23so2440128gxk.19
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Aug 2010 03:05:49 -0700 (PDT)
+Received: from mx1.redhat.com ([209.132.183.28]:36690 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759466Ab0HEUSQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Aug 2010 16:18:16 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If a scatterwalk chain contains an entry with an unaligned offset then
-hash_walk_next() will cut off the next step at the next alignment point=
-=2E
+Hello,
+following is a patchset providing an user-space interface to the kernel crypto
+API.  It is based on the older, BSD-compatible, implementation, but the
+user-space interface is different.
 
-However, if the entry ends before the next alignment point then we a lo=
-op,
-which leads to a kernel oops.
+These are the major differences compared to the BSD-like interface:
 
-=46ix this by checking whether the next aligment point is before the en=
-d of the
-current entry.
+* The API supports key storage and management inside the kernel.
+  An application can thus ask the kernel to generate a key; the key is
+  then referenced via an integer identifier, and the application can be
+  prevented from accessing the raw key data.  Such a key can, if so configured,
+  still be wrapped for key transport to the recipient of the message, and
+  unwrapped by the recipient.
 
-Signed-off-by: Szilveszter =D6rd=F6g <slipszi@gmail.com>
----
-Added the Signed-off-by line
+  The kernel key storage does not span system reboots, but applications can
+  also wrap the keys for persistent storage, receiving an encrypted blob that
+  does not reveal the raw key data, but can be later loaded back into the
+  kernel.
 
- crypto/ahash.c |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+* More algorithms and mechanisms are supported by the API, including public key
+  algorithms (RSA/DSA encryption and signing, D-H key derivation, key wrapping).
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index b8c59b8..f669822 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -47,8 +47,11 @@ static int hash_walk_next(struct crypto_hash_walk *w=
-alk)
- 	walk->data =3D crypto_kmap(walk->pg, 0);
- 	walk->data +=3D offset;
+Motivations for the extensions: governments are asking for more security
+features in the operating systems they procure, which make user-space
+implementations impractical.  A few examples:
 
--	if (offset & alignmask)
--		nbytes =3D alignmask + 1 - (offset & alignmask);
-+	if (offset & alignmask) {
-+		unsigned int unaligned =3D alignmask + 1 - (offset & alignmask);
-+		if (nbytes > unaligned)
-+			nbytes =3D unaligned;
-+	}
+* Advanced crypto module for OSPP for Common Criteria requires OS services
+  implementing several low-level crypto algorithms (e.g. AES, RSA).  This
+  requires the separation of crypto services from the consumer of those
+  services. (The threat model is that apps tend to have more vulnerabilities
+  than libraries and compromise of the app will lead to the ability to access
+  key material.) An user-space library is not separated, options are a) root
+  running daemon that does crypto, but this would be slow due to context
+  switches, scheduler mismatching and all the IPC overhead and b) use crypto
+  that is in the kernel.
 
- 	walk->entrylen -=3D nbytes;
- 	return nbytes;
---=20
-1.5.5.6
+* FIPS-140-3 calls out for cryptographic functions to be non-debuggable (ptrace)
+  meaning that you cannot get to the key material. The solution is the same as
+  above.
+
+* GPOSPP requires auditing for crypto events (so does FIPS-140 level 2 cert).
+  To do this you need any crypto to have CAP_AUDIT_WRITE permissions which
+  means making everything that links to openssl, libgcrypt, or nss setuid
+  root. Making firefox and 400 other applications setuid root is a non-starter.
+  So, the solution is again to use crypto in the kernel where auditing needs no
+  special permissions.
+
+Other advantages to having kernel crypto available to user space:
+
+* User space will be able to take advantage of kernel drivers for hardware
+  crypto accelerators.
+
+* glibc, which in some configurations links to libfreebl3.so for hashes
+  necessary for crypt(), will be able to use the kernel implementation; this
+  means one less library to load and dynamically link for each such process.
+
+The code is derived from the original cryptodev-linux patch set; most of the
+new implementation was written by Nikos Mavrogiannopoulos
+<n.mavrogiannopoulos@gmail.com>.  Attributions are included in the respective
+source files.
+
+The patches are not in a sequence that allows compilation after applying a
+subset, they were split into logical groups to ease reviewing instead.
