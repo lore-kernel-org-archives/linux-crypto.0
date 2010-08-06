@@ -1,37 +1,105 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Initcall ordering problem (TTY vs modprobe vs MD5) and cryptomgr
-	problem
-Date: Thu, 5 Aug 2010 19:27:33 -0700
-Message-ID: <AANLkTi=SzuEtnbZNk1KuOdXqp+e6rQ3C7R-9=J00LNrE@mail.gmail.com>
-References: <23662.1281056463@redhat.com> <20100806011706.GA21657@gondor.apana.org.au>
-	<20100806014057.GA22395@gondor.apana.org.au> <AANLkTi=+-Y2GOZYAZHeaX+op3XB9AY5S85rfJD3jSDvz@mail.gmail.com>
-	<11274.1281061410@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Initcall ordering problem (TTY vs modprobe vs MD5) and
+	cryptomgr problem
+Date: Fri, 6 Aug 2010 10:35:39 +0800
+Message-ID: <20100806023539.GA22774@gondor.apana.org.au>
+References: <23662.1281056463@redhat.com> <20100806011706.GA21657@gondor.apana.org.au> <20100806014057.GA22395@gondor.apana.org.au> <AANLkTi=+-Y2GOZYAZHeaX+op3XB9AY5S85rfJD3jSDvz@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>, gregkh@suse.de,
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: David Howells <dhowells@redhat.com>, gregkh@suse.de,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:60037 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S935257Ab0HFC1z (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:33512 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933390Ab0HFCfx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Aug 2010 22:27:55 -0400
-In-Reply-To: <11274.1281061410@redhat.com>
+	Thu, 5 Aug 2010 22:35:53 -0400
+Content-Disposition: inline
+In-Reply-To: <AANLkTi=+-Y2GOZYAZHeaX+op3XB9AY5S85rfJD3jSDvz@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 5, 2010 at 7:23 PM, David Howells <dhowells@redhat.com> wrote:
->
-> I wonder if tty_init() should be moved up, perhaps to immediately after
-> chrdev_init().
+On Thu, Aug 05, 2010 at 07:01:21PM -0700, Linus Torvalds wrote:
+> On Thu, Aug 5, 2010 at 6:40 PM, Herbert Xu <herbert@gondor.hengli.com=
+=2Eau> wrote:
+> >
+> > -config CRYPTO_MANAGER_TESTS
+> > - =A0 =A0 =A0 bool "Run algolithms' self-tests"
+> > - =A0 =A0 =A0 default y
+> > - =A0 =A0 =A0 depends on CRYPTO_MANAGER2
+> > +config CRYPTO_MANAGER_DISABLE_TESTS
+> > + =A0 =A0 =A0 bool "Disable run-time self tests"
+> > + =A0 =A0 =A0 depends on CRYPTO_MANAGER2 && EMBEDDED
+>=20
+> Why do you still want to force-enable those tests? I was going to
+> complain about the "default y" anyway, now I'm _really_ complaining,
+> because you've now made it impossible to disable those tests. Why?
 
-I do think that sounds sane. The tty layer is kind of special.
+Because it can save data.  Each cryptographic algorithm (such as
+AES) may have multiple impelmentations, some of which are hardware-
+based.
 
-I wouldn't call it _after_ chrdev_init(), though, I'd call it _from_
-chrdev_init(). Doesn't that make more sense (and keep it out of
-fs/dcache.c, which is an odd place to have some tty init).
+The purpose of these tests are to make a particular driver or
+implementation available only if it passes them.  So your encrypted
+disk/file system will not be subject to a hardware/software combo
+without at least some semblance of testing.
 
-But maybe there's some reason why it's an initcall. Unlikely.
+The last thing you want to is to upgrade your kernel with a new
+hardware crypto driver that detects that you have a piece of rarely-
+used crypto hardeware, decides to use it and ends up making your
+data toast.
 
-             Linus
+But whatever, if you want the default to be no tests, that's fine.
+Here's the patch to do just that.
+
+commit 00ca28a507b215dcd121735f16764ea4173c4ff9
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Aug 6 10:34:00 2010 +0800
+
+    crypto: testmgr - Default to no tests
+   =20
+    On Thu, Aug 05, 2010 at 07:01:21PM -0700, Linus Torvalds wrote:
+    > On Thu, Aug 5, 2010 at 6:40 PM, Herbert Xu <herbert@gondor.hengli=
+=2Ecom.au> wrote:
+    > >
+    > > -config CRYPTO_MANAGER_TESTS
+    > > -       bool "Run algolithms' self-tests"
+    > > -       default y
+    > > -       depends on CRYPTO_MANAGER2
+    > > +config CRYPTO_MANAGER_DISABLE_TESTS
+    > > +       bool "Disable run-time self tests"
+    > > +       depends on CRYPTO_MANAGER2 && EMBEDDED
+    >
+    > Why do you still want to force-enable those tests? I was going to
+    > complain about the "default y" anyway, now I'm _really_ complaini=
+ng,
+    > because you've now made it impossible to disable those tests. Why=
+?
+   =20
+    As requested, this patch sets the default to y and removes the
+    EMBEDDED dependency.
+   =20
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 6f5c50f..e573077 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -103,7 +103,8 @@ config CRYPTO_MANAGER2
+=20
+ config CRYPTO_MANAGER_DISABLE_TESTS
+ 	bool "Disable run-time self tests"
+-	depends on CRYPTO_MANAGER2 && EMBEDDED
++	default y
++	depends on CRYPTO_MANAGER2
+ 	help
+ 	  Disable run-time self tests that normally take place at
+ 	  algorithm registration.
+
+Cheers,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
