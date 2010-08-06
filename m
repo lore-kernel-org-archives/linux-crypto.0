@@ -1,43 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Initcall ordering problem (TTY vs modprobe vs MD5) and
-	cryptomgr problem
-Date: Fri, 6 Aug 2010 16:39:00 +0800
-Message-ID: <20100806083900.GA25385@gondor.apana.org.au>
-References: <20100806080642.GA4642@dspnet.fr>
+From: Alejandro Riveira =?UTF-8?B?RmVybsOhbmRleg==?=
+	<ariveira@gmail.com>
+Subject: Re: [PATCH] Trivial. Fix typo in kconfig entry.
+Date: Fri, 6 Aug 2010 12:21:25 +0200
+Message-ID: <20100806122125.3e1768cf@varda>
+References: <20100805112142.68d8926d@varda>
+	<20100806014328.GA22465@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kyle@moffetthome.net, torvalds@linux-foundation.org,
-	herbert@gondor.hengli.com.au, dhowells@redhat.com, gregkh@suse.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Olivier Galibert <galibert@pobox.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59477 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755326Ab0HFIjZ (ORCPT
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:64951 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761118Ab0HFKVa convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Aug 2010 04:39:25 -0400
-Content-Disposition: inline
-In-Reply-To: <20100806080642.GA4642@dspnet.fr>
+	Fri, 6 Aug 2010 06:21:30 -0400
+In-Reply-To: <20100806014328.GA22465@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Olivier Galibert <galibert@pobox.com> wrote:
->
-> Of course in practice without the tests your boot would probably just
-> have failed.  Badly-decrypted root partitions tend to be noticed as
-> such long before trying to write to them.  Then you would have bitched
-> on the list and the driver would have been fixed or removed faster
-> than having to wait for you (or other people with the hardware issue)
-> to notice the spew in dmesg.
+El Fri, 6 Aug 2010 09:43:28 +0800
+Herbert Xu <herbert@gondor.apana.org.au> escribi=C3=B3:
 
-So you'd rather have a box that doesn't boot rather than one
-that automatically falls back to software crypto allowing you
-to diagnose and report the problem.
+> On Thu, Aug 05, 2010 at 11:21:42AM +0200, Alejandro Riveira Fern=C3=A1=
+ndez wrote:
+> >=20
+> >  This fixes a typo in file crypto/Kconfig.
+>=20
+> Thanks for the patch.  As I've just negated this option, the typo
+> text no longer exists in the crypto-2.6 tree.
 
-Yes that makes a lot of sense.
+ Fair enough.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>=20
+> Cheers,
