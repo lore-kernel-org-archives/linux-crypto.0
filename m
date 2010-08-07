@@ -1,54 +1,38 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Initcall ordering problem (TTY vs modprobe vs MD5) and cryptomgr
-	problem
-Date: Fri, 6 Aug 2010 08:22:28 -0700
-Message-ID: <AANLkTi=TG8xWAtqr+3GxJZxQZ+hkjeViJJJCru-BdyxX@mail.gmail.com>
-References: <23662.1281056463@redhat.com> <20100806011706.GA21657@gondor.apana.org.au>
-	<20100806014057.GA22395@gondor.apana.org.au> <AANLkTi=+-Y2GOZYAZHeaX+op3XB9AY5S85rfJD3jSDvz@mail.gmail.com>
-	<20100806023539.GA22774@gondor.apana.org.au> <AANLkTimVOkAi1_G9B290fHRR3PbV4H9003VarAv_zbGn@mail.gmail.com>
-	<AANLkTinVO0prEfkuOUFWA12q8HwrXS6do_hjw1EqygZu@mail.gmail.com>
-	<20100806080642.GA4642@dspnet.fr>
+From: Miloslav Trmac <mitr@redhat.com>
+Subject: Re: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
+Date: Fri, 6 Aug 2010 20:54:13 -0400 (EDT)
+Message-ID: <533880245.382921281142453998.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <20100806002530.GA2056@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Kyle Moffett <kyle@moffetthome.net>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	David Howells <dhowells@redhat.com>, gregkh@suse.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Olivier Galibert <galibert@pobox.com>
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	Neil Horman <nhorman@redhat.com>,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	linux-crypto@vger.kernel.org
+To: Neil Horman <nhorman@tuxdriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:34679 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757449Ab0HFPXG convert rfc822-to-8bit
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:52160 "EHLO
+	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752268Ab0HGAy2 convert rfc822-to-8bit
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Aug 2010 11:23:06 -0400
-In-Reply-To: <20100806080642.GA4642@dspnet.fr>
+	Fri, 6 Aug 2010 20:54:28 -0400
+In-Reply-To: <20100806002530.GA2056@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 6, 2010 at 1:06 AM, Olivier Galibert <galibert@pobox.com> w=
-rote:
->
-> Maybe Linus would be happier if the self-tests were limited (by
-> default) to the hardware accelerators? =A0Having a software backup an=
-d
-> the risk of data loss indeed makes things different.
-
-No. I'd be happier if it was an OPTION.
-
-And it damn well defaults to "off". Like all other options.
-
-Then, for people who use it, and worry (and distro test kernels etc),
-turn it on. But don't make it a forced feature, and don't make it
-something that people think they _should_ turn on.
-
-I have crypto enabled, but I don't _use_ it. The upside for me is
-zero. Nil. Nada. And I bet that's the common case.
-
-And dammit, it you don't trust the hardware, don't send the driver
-upstreams. And if you worry about alpha-particles, you should run a
-RAM test on every boot. But don't ask _me_ to run one.
-
-It's that simple.
-
-                    Linus
+----- "Neil Horman" <nhorman@tuxdriver.com> wrote:
+> On Thu, Aug 05, 2010 at 10:17:53PM +0200, Miloslav Trma=C4=8D wrote:
+> > Hello,
+> > following is a patchset providing an user-space interface to the
+> kernel crypto
+> > API.  It is based on the older, BSD-compatible, implementation, but
+> the
+> > user-space interface is different.
+> >=20
+>=20
+> I only see patch 1/4 and 3/4.  Where are 2/4 and 4/4?
+Too large for the mailing list I'm afraid.  I have uploaded them at htt=
+p://people.redhat.com/mitr/cryptodev-ncr/ , you should also have receiv=
+ed a personal copy yesterday.
+    Mirek
