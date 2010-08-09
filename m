@@ -1,44 +1,69 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: n2 RNG driver bogus cast removal
-Date: Mon, 9 Aug 2010 10:26:07 -0400
-Message-ID: <20100809142607.GA19862@gondor.apana.org.au>
-References: <20100809.004514.73697921.davem@davemloft.net>
+Subject: Re: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
+Date: Mon, 9 Aug 2010 10:39:43 -0400
+Message-ID: <20100809143943.GB19862@gondor.apana.org.au>
+References: <1281039477-29703-1-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: segooon@gmail.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Cc: Neil Horman <nhorman@redhat.com>,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	linux-crypto@vger.kernel.org, Linda Wang <lwang@redhat.com>,
+	Steve Grubb <sgrubb@redhat.com>
+To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:46557 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40808 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752521Ab0HIO0P (ORCPT
+	with ESMTP id S1756603Ab0HIOjr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Aug 2010 10:26:15 -0400
+	Mon, 9 Aug 2010 10:39:47 -0400
 Content-Disposition: inline
-In-Reply-To: <20100809.004514.73697921.davem@davemloft.net>
+In-Reply-To: <1281039477-29703-1-git-send-email-mitr@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 09, 2010 at 12:45:14AM -0700, David Miller wrote:
+On Thu, Aug 05, 2010 at 10:17:53PM +0200, Miloslav Trma=C4=8D wrote:
+> Hello,
+> following is a patchset providing an user-space interface to the kern=
+el crypto
+> API.  It is based on the older, BSD-compatible, implementation, but t=
+he
+> user-space interface is different.
 >=20
-> Kulikov, can you at least build test your patches?  Casts are not
-> always incorrect, particularly when private cookies are "unsigned
-> long" as is the case here:
+> These are the major differences compared to the BSD-like interface:
 >=20
-> drivers/char/hw_random/n2-drv.c: In function =E2=80=98n2rng_data_read=
-=E2=80=99:
-> drivers/char/hw_random/n2-drv.c:390: warning: initialization makes po=
-inter from integer without a cast
+> * The API supports key storage and management inside the kernel.
+>   An application can thus ask the kernel to generate a key; the key i=
+s
+>   then referenced via an integer identifier, and the application can =
+be
+>   prevented from accessing the raw key data.  Such a key can, if so c=
+onfigured,
+>   still be wrapped for key transport to the recipient of the message,=
+ and
+>   unwrapped by the recipient.
 >=20
-> Herbert, please revert this change, thanks.  And I suspect there
-> might be more of these hwrng driver duds that went into the tree,
-> it's worth checking out. :-)
+>   The kernel key storage does not span system reboots, but applicatio=
+ns can
+>   also wrap the keys for persistent storage, receiving an encrypted b=
+lob that
+>   does not reveal the raw key data, but can be later loaded back into=
+ the
+>   kernel.
+>=20
+> * More algorithms and mechanisms are supported by the API, including =
+public key
+>   algorithms (RSA/DSA encryption and signing, D-H key derivation, key=
+ wrapping).
 
-Thanks Dave.  I'll revert it for now.
+Thanks for the patches.
 
-However, it probably makes sense to change priv into a void *
-as most drivers use it as a pointer instead of an integer.
+Unfortunately it fails to satisfy the requirement of supporting
+all our existing kernel crypto interfaces, such as AEAD, as well
+as being flexible enough in adding new interfaces such as xor.
+
+So we need to address these issues before this can be integrated
+into Linux.
 
 Thanks,
 --=20
