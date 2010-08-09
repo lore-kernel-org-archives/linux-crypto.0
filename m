@@ -1,38 +1,35 @@
-From: Miloslav Trmac <mitr@redhat.com>
-Subject: Re: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
-Date: Fri, 6 Aug 2010 20:54:13 -0400 (EDT)
-Message-ID: <533880245.382921281142453998.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <20100806002530.GA2056@localhost.localdomain>
+From: David Miller <davem@davemloft.net>
+Subject: n2 RNG driver bogus cast removal
+Date: Mon, 09 Aug 2010 00:45:14 -0700 (PDT)
+Message-ID: <20100809.004514.73697921.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Neil Horman <nhorman@redhat.com>,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: Text/Plain; charset=iso-8859-7
+Content-Transfer-Encoding: base64
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: segooon@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:52160 "EHLO
-	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752268Ab0HGAy2 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Aug 2010 20:54:28 -0400
-In-Reply-To: <20100806002530.GA2056@localhost.localdomain>
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:53228
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751484Ab0HIHoz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Aug 2010 03:44:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Neil Horman" <nhorman@tuxdriver.com> wrote:
-> On Thu, Aug 05, 2010 at 10:17:53PM +0200, Miloslav Trma=C4=8D wrote:
-> > Hello,
-> > following is a patchset providing an user-space interface to the
-> kernel crypto
-> > API.  It is based on the older, BSD-compatible, implementation, but
-> the
-> > user-space interface is different.
-> >=20
->=20
-> I only see patch 1/4 and 3/4.  Where are 2/4 and 4/4?
-Too large for the mailing list I'm afraid.  I have uploaded them at htt=
-p://people.redhat.com/mitr/cryptodev-ncr/ , you should also have receiv=
-ed a personal copy yesterday.
-    Mirek
+DQpLdWxpa292LCBjYW4geW91IGF0IGxlYXN0IGJ1aWxkIHRlc3QgeW91ciBwYXRjaGVzPyAgQ2Fz
+dHMgYXJlIG5vdA0KYWx3YXlzIGluY29ycmVjdCwgcGFydGljdWxhcmx5IHdoZW4gcHJpdmF0ZSBj
+b29raWVzIGFyZSAidW5zaWduZWQNCmxvbmciIGFzIGlzIHRoZSBjYXNlIGhlcmU6DQoNCmRyaXZl
+cnMvY2hhci9od19yYW5kb20vbjItZHJ2LmM6IEluIGZ1bmN0aW9uIKFuMnJuZ19kYXRhX3JlYWSi
+Og0KZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9uMi1kcnYuYzozOTA6IHdhcm5pbmc6IGluaXRpYWxp
+emF0aW9uIG1ha2VzIHBvaW50ZXIgZnJvbSBpbnRlZ2VyIHdpdGhvdXQgYSBjYXN0DQoNCkhlcmJl
+cnQsIHBsZWFzZSByZXZlcnQgdGhpcyBjaGFuZ2UsIHRoYW5rcy4gIEFuZCBJIHN1c3BlY3QgdGhl
+cmUNCm1pZ2h0IGJlIG1vcmUgb2YgdGhlc2UgaHdybmcgZHJpdmVyIGR1ZHMgdGhhdCB3ZW50IGlu
+dG8gdGhlIHRyZWUsDQppdCdzIHdvcnRoIGNoZWNraW5nIG91dC4gOi0pDQoNClRoYW5rcy4NCg0K
+Y29tbWl0IDhiOWNmZGNhOWM1MmY3ZDM5YzNjY2ZhYzE2NjhlMzFjMjBjOWY0MmUNCkF1dGhvcjog
+S3VsaWtvdiBWYXNpbGl5IDxzZWdvb29uQGdtYWlsLmNvbT4NCkRhdGU6ICAgTW9uIEp1bCA1IDIx
+OjI1OjA2IDIwMTAgKzA4MDANCg0KICAgIGh3cm5nOiBuMi1kcnYgLSByZW1vdmUgY2FzdHMgZnJv
+bSB2b2lkKg0KICAgIA0KICAgIFJlbW92ZSB1bm5lc2Vzc2FyeSBjYXN0cyBmcm9tIHZvaWQqLg0K
+ICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEt1bGlrb3YgVmFzaWxpeSA8c2Vnb29vbkBnbWFpbC5j
+b20+DQogICAgU2lnbmVkLW9mZi1ieTogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEu
+b3JnLmF1Pg0KDQo=
