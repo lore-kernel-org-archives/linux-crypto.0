@@ -1,135 +1,107 @@
-From: Neil Horman <nhorman@redhat.com>
+From: Miloslav Trmac <mitr@redhat.com>
 Subject: Re: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
-Date: Tue, 10 Aug 2010 15:17:57 -0400
-Message-ID: <20100810191757.GD9789@hmsreliant.think-freely.org>
-References: <20100810164045.GH3390@hmsreliant.think-freely.org>
- <201008101414.24749.sgrubb@redhat.com>
- <20100810184544.GB9789@hmsreliant.think-freely.org>
- <201008101510.12638.sgrubb@redhat.com>
+Date: Tue, 10 Aug 2010 15:37:23 -0400 (EDT)
+Message-ID: <823121944.164121281469043745.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <20100810191018.GC9789@hmsreliant.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Cc: Neil Horman <nhorman@tuxdriver.com>,
-	Miloslav Trmac <mitr@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	linux-crypto@vger.kernel.org, Linda Wang <lwang@redhat.com>
-To: Steve Grubb <sgrubb@redhat.com>
+	linux-crypto@vger.kernel.org, Linda Wang <lwang@redhat.com>,
+	Steve Grubb <sgrubb@redhat.com>
+To: Neil Horman <nhorman@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:28626 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932226Ab0HJTWZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Aug 2010 15:22:25 -0400
-Content-Disposition: inline
-In-Reply-To: <201008101510.12638.sgrubb@redhat.com>
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:45717 "EHLO
+	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750760Ab0HJThe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 10 Aug 2010 15:37:34 -0400
+In-Reply-To: <20100810191018.GC9789@hmsreliant.think-freely.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 10, 2010 at 03:10:12PM -0400, Steve Grubb wrote:
-> On Tuesday, August 10, 2010 02:45:44 pm Neil Horman wrote:
-> > On Tue, Aug 10, 2010 at 02:14:24PM -0400, Steve Grubb wrote:
-> > > On Tuesday, August 10, 2010 01:57:40 pm Neil Horman wrote:
-> > > > > > I'm not so sure I follow.  how can you receive messages on a socket
-> > > > > > in response to requests that were sent from a different socket. 
-> > > > > > In the netlink multicast and broadcast case, sure, but theres no
-> > > > > > need to use those.  I suppose you could exit a process, start
-> > > > > > another process in which the pid gets reused, open up a subsequent
-> > > > > > socket and perhaps confuse audit that way, but you're not going to
-> > > > > > get responses to the requests that the previous process sent in
-> > > > > > that case.
-> > > > > 
-> > > > > I don't even need to open a subsequent socket - as son as the process
-> > > > > ID is reused, the audit message is incorrect, which is not really
-> > > > > acceptable in itself.
-> > > > 
-> > > > But, you do, thats my point.  If a process exits, and another process
-> > > > starts up that happens to reuse the same pid, it can't just call
-> > > > recvmsg on the socket descriptor that the last process used for
-> > > > netlink messages and expect to get any data.  That socket descriptor
-> > > > won't be connected to the netlink service (or anything) anymore, and
-> > > > you'll get an error from the kernel.
-> > > 
-> > > You are looking at it from the wrong end. Think of it from audit's
-> > > perspective about how do you guarantee that the audit trail is correct?
-> > > This has been discussed on linux-audit mail list before and the
-> > > conclusion is you have very limited information to work with. By being
-> > > synchronous the syscall, we get everything in the syscall record from
-> > > the processes audit context.
+----- "Neil Horman" <nhorman@redhat.com> wrote:
+> On Tue, Aug 10, 2010 at 02:19:59PM -0400, Miloslav Trmac wrote:
+> > ----- "Neil Horman" <nhorman@tuxdriver.com> wrote:
+> > It _doesn't matter_ that I don't receive a response.  I have caused
+> an operation in the kernel and the requested audit record is
+> incorrect.  The audit subsystem needs to work even if - especially if
+> - the userspace process is malicious.  The process might have wanted
+> to simply cause a misleading audit record; or the operation (such as
+> importing a key from supplied data) might not really need the response
+> in order to achieve its effect.
+> 
+> Why is it incorrect?  What would audit have recorded in the above case?  That a
+> process attempted to recieve data on a descriptor that it didn't have open?
+Again, the receive side _doesn't matter_.  At least by the formal semantics of netlink (not relying on the AFAIK undocumented synchronous implementation), there's a risk that the audit record about the _sender_ is incorrect (athough the inability to audit the identity of the recipient of the data might be a problem as well, I'm not sure).
+
+> > > > > And
+> > > > > in the event that happens, Audit should log a close event on the
+> > > > > fd inquestion
+> > > > > between the operations.
+> > > > audit only logs explicitly requested operations, so an administrator
+> > > that asks for crypto events does not automatically get any close
+> > > events.  Besides, the audit record should be correct in the first
+> > > place, instead of giving the admin a puzzle to decipher.
+> > > I still don't see whats incorrect here.  If two processes wind up reusing a
+> > > process id, thats audits problem to figure out, nothing elses.
+> > If an operation attributed to user A is recorded by the kernel as
+> being performed by user B, that is not an user problem.
 > > 
-> > What information do you need in the audit record that you might loose
-> > accross two syscalls?
-> 
-> This is easier to show that explain. With Mirek's current patch:
-> 
-> type=SYSCALL msg=audit(1281013374.713:11671): arch=c000003e syscall=2 
-> success=yes exit=3 a0=400b67 a1=2 a2=0 a3=7fff4daa1200 items=1 ppid=1352 
-> pid=1375 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 
-> tty=tty6 ses=3 comm="ncr-setkey" exe="/home/mitr/cryptodev-
-> linux/userspace/ncr-setkey" subj=unconfined_u:unconfined_r:unconfined_t:s0-
-> s0:c0.c1023 key=(null)
-> type=CRYPTO_USERSPACE_OP msg=audit(1281013374.713:11671): 
-> crypto_op=context_new ctx=0
-> type=CWD msg=audit(1281013374.713:11671):  cwd="/root"
-> type=PATH msg=audit(1281013374.713:11671): item=0 name="/dev/crypto" 
-> inode=12498 dev=00:05 mode=020660 ouid=0 ogid=0 rdev=0a:3a 
-> obj=system_u:object_r:device_t:s0
-> type=CRYPTO_STORAGE_KEY msg=audit(1281013374.715:11672): key_size=16
-> 
-> 
-> The netlink aproach, we only get the credentials that ride with the netlink 
-> packet 
-> 
-> http://lxr.linux.no/#linux+v2.6.35/include/linux/netlink.h#L159
-> 
-> There really is no comparison between what can be recorded synchronously vs 
-> async.
-> 
+> You're right, its also not a netlink problem, a cryptodev problem, or an ioctl
+> problem.  Its an audit problem.
+The user doesn't particularly care which subsystem maintainer is supposed to fix what :)  The reality seems to be that audit and netlink don't play well together.
 
-Ok, so the $64 dollar question then: Do FIPS or Common Criteria require that you
-log more than whats in the netlink packet?
+> > > > > Theres also the child process case, in which a child process might read
+> > > > > responses from requests sent by a parent, and vice versa, since fork inherits
+> > > > > file descriptors, but thats an issue inherent in any mechanism you use,
+> > > > > including the character interface, so I'm not sure what the problem is
+> > > > > there.
+> > > > Actually that's not a problem with ioctl() because the response is
+> > > written back _before_ ioctl() returns, so it is always provided to the
+> > > original calling thread.
+> > > > 
+> > > > With the current design the parent and child share the key/session
+> > > namespace after fork(), but operation results are always reliably and
+> > > automatically provided to the thread that invoked the operation,
+> > > without any user-space collaboration.
+> > 
+> > > Is that _really_ that important?  That the kernel return data in the same call
+> > > that its made?
+> > Not for audit; but yes, it is important.
+> > 
+> I don't follow you here.  If its not important for audit to have synchrnous
+> calls, why is it important at all?
+There are two separate reasons to avoid netlink:
 
-> 
-> > It sounds from previous emails that, generally speaking, you're worried that
-> > you want the task struct that current points to in the recvmsg call be
-> > guaranteeed to be the same as the task struct that current points to in the
-> > sendmsg call (i.e. no children (re)using the same socket descriptor, etc). 
-> 
-> Not really, we are _hoping_ that the pid in the netlink credentials is the 
-> same pid that sent the packet in the first place. From the time we reference 
-> the pid out of the skb until we go hunting and locate the pid in the list of 
-> tasks, it could have died and been replaced with another task with different 
-> credentials. We can't take that risk.
-> 
-> 
-> > Can this be handled by using the fact that netlink is actually syncronous
-> > under the covers?
-> 
-> But its not or all the credentials would not be riding in the skb.
-> 
-Not true.  It not guaranteed to, as you can do anything you want when you
-receive a netlink msg in the kernel.  But thats not to say that you can't
-enforce synchronization, and in so doing obtain more information.
+- Audit wants the operation to run in the process context of the caller.  This is not directly related to the question if there is one or >=2 syscalls.
 
-> 
-> > Can you ennumerate here what FIPS and Common Criteria mandate be presented
-> > in the audit logs?
-> 
-> Who did what to whom at what time and what was the outcome. In the case of 
-> configuration changes we need the new and old values. However, we need extra 
-> information to make the selective audit work right.
-> 
-Somehow I doubt that FIPS mandates that audit messages include "who did what to
-whoom and what the result was" :).  Seriously, what do FIPS and common criteria
-require in an audit message?  I assume this is a partial list:
-* sending process id
-* requested operation
-* session id
-* user id
-* group id
-* operation result
+- Operation invocation method.  Here one syscall is important for the reasons I have (performance, simplicity/reliability).  Making audit work well with netlink does not override these reasons in my opinion.
 
-I see lots of other items in the above log message, but I'm not sure what else
-is required.  Can you elaborate?
+> > 1) performance: this is not ip(8), where no one cares if the
+> operation runs 10ms or 1000ms.  Crypto is at least 2 operations per
+> SSL record (which can be as little as 1 byte of application data), and
+> users will care about the speed.  Batching more operations into a
+> single request is impractical because it would require very extensive
+> changes in users of the crypto libraries, and the generic crypto
+> interfaces such as PKCS#11 don't natively support batching so it might
+> not even be possible to express this in some libraries.
+> > 
+> 
+> Ok, so is the assertion here that your kernel interface is restricted by other user space
+> libraries?
+The kernel interface is not "restricted" by other user-space libraries as such, but the only practical way for most user-space applications to use the kernel interface (within the next 5 years) is to modify existing user space libraries to use the kernel interface as a backend (there's just not enough manpower to port the whole world, and quite a few upstream maintainers are understandably reluctant to port their code to a Linux-specific interface).  In that sense, only the features that are _currently_ provided by user-space libraries matter when discussing performance and other impact on users.
 
-Neil
+> i.e. the operation has to be syncronous because anymore than 1
+> syscall per operation has too much impact on performance?
+We need to assume that this implementation will be benchmarked against pure user-space implementations (same as measuring SELinux impact compared to kernels that don't use it).  In that sense doubling the number of syscalls is not at all great.
 
-> -Steve
+> I ask
+> because the
+> recvmmsg (2 m's) will give you the exact same performance profile as ioctl.  You
+> can let the kernel do all the batching with multiple calls to sendmsg, and get
+> all the responses at once with a single additional call to recvmmsg.
+I'm afraid that doesn't help because the userspace libraries will only request one operation at a time.
+     Mirek
