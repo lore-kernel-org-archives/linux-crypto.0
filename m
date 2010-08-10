@@ -1,121 +1,97 @@
-From: Miloslav Trmac <mitr@redhat.com>
-Subject: Re: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
-Date: Tue, 10 Aug 2010 14:19:59 -0400 (EDT)
-Message-ID: <1257297871.155001281464399281.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <20100810175740.GC3072@hmsreliant.think-freely.org>
+From: "Loc Ho" <lho@apm.com>
+Subject: RE: [PATCH 0/4] RFC: "New" /dev/crypto user-space interface
+Date: Tue, 10 Aug 2010 11:12:59 -0700
+Message-ID: <026401cb38b7$ab6402e0$022c08a0$@com>
+References: <20100810164045.GH3390@hmsreliant.think-freely.org> <1588375167.142801281459463292.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Neil Horman <nhorman@redhat.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	linux-crypto@vger.kernel.org, Linda Wang <lwang@redhat.com>,
-	Steve Grubb <sgrubb@redhat.com>
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "'Neil Horman'" <nhorman@tuxdriver.com>,
+	"'Herbert Xu'" <herbert@gondor.hengli.com.au>,
+	"'Nikos Mavrogiannopoulos'" <n.mavrogiannopoulos@gmail.com>,
+	<linux-crypto@vger.kernel.org>, "'Linda Wang'" <lwang@redhat.com>,
+	"'Steve Grubb'" <sgrubb@redhat.com>
+To: "'Miloslav Trmac'" <mitr@redhat.com>,
+	"'Neil Horman'" <nhorman@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:45530 "EHLO
-	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S932515Ab0HJSUN (ORCPT
+Received: from exprod5og105.obsmtp.com ([64.18.0.180]:48114 "HELO
+	exprod5og105.obsmtp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S932353Ab0HJSVJ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Aug 2010 14:20:13 -0400
-In-Reply-To: <20100810175740.GC3072@hmsreliant.think-freely.org>
+	Tue, 10 Aug 2010 14:21:09 -0400
+Received: by pwi2 with SMTP id 2so240463pwi.32
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Aug 2010 11:21:09 -0700 (PDT)
+In-Reply-To: <1588375167.142801281459463292.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Content-Language: en-us
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Neil Horman" <nhorman@tuxdriver.com> wrote:
-> On Tue, Aug 10, 2010 at 12:57:43PM -0400, Miloslav Trmac wrote:
-> > 
-> > ----- "Neil Horman" <nhorman@redhat.com> wrote:
-> > 
-> > > On Tue, Aug 10, 2010 at 11:40:00AM -0400, Miloslav Trmac wrote:
-> > > > ----- "Neil Horman" <nhorman@redhat.com> wrote:
-> > > > > On Tue, Aug 10, 2010 at 10:47:14AM -0400, Miloslav Trmac wrote:
-> > > > > > ----- "Neil Horman" <nhorman@redhat.com> wrote:
-> > > > > > > On Tue, Aug 10, 2010 at 09:24:31AM -0400, Steve Grubb wrote:
-> > > > > > > > The problem with the netlink approach is that auditing is not as good because
-> > > > > > > > netlink is an async protocol. The kernel can only use the credentials that
-> > > > > > > > ride in the skb with the command since there is no guarantee the process has
-> > > > > > > > not changed credentials by the time you get the packet. Adding more
-> > > > > > > > credentials to the netlink headers is also not good. As it is now, the
-> > > > > > > > auditing is synchronous with the syscall and we can get at more information
-> > > > > > > > and reliably create the audit records called out by the protection profiles or
-> > > > > > > > FIPS-140 level 2.
-> > > > > > > >
-> > > > > > > > -Steve
-> > > > > > >
-> > > > > > > I think thats pretty easy to serialize though.  All you need to do is enforce a
-> > > > > > > rule in the kernel that dictates any creditial changes to a given context must
-> > > > > > > be serialized behind all previously submitted crypto operations.
-> > > > > > That would be a bit unusual from the layering/semantics aspect - why
-> > > > > should credential changes care about crypto operations when they don't
-> > > > > care about any other operations? - and it would require pretty
-> > > > > widespread changes throughout the kernel core.
-> > > > > >     Mirek
-> > > > >
-> > > > >
-> > > > > I'm sorry, I thought steve was referring to credentials in the sense of changing
-> > > > > keys/etc while crypto operations were in flight.
-> > > > The audited values are mainly process/thread attributes: pid, ppid,
-> > > {,e,fs}[ug]id, session id, and the like.  Most of these are attached
-> > > to the netlink packet, and performing a lookup by PID is at packet
-> > > handling time is unreliable - as far as I understand the netlink
-> > > receive routine does not have to run in the same process context, so
-> > > the PID might not even refer to the same process.
-> > >
-> > > I'm not so sure I follow.  how can you receive messages on a socket in response
-> > > to requests that were sent from a different socket.  In the netlink multicast
-> > > and broadcast case, sure, but theres no need to use those.  I suppose you could
-> > > exit a process, start another process in which the pid gets reused, open up a
-> > > subsequent socket and perhaps confuse audit that way, but you're not going to
-> > > get responses to the requests that the previous process sent in that case.
-> > I don't even need to open a subsequent socket - as son as the
-> process ID is reused, the audit message is incorrect, which is not
-> really acceptable in itself.
-> > 
-> But, you do, thats my point.  If a process exits, and another process starts up
-> that happens to reuse the same pid, it can't just call recvmsg on the socket
-> descriptor that the last process used for netlink messages and expect to get any
-> data.
-It _doesn't matter_ that I don't receive a response.  I have caused an operation in the kernel and the requested audit record is incorrect.  The audit subsystem needs to work even if - especially if - the userspace process is malicious.  The process might have wanted to simply cause a misleading audit record; or the operation (such as importing a key from supplied data) might not really need the response in order to achieve its effect.
+Hi Miloslav,
 
-> > > And
-> > > in the event that happens, Audit should log a close event on the
-> fd inquestion
-> > > between the operations.
-> > audit only logs explicitly requested operations, so an administrator
-> that asks for crypto events does not automatically get any close
-> events.  Besides, the audit record should be correct in the first
-> place, instead of giving the admin a puzzle to decipher.
-> I still don't see whats incorrect here.  If two processes wind up reusing a
-> process id, thats audits problem to figure out, nothing elses.
-If an operation attributed to user A is recorded by the kernel as being performed by user B, that is not an user problem.
+I had read or glance over the patch from " http://people.redhat.com/mit=
+r/cryptodev-ncr/0002". We have post a version of the CryptoDev over a y=
+ear ago. Unfortunately, we did not got a chance to pick up again. In th=
+at process, Herbert Xu provides a number of comments. You can search th=
+e mailing list for that. Here are my comment based on experience with h=
+ardware crypto:
 
-> What exactly is
-> the problem that you see involving netlink and audit here?  Compare whatever
-> problem you see a crypto netlink protocol having in regards to audit to another
-> netlink protocol (say rtnetlink), and explain to me why the latter doesn't have
-> that issue as well.
-AFAIK most netlink users in the kernel are not audited, and those that are typically only allow operations by system administrators.  And I haven't claimed that the other users are correct :)  Notably audit itself does not record as much information about the invoking process as we'd like because it is not available.
+1. This CrytoDev (user space) interface needs to support multiple opera=
+tions at once
+2. This CrytoDev interface needs to support async
+3. This CryotDev interface needs to support large data operation such a=
+s an entire file
+4. Zero crypto (already see this in your version)
+5. Avoid a lot of little kmalloc for various small structures (This onc=
+e is from Herbert Xu.)
+6. This interface needs to work with OpenSSL which allow OpenSwan to wo=
+rk
 
-> > > Theres also the child process case, in which a child process might read
-> > > responses from requests sent by a parent, and vice versa, since fork inherits
-> > > file descriptors, but thats an issue inherent in any mechanism you use,
-> > > including the character interface, so I'm not sure what the problem is
-> > > there.
-> > Actually that's not a problem with ioctl() because the response is
-> written back _before_ ioctl() returns, so it is always provided to the
-> original calling thread.
-> > 
-> > With the current design the parent and child share the key/session
-> namespace after fork(), but operation results are always reliably and
-> automatically provided to the thread that invoked the operation,
-> without any user-space collaboration.
+Reason for item above:
+Item #1. Multiple operations - This needs to take advance of the hardwa=
+re offload. If you only submit one operation at a time, the latency of =
+the software/hardware will be a problem. By allow submitting multiple o=
+perations, you fill up the hardware buffer and keep in running. Otherwi=
+se, it just be idle a majority of the time and the difference between S=
+W vs HW is nill.
 
-> Is that _really_ that important?  That the kernel return data in the same call
-> that its made?
-Not for audit; but yes, it is important.
+Item #2. Asnc - You can argue that you can open multiple /dev/crypto se=
+ssion and submit them. But this does not work for the same session and =
+for HW base crypto. Having an async interface has the benefit to the us=
+er space application developer as they can use the same async programmi=
+ng interface as with other I/O operations.
 
-1) performance: this is not ip(8), where no one cares if the operation runs 10ms or 1000ms.  Crypto is at least 2 operations per SSL record (which can be as little as 1 byte of application data), and users will care about the speed.  Batching more operations into a single request is impractical because it would require very extensive changes in users of the crypto libraries, and the generic crypto interfaces such as PKCS#11 don't natively support batching so it might not even be possible to express this in some libraries.
+Item #3. Large file support - Most hardware algorithms can't support th=
+is as the operation cannot be continue. Not sure how to handle this.
 
-2) simplicity and reliability: you are downplaying the overhead and synchronization necessary (potentially among multiple processes!) to simply receive a response, but it is still enormous compared to the single syscall case.  Even worse, netlink(7) says "netlink is not a reliable protocol.  ... but may drop messages".  Would you accept such a mechanism to transfer "write data to file" operations?  "Compress data using AES" is much more similar to "write data to file" than to "change this aspect of kernel routing configuration" - it is an application-level service, not a way to communicate long-term parameters to a pretty independent subsystem residing in the kernel.
-    Mirek
+Item #4. Right now you are pining the entire buffer. For small buffer, =
+this may not make sense. We have not got a chance to see if what is the=
+ limit for this.
+
+Item #5. Herbert Xu mentioned that we should avoid having a lot of smal=
+l kmalloc when possible.
+
+Item #6. You should give OpenSSL a patach and see how it works out. Alt=
+hough, OpenSSL does not take advantage of batch submission. Again, to r=
+eally take advantage of the HW, you really need to support batch operat=
+ion.
+
+=46or all other comments, search for previous /dev/cryptodev submission=
+ and you will find a bunch of argue on this "user space crypto API".
+
+-Loc
+
+
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments,=
+=20
+is for the sole use of the intended recipient(s) and contains informati=
+on=A0
+that is confidential and proprietary to AppliedMicro Corporation or its=
+ subsidiaries.=20
+It is to be used solely for the purpose of furthering the parties' busi=
+ness relationship.=20
+All unauthorized review, use, disclosure or distribution is prohibited.=
+=20
+If you are not the intended recipient, please contact the sender by rep=
+ly e-mail=20
+and destroy all copies of the original message.
+=0D
