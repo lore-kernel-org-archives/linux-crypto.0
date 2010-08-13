@@ -1,34 +1,33 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [RFC 9/9] crypto: Add Samsung crypto engine driver
-Date: Thu, 12 Aug 2010 15:32:08 -0700 (PDT)
-Message-ID: <20100812.153208.48514514.davem@davemloft.net>
-References: <4C129341.2060407@gmail.com>
-	<AANLkTi=FKAdC9AwPR41MUBUjBZ2Zf1qv1DSQ+EnMHu7d@mail.gmail.com>
-	<4C63DF4C.1020501@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto/Kconfig: fix typo
+Date: Thu, 12 Aug 2010 21:13:46 -0400
+Message-ID: <20100813011346.GA21394@gondor.apana.org.au>
+References: <20100811183717.GF20015@hexapodia.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: kmpark@infradead.org, linux-samsung-soc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: mcuelenaere@gmail.com
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <4C63DF4C.1020501@gmail.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	trivial@kernel.org, virtuoso@slind.org, davem@davemloft.net
+To: Andy Isaacson <adi@hexapodia.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:33016 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754840Ab0HMBNu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Aug 2010 21:13:50 -0400
+Content-Disposition: inline
+In-Reply-To: <20100811183717.GF20015@hexapodia.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Maurus Cuelenaere <mcuelenaere@gmail.com>
-Date: Thu, 12 Aug 2010 13:47:24 +0200
+Andy Isaacson <adi@hexapodia.org> wrote:
+> algolithm -> algorithm
+> 
+> Signed-off-by: Andy Isaacson <adi@hexapodia.org>
 
-> The main issues still remain (DMA not working at all and FIFO not
-> working for some (T)DES transfers). Additionally, I couldn't get
-> tcrypt to test the s3c-sss driver for some reason, it always picked
-> the standard AES/TDES/DES driver (even though s3c-sss has a higher
-> priority and succeeded the self-test).
+Thanks for the patch, but this line no longer exists in crypto-2.6.
 
-I forget the details of your driver, but were your encryption algorithms
-implemented async?
-
-tcrypt can validate async crypto algorithms, but cannot performance
-test them just yet.  I can performance test async hash algorithms,
-for which I added the code for a few months ago.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
