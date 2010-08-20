@@ -1,55 +1,62 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH 01/19] User-space API definition
-Date: Fri, 20 Aug 2010 10:12:46 -0700
-Message-ID: <20100820101246.6c7a3729.randy.dunlap@oracle.com>
+From: Ted Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
+Date: Fri, 20 Aug 2010 19:48:11 -0400
+Message-ID: <20100820234811.GB10450@thunk.org>
 References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
-	<1282293963-27807-2-git-send-email-mitr@redhat.com>
+ <20100820135612.GC4053@thunk.org>
+ <4C6EB556.3050608@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-crypto@vger.kernel.org,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
-To: Miloslav =?UTF-8?B?VHJtYcSN?= <mitr@redhat.com>
+Cc: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
+	linux-kernel@vger.kernel.org
+To: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:33415 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752311Ab0HTRNK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Aug 2010 13:13:10 -0400
-In-Reply-To: <1282293963-27807-2-git-send-email-mitr@redhat.com>
+Received: from thunk.org ([69.25.196.29]:44225 "EHLO thunker.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750915Ab0HTXsg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 Aug 2010 19:48:36 -0400
+Content-Disposition: inline
+In-Reply-To: <4C6EB556.3050608@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 20 Aug 2010 10:45:44 +0200 Miloslav Trma=C4=8D wrote:
+On Fri, Aug 20, 2010 at 07:03:18PM +0200, Nikos Mavrogiannopoulos wrote=
+:
+> On 08/20/2010 03:56 PM, Ted Ts'o wrote:
+> > On Fri, Aug 20, 2010 at 10:45:43AM +0200, Miloslav Trma=C4=8D wrote=
+:
+> >> Hello, following is a patchset providing an user-space interface t=
+o
+> >> the kernel crypto API.  It is based on the older, BSD-compatible,
+> >> implementation, but the user-space interface is different.
+> >=20
+> > What's the goal of exporting the kernel crypto routines to userspac=
+e,
+> > as opposed to just simply doing the crypto in userspace?=20
+>=20
+> This was the goal of the original cryptodev OpenBSD API and the
+> subsequent linux port in http://home.gna.org/cryptodev-linux/. In
+> typical PCs it might even be slower to use such an accelerator in ker=
+nel
+> space, but in embedded systems where the hardware version of AES migh=
+t
+> be 100 times faster than the software it might make sense.
 
-> +#define NCRIO_KEY_INIT			_IO('c', 204)
-> +/* generate a secret key */
-> +#define NCRIO_KEY_GENERATE     	_IOWR('c', 205, struct ncr_key_gener=
-ate)
-> +/* generate a public key pair */
-> +#define NCRIO_KEY_GENERATE_PAIR _IOWR('c', 206, struct ncr_key_gener=
-ate_pair)
-> +/* derive a new key from an old one */
-> +#define NCRIO_KEY_DERIVE        _IOWR('c', 207, struct ncr_key_deriv=
-e)
-> +/* return information on a key */
-> +#define NCRIO_KEY_GET_INFO      _IOWR('c', 208, struct ncr_key_get_i=
-nfo)
-> +/* export a secret key */
-> +#define NCRIO_KEY_EXPORT       	_IOWR('c', 209, struct ncr_key_expor=
-t)
-> +/* import a secret key */
-> +#define NCRIO_KEY_IMPORT       	_IOWR('c', 210, struct ncr_key_impor=
-t)
-> +
-> +#define NCRIO_KEY_DEINIT       _IOR ('c', 215, ncr_key_t)
+OK, but I hope that in that case, we don't go encouraging applications
+to use the /dev/crypto API directly.  I know a number of distributions
+have been standardizing on NSS as the library that all of their
+applications will use, such that by simply configuring libnss
+differently, the crypto can either be done in userspace, or it can be
+done in hardware, either for crypto acceleration purposes or for when
+the key is locked inside hardware can only be used with appropriate
+authentication to encrypt or sign data passed to the hardware device.
 
+If you encourage applications to use /dev/crypto directly, then either
+(a) they will be much slower on PC's, or (b) the applications will
+need to be rewritten when they are moved between your embedded devices
+and standard PC's.
 
-Please add (another) 'c' entry to Documentation/ioctl/ioctl-number.txt.
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your cod=
-e ***
+					- Ted
