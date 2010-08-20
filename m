@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH 07/19] Add crypto API utilities.
-Date: Fri, 20 Aug 2010 10:45:50 +0200
-Message-ID: <1282293963-27807-8-git-send-email-mitr@redhat.com>
+Subject: [PATCH 18/19] Add ioctl handlers
+Date: Fri, 20 Aug 2010 10:46:02 +0200
+Message-ID: <1282293963-27807-20-git-send-email-mitr@redhat.com>
 References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
 Cc: linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
@@ -13,395 +13,430 @@ In-Reply-To: <1282293963-27807-1-git-send-email-mitr@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This encapsulates allocation/deallocation of all necessary objects,
-dealing with the asynchronous nature of ablkcipher/ahash.
+Add ioctl and compat_ioctl handling.  This is the only file that
+directly accesses structured data from userspace (other files may access
+unformated data such as cipher input or multiple-precision integers).
 
-Long term, I'm not quite sure this layer makes sense; For now, it
-provides a truly simple API for internal callers in libtomcrypt, at
-least.
+Also add the last operation, ncr_master_key_set.
 ---
- crypto/userspace/Makefile           |    2 +-
- crypto/userspace/cryptodev_cipher.c |  339 +++++++++++++++++++++++++++++++++++
- crypto/userspace/cryptodev_main.c   |   13 ++
- 3 files changed, 353 insertions(+), 1 deletions(-)
- create mode 100644 crypto/userspace/cryptodev_cipher.c
- create mode 100644 crypto/userspace/cryptodev_main.c
+ crypto/userspace/ncr.c |  405 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 405 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/userspace/Makefile b/crypto/userspace/Makefile
-index f7f3ea2..a37969b 100644
---- a/crypto/userspace/Makefile
-+++ b/crypto/userspace/Makefile
-@@ -1,6 +1,6 @@
- ccflags-y += -I$(src)/libtommath -I$(src)/libtomcrypt/headers -I$(src) -DLTC_SOURCE
+diff --git a/crypto/userspace/ncr.c b/crypto/userspace/ncr.c
+index 9fb56ad..ee812ab 100644
+--- a/crypto/userspace/ncr.c
++++ b/crypto/userspace/ncr.c
+@@ -44,6 +44,411 @@
+  */
+ struct key_item_st master_key;
  
--cryptodev-objs := utils.o
-+cryptodev-objs := cryptodev_main.o cryptodev_cipher.o utils.o
- 
- 
- obj-$(CONFIG_CRYPTO_USERSPACE) += cryptodev.o
-diff --git a/crypto/userspace/cryptodev_cipher.c b/crypto/userspace/cryptodev_cipher.c
-new file mode 100644
-index 0000000..4e74fcc
---- /dev/null
-+++ b/crypto/userspace/cryptodev_cipher.c
-@@ -0,0 +1,339 @@
-+/*
-+ * Driver for /dev/crypto device (aka CryptoDev)
-+ *
-+ * Copyright (c) 2010 Nikos Mavrogiannopoulos <nmav@gnutls.org>
-+ * Portions Copyright (c) 2010 Michael Weiser
-+ * Portions Copyright (c) 2010 Phil Sutter
-+ *
-+ * This file is part of linux cryptodev.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ * 
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ * 
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-+ */
++static struct mutex lists_ida_mutex;
++static DEFINE_IDA(lists_ida);
 +
-+#include <linux/crypto.h>
-+#include <linux/mm.h>
-+#include <linux/highmem.h>
-+#include <linux/ioctl.h>
-+#include <linux/random.h>
-+#include <linux/scatterlist.h>
-+#include <linux/uaccess.h>
-+#include <crypto/algapi.h>
-+#include <crypto/hash.h>
-+#include "cryptodev_int.h"
-+
-+
-+struct cryptodev_result {
-+	struct completion completion;
-+	int err;
-+};
-+
-+static void cryptodev_complete(struct crypto_async_request *req, int err)
++struct ncr_lists *ncr_init_lists(void)
 +{
-+	struct cryptodev_result *res = req->data;
++	struct ncr_lists *lst;
 +
-+	if (err == -EINPROGRESS)
-+		return;
++	lst = kmalloc(sizeof(*lst), GFP_KERNEL);
++	if(!lst) {
++		err();
++		return NULL;
++	}
 +
-+	res->err = err;
-+	complete(&res->completion);
++	memset(lst, 0, sizeof(*lst));
++
++	mutex_init(&lists_ida_mutex);
++	mutex_lock(&lists_ida_mutex);
++	/* ida_pre_get() should preallocate enough, and, due to lists_ida_mutex,
++	   nobody else can use the preallocated data.  Therefore the loop
++	   recommended in idr_get_new() documentation is not necessary. */
++	if (ida_pre_get(&lists_ida, GFP_KERNEL) == 0 ||
++	    ida_get_new(&lists_ida, &lst->id) != 0) {
++		mutex_unlock(&lists_ida_mutex);
++		kfree(lst);
++		return NULL;
++	}
++	mutex_unlock(&lists_ida_mutex);
++
++	mutex_init(&lst->key_idr_mutex);
++	idr_init(&lst->key_idr);
++
++	mutex_init(&lst->session_idr_mutex);
++	idr_init(&lst->session_idr);
++
++	return lst;
 +}
 +
-+int cryptodev_cipher_init(struct cipher_data* out, const char* alg_name, uint8_t * keyp, size_t keylen)
++void ncr_deinit_lists(struct ncr_lists *lst)
 +{
-+	
-+	struct ablkcipher_alg* alg;
-+	int ret;
++	if(lst) {
++		ncr_key_list_deinit(lst);
++		ncr_sessions_list_deinit(lst);
 +
-+	memset(out, 0, sizeof(*out));
++		mutex_lock(&lists_ida_mutex);
++		ida_remove(&lists_ida, lst->id);
++		mutex_unlock(&lists_ida_mutex);
 +
-+	out->async.s = crypto_alloc_ablkcipher(alg_name, 0, 0);
-+	if (unlikely(IS_ERR(out->async.s))) {
-+		dprintk(1,KERN_DEBUG,"%s: Failed to load cipher %s\n", __func__,
-+			   alg_name);
-+		return -EINVAL;
++		kfree(lst);
++	}
++}
++
++void ncr_master_key_reset(void)
++{
++	memset(&master_key, 0, sizeof(master_key));
++}
++
++static int ncr_master_key_set(const struct ncr_master_key_set *st,
++			      struct nlattr *tb[])
++{
++struct audit_buffer *ab;
++int ret;
++
++	/* This will also cause auditing of the syscall, including information
++	   about the process, and success/failure indication.  Note that on
++	   error the AUDIT_CRYPTO_STORAGE_KEY record will be empty. */
++	ab = audit_log_start(current->audit_context, GFP_KERNEL,
++			     AUDIT_CRYPTO_STORAGE_KEY);
++
++	if (current_euid() != 0 && !capable(CAP_SYS_ADMIN)) {
++		err();
++		ret = -EPERM;
++		goto end;
 +	}
 +
-+	alg = crypto_ablkcipher_alg(out->async.s);
-+
-+	if (alg != NULL) {
-+		/* Was correct key length supplied? */
-+		if (alg->max_keysize > 0 && unlikely((keylen < alg->min_keysize) ||
-+			(keylen > alg->max_keysize))) {
-+			dprintk(1,KERN_DEBUG,"Wrong keylen '%zu' for algorithm '%s'. Use %u to %u.\n",
-+				   keylen, alg_name, alg->min_keysize, 
-+				   alg->max_keysize);
-+			ret = -EINVAL;
-+			goto error;
-+		}
-+	}
-+
-+	ret = crypto_ablkcipher_setkey(out->async.s, keyp, keylen);
-+	if (unlikely(ret)) {
-+		dprintk(1,KERN_DEBUG,"Setting key failed for %s-%zu.\n",
-+			alg_name, keylen*8);
++	if (st->key_size > sizeof(master_key.key.secret.data)) {
++		err();
 +		ret = -EINVAL;
-+		goto error;
++		goto end;
 +	}
 +
-+	out->blocksize = crypto_ablkcipher_blocksize(out->async.s);
-+	out->ivsize = crypto_ablkcipher_ivsize(out->async.s);
-+
-+	out->async.result = kmalloc(sizeof(*out->async.result), GFP_KERNEL);
-+	if (unlikely(!out->async.result)) {
-+		ret = -ENOMEM;
-+		goto error;
++	if (st->key_size != 16 && st->key_size != 24 && st->key_size != 32) {
++		dprintk(0, KERN_DEBUG, "Master key size must be 16,24 or 32.\n");
++		ret = -EINVAL;
++		goto end;
 +	}
 +
-+	memset(out->async.result, 0, sizeof(*out->async.result));
-+	init_completion(&out->async.result->completion);
-+
-+	out->async.request = ablkcipher_request_alloc(out->async.s, GFP_KERNEL);
-+	if (unlikely(!out->async.request)) {
-+		dprintk(1,KERN_ERR,"error allocating async crypto request\n");
-+		ret = -ENOMEM;
-+		goto error;
++	if (master_key.type != NCR_KEY_TYPE_INVALID) {
++		dprintk(0, KERN_DEBUG, "Master key was previously initialized.\n");
 +	}
 +
-+	ablkcipher_request_set_callback(out->async.request, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					cryptodev_complete, out->async.result);
++	if (unlikely(copy_from_user(master_key.key.secret.data, st->key,
++				    st->key_size))) {
++		err();
++		ret = -EFAULT;
++		goto end;
++	}
 +
-+	out->init = 1;
-+	return 0;
-+error:
-+	if (out->async.request)
-+		ablkcipher_request_free(out->async.request);
-+	kfree(out->async.result);
-+	if (out->async.s)
-+		crypto_free_ablkcipher(out->async.s);
++	dprintk(0, KERN_INFO, "Initializing master key.\n");
++	/* Not much we can reveal... */
++	audit_log_format(ab, "key_size=%u", (unsigned)st->key_size);
++
++	master_key.type = NCR_KEY_TYPE_SECRET;
++	master_key.key.secret.size = st->key_size;
++
++	ret = 0;
++
++end:
++	audit_log_end(ab);
 +
 +	return ret;
 +}
 +
-+void cryptodev_cipher_deinit(struct cipher_data* cdata)
++int
++ncr_ioctl(struct ncr_lists *lst, unsigned int cmd, unsigned long arg_)
 +{
-+	if (cdata->init) {
-+		if (cdata->async.request)
-+			ablkcipher_request_free(cdata->async.request);
-+		kfree(cdata->async.result);
-+		if (cdata->async.s)
-+			crypto_free_ablkcipher(cdata->async.s);
++	void __user *arg = (void __user *)arg_;
++	struct nlattr *tb[NCR_ATTR_MAX + 1];
++	void *attr_buf;
++	int ret;
 +
-+		cdata->init = 0;
++	if (unlikely(!lst))
++		BUG();
++
++	switch (cmd) {
++#define CASE_(LABEL, STRUCT, FUNCTION, ARGS)				\
++	case (LABEL): {							\
++		struct STRUCT data;					\
++									\
++		attr_buf = NCR_GET_INPUT_ARGS_NO_OUTPUT(&data, tb, arg); \
++		if (IS_ERR(attr_buf)) {					\
++			err();						\
++			return PTR_ERR(attr_buf);			\
++		}							\
++		ret = (FUNCTION)ARGS;					\
++		break;							\
 +	}
-+}
++#define CASE_NO_OUTPUT(LABEL, STRUCT, FUNCTION)				\
++		CASE_(LABEL, STRUCT, FUNCTION, (lst, &data, tb))
++#define CASE_NO_OUTPUT_COMPAT(LABEL, STRUCT, FUNCTION)			\
++		CASE_(LABEL, STRUCT, FUNCTION, (lst, &data, tb, 0))
 +
-+void cryptodev_cipher_set_iv(struct cipher_data* cdata, void *iv, size_t iv_size)
-+{
-+	memcpy(cdata->async.iv, iv, min(iv_size,sizeof(cdata->async.iv)));
-+}
++	case NCRIO_KEY_INIT:
++		return ncr_key_init(lst);
++	CASE_NO_OUTPUT(NCRIO_KEY_GENERATE, ncr_key_generate, ncr_key_generate);
++	CASE_NO_OUTPUT(NCRIO_KEY_GENERATE_PAIR, ncr_key_generate_pair,
++		       ncr_key_generate_pair);
++	CASE_NO_OUTPUT(NCRIO_KEY_DERIVE, ncr_key_derive, ncr_key_derive);
++	case NCRIO_KEY_GET_INFO: {
++		struct ncr_key_get_info data;
++		struct ncr_out out;
 +
-+static inline int waitfor (struct cryptodev_result* cr, ssize_t ret)
-+{
-+	switch (ret) {
-+	case 0:
-+		break;
-+	case -EINPROGRESS:
-+	case -EBUSY:
-+		wait_for_completion(&cr->completion);
-+		/* At this point we known for sure the request has finished,
-+		 * because wait_for_completion above was not interruptible.
-+		 * This is important because otherwise hardware or driver
-+		 * might try to access memory which will be freed or reused for
-+		 * another request. */
-+
-+		if (unlikely(cr->err)) {
-+			dprintk(0,KERN_ERR,"error from async request: %d \n", cr->err);
-+                        return cr->err; 
++		attr_buf = NCR_GET_INPUT_ARGS(&data, tb, arg);
++		if (IS_ERR(attr_buf)) {
++			err();
++			return PTR_ERR(attr_buf);
 +		}
-+
++		ret = NCR_OUT_INIT(&out, &data, arg);
++		if (ret != 0) {
++			err();
++			break;
++		}
++		ret = ncr_key_get_info(lst, &out, &data, tb);
++		ncr_out_free(&out);
 +		break;
-+	default:
-+		return ret;
 +	}
++	CASE_NO_OUTPUT(NCRIO_KEY_EXPORT, ncr_key_export, ncr_key_export);
++	CASE_NO_OUTPUT(NCRIO_KEY_IMPORT, ncr_key_import, ncr_key_import);
++	case NCRIO_KEY_DEINIT: {
++		ncr_key_t key;
 +
-+	return 0;
-+}
-+
-+
-+int _cryptodev_cipher_encrypt(struct cipher_data* cdata, const void* plaintext,
-+	size_t plaintext_size, void* ciphertext, size_t ciphertext_size)
-+{
-+struct scatterlist sg, sg2;
-+
-+	sg_init_one(&sg, plaintext, plaintext_size);
-+	sg_init_one(&sg2, ciphertext, ciphertext_size);
-+
-+	return cryptodev_cipher_encrypt( cdata, &sg, &sg2, plaintext_size);
-+}
-+
-+int _cryptodev_cipher_decrypt(struct cipher_data* cdata, const void* ciphertext,
-+	size_t ciphertext_size, void* plaintext, size_t plaintext_size)
-+{
-+struct scatterlist sg, sg2;
-+
-+	sg_init_one(&sg, ciphertext, ciphertext_size);
-+	sg_init_one(&sg2, plaintext, plaintext_size);
-+
-+	return cryptodev_cipher_decrypt( cdata, &sg, &sg2, ciphertext_size);
-+}
-+
-+
-+ssize_t cryptodev_cipher_encrypt( struct cipher_data* cdata, const struct scatterlist *sg1, struct scatterlist *sg2, size_t len)
-+{
-+	int ret;
-+
-+	INIT_COMPLETION(cdata->async.result->completion);
-+	ablkcipher_request_set_crypt(cdata->async.request, (struct scatterlist*)sg1, sg2,
-+			len, cdata->async.iv);
-+	ret = crypto_ablkcipher_encrypt(cdata->async.request);
-+
-+	return waitfor(cdata->async.result,ret);
-+}
-+
-+ssize_t cryptodev_cipher_decrypt( struct cipher_data* cdata, const struct scatterlist *sg1, struct scatterlist *sg2, size_t len)
-+{
-+	int ret;
-+
-+	INIT_COMPLETION(cdata->async.result->completion);
-+	ablkcipher_request_set_crypt(cdata->async.request, (struct scatterlist*)sg1, sg2,
-+			len, cdata->async.iv);
-+	ret = crypto_ablkcipher_decrypt(cdata->async.request);
-+
-+	return waitfor(cdata->async.result, ret);
-+}
-+
-+/* Hash functions */
-+
-+int cryptodev_hash_init( struct hash_data* hdata, const char* alg_name, int hmac_mode, void * mackey, size_t mackeylen)
-+{
-+int ret;
-+
-+	hdata->async.s = crypto_alloc_ahash(alg_name, 0, 0);
-+	if (unlikely(IS_ERR(hdata->async.s))) {
-+		dprintk(1,KERN_DEBUG,"%s: Failed to load transform for %s\n", __func__,
-+				   alg_name);
-+		return -EINVAL;
-+	}
-+
-+	/* Copy the key from user and set to TFM. */
-+	if (hmac_mode != 0) {
-+
-+		ret = crypto_ahash_setkey(hdata->async.s, mackey, mackeylen);
++		ret = get_user(key, (const ncr_key_t __user *)arg);
 +		if (unlikely(ret)) {
-+			dprintk(1,KERN_DEBUG,"Setting hmac key failed for %s-%zu.\n",
-+				alg_name, mackeylen*8);
-+			ret = -EINVAL;
-+			goto error;
++			err();
++			return ret;
 +		}
++		return ncr_key_deinit(lst, key);
 +	}
-+
-+	hdata->digestsize = crypto_ahash_digestsize(hdata->async.s);
-+
-+	hdata->async.result = kmalloc(sizeof(*hdata->async.result), GFP_KERNEL);
-+	if (unlikely(!hdata->async.result)) {
-+		ret = -ENOMEM;
-+		goto error;
++	CASE_NO_OUTPUT(NCRIO_KEY_WRAP, ncr_key_wrap, ncr_key_wrap);
++	CASE_NO_OUTPUT(NCRIO_KEY_UNWRAP, ncr_key_unwrap, ncr_key_unwrap);
++	CASE_NO_OUTPUT(NCRIO_KEY_STORAGE_WRAP, ncr_key_storage_wrap,
++		       ncr_key_storage_wrap);
++	CASE_NO_OUTPUT(NCRIO_KEY_STORAGE_UNWRAP, ncr_key_storage_unwrap,
++		       ncr_key_storage_unwrap);
++	CASE_NO_OUTPUT(NCRIO_SESSION_INIT, ncr_session_init, ncr_session_init);
++	CASE_NO_OUTPUT_COMPAT(NCRIO_SESSION_UPDATE, ncr_session_update,
++			      ncr_session_update);
++	CASE_NO_OUTPUT_COMPAT(NCRIO_SESSION_FINAL, ncr_session_final,
++			      ncr_session_final);
++	CASE_NO_OUTPUT_COMPAT(NCRIO_SESSION_ONCE, ncr_session_once,
++			      ncr_session_once);
++	CASE_(NCRIO_MASTER_KEY_SET, ncr_master_key_set, ncr_master_key_set,
++	      (&data, tb));
++	default:
++		return -EINVAL;
++#undef CASE_
++#undef CASE_NO_OUTPUT
++#undef CASE_NO_OUTPUT_COMPAT
 +	}
-+
-+	memset(hdata->async.result, 0, sizeof(*hdata->async.result));
-+	init_completion(&hdata->async.result->completion);
-+
-+	hdata->async.request = ahash_request_alloc(hdata->async.s, GFP_KERNEL);
-+	if (unlikely(!hdata->async.request)) {
-+		dprintk(0,KERN_ERR,"error allocating async crypto request\n");
-+		ret = -ENOMEM;
-+		goto error;
-+	}
-+
-+	ahash_request_set_callback(hdata->async.request, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					cryptodev_complete, hdata->async.result);
-+
-+	ret = crypto_ahash_init(hdata->async.request);
-+	if (unlikely(ret)) {
-+		dprintk(0,KERN_ERR,
-+			"error in crypto_hash_init()\n");
-+		goto error_request;
-+	}
-+
-+	hdata->init = 1;
-+	return 0;
-+
-+error_request:
-+	ahash_request_free(hdata->async.request);
-+error:
-+	kfree(hdata->async.result);
-+	crypto_free_ahash(hdata->async.s);
++	kfree(attr_buf);
 +	return ret;
 +}
 +
-+void cryptodev_hash_deinit(struct hash_data* hdata)
++#ifdef CONFIG_COMPAT
++struct compat_ncr_key_export {
++	__u32 input_size, output_size;
++	ncr_key_t key;
++	compat_uptr_t buffer;
++	compat_int_t buffer_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_EXPORT _IOWR('c', 209, struct compat_ncr_key_export)
++
++static void convert_ncr_key_export(struct ncr_key_export *new,
++				   const struct compat_ncr_key_export *old)
 +{
-+	if (hdata->init) {
-+		if (hdata->async.request)
-+			ahash_request_free(hdata->async.request);
-+		kfree(hdata->async.result);
-+		if (hdata->async.s)
-+			crypto_free_ahash(hdata->async.s);
-+		hdata->init = 0;
-+	}
++	new->key = old->key;
++	new->buffer = compat_ptr(old->buffer);
++	new->buffer_size = old->buffer_size;
 +}
 +
-+int cryptodev_hash_reset( struct hash_data* hdata)
++struct compat_ncr_key_import {
++	__u32 input_size, output_size;
++	ncr_key_t key;
++	compat_uptr_t data;
++	__u32 data_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_IMPORT _IOWR('c', 210, struct compat_ncr_key_import)
++
++static void convert_ncr_key_import(struct ncr_key_import *new,
++				   const struct compat_ncr_key_import *old)
 +{
-+int ret;
-+	ret = crypto_ahash_init(hdata->async.request);
-+	if (unlikely(ret)) {
-+		dprintk(0,KERN_ERR,
-+			"error in crypto_hash_init()\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+
++	new->key = old->key;
++	new->data = compat_ptr(old->data);
++	new->data_size = old->data_size;
 +}
 +
-+ssize_t cryptodev_hash_update( struct hash_data* hdata, struct scatterlist *sg, size_t len)
++struct compat_ncr_key_wrap {
++	__u32 input_size, output_size;
++	ncr_key_t wrapping_key;
++	ncr_key_t source_key;
++	compat_uptr_t buffer;
++	compat_int_t buffer_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_WRAP _IOWR('c', 250, struct compat_ncr_key_wrap)
++
++static void convert_ncr_key_wrap(struct ncr_key_wrap *new,
++				 const struct compat_ncr_key_wrap *old)
 +{
++	new->wrapping_key = old->wrapping_key;
++	new->source_key = old->source_key;
++	new->buffer = compat_ptr(old->buffer);
++	new->buffer_size = old->buffer_size;
++}
++
++struct compat_ncr_key_unwrap {
++	__u32 input_size, output_size;
++	ncr_key_t wrapping_key;
++	ncr_key_t dest_key;
++	compat_uptr_t data;
++	__u32 data_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_UNWRAP _IOWR('c', 251, struct compat_ncr_key_unwrap)
++
++static void convert_ncr_key_unwrap(struct ncr_key_unwrap *new,
++				   const struct compat_ncr_key_unwrap *old)
++{
++	new->wrapping_key = old->wrapping_key;
++	new->dest_key = old->dest_key;
++	new->data = compat_ptr(old->data);
++	new->data_size = old->data_size;
++}
++
++struct compat_ncr_key_storage_wrap {
++	__u32 input_size, output_size;
++	ncr_key_t key;
++	compat_uptr_t buffer;
++	compat_int_t buffer_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_STORAGE_WRAP				\
++	_IOWR('c', 261, struct compat_ncr_key_storage_wrap)
++
++static void convert_ncr_key_storage_wrap(struct ncr_key_storage_wrap *new,
++					 const struct compat_ncr_key_storage_wrap *old)
++{
++	new->key = old->key;
++	new->buffer = compat_ptr(old->buffer);
++	new->buffer_size = old->buffer_size;
++}
++
++struct compat_ncr_key_storage_unwrap {
++	__u32 input_size, output_size;
++	ncr_key_t key;
++	compat_uptr_t data;
++	__u32 data_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_KEY_STORAGE_UNWRAP				\
++	_IOWR('c', 262, struct compat_ncr_key_storage_wrap)
++
++static void convert_ncr_key_storage_unwrap(struct ncr_key_storage_unwrap *new,
++					   const struct compat_ncr_key_storage_unwrap *old)
++{
++	new->key = old->key;
++	new->data = compat_ptr(old->data);
++	new->data_size = old->data_size;
++}
++
++struct compat_ncr_master_key_set {
++	__u32 input_size, output_size;
++	compat_uptr_t key;
++	__u32 key_size;
++	__NL_ATTRIBUTES;
++};
++#define COMPAT_NCRIO_MASTER_KEY_SET				\
++	_IOWR('c', 260, struct compat_ncr_master_key_set)
++
++static void convert_ncr_master_key_set(struct ncr_master_key_set *new,
++				       const struct compat_ncr_master_key_set *old)
++{
++	new->key = compat_ptr(old->key);
++	new->key_size = old->key_size;
++}
++
++long
++ncr_compat_ioctl(struct ncr_lists *lst, unsigned int cmd, unsigned long arg_)
++{
++	void __user *arg = (void __user *)arg_;
++	struct nlattr *tb[NCR_ATTR_MAX + 1];
++	void *attr_buf;
 +	int ret;
 +
-+	INIT_COMPLETION(hdata->async.result->completion);
-+	ahash_request_set_crypt(hdata->async.request, sg, NULL,
-+			len);
++	if (unlikely(!lst))
++		BUG();
 +
-+	ret = crypto_ahash_update(hdata->async.request);
++	switch (cmd) {
++	case NCRIO_KEY_INIT:
++	case NCRIO_KEY_GENERATE:
++	case NCRIO_KEY_GENERATE_PAIR:
++	case NCRIO_KEY_DERIVE:
++	case NCRIO_KEY_GET_INFO:
++	case NCRIO_KEY_DEINIT:
++	case NCRIO_SESSION_INIT:
++		return ncr_ioctl(lst, cmd, arg_);
 +
-+	return waitfor(hdata->async.result,ret);
++#define CASE_(LABEL, STRUCT, FUNCTION, ARGS)				\
++	case (LABEL): {							\
++		struct compat_##STRUCT old;				\
++		struct STRUCT new;					\
++									\
++		attr_buf = NCR_GET_INPUT_ARGS_NO_OUTPUT(&old, tb, arg);	\
++		if (IS_ERR(attr_buf)) {					\
++			err();						\
++			return PTR_ERR(attr_buf);			\
++		}							\
++		convert_##STRUCT(&new, &old);				\
++		ret = (FUNCTION)ARGS;					\
++		break;							\
++	}
++#define CASE_NO_OUTPUT(LABEL, STRUCT, FUNCTION)			\
++		CASE_(LABEL, STRUCT, FUNCTION, (lst, &new, tb))
++
++#define CASE_COMPAT_ONLY(LABEL, STRUCT, FUNCTION)			\
++	case (LABEL): {							\
++		struct STRUCT data;					\
++									\
++		attr_buf = NCR_GET_INPUT_ARGS_NO_OUTPUT(&data, tb, arg); \
++		if (IS_ERR(attr_buf)) {					\
++			err();						\
++			return PTR_ERR(attr_buf);			\
++		}							\
++		ret = (FUNCTION)(lst, &data, tb, 1);			\
++		break;							\
++	}
++
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_EXPORT, ncr_key_export, ncr_key_export);
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_IMPORT, ncr_key_import, ncr_key_import);
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_WRAP, ncr_key_wrap, ncr_key_wrap);
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_UNWRAP, ncr_key_unwrap, ncr_key_unwrap);
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_STORAGE_WRAP, ncr_key_storage_wrap,
++		       ncr_key_storage_wrap);
++	CASE_NO_OUTPUT(COMPAT_NCRIO_KEY_STORAGE_UNWRAP, ncr_key_storage_unwrap,
++		       ncr_key_storage_unwrap);
++	CASE_COMPAT_ONLY(NCRIO_SESSION_UPDATE, ncr_session_update,
++			 ncr_session_update);
++	CASE_COMPAT_ONLY(NCRIO_SESSION_FINAL, ncr_session_final,
++			 ncr_session_final);
++	CASE_COMPAT_ONLY(NCRIO_SESSION_ONCE, ncr_session_once,
++			 ncr_session_once);
++	CASE_(COMPAT_NCRIO_MASTER_KEY_SET, ncr_master_key_set,
++	      ncr_master_key_set, (&new, tb));
++	default:
++		return -EINVAL;
++#undef CASE_
++#undef CASE_NO_OUTPUT
++#undef CASE_COMPAT_ONLY
++	}
++	kfree(attr_buf);
++	return ret;
 +}
++#endif
 +
-+ssize_t _cryptodev_hash_update( struct hash_data* hdata, const void* data, size_t len)
-+{
-+struct scatterlist sg;
-+
-+	sg_init_one(&sg, data, len);
-+
-+	return cryptodev_hash_update( hdata, &sg, len);
-+}
-+
-+int cryptodev_hash_final( struct hash_data* hdata, void* output)
-+{
-+	int ret;
-+
-+	INIT_COMPLETION(hdata->async.result->completion);
-+	ahash_request_set_crypt(hdata->async.request, NULL, output, 0);
-+
-+	ret = crypto_ahash_final(hdata->async.request);
-+
-+	return waitfor(hdata->async.result,ret);
-+}
-diff --git a/crypto/userspace/cryptodev_main.c b/crypto/userspace/cryptodev_main.c
-new file mode 100644
-index 0000000..c6419f4
---- /dev/null
-+++ b/crypto/userspace/cryptodev_main.c
-@@ -0,0 +1,13 @@
-+#include "cryptodev_int.h"
-+#include "ncr-int.h"
-+#include <linux/version.h>
-+
-+MODULE_AUTHOR("Nikos Mavrogiannopoulos <nmav@gnutls.org>");
-+MODULE_DESCRIPTION("CryptoDev driver");
-+MODULE_LICENSE("GPL");
-+
-+/* ====== Module parameters ====== */
-+
-+int cryptodev_verbosity = 0;
-+module_param(cryptodev_verbosity, int, 0644);
-+MODULE_PARM_DESC(cryptodev_verbosity, "0: normal, 1: verbose, 2: debug");
+ int ncr_session_input_data_from_nla(struct ncr_session_input_data *dest,
+ 				    const struct nlattr *nla, int compat)
+ {
 -- 
 1.7.2.1
