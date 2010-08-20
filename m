@@ -1,47 +1,153 @@
-From: Stefan Richter <stefanr@s5r6.in-berlin.de>
-Subject: Re: [PATCH 06/19] Add ioctl() argument and attribute handling utils
-Date: Fri, 20 Aug 2010 14:59:06 +0200
-Message-ID: <4C6E7C1A.1070203@s5r6.in-berlin.de>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <1282293963-27807-7-git-send-email-mitr@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-crypto@vger.kernel.org,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
-To: =?UTF-8?B?TWlsb3NsYXYgVHJtYcSN?= <mitr@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1282293963-27807-7-git-send-email-mitr@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: [PATCH 1/2] crypto: updates to enable omap aes
+Date: Fri, 20 Aug 2010 16:44:46 +0300
+Message-ID: <f419b9c0bc0aa64a1a012a57e52aa9477b91b23f.1282311763.git.dmitry.kasatkin@nokia.com>
+References: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: herbert@gondor.hengli.com.au
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+In-Reply-To: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+References: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Miloslav Trma=C4=8D wrote:
-> --- /dev/null
-> +++ b/crypto/userspace/utils.c
-[...]
-> +#ifdef CONFIG_COMPAT
-> +/* max() is too clever for compile-time constants */
-> +#define CONST_MAX(A, B) ((A) > (B) ? (A) : (B))
-> +
-> +#define MAX_SESSION_INPUT_DATA_SIZE					\
-> +	(CONST_MAX(sizeof(struct ncr_session_input_data),		\
-> +		   sizeof(struct compat_ncr_session_input_data)))
-> +#define MAX_SESSION_OUTPUT_BUFFER_SIZE					\
-> +	(CONST_MAX(sizeof(struct ncr_session_output_buffer),		\
-> +		   sizeof(struct compat_ncr_session_output_buffer)))
-> +
-> +#else /* !CONFIG_COMPAT */
-> +
-> +#define MAX_SESSION_INPUT_DATA_SIZE (sizeof(struct ncr_session_input=
-_data))
-> +#define MAX_SESSION_OUTPUT_BUFFER_SIZE			\
-> +	(sizeof(struct ncr_session_output_buffer))
-> +
-> +#endif /* !CONFIG_COMPAT */
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+---
+ arch/arm/mach-omap2/clock2420_data.c |    2 +-
+ arch/arm/mach-omap2/clock2430_data.c |    2 +-
+ arch/arm/mach-omap2/clock3xxx_data.c |    2 +-
+ arch/arm/mach-omap2/devices.c        |   71 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 74 insertions(+), 3 deletions(-)
 
-struct compat_xyz cannot be bigger than struct xyz, can it?
---=20
-Stefan Richter
--=3D=3D=3D=3D=3D-=3D=3D-=3D- =3D--- =3D-=3D--
-http://arcgraph.de/sr/
+diff --git a/arch/arm/mach-omap2/clock2420_data.c b/arch/arm/mach-omap2/clock2420_data.c
+index 37d65d6..5f2066a 100644
+--- a/arch/arm/mach-omap2/clock2420_data.c
++++ b/arch/arm/mach-omap2/clock2420_data.c
+@@ -1838,7 +1838,7 @@ static struct omap_clk omap2420_clks[] = {
+ 	CLK(NULL,	"des_ick",	&des_ick,	CK_242X),
+ 	CLK("omap-sham",	"ick",	&sha_ick,	CK_242X),
+ 	CLK("omap_rng",	"ick",		&rng_ick,	CK_242X),
+-	CLK(NULL,	"aes_ick",	&aes_ick,	CK_242X),
++	CLK("omap-aes",	"ick",	&aes_ick,	CK_242X),
+ 	CLK(NULL,	"pka_ick",	&pka_ick,	CK_242X),
+ 	CLK(NULL,	"usb_fck",	&usb_fck,	CK_242X),
+ 	CLK("musb_hdrc",	"fck",	&osc_ck,	CK_242X),
+diff --git a/arch/arm/mach-omap2/clock2430_data.c b/arch/arm/mach-omap2/clock2430_data.c
+index b33118f..701a171 100644
+--- a/arch/arm/mach-omap2/clock2430_data.c
++++ b/arch/arm/mach-omap2/clock2430_data.c
+@@ -1926,7 +1926,7 @@ static struct omap_clk omap2430_clks[] = {
+ 	CLK(NULL,	"des_ick",	&des_ick,	CK_243X),
+ 	CLK("omap-sham",	"ick",	&sha_ick,	CK_243X),
+ 	CLK("omap_rng",	"ick",		&rng_ick,	CK_243X),
+-	CLK(NULL,	"aes_ick",	&aes_ick,	CK_243X),
++	CLK("omap-aes",	"ick",	&aes_ick,	CK_243X),
+ 	CLK(NULL,	"pka_ick",	&pka_ick,	CK_243X),
+ 	CLK(NULL,	"usb_fck",	&usb_fck,	CK_243X),
+ 	CLK("musb_hdrc",	"ick",	&usbhs_ick,	CK_243X),
+diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
+index dfdce2d..c73906d 100644
+--- a/arch/arm/mach-omap2/clock3xxx_data.c
++++ b/arch/arm/mach-omap2/clock3xxx_data.c
+@@ -3288,7 +3288,7 @@ static struct omap_clk omap3xxx_clks[] = {
+ 	CLK(NULL,	"usbtll_ick",	&usbtll_ick,	CK_3430ES2 | CK_AM35XX),
+ 	CLK("mmci-omap-hs.2",	"ick",	&mmchs3_ick,	CK_3430ES2 | CK_AM35XX),
+ 	CLK(NULL,	"icr_ick",	&icr_ick,	CK_343X),
+-	CLK(NULL,	"aes2_ick",	&aes2_ick,	CK_343X),
++	CLK("omap-aes",	"ick",	&aes2_ick,	CK_343X),
+ 	CLK("omap-sham",	"ick",	&sha12_ick,	CK_343X),
+ 	CLK(NULL,	"des2_ick",	&des2_ick,	CK_343X),
+ 	CLK("mmci-omap-hs.1",	"ick",	&mmchs2_ick,	CK_3XXX),
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index 2dbb265..b27e7cb 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -498,6 +498,76 @@ static void omap_init_sham(void)
+ static inline void omap_init_sham(void) { }
+ #endif
+ 
++#if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
++
++#ifdef CONFIG_ARCH_OMAP24XX
++static struct resource omap2_aes_resources[] = {
++	{
++		.start	= OMAP24XX_SEC_AES_BASE,
++		.end	= OMAP24XX_SEC_AES_BASE + 0x4C,
++		.flags	= IORESOURCE_MEM,
++	},
++	{
++		.start	= OMAP24XX_DMA_AES_TX,
++		.flags	= IORESOURCE_DMA,
++	},
++	{
++		.start	= OMAP24XX_DMA_AES_RX,
++		.flags	= IORESOURCE_DMA,
++	}
++};
++static int omap2_aes_resources_sz = ARRAY_SIZE(omap2_aes_resources);
++#else
++#define omap2_aes_resources		NULL
++#define omap2_aes_resources_sz		0
++#endif
++
++#ifdef CONFIG_ARCH_OMAP34XX
++static struct resource omap3_aes_resources[] = {
++	{
++		.start	= OMAP34XX_SEC_AES_BASE,
++		.end	= OMAP34XX_SEC_AES_BASE + 0x4C,
++		.flags	= IORESOURCE_MEM,
++	},
++	{
++		.start	= OMAP34XX_DMA_AES2_TX,
++		.flags	= IORESOURCE_DMA,
++	},
++	{
++		.start	= OMAP34XX_DMA_AES2_RX,
++		.flags	= IORESOURCE_DMA,
++	}
++};
++static int omap3_aes_resources_sz = ARRAY_SIZE(omap3_aes_resources);
++#else
++#define omap3_aes_resources		NULL
++#define omap3_aes_resources_sz		0
++#endif
++
++static struct platform_device aes_device = {
++	.name		= "omap-aes",
++	.id		= -1,
++};
++
++static void omap_init_aes(void)
++{
++	if (cpu_is_omap24xx()) {
++		aes_device.resource = omap2_aes_resources;
++		aes_device.num_resources = omap2_aes_resources_sz;
++	} else if (cpu_is_omap34xx()) {
++		aes_device.resource = omap3_aes_resources;
++		aes_device.num_resources = omap3_aes_resources_sz;
++	} else {
++		pr_err("%s: platform not supported\n", __func__);
++		return;
++	}
++	platform_device_register(&aes_device);
++}
++
++#else
++static inline void omap_init_aes(void) { }
++#endif
++
+ /*-------------------------------------------------------------------------*/
+ 
+ #if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_ARCH_OMAP4)
+@@ -854,6 +924,7 @@ static int __init omap2_init_devices(void)
+ 	omap_hdq_init();
+ 	omap_init_sti();
+ 	omap_init_sham();
++	omap_init_aes();
+ 	omap_init_vout();
+ 
+ 	return 0;
+-- 
+1.7.0.4
+
