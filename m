@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH 15/19] Add key wrapping operations
-Date: Fri, 20 Aug 2010 10:45:59 +0200
-Message-ID: <1282293963-27807-17-git-send-email-mitr@redhat.com>
+Subject: [PATCH 14/19] Add most operations on key objects.
+Date: Fri, 20 Aug 2010 10:45:58 +0200
+Message-ID: <1282293963-27807-16-git-send-email-mitr@redhat.com>
 References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
 Cc: linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
@@ -9,196 +9,52 @@ Cc: linux-crypto@vger.kernel.org,
 	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
 To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38491 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34483 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752919Ab0HTIrB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Aug 2010 04:47:01 -0400
+	id S1752895Ab0HTIq7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 Aug 2010 04:46:59 -0400
 In-Reply-To: <1282293963-27807-1-git-send-email-mitr@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 This includes:
-- ncr_key_wrap
-- ncr_key_unwrap
-- ncr_key_storage_wrap
-- ncr_key_storage_unwrap
+- ncr_key_init
+- ncr_key_deinit
+- ncr_key_export (as plaintext)
+- ncr_key_import
+- ncr_key_generate
+- ncr_key_generate_pair
+- ncr_key_derive
+- ncr_key_get_info
+and supporting infrastructure.
 ---
- crypto/userspace/Makefile          |    5 +-
- crypto/userspace/ncr-key-storage.c |  136 +++++++
- crypto/userspace/ncr-key-wrap.c    |  763 ++++++++++++++++++++++++++++++++++++
- crypto/userspace/ncr.c             |   29 ++
- 4 files changed, 931 insertions(+), 2 deletions(-)
- create mode 100644 crypto/userspace/ncr-key-storage.c
- create mode 100644 crypto/userspace/ncr-key-wrap.c
- create mode 100644 crypto/userspace/ncr.c
+ crypto/userspace/Makefile  |    2 +-
+ crypto/userspace/ncr-key.c |  689 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 690 insertions(+), 1 deletions(-)
+ create mode 100644 crypto/userspace/ncr-key.c
 
 diff --git a/crypto/userspace/Makefile b/crypto/userspace/Makefile
-index 454ed9d..689ee0d 100644
+index fa4168d..454ed9d 100644
 --- a/crypto/userspace/Makefile
 +++ b/crypto/userspace/Makefile
-@@ -63,8 +63,9 @@ TOMCRYPT_OBJECTS = libtomcrypt/misc/zeromem.o libtomcrypt/misc/crypt/crypt_argch
+@@ -63,7 +63,7 @@ TOMCRYPT_OBJECTS = libtomcrypt/misc/zeromem.o libtomcrypt/misc/crypt/crypt_argch
  	libtomcrypt/misc/pk_get_oid.o libtomcrypt/pk/asn1/der/x509/der_encode_subject_public_key_info.o \
  	libtomcrypt/pk/asn1/der/x509/der_decode_subject_public_key_info.o
  
--cryptodev-objs := cryptodev_main.o cryptodev_cipher.o ncr-key.o ncr-limits.o \
--	ncr-pk.o ncr-sessions.o ncr-dh.o utils.o $(TOMMATH_OBJECTS) \
-+cryptodev-objs := cryptodev_main.o cryptodev_cipher.o ncr.o \
-+	ncr-key.o ncr-limits.o  ncr-pk.o ncr-sessions.o ncr-dh.o \
-+	ncr-key-wrap.o ncr-key-storage.o utils.o $(TOMMATH_OBJECTS) \
+-cryptodev-objs := cryptodev_main.o cryptodev_cipher.o ncr-limits.o \
++cryptodev-objs := cryptodev_main.o cryptodev_cipher.o ncr-key.o ncr-limits.o \
+ 	ncr-pk.o ncr-sessions.o ncr-dh.o utils.o $(TOMMATH_OBJECTS) \
  	$(TOMCRYPT_OBJECTS)
  
- 
-diff --git a/crypto/userspace/ncr-key-storage.c b/crypto/userspace/ncr-key-storage.c
+diff --git a/crypto/userspace/ncr-key.c b/crypto/userspace/ncr-key.c
 new file mode 100644
-index 0000000..4d0cb87
+index 0000000..b90a4fc
 --- /dev/null
-+++ b/crypto/userspace/ncr-key-storage.c
-@@ -0,0 +1,136 @@
++++ b/crypto/userspace/ncr-key.c
+@@ -0,0 +1,689 @@
 +/*
 + * New driver for /dev/crypto device (aka CryptoDev)
-+
-+ * Copyright (c) 2010 Katholieke Universiteit Leuven
 + *
-+ * Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-+ *
-+ * This file is part of linux cryptodev.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ * 
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ * 
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-+ */
-+
-+#include <linux/ioctl.h>
-+#include <linux/mm.h>
-+#include <linux/ncr.h>
-+#include <linux/slab.h>
-+#include <linux/uaccess.h>
-+#include <linux/scatterlist.h>
-+#include "ncr-int.h"
-+#include "cryptodev_int.h"
-+
-+struct packed_key {
-+	uint32_t version;
-+	uint8_t type;
-+	uint32_t flags;
-+	uint8_t algorithm[32];	/* NUL-terminated */
-+	uint8_t key_id[MAX_KEY_ID_SIZE];
-+	uint8_t key_id_size;
-+
-+	uint8_t raw[KEY_DATA_MAX_SIZE];
-+	uint32_t raw_size;
-+} __attribute__((__packed__));
-+
-+#define THIS_VERSION 1
-+
-+int key_to_storage_data( uint8_t** sdata, size_t * sdata_size, const struct key_item_st *key)
-+{
-+	struct packed_key * pkey;
-+	int ret;
-+
-+	pkey = kmalloc(sizeof(*pkey), GFP_KERNEL);
-+	if (pkey == NULL) {
-+		err();
-+		return -ENOMEM;
-+	}
-+
-+	pkey->version = THIS_VERSION;
-+	pkey->type = key->type;
-+	pkey->flags = key->flags;
-+	BUG_ON(strlen(key->algorithm->kstr) > sizeof(pkey->algorithm) - 1);
-+	strcpy(pkey->algorithm, key->algorithm->kstr);
-+	pkey->key_id_size = key->key_id_size;
-+	memcpy(pkey->key_id, key->key_id, key->key_id_size);
-+
-+	if (key->type == NCR_KEY_TYPE_SECRET) {
-+		pkey->raw_size = key->key.secret.size;
-+		memcpy(pkey->raw, key->key.secret.data, pkey->raw_size);
-+	} else if (key->type == NCR_KEY_TYPE_PRIVATE || key->type == NCR_KEY_TYPE_PUBLIC) {
-+		pkey->raw_size = sizeof(pkey->raw);
-+		ret = ncr_pk_pack( key, pkey->raw, &pkey->raw_size);
-+		if (ret < 0) {
-+			err();
-+			goto fail;
-+		}
-+	} else {
-+		err();
-+		ret = -EINVAL;
-+		goto fail;
-+	}
-+
-+	*sdata = (void*)pkey;
-+	*sdata_size = sizeof(*pkey);
-+
-+	return 0;
-+fail:
-+	kfree(pkey);
-+
-+	return ret;
-+}
-+
-+int key_from_storage_data(struct key_item_st* key, const void* data, size_t data_size)
-+{
-+	const struct packed_key * pkey = data;
-+	int ret;
-+
-+	if (data_size != sizeof(*pkey) || pkey->version != THIS_VERSION
-+	    || memchr(pkey->algorithm, '\0', sizeof(pkey->algorithm)) == NULL
-+	    || pkey->key_id_size > MAX_KEY_ID_SIZE) {
-+		err();
-+		return -EINVAL;
-+	}
-+
-+	key->type = pkey->type;
-+	key->flags = pkey->flags;
-+
-+	key->algorithm = _ncr_algo_to_properties(pkey->algorithm);
-+	if (key->algorithm == NULL) {
-+		err();
-+		return -EINVAL;
-+	}
-+	key->key_id_size = pkey->key_id_size;
-+	memcpy(key->key_id, pkey->key_id, pkey->key_id_size);
-+
-+	if (key->type == NCR_KEY_TYPE_SECRET) {
-+		if (pkey->raw_size > NCR_CIPHER_MAX_KEY_LEN) {
-+			err();
-+			return -EINVAL;
-+		}
-+		key->key.secret.size = pkey->raw_size;
-+		memcpy(key->key.secret.data, pkey->raw, pkey->raw_size);
-+	} else if (key->type == NCR_KEY_TYPE_PUBLIC 
-+		|| key->type == NCR_KEY_TYPE_PRIVATE) {
-+		ret = ncr_pk_unpack( key, pkey->raw, pkey->raw_size);
-+		if (ret < 0) {
-+			err();
-+			return ret;
-+		}
-+	} else {
-+		err();
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-diff --git a/crypto/userspace/ncr-key-wrap.c b/crypto/userspace/ncr-key-wrap.c
-new file mode 100644
-index 0000000..df96a79
---- /dev/null
-+++ b/crypto/userspace/ncr-key-wrap.c
-@@ -0,0 +1,763 @@
-+/*
-+ * New driver for /dev/crypto device (aka CryptoDev)
-+
 + * Copyright (c) 2010 Katholieke Universiteit Leuven
 + *
 + * Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
@@ -225,774 +81,665 @@ index 0000000..df96a79
 +#include <linux/mm.h>
 +#include <linux/ncr.h>
 +#include <linux/slab.h>
-+#include <linux/highmem.h>
 +#include <linux/random.h>
 +#include <linux/uaccess.h>
 +#include <linux/scatterlist.h>
 +#include <net/netlink.h>
 +#include "ncr-int.h"
-+#include "cryptodev_int.h"
++#include "utils.h"
 +
-+typedef uint8_t val64_t[8];
++static void ncr_key_clear(struct key_item_st* item);
 +
-+static const val64_t initA = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
-+
-+
-+static void val64_xor( val64_t val, uint32_t x)
++static int key_list_deinit_fn(int id, void *item, void *unused)
 +{
-+	val[7] ^= x & 0xff;
-+	val[6] ^= (x >> 8) & 0xff;
-+	val[5] ^= (x >> 16) & 0xff;
-+	val[4] ^= (x >> 24) & 0xff;
-+}
-+
-+static int rfc3394_wrap(val64_t *R, unsigned int n, struct cipher_data* ctx,
-+	uint8_t* output, size_t *output_size, const uint8_t iv[8])
-+{
-+val64_t A;
-+uint8_t aes_block[16];
-+int i,j;
-+
-+	if (*output_size < (n+1)*8) {
-+		err();
-+		return -ERANGE;
-+	}
-+
-+	memcpy(A, iv, 8);
-+
-+	for (i=0;i<6*n;i++) {
-+		memcpy(aes_block, A, 8);
-+		memcpy(&aes_block[8], R[0], 8);
-+
-+		_cryptodev_cipher_encrypt(ctx, aes_block, sizeof(aes_block),
-+			aes_block, sizeof(aes_block));
-+
-+		memcpy(A, aes_block, 8); /* A = MSB64(AES(A^{t-1}|R_{1}^{t-1})) */
-+		val64_xor(A, i+1); /* A ^= t */
-+
-+		for (j=0;j<n-1;j++)
-+			memcpy(R[j], R[j+1], sizeof(R[j]));
-+		memcpy(R[n-1], &aes_block[8], 8); /* R[n-1] = LSB64(AES(A^{t-1}|R_{1}^{t-1})) */
-+	}
-+
-+	memcpy(output, A, sizeof(A));
-+	for (j=0;j<n;j++)
-+		memcpy(&output[(j+1)*8], R[j], 8);
-+	*output_size = (n+1)*8;
-+
++	(void)unused;
++	_ncr_key_item_put(item);
 +	return 0;
 +}
 +
-+static int rfc3394_unwrap(const uint8_t *wrapped_key, val64_t R[], unsigned int n, val64_t A, struct cipher_data *ctx)
++void ncr_key_list_deinit(struct ncr_lists *lst)
 +{
-+	int i, j;
-+	uint8_t aes_block[16];
-+
-+	memcpy(A, wrapped_key, 8); /* A = C[0] */
-+	for (i=0;i<n;i++)
-+		memcpy(R[i], &wrapped_key[(i+1)*8], 8);
-+
-+	for (i=(6*n)-1;i>=0;i--) {
-+		val64_xor(A, i+1);
-+
-+		memcpy(aes_block, A, 8);
-+		memcpy(&aes_block[8], R[n-1], 8);
-+
-+		_cryptodev_cipher_decrypt(ctx, aes_block, sizeof(aes_block),
-+			aes_block, sizeof(aes_block));
-+
-+		memcpy(A, aes_block, 8);
-+
-+		for (j=n-1;j>=1;j--)
-+			memcpy(R[j], R[j-1], sizeof(R[j]));
-+
-+		memcpy(R[0], &aes_block[8], 8);
-+	}
-+
-+	return 0;
++	/* The mutex is not necessary, but doesn't hurt and makes it easier to
++	   verify locking correctness. */
++	mutex_lock(&lst->key_idr_mutex);
++	idr_for_each(&lst->key_idr, key_list_deinit_fn, NULL);
++	idr_remove_all(&lst->key_idr);
++	idr_destroy(&lst->key_idr);
++	mutex_unlock(&lst->key_idr_mutex);
 +}
 +
-+#define RFC5649_IV "\xA6\x59\x59\xA6"
-+static int _wrap_aes_rfc5649(void* kdata, size_t kdata_size, struct key_item_st* kek,
-+	void* output, size_t* output_size, const void* _iv, size_t iv_size)
++/* returns the data item corresponding to desc */
++int ncr_key_item_get_read(struct key_item_st**st, struct ncr_lists *lst,
++	ncr_key_t desc)
 +{
-+size_t n;
-+int i, ret;
-+struct cipher_data ctx;
-+uint8_t iv[8];
-+val64_t *R = NULL;
-+
-+	if (iv_size != 4) {
-+		memcpy(iv, RFC5649_IV, 4);
-+	} else {
-+		memcpy(iv, _iv, 4);
-+	}
-+	iv_size = 8;
-+	iv[4] = (kdata_size >> 24) & 0xff;
-+	iv[5] = (kdata_size >> 16) & 0xff;
-+	iv[6] = (kdata_size >> 8) & 0xff;
-+	iv[7] = (kdata_size) & 0xff;
-+
-+	n = (kdata_size+7)/8;
-+	if (n==1) { /* unimplemented */
-+		err();
-+		return -EINVAL;
-+	}
-+
-+	ret = cryptodev_cipher_init(&ctx, "ecb(aes)", kek->key.secret.data, kek->key.secret.size);
-+	if (ret < 0) {
-+		err();
-+		return ret;
-+	}
-+
-+	R = kmalloc(n * sizeof (*R), GFP_KERNEL);
-+	if (R == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	/* R = P */
-+	for (i=0;i<kdata_size;i++) {
-+		R[i/8][i%8] = ((uint8_t*)kdata)[i];
-+	}
-+
-+	for (;i<n*8;i++) {
-+		R[i/8][i%8] = 0;
-+	}
-+
-+	ret = rfc3394_wrap( R, n, &ctx, output, output_size, iv);
-+	if (ret < 0) {
-+		err();
-+		goto cleanup;
-+	}
-+
-+	ret = 0;
-+
-+cleanup:
-+	kfree(R);
-+	cryptodev_cipher_deinit(&ctx);
-+
-+	return ret;
-+}
-+
-+static int _unwrap_aes_rfc5649(void* kdata, size_t *kdata_size, struct key_item_st* kek,
-+	const void *wrapped_key, size_t wrapped_key_size, const void* _iv, size_t iv_size)
-+{
-+size_t n;
-+int i, ret;
-+struct cipher_data ctx;
-+uint8_t iv[4];
-+size_t size;
-+val64_t *R = NULL, A;
-+
-+	if (iv_size != 4) {
-+		memcpy(iv, RFC5649_IV, 4);
-+	} else {
-+		memcpy(iv, _iv, 4);
-+	}
-+	iv_size = 4;
-+
-+	ret = cryptodev_cipher_init(&ctx, "ecb(aes)", kek->key.secret.data, kek->key.secret.size);
-+	if (ret < 0) {
-+		err();
-+		return ret;
-+	}
-+
-+	if (wrapped_key_size % 8 != 0) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	n = wrapped_key_size/8 - 1;
-+
-+	if (*kdata_size < (n-1)*8) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	R = kmalloc(n * sizeof (*R), GFP_KERNEL);
-+	if (R == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	ret = rfc3394_unwrap(wrapped_key, R, n, A, &ctx);
-+	if (ret < 0) {
-+		err();
-+		goto cleanup;
-+	}
-+
-+	if (memcmp(A, iv, 4)!= 0) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	size = (A[4] << 24) | (A[5] << 16) | (A[6] << 8) | A[7];
-+	if (size > n*8 || size < (n-1)*8 || *kdata_size < size) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	memset(kdata, 0, size);
-+	*kdata_size = size;
-+	for (i=0;i<size;i++) {
-+		((uint8_t*)kdata)[i] = R[i/8][i%8];
-+	}
-+
-+	ret = 0;
-+
-+cleanup:
-+	kfree(R);
-+	cryptodev_cipher_deinit(&ctx);
-+
-+	return ret;
-+}
-+
-+
-+static int wrap_aes_rfc5649(struct key_item_st* tobewrapped, struct key_item_st *kek,
-+	void* output, size_t* output_size, const void* iv, size_t iv_size)
-+{
-+	if (tobewrapped->type != NCR_KEY_TYPE_SECRET) {
-+		err();
-+		return -EINVAL;
-+	}
-+
-+	return _wrap_aes_rfc5649(tobewrapped->key.secret.data, tobewrapped->key.secret.size,
-+		kek, output, output_size, iv, iv_size);
++struct key_item_st* item;
++int ret;
 +	
++	*st = NULL;
++	
++	mutex_lock(&lst->key_idr_mutex);
++	item = idr_find(&lst->key_idr, desc);
++	if (item == NULL) {
++		err();
++		ret = -EINVAL;
++		goto exit;
++	}
++	atomic_inc(&item->refcnt);
++
++	if (atomic_read(&item->writer) != 0) {
++		/* writer in place busy */
++		atomic_dec(&item->refcnt);
++		ret = -EBUSY;
++		goto exit;
++	}
++
++	*st = item;
++	ret = 0;
++
++exit:
++	mutex_unlock(&lst->key_idr_mutex);
++	return ret;
 +}
 +
-+static int unwrap_aes_rfc5649(struct key_item_st* output, struct key_item_st *kek,
-+	void* wrapped, size_t wrapped_size, const void* iv, size_t iv_size)
-+{
-+	output->type = NCR_KEY_TYPE_SECRET;
-+
-+	return _unwrap_aes_rfc5649(output->key.secret.data, &output->key.secret.size, kek, 
-+		wrapped, wrapped_size, iv, iv_size);
-+}
-+		
-+
-+/* Wraps using the RFC3394 way.
++/* as above but will never return anything that
++ * is in use.
 + */
-+static int wrap_aes(struct key_item_st* tobewrapped, struct key_item_st *kek,
-+	void* output, size_t *output_size, const void* iv, size_t iv_size)
++int ncr_key_item_get_write( struct key_item_st** st, 
++	struct ncr_lists *lst, ncr_key_t desc)
 +{
-+size_t key_size, n;
-+uint8_t *raw_key;
-+int i, ret;
-+struct cipher_data ctx;
-+val64_t *R = NULL;
-+
-+	if (tobewrapped->type != NCR_KEY_TYPE_SECRET) {
-+		err();
-+		return -EINVAL;
-+	}
-+	
-+	if (iv_size < sizeof(initA)) {
-+		iv_size = sizeof(initA);
-+		iv = initA;
-+	}
-+
-+	ret = cryptodev_cipher_init(&ctx, "ecb(aes)", kek->key.secret.data, kek->key.secret.size);
-+	if (ret < 0) {
-+		err();
-+		return ret;
-+	}
-+
-+	raw_key = tobewrapped->key.secret.data;
-+	key_size = tobewrapped->key.secret.size;
-+
-+	if (key_size % 8 != 0) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	n = key_size/8;
-+
-+
-+	R = kmalloc(sizeof(*R)*n, GFP_KERNEL);
-+	if (R == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	/* R = P */
-+	for (i=0;i<n;i++) {
-+		memcpy(R[i], &raw_key[i*8], 8);
-+	}
-+
-+	ret = rfc3394_wrap( R, n, &ctx, output, output_size, iv);
-+	if (ret < 0) {
-+		err();
-+		goto cleanup;
-+	}
-+
-+	ret = 0;
-+
-+cleanup:
-+	kfree(R);
-+	cryptodev_cipher_deinit(&ctx);
-+
-+	return ret;
-+}
-+
-+#if 0
-+/* for debugging */
-+void print_val64(char* str, val64_t val)
-+{
-+	int i;
-+	printk("%s: ",str);
-+	for (i=0;i<8;i++)
-+	  printk("%.2x", val[i]);
-+	printk("\n");
-+	
-+}
-+#endif
-+
-+static int unwrap_aes(struct key_item_st* output, struct key_item_st *kek,
-+	void* wrapped_key, size_t wrapped_key_size, const void* iv, size_t iv_size)
-+{
-+size_t n;
-+val64_t A;
-+int i, ret;
-+struct cipher_data ctx;
-+val64_t * R = NULL;
-+
-+	if (iv_size < sizeof(initA)) {
-+		iv_size = sizeof(initA);
-+		iv = initA;
-+	}
-+
-+	ret = cryptodev_cipher_init(&ctx, "ecb(aes)", kek->key.secret.data, kek->key.secret.size);
-+	if (ret < 0) {
-+		err();
-+		return ret;
-+	}
-+
-+	output->type = NCR_KEY_TYPE_SECRET;
-+
-+	if (wrapped_key_size % 8 != 0) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	n = wrapped_key_size/8 - 1;
-+
-+	if (NCR_CIPHER_MAX_KEY_LEN < (n-1)*8) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	R = kmalloc(sizeof(*R)*n, GFP_KERNEL);
-+	if (R == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	ret = rfc3394_unwrap(wrapped_key, R, n, A, &ctx);
-+	if (ret < 0) {
-+		err();
-+		goto cleanup;
-+	}
-+
-+	if (memcmp(A, iv, 8)!= 0) {
-+		err();
-+		ret = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	memset(&output->key, 0, sizeof(output->key));
-+	for (i=0;i<n;i++) {
-+		memcpy(&output->key.secret.data[i*8], R[i], sizeof(R[i]));
-+	}
-+	output->key.secret.size = n*8;
-+	output->flags = NCR_KEY_FLAG_WRAPPABLE;
-+	output->type = NCR_KEY_TYPE_SECRET;
-+
-+	ret = 0;
-+
-+cleanup:
-+	kfree(R);
-+	cryptodev_cipher_deinit(&ctx);
-+
-+	return ret;
-+}
-+
-+static const char *ncr_wrap_name(struct nlattr *tb[])
-+{
-+	const struct nlattr *nla;
-+
-+	nla = tb[NCR_ATTR_WRAPPING_ALGORITHM];
-+	if (nla != NULL)
-+		return nla_data(nla);
-+	return "unknown";
-+}
-+
-+int ncr_key_wrap(struct ncr_lists *lst, const struct ncr_key_wrap *wrap,
-+		 struct nlattr *tb[])
-+{
-+const struct nlattr *nla;
-+struct key_item_st* wkey = NULL;
-+struct key_item_st* key = NULL;
-+void* data = NULL;
-+const void *iv;
-+size_t data_size, iv_size;
++struct key_item_st* item;
 +int ret;
 +
-+	if (wrap->buffer_size < 0) {
++	*st = NULL;
++
++	mutex_lock(&lst->key_idr_mutex);
++	item = idr_find(&lst->key_idr, desc);
++	if (item == NULL) {
 +		err();
-+		return -EINVAL;
++		ret = -EINVAL;
++		goto exit;
++	}
++	/* do not return items that are in use already */
++
++	if (atomic_add_unless(&item->writer, 1, 1)==0) {
++		/* another writer so busy */
++		ret = -EBUSY;
++		goto exit;
 +	}
 +
-+	ret = ncr_key_item_get_read(&wkey, lst, wrap->source_key);
++	if (atomic_add_unless(&item->refcnt, 1, 2)==0) {
++		/* some reader is active so busy */
++		atomic_dec(&item->writer);
++		ret = -EBUSY;
++		goto exit;
++	}
++
++	*st = item;
++	ret = 0;
++
++exit:
++	mutex_unlock(&lst->key_idr_mutex);
++	return ret;
++}
++
++void _ncr_key_item_put( struct key_item_st* item)
++{
++	if (atomic_read(&item->writer) > 0)
++		atomic_dec(&item->writer);
++	if (atomic_dec_and_test(&item->refcnt)) {
++			ncr_limits_remove(item->uid, item->pid, LIMIT_TYPE_KEY);
++			ncr_key_clear(item);
++			kfree(item);
++	}
++}
++
++static void _ncr_key_remove(struct ncr_lists *lst, ncr_key_t desc)
++{
++	struct key_item_st * item;
++
++	mutex_lock(&lst->key_idr_mutex);
++	item = idr_find(&lst->key_idr, desc);
++	if (item != NULL)
++		idr_remove(&lst->key_idr, desc); /* Steal the reference */
++	mutex_unlock(&lst->key_idr_mutex);
++
++	if (item != NULL)
++		_ncr_key_item_put(item);
++}
++
++int ncr_key_init(struct ncr_lists *lst)
++{
++	ncr_key_t desc;
++	struct key_item_st* key;
++	int ret;
++
++	ret = ncr_limits_add_and_check(current_euid(), task_pid_nr(current), LIMIT_TYPE_KEY);
 +	if (ret < 0) {
 +		err();
 +		return ret;
 +	}
 +
-+	if (!(wkey->flags & NCR_KEY_FLAG_WRAPPABLE)) {
++	key = kmalloc(sizeof(*key), GFP_KERNEL);
++	if (key == NULL) {
++		err();
++		ret = -ENOMEM;
++		goto err_limits;
++	}
++
++	memset(key, 0, sizeof(*key));
++
++	atomic_set(&key->refcnt, 1);
++	atomic_set(&key->writer, 0);
++	key->uid = current_euid();
++	key->pid = task_pid_nr(current);
++	key->context_id = lst->id;
++
++	mutex_lock(&lst->key_idr_mutex);
++	/* idr_pre_get() should preallocate enough, and, due to key_idr_mutex,
++	   nobody else can use the preallocated data.  Therefore the loop
++	   recommended in idr_get_new() documentation is not necessary. */
++	if (idr_pre_get(&lst->key_idr, GFP_KERNEL) == 0 ||
++	    idr_get_new(&lst->key_idr, key, &key->desc) != 0) {
++		mutex_unlock(&lst->key_idr_mutex);
++		_ncr_key_item_put(key);
++		return -ENOMEM;
++	}
++	desc = key->desc;
++	mutex_unlock(&lst->key_idr_mutex);
++
++	return desc;
++
++err_limits:
++	ncr_limits_remove(current_euid(), task_pid_nr(current), LIMIT_TYPE_KEY);
++	return ret;
++}
++
++int ncr_key_deinit(struct ncr_lists *lst, ncr_key_t desc)
++{
++	_ncr_key_remove(lst, desc);
++	return 0;
++}
++
++int ncr_key_export(struct ncr_lists *lst, const struct ncr_key_export *data,
++		   struct nlattr *tb[])
++{
++struct key_item_st* item = NULL;
++void* tmp = NULL;
++uint32_t tmp_size;
++int ret;
++
++	if (data->buffer_size < 0) {
++		err();
++		return -EINVAL;
++	}
++
++	ret = ncr_key_item_get_read(&item, lst, data->key);
++	if (ret < 0) {
++		err();
++		return ret;
++	}
++
++	if (!(item->flags & NCR_KEY_FLAG_EXPORTABLE)) {
 +		err();
 +		ret = -EPERM;
 +		goto fail;
 +	}
 +
-+	ret = ncr_key_item_get_read(&key, lst, wrap->wrapping_key);
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
++	switch (item->type) {
++		case NCR_KEY_TYPE_SECRET:
++			if (item->key.secret.size > data->buffer_size) {
++				err();
++				ret = -ERANGE;
++				goto fail;
++			}
 +
-+	data_size = wrap->buffer_size;
-+	data = kmalloc(data_size, GFP_KERNEL);
-+	if (data == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+	
-+	nla = tb[NCR_ATTR_IV];
-+	if (nla != NULL) {
-+		iv = nla_data(nla);
-+		iv_size = nla_len(nla);
-+	} else {
-+		iv = NULL;
-+		iv_size = 0;
-+	}
++			/* found */
++			if (item->key.secret.size > 0) {
++				ret = copy_to_user(data->buffer, item->key.secret.data, item->key.secret.size);
++				if (unlikely(ret)) {
++					err();
++					ret = -EFAULT;
++					goto fail;
++				}
++			}
 +
-+	nla = tb[NCR_ATTR_WRAPPING_ALGORITHM];
-+	if (nla == NULL) {
-+		err();
-+		ret = -EINVAL;
-+		goto fail;
-+	}
-+	if (nla_strcmp(nla, NCR_WALG_AES_RFC3394) == 0)
-+		ret = wrap_aes(wkey, key, data, &data_size, iv, iv_size);
-+	else if (nla_strcmp(nla, NCR_WALG_AES_RFC5649) == 0)
-+		ret = wrap_aes_rfc5649(wkey, key, data, &data_size, iv,
-+				       iv_size);
-+	else {
-+		err();
-+		ret = -EINVAL;
-+	}
-+	
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
++			ret = item->key.secret.size;
++			break;
++		case NCR_KEY_TYPE_PUBLIC:
++		case NCR_KEY_TYPE_PRIVATE:
++			tmp_size = data->buffer_size;
++			
++			tmp = kmalloc(tmp_size, GFP_KERNEL);
++			if (tmp == NULL) {
++				err();
++				ret = -ENOMEM;
++				goto fail;
++			}
 +
-+	ret = copy_to_user(wrap->buffer, data, data_size);
-+	if (unlikely(ret)) {
-+		ret = -EFAULT;
-+		goto fail;
-+	}
++			ret = ncr_pk_pack(item, tmp, &tmp_size);
++			if (ret < 0) {
++				err();
++				goto fail;
++			}
 +
-+	ret = data_size;
++			ret = copy_to_user(data->buffer, tmp, tmp_size);
++			if (unlikely(ret)) {
++				err();
++				ret = -EFAULT;
++				goto fail;
++			}
++			
++			ret = tmp_size;
++			break;
++		default:
++			err();
++			ret = -EINVAL;
++			goto fail;
++	}
 +
 +fail:
-+	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_WRAP, lst->id, -1, NULL,
-+			    ncr_wrap_name(tb), wrap->wrapping_key,
-+			    key != NULL ? key->key_id : NULL,
-+			    key != NULL ? key->key_id_size : 0,
-+			    wrap->source_key,
-+			    wkey != NULL ? wkey->key_id : NULL,
-+			    wkey != NULL ? wkey->key_id_size : 0);
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_EXPORT, lst->id, -1, NULL,
++			    ncr_algorithm_name(item->algorithm), item->desc,
++			    item->key_id, item->key_id_size, -1, NULL, 0);
 +
-+	if (wkey != NULL) _ncr_key_item_put(wkey);
-+	if (key != NULL) _ncr_key_item_put(key);
-+	kfree(data);
-+
++	kfree(tmp);
++	_ncr_key_item_put(item);
 +	return ret;
++	
 +}
 +
-+/* Unwraps keys. All keys unwrapped are not accessible by 
-+ * userspace.
-+ */
-+int ncr_key_unwrap(struct ncr_lists *lst, const struct ncr_key_unwrap *wrap,
++int ncr_key_import(struct ncr_lists *lst, const struct ncr_key_import *data,
 +		   struct nlattr *tb[])
 +{
 +const struct nlattr *nla;
-+struct key_item_st* wkey = NULL;
-+struct key_item_st* key = NULL;
-+void* data = NULL;
-+const void *iv;
-+size_t data_size, iv_size;
++struct key_item_st* item = NULL;
 +int ret;
++void* tmp = NULL;
++size_t tmp_size;
 +
-+	ret = ncr_key_item_get_write(&wkey, lst, wrap->dest_key);
++	ret = ncr_key_item_get_write( &item, lst, data->key);
 +	if (ret < 0) {
 +		err();
 +		return ret;
 +	}
 +
-+	ret = ncr_key_item_get_read(&key, lst, wrap->wrapping_key);
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
++	ncr_key_clear(item);
 +
-+	data_size = wrap->data_size;
-+	data = kmalloc(data_size, GFP_KERNEL);
-+	if (data == NULL) {
++	tmp = kmalloc(data->data_size, GFP_KERNEL);
++	if (tmp == NULL) {
 +		err();
 +		ret = -ENOMEM;
 +		goto fail;
 +	}
-+
-+	if (unlikely(copy_from_user(data, wrap->data, data_size))) {
++	
++	if (unlikely(copy_from_user(tmp, data->data, data->data_size))) {
 +		err();
 +		ret = -EFAULT;
 +		goto fail;
 +	}
++	tmp_size = data->data_size;
 +
-+	nla = tb[NCR_ATTR_IV];
++	nla = tb[NCR_ATTR_KEY_TYPE];
++	if (tb == NULL) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++	item->type = nla_get_u32(nla);
++
++	item->algorithm = _ncr_nla_to_properties(tb[NCR_ATTR_ALGORITHM]);
++	if (item->algorithm == NULL) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++
++	nla = tb[NCR_ATTR_KEY_FLAGS];
++	if (nla != NULL)
++		item->flags = nla_get_u32(nla);
++
++	nla = tb[NCR_ATTR_KEY_ID];
 +	if (nla != NULL) {
-+		iv = nla_data(nla);
-+		iv_size = nla_len(nla);
++		if (nla_len(nla) > MAX_KEY_ID_SIZE) {
++			err();
++			ret = -EOVERFLOW;
++			goto fail;
++		}
++
++		item->key_id_size = nla_len(nla);
++		memcpy(item->key_id, nla_data(nla), item->key_id_size);
++	}
++
++	switch(item->type) {
++		case NCR_KEY_TYPE_SECRET:
++
++			if (tmp_size > NCR_CIPHER_MAX_KEY_LEN) {
++				err();
++				ret = -EINVAL;
++				goto fail;
++			}
++			
++			memcpy(item->key.secret.data, tmp, tmp_size);
++			item->key.secret.size = tmp_size;
++			break;
++		case NCR_KEY_TYPE_PRIVATE:
++		case NCR_KEY_TYPE_PUBLIC:
++			ret = ncr_pk_unpack( item, tmp, tmp_size);
++			if (ret < 0) {
++				err();
++				goto fail;
++			}
++			break;
++
++		default:
++			err();
++			ret = -EINVAL;
++			goto fail;
++	}
++
++	ret = 0;
++
++fail:
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_IMPORT, lst->id, -1, NULL,
++			    ncr_algorithm_name(item->algorithm), item->desc,
++			    item->key_id, item->key_id_size, -1, NULL, 0);
++
++	_ncr_key_item_put(item);
++	kfree(tmp);
++
++	return ret;
++}
++
++static void ncr_key_clear(struct key_item_st* item)
++{
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_ZEROIZE, item->context_id, -1,
++			    NULL, ncr_algorithm_name(item->algorithm),
++			    item->desc, item->key_id, item->key_id_size, -1,
++			    NULL, 0);
++
++	/* clears any previously allocated parameters */
++	if (item->type == NCR_KEY_TYPE_PRIVATE ||
++		item->type == NCR_KEY_TYPE_PUBLIC) {
++		
++		ncr_pk_clear(item);
++	}
++	memset(&item->key, 0, sizeof(item->key));
++	memset(item->key_id, 0, sizeof(item->key_id));
++	item->key_id_size = 0;
++	item->flags = 0;
++	
++	return;
++}
++
++/* Generate a secret key
++ */
++int ncr_key_generate(struct ncr_lists *lst, const struct ncr_key_generate *gen,
++		     struct nlattr *tb[])
++{
++const struct nlattr *nla;
++struct key_item_st* item = NULL;
++const struct algo_properties_st *algo;
++int ret;
++size_t size;
++
++	ret = ncr_key_item_get_write(&item, lst, gen->key);
++	if (ret < 0) {
++		err();
++		return ret;
++	}
++
++	ncr_key_clear(item);
++
++	/* we generate only secret keys */
++	nla = tb[NCR_ATTR_KEY_FLAGS];
++	if (nla != NULL)
++		item->flags = nla_get_u32(nla);
++
++	algo = _ncr_nla_to_properties(tb[NCR_ATTR_ALGORITHM]);
++	if (algo == NULL) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++	item->type = algo->key_type;
++	if (item->type == NCR_KEY_TYPE_SECRET) {
++		u32 key_bits;
++
++		item->algorithm = algo;
++
++		nla = tb[NCR_ATTR_SECRET_KEY_BITS];
++		if (nla == NULL) {
++			err();
++			ret = -EINVAL;
++			goto fail;
++		}
++		key_bits = nla_get_u32(nla);
++		size = key_bits / 8;
++		if (key_bits % 8 != 0 || size > NCR_CIPHER_MAX_KEY_LEN) {
++			err();
++			ret = -EINVAL;
++			goto fail;
++		}
++
++		get_random_bytes(item->key.secret.data, size);
++		item->key.secret.size = size;
++
++		/* generate random key id */
++		item->key_id_size = 5;
++		get_random_bytes(item->key_id, item->key_id_size);
 +	} else {
-+		iv = NULL;
-+		iv_size = 0;
-+	}
-+
-+	nla = tb[NCR_ATTR_WRAPPING_ALGORITHM];
-+	if (nla == NULL) {
 +		err();
 +		ret = -EINVAL;
 +		goto fail;
 +	}
-+	if (nla_strcmp(nla, NCR_WALG_AES_RFC3394) == 0)
-+		ret = unwrap_aes(wkey, key, data, data_size, iv, iv_size);
-+	else if (nla_strcmp(nla, NCR_WALG_AES_RFC5649) == 0)
-+		ret = unwrap_aes_rfc5649(wkey, key, data, data_size, iv,
-+					 iv_size);
-+	else {
++	
++	ret = 0;
++
++fail:
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_GEN, lst->id, -1, NULL,
++			    ncr_algorithm_name(algo), item->desc, item->key_id,
++			    item->key_id_size, -1, NULL, 0);
++
++	if (ret < 0) item->type = NCR_KEY_TYPE_INVALID;
++	_ncr_key_item_put(item);
++	return ret;
++}
++
++int ncr_key_get_info(struct ncr_lists *lst, struct ncr_out *out,
++		     const struct ncr_key_get_info *info, struct nlattr *tb[])
++{
++const struct nlattr *nla;
++const u16 *attr, *attr_end;
++struct key_item_st* item = NULL;
++int ret;
++
++	ret = ncr_key_item_get_read(&item, lst, info->key);
++	if (ret < 0) {
 +		err();
-+		ret = -EINVAL;
++		return ret;
 +	}
 +	
-+fail:
-+	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_UNWRAP, lst->id, -1, NULL,
-+			    ncr_wrap_name(tb), wrap->wrapping_key,
-+			    key != NULL ? key->key_id : NULL,
-+			    key != NULL ? key->key_id_size : 0, wrap->dest_key,
-+			    wkey != NULL ? wkey->key_id : NULL,
-+			    wkey != NULL ? wkey->key_id_size : 0);
++	if (item->type == NCR_KEY_TYPE_INVALID) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
 +
-+	if (wkey != NULL) _ncr_key_item_put(wkey);
-+	if (key != NULL) _ncr_key_item_put(key);
-+	if (data != NULL) kfree(data);
++	nla = tb[NCR_ATTR_WANTED_ATTRS];
++	if (nla == NULL || nla_len(nla) % sizeof(u16) != 0) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++	attr = nla_data(nla);
++	attr_end = attr + nla_len(nla) / sizeof(u16);
++	while (attr < attr_end) {
++		switch (*attr) {
++		case NCR_ATTR_KEY_FLAGS:
++			ret = ncr_out_put_u32(out, *attr, item->flags);
++			break;
++		case NCR_ATTR_KEY_TYPE:
++			ret = ncr_out_put_u32(out, *attr, item->type);
++			break;
++		case NCR_ATTR_ALGORITHM:
++			ret = ncr_out_put_string(out, *attr,
++						 item->algorithm->kstr);
++			break;
++		default:
++			break; /* Silently ignore */
++		}
++		if (ret != 0) {
++			err();
++			goto fail;
++		}
++		attr++;
++	}
++
++	ret = ncr_out_finish(out);
++	if (ret != 0) {
++		err();
++		goto fail;
++	}
++
++fail:
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_GET_INFO, lst->id, -1, NULL,
++			    ncr_algorithm_name(item->algorithm), item->desc,
++			    item->key_id, item->key_id_size, -1, NULL, 0);
++
++	_ncr_key_item_put( item);
 +
 +	return ret;
 +}
 +
-+int ncr_key_storage_wrap(struct ncr_lists *lst,
-+			 const struct ncr_key_storage_wrap *wrap,
-+			 struct nlattr *tb[])
++int ncr_key_generate_pair(struct ncr_lists *lst,
++			  const struct ncr_key_generate_pair *gen,
++			  struct nlattr *tb[])
 +{
-+struct key_item_st* wkey = NULL;
-+void* data = NULL;
-+size_t data_size;
-+uint8_t * sdata = NULL;
-+size_t sdata_size = 0;
++const struct nlattr *nla;
++struct key_item_st* private = NULL;
++struct key_item_st* public = NULL;
 +int ret;
 +
-+	if (master_key.type != NCR_KEY_TYPE_SECRET) {
++	ret = ncr_key_item_get_write(&private, lst, gen->private_key);
++	if (ret < 0) {
 +		err();
-+		return -ENOKEY;
++		goto fail;
 +	}
 +
-+	if (wrap->buffer_size < 0) {
++	ret = ncr_key_item_get_write(&public, lst, gen->public_key);
++	if (ret < 0) {
 +		err();
-+		return -EINVAL;
++		goto fail;
 +	}
 +
-+	ret = ncr_key_item_get_read(&wkey, lst, wrap->key);
++	ncr_key_clear(public);
++	ncr_key_clear(private);
++
++	/* we generate only secret keys */
++	nla = tb[NCR_ATTR_KEY_FLAGS];
++	if (nla != NULL)
++		private->flags = public->flags = nla_get_u32(nla);
++
++	private->algorithm = public->algorithm
++		= _ncr_nla_to_properties(tb[NCR_ATTR_ALGORITHM]);
++	if (private->algorithm == NULL) {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++	public->type = public->algorithm->key_type;
++	private->type = NCR_KEY_TYPE_PRIVATE;
++	public->flags |= (NCR_KEY_FLAG_EXPORTABLE|NCR_KEY_FLAG_WRAPPABLE);
++	
++	if (public->type == NCR_KEY_TYPE_PUBLIC) {
++		ret = ncr_pk_generate(public->algorithm, tb, private, public);
++		if (ret < 0) {
++			err();
++			goto fail;
++		}
++	} else {
++		err();
++		ret = -EINVAL;
++		goto fail;
++	}
++	
++	ret = 0;
++fail:
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_GEN, lst->id, -1, NULL,
++			    ncr_algorithm_name(private != NULL
++					       ? private->algorithm : NULL),
++			    gen->private_key,
++			    private != NULL ? private->key_id : NULL,
++			    private != NULL ? private->key_id_size : 0,
++			    gen->public_key,
++			    public != NULL ? public->key_id : NULL,
++			    public != NULL ? public->key_id_size : 0);
++
++	if (public) {
++		if (ret < 0) public->type = NCR_KEY_TYPE_INVALID;
++		_ncr_key_item_put(public);
++	}
++	if (private) {
++		if (ret < 0) private->type = NCR_KEY_TYPE_INVALID;
++		_ncr_key_item_put(private);
++	}
++	return ret;
++}
++
++int ncr_key_derive(struct ncr_lists *lst, const struct ncr_key_derive *data,
++		   struct nlattr *tb[])
++{
++const struct nlattr *nla;
++int ret;
++struct key_item_st* key = NULL;
++struct key_item_st* newkey = NULL;
++
++	ret = ncr_key_item_get_read(&key, lst, data->input_key);
 +	if (ret < 0) {
 +		err();
 +		return ret;
 +	}
 +
-+	if (!(wkey->flags & NCR_KEY_FLAG_WRAPPABLE)) {
-+		err();
-+		ret = -EPERM;
-+		goto fail;
-+	}
-+
-+	data_size = wrap->buffer_size;
-+	data = kmalloc(data_size, GFP_KERNEL);
-+	if (data == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+	
-+	ret = key_to_storage_data(&sdata, &sdata_size, wkey);
++	ret = ncr_key_item_get_write(&newkey, lst, data->new_key);
 +	if (ret < 0) {
 +		err();
 +		goto fail;
 +	}
 +
-+	ret = _wrap_aes_rfc5649(sdata, sdata_size, &master_key, data, &data_size, NULL, 0);
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
++	ncr_key_clear(newkey);
 +
-+	ret = copy_to_user(wrap->buffer, data, data_size);
-+	if (unlikely(ret)) {
-+		ret = -EFAULT;
-+		goto fail;
-+	}
++	nla = tb[NCR_ATTR_KEY_FLAGS];
++	if (nla != NULL)
++		newkey->flags = nla_get_u32(nla);
 +
-+	ret = data_size;
++	switch (key->type) {
++		case NCR_KEY_TYPE_PUBLIC:
++		case NCR_KEY_TYPE_PRIVATE:
++			ret = ncr_pk_derive(newkey, key, tb);
++			if (ret < 0) {
++				err();
++				goto fail;
++			}
++			break;
++		default:
++			err();
++			ret = -EINVAL;
++			goto fail;
++	}
 +
 +fail:
-+	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_WRAP, lst->id, -1, NULL, NULL,
-+			    -1, NULL, 0, wrap->key,
-+			    wkey != NULL ? wkey->key_id : NULL,
-+			    wkey != NULL ? wkey->key_id_size : 0);
++	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_DERIVE, lst->id, -1, NULL,
++			    ncr_algorithm_name(key->algorithm), key->desc,
++			    key->key_id, key->key_id_size, data->new_key,
++			    newkey != NULL ? newkey->key_id : NULL,
++			    newkey != NULL ? newkey->key_id_size : 0);
 +
-+	if (wkey != NULL) _ncr_key_item_put(wkey);
-+	if (data != NULL) kfree(data);
-+	if (sdata != NULL) kfree(sdata);
-+
++	_ncr_key_item_put(key);
++	if (newkey)
++		_ncr_key_item_put(newkey);
 +	return ret;
-+}
-+
-+int ncr_key_storage_unwrap(struct ncr_lists *lst,
-+			   const struct ncr_key_storage_unwrap *wrap,
-+			   struct nlattr *tb[])
-+{
-+struct key_item_st* wkey = NULL;
-+void* data = NULL;
-+uint8_t * sdata = NULL;
-+size_t sdata_size = 0, data_size;
-+int ret;
-+
-+	if (master_key.type != NCR_KEY_TYPE_SECRET) {
-+		err();
-+		return -ENOKEY;
-+	}
-+
-+	ret = ncr_key_item_get_write(&wkey, lst, wrap->key);
-+	if (ret < 0) {
-+		err();
-+		return ret;
-+	}
-+
-+	data_size = wrap->data_size;
-+	data = kmalloc(data_size, GFP_KERNEL);
-+	if (data == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+
-+	if (unlikely(copy_from_user(data, wrap->data, data_size))) {
-+		err();
-+		ret = -EFAULT;
-+		goto fail;
-+	}
-+
-+	sdata_size = data_size;
-+	sdata = kmalloc(sdata_size, GFP_KERNEL);
-+	if (sdata == NULL) {
-+		err();
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+
-+	wkey->flags = NCR_KEY_FLAG_WRAPPABLE;
-+
-+	ret = _unwrap_aes_rfc5649(sdata, &sdata_size, &master_key, data, data_size, NULL, 0);
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
-+
-+	ret = key_from_storage_data(wkey, sdata, sdata_size);
-+	if (ret < 0) {
-+		err();
-+		goto fail;
-+	}
 +	
-+
-+fail:
-+	audit_log_crypto_op(AUDIT_CRYPTO_OP_KEY_UNWRAP, lst->id, -1, NULL, NULL,
-+			    -1, NULL, 0, wrap->key,
-+			    wkey != NULL ? wkey->key_id : NULL,
-+			    wkey != NULL ? wkey->key_id_size : 0);
-+
-+	if (wkey != NULL) _ncr_key_item_put(wkey);
-+	if (data != NULL) kfree(data);
-+	if (sdata != NULL) kfree(sdata);
-+
-+	return ret;
 +}
-diff --git a/crypto/userspace/ncr.c b/crypto/userspace/ncr.c
-new file mode 100644
-index 0000000..1838aab
---- /dev/null
-+++ b/crypto/userspace/ncr.c
-@@ -0,0 +1,29 @@
-+/*
-+ * New driver for /dev/crypto device (aka CryptoDev)
-+ *
-+ * Copyright (c) 2010 Katholieke Universiteit Leuven
-+ *
-+ * Author: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-+ *
-+ * This file is part of linux cryptodev.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ * 
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ * 
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-+ */
 +
-+#include "ncr-int.h"
-+
-+/* This is the master wrapping key for storage of keys
-+ */
-+struct key_item_st master_key;
 -- 
 1.7.2.1
