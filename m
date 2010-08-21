@@ -1,62 +1,53 @@
-From: Ted Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
-Date: Fri, 20 Aug 2010 19:48:11 -0400
-Message-ID: <20100820234811.GB10450@thunk.org>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
- <20100820135612.GC4053@thunk.org>
- <4C6EB556.3050608@gmail.com>
+From: Miloslav Trmac <mitr@redhat.com>
+Subject: Re: [PATCH 06/19] Add ioctl() argument and attribute handling utils
+Date: Fri, 20 Aug 2010 22:15:41 -0400 (EDT)
+Message-ID: <1833173750.1044971282356941800.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <4C6E7C1A.1070203@s5r6.in-berlin.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
-	linux-kernel@vger.kernel.org
-To: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
+To: Stefan Richter <stefanr@s5r6.in-berlin.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from thunk.org ([69.25.196.29]:44225 "EHLO thunker.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750915Ab0HTXsg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Aug 2010 19:48:36 -0400
-Content-Disposition: inline
-In-Reply-To: <4C6EB556.3050608@gmail.com>
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:41063 "EHLO
+	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751027Ab0HUCP4 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 Aug 2010 22:15:56 -0400
+In-Reply-To: <4C6E7C1A.1070203@s5r6.in-berlin.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 20, 2010 at 07:03:18PM +0200, Nikos Mavrogiannopoulos wrote=
-:
-> On 08/20/2010 03:56 PM, Ted Ts'o wrote:
-> > On Fri, Aug 20, 2010 at 10:45:43AM +0200, Miloslav Trma=C4=8D wrote=
-:
-> >> Hello, following is a patchset providing an user-space interface t=
-o
-> >> the kernel crypto API.  It is based on the older, BSD-compatible,
-> >> implementation, but the user-space interface is different.
-> >=20
-> > What's the goal of exporting the kernel crypto routines to userspac=
-e,
-> > as opposed to just simply doing the crypto in userspace?=20
+----- "Stefan Richter" <stefanr@s5r6.in-berlin.de> wrote:
+> Miloslav Trma=C4=8D wrote:
+> > --- /dev/null
+> > +++ b/crypto/userspace/utils.c
+> [...]
+> > +#ifdef CONFIG_COMPAT
+> > +/* max() is too clever for compile-time constants */
+> > +#define CONST_MAX(A, B) ((A) > (B) ? (A) : (B))
+> > +
+> > +#define MAX_SESSION_INPUT_DATA_SIZE					\
+> > +	(CONST_MAX(sizeof(struct ncr_session_input_data),		\
+> > +		   sizeof(struct compat_ncr_session_input_data)))
+> > +#define MAX_SESSION_OUTPUT_BUFFER_SIZE					\
+> > +	(CONST_MAX(sizeof(struct ncr_session_output_buffer),		\
+> > +		   sizeof(struct compat_ncr_session_output_buffer)))
+> > +
+> > +#else /* !CONFIG_COMPAT */
+> > +
+> > +#define MAX_SESSION_INPUT_DATA_SIZE (sizeof(struct ncr_session_inp=
+ut_data))
+> > +#define MAX_SESSION_OUTPUT_BUFFER_SIZE			\
+> > +	(sizeof(struct ncr_session_output_buffer))
+> > +
+> > +#endif /* !CONFIG_COMPAT */
 >=20
-> This was the goal of the original cryptodev OpenBSD API and the
-> subsequent linux port in http://home.gna.org/cryptodev-linux/. In
-> typical PCs it might even be slower to use such an accelerator in ker=
-nel
-> space, but in embedded systems where the hardware version of AES migh=
-t
-> be 100 times faster than the software it might make sense.
-
-OK, but I hope that in that case, we don't go encouraging applications
-to use the /dev/crypto API directly.  I know a number of distributions
-have been standardizing on NSS as the library that all of their
-applications will use, such that by simply configuring libnss
-differently, the crypto can either be done in userspace, or it can be
-done in hardware, either for crypto acceleration purposes or for when
-the key is locked inside hardware can only be used with appropriate
-authentication to encrypt or sign data passed to the hardware device.
-
-If you encourage applications to use /dev/crypto directly, then either
-(a) they will be much slower on PC's, or (b) the applications will
-need to be rewritten when they are moved between your embedded devices
-and standard PC's.
-
-					- Ted
+> struct compat_xyz cannot be bigger than struct xyz, can it?
+Perhaps not, but the code has been written and it's easier to keep it t=
+han to speculate :)  It also helps document the fact that the data form=
+at depends on properties of the userspace.
+    Mirek
