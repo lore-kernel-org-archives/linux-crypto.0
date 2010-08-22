@@ -1,150 +1,139 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [linux-cifs-client][patch] Make NTLMv2 as auth mech withing
- NTLMSSP and enable signing using crypto shash APIs
-Date: Sat, 21 Aug 2010 19:38:17 -0400
-Message-ID: <20100821193817.7800d19d@tlielax.poochiereds.net>
-References: <1280975679-9096-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20100821071441.3b9cbef5@tlielax.poochiereds.net>
-	<AANLkTi=79uJyM-i99KxrEmyECPoCPXPnsdY7HwGc9UtA@mail.gmail.com>
+From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
+Date: Sun, 22 Aug 2010 09:52:14 +0200
+Message-ID: <4C70D72E.2040605@gmail.com>
+References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <201008211908.03705.arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org,
-	samba-technical@samba.org, linux-crypto@vger.kernel.org
-To: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Cc: =?UTF-8?B?TWlsb3NsYXYgVHJtYcSN?= <mitr@redhat.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
+	linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cdptpa-omtalb.mail.rr.com ([75.180.132.120]:43430 "EHLO
-	cdptpa-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751668Ab0HUXiU convert rfc822-to-8bit (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:36970 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751485Ab0HVHwS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 Aug 2010 19:38:20 -0400
-In-Reply-To: <AANLkTi=79uJyM-i99KxrEmyECPoCPXPnsdY7HwGc9UtA@mail.gmail.com>
+	Sun, 22 Aug 2010 03:52:18 -0400
+In-Reply-To: <201008211908.03705.arnd@arndb.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 21 Aug 2010 09:23:11 -0500
-Shirish Pargaonkar <shirishpargaonkar@gmail.com> wrote:
+On 08/21/2010 07:08 PM, Arnd Bergmann wrote:
+> On Friday 20 August 2010 10:45:43 Miloslav Trma=C4=8D wrote:
+>>
+>> Major changes since the previous post:
+>> * "struct nlattr"-based extensible attributes used for extensibility
+>>   of most operations, both for input and output attributes
+> The API here looks overly complex resulting from the use of a combina=
+tion
+> of ioctl and netlink. If your interface cannot be easily expressed us=
+ing
+> simple (no indirect pointers or variable-length fields please) ioctl
+> and read/write operations, why not go all the way and turn the interf=
+ace
+> into a netlink facility?
 
-> On Sat, Aug 21, 2010 at 6:14 AM, Jeff Layton <jlayton@samba.org> wrot=
-e:
-> > On Wed, =A04 Aug 2010 21:34:39 -0500
-> > shirishpargaonkar@gmail.com wrote:
-> >
-> >> Make ntlmv2 as an authentication mechanism within ntlmssp
-> >> instead of ntlmv1.
-> >> Parse type 2 response in ntlmssp negotiation to pluck
-> >> AV pairs and use them to calculate ntlmv2 response token.
-> >> Also, assign domain name from the sever response in type 2
-> >> packet of ntlmssp and use that (netbios) domain name in
-> >> calculation of response.
-> >>
-> >> Enable cifs/smb signing using rc4 and md5.
-> >>
-> >> Changed name of the structure mac_key to session_key to reflect
-> >> the type of key it holds.
-> >>
-> >> Use kernel crypto_shash_* APIs instead of the equivalent cifs func=
-tions.
-> >>
-> >>
-> >> From 6ab552fd60804f3c708e1745ca936112fc9f9821 Mon Sep 17 00:00:00 =
-2001
-> >> From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-> >> Date: Wed, 4 Aug 2010 17:24:07 -0500
-> >> Subject: [PATCH] Make ntlmv2 as auth mech and enable signing using=
- crypto_shash APIs
-> >>
-> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-> >> ---
-> >> =A0fs/cifs/asn1.c =A0 =A0 =A0 =A0| =A0 =A06 +-
-> >> =A0fs/cifs/cifsencrypt.c | =A0416 ++++++++++++++++++++++++++++++++=
-++--------------
-> >> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 18 ++-
-> >> =A0fs/cifs/cifspdu.h =A0 =A0 | =A0 =A07 +-
-> >> =A0fs/cifs/cifsproto.h =A0 | =A0 12 +-
-> >> =A0fs/cifs/cifssmb.c =A0 =A0 | =A0 13 +-
-> >> =A0fs/cifs/connect.c =A0 =A0 | =A0 13 ++-
-> >> =A0fs/cifs/ntlmssp.h =A0 =A0 | =A0 13 ++
-> >> =A0fs/cifs/sess.c =A0 =A0 =A0 =A0| =A0118 +++++++++++----
-> >> =A0fs/cifs/transport.c =A0 | =A0 =A06 +-
-> >> =A010 files changed, 450 insertions(+), 172 deletions(-)
-> >>
-> >
-> > Overall this looks like a good change, but this patch is rather lar=
-ge.
-> > That makes it tough to bisect for bugs and to review...
-> >
-> > Would it be possible to break it up some? Maybe a patch (or patches=
-) to
-> > convert the existing code to using the crypto api's and then anothe=
-r
-> > set to fix up the NTLMSSP code?
-> >
-> > Also, with the conversion to the crypto API's can we remove some of=
- the
-> > cifs private crypto routines in smbencrypt.c? That would be a nice
-> > follow-on patch. It seems like switching to use the crypto API's sh=
-ould
-> > mean a net reduction in code.
-> >
-> >> diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
-> >> index cfd1ce3..21f0fbd 100644
-> >> --- a/fs/cifs/asn1.c
-> >> +++ b/fs/cifs/asn1.c
-> >> @@ -597,13 +597,13 @@ decode_negTokenInit(unsigned char *security_=
-blob, int length,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (co=
-mpare_oid(oid, oidlen, MSKRB5_OID,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 MSKRB5_OID_LEN))
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 server->sec_mskerberos =3D true;
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if =
-(compare_oid(oid, oidlen, KRB5U2U_OID,
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (comp=
-are_oid(oid, oidlen, KRB5U2U_OID,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0KRB5U2U_OID_LEN))
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 server->sec_kerberosu2u =3D true;
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if =
-(compare_oid(oid, oidlen, KRB5_OID,
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (comp=
-are_oid(oid, oidlen, KRB5_OID,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0KRB5_OID_LEN))
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 server->sec_kerberos =3D true;
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if =
-(compare_oid(oid, oidlen, NTLMSSP_OID,
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (comp=
-are_oid(oid, oidlen, NTLMSSP_OID,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NTLMSSP_OID_LEN))
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 server->sec_ntlmssp =3D true;
-> >>
-> >
-> > Why change the above? If compare_oid returns true on any of them, t=
-hen
-> > the others will return false. The else clauses ought to stay, IMO..=
+I believe that this is the result of the discussion in the version 1 of
+the proposal. The original API was specified with ioctls only.
+
+>> * Full compat_ioctl implementation
+> New drivers should be written to *avoid* compat_ioctl calls, using on=
+ly
+> very simple fixed-length data structures as ioctl commands.
+
+There are cases where this cannot be easily done, when say pointers are
+involved. IMHO forcing pointers to be u64 or u32 is dirtier than using
+the compat interface.
+
+>> * Version number added to the data format used when wrapping keys fo=
+r storage
+> Again, wrong direction. If you think you need a version number, the i=
+nterface
+> is probably not ready for inclusion yet. Make sure it is simple enoug=
+h that
+> you don't run into the case where you have to make incompatible chang=
+es
+> that require API versioning.
+
+Note that the version number is not to the interface but to data that
+are intended for storage. It is desirable to have such a version there.
+
+>>   The libtom* patches will probably still be too large for the maili=
+ng list;
+>>   the whole patch set is also available at
+>>   http://people.redhat.com/mitr/cryptodev-ncr/v2/ .
+> They actually seem to have made it to the list. However, the more sig=
+nficant
+> problem is the amount of code added to a security module. 20000 lines=
+ of
+> code that is essentially a user-level library moved into kernel space
+> can open up so many possible holes that you end up with a less secure
+> (and slower) setup in the end than just doing everything in user spac=
+e.
+
+The same argument could apply to an other algorithm in the kernel such
+as deflate, lzma, AES etc. There are cases that the benefits outweigh
+the risks of adding them. I believe this is such a case.
+
+>> These are the major differences compared to the BSD-like interface:
+>> * The API supports key storage and management inside the kernel.
+>>   An application can thus ask the kernel to generate a key; the key =
+is
+>>   then referenced via an integer identifier, and the application can=
+ be
+>>   prevented from accessing the raw key data.  Such a key can, if so =
+configured,
+>>   still be wrapped for key transport to the recipient of the message=
+, and
+>>   unwrapped by the recipient.
+> As Kyle mentioned, we already have a key management API in the kernel=
 =2E
+> I think you should make a better effort of interfacing with that and
+> adding features you need to it, like a way to prevent the kernel from
+> handing out keys as you mentioned in your reply.
+
+Note that the NCR does not do key management. Integrating with the key
+management API could be nice, but it is not something critical and is
+not duplicating code or efforts in any way.
+
+>>   An user-space library is not separated, options are a) root
+>>   running daemon that does crypto, but this would be slow due to con=
+text
+>>   switches, scheduler mismatching and all the IPC overhead and b) us=
+e crypto
+>>   that is in the kernel.
+> I think you will have to back that statement by measurements. There a=
+re
+> reasonably fast ways to do IPC and the interface you suggest to put i=
+n the
+> kernel does not exactly look tuned for performance.
+
+This is an alternative design. There quite some reasons against that,
+such as the auditing features. For me the main reason was  that there
+was no way to make it as fast (zero-copy) as this design, for the
+requirements we had (interface with existing crypto libraries through
+pkcs11). Zero-copy is important since crypto operations might involve
+large chunks of data.
+
+>> * FIPS-140-3 calls out for cryptographic functions to be non-debugga=
+ble (ptrace)
+>>   meaning that you cannot get to the key material. The solution is t=
+he same as
+>>   above.
 >=20
-> Jeff, with this the authentication mechanism always defaults to kerbe=
-ros
-> (if server supports it) even if an user wants to use a different auth
-> mech this way
-> e.g. sec=3Dntlm/ntlmi or sec=3Dntlmv2/ntlmv2i.
->=20
+> We have kgdb, kdb, qemu gdbserver, tracing and more things that would=
+ very
+> much make your code debuggable.
+> OTOH, disabling ptrace with a root-only prctl should be an easy thing=
+ to
+> implement if there is a use case for it.
 
-I don't think we're talking about the same thing here.
+You are right. Debugging by the administrator was not an issue. Only
+users should be prevented from that. It should have been mentioned.
 
-The above change doesn't change which of the sec_* flags end up set
-when decode_negTokenInit returns. It just means that the function does
-more parsing than it needs to.
 
-The change you're talking about is the one in CIFS_SessSetup. That one
-looks correct, I think.
-
---=20
-Jeff Layton <jlayton@samba.org>
+regards,
+Nikos
