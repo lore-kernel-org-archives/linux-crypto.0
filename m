@@ -1,139 +1,29 @@
-From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
-Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
-Date: Sun, 22 Aug 2010 09:52:14 +0200
-Message-ID: <4C70D72E.2040605@gmail.com>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <201008211908.03705.arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?UTF-8?B?TWlsb3NsYXYgVHJtYcSN?= <mitr@redhat.com>,
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 01/19] User-space API definition
+Date: Sun, 22 Aug 2010 11:22:47 +0100
+Message-ID: <28995.1282472567@redhat.com>
+References: <4C6FE8A5.30309@gnutls.org> <1282293963-27807-1-git-send-email-mitr@redhat.com> <1282293963-27807-2-git-send-email-mitr@redhat.com> <AANLkTinzUuihbS_Znm1rgxPPxiLTXeNx8ySF8LHqU=Jz@mail.gmail.com>
+Cc: dhowells@redhat.com, Kyle Moffett <kyle@moffetthome.net>,
+	=?UTF-8?B?TWlsb3NsYXYgVHJtYcSN?= <mitr@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
 	linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:36970 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751485Ab0HVHwS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Aug 2010 03:52:18 -0400
-In-Reply-To: <201008211908.03705.arnd@arndb.de>
+Received: from mx1.redhat.com ([209.132.183.28]:32315 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752158Ab0HVKXN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 22 Aug 2010 06:23:13 -0400
+In-Reply-To: <4C6FE8A5.30309@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/21/2010 07:08 PM, Arnd Bergmann wrote:
-> On Friday 20 August 2010 10:45:43 Miloslav Trma=C4=8D wrote:
->>
->> Major changes since the previous post:
->> * "struct nlattr"-based extensible attributes used for extensibility
->>   of most operations, both for input and output attributes
-> The API here looks overly complex resulting from the use of a combina=
-tion
-> of ioctl and netlink. If your interface cannot be easily expressed us=
-ing
-> simple (no indirect pointers or variable-length fields please) ioctl
-> and read/write operations, why not go all the way and turn the interf=
-ace
-> into a netlink facility?
+Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
 
-I believe that this is the result of the discussion in the version 1 of
-the proposal. The original API was specified with ioctls only.
+> It is not that simple. My understanding of the keyring API is that it
+> allows exporting of the keys to user-space and this crypto API
+> explicitly prevents that
 
->> * Full compat_ioctl implementation
-> New drivers should be written to *avoid* compat_ioctl calls, using on=
-ly
-> very simple fixed-length data structures as ioctl commands.
+That's simple.  Don't provide a read() key type operation, then.
 
-There are cases where this cannot be easily done, when say pointers are
-involved. IMHO forcing pointers to be u64 or u32 is dirtier than using
-the compat interface.
-
->> * Version number added to the data format used when wrapping keys fo=
-r storage
-> Again, wrong direction. If you think you need a version number, the i=
-nterface
-> is probably not ready for inclusion yet. Make sure it is simple enoug=
-h that
-> you don't run into the case where you have to make incompatible chang=
-es
-> that require API versioning.
-
-Note that the version number is not to the interface but to data that
-are intended for storage. It is desirable to have such a version there.
-
->>   The libtom* patches will probably still be too large for the maili=
-ng list;
->>   the whole patch set is also available at
->>   http://people.redhat.com/mitr/cryptodev-ncr/v2/ .
-> They actually seem to have made it to the list. However, the more sig=
-nficant
-> problem is the amount of code added to a security module. 20000 lines=
- of
-> code that is essentially a user-level library moved into kernel space
-> can open up so many possible holes that you end up with a less secure
-> (and slower) setup in the end than just doing everything in user spac=
-e.
-
-The same argument could apply to an other algorithm in the kernel such
-as deflate, lzma, AES etc. There are cases that the benefits outweigh
-the risks of adding them. I believe this is such a case.
-
->> These are the major differences compared to the BSD-like interface:
->> * The API supports key storage and management inside the kernel.
->>   An application can thus ask the kernel to generate a key; the key =
-is
->>   then referenced via an integer identifier, and the application can=
- be
->>   prevented from accessing the raw key data.  Such a key can, if so =
-configured,
->>   still be wrapped for key transport to the recipient of the message=
-, and
->>   unwrapped by the recipient.
-> As Kyle mentioned, we already have a key management API in the kernel=
-=2E
-> I think you should make a better effort of interfacing with that and
-> adding features you need to it, like a way to prevent the kernel from
-> handing out keys as you mentioned in your reply.
-
-Note that the NCR does not do key management. Integrating with the key
-management API could be nice, but it is not something critical and is
-not duplicating code or efforts in any way.
-
->>   An user-space library is not separated, options are a) root
->>   running daemon that does crypto, but this would be slow due to con=
-text
->>   switches, scheduler mismatching and all the IPC overhead and b) us=
-e crypto
->>   that is in the kernel.
-> I think you will have to back that statement by measurements. There a=
-re
-> reasonably fast ways to do IPC and the interface you suggest to put i=
-n the
-> kernel does not exactly look tuned for performance.
-
-This is an alternative design. There quite some reasons against that,
-such as the auditing features. For me the main reason was  that there
-was no way to make it as fast (zero-copy) as this design, for the
-requirements we had (interface with existing crypto libraries through
-pkcs11). Zero-copy is important since crypto operations might involve
-large chunks of data.
-
->> * FIPS-140-3 calls out for cryptographic functions to be non-debugga=
-ble (ptrace)
->>   meaning that you cannot get to the key material. The solution is t=
-he same as
->>   above.
->=20
-> We have kgdb, kdb, qemu gdbserver, tracing and more things that would=
- very
-> much make your code debuggable.
-> OTOH, disabling ptrace with a root-only prctl should be an easy thing=
- to
-> implement if there is a use case for it.
-
-You are right. Debugging by the administrator was not an issue. Only
-users should be prevented from that. It should have been mentioned.
-
-
-regards,
-Nikos
+David
