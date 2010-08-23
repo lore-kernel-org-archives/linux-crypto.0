@@ -1,76 +1,110 @@
 From: Miloslav Trmac <mitr@redhat.com>
-Subject: Re: [PATCH 01/19] User-space API definition
-Date: Mon, 23 Aug 2010 11:37:40 -0400 (EDT)
-Message-ID: <1269957386.1124701282577860651.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <1278368294.1123931282577639823.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
+Date: Mon, 23 Aug 2010 12:03:28 -0400 (EDT)
+Message-ID: <623164086.1128831282579408813.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <1291324238.1127211282578687312.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org,
-	David Howells <dhowells@redhat.com>
-To: Kyle Moffett <kyle@moffetthome.net>
+	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:55518 "EHLO
-	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751520Ab0HWPjK convert rfc822-to-8bit
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:52522 "EHLO
+	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754380Ab0HWQE6 convert rfc822-to-8bit
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Aug 2010 11:39:10 -0400
-In-Reply-To: <1278368294.1123931282577639823.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+	Mon, 23 Aug 2010 12:04:58 -0400
+In-Reply-To: <1291324238.1127211282578687312.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Kyle Moffett" <kyle@moffetthome.net> wrote:
-> On Fri, Aug 20, 2010 at 04:45, Miloslav Trma=C4=8D <mitr@redhat.com>
-> wrote:
-> > * ioctl(NCRIO_KEY_INIT) to allocate a key object; then generate the=
- key
-> > =C2=A0material inside the kernel, load a plaintext key, unwrap a ke=
-y, or
-> > =C2=A0derive a key. =C2=A0Similarly the key material can be copied =
-out of the
-> > =C2=A0kernel or wrapped.
-> >
-> Ugh... We already have one very nice key/keyring API in the kernel
-> (see Documentation/keys.txt) that's being used for crypto keys for
-> NFSv4, AFS, etc.  Can't you just add a bunch of cryptoapi key types t=
-o
-> that API instead?
-I have examined that API; going purely by the names, having only one fa=
-cility to manage "keys" does sound reasonable.
+----- "Arnd Bergmann" <arnd@arndb.de> wrote:
 
-Looking at the details, the keyring API is primarily designed for long-=
-term secure storage of unstructured, named blobs, in various namespaces=
- - in some respects it is quite similar to a memory-only filesystem: ea=
-ch key has an explicit name and permissions, there is a hierarchy, and =
-keys are designed to be shared between processes (although in some name=
-spaces they are not).
+> On Friday 20 August 2010 10:45:43 Miloslav Trma=C4=8D wrote:
+> >=20
+> > Major changes since the previous post:
+> > * "struct nlattr"-based extensible attributes used for extensibilit=
+y
+> >   of most operations, both for input and output attributes
+>=20
+> The API here looks overly complex resulting from the use of a combina=
+tion
+> of ioctl and netlink. If your interface cannot be easily expressed us=
+ing
+> simple (no indirect pointers or variable-length fields please) ioctl
+> and read/write operations, why not go all the way and turn the interf=
+ace
+> into a netlink facility?
+I'm afraid the flexibility is necessary: immediately after posting the =
+first interface with fixed structures there were requests for extension=
+s that would be difficult or impossible to implement using the structur=
+es; crypto is not something fixed, new algorithms with algorithm-specif=
+ic parameters appear all the time.  On the positive side, the implement=
+ation of session_once as shorthand for session_{init,update,final} is m=
+uch nicer with the netlink attributes.
 
-The keys for crypto are often short-lived, almost exclusively local to =
-a specific process, most don't have an unique name (which means a kerne=
-l-choosen integer is a better identifier than an application-choosen st=
-ring, especially if user-space libraries hide the existence of the kern=
-el crypto API from applications, because choosing an unique string iden=
-tifier is non-trivial).  The crypto keys also are also formatted for us=
-e by a specific algorithm, often using a non-trivial format (e.g. a RSA=
- key should be internally stored as the separate integer components, no=
-t as a blob).  They have some attribute flags, with no overlap with the=
- flags in the keyring API.
+Using netlink sockets is impractical: support of zero-copy encryption a=
+nd auditing requires that operations are performed synchronously in the=
+ task context, and the extra overhead of netlink is non-trivial (ioctl(=
+) is one syscall per operation, netlink is at least two syscalls per op=
+eration); based on a very crude benchmark, this results in about 20% pe=
+rformance penalty when encrypting 256 bytes using cbc(aes) - and that i=
+s not counting the impossibility to do zero-copy operations with netlin=
+k).  Also matching netlink replies to requests can be complex in a mult=
+i-threaded environments if there is one /dev/crypto file descriptor per=
+ process.
 
-I can see almost no overlap between the two sets of requirements.  Prob=
-ably the only common use case is handling session keys (e.g. keys used =
-in a kerberos ticket), which should be stored in the kernel for the dur=
-ation of the session, made available to each process in the session, an=
-d available as keys for kernel crypto.  Such keys will be in the minori=
-ty, though, and it seems to me the best approach for handling these is =
-to allow key export/import from/to keyring keys in addition to export/i=
-mport from/to data in userspace: the long-term storage would be handled=
- by the existing keyring API, which stores the key as unformatted binar=
-y data, and import into the crypto context would convert the key into t=
-he internal representation more suitable for crypto.
+> >   The libtom* patches will probably still be too large for the mail=
+ing list;
+> >   the whole patch set is also available at
+> >   http://people.redhat.com/mitr/cryptodev-ncr/v2/ .
+>=20
+> They actually seem to have made it to the list. However, the more sig=
+nficant
+> problem is the amount of code added to a security module. 20000 lines=
+ of
+> code that is essentially a user-level library moved into kernel space
+> can open up so many possible holes that you end up with a less secure
+> (and slower) setup in the end than just doing everything in user
+> space.
+Yes, it's a lot of code.   I'm afraid some of the security profiles req=
+uire public key algorithms, giving some Linux users no choice in the ma=
+tter.
 
-I have seriously considered the keyring API, and this is what I came up=
- with - but I'd love to be shown a better way.
+On the other hand, the user-space crypto API is not inherently tied to =
+the existence of these algorithms; if the public key algorithms were co=
+mpletely unacceptable for some reason, that should still make it possib=
+le to add the crypto API as such.
+
+> >   An user-space library is not separated, options are a) root
+> >   running daemon that does crypto, but this would be slow due to co=
+ntext
+> >   switches, scheduler mismatching and all the IPC overhead and b) u=
+se crypto
+> >   that is in the kernel.
+>=20
+> I think you will have to back that statement by measurements. There a=
+re
+> reasonably fast ways to do IPC and the interface you suggest to put i=
+n the
+> kernel does not exactly look tuned for performance.
+See above for the effect of a single additional syscall.  Crypto is oft=
+en done on small amounts of data at a time (one TLS/SSH record, which c=
+an be thousands of bytes in favorable cases, tens of bytes in the worst=
+ case), and each context switch is comparatively costly.
+
+> > * FIPS-140-3 calls out for cryptographic functions to be non-debugg=
+able (ptrace)
+> >   meaning that you cannot get to the key material. The solution is =
+the same as
+> >   above.
+>=20
+> We have kgdb, kdb, qemu gdbserver, tracing and more things that would=
+ very
+> much make your code debuggable.
+The system administrator is usually considered to be excluded from the =
+requirements of such standards.
     Mirek
