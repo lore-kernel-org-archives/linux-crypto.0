@@ -1,72 +1,102 @@
-From: Tomas Mraz <tmraz@redhat.com>
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
-Date: Mon, 23 Aug 2010 08:39:30 +0200
-Message-ID: <1282545570.7909.32.camel@vespa.frost.loc>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
-	 <20100820135612.GC4053@thunk.org> <4C6EB556.3050608@gmail.com>
-	 <20100820234811.GB10450@thunk.org>
+Date: Mon, 23 Aug 2010 10:09:54 +0200
+Message-ID: <201008231009.55037.arnd@arndb.de>
+References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <201008211908.03705.arnd@arndb.de> <4C70D72E.2040605@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: Text/Plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Miloslav =?UTF-8?Q?Trma=C4=8D?= <mitr@redhat.com>,
+Cc: Miloslav =?utf-8?q?Trma=C4=8D?= <mitr@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
 	linux-kernel@vger.kernel.org
-To: "Ted Ts'o" <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36085 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751978Ab0HWGjk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Aug 2010 02:39:40 -0400
-In-Reply-To: <20100820234811.GB10450@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4C70D72E.2040605@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2010-08-20 at 19:48 -0400, Ted Ts'o wrote:=20
-> On Fri, Aug 20, 2010 at 07:03:18PM +0200, Nikos Mavrogiannopoulos wro=
-te:
-> > On 08/20/2010 03:56 PM, Ted Ts'o wrote:
-> > > On Fri, Aug 20, 2010 at 10:45:43AM +0200, Miloslav Trma=E8 wrote:
-> > >> Hello, following is a patchset providing an user-space interface=
- to
-> > >> the kernel crypto API.  It is based on the older, BSD-compatible=
-,
-> > >> implementation, but the user-space interface is different.
-> > >=20
-> > > What's the goal of exporting the kernel crypto routines to usersp=
-ace,
-> > > as opposed to just simply doing the crypto in userspace?=20
-> >=20
-> > This was the goal of the original cryptodev OpenBSD API and the
-> > subsequent linux port in http://home.gna.org/cryptodev-linux/. In
-> > typical PCs it might even be slower to use such an accelerator in k=
-ernel
-> > space, but in embedded systems where the hardware version of AES mi=
-ght
-> > be 100 times faster than the software it might make sense.
+On Sunday 22 August 2010 09:52:14 Nikos Mavrogiannopoulos wrote:
+> On 08/21/2010 07:08 PM, Arnd Bergmann wrote:
+> > On Friday 20 August 2010 10:45:43 Miloslav Trma=C4=8D wrote:
+
+> >> * Full compat_ioctl implementation
+> > New drivers should be written to *avoid* compat_ioctl calls, using =
+only
+> > very simple fixed-length data structures as ioctl commands.
 >=20
-> OK, but I hope that in that case, we don't go encouraging application=
-s
-> to use the /dev/crypto API directly.  I know a number of distribution=
-s
-> have been standardizing on NSS as the library that all of their
-> applications will use, such that by simply configuring libnss
-> differently, the crypto can either be done in userspace, or it can be
-> done in hardware, either for crypto acceleration purposes or for when
-> the key is locked inside hardware can only be used with appropriate
-> authentication to encrypt or sign data passed to the hardware device.
+> There are cases where this cannot be easily done, when say pointers a=
+re
+> involved. IMHO forcing pointers to be u64 or u32 is dirtier than usin=
+g
+> the compat interface.
 
-Yes, this exactly is the plan. All the major crypto libraries - NSS,
-OpenSSL, libgcrypt - are going to be patched to use the kernel API in
-case they are configured to. By default they will still be using their
-internal implementation of the cryptographic algorithms. Of course ther=
-e
-still might be some applications (for example glibc libcrypt password
-hashing) that decide to use the kernel interface directly, but these
-will be a very small minority I think.
+Yes, but that only means you should avoid pointers in data structures
+that are passed to ioctl. Ideally, you would use ioctl to control
+the device while you use read and write to pass actual bits of data.
 
---=20
-Tomas Mraz
-No matter how far down the wrong road you've gone, turn back.
-                                              Turkish proverb
+> >> * Version number added to the data format used when wrapping keys =
+for storage
+> > Again, wrong direction. If you think you need a version number, the=
+ interface
+> > is probably not ready for inclusion yet. Make sure it is simple eno=
+ugh that
+> > you don't run into the case where you have to make incompatible cha=
+nges
+> > that require API versioning.
+>=20
+> Note that the version number is not to the interface but to data that
+> are intended for storage. It is desirable to have such a version ther=
+e.
+
+ok, makes sense.
+
+> >>   The libtom* patches will probably still be too large for the mai=
+ling list;
+> >>   the whole patch set is also available at
+> >>   http://people.redhat.com/mitr/cryptodev-ncr/v2/ .
+> > They actually seem to have made it to the list. However, the more s=
+ignficant
+> > problem is the amount of code added to a security module. 20000 lin=
+es of
+> > code that is essentially a user-level library moved into kernel spa=
+ce
+> > can open up so many possible holes that you end up with a less secu=
+re
+> > (and slower) setup in the end than just doing everything in user sp=
+ace.
+>=20
+> The same argument could apply to an other algorithm in the kernel suc=
+h
+> as deflate, lzma, AES etc. There are cases that the benefits outweigh
+> the risks of adding them. I believe this is such a case.
+
+The algorithms that are in the kernel already are there specifically be=
+cause
+they are used by the kernel itself, which is an entirely different stor=
+y.
+
+> >>   An user-space library is not separated, options are a) root
+> >>   running daemon that does crypto, but this would be slow due to c=
+ontext
+> >>   switches, scheduler mismatching and all the IPC overhead and b) =
+use crypto
+> >>   that is in the kernel.
+> > I think you will have to back that statement by measurements. There=
+ are
+> > reasonably fast ways to do IPC and the interface you suggest to put=
+ in the
+> > kernel does not exactly look tuned for performance.
+>=20
+> This is an alternative design. There quite some reasons against that,
+> such as the auditing features. For me the main reason was  that there
+> was no way to make it as fast (zero-copy) as this design, for the
+> requirements we had (interface with existing crypto libraries through
+> pkcs11). Zero-copy is important since crypto operations might involve
+> large chunks of data.
+
+You mean using a shared memory segment would not be possible without ch=
+anging
+the libpkcs11 interface?
+
+	Arnd
