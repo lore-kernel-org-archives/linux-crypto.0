@@ -1,34 +1,27 @@
-From: Tomas Mraz <tmraz@redhat.com>
+From: Miloslav Trmac <mitr@redhat.com>
 Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
-Date: Wed, 25 Aug 2010 08:44:39 +0200
-Message-ID: <1282718679.2930.42.camel@vespa.frost.loc>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
-	 <20100825062000.GA1424@ucw.cz>
+Date: Wed, 25 Aug 2010 11:28:44 -0400 (EDT)
+Message-ID: <1626059641.38051282750124404.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <20100825062000.GA1424@ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-2"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Miloslav Trma? <mitr@redhat.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
 	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
 To: Pavel Machek <pavel@ucw.cz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32122 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752281Ab0HYGox (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Aug 2010 02:44:53 -0400
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:34363 "EHLO
+	mx02.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751397Ab0HYP2v (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Aug 2010 11:28:51 -0400
 In-Reply-To: <20100825062000.GA1424@ucw.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2010-08-25 at 08:20 +0200, Pavel Machek wrote: 
-> Hi!
-> 
-> > Motivations for the extensions: governments are asking for more security
-> > features in the operating systems they procure, which make user-space
-> > implementations impractical.  A few examples:
-> > 
+----- "Pavel Machek" <pavel@ucw.cz> wrote:
 > > * Advanced crypto module for OSPP for Common Criteria requires OS services
 > >   implementing several low-level crypto algorithms (e.g. AES, RSA).  This
 > >   requires the separation of crypto services from the consumer of those
@@ -43,18 +36,11 @@ On Wed, 2010-08-25 at 08:20 +0200, Pavel Machek wrote:
 > into the kernel... and "IPC is slow" is not good enough reason to put
 > everything in kernel. Plus, you should be able to get better usage of
 > multicore with daemon.
+> 
+> Numbers?
+Posted here before - adding a single syscall (to the one existing ioctl()) adds a 20% performance penalty when encrypting 256 bytes using cbc(aes).  Even with a 32KB block the penalty is 2.7%, and lots of crypto is done on quite small data sizes.
 
-Actually not, and the arguments why multicore would not be really used
-better anyway were stated here as well. If an application needs some
-cryptography function in most of the cases it has to wait for the
-operation to finish before it can proceed  further. To use asynchronous
-crypto interfaces efficiently would require serious redesign and rewrite
-of the existing applications which is nowhere near to be accomplished.
-In case of applications where the benefits of asynchronous crypto would
-be obvious and easily utilized it is quite easier just to split the
-threads for crypto processing and the rest of the application directly
-inside the application process.
--- 
-Tomas Mraz
-No matter how far down the wrong road you've gone, turn back.
-                                              Turkish proverb
+Inter-process IPC would have even higher overhead.
+
+Using more cores is actually easier with the kernel implementation, where each crypto operation runs in the context of the calling task.  This naturally scales to the number of concurrent tasks; as Tomas has said, none of the existing crypto APIs naturally support parallel operations started by a single thread, so any performance advantage gained through this is unrealistic.  A daemon would have to explicitly create a thread for each core (and watch for CPU hotplug?), and the incoming requests would have to be distributed among the threads (with system-wide lock contention on the request queue/pipe/socket/whatever).
+    Mirek
