@@ -1,81 +1,60 @@
-From: Pavel Machek <pavel@ucw.cz>
+From: Tomas Mraz <tmraz@redhat.com>
 Subject: Re: [PATCH 00/19] RFC, v2: "New" /dev/crypto user-space interface
-Date: Wed, 25 Aug 2010 08:20:00 +0200
-Message-ID: <20100825062000.GA1424@ucw.cz>
+Date: Wed, 25 Aug 2010 08:44:39 +0200
+Message-ID: <1282718679.2930.42.camel@vespa.frost.loc>
 References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
+	 <20100825062000.GA1424@ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+Content-Type: text/plain; charset="ISO-8859-2"
+Content-Transfer-Encoding: 7bit
+Cc: Miloslav Trma? <mitr@redhat.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
 	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
-To: Miloslav Trma? <mitr@redhat.com>
+To: Pavel Machek <pavel@ucw.cz>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ksp.mff.cuni.cz ([195.113.26.206]:37458 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751380Ab0HYGUS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Aug 2010 02:20:18 -0400
-Content-Disposition: inline
-In-Reply-To: <1282293963-27807-1-git-send-email-mitr@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:32122 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752281Ab0HYGox (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Aug 2010 02:44:53 -0400
+In-Reply-To: <20100825062000.GA1424@ucw.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
-
-> Motivations for the extensions: governments are asking for more security
-> features in the operating systems they procure, which make user-space
-> implementations impractical.  A few examples:
+On Wed, 2010-08-25 at 08:20 +0200, Pavel Machek wrote: 
+> Hi!
 > 
-> * Advanced crypto module for OSPP for Common Criteria requires OS services
->   implementing several low-level crypto algorithms (e.g. AES, RSA).  This
->   requires the separation of crypto services from the consumer of those
->   services. (The threat model is that apps tend to have more vulnerabilities
->   than libraries and compromise of the app will lead to the ability to access
->   key material.) An user-space library is not separated, options are a) root
->   running daemon that does crypto, but this would be slow due to context
->   switches, scheduler mismatching and all the IPC overhead and b) use crypto
->   that is in the kernel.
-
-Hmm, root daemon seems like a way to go. You already do the switch
-into the kernel... and "IPC is slow" is not good enough reason to put
-everything in kernel. Plus, you should be able to get better usage of
-multicore with daemon.
-
-Numbers?
-								Pavel
-
-
-> * FIPS-140-3 calls out for cryptographic functions to be non-debuggable (ptrace)
->   meaning that you cannot get to the key material. The solution is the same as
->   above.
+> > Motivations for the extensions: governments are asking for more security
+> > features in the operating systems they procure, which make user-space
+> > implementations impractical.  A few examples:
+> > 
+> > * Advanced crypto module for OSPP for Common Criteria requires OS services
+> >   implementing several low-level crypto algorithms (e.g. AES, RSA).  This
+> >   requires the separation of crypto services from the consumer of those
+> >   services. (The threat model is that apps tend to have more vulnerabilities
+> >   than libraries and compromise of the app will lead to the ability to access
+> >   key material.) An user-space library is not separated, options are a) root
+> >   running daemon that does crypto, but this would be slow due to context
+> >   switches, scheduler mismatching and all the IPC overhead and b) use crypto
+> >   that is in the kernel.
 > 
-> * GPOSPP requires auditing for crypto events (so does FIPS-140 level 2 cert).
->   To do this you need any crypto to have CAP_AUDIT_WRITE permissions which
->   means making everything that links to openssl, libgcrypt, or nss setuid
->   root. Making firefox and 400 other applications setuid root is a non-starter.
->   So, the solution is again to use crypto in the kernel where auditing needs no
->   special permissions.
-> 
-> Other advantages to having kernel crypto available to user space:
-> 
-> * User space will be able to take advantage of kernel drivers for hardware
->   crypto accelerators.
-> 
-> * glibc, which in some configurations links to libfreebl3.so for hashes
->   necessary for crypt(), will be able to use the kernel implementation; this
->   means one less library to load and dynamically link for each such process.
-> 
-> The code is derived from the original cryptodev-linux patch set; most of the
-> new implementation was written by Nikos Mavrogiannopoulos
-> <n.mavrogiannopoulos@gmail.com>.  Attributions are included in the respective
-> source files.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+> Hmm, root daemon seems like a way to go. You already do the switch
+> into the kernel... and "IPC is slow" is not good enough reason to put
+> everything in kernel. Plus, you should be able to get better usage of
+> multicore with daemon.
 
+Actually not, and the arguments why multicore would not be really used
+better anyway were stated here as well. If an application needs some
+cryptography function in most of the cases it has to wait for the
+operation to finish before it can proceed  further. To use asynchronous
+crypto interfaces efficiently would require serious redesign and rewrite
+of the existing applications which is nowhere near to be accomplished.
+In case of applications where the benefits of asynchronous crypto would
+be obvious and easily utilized it is quite easier just to split the
+threads for crypto processing and the rest of the application directly
+inside the application process.
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Tomas Mraz
+No matter how far down the wrong road you've gone, turn back.
+                                              Turkish proverb
