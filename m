@@ -1,42 +1,36 @@
-From: Chuck Ebbert <cebbert@redhat.com>
-Subject: [PATCH] crypto: FIPS requires algorithm self-tests
-Date: Sun, 29 Aug 2010 17:47:56 -0400
-Message-ID: <20100829174756.12637b28@katamari>
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] crypto: Fix spelling error in crypto/Kconfig
+Date: Mon, 30 Aug 2010 18:41:09 +0200
+Message-ID: <201008301841.09535.bvanassche@acm.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49051 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750986Ab0H2VuC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Aug 2010 17:50:02 -0400
+Received: from jester.euphonynet.be ([212.87.96.13]:44552 "EHLO
+	mailpush2.euphonynet.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755539Ab0H3RG6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Aug 2010 13:06:58 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: FIPS requires algorithm self-tests
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: <stable@kernel.org>
 
-Signed-off-by: Chuck Ebbert <cebbert@redhat.com>
----
-
-Patch is against the latest cryptodev tree.
-
---- vanilla-2.6.36-rc2-git5.orig/crypto/Kconfig
-+++ vanilla-2.6.36-rc2-git5/crypto/Kconfig
-@@ -23,13 +23,12 @@ comment "Crypto core or helper"
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1cd497d..27484e4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -102,7 +102,7 @@ config CRYPTO_MANAGER2
+ 	select CRYPTO_PCOMP2
  
- config CRYPTO_FIPS
- 	bool "FIPS 200 compliance"
--	depends on CRYPTO_ANSI_CPRNG
-+	depends on CRYPTO_ANSI_CPRNG && !CRYPTO_MANAGER_DISABLE_TESTS
+ config CRYPTO_MANAGER_TESTS
+-	bool "Run algolithms' self-tests"
++	bool "Run algorithms' self-tests"
+ 	default y
+ 	depends on CRYPTO_MANAGER2
  	help
- 	  This options enables the fips boot option which is
- 	  required if you want to system to operate in a FIPS 200
- 	  certification.  You should say no unless you know what
--	  this is. Note that CRYPTO_ANSI_CPRNG is required if this
--	  option is selected
-+	  this is.
- 
- config CRYPTO_ALGAPI
- 	tristate
