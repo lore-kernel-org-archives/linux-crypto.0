@@ -1,63 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 2.6.36
-Date: Fri, 3 Sep 2010 19:07:22 +0800
-Message-ID: <20100903110722.GA31826@gondor.apana.org.au>
-References: <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] omap-aes: OMAP2/3 AES HW accelerator driver
+Date: Fri, 3 Sep 2010 19:15:35 +0800
+Message-ID: <20100903111535.GB31881@gondor.apana.org.au>
+References: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39538 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:56225 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753211Ab0ICLH3 (ORCPT
+	with ESMTP id S1755307Ab0ICLPi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Sep 2010 07:07:29 -0400
+	Fri, 3 Sep 2010 07:15:38 -0400
 Content-Disposition: inline
-In-Reply-To: <20100903060055.GA28915@gondor.apana.org.au>
+In-Reply-To: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 03, 2010 at 02:00:55PM +0800, Herbert Xu wrote:
-> Hi Linus:
->=20
-> This push fixes a bug in the new ahash walking code, as well as
-> the self-test disabling option.  The self-test disabling options
-> is now enabled by default as requested.
+On Fri, Aug 20, 2010 at 04:44:45PM +0300, Dmitry Kasatkin wrote:
+> This set of patches provides implementation of the driver for
+> OMAP2/3 AES hw accelerator.
+> 
 
-I missed a changeset in the push request.  This also includes a
-revert of a bogus cast removal patch.
+Both patches applied.
 
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (3):
-      crypto: testmgr - Fix test disabling option
-      crypto: testmgr - Default to no tests
-      Revert "hwrng: n2-drv - remove casts from void*"
-
-Szilveszter =D6rd=F6g (1):
-      crypto: hash - Fix handling of small unaligned buffers
-
- crypto/Kconfig                  |    8 ++++----
- crypto/ahash.c                  |    7 +++++--
- crypto/algboss.c                |    8 ++++----
- crypto/testmgr.c                |    4 ++--
- drivers/char/hw_random/n2-drv.c |    2 +-
- 5 files changed, 16 insertions(+), 13 deletions(-)
-
-Thanks,
---=20
+Thanks!
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
