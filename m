@@ -1,56 +1,65 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.35
-Date: Fri, 3 Sep 2010 14:00:55 +0800
-Message-ID: <20100903060055.GA28915@gondor.apana.org.au>
-References: <20090613020512.GA21024@gondor.apana.org.au> <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au>
+Subject: Re: [PATCH 01/19] User-space API definition
+Date: Fri, 3 Sep 2010 17:18:42 +0800
+Message-ID: <20100903091842.GC28952@gondor.apana.org.au>
+References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <1282293963-27807-2-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40804 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750800Ab0ICGBC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Sep 2010 02:01:02 -0400
+Cc: linux-crypto@vger.kernel.org,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
+To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20100722055043.GA25689@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1282293963-27807-2-git-send-email-mitr@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Fri, Aug 20, 2010 at 10:45:44AM +0200, Miloslav Trma=C4=8D wrote:
+> This patch introduces the new user-space API, <ncr.h>.
+>=20
+> Quick overview:
+>=20
+> * open("/dev/crypto") to get a FD, which acts as a namespace for key =
+and
+>   session identifiers.
+>=20
+> * ioctl(NCRIO_KEY_INIT) to allocate a key object; then generate the k=
+ey
+>   material inside the kernel, load a plaintext key, unwrap a key, or
+>   derive a key.  Similarly the key material can be copied out of the
+>   kernel or wrapped.
+>=20
+> * ioctl(NCRIO_SESSION_INIT) to allocate a crypto session (to encrypt,
+>   decrypt, hash, sign, or verify signature), then
+>   ioctl(NCRIO_SESSION_UPDATE) to act on chunks of data.  Deallocate t=
+he
+>   session, and optionally retrieve session results (e.g. hash or
+>   signature), using ioctl(NCRIO_SESSION_FINAL).
+>=20
+>   There is also NCRIO_SESSION_ONCE for an one-shot crypto operation
+>   using a single user->kernel context switch.
+>=20
+> Full documentation of the interface is in
+> Documentation/crypto/userspace.txt .
 
-This push fixes a bug in the new ahash walking code, as well as
-the self-test disabling option.  The self-test disabling options
-is now enabled by default as requested.
+Thanks for the updated patch-set.  It does indeed fulfil some
+of the requirements raised earlier.
 
+However, as far as I can see this still does not address the
+extensibility.  For example, say we want add an interface to
+allow the xoring of two arbitrary data streams using DMA offload,
+this interface would make that quite awkward.
 
-Please pull from
+In fact the whole interface is really tailored to the traditional
+encryption/hash operations that BSD provided so I think this is not
+a good foundation for our user-space API.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+I will be looking at this myself so please stay tuned and be ready
+to yell if you see that your requirements are not met.
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (2):
-      crypto: testmgr - Fix test disabling option
-      crypto: testmgr - Default to no tests
-
-Szilveszter =D6rd=F6g (1):
-      crypto: hash - Fix handling of small unaligned buffers
-
- crypto/Kconfig   |    8 ++++----
- crypto/ahash.c   |    7 +++++--
- crypto/algboss.c |    8 ++++----
- crypto/testmgr.c |    4 ++--
- 4 files changed, 15 insertions(+), 12 deletions(-)
-
-Thanks,
+Cheers,
 --=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
