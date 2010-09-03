@@ -1,52 +1,63 @@
-From: Miloslav Trmac <mitr@redhat.com>
-Subject: Re: [PATCH 01/19] User-space API definition
-Date: Fri, 3 Sep 2010 05:38:00 -0400 (EDT)
-Message-ID: <245859135.862181283506680927.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <423332662.861981283506383923.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 2.6.36
+Date: Fri, 3 Sep 2010 19:07:22 +0800
+Message-ID: <20100903110722.GA31826@gondor.apana.org.au>
+References: <20090910141905.GA17948@gondor.apana.org.au> <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:56473 "EHLO
-	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751250Ab0ICJiG (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:39538 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753211Ab0ICLH3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Sep 2010 05:38:06 -0400
-In-Reply-To: <423332662.861981283506383923.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+	Fri, 3 Sep 2010 07:07:29 -0400
+Content-Disposition: inline
+In-Reply-To: <20100903060055.GA28915@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
-> Thanks for the updated patch-set.  It does indeed fulfil some
-> of the requirements raised earlier.
-> 
-> However, as far as I can see this still does not address the
-> extensibility.  For example, say we want add an interface to
-> allow the xoring of two arbitrary data streams using DMA offload,
-> this interface would make that quite awkward.
-I don't think this would be a problem:
+On Fri, Sep 03, 2010 at 02:00:55PM +0800, Herbert Xu wrote:
+> Hi Linus:
+>=20
+> This push fixes a bug in the new ahash walking code, as well as
+> the self-test disabling option.  The self-test disabling options
+> is now enabled by default as requested.
 
-- Expose the xoring as a crypto_tfm, with the usual crypto API string identifier
-  (this is supposed to be a crypto API interface, not a generic interface
-  to the platform DMA controller, after all).
+I missed a changeset in the push request.  This also includes a
+revert of a bogus cast removal patch.
 
-- Check to see if the operation can be supported using the existing
-  attributes, add attributes if necessary.
 
-  In this case, NCR_UPDATE_INPUT_DATA can be used for the read-only
-  stream and NCR_UPDATE_OUTPUT_BUFFER for the read-write steram.
+Please pull from
 
-- If this is an entirely new crypto transform type, add support to
-  the session interface.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-  In this case, this would probably mean adding NCR_OP_COMBINE (or
-  something similar); SESSION_INIT would only allocate the tfm,
-  SESSION_UPDATE would be used for handling blocks of data as they
-  come and go.
+or
 
-The interface would have to be extended, but the extension would be completely backward-compatible and the additions to the interface would probably be smaller than the additions to the internal crypto API.  Notably no new ioctl()s would be needed.
-    Mirek
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (3):
+      crypto: testmgr - Fix test disabling option
+      crypto: testmgr - Default to no tests
+      Revert "hwrng: n2-drv - remove casts from void*"
+
+Szilveszter =D6rd=F6g (1):
+      crypto: hash - Fix handling of small unaligned buffers
+
+ crypto/Kconfig                  |    8 ++++----
+ crypto/ahash.c                  |    7 +++++--
+ crypto/algboss.c                |    8 ++++----
+ crypto/testmgr.c                |    4 ++--
+ drivers/char/hw_random/n2-drv.c |    2 +-
+ 5 files changed, 16 insertions(+), 13 deletions(-)
+
+Thanks,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
