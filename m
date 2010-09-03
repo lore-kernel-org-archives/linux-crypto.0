@@ -1,31 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] omap-aes: OMAP2/3 AES HW accelerator driver
-Date: Fri, 3 Sep 2010 19:15:35 +0800
-Message-ID: <20100903111535.GB31881@gondor.apana.org.au>
-References: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+Subject: Re: [PATCH] crypto: FIPS requires algorithm self-tests
+Date: Fri, 3 Sep 2010 19:18:16 +0800
+Message-ID: <20100903111816.GC31881@gondor.apana.org.au>
+References: <20100829174756.12637b28@katamari>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org
+To: Chuck Ebbert <cebbert@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56225 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:50987 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755307Ab0ICLPi (ORCPT
+	with ESMTP id S1752903Ab0ICLST (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Sep 2010 07:15:38 -0400
+	Fri, 3 Sep 2010 07:18:19 -0400
 Content-Disposition: inline
-In-Reply-To: <cover.1282311763.git.dmitry.kasatkin@nokia.com>
+In-Reply-To: <20100829174756.12637b28@katamari>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 20, 2010 at 04:44:45PM +0300, Dmitry Kasatkin wrote:
-> This set of patches provides implementation of the driver for
-> OMAP2/3 AES hw accelerator.
+On Sun, Aug 29, 2010 at 05:47:56PM -0400, Chuck Ebbert wrote:
+> crypto: FIPS requires algorithm self-tests
 > 
+> Signed-off-by: Chuck Ebbert <cebbert@redhat.com>
 
-Both patches applied.
-
-Thanks!
+Patch applied.  Thanks Chuck!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
