@@ -1,66 +1,71 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
 Subject: Re: [PATCH 01/19] User-space API definition
-Date: Fri, 3 Sep 2010 17:18:42 +0800
-Message-ID: <20100903091842.GC28952@gondor.apana.org.au>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com> <1282293963-27807-2-git-send-email-mitr@redhat.com>
+Date: Fri, 3 Sep 2010 11:34:36 +0200
+Message-ID: <AANLkTi=xtLpd7f_xxTa8G0H9L6wBn1r_SV8qTXwmOdB_@mail.gmail.com>
+References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
+	<1282293963-27807-2-git-send-email-mitr@redhat.com>
+	<20100903091842.GC28952@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
-	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
-To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1282293963-27807-2-git-send-email-mitr@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: =?UTF-8?Q?Miloslav_Trma=C4=8D?= <mitr@redhat.com>,
+	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qy0-f174.google.com ([209.85.216.174]:43298 "EHLO
+	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756548Ab0ICJeh convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Sep 2010 05:34:37 -0400
+In-Reply-To: <20100903091842.GC28952@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 20, 2010 at 10:45:44AM +0200, Miloslav Trma=C4=8D wrote:
-> This patch introduces the new user-space API, <ncr.h>.
->=20
-> Quick overview:
->=20
-> * open("/dev/crypto") to get a FD, which acts as a namespace for key =
-and
->   session identifiers.
->=20
-> * ioctl(NCRIO_KEY_INIT) to allocate a key object; then generate the k=
-ey
->   material inside the kernel, load a plaintext key, unwrap a key, or
->   derive a key.  Similarly the key material can be copied out of the
->   kernel or wrapped.
->=20
-> * ioctl(NCRIO_SESSION_INIT) to allocate a crypto session (to encrypt,
->   decrypt, hash, sign, or verify signature), then
->   ioctl(NCRIO_SESSION_UPDATE) to act on chunks of data.  Deallocate t=
-he
->   session, and optionally retrieve session results (e.g. hash or
->   signature), using ioctl(NCRIO_SESSION_FINAL).
->=20
->   There is also NCRIO_SESSION_ONCE for an one-shot crypto operation
->   using a single user->kernel context switch.
->=20
-> Full documentation of the interface is in
-> Documentation/crypto/userspace.txt .
+2010/9/3 Herbert Xu <herbert@gondor.apana.org.au>:
 
-Thanks for the updated patch-set.  It does indeed fulfil some
-of the requirements raised earlier.
+>> * ioctl(NCRIO_SESSION_INIT) to allocate a crypto session (to encrypt=
+,
+>> =C2=A0 decrypt, hash, sign, or verify signature), then
+>> =C2=A0 ioctl(NCRIO_SESSION_UPDATE) to act on chunks of data. =C2=A0D=
+eallocate the
+>> =C2=A0 session, and optionally retrieve session results (e.g. hash o=
+r
+>> =C2=A0 signature), using ioctl(NCRIO_SESSION_FINAL).
+>> =C2=A0 There is also NCRIO_SESSION_ONCE for an one-shot crypto opera=
+tion
+>> =C2=A0 using a single user->kernel context switch.
+>> Full documentation of the interface is in
+>> Documentation/crypto/userspace.txt .
+>
+> Thanks for the updated patch-set. =C2=A0It does indeed fulfil some
+> of the requirements raised earlier.
+>
+> However, as far as I can see this still does not address the
+> extensibility. =C2=A0For example, say we want add an interface to
+> allow the xoring of two arbitrary data streams using DMA offload,
+> this interface would make that quite awkward.
 
-However, as far as I can see this still does not address the
-extensibility.  For example, say we want add an interface to
-allow the xoring of two arbitrary data streams using DMA offload,
-this interface would make that quite awkward.
+Although I think the current API could handle something like this, I
+also think it is undesirable to do so. The API was designed with
+cryptographic operations in mind, and its extensibility might better
+be judged on how it can incorporate future cryptographic protocols
+(sigma-proofs and other zero-knowledge protocols and other protocols
+that I might not know of). An XOR operation, doesn't really fit into a
+cryptographic API. It could however be included in the current design
+with some utility ioctls() that address such helper operations. Even
+better, I think a XOR operation deserves a system call, since it is
+quite useful in a variety of applications, not only cryptographic
+ones.
 
-In fact the whole interface is really tailored to the traditional
-encryption/hash operations that BSD provided so I think this is not
-a good foundation for our user-space API.
+> In fact the whole interface is really tailored to the traditional
+> encryption/hash operations that BSD provided so I think this is not
+> a good foundation for our user-space API.
 
-I will be looking at this myself so please stay tuned and be ready
-to yell if you see that your requirements are not met.
+It supports much more than the openbsd API, but indeed it is designed
+with cryptographic operations in mind and this limitation can allow a
+semi-formal verification of its properties. I'll try to post a link to
+the design document as soon.
 
-Cheers,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Nikos
