@@ -1,71 +1,52 @@
-From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+From: Miloslav Trmac <mitr@redhat.com>
 Subject: Re: [PATCH 01/19] User-space API definition
-Date: Fri, 3 Sep 2010 11:34:36 +0200
-Message-ID: <AANLkTi=xtLpd7f_xxTa8G0H9L6wBn1r_SV8qTXwmOdB_@mail.gmail.com>
-References: <1282293963-27807-1-git-send-email-mitr@redhat.com>
-	<1282293963-27807-2-git-send-email-mitr@redhat.com>
-	<20100903091842.GC28952@gondor.apana.org.au>
+Date: Fri, 3 Sep 2010 05:38:00 -0400 (EDT)
+Message-ID: <245859135.862181283506680927.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <423332662.861981283506383923.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?UTF-8?Q?Miloslav_Trma=C4=8D?= <mitr@redhat.com>,
-	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:43298 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756548Ab0ICJeh convert rfc822-to-8bit (ORCPT
+Received: from mx3-phx2.redhat.com ([209.132.183.24]:56473 "EHLO
+	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751250Ab0ICJiG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Sep 2010 05:34:37 -0400
-In-Reply-To: <20100903091842.GC28952@gondor.apana.org.au>
+	Fri, 3 Sep 2010 05:38:06 -0400
+In-Reply-To: <423332662.861981283506383923.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2010/9/3 Herbert Xu <herbert@gondor.apana.org.au>:
-
->> * ioctl(NCRIO_SESSION_INIT) to allocate a crypto session (to encrypt=
-,
->> =C2=A0 decrypt, hash, sign, or verify signature), then
->> =C2=A0 ioctl(NCRIO_SESSION_UPDATE) to act on chunks of data. =C2=A0D=
-eallocate the
->> =C2=A0 session, and optionally retrieve session results (e.g. hash o=
-r
->> =C2=A0 signature), using ioctl(NCRIO_SESSION_FINAL).
->> =C2=A0 There is also NCRIO_SESSION_ONCE for an one-shot crypto opera=
-tion
->> =C2=A0 using a single user->kernel context switch.
->> Full documentation of the interface is in
->> Documentation/crypto/userspace.txt .
->
-> Thanks for the updated patch-set. =C2=A0It does indeed fulfil some
+----- "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
+> Thanks for the updated patch-set.  It does indeed fulfil some
 > of the requirements raised earlier.
->
+> 
 > However, as far as I can see this still does not address the
-> extensibility. =C2=A0For example, say we want add an interface to
+> extensibility.  For example, say we want add an interface to
 > allow the xoring of two arbitrary data streams using DMA offload,
 > this interface would make that quite awkward.
+I don't think this would be a problem:
 
-Although I think the current API could handle something like this, I
-also think it is undesirable to do so. The API was designed with
-cryptographic operations in mind, and its extensibility might better
-be judged on how it can incorporate future cryptographic protocols
-(sigma-proofs and other zero-knowledge protocols and other protocols
-that I might not know of). An XOR operation, doesn't really fit into a
-cryptographic API. It could however be included in the current design
-with some utility ioctls() that address such helper operations. Even
-better, I think a XOR operation deserves a system call, since it is
-quite useful in a variety of applications, not only cryptographic
-ones.
+- Expose the xoring as a crypto_tfm, with the usual crypto API string identifier
+  (this is supposed to be a crypto API interface, not a generic interface
+  to the platform DMA controller, after all).
 
-> In fact the whole interface is really tailored to the traditional
-> encryption/hash operations that BSD provided so I think this is not
-> a good foundation for our user-space API.
+- Check to see if the operation can be supported using the existing
+  attributes, add attributes if necessary.
 
-It supports much more than the openbsd API, but indeed it is designed
-with cryptographic operations in mind and this limitation can allow a
-semi-formal verification of its properties. I'll try to post a link to
-the design document as soon.
+  In this case, NCR_UPDATE_INPUT_DATA can be used for the read-only
+  stream and NCR_UPDATE_OUTPUT_BUFFER for the read-write steram.
 
-regards,
-Nikos
+- If this is an entirely new crypto transform type, add support to
+  the session interface.
+
+  In this case, this would probably mean adding NCR_OP_COMBINE (or
+  something similar); SESSION_INIT would only allocate the tfm,
+  SESSION_UPDATE would be used for handling blocks of data as they
+  come and go.
+
+The interface would have to be extended, but the extension would be completely backward-compatible and the additions to the interface would probably be smaller than the additions to the internal crypto API.  Notably no new ioctl()s would be needed.
+    Mirek
