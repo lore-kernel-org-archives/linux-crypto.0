@@ -1,62 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.35
-Date: Sat, 4 Sep 2010 20:22:45 +0800
-Message-ID: <20100904122245.GA10640@gondor.apana.org.au>
-References: <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100904064501.09ab7450@katamari>
+From: "desk@live.com" <autocicognara@fastwebnet.it>
+Subject: Mutual Support
+Date: Sat, 4 Sep 2010 17:40:03 +0200 (CEST)
+Message-ID: <9230417.1223821283614803164.JavaMail.defaultUser__49714.3655819402$1283616464$gmane$org@defaultHost>
+Reply-To: JU4343@ymail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Chuck Ebbert <cebbert@redhat.com>
+Content-Type: text/plain;charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54022 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752255Ab0IDMW4 (ORCPT
+Received: from aa012msr.fastwebnet.it ([85.18.95.72]:41496 "EHLO
+	aa012msr.fastwebnet.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754082Ab0IDQG0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 4 Sep 2010 08:22:56 -0400
-Content-Disposition: inline
-In-Reply-To: <20100904064501.09ab7450@katamari>
+	Sat, 4 Sep 2010 12:06:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Sep 04, 2010 at 06:45:01AM -0400, Chuck Ebbert wrote:
-> On Fri, 3 Sep 2010 14:00:55 +0800
-> Herbert Xu <herbert@gondor.hengli.com.au> wrote:
->=20
-> > Please pull from
-> >=20
-> > git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.gi=
-t
-> >=20
-> > or
-> >=20
-> > master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-> >=20
-> >=20
-> > Herbert Xu (2):
-> >       crypto: testmgr - Fix test disabling option
-> >       crypto: testmgr - Default to no tests
-> >=20
-> > Szilveszter =D6rd=F6g (1):
-> >       crypto: hash - Fix handling of small unaligned buffers
-> >=20
->=20
-> What happened to my minor fix?
->=20
->  [ http://marc.info/?l=3Dlinux-crypto-vger&m=3D128311860504202&w=3D2 =
-]
->=20
-> I never got a reply about it.
+Dear Sir/Madam,
 
-Hmm I did send you a reply.
+  I am Judith Johnson a solicitor at law, i have a proposal for you kindle get b
+ack to me for more information on my private email address at:judith4343@hotmail
+.com
 
-Anyway it's in cryptodev-2.6.
+God Bless you and you Family.
 
-Cheers,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sincerely,
+Judith Johnson
