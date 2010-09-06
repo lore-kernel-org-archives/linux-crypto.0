@@ -1,100 +1,69 @@
-From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+From: Kyle Moffett <kyle@moffetthome.net>
 Subject: Re: [PATCH 01/19] User-space API definition
-Date: Mon, 06 Sep 2010 21:13:45 +0200
-Message-ID: <4C853D69.2080108@gmail.com>
-References: <272391166.1009231283787434910.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com> <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com> <AANLkTim=nf7VVs0zDshivjrdFFYeWaoWYqAA6PCs3c4k@mail.gmail.com>
+Date: Mon, 6 Sep 2010 16:42:07 -0400
+Message-ID: <AANLkTi=kF880O_DuemgRPajvs3diyuvK8s4Ap04+kPzL@mail.gmail.com>
+References: <272391166.1009231283787434910.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+ <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+ <AANLkTim=nf7VVs0zDshivjrdFFYeWaoWYqAA6PCs3c4k@mail.gmail.com> <4C853D69.2080108@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Miloslav Trmac <mitr@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
 	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
-To: Kyle Moffett <kyle@moffetthome.net>
+To: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:62765 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750999Ab0IFTNt (ORCPT
+Received: from mail-ew0-f46.google.com ([209.85.215.46]:53687 "EHLO
+	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752310Ab0IFUm3 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Sep 2010 15:13:49 -0400
-In-Reply-To: <AANLkTim=nf7VVs0zDshivjrdFFYeWaoWYqAA6PCs3c4k@mail.gmail.com>
+	Mon, 6 Sep 2010 16:42:29 -0400
+In-Reply-To: <4C853D69.2080108@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/06/2010 08:00 PM, Kyle Moffett wrote:
+On Mon, Sep 6, 2010 at 15:13, Nikos Mavrogiannopoulos
+<n.mavrogiannopoulos@gmail.com> wrote:
+> On 09/06/2010 08:00 PM, Kyle Moffett wrote:
+>>> The kernel keyring service is basically a system-wide data storage
+>>> service. =C2=A0/dev/crypto needs a quick way to refer to short-live=
+d,
+>>> usually process-local, kernel-space data structures from
+>>> userspace.
+>>
+>> The problem with the approach you're proposing is that we then have
+>> two entirely separate classes of keys. =C2=A0First we have the exist=
+ing
+>> keyring class, which can be securely and revokably passed between
+>> different processes with limited rights, but cannot be handed up to
+>> the kernel's cryptoapi.
+>
+> I don't think this is the case. The NCR does not store any keys nor
+> retrieves them. It does delegate the burden of that to userspace
+> application. NCR exports a wrapped version of the key and the userspa=
+ce
+> application stores it. It could use the keyring to store the keys or
+> could directly store them in the filesystem.
 
->> The kernel keyring service is basically a system-wide data storage
->> service.  /dev/crypto needs a quick way to refer to short-lived,
->> usually process-local, kernel-space data structures from
->> userspace.
-> The problem with the approach you're proposing is that we then have 
-> two entirely separate classes of keys.  First we have the existing 
-> keyring class, which can be securely and revokably passed between 
-> different processes with limited rights, but cannot be handed up to 
-> the kernel's cryptoapi.
+Hmm, I'm confused.  You say "The NCR does not store any keys nor
+retrieves them", but ~75% of your API is specifically related to
+storing keys into kernel memory or retrieving them out of kernel
+memory.  Specifically, putting keys into and out of the kernel and
+passing them around between processes is the *whole point* of the
+keyring API.
 
-I don't think this is the case. The NCR does not store any keys nor
-retrieves them. It does delegate the burden of that to userspace
-application. NCR exports a wrapped version of the key and the userspace
-application stores it. It could use the keyring to store the keys or
-could directly store them in the filesystem.
+So let me ask for some clarification:
 
+You talk a lot in the patches about the API itself, but what is the
+intended *use-case* for NCR?
 
-> Then we have your new class, which are anonymous keys with a brand
-> new security model
-> (which doesn't even have LSM hooks yet)
+Is it to provide a back-end for code such as enhanced-security OpenSSL
+libraries?  For example, a privileged process would loads a key from
+disk into the kernel, then fork the unprivileged SSL server process?
 
-and what would this suggest?
+Is it just a canonical interface for userspace to encrypt or decrypt
+data using the kernel's CryptoAPI?
 
-> and which cannot be referenced by name. Another potential issue is
-> that keys are never actually "unnamed", in that sense.  If encryption
-> keys truly were "anonymous" then you would find it impossible to
-> reliably decrypt the data on the other end.  For example, every RSA
-> private key should be indexed either by the X.509 DN or for bare SSH
-> keys by the public modulus information. 
-> Even transient SSL session
-> keys are always put into an SSL session cache by apache or whatever
-> to allow them to be reused across multiple TCP streams!  So I would
-> argue that an SSL implementation that uses this should actually
-> create or use a keyring specifically as an SSL session cache (with
-> keys indexed by SSL session ID).
-
-Each key of NCR contains a key ID, that is the same in public
-and private keys (if generated by NCR), and that could be used to index
-it. Secret keys have a key id specified by the user. It does not require
-you to use it though.
-
-
-> It then becomes trivial to share an SSL session cache between 3 
-> independent HTTPS server programs from different vendors, such that 
-> the compromise of *any* of the processes would not in any way 
-> compromise the security of the session keys. 
-
-If you are sharing a cache, the protection given by NCR is actually not
-used. Unless of course you start wrapping keys to ensure that noone
-unauthorized except from the legitimate systems access them. Doing the
-crypto in user-space would be more efficient in that case.
-
-> So my recommendation would be to create some new operations of the 
-> existing keyring code:
-> (1) If you *really* care about anonymous transient keys that are not 
-> identified by an SSL session ID or similar, then add a keyring 
-> operation for "create an anonymous key in keyring X, where the
-> kernel creates a proper temporary name".  An SSL implementation would
-> default to using the process-local keyring, which means that
-> everything would automatically go away on process exit.
-> (2) Add cryptoapi hooks to automatically register keyring key types 
-> based on the loaded cryptoapi modules.
-> (3) Add any necessary keyring operations for efficiently performing 
-> zero-copy cryptoapi calls using those key types.
-
-I cannot get the big picture of you suggestions. How does this fit to
-NCR given the explanation on how keys are (not) stored by NCR. Is your
-suggestion about convenience calls to retrieve and store keys from and
-to keyring? Or you are suggesting NCR to be using the keyring for its
-internal reference of keys?
-
-If it is the latter, what would be the advantage of doing that?
-
-regards.
-Nikos
+Cheers,
+Kyle Moffett
