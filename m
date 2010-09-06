@@ -1,68 +1,89 @@
-From: Miloslav Trmac <mitr@redhat.com>
+From: Kyle Moffett <kyle@moffetthome.net>
 Subject: Re: [PATCH 01/19] User-space API definition
-Date: Mon, 6 Sep 2010 11:50:51 -0400 (EDT)
-Message-ID: <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Date: Mon, 6 Sep 2010 14:00:47 -0400
+Message-ID: <AANLkTim=nf7VVs0zDshivjrdFFYeWaoWYqAA6PCs3c4k@mail.gmail.com>
 References: <272391166.1009231283787434910.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+ <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Kyle Moffett <kyle@moffetthome.net>, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org,
 	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
 	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org,
 	David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+To: Miloslav Trmac <mitr@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:49520 "EHLO
-	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753568Ab0IFPu6 (ORCPT
+Received: from mail-ew0-f46.google.com ([209.85.215.46]:57631 "EHLO
+	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753217Ab0IFSBJ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Sep 2010 11:50:58 -0400
-In-Reply-To: <272391166.1009231283787434910.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+	Mon, 6 Sep 2010 14:01:09 -0400
+In-Reply-To: <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
-> On Mon, Aug 23, 2010 at 11:37:40AM -0400, Miloslav Trmac wrote:
-> >
-> > I can see almost no overlap between the two sets of requirements. 
-> Probably the only common use case is handling session keys (e.g. keys
-> used in a kerberos ticket), which should be stored in the kernel for
-> the duration of the session, made available to each process in the
-> session, and available as keys for kernel crypto.  Such keys will be
-> in the minority, though, and it seems to me the best approach for
-> handling these is to allow key export/import from/to keyring keys in
-> addition to export/import from/to data in userspace: the long-term
-> storage would be handled by the existing keyring API, which stores the
-> key as unformatted binary data, and import into the crypto context
-> would convert the key into the internal representation more suitable
-> for crypto.
-> > 
-> > I have seriously considered the keyring API, and this is what I came
-> up with - but I'd love to be shown a better way.
-> 
-> FWIW adding a second key management system to the kernel is
-> totally out of the question.
-> 
-> If the existing system doesn't work for you, find a way to build
-> on it so that it does.  Adding a second system that pretty much
-> does the same thing is unacceptable.
-It does _not_ do the same thing, same as ramfs and file descriptors do not do the same thing although they are both related to files.
+On Mon, Sep 6, 2010 at 11:50, Miloslav Trmac <mitr@redhat.com> wrote:
+> ----- "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
+>> On Mon, Aug 23, 2010 at 11:37:40AM -0400, Miloslav Trmac wrote:
+>> > I have seriously considered the keyring API, and this is what I ca=
+me
+>> up with - but I'd love to be shown a better way.
+>>
+>> FWIW adding a second key management system to the kernel is
+>> totally out of the question.
+>>
+>> If the existing system doesn't work for you, find a way to build
+>> on it so that it does. =C2=A0Adding a second system that pretty much
+>> does the same thing is unacceptable.
+> It does _not_ do the same thing, same as ramfs and file descriptors d=
+o not do the same thing although they are both related to files.
+>
+> The kernel keyring service is basically a system-wide data storage se=
+rvice. =C2=A0/dev/crypto needs a quick way to refer to short-lived, usu=
+ally process-local, kernel-space data structures from userspace.
 
-The kernel keyring service is basically a system-wide data storage service.  /dev/crypto needs a quick way to refer to short-lived, usually process-local, kernel-space data structures from userspace.
+The problem with the approach you're proposing is that we then have
+two entirely separate classes of keys.  First we have the existing
+keyring class, which can be securely and revokably passed between
+different processes with limited rights, but cannot be handed up to
+the kernel's cryptoapi.  Then we have your new class, which are
+anonymous keys with a brand new security model (which doesn't even
+have LSM hooks yet) and which cannot be referenced by name.
 
-Imagine that instead of
-    thread = clone(..., CLONE_THREAD);
-you needed to do
-    thread_fd = mkstemp("/proc/XXX");
-    fork(thread_fd);
-That's how "just using the existing keyring" would look like.
+Another potential issue is that keys are never actually "unnamed", in
+that sense.  If encryption keys truly were "anonymous" then you would
+find it impossible to reliably decrypt the data on the other end.  For
+example, every RSA private key should be indexed either by the X.509
+DN or for bare SSH keys by the public modulus information.  Even
+transient SSL session keys are always put into an SSL session cache by
+apache or whatever to allow them to be reused across multiple TCP
+streams!  So I would argue that an SSL implementation that uses this
+should actually create or use a keyring specifically as an SSL session
+cache (with keys indexed by SSL session ID).
 
-Adapting the existing keyring to match the /dev/crypto use case better would make the keyring API at least 25% larger, and introduce completely different key identification and lifetime semantics for a set of keys.
+It then becomes trivial to share an SSL session cache between 3
+independent HTTPS server programs from different vendors, such that
+the compromise of *any* of the processes would not in any way
+compromise the security of the session keys.  This would be especially
+true if the session keys are actually generated by a keyring+cryptoapi
+operation in the kernel.
 
-If you can see a way the two can be cleanly integrated, please don't just tell us that we have to do it, tell us how.
- 
-> Also, the key management for secret keys that you've added should
-> not be the only mode offered to the user.  Most people do not need
-> the separation between key setting and encryption/decryption.
-The "key ID" is not embedded into encryption operation requests (it uses a struct nlattr), so it would be quite possible to supply the raw key instead.
-    Mirek
+So my recommendation would be to create some new operations of the
+existing keyring code:
+
+(1) If you *really* care about anonymous transient keys that are not
+identified by an SSL session ID or similar, then add a keyring
+operation for "create an anonymous key in keyring X, where the kernel
+creates a proper temporary name".  An SSL implementation would default
+to using the process-local keyring, which means that everything would
+automatically go away on process exit.
+
+(2) Add cryptoapi hooks to automatically register keyring key types
+based on the loaded cryptoapi modules.
+
+(3) Add any necessary keyring operations for efficiently performing
+zero-copy cryptoapi calls using those key types.
+
+Cheers,
+Kyle Moffett
