@@ -1,87 +1,123 @@
-From: Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+From: Miloslav Trmac <mitr@redhat.com>
 Subject: Re: [PATCH 01/19] User-space API definition
-Date: Mon, 06 Sep 2010 23:11:25 +0200
-Message-ID: <4C8558FD.2010107@gmail.com>
-References: <272391166.1009231283787434910.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com> <169108422.1009631283788251084.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com> <AANLkTim=nf7VVs0zDshivjrdFFYeWaoWYqAA6PCs3c4k@mail.gmail.com> <4C853D69.2080108@gmail.com> <AANLkTi=kF880O_DuemgRPajvs3diyuvK8s4Ap04+kPzL@mail.gmail.com>
+Date: Mon, 6 Sep 2010 17:39:21 -0400 (EDT)
+Message-ID: <609705216.1019541283809161307.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+References: <1586512982.1019221283808142288.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Miloslav Trmac <mitr@redhat.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-crypto@vger.kernel.org, Neil Horman <nhorman@redhat.com>,
-	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	linux-crypto@vger.kernel.org,
+	Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>,
+	Neil Horman <nhorman@redhat.com>, linux-kernel@vger.kernel.org,
+	David Howells <dhowells@redhat.com>
 To: Kyle Moffett <kyle@moffetthome.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:60565 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751669Ab0IFVL3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Sep 2010 17:11:29 -0400
-In-Reply-To: <AANLkTi=kF880O_DuemgRPajvs3diyuvK8s4Ap04+kPzL@mail.gmail.com>
+Received: from mx3-phx2.redhat.com ([209.132.183.24]:40032 "EHLO
+	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1755705Ab0IFVj1 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Sep 2010 17:39:27 -0400
+In-Reply-To: <1586512982.1019221283808142288.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/06/2010 10:42 PM, Kyle Moffett wrote:
+----- "Kyle Moffett" <kyle@moffetthome.net> wrote:
+> On Mon, Sep 6, 2010 at 11:50, Miloslav Trmac <mitr@redhat.com> wrote:
+> > ----- "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
+> >> On Mon, Aug 23, 2010 at 11:37:40AM -0400, Miloslav Trmac wrote:
+> >> > I have seriously considered the keyring API, and this is what I
+> came
+> >> up with - but I'd love to be shown a better way.
+> >>
+> >> FWIW adding a second key management system to the kernel is
+> >> totally out of the question.
+> >>
+> >> If the existing system doesn't work for you, find a way to build
+> >> on it so that it does. =C2=A0Adding a second system that pretty mu=
+ch
+> >> does the same thing is unacceptable.
+> > It does _not_ do the same thing, same as ramfs and file descriptors
+> do not do the same thing although they are both related to files.
+> >
+> > The kernel keyring service is basically a system-wide data storage
+> service. =C2=A0/dev/crypto needs a quick way to refer to short-lived,
+> usually process-local, kernel-space data structures from userspace.
+>=20
+> The problem with the approach you're proposing is that we then have
+> two entirely separate classes of keys.=20
+"We have two entirely separate classes of files: inodes and file descri=
+ptors".
 
->>> The problem with the approach you're proposing is that we then have
->>> two entirely separate classes of keys.  First we have the existing
->>> keyring class, which can be securely and revokably passed between
->>> different processes with limited rights, but cannot be handed up to
->>> the kernel's cryptoapi.
->>
->> I don't think this is the case. The NCR does not store any keys nor
->> retrieves them. It does delegate the burden of that to userspace
->> application. NCR exports a wrapped version of the key and the userspace
->> application stores it. It could use the keyring to store the keys or
->> could directly store them in the filesystem.
-> 
-> Hmm, I'm confused.  You say "The NCR does not store any keys nor
-> retrieves them", but ~75% of your API is specifically related to
-> storing keys into kernel memory or retrieving them out of kernel
-> memory.
-> Specifically, putting keys into and out of the kernel and
-> passing them around between processes is the *whole point* of the
-> keyring API.
+Isn't that only a problem if there is actual duplicate functionality?  =
+And is copy_from_user() really enough reason to share the interface?
 
-I suppose you mean the reference to the internal representation of the
-key. This might be valid for few seconds until the required operation is
-over.
-This is not really what I would call storage. The storage and retrieval
-of keys is being done using two ioctl() the STORAGE_WRAP and STORAGE_UNWRAP.
+Like in the inodes/file descriptors case, the fact that you can read co=
+ntents of both does not automatically mean that a single interface for =
+both is the best option.  The naming does suggest that this should be t=
+he case here, but the differences are AFAICS much larger than the commo=
+nalities.
 
-An example of how NCR works:
-1. A Process generates an RSA key pair
-2. Stores the (encrypted) pair using the STORAGE_WRAP to a file.
 
-3. Another process loads the file, unwraps it using STORAGE_UNWRAP and
-gets a reference to the key
-4. Does an RSA decryption using the key
-5. Discards the reference to the key
+> Another potential issue is that keys are never actually "unnamed", in
+> that sense.
+They are perhaps not "unnamed" from a global point of view, or from the=
+ point of view of a few functions that directly manipulate the key, but=
+ they are quite anonymous from the process' point of view.
 
-Consider the reference as a file descriptor after you have opened a file
-(a wrapped key).
+> If encryption keys truly were "anonymous" then you would
+> find it impossible to reliably decrypt the data on the other end.  Fo=
+r
+> example, every RSA private key should be indexed either by the X.509
+> DN or for bare SSH keys by the public modulus information.
+Why would that be useful?  The SSH private key should be only available=
+ to sshd.  sshd has loaded the key from a file (_that_ is the key's "na=
+me", as far as the system administrator is concerned), and then the key=
+ is used only privately within the sshd process.  There is no more reas=
+on to have a name attached to the loaded private key object than there =
+is a reason to have a name attached to the file descriptor used to read=
+ /etc/ssh/sshd_config - the key is an application-internal object and i=
+ts user-space identifier is merely a "safe pointer into the kernel".
 
-How do you see keyring being involved in a setup like this?
+Actually, in a modularly-designed program, only one component of the pr=
+ogram works with the key, the rest should not even be aware of the exis=
+tence of the key, and having a process-wide (or even more general) name=
+ for the key can lead to unintended conflicts.  Imagine having the opti=
+on to give an every file descriptor a name, automatically replacing ear=
+lier file descriptors with the same name.
 
-> So let me ask for some clarification:
-> You talk a lot in the patches about the API itself, but what is the
-> intended *use-case* for NCR?
+Having a well-known name for the sshd host private key is perhaps usefu=
+l as an "attack this" sign :)
 
-In short: cryptographic operations.
+Same for public keys - when an application does
+   public_key =3D import_from_certificate();
+   encrypt_data_using(public_key)
+it is not interested in sharing the public key object with other proces=
+ses - after all, what if another process loaded a different key under t=
+he indented name?  Creating a meaningful identifier is about as costly =
+as just importing the key, anyway.
 
-> Is it to provide a back-end for code such as enhanced-security OpenSSL
-> libraries?  For example, a privileged process would loads a key from
-> disk into the kernel, then fork the unprivileged SSL server process?
+>  Even transient SSL session keys are always put into an SSL session c=
+ache by
+> apache or whatever to allow them to be reused across multiple TCP
+> streams!
+The SSL session cache is a quite unusual case.
 
-An unprivileged process will load a key from disk to kernel and use it.
-The keys leave the NCR framework only encrypted and authenticated.
+Also, there is one SSL private key per server DNS name, and one SSL ses=
+sion cache entry per client-server pair, but there are at least four te=
+mporary keys, for each connection, and there is absolutely no need to n=
+ame these.
 
-> Is it just a canonical interface for userspace to encrypt or decrypt
-> data using the kernel's CryptoAPI?
+> So my recommendation would be to create some new operations of the
+> existing keyring code:
 
-I don't understand what do you mean by canonical, but this API can be
-used to perform crypto operations. It uses the internal linux API where
-possible.
+> (2) Add cryptoapi hooks to automatically register keyring key types
+> based on the loaded cryptoapi modules.
+Hm, using a different key type for each cipher would at least allow reu=
+sing add_key()/KEYCTL_{READ,UPDATE}; I didn't think even these could be=
+ useful.
 
-regards,
-Nikos
+So it's better than absolutely hopeless now :)
+
+Thank you,
+    Mirek
