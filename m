@@ -1,54 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Subject: Re: RFC: Crypto API User-interface
-Date: Tue, 7 Sep 2010 22:41:36 +0800
-Message-ID: <20100907144136.GB7448@gondor.apana.org.au>
-References: <1847066281.1081601283869883727.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com> <421339997.1082251283870065826.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Date: Tue, 7 Sep 2010 16:49:46 +0200
+Message-ID: <AANLkTikWRewCXdq3eeBMRQr3Ke7C2q42jnKqbKVwwpCH@mail.gmail.com>
+References: <20100907084213.GA4610@gondor.apana.org.au>
+	<20100907140646.GA31921@infradead.org>
+	<20100907141112.GB6903@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org
-To: Miloslav Trmac <mitr@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41533 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932079Ab0IGOli (ORCPT
+Received: from mail-qy0-f181.google.com ([209.85.216.181]:34259 "EHLO
+	mail-qy0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751830Ab0IGOts convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Sep 2010 10:41:38 -0400
-Content-Disposition: inline
-In-Reply-To: <421339997.1082251283870065826.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+	Tue, 7 Sep 2010 10:49:48 -0400
+In-Reply-To: <20100907141112.GB6903@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 07, 2010 at 10:34:25AM -0400, Miloslav Trmac wrote:
+On Tue, Sep 7, 2010 at 4:11 PM, Herbert Xu <herbert@gondor.hengli.com.a=
+u> wrote:
+
+>> > This is what I am proposing for the Crypto API user-interface.
+>>
+>> Can you explain why we would ever want a userspace interface to it?
+>>
+>> doing crypto in kernel for userspace consumers sis simply insane.
+>> It's computational intensive code which has no business in kernel sp=
+ace
+>> unless absolutely required (e.g. for kernel consumers). =C2=A0In add=
+ition
+>> to that adding the context switch overhead and address space transit=
+ions
+>> is god awfull too.
+>>
+>> This all very much sounds like someone had far too much crack.
 >
-> > > > 	/* These may also be set through sendmsg(2) cmsgs. */
-> > > > 	op = ALG_AEAD_OP_ENCRYPT;
-> > > > 	setsockopt(opfd, SOL_ALG, ALG_AEAD_OP, op, sizeof(op));
-> > > > 	setsockopt(opfd, SOL_ALG, ALG_AEAD_SET_IV, iv, ivlen);
-> > > So that is 8 syscalls to initialize a single AEAD operation.
-> > 
-> > If this interface is fast enough for TCP, it ought to be fast
-> > enough for crypto.
-> Crypto has much smaller granularity than TCP.  A single TLS handshake involves something on the order of 20 separate crypto operations in addition to setting up the four transforms used throughout the life of the session.
-> 
-> A single SHA-256 password verification is more than 5000 hash operations by default.
+> FWIW I don't care about user-space using kernel software crypto at
+> all. =C2=A0It's the security people that do.
 
-You're clearly one of those crazy security people.
+Then I'd suggest to not enforce your design over to people who have
+thought and have interests on that. The NCR api which you rejected
+(for not supporting kernel keyring - which your design also doesn't!),
+has specific security goals and protects against specific threats.
+This design here has been proposed by you quite many times in the past
+and neither you, nor anyone else bothered implementing it. Now we have
+two working implementations that offer user-space access to crypto
+operations, (the openbsd cryptodev port), and NCR, but you discard
+them and insist on a different design. Maybe yours is better (you have
+to argue about that)... Probably I'd use it if it was there, but it
+isn't.
 
-If you're processing a small amount of data the last thing you want
-is to go through the kernel if you care about performance.
-
-Now on the other hand if you had to go through the kernel for
-certification reasons then why are you talking about performance?
-
-> The data will in the usual case be in user-space memory, not in file descriptors.  Existing low-level crypto libraries have no access to the file descriptors that are used to work with the data.  And even in the case of TLS where the data does come through a file descriptor, a MAC is then computed on it - so at most half of the (steady-state) crypto is coming through a file descriptor.
-
-man vmsplice
-
-Also learn to wrap your lines please.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Nikos
