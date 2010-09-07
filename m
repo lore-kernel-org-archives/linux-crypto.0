@@ -1,94 +1,130 @@
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-Subject: [PATCH]crypto/Kconfig update broken web addresses.
-Date: Mon,  6 Sep 2010 21:16:59 -0700
-Message-ID: <1283833019-26155-1-git-send-email-justinmattock@gmail.com>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davem@davemloft.net,
-	"Justin P. Mattock" <justinmattock@gmail.com>
-To: trivial@kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: RFC: Crypto API User-interface
+Date: Tue, 7 Sep 2010 16:42:13 +0800
+Message-ID: <20100907084213.GA4610@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Below is a patch to update the broken web addresses, in crypto/*
-that I could locate. Some are just simple typos that needed to be
-fixed, and some had a change in location altogether..
-let me know if any of them need to be changed and such. 
+Hi:
 
-Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+This is what I am proposing for the Crypto API user-interface.
 
----
- crypto/Kconfig |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+Note that this is the interface for operations.  There will be
+a separate interface (most likely netlink) for configuring crypto
+algorithms, e.g., picking a specific AES implementation as the
+system default.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1cd497d..925da03 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -365,7 +365,7 @@ config CRYPTO_RMD128
- 	  RIPEMD-160 should be used.
- 
- 	  Developed by Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
--	  See <http://home.esat.kuleuven.be/~bosselae/ripemd160.html>
-+	  See <http://homes.esat.kuleuven.be/~bosselae/ripemd160.html>
- 
- config CRYPTO_RMD160
- 	tristate "RIPEMD-160 digest algorithm"
-@@ -382,7 +382,7 @@ config CRYPTO_RMD160
- 	  against RIPEMD-160.
- 
- 	  Developed by Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
--	  See <http://home.esat.kuleuven.be/~bosselae/ripemd160.html>
-+	  See <http://homes.esat.kuleuven.be/~bosselae/ripemd160.html>
- 
- config CRYPTO_RMD256
- 	tristate "RIPEMD-256 digest algorithm"
-@@ -394,7 +394,7 @@ config CRYPTO_RMD256
- 	  (than RIPEMD-128).
- 
- 	  Developed by Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
--	  See <http://home.esat.kuleuven.be/~bosselae/ripemd160.html>
-+	  See <http://homes.esat.kuleuven.be/~bosselae/ripemd160.html>
- 
- config CRYPTO_RMD320
- 	tristate "RIPEMD-320 digest algorithm"
-@@ -406,7 +406,7 @@ config CRYPTO_RMD320
- 	  (than RIPEMD-160).
- 
- 	  Developed by Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
--	  See <http://home.esat.kuleuven.be/~bosselae/ripemd160.html>
-+	  See <http://homes.esat.kuleuven.be/~bosselae/ripemd160.html>
- 
- config CRYPTO_SHA1
- 	tristate "SHA1 digest algorithm"
-@@ -461,7 +461,7 @@ config CRYPTO_WP512
- 	  Whirlpool will be part of the ISO/IEC 10118-3:2003(E) standard
- 
- 	  See also:
--	  <http://planeta.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html>
-+	  <http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html>
- 
- config CRYPTO_GHASH_CLMUL_NI_INTEL
- 	tristate "GHASH digest algorithm (CLMUL-NI accelerated)"
-@@ -579,8 +579,8 @@ config CRYPTO_ANUBIS
- 	  in the NESSIE competition.
- 
- 	  See also:
--	  <https://www.cosic.esat.kuleuven.ac.be/nessie/reports/>
--	  <http://planeta.terra.com.br/informatica/paulobarreto/AnubisPage.html>
-+	  <https://www.cosic.esat.kuleuven.be/nessie/reports/>
-+	  <http://www.larc.usp.br/~pbarreto/AnubisPage.html>
- 
- config CRYPTO_ARC4
- 	tristate "ARC4 cipher algorithm"
-@@ -659,7 +659,7 @@ config CRYPTO_KHAZAD
- 	  on 32-bit processors.  Khazad uses an 128 bit key size.
- 
- 	  See also:
--	  <http://planeta.terra.com.br/informatica/paulobarreto/KhazadPage.html>
-+	  <http://www.larc.usp.br/~pbarreto/KhazadPage.html>
- 
- config CRYPTO_SALSA20
- 	tristate "Salsa20 stream cipher algorithm (EXPERIMENTAL)"
+First of all let's have a quick look at what the user-space side
+looks like for AEAD:
+
+	int op;
+
+	/* This fd corresponds to a tfm object. */
+	tfmfd = socket(AF_ALG, SOCK_STREAM, 0);
+
+	alg.type = "aead";
+	alg.name = "ccm(aes)";
+	bind(tfmfd, &alg, sizeof(alg));
+
+	setsockopt(tfmfd, SOL_ALG, ALG_AEAD_SET_KEY, key, keylen);
+
+The idea here is that each tfm corresponds to a listening socket.
+
+	/* Each listen call generates one or more fds for input/output
+	 * that behave like pipes.
+	 */
+	listen(tfmfd, 0);
+	/* fd for encryption/decryption */
+	opfd = accept(tfmfd, NULL, 0);
+	/* fd for associated data */
+	adfd = accept(tfmfd, NULL, 0);
+
+Each session corresponds to one or more connections obtained from
+that socket.  The number depends on the number of inputs/outputs
+of that particular type of operation.  For most types, there will
+be a s ingle connection/file descriptor that is used for both input
+and output.  AEAD is one of the few that require two inputs.
+
+	/* These may also be set through sendmsg(2) cmsgs. */
+	op = ALG_AEAD_OP_ENCRYPT;
+	setsockopt(opfd, SOL_ALG, ALG_AEAD_OP, op, sizeof(op));
+	setsockopt(opfd, SOL_ALG, ALG_AEAD_SET_IV, iv, ivlen);
+
+	/* Like pipes, larges writes will block!
+	 * For AEAD, ensure the socket buffer is large enough.
+	 * For ciphers, whenever the write blocks start reading.
+	 * For hashes, writes should never block.
+	 */
+	write(opfd, plain, datalen);
+	write(adfd, ad, adlen);
+
+	/* The first read triggers the operation. */
+	read(opfd, crypt, datalen);
+
+	op = ALG_AEAD_OP_DECRYPT;
+	setsockopt(opfd, SOL_ALG, ALG_AEAD_OP, op, sizeof(op));
+
+	write(opfd, crypt, datalen);
+	write(adfd, ad, adlen);
+
+	/* Returns -1 with errno EBADMSG if auth fails */
+	read(defd, plain, datalen);
+
+	/* Zero-copy */
+	splice(cryptfd, NULL, opfd, NULL, datalen, SPLICE_F_MOVE|SPLIFE_F_MORE);
+	/* We allow writes to be split into multiple system calls. */
+	splice(cryptfd2, NULL, opfd, NULL, datalen, SPLICE_F_MOVE);
+	splice(adatafd, NULL, adfd, NULL, adlen, SPLICE_F_MOVE);
+
+	/* For now reading is copy-only, if and when vmsplice
+	 * starts supporting zero-copy to user then we can do it
+	 * as well.
+	 */
+	read(opfd, plain, datalen);
+
+Ciphers/compression are pretty much the same sans adfd.
+
+For hashes:
+
+	/* This fd corresponds to a tfm object. */
+	tfmfd = socket(AF_ALG, SOCK_STREAM, 0);
+
+	alg.type = "hash";
+	alg.name = "xcbc(aes)";
+	bind(tfmfd, &alg, sizeof(alg));
+
+	setsockopt(tfmfd, SOL_ALG, ALG_HASH_SET_KEY, key, keylen);
+
+	/* Each listen call generates one or more fds for input/output
+	 * that behave like pipes.
+	 */
+	listen(tfmfd, 0);
+	/* fd for hashing */
+	opfd = accept(tfmfd, NULL, 0);
+
+	/* MSG_MORE prevents finalisation */
+	send(opfd, plain, datalen, MSG_MORE);
+
+	/* Reads partial hash state */
+	read(opfd, state, statelen);
+
+	/* Restore from a partial hash state */
+	send(opfd, state, statelen, MSG_OOB);
+
+	/* Finalise */
+	send(opfd, plain, 0, 0);
+	read(opfd, hash, hashlen);
+
+Please comment.
+
+Thanks,
 -- 
-1.7.2.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
