@@ -1,61 +1,35 @@
-From: Miloslav Trmac <mitr@redhat.com>
+From: Christoph Hellwig <hch@infradead.org>
 Subject: Re: RFC: Crypto API User-interface
-Date: Tue, 7 Sep 2010 07:27:47 -0400 (EDT)
-Message-ID: <815047906.1056041283858867555.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <1590523029.1055831283858598965.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Date: Tue, 7 Sep 2010 10:06:46 -0400
+Message-ID: <20100907140646.GA31921@infradead.org>
+References: <20100907084213.GA4610@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1590523029.1055831283858598965.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([18.85.46.34]:52386 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756181Ab0IGOGr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Sep 2010 10:06:47 -0400
+Content-Disposition: inline
+In-Reply-To: <20100907084213.GA4610@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
------ "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
-> First of all let's have a quick look at what the user-space side
-> looks like for AEAD:
+On Tue, Sep 07, 2010 at 04:42:13PM +0800, Herbert Xu wrote:
+> Hi:
 > 
-> 	/* Each listen call generates one or more fds for input/output
-> 	 * that behave like pipes.
-> 	 */
-> 	listen(tfmfd, 0);
-> 	/* fd for encryption/decryption */
-> 	opfd = accept(tfmfd, NULL, 0);
-> 	/* fd for associated data */
-> 	adfd = accept(tfmfd, NULL, 0);
-If nothing else, two consecutive accept() calls with different semantics go rather strongly against the spirit of the socket API IMHO.
+> This is what I am proposing for the Crypto API user-interface.
 
-> 	/* These may also be set through sendmsg(2) cmsgs. */
-> 	op = ALG_AEAD_OP_ENCRYPT;
-> 	setsockopt(opfd, SOL_ALG, ALG_AEAD_OP, op, sizeof(op));
-> 	setsockopt(opfd, SOL_ALG, ALG_AEAD_SET_IV, iv, ivlen);
-So that is 8 syscalls to initialize a single AEAD operation.
- 
-> 	/* Like pipes, larges writes will block!
-> 	 * For AEAD, ensure the socket buffer is large enough.
-> 	 * For ciphers, whenever the write blocks start reading.
-> 	 * For hashes, writes should never block.
-> 	 */
-How does one know the buffer is large enough?
+Can you explain why we would ever want a userspace interface to it?
 
-"Whenever the write blocks start reading" turns a trivial loop submitting one buffer-size at a time into something that would be much easier to get wrong.
+doing crypto in kernel for userspace consumers sis simply insane.
+It's computational intensive code which has no business in kernel space
+unless absolutely required (e.g. for kernel consumers).  In addition
+to that adding the context switch overhead and address space transitions
+is god awfull too.
 
-
-> 	/* Zero-copy */
-> 	splice(cryptfd, NULL, opfd, NULL, datalen,
-> SPLICE_F_MOVE|SPLIFE_F_MORE);
-So that is "zero copy on input if your data come from a file descriptor"?  I'm not sure many applications will be able to take advantage of that, and there's still the output copy.
-
-Also, is SPLICE_F_MOVE actually implemented?
-
-Why use splice() at all?  Simple write() gives the driver the __user pointers that can be used to access the underlying pages directly.  Yanking user-space pages out from the process address space to make them "owned" by the crypto driver, causing more page faults when the process wants to reuse the buffer, does not seem like a performance improvement.
-
-> Please comment.
-I can't really see any advantage in trying to use existing syscalls for crypto when the syscalls were clearly not intended for the purpose.  setsockopt() is fine for sockets because options are set up once per connection, and the connection very rarely lasts less than several milliseconds; crypto operation options have to be configured much more often.
-
-7 syscalls to compute a single hash is very difficult to accept.
-     Mirek
+This all very much sounds like someone had far too much crack.
