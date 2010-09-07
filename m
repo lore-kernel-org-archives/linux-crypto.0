@@ -1,72 +1,51 @@
-From: Miloslav Trmac <mitr@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: RFC: Crypto API User-interface
-Date: Tue, 7 Sep 2010 10:34:25 -0400 (EDT)
-Message-ID: <421339997.1082251283870065826.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <1847066281.1081601283869883727.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+Date: Tue, 7 Sep 2010 22:39:00 +0800
+Message-ID: <20100907143859.GA7448@gondor.apana.org.au>
+References: <20100907084213.GA4610@gondor.apana.org.au> <20100907140646.GA31921@infradead.org> <20100907141112.GB6903@gondor.apana.org.au> <20100907142427.GA14207@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:42174 "EHLO
-	mx01.colomx.prod.int.phx2.redhat.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1757058Ab0IGOe3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Sep 2010 10:34:29 -0400
-In-Reply-To: <1847066281.1081601283869883727.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20100907142427.GA14207@infradead.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
------ "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
-> On Tue, Sep 07, 2010 at 07:27:47AM -0400, Miloslav Trmac wrote:
-> > Hello,
-> > ----- "Herbert Xu" <herbert@gondor.hengli.com.au> wrote:
-> > > First of all let's have a quick look at what the user-space side
-> > > looks like for AEAD:
-> > > 
-> > > 	/* Each listen call generates one or more fds for input/output
-> > > 	 * that behave like pipes.
-> > > 	 */
-> > > 	listen(tfmfd, 0);
-> > > 	/* fd for encryption/decryption */
-> > > 	opfd = accept(tfmfd, NULL, 0);
-> > > 	/* fd for associated data */
-> > > 	adfd = accept(tfmfd, NULL, 0);
-> > If nothing else, two consecutive accept() calls with different
-> semantics go rather strongly against the spirit of the socket API
-> IMHO.
+On Tue, Sep 07, 2010 at 10:24:27AM -0400, Christoph Hellwig wrote:
 > 
-> If you have a better suggestion of obtaining multiple fds for
-> multiple input streams please let us know.
-- Don't use a FD for associated data that is limited to 16? bytes
+> I don't think they matter in practice.  We have less than a handfull
+> of drivers for them, and with CPUs gaining proper instructions they
+> are even less useful.  In addition any sane PCI card should just
+> allow userspace mapping of their descriptors.
 
-- Don't use file descriptors for input data at all, if it makes the interface so complex.
+I totally agree that mainstream CPUs won't need this at all.
 
-> > > 	/* These may also be set through sendmsg(2) cmsgs. */
-> > > 	op = ALG_AEAD_OP_ENCRYPT;
-> > > 	setsockopt(opfd, SOL_ALG, ALG_AEAD_OP, op, sizeof(op));
-> > > 	setsockopt(opfd, SOL_ALG, ALG_AEAD_SET_IV, iv, ivlen);
-> > So that is 8 syscalls to initialize a single AEAD operation.
+However we still have embedded users where the CPUs may not be
+powerful enough per se or where they want to use their CPUs for
+other work.
+
+There are also cases such as the Niagra SPU which may not be
+easy to manage from user-space (correct me if I'm wrong Dave).
+
+> > Now as a side-effect if this means that we can shut the security
+> > people up about adding another interface then all the better.  But
+> > I will certainly not go out of the way to add more crap to the
+> > kernel for that purpose.
 > 
-> If this interface is fast enough for TCP, it ought to be fast
-> enough for crypto.
-Crypto has much smaller granularity than TCP.  A single TLS handshake involves something on the order of 20 separate crypto operations in addition to setting up the four transforms used throughout the life of the session.
+> So what is the real use case for this?  In addition to kernel bloat
+> the real fear I have is that the security wankers will just configure
+> the userspace crypto libraries to always use the kernel interface
+> just in case, and once that happens we will have to deal with the whole
+> mess.  Especially for RHEL and Fedora where the inmantes now run the
+> asylum in that respect.
 
-A single SHA-256 password verification is more than 5000 hash operations by default.
+I will let the security people answer this :)
 
-> > Why use splice() at all?  Simple write() gives the driver the __user
-> pointers that can be used to access the underlying pages directly. 
-> Yanking user-space pages out from the process address space to make
-> them "owned" by the crypto driver, causing more page faults when the
-> process wants to reuse the buffer, does not seem like a performance
-> improvement.
-> 
-> For someone working on security I thought you would've considered
-> the pitfalls of inventing yet another interface for moving data
-> between the kernel/user-space.
-The data will in the usual case be in user-space memory, not in file descriptors.  Existing low-level crypto libraries have no access to the file descriptors that are used to work with the data.  And even in the case of TLS where the data does come through a file descriptor, a MAC is then computed on it - so at most half of the (steady-state) crypto is coming through a file descriptor.
-
-Finally, when the application uses file descriptors, it uses them to transfer the _encrypted_ form of the data; it keeps plaintext in memory in order to use it.  So avoiding the trip to userspace protects primarily the kind of data that does not need protecting.
-    Mirek
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
