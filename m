@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH -v2 4/6] generate secondary session key and ciphertext and send it if signing enabled
-Date: Thu,  9 Sep 2010 13:13:14 -0500
-Message-ID: <1284055994-843-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH -v2 5/6] convert hash calculations to use crypto apis
+Date: Thu,  9 Sep 2010 13:13:30 -0500
+Message-ID: <1284056010-867-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,252 +11,252 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-structure ntlmssp_auth and filed cphready is defined as per smb connection.
-
-ntlmssp_auth holds secondary key which is a nonce that gets used as a key
-to generate signatures, ciphertext is genereated by rc4/arc4 encryption of
-secondary key using ntlmv2 session key and sent in the session key field of
-the type 3 message sent by the client during ntlmssp negotiation/exchange
-These are per session structures and secondary key and cipher text
-get calculated only once per smb connection, during first smb session setup
-for that smb connection.
-
-Field cphready is used to mark such that once secondary keys and ciphertext
-are calculated during very first smb session setup for a smb connection
-and ciphertext is sent to the server, the same does not happen during
-subsequent smb session setups/establishments.
-
-A key is exchanged with the server if client indicates so in flags in
-type 1 messsage and server agrees in flag in type 2 message of ntlmssp
-negotiation.  If both client and agree, a key sent by client in
-type 3 message of ntlmssp negotiation in the session key field.
-The key is a ciphertext generated off of secondary key, a nonce, using
-ntlmv2 hash via rc4/arc4.
-
-If authentication is successful, the secondary key is the that client
-uses to calculate cifs/smb signature in the messages that client sends
-and to verify the messages sent by server.
-This key stays with the smb connection for its life and is the key used
-to generate (and verify) signatures for all the subsequent smb sessions
-for this smb connection.
-
-So only for the first smb session on any smb connection, type 1 message
-of ntlmssp negotiation selects the flag NTLMSSP_NEGOTIATE_KEY_XCH.
-It is not used for subsequent smb sessions on this smb connection i.e.
-no need to generate secondary key, create ciphertext and send it etc.
-
-After the very first successful smb session, sequence number gets set
-to 0 and  variable cphready is used to mark that the key calculations
-are done. cphready is reset when a reconnect of the smb connection
-happens as sessions get set up again.
-
-Calculation of ciphertext and setting cphready, is done within
-mutex lock to prevent race of smb session setups on a new smb connection.
+Use kernel crypto sync hash apis insetead of cifs crypto functions.
+The calls typically corrospond one to one except that insead of
+key init, setkey is used.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsglob.h    |   10 +++++++++
- fs/cifs/cifspdu.h     |    7 ++++++
- fs/cifs/cifsproto.h   |    1 +
- fs/cifs/connect.c     |    2 +
- fs/cifs/sess.c        |   26 ++++++++++++++++++-----
- 6 files changed, 93 insertions(+), 6 deletions(-)
+ fs/cifs/cifsencrypt.c |  152 ++++++++++++++++++++++++++++++++++++-------------
+ fs/cifs/cifsproto.h   |    1 -
+ 2 files changed, 112 insertions(+), 41 deletions(-)
 
 diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 857dd37..09d9f74 100644
+index 09d9f74..e72b0e5 100644
 --- a/fs/cifs/cifsencrypt.c
 +++ b/fs/cifs/cifsencrypt.c
-@@ -471,6 +471,59 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
- /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
- }
+@@ -342,38 +342,52 @@ static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
+ {
+ 	int rc = 0;
+ 	int len;
+-	char nt_hash[16];
+-	struct HMACMD5Context *pctxt;
++	char nt_hash[CIFS_NTHASH_SIZE];
+ 	wchar_t *user;
+ 	wchar_t *domain;
++	wchar_t *server;
  
-+int
-+calc_seckey(struct TCP_Server_Info *server)
+-	pctxt = kmalloc(sizeof(struct HMACMD5Context), GFP_KERNEL);
+-
+-	if (pctxt == NULL)
+-		return -ENOMEM;
++	if (!ses->server->secmech.sdeschmacmd5) {
++		cERROR(1, "calc_ntlmv2_hash: can't generate ntlmv2 hash\n");
++		return -1;
++	}
+ 
+ 	/* calculate md4 hash of password */
+ 	E_md4hash(ses->password, nt_hash);
+ 
+-	/* convert Domainname to unicode and uppercase */
+-	hmac_md5_init_limK_to_64(nt_hash, 16, pctxt);
++	crypto_shash_setkey(ses->server->secmech.hmacmd5, nt_hash,
++				CIFS_NTHASH_SIZE);
++
++	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
++	if (rc) {
++		cERROR(1, "calc_ntlmv2_hash: could not init hmacmd5\n");
++		return rc;
++	}
+ 
+ 	/* convert ses->userName to unicode and uppercase */
+ 	len = strlen(ses->userName);
+ 	user = kmalloc(2 + (len * 2), GFP_KERNEL);
+-	if (user == NULL)
++	if (user == NULL) {
++		cERROR(1, "calc_ntlmv2_hash: user mem alloc failure\n");
++		rc = -ENOMEM;
+ 		goto calc_exit_2;
++	}
+ 	len = cifs_strtoUCS((__le16 *)user, ses->userName, len, nls_cp);
+ 	UniStrupr(user);
+-	hmac_md5_update((char *)user, 2*len, pctxt);
++
++	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++				(char *)user, 2 * len);
+ 
+ 	/* convert ses->domainName to unicode and uppercase */
+ 	if (ses->domainName) {
+ 		len = strlen(ses->domainName);
+ 
+ 		domain = kmalloc(2 + (len * 2), GFP_KERNEL);
+-		if (domain == NULL)
++		if (domain == NULL) {
++			cERROR(1, "calc_ntlmv2_hash: domain mem alloc failure");
++			rc = -ENOMEM;
+ 			goto calc_exit_1;
++		}
+ 		len = cifs_strtoUCS((__le16 *)domain, ses->domainName, len,
+ 					nls_cp);
+ 		/* the following line was removed since it didn't work well
+@@ -381,18 +395,76 @@ static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
+ 		   Maybe converting the domain name earlier makes sense */
+ 		/* UniStrupr(domain); */
+ 
+-		hmac_md5_update((char *)domain, 2*len, pctxt);
++		crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++					(char *)domain, 2 * len);
+ 
+ 		kfree(domain);
++	} else if (ses->serverName) {
++		len = strlen(ses->serverName);
++
++		server = kmalloc(2 + (len * 2), GFP_KERNEL);
++		if (server == NULL) {
++			cERROR(1, "calc_ntlmv2_hash: server mem alloc failure");
++			rc = -ENOMEM;
++			goto calc_exit_1;
++		}
++		len = cifs_strtoUCS((__le16 *)server, ses->serverName, len,
++					nls_cp);
++		/* the following line was removed since it didn't work well
++		   with lower cased domain name that passed as an option.
++		   Maybe converting the domain name earlier makes sense */
++		/* UniStrupr(domain); */
++
++		crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++					(char *)server, 2 * len);
++
++		kfree(server);
+ 	}
++
++	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
++					ses->server->ntlmv2_hash);
++
+ calc_exit_1:
+ 	kfree(user);
+ calc_exit_2:
+ 	/* BB FIXME what about bytes 24 through 40 of the signing key?
+ 	   compare with the NTLM example */
+-	hmac_md5_final(ses->server->ntlmv2_hash, pctxt);
+ 
+-	kfree(pctxt);
++	return rc;
++}
++
++static int
++CalcNTLMv2_response(const struct cifsSesInfo *ses, char *v2_session_response)
 +{
 +	int rc;
-+	struct crypto_blkcipher *tfm_arc4;
-+	struct scatterlist sgin, sgout;
-+	struct blkcipher_desc desc;
 +
-+	if (!server) {
-+		cERROR(1, "%s: Can't determine ciphertext key\n", __func__);
-+		return 1;
++	if (!ses->server->secmech.sdeschmacmd5) {
++		cERROR(1, "calc_ntlmv2_hash: can't generate ntlmv2 hash\n");
++		return -1;
 +	}
 +
-+	mutex_lock(&server->srv_mutex);
-+	if (server->cphready) {
-+		mutex_unlock(&server->srv_mutex);
-+		return 0;
-+	}
++	crypto_shash_setkey(ses->server->secmech.hmacmd5,
++			ses->server->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
 +
-+	get_random_bytes(server->ntlmssp.sec_key, CIFS_NTLMV2_SESSKEY_SIZE);
-+
-+	tfm_arc4 = crypto_alloc_blkcipher("ecb(arc4)",
-+						0, CRYPTO_ALG_ASYNC);
-+	if (!tfm_arc4 || IS_ERR(tfm_arc4)) {
-+		cERROR(1, "could not allocate crypto API arc4\n");
-+		mutex_unlock(&server->srv_mutex);
-+		return PTR_ERR(tfm_arc4);
-+	}
-+
-+	desc.tfm = tfm_arc4;
-+
-+	crypto_blkcipher_setkey(tfm_arc4, server->session_key.data.ntlmv2.key,
-+					CIFS_CPHTXT_SIZE);
-+
-+	sg_init_one(&sgin, server->ntlmssp.sec_key, CIFS_CPHTXT_SIZE);
-+	sg_init_one(&sgout, server->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+
-+	rc = crypto_blkcipher_encrypt(&desc, &sgout, &sgin, CIFS_CPHTXT_SIZE);
++	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
 +	if (rc) {
-+		cERROR(1, "could not encrypt session key rc: %d\n", rc);
-+		mutex_unlock(&server->srv_mutex);
++		cERROR(1, "CalcNTLMv2_response: could not init hmacmd5");
 +		return rc;
 +	}
 +
-+	crypto_free_blkcipher(tfm_arc4);
++	memcpy(v2_session_response + CIFS_SERVER_CHALLENGE_SIZE,
++		ses->server->cryptKey, CIFS_SERVER_CHALLENGE_SIZE);
++	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++		v2_session_response + CIFS_SERVER_CHALLENGE_SIZE,
++		sizeof(struct ntlmv2_resp) - CIFS_SERVER_CHALLENGE_SIZE);
 +
-+	server->sequence_number = 0;
-+	server->cphready = true;
-+	mutex_unlock(&server->srv_mutex);
++	if (ses->tilen)
++		crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++					ses->tiblob, ses->tilen);
 +
-+	return 0;
-+}
++	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
++					v2_session_response);
 +
- void
- cifs_crypto_shash_release(struct TCP_Server_Info *server)
+ 	return rc;
+ }
+ 
+@@ -402,7 +474,6 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
  {
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f0ec235..c7da866 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -126,6 +126,14 @@ struct cifs_secmech {
- 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
- };
+ 	int rc;
+ 	struct ntlmv2_resp *buf = (struct ntlmv2_resp *)resp_buf;
+-	struct HMACMD5Context context;
  
-+/* per smb connection structure/fields */
-+struct ntlmssp_auth {
-+	__u32 client_flags; /* sent by client in type 1 ntlmsssp exchange */
-+	__u32 server_flags; /* sent by server in type 2 ntlmssp exchange */
-+	unsigned char sec_key[CIFS_CPHTXT_SIZE]; /* a nonce client generates */
-+	unsigned char ciphertext[CIFS_CPHTXT_SIZE]; /* sent to server */
-+};
+ 	buf->blob_signature = cpu_to_le32(0x00000101);
+ 	buf->reserved = 0;
+@@ -432,15 +503,35 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 		cERROR(1, "could not get v2 hash rc %d", rc);
+ 		goto setup_ntlmv2_rsp_ret;
+ 	}
+-	CalcNTLMv2_response(ses, resp_buf);
++	rc = CalcNTLMv2_response(ses, resp_buf);
++	if (rc) {
++		cERROR(1, "could not get v2 hash rc %d", rc);
++		goto setup_ntlmv2_rsp_ret;
++	}
 +
- struct cifs_cred {
- 	int uid;
- 	int gid;
-@@ -205,6 +213,8 @@ struct TCP_Server_Info {
- 	u16 dialect; /* dialect index that server chose */
- 	/* extended security flavors that server supports */
- 	struct cifs_secmech secmech; /* crypto sec mech functs, descriptors */
-+	struct ntlmssp_auth ntlmssp; /* sec key, ciphertext, flags */
-+	bool    cphready;               /* ciphertext is calculated */
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
-diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-index b0f4b56..dc90a36 100644
---- a/fs/cifs/cifspdu.h
-+++ b/fs/cifs/cifspdu.h
-@@ -134,6 +134,13 @@
-  * Size of the session key (crypto key encrypted with the password
-  */
- #define CIFS_SESS_KEY_SIZE (24)
-+#define CIFS_CLIENT_CHALLENGE_SIZE (8)
-+#define CIFS_SERVER_CHALLENGE_SIZE (8)
-+#define CIFS_HMAC_MD5_HASH_SIZE (16)
-+#define CIFS_CPHTXT_SIZE (16)
-+#define CIFS_NTLMV2_SESSKEY_SIZE (16)
-+#define CIFS_NTHASH_SIZE (16)
++	if (!ses->server->secmech.sdeschmacmd5) {
++		cERROR(1, "calc_ntlmv2_hash: can't generate ntlmv2 hash\n");
++		rc = -1;
++		goto setup_ntlmv2_rsp_ret;
++	}
 +
++	crypto_shash_setkey(ses->server->secmech.hmacmd5,
++			ses->server->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
++
++	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
++	if (rc) {
++		cERROR(1, "setup_ntlmv2_rsp: could not init hmacmd5\n");
++		goto setup_ntlmv2_rsp_ret;
++	}
++
++	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
++				resp_buf, CIFS_HMAC_MD5_HASH_SIZE);
  
- /*
-  * Maximum user name length
+-	/* now calculate the MAC key for NTLMv2 */
+-	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
+-	hmac_md5_update(resp_buf, 16, &context);
+-	hmac_md5_final(ses->server->session_key.data.ntlmv2.key, &context);
++	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
++		ses->server->session_key.data.ntlmv2.key);
+ 
+ 	memcpy(&ses->server->session_key.data.ntlmv2.resp, resp_buf,
+-	       sizeof(struct ntlmv2_resp));
++		sizeof(struct ntlmv2_resp));
+ 	ses->server->session_key.len = 16 + sizeof(struct ntlmv2_resp);
+ 
+ 	return 0;
+@@ -452,25 +543,6 @@ setup_ntlmv2_rsp_ret:
+ 	return rc;
+ }
+ 
+-void CalcNTLMv2_response(const struct cifsSesInfo *ses,
+-			 char *v2_session_response)
+-{
+-	struct HMACMD5Context context;
+-	/* rest of v2 struct already generated */
+-	memcpy(v2_session_response + 8, ses->server->cryptKey, 8);
+-	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
+-
+-	hmac_md5_update(v2_session_response+8,
+-			sizeof(struct ntlmv2_resp) - 8, &context);
+-
+-	if (ses->tilen)
+-		hmac_md5_update(ses->tiblob,
+-			ses->tilen, &context);
+-
+-	hmac_md5_final(v2_session_response, &context);
+-/*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
+-}
+-
+ int
+ calc_seckey(struct TCP_Server_Info *server)
+ {
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8466a16..d89a87a 100644
+index d89a87a..8fe46f5 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -371,6 +371,7 @@ extern int setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
+@@ -366,7 +366,6 @@ extern int cifs_verify_signature(struct smb_hdr *,
+ 				__u32 expected_sequence_number);
+ extern int cifs_calculate_session_key(struct session_key *key, const char *rn,
+ 				 const char *pass);
+-extern void CalcNTLMv2_response(const struct cifsSesInfo *, char *);
+ extern int setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
  			     const struct nls_table *);
  extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *);
- extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
-+extern int calc_seckey(struct TCP_Server_Info *);
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- extern void calc_lanman_hash(const char *password, const char *cryptkey,
- 				bool encrypt, char *lnm_session_key);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8789054..ffccd9f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -199,6 +199,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 			if (server->tcpStatus != CifsExiting)
- 				server->tcpStatus = CifsGood;
- 			server->sequence_number = 0;
-+			server->cphready = false;
- 			spin_unlock(&GlobalMid_Lock);
- 	/*		atomic_set(&server->inFlight,0);*/
- 			wake_up(&server->response_q);
-@@ -1569,6 +1570,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err2;
- 	}
- 
-+	tcp_ses->cphready = false;
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
- 	tcp_ses->noautotune = volume_info->noautotune;
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 8f44fde..7c94d7b 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -408,6 +408,8 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
- 		we must set the MIC field of the AUTHENTICATE_MESSAGE */
- 
-+	ses->server->ntlmssp.server_flags = le32_to_cpu(pblob->NegotiateFlags);
-+
- 	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
- 	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
- 	ses->tilen = tilen;
-@@ -442,10 +444,12 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
- 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
- 		NTLMSSP_NEGOTIATE_NTLM;
- 	if (ses->server->secMode &
--	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-+			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
- 		flags |= NTLMSSP_NEGOTIATE_SIGN;
--	if (ses->server->secMode & SECMODE_SIGN_REQUIRED)
--		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
-+		if (!ses->server->cphready)
-+			flags |= NTLMSSP_NEGOTIATE_KEY_XCH |
-+				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
-+	}
- 
- 	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
- 
-@@ -552,9 +556,19 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
- 	sec_blob->WorkstationName.MaximumLength = 0;
- 	tmp += 2;
- 
--	sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
--	sec_blob->SessionKey.Length = 0;
--	sec_blob->SessionKey.MaximumLength = 0;
-+	if ((ses->server->ntlmssp.server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
-+			!calc_seckey(ses->server)) {
-+		memcpy(tmp, ses->server->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-+		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
-+		sec_blob->SessionKey.MaximumLength =
-+			cpu_to_le16(CIFS_CPHTXT_SIZE);
-+		tmp += CIFS_CPHTXT_SIZE;
-+	} else {
-+		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-+		sec_blob->SessionKey.Length = 0;
-+		sec_blob->SessionKey.MaximumLength = 0;
-+	}
- 
- setup_ntlmv2_ret:
- 	return tmp - pbuffer;
 -- 
 1.6.0.2
