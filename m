@@ -1,34 +1,34 @@
-From: "Sam L. Carl" <mail@traffictractor.com>
-Subject: Don't Be a Victim of Scams!
-Date: Fri, 10 Sep 2010 00:49:16 +0100
-Message-ID: <0111c521$40431$3f310342133218@regina>
-Reply-To: "Sam L. Carl" <mail@traffictractor.com>
+From: David Miller <davem@davemloft.net>
+Subject: [PATCH] crypto: Niagara2 driver needs to depend upon CRYPTO_DES.
+Date: Thu, 09 Sep 2010 21:10:23 -0700 (PDT)
+Message-ID: <20100909.211023.242144504.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out1.ip05ir2.opaltelecom.net ([62.24.128.241]:65188 "EHLO
-	out1.ip05ir2.opaltelecom.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756980Ab0IIXtS (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:59672
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751036Ab0IJEKF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Sep 2010 19:49:18 -0400
+	Fri, 10 Sep 2010 00:10:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey,
 
-Just a quick email to tell you about the amount of scams online especially with the "make money online" niche. 
+Reported-by: Dennis Gilmore <dennis@ausil.us>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 
-How can you protect yourself? 
-
-Well, I have just released my brand new report on the top 10 make money online products available today. I and over 600 other people have tested and tested over 200 products and only 10 of them are really good.
-
-We have gotten impressive results with these top ten, even generating a massive $20,000 - $25,000 a month income.
-
-You can download my report for free. Yes it's 100% free, no hidden charges, no sales page just a simple download.
-
-So visit http://www.StopGuruScams.com and download my report today.
-
-All the best,
-Sam L. Carl
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index ea0b386..ad1cd59 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -172,6 +172,7 @@ config CRYPTO_DEV_MV_CESA
+ 
+ config CRYPTO_DEV_NIAGARA2
+        tristate "Niagara2 Stream Processing Unit driver"
++       select CRYPTO_DES
+        select CRYPTO_ALGAPI
+        depends on SPARC64
+        help
