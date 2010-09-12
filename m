@@ -1,31 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Niagara2 driver needs to depend upon
-	CRYPTO_DES.
-Date: Sun, 12 Sep 2010 10:44:41 +0800
-Message-ID: <20100912024441.GB22244@gondor.apana.org.au>
-References: <20100909.211023.242144504.davem@davemloft.net>
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+Subject: Re: [PATCH]crypto/Kconfig update broken web addresses.
+Date: Sat, 11 Sep 2010 20:31:33 -0700
+Message-ID: <4C8C4995.9060703@gmail.com>
+References: <1283833019-26155-1-git-send-email-justinmattock@gmail.com> <20100912024323.GA22244@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: trivial@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34894 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751049Ab0ILCon (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:51510 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751528Ab0ILDay (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Sep 2010 22:44:43 -0400
-Content-Disposition: inline
-In-Reply-To: <20100909.211023.242144504.davem@davemloft.net>
+	Sat, 11 Sep 2010 23:30:54 -0400
+In-Reply-To: <20100912024323.GA22244@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 09, 2010 at 09:10:23PM -0700, David Miller wrote:
-> 
-> Reported-by: Dennis Gilmore <dennis@ausil.us>
-> Signed-off-by: David S. Miller <davem@davemloft.net>
+On 09/11/2010 07:43 PM, Herbert Xu wrote:
+> On Mon, Sep 06, 2010 at 09:16:59PM -0700, Justin P. Mattock wrote:
+>> Below is a patch to update the broken web addresses, in crypto/*
+>> that I could locate. Some are just simple typos that needed to be
+>> fixed, and some had a change in location altogether..
+>> let me know if any of them need to be changed and such.
+>>
+>> Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
+>
+> Patch applied.  Thanks!
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+cool...
+
+Justin P. Mattock
