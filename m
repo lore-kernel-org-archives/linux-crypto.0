@@ -1,56 +1,57 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH -v2 2/6] ntlmv2/ntlmssp ntlmssp autentication code
-Date: Sun, 12 Sep 2010 21:43:01 -0500
-Message-ID: <AANLkTimYvmWFBf9Ok3MXPNjk8HWstxDWrspZ2WtSPoTW@mail.gmail.com>
-References: <1284055960-792-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20100912085214.08fea91e@tlielax.poochiereds.net>
-	<AANLkTintaxP-BGTRWH-3GmYERvM7g_WYXYYT0StZJaGj@mail.gmail.com>
-	<20100912222506.21f1c032@corrin.poochiereds.net>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH 1/3] crypto: talitos - fix warning: 'alg' may be used
+ uninitialized in this function
+Date: Mon, 13 Sep 2010 17:45:33 -0500
+Message-ID: <20100913174533.43d052ab.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100912222506.21f1c032-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from db3ehsobe006.messaging.microsoft.com ([213.199.154.144]:10939
+	"EHLO DB3EHSOBE006.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751383Ab0IMWpn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Sep 2010 18:45:43 -0400
+Received: from mail6-db3 (localhost.localdomain [127.0.0.1])	by
+ mail6-db3-R.bigfish.com (Postfix) with ESMTP id A03A0DB0323	for
+ <linux-crypto@vger.kernel.org>; Mon, 13 Sep 2010 22:55:05 +0000 (UTC)
+Received: from DB3EHSMHS002.bigfish.com (unknown [10.3.81.250])	by
+ mail6-db3.bigfish.com (Postfix) with ESMTP id 0F26522004B	for
+ <linux-crypto@vger.kernel.org>; Mon, 13 Sep 2010 22:55:00 +0000 (UTC)
+Received: from az33smr02.freescale.net (az33smr02.freescale.net
+ [10.64.34.200])	by de01egw02.freescale.net (8.14.3/8.14.3) with ESMTP id
+ o8DMjYD4008140	for <linux-crypto@vger.kernel.org>; Mon, 13 Sep 2010 15:45:34
+ -0700 (MST)
+Received: from az33exm22.fsl.freescale.net (az33exm22.am.freescale.net
+ [10.64.32.10])	by az33smr02.freescale.net (8.13.1/8.13.0) with ESMTP id
+ o8DMjeqQ018070	for <linux-crypto@vger.kernel.org>; Mon, 13 Sep 2010 17:45:40
+ -0500 (CDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Sep 12, 2010 at 9:25 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->
->> >
->> > Would it be reasonable to split the simple mac_key to session_key
->> > rename part into a separate patch from the ones that actually chan=
-ge
->> > behavior?
->>
->> OK. But I am not sure what we are trying to achieve here churning
->> these patches so
->> many times for a simple change. =A0Not sure who the audience is.
->>
->
-> I'm trying to achieve clarity and bisectability. By separating the
-> trivial changes from the substantive ones, the patches become smaller
-> and the changes they introduce are more evident.
->
-> For the clarity piece, the audience is those of us who are spending
-> time to review them (so far, Steve, Suresh and I). All of us have
-> limited amounts of time available to spend on review. None of us
-> want to spend time sifting through the trivial changes in these patch=
-es
-> to hunt down the ones that actually change behavior.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+drivers/crypto/talitos.c: In function 'talitos_probe':
+drivers/crypto/talitos.c:2363: warning: 'alg' may be used uninitialized in this function
+drivers/crypto/talitos.c:2363: note: 'alg' was declared here
 
-OK, I will make the change. I am now not sure whether that should be
-a separate patch altogether or one of the patches that belongs to this =
-patchset
-i.e. 2 of x or 3 of x etc..
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/talitos.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 4bcd825..d4c1fc2 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2389,6 +2389,9 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 					DESC_HDR_MODE0_MDEU_SHA256;
+ 		}
+ 		break;
++	default:
++		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	alg->cra_module = THIS_MODULE;
+-- 
+1.7.1
