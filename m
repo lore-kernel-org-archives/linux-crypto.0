@@ -1,67 +1,56 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v1 1/4] PPC4xx: Generalizing ADMA driver modifications
-Date: Thu, 23 Sep 2010 15:38:20 -0700
-Message-ID: <4C9BD6DC.3070707@intel.com>
-References: <1285279839-16588-1-git-send-email-tmarri@apm.com>
+From: Tirumala Marri <tmarri@apm.com>
+Subject: RE: [PATCH 1/2] PPC4xx: Generelizing drivers/dma/ppc4xx/adma.c
+Date: Thu, 23 Sep 2010 15:39:47 -0700
+Message-ID: <d2d7c3068b5582bde7529ccc65d71e52@mail.gmail.com>
+References: <1284774145-14543-1-git-send-email-tmarri@apm.com>
+	<4C9BB6EB.7020802@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"yur@emcraft.com" <yur@emcraft.com>,
-	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>
-To: "tmarri@apm.com" <tmarri@apm.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <1285279839-16588-1-git-send-email-tmarri@apm.com>
-Sender: linux-raid-owner@vger.kernel.org
+Cc: neilb@suse.de, yur@emcraft.com, linux-raid@vger.kernel.org,
+	herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+To: Dan Williams <dan.j.williams@intel.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <4C9BB6EB.7020802@intel.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 9/23/2010 3:10 PM, tmarri@apm.com wrote:
-> From: Tirumala Marri<tmarri@apm.com>
 >
-> This patch generalizes the existing drver/dma/ppc4xx/adma.c, so that
-> common code can be shared between different similar DMA engine
-> drivers in other SoCs. Also Makefile and Kconfig changed to accommodate
-> PPC4XX.
+> Will both versions of this driver exist in the same kernel build?  For
+> example the iop-adma driver supports iop13xx and iop3xx, but we select
+> the archtitecture at build time?  Or, as I assume in this case, will
+> the
+> two (maybe more?) ppc4xx adma drivers all be built in the same image,
+> more like ioatdma?
+
+
+[Marri] We select the architecture at build time.
+
+
+
 >
-> Signed-off-by: Tirumala R Marri<tmarri@apm.com>
-> ---
-> V1:
->    * No change.
-> ---
->   arch/powerpc/include/asm/async_tx.h |    4 +-
->   drivers/dma/Kconfig                 |    6 +-
->   drivers/dma/Makefile                |    2 +-
->   drivers/dma/ppc4xx/Makefile         |    2 +-
->   drivers/dma/ppc4xx/adma.c           | 4437 +++--------------------------------
->   drivers/dma/ppc4xx/adma.h           |   92 +-
->   6 files changed, 354 insertions(+), 4189 deletions(-)
+> In the latter case I would recommend a file structure like:
+>
+> drivers/dma/ppc4xx/adma.c
+> drivers/dma/ppc4xx/adma_440spe.c
+> drivers/dma/ppc4xx/adma_460ex.c
+>
+> With patches to move the chipset specific pieces to their own file.
+> Minimizing the code churn in adma.c, or at least showing a progression
+> of what is unique and needs to be moved.
+>
+> This would be similar to how ioatdma is structured and compiles a
+> single
+> driver to cover the three major hardware revisions.
 
-Did you look at this changelog before sending?  It just deletes 4000 
-lines of code??
 
-Moving and renaming code in one patch makes it very difficult to verify 
-the result.  When generalizing code the first thing I want to see with a 
-very quick glance at the patch(es) is that the existing implementation 
-is not harmed.  One way to go about this is to first identify the 
-portions of existing code that you want to reuse in your driver and the 
-pieces that are truly ppc440spe specific.  Move the ppc440spe pieces to 
-their own file (get this reviewed and approved by the ppc440spe 
-authors).  The remaining code in adma.c will be assumed generic.  You 
-can then have another patch to do a simple s/ppc440spe/ppc4xx/ in adma.c 
-(no other logic changes or code movement).  Then you can introduce your 
-ppc460ex unique implementation that calls into adma.c.
-
-I don't want to see patches along the lines of "rename 
-drivers/dma/ppc4xx/adma.c to drivers/dma/ppc4xx/ppc4xx-adma.c" because 
-that is just redundant.  Assume that the existing generic file names are 
-where the common code will lie and then add hw-implementation specific 
-files to call into that base.
-
-Another rule is that the conversion should be bisectable at every step, 
-I should be able to apply each patch in the series and still have a 
-functional/runnable result.
-
---
-Dan
+[Marri]Looks like this driver is similar to iop-adma driver.
