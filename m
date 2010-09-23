@@ -1,62 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Thu, 23 Sep 2010 15:58:40 +0800
-Message-ID: <20100923075840.GA30301@gondor.apana.org.au>
-References: <CFBC532374C38D45810FA00BC2D2C2040120CA815D@irsmsx502.ger.corp.intel.com> <20100920080752.GA972@gondor.apana.org.au> <AANLkTim_gVO2tHUw+vFC9vXRh8Dtv7N38HTCMUZ7LmNg@mail.gmail.com> <24483BA4C9F69C43A7379639D35543D7B6E12F4C@irsmsx502.ger.corp.intel.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH 1/2] PPC4xx: Generelizing drivers/dma/ppc4xx/adma.c
+Date: Thu, 23 Sep 2010 13:22:03 -0700
+Message-ID: <4C9BB6EB.7020802@intel.com>
+References: <1284774145-14543-1-git-send-email-tmarri@apm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Hoban, Adrian" <adrian.hoban@intel.com>,
-	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: "Struk, Tadeusz" <tadeusz.struk@intel.com>
+	"yur@emcraft.com" <yur@emcraft.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	"neilb@suse.de" <neilb@suse.de>
+To: "tmarri@apm.com" <tmarri@apm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36586 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750750Ab0IWH6n (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Sep 2010 03:58:43 -0400
-Content-Disposition: inline
-In-Reply-To: <24483BA4C9F69C43A7379639D35543D7B6E12F4C@irsmsx502.ger.corp.intel.com>
+Received: from mga02.intel.com ([134.134.136.20]:17964 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753502Ab0IWUWF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Sep 2010 16:22:05 -0400
+In-Reply-To: <1284774145-14543-1-git-send-email-tmarri@apm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 20, 2010 at 12:21:54PM +0100, Struk, Tadeusz wrote:
-> Hello Herbert,
-> I've reworked the patch 2/3 and successfully applied all of them.
-> The problem was spaces at EOL.
-> Please find the reworked patch below.
-> 
-> >From 06444d8a95458d807ae14699e557739281d0b026 Mon Sep 17 00:00:00 2001
-> From: Adrian Hoban <ahoban@allen.ir.intel.com>
-> Date: Fri, 10 Sep 2010 18:08:45 +0100
-> Subject: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-> 
-> This patch adds an optimized RFC4106 AES-GCM implementation for 64-bit
-> kernels. It supports 128-bit AES key size. This leverages the crypto
-> AEAD interface type to facilitate a combined AES & GCM operation to
-> be implemented in assembly code. The assembly code leverages Intel(R)
-> AES New Instructions and the PCLMULQDQ instruction.
-> 
-> Signed-off-by: Adrian Hoban <adrian.hoban@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> Signed-off-by: Gabriele Paoloni <gabriele.paoloni@intel.com>
-> Signed-off-by: Aidan O'Mahony <aidan.o.mahony@intel.com>
-> Signed-off-by: Erdinc Ozturk <erdinc.ozturk@intel.com>
-> Signed-off-by: James Guilford <james.guilford@intel.com>
-> Signed-off-by: Wajdi Feghali <wajdi.k.feghali@intel.com>
+On 9/17/2010 6:42 PM, tmarri@apm.com wrote:
+> From: Tirumala Marri<tmarri@apm.com>
+>
+> This patch generalizes the existing drver/dma/ppc4xx/adma.c, so that
+> common code can be shared between different similar DMA engine
+> drivers in other SoCs.
+>
+> Signed-off-by: Tirumala R Marri<tmarri@apm.com>
+> ---
+>   drivers/dma/ppc4xx/adma.c        | 4370 +++-----------------------------------
+>   drivers/dma/ppc4xx/adma.h        |  116 +-
+>   drivers/dma/ppc4xx/ppc4xx-adma.h | 4020 +++++++++++++++++++++++++++++++++++
+>   3 files changed, 4357 insertions(+), 4149 deletions(-)
+>   create mode 100644 drivers/dma/ppc4xx/ppc4xx-adma.h
+>
 
-Sorry, still doesn't work:
+Will both versions of this driver exist in the same kernel build?  For 
+example the iop-adma driver supports iop13xx and iop3xx, but we select 
+the archtitecture at build time?  Or, as I assume in this case, will the 
+two (maybe more?) ppc4xx adma drivers all be built in the same image, 
+more like ioatdma?
 
-$ git apply ~/p
-fatal: corrupt patch at line 67
-$ patch -s -p1 < ~/p
-patch: **** malformed patch at line 66: ALL_F
-$
+In the latter case I would recommend a file structure like:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+drivers/dma/ppc4xx/adma.c
+drivers/dma/ppc4xx/adma_440spe.c
+drivers/dma/ppc4xx/adma_460ex.c
+
+With patches to move the chipset specific pieces to their own file. 
+Minimizing the code churn in adma.c, or at least showing a progression 
+of what is unique and needs to be moved.
+
+This would be similar to how ioatdma is structured and compiles a single 
+driver to cover the three major hardware revisions.
+
+--
+Dan
