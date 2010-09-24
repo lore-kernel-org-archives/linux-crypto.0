@@ -1,50 +1,41 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v1 1/4] PPC4xx: Generalizing ADMA driver modifications
-Date: Thu, 23 Sep 2010 15:51:45 -0700
-Message-ID: <4C9BDA01.2060001@intel.com>
-References: <1285279839-16588-1-git-send-email-tmarri@apm.com> <4C9BD6DC.3070707@intel.com> <fe45b421a909d749a6cf583426a1ce6d@mail.gmail.com>
+From: Stefan Roese <sr@denx.de>
+Subject: Re: [PATCH 1/2] PPC4xx: Generelizing drivers/dma/ppc4xx/adma.c
+Date: Fri, 24 Sep 2010 08:58:04 +0200
+Message-ID: <201009240858.05018.sr@denx.de>
+References: <1284774145-14543-1-git-send-email-tmarri@apm.com> <4C9BB6EB.7020802@intel.com> <d2d7c3068b5582bde7529ccc65d71e52@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"yur@emcraft.com" <yur@emcraft.com>,
-	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>
-To: Tirumala Marri <tmarri@apm.com>
+Cc: Tirumala Marri <tmarri@apm.com>,
+	Dan Williams <dan.j.williams@intel.com>, neilb@suse.de,
+	yur@emcraft.com, linux-raid@vger.kernel.org,
+	herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org
+To: linuxppc-dev@lists.ozlabs.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:4405 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753357Ab0IWWvr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Sep 2010 18:51:47 -0400
-In-Reply-To: <fe45b421a909d749a6cf583426a1ce6d@mail.gmail.com>
+Received: from mo-p05-ob.rzone.de ([81.169.146.181]:57313 "EHLO
+	mo-p05-ob.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752829Ab0IXG6Q (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Sep 2010 02:58:16 -0400
+In-Reply-To: <d2d7c3068b5582bde7529ccc65d71e52@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9/23/2010 3:44 PM, Tirumala Marri wrote:
->>
->> Did you look at this changelog before sending?  It just deletes 4000
->> lines of code??
-> [Marri] The reason I have to send it in different file is the size of the
-> patch.
-> There seem to be issue with patch sizes 200k or more.
+On Friday 24 September 2010 00:39:47 Tirumala Marri wrote:
+> > Will both versions of this driver exist in the same kernel build?  For
+> > example the iop-adma driver supports iop13xx and iop3xx, but we select
+> > the archtitecture at build time?  Or, as I assume in this case, will
+> > the
+> > two (maybe more?) ppc4xx adma drivers all be built in the same image,
+> > more like ioatdma?
+> 
+> [Marri] We select the architecture at build time.
 
-Read the rest of what I wrote:
+It would be really preferable to support all those platforms in a single Linux 
+image. If technically possible, please try to move this direction.
 
-> Moving and renaming code in one patch makes it very difficult to verify
-> the result.  When generalizing code the first thing I want to see with a
-> very quick glance at the patch(es) is that the existing implementation
-> is not harmed.  One way to go about this is to first identify the
-> portions of existing code that you want to reuse in your driver and the
-> pieces that are truly ppc440spe specific.  Move the ppc440spe pieces to
-> their own file (get this reviewed and approved by the ppc440spe
-> authors).  The remaining code in adma.c will be assumed generic.  You
-> can then have another patch to do a simple s/ppc440spe/ppc4xx/ in adma.c
-> (no other logic changes or code movement).  Then you can introduce your
-> ppc460ex unique implementation that calls into adma.c.
+Thanks.
 
-The patch would not be so large if you leave the existing code where it 
-is and move the implementation specific pieces to their own file.
-
---
-Dan
+Cheers,
+Stefan
