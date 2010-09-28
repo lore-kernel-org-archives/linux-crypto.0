@@ -1,34 +1,111 @@
-From: Tirumala Marri <tmarri@apm.com>
-Subject: RE: [PATCH 1/2] PPC4xx: Generelizing drivers/dma/ppc4xx/adma.c
-Date: Fri, 24 Sep 2010 11:52:49 -0700
-Message-ID: <ba171a39721d9cfd3e7c8ca8d287f485@mail.gmail.com>
-References: <1284774145-14543-1-git-send-email-tmarri@apm.com>
- <4C9BB6EB.7020802@intel.com> <d2d7c3068b5582bde7529ccc65d71e52@mail.gmail.com>
- <201009240858.05018.sr@denx.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Dan Williams <dan.j.williams@intel.com>, neilb@suse.de,
-	yur@emcraft.com, linux-raid@vger.kernel.org,
-	herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org
-To: Stefan Roese <sr@denx.de>, linuxppc-dev@lists.ozlabs.org
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 0/4] keys: trusted and encrypted keys
+Date: Tue, 28 Sep 2010 14:36:29 -0400
+Message-ID: <1285698993-16927-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: linux-security-module@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from exprod5og107.obsmtp.com ([64.18.0.184]:59287 "HELO
-	exprod5og107.obsmtp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752651Ab0IXSwq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Sep 2010 14:52:46 -0400
-In-Reply-To: <201009240858.05018.sr@denx.de>
+Received: from e5.ny.us.ibm.com ([32.97.182.145]:47501 "EHLO e5.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755943Ab0I1Sgq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 28 Sep 2010 14:36:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->
-> It would be really preferable to support all those platforms in a
-> single Linux
-> image. If technically possible, please try to move this direction.
-It is do-able for couple of SoCs. Other SoC DMA engines are quite a bit
-different.
-Let me first do small steps first and slowly achieve some run time
-Differentiation.
+Sorry for the duplicate posting. Am cc'ing the crypto mailing 
+list as well. 
 
-Thanks,
-Marri
+Trusted and Encrypted Keys are two new key types added to the
+existing kernel key ring service. Both of these new types are
+variable length symmetic keys, and in both cases all keys are
+created in the kernel, and user space sees, stores, and loads 
+only encrypted blobs. Trusted Keys require the availability of a
+Trusted Platform Module (TPM) chip for greater security, while
+Encrypted Keys can be used on any system. All user level blobs,
+are displayed and loaded in hex ascii for convenience, and
+are integrity verified.
+
+Trusted Keys use a TPM both to generate and to seal the keys.
+Keys are sealed under a 2048 bit RSA key in the TPM, and optionally
+sealed to specified PCR (integrity measurement) values, and only
+unsealed by the TPM, if PCRs and blob integrity verifications match.
+A loaded Trusted Key can be updated with new (future) PCR values,
+so keys are easily migrated to new pcr values, such as when the
+kernel and initramfs are updated. The same key can have many
+saved blobs under different PCR values, so multiple boots are
+easily supported.
+
+Trusted Keys are sealed under the SRK, which must have the default
+authorization value (20 zeros). This can be set at takeownership
+time with the trouser's utility "tpm_takeownership -u -z".
+
+Usage:
+    keyctl add trusted name "NEW keylen [hex_pcrinfo]" ring
+    keyctl add trusted name "LOAD hex_blob" ring
+    keyctl update key "UPDATE hex_pcrinfo"
+    keyctl print keyid
+    keyctl pipe keyid > filename
+
+The key length for new keys are always in bytes.
+Trusted Keys can be 32 - 128 bytes (256 - 1024 bits), the upper
+limit is to fit within the 2048 bit SRK (RSA) keylength, with
+all necessary structure/padding. The keywords NEW, LOAD, and
+UPDATE can be all upper or all lower case.
+
+Encrypted keys do not depend on a TPM, and are faster, as they
+use AES for encryption/decryption. New keys are created from kernel
+generated random numbers, and are encrypted/decrypted using a
+specified 'master' key. The 'master' key can either be a trusted-key
+or user-key type. The main disadvantage of encrypted keys is that if
+they are not rooted in a trusted key, they are only as secure as the
+user key encrypting them. The master user key should therefore
+be loaded in as secure a way as possible, preferably early in
+boot.
+
+Usage:
+  keyctl add encrypted name "NEW master-key-name keylen" ring
+  keyctl add encrypted name "LOAD master-key-name keylen hex_blob" ring
+  keyctl update keyid "UPDATE master-key-name"
+
+The initial consumer of trusted keys is EVM, which at boot time
+needs a high quality symmetric key for HMAC protection of file
+metadata. The use of a trusted key provides strong guarantees
+that the EVM key has not been compromised by a user level problem,
+and when sealed to specific boot PCR values, protects against
+boot and offline attacks. Other uses for trusted and encrypted
+keys, such as for disk and file encryption are anticipated.
+
+Mimi Zohar
+Dave Safford
+
+Mimi Zohar (4):
+  lib: hex2bin converts ascii hexadecimal string to binary
+  key: add tpm_send command
+  keys: add new trusted key-type
+  keys: add new key-type encrypted
+
+ drivers/char/tpm/tpm.c            |   17 +
+ include/keys/encrypted-type.h     |   30 ++
+ include/keys/trusted-type.h       |   33 ++
+ include/linux/kernel.h            |    1 +
+ include/linux/tpm.h               |    3 +
+ lib/hexdump.c                     |   16 +
+ security/Kconfig                  |   33 ++
+ security/keys/Makefile            |    2 +
+ security/keys/encrypted_defined.c |  781 +++++++++++++++++++++++++++++
+ security/keys/encrypted_defined.h |   52 ++
+ security/keys/trusted_defined.c   |  997 +++++++++++++++++++++++++++++++++++++
+ security/keys/trusted_defined.h   |  125 +++++
+ 12 files changed, 2090 insertions(+), 0 deletions(-)
+ create mode 100644 include/keys/encrypted-type.h
+ create mode 100644 include/keys/trusted-type.h
+ create mode 100644 security/keys/encrypted_defined.c
+ create mode 100644 security/keys/encrypted_defined.h
+ create mode 100644 security/keys/trusted_defined.c
+ create mode 100644 security/keys/trusted_defined.h
+
+-- 
+1.7.2.2
