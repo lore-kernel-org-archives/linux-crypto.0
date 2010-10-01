@@ -1,202 +1,119 @@
 From: Tirumala Marri <tmarri@apm.com>
 Subject: RE: [PATCH] PPC4xx: ADMA separating SoC specific functions
-Date: Thu, 30 Sep 2010 17:03:59 -0700
-Message-ID: <b1772905c0f75c21f9265d30235d829d@mail.gmail.com>
-References: <1285865736-32074-1-git-send-email-tmarri@apm.com> <20100930190814.52268D2B48C@gemini.denx.de>
+Date: Thu, 30 Sep 2010 17:16:30 -0700
+Message-ID: <dc9b5d064d80ac2af2ccf932e94b2bb9@mail.gmail.com>
+References: <1285865736-32074-1-git-send-email-tmarri@apm.com>
+	<20100930190814.52268D2B48C@gemini.denx.de> <AANLkTi=CJOsayM1YnwE3a22D2S35aM+BTV6_YfXjcjiO@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linuxppc-dev@lists.ozlabs.org, yur@emcraft.com,
-	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dan.j.williams@intel.com
-To: Wolfgang Denk <wd@denx.de>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <20100930190814.52268D2B48C@gemini.denx.de>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Dan Williams <dan.j.williams@intel.com>, Wolfgang Denk <wd@denx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from exprod5og113.obsmtp.com ([64.18.0.26]:38245 "HELO
+	exprod5og113.obsmtp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751550Ab0JAAQg convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Sep 2010 20:16:36 -0400
+In-Reply-To: <AANLkTi=CJOsayM1YnwE3a22D2S35aM+BTV6_YfXjcjiO@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+> On Thu, Sep 30, 2010 at 12:08 PM, Wolfgang Denk <wd@denx.de> wrote:
+> [snip other valid review comments]
+> >
+> > This is a header file, yet you add here literally thousands of line=
+s
+> of
+> > code.
+>
+> Yes, these functions are entirely too large to be inlined.  It looks
+> like you are trying to borrow too heavily from the iop-adma model.
+> The differences between iop13xx and iop33x from a adma perspective ar=
+e
+> just in descriptor format and channel capabilities.  If you look at
+> the routines implemented in:
+> arch/arm/include/asm/hardware/iop3xx-adma.h
+> arch/arm/mach-iop13xx/include/mach/adma.h
+> ...they are just simple helpers that abstract the descriptor details.
+> For example:
+>
+> iop_adma_prep_dma_xor()
+> {
+> [snip]
+>         spin_lock_bh(&iop_chan->lock);
+>         slot_cnt =3D iop_chan_xor_slot_count(len, src_cnt,
+> &slots_per_op);
+>         sw_desc =3D iop_adma_alloc_slots(iop_chan, slot_cnt,
+> slots_per_op);
+>         if (sw_desc) {
+>                 grp_start =3D sw_desc->group_head;
+>                 iop_desc_init_xor(grp_start, src_cnt, flags);
+>                 iop_desc_set_byte_count(grp_start, iop_chan, len);
+>                 iop_desc_set_dest_addr(grp_start, iop_chan, dma_dest)=
+;
+>                 sw_desc->unmap_src_cnt =3D src_cnt;
+>                 sw_desc->unmap_len =3D len;
+>                 sw_desc->async_tx.flags =3D flags;
+>                 while (src_cnt--)
+>                         iop_desc_set_xor_src_addr(grp_start, src_cnt,
+>                                                   dma_src[src_cnt]);
+>         }
+>         spin_unlock_bh(&iop_chan->lock);
+>
+>         return sw_desc ? &sw_desc->async_tx : NULL;
+> }
+>
+> Where  iop_adma_alloc_slots() is implemented differently between
+> iop13xx and iop3xx.  In this case why does ppc440spe-adma.h exist?  I=
+f
+> it has code specific to ppe440spe it should just live in the ppe440sp=
+e
+> C file.  If it is truly generic it should move to the base adma.c
+> implementation.  If you want to reuse a ppe440spe routine just link t=
+o
+> it.
+[Marri]That is how I started changing the code. And I see tons of warni=
+ngs
+Saying "Used but not defined" or "Defined but not used". How should I
+suppress
+Some functions from adma.c are used in ppc440spe-adma.c and some from
+ppc440spe-adma.c
+Are used in adma.c. So I created intermediate file ppc440spe-adma.h wit=
+h
+inlined
+=46unctions. In future this will be converted into ppc4xx_adma.h and mo=
+ve
+existing
+SoC specific stuff to ppc440spe-adma.c file.
 
 >
-> When reposting a patch, please always indicate that this is new
-> version by using something like "[PATCH v2]" in the Subject line.
-[Marri] I know, but this patch is not modification of previous patch.
-It is complete brand new from scratch again. In that case isn't this
- will be first version ?
+> > Selecting the architecture at build time is bad as it prevents usin=
+g
+> a
+> > sinlge kernel image across a wide range of boards. =A0You only repl=
+ied
+> > "We select the architecture at build time." without any explanation
+> if
+> > there is a pressing technical reason to do it this way, or if this
+> was
+> > just a arbitrary decision.
+>
+> I agree I have yet to see any indication that this driver needs to
+> have an architecture selected at build time.
+>
+> A potential compromise a first step would be to have a common C file
+> that is shared between two driver modules until such point that they
+> can be unified into a common module.
 
-
-> > ---
->
-> Also, please include here (i. e. below the "---" line, i. e. in the
-> comments section, a description of what was changed compared to the
-> previous version of this patch.
->
-> As is, you enforce us to rescan the whole patch again and check
-> manually if you have reacted to any of the comments sent before, and
-> how.  As is, you make reviewing your poatches harder than necessary.
-
-[Marri} I will include comments in the further versions of this patch.
-
->
->
-> > diff --git a/drivers/dma/ppc4xx/adma.c b/drivers/dma/ppc4xx/adma.c
-> > index 0d58a4a..a1053cb 100644
-> > --- a/drivers/dma/ppc4xx/adma.c
-> > +++ b/drivers/dma/ppc4xx/adma.c
-> ...
-> > +#include "ppc440spe-adma.h"
-> > +
-> > +struct dma_async_tx_descriptor
-> > +*ppc440spe_adma_prep_dma_pq(struct dma_chan *chan,
-> > +			       dma_addr_t * dst,
-> > +			       dma_addr_t * src,
-> > +			       unsigned int src_cnt,
-> > +			       const unsigned char *scf,
-> > +			       size_t len,
-> > +			       unsigned long flags);
-> > +struct dma_async_tx_descriptor
-> > +*ppc440spe_adma_prep_dma_pqzero_sum(struct dma_chan *chan,
->
-> Should such 440SPe specific code not be removed here and placed into
-> ppc440spe-adma.c instead?
-[Marri] It is 440SPe specific. Definition is moved ppc440spe-adma.c
-
-
->
-> > +#if 0
-> >  static void prep_dma_pq_dbg(int id, dma_addr_t *dst, dma_addr_t
-> *src,
-> >  			    unsigned int src_cnt)
-> >  {
-> > @@ -213,8 +104,9 @@ static void prep_dma_pq_dbg(int id, dma_addr_t
-> *dst, dma_addr_t *src,
-> >  	for (i = 0; i < 2; i++)
-> >  		pr_debug("\t0x%016llx ", dst[i]);
-> >  }
-> > +#endif
->
-> Please do not add dead code - remove the whole "#if 0" block.
-[Marri] Will remove it.
-
-
-> *******/
->
-> It seems youremove all code, but leave the (now empty) comment
-> headers? This makes little sense to me.
->
-[Marri] Will clean up in the next version.
-> ...
-> >  /**
-> >   * ppc440spe_adma_free_slots - flags descriptor slots for reuse
-> >   * @slot: Slot to free
-> >   * Caller must hold &ppc440spe_chan->lock while calling this
-> function
-> >   */
->
-> Again, all this is pretty low-level 440SPe specific code. Why do you
-> keep this in the common drive rfile instead of moving it into the new
-> 440SPe specific file?
-[Marri]. With name change it can be used With any SoC ADMA driver.
-
-
->
->
-> > diff --git a/drivers/dma/ppc4xx/ppc440spe-adma.c
-> b/drivers/dma/ppc4xx/ppc440spe-adma.c
-> > new file mode 100644
-> > index 0000000..da467b4
-> ...
-> > +	/*  In the current implementation of ppc440spe ADMA driver it
-> > +
-> > +
-> > +
-> > +	 * makes sense to pick out only pq case, because it may be
->
-> Formatting problems?
-[Marri] Will fix in next version.
-
->
->
-> > diff --git a/drivers/dma/ppc4xx/ppc440spe-adma.h
-> b/drivers/dma/ppc4xx/ppc440spe-adma.h
-> > new file mode 100644
-> > index 0000000..81a1f46
-> > --- /dev/null
-> > +++ b/drivers/dma/ppc4xx/ppc440spe-adma.h
-> ...
-> > +/*
-> > + * ppc440spe_get_group_entry - get group entry with index idx
-> > + * @tdesc: is the last allocated slot in the group.
-> > + */
-> > +static struct ppc440spe_adma_desc_slot
-> *ppc440spe_get_group_entry(struct
-> > +
-ppc440spe_adma_desc_slot
-> > +							    *tdesc,
-> > +							    u32 entry_idx)
-> > +{
-> > +	struct ppc440spe_adma_desc_slot *iter = tdesc->group_head;
-> > +	int i = 0;
-> > +
-> > +	if (entry_idx < 0 || entry_idx >= (tdesc->src_cnt + tdesc-
-> >dst_cnt)) {
-> > +		printk("%s: entry_idx %d, src_cnt %d, dst_cnt %d\n",
-> > +		       __func__, entry_idx, tdesc->src_cnt, tdesc-
-> >dst_cnt);
-> > +		BUG();
-> > +	}
-> > +
-> > +	list_for_each_entry(iter, &tdesc->group_list, chain_node) {
-> > +		if (i++ == entry_idx)
-> > +			break;
-> > +	}
-> > +	return iter;
-> > +}
->
-> This is a header file, yet you add here literally thousands of lines of
-> code.
->
->
-> Note that more or less similar questions have been asked for the
-> previous version of this patch, but I fail to find any good
-> justification in your replies.
-[Marri] Reason for some functions in lined is 1) They are small enough
-To be in lined 2) If keep them in ppc440spe-adma.c I will have to make
-them
-Non static to avoid "Used but not defined warnings". With too many
-functions
-Non static might cause name space pollution in the kernel ?
-
->
->
-> Selecting the architecture at build time is bad as it prevents using a
-> sinlge kernel image across a wide range of boards.  You only replied
-> "We select the architecture at build time." without any explanation if
-> there is a pressing technical reason to do it this way, or if this was
-> just a arbitrary decision.
-[Marri] Build time separation is only for entirely different SoC DMA
-engine.
-For example 440spe and 460sx has engierely different DMA architecture.
-Whereas 440spe and 460ex can be determined at run time.I am planning to do
-the run time selection for similar SoCs. I discussed This with Yuri as
-well.
-
->
-> The same goes for putting so much source code in a header file - I
-> really see no technical need for this (especially not if you build for
-> a single architecture only).
-[Marri] I explained this above.
-
->
-> Also I wonder why you still keep so many 440SPe specific code in the
-> common file, even though you just create new 440SPe specific header
-> and source files.
->
->
-> Please elucidate.
->
->
-[Marri] With Dan's suggestion first I am working on separating SoC
-specific functions
-To avoid too many  changes. Next step is to re-name the functions in the
-Adma.c to common name line ppc4xx_xxx().
+As I responded to Mr. Wolfgang in previous email, similar SoC DMA engin=
+es
+will
+Be resolved at run time. Whereas completely different architectures wil=
+l
+be
+Resolved at build time.
 
 Regards,
 Marri
