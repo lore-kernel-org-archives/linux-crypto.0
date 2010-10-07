@@ -1,10 +1,10 @@
 From: Roberto Sassu <roberto.sassu@polito.it>
-Subject: [PATCH 1/2] keys: fixed handling of update method of the encrypted key type
-Date: Thu, 7 Oct 2010 14:29:24 +0200
-Message-ID: <201010071429.24664.roberto.sassu@polito.it>
+Subject: [PATCH 2/2] keys: added cleanup code for trusted and encrypted key types
+Date: Thu, 7 Oct 2010 14:30:45 +0200
+Message-ID: <201010071430.46281.roberto.sassu@polito.it>
 Mime-Version: 1.0
 Content-Type: multipart/signed;
-  boundary="nextPart1585546.Rar81MA0MJ";
+  boundary="nextPart2369476.E3WXDYghrc";
   protocol="application/pkcs7-signature";
   micalg=sha1
 Content-Transfer-Encoding: 7bit
@@ -12,122 +12,66 @@ To: Mimi Zohar <zohar@linux.vnet.ibm.com>, keyrings@linux-nfs.org,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
 	David Safford <safford@watson.ibm.com>,
 	Rajiv Andrade
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from new1.smtp.messagingengine.com ([66.111.4.221]:44431 "EHLO
-	new1.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1760423Ab0JGM3x (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Oct 2010 08:29:53 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
---nextPart1585546.Rar81MA0MJ
+--nextPart2369476.E3WXDYghrc
 Content-Type: text/plain;
   charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
-This patch adds the UPDATE keyword for encrypted key types:
-prevents updating existent keys if UPDATE is missing and creating
-new keys when UPDATE is specified.
+This patch frees the payload at the end of the instantiate
+method of both trusted and encrypted key types if an error occurs.
 
 Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
 =2D--
- security/keys/encrypted_defined.c |   31 +++++++++++++++++++++++--------
- 1 files changed, 23 insertions(+), 8 deletions(-)
+ security/keys/encrypted_defined.c |    6 ++++++
+ security/keys/trusted_defined.c   |    4 ++++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
 diff --git a/security/keys/encrypted_defined.c b/security/keys/encrypted_de=
 fined.c
-index 6b26db6..54c0f0f 100644
+index 54c0f0f..8426e66 100644
 =2D-- a/security/keys/encrypted_defined.c
 +++ b/security/keys/encrypted_defined.c
-@@ -64,7 +64,8 @@ static int aes_get_sizes(int *ivsize, int *blksize)
- }
-=20
- enum {
-=2D	Opt_err =3D -1, Opt_new =3D 1, Opt_load, Opt_NEW, Opt_LOAD
-+	Opt_err =3D -1, Opt_new =3D 1, Opt_load,=20
-+	Opt_update, Opt_NEW, Opt_LOAD, Opt_UPDATE
- };
-=20
- static match_table_t key_tokens =3D {
-@@ -72,6 +73,8 @@ static match_table_t key_tokens =3D {
- 	{Opt_NEW, "NEW"},
- 	{Opt_load, "load"},
- 	{Opt_LOAD, "LOAD"},
-+	{Opt_update, "update"},
-+	{Opt_UPDATE, "UPDATE"},
- 	{Opt_err, NULL}
- };
-=20
-@@ -81,6 +84,7 @@ static match_table_t key_tokens =3D {
-  * datablob format:
-  * NEW <master-key name> <decrypted data length>
-  * LOAD <master-key name> <decrypted data length> <encrypted iv + data>
-+ * UPDATE <new-master-key name>
-  *
-  * Tokenizes a copy of the keyctl data, returning a pointer to each token,
-  * which is null terminated.
-@@ -104,23 +108,36 @@ static int datablob_parse(char *datablob, char **mast=
-er_desc,
- 	*master_desc =3D strsep(&datablob, " \t");
- 	if (!*master_desc)
- 		goto out;
-=2D	*decrypted_datalen =3D strsep(&datablob, " \t");
-=2D	if (!*decrypted_datalen)
-=2D		goto out;
-+
-+	if (decrypted_datalen) {
-+		*decrypted_datalen =3D strsep(&datablob, " \t");
-+		if (!*decrypted_datalen)
-+			goto out;
-+	}
-=20
- 	switch (key_cmd) {
- 	case Opt_new:
- 	case Opt_NEW:
-+		if (!decrypted_datalen)
-+			break;
- 		ret =3D 0;
- 		break;
- 	case Opt_load:
- 	case Opt_LOAD:
-+		if (!decrypted_datalen)
-+			break;
- 		*hex_encoded_iv =3D strsep(&datablob, " \t");
- 		if (!*hex_encoded_iv)
- 			break;
- 		*hex_encoded_data =3D *hex_encoded_iv + (2 * ivsize) + 2;
- 		ret =3D 0;
- 		break;
-+	case Opt_update:
-+	case Opt_UPDATE:
-+		if (decrypted_datalen)
-+			break;
-+		ret =3D 0;
-+		break;
- 	case Opt_err:
- 		break;
+@@ -624,7 +624,13 @@ static int encrypted_instantiate(struct key *key, cons=
+t void *data,
  	}
-@@ -647,11 +664,9 @@ static int encrypted_update(struct key *key, const voi=
-d *data, size_t datalen)
- 		return -ENOMEM;
-=20
- 	memcpy(buf, data, datalen);
-=2D	new_master_desc =3D strsep(&buf, " \t");
-=2D	if (!*new_master_desc) {
-=2D		ret =3D -EINVAL;
-+	ret =3D datablob_parse(buf, &new_master_desc, NULL, NULL, NULL);
-+	if (ret < 0)
- 		goto out;
-=2D	}
-=20
- 	new_epayload =3D encrypted_key_alloc(key, new_master_desc,
- 					   epayload->datalen);
+ 	ret =3D encrypted_init(epayload, master_desc, decrypted_datalen,
+ 			     hex_encoded_iv, hex_encoded_data);
++	if (ret)
++		goto out_free_epayload;
++
+ 	rcu_assign_pointer(key->payload.data, epayload);
++out_free_epayload:
++	if (ret)
++		kfree(epayload);
+ out:
+ 	kfree(datablob);
+ 	return ret > 0 ? -EINVAL : ret;
+diff --git a/security/keys/trusted_defined.c b/security/keys/trusted_define=
+d.c
+index aedad16..ab7c7f9 100644
+=2D-- a/security/keys/trusted_defined.c
++++ b/security/keys/trusted_defined.c
+@@ -848,6 +848,10 @@ static int trusted_instantiate(struct key *key, const =
+void *data,
+ out:
+ 	if (!ret)
+ 		rcu_assign_pointer(key->payload.data, p);
++	else {
++		if (p)
++			kfree(p);
++	}
+ 	kfree(datablob);
+ 	return ret;
+ }
 =2D-=20
 1.7.2.3
 
 
---nextPart1585546.Rar81MA0MJ
+--nextPart2369476.E3WXDYghrc
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -208,12 +152,12 @@ TdtCm/yxR8XUlFyZkLHfhY19VW4luxb7KZ4GiPKDERdQwBb0kja4eqSOBkAPWZ9Y8zpv4bAxggIc
 MIICGAIBATBrMGUxCzAJBgNVBAYTAklUMR4wHAYDVQQKExVQb2xpdGVjbmljbyBkaSBUb3Jpbm8x
 NjA0BgNVBAMTLVBvbGl0ZWNuaWNvIGRpIFRvcmlubyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eQIC
 A8EwCQYFKw4DAhoFAKCBhzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-Fw0xMDEwMDcxMjI5MjRaMCMGCSqGSIb3DQEJBDEWBBSAC8t+y56Wm6df+BW5zFFd7/llRjAoBgkq
-hkiG9w0BCQ8xGzAZMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzANBgkqhkiG9w0BAQEFAASCAQC1
-KxrSxYY9zAH4lDxYJ9kFU/E4TSmOvuy9L5W4RWg2fnEpG/Oe3VX7QLFCnnSBLViNVQvk6cSBHQJk
-tl+3iw99b3r2t4oK5gLcJmgjzQTGvuWt/IW+a29TPT/5BuQeGEFI066K9u6+Lx/2Pc4rs1YG5vS1
-15euK05iUsyHc3xfq0veO4HDYIqa4W1ZlWG5v2hW+z6bNTDGFoZ0zqTZt/32nHsDbXheF8hEdKcz
-VabFJ9t8Nh6u7mvZMKVcVnGBfOwzWM2bIzcpYQkHILKeM/IVsKA+EP1qx1ivQ6EKw8oFVm1p9Akn
-wGZZ3QWGzA5vb57FnxS5OohWcWPAiIVxMV6qAAAAAAAA
+Fw0xMDEwMDcxMjMwNDZaMCMGCSqGSIb3DQEJBDEWBBQ9YNYqD+e/ajK91RlGvdEwCTdHdDAoBgkq
+hkiG9w0BCQ8xGzAZMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzANBgkqhkiG9w0BAQEFAASCAQAT
+sjcnyNzY2n/uLE9ihLJZMxMW9oJ5oAj7pPmhDGFgVZi7d+vfKEhV5Hxx3nKkBSQkfqx8H/k7Vcb7
+zw22/4UxLsjDgBhooRVwquLt05Elxq7Mof0Z8m4gBRZ/BIjSolduNncFSt/mQgIh5QlwrehibIeT
+Z1IPo9Kgmc6x0KZltC0HtbeEw9b/ahA7l4EW9JR3uvCWEtSYedPwNxP7XVnGUmtj0DOtyc3KAswU
+b05gvU1Ma2LxobR3/kD8UEvCPy1WSLKhUxGtKcAD1Kb2nTIJS/7dqxtyhgiYwc6DyVEkf+EmPnns
+We5t3RR7p5X5lpynvW/c2BxHy7yqjNDqF1ykAAAAAAAA
 
---nextPart1585546.Rar81MA0MJ--
+--nextPart2369476.E3WXDYghrc--
