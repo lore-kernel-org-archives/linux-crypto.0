@@ -1,163 +1,115 @@
-From: Roberto Sassu <roberto.sassu@polito.it>
-Subject: [PATCH 2/2] keys: added cleanup code for trusted and encrypted key types
-Date: Thu, 7 Oct 2010 14:30:45 +0200
-Message-ID: <201010071430.46281.roberto.sassu@polito.it>
-Mime-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart2369476.E3WXDYghrc";
-  protocol="application/pkcs7-signature";
-  micalg=sha1
-Content-Transfer-Encoding: 7bit
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>, keyrings@linux-nfs.org,
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: [PATCH v1 0/4] keys: trusted and encrypted keys
+Date: Thu,  7 Oct 2010 16:52:10 -0400
+Message-ID: <1286484734-3119-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	James Morris <jmorris@namei.org>,
 	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e9.ny.us.ibm.com ([32.97.182.139]:38739 "EHLO e9.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754079Ab0JGUwU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Oct 2010 16:52:20 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---nextPart2369476.E3WXDYghrc
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Since the original posting, the encrypted keys are started at
+late_initcall, in order to wait for the crypto API to be
+initialized, minor changes were made to Kconfig, and the
+TPM Maintainer acked the second patch.
 
-This patch frees the payload at the end of the instantiate
-method of both trusted and encrypted key types if an error occurs.
+Trusted and Encrypted Keys are two new key types added to the
+existing kernel key ring service. Both of these new types are
+variable length symmetic keys, and in both cases all keys are
+created in the kernel, and user space sees, stores, and loads 
+only encrypted blobs. Trusted Keys require the availability of a
+Trusted Platform Module (TPM) chip for greater security, while
+Encrypted Keys can be used on any system. All user level blobs,
+are displayed and loaded in hex ascii for convenience, and
+are integrity verified.
 
-Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
-=2D--
- security/keys/encrypted_defined.c |    6 ++++++
- security/keys/trusted_defined.c   |    4 ++++
- 2 files changed, 10 insertions(+), 0 deletions(-)
+Trusted Keys use a TPM both to generate and to seal the keys.
+Keys are sealed under a 2048 bit RSA key in the TPM, and optionally
+sealed to specified PCR (integrity measurement) values, and only
+unsealed by the TPM, if PCRs and blob integrity verifications match.
+A loaded Trusted Key can be updated with new (future) PCR values,
+so keys are easily migrated to new pcr values, such as when the
+kernel and initramfs are updated. The same key can have many
+saved blobs under different PCR values, so multiple boots are
+easily supported.
 
-diff --git a/security/keys/encrypted_defined.c b/security/keys/encrypted_de=
-fined.c
-index 54c0f0f..8426e66 100644
-=2D-- a/security/keys/encrypted_defined.c
-+++ b/security/keys/encrypted_defined.c
-@@ -624,7 +624,13 @@ static int encrypted_instantiate(struct key *key, cons=
-t void *data,
- 	}
- 	ret =3D encrypted_init(epayload, master_desc, decrypted_datalen,
- 			     hex_encoded_iv, hex_encoded_data);
-+	if (ret)
-+		goto out_free_epayload;
-+
- 	rcu_assign_pointer(key->payload.data, epayload);
-+out_free_epayload:
-+	if (ret)
-+		kfree(epayload);
- out:
- 	kfree(datablob);
- 	return ret > 0 ? -EINVAL : ret;
-diff --git a/security/keys/trusted_defined.c b/security/keys/trusted_define=
-d.c
-index aedad16..ab7c7f9 100644
-=2D-- a/security/keys/trusted_defined.c
-+++ b/security/keys/trusted_defined.c
-@@ -848,6 +848,10 @@ static int trusted_instantiate(struct key *key, const =
-void *data,
- out:
- 	if (!ret)
- 		rcu_assign_pointer(key->payload.data, p);
-+	else {
-+		if (p)
-+			kfree(p);
-+	}
- 	kfree(datablob);
- 	return ret;
- }
-=2D-=20
-1.7.2.3
+Trusted Keys are sealed under the SRK, which must have the default
+authorization value (20 zeros). This can be set at takeownership
+time with the trouser's utility "tpm_takeownership -u -z".
 
+Usage:
+    keyctl add trusted name "NEW keylen [hex_pcrinfo]" ring
+    keyctl add trusted name "LOAD hex_blob" ring
+    keyctl update key "UPDATE hex_pcrinfo"
+    keyctl print keyid
+    keyctl pipe keyid > filename
 
---nextPart2369476.E3WXDYghrc
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The key length for new keys are always in bytes.
+Trusted Keys can be 32 - 128 bytes (256 - 1024 bits), the upper
+limit is to fit within the 2048 bit SRK (RSA) keylength, with
+all necessary structure/padding. The keywords NEW, LOAD, and
+UPDATE can be all upper or all lower case.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIQCTCCBLMw
-ggOboAMCAQICARQwDQYJKoZIhvcNAQEFBQAwQTEQMA4GA1UEChMHRXVyb1BLSTEtMCsGA1UEAxMk
-RXVyb1BLSSBSb290IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTA2MTAyNDEzMzEzM1oXDTEw
-MTIzMTEyNTk1OVowUTELMAkGA1UEBhMCSVQxEDAOBgNVBAoTB0V1cm9QS0kxMDAuBgNVBAMTJ0V1
-cm9QS0kgSXRhbGlhbiBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTCCASIwDQYJKoZIhvcNAQEBBQAD
-ggEPADCCAQoCggEBAPbJ3y5bE0iL2iFW59R4KGHS3iTc22mq2GlDaOZLE3Xz1wTvB/yBl5e4ntMZ
-eEeWTW9JInNRTtfC3mcLk0gnEdK1rQZbe4lQwBVHdkG8LvRQDWHIkZNuccoUpQXMv+JbZjI6m7rH
-fU2CN/YCvFY9QL08xXsfDxvX2Ee4S7EwJiSEEJSiy+R00uTfvfn27d8a6LCqYLzlInRlz4C2CUbk
-+U2UAwjYEPTP2ziqFxztysbxC3fjqH8e6P5wIPXOS5cSYnVaEyp21VXhAOamVJEGlQCdVoTHs+pP
-BYqCBuNhBfienUPaEDHHUUYHZ2nS4eNzd9XOu+5hFi1/8hVZxN4sbdECAwEAAaOCAaQwggGgMEwG
-CWCGSAGG+EIBDQQ/Fj1Jc3N1ZWQgdW5kZXIgcG9saWN5OgogaHR0cDovL3d3dy5ldXJvcGtpLm9y
-Zy9jYS9yb290L2Nwcy8xLjEvMGUGCCsGAQUFBwEBBFkwVzAoBggrBgEFBQcwAYYcaHR0cDovL29j
-c3AuZXVyb3BraS5vcmc6ODAyNjArBggrBgEFBQcwAoYfaHR0cDovL3d3dy5ldXJvcGtpLm9yZy9j
-YS9yb290LzA7BgNVHR8ENDAyMDCgLqAshipodHRwOi8vd3d3LmV1cm9wa2kub3JnL2NhL3Jvb3Qv
-Y3JsL2NybC5kZXIwDAYDVR0TBAUwAwEB/zBOBgNVHSAERzBFMEMGCisGAQQBqQcBAQEwNTAzBggr
-BgEFBQcCARYnaHR0cDovL3d3dy5ldXJvcGtpLm9yZy9jYS9yb290L2Nwcy8xLjEvMA4GA1UdDwEB
-/wQEAwIB9jAdBgNVHQ4EFgQUjl4HtzG0Gbu5BJU0rMX9016KQsAwHwYDVR0jBBgwFoAUjNyLsaVK
-kOdOiHMYPJ3VXn7kss0wDQYJKoZIhvcNAQEFBQADggEBAFjlAWMiL7uhEAVcrPeMXsbQU+bQNbP1
-TBqyBoMCMJ4RakM7/67AsmqpKGIYwhjVkSNHhscRl5BuSiyviHOLbWUJ9tAAKt6hzMDr1J4OvWSH
-Sn8y9fSlyQU8+fQE8FHxXT3Aa7aLYVqsqr0ppmxRDL/9b/mdUVcMXiKFAdopFzhXIigfZFh6MW/o
-7/GEiDMGsovCiwKJ5ZL46zGRDaS+O0aRYQv2PHZaWrC8i0OPwghlTeB2DfUBzm0urPijBATdjzP8
-yO3YGymFZOIG08Roe4bwzrANGzX5luBk3lNmtXTPHoUtRLn3ADa+IUGwK6VYWHYJe1+uUHRNziQu
-/Zsb858wggU/MIIEJ6ADAgECAgIJzzANBgkqhkiG9w0BAQUFADBRMQswCQYDVQQGEwJJVDEQMA4G
-A1UEChMHRXVyb1BLSTEwMC4GA1UEAxMnRXVyb1BLSSBJdGFsaWFuIENlcnRpZmljYXRpb24gQXV0
-aG9yaXR5MB4XDTA2MTEwNjE3MTU1OVoXDTEwMTIzMTEyNTk1OVowZTELMAkGA1UEBhMCSVQxHjAc
-BgNVBAoTFVBvbGl0ZWNuaWNvIGRpIFRvcmlubzE2MDQGA1UEAxMtUG9saXRlY25pY28gZGkgVG9y
-aW5vIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEA/s1vopfmSp2eqKG/jW4H5YyfrZc/jWEnctMMm7TlVT+ryxJ2ifYV/7VyuYVIGdnCBnmJiav6
-uhePqpHyuejEZ+IdCchk04BSBbgzkSbWakw2ekv1SKm8WfvhxHbiSo/t//LQEANMJ+XeeqGl1TRR
-8gdMC6erWFGdl5FcuOpMoaqW6DszVGlOAf7Uo/DExZ0/9cw77GTRoDTA3vi1QJEYGaAAvI2/flaU
-8gn4QoktjowchDXBylVsyqs+ux3v7m3H0cgC3q62t2om2badk40F9XH1w2WPLQB6rSl+TPDxkl2k
-kR4goQprXR0b0OujS5ADq5Ds2w7YPj5h4J6ebsbIUQIDAQABo4ICCzCCAgcwdQYJYIZIAYb4QgEN
-BGgWZklzc3VlZCB1bmRlciBwb2xpY2llczoKIGh0dHA6Ly93d3cuZXVyb3BraS5vcmcvY2Evcm9v
-dC9jcHMvMS4xLwogaHR0cDovL3d3dy5ldXJvcGtpLm9yZy9jYS9pdC9jcHMvMS4xLzBcBggrBgEF
-BQcBAQRQME4wKAYIKwYBBQUHMAGGHGh0dHA6Ly9vY3NwLmV1cm9wa2kub3JnOjgwMjYwIgYIKwYB
-BQUHMAKGFmh0dHA6Ly93d3cuZXVyb3BraS5vcmcwPAYDVR0fBDUwMzAxoC+gLYYraHR0cDovL3d3
-dy5ldXJvcGtpLm9yZy9jYS9pdDIvY3JsMDMvY3JsLmRlcjAPBgNVHRMBAf8EBTADAQH/MIGTBgNV
-HSAEgYswgYgwQwYKKwYBBAGpBwEBATA1MDMGCCsGAQUFBwIBFidodHRwOi8vd3d3LmV1cm9wa2ku
-b3JnL2NhL3Jvb3QvY3BzLzEuMS8wQQYKKwYBBAGpBwIBATAzMDEGCCsGAQUFBwIBFiVodHRwOi8v
-d3d3LmV1cm9wa2kub3JnL2NhL2l0L2Nwcy8xLjEvMAsGA1UdDwQEAwIB9jAdBgNVHQ4EFgQUCf0l
-GW/jaHyCazVzvCgAviw8OjgwHwYDVR0jBBgwFoAUjl4HtzG0Gbu5BJU0rMX9016KQsAwDQYJKoZI
-hvcNAQEFBQADggEBANfGdD6B98NUwBOVYIiuo+SNfw8Afjr2oFHLYEHYhKdBED1WBckhK610v2zJ
-ctramnrqdd+xfyzmkyNm48OtkiVetYzXbgYeyMGxhO8HrJ1Ztf1yEN0lL8HgdK3lmJeLYNYH/cwZ
-5SlKwvTR/VENHLYlWsgWk47ut7W8+Zd/ESwzNdJUCBUMoQnGZ3giyhAXKAgIOckwL0g8KmnceY7J
-Y4L1G++1OuOoUcgg2jRPxcVmHVEe/cM0WHfUcigDXSBTIxAiDwlQ7ni97yX1RqBV/6IVdRDYKyjg
-YkdYcwU9ZuOKUP4Pl5KKCegLOHRoo5kX6V1o7b2IZGBFoVmkag4m4kkwggYLMIIE86ADAgECAgID
-wTANBgkqhkiG9w0BAQUFADBlMQswCQYDVQQGEwJJVDEeMBwGA1UEChMVUG9saXRlY25pY28gZGkg
-VG9yaW5vMTYwNAYDVQQDEy1Qb2xpdGVjbmljbyBkaSBUb3Jpbm8gQ2VydGlmaWNhdGlvbiBBdXRo
-b3JpdHkwHhcNMDgxMjA1MTYwMDAwWhcNMTAxMjMwMTIwMDAwWjB5MQswCQYDVQQGEwJJVDEeMBwG
-A1UEChMVUG9saXRlY25pY28gZGkgVG9yaW5vMTEwLwYDVQQLEyhEaXBhcnRpbWVudG8gZGkgQXV0
-b21hdGljYSBlIEluZm9ybWF0aWNhMRcwFQYDVQQDEw5Sb2JlcnRvICBTYXNzdTCCASIwDQYJKoZI
-hvcNAQEBBQADggEPADCCAQoCggEBAOS/leMNzG5v7FG73ythWtNPOdq8MEFpzg7mjy4M7UsS9+sc
-b7QE8TOX365q/+mBwxZ7qW+OhNKfgv14A3y/quju5P7mjTmTNvKWDpsUBjC+tCs+WpWsgIPc2xxW
-PrR7br04U/SYYNsxynh1TtO2gsQrHIj9S/wNiNRP8GGPCAiuYRlaL2CeSVn4JEKcT0zOeLIIqfDp
-3Ad3YeBhj+cR3TrmO9TyGTPCAb1oyq9wuA1Tx044rqSQNbp0e0RvOrwAIpD/2mNPP3ReTeB53aSg
-q0pCHoH1s2AcY/jWJ1joYFC9hh/2DqZRvMNIsM7Uce5Iiz2sgl1I61IUD4658HYzCmMCAwEAAaOC
-Aq8wggKrMIGVBglghkgBhvhCAQ0EgYcWgYRJc3N1ZWQgdW5kZXIgcG9saWNpZXM6CiBodHRwOi8v
-d3d3LmV1cm9wa2kub3JnL2NhL3Jvb3QvY3BzLzEuMS8KIGh0dHA6Ly93d3cuZXVyb3BraS5vcmcv
-Y2EvaXQvY3BzLzEuMS8KIGh0dHA6Ly9jYS5wb2xpdG8uaXQvY3BzLzIuMS8wEQYJYIZIAYb4QgEB
-BAQDAgCwMGMGCCsGAQUFBwEBBFcwVTAoBggrBgEFBQcwAYYcaHR0cDovL29jc3AuZXVyb3BraS5v
-cmc6ODAyNjApBggrBgEFBQcwAoYdaHR0cDovL3d3dy5ldXJvcGtpLm9yZy9jYS9pdC8wMgYDVR0f
-BCswKTAnoCWgI4YhaHR0cDovL2NhLnBvbGl0by5pdC9jcmwwMy9jcmwuZGVyMAwGA1UdEwEB/wQC
-MAAwOgYDVR0RBDMwMYEXcm9iZXJ0by5zYXNzdUBwb2xpdG8uaXSgFgYKKwYBBAGVYgIBAaAIFgYw
-MjEzMDUwgc0GA1UdIASBxTCBwjBDBgorBgEEAakHAQEBMDUwMwYIKwYBBQUHAgEWJ2h0dHA6Ly93
-d3cuZXVyb3BraS5vcmcvY2Evcm9vdC9jcHMvMS4xLzBBBgorBgEEAakHAgEBMDMwMQYIKwYBBQUH
-AgEWJWh0dHA6Ly93d3cuZXVyb3BraS5vcmcvY2EvaXQvY3BzLzEuMS8wOAYKKwYBBAGVYgECATAq
-MCgGCCsGAQUFBwIBFhxodHRwOi8vY2EucG9saXRvLml0L2Nwcy8yLjEvMAsGA1UdDwQEAwIE8DAd
-BgNVHQ4EFgQUP+37DpRL6r5BNjgsgFjI8MHvGTcwHwYDVR0jBBgwFoAUCf0lGW/jaHyCazVzvCgA
-viw8OjgwDQYJKoZIhvcNAQEFBQADggEBADRj0OWMglzLXTPuKND9gMTHd1iRPzRNI1TiYFN/WIyu
-a3mNev65wKn35VxbbMV6k7zuxxdC7o+iYRLepVOnpw90Af/SiJRc9QI4rk8tzSr5xII7vI0fPvcl
-rjSMymXCvwKrbYwrKe0FhBnSZ8AoewXoHDQ8f64heLIU8mLWuwo1+brq0pJUH5Q+69WAGD03ln+l
-Fhk2KqvVv8yAD21PydrS7Uk2ZLE7l7/+BTQBY8ZjpNRZ44C6+o7lou2zN6lkWtVHBwUNVdfu3wkS
-TdtCm/yxR8XUlFyZkLHfhY19VW4luxb7KZ4GiPKDERdQwBb0kja4eqSOBkAPWZ9Y8zpv4bAxggIc
-MIICGAIBATBrMGUxCzAJBgNVBAYTAklUMR4wHAYDVQQKExVQb2xpdGVjbmljbyBkaSBUb3Jpbm8x
-NjA0BgNVBAMTLVBvbGl0ZWNuaWNvIGRpIFRvcmlubyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eQIC
-A8EwCQYFKw4DAhoFAKCBhzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-Fw0xMDEwMDcxMjMwNDZaMCMGCSqGSIb3DQEJBDEWBBQ9YNYqD+e/ajK91RlGvdEwCTdHdDAoBgkq
-hkiG9w0BCQ8xGzAZMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzANBgkqhkiG9w0BAQEFAASCAQAT
-sjcnyNzY2n/uLE9ihLJZMxMW9oJ5oAj7pPmhDGFgVZi7d+vfKEhV5Hxx3nKkBSQkfqx8H/k7Vcb7
-zw22/4UxLsjDgBhooRVwquLt05Elxq7Mof0Z8m4gBRZ/BIjSolduNncFSt/mQgIh5QlwrehibIeT
-Z1IPo9Kgmc6x0KZltC0HtbeEw9b/ahA7l4EW9JR3uvCWEtSYedPwNxP7XVnGUmtj0DOtyc3KAswU
-b05gvU1Ma2LxobR3/kD8UEvCPy1WSLKhUxGtKcAD1Kb2nTIJS/7dqxtyhgiYwc6DyVEkf+EmPnns
-We5t3RR7p5X5lpynvW/c2BxHy7yqjNDqF1ykAAAAAAAA
+Encrypted keys do not depend on a TPM, and are faster, as they
+use AES for encryption/decryption. New keys are created from kernel
+generated random numbers, and are encrypted/decrypted using a
+specified 'master' key. The 'master' key can either be a trusted-key
+or user-key type. The main disadvantage of encrypted keys is that if
+they are not rooted in a trusted key, they are only as secure as the
+user key encrypting them. The master user key should therefore
+be loaded in as secure a way as possible, preferably early in
+boot.
 
---nextPart2369476.E3WXDYghrc--
+Usage:
+  keyctl add encrypted name "NEW master-key-name keylen" ring
+  keyctl add encrypted name "LOAD master-key-name keylen hex_blob" ring
+  keyctl update keyid "UPDATE master-key-name"
+
+The initial consumer of trusted keys is EVM, which at boot time
+needs a high quality symmetric key for HMAC protection of file
+metadata. The use of a trusted key provides strong guarantees
+that the EVM key has not been compromised by a user level problem,
+and when sealed to specific boot PCR values, protects against
+boot and offline attacks. Other uses for trusted and encrypted
+keys, such as for disk and file encryption are anticipated.
+
+Mimi Zohar
+Dave Safford
+
+Mimi Zohar (4):
+  lib: hex2bin converts ascii hexadecimal string to binary
+  key: add tpm_send command
+  keys: add new trusted key-type
+  keys: add new key-type encrypted
+
+ drivers/char/tpm/tpm.c            |   17 +
+ include/keys/encrypted-type.h     |   30 ++
+ include/keys/trusted-type.h       |   33 ++
+ include/linux/kernel.h            |    1 +
+ include/linux/tpm.h               |    3 +
+ lib/hexdump.c                     |   16 +
+ security/Kconfig                  |   31 ++
+ security/keys/Makefile            |    2 +
+ security/keys/encrypted_defined.c |  782 +++++++++++++++++++++++++++++
+ security/keys/encrypted_defined.h |   52 ++
+ security/keys/trusted_defined.c   |  997 +++++++++++++++++++++++++++++++++++++
+ security/keys/trusted_defined.h   |  125 +++++
+ 12 files changed, 2089 insertions(+), 0 deletions(-)
+ create mode 100644 include/keys/encrypted-type.h
+ create mode 100644 include/keys/trusted-type.h
+ create mode 100644 security/keys/encrypted_defined.c
+ create mode 100644 security/keys/encrypted_defined.h
+ create mode 100644 security/keys/trusted_defined.c
+ create mode 100644 security/keys/trusted_defined.h
+
+-- 
+1.7.2.2
