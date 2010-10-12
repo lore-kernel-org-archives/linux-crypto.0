@@ -1,186 +1,38 @@
-From: "Serge E. Hallyn" <serge@hallyn.com>
-Subject: Re: [PATCH v1.1 3/4] keys: add new trusted key-type
-Date: Mon, 11 Oct 2010 20:22:15 -0500
-Message-ID: <20101012012215.GA12906@hallyn.com>
-References: <1286827903-3066-1-git-send-email-zohar@linux.vnet.ibm.com>
- <1286827903-3066-4-git-send-email-zohar@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/3] Adding the AEAD interface type support to cryptd
+Date: Tue, 12 Oct 2010 09:37:36 +0800
+Message-ID: <20101012013736.GA2569@gondor.apana.org.au>
+References: <4CB3319F.mail9GN11AWZ7@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	James Morris <jmorris@namei.org>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
+	adrian.hoban@intel.com
+To: tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:45875 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753658Ab0JLBNT (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:45035 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756450Ab0JLBhj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Oct 2010 21:13:19 -0400
+	Mon, 11 Oct 2010 21:37:39 -0400
 Content-Disposition: inline
-In-Reply-To: <1286827903-3066-4-git-send-email-zohar@linux.vnet.ibm.com>
+In-Reply-To: <4CB3319F.mail9GN11AWZ7@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Mimi Zohar (zohar@linux.vnet.ibm.com):
+On Mon, Oct 11, 2010 at 04:47:43PM +0100, tadeusz.struk@intel.com wrote:
+> 
+> Hi Herbert,
+> Sorry for the mess. this is what happens when one uses wrong email client.
+> I'm resending the all the patches now.
+> Please let us know if it is ok now.
 
-Looks fine to me, and very useful.
+As you can see from the cryptodev tree, I've already applied
+your first patch.  So please only resubmit the two patches after
+it.
 
-Acked-by: Serge E. Hallyn <serge@hallyn.com>
-
-(for 1-3, haven't looked at 4 yet and won't tonight)
-
-> +config TRUSTED_KEYS
-> +	tristate "TRUSTED KEYS"
-> +	depends on KEYS && TCG_TPM
-> +	select CRYPTO
-> +	select CRYPTO_HMAC
-> +	select CRYPTO_SHA1
-> +	help
-> +	  This option provides support for creating/sealing/unsealing keys
-> +	  in the kernel. Trusted keys are TPM generated random numbers
-> +	  symmetric keys, RSA sealed by the TPM, and only unsealed by the
-> +	  TPM, if boot PCRs and other criteria match.  Userspace ever only
-> +	  sees/stores encrypted blobs.
-
-"
-This option provides support for creating, sealing, and unsealing keys
-in the kernel.  Trusted keys are ramdon symmetric keys created
-RSA-sealed, and stored in the TPM.  The TPM only unseals the keys if the
-boot PCRs and other criteria match.  Userspace can only ever see
-encrypted blobs.
-"
-
-> diff --git a/security/keys/trusted_defined.c b/security/keys/trusted_defined.c
-> new file mode 100644
-> index 0000000..0bd935f
-> --- /dev/null
-> +++ b/security/keys/trusted_defined.c
-> @@ -0,0 +1,999 @@
-> +/*
-> + * Copyright (C) 2010 IBM Corporation
-> + *
-> + * Author:
-> + * David Safford <safford@us.ibm.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, version 2 of the License.
-> + *
-> + * File: trusted_defined.c
-
-(don't put filenames in comments :)
-
-> + * Defines a new kernel key-type called 'trusted'. Trusted keys are
-> + * TPM generated random numbers, RSA sealed by the TPM, and only unsealed
-> + * by the TPM, if boot PCRs and other criteria match. Trusted keys are
-> + * created/sealed/unsealed in the kernel. Userspace ever only sees/stores
-> + * encrypted blobs.
-> + *
-> + * Keys are sealed under the SRK, which must have the default
-> + * authorization value (20 zeros).
-
-What does this mean?  They have to be sealed by a key that starts
-with 20 zeros?  (of course it doesn't mean that, but i don't understand
-what it does mean :)
-
-> This can be set at takeownership
-> + * time with the trouser's utility "tpm_takeownership -u -z".
-> + *
-> + * Usage:
-> + *   keyctl add trusted name "NEW keylen [hex_pcrinfo]" ring
-> + *   keyctl add trusted name "LOAD hex_blob" ring
-> + *   keyctl update key "UPDATE hex_pcrinfo"
-> + *   keyctl print keyid
-> + * keys can be 32 - 128 bytes, blob max is 1024 hex ascii characters
-> + * binary pcrinfo max is 512 hex ascii characters
-> + */
-> +
-> +#include <linux/uaccess.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/init.h>
-> +#include <linux/slab.h>
-> +#include <linux/parser.h>
-> +#include <linux/string.h>
-> +#include <keys/user-type.h>
-> +#include <keys/trusted-type.h>
-> +#include <linux/key-type.h>
-> +#include <linux/random.h>
-> +#include <linux/rcupdate.h>
-> +#include <linux/scatterlist.h>
-> +#include <linux/crypto.h>
-> +#include <linux/tpm.h>
-> +
-> +#include "trusted_defined.h"
-> +
-> +static char hmac_alg[] = "hmac(sha1)";
-> +static char hash_alg[] = "sha1";
-> +
-> +static int init_sha1_desc(struct hash_desc *desc)
-> +{
-> +	int rc;
-> +
-> +	desc->tfm = crypto_alloc_hash(hash_alg, 0, CRYPTO_ALG_ASYNC);
-> +	if (IS_ERR(desc->tfm)) {
-> +		rc = PTR_ERR(desc->tfm);
-> +		return rc;
-> +	}
-> +	desc->flags = 0;
-> +	rc = crypto_hash_init(desc);
-> +	if (rc)
-> +		crypto_free_hash(desc->tfm);
-> +	return rc;
-> +}
-> +
-> +static int init_hmac_desc(struct hash_desc *desc, unsigned char *key,
-> +			  int keylen)
-> +{
-> +	int rc;
-> +
-> +	desc->tfm = crypto_alloc_hash(hmac_alg, 0, CRYPTO_ALG_ASYNC);
-> +	if (IS_ERR(desc->tfm)) {
-> +		rc = PTR_ERR(desc->tfm);
-> +		return rc;
-> +	}
-> +	desc->flags = 0;
-> +	crypto_hash_setkey(desc->tfm, key, keylen);
-> +	rc = crypto_hash_init(desc);
-> +	if (rc)
-> +		crypto_free_hash(desc->tfm);
-> +	return rc;
-> +}
-> +
-> +static int TSS_sha1(unsigned char *data, int datalen, unsigned char *digest)
-> +{
-> +	struct hash_desc desc;
-> +	struct scatterlist sg[1];
-> +	int rc;
-> +
-> +	rc = init_sha1_desc(&desc);
-> +	if (rc != 0)
-> +		return rc;
-> +
-> +	sg_init_one(sg, data, datalen);
-> +	crypto_hash_update(&desc, sg, datalen);
-> +	crypto_hash_final(&desc, digest);
-> +	crypto_free_hash(desc.tfm);
-> +	return rc;
-
-In later functions where rc can only be 0, you 'return 0;', but here
-you return rc.  Is that an oversight, or is there something actually
-wrong here (like a missing hunk)?
-
-There are also several places where you:
-
-> +	datablob = kzalloc(datalen + 1, GFP_KERNEL);
-> +	if (!datablob)
-> +		return -ENOMEM;
-> +	memcpy(datablob, data, datalen);
-
-don't need to kzalloc.
-
--serge
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
