@@ -1,36 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2.6.36-rc7] crypto: use cancel_delayed_work_sync() in
-	hifn_795x
-Date: Tue, 19 Oct 2010 20:50:43 +0800
-Message-ID: <20101019125043.GB12898@gondor.apana.org.au>
-References: <4CB8445C.1060109@kernel.org>
+From: Greenbeard Labs <noreply@greenbeardlabs.com>
+Subject: Let Us Build Your Website!
+Date: Mon, 18 Oct 2010 20:51:34 -0500
+Message-ID: <310b6ebc0b22de42be8c4a19a58b70b2@relay.greenbeardlabs.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
-To: Tejun Heo <tj@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:45589 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754904Ab0JSMut (ORCPT
+Received: from relay.greenbeardlabs.com ([208.77.148.74]:61770 "EHLO
+	relay.greenbeardlabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933331Ab0JSNQn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Oct 2010 08:50:49 -0400
-Content-Disposition: inline
-In-Reply-To: <4CB8445C.1060109@kernel.org>
+	Tue, 19 Oct 2010 09:16:43 -0400
+Received: from relay.greenbeardlabs.com (relay.greenbeard.com [127.0.0.1])
+	by relay.greenbeardlabs.com (8.13.8/8.13.8) with ESMTP id o9J1pY71027465
+	for <linux-crypto@vger.kernel.org>; Mon, 18 Oct 2010 20:51:34 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 15, 2010 at 02:09:00PM +0200, Tejun Heo wrote:
-> Make hifn_795x::hifn_remove() call cancel_delayed_work_sync() instead
-> of calling cancel_delayed_work() followed by flush_scheduled_work().
-> 
-> This is to prepare for the deprecation and removal of
-> flush_scheduled_work().
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
+We=E2=80=99ll build a custom website for you that you can easily manage
+yourself. Whether you want a blog, company website, online store, or
+something more unique, we can help. Our prices are as low as $100 per
+page.
 
-Patch applied.  Thanks Tejun!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We can also help you generate more business by increasing your
+exposure on search engines, social media sites, and across the web.
+
+Visit www.greenbeardlabs.com to learn more!
+
+
+
+---
+If you would like to remove your email address from our mailing list, p=
+aste
+the following link into your browser:
+http://relay.greenbeardlabs.com/lists/?p=3Dunsubscribe&uid=3Df0cc9f78a6=
+6178ac90581201071f6bb7.
+
+Greenbeard Labs is a unit of Greenbeard Inc. This message is produced a=
+nd
+distributed by Greenbeard Inc, 3016 Selma, Dallas, TX 75234.
+
+
+--
+Powered by PHPlist, www.phplist.com --
