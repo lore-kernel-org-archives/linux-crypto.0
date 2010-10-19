@@ -1,43 +1,56 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: [PATCH v2.6.36-rc7] crypto: use cancel_delayed_work_sync() in hifn_795x
-Date: Fri, 15 Oct 2010 14:09:00 +0200
-Message-ID: <4CB8445C.1060109@kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+Date: Tue, 19 Oct 2010 20:49:08 +0800
+Message-ID: <20101019124908.GA12898@gondor.apana.org.au>
+References: <4CB41CED.mailDED1NSGGA@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
+	adrian.hoban@intel.com
+To: tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hera.kernel.org ([140.211.167.34]:49975 "EHLO hera.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753475Ab0JOMJI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Oct 2010 08:09:08 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:60674 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754904Ab0JSMtL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Oct 2010 08:49:11 -0400
+Content-Disposition: inline
+In-Reply-To: <4CB41CED.mailDED1NSGGA@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Make hifn_795x::hifn_remove() call cancel_delayed_work_sync() instead
-of calling cancel_delayed_work() followed by flush_scheduled_work().
+On Tue, Oct 12, 2010 at 09:31:41AM +0100, tadeusz.struk@intel.com wrote:
+> Hi Herbert,
+> Resubmitting the two other patches as requested.
+> Thanks,
+> Tadeusz
+> 
+> >From 06444d8a95458d807ae14699e557739281d0b026 Mon Sep 17 00:00:00 2001
+> From: Adrian Hoban <ahoban@allen.ir.intel.com>
+> Date: Fri, 10 Sep 2010 18:08:45 +0100
+> Subject: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+> 
+> This patch adds an optimized RFC4106 AES-GCM implementation for 64-bit
+> kernels. It supports 128-bit AES key size. This leverages the crypto
+> AEAD interface type to facilitate a combined AES & GCM operation to
+> be implemented in assembly code. The assembly code leverages Intel(R)
+> AES New Instructions and the PCLMULQDQ instruction.
 
-This is to prepare for the deprecation and removal of
-flush_scheduled_work().
+OK this patch applies now at least.  However it doesn't build:
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- drivers/crypto/hifn_795x.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+  AS [M]  arch/x86/crypto/aesni-intel_asm.o
+arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+arch/x86/crypto/aesni-intel_asm.S:803: Error: no such instruction: `aesenc 16*1(%rdi),%xmm6'
+arch/x86/crypto/aesni-intel_asm.S:803: Error: no such instruction: `aesenc 16*1(%rdi),%xmm7'
+arch/x86/crypto/aesni-intel_asm.S:803: Error: no such instruction: `aesenc 16*1(%rdi),%xmm8'
+...
 
-Index: work/drivers/crypto/hifn_795x.c
-===================================================================
---- work.orig/drivers/crypto/hifn_795x.c
-+++ work/drivers/crypto/hifn_795x.c
-@@ -2700,8 +2700,7 @@ static void __devexit hifn_remove(struct
- 	dev = pci_get_drvdata(pdev);
+I suppose you can't rely on these new binutils instructions just
+yet.
 
- 	if (dev) {
--		cancel_delayed_work(&dev->work);
--		flush_scheduled_work();
-+		cancel_delayed_work_sync(&dev->work);
-
- 		hifn_unregister_rng(dev);
- 		hifn_unregister_alg(dev);
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
