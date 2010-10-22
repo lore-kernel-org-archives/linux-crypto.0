@@ -1,41 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Wed, 20 Oct 2010 21:02:34 +0800
-Message-ID: <20101020130233.GB25827@gondor.apana.org.au>
-References: <4CB41CED.mailDED1NSGGA@intel.com> <20101019124908.GA12898@gondor.apana.org.au> <44813D8942D35947805CBEEA94195BB001B135B69E@irsmsx505.ger.corp.intel.com> <24483BA4C9F69C43A7379639D35543D7C2F99F27@irsmsx502.ger.corp.intel.com> <CFBC532374C38D45810FA00BC2D2C204012D3E76C4@irsmsx502.ger.corp.intel.com>
+From: "Allyn, Mark A" <mark.a.allyn@intel.com>
+Subject: Questions about ahash
+Date: Fri, 22 Oct 2010 10:54:58 -0600
+Message-ID: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Struk, Tadeusz" <tadeusz.struk@intel.com>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
-	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>
-To: "Hoban, Adrian" <adrian.hoban@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38953 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750762Ab0JTNCg (ORCPT
+Received: from mga01.intel.com ([192.55.52.88]:27709 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754084Ab0JVQzZ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Oct 2010 09:02:36 -0400
-Content-Disposition: inline
-In-Reply-To: <CFBC532374C38D45810FA00BC2D2C204012D3E76C4@irsmsx502.ger.corp.intel.com>
+	Fri, 22 Oct 2010 12:55:25 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 20, 2010 at 11:49:10AM +0100, Hoban, Adrian wrote:
-> Hi Herbert,
-> 
-> We have been using binutils v2.19. 
-> 
-> Can you please recommend the version(s) of binutils (gas) that we should test with before submitting a patch? V2.16.1, or perhaps the older version (2.12) described in /Documentation/Changes? 
-> 
-> We will retest with the recommended version, update the code and resubmit the patch ASAP. 
+Folks:
 
-I was using 2.18 so if you can make it work with 2.16 I think it
-should be fine as it wouldn't require any of the new AES instructions.
+I am attempting to implement an ahash instance for a hardware crypto device.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I see that there is a sha1 generic in the soruces a crypto/sha1_generic.c which uses the shash interface. I was hoping to use that, but there is some stuff in the headers that is confusing.
+
+In include/crypto/hash.h, there is a structure crypto_ahash which has pointers to the init, update, final, etc algorithms. These same algorithms are also referred to in the ahash_alg structure.
+
+In the case of shash, the crypto_shash structure does not have pointers to the algorithms.
+
+Why is the crypto_ahash structure so different? 
+
+There is a function shash_desc_ctx, but there is no function ahash_des_ctx. In the crys_sha1_init() function of sha1_generic, you call shash_desc_ctx. If I want to use the ahash instead of shash for sha1, then do I use shash_desc_ctx, or do I have to come up with my own ahash_desc_ctx?
+
+Thanks
+
+Mark Allyn
