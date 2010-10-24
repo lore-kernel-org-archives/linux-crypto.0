@@ -1,35 +1,100 @@
-From: "Allyn, Mark A" <mark.a.allyn@intel.com>
-Subject: Questions about ahash
-Date: Fri, 22 Oct 2010 10:54:58 -0600
-Message-ID: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 2.6.37
+Date: Sat, 23 Oct 2010 23:16:25 -0700
+Message-ID: <20101024061625.GA23715__17988.2921664559$1287901008$gmane$org@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:27709 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754084Ab0JVQzZ convert rfc822-to-8bit (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:48408 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754782Ab0JXGQe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Oct 2010 12:55:25 -0400
-Content-Language: en-US
+	Sun, 24 Oct 2010 02:16:34 -0400
+Content-Disposition: inline
+In-Reply-To: <20100804140448.GA4042@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Folks:
+Hi Linus:
 
-I am attempting to implement an ahash instance for a hardware crypto device.
+Here is the crypto update for 2.6.37:
 
-I see that there is a sha1 generic in the soruces a crypto/sha1_generic.c which uses the shash interface. I was hoping to use that, but there is some stuff in the headers that is confusing.
+* cryptd now supports AEAD.
+* OMAP2/3 AES support.
+* Mark Steffen Klassert as maintainer for padata/pcrypt.
+* Misc fixes.
 
-In include/crypto/hash.h, there is a structure crypto_ahash which has pointers to the init, update, final, etc algorithms. These same algorithms are also referred to in the ahash_alg structure.
 
-In the case of shash, the crypto_shash structure does not have pointers to the algorithms.
+Please pull from
 
-Why is the crypto_ahash structure so different? 
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-There is a function shash_desc_ctx, but there is no function ahash_des_ctx. In the crys_sha1_init() function of sha1_generic, you call shash_desc_ctx. If I want to use the ahash instead of shash for sha1, then do I use shash_desc_ctx, or do I have to come up with my own ahash_desc_ctx?
+or
 
-Thanks
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Mark Allyn
+
+Adrian Hoban (1):
+      crypto: cryptd - Adding the AEAD interface type support to cryptd
+
+Chuck Ebbert (1):
+      crypto: fips - FIPS requires algorithm self-tests
+
+David S. Miller (1):
+      crypto: n2_crypto - Niagara2 driver needs to depend upon CRYPTO_DES
+
+Dmitry Kasatkin (2):
+      crypto: updates to enable omap aes
+      crypto: omap-aes - OMAP2/3 AES hw accelerator driver
+
+Justin P. Mattock (1):
+      crypto: Kconfig - update broken web addresses
+
+Kim Phillips (3):
+      crypto: talitos - fix warning: 'alg' may be used uninitialized in this function
+      crypto: talitos - fix checkpatch warning
+      crypto: talitos - sparse check endian fixes
+
+Namhyung Kim (1):
+      padata: add missing __percpu markup in include/linux/padata.h
+
+Samu Onkalo (1):
+      crypto: omap-sham - Adjust DMA parameters
+
+Steffen Klassert (1):
+      MAINTAINERS: Add maintainer entries for padata/pcrypt
+
+Tejun Heo (1):
+      crypto: hifn_795x - use cancel_delayed_work_sync()
+
+Tracey Dent (1):
+      crypto: Makefile - replace the use of <module>-objs with <module>-y
+
+ MAINTAINERS                          |   16 +
+ arch/arm/mach-omap2/clock2420_data.c |    2 +-
+ arch/arm/mach-omap2/clock2430_data.c |    2 +-
+ arch/arm/mach-omap2/clock3xxx_data.c |    2 +-
+ arch/arm/mach-omap2/devices.c        |   71 +++
+ crypto/Kconfig                       |   21 +-
+ crypto/cryptd.c                      |  206 ++++++++-
+ drivers/crypto/Kconfig               |    9 +
+ drivers/crypto/Makefile              |    3 +-
+ drivers/crypto/amcc/Makefile         |    2 +-
+ drivers/crypto/hifn_795x.c           |    3 +-
+ drivers/crypto/omap-aes.c            |  948 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/omap-sham.c           |    6 +-
+ drivers/crypto/talitos.c             |   29 +-
+ include/crypto/cryptd.h              |   24 +
+ include/linux/padata.h               |    4 +-
+ 16 files changed, 1310 insertions(+), 38 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
