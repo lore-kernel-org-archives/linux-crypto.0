@@ -1,36 +1,29 @@
-From: Nicolas Kaiser <nikai@nikai.net>
-Subject: [PATCH] drivers/crypto: dubious error check
-Date: Sun, 24 Oct 2010 15:05:56 +0200
-Message-ID: <20101024150556.22f49c6a@absol.kitzblitz>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] drivers/crypto: dubious error check
+Date: Sun, 24 Oct 2010 09:39:49 -0700 (PDT)
+Message-ID: <20101024.093949.71101214.davem@davemloft.net>
+References: <20101024150556.22f49c6a@absol.kitzblitz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: nikai@nikai.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:46530
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752423Ab0JXQj1 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 24 Oct 2010 12:39:27 -0400
+In-Reply-To: <20101024150556.22f49c6a@absol.kitzblitz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Looks like a copy-and-paste problem to me.
+From: Nicolas Kaiser <nikai@nikai.net>
+Date: Sun, 24 Oct 2010 15:05:56 +0200
 
-Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
----
- drivers/crypto/n2_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+> Looks like a copy-and-paste problem to me.
+> 
+> Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 88ee015..7614126 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -1832,7 +1832,7 @@ static int __devinit get_irq_props(struct mdesc_handle *mdesc, u64 node,
- 		return -ENODEV;
- 
- 	ino = mdesc_get_property(mdesc, node, "ino", &ino_len);
--	if (!intr)
-+	if (!ino)
- 		return -ENODEV;
- 
- 	if (intr_len != ino_len)
--- 
-1.7.2.2
+Acked-by: David S. Miller <davem@davemloft.net>
