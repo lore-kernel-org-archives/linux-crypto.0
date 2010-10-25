@@ -1,34 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AES-NI for x86?
-Date: Mon, 25 Oct 2010 19:50:03 -0400
-Message-ID: <20101025235003.GA6076@gondor.apana.org.au>
-References: <28ED7E64-4E61-4868-B0CD-89FD18B08BBE@googlemail.com>
+From: Mark Allyn <allyn@well.com>
+Subject: General questions on crypto
+Date: Mon, 25 Oct 2010 16:35:31 -0700 (PDT)
+Message-ID: <Pine.GSO.4.64.1010251627060.2377@well.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Huang Ying <ying.huang@intel.com>
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41377 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751305Ab0JYXuG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Oct 2010 19:50:06 -0400
-Content-Disposition: inline
-In-Reply-To: <28ED7E64-4E61-4868-B0CD-89FD18B08BBE@googlemail.com>
+Received: from smtp.well.com ([208.17.81.207]:44095 "EHLO smtp.well.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757394Ab0JYXuS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Oct 2010 19:50:18 -0400
+Received: from well.com (well.com [10.0.101.205])
+	by smtp.well.com (8.14.3/8.14.3) with ESMTP id o9PNZVxS026628
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:35:31 -0700
+Received: from localhost (allyn@localhost)
+	by well.com (8.14.2/8.14.2/Submit) with ESMTP id o9PNZVjO004482
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:35:31 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Mathias Krause <minipli@googlemail.com> wrote:
-> Hello list,
-> 
-> will there be a 32-bit version of the Intel AES-NI code? I've seen a 32-bit
-> version in openssl so it should be possible. Not?
 
-It won't exist unless someone writes one.  Are you volunteering? :)
+Folks:
 
-Ccing the author in case there is some reason why it won't work in
-32-bit mode.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I am trying to understand how to implement an ahash instance for a 
+hardware encryption device.
+
+I notice that the in-kernel documentation has no mention of ahash.
+
+Does anyone know where I can find a basic how-to document on putting
+together an ahash implementation in an existing driver?
+
+The sha1_generic that is supplied appears to be using shash, is there an 
+example for ahash?
+
+Thanks
+
+Truly,
+
+Mark Allyn
+Portland, Oregon
+www.allyn.com
+971-563-7588
