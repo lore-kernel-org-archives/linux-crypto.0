@@ -1,44 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Questions about ahash
-Date: Mon, 25 Oct 2010 19:42:06 -0400
-Message-ID: <20101025234206.GA6046@gondor.apana.org.au>
-References: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
+From: Mark Allyn <allyn@well.com>
+Subject: Question on structures
+Date: Mon, 25 Oct 2010 16:45:21 -0700 (PDT)
+Message-ID: <Pine.GSO.4.64.1010251641420.2377@well.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: "Allyn, Mark A" <mark.a.allyn@intel.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39832 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758305Ab0JYXmJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Oct 2010 19:42:09 -0400
-Content-Disposition: inline
-In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
+Received: from smtp.well.com ([208.17.81.207]:45481 "EHLO smtp.well.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752873Ab0JYXpW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Oct 2010 19:45:22 -0400
+Received: from well.com (well.com [10.0.101.205])
+	by smtp.well.com (8.14.3/8.14.3) with ESMTP id o9PNjKcG032485
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:45:20 -0700
+Received: from localhost (allyn@localhost)
+	by well.com (8.14.2/8.14.2/Submit) with ESMTP id o9PNjL0g006825
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:45:21 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Allyn, Mark A <mark.a.allyn@intel.com> wrote:
-> Folks:
-> 
-> I am attempting to implement an ahash instance for a hardware crypto device.
-> 
-> I see that there is a sha1 generic in the soruces a crypto/sha1_generic.c which uses the shash interface. I was hoping to use that, but there is some stuff in the headers that is confusing.
 
-You should use shash only if your hardware is synchronous, e.g.,
-the AESNI instruction is a good example where a synchronous
-interface is appropriate.
+Folks:
 
-The reason crypto_ahash is so different is because it should be
-used where you need an asynchronous interface, where state has
-to be stored indefinitely.
+Perhaps this is due to me being a neophyte . . .
 
-> There is a function shash_desc_ctx, but there is no function ahash_des_ctx. In the crys_sha1_init() function of sha1_generic, you call shash_desc_ctx. If I want to use the ahash instead of shash for sha1, then do I use shash_desc_ctx, or do I have to come up with my own ahash_desc_ctx?
+I notice that some of the structure have two different sets of functions.
 
-The counterpart to shash_desc_ctx is ahash_request_ctx.
+For example, the ahash_alg structure has .init and then .base.cra_init. 
+What is the difference between the two?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+
+Truly,
+
+Mark Allyn
+Portland, Oregon
+www.allyn.com
+971-563-7588
