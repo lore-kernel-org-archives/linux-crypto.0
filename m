@@ -1,39 +1,35 @@
 From: Mark Allyn <allyn@well.com>
-Subject: General questions on crypto
-Date: Mon, 25 Oct 2010 16:35:31 -0700 (PDT)
-Message-ID: <Pine.GSO.4.64.1010251627060.2377@well.com>
+Subject: Re: Questions about ahash
+Date: Mon, 25 Oct 2010 16:51:05 -0700 (PDT)
+Message-ID: <Pine.GSO.4.64.1010251647580.2377@well.com>
+References: <20101025234206.GA6046@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-To: linux-crypto@vger.kernel.org
+Cc: "Allyn, Mark A" <mark.a.allyn@intel.com>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.well.com ([208.17.81.207]:44095 "EHLO smtp.well.com"
+Received: from smtp.well.com ([208.17.81.207]:44324 "EHLO smtp.well.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757394Ab0JYXuS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Oct 2010 19:50:18 -0400
-Received: from well.com (well.com [10.0.101.205])
-	by smtp.well.com (8.14.3/8.14.3) with ESMTP id o9PNZVxS026628
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:35:31 -0700
-Received: from localhost (allyn@localhost)
-	by well.com (8.14.2/8.14.2/Submit) with ESMTP id o9PNZVjO004482
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 16:35:31 -0700 (PDT)
+	id S1757170Ab0JYXvL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Oct 2010 19:51:11 -0400
+In-Reply-To: <20101025234206.GA6046@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-Folks:
+Herbert:
 
-I am trying to understand how to implement an ahash instance for a 
-hardware encryption device.
+Perhaps this is very fundamential, but what is the difference between
+synchronous and asynchronous as far as crypto is concerned? My device
+performs encryption and decryption asynchronously in relation to
+the main processor in the system. The driver tells the device to
+do x, then goes away and does other stuff, then gets an interrupt
+when the device is done and ready.
 
-I notice that the in-kernel documentation has no mention of ahash.
+The user space app waits for the device to finish, but the kernel
+is doing other stuff in the meantime.
 
-Does anyone know where I can find a basic how-to document on putting
-together an ahash implementation in an existing driver?
-
-The sha1_generic that is supplied appears to be using shash, is there an 
-example for ahash?
-
-Thanks
 
 Truly,
 
@@ -41,3 +37,11 @@ Mark Allyn
 Portland, Oregon
 www.allyn.com
 971-563-7588
+
+> You should use shash only if your hardware is synchronous, e.g.,
+> the AESNI instruction is a good example where a synchronous
+> interface is appropriate.
+>
+> The reason crypto_ahash is so different is because it should be
+> used where you need an asynchronous interface, where state has
+> to be stored indefinitely.
