@@ -1,29 +1,26 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] drivers/crypto: dubious error check
-Date: Sun, 24 Oct 2010 09:39:49 -0700 (PDT)
-Message-ID: <20101024.093949.71101214.davem@davemloft.net>
-References: <20101024150556.22f49c6a@absol.kitzblitz>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+From: Mathias Krause <minipli@googlemail.com>
+Subject: AES-NI for x86?
+Date: Mon, 25 Oct 2010 20:29:08 +0200
+Message-ID: <28ED7E64-4E61-4868-B0CD-89FD18B08BBE@googlemail.com>
+Mime-Version: 1.0 (Apple Message framework v1081)
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: nikai@nikai.net
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:46530
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752423Ab0JXQj1 (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:35220 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751316Ab0JYS3Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Oct 2010 12:39:27 -0400
-In-Reply-To: <20101024150556.22f49c6a@absol.kitzblitz>
+	Mon, 25 Oct 2010 14:29:25 -0400
+Received: by bwz11 with SMTP id 11so2684661bwz.19
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Oct 2010 11:29:23 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Nicolas Kaiser <nikai@nikai.net>
-Date: Sun, 24 Oct 2010 15:05:56 +0200
+Hello list,
 
-> Looks like a copy-and-paste problem to me.
-> 
-> Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
+will there be a 32-bit version of the Intel AES-NI code? I've seen a 32-bit
+version in openssl so it should be possible. Not?
 
-Acked-by: David S. Miller <davem@davemloft.net>
+Regards,
+Mathias 
