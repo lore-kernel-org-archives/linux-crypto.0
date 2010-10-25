@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] drivers/crypto: dubious error check
-Date: Mon, 25 Oct 2010 19:26:04 -0400
-Message-ID: <20101025232604.GA5728@gondor.apana.org.au>
-References: <20101024150556.22f49c6a@absol.kitzblitz> <20101024.093949.71101214.davem@davemloft.net>
+Subject: Re: Questions about ahash
+Date: Mon, 25 Oct 2010 19:42:06 -0400
+Message-ID: <20101025234206.GA6046@gondor.apana.org.au>
+References: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: nikai@nikai.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+To: "Allyn, Mark A" <mark.a.allyn@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54927 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:39832 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758121Ab0JYX0I (ORCPT
+	with ESMTP id S1758305Ab0JYXmJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Oct 2010 19:26:08 -0400
+	Mon, 25 Oct 2010 19:42:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20101024.093949.71101214.davem@davemloft.net>
+In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA32316140FE940B@rrsmsx501.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 24, 2010 at 09:39:49AM -0700, David Miller wrote:
-> From: Nicolas Kaiser <nikai@nikai.net>
-> Date: Sun, 24 Oct 2010 15:05:56 +0200
+Allyn, Mark A <mark.a.allyn@intel.com> wrote:
+> Folks:
 > 
-> > Looks like a copy-and-paste problem to me.
-> > 
-> > Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
+> I am attempting to implement an ahash instance for a hardware crypto device.
 > 
-> Acked-by: David S. Miller <davem@davemloft.net>
+> I see that there is a sha1 generic in the soruces a crypto/sha1_generic.c which uses the shash interface. I was hoping to use that, but there is some stuff in the headers that is confusing.
 
-Applied to crypto-2.6.  Thanks!
+You should use shash only if your hardware is synchronous, e.g.,
+the AESNI instruction is a good example where a synchronous
+interface is appropriate.
+
+The reason crypto_ahash is so different is because it should be
+used where you need an asynchronous interface, where state has
+to be stored indefinitely.
+
+> There is a function shash_desc_ctx, but there is no function ahash_des_ctx. In the crys_sha1_init() function of sha1_generic, you call shash_desc_ctx. If I want to use the ahash instead of shash for sha1, then do I use shash_desc_ctx, or do I have to come up with my own ahash_desc_ctx?
+
+The counterpart to shash_desc_ctx is ahash_request_ctx.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
