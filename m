@@ -1,39 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Question on structures
-Date: Mon, 25 Oct 2010 20:07:36 -0400
-Message-ID: <20101026000736.GA6315@gondor.apana.org.au>
-References: <Pine.GSO.4.64.1010251641420.2377@well.com>
+From: Huang Ying <ying.huang@intel.com>
+Subject: Re: AES-NI for x86?
+Date: Tue, 26 Oct 2010 09:28:05 +0800
+Message-ID: <1288056485.2862.330.camel@yhuang-dev>
+References: <20101025235003.GA6076@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Mark Allyn <allyn@well.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44736 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757170Ab0JZAHi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Oct 2010 20:07:38 -0400
-Content-Disposition: inline
-In-Reply-To: <Pine.GSO.4.64.1010251641420.2377@well.com>
+Received: from mga09.intel.com ([134.134.136.24]:12477 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751367Ab0JZB2H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Oct 2010 21:28:07 -0400
+In-Reply-To: <20101025235003.GA6076@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Mark Allyn <allyn@well.com> wrote:
-> 
-> Folks:
-> 
-> Perhaps this is due to me being a neophyte . . .
-> 
-> I notice that some of the structure have two different sets of functions.
-> 
-> For example, the ahash_alg structure has .init and then .base.cra_init. 
-> What is the difference between the two?
+Hi, Mathias,
 
-cra_init initialises a tfm object, while init is an operation
-specific to hash algorithms --- it initialises the hash state.
+On Tue, 2010-10-26 at 07:50 +0800, Herbert Xu wrote:
+> Mathias Krause <minipli@googlemail.com> wrote:
+> > Hello list,
+> > 
+> > will there be a 32-bit version of the Intel AES-NI code? I've seen a 32-bit
+> > version in openssl so it should be possible. Not?
+> 
+> It won't exist unless someone writes one.  Are you volunteering? :)
+> 
+> Ccing the author in case there is some reason why it won't work in
+> 32-bit mode.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+It can be done in 32-bit mode. We have not done that simply because we
+still have no time to work on that.
+
+You are welcome to do that. :)
+
+Best Regards,
+Huang Ying
