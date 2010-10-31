@@ -1,30 +1,28 @@
 From: Mathias Krause <minipli@googlemail.com>
 Subject: Re: [PATCH] x86, crypto: ported aes-ni implementation to x86
-Date: Sat, 30 Oct 2010 00:51:34 +0200
-Message-ID: <14A7481C-0E2C-4E68-8065-701B0D9DA317@googlemail.com>
+Date: Sun, 31 Oct 2010 20:32:51 +0100
+Message-ID: <24C59B90-1F93-4929-BBC2-1D7864250462@googlemail.com>
 References: <20101029221541.GA12822@gondor.apana.org.au>
 Mime-Version: 1.0 (Apple Message framework v1081)
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Huang Ying <ying.huang@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:57238 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932980Ab0J2Wvu (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:48391 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752626Ab0JaTdL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Oct 2010 18:51:50 -0400
-Received: by bwz11 with SMTP id 11so3016842bwz.19
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Oct 2010 15:51:49 -0700 (PDT)
+	Sun, 31 Oct 2010 15:33:11 -0400
+Received: by fxm16 with SMTP id 16so4434600fxm.19
+        for <linux-crypto@vger.kernel.org>; Sun, 31 Oct 2010 12:33:10 -0700 (PDT)
 In-Reply-To: <20101029221541.GA12822@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 30.10.2010, 00:15 Herbert Xu wrote:
 > Mathias Krause <minipli@googlemail.com> wrote:
->> The AES-NI instructions are also available in legacy mode so the x86
->> architecture may profit from those, too.
->> 
 >> To illustrate the performance gain here's a short summary of the tcrypt
 >> speed test on a Core i5 M 520 running at 2.40GHz comparing both
 >> assembler implementations:
@@ -37,59 +35,34 @@ On 30.10.2010, 00:15 Herbert Xu wrote:
 >> 
 >> Signed-off-by: Mathias Krause <minipli@googlemail.com>
 > 
-> Nice work :)
-> 
-> I have to say though that I'll love this een more if we could
-> avoid duplicating those assembly files somehow.  Is this possible?
-
-I thought about that too but found it more easy to split those files.
-The different calling conventions of the architectures and the limited 
-register set on the 32-bit version made me make some not so nice 
-#ifdef-able changes to the code so it'll work with less registers.
-
 > Oh and those CBC numbers look out of whack.  I'd expect CBC to be
 > way faster as it's done directly by the hardware unlike the
-> other modes.
-
-Well, actually the 32-bit assembler implementation has specialized 
-algorithms for ECB and CBC. But the latter must be implemented a 
-little different than the 64-bit version because I didn't have enough 
-xmm registers to make a 1:1 port. So I reused some registers for 
-loading memory values and used direct memory references to make 
-aesni_cbc_dec() work with the limited amount of registers.
-
-I'll look into it if we can do better, but if not, maybe leaving this 
-one out for the 32-bit version might be the best option. Doing so may
-even make it easier to combine the two assembler files again.
-
-Btw., because of the limited register set I wasn't able to port the 
-CTR mode version, yet. It uses even more registers -- xmm and general 
-purpose. :(
-
->  What numbers do you get in 64-bit before/after
+> other modes.  What numbers do you get in 64-bit before/after
 > your patch?
-
-Haven't yet build a 64-bit kernel but will try that tomorrow.
-
+> 
 > If the hardware CBC is really so much slower then maybe we should
 > stop using it.
 
-This must be related to the changes I made to the code. I would guess 
-it doesn't like the additional memory loads.
+Today I build and measured a 64-bit version without my changes and got 
+results for the above tests at around 60 to 66 MB/s which is ridiculous! 
+So I ran the test again and again and noticed that _sometimes_ I got 
+results for _some_ algorithms at 150 to 160 MB/s. That's weird!
 
-There's even more potential for optimization since I've still a 
-general purpose register left. ;)
+Testing the 32-bit version again (with my patch) I even got 151 MB/s for 
+the CBC mode, albeit now other algorithms were down to 58 - 67 MB/s. 
+Strange. Looks like I was just lucky with my first measurement. :/
 
-See this version as a first version to get feedback, especially from 
-Huang Ying. But it's already quite fast. :)
+I don't know why the numbers do vary that much. Maybe it's some magic in 
+the processor deactivating some cores and the kernel scheduling work to 
+the wrong core. Nevertheless my system under test was otherwise idle. I 
+booted a minimal initramfs based system with no services at all but the 
+ability to load the tcrypt module.
 
+Maybe Huang Ying can give us some insight why the numbers do vary that 
+much? My test case was 'modprobe tcrypt mode=200 sec=10' (for latter 
+tests I reduces the sec parameter to 1 in favor of doing multiple runs). 
+If that's an inappropriate test for the Intel AES instructions maybe 
+somebody can tell me how to do better? Maybe dd to a cryptoloop device?
 
 Regards,
 Mathias
-
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
