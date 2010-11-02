@@ -1,83 +1,33 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v1.1 4/4] keys: add new key-type encrypted
-Date: Tue, 02 Nov 2010 06:56:52 -0400
-Message-ID: <1288695412.16939.3.camel@localhost.localdomain>
-References: <1286827903-3066-1-git-send-email-zohar@linux.vnet.ibm.com>
-	 <1286827903-3066-5-git-send-email-zohar@linux.vnet.ibm.com>
-	 <201011021030.27253.roberto.sassu@polito.it>
+From: "Srood Sherif" <sherif1_srood@g.pl>
+Subject: For your interest
+Date: Tue, 2 Nov 2010 16:42:59 +0400
+Message-ID: <f4ce1084acd0e48cccf7f4cf5be6e866.squirrel@72.55.168.116>
+Reply-To: srood1_sherif@g.pl
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	James Morris <jmorris@namei.org>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: Roberto Sassu <roberto.sassu@polito.it>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e31.co.us.ibm.com ([32.97.110.149]:35143 "EHLO
-	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751404Ab0KBK5J (ORCPT
+Received: from syscomptechweb.com ([72.55.168.116]:35399 "EHLO
+	cl-t085-170cl.privatedns.com" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1751986Ab0KBMwG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Nov 2010 06:57:09 -0400
-In-Reply-To: <201011021030.27253.roberto.sassu@polito.it>
+	Tue, 2 Nov 2010 08:52:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2010-11-02 at 10:30 +0100, Roberto Sassu wrote:
-> The buffer 'derived_buf' in the function get_derived_key() must be
-> allocated dynamically in order to make room for an arbitrary length
-> master key.
-> 
-> Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
-> ---
->  security/keys/encrypted_defined.c |   15 +++++++++++++--
->  1 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/security/keys/encrypted_defined.c b/security/keys/encrypted_defined.c
-> index 5331925..65d9b13 100644
-> --- a/security/keys/encrypted_defined.c
-> +++ b/security/keys/encrypted_defined.c
-> @@ -289,10 +289,20 @@ enum derived_key_type { ENC_KEY, AUTH_KEY };
->  static int get_derived_key(char *derived_key, enum derived_key_type key_type,
->  			   void *master_key, unsigned int master_keylen)
->  {
-> -	char derived_buf[hash_size + 10];
-> +	char *derived_buf;
->  	int ret;
-> +	unsigned int derived_buf_len;
-> +
-> +	derived_buf_len = strlen("AUTH_KEY") + 1 + master_keylen;
-> +	if (derived_buf_len < hash_size)
-> +		derived_buf_len = hash_size;
-> +
-> +	derived_buf = kzalloc(derived_buf_len, GFP_KERNEL);
-> +	if (!derived_buf) {
-> +		pr_err("encrypted_key: out of memory\n");
-> +		return -ENOMEM;
-> +	}
->  
-> -	memset(derived_buf, 0, sizeof derived_buf);
+Greeting,
 
-Thanks Roberto!
+My name is Mr. Srood A. Sherif, I live and work in Abu
+Dhabi UAE. I have an urgent business which I believe
+will interest you. Find the enclose for details.
 
->  	if (key_type)
->  		strcpy(derived_buf, "AUTH_KEY");
->  	else
-> @@ -301,6 +311,7 @@ static int get_derived_key(char *derived_key, enum derived_key_type key_type,
->  	memcpy(derived_buf + strlen(derived_buf) + 1, master_key,
->  	       master_keylen);
->  	ret = calc_hash(derived_key, derived_buf, sizeof derived_buf);
-> +	kfree(derived_buf);
->  	return ret;
->  }
->  
+For any reason you cannot open that attachment, please
+let me know so that I can resend it in the body of the
+mail, thank you.
 
-Yes, and the length in calc_hash() would then need to be
-derived_buf_len.
+I wait for your response, Thank you.
 
-thanks,
+Regards
 
-Mimi
+Srood A. Sherif
