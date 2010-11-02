@@ -1,33 +1,45 @@
-From: "Srood Sherif" <sherif1_srood@g.pl>
-Subject: For your interest
-Date: Tue, 2 Nov 2010 16:42:59 +0400
-Message-ID: <f4ce1084acd0e48cccf7f4cf5be6e866.squirrel@72.55.168.116>
-Reply-To: srood1_sherif@g.pl
+From: "Mr. Vincent Cheng" <info@cheng.org>
+Subject: Partnership..?
+Date: Tue, 2 Nov 2010 06:44:47 -0300 (BRT)
+Message-ID: <48967.41.206.15.1.1288691087.squirrel@alesc.sc.gov.br>
+Reply-To: mrchengvich66@yahoo.com.hk
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7BIT
-To: unlisted-recipients:; (no To-header on input)
+To: info@mail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from syscomptechweb.com ([72.55.168.116]:35399 "EHLO
-	cl-t085-170cl.privatedns.com" rhost-flags-OK-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1751986Ab0KBMwG (ORCPT
+Received: from tubarao.alesc.sc.gov.br ([200.192.66.23]:53861 "EHLO
+	tubarao.alesc.sc.gov.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752839Ab0KBNtM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Nov 2010 08:52:06 -0400
+	Tue, 2 Nov 2010 09:49:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Greeting,
+Hello,
 
-My name is Mr. Srood A. Sherif, I live and work in Abu
-Dhabi UAE. I have an urgent business which I believe
-will interest you. Find the enclose for details.
+I am Mr. Vincent Cheng, and have a sensitive and confidential brief from
 
-For any reason you cannot open that attachment, please
-let me know so that I can resend it in the body of the
-mail, thank you.
+Hong Kong.
 
-I wait for your response, Thank you.
+I am asking for your partnership in re-profiling funds and will give the
 
-Regards
+details.
 
-Srood A. Sherif
+This is a legitimate transaction and you will be paid a handsome
+
+percentage for your "Management Fees". If interested you can kindly write
+
+and provide me with your confidential telephone number or fax number
+
+and I will provide further details with proper guidelines. I require absolute
+
+confidentiality as to any political problems.
+
+Finally, note that this must be concluded within two weeks. Kindly write
+
+back to this email  mrchengvich66@yahoo.com.hk, I look forward to hear from
+you.
+
+Regards,
+Vincent Cheng.
