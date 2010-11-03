@@ -1,41 +1,32 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Re: alg_test question
-Date: Wed, 03 Nov 2010 14:17:31 +0200
-Message-ID: <4CD152DB.5070601@nokia.com>
-References: <Pine.GSO.4.64.1011021041010.23172@well.com>
+Subject: Re: How do you specify driver in tcrypt
+Date: Wed, 03 Nov 2010 14:18:04 +0200
+Message-ID: <4CD152FC.4010902@nokia.com>
+References: <Pine.GSO.4.64.1011021410570.17169@well.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: ext Mark Allyn <allyn@well.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.1.47]:56746 "EHLO mgw-sa01.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754014Ab0KCMQ7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Nov 2010 08:16:59 -0400
-In-Reply-To: <Pine.GSO.4.64.1011021041010.23172@well.com>
+Received: from smtp.nokia.com ([147.243.1.48]:20320 "EHLO mgw-sa02.nokia.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754375Ab0KCMRc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Nov 2010 08:17:32 -0400
+In-Reply-To: <Pine.GSO.4.64.1011021410570.17169@well.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Mark,
+Hi,
 
-cryptomgr_test call it like
-
-    err = alg_test(param->driver, param->alg, type, CRYPTO_ALG_TESTED);
-
-tcrypt_test:
-    ret = alg_test(alg, alg, 0, 0);
-
+I guess you can provide driver name, like "omap-aes".
 
 - Dmitry
 
 
-On 02/11/10 19:42, ext Mark Allyn wrote:
-> What is the mask parameter for in the alg_test function? Also what is the 
-> type?
->
-> Better still, is there any documentation on how to use the alg_test 
-> function?
+On 02/11/10 23:11, ext Mark Allyn wrote:
+> I want to run tcrypt, but I want to only use a specific driver. How do I 
+> do that?
 >
 > Thanks
 >
