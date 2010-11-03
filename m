@@ -1,17 +1,17 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] x86, crypto: ported aes-ni implementation to x86
-Date: Wed,  3 Nov 2010 13:53:27 +0100
-Message-ID: <1288788807-28521-1-git-send-email-minipli@googlemail.com>
+Subject: [PATCH v3] x86, crypto: ported aes-ni implementation to x86
+Date: Wed,  3 Nov 2010 22:14:43 +0100
+Message-ID: <1288818883-7620-1-git-send-email-minipli@googlemail.com>
 Cc: Mathias Krause <minipli@googlemail.com>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Huang Ying <ying.huang@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grimli.r00tworld.net ([83.169.44.195]:50210 "EHLO
+Received: from grimli.r00tworld.net ([83.169.44.195]:54416 "EHLO
 	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753006Ab0KCMxa (ORCPT
+	with ESMTP id S1750825Ab0KCVOp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Nov 2010 08:53:30 -0400
+	Wed, 3 Nov 2010 17:14:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -29,7 +29,7 @@ x86:                              i568       aes-ni   delta
 512 bit, 8kB blocks, XTS:  118.35 MB/s  166.49 MB/s  +40.7%
 
 Additionally, due to some minor optimizations, the 64-bit version also
-get a performance gain up to 20% as seen below:
+got a performance gain up to 20% as seen below:
 
 x86-64:                      old impl.     new impl.  delta
 256 bit, 8kB blocks, ECB:  152.25 MB/s  183.84 MB/s  +20.7%
@@ -39,6 +39,12 @@ x86-64:                      old impl.     new impl.  delta
 
 Signed-off-by: Mathias Krause <minipli@googlemail.com>
 ---
+v3 changes:
+* fixed 32-bit implementation of aesni_ecb_enc (a hunk somehow moved to the end
+  of another function)
+
+Sorry for the noise. I should have reviewed the patch more carefully :/
+
 v2 changes:
 * hide almost all register names in macros so the same code base can be shared
   between x86 and x86_64
@@ -51,7 +57,7 @@ v2 changes:
  3 files changed, 141 insertions(+), 38 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index ff16756..bf810b7 100644
+index ff16756..48d6f7c 100644
 --- a/arch/x86/crypto/aesni-intel_asm.S
 +++ b/arch/x86/crypto/aesni-intel_asm.S
 @@ -9,6 +9,9 @@
@@ -328,7 +334,19 @@ index ff16756..bf810b7 100644
  	test LEN, LEN		# check length
  	jz .Lecb_enc_ret
  	mov 480(KEYP), KLEN
-@@ -609,6 +675,15 @@ ENTRY(aesni_ecb_enc)
+@@ -602,6 +668,11 @@ ENTRY(aesni_ecb_enc)
+ 	cmp $16, LEN
+ 	jge .Lecb_enc_loop1
+ .Lecb_enc_ret:
++#ifndef __x86_64__
++	popl KLEN
++	popl KEYP
++	popl LEN
++#endif
+ 	ret
+ 
+ /*
+@@ -609,6 +680,15 @@ ENTRY(aesni_ecb_enc)
   *		      size_t len);
   */
  ENTRY(aesni_ecb_dec)
@@ -344,7 +362,7 @@ index ff16756..bf810b7 100644
  	test LEN, LEN
  	jz .Lecb_dec_ret
  	mov 480(KEYP), KLEN
-@@ -646,6 +721,11 @@ ENTRY(aesni_ecb_dec)
+@@ -646,8 +726,14 @@ ENTRY(aesni_ecb_dec)
  	cmp $16, LEN
  	jge .Lecb_dec_loop1
  .Lecb_dec_ret:
@@ -355,21 +373,9 @@ index ff16756..bf810b7 100644
 +#endif
  	ret
  
- /*
-@@ -670,8 +750,14 @@ ENTRY(aesni_cbc_enc)
- 	jge .Lcbc_enc_loop
- 	movups STATE, (IVP)
- .Lcbc_enc_ret:
-+#ifndef __x86_64__
-+	popl KLEN
-+	popl KEYP
-+	popl LEN
-+#endif
- 	ret
- 
 +#ifdef __x86_64__
  /*
-  * void aesni_cbc_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  * void aesni_cbc_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
   *		      size_t len, u8 *iv)
 @@ -744,6 +830,7 @@ ENTRY(aesni_cbc_dec)
   *	INC:	== 1, in little endian
