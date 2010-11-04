@@ -1,86 +1,123 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [PATCH v3] x86, crypto: ported aes-ni implementation to x86
-Date: Thu, 04 Nov 2010 20:24:36 +0800
-Message-ID: <1288873476.2203.14.camel@yhuang-mobile>
-References: <1288818883-7620-1-git-send-email-minipli@googlemail.com>
-	 <1288823231.3016.25.camel@yhuang-mobile>
-	 <FE9298C4-BBD4-472A-946D-0E804B128831@googlemail.com>
+From: Nicolas Kaiser <nikai@nikai.net>
+Subject: Re: [PATCH] crypto: cast5: simplify if-statements
+Date: Thu, 4 Nov 2010 16:14:53 +0100
+Message-ID: <20101104161453.5e257b18@absol.kitzblitz>
+References: <20101027120324.0b12a8b8@absol.kitzblitz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Mathias Krause <minipli@googlemail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:57016 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750908Ab0KDMYi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Nov 2010 08:24:38 -0400
-In-Reply-To: <FE9298C4-BBD4-472A-946D-0E804B128831@googlemail.com>
+Received: from webhosting01.bon.m2soft.com ([195.38.20.32]:39530 "EHLO
+	webhosting01.bon.m2soft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751969Ab0KDPQx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Nov 2010 11:16:53 -0400
+Received: from absol.kitzblitz ([91.119.3.34])
+	(authenticated bits=0)
+	by webhosting01.bon.m2soft.com (8.13.8/8.13.8) with ESMTP id oA4FFNdZ029062
+	for <linux-crypto@vger.kernel.org>; Thu, 4 Nov 2010 16:15:24 +0100
+In-Reply-To: <20101027120324.0b12a8b8@absol.kitzblitz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2010-11-04 at 00:38 -0700, Mathias Krause wrote:
-> On 03.11.2010, 23:27 Huang Ying wrote:
-> > On Wed, 2010-11-03 at 14:14 -0700, Mathias Krause wrote:
-> >> The AES-NI instructions are also available in legacy mode so the 32-bit
-> >> architecture may profit from those, too.
-> >> 
-> >> To illustrate the performance gain here's a short summary of the tcrypt
-> >> speed test on a Core i7 M620 running at 2.67GHz comparing both assembler
-> >> implementations:
-> >> 
-> >> x86:                              i568       aes-ni   delta
-> >> 256 bit, 8kB blocks, ECB:  125.94 MB/s  187.09 MB/s  +48.6%
-> > 
-> > Which method do you used for speed testing?
-> > 
-> > modprobe tcrypt mode=200 sec=<?>
+* Nicolas Kaiser <nikai@nikai.net>:
+> I noticed that by factoring out common rounds from the
+> branches of the if-statements in the encryption and
+> decryption functions, the executable file size goes down
+> significantly, for crypto/cast5.ko from 26688 bytes
+> to 24336 bytes (amd64).
 > 
-> Yes. I used: modprobe tcrypt mode=200 sec=1
-> 
-> > That actually does not work very well for AES-NI. Because AES-NI
-> > blkcipher is tested in synchronous mode, and in that mode,
-> > kernel_fpu_begin/end() must be called for every block, and
-> > kernel_fpu_begin/end() is quite slow.
-> 
-> That's what I figured, too. Can this slowdown be avoided by saving and 
-> restoring the used FPU registers within the assembler implementation or 
-> would this be even slower?
+> On my test system, I saw a slight speedup.
 
-That is a customized version of kernel_fpu_begin/end(), I think the x86
-maintainer will not like it. And the benefit may be small too.
+Hi there!
 
-> > At the same time, some further
-> > optimization for AES-NI can not be tested (such as "ecb-aes-aesni"
-> > driver) in that mode, because they are only available in asynchronous
-> > mode.
-> 
-> After finding the bug in the second version of the patch I noticed this, 
-> too.
-> 
-> > When developing AES-NI for x86_64, I uses dm-crypt + AES-NI for speed
-> > testing, where AES-NI blkcipher will be tested in asynchronous mode, and
-> > kernel_fpu_begin/end() is called for every page. Can you use that to
-> > test?
-> 
-> But wouldn't this be even slower than the above measurement? I took the 
-> results for 8kB blocks and a page would only be 4kB ... well, depends on 
-> what kind of pages you took. IIRC x86-64 not only supports 2MB but also 
-> 1GB pages ;)
+How would I add a simple cast5 cipher speed test to tcrypt.c, like this?
+	case 14:
+		test_cipher_speed("ecb(cast5)", ENCRYPT, sec, NULL, 0,
+				  speed_template_8);
+		test_cipher_speed("ecb(cast5)", DECRYPT, sec, NULL, 0,
+				  speed_template_8);
+		test_cipher_speed("cbc(cast5)", ENCRYPT, sec, NULL, 0,
+				  speed_template_8);
+		test_cipher_speed("cbc(cast5)", DECRYPT, sec, NULL, 0,
+				  speed_template_8);
+		break;
 
-There is other difference between them. In synchronous mode
-kernel_fpu_begin/end() is called for every block, while in asynchronous
-mode and dm-crypt, kernel_fpu_begin/end() is called for every page. So
-although the block size is smaller, the result will be better.
+Does that make sense? Here are my results:
+# insmod crypto/tcrypt.ko mode=14 sec=30
 
-> > Or you can add test_acipher_speed (similar with test_ahash_speed) to
-> > test cipher in asynchronous mode.
-> 
-> Maybe I'll try this approach, since it looks like just a minor 
-> modification of the tcrypt module.
+Before:
+testing speed of ecb(cast5) encryption
+test 0 (64 bit key, 16 byte blocks): 118241789 operations in 30 seconds (1891868624 bytes)
+test 1 (64 bit key, 64 byte blocks): 40502820 operations in 30 seconds (2592180480 bytes)
+test 2 (64 bit key, 256 byte blocks): 11111145 operations in 30 seconds (2844453120 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2858271 operations in 30 seconds (2926869504 bytes)
+test 4 (64 bit key, 8192 byte blocks): 359327 operations in 30 seconds (2943606784 bytes)
 
-Thanks!
+testing speed of ecb(cast5) decryption
+test 0 (64 bit key, 16 byte blocks): 118443232 operations in 30 seconds (1895091712 bytes)
+test 1 (64 bit key, 64 byte blocks): 40060571 operations in 30 seconds (2563876544 bytes)
+test 2 (64 bit key, 256 byte blocks): 10944717 operations in 30 seconds (2801847552 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2811154 operations in 30 seconds (2878621696 bytes)
+test 4 (64 bit key, 8192 byte blocks): 353043 operations in 30 seconds (2892128256 bytes)
 
-Best Regards,
-Huang Ying
+testing speed of cbc(cast5) encryption
+test 0 (64 bit key, 16 byte blocks): 110614202 operations in 30 seconds (1769827232 bytes)
+test 1 (64 bit key, 64 byte blocks): 37260496 operations in 30 seconds (2384671744 bytes)
+test 2 (64 bit key, 256 byte blocks): 10323268 operations in 30 seconds (2642756608 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2650259 operations in 30 seconds (2713865216 bytes)
+test 4 (64 bit key, 8192 byte blocks): 333281 operations in 30 seconds (2730237952 bytes)
+
+testing speed of cbc(cast5) decryption
+test 0 (64 bit key, 16 byte blocks): 102455488 operations in 30 seconds (1639287808 bytes)
+test 1 (64 bit key, 64 byte blocks): 35507599 operations in 30 seconds (2272486336 bytes)
+test 2 (64 bit key, 256 byte blocks): 9962653 operations in 30 seconds (2550439168 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2569557 operations in 30 seconds (2631226368 bytes)
+test 4 (64 bit key, 8192 byte blocks): 323085 operations in 30 seconds (2646712320 bytes)
+
+ that's in sum:
+87993190 bytes/s
+86877105 bytes/s
+81609058 bytes/s
+78267680 bytes/s
+
+
+After:
+testing speed of ecb(cast5) encryption
+test 0 (64 bit key, 16 byte blocks): 120033632 operations in 30 seconds (1920538112 bytes)
+test 1 (64 bit key, 64 byte blocks): 41484473 operations in 30 seconds (2655006272 bytes)
+test 2 (64 bit key, 256 byte blocks): 11418041 operations in 30 seconds (2923018496 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2940940 operations in 30 seconds (3011522560 bytes)
+test 4 (64 bit key, 8192 byte blocks): 369831 operations in 30 seconds (3029655552 bytes)
+
+testing speed of ecb(cast5) decryption
+test 0 (64 bit key, 16 byte blocks): 122215696 operations in 30 seconds (1955451136 bytes)
+test 1 (64 bit key, 64 byte blocks): 41845591 operations in 30 seconds (2678117824 bytes)
+test 2 (64 bit key, 256 byte blocks): 11478322 operations in 30 seconds (2938450432 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2952595 operations in 30 seconds (3023457280 bytes)
+test 4 (64 bit key, 8192 byte blocks): 371305 operations in 30 seconds (3041730560 bytes)
+
+testing speed of cbc(cast5) encryption
+test 0 (64 bit key, 16 byte blocks): 112301700 operations in 30 seconds (1796827200 bytes)
+test 1 (64 bit key, 64 byte blocks): 38131586 operations in 30 seconds (2440421504 bytes)
+test 2 (64 bit key, 256 byte blocks): 10609299 operations in 30 seconds (2715980544 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2728723 operations in 30 seconds (2794212352 bytes)
+test 4 (64 bit key, 8192 byte blocks): 343249 operations in 30 seconds (2811895808 bytes)
+
+testing speed of cbc(cast5) decryption
+test 0 (64 bit key, 16 byte blocks): 106721453 operations in 30 seconds (1707543248 bytes)
+test 1 (64 bit key, 64 byte blocks): 37573333 operations in 30 seconds (2404693312 bytes)
+test 2 (64 bit key, 256 byte blocks): 10624511 operations in 30 seconds (2719874816 bytes)
+test 3 (64 bit key, 1024 byte blocks): 2745305 operations in 30 seconds (2811192320 bytes)
+test 4 (64 bit key, 8192 byte blocks): 345642 operations in 30 seconds (2831499264 bytes)
+
+ that's in sum:
+90264940 bytes/s
+90914715 bytes/s
+83728916 bytes/s
+83165353 bytes/s
+
+
+Best regards,
+Nicolas Kaiser
