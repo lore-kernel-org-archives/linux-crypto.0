@@ -1,100 +1,109 @@
-From: "Allyn, Mark A" <mark.a.allyn@intel.com>
-Subject: RE: [PATCH 1/1] crypto: api.c adding kernel-doc comments
-Date: Thu, 4 Nov 2010 11:25:06 -0600
-Message-ID: <8A0E4C92AE2D6D40AF99653191DA32316141394940@rrsmsx501.amr.corp.intel.com>
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH 1/1] crypto: api.c adding kernel-doc comments
+Date: Thu, 4 Nov 2010 10:30:52 -0700
+Message-ID: <20101104103052.d8791fe5.rdunlap@xenotime.net>
 References: <1288890442-11208-1-git-send-email-mark.a.allyn@intel.com>
- <20101104102219.7ec24969.rdunlap@xenotime.net>
+	<20101104102219.7ec24969.rdunlap@xenotime.net>
+	<8A0E4C92AE2D6D40AF99653191DA32316141394940@rrsmsx501.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
+To: "Allyn, Mark A" <mark.a.allyn@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:2615 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750760Ab0KDRZJ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Nov 2010 13:25:09 -0400
-In-Reply-To: <20101104102219.7ec24969.rdunlap@xenotime.net>
-Content-Language: en-US
+Received: from xenotime.net ([72.52.115.56]:49375 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751064Ab0KDRay (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Nov 2010 13:30:54 -0400
+Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-crypto@vger.kernel.org>; Thu, 4 Nov 2010 10:30:52 -0700
+In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA32316141394940@rrsmsx501.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is my first time in attempting to patch documentation. Shall I follow your suggestions by submitting a patch that depends on this patch or shall I submit the whole thing again with the corrections?
+On Thu, 4 Nov 2010 11:25:06 -0600 Allyn, Mark A wrote:
 
-Mark
-
------Original Message-----
-From: Randy Dunlap [mailto:rdunlap@xenotime.net] 
-Sent: Thursday, November 04, 2010 10:22 AM
-To: Allyn, Mark A
-Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/1] crypto: api.c adding kernel-doc comments
-
-On Thu,  4 Nov 2010 10:07:22 -0700 Mark Allyn wrote:
-
-> Add comments to crypto_alg_lookup and crypto_larval_lookup
+> This is my first time in attempting to patch documentation. Shall I follow your suggestions by submitting a patch that depends on this patch or shall I submit the whole thing again with the corrections?
 > 
-> I am re-submitting this due to errors
+
+Hi Mark,
+
+If your patch was already merged somewhere (even in an intermediate tree),
+you should just send a partial/update patch, but in this case, since it hasn't
+been merged anywhere (that I know of), I recommend sending a complete new patch.
+
+Thanks.
+
 > 
-> Signed-off-by: Mark A. Allyn <mark.a.allyn@intel.com>
-> ---
->  crypto/api.c |   19 +++++++++++++++++++
->  1 files changed, 19 insertions(+), 0 deletions(-)
+> -----Original Message-----
+> From: Randy Dunlap [mailto:rdunlap@xenotime.net] 
+> Sent: Thursday, November 04, 2010 10:22 AM
+> To: Allyn, Mark A
+> Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org
+> Subject: Re: [PATCH 1/1] crypto: api.c adding kernel-doc comments
 > 
-> diff --git a/crypto/api.c b/crypto/api.c
-> index 033a714..71c389d 100644
-> --- a/crypto/api.c
-> +++ b/crypto/api.c
-> @@ -193,6 +193,15 @@ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
->  	return alg;
->  }
->  
-> +/**
-> + * crypto_alg_lookup() return crypto_alg structure for an algorithm
-
-needs hyphen between function name and "return".
-
-> + * @name:	text string containing name of algorithm
-> + * @type:	crypto type (defined at about line 31 of
-> + *		include/linux/crypto.h)
-> + * @mask:	mask of allowable crypto types (use or'd list
-> + *		of types as defined at about line 31 of
-> + *		include/linux/crypto.h)
-
-drop the line numbers...
-
-> + */
->  struct crypto_alg *crypto_alg_lookup(const char *name, u32 type, u32 mask)
->  {
->  	struct crypto_alg *alg;
-> @@ -205,6 +214,16 @@ struct crypto_alg *crypto_alg_lookup(const char *name, u32 type, u32 mask)
->  }
->  EXPORT_SYMBOL_GPL(crypto_alg_lookup);
->  
-> +/**
-> + * crypto_alg_larval lookup() return large value (larval) crypto_alg
-
- * crypto_larval_lookup() - return large value (larval) crypto_alg
-
-
-> + *	structure for an algorithm
-> + * @name:	text string containing name of algorithm
-> + * @type:	crypto type (defined at about line 31 of
-> + *		include/linux/crypto.h)
-> + * @mask:	mask of allowable crypto types (use or'd list
-> + *		of types as defined at about line 31 of
-> + *		include/linux/crypto.h)
-> + */
-
-drop the line numbers.
-
->  struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
->  {
->  	struct crypto_alg *alg;
-> -- 
-
+> On Thu,  4 Nov 2010 10:07:22 -0700 Mark Allyn wrote:
+> 
+> > Add comments to crypto_alg_lookup and crypto_larval_lookup
+> > 
+> > I am re-submitting this due to errors
+> > 
+> > Signed-off-by: Mark A. Allyn <mark.a.allyn@intel.com>
+> > ---
+> >  crypto/api.c |   19 +++++++++++++++++++
+> >  1 files changed, 19 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/crypto/api.c b/crypto/api.c
+> > index 033a714..71c389d 100644
+> > --- a/crypto/api.c
+> > +++ b/crypto/api.c
+> > @@ -193,6 +193,15 @@ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
+> >  	return alg;
+> >  }
+> >  
+> > +/**
+> > + * crypto_alg_lookup() return crypto_alg structure for an algorithm
+> 
+> needs hyphen between function name and "return".
+> 
+> > + * @name:	text string containing name of algorithm
+> > + * @type:	crypto type (defined at about line 31 of
+> > + *		include/linux/crypto.h)
+> > + * @mask:	mask of allowable crypto types (use or'd list
+> > + *		of types as defined at about line 31 of
+> > + *		include/linux/crypto.h)
+> 
+> drop the line numbers...
+> 
+> > + */
+> >  struct crypto_alg *crypto_alg_lookup(const char *name, u32 type, u32 mask)
+> >  {
+> >  	struct crypto_alg *alg;
+> > @@ -205,6 +214,16 @@ struct crypto_alg *crypto_alg_lookup(const char *name, u32 type, u32 mask)
+> >  }
+> >  EXPORT_SYMBOL_GPL(crypto_alg_lookup);
+> >  
+> > +/**
+> > + * crypto_alg_larval lookup() return large value (larval) crypto_alg
+> 
+>  * crypto_larval_lookup() - return large value (larval) crypto_alg
+> 
+> 
+> > + *	structure for an algorithm
+> > + * @name:	text string containing name of algorithm
+> > + * @type:	crypto type (defined at about line 31 of
+> > + *		include/linux/crypto.h)
+> > + * @mask:	mask of allowable crypto types (use or'd list
+> > + *		of types as defined at about line 31 of
+> > + *		include/linux/crypto.h)
+> > + */
+> 
+> drop the line numbers.
+> 
+> >  struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+> >  {
+> >  	struct crypto_alg *alg;
+> > -- 
 
 ---
 ~Randy
