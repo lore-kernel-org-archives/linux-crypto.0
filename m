@@ -1,22 +1,36 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH 1/1] crypto: api.c adding kernel-doc comments
-Date: Thu, 4 Nov 2010 10:22:19 -0700
-Message-ID: <20101104102219.7ec24969.rdunlap@xenotime.net>
+From: "Allyn, Mark A" <mark.a.allyn@intel.com>
+Subject: RE: [PATCH 1/1] crypto: api.c adding kernel-doc comments
+Date: Thu, 4 Nov 2010 11:25:06 -0600
+Message-ID: <8A0E4C92AE2D6D40AF99653191DA32316141394940@rrsmsx501.amr.corp.intel.com>
 References: <1288890442-11208-1-git-send-email-mark.a.allyn@intel.com>
+ <20101104102219.7ec24969.rdunlap@xenotime.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Mark Allyn <mark.a.allyn@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:40698 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1750760Ab0KDRWa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Nov 2010 13:22:30 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-crypto@vger.kernel.org>; Thu, 4 Nov 2010 10:22:20 -0700
-In-Reply-To: <1288890442-11208-1-git-send-email-mark.a.allyn@intel.com>
+Received: from mga03.intel.com ([143.182.124.21]:2615 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750760Ab0KDRZJ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Nov 2010 13:25:09 -0400
+In-Reply-To: <20101104102219.7ec24969.rdunlap@xenotime.net>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+This is my first time in attempting to patch documentation. Shall I follow your suggestions by submitting a patch that depends on this patch or shall I submit the whole thing again with the corrections?
+
+Mark
+
+-----Original Message-----
+From: Randy Dunlap [mailto:rdunlap@xenotime.net] 
+Sent: Thursday, November 04, 2010 10:22 AM
+To: Allyn, Mark A
+Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/1] crypto: api.c adding kernel-doc comments
 
 On Thu,  4 Nov 2010 10:07:22 -0700 Mark Allyn wrote:
 
