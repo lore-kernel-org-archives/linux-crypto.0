@@ -1,38 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Thu, 4 Nov 2010 14:04:05 -0500
-Message-ID: <20101104190405.GA2501@gondor.apana.org.au>
-References: <4CC9946D.mailLH511GU0C@intel.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 1/4] net - Add AF_ALG macros
+Date: Thu, 04 Nov 2010 12:22:35 -0700 (PDT)
+Message-ID: <20101104.122235.189710188.davem@davemloft.net>
+References: <20101104173456.GA1321@gondor.apana.org.au>
+	<E1PE3jX-0000M8-FP@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
-	adrian.hoban@intel.com
-To: tadeusz.struk@intel.com
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:50682 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752360Ab0KDTEH (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:45551
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751849Ab0KDTWL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Nov 2010 15:04:07 -0400
-Content-Disposition: inline
-In-Reply-To: <4CC9946D.mailLH511GU0C@intel.com>
+	Thu, 4 Nov 2010 15:22:11 -0400
+In-Reply-To: <E1PE3jX-0000M8-FP@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 28, 2010 at 04:19:09PM +0100, tadeusz.struk@intel.com wrote:
-> Hi Herbert,
->    We have reworked the assembly to use macros instead of the new aesni instructions.
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Thu, 04 Nov 2010 12:36:19 -0500
 
-Both applied.  Thanks for your efforts!
+> net - Add AF_ALG macros
+> 
+> This patch adds the socket family/level macros for the yet-to-be-born
+> AF_ALG family.  The AF_ALG family provides the user-space interface
+> for the kernel crypto API.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->    Do you think it is possible to get it in into 2.6.37?
-
-Sorry, it needed to have been ready much earlier to make this
-merge window.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: David S. Miller <davem@davemloft.net>
