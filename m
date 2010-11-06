@@ -1,34 +1,69 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH 4/4] crypto: algif_skcipher - User-space interface for
- skcipher operations
-Date: Sat, 06 Nov 2010 13:23:34 +0100
-Message-ID: <1289046214.24626.63.camel@martin>
-References: <20101104173456.GA1321@gondor.apana.org.au>
-	 <E1PE3jY-0000Ml-7B@gondolin.me.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Tracey Dent <tdent48227@gmail.com>
+Subject: [PATCH] Crypto: Makefile: Makefile clean up
+Date: Sat,  6 Nov 2010 14:50:48 -0400
+Message-ID: <1289069448-1861-1-git-send-email-tdent48227@gmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Tracey Dent <tdent48227@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sitav-80024.hsr.ch ([152.96.80.24]:40492 "EHLO strongswan.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753670Ab0KFNVs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Nov 2010 09:21:48 -0400
-In-Reply-To: <E1PE3jY-0000Ml-7B@gondolin.me.apana.org.au>
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:34057 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750919Ab0KFSug (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Nov 2010 14:50:36 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Changed Makefile to use <modules>-y instead of <modules>-objs.
 
-I did a proof-of-concept implementation for our crypto library, the
-interface looks good so far. All our hash, hmac, xcbc and cipher test
-vectors matched.
+Signed-off-by: Tracey Dent <tdent48227@gmail.com>
+---
+ crypto/Makefile |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
 
-> +			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
-
-Every skcipher operation leaks memory on my box (this page?). Should be
-reproducible by doing encryption with any cipher.
-
-Regards
-Martin
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 423b7de..40a9e43 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -3,32 +3,32 @@
+ #
+ 
+ obj-$(CONFIG_CRYPTO) += crypto.o
+-crypto-objs := api.o cipher.o compress.o
++crypto-y := api.o cipher.o compress.o
+ 
+ obj-$(CONFIG_CRYPTO_WORKQUEUE) += crypto_wq.o
+ 
+ obj-$(CONFIG_CRYPTO_FIPS) += fips.o
+ 
+ crypto_algapi-$(CONFIG_PROC_FS) += proc.o
+-crypto_algapi-objs := algapi.o scatterwalk.o $(crypto_algapi-y)
++crypto_algapi-y := algapi.o scatterwalk.o $(crypto_algapi-y)
+ obj-$(CONFIG_CRYPTO_ALGAPI2) += crypto_algapi.o
+ 
+ obj-$(CONFIG_CRYPTO_AEAD2) += aead.o
+ 
+-crypto_blkcipher-objs := ablkcipher.o
+-crypto_blkcipher-objs += blkcipher.o
++crypto_blkcipher-y := ablkcipher.o
++crypto_blkcipher-y += blkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER2) += crypto_blkcipher.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER2) += chainiv.o
+ obj-$(CONFIG_CRYPTO_BLKCIPHER2) += eseqiv.o
+ obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
+ 
+-crypto_hash-objs += ahash.o
+-crypto_hash-objs += shash.o
++crypto_hash-y += ahash.o
++crypto_hash-y += shash.o
+ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
+ 
+ obj-$(CONFIG_CRYPTO_PCOMP2) += pcompress.o
+ 
+-cryptomgr-objs := algboss.o testmgr.o
++cryptomgr-y := algboss.o testmgr.o
+ 
+ obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
+ obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+-- 
+1.7.3.2.146.gca209
