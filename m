@@ -1,36 +1,34 @@
-From: Lee Nipper <lee.nipper@gmail.com>
-Subject: Re: [PATCH 1/1] crypto: api.c: doc on crypto_alg_lookup,
- crypto_larval_lookup, and crypto_alg_mod_lookup
-Date: Fri, 5 Nov 2010 14:57:04 -0500
-Message-ID: <AANLkTi=3kQ=op8wp2XqT2JpVtJUAe6fXrrDxWijsQaPp@mail.gmail.com>
-References: <1288980346-15961-1-git-send-email-mark.a.allyn@intel.com>
-	<AANLkTik7ttMgG97EOkDK7Cmh=7yUe8eUaTfnCoo12Q_9@mail.gmail.com>
-	<8A0E4C92AE2D6D40AF99653191DA32316141414460@rrsmsx501.amr.corp.intel.com>
-Reply-To: lee.nipper@gmail.com
+From: Martin Willi <martin@strongswan.org>
+Subject: Re: [PATCH 4/4] crypto: algif_skcipher - User-space interface for
+ skcipher operations
+Date: Sat, 06 Nov 2010 13:23:34 +0100
+Message-ID: <1289046214.24626.63.camel@martin>
+References: <20101104173456.GA1321@gondor.apana.org.au>
+	 <E1PE3jY-0000Ml-7B@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Allyn, Mark A" <mark.a.allyn@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:60901 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752327Ab0KET5F (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Nov 2010 15:57:05 -0400
-Received: by bwz11 with SMTP id 11so3014138bwz.19
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Nov 2010 12:57:04 -0700 (PDT)
-In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA32316141414460@rrsmsx501.amr.corp.intel.com>
+Received: from sitav-80024.hsr.ch ([152.96.80.24]:40492 "EHLO strongswan.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753670Ab0KFNVs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 6 Nov 2010 09:21:48 -0400
+In-Reply-To: <E1PE3jY-0000Ml-7B@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 5, 2010 at 13:36, Allyn, Mark A <mark.a.allyn@intel.com> wrote:
-> Can you please explain what larval means in this context? I tried googling it an could not find anything meaningful.
->
-> What is the difference between crypto_alg_lookup and crypto_larval_lookup?
->
+Hi Herbert,
 
-In the kernel crypto context,
-I think larval means that the lookup
-may load a module, if necessary, to provide support for the algorithm.
+I did a proof-of-concept implementation for our crypto library, the
+interface looks good so far. All our hash, hmac, xcbc and cipher test
+vectors matched.
 
-I defer to Herbert Xu for any further explanation.
+> +			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
+
+Every skcipher operation leaks memory on my box (this page?). Should be
+reproducible by doing encryption with any cipher.
+
+Regards
+Martin
