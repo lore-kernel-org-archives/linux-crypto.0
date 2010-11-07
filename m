@@ -1,40 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/4] crypto: algif_skcipher - User-space interface for
-	skcipher operations
-Date: Sun, 7 Nov 2010 09:08:13 +0800
-Message-ID: <20101107010813.GA20538@gondor.apana.org.au>
-References: <1289046214.24626.63.camel@martin>
+Subject: Re: [PATCH 1/1] crypto: api.c: doc on crypto_alg_lookup,
+	crypto_larval_lookup, and crypto_alg_mod_lookup
+Date: Sun, 7 Nov 2010 09:10:16 +0800
+Message-ID: <20101107011016.GA20564@gondor.apana.org.au>
+References: <8A0E4C92AE2D6D40AF99653191DA32316141414460@rrsmsx501.amr.corp.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
+Cc: lee.nipper@gmail.com, linux-crypto@vger.kernel.org
+To: "Allyn, Mark A" <mark.a.allyn@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44428 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:46436 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753917Ab0KGBIR (ORCPT
+	with ESMTP id S1753917Ab0KGBKW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 6 Nov 2010 21:08:17 -0400
+	Sat, 6 Nov 2010 21:10:22 -0400
 Content-Disposition: inline
-In-Reply-To: <1289046214.24626.63.camel@martin>
+In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA32316141414460@rrsmsx501.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Martin Willi <martin@strongswan.org> wrote:
-> Hi Herbert,
+Allyn, Mark A <mark.a.allyn@intel.com> wrote:
 > 
-> I did a proof-of-concept implementation for our crypto library, the
-> interface looks good so far. All our hash, hmac, xcbc and cipher test
-> vectors matched.
-> 
->> +                     sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
-> 
-> Every skcipher operation leaks memory on my box (this page?). Should be
-> reproducible by doing encryption with any cipher.
+> I was making an assumption that larval is shorthand for large value as there is nothing meaningful in google except for a type of wormlike form.
 
-Hmm, can you show me your test program and how you determined
-that it was leaking pages?
+Larval means not fully grown in this context, i.e., the algorithm
+that we've constructed will be filled in later to become a real
+algorithm object.
 
-Thanks!
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
