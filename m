@@ -1,79 +1,35 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [PATCH v1.2 2/4] key: add tpm_send command
-Date: Mon,  8 Nov 2010 10:30:44 -0500
-Message-ID: <1289230246-3856-3-git-send-email-zohar@linux.vnet.ibm.com>
-References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com>
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Subject: Re: [PATCH v1.2 3/4] keys: add new trusted key-type
+Date: Mon, 8 Nov 2010 10:09:37 -0700
+Message-ID: <20101108170937.GA31501@obsidianresearch.com>
+References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com> <1289230246-3856-4-git-send-email-zohar@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	James Morris <jmorris@namei.org>,
 	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from quartz.orcorp.ca ([139.142.54.143]:40682 "EHLO quartz.orcorp.ca"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751904Ab0KHRJu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Nov 2010 12:09:50 -0500
+Content-Disposition: inline
+In-Reply-To: <1289230246-3856-4-git-send-email-zohar@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add internal kernel tpm_send() command used to seal/unseal keys.
+On Mon, Nov 08, 2010 at 10:30:45AM -0500, Mimi Zohar wrote:
 
-Signed-off-by: David Safford <safford@watson.ibm.com>
-Reviewd-by: Mimi Zohar <zohar@watson.ibm.com>
-Acked-by: Rajiv Andrade <srajiv@linux.vnet.ibm.com>
-Acked-by: Serge E. Hallyn <serge@hallyn.com>
----
- drivers/char/tpm/tpm.c |   17 +++++++++++++++++
- include/linux/tpm.h    |    3 +++
- 2 files changed, 20 insertions(+), 0 deletions(-)
+> pcrlock=n    extends the designated PCR 'n' with a random value,
+>              so that a key sealed to that PCR may not be unsealed
+>              again until after a reboot.
 
-diff --git a/drivers/char/tpm/tpm.c b/drivers/char/tpm/tpm.c
-index 7c41335..5987d9c 100644
---- a/drivers/char/tpm/tpm.c
-+++ b/drivers/char/tpm/tpm.c
-@@ -780,6 +780,23 @@ int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
- }
- EXPORT_SYMBOL_GPL(tpm_pcr_extend);
- 
-+int tpm_send(u32 chip_num, char *cmd, int buflen)
-+{
-+	struct tpm_chip *chip;
-+	int rc;
-+
-+	chip = tpm_chip_find_get(chip_num);
-+	if (chip == NULL)
-+		return -ENODEV;
-+
-+	rc = transmit_cmd(chip, (struct tpm_cmd_t *)cmd, buflen,
-+			  "attempting tpm_cmd");
-+
-+	module_put(chip->dev->driver->owner);
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(tpm_send);
-+
- ssize_t tpm_show_pcrs(struct device *dev, struct device_attribute *attr,
- 		      char *buf)
- {
-diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-index ac5d1c1..a0ecaa9 100644
---- a/include/linux/tpm.h
-+++ b/include/linux/tpm.h
-@@ -31,6 +31,7 @@
- 
- extern int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf);
- extern int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash);
-+extern int tpm_send(u32 chip_num, char *cmd, int buflen);
- #else
- static inline int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf) {
- 	return -ENODEV;
-@@ -38,5 +39,7 @@ static inline int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf) {
- static inline int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash) {
- 	return -ENODEV;
- }
-+static inline int tpm_send(u32 chip_num, char *cmd, int buflen) {
-+	return -ENODEV;
- #endif
- #endif
--- 
-1.7.2.2
+Nice, but this seems very strange to me, since it has nothing to do
+with the key and could be done easially in userspace?
+
+Jason
