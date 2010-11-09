@@ -1,10 +1,15 @@
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+From: David Safford <safford@watson.ibm.com>
 Subject: Re: [PATCH v1.2 3/4] keys: add new trusted key-type
-Date: Mon, 8 Nov 2010 23:40:16 -0700
-Message-ID: <20101109064016.GF16307@obsidianresearch.com>
-References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com> <1289230246-3856-4-git-send-email-zohar@linux.vnet.ibm.com> <20101108170937.GA31501@obsidianresearch.com> <1289240313.6060.10.camel@localhost.localdomain>
+Date: Tue, 09 Nov 2010 10:17:18 -0500
+Message-ID: <1289315838.16976.38.camel@localhost.localdomain>
+References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com>
+	 <1289230246-3856-4-git-send-email-zohar@linux.vnet.ibm.com>
+	 <20101108170937.GA31501@obsidianresearch.com>
+	 <1289240313.6060.10.camel@localhost.localdomain>
+	 <20101109064016.GF16307@obsidianresearch.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
@@ -12,48 +17,69 @@ Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	James Morris <jmorris@namei.org>,
 	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
 	Mimi Zohar <zohar@us.ibm.com>
-To: David Safford <safford@watson.ibm.com>
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1289240313.6060.10.camel@localhost.localdomain>
+In-Reply-To: <20101109064016.GF16307@obsidianresearch.com>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 08, 2010 at 01:18:33PM -0500, David Safford wrote:
+On Mon, 2010-11-08 at 23:40 -0700, Jason Gunthorpe wrote:
+> It just seems like really odd functionality. I'm not familiar with the
+> KH api, but is there any chance now (or in future) that non-root could
+> access this function?
 
-> This is strictly for convenience in initramfs, so that the trusted
-> key can be loaded and locked in a single command, with no need for
-> an additional application to extend a PCR. As the the TPM driver 
-> already has support for extend, it's a trivial addition.
+good point - we really should explicitly require CAP_SYS_ADMIN for
+pcrlock to be safe. Willdo.
 
-I guess I imagined that user space would want to extend some PCRs
-anyhow with data from the root filesystem before handing over
-control. This is not related to your patch at all, just overall how
-I'd expect the TPM to be used..
+> A few random observations
+>  - I'm sure someone will say kdoc format should be used for those
+>    function comments?
 
-It just seems like really odd functionality. I'm not familiar with the
-KH api, but is there any chance now (or in future) that non-root could
-access this function?
+that's not required for static functions.
 
-A few random observations
- - I'm sure someone will say kdoc format should be used for those
-   function comments?
- - Using a random value to extend the PCR effectively wastes it
-   and creates a tiny risk the random extend could result in 0.
- - It would be nice to formally state the datablob is a
-   TPM_STORED_DATA with no embellishments. The expectation is
-   userspace can validate the sealInfo prior to loading the
-   key.
- - I'm unclear on the merits of using raw random data from the TPM.
-   I'd feel much better if this was mixed with random
-   from the kernel pool too. Ideally using a FIPS DBRNG transform..
- - Shouldn't all the TPM RPC functions live together in the TPM code
-   someplace? You've done a good job of adding many more general
-   primitives to build RPC's with.
+>  - Using a random value to extend the PCR effectively wastes it
+>    and creates a tiny risk the random extend could result in 0.
 
-   FWIW, last time I worked with TPMs I built a RPC code generator
-   for this stuff, which if any more are added would be a really smart
-   direction to head in.
+2^-160? And using a fixed value, or one under user control
+would be worse.
 
-Cheers,
-Jason
+>  - It would be nice to formally state the datablob is a
+>    TPM_STORED_DATA with no embellishments. The expectation is
+>    userspace can validate the sealInfo prior to loading the
+>    key.
+
+It's not obvious from the code? :-) Will clarify in comments.
+
+(It also needs to be documented somewhere in some userspace 
+documentation. We will be posting trusted key userspace utilities 
+(such as for generating/inspecting pcrinfo blobs and fields in 
+sealed blobs), and will certainly document it there too. Perhaps 
+the trusted keys information should be added to keyctl or a new
+man page too?)
+
+>  - I'm unclear on the merits of using raw random data from the TPM.
+>    I'd feel much better if this was mixed with random
+>    from the kernel pool too. Ideally using a FIPS DBRNG transform..
+
+The TPM's have a FIPS certified random number generator, which must
+pass a power-on self test before it is used. I have done extensive
+DieHard tests on various TPM chips, and they have all passed, showing
+in my tests unmeasurable correlation. Particularly at boot time, I
+trust the TPM random numbers more than the kernel pool, which has
+not yet been reseeded or had time to accumulate much entropy.
+
+>  - Shouldn't all the TPM RPC functions live together in the TPM code
+>    someplace? You've done a good job of adding many more general
+>    primitives to build RPC's with.
+>    FWIW, last time I worked with TPMs I built a RPC code generator
+>    for this stuff, which if any more are added would be a really smart
+>    direction to head in.
+
+The seal and unseal are now pretty general, and could be moved to 
+the TPM code, but unless there are other kernel users of the functions,
+they might as well stay static and with the trusted key code, since
+that's the only place they are being used. Easy enough to move and
+make public later if someone wants them...
+
+dave
+
