@@ -1,46 +1,28 @@
-From: David Safford <safford@watson.ibm.com>
-Subject: Re: [PATCH v1.2 3/4] keys: add new trusted key-type
-Date: Mon, 08 Nov 2010 13:18:33 -0500
-Message-ID: <1289240313.6060.10.camel@localhost.localdomain>
-References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com>
-	 <1289230246-3856-4-git-send-email-zohar@linux.vnet.ibm.com>
-	 <20101108170937.GA31501@obsidianresearch.com>
+From: <amandasaleeeby@centrum.sk>
+Subject: hello
+Date: Tue, 09 Nov 2010 06:51:04 +0100
+Message-ID: <201011090651.21481__3327.50424645401$1289281886$gmane$org@centrum.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	James Morris <jmorris@namei.org>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Content-Transfer-Encoding: 8bit
+To: "amandasaleeby" <amandasaleeby@centrum.sk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from igw2.watson.ibm.com ([129.34.20.6]:43927 "EHLO
-	igw2.watson.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752481Ab0KHSU1 convert rfc822-to-8bit (ORCPT
+Received: from farizej.centrum.cz ([90.183.38.130]:38662 "EHLO
+	farizej.centrum.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751074Ab0KIFvH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Nov 2010 13:20:27 -0500
-In-Reply-To: <20101108170937.GA31501@obsidianresearch.com>
+	Tue, 9 Nov 2010 00:51:07 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2010-11-08 at 10:09 -0700, Jason Gunthorpe wrote:
-> On Mon, Nov 08, 2010 at 10:30:45AM -0500, Mimi Zohar wrote:
-> 
-> > pcrlock=n    extends the designated PCR 'n' with a random value,
-> >              so that a key sealed to that PCR may not be unsealed
-> >              again until after a reboot.
-> 
-> Nice, but this seems very strange to me, since it has nothing to do
-> with the key and could be done easially in userspace?
-> 
-> Jason
-
-This is strictly for convenience in initramfs, so that the trusted
-key can be loaded and locked in a single command, with no need for
-an additional application to extend a PCR. As the the TPM driver 
-already has support for extend, it's a trivial addition.
-
-dave
+hello with love and trust
+my dearest friend compliment of the day to you.my name is Amanda saleeeby a
+girl of 23years old honest trusting kind caring loving and fun with
+compassionate and generous nature viewing your email address which really interest
+me to know more about you that is having communication friendship with you
+if you will have the desire with me.so that we can get to know each other
+better sharing feelings and thought together .i will like you to write me
+through my email for easiest communication.i will be waiting to read from
+you.I will be waiting for your mail;please make sure you replied to me with the email address below,it is very confidential and private,thanks and have a nice day.
+here is my email address
+Amandasaleeby@she.com
