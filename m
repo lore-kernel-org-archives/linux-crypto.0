@@ -1,67 +1,43 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: Linux 2.6.37-rc1 (pcrypt fault)
-Date: Wed, 10 Nov 2010 12:21:43 +0100
-Message-ID: <20101110112143.GB1868@secunet.com>
-References: <AANLkTimr3rW67HxgOUyReEW8dmmSsd4b7-Ns57mXzS1w@mail.gmail.com>
- <20101103141519.0a6f5906.randy.dunlap@oracle.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto ahash error handling
+Date: Wed, 10 Nov 2010 21:27:59 +0900
+Message-ID: <20101110122759.GA18577@gondor.apana.org.au>
+References: <4CD7B95E.9040501@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:40476 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752243Ab0KJLco (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Nov 2010 06:32:44 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:39271 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755791Ab0KJM2C (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Nov 2010 07:28:02 -0500
 Content-Disposition: inline
-In-Reply-To: <20101103141519.0a6f5906.randy.dunlap@oracle.com>
+In-Reply-To: <4CD7B95E.9040501@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 03, 2010 at 02:15:19PM -0700, Randy Dunlap wrote:
+Dmitry Kasatkin <dmitry.kasatkin@nokia.com> wrote:
+> Hello,
 > 
-> modprobe pcrypt; rmmod pcrypt ==>
+> When using crypto ahash API, is it necessary/mandatory to call
+> crypto_ahash_final() if crypto_ahash_update() returns error...
 > 
+> Basically it might happen after several calls while calculating hash if
+> HW error happens.
+> It is not possible to continue hash calculation. it is necessary to
+> reset HW and start whole hash again..
 > 
-> [   76.081639] calling  pcrypt_init+0x0/0x107 [pcrypt] @ 3016
-> Nov  3 13:02:15 control kernel: [   76.089883] initcall pcrypt_init+0x0/0x107 [pcrypt] returned 0 after 2476 usecs
-> [   76.081639] calling  pcrypt_i
-> 
-> 
-> [   79.940445] general protection fault: 0000 [#1] SMP DEBUG_PAGEALLOC
+> Any comments?
 
-Looks like a use after free of the padata instance.
-Does the patch below fix it?
+>From the driver's perspective you cannot expect that the user
+will call crypto_ahash_final in this case, or for that matter in
+any other case as the user is always free to leave a hash in
+an unfinalised state.
 
-Thanks for reporting,
-
-Steffen
-
-
-Subject: [PATCH] crypto: pcrypt - Fix use after free on padata_free
-
-kobject_put is called from padata_free for the padata kobject.
-The kobject's release function frees the padata instance,
-so don't call kobject_put for the padata kobject from pcrypt.
-
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/pcrypt.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index de30782..75586f1 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -504,7 +504,6 @@ err:
- 
- static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
- {
--	kobject_put(&pcrypt->pinst->kobj);
- 	free_cpumask_var(pcrypt->cb_cpumask->mask);
- 	kfree(pcrypt->cb_cpumask);
- 
+Cheers,
 -- 
-1.7.0.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
