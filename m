@@ -1,61 +1,67 @@
-From: Roberto Sassu <roberto.sassu@polito.it>
-Subject: Re: [PATCH v1.2 3/4] keys: add new trusted key-type
-Date: Tue, 9 Nov 2010 17:46:38 +0100
-Message-ID: <201011091746.38822.roberto.sassu@polito.it>
-References: <1289230246-3856-1-git-send-email-zohar@linux.vnet.ibm.com> <201011091702.58449.roberto.sassu@polito.it> <1289319910.16976.52.camel@localhost.localdomain>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: Linux 2.6.37-rc1 (pcrypt fault)
+Date: Wed, 10 Nov 2010 12:21:43 +0100
+Message-ID: <20101110112143.GB1868@secunet.com>
+References: <AANLkTimr3rW67HxgOUyReEW8dmmSsd4b7-Ns57mXzS1w@mail.gmail.com>
+ <20101103141519.0a6f5906.randy.dunlap@oracle.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	James Morris <jmorris@namei.org>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: David Safford <safford@watson.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3.smtp.messagingengine.com ([66.111.4.27]:34684 "EHLO
-	out3.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752098Ab0KIQsy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Nov 2010 11:48:54 -0500
-In-Reply-To: <1289319910.16976.52.camel@localhost.localdomain>
+Received: from a.mx.secunet.com ([195.81.216.161]:40476 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752243Ab0KJLco (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Nov 2010 06:32:44 -0500
+Content-Disposition: inline
+In-Reply-To: <20101103141519.0a6f5906.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tuesday, November 09, 2010 05:25:10 pm David Safford wrote:
-> On Tue, 2010-11-09 at 17:02 +0100, Roberto Sassu wrote:
+On Wed, Nov 03, 2010 at 02:15:19PM -0700, Randy Dunlap wrote:
 > 
-> > i want to inform you i've created a set of utilities for the creation of
-> > trusted and encrypted keys which also works with the TrustedGRUB software:
-> > for instance the new "trk_create" tool generates or updates a trusted key
-> > passing the pcrinfo structure relative to the future configuration
-> > by performing the same extend operations done by TrustedGRUB during the
-> > boot process:
-> ...
-> > I have tested these tools using the Fedora 13 operating system and they may be of interest
-> > if the TrustedGRUB part is not yet implemented by your tools. 
-> > 
-> > Roberto
+> modprobe pcrypt; rmmod pcrypt ==>
 > 
-> My tools don't yet do the future boot pcr calculation,
-> so this is wonderful. Are they available?
->
+> 
+> [   76.081639] calling  pcrypt_init+0x0/0x107 [pcrypt] @ 3016
+> Nov  3 13:02:15 control kernel: [   76.089883] initcall pcrypt_init+0x0/0x107 [pcrypt] returned 0 after 2476 usecs
+> [   76.081639] calling  pcrypt_i
+> 
+> 
+> [   79.940445] general protection fault: 0000 [#1] SMP DEBUG_PAGEALLOC
 
-Sorry, actually they are not yet available. I have a plan to release them soon,
-after doing some extra checks on the code.
-I will sent a email here to announce the availability of the package on our server. 
+Looks like a use after free of the padata instance.
+Does the patch below fix it?
 
-Roberto
+Thanks for reporting,
 
+Steffen
+
+
+Subject: [PATCH] crypto: pcrypt - Fix use after free on padata_free
+
+kobject_put is called from padata_free for the padata kobject.
+The kobject's release function frees the padata instance,
+so don't call kobject_put for the padata kobject from pcrypt.
+
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/pcrypt.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index de30782..75586f1 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -504,7 +504,6 @@ err:
  
-> dave
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+ static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
+ {
+-	kobject_put(&pcrypt->pinst->kobj);
+ 	free_cpumask_var(pcrypt->cb_cpumask->mask);
+ 	kfree(pcrypt->cb_cpumask);
+ 
+-- 
+1.7.0.4
