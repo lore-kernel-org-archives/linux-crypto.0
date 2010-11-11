@@ -1,40 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Subject: Re: crypto ahash error handling
-Date: Fri, 12 Nov 2010 01:17:08 +0900
-Message-ID: <20101111161707.GA32431@gondor.apana.org.au>
-References: <20101110122759.GA18577@gondor.apana.org.au> <4CDAB23B.9000704@nokia.com>
+Date: Thu, 11 Nov 2010 20:11:21 +0200
+Message-ID: <4CDC31C9.8070002@nokia.com>
+References: <20101110122759.GA18577@gondor.apana.org.au> <4CDAB23B.9000704@nokia.com> <20101111161707.GA32431@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+To: ext Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:45276 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752107Ab0KKQRL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Nov 2010 11:17:11 -0500
-Content-Disposition: inline
-In-Reply-To: <4CDAB23B.9000704@nokia.com>
+Received: from smtp.nokia.com ([147.243.128.24]:47296 "EHLO mgw-da01.nokia.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754670Ab0KKSLx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Nov 2010 13:11:53 -0500
+In-Reply-To: <20101111161707.GA32431@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 10, 2010 at 04:54:51PM +0200, Dmitry Kasatkin wrote:
-> This is not good.
-> 
-> Driver might allocate some resources, which needs to be released.
-> crypto_ahash_final() should do some kind of "cleanup" task.
+Hi,
 
-Then your driver is broken.  The whole hash API is designed around
-the fact that each update operation completely stores all output
-state in the memory provided, leaving no state behind in the
-hardware.
+Yes. Our HW is capable of producing unfinalised hashes.
+Everything is fine.
 
-Is your hardware capable of producing unfinalised hashes? If not
-then you shouldn't even be implementing an update operation in
-hardware.  You should instead use a software fallback.
+No. It is not broken.. It cleans up if error...
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Dmitry
+
+
+On 11/11/10 18:17, ext Herbert Xu wrote:
+> On Wed, Nov 10, 2010 at 04:54:51PM +0200, Dmitry Kasatkin wrote:
+>   
+>> This is not good.
+>>
+>> Driver might allocate some resources, which needs to be released.
+>> crypto_ahash_final() should do some kind of "cleanup" task.
+>>     
+> Then your driver is broken.  The whole hash API is designed around
+> the fact that each update operation completely stores all output
+> state in the memory provided, leaving no state behind in the
+> hardware.
+>
+> Is your hardware capable of producing unfinalised hashes? If not
+> then you shouldn't even be implementing an update operation in
+> hardware.  You should instead use a software fallback.
+>
+> Cheers,
+>   
