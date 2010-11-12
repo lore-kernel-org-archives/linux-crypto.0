@@ -1,58 +1,45 @@
-From: David Safford <safford@watson.ibm.com>
-Subject: Re: [PATCH v1.3 3/4] keys: add new trusted key-type
-Date: Fri, 12 Nov 2010 07:58:11 -0500
-Message-ID: <1289566691.4341.21.camel@localhost.localdomain>
-References: <1289404309-15955-4-git-send-email-zohar@linux.vnet.ibm.com>
-	 <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com>
-	 <8100.1289512670@redhat.com>
+From: Dan Rosenberg <drosenberg@vsecurity.com>
+Subject: [CRYPTO] obfuscating kernel pointers
+Date: Fri, 12 Nov 2010 08:32:01 -0500
+Message-ID: <1289568721.3090.267.camel@Dan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <8100.1289512670@redhat.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.vsecurity.com ([209.67.252.12]:64293 "EHLO
+	mx1.vsecurity.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932098Ab0KLNis (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Nov 2010 08:38:48 -0500
+Received: from c-98-229-66-118.hsd1.ma.comcast.net (HELO [192.168.1.128]) (drosenbe@[98.229.66.118])
+          (envelope-sender <drosenberg@vsecurity.com>)
+          by mx1.vsecurity.com (qmail-ldap-1.03) with SMTP
+          for <linux-crypto@vger.kernel.org>; 12 Nov 2010 13:32:01 -0000
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2010-11-11 at 21:57 +0000, David Howells wrote:
-> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+Hi Crypto people,
 
-Thanks for the helpful comments - much appreciated.
-Willdo on all of them - just one question on the last comment:
+I'm planning on submitting a patch that introduces a new %p format
+specifier that obfuscates kernel pointers depending on privileges.  This
+change is for security reasons - many networking protocols expose
+pointers to socket structures in their /proc interfaces, which are
+attractive targets when exploiting other issues.
 
-> > +/*
-> > + * Have the TPM seal(encrypt) the trusted key, possibly based on
-> > + * Platform Configuration Registers (PCRs). AUTH1 for sealing key.
-> > + */
-> > +static int tpm_seal(struct tpm_buf *tb, uint16_t keytype,
-> > +		    uint32_t keyhandle, unsigned char *keyauth,
-> > +		    unsigned char *data, uint32_t datalen,
-> > +		    unsigned char *blob, uint32_t * bloblen,
-> > +		    unsigned char *blobauth,
-> > +		    unsigned char *pcrinfo, uint32_t pcrinfosize)
-> > +{
-> > +	struct osapsess sess;
-> > +	unsigned char encauth[TPM_HASH_SIZE];
-> > +	unsigned char pubauth[TPM_HASH_SIZE];
-> > +	unsigned char xorwork[TPM_HASH_SIZE * 2];
-> > +	unsigned char xorhash[TPM_HASH_SIZE];
-> > +	unsigned char nonceodd[TPM_NONCE_SIZE];
-> 
-> That's quite a lot of stack space, and you're calling other functions that
-> also allocate chunks of stack space.
+It's been suggested that I initialize a secret value at boot, and use
+that as the key to a crypto hash function.  I should use a function that
+is relatively fast (ideally), produces a unique output based on its
+input of a pointer, and produces consistent output when given the same
+input.  It should be difficult to infer the input given only the output.
 
-checkstack showed that the max stack usage was for tpm_seal, at 530
-bytes. (The rest were 300 or less.)  I can certainly throw the hashes
-and nonce (120 bytes) into a dynamically allocated struct, if you
-think it is worth the extra code...
+I have two questions:
 
-thanks
-dave
+1. What is a proper, safe way of initializing a random value at boot?
+Are there any existing examples that do this?
+
+2. Can you recommend a crypto algorithm that would be well suited for
+this pointer obfuscation?
+
+Thanks,
+Dan
