@@ -1,45 +1,35 @@
-From: Dan Rosenberg <drosenberg@vsecurity.com>
-Subject: [CRYPTO] obfuscating kernel pointers
-Date: Fri, 12 Nov 2010 08:32:01 -0500
-Message-ID: <1289568721.3090.267.camel@Dan>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.vsecurity.com ([209.67.252.12]:64293 "EHLO
-	mx1.vsecurity.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932098Ab0KLNis (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Nov 2010 08:38:48 -0500
-Received: from c-98-229-66-118.hsd1.ma.comcast.net (HELO [192.168.1.128]) (drosenbe@[98.229.66.118])
-          (envelope-sender <drosenberg@vsecurity.com>)
-          by mx1.vsecurity.com (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 12 Nov 2010 13:32:01 -0000
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v1.3 2/4] key: add tpm_send command
+Date: Fri, 12 Nov 2010 14:11:12 +0000
+Message-ID: <22962.1289571072@redhat.com>
+References: <1289514356.2726.18.camel@localhost.localdomain> <1289404309-15955-3-git-send-email-zohar@linux.vnet.ibm.com> <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com> <6651.1289504931@redhat.com>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1289514356.2726.18.camel@localhost.localdomain>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Crypto people,
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-I'm planning on submitting a patch that introduces a new %p format
-specifier that obfuscates kernel pointers depending on privileges.  This
-change is for security reasons - many networking protocols expose
-pointers to socket structures in their /proc interfaces, which are
-attractive targets when exploiting other issues.
+> > > +	module_put(chip->dev->driver->owner);
+> > 
+> > Where's the corresponding module_get()?  I suspect this should be wrapped to
+> > match tpm_chip_find_get().
+> > 
+> > David
+> 
+> The module_get() is in tpm_chip_find_get(), which is just a helper.
+> (It's used this way throughout tpm.c)
 
-It's been suggested that I initialize a secret value at boot, and use
-that as the key to a crypto hash function.  I should use a function that
-is relatively fast (ideally), produces a unique output based on its
-input of a pointer, and produces consistent output when given the same
-input.  It should be difficult to infer the input given only the output.
+I'd make a function tpm_chip_find_put() just to wrap module_put() and then
+place it with tpm_chip_find_get() in the sources.  That makes it easier to see
+what's going on.
 
-I have two questions:
-
-1. What is a proper, safe way of initializing a random value at boot?
-Are there any existing examples that do this?
-
-2. Can you recommend a crypto algorithm that would be well suited for
-this pointer obfuscation?
-
-Thanks,
-Dan
+David
