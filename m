@@ -1,40 +1,58 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: Re: crypto ahash error handling
-Date: Fri, 12 Nov 2010 13:30:40 +0200
-Message-ID: <4CDD2560.1010509@nokia.com>
-References: <20101110122759.GA18577@gondor.apana.org.au> <4CDAB23B.9000704@nokia.com> <20101111161707.GA32431@gondor.apana.org.au> <4CDC31C9.8070002@nokia.com> <20101112000532.GA4188@gondor.apana.org.au>
+From: David Safford <safford@watson.ibm.com>
+Subject: Re: [PATCH v1.3 3/4] keys: add new trusted key-type
+Date: Fri, 12 Nov 2010 07:58:11 -0500
+Message-ID: <1289566691.4341.21.camel@localhost.localdomain>
+References: <1289404309-15955-4-git-send-email-zohar@linux.vnet.ibm.com>
+	 <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com>
+	 <8100.1289512670@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: ext Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.128.24]:36278 "EHLO mgw-da01.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755781Ab0KLLbT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Nov 2010 06:31:19 -0500
-In-Reply-To: <20101112000532.GA4188@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <8100.1289512670@redhat.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Well.. That was not the case before.
-I made a new patch set.
+On Thu, 2010-11-11 at 21:57 +0000, David Howells wrote:
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-I will send updates for SHA and AES soon after some more testing.
+Thanks for the helpful comments - much appreciated.
+Willdo on all of them - just one question on the last comment:
 
-- Dmitry
+> > +/*
+> > + * Have the TPM seal(encrypt) the trusted key, possibly based on
+> > + * Platform Configuration Registers (PCRs). AUTH1 for sealing key.
+> > + */
+> > +static int tpm_seal(struct tpm_buf *tb, uint16_t keytype,
+> > +		    uint32_t keyhandle, unsigned char *keyauth,
+> > +		    unsigned char *data, uint32_t datalen,
+> > +		    unsigned char *blob, uint32_t * bloblen,
+> > +		    unsigned char *blobauth,
+> > +		    unsigned char *pcrinfo, uint32_t pcrinfosize)
+> > +{
+> > +	struct osapsess sess;
+> > +	unsigned char encauth[TPM_HASH_SIZE];
+> > +	unsigned char pubauth[TPM_HASH_SIZE];
+> > +	unsigned char xorwork[TPM_HASH_SIZE * 2];
+> > +	unsigned char xorhash[TPM_HASH_SIZE];
+> > +	unsigned char nonceodd[TPM_NONCE_SIZE];
+> 
+> That's quite a lot of stack space, and you're calling other functions that
+> also allocate chunks of stack space.
 
+checkstack showed that the max stack usage was for tpm_seal, at 530
+bytes. (The rest were 300 or less.)  I can certainly throw the hashes
+and nonce (120 bytes) into a dynamically allocated struct, if you
+think it is worth the extra code...
 
-On 12/11/10 02:05, ext Herbert Xu wrote:
-> On Thu, Nov 11, 2010 at 08:11:21PM +0200, Dmitry Kasatkin wrote:
->   
->> Hi,
->>
->> Yes. Our HW is capable of producing unfinalised hashes.
->> Everything is fine.
->>     
-> OK then you should be fine even if the user never makes the "final"
-> call, right?
->
-> Cheers,
->   
+thanks
+dave
