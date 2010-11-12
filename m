@@ -1,60 +1,120 @@
-From: Dan Rosenberg <drosenberg@vsecurity.com>
-Subject: Re: [CRYPTO] obfuscating kernel pointers
-Date: Fri, 12 Nov 2010 12:39:41 -0500
-Message-ID: <1289583581.2034.8.camel@dan>
-References: <1289568721.3090.267.camel@Dan>
-	 <20101112172727.GA26217@hmsreliant.think-freely.org>
+From: David Safford <safford@watson.ibm.com>
+Subject: Re: [PATCH v1.3 3/4] keys: add new trusted key-type
+Date: Fri, 12 Nov 2010 12:39:52 -0500
+Message-ID: <1289583592.4341.58.camel@localhost.localdomain>
+References: <1289404309-15955-4-git-send-email-zohar@linux.vnet.ibm.com>
+	 <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com>
+	 <24801.1289580779@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Content-Transfer-Encoding: 8BIT
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.vsecurity.com ([209.67.252.12]:51755 "EHLO
-	mx1.vsecurity.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882Ab0KLRjo (ORCPT
+Received: from igw2.watson.ibm.com ([129.34.20.6]:43970 "EHLO
+	igw2.watson.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751829Ab0KLRkn convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Nov 2010 12:39:44 -0500
-In-Reply-To: <20101112172727.GA26217@hmsreliant.think-freely.org>
+	Fri, 12 Nov 2010 12:40:43 -0500
+In-Reply-To: <24801.1289580779@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks for your response.
+On Fri, 2010-11-12 at 16:52 +0000, David Howells wrote:
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-> > 
-> Just use get_random_bytes, or initalize an instance of cprng with
-> get_random_bytes.
+Again, thanks for the detailed review!
+Willdo on all suggestions with a couple of comments/questions:
+
+> > +#define TPM_MAX_BUF_SIZE		512
+> > +#define TPM_TAG_RQU_COMMAND		193
+> > +#define TPM_TAG_RQU_AUTH1_COMMAND	194
+> > +#define TPM_TAG_RQU_AUTH2_COMMAND	195
+> > +#define TPM_TAG_RSP_COMMAND		196
+> > +#define TPM_TAG_RSP_AUTH1_COMMAND	197
+> > +#define TPM_TAG_RSP_AUTH2_COMMAND	198
+> > +#define TPM_NONCE_SIZE			20
+> > +#define TPM_HASH_SIZE			20
+> > +#define TPM_SIZE_OFFSET			2
+> > +#define TPM_RETURN_OFFSET		6
+> > +#define TPM_DATA_OFFSET			10
+> > +#define TPM_U32_SIZE			4
+> > +#define TPM_GETRANDOM_SIZE		14
+> > +#define TPM_GETRANDOM_RETURN		14
+> > +#define TPM_ORD_GETRANDOM		70
+> > +#define TPM_RESET_SIZE			10
+> > +#define TPM_ORD_RESET			90
+> > +#define TPM_OSAP_SIZE			36
+> > +#define TPM_ORD_OSAP			11
+> > +#define TPM_OIAP_SIZE			10
+> > +#define TPM_ORD_OIAP			10
+> > +#define TPM_SEAL_SIZE			87
+> > +#define TPM_ORD_SEAL			23
+> > +#define TPM_ORD_UNSEAL			24
+> > +#define TPM_UNSEAL_SIZE			104
+> > +#define SEALKEYTYPE			1
+> > +#define SRKKEYTYPE			4
+> > +#define SRKHANDLE			0x40000000
+> > +#define TPM_ANY_NUM			0xFFFF
+> > +#define MAX_PCRINFO_SIZE		64
 > 
+> I suspect some of these should be in somewhere like linux/tpm.h rather than
+> here.  They're specific to TPM access not TPM key management.
 
-Will do.
+Most of them are not already defined in tpm.h, as they are never used
+there, but you are right, some are generic. I'll double check these..
 
+> > +#define TPM_DEBUG 0
 > 
-> Depends on your goal, if you just wnat to hide the pointers, why not just print
-> NULL instead of the value?  If you want to maintain some level of uniqueness,
-> just pull sizeof (void *) random bytes from whatever method above and add it to
-> the pointer in question, and hope for the best.
+> The TPM_DEBUG stuff should probably be in the directory with the sources, not
+> in a directory for others to include.
+
+Maybe some confusion here - trusted_defined.h is in the sources - only
+trusted-type.h is public in include/keys/.
+
+> > +#if TPM_DEBUG
+> > +static inline void dump_options(struct trusted_key_options *o)
+> > +{
+> > +	pr_info("trusted_key: sealing key type %d\n", o->keytype);
+> > +	pr_info("trusted_key: sealing key handle %0X\n", o->keyhandle);
+> > +	pr_info("trusted_key: pcrlock %d\n", o->pcrlock);
+> > +	pr_info("trusted_key: pcrinfo %d\n", o->pcrinfo_len);
+> > +	print_hex_dump(KERN_INFO, "pcrinfo ", DUMP_PREFIX_NONE,
+> > +		       16, 1, o->pcrinfo, o->pcrinfo_len, 0);
+> > +}
+> > +
+...
+> > +
+> > +static inline void store16(struct tpm_buf *buf, uint16_t value)
+> > +{
+> > +	*(uint16_t *) & buf->data[buf->len] = htons(value);
+> > +	buf->len += sizeof(value);
+> > +}
+> > +
+> > +static inline void store32(struct tpm_buf *buf, uint32_t value)
+> > +{
+> > +	*(uint32_t *) & buf->data[buf->len] = htonl(value);
+> > +	buf->len += sizeof(value);
+> > +}
+> > +
+> > +static inline void storebytes(struct tpm_buf *buf, unsigned char *in, int len)
+> > +{
+> > +	memcpy(buf->data + buf->len, in, len);
+> > +	buf->len += len;
+> > +}
 > 
+> Also these look like internal functions which shouldn't be in the global
+> headers.
 
-Unfortunately, neither of these sound like an option.  It's been
-requested from the networking folks that any replacement value for the
-socket addresses be a consistent unique identifier for object tracking
-purposes.  The current plan is to expose the real address to privileged
-readers, and expose a consistent obfuscated address that's only useful
-for tracking to unprivileged readers.
+This is in trusted_defined.h, which is with sources, not in
+include/keys/
 
-> Honestly, though, I'm having trouble seeing the value of this.  What interface in proc
-> are you seeing that exposes pointers from kernel space in any meaningful way?
-> and if those cases exist, isn't selinux the solution to preventing exposure of
-> these values to processes without sufficient privlidges?
-> Neil
-> 
-
-Lots of packet families expose them...see, for
-example, /proc/net/{tcp,udp,raw,unix}.  Since socket structures have
-function pointers, they are an appealing target in the event of a kernel
-memory write vulnerability.  The goal here is to make exploitation of
-such issues more difficult, including for distros that don't use
-SELinux.
-
-Thanks,
-Dan
+thanks!
+dave
