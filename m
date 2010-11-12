@@ -1,37 +1,52 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v1.3 4/4] keys: add new key-type encrypted
-Date: Fri, 12 Nov 2010 21:23:33 +0000
-Message-ID: <27900.1289597013@redhat.com>
-References: <1289595738.2731.80.camel@localhost.localdomain> <1289404309-15955-5-git-send-email-zohar@linux.vnet.ibm.com> <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com> <26689.1289591135@redhat.com>
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+From: Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1.3 2/4] key: add tpm_send command
+Date: Fri, 12 Nov 2010 19:24:50 -0200
+Message-ID: <4CDDB0A2.7090606@linux.vnet.ibm.com>
+References: <1289514356.2726.18.camel@localhost.localdomain> <1289404309-15955-3-git-send-email-zohar@linux.vnet.ibm.com> <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com> <6651.1289504931@redhat.com>  <22962.1289571072@redhat.com> <1289573330.4341.31.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells@redhat.com>,
+	Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
 	linux-crypto@vger.kernel.org,
 	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+	James Morris <jmorris@namei.org>
+To: David Safford <safford@watson.ibm.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1289595738.2731.80.camel@localhost.localdomain>
+In-Reply-To: <1289573330.4341.31.camel@localhost.localdomain>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-> > Why do you allow the master key to be supplied by a user-defined key rather
-> > than requiring a trusted-key unconditionally?
-> 
-> This is for systems without a TPM. The logic needs to exist, whether it
-> is here or in EVM.  By doing it here, a user could provide a passphrase
-> in the initramfs, which is used to decrypt the encrypted key.
 
-I thought that might be the case.  In which case, it might be better to allow
-someone to add a trusted key, supplying both encrypted and unencrypted
-versions of the data so that the TPM need not be consulted.  You might want to
-mark such a key so that it can be seen when it is dumped.
+Hi Dave,
 
-But if you're going to use a user-defined key, you really need to prefix the
-description with something suitable.
+On 11/12/2010 12:48 PM, David Safford wrote:
 
-David
+> On Fri, 2010-11-12 at 14:11 +0000, David Howells wrote:
+>> Mimi Zohar<zohar@linux.vnet.ibm.com>  wrote:
+>>
+>>>>> +	module_put(chip->dev->driver->owner);
+>>>> Where's the corresponding module_get()?  I suspect this should be wrapped to
+>>>> match tpm_chip_find_get().
+>>>>
+>>>> David
+>>> The module_get() is in tpm_chip_find_get(), which is just a helper.
+>>> (It's used this way throughout tpm.c)
+>> I'd make a function tpm_chip_find_put() just to wrap module_put() and then
+>> place it with tpm_chip_find_get() in the sources.  That makes it easier to see
+>> what's going on.
+> Or alternately rename the helper to tpm_chip_find_and_module_get()?
+> In either case, this is really up to Rajiv (the maintainer for tpm.c
+> who has already acked this patch), as this usage already appears in
+> other places in tpm.c. There would have to be a separate patch fixing
+> this for all of the instances. Rajiv, your thoughts?
+>
+> dave
+Rename the helper to tpm_chip_find_and_module_get() solves the naming issue in a simpler and better way in my opinion.
+
+Thanks,
+Rajiv
+
