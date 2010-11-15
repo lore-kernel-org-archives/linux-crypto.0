@@ -1,74 +1,46 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [CRYPTO] obfuscating kernel pointers
-Date: Mon, 15 Nov 2010 06:21:30 -0500
-Message-ID: <20101115112130.GA12043@hmsreliant.think-freely.org>
-References: <1289568721.3090.267.camel@Dan>
- <1289810592.30446.410.camel@vespa.frost.loc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 4/4] crypto: algif_skcipher - User-space interface for
+	skcipher operations
+Date: Mon, 15 Nov 2010 19:51:20 +0800
+Message-ID: <20101115115120.GA3797@gondor.apana.org.au>
+References: <20101107010813.GA20538@gondor.apana.org.au> <1289207420.2013.16.camel@martin>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dan Rosenberg <drosenberg@vsecurity.com>,
-	linux-crypto@vger.kernel.org
-To: Tomas Mraz <tmraz@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:36624 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755621Ab0KOLYd (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:60965 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755242Ab0KOLvX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Nov 2010 06:24:33 -0500
+	Mon, 15 Nov 2010 06:51:23 -0500
 Content-Disposition: inline
-In-Reply-To: <1289810592.30446.410.camel@vespa.frost.loc>
+In-Reply-To: <1289207420.2013.16.camel@martin>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 15, 2010 at 09:43:12AM +0100, Tomas Mraz wrote:
-> On Fri, 2010-11-12 at 08:32 -0500, Dan Rosenberg wrote: 
-> > Hi Crypto people,
-> > 
-> > I'm planning on submitting a patch that introduces a new %p format
-> > specifier that obfuscates kernel pointers depending on privileges.  This
-> > change is for security reasons - many networking protocols expose
-> > pointers to socket structures in their /proc interfaces, which are
-> > attractive targets when exploiting other issues.
-> > 
-> > It's been suggested that I initialize a secret value at boot, and use
-> > that as the key to a crypto hash function.  I should use a function that
-> > is relatively fast (ideally), produces a unique output based on its
-> > input of a pointer, and produces consistent output when given the same
-> > input.  It should be difficult to infer the input given only the output.
-> > 
-> > I have two questions:
-> > 
-> > 1. What is a proper, safe way of initializing a random value at boot?
-> > Are there any existing examples that do this?
-> > 
-> > 2. Can you recommend a crypto algorithm that would be well suited for
-> > this pointer obfuscation?
-> This would not be a 'hashing' algorithm but a simple block encryption
-> algorithm in the ECB mode with the random key initialized at boot. The
-> problem here is that the standard block ciphers have at least 64 bit
-> block length as smaller block length ciphers would not be secure for
-> general purpose uses. You would have to take an existing block cipher
-> algorithm and modify it to achieve the smaller block length.
+On Mon, Nov 08, 2010 at 10:10:20AM +0100, Martin Willi wrote:
 > 
-> -- 
-> Tomas Mraz
-> No matter how far down the wrong road you've gone, turn back.
->                                               Turkish proverb
+> The test program below runs 1000 encryptions:
 > 
-Something else occurs to me.  If this is to be implemented as an internal
-modification to the %p format token, you're going to have to be careful as to
-when you're able to use it.  Crypto algorithms can be built as individual
-modules, and the api has them auto-load on demand when instances of them are
-requested.  How are you going to be certain that the hash that you choose is
-available?  For that matter, how are you going to know when its safe to ask for
-the algorithm?  If you do a printk(...%p\n") early during the boot, you'll be
-calling request_moule->...->call_usermodehelper_exec before the workqueue or any
-of its datastructures are initalized, and that will oops you.
+> # grep nr_free /proc/vmstat 
+> nr_free_pages 11031
+> # ./test
 
-Neil
+Thanks, Miroslav identified a bogosity where if we're not doing
+a whole page then the last sgl pointer is off by one which triggers
+the leak.
 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+With his fix I cannot reproduce this problem anymore.
+
+Other major problems identified by him include inadequage checks
+with respect to ALG_MAX_PAGES, and the use of generic SG chaining
+instead of crypto SG chaining.
+
+So here is a respin of the patches which I hope will be the last :)
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
