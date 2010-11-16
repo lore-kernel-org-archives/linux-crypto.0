@@ -1,58 +1,75 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v1.3 4/4] keys: add new key-type encrypted
-Date: Tue, 16 Nov 2010 09:38:40 -0500
-Message-ID: <1289918320.3188.16.camel@localhost.localdomain>
-References: <1289849751.3027.17.camel@localhost.localdomain>
-	 <1289694826.3257.82.camel@localhost.localdomain>
-	 <1289595738.2731.80.camel@localhost.localdomain>
-	 <1289404309-15955-5-git-send-email-zohar@linux.vnet.ibm.com>
-	 <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com>
-	 <26689.1289591135@redhat.com> <27900.1289597013@redhat.com>
-	 <8268.1289837934@redhat.com>   <23151.1289916524@redhat.com>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 1/5] crypto: omap-aes: change in prevention of OCP bus
+ error
+Date: Tue, 16 Nov 2010 09:13:55 -0800
+Message-ID: <20101116171355.GR9264@atomide.com>
+References: <cover.1289409924.git.dmitry.kasatkin@nokia.com>
+ <78e86640037f10904b37250f0c578c6e0ca2c256.1289409924.git.dmitry.kasatkin@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e5.ny.us.ibm.com ([32.97.182.145]:39292 "EHLO e5.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756232Ab0KPOiq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Nov 2010 09:38:46 -0500
-In-Reply-To: <23151.1289916524@redhat.com>
+Received: from mho-01-ewr.mailhop.org ([204.13.248.71]:59337 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752978Ab0KPRON (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Nov 2010 12:14:13 -0500
+Content-Disposition: inline
+In-Reply-To: <78e86640037f10904b37250f0c578c6e0ca2c256.1289409924.git.dmitry.kasatkin@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2010-11-16 at 14:08 +0000, David Howells wrote: 
-> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
-> 
-> > Am assuming you mean something like this:
-> > 
-> > keyctl add encrypted name "new trusted:master-key-name keylen" ring
-> > keyctl add encrypted name "new user:master-key-name keylen" ring
-> > 
-> > and, as you said, works without changing the API.
-> 
-> No, that's not what I mean.  I maeant that when your internal functions look
-> for the user key, they should preface the description with a prefix.
-> 
-> It should be handled in request_user_key() or request_master_key().  The
-> description given to request_trusted_key() should have the prefix applied
-> there.  There's no need to mention it at all in the encrypted key add_key
-> command line.
-> 
-> David
+Hi,
 
-I actually like keyctl requiring 'trusted:' or 'user:'.  Forcing the
-user to indicate which type of key they want, is actually good - no
-misunderstandings. Another benefit, would be allowing 'keyctl update' to
-update the key description, not the key type.
+* Dmitry Kasatkin <dmitry.kasatkin@nokia.com> [101110 09:18]:
+> Suggested to use udelay() instead of nop as on the higher
+> core frequencies it might not be enough time.
+> 
+> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+> ---
+>  drivers/crypto/omap-aes.c |   10 ++++++----
+>  1 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+> index 799ca51..9d65611 100644
+> --- a/drivers/crypto/omap-aes.c
+> +++ b/drivers/crypto/omap-aes.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/io.h>
+>  #include <linux/crypto.h>
+>  #include <linux/interrupt.h>
+> +#include <linux/delay.h>
+>  #include <crypto/scatterwalk.h>
+>  #include <crypto/aes.h>
+>  
+> @@ -187,11 +188,12 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+>  		omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_SOFTRESET,
+>  					AES_REG_MASK_SOFTRESET);
+>  		/*
+> -		 * prevent OCP bus error (SRESP) in case an access to the module
+> -		 * is performed while the module is coming out of soft reset
+> +		 * prevent OCP bus error (SRESP) on OMAP3630 in case an access
+> +		 * to the module is performed while the module is
+> +		 * coming out of soft reset
+>  		 */
+> -		__asm__ __volatile__("nop");
+> -		__asm__ __volatile__("nop");
+> +		if (cpu_is_omap3630())
+> +			udelay(1);
+>  
+>  		err = omap_aes_wait(dd, AES_REG_SYSSTATUS,
+>  				AES_REG_SYSSTATUS_RESETDONE);
 
-Mimi 
+Please don't add more cpu_is_omapxxxx tests into drivers, those
+will be limited to arch/arm/*omap*/ platform init code soonish.
+The drivers should be generic.
+
+Instead, check the crypto hardware version during init. If that
+does not work, pass u32 flags in the platform data and define
+OMAP_AES_SOFT_RESET_ERROR bit.
+
+Regards,
+
+Tony
