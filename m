@@ -1,47 +1,34 @@
-From: Rajiv Andrade <srajiv@linux.vnet.ibm.com>
-Subject: Re: [PATCH v1.3 2/4] key: add tpm_send command
-Date: Wed, 17 Nov 2010 11:12:51 -0200
-Message-ID: <4CE3D4D3.7020306@linux.vnet.ibm.com>
-References: <1289599613.4341.64.camel@localhost.localdomain> <1289514356.2726.18.camel@localhost.localdomain> <1289404309-15955-3-git-send-email-zohar@linux.vnet.ibm.com> <1289404309-15955-1-git-send-email-zohar@linux.vnet.ibm.com> <6651.1289504931@redhat.com> <22962.1289571072@redhat.com> <1289573330.4341.31.camel@localhost.localdomain> <4CDDB0A2.7090606@linux.vnet.ibm.com> <28655.1289599899@redhat.com>
+From: Andy Whitcroft <apw@canonical.com>
+Subject: Re: Checkpatch complaining about spaces around * used as
+ arithmetic operator
+Date: Wed, 17 Nov 2010 20:50:01 +0000
+Message-ID: <20101117205001.GC6038@shadowen.org>
+References: <8A0E4C92AE2D6D40AF99653191DA323161417367B8@rrsmsx501.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: David Safford <safford@watson.ibm.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: "Allyn, Mark A" <mark.a.allyn@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:52202 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752888Ab0KQNNI (ORCPT
+Received: from adelie.canonical.com ([91.189.90.139]:34338 "EHLO
+	adelie.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932364Ab0KQUuH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Nov 2010 08:13:08 -0500
-In-Reply-To: <28655.1289599899@redhat.com>
+	Wed, 17 Nov 2010 15:50:07 -0500
+Content-Disposition: inline
+In-Reply-To: <8A0E4C92AE2D6D40AF99653191DA323161417367B8@rrsmsx501.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/11/10 20:11, David Howells wrote:
-> David Safford<safford@watson.ibm.com>  wrote:
->
->> David, does this look ok to you? If so, I will do two patches, one to
->> fix the helper name throughout the existing tpm.c, and then a new
->> version of the tpm_send patch which uses the new name.
-> I prefer my suggestion: Wrapping the module_put() up so that you don't see it
-> directly.  Then you don't need to alter tpm_chip_find_get().  I'll argue that
-> you don't need to know how tpm_chips are got/put, except in the code that
-> wraps it.
->
-tpm_chip_find_get() not only gets the tpm_chip, but also searches for it 
-given an index in a tpm_chip_list.
-tpm_chip_put() is then the name that fits the argument here, given it'll 
-only be a wrapper of the tpm_chip put
-functionality, not the searching one I assume.
+On Wed, Nov 17, 2010 at 01:44:03PM -0700, Allyn, Mark A wrote:
+> Hello:
+> 
+> I had checkpatch complain about spaces around the * symbol when it is used as an arithmetic operator (multiply) and not an address indicator.
+> 
+> This did not happen before; it's happening in the current next kernel.
+> 
+> Are there intended changes to checkpatch to require no spaces after the * even for multiply?
 
-I'll ack any of the two approaches (tpm_chip_put or tpm_chip_find_get 
-renaming) in any case.
+No that would be incorrect.  Could you send me the example which is
+triggering it so I can try and determine why.
 
-Rajiv
+-apw
