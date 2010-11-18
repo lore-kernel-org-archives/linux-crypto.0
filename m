@@ -1,129 +1,72 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [PATCH v1.4 0/5] keys: trusted and encrypted keys
-Date: Thu, 18 Nov 2010 17:42:41 -0500
-Message-ID: <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [PATCH v1.4 2/5] tpm: add module_put wrapper
+Date: Thu, 18 Nov 2010 17:42:43 -0500
+Message-ID: <1290120166-3132-3-git-send-email-zohar@linux.vnet.ibm.com>
+References: <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
 Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
 	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	James Morris <jmorris@namei.org>,
 	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e37.co.us.ibm.com ([32.97.110.158]:37780 "EHLO
-	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758099Ab0KRWm7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Nov 2010 17:42:59 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Changes were made in this patchset based on David Howell's comments.  The
-major technical change was converting from the crypto hash to shash API.
-The remaining changes are listed in the individual patch changelogs.
+For readability, define a tpm_chip_put() wrapper to call module_put().
+Replace existing module_put() calls with the wrapper.
 
-Trusted and Encrypted Keys are two new key types added to the existing
-kernel key ring service. Both of these new types are variable length
-symmetic keys, and in both cases all keys are created in the kernel, and
-user space sees, stores, and loads only encrypted blobs.  Trusted Keys
-require the availability of a Trusted Platform Module (TPM) chip for
-greater security, while Encrypted Keys can be used on any system. All
-user level blobs, are displayed and loaded in hex ascii for convenience,
-and are integrity verified.  
+(Change based on trusted/encrypted patchset review by David Howells.)
 
-Trusted Keys use a TPM both to generate and to seal the keys.  Keys are
-sealed under a 2048 bit RSA key in the TPM, and optionally sealed to
-specified PCR (integrity measurement) values, and only unsealed by the
-TPM, if PCRs and blob integrity verifications match.  A loaded Trusted
-Key can be updated with new (future) PCR values, so keys are easily
-migrated to new pcr values, such as when the kernel and initramfs are
-updated.  The same key can have many saved blobs under different PCR
-values, so multiple boots are easily supported.
+Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
+Signed-off-by: David Safford <safford@watson.ibm.com>
+---
+ drivers/char/tpm/tpm.c |    4 ++--
+ drivers/char/tpm/tpm.h |    5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-By default, trusted keys are sealed under the SRK, which has the default
-authorization value (20 zeros).  This can be set at takeownership time
-with the trouser's utility: "tpm_takeownership -u -z".
-
-Usage:
-    keyctl add trusted name "new keylen [options]" ring
-    keyctl add trusted name "load hex_blob [pcrlock=pcrnum]" ring
-    keyctl update key "update [options]"
-    keyctl print keyid
-
-    options:
-       keyhandle= ascii hex value of sealing key default 0x40000000 (SRK)
-       keyauth=	  ascii hex auth for sealing key default 0x00...
-		  (40 ascii zeros)
-       blobauth=  ascii hex auth for sealed data default 0x00...
-		  (40 ascii zeros)
-       pcrinfo=	  ascii hex of PCR_INFO or PCR_INFO_LONG (no default)
-       pcrlock=	  pcr number to be extended to "lock" blob
-       migratable= 0|1 indicating permission to reseal to new PCR values, 
-                   default 1 (resealing allowed)
-
-keyctl print returns an ascii hex copy of the sealed key, which is in
-standard TPM_STORED_DATA format.  The key length for new keys are always
-in bytes.  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits), the
-upper limit is to fit within the 2048 bit SRK (RSA) keylength, with all
-necessary structure/padding. 
-
-Encrypted keys do not depend on a TPM, and are faster, as they use AES
-for encryption/decryption.  New keys are created from kernel generated
-random numbers, and are encrypted/decrypted using a specified 'master'
-key.  The 'master' key can either be a trusted-key or user-key type. The
-main disadvantage of encrypted keys is that if they are not rooted in a
-trusted key, they are only as secure as the user key encrypting them.
-The master user key should therefore be loaded in as secure a way as
-possible, preferably early in boot.
-
-Usage:
-  keyctl add encrypted name "new master-key-name keylen" ring
-  keyctl add encrypted name "load key-type:master-key-name keylen hex_blob" ring
-  keyctl update keyid "update master-key-name"
-
-where 'key-type' is either 'trusted' or 'user'.
-
-The initial consumer of trusted keys is EVM, which at boot time needs a
-high quality symmetric key for HMAC protection of file metadata. The use
-of a trusted key provides strong guarantees that the EVM key has not
-been compromised by a user level problem, and when sealed to specific
-boot PCR values, protects against boot and offline attacks.  Other uses
-for trusted and encrypted keys, such as for disk and file encryption are
-anticipated.
-
-Mimi Zohar
-David Safford
-
-Mimi Zohar (5):
-  lib: hex2bin converts ascii hexadecimal string to binary
-  tpm: add module_put wrapper
-  key: add tpm_send command
-  keys: add new trusted key-type
-  keys: add new key-type encrypted
-
- Documentation/keys-trusted-encrypted.txt |   68 ++
- drivers/char/tpm/tpm.c                   |   20 +-
- drivers/char/tpm/tpm.h                   |    5 +
- include/keys/encrypted-type.h            |   29 +
- include/keys/trusted-type.h              |   31 +
- include/linux/kernel.h                   |    1 +
- include/linux/tpm.h                      |    4 +
- lib/hexdump.c                            |   16 +
- security/Kconfig                         |   31 +
- security/keys/Makefile                   |    2 +
- security/keys/encrypted_defined.c        |  876 +++++++++++++++++++++++
- security/keys/encrypted_defined.h        |   56 ++
- security/keys/trusted_defined.c          | 1136 ++++++++++++++++++++++++++++++
- security/keys/trusted_defined.h          |  147 ++++
- 14 files changed, 2420 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/keys-trusted-encrypted.txt
- create mode 100644 include/keys/encrypted-type.h
- create mode 100644 include/keys/trusted-type.h
- create mode 100644 security/keys/encrypted_defined.c
- create mode 100644 security/keys/encrypted_defined.h
- create mode 100644 security/keys/trusted_defined.c
- create mode 100644 security/keys/trusted_defined.h
-
+diff --git a/drivers/char/tpm/tpm.c b/drivers/char/tpm/tpm.c
+index 7c41335..26c09f3 100644
+--- a/drivers/char/tpm/tpm.c
++++ b/drivers/char/tpm/tpm.c
+@@ -736,7 +736,7 @@ int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf)
+ 	if (chip == NULL)
+ 		return -ENODEV;
+ 	rc = __tpm_pcr_read(chip, pcr_idx, res_buf);
+-	module_put(chip->dev->driver->owner);
++	tpm_chip_put(chip);
+ 	return rc;
+ }
+ EXPORT_SYMBOL_GPL(tpm_pcr_read);
+@@ -775,7 +775,7 @@ int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
+ 	rc = transmit_cmd(chip, &cmd, EXTEND_PCR_RESULT_SIZE,
+ 			  "attempting extend a PCR value");
+ 
+-	module_put(chip->dev->driver->owner);
++	tpm_chip_put(chip);
+ 	return rc;
+ }
+ EXPORT_SYMBOL_GPL(tpm_pcr_extend);
+diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
+index 792868d..72ddb03 100644
+--- a/drivers/char/tpm/tpm.h
++++ b/drivers/char/tpm/tpm.h
+@@ -113,6 +113,11 @@ struct tpm_chip {
+ 
+ #define to_tpm_chip(n) container_of(n, struct tpm_chip, vendor)
+ 
++static inline void tpm_chip_put(struct tpm_chip *chip)
++{
++	module_put(chip->dev->driver->owner);
++}
++
+ static inline int tpm_read_index(int base, int index)
+ {
+ 	outb(index, base);
 -- 
 1.7.2.2
+
