@@ -1,230 +1,129 @@
-From: "Struk, Tadeusz" <tadeusz.struk@intel.com>
-Subject: RE: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Thu, 18 Nov 2010 09:38:50 +0000
-Message-ID: <24483BA4C9F69C43A7379639D35543D7C3450A84@irsmsx502.ger.corp.intel.com>
-References: <4CC9946D.mailLH511GU0C@intel.com>
- <20101104190405.GA2501@gondor.apana.org.au>
- <20101117172331.3bbec734.akpm@linux-foundation.org>
- <20101118092640.GA9486@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1952494109=="
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
-	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
-	"Hoban, Adrian" <adrian.hoban@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20101118092640.GA9486@gondor.apana.org.au>
-MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: [PATCH v1.4 0/5] keys: trusted and encrypted keys
+Date: Thu, 18 Nov 2010 17:42:41 -0500
+Message-ID: <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e37.co.us.ibm.com ([32.97.110.158]:37780 "EHLO
+	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758099Ab0KRWm7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Nov 2010 17:42:59 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---===============1952494109==
-MIME-Version: 1.0
-Content-Language: en-US
-Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=SHA1; boundary="----=_NextPart_000_000A_01CB8704.68312020"
+Changes were made in this patchset based on David Howell's comments.  The
+major technical change was converting from the crypto hash to shash API.
+The remaining changes are listed in the individual patch changelogs.
 
-------=_NextPart_000_000A_01CB8704.68312020
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Trusted and Encrypted Keys are two new key types added to the existing
+kernel key ring service. Both of these new types are variable length
+symmetic keys, and in both cases all keys are created in the kernel, and
+user space sees, stores, and loads only encrypted blobs.  Trusted Keys
+require the availability of a Trusted Platform Module (TPM) chip for
+greater security, while Encrypted Keys can be used on any system. All
+user level blobs, are displayed and loaded in hex ascii for convenience,
+and are integrity verified.  
 
-Will do.
-Tadeusz
+Trusted Keys use a TPM both to generate and to seal the keys.  Keys are
+sealed under a 2048 bit RSA key in the TPM, and optionally sealed to
+specified PCR (integrity measurement) values, and only unsealed by the
+TPM, if PCRs and blob integrity verifications match.  A loaded Trusted
+Key can be updated with new (future) PCR values, so keys are easily
+migrated to new pcr values, such as when the kernel and initramfs are
+updated.  The same key can have many saved blobs under different PCR
+values, so multiple boots are easily supported.
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Thursday, November 18, 2010 9:27 AM
-To: Andrew Morton
-Cc: Struk, Tadeusz; linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; O Mahony, Aidan; Paoloni, Gabriele; Hoban, Adrian
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+By default, trusted keys are sealed under the SRK, which has the default
+authorization value (20 zeros).  This can be set at takeownership time
+with the trouser's utility: "tpm_takeownership -u -z".
 
-On Wed, Nov 17, 2010 at 05:23:31PM -0800, Andrew Morton wrote:
-> On Thu, 4 Nov 2010 14:04:05 -0500
-> Herbert Xu <herbert@gondor.hengli.com.au> wrote:
-> 
-> > On Thu, Oct 28, 2010 at 04:19:09PM +0100, tadeusz.struk@intel.com wrote:
-> > > Hi Herbert,
-> > >    We have reworked the assembly to use macros instead of the new aesni instructions.
-> > 
-> > Both applied.  Thanks for your efforts!
-> 
-> Whatever's in today's linux-next is a big fail with gas-2.16.1.
-> 
-> Which was entirely predictable!  How often has this happened recently??
-> 
-> 
-> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-> arch/x86/crypto/aesni-intel_asm.S:834: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm13'
-> arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm5'
-> arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-> arch/x86/crypto/aesni-intel_asm.S:866: Error: bad expression
+Usage:
+    keyctl add trusted name "new keylen [options]" ring
+    keyctl add trusted name "load hex_blob [pcrlock=pcrnum]" ring
+    keyctl update key "update [options]"
+    keyctl print keyid
 
-Sorry, but I no longer have access to a binutils that is older
-than 2.18 so I never saw this failure.
+    options:
+       keyhandle= ascii hex value of sealing key default 0x40000000 (SRK)
+       keyauth=	  ascii hex auth for sealing key default 0x00...
+		  (40 ascii zeros)
+       blobauth=  ascii hex auth for sealed data default 0x00...
+		  (40 ascii zeros)
+       pcrinfo=	  ascii hex of PCR_INFO or PCR_INFO_LONG (no default)
+       pcrlock=	  pcr number to be extended to "lock" blob
+       migratable= 0|1 indicating permission to reseal to new PCR values, 
+                   default 1 (resealing allowed)
 
-Tadeusz, could you please make an incremental patch that converts
-all the pshufb instructions to macros?
+keyctl print returns an ascii hex copy of the sealed key, which is in
+standard TPM_STORED_DATA format.  The key length for new keys are always
+in bytes.  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits), the
+upper limit is to fit within the 2048 bit SRK (RSA) keylength, with all
+necessary structure/padding. 
 
-Thanks!
+Encrypted keys do not depend on a TPM, and are faster, as they use AES
+for encryption/decryption.  New keys are created from kernel generated
+random numbers, and are encrypted/decrypted using a specified 'master'
+key.  The 'master' key can either be a trusted-key or user-key type. The
+main disadvantage of encrypted keys is that if they are not rooted in a
+trusted key, they are only as secure as the user key encrypting them.
+The master user key should therefore be loaded in as secure a way as
+possible, preferably early in boot.
+
+Usage:
+  keyctl add encrypted name "new master-key-name keylen" ring
+  keyctl add encrypted name "load key-type:master-key-name keylen hex_blob" ring
+  keyctl update keyid "update master-key-name"
+
+where 'key-type' is either 'trusted' or 'user'.
+
+The initial consumer of trusted keys is EVM, which at boot time needs a
+high quality symmetric key for HMAC protection of file metadata. The use
+of a trusted key provides strong guarantees that the EVM key has not
+been compromised by a user level problem, and when sealed to specific
+boot PCR values, protects against boot and offline attacks.  Other uses
+for trusted and encrypted keys, such as for disk and file encryption are
+anticipated.
+
+Mimi Zohar
+David Safford
+
+Mimi Zohar (5):
+  lib: hex2bin converts ascii hexadecimal string to binary
+  tpm: add module_put wrapper
+  key: add tpm_send command
+  keys: add new trusted key-type
+  keys: add new key-type encrypted
+
+ Documentation/keys-trusted-encrypted.txt |   68 ++
+ drivers/char/tpm/tpm.c                   |   20 +-
+ drivers/char/tpm/tpm.h                   |    5 +
+ include/keys/encrypted-type.h            |   29 +
+ include/keys/trusted-type.h              |   31 +
+ include/linux/kernel.h                   |    1 +
+ include/linux/tpm.h                      |    4 +
+ lib/hexdump.c                            |   16 +
+ security/Kconfig                         |   31 +
+ security/keys/Makefile                   |    2 +
+ security/keys/encrypted_defined.c        |  876 +++++++++++++++++++++++
+ security/keys/encrypted_defined.h        |   56 ++
+ security/keys/trusted_defined.c          | 1136 ++++++++++++++++++++++++++++++
+ security/keys/trusted_defined.h          |  147 ++++
+ 14 files changed, 2420 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/keys-trusted-encrypted.txt
+ create mode 100644 include/keys/encrypted-type.h
+ create mode 100644 include/keys/trusted-type.h
+ create mode 100644 security/keys/encrypted_defined.c
+ create mode 100644 security/keys/encrypted_defined.h
+ create mode 100644 security/keys/trusted_defined.c
+ create mode 100644 security/keys/trusted_defined.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-------=_NextPart_000_000A_01CB8704.68312020
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIYITCCAyAw
-ggKJoAMCAQICBDXe9M8wDQYJKoZIhvcNAQEFBQAwTjELMAkGA1UEBhMCVVMxEDAOBgNVBAoTB0Vx
-dWlmYXgxLTArBgNVBAsTJEVxdWlmYXggU2VjdXJlIENlcnRpZmljYXRlIEF1dGhvcml0eTAeFw05
-ODA4MjIxNjQxNTFaFw0xODA4MjIxNjQxNTFaME4xCzAJBgNVBAYTAlVTMRAwDgYDVQQKEwdFcXVp
-ZmF4MS0wKwYDVQQLEyRFcXVpZmF4IFNlY3VyZSBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkwgZ8wDQYJ
-KoZIhvcNAQEBBQADgY0AMIGJAoGBAMFdsVhnCGLuoJotHwhtkRRomAoe/toEbxOEYiHD0XzOnwXg
-uAHwTjTs4oqVBGSs8WtTXwWzy2eAv0ICjv7dAQns4QAUT/z78AzdQ7pbK+EfgHCZFVeTFvEPl2q3
-wmgjHMxNWTCsUR47ryvW7mNFe8XZX1DS41APOojnvxT94Me5AgMBAAGjggEJMIIBBTBwBgNVHR8E
-aTBnMGWgY6BhpF8wXTELMAkGA1UEBhMCVVMxEDAOBgNVBAoTB0VxdWlmYXgxLTArBgNVBAsTJEVx
-dWlmYXggU2VjdXJlIENlcnRpZmljYXRlIEF1dGhvcml0eTENMAsGA1UEAxMEQ1JMMTAaBgNVHRAE
-EzARgQ8yMDE4MDgyMjE2NDE1MVowCwYDVR0PBAQDAgEGMB8GA1UdIwQYMBaAFEjmaPkr0rKV10fY
-IyAQTzOYkJ/UMB0GA1UdDgQWBBRI5mj5K9KylddH2CMgEE8zmJCf1DAMBgNVHRMEBTADAQH/MBoG
-CSqGSIb2fQdBAAQNMAsbBVYzLjBjAwIGwDANBgkqhkiG9w0BAQUFAAOBgQBYzinq/Pfetc4CuRe1
-hdG54+CVzCUxDQCmkm5/tpJjnlCV0Zpv5BHeY4VumO6o/1rI01WyZnFX3sAh6z0qpyNJAQSGQnv8
-7n+iFlK1Z2fTQNs7JliyKHc9rhR3Ydb6KmYnoA36p3Nc6nDxlCFlRF/6/O8paKmih3nvee9PrAd3
-ODCCAz0wggKmoAMCAQICAwWw/zANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJVUzEQMA4GA1UE
-ChMHRXF1aWZheDEtMCsGA1UECxMkRXF1aWZheCBTZWN1cmUgQ2VydGlmaWNhdGUgQXV0aG9yaXR5
-MB4XDTA2MDIxNjE4MDEzMFoXDTE2MDIxOTE4MDEzMFowUjELMAkGA1UEBhMCVVMxGjAYBgNVBAoT
-EUludGVsIENvcnBvcmF0aW9uMScwJQYDVQQDEx5JbnRlbCBFeHRlcm5hbCBCYXNpYyBQb2xpY3kg
-Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDBpd/XOb9QVqEZ8mQ1042TdOIq3ATD
-IsV2xDyt30yLyMR5Wjtus0bn3B+he89BiNO/LP6+rFzEwlD55PlX+HLGIKeNNG97dqyc30FElEUj
-ZzTZFq2N4e3kVJ/XAEEgANzV8v9qp7qWwxugPgfc3z9BkYot+CifozexHLb/hEZj+yISCU61kRZv
-uSQ0E11yYL4dRgcglJeaHo3oX57rvIckaLsYV5/1Aj+R8DM1Ppk965XQAKsHfnyT7C4S50T4lVn4
-lz36wOdNZn/zegG1zp41lnoTFfT4KuKVJH5x7YD1p6KbgJCKLovnujGuohquBNfdXKpZkvz6pGv+
-iC1HawJdAgMBAAGjgaAwgZ0wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQaxgxKxEdvqNutK/D0
-Vgaj7TdUDDA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdlb3RydXN0LmNvbS9jcmxzL3Nl
-Y3VyZWNhLmNybDAfBgNVHSMEGDAWgBRI5mj5K9KylddH2CMgEE8zmJCf1DAPBgNVHRMBAf8EBTAD
-AQH/MA0GCSqGSIb3DQEBBQUAA4GBABMQOK2kVKVIlUWwLTdywJ+e2O+PC/uQltK2F3lRyrPfBn69
-tOkIP4SgDJOfsxyobIrPLe75kBLw+Dom13OBDp/EMZJZ1CglQfVV8co9mT3aZMjSGGQiMgkJLR3j
-Mfr900fXZKj5XeqCJ+JP0mEhJGEdVCY+FFlksJjV86fDrq1QMIIFYzCCBEugAwIBAgIKYSyl/gAA
-AAAABjANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9y
-YXRpb24xJzAlBgNVBAMTHkludGVsIEV4dGVybmFsIEJhc2ljIFBvbGljeSBDQTAeFw0wNjAzMjIy
-MjIyNDdaFw0xMjAzMjIyMjMyNDdaMFYxCzAJBgNVBAYTAlVTMRowGAYDVQQKExFJbnRlbCBDb3Jw
-b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSAzQjCCASIw
-DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMDoHJYUGvcdR4k0Qv8/RrwNX4+vEe5PN2LnGn4x
-fIWwdUbk5+zvrRy1HjoKdG/AShZfxAuFoVyNIah5GJLpiS/vGbsDYKK+EZcIcmtPfvbB9Yg09EnQ
-0OpsZ2ORRd5lYUfMUU+zkpgL96vKFdkiG+eeHEwnSS3VikGVrF7UDdKfvxZwRwQCx6rEHAFPCjBD
-VfGYZuYT1EDhSDvzEiU7KzBsxrdBCFU4RYL7kh+do+vyMDlBzpw3WKvMVbf3s5lxYiY7AjEhU8OS
-yZEQlgtK8PNyifHjmyrSaeJrPshM3PuLFG4d3gm1UJEiGNzxcHGb6YLP29IQAwY5mAk8j+UOVcsC
-AwEAAaOCAjUwggIxMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFG/DcREooZ0ZV/VnV8/ZKSaI
-1aWiMAsGA1UdDwQEAwIBhjAQBgkrBgEEAYI3FQEEAwIBADAZBgkrBgEEAYI3FAIEDB4KAFMAdQBi
-AEMAQTAfBgNVHSMEGDAWgBQaxgxKxEdvqNutK/D0Vgaj7TdUDDCBvQYDVR0fBIG1MIGyMIGvoIGs
-oIGphk5odHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFs
-JTIwQmFzaWMlMjBQb2xpY3klMjBDQS5jcmyGV2h0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29t
-L3JlcG9zaXRvcnkvQ1JML0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUyMENBLmNy
-bDCB4wYIKwYBBQUHAQEEgdYwgdMwYwYIKwYBBQUHMAKGV2h0dHA6Ly93d3cuaW50ZWwuY29tL3Jl
-cG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUy
-MENBLmNydDBsBggrBgEFBQcwAoZgaHR0cDovL2NlcnRpZmljYXRlcy5pbnRlbC5jb20vcmVwb3Np
-dG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwUG9saWN5JTIwQ0Eu
-Y3J0MA0GCSqGSIb3DQEBBQUAA4IBAQBAiWWHL6T21QXFZDyaUIye0jh7f40GXqi75Ro5JbpROtlZ
-BqyRq6oPMAG6Igxd5Bd9TMtNkOvguknFnK1y17UdMhLOl+FuInE+FAWk803aRW27OsX+ot0KmPio
-KnZ3L1K5qcQS3tp6or7AaZzd0w0qFitm4UfP9nnTXQtY9XM5QJ07IKFDE3tlOlamKhjbiJV3FKig
-CVesPZSx9h2G7Ve4irEfz915Vks26AJHGZagEHNxM9exkgem4ENsG+t0vYqn9x7YsqJ6fmbOSyrz
-jzb3CYeEfyE5SL+f3Vx9uMsQDyb8LVCDBXQtxLEHnFEBPrRSSF9kPmyjavx4UqFdPEyCMIIGAzCC
-BOugAwIBAgIKZw1HXAAAAAAjxTANBgkqhkiG9w0BAQUFADBWMQswCQYDVQQGEwJVUzEaMBgGA1UE
-ChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3Vp
-bmcgQ0EgM0IwHhcNMDgwMTEwMTcyNzE4WhcNMTEwMTA5MTcyNzE4WjBBMRcwFQYDVQQDEw5TdHJ1
-aywgVGFkZXVzejEmMCQGCSqGSIb3DQEJARYXdGFkZXVzei5zdHJ1a0BpbnRlbC5jb20wggEiMA0G
-CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQClqSXlOFL/ggjqlQPgWQfbGoOT4yENVEwzZuvK4PeK
-OXroeIoKcXFEoprX78QTrkYLDKB61GQk3NJSa2dTS4WAouEJvVEQu0s0E+Y4nTuaXz2SocnNZ/6j
-CCOrzel1Ka5F97VDsbySdFsX352mupb7RWS2oFkLDV1uibKQRlBJcwlqDaEJ3lhUhmDMbF3QV6Ub
-CJX+Gf43gGbS58QwUCXW2wvWBi/WYtr75OfvxJQt0+OyKz220C6DETxmICrehWb+JXKdQonW95uT
-XoSV4dTX+rgVy/nm9QxV8BPU9HtGTE+x56ljiVFo1mXoq1p8NUN5ByAN9k8M4vb9D6u6V/s/AgMB
-AAGjggLmMIIC4jALBgNVHQ8EBAMCB4AwHQYDVR0OBBYEFC0UqLUaXF/uJUZuopNj4kJ+HGrvMDwG
-CSsGAQQBgjcVBwQvMC0GJSsGAQQBgjcVCIbDjHWEmeVRg/2BKIWOn1OCkcAJZ4HevTmV8EMCAWQC
-AQUwHwYDVR0jBBgwFoAUb8NxESihnRlX9WdXz9kpJojVpaIwgckGA1UdHwSBwTCBvjCBu6CBuKCB
-tYZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUy
-MEJhc2ljJTIwSXNzdWluZyUyMENBJTIwM0IuY3Jshl1odHRwOi8vY2VydGlmaWNhdGVzLmludGVs
-LmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIw
-Q0ElMjAzQi5jcmwwge8GCCsGAQUFBwEBBIHiMIHfMGkGCCsGAQUFBzAChl1odHRwOi8vd3d3Lmlu
-dGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRlcy9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMl
-MjBJc3N1aW5nJTIwQ0ElMjAzQi5jcnQwcgYIKwYBBQUHMAKGZmh0dHA6Ly9jZXJ0aWZpY2F0ZXMu
-aW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNp
-YyUyMElzc3VpbmclMjBDQSUyMDNCLmNydDAfBgNVHSUEGDAWBggrBgEFBQcDBAYKKwYBBAGCNwoD
-DDApBgkrBgEEAYI3FQoEHDAaMAoGCCsGAQUFBwMEMAwGCisGAQQBgjcKAwwwSwYDVR0RBEQwQqAn
-BgorBgEEAYI3FAIDoBkMF3RhZGV1c3ouc3RydWtAaW50ZWwuY29tgRd0YWRldXN6LnN0cnVrQGlu
-dGVsLmNvbTANBgkqhkiG9w0BAQUFAAOCAQEAI92sQcvy3gnSPur4tntIcowUmIUXYCfLBz4kY/Ll
-7hnXFWcWPUuocRfveYFGMc6dklCxkQTpJpZ5uTc39GBllWyGvbrC+CcMkDrzTeeSWIdW1qxmXlk1
-5vySOVRyP8HmrhQbUIXZwqPx6CwlPu5FRHhxhNMbjWjPgTSHvGTBzcJ4BEHwBwlfb6rOww3v+FNx
-UozHcoRpBz9Z1eD1GxjsdqokqTUw3jbEdh8r6U2lLrVIPs2KX5ggoKenHx/y+zEKgtOmHnx74Q17
-LiCkMNhMomCmAxh6jAD+0gYkyyGNW4rBbjrd1x+yPNWXDkIveVIpG2+ItvvAOOcyu7Mk3CtrcTCC
-BkowggUyoAMCAQICCmsY2okAAAAAI9YwDQYJKoZIhvcNAQEFBQAwVjELMAkGA1UEBhMCVVMxGjAY
-BgNVBAoTEUludGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJ
-c3N1aW5nIENBIDNCMB4XDTA4MDExMTEyMTgyMFoXDTExMDExMDEyMTgyMFowQTEXMBUGA1UEAxMO
-U3RydWssIFRhZGV1c3oxJjAkBgkqhkiG9w0BCQEWF3RhZGV1c3ouc3RydWtAaW50ZWwuY29tMIIB
-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnYPdO/c4AwR6kFsc+VmfTh3XklKcIqYwdAl/
-g/gZP6QRAufJkBK90/g4Lx/hVwZQQ5itD7Hg1VnJ2GmMibZYeko6w47JX/xTNEl3Qb54xjjI3oG7
-E8EQOt6chxIrQvrADY6HtS0e0GvR7KU8lVgpDzmmhtdGM3KfSAWPddKDHonY2nW8UNQRbxlHOVi5
-/Buyg1/uZTvAU4j24EyluT92di7m3WfVuNGljAIJdvCvafgHuctaKw30zhLRKddT028bCyzH3rOE
-45zV1f1xV6y1WfpvtB3OeD6SsmvWHnkhhTQb5ha3wlncmkFji6xgsbL0e4HHD7DKDGWLupQ/aJQJ
-LQIDAQABo4IDLTCCAykwCwYDVR0PBAQDAgQwMEQGCSqGSIb3DQEJDwQ3MDUwDgYIKoZIhvcNAwIC
-AgCAMA4GCCqGSIb3DQMEAgIAgDAHBgUrDgMCBzAKBggqhkiG9w0DBzAdBgNVHQ4EFgQUxFOVRH5a
-3yrmo/bmsTy+YoXSZQIwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhsOMdYSZ5VGD/YEohY6f
-U4KRwAlnhLnZQYeE/04CAWQCAQkwHwYDVR0jBBgwFoAUb8NxESihnRlX9WdXz9kpJojVpaIwgckG
-A1UdHwSBwTCBvjCBu6CBuKCBtYZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9DUkwv
-SW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwM0IuY3Jshl1odHRwOi8v
-Y2VydGlmaWNhdGVzLmludGVsLmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFsJTIw
-QmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjAzQi5jcmwwge8GCCsGAQUFBwEBBIHiMIHfMGkGCCsGAQUF
-BzAChl1odHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRlcy9JbnRlbCUy
-MEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjAzQi5jcnQwcgYIKwYBBQUHMAKGZmh0
-dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVs
-JTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDNCLmNydDAfBgNVHSUEGDAWBggr
-BgEFBQcDBAYKKwYBBAGCNwoDBDApBgkrBgEEAYI3FQoEHDAaMAoGCCsGAQUFBwMEMAwGCisGAQQB
-gjcKAwQwSwYDVR0RBEQwQqAnBgorBgEEAYI3FAIDoBkMF3RhZGV1c3ouc3RydWtAaW50ZWwuY29t
-gRd0YWRldXN6LnN0cnVrQGludGVsLmNvbTANBgkqhkiG9w0BAQUFAAOCAQEArsRWL+cURG5dEUkU
-dY8MLw2a7l2jDkqeoqandVwUdHxNTGz2mInJKZixCCCZKlDxnt/D11N+FNVFmK4FA6r3Eht2xZCZ
-/uOXlsBkD4i2YbfZlcgRuvCbJMb8Hx3ioFrgszavij5/A+z0TwIAMY1lkJAZlTHjbfmAjPF43eiR
-UWV9yoJecQi9Afcmei7E/zi77ob8Xi7HYZPcpQ2WKORCrTYwk+VphDwyDx12vdpaYVtUKpvzGdRw
-5rT9Ma9N7EajhMbbCxFA3os83GHF1eLdQclsMbn1o3+J5KHr0rFaPcrFwEGhKsRgYr3Tgc9rU23r
-9C+5RJzJWhAVS12PknyQaTGCA0EwggM9AgEBMGQwVjELMAkGA1UEBhMCVVMxGjAYBgNVBAoTEUlu
-dGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENB
-IDNCAgpnDUdcAAAAACPFMAkGBSsOAwIaBQCgggGyMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEw
-HAYJKoZIhvcNAQkFMQ8XDTEwMTExODA5Mzg1MFowIwYJKoZIhvcNAQkEMRYEFEX9B1EaVGcmaDkD
-z3aJy/O07e/xMGcGCSqGSIb3DQEJDzFaMFgwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0G
-CCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMAcGBSsOAwIaMAoGCCqGSIb3DQIF
-MHMGCSsGAQQBgjcQBDFmMGQwVjELMAkGA1UEBhMCVVMxGjAYBgNVBAoTEUludGVsIENvcnBvcmF0
-aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENBIDNCAgprGNqJAAAA
-ACPWMHUGCyqGSIb3DQEJEAILMWagZDBWMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29y
-cG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3VpbmcgQ0EgM0ICCmsY
-2okAAAAAI9YwDQYJKoZIhvcNAQEBBQAEggEAGNHc+XPUkQohUVDcEAOH7dJcuUWxYrlZOa5Mmtrs
-8wliMC/tVddRLBThvxlW717TsgrQyFovxqIxXE5FPFEcgnDhUbvB8Wfm1F3BMFQdYKGnoGgVLG3S
-ejqe+XB/K2oM441nB5dGTaTGu9LjNrm/xNxWUaBfIho5p6AwXJCzevHdioS6XPMIdGBu6kVpaIVK
-j0U1DqFqG9LTushvaPB8TWPHjTF1FRnziF4XHBIrbWdx5q0S2rRkr0mb1U3SP3HLc+mt4A1u/ysQ
-jJN1X0mNYuhOp0VdGDD5WOCFuxE1pIrxJajuV8aSs2Clylj3Rs7sgtwOcXJrb7xJlRe0ZNN7gAAA
-AAAAAA==
-
-------=_NextPart_000_000A_01CB8704.68312020--
-
---===============1952494109==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
---------------------------------------------------------------
-Intel Shannon Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-Business address: Dromore House, East Park, Shannon, Co. Clare
-
-This e-mail and any attachments may contain confidential material for the s=
-ole use of the intended recipient(s). Any review or distribution by others =
-is strictly prohibited. If you are not the intended recipient, please conta=
-ct the sender and delete all copies.
-
-
---===============1952494109==--
+1.7.2.2
