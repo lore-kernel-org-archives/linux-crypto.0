@@ -1,74 +1,54 @@
-From: Huang Ying <ying.huang@intel.com>
-Subject: Re: [PATCH v4] x86, crypto: ported aes-ni implementation to x86
-Date: Thu, 18 Nov 2010 15:44:28 +0800
-Message-ID: <1290066268.3122.6.camel@yhuang-dev>
-References: <1289514030-32332-1-git-send-email-minipli@googlemail.com>
-	 <9A3E97A7-EB84-4F3A-A7FD-4471E7ECBE5C@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+Date: Thu, 18 Nov 2010 17:26:40 +0800
+Message-ID: <20101118092640.GA9486@gondor.apana.org.au>
+References: <4CC9946D.mailLH511GU0C@intel.com> <20101104190405.GA2501@gondor.apana.org.au> <20101117172331.3bbec734.akpm@linux-foundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, aidan.o.mahony@intel.com,
+	gabriele.paoloni@intel.com, adrian.hoban@intel.com
+To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:28427 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754894Ab0KRHoa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Nov 2010 02:44:30 -0500
-In-Reply-To: <9A3E97A7-EB84-4F3A-A7FD-4471E7ECBE5C@googlemail.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:39186 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754191Ab0KRJ0q (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Nov 2010 04:26:46 -0500
+Content-Disposition: inline
+In-Reply-To: <20101117172331.3bbec734.akpm@linux-foundation.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2010-11-18 at 15:41 +0800, Mathias Krause wrote:
-> On 11.11.2010, 23:20 Mathias Krause wrote:
-> > The AES-NI instructions are also available in legacy mode so the 32-bit
-> > architecture may profit from those, too.
-> > 
-> > To illustrate the performance gain here's a short summary of a dm-crypt
-> > speed test on a Core i7 M620 running at 2.67GHz comparing both assembler
-> > implementations:
-> > 
-> > x86:                   i568       aes-ni    delta
-> > ECB, 256 bit:     93.8 MB/s   123.3 MB/s   +31.4%
-> > CBC, 256 bit:     84.8 MB/s   262.3 MB/s  +209.3%
-> > LRW, 256 bit:    108.6 MB/s   222.1 MB/s  +104.5%
-> > XTS, 256 bit:    105.0 MB/s   205.5 MB/s   +95.7%
-> > 
-> > Additionally, due to some minor optimizations, the 64-bit version also
-> > got a minor performance gain as seen below:
-> > 
-> > x86-64:           old impl.    new impl.    delta
-> > ECB, 256 bit:    121.1 MB/s   123.0 MB/s    +1.5%
-> > CBC, 256 bit:    285.3 MB/s   290.8 MB/s    +1.9%
-> > LRW, 256 bit:    263.7 MB/s   265.3 MB/s    +0.6%
-> > XTS, 256 bit:    251.1 MB/s   255.3 MB/s    +1.7%
-> > 
-> > Signed-off-by: Mathias Krause <minipli@googlemail.com>
-> > ---
-> > v4 changes:
-> > * adapted CBC implementation to be useable on x86, too
-> > * redo the measurement using dm-crypt
-> > 
-> > v3 changes:
-> > * fixed 32-bit implementation of aesni_ecb_enc (a hunk somehow moved to the end
-> >  of another function)
-> > 
-> > v2 changes:
-> > * hide almost all register names in macros so the same code base can be shared
-> >  between x86 and x86_64
-> > * unified Kconfig documentation again
-> > * added alignment constraints for internal functions.
-> > 
-> > 
-> > arch/x86/crypto/aesni-intel_asm.S  |  197 ++++++++++++++++++++++++++++++------
-> > arch/x86/crypto/aesni-intel_glue.c |   22 +++-
-> > crypto/Kconfig                     |   12 ++-
-> > 3 files changed, 191 insertions(+), 40 deletions(-)
+On Wed, Nov 17, 2010 at 05:23:31PM -0800, Andrew Morton wrote:
+> On Thu, 4 Nov 2010 14:04:05 -0500
+> Herbert Xu <herbert@gondor.hengli.com.au> wrote:
 > 
-> No comments so far? :(
-> What's wrong with the patch?
+> > On Thu, Oct 28, 2010 at 04:19:09PM +0100, tadeusz.struk@intel.com wrote:
+> > > Hi Herbert,
+> > >    We have reworked the assembly to use macros instead of the new aesni instructions.
+> > 
+> > Both applied.  Thanks for your efforts!
+> 
+> Whatever's in today's linux-next is a big fail with gas-2.16.1.
+> 
+> Which was entirely predictable!  How often has this happened recently??
+> 
+> 
+> arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+> arch/x86/crypto/aesni-intel_asm.S:834: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm13'
+> arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm5'
+> arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
+> arch/x86/crypto/aesni-intel_asm.S:866: Error: bad expression
 
-Reviewed-by: Huang Ying <ying.huang@intel.com>
+Sorry, but I no longer have access to a binutils that is older
+than 2.18 so I never saw this failure.
 
-Best Regards,
-Huang Ying
+Tadeusz, could you please make an incremental patch that converts
+all the pshufb instructions to macros?
+
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
