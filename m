@@ -1,256 +1,50 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Wed, 17 Nov 2010 17:23:31 -0800
-Message-ID: <20101117172331.3bbec734.akpm@linux-foundation.org>
-References: <4CC9946D.mailLH511GU0C@intel.com>
-	<20101104190405.GA2501@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, aidan.o.mahony@intel.com,
-	gabriele.paoloni@intel.com, adrian.hoban@intel.com
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH v3] x86, crypto: ported aes-ni implementation to x86
+Date: Thu, 18 Nov 2010 08:38:38 +0100
+Message-ID: <CD0CDB5F-7FDE-4A2D-88A1-8FC7E4AD0B01@googlemail.com>
+References: <1288818883-7620-1-git-send-email-minipli@googlemail.com> <1288823231.3016.25.camel@yhuang-mobile> <F67572F2-BFB5-4EB5-8CEB-FBB7AC30EFE3@googlemail.com> <1289521991.8719.1035.camel@yhuang-dev> <363861B5-35D6-4A01-9BF2-2EC1023BA0F2@googlemail.com> <1289547275.8719.1077.camel@yhuang-dev> <3F97AFB7-CF6A-4C5A-B435-A6424FCF5C53@googlemail.com>
+Mime-Version: 1.0 (Apple Message framework v1082)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Huang Ying <ying.huang@intel.com>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:54871 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751210Ab0KRBYG (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:38096 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750975Ab0KRHip convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Nov 2010 20:24:06 -0500
-In-Reply-To: <20101104190405.GA2501@gondor.apana.org.au>
+	Thu, 18 Nov 2010 02:38:45 -0500
+Received: by bwz15 with SMTP id 15so2471981bwz.19
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Nov 2010 23:38:43 -0800 (PST)
+In-Reply-To: <3F97AFB7-CF6A-4C5A-B435-A6424FCF5C53@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 4 Nov 2010 14:04:05 -0500
-Herbert Xu <herbert@gondor.hengli.com.au> wrote:
-
-> On Thu, Oct 28, 2010 at 04:19:09PM +0100, tadeusz.struk@intel.com wrote:
-> > Hi Herbert,
-> >    We have reworked the assembly to use macros instead of the new aesni instructions.
+On 13.11.2010, 00:25 Mathias Krause wrote:
+> On 12.11.2010, 08:34 Huang Ying wrote:
+> On Fri, 2010-11-12 at 15:30 +0800, Mathias Krause wrote:
+>>> On 12.11.2010, 01:33 Huang Ying wrote:
+>>>> Why the improvement of ECB is so small? I can not understand it. It
+>>>> should be as big as CBC.
+>>> 
+>>> I don't know why the ECB variant is so slow compared to the other variants.
+>>> But it is so even for the current x86-64 version. See the above values for
+>>> "x86-64 (old)". I setup dm-crypt for this test like this:
+>>> # cryptsetup -c aes-ecb-plain -d /dev/urandom create cfs /dev/loop0
+>>> 
+>>> What where the numbers you measured in your tests while developing the
+>>> x86-64 version?
+>> 
+>> Can't remember the number. Do you have interest to dig into the issue?
 > 
-> Both applied.  Thanks for your efforts!
+> I looked at /proc/crypto while doing the tests again and noticed that ECB
+> isn't handled using cryptd, while all other modes, e.g. CBC and CTR, are.
+> The reason for that seems to be that for ECB, and only for ECB, the kernel
+> is using the synchronous block algorithm instead of the asynchronous one.
+> So the question is: Why is the ECB variant handled using the synchronous
+> cipher -- because of the missing iv handling in this mode?
 
-Whatever's in today's linux-next is a big fail with gas-2.16.1.
+Herbert, any idea why this is the case?
 
-Which was entirely predictable!  How often has this happened recently??
-
-
-arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
-arch/x86/crypto/aesni-intel_asm.S:834: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm13'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm5'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:866: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:871: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:871: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:876: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:876: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:881: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:881: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:889: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:889: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:889: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:889: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:905: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:915: Error: no such instruction: `pshufb %xmm2,%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:922: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:930: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:936: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:949: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:955: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:968: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:972: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:1084: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm13'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm5'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1115: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm6'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1120: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm7'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1125: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: bad expression
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: junk at end of line, first unrecognized character is `0'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1130: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:15: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: non-constant expression in ".if" statement
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm2'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm3'
-arch/x86/crypto/aesni-intel_asm.S:1141: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm4'
-arch/x86/crypto/aesni-intel_asm.S:1156: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1166: Error: no such instruction: `pshufb %xmm2,%xmm1'
-arch/x86/crypto/aesni-intel_asm.S:1172: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1178: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
-arch/x86/crypto/aesni-intel_asm.S:1182: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:1188: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:1201: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:1208: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm8'
-arch/x86/crypto/aesni-intel_asm.S:1221: Error: suffix or operands invalid for `movq'
-arch/x86/crypto/aesni-intel_asm.S:1225: Error: suffix or operands invalid for `movq'
-make[2]: *** [arch/x86/crypto/aesni-intel_asm.o] Error 1
-make[1]: *** [arch/x86/crypto] Error 2
-make: *** [arch/x86] Error 2
+Regards,
+Mathias
