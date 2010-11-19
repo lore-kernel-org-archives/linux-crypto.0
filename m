@@ -1,409 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/4] crypto: algif_hash - User-space interface for hash operations
-Date: Fri, 19 Nov 2010 17:52:47 +0800
-Message-ID: <E1PJNeB-0005vR-4n@gondolin.me.apana.org.au>
-References: <20101119095136.GA22665@gondor.apana.org.au>
-To: Martin Willi <martin@strongswan.org>, linux-crypto@vger.kernel.org
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: [PATCH v3 2/8] omap-sham: DMA initialization fixes for off mode
+Date: Fri, 19 Nov 2010 16:04:23 +0200
+Message-ID: <63992389ec0d39e7aee4b02e059c52dfeb985c17.1290174993.git.dmitry.kasatkin@nokia.com>
+References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38019 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752553Ab0KSJwu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Nov 2010 04:52:50 -0500
+Received: from smtp.nokia.com ([147.243.1.47]:58021 "EHLO mgw-sa01.nokia.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754314Ab0KSOD5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 19 Nov 2010 09:03:57 -0500
+In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
+In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
+References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto: algif_hash - User-space interface for hash operations
+DMA parameters for constant data were initialized during driver probe().
+It seems that those settings sometimes are lost when devices goes to off mode.
+This patch makes DMA initialization just before use.
+It solves off mode problems.
 
-This patch adds the af_alg plugin for hash, corresponding to
-the ahash kernel operation type.
+Fixes: NB#202786 - Aegis & SHA1 block off mode changes
 
-Keys can optionally be set through the setsockopt interface.
-
-Each sendmsg call will finalise the hash unless sent with a MSG_MORE
-flag.
-
-Partial hash states can be cloned using accept(2).
-
-The interface is completely synchronous, all operations will
-complete prior to the system call returning.
-
-Both sendmsg(2) and splice(2) support reading the user-space
-data directly without copying (except that the Crypto API itself
-may copy the data if alignment is off).
-
-For now only the splice(2) interface supports performing digest
-instead of init/update/final.  In future the sendmsg(2) interface
-will also be modified to use digest/finup where possible so that
-hardware that cannot return a partial hash state can still benefit
-from this interface.
-
-Thakns to Miloslav Trmac for reviewing this and contributing
-fixes and improvements.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: David S. Miller <davem@davemloft.net>
-Tested-by: Martin Willi <martin@strongswan.org>
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
+ drivers/crypto/omap-sham.c |   19 ++++++++++---------
+ 1 files changed, 10 insertions(+), 9 deletions(-)
 
- crypto/Kconfig      |    8 +
- crypto/Makefile     |    1 
- crypto/algif_hash.c |  319 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 328 insertions(+)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 357e3ca..6db27d7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -844,6 +844,14 @@ config CRYPTO_ANSI_CPRNG
- config CRYPTO_USER_API
- 	tristate
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 2222370..9dfbc4a 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -318,6 +318,16 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+ 	omap_set_dma_src_params(dd->dma_lch, 0, OMAP_DMA_AMODE_POST_INC,
+ 				dma_addr, 0, 0);
  
-+config CRYPTO_USER_API_HASH
-+	tristate "User-space interface for hash algorithms"
-+	select CRYPTO_HASH
-+	select CRYPTO_USER_API
-+	help
-+	  This option enables the user-spaces interface for hash
-+	  algorithms.
++	omap_set_dma_dest_params(dd->dma_lch, 0,
++			OMAP_DMA_AMODE_CONSTANT,
++			dd->phys_base + SHA_REG_DIN(0), 0, 16);
 +
- source "drivers/crypto/Kconfig"
++	omap_set_dma_dest_burst_mode(dd->dma_lch,
++			OMAP_DMA_DATA_BURST_16);
++
++	omap_set_dma_src_burst_mode(dd->dma_lch,
++			OMAP_DMA_DATA_BURST_4);
++
+ 	err = omap_sham_write_ctrl(dd, length, final, 1);
+ 	if (err)
+ 		return err;
+@@ -1071,15 +1081,6 @@ static int omap_sham_dma_init(struct omap_sham_dev *dd)
+ 		dev_err(dd->dev, "Unable to request DMA channel\n");
+ 		return err;
+ 	}
+-	omap_set_dma_dest_params(dd->dma_lch, 0,
+-			OMAP_DMA_AMODE_CONSTANT,
+-			dd->phys_base + SHA_REG_DIN(0), 0, 16);
+-
+-	omap_set_dma_dest_burst_mode(dd->dma_lch,
+-			OMAP_DMA_DATA_BURST_16);
+-
+-	omap_set_dma_src_burst_mode(dd->dma_lch,
+-			OMAP_DMA_DATA_BURST_4);
  
- endif	# if CRYPTO
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 0b13197..14ab405 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -86,6 +86,7 @@ obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
- obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
- obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
-+obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
- 
- #
- # generic algorithms and the async_tx api
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-new file mode 100644
-index 0000000..62122a1
---- /dev/null
-+++ b/crypto/algif_hash.c
-@@ -0,0 +1,319 @@
-+/*
-+ * algif_hash: User-space interface for hash algorithms
-+ *
-+ * This file provides the user-space API for hash algorithms.
-+ *
-+ * Copyright (c) 2010 Herbert Xu <herbert@gondor.apana.org.au>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#include <crypto/hash.h>
-+#include <crypto/if_alg.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/net.h>
-+#include <net/sock.h>
-+
-+struct hash_ctx {
-+	struct af_alg_sgl sgl;
-+
-+	u8 *result;
-+
-+	struct af_alg_completion completion;
-+
-+	unsigned int len;
-+	bool more;
-+
-+	struct ahash_request req;
-+};
-+
-+static int hash_sendmsg(struct kiocb *unused, struct socket *sock,
-+			struct msghdr *msg, size_t ignored)
-+{
-+	int limit = ALG_MAX_PAGES * PAGE_SIZE;
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct hash_ctx *ctx = ask->private;
-+	unsigned long iovlen;
-+	struct iovec *iov;
-+	long copied = 0;
-+	int err;
-+
-+	if (limit > sk->sk_sndbuf)
-+		limit = sk->sk_sndbuf;
-+
-+	lock_sock(sk);
-+	if (!ctx->more) {
-+		err = crypto_ahash_init(&ctx->req);
-+		if (err)
-+			goto unlock;
-+	}
-+
-+	ctx->more = 0;
-+
-+	for (iov = msg->msg_iov, iovlen = msg->msg_iovlen; iovlen > 0;
-+	     iovlen--, iov++) {
-+		unsigned long seglen = iov->iov_len;
-+		char __user *from = iov->iov_base;
-+
-+		while (seglen) {
-+			int len = min_t(unsigned long, seglen, limit);
-+			int newlen;
-+
-+			newlen = af_alg_make_sg(&ctx->sgl, from, len, 0);
-+			if (newlen < 0)
-+				goto unlock;
-+
-+			ahash_request_set_crypt(&ctx->req, ctx->sgl.sg, NULL,
-+						newlen);
-+
-+			err = af_alg_wait_for_completion(
-+				crypto_ahash_update(&ctx->req),
-+				&ctx->completion);
-+
-+			af_alg_free_sg(&ctx->sgl);
-+
-+			if (err)
-+				goto unlock;
-+
-+			seglen -= newlen;
-+			from += newlen;
-+			copied += newlen;
-+		}
-+	}
-+
-+	err = 0;
-+
-+	ctx->more = msg->msg_flags & MSG_MORE;
-+	if (!ctx->more) {
-+		ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
-+		err = af_alg_wait_for_completion(crypto_ahash_final(&ctx->req),
-+						 &ctx->completion);
-+	}
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ?: copied;
-+}
-+
-+static ssize_t hash_sendpage(struct socket *sock, struct page *page,
-+			     int offset, size_t size, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct hash_ctx *ctx = ask->private;
-+	int err;
-+
-+	lock_sock(sk);
-+	sg_init_table(ctx->sgl.sg, 1);
-+	sg_set_page(ctx->sgl.sg, page, size, offset);
-+
-+	ahash_request_set_crypt(&ctx->req, ctx->sgl.sg, ctx->result, size);
-+
-+	if (!(flags & MSG_MORE)) {
-+		if (ctx->more)
-+			err = crypto_ahash_finup(&ctx->req);
-+		else
-+			err = crypto_ahash_digest(&ctx->req);
-+	} else {
-+		if (!ctx->more) {
-+			err = crypto_ahash_init(&ctx->req);
-+			if (err)
-+				goto unlock;
-+		}
-+
-+		err = crypto_ahash_update(&ctx->req);
-+	}
-+
-+	err = af_alg_wait_for_completion(err, &ctx->completion);
-+	if (err)
-+		goto unlock;
-+
-+	ctx->more = flags & MSG_MORE;
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ?: size;
-+}
-+
-+static int hash_recvmsg(struct kiocb *unused, struct socket *sock,
-+			struct msghdr *msg, size_t len, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct hash_ctx *ctx = ask->private;
-+	unsigned ds = crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req));
-+	int err;
-+
-+	if (len > ds)
-+		len = ds;
-+	else if (len < ds)
-+		msg->msg_flags |= MSG_TRUNC;
-+
-+	lock_sock(sk);
-+	if (ctx->more) {
-+		ctx->more = 0;
-+		ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
-+		err = af_alg_wait_for_completion(crypto_ahash_final(&ctx->req),
-+						 &ctx->completion);
-+		if (err)
-+			goto unlock;
-+	}
-+
-+	err = memcpy_toiovec(msg->msg_iov, ctx->result, len);
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ?: len;
-+}
-+
-+static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct hash_ctx *ctx = ask->private;
-+	struct ahash_request *req = &ctx->req;
-+	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req))];
-+	struct sock *sk2;
-+	struct alg_sock *ask2;
-+	struct hash_ctx *ctx2;
-+	int err;
-+
-+	err = crypto_ahash_export(req, state);
-+	if (err)
-+		return err;
-+
-+	err = af_alg_accept(ask->parent, newsock);
-+	if (err)
-+		return err;
-+
-+	sk2 = newsock->sk;
-+	ask2 = alg_sk(sk2);
-+	ctx2 = ask2->private;
-+	ctx2->more = 1;
-+
-+	err = crypto_ahash_import(&ctx2->req, state);
-+	if (err) {
-+		sock_orphan(sk2);
-+		sock_put(sk2);
-+	}
-+
-+	return err;
-+}
-+
-+static struct proto_ops algif_hash_ops = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+
-+	.release	=	af_alg_release,
-+	.sendmsg	=	hash_sendmsg,
-+	.sendpage	=	hash_sendpage,
-+	.recvmsg	=	hash_recvmsg,
-+	.accept		=	hash_accept,
-+};
-+
-+static void *hash_bind(const char *name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_ahash(name, type, mask);
-+}
-+
-+static void hash_release(void *private)
-+{
-+	crypto_free_ahash(private);
-+}
-+
-+static int hash_setkey(void *private, const u8 *key, unsigned int keylen)
-+{
-+	return crypto_ahash_setkey(private, key, keylen);
-+}
-+
-+static void hash_sock_destruct(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct hash_ctx *ctx = ask->private;
-+
-+	sock_kfree_s(sk, ctx->result,
-+		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
-+	sock_kfree_s(sk, ctx, ctx->len);
-+	af_alg_release_parent(sk);
-+}
-+
-+static int hash_accept_parent(void *private, struct sock *sk)
-+{
-+	struct hash_ctx *ctx;
-+	struct alg_sock *ask = alg_sk(sk);
-+	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(private);
-+	unsigned ds = crypto_ahash_digestsize(private);
-+
-+	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->result = sock_kmalloc(sk, ds, GFP_KERNEL);
-+	if (!ctx->result) {
-+		sock_kfree_s(sk, ctx, len);
-+		return -ENOMEM;
-+	}
-+
-+	memset(ctx->result, 0, ds);
-+
-+	ctx->len = len;
-+	ctx->more = 0;
-+	af_alg_init_completion(&ctx->completion);
-+
-+	ask->private = ctx;
-+
-+	ahash_request_set_tfm(&ctx->req, private);
-+	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				   af_alg_complete, &ctx->completion);
-+
-+	sk->sk_destruct = hash_sock_destruct;
-+
-+	return 0;
-+}
-+
-+static const struct af_alg_type algif_type_hash = {
-+	.bind		=	hash_bind,
-+	.release	=	hash_release,
-+	.setkey		=	hash_setkey,
-+	.accept		=	hash_accept_parent,
-+	.ops		=	&algif_hash_ops,
-+	.name		=	"hash",
-+	.owner		=	THIS_MODULE
-+};
-+
-+static int __init algif_hash_init(void)
-+{
-+	return af_alg_register_type(&algif_type_hash);
-+}
-+
-+static void __exit algif_hash_exit(void)
-+{
-+	int err = af_alg_unregister_type(&algif_type_hash);
-+	BUG_ON(err);
-+}
-+
-+module_init(algif_hash_init);
-+module_exit(algif_hash_exit);
-+MODULE_LICENSE("GPL");
+ 	return 0;
+ }
+-- 
+1.7.0.4
