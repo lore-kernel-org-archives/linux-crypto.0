@@ -1,60 +1,33 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: [PATCH v3 7/8] omap-sham: FLAGS_FIRST is redundant and removed
-Date: Fri, 19 Nov 2010 16:04:28 +0200
-Message-ID: <d6513e13801b26221067cd1893960f6c58989dd0.1290174993.git.dmitry.kasatkin@nokia.com>
-References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
-To: herbert@gondor.hengli.com.au
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
-In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
-References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
-Sender: linux-omap-owner@vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v1.4 1/5] lib: hex2bin converts ascii hexadecimal string to binary
+Date: Fri, 19 Nov 2010 15:43:03 +0000
+Message-ID: <9780.1290181383@redhat.com>
+References: <1290120166-3132-2-git-send-email-zohar@linux.vnet.ibm.com> <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1290120166-3132-2-git-send-email-zohar@linux.vnet.ibm.com>
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-bufcnt is 0 if it was no update requests before,
-which is exact meaning of FLAGS_FIRST.
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
----
- drivers/crypto/omap-sham.c |    8 +-------
- 1 files changed, 1 insertions(+), 7 deletions(-)
+> Similar to the kgdb_hex2mem() code, hex2bin converts a string
+> to binary using the hex_to_bin() library call.
+> 
+> Changelog:
+> - Replace parameter names with src/dst (based on David Howell's comment)
+> - Add 'const' where needed (based on David Howell's comment)
+> - Replace int with size_t (based on David Howell's comment)
+> 
+> Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
+> Acked-by: Serge E. Hallyn <serge@hallyn.com>
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index c8d30eb..d88d7eb 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -72,7 +72,6 @@
- 
- #define DEFAULT_TIMEOUT_INTERVAL	HZ
- 
--#define FLAGS_FIRST		0x0001
- #define FLAGS_FINUP		0x0002
- #define FLAGS_FINAL		0x0004
- #define FLAGS_FAST		0x0008
-@@ -513,8 +512,6 @@ static int omap_sham_init(struct ahash_request *req)
- 
- 	ctx->flags = 0;
- 
--	ctx->flags |= FLAGS_FIRST;
--
- 	dev_dbg(dd->dev, "init: digest size: %d\n",
- 		crypto_ahash_digestsize(tfm));
- 
-@@ -739,12 +736,9 @@ static int omap_sham_update(struct ahash_request *req)
- 			/* may be can use faster functions */
- 			int aligned = IS_ALIGNED((u32)ctx->sg->offset,
- 								sizeof(u32));
--
--			if (aligned && (ctx->flags & FLAGS_FIRST))
-+			if (aligned)
- 				/* digest: first and final */
- 				ctx->flags |= FLAGS_FAST;
--
--			ctx->flags &= ~FLAGS_FIRST;
- 		}
- 	} else if (ctx->bufcnt + ctx->total <= ctx->buflen) {
- 		/* if not finaup -> not fast */
--- 
-1.7.0.4
-
+Acked-by: David Howells <dhowells@redhat.com>
