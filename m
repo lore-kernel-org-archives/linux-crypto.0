@@ -1,139 +1,216 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: [PATCH v3 4/8] omap-sham: removed redundunt locking
-Date: Fri, 19 Nov 2010 16:04:25 +0200
-Message-ID: <53d610dbd84e3d333c485162a33eb5799c8997e6.1290174993.git.dmitry.kasatkin@nokia.com>
+Subject: [PATCH v3 3/8] omap-sham: error handling improved
+Date: Fri, 19 Nov 2010 16:04:24 +0200
+Message-ID: <c6b3b7653260071d86c6af8936163d2a94c813a2.1290174993.git.dmitry.kasatkin@nokia.com>
 References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
 To: herbert@gondor.hengli.com.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.1.47]:58023 "EHLO mgw-sa01.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754375Ab0KSOD5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Nov 2010 09:03:57 -0500
+Return-path: <linux-omap-owner@vger.kernel.org>
 In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
 In-Reply-To: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
 References: <cover.1290174993.git.dmitry.kasatkin@nokia.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Locking for queuing and dequeuing is combined.
-test_and_set_bit() is also replaced with checking under dd->lock.
+Introduces DMA error handling.
+
+DMA error is returned as a result code of the hash request.
+Clients needs to handle error codes and may repeat hash calculation attempt.
+
+Also in the case of DMA error, SHAM module is set to be re-initialized again.
+It significantly improves stability against possible HW failures.
 
 Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
- drivers/crypto/omap-sham.c |   47 +++++++++++++++++++------------------------
- 1 files changed, 21 insertions(+), 26 deletions(-)
+ drivers/crypto/omap-sham.c |   67 +++++++++++++++++++++++++++++---------------
+ 1 files changed, 44 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index db20628..6340c5e 100644
+index 9dfbc4a..db20628 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -84,9 +84,7 @@
+@@ -83,6 +83,7 @@
+ #define FLAGS_INIT		0x0100
  #define FLAGS_CPU		0x0200
  #define FLAGS_HMAC		0x0400
- #define FLAGS_ERROR		0x0800
--
--/* 3rd byte */
--#define FLAGS_BUSY		16
-+#define FLAGS_BUSY		0x1000
++#define FLAGS_ERROR		0x0800
  
- #define OP_UPDATE	1
- #define OP_FINAL	2
-@@ -629,32 +627,37 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
- 	if ((ctx->flags & FLAGS_FINAL) || err)
+ /* 3rd byte */
+ #define FLAGS_BUSY		16
+@@ -137,6 +138,7 @@ struct omap_sham_dev {
+ 	int			irq;
+ 	struct clk		*iclk;
+ 	spinlock_t		lock;
++	int			err;
+ 	int			dma;
+ 	int			dma_lch;
+ 	struct tasklet_struct	done_task;
+@@ -234,10 +236,12 @@ static int omap_sham_write_ctrl(struct omap_sham_dev *dd, size_t length,
+ 				SHA_REG_MASK_SOFTRESET, SHA_REG_MASK_SOFTRESET);
+ 
+ 			if (omap_sham_wait(dd, SHA_REG_SYSSTATUS,
+-						SHA_REG_SYSSTATUS_RESETDONE))
++						SHA_REG_SYSSTATUS_RESETDONE)) {
++				clk_disable(dd->iclk);
+ 				return -ETIMEDOUT;
+-
++			}
+ 			dd->flags |= FLAGS_INIT;
++			dd->err = 0;
+ 		}
+ 	} else {
+ 		omap_sham_write(dd, SHA_REG_DIGCNT, ctx->digcnt);
+@@ -279,11 +283,12 @@ static int omap_sham_xmit_cpu(struct omap_sham_dev *dd, const u8 *buf,
+ 	if (err)
+ 		return err;
+ 
++	/* should be non-zero before next lines to disable clocks later */
++	ctx->digcnt += length;
++
+ 	if (omap_sham_wait(dd, SHA_REG_CTRL, SHA_REG_CTRL_INPUT_READY))
+ 		return -ETIMEDOUT;
+ 
+-	ctx->digcnt += length;
+-
+ 	if (final)
+ 		ctx->flags |= FLAGS_FINAL; /* catch last interrupt */
+ 
+@@ -303,7 +308,6 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+ 
+ 	dev_dbg(dd->dev, "xmit_dma: digcnt: %d, length: %d, final: %d\n",
+ 						ctx->digcnt, length, final);
+-
+ 	/* flush cache entries related to our page */
+ 	if (dma_addr == ctx->dma_addr)
+ 		dma_sync_single_for_device(dd->dev, dma_addr, length,
+@@ -411,6 +415,7 @@ static int omap_sham_update_dma_fast(struct omap_sham_dev *dd)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+ 	unsigned int length;
++	int err;
+ 
+ 	ctx->flags |= FLAGS_FAST;
+ 
+@@ -424,7 +429,11 @@ static int omap_sham_update_dma_fast(struct omap_sham_dev *dd)
+ 
+ 	ctx->total -= length;
+ 
+-	return omap_sham_xmit_dma(dd, sg_dma_address(ctx->sg), length, 1);
++	err = omap_sham_xmit_dma(dd, sg_dma_address(ctx->sg), length, 1);
++	if (err != -EINPROGRESS)
++		dma_unmap_sg(dd->dev, ctx->sg, 1, DMA_TO_DEVICE);
++
++	return err;
+ }
+ 
+ static int omap_sham_update_cpu(struct omap_sham_dev *dd)
+@@ -580,9 +589,6 @@ static int omap_sham_final_req(struct omap_sham_dev *dd)
+ 
+ 	ctx->bufcnt = 0;
+ 
+-	if (err != -EINPROGRESS)
+-		omap_sham_cleanup(req);
+-
+ 	dev_dbg(dd->dev, "final_req: err: %d\n", err);
+ 
+ 	return err;
+@@ -616,9 +622,11 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+ 		omap_sham_copy_hash(ctx->dd->req, 1);
+ 		if (ctx->flags & FLAGS_HMAC)
+ 			err = omap_sham_finish_req_hmac(req);
++	} else {
++		ctx->flags |= FLAGS_ERROR;
+ 	}
+ 
+-	if (ctx->flags & FLAGS_FINAL)
++	if ((ctx->flags & FLAGS_FINAL) || err)
  		omap_sham_cleanup(req);
  
--	clear_bit(FLAGS_BUSY, &ctx->dd->flags);
-+	ctx->dd->flags &= ~FLAGS_BUSY;
+ 	clear_bit(FLAGS_BUSY, &ctx->dd->flags);
+@@ -776,12 +784,14 @@ static int omap_sham_final(struct ahash_request *req)
  
- 	if (req->base.complete)
- 		req->base.complete(&req->base, err);
- }
+ 	ctx->flags |= FLAGS_FINUP;
  
--static int omap_sham_handle_queue(struct omap_sham_dev *dd)
-+static int omap_sham_handle_queue(struct omap_sham_dev *dd,
-+				  struct ahash_request *req)
- {
- 	struct crypto_async_request *async_req, *backlog;
- 	struct omap_sham_reqctx *ctx;
--	struct ahash_request *req, *prev_req;
-+	struct ahash_request *prev_req;
- 	unsigned long flags;
--	int err = 0;
--
--	if (test_and_set_bit(FLAGS_BUSY, &dd->flags))
--		return 0;
-+	int err = 0, ret = 0;
- 
- 	spin_lock_irqsave(&dd->lock, flags);
--	backlog = crypto_get_backlog(&dd->queue);
-+	if (req)
-+		ret = ahash_enqueue_request(&dd->queue, req);
-+	if (dd->flags & FLAGS_BUSY) {
-+		spin_unlock_irqrestore(&dd->lock, flags);
-+		return ret;
+-	/* OMAP HW accel works only with buffers >= 9 */
+-	/* HMAC is always >= 9 because of ipad */
+-	if ((ctx->digcnt + ctx->bufcnt) < 9)
+-		err = omap_sham_final_shash(req);
+-	else if (ctx->bufcnt)
+-		return omap_sham_enqueue(req, OP_FINAL);
++	if (!(ctx->flags & FLAGS_ERROR)) {
++		/* OMAP HW accel works only with buffers >= 9 */
++		/* HMAC is always >= 9 because of ipad */
++		if ((ctx->digcnt + ctx->bufcnt) < 9)
++			err = omap_sham_final_shash(req);
++		else if (ctx->bufcnt)
++			return omap_sham_enqueue(req, OP_FINAL);
 +	}
- 	async_req = crypto_dequeue_request(&dd->queue);
--	if (!async_req)
--		clear_bit(FLAGS_BUSY, &dd->flags);
-+	if (async_req) {
-+		dd->flags |= FLAGS_BUSY;
-+		backlog = crypto_get_backlog(&dd->queue);
-+	}
- 	spin_unlock_irqrestore(&dd->lock, flags);
  
- 	if (!async_req)
--		return 0;
-+		return ret;
+ 	omap_sham_cleanup(req);
  
- 	if (backlog)
- 		backlog->complete(backlog, -EINPROGRESS);
-@@ -690,7 +693,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd)
+@@ -851,6 +861,8 @@ static int omap_sham_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
+ 	struct omap_sham_ctx *tctx = crypto_tfm_ctx(tfm);
+ 	const char *alg_name = crypto_tfm_alg_name(tfm);
  
- 	dev_dbg(dd->dev, "exit, err: %d\n", err);
- 
--	return err;
-+	return ret;
- }
- 
- static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
-@@ -698,18 +701,10 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
- 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
- 	struct omap_sham_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
- 	struct omap_sham_dev *dd = tctx->dd;
--	unsigned long flags;
--	int err;
- 
- 	ctx->op = op;
- 
--	spin_lock_irqsave(&dd->lock, flags);
--	err = ahash_enqueue_request(&dd->queue, req);
--	spin_unlock_irqrestore(&dd->lock, flags);
--
--	omap_sham_handle_queue(dd);
--
--	return err;
-+	return omap_sham_handle_queue(dd, req);
- }
- 
- static int omap_sham_update(struct ahash_request *req)
-@@ -1041,7 +1036,7 @@ static void omap_sham_done_task(unsigned long data)
- 		/* finish curent request */
- 		omap_sham_finish_req(req, err);
- 		/* start new request */
--		omap_sham_handle_queue(dd);
-+		omap_sham_handle_queue(dd, NULL);
- 	}
- }
- 
-@@ -1049,7 +1044,7 @@ static void omap_sham_queue_task(unsigned long data)
- {
++	pr_info("enter\n");
++
+ 	/* Allocate a fallback and abort if it failed. */
+ 	tctx->fallback = crypto_alloc_shash(alg_name, 0,
+ 					    CRYPTO_ALG_NEED_FALLBACK);
+@@ -1008,7 +1020,7 @@ static void omap_sham_done_task(unsigned long data)
  	struct omap_sham_dev *dd = (struct omap_sham_dev *)data;
+ 	struct ahash_request *req = dd->req;
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	int ready = 1;
++	int ready = 0, err = 0;
  
--	omap_sham_handle_queue(dd);
-+	omap_sham_handle_queue(dd, NULL);
+ 	if (ctx->flags & FLAGS_OUTPUT_READY) {
+ 		ctx->flags &= ~FLAGS_OUTPUT_READY;
+@@ -1018,13 +1030,16 @@ static void omap_sham_done_task(unsigned long data)
+ 	if (dd->flags & FLAGS_DMA_ACTIVE) {
+ 		dd->flags &= ~FLAGS_DMA_ACTIVE;
+ 		omap_sham_update_dma_stop(dd);
+-		omap_sham_update_dma_slow(dd);
++		if (!dd->err)
++			err = omap_sham_update_dma_slow(dd);
+ 	}
+ 
+-	if (ready && !(dd->flags & FLAGS_DMA_ACTIVE)) {
+-		dev_dbg(dd->dev, "update done\n");
++	err = dd->err ? : err;
++
++	if (err != -EINPROGRESS && (ready || err)) {
++		dev_dbg(dd->dev, "update done: err: %d\n", err);
+ 		/* finish curent request */
+-		omap_sham_finish_req(req, 0);
++		omap_sham_finish_req(req, err);
+ 		/* start new request */
+ 		omap_sham_handle_queue(dd);
+ 	}
+@@ -1056,6 +1071,7 @@ static irqreturn_t omap_sham_irq(int irq, void *dev_id)
+ 	omap_sham_read(dd, SHA_REG_CTRL);
+ 
+ 	ctx->flags |= FLAGS_OUTPUT_READY;
++	dd->err = 0;
+ 	tasklet_schedule(&dd->done_task);
+ 
+ 	return IRQ_HANDLED;
+@@ -1065,8 +1081,13 @@ static void omap_sham_dma_callback(int lch, u16 ch_status, void *data)
+ {
+ 	struct omap_sham_dev *dd = data;
+ 
+-	if (likely(lch == dd->dma_lch))
+-		tasklet_schedule(&dd->done_task);
++	if (ch_status != OMAP_DMA_BLOCK_IRQ) {
++		pr_err("omap-sham DMA error status: 0x%hx\n", ch_status);
++		dd->err = -EIO;
++		dd->flags &= ~FLAGS_INIT; /* request to re-initialize */
++	}
++
++	tasklet_schedule(&dd->done_task);
  }
  
- static irqreturn_t omap_sham_irq(int irq, void *dev_id)
+ static int omap_sham_dma_init(struct omap_sham_dev *dd)
 -- 
 1.7.0.4
+
