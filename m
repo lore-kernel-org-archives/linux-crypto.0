@@ -1,202 +1,124 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [RFC] [PATCH] iproute2: Add IPsec extended sequence number support
-Date: Mon, 22 Nov 2010 11:37:13 +0100
-Message-ID: <20101122103713.GO1868@secunet.com>
-References: <20101122102455.GC1868@secunet.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1.4 5/5] keys: add new key-type encrypted
+Date: Mon, 22 Nov 2010 07:16:01 -0500
+Message-ID: <1290428161.2604.6.camel@localhost.localdomain>
+References: <1290120166-3132-6-git-send-email-zohar@linux.vnet.ibm.com>
+	 <1290120166-3132-1-git-send-email-zohar@linux.vnet.ibm.com>
+	 <10563.1290185000@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Gruenbacher <agruen@suse.de>,
-	Alex Badea <abadea@ixiacom.com>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:37302 "EHLO a.mx.secunet.com"
+Received: from e7.ny.us.ibm.com ([32.97.182.137]:52234 "EHLO e7.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753696Ab0KVKhV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Nov 2010 05:37:21 -0500
-Content-Disposition: inline
-In-Reply-To: <20101122102455.GC1868@secunet.com>
+	id S1755221Ab0KVMQH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Nov 2010 07:16:07 -0500
+In-Reply-To: <10563.1290185000@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Fri, 2010-11-19 at 16:43 +0000, David Howells wrote: 
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+> 
+> > +static int datablob_format(char __user *buffer,
+> > +			   struct encrypted_key_payload *epayload,
+> > +			   int asciiblob_len)
+> 
+> size_t?  There are other instances where you should be using size_t too.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- include/linux/xfrm.h |   12 ++++++++++++
- ip/ipxfrm.c          |    8 +++++++-
- ip/xfrm_state.c      |   37 +++++++++++++++++++++++++++++--------
- 3 files changed, 48 insertions(+), 9 deletions(-)
+Most of the crypto library calls use "unsigned int". Obviously didn't
+quite get everything else. Will look again.  thanks.
 
-diff --git a/include/linux/xfrm.h b/include/linux/xfrm.h
-index 07f2b63..dd6928d 100644
---- a/include/linux/xfrm.h
-+++ b/include/linux/xfrm.h
-@@ -84,6 +84,16 @@ struct xfrm_replay_state {
- 	__u32	bitmap;
- };
- 
-+struct xfrm_replay_state_esn {
-+	unsigned int	len;
-+	__u32	oseq;
-+	__u32	oseq_hi;
-+	__u32	seq;
-+	__u32	seq_hi;
-+	__u32	replay_window;
-+	__u32	bmp[0];
-+};
-+
- struct xfrm_algo {
- 	char		alg_name[64];
- 	unsigned int	alg_key_len;    /* in bits */
-@@ -283,6 +293,7 @@ enum xfrm_attr_type_t {
- 	XFRMA_KMADDRESS,        /* struct xfrm_user_kmaddress */
- 	XFRMA_ALG_AUTH_TRUNC,	/* struct xfrm_algo_auth */
- 	XFRMA_MARK,		/* struct xfrm_mark */
-+	XFRMA_REPLAY_ESN_VAL,	/* struct xfrm_replay_esn */
- 	__XFRMA_MAX
- 
- #define XFRMA_MAX (__XFRMA_MAX - 1)
-@@ -349,6 +360,7 @@ struct xfrm_usersa_info {
- #define XFRM_STATE_WILDRECV	8
- #define XFRM_STATE_ICMP		16
- #define XFRM_STATE_AF_UNSPEC	32
-+#define XFRM_STATE_ESN          64
- };
- 
- struct xfrm_usersa_id {
-diff --git a/ip/ipxfrm.c b/ip/ipxfrm.c
-index 99a6756..548e4a4 100644
---- a/ip/ipxfrm.c
-+++ b/ip/ipxfrm.c
-@@ -665,6 +665,12 @@ done:
- void xfrm_xfrma_print(struct rtattr *tb[], __u16 family,
- 		      FILE *fp, const char *prefix)
- {
-+
-+	if (tb[XFRMA_REPLAY_ESN_VAL]) {
-+		struct rtattr *rta = tb[XFRMA_REPLAY_ESN_VAL];
-+		struct xfrm_replay_state_esn *repl = (struct xfrm_replay_state_esn *) RTA_DATA(rta);
-+		fprintf(fp, "\treplay-window %u\n", repl->replay_window);
-+	}
- 	if (tb[XFRMA_MARK]) {
- 		struct rtattr *rta = tb[XFRMA_MARK];
- 		struct xfrm_mark *m = (struct xfrm_mark *) RTA_DATA(rta);
-@@ -809,7 +815,6 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
- 	STRBUF_CAT(buf, "\t");
- 
- 	fputs(buf, fp);
--	fprintf(fp, "replay-window %u ", xsinfo->replay_window);
- 	if (show_stats > 0)
- 		fprintf(fp, "seq 0x%08u ", xsinfo->seq);
- 	if (show_stats > 0 || xsinfo->flags) {
-@@ -822,6 +827,7 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
- 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_WILDRECV, "wildrecv");
- 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_ICMP, "icmp");
- 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_AF_UNSPEC, "af-unspec");
-+		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_ESN, "replay-esn");
- 		if (flags)
- 			fprintf(fp, "%x", flags);
- 	}
-diff --git a/ip/xfrm_state.c b/ip/xfrm_state.c
-index 38d4039..4c66923 100644
---- a/ip/xfrm_state.c
-+++ b/ip/xfrm_state.c
-@@ -50,15 +50,16 @@
- #define NLMSG_BUF_SIZE 4096
- #define RTA_BUF_SIZE 2048
- #define XFRM_ALGO_KEY_BUF_SIZE 512
-+#define XFRM_REPLAY_BMP_SIZE_U32 16
- 
- static void usage(void) __attribute__((noreturn));
- 
- static void usage(void)
- {
- 	fprintf(stderr, "Usage: ip xfrm state { add | update } ID [ XFRM_OPT ] [ mode MODE ]\n");
--	fprintf(stderr, "        [ reqid REQID ] [ seq SEQ ] [ replay-window SIZE ] [ flag FLAG-LIST ]\n");
-+	fprintf(stderr, "        [ reqid REQID ] [ seq SEQ ][ replay-window SIZE ] [ flag FLAG-LIST ]\n");
- 	fprintf(stderr, "        [ encap ENCAP ] [ sel SELECTOR ] [ replay-seq SEQ ]\n");
--	fprintf(stderr, "        [ replay-oseq SEQ ] [ LIMIT-LIST ]\n");
-+	fprintf(stderr, "        [ replay-oseq SEQ ] [ replay-seqhi SEQ ] [ replay-oseqhi SEQ ] [ LIMIT-LIST ]\n");
- 	fprintf(stderr, "Usage: ip xfrm state allocspi ID [ mode MODE ] [ reqid REQID ] [ seq SEQ ]\n");
- 	fprintf(stderr, "        [ min SPI max SPI ]\n");
- 	fprintf(stderr, "Usage: ip xfrm state { delete | get } ID\n");
-@@ -214,6 +215,8 @@ static int xfrm_state_flag_parse(__u8 *flags, int *argcp, char ***argvp)
- 				*flags |= XFRM_STATE_ICMP;
- 			else if (strcmp(*argv, "af-unspec") == 0)
- 				*flags |= XFRM_STATE_AF_UNSPEC;
-+			else if (strcmp(*argv, "replay-esn") == 0)
-+				*flags |= XFRM_STATE_ESN;
- 			else {
- 				PREV_ARG(); /* back track */
- 				break;
-@@ -239,7 +242,11 @@ static int xfrm_state_modify(int cmd, unsigned flags, int argc, char **argv)
- 		struct xfrm_usersa_info xsinfo;
- 		char   			buf[RTA_BUF_SIZE];
- 	} req;
--	struct xfrm_replay_state replay;
-+	struct {
-+		struct xfrm_replay_state_esn state;
-+		__u32 bmp[XFRM_REPLAY_BMP_SIZE_U32];
-+	} replay;
-+
- 	char *idp = NULL;
- 	char *aeadop = NULL;
- 	char *ealgop = NULL;
-@@ -249,8 +256,11 @@ static int xfrm_state_modify(int cmd, unsigned flags, int argc, char **argv)
- 	struct xfrm_mark mark = {0, 0};
- 
- 	memset(&req, 0, sizeof(req));
-+
- 	memset(&replay, 0, sizeof(replay));
- 
-+	replay.state.len = sizeof(replay);
-+
- 	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.xsinfo));
- 	req.n.nlmsg_flags = NLM_F_REQUEST|flags;
- 	req.n.nlmsg_type = cmd;
-@@ -275,16 +285,24 @@ static int xfrm_state_modify(int cmd, unsigned flags, int argc, char **argv)
- 			xfrm_seq_parse(&req.xsinfo.seq, &argc, &argv);
- 		} else if (strcmp(*argv, "replay-window") == 0) {
- 			NEXT_ARG();
--			if (get_u8(&req.xsinfo.replay_window, *argv, 0))
-+			if (get_u32(&replay.state.replay_window, *argv, 0))
- 				invarg("\"replay-window\" value is invalid", *argv);
- 		} else if (strcmp(*argv, "replay-seq") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&replay.seq, *argv, 0))
-+			if (get_u32(&replay.state.seq, *argv, 0))
- 				invarg("\"replay-seq\" value is invalid", *argv);
- 		} else if (strcmp(*argv, "replay-oseq") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&replay.oseq, *argv, 0))
-+			if (get_u32(&replay.state.oseq, *argv, 0))
- 				invarg("\"replay-oseq\" value is invalid", *argv);
-+		} else if (strcmp(*argv, "replay-seqhi") == 0) {
-+			NEXT_ARG();
-+			if (get_u32(&replay.state.seq_hi, *argv, 0))
-+				invarg("\"replay-seqhi\" value is invalid", *argv);
-+		} else if (strcmp(*argv, "replay-oseqhi") == 0) {
-+			NEXT_ARG();
-+			if (get_u32(&replay.state.oseq_hi, *argv, 0))
-+				invarg("\"replay-oseqhi\" value is invalid", *argv);
- 		} else if (strcmp(*argv, "flag") == 0) {
- 			NEXT_ARG();
- 			xfrm_state_flag_parse(&req.xsinfo.flags, &argc, &argv);
-@@ -434,9 +452,12 @@ parse_algo:
- 		argc--; argv++;
- 	}
- 
--	if (replay.seq || replay.oseq)
--		addattr_l(&req.n, sizeof(req.buf), XFRMA_REPLAY_VAL,
-+	if (replay.state.replay_window || replay.state.seq || replay.state.oseq ||
-+	    replay.state.seq_hi || replay.state.oseq_hi ) {
-+
-+		addattr_l(&req.n, sizeof(req.buf), XFRMA_REPLAY_ESN_VAL,
- 			  (void *)&replay, sizeof(replay));
-+	}
- 
- 	if (!idp) {
- 		fprintf(stderr, "Not enough information: \"ID\" is required\n");
--- 
-1.7.0.4
+> > +	index = strcspn(epayload->master_desc, ":");
+> > +	if (index == strlen(epayload->master_desc))
+> > +		goto out;
+> 
+> For single chars, use strchr() rather than strcspn(), and if you happen to
+> know the length too, use memchr().  This also means you don't need to do the
+> strlen() again to check the result.
+
+Don't have the length, but getting it once and then using strchr/memchr,
+should work. thanks.
+
+> > +	memset(derived_key, 0, sizeof derived_key);
+> > +	ret = get_derived_key(derived_key, AUTH_KEY, master_key, master_keylen)
+> 
+> Is the memset() actually necessary?
+
+not sure, will check.
+
+> > +	decrypted_datalen = (unsigned short)dlen;
+> 
+> Unnecessary cast.
+
+ok
+
+> > +	*(datablob + datalen) = 0;
+> > +	*(buf + datalen) = 0;
+> 
+> Use [].
+
+> > +	if (index == strlen(new_master_desc)
+> > +	    || (strncmp(new_master_desc, epayload->master_desc, index) != 0)) {
+> 
+> Superfluous brackets.
+> 
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+> 
+> > +	mkey = request_master_key(epayload, &master_key, &master_keylen);
+> > +	if (IS_ERR(mkey))
+> > +		return PTR_ERR(mkey);
+> > +
+> > +	memset(derived_key, 0, sizeof derived_key);
+> > +	ret = get_derived_key(derived_key, ENC_KEY, master_key, master_keylen);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	ret = derived_key_encrypt(epayload, derived_key, sizeof derived_key);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	ret = datablob_hmac_append(epayload, master_key, master_keylen);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	ret = datablob_format(buffer, epayload, asciiblob_len);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	rcu_read_unlock();
+> 
+> NAK!  This is not safe.  You may not sleep whilst you hold the RCU read lock
+> on the master key.  At the very least, datablob_format() may sleep as it
+> writes to userspace.
+
+datablob_format() could be split up into formatting the string returned
+to userspace and copying it userspace, releasing the lock before copying
+it, but that wouldn't resolve the other places it may sleep, like alloc.
+
+> I think what you should do is ignore RCU entirely and read lock the master
+> key's semaphore.
+
+thanks, will do.
+
+> > +	ret = aes_get_sizes();
+> > +	return ret;
+> 
+> Merge.
+> 
+> David
+
+ok
+
+thanks,
+
+Mimi
