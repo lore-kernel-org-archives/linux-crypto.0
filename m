@@ -1,51 +1,128 @@
-From: Eric Paris <eparis@redhat.com>
-Subject: Re: [PATCH 1/5] Add general crypto auditing infrastructure
-Date: Tue, 23 Nov 2010 13:37:11 -0500
-Message-ID: <1290537431.1443.22.camel@localhost.localdomain>
-References: <1446795227.263741290536751501.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sgrubb@redhat.com, herbert@gondor.hengli.com.au,
-	linux-audit@redhat.com, linux-crypto@vger.kernel.org
-To: Miloslav Trmac <mitr@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44333 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752033Ab0KWShV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Nov 2010 13:37:21 -0500
-In-Reply-To: <1446795227.263741290536751501.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: [PATCH v1.5 0/5] keys: trusted and encrypted keys
+Date: Tue, 23 Nov 2010 17:50:30 -0500
+Message-ID: <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2010-11-23 at 13:25 -0500, Miloslav Trmac wrote:
-> ----- "Eric Paris" <eparis@redhat.com> wrote:
-> > On Tue, 2010-11-23 at 13:50 +0100, Miloslav Trma=C4=8D wrote:
-> > > Collect audited crypto operations in a list, because a single _ex=
-it()
-> > > can cause several AF_ALG sockets to be closed, and each needs to =
-be
-> > > audited.
-> > >=20
-> > > Add the AUDIT_CRYPTO_OP field so that crypto operations are not
-> > audited
-> > > by default, but auditing can be enabled using a rule (probably
-> > > "-F crypto_op!=3D0").
-> >=20
-> > Just an implementation question, why a new list instead of finding =
-a
-> way
-> > to reuse struct audit_aux_data?
-> This remained in the code from an earlier version where the relative
-> order of crypto records was meaningful.  In the current version the
-> only difference is that an AUDIT_CRYPTO_OP filter has to traverse
-> fewer entries.
+Changes in this patchset were again based on David Howell's comments,
+including an encrypted key locking bugfix. The remaining changes are
+listed in the individual patch changelogs. (This patchset applies to
+security-testing/#next.)
 
-It probably won't actually have to traverse extra entries.  We shouldn'=
-t
-(at least that I can think of) ever have a single syscall which is goin=
-g
-to have crypto, execve, signal, fcaps, etc. records simultaneously.  In
-any case, if you send another round, I'd suggest reuse or aux.
+Trusted and Encrypted Keys are two new key types added to the existing
+kernel key ring service. Both of these new types are variable length
+symmetic keys, and in both cases all keys are created in the kernel, and
+user space sees, stores, and loads only encrypted blobs.  Trusted Keys
+require the availability of a Trusted Platform Module (TPM) chip for
+greater security, while Encrypted Keys can be used on any system. All
+user level blobs, are displayed and loaded in hex ascii for convenience,
+and are integrity verified.  
 
--Eric
+Trusted Keys use a TPM both to generate and to seal the keys.  Keys are
+sealed under a 2048 bit RSA key in the TPM, and optionally sealed to
+specified PCR (integrity measurement) values, and only unsealed by the
+TPM, if PCRs and blob integrity verifications match.  A loaded Trusted
+Key can be updated with new (future) PCR values, so keys are easily
+migrated to new pcr values, such as when the kernel and initramfs are
+updated.  The same key can have many saved blobs under different PCR
+values, so multiple boots are easily supported.
+
+By default, trusted keys are sealed under the SRK, which has the default
+authorization value (20 zeros).  This can be set at takeownership time
+with the trouser's utility: "tpm_takeownership -u -z".
+
+Usage:
+    keyctl add trusted name "new keylen [options]" ring
+    keyctl add trusted name "load hex_blob [pcrlock=pcrnum]" ring
+    keyctl update key "update [options]"
+    keyctl print keyid
+
+    options:
+       keyhandle= ascii hex value of sealing key default 0x40000000 (SRK)
+       keyauth=	  ascii hex auth for sealing key default 0x00...
+		  (40 ascii zeros)
+       blobauth=  ascii hex auth for sealed data default 0x00...
+		  (40 ascii zeros)
+       pcrinfo=	  ascii hex of PCR_INFO or PCR_INFO_LONG (no default)
+       pcrlock=	  pcr number to be extended to "lock" blob
+       migratable= 0|1 indicating permission to reseal to new PCR values, 
+                   default 1 (resealing allowed)
+
+keyctl print returns an ascii hex copy of the sealed key, which is in
+standard TPM_STORED_DATA format.  The key length for new keys are always
+in bytes.  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits), the
+upper limit is to fit within the 2048 bit SRK (RSA) keylength, with all
+necessary structure/padding. 
+
+Encrypted keys do not depend on a TPM, and are faster, as they use AES
+for encryption/decryption.  New keys are created from kernel generated
+random numbers, and are encrypted/decrypted using a specified 'master'
+key.  The 'master' key can either be a trusted-key or user-key type. The
+main disadvantage of encrypted keys is that if they are not rooted in a
+trusted key, they are only as secure as the user key encrypting them.
+The master user key should therefore be loaded in as secure a way as
+possible, preferably early in boot.
+
+Usage:
+  keyctl add encrypted name "new master-key-name keylen" ring
+  keyctl add encrypted name "load hex_blob" ring
+  keyctl update keyid "update master-key-name"
+
+where 'key-type' is either 'trusted' or 'user'.
+
+The initial consumer of trusted keys is EVM, which at boot time needs a
+high quality symmetric key for HMAC protection of file metadata. The use
+of a trusted key provides strong guarantees that the EVM key has not
+been compromised by a user level problem, and when sealed to specific
+boot PCR values, protects against boot and offline attacks.  Other uses
+for trusted and encrypted keys, such as for disk and file encryption are
+anticipated.
+
+Mimi Zohar
+David Safford
+
+Mimi Zohar (5):
+  lib: hex2bin converts ascii hexadecimal string to binary
+  tpm: add module_put wrapper
+  key: add tpm_send command
+  keys: add new trusted key-type
+  keys: add new key-type encrypted
+
+ Documentation/keys-trusted-encrypted.txt |  145 ++++
+ drivers/char/tpm/tpm.c                   |   20 +-
+ drivers/char/tpm/tpm.h                   |    5 +
+ include/keys/encrypted-type.h            |   29 +
+ include/keys/trusted-type.h              |   31 +
+ include/linux/kernel.h                   |    1 +
+ include/linux/tpm.h                      |    4 +
+ include/linux/tpm_command.h              |   28 +
+ lib/hexdump.c                            |   16 +
+ security/Kconfig                         |   31 +
+ security/keys/Makefile                   |    2 +
+ security/keys/encrypted_defined.c        |  907 +++++++++++++++++++++++
+ security/keys/encrypted_defined.h        |   56 ++
+ security/keys/trusted_defined.c          | 1151 ++++++++++++++++++++++++++++++
+ security/keys/trusted_defined.h          |  134 ++++
+ 15 files changed, 2558 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/keys-trusted-encrypted.txt
+ create mode 100644 include/keys/encrypted-type.h
+ create mode 100644 include/keys/trusted-type.h
+ create mode 100644 include/linux/tpm_command.h
+ create mode 100644 security/keys/encrypted_defined.c
+ create mode 100644 security/keys/encrypted_defined.h
+ create mode 100644 security/keys/trusted_defined.c
+ create mode 100644 security/keys/trusted_defined.h
+
+-- 
+1.7.2.2
+
