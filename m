@@ -1,8 +1,7 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [PATCH v1.5 1/5] lib: hex2bin converts ascii hexadecimal string to
- binary
-Date: Tue, 23 Nov 2010 18:43:14 -0500
-Message-ID: <1290555794.2604.12.camel@localhost.localdomain>
+Subject: [PATCH v1.5 3/5] key: add tpm_send command
+Date: Tue, 23 Nov 2010 18:54:16 -0500
+Message-ID: <1290556456.2604.14.camel@localhost.localdomain>
 References: <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -14,65 +13,78 @@ Cc: linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
 	David Safford <safford@watson.ibm.com>,
 	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e31.co.us.ibm.com ([32.97.110.149]:43039 "EHLO
+	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753416Ab0KWXyU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Nov 2010 18:54:20 -0500
 In-Reply-To: <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Similar to the kgdb_hex2mem() code, hex2bin converts a string
-to binary using the hex_to_bin() library call.
+Add internal kernel tpm_send() command used to seal/unseal keys.
 
 Changelog:
-- Replace parameter names with src/dst (based on David Howell's comment)
-- Add 'const' where needed (based on David Howell's comment)
-- Replace int with size_t (based on David Howell's comment)
+- replaced module_put in tpm_send() with new tpm_chip_put() wrapper
+  (suggested by David Howells)
+- Make tpm_send() cmd argument a 'void *' (suggested by David Howells)
 
+Signed-off-by: David Safford <safford@watson.ibm.com>
 Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
-Acked-by: Serge E. Hallyn <serge@hallyn.com>
 Acked-by: David Howells <dhowells@redhat.com>
 ---
- include/linux/kernel.h |    1 +
- lib/hexdump.c          |   16 ++++++++++++++++
- 2 files changed, 17 insertions(+), 0 deletions(-)
+ drivers/char/tpm/tpm.c |   16 ++++++++++++++++
+ include/linux/tpm.h    |    4 ++++
+ 2 files changed, 20 insertions(+), 0 deletions(-)
 
-diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-index 3f648d2..fbca217 100644
---- a/include/linux/kernel.h
-+++ b/include/linux/kernel.h
-@@ -419,6 +419,7 @@ static inline char *pack_hex_byte(char *buf, u8 byte)
+diff --git a/drivers/char/tpm/tpm.c b/drivers/char/tpm/tpm.c
+index 26c09f3..068bac8 100644
+--- a/drivers/char/tpm/tpm.c
++++ b/drivers/char/tpm/tpm.c
+@@ -780,6 +780,22 @@ int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
  }
+ EXPORT_SYMBOL_GPL(tpm_pcr_extend);
  
- extern int hex_to_bin(char ch);
-+extern void hex2bin(u8 *dst, const char *src, size_t count);
- 
- #ifndef pr_fmt
- #define pr_fmt(fmt) fmt
-diff --git a/lib/hexdump.c b/lib/hexdump.c
-index 5d7a480..b66b2bd 100644
---- a/lib/hexdump.c
-+++ b/lib/hexdump.c
-@@ -34,6 +34,22 @@ int hex_to_bin(char ch)
- EXPORT_SYMBOL(hex_to_bin);
- 
- /**
-+ * hex2bin - convert an ascii hexadecimal string to its binary representation
-+ * @dst: binary result
-+ * @src: ascii hexadecimal string
-+ * @count: result length
-+ */
-+void hex2bin(u8 *dst, const char *src, size_t count)
++int tpm_send(u32 chip_num, void *cmd, size_t buflen)
 +{
-+	while (count--) {
-+		*dst = hex_to_bin(*src++) << 4;
-+		*dst += hex_to_bin(*src++);
-+		dst++;
-+	}
-+}
-+EXPORT_SYMBOL(hex2bin);
++	struct tpm_chip *chip;
++	int rc;
 +
-+/**
-  * hex_dump_to_buffer - convert a blob of data to "hex ASCII" in memory
-  * @buf: data blob to dump
-  * @len: number of bytes in the @buf
++	chip = tpm_chip_find_get(chip_num);
++	if (chip == NULL)
++		return -ENODEV;
++
++	rc = transmit_cmd(chip, cmd, buflen, "attempting tpm_cmd");
++
++	tpm_chip_put(chip);
++	return rc;
++}
++EXPORT_SYMBOL_GPL(tpm_send);
++
+ ssize_t tpm_show_pcrs(struct device *dev, struct device_attribute *attr,
+ 		      char *buf)
+ {
+diff --git a/include/linux/tpm.h b/include/linux/tpm.h
+index ac5d1c1..fdc718a 100644
+--- a/include/linux/tpm.h
++++ b/include/linux/tpm.h
+@@ -31,6 +31,7 @@
+ 
+ extern int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf);
+ extern int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash);
++extern int tpm_send(u32 chip_num, void *cmd, size_t buflen);
+ #else
+ static inline int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf) {
+ 	return -ENODEV;
+@@ -38,5 +39,8 @@ static inline int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf) {
+ static inline int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash) {
+ 	return -ENODEV;
+ }
++static inline int tpm_send(u32 chip_num, void *cmd, size_t buflen) {
++	return -ENODEV;
++}
+ #endif
+ #endif
 -- 
 1.7.2.2
