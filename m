@@ -1,94 +1,40 @@
-From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH 3/5] Add "alg_name" operation to af_alg_type.
-Date: Tue, 23 Nov 2010 13:50:33 +0100
-Message-ID: <1290516635-26601-3-git-send-email-mitr@redhat.com>
-References: <344091777.216361290516431362.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: crypto_shash_digest API
+Date: Tue, 23 Nov 2010 09:34:01 -0500
+Message-ID: <1290522841.2606.168.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-audit@redhat.com, linux-crypto@vger.kernel.org,
-	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-To: sgrubb@redhat.com, herbert@gondor.hengli.com.au
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:6520 "EHLO mx1.redhat.com"
+Received: from e1.ny.us.ibm.com ([32.97.182.141]:37580 "EHLO e1.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753465Ab0KWMuw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Nov 2010 07:50:52 -0500
-In-Reply-To: <344091777.216361290516431362.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+	id S1754436Ab0KWOeH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Nov 2010 09:34:07 -0500
+Received: from d01dlp02.pok.ibm.com (d01dlp02.pok.ibm.com [9.56.224.85])
+	by e1.ny.us.ibm.com (8.14.4/8.13.1) with ESMTP id oANEQCbO018172
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2010 09:26:12 -0500
+Received: from d01relay06.pok.ibm.com (d01relay06.pok.ibm.com [9.56.227.116])
+	by d01dlp02.pok.ibm.com (Postfix) with ESMTP id ABF0C4DE8039
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2010 09:32:41 -0500 (EST)
+Received: from d01av02.pok.ibm.com (d01av02.pok.ibm.com [9.56.224.216])
+	by d01relay06.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id oANEY2TM1912940
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2010 09:34:02 -0500
+Received: from d01av02.pok.ibm.com (loopback [127.0.0.1])
+	by d01av02.pok.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id oANEY1kX025925
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2010 12:34:02 -0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi!
 
-Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
----
- crypto/algif_hash.c     |    6 ++++++
- crypto/algif_skcipher.c |    6 ++++++
- include/crypto/if_alg.h |    1 +
- 3 files changed, 13 insertions(+), 0 deletions(-)
+Am having problems finding any shash API documentation.  Could someone
+tell me if 'out' needs to be zeroed before calling crypto_shash_digest?
 
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index f08a42c..3a61e9d 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -243,6 +243,11 @@ static void hash_release(void *private)
- 	crypto_free_ahash(private);
- }
-=20
-+static const char *hash_alg_name(void *private)
-+{
-+	return crypto_tfm_alg_name(crypto_ahash_tfm(private));
-+}
-+
- static int hash_setkey(void *private, const u8 *key, unsigned int keyl=
-en)
- {
- 	return crypto_ahash_setkey(private, key, keylen);
-@@ -296,6 +301,7 @@ static int hash_accept_parent(void *private, struct=
- sock *sk)
- static const struct af_alg_type algif_type_hash =3D {
- 	.bind		=3D	hash_bind,
- 	.release	=3D	hash_release,
-+	.alg_name	=3D	hash_alg_name,
- 	.setkey		=3D	hash_setkey,
- 	.accept		=3D	hash_accept_parent,
- 	.ops		=3D	&algif_hash_ops,
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 4069460..e14c8be 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -561,6 +561,11 @@ static void skcipher_release(void *private)
- 	crypto_free_ablkcipher(private);
- }
-=20
-+static const char *skcipher_alg_name(void *private)
-+{
-+	return crypto_tfm_alg_name(crypto_ablkcipher_tfm(private));
-+}
-+
- static int skcipher_setkey(void *private, const u8 *key, unsigned int =
-keylen)
- {
- 	return crypto_ablkcipher_setkey(private, key, keylen);
-@@ -619,6 +624,7 @@ static int skcipher_accept_parent(void *private, st=
-ruct sock *sk)
- static const struct af_alg_type algif_type_skcipher =3D {
- 	.bind		=3D	skcipher_bind,
- 	.release	=3D	skcipher_release,
-+	.alg_name	=3D	skcipher_alg_name,
- 	.setkey		=3D	skcipher_setkey,
- 	.accept		=3D	skcipher_accept_parent,
- 	.ops		=3D	&algif_skcipher_ops,
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 336b9f2..092c599 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -49,6 +49,7 @@ struct af_alg_control {
- struct af_alg_type {
- 	void *(*bind)(const char *name, u32 type, u32 mask);
- 	void (*release)(void *private);
-+	const char *(*alg_name)(void *private);
- 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
- 	int (*accept)(void *private, struct sock *sk);
-=20
---=20
-1.7.3.2
+int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
+                        unsigned int len, u8 *out)
+
+thanks,
+
+Mimi
