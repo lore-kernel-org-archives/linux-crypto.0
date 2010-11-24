@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH 3/5] Add "alg_name" operation to af_alg_type.
-Date: Wed, 24 Nov 2010 18:05:53 +0100
-Message-ID: <1290618355-31193-4-git-send-email-mitr@redhat.com>
+Subject: [PATCH 5/5] Audit type-specific crypto operations
+Date: Wed, 24 Nov 2010 18:05:55 +0100
+Message-ID: <1290618355-31193-6-git-send-email-mitr@redhat.com>
 References: <1290618355-31193-1-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,10 +10,10 @@ Cc: linux-audit@redhat.com, linux-crypto@vger.kernel.org,
 	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
 To: eparis@redhat.com, herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36854 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:31531 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753800Ab0KXRGP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Nov 2010 12:06:15 -0500
+	id S1755691Ab0KXRGS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Nov 2010 12:06:18 -0500
 In-Reply-To: <1290618355-31193-1-git-send-email-mitr@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -21,74 +21,177 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
 ---
- crypto/algif_hash.c     |    6 ++++++
- crypto/algif_skcipher.c |    6 ++++++
- include/crypto/if_alg.h |    1 +
- 3 files changed, 13 insertions(+), 0 deletions(-)
+ crypto/af_alg.c         |   14 ++++++++++++++
+ crypto/algif_hash.c     |   27 +++++++++++++++++++++++----
+ crypto/algif_skcipher.c |   20 ++++++++++++++++++--
+ include/crypto/if_alg.h |    6 ++++++
+ 4 files changed, 61 insertions(+), 6 deletions(-)
 
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index fc1b0f7..450d51a 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -542,6 +542,20 @@ void af_alg_complete(struct crypto_async_request *=
+req, int err)
+ }
+ EXPORT_SYMBOL_GPL(af_alg_complete);
+=20
++#ifdef CONFIG_AUDIT
++int af_alg_audit_crypto_op(struct sock *sk, const char *operation, int=
+ ctx2)
++{
++	struct alg_sock *ask =3D alg_sk(sk);
++	struct alg_sock *parent_ask =3D alg_sk(ask->parent);
++	const char *alg_name;
++
++	alg_name =3D parent_ask->type->alg_name(parent_ask->private);
++	return audit_log_crypto_op(AUDIT_CRYPTO_OP_CTX_OP, parent_ask->id,
++				   ask->id, ctx2, alg_name, operation);
++}
++EXPORT_SYMBOL_GPL(af_alg_audit_crypto_op);
++#endif
++
+ static int __init af_alg_init(void)
+ {
+ 	int err =3D proto_register(&alg_proto, 0);
 diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index f08a42c..3a61e9d 100644
+index 3a61e9d..7e3ffd1 100644
 --- a/crypto/algif_hash.c
 +++ b/crypto/algif_hash.c
-@@ -243,6 +243,11 @@ static void hash_release(void *private)
- 	crypto_free_ahash(private);
+@@ -46,6 +46,10 @@ static int hash_sendmsg(struct kiocb *unused, struct=
+ socket *sock,
+ 	long copied =3D 0;
+ 	int err;
+=20
++	err =3D af_alg_audit_crypto_op(sk, "hash-input", -1);
++	if (err)
++		return err;
++
+ 	if (limit > sk->sk_sndbuf)
+ 		limit =3D sk->sk_sndbuf;
+=20
+@@ -112,6 +116,10 @@ static ssize_t hash_sendpage(struct socket *sock, =
+struct page *page,
+ 	struct hash_ctx *ctx =3D ask->private;
+ 	int err;
+=20
++	err =3D af_alg_audit_crypto_op(sk, "hash-input", -1);
++	if (err)
++		return err;
++
+ 	lock_sock(sk);
+ 	sg_init_table(ctx->sgl.sg, 1);
+ 	sg_set_page(ctx->sgl.sg, page, size, offset);
+@@ -154,6 +162,10 @@ static int hash_recvmsg(struct kiocb *unused, stru=
+ct socket *sock,
+ 	unsigned ds =3D crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req=
+));
+ 	int err;
+=20
++	err =3D af_alg_audit_crypto_op(sk, "hash-output", -1);
++	if (err)
++		return err;
++
+ 	if (len > ds)
+ 		len =3D ds;
+ 	else if (len < ds)
+@@ -202,12 +214,19 @@ static int hash_accept(struct socket *sock, struc=
+t socket *newsock, int flags)
+ 	ctx2 =3D ask2->private;
+ 	ctx2->more =3D 1;
+=20
++	err =3D af_alg_audit_crypto_op(sk, "hash-clone", ask2->id);
++	if (err)
++		goto error_sk2;
++
+ 	err =3D crypto_ahash_import(&ctx2->req, state);
+-	if (err) {
+-		sock_orphan(sk2);
+-		sock_put(sk2);
+-	}
++	if (err)
++		goto error_sk2;
++
++	return err;
+=20
++error_sk2:
++	sock_orphan(sk2);
++	sock_put(sk2);
+ 	return err;
  }
 =20
-+static const char *hash_alg_name(void *private)
-+{
-+	return crypto_tfm_alg_name(crypto_ahash_tfm(private));
-+}
-+
- static int hash_setkey(void *private, const u8 *key, unsigned int keyl=
-en)
- {
- 	return crypto_ahash_setkey(private, key, keylen);
-@@ -296,6 +301,7 @@ static int hash_accept_parent(void *private, struct=
- sock *sk)
- static const struct af_alg_type algif_type_hash =3D {
- 	.bind		=3D	hash_bind,
- 	.release	=3D	hash_release,
-+	.alg_name	=3D	hash_alg_name,
- 	.setkey		=3D	hash_setkey,
- 	.accept		=3D	hash_accept_parent,
- 	.ops		=3D	&algif_hash_ops,
 diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 4069460..e14c8be 100644
+index e14c8be..c5c37d6 100644
 --- a/crypto/algif_skcipher.c
 +++ b/crypto/algif_skcipher.c
-@@ -561,6 +561,11 @@ static void skcipher_release(void *private)
- 	crypto_free_ablkcipher(private);
- }
+@@ -283,6 +283,11 @@ static int skcipher_sendmsg(struct kiocb *unused, =
+struct socket *sock,
+ 			memcpy(ctx->iv, con.iv->iv, ivsize);
+ 	}
 =20
-+static const char *skcipher_alg_name(void *private)
-+{
-+	return crypto_tfm_alg_name(crypto_ablkcipher_tfm(private));
-+}
++	err =3D af_alg_audit_crypto_op(sk, ctx->enc ? "encrypt-input"
++				     : "decrypt-input", -1);
++	if (err)
++		goto unlock;
 +
- static int skcipher_setkey(void *private, const u8 *key, unsigned int =
-keylen)
- {
- 	return crypto_ablkcipher_setkey(private, key, keylen);
-@@ -619,6 +624,7 @@ static int skcipher_accept_parent(void *private, st=
-ruct sock *sk)
- static const struct af_alg_type algif_type_skcipher =3D {
- 	.bind		=3D	skcipher_bind,
- 	.release	=3D	skcipher_release,
-+	.alg_name	=3D	skcipher_alg_name,
- 	.setkey		=3D	skcipher_setkey,
- 	.accept		=3D	skcipher_accept_parent,
- 	.ops		=3D	&algif_skcipher_ops,
+ 	limit =3D max_t(int, sk->sk_sndbuf, PAGE_SIZE);
+ 	limit -=3D ctx->used;
+=20
+@@ -381,9 +386,15 @@ static ssize_t skcipher_sendpage(struct socket *so=
+ck, struct page *page,
+ 	struct alg_sock *ask =3D alg_sk(sk);
+ 	struct skcipher_ctx *ctx =3D ask->private;
+ 	struct skcipher_sg_list *sgl;
+-	int err =3D -EINVAL;
++	int err;
+ 	int limit;
+=20
++	err =3D af_alg_audit_crypto_op(sk, ctx->enc ? "encrypt-input"
++				     : "decrypt-input", -1);
++	if (err)
++		return err;
++
++	err =3D -EINVAL;
+ 	lock_sock(sk);
+ 	if (!ctx->more && ctx->used)
+ 		goto unlock;
+@@ -439,10 +450,15 @@ static int skcipher_recvmsg(struct kiocb *unused,=
+ struct socket *sock,
+ 	struct scatterlist *sg;
+ 	unsigned long iovlen;
+ 	struct iovec *iov;
+-	int err =3D -EAGAIN;
++	int err;
+ 	int used;
+ 	long copied =3D 0;
+=20
++	err =3D af_alg_audit_crypto_op(sk, ctx->enc ? "encrypt-output"
++				     : "decrypt-output", -1);
++	if (err)
++		return err;
++
+ 	lock_sock(sk);
+ 	for (iov =3D msg->msg_iov, iovlen =3D msg->msg_iovlen; iovlen > 0;
+ 	     iovlen--, iov++) {
 diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 336b9f2..092c599 100644
+index 092c599..6650ae5 100644
 --- a/include/crypto/if_alg.h
 +++ b/include/crypto/if_alg.h
-@@ -49,6 +49,7 @@ struct af_alg_control {
- struct af_alg_type {
- 	void *(*bind)(const char *name, u32 type, u32 mask);
- 	void (*release)(void *private);
-+	const char *(*alg_name)(void *private);
- 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
- 	int (*accept)(void *private, struct sock *sk);
+@@ -80,6 +80,12 @@ int af_alg_cmsg_send(struct msghdr *msg, struct af_a=
+lg_control *con);
+ int af_alg_wait_for_completion(int err, struct af_alg_completion *comp=
+letion);
+ void af_alg_complete(struct crypto_async_request *req, int err);
 =20
++#ifdef CONFIG_AUDIT
++int af_alg_audit_crypto_op(struct sock *sk, const char *operation, int=
+ ctx2);
++#else
++#define af_alg_audit_crypto_op(sk, operation, ctx2) (0)
++#endif
++
+ static inline struct alg_sock *alg_sk(struct sock *sk)
+ {
+ 	return (struct alg_sock *)sk;
 --=20
 1.7.3.2
