@@ -1,38 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/4] crypto: algif_skcipher - User-space interface for
-	skcipher operations
-Date: Fri, 26 Nov 2010 20:57:08 +0800
-Message-ID: <20101126125708.GA28786@gondor.apana.org.au>
-References: <20101115115120.GA3797@gondor.apana.org.au> <E1PHxca-00011N-As@gondolin.me.apana.org.au> <1289832949.1979.71.camel@martin> <20101119095136.GA22665@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
+Subject: [PATCH 1/4] net - Add AF_ALG macros
+Date: Fri, 26 Nov 2010 20:58:23 +0800
+Message-ID: <E1PLxsd-0007V6-GA@gondolin.me.apana.org.au>
+References: <20101126125708.GA28786@gondor.apana.org.au>
+To: Martin Willi <martin@strongswan.org>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41936 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:49501 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751302Ab0KZM5N (ORCPT
+	with ESMTP id S1752986Ab0KZM6Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Nov 2010 07:57:13 -0500
-Content-Disposition: inline
-In-Reply-To: <20101119095136.GA22665@gondor.apana.org.au>
+	Fri, 26 Nov 2010 07:58:25 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 19, 2010 at 05:51:36PM +0800, Herbert Xu wrote:
-> 
-> Miroslave found quite a few more problems with the patch-set
-> so here is another revision with those problems resolved:
+net - Add AF_ALG macros
 
-OK two more bugs found and fixed so here is one more revision:
+This patch adds the socket family/level macros for the yet-to-be-born
+AF_ALG family.  The AF_ALG family provides the user-space interface
+for the kernel crypto API.
 
-* If recvmsg leaves bytes behind in the last SG entry it gets
-  freed incorrectly.
-* sendmsg's SG loop did not apply the socket limit, causing
-  crashes with large sends.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: David S. Miller <davem@davemloft.net>
+---
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ include/linux/socket.h |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 5146b50..ebc081b 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -193,7 +193,8 @@ struct ucred {
+ #define AF_PHONET	35	/* Phonet sockets		*/
+ #define AF_IEEE802154	36	/* IEEE802154 sockets		*/
+ #define AF_CAIF		37	/* CAIF sockets			*/
+-#define AF_MAX		38	/* For now.. */
++#define AF_ALG		38	/* Algorithm sockets		*/
++#define AF_MAX		39	/* For now.. */
+ 
+ /* Protocol families, same as address families. */
+ #define PF_UNSPEC	AF_UNSPEC
+@@ -234,6 +235,7 @@ struct ucred {
+ #define PF_PHONET	AF_PHONET
+ #define PF_IEEE802154	AF_IEEE802154
+ #define PF_CAIF		AF_CAIF
++#define PF_ALG		AF_ALG
+ #define PF_MAX		AF_MAX
+ 
+ /* Maximum queue length specifiable by listen.  */
+@@ -307,6 +309,7 @@ struct ucred {
+ #define SOL_RDS		276
+ #define SOL_IUCV	277
+ #define SOL_CAIF	278
++#define SOL_ALG		279
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
