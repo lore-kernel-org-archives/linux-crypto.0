@@ -1,7 +1,7 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] crypto: aesni-intel - Fixed build error on x86-32
-Date: Sun, 28 Nov 2010 19:31:49 +0100
-Message-ID: <1290969109-28322-1-git-send-email-minipli@googlemail.com>
+Subject: [PATCH v2] crypto: aesni-intel - Fixed build error on x86-32
+Date: Sun, 28 Nov 2010 19:39:48 +0100
+Message-ID: <1290969588-30200-1-git-send-email-minipli@googlemail.com>
 References: <20101127083524.GC2364@gondor.apana.org.au>
 Cc: Huang Ying <ying.huang@intel.com>,
 	Mathias Krause <minipli@googlemail.com>
@@ -9,17 +9,18 @@ To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grimli.r00tworld.net ([83.169.44.195]:42645 "EHLO
+Received: from grimli.r00tworld.net ([83.169.44.195]:52874 "EHLO
 	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753846Ab0K1Sbw (ORCPT
+	with ESMTP id S1753973Ab0K1Sjt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Nov 2010 13:31:52 -0500
+	Sun, 28 Nov 2010 13:39:49 -0500
 In-Reply-To: <20101127083524.GC2364@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Herbert, thanks for merge but the AES-GCM code merged meanwhile made the x86-32
-bit version break on build. The following patch fixes this:
+bit version break on build. The following patch fixes this (now compile tested
+on x86-64, too):
 
 Exclude AES-GCM code for x86-32 due to heavy usage of 64-bit registers
 not available on x86-32.
@@ -70,7 +71,7 @@ index f592e03..d528fde 100644
  
  _key_expansion_128:
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 8a3b800..0f2c3c6 100644
+index 8a3b800..e1e60c7 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
 @@ -97,7 +97,6 @@ asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
@@ -109,9 +110,9 @@ index 8a3b800..0f2c3c6 100644
  		goto blk_ctr_err;
  	if ((err = crypto_register_alg(&ablk_ctr_alg)))
  		goto ablk_ctr_err;
-+	if ((err = crypto_register_alg(&__rfc4106_alg))
++	if ((err = crypto_register_alg(&__rfc4106_alg)))
 +		goto __aead_gcm_err;
-+	if ((err = crypto_register_alg(&rfc4106_alg))
++	if ((err = crypto_register_alg(&rfc4106_alg)))
 +		goto aead_gcm_err;
  #ifdef HAS_CTR
  	if ((err = crypto_register_alg(&ablk_rfc3686_ctr_alg)))
