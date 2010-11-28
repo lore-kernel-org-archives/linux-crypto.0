@@ -1,60 +1,169 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: algif_skcipher - Pass on error from af_alg_make_sg
-Date: Sun, 28 Nov 2010 16:29:36 +0800
-Message-ID: <20101128082936.GA9427@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: aesni-intel - Fixed build error on x86-32
+Date: Sun, 28 Nov 2010 19:31:49 +0100
+Message-ID: <1290969109-28322-1-git-send-email-minipli@googlemail.com>
+References: <20101127083524.GC2364@gondor.apana.org.au>
+Cc: Huang Ying <ying.huang@intel.com>,
+	Mathias Krause <minipli@googlemail.com>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53622 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751701Ab0K1I3i (ORCPT
+Received: from grimli.r00tworld.net ([83.169.44.195]:42645 "EHLO
+	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753846Ab0K1Sbw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Nov 2010 03:29:38 -0500
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by fornost.hengli.com.au with esmtp (Exim 4.69 #1 (Debian))
-	id 1PMcdc-0001yD-Sv
-	for <linux-crypto@vger.kernel.org>; Sun, 28 Nov 2010 19:29:36 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1PMcdc-0002SL-Pc
-	for linux-crypto@vger.kernel.org; Sun, 28 Nov 2010 16:29:36 +0800
-Content-Disposition: inline
+	Sun, 28 Nov 2010 13:31:52 -0500
+In-Reply-To: <20101127083524.GC2364@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+Herbert, thanks for merge but the AES-GCM code merged meanwhile made the x86-32
+bit version break on build. The following patch fixes this:
 
-The error from af_alg_make_sg was lost unintentionally.
+Exclude AES-GCM code for x86-32 due to heavy usage of 64-bit registers
+not available on x86-32.
 
-commit c762be637503b833012457087133c1292fd6056d
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Sun Nov 28 16:28:01 2010 +0800
+While at it, fixed unregister order in aesni_exit().
 
-    crypto: algif_skcipher - Pass on error from af_alg_make_sg
-    
-    The error returned from af_alg_make_sg is currently lost and we
-    always pass on -EINVAL.  This patch pases on the underlying error.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+---
+ arch/x86/crypto/aesni-intel_asm.S  |    5 ++++-
+ arch/x86/crypto/aesni-intel_glue.c |   26 +++++++++++++-------------
+ 2 files changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 211c956..9b2f440 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -472,7 +472,8 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
- 				goto unlock;
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index f592e03..d528fde 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -32,6 +32,7 @@
+ #include <linux/linkage.h>
+ #include <asm/inst.h>
  
- 			used = af_alg_make_sg(&ctx->rsgl, from, used, 1);
--			if (used < 0)
-+			err = used;
-+			if (err < 0)
- 				goto unlock;
++#ifdef __x86_64__
+ .data
+ POLY:   .octa 0xC2000000000000000000000000000001
+ TWOONE: .octa 0x00000001000000000000000000000001
+@@ -84,6 +85,7 @@ enc:        .octa 0x2
+ #define arg8 STACK_OFFSET+16(%r14)
+ #define arg9 STACK_OFFSET+24(%r14)
+ #define arg10 STACK_OFFSET+32(%r14)
++#endif
  
- 			ablkcipher_request_set_crypt(&ctx->req, sg,
-
-Cheers,
+ 
+ #define STATE1	%xmm0
+@@ -130,6 +132,7 @@ enc:        .octa 0x2
+ #endif
+ 
+ 
++#ifdef __x86_64__
+ /* GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
+ *
+ *
+@@ -1255,7 +1258,7 @@ _return_T_done_encrypt:
+ 	pop	%r13
+ 	pop	%r12
+ 	ret
+-
++#endif
+ 
+ 
+ _key_expansion_128:
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 8a3b800..0f2c3c6 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -97,7 +97,6 @@ asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
+ #ifdef CONFIG_X86_64
+ asmlinkage void aesni_ctr_enc(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv);
+-#endif
+ 
+ /* asmlinkage void aesni_gcm_enc()
+  * void *ctx,  AES Key schedule. Starts on a 16 byte boundary.
+@@ -149,6 +148,7 @@ aesni_rfc4106_gcm_ctx *aesni_rfc4106_gcm_ctx_get(struct crypto_aead *tfm)
+ 		PTR_ALIGN((u8 *)
+ 		crypto_tfm_ctx(crypto_aead_tfm(tfm)), AESNI_ALIGN);
+ }
++#endif
+ 
+ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
+ {
+@@ -822,6 +822,7 @@ static struct crypto_alg ablk_xts_alg = {
+ };
+ #endif
+ 
++#ifdef CONFIG_X86_64
+ static int rfc4106_init(struct crypto_tfm *tfm)
+ {
+ 	struct cryptd_aead *cryptd_tfm;
+@@ -1237,6 +1238,7 @@ static struct crypto_alg __rfc4106_alg = {
+ 		},
+ 	},
+ };
++#endif
+ 
+ static int __init aesni_init(void)
+ {
+@@ -1264,6 +1266,10 @@ static int __init aesni_init(void)
+ 		goto blk_ctr_err;
+ 	if ((err = crypto_register_alg(&ablk_ctr_alg)))
+ 		goto ablk_ctr_err;
++	if ((err = crypto_register_alg(&__rfc4106_alg))
++		goto __aead_gcm_err;
++	if ((err = crypto_register_alg(&rfc4106_alg))
++		goto aead_gcm_err;
+ #ifdef HAS_CTR
+ 	if ((err = crypto_register_alg(&ablk_rfc3686_ctr_alg)))
+ 		goto ablk_rfc3686_ctr_err;
+@@ -1281,19 +1287,9 @@ static int __init aesni_init(void)
+ 	if ((err = crypto_register_alg(&ablk_xts_alg)))
+ 		goto ablk_xts_err;
+ #endif
+-	err = crypto_register_alg(&__rfc4106_alg);
+-	if (err)
+-		goto __aead_gcm_err;
+-	err = crypto_register_alg(&rfc4106_alg);
+-	if (err)
+-		goto aead_gcm_err;
+ 	return err;
+ 
+-aead_gcm_err:
+-	crypto_unregister_alg(&__rfc4106_alg);
+-__aead_gcm_err:
+ #ifdef HAS_XTS
+-	crypto_unregister_alg(&ablk_xts_alg);
+ ablk_xts_err:
+ #endif
+ #ifdef HAS_PCBC
+@@ -1309,6 +1305,10 @@ ablk_lrw_err:
+ 	crypto_unregister_alg(&ablk_rfc3686_ctr_alg);
+ ablk_rfc3686_ctr_err:
+ #endif
++	crypto_unregister_alg(&rfc4106_alg);
++aead_gcm_err:
++	crypto_unregister_alg(&__rfc4106_alg);
++__aead_gcm_err:
+ 	crypto_unregister_alg(&ablk_ctr_alg);
+ ablk_ctr_err:
+ 	crypto_unregister_alg(&blk_ctr_alg);
+@@ -1331,8 +1331,6 @@ aes_err:
+ 
+ static void __exit aesni_exit(void)
+ {
+-	crypto_unregister_alg(&__rfc4106_alg);
+-	crypto_unregister_alg(&rfc4106_alg);
+ #ifdef HAS_XTS
+ 	crypto_unregister_alg(&ablk_xts_alg);
+ #endif
+@@ -1346,6 +1344,8 @@ static void __exit aesni_exit(void)
+ #ifdef HAS_CTR
+ 	crypto_unregister_alg(&ablk_rfc3686_ctr_alg);
+ #endif
++	crypto_unregister_alg(&rfc4106_alg);
++	crypto_unregister_alg(&__rfc4106_alg);
+ 	crypto_unregister_alg(&ablk_ctr_alg);
+ 	crypto_unregister_alg(&blk_ctr_alg);
+ #endif
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.6.5
