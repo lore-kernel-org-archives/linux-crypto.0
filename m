@@ -1,89 +1,57 @@
 From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: linux-next: Tree for November 29
-Date: Mon, 29 Nov 2010 08:12:11 -0800
-Message-ID: <20101129081211.2e0c7783.randy.dunlap@oracle.com>
+Subject: Re: linux-next: Tree for November 29 (aesni-intel)
+Date: Mon, 29 Nov 2010 08:31:05 -0800
+Message-ID: <20101129083105.e202e922.randy.dunlap@oracle.com>
 References: <20101129140335.19800705.sfr@canb.auug.org.au>
-	<AANLkTikiZoNM9zpXw3wSK7-uqh+ZYMpJ+wg0wPpBs_kx@mail.gmail.com>
-	<20101129145717.GA20232@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Zimny Lech <napohybelskurwysynom2010@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20101129145717.GA20232@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Mathias Krause <minipli@googlemail.com>,
+	linux-crypto@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Huang Ying <ying.huang@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from rcsinet10.oracle.com ([148.87.113.121]:53631 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752498Ab0K2Qce (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 29 Nov 2010 11:32:34 -0500
+In-Reply-To: <20101129140335.19800705.sfr@canb.auug.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 29 Nov 2010 22:57:17 +0800 Herbert Xu wrote:
+On Mon, 29 Nov 2010 14:03:35 +1100 Stephen Rothwell wrote:
 
-> On Mon, Nov 29, 2010 at 09:47:38AM +0000, Zimny Lech wrote:
-> > Ave
-> > 
-> > 2010/11/29 Stephen Rothwell <sfr@canb.auug.org.au>:
-> > > Hi all,
-> > >
-> > > Changes since 20101126:
-> > 
-> > 
-> > Setup is 14188 bytes (padded to 14336 bytes).
-> > System is 1267 kB
-> > CRC 61cea148
-> > Kernel: arch/x86/boot/bzImage is ready  (#1)
-> >   Building modules, stage 2.
-> >   MODPOST 537 modules
-> > ERROR: "sock_no_mmap" [crypto/algif_skcipher.ko] undefined!
+> Hi all,
 > 
-> I hope this patch fixes it for you.
-
-Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
-
-Thanks.
+> Changes since 20101126:
 
 
-> commit 7451708f39db19a8303bb7fb95f00aca9f673cb5
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Mon Nov 29 22:56:03 2010 +0800
-> 
->     crypto: af_alg - Add dependency on NET
->     
->     Add missing dependency on NET since we require sockets for our
->     interface.
->     
->     Should really be a select but kconfig doesn't like that:
->     
->     net/Kconfig:6:error: found recursive dependency: NET -> NETWORK_FILESYSTEMS -> AFS_FS -> AF_RXRPC -> CRYPTO -> CRYPTO_USER_API_HASH -> CRYPTO_USER_API -> NET
->     
->     Reported-by: Zimny Lech <napohybelskurwysynom2010@gmail.com>
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 467491d..96b0e55 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -848,6 +848,7 @@ config CRYPTO_USER_API
->  
->  config CRYPTO_USER_API_HASH
->  	tristate "User-space interface for hash algorithms"
-> +	depends on NET
->  	select CRYPTO_HASH
->  	select CRYPTO_USER_API
->  	help
-> @@ -856,6 +857,7 @@ config CRYPTO_USER_API_HASH
->  
->  config CRYPTO_USER_API_SKCIPHER
->  	tristate "User-space interface for symmetric key cipher algorithms"
-> +	depends on NET
->  	select CRYPTO_BLKCIPHER
->  	select CRYPTO_USER_API
->  	help
-> 
-> Thanks,
-> -- 
+on i386 builds, I get tons of these (and more) errors:
 
+arch/x86/crypto/aesni-intel_asm.S:841: Error: bad register name `%r12'
+arch/x86/crypto/aesni-intel_asm.S:842: Error: bad register name `%r13'
+arch/x86/crypto/aesni-intel_asm.S:843: Error: bad register name `%r14'
+arch/x86/crypto/aesni-intel_asm.S:844: Error: bad register name `%rsp'
+arch/x86/crypto/aesni-intel_asm.S:849: Error: bad register name `%rsp'
+arch/x86/crypto/aesni-intel_asm.S:850: Error: bad register name `%rsp'
+arch/x86/crypto/aesni-intel_asm.S:851: Error: bad register name `%r9'
+
+even though the kernel .config file says:
+
+CONFIG_CRYPTO_AES=m
+CONFIG_CRYPTO_AES_586=m
+CONFIG_CRYPTO_AES_NI_INTEL=m
+
+Should arch/x86/crypto/aesni-intel_asm.S be testing
+#ifdef CONFIG_X86_64
+instead of
+#ifdef __x86_64__
+or does that not matter?
+
+or is this a toolchain issue?
 
 ---
 ~Randy
