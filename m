@@ -1,34 +1,39 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [PATCH v1.5 0/5] keys: trusted and encrypted keys
-Date: Mon, 29 Nov 2010 08:56:34 +1100 (EST)
-Message-ID: <alpine.LRH.2.00.1011290856070.15604@tundra.namei.org>
-References: <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: aesni-intel - Fixed build error on x86-32
+Date: Mon, 29 Nov 2010 08:36:08 +0800
+Message-ID: <20101129003608.GA14734@gondor.apana.org.au>
+References: <20101127083524.GC2364@gondor.apana.org.au> <1290969588-30200-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Huang Ying <ying.huang@intel.com>
+To: Mathias Krause <minipli@googlemail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:56765 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754310Ab0K2AgL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 28 Nov 2010 19:36:11 -0500
+Content-Disposition: inline
+In-Reply-To: <1290969588-30200-1-git-send-email-minipli@googlemail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 23 Nov 2010, Mimi Zohar wrote:
+On Sun, Nov 28, 2010 at 07:39:48PM +0100, Mathias Krause wrote:
+> Herbert, thanks for merge but the AES-GCM code merged meanwhile made the x86-32
+> bit version break on build. The following patch fixes this (now compile tested
+> on x86-64, too):
+> 
+> Exclude AES-GCM code for x86-32 due to heavy usage of 64-bit registers
+> not available on x86-32.
+> 
+> While at it, fixed unregister order in aesni_exit().
+> 
+> Signed-off-by: Mathias Krause <minipli@googlemail.com>
 
-> Mimi Zohar (5):
->   lib: hex2bin converts ascii hexadecimal string to binary
->   tpm: add module_put wrapper
->   key: add tpm_send command
->   keys: add new trusted key-type
->   keys: add new key-type encrypted
-
-Applied to
-git://git.kernel.org/pub/scm/linux/kernel/git/jmorris/security-testing-2.6#next
-
+Patch applied.  Thanks Mathias!
 -- 
-James Morris
-<jmorris@namei.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
