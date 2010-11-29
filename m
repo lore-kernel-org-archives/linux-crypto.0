@@ -1,58 +1,70 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
+From: Mathias Krause <minipli@googlemail.com>
 Subject: Re: linux-next: Tree for November 29 (aesni-intel)
-Date: Mon, 29 Nov 2010 08:31:05 -0800
-Message-ID: <20101129083105.e202e922.randy.dunlap@oracle.com>
-References: <20101129140335.19800705.sfr@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date: Mon, 29 Nov 2010 19:26:31 +0100
+Message-ID: <DAEDA952-8AD2-406D-9F37-33740F86FC59@googlemail.com>
+References: <20101129140335.19800705.sfr@canb.auug.org.au> <20101129083105.e202e922.randy.dunlap@oracle.com>
+Mime-Version: 1.0 (Apple Message framework v1082)
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Mathias Krause <minipli@googlemail.com>,
-	linux-crypto@vger.kernel.org
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
 	Huang Ying <ying.huang@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:53631 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752498Ab0K2Qce (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:48117 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752039Ab0K2S0k (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 29 Nov 2010 11:32:34 -0500
-In-Reply-To: <20101129140335.19800705.sfr@canb.auug.org.au>
+	Mon, 29 Nov 2010 13:26:40 -0500
+In-Reply-To: <20101129083105.e202e922.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 29 Nov 2010 14:03:35 +1100 Stephen Rothwell wrote:
-
-> Hi all,
+On 29.11.2010, 17:31 Randy Dunlap wrote:
+> On Mon, 29 Nov 2010 14:03:35 +1100 Stephen Rothwell wrote:
 > 
-> Changes since 20101126:
+>> Hi all,
+>> 
+>> Changes since 20101126:
+> 
+> 
+> on i386 builds, I get tons of these (and more) errors:
+> 
+> arch/x86/crypto/aesni-intel_asm.S:841: Error: bad register name `%r12'
+> arch/x86/crypto/aesni-intel_asm.S:842: Error: bad register name `%r13'
+> arch/x86/crypto/aesni-intel_asm.S:843: Error: bad register name `%r14'
+> arch/x86/crypto/aesni-intel_asm.S:844: Error: bad register name `%rsp'
+> arch/x86/crypto/aesni-intel_asm.S:849: Error: bad register name `%rsp'
+> arch/x86/crypto/aesni-intel_asm.S:850: Error: bad register name `%rsp'
+> arch/x86/crypto/aesni-intel_asm.S:851: Error: bad register name `%r9'
+> 
+> even though the kernel .config file says:
+> 
+> CONFIG_CRYPTO_AES=m
+> CONFIG_CRYPTO_AES_586=m
+> CONFIG_CRYPTO_AES_NI_INTEL=m
+> 
+> Should arch/x86/crypto/aesni-intel_asm.S be testing
+> #ifdef CONFIG_X86_64
+> instead of
+> #ifdef __x86_64__
+> or does that not matter?
+> 
+> or is this a toolchain issue?
 
+Well, __x86_64__ should be a build-in define of the compiler while
+CONFIG_X86_64 is defined for 64 bit builds in include/generated/autoconf.h.
+So by using the latter we should be on the safe side but if your compiler
+defines __x86_64__ for 32-bit builds it's simply broken. Also git grep
+showed quite a few more places using __x86_64__ so those would miscompile on
+your toolchain, too.
 
-on i386 builds, I get tons of these (and more) errors:
+But it looks like linux-next is just missing
+559ad0ff1368baea14dbc3207d55b02bd69bda4b from Herbert's git repo at
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git.
+That should fix the build issue.
 
-arch/x86/crypto/aesni-intel_asm.S:841: Error: bad register name `%r12'
-arch/x86/crypto/aesni-intel_asm.S:842: Error: bad register name `%r13'
-arch/x86/crypto/aesni-intel_asm.S:843: Error: bad register name `%r14'
-arch/x86/crypto/aesni-intel_asm.S:844: Error: bad register name `%rsp'
-arch/x86/crypto/aesni-intel_asm.S:849: Error: bad register name `%rsp'
-arch/x86/crypto/aesni-intel_asm.S:850: Error: bad register name `%rsp'
-arch/x86/crypto/aesni-intel_asm.S:851: Error: bad register name `%r9'
-
-even though the kernel .config file says:
-
-CONFIG_CRYPTO_AES=m
-CONFIG_CRYPTO_AES_586=m
-CONFIG_CRYPTO_AES_NI_INTEL=m
-
-Should arch/x86/crypto/aesni-intel_asm.S be testing
-#ifdef CONFIG_X86_64
-instead of
-#ifdef __x86_64__
-or does that not matter?
-
-or is this a toolchain issue?
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Kind Regards,
+Mathias
