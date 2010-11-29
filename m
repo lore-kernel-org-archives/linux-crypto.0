@@ -1,8 +1,8 @@
 From: Randy Dunlap <randy.dunlap@oracle.com>
 Subject: Re: linux-next: Tree for November 29 (aesni-intel)
-Date: Mon, 29 Nov 2010 11:54:44 -0800
-Message-ID: <4CF40504.5060506@oracle.com>
-References: <4CF3F6CB.8080904@oracle.com> <1291058505-9384-1-git-send-email-minipli@googlemail.com> <4CF3FFAE.40906@oracle.com> <45B80502-8597-4650-990F-F23B4FC751B8@googlemail.com>
+Date: Mon, 29 Nov 2010 11:56:12 -0800
+Message-ID: <4CF4055C.1060000@oracle.com>
+References: <4CF3F6CB.8080904@oracle.com> <1291058505-9384-1-git-send-email-minipli@googlemail.com> <4CF3FFAE.40906@oracle.com> <358E1F68-6B24-4067-835E-94240025B0A3@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
@@ -14,11 +14,11 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-crypto@vger.kernel.org
 To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <45B80502-8597-4650-990F-F23B4FC751B8@googlemail.com>
+In-Reply-To: <358E1F68-6B24-4067-835E-94240025B0A3@googlemail.com>
 Sender: linux-next-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 11/29/10 11:45, Mathias Krause wrote:
+On 11/29/10 11:52, Mathias Krause wrote:
 > On 29.11.2010, 20:31 Randy Dunlap wrote:
 >> On 11/29/10 11:21, Mathias Krause wrote:
 >>> On 29.11.2010, 19:54 Randy Dunlap wrote:
@@ -86,28 +86,15 @@ On 11/29/10 11:45, Mathias Krause wrote:
 >> #define __x86_64__ 1
 >>
 >> So that's not the problem... and the patch below didn't help.
-> 
-> That's odd. The output of the commands looks good so the x86-64 specific code
-> should be left out for 32-bit builds. :/
-> 
 >> Sorry that I even asked about that.  What next?
 > 
-> Can you please post the full error message. Meanwhile I'm checking out a
-> linux-next tree, trying to reproduce your problem.
-> 
+> Sorry, I cannot reproduce the problem with the latest linux-next and commit
+> 559ad0ff1368baea14dbc3207d55b02bd69bda4b from cryptodev-2.6 applied. Please
+> ensure you've applied that patch.
 
-I just built with "make V=1" to see the full commands that are used, but
-that didn't help me either:
+OK, thanks for trying.
 
-  gcc -Wp,-MD,arch/x86/crypto/.aesni-intel_asm.o.d  -nostdinc -isystem /usr/lib/gcc/x86_64-redhat-linux/4.4.1/include -I/lnx/src/NEXT/linux-next-20101129/arch/x86/include -Iinclude  -I/lnx/src/NEXT/linux-next-20101129/include -include include/generated/autoconf.h -D__KERNEL__ -D__ASSEMBLY__ -m32 -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DMODULE  -c -o arch/x86/crypto/aesni-intel_asm.o /lnx/src/NEXT/linux-next-20101129/arch/x86/crypto/aesni-intel_asm.S
-
-
-There are 2945 lines like this:
-
-linux-next-20101129/arch/x86/crypto/aesni-intel_asm.S:841: Error: bad register name `%r12'
-
-It's around 311 KB, so I'll just put it here instead of emailing it:
-http://oss.oracle.com/~rdunlap/doc/cry32.out
+Yes, I have applied that patch.
 
 -- 
 ~Randy
