@@ -1,188 +1,178 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: [PATCHv2 2/6] omap-aes: redundant locking is removed
-Date: Tue, 30 Nov 2010 10:13:28 +0200
-Message-ID: <53efdd6bf0d375bc379437fba77cc461542e5bf4.1291104329.git.dmitry.kasatkin@nokia.com>
+Subject: [PATCHv2 4/6] omap-aes: unnecessary code removed
+Date: Tue, 30 Nov 2010 10:13:30 +0200
+Message-ID: <be7098ebdfe990862bce1fa64f6f822f7ebfa197.1291104329.git.dmitry.kasatkin@nokia.com>
 References: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
 To: herbert@gondor.hengli.com.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.128.26]:51556 "EHLO mgw-da02.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754462Ab0K3IM6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Nov 2010 03:12:58 -0500
+Return-path: <linux-omap-owner@vger.kernel.org>
 In-Reply-To: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
 In-Reply-To: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
 References: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Submitting request involved double locking for enqueuing and
-dequeuing. Now it is done under the same lock.
-
-FLAGS_BUSY is now handled under the same lock.
+Key and IV should always be set before AES operation.
+So no need to check if it has changed or not.
 
 Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
- drivers/crypto/omap-aes.c |   70 ++++++++++++++++++++------------------------
- 1 files changed, 32 insertions(+), 38 deletions(-)
+ drivers/crypto/omap-aes.c |   70 +++++++++++----------------------------------
+ 1 files changed, 17 insertions(+), 53 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 41c91f3..2d8f72e 100644
+index 704cc70..0b21dce 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -78,7 +78,7 @@
- #define FLAGS_NEW_IV		BIT(5)
- #define FLAGS_INIT		BIT(6)
- #define FLAGS_FAST		BIT(7)
--#define FLAGS_BUSY		8
-+#define FLAGS_BUSY		BIT(8)
+@@ -74,11 +74,9 @@
+ #define FLAGS_CBC		BIT(1)
+ #define FLAGS_GIV		BIT(2)
+ 
+-#define FLAGS_NEW_KEY		BIT(4)
+-#define FLAGS_NEW_IV		BIT(5)
+-#define FLAGS_INIT		BIT(6)
+-#define FLAGS_FAST		BIT(7)
+-#define FLAGS_BUSY		BIT(8)
++#define FLAGS_INIT		BIT(4)
++#define FLAGS_FAST		BIT(5)
++#define FLAGS_BUSY		BIT(6)
  
  struct omap_aes_ctx {
  	struct omap_aes_dev *dd;
-@@ -179,9 +179,8 @@ static int omap_aes_wait(struct omap_aes_dev *dd, u32 offset, u32 bit)
+@@ -105,9 +103,6 @@ struct omap_aes_dev {
+ 	unsigned long		flags;
+ 	int			err;
  
- static int omap_aes_hw_init(struct omap_aes_dev *dd)
+-	u32			*iv;
+-	u32			ctrl;
+-
+ 	spinlock_t		lock;
+ 	struct crypto_queue	queue;
+ 
+@@ -209,28 +204,13 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
  {
--	int err = 0;
+ 	unsigned int key32;
+-	int i, err, init = dd->flags & FLAGS_INIT;
++	int i, err;
+ 	u32 val, mask;
+ 
+ 	err = omap_aes_hw_init(dd);
+ 	if (err)
+ 		return err;
+ 
+-	val = FLD_VAL(((dd->ctx->keylen >> 3) - 1), 4, 3);
+-	if (dd->flags & FLAGS_CBC)
+-		val |= AES_REG_CTRL_CBC;
+-	if (dd->flags & FLAGS_ENCRYPT)
+-		val |= AES_REG_CTRL_DIRECTION;
 -
- 	clk_enable(dd->iclk);
+-	/* check if hw state & mode have not changed */
+-	if (init && dd->ctrl == val && !(dd->flags & FLAGS_NEW_IV) &&
+-		   !(dd->ctx->flags & FLAGS_NEW_KEY))
+-		goto out;
+-
+-	/* only need to write control registers for new settings */
+-
+-	dd->ctrl = val;
+-
+ 	val = 0;
+ 	if (dd->dma_lch_out >= 0)
+ 		val |= AES_REG_MASK_DMA_OUT_EN;
+@@ -241,27 +221,28 @@ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
+ 
+ 	omap_aes_write_mask(dd, AES_REG_MASK, val, mask);
+ 
+-	pr_debug("Set key\n");
+ 	key32 = dd->ctx->keylen / sizeof(u32);
+-	/* set a key */
 +
- 	if (!(dd->flags & FLAGS_INIT)) {
- 		/* is it necessary to reset before every operation? */
- 		omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_SOFTRESET,
-@@ -193,18 +192,15 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
- 		__asm__ __volatile__("nop");
- 		__asm__ __volatile__("nop");
- 
--		err = omap_aes_wait(dd, AES_REG_SYSSTATUS,
--				AES_REG_SYSSTATUS_RESETDONE);
--		if (!err)
--			dd->flags |= FLAGS_INIT;
-+		if (omap_aes_wait(dd, AES_REG_SYSSTATUS,
-+				AES_REG_SYSSTATUS_RESETDONE)) {
-+			clk_disable(dd->iclk);
-+			return -ETIMEDOUT;
-+		}
-+		dd->flags |= FLAGS_INIT;
++	/* it seems a key should always be set even if it has not changed */
+ 	for (i = 0; i < key32; i++) {
+ 		omap_aes_write(dd, AES_REG_KEY(i),
+ 			__le32_to_cpu(dd->ctx->key[i]));
  	}
+-	dd->ctx->flags &= ~FLAGS_NEW_KEY;
  
--	return err;
--}
--
--static void omap_aes_hw_cleanup(struct omap_aes_dev *dd)
--{
--	clk_disable(dd->iclk);
-+	return 0;
- }
+-	if (dd->flags & FLAGS_NEW_IV) {
+-		pr_debug("Set IV\n");
+-		omap_aes_write_n(dd, AES_REG_IV(0), dd->iv, 4);
+-		dd->flags &= ~FLAGS_NEW_IV;
+-	}
++	if ((dd->flags & FLAGS_CBC) && dd->req->info)
++		omap_aes_write_n(dd, AES_REG_IV(0), dd->req->info, 4);
++
++	val = FLD_VAL(((dd->ctx->keylen >> 3) - 1), 4, 3);
++	if (dd->flags & FLAGS_CBC)
++		val |= AES_REG_CTRL_CBC;
++	if (dd->flags & FLAGS_ENCRYPT)
++		val |= AES_REG_CTRL_DIRECTION;
  
- static void omap_aes_write_ctrl(struct omap_aes_dev *dd)
-@@ -538,6 +534,8 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 	mask = AES_REG_CTRL_CBC | AES_REG_CTRL_DIRECTION |
+ 			AES_REG_CTRL_KEY_SIZE;
+ 
+-	omap_aes_write_mask(dd, AES_REG_CTRL, dd->ctrl, mask);
++	omap_aes_write_mask(dd, AES_REG_CTRL, val, mask);
+ 
+-out:
+ 	/* start DMA or disable idle mode */
+ 	omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_START,
+ 			    AES_REG_MASK_START);
+@@ -561,16 +542,12 @@ static int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
+ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ {
+ 	struct ablkcipher_request *req = dd->req;
+-	struct omap_aes_ctx *ctx;
  
  	pr_debug("err: %d\n", err);
  
-+	dd->flags &= ~FLAGS_BUSY;
-+
- 	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(dd->req));
+ 	dd->flags &= ~FLAGS_BUSY;
  
- 	if (!dd->total)
-@@ -553,7 +551,7 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 
- 	omap_aes_write_mask(dd, AES_REG_MASK, 0, AES_REG_MASK_START);
- 
--	omap_aes_hw_cleanup(dd);
-+	clk_disable(dd->iclk);
- 
- 	omap_stop_dma(dd->dma_lch_in);
- 	omap_stop_dma(dd->dma_lch_out);
-@@ -580,22 +578,26 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 	return err;
+-	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
+-
+-	if (req->base.complete)
+-		req->base.complete(&req->base, err);
++	req->base.complete(&req->base, err);
  }
  
--static int omap_aes_handle_req(struct omap_aes_dev *dd)
-+static int omap_aes_handle_req(struct omap_aes_dev *dd,
-+			       struct ablkcipher_request *req)
- {
- 	struct crypto_async_request *async_req, *backlog;
- 	struct omap_aes_ctx *ctx;
- 	struct omap_aes_reqctx *rctx;
--	struct ablkcipher_request *req;
- 	unsigned long flags;
+ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+@@ -636,8 +613,6 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 
+ 	req = ablkcipher_request_cast(async_req);
+ 
+-	pr_debug("get new req\n");
 -
--	if (dd->total)
--		goto start;
-+	int err = 0;
+ 	/* assign new request to device */
+ 	dd->req = req;
+ 	dd->total = req->nbytes;
+@@ -651,18 +626,8 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 	rctx->mode &= FLAGS_MODE_MASK;
+ 	dd->flags = (dd->flags & ~FLAGS_MODE_MASK) | rctx->mode;
  
- 	spin_lock_irqsave(&dd->lock, flags);
-+	if (req)
-+		err = ablkcipher_enqueue_request(&dd->queue, req);
-+	if (dd->flags & FLAGS_BUSY) {
-+		spin_unlock_irqrestore(&dd->lock, flags);
-+		return err;
-+	}
- 	backlog = crypto_get_backlog(&dd->queue);
- 	async_req = crypto_dequeue_request(&dd->queue);
--	if (!async_req)
--		clear_bit(FLAGS_BUSY, &dd->flags);
-+	if (async_req)
-+		dd->flags |= FLAGS_BUSY;
- 	spin_unlock_irqrestore(&dd->lock, flags);
+-	dd->iv = req->info;
+-	if ((dd->flags & FLAGS_CBC) && dd->iv)
+-		dd->flags |= FLAGS_NEW_IV;
+-	else
+-		dd->flags &= ~FLAGS_NEW_IV;
+-
++	dd->ctx = ctx;
+ 	ctx->dd = dd;
+-	if (dd->ctx != ctx) {
+-		/* assign new context to device */
+-		dd->ctx = ctx;
+-		ctx->flags |= FLAGS_NEW_KEY;
+-	}
  
- 	if (!async_req)
-@@ -637,20 +639,23 @@ static int omap_aes_handle_req(struct omap_aes_dev *dd)
- 	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE))
- 		pr_err("request size is not exact amount of AES blocks\n");
+ 	err = omap_aes_crypt_dma_start(dd);
+ 	if (err) {
+@@ -744,7 +709,6 @@ static int omap_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
  
--start:
--	return omap_aes_crypt_dma_start(dd);
-+	omap_aes_crypt_dma_start(dd);
-+
-+	return err;
+ 	memcpy(ctx->key, key, keylen);
+ 	ctx->keylen = keylen;
+-	ctx->flags |= FLAGS_NEW_KEY;
+ 
+ 	return 0;
  }
- 
- static void omap_aes_task(unsigned long data)
- {
- 	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
--	int err;
- 
- 	pr_debug("enter\n");
- 
--	err = omap_aes_crypt_dma_stop(dd);
-+	omap_aes_crypt_dma_stop(dd);
- 
--	err = omap_aes_handle_req(dd);
-+	if (dd->total)
-+		omap_aes_crypt_dma_start(dd);
-+	else
-+		omap_aes_handle_req(dd, NULL);
- 
- 	pr_debug("exit\n");
- }
-@@ -661,8 +666,6 @@ static int omap_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 			crypto_ablkcipher_reqtfm(req));
- 	struct omap_aes_reqctx *rctx = ablkcipher_request_ctx(req);
- 	struct omap_aes_dev *dd;
--	unsigned long flags;
--	int err;
- 
- 	pr_debug("nbytes: %d, enc: %d, cbc: %d\n", req->nbytes,
- 		  !!(mode & FLAGS_ENCRYPT),
-@@ -674,16 +677,7 @@ static int omap_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 
- 	rctx->mode = mode;
- 
--	spin_lock_irqsave(&dd->lock, flags);
--	err = ablkcipher_enqueue_request(&dd->queue, req);
--	spin_unlock_irqrestore(&dd->lock, flags);
--
--	if (!test_and_set_bit(FLAGS_BUSY, &dd->flags))
--		omap_aes_handle_req(dd);
--
--	pr_debug("exit\n");
--
--	return err;
-+	return omap_aes_handle_req(dd, req);
- }
- 
- /* ********************** ALG API ************************************ */
 -- 
 1.7.0.4
+
