@@ -1,161 +1,163 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: [PATCHv2 5/6] omap-aes: initialize aes module once per request
-Date: Tue, 30 Nov 2010 10:13:31 +0200
-Message-ID: <2756a865d1d272569f341891796b352853e6fd21.1291104329.git.dmitry.kasatkin@nokia.com>
-References: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
-To: herbert@gondor.hengli.com.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: algif_skcipher - Fixed overflow when sndbuf is page aligned
+Date: Tue, 30 Nov 2010 16:51:21 +0800
+Message-ID: <20101130085121.GA28814@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.128.26]:51665 "EHLO mgw-da02.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754498Ab0K3INC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Nov 2010 03:13:02 -0500
-In-Reply-To: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
-In-Reply-To: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
-References: <cover.1291104329.git.dmitry.kasatkin@nokia.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:32866 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754741Ab0K3IvY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Nov 2010 03:51:24 -0500
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by fornost.hengli.com.au with esmtp (Exim 4.69 #1 (Debian))
+	id 1PNLvl-0007OW-Gc
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Nov 2010 19:51:21 +1100
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.69)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1PNLvl-0007VC-Dq
+	for linux-crypto@vger.kernel.org; Tue, 30 Nov 2010 16:51:21 +0800
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-AES module was initialized for every DMA transaction.
-That is redundant.
-Now it is initialized once per request.
+Hi:
 
-Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
----
- drivers/crypto/omap-aes.c |   54 +++++++++++++++++++++++---------------------
- 1 files changed, 28 insertions(+), 26 deletions(-)
+Just noticed that algif_skcipher fails to apply the sk_sndbuf limit
+correctly unless it is a multiple of PAGE_SIZE.  What happens is
+that the merge path will exceed sk_sndbuf causing the subsequent
+limit comparison to fail as it tries to do an unsigned comparison
+with a negative value.
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 0b21dce..b69da4f 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -176,6 +176,11 @@ static int omap_aes_wait(struct omap_aes_dev *dd, u32 offset, u32 bit)
+This patch fixes the problem.
+
+commit 0f6bb83cb12e4617e696ffa566f3fc6c092686e2
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Nov 30 16:49:02 2010 +0800
+
+    crypto: algif_skcipher - Fixed overflow when sndbuf is page aligned
+    
+    When sk_sndbuf is not a multiple of PAGE_SIZE, the limit tests
+    in sendmsg fail as the limit variable becomes negative and we're
+    using an unsigned comparison.
+    
+    The same thing can happen if sk_sndbuf is lowered after a sendmsg
+    call.
+    
+    This patch fixes this by always taking the signed maximum of limit
+    and 0 before we perform the comparison.
+    
+    It also rounds the value of sk_sndbuf down to a multiple of PAGE_SIZE
+    so that we don't end up allocating a page only to use a small number
+    of bytes in it because we're bound by sk_sndbuf.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 9b2f440..1f33480 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -52,12 +52,18 @@ struct skcipher_ctx {
+ #define MAX_SGL_ENTS ((PAGE_SIZE - sizeof(struct skcipher_sg_list)) / \
+ 		      sizeof(struct scatterlist) - 1)
  
- static int omap_aes_hw_init(struct omap_aes_dev *dd)
+-static inline bool skcipher_writable(struct sock *sk)
++static inline int skcipher_sndbuf(struct sock *sk)
  {
-+	/*
-+	 * clocks are enabled when request starts and disabled when finished.
-+	 * It may be long delays between requests.
-+	 * Device might go to off mode to save power.
-+	 */
- 	clk_enable(dd->iclk);
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct skcipher_ctx *ctx = ask->private;
  
- 	if (!(dd->flags & FLAGS_INIT)) {
-@@ -190,10 +195,9 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
- 		__asm__ __volatile__("nop");
- 
- 		if (omap_aes_wait(dd, AES_REG_SYSSTATUS,
--				AES_REG_SYSSTATUS_RESETDONE)) {
--			clk_disable(dd->iclk);
-+				AES_REG_SYSSTATUS_RESETDONE))
- 			return -ETIMEDOUT;
--		}
+-	return ctx->used + PAGE_SIZE <= max_t(int, sk->sk_sndbuf, PAGE_SIZE);
++	return max_t(int, max_t(int, sk->sk_sndbuf & PAGE_MASK, PAGE_SIZE) -
++			  ctx->used, 0);
++}
 +
- 		dd->flags |= FLAGS_INIT;
- 		dd->err = 0;
++static inline bool skcipher_writable(struct sock *sk)
++{
++	return PAGE_SIZE <= skcipher_sndbuf(sk);
+ }
+ 
+ static int skcipher_alloc_sgl(struct sock *sk)
+@@ -245,7 +251,6 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
+ 	struct af_alg_control con = {};
+ 	long copied = 0;
+ 	bool enc = 0;
+-	int limit;
+ 	int err;
+ 	int i;
+ 
+@@ -281,9 +286,6 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
+ 			memcpy(ctx->iv, con.iv->iv, ivsize);
  	}
-@@ -243,9 +247,19 @@ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
  
- 	omap_aes_write_mask(dd, AES_REG_CTRL, val, mask);
- 
--	/* start DMA or disable idle mode */
--	omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_START,
--			    AES_REG_MASK_START);
-+	/* IN */
-+	omap_set_dma_dest_params(dd->dma_lch_in, 0, OMAP_DMA_AMODE_CONSTANT,
-+				 dd->phys_base + AES_REG_DATA, 0, 4);
-+
-+	omap_set_dma_dest_burst_mode(dd->dma_lch_in, OMAP_DMA_DATA_BURST_4);
-+	omap_set_dma_src_burst_mode(dd->dma_lch_in, OMAP_DMA_DATA_BURST_4);
-+
-+	/* OUT */
-+	omap_set_dma_src_params(dd->dma_lch_out, 0, OMAP_DMA_AMODE_CONSTANT,
-+				dd->phys_base + AES_REG_DATA, 0, 4);
-+
-+	omap_set_dma_src_burst_mode(dd->dma_lch_out, OMAP_DMA_DATA_BURST_4);
-+	omap_set_dma_dest_burst_mode(dd->dma_lch_out, OMAP_DMA_DATA_BURST_4);
- 
- 	return 0;
- }
-@@ -419,7 +433,6 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm, dma_addr_t dma_addr_in,
- 	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct omap_aes_dev *dd = ctx->dd;
- 	int len32;
--	int err;
- 
- 	pr_debug("len: %d\n", length);
- 
-@@ -432,12 +445,6 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm, dma_addr_t dma_addr_in,
- 	len32 = DIV_ROUND_UP(length, sizeof(u32));
- 
- 	/* IN */
--	omap_set_dma_dest_params(dd->dma_lch_in, 0, OMAP_DMA_AMODE_CONSTANT,
--				 dd->phys_base + AES_REG_DATA, 0, 4);
+-	limit = max_t(int, sk->sk_sndbuf, PAGE_SIZE);
+-	limit -= ctx->used;
 -
--	omap_set_dma_dest_burst_mode(dd->dma_lch_in, OMAP_DMA_DATA_BURST_4);
--	omap_set_dma_src_burst_mode(dd->dma_lch_in, OMAP_DMA_DATA_BURST_4);
+ 	while (size) {
+ 		struct scatterlist *sg;
+ 		unsigned long len = size;
+@@ -309,20 +311,16 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
+ 			ctx->used += len;
+ 			copied += len;
+ 			size -= len;
+-			limit -= len;
+ 			continue;
+ 		}
+ 
+-		if (limit < PAGE_SIZE) {
++		if (!skcipher_writable(sk)) {
+ 			err = skcipher_wait_for_wmem(sk, msg->msg_flags);
+ 			if (err)
+ 				goto unlock;
 -
- 	omap_set_dma_transfer_params(dd->dma_lch_in, OMAP_DMA_DATA_TYPE_S32,
- 				     len32, 1, OMAP_DMA_SYNC_PACKET, dd->dma_in,
- 					OMAP_DMA_DST_SYNC);
-@@ -446,12 +453,6 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm, dma_addr_t dma_addr_in,
- 				dma_addr_in, 0, 0);
+-			limit = max_t(int, sk->sk_sndbuf, PAGE_SIZE);
+-			limit -= ctx->used;
+ 		}
  
- 	/* OUT */
--	omap_set_dma_src_params(dd->dma_lch_out, 0, OMAP_DMA_AMODE_CONSTANT,
--				dd->phys_base + AES_REG_DATA, 0, 4);
+-		len = min_t(unsigned long, len, limit);
++		len = min_t(unsigned long, len, skcipher_sndbuf(sk));
+ 
+ 		err = skcipher_alloc_sgl(sk);
+ 		if (err)
+@@ -352,7 +350,6 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
+ 			ctx->used += plen;
+ 			copied += plen;
+ 			size -= plen;
+-			limit -= plen;
+ 			sgl->cur++;
+ 		} while (len && sgl->cur < MAX_SGL_ENTS);
+ 
+@@ -380,7 +377,6 @@ static ssize_t skcipher_sendpage(struct socket *sock, struct page *page,
+ 	struct skcipher_ctx *ctx = ask->private;
+ 	struct skcipher_sg_list *sgl;
+ 	int err = -EINVAL;
+-	int limit;
+ 
+ 	lock_sock(sk);
+ 	if (!ctx->more && ctx->used)
+@@ -389,16 +385,10 @@ static ssize_t skcipher_sendpage(struct socket *sock, struct page *page,
+ 	if (!size)
+ 		goto done;
+ 
+-	limit = max_t(int, sk->sk_sndbuf, PAGE_SIZE);
+-	limit -= ctx->used;
 -
--	omap_set_dma_src_burst_mode(dd->dma_lch_out, OMAP_DMA_DATA_BURST_4);
--	omap_set_dma_dest_burst_mode(dd->dma_lch_out, OMAP_DMA_DATA_BURST_4);
+-	if (limit < PAGE_SIZE) {
++	if (!skcipher_writable(sk)) {
+ 		err = skcipher_wait_for_wmem(sk, flags);
+ 		if (err)
+ 			goto unlock;
 -
- 	omap_set_dma_transfer_params(dd->dma_lch_out, OMAP_DMA_DATA_TYPE_S32,
- 				     len32, 1, OMAP_DMA_SYNC_PACKET,
- 					dd->dma_out, OMAP_DMA_SRC_SYNC);
-@@ -459,13 +460,13 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm, dma_addr_t dma_addr_in,
- 	omap_set_dma_dest_params(dd->dma_lch_out, 0, OMAP_DMA_AMODE_POST_INC,
- 				 dma_addr_out, 0, 0);
+-		limit = max_t(int, sk->sk_sndbuf, PAGE_SIZE);
+-		limit -= ctx->used;
+ 	}
  
--	err = omap_aes_write_ctrl(dd);
--	if (err)
--		return err;
--
- 	omap_start_dma(dd->dma_lch_in);
- 	omap_start_dma(dd->dma_lch_out);
- 
-+	/* start DMA or disable idle mode */
-+	omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_START,
-+			    AES_REG_MASK_START);
-+
- 	return 0;
- }
- 
-@@ -545,6 +546,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 
- 	pr_debug("err: %d\n", err);
- 
-+	clk_disable(dd->iclk);
- 	dd->flags &= ~FLAGS_BUSY;
- 
- 	req->base.complete(&req->base, err);
-@@ -562,8 +564,6 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 	omap_stop_dma(dd->dma_lch_in);
- 	omap_stop_dma(dd->dma_lch_out);
- 
--	clk_disable(dd->iclk);
--
- 	if (dd->flags & FLAGS_FAST) {
- 		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
- 		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
-@@ -629,7 +629,9 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 	dd->ctx = ctx;
- 	ctx->dd = dd;
- 
--	err = omap_aes_crypt_dma_start(dd);
-+	err = omap_aes_write_ctrl(dd);
-+	if (!err)
-+		err = omap_aes_crypt_dma_start(dd);
- 	if (err) {
- 		/* aes_task will not finish it, so do it here */
- 		omap_aes_finish_req(dd, err);
+ 	err = skcipher_alloc_sgl(sk);
+
+Cheers,
 -- 
-1.7.0.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
