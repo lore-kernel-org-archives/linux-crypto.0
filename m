@@ -1,136 +1,148 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: [PATCH 1/5] xfrm: Add Traffic Flow Confidentiality padding XFRM attribute
-Date: Tue, 30 Nov 2010 16:49:11 +0100
-Message-ID: <1291132155-31277-2-git-send-email-martin@strongswan.org>
-References: <1291132155-31277-1-git-send-email-martin@strongswan.org>
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v1.5 4/5] keys: add new trusted key-type
+Date: Wed, 01 Dec 2010 17:48:30 +0000
+Message-ID: <9594.1291225710@redhat.com>
+References: <1290552635-3356-5-git-send-email-zohar@linux.vnet.ibm.com> <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
+	Mimi Zohar <zohar@us.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zaes.ch ([213.133.111.41]:38104 "EHLO zaes.ch"
+Received: from mx1.redhat.com ([209.132.183.28]:12083 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754338Ab0K3QbJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Nov 2010 11:31:09 -0500
-In-Reply-To: <1291132155-31277-1-git-send-email-martin@strongswan.org>
+	id S1756240Ab0LASvy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Dec 2010 13:51:54 -0500
+In-Reply-To: <1290552635-3356-5-git-send-email-zohar@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The XFRMA_TFCPAD attribute for XFRM state installation configures
-Traffic Flow Confidentiality by padding ESP packets to a specified
-length. To use RFC4303 TFC padding and overcome the 255 byte ESP
-padding field limit, the XFRM_TFC_ESPV3 flag must be set.
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: Martin Willi <martin@strongswan.org>
----
- include/linux/xfrm.h |    7 +++++++
- include/net/xfrm.h   |    1 +
- net/xfrm/xfrm_user.c |   16 ++++++++++++++--
- 3 files changed, 22 insertions(+), 2 deletions(-)
+> +static int TSS_sha1(const unsigned char *data, const unsigned int datalen,
+> +		    unsigned char *digest)
 
-diff --git a/include/linux/xfrm.h b/include/linux/xfrm.h
-index b971e38..b1e5f8a 100644
---- a/include/linux/xfrm.h
-+++ b/include/linux/xfrm.h
-@@ -283,6 +283,7 @@ enum xfrm_attr_type_t {
- 	XFRMA_KMADDRESS,        /* struct xfrm_user_kmaddress */
- 	XFRMA_ALG_AUTH_TRUNC,	/* struct xfrm_algo_auth */
- 	XFRMA_MARK,		/* struct xfrm_mark */
-+	XFRMA_TFC,		/* struct xfrm_tfc */
- 	__XFRMA_MAX
- 
- #define XFRMA_MAX (__XFRMA_MAX - 1)
-@@ -293,6 +294,12 @@ struct xfrm_mark {
- 	__u32           m; /* mask */
- };
- 
-+struct xfrm_tfc {
-+	__u16		pad;
-+	__u16		flags;
-+#define XFRM_TFC_ESPV3	1	/* RFC4303 TFC padding, if possible */
-+};
-+
- enum xfrm_sadattr_type_t {
- 	XFRMA_SAD_UNSPEC,
- 	XFRMA_SAD_CNT,
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index bcfb6b2..03468c0 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -143,6 +143,7 @@ struct xfrm_state {
- 	struct xfrm_id		id;
- 	struct xfrm_selector	sel;
- 	struct xfrm_mark	mark;
-+	struct xfrm_tfc		tfc;
- 
- 	u32			genid;
- 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 8bae6b2..0b4ec02 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -148,7 +148,8 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		     !attrs[XFRMA_ALG_AUTH_TRUNC]) ||
- 		    attrs[XFRMA_ALG_AEAD]	||
- 		    attrs[XFRMA_ALG_CRYPT]	||
--		    attrs[XFRMA_ALG_COMP])
-+		    attrs[XFRMA_ALG_COMP]	||
-+		    attrs[XFRMA_TFC])
- 			goto out;
- 		break;
- 
-@@ -172,7 +173,8 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		    attrs[XFRMA_ALG_AEAD]	||
- 		    attrs[XFRMA_ALG_AUTH]	||
- 		    attrs[XFRMA_ALG_AUTH_TRUNC]	||
--		    attrs[XFRMA_ALG_CRYPT])
-+		    attrs[XFRMA_ALG_CRYPT]	||
-+		    attrs[XFRMA_TFC])
- 			goto out;
- 		break;
- 
-@@ -186,6 +188,7 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		    attrs[XFRMA_ALG_CRYPT]	||
- 		    attrs[XFRMA_ENCAP]		||
- 		    attrs[XFRMA_SEC_CTX]	||
-+		    attrs[XFRMA_TFC]		||
- 		    !attrs[XFRMA_COADDR])
- 			goto out;
- 		break;
-@@ -439,6 +442,9 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
- 			goto error;
- 	}
- 
-+	if (attrs[XFRMA_TFC])
-+		memcpy(&x->tfc, nla_data(attrs[XFRMA_TFC]), sizeof(x->tfc));
-+
- 	if (attrs[XFRMA_COADDR]) {
- 		x->coaddr = kmemdup(nla_data(attrs[XFRMA_COADDR]),
- 				    sizeof(*x->coaddr), GFP_KERNEL);
-@@ -688,6 +694,9 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
- 	if (x->encap)
- 		NLA_PUT(skb, XFRMA_ENCAP, sizeof(*x->encap), x->encap);
- 
-+	if (x->tfc.pad || x->tfc.flags)
-+		NLA_PUT(skb, XFRMA_TFC, sizeof(x->tfc), &x->tfc);
-+
- 	if (xfrm_mark_put(skb, &x->mark))
- 		goto nla_put_failure;
- 
-@@ -2122,6 +2131,7 @@ static const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
- 	[XFRMA_MIGRATE]		= { .len = sizeof(struct xfrm_user_migrate) },
- 	[XFRMA_KMADDRESS]	= { .len = sizeof(struct xfrm_user_kmaddress) },
- 	[XFRMA_MARK]		= { .len = sizeof(struct xfrm_mark) },
-+	[XFRMA_TFC]		= { .len = sizeof(struct xfrm_tfc) },
- };
- 
- static struct xfrm_link {
-@@ -2301,6 +2311,8 @@ static inline size_t xfrm_sa_len(struct xfrm_state *x)
- 		l += nla_total_size(sizeof(*x->calg));
- 	if (x->encap)
- 		l += nla_total_size(sizeof(*x->encap));
-+	if (x->tfc.pad)
-+		l += nla_total_size(sizeof(x->tfc));
- 	if (x->security)
- 		l += nla_total_size(sizeof(struct xfrm_user_sec_ctx) +
- 				    x->security->ctx_len);
--- 
-1.7.1
+You seem to have made a bunch of integer length parameters 'const'.  Why?  I
+was suggesting making them size_t, not const.
+
+I was suggesting making the data pointers const.
+
+> +	if (!ret)
+> +		TSS_rawhmac(digest, key, keylen, SHA1_DIGEST_SIZE,
+> +			    paramdigest, TPM_NONCE_SIZE, h1,
+> +			    TPM_NONCE_SIZE, h2, 1, &c, 0, 0);
+
+TSS_rawhmac() can return an error.
+
+> +	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, sizeof tb->data);
+> +	memcpy(buf, tb->data + TPM_GETRANDOM_SIZE, len);
+
+trusted_tpm_send() won't fail?
+
+> +static int my_get_random(unsigned char *buf, int len)
+> +{
+> +	struct tpm_buf *tb;
+> +	int ret;
+> +
+> +	tb = kzalloc(sizeof *tb, GFP_KERNEL);
+> +	if (!tb)
+> +		return -ENOMEM;
+> +	ret = tpm_get_random(tb, buf, len);
+
+Isn't is it pointless to use kzalloc() rather than kmalloc()?
+
+> +	my_get_random(hash, SHA1_DIGEST_SIZE);
+> +	return tpm_pcr_extend(TPM_ANY_NUM, pcrnum, hash) ? -EINVAL : 0;
+
+my_get_random() won't fail?
+
+> +	ret = TSS_rawhmac(s->secret, key, SHA1_DIGEST_SIZE, TPM_NONCE_SIZE,
+> +			  enonce, TPM_NONCE_SIZE, ononce, 0, 0);
+> +	return ret;
+
+These can be merged.
+
+> +static int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
+> +{
+> +	int ret;
+> +
+> +	INIT_BUF(tb);
+> +	store16(tb, TPM_TAG_RQU_COMMAND);
+> +	store32(tb, TPM_OIAP_SIZE);
+> +	store32(tb, TPM_ORD_OIAP);
+> +	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	*handle = LOAD32(tb->data, TPM_DATA_OFFSET);
+> +	memcpy(nonce, &tb->data[TPM_DATA_OFFSET + sizeof(uint32_t)],
+> +	       TPM_NONCE_SIZE);
+> +	return ret;
+> +}
+
+If you don't need to return ret specifically, returning 0 would be more
+efficient.
+
+> +	ret = TSS_checkhmac1(tb->data, ordinal, td->nonceodd, sess.secret,
+> +			     SHA1_DIGEST_SIZE, storedsize, TPM_DATA_OFFSET, 0,
+> +			     0);
+> +
+> +	/* copy the returned blob to caller */
+> +	memcpy(blob, tb->data + TPM_DATA_OFFSET, storedsize);
+> +	*bloblen = storedsize;
+
+Don't do that if TSS_checkhmac1() fails.
+
+> +	TSS_authhmac(authdata1, keyauth, TPM_NONCE_SIZE,
+> +		     enonce1, nonceodd, cont, sizeof(uint32_t),
+> +		     &ordinal, bloblen, blob, 0, 0);
+
+TSS_authhmac() is called several times without checking for errors.
+
+> +	ret = TSS_checkhmac2(tb->data, ordinal, nonceodd,
+> +			     keyauth, SHA1_DIGEST_SIZE,
+> +			     blobauth, SHA1_DIGEST_SIZE,
+> +			     sizeof(uint32_t), TPM_DATA_OFFSET,
+> +			     *datalen, TPM_DATA_OFFSET + sizeof(uint32_t), 0,
+> +			     0);
+> +	if (ret < 0)
+> +		pr_info("trusted_key: TSS_checkhmac2 failed (%d)\n", ret);
+> +	memcpy(data, tb->data + TPM_DATA_OFFSET + sizeof(uint32_t), *datalen);
+> +	return ret;
+
+Don't do the memcpy() if TSS_checkhmac2() fails.
+
+> +	ret = tpm_unseal(tb, o->keyhandle, o->keyauth, p->blob, p->blob_len,
+> +			 o->blobauth, p->key, &p->key_len);
+> +	/* pull migratable flag out of sealed key */
+> +	p->migratable = p->key[--p->key_len];
+
+Don't do that if tpm_unseal() fails.
+
+> +static const match_table_t key_tokens = {
+> +	{Opt_new, "new"},
+> +	{Opt_load, "load"},
+> +	{Opt_update, "update"},
+> +	{Opt_keyhandle, "keyhandle=%s"},
+> +	{Opt_keyauth, "keyauth=%s"},
+> +	{Opt_blobauth, "blobauth=%s"},
+> +	{Opt_pcrinfo, "pcrinfo=%s"},
+> +	{Opt_pcrlock, "pcrlock=%s"},
+> +	{Opt_migratable, "migratable=%s"},
+> +	{Opt_err, NULL}
+
+Spaces after { and before }.  I'd also suggest using tabs to align the strings
+vertically, but that's up to you.
+
+> +	p = kzalloc(sizeof *p, GFP_KERNEL);
+> +
+> +	/* migratable by default */
+> +	p->migratable = 1;
+
+NAK!  p might be NULL.
+
+David
