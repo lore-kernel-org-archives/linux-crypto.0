@@ -1,183 +1,63 @@
-From: David Safford <safford@watson.ibm.com>
-Subject: Re: [PATCH v1.5 4/5] keys: add new trusted key-type
-Date: Wed, 01 Dec 2010 16:18:00 -0500
-Message-ID: <1291238280.2834.31.camel@localhost.localdomain>
-References: <1290552635-3356-5-git-send-email-zohar@linux.vnet.ibm.com>
-	 <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
-	 <9594.1291225710@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: padlock: fix for non-64byte aligned data
+Date: Thu, 2 Dec 2010 14:14:41 +0800
+Message-ID: <20101202061441.GA22378@gondor.apana.org.au>
+References: <1288893036-31704-1-git-send-email-phil@nwl.cc> <20101104184606.GA1994@gondor.apana.org.au> <20101105141238.GG29793@orbit.nwl.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>,
-	Mimi Zohar <zohar@us.ibm.com>
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Chuck Ebbert <cebbert@redhat.com>,
+	Nico Erfurth <ne@erfurth.eu>,
+	Harald Welte <HaraldWelte@viatech.com>,
+	Michal Ludvig <michal@logix.cz>
+To: Phil Sutter <phil@nwl.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from igw2.watson.ibm.com ([129.34.20.6]:42896 "EHLO
-	igw2.watson.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751740Ab0LAVTL convert rfc822-to-8bit (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:42963 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756959Ab0LBGOv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Dec 2010 16:19:11 -0500
-In-Reply-To: <9594.1291225710@redhat.com>
+	Thu, 2 Dec 2010 01:14:51 -0500
+Content-Disposition: inline
+In-Reply-To: <20101105141238.GG29793@orbit.nwl.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2010-12-01 at 17:48 +0000, David Howells wrote:
-> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+On Fri, Nov 05, 2010 at 03:12:38PM +0100, Phil Sutter wrote:
 > 
-> > +static int TSS_sha1(const unsigned char *data, const unsigned int datalen,
-> > +		    unsigned char *digest)
+> Yes, kind of. With that trivial fix applied, the driver is stable most
+> of the time.
+
+Great.
+
+> Yes, it does, but triggering the bug is not really trivial. I've had
+> best results with a speed testing tool using the asynchronous interface,
+> memory corruption occured in each run. The same tool operating
+> synchronously doesn't crash as soon, but having three or more instances
+> running in parallel yields the same result.
 > 
-> You seem to have made a bunch of integer length parameters 'const'.  Why?  I
-> was suggesting making them size_t, not const.
+> This problem is so racey, a simple printk statement at the beginning of
+> padlock_xcrypt_ecb() fixes it. Enclosing the same function's content in
+> lock_kernel()/unlock_kernel() statements helps as well.
+
+Interesting.  Do you have preemption enabled?
+
+Can you share the test program with us?
+ 
+> > Can you provide some information on the CPU where you're seeing
+> > this?
 > 
-> I was suggesting making the data pointers const.
+> This is the faulty one:
+> | -bash-4.0# cat /proc/cpuinfo 
+> | processor	: 0
+> | vendor_id	: CentaurHauls
+> | cpu family	: 6
+> | model		: 15
+> | model name	: VIA Nano processor L2200@1600MHz
+> | stepping	: 2
 
-I think all the data pointers that are const have been fixed.
-Will clean up the ints with size_t and not const as appropriate.
+Is there anyone else on the list who has this hardware?
 
-> > +	if (!ret)
-> > +		TSS_rawhmac(digest, key, keylen, SHA1_DIGEST_SIZE,
-> > +			    paramdigest, TPM_NONCE_SIZE, h1,
-> > +			    TPM_NONCE_SIZE, h2, 1, &c, 0, 0);
-> 
-> TSS_rawhmac() can return an error.
-
-will fix.
-
-> > +	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, sizeof tb->data);
-> > +	memcpy(buf, tb->data + TPM_GETRANDOM_SIZE, len);
-> 
-> trusted_tpm_send() won't fail?
-
-will fix.
-
-> > +static int my_get_random(unsigned char *buf, int len)
-> > +{
-> > +	struct tpm_buf *tb;
-> > +	int ret;
-> > +
-> > +	tb = kzalloc(sizeof *tb, GFP_KERNEL);
-> > +	if (!tb)
-> > +		return -ENOMEM;
-> > +	ret = tpm_get_random(tb, buf, len);
-> 
-> Isn't is it pointless to use kzalloc() rather than kmalloc()?
-
-correct - zero not needed here.
-
-> > +	my_get_random(hash, SHA1_DIGEST_SIZE);
-> > +	return tpm_pcr_extend(TPM_ANY_NUM, pcrnum, hash) ? -EINVAL : 0;
-> 
-> my_get_random() won't fail?
-
-will fix.
-
-> > +	ret = TSS_rawhmac(s->secret, key, SHA1_DIGEST_SIZE, TPM_NONCE_SIZE,
-> > +			  enonce, TPM_NONCE_SIZE, ononce, 0, 0);
-> > +	return ret;
-> 
-> These can be merged.
-
-will merge.
-
-> > +static int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
-> > +{
-> > +	int ret;
-> > +
-> > +	INIT_BUF(tb);
-> > +	store16(tb, TPM_TAG_RQU_COMMAND);
-> > +	store32(tb, TPM_OIAP_SIZE);
-> > +	store32(tb, TPM_ORD_OIAP);
-> > +	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	*handle = LOAD32(tb->data, TPM_DATA_OFFSET);
-> > +	memcpy(nonce, &tb->data[TPM_DATA_OFFSET + sizeof(uint32_t)],
-> > +	       TPM_NONCE_SIZE);
-> > +	return ret;
-> > +}
-> 
-> If you don't need to return ret specifically, returning 0 would be more
-> efficient.
-
-right - this can be return 0;
-
-> > +	ret = TSS_checkhmac1(tb->data, ordinal, td->nonceodd, sess.secret,
-> > +			     SHA1_DIGEST_SIZE, storedsize, TPM_DATA_OFFSET, 0,
-> > +			     0);
-> > +
-> > +	/* copy the returned blob to caller */
-> > +	memcpy(blob, tb->data + TPM_DATA_OFFSET, storedsize);
-> > +	*bloblen = storedsize;
-> 
-> Don't do that if TSS_checkhmac1() fails.
-
-will fix.
-
-> > +	TSS_authhmac(authdata1, keyauth, TPM_NONCE_SIZE,
-> > +		     enonce1, nonceodd, cont, sizeof(uint32_t),
-> > +		     &ordinal, bloblen, blob, 0, 0);
-> 
-> TSS_authhmac() is called several times without checking for errors.
-
-will fix.
-
-> > +	ret = TSS_checkhmac2(tb->data, ordinal, nonceodd,
-> > +			     keyauth, SHA1_DIGEST_SIZE,
-> > +			     blobauth, SHA1_DIGEST_SIZE,
-> > +			     sizeof(uint32_t), TPM_DATA_OFFSET,
-> > +			     *datalen, TPM_DATA_OFFSET + sizeof(uint32_t), 0,
-> > +			     0);
-> > +	if (ret < 0)
-> > +		pr_info("trusted_key: TSS_checkhmac2 failed (%d)\n", ret);
-> > +	memcpy(data, tb->data + TPM_DATA_OFFSET + sizeof(uint32_t), *datalen);
-> > +	return ret;
-> 
-> Don't do the memcpy() if TSS_checkhmac2() fails.
-
-will fix.
-
-> > +	ret = tpm_unseal(tb, o->keyhandle, o->keyauth, p->blob, p->blob_len,
-> > +			 o->blobauth, p->key, &p->key_len);
-> > +	/* pull migratable flag out of sealed key */
-> > +	p->migratable = p->key[--p->key_len];
-> 
-> Don't do that if tpm_unseal() fails.
-
-will fix.
-
-> > +static const match_table_t key_tokens = {
-> > +	{Opt_new, "new"},
-> > +	{Opt_load, "load"},
-> > +	{Opt_update, "update"},
-> > +	{Opt_keyhandle, "keyhandle=%s"},
-> > +	{Opt_keyauth, "keyauth=%s"},
-> > +	{Opt_blobauth, "blobauth=%s"},
-> > +	{Opt_pcrinfo, "pcrinfo=%s"},
-> > +	{Opt_pcrlock, "pcrlock=%s"},
-> > +	{Opt_migratable, "migratable=%s"},
-> > +	{Opt_err, NULL}
-> 
-> Spaces after { and before }.  I'd also suggest using tabs to align the strings
-> vertically, but that's up to you.
-
-Lindent takes the spaces out, CodingStyle doesn't say, and most similar
-examples in the kernel leave them out.
-
-> > +	p = kzalloc(sizeof *p, GFP_KERNEL);
-> > +
-> > +	/* migratable by default */
-> > +	p->migratable = 1;
-> 
-> NAK!  p might be NULL.
-
-yikes! will fix.
-
-dave
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
