@@ -1,31 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Install <linux/if_alg.h> for user-space applications
-Date: Thu, 2 Dec 2010 23:54:24 +0800
-Message-ID: <20101202155424.GA27474@gondor.apana.org.au>
-References: <1291305125-24692-1-git-send-email-mitr@redhat.com>
+From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+Subject: [PATCH] Install <linux/if_alg.h> for user-space applications
+Date: Thu,  2 Dec 2010 16:55:55 +0100
+Message-ID: <1291305355-24899-1-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
+Cc: linux-crypto@vger.kernel.org,
+	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+To: <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33683 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752041Ab0LBPy0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Dec 2010 10:54:26 -0500
-Content-Disposition: inline
-In-Reply-To: <1291305125-24692-1-git-send-email-mitr@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:11960 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752041Ab0LBP4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Dec 2010 10:56:02 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 02, 2010 at 04:52:05PM +0100, Miloslav Trma=C4=8D wrote:
-> ---
->  include/linux/Kbuild |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
 
-Sign-off?
+Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
+---
+ include/linux/Kbuild |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/include/linux/Kbuild b/include/linux/Kbuild
+index 9aa9bca..60db44c 100644
+--- a/include/linux/Kbuild
++++ b/include/linux/Kbuild
+@@ -81,6 +81,7 @@ header-y +=3D hysdn_if.h
+ header-y +=3D i2o-dev.h
+ header-y +=3D i8k.h
+ header-y +=3D if_addrlabel.h
++header-y +=3D if_alg.h
+ header-y +=3D if_arcnet.h
+ header-y +=3D if_bonding.h
+ header-y +=3D if_cablemodem.h
 --=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.3.2
