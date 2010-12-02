@@ -1,33 +1,31 @@
-From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH] Install <linux/if_alg.h> for user-space applications
-Date: Thu,  2 Dec 2010 16:52:05 +0100
-Message-ID: <1291305125-24692-1-git-send-email-mitr@redhat.com>
-Cc: linux-crypto@vger.kernel.org,
-	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-To: <herbert@gondor.hengli.com.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] Install <linux/if_alg.h> for user-space applications
+Date: Thu, 2 Dec 2010 23:54:24 +0800
+Message-ID: <20101202155424.GA27474@gondor.apana.org.au>
+References: <1291305125-24692-1-git-send-email-mitr@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33335 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752041Ab0LBPwR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Dec 2010 10:52:17 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:33683 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752041Ab0LBPy0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Dec 2010 10:54:26 -0500
+Content-Disposition: inline
+In-Reply-To: <1291305125-24692-1-git-send-email-mitr@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
----
- include/linux/Kbuild |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+On Thu, Dec 02, 2010 at 04:52:05PM +0100, Miloslav Trma=C4=8D wrote:
+> ---
+>  include/linux/Kbuild |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/include/linux/Kbuild b/include/linux/Kbuild
-index 9aa9bca..60db44c 100644
---- a/include/linux/Kbuild
-+++ b/include/linux/Kbuild
-@@ -81,6 +81,7 @@ header-y += hysdn_if.h
- header-y += i2o-dev.h
- header-y += i8k.h
- header-y += if_addrlabel.h
-+header-y += if_alg.h
- header-y += if_arcnet.h
- header-y += if_bonding.h
- header-y += if_cablemodem.h
--- 
-1.7.3.2
+Sign-off?
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
