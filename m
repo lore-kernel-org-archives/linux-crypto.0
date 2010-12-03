@@ -1,39 +1,76 @@
-From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH] Make sure sk_security is initialized on accept()ed sockets
-Date: Fri,  3 Dec 2010 12:41:48 +0100
-Message-ID: <1291376508-6902-1-git-send-email-mitr@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-To: <herbert@gondor.hengli.com.au>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v1.5 5/5] keys: add new key-type encrypted
+Date: Fri, 03 Dec 2010 13:42:05 +0000
+Message-ID: <4182.1291383725@redhat.com>
+References: <1290556535.2604.16.camel@localhost.localdomain> <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50973 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:61265 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932404Ab0LCLlx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Dec 2010 06:41:53 -0500
+	id S1752140Ab0LCNmU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Dec 2010 08:42:20 -0500
+In-Reply-To: <1290556535.2604.16.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
----
- crypto/af_alg.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> +#define KEY_TRUSTED_PREFIX "trusted:"
+> +#define KEY_TRUSTED_PREFIX_LEN (sizeof (KEY_TRUSTED_PREFIX) - 1)
+> +#define KEY_USER_PREFIX "user:"
+> +#define KEY_USER_PREFIX_LEN (sizeof (KEY_USER_PREFIX) - 1)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index cabed0e..bd9e53c 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -242,6 +242,7 @@ int af_alg_accept(struct sock *sk, struct socket *n=
-ewsock)
- 		goto unlock;
-=20
- 	sock_init_data(newsock, sk2);
-+	sock_graft(sk2, newsock);
-=20
- 	err =3D type->accept(ask->private, sk2);
- 	if (err) {
---=20
-1.7.3.2
+I'd recommend using static const char arrays.
+
+> +static int datablob_parse(char *datablob, char **master_desc,
+> ...
+> +		*hex_encoded_data = *hex_encoded_iv + (2 * ivsize) + 2;
+
+Do you need to validate the length of the string here?
+
+> +static struct key *request_trusted_key(const char *trusted_desc,
+> +				       u8 **master_key,
+> +				       unsigned int *master_keylen)
+
+You need to annotate the function with an __acquires() to indicate that it
+returns with a lock held for Sparse checking.  I think you should be able to
+do:
+
+	__acquires(tkey->sem)
+
+on the line before the '{'.
+
+> +static struct key *request_user_key(const char *master_desc, u8 **master_key,
+> +				    unsigned int *master_keylen)
+
+Ditto.
+
+> +static struct sdesc *init_sdesc(struct crypto_shash *alg)
+> +{
+> +	struct sdesc *sdesc;
+> +	int size;
+> +
+> +	size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
+> +	sdesc = kmalloc(size, GFP_KERNEL);
+
+I think I'd call it alloc_sdesc() rather than init_sdesc().
+
+> +static int calc_hmac(u8 *digest, const u8 *key, const unsigned int keylen,
+> +		     const u8 *buf, const unsigned int buflen)
+
+size_t not 'const unsigned int' please.  There are multiple of these within
+the patch.
+
+> +	sg_set_buf(&sg_out[0], epayload->decrypted_data,
+> +		   (unsigned int)epayload->decrypted_datalen);
+
+Superfluous cast.
+
+David
