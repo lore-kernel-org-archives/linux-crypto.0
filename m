@@ -1,79 +1,60 @@
-From: "Struk, Tadeusz" <tadeusz.struk@intel.com>
-Subject: RE: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
-Date: Fri, 3 Dec 2010 11:05:56 +0000
-Message-ID: <24483BA4C9F69C43A7379639D35543D7C3682C99@irsmsx502.ger.corp.intel.com>
-References: <4CC9946D.mailLH511GU0C@intel.com>
- <20101104190405.GA2501@gondor.apana.org.au>
- <20101117172331.3bbec734.akpm@linux-foundation.org>
- <20101118092640.GA9486@gondor.apana.org.au>
- <24483BA4C9F69C43A7379639D35543D7C3450A84@irsmsx502.ger.corp.intel.com>
- <20101202161403.74daae6f.akpm@linux-foundation.org>
- <20101203013021.GA304@gondor.apana.org.au>
+From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+Subject: [PATCH] Add missing lockdep class names
+Date: Fri,  3 Dec 2010 12:38:37 +0100
+Message-ID: <1291376317-6801-1-git-send-email-mitr@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
-	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
-	"Hoban, Adrian" <adrian.hoban@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
+To: <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:49669 "EHLO mga09.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:28532 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757235Ab0LCLHX convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Dec 2010 06:07:23 -0500
-In-Reply-To: <20101203013021.GA304@gondor.apana.org.au>
-Content-Language: en-US
+	id S1752601Ab0LCLio (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Dec 2010 06:38:44 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert and Andrew,
-Sorry for delay. We have the patch almost ready. We just want to do some more testing before we send it.
-We should be ready to send it out next week. Next Friday (10 Dec) will be worst case date.
-Thanks,
-Tadeusz
- 
 
------Original Message-----
-From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
-Sent: Friday, December 03, 2010 1:30 AM
-To: Andrew Morton
-Cc: Struk, Tadeusz; linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; O Mahony, Aidan; Paoloni, Gabriele; Hoban, Adrian
-Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
+---
+ net/core/sock.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-On Thu, Dec 02, 2010 at 04:14:03PM -0800, Andrew Morton wrote:
->
-> > > Tadeusz, could you please make an incremental patch that converts
-> > > all the pshufb instructions to macros?
-> > > 
-> >
-> > Will do.
-> > Tadeusz
-> > 
-> 
-> (top-posting repaired)
-> 
-> (busted attribution/quoting repaired)
-> 
-> Current mainline still has this failure.
-
-Tadeusz, can you update us on your progress on this?
-
-Andrew, I'll just back this out if it doesn't get resolved.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---------------------------------------------------------------
-Intel Shannon Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-Business address: Dromore House, East Park, Shannon, Co. Clare
-
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 3eed542..634d5bc 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -157,7 +157,7 @@ static const char *const af_family_key_strings[AF_M=
+AX+1] =3D {
+   "sk_lock-27"       , "sk_lock-28"          , "sk_lock-AF_CAN"      ,
+   "sk_lock-AF_TIPC"  , "sk_lock-AF_BLUETOOTH", "sk_lock-IUCV"        ,
+   "sk_lock-AF_RXRPC" , "sk_lock-AF_ISDN"     , "sk_lock-AF_PHONET"   ,
+-  "sk_lock-AF_IEEE802154", "sk_lock-AF_CAIF" ,
++  "sk_lock-AF_IEEE802154", "sk_lock-AF_CAIF" , "sk_lock-AF_ALG"      ,
+   "sk_lock-AF_MAX"
+ };
+ static const char *const af_family_slock_key_strings[AF_MAX+1] =3D {
+@@ -173,7 +173,7 @@ static const char *const af_family_slock_key_string=
+s[AF_MAX+1] =3D {
+   "slock-27"       , "slock-28"          , "slock-AF_CAN"      ,
+   "slock-AF_TIPC"  , "slock-AF_BLUETOOTH", "slock-AF_IUCV"     ,
+   "slock-AF_RXRPC" , "slock-AF_ISDN"     , "slock-AF_PHONET"   ,
+-  "slock-AF_IEEE802154", "slock-AF_CAIF" ,
++  "slock-AF_IEEE802154", "slock-AF_CAIF" , "slock-AF_ALG"      ,
+   "slock-AF_MAX"
+ };
+ static const char *const af_family_clock_key_strings[AF_MAX+1] =3D {
+@@ -189,7 +189,7 @@ static const char *const af_family_clock_key_string=
+s[AF_MAX+1] =3D {
+   "clock-27"       , "clock-28"          , "clock-AF_CAN"      ,
+   "clock-AF_TIPC"  , "clock-AF_BLUETOOTH", "clock-AF_IUCV"     ,
+   "clock-AF_RXRPC" , "clock-AF_ISDN"     , "clock-AF_PHONET"   ,
+-  "clock-AF_IEEE802154", "clock-AF_CAIF" ,
++  "clock-AF_IEEE802154", "clock-AF_CAIF" , "clock-AF_ALG"      ,
+   "clock-AF_MAX"
+ };
+=20
+--=20
+1.7.3.2
