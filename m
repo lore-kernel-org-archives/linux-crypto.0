@@ -1,34 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Add missing lockdep class names for AF_ALG
-Date: Fri, 3 Dec 2010 13:55:42 +0800
-Message-ID: <20101203055542.GA1910@gondor.apana.org.au>
-References: <1291122924-30276-1-git-send-email-mitr@redhat.com>
+Subject: Re: [PATCH 3/5] xfrm: Traffic Flow Confidentiality for IPv4 ESP
+Date: Fri, 3 Dec 2010 15:34:03 +0800
+Message-ID: <20101203073403.GA2292@gondor.apana.org.au>
+References: <1291132155-31277-1-git-send-email-martin@strongswan.org> <1291132155-31277-4-git-send-email-martin@strongswan.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Miloslav =?utf-8?B?VHJtYcSN?= <mitr@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38493 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751786Ab0LCFzr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Dec 2010 00:55:47 -0500
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Martin Willi <martin@strongswan.org>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1291122924-30276-1-git-send-email-mitr@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1291132155-31277-4-git-send-email-martin@strongswan.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 30, 2010 at 02:15:24PM +0100, Miloslav Trma=C4=8D wrote:
-> ---
->  net/core/sock.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+On Tue, Nov 30, 2010 at 03:49:13PM +0000, Martin Willi wrote:
+>
+> +	if (skb->len >= tfcpadto) {
+> +		clen = ALIGN(skb->len + 2, blksize);
+> +	} else if (x->tfc.flags & XFRM_TFC_ESPV3 &&
+> +		   x->props.mode == XFRM_MODE_TUNNEL) {
+> +		/* ESPv3 TFC padding, append bytes to payload */
+> +		tfclen = tfcpadto - skb->len;
+> +		clen = ALIGN(skb->len + 2 + tfclen, blksize);
+> +	} else {
+> +		/* ESPv2 TFC padding. If we exceed the 255 byte maximum, use
+> +		 * random padding to hide payload length as good as possible. */
+> +		clen = ALIGN(skb->len + 2 + tfcpadto - skb->len, blksize);
+> +		if (clen - skb->len - 2 > 255) {
+> +			clen = ALIGN(skb->len + (u8)random32() + 2, blksize);
+> +			if (clen - skb->len - 2 > 255)
+> +				clen -= blksize;
+> +		}
 
-Please resend with sign-offs.
+What is the basis of this random length padding?
 
-Thanks,
---=20
+Also, what happens when padto exceeds the MTU? Doesn't this
+effectively disable PMTU-discovery?
+
+I know that your last patch allows the padto to be set by PMTU.
+But why would we ever want to use a padto that isn't clamped by
+PMTU?
+
+Cheers,
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
