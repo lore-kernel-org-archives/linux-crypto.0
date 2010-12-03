@@ -1,38 +1,49 @@
-From: =?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-Subject: [PATCH] Install <linux/if_alg.h> for user-space applications
-Date: Thu,  2 Dec 2010 16:55:55 +0100
-Message-ID: <1291305355-24899-1-git-send-email-mitr@redhat.com>
+From: "Dear 'WEBMAIL ACCOUNT USER'," <info@web.com>
+Subject: Dear 'WEBMAIL ACCOUNT USER',
+Date: Thu, 2 Dec 2010 23:46:00 -0500 (EST)
+Message-ID: <52733.82.128.14.132.1291351560.squirrel@wnl.lk>
+Reply-To: helpdisk112@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	=?UTF-8?q?Miloslav=20Trma=C4=8D?= <mitr@redhat.com>
-To: <herbert@gondor.hengli.com.au>
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:11960 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752041Ab0LBP4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Dec 2010 10:56:02 -0500
+Received: from wnl.lk ([203.143.12.196]:35286 "HELO mail.wnl.lk"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1756216Ab0LBSmy convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Dec 2010 13:42:54 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-Signed-off-by: Miloslav Trma=C4=8D <mitr@redhat.com>
----
- include/linux/Kbuild |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/include/linux/Kbuild b/include/linux/Kbuild
-index 9aa9bca..60db44c 100644
---- a/include/linux/Kbuild
-+++ b/include/linux/Kbuild
-@@ -81,6 +81,7 @@ header-y +=3D hysdn_if.h
- header-y +=3D i2o-dev.h
- header-y +=3D i8k.h
- header-y +=3D if_addrlabel.h
-+header-y +=3D if_alg.h
- header-y +=3D if_arcnet.h
- header-y +=3D if_bonding.h
- header-y +=3D if_cablemodem.h
---=20
-1.7.3.2
+
+Dear 'WEBMAIL ACCOUNT USER',
+
+We are currrently upgrading our database and all account need to be ver=
+ified.
+To complete your account activation with us,you are required to reply t=
+o this
+message and enter correctly the information's that is required from you=
+=2E
+
+=46ill in your User Name and Password in the space provided (********)Y=
+ou are
+required to reply to this e-mail within the next 48 hours.
+
+=46ailure to get back to us, your Webmail account will be de-activated =
+from our
+database.
+
+=46ULL NAME;
+USERNAME;
+PASSWORD;
+RE-TYPE PASSWORD;
+DATE OF BIRTH;
+
+
+Thank you for using  Webmail Copyright 2010 =A9  Web Team.
+
+19X45HANJ4453VXTM334M
+     05-10-2010
