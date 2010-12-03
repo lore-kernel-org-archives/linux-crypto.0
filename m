@@ -1,76 +1,23 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v1.5 5/5] keys: add new key-type encrypted
-Date: Fri, 03 Dec 2010 13:42:05 +0000
-Message-ID: <4182.1291383725@redhat.com>
-References: <1290556535.2604.16.camel@localhost.localdomain> <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	James Morris <jmorris@namei.org>,
-	David Safford <safford@watson.ibm.com>,
-	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+From: Christoph Sievers <christoph.sievers@gmail.com>
+Subject: http://eprint.iacr.org/2010/594 (Access Based Cache Attacks on AES)
+ a problem?
+Date: Fri, 03 Dec 2010 21:32:09 +0100
+Message-ID: <4CF953C9.8020909@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:61265 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752140Ab0LCNmU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Dec 2010 08:42:20 -0500
-In-Reply-To: <1290556535.2604.16.camel@localhost.localdomain>
+Received: from mail-wy0-f194.google.com ([74.125.82.194]:36534 "EHLO
+	mail-wy0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753892Ab0LCUbV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Dec 2010 15:31:21 -0500
+Received: by wyb32 with SMTP id 32so3728943wyb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Dec 2010 12:31:20 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+is http://eprint.iacr.org/2010/594 a problem and if so what has to be done?
 
-> +#define KEY_TRUSTED_PREFIX "trusted:"
-> +#define KEY_TRUSTED_PREFIX_LEN (sizeof (KEY_TRUSTED_PREFIX) - 1)
-> +#define KEY_USER_PREFIX "user:"
-> +#define KEY_USER_PREFIX_LEN (sizeof (KEY_USER_PREFIX) - 1)
-
-I'd recommend using static const char arrays.
-
-> +static int datablob_parse(char *datablob, char **master_desc,
-> ...
-> +		*hex_encoded_data = *hex_encoded_iv + (2 * ivsize) + 2;
-
-Do you need to validate the length of the string here?
-
-> +static struct key *request_trusted_key(const char *trusted_desc,
-> +				       u8 **master_key,
-> +				       unsigned int *master_keylen)
-
-You need to annotate the function with an __acquires() to indicate that it
-returns with a lock held for Sparse checking.  I think you should be able to
-do:
-
-	__acquires(tkey->sem)
-
-on the line before the '{'.
-
-> +static struct key *request_user_key(const char *master_desc, u8 **master_key,
-> +				    unsigned int *master_keylen)
-
-Ditto.
-
-> +static struct sdesc *init_sdesc(struct crypto_shash *alg)
-> +{
-> +	struct sdesc *sdesc;
-> +	int size;
-> +
-> +	size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
-> +	sdesc = kmalloc(size, GFP_KERNEL);
-
-I think I'd call it alloc_sdesc() rather than init_sdesc().
-
-> +static int calc_hmac(u8 *digest, const u8 *key, const unsigned int keylen,
-> +		     const u8 *buf, const unsigned int buflen)
-
-size_t not 'const unsigned int' please.  There are multiple of these within
-the patch.
-
-> +	sg_set_buf(&sg_out[0], epayload->decrypted_data,
-> +		   (unsigned int)epayload->decrypted_datalen);
-
-Superfluous cast.
-
-David
+rgds
