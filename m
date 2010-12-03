@@ -1,49 +1,76 @@
-From: "Dear 'WEBMAIL ACCOUNT USER'," <info@web.com>
-Subject: Dear 'WEBMAIL ACCOUNT USER',
-Date: Thu, 2 Dec 2010 23:46:00 -0500 (EST)
-Message-ID: <52733.82.128.14.132.1291351560.squirrel@wnl.lk>
-Reply-To: helpdisk112@gmail.com
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+Date: Thu, 2 Dec 2010 16:14:03 -0800
+Message-ID: <20101202161403.74daae6f.akpm@linux-foundation.org>
+References: <4CC9946D.mailLH511GU0C@intel.com>
+	<20101104190405.GA2501@gondor.apana.org.au>
+	<20101117172331.3bbec734.akpm@linux-foundation.org>
+	<20101118092640.GA9486@gondor.apana.org.au>
+	<24483BA4C9F69C43A7379639D35543D7C3450A84@irsmsx502.ger.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>
+To: "Struk, Tadeusz" <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wnl.lk ([203.143.12.196]:35286 "HELO mail.wnl.lk"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-	id S1756216Ab0LBSmy convert rfc822-to-8bit (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:40675 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757824Ab0LCAOd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Dec 2010 13:42:54 -0500
+	Thu, 2 Dec 2010 19:14:33 -0500
+In-Reply-To: <24483BA4C9F69C43A7379639D35543D7C3450A84@irsmsx502.ger.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Thu, 18 Nov 2010 09:38:50 +0000
+"Struk, Tadeusz" <tadeusz.struk@intel.com> wrote:
 
+> -----Original Message-----
+> > From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
+> > Sent: Thursday, November 18, 2010 9:27 AM
+> > To: Andrew Morton
+> > Cc: Struk, Tadeusz; linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; O Mahony, Aidan; Paoloni, Gabriele; Hoban, Adrian
+> > Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+> > 
+> > On Wed, Nov 17, 2010 at 05:23:31PM -0800, Andrew Morton wrote:
+> > > On Thu, 4 Nov 2010 14:04:05 -0500
+> > > Herbert Xu <herbert@gondor.hengli.com.au> wrote:
+> > > 
+> > > > On Thu, Oct 28, 2010 at 04:19:09PM +0100, tadeusz.struk@intel.com wrote:
+> > > > > Hi Herbert,
+> > > > >    We have reworked the assembly to use macros instead of the new aesni instructions.
+> > > > 
+> > > > Both applied.  Thanks for your efforts!
+> > > 
+> > > Whatever's in today's linux-next is a big fail with gas-2.16.1.
+> > > 
+> > > Which was entirely predictable!  How often has this happened recently??
+> > > 
+> > > 
+> > > arch/x86/crypto/aesni-intel_asm.S: Assembler messages:
+> > > arch/x86/crypto/aesni-intel_asm.S:834: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm13'
+> > > arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm5'
+> > > arch/x86/crypto/aesni-intel_asm.S:866: Error: no such instruction: `pshufb SHUF_MASK(%rip),%xmm0'
+> > > arch/x86/crypto/aesni-intel_asm.S:866: Error: bad expression
+> > 
+> > Sorry, but I no longer have access to a binutils that is older
+> > than 2.18 so I never saw this failure.
+> > 
+> > Tadeusz, could you please make an incremental patch that converts
+> > all the pshufb instructions to macros?
+> > 
+>
+> Will do.
+> Tadeusz
+> 
 
+(top-posting repaired)
 
-Dear 'WEBMAIL ACCOUNT USER',
+(busted attribution/quoting repaired)
 
-We are currrently upgrading our database and all account need to be ver=
-ified.
-To complete your account activation with us,you are required to reply t=
-o this
-message and enter correctly the information's that is required from you=
-=2E
-
-=46ill in your User Name and Password in the space provided (********)Y=
-ou are
-required to reply to this e-mail within the next 48 hours.
-
-=46ailure to get back to us, your Webmail account will be de-activated =
-from our
-database.
-
-=46ULL NAME;
-USERNAME;
-PASSWORD;
-RE-TYPE PASSWORD;
-DATE OF BIRTH;
-
-
-Thank you for using  Webmail Copyright 2010 =A9  Web Team.
-
-19X45HANJ4453VXTM334M
-     05-10-2010
+Current mainline still has this failure.
