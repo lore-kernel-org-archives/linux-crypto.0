@@ -1,41 +1,98 @@
-From: Phil Sutter <phil@nwl.cc>
-Subject: Re: [PATCH] crypto: padlock: fix for non-64byte aligned data
-Date: Tue, 7 Dec 2010 14:40:57 +0100
-Message-ID: <20101207134057.GB24946@orbit.nwl.cc>
-References: <1288893036-31704-1-git-send-email-phil@nwl.cc>
- <20101104184606.GA1994@gondor.apana.org.au>
- <20101105141238.GG29793@orbit.nwl.cc>
- <20101202061441.GA22378@gondor.apana.org.au>
- <20101207104141.GA24946@orbit.nwl.cc>
- <20101207113956.GA6128@gondor.apana.org.au>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1.5 5/5] keys: add new key-type encrypted
+Date: Tue, 07 Dec 2010 17:48:42 -0500
+Message-ID: <1291762122.2680.31.camel@localhost.localdomain>
+References: <1290556535.2604.16.camel@localhost.localdomain>
+	 <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com>
+	 <4182.1291383725@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Chuck Ebbert <cebbert@redhat.com>,
-	Nico Erfurth <ne@erfurth.eu>,
-	Harald Welte <HaraldWelte@viatech.com>,
-	Michal Ludvig <michal@logix.cz>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.169.95]:57408 "EHLO orbit.nwl.cc"
+Received: from e1.ny.us.ibm.com ([32.97.182.141]:39615 "EHLO e1.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753962Ab0LGNk6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Dec 2010 08:40:58 -0500
-Content-Disposition: inline
-In-Reply-To: <20101207113956.GA6128@gondor.apana.org.au>
+	id S1753199Ab0LGWsq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Dec 2010 17:48:46 -0500
+In-Reply-To: <4182.1291383725@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
-On Tue, Dec 07, 2010 at 07:39:56PM +0800, Herbert Xu wrote:
-> On Tue, Dec 07, 2010 at 11:41:41AM +0100, Phil Sutter wrote:
-> >
-> > Yes, CONFIG_PREEMPT is active in my test system's kernel.
+On Fri, 2010-12-03 at 13:42 +0000, David Howells wrote: 
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 > 
-> OK, can you see if the problem is still reproducible without
-> preemption?
+> > +#define KEY_TRUSTED_PREFIX "trusted:"
+> > +#define KEY_TRUSTED_PREFIX_LEN (sizeof (KEY_TRUSTED_PREFIX) - 1)
+> > +#define KEY_USER_PREFIX "user:"
+> > +#define KEY_USER_PREFIX_LEN (sizeof (KEY_USER_PREFIX) - 1)
+> 
+> I'd recommend using static const char arrays.
 
-Yes, it is. I just redid the test with a CONFIG_PREEMPT_NONE kernel,
-memory corruption occurs every time.
+Ok
 
-Greetings, Phil
+> > +static int datablob_parse(char *datablob, char **master_desc,
+> > ...
+> > +		*hex_encoded_data = *hex_encoded_iv + (2 * ivsize) + 2;
+> 
+> Do you need to validate the length of the string here?
+
+definitely. thanks!
+
+> > +static struct key *request_trusted_key(const char *trusted_desc,
+> > +				       u8 **master_key,
+> > +				       unsigned int *master_keylen)
+> 
+> You need to annotate the function with an __acquires() to indicate that it
+> returns with a lock held for Sparse checking.  I think you should be able to
+> do:
+> 
+> 	__acquires(tkey->sem)
+
+hm, only after addding '__acquires' are there Sparse errors.
+
+> on the line before the '{'.
+> 
+> > +static struct key *request_user_key(const char *master_desc, u8 **master_key,
+> > +				    unsigned int *master_keylen)
+> 
+> Ditto.
+> 
+> > +static struct sdesc *init_sdesc(struct crypto_shash *alg)
+> > +{
+> > +	struct sdesc *sdesc;
+> > +	int size;
+> > +
+> > +	size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
+> > +	sdesc = kmalloc(size, GFP_KERNEL);
+> 
+> I think I'd call it alloc_sdesc() rather than init_sdesc().
+
+Ok
+
+> > +static int calc_hmac(u8 *digest, const u8 *key, const unsigned int keylen,
+> > +		     const u8 *buf, const unsigned int buflen)
+> 
+> size_t not 'const unsigned int' please.  There are multiple of these within
+> the patch.
+
+Have reverted adding the unnecessary 'const' and converted some
+additional 'unsigned int' to 'size_t', but there are still some
+remaining; those used as crypto options.
+
+> > +	sg_set_buf(&sg_out[0], epayload->decrypted_data,
+> > +		   (unsigned int)epayload->decrypted_datalen);
+> 
+> Superfluous cast.
+> 
+> David
+
+thanks!
+
+Mimi 
