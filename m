@@ -1,45 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] xfrm: Traffic Flow Confidentiality for IPv4 ESP
-Date: Wed, 8 Dec 2010 17:24:32 +0800
-Message-ID: <20101208092432.GA15610@gondor.apana.org.au>
-References: <1291717744-30111-1-git-send-email-martin@strongswan.org> <1291717744-30111-3-git-send-email-martin@strongswan.org> <20101208084954.GA15252@gondor.apana.org.au> <1291800041.2005.25.camel@martin>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60942 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752133Ab0LHJYe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Dec 2010 04:24:34 -0500
-Content-Disposition: inline
-In-Reply-To: <1291800041.2005.25.camel@martin>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v1.5 5/5] keys: add new key-type encrypted
+Date: Wed, 08 Dec 2010 10:54:24 +0000
+Message-ID: <13657.1291805664@redhat.com>
+References: <1291762122.2680.31.camel@localhost.localdomain> <1290556535.2604.16.camel@localhost.localdomain> <1290552635-3356-1-git-send-email-zohar@linux.vnet.ibm.com> <4182.1291383725@redhat.com>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	James Morris <jmorris@namei.org>,
+	David Safford <safford@watson.ibm.com>,
+	Rajiv Andrade <srajiv@linux.vnet.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1291762122.2680.31.camel@localhost.localdomain>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 08, 2010 at 10:20:41AM +0100, Martin Willi wrote:
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+
+> > > +static struct key *request_trusted_key(const char *trusted_desc,
+> > > +				       u8 **master_key,
+> > > +				       unsigned int *master_keylen)
+> > 
+> > You need to annotate the function with an __acquires() to indicate that it
+> > returns with a lock held for Sparse checking.  I think you should be able to
+> > do:
+> > 
+> > 	__acquires(tkey->sem)
 > 
-> > In particular, why would we need a boundary at all? Setting it to
-> > anything other than the PMTU would seem to defeat the purpose of
-> > TFC for packets between the boundary and the PMTU.
-> 
-> I don't agree, this highly depends on the traffic on the SA. For a
-> general purpose tunnel with TCP flows, PMTU padding is fine. But if
-> there are only small packets (maybe SIP+RTP), padding to the PMTU is
-> very expensive.
-> 
-> The administrator setting up the SAs probably knows (or even controls
-> directly) what traffic it is used for, and might lower the boundary
-> accordingly.
+> hm, only after addding '__acquires' are there Sparse errors.
 
-OK, that's a good reason.
+Leave it, then.
 
-But you should probably get rid of that unused flag field in
-the user-interface and just provide a pad length.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David
