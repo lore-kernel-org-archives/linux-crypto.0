@@ -1,56 +1,40 @@
-From: Kent Borg <kentborg@borg.org>
-Subject: Crypto Hardware Drivers?
-Date: Wed, 08 Dec 2010 16:13:48 -0500
-Message-ID: <4CFFF50C.4000406@borg.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] xfrm: ESP Traffic Flow Confidentiality padding (v3)
+Date: Thu, 9 Dec 2010 20:47:32 +0800
+Message-ID: <20101209124732.GA28931@gondor.apana.org.au>
+References: <1291819071-17538-1-git-send-email-martin@strongswan.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from borg.org ([64.105.205.123]:42528 "EHLO borg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753455Ab0LHVnD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Dec 2010 16:43:03 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: kentborg)
-	by borg.org (Postfix) with ESMTP id 0C814186781
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Dec 2010 16:13:48 -0500 (EST)
+Received: from helcar.apana.org.au ([209.40.204.226]:55664 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755305Ab0LIMre (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Dec 2010 07:47:34 -0500
+Content-Disposition: inline
+In-Reply-To: <1291819071-17538-1-git-send-email-martin@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Is this the right place to ask questions about writing a Linux device 
-driver to make some crypto hardware on an ARM SoC work under the Linux 
-crypto API?
+On Wed, Dec 08, 2010 at 03:37:48PM +0100, Martin Willi wrote:
+> The following patchset adds Traffic Flow Confidentiality padding. The
+> first patch introduces a new Netlink XFRM attribute to configure TFC via
+> userspace. Patch two and three implement the padding logic in IPv4 and
+> IPv6 ESP. Padding is always done using the RFC4303 format an is clamped
+> to the PMTU.
+> 
+> Changes from v2:
+>   - Remove unused flag field in attribute, use a plain u32 as attribute payload
+>   - Reject installation of TFC padding on non-tunnel SAs
 
-I have some hardware documentation that I don't yet know whether I can 
-talk about (I know, if I can't then the driver will have difficulty 
-being be GPL, and if it isn't an open license, it won't work...).
+Looks good to me.  Thanks for the hard work Martin!
 
-I have some sample code for the hardware that is an incomplete and 
-obsolete Linux module.
-I can see source code examples for things like the Padlock, IXP4xx 
-hardware, etc.
-I have never touched any Linux kernel crypto code before this project.  
-(I have done some stuff in userland, so the fact of crypto doesn't scare 
-me.)
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-At the moment I am trying to understand things like the parameter to 
-crypto_register_alg(), how that is different from crypto_register_ahash()...
-
-And for a DMA case how data moves and who owns the memory. 
-
-Stuff like that...
-
-Yes, the sources and Google are my friends, and 
-Documentation/crypto/api-intro.txt has a very promising title but 
-doesn't say terribly much inside.
-
-Are there any obvious key resources I should know about?  (Any general 
-pointers would be appreciated, too.)
-
-
-Thanks,
-
--kb
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
