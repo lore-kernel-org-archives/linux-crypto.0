@@ -1,36 +1,55 @@
-From: Tobias Karnat <tobias.karnat@googlemail.com>
-Subject: Re: Crypto Hardware Drivers?
-Date: Mon, 13 Dec 2010 18:43:23 +0100
-Message-ID: <1292262203.18430.22.camel@Tobias-Karnat>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH] Add RNG support to AF_ALG
+Date: Mon, 13 Dec 2010 12:47:37 -0500
+Message-ID: <20101213174737.GA12588@hmsreliant.think-freely.org>
+References: <385134132.614111292260958484.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+ <1049191813.614221292261074998.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Kent Borg <kentborg@borg.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Miloslav Trmac <mitr@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:52640 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758528Ab0LMRn2 (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:43629 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757626Ab0LMRrp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Dec 2010 12:43:28 -0500
-Received: by wwa36 with SMTP id 36so6578592wwa.1
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Dec 2010 09:43:27 -0800 (PST)
+	Mon, 13 Dec 2010 12:47:45 -0500
+Content-Disposition: inline
+In-Reply-To: <1049191813.614221292261074998.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Mon, Dec 13, 2010 at 12:24:34PM -0500, Miloslav Trmac wrote:
+> ----- "Neil Horman" <nhorman@tuxdriver.com> wrote:
+> > +static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
+> > +			struct msghdr *msg, size_t len, int flags)
+> > +{
+> > +	struct sock *sk = sock->sk;
+> > +	struct alg_sock *ask = alg_sk(sk);
+> > +	struct rng_ctx *ctx = ask->private;
+> > +	int rc, i;
+> > +	u8 *data = kzalloc(len, GFP_KERNEL);
+> There probably should be an upper limit on the allocation - perhaps just always allocate a single page.
+> 
+I'd rather allocate the explicit amount needed, just to avoid added memory
+pressure allocating memory that we won't use, but yes, I can definately add an
+upper limit to how much data can be requested in a single call.
 
-In case it is based on TI OMAP, there are already drivers available:
+> > +static void rng_release(void *private)
+> > +{
+> > +	struct rng_ctx *ctx = private;
+> > +	crypto_free_rng(ctx->ctx);
+> > +	kfree(ctx->seed);
+> Is a seed secret enough that it should be zeroed before freeing?  (Same in setkey, accept_parent).
+> 
+I don't think that nececcecary, strictly speaking, but it couldn't hurt.
+Actually looking at it, I don't really need to duplicate the seed at all in
+accept_parent.  I can probaby shrink that down considerably. 
 
-OMAP SHA1/MD5 driver:
-http://marc.info/?l=linux-crypto-vger&m=127246431212905&w=2
-http://marc.info/?l=linux-crypto-vger&m=129017544602970&w=2
+Thanks for the notes Mirek, I'll post an updated version shortly.
+Neil
 
-OMAP2/3 AES HW accelerator driver:
-http://marc.info/?l=linux-crypto-vger&m=128231192601283&w=2
-http://marc.info/?l=linux-crypto-vger&m=129110479321959&w=2
-
-However the OMAP's are supposed to also support DES/3DES acceleration,
-in case my guess was right, do you can think of writing a driver for it?
-
--Tobias
+>      Mirek
+> 
