@@ -1,43 +1,29 @@
-From: Miloslav Trmac <mitr@redhat.com>
-Subject: Re: [PATCH] Add RNG support to AF_ALG
-Date: Mon, 13 Dec 2010 12:50:21 -0500 (EST)
-Message-ID: <1453219646.616071292262621577.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-References: <20101213174737.GA12588@hmsreliant.think-freely.org>
+From: Kent Borg <kentborg@borg.org>
+Subject: Re: Crypto Hardware Drivers?
+Date: Mon, 13 Dec 2010 12:53:31 -0500
+Message-ID: <4D065D9B.6010401@borg.org>
+References: <1292262203.18430.22.camel@Tobias-Karnat>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+Cc: linux-crypto@vger.kernel.org
+To: Tobias Karnat <tobias.karnat@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:38565 "EHLO
-	mx4-phx2.redhat.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758570Ab0LMRub (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Dec 2010 12:50:31 -0500
-In-Reply-To: <20101213174737.GA12588@hmsreliant.think-freely.org>
+Received: from borg.org ([64.105.205.123]:34528 "EHLO borg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756613Ab0LMRxf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Dec 2010 12:53:35 -0500
+In-Reply-To: <1292262203.18430.22.camel@Tobias-Karnat>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
------ "Neil Horman" <nhorman@tuxdriver.com> wrote:
+Tobias Karnat wrote:
+> In case it is based on TI OMAP, there are already drivers available:
+>   
 
-> On Mon, Dec 13, 2010 at 12:24:34PM -0500, Miloslav Trmac wrote:
-> > ----- "Neil Horman" <nhorman@tuxdriver.com> wrote:
-> > > +static int rng_recvmsg(struct kiocb *unused, struct socket
-> *sock,
-> > > +			struct msghdr *msg, size_t len, int flags)
-> > > +{
-> > > +	struct sock *sk = sock->sk;
-> > > +	struct alg_sock *ask = alg_sk(sk);
-> > > +	struct rng_ctx *ctx = ask->private;
-> > > +	int rc, i;
-> > > +	u8 *data = kzalloc(len, GFP_KERNEL);
-> > There probably should be an upper limit on the allocation - perhaps
-> just always allocate a single page.
-> > 
-> I'd rather allocate the explicit amount needed, just to avoid added memory
-> pressure allocating memory that we won't use, but yes, I can definately add an
-> upper limit to how much data can be requested in a single call.
-Please allow arbitrarily large requests.  rng_recvmsg can easily use a smaller buffer by filling the user-space destination one buffer-size at a time, on the other hand handling an arbitrary upper limit in user-space would be unnecessarily complex.
-    Mirek
+No, unfortunately, it isn't. 
+
+
+-kb, the Kent who has looked through the existing crypto drivers to 
+learn how they work, and who would have loved to have found one that 
+matched his hardware.
