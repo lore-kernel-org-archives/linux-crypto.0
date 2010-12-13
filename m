@@ -1,36 +1,31 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 0/3] xfrm: ESP Traffic Flow Confidentiality padding (v3)
-Date: Fri, 10 Dec 2010 14:44:22 -0800 (PST)
-Message-ID: <20101210.144422.52203130.davem@davemloft.net>
-References: <1291819071-17538-1-git-send-email-martin@strongswan.org>
-	<20101209124732.GA28931@gondor.apana.org.au>
+From: Jeff Garzik <jeff@garzik.org>
+Subject: [CRYPTO] skein hash updated
+Date: Sun, 12 Dec 2010 22:41:18 -0500
+Message-ID: <4D0595DE.5050903@garzik.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: martin@strongswan.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20101209124732.GA28931@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:63113 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756674Ab0LMDlZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 12 Dec 2010 22:41:25 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 9 Dec 2010 20:47:32 +0800
+I've been quietly maintaining a Linux kernel implementation of the 
+'skein' hash algorithm, which is one of the proposed SHA-3 algorithms. 
+First posted around two years ago: 
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg02373.html
 
-> On Wed, Dec 08, 2010 at 03:37:48PM +0100, Martin Willi wrote:
->> The following patchset adds Traffic Flow Confidentiality padding. The
->> first patch introduces a new Netlink XFRM attribute to configure TFC via
->> userspace. Patch two and three implement the padding logic in IPv4 and
->> IPv6 ESP. Padding is always done using the RFC4303 format an is clamped
->> to the PMTU.
->> 
->> Changes from v2:
->>   - Remove unused flag field in attribute, use a plain u32 as attribute payload
->>   - Reject installation of TFC padding on non-tunnel SAs
-> 
-> Looks good to me.  Thanks for the hard work Martin!
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Skein is currently at version 1.3, and as slashdot readers are aware, 
+skein is one of the finalists for SHA-3.
 
-All applied, thanks everyone!
+The git URL remains unchanged:  branch "skein" of
+git://git.kernel.org/pub/scm/linux/kernel/git/jgarzik/misc-2.6.git
+
+Thanks to Tobias Karnat for recent updates, including conversion to shash.
