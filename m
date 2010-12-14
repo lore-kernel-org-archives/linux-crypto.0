@@ -1,303 +1,37 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: [PATCH] Add RNG support to AF_ALG (v2)
-Date: Mon, 13 Dec 2010 16:25:14 -0500
-Message-ID: <1292275514-2488-1-git-send-email-nhorman@tuxdriver.com>
-References: <1292260317-2684-1-git-send-email-nhorman@tuxdriver.com>
-Cc: Neil Horman <nhorman@tuxdriver.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3] RFC4106 AES-GCM Driver Using Intel New Instructions
+Date: Tue, 14 Dec 2010 10:21:51 +0800
+Message-ID: <20101214022150.GA11023@gondor.apana.org.au>
+References: <4CC9946D.mailLH511GU0C@intel.com> <20101104190405.GA2501@gondor.apana.org.au> <20101117172331.3bbec734.akpm@linux-foundation.org> <20101118092640.GA9486@gondor.apana.org.au> <24483BA4C9F69C43A7379639D35543D7C3450A84@irsmsx502.ger.corp.intel.com> <20101202161403.74daae6f.akpm@linux-foundation.org> <20101203013021.GA304@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:39343 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756572Ab0LMV0D (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:48774 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759125Ab0LNCVy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Dec 2010 16:26:03 -0500
-In-Reply-To: <1292260317-2684-1-git-send-email-nhorman@tuxdriver.com>
+	Mon, 13 Dec 2010 21:21:54 -0500
+Content-Disposition: inline
+In-Reply-To: <20101203013021.GA304@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change notes:
-Changed rng_rcvmsg to allocate a fixed size maximum temp block to store rng data
-when recvmsg is called.  This should prevent malicious DoS from user space by
-tring to receive obscene amounts of random data in one call.  Instead now we
-loop using the same block of data and copy it incrementally to the user space
-buffer using memcpy_toiovecend
+On Fri, Dec 03, 2010 at 09:30:21AM +0800, Herbert Xu wrote:
+>
+> Andrew, I'll just back this out if it doesn't get resolved.
 
-Also changed the accept routine to only allocate a new rng, and not store the
-seed value separately, simplifying the code somewhat.  also now we memset the
-parent sockets seed value to zero on free to hide the seed from intruders.
+Andrew, the problem should be resolved in the current cryptodev
+tree.  Please let me know if it still blows up for you.
 
-Summary:
-This patch enhances the AF_ALG protocol family to include support for random
-number generator algorithms.  With this enhancment, users of the AF_ALG protocol
-can now bind sockets to instances of the various RNG algorithms available to the
-kernel.  For those RNG's that support it, instances can be reseeded using the
-SETKEY socket option within the AF_ALG socket family.  Like with hashes and
-ciphers, only the intially created socket allows seeding, and only child sockets
-retured via accept may return random data.  Sending data on RNG instances is
-prohibited, only receiving RNG data is possible.
-
-Tested successfully using NIST provided RNG vectors by myself:
-Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
----
- crypto/Kconfig     |    9 ++
- crypto/Makefile    |    1 +
- crypto/algif_rng.c |  212 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 222 insertions(+), 0 deletions(-)
- create mode 100644 crypto/algif_rng.c
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 96b0e55..ea448ca 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -864,6 +864,15 @@ config CRYPTO_USER_API_SKCIPHER
- 	  This option enables the user-spaces interface for symmetric
- 	  key cipher algorithms.
- 
-+config CRYPTO_USER_API_RNG
-+	tristate "User-space interface for Random Number Generator algorithms"
-+	depends on NET
-+	select CRYPTO_ANSI_CPRNG
-+	select CRYPTO_USER_API
-+	help
-+	  This option enables the user-space interface for random number
-+	  generation algorithms.
-+
- source "drivers/crypto/Kconfig"
- 
- endif	# if CRYPTO
-diff --git a/crypto/Makefile b/crypto/Makefile
-index e9a399c..8868555 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -88,6 +88,7 @@ obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
- obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
- obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
-+obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- 
- #
- # generic algorithms and the async_tx api
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-new file mode 100644
-index 0000000..8664793
---- /dev/null
-+++ b/crypto/algif_rng.c
-@@ -0,0 +1,212 @@
-+/*
-+ * algif_rng: User-space interface for rng algorithms
-+ *
-+ * This file provides the user-space API for rng algorithms.
-+ *
-+ * Copyright (c) 2010 Neil Horman <nhorman@tuxdriver.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#include <crypto/rng.h>
-+#include <crypto/if_alg.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/net.h>
-+#include <net/sock.h>
-+
-+struct rng_ctx {
-+	struct crypto_rng *ctx;
-+	u8 *seed;
-+	size_t seedlen;
-+	char *name;
-+	u32 type;
-+	u32 mask;
-+};
-+
-+static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
-+			struct msghdr *msg, size_t len, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct crypto_rng *ctx = ask->private;
-+	int rc = 0;
-+	int rc2;
-+	u8 *data;
-+	size_t alen, clen;
-+
-+	/*
-+	 * Prevent huge memory allocations from user space
-+	 */
-+	alen = (len > PAGE_SIZE) ? PAGE_SIZE : len;
-+	data = kzalloc(alen, GFP_KERNEL);
-+
-+	if (!data)
-+		return -ENOMEM;
-+
-+	clen = 0;
-+	while (clen != len) {
-+		rc = crypto_rng_get_bytes(ctx, data, alen);
-+		if (rc < 0)
-+			goto out;
-+
-+		rc2 = memcpy_toiovecend(msg->msg_iov, data, clen, rc);
-+		if (rc2) {
-+			rc = rc2;
-+			goto out;
-+		}
-+
-+		clen += rc;
-+
-+		/*
-+		 * Get the remaining bytes
-+		 */
-+		if ((len-clen) < alen)
-+			alen = len-clen;
-+		rc = 0;
-+	}
-+out:
-+	kfree(data);
-+	return rc ?: len;
-+}
-+
-+
-+static struct proto_ops algif_rng_ops = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+
-+	.release	=	af_alg_release,
-+	.sendmsg	=	sock_no_sendmsg,
-+	.sendpage	=	sock_no_sendpage,
-+	.recvmsg	=	rng_recvmsg,
-+	.accept		=	sock_no_accept,
-+};
-+
-+static void *rng_bind(const char *name, u32 type, u32 mask)
-+{
-+	struct rng_ctx *new = kzalloc(sizeof(struct rng_ctx), GFP_KERNEL);
-+
-+	if (!new)
-+		goto out;
-+
-+	new->name = kmemdup(name, strnlen(name, 63)+1, GFP_KERNEL);
-+	new->type = type;
-+	new->mask = mask;
-+out:
-+	return new;
-+}
-+
-+static void rng_release(void *private)
-+{
-+	struct rng_ctx *ctx = private;
-+	crypto_free_rng(ctx->ctx);
-+	if (ctx->seed)
-+		memset(ctx->seed, 0, ctx->seedlen);
-+	kfree(ctx->seed);
-+	kfree(ctx->name);
-+	kfree(ctx);
-+}
-+
-+static int rng_setkey(void *private, const u8 *key, unsigned int keylen)
-+{
-+	struct rng_ctx *ctx = private;
-+	u8 *oldseed = ctx->seed;
-+	size_t oldlen = ctx->seedlen;
-+
-+	ctx->seed = kmemdup(key, keylen, GFP_KERNEL);
-+
-+	if (!ctx->seed)
-+		return -ENOMEM;
-+
-+	ctx->seedlen = keylen;
-+
-+	if (oldseed) {
-+		memset(oldseed, 0, oldlen);
-+		kfree(oldseed);
-+	}
-+
-+	return 0;
-+}
-+
-+static void rng_sock_destruct(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct crypto_rng *ctx = ask->private;
-+
-+	crypto_free_rng(ctx);
-+	af_alg_release_parent(sk);
-+}
-+
-+static int rng_accept_parent(void *private, struct sock *sk)
-+{
-+	struct rng_ctx *parent = private;
-+	struct crypto_rng *child;
-+	struct alg_sock *ask = alg_sk(sk);
-+	int rc = -EINVAL;
-+
-+	if (!parent->seed)
-+		goto out;
-+
-+	rc = -ENOENT;
-+	child = crypto_alloc_rng(parent->name,
-+				 parent->type, parent->mask);
-+	if (IS_ERR(child))
-+		goto out;
-+
-+	rc = -EBUSY;
-+	if (crypto_rng_reset(child, parent->seed, parent->seedlen))
-+		goto out_ctx;
-+
-+	ask->private = child;
-+
-+	sk->sk_destruct = rng_sock_destruct;
-+
-+
-+	return 0;
-+
-+out_ctx:
-+	crypto_free_rng(child);
-+out:
-+	return rc;
-+}
-+
-+static const struct af_alg_type algif_type_rng = {
-+	.bind		=	rng_bind,
-+	.release	=	rng_release,
-+	.setkey		=	rng_setkey,
-+	.accept		=	rng_accept_parent,
-+	.ops		=	&algif_rng_ops,
-+	.name		=	"rng",
-+	.owner		=	THIS_MODULE
-+};
-+
-+static int __init algif_rng_init(void)
-+{
-+	return af_alg_register_type(&algif_type_rng);
-+}
-+
-+static void __exit algif_rng_exit(void)
-+{
-+	int err = af_alg_unregister_type(&algif_type_rng);
-+	BUG_ON(err);
-+}
-+
-+module_init(algif_rng_init);
-+module_exit(algif_rng_exit);
-+MODULE_LICENSE("GPL");
+Thanks,
 -- 
-1.7.2.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
