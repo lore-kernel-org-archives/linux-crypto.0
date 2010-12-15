@@ -1,41 +1,36 @@
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: [PATCH] crypto: ghash-clmulni-intel_glue needs err.h
-Date: Tue, 14 Dec 2010 16:26:41 -0800
-Message-ID: <20101214162641.3e229f12.randy.dunlap@oracle.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: ghash-clmulni-intel_glue needs err.h
+Date: Wed, 15 Dec 2010 17:59:23 +0800
+Message-ID: <20101215095923.GA24313@gondor.apana.org.au>
+References: <20101214162641.3e229f12.randy.dunlap@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
 	akpm <akpm@linux-foundation.org>
-To: lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:42452 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754956Ab0LOA1z (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:39316 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750795Ab0LOJ71 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Dec 2010 19:27:55 -0500
+	Wed, 15 Dec 2010 04:59:27 -0500
+Content-Disposition: inline
+In-Reply-To: <20101214162641.3e229f12.randy.dunlap@oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Randy Dunlap <randy.dunlap@oracle.com>
+On Tue, Dec 14, 2010 at 04:26:41PM -0800, Randy Dunlap wrote:
+> From: Randy Dunlap <randy.dunlap@oracle.com>
+> 
+> Add missing header file:
+> 
+> arch/x86/crypto/ghash-clmulni-intel_glue.c:256: error: implicit declaration of function 'IS_ERR'
+> arch/x86/crypto/ghash-clmulni-intel_glue.c:257: error: implicit declaration of function 'PTR_ERR'
+> 
+> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-Add missing header file:
-
-arch/x86/crypto/ghash-clmulni-intel_glue.c:256: error: implicit declaration of function 'IS_ERR'
-arch/x86/crypto/ghash-clmulni-intel_glue.c:257: error: implicit declaration of function 'PTR_ERR'
-
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
----
- arch/x86/crypto/ghash-clmulni-intel_glue.c |    1 +
- 1 file changed, 1 insertion(+)
-
---- linux-next-20101214.orig/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ linux-next-20101214/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -10,6 +10,7 @@
-  * by the Free Software Foundation.
-  */
- 
-+#include <linux/err.h>
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
