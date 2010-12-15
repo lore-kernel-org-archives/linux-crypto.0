@@ -1,35 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ghash-clmulni-intel_glue needs err.h
-Date: Wed, 15 Dec 2010 17:59:23 +0800
-Message-ID: <20101215095923.GA24313@gondor.apana.org.au>
-References: <20101214162641.3e229f12.randy.dunlap@oracle.com>
+Subject: Crypto Fixes for 2.6.37
+Date: Wed, 15 Dec 2010 19:50:35 +0800
+Message-ID: <20101215115035.GA25248@gondor.apana.org.au>
+References: <20091020065442.GA5947@gondor.apana.org.au> <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	akpm <akpm@linux-foundation.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39316 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:55774 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750795Ab0LOJ71 (ORCPT
+	with ESMTP id S1751345Ab0LOLuq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Dec 2010 04:59:27 -0500
+	Wed, 15 Dec 2010 06:50:46 -0500
 Content-Disposition: inline
-In-Reply-To: <20101214162641.3e229f12.randy.dunlap@oracle.com>
+In-Reply-To: <20100903110722.GA31826@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 14, 2010 at 04:26:41PM -0800, Randy Dunlap wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
-> 
-> Add missing header file:
-> 
-> arch/x86/crypto/ghash-clmulni-intel_glue.c:256: error: implicit declaration of function 'IS_ERR'
-> arch/x86/crypto/ghash-clmulni-intel_glue.c:257: error: implicit declaration of function 'PTR_ERR'
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Hi Linus:
 
-Patch applied.  Thanks!
+This push fixes a build problem under certain configurations due
+to a missing include.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Randy Dunlap (1):
+      crypto: ghash-intel - ghash-clmulni-intel_glue needs err.h
+
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
