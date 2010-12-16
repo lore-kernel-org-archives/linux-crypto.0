@@ -1,40 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 2.6.37
-Date: Thu, 16 Dec 2010 08:58:13 +0800
-Message-ID: <20101216005813.GA820@gondor.apana.org.au>
-References: <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <AANLkTikM4vQe7dsN8JJ1QSLeeTbRpSnuoJU=e4H2YFoz@mail.gmail.com> <20101216004938.GA32662@gondor.apana.org.au>
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: [PATCH -next] crypto: fix af_alg memory_allocated data type
+Date: Thu, 16 Dec 2010 10:18:00 -0800
+Message-ID: <20101216101800.36529e89.randy.dunlap@oracle.com>
+References: <20101216173745.264eb2ca.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60444 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754536Ab0LPA6S (ORCPT
+Received: from rcsinet10.oracle.com ([148.87.113.121]:63490 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751355Ab0LPSSO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Dec 2010 19:58:18 -0500
-Content-Disposition: inline
-In-Reply-To: <20101216004938.GA32662@gondor.apana.org.au>
+	Thu, 16 Dec 2010 13:18:14 -0500
+In-Reply-To: <20101216173745.264eb2ca.sfr@canb.auug.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 16, 2010 at 08:49:38AM +0800, Herbert Xu wrote:
-> On Wed, Dec 15, 2010 at 12:40:48PM -0800, Linus Torvalds wrote:
-> >
-> > There's a few other objects like that too. How do you push to your
-> > repo, and what changed?
-> 
-> Oops, I've fixed that now.  I use rsync to copy files across so
-> it's my end that has changed.  And indeed I've just done an upgrade.
-> Sorry.
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-OK it should be fixed for got now.  I suspect what has changed
-is that git is now using my umask by default.
+Change data type to fix warning:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+crypto/af_alg.c:35: warning: initialization from incompatible pointer type
+
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+---
+ crypto/af_alg.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- linux-next-20101216.orig/crypto/af_alg.c
++++ linux-next-20101216/crypto/af_alg.c
+@@ -27,7 +27,7 @@ struct alg_type_list {
+ 	struct list_head list;
+ };
+ 
+-static atomic_t alg_memory_allocated;
++static atomic_long_t alg_memory_allocated;
+ 
+ static struct proto alg_proto = {
+ 	.name			= "ALG",
