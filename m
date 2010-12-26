@@ -1,42 +1,102 @@
-From: Phil Sutter <phil@nwl.cc>
-Subject: Improving SHA-1 performance with Intel SSE3
-Date: Thu, 23 Dec 2010 14:55:13 +0100
-Message-ID: <20101223135513.GA20507@orbit.nwl.cc>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+Subject: [PATCH] crypto: ripemd - Set module author and update email address.
+Date: Sun, 26 Dec 2010 22:50:30 +0100
+Message-ID: <1293400230-5705-1-git-send-email-ken@codelabs.ch>
+Cc: linux-crypto@vger.kernel.org,
+	Adrian-Ken Rueegsegger <ken@codelabs.ch>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.141.167]:51389 "EHLO orbit.nwl.cc"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752148Ab0LWOB1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Dec 2010 09:01:27 -0500
-Content-Disposition: inline
+Received: from mail.codelabs.ch ([217.150.249.120]:54838 "EHLO
+	fenrir.codelabs.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752609Ab0LZV5z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 26 Dec 2010 16:57:55 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear list,
+Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
+---
+ crypto/rmd128.c |    3 ++-
+ crypto/rmd160.c |    3 ++-
+ crypto/rmd256.c |    3 ++-
+ crypto/rmd320.c |    3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
 
-I am doing performance tests on an Intel I5 (661 i think) based machine.
-Thanks to the AES-NI extensions, I am able to get a throughput of about
-500MB/s when doing AES256.
-
-But for TLS, hashing performance is important, too. SSE4.2 provides no
-equivalent extension for SHA-1, so that needs to be done purely in
-software - with a resulting throughput of about 200MB/s.
-
-Given a situation where I need to both hash and encrypt some plaintext,
-throughput drops even worse to about 180MB/s since both operations need
-to be done sequentially (this all is done on a single core, btw).
-
-So despite the very stunning AES performance, I guess one has a hard
-time saturating the wire (full-duplex) with TLS. Is that correct so far,
-or am I getting something wrong here?
-
-The actual question (indeed related to the subject) is this: are there
-any implementations/plans on using SSE3 to speed up SHA-1 as stated in
-[1]? Do you see any possible problems when trying to do so (regarding
-e.g. SSE3 detection or something)?
-
-Greetings, Phil
-
-1: http://software.intel.com/en-us/articles/improving-the-performance-of-the-secure-hash-algorithm-1/?wapkw=(sha1+optimization)
+diff --git a/crypto/rmd128.c b/crypto/rmd128.c
+index 1ceb673..8a0f68b 100644
+--- a/crypto/rmd128.c
++++ b/crypto/rmd128.c
+@@ -5,7 +5,7 @@
+  *
+  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
+  *
+- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
++ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -325,4 +325,5 @@ module_init(rmd128_mod_init);
+ module_exit(rmd128_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
+ MODULE_DESCRIPTION("RIPEMD-128 Message Digest");
+diff --git a/crypto/rmd160.c b/crypto/rmd160.c
+index 472261f..525d7bb 100644
+--- a/crypto/rmd160.c
++++ b/crypto/rmd160.c
+@@ -5,7 +5,7 @@
+  *
+  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
+  *
+- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
++ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -369,4 +369,5 @@ module_init(rmd160_mod_init);
+ module_exit(rmd160_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
+ MODULE_DESCRIPTION("RIPEMD-160 Message Digest");
+diff --git a/crypto/rmd256.c b/crypto/rmd256.c
+index 72eafa8..69293d9 100644
+--- a/crypto/rmd256.c
++++ b/crypto/rmd256.c
+@@ -5,7 +5,7 @@
+  *
+  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
+  *
+- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
++ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -344,4 +344,5 @@ module_init(rmd256_mod_init);
+ module_exit(rmd256_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
+ MODULE_DESCRIPTION("RIPEMD-256 Message Digest");
+diff --git a/crypto/rmd320.c b/crypto/rmd320.c
+index 86becab..09f97df 100644
+--- a/crypto/rmd320.c
++++ b/crypto/rmd320.c
+@@ -5,7 +5,7 @@
+  *
+  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
+  *
+- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
++ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -393,4 +393,5 @@ module_init(rmd320_mod_init);
+ module_exit(rmd320_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
+ MODULE_DESCRIPTION("RIPEMD-320 Message Digest");
+-- 
+1.6.5
