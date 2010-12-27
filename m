@@ -1,102 +1,34 @@
-From: Adrian-Ken Rueegsegger <ken@codelabs.ch>
-Subject: [PATCH] crypto: ripemd - Set module author and update email address.
-Date: Sun, 26 Dec 2010 22:50:30 +0100
-Message-ID: <1293400230-5705-1-git-send-email-ken@codelabs.ch>
-Cc: linux-crypto@vger.kernel.org,
-	Adrian-Ken Rueegsegger <ken@codelabs.ch>
-To: herbert@gondor.apana.org.au
+From: Toralf =?utf-8?q?F=C3=B6rster?= <toralf.foerster@gmx.de>
+Subject: unmet direct dependencies  (CRYPTO && EXPERIMENTAL)
+Date: Mon, 27 Dec 2010 13:13:31 +0100
+Message-ID: <201012271313.31686.toralf.foerster@gmx.de>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.codelabs.ch ([217.150.249.120]:54838 "EHLO
-	fenrir.codelabs.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752609Ab0LZV5z (ORCPT
+Received: from mailout-de.gmx.net ([213.165.64.23]:54516 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1750958Ab0L0MNf convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 26 Dec 2010 16:57:55 -0500
+	Mon, 27 Dec 2010 07:13:35 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Adrian-Ken Rueegsegger <ken@codelabs.ch>
----
- crypto/rmd128.c |    3 ++-
- crypto/rmd160.c |    3 ++-
- crypto/rmd256.c |    3 ++-
- crypto/rmd320.c |    3 ++-
- 4 files changed, 8 insertions(+), 4 deletions(-)
+Hello,
 
-diff --git a/crypto/rmd128.c b/crypto/rmd128.c
-index 1ceb673..8a0f68b 100644
---- a/crypto/rmd128.c
-+++ b/crypto/rmd128.c
-@@ -5,7 +5,7 @@
-  *
-  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
-  *
-- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
-+ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -325,4 +325,5 @@ module_init(rmd128_mod_init);
- module_exit(rmd128_mod_fini);
- 
- MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-128 Message Digest");
-diff --git a/crypto/rmd160.c b/crypto/rmd160.c
-index 472261f..525d7bb 100644
---- a/crypto/rmd160.c
-+++ b/crypto/rmd160.c
-@@ -5,7 +5,7 @@
-  *
-  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
-  *
-- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
-+ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -369,4 +369,5 @@ module_init(rmd160_mod_init);
- module_exit(rmd160_mod_fini);
- 
- MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-160 Message Digest");
-diff --git a/crypto/rmd256.c b/crypto/rmd256.c
-index 72eafa8..69293d9 100644
---- a/crypto/rmd256.c
-+++ b/crypto/rmd256.c
-@@ -5,7 +5,7 @@
-  *
-  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
-  *
-- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
-+ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -344,4 +344,5 @@ module_init(rmd256_mod_init);
- module_exit(rmd256_mod_fini);
- 
- MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-256 Message Digest");
-diff --git a/crypto/rmd320.c b/crypto/rmd320.c
-index 86becab..09f97df 100644
---- a/crypto/rmd320.c
-+++ b/crypto/rmd320.c
-@@ -5,7 +5,7 @@
-  *
-  * Based on the reference implementation by Antoon Bosselaers, ESAT-COSIC
-  *
-- * Copyright (c) 2008 Adrian-Ken Rueegsegger <rueegsegger (at) swiss-it.ch>
-+ * Copyright (c) 2008 Adrian-Ken Rueegsegger <ken@codelabs.ch>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -393,4 +393,5 @@ module_init(rmd320_mod_init);
- module_exit(rmd320_mod_fini);
- 
- MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-320 Message Digest");
--- 
-1.6.5
+a "make randconfig 1>/dev/null" gave today :
+
+warning: (CRYPTO_LRW && CRYPTO && EXPERIMENTAL || CRYPTO_XTS && CRYPTO =
+&& EXPERIMENTAL || CRYPTO_GHASH && CRYPTO) selects=20
+CRYPTO_GF128MUL which has unmet direct dependencies (CRYPTO && EXPERIME=
+NTAL)
+
+for the current git kernel sources.
+Is this an already known issue ?
+
+--=20
+MfG/Kind regards
+Toralf F=C3=B6rster
+
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
