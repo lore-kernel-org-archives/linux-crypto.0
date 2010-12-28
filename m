@@ -1,64 +1,74 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Toralf =?iso-8859-1?q?F=F6rster?= <toralf.foerster@gmx.de>
 Subject: Re: unmet direct dependencies  (CRYPTO && EXPERIMENTAL)
-Date: Tue, 28 Dec 2010 22:58:26 +1100
-Message-ID: <20101228115826.GA27538@gondor.apana.org.au>
-References: <201012271313.31686.toralf.foerster@gmx.de>
+Date: Tue, 28 Dec 2010 15:43:32 +0100
+Message-ID: <201012281543.32577.toralf.foerster@gmx.de>
+References: <20101228115826.GA27538@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: Text/Plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-crypto@vger.kernel.org
-To: Toralf =?iso-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40303 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752972Ab0L1L6a (ORCPT
+Received: from mailout-de.gmx.net ([213.165.64.22]:49220 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1753242Ab0L1Ong convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Dec 2010 06:58:30 -0500
-Content-Disposition: inline
-In-Reply-To: <201012271313.31686.toralf.foerster@gmx.de>
+	Tue, 28 Dec 2010 09:43:36 -0500
+In-Reply-To: <20101228115826.GA27538@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Toralf F=F6rster <toralf.foerster@gmx.de> wrote:
+
+Herbert Xu wrote at 12:58:26
+> Toralf F=F6rster <toralf.foerster@gmx.de> wrote:
+> > a "make randconfig 1>/dev/null" gave today :
+> >=20
+> > warning: (CRYPTO_LRW && CRYPTO && EXPERIMENTAL || CRYPTO_XTS && CRY=
+PTO &&
+> > EXPERIMENTAL || CRYPTO_GHASH && CRYPTO) selects CRYPTO_GF128MUL whi=
+ch
+> > has unmet direct dependencies (CRYPTO && EXPERIMENTAL)
+> >=20
+> > for the current git kernel sources.
+> > Is this an already known issue ?
 >=20
-> a "make randconfig 1>/dev/null" gave today :
+> Does this patch help?
+
+Althought I did not have the original .config, I'm pretty sure this pat=
+ch=20
+helps b/c after I applied it, the issue wasn't any longer observed even=
+ doing=20
+*a lot* of "make randconfig"..
+
+> commit 8ad225e8e4f530f500c12ec77fd5a51caf6a2f66
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Tue Dec 28 22:56:26 2010 +1100
 >=20
-> warning: (CRYPTO_LRW && CRYPTO && EXPERIMENTAL || CRYPTO_XTS && CRYPT=
-O && EXPERIMENTAL || CRYPTO_GHASH && CRYPTO) selects=20
-> CRYPTO_GF128MUL which has unmet direct dependencies (CRYPTO && EXPERI=
-MENTAL)
+>     crypto: gf128mul - Remove experimental tag
 >=20
-> for the current git kernel sources.
-> Is this an already known issue ?
+>     This feature no longer needs the experimental tag.
+>=20
+>     Reported-by: Toralf F=F6rster <toralf.foerster@gmx.de>
+>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>=20
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 96b0e55..4b7cb0e 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -110,7 +110,6 @@ config CRYPTO_MANAGER_DISABLE_TESTS
+>=20
+>  config CRYPTO_GF128MUL
+>  	tristate "GF(2^128) multiplication functions (EXPERIMENTAL)"
+> -	depends on EXPERIMENTAL
+>  	help
+>  	  Efficient table driven implementation of multiplications in the
+>  	  field GF(2^128).  This is needed by some cypher modes. This
+>=20
+> Thanks,
 
-Does this patch help?
 
-commit 8ad225e8e4f530f500c12ec77fd5a51caf6a2f66
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Dec 28 22:56:26 2010 +1100
-
-    crypto: gf128mul - Remove experimental tag
-   =20
-    This feature no longer needs the experimental tag.
-   =20
-    Reported-by: Toralf F=F6rster <toralf.foerster@gmx.de>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 96b0e55..4b7cb0e 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -110,7 +110,6 @@ config CRYPTO_MANAGER_DISABLE_TESTS
-=20
- config CRYPTO_GF128MUL
- 	tristate "GF(2^128) multiplication functions (EXPERIMENTAL)"
--	depends on EXPERIMENTAL
- 	help
- 	  Efficient table driven implementation of multiplications in the
- 	  field GF(2^128).  This is needed by some cypher modes. This
-
-Thanks,
 --=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+MfG/Kind regards
+Toralf F=F6rster
+
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
