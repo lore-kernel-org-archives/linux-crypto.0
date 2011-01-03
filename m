@@ -1,41 +1,67 @@
-From: roel kluin <roel.kluin@gmail.com>
-Subject: [PATCH] crypto: dont return PTR_ERR() of wrong pointer
-Date: Fri, 31 Dec 2010 16:21:41 +0100
-Message-ID: <4D1DF505.3040005@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+From: Tejun Heo <tj@kernel.org>
+Subject: [PATCH 05/32] crypto: mark crypto workqueues CPU_INTENSIVE
+Date: Mon,  3 Jan 2011 14:49:28 +0100
+Message-ID: <1294062595-30097-6-git-send-email-tj@kernel.org>
+References: <1294062595-30097-1-git-send-email-tj@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ew0-f46.google.com ([209.85.215.46]:41704 "EHLO
-	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751652Ab0LaPVo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 31 Dec 2010 10:21:44 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1294062595-30097-1-git-send-email-tj@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Fix a PTR_ERR() return of the wrong pointer
+kcrypto_wq and pcrypt->wq's are used to run ciphers and may consume
+considerable amount of CPU cycles.  Mark both as CPU_INTENSIVE so that
+they don't block other work items.
 
-Signed-off-by: Roel Kluin <roel.kluin@gmail.com>
+As the workqueues are primarily used to burn CPU cycles, concurrency
+levels shouldn't matter much and are left at 1.  A higher value may be
+beneficial and needs investigation.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 ---
- drivers/crypto/mv_cesa.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Only compile tested.  Please feel free to take it into the subsystem
+tree or simply ack - I'll route it through the wq tree.
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 7d279e5..c99305a 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -857,7 +857,7 @@ static int mv_cra_hash_init(struct crypto_tfm *tfm, const char *base_hash_name,
- 			printk(KERN_WARNING MV_CESA
- 			       "Base driver '%s' could not be loaded!\n",
- 			       base_hash_name);
--			err = PTR_ERR(fallback_tfm);
-+			err = PTR_ERR(base_hash);
- 			goto err_bad_base;
- 		}
- 	}
+Thanks.
+
+ crypto/crypto_wq.c |    3 ++-
+ crypto/pcrypt.c    |    3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/crypto_wq.c b/crypto/crypto_wq.c
+index fdcf624..b980ee1 100644
+--- a/crypto/crypto_wq.c
++++ b/crypto/crypto_wq.c
+@@ -20,7 +20,8 @@ EXPORT_SYMBOL_GPL(kcrypto_wq);
+ 
+ static int __init crypto_wq_init(void)
+ {
+-	kcrypto_wq = create_workqueue("crypto");
++	kcrypto_wq = alloc_workqueue("crypto",
++				     WQ_MEM_RECLAIM | WQ_CPU_INTENSIVE, 1);
+ 	if (unlikely(!kcrypto_wq))
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 75586f1..29a89da 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -455,7 +455,8 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
+ 
+ 	get_online_cpus();
+ 
+-	pcrypt->wq = create_workqueue(name);
++	pcrypt->wq = alloc_workqueue(name,
++				     WQ_MEM_RECLAIM | WQ_CPU_INTENSIVE, 1);
+ 	if (!pcrypt->wq)
+ 		goto err;
+ 
+-- 
+1.7.1
