@@ -1,7 +1,7 @@
 From: "Mario 'BitKoenig' Holbe" <Mario.Holbe@TU-Ilmenau.DE>
 Subject: Re: 2.6.37-rc7: Regression: b43: crashes in hwrng_register()
-Date: Wed, 5 Jan 2011 02:45:39 +0100
-Message-ID: <20110105014538.GK27114@darkside.kls.lan>
+Date: Wed, 5 Jan 2011 04:52:22 +0100
+Message-ID: <20110105035222.GA8762@darkside.kls.lan>
 References: <20101231022550.GA2512@darkside.kls.lan>
  <20101231024653.GA24879@gondor.apana.org.au>
  <20101231085103.GA31935@darkside.kls.lan>
@@ -14,7 +14,7 @@ References: <20101231022550.GA2512@darkside.kls.lan>
  <20110105003020.GA5751@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="umrsQkkrw7viUWFs"
+	protocol="application/pgp-signature"; boundary="PNTmBPCT7hxwcZjr"
 Cc: Larry Finger <Larry.Finger@lwfinger.net>,
 	Matt Mackall <mpm@selenic.com>,
 	LKML <linux-kernel@vger.kernel.org>,
@@ -23,18 +23,18 @@ Cc: Larry Finger <Larry.Finger@lwfinger.net>,
 	Michal Ludvig <michal@logix.cz>
 To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from piggy.rz.tu-ilmenau.de ([141.24.4.8]:46829 "EHLO
+Received: from piggy.rz.tu-ilmenau.de ([141.24.4.8]:57604 "EHLO
 	piggy.rz.tu-ilmenau.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751147Ab1AEBp7 (ORCPT
+	with ESMTP id S1751050Ab1AEDwg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Jan 2011 20:45:59 -0500
+	Tue, 4 Jan 2011 22:52:36 -0500
 Content-Disposition: inline
 In-Reply-To: <20110105003020.GA5751@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---umrsQkkrw7viUWFs
+--PNTmBPCT7hxwcZjr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -42,61 +42,60 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Jan 05, 2011 at 11:30:20AM +1100, Herbert Xu wrote:
 > OK, so xstore really is producing crap.  Can you try this path
 > (also against vanilla) to print out some extra info?
->=20
->  	irq_ts_restore(ts_state);
-> +	printk(KERN_DEBUG "%p 0x%x 0x%x\n", addr, *addr, eax_out);
->  	return eax_out;
 
-# dd if=3D/dev/hwrng bs=3D16 count=3D1 | hexdump -C
-1+0 records in
-1+0 records out
-16 bytes (16 B) copied, 0,000288649 s, 55,4 kB/s
-00000000  00 ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |..............=
-=2E.|
-00000010
-#                                                                          =
-        =20
+All right, here is what happens...
 
-Jan  5 02:25:00 ideapad kernel: [  112.073759] f3cc3f38 0x0 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073770] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073774] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073788] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073791] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073805] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073808] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073821] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073825] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073838] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073841] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073855] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073858] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073872] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073875] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073888] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073892] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073905] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073908] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073922] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073925] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073938] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073942] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073955] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073959] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073972] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073975] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.073989] f3cc3f38 0xffffffff 0x8
-Jan  5 02:25:00 ideapad kernel: [  112.073992] f3cc3f30 0x0 0x0
-Jan  5 02:25:00 ideapad kernel: [  112.074005] f3cc3f38 0xffffffff 0x8
+On top of your 3rd patch:
+
+--- linux-source-2.6.37-rc7/drivers/char/hw_random/via-rng.c.hxu3	2011-01-0=
+5 04:13:09.452322117 +0100
++++ linux-source-2.6.37-rc7/drivers/char/hw_random/via-rng.c	2011-01-05 03:=
+59:33.169316276 +0100
+@@ -97,6 +97,10 @@ static int via_rng_data_present(struct h
+ 	u32 bytes_out;
+ 	int i;
+=20
++	printk(KERN_DEBUG "buf=3D%p + %zu, via_rng_datum=3D%p\n",
++			buf, sizeof(buf), via_rng_datum);
++
++
+ 	/* We choose the recommended 1-byte-per-instruction RNG rate,
+ 	 * for greater randomness at the expense of speed.  Larger
+ 	 * values 2, 4, or 8 bytes-per-instruction yield greater
+
+gives:
+
+[  103.276337] buf=3Df6e23f28 + 28, via_rng_datum=3Df6e23f30
+[  103.276351] f6e23f38 0x0 0x8
+[  103.276371] buf=3Df6e23f28 + 28, via_rng_datum=3Df6e23f30
+[  103.276380] f6e23f38 0xffffffff 0x8
+=2E..
+
+According to the VIA PadLock Programming Guide, XSTORE increments EDI by
+the number of bytes stored.
+This did obviously not matter as long as the buffer was "sufficiently
+distant", but now you have the buffer close on the stack and I believe,
+the optimizer crops up, hence the EDI increment begins to matter.
+
+IMHO EDI (and EDX - for completeness :)) should be put on the asm
+clobber-list, but if I try to do it, I always get:
+error: can't find a register in class 'DIREG' while reloading 'asm'
+error: 'asm' operand has impossible constraints
+
+So... I have the reason - solution is up to you :)
+
+Btw: the 8 bytes increment (as well as the 8 in EAX 4:0) proves that
+XSTOR indeed writes more than 32bit :)
 
 
-Mario
+g'nite
+   Mario
 --=20
-Oh Du mein Koenig ... Eine Netzgroesse schrieb mal sinngemaess:
-Du musst es so lesen wie ich es meine, nicht so wie ich es schreibe.
-Ich meine es natuerlich so, wie Du es schreibst 8--)
-                              -- O.G. Schwenk in de.comm.chatsystems
+The only thing to be scared of, son, is tomorrow.
+I don't live for tomorrow. Never saw the fun in it.
+                       -- Denny Crane, Boston Legal
 
---umrsQkkrw7viUWFs
+--PNTmBPCT7hxwcZjr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 Content-Disposition: inline
@@ -104,13 +103,13 @@ Content-Disposition: inline
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.10 (GNU/Linux)
 
-iQEVAwUBTSPNQhS+e2HeSPbpAQKMTQf/XwxdO5rRae+5/npST+w/Nj0hHz5kVUbn
-Ai0xz4Ea0+0q+dj2WQrFFGzHQPcHhW+sGa9JdFmlvEkpiyxMkUEjZu3F8Os7n9Be
-XUSBjnlBlkFRTvnwMPTif+9x6nQNzETVUTfFM8ZJfWAAfDURfaQALrpKCzD2uS89
-pY/rItQpAOZx4hUgXnEgHqo9EpsMo4NN+v4QnjCONEVPuLp0czgpwpyW6CVJxN+6
-j8IItiRh4ZK2Ivo18Dj2mkp5L0Me7ocmsUTmmgMIeybSGpadIreDnYA03EUdzoZL
-h+5kca+NCjl5u+Oql0X7QaRTyevTn8lfZfsI7eesztLHqA1OjFGmsw==
-=bajl
+iQEVAwUBTSPq9hS+e2HeSPbpAQIi2gf/TsnTxgNFdqGKUFY3tFLYpDx1SyJ39OgF
+BlSZZoidVkrmKQrYZqxmWcDDheqM+3x9fBmEoUTn3v19490+OMwNUPj/2BTN9irK
+w06BA9wwhfGhWULd2yWjpaSj8A7VPzXiDCWytMV5K8fEre9hdNGY17v978Bprx/z
+GvKML8kzqBXjd4cG9tVwG7f212LMSgTwwalh9dfQM+YtK1nFhxjk5WTDKc9tG+/2
+PSiWwpara+oUl4JX7/phvchoivrGd7xegbtDtL0AxZax2bSKtx7RG8xQWNI/DzVW
+qxsixKBoThfAB6HHE8wELra0R1isFU8jhPLqlt8KPpbwmR8UeeuoKg==
+=Vz/q
 -----END PGP SIGNATURE-----
 
---umrsQkkrw7viUWFs--
+--PNTmBPCT7hxwcZjr--
