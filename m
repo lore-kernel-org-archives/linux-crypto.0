@@ -1,57 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: Crypto Update for 2.6.38
-Date: Fri, 7 Jan 2011 08:16:46 +1100
-Message-ID: <20110106211645.GA26184@gondor.apana.org.au>
-References: <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au> <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
+Date: Thu, 6 Jan 2011 13:23:19 -0800
+Message-ID: <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
+References: <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au>
+ <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au>
+ <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au>
+ <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au>
+ <20110106000157.GA16089@gondor.apana.org.au> <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
+ <20110106211645.GA26184@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:43631 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753079Ab1AFVY3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Jan 2011 16:24:29 -0500
+In-Reply-To: <20110106211645.GA26184@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 06, 2011 at 10:05:46AM -0800, Linus Torvalds wrote:
+On Thu, Jan 6, 2011 at 1:16 PM, Herbert Xu <herbert@gondor.hengli.com.au> wrote:
+> On Thu, Jan 06, 2011 at 10:05:46AM -0800, Linus Torvalds wrote:
+>>
+>> Is there really any point to this? And can we get more explanation of
+>> what the interface is, and who would use it?
 >
-> Is there really any point to this? And can we get more explanation of
-> what the interface is, and who would use it?
+> I think you've answered it yourself in the third paragraph :)
 
-I think you've answered it yourself in the third paragraph :)
+No I didn't.
 
-> If you need crypto in user space, it's almost invariably better done
-> in user space. If the CPU can do crypto on its own, and doesn't expose
-> those instructions to user space, it's just a stupid CPU - and the
-> user/kernel transfer is likely going to make it slower than a pure
-> software approach for any but the biggest transfers.
+What part of "can we get more explanation of what the interface is" is unclear?
 
-I agree completely.
+Explanations of interface. Code. Who uses it? What are the actual
+performance benefits on real code?
 
-> And if the crypto engine is off-chip, the sw version is going to be
-> faster anyway except for possible async versions that are hard to
-> interface to user space.
-> 
-> So I really need more convincing about the whole user-space interface.
-> Adding new interfaces willy-nilly isn't a good idea. They need damn
-> good reasons.
+Quite frankly, asynchronous external devices using DMA or similar are
+seldom real performance improvements. The bus and cache traffic tends
+to overwhelm any other advantage, and commonly the result is (a) lower
+performance with (b) better-looking profiles.
 
-Right.  This purpose of this interface is to access the async
-hardware crypto drivers that we have added over the past years.
+But "better-looking profiles" isn't actually a real advantage.
 
-For a modern x86-64 CPU it isn't interesting at all.  It's mainly
-for other architectures where the CPU may not be able to keep up
-with say 10Gb/s IPsec traffic and the encryption and/or hashing
-must be offloaded.
+And I really do want to hear about new kernel interfaces. What _are_
+the interfaces, and what are the advantages to them.
 
-This is also why only hash and skcipher are supported as they
-are the main algorithm types supported by teh current async
-drivers in the kernel.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+                     Linus
