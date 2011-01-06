@@ -1,13 +1,13 @@
 From: Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: Crypto Update for 2.6.38
-Date: Thu, 6 Jan 2011 14:43:35 -0800
-Message-ID: <AANLkTinbH8i8rjUxACV5PkdLuVc9YccT+E5x=ZBWunyU@mail.gmail.com>
-References: <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au>
- <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au>
+Date: Thu, 6 Jan 2011 15:25:32 -0800
+Message-ID: <AANLkTi=E3fqTos7A2fJ2PRKT=o5=sgWh+CzMv4G7P4rZ@mail.gmail.com>
+References: <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au>
  <20110106000157.GA16089@gondor.apana.org.au> <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
  <20110106211645.GA26184@gondor.apana.org.au> <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
  <20110106213932.GA26538@gondor.apana.org.au> <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
- <20110106223042.GA27080@gondor.apana.org.au>
+ <20110106223042.GA27080@gondor.apana.org.au> <AANLkTinbH8i8rjUxACV5PkdLuVc9YccT+E5x=ZBWunyU@mail.gmail.com>
+ <20110106225301.GA27358@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -16,48 +16,43 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:38950 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:50232 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751355Ab1AFXOq convert rfc822-to-8bit
+	by vger.kernel.org with ESMTP id S1752513Ab1AFXZz convert rfc822-to-8bit
 	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jan 2011 18:14:46 -0500
-In-Reply-To: <20110106223042.GA27080@gondor.apana.org.au>
+	Thu, 6 Jan 2011 18:25:55 -0500
+In-Reply-To: <20110106225301.GA27358@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 6, 2011 at 2:30 PM, Herbert Xu <herbert@gondor.hengli.com.a=
+On Thu, Jan 6, 2011 at 2:53 PM, Herbert Xu <herbert@gondor.hengli.com.a=
 u> wrote:
+> On Thu, Jan 06, 2011 at 02:43:35PM -0800, Linus Torvalds wrote:
+>>
+>> Can you do the "bypass directly to the TCP stream" with the interfac=
+e
+>> you added? It isn't at all obvious how it would work.
 >
-> The main use-case is bulk encryption/hashing in user-space. =A0For
-> example, on Sparc Niagara2 you need to use SPU (Stream Processing
-> Unit) in order to do crypto at 10Gb/s over the network.
+> Yes it can. =A0The interface allows zero-copy in both directions
+> using the splice interface. =A0Here is a sample program demonstrating
+> zero-copy in-place encryption. =A0It doesn't send the result over TCP
+> but I'm sure you can imagine what that would look like.
 
-Umm. But doesn't that require that the data then be sent to the network=
-?
+Ok. So can we actually get numbers for this?
 
-Why would a user-space -> crypto engine -> user space -> network chip
-thing ever be good enough? Niagara is so slow that the whole bounce
-thing will totally negate all the SPU advantages.
+Put another way: I really really REALLY don't want to merge new
+user-space interfaces that don't actually work in reality. But if this
+allows direct encryption to a network interface, and it actually is
+able to saturate 10Gb on niagara (unlike a user-mode encryption thing,
+I assume, since those things are dog slow), then that would certainly
+be a good real-life test.
 
-Your interface doesn't seem to support the use case that you actually
-want, which is to avoid the bouncing back and forth between user space
-buffers.
+But I really don't want to merge it unless it has had at least
+real-life testing of actually doing better than regular sw user-space
+encryption.
 
-And if you bounce back and forth, I bet you can't get that 10Gb/s anywa=
-y.
+I realize that on PC's, it's unlikely to ever help. So I'm not asking
+for "show me how this helps on my hardware". But I do want to get some
+case on _some_ actual hardware where it works on a real load.
 
-Can you do the "bypass directly to the TCP stream" with the interface
-you added? It isn't at all obvious how it would work.
-
-So let me repeat ONE MORE TIME:
-
- - I understand that your interface can use the hw that exists
-
- - but I still want real-world use cases to show that it actually
-works and makes sense in practice.
-
-Don't give me "we could use the SPU" crap. Give me "this program
-actually uses the SPU and gets better performance thanks to it, and
-here are the numbers".
-
-                         Linus
+                    Linus
