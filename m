@@ -1,44 +1,69 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Update for 2.6.38
-Date: Fri, 7 Jan 2011 14:04:39 +1100
-Message-ID: <20110107030439.GA884@gondor.apana.org.au>
-References: <20110106225301.GA27358@gondor.apana.org.au> <AANLkTi=E3fqTos7A2fJ2PRKT=o5=sgWh+CzMv4G7P4rZ@mail.gmail.com> <20110107001459.GA32068@gondor.apana.org.au> <20110106.184302.193709839.davem@davemloft.net>
+Subject: Re: 2.6.37-rc7: Regression: b43: crashes in hwrng_register()
+Date: Fri, 7 Jan 2011 14:49:48 +1100
+Message-ID: <20110107034948.GA1177@gondor.apana.org.au>
+References: <20110104224238.GA4978@gondor.apana.org.au> <20110104230644.GJ27114@darkside.kls.lan> <20110105003020.GA5751@gondor.apana.org.au> <20110105035222.GA8762@darkside.kls.lan> <20110105054735.GA7773@gondor.apana.org.au> <20110105131621.GA24769@darkside.kls.lan> <20110106061241.GA18939@gondor.apana.org.au> <20110106131516.GB8803@darkside.kls.lan> <20110106133541.GA22030@gondor.apana.org.au> <20110106144254.GC8803@darkside.kls.lan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: Mario 'BitKoenig' Holbe <Mario.Holbe@TU-Ilmenau.DE>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	Matt Mackall <mpm@selenic.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Linux Crypto Maili
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59598 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:57410 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755746Ab1AGDEo (ORCPT
+	with ESMTP id S1751685Ab1AGDuB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jan 2011 22:04:44 -0500
+	Thu, 6 Jan 2011 22:50:01 -0500
 Content-Disposition: inline
-In-Reply-To: <20110106.184302.193709839.davem@davemloft.net>
+In-Reply-To: <20110106144254.GC8803@darkside.kls.lan>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 06, 2011 at 06:43:02PM -0800, David Miller wrote:
+On Thu, Jan 06, 2011 at 03:42:55PM +0100, Mario 'BitKoenig' Holbe wrote:
 >
-> davem@maramba:~$ time ./crypto_user_test >/dev/null
-> 
-> real		 0m46.586s
-> user		 0m3.280s
-> sys		 0m43.230s
-> davem@maramba:~$ time ./crypto_user_test software >/dev/null
-> 
-> real		 10m40.336s
-> user		 10m40.540s
-> sys		 0m0.000s
-> davem@maramba:~$   
-> 
-> What's that, something like a factor of 13 faster? :-)
+> holbe@ideapad ~ % gcc -o via-rng-test via-rng-test.c
+> holbe@ideapad ~ % ./via-rng-test
+> 0xbff09d40: 00000000
+> ecx: aa55aa55   edx: ffffff03   edi: 0xbff09d40
+> ecx: aa55aa55   edx: 00000003   edi: 0xbff09d48
+> 0xbff09d40: 339d4525
+> holbe@ideapad ~ % 
 
-Heh, I missed the leading 1 in your second result and was about
-to spill my drink :)
+Thanks, I've applied this patch:
 
-Thanks!
+commit 0735ac1f2551d9f9d356126aaf3b1110150918e6
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Jan 7 14:48:57 2011 +1100
+
+    hwrng: via_rng - Fix asm constraints
+    
+    The inline asm to invoke xstore did not specify the constraints
+    correctly.  In particular, dx/di should have been marked as output
+    registers as well as input as they're modified by xstore.
+    
+    Thanks to Mario Holbe for creating this patch and testing it.
+    
+    Tested-by: Mario 'BitKoenig' Holbe <Mario.Holbe@TU-Ilmenau.DE>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index 794aacb..7f86666 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -81,8 +81,7 @@ static inline u32 xstore(u32 *addr, u32 edx_in)
+ 	ts_state = irq_ts_save();
+ 
+ 	asm(".byte 0x0F,0xA7,0xC0 /* xstore %%edi (addr=%0) */"
+-		:"=m"(*addr), "=a"(eax_out)
+-		:"D"(addr), "d"(edx_in));
++		: "=m" (*addr), "=a" (eax_out), "+d" (edx_in), "+D" (addr));
+ 
+ 	irq_ts_restore(ts_state);
+ 	return eax_out;
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
