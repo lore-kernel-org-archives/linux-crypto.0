@@ -1,112 +1,87 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: hwrng: via_rng - Fix memory scribbling on some CPUs
-Date: Fri, 7 Jan 2011 14:55:40 +1100
-Message-ID: <20110107035540.GB1341@gondor.apana.org.au>
-References: <20110105003020.GA5751@gondor.apana.org.au> <20110105035222.GA8762@darkside.kls.lan> <20110105054735.GA7773@gondor.apana.org.au> <20110105131621.GA24769@darkside.kls.lan> <20110106061241.GA18939@gondor.apana.org.au> <20110106131516.GB8803@darkside.kls.lan> <20110106133541.GA22030@gondor.apana.org.au> <20110106144254.GC8803@darkside.kls.lan> <20110107034948.GA1177@gondor.apana.org.au> <20110107035456.GA1341@gondor.apana.org.au>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: Crypto Update for 2.6.38
+Date: Fri, 7 Jan 2011 07:04:51 -0500
+Message-ID: <20110107120451.GA22347@hmsreliant.think-freely.org>
+References: <20100519020603.GA19654@gondor.apana.org.au>
+ <20100521104404.GA29530@gondor.apana.org.au>
+ <20100804140448.GA4042@gondor.apana.org.au>
+ <20101024061625.GA23715@gondor.apana.org.au>
+ <20110106000157.GA16089@gondor.apana.org.au>
+ <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
+ <20110106211645.GA26184@gondor.apana.org.au>
+ <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
+ <20110106213932.GA26538@gondor.apana.org.au>
+ <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Mario 'BitKoenig' Holbe <Mario.Holbe@TU-Ilmenau.DE>,
-	Larry Finger <Larry.Finger@lwfinger.net>,
-	Matt Mackall <mpm@selenic.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Maili
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:51082 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753073Ab1AGDzp (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:37438 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750960Ab1AGMFK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jan 2011 22:55:45 -0500
+	Fri, 7 Jan 2011 07:05:10 -0500
 Content-Disposition: inline
-In-Reply-To: <20110107035456.GA1341@gondor.apana.org.au>
+In-Reply-To: <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-commit 55db8387a5e8d07407f0b7c6b2526417a2bc6243
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Jan 7 14:55:06 2011 +1100
+On Thu, Jan 06, 2011 at 02:13:17PM -0800, Linus Torvalds wrote:
+> On Thu, Jan 6, 2011 at 1:39 PM, Herbert Xu <herbert@gondor.hengli.com.au> wrote:
+> > On Thu, Jan 06, 2011 at 01:23:19PM -0800, Linus Torvalds wrote:
+> >>
+> >> Explanations of interface. Code. Who uses it? What are the actual
+> >> performance benefits on real code?
+> >
+> > You snipped out the bit in my reply where I expanded on it:
+> 
+> You didn't expand on it AT ALL.
+> 
+> You just mentioned "the interface". I haven't seen WHAT THAT INTERFACE IS!
+> 
+> How hard is that to understand?
+> 
+> > Here is the original cover email for the patches:
+> 
+> Ok, this is more like it. This is roughly what I wanted to see:
+> 
+> > : Here is a sample hash program (note that these only illustrate
+> > : what the interface looks like and are not meant to be good examples
+> > : of coding :)
+> 
+> But I'm still missing the part where you show that there is any actual
+> use case that makes sense, and that actually improves performance.
+> Maybe it's been posted somewhere else, but the thing is, you're asking
+> _me_ to pull, and as a result you need to convince _me_ that this is a
+> good idea. So if it's been posted/discussed extensively elsewhere,
+> please point to those discussions.
+> 
+> I really don't like adding interfaces that don't have hard uses
+> associated with them. We've done it in the past, and it tends to be a
+> morass and a bad idea. That's been true even when the idea has been my
+> own, and thus obviously genius-level and clearly the RightThing(tm),
+> like "splice()". And it's why I push back on new interfaces when I see
+> them.
+> 
+> Btw, it doesn't have to be about performance per se. Does this allow
+> people to use keys without actually _seeing_ those keys? Your example
+> implies that that is not the case, but that's actually one of the few
+> reasons to actually support a kernel crypto interface - the ability to
+> have private personal keys around, but not having to actually let
+> possibly untrusted programs see them.
+> 
+This actually is an indirect feature of this interface.  Using it, you can open
+a algorithm socket, select a specific alg, assign a key, and then pass that
+socket descriptor over a unix socket to an another process using an
+SCM_RIGHTS ancilliary message.  The receiving process can then use children
+acceppted from that passed socket to preform the configured crypto operation
+without any knoweldge of the keys used in it.  I can write a demo app if you
+like.
 
-    hwrng: via_rng - Fix memory scribbling on some CPUs
-    
-    It has been reported that on at least one Nano CPU the xstore
-    instruction will write as many as 16 bytes of data to the output
-    buffer.
-    
-    This causes memory corruption as we use rng->priv which is only
-    4-8 bytes long.
-    
-    This patch fixes this by using an intermediate buffer on the stack
-    with at least 16 bytes and aligned to a 16-byte boundary.
-    
-    The problem was observed on the following processor:
-    
-    processor	: 0
-    vendor_id	: CentaurHauls
-    cpu family	: 6
-    model		: 15
-    model name	: VIA Nano processor U2250 (1.6GHz Capable)
-    stepping	: 3
-    cpu MHz		: 1600.000
-    cache size	: 1024 KB
-    fdiv_bug	: no
-    hlt_bug		: no
-    f00f_bug	: no
-    coma_bug	: no
-    fpu		: yes
-    fpu_exception	: yes
-    cpuid level	: 10
-    wp		: yes
-    flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat clflush acpi mmx fxsr sse sse2 ss tm syscall nx lm constant_tsc up rep_good pni monitor vmx est tm2 ssse3 cx16 xtpr rng rng_en ace ace_en ace2 phe phe_en lahf_lm
-    bogomips	: 3192.08
-    clflush size	: 64
-    cache_alignment	: 128
-    address sizes	: 36 bits physical, 48 bits virtual
-    power management:
-    
-    Tested-by: Mario 'BitKoenig' Holbe <Mario.Holbe@TU-Ilmenau.DE>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
-index 7f86666..d0387a8 100644
---- a/drivers/char/hw_random/via-rng.c
-+++ b/drivers/char/hw_random/via-rng.c
-@@ -24,6 +24,7 @@
-  * warranty of any kind, whether express or implied.
-  */
+Regards
+Neil
  
-+#include <crypto/padlock.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/hw_random.h>
-@@ -34,7 +35,6 @@
- #include <asm/i387.h>
- 
- 
--#define PFX	KBUILD_MODNAME ": "
- 
- 
- enum {
-@@ -89,8 +89,10 @@ static inline u32 xstore(u32 *addr, u32 edx_in)
- 
- static int via_rng_data_present(struct hwrng *rng, int wait)
- {
-+	char buf[16 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
-+		((aligned(STACK_ALIGN)));
-+	u32 *via_rng_datum = (u32 *)PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
- 	u32 bytes_out;
--	u32 *via_rng_datum = (u32 *)(&rng->priv);
- 	int i;
- 
- 	/* We choose the recommended 1-byte-per-instruction RNG rate,
-@@ -114,6 +116,7 @@ static int via_rng_data_present(struct hwrng *rng, int wait)
- 			break;
- 		udelay(10);
- 	}
-+	rng->priv = *via_rng_datum;
- 	return bytes_out ? 1 : 0;
- }
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
