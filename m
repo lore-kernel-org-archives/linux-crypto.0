@@ -1,38 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Crypto Update for 2.6.38
-Date: Fri, 7 Jan 2011 14:03:49 +1100
-Message-ID: <20110107030349.GA845@gondor.apana.org.au>
-References: <20110106000157.GA16089@gondor.apana.org.au> <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com> <20110106211645.GA26184@gondor.apana.org.au> <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com> <20110106213932.GA26538@gondor.apana.org.au> <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com> <20110106223042.GA27080@gondor.apana.org.au> <AANLkTinbH8i8rjUxACV5PkdLuVc9YccT+E5x=ZBWunyU@mail.gmail.com> <20110106225301.GA27358@gondor.apana.org.au> <20110106213928.jd36vdlpcgsgcwss-cebfxv@webmail.spamcop.net>
+Date: Fri, 7 Jan 2011 14:04:39 +1100
+Message-ID: <20110107030439.GA884@gondor.apana.org.au>
+References: <20110106225301.GA27358@gondor.apana.org.au> <AANLkTi=E3fqTos7A2fJ2PRKT=o5=sgWh+CzMv4G7P4rZ@mail.gmail.com> <20110107001459.GA32068@gondor.apana.org.au> <20110106.184302.193709839.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Pavel Roskin <proski@gnu.org>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57256 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59598 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755429Ab1AGDD7 (ORCPT
+	with ESMTP id S1755746Ab1AGDEo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jan 2011 22:03:59 -0500
+	Thu, 6 Jan 2011 22:04:44 -0500
 Content-Disposition: inline
-In-Reply-To: <20110106213928.jd36vdlpcgsgcwss-cebfxv@webmail.spamcop.net>
+In-Reply-To: <20110106.184302.193709839.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 06, 2011 at 09:39:28PM -0500, Pavel Roskin wrote:
+On Thu, Jan 06, 2011 at 06:43:02PM -0800, David Miller wrote:
 >
-> By the way, is it a good idea to use setsockopt() this way?  Some keys  
-> may be large.  And if AEAD is supported, will it use setsockopt() for  
-> the unencrypted authenticated data?
+> davem@maramba:~$ time ./crypto_user_test >/dev/null
+> 
+> real		 0m46.586s
+> user		 0m3.280s
+> sys		 0m43.230s
+> davem@maramba:~$ time ./crypto_user_test software >/dev/null
+> 
+> real		 10m40.336s
+> user		 10m40.540s
+> sys		 0m0.000s
+> davem@maramba:~$   
+> 
+> What's that, something like a factor of 13 faster? :-)
 
-For large keys (i.e., asymmetric key crypto) the kernel keyring API
-would be the obvious way of passing them around.
+Heh, I missed the leading 1 in your second result and was about
+to spill my drink :)
 
-For AEAD the AD would be passed around through send/splice.
-
-Cheers,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
