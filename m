@@ -1,183 +1,70 @@
-From: Hamid Nassiby <h.nassiby@gmail.com>
-Subject: Re: Fwd: crypto accelerator driver problems
-Date: Sat, 8 Jan 2011 11:09:18 +0330
-Message-ID: <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com>
-References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com> <20101230211900.GA22742@gondor.apana.org.au>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: Crypto Update for 2.6.38
+Date: Sat, 8 Jan 2011 15:23:04 +0200
+Message-ID: <AANLkTi=wLQNF2p3v_-2F9hLobVVqQTOQB8F76a=fSoLW@mail.gmail.com>
+References: <20100519020603.GA19654@gondor.apana.org.au>
+	<20100521104404.GA29530@gondor.apana.org.au>
+	<20100804140448.GA4042@gondor.apana.org.au>
+	<20101024061625.GA23715@gondor.apana.org.au>
+	<20110106000157.GA16089@gondor.apana.org.au>
+	<AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
+	<20110106211645.GA26184@gondor.apana.org.au>
+	<AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
+	<20110106213932.GA26538@gondor.apana.org.au>
+	<AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
+	<20110107120451.GA22347@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:58542 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750877Ab1AHHju convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Jan 2011 02:39:50 -0500
-Received: by gyb11 with SMTP id 11so6831878gyb.19
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Jan 2011 23:39:50 -0800 (PST)
-In-Reply-To: <20101230211900.GA22742@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Neil Horman <nhorman@tuxdriver.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20110107120451.GA22347@hmsreliant.think-freely.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 31, 2010 at 12:49 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
->
-> Hamid Nassiby <h.nassiby@gmail.com> wrote:
-> > Hi,
-> >
-> > As some good news and additional information, with the following pa=
-tch
-> > I no more get
-> > "UDP bad cheksum" error as I mentioned erlier with Iperf in udp mod=
-e.
-> > But some times I get the following call trace in dmesg after runnin=
-g
-> > Iperf in UDP mode, more than one time (and ofcourse Iperf stops
-> > transferring data while it uses 100% of CPU cycles.
-> >
-> >
-> >
-> > [ =C2=A0130.171909] mydriver-aes: mydriver Crypto-Engine enabled.
-> > [ =C2=A0134.767846] NET: Registered protocol family 15
-> > [ =C2=A0200.031846] iperf: page allocation failure. order:0, mode:0=
-x20
-> > [ =C2=A0200.031850] Pid: 10935, comm: iperf Tainted: P =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A02.6.36-zen1 #1
-> > [ =C2=A0200.031852] Call Trace:
-> > [ =C2=A0200.031860] =C2=A0[<ffffffff8108ab39>] ? __alloc_pages_node=
-mask+0x6d3/0x722
-> > [ =C2=A0200.031864] =C2=A0[<ffffffff810b454f>] ? virt_to_head_page+=
-0x9/0x30
-> > [ =C2=A0200.031867] =C2=A0[<ffffffff810afac2>] ? alloc_pages_curren=
-t+0xa5/0xce
-> > [ =C2=A0200.031869] =C2=A0[<ffffffff810899ad>] ? __get_free_pages+0=
-x9/0x46
-> > [ =C2=A0200.031872] =C2=A0[<ffffffff8102bbbf>] ? need_resched+0x1a/=
-0x23
-> > [ =C2=A0200.031876] =C2=A0[<ffffffff811a10ad>] ? blkcipher_walk_nex=
-t+0x68/0x2d9
->
-> This means that your box has run out of memory temporarily.
-> If all errors were handled correctly it should continue at this
-> point.
->
-> > --- mydriver1 =C2=A0 2010-12-21 15:20:17.000000000 +0330
-> > +++ mydriver2 =C2=A0 2010-12-21 15:24:18.000000000 +0330
-> > @@ -1,4 +1,3 @@
-> > -
-> > static int
-> > mydriver_cbc_decrypt(struct blkcipher_desc *desc,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struc=
-t scatterlist *dst, struct scatterlist *src,
-> > @@ -14,18 +13,17 @@ mydriver_cbc_decrypt(struct blkcipher_desc
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D blkcipher_walk_virt(desc, &walk)=
-;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0op->iv =3D walk.iv;
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 while((nbytes =3D walk.nbytes)) {
-> > +
->
-> However, your patch removes the error checking (and the loop
-> condition) which is why it crashes.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Fri, Jan 7, 2011 at 2:04 PM, Neil Horman <nhorman@tuxdriver.com> wro=
+te:
 
+>> Btw, it doesn't have to be about performance per se. Does this allow
+>> people to use keys without actually _seeing_ those keys? Your exampl=
+e
+>> implies that that is not the case, but that's actually one of the fe=
+w
+>> reasons to actually support a kernel crypto interface - the ability =
+to
+>> have private personal keys around, but not having to actually let
+>> possibly untrusted programs see them.
+> This actually is an indirect feature of this interface. =C2=A0Using i=
+t, you can open
+> a algorithm socket, select a specific alg, assign a key, and then pas=
+s that
+> socket descriptor over a unix socket to an another process using an
+> SCM_RIGHTS ancilliary message. =C2=A0The receiving process can then u=
+se children
+> acceppted from that passed socket to preform the configured crypto op=
+eration
+> without any knoweldge of the keys used in it. =C2=A0I can write a dem=
+o app if you
+> like.
 
+Several things have to be considered when extending an interface like
+that. For example, do the algorithm implementations protect against
+timing attacks, or keys can be recovered, using them? What is the
+purpose of cryptographic key separation? If long term keys are to be
+protected, then it makes sense to support RSA, DSA keys in addition to
+symmetric keys (e.g. microsoft only supports assymetric keys for
+separation, since symmetric ones are rarely used as long term keys -
+[in TLS-PSK]).
 
-Hi Herbert,
+Some of these issues are discussed in my report on a user-space crypto
+interface that specifically targeted separation and speed at [0].
 
-=46irst I should notice that by removing while loop iteration, "UDP bad=
- checksum"
-error in dmesg output is no longer seen. Diving deeper in problem, It s=
-eemed
-to me that when mydriver_transform returns 0, I must not get any more b=
-ytes
-(belonging to previous request) to process in the next iteration of whi=
-le loop.
-But I see that the behavior is not as it has to be (By removing while l=
-oop
-mydriver_transform gets for example one 1500 byte request, processes it=
- and
-copies it back to destination, But in existence of while loop It gets s=
-ame
-request as one 1300 byte request, processes and copies it back to desti=
-nation,
-returning 0, and getting remaining 200 bytes of request in second itera=
-tion of
-while, so on the other end of tunnel I see "UDP bad checksum"). So I co=
-nclude
-that blkcipher_walk_done behaves strange, assigns incorrect value to wa=
-lk.nbytes
-resulting in iterating while loop one time more!
+regards,
+Nikos
 
-
-Second note is about our accelerator's architecture and the way we shou=
-ld
-utilize it. Our device has several crypto engines built in. So for maxi=
-mum
-utilization of device we should feed it with multiple crypto requests
-simultaneously (I intended for doing  it by using pcrypt) and here is t=
-he point
-everything freezes. From other point of view, I found that if I protect=
- entering
-write_request and read_response in mydriver_transform by one lock
-(spin_unlock(x) before write_request and spin_unlock(x) after read_reas=
-ponse in
-mydriver_transform as shown in following code snippet), I would be able=
- to run
-"iperf" in tcp mode successfully. This leads me to uncertainty, because=
- in
-such a situation, we only utilize one crypto engine of device and each =
-request
-is followed by its response sequentially and arrangement of requests an=
-d
-responses is not interleaved. So I guess that getting multiple requests=
- to
-device and receiving the responses not in the same arrangement they del=
-ivered to
-device, might cause TCP transfer to freeze, and here my question arises=
-: If my
-conclusion is true, SHOULD I change the driver approach to ablkcipher?
-
-
-Code snippet in the way write_request and read_response are protected b=
-y lock
-and iperf in TCP mode progresses:
-
-
-static inline int mydriver_transform(struct mydriver_aes_op *op, int al=
-g)
-{
-		.
-		.
-		.
-		spin_lock_irqsave(&glock, tflag);
-		write_request(req_buf, req_len);
-		kfree(req_buf);
-		req_buf =3D NULL;
-		err =3D read_response(&res_buf,my_req_id);
-		spin_unlock_irqrestore(&glock, tflag2);
-		if (err =3D=3D 0){
-				kfree(res_buf);
-				res_buf =3D NULL;
-				return 0;
-		}
-
-		memcpy(op->dst, (res_buf + sizeof(struct response_hdr)),
-op->len);
-	=09
-		kfree(res_buf);
-		res_buf =3D NULL;
-		return op->len;
-}
-
-
-I'm looking forward to hearing you soon.
-Thanks,
-
-Hamid.
+[0]. https://www.cosic.esat.kuleuven.be/publications/article-1490.pdf
