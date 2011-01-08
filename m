@@ -1,87 +1,183 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: Crypto Update for 2.6.38
-Date: Fri, 7 Jan 2011 07:04:51 -0500
-Message-ID: <20110107120451.GA22347@hmsreliant.think-freely.org>
-References: <20100519020603.GA19654@gondor.apana.org.au>
- <20100521104404.GA29530@gondor.apana.org.au>
- <20100804140448.GA4042@gondor.apana.org.au>
- <20101024061625.GA23715@gondor.apana.org.au>
- <20110106000157.GA16089@gondor.apana.org.au>
- <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
- <20110106211645.GA26184@gondor.apana.org.au>
- <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
- <20110106213932.GA26538@gondor.apana.org.au>
- <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
+From: Hamid Nassiby <h.nassiby@gmail.com>
+Subject: Re: Fwd: crypto accelerator driver problems
+Date: Sat, 8 Jan 2011 11:09:18 +0330
+Message-ID: <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com>
+References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com> <20101230211900.GA22742@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:37438 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750960Ab1AGMFK (ORCPT
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:58542 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750877Ab1AHHju convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Jan 2011 07:05:10 -0500
-Content-Disposition: inline
-In-Reply-To: <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
+	Sat, 8 Jan 2011 02:39:50 -0500
+Received: by gyb11 with SMTP id 11so6831878gyb.19
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Jan 2011 23:39:50 -0800 (PST)
+In-Reply-To: <20101230211900.GA22742@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 06, 2011 at 02:13:17PM -0800, Linus Torvalds wrote:
-> On Thu, Jan 6, 2011 at 1:39 PM, Herbert Xu <herbert@gondor.hengli.com.au> wrote:
-> > On Thu, Jan 06, 2011 at 01:23:19PM -0800, Linus Torvalds wrote:
-> >>
-> >> Explanations of interface. Code. Who uses it? What are the actual
-> >> performance benefits on real code?
+On Fri, Dec 31, 2010 at 12:49 AM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+>
+> Hamid Nassiby <h.nassiby@gmail.com> wrote:
+> > Hi,
 > >
-> > You snipped out the bit in my reply where I expanded on it:
-> 
-> You didn't expand on it AT ALL.
-> 
-> You just mentioned "the interface". I haven't seen WHAT THAT INTERFACE IS!
-> 
-> How hard is that to understand?
-> 
-> > Here is the original cover email for the patches:
-> 
-> Ok, this is more like it. This is roughly what I wanted to see:
-> 
-> > : Here is a sample hash program (note that these only illustrate
-> > : what the interface looks like and are not meant to be good examples
-> > : of coding :)
-> 
-> But I'm still missing the part where you show that there is any actual
-> use case that makes sense, and that actually improves performance.
-> Maybe it's been posted somewhere else, but the thing is, you're asking
-> _me_ to pull, and as a result you need to convince _me_ that this is a
-> good idea. So if it's been posted/discussed extensively elsewhere,
-> please point to those discussions.
-> 
-> I really don't like adding interfaces that don't have hard uses
-> associated with them. We've done it in the past, and it tends to be a
-> morass and a bad idea. That's been true even when the idea has been my
-> own, and thus obviously genius-level and clearly the RightThing(tm),
-> like "splice()". And it's why I push back on new interfaces when I see
-> them.
-> 
-> Btw, it doesn't have to be about performance per se. Does this allow
-> people to use keys without actually _seeing_ those keys? Your example
-> implies that that is not the case, but that's actually one of the few
-> reasons to actually support a kernel crypto interface - the ability to
-> have private personal keys around, but not having to actually let
-> possibly untrusted programs see them.
-> 
-This actually is an indirect feature of this interface.  Using it, you can open
-a algorithm socket, select a specific alg, assign a key, and then pass that
-socket descriptor over a unix socket to an another process using an
-SCM_RIGHTS ancilliary message.  The receiving process can then use children
-acceppted from that passed socket to preform the configured crypto operation
-without any knoweldge of the keys used in it.  I can write a demo app if you
-like.
+> > As some good news and additional information, with the following pa=
+tch
+> > I no more get
+> > "UDP bad cheksum" error as I mentioned erlier with Iperf in udp mod=
+e.
+> > But some times I get the following call trace in dmesg after runnin=
+g
+> > Iperf in UDP mode, more than one time (and ofcourse Iperf stops
+> > transferring data while it uses 100% of CPU cycles.
+> >
+> >
+> >
+> > [ =C2=A0130.171909] mydriver-aes: mydriver Crypto-Engine enabled.
+> > [ =C2=A0134.767846] NET: Registered protocol family 15
+> > [ =C2=A0200.031846] iperf: page allocation failure. order:0, mode:0=
+x20
+> > [ =C2=A0200.031850] Pid: 10935, comm: iperf Tainted: P =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A02.6.36-zen1 #1
+> > [ =C2=A0200.031852] Call Trace:
+> > [ =C2=A0200.031860] =C2=A0[<ffffffff8108ab39>] ? __alloc_pages_node=
+mask+0x6d3/0x722
+> > [ =C2=A0200.031864] =C2=A0[<ffffffff810b454f>] ? virt_to_head_page+=
+0x9/0x30
+> > [ =C2=A0200.031867] =C2=A0[<ffffffff810afac2>] ? alloc_pages_curren=
+t+0xa5/0xce
+> > [ =C2=A0200.031869] =C2=A0[<ffffffff810899ad>] ? __get_free_pages+0=
+x9/0x46
+> > [ =C2=A0200.031872] =C2=A0[<ffffffff8102bbbf>] ? need_resched+0x1a/=
+0x23
+> > [ =C2=A0200.031876] =C2=A0[<ffffffff811a10ad>] ? blkcipher_walk_nex=
+t+0x68/0x2d9
+>
+> This means that your box has run out of memory temporarily.
+> If all errors were handled correctly it should continue at this
+> point.
+>
+> > --- mydriver1 =C2=A0 2010-12-21 15:20:17.000000000 +0330
+> > +++ mydriver2 =C2=A0 2010-12-21 15:24:18.000000000 +0330
+> > @@ -1,4 +1,3 @@
+> > -
+> > static int
+> > mydriver_cbc_decrypt(struct blkcipher_desc *desc,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struc=
+t scatterlist *dst, struct scatterlist *src,
+> > @@ -14,18 +13,17 @@ mydriver_cbc_decrypt(struct blkcipher_desc
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D blkcipher_walk_virt(desc, &walk)=
+;
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0op->iv =3D walk.iv;
+> >
+> > - =C2=A0 =C2=A0 =C2=A0 while((nbytes =3D walk.nbytes)) {
+> > +
+>
+> However, your patch removes the error checking (and the loop
+> condition) which is why it crashes.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-Regards
-Neil
- 
+
+
+Hi Herbert,
+
+=46irst I should notice that by removing while loop iteration, "UDP bad=
+ checksum"
+error in dmesg output is no longer seen. Diving deeper in problem, It s=
+eemed
+to me that when mydriver_transform returns 0, I must not get any more b=
+ytes
+(belonging to previous request) to process in the next iteration of whi=
+le loop.
+But I see that the behavior is not as it has to be (By removing while l=
+oop
+mydriver_transform gets for example one 1500 byte request, processes it=
+ and
+copies it back to destination, But in existence of while loop It gets s=
+ame
+request as one 1300 byte request, processes and copies it back to desti=
+nation,
+returning 0, and getting remaining 200 bytes of request in second itera=
+tion of
+while, so on the other end of tunnel I see "UDP bad checksum"). So I co=
+nclude
+that blkcipher_walk_done behaves strange, assigns incorrect value to wa=
+lk.nbytes
+resulting in iterating while loop one time more!
+
+
+Second note is about our accelerator's architecture and the way we shou=
+ld
+utilize it. Our device has several crypto engines built in. So for maxi=
+mum
+utilization of device we should feed it with multiple crypto requests
+simultaneously (I intended for doing  it by using pcrypt) and here is t=
+he point
+everything freezes. From other point of view, I found that if I protect=
+ entering
+write_request and read_response in mydriver_transform by one lock
+(spin_unlock(x) before write_request and spin_unlock(x) after read_reas=
+ponse in
+mydriver_transform as shown in following code snippet), I would be able=
+ to run
+"iperf" in tcp mode successfully. This leads me to uncertainty, because=
+ in
+such a situation, we only utilize one crypto engine of device and each =
+request
+is followed by its response sequentially and arrangement of requests an=
+d
+responses is not interleaved. So I guess that getting multiple requests=
+ to
+device and receiving the responses not in the same arrangement they del=
+ivered to
+device, might cause TCP transfer to freeze, and here my question arises=
+: If my
+conclusion is true, SHOULD I change the driver approach to ablkcipher?
+
+
+Code snippet in the way write_request and read_response are protected b=
+y lock
+and iperf in TCP mode progresses:
+
+
+static inline int mydriver_transform(struct mydriver_aes_op *op, int al=
+g)
+{
+		.
+		.
+		.
+		spin_lock_irqsave(&glock, tflag);
+		write_request(req_buf, req_len);
+		kfree(req_buf);
+		req_buf =3D NULL;
+		err =3D read_response(&res_buf,my_req_id);
+		spin_unlock_irqrestore(&glock, tflag2);
+		if (err =3D=3D 0){
+				kfree(res_buf);
+				res_buf =3D NULL;
+				return 0;
+		}
+
+		memcpy(op->dst, (res_buf + sizeof(struct response_hdr)),
+op->len);
+	=09
+		kfree(res_buf);
+		res_buf =3D NULL;
+		return op->len;
+}
+
+
+I'm looking forward to hearing you soon.
+Thanks,
+
+Hamid.
