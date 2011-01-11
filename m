@@ -1,79 +1,51 @@
-From: Dag Arne Osvik <da@osvik.no>
-Subject: Re: Crypto Update for 2.6.38
-Date: Mon, 10 Jan 2011 20:05:30 +0100
-Message-ID: <1294686330.16075.2.camel@Nokia-N900-51-1>
-References: <20100804140448.GA4042@gondor.apana.org.au>
-	 <20101024061625.GA23715@gondor.apana.org.au>
-	 <20110106000157.GA16089@gondor.apana.org.au>
-	 <AANLkTikzg3Hndp8WRi59bvJdBLxi=p-1gt7aZDLYbSW8@mail.gmail.com>
-	 <20110106211645.GA26184@gondor.apana.org.au>
-	 <AANLkTimwaJCUxvMLoeS5Cpmu7FX3y=coeSdkPrrL4zcr@mail.gmail.com>
-	 <20110106213932.GA26538@gondor.apana.org.au>
-	 <AANLkTi=fggNhMm1LpOzzZ0_ofaU6w=ahX8SMGgFkHCui@mail.gmail.com>
-	 <20110107120451.GA22347@hmsreliant.think-freely.org>
-	 <AANLkTi=wLQNF2p3v_-2F9hLobVVqQTOQB8F76a=fSoLW@mail.gmail.com>
-	  <20110110120302.GA5869@hmsreliant.think-freely.org>
-Reply-To: Dag Arne Osvik <da@osvik.no>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Neil Horman <nhorman@tuxdriver.com>,
-	Nikos Mavrogiannopoulos <nmav@gnutls.org>
+From: Jamie Iles <jamie@jamieiles.com>
+Subject: [PATCH 01/16] crypto: omap-aes: don't treat NULL clk as an error
+Date: Tue, 11 Jan 2011 12:43:38 +0000
+Message-ID: <1294749833-32019-2-git-send-email-jamie@jamieiles.com>
+References: <1294749833-32019-1-git-send-email-jamie@jamieiles.com>
+Cc: Jamie Iles <jamie@jamieiles.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20110110120302.GA5869@hmsreliant.think-freely.org>
-Content-ID: <1294686329.16075.1.camel@Nokia-N900-51-1>
+In-Reply-To: <1294749833-32019-1-git-send-email-jamie@jamieiles.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-> On Sat, Jan 08, 2011 at 03:23:04PM +0200, Nikos Mavrogiannopoulos wro=
-te:
-> > On Fri, Jan 7, 2011 at 2:04 PM, Neil Horman <nhorman@tuxdriver.com>
-> > wrote:
-> >=20
-> > > > Btw, it doesn't have to be about performance per se. Does this
-> > > > allow people to use keys without actually _seeing_ those keys?
-> > > > Your example implies that that is not the case, but that's
-> > > > actually one of the few reasons to actually support a kernel
-> > > > crypto interface - the ability to have private personal keys
-> > > > around, but not having to actually let possibly untrusted progr=
-ams
-> > > > see them.
-> > > This actually is an indirect feature of this interface. =C2=A0Usi=
-ng it,
-> > > you can open a algorithm socket, select a specific alg, assign a
-> > > key, and then pass that socket descriptor over a unix socket to a=
-n
-> > > another process using an SCM_RIGHTS ancilliary message. =C2=A0The
-> > > receiving process can then use children acceppted from that passe=
-d
-> > > socket to preform the configured crypto operation without any
-> > > knoweldge of the keys used in it. =C2=A0I can write a demo app if=
- you
-> > > like.
-> >=20
-> > Several things have to be considered when extending an interface li=
-ke
-> > that. For example, do the algorithm implementations protect against
-> > timing attacks, or keys can be recovered, using them? What is the
-> No, the kernel does not implement any protection against timing attac=
-ks
-> in the algorithms per-se, but preforming a timing attack against a
-> kernel crypto operation is going to be near impossible anyway, as
-> precise timing measurements are going to get obscured by interupts,
-> scheduling jitter, lock contention, and various other factors that wi=
-ll
-> make measuring syscall time fairly useless.
+clk_get() returns a struct clk cookie to the driver and some platforms
+may return NULL if they only support a single clock.  clk_get() has only
+failed if it returns a ERR_PTR() encoded pointer.
 
-Let me just point out that this is not near impossible at all; instead =
-it has already been done more than 6 years ago. And it's not only sysca=
-ll time that leaks information. One practical example is recovery of a =
-full AES key in a couple of seconds, using cache attacks against an enc=
-rypted file system. AES-NI is immune to this kind of attack, but other =
-algorithms typically implemented using lookup tables are at risk.
+Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+---
+ drivers/crypto/omap-aes.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Dag Arne
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 799ca51..24d0f3f 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -17,6 +17,7 @@
+ #include <linux/err.h>
+ #include <linux/module.h>
+ #include <linux/init.h>
++#include <linux/err.h>
+ #include <linux/errno.h>
+ #include <linux/kernel.h>
+ #include <linux/clk.h>
+@@ -830,9 +831,9 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 
+ 	/* Initializing the clock */
+ 	dd->iclk = clk_get(dev, "ick");
+-	if (!dd->iclk) {
++	if (IS_ERR(dd->iclk)) {
+ 		dev_err(dev, "clock intialization failed.\n");
+-		err = -ENODEV;
++		err = PTR_ERR(dd->iclk);
+ 		goto err_res;
+ 	}
+ 
+-- 
+1.7.3.4
