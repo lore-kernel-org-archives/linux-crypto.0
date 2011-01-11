@@ -1,7 +1,7 @@
 From: Jamie Iles <jamie@jamieiles.com>
-Subject: [PATCH 01/16] crypto: omap-aes: don't treat NULL clk as an error
-Date: Tue, 11 Jan 2011 12:43:38 +0000
-Message-ID: <1294749833-32019-2-git-send-email-jamie@jamieiles.com>
+Subject: [PATCH 02/16] crypto: omap-sham: don't treat NULL clk as an error
+Date: Tue, 11 Jan 2011 12:43:39 +0000
+Message-ID: <1294749833-32019-3-git-send-email-jamie@jamieiles.com>
 References: <1294749833-32019-1-git-send-email-jamie@jamieiles.com>
 Cc: Jamie Iles <jamie@jamieiles.com>,
 	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
@@ -20,22 +20,14 @@ Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Jamie Iles <jamie@jamieiles.com>
 ---
- drivers/crypto/omap-aes.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/omap-sham.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 799ca51..24d0f3f 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -17,6 +17,7 @@
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/init.h>
-+#include <linux/err.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/clk.h>
-@@ -830,9 +831,9 @@ static int omap_aes_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index a081c7c..1acfcd2 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1150,9 +1150,9 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
  
  	/* Initializing the clock */
  	dd->iclk = clk_get(dev, "ick");
@@ -44,7 +36,7 @@ index 799ca51..24d0f3f 100644
  		dev_err(dev, "clock intialization failed.\n");
 -		err = -ENODEV;
 +		err = PTR_ERR(dd->iclk);
- 		goto err_res;
+ 		goto clk_err;
  	}
  
 -- 
