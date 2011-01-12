@@ -1,29 +1,37 @@
-From: Mark Allyn <allyn@well.com>
-Subject: Disregard my last question I found out the answer
-Date: Tue, 11 Jan 2011 11:47:19 -0800 (PST)
-Message-ID: <Pine.GSO.4.64.1101111146480.2994@well.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Why are there multiple defines of scatter_walk?
+Date: Wed, 12 Jan 2011 15:21:01 +1100
+Message-ID: <20110112042101.GA15048@gondor.apana.org.au>
+References: <Pine.GSO.4.64.1101111118140.25632@well.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Mark Allyn <allyn@well.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.well.com ([208.17.81.207]:52196 "EHLO smtp.well.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932378Ab1AKTrU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Jan 2011 14:47:20 -0500
-Received: from well.com (well.com [10.0.101.205])
-	by smtp.well.com (8.14.3/8.14.3) with ESMTP id p0BJlJHS015054
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2011 11:47:20 -0800
-Received: from localhost (allyn@localhost)
-	by well.com (8.14.2/8.14.2/Submit) with ESMTP id p0BJlJOR003274
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2011 11:47:19 -0800 (PST)
+Received: from helcar.apana.org.au ([209.40.204.226]:54058 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932791Ab1ALEVE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Jan 2011 23:21:04 -0500
+Content-Disposition: inline
+In-Reply-To: <Pine.GSO.4.64.1101111118140.25632@well.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Mark Allyn <allyn@well.com> wrote:
+> 
+> I notice two defines of struct scatter_walk; one at line 20 of 
+> include/crypto/scatterwalk.h and the other at line 74 of 
+> include/crypto/algapi.h
+> 
+> They are not the same. Why?
+> 
+> Which one does a driver supposed to include?
 
+In my copy of scatterwalk.h there is no such struct definition.
 
-Truly,
-
-Mark Allyn
-Portland, Oregon
-www.allyn.com
-971-563-7588
+What version of Linux are you looking at?
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
