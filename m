@@ -1,37 +1,79 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Why are there multiple defines of scatter_walk?
-Date: Wed, 12 Jan 2011 15:21:01 +1100
-Message-ID: <20110112042101.GA15048@gondor.apana.org.au>
-References: <Pine.GSO.4.64.1101111118140.25632@well.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Subject: Re: [PATCH 01/16] crypto: omap-aes: don't treat NULL clk as an error
+Date: Wed, 12 Jan 2011 16:32:31 +0200
+Message-ID: <4D2DBB7F.4030402@nokia.com>
+References: <1294749833-32019-1-git-send-email-jamie@jamieiles.com> <1294749833-32019-2-git-send-email-jamie@jamieiles.com> <alpine.DEB.1.10.1101111755500.18906@esdhcp041196.research.nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Mark Allyn <allyn@well.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Jamie Iles <jamie@jamieiles.com>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>
+To: Aaro Koskinen <aaro.koskinen@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54058 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932791Ab1ALEVE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Jan 2011 23:21:04 -0500
-Content-Disposition: inline
-In-Reply-To: <Pine.GSO.4.64.1101111118140.25632@well.com>
+Received: from smtp.nokia.com ([147.243.128.26]:30250 "EHLO mgw-da02.nokia.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750915Ab1ALOci (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Jan 2011 09:32:38 -0500
+In-Reply-To: <alpine.DEB.1.10.1101111755500.18906@esdhcp041196.research.nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Mark Allyn <allyn@well.com> wrote:
-> 
-> I notice two defines of struct scatter_walk; one at line 20 of 
-> include/crypto/scatterwalk.h and the other at line 74 of 
-> include/crypto/algapi.h
-> 
-> They are not the same. Why?
-> 
-> Which one does a driver supposed to include?
+Hi,
 
-In my copy of scatterwalk.h there is no such struct definition.
+Indeed, thanks
 
-What version of Linux are you looking at?
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 11/01/11 17:56, Aaro Koskinen wrote:
+> Hi,
+>
+> On Tue, 11 Jan 2011, Jamie Iles wrote:
+>
+>> clk_get() returns a struct clk cookie to the driver and some platforms
+>> may return NULL if they only support a single clock.  clk_get() has only
+>> failed if it returns a ERR_PTR() encoded pointer.
+>>
+>> Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+>> Cc: linux-crypto@vger.kernel.org
+>> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+>
+> Reviewed-by: Aaro Koskinen <aaro.koskinen@nokia.com>
+Reviewed-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+>
+>> ---
+>> drivers/crypto/omap-aes.c |    5 +++--
+>> 1 files changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+>> index 799ca51..24d0f3f 100644
+>> --- a/drivers/crypto/omap-aes.c
+>> +++ b/drivers/crypto/omap-aes.c
+>> @@ -17,6 +17,7 @@
+>> #include <linux/err.h>
+>> #include <linux/module.h>
+>> #include <linux/init.h>
+>> +#include <linux/err.h>
+>> #include <linux/errno.h>
+>> #include <linux/kernel.h>
+>> #include <linux/clk.h>
+>> @@ -830,9 +831,9 @@ static int omap_aes_probe(struct platform_device
+>> *pdev)
+>>
+>>     /* Initializing the clock */
+>>     dd->iclk = clk_get(dev, "ick");
+>> -    if (!dd->iclk) {
+>> +    if (IS_ERR(dd->iclk)) {
+>>         dev_err(dev, "clock intialization failed.\n");
+>> -        err = -ENODEV;
+>> +        err = PTR_ERR(dd->iclk);
+>>         goto err_res;
+>>     }
+>>
+>> -- 
+>> 1.7.3.4
+>>
+>> -- 
+>> To unsubscribe from this list: send the line "unsubscribe
+>> linux-kernel" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Please read the FAQ at  http://www.tux.org/lkml/
+>>
