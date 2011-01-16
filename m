@@ -1,44 +1,99 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: RSA verification in the kernel
-Date: Thu, 13 Jan 2011 11:57:18 +0100
-Message-ID: <AANLkTikJcQtZsjitEmzOBEoF4cySHpdN9pKgper37hiH@mail.gmail.com>
-References: <4D2EA764.4070109@nokia.com>
-	<AANLkTi=O3Kn3u8-4P0MaFfzWBRY4P4bfE6a3n+xHt+EQ@mail.gmail.com>
-	<4D2ED304.10306@nokia.com>
-	<4D2ED44C.4040100@nokia.com>
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+ rfc4106_set_hash_subkey().
+Date: Sun, 16 Jan 2011 15:38:47 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
+	x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Huang Ying <ying.huang@intel.com>,
+	Adrian Hoban <adrian.hoban@intel.com>,
+	Gabriele Paoloni <gabriele.paoloni@intel.com>,
+	aidan.o.mahony@intel.com
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:33902 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756310Ab1AMK5T convert rfc822-to-8bit (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:13516 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752718Ab1APOit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Jan 2011 05:57:19 -0500
-Received: by qyj19 with SMTP id 19so5288695qyj.19
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Jan 2011 02:57:18 -0800 (PST)
-In-Reply-To: <4D2ED44C.4040100@nokia.com>
+	Sun, 16 Jan 2011 09:38:49 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 13, 2011 at 11:30 AM, Dmitry Kasatkin
-<dmitry.kasatkin@nokia.com> wrote:
-> Hi,
-> License of that library is such
-> --------------------------------------------------
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DO WHAT THE FUCK YOU WANT TO=
- PUBLIC LICENSE
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-Version 2, December 2004
-> =C2=A0Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+There's a small memory leak in 
+arch/x86/crypto/aesni-intel_glue.c::rfc4106_set_hash_subkey(). If the call 
+to kmalloc() fails and returns NULL then the memory allocated previously 
+by ablkcipher_request_alloc() is not freed when we leave the function.
 
-I see that there is new maintainer of libtomcrypt and such and uses thi=
-s
-licence. This wasn't the case when I started working on that, thus
-my code is based on the last public domain one released by Tom
-(and is also pretty modified).
+I could have just added a call to ablkcipher_request_free() before we 
+return -ENOMEM, but that started to look too much like the code we 
+already had at the end of the function, so I chose instead to rework the 
+code a bit so that there are now a few labels at the end that we goto when 
+various allocations fail, so we don't have to repeat the same blocks of 
+code (this also reduces the object code size slightly).
 
-regards,
-Nikos
+Please review and consider merging.
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ aesni-intel_glue.c |   17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+  compile tested only.
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e1e60c7..e013552 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -873,21 +873,19 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 	crypto_ablkcipher_clear_flags(ctr_tfm, ~0);
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
+-	if (ret) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return ret;
+-	}
++	if (ret)
++		goto out;
+ 
+ 	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
+ 	if (!req) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto out_free_ablkcipher;
+ 	}
+ 
+ 	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
+ 	if (!req_data) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto out_free_request;
+ 	}
+ 	memset(req_data->iv, 0, sizeof(req_data->iv));
+ 
+@@ -913,9 +911,12 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 		if (!ret)
+ 			ret = req_data->result.err;
+ 	}
++out_free_request:
+ 	ablkcipher_request_free(req);
+ 	kfree(req_data);
++out_free_ablkcipher:
+ 	crypto_free_ablkcipher(ctr_tfm);
++out:
+ 	return ret;
+ }
+ 
+
+
+-- 
+Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
+Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
+Plain text mails only, please.
