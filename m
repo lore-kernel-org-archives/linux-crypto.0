@@ -1,29 +1,47 @@
-From: Jesper Juhl <jj@chaosbits.net>
-Subject: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+From: "Struk, Tadeusz" <tadeusz.struk@intel.com>
+Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
  rfc4106_set_hash_subkey().
-Date: Sun, 16 Jan 2011 15:38:47 +0100 (CET)
-Message-ID: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
+Date: Wed, 19 Jan 2011 16:02:46 +0000
+Message-ID: <24483BA4C9F69C43A7379639D35543D7C5398DB6@irsmsx502.ger.corp.intel.com>
+References: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
-	x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Huang Ying <ying.huang@intel.com>,
-	Adrian Hoban <adrian.hoban@intel.com>,
-	Gabriele Paoloni <gabriele.paoloni@intel.com>,
-	aidan.o.mahony@intel.com
-To: linux-crypto@vger.kernel.org
+	"Huang, Ying" <ying.huang@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>
+To: Jesper Juhl <jj@chaosbits.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:13516 "EHLO
-	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752718Ab1APOit (ORCPT
+Received: from mga11.intel.com ([192.55.52.93]:49071 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752411Ab1ASQCw convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 16 Jan 2011 09:38:49 -0500
+	Wed, 19 Jan 2011 11:02:52 -0500
+In-Reply-To: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+Hi Jesper,
+We have tested your changes and all is fine.
+Thank you for identifying this issue.
+Regards,
+Tadeusz
+
+-----Original Message-----
+From: Jesper Juhl [mailto:jj@chaosbits.net] 
+Sent: Sunday, January 16, 2011 2:39 PM
+To: linux-crypto@vger.kernel.org
+Cc: Struk, Tadeusz; linux-kernel@vger.kernel.org; x86@kernel.org; H. Peter Anvin; Ingo Molnar; Thomas Gleixner; David S. Miller; Herbert Xu; Huang, Ying; Hoban, Adrian; Paoloni, Gabriele; O Mahony, Aidan
+Subject: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in rfc4106_set_hash_subkey().
 
 There's a small memory leak in 
 arch/x86/crypto/aesni-intel_glue.c::rfc4106_set_hash_subkey(). If the call 
@@ -97,3 +115,12 @@ index e1e60c7..e013552 100644
 Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
 Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
 Plain text mails only, please.
+
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
+
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
