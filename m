@@ -1,84 +1,51 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Replace cifs md5 hashing functions with kernel
- crypto APIs
-Date: Fri, 21 Jan 2011 12:13:41 -0600
-Message-ID: <AANLkTi=tcnBinjoKf8St7jbbrnPTv__fZme4bwp408nL@mail.gmail.com>
-References: <1295622245-10581-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20110121104228.60262dd2@tlielax.poochiereds.net>
-	<AANLkTim3b8TFYYV5dcpOi4DtoLBz1XqdOOt6fTYB88uU@mail.gmail.com>
-	<4D39BD64.5080101@samba.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+	rfc4106_set_hash_subkey().
+Date: Sun, 23 Jan 2011 18:56:46 +1100
+Message-ID: <20110123075646.GA19175@gondor.apana.org.au>
+References: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D39BD64.5080101-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Huang Ying <ying.huang@intel.com>,
+	Adrian Hoban <adrian.hoban@intel.com>,
+	Gabriele Paoloni <gabriele.paoloni@intel.com>,
+	aidan.o.mahony@intel.com
+To: Jesper Juhl <jj@chaosbits.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:49306 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750890Ab1AWH5A (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 23 Jan 2011 02:57:00 -0500
+Content-Disposition: inline
+In-Reply-To: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 21, 2011 at 11:07 AM, Stefan (metze) Metzmacher
-<metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Hi Shirish,
->
->>>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>>
->>>> Replace remaining use of md5 hash functions local to cifs module
->>>> with kernel crypto APIs.
->>>> Remove header and source file containing those local functions.
->>>>
->>>>
->>>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>> ---
->>>> =A0fs/cifs/Makefile =A0 =A0 =A0| =A0 =A02 +-
->>>> =A0fs/cifs/cifsencrypt.c | =A0 =A01 -
->>>> =A0fs/cifs/link.c =A0 =A0 =A0 =A0| =A0 59 +++++++--
->>>> =A0fs/cifs/md5.c =A0 =A0 =A0 =A0 | =A0366 ------------------------=
--------------------------
->>>> =A0fs/cifs/md5.h =A0 =A0 =A0 =A0 | =A0 38 -----
->>>> =A0fs/cifs/smbencrypt.c =A0| =A0 =A01 -
->>>> =A06 files changed, 51 insertions(+), 416 deletions(-)
->>>> =A0delete mode 100644 fs/cifs/md5.c
->>>> =A0delete mode 100644 fs/cifs/md5.h
->>>>
->>>
->>> Very nice. The CIFS parts look good to me, and I'm always fond of
->>> reducing the code we need to support as well as the cifs.ko footpri=
-nt.
->>> Assuming that mfsymlink support still works after this patch...
->>
->> I did test briefly, e.g. creating symlinks and deleting them.
->> Hoping Stefan Metzmacher will comment.
->> I did verify that the (md5) hash value was different for different a=
-ctualpaths
->
-> Just test with and without your changes, create symlinks with both
-> versions which point to
-> the same target. And verify you can use them with both.
-> Then you can mount without mfsymlink support and verify that the
-> lowlevel file
-> has the same md5sum.
->
-> metze
->
->
+On Sun, Jan 16, 2011 at 03:38:47PM +0100, Jesper Juhl wrote:
+> There's a small memory leak in 
+> arch/x86/crypto/aesni-intel_glue.c::rfc4106_set_hash_subkey(). If the call 
+> to kmalloc() fails and returns NULL then the memory allocated previously 
+> by ablkcipher_request_alloc() is not freed when we leave the function.
+> 
+> I could have just added a call to ablkcipher_request_free() before we 
+> return -ENOMEM, but that started to look too much like the code we 
+> already had at the end of the function, so I chose instead to rework the 
+> code a bit so that there are now a few labels at the end that we goto when 
+> various allocations fail, so we don't have to repeat the same blocks of 
+> code (this also reduces the object code size slightly).
+> 
+> Please review and consider merging.
+> 
+> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
 
-metze, Thanks. I think the patch is working.
-
-cifsa.nopatch and cifsa.patch were created as symlinks using mount
-option mfsymlinks
-without and with this patch respectively.
-
- # mount -t cifs //<server_name>/<share_name> /mnt/smb_c -o
-user=3D<user>,pass=3D<password>
-
-# md5sum /mnt/smb_c/cifsa.nopatch
-d1077212b3a759439645e1fee8d6a268  /mnt/smb_c/cifsa.nopatch
-
-# md5sum /mnt/smb_c/cifsa.patch
-d1077212b3a759439645e1fee8d6a268  /mnt/smb_c/cifsa.patch
-
-I tried this with another actualpath file and md5sum of both the
-created symlinks (with
-and without the patch) is same.
+Patch applied.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
