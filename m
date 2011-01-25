@@ -1,37 +1,24 @@
-From: Davidlohr Bueso <dave@gnu.org>
-Subject: [PATCH] crypt: ablkcipher: remove redundant NULL check
-Date: Tue, 25 Jan 2011 13:27:45 -0300
-Message-ID: <1295972865.1998.9.camel@offworld>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] crypt: ablkcipher: remove redundant NULL check
+Date: Tue, 25 Jan 2011 12:39:50 -0800 (PST)
+Message-ID: <20110125.123950.104063911.davem@davemloft.net>
+References: <1295972865.1998.9.camel@offworld>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: dave@gnu.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1295972865.1998.9.camel@offworld>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Davidlohr Bueso <dave@gnu.org>
+Date: Tue, 25 Jan 2011 13:27:45 -0300
 
-Signed-off-by: Davidlohr Bueso <dave@gnu.org>
----
- crypto/ablkcipher.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+> From: Davidlohr Bueso <dave@gnu.org>
+> 
+> Signed-off-by: Davidlohr Bueso <dave@gnu.org>
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index a854df2..fdc67d3 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -141,8 +141,7 @@ err:
- 
- 	if (walk->iv != req->info)
- 		memcpy(req->info, walk->iv, tfm->crt_ablkcipher.ivsize);
--	if (walk->iv_buffer)
--		kfree(walk->iv_buffer);
-+	kfree(walk->iv_buffer);
- 
- 	return err;
- }
--- 
-1.7.1
+Acked-by: David S. Miller <davem@davemloft.net>
