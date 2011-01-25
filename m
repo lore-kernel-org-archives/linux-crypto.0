@@ -1,48 +1,36 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH] crypto: mark xts(aes) as fips_allowed
-Date: Tue, 25 Jan 2011 16:32:48 -0500
-Message-ID: <20110125213248.GD3427@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: hash finup() issue
+Date: Wed, 26 Jan 2011 09:29:17 +1000
+Message-ID: <20110125232917.GA14972@gondor.apana.org.au>
+References: <4D3ED3CF.4080205@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43237 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753784Ab1AYVdP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Jan 2011 16:33:15 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:52191 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753181Ab1AYX3U (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Jan 2011 18:29:20 -0500
 Content-Disposition: inline
+In-Reply-To: <4D3ED3CF.4080205@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We (Red Hat) are intending to include dm-crypt functionality, using
-xts(aes) for disk encryption, as part of an upcoming FIPS-140-2
-certification effort, and xts(aes) *is* on the list of possible
-mode/cipher combinations that can be certified. To make that possible, we
-need to mark xts(aes) as fips_allowed in the crypto subsystem.
+On Tue, Jan 25, 2011 at 03:44:47PM +0200, Dmitry Kasatkin wrote:
+>
+> What we have done in our system is introduced a new flag which is set to
+> request.
+> flags |= CRYPTO_TFM_REQ_USE_FINUP;
+> ahash_request_set_callback(req, flags,  tcrypt_complete, &tresult);
 
-A 'modprobe tcrypt mode=10' in fips mode shows xts(aes) self-tests
-passing successfully after this change.
+We don't need a flag for this, we just need to optimise the
+user-interface code to actually use finup when MSG_MORE is not
+set.
 
-Signed-off-by: Jarod Wilson <jarod@redhat.com>
-
----
- crypto/testmgr.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 27ea9fe..521fdb2 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2453,6 +2453,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "xts(aes)",
- 		.test = alg_test_skcipher,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.cipher = {
- 				.enc = {
-
+Cheers,
 -- 
-Jarod Wilson
-jarod@redhat.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
