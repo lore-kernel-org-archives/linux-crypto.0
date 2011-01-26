@@ -1,42 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: hash finup() issue
-Date: Thu, 27 Jan 2011 09:32:17 +1000
-Message-ID: <20110126233217.GA26664@gondor.apana.org.au>
-References: <4D3ED3CF.4080205@nokia.com> <20110125232917.GA14972@gondor.apana.org.au> <4D3FD18F.2020905@nokia.com>
+Subject: Re: Fwd: crypto accelerator driver problems
+Date: Thu, 27 Jan 2011 09:33:15 +1000
+Message-ID: <20110126233315.GB26664@gondor.apana.org.au>
+References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com> <20101230211900.GA22742@gondor.apana.org.au> <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com> <AANLkTin8au=98mmfsaJjOSyJNibk3foZWihj6EGTGWK-@mail.gmail.com> <20110126070939.GA18150@gondor.apana.org.au> <AANLkTi=m0jVWSqR1FNX9r9HH32LbA0aWJxSQtLd_VszW@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+To: Hamid Nassiby <h.nassiby@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:55081 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40651 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754383Ab1AZXcW (ORCPT
+	with ESMTP id S1753471Ab1AZXdR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Jan 2011 18:32:22 -0500
+	Wed, 26 Jan 2011 18:33:17 -0500
 Content-Disposition: inline
-In-Reply-To: <4D3FD18F.2020905@nokia.com>
+In-Reply-To: <AANLkTi=m0jVWSqR1FNX9r9HH32LbA0aWJxSQtLd_VszW@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 26, 2011 at 09:47:27AM +0200, Dmitry Kasatkin wrote:
-> I am not talking about user space API at all.
-> 
-> I talk about kernel crypto API and kernel clients.
-> 
-> Please understand the following: when update() is called driver does not
-> know if it is last update or not...
-> That is essential.
-> If client code would always use update/finup then it is fine..
-> But original API and clients uses update/final...
-> That is why some way (flag) needed to tell if finup() will be used or not...
-> 
-> It gave up 20% performance improvement in some case because no extra
-> memcpy has been done...
-> 
-> If you think about other solution, please share...
+On Wed, Jan 26, 2011 at 11:20:22AM +0330, Hamid Nassiby wrote:
+>
+> Do you mean that different IP packets fit into one single Block Cipher tfm?
+> Would you please explain expansively?
 
-If the crypto user can set the FINUP flag then it can just call
-finup, simple.
+We allocate one tfm per SA.  So as long as ordering is guaranteed
+per SA then it's guaranteed per SA which is all that's needed.
 
 Cheers,
 -- 
