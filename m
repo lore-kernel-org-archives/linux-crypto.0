@@ -1,50 +1,45 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH] crypto: mark ghash as fips_allowed
-Date: Wed, 26 Jan 2011 12:00:54 -0500
-Message-ID: <20110126170054.GB18067@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: hash finup() issue
+Date: Thu, 27 Jan 2011 09:32:17 +1000
+Message-ID: <20110126233217.GA26664@gondor.apana.org.au>
+References: <4D3ED3CF.4080205@nokia.com> <20110125232917.GA14972@gondor.apana.org.au> <4D3FD18F.2020905@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48348 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753669Ab1AZRBA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Jan 2011 12:01:00 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:55081 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754383Ab1AZXcW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 26 Jan 2011 18:32:22 -0500
 Content-Disposition: inline
+In-Reply-To: <4D3FD18F.2020905@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A self-test failure in fips mode means a panic. Well, gcm(aes)
-self-tests currently fail in fips mode, as gcm is dependent on ghash,
-which semi-recently got self-test vectors added, but wasn't marked as a
-fips_allowed algorithm. Because of gcm's dependence on what is now seen
-as a non-fips_allowed algorithm, its self-tests refuse to run.
-Previously, ghash got a pass in fips mode, due to the lack of any test
-vectors at all, and thus gcm self-tests were able to run. After this
-patch, a 'modprobe tcrypt mode=35' no longer panics in fips mode, and
-successful self-test of gcm(aes) is reported.
+On Wed, Jan 26, 2011 at 09:47:27AM +0200, Dmitry Kasatkin wrote:
+> I am not talking about user space API at all.
+> 
+> I talk about kernel crypto API and kernel clients.
+> 
+> Please understand the following: when update() is called driver does not
+> know if it is last update or not...
+> That is essential.
+> If client code would always use update/finup then it is fine..
+> But original API and clients uses update/final...
+> That is why some way (flag) needed to tell if finup() will be used or not...
+> 
+> It gave up 20% performance improvement in some case because no extra
+> memcpy has been done...
+> 
+> If you think about other solution, please share...
 
-Signed-off-by: Jarod Wilson <jarod@redhat.com>
----
- crypto/testmgr.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+If the crypto user can set the FINUP flag then it can just call
+finup, simple.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 521fdb2..2854865 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2077,6 +2077,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "ghash",
- 		.test = alg_test_hash,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.hash = {
- 				.vecs = ghash_tv_template,
+Cheers,
 -- 
-1.7.1
-
--- 
-Jarod Wilson
-jarod@redhat.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
