@@ -1,37 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mark ghash as fips_allowed
-Date: Sat, 29 Jan 2011 15:14:51 +1100
-Message-ID: <20110129041451.GC21186@gondor.apana.org.au>
-References: <20110126170054.GB18067@redhat.com>
+Subject: Re: [PATCH 02/16] crypto: omap-sham: don't treat NULL clk as an
+	error
+Date: Sat, 29 Jan 2011 16:01:53 +1100
+Message-ID: <20110129050152.GA22273@gondor.apana.org.au>
+References: <1294749833-32019-1-git-send-email-jamie@jamieiles.com> <1294749833-32019-3-git-send-email-jamie@jamieiles.com> <alpine.DEB.1.10.1101111756130.18906@esdhcp041196.research.nokia.com> <4D2DBB92.1090504@nokia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+Cc: Aaro Koskinen <aaro.koskinen@nokia.com>,
+	Jamie Iles <jamie@jamieiles.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60277 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40668 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753320Ab1A2EOx (ORCPT
+	with ESMTP id S1750726Ab1A2FCG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Jan 2011 23:14:53 -0500
+	Sat, 29 Jan 2011 00:02:06 -0500
 Content-Disposition: inline
-In-Reply-To: <20110126170054.GB18067@redhat.com>
+In-Reply-To: <4D2DBB92.1090504@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 26, 2011 at 12:00:54PM -0500, Jarod Wilson wrote:
-> A self-test failure in fips mode means a panic. Well, gcm(aes)
-> self-tests currently fail in fips mode, as gcm is dependent on ghash,
-> which semi-recently got self-test vectors added, but wasn't marked as a
-> fips_allowed algorithm. Because of gcm's dependence on what is now seen
-> as a non-fips_allowed algorithm, its self-tests refuse to run.
-> Previously, ghash got a pass in fips mode, due to the lack of any test
-> vectors at all, and thus gcm self-tests were able to run. After this
-> patch, a 'modprobe tcrypt mode=35' no longer panics in fips mode, and
-> successful self-test of gcm(aes) is reported.
-> 
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+On Wed, Jan 12, 2011 at 02:32:50PM +0000, Dmitry Kasatkin wrote:
+>
+> >> Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+> >> Cc: linux-crypto@vger.kernel.org
+> >> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+> >
+> > Reviewed-by: Aaro Koskinen <aaro.koskinen@nokia.com>
+> >
+> Reviewed-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 
-Both patches applied.  Thanks Jarod.
+Both pathces applied.
+
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
