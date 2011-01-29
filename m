@@ -1,30 +1,36 @@
-From: "bogdan" <bogdann@gmx.com>
-Subject: encrypt memory before suspending to ram
-Date: Fri, 28 Jan 2011 10:15:23 +0100
-Message-ID: <20110128092722.300250@gmx.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypt: ablkcipher: remove redundant NULL check
+Date: Sat, 29 Jan 2011 15:10:01 +1100
+Message-ID: <20110129041001.GA21186@gondor.apana.org.au>
+References: <1295972865.1998.9.camel@offworld> <20110125.123950.104063911.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: dave@gnu.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout-eu.gmx.com ([213.165.64.42]:52596 "HELO
-	mailout-eu.gmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751224Ab1A1J1Z (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:50970 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752620Ab1A2EKK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Jan 2011 04:27:25 -0500
+	Fri, 28 Jan 2011 23:10:10 -0500
+Content-Disposition: inline
+In-Reply-To: <20110125.123950.104063911.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all!
+On Tue, Jan 25, 2011 at 12:39:50PM -0800, David Miller wrote:
+> From: Davidlohr Bueso <dave@gnu.org>
+> Date: Tue, 25 Jan 2011 13:27:45 -0300
+> 
+> > From: Davidlohr Bueso <dave@gnu.org>
+> > 
+> > Signed-off-by: Davidlohr Bueso <dave@gnu.org>
+> 
+> Acked-by: David S. Miller <davem@davemloft.net>
 
-This is my first post here.
-
-As stated in the subject, I think encrypting memory before suspending to ram and asking for a password on resume would be quite a nice feature for anyone who encrypts their hard drive.
-
-So, has anybody done this already, or is currently working on it?
-
-I could possibly do it myself, but at the momment I have zero experience with kernel programming.
-Any help?
-
-Thanks in advance!
-Bogdan
+Patch applied.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
