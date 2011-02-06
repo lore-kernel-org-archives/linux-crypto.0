@@ -1,40 +1,103 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 02/16] crypto: omap-sham: don't treat NULL clk as an
-	error
-Date: Sat, 29 Jan 2011 16:01:53 +1100
-Message-ID: <20110129050152.GA22273@gondor.apana.org.au>
-References: <1294749833-32019-1-git-send-email-jamie@jamieiles.com> <1294749833-32019-3-git-send-email-jamie@jamieiles.com> <alpine.DEB.1.10.1101111756130.18906@esdhcp041196.research.nokia.com> <4D2DBB92.1090504@nokia.com>
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+ rfc4106_set_hash_subkey().
+Date: Sun, 6 Feb 2011 20:43:22 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1102062039080.13593@swampdragon.chaosbits.net>
+References: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net> <24483BA4C9F69C43A7379639D35543D7C5398DB6@irsmsx502.ger.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Aaro Koskinen <aaro.koskinen@nokia.com>,
-	Jamie Iles <jamie@jamieiles.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Huang, Ying" <ying.huang@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>
+To: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40668 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750726Ab1A2FCG (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:21396 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753645Ab1BFToj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 29 Jan 2011 00:02:06 -0500
-Content-Disposition: inline
-In-Reply-To: <4D2DBB92.1090504@nokia.com>
+	Sun, 6 Feb 2011 14:44:39 -0500
+In-Reply-To: <24483BA4C9F69C43A7379639D35543D7C5398DB6@irsmsx502.ger.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 12, 2011 at 02:32:50PM +0000, Dmitry Kasatkin wrote:
->
-> >> Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-> >> Cc: linux-crypto@vger.kernel.org
-> >> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
-> >
-> > Reviewed-by: Aaro Koskinen <aaro.koskinen@nokia.com>
-> >
-> Reviewed-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+On Wed, 19 Jan 2011, Struk, Tadeusz wrote:
 
-Both pathces applied.
+> Hi Jesper,
 
-Thanks!
+Hi Tadeusz,
+
+> We have tested your changes and all is fine.
+> Thank you for identifying this issue.
+
+You are welcome. But I believe I made a mistake in that patch. I looked at 
+it again and I'm convinced that the 'out' label should not exist. The 
+jump to it will still leak 'ctr_tfm' - don't you agree?
+
+I believe the patch should look like this instead:
+
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ aesni-intel_glue.c |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e1e60c7..4a8c015 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -873,21 +873,19 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 	crypto_ablkcipher_clear_flags(ctr_tfm, ~0);
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
+-	if (ret) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return ret;
+-	}
++	if (ret)
++		goto out_free_ablkcipher;
+ 
+ 	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
+ 	if (!req) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto out_free_ablkcipher;
+ 	}
+ 
+ 	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
+ 	if (!req_data) {
+-		crypto_free_ablkcipher(ctr_tfm);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto out_free_request;
+ 	}
+ 	memset(req_data->iv, 0, sizeof(req_data->iv));
+ 
+@@ -913,8 +911,10 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 		if (!ret)
+ 			ret = req_data->result.err;
+ 	}
++out_free_request:
+ 	ablkcipher_request_free(req);
+ 	kfree(req_data);
++out_free_ablkcipher:
+ 	crypto_free_ablkcipher(ctr_tfm);
+ 	return ret;
+ }
+
+
+Herbert: If Tadeusz agrees, could you please replace the patch you merged 
+with the one above?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
+Plain text mails only, please.
+Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
