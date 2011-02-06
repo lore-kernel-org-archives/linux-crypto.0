@@ -1,41 +1,86 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: sha1 - Add test vector to test partial block processing
-Date: Fri, 18 Feb 2011 20:43:28 +1100
-Message-ID: <20110218094328.GA27184@gondor.apana.org.au>
-References: <20110207092817.GA16881@gondor.apana.org.au> <1297082827.11137.15.camel@bender> <20110217032557.GA12955@gondor.apana.org.au> <1297955462.3547.14.camel@localhost.localdomain> <20110217205226.GA21423@gondor.apana.org.au> <1298021837.17221.33.camel@bender>
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+ rfc4106_set_hash_subkey().
+Date: Sun, 6 Feb 2011 22:33:31 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1102062231530.13593@swampdragon.chaosbits.net>
+References: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net> <24483BA4C9F69C43A7379639D35543D7C5398DB6@irsmsx502.ger.corp.intel.com> <alpine.LNX.2.00.1102062039080.13593@swampdragon.chaosbits.net> <20110206203408.GA12426@gondor.apana.org.au>
+ <alpine.LNX.2.00.1102062134150.13593@swampdragon.chaosbits.net> <20110206204829.GA12652@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Jan Glauber <jang@linux.vnet.ibm.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Huang, Ying" <ying.huang@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34262 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750932Ab1BRJnb (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:22795 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753522Ab1BFVer (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Feb 2011 04:43:31 -0500
-Content-Disposition: inline
-In-Reply-To: <1298021837.17221.33.camel@bender>
+	Sun, 6 Feb 2011 16:34:47 -0500
+In-Reply-To: <20110206204829.GA12652@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 18, 2011 at 09:37:17AM +0000, Jan Glauber wrote:
->
-> Without 9d20b57 it gives:
-> 
-> [root@h4245005 ~]# modprobe tcrypt mode=2
-> FATAL: Error inserting tcrypt (/lib/modules/2.6.38-rc4-dirty/kernel/crypto/tcrypt.ko): Resource temporarily unavailable
-> [root@h4245005 ~]# tail -f /var/log/messages 
-> ...
-> Feb 18 10:22:13 h4245005 kernel: alg: hash: Chunking test 2 failed for sha1-s390
-> Feb 18 10:22:13 h4245005 kernel: 00000000: 4a d0 d6 bd 53 2b 6b df cd 34 b9 60 d1 90 85 d0
-> Feb 18 10:22:13 h4245005 kernel: 00000010: 38 70 2b 41
-> 
-> With the patch applied nothing shows up in dmesg.
-> 
-> --Jan
+On Mon, 7 Feb 2011, Herbert Xu wrote:
 
-Excellent.  Thanks a lot for testing Jan!
+> On Sun, Feb 06, 2011 at 09:34:33PM +0100, Jesper Juhl wrote:
+> > On Mon, 7 Feb 2011, Herbert Xu wrote:
+> > 
+> > > On Sun, Feb 06, 2011 at 08:43:22PM +0100, Jesper Juhl wrote:
+> > > > 
+> > > > Herbert: If Tadeusz agrees, could you please replace the patch you merged 
+> > > > with the one above?
+> > > 
+> > > Please send an incremental patch.
+> > > 
+> > Sure thing. What would you like it based on exactly?
+> 
+> The current cryptodev-2.6 tree should do.
+> 
+Here goes.
+
+Fix up previous patch that attempted to fix a mem leak in 
+rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
+out' would still leak.
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ aesni-intel_glue.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git 
+a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e013552..4a8c015 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -874,7 +874,7 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
+ 	if (ret)
+-		goto out;
++		goto out_free_ablkcipher;
+ 
+ 	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
+ 	if (!req) {
+@@ -916,7 +916,6 @@ out_free_request:
+ 	kfree(req_data);
+ out_free_ablkcipher:
+ 	crypto_free_ablkcipher(ctr_tfm);
+-out:
+ 	return ret;
+ }
+ 
+ 
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
+Plain text mails only, please.
+Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
