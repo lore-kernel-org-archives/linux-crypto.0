@@ -1,46 +1,36 @@
-From: Jesper Juhl <jj@chaosbits.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
- rfc4106_set_hash_subkey().
-Date: Mon, 7 Feb 2011 19:24:43 +0100 (CET)
-Message-ID: <alpine.LNX.2.00.1102071922220.27796@swampdragon.chaosbits.net>
+	rfc4106_set_hash_subkey().
+Date: Tue, 8 Feb 2011 08:09:02 +1100
+Message-ID: <20110207210901.GA21941@gondor.apana.org.au>
 References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: herbert@gondor.hengli.com.au, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, aidan.o.mahony@intel.com,
-	gabriele.paoloni@intel.com, adrian.hoban@intel.com
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
+	adrian.hoban@intel.com, jj@chaosbits.net
 To: tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:23128 "EHLO
-	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754357Ab1BGSZ6 (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:39123 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754524Ab1BGVJF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Feb 2011 13:25:58 -0500
+	Mon, 7 Feb 2011 16:09:05 -0500
+Content-Disposition: inline
 In-Reply-To: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 7 Feb 2011, tadeusz.struk@intel.com wrote:
-
-> From: 
-> Date: Sun, 16 Jan 2011 16:41:11 +0000
-> Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in rfc4106_set_hash_subkey().
+On Mon, Feb 07, 2011 at 05:32:59PM +0000, tadeusz.struk@intel.com wrote:
+>
+> Here goes.
 > 
-> Hi Jesper,
-> Thanks, but I think there is still a problem here. You don't want to kfree req_data
-> when the kmalloc failed. I think it should look as follows.  
-> Are you ok with this?
-> 
-Fine by me.
+> Fix up previous patch that attempted to fix a mem leak in 
+> rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
+> out' would still leak.
 
-I was aware of the kfree(NULL) thing, but desided to leave it as is for 
-two reasons - 1) kfree(NULL) is harmless and this is an error path, so the 
-extra function call doesn't matter much. 2) I wanted to preserve 
-deallocations in the reverse order of the allocations. But sure, moving 
-that kfree is a tiny optimization of the error path, so I'm fine with it.
-
-
+Sign-off?
 -- 
-Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
-Plain text mails only, please.
-Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
