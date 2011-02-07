@@ -1,47 +1,53 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
-	rfc4106_set_hash_subkey().
-Date: Mon, 7 Feb 2011 07:48:29 +1100
-Message-ID: <20110206204829.GA12652@gondor.apana.org.au>
-References: <alpine.LNX.2.00.1101161527440.8049@swampdragon.chaosbits.net> <24483BA4C9F69C43A7379639D35543D7C5398DB6@irsmsx502.ger.corp.intel.com> <alpine.LNX.2.00.1102062039080.13593@swampdragon.chaosbits.net> <20110206203408.GA12426@gondor.apana.org.au> <alpine.LNX.2.00.1102062134150.13593@swampdragon.chaosbits.net>
+Subject: crypto: sha-s390 - Reset index after processing partial block
+Date: Mon, 7 Feb 2011 20:28:17 +1100
+Message-ID: <20110207092817.GA16881@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Huang, Ying" <ying.huang@intel.com>,
-	"Hoban, Adrian" <adrian.hoban@intel.com>,
-	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>
-To: Jesper Juhl <jj@chaosbits.net>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jan Glauber <jang@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:43993 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:36515 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754001Ab1BFUsd (ORCPT
+	with ESMTP id S1752312Ab1BGJ2Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 6 Feb 2011 15:48:33 -0500
+	Mon, 7 Feb 2011 04:28:25 -0500
 Content-Disposition: inline
-In-Reply-To: <alpine.LNX.2.00.1102062134150.13593@swampdragon.chaosbits.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Feb 06, 2011 at 09:34:33PM +0100, Jesper Juhl wrote:
-> On Mon, 7 Feb 2011, Herbert Xu wrote:
-> 
-> > On Sun, Feb 06, 2011 at 08:43:22PM +0100, Jesper Juhl wrote:
-> > > 
-> > > Herbert: If Tadeusz agrees, could you please replace the patch you merged 
-> > > with the one above?
-> > 
-> > Please send an incremental patch.
-> > 
-> Sure thing. What would you like it based on exactly?
+Hi:
 
-The current cryptodev-2.6 tree should do.
+This patch fixes an old but nasty bug in the sha-s390 code.
+
+commit 9d20b571f5bda7273656e1b86ef91eddc94adacc
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Feb 7 20:26:06 2011 +1100
+
+    crypto: sha-s390 - Reset index after processing partial block
+    
+    The partial block handling in sha-s390 is broken when we get a
+    partial block that is followed by an update which fills it with
+    bytes left-over.  Instead of storing the newly left-over bytes
+    at the start of the buffer, it will be stored immediately after
+    the previous partial block.
+    
+    This patch fixes this by resetting the index pointer.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/s390/crypto/sha_common.c b/arch/s390/crypto/sha_common.c
+index f42dbab..48884f8 100644
+--- a/arch/s390/crypto/sha_common.c
++++ b/arch/s390/crypto/sha_common.c
+@@ -38,6 +38,7 @@ int s390_sha_update(struct shash_desc *desc, const u8 *data, unsigned int len)
+ 		BUG_ON(ret != bsize);
+ 		data += bsize - index;
+ 		len -= bsize - index;
++		index = 0;
+ 	}
+ 
+ 	/* process as many blocks as possible */
 
 Cheers,
 -- 
