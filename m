@@ -1,68 +1,99 @@
-From: Jan Glauber <jang@linux.vnet.ibm.com>
-Subject: Re: crypto: sha-s390 - Reset index after processing partial block
-Date: Mon, 07 Feb 2011 13:47:07 +0100
-Message-ID: <1297082827.11137.15.camel@bender>
-References: <20110207092817.GA16881@gondor.apana.org.au>
+From: tadeusz.struk@intel.com
+Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+ rfc4106_set_hash_subkey().
+Date: Mon, 07 Feb 2011 17:32:59 +0000
+Message-ID: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
+	adrian.hoban@intel.com, tadeusz.struk@intel.com, jj@chaosbits.net
+To: herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mtagate4.uk.ibm.com ([194.196.100.164]:37811 "EHLO
-	mtagate4.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752563Ab1BGNrx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Feb 2011 08:47:53 -0500
-Received: from d06nrmr1507.portsmouth.uk.ibm.com (d06nrmr1507.portsmouth.uk.ibm.com [9.149.38.233])
-	by mtagate4.uk.ibm.com (8.13.1/8.13.1) with ESMTP id p17DlqqC011285
-	for <linux-crypto@vger.kernel.org>; Mon, 7 Feb 2011 13:47:52 GMT
-Received: from d06av06.portsmouth.uk.ibm.com (d06av06.portsmouth.uk.ibm.com [9.149.37.217])
-	by d06nrmr1507.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p17Dlter1880104
-	for <linux-crypto@vger.kernel.org>; Mon, 7 Feb 2011 13:47:55 GMT
-Received: from d06av06.portsmouth.uk.ibm.com (loopback [127.0.0.1])
-	by d06av06.portsmouth.uk.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p17DlpUJ010227
-	for <linux-crypto@vger.kernel.org>; Mon, 7 Feb 2011 06:47:51 -0700
-In-Reply-To: <20110207092817.GA16881@gondor.apana.org.au>
+Received: from mga02.intel.com ([134.134.136.20]:46670 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754263Ab1BGRdF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Feb 2011 12:33:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ouch.
+From: 
+Date: Sun, 16 Jan 2011 16:41:11 +0000
+Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in rfc4106_set_hash_subkey().
 
-Acked-by: Jan Glauber <jang@linux.vnet.ibm.com>
+Hi Jesper,
+Thanks, but I think there is still a problem here. You don't want to kfree req_data
+when the kmalloc failed. I think it should look as follows.  
+Are you ok with this?
 
-On Mon, 2011-02-07 at 20:28 +1100, Herbert Xu wrote:
-> Hi:
+On Mon, 7 Feb 2011, Herbert Xu wrote:
+
+> On Sun, Feb 06, 2011 at 09:34:33PM +0100, Jesper Juhl wrote:
+> > On Mon, 7 Feb 2011, Herbert Xu wrote:
+> > 
+> > > On Sun, Feb 06, 2011 at 08:43:22PM +0100, Jesper Juhl wrote:
+> > > > 
+> > > > Herbert: If Tadeusz agrees, could you please replace the patch
+> > > > you merged 
+> > > > with the one above?
+> > > 
+> > > Please send an incremental patch.
+> > > 
+> > Sure thing. What would you like it based on exactly?
 > 
-> This patch fixes an old but nasty bug in the sha-s390 code.
+> The current cryptodev-2.6 tree should do.
 > 
-> commit 9d20b571f5bda7273656e1b86ef91eddc94adacc
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Mon Feb 7 20:26:06 2011 +1100
-> 
->     crypto: sha-s390 - Reset index after processing partial block
->     
->     The partial block handling in sha-s390 is broken when we get a
->     partial block that is followed by an update which fills it with
->     bytes left-over.  Instead of storing the newly left-over bytes
->     at the start of the buffer, it will be stored immediately after
->     the previous partial block.
->     
->     This patch fixes this by resetting the index pointer.
->     
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/arch/s390/crypto/sha_common.c b/arch/s390/crypto/sha_common.c
-> index f42dbab..48884f8 100644
-> --- a/arch/s390/crypto/sha_common.c
-> +++ b/arch/s390/crypto/sha_common.c
-> @@ -38,6 +38,7 @@ int s390_sha_update(struct shash_desc *desc, const u8 *data, unsigned int len)
->  		BUG_ON(ret != bsize);
->  		data += bsize - index;
->  		len -= bsize - index;
-> +		index = 0;
->  	}
-> 
->  	/* process as many blocks as possible */
-> 
-> Cheers,
+Here goes.
+
+Fix up previous patch that attempted to fix a mem leak in 
+rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
+out' would still leak.
+
+---
+ arch/x86/crypto/aesni-intel_glue.c |    7 +++----
+ 1 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e013552..c9f0227 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -874,11 +874,11 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
+ 	if (ret)
+-		goto out;
++		goto out_free_ablkcipher;
+ 
+ 	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
+ 	if (!req) {
+-		ret = -EINVAL;
++		ret = -ENOMEM;
+ 		goto out_free_ablkcipher;
+ 	}
+ 
+@@ -911,12 +911,11 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 		if (!ret)
+ 			ret = req_data->result.err;
+ 	}
++	kfree(req_data);
+ out_free_request:
+ 	ablkcipher_request_free(req);
+-	kfree(req_data);
+ out_free_ablkcipher:
+ 	crypto_free_ablkcipher(ctr_tfm);
+-out:
+ 	return ret;
+ }
+ 
+-- 
+1.7.4
+
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
+
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
