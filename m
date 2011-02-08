@@ -1,36 +1,101 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: tadeusz.struk@intel.com
 Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
-	rfc4106_set_hash_subkey().
-Date: Tue, 8 Feb 2011 08:09:02 +1100
-Message-ID: <20110207210901.GA21941@gondor.apana.org.au>
-References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
+ rfc4106_set_hash_subkey().
+Date: Tue, 08 Feb 2011 08:59:20 +0000
+Message-ID: <4d5105e8.uHY2Lh7Uj4mhTOwB%tadeusz.struk@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
-	adrian.hoban@intel.com, jj@chaosbits.net
-To: tadeusz.struk@intel.com
+	adrian.hoban@intel.com, tadeusz.struk@intel.com, jj@chaosbits.net
+To: herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39123 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754524Ab1BGVJF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Feb 2011 16:09:05 -0500
-Content-Disposition: inline
-In-Reply-To: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
+Received: from mga02.intel.com ([134.134.136.20]:62895 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752126Ab1BHI7Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Feb 2011 03:59:25 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 07, 2011 at 05:32:59PM +0000, tadeusz.struk@intel.com wrote:
->
-> Here goes.
-> 
-> Fix up previous patch that attempted to fix a mem leak in 
-> rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
-> out' would still leak.
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Date: Sun, 16 Jan 2011 16:41:11 +0000
+Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in rfc4106_set_hash_subkey().
 
-Sign-off?
+Hi Jesper,
+Thanks, but I think there is still a problem here. You don't want to kfree req_data
+when the kmalloc failed. I think it should look as follows.  
+Are you ok with this?
+
+On Mon, 7 Feb 2011, Herbert Xu wrote:
+
+> On Sun, Feb 06, 2011 at 09:34:33PM +0100, Jesper Juhl wrote:
+> > On Mon, 7 Feb 2011, Herbert Xu wrote:
+> > 
+> > > On Sun, Feb 06, 2011 at 08:43:22PM +0100, Jesper Juhl wrote:
+> > > > 
+> > > > Herbert: If Tadeusz agrees, could you please replace the patch
+> > > > you merged 
+> > > > with the one above?
+> > > 
+> > > Please send an incremental patch.
+> > > 
+> > Sure thing. What would you like it based on exactly?
+> 
+> The current cryptodev-2.6 tree should do.
+> 
+Here goes.
+
+Fix up previous patch that attempted to fix a mem leak in 
+rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
+out' would still leak. Now with sign-offs.
+
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Gabriele Paoloni <gabriele.paoloni@intel.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c |    7 +++----
+ 1 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e013552..c9f0227 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -874,11 +874,11 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
+ 	if (ret)
+-		goto out;
++		goto out_free_ablkcipher;
+ 
+ 	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
+ 	if (!req) {
+-		ret = -EINVAL;
++		ret = -ENOMEM;
+ 		goto out_free_ablkcipher;
+ 	}
+ 
+@@ -911,12 +911,11 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 		if (!ret)
+ 			ret = req_data->result.err;
+ 	}
++	kfree(req_data);
+ out_free_request:
+ 	ablkcipher_request_free(req);
+-	kfree(req_data);
+ out_free_ablkcipher:
+ 	crypto_free_ablkcipher(ctr_tfm);
+-out:
+ 	return ret;
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.4
+
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
+
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
