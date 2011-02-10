@@ -1,28 +1,46 @@
-From: "Mvei" <radletkt@yahoo.com.tr>
-Subject: Hg Kky W%RAN_
-Date: Thu, 10 Feb 2011 10:31:35 +0800
-Message-ID: <201102101031352502856@yahoo.com.tr>
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+ rfc4106_set_hash_subkey().
+Date: Thu, 10 Feb 2011 19:47:26 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1102101945580.26035@swampdragon.chaosbits.net>
+References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com> <20110207210901.GA21941@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: tadeusz.struk@intel.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, aidan.o.mahony@intel.com,
+	gabriele.paoloni@intel.com, adrian.hoban@intel.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nm8-vm0.bullet.mail.bf1.yahoo.com ([98.139.213.95]:47152 "HELO
-	nm8-vm0.bullet.mail.bf1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1754213Ab1BJCfr (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:23541 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750917Ab1BJSsf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Feb 2011 21:35:47 -0500
+	Thu, 10 Feb 2011 13:48:35 -0500
+In-Reply-To: <20110207210901.GA21941@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-NbG+yczQ0Neo0rW5qdOmuPfA4L6rt8LP49HMoaOyydPD1K2zp9HMy7/F5NbGo6yw/New0+vV5sa3
-zt631rHwo6y/2rjQtL/V/aGjIL6tuf224MTqtcTK0LOhtLjBtqOssru2z7XE1srBv7jEvfijrLfC
-1ea2yLTvtb05MCXS1MnPoaPKx7OjxOrX1LPpoaLLzcDxoaK1yMrX0aGhow0KT7j3xrfFxs/j0cy8
-27jxo7rUqi/M9Si6rNPKt9EpICANCjjI7dbQu6qjpDI2MCAg07LW0Luqo6QyMzAgICDL1dHMo6Qy
-MjAgICAgu8a618KlMTkxNqOkNTAwICC67LrTtcCjpDU1MCAgvsXO5dau1/CjpDUwMCAgus3M7M/C
-o6Q0ODAgIL3w3L3I2KOkMTMwICAgwLbI7dy9yNijpDMwMCAgIMjt0/HPqqOkMTMwICANCsn6svrB
-tLXE16jStbuvo6y8vMr1tcS9+LK9o6zWysG/vfG3x870sciho9Pr1ebRzMTRt9ayrtbZoaPN6sir
-v8nS1MqkyM7I1bOjvbu8yqGjDQp2uPy24Ma3xcbAtLXn18nRr6O6MTM1IDkwNDQgMTg0NiAgUVE6
-MTU5Nzc5Mzg2OA0KwarPtcjLo7qzwrHzDQrIq7n6v+y13cj9zOzE2r/Jtb2ho7v1tb24tr/uoaPH
-67fF0MS5usLyo6FF
+On Tue, 8 Feb 2011, Herbert Xu wrote:
+
+> On Mon, Feb 07, 2011 at 05:32:59PM +0000, tadeusz.struk@intel.com wrote:
+> >
+> > Here goes.
+> > 
+> > Fix up previous patch that attempted to fix a mem leak in 
+> > rfc4106_set_hash_subkey. The previous patch was flawed in that the 'goto 
+> > out' would still leak.
+> 
+> Sign-off?
+> 
+
+Since it's identical to the patch I posted except for the moving of the 
+kfree() which (IMHO) is a minor detail, I hope you can use my sign-off so 
+we can move along and get the patch merged..
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+
+
+-- 
+Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
+Plain text mails only, please.
+Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
