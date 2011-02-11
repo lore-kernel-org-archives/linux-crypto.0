@@ -1,51 +1,77 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+From: "Paoloni, Gabriele" <gabriele.paoloni@intel.com>
+Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
  rfc4106_set_hash_subkey().
-Date: Fri, 11 Feb 2011 15:26:47 +0100
-Message-ID: <20110211142647.GA3920@ucw.cz>
+Date: Fri, 11 Feb 2011 14:38:49 +0000
+Message-ID: <DF7BB929B28FCF479E888E3D9F8D9E88F3E2E668@irsmsx502.ger.corp.intel.com>
 References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com>
  <alpine.LNX.2.00.1102071922220.27796@swampdragon.chaosbits.net>
+ <20110211142647.GA3920@ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, herbert@gondor.hengli.com.au,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	aidan.o.mahony@intel.com, gabriele.paoloni@intel.com,
-	adrian.hoban@intel.com
-To: Jesper Juhl <jj@chaosbits.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ksp.mff.cuni.cz ([195.113.26.206]:44781 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1756439Ab1BKO1J (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Feb 2011 09:27:09 -0500
-Content-Disposition: inline
-In-Reply-To: <alpine.LNX.2.00.1102071922220.27796@swampdragon.chaosbits.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "Struk, Tadeusz" <tadeusz.struk@intel.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>
+To: Pavel Machek <pavel@ucw.cz>, Jesper Juhl <jj@chaosbits.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20110211142647.GA3920@ucw.cz>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon 2011-02-07 19:24:43, Jesper Juhl wrote:
-> On Mon, 7 Feb 2011, tadeusz.struk@intel.com wrote:
+Well anyway I think that the return value of "ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL)" has to be changed from -EINVAL to -ENOMEM in case of failure. That is why would stay on the patch that Tadeusz proposed. Otherwise Juhl should send another one....
+
+> -----Original Message-----
+> From: Pavel Machek [mailto:pavel@ucw.cz]
+> Sent: Friday, February 11, 2011 2:27 PM
+> To: Jesper Juhl
+> Cc: Struk, Tadeusz; herbert@gondor.hengli.com.au; linux-
+> kernel@vger.kernel.org; linux-crypto@vger.kernel.org; O Mahony, Aidan;
+> Paoloni, Gabriele; Hoban, Adrian
+> Subject: Re: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+> rfc4106_set_hash_subkey().
 > 
-> > From: 
-> > Date: Sun, 16 Jan 2011 16:41:11 +0000
-> > Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in rfc4106_set_hash_subkey().
-> > 
-> > Hi Jesper,
-> > Thanks, but I think there is still a problem here. You don't want to kfree req_data
-> > when the kmalloc failed. I think it should look as follows.  
-> > Are you ok with this?
-> > 
-> Fine by me.
+> On Mon 2011-02-07 19:24:43, Jesper Juhl wrote:
+> > On Mon, 7 Feb 2011, tadeusz.struk@intel.com wrote:
+> >
+> > > From:
+> > > Date: Sun, 16 Jan 2011 16:41:11 +0000
+> > > Subject: RE: [PATCH] rfc4106, Intel, AES-NI: Don't leak memory in
+> rfc4106_set_hash_subkey().
+> > >
+> > > Hi Jesper,
+> > > Thanks, but I think there is still a problem here. You don't want
+> to kfree req_data
+> > > when the kmalloc failed. I think it should look as follows.
+> > > Are you ok with this?
+> > >
+> > Fine by me.
+> >
+> > I was aware of the kfree(NULL) thing, but desided to leave it as is
+> for
+> > two reasons - 1) kfree(NULL) is harmless and this is an error path,
+> so the
+> > extra function call doesn't matter much. 2) I wanted to preserve
+> > deallocations in the reverse order of the allocations. But sure,
+> moving
+> > that kfree is a tiny optimization of the error path, so I'm fine with
+> it.
 > 
-> I was aware of the kfree(NULL) thing, but desided to leave it as is for 
-> two reasons - 1) kfree(NULL) is harmless and this is an error path, so the 
-> extra function call doesn't matter much. 2) I wanted to preserve 
-> deallocations in the reverse order of the allocations. But sure, moving 
-> that kfree is a tiny optimization of the error path, so I'm fine with it.
+> I don't think such optimalization is worth doing... original code is
+> as good but shorter and less complex...
+> 
+> --
+> (english) http://www.livejournal.com/~pavelmachek
+> (cesky, pictures)
+> http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
 
-I don't think such optimalization is worth doing... original code is
-as good but shorter and less complex...
-
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
