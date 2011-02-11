@@ -1,10 +1,10 @@
 From: Jesper Juhl <jj@chaosbits.net>
 Subject: RE: [PATCH](updated) rfc4106, Intel, AES-NI: Don't leak memory in
  rfc4106_set_hash_subkey()..
-Date: Fri, 11 Feb 2011 22:09:22 +0100 (CET)
-Message-ID: <alpine.LNX.2.00.1102112204020.16994@swampdragon.chaosbits.net>
+Date: Fri, 11 Feb 2011 22:14:44 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1102112211230.16994@swampdragon.chaosbits.net>
 References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com> <alpine.LNX.2.00.1102071922220.27796@swampdragon.chaosbits.net> <20110211142647.GA3920@ucw.cz> <DF7BB929B28FCF479E888E3D9F8D9E88F3E2E668@irsmsx502.ger.corp.intel.com>
- <alpine.LNX.2.00.1102111546310.13370@swampdragon.chaosbits.net>
+ <alpine.LNX.2.00.1102111546310.13370@swampdragon.chaosbits.net> <alpine.LNX.2.00.1102112204020.16994@swampdragon.chaosbits.net>
 Mime-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Cc: Pavel Machek <pavel@ucw.cz>,
@@ -16,44 +16,56 @@ To: "Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:11031 "EHLO
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:11121 "EHLO
 	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758133Ab1BKVKa (ORCPT
+	with ESMTP id S1756829Ab1BKVPx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Feb 2011 16:10:30 -0500
-In-Reply-To: <alpine.LNX.2.00.1102111546310.13370@swampdragon.chaosbits.net>
+	Fri, 11 Feb 2011 16:15:53 -0500
+In-Reply-To: <alpine.LNX.2.00.1102112204020.16994@swampdragon.chaosbits.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On Fri, 11 Feb 2011, Jesper Juhl wrote:
 
-> On Fri, 11 Feb 2011, Paoloni, Gabriele wrote:
+> On Fri, 11 Feb 2011, Jesper Juhl wrote:
 > 
-> > Well anyway I think that the return value of "ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL)" has to be changed from -EINVAL to -ENOMEM in case of failure. That is why would stay on the patch that Tadeusz proposed. Otherwise Juhl should send another one....
+> > On Fri, 11 Feb 2011, Paoloni, Gabriele wrote:
 > > 
-> I'll take a look again later this evening when I get home from work.
+> > > Well anyway I think that the return value of "ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL)" has to be changed from -EINVAL to -ENOMEM in case of failure. That is why would stay on the patch that Tadeusz proposed. Otherwise Juhl should send another one....
+> > > 
+> > I'll take a look again later this evening when I get home from work.
+> > 
+> Hopefully this takes care of all complaints and can actually get merged so 
+> we can get the leak fixed (patch is against current cryptodev-2.6 tree).
 > 
-Hopefully this takes care of all complaints and can actually get merged so 
-we can get the leak fixed (patch is against current cryptodev-2.6 tree).
+> 
+> Fix up previous patch that failed to properly fix mem leak in 
+> rfc4106_set_hash_subkey(). This add-on patch; fixes the leak. moves 
+> kfree() out of the error path, returns -ENOMEM rather than -EINVAL when 
+> ablkcipher_request_alloc() fails.
+> 
 
-
-Fix up previous patch that failed to properly fix mem leak in 
-rfc4106_set_hash_subkey(). This add-on patch; fixes the leak. moves 
-kfree() out of the error path, returns -ENOMEM rather than -EINVAL when 
-ablkcipher_request_alloc() fails.
+And of course I just had to screw up and send the wrong diff. The one I 
+sent does not compile and was a temporary file I imported into the mail by 
+accident :-(
+Below is the real patch - changelog above still applies - sorry about 
+that.
 
 Signed-off-by: Jesper Juhl <jj@chaosbits.net>
 ---
- aesni-intel_glue.c |   13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ aesni-intel_glue.c |   15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index e013552..502b76d 100644
+index e013552..e0e6340 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -876,17 +876,15 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+@@ -874,19 +874,17 @@ rfc4106_set_hash_subkey(u8 *hash_subkey, const u8 *key, unsigned int key_len)
+ 
+ 	ret = crypto_ablkcipher_setkey(ctr_tfm, key, key_len);
  	if (ret)
- 		goto out;
+-		goto out;
++		goto out_free_ablkcipher;
  
 +	ret = -ENOMEM;
  	req = ablkcipher_request_alloc(ctr_tfm, GFP_KERNEL);
@@ -87,8 +99,7 @@ index e013552..502b76d 100644
  	return ret;
  }
  
-
-
+ 
 -- 
 Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
 Plain text mails only, please.
