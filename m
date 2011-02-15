@@ -1,773 +1,2086 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: Use ecb des kernel crypto APIs instead of local cifs functions
-Date: Mon, 14 Feb 2011 17:33:43 -0600
-Message-ID: <1297726423-10547-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Jamie Iles <jamie@jamieiles.com>
+Subject: [PATCH] picoxcell_crypto: add support for the picoxcell crypto engines
+Date: Tue, 15 Feb 2011 13:32:13 +0000
+Message-ID: <1297776733-17816-1-git-send-email-jamie@jamieiles.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	Jamie Iles <jamie@jamieiles.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:37123 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751113Ab1BONcf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Feb 2011 08:32:35 -0500
+Received: by eye27 with SMTP id 27so56333eye.19
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Feb 2011 05:32:33 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Picochip picoXcell devices have two crypto engines, one targeted
+at IPSEC offload and the other at WCDMA layer 2 ciphering.
 
+v2:	- use symbolic constants for key sizes etc
+	- cleanup DDT generation
+	- use strict_strtoul() for stat irq threshold
+	- minor code cleanups
 
-Use kernel crypto APIs for DES encryption during LM and NT hash generation
-instead of local functions within cifs.
-Source file smbdes.c is deleted excpet four functions, one of which
-uses ecb des functionality provided by kernel crypto apis.
-
-Change lnm_session_key back to 24 bytes instead of 16 bytes.
-Remove function SMBOWFencrypt.
-
-Add return codes to various functions such as calc_lanman_hash,
-SMBencrypt, and SMBencrypt.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Jamie Iles <jamie@jamieiles.com>
 ---
- fs/cifs/Kconfig       |    1 +
- fs/cifs/Makefile      |    2 +-
- fs/cifs/cifsencrypt.c |   10 +-
- fs/cifs/cifsglob.h    |    3 +-
- fs/cifs/cifsproto.h   |    7 +-
- fs/cifs/connect.c     |    3 +-
- fs/cifs/sess.c        |    4 +-
- fs/cifs/smbdes.c      |  418 -------------------------------------------------
- fs/cifs/smbencrypt.c  |  125 ++++++++++++---
- 9 files changed, 115 insertions(+), 458 deletions(-)
- delete mode 100644 fs/cifs/smbdes.c
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index 7cb0f7f..99ff2ca 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -7,6 +7,7 @@ config CIFS
- 	select CRYPTO_MD5
- 	select CRYPTO_HMAC
- 	select CRYPTO_ARC4
+Thanks to Kim Phillips for some great review comments!
+
+ drivers/crypto/Kconfig                 |   17 +
+ drivers/crypto/Makefile                |    2 +-
+ drivers/crypto/picoxcell_crypto.c      | 1867 ++++++++++++++++++++++++++++++++
+ drivers/crypto/picoxcell_crypto_regs.h |  128 +++
+ 4 files changed, 2013 insertions(+), 1 deletions(-)
+ create mode 100644 drivers/crypto/picoxcell_crypto.c
+ create mode 100644 drivers/crypto/picoxcell_crypto_regs.h
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index eab2cf7..e541852 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -252,4 +252,21 @@ config CRYPTO_DEV_OMAP_AES
+ 	  OMAP processors have AES module accelerator. Select this if you
+ 	  want to use the OMAP module for AES algorithms.
+ 
++config CRYPTO_DEV_PICOXCELL
++	tristate "Support for picoXcell IPSEC and Layer2 crypto engines"
++	depends on ARCH_PICOXCELL
++	select CRYPTO_AES
++	select CRYPTO_AUTHENC
++	select CRYPTO_ALGAPI
 +	select CRYPTO_DES
- 	help
- 	  This is the client VFS module for the Common Internet File System
- 	  (CIFS) protocol which is the successor to the Server Message Block
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index d875584..005d524 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -4,7 +4,7 @@
- obj-$(CONFIG_CIFS) += cifs.o
- 
- cifs-y := cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o inode.o \
--	  link.o misc.o netmisc.o smbdes.o smbencrypt.o transport.o asn1.o \
-+	  link.o misc.o netmisc.o smbencrypt.o transport.o asn1.o \
- 	  cifs_unicode.o nterr.o xattr.o cifsencrypt.o \
- 	  readdir.o ioctl.o sess.o export.o
- 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index a51585f..7a54624 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -265,10 +265,11 @@ int setup_ntlm_response(struct cifsSesInfo *ses)
- }
- 
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
--void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
-+int calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 			char *lnm_session_key)
- {
- 	int i;
-+	int rc;
- 	char password_with_pad[CIFS_ENCPWD_SIZE];
- 
- 	memset(password_with_pad, 0, CIFS_ENCPWD_SIZE);
-@@ -279,7 +280,7 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 		memset(lnm_session_key, 0, CIFS_SESS_KEY_SIZE);
- 		memcpy(lnm_session_key, password_with_pad,
- 			CIFS_ENCPWD_SIZE);
--		return;
-+		return 0;
- 	}
- 
- 	/* calculate old style session key */
-@@ -296,10 +297,9 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 	for (i = 0; i < CIFS_ENCPWD_SIZE; i++)
- 		password_with_pad[i] = toupper(password_with_pad[i]);
- 
--	SMBencrypt(password_with_pad, cryptkey, lnm_session_key);
-+	rc = SMBencrypt(password_with_pad, cryptkey, lnm_session_key);
- 
--	/* clear password before we return/free memory */
--	memset(password_with_pad, 0, CIFS_ENCPWD_SIZE);
-+	return rc;
- }
- #endif /* CIFS_WEAK_PW_HASH */
- 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 17afb0f..0b5c950 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -710,7 +710,8 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
- 
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_SIGN | \
-+			CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
- /*
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8096f27..e131f85 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -383,7 +383,7 @@ extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
- extern int calc_seckey(struct cifsSesInfo *);
- 
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
--extern void calc_lanman_hash(const char *password, const char *cryptkey,
-+extern int calc_lanman_hash(const char *password, const char *cryptkey,
- 				bool encrypt, char *lnm_session_key);
- #endif /* CIFS_WEAK_PW_HASH */
- extern int CIFSSMBCopy(int xid,
-@@ -427,9 +427,6 @@ extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
- 		struct cifs_sb_info *cifs_sb, int xid);
- extern int mdfour(unsigned char *, unsigned char *, int);
- extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
--extern void SMBencrypt(unsigned char *passwd, const unsigned char *c8,
--			unsigned char *p24);
--extern void E_P16(unsigned char *p14, unsigned char *p16);
--extern void E_P24(unsigned char *p21, const unsigned char *c8,
-+extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
- 			unsigned char *p24);
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8d6c17a..25fdfb7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3004,7 +3004,8 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- 		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
- 		    (ses->server->secType == LANMAN))
--			calc_lanman_hash(tcon->password, ses->server->cryptkey,
-+			rc = calc_lanman_hash(tcon->password,
-+				ses->server->cryptkey,
- 					 ses->server->secMode &
- 					    SECMODE_PW_ENCRYPT ? true : false,
- 					 bcc_ptr);
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 1adc962..6d3143c 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -656,7 +656,7 @@ ssetup_ntlmssp_authenticate:
- 
- 	if (type == LANMAN) {
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
--		char lnm_session_key[CIFS_SESS_KEY_SIZE];
-+		char lnm_session_key[CIFS_AUTH_RESP_SIZE];
- 
- 		pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
- 
-@@ -670,7 +670,7 @@ ssetup_ntlmssp_authenticate:
- 		 * to use challenge/response method (i.e. Password bit is 1).
- 		 */
- 
--		calc_lanman_hash(ses->password, ses->server->cryptkey,
-+		rc = calc_lanman_hash(ses->password, ses->server->cryptkey,
- 				 ses->server->secMode & SECMODE_PW_ENCRYPT ?
- 					true : false, lnm_session_key);
- 
-diff --git a/fs/cifs/smbdes.c b/fs/cifs/smbdes.c
-deleted file mode 100644
-index 0472148..0000000
---- a/fs/cifs/smbdes.c
-+++ /dev/null
-@@ -1,418 +0,0 @@
--/*
--   Unix SMB/Netbios implementation.
--   Version 1.9.
--
--   a partial implementation of DES designed for use in the
--   SMB authentication protocol
--
--   Copyright (C) Andrew Tridgell 1998
--   Modified by Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org) 2002,2004
--
--   This program is free software; you can redistribute it and/or modify
--   it under the terms of the GNU General Public License as published by
--   the Free Software Foundation; either version 2 of the License, or
--   (at your option) any later version.
--
--   This program is distributed in the hope that it will be useful,
--   but WITHOUT ANY WARRANTY; without even the implied warranty of
--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--   GNU General Public License for more details.
--
--   You should have received a copy of the GNU General Public License
--   along with this program; if not, write to the Free Software
--   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--*/
--
--/* NOTES:
--
--   This code makes no attempt to be fast! In fact, it is a very
--   slow implementation
--
--   This code is NOT a complete DES implementation. It implements only
--   the minimum necessary for SMB authentication, as used by all SMB
--   products (including every copy of Microsoft Windows95 ever sold)
--
--   In particular, it can only do a unchained forward DES pass. This
--   means it is not possible to use this code for encryption/decryption
--   of data, instead it is only useful as a "hash" algorithm.
--
--   There is no entry point into this code that allows normal DES operation.
--
--   I believe this means that this code does not come under ITAR
--   regulations but this is NOT a legal opinion. If you are concerned
--   about the applicability of ITAR regulations to this code then you
--   should confirm it for yourself (and maybe let me know if you come
--   up with a different answer to the one above)
--*/
--#include <linux/slab.h>
--#define uchar unsigned char
--
--static uchar perm1[56] = { 57, 49, 41, 33, 25, 17, 9,
--	1, 58, 50, 42, 34, 26, 18,
--	10, 2, 59, 51, 43, 35, 27,
--	19, 11, 3, 60, 52, 44, 36,
--	63, 55, 47, 39, 31, 23, 15,
--	7, 62, 54, 46, 38, 30, 22,
--	14, 6, 61, 53, 45, 37, 29,
--	21, 13, 5, 28, 20, 12, 4
--};
--
--static uchar perm2[48] = { 14, 17, 11, 24, 1, 5,
--	3, 28, 15, 6, 21, 10,
--	23, 19, 12, 4, 26, 8,
--	16, 7, 27, 20, 13, 2,
--	41, 52, 31, 37, 47, 55,
--	30, 40, 51, 45, 33, 48,
--	44, 49, 39, 56, 34, 53,
--	46, 42, 50, 36, 29, 32
--};
--
--static uchar perm3[64] = { 58, 50, 42, 34, 26, 18, 10, 2,
--	60, 52, 44, 36, 28, 20, 12, 4,
--	62, 54, 46, 38, 30, 22, 14, 6,
--	64, 56, 48, 40, 32, 24, 16, 8,
--	57, 49, 41, 33, 25, 17, 9, 1,
--	59, 51, 43, 35, 27, 19, 11, 3,
--	61, 53, 45, 37, 29, 21, 13, 5,
--	63, 55, 47, 39, 31, 23, 15, 7
--};
--
--static uchar perm4[48] = { 32, 1, 2, 3, 4, 5,
--	4, 5, 6, 7, 8, 9,
--	8, 9, 10, 11, 12, 13,
--	12, 13, 14, 15, 16, 17,
--	16, 17, 18, 19, 20, 21,
--	20, 21, 22, 23, 24, 25,
--	24, 25, 26, 27, 28, 29,
--	28, 29, 30, 31, 32, 1
--};
--
--static uchar perm5[32] = { 16, 7, 20, 21,
--	29, 12, 28, 17,
--	1, 15, 23, 26,
--	5, 18, 31, 10,
--	2, 8, 24, 14,
--	32, 27, 3, 9,
--	19, 13, 30, 6,
--	22, 11, 4, 25
--};
--
--static uchar perm6[64] = { 40, 8, 48, 16, 56, 24, 64, 32,
--	39, 7, 47, 15, 55, 23, 63, 31,
--	38, 6, 46, 14, 54, 22, 62, 30,
--	37, 5, 45, 13, 53, 21, 61, 29,
--	36, 4, 44, 12, 52, 20, 60, 28,
--	35, 3, 43, 11, 51, 19, 59, 27,
--	34, 2, 42, 10, 50, 18, 58, 26,
--	33, 1, 41, 9, 49, 17, 57, 25
--};
--
--static uchar sc[16] = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
--
--static uchar sbox[8][4][16] = {
--	{{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
--	 {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
--	 {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
--	 {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13} },
--
--	{{15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10},
--	 {3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5},
--	 {0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
--	 {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9} },
--
--	{{10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8},
--	 {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1},
--	 {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
--	 {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12} },
--
--	{{7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15},
--	 {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9},
--	 {10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4},
--	 {3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14} },
--
--	{{2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9},
--	 {14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6},
--	 {4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14},
--	 {11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3} },
--
--	{{12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11},
--	 {10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8},
--	 {9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6},
--	 {4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13} },
--
--	{{4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1},
--	 {13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6},
--	 {1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2},
--	 {6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12} },
--
--	{{13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7},
--	 {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2},
--	 {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
--	 {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11} }
--};
--
--static void
--permute(char *out, char *in, uchar *p, int n)
--{
--	int i;
--	for (i = 0; i < n; i++)
--		out[i] = in[p[i] - 1];
--}
--
--static void
--lshift(char *d, int count, int n)
--{
--	char out[64];
--	int i;
--	for (i = 0; i < n; i++)
--		out[i] = d[(i + count) % n];
--	for (i = 0; i < n; i++)
--		d[i] = out[i];
--}
--
--static void
--concat(char *out, char *in1, char *in2, int l1, int l2)
--{
--	while (l1--)
--		*out++ = *in1++;
--	while (l2--)
--		*out++ = *in2++;
--}
--
--static void
--xor(char *out, char *in1, char *in2, int n)
--{
--	int i;
--	for (i = 0; i < n; i++)
--		out[i] = in1[i] ^ in2[i];
--}
--
--static void
--dohash(char *out, char *in, char *key, int forw)
--{
--	int i, j, k;
--	char *pk1;
--	char c[28];
--	char d[28];
--	char *cd;
--	char (*ki)[48];
--	char *pd1;
--	char l[32], r[32];
--	char *rl;
--
--	/* Have to reduce stack usage */
--	pk1 = kmalloc(56+56+64+64, GFP_KERNEL);
--	if (pk1 == NULL)
--		return;
--
--	ki = kmalloc(16*48, GFP_KERNEL);
--	if (ki == NULL) {
--		kfree(pk1);
--		return;
--	}
--
--	cd = pk1 + 56;
--	pd1 = cd  + 56;
--	rl = pd1 + 64;
--
--	permute(pk1, key, perm1, 56);
--
--	for (i = 0; i < 28; i++)
--		c[i] = pk1[i];
--	for (i = 0; i < 28; i++)
--		d[i] = pk1[i + 28];
--
--	for (i = 0; i < 16; i++) {
--		lshift(c, sc[i], 28);
--		lshift(d, sc[i], 28);
--
--		concat(cd, c, d, 28, 28);
--		permute(ki[i], cd, perm2, 48);
--	}
--
--	permute(pd1, in, perm3, 64);
--
--	for (j = 0; j < 32; j++) {
--		l[j] = pd1[j];
--		r[j] = pd1[j + 32];
--	}
--
--	for (i = 0; i < 16; i++) {
--		char *er;  /* er[48]  */
--		char *erk; /* erk[48] */
--		char b[8][6];
--		char *cb;  /* cb[32]  */
--		char *pcb; /* pcb[32] */
--		char *r2;  /* r2[32]  */
--
--		er = kmalloc(48+48+32+32+32, GFP_KERNEL);
--		if (er == NULL) {
--			kfree(pk1);
--			kfree(ki);
--			return;
--		}
--		erk = er+48;
--		cb  = erk+48;
--		pcb = cb+32;
--		r2  = pcb+32;
--
--		permute(er, r, perm4, 48);
--
--		xor(erk, er, ki[forw ? i : 15 - i], 48);
--
--		for (j = 0; j < 8; j++)
--			for (k = 0; k < 6; k++)
--				b[j][k] = erk[j * 6 + k];
--
--		for (j = 0; j < 8; j++) {
--			int m, n;
--			m = (b[j][0] << 1) | b[j][5];
--
--			n = (b[j][1] << 3) | (b[j][2] << 2) | (b[j][3] <<
--							       1) | b[j][4];
--
--			for (k = 0; k < 4; k++)
--				b[j][k] =
--				    (sbox[j][m][n] & (1 << (3 - k))) ? 1 : 0;
--		}
--
--		for (j = 0; j < 8; j++)
--			for (k = 0; k < 4; k++)
--				cb[j * 4 + k] = b[j][k];
--		permute(pcb, cb, perm5, 32);
--
--		xor(r2, l, pcb, 32);
--
--		for (j = 0; j < 32; j++)
--			l[j] = r[j];
--
--		for (j = 0; j < 32; j++)
--			r[j] = r2[j];
--
--		kfree(er);
--	}
--
--	concat(rl, r, l, 32, 32);
--
--	permute(out, rl, perm6, 64);
--	kfree(pk1);
--	kfree(ki);
--}
--
--static void
--str_to_key(unsigned char *str, unsigned char *key)
--{
--	int i;
--
--	key[0] = str[0] >> 1;
--	key[1] = ((str[0] & 0x01) << 6) | (str[1] >> 2);
--	key[2] = ((str[1] & 0x03) << 5) | (str[2] >> 3);
--	key[3] = ((str[2] & 0x07) << 4) | (str[3] >> 4);
--	key[4] = ((str[3] & 0x0F) << 3) | (str[4] >> 5);
--	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
--	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
--	key[7] = str[6] & 0x7F;
--	for (i = 0; i < 8; i++)
--		key[i] = (key[i] << 1);
--}
--
--static void
--smbhash(unsigned char *out, const unsigned char *in, unsigned char *key,
--	int forw)
--{
--	int i;
--	char *outb; /* outb[64] */
--	char *inb;  /* inb[64]  */
--	char *keyb; /* keyb[64] */
--	unsigned char key2[8];
--
--	outb = kmalloc(64 * 3, GFP_KERNEL);
--	if (outb == NULL)
--		return;
--
--	inb  = outb + 64;
--	keyb = inb +  64;
--
--	str_to_key(key, key2);
--
--	for (i = 0; i < 64; i++) {
--		inb[i] = (in[i / 8] & (1 << (7 - (i % 8)))) ? 1 : 0;
--		keyb[i] = (key2[i / 8] & (1 << (7 - (i % 8)))) ? 1 : 0;
--		outb[i] = 0;
--	}
--
--	dohash(outb, inb, keyb, forw);
--
--	for (i = 0; i < 8; i++)
--		out[i] = 0;
--
--	for (i = 0; i < 64; i++) {
--		if (outb[i])
--			out[i / 8] |= (1 << (7 - (i % 8)));
--	}
--	kfree(outb);
--}
--
--void
--E_P16(unsigned char *p14, unsigned char *p16)
--{
--	unsigned char sp8[8] =
--	    { 0x4b, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 };
--	smbhash(p16, sp8, p14, 1);
--	smbhash(p16 + 8, sp8, p14 + 7, 1);
--}
--
--void
--E_P24(unsigned char *p21, const unsigned char *c8, unsigned char *p24)
--{
--	smbhash(p24, c8, p21, 1);
--	smbhash(p24 + 8, c8, p21 + 7, 1);
--	smbhash(p24 + 16, c8, p21 + 14, 1);
--}
--
--#if 0 /* currently unused */
--static void
--D_P16(unsigned char *p14, unsigned char *in, unsigned char *out)
--{
--	smbhash(out, in, p14, 0);
--	smbhash(out + 8, in + 8, p14 + 7, 0);
--}
--
--static void
--E_old_pw_hash(unsigned char *p14, unsigned char *in, unsigned char *out)
--{
--	smbhash(out, in, p14, 1);
--	smbhash(out + 8, in + 8, p14 + 7, 1);
--}
--/* these routines are currently unneeded, but may be
--	needed later */
--void
--cred_hash1(unsigned char *out, unsigned char *in, unsigned char *key)
--{
--	unsigned char buf[8];
--
--	smbhash(buf, in, key, 1);
--	smbhash(out, buf, key + 9, 1);
--}
--
--void
--cred_hash2(unsigned char *out, unsigned char *in, unsigned char *key)
--{
--	unsigned char buf[8];
--	static unsigned char key2[8];
--
--	smbhash(buf, in, key, 1);
--	key2[0] = key[7];
--	smbhash(out, buf, key2, 1);
--}
--
--void
--cred_hash3(unsigned char *out, unsigned char *in, unsigned char *key, int forw)
--{
--	static unsigned char key2[8];
--
--	smbhash(out, in, key, forw);
--	key2[0] = key[7];
--	smbhash(out + 8, in + 8, key2, forw);
--}
--#endif /* unneeded routines */
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index b5041c8..1735e1b 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -47,6 +47,89 @@
- #define SSVALX(buf,pos,val) (CVAL(buf,pos)=(val)&0xFF,CVAL(buf,pos+1)=(val)>>8)
- #define SSVAL(buf,pos,val) SSVALX((buf),(pos),((__u16)(val)))
- 
-+static void
-+str_to_key(unsigned char *str, unsigned char *key)
++	select CRYPTO_CBC
++	select CRYPTO_ECB
++	select CRYPTO_SEQIV
++	help
++	  This option enables support for the hardware offload engines in the
++	  Picochip picoXcell SoC devices. Select this for IPSEC ESP offload
++	  and for 3gpp Layer 2 ciphering support.
++
++	  Saying m here will build a module named pipcoxcell_crypto.
++
+ endif # CRYPTO_HW
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 2566973..5203e34 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -10,4 +10,4 @@ obj-$(CONFIG_CRYPTO_DEV_IXP4XX) += ixp4xx_crypto.o
+ obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_SHAM) += omap-sham.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
+-
++obj-$(CONFIG_CRYPTO_DEV_PICOXCELL) += picoxcell_crypto.o
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+new file mode 100644
+index 0000000..b092d0a
+--- /dev/null
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -0,0 +1,1867 @@
++/*
++ * Copyright (c) 2010-2011 Picochip Ltd., Jamie Iles
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++#include <crypto/aead.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <crypto/authenc.h>
++#include <crypto/des.h>
++#include <crypto/md5.h>
++#include <crypto/sha.h>
++#include <crypto/internal/skcipher.h>
++#include <linux/clk.h>
++#include <linux/crypto.h>
++#include <linux/delay.h>
++#include <linux/dma-mapping.h>
++#include <linux/dmapool.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/list.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/pm.h>
++#include <linux/rtnetlink.h>
++#include <linux/scatterlist.h>
++#include <linux/sched.h>
++#include <linux/slab.h>
++#include <linux/timer.h>
++
++#include "picoxcell_crypto_regs.h"
++
++/*
++ * The threshold for the number of entries in the CMD FIFO available before
++ * the CMD0_CNT interrupt is raised. Increasing this value will reduce the
++ * number of interrupts raised to the CPU.
++ */
++#define CMD0_IRQ_THRESHOLD   1
++
++/*
++ * The timeout period (in jiffies) for a PDU. When the the number of PDUs in
++ * flight is greater than the STAT_IRQ_THRESHOLD or 0 the timer is disabled.
++ * When there are packets in flight but lower than the threshold, we enable
++ * the timer and at expiry, attempt to remove any processed packets from the
++ * queue and if there are still packets left, schedule the timer again.
++ */
++#define PACKET_TIMEOUT	    1
++
++/* The priority to register each algorithm with. */
++#define SPACC_CRYPTO_ALG_PRIORITY	10000
++
++#define SPACC_CRYPTO_KASUMI_F8_KEY_LEN	16
++#define SPACC_CRYPTO_IPSEC_CIPHER_PG_SZ 64
++#define SPACC_CRYPTO_IPSEC_HASH_PG_SZ	64
++#define SPACC_CRYPTO_IPSEC_MAX_CTXS	32
++#define SPACC_CRYPTO_IPSEC_FIFO_SZ	32
++#define SPACC_CRYPTO_L2_CIPHER_PG_SZ	64
++#define SPACC_CRYPTO_L2_HASH_PG_SZ	64
++#define SPACC_CRYPTO_L2_MAX_CTXS	128
++#define SPACC_CRYPTO_L2_FIFO_SZ		128
++
++#define MAX_DDT_LEN			16
++
++/* DDT format. This must match the hardware DDT format exactly. */
++struct spacc_ddt {
++	dma_addr_t	p;
++	u32		len;
++};
++
++/*
++ * Asynchronous crypto request structure.
++ *
++ * This structure defines a request that is either queued for processing or
++ * being processed.
++ */
++struct spacc_req {
++	struct list_head		list;
++	struct spacc_engine		*engine;
++	struct crypto_async_request	*req;
++	int				result;
++	bool				is_encrypt;
++	unsigned			ctx_id;
++	dma_addr_t			src_addr, dst_addr;
++	struct spacc_ddt		*src_ddt, *dst_ddt;
++	void				(*complete)(struct spacc_req *req);
++
++	/* AEAD specific bits. */
++	u8				*giv;
++	size_t				giv_len;
++	dma_addr_t			giv_pa;
++};
++
++struct spacc_engine {
++	void __iomem			*regs;
++	struct list_head		pending;
++	int				next_ctx;
++	spinlock_t			hw_lock;
++	int				in_flight;
++	struct list_head		completed;
++	struct list_head		in_progress;
++	struct tasklet_struct		complete;
++	unsigned long			fifo_sz;
++	void __iomem			*cipher_ctx_base;
++	void __iomem			*hash_key_base;
++	struct spacc_alg		*algs;
++	unsigned			num_algs;
++	struct list_head		registered_algs;
++	size_t				cipher_pg_sz;
++	size_t				hash_pg_sz;
++	const char			*name;
++	struct clk			*clk;
++	struct device			*dev;
++	unsigned			max_ctxs;
++	struct timer_list		packet_timeout;
++	unsigned			stat_irq_thresh;
++	struct dma_pool			*req_pool;
++};
++
++/* Algorithm type mask. */
++#define SPACC_CRYPTO_ALG_MASK		0x7
++
++/* SPACC definition of a crypto algorithm. */
++struct spacc_alg {
++	unsigned long			ctrl_default;
++	unsigned long			type;
++	struct crypto_alg		alg;
++	struct spacc_engine		*engine;
++	struct list_head		entry;
++	int				key_offs;
++	int				iv_offs;
++};
++
++/* Generic context structure for any algorithm type. */
++struct spacc_generic_ctx {
++	struct spacc_engine		*engine;
++	int				flags;
++	int				key_offs;
++	int				iv_offs;
++};
++
++/* Block cipher context. */
++struct spacc_ablk_ctx {
++	struct spacc_generic_ctx	generic;
++	u8				key[AES_MAX_KEY_SIZE];
++	u8				key_len;
++	/*
++	 * The fallback cipher. If the operation can't be done in hardware,
++	 * fallback to a software version.
++	 */
++	struct crypto_ablkcipher	*sw_cipher;
++};
++
++/* AEAD cipher context. */
++struct spacc_aead_ctx {
++	struct spacc_generic_ctx	generic;
++	u8				cipher_key[AES_MAX_KEY_SIZE];
++	u8				hash_ctx[SPACC_CRYPTO_IPSEC_HASH_PG_SZ];
++	u8				cipher_key_len;
++	u8				hash_key_len;
++	struct crypto_aead		*sw_cipher;
++	size_t				auth_size;
++	u8				salt[AES_BLOCK_SIZE];
++};
++
++static inline struct spacc_alg *to_spacc_alg(struct crypto_alg *alg)
 +{
++	return alg ? container_of(alg, struct spacc_alg, alg) : NULL;
++}
++
++static inline int spacc_fifo_cmd_full(struct spacc_engine *engine)
++{
++	u32 fifo_stat = readl(engine->regs + SPA_FIFO_STAT_REG_OFFSET);
++
++	return fifo_stat & SPA_FIFO_CMD_FULL;
++}
++
++/*
++ * Given a cipher context, and a context number, get the base address of the
++ * context page.
++ *
++ * Returns the address of the context page where the key/context may
++ * be written.
++ */
++static inline void __iomem *spacc_ctx_page_addr(struct spacc_generic_ctx *ctx,
++						unsigned indx,
++						bool is_cipher_ctx)
++{
++	return is_cipher_ctx ? ctx->engine->cipher_ctx_base +
++			(indx * ctx->engine->cipher_pg_sz) :
++		ctx->engine->hash_key_base + (indx * ctx->engine->hash_pg_sz);
++}
++
++/* The context pages can only be written with 32-bit accesses. */
++static inline void memcpy_toio32(u32 __iomem *dst, const void *src,
++				 unsigned count)
++{
++	const u32 *src32 = (const u32 *) src;
++
++	while (count--)
++		writel(*src32++, dst++);
++}
++
++static void spacc_cipher_write_ctx(struct spacc_generic_ctx *ctx,
++				   void __iomem *page_addr, const u8 *key,
++				   size_t key_len, const u8 *iv, size_t iv_len)
++{
++	void __iomem *key_ptr = page_addr + ctx->key_offs;
++	void __iomem *iv_ptr = page_addr + ctx->iv_offs;
++
++	memcpy_toio32(key_ptr, key, key_len / 4);
++	memcpy_toio32(iv_ptr, iv, iv_len / 4);
++}
++
++/*
++ * Load a context into the engines context memory.
++ *
++ * Returns the index of the context page where the context was loaded.
++ */
++static unsigned spacc_load_ctx(struct spacc_generic_ctx *ctx,
++			       const u8 *ciph_key, size_t ciph_len,
++			       const u8 *iv, size_t ivlen, const u8 *hash_key,
++			       size_t hash_len)
++{
++	unsigned indx = ctx->engine->next_ctx++;
++	void __iomem *ciph_page_addr, *hash_page_addr;
++
++	ciph_page_addr = spacc_ctx_page_addr(ctx, indx, 1);
++	hash_page_addr = spacc_ctx_page_addr(ctx, indx, 0);
++
++	ctx->engine->next_ctx &= ctx->engine->fifo_sz - 1;
++	spacc_cipher_write_ctx(ctx, ciph_page_addr, ciph_key, ciph_len, iv,
++			       ivlen);
++	writel(ciph_len | (indx << SPA_KEY_SZ_CTX_INDEX_OFFSET) |
++	       (1 << SPA_KEY_SZ_CIPHER_OFFSET),
++	       ctx->engine->regs + SPA_KEY_SZ_REG_OFFSET);
++
++	if (hash_key) {
++		memcpy_toio32(hash_page_addr, hash_key, hash_len / 4);
++		writel(hash_len | (indx << SPA_KEY_SZ_CTX_INDEX_OFFSET),
++		       ctx->engine->regs + SPA_KEY_SZ_REG_OFFSET);
++	}
++
++	return indx;
++}
++
++/* Count the number of scatterlist entries in a scatterlist. */
++static int sg_count(struct scatterlist *sg_list, int nbytes)
++{
++	struct scatterlist *sg = sg_list;
++	int sg_nents = 0;
++
++	while (nbytes > 0) {
++		++sg_nents;
++		nbytes -= sg->length;
++		sg = sg_next(sg);
++	}
++
++	return sg_nents;
++}
++
++static inline void ddt_set(struct spacc_ddt *ddt, dma_addr_t phys, size_t len)
++{
++	ddt->p = phys;
++	ddt->len = len;
++}
++
++/*
++ * Take a crypto request and scatterlists for the data and turn them into DDTs
++ * for passing to the crypto engines. This also DMA maps the data so that the
++ * crypto engines can DMA to/from them.
++ */
++static struct spacc_ddt *spacc_sg_to_ddt(struct spacc_engine *engine,
++					 struct scatterlist *payload,
++					 unsigned nbytes,
++					 enum dma_data_direction dir,
++					 dma_addr_t *ddt_phys)
++{
++	unsigned nents, mapped_ents;
++	struct scatterlist *cur;
++	struct spacc_ddt *ddt;
 +	int i;
 +
-+	key[0] = str[0] >> 1;
-+	key[1] = ((str[0] & 0x01) << 6) | (str[1] >> 2);
-+	key[2] = ((str[1] & 0x03) << 5) | (str[2] >> 3);
-+	key[3] = ((str[2] & 0x07) << 4) | (str[3] >> 4);
-+	key[4] = ((str[3] & 0x0F) << 3) | (str[4] >> 5);
-+	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
-+	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
-+	key[7] = str[6] & 0x7F;
-+	for (i = 0; i < 8; i++)
-+		key[i] = (key[i] << 1);
++	nents = sg_count(payload, nbytes);
++	mapped_ents = dma_map_sg(engine->dev, payload, nents, dir);
++
++	if (mapped_ents + 1 > MAX_DDT_LEN)
++		goto out;
++
++	ddt = dma_pool_alloc(engine->req_pool, GFP_ATOMIC, ddt_phys);
++	if (!ddt)
++		goto out;
++
++	for_each_sg(payload, cur, mapped_ents, i)
++		ddt_set(&ddt[i], sg_dma_address(cur), sg_dma_len(cur));
++	ddt_set(&ddt[mapped_ents], 0, 0);
++
++	return ddt;
++
++out:
++	dma_unmap_sg(engine->dev, payload, nents, dir);
++	return NULL;
 +}
 +
-+static int
-+smbhash(unsigned char *out, const unsigned char *in, unsigned char *key,
-+	int forw)
++static int spacc_aead_make_ddts(struct spacc_req *req, u8 *giv)
 +{
-+	int rc;
-+	unsigned char key2[8];
-+	struct crypto_blkcipher *tfm_des;
-+	struct scatterlist sgin, sgout;
-+	struct blkcipher_desc desc;
++	struct aead_request *areq = container_of(req->req, struct aead_request,
++						 base);
++	struct spacc_engine *engine = req->engine;
++	struct spacc_ddt *src_ddt, *dst_ddt;
++	unsigned ivsize = crypto_aead_ivsize(crypto_aead_reqtfm(areq));
++	unsigned nents = sg_count(areq->src, areq->cryptlen);
++	dma_addr_t iv_addr;
++	struct scatterlist *cur;
++	int i, dst_ents, src_ents, assoc_ents;
++	u8 *iv = giv ? giv : areq->iv;
 +
-+	str_to_key(key, key2);
++	src_ddt = dma_pool_alloc(engine->req_pool, GFP_ATOMIC, &req->src_addr);
++	if (!src_ddt)
++		return -ENOMEM;
 +
-+	tfm_des = crypto_alloc_blkcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(tfm_des)) {
-+		rc = PTR_ERR(tfm_des);
-+		cERROR(1, "could not allocate des crypto API\n");
-+		goto smbhash_err;
++	dst_ddt = dma_pool_alloc(engine->req_pool, GFP_ATOMIC, &req->dst_addr);
++	if (!dst_ddt) {
++		dma_pool_free(engine->req_pool, src_ddt, req->src_addr);
++		return -ENOMEM;
 +	}
 +
-+	desc.tfm = tfm_des;
++	req->src_ddt = src_ddt;
++	req->dst_ddt = dst_ddt;
 +
-+	crypto_blkcipher_setkey(tfm_des, key2, 8);
-+
-+	sg_init_one(&sgin, in, 8);
-+	sg_init_one(&sgout, out, 8);
-+
-+	rc = crypto_blkcipher_encrypt(&desc, &sgout, &sgin, 8);
-+	if (rc) {
-+		cERROR(1, "could not encrypt crypt key rc: %d\n", rc);
-+		crypto_free_blkcipher(tfm_des);
-+		goto smbhash_err;
++	assoc_ents = dma_map_sg(engine->dev, areq->assoc,
++		sg_count(areq->assoc, areq->assoclen), DMA_TO_DEVICE);
++	if (areq->src != areq->dst) {
++		src_ents = dma_map_sg(engine->dev, areq->src, nents,
++				      DMA_TO_DEVICE);
++		dst_ents = dma_map_sg(engine->dev, areq->dst, nents,
++				      DMA_FROM_DEVICE);
++	} else {
++		src_ents = dma_map_sg(engine->dev, areq->src, nents,
++				      DMA_BIDIRECTIONAL);
++		dst_ents = 0;
 +	}
 +
-+smbhash_err:
-+	return rc;
++	/*
++	 * Map the IV/GIV. For the GIV it needs to be bidirectional as it is
++	 * formed by the crypto block and sent as the ESP IV for IPSEC.
++	 */
++	iv_addr = dma_map_single(engine->dev, iv, ivsize,
++				 giv ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE);
++	req->giv_pa = iv_addr;
++
++	/*
++	 * Map the associated data. For decryption we don't copy the
++	 * associated data.
++	 */
++	for_each_sg(areq->assoc, cur, assoc_ents, i) {
++		ddt_set(src_ddt++, sg_dma_address(cur), sg_dma_len(cur));
++		if (req->is_encrypt)
++			ddt_set(dst_ddt++, sg_dma_address(cur),
++				sg_dma_len(cur));
++	}
++	ddt_set(src_ddt++, iv_addr, ivsize);
++
++	if (giv || req->is_encrypt)
++		ddt_set(dst_ddt++, iv_addr, ivsize);
++
++	/*
++	 * Now map in the payload for the source and destination and terminate
++	 * with the NULL pointers.
++	 */
++	for_each_sg(areq->src, cur, src_ents, i) {
++		ddt_set(src_ddt++, sg_dma_address(cur), sg_dma_len(cur));
++		if (areq->src == areq->dst)
++			ddt_set(dst_ddt++, sg_dma_address(cur),
++				sg_dma_len(cur));
++	}
++
++	for_each_sg(areq->dst, cur, dst_ents, i)
++		ddt_set(dst_ddt++, sg_dma_address(cur),
++			sg_dma_len(cur));
++
++	ddt_set(src_ddt, 0, 0);
++	ddt_set(dst_ddt, 0, 0);
++
++	return 0;
 +}
 +
-+static int
-+E_P16(unsigned char *p14, unsigned char *p16)
++static void spacc_aead_free_ddts(struct spacc_req *req)
 +{
-+	int rc;
-+	unsigned char sp8[8] =
-+	    { 0x4b, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 };
++	struct aead_request *areq = container_of(req->req, struct aead_request,
++						 base);
++	struct spacc_alg *alg = to_spacc_alg(req->req->tfm->__crt_alg);
++	struct spacc_ablk_ctx *aead_ctx = crypto_tfm_ctx(req->req->tfm);
++	struct spacc_engine *engine = aead_ctx->generic.engine;
++	unsigned ivsize = alg->alg.cra_aead.ivsize;
++	unsigned nents = sg_count(areq->src, areq->cryptlen);
 +
-+	rc = smbhash(p16, sp8, p14, 1);
-+	if (rc)
-+		return rc;
-+	rc = smbhash(p16 + 8, sp8, p14 + 7, 1);
-+	return rc;
++	if (areq->src != areq->dst) {
++		dma_unmap_sg(engine->dev, areq->src, nents, DMA_TO_DEVICE);
++		dma_unmap_sg(engine->dev, areq->dst,
++			     sg_count(areq->dst, areq->cryptlen),
++			     DMA_FROM_DEVICE);
++	} else
++		dma_unmap_sg(engine->dev, areq->src, nents, DMA_BIDIRECTIONAL);
++
++	dma_unmap_sg(engine->dev, areq->assoc,
++		     sg_count(areq->assoc, areq->assoclen), DMA_TO_DEVICE);
++
++	dma_unmap_single(engine->dev, req->giv_pa, ivsize, DMA_BIDIRECTIONAL);
++
++	dma_pool_free(engine->req_pool, req->src_ddt, req->src_addr);
++	dma_pool_free(engine->req_pool, req->dst_ddt, req->dst_addr);
 +}
 +
-+static int
-+E_P24(unsigned char *p21, const unsigned char *c8, unsigned char *p24)
++static void spacc_free_ddt(struct spacc_req *req, struct spacc_ddt *ddt,
++			   dma_addr_t ddt_addr, struct scatterlist *payload,
++			   unsigned nbytes, enum dma_data_direction dir)
 +{
-+	int rc;
++	unsigned nents = sg_count(payload, nbytes);
 +
-+	rc = smbhash(p24, c8, p21, 1);
-+	if (rc)
-+		return rc;
-+	rc = smbhash(p24 + 8, c8, p21 + 7, 1);
-+	if (rc)
-+		return rc;
-+	rc = smbhash(p24 + 16, c8, p21 + 14, 1);
-+	return rc;
++	dma_unmap_sg(req->engine->dev, payload, nents, dir);
++	dma_pool_free(req->engine->req_pool, ddt, ddt_addr);
 +}
 +
- /* produce a md4 message digest from data of length n bytes */
- int
- mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
-@@ -87,40 +170,30 @@ mdfour_err:
- 	return rc;
- }
- 
--/* Does the des encryption from the NT or LM MD4 hash. */
--static void
--SMBOWFencrypt(unsigned char passwd[16], const unsigned char *c8,
--	      unsigned char p24[24])
--{
--	unsigned char p21[21];
--
--	memset(p21, '\0', 21);
--
--	memcpy(p21, passwd, 16);
--	E_P24(p21, c8, p24);
--}
--
- /*
-    This implements the X/Open SMB password encryption
-    It takes a password, a 8 byte "crypt key" and puts 24 bytes of
-    encrypted password into p24 */
- /* Note that password must be uppercased and null terminated */
--void
-+int
- SMBencrypt(unsigned char *passwd, const unsigned char *c8, unsigned char *p24)
- {
--	unsigned char p14[15], p21[21];
-+	int rc;
-+	unsigned char p14[15], p16[16], p21[21];
- 
-+	memset(p14, '\0', 15);
-+	memset(p16, '\0', 16);
- 	memset(p21, '\0', 21);
--	memset(p14, '\0', 14);
--	strncpy((char *) p14, (char *) passwd, 14);
- 
--/*	strupper((char *)p14); *//* BB at least uppercase the easy range */
--	E_P16(p14, p21);
-+	memcpy(p14, passwd, 14);
-+	rc = E_P16(p14, p16);
-+	if (rc)
-+		return rc;
- 
--	SMBOWFencrypt(p21, c8, p24);
-+	memcpy(p21, passwd, 16);
-+	rc = E_P24(p21, c8, p24);
- 
--	memset(p14, 0, 15);
--	memset(p21, 0, 21);
-+	return rc;
- }
- 
- /* Routines for Windows NT MD4 Hash functions. */
-@@ -279,16 +352,18 @@ int
- SMBNTencrypt(unsigned char *passwd, unsigned char *c8, unsigned char *p24)
- {
- 	int rc;
--	unsigned char p21[21];
-+	unsigned char p16[16], p21[21];
- 
-+	memset(p16, '\0', 21);
- 	memset(p21, '\0', 21);
- 
--	rc = E_md4hash(passwd, p21);
-+	rc = E_md4hash(passwd, p16);
- 	if (rc) {
- 		cFYI(1, "%s Can't generate NT hash, error: %d", __func__, rc);
- 		return rc;
- 	}
--	SMBOWFencrypt(p21, c8, p24);
-+	memcpy(p21, p16, 16);
-+	rc = E_P24(p21, c8, p24);
- 	return rc;
- }
- 
++/*
++ * Set key for a DES operation in an AEAD cipher. This also performs weak key
++ * checking if required.
++ */
++static int spacc_aead_des_setkey(struct crypto_aead *aead, const u8 *key,
++				 unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++	u32 tmp[DES_EXPKEY_WORDS];
++
++	if (unlikely(!des_ekey(tmp, key)) &&
++	    (crypto_aead_get_flags(aead)) & CRYPTO_TFM_REQ_WEAK_KEY) {
++		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
++		return -EINVAL;
++	}
++
++	memcpy(ctx->cipher_key, key, len);
++	ctx->cipher_key_len = len;
++
++	return 0;
++}
++
++/* Set the key for the AES block cipher component of the AEAD transform. */
++static int spacc_aead_aes_setkey(struct crypto_aead *aead, const u8 *key,
++				 unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	/*
++	 * IPSec engine only supports 128 and 256 bit AES keys. If we get a
++	 * request for any other size (192 bits) then we need to do a software
++	 * fallback.
++	 */
++	if (len != AES_KEYSIZE_128 && len != AES_KEYSIZE_256) {
++		/*
++		 * Set the fallback transform to use the same request flags as
++		 * the hardware transform.
++		 */
++		ctx->sw_cipher->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
++		ctx->sw_cipher->base.crt_flags |=
++			tfm->crt_flags & CRYPTO_TFM_REQ_MASK;
++		return crypto_aead_setkey(ctx->sw_cipher, key, len);
++	}
++
++	memcpy(ctx->cipher_key, key, len);
++	ctx->cipher_key_len = len;
++
++	return 0;
++}
++
++static int spacc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
++			     unsigned int keylen)
++{
++	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	struct spacc_alg *alg = to_spacc_alg(tfm->base.__crt_alg);
++	struct rtattr *rta = (void *)key;
++	struct crypto_authenc_key_param *param;
++	unsigned int authkeylen, enckeylen;
++	int err = -EINVAL;
++
++	if (!RTA_OK(rta, keylen))
++		goto badkey;
++
++	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
++		goto badkey;
++
++	if (RTA_PAYLOAD(rta) < sizeof(*param))
++		goto badkey;
++
++	param = RTA_DATA(rta);
++	enckeylen = be32_to_cpu(param->enckeylen);
++
++	key += RTA_ALIGN(rta->rta_len);
++	keylen -= RTA_ALIGN(rta->rta_len);
++
++	if (keylen < enckeylen)
++		goto badkey;
++
++	authkeylen = keylen - enckeylen;
++
++	if (enckeylen > AES_MAX_KEY_SIZE)
++		goto badkey;
++
++	if ((alg->ctrl_default & SPACC_CRYPTO_ALG_MASK) ==
++	    SPA_CTRL_CIPH_ALG_AES)
++		err = spacc_aead_aes_setkey(tfm, key + authkeylen, enckeylen);
++	else
++		err = spacc_aead_des_setkey(tfm, key + authkeylen, enckeylen);
++
++	if (err)
++		goto badkey;
++
++	memcpy(ctx->hash_ctx, key, authkeylen);
++	ctx->hash_key_len = authkeylen;
++
++	return 0;
++
++badkey:
++	crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++	return -EINVAL;
++}
++
++static int spacc_aead_setauthsize(struct crypto_aead *tfm,
++				  unsigned int authsize)
++{
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(crypto_aead_tfm(tfm));
++
++	ctx->auth_size = authsize;
++
++	return 0;
++}
++
++/*
++ * Check if an AEAD request requires a fallback operation. Some requests can't
++ * be completed in hardware because the hardware may not support certain key
++ * sizes. In these cases we need to complete the request in software.
++ */
++static int spacc_aead_need_fallback(struct spacc_req *req)
++{
++	struct aead_request *aead_req;
++	struct crypto_tfm *tfm = req->req->tfm;
++	struct crypto_alg *alg = req->req->tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	aead_req = container_of(req->req, struct aead_request, base);
++	/*
++	 * If we have a non-supported key-length, then we need to do a
++	 * software fallback.
++	 */
++	if ((spacc_alg->ctrl_default & SPACC_CRYPTO_ALG_MASK) ==
++	    SPA_CTRL_CIPH_ALG_AES &&
++	    ctx->cipher_key_len != AES_KEYSIZE_128 &&
++	    ctx->cipher_key_len != AES_KEYSIZE_256)
++		return 1;
++
++	return 0;
++}
++
++static int spacc_aead_do_fallback(struct aead_request *req, unsigned alg_type,
++				  bool is_encrypt)
++{
++	struct crypto_tfm *old_tfm = crypto_aead_tfm(crypto_aead_reqtfm(req));
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(old_tfm);
++	int err;
++
++	if (ctx->sw_cipher) {
++		/*
++		 * Change the request to use the software fallback transform,
++		 * and once the ciphering has completed, put the old transform
++		 * back into the request.
++		 */
++		aead_request_set_tfm(req, ctx->sw_cipher);
++		err = is_encrypt ? crypto_aead_encrypt(req) :
++		    crypto_aead_decrypt(req);
++		aead_request_set_tfm(req, __crypto_aead_cast(old_tfm));
++	} else
++		err = -EINVAL;
++
++	return err;
++}
++
++static void spacc_aead_complete(struct spacc_req *req)
++{
++	spacc_aead_free_ddts(req);
++	req->req->complete(req->req, req->result);
++}
++
++static int spacc_aead_submit(struct spacc_req *req)
++{
++	struct crypto_tfm *tfm = req->req->tfm;
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_alg *alg = req->req->tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++	struct spacc_engine *engine = ctx->generic.engine;
++	u32 ctrl, proc_len, assoc_len;
++	struct aead_request *aead_req =
++		container_of(req->req, struct aead_request, base);
++
++	req->result = -EINPROGRESS;
++	req->ctx_id = spacc_load_ctx(&ctx->generic, ctx->cipher_key,
++		ctx->cipher_key_len, aead_req->iv, alg->cra_aead.ivsize,
++		ctx->hash_ctx, ctx->hash_key_len);
++
++	/* Set the source and destination DDT pointers. */
++	writel(req->src_addr, engine->regs + SPA_SRC_PTR_REG_OFFSET);
++	writel(req->dst_addr, engine->regs + SPA_DST_PTR_REG_OFFSET);
++	writel(0, engine->regs + SPA_OFFSET_REG_OFFSET);
++
++	assoc_len = aead_req->assoclen;
++	proc_len = aead_req->cryptlen + assoc_len;
++
++	/*
++	 * If we aren't generating an IV, then we need to include the IV in the
++	 * associated data so that it is included in the hash.
++	 */
++	if (!req->giv) {
++		assoc_len += crypto_aead_ivsize(crypto_aead_reqtfm(aead_req));
++		proc_len += crypto_aead_ivsize(crypto_aead_reqtfm(aead_req));
++	} else
++		proc_len += req->giv_len;
++
++	/*
++	 * If we are decrypting, we need to take the length of the ICV out of
++	 * the processing length.
++	 */
++	if (!req->is_encrypt)
++		proc_len -= ctx->auth_size;
++
++	writel(proc_len, engine->regs + SPA_PROC_LEN_REG_OFFSET);
++	writel(assoc_len, engine->regs + SPA_AAD_LEN_REG_OFFSET);
++	writel(ctx->auth_size, engine->regs + SPA_ICV_LEN_REG_OFFSET);
++	writel(0, engine->regs + SPA_ICV_OFFSET_REG_OFFSET);
++	writel(0, engine->regs + SPA_AUX_INFO_REG_OFFSET);
++
++	ctrl = spacc_alg->ctrl_default | (req->ctx_id << SPA_CTRL_CTX_IDX) |
++		(1 << SPA_CTRL_ICV_APPEND);
++	if (req->is_encrypt)
++		ctrl |= (1 << SPA_CTRL_ENCRYPT_IDX) | (1 << SPA_CTRL_AAD_COPY);
++	else
++		ctrl |= (1 << SPA_CTRL_KEY_EXP);
++
++	mod_timer(&engine->packet_timeout, jiffies + PACKET_TIMEOUT);
++
++	writel(ctrl, engine->regs + SPA_CTRL_REG_OFFSET);
++
++	return -EINPROGRESS;
++}
++
++/*
++ * Setup an AEAD request for processing. This will configure the engine, load
++ * the context and then start the packet processing.
++ *
++ * @giv Pointer to destination address for a generated IV. If the
++ *	request does not need to generate an IV then this should be set to NULL.
++ */
++static int spacc_aead_setup(struct aead_request *req, u8 *giv,
++			    unsigned alg_type, bool is_encrypt)
++{
++	struct crypto_alg *alg = req->base.tfm->__crt_alg;
++	struct spacc_engine *engine = to_spacc_alg(alg)->engine;
++	struct spacc_req *dev_req = aead_request_ctx(req);
++	int err = -EINPROGRESS;
++	unsigned long flags;
++	unsigned ivsize = crypto_aead_ivsize(crypto_aead_reqtfm(req));
++
++	dev_req->giv		= giv;
++	dev_req->giv_len	= ivsize;
++	dev_req->req		= &req->base;
++	dev_req->is_encrypt	= is_encrypt;
++	dev_req->result		= -EBUSY;
++	dev_req->engine		= engine;
++	dev_req->complete	= spacc_aead_complete;
++
++	if (unlikely(spacc_aead_need_fallback(dev_req)))
++		return spacc_aead_do_fallback(req, alg_type, is_encrypt);
++
++	spacc_aead_make_ddts(dev_req, dev_req->giv);
++
++	err = -EINPROGRESS;
++	spin_lock_irqsave(&engine->hw_lock, flags);
++	if (unlikely(spacc_fifo_cmd_full(engine))) {
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			err = -EBUSY;
++			spin_unlock_irqrestore(&engine->hw_lock, flags);
++			goto out_free_ddts;
++		}
++		list_add_tail(&dev_req->list, &engine->pending);
++	} else {
++		++engine->in_flight;
++		list_add_tail(&dev_req->list, &engine->in_progress);
++		spacc_aead_submit(dev_req);
++	}
++	spin_unlock_irqrestore(&engine->hw_lock, flags);
++
++	goto out;
++
++out_free_ddts:
++	spacc_aead_free_ddts(dev_req);
++out:
++	return err;
++}
++
++static int spacc_aead_encrypt(struct aead_request *req)
++{
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
++
++	return spacc_aead_setup(req, NULL, alg->type, 1);
++}
++
++static int spacc_aead_givencrypt(struct aead_givcrypt_request *req)
++{
++	struct crypto_aead *tfm = aead_givcrypt_reqtfm(req);
++	struct spacc_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	size_t ivsize = crypto_aead_ivsize(tfm);
++	struct spacc_alg *alg = to_spacc_alg(tfm->base.__crt_alg);
++	unsigned len;
++	__be64 seq;
++
++	memcpy(req->areq.iv, ctx->salt, ivsize);
++	len = ivsize;
++	if (ivsize > sizeof(u64)) {
++		memset(req->giv, 0, ivsize - sizeof(u64));
++		len = sizeof(u64);
++	}
++	seq = cpu_to_be64(req->seq);
++	memcpy(req->giv + ivsize - len, &seq, len);
++
++	return spacc_aead_setup(&req->areq, req->giv, alg->type, 1);
++}
++
++static int spacc_aead_decrypt(struct aead_request *req)
++{
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
++
++	return spacc_aead_setup(req, NULL, alg->type, 0);
++}
++
++/*
++ * Initialise a new AEAD context. This is responsible for allocating the
++ * fallback cipher and initialising the context.
++ */
++static int spacc_aead_cra_init(struct crypto_tfm *tfm)
++{
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_alg *alg = tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++	struct spacc_engine *engine = spacc_alg->engine;
++
++	ctx->generic.flags = spacc_alg->type;
++	ctx->generic.engine = engine;
++	ctx->sw_cipher = crypto_alloc_aead(alg->cra_name, 0,
++					   CRYPTO_ALG_ASYNC |
++					   CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(ctx->sw_cipher)) {
++		dev_warn(engine->dev, "failed to allocate fallback for %s\n",
++			 alg->cra_name);
++		ctx->sw_cipher = NULL;
++	}
++	ctx->generic.key_offs = spacc_alg->key_offs;
++	ctx->generic.iv_offs = spacc_alg->iv_offs;
++
++	get_random_bytes(ctx->salt, sizeof(ctx->salt));
++
++	tfm->crt_aead.reqsize = sizeof(struct spacc_req);
++
++	return 0;
++}
++
++/*
++ * Destructor for an AEAD context. This is called when the transform is freed
++ * and must free the fallback cipher.
++ */
++static void spacc_aead_cra_exit(struct crypto_tfm *tfm)
++{
++	struct spacc_aead_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	if (ctx->sw_cipher)
++		crypto_free_aead(ctx->sw_cipher);
++	ctx->sw_cipher = NULL;
++}
++
++/*
++ * Set the DES key for a block cipher transform. This also performs weak key
++ * checking if the transform has requested it.
++ */
++static int spacc_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
++			    unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++	u32 tmp[DES_EXPKEY_WORDS];
++
++	if (len > DES3_EDE_KEY_SIZE) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	if (unlikely(!des_ekey(tmp, key)) &&
++	    (crypto_ablkcipher_get_flags(cipher) & CRYPTO_TFM_REQ_WEAK_KEY)) {
++		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
++		return -EINVAL;
++	}
++
++	memcpy(ctx->key, key, len);
++	ctx->key_len = len;
++
++	return 0;
++}
++
++/*
++ * Set the key for an AES block cipher. Some key lengths are not supported in
++ * hardware so this must also check whether a fallback is needed.
++ */
++static int spacc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
++			    unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++	int err = 0;
++
++	if (len > AES_MAX_KEY_SIZE) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	/*
++	 * IPSec engine only supports 128 and 256 bit AES keys. If we get a
++	 * request for any other size (192 bits) then we need to do a software
++	 * fallback.
++	 */
++	if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
++	    ctx->sw_cipher) {
++		/*
++		 * Set the fallback transform to use the same request flags as
++		 * the hardware transform.
++		 */
++		ctx->sw_cipher->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
++		ctx->sw_cipher->base.crt_flags |=
++			cipher->base.crt_flags & CRYPTO_TFM_REQ_MASK;
++
++		err = crypto_ablkcipher_setkey(ctx->sw_cipher, key, len);
++		if (err)
++			goto sw_setkey_failed;
++	} else if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
++		   !ctx->sw_cipher)
++		err = -EINVAL;
++
++	memcpy(ctx->key, key, len);
++	ctx->key_len = len;
++
++sw_setkey_failed:
++	if (err && ctx->sw_cipher) {
++		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
++		tfm->crt_flags |=
++			ctx->sw_cipher->base.crt_flags & CRYPTO_TFM_RES_MASK;
++	}
++
++	return err;
++}
++
++static int spacc_kasumi_f8_setkey(struct crypto_ablkcipher *cipher,
++				  const u8 *key, unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++	int err = 0;
++
++	if (len > AES_MAX_KEY_SIZE) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		err = -EINVAL;
++		goto out;
++	}
++
++	memcpy(ctx->key, key, len);
++	ctx->key_len = len;
++
++out:
++	return err;
++}
++
++static int spacc_ablk_need_fallback(struct spacc_req *req)
++{
++	struct spacc_ablk_ctx *ctx;
++	struct crypto_tfm *tfm = req->req->tfm;
++	struct crypto_alg *alg = req->req->tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++
++	ctx = crypto_tfm_ctx(tfm);
++
++	return (spacc_alg->ctrl_default & SPACC_CRYPTO_ALG_MASK) ==
++			SPA_CTRL_CIPH_ALG_AES &&
++			ctx->key_len != AES_KEYSIZE_128 &&
++			ctx->key_len != AES_KEYSIZE_256;
++}
++
++static void spacc_ablk_complete(struct spacc_req *req)
++{
++	struct ablkcipher_request *ablk_req =
++		container_of(req->req, struct ablkcipher_request, base);
++
++	if (ablk_req->src != ablk_req->dst) {
++		spacc_free_ddt(req, req->src_ddt, req->src_addr, ablk_req->src,
++			       ablk_req->nbytes, DMA_TO_DEVICE);
++		spacc_free_ddt(req, req->dst_ddt, req->dst_addr, ablk_req->dst,
++			       ablk_req->nbytes, DMA_FROM_DEVICE);
++	} else
++		spacc_free_ddt(req, req->dst_ddt, req->dst_addr, ablk_req->dst,
++			       ablk_req->nbytes, DMA_BIDIRECTIONAL);
++
++	req->req->complete(req->req, req->result);
++}
++
++static int spacc_ablk_submit(struct spacc_req *req)
++{
++	struct crypto_tfm *tfm = req->req->tfm;
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct ablkcipher_request *ablk_req = ablkcipher_request_cast(req->req);
++	struct crypto_alg *alg = req->req->tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++	struct spacc_engine *engine = ctx->generic.engine;
++	u32 ctrl;
++
++	req->ctx_id = spacc_load_ctx(&ctx->generic, ctx->key,
++		ctx->key_len, ablk_req->info, alg->cra_ablkcipher.ivsize,
++		NULL, 0);
++
++	writel(req->src_addr, engine->regs + SPA_SRC_PTR_REG_OFFSET);
++	writel(req->dst_addr, engine->regs + SPA_DST_PTR_REG_OFFSET);
++	writel(0, engine->regs + SPA_OFFSET_REG_OFFSET);
++
++	writel(ablk_req->nbytes, engine->regs + SPA_PROC_LEN_REG_OFFSET);
++	writel(0, engine->regs + SPA_ICV_OFFSET_REG_OFFSET);
++	writel(0, engine->regs + SPA_AUX_INFO_REG_OFFSET);
++	writel(0, engine->regs + SPA_AAD_LEN_REG_OFFSET);
++
++	ctrl = spacc_alg->ctrl_default | (req->ctx_id << SPA_CTRL_CTX_IDX) |
++		(req->is_encrypt ? (1 << SPA_CTRL_ENCRYPT_IDX) :
++		 (1 << SPA_CTRL_KEY_EXP));
++
++	mod_timer(&engine->packet_timeout, jiffies + PACKET_TIMEOUT);
++
++	writel(ctrl, engine->regs + SPA_CTRL_REG_OFFSET);
++
++	return -EINPROGRESS;
++}
++
++static int spacc_ablk_do_fallback(struct ablkcipher_request *req,
++				  unsigned alg_type, bool is_encrypt)
++{
++	struct crypto_tfm *old_tfm =
++	    crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(old_tfm);
++	int err;
++
++	if (!ctx->sw_cipher)
++		return -EINVAL;
++
++	/*
++	 * Change the request to use the software fallback transform, and once
++	 * the ciphering has completed, put the old transform back into the
++	 * request.
++	 */
++	ablkcipher_request_set_tfm(req, ctx->sw_cipher);
++	err = is_encrypt ? crypto_ablkcipher_encrypt(req) :
++		crypto_ablkcipher_decrypt(req);
++	ablkcipher_request_set_tfm(req, __crypto_ablkcipher_cast(old_tfm));
++
++	return err;
++}
++
++static int spacc_ablk_setup(struct ablkcipher_request *req, unsigned alg_type,
++			    bool is_encrypt)
++{
++	struct crypto_alg *alg = req->base.tfm->__crt_alg;
++	struct spacc_engine *engine = to_spacc_alg(alg)->engine;
++	struct spacc_req *dev_req = ablkcipher_request_ctx(req);
++	unsigned long flags;
++	int err = -ENOMEM;
++
++	dev_req->req		= &req->base;
++	dev_req->is_encrypt	= is_encrypt;
++	dev_req->engine		= engine;
++	dev_req->complete	= spacc_ablk_complete;
++	dev_req->result		= -EINPROGRESS;
++
++	if (unlikely(spacc_ablk_need_fallback(dev_req)))
++		return spacc_ablk_do_fallback(req, alg_type, is_encrypt);
++
++	/*
++	 * Create the DDT's for the engine. If we share the same source and
++	 * destination then we can optimize by reusing the DDT's.
++	 */
++	if (req->src != req->dst) {
++		dev_req->src_ddt = spacc_sg_to_ddt(engine, req->src,
++			req->nbytes, DMA_TO_DEVICE, &dev_req->src_addr);
++		if (!dev_req->src_ddt)
++			goto out;
++
++		dev_req->dst_ddt = spacc_sg_to_ddt(engine, req->dst,
++			req->nbytes, DMA_FROM_DEVICE, &dev_req->dst_addr);
++		if (!dev_req->dst_ddt)
++			goto out_free_src;
++	} else {
++		dev_req->dst_ddt = spacc_sg_to_ddt(engine, req->dst,
++			req->nbytes, DMA_BIDIRECTIONAL, &dev_req->dst_addr);
++		if (!dev_req->dst_ddt)
++			goto out;
++
++		dev_req->src_ddt = NULL;
++		dev_req->src_addr = dev_req->dst_addr;
++	}
++
++	err = -EINPROGRESS;
++	spin_lock_irqsave(&engine->hw_lock, flags);
++	/*
++	 * Check if the engine will accept the operation now. If it won't then
++	 * we either stick it on the end of a pending list if we can backlog,
++	 * or bailout with an error if not.
++	 */
++	if (unlikely(spacc_fifo_cmd_full(engine))) {
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			err = -EBUSY;
++			spin_unlock_irqrestore(&engine->hw_lock, flags);
++			goto out_free_ddts;
++		}
++		list_add_tail(&dev_req->list, &engine->pending);
++	} else {
++		++engine->in_flight;
++		list_add_tail(&dev_req->list, &engine->in_progress);
++		spacc_ablk_submit(dev_req);
++	}
++	spin_unlock_irqrestore(&engine->hw_lock, flags);
++
++	goto out;
++
++out_free_ddts:
++	spacc_free_ddt(dev_req, dev_req->dst_ddt, dev_req->dst_addr, req->dst,
++		       req->nbytes, req->src == req->dst ?
++		       DMA_BIDIRECTIONAL : DMA_FROM_DEVICE);
++out_free_src:
++	if (req->src != req->dst)
++		spacc_free_ddt(dev_req, dev_req->src_ddt, dev_req->src_addr,
++			       req->src, req->nbytes, DMA_TO_DEVICE);
++out:
++	return err;
++}
++
++static int spacc_ablk_cra_init(struct crypto_tfm *tfm)
++{
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_alg *alg = tfm->__crt_alg;
++	struct spacc_alg *spacc_alg = to_spacc_alg(alg);
++	struct spacc_engine *engine = spacc_alg->engine;
++
++	ctx->generic.flags = spacc_alg->type;
++	ctx->generic.engine = engine;
++	if (alg->cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
++		ctx->sw_cipher = crypto_alloc_ablkcipher(alg->cra_name, 0,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
++		if (IS_ERR(ctx->sw_cipher)) {
++			dev_warn(engine->dev, "failed to allocate fallback for %s\n",
++				 alg->cra_name);
++			ctx->sw_cipher = NULL;
++		}
++	}
++	ctx->generic.key_offs = spacc_alg->key_offs;
++	ctx->generic.iv_offs = spacc_alg->iv_offs;
++
++	tfm->crt_ablkcipher.reqsize = sizeof(struct spacc_req);
++
++	return 0;
++}
++
++static void spacc_ablk_cra_exit(struct crypto_tfm *tfm)
++{
++	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	if (ctx->sw_cipher)
++		crypto_free_ablkcipher(ctx->sw_cipher);
++	ctx->sw_cipher = NULL;
++}
++
++static int spacc_ablk_encrypt(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
++
++	return spacc_ablk_setup(req, alg->type, 1);
++}
++
++static int spacc_ablk_decrypt(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct spacc_alg *alg = to_spacc_alg(tfm->__crt_alg);
++
++	return spacc_ablk_setup(req, alg->type, 0);
++}
++
++static inline int spacc_fifo_stat_empty(struct spacc_engine *engine)
++{
++	return readl(engine->regs + SPA_FIFO_STAT_REG_OFFSET) &
++		SPA_FIFO_STAT_EMPTY;
++}
++
++static void spacc_process_done(struct spacc_engine *engine)
++{
++	struct spacc_req *req;
++	unsigned long flags;
++
++	spin_lock_irqsave(&engine->hw_lock, flags);
++
++	while (!spacc_fifo_stat_empty(engine)) {
++		req = list_first_entry(&engine->in_progress, struct spacc_req,
++				       list);
++		list_move_tail(&req->list, &engine->completed);
++
++		/* POP the status register. */
++		writel(~0, engine->regs + SPA_STAT_POP_REG_OFFSET);
++		req->result = (readl(engine->regs + SPA_STATUS_REG_OFFSET) &
++		     SPA_STATUS_RES_CODE_MASK) >> SPA_STATUS_RES_CODE_OFFSET;
++
++		/*
++		 * Convert the SPAcc error status into the standard POSIX error
++		 * codes.
++		 */
++		if (unlikely(req->result)) {
++			switch (req->result) {
++			case SPA_STATUS_ICV_FAIL:
++				req->result = -EBADMSG;
++				break;
++
++			case SPA_STATUS_MEMORY_ERROR:
++				dev_warn(engine->dev,
++					 "memory error triggered\n");
++				req->result = -EFAULT;
++				break;
++
++			case SPA_STATUS_BLOCK_ERROR:
++				dev_warn(engine->dev,
++					 "block error triggered\n");
++				req->result = -EIO;
++				break;
++			}
++		}
++	}
++
++	tasklet_schedule(&engine->complete);
++
++	spin_unlock_irqrestore(&engine->hw_lock, flags);
++}
++
++static irqreturn_t spacc_spacc_irq(int irq, void *dev)
++{
++	struct spacc_engine *engine = (struct spacc_engine *)dev;
++	u32 spacc_irq_stat = readl(engine->regs + SPA_IRQ_STAT_REG_OFFSET);
++
++	writel(spacc_irq_stat, engine->regs + SPA_IRQ_STAT_REG_OFFSET);
++	spacc_process_done(engine);
++
++	return IRQ_HANDLED;
++}
++
++static void spacc_packet_timeout(unsigned long data)
++{
++	struct spacc_engine *engine = (struct spacc_engine *)data;
++
++	spacc_process_done(engine);
++}
++
++static int spacc_req_submit(struct spacc_req *req)
++{
++	struct crypto_alg *alg = req->req->tfm->__crt_alg;
++
++	if (CRYPTO_ALG_TYPE_AEAD == (CRYPTO_ALG_TYPE_MASK & alg->cra_flags))
++		return spacc_aead_submit(req);
++	else
++		return spacc_ablk_submit(req);
++}
++
++static void spacc_spacc_complete(unsigned long data)
++{
++	struct spacc_engine *engine = (struct spacc_engine *)data;
++	struct spacc_req *req, *tmp;
++	unsigned long flags;
++	int num_removed = 0;
++	LIST_HEAD(completed);
++
++	spin_lock_irqsave(&engine->hw_lock, flags);
++	list_splice_init(&engine->completed, &completed);
++	spin_unlock_irqrestore(&engine->hw_lock, flags);
++
++	list_for_each_entry_safe(req, tmp, &completed, list) {
++		++num_removed;
++		req->complete(req);
++	}
++
++	/* Try and fill the engine back up again. */
++	spin_lock_irqsave(&engine->hw_lock, flags);
++
++	engine->in_flight -= num_removed;
++
++	list_for_each_entry_safe(req, tmp, &engine->pending, list) {
++		if (spacc_fifo_cmd_full(engine))
++			break;
++
++		list_move_tail(&req->list, &engine->in_progress);
++		++engine->in_flight;
++		req->result = spacc_req_submit(req);
++	}
++
++	if (engine->in_flight)
++		mod_timer(&engine->packet_timeout, jiffies + PACKET_TIMEOUT);
++
++	spin_unlock_irqrestore(&engine->hw_lock, flags);
++}
++
++#ifdef CONFIG_PM
++static int spacc_suspend(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct spacc_engine *engine = platform_get_drvdata(pdev);
++
++	/*
++	 * We only support standby mode. All we have to do is gate the clock to
++	 * the spacc. The hardware will preserve state until we turn it back
++	 * on again.
++	 */
++	clk_disable(engine->clk);
++
++	return 0;
++}
++
++static int spacc_resume(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct spacc_engine *engine = platform_get_drvdata(pdev);
++
++	return clk_enable(engine->clk);
++}
++
++static const struct dev_pm_ops spacc_pm_ops = {
++	.suspend	= spacc_suspend,
++	.resume		= spacc_resume,
++};
++#endif /* CONFIG_PM */
++
++static inline struct spacc_engine *spacc_dev_to_engine(struct device *dev)
++{
++	return dev ? platform_get_drvdata(to_platform_device(dev)) : NULL;
++}
++
++static ssize_t spacc_stat_irq_thresh_show(struct device *dev,
++					  struct device_attribute *attr,
++					  char *buf)
++{
++	struct spacc_engine *engine = spacc_dev_to_engine(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%u\n", engine->stat_irq_thresh);
++}
++
++static ssize_t spacc_stat_irq_thresh_store(struct device *dev,
++					   struct device_attribute *attr,
++					   const char *buf, size_t len)
++{
++	struct spacc_engine *engine = spacc_dev_to_engine(dev);
++	unsigned long thresh;
++
++	if (strict_strtoul(buf, 0, &thresh))
++		return -EINVAL;
++
++	thresh = clamp(thresh, 1UL, engine->fifo_sz - 1);
++
++	engine->stat_irq_thresh = thresh;
++	writel(engine->stat_irq_thresh << SPA_IRQ_CTRL_STAT_CNT_OFFSET,
++	       engine->regs + SPA_IRQ_CTRL_REG_OFFSET);
++
++	return len;
++}
++static DEVICE_ATTR(stat_irq_thresh, 0644, spacc_stat_irq_thresh_show,
++		   spacc_stat_irq_thresh_store);
++
++static struct spacc_alg ipsec_engine_algs[] = {
++	{
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC,
++		.key_offs = 0,
++		.iv_offs = AES_MAX_KEY_SIZE,
++		.alg = {
++			.cra_name = "cbc(aes)",
++			.cra_driver_name = "cbc-aes-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_NEED_FALLBACK,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_aes_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = AES_MIN_KEY_SIZE,
++				.max_keysize = AES_MAX_KEY_SIZE,
++				.ivsize = AES_BLOCK_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.key_offs = 0,
++		.iv_offs = AES_MAX_KEY_SIZE,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_ECB,
++		.alg = {
++			.cra_name = "ecb(aes)",
++			.cra_driver_name = "ecb-aes-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_aes_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = AES_MIN_KEY_SIZE,
++				.max_keysize = AES_MAX_KEY_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC,
++		.alg = {
++			.cra_name = "cbc(des)",
++			.cra_driver_name = "cbc-des-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_des_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = DES_KEY_SIZE,
++				.max_keysize = DES_KEY_SIZE,
++				.ivsize = DES_BLOCK_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_ECB,
++		.alg = {
++			.cra_name = "ecb(des)",
++			.cra_driver_name = "ecb-des-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_des_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = DES_KEY_SIZE,
++				.max_keysize = DES_KEY_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC,
++		.alg = {
++			.cra_name = "cbc(des3_ede)",
++			.cra_driver_name = "cbc-des3-ede-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_des_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = DES3_EDE_KEY_SIZE,
++				.max_keysize = DES3_EDE_KEY_SIZE,
++				.ivsize = DES3_EDE_BLOCK_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_ECB,
++		.alg = {
++			.cra_name = "ecb(des3_ede)",
++			.cra_driver_name = "ecb-des3-ede-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_des_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = DES3_EDE_KEY_SIZE,
++				.max_keysize = DES3_EDE_KEY_SIZE,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++	{
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_SHA | SPA_CTRL_HASH_MODE_HMAC,
++		.key_offs = 0,
++		.iv_offs = AES_MAX_KEY_SIZE,
++		.alg = {
++			.cra_name = "authenc(hmac(sha1),cbc(aes))",
++			.cra_driver_name = "authenc-hmac-sha1-cbc-aes-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = AES_BLOCK_SIZE,
++				.maxauthsize = SHA1_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++	{
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_SHA256 |
++				SPA_CTRL_HASH_MODE_HMAC,
++		.key_offs = 0,
++		.iv_offs = AES_MAX_KEY_SIZE,
++		.alg = {
++			.cra_name = "authenc(hmac(sha256),cbc(aes))",
++			.cra_driver_name = "authenc-hmac-sha256-cbc-aes-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = AES_BLOCK_SIZE,
++				.maxauthsize = SHA256_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++	{
++		.key_offs = 0,
++		.iv_offs = AES_MAX_KEY_SIZE,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_MD5 | SPA_CTRL_HASH_MODE_HMAC,
++		.alg = {
++			.cra_name = "authenc(hmac(md5),cbc(aes))",
++			.cra_driver_name = "authenc-hmac-md5-cbc-aes-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = AES_BLOCK_SIZE,
++				.maxauthsize = MD5_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_SHA | SPA_CTRL_HASH_MODE_HMAC,
++		.alg = {
++			.cra_name = "authenc(hmac(sha1),cbc(des3_ede))",
++			.cra_driver_name = "authenc-hmac-sha1-cbc-3des-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = DES3_EDE_BLOCK_SIZE,
++				.maxauthsize = SHA1_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_AES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_SHA256 |
++				SPA_CTRL_HASH_MODE_HMAC,
++		.alg = {
++			.cra_name = "authenc(hmac(sha256),cbc(des3_ede))",
++			.cra_driver_name = "authenc-hmac-sha256-cbc-3des-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = DES3_EDE_BLOCK_SIZE,
++				.maxauthsize = SHA256_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++	{
++		.key_offs = DES_BLOCK_SIZE,
++		.iv_offs = 0,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_DES | SPA_CTRL_CIPH_MODE_CBC |
++				SPA_CTRL_HASH_ALG_MD5 | SPA_CTRL_HASH_MODE_HMAC,
++		.alg = {
++			.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
++			.cra_driver_name = "authenc-hmac-md5-cbc-3des-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct spacc_aead_ctx),
++			.cra_type = &crypto_aead_type,
++			.cra_module = THIS_MODULE,
++			.cra_aead = {
++				.setkey = spacc_aead_setkey,
++				.setauthsize = spacc_aead_setauthsize,
++				.encrypt = spacc_aead_encrypt,
++				.decrypt = spacc_aead_decrypt,
++				.givencrypt = spacc_aead_givencrypt,
++				.ivsize = DES3_EDE_BLOCK_SIZE,
++				.maxauthsize = MD5_DIGEST_SIZE,
++			},
++			.cra_init = spacc_aead_cra_init,
++			.cra_exit = spacc_aead_cra_exit,
++		},
++	},
++};
++
++static struct spacc_alg l2_engine_algs[] = {
++	{
++		.key_offs = 0,
++		.iv_offs = SPACC_CRYPTO_KASUMI_F8_KEY_LEN,
++		.ctrl_default = SPA_CTRL_CIPH_ALG_KASUMI |
++				SPA_CTRL_CIPH_MODE_F8,
++		.alg = {
++			.cra_name = "f8(kasumi)",
++			.cra_driver_name = "f8-kasumi-picoxcell",
++			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
++			.cra_flags = CRYPTO_ALG_TYPE_GIVCIPHER | CRYPTO_ALG_ASYNC,
++			.cra_blocksize = 8,
++			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
++			.cra_type = &crypto_ablkcipher_type,
++			.cra_module = THIS_MODULE,
++			.cra_ablkcipher = {
++				.setkey = spacc_kasumi_f8_setkey,
++				.encrypt = spacc_ablk_encrypt,
++				.decrypt = spacc_ablk_decrypt,
++				.min_keysize = 16,
++				.max_keysize = 16,
++				.ivsize = 8,
++			},
++			.cra_init = spacc_ablk_cra_init,
++			.cra_exit = spacc_ablk_cra_exit,
++		},
++	},
++};
++
++static int __devinit spacc_probe(struct platform_device *pdev,
++				 unsigned max_ctxs, size_t cipher_pg_sz,
++				 size_t hash_pg_sz, size_t fifo_sz,
++				 struct spacc_alg *algs, size_t num_algs)
++{
++	int i, err, ret = -EINVAL;
++	struct resource *mem, *irq;
++	struct spacc_engine *engine = devm_kzalloc(&pdev->dev, sizeof(*engine),
++						   GFP_KERNEL);
++	if (!engine)
++		return -ENOMEM;
++
++	engine->max_ctxs	= max_ctxs;
++	engine->cipher_pg_sz	= cipher_pg_sz;
++	engine->hash_pg_sz	= hash_pg_sz;
++	engine->fifo_sz		= fifo_sz;
++	engine->algs		= algs;
++	engine->num_algs	= num_algs;
++	engine->name		= dev_name(&pdev->dev);
++
++	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
++	if (!mem || !irq) {
++		dev_err(&pdev->dev, "no memory/irq resource for engine\n");
++		return -ENXIO;
++	}
++
++	if (!devm_request_mem_region(&pdev->dev, mem->start, resource_size(mem),
++				     engine->name))
++		return -ENOMEM;
++
++	engine->regs = devm_ioremap(&pdev->dev, mem->start, resource_size(mem));
++	if (!engine->regs) {
++		dev_err(&pdev->dev, "memory map failed\n");
++		return -ENOMEM;
++	}
++
++	if (devm_request_irq(&pdev->dev, irq->start, spacc_spacc_irq, 0,
++			     engine->name, engine)) {
++		dev_err(engine->dev, "failed to request IRQ\n");
++		return -EBUSY;
++	}
++
++	engine->dev		= &pdev->dev;
++	engine->cipher_ctx_base = engine->regs + SPA_CIPH_KEY_BASE_REG_OFFSET;
++	engine->hash_key_base	= engine->regs + SPA_HASH_KEY_BASE_REG_OFFSET;
++
++	engine->req_pool = dmam_pool_create(engine->name, engine->dev,
++		MAX_DDT_LEN * sizeof(struct spacc_ddt), 8, SZ_64K);
++	if (!engine->req_pool)
++		return -ENOMEM;
++
++	spin_lock_init(&engine->hw_lock);
++
++	engine->clk = clk_get(&pdev->dev, NULL);
++	if (IS_ERR(engine->clk)) {
++		dev_info(&pdev->dev, "clk unavailable\n");
++		device_remove_file(&pdev->dev, &dev_attr_stat_irq_thresh);
++		return PTR_ERR(engine->clk);
++	}
++
++	if (clk_enable(engine->clk)) {
++		dev_info(&pdev->dev, "unable to enable clk\n");
++		clk_put(engine->clk);
++		return -EIO;
++	}
++
++	err = device_create_file(&pdev->dev, &dev_attr_stat_irq_thresh);
++	if (err) {
++		clk_disable(engine->clk);
++		clk_put(engine->clk);
++		return err;
++	}
++
++
++	/*
++	 * Use an IRQ threshold of 50% as a default. This seems to be a
++	 * reasonable trade off of latency against throughput but can be
++	 * changed at runtime.
++	 */
++	engine->stat_irq_thresh = (engine->fifo_sz / 2);
++
++	/*
++	 * Configure the interrupts. We only use the STAT_CNT interrupt as we
++	 * only submit a new packet for processing when we complete another in
++	 * the queue. This minimizes time spent in the interrupt handler.
++	 */
++	writel(engine->stat_irq_thresh << SPA_IRQ_CTRL_STAT_CNT_OFFSET,
++	       engine->regs + SPA_IRQ_CTRL_REG_OFFSET);
++	writel(SPA_IRQ_EN_STAT_EN | SPA_IRQ_EN_GLBL_EN,
++	       engine->regs + SPA_IRQ_EN_REG_OFFSET);
++
++	setup_timer(&engine->packet_timeout, spacc_packet_timeout,
++		    (unsigned long)engine);
++
++	INIT_LIST_HEAD(&engine->pending);
++	INIT_LIST_HEAD(&engine->completed);
++	INIT_LIST_HEAD(&engine->in_progress);
++	engine->in_flight = 0;
++	tasklet_init(&engine->complete, spacc_spacc_complete,
++		     (unsigned long)engine);
++
++	platform_set_drvdata(pdev, engine);
++
++	INIT_LIST_HEAD(&engine->registered_algs);
++	for (i = 0; i < engine->num_algs; ++i) {
++		engine->algs[i].engine = engine;
++		err = crypto_register_alg(&engine->algs[i].alg);
++		if (!err) {
++			list_add_tail(&engine->algs[i].entry,
++				      &engine->registered_algs);
++			ret = 0;
++		}
++		if (err)
++			dev_err(engine->dev, "failed to register alg \"%s\"\n",
++				engine->algs[i].alg.cra_name);
++		else
++			dev_dbg(engine->dev, "registered alg \"%s\"\n",
++				engine->algs[i].alg.cra_name);
++	}
++
++	return ret;
++}
++
++static int __devexit spacc_remove(struct platform_device *pdev)
++{
++	struct spacc_alg *alg, *next;
++	struct spacc_engine *engine = platform_get_drvdata(pdev);
++
++	del_timer_sync(&engine->packet_timeout);
++	device_remove_file(&pdev->dev, &dev_attr_stat_irq_thresh);
++
++	list_for_each_entry_safe(alg, next, &engine->registered_algs, entry) {
++		list_del(&alg->entry);
++		crypto_unregister_alg(&alg->alg);
++	}
++
++	clk_disable(engine->clk);
++	clk_put(engine->clk);
++
++	return 0;
++}
++
++static int __devinit ipsec_probe(struct platform_device *pdev)
++{
++	return spacc_probe(pdev, SPACC_CRYPTO_IPSEC_MAX_CTXS,
++			   SPACC_CRYPTO_IPSEC_CIPHER_PG_SZ,
++			   SPACC_CRYPTO_IPSEC_HASH_PG_SZ,
++			   SPACC_CRYPTO_IPSEC_FIFO_SZ, ipsec_engine_algs,
++			   ARRAY_SIZE(ipsec_engine_algs));
++}
++
++static struct platform_driver ipsec_driver = {
++	.probe		= ipsec_probe,
++	.remove		= __devexit_p(spacc_remove),
++	.driver		= {
++		.name	= "picoxcell-ipsec",
++#ifdef CONFIG_PM
++		.pm	= &spacc_pm_ops,
++#endif /* CONFIG_PM */
++	},
++};
++
++static int __devinit l2_probe(struct platform_device *pdev)
++{
++	return spacc_probe(pdev, SPACC_CRYPTO_L2_MAX_CTXS,
++			   SPACC_CRYPTO_L2_CIPHER_PG_SZ,
++			   SPACC_CRYPTO_L2_HASH_PG_SZ, SPACC_CRYPTO_L2_FIFO_SZ,
++			   l2_engine_algs, ARRAY_SIZE(l2_engine_algs));
++}
++
++static struct platform_driver l2_driver = {
++	.probe		= l2_probe,
++	.remove		= __devexit_p(spacc_remove),
++	.driver		= {
++		.name	= "picoxcell-l2",
++#ifdef CONFIG_PM
++		.pm	= &spacc_pm_ops,
++#endif /* CONFIG_PM */
++	},
++};
++
++static int __init spacc_init(void)
++{
++	int ret = platform_driver_register(&ipsec_driver);
++	if (ret) {
++		pr_err("failed to register ipsec spacc driver");
++		goto out;
++	}
++
++	ret = platform_driver_register(&l2_driver);
++	if (ret) {
++		pr_err("failed to register l2 spacc driver");
++		goto l2_failed;
++	}
++
++	return 0;
++
++l2_failed:
++	platform_driver_unregister(&ipsec_driver);
++out:
++	return ret;
++}
++module_init(spacc_init);
++
++static void __exit spacc_exit(void)
++{
++	platform_driver_unregister(&ipsec_driver);
++	platform_driver_unregister(&l2_driver);
++}
++module_exit(spacc_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Jamie Iles");
+diff --git a/drivers/crypto/picoxcell_crypto_regs.h b/drivers/crypto/picoxcell_crypto_regs.h
+new file mode 100644
+index 0000000..af93442
+--- /dev/null
++++ b/drivers/crypto/picoxcell_crypto_regs.h
+@@ -0,0 +1,128 @@
++/*
++ * Copyright (c) 2010 Picochip Ltd., Jamie Iles
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++#ifndef __PICOXCELL_CRYPTO_REGS_H__
++#define __PICOXCELL_CRYPTO_REGS_H__
++
++#define SPA_STATUS_OK			0
++#define SPA_STATUS_ICV_FAIL		1
++#define SPA_STATUS_MEMORY_ERROR		2
++#define SPA_STATUS_BLOCK_ERROR		3
++
++#define SPA_IRQ_CTRL_STAT_CNT_OFFSET	16
++#define SPA_IRQ_STAT_STAT_MASK		(1 << 4)
++#define SPA_FIFO_STAT_STAT_OFFSET	16
++#define SPA_FIFO_STAT_STAT_CNT_MASK	(0x3F << SPA_FIFO_STAT_STAT_OFFSET)
++#define SPA_STATUS_RES_CODE_OFFSET	24
++#define SPA_STATUS_RES_CODE_MASK	(0x3 << SPA_STATUS_RES_CODE_OFFSET)
++#define SPA_KEY_SZ_CTX_INDEX_OFFSET	8
++#define SPA_KEY_SZ_CIPHER_OFFSET	31
++
++#define SPA_IRQ_EN_REG_OFFSET		0x00000000
++#define SPA_IRQ_STAT_REG_OFFSET		0x00000004
++#define SPA_IRQ_CTRL_REG_OFFSET		0x00000008
++#define SPA_FIFO_STAT_REG_OFFSET	0x0000000C
++#define SPA_SDMA_BRST_SZ_REG_OFFSET	0x00000010
++#define SPA_SRC_PTR_REG_OFFSET		0x00000020
++#define SPA_DST_PTR_REG_OFFSET		0x00000024
++#define SPA_OFFSET_REG_OFFSET		0x00000028
++#define SPA_AAD_LEN_REG_OFFSET		0x0000002C
++#define SPA_PROC_LEN_REG_OFFSET		0x00000030
++#define SPA_ICV_LEN_REG_OFFSET		0x00000034
++#define SPA_ICV_OFFSET_REG_OFFSET	0x00000038
++#define SPA_SW_CTRL_REG_OFFSET		0x0000003C
++#define SPA_CTRL_REG_OFFSET		0x00000040
++#define SPA_AUX_INFO_REG_OFFSET		0x0000004C
++#define SPA_STAT_POP_REG_OFFSET		0x00000050
++#define SPA_STATUS_REG_OFFSET		0x00000054
++#define SPA_KEY_SZ_REG_OFFSET		0x00000100
++#define SPA_CIPH_KEY_BASE_REG_OFFSET	0x00004000
++#define SPA_HASH_KEY_BASE_REG_OFFSET	0x00008000
++#define SPA_RC4_CTX_BASE_REG_OFFSET	0x00020000
++
++#define SPA_IRQ_EN_REG_RESET		0x00000000
++#define SPA_IRQ_CTRL_REG_RESET		0x00000000
++#define SPA_FIFO_STAT_REG_RESET		0x00000000
++#define SPA_SDMA_BRST_SZ_REG_RESET	0x00000000
++#define SPA_SRC_PTR_REG_RESET		0x00000000
++#define SPA_DST_PTR_REG_RESET		0x00000000
++#define SPA_OFFSET_REG_RESET		0x00000000
++#define SPA_AAD_LEN_REG_RESET		0x00000000
++#define SPA_PROC_LEN_REG_RESET		0x00000000
++#define SPA_ICV_LEN_REG_RESET		0x00000000
++#define SPA_ICV_OFFSET_REG_RESET	0x00000000
++#define SPA_SW_CTRL_REG_RESET		0x00000000
++#define SPA_CTRL_REG_RESET		0x00000000
++#define SPA_AUX_INFO_REG_RESET		0x00000000
++#define SPA_STAT_POP_REG_RESET		0x00000000
++#define SPA_STATUS_REG_RESET		0x00000000
++#define SPA_KEY_SZ_REG_RESET		0x00000000
++
++#define SPA_CTRL_HASH_ALG_IDX		4
++#define SPA_CTRL_CIPH_MODE_IDX		8
++#define SPA_CTRL_HASH_MODE_IDX		12
++#define SPA_CTRL_CTX_IDX		16
++#define SPA_CTRL_ENCRYPT_IDX		24
++#define SPA_CTRL_AAD_COPY		25
++#define SPA_CTRL_ICV_PT			26
++#define SPA_CTRL_ICV_ENC		27
++#define SPA_CTRL_ICV_APPEND		28
++#define SPA_CTRL_KEY_EXP		29
++
++#define SPA_KEY_SZ_CXT_IDX		8
++#define SPA_KEY_SZ_CIPHER_IDX		31
++
++#define SPA_IRQ_EN_CMD0_EN		(1 << 0)
++#define SPA_IRQ_EN_STAT_EN		(1 << 4)
++#define SPA_IRQ_EN_GLBL_EN		(1 << 31)
++
++#define SPA_CTRL_CIPH_ALG_NULL		0x00
++#define SPA_CTRL_CIPH_ALG_DES		0x01
++#define SPA_CTRL_CIPH_ALG_AES		0x02
++#define SPA_CTRL_CIPH_ALG_RC4		0x03
++#define SPA_CTRL_CIPH_ALG_MULTI2	0x04
++#define SPA_CTRL_CIPH_ALG_KASUMI	0x05
++
++#define SPA_CTRL_HASH_ALG_NULL		(0x00 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_MD5		(0x01 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_SHA		(0x02 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_SHA224	(0x03 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_SHA256	(0x04 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_SHA384	(0x05 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_SHA512	(0x06 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_AESMAC	(0x07 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_AESCMAC	(0x08 << SPA_CTRL_HASH_ALG_IDX)
++#define SPA_CTRL_HASH_ALG_KASF9		(0x09 << SPA_CTRL_HASH_ALG_IDX)
++
++#define SPA_CTRL_CIPH_MODE_NULL		(0x00 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_ECB		(0x00 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_CBC		(0x01 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_CTR		(0x02 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_CCM		(0x03 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_GCM		(0x05 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_OFB		(0x07 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_CFB		(0x08 << SPA_CTRL_CIPH_MODE_IDX)
++#define SPA_CTRL_CIPH_MODE_F8		(0x09 << SPA_CTRL_CIPH_MODE_IDX)
++
++#define SPA_CTRL_HASH_MODE_RAW		(0x00 << SPA_CTRL_HASH_MODE_IDX)
++#define SPA_CTRL_HASH_MODE_SSLMAC	(0x01 << SPA_CTRL_HASH_MODE_IDX)
++#define SPA_CTRL_HASH_MODE_HMAC		(0x02 << SPA_CTRL_HASH_MODE_IDX)
++
++#define SPA_FIFO_STAT_EMPTY		(1 << 31)
++#define SPA_FIFO_CMD_FULL		(1 << 7)
++
++#endif /* __PICOXCELL_CRYPTO_REGS_H__ */
 -- 
-1.6.0.2
+1.7.4
