@@ -1,40 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH](updated) rfc4106, Intel, AES-NI: Don't leak memory in
-	rfc4106_set_hash_subkey()..
-Date: Wed, 16 Feb 2011 13:04:21 +1100
-Message-ID: <20110216020421.GA8201@gondor.apana.org.au>
-References: <4d502ccb.p+rKcuFjWCnBlXY9%tadeusz.struk@intel.com> <alpine.LNX.2.00.1102071922220.27796@swampdragon.chaosbits.net> <20110211142647.GA3920@ucw.cz> <DF7BB929B28FCF479E888E3D9F8D9E88F3E2E668@irsmsx502.ger.corp.intel.com> <alpine.LNX.2.00.1102111546310.13370@swampdragon.chaosbits.net> <alpine.LNX.2.00.1102112204020.16994@swampdragon.chaosbits.net> <alpine.LNX.2.00.1102112211230.16994@swampdragon.chaosbits.net>
+Subject: Crypto Fixes for 2.6.38
+Date: Wed, 16 Feb 2011 16:39:11 +1100
+Message-ID: <20110216053911.GA10999__18586.1880927861$1297834785$gmane$org@gondor.apana.org.au>
+References: <20091230021253.GA17067@gondor.apana.org.au> <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
-	tadeusz.struk@intel.com, Pavel Machek <pavel@ucw.cz>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
-	"Hoban, Adrian" <adrian.hoban@intel.com>
-To: Jesper Juhl <jj@chaosbits.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:47728 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:51530 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932871Ab1BPCEc (ORCPT
+	with ESMTP id S1751454Ab1BPFjT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Feb 2011 21:04:32 -0500
+	Wed, 16 Feb 2011 00:39:19 -0500
 Content-Disposition: inline
-In-Reply-To: <alpine.LNX.2.00.1102112211230.16994@swampdragon.chaosbits.net>
+In-Reply-To: <20101215115035.GA25248@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 11, 2011 at 10:14:44PM +0100, Jesper Juhl wrote:
-> 
-> And of course I just had to screw up and send the wrong diff. The one I 
-> sent does not compile and was a temporary file I imported into the mail by 
-> accident :-(
-> Below is the real patch - changelog above still applies - sorry about 
-> that.
-> 
-> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+Hi Linus:
 
-Patch applied.  Thanks!
+This push fixes an ancient bug in s390's implementation of SHA
+that manifests itself only under certain conditions.  This bug
+causes the generation of incorrect hashes, and potentially memory
+corruption.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Herbert Xu (1):
+      crypto: sha-s390 - Reset index after processing partial block
+
+ arch/s390/crypto/sha_common.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+ 
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
