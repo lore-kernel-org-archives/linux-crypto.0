@@ -1,38 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] picoxcell_crypto: add support for the picoxcell crypto
-	engines
-Date: Mon, 21 Feb 2011 16:48:34 +1100
-Message-ID: <20110221054834.GB26462@gondor.apana.org.au>
-References: <1297776733-17816-1-git-send-email-jamie@jamieiles.com>
+From: David Sterba <dsterba@suse.cz>
+Subject: [PATCH] crypto: do not attempt to write to readonly variable
+Date: Mon, 21 Feb 2011 15:27:22 +0100
+Message-ID: <1298298442-24697-1-git-send-email-dsterba@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Jamie Iles <jamie@jamieiles.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-kernel@vger.kernel.org, David Sterba <dsterba@suse.cz>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39585 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752935Ab1BUFsj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Feb 2011 00:48:39 -0500
-Content-Disposition: inline
-In-Reply-To: <1297776733-17816-1-git-send-email-jamie@jamieiles.com>
+Received: from cantor.suse.de ([195.135.220.2]:33443 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754212Ab1BUO1h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Feb 2011 09:27:37 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 15, 2011 at 01:32:13PM +0000, Jamie Iles wrote:
-> Picochip picoXcell devices have two crypto engines, one targeted
-> at IPSEC offload and the other at WCDMA layer 2 ciphering.
-> 
-> v2:	- use symbolic constants for key sizes etc
-> 	- cleanup DDT generation
-> 	- use strict_strtoul() for stat irq threshold
-> 	- minor code cleanups
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+Commit da7f033ddc9fdeb (=E2=80=9Dcrypto: cryptomgr - Add test infrastru=
+cture=E2=80=9D) added a
+const to variable which is later used as target buffer of memcpy.
 
-Patch applied.  Thanks Jamie!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+crypto/tcrypt.c:217:12: warning: passing 'const char (*)[128]' to param=
+eter of type 'void *' discards qualifiers
+                                memset(&iv, 0xff, iv_len);
+
+
+crypto/tcrypt.c:test_cipher_speed()
+
+-       unsigned char *key, iv[128];
++       const char *key, iv[128];
+=2E..
+        memset(&iv, 0xff, iv_len);
+
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: David Sterba <dsterba@suse.cz>
+---
+ crypto/tcrypt.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 9aac5e5..e912ea5 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -146,7 +146,8 @@ static void test_cipher_speed(const char *algo, int=
+ enc, unsigned int sec,
+ 			      unsigned int tcount, u8 *keysize)
+ {
+ 	unsigned int ret, i, j, iv_len;
+-	const char *key, iv[128];
++	const char *key;
++	char iv[128];
+ 	struct crypto_blkcipher *tfm;
+ 	struct blkcipher_desc desc;
+ 	const char *e;
+--=20
+1.7.4
