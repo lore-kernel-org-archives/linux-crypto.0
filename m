@@ -1,57 +1,52 @@
-From: David Sterba <dsterba@suse.cz>
-Subject: [PATCH] crypto: do not attempt to write to readonly variable
-Date: Mon, 21 Feb 2011 15:27:22 +0100
-Message-ID: <1298298442-24697-1-git-send-email-dsterba@suse.cz>
+From: "Mark Burkley" <crypto-dev@emutex.com>
+Subject: Development of asynchronous deflate for IPComp
+Date: Wed, 23 Feb 2011 09:59:27 -0000
+Message-ID: <010001cbd340$5ee932e0$1cbb98a0$@com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org, David Sterba <dsterba@suse.cz>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:33443 "EHLO mx1.suse.de"
+Received: from gran.netsource.ie ([212.17.32.37]:42084 "EHLO gran.netsource.ie"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754212Ab1BUO1h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Feb 2011 09:27:37 -0500
+	id S1752601Ab1BWLB7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Feb 2011 06:01:59 -0500
+Received: from 87-198-137-210.static.ptr.magnet.ie ([87.198.137.210] helo=statler.emutex.com)
+	by gran.netsource.ie with esmtp (Exim 3.36 #1)
+	id 1PsBVP-0005aT-00
+	for linux-crypto@vger.kernel.org; Wed, 23 Feb 2011 09:59:35 +0000
+Content-Language: en-ie
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit da7f033ddc9fdeb (=E2=80=9Dcrypto: cryptomgr - Add test infrastru=
-cture=E2=80=9D) added a
-const to variable which is later used as target buffer of memcpy.
+Hi all,
 
-crypto/tcrypt.c:217:12: warning: passing 'const char (*)[128]' to param=
-eter of type 'void *' discards qualifiers
-                                memset(&iv, 0xff, iv_len);
+Just a short note to let you know we are almost finished development of a
+patch to allow asynchronous compression in ipcomp.  This enables a module to
+register asynchronous deflate in order to use a hardware deflate
+accelerator.
+
+We followed the scheme for ahash and ablkcipher to create an acompress
+strcuture and modified xfrm_ipcomp.c to handle an -EINPROGRESS return from
+the call to comp_compress with a callback that completes building the IPComp
+header and then calls xfrm_output_resume.
+
+I did a quick search but didn't find any other patches to enable asynch
+compression but I would be interested to hear from anyone else who might be
+working in this area.
+
+There are no immediate plans to upstream the patch (we are still on 2.6.29)
+but it is something I will be pushing for especially if there is interest in
+adding this to the kernel.
+
+Feedback welcome,
+
+Thanks,
+
+Mark
 
 
-crypto/tcrypt.c:test_cipher_speed()
-
--       unsigned char *key, iv[128];
-+       const char *key, iv[128];
-=2E..
-        memset(&iv, 0xff, iv_len);
-
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: David Sterba <dsterba@suse.cz>
----
- crypto/tcrypt.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 9aac5e5..e912ea5 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -146,7 +146,8 @@ static void test_cipher_speed(const char *algo, int=
- enc, unsigned int sec,
- 			      unsigned int tcount, u8 *keysize)
- {
- 	unsigned int ret, i, j, iv_len;
--	const char *key, iv[128];
-+	const char *key;
-+	char iv[128];
- 	struct crypto_blkcipher *tfm;
- 	struct blkcipher_desc desc;
- 	const char *e;
---=20
-1.7.4
+-- 
+Mark Burkley <mark@emutex.com>            
+http://www.emutex.com/
