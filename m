@@ -1,52 +1,34 @@
-From: "Mark Burkley" <crypto-dev@emutex.com>
-Subject: Development of asynchronous deflate for IPComp
-Date: Wed, 23 Feb 2011 09:59:27 -0000
-Message-ID: <010001cbd340$5ee932e0$1cbb98a0$@com>
+From: "Ian Davies" <iandavies198@gmail.com>
+Subject: Please i wait to hear from you urgently, it very important
+Date: Thu, 24 Feb 2011 11:14:13 -0800
+Message-ID: <20110224200926.38A245E002C@mail.dumlupinar.edu.tr>
+Reply-To: <iandavies822@yahoo.no>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain;charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
-To: <linux-crypto@vger.kernel.org>
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gran.netsource.ie ([212.17.32.37]:42084 "EHLO gran.netsource.ie"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752601Ab1BWLB7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Feb 2011 06:01:59 -0500
-Received: from 87-198-137-210.static.ptr.magnet.ie ([87.198.137.210] helo=statler.emutex.com)
-	by gran.netsource.ie with esmtp (Exim 3.36 #1)
-	id 1PsBVP-0005aT-00
-	for linux-crypto@vger.kernel.org; Wed, 23 Feb 2011 09:59:35 +0000
-Content-Language: en-ie
+Received: from dpusmtpgw.dpu.edu.tr ([194.27.43.31]:64594 "EHLO
+	dpusmtpgw.dumlupinar.edu.tr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753946Ab1BYCyc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Feb 2011 21:54:32 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all,
+I am Ian Davies ;an accredited vendor of Alliot Groups, a subsidiary firm of Emirates International Holding (EIH); A private equity funds holding company that focuses on hedge funds.
 
-Just a short note to let you know we are almost finished development of a
-patch to allow asynchronous compression in ipcomp.  This enables a module to
-register asynchronous deflate in order to use a hardware deflate
-accelerator.
+I have contacted you in the hope that you can be my associate by accepting to stand as the legal recipient to a Fixed-Income deposit, valued at 25MUSD by provind an International Offshore account to clear the funds.
 
-We followed the scheme for ahash and ablkcipher to create an acompress
-strcuture and modified xfrm_ipcomp.c to handle an -EINPROGRESS return from
-the call to comp_compress with a callback that completes building the IPComp
-header and then calls xfrm_output_resume.
-
-I did a quick search but didn't find any other patches to enable asynch
-compression but I would be interested to hear from anyone else who might be
-working in this area.
-
-There are no immediate plans to upstream the patch (we are still on 2.6.29)
-but it is something I will be pushing for especially if there is interest in
-adding this to the kernel.
-
-Feedback welcome,
-
-Thanks,
-
-Mark
+Once I file your details as the new recipient to the funds, the fundswill be approved through the AUTOMATED CLEARING HOUSE (ACH) - A facility used by financial institutions to distribute electronic debit and credit entries to bank accounts and therefore settles such entries. Under the automated clearing house system. 
 
 
--- 
-Mark Burkley <mark@emutex.com>            
-http://www.emutex.com/
+upon approval of your details  as the new recipient; a Credit advice will be issued in your favor and the funds will clear in your account within three banking days. I am willing to give you 40% which is 10MUSD as your commission out of the 25MUSD for your assistance in providing an International Offshore account to clear the funds.
+
+
+I am confident you will be honest enough to adhere to our agreed commissions in spite of the 25MUSD coming through your account. I will need you to forward me your legal names address and phone to file your details on the fund as the new recipient in this first Quater of the financial fiscal year 2011.
+
+Looking forward to working with you.
+Ian Davies
+Accredited vendor
+Alliot Groups PS
