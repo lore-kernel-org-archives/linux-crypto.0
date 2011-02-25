@@ -1,34 +1,39 @@
-From: "Ian Davies" <iandavies198@gmail.com>
-Subject: Please i wait to hear from you urgently, it very important
-Date: Thu, 24 Feb 2011 11:14:13 -0800
-Message-ID: <20110224200926.38A245E002C@mail.dumlupinar.edu.tr>
-Reply-To: <iandavies822@yahoo.no>
+From: Atul Sowani <sowani@gmail.com>
+Subject: [PATCH 2.6.37.2 1/1] crypto: Uninitialized variable fix.
+Date: Fri, 25 Feb 2011 23:28:28 +0530
+Message-ID: <4D67EDC4.3020103@gmail.com>
+Reply-To: sowani@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain;charset="Windows-1251"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Cc: linux-crypto@vger.kernel.org, gregkh@suse.de
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dpusmtpgw.dpu.edu.tr ([194.27.43.31]:64594 "EHLO
-	dpusmtpgw.dumlupinar.edu.tr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753946Ab1BYCyc (ORCPT
+Received: from mail-px0-f174.google.com ([209.85.212.174]:34245 "EHLO
+	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755822Ab1BYSA7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Feb 2011 21:54:32 -0500
+	Fri, 25 Feb 2011 13:00:59 -0500
+Received: by pxi15 with SMTP id 15so291472pxi.19
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2011 10:00:59 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I am Ian Davies ;an accredited vendor of Alliot Groups, a subsidiary firm of Emirates International Holding (EIH); A private equity funds holding company that focuses on hedge funds.
+Array inter[4] was uninitialized in anubis_crypt() and was causing
+compiler warning. Added the array initialization.
 
-I have contacted you in the hope that you can be my associate by accepting to stand as the legal recipient to a Fixed-Income deposit, valued at 25MUSD by provind an International Offshore account to clear the funds.
+Signed-off-by: Atul Sowani <sowani@gmail.com>
+---
 
-Once I file your details as the new recipient to the funds, the fundswill be approved through the AUTOMATED CLEARING HOUSE (ACH) - A facility used by financial institutions to distribute electronic debit and credit entries to bank accounts and therefore settles such entries. Under the automated clearing house system. 
+diff a/crypto/anubis.c b/crypto/anubis.c
+--- a/crypto/anubis.c   2011-02-25 04:39:00.000000000 +0530
++++ b/crypto/anubis.c   2011-02-25 23:07:12.000000000 +0530
+@@ -578,7 +578,7 @@ static void anubis_crypt(u32 roundKey[AN
+         __be32 *dst = (__be32 *)ciphertext;
+         int i, r;
+         u32 state[4];
+-       u32 inter[4];
++       u32 inter[4] = { 0, 0, 0, 0 };
 
-
-upon approval of your details  as the new recipient; a Credit advice will be issued in your favor and the funds will clear in your account within three banking days. I am willing to give you 40% which is 10MUSD as your commission out of the 25MUSD for your assistance in providing an International Offshore account to clear the funds.
-
-
-I am confident you will be honest enough to adhere to our agreed commissions in spite of the 25MUSD coming through your account. I will need you to forward me your legal names address and phone to file your details on the fund as the new recipient in this first Quater of the financial fiscal year 2011.
-
-Looking forward to working with you.
-Ian Davies
-Accredited vendor
-Alliot Groups PS
+         /*
+          * map plaintext block to cipher state (mu)
