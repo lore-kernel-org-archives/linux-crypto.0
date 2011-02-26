@@ -1,43 +1,34 @@
-From: Greg KH <gregkh@suse.de>
-Subject: Re: [PATCH 2.6.37.2 1/1] crypto: Uninitialized variable fix.
-Date: Fri, 25 Feb 2011 10:09:55 -0800
-Message-ID: <20110225180955.GA22156@suse.de>
-References: <4D67EDC4.3020103@gmail.com>
-Mime-Version: 1.0
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.6b file/swap crypto package
+Date: Sat, 26 Feb 2011 20:40:43 +0200
+Message-ID: <4D69492B.CB694458@users.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Atul Sowani <sowani@gmail.com>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55512 "EHLO mx2.suse.de"
+Received: from mailq1.tnnet.fi ([217.112.240.127]:52849 "EHLO mailq1.tnnet.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756299Ab1BYSKS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Feb 2011 13:10:18 -0500
-Content-Disposition: inline
-In-Reply-To: <4D67EDC4.3020103@gmail.com>
+	id S1752315Ab1BZSvO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 26 Feb 2011 13:51:14 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 25, 2011 at 11:28:28PM +0530, Atul Sowani wrote:
-> Array inter[4] was uninitialized in anubis_crypt() and was causing
-> compiler warning. Added the array initialization.
-> 
-> Signed-off-by: Atul Sowani <sowani@gmail.com>
-> ---
-> 
-> diff a/crypto/anubis.c b/crypto/anubis.c
-> --- a/crypto/anubis.c   2011-02-25 04:39:00.000000000 +0530
-> +++ b/crypto/anubis.c   2011-02-25 23:07:12.000000000 +0530
-> @@ -578,7 +578,7 @@ static void anubis_crypt(u32 roundKey[AN
->         __be32 *dst = (__be32 *)ciphertext;
->         int i, r;
->         u32 state[4];
-> -       u32 inter[4];
-> +       u32 inter[4] = { 0, 0, 0, 0 };
+loop-AES changes since previous release:
+- Fixed a bug that can cause "NULL pointer dereference" at /dev/md* backing
+  device, and possibly other backing devices that call __bio_clone(). This
+  bug is present in loop-AES-v3.6a (and loop-AES-v3.5 versions with
+  linux-2.6.37 or later kernels).
+- Fixed a bug that can cause slow operation or even deadlock. This bug is
+  present only in loop-AES-v3.6a version. Older versions are not affected.
 
-That's nice, it looks like a bug in the compiler, preinitializing this
-variable doesn't fix any real bug.
 
-sorry,
+bzip2 compressed tarball is here:
 
-greg k-h
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6b.tar.bz2
+    md5sum 247e5a909877577bdcd246f8caada689
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6b.tar.bz2.sign
+
+-- 
+Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
