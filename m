@@ -1,34 +1,32 @@
-From: Jari Ruusu <jariruusu@users.sourceforge.net>
-Subject: Announce loop-AES-v3.6b file/swap crypto package
-Date: Sat, 26 Feb 2011 20:40:43 +0200
-Message-ID: <4D69492B.CB694458@users.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii
+From: Kent Borg <kentborg@borg.org>
+Subject: aes-generic.c: what mode is it?
+Date: Mon, 28 Feb 2011 14:48:50 -0500
+Message-ID: <4D6BFC22.2010505@borg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailq1.tnnet.fi ([217.112.240.127]:52849 "EHLO mailq1.tnnet.fi"
+Received: from borg.org ([64.105.205.123]:58340 "EHLO borg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752315Ab1BZSvO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 26 Feb 2011 13:51:14 -0500
+	id S1754124Ab1B1UI4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Feb 2011 15:08:56 -0500
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: kentborg)
+	by borg.org (Postfix) with ESMTP id 8D62C186782
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2011 14:48:51 -0500 (EST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-loop-AES changes since previous release:
-- Fixed a bug that can cause "NULL pointer dereference" at /dev/md* backing
-  device, and possibly other backing devices that call __bio_clone(). This
-  bug is present in loop-AES-v3.6a (and loop-AES-v3.5 versions with
-  linux-2.6.37 or later kernels).
-- Fixed a bug that can cause slow operation or even deadlock. This bug is
-  present only in loop-AES-v3.6a version. Older versions are not affected.
+Hardware crypto drivers all seem to have encryption modes, but 
+aes-generic.c does not.  But it must.  What is the mode of 
+aes-generic.c?  ECB seems the most bare-bones...but if it is ECB, why 
+not say so?
 
 
-bzip2 compressed tarball is here:
+Thanks,
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6b.tar.bz2
-    md5sum 247e5a909877577bdcd246f8caada689
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6b.tar.bz2.sign
-
--- 
-Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
+-kb the Kent who is trying to get some new crypto hardware working and 
+is looking to do some cribbing.
