@@ -1,76 +1,53 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC] [PATCH 06/11] esp4: Add support for IPsec extended
- sequence numbers
-Date: Tue, 8 Mar 2011 08:04:46 +0100
-Message-ID: <20110308070446.GA31402@secunet.com>
-References: <20101122102455.GC1868@secunet.com>
- <20101122103014.GI1868@secunet.com>
- <20101202072947.GA22998@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC 12/12] iscsi-target: Add Makefile/Kconfig and update TCM
+	top level
+Date: Tue, 8 Mar 2011 17:33:34 +0800
+Message-ID: <20110308093334.GA21996@gondor.apana.org.au>
+References: <1299539747.19683.333.camel@haakon2.linux-iscsi.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>,
-	Andreas Gruenbacher <agruen@suse.de>,
-	Alex Badea <abadea@ixiacom.com>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: James.Bottomley@hansenpartnership.com, hch@infradead.org,
+	rdunlap@xenotime.net, linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:33789 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752245Ab1CHHEs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Mar 2011 02:04:48 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:45296 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751756Ab1CHJdt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Mar 2011 04:33:49 -0500
 Content-Disposition: inline
-In-Reply-To: <20101202072947.GA22998@gondor.apana.org.au>
+In-Reply-To: <1299539747.19683.333.camel@haakon2.linux-iscsi.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sorry for the huge delay...
+Nicholas A. Bellinger <nab@linux-iscsi.org> wrote:
+>
+>> > I should mention this is with the following .config:
+>> > 
+>> > CONFIG_CRYPTO_CRC32C=y
+>> > CONFIG_CRYPTO_CRC32C_INTEL=m
 
-On Thu, Dec 02, 2010 at 03:29:47PM +0800, Herbert Xu wrote:
-> On Mon, Nov 22, 2010 at 11:30:14AM +0100, Steffen Klassert wrote:
-> >
-> > @@ -205,11 +228,18 @@ static int esp_output(struct xfrm_state *x, struct sk_buff *skb)
-> >  	skb_to_sgvec(skb, sg,
-> >  		     esph->enc_data + crypto_aead_ivsize(aead) - skb->data,
-> >  		     clen + alen);
-> > -	sg_init_one(asg, esph, sizeof(*esph));
-> > +
-> > +	if ((x->props.flags & XFRM_STATE_ESN)) {
-> > +		sg_init_table(asg, 2);
-> > +		sg_set_buf(asg, esph, sizeof(*esph));
-> > +		*seqhi = htonl(XFRM_SKB_CB(skb)->seq.output.hi);
-> > +		sg_set_buf(asg + 1, seqhi, seqhilen);
-> > +	} else
-> > +		sg_init_one(asg, esph, sizeof(*esph));
-> 
-> I think this is wrong for AEAD algorithms.  You want the sequence
-> number in network byte order for them so the high bits need to be
-> inserted into the middle of the ESP header.
-> 
+This is why you get the unoptimised version.  Had you selected
+both as built-in or both as modules, then it would have worked
+as intended.
+ 
+> What about the following to simply call request_module("crc32c_intel")
+> at module_init() time and top the extra iscsi_login_setup_crypto()
+> code..?
 
-Yes, indeed.
+If we're going to do this we should do it in the crypto layer,
+and not litter every single crypto API user with such crap.
 
-> The other problem is that you're currently requiring the authencesn
-> user to provide two SG entries which is fine for now.  However,
-> since this might be exported to user-space in future, authenecesn
-> shouldn't really rely on that, or at least it shouldn't BUG.
-> 
-> So one solution is to do it based on bytes in authencesn.  That is,
-> your associated input should always be 12 bytes long, and then you
-> simply construct a new SG list for your actual processing with the
-> middle 4 bytes taken out.
-> 
-> For IPsec it could just provide an SG list with three entries,
-> of 4 bytes each.
+Currently we don't invoke request_module unless no implementation
+is reigstered for an algorithm.  You can change this so that it
+also invokes request_module if we have not yet done so at least
+once for that algorithm.
 
-Ok, I've updated the patchset in this regard.
+Patches are welcome.
 
-> 
-> Of course for simplicity, you could require this to be the case in
-> authencesn and return -EINVAL (not BUG :) if it's not the case.
-> 
-
-Doing BUG was a leftover from debugging the thing. On debugging it is 
-sometimes better to pull the emergency brake as soon as something
-unexpected happens. I replaced BUG with return -EINVAL now.
-
-I'll resend the patchset for a second round of review.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
