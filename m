@@ -1,7 +1,8 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 0/3] crypto: add support for the Freescale SEC4/CAAM
-Date: Wed, 9 Mar 2011 18:54:31 -0600
-Message-ID: <20110309185431.e73a3c2c.kim.phillips@freescale.com>
+Subject: [PATCH 1/3] crypto: add device tree bindings for the Freescale
+ SEC4/CAAM
+Date: Wed, 9 Mar 2011 18:54:41 -0600
+Message-ID: <20110309185441.b152077d.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
@@ -10,51 +11,559 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
 	<devicetree-discuss@lists.ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe003.messaging.microsoft.com ([216.32.180.13]:51995
-	"EHLO VA3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753045Ab1CJAym (ORCPT
+Received: from va3ehsobe002.messaging.microsoft.com ([216.32.180.12]:53284
+	"EHLO VA3EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753045Ab1CJAyz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Mar 2011 19:54:42 -0500
+	Wed, 9 Mar 2011 19:54:55 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-splitting and resending due to apparent 100KB message limit imposed by
-linux-crypto and devicetree-discuss mailing lists.
+Add SEC4 device tree binding documentation and add a SEC4
+device node to the P4080's dts.
 
-No content has been changed from the original post that made it through
-linuxppc-dev's 400KB limit, available here:
-
-http://patchwork.ozlabs.org/patch/86051/
-
- .../devicetree/bindings/crypto/fsl-sec4.txt        |  409 +++++
- arch/powerpc/boot/dts/p4080ds.dts                  |   95 ++-
- drivers/crypto/Kconfig                             |    2 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/caam/Kconfig                        |   72 +
- drivers/crypto/caam/Makefile                       |    8 +
- drivers/crypto/caam/caamalg.c                      | 1163 ++++++++++++++
- drivers/crypto/caam/compat.h                       |   35 +
- drivers/crypto/caam/ctrl.c                         |  270 ++++
- drivers/crypto/caam/desc.h                         | 1605 ++++++++++++++++++++
- drivers/crypto/caam/desc_constr.h                  |  204 +++
- drivers/crypto/caam/error.c                        |  248 +++
- drivers/crypto/caam/error.h                        |   10 +
- drivers/crypto/caam/intern.h                       |  113 ++
- drivers/crypto/caam/jr.c                           |  523 +++++++
- drivers/crypto/caam/jr.h                           |   21 +
- drivers/crypto/caam/regs.h                         |  663 ++++++++
- 17 files changed, 5441 insertions(+), 1 deletions(-)
+Signed-off-by: Steve Cornelius <sec@pobox.com>
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ .../devicetree/bindings/crypto/fsl-sec4.txt        |  409 ++++++++++++++++++++
+ arch/powerpc/boot/dts/p4080ds.dts                  |   95 +++++-
+ 2 files changed, 503 insertions(+), 1 deletions(-)
  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-sec4.txt
- create mode 100644 drivers/crypto/caam/Kconfig
- create mode 100644 drivers/crypto/caam/Makefile
- create mode 100644 drivers/crypto/caam/caamalg.c
- create mode 100644 drivers/crypto/caam/compat.h
- create mode 100644 drivers/crypto/caam/ctrl.c
- create mode 100644 drivers/crypto/caam/desc.h
- create mode 100644 drivers/crypto/caam/desc_constr.h
- create mode 100644 drivers/crypto/caam/error.c
- create mode 100644 drivers/crypto/caam/error.h
- create mode 100644 drivers/crypto/caam/intern.h
- create mode 100644 drivers/crypto/caam/jr.c
- create mode 100644 drivers/crypto/caam/jr.h
- create mode 100644 drivers/crypto/caam/regs.h
+
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+new file mode 100644
+index 0000000..fce16a8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -0,0 +1,409 @@
++=====================================================================
++SEC 4 Device Tree Binding
++Copyright (C) 2008-2011 Freescale Semiconductor Inc.
++
++ CONTENTS
++   -Overview
++   -SEC 4 Node
++   -Job Ring Node
++   -Run Time Integrity Check (RTIC) Node
++   -Run Time Integrity Check (RTIC) Memory Node
++   -Secure Non-Volatile Storage (SNVS) Node
++   -Full Example
++
++NOTE: the SEC 4 is also known as Freescale's Cryptographic Accelerator
++Accelerator and Assurance Module (CAAM).
++
++=====================================================================
++Overview
++
++DESCRIPTION
++
++SEC 4 h/w can process requests from 2 types of sources.
++1. DPAA Queue Interface (HW interface between Queue Manager & SEC 4).
++2. Job Rings (HW interface between cores & SEC 4 registers).
++
++High Speed Data Path Configuration:
++
++HW interface between QM & SEC 4 and also BM & SEC 4, on DPAA-enabled parts
++such as the P4080.  The number of simultaneous dequeues the QI can make is
++equal to the number of Descriptor Controller (DECO) engines in a particular
++SEC version.  E.g., the SEC 4.0 in the P4080 has 5 DECOs and can thus
++dequeue from 5 subportals simultaneously.
++
++Job Ring Data Path Configuration:
++
++Each JR is located on a separate 4k page, they may (or may not) be made visible
++in the memory partition devoted to a particular core.  The P4080 has 4 JRs, so
++up to 4 JRs can be configured; and all 4 JRs process requests in parallel.
++
++=====================================================================
++P4080 SEC 4 Node
++
++Description
++
++    Node defines the base address of the SEC 4 block.
++    This block specifies the address range of all global
++    configuration registers for the SEC 4 block.  It
++    also receives interrupts from the Run Time Integrity Check
++    (RTIC) function within the SEC 4 block.
++
++PROPERTIES
++
++   - compatible
++      Usage: required
++      Value type: <string>
++      Definition: Must include "fsl,p4080-sec4.0","fsl,sec-4.0"
++
++   - #address-cells
++       Usage: required
++       Value type: <u32>
++       Definition: A standard property.  Defines the number of cells
++           for representing physical addresses in child nodes.
++
++   - #size-cells
++       Usage: required
++       Value type: <u32>
++       Definition: A standard property.  Defines the number of cells
++           for representing the size of physical addresses in
++           child nodes.
++
++   - reg
++      Usage: required
++      Value type: <prop-encoded-array>
++      Definition: A standard property.  Specifies the physical
++          address and length of the SEC4.0 configuration registers.
++          registers
++
++   - ranges
++       Usage: required
++       Value type: <prop-encoded-array>
++       Definition: A standard property.  Specifies the physical address
++           range of the SEC 4.0 register space (-SNVS not included).  A
++           triplet that includes the child address, parent address, &
++           length.
++
++   - interrupts
++      Usage: required
++      Value type: <prop_encoded-array>
++      Definition:  Specifies the interrupts generated by this
++           device.  The value of the interrupts property
++           consists of one interrupt specifier. The format
++           of the specifier is defined by the binding document
++           describing the node's interrupt parent.
++
++   - interrupt-parent
++      Usage: (required if interrupt property is defined)
++      Value type: <phandle>
++      Definition: A single <phandle> value that points
++          to the interrupt parent to which the child domain
++          is being mapped.
++
++   Note: All other standard properties (see the ePAPR) are allowed
++   but are optional.
++
++
++EXAMPLE
++	crypto@300000 {
++		compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0x300000 0x10000>;
++		ranges = <0 0x300000 0x10000>;
++		interrupt-parent = <&mpic>;
++		interrupts = <92 2>;
++	};
++
++=====================================================================
++P4080 Job Ring (JR) Node
++
++    Child of the crypto node defines data processing interface to SEC 4
++    across the peripheral bus for purposes of processing
++    cryptographic descriptors. The specified address
++    range can be made visible to one (or more) cores.
++    The interrupt defined for this node is controlled within
++    the address range of this node.
++
++  - compatible
++      Usage: required
++      Value type: <string>
++      Definition: Must include "fsl,p4080-sec4.0-job-ring","fsl,sec4.0-job-ring"
++
++  - reg
++      Usage: required
++      Value type: <prop-encoded-array>
++      Definition: Specifies a two JR parameters:  an offset from
++          the parent physical address and the length the JR registers.
++
++   - fsl,liodn
++       Usage: optional-but-recommended
++       Value type: <prop-encoded-array>
++       Definition:
++           Specifies the LIODN to be used in conjunction with
++           the ppid-to-liodn table that specifies the PPID to LIODN mapping.
++           Needed if the PAMU is used.  Value is a 12 bit value
++           where value is a LIODN ID for this JR. This property is
++           normally set by boot firmware.
++
++   - interrupts
++      Usage: required
++      Value type: <prop_encoded-array>
++      Definition:  Specifies the interrupts generated by this
++           device.  The value of the interrupts property
++           consists of one interrupt specifier. The format
++           of the specifier is defined by the binding document
++           describing the node's interrupt parent.
++
++   - interrupt-parent
++      Usage: (required if interrupt property is defined)
++      Value type: <phandle>
++      Definition: A single <phandle> value that points
++          to the interrupt parent to which the child domain
++          is being mapped.
++
++EXAMPLE
++	jr@1000 {
++		compatible = "fsl,p4080-sec4.0-job-ring",
++			     "fsl,sec4.0-job-ring";
++		reg = <0x1000 0x1000>;
++		fsl,liodn = <0x081>;
++		interrupt-parent = <&mpic>;
++		interrupts = <88 2>;
++	};
++
++
++=====================================================================
++P4080 Run Time Integrity Check (RTIC) Node
++
++  Child node of the crypto node.  Defines a register space that
++  contains up to 5 sets of addresses and their lengths (sizes) that
++  will be checked at run time.  After an initial hash result is
++  calculated, these addresses are checked by HW to monitor any
++  change.  If any memory is modified, a Security Violation is
++  triggered (see SNVS definition).
++
++
++  - compatible
++      Usage: required
++      Value type: <string>
++      Definition: Must include "fsl,p4080-sec4.0-rtic","fsl,sec4.0-rtic".
++
++   - #address-cells
++       Usage: required
++       Value type: <u32>
++       Definition: A standard property.  Defines the number of cells
++           for representing physical addresses in child nodes.  Must
++           have a value of 1.
++
++   - #size-cells
++       Usage: required
++       Value type: <u32>
++       Definition: A standard property.  Defines the number of cells
++           for representing the size of physical addresses in
++           child nodes.  Must have a value of 1.
++
++  - reg
++      Usage: required
++      Value type: <prop-encoded-array>
++      Definition: A standard property.  Specifies a two parameters:
++          an offset from the parent physical address and the length
++          the SEC4 registers.
++
++   - ranges
++       Usage: required
++       Value type: <prop-encoded-array>
++       Definition: A standard property.  Specifies the physical address
++           range of the SEC 4 register space (-SNVS not included).  A
++           triplet that includes the child address, parent address, &
++           length.
++
++EXAMPLE
++	rtic@6000 {
++		compatible = "fsl,p4080-sec4.0-rtic",
++			     "fsl,sec4.0-rtic";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0x6000 0x100>;
++		ranges = <0x0 0x6100 0xe00>;
++	};
++
++=====================================================================
++P4080 Run Time Integrity Check (RTIC) Memory Node
++  A child node that defines individual RTIC memory regions that are used to
++  perform run-time integrity check of memory areas that should not modified.
++  The node defines a register that contains the memory address &
++  length (combined) and a second register that contains the hash result
++  in big endian format.
++
++  - compatible
++      Usage: required
++      Value type: <string>
++      Definition: Must include "fsl,p4080-sec4.0-rtic-memory","fsl,sec4.0-rtic-memory".
++
++  - reg
++      Usage: required
++      Value type: <prop-encoded-array>
++      Definition: A standard property.  Specifies two parameters:
++          an offset from the parent physical address and the length:
++
++          1. The location of the RTIC memory address & length registers.
++          2. The location RTIC hash result.
++
++  - fsl,rtic-region
++       Usage: optional-but-recommended
++       Value type: <prop-encoded-array>
++       Definition:
++           Specifies the HW address (36 bit address) for this region
++           followed by the length of the HW partition to be checked;
++           the address is represented as a 64 bit quantity followed
++           by a 32 bit length.
++
++   - fsl,liodn
++       Usage: optional-but-recommended
++       Value type: <prop-encoded-array>
++       Definition:
++           Specifies the LIODN to be used in conjunction with
++           the ppid-to-liodn table that specifies the PPID to LIODN
++           mapping.  Needed if the PAMU is used.  Value is a 12 bit value
++           where value is a LIODN ID for this RTIC memory region. This
++           property is normally set by boot firmware.
++
++EXAMPLE
++	rtic-a@0 {
++		compatible = "fsl,p4080-sec4.0-rtic-memory",
++			     "fsl,sec4.0-rtic-memory";
++		reg = <0x00 0x20 0x100 0x80>;
++		fsl,liodn   = <0x03c>;
++		fsl,rtic-region  = <0x12345678 0x12345678 0x12345678>;
++	};
++
++=====================================================================
++P4080 Secure Non-Volatile Storage (SNVS) Node
++
++    Node defines address range and the associated
++    interrupt for the SNVS function.  This function
++    monitors security state information & reports
++    security violations.
++
++  - compatible
++      Usage: required
++      Value type: <string>
++      Definition: Must include "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon".
++
++  - reg
++      Usage: required
++      Value type: <prop-encoded-array>
++      Definition: A standard property.  Specifies the physical
++          address and length of the SEC4 configuration
++          registers.
++
++   - interrupts
++      Usage: required
++      Value type: <prop_encoded-array>
++      Definition:  Specifies the interrupts generated by this
++           device.  The value of the interrupts property
++           consists of one interrupt specifier. The format
++           of the specifier is defined by the binding document
++           describing the node's interrupt parent.
++
++   - interrupt-parent
++      Usage: (required if interrupt property is defined)
++      Value type: <phandle>
++      Definition: A single <phandle> value that points
++          to the interrupt parent to which the child domain
++          is being mapped.
++
++EXAMPLE
++	sec_mon@314000 {
++		compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++		reg = <0x314000 0x1000>;
++		interrupt-parent = <&mpic>;
++		interrupts = <93 2>;
++	};
++
++=====================================================================
++FULL EXAMPLE
++
++	crypto: crypto@300000 {
++		compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		reg = <0x300000 0x10000>;
++		ranges = <0 0x300000 0x10000>;
++		interrupt-parent = <&mpic>;
++		interrupts = <92 2>;
++
++		sec_jr0: jr@1000 {
++			compatible = "fsl,p4080-sec4.0-job-ring",
++				     "fsl,sec4.0-job-ring";
++			reg = <0x1000 0x1000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <88 2>;
++		};
++
++		sec_jr1: jr@2000 {
++			compatible = "fsl,p4080-sec4.0-job-ring",
++				     "fsl,sec4.0-job-ring";
++			reg = <0x2000 0x1000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <89 2>;
++		};
++
++		sec_jr2: jr@3000 {
++			compatible = "fsl,p4080-sec4.0-job-ring",
++				     "fsl,sec4.0-job-ring";
++			reg = <0x3000 0x1000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <90 2>;
++		};
++
++		sec_jr3: jr@4000 {
++			compatible = "fsl,p4080-sec4.0-job-ring",
++				     "fsl,sec4.0-job-ring";
++			reg = <0x4000 0x1000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <91 2>;
++		};
++
++		rtic@6000 {
++			compatible = "fsl,p4080-sec4.0-rtic",
++				     "fsl,sec4.0-rtic";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			reg = <0x6000 0x100>;
++			ranges = <0x0 0x6100 0xe00>;
++
++			rtic_a: rtic-a@0 {
++				compatible = "fsl,p4080-sec4.0-rtic-memory",
++					     "fsl,sec4.0-rtic-memory";
++				reg = <0x00 0x20 0x100 0x80>;
++			};
++
++			rtic_b: rtic-b@20 {
++				compatible = "fsl,p4080-sec4.0-rtic-memory",
++					     "fsl,sec4.0-rtic-memory";
++				reg = <0x20 0x20 0x200 0x80>;
++			};
++
++			rtic_c: rtic-c@40 {
++				compatible = "fsl,p4080-sec4.0-rtic-memory",
++					     "fsl,sec4.0-rtic-memory";
++				reg = <0x40 0x20 0x300 0x80>;
++			};
++
++			rtic_d: rtic-d@60 {
++				compatible = "fsl,p4080-sec4.0-rtic-memory",
++					     "fsl,sec4.0-rtic-memory";
++				reg = <0x60 0x20 0x500 0x80>;
++			};
++		};
++	};
++
++	sec_mon: sec_mon@314000 {
++		compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++		reg = <0x314000 0x1000>;
++		interrupt-parent = <&mpic>;
++		interrupts = <93 2>;
++	};
++
++=====================================================================
+diff --git a/arch/powerpc/boot/dts/p4080ds.dts b/arch/powerpc/boot/dts/p4080ds.dts
+index 5b7fc29..c78e801 100644
+--- a/arch/powerpc/boot/dts/p4080ds.dts
++++ b/arch/powerpc/boot/dts/p4080ds.dts
+@@ -1,7 +1,7 @@
+ /*
+  * P4080DS Device Tree Source
+  *
+- * Copyright 2009 Freescale Semiconductor Inc.
++ * Copyright 2009-2011 Freescale Semiconductor Inc.
+  *
+  * This program is free software; you can redistribute	it and/or modify it
+  * under  the terms of	the GNU General	 Public License as published by the
+@@ -33,6 +33,17 @@
+ 		dma1 = &dma1;
+ 		sdhc = &sdhc;
+ 
++		crypto = &crypto;
++		sec_jr0 = &sec_jr0;
++		sec_jr1 = &sec_jr1;
++		sec_jr2 = &sec_jr2;
++		sec_jr3 = &sec_jr3;
++		rtic_a = &rtic_a;
++		rtic_b = &rtic_b;
++		rtic_c = &rtic_c;
++		rtic_d = &rtic_d;
++		sec_mon = &sec_mon;
++
+ 		rio0 = &rapidio0;
+ 	};
+ 
+@@ -410,6 +421,88 @@
+ 			dr_mode = "host";
+ 			phy_type = "ulpi";
+ 		};
++
++		crypto: crypto@300000 {
++			compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			reg = <0x300000 0x10000>;
++			ranges = <0 0x300000 0x10000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <92 2>;
++
++			sec_jr0: jr@1000 {
++				compatible = "fsl,p4080-sec4.0-job-ring",
++					     "fsl,sec4.0-job-ring";
++				reg = <0x1000 0x1000>;
++				interrupt-parent = <&mpic>;
++				interrupts = <88 2>;
++			};
++
++			sec_jr1: jr@2000 {
++				compatible = "fsl,p4080-sec4.0-job-ring",
++					     "fsl,sec4.0-job-ring";
++				reg = <0x2000 0x1000>;
++				interrupt-parent = <&mpic>;
++				interrupts = <89 2>;
++			};
++
++			sec_jr2: jr@3000 {
++				compatible = "fsl,p4080-sec4.0-job-ring",
++					     "fsl,sec4.0-job-ring";
++				reg = <0x3000 0x1000>;
++				interrupt-parent = <&mpic>;
++				interrupts = <90 2>;
++			};
++
++			sec_jr3: jr@4000 {
++				compatible = "fsl,p4080-sec4.0-job-ring",
++					     "fsl,sec4.0-job-ring";
++				reg = <0x4000 0x1000>;
++				interrupt-parent = <&mpic>;
++				interrupts = <91 2>;
++			};
++
++			rtic@6000 {
++				compatible = "fsl,p4080-sec4.0-rtic",
++					     "fsl,sec4.0-rtic";
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x6000 0x100>;
++				ranges = <0x0 0x6100 0xe00>;
++
++				rtic_a: rtic-a@0 {
++					compatible = "fsl,p4080-sec4.0-rtic-memory",
++						     "fsl,sec4.0-rtic-memory";
++					reg = <0x00 0x20 0x100 0x80>;
++				};
++
++				rtic_b: rtic-b@20 {
++					compatible = "fsl,p4080-sec4.0-rtic-memory",
++						     "fsl,sec4.0-rtic-memory";
++					reg = <0x20 0x20 0x200 0x80>;
++				};
++
++				rtic_c: rtic-c@40 {
++					compatible = "fsl,p4080-sec4.0-rtic-memory",
++						     "fsl,sec4.0-rtic-memory";
++					reg = <0x40 0x20 0x300 0x80>;
++				};
++
++				rtic_d: rtic-d@60 {
++					compatible = "fsl,p4080-sec4.0-rtic-memory",
++						     "fsl,sec4.0-rtic-memory";
++					reg = <0x60 0x20 0x500 0x80>;
++				};
++			};
++		};
++
++		sec_mon: sec_mon@314000 {
++			compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++			reg = <0x314000 0x1000>;
++			interrupt-parent = <&mpic>;
++			interrupts = <93 2>;
++		};
+ 	};
+ 
+ 	rapidio0: rapidio@ffe0c0000 {
+-- 
+1.7.4.1
