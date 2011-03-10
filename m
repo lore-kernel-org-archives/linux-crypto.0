@@ -1,46 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
 Subject: Re: [PATCH 0/2] Add struct crypto_alg->cra_check_optimized for
 	crc32c_intel
-Date: Thu, 10 Mar 2011 16:43:46 +0800
-Message-ID: <20110310084346.GA10650@gondor.apana.org.au>
+Date: Thu, 10 Mar 2011 00:54:24 -0800
+Message-ID: <1299747264.5263.35.camel@haakon2.linux-iscsi.org>
 References: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org>
+	 <20110310084346.GA10650@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 Cc: linux-kernel <linux-kernel@vger.kernel.org>,
 	linux-crypto <linux-crypto@vger.kernel.org>,
 	James Bottomley <James.Bottomley@suse.de>,
 	Christoph Hellwig <hch@lst.de>,
 	Randy Dunlap <rdunlap@xenotime.net>,
 	linux-scsi <linux-scsi@vger.kernel.org>
-To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57610 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751292Ab1CJIoD (ORCPT
+Received: from mail.linux-iscsi.org ([67.23.28.174]:55727 "EHLO
+	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751762Ab1CJJBL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Mar 2011 03:44:03 -0500
-Content-Disposition: inline
-In-Reply-To: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org>
+	Thu, 10 Mar 2011 04:01:11 -0500
+In-Reply-To: <20110310084346.GA10650@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 10, 2011 at 12:21:10AM -0800, Nicholas A. Bellinger wrote:
+On Thu, 2011-03-10 at 16:43 +0800, Herbert Xu wrote:
+> On Thu, Mar 10, 2011 at 12:21:10AM -0800, Nicholas A. Bellinger wrote:
+> > 
+> > Nicholas Bellinger (2):
+> >   crypto: Add struct crypto_alg->cra_check_optimized
+> >   crypto/crc32c: Add crc32c_cra_check_optimized for crc32c_intel
 > 
-> Nicholas Bellinger (2):
->   crypto: Add struct crypto_alg->cra_check_optimized
->   crypto/crc32c: Add crc32c_cra_check_optimized for crc32c_intel
+> I think you misunderstood my suggestion.  The reason I asked
+> for this to be done in the crypto API is because it is not specific
+> to crc32c_intel.
+> 
+> So sending me a patch that modifies crc32c clearly misses the
+> point :)
+> 
+> This should be done in the core API, i.e., api.c/algapi.c.
+> 
 
-I think you misunderstood my suggestion.  The reason I asked
-for this to be done in the crypto API is because it is not specific
-to crc32c_intel.
+OK, so you mean each struct crypto_alg should define something like a
+'cra_optimized_name' for which request_module(alg->cra_optimized_name)
+is called somewhere in libcrypto code..?
 
-So sending me a patch that modifies crc32c clearly misses the
-point :)
-
-This should be done in the core API, i.e., api.c/algapi.c.
+Would you mind being a bit more specific where this should be happening
+in api.c/algapi.c..?
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--nab
