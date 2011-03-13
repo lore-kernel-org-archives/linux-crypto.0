@@ -1,78 +1,42 @@
-From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
-Subject: Re: [PATCH 0/2] Add struct crypto_alg->cra_check_optimized for
-	crc32c_intel
-Date: Thu, 10 Mar 2011 02:05:17 -0800
-Message-ID: <1299751517.5263.60.camel@haakon2.linux-iscsi.org>
-References: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org>
-	 <20110310084346.GA10650@gondor.apana.org.au>
-	 <1299747264.5263.35.camel@haakon2.linux-iscsi.org>
-	 <20110310090929.GA10919@gondor.apana.org.au>
-	 <1299748387.5263.45.camel@haakon2.linux-iscsi.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC v2 PATCH 1/9] crypto: authencesn - Add algorithm to
+	handle IPsec extended sequence numbers
+Date: Sun, 13 Mar 2011 14:30:17 +0800
+Message-ID: <20110313063017.GA10849@gondor.apana.org.au>
+References: <20110308100407.GB31402@secunet.com> <20110308100458.GC31402@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	James Bottomley <James.Bottomley@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Randy Dunlap <rdunlap@xenotime.net>,
-	linux-scsi <linux-scsi@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>,
+	Alex Badea <abadea@ixiacom.com>,
+	Andreas Gruenbacher <agruen@suse.de>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linux-iscsi.org ([67.23.28.174]:43854 "EHLO
-	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750921Ab1CJKMG (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:43045 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751736Ab1CMGah (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Mar 2011 05:12:06 -0500
-In-Reply-To: <1299748387.5263.45.camel@haakon2.linux-iscsi.org>
+	Sun, 13 Mar 2011 01:30:37 -0500
+Content-Disposition: inline
+In-Reply-To: <20110308100458.GC31402@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2011-03-10 at 01:13 -0800, Nicholas A. Bellinger wrote:
-> On Thu, 2011-03-10 at 17:09 +0800, Herbert Xu wrote:
-> > On Thu, Mar 10, 2011 at 12:54:24AM -0800, Nicholas A. Bellinger wrote:
-> > >
-> > > OK, so you mean each struct crypto_alg should define something like a
-> > > 'cra_optimized_name' for which request_module(alg->cra_optimized_name)
-> > > is called somewhere in libcrypto code..?
-> > 
-> > No, what I mean is that whenever we look up an algorithm through
-> > crypto_alg_mod_lookup, we should conditionally call modprobe if
-> > we havn't done so already.
-> > 
-> > So you just need to record one bit of info in each crypto_alg
-> > object to indicate whether we have invoked modprobe.  I suggest
-> > adding a CRYPTO_ALG_* bit.
-> > 
-> 
-> Mmmm, now I am really confused, and please let me apologize in advance
-> for my lack of experience with libcrypto internals..  ;)
-> 
-> I thought the problem was that CONFIG_CRYPTO_ALGFOO=y and
-> CONFIG_CRYPTO_ALGFOO_ARCH_HW_OFFLOAD=m would cause the latter to not
-> explictly call request_module() for this HW offload case..
-> 
-> So what I don't understand how adding a request_module() call to a list
-> of known modules works when crc32c_intel.ko has not been loaded yet..?
-> 
-> Am I missing something obvious wrt to how crc32c.ko can tell libcrypto
-> about which architecture dependent optimized modules it should load..?
-> 
+On Tue, Mar 08, 2011 at 11:04:58AM +0100, Steffen Klassert wrote:
+>
+> +	return crypto_authenc_esn_genicv(req, iv, CRYPTO_TFM_REQ_MAY_SLEEP);
 
-Just to clarify a bit on my previous comments..
+BTW, we should get rid of these MAY_SLEEP flags.  Originally I
+included them for the IPsec encryption path because that happens
+to be sleepable.  We should instead be getting it from the request
+itself.
 
-We are still expecting the libcrypto consumer (iscsi_target_mod.ko) to
-call the arch independent crypto_alloc_hash("crc32c", ...) in order to
-have libcrypto backend logic perform a request_module() upon
-architecture dependent offload modules (like crc32c_intel.ko) that
-libcrypto consumers are not (and should not) be calling directly via
-crypto_alloc_host("crc32c_intel", ...), correct..?
+Also, as soon as we enter the async path it becomes unsleepable.
 
-Where I am getting confused is wrt to a new crypto_alg_mod_lookup() ->
-request_module() call for a struct shash_alg that has not yet be loaded
-via arch/x86/crypto/crc32c-intel.c:crc32c_intel_mod_init() ->
-crypto_register_shash().
+Of course this affects the existing authenc file as well.
 
-Thanks,
-
---nab
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
