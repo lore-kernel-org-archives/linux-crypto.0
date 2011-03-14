@@ -1,63 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Add struct crypto_alg->cra_check_optimized for
-	crc32c_intel
-Date: Sun, 13 Mar 2011 17:01:58 +0800
-Message-ID: <20110313090158.GA12473@gondor.apana.org.au>
-References: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org> <20110310084346.GA10650@gondor.apana.org.au> <1299747264.5263.35.camel@haakon2.linux-iscsi.org> <20110310090929.GA10919@gondor.apana.org.au> <1299748387.5263.45.camel@haakon2.linux-iscsi.org> <1299751517.5263.60.camel@haakon2.linux-iscsi.org>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [RFC v2 PATCH 1/9] crypto: authencesn - Add algorithm to
+ handle IPsec extended sequence numbers
+Date: Mon, 14 Mar 2011 09:37:41 +0100
+Message-ID: <20110314083741.GN31402@secunet.com>
+References: <20110308100407.GB31402@secunet.com>
+ <20110308100458.GC31402@secunet.com>
+ <20110313063017.GA10849@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	James Bottomley <James.Bottomley@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Randy Dunlap <rdunlap@xenotime.net>,
-	linux-scsi <linux-scsi@vger.kernel.org>
-To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Cc: David Miller <davem@davemloft.net>,
+	Alex Badea <abadea@ixiacom.com>,
+	Andreas Gruenbacher <agruen@suse.de>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37482 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753303Ab1CMJCM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 13 Mar 2011 05:02:12 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:60178 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752284Ab1CNIhn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Mar 2011 04:37:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1299751517.5263.60.camel@haakon2.linux-iscsi.org>
+In-Reply-To: <20110313063017.GA10849@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 10, 2011 at 02:05:17AM -0800, Nicholas A. Bellinger wrote:
->
-> We are still expecting the libcrypto consumer (iscsi_target_mod.ko) to
-> call the arch independent crypto_alloc_hash("crc32c", ...) in order to
-> have libcrypto backend logic perform a request_module() upon
-> architecture dependent offload modules (like crc32c_intel.ko) that
-> libcrypto consumers are not (and should not) be calling directly via
-> crypto_alloc_host("crc32c_intel", ...), correct..?
+On Sun, Mar 13, 2011 at 02:30:17PM +0800, Herbert Xu wrote:
+> On Tue, Mar 08, 2011 at 11:04:58AM +0100, Steffen Klassert wrote:
+> >
+> > +	return crypto_authenc_esn_genicv(req, iv, CRYPTO_TFM_REQ_MAY_SLEEP);
+> 
+> BTW, we should get rid of these MAY_SLEEP flags.  Originally I
+> included them for the IPsec encryption path because that happens
+> to be sleepable. We should instead be getting it from the request
+> itself.
+> 
 
-Right.
-
-> Where I am getting confused is wrt to a new crypto_alg_mod_lookup() ->
-> request_module() call for a struct shash_alg that has not yet be loaded
-> via arch/x86/crypto/crc32c-intel.c:crc32c_intel_mod_init() ->
-> crypto_register_shash().
-
-If you look at crypto_alg_mod_lookup, basically there are two paths.
-Either we already have a registered algorithm of the requested name,
-or we don't.
-
-In the first case, we won't invoke request_module and in the second
-case we will.
-
-So what I'm suggesting is that in the first case we also invoke
-request_module conditionally.  Now exactly what that condition is
-is the tricky bit.
-
-The easiest is to flip a bit in the algorithm we just found.  This
-isn't optimal as it'll mean that for each unregistered algorithm
-we'll end up modprobing twice, but that shouldn't be too bad I
-think.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Not sure if I get you right, but we do not set this flag here.
+We use it to mask the flags we got from the request, so we pass
+this flag to the ahash algorithm just if it was set by the
+original aead request.
