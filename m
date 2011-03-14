@@ -1,39 +1,80 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC v2 PATCH 1/9] crypto: authencesn - Add algorithm to
- handle IPsec extended sequence numbers
-Date: Mon, 14 Mar 2011 11:02:45 +0100
-Message-ID: <20110314100245.GO31402@secunet.com>
-References: <20110308100407.GB31402@secunet.com>
- <20110308100458.GC31402@secunet.com>
- <20110313063017.GA10849@gondor.apana.org.au>
- <20110314083741.GN31402@secunet.com>
- <20110314093907.GA25957@gondor.apana.org.au>
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Subject: Re: [PATCH 0/2] Add struct crypto_alg->cra_check_optimized for
+	crc32c_intel
+Date: Mon, 14 Mar 2011 05:14:17 -0700
+Message-ID: <1300104857.28255.77.camel@haakon2.linux-iscsi.org>
+References: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org>
+	 <20110310084346.GA10650@gondor.apana.org.au>
+	 <1299747264.5263.35.camel@haakon2.linux-iscsi.org>
+	 <20110310090929.GA10919@gondor.apana.org.au>
+	 <1299748387.5263.45.camel@haakon2.linux-iscsi.org>
+	 <1299751517.5263.60.camel@haakon2.linux-iscsi.org>
+	 <20110313090158.GA12473@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>,
-	Alex Badea <abadea@ixiacom.com>,
-	Andreas Gruenbacher <agruen@suse.de>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	James Bottomley <James.Bottomley@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Randy Dunlap <rdunlap@xenotime.net>,
+	linux-scsi <linux-scsi@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:55332 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751042Ab1CNKCr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Mar 2011 06:02:47 -0400
-Content-Disposition: inline
-In-Reply-To: <20110314093907.GA25957@gondor.apana.org.au>
+Received: from mail.linux-iscsi.org ([67.23.28.174]:41368 "EHLO
+	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755311Ab1CNMVU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Mar 2011 08:21:20 -0400
+In-Reply-To: <20110313090158.GA12473@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 14, 2011 at 05:39:07PM +0800, Herbert Xu wrote:
-> > 
-> > Not sure if I get you right, but we do not set this flag here.
-> > We use it to mask the flags we got from the request, so we pass
-> > this flag to the ahash algorithm just if it was set by the
-> > original aead request.
+On Sun, 2011-03-13 at 17:01 +0800, Herbert Xu wrote:
+> On Thu, Mar 10, 2011 at 02:05:17AM -0800, Nicholas A. Bellinger wrote:
+> >
+> > We are still expecting the libcrypto consumer (iscsi_target_mod.ko) to
+> > call the arch independent crypto_alloc_hash("crc32c", ...) in order to
+> > have libcrypto backend logic perform a request_module() upon
+> > architecture dependent offload modules (like crc32c_intel.ko) that
+> > libcrypto consumers are not (and should not) be calling directly via
+> > crypto_alloc_host("crc32c_intel", ...), correct..?
 > 
-> Indeed you are right.  As long as it is only a mask and only
-> used on the sync path it should be OK.
+> Right.
+> 
+> > Where I am getting confused is wrt to a new crypto_alg_mod_lookup() ->
+> > request_module() call for a struct shash_alg that has not yet be loaded
+> > via arch/x86/crypto/crc32c-intel.c:crc32c_intel_mod_init() ->
+> > crypto_register_shash().
+> 
+> If you look at crypto_alg_mod_lookup, basically there are two paths.
+> Either we already have a registered algorithm of the requested name,
+> or we don't.
+> 
+> In the first case, we won't invoke request_module and in the second
+> case we will.
+> 
+> So what I'm suggesting is that in the first case we also invoke
+> request_module conditionally.  Now exactly what that condition is
+> is the tricky bit.
+> 
+> The easiest is to flip a bit in the algorithm we just found.  This
+> isn't optimal as it'll mean that for each unregistered algorithm
+> we'll end up modprobing twice, but that shouldn't be too bad I
+> think.
 > 
 
-Yes, that's how it is used in both, authenc and authencesn.
+Hi Herbert,
+
+Thanks for your feedback on this issue, and again my apologies for the
+lack of experience beyond the external libcrypto API.  I will take
+another look this week and see if something can be produced more along
+the lines of what you had in mind to resolve this special case.  In the
+mean time the extra crypto_alloc_hash("crc32c-intel", ...) calls have
+been removed from RFC-v2 iscsi-target code posted earlier this morning.
+
+Please feel free to add any other pointers and I will have a look.
+
+Best Regards,
+
+--nab
