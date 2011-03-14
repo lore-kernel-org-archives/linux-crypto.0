@@ -1,80 +1,414 @@
-From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
-Subject: Re: [PATCH 0/2] Add struct crypto_alg->cra_check_optimized for
-	crc32c_intel
-Date: Mon, 14 Mar 2011 05:14:17 -0700
-Message-ID: <1300104857.28255.77.camel@haakon2.linux-iscsi.org>
-References: <1299745272-25477-1-git-send-email-nab@linux-iscsi.org>
-	 <20110310084346.GA10650@gondor.apana.org.au>
-	 <1299747264.5263.35.camel@haakon2.linux-iscsi.org>
-	 <20110310090929.GA10919@gondor.apana.org.au>
-	 <1299748387.5263.45.camel@haakon2.linux-iscsi.org>
-	 <1299751517.5263.60.camel@haakon2.linux-iscsi.org>
-	 <20110313090158.GA12473@gondor.apana.org.au>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH] crypto: caam - standardize device tree naming convention to
+ utilize '-vX.Y'
+Date: Mon, 14 Mar 2011 17:42:47 -0500
+Message-ID: <20110314174247.e5515448.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	James Bottomley <James.Bottomley@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Randy Dunlap <rdunlap@xenotime.net>,
-	linux-scsi <linux-scsi@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kumar Gala <kumar.gala@freescale.com>,
+	Steve Cornelius <sec@pobox.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	<devicetree-discuss@lists.ozlabs.org>,
+	<linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linux-iscsi.org ([67.23.28.174]:41368 "EHLO
-	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755311Ab1CNMVU (ORCPT
+Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:44089
+	"EHLO VA3EHSOBE001.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751715Ab1CNWn0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Mar 2011 08:21:20 -0400
-In-Reply-To: <20110313090158.GA12473@gondor.apana.org.au>
+	Mon, 14 Mar 2011 18:43:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 2011-03-13 at 17:01 +0800, Herbert Xu wrote:
-> On Thu, Mar 10, 2011 at 02:05:17AM -0800, Nicholas A. Bellinger wrote:
-> >
-> > We are still expecting the libcrypto consumer (iscsi_target_mod.ko) to
-> > call the arch independent crypto_alloc_hash("crc32c", ...) in order to
-> > have libcrypto backend logic perform a request_module() upon
-> > architecture dependent offload modules (like crc32c_intel.ko) that
-> > libcrypto consumers are not (and should not) be calling directly via
-> > crypto_alloc_host("crc32c_intel", ...), correct..?
-> 
-> Right.
-> 
-> > Where I am getting confused is wrt to a new crypto_alg_mod_lookup() ->
-> > request_module() call for a struct shash_alg that has not yet be loaded
-> > via arch/x86/crypto/crc32c-intel.c:crc32c_intel_mod_init() ->
-> > crypto_register_shash().
-> 
-> If you look at crypto_alg_mod_lookup, basically there are two paths.
-> Either we already have a registered algorithm of the requested name,
-> or we don't.
-> 
-> In the first case, we won't invoke request_module and in the second
-> case we will.
-> 
-> So what I'm suggesting is that in the first case we also invoke
-> request_module conditionally.  Now exactly what that condition is
-> is the tricky bit.
-> 
-> The easiest is to flip a bit in the algorithm we just found.  This
-> isn't optimal as it'll mean that for each unregistered algorithm
-> we'll end up modprobing twice, but that shouldn't be too bad I
-> think.
-> 
+Help clarify that the number trailing in compatible nomenclature
+is the version number of the device, i.e., change:
 
-Hi Herbert,
+"fsl,p4080-sec4.0", "fsl,sec4.0";
 
-Thanks for your feedback on this issue, and again my apologies for the
-lack of experience beyond the external libcrypto API.  I will take
-another look this week and see if something can be produced more along
-the lines of what you had in mind to resolve this special case.  In the
-mean time the extra crypto_alloc_hash("crc32c-intel", ...) calls have
-been removed from RFC-v2 iscsi-target code posted earlier this morning.
+to:
 
-Please feel free to add any other pointers and I will have a look.
+"fsl,p4080-sec-v4.0", "fsl,sec-v4.0";
 
-Best Regards,
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Cc: Kumar Gala <kumar.gala@freescale.com>
+Cc: Steve Cornelius <sec@pobox.com>
+---
+ .../devicetree/bindings/crypto/fsl-sec4.txt        |   68 ++++++++++----------
+ arch/powerpc/boot/dts/p4080ds.dts                  |   41 ++++++------
+ drivers/crypto/caam/caamalg.c                      |    4 +-
+ drivers/crypto/caam/ctrl.c                         |    6 +-
+ 4 files changed, 60 insertions(+), 59 deletions(-)
 
---nab
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index fce16a8..568aa3c 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -53,7 +53,7 @@ PROPERTIES
+    - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,p4080-sec4.0","fsl,sec-4.0"
++      Definition: Must include "fsl,p4080-sec-v4.0","fsl,sec-v4.0"
+ 
+    - #address-cells
+        Usage: required
+@@ -72,7 +72,7 @@ PROPERTIES
+       Usage: required
+       Value type: <prop-encoded-array>
+       Definition: A standard property.  Specifies the physical
+-          address and length of the SEC4.0 configuration registers.
++          address and length of the SEC4 configuration registers.
+           registers
+ 
+    - ranges
+@@ -105,7 +105,7 @@ PROPERTIES
+ 
+ EXAMPLE
+ 	crypto@300000 {
+-		compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++		compatible = "fsl,p4080-sec-v4.0", "fsl,sec-v4.0";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		reg = <0x300000 0x10000>;
+@@ -127,7 +127,7 @@ P4080 Job Ring (JR) Node
+   - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,p4080-sec4.0-job-ring","fsl,sec4.0-job-ring"
++      Definition: Must include "fsl,p4080-sec-v4.0-job-ring","fsl,sec-v4.0-job-ring"
+ 
+   - reg
+       Usage: required
+@@ -163,8 +163,8 @@ P4080 Job Ring (JR) Node
+ 
+ EXAMPLE
+ 	jr@1000 {
+-		compatible = "fsl,p4080-sec4.0-job-ring",
+-			     "fsl,sec4.0-job-ring";
++		compatible = "fsl,p4080-sec-v4.0-job-ring",
++			     "fsl,sec-v4.0-job-ring";
+ 		reg = <0x1000 0x1000>;
+ 		fsl,liodn = <0x081>;
+ 		interrupt-parent = <&mpic>;
+@@ -186,7 +186,7 @@ P4080 Run Time Integrity Check (RTIC) Node
+   - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,p4080-sec4.0-rtic","fsl,sec4.0-rtic".
++      Definition: Must include "fsl,p4080-sec-v4.0-rtic","fsl,sec-v4.0-rtic".
+ 
+    - #address-cells
+        Usage: required
+@@ -219,8 +219,8 @@ P4080 Run Time Integrity Check (RTIC) Node
+ 
+ EXAMPLE
+ 	rtic@6000 {
+-		compatible = "fsl,p4080-sec4.0-rtic",
+-			     "fsl,sec4.0-rtic";
++		compatible = "fsl,p4080-sec-v4.0-rtic",
++			     "fsl,sec-v4.0-rtic";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		reg = <0x6000 0x100>;
+@@ -238,7 +238,7 @@ P4080 Run Time Integrity Check (RTIC) Memory Node
+   - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,p4080-sec4.0-rtic-memory","fsl,sec4.0-rtic-memory".
++      Definition: Must include "fsl,p4080-sec-v4.0-rtic-memory","fsl,sec-v4.0-rtic-memory".
+ 
+   - reg
+       Usage: required
+@@ -270,8 +270,8 @@ P4080 Run Time Integrity Check (RTIC) Memory Node
+ 
+ EXAMPLE
+ 	rtic-a@0 {
+-		compatible = "fsl,p4080-sec4.0-rtic-memory",
+-			     "fsl,sec4.0-rtic-memory";
++		compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++			     "fsl,sec-v4.0-rtic-memory";
+ 		reg = <0x00 0x20 0x100 0x80>;
+ 		fsl,liodn   = <0x03c>;
+ 		fsl,rtic-region  = <0x12345678 0x12345678 0x12345678>;
+@@ -288,7 +288,7 @@ P4080 Secure Non-Volatile Storage (SNVS) Node
+   - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon".
++      Definition: Must include "fsl,p4080-sec-v4.0-mon", "fsl,sec-v4.0-mon".
+ 
+   - reg
+       Usage: required
+@@ -315,7 +315,7 @@ P4080 Secure Non-Volatile Storage (SNVS) Node
+ 
+ EXAMPLE
+ 	sec_mon@314000 {
+-		compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++		compatible = "fsl,p4080-sec-v4.0-mon", "fsl,sec-v4.0-mon";
+ 		reg = <0x314000 0x1000>;
+ 		interrupt-parent = <&mpic>;
+ 		interrupts = <93 2>;
+@@ -325,7 +325,7 @@ EXAMPLE
+ FULL EXAMPLE
+ 
+ 	crypto: crypto@300000 {
+-		compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++		compatible = "fsl,p4080-sec-v4.0", "fsl,sec-v4.0";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		reg = <0x300000 0x10000>;
+@@ -334,73 +334,73 @@ FULL EXAMPLE
+ 		interrupts = <92 2>;
+ 
+ 		sec_jr0: jr@1000 {
+-			compatible = "fsl,p4080-sec4.0-job-ring",
+-				     "fsl,sec4.0-job-ring";
++			compatible = "fsl,p4080-sec-v4.0-job-ring",
++				     "fsl,sec-v4.0-job-ring";
+ 			reg = <0x1000 0x1000>;
+ 			interrupt-parent = <&mpic>;
+ 			interrupts = <88 2>;
+ 		};
+ 
+ 		sec_jr1: jr@2000 {
+-			compatible = "fsl,p4080-sec4.0-job-ring",
+-				     "fsl,sec4.0-job-ring";
++			compatible = "fsl,p4080-sec-v4.0-job-ring",
++				     "fsl,sec-v4.0-job-ring";
+ 			reg = <0x2000 0x1000>;
+ 			interrupt-parent = <&mpic>;
+ 			interrupts = <89 2>;
+ 		};
+ 
+ 		sec_jr2: jr@3000 {
+-			compatible = "fsl,p4080-sec4.0-job-ring",
+-				     "fsl,sec4.0-job-ring";
++			compatible = "fsl,p4080-sec-v4.0-job-ring",
++				     "fsl,sec-v4.0-job-ring";
+ 			reg = <0x3000 0x1000>;
+ 			interrupt-parent = <&mpic>;
+ 			interrupts = <90 2>;
+ 		};
+ 
+ 		sec_jr3: jr@4000 {
+-			compatible = "fsl,p4080-sec4.0-job-ring",
+-				     "fsl,sec4.0-job-ring";
++			compatible = "fsl,p4080-sec-v4.0-job-ring",
++				     "fsl,sec-v4.0-job-ring";
+ 			reg = <0x4000 0x1000>;
+ 			interrupt-parent = <&mpic>;
+ 			interrupts = <91 2>;
+ 		};
+ 
+ 		rtic@6000 {
+-			compatible = "fsl,p4080-sec4.0-rtic",
+-				     "fsl,sec4.0-rtic";
++			compatible = "fsl,p4080-sec-v4.0-rtic",
++				     "fsl,sec-v4.0-rtic";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+ 			reg = <0x6000 0x100>;
+ 			ranges = <0x0 0x6100 0xe00>;
+ 
+ 			rtic_a: rtic-a@0 {
+-				compatible = "fsl,p4080-sec4.0-rtic-memory",
+-					     "fsl,sec4.0-rtic-memory";
++				compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++					     "fsl,sec-v4.0-rtic-memory";
+ 				reg = <0x00 0x20 0x100 0x80>;
+ 			};
+ 
+ 			rtic_b: rtic-b@20 {
+-				compatible = "fsl,p4080-sec4.0-rtic-memory",
+-					     "fsl,sec4.0-rtic-memory";
++				compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++					     "fsl,sec-v4.0-rtic-memory";
+ 				reg = <0x20 0x20 0x200 0x80>;
+ 			};
+ 
+ 			rtic_c: rtic-c@40 {
+-				compatible = "fsl,p4080-sec4.0-rtic-memory",
+-					     "fsl,sec4.0-rtic-memory";
++				compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++					     "fsl,sec-v4.0-rtic-memory";
+ 				reg = <0x40 0x20 0x300 0x80>;
+ 			};
+ 
+ 			rtic_d: rtic-d@60 {
+-				compatible = "fsl,p4080-sec4.0-rtic-memory",
+-					     "fsl,sec4.0-rtic-memory";
++				compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++					     "fsl,sec-v4.0-rtic-memory";
+ 				reg = <0x60 0x20 0x500 0x80>;
+ 			};
+ 		};
+ 	};
+ 
+ 	sec_mon: sec_mon@314000 {
+-		compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++		compatible = "fsl,p4080-sec-v4.0-mon", "fsl,sec-v4.0-mon";
+ 		reg = <0x314000 0x1000>;
+ 		interrupt-parent = <&mpic>;
+ 		interrupts = <93 2>;
+diff --git a/arch/powerpc/boot/dts/p4080ds.dts b/arch/powerpc/boot/dts/p4080ds.dts
+index c78e801..0430d24 100644
+--- a/arch/powerpc/boot/dts/p4080ds.dts
++++ b/arch/powerpc/boot/dts/p4080ds.dts
+@@ -423,7 +423,7 @@
+ 		};
+ 
+ 		crypto: crypto@300000 {
+-			compatible = "fsl,p4080-sec4.0", "fsl,sec4.0";
++			compatible = "fsl,p4080-sec-v4.0", "fsl,sec-v4.0";
+ 			#address-cells = <1>;
+ 			#size-cells = <1>;
+ 			reg = <0x300000 0x10000>;
+@@ -432,73 +432,74 @@
+ 			interrupts = <92 2>;
+ 
+ 			sec_jr0: jr@1000 {
+-				compatible = "fsl,p4080-sec4.0-job-ring",
+-					     "fsl,sec4.0-job-ring";
++				compatible = "fsl,p4080-sec-v4.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
+ 				reg = <0x1000 0x1000>;
+ 				interrupt-parent = <&mpic>;
+ 				interrupts = <88 2>;
+ 			};
+ 
+ 			sec_jr1: jr@2000 {
+-				compatible = "fsl,p4080-sec4.0-job-ring",
+-					     "fsl,sec4.0-job-ring";
++				compatible = "fsl,p4080-sec-v4.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
+ 				reg = <0x2000 0x1000>;
+ 				interrupt-parent = <&mpic>;
+ 				interrupts = <89 2>;
+ 			};
+ 
+ 			sec_jr2: jr@3000 {
+-				compatible = "fsl,p4080-sec4.0-job-ring",
+-					     "fsl,sec4.0-job-ring";
++				compatible = "fsl,p4080-sec-v4.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
+ 				reg = <0x3000 0x1000>;
+ 				interrupt-parent = <&mpic>;
+ 				interrupts = <90 2>;
+ 			};
+ 
+ 			sec_jr3: jr@4000 {
+-				compatible = "fsl,p4080-sec4.0-job-ring",
+-					     "fsl,sec4.0-job-ring";
++				compatible = "fsl,p4080-sec-v4.0-job-ring",
++					     "fsl,sec-v4.0-job-ring";
+ 				reg = <0x4000 0x1000>;
+ 				interrupt-parent = <&mpic>;
+ 				interrupts = <91 2>;
+ 			};
+ 
+ 			rtic@6000 {
+-				compatible = "fsl,p4080-sec4.0-rtic",
+-					     "fsl,sec4.0-rtic";
++				compatible = "fsl,p4080-sec-v4.0-rtic",
++					     "fsl,sec-v4.0-rtic";
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 				reg = <0x6000 0x100>;
+ 				ranges = <0x0 0x6100 0xe00>;
+ 
+ 				rtic_a: rtic-a@0 {
+-					compatible = "fsl,p4080-sec4.0-rtic-memory",
+-						     "fsl,sec4.0-rtic-memory";
++					compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++						     "fsl,sec-v4.0-rtic-memory";
+ 					reg = <0x00 0x20 0x100 0x80>;
+ 				};
+ 
+ 				rtic_b: rtic-b@20 {
+-					compatible = "fsl,p4080-sec4.0-rtic-memory",
+-						     "fsl,sec4.0-rtic-memory";
++					compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++						     "fsl,sec-v4.0-rtic-memory";
+ 					reg = <0x20 0x20 0x200 0x80>;
+ 				};
+ 
+ 				rtic_c: rtic-c@40 {
+-					compatible = "fsl,p4080-sec4.0-rtic-memory",
+-						     "fsl,sec4.0-rtic-memory";
++					compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++						     "fsl,sec-v4.0-rtic-memory";
+ 					reg = <0x40 0x20 0x300 0x80>;
+ 				};
+ 
+ 				rtic_d: rtic-d@60 {
+-					compatible = "fsl,p4080-sec4.0-rtic-memory",
+-						     "fsl,sec4.0-rtic-memory";
++					compatible = "fsl,p4080-sec-v4.0-rtic-memory",
++						     "fsl,sec-v4.0-rtic-memory";
+ 					reg = <0x60 0x20 0x500 0x80>;
+ 				};
+ 			};
+ 		};
+ 
+ 		sec_mon: sec_mon@314000 {
+-			compatible = "fsl,p4080-sec4.0-mon", "fsl,sec4.0-mon";
++			compatible = "fsl,p4080-sec-v4.0-mon",
++				     "fsl,sec-v4.0-mon";
+ 			reg = <0x314000 0x1000>;
+ 			interrupt-parent = <&mpic>;
+ 			interrupts = <93 2>;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index d7fe3d3..1403434 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1020,7 +1020,7 @@ static void __exit caam_algapi_exit(void)
+ 	struct caam_crypto_alg *t_alg, *n;
+ 	int i, err;
+ 
+-	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+ 	if (!dev_node)
+ 		return;
+ 
+@@ -1094,7 +1094,7 @@ static int __init caam_algapi_init(void)
+ 	struct caam_drv_private *priv;
+ 	int i = 0, err = 0;
+ 
+-	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+ 	if (!dev_node)
+ 		return -ENODEV;
+ 
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index aa22161..59aae4e 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -108,7 +108,7 @@ static int caam_probe(struct platform_device *pdev,
+ 	 * for all, then go probe each one.
+ 	 */
+ 	rspec = 0;
+-	for_each_compatible_node(np, NULL, "fsl,sec4.0-job-ring")
++	for_each_compatible_node(np, NULL, "fsl,sec-v4.0-job-ring")
+ 		rspec++;
+ 	ctrlpriv->jrdev = kzalloc(sizeof(struct device *) * rspec, GFP_KERNEL);
+ 	if (ctrlpriv->jrdev == NULL) {
+@@ -118,7 +118,7 @@ static int caam_probe(struct platform_device *pdev,
+ 
+ 	ring = 0;
+ 	ctrlpriv->total_jobrs = 0;
+-	for_each_compatible_node(np, NULL, "fsl,sec4.0-job-ring") {
++	for_each_compatible_node(np, NULL, "fsl,sec-v4.0-job-ring") {
+ 		caam_jr_probe(pdev, np, ring);
+ 		ctrlpriv->total_jobrs++;
+ 		ring++;
+@@ -236,7 +236,7 @@ static int caam_probe(struct platform_device *pdev,
+ 
+ static struct of_device_id caam_match[] = {
+ 	{
+-		.compatible = "fsl,sec4.0",
++		.compatible = "fsl,sec-v4.0",
+ 	},
+ 	{},
+ };
+-- 
+1.7.4.1
