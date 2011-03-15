@@ -1,63 +1,93 @@
-From: Dan Carpenter <error27@gmail.com>
-Subject: [patch] crypto: caam - ARRAY_SIZE() vs sizeof()
-Date: Tue, 15 Mar 2011 09:59:55 +0300
-Message-ID: <20110315065955.GP2008@bicker>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 2.6.39
+Date: Tue, 15 Mar 2011 22:59:40 +0800
+Message-ID: <20110315145940.GA15373@gondor.apana.org.au>
+References: <20081225001724.GA2813@gondor.apana.org.au> <20081225002020.GA2912@gondor.apana.org.au> <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Steve Cornelius <sec@pobox.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:58497 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754224Ab1COHAN (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:45886 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757275Ab1COO7u (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Mar 2011 03:00:13 -0400
+	Tue, 15 Mar 2011 10:59:50 -0400
 Content-Disposition: inline
+In-Reply-To: <20110106000157.GA16089@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ARRAY_SIZE() was intended here instead of sizeof().  sizeof() is four
-times larger than ARRAY_SIZE().  outstr is normally 256 chars so 
-printing garbage to it could overfill the buffer and corrupt memory.
+Hi Linus:
 
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+Here is the crypto update for 2.6.39:
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index bd57a68..7e2d54b 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -73,7 +73,7 @@ static void report_ccb_status(u32 status, char *outstr)
- 
- 	report_jump_idx(status, outstr);
- 
--	if (cha_id < sizeof(cha_id_list)) {
-+	if (cha_id < ARRAY_SIZE(cha_id_list)) {
- 		SPRINTFCAT(outstr, "%s: ", cha_id_list[cha_id],
- 			   strlen(cha_id_list[cha_id]));
- 	} else {
-@@ -81,7 +81,7 @@ static void report_ccb_status(u32 status, char *outstr)
- 			   cha_id, sizeof("ff"));
- 	}
- 
--	if (err_id < sizeof(err_id_list)) {
-+	if (err_id < ARRAY_SIZE(err_id_list)) {
- 		SPRINTFCAT(outstr, "%s", err_id_list[err_id],
- 			   strlen(err_id_list[err_id]));
- 	} else {
-@@ -198,11 +198,11 @@ static void report_deco_status(u32 status, char *outstr)
- 
- 	report_jump_idx(status, outstr);
- 
--	for (i = 0; i < sizeof(desc_error_list); i++)
-+	for (i = 0; i < ARRAY_SIZE(desc_error_list); i++)
- 		if (desc_error_list[i].value == desc_error)
- 			break;
- 
--	if (i != sizeof(desc_error_list) && desc_error_list[i].error_text) {
-+	if (i != ARRAY_SIZE(desc_error_list) && desc_error_list[i].error_text) {
- 		SPRINTFCAT(outstr, "%s", desc_error_list[i].error_text,
- 			   strlen(desc_error_list[i].error_text));
- 	} else {
+* New picoxcell crypto driver.
+* New picoxcell RNG driver.
+* Added SHA test vectors to detect bugs such as the recent one on s390.
+* Memory leaks fixes on error path in aesni-intel.
+* xts(aes) and ghash are now available in FIPS mode.
+* Misc fixes.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+David Sterba (1):
+      crypto: tcrypt - do not attempt to write to readonly variable
+
+Davidlohr Bueso (1):
+      crypto: skcipher - remove redundant NULL check
+
+Herbert Xu (1):
+      crypto: sha1 - Add test vector to test partial block processing
+
+Jamie Iles (4):
+      hwrng: pixocell - add support for picoxcell TRNG
+      crypto: omap-aes - don't treat NULL clk as an error
+      crypto: omap-sham - don't treat NULL clk as an error
+      crypto: picoxcell - add support for the picoxcell crypto engines
+
+Jarod Wilson (3):
+      crypto: testmgr - mark xts(aes) as fips_allowed
+      crypto: testmgr - mark ghash as fips_allowed
+      random: update interface comments to reflect reality
+
+Jesper Juhl (2):
+      crypto: aesni-intel - Don't leak memory in rfc4106_set_hash_subkey
+      crypto: aesni-intel - Fix remaining leak in rfc4106_set_hash_key
+
+Julia Lawall (1):
+      hwrng: omap - Convert release_resource to release_region/release_mem_region
+
+ arch/x86/crypto/aesni-intel_glue.c     |   24 +-
+ crypto/ablkcipher.c                    |    3 +-
+ crypto/tcrypt.c                        |    3 +-
+ crypto/testmgr.c                       |    2 +
+ crypto/testmgr.h                       |   30 +-
+ drivers/char/hw_random/Kconfig         |   12 +
+ drivers/char/hw_random/Makefile        |    1 +
+ drivers/char/hw_random/omap-rng.c      |   14 +-
+ drivers/char/hw_random/picoxcell-rng.c |  208 ++++
+ drivers/char/random.c                  |   13 +-
+ drivers/crypto/Kconfig                 |   17 +
+ drivers/crypto/Makefile                |    2 +-
+ drivers/crypto/omap-aes.c              |    4 +-
+ drivers/crypto/omap-sham.c             |    4 +-
+ drivers/crypto/picoxcell_crypto.c      | 1867 ++++++++++++++++++++++++++++++++
+ drivers/crypto/picoxcell_crypto_regs.h |  128 +++
+ 16 files changed, 2299 insertions(+), 33 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
