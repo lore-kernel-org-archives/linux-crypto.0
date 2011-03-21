@@ -1,64 +1,34 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-Subject: RSA signature verification
-Date: Mon, 21 Mar 2011 16:04:41 +0200
-Message-ID: <4D875AF9.4060302@nokia.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: RSA signature verification
+Date: Mon, 21 Mar 2011 22:06:53 +0800
+Message-ID: <20110321140653.GA14174@gondor.apana.org.au>
+References: <4D875AF9.4060302@nokia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: ext Herbert Xu <herbert@gondor.hengli.com.au>
+To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.128.26]:34423 "EHLO mgw-da02.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752872Ab1CUOE1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Mar 2011 10:04:27 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:54216 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752925Ab1CUOGz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Mar 2011 10:06:55 -0400
+Content-Disposition: inline
+In-Reply-To: <4D875AF9.4060302@nokia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Mon, Mar 21, 2011 at 04:04:41PM +0200, Dmitry Kasatkin wrote:
+>
+> Do you think it make sense to have it as a crypto "algo"
+> What kind of API you would have in mind?
 
-I work on kernel RSA verification for IMA/EVM.
+So the obvious question is who will use this functionality in
+the kernel? If the only use is going to be in user-space, then
+the next question is are you doing this for hardware enablement.
 
-Currently I have a patch which provides "direct" API like ksign_verify()
-to get signature verified.
-I was thinking about doing it via crypto interface as usual but for now
-I have done it directly.
-I have found some very old (5y) patches where someone tried to have it
-as kind of hash API.
-update(), update(), final...
-
-As RSA, in contrast to hash, has like sign/verify operations.
-For the kernel there is only verify.
-
-Snippet from the code:
-
------------------------------------------------------------------------
-    desc = kzalloc(sizeof(*desc) + crypto_shash_descsize(shash),
-               GFP_KERNEL);
-    if (!desc)
-        goto err;
-
-    desc->tfm = shash;
-    desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-
-    crypto_shash_init(desc);
-    crypto_shash_update(desc, digest, digestlen);
-    crypto_shash_update(desc, sig, sizeof(*sh));
-    crypto_shash_final(desc, h);
-
-    kfree(desc);
-
-    /* pass signature mpis address */
-    err = ksign_verify_rsa(key, sig + sizeof(*sh), siglen - sizeof(*sh),
-                 h, sizeof(h));
-
------------------------------------------------------------------------
-
-So hash is calculated which is then verified against
-signature.
-
-Do you think it make sense to have it as a crypto "algo"
-What kind of API you would have in mind?
-
-Thanks,
-Dmitry
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
