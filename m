@@ -1,37 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: RSA signature verification
-Date: Tue, 22 Mar 2011 16:58:42 +0800
-Message-ID: <20110322085842.GA23630@gondor.apana.org.au>
-References: <4D875AF9.4060302@nokia.com> <20110321140653.GA14174@gondor.apana.org.au> <4D8848EC.6070306@nokia.com> <20110322073407.GA23028@gondor.apana.org.au> <4D886493.5050204@nokia.com>
+Subject: Re: [PATCH] crypto: caam - standardize device tree naming
+	convention to utilize '-vX.Y'
+Date: Wed, 23 Mar 2011 21:18:42 +0800
+Message-ID: <20110323131842.GA4374@gondor.apana.org.au>
+References: <20110314174247.e5515448.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	James Morris <jmorris@namei.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+Cc: devicetree-discuss@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Kumar Gala <kumar.gala@freescale.com>,
+	Steve Cornelius <sec@pobox.com>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59175 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:44859 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751830Ab1CVI6p (ORCPT
+	with ESMTP id S932600Ab1CWNSt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Mar 2011 04:58:45 -0400
+	Wed, 23 Mar 2011 09:18:49 -0400
 Content-Disposition: inline
-In-Reply-To: <4D886493.5050204@nokia.com>
+In-Reply-To: <20110314174247.e5515448.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 22, 2011 at 10:57:55AM +0200, Dmitry Kasatkin wrote:
-> Hi,
+On Mon, Mar 14, 2011 at 05:42:47PM -0500, Kim Phillips wrote:
+> Help clarify that the number trailing in compatible nomenclature
+> is the version number of the device, i.e., change:
 > 
-> Accepted by whom?
-> We extend functionality of Integrity subsystem in order to support
-> flashable images which can be verified with public keys...
+> "fsl,p4080-sec4.0", "fsl,sec4.0";
+> 
+> to:
+> 
+> "fsl,p4080-sec-v4.0", "fsl,sec-v4.0";
+> 
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Cc: Kumar Gala <kumar.gala@freescale.com>
+> Cc: Steve Cornelius <sec@pobox.com>
 
-Whoever that's going to merge the use-case for this :)
-
-I'm not adding a whole new API unless we have a solid in-kernel
-user or we're doing this for hardware enablement.
-
-Cheers,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
