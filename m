@@ -1,379 +1,243 @@
-From: <BrillyWu@viatech.com.cn>
-Subject: RE: [PATCH] crypto: padlock - Add SHA-1/256 module for VIA Nano
-Date: Thu, 24 Mar 2011 09:46:45 +0800
-Message-ID: <C4F7CD9A92DBFF48AD8779355CD4D7890A047C@exchsg04.s3graphics.com>
-References: <C4F7CD9A92DBFF48AD8779355CD4D7890A02F3@exchsg04.s3graphics.com> <20110322085233.GA23594@gondor.apana.org.au> <20110323132718.GA4567@gondor.apana.org.au>
+From: "Struk, Tadeusz" <tadeusz.struk@intel.com>
+Subject: RE: [PATCH] RFC4106 AES-GCM Driver - fixed problem with packets
+	that are not multiple of 64bytes
+Date: Thu, 24 Mar 2011 09:40:28 +0000
+Message-ID: <24483BA4C9F69C43A7379639D35543D7CEB6A9CE@irsmsx502.ger.corp.intel.com>
+References: <4d77a344.ufBJ2BimO/o2UpKI%tadeusz.struk@intel.com>
+ <20110313085636.GB12392@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="BIG5"
-Content-Transfer-Encoding: 8BIT
-Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>
-To: <herbert@gondor.apana.org.au>
+Content-Type: multipart/mixed; boundary="===============1375807506=="
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"O Mahony, Aidan" <aidan.o.mahony@intel.com>,
+	"Paoloni, Gabriele" <gabriele.paoloni@intel.com>,
+	"Hoban, Adrian" <adrian.hoban@intel.com>,
+	"Struk, Tadeusz" <tadeusz.struk@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from exchtp08.via.com.tw ([61.66.243.7]:18111 "EHLO
-	exchtp08.via.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751065Ab1CXBq4 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Mar 2011 21:46:56 -0400
-Content-class: urn:content-classes:message
-In-Reply-To: <20110323132718.GA4567@gondor.apana.org.au>
+Received: from mga14.intel.com ([143.182.124.37]:55538 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756694Ab1CXJle (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Mar 2011 05:41:34 -0400
+In-Reply-To: <20110313085636.GB12392@gondor.apana.org.au>
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks for your guide, it's just my mailer's malfunction. 
-I have made a test and it can work now. Please check it.
+--===============1375807506==
+MIME-Version: 1.0
+Content-Language: en-US
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=SHA1; boundary="----=_NextPart_000_000B_01CBEA07.82AEB730"
 
-Add new SHA-1/256 module that never needs any fallback and just calls the
-PadLock hardware instruction supported from VIA Nano processors to implement
-the "update" and "final" function. 
-They are respectively named "sha1_alg_nano" and "sha256_alg_nano", and will
-be used on any VIA Nano processor or the later ones. On VIA C7 CPU, the "sha1_alg"
-and "sha256_alg" modules will still be used as before.
- 
-Signed-off-by: BrillyWu<brillywu@viatech.com.cn>
-Signed-off-by: KaryJin<karyjin@viatech.com.cn>
----
-drivers/crypto/padlock-sha.c | 269 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
-1 file changed, 264 insertions(+), 5 deletions(-)
+------=_NextPart_000_000B_01CBEA07.82AEB730
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
---- a/drivers/crypto/padlock-sha.c	2011-03-22 22:20:16.547343999 +0800
-+++ b/drivers/crypto/padlock-sha.c	2011-03-15 09:05:40.049188018 +0800
-@@ -288,9 +288,250 @@ static struct shash_alg sha256_alg = {
- 	}
- };
- 
-+/* Add two shash_alg instance for hardware-implemented *
-+* multiple-parts hash supported by VIA Nano Processor.*/
-+static int padlock_sha1_init_nano(struct shash_desc *desc)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+
-+	*sctx = (struct sha1_state){
-+		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
-+	};
-+
-+	return 0;
-+}
-+
-+static int padlock_sha1_update_nano(struct shash_desc *desc,
-+			const u8 *data,	unsigned int len)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial, done;
-+	const u8 *src;
-+	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
-+	u8 buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
-+		((aligned(STACK_ALIGN)));
-+	u8 *dst = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
-+	int ts_state;
-+
-+	partial = sctx->count & 0x3f;
-+	sctx->count += len;
-+	done = 0;
-+	src = data;
-+	memcpy(dst, (u8 *)(sctx->state), SHA1_DIGEST_SIZE);
-+
-+	if ((partial + len) >= SHA1_BLOCK_SIZE) {
-+
-+		/* Append the bytes in state's buffer to a block to handle */
-+		if (partial) {
-+			done = -partial;
-+			memcpy(sctx->buffer + partial, data,
-+				done + SHA1_BLOCK_SIZE);
-+			src = sctx->buffer;
-+			ts_state = irq_ts_save();
-+			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
-+			: "+S"(src), "+D"(dst) \
-+			: "a"((long)-1), "c"((unsigned long)1));
-+			irq_ts_restore(ts_state);
-+			done += SHA1_BLOCK_SIZE;
-+			src = data + done;
-+		}
-+
-+		/* Process the left bytes from the input data */
-+		if (len - done >= SHA1_BLOCK_SIZE) {
-+			ts_state = irq_ts_save();
-+			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
-+			: "+S"(src), "+D"(dst)
-+			: "a"((long)-1),
-+			"c"((unsigned long)((len - done) / SHA1_BLOCK_SIZE)));
-+			irq_ts_restore(ts_state);
-+			done += ((len - done) - (len - done) % SHA1_BLOCK_SIZE);
-+			src = data + done;
-+		}
-+		partial = 0;
-+	}
-+	memcpy((u8 *)(sctx->state), dst, SHA1_DIGEST_SIZE);
-+	memcpy(sctx->buffer + partial, src, len - done);
-+
-+	return 0;
-+}
-+
-+static int padlock_sha1_final_nano(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha1_state *state = (struct sha1_state *)shash_desc_ctx(desc);
-+	unsigned int partial, padlen;
-+	__be64 bits;
-+	static const u8 padding[64] = { 0x80, };
-+
-+	bits = cpu_to_be64(state->count << 3);
-+
-+	/* Pad out to 56 mod 64 */
-+	partial = state->count & 0x3f;
-+	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
-+	padlock_sha1_update_nano(desc, padding, padlen);
-+
-+	/* Append length field bytes */
-+	padlock_sha1_update_nano(desc, (const u8 *)&bits, sizeof(bits));
-+
-+	/* Swap to output */
-+	padlock_output_block((uint32_t *)(state->state), (uint32_t *)out, 5);
-+
-+	return 0;
-+}
-+
-+static int padlock_sha256_init_nano(struct shash_desc *desc)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+
-+	*sctx = (struct sha256_state){
-+		.state = { SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3, \
-+				SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7},
-+	};
-+
-+	return 0;
-+}
-+
-+static int padlock_sha256_update_nano(struct shash_desc *desc, const u8 *data,
-+			  unsigned int len)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial, done;
-+	const u8 *src;
-+	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
-+	u8 buf[128 + PADLOCK_ALIGNMENT - STACK_ALIGN] __attribute__
-+		((aligned(STACK_ALIGN)));
-+	u8 *dst = PTR_ALIGN(&buf[0], PADLOCK_ALIGNMENT);
-+	int ts_state;
-+
-+	partial = sctx->count & 0x3f;
-+	sctx->count += len;
-+	done = 0;
-+	src = data;
-+	memcpy(dst, (u8 *)(sctx->state), SHA256_DIGEST_SIZE);
-+
-+	if ((partial + len) >= SHA256_BLOCK_SIZE) {
-+
-+		/* Append the bytes in state's buffer to a block to handle */
-+		if (partial) {
-+			done = -partial;
-+			memcpy(sctx->buf + partial, data,
-+				done + SHA256_BLOCK_SIZE);
-+			src = sctx->buf;
-+			ts_state = irq_ts_save();
-+			asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
-+			: "+S"(src), "+D"(dst)
-+			: "a"((long)-1), "c"((unsigned long)1));
-+			irq_ts_restore(ts_state);
-+			done += SHA256_BLOCK_SIZE;
-+			src = data + done;
-+		}
-+
-+		/* Process the left bytes from input data*/
-+		if (len - done >= SHA256_BLOCK_SIZE) {
-+			ts_state = irq_ts_save();
-+			asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
-+			: "+S"(src), "+D"(dst)
-+			: "a"((long)-1),
-+			"c"((unsigned long)((len - done) / 64)));
-+			irq_ts_restore(ts_state);
-+			done += ((len - done) - (len - done) % 64);
-+			src = data + done;
-+		}
-+		partial = 0;
-+	}
-+	memcpy((u8 *)(sctx->state), dst, SHA256_DIGEST_SIZE);
-+	memcpy(sctx->buf + partial, src, len - done);
-+
-+	return 0;
-+}
-+
-+static int padlock_sha256_final_nano(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha256_state *state =
-+		(struct sha256_state *)shash_desc_ctx(desc);
-+	unsigned int partial, padlen;
-+	__be64 bits;
-+	static const u8 padding[64] = { 0x80, };
-+
-+	bits = cpu_to_be64(state->count << 3);
-+
-+	/* Pad out to 56 mod 64 */
-+	partial = state->count & 0x3f;
-+	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
-+	padlock_sha256_update_nano(desc, padding, padlen);
-+
-+	/* Append length field bytes */
-+	padlock_sha256_update_nano(desc, (const u8 *)&bits, sizeof(bits));
-+
-+	/* Swap to output */
-+	padlock_output_block((uint32_t *)(state->state), (uint32_t *)out, 8);
-+
-+	return 0;
-+}
-+
-+static int padlock_sha_export_nano(struct shash_desc *desc,
-+				void *out)
-+{
-+	int statesize = crypto_shash_statesize(desc->tfm);
-+	void *sctx = shash_desc_ctx(desc);
-+
-+	memcpy(out, sctx, statesize);
-+	return 0;
-+}
-+
-+static int padlock_sha_import_nano(struct shash_desc *desc,
-+				const void *in)
-+{
-+	int statesize = crypto_shash_statesize(desc->tfm);
-+	void *sctx = shash_desc_ctx(desc);
-+
-+	memcpy(sctx, in, statesize);
-+	return 0;
-+}
-+
-+static struct shash_alg sha1_alg_nano = {
-+	.digestsize	=	SHA1_DIGEST_SIZE,
-+	.init		=	padlock_sha1_init_nano,
-+	.update		=	padlock_sha1_update_nano,
-+	.final		=	padlock_sha1_final_nano,
-+	.export		=	padlock_sha_export_nano,
-+	.import		=	padlock_sha_import_nano,
-+	.descsize	=	sizeof(struct sha1_state),
-+	.statesize	=	sizeof(struct sha1_state),
-+	.base		=	{
-+		.cra_name		=	"sha1",
-+		.cra_driver_name	=	"sha1-padlock-nano",
-+		.cra_priority		=	PADLOCK_CRA_PRIORITY,
-+		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		=	SHA1_BLOCK_SIZE,
-+		.cra_module		=	THIS_MODULE,
-+	}
-+};
-+
-+static struct shash_alg sha256_alg_nano = {
-+	.digestsize	=	SHA256_DIGEST_SIZE,
-+	.init		=	padlock_sha256_init_nano,
-+	.update		=	padlock_sha256_update_nano,
-+	.final		=	padlock_sha256_final_nano,
-+	.export		=	padlock_sha_export_nano,
-+	.import		=	padlock_sha_import_nano,
-+	.descsize	=	sizeof(struct sha256_state),
-+	.statesize	=	sizeof(struct sha256_state),
-+	.base		=	{
-+		.cra_name		=	"sha256",
-+		.cra_driver_name	=	"sha256-padlock-nano",
-+		.cra_priority		=	PADLOCK_CRA_PRIORITY,
-+		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		=	SHA256_BLOCK_SIZE,
-+		.cra_module		=	THIS_MODULE,
-+	}
-+};
-+
- static int __init padlock_init(void)
- {
- 	int rc = -ENODEV;
-+	struct cpuinfo_x86 *c = &cpu_data(0);
-+	struct shash_alg *sha1;
-+	struct shash_alg *sha256;
- 
- 	if (!cpu_has_phe) {
- 		printk(KERN_NOTICE PFX "VIA PadLock Hash Engine not detected.\n");
-@@ -302,11 +543,21 @@ static int __init padlock_init(void)
- 		return -ENODEV;
- 	}
- 
--	rc = crypto_register_shash(&sha1_alg);
-+	/* Register the newly added algorithm module if on *
-+	* VIA Nano processor, or else just do as before */
-+	if (c->x86_model < 0x0f) {
-+		sha1 = &sha1_alg;
-+		sha256 = &sha256_alg;
-+	} else {
-+		sha1 = &sha1_alg_nano;
-+		sha256 = &sha256_alg_nano;
-+	}
-+
-+	rc = crypto_register_shash(sha1);
- 	if (rc)
- 		goto out;
- 
--	rc = crypto_register_shash(&sha256_alg);
-+	rc = crypto_register_shash(sha256);
- 	if (rc)
- 		goto out_unreg1;
- 
-@@ -315,7 +566,8 @@ static int __init padlock_init(void)
- 	return 0;
- 
- out_unreg1:
--	crypto_unregister_shash(&sha1_alg);
-+	crypto_unregister_shash(sha1);
-+
- out:
- 	printk(KERN_ERR PFX "VIA PadLock SHA1/SHA256 initialization failed.\n");
- 	return rc;
-@@ -323,8 +575,15 @@ out:
- 
- static void __exit padlock_fini(void)
- {
--	crypto_unregister_shash(&sha1_alg);
--	crypto_unregister_shash(&sha256_alg);
-+	struct cpuinfo_x86 *c = &cpu_data(0);
-+
-+	if (c->x86_model >= 0x0f) {
-+		crypto_unregister_shash(&sha1_alg_nano);
-+		crypto_unregister_shash(&sha256_alg_nano);
-+	} else {
-+		crypto_unregister_shash(&sha1_alg);
-+		crypto_unregister_shash(&sha256_alg);
-+	}
- }
- 
- module_init(padlock_init);
+Hi Herbert,
+This is rather critical as packets of size different than multiple of 64bytes are dropped.
+Do you mind if we push it against stable 2.6.38?
+Thanks,
+Tadeusz
 
 -----Original Message-----
-From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
-Sent: Wednesday, March 23, 2011 9:27 PM
-To: Brilly Wu
-Cc: linux-crypto@vger.kernel.org; davem@davemloft.net
-Subject: Re: [PATCH] crypto: padlock - Add SHA-1/256 module for VIA Nano
+From: Herbert Xu [mailto:herbert@gondor.apana.org.au] 
+Sent: Sunday, March 13, 2011 8:57 AM
+To: Struk, Tadeusz
+Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; O Mahony, Aidan; Paoloni, Gabriele; Hoban, Adrian
+Subject: Re: [PATCH] RFC4106 AES-GCM Driver - fixed problem with packets that are not multiple of 64bytes
 
-On Tue, Mar 22, 2011 at 04:52:33PM +0800, Herbert Xu wrote:
-> On Tue, Mar 22, 2011 at 02:10:13PM +0800, BrillyWu@viatech.com.cn wrote:
-> > Add new SHA-1/256 module that never needs any fallback and just 
-> > calls the PadLock hardware instruction supported from VIA Nano 
-> > processors to implement the "update" and "final" function.
-> > They are respectively named "sha1_alg_nano" and "sha256_alg_nano", 
-> > and will be used on any VIA Nano processor or the later ones. On VIA 
-> > C7 CPU, the "sha1_alg"
-> > and "sha256_alg" modules will still be used as before.
-> >  
-> > Signed-off-by: BrillyWu<brillywu@viatech.com.cn>
-> > Signed-off-by: KaryJin<karyjin@viatech.com.cn>
+On Wed, Mar 09, 2011 at 03:56:52PM +0000, tadeusz.struk@intel.com wrote:
+> From: Tadeusz Struk <tadeusz.struk@intel.com>
+> Date: Wed, 9 Mar 2011 15:01:06 +0000
+> Subject: [PATCH] RFC4106 AES-GCM Driver - fixed problem with packets that are not multiple of 64bytes
 > 
-> Very nice :) I'll apply the patch.
+> Hi Herbert,
+> This patch fixes problem with packets that are not multiple of 64bytes.
 
-Unfortunately it doesn't apply:
-
-$ git apply ~/p
-fatal: patch fragment without header at line 23: @@ -288,9 +288,250 @@ static struct shash_alg sha256_alg = {
-
-It appears that your mailer has chopped the lines up.  Please resend the patch with this problem fixed.  You can test this yourself by applying the patch from the copy sent to you via the list.
-
-Thanks,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe linux-crypto" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+------=_NextPart_000_000B_01CBEA07.82AEB730
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIId7jCCAyAw
+ggKJoAMCAQICBDXe9M8wDQYJKoZIhvcNAQEFBQAwTjELMAkGA1UEBhMCVVMxEDAOBgNVBAoTB0Vx
+dWlmYXgxLTArBgNVBAsTJEVxdWlmYXggU2VjdXJlIENlcnRpZmljYXRlIEF1dGhvcml0eTAeFw05
+ODA4MjIxNjQxNTFaFw0xODA4MjIxNjQxNTFaME4xCzAJBgNVBAYTAlVTMRAwDgYDVQQKEwdFcXVp
+ZmF4MS0wKwYDVQQLEyRFcXVpZmF4IFNlY3VyZSBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkwgZ8wDQYJ
+KoZIhvcNAQEBBQADgY0AMIGJAoGBAMFdsVhnCGLuoJotHwhtkRRomAoe/toEbxOEYiHD0XzOnwXg
+uAHwTjTs4oqVBGSs8WtTXwWzy2eAv0ICjv7dAQns4QAUT/z78AzdQ7pbK+EfgHCZFVeTFvEPl2q3
+wmgjHMxNWTCsUR47ryvW7mNFe8XZX1DS41APOojnvxT94Me5AgMBAAGjggEJMIIBBTBwBgNVHR8E
+aTBnMGWgY6BhpF8wXTELMAkGA1UEBhMCVVMxEDAOBgNVBAoTB0VxdWlmYXgxLTArBgNVBAsTJEVx
+dWlmYXggU2VjdXJlIENlcnRpZmljYXRlIEF1dGhvcml0eTENMAsGA1UEAxMEQ1JMMTAaBgNVHRAE
+EzARgQ8yMDE4MDgyMjE2NDE1MVowCwYDVR0PBAQDAgEGMB8GA1UdIwQYMBaAFEjmaPkr0rKV10fY
+IyAQTzOYkJ/UMB0GA1UdDgQWBBRI5mj5K9KylddH2CMgEE8zmJCf1DAMBgNVHRMEBTADAQH/MBoG
+CSqGSIb2fQdBAAQNMAsbBVYzLjBjAwIGwDANBgkqhkiG9w0BAQUFAAOBgQBYzinq/Pfetc4CuRe1
+hdG54+CVzCUxDQCmkm5/tpJjnlCV0Zpv5BHeY4VumO6o/1rI01WyZnFX3sAh6z0qpyNJAQSGQnv8
+7n+iFlK1Z2fTQNs7JliyKHc9rhR3Ydb6KmYnoA36p3Nc6nDxlCFlRF/6/O8paKmih3nvee9PrAd3
+ODCCAz0wggKmoAMCAQICAwWw/zANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJVUzEQMA4GA1UE
+ChMHRXF1aWZheDEtMCsGA1UECxMkRXF1aWZheCBTZWN1cmUgQ2VydGlmaWNhdGUgQXV0aG9yaXR5
+MB4XDTA2MDIxNjE4MDEzMFoXDTE2MDIxOTE4MDEzMFowUjELMAkGA1UEBhMCVVMxGjAYBgNVBAoT
+EUludGVsIENvcnBvcmF0aW9uMScwJQYDVQQDEx5JbnRlbCBFeHRlcm5hbCBCYXNpYyBQb2xpY3kg
+Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDBpd/XOb9QVqEZ8mQ1042TdOIq3ATD
+IsV2xDyt30yLyMR5Wjtus0bn3B+he89BiNO/LP6+rFzEwlD55PlX+HLGIKeNNG97dqyc30FElEUj
+ZzTZFq2N4e3kVJ/XAEEgANzV8v9qp7qWwxugPgfc3z9BkYot+CifozexHLb/hEZj+yISCU61kRZv
+uSQ0E11yYL4dRgcglJeaHo3oX57rvIckaLsYV5/1Aj+R8DM1Ppk965XQAKsHfnyT7C4S50T4lVn4
+lz36wOdNZn/zegG1zp41lnoTFfT4KuKVJH5x7YD1p6KbgJCKLovnujGuohquBNfdXKpZkvz6pGv+
+iC1HawJdAgMBAAGjgaAwgZ0wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQaxgxKxEdvqNutK/D0
+Vgaj7TdUDDA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdlb3RydXN0LmNvbS9jcmxzL3Nl
+Y3VyZWNhLmNybDAfBgNVHSMEGDAWgBRI5mj5K9KylddH2CMgEE8zmJCf1DAPBgNVHRMBAf8EBTAD
+AQH/MA0GCSqGSIb3DQEBBQUAA4GBABMQOK2kVKVIlUWwLTdywJ+e2O+PC/uQltK2F3lRyrPfBn69
+tOkIP4SgDJOfsxyobIrPLe75kBLw+Dom13OBDp/EMZJZ1CglQfVV8co9mT3aZMjSGGQiMgkJLR3j
+Mfr900fXZKj5XeqCJ+JP0mEhJGEdVCY+FFlksJjV86fDrq1QMIIFijCCBHKgAwIBAgIKYR6AtwAA
+AAAABzANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9y
+YXRpb24xJzAlBgNVBAMTHkludGVsIEV4dGVybmFsIEJhc2ljIFBvbGljeSBDQTAeFw0wOTA1MTUx
+OTI1MTNaFw0xNTA1MTUxOTM1MTNaMFYxCzAJBgNVBAYTAlVTMRowGAYDVQQKExFJbnRlbCBDb3Jw
+b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSAzQTCCASIw
+DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMGPgGLnOO5IOzlHRfr1XfCVb97V4BR2QVpPZ7Cr
+cIQ+FGa2KHD/6dPjwxOIrtFTdfW4BYikdFmxUZVBWRWZ5Vye2cCdGzFWqIEOE1e17nNx1jM8Z6GZ
+EqbDUS+vBuPlBFHKQoVm5BaNIHpyn2XZxqwjV9j5/crIfPrCGstk+2ztUhVS8OHEgzO784PgD9pO
+gBnnAbZHmEM1FYYmQ6ibS+gVCHzobDYG+YReRiHpFKWBxpUuP+X0WYFw/Ja1JW7N8pELAFDw0UFB
+WFgiv1QIusdLvSy8mcsLJ5wy050OVcxShqoUxhw/wvyuuoQxvmEPjhRa1C2oSCmGN0003GMhQWMC
+AwEAAaOCAlwwggJYMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFKoWZq+3PVZTYK4Nwu3z7gfL
+UWB+MAsGA1UdDwQEAwIBhjASBgkrBgEEAYI3FQEEBQIDAQABMCMGCSsGAQQBgjcVAgQWBBTCKwhT
+x+hdMsKCgOmWwLgjQsAV+TAZBgkrBgEEAYI3FAIEDB4KAFMAdQBiAEMAQTAfBgNVHSMEGDAWgBQa
+xgxKxEdvqNutK/D0Vgaj7TdUDDCBvQYDVR0fBIG1MIGyMIGvoIGsoIGphk5odHRwOi8vd3d3Lmlu
+dGVsLmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBQb2xpY3kl
+MjBDQS5jcmyGV2h0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0lu
+dGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUyMENBLmNybDCB4wYIKwYBBQUHAQEEgdYw
+gdMwYwYIKwYBBQUHMAKGV2h0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNh
+dGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUyMENBLmNydDBsBggrBgEFBQcw
+AoZgaHR0cDovL2NlcnRpZmljYXRlcy5pbnRlbC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMv
+SW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwUG9saWN5JTIwQ0EuY3J0MA0GCSqGSIb3DQEBBQUA
+A4IBAQCUY/1d0MS6VPTlIcOho1XWh193PD5kJDJSPdphLHQdM1oKA+whMdIBoY1VzTDDK+C+Ey4J
+cyna7fpC8uVmn/Rz/i9MZtyc7qezPtZTn9UyORvJmddH+Ox/RycGwe3ags8jUdspECorYOkJyZks
+nDIlTVUvbR7wyY+gGJYqxWXqrcVFEiMsWu8/OIlf7F2gAYMBw1kZ55dn4lWBIM0WqvReWpPvhYeN
+7Y+3MKEdSMkQ7TZiNbfdZ5D/8KfWNMTJ4VHltOgCL1lA5tx/F4R1920skpL5eu3Sj650RUe3rOXs
+aV5NyJzBwB31+1zsmleVdFD0k/Fw9HxXbAQE35ucN/7CMIIFijCCBHKgAwIBAgIKYSCKYgAAAAAA
+CDANBgkqhkiG9w0BAQUFADBSMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRp
+b24xJzAlBgNVBAMTHkludGVsIEV4dGVybmFsIEJhc2ljIFBvbGljeSBDQTAeFw0wOTA1MTUxOTI3
+MjZaFw0xNTA1MTUxOTM3MjZaMFYxCzAJBgNVBAYTAlVTMRowGAYDVQQKExFJbnRlbCBDb3Jwb3Jh
+dGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSAzQjCCASIwDQYJ
+KoZIhvcNAQEBBQADggEPADCCAQoCggEBAKQEM1Wn9TU9vc9C+/Tc7KB+eiYElmrcEWE32WUdHvWG
++IcQHVQsikTmMyKKojNLw2B5s6Iekc8ivDo/wCfjZzX9JyftMnc+AArc0la87Olybzm8K9jXEfTB
+vTnUSFSiI9ZYefITdiUgqlAFuljFZEHYKYtLuhrRacpmQfP4mV63NKdc2bT804HRf6YptZFa4k6Y
+N94zlrGNrBuQQ74WFzz/jLBusbUpEkro6Mu/ZYFOFWQrV9lBhF9Ruk8yN+3N6n9fUo/qBigiF2kE
+n9xVh1ykl7SCGL2jBUkXx4qgV27a6Si8lRRdgrHGtN/HWnSWlLXTH5l575H4Lq++77OFv38CAwEA
+AaOCAlwwggJYMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFA7GKvdZsggQkCVvw939imYxMCvF
+MAsGA1UdDwQEAwIBhjASBgkrBgEEAYI3FQEEBQIDAQABMCMGCSsGAQQBgjcVAgQWBBQ5oFY2ekKQ
+/5Ktim+VdMeSWb4QWTAZBgkrBgEEAYI3FAIEDB4KAFMAdQBiAEMAQTAfBgNVHSMEGDAWgBQaxgxK
+xEdvqNutK/D0Vgaj7TdUDDCBvQYDVR0fBIG1MIGyMIGvoIGsoIGphk5odHRwOi8vd3d3LmludGVs
+LmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBQb2xpY3klMjBD
+QS5jcmyGV2h0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0ludGVs
+JTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUyMENBLmNybDCB4wYIKwYBBQUHAQEEgdYwgdMw
+YwYIKwYBBQUHMAKGV2h0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNhdGVz
+L0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMFBvbGljeSUyMENBLmNydDBsBggrBgEFBQcwAoZg
+aHR0cDovL2NlcnRpZmljYXRlcy5pbnRlbC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50
+ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwUG9saWN5JTIwQ0EuY3J0MA0GCSqGSIb3DQEBBQUAA4IB
+AQCxtQEHchVQhXyjEqtMVUMe6gkmPsIczHxSeqNbo9dsD+6xbT65JT+oYgpIAtfEsYXeUJu1cChq
+pb22U5bMAz7eaQcW5bzefufWvA6lg2048B8oczBj/q+5P5NpYrUO8jOmN4jTjfJq3ElZ7yFWpy7r
+B3Vm/aN6ATYqWfMbS/xfh+JCxmH3droUmMJI0/aZJHsLtjbjFnNsHDNrJZX1vxlM78Lb1hjskTEN
+PmhbVbfTj5i/ZGnhv4tmI8QZPCNtcegXJrfhRl2D9bWpdTOPrWiLDUqzy1Z6KL7TcOS/PCl8RHCJ
+XkPau/thTQCpIoDa2+c+3XA++gRTfAQ4svTO260NMIIGDzCCBPegAwIBAgIKUnNA2QABAABWQzAN
+BgkqhkiG9w0BAQUFADBWMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24x
+KzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3VpbmcgQ0EgM0EwHhcNMTEwMTEwMDkz
+MjExWhcNMTMxMjI1MDkzMjExWjBBMRcwFQYDVQQDEw5TdHJ1aywgVGFkZXVzejEmMCQGCSqGSIb3
+DQEJARYXdGFkZXVzei5zdHJ1a0BpbnRlbC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQDOkcIQ3fGinLEfugUTvdd8vJA2hfghoTtkTarTmd8OQeeYocL3l9u6DBUP073041UUHnhA
+SeLImDuQHvBgAxEc8AMAyOXydkbRtSnA2W7lx4hYff6GILcuFqJEeFEzXmGldv6tXgv7rXE/1U4/
+UthDA2d3n5j1460jFogRcBnGWalcsKYASiEA2h5ppuziau4tZYSrrmOadutNr+xGZr+C7sZdk3bC
+67uuWiFH2LEIg4NPn04FwhNnBZGfsyCSB5LEg7HLHsCiaPV76GO84Dqr7TczFyDvDGo9gvuoX5IU
+CtK5DglcdnYhP1W6YinjHLQCZecsEWKHrreLst/PO7zVAgMBAAGjggLyMIIC7jALBgNVHQ8EBAMC
+B4AwHQYDVR0OBBYEFFgsT71qXYLawUPKQ9I01GBcwjyRMDwGCSsGAQQBgjcVBwQvMC0GJSsGAQQB
+gjcVCIbDjHWEmeVRg/2BKIWOn1OCkcAJZ4HevTmV8EMCAWQCAQgwHwYDVR0jBBgwFoAUqhZmr7c9
+VlNgrg3C7fPuB8tRYH4wgc8GA1UdHwSBxzCBxDCBwaCBvqCBu4ZXaHR0cDovL3d3dy5pbnRlbC5j
+b20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENB
+JTIwM0EoMSkuY3JshmBodHRwOi8vY2VydGlmaWNhdGVzLmludGVsLmNvbS9yZXBvc2l0b3J5L0NS
+TC9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjAzQSgxKS5jcmwwgfUG
+CCsGAQUFBwEBBIHoMIHlMGwGCCsGAQUFBzAChmBodHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0
+b3J5L2NlcnRpZmljYXRlcy9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0El
+MjAzQSgxKS5jcnQwdQYIKwYBBQUHMAKGaWh0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29tL3Jl
+cG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3Vpbmcl
+MjBDQSUyMDNBKDEpLmNydDAfBgNVHSUEGDAWBggrBgEFBQcDBAYKKwYBBAGCNwoDDDApBgkrBgEE
+AYI3FQoEHDAaMAoGCCsGAQUFBwMEMAwGCisGAQQBgjcKAwwwSwYDVR0RBEQwQqAnBgorBgEEAYI3
+FAIDoBkMF3RhZGV1c3ouc3RydWtAaW50ZWwuY29tgRd0YWRldXN6LnN0cnVrQGludGVsLmNvbTAN
+BgkqhkiG9w0BAQUFAAOCAQEAPUhKMJR+nHX/mfAfGrzuTNh4DgXo5XRAhy9ZgPWzLYuR5NJjSBOS
+CMwJIa3+aDlW23TxeSzFuvN6eMCpwgpRz+lrkpkpsZYjzCEwsCqa4Q6Eh/88LxSqyjg0ZR/kdVAf
+Hiw2YsiRs8C/e5WIgfXQQ3S9nw2o5XD04O0klhwvL3/ralRHOdIa8O38OJ1NY2Btl/wWqCInYleO
+1MbMIvbOakdhzPY4NjgXpRVZLR8h95Qi5kfByeh6UERanPZkfg3YwCX+/lV2pG+tRSjkFH8OP7Rl
+/P1ql99DdbIJdLmyrmodLE5eFBoISmj/uwyBWQV5L7jz8nRsnJY+2cFlr5k5vTCCBlYwggU+oAMC
+AQICClyFGrgAAQAAXQQwDQYJKoZIhvcNAQEFBQAwVjELMAkGA1UEBhMCVVMxGjAYBgNVBAoTEUlu
+dGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENB
+IDNCMB4XDTEwMTAxMzA4MzM1OFoXDTEzMDkyNzA4MzM1OFowQTEXMBUGA1UEAxMOU3RydWssIFRh
+ZGV1c3oxJjAkBgkqhkiG9w0BCQEWF3RhZGV1c3ouc3RydWtAaW50ZWwuY29tMIIBIjANBgkqhkiG
+9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtXe1hUXv884PJxBpMk75Bj7hXF8cpyHAcvupqg3nxsVH2Zzg
+gopxNQPmjxd15ECFWSzgmNnxPxkRvlvhaXLAK1YTTutJouu82IMHH0moxdKAATI7CmI6CltKl4FK
+b6xClQdYmf65dkhD4K84dvuPmrgqOeqEjXgvw0LZv1F4tNcK6PitoYAuULY093gx+aTjQAMxO7Ka
+ca9J6LiCCaqQd9DJO5kXh7qZj6VUrfVMww38lPA5P4d7pssj95v+zaySk4tsaih4DzGa01l4Q8a5
+00PUSZVOvgYNqWUxztuBblLYZOVAdfZdN0tXvKCn75PmGOKIlTC3sdwQBoc/ZaFdjwIDAQABo4ID
+OTCCAzUwCwYDVR0PBAQDAgQwMEQGCSqGSIb3DQEJDwQ3MDUwDgYIKoZIhvcNAwICAgCAMA4GCCqG
+SIb3DQMEAgIAgDAHBgUrDgMCBzAKBggqhkiG9w0DBzAdBgNVHQ4EFgQUoyGOuYM9LfSJmWO+Bdrh
+wfBBW1IwPQYJKwYBBAGCNxUHBDAwLgYmKwYBBAGCNxUIhsOMdYSZ5VGD/YEohY6fU4KRwAlnhLnZ
+QYeE/04CAWQCAQwwHwYDVR0jBBgwFoAUDsYq91myCBCQJW/D3f2KZjEwK8Uwgc8GA1UdHwSBxzCB
+xDCBwaCBvqCBu4ZXaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBF
+eHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwM0IoMSkuY3JshmBodHRwOi8vY2VydGlm
+aWNhdGVzLmludGVsLmNvbS9yZXBvc2l0b3J5L0NSTC9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMl
+MjBJc3N1aW5nJTIwQ0ElMjAzQigxKS5jcmwwgfUGCCsGAQUFBwEBBIHoMIHlMGwGCCsGAQUFBzAC
+hmBodHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRlcy9JbnRlbCUyMEV4
+dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjAzQigxKS5jcnQwdQYIKwYBBQUHMAKGaWh0
+dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVs
+JTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDNCKDEpLmNydDAfBgNVHSUEGDAW
+BggrBgEFBQcDBAYKKwYBBAGCNwoDBDApBgkrBgEEAYI3FQoEHDAaMAoGCCsGAQUFBwMEMAwGCisG
+AQQBgjcKAwQwSwYDVR0RBEQwQqAnBgorBgEEAYI3FAIDoBkMF3RhZGV1c3ouc3RydWtAaW50ZWwu
+Y29tgRd0YWRldXN6LnN0cnVrQGludGVsLmNvbTANBgkqhkiG9w0BAQUFAAOCAQEAZQKWbx00FBUu
+3xRCKw1hFLVoZWd9Z9WC4KJnw4VgpLeEZGwiACO+9uUTTJzXo3zekqtifrDj4wnGfadsMcsZ70Bx
+GIpe2yVsLtZiW+iWA/6mzY7QH/LmuqzoFMEa5Loy6Y3QC7viDTu55FurUpGwgAWc5WOZ9K4AFakq
+5vsm0oClHMACjntKeORyIYWskJ9Rs/z2l+0vE/gUDsn96hx1+GgoVegtyEEyfxrhz1ZovnjMTxlu
+jXHoi0/qVkuTO4zgNMBMM18MvJ/Y7r+Uws5vOpFJHZ3BokIlgc58cG6meD4j3mSL6hbVFOTJSmrv
+XzVjpMpThGp5MKA+0t9fdZ6qYDGCA0EwggM9AgEBMGQwVjELMAkGA1UEBhMCVVMxGjAYBgNVBAoT
+EUludGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5n
+IENBIDNBAgpSc0DZAAEAAFZDMAkGBSsOAwIaBQCgggGyMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
+BwEwHAYJKoZIhvcNAQkFMQ8XDTExMDMyNDA5NDAyOFowIwYJKoZIhvcNAQkEMRYEFHZEUO9vTSNA
+kv/R3kH1a5tLUjf2MGcGCSqGSIb3DQEJDzFaMFgwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCA
+MA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMAcGBSsOAwIaMAoGCCqGSIb3
+DQIFMHMGCSsGAQQBgjcQBDFmMGQwVjELMAkGA1UEBhMCVVMxGjAYBgNVBAoTEUludGVsIENvcnBv
+cmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENBIDNCAgpchRq4
+AAEAAF0EMHUGCyqGSIb3DQEJEAILMWagZDBWMQswCQYDVQQGEwJVUzEaMBgGA1UEChMRSW50ZWwg
+Q29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3VpbmcgQ0EgM0IC
+ClyFGrgAAQAAXQQwDQYJKoZIhvcNAQEBBQAEggEAfrG9dIr4yIVR8ToaRZwr7Di3EXJpwF47qc4Q
+TKoSCks7ph5kH1J5hBzWmmmB5xrz9MdZDCamisLx3NMQPoqoHHXtNrCbVVGs+MtZ5WGA36pZcFN2
+J4hG0GdjrpMarB6TzAdyzC4MRO4vbcsdYhGfHo+47p19RwYkm15mlHpJmpH4xhvTwxaPlnpsFbT1
+KVVBn9kHchXzje2iMn7nFrqvl8brmi7Uv/PaQVfrrweTRxvnv8kBmUU9/pNGbisd6v9FZojuhsl5
+xV85u9z/qZMFDKgT6nxMgglJUBIQPqmuNBPZUn2ihP4JUAzN8nlCObbXwNqzXewvJGEmtBxPi9EZ
+YQAAAAAAAA==
+
+------=_NextPart_000_000B_01CBEA07.82AEB730--
+
+--===============1375807506==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+--------------------------------------------------------------
+Intel Shannon Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+Business address: Dromore House, East Park, Shannon, Co. Clare
+
+This e-mail and any attachments may contain confidential material for the s=
+ole use of the intended recipient(s). Any review or distribution by others =
+is strictly prohibited. If you are not the intended recipient, please conta=
+ct the sender and delete all copies.
+
+
+--===============1375807506==--
