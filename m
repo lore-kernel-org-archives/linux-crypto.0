@@ -1,54 +1,47 @@
-From: Jari Ruusu <jariruusu@users.sourceforge.net>
-Subject: Re: loop-aes: It is not longer possible to create a filesystem on an
- encrypted DVD-RAM
-Date: Mon, 28 Mar 2011 09:56:52 +0300
-Message-ID: <4D903134.CFFC7ACF@users.sourceforge.net>
-References: <134368.68091.qm@web114114.mail.gq1.yahoo.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 2.6.39
+Date: Mon, 28 Mar 2011 15:13:22 +0800
+Message-ID: <20110328071322.GA6569@gondor.apana.org.au>
+References: <20100201195204.GA6953@gondor.apana.org.au> <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Thomas Siedlich <thomas.siedlich@yahoo.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.tnnet.fi ([217.112.240.26]:39735 "EHLO mail.tnnet.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752732Ab1C1G4z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Mar 2011 02:56:55 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:52175 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751314Ab1C1HNa (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Mar 2011 03:13:30 -0400
+Content-Disposition: inline
+In-Reply-To: <20110216053911.GA10999@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thomas Siedlich wrote:
-> I try to format a loop-aes encrypted DVD-RAM in /dev/sr0 with mke2fs.
+Hi Linus:
 
-What loop-AES version are you using?
+This push fixes a bug in the aesni-intel driver that may cause
+incorrect results for certain input sizes.
 
-What kernel version are you using?
+Please pull from
 
-> ,----[/var/log/syslog]
-> | Mar 27 15:29:27 eagle kernel: loop2: loop_end_io_transfer err=-95 bi_rw=0x461
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Backing device returned EOPNOTSUPP (Operation not supported on transport
-endpoint) error for a write. Interpreting rest of bi_rw bits depends on
-kernel version. For 2.6.38 kernel bi_rw means: "metadata io request",
-"request to discard sectors", and "This bio has already been subjected to
-throttling rules. Don't do it again"
+or
 
-> | Mar 27 15:29:27 eagle kernel: Buffer I/O error on device loop2, logical block 0
-> | Mar 27 15:29:27 eagle kernel: lost page write due to I/O error on loop2
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Somehow EOPNOTSUPP error got interpreted as I/O error and/or write was not
-retried with bi_rw bits cleared that backing device do not support.
+Tadeusz Struk (1):
+      crypto: aesni-intel - fixed problem with packets that are not multiple of 64bytes
 
-> | Mar 27 15:29:27 eagle kernel: loop2: loop_end_io_transfer err=-95 bi_rw=0x20
-> | Mar 27 15:29:27 eagle kernel: Buffer I/O error on device loop2, logical block 0
+ arch/x86/crypto/aesni-intel_asm.S  |    5 ++++-
+ arch/x86/crypto/aesni-intel_glue.c |   14 ++++++++++++--
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
-Backing device returned EOPNOTSUPP error for a read. Interpreting rest of
-bi_rw bits depends on kernel version. For 2.6.38 kernel bi_rw means:
-"metadata io request".
-
-> It just works fine but unencrypted :-(.
-
-As a temporary workaround, you can create unencrypted file system and then
-encrypt it in-place using aespipe tool.
-
+Thanks,
 -- 
-Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
