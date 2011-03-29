@@ -1,106 +1,66 @@
-From: Thomas Siedlich <thomas.siedlich@yahoo.com>
-Subject: Re: loop-aes: It is not longer possible to create a filesystem on an  encrypted DVD-RAM
-Date: Mon, 28 Mar 2011 15:24:21 -0700 (PDT)
-Message-ID: <610509.93400.qm@web114106.mail.gq1.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Re: loop-aes: It is not longer possible to create a filesystem on an  
+ encrypted DVD-RAM
+Date: Tue, 29 Mar 2011 07:07:03 +0300
+Message-ID: <4D915AE7.BA4444B9@users.sourceforge.net>
+References: <610509.93400.qm@web114106.mail.gq1.yahoo.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Jari Ruusu <jariruusu@users.sourceforge.net>
+To: Thomas Siedlich <thomas.siedlich@yahoo.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nm26-vm0.bullet.mail.sp2.yahoo.com ([98.139.91.230]:39622 "HELO
-	nm26-vm0.bullet.mail.sp2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1754995Ab1C1WYW convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Mar 2011 18:24:22 -0400
+Received: from mail.tnnet.fi ([217.112.240.26]:43640 "EHLO mail.tnnet.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750774Ab1C2EHJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Mar 2011 00:07:09 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Jari!
+Thomas Siedlich wrote:
+> For my kernel it should mean (if I interpret
+> /usr/src/linux/include/linux/bio.h right):
+> "Tell the IO scheduler not to wait for more requests after this
+>         one has been submitted, even if it is a SYNC request."
+> "synchronous I/O hint."
+> "barrier"
+> "write"
 
-Jari Ruusu wrote:
-> Thomas Siedlich wrote:
-> > I try to format a loop-aes encrypted DVD-RAM in
-> > /dev/sr0 with mke2fs.
->=20
-> What loop-AES version are you using?
+"barrier" bit is the one that triggered EOPNOTSUPP error from backing device.
 
-3.3a, which is the latest in Debian.
-I see sourceforge has 3.6b :-( and I see also that the Debian package
-has orphaned.
-<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D614808>
-It's a pity.
+> Here:
+> "barrier"
+> and
+> "read"
 
-> What kernel version are you using?
+Same here.
 
-2.6.35.3 (selfcompiled from kernel.org).
+> So "barrier" is the same in both messages. But why does it work
+> without loop? The backing device should be the same, shouldn't it?
 
-> > ,----[/var/log/syslog]
-> > | Mar 27 15:29:27 eagle kernel: loop2:
-> > loop_end_io_transfer err=3D-95 bi_rw=3D0x461
->=20
-> Backing device returned EOPNOTSUPP (Operation not supported
-> on transport
-> endpoint) error for a write. Interpreting rest of bi_rw
-> bits depends on
-> kernel version. For 2.6.38 kernel bi_rw means: "metadata io
-> request",
-> "request to discard sectors", and "This bio has already
-> been subjected to
-> throttling rules. Don't do it again"
+Because loop-AES-v3.3a has a bug in barrier request handling that triggers
+when a barrier request is sent to backing device that can't handle barrier
+request. This is what happens:
 
-=46or my kernel it should mean (if I interpret=20
-/usr/src/linux/include/linux/bio.h right):
-"Tell the IO scheduler not to wait for more requests after this
-=A0 =A0 =A0 =A0 one has been submitted, even if it is a SYNC request."
-"synchronous I/O hint."
-"barrier"
-"write"
+1) Block layer kernel code above loop driver issues empty barrier request to
+   loop driver.
+2) Loop driver does not pass that empty barrier request to backing device.
+   Instead it sets a flag to indicate "mark next request as barrier".
+3) Next request arrives at loop driver, loop driver marks that one as
+   barrier request, and eventually sends it to backing device.
+4) Backing device driver decides that it doesn't do barriers at all, and
+   aborts processing that request.
 
-> > | Mar 27 15:29:27 eagle kernel: Buffer I/O error on
-> >   device loop2, logical block 0
-> > | Mar 27 15:29:27 eagle kernel: lost page write due to
-> >   I/O error on loop2
->=20
-> Somehow EOPNOTSUPP error got interpreted as I/O error
-> and/or write was not
-> retried with bi_rw bits cleared that backing device do not
-> support.
->=20
-> > | Mar 27 15:29:27 eagle kernel: loop2:
-> >   loop_end_io_transfer err=3D-95 bi_rw=3D0x20
-> > | Mar 27 15:29:27 eagle kernel: Buffer I/O error on
-> >   device loop2, logical block 0
->=20
-> Backing device returned EOPNOTSUPP error for a read.
-> Interpreting rest of
-> bi_rw bits depends on kernel version. For 2.6.38 kernel
-> bi_rw means:
-> "metadata io request".
+In short: due to loop driver bug, backing device driver aborted wrong
+request with EOPNOTSUPP error code.
 
-Here:
-"barrier"
-and
-"read"
+This bug is fixed in loop-AES-v3.6b (it got fixed as part of queue code
+removal/rewrite). If you can reproduce this error with loop-AES-v3.6b, then
+I definitely want to know about it.
 
-So "barrier" is the same in both messages. But why does it work
-without loop? The backing device should be the same, shouldn't it?
+Seeing small amount of EOPNOTSUPP errors (loop_end_io_transfer err=-95 ...)
+in syslog is normal. This can happen when a file system is probing and/or
+learning that backing device under loop device driver does not support
+barriers.
 
-> > It just works fine but unencrypted :-(.
->=20
-> As a temporary workaround, you can create unencrypted file
-> system and then
-> encrypt it in-place using aespipe tool.
-
-Great idea! I give it a try.
-
-dd if=3D/dev/sr0 bs=3D64k | aespipe -e AES256 -K ./key.gpg \
-  | dd of=3D/dev/sr0 bs=3D64k conv=3Dnotrunc
-
-This works. Thanks Jari for this workaround!
-
-Thomas
-
-
-
-     =20
+-- 
+Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
