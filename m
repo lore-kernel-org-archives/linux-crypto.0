@@ -1,33 +1,37 @@
-From: "Mr Tan Wong" <mrtanwong@hangsengbank.com.hk>
-Subject: Business Proposal
-Date: Sat, 2 Apr 2011 02:53:30 +0800 (CST)
-Message-ID: <23493.41.203.64.250.1301684010.squirrel__47750.823343131$1301686474$gmane$org@webmail.yunfu.com.tw>
-Reply-To: mrtan75wong@hksaps.coms.hk
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 2/6] drivers/crypto/caam/caamalg.c: introduce missing
+ kfree
+Date: Fri, 1 Apr 2011 14:42:05 -0500
+Message-ID: <20110401144205.b050c598.kim.phillips@freescale.com>
+References: <1301667827-20056-2-git-send-email-julia@diku.dk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	<kernel-janitors@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Steve Cornelius <sec@pobox.com>,
+	Dan Carpenter <error27@gmail.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+To: Julia Lawall <julia@diku.dk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail6.dns168.com.tw ([202.133.248.42]:35072 "EHLO
-	mail6.dns168.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753615Ab1DATeT (ORCPT
+Received: from ch1outboundpool.messaging.microsoft.com ([216.32.181.182]:23875
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752323Ab1DATnS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Apr 2011 15:34:19 -0400
+	Fri, 1 Apr 2011 15:43:18 -0400
+In-Reply-To: <1301667827-20056-2-git-send-email-julia@diku.dk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Fri, 1 Apr 2011 16:23:43 +0200
+Julia Lawall <julia@diku.dk> wrote:
 
+> Error handling code following a kmalloc should free the allocated data.
 
+> Signed-off-by: Julia Lawall <julia@diku.dk>
+> ---
 
-FROM:MR TAN WONG
-mrtan75wong@hksaps.coms.hk
+Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
-I am Mr.Tan Wong director of operations, Hang Seng Bank, Hong Kong.I have
-urgent and very confidential business proposition involving transfer of
-$24,500,000.00 that will be of great benefit for both of us. I will give you
-more details as regards this transaction as soon as you notify me of your
-interest. Awaiting your urgent reply via my email address
-(mrtan75wong@hksaps.coms.hk)  which is my confidential email address.
-
-Kind Regards,
-Mr.Tan Wong
+Kim
