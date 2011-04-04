@@ -1,58 +1,151 @@
-From: markus reichelt <ml@mareichelt.com>
-Subject: Re: loop-aes: It is not longer possible to create a filesystem on an   encrypted DVD-RAM
-Date: Sat, 2 Apr 2011 23:32:23 +0200
-Message-ID: <20110402213223.GA27652@pc21.mareichelt.com>
-References: <4D915AE7.BA4444B9@users.sourceforge.net> <208104.65278.qm@web114105.mail.gq1.yahoo.com>
+From: James Morris <jmorris@namei.org>
+Subject: [ANN] Linux Security Summit 2011 - Announcement and CFP
+Date: Mon, 4 Apr 2011 18:39:59 +1000 (EST)
+Message-ID: <alpine.LRH.2.00.1104041833360.354@tundra.namei.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vpn.antaris-organics.com ([77.74.199.76]:53786 "EHLO
-	vpn.antaris-organics.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757141Ab1DBVkl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 2 Apr 2011 17:40:41 -0400
-Content-Disposition: inline
-In-Reply-To: <208104.65278.qm@web114105.mail.gq1.yahoo.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-kernel@vger.kernel.org, lwn@lwn.net,
+	fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
+	ubuntu-hardened@lists.ubuntu.com,
+	tomoyo-users-en@lists.sourceforge.jp,
+	netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Audit-ML <linux-audit@redhat.com>,
+	Linux Security Summit Program Committee
+	<lss-pc@ext.namei.org>, Jesse Barnes <jbarnes@virtuousgeek.org>,
+	gentoo-hardened@gentoo.org
+To: linux-security-module@vger.kernel.org
+Return-path: <netfilter-devel-owner@vger.kernel.org>
+Sender: netfilter-devel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
+
+==========================================================================
+
+                 ANNOUNCEMENT AND CALL FOR PARTICIPATION
+
+                 LINUX SECURITY SUMMIT 2011 - SANTA ROSA
+
+==========================================================================
 
 
---bg08WKrSYDhXBjb5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+DESCRIPTION
 
-* Thomas Siedlich <thomas.siedlich@yahoo.com> wrote:
+  The Linux Security Summit is a technical forum for collaboration
+  between Linux developers, researchers, and end users.  Its primary aim
+  is to foster community efforts in analyzing and solving Linux security
+  challenges.
 
-> [solved]
+  The format of the summit will be:
+  
+    * Selected brief presentations
+    * Lightning talks
+    * Q&A panel sessions 
 
-Thanks, added to the FAQ.
 
---=20
-left blank, right bald
-loop-AES FAQ: http://mareichelt.de/pub/texts.loop-aes.php#faq
---bg08WKrSYDhXBjb5
-Content-Type: application/pgp-signature
-Content-Disposition: inline
+WEB SITE
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+  https://security.wiki.kernel.org/index.php/LinuxSecuritySummit2011
 
-iQIcBAEBAgAGBQJNl5XmAAoJEMImmhyPL9kTd4oQAIzavXMr6GIegvnYAaltXioI
-jIXQ16yBnMpeNCAME3+z0x0o6qo+6dSUw4kHKmZg7zlH+cUn0vreKMaPP8PTeobW
-XHuCzAHvw6cTyUndcJIFUCEH+lfiEt0bueyO3WtndAqD82ZzgAsSgJ6WNfH6stAw
-92rPBm/AhuAHLctg/hbyE9OQhFztUezGFRgio0uqHhjo1icwhUfUGyTA//kOeXXW
-N3fC0XddHjIpACsXI3k1G/oesDVA2/t31BEPE1jPCv5Iac5wjuonklmime77F5qQ
-3By7J1f+hGj1V50XhpQ9A7dhvXPlwMZIgBy+2KAU/PgYlABMWKEAiiwe2rmZ+rUz
-PFHSQcIwHKaCD1jgfDv0fO2WehzgPVlre3Q9OGfJkpYWCd1WXpaCrRfGuE36LBfQ
-En3KSTk9bVN9EGksY/PwT9D1ru9dLWW/j2YgX0aH0K+jNXgQ0zqeECZrE0TEYQUe
-7IrnxtjvsjjW0r8eU0k5vhnkOeAX4cqZJyxP5qkFn3nTvYNxBENSX/Sgcgwyq+5D
-MaubcFdjkXrEOo2MPmT/zmb+4UiIFB6nQgaoVOheLTbNhbGTWnaRE1Rkpt0FizIg
-Li4kNxWeJ7hCT7dyxVWePc0EfIaPBnOs/r1YrxvTzFOOUc+ae295D5U4WkPYlD3C
-klcGJeaazvvlLfLeptqG
-=NH9d
------END PGP SIGNATURE-----
 
---bg08WKrSYDhXBjb5--
+DATES / LOCATION
+
+  The Linux Security Summit for 2011 will be held on the 8th of September in
+  Santa Rosa, CA, USA.  It will be co-located with Linux Plumbers Conference
+  (LPC) [1].
+  
+  Note that Linux Security Summit attendees and speakers must be registered to attend
+  LPC.  See the LPC site for details on registration, travel, and accommodation:
+  
+    http://www.linuxplumbersconf.org/2011/
+
+  The Linux Security Summit CFP is now open, and will close on 27th of May.
+  
+  Accepted speakers will be notified by 1st of June.
+
+
+WHO SHOULD ATTEND
+
+  The event is open to all registered LPC attendees.
+  
+  You do not have to be a "security person" to attend -- we're seeking a
+  diverse range of attendees, and welcome the participation of general
+  developers, researchers, operations, and end-users.
+
+  There will be several panel sessions in addition to brief, selected
+  presentations, with a strong focus on discussion.
+
+
+CALL FOR PARTICIPATION
+
+  The program committee currently seeks proposals for:
+
+  Presentations:
+  
+    Brief technical talks in 30 minute slots, including at least 10
+    minutes of discussion (i.e.  the maximum length of the presentation
+    alone is 20 minutes).  Papers are encouraged, and slides should be
+    minimal.
+    
+    Presentation abstracts should be approximately 150 words in length.
+
+
+  Panel discussion topics:
+  
+    If you'd like to see an issue discussed in a Q&A style panel, send it
+    in.  Note that this may result in you volunteering to participate in
+    a panel.
+
+    
+  Topic areas include, but are not limited to:
+  
+    * System hardening
+    * Access control
+    * Cryptography
+    * Integrity control
+    * Hardware security
+    * Networking
+    * Storage
+    * Virtualization
+    * Desktop
+    * Tools
+    * Management
+    * Case studies
+    * Emerging technologies, threats & techniques 
+    
+
+  Proposals should be submitted in plain text via email to the program
+  committee at:  lss-pc (_at_) ext.namei.org
+
+
+MAILING LIST
+
+  Everyone planning to attend should join the event mailing list:
+  
+     https://ext.namei.org/mailman/listinfo/linux-security-summit
+     
+  Updates and announcements about the event will also be sent to the list.
+  
+
+PROGRAM COMMITTEE
+
+  The Linux Security Summit for 2011 is organized by:
+
+    * James Morris, Red Hat
+    * Serge Hallyn, Canonical
+    * Paul Moore, HP
+    * Stephen Smalley, NSA
+    * Joshua Brindle, Tresys
+    * Tetsuo Handa, NTT Data
+    * Herbert Xu, Red Hat
+    * John Johansen, Canonical
+    * Kees Cook, Canonical
+    * Casey Schaufler, Smack Project
+
+  The program committee may be contacted as a group via email:
+
+     lss-pc (_at_) ext.namei.org
+   
+
+REFERENCES  
+
+  [1] Linux Plumbers Conference http://www.linuxplumbersconf.org/2011/
+
