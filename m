@@ -1,30 +1,42 @@
-From: Phil Sutter <phil@nwl.cc>
-Subject: aead: driver side documentation
-Date: Mon, 4 Apr 2011 19:03:37 +0200
-Message-ID: <20110404170337.GA1511@orbit.nwl.cc>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: aead: driver side documentation
+Date: Mon, 4 Apr 2011 20:35:43 -0500
+Message-ID: <20110404203543.4f80b41b.kim.phillips@freescale.com>
+References: <20110404170337.GA1511@orbit.nwl.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: Phil Sutter <phil@nwl.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.141.167]:33721 "EHLO orbit.nwl.cc"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751450Ab1DDRJX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Apr 2011 13:09:23 -0400
-Received: from orbit.nwl.cc (localhost [127.0.0.1])
-	by orbit.nwl.cc (Postfix) with ESMTP id 2D1771044A91
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2011 19:03:37 +0200 (CEST)
-Content-Disposition: inline
+Received: from ch1outboundpool.messaging.microsoft.com ([216.32.181.182]:31521
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751373Ab1DEBfw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 Apr 2011 21:35:52 -0400
+In-Reply-To: <20110404170337.GA1511@orbit.nwl.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear list,
+On Mon, 4 Apr 2011 19:03:37 +0200
+Phil Sutter <phil@nwl.cc> wrote:
 
-I would like to enhance drivers/crypto/mv_cesa.c by an AEAD algorithm
-(at least authenc(hmac(sha1),cbc(aes))), since the driver is able to do
-both operations in one go.
+> I would like to enhance drivers/crypto/mv_cesa.c by an AEAD algorithm
+> (at least authenc(hmac(sha1),cbc(aes))), since the driver is able to do
+> both operations in one go.
+> 
+> Unfortunately, I have found little information about this task in
+> Documentation/ or the web. Am I missing something? It would be really
+> great if you could point me to the right direction here.
 
-Unfortunately, I have found little information about this task in
-Documentation/ or the web. Am I missing something? It would be really
-great if you could point me to the right direction here.
+use existing drivers for guidance.  The following drivers implement
+those types of algorithms:
 
-Greetings, Phil
+drivers/crypto/caam/caamalg.c*
+drivers/crypto/ixp4xx_crypto.c
+drivers/crypto/picoxcell_crypto.c
+drivers/crypto/talitos.c
+
+Kim
+
+* only available in Herbert's cryptodev-2.6 tree
