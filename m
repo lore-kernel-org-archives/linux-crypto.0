@@ -1,66 +1,62 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: aead: driver side documentation
-Date: Tue, 5 Apr 2011 19:21:29 -0500
-Message-ID: <20110405192129.d2778dec.kim.phillips@freescale.com>
-References: <20110404170337.GA1511@orbit.nwl.cc>
-	<20110404203543.4f80b41b.kim.phillips@freescale.com>
-	<20110405130435.GB15256@orbit.nwl.cc>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: Phil Sutter <phil@nwl.cc>
+From: Aditya Shevade <aditya.shevade@gmail.com>
+Subject: [PATCH] crypto: blowfish: Fixed a multi line macro issue
+Date: Wed,  6 Apr 2011 23:49:20 -0700
+Message-ID: <1302158960-20479-1-git-send-email-aditya.shevade@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Aditya Shevade <aditya.shevade@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:33060 "EHLO
-	TX2EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751994Ab1DFAVd (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:53601 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752108Ab1DGGt4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Apr 2011 20:21:33 -0400
-In-Reply-To: <20110405130435.GB15256@orbit.nwl.cc>
+	Thu, 7 Apr 2011 02:49:56 -0400
+Received: by iyb14 with SMTP id 14so2159078iyb.19
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Apr 2011 23:49:55 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 5 Apr 2011 15:04:35 +0200
-Phil Sutter <phil@nwl.cc> wrote:
+Fixed a multi line macro with do-while loop.
+Fixed some other minor tab related issues.
 
-> Hi,
-> 
-> On Mon, Apr 04, 2011 at 08:35:43PM -0500, Kim Phillips wrote:
-> > On Mon, 4 Apr 2011 19:03:37 +0200
-> > Phil Sutter <phil@nwl.cc> wrote:
-> > 
-> > > I would like to enhance drivers/crypto/mv_cesa.c by an AEAD algorithm
-> > > (at least authenc(hmac(sha1),cbc(aes))), since the driver is able to do
-> > > both operations in one go.
-> > > 
-> > > Unfortunately, I have found little information about this task in
-> > > Documentation/ or the web. Am I missing something? It would be really
-> > > great if you could point me to the right direction here.
-> > 
-> > use existing drivers for guidance.  The following drivers implement
-> > those types of algorithms:
-> 
-> Thanks for the hint, although I've already found the "sample code". ;)
-> Was rather looking for something telling me what is crucial and what
-> options there are. Concrete code tends to just show the solution of a
-> specific problem. (My five cents to the question why code is often, but
-> seldomly good documentation.)
-> 
-> Grepping reveals IPSec (i.e., esp{4,6}.c) as the only user of AEAD so
-> far. Is this correct?
+Signed-off-by: Aditya Shevade <aditya.shevade@gmail.com>
+---
+ crypto/blowfish.c |   14 +++++++++-----
+ 1 files changed, 9 insertions(+), 5 deletions(-)
 
-yep.
-
-I started to add test vectors from [1] to crypto/testmgr.c, but it
-required that drivers not assume associated data, iv, and cipher data
-were contiguous in memory, and since some of them do, I don't know if
-such a contribution would be acceptable upstream.
-
-then there's the rtnetlink dependencies I mention in [2] that
-also make drivers fail AEAD testmgr tests in their setkey()
-implementations, IIRC, because testmgr keys aren't RTA_OK.
-
-Kim
-
-[1] http://grouper.ieee.org/groups/1619/email/msg01966.html
-[2] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05533.html
+diff --git a/crypto/blowfish.c b/crypto/blowfish.c
+index a67d52e..5d9bc2e 100644
+--- a/crypto/blowfish.c
++++ b/crypto/blowfish.c
+@@ -309,9 +309,13 @@ static const u32 bf_sbox[256 * 4] = {
+ #define GET32_0(x) (((x) >> (24)) & (0xff))
+ 
+ #define bf_F(x) (((S[GET32_0(x)] + S[256 + GET32_1(x)]) ^ \
+-          S[512 + GET32_2(x)]) + S[768 + GET32_3(x)])
++	S[512 + GET32_2(x)]) + S[768 + GET32_3(x)])
+ 
+-#define ROUND(a, b, n)  b ^= P[n]; a ^= bf_F (b)
++#define ROUND(a, b, n)  \
++	do { \
++		b ^= P[n]; \
++		a ^= bf_F(b) \
++	} while (0)
+ 
+ /*
+  * The blowfish encipher, processes 64-bit blocks.
+@@ -460,9 +464,9 @@ static struct crypto_alg alg = {
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	BF_MIN_KEY_SIZE,
+ 	.cia_max_keysize	=	BF_MAX_KEY_SIZE,
+-	.cia_setkey   		= 	bf_setkey,
+-	.cia_encrypt 		=	bf_encrypt,
+-	.cia_decrypt  		=	bf_decrypt } }
++	.cia_setkey		=	bf_setkey,
++	.cia_encrypt		=	bf_encrypt,
++	.cia_decrypt		=	bf_decrypt } }
+ };
+ 
+ static int __init blowfish_mod_init(void)
+-- 
+1.7.4.3
