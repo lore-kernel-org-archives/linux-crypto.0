@@ -1,39 +1,30 @@
-From: Aditya Shevade <aditya.shevade@gmail.com>
+From: David Miller <davem@davemloft.net>
 Subject: Re: [PATCH] crypto: blowfish: Fixed a multi line macro issue
-Date: Fri, 8 Apr 2011 10:46:57 -0700
-Message-ID: <BANLkTikGeCWy3gdeCOX+OYsjuckRMG+b+Q@mail.gmail.com>
+Date: Fri, 08 Apr 2011 10:53:51 -0700 (PDT)
+Message-ID: <20110408.105351.226772899.davem@davemloft.net>
 References: <1302158960-20479-1-git-send-email-aditya.shevade@gmail.com>
 	<20110408124501.GB19422@gondor.apana.org.au>
+	<BANLkTikGeCWy3gdeCOX+OYsjuckRMG+b+Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: aditya.shevade@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:52519 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756859Ab1DHRq5 (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:39079
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751871Ab1DHRy1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Apr 2011 13:46:57 -0400
-Received: by pwi15 with SMTP id 15so1330562pwi.19
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Apr 2011 10:46:57 -0700 (PDT)
-In-Reply-To: <20110408124501.GB19422@gondor.apana.org.au>
+	Fri, 8 Apr 2011 13:54:27 -0400
+In-Reply-To: <BANLkTikGeCWy3gdeCOX+OYsjuckRMG+b+Q@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 8, 2011 at 5:45 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Wed, Apr 06, 2011 at 11:49:20PM -0700, Aditya Shevade wrote:
-> > Fixed a multi line macro with do-while loop.
-> > Fixed some other minor tab related issues.
-> >
-> > Signed-off-by: Aditya Shevade <aditya.shevade@gmail.com>
->
-> Your patch doesn't even build!
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+From: Aditya Shevade <aditya.shevade@gmail.com>
+Date: Fri, 8 Apr 2011 10:46:57 -0700
 
-Oh, I see the problem. I forgot a semicolon in the commit file. Making
-the change.
+> Oh, I see the problem. I forgot a semicolon in the commit file. Making
+> the change.
+
+I think it's even more important that you are submitting patches
+you aren't even build testing.
