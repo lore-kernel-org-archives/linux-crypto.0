@@ -1,30 +1,52 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: blowfish: Fixed a multi line macro issue
-Date: Fri, 08 Apr 2011 10:53:51 -0700 (PDT)
-Message-ID: <20110408.105351.226772899.davem@davemloft.net>
-References: <1302158960-20479-1-git-send-email-aditya.shevade@gmail.com>
-	<20110408124501.GB19422@gondor.apana.org.au>
-	<BANLkTikGeCWy3gdeCOX+OYsjuckRMG+b+Q@mail.gmail.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: aead: driver side documentation
+Date: Fri, 8 Apr 2011 15:44:01 -0500
+Message-ID: <20110408154401.4cbb989b.kim.phillips@freescale.com>
+References: <20110405192129.d2778dec.kim.phillips@freescale.com>
+	<20110408005533.GA14581@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: aditya.shevade@gmail.com
+Cc: <phil@nwl.cc>, <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:39079
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751871Ab1DHRy1 (ORCPT
+Received: from va3ehsobe002.messaging.microsoft.com ([216.32.180.12]:10222
+	"EHLO VA3EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757841Ab1DHUoH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Apr 2011 13:54:27 -0400
-In-Reply-To: <BANLkTikGeCWy3gdeCOX+OYsjuckRMG+b+Q@mail.gmail.com>
+	Fri, 8 Apr 2011 16:44:07 -0400
+In-Reply-To: <20110408005533.GA14581@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Aditya Shevade <aditya.shevade@gmail.com>
-Date: Fri, 8 Apr 2011 10:46:57 -0700
+On Fri, 8 Apr 2011 08:55:33 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-> Oh, I see the problem. I forgot a semicolon in the commit file. Making
-> the change.
+> Kim Phillips <kim.phillips@freescale.com> wrote:
+> >
+> > I started to add test vectors from [1] to crypto/testmgr.c, but it
+> > required that drivers not assume associated data, iv, and cipher data
+> > were contiguous in memory, and since some of them do, I don't know if
+> > such a contribution would be acceptable upstream.
+> 
+> Such drivers are broken and should be fixed.
 
-I think it's even more important that you are submitting patches
-you aren't even build testing.
+ok.
+
+> > then there's the rtnetlink dependencies I mention in [2] that
+> > also make drivers fail AEAD testmgr tests in their setkey()
+> > implementations, IIRC, because testmgr keys aren't RTA_OK.
+> 
+> Can you elaborate on this problem?
+
+the following conditions in a driver setkey fail:
+
+        if (!RTA_OK(rta, keylen))
+                goto badkey;
+
+        if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
+                goto badkey;
+
+because testmgr keys are plain strings, not rtattr structs.
+
+Kim
