@@ -1,28 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: add S5PV210 advanced crypto engine support.
-Date: Fri, 8 Apr 2011 20:41:07 +0800
-Message-ID: <20110408124107.GA19422@gondor.apana.org.au>
-References: <1301764278-7345-1-git-send-email-vzapolskiy@gmail.com>
+Subject: Re: [PATCH 2/6] drivers/crypto/caam/caamalg.c: introduce missing
+	kfree
+Date: Fri, 8 Apr 2011 20:39:39 +0800
+Message-ID: <20110408123939.GA19398@gondor.apana.org.au>
+References: <1301667827-20056-2-git-send-email-julia@diku.dk> <20110401144205.b050c598.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Kukjin Kim <kgene.kim@samsung.com>
-To: Vladimir Zapolskiy <vzapolskiy@gmail.com>
+Cc: Julia Lawall <julia@diku.dk>, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Steve Cornelius <sec@pobox.com>,
+	Dan Carpenter <error27@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57820 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:40858 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756133Ab1DHMlK (ORCPT
+	with ESMTP id S1756133Ab1DHMl2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Apr 2011 08:41:10 -0400
+	Fri, 8 Apr 2011 08:41:28 -0400
 Content-Disposition: inline
-In-Reply-To: <1301764278-7345-1-git-send-email-vzapolskiy@gmail.com>
+In-Reply-To: <20110401144205.b050c598.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Apr 02, 2011 at 08:11:18PM +0300, Vladimir Zapolskiy wrote:
-> This change adds support for AES encrypting and decrypting using
-> advanced crypto engine found on Samsung S5PV210 and S5PC110 SoCs.
+On Fri, Apr 01, 2011 at 02:42:05PM -0500, Kim Phillips wrote:
+> On Fri, 1 Apr 2011 16:23:43 +0200
+> Julia Lawall <julia@diku.dk> wrote:
 > 
-> Signed-off-by: Vladimir Zapolskiy <vzapolskiy@gmail.com>
+> > Error handling code following a kmalloc should free the allocated data.
+> 
+> > Signed-off-by: Julia Lawall <julia@diku.dk>
+> > ---
+> 
+> Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
 Patch applied.  Thanks!
 -- 
