@@ -1,51 +1,40 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 3/4] crypto: caam - remove WAIT-FOR-COMPLETIONs from
- givencrypt descriptor
-Date: Mon, 11 Apr 2011 19:15:24 -0500
-Message-ID: <20110411191524.c825a8bf.kim.phillips@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: aead: driver side documentation
+Date: Fri, 15 Apr 2011 16:46:07 +0800
+Message-ID: <20110415084607.GA1622@gondor.apana.org.au>
+References: <20110405192129.d2778dec.kim.phillips@freescale.com> <20110408005533.GA14581@gondor.apana.org.au> <20110408154401.4cbb989b.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Steve Cornelius <sec@pobox.com>
-To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: phil@nwl.cc, linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:24349 "EHLO
-	TX2EHSOBE005.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756472Ab1DLAQO (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:33290 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752707Ab1DOIqQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Apr 2011 20:16:14 -0400
+	Fri, 15 Apr 2011 04:46:16 -0400
+Content-Disposition: inline
+In-Reply-To: <20110408154401.4cbb989b.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-remains from descriptor debugging - not required for normal operation.
+On Fri, Apr 08, 2011 at 03:44:01PM -0500, Kim Phillips wrote:
+> the following conditions in a driver setkey fail:
+> 
+>         if (!RTA_OK(rta, keylen))
+>                 goto badkey;
+> 
+>         if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
+>                 goto badkey;
+> 
+> because testmgr keys are plain strings, not rtattr structs.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
- drivers/crypto/caam/caamalg.c |    6 ++----
- 1 files changed, 2 insertions(+), 4 deletions(-)
+There is no reason why an authenc test vector can't use an rtattr.
+The key value is a char *, so you can point it to a struct quite
+easily.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 20e1215..8eb84d3 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -828,15 +828,13 @@ static int aead_authenc_givencrypt(struct aead_givcrypt_request *req)
- 	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
- 
- 	/* MOVE DECO Alignment -> C1 Context 16 bytes */
--	append_move(desc, MOVE_WAITCOMP | MOVE_SRC_INFIFO |
--		    MOVE_DEST_CLASS1CTX | ivsize);
-+	append_move(desc, MOVE_SRC_INFIFO | MOVE_DEST_CLASS1CTX | ivsize);
- 
- 	/* re-enable info fifo entries */
- 	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
- 
- 	/* MOVE C1 Context -> OFIFO 16 bytes */
--	append_move(desc, MOVE_WAITCOMP | MOVE_SRC_CLASS1CTX |
--		    MOVE_DEST_OUTFIFO | ivsize);
-+	append_move(desc, MOVE_SRC_CLASS1CTX | MOVE_DEST_OUTFIFO | ivsize);
- 
- 	append_fifo_store(desc, iv_dma, ivsize, FIFOST_TYPE_MESSAGE_DATA);
- 
+Cheers,
 -- 
-1.7.4.3.dirty
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
