@@ -1,39 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: aead: driver side documentation
-Date: Fri, 15 Apr 2011 16:46:07 +0800
-Message-ID: <20110415084607.GA1622@gondor.apana.org.au>
-References: <20110405192129.d2778dec.kim.phillips@freescale.com> <20110408005533.GA14581@gondor.apana.org.au> <20110408154401.4cbb989b.kim.phillips@freescale.com>
+Subject: Re: [PATCH 1/4] crypto: caam - handle interrupt lines shared
+	across rings
+Date: Fri, 15 Apr 2011 17:50:49 +0800
+Message-ID: <20110415095049.GA2129@gondor.apana.org.au>
+References: <20110411191516.bae0454e.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: phil@nwl.cc, linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Steve Cornelius <sec@pobox.com>
 To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33290 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:52502 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752707Ab1DOIqQ (ORCPT
+	with ESMTP id S1751923Ab1DOJu4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Apr 2011 04:46:16 -0400
+	Fri, 15 Apr 2011 05:50:56 -0400
 Content-Disposition: inline
-In-Reply-To: <20110408154401.4cbb989b.kim.phillips@freescale.com>
+In-Reply-To: <20110411191516.bae0454e.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 08, 2011 at 03:44:01PM -0500, Kim Phillips wrote:
-> the following conditions in a driver setkey fail:
+On Mon, Apr 11, 2011 at 07:15:16PM -0500, Kim Phillips wrote:
+> - add IRQF_SHARED to request_irq flags to support parts such as
+> the p1023 that has one IRQ line per couple of rings.
 > 
->         if (!RTA_OK(rta, keylen))
->                 goto badkey;
+> - resetting a job ring triggers an interrupt, so move request_irq
+> prior to jr_reset to avoid 'got IRQ but nobody cared' messages.
 > 
->         if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
->                 goto badkey;
+> - disable IRQs in h/w to avoid contention between reset and
+> interrupt status
 > 
-> because testmgr keys are plain strings, not rtattr structs.
+> - delete invalid comment - if there were incomplete jobs,
+> module would be in use, preventing an unload.
+> 
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> ---
+> this, and the remaining patches in this series, tested on p1023, p3041,
+> p4080, and 32- and 64-bit p5020.
 
-There is no reason why an authenc test vector can't use an rtattr.
-The key value is a char *, so you can point it to a struct quite
-easily.
-
-Cheers,
+All four patches applied.  Thanks Kim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
