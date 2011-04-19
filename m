@@ -1,33 +1,43 @@
-From: Kent Borg <kentborg@borg.org>
-Subject: shash_alg size fields and stomping memory
-Date: Tue, 19 Apr 2011 14:29:16 -0400
-Message-ID: <4DADD47C.1080701@borg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: jang@linux.vnet.ibm.com
+Subject: [PATCH 0/1] add support for z196 CPACF algorithms
+Date: Tue, 19 Apr 2011 21:23:30 +0200
+Message-ID: <20110419192330.131516742@linux.vnet.ibm.com>
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from borg.org ([64.105.205.123]:56244 "EHLO borg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752529Ab1DSSs5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Apr 2011 14:48:57 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: kentborg)
-	by borg.org (Postfix) with ESMTP id DF564186781
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2011 14:29:16 -0400 (EDT)
+Received: from mtagate5.uk.ibm.com ([194.196.100.165]:53404 "EHLO
+	mtagate5.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752890Ab1DST0b (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Apr 2011 15:26:31 -0400
+Received: from d06nrmr1707.portsmouth.uk.ibm.com (d06nrmr1707.portsmouth.uk.ibm.com [9.149.39.225])
+	by mtagate5.uk.ibm.com (8.13.1/8.13.1) with ESMTP id p3JJQU3b020785
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2011 19:26:30 GMT
+Received: from d06av07.portsmouth.uk.ibm.com (d06av07.portsmouth.uk.ibm.com [9.149.37.248])
+	by d06nrmr1707.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p3JJRQji1982548
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2011 20:27:26 +0100
+Received: from d06av07.portsmouth.uk.ibm.com (loopback [127.0.0.1])
+	by d06av07.portsmouth.uk.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p3JJQUbX009889
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2011 13:26:30 -0600
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In struct shash_alg what are the various sizes for?  (WOuld be cool to 
-know what everything is for in those alg structures...)
+Hi Herbert,
 
-My most recent discovery is that if I want to do an shash_desc_ctx() and 
-use the result, cra_ctxsize doesn't seem to mean a thing.  Rather, 
-unless I set descsize, memory will be stomped.
+2nd try, this time with quilt...
 
-And, while I am at it, what is "cra"? 
+This patch series adds support for the algorithms that came with the latest
+System z machine, z196.
 
+Patch 1 and 2 are trivial cleanup patches to make the new code better fit in.
 
--kb, the Kent who would love to RTFM but there doesn't seem to be an FM.
+Patch 3,4,5 are the actual feature patches.
+
+I tried to make the Kconfig descriptions a bit more useful by stating which
+machine supports which feature, Patch 6 does this likewise for the
+existing CPACF algorithms.
+
+Patch 7 and 8 contain the changes we needed for testing with tcrypt.
+
+Thanks, Jan
+-- 
