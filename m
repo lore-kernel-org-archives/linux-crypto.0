@@ -1,24 +1,22 @@
-From: puneets@nvidia.com
-Subject: [PATCH] crypto: testmgr: add support for aes ofb mode
-Date: Mon, 25 Apr 2011 17:39:00 +0530
-Message-ID: <1303733340-1968-1-git-send-email-puneets@nvidia.com>
-Cc: davem@davemloft.net, puneet saxena <puneets@nvidia.com>
-To: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate04.nvidia.com ([216.228.121.35]:18135 "EHLO
-	hqemgate04.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758526Ab1DYMIp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Apr 2011 08:08:45 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org
+Subject: [PATCH v2] crypto: testmgr: add support for aes ofb mode
+Date: Mon, 25 Apr 2011 18:01:26 +0530
+Message-ID: <1303734686-2082-1-git-send-email-puneets@nvidia.com>
+Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	puneet saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+To: herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: puneet saxena <puneets@nvidia.com>
+From: puneet saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 
 the fix add testcase for testing aes ofb mode.
 
-Signed-off-by: Puneet Saxena <puneets@nvidia.com>
+Signed-off-by: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 ---
+v2: added linux-tegra mailing list
+
  crypto/testmgr.c |   16 ++++++++++++++
  crypto/testmgr.h |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
  2 files changed, 76 insertions(+), 1 deletions(-)
@@ -138,11 +136,3 @@ index aa6dac0..9d264bd 100644
  		.key    = zeroed_string,
 -- 
 1.7.1.1
-
-
------------------------------------------------------------------------------------
-This email message is for the sole use of the intended recipient(s) and may contain
-confidential information.  Any unauthorized review, use, disclosure or distribution
-is prohibited.  If you are not the intended recipient, please contact the sender by
-reply email and destroy all copies of the original message.
------------------------------------------------------------------------------------
