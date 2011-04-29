@@ -1,46 +1,29 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/8] s390: add System z hardware support for CTR mode
-Date: Wed, 27 Apr 2011 20:40:04 +1000
-Message-ID: <20110427104004.GA1697@gondor.apana.org.au>
-References: <20110419192913.888086020@linux.vnet.ibm.com> <20110419193248.399099652@linux.vnet.ibm.com> <20110426063437.GA19539@gondor.apana.org.au> <1303900640.3495.12.camel@localhost.localdomain>
-Mime-Version: 1.0
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.6c file/swap crypto package
+Date: Fri, 29 Apr 2011 18:59:06 +0300
+Message-ID: <4DBAE04A.E8561764@users.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>
-To: Jan Glauber <jang@linux.vnet.ibm.com>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48236 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753115Ab1D0KkL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Apr 2011 06:40:11 -0400
-Content-Disposition: inline
-In-Reply-To: <1303900640.3495.12.camel@localhost.localdomain>
+Received: from mail.tnnet.fi ([217.112.240.26]:39488 "EHLO mail.tnnet.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751969Ab1D2P7J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Apr 2011 11:59:09 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 27, 2011 at 12:37:20PM +0200, Jan Glauber wrote:
-> On Tue, 2011-04-26 at 16:34 +1000, Herbert Xu wrote:
-> > On Tue, Apr 19, 2011 at 09:29:17PM +0200, jang@linux.vnet.ibm.com wrote:
-> > >
-> > > @@ -664,11 +784,6 @@ static int __init aes_s390_init(void)
-> > >  	if (ret)
-> > >  		goto cbc_aes_err;
-> > >  
-> > > -	/* skip XTS if MSA-4 is not available */
-> > > -	if ((stfle(facility_bits, 2) <= 0) ||
-> > > -	    !(facility_bits[1] & (1ULL << (63 - (77 - 64)))))
-> > > -		goto out;
-> > 
-> > Any reason why this hunk is here?
-> 
-> This hunk is a left-over from development in the XTS patch and
-> superfluous so it should be removed. Should I repost the whole series?
+loop-AES changes since previous release:
+- Worked around block layer interface breakage on 2.6.39-rc kernels.
 
-No worries.  I'll just kill it in the combined XTS patch.
 
-Thanks,
+bzip2 compressed tarball is here:
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6c.tar.bz2
+    md5sum a030eb9af42e167d11434e2475187f00
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6c.tar.bz2.sign
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
