@@ -1,38 +1,51 @@
-From: Tzvi Chumash <tzvi@research.att.com>
-Subject: blowfish from openSSL to kernel cryptoAPI
-Date: Mon, 02 May 2011 18:34:30 -0400
-Message-ID: <ipnbl5$ug4$1@dough.gmane.org>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 1/4] crypto: caam - handle interrupt lines shared across
+ rings
+Date: Mon, 2 May 2011 18:27:27 -0500
+Message-ID: <20110502182727.366857bd.kim.phillips@freescale.com>
+References: <20110411191516.bae0454e.kim.phillips@freescale.com>
+	<20110415095049.GA2129@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Cc: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	Steve Cornelius <sec@pobox.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:53215 "EHLO lo.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751646Ab1EBWkI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 May 2011 18:40:08 -0400
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <glkc-linux-crypto@m.gmane.org>)
-	id 1QH1mg-0000EU-7B
-	for linux-crypto@vger.kernel.org; Tue, 03 May 2011 00:40:06 +0200
-Received: from 135.207.174.202 ([135.207.174.202])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Tue, 03 May 2011 00:40:06 +0200
-Received: from tzvi by 135.207.174.202 with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Tue, 03 May 2011 00:40:06 +0200
+Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:7492 "EHLO
+	TX2EHSOBE004.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751151Ab1EBX1d (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 May 2011 19:27:33 -0400
+In-Reply-To: <20110415095049.GA2129@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Fri, 15 Apr 2011 17:50:49 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-I'm trying (without much success) to decrypt in-kernel 
-(2.6.18-194.el5PAE) a cipher that was created using openSSL 
-(0.9.8e-fips-rhel5) using blowfish with a 56-byte key/8-byte iv. Are the 
-implementations incompatible (i.e. can't encrypt in one and decrypt in 
-the other?) or am I doing something wrong?
+> On Mon, Apr 11, 2011 at 07:15:16PM -0500, Kim Phillips wrote:
+> > - add IRQF_SHARED to request_irq flags to support parts such as
+> > the p1023 that has one IRQ line per couple of rings.
+> > 
+> > - resetting a job ring triggers an interrupt, so move request_irq
+> > prior to jr_reset to avoid 'got IRQ but nobody cared' messages.
+> > 
+> > - disable IRQs in h/w to avoid contention between reset and
+> > interrupt status
+> > 
+> > - delete invalid comment - if there were incomplete jobs,
+> > module would be in use, preventing an unload.
+> > 
+> > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> > ---
+> > this, and the remaining patches in this series, tested on p1023, p3041,
+> > p4080, and 32- and 64-bit p5020.
+> 
+> All four patches applied.  Thanks Kim!
+
+I don't see them in cryptodev-2.6 - did you forget to push them?
 
 Thanks,
 
-Tzvi
+Kim
