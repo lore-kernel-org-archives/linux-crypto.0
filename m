@@ -1,91 +1,34 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 2/2] crypto: caam - fix printk recursion for long error
- texts
-Date: Mon, 2 May 2011 18:29:17 -0500
-Message-ID: <20110502182917.4400d8e2.kim.phillips@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto: caam - handle interrupt lines shared
+	across rings
+Date: Tue, 3 May 2011 09:56:02 +1000
+Message-ID: <20110502235602.GA26670@gondor.apana.org.au>
+References: <20110411191516.bae0454e.kim.phillips@freescale.com> <20110415095049.GA2129@gondor.apana.org.au> <20110502182727.366857bd.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Steve Cornelius <sec@pobox.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Steve Cornelius <sec@pobox.com>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:4884 "EHLO
-	VA3EHSOBE008.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751151Ab1EBXaB (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:56631 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753231Ab1EBX4R (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 May 2011 19:30:01 -0400
+	Mon, 2 May 2011 19:56:17 -0400
+Content-Disposition: inline
+In-Reply-To: <20110502182727.366857bd.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-during recent descriptor development, an Invalid Sequence Command
-error triggered a:
+On Mon, May 02, 2011 at 06:27:27PM -0500, Kim Phillips wrote:
+>
+> I don't see them in cryptodev-2.6 - did you forget to push them?
 
-BUG: recent printk recursion!
+Indeed, they were stuck on my other machine.  They should be on
+master now and should show up on the public mirror soon.
 
-due to insufficient memory allocated for the error text.
-
-The Invalid Sequence Command error text is the longest.
-The length of the maximum error string is computed as
-the sum of:
-
-"DECO: ": 6
-"jump tgt desc idx 255: ": 23
-Invalid Sequence Command text: 272
-zero termination character: 1
-
-i.e, 302 characters.
-
-Define this maximum error string length in error.h and fix
-caam_jr_strstatus callsites.
-
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
- drivers/crypto/caam/caamalg.c |    6 +++---
- drivers/crypto/caam/error.h   |    1 +
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 719ad06..449f5b6 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -113,7 +113,7 @@ static void split_key_done(struct device *dev, u32 *desc, u32 err,
- 	dev_err(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- #endif
- 	if (err) {
--		char tmp[256];
-+		char tmp[CAAM_ERROR_STR_MAX];
- 
- 		dev_err(dev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
- 	}
-@@ -414,7 +414,7 @@ static void ipsec_esp_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		 offsetof(struct ipsec_esp_edesc, hw_desc));
- 
- 	if (err) {
--		char tmp[256];
-+		char tmp[CAAM_ERROR_STR_MAX];
- 
- 		dev_err(jrdev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
- 	}
-@@ -454,7 +454,7 @@ static void ipsec_esp_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		 offsetof(struct ipsec_esp_edesc, hw_desc));
- 
- 	if (err) {
--		char tmp[256];
-+		char tmp[CAAM_ERROR_STR_MAX];
- 
- 		dev_err(jrdev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
- 	}
-diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
-index 067afc1..02c7baa 100644
---- a/drivers/crypto/caam/error.h
-+++ b/drivers/crypto/caam/error.h
-@@ -6,5 +6,6 @@
- 
- #ifndef CAAM_ERROR_H
- #define CAAM_ERROR_H
-+#define CAAM_ERROR_STR_MAX 302
- extern char *caam_jr_strstatus(char *outstr, u32 status);
- #endif /* CAAM_ERROR_H */
+Thanks,
 -- 
-1.7.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
