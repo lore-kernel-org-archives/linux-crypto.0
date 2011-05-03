@@ -1,57 +1,158 @@
-From: Tzvi Chumash <tzvi@research.att.com>
+From: Emanuele Cesena <emanuele.cesena@gmail.com>
 Subject: Re: blowfish from openSSL to kernel cryptoAPI
-Date: Tue, 03 May 2011 11:46:35 -0400
-Message-ID: <ipp84b$m6s$1@dough.gmane.org>
-References: <ipnbl5$ug4$1@dough.gmane.org> <4DC015AD.BA46DC3F@users.sourceforge.net>
+Date: Tue, 03 May 2011 18:19:25 +0200
+Message-ID: <1304439565.2652.47.camel@ec>
+References: <ipnbl5$ug4$1@dough.gmane.org>
+	 <4DC015AD.BA46DC3F@users.sourceforge.net>  <ipp84b$m6s$1@dough.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: multipart/signed; micalg="sha1"; protocol="application/x-pkcs7-signature"; boundary="=-/x+ulM5c45nUsGitBHs0"
+Cc: linux-crypto@vger.kernel.org
+To: Tzvi Chumash <tzvi@research.att.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:43563 "EHLO lo.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752469Ab1ECPsp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 May 2011 11:48:45 -0400
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <glkc-linux-crypto@m.gmane.org>)
-	id 1QHHq7-000439-Sq
-	for linux-crypto@vger.kernel.org; Tue, 03 May 2011 17:48:43 +0200
-Received: from 135.207.174.202 ([135.207.174.202])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Tue, 03 May 2011 17:48:43 +0200
-Received: from tzvi by 135.207.174.202 with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-crypto@vger.kernel.org>; Tue, 03 May 2011 17:48:43 +0200
-In-Reply-To: <4DC015AD.BA46DC3F@users.sourceforge.net>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:53078 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753296Ab1ECQUX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 May 2011 12:20:23 -0400
+Received: by fxm17 with SMTP id 17so215528fxm.19
+        for <linux-crypto@vger.kernel.org>; Tue, 03 May 2011 09:20:21 -0700 (PDT)
+In-Reply-To: <ipp84b$m6s$1@dough.gmane.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks for your response, Jari. I tried changing the byte ordering on 
-the key,iv and the data(before and after decrypt) and the result is 
-still wrong. Unless someone has another idea, I will have to change the 
-user-space part to also encrypt in-kernel instead of using openSSL...
 
-I was assuming that given the same parameters (e.g. encryption 
-algorithm, CBC, key, iv), the cipher data would be equivalent between 
-different implementations (in this case openSSL/cryptoapi). Was that a 
-wrong assumption?
+--=-/x+ulM5c45nUsGitBHs0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks again,
+On Tue, 2011-05-03 at 11:46 -0400, Tzvi Chumash wrote:
+> I was assuming that given the same parameters (e.g. encryption=20
+> algorithm, CBC, key, iv), the cipher data would be equivalent between=20
+> different implementations (in this case openSSL/cryptoapi). Was that a=
+=20
+> wrong assumption?
+>=20
+It may be a stupid remark... anyway, OpenSSL uses key/iv "internally"
+and exposes to the user passphrase and salt. Did you check that you have
+not confused them?
 
-Tzvi
+Best,
+--=20
+Emanuele Cesena <emanuele.cesena@gmail.com>
+
+Il corpo non ha ideali
+
+--=-/x+ulM5c45nUsGitBHs0
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+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
+IwQYMBaAFNB15T/ryrprllF8IKWYvfNn07RKMIGRBgNVHSAEgYkwgYYwPgYKKwYBBAGpBwEBAjAw
+MC4GCCsGAQUFBwIBFiJodHRwOi8vd3d3LmV1cm9wa2kub3JnL2NhL2Nwcy8xLjIvMEQGCisGAQQB
+qQcCAQIwNjA0BggrBgEFBQcCARYoaHR0cDovL3d3dy5pdGFseS5ldXJvcGtpLm9yZy9jYS9jcHMv
+MS4yLzB+BggrBgEFBQcBAQRyMHAwKQYIKwYBBQUHMAGGHWh0dHA6Ly9vY3NwLml0YWx5LmV1cm9w
+a2kub3JnMEMGCCsGAQUFBzAChjdodHRwOi8vd3d3Lml0YWx5LmV1cm9wa2kub3JnL2NhL2NlcnRz
+L2V1cm9wa2lfaXRhbHkuY2VyMEIGA1UdHwQ7MDkwN6A1oDOGMWh0dHA6Ly93d3cuaXRhbHkuZXVy
+b3BraS5vcmcvY2EvY3JsL2l0YWx5X2NybC5jcmwwDQYJKoZIhvcNAQEFBQADggEBAFNUlYhQGVuP
+EVBOSNEuC80+3TebY0iGAK35IggW4LiuEHXRWoeKwBbryFfEcR8VnTovF4wufegac+uJZB2k+QLs
+wC3zuJLIgbo593W83ShSG5aCJioMoQ5X9Zfd+j1BfIV/zARyhorEvgC7doGfBVxG3qAmQEYbonot
+hz4UJWld3Gd3zmwpqpNMLG2JO3BJWOrAun9SWPVRLOE/92Pq/jTMB6Lkse0KNJTBbNHPUzydOzPU
+tPA7JvMDnzb6L98hVVqKoxmJw3C2sV/NOl/tuTfS6dnZypZstRaOV0JSWgP4PAqcPte0N40h8q4D
+/Rdg5P7EcUklgZqL57cyUCCQro8wggVkMIIETKADAgECAgICzTANBgkqhkiG9w0BAQUFADBlMQsw
+CQYDVQQGEwJJVDEeMBwGA1UEChMVUG9saXRlY25pY28gZGkgVG9yaW5vMTYwNAYDVQQDEy1Qb2xp
+dGVjbmljbyBkaSBUb3Jpbm8gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTEwMTE3MDc0MDIx
+WhcNMTUxMjMxMjM1OTU5WjBhMQswCQYDVQQGEwJJVDEeMBwGA1UEChMVUG9saXRlY25pY28gZGkg
+VG9yaW5vMRkwFwYDVQQDExBFbWFudWVsZSAgQ2VzZW5hMRcwFQYKCZImiZPyLGQBARMHZDAxOTIz
+ODCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALBtPhV/spNdpCPGz2+nFtCc9vmCR0v4
+YmpxBPFRB9qCLgO0vRpW/74DbqW6w4VVFAnMps0BOSluUW95p3Bg6LGUGgkZ0d90xq4cQsbkbmxA
+OWiNgV38+K90Mcfb6uKSbWI1w5rLxCCOtr3kHLTx/OOhfvAPmd1vMbYDaFaxjBLDwuosj4DiYFCF
+al7TfNf6KOOTQZ8tgG25UzQU2kGp6S6zCsjfnEvlejzTZpuilirUedxL/nG0hTcAISQQNwXzPK6t
+ytiNPYPeO0W8rXoisCJsVmIGxieIhmEGZBbaLBq+FfbDfLyaAf2107G/Te2lcO471sy3H3tvfzkc
+1gwO100CAwEAAaOCAiAwggIcMA4GA1UdDwEB/wQEAwID+DAnBgNVHSUEIDAeBggrBgEFBQcDAgYI
+KwYBBQUHAwMGCCsGAQUFBwMEMCQGA1UdEQQdMBuBGWVtYW51ZWxlLmNlc2VuYUBnbWFpbC5jb20w
+DAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUmdiXEB14KSEspMezdP2yWt/rMpkwHwYDVR0jBBgwFoAU
+zZtbW57qdiHEEGjo0i032x8vyOQwgcsGA1UdIASBwzCBwDA+BgorBgEEAakHAQECMDAwLgYIKwYB
+BQUHAgEWImh0dHA6Ly93d3cuZXVyb3BraS5vcmcvY2EvY3BzLzEuMi8wRAYKKwYBBAGpBwIBAjA2
+MDQGCCsGAQUFBwIBFihodHRwOi8vd3d3Lml0YWx5LmV1cm9wa2kub3JnL2NhL2Nwcy8xLjIvMDgG
+CisGAQQBlWIBAgIwKjAoBggrBgEFBQcCARYcaHR0cDovL2NhLnBvbGl0by5pdC9jcHMvMi4yLzBm
+BggrBgEFBQcBAQRaMFgwIQYIKwYBBQUHMAGGFWh0dHA6Ly9vY3NwLnBvbGl0by5pdDAzBggrBgEF
+BQcwAoYnaHR0cDovL2NhLnBvbGl0by5pdC9jZXJ0cy9wb2xpdG9fY2EuY2VyMDcGA1UdHwQwMC4w
+LKAqoCiGJmh0dHA6Ly9jYS5wb2xpdG8uaXQvY3JsL3BvbGl0b19jcmwuY3JsMA0GCSqGSIb3DQEB
+BQUAA4IBAQCqYU6eF+n9RaasHmmqW3XtVuOEZ78Wlscmzq+tpSHTKT4xYt5ZVy4ES2BHf8ylKmEG
+xRihVI+GPTP27Vzn54L1/D34UPsyII6v8mneOazPTEtKoIP5vrF0/veJQPlv++Z7h1F3BDJAaBQx
+e2abbF/BaFHeQ8xdnU37CCnKaXJ4d8CqF+tiPsxxpgNn3Ge9dNa6EzDoPZRNDzt51YQwqwHK8Aqe
+DXBoiwo26AwZwZUZPu2xH+Atird4HBcJkcY4wN0UKZqu1SvEwQ6iWY+JETCUvHceopypXKWoBs9F
+gk6zjv9gLhKXbx6wQYqw/HGOAVzUxq+paWYShHElKbb0aGYZMIIFZDCCBEygAwIBAgICAs0wDQYJ
+KoZIhvcNAQEFBQAwZTELMAkGA1UEBhMCSVQxHjAcBgNVBAoTFVBvbGl0ZWNuaWNvIGRpIFRvcmlu
+bzE2MDQGA1UEAxMtUG9saXRlY25pY28gZGkgVG9yaW5vIENlcnRpZmljYXRpb24gQXV0aG9yaXR5
+MB4XDTExMDExNzA3NDAyMVoXDTE1MTIzMTIzNTk1OVowYTELMAkGA1UEBhMCSVQxHjAcBgNVBAoT
+FVBvbGl0ZWNuaWNvIGRpIFRvcmlubzEZMBcGA1UEAxMQRW1hbnVlbGUgIENlc2VuYTEXMBUGCgmS
+JomT8ixkAQETB2QwMTkyMzgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwbT4Vf7KT
+XaQjxs9vpxbQnPb5gkdL+GJqcQTxUQfagi4DtL0aVv++A26lusOFVRQJzKbNATkpblFveadwYOix
+lBoJGdHfdMauHELG5G5sQDlojYFd/PivdDHH2+rikm1iNcOay8Qgjra95By08fzjoX7wD5ndbzG2
+A2hWsYwSw8LqLI+A4mBQhWpe03zX+ijjk0GfLYBtuVM0FNpBqekuswrI35xL5Xo802abopYq1Hnc
+S/5xtIU3ACEkEDcF8zyurcrYjT2D3jtFvK16IrAibFZiBsYniIZhBmQW2iwavhX2w3y8mgH9tdOx
+v03tpXDuO9bMtx97b385HNYMDtdNAgMBAAGjggIgMIICHDAOBgNVHQ8BAf8EBAMCA/gwJwYDVR0l
+BCAwHgYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBDAkBgNVHREEHTAbgRllbWFudWVsZS5j
+ZXNlbmFAZ21haWwuY29tMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFJnYlxAdeCkhLKTHs3T9slrf
+6zKZMB8GA1UdIwQYMBaAFM2bW1ue6nYhxBBo6NItN9sfL8jkMIHLBgNVHSAEgcMwgcAwPgYKKwYB
+BAGpBwEBAjAwMC4GCCsGAQUFBwIBFiJodHRwOi8vd3d3LmV1cm9wa2kub3JnL2NhL2Nwcy8xLjIv
+MEQGCisGAQQBqQcCAQIwNjA0BggrBgEFBQcCARYoaHR0cDovL3d3dy5pdGFseS5ldXJvcGtpLm9y
+Zy9jYS9jcHMvMS4yLzA4BgorBgEEAZViAQICMCowKAYIKwYBBQUHAgEWHGh0dHA6Ly9jYS5wb2xp
+dG8uaXQvY3BzLzIuMi8wZgYIKwYBBQUHAQEEWjBYMCEGCCsGAQUFBzABhhVodHRwOi8vb2NzcC5w
+b2xpdG8uaXQwMwYIKwYBBQUHMAKGJ2h0dHA6Ly9jYS5wb2xpdG8uaXQvY2VydHMvcG9saXRvX2Nh
+LmNlcjA3BgNVHR8EMDAuMCygKqAohiZodHRwOi8vY2EucG9saXRvLml0L2NybC9wb2xpdG9fY3Js
+LmNybDANBgkqhkiG9w0BAQUFAAOCAQEAqmFOnhfp/UWmrB5pqlt17VbjhGe/FpbHJs6vraUh0yk+
+MWLeWVcuBEtgR3/MpSphBsUYoVSPhj0z9u1c5+eC9fw9+FD7MiCOr/Jp3jmsz0xLSqCD+b6xdP73
+iUD5b/vme4dRdwQyQGgUMXtmm2xfwWhR3kPMXZ1N+wgpymlyeHfAqhfrYj7McaYDZ9xnvXTWuhMw
+6D2UTQ87edWEMKsByvAKng1waIsKNugMGcGVGT7tsR/gLYq3eBwXCZHGOMDdFCmartUrxMEOolmP
+iREwlLx3HqKcqVylqAbPRYJOs47/YC4Sl28esEGKsPxxjgFc1MavqWlmEoRxJSm29GhmGTGCAu0w
+ggLpAgEBMGswZTELMAkGA1UEBhMCSVQxHjAcBgNVBAoTFVBvbGl0ZWNuaWNvIGRpIFRvcmlubzE2
+MDQGA1UEAxMtUG9saXRlY25pY28gZGkgVG9yaW5vIENlcnRpZmljYXRpb24gQXV0aG9yaXR5AgIC
+zTAJBgUrDgMCGgUAoIIBVzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
+Fw0xMTA1MDMxNjE5MjVaMCMGCSqGSIb3DQEJBDEWBBTpJT/M6nEpNlYE4iTKjqI3PwyXzzB6Bgkr
+BgEEAYI3EAQxbTBrMGUxCzAJBgNVBAYTAklUMR4wHAYDVQQKExVQb2xpdGVjbmljbyBkaSBUb3Jp
+bm8xNjA0BgNVBAMTLVBvbGl0ZWNuaWNvIGRpIFRvcmlubyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0
+eQICAs0wfAYLKoZIhvcNAQkQAgsxbaBrMGUxCzAJBgNVBAYTAklUMR4wHAYDVQQKExVQb2xpdGVj
+bmljbyBkaSBUb3Jpbm8xNjA0BgNVBAMTLVBvbGl0ZWNuaWNvIGRpIFRvcmlubyBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eQICAs0wDQYJKoZIhvcNAQEBBQAEggEAJIeO/bruLlCcp5f4mzdxYOQ4r4m1
+zWiyVFBti/tRhMLrRA7mZdTxStjGKlwTPKBRxWE04ZvvwEGIsNheh8Xz1GSIBhYkOhGKxcr1nI15
+kNY/miFp0PrbLeoS7CcUtoJRkR49WljJxZt1dxb0cFGA54a29Wzo75dyxQUxzopoYs+iVt//fpaG
+J5XveBr5PaIGSCKI1jxv16HlNNA2QtuvaQh+7LlYWbk2fJEPXsysEPSmhj9qWmc9rPNCb5odvcNx
+kgrt2iw4PHduL78xZqAOCDzG2Fd/BwkJDdwRIFo5CO+ylXRPLLVB34HsR8rTyIwY3uFhhjMvEdY8
+FCsCzgP0EgAAAAAAAA==
 
 
-On 5/3/2011 10:48 AM, Jari Ruusu wrote:
-> Tzvi Chumash wrote:
->> I'm trying (without much success) to decrypt in-kernel
->> (2.6.18-194.el5PAE) a cipher that was created using openSSL
->> (0.9.8e-fips-rhel5) using blowfish with a 56-byte key/8-byte iv. Are the
->> implementations incompatible (i.e. can't encrypt in one and decrypt in
->> the other?) or am I doing something wrong?
->
-> Check byte order of the two implementations. Many blowfish implementations
-> got byte order wrong. Does it help if you swap byte order from
-> 0-1-2-3-4-5-6-7 to 7-6-5-4-3-2-1-0 of key/data/IV before and after crypto
-> operation?
->
+--=-/x+ulM5c45nUsGitBHs0--
