@@ -1,33 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -next] crypto: fix aesni build on i386
-Date: Wed, 18 May 2011 09:03:44 +1000
-Message-ID: <20110517230344.GA27291@gondor.apana.org.au>
-References: <20110517142749.8927b65b.sfr@canb.auug.org.au> <20110517115245.5544a0d0.randy.dunlap@oracle.com>
+Subject: Re: [PATCH 1/4] crypto: caam - platform_bus_type migration
+Date: Thu, 19 May 2011 14:39:03 +1000
+Message-ID: <20110519043903.GA23507@gondor.apana.org.au>
+References: <20110514220755.a5dad77f.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, davem@davemloft.net,
-	Huang Ying <ying.huang@intel.com>, linux-next@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Return-path: <linux-next-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:47792 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754573Ab1ESEjH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 May 2011 00:39:07 -0400
 Content-Disposition: inline
-In-Reply-To: <20110517115245.5544a0d0.randy.dunlap@oracle.com>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20110514220755.a5dad77f.kim.phillips@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 17, 2011 at 11:52:45AM -0700, Randy Dunlap wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
+On Sat, May 14, 2011 at 10:07:55PM -0500, Kim Phillips wrote:
+> this fixes a build error since cryptodev-2.6 got rebased
+> to include commit d714d1979d7b4df7e2c127407f4014ce71f73cd0
+> "dt: eliminate of_platform_driver shim code".
 > 
-> Fix build error on i386 by moving function prototypes:
-> 
-> arch/x86/crypto/aesni-intel_glue.c: In function 'aesni_init':
-> arch/x86/crypto/aesni-intel_glue.c:1263: error: implicit declaration of function 'crypto_fpu_init'
-> arch/x86/crypto/aesni-intel_glue.c: In function 'aesni_exit':
-> arch/x86/crypto/aesni-intel_glue.c:1373: error: implicit declaration of function 'crypto_fpu_exit'
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-Applied.  Thanks Randy!
+All four patches applied.  Thanks Kim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
