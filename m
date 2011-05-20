@@ -1,34 +1,39 @@
-From: "PROF.MAURICE IWU" <augustine_osakwe@yahoo.co.in>
-Subject: Equity Business Investment
-Date: Fri, 20 May 2011 18:41:23 +0530 (IST)
-Message-ID: <458588.37498.qm__45941.6530597538$1305897503$gmane$org@web95513.mail.in.yahoo.com>
-Reply-To: profmauriceiwu2221@yahoo.co.jp
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: undisclosed recipients:;
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from web95513.mail.in.yahoo.com ([121.101.151.13]:44881 "HELO
-	web95513.mail.in.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1755937Ab1ETNSH convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 May 2011 09:18:07 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH 2/8] x86: Fix set but not used in ghash_async_setkey()
+Date: Fri, 20 May 2011 16:12:59 -0300
+Message-ID: <1305918786-7239-2-git-send-email-padovan@profusion.mobi>
+References: <1305918786-7239-1-git-send-email-padovan@profusion.mobi>
+Cc: Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API),
+	"David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API),
+	Thomas Gleixner <tglx@linutronix.de> (maintainer:X86
+	ARCHITECTURE...),
+	Ingo Molnar <mingo@redhat.com> (maintainer:X86 ARCHITECTURE...),
+	"H. Peter Anvin" <hpa@zytor.com> (maintainer:X86 ARCHITECTURE...),
+	x86@kernel.org (maintainer:X86 ARCHITECTURE...),
+	linux-crypto@vger.kernel.org (open list:CRYPTO API)
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1305918786-7239-1-git-send-email-padovan@profusion.mobi>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Equity Business Investment
->From Prof. Maurice Iwu 
-
-Dear Friend,
-
-I am Prof. Maurice M. Iwu, Former Chairman Independent Electoral Commission 
-(INEC).Currently, I am on compulsory terminal leave presently in UK , 
-leading up to my final retirement from public service.
-
-I am seeking your partnership in a mutual benefit project involving 
-investing into your company and secondly on properties and to be precise Estate Development or any other profitable venture of your great idea for our mutual benefit of Equity Market Investment.,
-
-Sincerely,
-Prof. Maurice M.Iwu.
-{INEC.}
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 7a6e68e..976aa64 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -245,7 +245,7 @@ static int ghash_async_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	crypto_ahash_set_flags(tfm, crypto_ahash_get_flags(child)
+ 			       & CRYPTO_TFM_RES_MASK);
+ 
+-	return 0;
++	return err;
+ }
+ 
+ static int ghash_async_init_tfm(struct crypto_tfm *tfm)
+-- 
+1.7.5.1
