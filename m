@@ -1,45 +1,51 @@
-From: "western101@algish.com" <bybrasil@ism.com.br>
-Subject: (unknown)
-Date: Sat, 21 May 2011 09:54:34 -0300
-Message-ID: <20110521095434.194452lz8ijjxecc__41205.793785821$1305987519$gmane$org@webmail.ism.com.br>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH] crypto: caam - fix operator precedence in shared descriptor
+ allocation
+Date: Mon, 23 May 2011 18:45:23 -0500
+Message-ID: <20110523184523.62654cb1.kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from raptor.ism.com.br ([200.215.129.13]:37037 "EHLO
-	ocelot.ism.com.br" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750862Ab1EUOS1 (ORCPT
+Received: from am1ehsobe001.messaging.microsoft.com ([213.199.154.204]:20425
+	"EHLO AM1EHSOBE001.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755927Ab1EWXqe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 May 2011 10:18:27 -0400
-Subject: 
-Content-Disposition: inline
+	Mon, 23 May 2011 19:46:34 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+setkey allocates 16 bytes (CAAM_CMD_SZ *
+DESC_AEAD_SHARED_TEXT_LEN) shy of what is needed to
+store the shared descriptor, resulting in memory
+corruption.  Fix this.
 
-My associate has helped me to send your first payment
-of $7,500 USD to you as instructed by Mr. David Cameron
-the United Kingdom prime minister after the last G20
-meeting that was held in United Kingdom, making you one
-of the beneficiaries. Here is the information below.
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+Bug introduced in commit 4427b1b - "crypto: caam - add support for
+sha512 variants of existing AEAD algorithms".
 
-MTCN Numbers: 6096147516
-Sender First Name Is = Johannes
-Second Name = Davis
+ drivers/crypto/caam/caamalg.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-I told him to keep sending you $7,500 USD twice a week
-until the FULL payment of ($820000.00 United State Dollars)
-is completed.
-
-A certificate will be made to change the Receiver Name as
-stated by the British prime minister, send your Full Names
-and address via Email to: Mr Garry Moore
-
-You cannot pickup the money until the certificate is issued to you.
-
-Regards
-Mr. Garry Moore.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index d0e65d6..676d957 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -238,9 +238,9 @@ static int build_sh_desc_ipsec(struct caam_ctx *ctx)
+ 
+ 	/* build shared descriptor for this session */
+ 	sh_desc = kmalloc(CAAM_CMD_SZ * DESC_AEAD_SHARED_TEXT_LEN +
+-			  keys_fit_inline ?
+-			  ctx->split_key_pad_len + ctx->enckeylen :
+-			  CAAM_PTR_SZ * 2, GFP_DMA | GFP_KERNEL);
++			  (keys_fit_inline ?
++			   ctx->split_key_pad_len + ctx->enckeylen :
++			   CAAM_PTR_SZ * 2), GFP_DMA | GFP_KERNEL);
+ 	if (!sh_desc) {
+ 		dev_err(jrdev, "could not allocate shared descriptor\n");
+ 		return -ENOMEM;
+-- 
+1.7.5.1
