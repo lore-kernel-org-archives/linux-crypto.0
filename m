@@ -1,34 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - fix operator precedence in shared
-	descriptor allocation
-Date: Thu, 26 May 2011 13:30:44 +1000
-Message-ID: <20110526033044.GB14500@gondor.apana.org.au>
-References: <20110523184523.62654cb1.kim.phillips@freescale.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: sha1: modify sha1_update to use SHA1_BLOCK_SIZE
+Date: Wed, 25 May 2011 23:34:11 -0400 (EDT)
+Message-ID: <20110525.233411.1372538972166578285.davem@davemloft.net>
+References: <1306379477-24552-1-git-send-email-msb@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, herbert@gondor.hengli.com.au,
+	linux-crypto@vger.kernel.org
+To: msb@chromium.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38819 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754835Ab1EZDaq (ORCPT
+Received: from shards.monkeyblade.net ([198.137.202.13]:41880 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754835Ab1EZDeW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 May 2011 23:30:46 -0400
-Content-Disposition: inline
-In-Reply-To: <20110523184523.62654cb1.kim.phillips@freescale.com>
+	Wed, 25 May 2011 23:34:22 -0400
+In-Reply-To: <1306379477-24552-1-git-send-email-msb@chromium.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 23, 2011 at 06:45:23PM -0500, Kim Phillips wrote:
-> setkey allocates 16 bytes (CAAM_CMD_SZ *
-> DESC_AEAD_SHARED_TEXT_LEN) shy of what is needed to
-> store the shared descriptor, resulting in memory
-> corruption.  Fix this.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+From: Mandeep Singh Baines <msb@chromium.org>
+Date: Wed, 25 May 2011 20:11:17 -0700
 
-Applied to cryptodev.  Thanks Kim!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Plus some other minor cleanup.
+> 
+> Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
+
+The temp[] buffer is explicitly places inside the inner most
+basic block so that the compiler doesn't allocate the stack
+space unless that code path is taken.
+
+Besides the use of the SHA_* macros, I think your changes
+actually make the code worse.
