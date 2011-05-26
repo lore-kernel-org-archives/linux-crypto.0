@@ -1,34 +1,87 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] crypto/testmgr: add xts-aes-256 self-test
-Date: Wed, 25 May 2011 16:46:30 -0400
-Message-ID: <4DDD6AA6.30800@redhat.com>
-References: <1306348377-14494-1-git-send-email-jarod@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+From: Mandeep Singh Baines <msb@chromium.org>
+Subject: [PATCH] crypto: sha1: modify sha1_update to use SHA1_BLOCK_SIZE
+Date: Wed, 25 May 2011 20:11:17 -0700
+Message-ID: <1306379477-24552-1-git-send-email-msb@chromium.org>
+Cc: Mandeep Singh Baines <msb@chromium.org>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:12611 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932237Ab1EYUrL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 May 2011 16:47:11 -0400
-In-Reply-To: <1306348377-14494-1-git-send-email-jarod@redhat.com>
+Received: from smtp-out.google.com ([74.125.121.67]:13945 "EHLO
+	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754053Ab1EZDLm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 May 2011 23:11:42 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Jarod Wilson wrote:
-> FIPS compliance requires a known-answer self-test for all approved cipher and
-> mode combinations, for all valid key sizes. Presently, there are only
-> self-tests for xts-aes-128. This adds a 256-bit one, pulled from the same
-> reference document, which should satisfy the requirement.
+Plus some other minor cleanup.
 
-Oh hell. v2 coming in a bit after I verify its actually really still 
-functional with the new vector added. I forgot to update 
-AES_XTS_ENC_TEST_VECTORS and AES_XTS_DEC_TEST_VECTORS to match, so the 
-new vector wasn't being run.
+Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/sha1_generic.c |   39 +++++++++++++++++++--------------------
+ 1 files changed, 19 insertions(+), 20 deletions(-)
 
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index 0416091..4bdd228 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -40,33 +40,32 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len)
+ {
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
++	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
++	u32 temp[SHA_WORKSPACE_WORDS];
++	const u8 *src = data;
+ 
+-	partial = sctx->count & 0x3f;
+ 	sctx->count += len;
+-	done = 0;
+-	src = data;
+ 
+-	if ((partial + len) > 63) {
+-		u32 temp[SHA_WORKSPACE_WORDS];
++	if (partial && ((partial + len) >= SHA1_BLOCK_SIZE)) {
++		unsigned int done = SHA1_BLOCK_SIZE - partial;
+ 
+-		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buffer + partial, data, done + 64);
+-			src = sctx->buffer;
+-		}
++		memcpy(sctx->buffer + partial, src, done);
++		sha_transform(sctx->state, sctx->buffer, temp);
++		len -= done;
++		src += done;
++		partial = 0;
++	}
+ 
+-		do {
+-			sha_transform(sctx->state, src, temp);
+-			done += 64;
+-			src = data + done;
+-		} while (done + 63 < len);
++	while (len >= SHA1_BLOCK_SIZE) {
++		sha_transform(sctx->state, src, temp);
++		len -= SHA1_BLOCK_SIZE;
++		src += SHA1_BLOCK_SIZE;
++	}
+ 
++	if (src != data)
+ 		memset(temp, 0, sizeof(temp));
+-		partial = 0;
+-	}
+-	memcpy(sctx->buffer + partial, src, len - done);
++
++	memcpy(sctx->buffer + partial, src, len);
+ 
+ 	return 0;
+ }
 -- 
-Jarod Wilson
-jarod@redhat.com
+1.7.3.1
