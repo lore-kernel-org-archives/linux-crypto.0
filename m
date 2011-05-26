@@ -1,33 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/8] x86: Fix set but not used in ghash_async_setkey()
-Date: Thu, 26 May 2011 13:29:45 +1000
-Message-ID: <20110526032945.GA14500@gondor.apana.org.au>
-References: <1305918786-7239-1-git-send-email-padovan@profusion.mobi> <1305918786-7239-2-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH] crypto: caam - fix operator precedence in shared
+	descriptor allocation
+Date: Thu, 26 May 2011 13:30:44 +1000
+Message-ID: <20110526033044.GB14500@gondor.apana.org.au>
+References: <20110523184523.62654cb1.kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:45240 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:38819 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755814Ab1EZDaL (ORCPT
+	with ESMTP id S1754835Ab1EZDaq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 May 2011 23:30:11 -0400
+	Wed, 25 May 2011 23:30:46 -0400
 Content-Disposition: inline
-In-Reply-To: <1305918786-7239-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <20110523184523.62654cb1.kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 20, 2011 at 04:12:59PM -0300, Gustavo F. Padovan wrote:
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+On Mon, May 23, 2011 at 06:45:23PM -0500, Kim Phillips wrote:
+> setkey allocates 16 bytes (CAAM_CMD_SZ *
+> DESC_AEAD_SHARED_TEXT_LEN) shy of what is needed to
+> store the shared descriptor, resulting in memory
+> corruption.  Fix this.
+> 
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-Patch applied.  Thanks a lot.
+Applied to cryptodev.  Thanks Kim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
