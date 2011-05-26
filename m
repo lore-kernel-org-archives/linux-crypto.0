@@ -1,34 +1,95 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] crypto: sha1: modify sha1_update to use SHA1_BLOCK_SIZE
-Date: Wed, 25 May 2011 20:52:01 -0700
-Message-ID: <1306381921.28839.17.camel@Joe-Laptop>
+From: Mandeep Singh Baines <msb@chromium.org>
+Subject: [PATCH v2] crypto: sha1: modify sha1_update to use SHA1_BLOCK_SIZE
+Date: Thu, 26 May 2011 16:20:58 -0700
+Message-ID: <20110526232058.GQ11023@google.com>
 References: <1306379477-24552-1-git-send-email-msb@chromium.org>
-	 <20110525.233411.1372538972166578285.davem@davemloft.net>
+ <20110525.233411.1372538972166578285.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: msb@chromium.org, linux-kernel@vger.kernel.org,
-	herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org
+	herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	Joe Perches <joe@perches.com>
 To: David Miller <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.perches.com ([173.55.12.10]:2057 "EHLO mail.perches.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755991Ab1EZDwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 May 2011 23:52:03 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <20110525.233411.1372538972166578285.davem@davemloft.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2011-05-25 at 23:34 -0400, David Miller wrote:
-> From: Mandeep Singh Baines <msb@chromium.org>
-> Date: Wed, 25 May 2011 20:11:17 -0700
-> > Plus some other minor cleanup.
-> > Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
+David Miller (davem@davemloft.net) wrote:
+> 
 > The temp[] buffer is explicitly places inside the inner most
 > basic block so that the compiler doesn't allocate the stack
 > space unless that code path is taken.
+> 
 
-Does any version of gcc manage to do that?
+Fixed in V2 (this patch). Thanks for the review.
 
-Regardless, it's still a good idea to keep
-declarations in the use scope.
+-- >8 -- (snip)
+
+Plus some other minor cleanup.
+
+Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Joe Perches <joe@perches.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/sha1_generic.c |   33 +++++++++++++++------------------
+ 1 files changed, 15 insertions(+), 18 deletions(-)
+
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index 0416091..0b56719 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -40,33 +40,30 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len)
+ {
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
++	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
+ 
+-	partial = sctx->count & 0x3f;
+ 	sctx->count += len;
+-	done = 0;
+-	src = data;
+ 
+-	if ((partial + len) > 63) {
++	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+ 		u32 temp[SHA_WORKSPACE_WORDS];
+ 
+ 		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buffer + partial, data, done + 64);
+-			src = sctx->buffer;
+-		}
+-
+-		do {
+-			sha_transform(sctx->state, src, temp);
+-			done += 64;
+-			src = data + done;
+-		} while (done + 63 < len);
++			unsigned int done = SHA1_BLOCK_SIZE - partial;
+ 
++			memcpy(sctx->buffer + partial, data, done);
++			sha_transform(sctx->state, sctx->buffer, temp);
++			len -= done;
++			data += done;
++			partial = 0;
++		}
++		while (len >= SHA1_BLOCK_SIZE) {
++			sha_transform(sctx->state, data, temp);
++			len -= SHA1_BLOCK_SIZE;
++			data += SHA1_BLOCK_SIZE;
++		}
+ 		memset(temp, 0, sizeof(temp));
+-		partial = 0;
+ 	}
+-	memcpy(sctx->buffer + partial, src, len - done);
++	memcpy(sctx->buffer + partial, data, len);
+ 
+ 	return 0;
+ }
+-- 
+1.7.3.1
