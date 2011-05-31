@@ -1,37 +1,48 @@
-From: Frederick Gazerblezeebe <fgazerblezeebe@gmail.com>
-Subject: loop-aes encrypted root on Fedora 15 using systemd
-Date: Mon, 30 May 2011 14:31:03 -0700
-Message-ID: <BANLkTimKp4VgiZwEzB7d5yO9msKLu92pSw@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: sha1: modify sha1_update to use
+	SHA1_BLOCK_SIZE
+Date: Tue, 31 May 2011 15:22:45 +1000
+Message-ID: <20110531052245.GA17068@gondor.apana.org.au>
+References: <1306379477-24552-1-git-send-email-msb@chromium.org> <20110525.233411.1372538972166578285.davem@davemloft.net> <20110526232058.GQ11023@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Joe Perches <joe@perches.com>
+To: Mandeep Singh Baines <msb@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:53333 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752608Ab1E3VbD (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:46973 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756066Ab1EaFWz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 May 2011 17:31:03 -0400
-Received: by vxi39 with SMTP id 39so2874012vxi.19
-        for <linux-crypto@vger.kernel.org>; Mon, 30 May 2011 14:31:03 -0700 (PDT)
+	Tue, 31 May 2011 01:22:55 -0400
+Content-Disposition: inline
+In-Reply-To: <20110526232058.GQ11023@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I am trying to set up a Fedora 15 system (kernel 2.6.39) on which the
-root filesystem is encrypted with loop-aes (v3.6c).
+On Thu, May 26, 2011 at 04:20:58PM -0700, Mandeep Singh Baines wrote:
+> David Miller (davem@davemloft.net) wrote:
+> > 
+> > The temp[] buffer is explicitly places inside the inner most
+> > basic block so that the compiler doesn't allocate the stack
+> > space unless that code path is taken.
+> > 
+> 
+> Fixed in V2 (this patch). Thanks for the review.
+> 
+> -- >8 -- (snip)
+> 
+> Plus some other minor cleanup.
 
-Can someone suggest the best location to place the initial losetup
-commands? This new version uses the systemd boot stuff and
-/etc/rc.d/rc.sysinit (where I placed the losetup commands before) no
-longer exists. I was partially successful placing them in
-/lib/systemd/fedora-readonly, meaning losetup successfully sets up the
-loop device, but attempts to actually mount a file system on this loop
-fail and the boot process terminates. I think I may be placing the
-losetup too late in the sequence and the system is attempting to mount
-on the loop before it is actually set up, but that's just a guess at
-this point.
+I don't really like the cleanups.  In any case, mixing up the
+use of SHA1_BLOCK_SIZE with cleanups increases the chance of
+introducing a bug.
 
-Any suggestions on how I might proceed would be greatly appreciated.
+So please redo the patch with only the addition of SHA1_BLOCK_SIZE
+and nothing else.
 
-Thanks.
-
-FG
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
