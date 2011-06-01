@@ -1,44 +1,44 @@
-From: Prarit Bhargava <prarit@redhat.com>
-Subject: [RFC PATCH 08/35] drivers/crypto changes for SMBIOS and System Firmware
-Date: Tue, 31 May 2011 11:51:34 -0400
-Message-ID: <20110531155134.3502.43590.sendpatchset@prarit.bos.redhat.com>
-Content-Type: text/x-c; charset=us-ascii
-Cc: Prarit Bhargava <prarit@redhat.com>
-To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+From: Richard Weinberger <richard@nod.at>
+Subject: [PATCH] crypto: UML build fixes
+Date: Wed,  1 Jun 2011 16:13:11 +0200
+Message-ID: <1306937591-21815-1-git-send-email-richard@nod.at>
+Cc: linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, Richard Weinberger <richard@nod.at>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-drivers/crypto changes for SMBIOS and System Firmware
+CRYPTO_GHASH_CLMUL_NI_INTEL and CRYPTO_AES_NI_INTEL cannot be used
+on UML.
+Commit 3e02e5cb and 54b6a1b enabled them by accident.
 
+Signed-off-by: Richard Weinberger <richard@nod.at>
 ---
- drivers/crypto/amcc/crypto4xx_sa.c |    1 -
- drivers/crypto/hifn_795x.c         |    1 -
- 2 files changed, 0 insertions(+), 2 deletions(-)
+ crypto/Kconfig |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.c b/drivers/crypto/amcc/crypto4xx_sa.c
-index de8a7a4..2995fe7 100644
---- a/drivers/crypto/amcc/crypto4xx_sa.c
-+++ b/drivers/crypto/amcc/crypto4xx_sa.c
-@@ -22,7 +22,6 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/moduleparam.h>
--#include <linux/mod_devicetable.h>
- #include <linux/interrupt.h>
- #include <linux/spinlock_types.h>
- #include <linux/highmem.h>
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index a84250a..9ada5b5 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -20,7 +20,6 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/moduleparam.h>
--#include <linux/mod_devicetable.h>
- #include <linux/interrupt.h>
- #include <linux/pci.h>
- #include <linux/slab.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 87b22ca..2af8155 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -458,7 +458,7 @@ config CRYPTO_WP512
+ 
+ config CRYPTO_GHASH_CLMUL_NI_INTEL
+ 	tristate "GHASH digest algorithm (CLMUL-NI accelerated)"
+-	depends on (X86 || UML_X86) && 64BIT
++	depends on X86 && 64BIT
+ 	select CRYPTO_SHASH
+ 	select CRYPTO_CRYPTD
+ 	help
+@@ -533,7 +533,7 @@ config CRYPTO_AES_X86_64
+ 
+ config CRYPTO_AES_NI_INTEL
+ 	tristate "AES cipher algorithms (AES-NI)"
+-	depends on (X86 || UML_X86)
++	depends on X86
+ 	select CRYPTO_AES_X86_64 if 64BIT
+ 	select CRYPTO_AES_586 if !64BIT
+ 	select CRYPTO_CRYPTD
 -- 
-1.7.5.1
+1.7.5.3
