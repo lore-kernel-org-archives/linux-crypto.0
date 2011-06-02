@@ -1,7 +1,7 @@
 From: Dmitry Kasatkin <dmitry.s.kasatkin@gmail.com>
-Subject: [PATCH 07/11] omap-sham: remove dedicated queue handling tasklet
-Date: Thu,  2 Jun 2011 21:10:09 +0300
-Message-ID: <64d51f6a321899f60b8bca01274673943e7aa972.1306926921.git.dmitry.kasatkin@gmail.com>
+Subject: [PATCH 05/11] omap-sham: move some flags to device context
+Date: Thu,  2 Jun 2011 21:10:07 +0300
+Message-ID: <45316cd4c56a940bb29b23bda5c6c196c29c78ea.1306926921.git.dmitry.kasatkin@gmail.com>
 References: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
 	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
@@ -15,100 +15,83 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 
-Calling omap_sham_handle_queue from "done" tasklet should be done
-after irq scheduled tasklet completes.
-Having additional tasklet does not solve that issue because it might
-be execute before.
-So queue handling tasklet has been removed and functionality integrated
-into single tasklet.
+Couple of context flags have been moved to device flags.
+IRQ and tasklet handlers does not need to access request
+context anymore.
 
 Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
- drivers/crypto/omap-sham.c |   24 +++++++++---------------
- 1 files changed, 9 insertions(+), 15 deletions(-)
+ drivers/crypto/omap-sham.c |   19 ++++++-------------
+ 1 files changed, 6 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 84e5890..24de4ace 100644
+index 208404e..b959dc6 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -146,7 +146,6 @@ struct omap_sham_dev {
- 	int			dma;
- 	int			dma_lch;
- 	struct tasklet_struct	done_task;
--	struct tasklet_struct	queue_task;
+@@ -303,7 +303,7 @@ static int omap_sham_xmit_cpu(struct omap_sham_dev *dd, const u8 *buf,
+ 		return -ETIMEDOUT;
  
- 	unsigned long		flags;
- 	struct crypto_queue	queue;
-@@ -653,6 +652,9 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+ 	if (final)
+-		set_bit(FLAGS_FINAL, &ctx->flags); /* catch last interrupt */
++		set_bit(FLAGS_FINAL, &dd->flags); /* catch last interrupt */
  
- 	if (req->base.complete)
- 		req->base.complete(&req->base, err);
-+
-+	/* handle new request */
-+	tasklet_schedule(&dd->done_task);
- }
+ 	len32 = DIV_ROUND_UP(length, sizeof(u32));
  
- static int omap_sham_handle_queue(struct omap_sham_dev *dd,
-@@ -716,11 +718,9 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- 		err = omap_sham_final_req(dd);
- 	}
- err1:
--	if (err != -EINPROGRESS) {
-+	if (err != -EINPROGRESS)
- 		/* done_task will not finish it, so do it here */
- 		omap_sham_finish_req(req, err);
--		tasklet_schedule(&dd->queue_task);
--	}
+@@ -336,7 +336,7 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+ 	ctx->digcnt += length;
  
- 	dev_dbg(dd->dev, "exit, err: %d\n", err);
+ 	if (final)
+-		set_bit(FLAGS_FINAL, &ctx->flags); /* catch last interrupt */
++		set_bit(FLAGS_FINAL, &dd->flags); /* catch last interrupt */
  
-@@ -1035,6 +1035,11 @@ static void omap_sham_done_task(unsigned long data)
+ 	set_bit(FLAGS_DMA_ACTIVE, &dd->flags);
+ 
+@@ -642,7 +642,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+ 
+ 	if (!err) {
+ 		omap_sham_copy_hash(req, 1);
+-		if (test_bit(FLAGS_FINAL, &ctx->flags))
++		if (test_bit(FLAGS_FINAL, &dd->flags))
+ 			err = omap_sham_finish(req);
+ 	} else {
+ 		ctx->flags |= BIT(FLAGS_ERROR);
+@@ -1034,10 +1034,9 @@ static void omap_sham_done_task(unsigned long data)
+ {
  	struct omap_sham_dev *dd = (struct omap_sham_dev *)data;
+ 	struct ahash_request *req = dd->req;
+-	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
  	int ready = 0, err = 0;
  
-+	if (!test_bit(FLAGS_BUSY, &dd->flags)) {
-+		omap_sham_handle_queue(dd, NULL);
-+		return;
-+	}
-+
- 	if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags))
+-	if (test_and_clear_bit(FLAGS_OUTPUT_READY, &ctx->flags))
++	if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags))
  		ready = 1;
  
-@@ -1050,18 +1055,9 @@ static void omap_sham_done_task(unsigned long data)
- 		dev_dbg(dd->dev, "update done: err: %d\n", err);
- 		/* finish curent request */
- 		omap_sham_finish_req(dd->req, err);
--		/* start new request */
--		omap_sham_handle_queue(dd, NULL);
- 	}
- }
- 
--static void omap_sham_queue_task(unsigned long data)
--{
--	struct omap_sham_dev *dd = (struct omap_sham_dev *)data;
--
--	omap_sham_handle_queue(dd, NULL);
--}
--
+ 	if (test_and_clear_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
+@@ -1067,14 +1066,8 @@ static void omap_sham_queue_task(unsigned long data)
  static irqreturn_t omap_sham_irq(int irq, void *dev_id)
  {
  	struct omap_sham_dev *dd = dev_id;
-@@ -1137,7 +1133,6 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- 	INIT_LIST_HEAD(&dd->list);
- 	spin_lock_init(&dd->lock);
- 	tasklet_init(&dd->done_task, omap_sham_done_task, (unsigned long)dd);
--	tasklet_init(&dd->queue_task, omap_sham_queue_task, (unsigned long)dd);
- 	crypto_init_queue(&dd->queue, OMAP_SHAM_QUEUE_LENGTH);
+-	struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+-
+-	if (!ctx) {
+-		dev_err(dd->dev, "unknown interrupt.\n");
+-		return IRQ_HANDLED;
+-	}
  
- 	dd->irq = -1;
-@@ -1246,7 +1241,6 @@ static int __devexit omap_sham_remove(struct platform_device *pdev)
- 	for (i = 0; i < ARRAY_SIZE(algs); i++)
- 		crypto_unregister_ahash(&algs[i]);
- 	tasklet_kill(&dd->done_task);
--	tasklet_kill(&dd->queue_task);
- 	iounmap(dd->io_base);
- 	clk_put(dd->iclk);
- 	omap_sham_dma_cleanup(dd);
+-	if (unlikely(test_bit(FLAGS_FINAL, &ctx->flags)))
++	if (unlikely(test_bit(FLAGS_FINAL, &dd->flags)))
+ 		/* final -> allow device to go to power-saving mode */
+ 		omap_sham_write_mask(dd, SHA_REG_CTRL, 0, SHA_REG_CTRL_LENGTH);
+ 
+@@ -1082,7 +1075,7 @@ static irqreturn_t omap_sham_irq(int irq, void *dev_id)
+ 				 SHA_REG_CTRL_OUTPUT_READY);
+ 	omap_sham_read(dd, SHA_REG_CTRL);
+ 
+-	set_bit(FLAGS_OUTPUT_READY, &ctx->flags);
++	set_bit(FLAGS_OUTPUT_READY, &dd->flags);
+ 	dd->err = 0;
+ 	tasklet_schedule(&dd->done_task);
+ 
 -- 
 1.7.4.1
 
