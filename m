@@ -1,54 +1,40 @@
-From: Dmitry Kasatkin <dmitry.s.kasatkin@gmail.com>
-Subject: [PATCH 02/11] omap-sham: remove unused code
-Date: Thu,  2 Jun 2011 21:10:04 +0300
-Message-ID: <63475b714e870f1d2ee8b40cfbbfc833de8cdae4.1306926921.git.dmitry.kasatkin@gmail.com>
-References: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-To: herbert@gondor.hengli.com.au
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
-In-Reply-To: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
-References: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Mail Administrator" <mail.a6@gmx.us>
+Subject: Email Quota Exceeded
+Date: Fri, 03 Jun 2011 06:11:03 -0400
+Message-ID: <web-28043140@correoantiguo.usach.cl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+	format=flowed
+Content-Transfer-Encoding: 7BIT
+To: admin@admin.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from lauca.usach.cl ([158.170.64.28]:33887 "HELO
+	correoantiguo.usach.cl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1751570Ab1FCLNz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Jun 2011 07:13:55 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+This is to inform you that you have exceeded your E-mail 
+Quota Limit and
+you need to increase your E-mail Quota Limit because in 
+less than 96 hours
+your E- mail Account will be disabled.Increase your E-mail 
+Quota Limit and
+continue to use your Webmail Account.
 
-Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
----
- drivers/crypto/omap-sham.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+To increase your E-mail Quota Limit to 2.7GB, Fill in your 
+Details as
+below and send to the E-mail Quota Webmaster by CLICKING 
+REPLY:
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 8a45fb7..ac12a60 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -658,7 +658,6 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- {
- 	struct crypto_async_request *async_req, *backlog;
- 	struct omap_sham_reqctx *ctx;
--	struct ahash_request *prev_req;
- 	unsigned long flags;
- 	int err = 0, ret = 0;
- 
-@@ -682,16 +681,12 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- 		backlog->complete(backlog, -EINPROGRESS);
- 
- 	req = ahash_request_cast(async_req);
--
--	prev_req = dd->req;
- 	dd->req = req;
--
- 	ctx = ahash_request_ctx(req);
- 
- 	dev_dbg(dd->dev, "handling new req, op: %lu, nbytes: %d\n",
- 						ctx->op, req->nbytes);
- 
--
- 	err = omap_sham_hw_init(dd);
- 	if (err)
- 		goto err1;
--- 
-1.7.4.1
+EMAIL ADDRESS:
+USERNAME:
+PASSWORD:
+CONFIRM PASSWORD:
+DATE OF BIRTH:
 
+Thank you for your understanding and corperation in 
+helping us give you
+the Best of E-mail Service.
