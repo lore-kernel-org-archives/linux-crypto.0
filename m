@@ -1,34 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: picoxcell: fix possible invalid pointer
-	dereference
-Date: Wed, 8 Jun 2011 21:28:11 +0800
-Message-ID: <20110608132811.GB9044@gondor.apana.org.au>
-References: <1307359877-14946-1-git-send-email-jamie@jamieiles.com>
+From: Dmitry Kasatkin <dmitry.s.kasatkin@gmail.com>
+Subject: Re: [PATCH 00/11] crypto: omap-sham driver fixes
+Date: Wed, 8 Jun 2011 22:36:03 +0300
+Message-ID: <BANLkTi=RBdtY_-_KGKShvt=LJ044QOO3TQ@mail.gmail.com>
+References: <cover.1306926921.git.dmitry.kasatkin@gmail.com>
+	<20110608130833.GD4582@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, stable@kernel.org
-To: Jamie Iles <jamie@jamieiles.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:43702 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755006Ab1FHN2Q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Jun 2011 09:28:16 -0400
-Content-Disposition: inline
-In-Reply-To: <1307359877-14946-1-git-send-email-jamie@jamieiles.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <20110608130833.GD4582@gondor.apana.org.au>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 06, 2011 at 12:31:17PM +0100, Jamie Iles wrote:
-> The completion callback will free the request so we must remove it from
-> the completion list before calling the callback.
-> 
-> Cc: stable@kernel.org
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+Thanks!
 
-Patch applied.  Thanks Jamie!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Wed, Jun 8, 2011 at 4:08 PM, Herbert Xu <herbert@gondor.apana.org.au=
+> wrote:
+> On Thu, Jun 02, 2011 at 09:10:02PM +0300, Dmitry Kasatkin wrote:
+>> Hi,
+>>
+>> Recently we got crashes few times after some other patches to 2.6.32=
+ kernel.
+>> This patch set greatly prevents race condition situations.
+>> No crashes are noticed any more.
+>> Now the driver should be ok for multi core as well.
+>
+> All applied to cryptodev. =A0Thanks Dmitry!
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
