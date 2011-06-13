@@ -1,100 +1,80 @@
-From: john stultz <johnstul@us.ibm.com>
-Subject: Re: [PATCH 0/5] Feed entropy pool via high-resolution clocksources
-Date: Mon, 13 Jun 2011 15:38:45 -0700
-Message-ID: <1308004725.2893.20.camel@work-vm>
-References: <1308002818-27802-1-git-send-email-jarod@redhat.com>
+From: Kent Borg <kentborg@borg.org>
+Subject: Re: [PATCH 4/5] tsc: wire up entropy generation function
+Date: Mon, 13 Jun 2011 19:55:28 -0400
+Message-ID: <4DF6A370.3000200@borg.org>
+References: <1308002818-27802-1-git-send-email-jarod@redhat.com>	<1308002818-27802-5-git-send-email-jarod@redhat.com> <BANLkTin=BkfyPjaWRc1rfTWU34NLdn7FLgY6yUbSrjzPpx7Gmg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	"Venkatesh Pallipadi (Venki)" <venki@google.com>,
+Cc: Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
+	Matt Mackall <mpm@selenic.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@elte.hu>,
+	Ingo Molnar <mingo@elte.hu>, John Stultz <johnstul@us.ibm.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jarod Wilson <jarod@redhat.com>
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>
+To: Venkatesh Pallipadi <venki@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e37.co.us.ibm.com ([32.97.110.158]:55604 "EHLO
-	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755295Ab1FMWjK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2011 18:39:10 -0400
-Received: from d03relay05.boulder.ibm.com (d03relay05.boulder.ibm.com [9.17.195.107])
-	by e37.co.us.ibm.com (8.14.4/8.13.1) with ESMTP id p5DMa7do005945
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2011 16:36:07 -0600
-Received: from d03av03.boulder.ibm.com (d03av03.boulder.ibm.com [9.17.195.169])
-	by d03relay05.boulder.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p5DMcopF174934
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2011 16:38:50 -0600
-Received: from d03av03.boulder.ibm.com (loopback [127.0.0.1])
-	by d03av03.boulder.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p5DGclcP007860
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2011 10:38:49 -0600
-In-Reply-To: <1308002818-27802-1-git-send-email-jarod@redhat.com>
+Received: from borg.org ([64.105.205.123]:40323 "EHLO borg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755169Ab1FMXzi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2011 19:55:38 -0400
+In-Reply-To: <BANLkTin=BkfyPjaWRc1rfTWU34NLdn7FLgY6yUbSrjzPpx7Gmg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2011-06-13 at 18:06 -0400, Jarod Wilson wrote:
-> Many server systems are seriously lacking in sources of entropy,
-> as we typically only feed the entropy pool by way of input layer
-> events, a few NIC driver interrupts and disk activity. A non-busy
-> server can easily become entropy-starved. We can mitigate this
-> somewhat by periodically mixing in entropy data based on the
-> delta between multiple high-resolution clocksource reads, per:
-> 
->   https://www.osadl.org/Analysis-of-inherent-randomness-of-the-L.rtlws11-developers-okech.0.html
-> 
-> Additionally, NIST already approves of similar implementations, so
-> this should be usable in high-securtiy deployments requiring a
-> fair chunk of available entropy data for frequent use of /dev/random.
-> 
-> http://csrc.nist.gov/groups/STM/cmvp/documents/140-1/140sp/140sp750.pdf
-> (section 6.1 mentions a clock-based seed source).
-> 
-> Yes, thus far, I've only bothered with x86-based clocksources, since that
-> is what I can test most easily. If this patch series isn't deemed totally
-> insane, adding support for other clocksources should be trivial.
-> 
-> Also note that unless you explicitly build and load the clock-entropy
-> driver, there should be little or no change whatsoever to the way anything
-> behaves right now, its purely opt-in. There's probably room for some
-> improvement here, and I'm kind of outside my comfort area, but hey, it
-> seems to work pretty well here in my own testing, so here it is...
-> 
-> Jarod Wilson (5):
->   random: add new clocksource entropy interface
->   clocksource: add support for entropy-generation function
->   hpet: wire up entropy generation function
->   tsc: wire up entropy generation function
->   misc: add clocksource-based entropy generation driver
+Venkatesh Pallipadi wrote:
+> On Mon, Jun 13, 2011 at 3:06 PM, Jarod Wilson <jarod@redhat.com> wrote:
+>   
+>> TSC is high enough resolution that we can use its low-order byte to
+>> stir new data into the random number generator entropy pool.
+>
+> From what I vaguely remember from years past, rdtsc, especially last
+> few bits of it are not very good as random number source. 
 
-So this is interesting work, but I have a few questions.
+It doesn't have to be "random" (a very high bar), it just has to be 
+somewhat non-deterministic to contain entropy (a low-bar).  The idea 
+isn't to  use the TSC as a random number, only to use it for mixing the 
+pool.  If somehow the TSC were *completely* deterministic, we would only 
+fail to add entropy, any entropy already in the pool would still be just 
+as good as before, no harm done.  (Like a perfect shuffle of an already 
+randomly arranged deck of cards.)
 
-1) hpet_add_entropy() and tsc_add_entropy() are basically identical. It
-seems there should be a generic bit of code that uses the clocksource's
-read() function and does the same calculation.
+Okay, not "no harm", a ~little~ harm.  There are two problems with using 
+the TSC if it doesn't have much entropy:
 
-2) If the .entropy() functions really aren't clocksource specific, it
-doesn't really seem like this functionality belongs in the clocksource
-layer. Instead it seems it should be a layer above, that makes use of
-the clocksource code in a generic fashion.
+  1. It wastes computrons.  Okay, have efficient code, don't run it too 
+often.
 
-3) Why are you making use of the curr_clocksource? The timekeeping code
-has very strict rules about what makes a clocksource usable for
-timekeeping. I suspect entropy generation has different requirements,
-and thus shouldn't lean on the curr_clocksource value (ie: TSC may be
-unsynced or halts in idle, and thus unusable for time, but likely still
-ok for entropy).
+  2. Entropy estimates might be too high.  Okay, but entropy estimation 
+is a horrible
+     problem in the best of well-defined circumstances.  Some (Schneier 
+I think) say
+     it isn't worth attempting.  Difficulty in estimating entropy is a 
+bad excuse for
+     starving the system of entropy.  Better to credit no entropy than 
+to collect
+     no entropy.  In a server, entropy sources should not be discarded.
 
-4) Further on that point, there's a likely bug: If an entropy supporting
-clocksource is available,  clocksource_entropy_available() will return
-true, but if the one curr_clocksource is not the one that supports
-entropy, clocksource_add_entropy() won't do anything. I suspect the
-add_entropy function needs to scan for a entropy flagged clocksource and
-use it instead. 
+> As they are
+> based on lower bus frequency and a multiplier. 
 
-5) Does the entropy calculation need to be flagged clocksource by
-clocksource? Or could a generic metric be made (ie: frequency?) in order
-to enable such functionality on all capable clocksources automatically?
+Based on a lower bus frequency, but multiplied up in the CPU.  Why?  
+Because synchronous clock distribution is very difficult at GHz speeds.  
+Heck, even inside the CPU, clock distribution is not a trivial matter.  
+It is impossible for anyone at a distance to know the LSB of the TSC at 
+any given moment because the very concept of a "given moment" is ill 
+defined at any distance.
+
+And how is the low-frequency clock multiplied up?  With analog circuitry 
+(a PLL, right?), and analog is a source of indeterminism.  There is 
+going to be a little jitter in there.  Differences from chip-to-chip, 
+with slight power supply changes, with temperature, with time.
 
 
-thanks
--john
+Disclaimer: I have not looked at the patch carefully, it might be shit.  
+But the idea of letting us add some entropy is excellent!
+
+
+-kb, the Kent who has been paid money for building a defensible RNG.
