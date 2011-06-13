@@ -1,7 +1,7 @@
 From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH 3/5] hpet: wire up entropy generation function
-Date: Mon, 13 Jun 2011 18:06:56 -0400
-Message-ID: <1308002818-27802-4-git-send-email-jarod@redhat.com>
+Subject: [PATCH 2/5] clocksource: add support for entropy-generation function
+Date: Mon, 13 Jun 2011 18:06:55 -0400
+Message-ID: <1308002818-27802-3-git-send-email-jarod@redhat.com>
 References: <1308002818-27802-1-git-send-email-jarod@redhat.com>
 Cc: Jarod Wilson <jarod@redhat.com>, Matt Mackall <mpm@selenic.com>,
 	"Venkatesh Pallipadi (Venki)" <venki@google.com>,
@@ -11,16 +11,17 @@ Cc: Jarod Wilson <jarod@redhat.com>, Matt Mackall <mpm@selenic.com>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41767 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:13546 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753285Ab1FMWHj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Jun 2011 18:07:39 -0400
+	id S1754009Ab1FMWHq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Jun 2011 18:07:46 -0400
 In-Reply-To: <1308002818-27802-1-git-send-email-jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-HPET is high enough resolution that we can use its low-order byte to
-stir new data into the random number generator entropy pool.
+Add a new function pointer to struct clocksource that can optionally be
+filled in by clocksources deemed to be high enough resolution to feed
+the random number generator entropy pool.
 
 CC: Matt Mackall <mpm@selenic.com>
 CC: "Venkatesh Pallipadi (Venki)" <venki@google.com>
@@ -31,51 +32,84 @@ CC: Herbert Xu <herbert@gondor.apana.org.au>
 CC: "David S. Miller" <davem@davemloft.net>
 Signed-off-by: Jarod Wilson <jarod@redhat.com>
 ---
- arch/x86/kernel/hpet.c |   18 ++++++++++++++++++
- 1 files changed, 18 insertions(+), 0 deletions(-)
+ include/linux/clocksource.h |    6 ++++++
+ kernel/time/clocksource.c   |   33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+), 0 deletions(-)
 
-diff --git a/arch/x86/kernel/hpet.c b/arch/x86/kernel/hpet.c
-index 6781765..cf23090 100644
---- a/arch/x86/kernel/hpet.c
-+++ b/arch/x86/kernel/hpet.c
-@@ -10,6 +10,7 @@
- #include <linux/cpu.h>
- #include <linux/pm.h>
- #include <linux/io.h>
-+#include <linux/random.h>
+diff --git a/include/linux/clocksource.h b/include/linux/clocksource.h
+index d4646b4..c74bcf2 100644
+--- a/include/linux/clocksource.h
++++ b/include/linux/clocksource.h
+@@ -156,6 +156,8 @@ extern u64 timecounter_cyc2time(struct timecounter *tc,
+  * @vread:		vsyscall based read
+  * @suspend:		suspend function for the clocksource, if necessary
+  * @resume:		resume function for the clocksource, if necessary
++ * @entropy:		random entropy pool addition function (optional, and
++ *			requires a fairly high-resolution clocksource)
+  */
+ struct clocksource {
+ 	/*
+@@ -184,6 +186,7 @@ struct clocksource {
+ 	unsigned long flags;
+ 	void (*suspend)(struct clocksource *cs);
+ 	void (*resume)(struct clocksource *cs);
++	void (*entropy)(struct clocksource *cs);
  
- #include <asm/fixmap.h>
- #include <asm/i8253.h>
-@@ -63,6 +64,22 @@ static inline void hpet_writel(unsigned int d, unsigned int a)
- 	writel(d, hpet_virt_address + a);
+ #ifdef CONFIG_CLOCKSOURCE_WATCHDOG
+ 	/* Watchdog related data, used by the framework */
+@@ -279,6 +282,9 @@ extern void clocksource_resume(void);
+ extern struct clocksource * __init __weak clocksource_default_clock(void);
+ extern void clocksource_mark_unstable(struct clocksource *cs);
+ 
++extern bool clocksource_entropy_available(void);
++extern void clocksource_add_entropy(void);
++
+ extern void
+ clocks_calc_mult_shift(u32 *mult, u32 *shift, u32 from, u32 to, u32 minsec);
+ 
+diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
+index 1c95fd6..71006ef 100644
+--- a/kernel/time/clocksource.c
++++ b/kernel/time/clocksource.c
+@@ -745,6 +745,39 @@ void clocksource_unregister(struct clocksource *cs)
  }
+ EXPORT_SYMBOL(clocksource_unregister);
  
-+static void hpet_add_entropy(void)
++/**
++ * Do we have at least one clocksource that can generate entropy?
++ */
++bool clocksource_entropy_available(void)
 +{
-+	static unsigned long last;
-+	unsigned long counter;
-+	int delta;
++	struct clocksource *src;
++	bool entropy_possible = false;
 +
-+	counter = hpet_readl(HPET_COUNTER);
-+	delta = (int)(counter - last);
-+	last = counter;
++	mutex_lock(&clocksource_mutex);
++	list_for_each_entry(src, &clocksource_list, list) {
++		if (src->entropy) {
++			entropy_possible = true;
++			break;
++		}
++	}
++	mutex_unlock(&clocksource_mutex);
 +
-+	if (delta == counter)
++	return entropy_possible;
++}
++EXPORT_SYMBOL(clocksource_entropy_available);
++
++/**
++ * Call the clocksource's entropy-generation function, if set
++ */
++void clocksource_add_entropy(void)
++{
++	if (!curr_clocksource->entropy)
 +		return;
 +
-+	add_clocksource_randomness(delta);
++	curr_clocksource->entropy(curr_clocksource);
 +}
++EXPORT_SYMBOL(clocksource_add_entropy);
 +
- #ifdef CONFIG_X86_64
- #include <asm/pgtable.h>
- #endif
-@@ -752,6 +769,7 @@ static struct clocksource clocksource_hpet = {
- 	.mask		= HPET_MASK,
- 	.flags		= CLOCK_SOURCE_IS_CONTINUOUS,
- 	.resume		= hpet_resume_counter,
-+	.entropy	= hpet_add_entropy,
- #ifdef CONFIG_X86_64
- 	.vread		= vread_hpet,
- #endif
+ #ifdef CONFIG_SYSFS
+ /**
+  * sysfs_show_current_clocksources - sysfs interface for current clocksource
 -- 
 1.7.1
