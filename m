@@ -1,12 +1,13 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
+From: Kent Borg <kentborg@borg.org>
 Subject: Re: [PATCH 4/5] tsc: wire up entropy generation function
-Date: Tue, 14 Jun 2011 11:11:11 -0700
-Message-ID: <4DF7A43F.5040901@zytor.com>
-References: <1308002818-27802-1-git-send-email-jarod@redhat.com>	 <1308002818-27802-5-git-send-email-jarod@redhat.com>	 <BANLkTin=BkfyPjaWRc1rfTWU34NLdn7FLgY6yUbSrjzPpx7Gmg@mail.gmail.com>	 <4DF690E4.1060004@zytor.com> <1308006608.15617.62.camel@calx>
+Date: Tue, 14 Jun 2011 16:04:05 -0400
+Message-ID: <4DF7BEB5.1070006@borg.org>
+References: <1308002818-27802-1-git-send-email-jarod@redhat.com>	 <1308002818-27802-5-git-send-email-jarod@redhat.com>	 <BANLkTin=BkfyPjaWRc1rfTWU34NLdn7FLgY6yUbSrjzPpx7Gmg@mail.gmail.com>	 <4DF690E4.1060004@zytor.com> <4DF6ADD0.6080607@borg.org>	 <4DF6BDB4.2060201@zytor.com>  <4DF75688.2050509@borg.org>	 <1308062037.15617.71.camel@calx>  <4DF79EF1.3010004@borg.org> <1308074432.15617.136.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Venkatesh Pallipadi <venki@google.com>,
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	Venkatesh Pallipadi <venki@google.com>,
 	Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@elte.hu>, John Stultz <johnstul@us.ibm.com>,
@@ -15,48 +16,37 @@ Cc: Venkatesh Pallipadi <venki@google.com>,
 	Suresh Siddha <suresh.b.siddha@intel.com>
 To: Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:54387 "EHLO mail.zytor.com"
+Received: from borg.org ([64.105.205.123]:59778 "EHLO borg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751443Ab1FNSMA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jun 2011 14:12:00 -0400
-In-Reply-To: <1308006608.15617.62.camel@calx>
+	id S1750947Ab1FNUEI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Jun 2011 16:04:08 -0400
+In-Reply-To: <1308074432.15617.136.camel@calx>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/13/2011 04:10 PM, Matt Mackall wrote:
-> 
-> Well the issue is that samples are going to be roughly aligned to some
-> multiple of the bus frequency. If an interrupt occurs on bus cycle X,
-> this code will be hit at roughly TSC cycle X*M+d.
-> 
->> This is correct; at the very least I would multiply the low 32 bits of
->> the TSC with a 32-bit prime number before mixing.
-> 
-> This multiply doesn't actually accomplish anything. Mixing known values
-> into the pool is harmless because the mixing function is fully
-> reversable. ie:
-> 
->  unmix(sample, mix(sample, pool)) = pool
-> 
-> If you didn't know the contents of pool before, you can't guess it
-> after.
-> 
-> The danger comes if you (a) already know pool and (b) can narrow sample
-> to a tractable set of values. Then you can calculate a set of possible
-> pool' values and compare the resulting output to confirm the actual
-> state of pool' (aka state extension attack). Sticking a constant
-> multiplier on sample doesn't affect this attack at all.
-> 
+Matt Mackall wrote:
+ > [network adapters are] a great source of potential entropy, a bad
+ > source of guaranteed entropy. The current RNG tries to do
+ > accounting on the latter. Accounting on the former is extremely
+ > suspect.
 
-It only matters if you actually truncate it to LSBs.
+So we need a patch that:
 
->> However, the big issue with this is that it's recursive... what causes
->> this to be invoked... probably an interrupt, which is going to have been
->> invoked by a timer, quite possible the TSC deadline timer.  Oops.
-> 
-> ..and the sampling function already mixes in a TSC timestamp with the
-> provided timestamp.
+ - Deletes the IRQF_SAMPLE_RANDOM mention in feature-removal-schedule.txt,
 
-Right.
+ - Restores instances of IRQF_SAMPLE_RANDOM in drivers, and
 
-	-hpa
+ - Changes the credit_entropy_bits() to credit less entropy*.
+
+   * The code seems to only handle integer values of entropy.  Maybe 
+when crediting, choose between 1 and 0 credits. 
+
+Then once that kernel makes it into the field, a bunch of entropy 
+starved machines will no longer be entropy starved.  A few machines that 
+are run by people who worship an entropy estimate will still have to 
+install mice and users, explicit RNGs, etc., but entropy will flow.
+
+Make sense?
+
+
+-kb
