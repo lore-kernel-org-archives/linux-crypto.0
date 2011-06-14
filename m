@@ -1,90 +1,111 @@
 From: Matt Mackall <mpm@selenic.com>
-Subject: Re: [PATCH 4/5] tsc: wire up entropy generation function
-Date: Tue, 14 Jun 2011 16:04:18 -0500
-Message-ID: <1308085458.15617.175.camel@calx>
+Subject: Re: [PATCH 0/5] Feed entropy pool via high-resolution clocksources
+Date: Tue, 14 Jun 2011 16:45:02 -0500
+Message-ID: <1308087902.15617.208.camel@calx>
 References: <1308002818-27802-1-git-send-email-jarod@redhat.com>
-	 <1308002818-27802-5-git-send-email-jarod@redhat.com>
-	 <BANLkTin=BkfyPjaWRc1rfTWU34NLdn7FLgY6yUbSrjzPpx7Gmg@mail.gmail.com>
-	 <4DF690E4.1060004@zytor.com> <4DF6ADD0.6080607@borg.org>
-	 <4DF6BDB4.2060201@zytor.com>  <4DF75688.2050509@borg.org>
-	 <1308062037.15617.71.camel@calx>  <4DF79EF1.3010004@borg.org>
-	 <1308074432.15617.136.camel@calx>  <4DF7BEB5.1070006@borg.org>
+	 <1308006912.15617.67.camel@calx>  <4DF77BBC.8090702@redhat.com>
+	 <1308071629.15617.127.camel@calx>  <4DF7C1CD.4060504@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	Venkatesh Pallipadi <venki@google.com>,
-	Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org,
+	"Venkatesh Pallipadi (Venki)" <venki@google.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@elte.hu>, John Stultz <johnstul@us.ibm.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Suresh Siddha <suresh.b.siddha@intel.com>
-To: Kent Borg <kentborg@borg.org>
+	"H. Peter Anvin" <hpa@zytor.com>, Steve Grubb <sgrubb@redhat.com>
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from waste.org ([173.11.57.241]:37846 "EHLO waste.org"
+Received: from waste.org ([173.11.57.241]:58213 "EHLO waste.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753960Ab1FNVEX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jun 2011 17:04:23 -0400
-In-Reply-To: <4DF7BEB5.1070006@borg.org>
+	id S1752468Ab1FNVpH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Jun 2011 17:45:07 -0400
+In-Reply-To: <4DF7C1CD.4060504@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2011-06-14 at 16:04 -0400, Kent Borg wrote:
+On Tue, 2011-06-14 at 16:17 -0400, Jarod Wilson wrote:
 > Matt Mackall wrote:
->  > [network adapters are] a great source of potential entropy, a bad
->  > source of guaranteed entropy. The current RNG tries to do
->  > accounting on the latter. Accounting on the former is extremely
->  > suspect.
+> > On Tue, 2011-06-14 at 11:18 -0400, Jarod Wilson wrote:
+> >> Matt Mackall wrote:
+> ...
+> >>> No: it's not a great idea to _credit_ the entropy count with this data.
+> >>> Someone watching the TSC or HPET from userspace can guess when samples
+> >>> are added by watching for drop-outs in their sampling (ie classic timing
+> >>> attack).
+> >> I'm admittedly a bit of a novice in this area... Why does it matter if
+> >> someone watching knows more or less when a sample is added? It doesn't
+> >> really reveal anything about the sample itself, if we're using a
+> >> high-granularity counter value's low bits -- round-trip to userspace has
+> >> all sorts of inherent timing jitter, so determining the low-order bits
+> >> the kernel got by monitoring from userspace should be more or less
+> >> impossible. And the pool is constantly changing, making it a less static
+> >> target on an otherwise mostly idle system.
+> >
+> > I recommend you do some Google searches for "ssl timing attack" and "aes
+> > timing attack" to get a feel for the kind of seemingly impossible things
+> > that can be done and thereby recalibrate your scale of the impossible.
 > 
-> So we need a patch that:
+> Hm. These are attempting to reveal a static key though. We're talking 
+> about trying to reveal the exact value of the counter when it was read 
+> by the kernel. And trying to do so repeatedly, several times per second. 
+
+I read this as "I am not yet properly recalibrated".
+
+Yes, it's hard. Hard != impractical.
+
+> And this can't be done without getting some form of local system access, 
+
+Ok, now Google "remote timing attack".
+
+> This code is largely spurned on by someone here at Red Hat who I 
+> probably should have had in the cc list to begin with, Steve Grubb, who 
+> pointed to slides 23-25 and the chart in slide 30 of this doc...
 > 
->  - Deletes the IRQF_SAMPLE_RANDOM mention in feature-removal-schedule.txt,
+> https://www.osadl.org/fileadmin/dam/presentations/RTLWS11/okech-inherent-randomness.pdf
 > 
->  - Restores instances of IRQF_SAMPLE_RANDOM in drivers, and
-> 
->  - Changes the credit_entropy_bits() to credit less entropy*.
-> 
->    * The code seems to only handle integer values of entropy.  Maybe 
-> when crediting, choose between 1 and 0 credits. 
+> ...as the primary arguments for why this is a good source of entropy.
 
-No, that's not what I'm saying here. I'm saying we need to rethink
-entropy accounting entirely.
+..on a sixth-generation desktop CPU with a cycle-accurate counter.
 
-An alternate plan is:
+Welcome to the real world, where that's now a tiny minority of deployed
+systems.
 
-- add an add_network_randomness hook in the network stack that feeds
-samples with 0 entropy credits (strengthen /dev/urandom)
+But that's not even the point. Entropy accounting here is about
+providing a theoretical level of security above "cryptographically
+strong". As the source says: 
 
-- add similar sources elsewhere in the kernel
+"Even if it is possible to  analyze SHA in some clever way, as long as
+the amount of data returned from the generator is less than the inherent
+entropy in the pool, the output data is totally unpredictable."
 
-- remove the entropy accounting framework so that /dev/random is the
-same as /dev/urandom
+This is the goal of the code as it exists. And that goal depends on
+consistent _underestimates_ and accurate accounting.
 
 
-I currently don't think either of these is quite right for lots of
-interesting systems and the answer is somewhere in the middle. 
+Look, I understand what I'm trying to say here is very confusing, so
+please make an effort to understand all the pieces together:
 
+- the driver is designed for -perfect- security as described above
+- the usual assumptions about observability of network samples and other
+timestamps ARE FALSE on COMMON NON-PC HARDWARE
+- thus network sampling is incompatible with the CURRENT design
+- nonetheless, the current design of entropy accounting is not actually
+meeting its goals in practice
+- thus we need an alternative to entropy accounting
+- that alternative WILL be compatible with sampling insecure sources
 
-Let me describle one extremely common pathological case: Wifi routers.
-Many of these have effectively no storage and don't preserve pool data
-across boots or a battery-backed RTC so they come up in a 'known' pool
-state. Many of them also don't have a high-resolution time source or
-cycle counter available. So guessing the timestamp on a network packet
-is just about trivial. State extension attacks here are probably quite
-easy (though I don't know that anyone's tried it).
+> Well, they *are* understood to be estimates, and /dev/random does block 
+> when we've spent everything we've (estimated we've) got, and at least 
+> circa 2.6.18 in RHEL5.4, NIST was satisfied that /dev/random's 
+> estimation was "good enough" by way of some statistical analysis done on 
+> data dumped out of it.
 
-So I think what we want to instead do is simply count samples until
-we've got enough unleaked internal state that state extension becomes
-hopeless. If we assume an attacker can guess each sample with 99%
-accuracy (.08 bits per sample), pool state extension becomes intractable
-(> 2^64 guesses) at a batch size on the order of 1000 samples. If we
-have inputs from a variety of sources (network, keyboard, mouse, etc),
-this number is probably quite a bit smaller.
-
-This is a lot like the existing catastrophic reseed logic, except that
-the effective multiplier is much larger and probably implies another
-pool in the chain.
+A modern stream cipher output on a -single- sample will also pass that
+test. These sorts of statistical tests can never be more than a basic
+sanity check because they only look at output streams. A real attacker
+tries to observe inputs and correlate their observations with outputs.
 
 -- 
 Mathematics is the supreme nostalgia of our time.
