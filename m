@@ -1,93 +1,61 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH 2/5] clocksource: add support for entropy-generation function
-Date: Fri, 17 Jun 2011 17:19:37 -0400
-Message-ID: <4DFBC4E9.902@redhat.com>
-References: <1308002818-27802-1-git-send-email-jarod@redhat.com> <1308002818-27802-3-git-send-email-jarod@redhat.com> <alpine.LFD.2.02.1106172247070.11814@ionos>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 0/5] Feed entropy pool via high-resolution clocksources
+Date: Sat, 18 Jun 2011 15:40:50 -0700
+Message-ID: <4DFD2972.7020603@zytor.com>
+References: <1308002818-27802-1-git-send-email-jarod@redhat.com>	 <1308006912.15617.67.camel@calx>  <4DF77BBC.8090702@redhat.com>	 <1308071629.15617.127.camel@calx>  <4DF7C1CD.4060504@redhat.com>	 <1308087902.15617.208.camel@calx>  <4DF7E5FB.3080907@redhat.com>	 <1308093142.15617.233.camel@calx>  <4DFBAF75.30505@zytor.com> <1308342487.15617.552.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+Cc: Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
 	"Venkatesh Pallipadi (Venki)" <venki@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@elte.hu>, John Stultz <johnstul@us.ibm.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Thomas Gleixner <tglx@linutronix.de>
+	"David S. Miller" <davem@davemloft.net>,
+	Steve Grubb <sgrubb@redhat.com>,
+	Fenghua Yu <fenghua.yu@intel.com>
+To: Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57798 "EHLO mx1.redhat.com"
+Received: from terminus.zytor.com ([198.137.202.10]:36094 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752573Ab1FQVUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Jun 2011 17:20:16 -0400
-In-Reply-To: <alpine.LFD.2.02.1106172247070.11814@ionos>
+	id S1752773Ab1FRWos (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 18 Jun 2011 18:44:48 -0400
+In-Reply-To: <1308342487.15617.552.camel@calx>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thomas Gleixner wrote:
-> On Mon, 13 Jun 2011, Jarod Wilson wrote:
->> Add a new function pointer to struct clocksource that can optionally be
->> filled in by clocksources deemed to be high enough resolution to feed
->> the random number generator entropy pool.
->
-> Uurrg.
->
->> + * @entropy:		random entropy pool addition function (optional, and
->> + *			requires a fairly high-resolution clocksource)
->
-> Why do you want to do that ? Looking at the implementations of TSC and
-> HPET it's the same code. We really do not want to add that all over
-> the place. We can make that a property flag and the entropy function
-> common to the core code.
->
->> +/**
->> + * Do we have at least one clocksource that can generate entropy?
->> + */
->> +bool clocksource_entropy_available(void)
->> +{
->> +	struct clocksource *src;
->> +	bool entropy_possible = false;
->> +
->> +	mutex_lock(&clocksource_mutex);
->> +	list_for_each_entry(src,&clocksource_list, list) {
->> +		if (src->entropy) {
->> +			entropy_possible = true;
->> +			break;
->> +		}
->> +	}
->> +	mutex_unlock(&clocksource_mutex);
->> +
->> +	return entropy_possible;
->> +}
->> +EXPORT_SYMBOL(clocksource_entropy_available);
->
-> That should be evaluated when clocksources are registered not at some
-> random point in time, which might return total nonsense as it's not
-> guaranteed that the clocksource which has the entropy property is
-> going to end up as the current clocksource.
->
->> +/**
->> + * Call the clocksource's entropy-generation function, if set
->> + */
->> +void clocksource_add_entropy(void)
->> +{
->> +	if (!curr_clocksource->entropy)
->> +		return;
->
-> Why restricting it to the current clocksource? We can use the best
-> registered one for this which has the entropy property set.
+On 06/17/2011 01:28 PM, Matt Mackall wrote:
+>>
+>> The one use case that it is cryptographically insufficient for is to
+>> seed a new PRNG, which probably means it is unsuitable for being fed
+>> as-is into /dev/random.
+> 
+> The thing to understand about the input side of /dev/random is that it's
+> COMPLETELY immune to untrusted data. So there's absolutely no harm in
+> sending it data of questionable entropy so long as you don't tell it to
+> account it. And, of course, if it DOES contain entropy, it makes things
+> better.
+> 
+> Think of it this way: I have a coin in my pocket. You, the attacker,
+> tell me to flip it. You can do that any number of times and not improve
+> your guess about the coin's state over your initial guess. This is what
+> it means to have a reversible mixing function: no number of iterations
+> reduces the degrees of freedom of the pool.
+> 
 
-Yeah, John had some similar suggestions, and locally, I've got a 
-modified version that instead of adding entropy functions for each 
-clocksource, adds an entropy rating, then the highest rated entropy 
-clocksource gets used, but a common clocksource entropy function that 
-calls the chosen clocksource's read function. The entropy clocksource 
-function gets picked by way of another function similar to 
-clocksource_select, called in all the same places.
+What I meant is that it is unsuitable to *bypass the pool* for
+/dev/random.  I think we can -- and almost certainly should -- use
+RDRAND on the input side; we just have to figure out the accounting.
 
-However, since none of this is going to be viable until the random code 
-is significantly restructured, I haven't bothered with posting any of 
-the updates I've made. I can toss the delta out there if anyone really 
-wants to take a look at it, but otherwise, I'll just sit on it until 
-said restructuring happens.
+However, RDRAND is high enough quality (and high enough bandwidth) that
+it should be not just possible but desirable to completely bypass the
+pool system for /dev/urandom users and pull straight from the RDRAND
+instruction.  I don't actually know what the exact numbers look like,
+but the stall conditions being looked at are of the order of "every core
+in the socket trying to execute RDRAND at the same time."
+
+	-hpa
 
 -- 
-Jarod Wilson
-jarod@redhat.com
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
