@@ -1,57 +1,63 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 0/5] Feed entropy pool via high-resolution clocksources
-Date: Sun, 19 Jun 2011 17:01:07 -0700
-Message-ID: <4DFE8DC3.9020105@zytor.com>
-References: <4DF77BBC.8090702@redhat.com> <1308071629.15617.127.camel@calx> <4DF7C1CD.4060504@redhat.com> <1308087902.15617.208.camel@calx> <4DF7E5FB.3080907@redhat.com> <1308093142.15617.233.camel@calx> <4DFBAF75.30505@zytor.com> <1308342487.15617.552.camel@calx> <4DFD2972.7020603@zytor.com> <20110619133843.GA2900@neilslaptop.think-freely.org> <20110619150758.GB14723@gondor.apana.org.au>
+From: Josh Boyer <jwboyer@linux.vnet.ibm.com>
+Subject: [PATCH] crypto: crypto4xx - Perform read/modify/write on device
+ control register
+Date: Tue, 21 Jun 2011 08:13:21 -0400
+Message-ID: <20110621121321.GA2414@zod.rchland.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Neil Horman <nhorman@tuxdriver.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Jarod Wilson <jarod@redhat.com>, linux-crypto@vger.kernel.org,
-	"Venkatesh Pallipadi (Venki)" <venki@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@elte.hu>, John Stultz <johnstul@us.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Steve Grubb <sgrubb@redhat.com>,
-	Fenghua Yu <fenghua.yu@intel.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linuxppc-dev@lists.ozlabs.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: James Hsiao <jhsiao@amcc.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:44441 "EHLO mail.zytor.com"
+Received: from e5.ny.us.ibm.com ([32.97.182.145]:48975 "EHLO e5.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754870Ab1FTABl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 19 Jun 2011 20:01:41 -0400
-In-Reply-To: <20110619150758.GB14723@gondor.apana.org.au>
+	id S1751401Ab1FUMLs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Jun 2011 08:11:48 -0400
+Received: from d01relay04.pok.ibm.com (d01relay04.pok.ibm.com [9.56.227.236])
+	by e5.ny.us.ibm.com (8.14.4/8.13.1) with ESMTP id p5LBhjso003523
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2011 07:43:45 -0400
+Received: from d03av05.boulder.ibm.com (d03av05.boulder.ibm.com [9.17.195.85])
+	by d01relay04.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p5LCBlWp148276
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2011 08:11:47 -0400
+Received: from d03av05.boulder.ibm.com (loopback [127.0.0.1])
+	by d03av05.boulder.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p5LCBiio012270
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2011 06:11:46 -0600
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/19/2011 08:07 AM, Herbert Xu wrote:
-> On Sun, Jun 19, 2011 at 09:38:43AM -0400, Neil Horman wrote:
->>
->> It sounds to me like, if its desireous to bypass the entropy pool, then we
->> should bypass the /dev/random path altogether.  Why not write a hwrng driver
->> that can export access to the rdrand instruction via a misc device.
-> 
-> I presume the rdrand instruction can be used from user-space
-> directly.
-> 
+The Security function on the AMCC SoCs has multiple engines within a
+single MMIO range.  The crypto driver currently enables the 3DES
+functionality by doing a blind write to the device control register.
+This can unintentionally disable other functions like the PKA or TRNG
+when the driver is loaded.
 
-Yes, it can.
+Perform a read/modify/write to enable the 3DES function instead.
 
-Again, RDRAND is not suitable for /dev/random (as opposed to
-/dev/urandom users.)  /dev/urandom is used both by user space (and here
-the only reason to hook it up to /dev/urandom is compatibility with
-existing userspace; we are working separately to enabling user space
-users like OpenSSL to use RDRAND directly) and by kernel users via the
-internal APIs.
+Signed-off-by: Josh Boyer <jwboyer@linux.vnet.ibm.com>
 
-/dev/random as far as I can tell is only ever fed to userspace, however,
-the guarantees that it is at least supposed to give are very, very
-strict.  RDRAND do not fulfill those criteria, but we should be able to
-use it as part of its implementation.
+---
 
-	-hpa
-
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 1891252..1d103f9 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -51,6 +51,7 @@ static void crypto4xx_hw_init(struct crypto4xx_device *dev)
+ 	union ce_io_threshold io_threshold;
+ 	u32 rand_num;
+ 	union ce_pe_dma_cfg pe_dma_cfg;
++	u32 device_ctrl;
+ 
+ 	writel(PPC4XX_BYTE_ORDER, dev->ce_base + CRYPTO4XX_BYTE_ORDER_CFG);
+ 	/* setup pe dma, include reset sg, pdr and pe, then release reset */
+@@ -84,7 +85,9 @@ static void crypto4xx_hw_init(struct crypto4xx_device *dev)
+ 	writel(ring_size.w, dev->ce_base + CRYPTO4XX_RING_SIZE);
+ 	ring_ctrl.w = 0;
+ 	writel(ring_ctrl.w, dev->ce_base + CRYPTO4XX_RING_CTRL);
+-	writel(PPC4XX_DC_3DES_EN, dev->ce_base + CRYPTO4XX_DEVICE_CTRL);
++	device_ctrl = readl(dev->ce_base + CRYPTO4XX_DEVICE_CTRL);
++	device_ctrl |= PPC4XX_DC_3DES_EN;
++	writel(device_ctrl, dev->ce_base + CRYPTO4XX_DEVICE_CTRL);
+ 	writel(dev->gdr_pa, dev->ce_base + CRYPTO4XX_GATH_RING_BASE);
+ 	writel(dev->sdr_pa, dev->ce_base + CRYPTO4XX_SCAT_RING_BASE);
+ 	part_ring_size.w = 0;
