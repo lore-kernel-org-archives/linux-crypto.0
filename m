@@ -1,66 +1,47 @@
-From: Mandeep Singh Baines <msb@google.com>
-Subject: [PATCH v3] crypto: sha1: use SHA1_BLOCK_SIZE
-Date: Thu, 23 Jun 2011 12:02:27 -0700
-Message-ID: <20110623190227.GH13916@google.com>
-References: <1306379477-24552-1-git-send-email-msb@chromium.org>
- <20110525.233411.1372538972166578285.davem@davemloft.net>
- <20110526232058.GQ11023@google.com>
- <20110531052245.GA17068@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 00/35]: System Firmware and SMBIOS Support
+Date: Fri, 24 Jun 2011 15:40:57 +0200
+Message-ID: <201106241540.57952.arnd@arndb.de>
+References: <20110623172206.27602.34306.sendpatchset@prarit.bos.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Mandeep Singh Baines <msb@chromium.org>,
-	David Miller <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Joe Perches <joe@perches.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20110531052245.GA17068@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-ia64@vger.kernel.org,
+	x86@kernel.org, linux-acpi@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, lm-sensors@lm-sensors.org,
+	linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	rtc-linux@googlegroups.com, evel@driverdev.osuosl.org,
+	linux-usb@vger.kernel.org,
+	device-drivers-devel@blackfin.uclinux.org,
+	linux-watchdog@vger.kernel.org, grant.likely@secretlab.ca,
+	dz@debian.org, rpurdie@rpsys.net, eric.piel@tremplin-utc.net,
+	abelay@mit.edu, johnpol@2ka.mipt.ru
+To: Prarit Bhargava <prarit@redhat.com>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <20110623172206.27602.34306.sendpatchset@prarit.bos.redhat.com>
+Sender: linux-acpi-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Modify sha1_update to use SHA1_BLOCK_SIZE.
+On Thursday 23 June 2011 19:22:06 Prarit Bhargava wrote:
+> This new patchset reworks the existing DMI code into two separate layers.  It is
+> based off of the feedback I received previously when discussing the SMBIOS
+> version patch on LKML.
 
-Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
----
- crypto/sha1_generic.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+Hi Prarit,
 
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-index 0416091..00ae60e 100644
---- a/crypto/sha1_generic.c
-+++ b/crypto/sha1_generic.c
-@@ -43,25 +43,26 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
- 	unsigned int partial, done;
- 	const u8 *src;
- 
--	partial = sctx->count & 0x3f;
-+	partial = sctx->count % SHA1_BLOCK_SIZE;
- 	sctx->count += len;
- 	done = 0;
- 	src = data;
- 
--	if ((partial + len) > 63) {
-+	if ((partial + len) >= SHA1_BLOCK_SIZE) {
- 		u32 temp[SHA_WORKSPACE_WORDS];
- 
- 		if (partial) {
- 			done = -partial;
--			memcpy(sctx->buffer + partial, data, done + 64);
-+			memcpy(sctx->buffer + partial, data,
-+			       done + SHA1_BLOCK_SIZE);
- 			src = sctx->buffer;
- 		}
- 
- 		do {
- 			sha_transform(sctx->state, src, temp);
--			done += 64;
-+			done += SHA1_BLOCK_SIZE;
- 			src = data + done;
--		} while (done + 63 < len);
-+		} while (done + SHA1_BLOCK_SIZE <= len);
- 
- 		memset(temp, 0, sizeof(temp));
- 		partial = 0;
--- 
-1.7.3.1
+No objections to the patches, but when you send out a series as long as
+this one, please ensure that all patches are sent as replies to the
+introductory mail. Also, do not repeat the one-line patch summary in the
+body of the email.
+
+When using "git send-email --thread --no-chain-reply", this works
+automatically. It will also let you put the Cc list into the
+patch description and work out where to send each patch.
+
+	Arnd
