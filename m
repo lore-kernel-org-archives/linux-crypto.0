@@ -1,47 +1,59 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 00/35]: System Firmware and SMBIOS Support
-Date: Fri, 24 Jun 2011 15:40:57 +0200
-Message-ID: <201106241540.57952.arnd@arndb.de>
-References: <20110623172206.27602.34306.sendpatchset@prarit.bos.redhat.com>
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: [PATCH] Crypto: Don't use err uninitialized in
+ algif_hash.c:hash_sendmsg()
+Date: Sun, 26 Jun 2011 23:23:06 +0200 (CEST)
+Message-ID: <alpine.LNX.2.00.1106262320530.26572@swampdragon.chaosbits.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-ia64@vger.kernel.org,
-	x86@kernel.org, linux-acpi@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	openipmi-developer@lists.sourceforge.net,
-	platform-driver-x86@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, lm-sensors@lm-sensors.org,
-	linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	rtc-linux@googlegroups.com, evel@driverdev.osuosl.org,
-	linux-usb@vger.kernel.org,
-	device-drivers-devel@blackfin.uclinux.org,
-	linux-watchdog@vger.kernel.org, grant.likely@secretlab.ca,
-	dz@debian.org, rpurdie@rpsys.net, eric.piel@tremplin-utc.net,
-	abelay@mit.edu, johnpol@2ka.mipt.ru
-To: Prarit Bhargava <prarit@redhat.com>
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <20110623172206.27602.34306.sendpatchset@prarit.bos.redhat.com>
-Sender: linux-acpi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:15549 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755305Ab1FZVcK (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 26 Jun 2011 17:32:10 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 23 June 2011 19:22:06 Prarit Bhargava wrote:
-> This new patchset reworks the existing DMI code into two separate layers.  It is
-> based off of the feedback I received previously when discussing the SMBIOS
-> version patch on LKML.
+If af_alg_make_sg() returns <0 in hash_sendmsg() we'll jump to the
+'unlock' label without having set 'err' to anything. At the 'unlock'
+label the value of 'err' is tested to determine return value of the
+function - not good to base that on a uninitialized variable.
 
-Hi Prarit,
+This patch sets 'err' to the return value of hash_sendmsg() before the
+'goto' when the value is less than zero, which seems to me to be the
+proper thing to do.
 
-No objections to the patches, but when you send out a series as long as
-this one, please ensure that all patches are sent as replies to the
-introductory mail. Also, do not repeat the one-line patch summary in the
-body of the email.
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ crypto/algif_hash.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-When using "git send-email --thread --no-chain-reply", this works
-automatically. It will also let you put the Cc list into the
-patch description and work out where to send each patch.
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 62122a1..1847544 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -68,9 +68,10 @@ static int hash_sendmsg(struct kiocb *unused, struct socket *sock,
+ 			int newlen;
+ 
+ 			newlen = af_alg_make_sg(&ctx->sgl, from, len, 0);
+-			if (newlen < 0)
++			if (newlen < 0) {
++				err = newlen;
+ 				goto unlock;
+-
++			}
+ 			ahash_request_set_crypt(&ctx->req, ctx->sgl.sg, NULL,
+ 						newlen);
+ 
+-- 
+1.7.5.2
 
-	Arnd
+
+-- 
+Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
