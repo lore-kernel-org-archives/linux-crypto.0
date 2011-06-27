@@ -1,41 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: crypto4xx - Perform read/modify/write on
-	device control register
-Date: Mon, 27 Jun 2011 15:33:29 +0800
-Message-ID: <20110627073329.GA9206@gondor.apana.org.au>
-References: <20110621121321.GA2414@zod.rchland.ibm.com>
+Subject: Re: [PATCH v3] crypto: sha1: use SHA1_BLOCK_SIZE
+Date: Mon, 27 Jun 2011 15:42:12 +0800
+Message-ID: <20110627074212.GA9289@gondor.apana.org.au>
+References: <1306379477-24552-1-git-send-email-msb@chromium.org> <20110525.233411.1372538972166578285.davem@davemloft.net> <20110526232058.GQ11023@google.com> <20110531052245.GA17068@gondor.apana.org.au> <20110623190227.GH13916@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linuxppc-dev@lists.ozlabs.org, James Hsiao <jhsiao@amcc.com>,
-	linux-crypto@vger.kernel.org
-To: Josh Boyer <jwboyer@linux.vnet.ibm.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Mandeep Singh Baines <msb@chromium.org>,
+	David Miller <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Joe Perches <joe@perches.com>
+To: Mandeep Singh Baines <msb@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:38301 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756855Ab1F0HmX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Jun 2011 03:42:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20110621121321.GA2414@zod.rchland.ibm.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
-	<mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20110623190227.GH13916@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 21, 2011 at 08:13:21AM -0400, Josh Boyer wrote:
-> The Security function on the AMCC SoCs has multiple engines within a
-> single MMIO range.  The crypto driver currently enables the 3DES
-> functionality by doing a blind write to the device control register.
-> This can unintentionally disable other functions like the PKA or TRNG
-> when the driver is loaded.
+On Thu, Jun 23, 2011 at 12:02:27PM -0700, Mandeep Singh Baines wrote:
+> Modify sha1_update to use SHA1_BLOCK_SIZE.
 > 
-> Perform a read/modify/write to enable the 3DES function instead.
-> 
-> Signed-off-by: Josh Boyer <jwboyer@linux.vnet.ibm.com>
+> Signed-off-by: Mandeep Singh Baines <msb@chromium.org>
 
-Patch applied.  Thanks.
+Patch applied.  Thanks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
