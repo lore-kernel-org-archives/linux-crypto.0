@@ -1,48 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - fix operator precedence in shared
-	descriptor allocation
-Date: Thu, 30 Jun 2011 07:44:46 +0800
-Message-ID: <20110629234446.GA16511@gondor.apana.org.au>
-References: <20110523184523.62654cb1.kim.phillips@freescale.com> <20110526033044.GB14500@gondor.apana.org.au> <20110629111226.0ffca866.kim.phillips@freescale.com>
+Subject: Crypto Fixes for 3.0
+Date: Thu, 30 Jun 2011 07:51:53 +0800
+Message-ID: <20110629235153.GA16559@gondor.apana.org.au>
+References: <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Kumar Gala <kumar.gala@freescale.com>
-To: Kim Phillips <kim.phillips@freescale.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-cry
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42839 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:42823 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753661Ab1F2XpJ (ORCPT
+	with ESMTP id S1758372Ab1F2XwC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2011 19:45:09 -0400
+	Wed, 29 Jun 2011 19:52:02 -0400
 Content-Disposition: inline
-In-Reply-To: <20110629111226.0ffca866.kim.phillips@freescale.com>
+In-Reply-To: <20110328071322.GA6569@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 29, 2011 at 11:12:26AM -0500, Kim Phillips wrote:
-> On Thu, 26 May 2011 13:30:44 +1000
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > On Mon, May 23, 2011 at 06:45:23PM -0500, Kim Phillips wrote:
-> > > setkey allocates 16 bytes (CAAM_CMD_SZ *
-> > > DESC_AEAD_SHARED_TEXT_LEN) shy of what is needed to
-> > > store the shared descriptor, resulting in memory
-> > > corruption.  Fix this.
-> > > 
-> > > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
-> > 
-> > Applied to cryptodev.  Thanks Kim!
-> 
-> Herbert, this patch fixes a memory corruption bug introduced in
-> commit 4427b1b - "crypto: caam - add support for sha512 variants of
-> existing AEAD algorithms", which is currently the last commit for
-> caam in Linus' tree. Can you please push this commit (c5bf900 in
-> cryptodev) to Linus before he releases 3.0?
+Hi Linus:
 
-Thanks for the note.  I'll push this patch to crypto-2.6 and rebase
-cryptodev.
+This push fixes a memory corruption bug due to undersized kmalloc
+in the caam driver.  The patch has actually been in my tree for
+a month but I had incorrectly placed it in the tree for linux-next.
+Sorry about that.
 
-Cheers,
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Kim Phillips (1):
+      crypto: caam - fix operator precedence in shared descriptor allocation
+
+ drivers/crypto/caam/caamalg.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
