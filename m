@@ -1,49 +1,34 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.0
-Date: Thu, 30 Jun 2011 07:51:53 +0800
-Message-ID: <20110629235153.GA16559@gondor.apana.org.au>
-References: <20100305071043.GA3548@gondor.apana.org.au> <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au>
+From: "PROF.MAURICE IWU" <iwumaurice900@sify.com>
+Subject: Equity Business Investment
+Date: Thu, 30 Jun 2011 17:44:46 +0200
+Message-ID: <EXCHANGE03YW8BYXifW0000054a__43684.6786564731$1309448719$gmane$org@exchange03.2besource.com>
+Reply-To: <profmauriceiwu2221@yahoo.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42823 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758372Ab1F2XwC (ORCPT
+Received: from exchange.2besource.com ([203.126.216.22]:14307 "EHLO
+	exchange03.2besource.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750988Ab1F3Poy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jun 2011 19:52:02 -0400
-Content-Disposition: inline
-In-Reply-To: <20110328071322.GA6569@gondor.apana.org.au>
+	Thu, 30 Jun 2011 11:44:54 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Equity Business Investment
+>From Prof. Maurice Iwu 
 
-This push fixes a memory corruption bug due to undersized kmalloc
-in the caam driver.  The patch has actually been in my tree for
-a month but I had incorrectly placed it in the tree for linux-next.
-Sorry about that.
+Dear Friend,
 
-Please pull from
+I am Prof. Maurice M. Iwu, Former Chairman Independent Electoral Commission 
+(INEC).Currently, I am on compulsory terminal leave presently in UK , 
+leading up to my final retirement from public service.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+I am seeking your partnership in a mutual benefit project involving 
+investing into your company and secondly on properties and to be precise Estate Development or any other profitable venture of your great idea for our mutual benefit of Equity Market Investment.,
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Kim Phillips (1):
-      crypto: caam - fix operator precedence in shared descriptor allocation
-
- drivers/crypto/caam/caamalg.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sincerely,
+Prof. Maurice M.Iwu.
+{INEC.}
