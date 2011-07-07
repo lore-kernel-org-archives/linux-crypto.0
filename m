@@ -1,53 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Fwd: crypto accelerator driver problems
-Date: Tue, 5 Jul 2011 14:53:51 +0800
-Message-ID: <20110705065351.GA31107@gondor.apana.org.au>
-References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com> <20101230211900.GA22742@gondor.apana.org.au> <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com> <AANLkTin8au=98mmfsaJjOSyJNibk3foZWihj6EGTGWK-@mail.gmail.com> <20110126070939.GA18150@gondor.apana.org.au> <AANLkTi=m0jVWSqR1FNX9r9HH32LbA0aWJxSQtLd_VszW@mail.gmail.com> <20110126233315.GB26664@gondor.apana.org.au> <CAFuf8QO1gG2WUMmgywHANBHgBj1D8RV8xkJvMYOdiJSovduG+A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Hamid Nassiby <h.nassiby@gmail.com>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto, gf128: fix call to memset()
+Date: Thu,  7 Jul 2011 10:33:50 +0200
+Message-ID: <1310027630-26488-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>,
+	PaX Team <pageexec@freemail.hu>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44819 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753775Ab1GEGxy (ORCPT
+Received: from grimli.r00tworld.net ([83.169.44.195]:45539 "EHLO
+	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754618Ab1GGImo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jul 2011 02:53:54 -0400
-Content-Disposition: inline
-In-Reply-To: <CAFuf8QO1gG2WUMmgywHANBHgBj1D8RV8xkJvMYOdiJSovduG+A@mail.gmail.com>
+	Thu, 7 Jul 2011 04:42:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 05, 2011 at 10:15:08AM +0330, Hamid Nassiby wrote:
->
-> and preferably to :
-> 
-> /* Critical PSEUDO code */
-> /* distinct locks for write_to_device and read_from_device */
->               spin_lock_irqsave(&lock1, flag1);
->                  write_to_device(op, 0, my_req_id);
->               spin_unlock_irqrestore(&lock1, flag1);
-> 
->               spin_lock_irqsave(&lock2, flag2);
->                 ret = read_from_device(op, 0, my_req_id);
->               spin_unlock_irqrestore(&lock2, flag2);
-> /* End of Critical PSEUDO*/
-> 
-> 
-> Here, it seems we must have no problem, but as soon as one TCP flow starts
-> the system hangs.
+In gf128mul_lle() and gf128mul_bbe() r isn't completely initialized with
+zero because the size argument passed to memset() is the size of the
+pointer, not the structure it points to.
 
-Do you know why it hangs?
+Luckily there are no in-kernel users of those functions so the ABI
+change implied by this fix should break no existing code.
 
-It sounds like the problem isn't with the synchronisation itself,
-which at worst will produce bogus packets, but something else in
-your code that is leading to the dead-lock.
+Based on a patch by the PaX Team.
 
-Please enable lockdep and related debugging features to track down
-the problem.
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Cc: PaX Team <pageexec@freemail.hu>
+---
+ crypto/gf128mul.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Cheers,
+diff --git a/crypto/gf128mul.c b/crypto/gf128mul.c
+index df35e4c..5276607 100644
+--- a/crypto/gf128mul.c
++++ b/crypto/gf128mul.c
+@@ -182,7 +182,7 @@ void gf128mul_lle(be128 *r, const be128 *b)
+ 	for (i = 0; i < 7; ++i)
+ 		gf128mul_x_lle(&p[i + 1], &p[i]);
+ 
+-	memset(r, 0, sizeof(r));
++	memset(r, 0, sizeof(*r));
+ 	for (i = 0;;) {
+ 		u8 ch = ((u8 *)b)[15 - i];
+ 
+@@ -220,7 +220,7 @@ void gf128mul_bbe(be128 *r, const be128 *b)
+ 	for (i = 0; i < 7; ++i)
+ 		gf128mul_x_bbe(&p[i + 1], &p[i]);
+ 
+-	memset(r, 0, sizeof(r));
++	memset(r, 0, sizeof(*r));
+ 	for (i = 0;;) {
+ 		u8 ch = ((u8 *)b)[i];
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.6.5
