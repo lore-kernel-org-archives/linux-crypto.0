@@ -1,44 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto, gf128: fix call to memset()
-Date: Fri, 8 Jul 2011 17:21:38 +0800
-Message-ID: <20110708092137.GA29180@gondor.apana.org.au>
-References: <1310027630-26488-1-git-send-email-minipli@googlemail.com> <20110707.021039.1936036404024998528.davem@davemloft.net>
-Mime-Version: 1.0
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.6d file/swap crypto package
+Date: Fri, 08 Jul 2011 19:46:09 +0300
+Message-ID: <4E173451.DD55B8DF@users.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii
-Cc: minipli@googlemail.com, linux-crypto@vger.kernel.org,
-	pageexec@freemail.hu
-To: David Miller <davem@davemloft.net>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48509 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751028Ab1GHJVr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Jul 2011 05:21:47 -0400
-Content-Disposition: inline
-In-Reply-To: <20110707.021039.1936036404024998528.davem@davemloft.net>
+Received: from mail.tnnet.fi ([217.112.240.26]:59470 "EHLO mail.tnnet.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752912Ab1GHQqM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 8 Jul 2011 12:46:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 07, 2011 at 02:10:39AM -0700, David Miller wrote:
-> From: Mathias Krause <minipli@googlemail.com>
-> Date: Thu,  7 Jul 2011 10:33:50 +0200
-> 
-> > In gf128mul_lle() and gf128mul_bbe() r isn't completely initialized with
-> > zero because the size argument passed to memset() is the size of the
-> > pointer, not the structure it points to.
-> > 
-> > Luckily there are no in-kernel users of those functions so the ABI
-> > change implied by this fix should break no existing code.
-> > 
-> > Based on a patch by the PaX Team.
-> > 
-> > Signed-off-by: Mathias Krause <minipli@googlemail.com>
-> > Cc: PaX Team <pageexec@freemail.hu>
-> 
-> Acked-by: David S. Miller <davem@davemloft.net>
+loop-AES changes since previous release:
+- build-initrd.sh is now able to set up more than one loop device.
+- Fixed build on 3.x kernels.
+- Lots of #ifdef spaghetti removed for 3.x kernels.
+- Fixed build on recent RHEL kernels.
 
-Patch applied.  Thanks a lot!
+
+bzip2 compressed tarball is here:
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6d.tar.bz2
+    md5sum a8b88ae368e1fcbcc073adf28fdfeb1a
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6d.tar.bz2.sign
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
