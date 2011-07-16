@@ -1,37 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/8] crypto: talitos - ensure request ordering within a
-	single tfm
-Date: Fri, 15 Jul 2011 11:23:40 +0800
-Message-ID: <20110715032339.GA27854@gondor.apana.org.au>
-References: <1310165849-22177-1-git-send-email-kim.phillips@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH 1/2] crypto, sha1: export sha1_update for reuse
+Date: Sat, 16 Jul 2011 14:44:12 +0200
+Message-ID: <1310820253-5702-2-git-send-email-minipli@googlemail.com>
+References: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38015 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755131Ab1GODXn (ORCPT
+Received: from grimli.r00tworld.net ([83.169.44.195]:44138 "EHLO
+	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751129Ab1GPMoP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Jul 2011 23:23:43 -0400
-Content-Disposition: inline
-In-Reply-To: <1310165849-22177-1-git-send-email-kim.phillips@freescale.com>
+	Sat, 16 Jul 2011 08:44:15 -0400
+In-Reply-To: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 08, 2011 at 10:57:22PM +0000, Kim Phillips wrote:
-> Assign single target channel per tfm in talitos_cra_init instead of
-> performing channel scheduling dynamically during the encryption request.
-> This changes the talitos_submit interface to accept a new channel
-> number argument.  Without this, rapid bursts of misc. sized requests
-> could make it possible for IPsec packets to be encrypted out-of-order,
-> which would result in packet drops due to sequence numbers falling
-> outside the anti-reply window on a peer gateway.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Export the update function as crypto_sha1_update() to not have the need
+to reimplement the same algorithm for each SHA-1 implementation. This
+way the generic SHA-1 implementation can be used as fallback for other
+implementations that fail to run under certain circumstances, like the
+need for an FPU context while executing in IRQ context.
 
-All patches applied.  Thanks!
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+---
+ crypto/sha1_generic.c |    9 +++++----
+ include/crypto/sha.h  |    5 +++++
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index 0416091..0b6d907 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -36,7 +36,7 @@ static int sha1_init(struct shash_desc *desc)
+ 	return 0;
+ }
+ 
+-static int sha1_update(struct shash_desc *desc, const u8 *data,
++int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len)
+ {
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+@@ -70,6 +70,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(crypto_sha1_update);
+ 
+ 
+ /* Add padding and return the message digest. */
+@@ -86,10 +87,10 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
+ 	/* Pad out to 56 mod 64 */
+ 	index = sctx->count & 0x3f;
+ 	padlen = (index < 56) ? (56 - index) : ((64+56) - index);
+-	sha1_update(desc, padding, padlen);
++	crypto_sha1_update(desc, padding, padlen);
+ 
+ 	/* Append length */
+-	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
++	crypto_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
+ 
+ 	/* Store state in digest */
+ 	for (i = 0; i < 5; i++)
+@@ -120,7 +121,7 @@ static int sha1_import(struct shash_desc *desc, const void *in)
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_init,
+-	.update		=	sha1_update,
++	.update		=	crypto_sha1_update,
+ 	.final		=	sha1_final,
+ 	.export		=	sha1_export,
+ 	.import		=	sha1_import,
+diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+index 069e85b..7c46d0c 100644
+--- a/include/crypto/sha.h
++++ b/include/crypto/sha.h
+@@ -82,4 +82,9 @@ struct sha512_state {
+ 	u8 buf[SHA512_BLOCK_SIZE];
+ };
+ 
++#if defined(CONFIG_CRYPTO_SHA1) || defined (CONFIG_CRYPTO_SHA1_MODULE)
++extern int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
++			      unsigned int len);
++#endif
++
+ #endif
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.5.6.5
