@@ -1,91 +1,46 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 1/2] crypto, sha1: export sha1_update for reuse
-Date: Sat, 16 Jul 2011 14:44:12 +0200
-Message-ID: <1310820253-5702-2-git-send-email-minipli@googlemail.com>
-References: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
+Subject: [PATCH 0/2] crypto, x86: assembler implementation of SHA1
+Date: Sat, 16 Jul 2011 14:44:11 +0200
+Message-ID: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
 Cc: linux-crypto@vger.kernel.org,
 	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
 	Mathias Krause <minipli@googlemail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grimli.r00tworld.net ([83.169.44.195]:44138 "EHLO
+Received: from grimli.r00tworld.net ([83.169.44.195]:44136 "EHLO
 	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751129Ab1GPMoP (ORCPT
+	with ESMTP id S1751205Ab1GPMoP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Sat, 16 Jul 2011 08:44:15 -0400
-In-Reply-To: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Export the update function as crypto_sha1_update() to not have the need
-to reimplement the same algorithm for each SHA-1 implementation. This
-way the generic SHA-1 implementation can be used as fallback for other
-implementations that fail to run under certain circumstances, like the
-need for an FPU context while executing in IRQ context.
+This patch series adds an assembler implementation for the SHA1 hash algorithm
+for the x86-64 architecture. Its raw hash performance can be more than 2 times
+faster than the generic C implementation. This gives a real world benefit for
+IPsec with an throughput increase of up to +35%. For concrete numbers have a
+look at the second patch.
 
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
----
- crypto/sha1_generic.c |    9 +++++----
- include/crypto/sha.h  |    5 +++++
- 2 files changed, 10 insertions(+), 4 deletions(-)
+This implementation is currently x86-64 only but might be ported to 32 bit with
+some effort in a follow up patch. (I had no time to do this yet.)
 
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-index 0416091..0b6d907 100644
---- a/crypto/sha1_generic.c
-+++ b/crypto/sha1_generic.c
-@@ -36,7 +36,7 @@ static int sha1_init(struct shash_desc *desc)
- 	return 0;
- }
- 
--static int sha1_update(struct shash_desc *desc, const u8 *data,
-+int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
- 			unsigned int len)
- {
- 	struct sha1_state *sctx = shash_desc_ctx(desc);
-@@ -70,6 +70,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(crypto_sha1_update);
- 
- 
- /* Add padding and return the message digest. */
-@@ -86,10 +87,10 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
- 	/* Pad out to 56 mod 64 */
- 	index = sctx->count & 0x3f;
- 	padlen = (index < 56) ? (56 - index) : ((64+56) - index);
--	sha1_update(desc, padding, padlen);
-+	crypto_sha1_update(desc, padding, padlen);
- 
- 	/* Append length */
--	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
-+	crypto_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 5; i++)
-@@ -120,7 +121,7 @@ static int sha1_import(struct shash_desc *desc, const void *in)
- static struct shash_alg alg = {
- 	.digestsize	=	SHA1_DIGEST_SIZE,
- 	.init		=	sha1_init,
--	.update		=	sha1_update,
-+	.update		=	crypto_sha1_update,
- 	.final		=	sha1_final,
- 	.export		=	sha1_export,
- 	.import		=	sha1_import,
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index 069e85b..7c46d0c 100644
---- a/include/crypto/sha.h
-+++ b/include/crypto/sha.h
-@@ -82,4 +82,9 @@ struct sha512_state {
- 	u8 buf[SHA512_BLOCK_SIZE];
- };
- 
-+#if defined(CONFIG_CRYPTO_SHA1) || defined (CONFIG_CRYPTO_SHA1_MODULE)
-+extern int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
-+			      unsigned int len);
-+#endif
-+
- #endif
--- 
-1.5.6.5
+Note: The SSSE3 is no typo, it's "Supplemental SSE3".
+
+Regards,
+Mathias
+
+Mathias Krause (2):
+  crypto, sha1: export sha1_update for reuse
+  crypto, x86: SSSE3 based SHA1 implementation for x86-64
+
+ arch/x86/crypto/Makefile          |    8 +
+ arch/x86/crypto/sha1_ssse3_asm.S  |  558 +++++++++++++++++++++++++++++++++++++
+ arch/x86/crypto/sha1_ssse3_glue.c |  240 ++++++++++++++++
+ arch/x86/include/asm/cpufeature.h |    3 +
+ crypto/Kconfig                    |   10 +
+ crypto/sha1_generic.c             |    9 +-
+ include/crypto/sha.h              |    5 +
+ 7 files changed, 829 insertions(+), 4 deletions(-)
+ create mode 100644 arch/x86/crypto/sha1_ssse3_asm.S
+ create mode 100644 arch/x86/crypto/sha1_ssse3_glue.c
