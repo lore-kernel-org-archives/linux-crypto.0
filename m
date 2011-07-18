@@ -1,954 +1,931 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 2/2] crypto, x86: SSSE3 based SHA1 implementation for x86-64
-Date: Sat, 16 Jul 2011 14:44:13 +0200
-Message-ID: <1310820253-5702-3-git-send-email-minipli@googlemail.com>
-References: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
-	Mathias Krause <minipli@googlemail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grimli.r00tworld.net ([83.169.44.195]:44140 "EHLO
-	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751163Ab1GPMoP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 16 Jul 2011 08:44:15 -0400
-In-Reply-To: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Prarit Bhargava <prarit@redhat.com>
+Subject: [PATCH 01/34] System Firmware Interface
+Date: Mon, 18 Jul 2011 09:08:15 -0400
+Message-ID: <1310994528-26276-2-git-send-email-prarit@redhat.com>
+References: <1310994528-26276-1-git-send-email-prarit@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-ia64@vger.kernel.org, linux-pci@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	platform-driver-x86@vger.kernel.org, grant.likely@secretlab.ca,
+	linux-ide@vger.kernel.org, linux-i2c@vger.kernel.org,
+	device-drivers-devel@blackfin.uclinux.org, abelay@mit.edu,
+	Prarit Bhargava <prarit@redhat.com>, eric.piel@tremplin-utc.net,
+	x86@kernel.org, lm-sensors@lm-sensors.org,
+	linux-acpi@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org, johnpol@2ka.mipt.ru,
+	linux-watchdog@vger.kernel.org, rtc-linux@googlegroups.com,
+	dz@debian.org, openipmi-developer@lists.sourceforge.net,
+	evel@driverdev.osuosl.org, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org, rpurdie@rpsys.net, linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <dri-devel-bounces+sf-dri-devel=m.gmane.org@lists.freedesktop.org>
+In-Reply-To: <1310994528-26276-1-git-send-email-prarit@redhat.com>
+List-Unsubscribe: <http://lists.freedesktop.org/mailman/options/dri-devel>,
+	<mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <http://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+	<mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Sender: dri-devel-bounces+sf-dri-devel=m.gmane.org@lists.freedesktop.org
+Errors-To: dri-devel-bounces+sf-dri-devel=m.gmane.org@lists.freedesktop.org
+List-Id: linux-crypto.vger.kernel.org
 
-This is an assembler implementation of the SHA1 algorithm using the
-Supplemental SSE3 (SSSE3) instructions or, when available, the
-Advanced Vector Extensions (AVX).
+This patch introduces a general System Firmware interface to the kernel, called
+sysfw.
 
-Testing with the tcrypt module shows the raw hash performance is up to
-2.3 times faster than the C implementation, using 8k data blocks on a
-Core 2 Duo T5500. For the smalest data set (16 byte) it is still 25%
-faster.
+Inlcluded in this interface is the ability to search a standard set of fields,
+sysfw_lookup().  The fields are currently based upon the x86 and ia64 SMBIOS
+fields but exapandable to fields that other arches may introduce.  Also
+included is  the ability to search and match against those fields, and run
+a callback function against the matches, sysfw_callback().
 
-Since this implementation uses SSE/YMM registers it cannot safely be
-used in every situation, e.g. while an IRQ interrupts a kernel thread.
-The implementation falls back to the generic SHA1 variant, if using
-the SSE/YMM registers is not possible.
+Modify module code to use sysfw instead of old DMI interface.
 
-With this algorithm I was able to increase the throughput of a single
-IPsec link from 344 Mbit/s to 464 Mbit/s on a Core 2 Quad CPU using
-the SSSE3 variant -- a speedup of +34.8%.
+[v2]: Modified sysfw_id to include up to 8 matches.  Almost all declarations of
+sysfw_id are __init so the increased kernel image size isn't a big issue.
 
-Saving and restoring SSE/YMM state might make the actual throughput
-fluctuate when there are FPU intensive userland applications running.
-For example, meassuring the performance using iperf2 directly on the
-machine under test gives wobbling numbers because iperf2 uses the FPU
-for each packet to check if the reporting interval has expired (in the
-above test I got min/max/avg: 402/484/464 MBit/s).
+[v3]: Use sysfs bus instead of class, restore existing dmi class for backwards
+compatibility.
 
-Using this algorithm on a IPsec gateway gives much more reasonable and
-stable numbers, albeit not as high as in the directly connected case.
-Here is the result from an RFC 2544 test run with a EXFO Packet Blazer
-FTB-8510:
-
- frame size    sha1-generic     sha1-ssse3    delta
-    64 byte     37.5 MBit/s    37.5 MBit/s     0.0%
-   128 byte     56.3 MBit/s    62.5 MBit/s   +11.0%
-   256 byte     87.5 MBit/s   100.0 MBit/s   +14.3%
-   512 byte    131.3 MBit/s   150.0 MBit/s   +14.2%
-  1024 byte    162.5 MBit/s   193.8 MBit/s   +19.3%
-  1280 byte    175.0 MBit/s   212.5 MBit/s   +21.4%
-  1420 byte    175.0 MBit/s   218.7 MBit/s   +25.0%
-  1518 byte    150.0 MBit/s   181.2 MBit/s   +20.8%
-
-The throughput for the largest frame size is lower than for the
-previous size because the IP packets need to be fragmented in this
-case to make there way through the IPsec tunnel.
-
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
-Cc: Maxim Locktyukhin <maxim.locktyukhin@intel.com>
+Cc: linux-ia64@vger.kernel.org
+Cc: x86@kernel.org
+Cc: linux-acpi@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: openipmi-developer@lists.sourceforge.net
+Cc: platform-driver-x86@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: lm-sensors@lm-sensors.org
+Cc: linux-i2c@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: linux-input@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-pci@vger.kernel.org
+Cc: rtc-linux@googlegroups.com
+Cc: evel@driverdev.osuosl.org
+Cc: linux-usb@vger.kernel.org
+Cc: device-drivers-devel@blackfin.uclinux.org
+Cc: linux-watchdog@vger.kernel.org
+Cc: grant.likely@secretlab.ca
+Cc: dz@debian.org
+Cc: rpurdie@rpsys.net
+Cc: eric.piel@tremplin-utc.net
+Cc: abelay@mit.edu
+Cc: johnpol@2ka.mipt.ru
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
 ---
- arch/x86/crypto/Makefile          |    8 +
- arch/x86/crypto/sha1_ssse3_asm.S  |  558 +++++++++++++++++++++++++++++++++++++
- arch/x86/crypto/sha1_ssse3_glue.c |  240 ++++++++++++++++
- arch/x86/include/asm/cpufeature.h |    3 +
- crypto/Kconfig                    |   10 +
- 5 files changed, 819 insertions(+), 0 deletions(-)
- create mode 100644 arch/x86/crypto/sha1_ssse3_asm.S
- create mode 100644 arch/x86/crypto/sha1_ssse3_glue.c
+ drivers/firmware/Kconfig        |   25 +++
+ drivers/firmware/Makefile       |    3 +-
+ drivers/firmware/sysfw-sysfs.c  |  306 +++++++++++++++++++++++++++++++++++++++
+ drivers/firmware/sysfw.c        |  168 +++++++++++++++++++++
+ include/linux/mod_devicetable.h |   62 ++++++++
+ include/linux/sysfw.h           |  113 ++++++++++++++
+ init/main.c                     |    3 +
+ scripts/mod/file2alias.c        |   52 ++++----
+ 8 files changed, 705 insertions(+), 27 deletions(-)
+ create mode 100644 drivers/firmware/sysfw-sysfs.c
+ create mode 100644 drivers/firmware/sysfw.c
+ create mode 100644 include/linux/sysfw.h
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index c04f1b7..a80be92 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
- obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
+index efba163..79a1b9d 100644
+--- a/drivers/firmware/Kconfig
++++ b/drivers/firmware/Kconfig
+@@ -157,6 +157,31 @@ config SIGMA
+ 	  If unsure, say N here.  Drivers that need these helpers will select
+ 	  this option automatically.
  
- obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
-+obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
- 
- aes-i586-y := aes-i586-asm_32.o aes_glue.o
- twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
-@@ -25,3 +26,10 @@ salsa20-x86_64-y := salsa20-x86_64-asm_64.o salsa20_glue.o
- aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
- 
- ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
++config SYSTEM_FIRMWARE
++	bool "System Firmware Interface"
++	default y
++	help
++	  Enables common System Firmware Interface to export system firmware
++	  (SMBIOS, DMI, etc.) information to kernel and userspace.
 +
-+# enable AVX support only when $(AS) can actually assemble the instructions
-+ifeq ($(call as-instr,vpxor %xmm0$(comma)%xmm1$(comma)%xmm2,yes,no),yes)
-+AFLAGS_sha1_ssse3.o += -DSHA1_ENABLE_AVX_SUPPORT
-+CFLAGS_sha1_ssse3_glue.o += -DSHA1_ENABLE_AVX_SUPPORT
-+endif
-+sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
-diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
++config SYSTEM_FIRMWARE_SYSFS
++	bool "Export System Firmware identification via sysfs to userspace"
++	depends on SYSTEM_FIRMWARE
++	help
++	  Say Y here if you want to query system identification information
++	  from userspace through /sys/class/sysfw/id/ or if you want
++	  system firmware (sysfw) based module auto-loading.
++
++config SYSTEM_FIRMWARE_DMI_COMPAT
++	bool "Export dmi compatibility class in sysfs"
++	depends on SYSTEM_FIRMWARE
++	default y
++	help
++	  This exposes /sys/class/dmi/* as a pointer to the sysfw class for
++	  old software.  This is purely a backwards compatability feature and
++	  should not be used in new user space software.  Please see
++	  Documentation/ABI for details.
++
+ source "drivers/firmware/google/Kconfig"
+ 
+ endmenu
+diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
+index 47338c9..41bc64a 100644
+--- a/drivers/firmware/Makefile
++++ b/drivers/firmware/Makefile
+@@ -13,5 +13,6 @@ obj-$(CONFIG_ISCSI_IBFT_FIND)	+= iscsi_ibft_find.o
+ obj-$(CONFIG_ISCSI_IBFT)	+= iscsi_ibft.o
+ obj-$(CONFIG_FIRMWARE_MEMMAP)	+= memmap.o
+ obj-$(CONFIG_SIGMA)		+= sigma.o
+-
+ obj-$(CONFIG_GOOGLE_FIRMWARE)	+= google/
++obj-$(CONFIG_SYSTEM_FIRMWARE)	+= sysfw.o
++obj-$(CONFIG_SYSTEM_FIRMWARE_SYSFS)	+= sysfw-sysfs.o
+diff --git a/drivers/firmware/sysfw-sysfs.c b/drivers/firmware/sysfw-sysfs.c
 new file mode 100644
-index 0000000..8fb0ba6
+index 0000000..48d7d07
 --- /dev/null
-+++ b/arch/x86/crypto/sha1_ssse3_asm.S
-@@ -0,0 +1,558 @@
++++ b/drivers/firmware/sysfw-sysfs.c
+@@ -0,0 +1,306 @@
 +/*
-+ * This is a SIMD SHA-1 implementation. It requires the Intel(R) Supplemental
-+ * SSE3 instruction set extensions introduced in Intel Core Microarchitecture
-+ * processors. CPUs supporting Intel(R) AVX extensions will get an additional
-+ * boost.
++ * Export sysfs sysfw_field's to userspace
 + *
-+ * This work was inspired by the vectorized implementation of Dean Gaudet.
-+ * Additional information on it can be found at:
-+ *    http://www.arctic.org/~dean/crypto/sha1.html
++ * Updated 2011, Prarit Bhargava, prarit@redhat.com
++ * Copyright 2007, Lennart Poettering
 + *
-+ * It was improved upon with more efficient vectorization of the message
-+ * scheduling. This implementation has also been optimized for all current and
-+ * several future generations of Intel CPUs.
-+ *
-+ * See this article for more information about the implementation details:
-+ *   http://software.intel.com/en-us/articles/improving-the-performance-of-the-secure-hash-algorithm-1/
-+ *
-+ * Copyright (C) 2010, Intel Corp.
-+ *   Authors: Maxim Locktyukhin <maxim.locktyukhin@intel.com>
-+ *            Ronen Zohar <ronen.zohar@intel.com>
-+ *
-+ * Converted to AT&T syntax and adapted for inclusion in the Linux kernel:
-+ *   Author: Mathias Krause <minipli@googlemail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
++ * Licensed under GPLv2
 + */
 +
-+#define CTX	%rdi	// arg1
-+#define BUF	%rsi	// arg2
-+#define CNT	%rdx	// arg3
-+
-+#define REG_A	%ecx
-+#define REG_B	%esi
-+#define REG_C	%edi
-+#define REG_D	%ebp
-+#define REG_E	%edx
-+
-+#define REG_T1	%eax
-+#define REG_T2	%ebx
-+
-+#define K_BASE		%r8
-+#define HASH_PTR	%r9
-+#define BUFFER_PTR	%r10
-+#define BUFFER_END	%r11
-+
-+#define W_TMP1	%xmm0
-+#define W_TMP2	%xmm9
-+
-+#define W0	%xmm1
-+#define W4	%xmm2
-+#define W8	%xmm3
-+#define W12	%xmm4
-+#define W16	%xmm5
-+#define W20	%xmm6
-+#define W24	%xmm7
-+#define W28	%xmm8
-+
-+#define XMM_SHUFB_BSWAP	%xmm10
-+
-+/* we keep window of 64 w[i]+K pre-calculated values in a circular buffer */
-+#define WK(t)	(((t) & 15) * 4)(%rsp)
-+#define W_PRECALC_AHEAD	16
-+
-+/*
-+ * This macro implements the SHA-1 function's body for single 64-byte block
-+ * param: function's name
-+ */
-+.macro SHA1_VECTOR_ASM  name
-+	.global	\name
-+	.type	\name, @function
-+	.align 32
-+\name:
-+	push	%rbx
-+	push	%rbp
-+	push	%r12
-+
-+	mov	%rsp, %r12
-+	sub	$64, %rsp		# allocate workspace
-+	and	$~15, %rsp		# align stack
-+
-+	mov	CTX, HASH_PTR
-+	mov	BUF, BUFFER_PTR
-+
-+	shl	$6, CNT			# multiply by 64
-+	add	BUF, CNT
-+	mov	CNT, BUFFER_END
-+
-+	lea	K_XMM_AR(%rip), K_BASE
-+	xmm_mov	BSWAP_SHUFB_CTL(%rip), XMM_SHUFB_BSWAP
-+
-+	SHA1_PIPELINED_MAIN_BODY
-+
-+	# cleanup workspace
-+	mov	$8, %ecx
-+	mov	%rsp, %rdi
-+	xor	%rax, %rax
-+	rep stosq
-+
-+	mov	%r12, %rsp		# deallocate workspace
-+
-+	pop     %r12
-+	pop	%rbp
-+	pop	%rbx
-+	ret
-+
-+	.size	\name, .-\name
-+.endm
-+
-+/*
-+ * This macro implements 80 rounds of SHA-1 for one 64-byte block
-+ */
-+.macro SHA1_PIPELINED_MAIN_BODY
-+	INIT_REGALLOC
-+
-+	mov	  (HASH_PTR), A
-+	mov	 4(HASH_PTR), B
-+	mov	 8(HASH_PTR), C
-+	mov	12(HASH_PTR), D
-+	mov	16(HASH_PTR), E
-+
-+  .set i, 0
-+  .rept W_PRECALC_AHEAD
-+	W_PRECALC i
-+    .set i, (i+1)
-+  .endr
-+
-+.align 4
-+1:
-+	RR F1,A,B,C,D,E,0
-+	RR F1,D,E,A,B,C,2
-+	RR F1,B,C,D,E,A,4
-+	RR F1,E,A,B,C,D,6
-+	RR F1,C,D,E,A,B,8
-+
-+	RR F1,A,B,C,D,E,10
-+	RR F1,D,E,A,B,C,12
-+	RR F1,B,C,D,E,A,14
-+	RR F1,E,A,B,C,D,16
-+	RR F1,C,D,E,A,B,18
-+
-+	RR F2,A,B,C,D,E,20
-+	RR F2,D,E,A,B,C,22
-+	RR F2,B,C,D,E,A,24
-+	RR F2,E,A,B,C,D,26
-+	RR F2,C,D,E,A,B,28
-+
-+	RR F2,A,B,C,D,E,30
-+	RR F2,D,E,A,B,C,32
-+	RR F2,B,C,D,E,A,34
-+	RR F2,E,A,B,C,D,36
-+	RR F2,C,D,E,A,B,38
-+
-+	RR F3,A,B,C,D,E,40
-+	RR F3,D,E,A,B,C,42
-+	RR F3,B,C,D,E,A,44
-+	RR F3,E,A,B,C,D,46
-+	RR F3,C,D,E,A,B,48
-+
-+	RR F3,A,B,C,D,E,50
-+	RR F3,D,E,A,B,C,52
-+	RR F3,B,C,D,E,A,54
-+	RR F3,E,A,B,C,D,56
-+	RR F3,C,D,E,A,B,58
-+
-+	add $64, BUFFER_PTR		# move to the next 64-byte block
-+	cmp BUFFER_END, BUFFER_PTR	# if the current is the last one use
-+	cmovae K_BASE, BUFFER_PTR	# dummy source to avoid buffer overrun
-+
-+	RR F4,A,B,C,D,E,60
-+	RR F4,D,E,A,B,C,62
-+	RR F4,B,C,D,E,A,64
-+	RR F4,E,A,B,C,D,66
-+	RR F4,C,D,E,A,B,68
-+
-+	RR F4,A,B,C,D,E,70
-+	RR F4,D,E,A,B,C,72
-+	RR F4,B,C,D,E,A,74
-+	RR F4,E,A,B,C,D,76
-+	RR F4,C,D,E,A,B,78
-+
-+	UPDATE_HASH   (HASH_PTR), A
-+	UPDATE_HASH  4(HASH_PTR), B
-+	UPDATE_HASH  8(HASH_PTR), C
-+	UPDATE_HASH 12(HASH_PTR), D
-+	UPDATE_HASH 16(HASH_PTR), E
-+
-+	RESTORE_RENAMED_REGS
-+	cmp K_BASE, BUFFER_PTR		# K_BASE means, we reached the end
-+	jne 1b
-+.endm
-+
-+.macro INIT_REGALLOC
-+  .set A, REG_A
-+  .set B, REG_B
-+  .set C, REG_C
-+  .set D, REG_D
-+  .set E, REG_E
-+  .set T1, REG_T1
-+  .set T2, REG_T2
-+.endm
-+
-+.macro RESTORE_RENAMED_REGS
-+	# order is important (REG_C is where it should be)
-+	mov	B, REG_B
-+	mov	D, REG_D
-+	mov	A, REG_A
-+	mov	E, REG_E
-+.endm
-+
-+.macro SWAP_REG_NAMES  a, b
-+  .set _T, \a
-+  .set \a, \b
-+  .set \b, _T
-+.endm
-+
-+.macro F1  b, c, d
-+	mov	\c, T1
-+	SWAP_REG_NAMES \c, T1
-+	xor	\d, T1
-+	and	\b, T1
-+	xor	\d, T1
-+.endm
-+
-+.macro F2  b, c, d
-+	mov	\d, T1
-+	SWAP_REG_NAMES \d, T1
-+	xor	\c, T1
-+	xor	\b, T1
-+.endm
-+
-+.macro F3  b, c ,d
-+	mov	\c, T1
-+	SWAP_REG_NAMES \c, T1
-+	mov	\b, T2
-+	or	\b, T1
-+	and	\c, T2
-+	and	\d, T1
-+	or	T2, T1
-+.endm
-+
-+.macro F4  b, c, d
-+	F2 \b, \c, \d
-+.endm
-+
-+.macro UPDATE_HASH  hash, val
-+	add	\hash, \val
-+	mov	\val, \hash
-+.endm
-+
-+/*
-+ * RR does two rounds of SHA-1 back to back with W[] pre-calc
-+ *   t1 = F(b, c, d);   e += w(i)
-+ *   e += t1;           b <<= 30;   d  += w(i+1);
-+ *   t1 = F(a, b, c);
-+ *   d += t1;           a <<= 5;
-+ *   e += a;
-+ *   t1 = e;            a >>= 7;
-+ *   t1 <<= 5;
-+ *   d += t1;
-+ */
-+.macro RR  F, a, b, c, d, e, round
-+	add	WK(\round), \e
-+	\F   \b, \c, \d		# t1 = F(b, c, d);
-+	W_PRECALC (\round + W_PRECALC_AHEAD)
-+	rol	$30, \b
-+	add	T1, \e
-+	add	WK(\round + 1), \d
-+
-+	\F   \a, \b, \c
-+	W_PRECALC (\round + W_PRECALC_AHEAD + 1)
-+	rol	$5, \a
-+	add	\a, \e
-+	add	T1, \d
-+	ror	$7, \a		# (a <<r 5) >>r 7) => a <<r 30)
-+
-+	mov	\e, T1
-+	SWAP_REG_NAMES \e, T1
-+
-+	rol	$5, T1
-+	add	T1, \d
-+
-+	# write:  \a, \b
-+	# rotate: \a<=\d, \b<=\e, \c<=\a, \d<=\b, \e<=\c
-+.endm
-+
-+.macro W_PRECALC  r
-+  .set i, \r
-+
-+  .if (i < 20)
-+    .set K_XMM, 0
-+  .elseif (i < 40)
-+    .set K_XMM, 16
-+  .elseif (i < 60)
-+    .set K_XMM, 32
-+  .elseif (i < 80)
-+    .set K_XMM, 48
-+  .endif
-+
-+  .if ((i < 16) || ((i >= 80) && (i < (80 + W_PRECALC_AHEAD))))
-+    .set i, ((\r) % 80)	    # pre-compute for the next iteration
-+    .if (i == 0)
-+	W_PRECALC_RESET
-+    .endif
-+	W_PRECALC_00_15
-+  .elseif (i<32)
-+	W_PRECALC_16_31
-+  .elseif (i < 80)   // rounds 32-79
-+	W_PRECALC_32_79
-+  .endif
-+.endm
-+
-+.macro W_PRECALC_RESET
-+  .set W,          W0
-+  .set W_minus_04, W4
-+  .set W_minus_08, W8
-+  .set W_minus_12, W12
-+  .set W_minus_16, W16
-+  .set W_minus_20, W20
-+  .set W_minus_24, W24
-+  .set W_minus_28, W28
-+  .set W_minus_32, W
-+.endm
-+
-+.macro W_PRECALC_ROTATE
-+  .set W_minus_32, W_minus_28
-+  .set W_minus_28, W_minus_24
-+  .set W_minus_24, W_minus_20
-+  .set W_minus_20, W_minus_16
-+  .set W_minus_16, W_minus_12
-+  .set W_minus_12, W_minus_08
-+  .set W_minus_08, W_minus_04
-+  .set W_minus_04, W
-+  .set W,          W_minus_32
-+.endm
-+
-+.macro W_PRECALC_SSSE3
-+
-+.macro W_PRECALC_00_15
-+	W_PRECALC_00_15_SSSE3
-+.endm
-+.macro W_PRECALC_16_31
-+	W_PRECALC_16_31_SSSE3
-+.endm
-+.macro W_PRECALC_32_79
-+	W_PRECALC_32_79_SSSE3
-+.endm
-+
-+/* message scheduling pre-compute for rounds 0-15 */
-+.macro W_PRECALC_00_15_SSSE3
-+  .if ((i & 3) == 0)
-+	movdqu	(i*4)(BUFFER_PTR), W_TMP1
-+  .elseif ((i & 3) == 1)
-+	pshufb	XMM_SHUFB_BSWAP, W_TMP1
-+	movdqa	W_TMP1, W
-+  .elseif ((i & 3) == 2)
-+	paddd	(K_BASE), W_TMP1
-+  .elseif ((i & 3) == 3)
-+	movdqa  W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+/* message scheduling pre-compute for rounds 16-31
-+ *
-+ * - calculating last 32 w[i] values in 8 XMM registers
-+ * - pre-calculate K+w[i] values and store to mem, for later load by ALU add
-+ *   instruction
-+ *
-+ * some "heavy-lifting" vectorization for rounds 16-31 due to w[i]->w[i-3]
-+ * dependency, but improves for 32-79
-+ */
-+.macro W_PRECALC_16_31_SSSE3
-+  # blended scheduling of vector and scalar instruction streams, one 4-wide
-+  # vector iteration / 4 scalar rounds
-+  .if ((i & 3) == 0)
-+	movdqa	W_minus_12, W
-+	palignr	$8, W_minus_16, W	# w[i-14]
-+	movdqa	W_minus_04, W_TMP1
-+	psrldq	$4, W_TMP1		# w[i-3]
-+	pxor	W_minus_08, W
-+  .elseif ((i & 3) == 1)
-+	pxor	W_minus_16, W_TMP1
-+	pxor	W_TMP1, W
-+	movdqa	W, W_TMP2
-+	movdqa	W, W_TMP1
-+	pslldq	$12, W_TMP2
-+  .elseif ((i & 3) == 2)
-+	psrld	$31, W
-+	pslld	$1, W_TMP1
-+	por	W, W_TMP1
-+	movdqa	W_TMP2, W
-+	psrld	$30, W_TMP2
-+	pslld	$2, W
-+  .elseif ((i & 3) == 3)
-+	pxor	W, W_TMP1
-+	pxor	W_TMP2, W_TMP1
-+	movdqa	W_TMP1, W
-+	paddd	K_XMM(K_BASE), W_TMP1
-+	movdqa	W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+/* message scheduling pre-compute for rounds 32-79
-+ *
-+ * in SHA-1 specification: w[i] = (w[i-3] ^ w[i-8]  ^ w[i-14] ^ w[i-16]) rol 1
-+ * instead we do equal:    w[i] = (w[i-6] ^ w[i-16] ^ w[i-28] ^ w[i-32]) rol 2
-+ * allows more efficient vectorization since w[i]=>w[i-3] dependency is broken
-+ */
-+.macro W_PRECALC_32_79_SSSE3
-+  .if ((i & 3) == 0)
-+	movdqa	W_minus_04, W_TMP1
-+	pxor	W_minus_28, W		# W is W_minus_32 before xor
-+	palignr	$8, W_minus_08, W_TMP1
-+  .elseif ((i & 3) == 1)
-+	pxor	W_minus_16, W
-+	pxor	W_TMP1, W
-+	movdqa	W, W_TMP1
-+  .elseif ((i & 3) == 2)
-+	psrld	$30, W
-+	pslld	$2, W_TMP1
-+	por	W, W_TMP1
-+  .elseif ((i & 3) == 3)
-+	movdqa	W_TMP1, W
-+	paddd	K_XMM(K_BASE), W_TMP1
-+	movdqa	W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+.endm		// W_PRECALC_SSSE3
-+
-+
-+#define K1	0x5a827999
-+#define K2	0x6ed9eba1
-+#define K3	0x8f1bbcdc
-+#define K4	0xca62c1d6
-+
-+.section .rodata
-+.align 16
-+
-+K_XMM_AR:
-+	.long K1, K1, K1, K1
-+	.long K2, K2, K2, K2
-+	.long K3, K3, K3, K3
-+	.long K4, K4, K4, K4
-+
-+BSWAP_SHUFB_CTL:
-+	.long 0x00010203
-+	.long 0x04050607
-+	.long 0x08090a0b
-+	.long 0x0c0d0e0f
-+
-+
-+.section .text
-+
-+W_PRECALC_SSSE3
-+.macro xmm_mov a, b
-+	movdqu	\a,\b
-+.endm
-+
-+/* SSSE3 optimized implementation:
-+ *  extern "C" void sha1_transform_ssse3(u32 *digest, const char *data, u32 *ws,
-+ *                                       unsigned int rounds);
-+ */
-+SHA1_VECTOR_ASM     sha1_transform_ssse3
-+
-+#ifdef SHA1_ENABLE_AVX_SUPPORT
-+
-+.macro W_PRECALC_AVX
-+
-+.purgem W_PRECALC_00_15
-+.macro  W_PRECALC_00_15
-+    W_PRECALC_00_15_AVX
-+.endm
-+.purgem W_PRECALC_16_31
-+.macro  W_PRECALC_16_31
-+    W_PRECALC_16_31_AVX
-+.endm
-+.purgem W_PRECALC_32_79
-+.macro  W_PRECALC_32_79
-+    W_PRECALC_32_79_AVX
-+.endm
-+
-+.macro W_PRECALC_00_15_AVX
-+  .if ((i & 3) == 0)
-+	vmovdqu	(i*4)(BUFFER_PTR), W_TMP1
-+  .elseif ((i & 3) == 1)
-+	vpshufb	XMM_SHUFB_BSWAP, W_TMP1, W
-+  .elseif ((i & 3) == 2)
-+	vpaddd	(K_BASE), W, W_TMP1
-+  .elseif ((i & 3) == 3)
-+	vmovdqa	W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+.macro W_PRECALC_16_31_AVX
-+  .if ((i & 3) == 0)
-+	vpalignr $8, W_minus_16, W_minus_12, W	# w[i-14]
-+	vpsrldq	$4, W_minus_04, W_TMP1		# w[i-3]
-+	vpxor	W_minus_08, W, W
-+	vpxor	W_minus_16, W_TMP1, W_TMP1
-+  .elseif ((i & 3) == 1)
-+	vpxor	W_TMP1, W, W
-+	vpslldq	$12, W, W_TMP2
-+	vpslld	$1, W, W_TMP1
-+  .elseif ((i & 3) == 2)
-+	vpsrld	$31, W, W
-+	vpor	W, W_TMP1, W_TMP1
-+	vpslld	$2, W_TMP2, W
-+	vpsrld	$30, W_TMP2, W_TMP2
-+  .elseif ((i & 3) == 3)
-+	vpxor	W, W_TMP1, W_TMP1
-+	vpxor	W_TMP2, W_TMP1, W
-+	vpaddd	K_XMM(K_BASE), W, W_TMP1
-+	vmovdqu	W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+.macro W_PRECALC_32_79_AVX
-+  .if ((i & 3) == 0)
-+	vpalignr $8, W_minus_08, W_minus_04, W_TMP1
-+	vpxor	W_minus_28, W, W		# W is W_minus_32 before xor
-+  .elseif ((i & 3) == 1)
-+	vpxor	W_minus_16, W_TMP1, W_TMP1
-+	vpxor	W_TMP1, W, W
-+  .elseif ((i & 3) == 2)
-+	vpslld	$2, W, W_TMP1
-+	vpsrld	$30, W, W
-+	vpor	W, W_TMP1, W
-+  .elseif ((i & 3) == 3)
-+	vpaddd	K_XMM(K_BASE), W, W_TMP1
-+	vmovdqu	W_TMP1, WK(i&~3)
-+	W_PRECALC_ROTATE
-+  .endif
-+.endm
-+
-+.endm    // W_PRECALC_AVX
-+
-+W_PRECALC_AVX
-+.purgem xmm_mov
-+.macro xmm_mov a, b
-+	vmovdqu	\a,\b
-+.endm
-+
-+
-+/* AVX optimized implementation:
-+ *  extern "C" void sha1_transform_avx(u32 *digest, const char *data, u32 *ws,
-+ *                                     unsigned int rounds);
-+ */
-+SHA1_VECTOR_ASM     sha1_transform_avx
-+
-+#endif
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-new file mode 100644
-index 0000000..f916499
---- /dev/null
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -0,0 +1,240 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Glue code for the SHA1 Secure Hash Algorithm assembler implementation using
-+ * Supplemental SSE3 instructions.
-+ *
-+ * This file is based on sha1_generic.c
-+ *
-+ * Copyright (c) Alan Smithee.
-+ * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-+ * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
-+ * Copyright (c) Mathias Krause <minipli@googlemail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
-+
-+#include <crypto/internal/hash.h>
-+#include <linux/init.h>
 +#include <linux/module.h>
-+#include <linux/mm.h>
-+#include <linux/cryptohash.h>
-+#include <linux/types.h>
-+#include <crypto/sha.h>
-+#include <asm/byteorder.h>
-+#include <asm/i387.h>
-+#include <asm/xcr.h>
-+#include <asm/xsave.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/sysfw.h>
++#include <linux/device.h>
++#include <linux/slab.h>
++#include <linux/sysfw.h>
 +
++struct sysfw_device_attribute {
++	struct device_attribute dev_attr;
++	int field;
++};
++#define to_sysfw_dev_attr(_dev_attr) \
++	container_of(_dev_attr, struct sysfw_device_attribute, dev_attr)
 +
-+asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
-+				     unsigned int rounds);
-+#ifdef SHA1_ENABLE_AVX_SUPPORT
-+asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
-+				   unsigned int rounds);
++static ssize_t sys_sysfw_field_show(struct device *dev,
++				  struct device_attribute *attr,
++				  char *page)
++{
++	int field = to_sysfw_dev_attr(attr)->field;
++	ssize_t len;
++	len = scnprintf(page, PAGE_SIZE, "%s\n", sysfw_lookup(field));
++	page[len-1] = '\n';
++	return len;
++}
++
++#define SYSFW_ATTR(_name, _mode, _show, _field)			\
++	{ .dev_attr = __ATTR(_name, _mode, _show, NULL),	\
++	  .field = _field }
++
++#define DEFINE_SYSFW_ATTR_WITH_SHOW(_name, _mode, _field)		\
++static struct sysfw_device_attribute sys_sysfw_##_name##_attr =	\
++	SYSFW_ATTR(_name, _mode, sys_sysfw_field_show, _field);
++
++DEFINE_SYSFW_ATTR_WITH_SHOW(bios_vendor,	0444, SYSFW_BIOS_VENDOR);
++DEFINE_SYSFW_ATTR_WITH_SHOW(bios_version,	0444, SYSFW_BIOS_VERSION);
++DEFINE_SYSFW_ATTR_WITH_SHOW(bios_date,		0444, SYSFW_BIOS_DATE);
++DEFINE_SYSFW_ATTR_WITH_SHOW(sys_vendor,	0444, SYSFW_SYS_VENDOR);
++DEFINE_SYSFW_ATTR_WITH_SHOW(product_name,	0444, SYSFW_PRODUCT_NAME);
++DEFINE_SYSFW_ATTR_WITH_SHOW(product_version,	0444, SYSFW_PRODUCT_VERSION);
++DEFINE_SYSFW_ATTR_WITH_SHOW(product_serial,	0400, SYSFW_PRODUCT_SERIAL);
++DEFINE_SYSFW_ATTR_WITH_SHOW(product_uuid,	0400, SYSFW_PRODUCT_UUID);
++DEFINE_SYSFW_ATTR_WITH_SHOW(board_vendor,	0444, SYSFW_BOARD_VENDOR);
++DEFINE_SYSFW_ATTR_WITH_SHOW(board_name,	0444, SYSFW_BOARD_NAME);
++DEFINE_SYSFW_ATTR_WITH_SHOW(board_version,	0444, SYSFW_BOARD_VERSION);
++DEFINE_SYSFW_ATTR_WITH_SHOW(board_serial,	0400, SYSFW_BOARD_SERIAL);
++DEFINE_SYSFW_ATTR_WITH_SHOW(board_asset_tag,	0444, SYSFW_BOARD_ASSET_TAG);
++DEFINE_SYSFW_ATTR_WITH_SHOW(chassis_vendor,	0444, SYSFW_CHASSIS_VENDOR);
++DEFINE_SYSFW_ATTR_WITH_SHOW(chassis_type,	0444, SYSFW_CHASSIS_TYPE);
++DEFINE_SYSFW_ATTR_WITH_SHOW(chassis_version,	0444, SYSFW_CHASSIS_VERSION);
++DEFINE_SYSFW_ATTR_WITH_SHOW(chassis_serial,	0400, SYSFW_CHASSIS_SERIAL);
++DEFINE_SYSFW_ATTR_WITH_SHOW(chassis_asset_tag,	0444, SYSFW_CHASSIS_ASSET_TAG);
++
++static void ascii_filter(char *d, const char *s)
++{
++	/* Filter out characters we don't want to see in the modalias string */
++	for (; *s; s++)
++		if (*s > ' ' && *s < 127 && *s != ':')
++			*(d++) = *s;
++
++	*d = 0;
++}
++
++static ssize_t get_modalias(char *buffer, size_t buffer_size,
++			    struct device *dev)
++{
++	static const struct mafield {
++		const char *prefix;
++		int field;
++	} fields[] = {
++		{ "bvn", SYSFW_BIOS_VENDOR },
++		{ "bvr", SYSFW_BIOS_VERSION },
++		{ "bd",  SYSFW_BIOS_DATE },
++		{ "svn", SYSFW_SYS_VENDOR },
++		{ "pn",  SYSFW_PRODUCT_NAME },
++		{ "pvr", SYSFW_PRODUCT_VERSION },
++		{ "rvn", SYSFW_BOARD_VENDOR },
++		{ "rn",  SYSFW_BOARD_NAME },
++		{ "rvr", SYSFW_BOARD_VERSION },
++		{ "cvn", SYSFW_CHASSIS_VENDOR },
++		{ "ct",  SYSFW_CHASSIS_TYPE },
++		{ "cvr", SYSFW_CHASSIS_VERSION },
++		{ NULL,  SYSFW_NONE }
++	};
++	ssize_t l, left;
++	char *p;
++	const struct mafield *f;
++	const char *name = dev_name(dev);
++
++	left = buffer_size;
++	p = buffer;
++	name = dev_name(dev);
++	if (!strncmp(dev_name(dev), "sysfw", 5)) {
++		strcpy(buffer, "sysfw");
++		p += 5;
++		left -= 6;
++	}
++#ifdef CONFIG_SYSTEM_FIRMWARE_DMI_COMPAT
++	if (!strncmp(dev_name(dev), "id", 2)) { /* old dmi */
++		strcpy(buffer, "dmi");
++		p +=  3;
++		left -= 4;
++	}
 +#endif
 +
-+static asmlinkage void (*sha1_transform_asm)(u32 *, const char *, unsigned int);
++	for (f = fields; f->prefix && left > 0; f++) {
++		const char *c;
++		char *t;
 +
++		c = sysfw_lookup(f->field);
++		if (!c)
++			continue;
 +
-+static int sha1_ssse3_init(struct shash_desc *desc)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
++		t = kmalloc(strlen(c) + 1, GFP_KERNEL);
++		if (!t)
++			break;
++		ascii_filter(t, c);
++		l = scnprintf(p, left, ":%s%s", f->prefix, t);
++		kfree(t);
 +
-+	*sctx = (struct sha1_state){
-+		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
-+	};
-+
-+	return 0;
-+}
-+
-+static int __sha1_ssse3_update(struct shash_desc *desc, const u8 *data,
-+			       unsigned int len, unsigned int partial)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	unsigned int done = 0;
-+
-+	sctx->count += len;
-+
-+	if (partial) {
-+		done = SHA1_BLOCK_SIZE - partial;
-+		memcpy(sctx->buffer + partial, data, done);
-+		sha1_transform_asm(sctx->state, sctx->buffer, 1);
++		p += l;
++		left -= l;
 +	}
 +
-+	if (len - done >= SHA1_BLOCK_SIZE) {
-+		const unsigned int rounds = (len - done) / SHA1_BLOCK_SIZE;
++	p[0] = ':';
++	p[1] = 0;
 +
-+		sha1_transform_asm(sctx->state, data + done, rounds);
-+		done += rounds * SHA1_BLOCK_SIZE;
-+	}
-+
-+	memcpy(sctx->buffer, data + done, len - done);
-+
-+	return 0;
++	return p - buffer + 1;
 +}
 +
-+static int sha1_ssse3_update(struct shash_desc *desc, const u8 *data,
-+			     unsigned int len)
++static ssize_t sys_sysfw_modalias_show(struct device *dev,
++				       struct device_attribute *attr,
++				       char *page)
 +{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
-+	int res;
-+
-+	/* Handle the fast case right here */
-+	if (partial + len < SHA1_BLOCK_SIZE) {
-+		sctx->count += len;
-+		memcpy(sctx->buffer + partial, data, len);
-+
-+		return 0;
-+	}
-+
-+	if (!irq_fpu_usable()) {
-+		res = crypto_sha1_update(desc, data, len);
-+	} else {
-+		kernel_fpu_begin();
-+		res = __sha1_ssse3_update(desc, data, len, partial);
-+		kernel_fpu_end();
-+	}
-+
-+	return res;
++	ssize_t r;
++	r = get_modalias(page, PAGE_SIZE-1, dev);
++	page[r] = '\n';
++	page[r+1] = 0;
++	return r+1;
 +}
 +
++static struct device_attribute sys_sysfw_modalias_attr =
++	__ATTR(modalias, 0444, sys_sysfw_modalias_show, NULL);
 +
-+/* Add padding and return the message digest. */
-+static int sha1_ssse3_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	unsigned int i, index, padlen;
-+	__be32 *dst = (__be32 *)out;
-+	__be64 bits;
-+	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
++static struct attribute *sys_sysfw_attributes[SYSFW_STRING_MAX+2];
 +
-+	bits = cpu_to_be64(sctx->count << 3);
-+
-+	/* Pad out to 56 mod 64 and append length */
-+	index = sctx->count % SHA1_BLOCK_SIZE;
-+	padlen = (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56) - index);
-+	if (!irq_fpu_usable()) {
-+		crypto_sha1_update(desc, padding, padlen);
-+		crypto_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
-+	} else {
-+		kernel_fpu_begin();
-+		/* We need to fill a whole block for __sha1_ssse3_update() */
-+		if (padlen <= 56) {
-+			sctx->count += padlen;
-+			memcpy(sctx->buffer + index, padding, padlen);
-+		} else {
-+			__sha1_ssse3_update(desc, padding, padlen, index);
-+		}
-+		__sha1_ssse3_update(desc, (const u8 *)&bits, sizeof(bits), 56);
-+		kernel_fpu_end();
-+	}
-+
-+	/* Store state in digest */
-+	for (i = 0; i < 5; i++)
-+		dst[i] = cpu_to_be32(sctx->state[i]);
-+
-+	/* Wipe context */
-+	memset(sctx, 0, sizeof(*sctx));
-+
-+	return 0;
-+}
-+
-+static int sha1_ssse3_export(struct shash_desc *desc, void *out)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+
-+	memcpy(out, sctx, sizeof(*sctx));
-+
-+	return 0;
-+}
-+
-+static int sha1_ssse3_import(struct shash_desc *desc, const void *in)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+
-+	memcpy(sctx, in, sizeof(*sctx));
-+
-+	return 0;
-+}
-+
-+static struct shash_alg alg = {
-+	.digestsize	=	SHA1_DIGEST_SIZE,
-+	.init		=	sha1_ssse3_init,
-+	.update		=	sha1_ssse3_update,
-+	.final		=	sha1_ssse3_final,
-+	.export		=	sha1_ssse3_export,
-+	.import		=	sha1_ssse3_import,
-+	.descsize	=	sizeof(struct sha1_state),
-+	.statesize	=	sizeof(struct sha1_state),
-+	.base		=	{
-+		.cra_name	=	"sha1",
-+		.cra_driver_name=	"sha1-ssse3",
-+		.cra_priority	=	150,
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA1_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
++static struct attribute_group sys_sysfw_attribute_group = {
++	.attrs = sys_sysfw_attributes,
 +};
 +
-+#ifdef SHA1_ENABLE_AVX_SUPPORT
-+static bool __init avx_usable(void)
++static const struct attribute_group *sys_sysfw_attribute_groups[] = {
++	&sys_sysfw_attribute_group,
++	NULL
++};
++
++static void sys_sysfw_release(struct device *dev)
 +{
-+	u64 xcr0;
++	/* nothing to do */
++	return;
++}
 +
-+	if (!cpu_has_avx || !cpu_has_osxsave)
-+		return false;
++static struct device_type sysfw_type = {
++	.groups = sys_sysfw_attribute_groups,
++	.release = sys_sysfw_release,
++};
 +
-+	xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
-+	if ((xcr0 & (XSTATE_SSE | XSTATE_YMM)) != (XSTATE_SSE | XSTATE_YMM)) {
-+		pr_info("AVX detected but unusable.\n");
++/* Initialization */
 +
-+		return false;
++#define ADD_SYSFW_ATTR(_name, _field) \
++	if (sysfw_lookup(_field)) \
++		sys_sysfw_attributes[i++] = \
++		&sys_sysfw_##_name##_attr.dev_attr.attr;
++
++/* In a separate function to keep gcc 3.2 happy - do NOT merge this in
++   sysfw_bus_init! */
++static void __init sysfw_id_init_attr_table(void)
++{
++	int i;
++
++	/* Not necessarily all SYSFW fields are available on all
++	 * systems, hence let's built an attribute table of just
++	 * what's available */
++	i = 0;
++	ADD_SYSFW_ATTR(bios_vendor,       SYSFW_BIOS_VENDOR);
++	ADD_SYSFW_ATTR(bios_version,      SYSFW_BIOS_VERSION);
++	ADD_SYSFW_ATTR(bios_date,         SYSFW_BIOS_DATE);
++	ADD_SYSFW_ATTR(sys_vendor,        SYSFW_SYS_VENDOR);
++	ADD_SYSFW_ATTR(product_name,      SYSFW_PRODUCT_NAME);
++	ADD_SYSFW_ATTR(product_version,   SYSFW_PRODUCT_VERSION);
++	ADD_SYSFW_ATTR(product_serial,    SYSFW_PRODUCT_SERIAL);
++	ADD_SYSFW_ATTR(product_uuid,      SYSFW_PRODUCT_UUID);
++	ADD_SYSFW_ATTR(board_vendor,      SYSFW_BOARD_VENDOR);
++	ADD_SYSFW_ATTR(board_name,        SYSFW_BOARD_NAME);
++	ADD_SYSFW_ATTR(board_version,     SYSFW_BOARD_VERSION);
++	ADD_SYSFW_ATTR(board_serial,      SYSFW_BOARD_SERIAL);
++	ADD_SYSFW_ATTR(board_asset_tag,   SYSFW_BOARD_ASSET_TAG);
++	ADD_SYSFW_ATTR(chassis_vendor,    SYSFW_CHASSIS_VENDOR);
++	ADD_SYSFW_ATTR(chassis_type,      SYSFW_CHASSIS_TYPE);
++	ADD_SYSFW_ATTR(chassis_version,   SYSFW_CHASSIS_VERSION);
++	ADD_SYSFW_ATTR(chassis_serial,    SYSFW_CHASSIS_SERIAL);
++	ADD_SYSFW_ATTR(chassis_asset_tag, SYSFW_CHASSIS_ASSET_TAG);
++	sys_sysfw_attributes[i++] = &sys_sysfw_modalias_attr.attr;
++}
++
++static int sysfw_dev_uevent(struct device *dev, struct kobj_uevent_env *env)
++{
++	ssize_t len;
++
++	if (add_uevent_var(env, "MODALIAS="))
++		return -ENOMEM;
++	len = get_modalias(&env->buf[env->buflen - 1],
++			   sizeof(env->buf) - env->buflen, dev);
++	if (len >= (sizeof(env->buf) - env->buflen))
++		return -ENOMEM;
++	env->buflen += len;
++	return 0;
++}
++
++#ifdef CONFIG_SYSTEM_FIRMWARE_DMI_COMPAT
++/* Hopefully someday we can get rid of this. */
++static struct class dmi_class = {
++	.name = "dmi",
++	.dev_release = (void(*)(struct device *)) kfree,
++	.dev_uevent = sysfw_dev_uevent,
++};
++
++static struct device dmi_dev = {
++	.class = &dmi_class,
++	.groups = sys_sysfw_attribute_groups,
++};
++
++static int __init sysfw_legacy_dmi(void)
++{
++	int ret;
++
++	ret = class_register(&dmi_class);
++	if (ret)
++		return ret;
++
++	dev_set_name(&dmi_dev, "id");
++	ret = device_register(&dmi_dev);
++	return ret;
++}
++#else
++static int __init sysfw_legacy_dmi(void)
++{
++	return 0;
++}
++#endif
++
++static int sysfw_bus_match(struct device *dev, struct device_driver *drv)
++{
++	return 1;
++}
++
++struct bus_type sysfw_bus_type = {
++	.name = "sysfw",
++	.match = sysfw_bus_match,
++	.uevent = sysfw_dev_uevent,
++};
++
++static struct device sysfw_dev = {
++	.bus = &sysfw_bus_type,
++	.type = &sysfw_type,
++};
++
++void sysfw_sysfs_device_init(const char *name)
++{
++	if (!dev_name(&sysfw_dev))
++		dev_set_name(&sysfw_dev, name);
++}
++
++static int __init sysfw_bus_init(void)
++{
++	int ret;
++
++	sysfw_id_init_attr_table();
++
++	ret = bus_register(&sysfw_bus_type);
++	if (ret)
++		return ret;
++
++	ret = device_register(&sysfw_dev);
++	if (ret) {
++		bus_unregister(&sysfw_bus_type);
++	}
++	return ret;
++
++	/* Failing to setup legacy DMI is NOT a fatal error */
++	ret = sysfw_legacy_dmi();
++	if (ret)
++		printk(KERN_ERR "SYSFW: DMI Legacy sysfs did not "
++		       "initialize.\n");
++
++	return 0;
++}
++arch_initcall(sysfw_bus_init);
+diff --git a/drivers/firmware/sysfw.c b/drivers/firmware/sysfw.c
+new file mode 100644
+index 0000000..c37e19e
+--- /dev/null
++++ b/drivers/firmware/sysfw.c
+@@ -0,0 +1,168 @@
++/*
++ * System Firmware (sysfw) support
++ *
++ * started by Prarit Bhargava, Copyright (C) 2011 Red Hat, Inc.
++ *
++ * SYSFW interface to export commonly used values from System Firmware
++ *
++ * Some bits copied directly from original x86 and ia64 dmi*.c files
++ */
++#include <linux/device.h>
++#include <linux/errno.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/mod_devicetable.h>
++#include <linux/slab.h>
++#include <linux/sysfw.h>
++
++/* Global sysfw instance */
++static struct sysfw_driver *sysfw;
++
++/**
++ * sysfw_driver_register - register a firmware driver
++ * @driver: sysfw_driver struct representing driver to register
++ *
++ * This function registers a sysfw driver.  Since the FW exists for the
++ * lifetime of the system there is no need for an unregister function.
++ */
++int __init sysfw_driver_register(struct sysfw_driver *driver)
++{
++	int ret;
++
++	if (!driver->init || !driver->name) {
++		WARN(1, "System Firmware Interface: driver error\n");
++		return -EFAULT;
 +	}
 +
++	if (sysfw) {
++		WARN(1, "System Firmware Interface: already registered\n");
++		return -EBUSY;
++	}
++
++	sysfw = driver;
++	ret = sysfw->init();
++	if (ret)
++		return -ENODEV;
++
++	return 0;
++}
++
++/* called in start_kernel(), after memory management has been initialized. */
++void __init sysfw_init_late(void)
++{
++	if (sysfw && sysfw->late)
++		sysfw->late();
++	sysfw_sysfs_device_init(sysfw->name);
++}
++
++/**
++ * sysfw_lookup - find a sysfw value for a given field.
++ * @field: field to lookup
++ *
++ * This function calls into the system firmware and returns an appropriate
++ * string.
++ */
++const char *sysfw_lookup(int field)
++{
++	if (sysfw && sysfw->lookup)
++		return sysfw->lookup(field);
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(sysfw_lookup);
++
++/**
++ * sysfw_vendor_is - checks to see if the vendor fields in the firmware
++ * contain a string
++ * @str: string to search for
++ *
++ * Returns true/false if the string is in any of the SYSFW_*VENDOR* fields.
++ */
++bool sysfw_vendor_is(const char *str)
++{
++	static int fields[] = { SYSFW_BIOS_VENDOR, SYSFW_BIOS_VERSION,
++				SYSFW_SYS_VENDOR, SYSFW_PRODUCT_NAME,
++				SYSFW_PRODUCT_VERSION, SYSFW_BOARD_VENDOR,
++				SYSFW_BOARD_NAME, SYSFW_BOARD_VERSION,
++				SYSFW_NONE };
++	int i;
++
++	if (!sysfw)
++		return false;
++
++	if (!sysfw->lookup)
++		return false;
++
++	for (i = 0; fields[i] != SYSFW_NONE; i++) {
++		if (sysfw_lookup(i) && strstr(sysfw_lookup(i), str))
++			return true;
++	}
++	return false;
++}
++EXPORT_SYMBOL(sysfw_vendor_is);
++
++/**
++ * sysfw_get_date - returns the date of the firmware in YYYYMMDD format.
++ *
++ * Retuns the date the firmware was built in YYYYMMDD for easy comparisons.
++ */
++int sysfw_get_date(void)
++{
++	if (sysfw && sysfw->date)
++		return sysfw->date();
++	return 0;
++}
++EXPORT_SYMBOL(sysfw_get_date);
++
++/* compares and matches the strings in sysfw_id */
++static bool sysfw_match_fields(const struct sysfw_id *id, int exactmatch)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(id->matches); i++) {
++		int s = id->matches[i].slot;
++		if (s == SYSFW_NONE)
++			break;
++		if (!sysfw_lookup(s))
++			continue;
++		if (exactmatch &&
++		    !strcmp(sysfw_lookup(s), id->matches[i].substr))
++			continue;
++		if (!exactmatch &&
++		    strstr(sysfw_lookup(s), id->matches[i].substr))
++			continue;
++		/* No match */
++		return false;
++	}
 +	return true;
 +}
-+#endif
 +
-+static int __init sha1_ssse3_mod_init(void)
++static bool sysfw_is_end_of_table(const struct sysfw_id *id)
 +{
-+	/* test for SSSE3 first */
-+	if (cpu_has_ssse3)
-+		sha1_transform_asm = sha1_transform_ssse3;
-+
-+#ifdef SHA1_ENABLE_AVX_SUPPORT
-+	/* allow AVX to override SSSE3, it's a little faster */
-+	if (avx_usable())
-+		sha1_transform_asm = sha1_transform_avx;
-+#endif
-+
-+	if (sha1_transform_asm) {
-+		pr_info("Using %s optimized SHA-1 implementation\n",
-+		        sha1_transform_asm == sha1_transform_ssse3 ? "SSSE3"
-+		                                                   : "AVX");
-+		return crypto_register_shash(&alg);
-+	}
-+	pr_info("Neither AVX nor SSSE3 is available/usable.\n");
-+
-+	return -ENODEV;
++	return id->matches[0].slot == SYSFW_NONE;
 +}
 +
-+static void __exit sha1_ssse3_mod_fini(void)
++/**
++ * sysfw_callback - go through a list and run a function on all matching ids
++ * @list: list of ids to search
++ *
++ * This function takes a list of fields and strings to compare, attempts to
++ * compare the strings to the sysfw fields and runs a callback function for
++ * each positive comparison.  The comparison can stop by returning 0 in
++ * the callback function.
++ */
++const struct sysfw_id *sysfw_callback(const struct sysfw_id *list)
 +{
-+	crypto_unregister_shash(&alg);
++	const struct sysfw_id *id;
++
++	if (!sysfw)
++		return NULL;
++
++	for (id = list; !sysfw_is_end_of_table(id); id++)
++		if (sysfw_match_fields(id, id->exactmatch)) {
++			if (id->callback)
++				id->callback(id);
++			return id;
++		}
++	return NULL;
 +}
-+
-+module_init(sha1_ssse3_mod_init);
-+module_exit(sha1_ssse3_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, Supplemental SSE3 accelerated");
-+
-+MODULE_ALIAS("sha1");
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index 71cc380..a72bce3 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -257,7 +257,9 @@ extern const char * const x86_power_flags[32];
- #define cpu_has_xmm		boot_cpu_has(X86_FEATURE_XMM)
- #define cpu_has_xmm2		boot_cpu_has(X86_FEATURE_XMM2)
- #define cpu_has_xmm3		boot_cpu_has(X86_FEATURE_XMM3)
-+#define cpu_has_ssse3		boot_cpu_has(X86_FEATURE_SSSE3)
- #define cpu_has_aes		boot_cpu_has(X86_FEATURE_AES)
-+#define cpu_has_avx		boot_cpu_has(X86_FEATURE_AVX)
- #define cpu_has_ht		boot_cpu_has(X86_FEATURE_HT)
- #define cpu_has_mp		boot_cpu_has(X86_FEATURE_MP)
- #define cpu_has_nx		boot_cpu_has(X86_FEATURE_NX)
-@@ -285,6 +287,7 @@ extern const char * const x86_power_flags[32];
- #define cpu_has_xmm4_2		boot_cpu_has(X86_FEATURE_XMM4_2)
- #define cpu_has_x2apic		boot_cpu_has(X86_FEATURE_X2APIC)
- #define cpu_has_xsave		boot_cpu_has(X86_FEATURE_XSAVE)
-+#define cpu_has_osxsave		boot_cpu_has(X86_FEATURE_OSXSAVE)
- #define cpu_has_hypervisor	boot_cpu_has(X86_FEATURE_HYPERVISOR)
- #define cpu_has_pclmulqdq	boot_cpu_has(X86_FEATURE_PCLMULQDQ)
- #define cpu_has_perfctr_core	boot_cpu_has(X86_FEATURE_PERFCTR_CORE)
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 87b22ca..6ccec3b 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -407,6 +407,16 @@ config CRYPTO_SHA1
- 	help
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
++EXPORT_SYMBOL(sysfw_callback);
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index ae28e93..89153ad 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -482,6 +482,68 @@ struct dmi_system_id {
  
-+config CRYPTO_SHA1_SSSE3
-+	tristate "SHA1 digest algorithm (SSSE3/AVX)"
-+	depends on X86 && 64BIT
-+	select CRYPTO_SHA1
-+	select CRYPTO_HASH
-+	help
-+	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
-+	  using Supplemental SSE3 (SSSE3) instructions or Advanced Vector
-+	  Extensions (AVX), when available.
+ #define DMI_MATCH(a, b)	{ a, b }
+ 
++/*
++ * sysfw field - right now these are based on x86/ia64's SMBIOS fields.  But
++ * other arches are certainly welcome to add additional fields.  The
++ * sys_lookup() functions must be careful to return NULL on non-populated
++ * fields.
++ */
++enum sysfw_field {
++	SYSFW_NONE,
++	SYSFW_BIOS_VENDOR,
++	SYSFW_BIOS_VERSION,
++	SYSFW_BIOS_DATE,
++	SYSFW_SYS_VENDOR,
++	SYSFW_PRODUCT_NAME,
++	SYSFW_PRODUCT_VERSION,
++	SYSFW_PRODUCT_SERIAL,
++	SYSFW_PRODUCT_UUID,
++	SYSFW_BOARD_VENDOR,
++	SYSFW_BOARD_NAME,
++	SYSFW_BOARD_VERSION,
++	SYSFW_BOARD_SERIAL,
++	SYSFW_BOARD_ASSET_TAG,
++	SYSFW_CHASSIS_VENDOR,
++	SYSFW_CHASSIS_TYPE,
++	SYSFW_CHASSIS_VERSION,
++	SYSFW_CHASSIS_SERIAL,
++	SYSFW_CHASSIS_ASSET_TAG,
++	SYSFW_STRING_MAX,
++};
 +
- config CRYPTO_SHA256
- 	tristate "SHA224 and SHA256 digest algorithm"
- 	select CRYPTO_HASH
++struct sysfw_strmatch {
++	unsigned char slot;
++	char substr[79];
++};
++
++#ifndef __KERNEL__
++struct sysfw_id {
++	kernel_ulong_t callback;
++	kernel_ulong_t ident;
++	struct sysfw_strmatch matches[8];
++	kernel_ulong_t driver_data
++			__attribute__((aligned(sizeof(kernel_ulong_t))));
++	kernel_ulong_t exactmatch;
++};
++#else
++struct sysfw_id {
++	int (*callback)(const struct sysfw_id *);
++	const char *ident;
++	struct sysfw_strmatch matches[8];
++	void *driver_data;
++	kernel_ulong_t exactmatch;
++};
++/*
++ * struct sysfw_device_id appears during expansion of
++ * "MODULE_DEVICE_TABLE(sysfw, x)". Compiler doesn't look inside it
++ * but this is enough for gcc 3.4.6 to error out:
++ *	error: storage size of '__mod_sysfw_device_table' isn't known
++ */
++#define sysfw_device_id sysfw_system_id
++#endif
++
++#define SYSFW_MATCH(a, b)	{ a, b }
++
+ #define PLATFORM_NAME_SIZE	20
+ #define PLATFORM_MODULE_PREFIX	"platform:"
+ 
+diff --git a/include/linux/sysfw.h b/include/linux/sysfw.h
+new file mode 100644
+index 0000000..8dcb674
+--- /dev/null
++++ b/include/linux/sysfw.h
+@@ -0,0 +1,113 @@
++/*
++ * include/linux/sysfw.h
++ *
++ * System Firmware (sysfw) Interface
++ */
++#ifndef _SYSFW_H
++#define _SYSFW_H
++
++#include <linux/mod_devicetable.h>
++
++/*
++ * sysfw_id and sysfw_field (the SYSFW_*) enums are defined in
++ * mod_devicetable.h
++ */
++
++/*
++ * sysfw_driver struct -- passed in to sysfw_init() by every firmware
++ * driver
++ */
++struct sysfw_driver {
++	const char *name;
++	/* find & evaluate firmware */
++	int (*init)(void);
++	/* late init, done after memory management is initialized */
++	int (*late)(void);
++	/* find a specific value in sysfw_field */
++	const char * (*lookup)(int field);
++	/* return date in YYYYMMDD format */
++	int (*date)(void);
++};
++
++#ifdef CONFIG_SYSTEM_FIRMWARE
++/**
++ * sysfw_driver_register - register a firmware driver
++ * @driver: sysfw_driver struct representing driver to register
++ *
++ * This function registers a sysfw driver.  Since the FW exists for the
++ * lifetime of the system there is no need for an unregister function.
++ */
++extern int sysfw_driver_register(struct sysfw_driver *driver);
++
++/**
++ * sysfw_lookup - find a sysfw value for a given field.
++ * @field: field to lookup
++ *
++ * This function calls into the system firmware and returns an appropriate
++ * string.
++ */
++extern const char *sysfw_lookup(int field);
++
++/**
++ * sysfw_get_date - returns the date of the firmware in YYYYMMDD format.
++ *
++ * Retuns the date the firmware was built in YYYYMMDD for easy comparisons.
++ */
++extern int sysfw_get_date(void);
++
++/**
++ * sysfw_vendor_is - checks to see if the vendor fields in the firmware
++ * contain a string
++ * @str: string to search for
++ *
++ * Returns true/false if the string is in any of the SYSFW_*VENDOR* fields.
++ */
++extern bool sysfw_vendor_is(const char *str);
++
++/**
++ * sysfw_callback - go through a list and run a function on all matching ids
++ * @list: list of ids to search
++ *
++ * This function takes a list of fields and strings to compare, attempts to
++ * compare the strings to the sysfw fields and runs a callback function for
++ * each positive comparison.  The comparison can stop by returning 0 in
++ * the callback function.  The function returns the first match in the list.
++ */
++extern const struct sysfw_id *sysfw_callback(const struct sysfw_id *list);
++
++/* Kernel internal only, run after memory management has been initialized */
++extern void sysfw_init_late(void);
++/* Kernel internal only, init's sysfs for the sysfw device */
++extern void sysfw_sysfs_device_init(const char *name);
++
++#else /* CONFIG_SYSTEM_FIRMWARE */
++
++static inline int sysfw_driver_register(struct sysfw_driver *driver)
++{
++	return -1;
++}
++static inline const char *sysfw_lookup(int field)
++{
++	return NULL;
++}
++static inline int sysfw_get_date(void)
++{
++	return 0;
++}
++static inline bool sysfw_vendor_is(const char *str)
++{
++	return false;
++}
++static const struct sysfw_id *sysfw_callback(const struct sysfw_id *list)
++{
++	return NULL;
++}
++static inline void sysfw_init_late(void)
++{
++	return;
++}
++#endif /* CONFIG_SYSTEM_FIRMWARE */
++
++#define sysfw_vendor_contains(str) sysfw_vendor_is(str)
++
++#endif /* _SYSFW_H */
+diff --git a/init/main.c b/init/main.c
+index d7211fa..8b99aeb 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -68,6 +68,7 @@
+ #include <linux/shmem_fs.h>
+ #include <linux/slab.h>
+ #include <linux/perf_event.h>
++#include <linux/sysfw.h>
+ 
+ #include <asm/io.h>
+ #include <asm/bugs.h>
+@@ -554,6 +555,8 @@ asmlinkage void __init start_kernel(void)
+ 
+ 	kmem_cache_init_late();
+ 
++	sysfw_init_late();
++
+ 	/*
+ 	 * HACK ALERT! This is early. We're enabling the console before
+ 	 * we've done PCI setups etc, and console_init() must be aware of
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index e26e2fb..92a27e3 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -753,26 +753,26 @@ static int do_spi_entry(const char *filename, struct spi_device_id *id,
+ 	return 1;
+ }
+ 
+-static const struct dmifield {
++static const struct sysfwfield {
+ 	const char *prefix;
+ 	int field;
+-} dmi_fields[] = {
+-	{ "bvn", DMI_BIOS_VENDOR },
+-	{ "bvr", DMI_BIOS_VERSION },
+-	{ "bd",  DMI_BIOS_DATE },
+-	{ "svn", DMI_SYS_VENDOR },
+-	{ "pn",  DMI_PRODUCT_NAME },
+-	{ "pvr", DMI_PRODUCT_VERSION },
+-	{ "rvn", DMI_BOARD_VENDOR },
+-	{ "rn",  DMI_BOARD_NAME },
+-	{ "rvr", DMI_BOARD_VERSION },
+-	{ "cvn", DMI_CHASSIS_VENDOR },
+-	{ "ct",  DMI_CHASSIS_TYPE },
+-	{ "cvr", DMI_CHASSIS_VERSION },
+-	{ NULL,  DMI_NONE }
++} sysfw_fields[] = {
++	{ "bvn", SYSFW_BIOS_VENDOR },
++	{ "bvr", SYSFW_BIOS_VERSION },
++	{ "bd",  SYSFW_BIOS_DATE },
++	{ "svn", SYSFW_SYS_VENDOR },
++	{ "pn",  SYSFW_PRODUCT_NAME },
++	{ "pvr", SYSFW_PRODUCT_VERSION },
++	{ "rvn", SYSFW_BOARD_VENDOR },
++	{ "rn",  SYSFW_BOARD_NAME },
++	{ "rvr", SYSFW_BOARD_VERSION },
++	{ "cvn", SYSFW_CHASSIS_VENDOR },
++	{ "ct",  SYSFW_CHASSIS_TYPE },
++	{ "cvr", SYSFW_CHASSIS_VERSION },
++	{ NULL,  SYSFW_NONE }
+ };
+ 
+-static void dmi_ascii_filter(char *d, const char *s)
++static void sysfw_ascii_filter(char *d, const char *s)
+ {
+ 	/* Filter out characters we don't want to see in the modalias string */
+ 	for (; *s; s++)
+@@ -783,20 +783,20 @@ static void dmi_ascii_filter(char *d, const char *s)
+ }
+ 
+ 
+-static int do_dmi_entry(const char *filename, struct dmi_system_id *id,
+-			char *alias)
++static int do_sysfw_entry(const char *filename, struct sysfw_id *id,
++			  char *alias)
+ {
+ 	int i, j;
+ 
+-	sprintf(alias, "dmi*");
++	sprintf(alias, "sysfw*");
+ 
+-	for (i = 0; i < ARRAY_SIZE(dmi_fields); i++) {
++	for (i = 0; i < ARRAY_SIZE(sysfw_fields); i++) {
+ 		for (j = 0; j < 4; j++) {
+ 			if (id->matches[j].slot &&
+-			    id->matches[j].slot == dmi_fields[i].field) {
++			    id->matches[j].slot == sysfw_fields[i].field) {
+ 				sprintf(alias + strlen(alias), ":%s*",
+-					dmi_fields[i].prefix);
+-				dmi_ascii_filter(alias + strlen(alias),
++					sysfw_fields[i].prefix);
++				sysfw_ascii_filter(alias + strlen(alias),
+ 						 id->matches[j].substr);
+ 				strcat(alias, "*");
+ 			}
+@@ -1002,10 +1002,10 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
+ 		do_table(symval, sym->st_size,
+ 			 sizeof(struct spi_device_id), "spi",
+ 			 do_spi_entry, mod);
+-	else if (sym_is(symname, "__mod_dmi_device_table"))
++	else if (sym_is(symname, "__mod_sysfw_device_table"))
+ 		do_table(symval, sym->st_size,
+-			 sizeof(struct dmi_system_id), "dmi",
+-			 do_dmi_entry, mod);
++			 sizeof(struct sysfw_id), "sysfw",
++			 do_sysfw_entry, mod);
+ 	else if (sym_is(symname, "__mod_platform_device_table"))
+ 		do_table(symval, sym->st_size,
+ 			 sizeof(struct platform_device_id), "platform",
 -- 
-1.5.6.5
+1.6.5.2
