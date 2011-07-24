@@ -1,136 +1,74 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 3.1
-Date: Sun, 24 Jul 2011 09:17:52 +0800
-Message-ID: <20110724011752.GA14373@gondor.apana.org.au>
-References: <20090324044932.GA18245@gondor.apana.org.au> <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au> <20110315145940.GA15373@gondor.apana.org.au> <20110520235409.GA1722@gondor.apana.org.au>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH 2/2] crypto, x86: SSSE3 based SHA1 implementation for x86-64
+Date: Sun, 24 Jul 2011 19:29:46 +0200
+Message-ID: <CA+rthh_CM=phRxZsBOav4iOiEkpbkxcFT1jgRGSfqA7=Kn6zQQ@mail.gmail.com>
+References: <1310820253-5702-1-git-send-email-minipli@googlemail.com>
+	<1310820253-5702-3-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-cry
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36062 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750763Ab1GXBSA (ORCPT
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:64613 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751416Ab1GXR3r convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 23 Jul 2011 21:18:00 -0400
-Content-Disposition: inline
-In-Reply-To: <20110520235409.GA1722@gondor.apana.org.au>
+	Sun, 24 Jul 2011 13:29:47 -0400
+Received: by vws1 with SMTP id 1so2550485vws.19
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Jul 2011 10:29:46 -0700 (PDT)
+In-Reply-To: <1310820253-5702-3-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Sat, Jul 16, 2011 at 2:44 PM, Mathias Krause <minipli@googlemail.com=
+> wrote:
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+> index c04f1b7..a80be92 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) +=3D aesni-intel.=
+o
+> =A0obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) +=3D ghash-clmulni-intel=
+=2Eo
+>
+> =A0obj-$(CONFIG_CRYPTO_CRC32C_INTEL) +=3D crc32c-intel.o
+> +obj-$(CONFIG_CRYPTO_SHA1_SSSE3) +=3D sha1-ssse3.o
+>
+> =A0aes-i586-y :=3D aes-i586-asm_32.o aes_glue.o
+> =A0twofish-i586-y :=3D twofish-i586-asm_32.o twofish_glue.o
+> @@ -25,3 +26,10 @@ salsa20-x86_64-y :=3D salsa20-x86_64-asm_64.o sals=
+a20_glue.o
+> =A0aesni-intel-y :=3D aesni-intel_asm.o aesni-intel_glue.o fpu.o
+>
+> =A0ghash-clmulni-intel-y :=3D ghash-clmulni-intel_asm.o ghash-clmulni=
+-intel_glue.o
+> +
+> +# enable AVX support only when $(AS) can actually assemble the instr=
+uctions
+> +ifeq ($(call as-instr,vpxor %xmm0$(comma)%xmm1$(comma)%xmm2,yes,no),=
+yes)
+> +AFLAGS_sha1_ssse3.o +=3D -DSHA1_ENABLE_AVX_SUPPORT
 
-Here is the crypto update for 3.1:
+This should have been
 
-* Support for AES/DES/3DES in caam.
-* Improved AEAD support in caam.
-* Added hardware SHA-224 support to s390.
-* Added ppc4xx RNG driver.
-* Updates to omap-sham driver.
-* Updates to talitos driver.
-* Added XTS-AES-256 test vectors.
-* Misc fixes.
- 
+    AFLAGS_sha1_ssse3_asm.o +=3D -DSHA1_ENABLE_AVX_SUPPORT
 
-Please pull from
+instead. Sorry, a missing adjustment for a "last minute file rename".
+I'll post a new version of the series with a wider target audience
+since there have been no reply so far for a week.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+> +CFLAGS_sha1_ssse3_glue.o +=3D -DSHA1_ENABLE_AVX_SUPPORT
+> +endif
+> +sha1-ssse3-y :=3D sha1_ssse3_asm.o sha1_ssse3_glue.o
+> diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_=
+ssse3_asm.S
+> new file mode 100644
+> index 0000000..8fb0ba6
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Dmitry Kasatkin (11):
-      crypto: omap-sham - remove extra reference
-      crypto: omap-sham - remove unused code
-      crypto: omap-sham - replace flags bit mask with bit number
-      crypto: omap-sham - replace flags operation with atomic bit operations
-      crypto: omap-sham - move some flags to device context
-      crypto: omap-sham - remove unnecessary local variable
-      crypto: omap-sham - remove dedicated queue handling tasklet
-      crypto: omap-sham - irq and dma handling changes
-      crypto: omap-sham - irq handler must not clear error code
-      crypto: omap-sham - clear device flags when finishing request
-      crypto: omap-sham - do not schedule tasklet if there is no active requests
-
-Gustavo F. Padovan (1):
-      crypto: ghash-intel - Fix set but not used in ghash_async_setkey()
-
-H Hartley Sweeten (1):
-      hwrng: timeriomem - use resource_size
-
-Herbert Xu (1):
-      crypto: algif_hash - Handle initial af_alg_make_sg error correctly
-
-Jan Glauber (1):
-      crypto: s390 - support hardware accelerated SHA-224
-
-Jarod Wilson (1):
-      crypto: testmgr - add xts-aes-256 self-test
-
-Josh Boyer (2):
-      crypto: crypto4xx - Perform read/modify/write on device control register
-      hwrng: ppc4xx - add support for ppc4xx TRNG
-
-Julia Lawall (2):
-      hwrng: omap - add missing clk_put
-      hwrng: nomadik - add missing clk_put
-
-Kim Phillips (5):
-      crypto: caam - fix build warning when DEBUG_FS not configured
-      crypto: talitos - ensure request ordering within a single tfm
-      crypto: talitos - don't set done notification in hot path
-      crypto: talitos - remove unused giv from ablkcipher methods
-      crypto: talitos - don't bad_key in ablkcipher setkey
-
-Mandeep Singh Baines (1):
-      crypto: sha1_generic - use SHA1_BLOCK_SIZE
-
-Mathias Krause (1):
-      crypto: gf128mul - fix call to memset()
-
-Mati Vait (2):
-      crypto: crc32c - Fixed coding style issue
-      crypto: arc4 - Fixed coding style issues
-
-Richard Weinberger (1):
-      crypto: UML build fixes
-
-Yuan Kang (4):
-      crypto: caam - shorter names
-      crypto: caam - structure renaming
-      crypto: caam - faster aead implementation
-      crypto: caam - ablkcipher support
-
- arch/s390/crypto/sha256_s390.c             |   66 +-
- arch/x86/crypto/ghash-clmulni-intel_glue.c |    2 +-
- crypto/Kconfig                             |    4 +-
- crypto/algif_hash.c                        |    4 +-
- crypto/arc4.c                              |   15 +-
- crypto/crc32c.c                            |   10 +-
- crypto/gf128mul.c                          |    4 +-
- crypto/sha1_generic.c                      |   11 +-
- crypto/testmgr.h                           |  293 +++++-
- drivers/char/hw_random/Kconfig             |   12 +
- drivers/char/hw_random/Makefile            |    1 +
- drivers/char/hw_random/nomadik-rng.c       |    3 +-
- drivers/char/hw_random/omap-rng.c          |    6 +-
- drivers/char/hw_random/ppc4xx-rng.c        |  156 +++
- drivers/char/hw_random/timeriomem-rng.c    |    3 +-
- drivers/crypto/amcc/crypto4xx_core.c       |    5 +-
- drivers/crypto/caam/caamalg.c              | 1848 +++++++++++++++++++++-------
- drivers/crypto/caam/compat.h               |    1 +
- drivers/crypto/caam/ctrl.c                 |    4 +-
- drivers/crypto/caam/desc_constr.h          |   58 +-
- drivers/crypto/omap-sham.c                 |  180 ++--
- drivers/crypto/talitos.c                   |   47 +-
- 22 files changed, 2136 insertions(+), 597 deletions(-)
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Mathias
