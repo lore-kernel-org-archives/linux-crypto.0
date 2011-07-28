@@ -1,43 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [Bugme-new] [Bug 37862] New: padlock related kernel NULL
-	pointer dereference
-Date: Thu, 28 Jul 2011 16:11:10 +0800
-Message-ID: <20110728081110.GA5031@gondor.apana.org.au>
-References: <4DFE10F2.20204@scintilla.utwente.nl>
+Subject: Re: [Bug 37862] padlock related kernel NULL pointer dereference
+Date: Thu, 28 Jul 2011 17:34:08 +0800
+Message-ID: <20110728093408.GA5757@gondor.apana.org.au>
+References: <bug-37862-2647@https.bugzilla.kernel.org/> <201107280920.p6S9KDhw003188@demeter1.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
+Cc: "Jethro Beekman - E.T.S.V. Scintilla" <jethrob@scintilla.utwente.nl>,
+	linux-crypto@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>,
-	bugzilla-daemon@bugzilla.kernel.org,
 	Suresh Siddha <suresh.b.siddha@intel.com>
-To: "Jethro Beekman - E.T.S.V. Scintilla" <jethrob@scintilla.utwente.nl>
+To: bugzilla-daemon@bugzilla.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:52191 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:48789 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754238Ab1G1ILT (ORCPT
+	with ESMTP id S1753630Ab1G1JeQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Jul 2011 04:11:19 -0400
+	Thu, 28 Jul 2011 05:34:16 -0400
 Content-Disposition: inline
-In-Reply-To: <4DFE10F2.20204@scintilla.utwente.nl>
+In-Reply-To: <201107280920.p6S9KDhw003188@demeter1.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jun 19, 2011 at 03:08:34PM +0000, Jethro Beekman - E.T.S.V. Scintilla wrote:
-> I'm running into a problem with what I think is the padlock_aes driver. 
-> It seems to be related to the fix of commit 
-> faf996d6cdc3a8e6205ae5226f667aa7d1f5f6c2 (crypto: padlock - fix VIA 
-> PadLock instruction usage with irq_ts_save/restore()), but I'm pretty 
-> sure that that fix is already in my kernel. So here's a copy of the 
-> bugzilla report ( https://bugzilla.kernel.org/show_bug.cgi?id=37862 ):
+On Thu, Jul 28, 2011 at 09:20:13AM +0000, bugzilla-daemon@bugzilla.kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=37862
+> 
+> 
+> 
+> 
+> 
+> --- Comment #10 from Jethro Beekman <kernel@jbeekman.nl>  2011-07-28 09:20:13 ---
+> That is interesting, on 
+> http://git.kernel.org/?p=linux/kernel/git/stable/linux-2.6.26.y.git;a=history;f=drivers/crypto
+> that particular patch is included but on
+> https://github.com/mirrors/linux-2.6/commits/v2.6.26/drivers/crypto
+> it isn't.
+> 
+> Anyway, my distro's kernel source package has the patch applied.
 
-Hmm, why do you think that patch is in your 2.6.26 kernel when
-it was added in 2.6.27?
+OK, it does seem that it was applied.  Suresh, any ideas what
+might be wrong here? The crash looks eerily like the one that
+was fixed by your patch.
 
-In any case, please try to reproduce this with the latest upstream
-kernel instead of an ancient distro kernel.
+> I will try to use the latest kernel, but in the very near future I won't be
+> able to test on that system. In that case, I will try to get a colleague
+> working on this.
 
-If for whatever reason you're stuck with your distro kernel then
-please seek advice from your distribution maker.
+Please do.
 
 Thanks,
 -- 
