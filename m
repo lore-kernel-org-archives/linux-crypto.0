@@ -1,37 +1,45 @@
-From: Ralf Jung <ralfjung-e@gmx.de>
-Subject: cryptsetup: "FATAL" padlock_{aes,sha} error during boot
-Date: Thu, 28 Jul 2011 14:03:26 +0200
-Message-ID: <201107281403.27224.ralfjung-e@gmx.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/2] crypto, sha1: export sha1_update for reuse
+Date: Thu, 28 Jul 2011 22:58:12 +0800
+Message-ID: <20110728145812.GA8396@gondor.apana.org.au>
+References: <1311529994-7924-1-git-send-email-minipli@googlemail.com> <1311529994-7924-2-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: 485070@bugs.debian.org, katzj@redhat.com
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	linux-kernel@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout-de.gmx.net ([213.165.64.23]:41449 "HELO
-	mailout-de.gmx.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754366Ab1G1MDR (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:60045 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754482Ab1G1O6Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Jul 2011 08:03:17 -0400
+	Thu, 28 Jul 2011 10:58:25 -0400
+Content-Disposition: inline
+In-Reply-To: <1311529994-7924-2-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Sun, Jul 24, 2011 at 07:53:13PM +0200, Mathias Krause wrote:
+>
+> diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+> index 069e85b..7c46d0c 100644
+> --- a/include/crypto/sha.h
+> +++ b/include/crypto/sha.h
+> @@ -82,4 +82,9 @@ struct sha512_state {
+>  	u8 buf[SHA512_BLOCK_SIZE];
+>  };
+>  
+> +#if defined(CONFIG_CRYPTO_SHA1) || defined (CONFIG_CRYPTO_SHA1_MODULE)
+> +extern int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
+> +			      unsigned int len);
+> +#endif
 
-as per request of Jonathan at http://bugs.debian.org/cgi-
-bin/bugreport.cgi?bug=485070, I am reporting the mentioned bug to this list as 
-well:
+Please remove the unnecessary #if.
 
-With current Debian testing (Kernel 2.6.39), I am getting this error on each 
-boot:
-FATAL: Error inserting padlock_sha (/lib/modules/2.6.39-2-
-amd64/kernel/drivers/crypto/padlock-sha.ko): No such device
-I understand it is harmless, but it should still be fixed since it irritates 
-users suggesting something is seriously going wrong.
-
-No patch though, sorry, compiling and botting a custom kernel still sounds 
-like black magic for me ;-)
-
-Kind regards,
-Ralf
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
