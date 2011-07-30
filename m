@@ -1,75 +1,72 @@
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH] crypto: padlock-aes - Make module loading even quieter when
- hardware is missing
-Date: Sat, 30 Jul 2011 13:50:12 +0200
-Message-ID: <20110730115011.GA2837@elie>
-References: <201107281403.27224.ralfjung-e@gmx.de>
- <20110730061307.GA24394@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/2] crypto, sha1: export sha1_update for reuse
+Date: Sat, 30 Jul 2011 21:46:50 +0800
+Message-ID: <20110730134650.GA26753@gondor.apana.org.au>
+References: <1311529994-7924-1-git-send-email-minipli@googlemail.com> <1311529994-7924-2-git-send-email-minipli@googlemail.com> <20110728145812.GA8396@gondor.apana.org.au> <CA+rthh-=qKpYM-9F0e=6DUpqxXWbMuMcXnGq9cZTK0V=Kbpg0A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ralf Jung <ralfjung-e@gmx.de>, linux-crypto@vger.kernel.org,
-	katzj@redhat.com
-To: Herbert Xu <herbert@gondor.apana.org.au>, 485070@bugs.debian.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	linux-kernel@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:34923 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751320Ab1G3Lud (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:57215 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751750Ab1G3NrE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 30 Jul 2011 07:50:33 -0400
-Received: by fxh19 with SMTP id 19so3042573fxh.19
-        for <linux-crypto@vger.kernel.org>; Sat, 30 Jul 2011 04:50:32 -0700 (PDT)
+	Sat, 30 Jul 2011 09:47:04 -0400
 Content-Disposition: inline
-In-Reply-To: <20110730061307.GA24394@gondor.apana.org.au>
+In-Reply-To: <CA+rthh-=qKpYM-9F0e=6DUpqxXWbMuMcXnGq9cZTK0V=Kbpg0A@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When loading aes via the module alias, a padlock module failing to
-load due to missing hardware is not particularly notable.  With
-v2.6.27-rc1~1107^2~14 (crypto: padlock - Make module loading quieter
-when hardware isn't available, 2008-07-03), the padlock-aes module
-suppresses the relevant messages when the "quiet" flag is in use; but
-better to suppress this particular message completely, since the
-administrator can already distinguish such errors by the absence of a
-message indicating initialization failing or succeeding.
+On Thu, Jul 28, 2011 at 05:29:35PM +0200, Mathias Krause wrote:
+> On Thu, Jul 28, 2011 at 4:58 PM, Herbert Xu <herbert@gondor.apana.org=
+=2Eau> wrote:
+> > On Sun, Jul 24, 2011 at 07:53:13PM +0200, Mathias Krause wrote:
+> >>
+> >> diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+> >> index 069e85b..7c46d0c 100644
+> >> --- a/include/crypto/sha.h
+> >> +++ b/include/crypto/sha.h
+> >> @@ -82,4 +82,9 @@ struct sha512_state {
+> >> =C2=A0 =C2=A0 =C2=A0 u8 buf[SHA512_BLOCK_SIZE];
+> >> =C2=A0};
+> >>
+> >> +#if defined(CONFIG_CRYPTO_SHA1) || defined (CONFIG_CRYPTO_SHA1_MO=
+DULE)
+> >> +extern int crypto_sha1_update(struct shash_desc *desc, const u8 *=
+data,
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 unsigned int len);
+> >> +#endif
+> >
+> > Please remove the unnecessary #if.
+>=20
+> The function will only be available when crypto/sha1_generic.o will
+> either be build into the kernel or build as a module. Without the #if
+> a potential wrong user of this function might not be detected as earl=
+y
+> as at compilation time but as late as at link time, or even worse, as
+> late as on module load time -- which is pretty bad. IMHO it's better
+> to detect errors early, as in reading "error: implicit declaration of
+> function =E2=80=98crypto_sha1_update=E2=80=99" when trying to compile=
+ the code in
+> question instead of "Unknown symbol crypto_sha1_update" in dmesg when
+> trying to load the module. That for I would like to keep the #if.
 
-This avoids occasional messages in syslog of the form
+In order to be consistent please remove the ifdef.  In most
+similar cases in the crypto subsystem we don't do this.  As
+adding such ifdefs all over the place would gain very little,
+I'd much rather you left it out.
 
-	padlock_aes: VIA PadLock not detected.
+The one case where this would make sense is if it were a trivial
+inline in the !defined case.
 
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
----
-Herbert Xu wrote:
-> Ralf Jung <ralfjung-e@gmx.de> wrote:
-
->> With current Debian testing (Kernel 2.6.39), I am getting this error on each 
->> boot:
->> FATAL: Error inserting padlock_sha (/lib/modules/2.6.39-2-
->> amd64/kernel/drivers/crypto/padlock-sha.ko): No such device
-[...]
-> That message comes from user-space and needs to be fixed there.
-
-Thanks.  Indeed, I was sloppy when reading the original report and
-thought he was talking about a different message.  Sorry for the
-noise.
-
- drivers/crypto/padlock-aes.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index db33d300..29b9469f 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -508,10 +508,8 @@ static int __init padlock_init(void)
- 	int ret;
- 	struct cpuinfo_x86 *c = &cpu_data(0);
- 
--	if (!cpu_has_xcrypt) {
--		printk(KERN_NOTICE PFX "VIA PadLock not detected.\n");
-+	if (!cpu_has_xcrypt)
- 		return -ENODEV;
--	}
- 
- 	if (!cpu_has_xcrypt_enabled) {
- 		printk(KERN_NOTICE PFX "VIA PadLock detected, but not enabled. Hmm, strange...\n");
--- 
-1.7.6
+Thanks!
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
