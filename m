@@ -1,43 +1,44 @@
-From: Jamie Iles <jamie@jamieiles.com>
-Subject: [PATCH] crypto: picoxcell: fix possible invalid pointer dereference
-Date: Tue,  2 Aug 2011 11:29:06 +0100
-Message-ID: <1312280946-4451-1-git-send-email-jamie@jamieiles.com>
-Cc: Jamie Iles <jamie@jamieiles.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: padlock-aes - Make module loading even quieter
+	when hardware is missing
+Date: Wed, 3 Aug 2011 14:08:01 +0800
+Message-ID: <20110803060801.GA32481@gondor.apana.org.au>
+References: <201107281403.27224.ralfjung-e@gmx.de> <20110730061307.GA24394@gondor.apana.org.au> <20110730115011.GA2837@elie>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: 485070@bugs.debian.org, Ralf Jung <ralfjung-e@gmx.de>,
+	linux-crypto@vger.kernel.org, katzj@redhat.com
+To: Jonathan Nieder <jrnieder@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:47524 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750822Ab1HBK3O (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:48466 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754936Ab1HCGIN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Aug 2011 06:29:14 -0400
-Received: by wwe5 with SMTP id 5so6580176wwe.1
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Aug 2011 03:29:12 -0700 (PDT)
+	Wed, 3 Aug 2011 02:08:13 -0400
+Content-Disposition: inline
+In-Reply-To: <20110730115011.GA2837@elie>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The completion callback will free the request so we must remove it from
-the completion list before calling the callback.
+On Sat, Jul 30, 2011 at 01:50:12PM +0200, Jonathan Nieder wrote:
+> When loading aes via the module alias, a padlock module failing to
+> load due to missing hardware is not particularly notable.  With
+> v2.6.27-rc1~1107^2~14 (crypto: padlock - Make module loading quieter
+> when hardware isn't available, 2008-07-03), the padlock-aes module
+> suppresses the relevant messages when the "quiet" flag is in use; but
+> better to suppress this particular message completely, since the
+> administrator can already distinguish such errors by the absence of a
+> message indicating initialization failing or succeeding.
+> 
+> This avoids occasional messages in syslog of the form
+> 
+> 	padlock_aes: VIA PadLock not detected.
+> 
+> Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Jamie Iles <jamie@jamieiles.com>
----
- drivers/crypto/picoxcell_crypto.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index 017340c..a2b553e 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1242,8 +1242,8 @@ static void spacc_spacc_complete(unsigned long data)
- 	spin_unlock_irqrestore(&engine->hw_lock, flags);
- 
- 	list_for_each_entry_safe(req, tmp, &completed, list) {
--		req->complete(req);
- 		list_del(&req->list);
-+		req->complete(req);
- 	}
- }
- 
+Patch applied.  Thanks Jonathan!
 -- 
-1.7.4.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
