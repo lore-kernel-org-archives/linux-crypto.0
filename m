@@ -1,43 +1,56 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: padlock-aes - Make module loading even quieter
-	when hardware is missing
-Date: Wed, 3 Aug 2011 14:08:01 +0800
-Message-ID: <20110803060801.GA32481@gondor.apana.org.au>
-References: <201107281403.27224.ralfjung-e@gmx.de> <20110730061307.GA24394@gondor.apana.org.au> <20110730115011.GA2837@elie>
+Subject: Re: [PATCH v2 2/2] crypto, x86: SSSE3 based SHA1 implementation
+	for x86-64
+Date: Thu, 4 Aug 2011 14:44:36 +0800
+Message-ID: <20110804064436.GA16247@gondor.apana.org.au>
+References: <1311529994-7924-1-git-send-email-minipli@googlemail.com> <1311529994-7924-3-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: 485070@bugs.debian.org, Ralf Jung <ralfjung-e@gmx.de>,
-	linux-crypto@vger.kernel.org, katzj@redhat.com
-To: Jonathan Nieder <jrnieder@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	linux-kernel@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48466 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:53436 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754936Ab1HCGIN (ORCPT
+	with ESMTP id S1750891Ab1HDGot (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Aug 2011 02:08:13 -0400
+	Thu, 4 Aug 2011 02:44:49 -0400
 Content-Disposition: inline
-In-Reply-To: <20110730115011.GA2837@elie>
+In-Reply-To: <1311529994-7924-3-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jul 30, 2011 at 01:50:12PM +0200, Jonathan Nieder wrote:
-> When loading aes via the module alias, a padlock module failing to
-> load due to missing hardware is not particularly notable.  With
-> v2.6.27-rc1~1107^2~14 (crypto: padlock - Make module loading quieter
-> when hardware isn't available, 2008-07-03), the padlock-aes module
-> suppresses the relevant messages when the "quiet" flag is in use; but
-> better to suppress this particular message completely, since the
-> administrator can already distinguish such errors by the absence of a
-> message indicating initialization failing or succeeding.
-> 
-> This avoids occasional messages in syslog of the form
-> 
-> 	padlock_aes: VIA PadLock not detected.
-> 
-> Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+On Sun, Jul 24, 2011 at 07:53:14PM +0200, Mathias Krause wrote:
+>
+> With this algorithm I was able to increase the throughput of a single
+> IPsec link from 344 Mbit/s to 464 Mbit/s on a Core 2 Quad CPU using
+> the SSSE3 variant -- a speedup of +34.8%.
 
+Were you testing this on the transmit side or the receive side?
 
-Patch applied.  Thanks Jonathan!
+As the IPsec receive code path usually runs in a softirq context,
+does this code have any effect there at all?
+
+This is pretty similar to the situation with the Intel AES code.
+Over there they solved it by using the asynchronous interface and
+deferring the processing to a work queue.
+
+This also avoids the situation where you have an FPU/SSE using
+process that also tries to transmit over IPsec thrashing the
+FPU state.
+
+Now I'm still happy to take this because hashing is very different
+from ciphers in that some users tend to hash small amounts of data
+all the time.  Those users will typically use the shash interface
+that you provide here.
+
+So I'm interested to know how much of an improvement this is for
+those users (< 64 bytes).  If you run the tcrypt speed tests that
+should provide some useful info.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
