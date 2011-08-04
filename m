@@ -1,29 +1,52 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: Re: [PATCH v2 2/2] crypto, x86: SSSE3 based SHA1 implementation for x86-64
-Date: Thu, 4 Aug 2011 19:08:07 +0200
-Message-ID: <CA+rthh_5sd1qgvYjLTR69RY-rJVC2ukzDHG1sVPwNctnpnxhiA@mail.gmail.com>
-References: <1311529994-7924-1-git-send-email-minipli@googlemail.com>
-	<1311529994-7924-3-git-send-email-minipli@googlemail.com>
-	<20110804064436.GA16247@gondor.apana.org.au>
-	<CA+rthh_nx2bvM71M=AdUuhEpT7EbhB5DbwkT=5zNF7MO-TGyHA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
+Subject: [PATCH v3 0/2] crypto, x86: assembler implementation of SHA1
+Date: Thu,  4 Aug 2011 20:19:23 +0200
+Message-ID: <1312481965-26484-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
 	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:58857 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751068Ab1HDRII (ORCPT
+Received: from grimli.r00tworld.net ([83.169.44.195]:43410 "EHLO
+	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755458Ab1HDST1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Aug 2011 13:08:08 -0400
-In-Reply-To: <CA+rthh_nx2bvM71M=AdUuhEpT7EbhB5DbwkT=5zNF7MO-TGyHA@mail.gmail.com>
+	Thu, 4 Aug 2011 14:19:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 4, 2011 at 7:05 PM, Mathias Krause <minipli@googlemail.com> wrote:
-> It does. Just have a look at how fpu_available() is implemented:
+This patch series adds an assembler implementation for the SHA1 hash algorithm
+for the x86-64 architecture. Its raw hash performance can be more than 2 times
+faster than the generic C implementation. This gives a real world benefit for
+IPsec with an throughput increase of up to +35%. For concrete numbers have a
+look at the second patch.
 
-read: irq_fpu_usable()
+This implementation is currently x86-64 only but might be ported to 32 bit with
+some effort in a follow up patch. (I had no time to do this yet.)
+
+Note: The SSSE3 is no typo, it's "Supplemental SSE3".
+
+v3 changes:
+- removed #ifdef in first patch
+v2 changes:
+- fixed typo in Makefile making AVX version unusable
+- whitespace fixes for the .S file
+
+Regards,
+Mathias
+
+Mathias Krause (2):
+  crypto, sha1: export sha1_update for reuse
+  crypto, x86: SSSE3 based SHA1 implementation for x86-64
+
+ arch/x86/crypto/Makefile          |    8 +
+ arch/x86/crypto/sha1_ssse3_asm.S  |  558 +++++++++++++++++++++++++++++++++++++
+ arch/x86/crypto/sha1_ssse3_glue.c |  240 ++++++++++++++++
+ arch/x86/include/asm/cpufeature.h |    3 +
+ crypto/Kconfig                    |   10 +
+ crypto/sha1_generic.c             |    9 +-
+ include/crypto/sha.h              |    3 +
+ 7 files changed, 827 insertions(+), 4 deletions(-)
+ create mode 100644 arch/x86/crypto/sha1_ssse3_asm.S
+ create mode 100644 arch/x86/crypto/sha1_ssse3_glue.c
