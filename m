@@ -1,7 +1,7 @@
-From: Joachim Eastwood <manabian@gmail.com>
+From: Andreas Schwab <schwab@linux-m68k.org>
 Subject: Re: [PATCH] lib/sha1: use the git implementation of SHA-1
-Date: Sun, 7 Aug 2011 20:57:36 +0200
-Message-ID: <CAGhQ9VwgpPv=z3TmODKwaXSneTaCrsj4cTpLEVXJ1aATiGZLrg@mail.gmail.com>
+Date: Sun, 07 Aug 2011 21:47:58 +0200
+Message-ID: <m2liv5ovf5.fsf@igel.home>
 References: <1312595187-3265-1-git-send-email-msb@chromium.org>
 	<CAGhQ9Vxb9F0jJ2o0ft-OOfOUMOArj_ci2gO__mxPkZJaNiA+4A@mail.gmail.com>
 	<CA+55aFxKES2bbcYWD29TFsGg19KXauPDwdkgYXXZbZ72kEXduw@mail.gmail.com>
@@ -9,93 +9,45 @@ References: <1312595187-3265-1-git-send-email-msb@chromium.org>
 	<CA+55aFyECSVQT9Gi6KuiBrrMoC44CVJRZAb+s0Lt9j0UuKyfwQ@mail.gmail.com>
 	<CAGhQ9Vx-MoFb7rEBQCwqi8zLjoWiED7FXvzcq2eDfTEg_P=2ug@mail.gmail.com>
 	<d86cf41b-bc2f-400f-823e-8042913974ae@email.android.com>
+	<CAGhQ9VwgpPv=z3TmODKwaXSneTaCrsj4cTpLEVXJ1aATiGZLrg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Mandeep Singh Baines <msb@chromium.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Mandeep Singh Baines <msb@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	Ramsay Jones <ramsay@ramsay1.demon.co.uk>,
 	Nicolas Pitre <nico@cam.org>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux@arm.linux.org.uk
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <d86cf41b-bc2f-400f-823e-8042913974ae@email.android.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Joachim Eastwood <manabian@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-out.m-online.net ([212.18.0.10]:55866 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754755Ab1HGTsE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Aug 2011 15:48:04 -0400
+In-Reply-To: <CAGhQ9VwgpPv=z3TmODKwaXSneTaCrsj4cTpLEVXJ1aATiGZLrg@mail.gmail.com>
+	(Joachim Eastwood's message of "Sun, 7 Aug 2011 20:57:36 +0200")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Aug 7, 2011 at 8:38 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> There aren't many users of that define, could you just turn it back t=
-o the proper 16, and then try changing it to 80 in each place that uses=
- it?
->
-> That way we'd see exactly *which* use is the buggy one..
+Joachim Eastwood <manabian@gmail.com> writes:
 
-Its drivers/char/random.c.
-
-Boots fine when forcing workspace array in extract_buf to 80.
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index c35a785..0584bb0 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -816,7 +816,7 @@ static size_t account(struct entropy_store *r,
-size_t nbytes, int min,
- static void extract_buf(struct entropy_store *r, __u8 *out)
- {
-        int i;
--       __u32 hash[5], workspace[SHA_WORKSPACE_WORDS];
-+       __u32 hash[5], workspace[80 /*SHA_WORKSPACE_WORDS*/];
-        __u8 extract[64];
-
-        /* Generate a hash across the pool, 16 words (512 bits) at a ti=
-me */
-
-regards
-Joachim Eastwood
-
-
-> =A0 =A0 =A0 =A0Linus
->
-> Joachim =A0Eastwood <manabian@gmail.com> wrote:
->
->>On Sun, Aug 7, 2011 at 7:44 PM, Linus Torvalds
->><torvalds@linux-foundation.org> wrote:
->>> On Sun, Aug 7, 2011 at 10:36 AM, Joachim =A0Eastwood
->><manabian@gmail.com> wrote:
->>>>
->>>> These printk's come from drivers/char/random.c
->>>> So it doesn't seem like it hangs in any of the sha_* funtions.
->>>
->>> The only other change is to SHA_WORKSPACE_WORDS - I wonder if some
->>> code depends on the old (much bigger) workspace for some reason?
->>>
->>> The git SHA1 routines are way smarter than the old SHA1, and will
->>> re-use the workspace area, so they need only a fraction of the old
->>> area.
->>>
->>> Try changing SHA_WORKSPACE_WORDS back to 80 (in
->>> include/linux/cryptohash.h). The git sha1 only needs 16 words, but =
-=2E.
+> On Sun, Aug 7, 2011 at 8:38 PM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>> There aren't many users of that define, could you just turn it back to the proper 16, and then try changing it to 80 in each place that uses it?
 >>
->>yup, setting it to 80 makes my kernel boot again :-)
->>
->>> If that fixes it for you, then it's almost certainly some buggy use=
-r
->>> that uses the SHA1 workspace array for its own odd case, and
->>> incorrectly "knows" that it's that old wasteful 320 bytes. There's =
-a
->>> few places in networking that uses SHA_WORKSPACE_WORDS.
->>
->>Guess more architectures than ARM are affected by this then.
->>
->>regards
->>Joachim Eastwood
->>
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 Linus
->>>
+>> That way we'd see exactly *which* use is the buggy one..
 >
->
+> Its drivers/char/random.c.
+
+ARM has its own implementation of sha_transform in arch/arm/lib/sha1.S,
+which assumes SHA_WORKSPACE_WORDS is 80.
+
+Andreas.
+
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
+"And now for something completely different."
