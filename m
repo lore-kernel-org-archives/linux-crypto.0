@@ -1,12 +1,12 @@
-From: Mandeep Singh Baines <msb@chromium.org>
-Subject: Re: [PATCH] lib/sha1: remove memsets and allocate workspace on the
- stack
-Date: Mon, 8 Aug 2011 22:52:27 -0700
-Message-ID: <20110809055226.GE6103@google.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] lib/sha1: remove memsets and allocate workspace on the stack
+Date: Tue, 9 Aug 2011 09:01:24 +0200
+Message-ID: <CAMuHMdU1Pu7ya3W1HvoXLMPSn7vpbk=BejsCx=Kn5ieL-RuA8A@mail.gmail.com>
 References: <1312844837-10086-1-git-send-email-msb@chromium.org>
- <1312847115.1643.22.camel@Joe-Laptop>
+	<1312847115.1643.22.camel@Joe-Laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Mandeep Singh Baines <msb@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	Ramsay Jones <ramsay@ramsay1.demon.co.uk>,
@@ -18,93 +18,42 @@ Cc: Mandeep Singh Baines <msb@chromium.org>,
 	linux-crypto@vger.kernel.org,
 	Linus Torvalds <torvalds@linux-foundation.org>
 To: Joe Perches <joe@perches.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-iy0-f170.google.com ([209.85.210.170]:36982 "EHLO
+	mail-iy0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752028Ab1HIHBZ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Aug 2011 03:01:25 -0400
 In-Reply-To: <1312847115.1643.22.camel@Joe-Laptop>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Joe Perches (joe@perches.com) wrote:
-> On Mon, 2011-08-08 at 16:07 -0700, Mandeep Singh Baines wrote:
-> > The previous implementation required the workspace to be passed in as
-> > a parameter. This prevents the compiler from being able to store the
-> > workspace in registers. I've also removed the memset since that also
-> > prevents the compiler from storing the workspace in registers.
-> 
-> I did a similar patch locally.
-> 
-> > There is no loss of security due to removing the memset. It would be a
-> > bug for the stack to leak to userspace. However, a defence-in-depth
-> > argument could be made for keeping the clearing of the workspace.
-> 
+On Tue, Aug 9, 2011 at 01:45, Joe Perches <joe@perches.com> wrote:
 > You should add #include <linux/crypthash.h> to
 > lib/sha1.c and perhaps rationalize the use of __u8
 > and char for the second argument to sha_transform in
 > the definition and uses.
-> 
+>
 > For defense in depth, a bool could be added to sha_transform
 > like:
-> 
+>
 > void sha_transform(__u32 *digest, const char *data, bool wipe);
-> 
 
-This seems reasonable to me. In our case, there is no secrecy
-issue. We hash the blocks of the RO root filesystem. There is nothing
-secret about the rootfs blocks or their hash. We use the hashes to verify
-that the blocks haven't been modified by an attacker.
+Yeah, why is the second parameter not "const void *data"? That
+would save some casts in the callers.
 
-We don't call sha_tranform directly. We use crypto_hash_digest. So maybe
-add a wipe param there. I'm happy to work on or test such a patch if folks
-think its interesting. Its saves me 190 ms on a 6 second boot. I suspect
-there may be other hash intense applications that also don't need secracy.
+Gr{oetje,eeting}s,
 
-> and the internal workspace memset after use if wipe set though
-> perhaps the memset could be a compile time option like
-> CONFIG_CRYPTO_DEFENSE_IN_DEPTH or such instead.
-> 
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 Geert
 
-Maybe instead use wipe=0 in code paths where you don't need secracy.
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-=
+m68k.org
 
-> > diff --git a/drivers/char/random.c b/drivers/char/random.c
-> []
-> > @@ -816,13 +816,13 @@ static size_t account(struct entropy_store *r, size_t nbytes, int min,
-> >  static void extract_buf(struct entropy_store *r, __u8 *out)
-> []
-> > -		sha_transform(hash, (__u8 *)(r->pool + i), workspace);
-> > +		sha_transform(hash, (__u8 *)(r->pool + i));
-> []
-> > diff --git a/include/linux/cryptohash.h b/include/linux/cryptohash.h
-> []
-> > @@ -3,10 +3,9 @@
-> []
-> > -void sha_transform(__u32 *digest, const char *data, __u32 *W);
-> > +void sha_transform(__u32 *digest, const char *data);
-> []
-> > diff --git a/lib/sha1.c b/lib/sha1.c
-> []
-> > +void sha_transform(__u32 *digest, const char *data)
-> []
-> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> []
-> > @@ -50,7 +49,7 @@ static u32 cookie_hash(__be32 saddr, __be32 daddr, __be16 sport, __be16 dport,
-> []
-> > -	sha_transform(tmp + 16, (__u8 *)tmp, tmp + 16 + 5);
-> > +	sha_transform(tmp + 16, (__u8 *)tmp);
-> []
-> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> []
-> > @@ -2511,8 +2510,7 @@ struct sk_buff *tcp_make_synack(struct sock *sk, struct dst_entry *dst,
-> []
-> >  			sha_transform((__u32 *)&xvp->cookie_bakery[0],
-> > -				      (char *)mess,
-> > -				      &workspace[0]);
-> > +				      (char *)mess);
-> []
-> > diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-> []
-> > @@ -81,7 +80,7 @@ static u32 cookie_hash(const struct in6_addr *saddr, const struct in6_addr *dadd
-> []
-> > -	sha_transform(tmp + 16, (__u8 *)tmp, tmp + 16 + 5);
-> > +	sha_transform(tmp + 16, (__u8 *)tmp);
-> 
-> 
+In personal conversations with technical people, I call myself a hacker=
+=2E But
+when I'm talking to journalists I just say "programmer" or something li=
+ke that.
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0=C2=A0 -- Linus Torvalds
