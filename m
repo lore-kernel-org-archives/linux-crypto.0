@@ -1,37 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] n2_crypto: Fix a get/put_cpu() imbalance
-Date: Wed, 10 Aug 2011 18:59:58 +0800
-Message-ID: <20110810105958.GA2607@gondor.apana.org.au>
-References: <1312619188.5589.27.camel@localhost.localdomain>
+Subject: Re: [PATCH 1/3] crypto: picoxcell - convert to platform ID table
+Date: Wed, 10 Aug 2011 19:01:59 +0800
+Message-ID: <20110810110159.GA2649@gondor.apana.org.au>
+References: <1312215919-24419-1-git-send-email-jamie@jamieiles.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Thomas Meyer <thomas@m3y3r.de>
+Cc: linux-crypto@vger.kernel.org
+To: Jamie Iles <jamie@jamieiles.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60632 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:46423 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752684Ab1HJLAJ (ORCPT
+	with ESMTP id S1751343Ab1HJLCC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Aug 2011 07:00:09 -0400
+	Wed, 10 Aug 2011 07:02:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1312619188.5589.27.camel@localhost.localdomain>
+In-Reply-To: <1312215919-24419-1-git-send-email-jamie@jamieiles.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Aug 06, 2011 at 08:26:25AM +0000, Thomas Meyer wrote:
-> From: Thomas Meyer <thomas@m3y3r.de>
+On Mon, Aug 01, 2011 at 05:25:17PM +0100, Jamie Iles wrote:
+> Use a platform ID table and a single platform_driver.  It's neater and
+> makes the device tree addition easier and more consistent.  Rename the
+> match values to be inline with what they'll be in the device tree
+> bindings.  There aren't any current in-tree users of the existing device
+> names.
 > 
-> Fix a get/put_cpu() imbalance in the error case when qp == NULL
-> 
-> Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
 
-I tried to apply your patch but it doesn't work as your mailer
-has turned all the tabs into spaces.  Please resend and make
-sure that you can still apply the patch that the list forwards
-back to you.
+All three patches applied.
 
-Thanks,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
