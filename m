@@ -1,44 +1,41 @@
 From: Josh Boyer <jwboyer@redhat.com>
-Subject: Re: Cryptomgr race vs built-in aesni
-Date: Thu, 11 Aug 2011 12:40:06 -0400
-Message-ID: <20110811164006.GA2167@zod.bos.redhat.com>
-References: <CA+5PVA4TjqNjKKgDsnbfzC-s9U3m=ZtXWb6rCAOYGz_Vbzunrg@mail.gmail.com>
+Subject: [PATCH] crypto: aesni-intel - Add ivsize to ablk_ecb_alg
+Date: Thu, 11 Aug 2011 12:40:41 -0400
+Message-ID: <20110811164040.GB2167@zod.bos.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:5616 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751314Ab1HKRxO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Aug 2011 13:53:14 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CA+5PVA4TjqNjKKgDsnbfzC-s9U3m=ZtXWb6rCAOYGz_Vbzunrg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-> Fedora has had a bug[1] open for a while with people seeing this upon boot:
+The ablkcipher structure in ablk_ecb_alg is lacking an ivsize setting.
+This causes the algorithm to fail it's self-test when it's registered
+with the error message:
 
-> [    0.807387] alg: skcipher: Failed to load transform for ecb-aes-aesni: -2
+[    0.806920] alg: skcipher: Failed to load transform for ecb-aes-aesni: -2
 
-> We're still seeing it with the 3.0 kernel, so I poked at it today.
+crypto_lookup_skcipher doesn't like a missing ivsize.  Adding the ivsize
+allows the self-test lookup to pass.
 
-<snip>
+Signed-off-by: Josh Boyer <jwboyer@redhat.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-> So it seems that the aesni module is trying to register the ecb(aes) alg
-> and before that completes (or something?) the test gets scheduled and
-> tries to do a CRYPTO_MSG_ALG_REQUEST on something that hasn't
-> finished it's module_init function yet.  Eventually the aesni_init function
-> completes successfully (the last printk), so I'm assuming that the
-> module is still present but that particular algorithm is listed as unavailable.
-
-Ok, so it's not what I thought it was.  I did some more investigation today,
-and it seems that the ablk_ebc_alg is missing the ivsize setting and the
-crypto stack doesn't like that on a CRYPTO_ALG_TYPE_BLKCIPHER type.  I added
-ivsize = AES_BLOCK_SIZE, and the error message goes away entirely.  This also
-matches how ablk_cbc_alg works now, so I'm somewhat guessing this is correct.
-
-My understanding of the crypto layer is at best non-existent, so if I'm wrong
-please shout.  I'll send a patch sortly.
-
-josh
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index feee8ff..711cc3c 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -587,6 +587,7 @@ static struct crypto_alg ablk_ecb_alg = {
+ 		.ablkcipher = {
+ 			.min_keysize	= AES_MIN_KEY_SIZE,
+ 			.max_keysize	= AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
+ 			.setkey		= ablk_set_key,
+ 			.encrypt	= ablk_encrypt,
+ 			.decrypt	= ablk_decrypt,
+-- 
+1.7.6
