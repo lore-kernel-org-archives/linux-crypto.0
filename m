@@ -1,18 +1,17 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 10/16] crypto: Add userspace report for givcipher type
- algorithms
-Date: Thu, 11 Aug 2011 13:32:21 +0200
-Message-ID: <20110811113220.GN16877@secunet.com>
+Subject: [PATCH 11/16] crypto: Add userspace report for aead type algorithms
+Date: Thu, 11 Aug 2011 13:32:55 +0200
+Message-ID: <20110811113255.GO16877@secunet.com>
 References: <20110811112603.GD16877@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:56351 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:56361 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755273Ab1HKLbs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Aug 2011 07:31:48 -0400
+	id S1754612Ab1HKLcX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Aug 2011 07:32:23 -0400
 Content-Disposition: inline
 In-Reply-To: <20110811112603.GD16877@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -21,37 +20,46 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/ablkcipher.c        |   29 +++++++++++++++++++++++++++++
- include/linux/cryptouser.h |    1 +
- 2 files changed, 30 insertions(+), 0 deletions(-)
+ crypto/aead.c              |   31 +++++++++++++++++++++++++++++++
+ include/linux/cryptouser.h |   10 ++++++++++
+ 2 files changed, 41 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index d9b6717..c19d14b 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -463,6 +463,32 @@ static int crypto_init_givcipher_ops(struct crypto_tfm *tfm, u32 type,
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 6729e8f..25793b7 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -21,6 +21,8 @@
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+ #include <linux/seq_file.h>
++#include <linux/cryptouser.h>
++#include <net/netlink.h>
+ 
+ #include "internal.h"
+ 
+@@ -109,6 +111,32 @@ static int crypto_init_aead_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
  	return 0;
  }
  
-+static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
 +	__attribute__ ((unused));
-+static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
 +{
-+	struct crypto_report_ablkcipher rablkcipher;
++	struct crypto_report_aead raead;
++	struct aead_alg *aead = &alg->cra_aead;
 +
-+	snprintf(rablkcipher.type, CRYPTO_MAX_ALG_NAME, "%s", "givcipher");
-+	snprintf(rablkcipher.geniv, CRYPTO_MAX_ALG_NAME, "%s",
-+		 alg->cra_ablkcipher.geniv ?: "<built-in>");
-+	snprintf(rablkcipher.async, CRYPTO_MAX_ALG_NAME, "%s",
++	snprintf(raead.type, CRYPTO_MAX_ALG_NAME, "%s", "aead");
++	snprintf(raead.geniv, CRYPTO_MAX_ALG_NAME, "%s",
++		 aead->geniv ?: "<built-in>");
++	snprintf(raead.async, CRYPTO_MAX_ALG_NAME, "%s",
 +		 alg->cra_flags & CRYPTO_ALG_ASYNC ? "yes" : "no");
 +
-+	rablkcipher.blocksize = alg->cra_blocksize;
-+	rablkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
-+	rablkcipher.max_keysize = alg->cra_ablkcipher.max_keysize;
-+	rablkcipher.ivsize = alg->cra_ablkcipher.ivsize;
++	raead.blocksize = alg->cra_blocksize;
++	raead.maxauthsize = aead->maxauthsize;
++	raead.ivsize = aead->ivsize;
 +
-+	NLA_PUT(skb, CRYPTOCFGA_REPORT_GIVCIPHER,
-+		sizeof(struct crypto_report_ablkcipher), &rablkcipher);
++	NLA_PUT(skb, CRYPTOCFGA_REPORT_AEAD,
++		sizeof(struct crypto_report_aead), &raead);
 +
 +	return 0;
 +
@@ -59,30 +67,43 @@ index d9b6717..c19d14b 100644
 +	return -EMSGSIZE;
 +}
 +
- static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
+ static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
  	__attribute__ ((unused));
- static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
-@@ -485,6 +511,9 @@ const struct crypto_type crypto_givcipher_type = {
+ static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
+@@ -130,6 +158,9 @@ const struct crypto_type crypto_aead_type = {
  #ifdef CONFIG_PROC_FS
- 	.show = crypto_givcipher_show,
+ 	.show = crypto_aead_show,
  #endif
 +#ifdef CONFIG_CRYPTO_USER
-+	.report = crypto_givcipher_report,
++	.report = crypto_aead_report,
 +#endif
  };
- EXPORT_SYMBOL_GPL(crypto_givcipher_type);
+ EXPORT_SYMBOL_GPL(crypto_aead_type);
  
 diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 8440966..e2c76f7 100644
+index e2c76f7..04762d7 100644
 --- a/include/linux/cryptouser.h
 +++ b/include/linux/cryptouser.h
-@@ -39,6 +39,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_AHASH,	/* struct crypto_report_ahash */
+@@ -40,6 +40,7 @@ enum crypto_attr_type_t {
  	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
  	CRYPTOCFGA_REPORT_ABLKCIPHER,	/* struct crypto_report_ablkcipher */
-+	CRYPTOCFGA_REPORT_GIVCIPHER,	/* struct crypto_report_ablkcipher */
+ 	CRYPTOCFGA_REPORT_GIVCIPHER,	/* struct crypto_report_ablkcipher */
++	CRYPTOCFGA_REPORT_AEAD,		/* struct crypto_report_aead */
  	__CRYPTOCFGA_MAX
  
  #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
+@@ -99,3 +100,12 @@ struct crypto_report_ablkcipher {
+ 	unsigned int max_keysize;
+ 	unsigned int ivsize;
+ };
++
++struct crypto_report_aead {
++	char type[CRYPTO_MAX_NAME];
++	char async[CRYPTO_MAX_NAME];
++	char geniv[CRYPTO_MAX_NAME];
++	unsigned int blocksize;
++	unsigned int maxauthsize;
++	unsigned int ivsize;
++};
 -- 
 1.7.0.4
