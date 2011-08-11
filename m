@@ -1,39 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/2] crypto, x86: assembler implementation of SHA1
-Date: Wed, 10 Aug 2011 19:03:30 +0800
-Message-ID: <20110810110330.GC2649@gondor.apana.org.au>
-References: <1312481965-26484-1-git-send-email-minipli@googlemail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH 00/16] crypto user configuration api
+Date: Thu, 11 Aug 2011 13:26:03 +0200
+Message-ID: <20110811112603.GD16877@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Maxim Locktyukhin <maxim.locktyukhin@intel.com>
-To: Mathias Krause <minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60101 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752936Ab1HJLDh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Aug 2011 07:03:37 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:34390 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753680Ab1HKLZc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Aug 2011 07:25:32 -0400
 Content-Disposition: inline
-In-Reply-To: <1312481965-26484-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 04, 2011 at 08:19:23PM +0200, Mathias Krause wrote:
-> This patch series adds an assembler implementation for the SHA1 hash algorithm
-> for the x86-64 architecture. Its raw hash performance can be more than 2 times
-> faster than the generic C implementation. This gives a real world benefit for
-> IPsec with an throughput increase of up to +35%. For concrete numbers have a
-> look at the second patch.
-> 
-> This implementation is currently x86-64 only but might be ported to 32 bit with
-> some effort in a follow up patch. (I had no time to do this yet.)
-> 
-> Note: The SSSE3 is no typo, it's "Supplemental SSE3".
+This patchset adds a netlink based user configuration API for the crypto
+layer, similar to the configuration API of xfrm.
 
-Both patches applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The patchset is based on the current cryptodev-2.6 tree and also available
+at branch 'crypto-user-config-api' of
+
+git://git.kernel.org/pub/scm/linux/kernel/git/klassert/linux-stk.git
+
+A userspace tool that makes use of the configuration API is temporarily
+available at
+
+http://www.kernel.org/pub/linux/kernel/people/klassert/crconf/ 
+
+With this it is possible to instantiate certain algorithms by doing
+
+crconf add driver "cbc(aes-generic)" type 4
+
+or
+
+crconf add driver "cbc(aes-generic)" type 4 priority 100
+
+To remove a (form templates build and unused) algorithm with all subsequent
+algorithms do
+
+crconf del driver "cbc(aes-generic)" type 4
+
+It is possible to update the priority of an algorithm by doing
+
+crconf update driver "cbc(aes-generic)" type 4 priority 200
+
+this updates the priority of this and all subsequent algorithms.
+
+Finally it is possible to print the instantiated crypto algorithms
+similar to /proc/crypto by doing
+
+crconf show all
+
+This prints the algorithm informations of all instantiated algorithms
+as long as the information fits into a netlink message.
+
+Steffen
