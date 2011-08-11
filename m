@@ -1,41 +1,53 @@
-From: Josh Boyer <jwboyer@redhat.com>
-Subject: [PATCH] crypto: aesni-intel - Add ivsize to ablk_ecb_alg
-Date: Thu, 11 Aug 2011 12:40:41 -0400
-Message-ID: <20110811164040.GB2167@zod.bos.redhat.com>
+From: Michel Machado <michel@digirati.com.br>
+Subject: RSA
+Date: Thu, 11 Aug 2011 14:30:53 -0400
+Message-ID: <1313087453.2239.28.camel@Thor>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mta63.f1.k8.com.br ([187.16.23.95]:34148 "EHLO
+	mta63.f1.k8.com.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751440Ab1HKSrq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Aug 2011 14:47:46 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by smtpl.f1.k8.com.br (Postfix) with ESMTP id 57418200A422
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Aug 2011 18:30:56 +0000 (GMT)
+Received: from smtpl.f1.k8.com.br ([127.0.0.1])
+	by localhost (mta63.f1.k8.com.br [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id b1dlJvtyLRSP for <linux-crypto@vger.kernel.org>;
+	Thu, 11 Aug 2011 18:30:56 +0000 (GMT)
+Received: from [192.168.10.104] (c-76-127-142-250.hsd1.ma.comcast.net [76.127.142.250])
+	by smtpl.f1.k8.com.br (Postfix) with ESMTPA id A7420200A0EE
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Aug 2011 18:30:55 +0000 (GMT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The ablkcipher structure in ablk_ecb_alg is lacking an ivsize setting.
-This causes the algorithm to fail it's self-test when it's registered
-with the error message:
+Hi there,
 
-[    0.806920] alg: skcipher: Failed to load transform for ecb-aes-aesni: -2
+   I'm implementing a new network stack in Linux's kernel [1], and I
+need a RSA implementation to keep the guarantees of the design [2].
 
-crypto_lookup_skcipher doesn't like a missing ivsize.  Adding the ivsize
-allows the self-test lookup to pass.
+   Searching the archive of Linux's mailing lists, I've found that
+adding RSA to the kernel has been already tried, but it was left out
+because the uses were not convincing then.
 
-Signed-off-by: Josh Boyer <jwboyer@redhat.com>
----
- arch/x86/crypto/aesni-intel_glue.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+   I intend to submit my work [3, 4] when I get a reasonable working
+version. Until there, could anyone point me to a working patch to add
+RSA to the kernel? The old patch [5] doesn't integrate with the current
+Crypto API.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index feee8ff..711cc3c 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -587,6 +587,7 @@ static struct crypto_alg ablk_ecb_alg = {
- 		.ablkcipher = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
- 			.setkey		= ablk_set_key,
- 			.encrypt	= ablk_encrypt,
- 			.decrypt	= ablk_decrypt,
+   Is there hope to have RSA added to Linux? If not for a ready use,
+it'd help to experiment with things that are still in the making.
+
+[1] http://www.cs.cmu.edu/~xia/
+[2] http://reports-archive.adm.cs.cmu.edu/anon/2011/CMU-CS-11-100.pdf
+[3] git://github.com/AltraMayor/XIA-for-Linux.git
+[4] git://github.com/AltraMayor/xiaconf.git
+[5] http://lwn.net/Articles/228892/
+
 -- 
-1.7.6
+[ ]'s
+Michel Machado
