@@ -1,41 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 01/16] crypto: authenc - Don't multiply priorities
-Date: Mon, 15 Aug 2011 15:19:29 +0800
-Message-ID: <20110815071928.GA29761@gondor.apana.org.au>
-References: <20110811112603.GD16877@secunet.com> <20110811112639.GE16877@secunet.com>
+Subject: Re: [PATCH] n2_crypto: Fix a get/put_cpu() imbalance
+Date: Mon, 15 Aug 2011 15:20:52 +0800
+Message-ID: <20110815072052.GA29799@gondor.apana.org.au>
+References: <1312619188.5589.27.camel@localhost.localdomain> <20110810105958.GA2607@gondor.apana.org.au> <1313222402.16820.12.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Thomas Meyer <thomas@m3y3r.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38363 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:37267 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752538Ab1HOHTc (ORCPT
+	with ESMTP id S1752499Ab1HOHU7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Aug 2011 03:19:32 -0400
+	Mon, 15 Aug 2011 03:20:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20110811112639.GE16877@secunet.com>
+In-Reply-To: <1313222402.16820.12.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 11, 2011 at 01:26:39PM +0200, Steffen Klassert wrote:
-> Most crypto algorithms simply take the priority value of the underlying
-> algorithm and add some value to calculate the algorithms priority.
-> The only exeptions are the authenc algorithms. We change the authenc
-> algorithms to calculate their priority to the sum of the underlying
-> algorithms plus 100. With this we can keep the priority consistent if
-> one of the underlying algorithms changes the priority.
+On Sat, Aug 13, 2011 at 09:59:58AM +0200, Thomas Meyer wrote:
+> From: Thomas Meyer <thomas@m3y3r.de>
 > 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Fix a get/put_cpu() imbalance in the error case when qp == NULL
+> 
+> Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
 
-Actually the reason it places a bigger weight on the cipher's
-priority is because typically ciphers are slower than hashes.
-So this is expressing the fact that we'd rather use a faster
-cipher with a slower hash than the other way around.
-
-Do you have a particular scenario in mind where this is broken?
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
