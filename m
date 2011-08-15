@@ -1,23 +1,35 @@
-From: Favour love <favour2b@itimes.com>
-Subject: HELLO
-Date: Mon, 15 Aug 2011 18:01:06 +0530 (IST)
-Message-ID: <988961545.1478531313411466418.JavaMail.root@ims1.itimes.com>
-Reply-To: Favour baby <favourbaby2b@yahoo.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: Re: [RFC v1.1 1/5] crypto: GnuPG based MPI lib
+Date: Mon, 15 Aug 2011 19:12:26 +0300
+Message-ID: <4E49456A.4020506@intel.com>
+References: <cover.1313082284.git.dmitry.kasatkin@intel.com> <b1b21a68321fa5fc79295a28e4560391606b043e.1313082284.git.dmitry.kasatkin@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bmc05.indiatimes.com ([223.165.31.109]:62512 "HELO
-	bmc05.indiatimes.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752842Ab1HOMaj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Aug 2011 08:30:39 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
+To: linux-security-module@vger.kernel.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <b1b21a68321fa5fc79295a28e4560391606b043e.1313082284.git.dmitry.kasatkin@intel.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-hello dear,
-How are you? I hope you are fine, my name is miss Favour, I saw your profile today when i was browsing looking for a new friend, that is why i write this mail to you, I will like to know more about you if you don't mind, reply me soon so that i will send you my picture and we be good friends,
-Accept my regards,
-Hope to hear from you soon,
-Favour
+Hi,
+
+Can anyone please tell why this patch did not appear in archives?
+I have received it in my 2 accounts, but I cannot see it in archive.
+Is any size limitations??
+
+- Dmitry
+
+
+On 11/08/11 20:20, Dmitry Kasatkin wrote:
+> From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+>
+> Adds the multi-precision-integer maths library which was originally taken
+> from GnuPG and ported to the kernel by (among others) David Howells.
+> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
+>
+> This library is used to implemenet RSA digital signature verification
+> used in IMA/EVM integrity protection subsystem.
+>
+> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
