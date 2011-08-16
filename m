@@ -1,42 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aesni-intel - Add ivsize to ablk_ecb_alg
-Date: Tue, 16 Aug 2011 20:32:27 +0800
-Message-ID: <20110816123227.GB9413@gondor.apana.org.au>
-References: <20110811164040.GB2167@zod.bos.redhat.com> <20110815071528.GA29656@gondor.apana.org.au> <20110815115038.GA2227@zod.bos.redhat.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 01/16] crypto: authenc - Don't multiply priorities
+Date: Tue, 16 Aug 2011 14:37:09 +0200
+Message-ID: <20110816123709.GW16877@secunet.com>
+References: <20110811112603.GD16877@secunet.com>
+ <20110811112639.GE16877@secunet.com>
+ <20110815071928.GA29761@gondor.apana.org.au>
+ <20110815080257.GU16877@secunet.com>
+ <20110815085546.GA30341@gondor.apana.org.au>
+ <20110815100806.GV16877@secunet.com>
+ <20110816123051.GA9413@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Josh Boyer <jwboyer@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34718 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751236Ab1HPMca (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Aug 2011 08:32:30 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:35231 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751236Ab1HPMgP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Aug 2011 08:36:15 -0400
 Content-Disposition: inline
-In-Reply-To: <20110815115038.GA2227@zod.bos.redhat.com>
+In-Reply-To: <20110816123051.GA9413@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 15, 2011 at 07:50:39AM -0400, Josh Boyer wrote:
->
-> Well, yes, it does in this code:
+On Tue, Aug 16, 2011 at 08:30:51PM +0800, Herbert Xu wrote:
 > 
-> 	if (!((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-> 	      CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
-> 					  alg->cra_ablkcipher.ivsize)) {
+> We don't want to automatically update a value that the user may
+> have previously set.  So I think updating instances on mass won't
+> work anyway.
 > 
-> 		printk(KERN_ERR "%s: %d\n", __func__, __LINE__);
-> 		return alg;
-> 	}
+> Besides, an instance may depend on an algorithm which should not
+> influence its priority value at all (e.g., if it's only used during
+> setkey).
 > 
-> But the lookup seems to fail after it returns (see traces below).
+> So let's just remove that and make this simpler.
+> 
 
-OK something's clearly screwed up.  I'll try to reproduce this
-here.
-
-Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ok, I'll remove it and respin the patches.
