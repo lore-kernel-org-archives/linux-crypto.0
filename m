@@ -1,39 +1,42 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH 01/16] crypto: authenc - Don't multiply priorities
-Date: Tue, 16 Aug 2011 14:37:09 +0200
-Message-ID: <20110816123709.GW16877@secunet.com>
-References: <20110811112603.GD16877@secunet.com>
- <20110811112639.GE16877@secunet.com>
- <20110815071928.GA29761@gondor.apana.org.au>
- <20110815080257.GU16877@secunet.com>
- <20110815085546.GA30341@gondor.apana.org.au>
- <20110815100806.GV16877@secunet.com>
- <20110816123051.GA9413@gondor.apana.org.au>
+From: Dmitry Kasatkin <dmitry.s.kasatkin@gmail.com>
+Subject: Re: [RFC v1.1 1/5] crypto: GnuPG based MPI lib
+Date: Wed, 17 Aug 2011 13:50:23 +0300
+Message-ID: <4E4B9CEF.2060201@gmail.com>
+References: <cover.1313082284.git.dmitry.kasatkin@intel.com> <b1b21a68321fa5fc79295a28e4560391606b043e.1313082284.git.dmitry.kasatkin@intel.com> <alpine.LRH.2.00.1108161056310.7706@tundra.namei.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com
+To: James Morris <jmorris@namei.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:35231 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751236Ab1HPMgP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Aug 2011 08:36:15 -0400
-Content-Disposition: inline
-In-Reply-To: <20110816123051.GA9413@gondor.apana.org.au>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:44515 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752821Ab1HQKtL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Aug 2011 06:49:11 -0400
+In-Reply-To: <alpine.LRH.2.00.1108161056310.7706@tundra.namei.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 16, 2011 at 08:30:51PM +0800, Herbert Xu wrote:
+On 16/08/11 03:57, James Morris wrote:
+> On Thu, 11 Aug 2011, Dmitry Kasatkin wrote:
 > 
-> We don't want to automatically update a value that the user may
-> have previously set.  So I think updating instances on mass won't
-> work anyway.
+>> From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+>>
+>> Adds the multi-precision-integer maths library which was originally taken
+>> from GnuPG and ported to the kernel by (among others) David Howells.
+>> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
 > 
-> Besides, an instance may depend on an algorithm which should not
-> influence its priority value at all (e.g., if it's only used during
-> setkey).
+> First thing -- this code needs to be formatted using kernel coding style.
 > 
-> So let's just remove that and make this simpler.
 > 
+> - James
 
-Ok, I'll remove it and respin the patches.
+The code is inherited from GnuPG which does not follow kernel coding
+standard. There are lots of "checkpatch" errors and warnings..
+Do you say it must be reformatted?
+
+- Dmitry
