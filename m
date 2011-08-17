@@ -1,58 +1,59 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v2 00/15] crypto user configuration api
-Date: Wed, 17 Aug 2011 14:08:59 +0200
-Message-ID: <20110817120859.GX16877@secunet.com>
+Subject: [PATCH v2 01/15] crypto: Add a flag to identify crypto instances
+Date: Wed, 17 Aug 2011 14:09:36 +0200
+Message-ID: <20110817120936.GY16877@secunet.com>
+References: <20110817120859.GX16877@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:41214 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:41221 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752303Ab1HQMIC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Aug 2011 08:08:02 -0400
+	id S1752005Ab1HQMIl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Aug 2011 08:08:41 -0400
 Content-Disposition: inline
+In-Reply-To: <20110817120859.GX16877@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patchset adds a netlink based user configuration API for the crypto
-layer, similar to the configuration API of xfrm.
+The upcomming crypto user configuration api needs to identify
+crypto instances. This patch adds a flag that is set if the
+algorithm is an instance that is build from templates.
 
-The patchset is based on the current cryptodev-2.6 tree and also available
-at branch 'crypto-user-config-api' of
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/algapi.c        |    1 +
+ include/linux/crypto.h |    5 +++++
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-git://git.kernel.org/pub/scm/linux/kernel/git/klassert/linux-stk.git
-
-A userspace tool that makes use of the configuration API is temporarily
-available at
-
-http://www.kernel.org/pub/linux/kernel/people/klassert/crconf/ 
-
-With this it is possible to instantiate certain algorithms by doing
-
-crconf add driver "cbc(aes-generic)" type 4
-
-or
-
-crconf add driver "cbc(aes-generic)" type 4 priority 100
-
-To remove a (form templates build and unused) algorithm with all subsequent
-algorithms do
-
-crconf del driver "cbc(aes-generic)" type 4
-
-Finally it is possible to print the instantiated crypto algorithms
-similar to /proc/crypto by doing
-
-crconf show all
-
-This prints the algorithm informations of all instantiated algorithms
-as long as the information fits into a netlink message.
-
-Changes from v1:
-
-- Removed the priority update functions.
-- Fix algorithm information printing when build as module.
-- Update the crconf tool according to the kernel changes.
-
-Steffen
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c3cf1a6..6fd9bcf 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -493,6 +493,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 		goto err;
+ 
+ 	inst->alg.cra_module = tmpl->module;
++	inst->alg.cra_flags |= CRYPTO_ALG_INSTANCE;
+ 
+ 	down_write(&crypto_alg_sem);
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index e5e468e..cba4d63 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -72,6 +72,11 @@
+ #define CRYPTO_ALG_TESTED		0x00000400
+ 
+ /*
++ * Set if the algorithm is an instance that is build from telplates.
++ */
++#define CRYPTO_ALG_INSTANCE		0x00000800
++
++/*
+  * Transform masks and values (for crt_flags).
+  */
+ #define CRYPTO_TFM_REQ_MASK		0x000fff00
+-- 
+1.7.0.4
