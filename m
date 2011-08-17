@@ -1,34 +1,58 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: [RFC v1.1 1/5] crypto: GnuPG based MPI lib
-Date: Wed, 17 Aug 2011 13:38:45 +0200
-Message-ID: <CAJU7zaKYRLO1yfNBZOho6LSczYr+PPvHT7zfmo=kSoVcM=O2ng@mail.gmail.com>
-References: <cover.1313082284.git.dmitry.kasatkin@intel.com>
-	<b1b21a68321fa5fc79295a28e4560391606b043e.1313082284.git.dmitry.kasatkin@intel.com>
-	<4E49456A.4020506@intel.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH v2 00/15] crypto user configuration api
+Date: Wed, 17 Aug 2011 14:08:59 +0200
+Message-ID: <20110817120859.GX16877@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
-To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <4E49456A.4020506@intel.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:41214 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752303Ab1HQMIC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Aug 2011 08:08:02 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 15, 2011 at 6:12 PM, Dmitry Kasatkin
-<dmitry.kasatkin@intel.com> wrote:
-> On 11/08/11 20:20, Dmitry Kasatkin wrote:
->> From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
->>
->> Adds the multi-precision-integer maths library which was originally taken
->> from GnuPG and ported to the kernel by (among others) David Howells.
->> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
->> This library is used to implemenet RSA digital signature verification
->> used in IMA/EVM integrity protection subsystem.
+This patchset adds a netlink based user configuration API for the crypto
+layer, similar to the configuration API of xfrm.
 
-Was there a particular reason to select the GnuPG mpi lib? Why not
-include gmp (the gnupg mpi lib is a very old fork of gmp), or some other
-big number library?
+The patchset is based on the current cryptodev-2.6 tree and also available
+at branch 'crypto-user-config-api' of
 
-regards,
-Nikos
+git://git.kernel.org/pub/scm/linux/kernel/git/klassert/linux-stk.git
+
+A userspace tool that makes use of the configuration API is temporarily
+available at
+
+http://www.kernel.org/pub/linux/kernel/people/klassert/crconf/ 
+
+With this it is possible to instantiate certain algorithms by doing
+
+crconf add driver "cbc(aes-generic)" type 4
+
+or
+
+crconf add driver "cbc(aes-generic)" type 4 priority 100
+
+To remove a (form templates build and unused) algorithm with all subsequent
+algorithms do
+
+crconf del driver "cbc(aes-generic)" type 4
+
+Finally it is possible to print the instantiated crypto algorithms
+similar to /proc/crypto by doing
+
+crconf show all
+
+This prints the algorithm informations of all instantiated algorithms
+as long as the information fits into a netlink message.
+
+Changes from v1:
+
+- Removed the priority update functions.
+- Fix algorithm information printing when build as module.
+- Update the crconf tool according to the kernel changes.
+
+Steffen
