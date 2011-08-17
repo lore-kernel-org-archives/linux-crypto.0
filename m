@@ -1,80 +1,58 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v2 15/15] crypto: Add userspace report for compress type
- algorithms
-Date: Wed, 17 Aug 2011 14:18:26 +0200
-Message-ID: <20110817121825.GM16877@secunet.com>
-References: <20110817120859.GX16877@secunet.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: Re: [RFC v1.1 1/5] crypto: GnuPG based MPI lib
+Date: Wed, 17 Aug 2011 15:23:05 +0300
+Message-ID: <4E4BB2A9.30508@intel.com>
+References: <cover.1313082284.git.dmitry.kasatkin@intel.com>	<b1b21a68321fa5fc79295a28e4560391606b043e.1313082284.git.dmitry.kasatkin@intel.com>	<4E49456A.4020506@intel.com> <CAJU7zaKYRLO1yfNBZOho6LSczYr+PPvHT7zfmo=kSoVcM=O2ng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, zohar@linux.vnet.ibm.com
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:50786 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752238Ab1HQMR2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Aug 2011 08:17:28 -0400
-Content-Disposition: inline
-In-Reply-To: <20110817120859.GX16877@secunet.com>
+Received: from mga07.intel.com ([143.182.124.22]:59513 "EHLO
+	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752126Ab1HQMVy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Aug 2011 08:21:54 -0400
+In-Reply-To: <CAJU7zaKYRLO1yfNBZOho6LSczYr+PPvHT7zfmo=kSoVcM=O2ng@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/crypto_user.c       |   21 +++++++++++++++++++++
- include/linux/cryptouser.h |    1 +
- 2 files changed, 22 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 9d10d2f..2cc3694 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -88,6 +88,22 @@ nla_put_failure:
- 	return -EMSGSIZE;
- }
- 
-+static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_comp rcomp;
-+
-+	snprintf(rcomp.type, CRYPTO_MAX_ALG_NAME, "%s", "compression");
-+
-+	NLA_PUT(skb, CRYPTOCFGA_REPORT_COMPRESS,
-+		sizeof(struct crypto_report_comp), &rcomp);
-+
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+
-+
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_report_base *rb, struct sk_buff *skb)
- {
-@@ -125,6 +141,11 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
- 
- 		break;
-+	case CRYPTO_ALG_TYPE_COMPRESS:
-+		if (crypto_report_comp(skb, alg))
-+			goto nla_put_failure;
-+
-+		break;
- 	}
- 
- out:
-diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 4af8222..56992c1 100644
---- a/include/linux/cryptouser.h
-+++ b/include/linux/cryptouser.h
-@@ -44,6 +44,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_PCOMPRESS,	/* struct crypto_report_comp */
- 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
- 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
-+	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
- 	__CRYPTOCFGA_MAX
- 
- #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
--- 
-1.7.0.4
+On 17/08/11 14:38, Nikos Mavrogiannopoulos wrote:
+> On Mon, Aug 15, 2011 at 6:12 PM, Dmitry Kasatkin
+> <dmitry.kasatkin@intel.com> wrote:
+>> On 11/08/11 20:20, Dmitry Kasatkin wrote:
+>>> From: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
+>>>
+>>> Adds the multi-precision-integer maths library which was originally taken
+>>> from GnuPG and ported to the kernel by (among others) David Howells.
+>>> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
+>>> This library is used to implemenet RSA digital signature verification
+>>> used in IMA/EVM integrity protection subsystem.
+> Was there a particular reason to select the GnuPG mpi lib? Why not
+> include gmp (the gnupg mpi lib is a very old fork of gmp), or some other
+> big number library?
+>
+GNUPG MPI kernel port was available and has shown the best performance
+comparing to other kernel implementations
+such as LibTomMath and once other rsa implementation..
+
+In fact I took libtommath from your cryptodev-linux#newapi project.
+I have patches and RSA implementation in my git trees.
+IIRC performance was about twice worse than in Gnupg MPI lib...
+
+- Dmitry
+
+
+
+- Dmitry
+
+> regards,
+> Nikos
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
