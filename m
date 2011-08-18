@@ -1,67 +1,53 @@
-From: Yuan Kang <Yuan.Kang@freescale.com>
-Subject: [RFC] ah4: use passed-in value of err in ah_output_done
-Date: Wed, 17 Aug 2011 14:46:18 -0500
-Message-ID: <20110817144618.e55f460d.Yuan.Kang@freescale.com>
+From: sales1@fortunecardtech.com
+Subject: Plastic Card
+Date: Thu, 18 Aug 2011 08:44:42 -0400
+Message-ID: <20110818084442.xheq1w0o0gcssw4k@mail.fortunecardtech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:40845
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751200Ab1HQTuT (ORCPT
+Received: from mail37c40.carrierzone.com ([209.235.156.177]:56164 "EHLO
+	mail37c40.carrierzone.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755006Ab1HRPN2 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Aug 2011 15:50:19 -0400
-Received: from mail49-ch1 (localhost.localdomain [127.0.0.1])	by
- mail49-ch1-R.bigfish.com (Postfix) with ESMTP id 636E2628445	for
- <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2011 19:50:18 +0000 (UTC)
-Received: from CH1EHSMHS025.bigfish.com (snatpool1.int.messaging.microsoft.com
- [10.43.68.246])	by mail49-ch1.bigfish.com (Postfix) with ESMTP id
- 3EBB01AA004F	for <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2011 19:50:18
- +0000 (UTC)
-Received: from localhost (b36765-ec1.am.freescale.net [10.82.120.211])	by
- az33smr01.freescale.net (8.13.1/8.13.0) with SMTP id p7HJoEl1004608	for
- <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2011 14:50:14 -0500 (CDT)
+	Thu, 18 Aug 2011 11:13:28 -0400
+Received: from mail37c40.carrierzone.com (localhost [127.0.0.1])
+	by mail37c40.carrierzone.com (8.13.6/8.13.1) with ESMTP id p7ICigdS013589
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2011 12:44:42 +0000
+Received: (from webmail@localhost)
+	by mail37c40.carrierzone.com (8.13.6/8.12.2/Submit) id p7ICigM7013587
+	for linux-crypto@vger.kernel.org; Thu, 18 Aug 2011 08:44:42 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ah_output_done, as the callback function for the
-digest function, receives the exit status in err,
-and calls xfrm_output_resume, which also takes a
-parameter called err.
-Assuming that the digest function exited successfully,
-the value of err is 0, and prevents xfrm_output_resume
-from calling ah_output, which calls the digest function,
-again. However, setting the value of err to ah->nexthdr
-gives err a positive protocol value, resulting in
-infinite calls of the digest function, preventing the
-sending of the packet to the network.
+Dear sir/Madam,
 
-It appears that, except for the first call,
-xfrm_output_resume should take err directly from the
-value that ah_output_done receives, like esp_output_done,
-and unlike ah_input_done, which calls xfrm_input_resume,
-which explicitly takes a parameter called nexthdr.
-When the change was made, ICMP would work with ah transport
-mode.
+Hope you are fine!
+=C2=A0
+Today=C2=A0I=C2=A0send a email to you=C2=A0in=C2=A0order to=C2=A0introd=
+uce=C2=A0you=C2=A0to our=C2=A0company--=C2=A0Fortune!=C2=A0
+=C2=A0
+=46ortune=C2=A0is a manufacturer of Plastic Card=C2=A0.=C2=A0We=C2=A0ha=
+ve=C2=A0had over 11 years experiences.=C2=A0Now=C2=A0Our clients throug=
+hout=C2=A0Hong=C2=A0Kong,the United=C2=A0States,Australia and so on. we=
+ have the world's most advanced equipment and we can add=C2=A0lots of=C2=
+=A0different technology on the card,such as big/small embossing ,stripe=
+/hole=C2=A0punch,bar code,signature panel,gold/silver background,etc.=20
 
-Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
----
- net/ipv4/ah4.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+Also, we take great action on environmentally-friendly thinking. New pr=
+oduct of Biodegradable material card is ready for our clients. The mate=
+rial is PLA =E2=80=93 Poly Lactic Acid.=C2=A0
+=C2=A0
+If you are interested in our product,please let us know! We are looking=
+ foward to your reply!
+=C2=A0
+Best Regards,
 
-diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
-index c1f4154..33ca186 100644
---- a/net/ipv4/ah4.c
-+++ b/net/ipv4/ah4.c
-@@ -136,8 +136,6 @@ static void ah_output_done(struct crypto_async_request *base, int err)
- 		memcpy(top_iph+1, iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
- 	}
- 
--	err = ah->nexthdr;
--
- 	kfree(AH_SKB_CB(skb)->tmp);
- 	xfrm_output_resume(skb, err);
- }
--- 
-1.7.4.4
+Daisy Lee
+=46ortune Card-tech Limited
+Tel: 852-6559 3828
+=46ax: 852-8148 7833
+website:www.fortunecardtech.com
