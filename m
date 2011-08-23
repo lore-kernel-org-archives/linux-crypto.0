@@ -1,63 +1,24 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 02/15] crypto: Add userspace configuration API
-Date: Mon, 22 Aug 2011 14:59:01 +0800
-Message-ID: <20110822065901.GA29599@gondor.apana.org.au>
-References: <20110817120859.GX16877@secunet.com> <20110817121013.GZ16877@secunet.com>
+From: "Bailey, Colleen" <Colleen.Bailey@newcanaan.k12.ct.us>
+Subject: =?windows-1256?Q?Re-Validate_Your_MailBox=FE?=
+Date: Mon, 22 Aug 2011 20:36:49 -0400
+Message-ID: <8BBD70E939D03345A76572F4E8366E340A490D7583__24284.8306349062$1314059899$gmane$org@email>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset="windows-1256"
+Content-Transfer-Encoding: 8BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48909 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750806Ab1HVG7G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Aug 2011 02:59:06 -0400
-Content-Disposition: inline
-In-Reply-To: <20110817121013.GZ16877@secunet.com>
+Received: from 135.newcanaan.info ([167.206.190.135]:2225 "EHLO
+	email.newcanaan.k12.ct.us" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1753934Ab1HWAiO convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Aug 2011 20:38:14 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 17, 2011 at 02:10:13PM +0200, Steffen Klassert wrote:
->
-> +struct crypto_user_alg {
-> +	char cru_name[CRYPTO_MAX_ALG_NAME];
-> +	char cru_driver_name[CRYPTO_MAX_ALG_NAME];
-> +	__u32 type;
-> +	__u32 mask;
-> +};
-> +
-> +#define CRYPTO_MAX_NAME CRYPTO_MAX_ALG_NAME
-> +
-> +struct crypto_report_base {
-> +	char name[CRYPTO_MAX_ALG_NAME];
-> +	char driver_name[CRYPTO_MAX_ALG_NAME];
-> +	char module_name[CRYPTO_MAX_NAME];
-> +	char selftest[CRYPTO_MAX_NAME];
-> +	int priority;
-> +	int refcnt;
-> +};
 
-We should use one structure for both creating algorithms and
-querying them.  User-space can leave the query fields blank
-when creating them.
 
-On another note, all fields specified when creating an algorithm
-should be returned when querying/reporting.  This is so that
-we can recreate the exact configuration after dumping.
+Your mailbox storage limit has been exceeded until you re-validate your mailbox you can not send or recieve e-mail.To re-validate your mailbox please CLICK  HERE <http://bit.ly/n6sbvD>
 
-Also, instead of returning selftest as a string, a single bit
-would suffice.  So I'd suggest turning it into flags of type
-__u32.
-
-In fact, let's turn the other two int fields into __u32 too.
-
-Sorry for not pointing this out earlier.  But we need to get this
-right the first time as we'll be stuck with the interface for
-ever.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+System Administrator
