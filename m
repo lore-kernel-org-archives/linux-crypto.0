@@ -1,46 +1,172 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: comparison of the AF_ALG interface with the /dev/crypto
-Date: Sun, 28 Aug 2011 15:17:00 +0200
-Message-ID: <4E5A3FCC.2030504@gnutls.org>
+From: David Miller <davem@davemloft.net>
+Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
+Date: Sun, 28 Aug 2011 16:35:54 -0400 (EDT)
+Message-ID: <20110828.163554.2024158531156183815.davem@davemloft.net>
+References: <4E5A3FCC.2030504@gnutls.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-To: cryptodev-linux-devel@gna.org,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Cc: cryptodev-linux-devel@gna.org, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
+To: nmav@gnutls.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:40264 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751915Ab1H1NRK (ORCPT
+Received: from shards.monkeyblade.net ([198.137.202.13]:59856 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752014Ab1H1UgQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Aug 2011 09:17:10 -0400
+	Sun, 28 Aug 2011 16:36:16 -0400
+In-Reply-To: <4E5A3FCC.2030504@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
-  I've compared the cryptodev [0] and AF_ALG interfaces in terms of
-performance [1]. I've put the results, as well as the benchmarks used
-in: http://home.gna.org/cryptodev-linux/comparison.html
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date: Sun, 28 Aug 2011 15:17:00 +0200
 
-The benchmark idea was to test the speed of initialization, encryption
-and deinitiation, as well as the encryption speed alone. These are the
-most common use cases of the frameworks (i.e. how they would be used by 
-a cryptographic library).
+> The benchmark idea was to test the speed of initialization, encryption
+> and deinitiation, as well as the encryption speed alone. These are the
+> most common use cases of the frameworks (i.e. how they would be used
+> by a cryptographic library).
 
-The AF_ALG appears to have poor performance comparing to cryptodev. Note
-that the test with software AES is not really indicative because the
-cost of software encryption masks the overhead of the framework. The
-difference is clearly seen in the NULL cipher that has no cost (as one
-would expect from a hardware cipher accelerator).
+Be sure to use splice() with AF_ALG for maximum performance.
 
-Given my benchmarks have no issues, it is not apparent to me why one
-should use AF_ALG instead of cryptodev. I do not know though why AF_ALG
-performs so poor. I'd speculate by blaming it on the usage of the socket
-API and the number of system calls required.
+For example, see the test program below.  You'll need to replace
+"8192" with whatever the page size is on your cpu.
 
-regards,
-Nikos
+--------------------
+#include <fcntl.h>
+#include <openssl/aes.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <linux/types.h>
 
-[0]. http://home.gna.org/cryptodev-linux/
-[1]. Both intend to provide user-space with high-bandwidth hardware 
-accelerated ciphers, thus performance seems a rational to compare.
+#define AF_ALG 38
+#define SOL_ALG 279
+
+#define SPLICE_F_GIFT	(0x08)	/* pages passed in are a gift */
+
+struct sockaddr_alg {
+	__u16	salg_family;
+	__u8	salg_type[14];
+	__u32	salg_feat;
+	__u32	salg_mask;
+	__u8	salg_name[64];
+};
+
+struct af_alg_iv {
+	__u32	ivlen;
+	__u8	iv[0];
+};
+
+/* Socket options */
+#define ALG_SET_KEY			1
+#define ALG_SET_IV			2
+#define ALG_SET_OP			3
+
+/* Operations */
+#define ALG_OP_DECRYPT			0
+#define ALG_OP_ENCRYPT			1
+
+static char buf[8192] __attribute__((__aligned__(8192)));
+
+static void crypt_ssl(const char *key, char *iv, int i)
+{
+	AES_KEY akey;
+
+	AES_set_encrypt_key(key, 128, &akey);
+
+	while (i--)
+		AES_cbc_encrypt(buf, buf, 8192, &akey, iv, 1);
+}
+
+static void crypt_kernel(const char *key, char *oiv, int i)
+{
+	int opfd;
+	int tfmfd;
+	struct sockaddr_alg sa = {
+		.salg_family = AF_ALG,
+		.salg_type = "skcipher",
+		.salg_name = "cbc(aes)"
+	};
+	struct msghdr msg = {};
+	struct cmsghdr *cmsg;
+	char cbuf[CMSG_SPACE(4) + CMSG_SPACE(20)] = {};
+	struct aes_iv {
+		__u32 len;
+		__u8 iv[16];
+	} *iv;
+	struct iovec iov;
+	int pipes[2];
+
+	pipe(pipes);
+
+	tfmfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+
+	bind(tfmfd, (struct sockaddr *)&sa, sizeof(sa));
+
+	setsockopt(tfmfd, SOL_ALG, ALG_SET_KEY, key, 16);
+
+	opfd = accept(tfmfd, NULL, 0);
+
+	msg.msg_control = cbuf;
+	msg.msg_controllen = sizeof(cbuf);
+
+	cmsg = CMSG_FIRSTHDR(&msg);
+	cmsg->cmsg_level = SOL_ALG;
+	cmsg->cmsg_type = ALG_SET_OP;
+	cmsg->cmsg_len = CMSG_LEN(4);
+	*(__u32 *)CMSG_DATA(cmsg) = ALG_OP_ENCRYPT;
+
+	cmsg = CMSG_NXTHDR(&msg, cmsg);
+	cmsg->cmsg_level = SOL_ALG;
+	cmsg->cmsg_type = ALG_SET_IV;
+	cmsg->cmsg_len = CMSG_LEN(20);
+	iv = (void *)CMSG_DATA(cmsg);
+	iv->len = 16;
+	memcpy(iv->iv, oiv, 16);
+
+	iov.iov_base = buf;
+	iov.iov_len = 8192;
+
+	msg.msg_iovlen = 0;
+	msg.msg_flags = MSG_MORE;
+
+	while (i--) {
+		sendmsg(opfd, &msg, 0);
+		vmsplice(pipes[1], &iov, 1, SPLICE_F_GIFT);
+		splice(pipes[0], NULL, opfd, NULL, 8192, 0);
+		read(opfd, buf, 8192);
+	}
+
+	close(opfd);
+	close(tfmfd);
+	close(pipes[0]);
+	close(pipes[1]);
+}
+
+int main(int argc, char **argv)
+{
+	int i;
+
+	const char key[16] =
+		"\x06\xa9\x21\x40\x36\xb8\xa1\x5b"
+		"\x51\x2e\x03\xd5\x34\x12\x00\x06";
+	char iv[16] = 
+		"\x3d\xaf\xba\x42\x9d\x9e\xb4\x30"
+		"\xb4\x22\xda\x80\x2c\x9f\xac\x41";
+	
+	memcpy(buf, "Single block msg", 16);
+
+	if (argc > 1)
+		crypt_ssl(key, iv, 1024 * 1024);
+	else
+		crypt_kernel(key, iv, 1024 * 1024);
+
+	for (i = 0; i < 8192; i++) {
+		printf("%02x", (unsigned char)buf[i]);
+	}
+	printf("\n");
+
+	return 0;
+}
