@@ -1,53 +1,75 @@
-From: =?utf-8?B?5q+P5aSp6YO95pyJ5paw5Lmw5a62?= <admin@brentonasia.com>
-Subject: =?utf-8?B?5pyA5paw5bm/5Lqk5Lya5Lmw5a625bqTKzUwMOS4h+a1t+WkluS5sOWutui1hOa6kCs=?=
-	=?utf-8?B?6YKu5Lu25Y+R6YCB5pa55qGIPeavj+WkqemDveacieaWsOS5sOWutuWbnuWkje+8gQ==?=
-Date: Tue, 30 Aug 2011 04:22:44 +0000 (UTC)
-Message-ID: <20111002115715033131@brentonasia.com>
-Reply-To: <1339625218@qq.com>
+From: Phil Sutter <phil@nwl.cc>
+Subject: Re: [Cryptodev-linux-devel] comparison of the AF_ALG interface
+ with the  /dev/crypto
+Date: Tue, 30 Aug 2011 18:33:42 +0200
+Message-ID: <20110830163342.GC2615@orbit.nwl.cc>
+References: <4E5A3FCC.2030504@gnutls.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Cc: cryptodev-linux-devel@gna.org,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [183.63.203.40] ([183.63.203.40]:31127 "HELO brentonasia.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-	id S1751317Ab1H3EWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Aug 2011 00:22:40 -0400
-Date: Sun, 2 Oct 2011 11:57:05 +0800
+Received: from orbit.nwl.cc ([91.121.141.167]:51444 "EHLO orbit.nwl.cc"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753190Ab1H3Qnj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Aug 2011 12:43:39 -0400
+Content-Disposition: inline
+In-Reply-To: <4E5A3FCC.2030504@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-NTAw5LiH5rW35aSW5Lmw5a626LWE5rqQK+mCruS7tuWPkemAgeaWueahiCvmtbflpJbkubDlrrZF
-bWFpbOaQnOe0ouacuj3mr4/lpKnpg73mnInlrqLmiLflm57lpI3vvIENCjUwMOS4h+a1t+WkluS5
-sOWutui1hOa6kCvpgq7ku7blj5HpgIHmlrnmoYgr5rW35aSW5Lmw5a62RW1haWzmkJzntKLmnLo9
-5q+P5aSp6YO95pyJ5a6i5oi35Zue5aSN77yBDQoNCjHjgIE1MDDkuIfkubDlrrbotYTmupDvvJog
-6LWg6YCB55qENTAw5LiH5Lmw5a626LWE5rqQ5bqT77yM5pu05pawICjlj6/ku6XmjInnhafmgqjn
-moTkuqflk4Hmj5Dlj5blh7rmnaXvvIzmm7Tnsr7lh4blvIDlj5Ep44CCIA0KMuOAgei2hee6p+a1
-t+WkluS5sOWutkVtYWls5pCc57Si5py677yaIOWGhee9ruS6hjYwMOS4h+ihjOS4muWFs+mUruiv
-je+8jOagueaNrumVv+WwvuivjeaQnOe0ou+8jOe7k+aenOabtOeyvuehruWMuemFje+8m+avj+Wk
-qeiDveaQnOe0ojEtMuS4h+S7peS4iuS5sOWutuecn+WunkVNQUlM77yM5oiQ5Y2V546H6auY44CC
-IA0KM+OAgee+pOWPkei9r+S7tu+8miDmk43kvZznroDljZXvvIzlip/og73lvLrlpKfvvIzmqKHk
-u7/kurrlt6Xmk43kvZzmqKHlvI/vvIzliLDovr7njofpq5jvvIzml6Xlj5HpgIE15LiH5bCB5Lul
-5LiK44CCIA0KIA0K5pSv5oyB5pSv5LuY5a6d5ouF5L+d5Lqk5piTICjlhYjlj5HotKflubblrono
-o4Xorr7nva7nvqTlj5Hova/ku7bvvIznhLblkI7ku5jmrL4pIOW9u+W6leaJk+a2iOaCqOeahCDp
-ob7omZHjgIINCg0K6K+36IGU57O777yaDQpRUToxMzM5NjI1MjE4ICAgZW1haWw6IDEzMzk2MjUy
-MThAcXEuY29tDQpRUToxMzM5NjI1MjE4ICAgZW1haWw6IDEzMzk2MjUyMThAcXEuY29tDQpRUTox
-MzM5NjI1MjE4ICAgZW1haWw6IDEzMzk2MjUyMThAcXEuY29tDQpRUToxMzM5NjI1MjE4ICAgZW1h
-aWw6IDEzMzk2MjUyMThAcXEuY29tDQpRUToxMzM5NjI1MjE4ICAgZW1haWw6IDEzMzk2MjUyMThA
-cXEuY29tDQpRUToxMzM5NjI1MjE4ICAgZW1haWw6IDEzMzk2MjUyMThAcXEuY29tDQoNCuWFjei0
-uei1oOmAgToNCjHjgIHotoXnuqfmtbflpJbkubDlrrbmkJzntKLmnLos5Y+v5Lul6L275p2+5omr
-5o+P5Ye6IDUwMC0xMDAw5LiH5Lmw5a62RW1haWzvvIzlu7rnq4voh6rlt7HnmoTokKXplIDmlbDm
-ja7lupPjgIINCjLjgIEyMDA55bm05rW35YWz5o+Q5Y2V5pWw5o2ucGllcnPniYjmlbDmja4gMeWN
-g+S4h+OAgg0KM+OAgTIwMTHmmKXlraMxMDnlsYrlub/kuqTkvJrkubDlrrbnjrDlnLror6Lnm5jm
-lbDmja7lupPmlrDpspzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDmja7v
-vIzlrrnmmJPmiJDljZXvvIEgDQo044CBMjAwOOW5tOiHszIwMTDlubQg5pil5a2jK+eni+Wto+W5
-v+S6pOS8muS5sOWutuWQjeW9le+8jDEwMyAxMDQgMTA1IDEwNiAxMDcgMTA4IOWFseWFreWxiu+8
-jOWFsTEyMC425LiH5pWw5o2u44CCIA0KNeOAgeacgOaWsOWFqOeQg+S5sOWutuW6kyzlhbE0NTE2
-NjDmnaHmlbDmja7vvIzmr4/kuKrlnYfmnIlFbWFpbOOAgg0KNuOAgTIwMTDlubTlm73pmYXkv4Pp
-lIDljY/kvJrvvIhQUEFJ77yJ5oiQ5ZGY5ZCN5Y2VIFBQQUkgTWVtYmVycyBEaXJlY3RvcnnvvIzp
-nZ7luLjph43opoHnmoTlpKfkubDlrrbjgIINCjfjgIEyMDEw5bm05Yiw6aaZ5riv6YeH6LSt55qE
-5Zu95aSW5a6i5Lq65ZCN5b2VKOmmmea4r+i0uOWPkeWxgOaPkOS+mynvvIzlhbE3LjLkuIfmlbDm
-ja7vvIzotoXnuqfph43opoHnmoTkubDlrrbjgIINCjjjgIExMDDkuIfmnaHlm73lpJbotLjmmJPo
-r6Lnm5jvvIzmr4/kuKrlnYfmnIlFbWFpbOOAgg0KOeOAgeS5sOWutui1hOa6kOabtOaWsOS4reOA
-guOAguOAgg0K5YWo6YOo6YO95pyJ44CCDQogDQo=
+Hi,
+
+On Sun, Aug 28, 2011 at 03:17:00PM +0200, Nikos Mavrogiannopoulos wrote:
+>   I've compared the cryptodev [0] and AF_ALG interfaces in terms of
+> performance [1]. I've put the results, as well as the benchmarks used
+> in: http://home.gna.org/cryptodev-linux/comparison.html
+
+Well done, Nikos!
+
+I did a short verification of your results on a (bit older) Via Eden
+running at 1GHz (with padlock enabled, of course). I just ran the
+cryptodev "fulltest" and  af_alg "aes", so this should relate to the
+overall-test using splice. Here are the numbers:
+
+chunksize        cryptodev       af_alg    
+-------------------------------------------
+512              15.34 MB/s      12.32 MB/s
+1024             30.01 MB/s      24.22 MB/s
+2048             57.29 MB/s      46.85 MB/s
+4096            103.13 MB/s      87.29 MB/s
+8192            174.08 MB/s     150.04 MB/s
+16384             0.27 GB/s       0.23 GB/s
+32768             0.35 GB/s       0.32 GB/s
+65536             0.42 GB/s       0.38 GB/s
+
+So at it's best (512byte chunks), cryptodev is about 25% faster. The
+worst case is with 32kbyte chunks, then cryptodev is only 9% faster.
+
+> The AF_ALG appears to have poor performance comparing to cryptodev. Note
+> that the test with software AES is not really indicative because the
+> cost of software encryption masks the overhead of the framework. The
+> difference is clearly seen in the NULL cipher that has no cost (as one
+> would expect from a hardware cipher accelerator).
+
+Not really. Indeed, a crypto engine accelerates the actual encryption.
+But another important benefit of CPU-separate (unlike padlock) engines
+is the offloading of that work, so the CPU can do other things in the
+mean time. E.g. handling the less efficient userspace interface. ;)
+OK, just kidding - in reality you always need to do init and fini stuff
+before and after the actual crypto operation to get any result at all.
+Skipping the middle should allow for measuring the rest.
+
+> Given my benchmarks have no issues, it is not apparent to me why one
+> should use AF_ALG instead of cryptodev. I do not know though why AF_ALG
+> performs so poor. I'd speculate by blaming it on the usage of the socket
+> API and the number of system calls required.
+
+Interestingly, the splice variant is outrun by regular AF_ALG on small
+buffers. I don't know if there is something wrong with the code, but
+according to some old benchmarks I found, cryptodev with zero-copy
+enabled got faster in every situation (even with 16byte buffers).
+
+Greetings, Phil
