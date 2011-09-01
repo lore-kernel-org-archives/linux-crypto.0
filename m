@@ -1,35 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
-Date: Thu, 1 Sep 2011 11:07:37 +1000
-Message-ID: <20110901010737.GA25658@gondor.apana.org.au>
+From: "Bob Pearson" <rpearson@systemfabricworks.com>
+Subject: RE: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
+Date: Thu, 1 Sep 2011 00:40:08 -0500
+Message-ID: <03ac01cc6869$9cd23b60$d676b220$@systemfabricworks.com>
 References: <20110901003317.32645.16843.stgit@elm3c44.beaverton.ibm.com> <20110901003336.32645.32746.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
-	Theodore Tso <tytso@mit.edu>,
-	David Miller <davem@davemloft.net>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-ext4@vger.kernel.org
-To: "Darrick J. Wong" <djwong@us.ibm.com>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: "'linux-kernel'" <linux-kernel@vger.kernel.org>,
+	"'Mingming Cao'" <cmm@us.ibm.com>,
+	"'linux-crypto'" <linux-crypto@vger.kernel.org>,
+	"'linux-fsdevel'" <linux-fsdevel@vger.kernel.org>,
+	<linux-ext4@vger.kernel.org>
+To: "'Darrick J. Wong'" <djwong@us.ibm.com>,
+	"'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+	"'Herbert Xu'" <herbert@gondor.apana.org.au>,
+	"'Theodore Tso'" <tytso@mit.edu>,
+	"'David Miller
 Return-path: <linux-ext4-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <20110901003336.32645.32746.stgit@elm3c44.beaverton.ibm.com>
+Content-Language: en-us
 Sender: linux-ext4-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 31, 2011 at 05:33:36PM -0700, Darrick J. Wong wrote:
-> This is a loadable module that will self-test the CRC32c code.
-> 
-> Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
+Hi Darrick,
 
-Please use the existing crypto testing framework.
+The same code in crc32.c was helpful to measure performance and help code tuning as well as indicate correctness. Otherwise the code in crypto may be enough to test all the corner cases. If this survives the review I wonder if there is a way to combine crc32 and crc32c together somehow. I like yours because you can load/unload and not need the memory permanently.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Bob
+
