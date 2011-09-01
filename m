@@ -1,31 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: David Miller <davem@davemloft.net>
 Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
-Date: Thu, 1 Sep 2011 23:13:53 +0800
-Message-ID: <20110901151352.GA32055@gondor.apana.org.au>
-References: <20110901133952.GB14522@orbit.nwl.cc> <20110901141445.GA31447@gondor.apana.org.au> <20110901150928.GC14522@orbit.nwl.cc>
+Date: Thu, 01 Sep 2011 11:32:34 -0400 (EDT)
+Message-ID: <20110901.113234.755815899606372879.davem@davemloft.net>
+References: <CAJU7za+OAusW-n9F4CLJNSAXVQTE2gxkdgpDFZb2tfys3EZspw@mail.gmail.com>
+	<20110901145902.GA31834@gondor.apana.org.au>
+	<CAJU7zaKnKYYLx6W_9WsZCcwhNd0KMM9R8fs2D0=Xd_6T_AE4=A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: nmav@gnutls.org, cryptodev-linux-devel@gna.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20110901150928.GC14522@orbit.nwl.cc>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.hengli.com.au, phil@nwl.cc,
+	cryptodev-linux-devel@gna.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: nmav@gnutls.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([198.137.202.13]:47923 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932367Ab1IAPd7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Sep 2011 11:33:59 -0400
+In-Reply-To: <CAJU7zaKnKYYLx6W_9WsZCcwhNd0KMM9R8fs2D0=Xd_6T_AE4=A@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 01, 2011 at 05:09:28PM +0200, Phil Sutter wrote:
->
-> Good point. So in order to also test the throughput, I've put my OpenRD
-> under load:
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Date: Thu, 1 Sep 2011 17:06:06 +0200
 
-No that's not what I meant.  You're pushing a request to an
-async device and waiting for a response to come back before
-pushing the next request.  In order to maximise throughput,
-you need to issue your requests without waiting for the responses
-synchronously.
+> It would be interesting to have a partial kernel-space TLS
+> implementation but I don't know whether such a thing could ever make
+> it to kernel.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Herbert and I have discussed this several times and we plan on
+implementing this at some point.
