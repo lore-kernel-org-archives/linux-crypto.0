@@ -1,52 +1,34 @@
-From: "Bob Pearson" <rpearson@systemfabricworks.com>
-Subject: RE: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
-Date: Wed, 31 Aug 2011 20:20:55 -0500
-Message-ID: <035501cc6845$66a0ad20$33e20760$@systemfabricworks.com>
-References: <20110901003317.32645.16843.stgit@elm3c44.beaverton.ibm.com> <20110901003336.32645.32746.stgit@elm3c44.beaverton.ibm.com> <20110901010737.GA25658@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
+Date: Thu, 1 Sep 2011 11:51:21 +1000
+Message-ID: <20110901015120.GA26182@gondor.apana.org.au>
+References: <035501cc6845$66a0ad20$33e20760$@systemfabricworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
-	"'Theodore Tso'" <tytso@mit.edu>,
-	"'David Miller'" <davem@davemloft.net>,
-	"'linux-kernel'" <linux-kernel@vger.kernel.org>,
-	"'Mingming Cao'" <cmm@us.ibm.com>,
-	"'linux-crypto'" <linux-crypto@vger.kernel.org>,
-	"'linux-fsdevel'" <linux-fsdevel@vger.kernel.org>,
-	<linux-ext4@vger.kernel.org>
-To: "'Herbert Xu'" <herbert@gondor.apana.org.au>,
-	"'Darrick J. Wong'" <djwong@us.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: djwong@us.ibm.com, adilger.kernel@dilger.ca, tytso@mit.edu,
+	davem@davemloft.net, linux-kernel@vger.kernel.org, cmm@us.ibm.com,
+	linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+To: Bob Pearson <rpearson@systemfabricworks.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cdptpa-bc-oedgelb.mail.rr.com ([75.180.133.32]:49451 "EHLO
-	cdptpa-bc-oedgelb.mail.rr.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752307Ab1IABU4 (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:36759 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751168Ab1IABvj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Aug 2011 21:20:56 -0400
-In-Reply-To: <20110901010737.GA25658@gondor.apana.org.au>
-Content-Language: en-us
+	Wed, 31 Aug 2011 21:51:39 -0400
+Content-Disposition: inline
+In-Reply-To: <035501cc6845$66a0ad20$33e20760$@systemfabricworks.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Could you elaborate a little on this?
+Bob Pearson <rpearson@systemfabricworks.com> wrote:
+> Could you elaborate a little on this?
 
-> -----Original Message-----
-> From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
-> Sent: Wednesday, August 31, 2011 8:08 PM
-> To: Darrick J. Wong
-> Cc: Andreas Dilger; Theodore Tso; David Miller; Bob Pearson; linux-kernel;
-> Mingming Cao; linux-crypto; linux-fsdevel; linux-ext4@vger.kernel.org
-> Subject: Re: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
-> 
-> On Wed, Aug 31, 2011 at 05:33:36PM -0700, Darrick J. Wong wrote:
-> > This is a loadable module that will self-test the CRC32c code.
-> >
-> > Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
-> 
-> Please use the existing crypto testing framework.
-> 
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sure, we already have a self-test infrastructure under crypto
+in testmgr.*.  It even includes test vectors for crc32c.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
