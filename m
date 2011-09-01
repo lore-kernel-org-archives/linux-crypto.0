@@ -1,40 +1,46 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
-Date: Thu, 01 Sep 2011 18:19:00 +0200
-Message-ID: <4E5FB074.6000404@gnutls.org>
-References: <CAJU7za+OAusW-n9F4CLJNSAXVQTE2gxkdgpDFZb2tfys3EZspw@mail.gmail.com>	<20110901145902.GA31834@gondor.apana.org.au>	<CAJU7zaKnKYYLx6W_9WsZCcwhNd0KMM9R8fs2D0=Xd_6T_AE4=A@mail.gmail.com> <20110901.113234.755815899606372879.davem@davemloft.net>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
+Date: Thu, 1 Sep 2011 15:18:54 -0700
+Message-ID: <20110901221854.GA12086@tux1.beaverton.ibm.com>
+References: <20110901003317.32645.16843.stgit@elm3c44.beaverton.ibm.com> <20110901003336.32645.32746.stgit@elm3c44.beaverton.ibm.com> <03ac01cc6869$9cd23b60$d676b220$@systemfabricworks.com>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.hengli.com.au, phil@nwl.cc,
-	cryptodev-linux-devel@gna.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+	"'Herbert Xu'" <herbert@gondor.apana.org.au>,
+	"'Theodore Tso'" <tytso@mit.edu>,
+	"'David Miller'" <davem@davemloft.net>,
+	"'linux-kernel'" <linux-kernel@vger.kernel.org>,
+	"'Mingming Cao'" <cmm@us.ibm.com>,
+	"'linux-crypto'" <linux-crypto@vger.kernel.org>,
+	"'linux-fsdevel'" <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Bob Pearson <rpearson@systemfabricworks.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ww0-f42.google.com ([74.125.82.42]:43286 "EHLO
-	mail-ww0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752695Ab1IAQTD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Sep 2011 12:19:03 -0400
-In-Reply-To: <20110901.113234.755815899606372879.davem@davemloft.net>
+Received: from e7.ny.us.ibm.com ([32.97.182.137]:56181 "EHLO e7.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932082Ab1IAWUS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Sep 2011 18:20:18 -0400
+Content-Disposition: inline
+In-Reply-To: <03ac01cc6869$9cd23b60$d676b220$@systemfabricworks.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/01/2011 05:32 PM, David Miller wrote:
-> From: Nikos Mavrogiannopoulos<nmav@gnutls.org>
-> Date: Thu, 1 Sep 2011 17:06:06 +0200
->
->> It would be interesting to have a partial kernel-space TLS
->> implementation but I don't know whether such a thing could ever make
->> it to kernel.
-> Herbert and I have discussed this several times and we plan on
-> implementing this at some point.
+On Thu, Sep 01, 2011 at 12:40:08AM -0500, Bob Pearson wrote:
+> Hi Darrick,
+> 
+> The same code in crc32.c was helpful to measure performance and help code
+> tuning as well as indicate correctness. Otherwise the code in crypto may be
+> enough to test all the corner cases. If this survives the review I wonder if
+> there is a way to combine crc32 and crc32c together somehow. I like yours
+> because you can load/unload and not need the memory permanently.
 
-The problem is that TLS is not a universal thing. There is still SSH,
-kerberos, openvpn (as far as I remember it is a custom protocol), etc. 
-It makes sense to have something to apply broadly, especially when it is 
-in the Linux kernel. Currently have a device such as /dev/crypto looks 
-like a good compromise.
+I suspect it would be pretty easy to adapt the Makefile to generate the
+relevant .c and .h files; in particular it could be useful to use the crypto
+framework for crc32 on the off chance anyone wants to provide hwaccel for that
+too.
 
-regards,
-Nikos
+That said, merging libcrc32c-test vectors with the existing one (sorry, I
+didn't realize that existed) shouldn't be too difficult.
+
+--D
