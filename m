@@ -1,31 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] crc32c: Implement a self-test for CRC32c
-Date: Thu, 1 Sep 2011 11:51:21 +1000
-Message-ID: <20110901015120.GA26182@gondor.apana.org.au>
-References: <035501cc6845$66a0ad20$33e20760$@systemfabricworks.com>
+Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
+Date: Thu, 1 Sep 2011 12:15:34 +1000
+Message-ID: <20110901021534.GA26330@gondor.apana.org.au>
+References: <4E5A3FCC.2030504@gnutls.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: djwong@us.ibm.com, adilger.kernel@dilger.ca, tytso@mit.edu,
-	davem@davemloft.net, linux-kernel@vger.kernel.org, cmm@us.ibm.com,
-	linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-To: Bob Pearson <rpearson@systemfabricworks.com>
+Cc: cryptodev-linux-devel@gna.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36759 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:42863 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751168Ab1IABvj (ORCPT
+	with ESMTP id S1757388Ab1IACPq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Aug 2011 21:51:39 -0400
+	Wed, 31 Aug 2011 22:15:46 -0400
 Content-Disposition: inline
-In-Reply-To: <035501cc6845$66a0ad20$33e20760$@systemfabricworks.com>
+In-Reply-To: <4E5A3FCC.2030504@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Bob Pearson <rpearson@systemfabricworks.com> wrote:
-> Could you elaborate a little on this?
+Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
+>
+> Given my benchmarks have no issues, it is not apparent to me why one
+> should use AF_ALG instead of cryptodev. I do not know though why AF_ALG
+> performs so poor. I'd speculate by blaming it on the usage of the socket
+> API and the number of system calls required.
 
-Sure, we already have a self-test infrastructure under crypto
-in testmgr.*.  It even includes test vectors for crc32c.
+The target usage of AF_ALG is hardware offload devices that cannot
+be directly used in user-space, not software crypto on implementations
+such as AESNI/Padlock.
+
+Going through the kernel to use something like AESNI/Padlock or
+software crypto is insane.
+
+Given the intended target case, your numbers are pretty much
+meaningless as cryptodev's performance can be easily beaten
+by a pure user-space implementation.
 
 Cheers,
 -- 
