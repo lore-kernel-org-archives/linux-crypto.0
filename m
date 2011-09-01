@@ -1,42 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
-Date: Thu, 1 Sep 2011 22:14:45 +0800
-Message-ID: <20110901141445.GA31447@gondor.apana.org.au>
-References: <20110901133952.GB14522@orbit.nwl.cc>
+From: Adam Tisovsky <tisovsky@gmail.com>
+Subject: IPsec performance (in)dependent on ingress rate?
+Date: Thu, 1 Sep 2011 16:24:31 +0200
+Message-ID: <CAM7W65KL+9Dp258ESbz_FssmScTLMjkb-qO2PrK-1kLFQbvrEQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: nmav@gnutls.org, cryptodev-linux-devel@gna.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Phil Sutter <phil@nwl.cc>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41775 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757420Ab1IAOPB (ORCPT
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:43654 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757552Ab1IAOYc convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Sep 2011 10:15:01 -0400
-Content-Disposition: inline
-In-Reply-To: <20110901133952.GB14522@orbit.nwl.cc>
+	Thu, 1 Sep 2011 10:24:32 -0400
+Received: by yie30 with SMTP id 30so1421812yie.19
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2011 07:24:31 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Phil Sutter <phil@nwl.cc> wrote:
-> 
-> chunksize       af_alg          cryptodev       (100 * cryptodev / af_alg)
-> --------------------------------------------------------------------------
-> 512              4.169 MB/s      7.113 MB/s     171 %
-> 1024             7.904 MB/s     12.957 MB/s     164 %
-> 2048            13.163 MB/s     19.683 MB/s     150 %
-> 4096            20.218 MB/s     26.960 MB/s     133 %
-> 8192            27.539 MB/s     34.373 MB/s     125 %
-> 16384           33.730 MB/s     39.997 MB/s     119 %
-> 32768           37.399 MB/s     42.727 MB/s     114 %
-> 65536           40.004 MB/s     44.660 MB/s     112 %
+Hi,
 
-Are you maxing out your submission CPU? If not then you're testing
-the latency of the interface, as opposed to the throughput.
+I=92m doing some benchmarks of IPsec performance on Cisco router and I
+have experienced the situation described below. My question is whether
+anybody has performed similar tests on Linux (StrongSWAN, OpenSWAN,=85)
+or any other security gateway and can tell how did it behave.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+When you are gradually increasing the rate of traffic to be secured
+(using UDP as a transport protocol) you reach the maximum possible
+throughput of the device. But when you continue increasing the rate of
+ingress traffic beyond this point, the fowarding rate of device will
+decrease. Example:
+
+Max. throughput of device is 10 Mbps. If ingress traffic rate is 10
+Mbps, then forwarding rate is 10 Mbps. But when ingress rate is 20
+Mbps, you get forwarding rate only 5 Mbps.
+
+I have experienced this on Cisco 1841 router with HW accelerator
+DISABLED. After some investigation I foud out that more ingress
+traffic utilizes main CPU more by interrupts. And interrupts go on the
+expense of encryption process. Therefore the decrease of forwarding
+rate. With HW accelerator enabled this situation on does not occur,
+device forwards traffic at the maximum rate even if it=92s overloaded b=
+y
+the ingress tarffic.
+
+I didin=92t find any information dealing with this, however I find it
+quite interesting. I=92m also planning to do the tests on StrongSWAN an=
+d
+OpenSWAN, but it takes some time. So any information will be helpful
+in advance.
+
+Thank you
+Adam
