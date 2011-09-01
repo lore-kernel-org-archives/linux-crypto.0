@@ -1,53 +1,38 @@
-From: Adam Tisovsky <tisovsky@gmail.com>
-Subject: IPsec performance (in)dependent on ingress rate?
-Date: Thu, 1 Sep 2011 16:24:31 +0200
-Message-ID: <CAM7W65KL+9Dp258ESbz_FssmScTLMjkb-qO2PrK-1kLFQbvrEQ@mail.gmail.com>
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: comparison of the AF_ALG interface with the /dev/crypto
+Date: Thu, 1 Sep 2011 16:56:56 +0200
+Message-ID: <CAJU7za+OAusW-n9F4CLJNSAXVQTE2gxkdgpDFZb2tfys3EZspw@mail.gmail.com>
+References: <20110901133952.GB14522@orbit.nwl.cc>
+	<20110901141445.GA31447@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Phil Sutter <phil@nwl.cc>, cryptodev-linux-devel@gna.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:43654 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757552Ab1IAOYc convert rfc822-to-8bit (ORCPT
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:54831 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757671Ab1IAO46 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Sep 2011 10:24:32 -0400
-Received: by yie30 with SMTP id 30so1421812yie.19
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2011 07:24:31 -0700 (PDT)
+	Thu, 1 Sep 2011 10:56:58 -0400
+In-Reply-To: <20110901141445.GA31447@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Thu, Sep 1, 2011 at 4:14 PM, Herbert Xu <herbert@gondor.hengli.com.au> wrote:
 
-I=92m doing some benchmarks of IPsec performance on Cisco router and I
-have experienced the situation described below. My question is whether
-anybody has performed similar tests on Linux (StrongSWAN, OpenSWAN,=85)
-or any other security gateway and can tell how did it behave.
+> Are you maxing out your submission CPU? If not then you're testing
+> the latency of the interface, as opposed to the throughput.
 
-When you are gradually increasing the rate of traffic to be secured
-(using UDP as a transport protocol) you reach the maximum possible
-throughput of the device. But when you continue increasing the rate of
-ingress traffic beyond this point, the fowarding rate of device will
-decrease. Example:
+I think it is obvious that a benchmark of throughput measures
+throughput. If however, you think that AF_ALG is in disadvantage in
+this benchmark, because it is a high latency interface, you're free to
+propose and perform another one. I haven't seen anywhere how is this
+interface was supposed to be used, nor about its qualities (high
+latency, maybe(?) high throughput or so). Thus, I designed this
+benchmark with a use-case in mind, i.e., a TLS or DTLS tunnel
+executing in a system with such an accelerator. There might be other
+benchmarks with other use cases in mind, but I haven't seen any.
 
-Max. throughput of device is 10 Mbps. If ingress traffic rate is 10
-Mbps, then forwarding rate is 10 Mbps. But when ingress rate is 20
-Mbps, you get forwarding rate only 5 Mbps.
-
-I have experienced this on Cisco 1841 router with HW accelerator
-DISABLED. After some investigation I foud out that more ingress
-traffic utilizes main CPU more by interrupts. And interrupts go on the
-expense of encryption process. Therefore the decrease of forwarding
-rate. With HW accelerator enabled this situation on does not occur,
-device forwards traffic at the maximum rate even if it=92s overloaded b=
-y
-the ingress tarffic.
-
-I didin=92t find any information dealing with this, however I find it
-quite interesting. I=92m also planning to do the tests on StrongSWAN an=
-d
-OpenSWAN, but it takes some time. So any information will be helpful
-in advance.
-
-Thank you
-Adam
+regards,
+Nikos
