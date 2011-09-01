@@ -1,40 +1,50 @@
-From: "Ruby Clark" <ruby.clark21@gmail.com>
-Subject: Publicity Proposal to geekdaily.net
-Date: Tue, 30 Aug 2011 16:04:45 -0500
-Message-ID: <21563579935201235230367@APOYO8-PC>
-Reply-To: ruby.clark21@gmail.com
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: [PATCH v1 0/3] crc32c: Add faster algorithm and self-test code
+Date: Wed, 31 Aug 2011 17:33:17 -0700
+Message-ID: <20110901003317.32645.16843.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from junior-high-stores.info ([96.9.177.69]:46382 "EHLO
-	host.enter2myworld.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752202Ab1H3WX2 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Aug 2011 18:23:28 -0400
-Received: from [190.234.118.4] (helo=190.234.118.4)
-	by host.enter2myworld.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <ruby.clark21@gmail.com>)
-	id 1QyVUC-0001zu-ME
-	for linux-crypto@vger.kernel.org; Tue, 30 Aug 2011 17:04:45 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	"Darrick J. Wong" <djwong@us.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-My name is Ruby Clark and I was wondering if you are interested in exchange links, I'll place your link on my sites exactly here:
+Hi all,
 
-thecleantechshow(dot)com PR4
-songzforsale(dot)com  PR3
+This patchset replaces the current crc32c software implementation, which uses a
+slow per-byte lookup table algorithm, with a faster implementation that uses an
+adaptation of the slice-by-8 algorithm that Bob Pearson has been pushing for
+crc32.
 
-If you agree please send me your site details:
+The motivation for this patchset is that I am working on adding full metadata
+checksumming to ext4[1].  As far as performance impact of adding checksumming
+goes, I see nearly no change with a standard mail server ffsb simulation.  On a
+test that involves only file creation and deletion and extent tree writes, I
+see a drop of about 50 pcercent with the current kernel crc32c implementation;
+this improves to a drop of about 20 percent with the enclosed crc32c code.
 
-Title:
-Url:
+When metadata is usually a small fraction of total IO, this new implementation
+doesn't help much because metadata is usually a small fraction of total IO.
+However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
+tree), then this patch speeds up the operation substantially.
 
-I'll place your link in less than 24 hours, then I'll send you an email with my info.
+Please have a look at the patches, and please feel free to suggest any changes.
+I will be at LPC next week if anyone wishes to discuss, debate, or protest.
 
-Regards
+Incidentally, given that iscsi, sctp, and btrfs also use crc32c, this patchset
+should improve their speed as well.  I have not yet quantified that, however.
 
+--D
 
-If you don't want to receive more mails just reply with "unsubscribe".
+[1] https://ext4.wiki.kernel.org/index.php/Ext4_Metadata_Checksums
