@@ -1,44 +1,37 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Subject: [RFC v2.0 3/3] evm: digital signature verification support
-Date: Tue,  6 Sep 2011 16:11:08 +0300
-Message-ID: <9966dcea040c7b26e7822fc760cefa93b92190a0.1315314576.git.dmitry.kasatkin@intel.com>
+Subject: [RFC v2.0 3/3] evm: digital signature support
+Date: Tue,  6 Sep 2011 16:11:07 +0300
+Message-ID: <850024352ce936b429c82aaf26b437b7332344dc.1315313377.git.dmitry.kasatkin@intel.com>
 References: <cover.1315314576.git.dmitry.kasatkin@intel.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	zohar@linux.vnet.ibm.com
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga10.intel.com ([192.55.52.92]:31823 "EHLO
-	fmsmga102.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754092Ab1IFNJy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Sep 2011 09:09:54 -0400
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <cover.1315314576.git.dmitry.kasatkin@intel.com>
-In-Reply-To: <cover.1315314576.git.dmitry.kasatkin@intel.com>
-References: <cover.1315314576.git.dmitry.kasatkin@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <cover.1315313377.git.dmitry.kasatkin@intel.com>
+References: <cover.1315313377.git.dmitry.kasatkin@intel.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This option enables digital signature verification support for EVM.
-With this feature file metadata can be protected using digital
-signature instead of HMAC. When building an image,
-which has to be flashed to different devices, an HMAC cannot
-be used to sign file metadata, because the HMAC key is different on
-every device. File metadata can be protected using digital signature.
+When building an image, which has to be flashed to different devices,
+an HMAC cannot be used to sign file metadata, as the HMAC key is different
+on every device. File metadata can be protected using digital signature.
+This patch enables RSA signature based integrity verification.
 
 Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Acked-by: Mimi Zohar <zohar@us.ibm.com>
 ---
- security/integrity/evm/Kconfig      |   15 ++++
+ security/integrity/evm/Kconfig      |   14 ++++
  security/integrity/evm/evm.h        |   12 ++++
  security/integrity/evm/evm_crypto.c |   66 ++++++++++++++-----
  security/integrity/evm/evm_main.c   |  125 +++++++++++++++++++++++++++++++----
- 4 files changed, 188 insertions(+), 30 deletions(-)
+ 4 files changed, 187 insertions(+), 30 deletions(-)
 
 diff --git a/security/integrity/evm/Kconfig b/security/integrity/evm/Kconfig
-index 884617d..4397bb6 100644
+index 884617d..84eea75 100644
 --- a/security/integrity/evm/Kconfig
 +++ b/security/integrity/evm/Kconfig
-@@ -12,3 +12,18 @@ config EVM
+@@ -12,3 +12,17 @@ config EVM
  	  integrity attacks.
  
  	  If you are unsure how to answer this question, answer N.
@@ -49,12 +42,11 @@ index 884617d..4397bb6 100644
 +	default n
 +	select CRYPTO_KSIGN_RSA
 +	help
-+	  This option enables digital signature verification support for EVM.
-+	  With this feature file metadata can be protected using digital
-+	  signature instead of HMAC. When building an image,
-+	  which has to be flashed to different devices, an HMAC cannot
-+	  be used to sign file metadata, because the HMAC key is different on
-+	  every device. File metadata can be protected using digital signature.
++	  When building an image, which has to be flashed to different
++	  devices, an HMAC cannot be used to sign file metadata, as
++	  the HMAC key is different on every device.
++	  File metadata can be protected using digital signature.
++	  This option enables RSA signature based integrity verification.
 +
 +	  If unsure, say N.
 diff --git a/security/integrity/evm/evm.h b/security/integrity/evm/evm.h
@@ -412,3 +404,4 @@ index 8b2eff9..d8ac109 100644
  /*
 -- 
 1.7.4.1
+
