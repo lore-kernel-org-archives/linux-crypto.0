@@ -1,54 +1,161 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Mon, 5 Sep 2011 10:36:29 +0800
-Message-ID: <CACXcFmkxX2=qGDgCdYJ4ZjhX1TOxSmq686eHymc1RgVNuVqMXA@mail.gmail.com>
-References: <1314974248-1511-1-git-send-email-jarod@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Neil Horman <nhorman@redhat.com>,
-	Herbert Xu <herbert.xu@redhat.com>,
-	Steve Grubb <sgrubb@redhat.com>,
-	Stephan Mueller <stephan.mueller@atsec.com>
-To: Jarod Wilson <jarod@redhat.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: [RFC v2.0 0/3] evm: digital signature verification extension
+Date: Tue,  6 Sep 2011 16:11:04 +0300
+Message-ID: <cover.1315314576.git.dmitry.kasatkin@intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com
+To: linux-security-module@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:34517 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751278Ab1IECga (ORCPT
+Received: from mga06.intel.com ([134.134.136.21]:47804 "EHLO
+	orsmga101.jf.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753062Ab1IFNJp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 4 Sep 2011 22:36:30 -0400
-Received: by vxi9 with SMTP id 9so3511530vxi.19
-        for <linux-crypto@vger.kernel.org>; Sun, 04 Sep 2011 19:36:29 -0700 (PDT)
-In-Reply-To: <1314974248-1511-1-git-send-email-jarod@redhat.com>
+	Tue, 6 Sep 2011 09:09:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 2, 2011 at 10:37 PM, Jarod Wilson <jarod@redhat.com> wrote:
+Hello,
 
-> Certain security-related certifications and their respective review
-> bodies have said that they find use of /dev/urandom for certain
-> functions, such as setting up ssh connections, is acceptable, but if and
-> only if /dev/urandom can block after a certain threshold of bytes have
-> been read from it with the entropy pool exhausted. ...
->
-> At present, urandom never blocks, even after all entropy has been
-> exhausted from the entropy input pool. random immediately blocks when
-> the input pool is exhausted. Some use cases want behavior somewhere in
-> between these two, where blocking only occurs after some number have
-> bytes have been read following input pool entropy exhaustion. Its
-> possible to accomplish this and make it fully user-tunable, by adding a
-> sysctl to set a max-bytes-after-0-entropy read threshold for urandom. In
-> the out-of-the-box configuration, urandom behaves as it always has, but
-> with a threshold value set, we'll block when its been exceeded.
+Updated before LSS.
 
-Is it possible to calculate what that threshold should be? The Yarrow
-paper includes arguments about the frequency of rekeying required to
-keep a block cipher based generator secure. Is there any similar
-analysis for the has-based pool? (& If not, should we switch to a
-block cipher?)
+Changes to version 1.1:
+- GnuPG MPI library has been refactored with lindent and checkpatch errors
+  and warnings has been fixed.
+- creation of evm keyring has been remove. It is done now in user space.
+- related ksign and evm patches has been squashed.
+- patch descriptions has been updated.
+ 
+As EVM patches were recently merged to security-testing-2.6#next,
+it is a good time to resend evm signature verification patches for active
+discussion. Last time I forgot --cc linux-crypto. Here it is.
 
-/dev/urandom should not block unless both it has produced enough
-output since the last rekey that it requires a rekey and there is not
-enough entropy in the input pool to drive that rekey.
+This patchset introduces digital signature extensions for the IMA/EVM kernel
+integrity subsystem and is applied on the top of the EVM patches posted to
+LSM mailing list earlier.
 
-But what is a reasonable value for "enough" in that sentence?
+Currently EVM stores the HMAC in security.evm to verify integrity of the
+file's metadata. This is quite sufficient for individually installed systems,
+where a system unique HMAC key can be provisioned and the initial filesystem
+labeling can be done.
+
+Software installation for consumer electronics or embedded devices is usually
+done via flashing a filesystem image. Initial filesystem image labeling is done
+during image creation process. It either has to be done (1) using a system
+unique HMAC key or (2) using an image specific HMAC key. In first case, those
+keys are either unknown, or a unique image has to be created for thousand or
+millions of devices, which is not feasible. The second case, using an image
+specific HMAC key, would require (2.1) provisioning of the key to millions of
+devices, which is not easily feasible or (2.1) encrypting the key with a shared
+symmetric key which is not a strong security measure.
+
+Digital signature extension for EVM provides a solution to perform labeling of
+the image using a single digital private key and use a known public key to
+verify the signature. For performance reasons, after verification, signature is
+replaced with local HMAC.
+
+Digital signature verification uses RSA algorithm, implemented using cut-down
+port of multi-precision integers (MPI) library from GnuPG and has been taken
+from RedHat Enterprise Linux kernel (MODSIGN patches). Decision to use this
+library was made, because its performance was 2 times better than other ports
+such as libtommath library.
+
+The motivation for integrity protection, in general, is to protect against
+offline modifications. The runtime protection is ensured via access control
+mechanisms.  Of particular importance is protecting users or owners from being
+sold or given tampered devices, which can do nasty things such as spying or
+stealing personal data. Integrity protection ensures that modifications of the
+system will not remain undetected. The EVM digital signature extension makes
+this feasible for consumerelectronics/embedded devices.
+
+There is also a second patchset which implements digital signature support for
+IMA-appraisal patchset, which is planned to be reviewed right after the
+IMA-appaisal review.
+
+All patches on the top of ima-2.6 (3.x.x) kernel are available here:
+git://git.kernel.org/pub/scm/linux/kernel/git/kasatkin/ima-ksign.git
+
+Supporting utility for key handling and signing is available here:
+http://meego.gitorious.org/meego-platform-security/evm-utils
+
+Regards,
+Dmitry
+
+Dmitry Kasatkin (3):
+  crypto: GnuPG based MPI lib
+  crypto: ksign - digital signature verification support
+  evm: digital signature verification support
+
+ crypto/Kconfig                      |   19 +
+ crypto/Makefile                     |    4 +
+ crypto/ksign.c                      |  269 +++++++
+ crypto/mpi/Makefile                 |   30 +
+ crypto/mpi/generic_mpi-asm-defs.h   |    4 +
+ crypto/mpi/generic_mpih-add1.c      |   61 ++
+ crypto/mpi/generic_mpih-lshift.c    |   63 ++
+ crypto/mpi/generic_mpih-mul1.c      |   57 ++
+ crypto/mpi/generic_mpih-mul2.c      |   60 ++
+ crypto/mpi/generic_mpih-mul3.c      |   61 ++
+ crypto/mpi/generic_mpih-rshift.c    |   63 ++
+ crypto/mpi/generic_mpih-sub1.c      |   60 ++
+ crypto/mpi/generic_udiv-w-sdiv.c    |  106 +++
+ crypto/mpi/longlong.h               | 1478 +++++++++++++++++++++++++++++++++++
+ crypto/mpi/mpi-add.c                |  234 ++++++
+ crypto/mpi/mpi-bit.c                |  235 ++++++
+ crypto/mpi/mpi-cmp.c                |   68 ++
+ crypto/mpi/mpi-div.c                |  333 ++++++++
+ crypto/mpi/mpi-gcd.c                |   59 ++
+ crypto/mpi/mpi-inline.c             |   31 +
+ crypto/mpi/mpi-inline.h             |  122 +++
+ crypto/mpi/mpi-internal.h           |  260 ++++++
+ crypto/mpi/mpi-inv.c                |  187 +++++
+ crypto/mpi/mpi-mpow.c               |  133 ++++
+ crypto/mpi/mpi-mul.c                |  194 +++++
+ crypto/mpi/mpi-pow.c                |  322 ++++++++
+ crypto/mpi/mpi-scan.c               |  136 ++++
+ crypto/mpi/mpicoder.c               |  361 +++++++++
+ crypto/mpi/mpih-cmp.c               |   56 ++
+ crypto/mpi/mpih-div.c               |  541 +++++++++++++
+ crypto/mpi/mpih-mul.c               |  527 +++++++++++++
+ crypto/mpi/mpiutil.c                |  206 +++++
+ include/linux/crypto/ksign.h        |   67 ++
+ include/linux/crypto/mpi.h          |  146 ++++
+ security/integrity/evm/Kconfig      |   15 +
+ security/integrity/evm/evm.h        |   12 +
+ security/integrity/evm/evm_crypto.c |   66 ++-
+ security/integrity/evm/evm_main.c   |  125 +++-
+ 38 files changed, 6741 insertions(+), 30 deletions(-)
+ create mode 100644 crypto/ksign.c
+ create mode 100644 crypto/mpi/Makefile
+ create mode 100644 crypto/mpi/generic_mpi-asm-defs.h
+ create mode 100644 crypto/mpi/generic_mpih-add1.c
+ create mode 100644 crypto/mpi/generic_mpih-lshift.c
+ create mode 100644 crypto/mpi/generic_mpih-mul1.c
+ create mode 100644 crypto/mpi/generic_mpih-mul2.c
+ create mode 100644 crypto/mpi/generic_mpih-mul3.c
+ create mode 100644 crypto/mpi/generic_mpih-rshift.c
+ create mode 100644 crypto/mpi/generic_mpih-sub1.c
+ create mode 100644 crypto/mpi/generic_udiv-w-sdiv.c
+ create mode 100644 crypto/mpi/longlong.h
+ create mode 100644 crypto/mpi/mpi-add.c
+ create mode 100644 crypto/mpi/mpi-bit.c
+ create mode 100644 crypto/mpi/mpi-cmp.c
+ create mode 100644 crypto/mpi/mpi-div.c
+ create mode 100644 crypto/mpi/mpi-gcd.c
+ create mode 100644 crypto/mpi/mpi-inline.c
+ create mode 100644 crypto/mpi/mpi-inline.h
+ create mode 100644 crypto/mpi/mpi-internal.h
+ create mode 100644 crypto/mpi/mpi-inv.c
+ create mode 100644 crypto/mpi/mpi-mpow.c
+ create mode 100644 crypto/mpi/mpi-mul.c
+ create mode 100644 crypto/mpi/mpi-pow.c
+ create mode 100644 crypto/mpi/mpi-scan.c
+ create mode 100644 crypto/mpi/mpicoder.c
+ create mode 100644 crypto/mpi/mpih-cmp.c
+ create mode 100644 crypto/mpi/mpih-div.c
+ create mode 100644 crypto/mpi/mpih-mul.c
+ create mode 100644 crypto/mpi/mpiutil.c
+ create mode 100644 include/linux/crypto/ksign.h
+ create mode 100644 include/linux/crypto/mpi.h
+
+-- 
+1.7.4.1
