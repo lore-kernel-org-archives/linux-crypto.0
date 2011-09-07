@@ -1,76 +1,55 @@
-From: Stephan Mueller <stephan.mueller@atsec.com>
+From: Steve Grubb <sgrubb@redhat.com>
 Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Wed, 07 Sep 2011 23:27:12 +0200
-Message-ID: <4E67E1B0.2040309@atsec.com>
-References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <4E67B75B.8010500@redhat.com> <20110907192737.GD20571@thunk.org> <201109071602.24519.sgrubb@redhat.com> <20110907211858.GE20571@thunk.org>
+Date: Wed, 7 Sep 2011 17:28:30 -0400
+Message-ID: <201109071728.31162.sgrubb@redhat.com>
+References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <201109071656.49758.sgrubb@redhat.com> <1315429827.3576.61.camel@lappy>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-To: Ted Ts'o <tytso@mit.edu>, Steve Grubb <sgrubb@redhat.com>,
-	Jarod Wilson <jarod@redhat.com>,
-	Sasha Levin <levinsasha928@gmail.com>,
-	linux-crypto@vger.kernel.org, Matt Mackall <mpm@sele
+Cc: "Ted Ts'o" <tytso@mit.edu>, Jarod Wilson <jarod@redhat.com>,
+	linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	Neil Horman <nhorman@redhat.com>,
+	Herbert Xu <herbert.xu@redhat.com>,
+	Stephan Mueller <stephan.mueller@atsec.com>,
+	lkml <linux-kernel@vger.kernel.org>
+To: Sasha Levin <levinsasha928@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.atsec.com ([195.30.99.214]:53580 "EHLO mail.atsec.com"
+Received: from mx1.redhat.com ([209.132.183.28]:2743 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757028Ab1IGV1W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Sep 2011 17:27:22 -0400
-Received: from mail.atsec.com (localhost [127.0.0.1])
-	by mail.atsec.com (Postfix) with ESMTP id 19C2678070
-	for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2011 23:27:17 +0200 (CEST)
-In-Reply-To: <20110907211858.GE20571@thunk.org>
+	id S1757074Ab1IGV2q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Sep 2011 17:28:46 -0400
+In-Reply-To: <1315429827.3576.61.camel@lappy>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07.09.2011 23:18:58, +0200, Ted Ts'o <tytso@mit.edu> wrote:
-
-Hi Ted,
-
-> On Wed, Sep 07, 2011 at 04:02:24PM -0400, Steve Grubb wrote:
->>
->> When a system is underattack, do you really want to be using a PRNG
->> for anything like seeding openssl?  Because a PRNG is what urandom
->> degrades into when its attacked.
+On Wednesday, September 07, 2011 05:10:27 PM Sasha Levin wrote:
+> > > > > Something similar probably happens for getting junk on disks before
+> > > > > creating an encrypted filesystem on top of them.
+> > > > 
+> > > > During system install, this sysctl is not likely to be applied.
+> > > 
+> > > It may happen at any time you need to create a new filesystem, which
+> > > won't necessarily happen during system install.
+> > > 
+> > > See for example the instructions on how to set up a LUKS filesystem:
+> > > https://wiki.archlinux.org/index.php/System_Encryption_with_LUKS#Prepar
+> > > atio n_and_mapping
+> > 
+> > Those instructions might need to be changed. That is one way of many to
+> > get random numbers on the disk. Anyone really needing the security to
+> > have the sysctl on will also probably accept that its doing its job and
+> > keeping the numbers random. Again, no effect unless you turn it on.
 > 
-> This is not technically true.  urandom degrades into a CRNG
-> (cryptographic random number generator).  In fact what most security
-> experts recommend is to take a small amount of security, and then use
-> that to seed a CRNG.
-
-Correct.
-
-However, a CRNG shall be reseeded once in a while - see standard crypto
-libraries and their CRNGs (OpenSSL being a notable exception here). And
-that is what this entire discussion is all about: to ensure that the
-CRNG is reseeded with entropy, eventually.
-
+> There are bunch of other places that would need to be changed in that
+> case :)
 > 
->> If enough bytes are read that an
->> attacker can guess the internal state of the RNG, do you really want
->> it seeding a openssh session?
-> 
-> In a cryptographic random number generator, there is a either a
-> cryptographic hash or a encryption algorithm at the core.  So you
-> would need a huge amounts of bytes, and then you would have to carry
-> out an attack on the cryptographic core.
+> Why not implement it as a user mode CUSE driver that would
+> wrap /dev/urandom and make it behave any way you want to? why push it
+> into the kernel?
 
-Correct.
+For one, auditing does not work for FUSE or things like that. We have to be able to 
+audit who is using what. Then there are the FIPS-140 requirements and this will spread 
+it. There are problems sending crypto audit events from user space, too.
 
-And exactly that is the concern from organizations like BSI. Their
-cryptographer's concern is that due to the volume of data that you can
-extract from /dev/urandom, you may find cycles or patterns that increase
-the probability to guess the next random value compared to brute force
-attack. Note, it is all about probabilities.
-> 
-> If this is the basis for the patch, then we should definitely NACK it.
-> It sounds like snake oil fear mongering.
-> 
-> 					- Ted
-> 
-> 
-> 
-
-
--- 
-Ciao
-Stephan
+-Steve
