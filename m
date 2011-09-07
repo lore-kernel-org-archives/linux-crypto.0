@@ -1,46 +1,48 @@
-From: David Miller <davem@davemloft.net>
+From: Sasha Levin <levinsasha928@gmail.com>
 Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Wed, 07 Sep 2011 15:49:24 -0400 (EDT)
-Message-ID: <20110907.154924.1213552068898117151.davem@davemloft.net>
-References: <1315419179.3576.6.camel@lappy>
-	<4E67B75B.8010500@redhat.com>
-	<20110907192737.GD20571@thunk.org>
+Date: Wed, 07 Sep 2011 23:00:42 +0300
+Message-ID: <1315425642.3576.30.camel@lappy>
+References: <1314974248-1511-1-git-send-email-jarod@redhat.com>
+	 <1315417137-12093-1-git-send-email-jarod@redhat.com>
+	 <1315419179.3576.6.camel@lappy>  <4E67B75B.8010500@redhat.com>
+	 <1315422330.3576.22.camel@lappy>  <4E67C659.1080707@redhat.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: jarod@redhat.com, levinsasha928@gmail.com,
-	linux-crypto@vger.kernel.org, mpm@selenic.com, nhorman@redhat.com,
-	herbert.xu@redhat.com, sgrubb@redhat.com,
-	stephan.mueller@atsec.com, linux-kernel@vger.kernel.org
-To: tytso@mit.edu
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([198.137.202.13]:40697 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754754Ab1IGTth (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Sep 2011 15:49:37 -0400
-In-Reply-To: <20110907192737.GD20571@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	Neil Horman <nhorman@redhat.com>,
+	Herbert Xu <herbert.xu@redhat.com>,
+	Steve Grubb <sgrubb@redhat.com>,
+	Stephan Mueller <stephan.mueller@atsec.com>,
+	lkml <linux-kernel@vger.kernel.org>
+To: Jarod Wilson <jarod@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4E67C659.1080707@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: "Ted Ts'o" <tytso@mit.edu>
-Date: Wed, 7 Sep 2011 15:27:37 -0400
-
-> On Wed, Sep 07, 2011 at 02:26:35PM -0400, Jarod Wilson wrote:
->> We're looking for a generic solution here that doesn't require
->> re-educating every single piece of userspace. And anything done in
->> userspace is going to be full of possible holes -- there needs to be
->> something in place that actually *enforces* the policy, and
->> centralized accounting/tracking, lest you wind up with multiple
->> processes racing to grab the entropy.
+On Wed, 2011-09-07 at 15:30 -0400, Jarod Wilson wrote:
+> Sasha Levin wrote:
+> > On Wed, 2011-09-07 at 14:26 -0400, Jarod Wilson wrote:
+> >> Sasha Levin wrote:
+> >> [..] And anything done in
+> >> userspace is going to be full of possible holes [..]
+> >
+> > Such as? Is there an example of a case which can't be handled in
+> > userspace?
 > 
-> Yeah, but there are userspace programs that depend on urandom not
-> blocking... so your proposed change would break them.
+> How do you mandate preventing reads from urandom when there isn't 
+> sufficient entropy? You likely wind up needing to restrict access to the 
+> actual urandom via permissions and selinux policy or similar, and then 
+> run a daemon or something that provides a pseudo-urandom that brokers 
+> access to the real urandom. Get the permissions or policy wrong, and 
+> havoc ensues. An issue with the initscript or udev rule to hide the real 
+> urandom, and things can fall down. Its a whole lot more fragile than 
+> this approach, and a lot more involved in setting it up.
 
-Agreed, and this is a really poor approach to solving the problem.
+Replace /dev/urandom with a simple CUSE driver, redirect reads to the
+real urandom after applying your threshold.
 
-If you change semantics, you have to create a new facility and then
-convert the userland pieces over to it.
+-- 
 
-Yes, this is harder and requires more work, but it is necessary as
-it is the only way to ensure that we won't break something.
+Sasha.
