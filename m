@@ -1,43 +1,42 @@
-From: H Hartley Sweeten <hartleys@visionengravers.com>
-Subject: [PATCH] aes_glue.c: quiet sparse noise about symbol not declared
-Date: Fri, 9 Sep 2011 13:47:02 -0700
-Message-ID: <201109091347.03199.hartleys@visionengravers.com>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] random: add blocking facility to urandom
+Date: Fri, 9 Sep 2011 23:27:32 +0200 (CEST)
+Message-ID: <alpine.LFD.2.02.1109092241390.2723@ionos>
+References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <201109080911.12921.sgrubb@redhat.com> <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com> <201109090904.18321.sgrubb@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <hpa@zytor.com>
-To: Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Sandy Harris <sandyinchina@gmail.com>,
+	Neil Horman <nhorman@redhat.com>,
+	Tomas Mraz <tmraz@redhat.com>,
+	Sasha Levin <levinsasha928@gmail.com>,
+	Ted Ts'o <tytso@mit.edu>, Jarod Wilson <jarod@redhat.com>,
+	linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert.xu@redhat.com>,
+	Stephan Mueller <stephan.mueller@atsec.com>,
+	lkml <linux-kernel@vger.kernel.org>
+To: Steve Grubb <sgrubb@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <201109090904.18321.sgrubb@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Include <asm/aes.h> to pick up the declarations for crypto_aes_encrypt_x86
-and crypto_aes_decrypt_x86 to quiet the sparse noise:
+On Fri, 9 Sep 2011, Steve Grubb wrote:
+> But what I was trying to say is that we can't depend on these supplemental hardware 
+> devices like TPM because we don't have access to the proprietary technical details 
+> that would be necessary to supplement the analysis. And when it comes to TPM chips, I 
+> bet each chip has different details and entropy sources and entropy estimations and 
+> rates. Those details we can't get at, so we can't solve the problem by including that 
+> hardware. That is the point I was trying to make. :)
 
-warning: symbol 'crypto_aes_encrypt_x86' was not declared. Should it be static?
-warning: symbol 'crypto_aes_decrypt_x86' was not declared. Should it be static?
+Well, there is enough prove out there that the hardware you're using
+is a perfect random number generator by itself.
 
-Signed-off-by: H Hartley Sweeten <hsweeten@visionengravers.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-"David S. Miller" <davem@davemloft.net>
-Thomas Gleixner <tglx@linutronix.de>
-Ingo Molnar <mingo@redhat.com>
-"H. Peter Anvin" <hpa@zytor.com>
+So stop complaining about not having access to TPM chips if you can
+create an entropy source just by (ab)using the inherent randomness of
+modern CPU architectures to refill your entropy pool on the fly when
+the need arises w/o imposing completely unintuitive thresholds and
+user visible API changes.
 
----
+Thanks,
 
-diff --git a/arch/x86/crypto/aes_glue.c b/arch/x86/crypto/aes_glue.c
-index bdce3ee..8efcf42 100644
---- a/arch/x86/crypto/aes_glue.c
-+++ b/arch/x86/crypto/aes_glue.c
-@@ -5,6 +5,7 @@
- 
- #include <linux/module.h>
- #include <crypto/aes.h>
-+#include <asm/aes.h>
- 
- asmlinkage void aes_enc_blk(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
- asmlinkage void aes_dec_blk(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in);
+	tglx
