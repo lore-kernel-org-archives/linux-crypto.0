@@ -1,59 +1,63 @@
-From: =?utf-8?B?5LuFMTDlhYPmr4/lpKk=?= <test@farmaciakino.com.mx>
-Subject: =?utf-8?B?576k5Y+R6L2v5Lu2K+S5sOWutuaQnOe0ouacuisxMDnlsYrlub/kuqTkvJrkubDlrrY=?=
-	=?utf-8?B?44CB5rW35YWz5pWw5o2uLEIyQuivouebmOS5sOWutjUwMOS4h+OAgg==?=
-Date: Fri, 9 Sep 2011 17:58:34 +0000 (UTC)
-Message-ID: <20111210014658134734@farmaciakino.com.mx>
-Reply-To: <1339625218@qq.com>
+From: Eric Paris <eparis@parisplace.org>
+Subject: Re: [PATCH] random: add blocking facility to urandom
+Date: Fri, 9 Sep 2011 15:08:03 -0400
+Message-ID: <CACLa4ptAYEieckVLz+qs9PGfDrw9QjExUx+EMn9tqiCoQ4aqfg@mail.gmail.com>
+References: <4E67E1B0.2040309@atsec.com>
+	<20110908084420.GC4032@infradead.org>
+	<201109080748.27750.sgrubb@redhat.com>
+	<20110908.121347.1753630996526838840.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: sgrubb@redhat.com, hch@infradead.org, stephan.mueller@atsec.com,
+	tytso@mit.edu, jarod@redhat.com, levinsasha928@gmail.com,
+	linux-crypto@vger.kernel.org, mpm@selenic.com, nhorman@redhat.com,
+	herbert.xu@redhat.com, linux-kernel@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from customer-189-254-207-178-sta.uninet-ide.com.mx ([189.254.207.178]:15427
-	"EHLO adkino.farmaciakino.com.mx" rhost-flags-OK-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1753205Ab1IIR63 (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:44797 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759824Ab1IITIF convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Sep 2011 13:58:29 -0400
-Date: Sat, 10 Dec 2011 01:46:46 +0800
+	Fri, 9 Sep 2011 15:08:05 -0400
+In-Reply-To: <20110908.121347.1753630996526838840.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-576k5Y+R6L2v5Lu2KzEwOeWxiuW5v+S6pOS8muS5sOWutuOAgea1t+WFs+aVsOaNruOAgeaQnOe0
-ouW8leaTjuS5sOWutixCMkLor6Lnm5jkubDlrrblhbE1MDDkuIcs5LuFMTDlhYPmr4/lpKnjgIIg
-DQrkv53or4Hmr4/lpKnpg73mnInkubDlrrblm57lpI3jgIINCuS/neivgeavj+WkqemDveacieS5
-sOWutuWbnuWkjeOAgg0KDQoNCjHjgIHnvqTlj5Hova/ku7bvvJog5pON5L2c566A5Y2V77yM5Yqf
-6IO95by65aSn77yM5qih5Lu/5Lq65bel5pON5L2c5qih5byP77yM5Yiw6L6+546H6auY77yM5pel
-5Y+R6YCBNeS4h+WwgeS7peS4iuOAgiANCjLjgIE1MDDkuIfkubDlrrbotYTmupDvvJog6LWg6YCB
-55qENTAw5LiH5Lmw5a626LWE5rqQ5bqT77yM5pu05pawICjlj6/ku6XmjInnhafmgqjnmoTkuqfl
-k4Hmj5Dlj5blh7rmnaXvvIzmm7Tnsr7lh4blvIDlj5Ep44CCIA0KM+OAgei2hee6p+a1t+WkluS5
-sOWutkVtYWls5pCc57Si5py677yaIOWGhee9ruS6hjYwMOS4h+ihjOS4muWFs+mUruivje+8jOag
-ueaNrumVv+WwvuivjeaQnOe0ou+8jOe7k+aenOabtOeyvuehruWMuemFje+8m+avj+WkqeiDveaQ
-nOe0ojEtMuS4h+S7peS4iuS5sOWutuecn+WunkVNQUlM77yM5oiQ5Y2V546H6auY44CCIA0KIA0K
-DQropoHnmoTmipPntKfogZTns7tRUTogMTMzOTYyNTIxOCAgIOaIluiAheeri+WNs+WbnuWkjemC
-rueusTogMTMzOTYyNTIxOEBxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiAxMzM5NjI1MjE4
-ICAg5oiW6ICF56uL5Y2z5Zue5aSN6YKu566xOiAxMzM5NjI1MjE4QHFxLmNvbQ0K6KaB55qE5oqT
-57Sn6IGU57O7UVE6IDEzMzk2MjUyMTggICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDEzMzk2
-MjUyMThAcXEuY29tDQogDQrlhY3otLnotaDpgIE6DQrkuIDlhbE45Liq5YyFKOaVsOaNruaYr+WF
-qOihjOS4mueahO+8jOaMieeFp+ihjOS4muWIhuWlveexu++8jOW5tuS4lOWPr+S7peaMieeFp+WF
-s+mUruivjeafpeivoueahCnvvJogDQox77yMMjAxMeaYpeWtozEwOeWxiuW5v+S6pOS8muS5sOWu
-tueOsOWcuuivouebmOaVsOaNruW6k+aWsOmynOWHuueCie+8jOi2hee6p+aWsOmynOS5sOWutu+8
-jOaWsOmynOaVsOaNru+8jOWuueaYk+aIkOWNle+8gSANCjLvvIzotK3kubDlkI7lj6/ku6XlhY3o
-tLnmm7TmlrAyMDEx56eL5a2j5bm/5Lqk5LyaKzIwMTLmmKXlraPlub/kuqTkvJrkubDlrrbmlbDm
-ja7jgILlpKrotoXlgLzkuobjgIINCjPvvIzmnIDmlrDlhajnkIPkubDlrrblupMs5YWxNDUxNjYw
-5p2h5pWw5o2u44CCICjmnIDmlrDmm7TmlrDml6XmnJ8gMjAxMS0wNS0xNuaXpSkNCjTvvIwyMDA4
-5bm0LDIwMDnlubQsMjAxMOW5tCDmmKXlraMr56eL5a2j5bm/5Lqk5Lya5Lmw5a625ZCN5b2V77yM
-MTAzIDEwNCAxMDUgMTA2IDEwNyAxMDgg5YWx5YWt5bGKIOWFsTEyMC425LiH5pWw5o2u44CCDQo1
-77yMMjAxMOW5tOWbvemZheS/g+mUgOWNj+S8mu+8iFBQQUnvvInmiJDlkZjlkI3ljZUgUFBBSSBN
-ZW1iZXJzIERpcmVjdG9yee+8jOmdnuW4uOmHjeimgeeahOWkp+S5sOWutuOAgg0KNu+8jDIwMTDl
-ubTliLDpppnmuK/ph4fotK3nmoTlm73lpJblrqLkurrlkI3lvZUo6aaZ5riv6LS45Y+R5bGA5o+Q
-5L6bKe+8jOWFsTcuMuS4h+aVsOaNru+8jOi2hee6p+mHjeimgeeahOS5sOWutuOAgg0KN++8jDQ4
-LjY45LiH5p2h5pyA5paw5Lmw5a626K+i55uY77yM6LSt5Lmw5ZCO5q+P5pyI5pu05pawIDEtMuS4
-h+adoe+8jOWMheaLrDLpg6jliIbvvIwx77yM5pyA5paw55qE6K+i55uYIDLvvIzmnIDmlrDnmoTl
-sZXkvJrkubDlrrbjgILlhY3otLnmm7TmlrAzNuS4quaciOOAgg0KOO+8jDIwMDnlubTmtbflhbPm
-j5DljZXmlbDmja5waWVyc+eJiOaVsOaNriAx5Y2D5LiH44CCDQoNCg0K6K+a5L+h5Li65pys77yM
-5pSv5oyB5pSv5LuY5a6d5ouF5L+d5Lqk5piTICjlhYjlj5HotKflubblronoo4Xorr7nva7nvqTl
-j5Hova/ku7bvvIznhLblkI7ku5jmrL4pIOW9u+W6leaJk+a2iOaCqOeahCDpob7omZHjgIINCg0K
-IA0KDQoNCiANCg0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaI
-kOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2u
-LeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K
+On Thu, Sep 8, 2011 at 12:13 PM, David Miller <davem@davemloft.net> wro=
+te:
+> From: Steve Grubb <sgrubb@redhat.com>
+
+>> This patch does not _break_ all existing applications. If a system w=
+ere under attack,
+>> they might pause momentarily, but they do not break. Please, try the=
+ patch and use a
+>> nice large number like 2000000 and see for yourself. Right now, ever=
+yone arguing about
+>> this breaking things have not tried it to see if in fact things do b=
+reak and how they
+>> break if they do.
+>
+> If the application holds a critical resource other threads want when =
+it
+> blocks on /dev/urandom, then your change breaks things. =A0I can come=
+ up
+> with more examples if you like.
+>
+> Please get off this idea that you can just change the blocking behavi=
+or
+> for a file descriptor and nothing of consequence will happen.
+
+I know it's work porting userspace, but would anyone think that a new
+char device to do this would be a good enough idea?  You obviously
+already worked out methods to port things which normally use urandom
+to use random to discover the problem, so most of the work should be
+done.  I suggest /dev/jkrandom (since this is half way between
+/dev/random and /dev/urandom and 'u' is the 21st letter it seemed
+appropriate to use letters 10 and 11)
+
+Thus userspace can decide what matters.  Always with entropy and
+blocks often (random).  From good enough entropy and rarely blocks
+(jkrandom).  Possibly from some entropy and never block (urandom).
+
+-Eric
