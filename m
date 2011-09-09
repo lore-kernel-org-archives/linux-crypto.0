@@ -1,13 +1,12 @@
-From: Sandy Harris <sandyinchina@gmail.com>
+From: Steve Grubb <sgrubb@redhat.com>
 Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Fri, 9 Sep 2011 10:21:13 +0800
-Message-ID: <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com>
-References: <1314974248-1511-1-git-send-email-jarod@redhat.com>
-	<1315464117.11199.51.camel@vespa.frost.loc>
-	<20110908125234.GD13657@hmsreliant.think-freely.org>
-	<201109080911.12921.sgrubb@redhat.com>
+Date: Fri, 9 Sep 2011 09:04:17 -0400
+Message-ID: <201109090904.18321.sgrubb@redhat.com>
+References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <201109080911.12921.sgrubb@redhat.com> <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Cc: Neil Horman <nhorman@redhat.com>, Tomas Mraz <tmraz@redhat.com>,
 	Sasha Levin <levinsasha928@gmail.com>,
 	"Ted Ts'o" <tytso@mit.edu>, Jarod Wilson <jarod@redhat.com>,
@@ -15,110 +14,47 @@ Cc: Neil Horman <nhorman@redhat.com>, Tomas Mraz <tmraz@redhat.com>,
 	Herbert Xu <herbert.xu@redhat.com>,
 	Stephan Mueller <stephan.mueller@atsec.com>,
 	lkml <linux-kernel@vger.kernel.org>
-To: Steve Grubb <sgrubb@redhat.com>
+To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:60210 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932548Ab1IICVP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Sep 2011 22:21:15 -0400
-In-Reply-To: <201109080911.12921.sgrubb@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:22200 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753299Ab1IINE2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Sep 2011 09:04:28 -0400
+In-Reply-To: <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 8, 2011 at 9:11 PM, Steve Grubb <sgrubb@redhat.com> wrote:
+On Thursday, September 08, 2011 10:21:13 PM Sandy Harris wrote:
+> > The system being low on entropy is another problem that should be
+> > addressed. For our purposes, we cannot say take it from TPM or RDRND or
+> > any plugin board. We have to have the mathematical analysis that goes
+> > with it, we need to know where the entropy comes from, and a worst case
+> > entropy estimation.
+> 
+> Much of that is in the driver code's comments or previous email
+> threads. For example,
+> this thread cover many of the issues:
+> http://yarchive.net/comp/linux/dev_random.html
+> There are plenty of others as well.
+> 
+> > It has to be documented in detail.
+> 
+> Yes. But apart from code comments, what documentation
+> are we talking about? Googling for /dev/random on tldp.org
+> turns up nothing that treats this in any detail.
 
-> The system being low on entropy is another problem that should be addressed. For our
-> purposes, we cannot say take it from TPM or RDRND or any plugin board. We have to have
-> the mathematical analysis that goes with it, we need to know where the entropy comes
-> from, and a worst case entropy estimation.
+Thanks for the reply. I see that you are trying to be helpful. But I think you 
+misunderstand what I was trying to say or maybe I was not entirely clear. We have the 
+correct analysis for the kernel and it does indeed pass FIPS-140, unaided. We know the 
+entropy comes from what the minimum entropy estimation is, and quality. (The only 
+issue is guaranteeing that any seed source must also include entropy.) 
 
-Much of that is in the driver code's comments or previous email
-threads. For example,
-this thread cover many of the issues:
-http://yarchive.net/comp/linux/dev_random.html
-There are plenty of others as well.
+But what I was trying to say is that we can't depend on these supplemental hardware 
+devices like TPM because we don't have access to the proprietary technical details 
+that would be necessary to supplement the analysis. And when it comes to TPM chips, I 
+bet each chip has different details and entropy sources and entropy estimations and 
+rates. Those details we can't get at, so we can't solve the problem by including that 
+hardware. That is the point I was trying to make. :)
 
-> It has to be documented in detail.
-
-Yes. But apart from code comments, what documentation
-are we talking about? Googling for /dev/random on tldp.org
-turns up nothing that treats this in any detail.
-
-
-> The only
-> way we can be certain is if its based on system events. Linux systems are constantly
-> low on entropy and this really needs addressing. But that is a separate issue. For
-> real world use, I'd recommend everyone use a TPM chip + rngd and you'll never be short
-> on random numbers.
-
-Yes. Here's something I wrote on the Debian Freedombox list:
-
-| No problem on a typical Linux desktop; it does not
-| do much crypto and /dev/random gets input from
-| keyboard & mouse movement, disk delays, etc.
-| However, it might be a major problem for a plug
-| server that does more crypto, runs headless, and
-| use solid state storage.
-
-| Some plug computers may have a hardware RNG,
-| which is the best solution, but we cannot count on
-| that in the general case.
-
-| Where the plug has a sound card equivalent, and
-| it isn't used for sound, there is a good solution
-| using circuit noise in the card as the basis for
-| a hardware RNG.
-| http://www.av8n.com/turbid/paper/turbid.htm
-
-| A good academic paper on the problem is:
-| https://db.usenix.org/publications/library/proceedings/sec98/gutmann.html
-
-| However, his software does not turn up in
-| the Ubuntu repository. Is it in Debian?
-| Could it be?
-
-| Ubuntu, and I assume Debian, does have
-| Havege, another researcher's solution
-| to the same problem.
-| http://www.irisa.fr/caps/projects/hipsor/
-
-Some of that sort of discussion should be in the documentation.
-I'm not sure how much currently is.
-
-> But in the case where we are certifying the OS, we need the
-> mathematical argument to prove that unaided, things are correct.
-
-No, we cannot "prove that unaided, things are correct" if
-by "correct" you mean urandom output is safe against all
-conceivable attacks and by "unaided" you mean without
-new entropy inputs. It is a PRNG, so without reseeding it
-must be breakable in theory; that comes with the territory.
-
-That need not be a problem, though. We cannot /prove/
-that any of the ciphers or hashes in widespread use are
-correct either. In fact, we can prove the opposite; they
-are all provably breakable by an opponent with enough
-resources, for extremely large values of enough.
-
-Consider a block cipher like AES: there are three known
-attacks that must break it in theory -- brute force search
-for the key, or reduce the cipher to a set of equations
-then feed in some known plaintext/ciphertext pairs and
-solve for the key, or just collect enough known pairs to
-build a codebook that breaks the cipher. We know the
-brute force and codebook attacks are astronomically
-expensive, and there are good arguments that algebra
-is as well, but they all work in theory. Despite that, we
-can use AES with reasonable confidence and with
-certifications from various government bodies.
-
-There are similar arguments for confidence in urandom.
-The simplest are the size of the state relative to the
-outputs and the XOR that reduces 160 bits of SHA-1
-output to 80 of generator output. More detailed discussion is
-in the first thread I cited above.
-
-Barring a complete failure of SHA-1, an enemy who wants to
-infer the state from outputs needs astronomically large amounts
-of both data and effort.
+Thanks,
+-Steve
