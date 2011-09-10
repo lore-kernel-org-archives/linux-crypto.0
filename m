@@ -1,42 +1,58 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Fri, 9 Sep 2011 23:27:32 +0200 (CEST)
-Message-ID: <alpine.LFD.2.02.1109092241390.2723@ionos>
-References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <201109080911.12921.sgrubb@redhat.com> <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com> <201109090904.18321.sgrubb@redhat.com>
+From: =?utf-8?B?5LuFMTDlhYPmr4/lpKk=?= <admin@vetrasa.com>
+Subject: =?utf-8?B?576k5Y+R6L2v5Lu2K+S5sOWutuaQnOe0ouacuisxMDnlsYrlub/kuqTkvJrkubDlrrY=?=
+	=?utf-8?B?44CB5rW35YWz5pWw5o2uLEIyQuivouebmOS5sOWutjUwMOS4h+OAgg==?=
+Date: Sat, 10 Sep 2011 21:30:30 +0000 (UTC)
+Message-ID: <20111211045800470330@vetrasa.com>
+Reply-To: <1339625218@qq.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Sandy Harris <sandyinchina@gmail.com>,
-	Neil Horman <nhorman@redhat.com>,
-	Tomas Mraz <tmraz@redhat.com>,
-	Sasha Levin <levinsasha928@gmail.com>,
-	Ted Ts'o <tytso@mit.edu>, Jarod Wilson <jarod@redhat.com>,
-	linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert.xu@redhat.com>,
-	Stephan Mueller <stephan.mueller@atsec.com>,
-	lkml <linux-kernel@vger.kernel.org>
-To: Steve Grubb <sgrubb@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <201109090904.18321.sgrubb@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from vetrasa.com ([186.32.190.179]:25978 "EHLO mail.vetrasa.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933810Ab1IJVa1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 10 Sep 2011 17:30:27 -0400
+Date: Sun, 11 Dec 2011 04:57:54 +0800
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 9 Sep 2011, Steve Grubb wrote:
-> But what I was trying to say is that we can't depend on these supplemental hardware 
-> devices like TPM because we don't have access to the proprietary technical details 
-> that would be necessary to supplement the analysis. And when it comes to TPM chips, I 
-> bet each chip has different details and entropy sources and entropy estimations and 
-> rates. Those details we can't get at, so we can't solve the problem by including that 
-> hardware. That is the point I was trying to make. :)
-
-Well, there is enough prove out there that the hardware you're using
-is a perfect random number generator by itself.
-
-So stop complaining about not having access to TPM chips if you can
-create an entropy source just by (ab)using the inherent randomness of
-modern CPU architectures to refill your entropy pool on the fly when
-the need arises w/o imposing completely unintuitive thresholds and
-user visible API changes.
-
-Thanks,
-
-	tglx
+576k5Y+R6L2v5Lu2KzEwOeWxiuW5v+S6pOS8muS5sOWutuOAgea1t+WFs+aVsOaNruOAgeaQnOe0
+ouW8leaTjuS5sOWutixCMkLor6Lnm5jkubDlrrblhbE1MDDkuIcs5LuFMTDlhYPmr4/lpKnjgIIg
+DQrkv53or4Hmr4/lpKnpg73mnInkubDlrrblm57lpI3jgIINCuS/neivgeavj+WkqemDveacieS5
+sOWutuWbnuWkjeOAgg0KDQoNCjHjgIHnvqTlj5Hova/ku7bvvJog5pON5L2c566A5Y2V77yM5Yqf
+6IO95by65aSn77yM5qih5Lu/5Lq65bel5pON5L2c5qih5byP77yM5Yiw6L6+546H6auY77yM5pel
+5Y+R6YCBNeS4h+WwgeS7peS4iuOAgiANCjLjgIE1MDDkuIfkubDlrrbotYTmupDvvJog6LWg6YCB
+55qENTAw5LiH5Lmw5a626LWE5rqQ5bqT77yM5pu05pawICjlj6/ku6XmjInnhafmgqjnmoTkuqfl
+k4Hmj5Dlj5blh7rmnaXvvIzmm7Tnsr7lh4blvIDlj5Ep44CCIA0KM+OAgei2hee6p+a1t+WkluS5
+sOWutkVtYWls5pCc57Si5py677yaIOWGhee9ruS6hjYwMOS4h+ihjOS4muWFs+mUruivje+8jOag
+ueaNrumVv+WwvuivjeaQnOe0ou+8jOe7k+aenOabtOeyvuehruWMuemFje+8m+avj+WkqeiDveaQ
+nOe0ojEtMuS4h+S7peS4iuS5sOWutuecn+WunkVNQUlM77yM5oiQ5Y2V546H6auY44CCIA0KIA0K
+DQropoHnmoTmipPntKfogZTns7tRUTogMTMzOTYyNTIxOCAgIOaIluiAheeri+WNs+WbnuWkjemC
+rueusTogMTMzOTYyNTIxOEBxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiAxMzM5NjI1MjE4
+ICAg5oiW6ICF56uL5Y2z5Zue5aSN6YKu566xOiAxMzM5NjI1MjE4QHFxLmNvbQ0K6KaB55qE5oqT
+57Sn6IGU57O7UVE6IDEzMzk2MjUyMTggICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDEzMzk2
+MjUyMThAcXEuY29tDQogDQrlhY3otLnotaDpgIE6DQrkuIDlhbE45Liq5YyFKOaVsOaNruaYr+WF
+qOihjOS4mueahO+8jOaMieeFp+ihjOS4muWIhuWlveexu++8jOW5tuS4lOWPr+S7peaMieeFp+WF
+s+mUruivjeafpeivoueahCnvvJogDQox77yMMjAxMeaYpeWtozEwOeWxiuW5v+S6pOS8muS5sOWu
+tueOsOWcuuivouebmOaVsOaNruW6k+aWsOmynOWHuueCie+8jOi2hee6p+aWsOmynOS5sOWutu+8
+jOaWsOmynOaVsOaNru+8jOWuueaYk+aIkOWNle+8gSANCjLvvIzotK3kubDlkI7lj6/ku6XlhY3o
+tLnmm7TmlrAyMDEx56eL5a2j5bm/5Lqk5LyaKzIwMTLmmKXlraPlub/kuqTkvJrkubDlrrbmlbDm
+ja7jgILlpKrotoXlgLzkuobjgIINCjPvvIzmnIDmlrDlhajnkIPkubDlrrblupMs5YWxNDUxNjYw
+5p2h5pWw5o2u44CCICjmnIDmlrDmm7TmlrDml6XmnJ8gMjAxMS0wNS0xNuaXpSkNCjTvvIwyMDA4
+5bm0LDIwMDnlubQsMjAxMOW5tCDmmKXlraMr56eL5a2j5bm/5Lqk5Lya5Lmw5a625ZCN5b2V77yM
+MTAzIDEwNCAxMDUgMTA2IDEwNyAxMDgg5YWx5YWt5bGKIOWFsTEyMC425LiH5pWw5o2u44CCDQo1
+77yMMjAxMOW5tOWbvemZheS/g+mUgOWNj+S8mu+8iFBQQUnvvInmiJDlkZjlkI3ljZUgUFBBSSBN
+ZW1iZXJzIERpcmVjdG9yee+8jOmdnuW4uOmHjeimgeeahOWkp+S5sOWutuOAgg0KNu+8jDIwMTDl
+ubTliLDpppnmuK/ph4fotK3nmoTlm73lpJblrqLkurrlkI3lvZUo6aaZ5riv6LS45Y+R5bGA5o+Q
+5L6bKe+8jOWFsTcuMuS4h+aVsOaNru+8jOi2hee6p+mHjeimgeeahOS5sOWutuOAgg0KN++8jDQ4
+LjY45LiH5p2h5pyA5paw5Lmw5a626K+i55uY77yM6LSt5Lmw5ZCO5q+P5pyI5pu05pawIDEtMuS4
+h+adoe+8jOWMheaLrDLpg6jliIbvvIwx77yM5pyA5paw55qE6K+i55uYIDLvvIzmnIDmlrDnmoTl
+sZXkvJrkubDlrrbjgILlhY3otLnmm7TmlrAzNuS4quaciOOAgg0KOO+8jDIwMDnlubTmtbflhbPm
+j5DljZXmlbDmja5waWVyc+eJiOaVsOaNriAx5Y2D5LiH44CCDQoNCg0K6K+a5L+h5Li65pys77yM
+5pSv5oyB5pSv5LuY5a6d5ouF5L+d5Lqk5piTICjlhYjlj5HotKflubblronoo4Xorr7nva7nvqTl
+j5Hova/ku7bvvIznhLblkI7ku5jmrL4pIOW9u+W6leaJk+a2iOaCqOeahCDpob7omZHjgIINCg0K
+IA0KDQoNCiANCg0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaI
+kOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2u
+LeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K
