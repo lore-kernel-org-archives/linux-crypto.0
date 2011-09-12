@@ -1,68 +1,69 @@
-From: Valdis.Kletnieks@vt.edu
+From: Jarod Wilson <jarod@redhat.com>
 Subject: Re: [PATCH] random: add blocking facility to urandom
-Date: Sat, 10 Sep 2011 22:05:46 -0400
-Message-ID: <118704.1315706746@turing-police.cc.vt.edu>
-References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <1315464117.11199.51.camel@vespa.frost.loc> <20110908125234.GD13657@hmsreliant.think-freely.org> <201109080911.12921.sgrubb@redhat.com>
-            <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com>
+Date: Mon, 12 Sep 2011 09:55:15 -0400
+Message-ID: <4E6E0F43.6070307@redhat.com>
+References: <1314974248-1511-1-git-send-email-jarod@redhat.com> <1315464117.11199.51.camel@vespa.frost.loc> <20110908125234.GD13657@hmsreliant.think-freely.org> <201109080911.12921.sgrubb@redhat.com>            <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com> <118704.1315706746@turing-police.cc.vt.edu>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1315706745_28234P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Steve Grubb <sgrubb@redhat.com>, Neil Horman <nhorman@redhat.com>,
+Cc: Sandy Harris <sandyinchina@gmail.com>,
+	Steve Grubb <sgrubb@redhat.com>,
+	Neil Horman <nhorman@redhat.com>,
 	Tomas Mraz <tmraz@redhat.com>,
 	Sasha Levin <levinsasha928@gmail.com>,
-	"Ted Ts'o" <tytso@mit.edu>, Jarod Wilson <jarod@redhat.com>,
-	linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+	"Ted Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+	Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert.xu@redhat.com>,
 	Stephan Mueller <stephan.mueller@atsec.com>,
 	lkml <linux-kernel@vger.kernel.org>
-To: Sandy Harris <sandyinchina@gmail.com>
+To: Valdis.Kletnieks@vt.edu
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:45508 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758682Ab1IKCGD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 10 Sep 2011 22:06:03 -0400
-In-Reply-To: Your message of "Fri, 09 Sep 2011 10:21:13 +0800."
-             <CACXcFmnnMLHq2VE35i4QK4wNePXHJc6T73VQNTmJo7WEz34DaQ@mail.gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:42958 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754774Ab1ILN7l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Sep 2011 09:59:41 -0400
+In-Reply-To: <118704.1315706746@turing-police.cc.vt.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---==_Exmh_1315706745_28234P
-Content-Type: text/plain; charset=us-ascii
+Valdis.Kletnieks@vt.edu wrote:
+> On Fri, 09 Sep 2011 10:21:13 +0800, Sandy Harris said:
+>> Barring a complete failure of SHA-1, an enemy who wants to
+>> infer the state from outputs needs astronomically large amounts
+>> of both data and effort.
+>
+> So let me get this straight - the movie-plot attack we're defending against is
+> somebody readin literally gigabytes to terabytes (though I suspect realistic
+> attacks will require peta/exabytes) of data from /dev/urandom, then performing
+> all the data reduction needed to infer the state of enough of the entropy pool
+> to infer all 160 bits of SHA-1 when only 80 bits are output...
+>
+> *and* doing it all without taking *any* action that adds any entropy to the
+> pool, and *also* ensuring that no other programs add any entropy via their
+> actions before the reading and data reduction completes. (Hint - if the
+> attacker can do this, you're already pwned and have bigger problems)
+>
+> /me thinks RedHat needs to start insisting on random drug testing for
+> their security experts at BSI.  EIther that, or force BSI to share the
+> really good stuff they've been smoking, or they need to learn how huge
+> a number 2^160 *really* is....
 
-On Fri, 09 Sep 2011 10:21:13 +0800, Sandy Harris said:
-> Barring a complete failure of SHA-1, an enemy who wants to
-> infer the state from outputs needs astronomically large amounts
-> of both data and effort.
+Well, previously, we were looking at simply improving random entropy 
+contributions, but quoting Matt Mackall from here:
 
-So let me get this straight - the movie-plot attack we're defending against is
-somebody readin literally gigabytes to terabytes (though I suspect realistic
-attacks will require peta/exabytes) of data from /dev/urandom, then performing
-all the data reduction needed to infer the state of enough of the entropy pool
-to infer all 160 bits of SHA-1 when only 80 bits are output...
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05799.html
 
-*and* doing it all without taking *any* action that adds any entropy to the
-pool, and *also* ensuring that no other programs add any entropy via their
-actions before the reading and data reduction completes. (Hint - if the
-attacker can do this, you're already pwned and have bigger problems)
+'I recommend you do some Google searches for "ssl timing attack" and 
+"aes timing attack" to get a feel for the kind of seemingly impossible 
+things that can be done and thereby recalibrate your scale of the 
+impossible.'
 
-/me thinks RedHat needs to start insisting on random drug testing for
-their security experts at BSI.  EIther that, or force BSI to share the
-really good stuff they've been smoking, or they need to learn how huge
-a number 2^160 *really* is....
+:)
 
+Note: I'm not a crypto person. At all. I'm just the "lucky" guy who got 
+tagged to work on trying to implement various suggestions to satisfy 
+various government agencies.
 
---==_Exmh_1315706745_28234P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFObBd5cC3lWbTT17ARAiJDAKCfrzp7udA1haRF+OhRfyrjwLPcFwCfaI7M
-ObCuxyAWv2Ra4E0LvLriDTM=
-=4CR4
------END PGP SIGNATURE-----
-
---==_Exmh_1315706745_28234P--
+-- 
+Jarod Wilson
+jarod@redhat.com
