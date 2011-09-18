@@ -1,65 +1,60 @@
-From: msb@google.com
-Subject: Re: [PATCH] lib/sha1.c: quite sparse noise about symbol not
- declared
-Date: Tue, 13 Sep 2011 14:58:51 -0700
-Message-ID: <20110913215851.GD9560@google.com>
-References: <201109091130.28110.hartleys@visionengravers.com>
+From: =?utf-8?B?5LuFMTDlhYPmr4/lpKk=?= <admin@gener-tech.net>
+Subject: =?utf-8?B?576k5Y+R6L2v5Lu2K+S5sOWutuaQnOe0ouacuisxMDnlsYrlub/kuqTkvJrkubDlrrY=?=
+	=?utf-8?B?44CB5rW35YWz5pWw5o2uLEIyQuivouebmOS5sOWutjUwMOS4h+OAgg==?=
+Date: Sun, 18 Sep 2011 01:02:50 +0000 (UTC)
+Message-ID: <20120918084114231066@gener-tech.net>
+Reply-To: <1339625218@qq.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-To: H Hartley Sweeten <hartleys@visionengravers.com>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+To: <linspj@aol.com>, <linsaini@hotmail.com>, <lintou567@yahoo.com.cn>,
+	<linust@interramp.com>, <linux-crypto@vger.kernel.org>,
+	<linux-net@vger.kernel.org>, <linvoleather@gmail.com>,
+	<lin
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp-out.google.com ([74.125.121.67]:19952 "EHLO
-	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932897Ab1IMV7M (ORCPT
+Received: from [180.168.143.187] ([180.168.143.187]:10176 "EHLO
+	gener-bxz7t1o42.gener-tech.net" rhost-flags-FAIL-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752202Ab1IRBCl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Sep 2011 17:59:12 -0400
-Received: from wpaz21.hot.corp.google.com (wpaz21.hot.corp.google.com [172.24.198.85])
-	by smtp-out.google.com with ESMTP id p8DLx91F022117
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2011 14:59:10 -0700
-Received: from pzk1 (pzk1.prod.google.com [10.243.19.129])
-	by wpaz21.hot.corp.google.com with ESMTP id p8DLwxc6024599
-	(version=TLSv1/SSLv3 cipher=RC4-SHA bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2011 14:59:08 -0700
-Received: by pzk1 with SMTP id 1so2026536pzk.30
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2011 14:59:07 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <201109091130.28110.hartleys@visionengravers.com>
+	Sat, 17 Sep 2011 21:02:41 -0400
+Date: Tue, 18 Sep 2012 08:41:00 +0800
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-+cc linux-crypto, herbert, davem, torvalds
-
-H Hartley Sweeten (hartleys@visionengravers.com) wrote:
-> Include <linux/cryptohash.h> to pickup the declarations for sha_transform
-> and sha_init to quite the sparse noise:
-> 
-> warning: symbol 'sha_transform' was not declared. Should it be static?
-> warning: symbol 'sha_init' was not declared. Should it be static?
-> 
-> Signed-off-by: H Hartley Sweeten <hsweeten@visionengravers.com>
-> Cc: Mandeep Singh Baines <msb@chromium.org>
-> 
-
-Acked-by: Mandeep Singh Baines <msb@chromium.org>
-
-Thanks.
-
-> ---
-> 
-> diff --git a/lib/sha1.c b/lib/sha1.c
-> index f33271d..1de509a 100644
-> --- a/lib/sha1.c
-> +++ b/lib/sha1.c
-> @@ -8,6 +8,7 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/bitops.h>
-> +#include <linux/cryptohash.h>
->  #include <asm/unaligned.h>
->  
->  /*
+576k5Y+R6L2v5Lu2KzEwOeWxiuW5v+S6pOS8muS5sOWutuOAgea1t+WFs+aVsOaNruOAgeaQnOe0
+ouW8leaTjuS5sOWutixCMkLor6Lnm5jkubDlrrblhbE1MDDkuIcs5LuFMTDlhYPmr4/lpKnjgIIg
+DQrkv53or4Hmr4/lpKnpg73mnInkubDlrrblm57lpI3jgIINCuS/neivgeavj+WkqemDveacieS5
+sOWutuWbnuWkjeOAgg0KDQoNCjHjgIHnvqTlj5Hova/ku7bvvJog5pON5L2c566A5Y2V77yM5Yqf
+6IO95by65aSn77yM5qih5Lu/5Lq65bel5pON5L2c5qih5byP77yM5Yiw6L6+546H6auY77yM5pel
+5Y+R6YCBNeS4h+WwgeS7peS4iuOAgiANCjLjgIE1MDDkuIflub/kuqTkvJrkubDlrrbotYTmupDv
+vJog6LWg6YCB55qENTAw5LiH5Lmw5a626LWE5rqQ5bqT77yM5q+P5pyI5pu05pawIOOAgiANCjPj
+gIHotoXnuqfmtbflpJbkubDlrrZFbWFpbOaQnOe0ouacuu+8miDmr4/lpKnog73mkJzntKIxLTLk
+uIfku6XkuIrkubDlrrbnnJ/lrp5FTUFJTO+8jOaIkOWNleeOh+mrmOOAgiANCiANCg0K6KaB55qE
+5oqT57Sn6IGU57O7UVE6IDEzMzk2MjUyMTggICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDEz
+Mzk2MjUyMThAcXEuY29tDQropoHnmoTmipPntKfogZTns7tRUTogMTMzOTYyNTIxOCAgIOaIluiA
+heeri+WNs+WbnuWkjemCrueusTogMTMzOTYyNTIxOEBxcS5jb20NCuimgeeahOaKk+e0p+iBlOez
+u1FROiAxMzM5NjI1MjE4ICAg5oiW6ICF56uL5Y2z5Zue5aSN6YKu566xOiAxMzM5NjI1MjE4QHFx
+LmNvbQ0KDQrlhY3otLnotaDpgIE6DQrkuIDlhbE45Liq5YyFKOaVsOaNruaYr+WFqOihjOS4muea
+hO+8jOaMieeFp+ihjOS4muWIhuWlveexu++8jOW5tuS4lOWPr+S7peaMieeFp+WFs+mUruivjeaf
+peivoueahCnvvJogDQox77yMMjAxMeaYpeWtozEwOeWxiuW5v+S6pOS8muS5sOWutueOsOWcuuiv
+ouebmOaVsOaNruW6k+aWsOmynOWHuueCie+8jOi2hee6p+aWsOmynOS5sOWutu+8jOaWsOmynOaV
+sOaNru+8jOWuueaYk+aIkOWNle+8gSANCjLvvIzotK3kubDlkI7lj6/ku6XlhY3otLnmm7TmlrAy
+MDEx56eL5a2j5bm/5Lqk5LyaKzIwMTLmmKXlraPlub/kuqTkvJrkubDlrrbmlbDmja7jgILlpKro
+toXlgLzkuobjgIINCjPvvIzmnIDmlrDlhajnkIPkubDlrrblupMs5YWxNDUxNjYw5p2h5pWw5o2u
+44CCICjmnIDmlrDmm7TmlrDml6XmnJ8gMjAxMS0wNS0xNuaXpSkNCjTvvIwyMDA45bm0LDIwMDnl
+ubQsMjAxMOW5tCDmmKXlraMr56eL5a2j5bm/5Lqk5Lya5Lmw5a625ZCN5b2V77yMMTAzIDEwNCAx
+MDUgMTA2IDEwNyAxMDgg5YWx5YWt5bGKIOWFsTEyMC425LiH5pWw5o2u44CCDQo177yMMjAxMOW5
+tOWbvemZheS/g+mUgOWNj+S8mu+8iFBQQUnvvInmiJDlkZjlkI3ljZUgUFBBSSBNZW1iZXJzIERp
+cmVjdG9yee+8jOmdnuW4uOmHjeimgeeahOWkp+S5sOWutuOAgg0KNu+8jDIwMTDlubTliLDpppnm
+uK/ph4fotK3nmoTlm73lpJblrqLkurrlkI3lvZUo6aaZ5riv6LS45Y+R5bGA5o+Q5L6bKe+8jOWF
+sTcuMuS4h+aVsOaNru+8jOi2hee6p+mHjeimgeeahOS5sOWutuOAgg0KN++8jDQ4LjY45LiH5p2h
+5pyA5paw5Lmw5a626K+i55uY77yM6LSt5Lmw5ZCO5q+P5pyI5pu05pawIDEtMuS4h+adoe+8jOWM
+heaLrDLpg6jliIbvvIwx77yM5pyA5paw55qE6K+i55uYIDLvvIzmnIDmlrDnmoTlsZXkvJrkubDl
+rrbjgILlhY3otLnmm7TmlrAzNuS4quaciOOAgg0KOO+8jDIwMDnlubTmtbflhbPmj5DljZXmlbDm
+ja5waWVyc+eJiOaVsOaNriAx5Y2D5LiH44CCDQoNCg0K6K+a5L+h5Li65pys77yM5pSv5oyB5pSv
+5LuY5a6d5ouF5L+d5Lqk5piTICjlhYjlj5HotKflubblronoo4Xorr7nva7nvqTlj5Hova/ku7bv
+vIznhLblkI7ku5jmrL4pIOW9u+W6leaJk+a2iOaCqOeahCDpob7omZHjgIINCg0KIA0KDQoNCiAN
+Cg0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+ae
+gemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeO
+h+aegemrmA0K57K+5YeG5pWw5o2uLeaIkOWNleeOh+aegemrmA0K
