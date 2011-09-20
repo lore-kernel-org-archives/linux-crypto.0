@@ -1,71 +1,60 @@
-From: Sven Schnelle <svens@stackframe.org>
-Subject: Re: Kernel OOPS with Freescale talitos driver on ppc
-Date: Tue, 20 Sep 2011 09:40:39 +0200
-Message-ID: <87zkhz3bm0.fsf@begreifnix.stackframe.org>
-References: <877h544vh6.fsf@begreifnix.stackframe.org>
-	<20110919162001.e296597e.kim.phillips@freescale.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [RFC v2.1 0/6] evm: digital signature verification extension
+Date: Tue, 20 Sep 2011 09:24:28 -0400
+Message-ID: <1316525069.3189.4.camel@localhost.localdomain>
+References: <cover.1315921427.git.dmitry.kasatkin@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: <linux-crypto@vger.kernel.org>
-To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.duncanthrax.net ([89.31.1.170]:33173 "EHLO
-	smtp.duncanthrax.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753723Ab1ITHko (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Sep 2011 03:40:44 -0400
-In-Reply-To: <20110919162001.e296597e.kim.phillips@freescale.com> (Kim Phillips's message of "Mon\, 19 Sep 2011 16\:20\:01 -0500")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-security-module@vger.kernel.org,
+	Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dhowells@redhat.com,
+	Greg KH <greg@kroah.com>,
+	"Serge E. Hallyn" <serge.hallyn@canonical.com>
+To: herbert@gondor.hengli.com.au
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <cover.1315921427.git.dmitry.kasatkin@intel.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Kim Phillips <kim.phillips@freescale.com> writes:
+On Tue, 2011-09-13 at 17:20 +0300, Dmitry Kasatkin wrote: 
+> Hello,
+> 
+> Changes to version 2.0:
+> - MPI patch has been split to smaller in order to go to mailing lists.
+>   First 2 patches include only source and header files which are needed
+>   to build ksign verification. Headers and sources are split just to
+>   meet 100k kernel.org limit.
+>   Last patch adds all rest soures from original ported MPI library.
+>   
+> Changes to version 1.1:
+> - GnuPG MPI library has been refactored with lindent and checkpatch errors
+>   and warnings has been fixed.
+> - creation of evm keyring has been remove. It is done now in user space.
+> - related ksign and evm patches has been squashed.
+> - patch descriptions has been updated.
+> 
+> As EVM patches were recently merged to security-testing-2.6#next,
+> it is a good time to resend evm signature verification patches for active
+> discussion. Last time I forgot --cc linux-crypto. Here it is.
+> 
+> This patchset introduces digital signature extensions for the IMA/EVM kernel
+> integrity subsystem and is applied on the top of the EVM patches posted to
+> LSM mailing list earlier.
 
-> On Mon, 19 Sep 2011 13:33:57 +0200
-> Sven Schnelle <svens@stackframe.org> wrote:
->
->> Hi Kim,
->> 
->> i'm seeing the following oops on ppc (Freescale P1020):
->> 
->> talitos ffe30000.crypto: cur_desc: (channel 1) 00000000
->> Unable to handle kernel paging request for data at address 0x00000000
->
-> You should have seen the "couldn't locate current descriptor" error
-> message right before it crashed.
+Hi Herbert
 
-Yes, that message is printed before the oops output. Sorry for cutting
-that off in the dmesg output.
+Back in March 2011, in preparation for EVM, Dmitry posted the GnuPG MPI
+library patch here on linux-crypto. The reason given for not upstreaming
+the MPI library, at the time, was for lack of an in kernel user
+(http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05613.html).
+With the recent merging of the EVM patches in linux-next, via
+security-testing-2.6/#next, that is changing.  Any chance of re-opening
+the discussion? 
 
->> I've fixed that with the attached patch, however, i have no idea why the
->> SEC engine doesn't return a descriptor pointer in CDPR. As i understand
->> the documentation, it should put the 'currently processed' descriptor
->> there. Can someone shed some light on this?
->
-> I believe the CDPR may be overwritten by the time the core gets to
-> it if there is another descriptor queued in the channel's fetch
-> FIFO.
+thanks,
 
-Hmm, i don't see that there are any other descriptor queued. But i can
-add debug later.
+Mimi
 
-> You may be able to glean more information about what happened
-> by looking at the ISR execution units done/error bits in isr_lo, the
-> descriptor buffer (displayed at the end of report_eu_error), or the
-> EU ISRs themselves (see below).
-
-The AESU unit says "data size error", probably because the input data to
-aead_decrypt() isn't a multiple of the block size. I'm currently fixing
-this in the code. However, i'm not sure if the crypto api or the HW
-driver should pad the data to blocksize in such cases.
-
-> fwiw, I just booted a vanilla 3.1-rc6 kernel on a p1020 with your
-> config and CONFIG_CRYPTO_MANAGER_DISABLE_TESTS not set, and the
-> selftests passed.  IPSec isn't enabled in your config.  Are you
-> implementing a new algorithm?  If not, how to reproduce?
-
-It is a custom layer 2 tunneling protocol, which doesn't use IPSec.
-That's the reson we don't have that option enabled.
-
-Thanks,
-
-Sven
