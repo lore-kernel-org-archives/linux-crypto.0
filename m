@@ -1,18 +1,18 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v3 06/17] crypto: Add userspace report for larval type
+Subject: [PATCH v3 07/17] crypto: Add userspace report for shash type
  algorithms
-Date: Wed, 21 Sep 2011 11:04:08 +0200
-Message-ID: <20110921090408.GK1808@secunet.com>
+Date: Wed, 21 Sep 2011 11:04:49 +0200
+Message-ID: <20110921090449.GL1808@secunet.com>
 References: <20110921085855.GE1808@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:35717 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:35737 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750873Ab1IUJEK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Sep 2011 05:04:10 -0400
+	id S1750873Ab1IUJEv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Sep 2011 05:04:51 -0400
 Content-Disposition: inline
 In-Reply-To: <20110921085855.GE1808@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -21,57 +21,77 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/crypto_user.c       |   12 ++++++++++++
- include/linux/cryptouser.h |    5 +++++
- 2 files changed, 17 insertions(+), 0 deletions(-)
+ crypto/shash.c             |   21 +++++++++++++++++++++
+ include/linux/cryptouser.h |    7 +++++++
+ 2 files changed, 28 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 12cec5e..a5e92a3 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -83,11 +83,23 @@ static int crypto_report_one(struct crypto_alg *alg,
- 	ualg->cru_priority = alg->cra_priority;
- 	ualg->cru_refcnt = atomic_read(&alg->cra_refcnt);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 76f74b9..cc3049f 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -17,6 +17,8 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/seq_file.h>
++#include <linux/cryptouser.h>
++#include <net/netlink.h>
  
-+	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
-+		struct crypto_report_larval rl;
-+
-+		snprintf(rl.type, CRYPTO_MAX_ALG_NAME, "%s", "larval");
-+
-+		NLA_PUT(skb, CRYPTOCFGA_REPORT_LARVAL,
-+			sizeof(struct crypto_report_larval), &rl);
-+
-+		goto out;
-+	}
-+
- 	if (alg->cra_type && alg->cra_type->report) {
- 		if (alg->cra_type->report(skb, alg))
- 			goto nla_put_failure;
- 	}
+ #include "internal.h"
  
-+out:
- 	return 0;
+@@ -522,6 +524,24 @@ static unsigned int crypto_shash_extsize(struct crypto_alg *alg)
+ 	return alg->cra_ctxsize;
+ }
  
- nla_put_failure:
++static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_hash rhash;
++	struct shash_alg *salg = __crypto_shash_alg(alg);
++
++	snprintf(rhash.type, CRYPTO_MAX_ALG_NAME, "%s", "shash");
++	rhash.blocksize = alg->cra_blocksize;
++	rhash.digestsize = salg->digestsize;
++
++	NLA_PUT(skb, CRYPTOCFGA_REPORT_SHASH,
++		sizeof(struct crypto_report_hash), &rhash);
++
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++
+ static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
+ 	__attribute__ ((unused));
+ static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
+@@ -541,6 +561,7 @@ static const struct crypto_type crypto_shash_type = {
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_shash_show,
+ #endif
++	.report = crypto_shash_report,
+ 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
+ 	.maskset = CRYPTO_ALG_TYPE_MASK,
+ 	.type = CRYPTO_ALG_TYPE_SHASH,
 diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 424d991..59d801f 100644
+index 59d801f..c94649f 100644
 --- a/include/linux/cryptouser.h
 +++ b/include/linux/cryptouser.h
-@@ -36,6 +36,7 @@ enum {
- enum crypto_attr_type_t {
+@@ -37,6 +37,7 @@ enum crypto_attr_type_t {
  	CRYPTOCFGA_UNSPEC,
  	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
-+	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
+ 	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
++	CRYPTOCFGA_REPORT_SHASH,	/* struct crypto_report_hash */
  	__CRYPTOCFGA_MAX
  
  #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-@@ -51,3 +52,7 @@ struct crypto_user_alg {
- 	__u32 cru_refcnt;
- 	__u32 cru_flags;
+@@ -56,3 +57,9 @@ struct crypto_user_alg {
+ struct crypto_report_larval {
+ 	char type[CRYPTO_MAX_NAME];
  };
 +
-+struct crypto_report_larval {
++struct crypto_report_hash {
 +	char type[CRYPTO_MAX_NAME];
++	unsigned int blocksize;
++	unsigned int digestsize;
 +};
 -- 
 1.7.0.4
