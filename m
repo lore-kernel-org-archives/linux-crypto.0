@@ -1,18 +1,18 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v3 07/17] crypto: Add userspace report for shash type
+Subject: [PATCH v3 08/17] crypto: Add userspace report for ahash type
  algorithms
-Date: Wed, 21 Sep 2011 11:04:49 +0200
-Message-ID: <20110921090449.GL1808@secunet.com>
+Date: Wed, 21 Sep 2011 11:05:36 +0200
+Message-ID: <20110921090536.GM1808@secunet.com>
 References: <20110921085855.GE1808@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:35737 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:35748 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750873Ab1IUJEv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Sep 2011 05:04:51 -0400
+	id S1750873Ab1IUJFj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Sep 2011 05:05:39 -0400
 Content-Disposition: inline
 In-Reply-To: <20110921085855.GE1808@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -21,16 +21,16 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- crypto/shash.c             |   21 +++++++++++++++++++++
- include/linux/cryptouser.h |    7 +++++++
- 2 files changed, 28 insertions(+), 0 deletions(-)
+ crypto/ahash.c             |   21 +++++++++++++++++++++
+ include/linux/cryptouser.h |    1 +
+ 2 files changed, 22 insertions(+), 0 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 76f74b9..cc3049f 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -17,6 +17,8 @@
- #include <linux/module.h>
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index f669822..d5798fe 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -21,6 +21,8 @@
+ #include <linux/sched.h>
  #include <linux/slab.h>
  #include <linux/seq_file.h>
 +#include <linux/cryptouser.h>
@@ -38,20 +38,20 @@ index 76f74b9..cc3049f 100644
  
  #include "internal.h"
  
-@@ -522,6 +524,24 @@ static unsigned int crypto_shash_extsize(struct crypto_alg *alg)
- 	return alg->cra_ctxsize;
+@@ -397,6 +399,24 @@ static unsigned int crypto_ahash_extsize(struct crypto_alg *alg)
+ 	return sizeof(struct crypto_shash *);
  }
  
-+static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
 +{
 +	struct crypto_report_hash rhash;
-+	struct shash_alg *salg = __crypto_shash_alg(alg);
 +
-+	snprintf(rhash.type, CRYPTO_MAX_ALG_NAME, "%s", "shash");
++	snprintf(rhash.type, CRYPTO_MAX_ALG_NAME, "%s", "ahash");
++
 +	rhash.blocksize = alg->cra_blocksize;
-+	rhash.digestsize = salg->digestsize;
++	rhash.digestsize = __crypto_hash_alg_common(alg)->digestsize;
 +
-+	NLA_PUT(skb, CRYPTOCFGA_REPORT_SHASH,
++	NLA_PUT(skb, CRYPTOCFGA_REPORT_AHASH,
 +		sizeof(struct crypto_report_hash), &rhash);
 +
 +	return 0;
@@ -60,38 +60,28 @@ index 76f74b9..cc3049f 100644
 +	return -EMSGSIZE;
 +}
 +
- static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
+ static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
  	__attribute__ ((unused));
- static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
-@@ -541,6 +561,7 @@ static const struct crypto_type crypto_shash_type = {
+ static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
+@@ -415,6 +435,7 @@ const struct crypto_type crypto_ahash_type = {
  #ifdef CONFIG_PROC_FS
- 	.show = crypto_shash_show,
+ 	.show = crypto_ahash_show,
  #endif
-+	.report = crypto_shash_report,
++	.report = crypto_ahash_report,
  	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
- 	.maskset = CRYPTO_ALG_TYPE_MASK,
- 	.type = CRYPTO_ALG_TYPE_SHASH,
+ 	.maskset = CRYPTO_ALG_TYPE_AHASH_MASK,
+ 	.type = CRYPTO_ALG_TYPE_AHASH,
 diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 59d801f..c94649f 100644
+index c94649f..aedee33 100644
 --- a/include/linux/cryptouser.h
 +++ b/include/linux/cryptouser.h
-@@ -37,6 +37,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_UNSPEC,
+@@ -38,6 +38,7 @@ enum crypto_attr_type_t {
  	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
  	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
-+	CRYPTOCFGA_REPORT_SHASH,	/* struct crypto_report_hash */
+ 	CRYPTOCFGA_REPORT_SHASH,	/* struct crypto_report_hash */
++	CRYPTOCFGA_REPORT_AHASH,	/* struct crypto_report_hash */
  	__CRYPTOCFGA_MAX
  
  #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-@@ -56,3 +57,9 @@ struct crypto_user_alg {
- struct crypto_report_larval {
- 	char type[CRYPTO_MAX_NAME];
- };
-+
-+struct crypto_report_hash {
-+	char type[CRYPTO_MAX_NAME];
-+	unsigned int blocksize;
-+	unsigned int digestsize;
-+};
 -- 
 1.7.0.4
