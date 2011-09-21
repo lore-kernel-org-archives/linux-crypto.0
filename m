@@ -1,72 +1,59 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v3 00/17] crypto user configuration api
-Date: Wed, 21 Sep 2011 10:58:55 +0200
-Message-ID: <20110921085855.GE1808@secunet.com>
+Subject: [PATCH v3 01/17] crypto: Add a flag to identify crypto instances
+Date: Wed, 21 Sep 2011 10:59:36 +0200
+Message-ID: <20110921085936.GF1808@secunet.com>
+References: <20110921085855.GE1808@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:38933 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:33776 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752638Ab1IUI67 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Sep 2011 04:58:59 -0400
+	id S1752226Ab1IUI7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Sep 2011 04:59:39 -0400
 Content-Disposition: inline
+In-Reply-To: <20110921085855.GE1808@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patchset adds a netlink based user configuration API for the crypto
-layer, similar to the configuration API of xfrm.
+The upcomming crypto user configuration api needs to identify
+crypto instances. This patch adds a flag that is set if the
+algorithm is an instance that is build from templates.
 
-The patchset is based on the current cryptodev-2.6 tree.
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/algapi.c        |    1 +
+ include/linux/crypto.h |    5 +++++
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-A userspace tool that makes use of the configuration API is available at
-
-https://sourceforge.net/projects/crconf/files/crconf-pre1.tar.gz
-
-With this it is possible to instantiate certain algorithms by doing
-
-crconf add driver "cbc(aes-generic)" type 4
-
-or
-
-crconf add driver "cbc(aes-generic)" type 4 priority 100
-
-To remove a (form templates build and unused) algorithm with all subsequent
-algorithms do
-
-crconf del driver "cbc(aes-generic)" type 4
-
-It is possible to update the priority of an algorithm by doing
-
-crconf update driver "cbc(aes-generic)" type 4 priority 200
-
-this updates the priority of this algorithm and removes all algorithms
-on top.
-
-Finally it is possible to print the instantiated crypto algorithms
-similar to /proc/crypto by doing
-
-crconf show all
-
-This prints the algorithm informations of all instantiated algorithms
-as long as the information fits into a netlink message.
-
-Changes from v1:
-
-- Removed the priority update functions.
-- Fix algorithm information printing when build as module.
-- Update the crconf tool according to the kernel changes.
-
-Changes from v2:
-
-- Use one structure for creating and basic querying of algorithms.
-- Send the algorithm flags to userspace, so the userspace can
-  check for things like passed selftest, async algorithms etc.
-- Update the crconf tool according to the kernel changes.
-- Add the priority update functions back. We need to be able to update
-  the priority of algorithms, as we can't delete core algorithms like
-  aes-generic. When we update the priority of an algorithm, we remove
-  all algorithms on top.
-
-Steffen
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c3cf1a6..6fd9bcf 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -493,6 +493,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 		goto err;
+ 
+ 	inst->alg.cra_module = tmpl->module;
++	inst->alg.cra_flags |= CRYPTO_ALG_INSTANCE;
+ 
+ 	down_write(&crypto_alg_sem);
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index e5e468e..de9adec 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -72,6 +72,11 @@
+ #define CRYPTO_ALG_TESTED		0x00000400
+ 
+ /*
++ * Set if the algorithm is an instance that is build from templates.
++ */
++#define CRYPTO_ALG_INSTANCE		0x00000800
++
++/*
+  * Transform masks and values (for crt_flags).
+  */
+ #define CRYPTO_TFM_REQ_MASK		0x000fff00
+-- 
+1.7.0.4
