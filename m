@@ -1,65 +1,55 @@
-From: =?utf-8?B?5LuFMTDlhYPmr4/lpKk=?= <admin@mail.china-tax.org>
-Subject: =?utf-8?B?576k5Y+R6L2v5Lu2K+S5sOWutuaQnOe0ouacuisxMDnlsYrlub/kuqTkvJrkubDlrrY=?=
-	=?utf-8?B?44CB5rW35YWz5pWw5o2uLEIyQuivouebmOS5sOWutjUwMOS4hw==?=
-Date: Wed, 21 Sep 2011 07:25:48 +0000 (UTC)
-Message-ID: <20120921152037418686@mail.china-tax.org>
-Reply-To: <1339625218@qq.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 01/16] crypto: authenc - Don't multiply priorities
+Date: Wed, 21 Sep 2011 10:32:15 +0200
+Message-ID: <20110921083215.GD1808@secunet.com>
+References: <20110811112603.GD16877@secunet.com>
+ <20110811112639.GE16877@secunet.com>
+ <20110815071928.GA29761@gondor.apana.org.au>
+ <20110815080257.GU16877@secunet.com>
+ <20110815085546.GA30341@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>, <linvwert@comcast.net>,
-	<linxiao12@163.com>, <linxw@tradeinfo.cn>,
-	<linyitandiao@518ad.com>, <linzdh@singnet.com>,
-	<linzontechnology@msn.com>, <lion@vi
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [211.154.163.243] ([211.154.163.243]:4438 "HELO
-	mail.china-tax.org" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with SMTP id S1752537Ab1IUHZi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Sep 2011 03:25:38 -0400
-Date: Fri, 21 Sep 2012 15:20:29 +0800
+Received: from a.mx.secunet.com ([195.81.216.161]:56164 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751047Ab1IUIcS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Sep 2011 04:32:18 -0400
+Content-Disposition: inline
+In-Reply-To: <20110815085546.GA30341@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-576k5Y+R6L2v5Lu2KzEwOeWxiuW5v+S6pOS8muS5sOWutuOAgea1t+WFs+aVsOaNruOAgeaQnOe0
-ouW8leaTjuS5sOWutixCMkLor6Lnm5jkubDlrrblhbE1MDDkuIcs5LuFMTDlhYPmr4/lpKnjgIIg
-DQrnvqTlj5Hova/ku7YrMTA55bGK5bm/5Lqk5Lya5Lmw5a6244CB5rW35YWz5pWw5o2u44CB5pCc
-57Si5byV5pOO5Lmw5a62LEIyQuivouebmOS5sOWutuWFsTUwMOS4hyzku4UxMOWFg+avj+WkqeOA
-giANCuS/neivgeavj+WkqemDveacieS5sOWutuWbnuWkjeOAgg0K5L+d6K+B5q+P5aSp6YO95pyJ
-5Lmw5a625Zue5aSN44CCDQrkv53or4Hmr4/lpKnpg73mnInkubDlrrblm57lpI3jgIINCjHjgIHn
-vqTlj5Hova/ku7bvvJog5pON5L2c566A5Y2V77yM5Yqf6IO95by65aSn77yM5qih5Lu/5Lq65bel
-5pON5L2c5qih5byP77yM5Yiw6L6+546H6auY77yM5pel5Y+R6YCBNeS4h+WwgeS7peS4iuOAgiAN
-CjLjgIE1MDDkuIfkubDlrrbotYTmupDvvJog6LWg6YCB55qENTAw5LiH5Lmw5a626LWE5rqQ5bqT
-77yM5pu05pawICjlj6/ku6XmjInnhafmgqjnmoTkuqflk4Hmj5Dlj5blh7rmnaXvvIzmm7Tnsr7l
-h4blvIDlj5Ep44CCIA0KM+OAgei2hee6p+a1t+WkluS5sOWutkVtYWls5pCc57Si5py677yaIOWG
-hee9ruS6hjYwMOS4h+ihjOS4muWFs+mUruivje+8jOagueaNrumVv+WwvuivjeaQnOe0ou+8jOe7
-k+aenOabtOeyvuehruWMuemFje+8m+avj+WkqeiDveaQnOe0ojEtMuS4h+S7peS4iuS5sOWutuec
-n+WunkVNQUlM77yM5oiQ5Y2V546H6auY44CCIA0KIA0K6KaB55qE5oqT57Sn6IGU57O7UVE6IDEz
-Mzk2MjUyMTggICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDEzMzk2MjUyMThAcXEuY29tDQro
-poHnmoTmipPntKfogZTns7tRUTogMTMzOTYyNTIxOCAgIOaIluiAheeri+WNs+WbnuWkjemCrueu
-sTogMTMzOTYyNTIxOEBxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiAxMzM5NjI1MjE4ICAg
-5oiW6ICF56uL5Y2z5Zue5aSN6YKu566xOiAxMzM5NjI1MjE4QHFxLmNvbQ0KIA0K5YWN6LS56LWg
-6YCBOg0K5LiA5YWxOOS4quWMhSjmlbDmja7mmK/lhajooYzkuJrnmoTvvIzmjInnhafooYzkuJrl
-iIblpb3nsbvvvIzlubbkuJTlj6/ku6XmjInnhaflhbPplK7or43mn6Xor6LnmoQp77yaIA0KMe+8
-jDIwMTHmmKXlraMxMDnlsYrlub/kuqTkvJrkubDlrrbnjrDlnLror6Lnm5jmlbDmja7lupPmlrDp
-spzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDmja7vvIzlrrnmmJPmiJDl
-jZXvvIEgDQoy77yM6LSt5Lmw5ZCO5Y+v5Lul5YWN6LS55pu05pawMjAxMeeni+Wto+W5v+S6pOS8
-misyMDEy5pil5a2j5bm/5Lqk5Lya5Lmw5a625pWw5o2u44CC5aSq6LaF5YC85LqG44CCDQoz77yM
-5pyA5paw5YWo55CD5Lmw5a625bqTLOWFsTQ1MTY2MOadoeaVsOaNruOAgiAo5pyA5paw5pu05paw
-5pel5pyfIDIwMTEtMDUtMTbml6UpDQo077yMMjAwOOW5tCwyMDA55bm0LDIwMTDlubQg5pil5a2j
-K+eni+Wto+W5v+S6pOS8muS5sOWutuWQjeW9le+8jDEwMyAxMDQgMTA1IDEwNiAxMDcgMTA4IOWF
-seWFreWxiiDlhbExMjAuNuS4h+aVsOaNruOAgg0KNe+8jDIwMTDlubTlm73pmYXkv4PplIDljY/k
-vJrvvIhQUEFJ77yJ5oiQ5ZGY5ZCN5Y2VIFBQQUkgTWVtYmVycyBEaXJlY3RvcnnvvIzpnZ7luLjp
-h43opoHnmoTlpKfkubDlrrbjgIINCjbvvIwyMDEw5bm05Yiw6aaZ5riv6YeH6LSt55qE5Zu95aSW
-5a6i5Lq65ZCN5b2VKOmmmea4r+i0uOWPkeWxgOaPkOS+mynvvIzlhbE3LjLkuIfmlbDmja7vvIzo
-toXnuqfph43opoHnmoTkubDlrrbjgIINCjfvvIw0OC42OOS4h+adoeacgOaWsOS5sOWutuivoueb
-mO+8jOi0reS5sOWQjuavj+aciOabtOaWsCAxLTLkuIfmnaHvvIzljIXmi6wy6YOo5YiG77yMMe+8
-jOacgOaWsOeahOivouebmCAy77yM5pyA5paw55qE5bGV5Lya5Lmw5a6244CC5YWN6LS55pu05paw
-MzbkuKrmnIjjgIINCjjvvIwyMDA55bm05rW35YWz5o+Q5Y2V5pWw5o2ucGllcnPniYjmlbDmja4g
-MeWNg+S4h+OAgg0KDQror5rkv6HkuLrmnKzvvIzmlK/mjIHmlK/ku5jlrp3mi4Xkv53kuqTmmJMg
-KOWFiOWPkei0p+W5tuWuieijheiuvue9rue+pOWPkei9r+S7tu+8jOeEtuWQjuS7mOasvikg5b27
-5bqV5omT5raI5oKo55qEIOmhvuiZkeOAgg0KIA0KDQogDQrnsr7lh4bmlbDmja4t5oiQ5Y2V546H
-5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ5Y2V
-546H5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ
-5Y2V546H5p6B6auYDQo=
+On Mon, Aug 15, 2011 at 04:55:46PM +0800, Herbert Xu wrote:
+> On Mon, Aug 15, 2011 at 10:02:57AM +0200, Steffen Klassert wrote:
+> >
+> > I don't think it is broken. It's just easier to handle if an underlying
+> > algorithm changes it's priority. If the user changes the priority of a
+> > certain algorithm, I take the difference of the old and new priority
+> > value and add this to all subsequent algorithms. So this can not take the
+> > weight into account without some 'per algorithm' priority update functions.
+> 
+> Oh I see.  I don't think we need to go that far.
+> 
+> Here are two simpler ways of handling this:
+> 
+> 1) Liquidate all instances on top of the algorithm being changed
+> (this is what we already do when you register a new implementation
+> of an algorithm with a higher priority).
+> 
+> 2) Do nothing and let the user change everything manually.
+> 
+> My take would be to just do 1) considering that the usage scenario
+> is that the user is either going to change something like AES at
+> the very bottom of the pile or something complex at the top.
+> 
+
+I've just noticed that we need the update functionality to change
+the priority of algorithms that are not build from templates because
+we can't delete them without unloading the module. If the algorithm
+is not build as a module, we can't delete it at all. So there is no
+chance to change the priority without an update functionality.
+
+Therefore I'll bring the update functions back. I'll use your option 1)
+to deal with the algorithms on top of the changed one.
