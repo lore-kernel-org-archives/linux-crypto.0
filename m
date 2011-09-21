@@ -1,79 +1,44 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v3 17/17] crypto: Add userspace report for compress type
- algorithms
-Date: Wed, 21 Sep 2011 11:12:35 +0200
-Message-ID: <20110921091234.GV1808@secunet.com>
-References: <20110921085855.GE1808@secunet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:41668 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752216Ab1IUJMj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Sep 2011 05:12:39 -0400
-Content-Disposition: inline
-In-Reply-To: <20110921085855.GE1808@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Yong Zhang <yong.zhang0@gmail.com>
+Subject: [PATCH 29/57] crypto: irq: Remove IRQF_DISABLED
+Date: Wed, 21 Sep 2011 17:28:30 +0800
+Message-ID: <1316597339-29861-30-git-send-email-yong.zhang0@gmail.com>
+References: <1316597339-29861-1-git-send-email-yong.zhang0@gmail.com>
+Cc: tglx@linutronix.de, yong.zhang0@gmail.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1316597339-29861-1-git-send-email-yong.zhang0@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Since commit [c58543c8: genirq: Run irq handlers with interrupts disabled],
+We run all interrupt handlers with interrupts disabled
+and we even check and yell when an interrupt handler
+returns with interrupts enabled (see commit [b738a50a:
+genirq: Warn when handler enables interrupts]).
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+So now this flag is a NOOP and can be removed.
+
+Signed-off-by: Yong Zhang <yong.zhang0@gmail.com>
 ---
- crypto/crypto_user.c       |   20 ++++++++++++++++++++
- include/linux/cryptouser.h |    1 +
- 2 files changed, 21 insertions(+), 0 deletions(-)
+ drivers/crypto/mv_cesa.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index cd08b2f..b5a55f6 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -89,6 +89,21 @@ nla_put_failure:
- 	return -EMSGSIZE;
- }
- 
-+static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_comp rcomp;
-+
-+	snprintf(rcomp.type, CRYPTO_MAX_ALG_NAME, "%s", "compression");
-+
-+	NLA_PUT(skb, CRYPTOCFGA_REPORT_COMPRESS,
-+		sizeof(struct crypto_report_comp), &rcomp);
-+
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
- {
-@@ -126,6 +141,11 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
- 
- 		break;
-+	case CRYPTO_ALG_TYPE_COMPRESS:
-+		if (crypto_report_comp(skb, alg))
-+			goto nla_put_failure;
-+
-+		break;
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 5c6f56f..7a10360 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1041,8 +1041,7 @@ static int mv_probe(struct platform_device *pdev)
+ 		goto err_unmap_sram;
  	}
  
- out:
-diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 797dfd9..8e7b796 100644
---- a/include/linux/cryptouser.h
-+++ b/include/linux/cryptouser.h
-@@ -47,6 +47,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_PCOMPRESS,	/* struct crypto_report_comp */
- 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
- 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
-+	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
- 	__CRYPTOCFGA_MAX
+-	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
+-			cp);
++	ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev), cp);
+ 	if (ret)
+ 		goto err_thread;
  
- #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
 -- 
-1.7.0.4
+1.7.4.1
