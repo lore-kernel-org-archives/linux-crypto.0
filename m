@@ -1,44 +1,36 @@
-From: Yong Zhang <yong.zhang0@gmail.com>
-Subject: [PATCH 29/55] crypto: irq: Remove IRQF_DISABLED
-Date: Thu, 22 Sep 2011 16:58:56 +0800
-Message-ID: <1316681962-8217-30-git-send-email-yong.zhang0@gmail.com>
-References: <1316681962-8217-1-git-send-email-yong.zhang0@gmail.com>
-Cc: tglx@linutronix.de, yong.zhang0@gmail.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1316681962-8217-1-git-send-email-yong.zhang0@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto: blowfish - split generic and common c code
+Date: Thu, 22 Sep 2011 21:29:39 +1000
+Message-ID: <20110922112938.GA32559@gondor.apana.org.au>
+References: <20110901224506.7795.35128.stgit@localhost6.localdomain6>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:52032 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752599Ab1IVL3n (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 22 Sep 2011 07:29:43 -0400
+Content-Disposition: inline
+In-Reply-To: <20110901224506.7795.35128.stgit@localhost6.localdomain6>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Since commit [e58aa3d2: genirq: Run irq handlers with interrupts disabled],
-We run all interrupt handlers with interrupts disabled
-and we even check and yell when an interrupt handler
-returns with interrupts enabled (see commit [b738a50a:
-genirq: Warn when handler enables interrupts]).
+On Fri, Sep 02, 2011 at 01:45:07AM +0300, Jussi Kivilinna wrote:
+> Patch splits up the blowfish crypto routine into a common part (key setup)
+> which will be used by blowfish crypto modules (x86_64 assembly and generic-c).
+> 
+> Also fixes errors/warnings reported by checkpatch.
+> 
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-So now this flag is a NOOP and can be removed.
+All applied to cryptodev.
 
-Signed-off-by: Yong Zhang <yong.zhang0@gmail.com>
----
- drivers/crypto/mv_cesa.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 5c6f56f..7a10360 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1041,8 +1041,7 @@ static int mv_probe(struct platform_device *pdev)
- 		goto err_unmap_sram;
- 	}
- 
--	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
--			cp);
-+	ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev), cp);
- 	if (ret)
- 		goto err_thread;
- 
+Thanks!
 -- 
-1.7.4.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
