@@ -1,42 +1,45 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 2/2] crypto: blowfish-x86_64: add credits
-Date: Fri, 23 Sep 2011 19:51:00 +0300
-Message-ID: <20110923165100.29475.89853.stgit@localhost6.localdomain6>
-References: <20110923165055.29475.16493.stgit@localhost6.localdomain6>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 10/17] crypto: Add userspace report for ablkcipher
+	type algorithms
+Date: Sat, 24 Sep 2011 13:21:25 +1000
+Message-ID: <20110924032125.GA26475@gondor.apana.org.au>
+References: <20110921085855.GE1808@secunet.com> <20110921090716.GO1808@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:45435 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753231Ab1IWQvD (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:34289 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753331Ab1IXDV3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Sep 2011 12:51:03 -0400
-In-Reply-To: <20110923165055.29475.16493.stgit@localhost6.localdomain6>
+	Fri, 23 Sep 2011 23:21:29 -0400
+Content-Disposition: inline
+In-Reply-To: <20110921090716.GO1808@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
----
- arch/x86/crypto/blowfish_glue.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+On Wed, Sep 21, 2011 at 11:07:16AM +0200, Steffen Klassert wrote:
+>
+> diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
+> index 62ae124..0c359e5 100644
+> --- a/include/linux/cryptouser.h
+> +++ b/include/linux/cryptouser.h
+> @@ -40,6 +40,7 @@ enum crypto_attr_type_t {
+>  	CRYPTOCFGA_REPORT_SHASH,	/* struct crypto_report_hash */
+>  	CRYPTOCFGA_REPORT_AHASH,	/* struct crypto_report_hash */
+>  	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
+> +	CRYPTOCFGA_REPORT_ABLKCIPHER,	/* struct crypto_report_blkcipher */
 
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index 40911ab..2568a7b 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -3,6 +3,11 @@
-  *
-  * Copyright (c) 2011 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-  *
-+ * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
-+ *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-+ * CTR part based on code (crypto/ctr.c) by:
-+ *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
-+ *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation; either version 2 of the License, or
+I don't think you should distinguish between BLKCIPHER and ABLKCIPHER.
+A good rule of thumb would be if the report data structure is the
+same, then the type value should be the same.
+
+You can still have the string type to show something different to
+the user.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
