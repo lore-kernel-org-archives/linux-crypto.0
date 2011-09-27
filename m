@@ -1,33 +1,80 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [RFC v2.1 0/6] evm: digital signature verification extension
-Date: Tue, 27 Sep 2011 09:15:32 +1000 (EST)
-Message-ID: <alpine.LRH.2.00.1109270914480.4126@tundra.namei.org>
-References: <cover.1315921427.git.dmitry.kasatkin@intel.com> <1316525069.3189.4.camel@localhost.localdomain> <CALLzPKbPM-7Z4UphWvZUFxT9vF8XJSWyeUGTkLaM7--2A6y7eA@mail.gmail.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH v4 00/17] crypto user configuration api
+Date: Tue, 27 Sep 2011 07:20:50 +0200
+Message-ID: <20110927052050.GB1808@secunet.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	herbert@gondor.hengli.com.au,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	Greg KH <greg@kroah.com>,
-	"Serge E. Hallyn" <serge.hallyn@canonical.com>
-To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALLzPKbPM-7Z4UphWvZUFxT9vF8XJSWyeUGTkLaM7--2A6y7eA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:33932 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752482Ab1I0FU4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Sep 2011 01:20:56 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 26 Sep 2011, Kasatkin, Dmitry wrote:
+This patchset adds a netlink based user configuration API for the crypto
+layer, similar to the configuration API of xfrm.
 
-> It seems nobody wants to share their thoughts about it?
-> Does this silence mean acceptance?
-> Should I prepare final patches for merge?
+The patchset is based on the current cryptodev tree.
 
-Not yet.
+A userspace tool that makes use of the configuration API is available at
 
-I'd like to hear what the crypto folk think about the crypto.
+https://sourceforge.net/projects/crconf/files/crconf-pre2.tar.gz
 
--- 
-James Morris
-<jmorris@namei.org>
+With this it is possible to instantiate certain algorithms by doing
+
+crconf add driver "cbc(aes-generic)" type 4
+
+or
+
+crconf add driver "cbc(aes-generic)" type 4 priority 100
+
+To remove a (form templates build and unused) algorithm with all subsequent
+algorithms do
+
+crconf del driver "cbc(aes-generic)" type 4
+
+It is possible to update the priority of an algorithm by doing
+
+crconf update driver "cbc(aes-generic)" type 4 priority 200
+
+this updates the priority of this algorithm and removes all algorithms
+on top.
+
+Finally it is possible to print the instantiated crypto algorithms
+similar to /proc/crypto by doing
+
+crconf show all
+
+This prints the algorithm informations of all instantiated algorithms
+as long as the information fits into a netlink message.
+
+Changes from v1:
+
+- Removed the priority update functions.
+- Fix algorithm information printing when build as module.
+- Update the crconf tool according to the kernel changes.
+
+Changes from v2:
+
+- Use one structure for creating and basic querying of algorithms.
+- Send the algorithm flags to userspace, so the userspace can
+  check for things like passed selftest, async algorithms etc.
+- Update the crconf tool according to the kernel changes.
+- Add some priority update functions. We need to be able to update
+  the priority of algorithms, as we can't delete core algorithms like
+  aes-generic. When we update the priority of an algorithm, we remove
+  all algorithms on top.
+
+Changes from v3:
+
+- Remove the priority field from struct crypto_user_alg and use the
+  existing netlink attribute to send the priority value to userspace.
+- Update the crconf tool according to the kernel changes.
+- Don't distinguish between netlink attributes that use the same
+  type value.
+
+Steffen
