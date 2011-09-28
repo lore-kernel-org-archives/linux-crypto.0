@@ -1,54 +1,64 @@
-From: "Darrick J. Wong" <djwong@us.ibm.com>
-Subject: Re: [PATCH 2/3] libcrc32c: Expose big-endian version of crc32c
-Date: Wed, 28 Sep 2011 09:51:45 -0700
-Message-ID: <20110928165133.GQ12086@tux1.beaverton.ibm.com>
-References: <20110927221239.21653.17489.stgit@elm3c44.beaverton.ibm.com> <20110927221253.21653.28062.stgit@elm3c44.beaverton.ibm.com> <20110928035356.GA6671@gondor.apana.org.au>
-Reply-To: djwong@us.ibm.com
+From: =?utf-8?B?5LuFMTDlhYPmr4/lpKk=?= <user@avonbridge-hotel.com>
+Subject: =?utf-8?B?576k5Y+R6L2v5Lu2K+S5sOWutuaQnOe0ouacuisxMDnlsYrlub/kuqTkvJrkubDlrrY=?=
+	=?utf-8?B?44CB5rW35YWz5pWw5o2uLEIyQuivouebmOS5sOWutjUwMOS4h+OAgg==?=
+Date: Wed, 28 Sep 2011 23:21:01 +0000 (UTC)
+Message-ID: <F5332C0D036E7CE500087D4CE24A697E@afsdhturs>
+Reply-To: <911585605@qq.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
-	Theodore Tso <tytso@mit.edu>,
-	David Miller <davem@davemloft.net>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-ext4@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+To: <linnow@hotmail.com>, <linux-crypto@vger.kernel.org>,
+	<linux-usb-users@lists.sourceforge.net>, <linxiaohong@cnhmtl.com>,
+	<linyuan@15.com>, <linzynw@ymail.com>, <lionelneykov@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e33.co.us.ibm.com ([32.97.110.151]:36090 "EHLO
-	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752091Ab1I1Qwv (ORCPT
+Received: from host213-123-178-18.in-addr.btopenworld.com ([213.123.178.18]:17179
+	"EHLO avonbridge-hotel.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1755809Ab1I1Wm0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Sep 2011 12:52:51 -0400
-Received: from /spool/local
-	by us.ibm.com with XMail ESMTP
-	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
-	Wed, 28 Sep 2011 10:52:47 -0600
-Content-Disposition: inline
-In-Reply-To: <20110928035356.GA6671@gondor.apana.org.au>
+	Wed, 28 Sep 2011 18:42:26 -0400
+Date: Thu, 27 Sep 2012 18:56:19 +0800
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 28, 2011 at 01:53:59PM +1000, Herbert Xu wrote:
-> On Tue, Sep 27, 2011 at 03:12:53PM -0700, Darrick J. Wong wrote:
-> > Provide a big-endian version of crc32c for modules that want it.
-> 
-> Who is going to use this?
-
-Well, I was using it for jbd2 ... but since you ask, it seems to work just as
-well with crc32c-le, so I think I'll just drop the -be version.
-
---D
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-ext4" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+576k5Y+R6L2v5Lu2KzEwOeWxiuW5v+S6pOS8muS5sOWutuOAgea1t+WFs+aVsOaNruOAgeaQnOe0
+ouW8leaTjuS5sOWutixCMkLor6Lnm5jkubDlrrblhbE1MDDkuIcs5LuFMTDlhYPmr4/lpKnjgIIg
+DQrnvqTlj5Hova/ku7YrMTA55bGK5bm/5Lqk5Lya5Lmw5a6244CB5rW35YWz5pWw5o2u44CB5pCc
+57Si5byV5pOO5Lmw5a62LEIyQuivouebmOS5sOWutuWFsTUwMOS4hyzku4UxMOWFg+avj+WkqeOA
+giANCuS/neivgeavj+WkqemDveacieS5sOWutuWbnuWkjeOAgg0K5L+d6K+B5q+P5aSp6YO95pyJ
+5Lmw5a625Zue5aSN44CCDQrkv53or4Hmr4/lpKnpg73mnInkubDlrrblm57lpI3jgIINCg0KMeOA
+gee+pOWPkei9r+S7tu+8miDmk43kvZznroDljZXvvIzlip/og73lvLrlpKfvvIzmqKHku7/kurrl
+t6Xmk43kvZzmqKHlvI/vvIzliLDovr7njofpq5jvvIzml6Xlj5HpgIE15LiH5bCB5Lul5LiK44CC
+IA0KMuOAgTUwMOS4h+S5sOWutui1hOa6kO+8miDotaDpgIHnmoQ1MDDkuIfkubDlrrbotYTmupDl
+upPvvIzmm7TmlrAgKOWPr+S7peaMieeFp+aCqOeahOS6p+WTgeaPkOWPluWHuuadpe+8jOabtOey
+vuWHhuW8gOWPkSnjgIIgDQoz44CB6LaF57qn5rW35aSW5Lmw5a62RW1haWzmkJzntKLmnLrvvJog
+5YaF572u5LqGNjAw5LiH6KGM5Lia5YWz6ZSu6K+N77yM5qC55o2u6ZW/5bC+6K+N5pCc57Si77yM
+57uT5p6c5pu057K+56Gu5Yy56YWN77yb5q+P5aSp6IO95pCc57SiMS0y5LiH5Lul5LiK5Lmw5a62
+55yf5a6eRU1BSUzvvIzmiJDljZXnjofpq5jjgIIgDQogDQoNCuimgeeahOaKk+e0p+iBlOezu1FR
+OiA5MTE1ODU2MDUgICDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDkxMTU4NTYwNUBxcS5jb20N
+CuimgeeahOaKk+e0p+iBlOezu1FROiA5MTE1ODU2MDUgICDmiJbogIXnq4vljbPlm57lpI3pgq7n
+rrE6IDkxMTU4NTYwNUBxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiA5MTE1ODU2MDUgICDm
+iJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDkxMTU4NTYwNUBxcS5jb20NCiANCuWFjei0uei1oOmA
+gToNCuS4gOWFsTjkuKrljIUo5pWw5o2u5piv5YWo6KGM5Lia55qE77yM5oyJ54Wn6KGM5Lia5YiG
+5aW957G777yM5bm25LiU5Y+v5Lul5oyJ54Wn5YWz6ZSu6K+N5p+l6K+i55qEKe+8miANCjHvvIwy
+MDEx5pil5a2jMTA55bGK5bm/5Lqk5Lya5Lmw5a62546w5Zy66K+i55uY5pWw5o2u5bqT5paw6bKc
+5Ye654KJ77yM6LaF57qn5paw6bKc5Lmw5a6277yM5paw6bKc5pWw5o2u77yM5a655piT5oiQ5Y2V
+77yBIA0KMu+8jOi0reS5sOWQjuWPr+S7peWFjei0ueabtOaWsDIwMTHnp4vlraPlub/kuqTkvJor
+MjAxMuaYpeWto+W5v+S6pOS8muS5sOWutuaVsOaNruOAguWkqui2heWAvOS6huOAgg0KM++8jOac
+gOaWsOWFqOeQg+S5sOWutuW6kyzlhbE0NTE2NjDmnaHmlbDmja7jgIIgKOacgOaWsOabtOaWsOaX
+peacnyAyMDExLTA1LTE25pelKQ0KNO+8jDIwMDjlubQsMjAwOeW5tCwyMDEw5bm0IOaYpeWtoyvn
+p4vlraPlub/kuqTkvJrkubDlrrblkI3lvZXvvIwxMDMgMTA0IDEwNSAxMDYgMTA3IDEwOCDlhbHl
+ha3lsYog5YWxMTIwLjbkuIfmlbDmja7jgIINCjXvvIwyMDEw5bm05Zu96ZmF5L+D6ZSA5Y2P5Lya
+77yIUFBBSe+8ieaIkOWRmOWQjeWNlSBQUEFJIE1lbWJlcnMgRGlyZWN0b3J577yM6Z2e5bi46YeN
+6KaB55qE5aSn5Lmw5a6244CCDQo277yMMjAxMOW5tOWIsOmmmea4r+mHh+i0reeahOWbveWkluWu
+ouS6uuWQjeW9lSjpppnmuK/otLjlj5HlsYDmj5Dkvpsp77yM5YWxNy4y5LiH5pWw5o2u77yM6LaF
+57qn6YeN6KaB55qE5Lmw5a6244CCDQo377yMNDguNjjkuIfmnaHmnIDmlrDkubDlrrbor6Lnm5jv
+vIzotK3kubDlkI7mr4/mnIjmm7TmlrAgMS0y5LiH5p2h77yM5YyF5ousMumDqOWIhu+8jDHvvIzm
+nIDmlrDnmoTor6Lnm5ggMu+8jOacgOaWsOeahOWxleS8muS5sOWutuOAguWFjei0ueabtOaWsDM2
+5Liq5pyI44CCDQo477yMMjAwOeW5tOa1t+WFs+aPkOWNleaVsOaNrnBpZXJz54mI5pWw5o2uIDHl
+jYPkuIfjgIINCg0KDQror5rkv6HkuLrmnKzvvIzmlK/mjIHmlK/ku5jlrp3mi4Xkv53kuqTmmJMg
+KOWFiOWPkei0p+W5tuWuieijheiuvue9rue+pOWPkei9r+S7tu+8jOeEtuWQjuS7mOasvikg5b27
+5bqV5omT5raI5oKo55qEIOmhvuiZkeOAgg0KDQogDQoNCg0KIA0KDQrnsr7lh4bmlbDmja4t5oiQ
+5Y2V546H5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrnsr7lh4bmlbDmja4t
+5oiQ5Y2V546H5p6B6auYDQrnsr7lh4bmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrnsr7lh4bmlbDm
+ja4t5oiQ5Y2V546H5p6B6auYDQo=
