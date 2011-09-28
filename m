@@ -1,45 +1,54 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [RFC v2.1 0/6] evm: digital signature verification extension
-Date: Wed, 28 Sep 2011 18:37:34 +0300
-Message-ID: <CALLzPKa=DuhmTZ7enLH6LNKA1mimC9OJZoaCJrprrHJwg=mRdQ@mail.gmail.com>
-References: <cover.1315921427.git.dmitry.kasatkin@intel.com>
-	<1316525069.3189.4.camel@localhost.localdomain>
-	<CALLzPKbPM-7Z4UphWvZUFxT9vF8XJSWyeUGTkLaM7--2A6y7eA@mail.gmail.com>
-	<alpine.LRH.2.00.1109270914480.4126@tundra.namei.org>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH 2/3] libcrc32c: Expose big-endian version of crc32c
+Date: Wed, 28 Sep 2011 09:51:45 -0700
+Message-ID: <20110928165133.GQ12086@tux1.beaverton.ibm.com>
+References: <20110927221239.21653.17489.stgit@elm3c44.beaverton.ibm.com> <20110927221253.21653.28062.stgit@elm3c44.beaverton.ibm.com> <20110928035356.GA6671@gondor.apana.org.au>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	herbert@gondor.hengli.com.au,
+Content-Type: text/plain; charset=us-ascii
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
 	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	Greg KH <greg@kroah.com>,
-	"Serge E. Hallyn" <serge.hallyn@canonical.com>
-To: James Morris <jmorris@namei.org>, herbert@gondor.apana.org.au
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <alpine.LRH.2.00.1109270914480.4126@tundra.namei.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e33.co.us.ibm.com ([32.97.110.151]:36090 "EHLO
+	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752091Ab1I1Qwv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Sep 2011 12:52:51 -0400
+Received: from /spool/local
+	by us.ibm.com with XMail ESMTP
+	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
+	Wed, 28 Sep 2011 10:52:47 -0600
+Content-Disposition: inline
+In-Reply-To: <20110928035356.GA6671@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 27, 2011 at 2:15 AM, James Morris <jmorris@namei.org> wrote:
-> On Mon, 26 Sep 2011, Kasatkin, Dmitry wrote:
->
->> It seems nobody wants to share their thoughts about it?
->> Does this silence mean acceptance?
->> Should I prepare final patches for merge?
->
-> Not yet.
->
-> I'd like to hear what the crypto folk think about the crypto.
->
+On Wed, Sep 28, 2011 at 01:53:59PM +1000, Herbert Xu wrote:
+> On Tue, Sep 27, 2011 at 03:12:53PM -0700, Darrick J. Wong wrote:
+> > Provide a big-endian version of crc32c for modules that want it.
+> 
+> Who is going to use this?
+
+Well, I was using it for jbd2 ... but since you ask, it seems to work just as
+well with crc32c-le, so I think I'll just drop the -be version.
+
+--D
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 > --
-> James Morris
-> <jmorris@namei.org>
->
-
-Herbert,
-
-Can you say what you think?
-
-Thank you,
-Dmitry
+> To unsubscribe from this list: send the line "unsubscribe linux-ext4" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
