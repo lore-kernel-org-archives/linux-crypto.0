@@ -1,56 +1,60 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [RFC v2.1 0/6] evm: digital signature verification extension
-Date: Thu, 29 Sep 2011 15:13:11 +0300
-Message-ID: <CALLzPKa=hvRxwtaupOKO=UqdVZhLvsmzUSe3mzL93WuJxuT8xA@mail.gmail.com>
-References: <cover.1315921427.git.dmitry.kasatkin@intel.com>
-	<1316525069.3189.4.camel@localhost.localdomain>
-	<CALLzPKbPM-7Z4UphWvZUFxT9vF8XJSWyeUGTkLaM7--2A6y7eA@mail.gmail.com>
-	<alpine.LRH.2.00.1109270914480.4126@tundra.namei.org>
-	<CALLzPKa=DuhmTZ7enLH6LNKA1mimC9OJZoaCJrprrHJwg=mRdQ@mail.gmail.com>
-	<20110929001424.GA17356@gondor.apana.org.au>
-	<alpine.LRH.2.00.1109291042290.21622@tundra.namei.org>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH v3] crc32c: Implement CRC32c with slicing-by-8 algorithm
+Date: Fri, 30 Sep 2011 09:12:23 -0700
+Message-ID: <20110930161223.GW11984@tux1.beaverton.ibm.com>
+References: <OF1BEE9025.31A1BE17-ONC125791B.00203167-C125791B.00211B4A@transmode.se>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	Greg KH <greg@kroah.com>,
-	"Serge E. Hallyn" <serge.hallyn@canonical.com>
-To: James Morris <jmorris@namei.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+To: Joakim Tjernlund <joakim.tjernlund@transmode.se>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga12.intel.com ([143.182.124.36]:35745 "EHLO
-	azsmga102.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751464Ab1I2MNO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Sep 2011 08:13:14 -0400
-In-Reply-To: <alpine.LRH.2.00.1109291042290.21622@tundra.namei.org>
+Received: from e4.ny.us.ibm.com ([32.97.182.144]:39803 "EHLO e4.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753986Ab1I3QMo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 30 Sep 2011 12:12:44 -0400
+Content-Disposition: inline
+In-Reply-To: <OF1BEE9025.31A1BE17-ONC125791B.00203167-C125791B.00211B4A@transmode.se>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 29, 2011 at 3:42 AM, James Morris <jmorris@namei.org> wrote:
-> On Thu, 29 Sep 2011, Herbert Xu wrote:
->
->> Well if James is OK with adding the user for this then I'm fine
->> with adding the necessary infrastructure.
->
-> Are you happy with the API?
->
->
-> --
-> James Morris
-> <jmorris@namei.org>
->
+[putting mailing lists on cc]
 
-Hello,
+On Fri, Sep 30, 2011 at 08:01:36AM +0200, Joakim Tjernlund wrote:
+> 
+> (Just happen to see this patch in the archives)
+> 
+> - This is basically an copy of Bobs crc32 work and duplicates code, this
+>   code needs to move into /lib/crc32.c and use the existing framework.
 
-One comment earlier (some years ago) was to put MPI lib to the /lib folder.
-Indeed it is a math "library"...
-ksign.c can be also there..
+Which framework are you talking about?  lib/crc32.c appears to be a simple
+module that exports a utility function.  Do you mean that you want to merge the
+crc32{,c}defs.h and gen_crc32{,c}table.c code?  Do you want a build script that
+starts with only a crc${ALG}_defs.h file and stamps out gencrc${ALG}_table.c
+and crc${ALG}.c boilerplate code and then builds it?
 
-Does /lib sounds better?
-It does not break anything. It is just enabling technology for IMA/EVM.
-And of course it will evolve further...
+I really don't know; from my perspective there was a slow implementation in
+crypto/crc32c.c and I wanted to speed it up.  crc32c seems to be in crypto/ and
+not lib/ so that the implementation can be replaced with a hardware accelerated
+version at runtime (crc32c-intel).
 
-- Dmitry
+For crc32 which has no such hw replacement (as far as I know), moving it into
+crypto/ would incur the overhead of going through the cryptoapi for not much
+benefit.  On the other hand it wouldn't be hard to put the crc32 code into
+crypto/.
+> 
+> - Slice by 8 is just half the speed on my ppc32 compared to slice by 4 so
+>   it can't be enabled for all archs. Best to start with all 64 bit archs
+
+<shrug> I suppose I could make CRC32C_BITS configurable.  What is the hardware
+profile of your ppc32 processor?  How much L1D/L2 cache?  slice-by-8 does have
+a big cache footprint.  On the other hand it's faster than the slice-by-4
+(crc32) and Sarwate (crc32c) code in the kernel, even on old slow 32-bit x86
+processors (PII, PIII, P4).
+
+> - Last time I tested Bobs slice by 8 on ppc32 it didn't work.
+
+... is crc32c broken *now*?  It seems fine on x86/amd64/ppc64.
+
+--D
