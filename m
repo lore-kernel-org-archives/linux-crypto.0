@@ -1,77 +1,79 @@
 From: Joakim Tjernlund <joakim.tjernlund@transmode.se>
-Subject: Re: [PATCH v3] crc32c: Implement CRC32c with slicing-by-8 algorithm
-Date: Sat, 1 Oct 2011 15:52:00 +0200
-Message-ID: <OF34B3D797.8C95417C-ONC125791C.00497BA8-C125791C.004C2C5A@transmode.se>
-References: <OF1BEE9025.31A1BE17-ONC125791B.00203167-C125791B.00211B4A@transmode.se> <20110930161223.GW11984@tux1.beaverton.ibm.com>
+Subject: Re: [PATCH v4] crc32c: Implement CRC32c with slicing-by-8 algorithm
+Date: Sat, 1 Oct 2011 16:02:10 +0200
+Message-ID: <OF54094699.6F5CF2B6-ONC125791C.004C901C-C125791C.004D1A61@transmode.se>
+References: <20110930192956.4176.29905.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-To: djwong@us.ibm.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20110930161223.GW11984@tux1.beaverton.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Mingming Cao <cmm@us.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	Theodore Tso <tytso@mit.edu>
+To: "Darrick J. Wong" <djwong@us.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gw1.transmode.se ([195.58.98.146]:41193 "EHLO gw1.transmode.se"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751009Ab1JAOCM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 1 Oct 2011 10:02:12 -0400
+In-Reply-To: <20110930192956.4176.29905.stgit@elm3c44.beaverton.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-"Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/09/30 18:12:23:
+
+"Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/09/30 21:29:56:
 >
-> [putting mailing lists on cc]
+> The existing CRC32c implementation uses Sarwate's algorithm to calculate the
+> code one byte at a time.  Using a slicing-by-8 algorithm adapted from Bob
+> Pearson, we can process buffers 8 bytes at a time, for a substantial increase
+> in performance.
 >
-> On Fri, Sep 30, 2011 at 08:01:36AM +0200, Joakim Tjernlund wrote:
-> >
-> > (Just happen to see this patch in the archives)
-> >
-> > - This is basically an copy of Bobs crc32 work and duplicates code, this
-> >   code needs to move into /lib/crc32.c and use the existing framework.
+> The motivation for this patchset is that I am working on adding full metadata
+> checksumming to ext4 and jbd2.  As far as performance impact of adding
+> checksumming goes, I see nearly no change with a standard mail server ffsb
+> simulation.  On a test that involves only metadata operations (file creation
+> and deletion, and fallocate/truncate), I see a drop of about 50 pcercent with
+> the current kernel crc32c implementation; this improves to a drop of about 20
+> percent with the enclosed crc32c code.
 >
-> Which framework are you talking about?  lib/crc32.c appears to be a simple
-> module that exports a utility function.  Do you mean that you want to merge the
-> crc32{,c}defs.h and gen_crc32{,c}table.c code?  Do you want a build script that
-> starts with only a crc${ALG}_defs.h file and stamps out gencrc${ALG}_table.c
-> and crc${ALG}.c boilerplate code and then builds it?
-
-I meant adding a crc32c_le in crc32.c and extend gen_table to generate the crc32c table.
-
+> When metadata is usually a small fraction of total IO, this new implementation
+> doesn't help much because metadata is usually a small fraction of total IO.
+> However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
+> tree), then this patch speeds up the operation substantially.
 >
-> I really don't know; from my perspective there was a slow implementation in
-> crypto/crc32c.c and I wanted to speed it up.  crc32c seems to be in crypto/ and
-> not lib/ so that the implementation can be replaced with a hardware accelerated
-> version at runtime (crc32c-intel).
-
-It was a mistake to place it there IMHO.
-
+> Given that iscsi, sctp, and btrfs also use crc32c, this patchset should improve
+> their speed as well.  I have some preliminary results[1] that show the
+> difference in various crc algorithms that I've come across: the "crc32c-by8-le"
+> column is the new algorithm in the patch; the "crc32c" column is the current
+> crc32c kernel implementation; and the "crc32-kern-le" column is the current
+> crc32 kernel implementation, which is similar to the results one gets for
+> CONFIG_CRC32C_SLICEBY4=y.  As you can see, the new implementation runs at
+> nearly 4x the speed of the current implementation; even the slimmer slice-by-4
+> implementation is generally 2-3x faster.
 >
-> For crc32 which has no such hw replacement (as far as I know), moving it into
-> crypto/ would incur the overhead of going through the cryptoapi for not much
-> benefit.  On the other hand it wouldn't be hard to put the crc32 code into
-> crypto/.
-
-No, CRC is not a crypto. It is used by other subsystems like file systems that
-has nothing to do with crypto. Compare with the internet checksum, I think you
-will have a hard time moving it to crypto.
-
-> >
-> > - Slice by 8 is just half the speed on my ppc32 compared to slice by 4 so
-> >   it can't be enabled for all archs. Best to start with all 64 bit archs
+> However, the implementation allows the kernel builder to select from a variety
+> of space-speed tradeoffs, should my results not hold true on a particular
+> class of system.
 >
-> <shrug> I suppose I could make CRC32C_BITS configurable.  What is the hardware
-> profile of your ppc32 processor?  How much L1D/L2 cache?  slice-by-8 does have
-> a big cache footprint.  On the other hand it's faster than the slice-by-4
-> (crc32) and Sarwate (crc32c) code in the kernel, even on old slow 32-bit x86
-> processors (PII, PIII, P4).
-
-It is a low end embedded 333 MHz CPU with only L1 cache. How much faster
-is slice by 8 than slice by 4 on these old x86 machines?
-
-Bobs last version tested for 64/32 bits arch and selected slice by 8/slice by 4 based
-on that.
-
+> v2: Use the crypto testmgr api for self-test.
+> v3: Get rid of the -be version, which had no users.
+> v4: Allow kernel builder a choice of speed vs. space optimization.
 >
-> > - Last time I tested Bobs slice by 8 on ppc32 it didn't work.
+> [1]http://djwong.org/docs/ext4_metadata_checksums.html
+> (cached copy of the ext4 wiki)
 >
-> ... is crc32c broken *now*?  It seems fine on x86/amd64/ppc64.
+> Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
 
-Don't know, I haven't tested it. Don't have much time ATM and I don't
-want to test something I don't agree with.
+This is based on an old version of Bobs slice by 8 that has lots duplication and
+hard to maintain.
+
+Start from Bobs latest patches and add crc32c to lib/crc32.c
+
+Also, for crc32c I think you only need slice by 4 and slice by 8
 
  Jocke
