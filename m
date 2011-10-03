@@ -1,61 +1,58 @@
 From: Joakim Tjernlund <joakim.tjernlund@transmode.se>
-Subject: Re: [PATCH v3] crc32c: Implement CRC32c with slicing-by-8 algorithm
-Date: Mon, 3 Oct 2011 22:13:18 +0200
-Message-ID: <OFDEA4FB6B.CBB97DA3-ONC125791E.006E5FDA-C125791E.006F14E4@transmode.se>
-References: <OF1BEE9025.31A1BE17-ONC125791B.00203167-C125791B.00211B4A@transmode.se> <20110930161223.GW11984@tux1.beaverton.ibm.com> <OF34B3D797.8C95417C-ONC125791C.00497BA8-C125791C.004C2C5A@transmode.se> <20111003160036.GX11984@tux1.beaverton.ibm.com>
+Subject: Re: [PATCH v4] crc32c: Implement CRC32c with slicing-by-8 algorithm
+Date: Mon, 3 Oct 2011 22:27:03 +0200
+Message-ID: <OFA190E2A9.231A7DD6-ONC125791E.006F1765-C125791E.00705758@transmode.se>
+References: <20110930192956.4176.29905.stgit@elm3c44.beaverton.ibm.com> <OF54094699.6F5CF2B6-ONC125791C.004C901C-C125791C.004D1A61@transmode.se> <20111003153634.GA12447@tux1.beaverton.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Mingming Cao <cmm@us.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	Theodore Tso <tytso@mit.edu>
 To: djwong@us.ibm.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gw1.transmode.se ([195.58.98.146]:39159 "EHLO gw1.transmode.se"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755231Ab1JCUNV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Oct 2011 16:13:21 -0400
-In-Reply-To: <20111003160036.GX11984@tux1.beaverton.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+In-Reply-To: <20111003153634.GA12447@tux1.beaverton.ibm.com>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-"Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/10/03 18:00:36:
+"Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/10/03 17:36:46:
 >
-> On Sat, Oct 01, 2011 at 03:52:00PM +0200, Joakim Tjernlund wrote:
-> > "Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/09/30 18:12:23:
-> > >
-> > > [putting mailing lists on cc]
+> On Sat, Oct 01, 2011 at 04:02:10PM +0200, Joakim Tjernlund wrote:
+> >
+> > "Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/09/30 21:29:56:
 
 [SNIP]
 
-> > >
-> > > <shrug> I suppose I could make CRC32C_BITS configurable.  What is the hardware
-> > > profile of your ppc32 processor?  How much L1D/L2 cache?  slice-by-8 does have
-> > > a big cache footprint.  On the other hand it's faster than the slice-by-4
-> > > (crc32) and Sarwate (crc32c) code in the kernel, even on old slow 32-bit x86
-> > > processors (PII, PIII, P4).
 > >
-> > It is a low end embedded 333 MHz CPU with only L1 cache. How much faster
-> > is slice by 8 than slice by 4 on these old x86 machines?
+> > This is based on an old version of Bobs slice by 8 that has lots duplication and
+> > hard to maintain.
 >
-> How much L1 cache?  Or, if you'd rather not give away specifics, has the CPU
-> more than 8KB L1 cache?  I'm willing to concede that with little cache the
-> added memory pressure could be painful.
->
-> As for the old x86 machines, please have a look at:
-> http://djwong.org/docs/ext4_metadata_checksums.html#Benchmarking
->
-> ~15% faster on a 2GHz Via C7
-> ~20% faster on a 2.7GHz P4
-> ~25% faster on a 500MHz P3
->
-> I vaguely recall it was ~20% faster on a 400MHz P2, but all the kernel.org
-> wikis are still down. :(
->
-> So I suspect the key factor here is memory hierachy, since all of those systems
-> have at least 16K of L1 cache.  Slice by 8 might actually suck on a Pentium
-> Proor earlier.  Unfortunately I don't have anything older than a PII...
+> Are you referring to "[PATCH v6 05/10] crc32-misc-cleanup.diff" from 8/31?  I
+> haven't seen that one, so I'll go comb the internet.  Thank you for the
+> pointer, I'll update my patch.
 
-It is 16KB cache on this CPU. I don't know why it was so much slower. Could be a
-gcc thing as gcc does a fairly lame job at optimizing crc32. Still think making this
-configurable is a good thing. At least until the verdict is in from other CPUs.
+Not sure what version it was anymore as some time has passed. I think Bob was
+supposed to do one more round of polishing the code and resend it.
 
-  Jocke
+>
+> > Start from Bobs latest patches and add crc32c to lib/crc32.c
+>
+> If I did that, how should I handle patching in the hardware accelerated version
+> on Intel systems?  That switcheroo ability seems to have been Herbert Xu's
+> motivation for moving crc32c into crypto/ in the first place:
+
+I don't know, I haven't looked at that problem. I suspect it moved because that
+was the easiest solution. Having an identical impl. of crc32(only the table values differ)
+in crypto compared to the one in lib is not the way forward though.
+
+Could not someone on the cc list weigh in here? I have no formal right to
+demand anything, I am just expressing my opinion.
+
+    Jocke
+
