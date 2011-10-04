@@ -1,42 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC v2.1 0/6] evm: digital signature verification extension
-Date: Tue, 4 Oct 2011 21:04:40 +0200
-Message-ID: <20111004190440.GB23212@gondor.apana.org.au>
-References: <cover.1315921427.git.dmitry.kasatkin@intel.com> <1316525069.3189.4.camel@localhost.localdomain> <CALLzPKbPM-7Z4UphWvZUFxT9vF8XJSWyeUGTkLaM7--2A6y7eA@mail.gmail.com> <alpine.LRH.2.00.1109270914480.4126@tundra.namei.org> <CALLzPKa=DuhmTZ7enLH6LNKA1mimC9OJZoaCJrprrHJwg=mRdQ@mail.gmail.com> <20110929001424.GA17356@gondor.apana.org.au> <alpine.LRH.2.00.1109291042290.21622@tundra.namei.org>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: [PATCH v5 0/4] crc32c: Add faster algorithm and self-test code
+Date: Tue, 04 Oct 2011 16:53:57 -0700
+Message-ID: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
 	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dhowells@redhat.com,
-	Greg KH <greg@kroah.com>,
-	"Serge E. Hallyn" <serge.hallyn@canonical.com>
-To: James Morris <jmorris@namei.org>
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	"Darrick J. Wong" <djwong@us.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35568 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932820Ab1JDTE7 (ORCPT
+Received: from e38.co.us.ibm.com ([32.97.110.159]:35475 "EHLO
+	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933620Ab1JDXyB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Oct 2011 15:04:59 -0400
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.00.1109291042290.21622@tundra.namei.org>
+	Tue, 4 Oct 2011 19:54:01 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 29, 2011 at 10:42:46AM +1000, James Morris wrote:
-> On Thu, 29 Sep 2011, Herbert Xu wrote:
-> 
-> > Well if James is OK with adding the user for this then I'm fine
-> > with adding the necessary infrastructure.
-> 
-> Are you happy with the API?
+Hi all,
 
-As there is only one user, we can add whatever we want and fix
-it later, as long as the crypto part is exposed to user-space.
+This patchset (re)uses Bob Pearson's crc32 slice-by-8 code to stamp out a
+software crc32c implementation.  It requires that all ten of his patches (at
+least the ones dated 31 Aug 2011) be applied.  It removes the crc32c
+implementation in crypto/ in favor of using the stamped-out one in lib/.  There
+is also a change to Kconfig so that the kernel builder can pick an
+implementation best suited for the hardware.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The motivation for this patchset is that I am working on adding full metadata
+checksumming to ext4.  As far as performance impact of adding checksumming
+goes, I see nearly no change with a standard mail server ffsb simulation.  On a
+test that involves only file creation and deletion and extent tree writes, I
+see a drop of about 50 pcercent with the current kernel crc32c implementation;
+this improves to a drop of about 20 percent with the enclosed crc32c code.
+
+When metadata is usually a small fraction of total IO, this new implementation
+doesn't help much because metadata is usually a small fraction of total IO.
+However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
+tree), then this patch speeds up the operation substantially.
+
+Incidentally, given that iscsi, sctp, and btrfs also use crc32c, this patchset
+should improve their speed as well.  I have not yet quantified that, however.
+
+--D
