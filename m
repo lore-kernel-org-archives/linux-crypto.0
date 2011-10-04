@@ -1,9 +1,8 @@
-From: "Darrick J. Wong" <djwong@us.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v4] crc32c: Implement CRC32c with slicing-by-8 algorithm
-Date: Mon, 3 Oct 2011 17:55:10 -0700
-Message-ID: <20111004005510.GB12447@tux1.beaverton.ibm.com>
-References: <20110930192956.4176.29905.stgit@elm3c44.beaverton.ibm.com> <OF54094699.6F5CF2B6-ONC125791C.004C901C-C125791C.004D1A61@transmode.se> <20111003153634.GA12447@tux1.beaverton.ibm.com> <OFA190E2A9.231A7DD6-ONC125791E.006F1765-C125791E.00705758@transmode.se> <20111003203513.GA10346@gondor.apana.org.au>
-Reply-To: djwong@us.ibm.com
+Date: Tue, 4 Oct 2011 07:59:53 +0100
+Message-ID: <20111004065953.GA16606@gondor.apana.org.au>
+References: <20110930192956.4176.29905.stgit@elm3c44.beaverton.ibm.com> <OF54094699.6F5CF2B6-ONC125791C.004C901C-C125791C.004D1A61@transmode.se> <20111003153634.GA12447@tux1.beaverton.ibm.com> <OFA190E2A9.231A7DD6-ONC125791E.006F1765-C125791E.00705758@transmode.se> <20111003203513.GA10346@gondor.apana.org.au> <20111004005510.GB12447@tux1.beaverton.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Joakim Tjernlund <joakim.tjernlund@transmode.se>,
@@ -16,44 +15,32 @@ Cc: Joakim Tjernlund <joakim.tjernlund@transmode.se>,
 	linux-kernel <linux-kernel@vger.kernel.org>,
 	Bob Pearson <rpearson@systemfabricworks.com>,
 	Theodore Tso <tytso@mit.edu>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e38.co.us.ibm.com ([32.97.110.159]:42264 "EHLO
-	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752347Ab1JDAzS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Oct 2011 20:55:18 -0400
+To: "Darrick J. Wong" <djwong@us.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20111003203513.GA10346@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20111004005510.GB12447@tux1.beaverton.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 03, 2011 at 09:35:13PM +0100, Herbert Xu wrote:
-> On Mon, Oct 03, 2011 at 10:27:03PM +0200, Joakim Tjernlund wrote:
-> >
-> > > > Start from Bobs latest patches and add crc32c to lib/crc32.c
-> > >
-> > > If I did that, how should I handle patching in the hardware accelerated version
-> > > on Intel systems?  That switcheroo ability seems to have been Herbert Xu's
-> > > motivation for moving crc32c into crypto/ in the first place:
-> > 
-> > I don't know, I haven't looked at that problem. I suspect it moved because that
-> > was the easiest solution. Having an identical impl. of crc32(only the table values differ)
-> > in crypto compared to the one in lib is not the way forward though.
+On Mon, Oct 03, 2011 at 05:55:10PM -0700, Darrick J. Wong wrote:
+>
+> So what I think I'm hearing is...
 > 
-> You can always get crypto/crc32c.c to use call helpers from
-> lib/crc32.c.
+> 1. Apply Bob's slice-by-8 algorithm patch to regular crc32.
+> 2. Adapt crc32's build code to generate crc32c as well.
+> 3. Remove crypto/crc32c.c's implementation and have it wrap the code generated
+>    by #2.
+> 4. Retain the current libcrc32c.  I guess if you don't configure CRYPTO and
+>    CRYPTO_CRC32C then it could also just reference the generated crc32c functions
+>    directly.
+> 
+> Is this a satisfactory way to move forward?
 
-So what I think I'm hearing is...
+All good except that you don't really have to touch libcrc32c
+at all.
 
-1. Apply Bob's slice-by-8 algorithm patch to regular crc32.
-2. Adapt crc32's build code to generate crc32c as well.
-3. Remove crypto/crc32c.c's implementation and have it wrap the code generated
-   by #2.
-4. Retain the current libcrc32c.  I guess if you don't configure CRYPTO and
-   CRYPTO_CRC32C then it could also just reference the generated crc32c functions
-   directly.
-
-Is this a satisfactory way to move forward?
-
---D
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
