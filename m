@@ -1,252 +1,155 @@
-From: Hamid Nassiby <h.nassiby@gmail.com>
-Subject: Re: Fwd: crypto accelerator driver problems
-Date: Wed, 5 Oct 2011 13:33:33 +0330
-Message-ID: <CAFuf8QOCKXOgMyu7FceYRGh_oTw+pt96tasVC19pS1Zzd96mxQ@mail.gmail.com>
-References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com>
- <20101230211900.GA22742@gondor.apana.org.au> <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com>
- <AANLkTin8au=98mmfsaJjOSyJNibk3foZWihj6EGTGWK-@mail.gmail.com>
- <20110126070939.GA18150@gondor.apana.org.au> <AANLkTi=m0jVWSqR1FNX9r9HH32LbA0aWJxSQtLd_VszW@mail.gmail.com>
- <20110126233315.GB26664@gondor.apana.org.au> <CAFuf8QO1gG2WUMmgywHANBHgBj1D8RV8xkJvMYOdiJSovduG+A@mail.gmail.com>
- <20110705065351.GA31107@gondor.apana.org.au> <CAFuf8QPV248w=S06s7mz=vLzYdsrjQ7nvChui-3P3kgMzV8vHA@mail.gmail.com>
- <20111004075755.GV1808@secunet.com>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH v5 0/4] crc32c: Add faster algorithm and self-test code
+Date: Thu, 6 Oct 2011 13:20:42 -0700
+Message-ID: <20111006202042.GD12447@tux1.beaverton.ibm.com>
+References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:55622 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932096Ab1JEKEF convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Oct 2011 06:04:05 -0400
-Received: by bkbzt4 with SMTP id zt4so1912576bkb.19
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Oct 2011 03:04:04 -0700 (PDT)
-In-Reply-To: <20111004075755.GV1808@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 4, 2011 at 11:27 AM, Steffen Klassert
-<steffen.klassert@secunet.com> wrote:
->
-> On Sat, Oct 01, 2011 at 12:38:19PM +0330, Hamid Nassiby wrote:
-> >
-> > And my_cbc_encrypt function as PSEUDO/real code (for simplicity of
-> > representation) is as:
-> >
-> > static int
-> > my_cbc_encrypt(struct blkcipher_desc *desc,
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct scatterlist *dst, struct sca=
-tterlist *src,
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int nbytes)
-> > {
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 SOME__common_preparation_and_initializa=
-tions;
-> >
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock_irqsave(&myloc, myflags);
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 send_request_to_device(&dev); /*sends r=
-equest to device. After
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 processing request,device writes
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 result to destination*/
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 while(!readl(complete_flag)); /*here we=
- wait for a flag in
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 device register spa=
-ce indicating completion. */
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock_irqrestore(&mylock, myflags=
-);
-> >
-> >
-> > }
->
-> As I told you already in the private mail, it makes not too much sens=
-e
-> to parallelize the crypto layer and to hold a global lock during the
-> crypto operation. So if you really need this lock, you are much bette=
-r
-> off without a parallelization.
->
-Hi Steffen,
-Thanks for your reply :).
+On Tue, Oct 04, 2011 at 04:53:57PM -0700, Darrick J. Wong wrote:
+> Hi all,
+> 
+> This patchset (re)uses Bob Pearson's crc32 slice-by-8 code to stamp out a
+> software crc32c implementation.  It requires that all ten of his patches (at
+> least the ones dated 31 Aug 2011) be applied.  It removes the crc32c
+> implementation in crypto/ in favor of using the stamped-out one in lib/.  There
+> is also a change to Kconfig so that the kernel builder can pick an
+> implementation best suited for the hardware.
+> 
+> The motivation for this patchset is that I am working on adding full metadata
+> checksumming to ext4.  As far as performance impact of adding checksumming
+> goes, I see nearly no change with a standard mail server ffsb simulation.  On a
+> test that involves only file creation and deletion and extent tree writes, I
+> see a drop of about 50 pcercent with the current kernel crc32c implementation;
+> this improves to a drop of about 20 percent with the enclosed crc32c code.
+> 
+> When metadata is usually a small fraction of total IO, this new implementation
+> doesn't help much because metadata is usually a small fraction of total IO.
+> However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
+> tree), then this patch speeds up the operation substantially.
+> 
+> Incidentally, given that iscsi, sctp, and btrfs also use crc32c, this patchset
+> should improve their speed as well.  I have not yet quantified that, however.
 
-It makes sense in two manners:
-1. If request transmit time to device is much shorter=A0than request
-processing time
-=A0spent in device and the device has more than one processing engine.
+As for Mr. Tjernlund's unresolved questions regarding the v4 patch, I have
+tested this new code on x64/x32/ppc32/ppc64 and it seems to work fine, both
+with the crc32c selftest and also on a practical level with ext4 metadata
+checksumming enabled.  Updating to Bob's newest calculation code brings about a
+10-15% speedup on the ppc64 box.  I also see that slice-by-8 is about 20%
+faster than slice-by-4 on my ppc32 box.
 
-=A02. It also can be advantageous when device has only one processing
-engine and we
-have multiple blkcipher requests pending behind entrance port of device=
-,
-because delay between request entrances to device will be shorter. The =
-overall
-advantage will be that our IPSec throughput gets nearer to our device b=
-ulk
-encryption throughput. (It is interesting to note that with our
-current driver and device
-configuration, if I test gateway throughput with a traffic belonging to=
- two SAs,
-traveling through one link that connects them, I'll get a rate about
-280Mbps(80Mbps
-increase in comparison with one SA's traffic), while our device's bulk
-processing is
-about 400Mbps.)
+I did _not_ see any failures on ppc32 when running an extended ext4+checksum
+test suite.
 
-Currently we want to take advantage of the latter case and then extend =
-it.
+Details of the ppc32 box:
+root@dyn9047029101:~# cat /proc/cpuinfo 
+processor	: 0
+cpu		: 740/750
+temperature 	: 45 C (uncalibrated)
+clock		: 500.000000MHz
+revision	: 131.0 (pvr 0008 8300)
+bogomips	: 49.86
 
->
->
->
-> >
-> > With above code, I can successfully test IPSec gateway equipped wit=
-h our
-> > hardware and get a 200Mbps throughput using Iperf. Now I am facing =
-with another
-> > poblem. As I mentioned earlier, our hardware has 4 aes engines buil=
-tin. With
-> > above code I only utilize one of them.
-> > >From this point, we want to go a step further and utilize more tha=
-n one aes
-> > engines of our device. Simplest solution appears to me is to deploy
-> > pcrypt/padata, made by Steffen Klassert. First instantiate in a dua=
-l
-> > core gateway :
-> > =A0 =A0 =A0 modprobe tcrypt alg=3D"pcrypt(authenc(hmac(md5),cbc(aes=
-)))" type=3D3
-> > =A0and test again. Running Iperf now gives me a very low
-> > throughput about 20Mbps while dmesg shows the following:
-> >
-> > =A0 =A0BUG: workqueue leaked lock or atomic: kworker/0:1/0x00000001=
-/10
-> > =A0 =A0 =A0 =A0last function: padata_parallel_worker+0x0/0x80
->
-> This looks like the parallel worker exited in atomic context,
-> but I can't tell you much more as long as you don't show us your code=
-=2E
+total bogomips	: 49.86
+timebase	: 24934966
+platform	: PowerMac
+model		: PowerMac1,1
+machine		: PowerMac1,1
+motherboard	: PowerMac1,1 MacRISC Power Macintosh
+detected as	: 66 (Blue&White G3)
+pmac flags	: 00000000
+L2 cache	: 1024K unified
+pmac-generation	: NewWorld
+Memory		: 896 MB
+root@dyn9047029101:~# gcc --version
+gcc-4.4.real (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+Copyright (C) 2009 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+root@dyn9047029101:~# for i in /sys/devices/system/cpu/cpu0/cache/*/*; do echo $i $(cat $i); done
+/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size 32
+/sys/devices/system/cpu/cpu0/cache/index0/level 1
+/sys/devices/system/cpu/cpu0/cache/index0/number_of_sets 128
+/sys/devices/system/cpu/cpu0/cache/index0/shared_cpu_map 00000000,00000000,00000000,00000001
+/sys/devices/system/cpu/cpu0/cache/index0/size 32K
+/sys/devices/system/cpu/cpu0/cache/index0/type Data
+/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity 8
+/sys/devices/system/cpu/cpu0/cache/index1/coherency_line_size 32
+/sys/devices/system/cpu/cpu0/cache/index1/level 1
+/sys/devices/system/cpu/cpu0/cache/index1/number_of_sets 128
+/sys/devices/system/cpu/cpu0/cache/index1/shared_cpu_map 00000000,00000000,00000000,00000001
+/sys/devices/system/cpu/cpu0/cache/index1/size 32K
+/sys/devices/system/cpu/cpu0/cache/index1/type Instruction
+/sys/devices/system/cpu/cpu0/cache/index1/ways_of_associativity 8
+/sys/devices/system/cpu/cpu0/cache/index2/coherency_line_size 128
+/sys/devices/system/cpu/cpu0/cache/index2/level 2
+/sys/devices/system/cpu/cpu0/cache/index2/number_of_sets 4096
+/sys/devices/system/cpu/cpu0/cache/index2/shared_cpu_map 00000000,00000000,00000000,00000001
+/sys/devices/system/cpu/cpu0/cache/index2/size 1024K
+/sys/devices/system/cpu/cpu0/cache/index2/type Unified
+/sys/devices/system/cpu/cpu0/cache/index2/ways_of_associativity 2
 
-OK, I represented code as PSEUSO, just to simplify and concentrate prob=
-lem's
-aspects ;),  (but it is also possible that I've concentrated it in a
-wrong way :D)
-This is my_cbc_encrypt code and functions it calls, bottom-up:
+The ppc64 box:
+root@elm3c7:~# cat /proc/cpuinfo 
+processor	: 0
+cpu		: POWER5+ (gs)
+clock		: 1900.098000MHz
+revision	: 2.0 (pvr 003b 0200)
 
-int write_request(u8 *buff, unsigned int count)
-{
+(the rest is omitted for brevity)
 
-	u32  tlp_size =3D 32;
-	struct my_dma_desc *desc_table =3D (struct my_dma_desc *)global_bar[0]=
-;
-	tlp_size =3D (count/128) | (tlp_size << 16);
-	memcpy(g_mydev->rdmaBuf_va, buff, count);
-	wmb();
+root@elm3c7:~# gcc --version
+gcc-4.4.real (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+Copyright (C) 2009 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-	writel(cpu_to_le32(tlp_size),(&desc_table->wdmaperf));
-	wmb();
+root@elm3c7:~# for i in /sys/devices/system/cpu/cpu0/cache/*/*; do echo $i $(cat $i); done
+/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size 128
+/sys/devices/system/cpu/cpu0/cache/index0/level 1
+/sys/devices/system/cpu/cpu0/cache/index0/number_of_sets 64
+/sys/devices/system/cpu/cpu0/cache/index0/shared_cpu_map 00000000,00000000,00000000,00000001
+/sys/devices/system/cpu/cpu0/cache/index0/size 32K
+/sys/devices/system/cpu/cpu0/cache/index0/type Data
+/sys/devices/system/cpu/cpu0/cache/index0/ways_of_associativity 4
+/sys/devices/system/cpu/cpu0/cache/index1/coherency_line_size 128
+/sys/devices/system/cpu/cpu0/cache/index1/level 1
+/sys/devices/system/cpu/cpu0/cache/index1/number_of_sets 256
+/sys/devices/system/cpu/cpu0/cache/index1/shared_cpu_map 00000000,00000000,00000000,00000001
+/sys/devices/system/cpu/cpu0/cache/index1/size 64K
+/sys/devices/system/cpu/cpu0/cache/index1/type Instruction
+/sys/devices/system/cpu/cpu0/cache/index1/ways_of_associativity 2
+/sys/devices/system/cpu/cpu0/cache/index2/coherency_line_size 128
+/sys/devices/system/cpu/cpu0/cache/index2/level 2
+/sys/devices/system/cpu/cpu0/cache/index2/number_of_sets 1536
+/sys/devices/system/cpu/cpu0/cache/index2/shared_cpu_map 00000000,00000000,00000000,00000005
+/sys/devices/system/cpu/cpu0/cache/index2/size 1920K
+/sys/devices/system/cpu/cpu0/cache/index2/type Unified
+/sys/devices/system/cpu/cpu0/cache/index2/ways_of_associativity 10
+/sys/devices/system/cpu/cpu0/cache/index3/coherency_line_size 128
+/sys/devices/system/cpu/cpu0/cache/index3/level 3
+/sys/devices/system/cpu/cpu0/cache/index3/number_of_sets 1
+/sys/devices/system/cpu/cpu0/cache/index3/shared_cpu_map 00000000,00000000,00000000,00000005
+/sys/devices/system/cpu/cpu0/cache/index3/size 36864K
+/sys/devices/system/cpu/cpu0/cache/index3/type Unified
+/sys/devices/system/cpu/cpu0/cache/index3/ways_of_associativity 0
 
-	while((readl(&desc_table->ddmacr) | 0xFFFF0000)!=3D 0xFFFF0101);/*wait=
- for
- 						transfer compeltion*/
-	return 0;
-}
+--D
 
- int my_transform(struct my_aes_op *op, int alg)
-{
-
-		int  req_len, err;
-		unsigned long iflagsq, tflag;
-		u8 *req_buf =3D NULL, *res_buf =3D NULL;
-		alg_operation operation;
-		if (op->len =3D=3D 0)
-			return 0;
-		operation =3D !(op->dir);
-
-		create_request(alg, op->mode, operation, 0, op->key,
-			  op->iv, op->src, op->len, &req_buf, &req_len); /*add
-			header to original request and copy it to req_buf*/
-
- 		spin_lock_irqsave(&glock, tflag);
-	=09
-		write_request(req_buf, req_len);/*now req_buf is sent to device
-				, device en/decrypts request and writes the
-				the result to a fixed dma mapped address*/
-		if (err){
-			printk(KERN_EMERG"Error WriteReuest:errcode=3D%d\n", err);
-			//handle exception (never occured)
-		}
-		kfree(req_buf);
-		req_buf =3D NULL;
-
-		memcpy(op->dst, (g_mydev->wdmaBuf_va, op->len);/*copy result from
-			 fixed coherent dma mapped memory to destination*/
-		spin_unlock_irqrestore(&glock, tflag);
-	=09
-		return op->len;
-}
-
-static int
-my_cbc_encrypt(struct blkcipher_desc *desc,
-		  struct scatterlist *dst, struct scatterlist *src,
-		  unsigned int nbytes)
-{
-	struct my_aes_op *op =3D crypto_blkcipher_ctx(desc->tfm);
-	struct blkcipher_walk walk;
-	int err, ret;
-	unsigned long c2flag;
-	if (unlikely(op->keylen !=3D AES_KEYSIZE_128))
-		return fallback_blk_enc(desc, dst, src, nbytes);
-
-
-	blkcipher_walk_init(&walk, dst, src, nbytes);
-	err =3D blkcipher_walk_virt(desc, &walk);
-	op->iv =3D walk.iv;
-
-	while((nbytes =3D walk.nbytes)) {
-
-		op->src =3D walk.src.virt.addr,
-		op->dst =3D walk.dst.virt.addr;
-		op->mode =3D AES_MODE_CBC;
-		op->len =3D nbytes /*- (nbytes % AES_MIN_BLOCK_SIZE)*/;
-		op->dir =3D AES_DIR_ENCRYPT;
-		ret =3D my_transform(op, 0);
-		nbytes -=3D ret;
-		err =3D blkcipher_walk_done(desc, &walk, nbytes);
-	}
-
-	return err;
-}
-
->
-> >
-> > I must emphasize again that goal of deploying pcrypt/padata is to h=
-ave more than
-> > one request present in our hardware (e.g. in a quad cpu system we'l=
-l have 4
-> > encryption and 4 decryption requests sent into our hardware). Also =
-I tried using
-> > pcrypt/padata in a single cpu system with one change in pcrypt_init=
-_padata
-> > function of pcrypt.c: passing 4 as max_active parameter of alloc_wo=
-rkqueue.
-> > In fact I called alloc_workqueue as:
-> >
-> > alloc_workqueue(name, WQ_MEM_RECLAIM | WQ_CPU_INTENSIVE, 4);
->
-> This does not make sense. max_active has to be 1 as we have to care a=
-bout the
-> order of the work items, so we don't want to have more than one work =
-item
-> executing at the same time per CPU. And as we run the parallel worker=
-s with BHs
-> off, it is not even possible to execute more than one work item at th=
-e same
-> time per CPU.
->
-
-Did you turn BHs off, to prevent deadlocks  between your workqueues and
-network's softirqs?
-If there is any other thing that will help, I am pleased to hear.
-
-Thanks.
