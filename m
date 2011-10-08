@@ -1,71 +1,112 @@
-From: Joakim Tjernlund <joakim.tjernlund@transmode.se>
-Subject: Re: [PATCH v5 0/4] crc32c: Add faster algorithm and self-test code
-Date: Fri, 7 Oct 2011 09:38:01 +0200
-Message-ID: <OF47136962.36AF976D-ONC1257922.0029A6FB-C1257922.0029EF1C@transmode.se>
-References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111006202042.GD12447@tux1.beaverton.ibm.com>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: [PATCH v5.1 4/4] crc32: Select an algorithm via kconfig
+Date: Sat, 8 Oct 2011 00:42:07 -0700
+Message-ID: <20111008074207.GK12447@tux1.beaverton.ibm.com>
+References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235429.1560.89556.stgit@elm3c44.beaverton.ibm.com>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
-	Mingming Cao <cmm@us.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Joakim Tjernlund <joakim.tjernlund@transmode.se>,
 	Bob Pearson <rpearson@systemfabricworks.com>,
-	Theodore Tso <tytso@mit.edu>
-To: djwong@us.ibm.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gw1.transmode.se ([195.58.98.146]:35376 "EHLO gw1.transmode.se"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759182Ab1JGHiJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Oct 2011 03:38:09 -0400
-In-Reply-To: <20111006202042.GD12447@tux1.beaverton.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20111004235429.1560.89556.stgit@elm3c44.beaverton.ibm.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-"Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/10/06 22:20:42:
-> Subject: Re: [PATCH v5 0/4] crc32c: Add faster algorithm and self-test code
->
-> On Tue, Oct 04, 2011 at 04:53:57PM -0700, Darrick J. Wong wrote:
-> > Hi all,
-> >
-> > This patchset (re)uses Bob Pearson's crc32 slice-by-8 code to stamp out a
-> > software crc32c implementation.  It requires that all ten of his patches (at
-> > least the ones dated 31 Aug 2011) be applied.  It removes the crc32c
-> > implementation in crypto/ in favor of using the stamped-out one in lib/.  There
-> > is also a change to Kconfig so that the kernel builder can pick an
-> > implementation best suited for the hardware.
-> >
-> > The motivation for this patchset is that I am working on adding full metadata
-> > checksumming to ext4.  As far as performance impact of adding checksumming
-> > goes, I see nearly no change with a standard mail server ffsb simulation.  On a
-> > test that involves only file creation and deletion and extent tree writes, I
-> > see a drop of about 50 pcercent with the current kernel crc32c implementation;
-> > this improves to a drop of about 20 percent with the enclosed crc32c code.
-> >
-> > When metadata is usually a small fraction of total IO, this new implementation
-> > doesn't help much because metadata is usually a small fraction of total IO.
-> > However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
-> > tree), then this patch speeds up the operation substantially.
-> >
-> > Incidentally, given that iscsi, sctp, and btrfs also use crc32c, this patchset
-> > should improve their speed as well.  I have not yet quantified that, however.
->
-> As for Mr. Tjernlund's unresolved questions regarding the v4 patch, I have
-> tested this new code on x64/x32/ppc32/ppc64 and it seems to work fine, both
-> with the crc32c selftest and also on a practical level with ext4 metadata
-> checksumming enabled.  Updating to Bob's newest calculation code brings about a
-> 10-15% speedup on the ppc64 box.  I also see that slice-by-8 is about 20%
-> faster than slice-by-4 on my ppc32 box.
->
-> I did _not_ see any failures on ppc32 when running an extended ext4+checksum
-> test suite.
+Oops, the description of CRC32_SLICEBY4 is a bit screwy.  Let's try that again.
+---
+Allow the kernel builder to choose a crc32* algorithm for the kernel.
 
-Hi Darrick, I finally had some time to look this series over and I like
-this much better. Thank you for your patience with me :)
+Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
+---
 
-Acked-By: Joakim Tjernlund <joakim.tjernlund@transmode.se>
+ lib/Kconfig     |   36 ++++++++++++++++++++++++++++++++++++
+ lib/crc32defs.h |   18 ++++++++++++++++++
+ 2 files changed, 54 insertions(+), 0 deletions(-)
 
- Jocke
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 477be04..27881d9 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -70,6 +70,42 @@ config CRC32_SELFTEST
+ 	  and crc32_be over byte strings with random alignment and length
+ 	  and computes the total elapsed time and number of bytes processed.
+ 
++choice
++	prompt "CRC32 implementation"
++	depends on CRC32
++	default CRC32_SLICEBY8
++
++config CRC32_SLICEBY8
++	bool "Slice by 8 bytes"
++	help
++	  Calculate checksum 8 bytes at a time with a clever slicing algorithm.
++	  This is the fastest algorithm, but comes with a 8KiB lookup table.
++	  Most modern processors have enough cache that this shouldn't be
++	  a problem.
++
++	  If you don't know which to choose, choose this one.
++
++config CRC32_SLICEBY4
++	bool "Slice by 4 bytes"
++	help
++	  Calculate checksum 4 bytes at a time with a clever slicing algorithm.
++	  This is a bit slower than slice by 8, but has a smaller 4KiB lookup
++	  table.
++
++config CRC32_SARWATE
++	bool "Sarwate's Algorithm (one byte at a time)"
++	help
++	  Calculate checksum a byte at a time using Sarwate's algorithm.  This
++	  is not particularly fast, but has a small 256 byte lookup table.
++
++config CRC32_BIT
++	bool "Classic Algorithm (one bit at a time)"
++	help
++	  Calculate checksum one bit at a time.  This is VERY slow, but has
++	  no lookup table.  This is provided as a debugging option.
++
++endchoice
++
+ config CRC7
+ 	tristate "CRC7 functions"
+ 	help
+diff --git a/lib/crc32defs.h b/lib/crc32defs.h
+index 6fd1917..64cba2c 100644
+--- a/lib/crc32defs.h
++++ b/lib/crc32defs.h
+@@ -13,6 +13,24 @@
+  */
+ #define CRC32C_POLY_LE 0x82F63B78
+ 
++/* Try to choose an implementation variant via Kconfig */
++#ifdef CONFIG_CRC32_SLICEBY8
++# define CRC_LE_BITS 64
++# define CRC_BE_BITS 64
++#endif
++#ifdef CONFIG_CRC32_SLICEBY4
++# define CRC_LE_BITS 32
++# define CRC_BE_BITS 32
++#endif
++#ifdef CONFIG_CRC32_SARWATE
++# define CRC_LE_BITS 8
++# define CRC_BE_BITS 8
++#endif
++#ifdef CONFIG_CRC32_BIT
++# define CRC_LE_BITS 1
++# define CRC_BE_BITS 1
++#endif
++
+ /*
+  * How many bits at a time to use.  Valid values are 1, 2, 4, 8, 32 and 64.
+  * For less performance-sensitive, use 4 or 8 to save table size.
