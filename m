@@ -1,37 +1,51 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH] crypto: twofish-x86_64-3way: fix ctr blocksize to 1
-Date: Mon, 10 Oct 2011 12:33:02 +0300
-Message-ID: <20111010093302.7983.18671.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:58659 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753097Ab1JJJdG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Oct 2011 05:33:06 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Richard Weinberger <richard@nod.at>
+Subject: [PATCH] crypto: Make hifn_795x build depend on !ARCH_DMA_ADDR_T_64BIT
+Date: Mon, 10 Oct 2011 12:55:41 +0200
+Message-ID: <1318244141-10879-1-git-send-email-richard@nod.at>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, Richard Weinberger <richard@nod.at>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+hifn_795x works only on 32 bit, remove the detection while loading
+the module and catch non-32 bit systems at build time.
+
+Signed-off-by: Richard Weinberger <richard@nod.at>
 ---
- arch/x86/crypto/twofish_glue_3way.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ drivers/crypto/Kconfig     |    1 +
+ drivers/crypto/hifn_795x.c |    6 ++----
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index 0cbf9fa..5ede9c4 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -414,7 +414,7 @@ static struct crypto_alg blk_ctr_alg = {
- 	.cra_driver_name	= "ctr-twofish-3way",
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= TF_BLOCK_SIZE,
-+	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct twofish_ctx),
- 	.cra_alignmask		= 0,
- 	.cra_type		= &crypto_blkcipher_type,
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index e0b25de..fdbb726 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -200,6 +200,7 @@ config CRYPTO_DEV_HIFN_795X
+ 	select CRYPTO_BLKCIPHER
+ 	select HW_RANDOM if CRYPTO_DEV_HIFN_795X_RNG
+ 	depends on PCI
++	depends on !ARCH_DMA_ADDR_T_64BIT
+ 	help
+ 	  This option allows you to have support for HIFN 795x crypto adapters.
+ 
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index a84250a..fe765f4 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2744,10 +2744,8 @@ static int __init hifn_init(void)
+ 	unsigned int freq;
+ 	int err;
+ 
+-	if (sizeof(dma_addr_t) > 4) {
+-		printk(KERN_INFO "HIFN supports only 32-bit addresses.\n");
+-		return -EINVAL;
+-	}
++	/* HIFN supports only 32-bit addresses */
++	BUILD_BUG_ON(sizeof(dma_addr_t) != 4);
+ 
+ 	if (strncmp(hifn_pll_ref, "ext", 3) &&
+ 	    strncmp(hifn_pll_ref, "pci", 3)) {
+-- 
+1.7.7
