@@ -1,31 +1,37 @@
-From: Sverd Johnsen <sverd.johnsen@googlemail.com>
-Subject: CONFIG_CRYPTO_PCRYPT, CONFIG_CRYPTO_CRYPTD etc. questions
-Date: Sun, 9 Oct 2011 01:00:08 +0200
-Message-ID: <CAGmahrQ5YC0UynzyjzMcvunh_UgKo-OMF6A9PM_nD3w12hrM2Q@mail.gmail.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH] crypto: blowfish-x86_64: fix ctr blocksize to 1
+Date: Mon, 10 Oct 2011 12:32:15 +0300
+Message-ID: <20111010093215.7547.44692.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:36542 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752311Ab1JHXAI (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:54152 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753118Ab1JJJcS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Oct 2011 19:00:08 -0400
-Received: by pzk1 with SMTP id 1so12749107pzk.1
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Oct 2011 16:00:08 -0700 (PDT)
+	Mon, 10 Oct 2011 05:32:18 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey,
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ arch/x86/crypto/blowfish_glue.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-how do they work? Should one use them? Does it work with all ciphers?
-Do they exclude each other?
-
-Do they need module parameters? What if they are built-in? How can I
-verify that they work?
-How do they work? There is absolutely no fucking information
-whatsoever, neither in the help text nor in the docs. Am i missing
-something?
-
-Talking mostly about typical disk encryption on SMP machines via
-dm-crypt, interested in best performance. (without AES-NI)
+diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
+index 40911ab..dd3964a 100644
+--- a/arch/x86/crypto/blowfish_glue.c
++++ b/arch/x86/crypto/blowfish_glue.c
+@@ -423,7 +423,7 @@ static struct crypto_alg blk_ctr_alg = {
+ 	.cra_driver_name	= "ctr-blowfish-asm",
+ 	.cra_priority		= 300,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		= BF_BLOCK_SIZE,
++	.cra_blocksize		= 1,
+ 	.cra_ctxsize		= sizeof(struct bf_ctx),
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
