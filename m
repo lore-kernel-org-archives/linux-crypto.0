@@ -1,51 +1,277 @@
-From: Richard Weinberger <richard@nod.at>
-Subject: [PATCH] crypto: Make hifn_795x build depend on !ARCH_DMA_ADDR_T_64BIT
-Date: Mon, 10 Oct 2011 12:55:41 +0200
-Message-ID: <1318244141-10879-1-git-send-email-richard@nod.at>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, Richard Weinberger <richard@nod.at>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH] crypto: testmgr: add blowfish test-vectors
+Date: Mon, 10 Oct 2011 23:03:03 +0300
+Message-ID: <20111010200303.4105.72745.stgit@localhost6.localdomain6>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:35971 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753714Ab1JJUDJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Oct 2011 16:03:09 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-hifn_795x works only on 32 bit, remove the detection while loading
-the module and catch non-32 bit systems at build time.
+Add tests for parallel blowfish-x86_64 code paths.
 
-Signed-off-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- drivers/crypto/Kconfig     |    1 +
- drivers/crypto/hifn_795x.c |    6 ++----
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ crypto/tcrypt.c  |    1 
+ crypto/testmgr.c |   15 +++++
+ crypto/testmgr.h |  172 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 184 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index e0b25de..fdbb726 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -200,6 +200,7 @@ config CRYPTO_DEV_HIFN_795X
- 	select CRYPTO_BLKCIPHER
- 	select HW_RANDOM if CRYPTO_DEV_HIFN_795X_RNG
- 	depends on PCI
-+	depends on !ARCH_DMA_ADDR_T_64BIT
- 	help
- 	  This option allows you to have support for HIFN 795x crypto adapters.
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index fc35650..91f3ab4 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -782,6 +782,7 @@ static int do_test(int m)
+ 	case 7:
+ 		ret += tcrypt_test("ecb(blowfish)");
+ 		ret += tcrypt_test("cbc(blowfish)");
++		ret += tcrypt_test("ctr(blowfish)");
+ 		break;
  
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index a84250a..fe765f4 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -2744,10 +2744,8 @@ static int __init hifn_init(void)
- 	unsigned int freq;
- 	int err;
+ 	case 8:
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b6b93d4..466f9c0 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1756,6 +1756,21 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "ctr(blowfish)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = {
++				.enc = {
++					.vecs = bf_ctr_enc_tv_template,
++					.count = BF_CTR_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = bf_ctr_dec_tv_template,
++					.count = BF_CTR_DEC_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "cts(cbc(aes))",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 27adc92..a519022 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -2391,10 +2391,12 @@ static struct cipher_testvec des3_ede_cbc_dec_tv_template[] = {
+ /*
+  * Blowfish test vectors.
+  */
+-#define BF_ENC_TEST_VECTORS	6
+-#define BF_DEC_TEST_VECTORS	6
+-#define BF_CBC_ENC_TEST_VECTORS	1
+-#define BF_CBC_DEC_TEST_VECTORS	1
++#define BF_ENC_TEST_VECTORS	7
++#define BF_DEC_TEST_VECTORS	7
++#define BF_CBC_ENC_TEST_VECTORS	2
++#define BF_CBC_DEC_TEST_VECTORS	2
++#define BF_CTR_ENC_TEST_VECTORS	2
++#define BF_CTR_DEC_TEST_VECTORS	2
  
--	if (sizeof(dma_addr_t) > 4) {
--		printk(KERN_INFO "HIFN supports only 32-bit addresses.\n");
--		return -EINVAL;
--	}
-+	/* HIFN supports only 32-bit addresses */
-+	BUILD_BUG_ON(sizeof(dma_addr_t) != 4);
+ static struct cipher_testvec bf_enc_tv_template[] = {
+ 	{ /* DES test vectors from OpenSSL */
+@@ -2448,6 +2450,24 @@ static struct cipher_testvec bf_enc_tv_template[] = {
+ 		.ilen	= 8,
+ 		.result	= "\xc0\x45\x04\x01\x2e\x4e\x1f\x53",
+ 		.rlen	= 8,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.ilen	= 40,
++		.result	= "\x96\x87\x3D\x0C\x7B\xFB\xBD\x1F"
++			  "\xE3\xC1\x99\x6D\x39\xD4\xC2\x7D"
++			  "\xD7\x87\xA1\xF2\xDF\x51\x71\x26"
++			  "\xC2\xF4\x6D\xFF\xF6\xCD\x6B\x40"
++			  "\xE1\xB3\xBF\xD4\x38\x2B\xC8\x3B",
++		.rlen	= 40,
+ 	},
+ };
  
- 	if (strncmp(hifn_pll_ref, "ext", 3) &&
- 	    strncmp(hifn_pll_ref, "pci", 3)) {
--- 
-1.7.7
+@@ -2503,6 +2523,24 @@ static struct cipher_testvec bf_dec_tv_template[] = {
+ 		.ilen	= 8,
+ 		.result	= "\xfe\xdc\xba\x98\x76\x54\x32\x10",
+ 		.rlen	= 8,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.input	= "\x96\x87\x3D\x0C\x7B\xFB\xBD\x1F"
++			  "\xE3\xC1\x99\x6D\x39\xD4\xC2\x7D"
++			  "\xD7\x87\xA1\xF2\xDF\x51\x71\x26"
++			  "\xC2\xF4\x6D\xFF\xF6\xCD\x6B\x40"
++			  "\xE1\xB3\xBF\xD4\x38\x2B\xC8\x3B",
++		.ilen	= 40,
++		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.rlen	= 40,
+ 	},
+ };
+ 
+@@ -2522,6 +2560,25 @@ static struct cipher_testvec bf_cbc_enc_tv_template[] = {
+ 			  "\x58\xde\xb9\xe7\x15\x46\x16\xd9"
+ 			  "\x59\xf1\x65\x2b\xd5\xff\x92\xcc",
+ 		.rlen	= 32,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.ilen	= 40,
++		.result	= "\xB4\xFE\xA5\xBB\x3D\x2C\x27\x06"
++			  "\x06\x2B\x3A\x92\xB2\xF5\x5E\x62"
++			  "\x84\xCD\xF7\x66\x7E\x41\x6C\x8E"
++			  "\x1B\xD9\x02\xB6\x48\xB0\x87\x25"
++			  "\x01\x9C\x93\x63\x51\x60\x82\xD2",
++		.rlen	= 40,
+ 	},
+ };
+ 
+@@ -2541,6 +2598,113 @@ static struct cipher_testvec bf_cbc_dec_tv_template[] = {
+ 			  "\x68\x65\x20\x74\x69\x6d\x65\x20"
+ 			  "\x66\x6f\x72\x20\x00\x00\x00\x00",
+ 		.rlen	= 32,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\xB4\xFE\xA5\xBB\x3D\x2C\x27\x06"
++			  "\x06\x2B\x3A\x92\xB2\xF5\x5E\x62"
++			  "\x84\xCD\xF7\x66\x7E\x41\x6C\x8E"
++			  "\x1B\xD9\x02\xB6\x48\xB0\x87\x25"
++			  "\x01\x9C\x93\x63\x51\x60\x82\xD2",
++		.ilen	= 40,
++		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.rlen	= 40,
++	},
++};
++
++static struct cipher_testvec bf_ctr_enc_tv_template[] = {
++	{ /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.ilen	= 40,
++		.result	= "\xC7\xA3\xDF\xB9\x05\xF4\x9E\x8D"
++			  "\x9E\xDF\x38\x18\x83\x07\xEF\xC1"
++			  "\x93\x3C\xAA\xAA\xFE\x06\x42\xCC"
++			  "\x0D\x70\x86\x5A\x44\xAD\x85\x17"
++			  "\xE4\x1F\x5E\xA5\x89\xAC\x32\xBC",
++		.rlen	= 40,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
++			  "\x6D\x04\x9B",
++		.ilen	= 43,
++		.result	= "\xC7\xA3\xDF\xB9\x05\xF4\x9E\x8D"
++			  "\x9E\xDF\x38\x18\x83\x07\xEF\xC1"
++			  "\x93\x3C\xAA\xAA\xFE\x06\x42\xCC"
++			  "\x0D\x70\x86\x5A\x44\xAD\x85\x17"
++			  "\xE4\x1F\x5E\xA5\x89\xAC\x32\xBC"
++			  "\x3D\xA7\xE9",
++		.rlen	= 43,
++	},
++};
++
++static struct cipher_testvec bf_ctr_dec_tv_template[] = {
++	{ /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\xC7\xA3\xDF\xB9\x05\xF4\x9E\x8D"
++			  "\x9E\xDF\x38\x18\x83\x07\xEF\xC1"
++			  "\x93\x3C\xAA\xAA\xFE\x06\x42\xCC"
++			  "\x0D\x70\x86\x5A\x44\xAD\x85\x17"
++			  "\xE4\x1F\x5E\xA5\x89\xAC\x32\xBC",
++		.ilen	= 40,
++		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9",
++		.rlen	= 40,
++	}, { /* Generated with Crypto++ */
++		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
++			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
++			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
++			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
++		.klen	= 32,
++		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F",
++		.input	= "\xC7\xA3\xDF\xB9\x05\xF4\x9E\x8D"
++			  "\x9E\xDF\x38\x18\x83\x07\xEF\xC1"
++			  "\x93\x3C\xAA\xAA\xFE\x06\x42\xCC"
++			  "\x0D\x70\x86\x5A\x44\xAD\x85\x17"
++			  "\xE4\x1F\x5E\xA5\x89\xAC\x32\xBC"
++			  "\x3D\xA7\xE9",
++		.ilen	= 43,
++		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
++			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
++			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
++			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
++			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
++			  "\x6D\x04\x9B",
++		.rlen	= 43,
+ 	},
+ };
+ 
