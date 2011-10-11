@@ -1,331 +1,127 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH] crypto: testmgr: add twofish tests
-Date: Mon, 10 Oct 2011 23:03:12 +0300
-Message-ID: <20111010200312.4190.27860.stgit@localhost6.localdomain6>
+From: Boaz Harrosh <bharrosh@panasas.com>
+Subject: [RFC]: do_xor_speed Broken on UML do to jiffies
+Date: Tue, 11 Oct 2011 02:13:21 +0200
+Message-ID: <4E938A21.70708@panasas.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:35769 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753714Ab1JJUDU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Oct 2011 16:03:20 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Dan Williams <dan.j.williams@intel.com>, Herbert Xu
+	<herbert@gondor.hengli.com.au>, "David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, l
+Return-path: <user-mode-linux-devel-bounces@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/user-mode-linux-devel>,
+	<mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=user-mode-linux-devel>
+List-Post: <mailto:user-mode-linux-devel@lists.sourceforge.net>
+List-Help: <mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/user-mode-linux-devel>,
+	<mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=subscribe>
+Errors-To: user-mode-linux-devel-bounces@lists.sourceforge.net
+List-Id: linux-crypto.vger.kernel.org
 
-Add tests for parallel twofish-x86_64-3way code paths.
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Remember that hang I reported a while back on UML. Well
+I'm at it again, and it still hangs and I found why.
+
+I have dprinted jiffies and it never advances during the
+loop at do_xor_speed. Therefor it is stuck in an endless
+loop. I have also dprinted current_kernel_time() and it
+returns the same constant value as well.
+
+Note that it does usually work on UML, only during
+the modprobe of xor.ko while that test is running, it is broken.
+It looks like some lucking is preventing the clock from ticking.
+
+However ktime_get_ts does work for me so I changed the code
+as below, so I can work. See how I put several safety
+guards, to never get hangs again.
+And I think my time based approach is more accurate then
+previous system.
+
+UML guys please investigate the jiffies issue? what is
+xor.ko not doing right?
+
+Signed-off-by: Boaz Harrosh <bharrosh@panasas.com>
 ---
- crypto/tcrypt.c  |    1 
- crypto/testmgr.c |   15 ++++
- crypto/testmgr.h |  226 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 238 insertions(+), 4 deletions(-)
+ crypto/xor.c |   46 +++++++++++++++++++++++++++-------------------
+ 1 files changed, 27 insertions(+), 19 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 91f3ab4..0c4e80f 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -788,6 +788,7 @@ static int do_test(int m)
- 	case 8:
- 		ret += tcrypt_test("ecb(twofish)");
- 		ret += tcrypt_test("cbc(twofish)");
-+		ret += tcrypt_test("ctr(twofish)");
- 		break;
- 
- 	case 9:
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 466f9c0..e91c1eb 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1771,6 +1771,21 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "ctr(twofish)",
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = {
-+				.enc = {
-+					.vecs = tf_ctr_enc_tv_template,
-+					.count = TF_CTR_ENC_TEST_VECTORS
-+				},
-+				.dec = {
-+					.vecs = tf_ctr_dec_tv_template,
-+					.count = TF_CTR_DEC_TEST_VECTORS
-+				}
-+			}
-+		}
-+	}, {
- 		.alg = "cts(cbc(aes))",
- 		.test = alg_test_skcipher,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index a519022..37b4d8f 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -2711,10 +2711,12 @@ static struct cipher_testvec bf_ctr_dec_tv_template[] = {
- /*
-  * Twofish test vectors.
-  */
--#define TF_ENC_TEST_VECTORS		3
--#define TF_DEC_TEST_VECTORS		3
--#define TF_CBC_ENC_TEST_VECTORS		4
--#define TF_CBC_DEC_TEST_VECTORS		4
-+#define TF_ENC_TEST_VECTORS		4
-+#define TF_DEC_TEST_VECTORS		4
-+#define TF_CBC_ENC_TEST_VECTORS		5
-+#define TF_CBC_DEC_TEST_VECTORS		5
-+#define TF_CTR_ENC_TEST_VECTORS		2
-+#define TF_CTR_DEC_TEST_VECTORS		2
- 
- static struct cipher_testvec tf_enc_tv_template[] = {
- 	{
-@@ -2746,6 +2748,30 @@ static struct cipher_testvec tf_enc_tv_template[] = {
- 		.result	= "\x37\x52\x7b\xe0\x05\x23\x34\xb8"
- 			  "\x9f\x0c\xfc\xca\xe8\x7c\xfa\x20",
- 		.rlen	= 16,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x3F\x85\x62\x3F\x1C\xF9\xD6\x1C"
-+			  "\xF9\xD6\xB3\x90\x6D\x4A\x90\x6D"
-+			  "\x4A\x27\x04\xE1\x27\x04\xE1\xBE"
-+			  "\x9B\x78\xBE\x9B\x78\x55\x32\x0F",
-+		.klen	= 32,
-+		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.ilen	= 64,
-+		.result	= "\x88\xCB\x1E\xC2\xAF\x8A\x97\xFF"
-+			  "\xF6\x90\x46\x9C\x4A\x0F\x08\xDC"
-+			  "\xDE\xAB\xAD\xFA\xFC\xA8\xC2\x3D"
-+			  "\xE0\xE4\x8B\x3F\xD5\xA3\xF7\x14"
-+			  "\x34\x9E\xB6\x08\xB2\xDD\xA8\xF5"
-+			  "\xDF\xFA\xC7\xE8\x09\x50\x76\x08"
-+			  "\xA2\xB6\x6A\x59\xC0\x2B\x6D\x05"
-+			  "\x89\xF6\x82\xF0\xD3\xDB\x06\x02",
-+		.rlen	= 64,
- 	},
- };
- 
-@@ -2779,6 +2805,30 @@ static struct cipher_testvec tf_dec_tv_template[] = {
- 		.ilen	= 16,
- 		.result	= zeroed_string,
- 		.rlen	= 16,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x3F\x85\x62\x3F\x1C\xF9\xD6\x1C"
-+			  "\xF9\xD6\xB3\x90\x6D\x4A\x90\x6D"
-+			  "\x4A\x27\x04\xE1\x27\x04\xE1\xBE"
-+			  "\x9B\x78\xBE\x9B\x78\x55\x32\x0F",
-+		.klen	= 32,
-+		.input	= "\x88\xCB\x1E\xC2\xAF\x8A\x97\xFF"
-+			  "\xF6\x90\x46\x9C\x4A\x0F\x08\xDC"
-+			  "\xDE\xAB\xAD\xFA\xFC\xA8\xC2\x3D"
-+			  "\xE0\xE4\x8B\x3F\xD5\xA3\xF7\x14"
-+			  "\x34\x9E\xB6\x08\xB2\xDD\xA8\xF5"
-+			  "\xDF\xFA\xC7\xE8\x09\x50\x76\x08"
-+			  "\xA2\xB6\x6A\x59\xC0\x2B\x6D\x05"
-+			  "\x89\xF6\x82\xF0\xD3\xDB\x06\x02",
-+		.ilen	= 64,
-+		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.rlen	= 64,
- 	},
- };
- 
-@@ -2825,6 +2875,32 @@ static struct cipher_testvec tf_cbc_enc_tv_template[] = {
- 			  "\x05\xef\x8c\x61\xa8\x11\x58\x26"
- 			  "\x34\xba\x5c\xb7\x10\x6a\xa6\x41",
- 		.rlen	= 48,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.ilen	= 64,
-+		.result	= "\xC8\xFF\xF2\x53\xA6\x27\x09\xD1"
-+			  "\x33\x38\xC2\xC0\x0C\x14\x7E\xB5"
-+			  "\x26\x1B\x05\x0C\x05\x12\x3F\xC0"
-+			  "\xF9\x1C\x02\x28\x40\x96\x6F\xD0"
-+			  "\x3D\x32\xDF\xDA\x56\x00\x6E\xEE"
-+			  "\x5B\x2A\x72\x9D\xC2\x4D\x19\xBC"
-+			  "\x8C\x53\xFA\x87\x6F\xDD\x81\xA3"
-+			  "\xB1\xD3\x44\x65\xDF\xE7\x63\x38",
-+		.rlen	= 64,
- 	},
- };
- 
-@@ -2871,6 +2947,148 @@ static struct cipher_testvec tf_cbc_dec_tv_template[] = {
- 		.ilen	= 48,
- 		.result	= zeroed_string,
- 		.rlen	= 48,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\xC8\xFF\xF2\x53\xA6\x27\x09\xD1"
-+			  "\x33\x38\xC2\xC0\x0C\x14\x7E\xB5"
-+			  "\x26\x1B\x05\x0C\x05\x12\x3F\xC0"
-+			  "\xF9\x1C\x02\x28\x40\x96\x6F\xD0"
-+			  "\x3D\x32\xDF\xDA\x56\x00\x6E\xEE"
-+			  "\x5B\x2A\x72\x9D\xC2\x4D\x19\xBC"
-+			  "\x8C\x53\xFA\x87\x6F\xDD\x81\xA3"
-+			  "\xB1\xD3\x44\x65\xDF\xE7\x63\x38",
-+		.ilen	= 64,
-+		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.rlen	= 64,
-+	},
-+};
+diff --git a/crypto/xor.c b/crypto/xor.c
+index b75182d..65433f5 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -62,37 +62,45 @@ static struct xor_block_template *template_list;
+ static void
+ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ {
+-	int speed;
+-	unsigned long now;
+-	int i, count, max;
++	unsigned speed, count;
++	u64 ns_begin;
++	u64 ns_end;
++	struct timespec ts;
 +
-+static struct cipher_testvec tf_ctr_enc_tv_template[] = {
-+	{ /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.ilen	= 64,
-+		.result	= "\xDF\xDD\x69\xFA\xB0\x2E\xFD\xFE"
-+			  "\x70\x9E\xC5\x4B\xC9\xD4\xA1\x30"
-+			  "\x26\x9B\x89\xA1\xEE\x43\xE0\x52"
-+			  "\x55\x17\x4E\xC7\x0E\x33\x1F\xF1"
-+			  "\x9F\x8D\x40\x9F\x24\xFD\x92\xA0"
-+			  "\xBC\x8F\x35\xDD\x67\x38\xD8\xAA"
-+			  "\xCF\xF8\x48\xCA\xFB\xE4\x5C\x60"
-+			  "\x01\x41\x21\x12\x38\xAB\x52\x4F",
-+		.rlen	= 64,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C"
-+			  "\xC3\x37\xCE",
-+		.ilen	= 67,
-+		.result	= "\xDF\xDD\x69\xFA\xB0\x2E\xFD\xFE"
-+			  "\x70\x9E\xC5\x4B\xC9\xD4\xA1\x30"
-+			  "\x26\x9B\x89\xA1\xEE\x43\xE0\x52"
-+			  "\x55\x17\x4E\xC7\x0E\x33\x1F\xF1"
-+			  "\x9F\x8D\x40\x9F\x24\xFD\x92\xA0"
-+			  "\xBC\x8F\x35\xDD\x67\x38\xD8\xAA"
-+			  "\xCF\xF8\x48\xCA\xFB\xE4\x5C\x60"
-+			  "\x01\x41\x21\x12\x38\xAB\x52\x4F"
-+			  "\xA8\x57\x20",
-+		.rlen	= 67,
-+	},
-+};
-+
-+static struct cipher_testvec tf_ctr_dec_tv_template[] = {
-+	{ /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\xDF\xDD\x69\xFA\xB0\x2E\xFD\xFE"
-+			  "\x70\x9E\xC5\x4B\xC9\xD4\xA1\x30"
-+			  "\x26\x9B\x89\xA1\xEE\x43\xE0\x52"
-+			  "\x55\x17\x4E\xC7\x0E\x33\x1F\xF1"
-+			  "\x9F\x8D\x40\x9F\x24\xFD\x92\xA0"
-+			  "\xBC\x8F\x35\xDD\x67\x38\xD8\xAA"
-+			  "\xCF\xF8\x48\xCA\xFB\xE4\x5C\x60"
-+			  "\x01\x41\x21\x12\x38\xAB\x52\x4F",
-+		.ilen	= 64,
-+		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C",
-+		.rlen	= 64,
-+	}, { /* Generated with Crypto++ */
-+		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
-+			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-+			  "\x27\x04\xE1\x27\x04\xE1\xBE\x9B"
-+			  "\x78\xBE\x9B\x78\x55\x32\x0F\x55",
-+		.klen	= 32,
-+		.iv	= "\xE2\x24\x89\xEE\x53\xB8\x1D\x5F"
-+			  "\xC4\x29\x8E\xF3\x35\x9A\xFF\x64",
-+		.input	= "\xDF\xDD\x69\xFA\xB0\x2E\xFD\xFE"
-+			  "\x70\x9E\xC5\x4B\xC9\xD4\xA1\x30"
-+			  "\x26\x9B\x89\xA1\xEE\x43\xE0\x52"
-+			  "\x55\x17\x4E\xC7\x0E\x33\x1F\xF1"
-+			  "\x9F\x8D\x40\x9F\x24\xFD\x92\xA0"
-+			  "\xBC\x8F\x35\xDD\x67\x38\xD8\xAA"
-+			  "\xCF\xF8\x48\xCA\xFB\xE4\x5C\x60"
-+			  "\x01\x41\x21\x12\x38\xAB\x52\x4F"
-+			  "\xA8\x57\x20",
-+		.ilen	= 67,
-+		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
-+			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
-+			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-+			  "\xAC\x20\xB7\x4E\xE5\x59\xF0\x87"
-+			  "\x1E\x92\x29\xC0\x34\xCB\x62\xF9"
-+			  "\x6D\x04\x9B\x0F\xA6\x3D\xD4\x48"
-+			  "\xDF\x76\x0D\x81\x18\xAF\x23\xBA"
-+			  "\x51\xE8\x5C\xF3\x8A\x21\x95\x2C"
-+			  "\xC3\x37\xCE",
-+		.rlen	= 67,
- 	},
- };
  
+ 	tmpl->next = template_list;
+ 	template_list = tmpl;
+ 
+ 	/*
+-	 * Count the number of XORs done during a whole jiffy, and use
++	 * Count the number of XORs done during 10 miliseconds, and use
+ 	 * this to calculate the speed of checksumming.  We use a 2-page
+ 	 * allocation to have guaranteed color L1-cache layout.
+ 	 */
+-	max = 0;
+-	for (i = 0; i < 5; i++) {
+-		now = jiffies;
+-		count = 0;
+-		while (jiffies == now) {
+-			mb(); /* prevent loop optimzation */
+-			tmpl->do_2(BENCH_SIZE, b1, b2);
+-			mb();
+-			count++;
+-			mb();
+-		}
+-		if (count > max)
+-			max = count;
++	ktime_get_ts(&ts);
++	ns_begin = timespec_to_ns(&ts);
++	count = 0;
++	while (count < 4000000L) {
++		mb(); /* prevent loop optimzation */
++		tmpl->do_2(BENCH_SIZE, b1, b2);
++		mb();
++		count++;
++		mb();
++
++		ktime_get_ts(&ts);
++		ns_end = timespec_to_ns(&ts);
++		/* Test for 10 miliseconds */
++		if ((ns_end - ns_begin) > NSEC_PER_SEC / 100)
++			break;
+ 	}
+ 
+-	speed = max * (HZ * BENCH_SIZE / 1024);
++	ns_end -= ns_begin;
++	if (ns_end > 0)
++		speed = BENCH_SIZE / 1024 * count * NSEC_PER_SEC / ns_end;
++	else
++		speed = 17;
+ 	tmpl->speed = speed;
+ 
+-	printk(KERN_INFO "   %-10s: %5d.%03d MB/sec\n", tmpl->name,
++	printk(KERN_INFO "   %-10s: %5u.%03u MB/sec\n", tmpl->name,
+ 	       speed / 1000, speed % 1000);
+ }
+ 
+-- 
+1.7.2.3
+
+
+------------------------------------------------------------------------------
+All the data continuously generated in your IT infrastructure contains a
+definitive record of customers, application performance, security
+threats, fraudulent activity and more. Splunk takes this data and makes
+sense of it. Business sense. IT sense. Common sense.
+http://p.sf.net/sfu/splunk-d2d-oct
