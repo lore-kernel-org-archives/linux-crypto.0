@@ -1,127 +1,72 @@
-From: Boaz Harrosh <bharrosh@panasas.com>
-Subject: [RFC]: do_xor_speed Broken on UML do to jiffies
-Date: Tue, 11 Oct 2011 02:13:21 +0200
-Message-ID: <4E938A21.70708@panasas.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: CONFIG_CRYPTO_PCRYPT, CONFIG_CRYPTO_CRYPTD etc. questions
+Date: Tue, 11 Oct 2011 11:17:06 +0200
+Message-ID: <20111011091706.GA1830@secunet.com>
+References: <CAGmahrQ5YC0UynzyjzMcvunh_UgKo-OMF6A9PM_nD3w12hrM2Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-To: Dan Williams <dan.j.williams@intel.com>, Herbert Xu
-	<herbert@gondor.hengli.com.au>, "David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, l
-Return-path: <user-mode-linux-devel-bounces@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/user-mode-linux-devel>,
-	<mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=user-mode-linux-devel>
-List-Post: <mailto:user-mode-linux-devel@lists.sourceforge.net>
-List-Help: <mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/user-mode-linux-devel>,
-	<mailto:user-mode-linux-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: user-mode-linux-devel-bounces@lists.sourceforge.net
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Sverd Johnsen <sverd.johnsen@googlemail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:44909 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751368Ab1JKJRJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Oct 2011 05:17:09 -0400
+Content-Disposition: inline
+In-Reply-To: <CAGmahrQ5YC0UynzyjzMcvunh_UgKo-OMF6A9PM_nD3w12hrM2Q@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On Sun, Oct 09, 2011 at 01:00:08AM +0200, Sverd Johnsen wrote:
+> Hey,
+> 
+> how do they work? Should one use them? Does it work with all ciphers?
+> Do they exclude each other?
 
-Remember that hang I reported a while back on UML. Well
-I'm at it again, and it still hangs and I found why.
+They don't exclude each other, but using both in an algorithm instance
+does not make much sense. It depends on your usecase what to choose.
 
-I have dprinted jiffies and it never advances during the
-loop at do_xor_speed. Therefor it is stuck in an endless
-loop. I have also dprinted current_kernel_time() and it
-returns the same constant value as well.
+If a single cpu sends a lot of crypto requests (like it happens on
+IPsec networking), it makes sense to parallelize with pcrypt. 
 
-Note that it does usually work on UML, only during
-the modprobe of xor.ko while that test is running, it is broken.
-It looks like some lucking is preventing the clock from ticking.
+Usually you don't need to setup a cryptd algorithm expicit. If an
+algorithm needs cryptd, it cooses it automatically. It is used e.g.
+to move the crypto requests out of atomic context (AES-NI does this.)
 
-However ktime_get_ts does work for me so I changed the code
-as below, so I can work. See how I put several safety
-guards, to never get hangs again.
-And I think my time based approach is more accurate then
-previous system.
+> 
+> Do they need module parameters? What if they are built-in?
 
-UML guys please investigate the jiffies issue? what is
-xor.ko not doing right?
+They don't need module parameters. It does not matter much if they
+are build-in or a module. If they are build-in, they can be just
+instantiated. If they are build as module, the crypto layer tries
+to autoload the module if it is not already loaded.
 
-Signed-off-by: Boaz Harrosh <bharrosh@panasas.com>
----
- crypto/xor.c |   46 +++++++++++++++++++++++++++-------------------
- 1 files changed, 27 insertions(+), 19 deletions(-)
+If you want to use pcrypt/cryptd on an algorithm that does not coose
+them automatically, you have to instantiate (load) these algorithms.
 
-diff --git a/crypto/xor.c b/crypto/xor.c
-index b75182d..65433f5 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -62,37 +62,45 @@ static struct xor_block_template *template_list;
- static void
- do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- {
--	int speed;
--	unsigned long now;
--	int i, count, max;
-+	unsigned speed, count;
-+	u64 ns_begin;
-+	u64 ns_end;
-+	struct timespec ts;
-+
- 
- 	tmpl->next = template_list;
- 	template_list = tmpl;
- 
- 	/*
--	 * Count the number of XORs done during a whole jiffy, and use
-+	 * Count the number of XORs done during 10 miliseconds, and use
- 	 * this to calculate the speed of checksumming.  We use a 2-page
- 	 * allocation to have guaranteed color L1-cache layout.
- 	 */
--	max = 0;
--	for (i = 0; i < 5; i++) {
--		now = jiffies;
--		count = 0;
--		while (jiffies == now) {
--			mb(); /* prevent loop optimzation */
--			tmpl->do_2(BENCH_SIZE, b1, b2);
--			mb();
--			count++;
--			mb();
--		}
--		if (count > max)
--			max = count;
-+	ktime_get_ts(&ts);
-+	ns_begin = timespec_to_ns(&ts);
-+	count = 0;
-+	while (count < 4000000L) {
-+		mb(); /* prevent loop optimzation */
-+		tmpl->do_2(BENCH_SIZE, b1, b2);
-+		mb();
-+		count++;
-+		mb();
-+
-+		ktime_get_ts(&ts);
-+		ns_end = timespec_to_ns(&ts);
-+		/* Test for 10 miliseconds */
-+		if ((ns_end - ns_begin) > NSEC_PER_SEC / 100)
-+			break;
- 	}
- 
--	speed = max * (HZ * BENCH_SIZE / 1024);
-+	ns_end -= ns_begin;
-+	if (ns_end > 0)
-+		speed = BENCH_SIZE / 1024 * count * NSEC_PER_SEC / ns_end;
-+	else
-+		speed = 17;
- 	tmpl->speed = speed;
- 
--	printk(KERN_INFO "   %-10s: %5d.%03d MB/sec\n", tmpl->name,
-+	printk(KERN_INFO "   %-10s: %5u.%03u MB/sec\n", tmpl->name,
- 	       speed / 1000, speed % 1000);
- }
- 
--- 
-1.7.2.3
+Right now, using 'tcrypt' is the only way to instantiate such nonstandard
+algorithms. That's kind of a hack, but things are getting much easier
+as soon as we have the crypto userspace configuration API merged.
 
+> How can I verify that they work?
 
-------------------------------------------------------------------------------
-All the data continuously generated in your IT infrastructure contains a
-definitive record of customers, application performance, security
-threats, fraudulent activity and more. Splunk takes this data and makes
-sense of it. Business sense. IT sense. Common sense.
-http://p.sf.net/sfu/splunk-d2d-oct
+You can look at /proc/crypto, this shows which algorithms are used.
+You should find cryptd/pcrypt in the algorithm drivers name if they
+are instantiated.
+
+> How do they work? There is absolutely no fucking information
+> whatsoever, neither in the help text nor in the docs. Am i missing
+> something?
+
+Indeed, there is no documentation.
+
+> 
+> Talking mostly about typical disk encryption on SMP machines via
+> dm-crypt, interested in best performance. (without AES-NI)
+
+dm-crypt uses it's own workqueue, so you don't need cryptd here.
+On recent kernels this workqueue is multithreaded, so if the
+crypto requests are send from multiple cpus it behaves well
+parallelized. If only one cpu sends crypto requests, it is
+serialized to this cpu. pcrypt could help here, but it still
+lacks ablkcipher support what is needed for dm-crypt.
