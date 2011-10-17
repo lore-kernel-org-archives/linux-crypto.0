@@ -1,53 +1,59 @@
-From: Hamid Nassiby <h.nassiby@gmail.com>
-Subject: Re: Fwd: crypto accelerator driver problems
-Date: Sat, 15 Oct 2011 14:56:28 +0330
-Message-ID: <CAFuf8QMeLdAPs2fqYwDmLyOW=uyzD82hboYy=Q4uy3f=0bWcTg@mail.gmail.com>
-References: <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com>
-	<AANLkTin8au=98mmfsaJjOSyJNibk3foZWihj6EGTGWK-@mail.gmail.com>
-	<20110126070939.GA18150@gondor.apana.org.au>
-	<AANLkTi=m0jVWSqR1FNX9r9HH32LbA0aWJxSQtLd_VszW@mail.gmail.com>
-	<20110126233315.GB26664@gondor.apana.org.au>
-	<CAFuf8QO1gG2WUMmgywHANBHgBj1D8RV8xkJvMYOdiJSovduG+A@mail.gmail.com>
-	<20110705065351.GA31107@gondor.apana.org.au>
-	<CAFuf8QPV248w=S06s7mz=vLzYdsrjQ7nvChui-3P3kgMzV8vHA@mail.gmail.com>
-	<20111004075755.GV1808@secunet.com>
-	<CAFuf8QOCKXOgMyu7FceYRGh_oTw+pt96tasVC19pS1Zzd96mxQ@mail.gmail.com>
-	<20111011094222.GB1830@secunet.com>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: Re: [PATCH v2.1 4/7] crypto: GnuPG based MPI lib - additional sources
+ (part 4)
+Date: Mon, 17 Oct 2011 12:09:21 +0300
+Message-ID: <CALLzPKbdM3Q3i-wuqqemMQzP9AWGnVki7SOAmRu9z-u0o8uGkA@mail.gmail.com>
+References: <cover.1318598705.git.dmitry.kasatkin@intel.com>
+	<81f834dca8feb889e2acbc666e730cf89b5d5c41.1318598705.git.dmitry.kasatkin@intel.com>
+	<alpine.LRH.2.00.1110151132430.24994@tundra.namei.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
+	herbert@gondor.hengli.com.au
+To: James Morris <jmorris@namei.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:48230 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750856Ab1JOL0a (ORCPT
+Received: from mga10.intel.com ([192.55.52.92]:36196 "EHLO
+	fmsmga102.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750902Ab1JQJJ0 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 15 Oct 2011 07:26:30 -0400
-Received: by bkbzt19 with SMTP id zt19so1110775bkb.19
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Oct 2011 04:26:28 -0700 (PDT)
-In-Reply-To: <20111011094222.GB1830@secunet.com>
+	Mon, 17 Oct 2011 05:09:26 -0400
+In-Reply-To: <alpine.LRH.2.00.1110151132430.24994@tundra.namei.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/11/11, Steffen Klassert <steffen.klassert@secunet.com> wrote:
-
+On Sat, Oct 15, 2011 at 3:34 AM, James Morris <jmorris@namei.org> wrote=
+:
+> On Fri, 14 Oct 2011, Dmitry Kasatkin wrote:
 >
-> I can't tell much when looking at this code snippet. One guess would be
-> someone (maybe you) has set the CRYPTO_TFM_REQ_MAY_SLEEP flag, as
-> blkcipher_walk_done calls crypto_yield() which in turn might call
-> schedule() if this flag is set. prcypt removes this flag explicit.
+>> +#if 0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* not yet ported to M=
+PI */
+>> +
+>> +mpi_limb_t
+>> +mpihelp_udiv_w_sdiv(mpi_limp_t *rp,
+>> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mpi_limp_t=
+ *a1, mpi_limp_t *a0, mpi_limp_t *d)
+>
+> Drop this if it's not working.
+>
+>
+> --
+> James Morris
+> <jmorris@namei.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-secur=
+ity-module" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.ht=
+ml
 >
 
-I've not set such a flag.
+It is there for completeness and it will not be even compiled at all
+without CONFIG_MPILIB_EXTRA
 
->
-> Basically, the bottom halves are off to keep up with the network softirqs.
-> They run with much higher priority and would interrupt the parallel
-> workers frequently.
->
+Still remove?
 
-Do you mean that with BHs on, we only have some performance degrades?
-
-Thanks for your reply.
-Any other idea?
+- Dmitry
