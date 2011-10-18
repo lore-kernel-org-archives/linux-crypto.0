@@ -1,37 +1,56 @@
-From: Matthias-Christian Ott <ott@mirix.org>
-Subject: Hardware acceleration indication in af_alg
-Date: Tue, 18 Oct 2011 15:13:52 +0200
-Message-ID: <20111018131351.GB24865@qi>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] talitos: handle descriptor not found in error path
+Date: Tue, 18 Oct 2011 11:17:00 -0500
+Message-ID: <20111018111700.75b79365.kim.phillips@freescale.com>
+References: <20110924191649.a42c86d2.kim.phillips@freescale.com>
+	<20111018073613.GA13923@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <svens@stackframe.org>, <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mirix.org ([78.46.130.147]:50883 "EHLO a.mirix.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755265Ab1JRNfu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Oct 2011 09:35:50 -0400
-Received: from [139.18.255.53] (helo=qi)
-	by a.mirix.org with esmtpsa (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.76)
-	(envelope-from <ott@mirix.org>)
-	id 1RG9UP-0000SA-Fo
-	for linux-crypto@vger.kernel.org; Tue, 18 Oct 2011 15:13:53 +0200
-Content-Disposition: inline
+Received: from db3ehsobe003.messaging.microsoft.com ([213.199.154.141]:7577
+	"EHLO DB3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S933002Ab1JRQRz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 18 Oct 2011 12:17:55 -0400
+In-Reply-To: <20111018073613.GA13923@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I did some experiments with af_alg and noticed that to be really
-useful, it should indicate whether a certain algorithm is hardware
-accelerated. I guess this has to be inferred by the priority of the
-algorithm could be made available via a read-only socket option. Any
-thoughts on this?
+On Tue, 18 Oct 2011 09:36:18 +0200
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-I can imagine, an alternative approach and perhaps better approach
-would be to measure the speed of the kernel provided algorithm against
-a software implementation, but there are many other factors that could
-influence the results. Therefore, it is perhaps better to just make
-the assumption that hardware acceleration is faster which is made in
-the kernel anyhow.
+> Kim Phillips <kim.phillips@freescale.com> wrote:
+> > The CDPR (Current Descriptor Pointer Register) can be unreliable
+> > when trying to locate an offending descriptor.  Handle that case by
+> > (a) not OOPSing, and (b) reverting to the machine internal copy of
+> > the descriptor header in order to report the correct execution unit
+> > error.
+> > 
+> > Note: printing all execution units' ISRs is not effective because it
+> > results in an internal time out (ITO) error and the EU resetting its
+> > ISR value (at least when specifying an invalid key length on an SEC
+> > 2.2/MPC8313E).
+> > 
+> > Reported-by: Sven Schnelle <svens@stackframe.org>
+> > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> > ---
+> > please test, as it seems I cannot reproduce the descriptor not found
+> > case.
+> 
+> So what's the verdict Kim, should I take this patch or not?
 
-Regards,
-Matthias-Christian
+sure - I've verified it does at least satisfy Sven's shouldn't-oops
+comment.
+
+btw, can you take a look at applying this also?:
+
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05996.html
+
+It makes IPSec AH work for async crypto implementations.
+
+Thanks,
+
+Kim
