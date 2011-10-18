@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 07/18] crypto: serpent-sse2: add lrw support
-Date: Tue, 18 Oct 2011 13:32:44 +0300
-Message-ID: <20111018103244.3074.7632.stgit@localhost6.localdomain6>
+Subject: [PATCH 06/18] crypto: tcrypt: add lrw(serpent) tests
+Date: Tue, 18 Oct 2011 13:32:39 +0300
+Message-ID: <20111018103239.3074.35142.stgit@localhost6.localdomain6>
 References: <20111018103208.3074.11546.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,353 +10,64 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:39151 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754405Ab1JRKcs (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:43378 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754405Ab1JRKco (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Oct 2011 06:32:48 -0400
+	Tue, 18 Oct 2011 06:32:44 -0400
 In-Reply-To: <20111018103208.3074.11546.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Patch adds LRW support for serpent-sse2 by using lrw_crypt(). Patch has been
-tested with tcrypt and automated filesystem tests.
-
-Tcrypt benchmarks results (serpent-sse2/serpent_generic speed ratios):
-
-Benchmark results with tcrypt:
-
-Intel Celeron T1600 (x86_64) (fam:6, model:15, step:13):
-
-size    lrw-enc lrw-dec
-16B     1.00x   0.96x
-64B     1.01x   1.01x
-256B    3.01x   2.97x
-1024B   3.39x   3.33x
-8192B   3.35x   3.33x
-
-AMD Phenom II 1055T (x86_64) (fam:16, model:10):
-
-size    lrw-enc lrw-dec
-16B     0.98x   1.03x
-64B     1.01x   1.04x
-256B    2.10x   2.14x
-1024B   2.28x   2.33x
-8192B   2.30x   2.33x
-
-Intel Atom N270 (i586):
-
-size    lrw-enc lrw-dec
-16B     0.97x   0.97x
-64B     1.47x   1.50x
-256B    1.72x   1.69x
-1024B   1.88x   1.81x
-8192B   1.84x   1.79x
-
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/serpent_sse2_glue.c |  211 +++++++++++++++++++++++++++++++++++
- crypto/serpent.c                    |   10 +-
- include/crypto/serpent.h            |    2 
- 3 files changed, 221 insertions(+), 2 deletions(-)
+ crypto/tcrypt.c |    9 +++++++++
+ crypto/tcrypt.h |    1 +
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 5cf17e2..97c55b6 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -38,12 +38,17 @@
- #include <crypto/cryptd.h>
- #include <crypto/b128ops.h>
- #include <crypto/ctr.h>
-+#include <crypto/lrw.h>
- #include <asm/i387.h>
- #include <asm/serpent.h>
- #include <crypto/scatterwalk.h>
- #include <linux/workqueue.h>
- #include <linux/spinlock.h>
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 5526065..9a9e170 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -996,6 +996,7 @@ static int do_test(int m)
+ 		ret += tcrypt_test("ecb(serpent)");
+ 		ret += tcrypt_test("cbc(serpent)");
+ 		ret += tcrypt_test("ctr(serpent)");
++		ret += tcrypt_test("lrw(serpent)");
+ 		break;
  
-+#if defined(CONFIG_CRYPTO_LRW) || defined(CONFIG_CRYPTO_LRW_MODULE)
-+#define HAS_LRW
-+#endif
-+
- struct async_serpent_ctx {
- 	struct cryptd_ablkcipher *cryptd_tfm;
- };
-@@ -459,6 +464,152 @@ static struct crypto_alg blk_ctr_alg = {
- 	},
- };
+ 	case 10:
+@@ -1305,6 +1306,10 @@ static int do_test(int m)
+ 				  speed_template_16_32);
+ 		test_cipher_speed("ctr(serpent)", DECRYPT, sec, NULL, 0,
+ 				  speed_template_16_32);
++		test_cipher_speed("lrw(serpent)", ENCRYPT, sec, NULL, 0,
++				  speed_template_32_48);
++		test_cipher_speed("lrw(serpent)", DECRYPT, sec, NULL, 0,
++				  speed_template_32_48);
+ 		break;
  
-+#ifdef HAS_LRW
-+
-+struct crypt_priv {
-+	struct serpent_ctx *ctx;
-+	bool fpu_enabled;
-+};
-+
-+static void encrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
-+{
-+	const unsigned int bsize = SERPENT_BLOCK_SIZE;
-+	struct crypt_priv *ctx = priv;
-+	int i;
-+
-+	ctx->fpu_enabled = serpent_fpu_begin(ctx->fpu_enabled, nbytes);
-+
-+	if (nbytes == bsize * SERPENT_PARALLEL_BLOCKS) {
-+		serpent_enc_blk_xway(ctx->ctx, srcdst, srcdst);
-+		return;
-+	}
-+
-+	for (i = 0; i < nbytes / bsize; i++, srcdst += bsize)
-+		__serpent_encrypt(ctx->ctx, srcdst, srcdst);
-+}
-+
-+static void decrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
-+{
-+	const unsigned int bsize = SERPENT_BLOCK_SIZE;
-+	struct crypt_priv *ctx = priv;
-+	int i;
-+
-+	ctx->fpu_enabled = serpent_fpu_begin(ctx->fpu_enabled, nbytes);
-+
-+	if (nbytes == bsize * SERPENT_PARALLEL_BLOCKS) {
-+		serpent_dec_blk_xway(ctx->ctx, srcdst, srcdst);
-+		return;
-+	}
-+
-+	for (i = 0; i < nbytes / bsize; i++, srcdst += bsize)
-+		__serpent_decrypt(ctx->ctx, srcdst, srcdst);
-+}
-+
-+struct serpent_lrw_ctx {
-+	struct lrw_table_ctx lrw_table;
-+	struct serpent_ctx serpent_ctx;
-+};
-+
-+static int lrw_serpent_setkey(struct crypto_tfm *tfm, const u8 *key,
-+			      unsigned int keylen)
-+{
-+	struct serpent_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
-+	int err;
-+
-+	err = __serpent_setkey(&ctx->serpent_ctx, key, keylen -
-+							SERPENT_BLOCK_SIZE);
-+	if (err)
-+		return err;
-+
-+	return lrw_init_table(&ctx->lrw_table, key + keylen -
-+						SERPENT_BLOCK_SIZE);
-+}
-+
-+static int lrw_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
-+{
-+	struct serpent_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[SERPENT_PARALLEL_BLOCKS];
-+	struct crypt_priv crypt_ctx = {
-+		.ctx = &ctx->serpent_ctx,
-+		.fpu_enabled = false,
-+	};
-+	struct lrw_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
-+
-+		.table_ctx = &ctx->lrw_table,
-+		.crypt_ctx = &crypt_ctx,
-+		.crypt_fn = encrypt_callback,
-+	};
-+	int ret;
-+
-+	ret = lrw_crypt(desc, dst, src, nbytes, &req);
-+	serpent_fpu_end(crypt_ctx.fpu_enabled);
-+
-+	return ret;
-+}
-+
-+static int lrw_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
-+{
-+	struct serpent_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[SERPENT_PARALLEL_BLOCKS];
-+	struct crypt_priv crypt_ctx = {
-+		.ctx = &ctx->serpent_ctx,
-+		.fpu_enabled = false,
-+	};
-+	struct lrw_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
-+
-+		.table_ctx = &ctx->lrw_table,
-+		.crypt_ctx = &crypt_ctx,
-+		.crypt_fn = decrypt_callback,
-+	};
-+	int ret;
-+
-+	ret = lrw_crypt(desc, dst, src, nbytes, &req);
-+	serpent_fpu_end(crypt_ctx.fpu_enabled);
-+
-+	return ret;
-+}
-+
-+static void lrw_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct serpent_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	lrw_free_table(&ctx->lrw_table);
-+}
-+
-+static struct crypto_alg blk_lrw_alg = {
-+	.cra_name		= "__lrw-serpent-sse2",
-+	.cra_driver_name	= "__driver-lrw-serpent-sse2",
-+	.cra_priority		= 0,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= SERPENT_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct serpent_lrw_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(blk_lrw_alg.cra_list),
-+	.cra_exit		= lrw_exit_tfm,
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= SERPENT_MIN_KEY_SIZE +
-+					  SERPENT_BLOCK_SIZE,
-+			.max_keysize	= SERPENT_MAX_KEY_SIZE +
-+					  SERPENT_BLOCK_SIZE,
-+			.ivsize		= SERPENT_BLOCK_SIZE,
-+			.setkey		= lrw_serpent_setkey,
-+			.encrypt	= lrw_encrypt,
-+			.decrypt	= lrw_decrypt,
-+		},
-+	},
-+};
-+
-+#endif
-+
- static int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
- 			unsigned int key_len)
- {
-@@ -657,6 +808,48 @@ static struct crypto_alg ablk_ctr_alg = {
- 	},
- };
+ 	case 300:
+@@ -1521,6 +1526,10 @@ static int do_test(int m)
+ 				   speed_template_16_32);
+ 		test_acipher_speed("ctr(serpent)", DECRYPT, sec, NULL, 0,
+ 				   speed_template_16_32);
++		test_acipher_speed("lrw(serpent)", ENCRYPT, sec, NULL, 0,
++				   speed_template_32_48);
++		test_acipher_speed("lrw(serpent)", DECRYPT, sec, NULL, 0,
++				   speed_template_32_48);
+ 		break;
  
-+#ifdef HAS_LRW
-+
-+static int ablk_lrw_init(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-lrw-serpent-sse2", 0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ablk_init_common(tfm, cryptd_tfm);
-+	return 0;
-+}
-+
-+static struct crypto_alg ablk_lrw_alg = {
-+	.cra_name		= "lrw(serpent)",
-+	.cra_driver_name	= "lrw-serpent-sse2",
-+	.cra_priority		= 400,
-+	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize		= SERPENT_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct async_serpent_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(ablk_lrw_alg.cra_list),
-+	.cra_init		= ablk_lrw_init,
-+	.cra_exit		= ablk_exit,
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize	= SERPENT_MIN_KEY_SIZE +
-+					  SERPENT_BLOCK_SIZE,
-+			.max_keysize	= SERPENT_MAX_KEY_SIZE +
-+					  SERPENT_BLOCK_SIZE,
-+			.ivsize		= SERPENT_BLOCK_SIZE,
-+			.setkey		= ablk_set_key,
-+			.encrypt	= ablk_encrypt,
-+			.decrypt	= ablk_decrypt,
-+		},
-+	},
-+};
-+
-+#endif
-+
- static int __init serpent_sse2_init(void)
- {
- 	int err;
-@@ -684,8 +877,22 @@ static int __init serpent_sse2_init(void)
- 	err = crypto_register_alg(&ablk_ctr_alg);
- 	if (err)
- 		goto ablk_ctr_err;
-+#ifdef HAS_LRW
-+	err = crypto_register_alg(&blk_lrw_alg);
-+	if (err)
-+		goto blk_lrw_err;
-+	err = crypto_register_alg(&ablk_lrw_alg);
-+	if (err)
-+		goto ablk_lrw_err;
-+#endif
- 	return err;
+ 	case 1000:
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 10cb925..3eceaef 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -51,6 +51,7 @@ static u8 speed_template_8_32[] = {8, 32, 0};
+ static u8 speed_template_16_32[] = {16, 32, 0};
+ static u8 speed_template_16_24_32[] = {16, 24, 32, 0};
+ static u8 speed_template_32_40_48[] = {32, 40, 48, 0};
++static u8 speed_template_32_48[] = {32, 48, 0};
+ static u8 speed_template_32_48_64[] = {32, 48, 64, 0};
  
-+#ifdef HAS_LRW
-+ablk_lrw_err:
-+	crypto_unregister_alg(&blk_lrw_alg);
-+blk_lrw_err:
-+	crypto_unregister_alg(&ablk_ctr_alg);
-+#endif
- ablk_ctr_err:
- 	crypto_unregister_alg(&ablk_cbc_alg);
- ablk_cbc_err:
-@@ -702,6 +909,10 @@ blk_ecb_err:
- 
- static void __exit serpent_sse2_exit(void)
- {
-+#ifdef HAS_LRW
-+	crypto_unregister_alg(&ablk_lrw_alg);
-+	crypto_unregister_alg(&blk_lrw_alg);
-+#endif
- 	crypto_unregister_alg(&ablk_ctr_alg);
- 	crypto_unregister_alg(&ablk_cbc_alg);
- 	crypto_unregister_alg(&ablk_ecb_alg);
-diff --git a/crypto/serpent.c b/crypto/serpent.c
-index eb61630..7cc2cae 100644
---- a/crypto/serpent.c
-+++ b/crypto/serpent.c
-@@ -206,9 +206,9 @@
- 	x1 ^= x4;	x3 ^= x4;	x4 &= x0;	\
- 	x4 ^= x2;
- 
--int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
-+int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
-+		     unsigned int keylen)
- {
--	struct serpent_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *k = ctx->expkey;
- 	u8  *k8 = (u8 *)k;
- 	u32 r0,r1,r2,r3,r4;
-@@ -349,6 +349,12 @@ int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(__serpent_setkey);
-+
-+int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
-+{
-+	return __serpent_setkey(crypto_tfm_ctx(tfm), key, keylen);
-+}
- EXPORT_SYMBOL_GPL(serpent_setkey);
- 
- void __serpent_encrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src)
-diff --git a/include/crypto/serpent.h b/include/crypto/serpent.h
-index 40df885..b7e0941 100644
---- a/include/crypto/serpent.h
-+++ b/include/crypto/serpent.h
-@@ -17,6 +17,8 @@ struct serpent_ctx {
- 	u32 expkey[SERPENT_EXPKEY_WORDS];
- };
- 
-+int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
-+		     unsigned int keylen);
- int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen);
- 
- void __serpent_encrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src);
+ /*
