@@ -1,56 +1,193 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] talitos: handle descriptor not found in error path
-Date: Tue, 18 Oct 2011 11:17:00 -0500
-Message-ID: <20111018111700.75b79365.kim.phillips@freescale.com>
-References: <20110924191649.a42c86d2.kim.phillips@freescale.com>
-	<20111018073613.GA13923@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <svens@stackframe.org>, <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from db3ehsobe003.messaging.microsoft.com ([213.199.154.141]:7577
-	"EHLO DB3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933002Ab1JRQRz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Oct 2011 12:17:55 -0400
-In-Reply-To: <20111018073613.GA13923@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: [PATCH v2.2 0/7] evm: digital signature verification extension
+Date: Wed, 19 Oct 2011 14:51:29 +0300
+Message-ID: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
+	herbert@gondor.apana.org.au
+To: linux-security-module@vger.kernel.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 18 Oct 2011 09:36:18 +0200
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hello,
 
-> Kim Phillips <kim.phillips@freescale.com> wrote:
-> > The CDPR (Current Descriptor Pointer Register) can be unreliable
-> > when trying to locate an offending descriptor.  Handle that case by
-> > (a) not OOPSing, and (b) reverting to the machine internal copy of
-> > the descriptor header in order to report the correct execution unit
-> > error.
-> > 
-> > Note: printing all execution units' ISRs is not effective because it
-> > results in an internal time out (ITO) error and the EU resetting its
-> > ISR value (at least when specifying an invalid key length on an SEC
-> > 2.2/MPC8313E).
-> > 
-> > Reported-by: Sven Schnelle <svens@stackframe.org>
-> > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
-> > ---
-> > please test, as it seems I cannot reproduce the descriptor not found
-> > case.
-> 
-> So what's the verdict Kim, should I take this patch or not?
+Changes in version 2.2:
+* uses EXPORT_SYMBOL_GPL
+* disabled code removed
+* removed casting after kmalloc
 
-sure - I've verified it does at least satisfy Sven's shouldn't-oops
-comment.
+Changes to version 2.1:
+* MPI lib moved to /lib directory.
+* added configuration option CONFIG_MPILIB_EXTRA to exclude building
+  a part of MPI library, which is not used in RSA impelementation.
+* added API documentation
+* added Documentation for digsig
+* splitted evm digital signature verification patch into 2.
+  Common code will be used by IMA digital singnature verification.
 
-btw, can you take a look at applying this also?:
+Changes to version 2.0:
+* MPI patch has been split to smaller in order to go to mailing lists.
+  First 2 patches include only source and header files which are needed
+  to build ksign verification. Headers and sources are split just to
+  meet 100k kernel.org limit.
+  Last patch adds all rest soures from original ported MPI library.
+  
+Changes to version 1.1:
+* GnuPG MPI library has been refactored with lindent and checkpatch errors
+  and warnings has been fixed.
+* creation of evm keyring has been remove. It is done now in user space.
+* related ksign and evm patches has been squashed.
+* patch descriptions has been updated.
+ 
+As EVM patches were recently merged to security-testing-2.6#next,
+it is a good time to resend evm signature verification patches for active
+discussion. Last time I forgot --cc linux-crypto. Here it is.
 
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05996.html
+This patchset introduces digital signature extensions for the IMA/EVM kernel
+integrity subsystem and is applied on the top of the EVM patches posted to
+LSM mailing list earlier.
 
-It makes IPSec AH work for async crypto implementations.
+Currently EVM stores the HMAC in security.evm to verify integrity of the
+file's metadata. This is quite sufficient for individually installed systems,
+where a system unique HMAC key can be provisioned and the initial filesystem
+labeling can be done.
 
-Thanks,
+Software installation for consumer electronics or embedded devices is usually
+done via flashing a filesystem image. Initial filesystem image labeling is done
+during image creation process. It either has to be done (1) using a system
+unique HMAC key or (2) using an image specific HMAC key. In first case, those
+keys are either unknown, or a unique image has to be created for thousand or
+millions of devices, which is not feasible. The second case, using an image
+specific HMAC key, would require (2.1) provisioning of the key to millions of
+devices, which is not easily feasible or (2.1) encrypting the key with a shared
+symmetric key which is not a strong security measure.
 
-Kim
+Digital signature extension for EVM provides a solution to perform labeling of
+the image using a single digital private key and use a known public key to
+verify the signature. For performance reasons, after verification, signature is
+replaced with local HMAC.
+
+Digital signature verification uses RSA algorithm, implemented using cut-down
+port of multi-precision integers (MPI) library from GnuPG and has been taken
+from RedHat Enterprise Linux kernel (MODSIGN patches). Decision to use this
+library was made, because its performance was 2 times better than other ports
+such as libtommath library.
+
+The GnuPG MPI library patch was posted here on linux-crypto back in
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05613.html.
+Reason for upstreaming was that it to be a solid in-kernel user of the API.
+Now with the recent merging of the EVM patches in linux-next via
+security-testing-2.6/#next, MPI library is required for EVM digital signature
+verification extension.
+
+The motivation for integrity protection, in general, is to protect against
+offline modifications. The runtime protection is ensured via access control
+mechanisms.  Of particular importance is protecting users or owners from being
+sold or given tampered devices, which can do nasty things such as spying or
+stealing personal data. Integrity protection ensures that modifications of the
+system will not remain undetected. The EVM digital signature extension makes
+this feasible for consumerelectronics/embedded devices.
+
+There is also a second patchset which implements digital signature support for
+IMA-appraisal patchset, which is planned to be reviewed right after the
+IMA-appaisal review.
+
+All patches on the top of ima-2.6 (3.x.x) kernel are available here:
+git://git.kernel.org/pub/scm/linux/kernel/git/kasatkin/ima-ksign.git
+http://meego.gitorious.org/meego-platform-security/ima-ksign
+
+Supporting utility for key handling and signing is available here:
+http://meego.gitorious.org/meego-platform-security/evm-utils
+
+Regards,
+Dmitry
+
+Dmitry Kasatkin (7):
+  crypto: GnuPG based MPI lib - source files (part 1)
+  crypto: GnuPG based MPI lib - header files (part 2)
+  crypto: GnuPG based MPI lib - make files (part 3)
+  crypto: GnuPG based MPI lib - additional sources (part 4)
+  crypto: digital signature verification support
+  integrity: digital signature verification using multiple keyrings
+  evm: digital signature verification support
+
+ Documentation/digsig.txt            |   97 +++
+ include/linux/digsig.h              |   64 ++
+ include/linux/mpi.h                 |  146 ++++
+ lib/Kconfig                         |   25 +
+ lib/Makefile                        |    3 +
+ lib/digsig.c                        |  283 +++++++
+ lib/mpi/Makefile                    |   33 +
+ lib/mpi/generic_mpi-asm-defs.h      |    4 +
+ lib/mpi/generic_mpih-add1.c         |   61 ++
+ lib/mpi/generic_mpih-lshift.c       |   63 ++
+ lib/mpi/generic_mpih-mul1.c         |   57 ++
+ lib/mpi/generic_mpih-mul2.c         |   60 ++
+ lib/mpi/generic_mpih-mul3.c         |   61 ++
+ lib/mpi/generic_mpih-rshift.c       |   63 ++
+ lib/mpi/generic_mpih-sub1.c         |   60 ++
+ lib/mpi/longlong.h                  | 1478 +++++++++++++++++++++++++++++++++++
+ lib/mpi/mpi-add.c                   |  234 ++++++
+ lib/mpi/mpi-bit.c                   |  236 ++++++
+ lib/mpi/mpi-cmp.c                   |   68 ++
+ lib/mpi/mpi-div.c                   |  333 ++++++++
+ lib/mpi/mpi-gcd.c                   |   59 ++
+ lib/mpi/mpi-inline.c                |   31 +
+ lib/mpi/mpi-inline.h                |  122 +++
+ lib/mpi/mpi-internal.h              |  261 ++++++
+ lib/mpi/mpi-inv.c                   |  187 +++++
+ lib/mpi/mpi-mpow.c                  |  133 ++++
+ lib/mpi/mpi-mul.c                   |  194 +++++
+ lib/mpi/mpi-pow.c                   |  323 ++++++++
+ lib/mpi/mpi-scan.c                  |  136 ++++
+ lib/mpi/mpicoder.c                  |  365 +++++++++
+ lib/mpi/mpih-cmp.c                  |   56 ++
+ lib/mpi/mpih-div.c                  |  541 +++++++++++++
+ lib/mpi/mpih-mul.c                  |  527 +++++++++++++
+ lib/mpi/mpiutil.c                   |  208 +++++
+ security/integrity/Kconfig          |   14 +
+ security/integrity/Makefile         |    1 +
+ security/integrity/digsig.c         |   48 ++
+ security/integrity/evm/evm.h        |   12 +
+ security/integrity/evm/evm_crypto.c |   66 ++-
+ security/integrity/evm/evm_main.c   |   94 ++-
+ security/integrity/integrity.h      |   20 +
+ 41 files changed, 6797 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/digsig.txt
+ create mode 100644 include/linux/digsig.h
+ create mode 100644 include/linux/mpi.h
+ create mode 100644 lib/digsig.c
+ create mode 100644 lib/mpi/Makefile
+ create mode 100644 lib/mpi/generic_mpi-asm-defs.h
+ create mode 100644 lib/mpi/generic_mpih-add1.c
+ create mode 100644 lib/mpi/generic_mpih-lshift.c
+ create mode 100644 lib/mpi/generic_mpih-mul1.c
+ create mode 100644 lib/mpi/generic_mpih-mul2.c
+ create mode 100644 lib/mpi/generic_mpih-mul3.c
+ create mode 100644 lib/mpi/generic_mpih-rshift.c
+ create mode 100644 lib/mpi/generic_mpih-sub1.c
+ create mode 100644 lib/mpi/longlong.h
+ create mode 100644 lib/mpi/mpi-add.c
+ create mode 100644 lib/mpi/mpi-bit.c
+ create mode 100644 lib/mpi/mpi-cmp.c
+ create mode 100644 lib/mpi/mpi-div.c
+ create mode 100644 lib/mpi/mpi-gcd.c
+ create mode 100644 lib/mpi/mpi-inline.c
+ create mode 100644 lib/mpi/mpi-inline.h
+ create mode 100644 lib/mpi/mpi-internal.h
+ create mode 100644 lib/mpi/mpi-inv.c
+ create mode 100644 lib/mpi/mpi-mpow.c
+ create mode 100644 lib/mpi/mpi-mul.c
+ create mode 100644 lib/mpi/mpi-pow.c
+ create mode 100644 lib/mpi/mpi-scan.c
+ create mode 100644 lib/mpi/mpicoder.c
+ create mode 100644 lib/mpi/mpih-cmp.c
+ create mode 100644 lib/mpi/mpih-div.c
+ create mode 100644 lib/mpi/mpih-mul.c
+ create mode 100644 lib/mpi/mpiutil.c
+ create mode 100644 security/integrity/digsig.c
+
+-- 
+1.7.4.1
+
