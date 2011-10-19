@@ -1,193 +1,158 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Subject: [PATCH v2.2 0/7] evm: digital signature verification extension
-Date: Wed, 19 Oct 2011 14:51:29 +0300
-Message-ID: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+Subject: [PATCH v2.2 6/7] integrity: digital signature verification using multiple keyrings
+Date: Wed, 19 Oct 2011 14:51:35 +0300
+Message-ID: <f094bd1603dcf682b8ab5fb41af7c5635cb04d23.1319025009.git.dmitry.kasatkin@intel.com>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
 	herbert@gondor.apana.org.au
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga07.intel.com ([143.182.124.22]:36957 "EHLO
+	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755934Ab1JSLtZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Oct 2011 07:49:25 -0400
+In-Reply-To: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+In-Reply-To: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Define separate keyrings for each of the different use cases - evm, ima,
+and modules. Using different keyrings improves search performance, and also
+allows "locking" specific keyring to prevent adding new keys.
+This is useful for evm and module keyrings, when keys are usually only
+added from initramfs.
 
-Changes in version 2.2:
-* uses EXPORT_SYMBOL_GPL
-* disabled code removed
-* removed casting after kmalloc
-
-Changes to version 2.1:
-* MPI lib moved to /lib directory.
-* added configuration option CONFIG_MPILIB_EXTRA to exclude building
-  a part of MPI library, which is not used in RSA impelementation.
-* added API documentation
-* added Documentation for digsig
-* splitted evm digital signature verification patch into 2.
-  Common code will be used by IMA digital singnature verification.
-
-Changes to version 2.0:
-* MPI patch has been split to smaller in order to go to mailing lists.
-  First 2 patches include only source and header files which are needed
-  to build ksign verification. Headers and sources are split just to
-  meet 100k kernel.org limit.
-  Last patch adds all rest soures from original ported MPI library.
-  
-Changes to version 1.1:
-* GnuPG MPI library has been refactored with lindent and checkpatch errors
-  and warnings has been fixed.
-* creation of evm keyring has been remove. It is done now in user space.
-* related ksign and evm patches has been squashed.
-* patch descriptions has been updated.
- 
-As EVM patches were recently merged to security-testing-2.6#next,
-it is a good time to resend evm signature verification patches for active
-discussion. Last time I forgot --cc linux-crypto. Here it is.
-
-This patchset introduces digital signature extensions for the IMA/EVM kernel
-integrity subsystem and is applied on the top of the EVM patches posted to
-LSM mailing list earlier.
-
-Currently EVM stores the HMAC in security.evm to verify integrity of the
-file's metadata. This is quite sufficient for individually installed systems,
-where a system unique HMAC key can be provisioned and the initial filesystem
-labeling can be done.
-
-Software installation for consumer electronics or embedded devices is usually
-done via flashing a filesystem image. Initial filesystem image labeling is done
-during image creation process. It either has to be done (1) using a system
-unique HMAC key or (2) using an image specific HMAC key. In first case, those
-keys are either unknown, or a unique image has to be created for thousand or
-millions of devices, which is not feasible. The second case, using an image
-specific HMAC key, would require (2.1) provisioning of the key to millions of
-devices, which is not easily feasible or (2.1) encrypting the key with a shared
-symmetric key which is not a strong security measure.
-
-Digital signature extension for EVM provides a solution to perform labeling of
-the image using a single digital private key and use a known public key to
-verify the signature. For performance reasons, after verification, signature is
-replaced with local HMAC.
-
-Digital signature verification uses RSA algorithm, implemented using cut-down
-port of multi-precision integers (MPI) library from GnuPG and has been taken
-from RedHat Enterprise Linux kernel (MODSIGN patches). Decision to use this
-library was made, because its performance was 2 times better than other ports
-such as libtommath library.
-
-The GnuPG MPI library patch was posted here on linux-crypto back in
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05613.html.
-Reason for upstreaming was that it to be a solid in-kernel user of the API.
-Now with the recent merging of the EVM patches in linux-next via
-security-testing-2.6/#next, MPI library is required for EVM digital signature
-verification extension.
-
-The motivation for integrity protection, in general, is to protect against
-offline modifications. The runtime protection is ensured via access control
-mechanisms.  Of particular importance is protecting users or owners from being
-sold or given tampered devices, which can do nasty things such as spying or
-stealing personal data. Integrity protection ensures that modifications of the
-system will not remain undetected. The EVM digital signature extension makes
-this feasible for consumerelectronics/embedded devices.
-
-There is also a second patchset which implements digital signature support for
-IMA-appraisal patchset, which is planned to be reviewed right after the
-IMA-appaisal review.
-
-All patches on the top of ima-2.6 (3.x.x) kernel are available here:
-git://git.kernel.org/pub/scm/linux/kernel/git/kasatkin/ima-ksign.git
-http://meego.gitorious.org/meego-platform-security/ima-ksign
-
-Supporting utility for key handling and signing is available here:
-http://meego.gitorious.org/meego-platform-security/evm-utils
-
-Regards,
-Dmitry
-
-Dmitry Kasatkin (7):
-  crypto: GnuPG based MPI lib - source files (part 1)
-  crypto: GnuPG based MPI lib - header files (part 2)
-  crypto: GnuPG based MPI lib - make files (part 3)
-  crypto: GnuPG based MPI lib - additional sources (part 4)
-  crypto: digital signature verification support
-  integrity: digital signature verification using multiple keyrings
-  evm: digital signature verification support
-
- Documentation/digsig.txt            |   97 +++
- include/linux/digsig.h              |   64 ++
- include/linux/mpi.h                 |  146 ++++
- lib/Kconfig                         |   25 +
- lib/Makefile                        |    3 +
- lib/digsig.c                        |  283 +++++++
- lib/mpi/Makefile                    |   33 +
- lib/mpi/generic_mpi-asm-defs.h      |    4 +
- lib/mpi/generic_mpih-add1.c         |   61 ++
- lib/mpi/generic_mpih-lshift.c       |   63 ++
- lib/mpi/generic_mpih-mul1.c         |   57 ++
- lib/mpi/generic_mpih-mul2.c         |   60 ++
- lib/mpi/generic_mpih-mul3.c         |   61 ++
- lib/mpi/generic_mpih-rshift.c       |   63 ++
- lib/mpi/generic_mpih-sub1.c         |   60 ++
- lib/mpi/longlong.h                  | 1478 +++++++++++++++++++++++++++++++++++
- lib/mpi/mpi-add.c                   |  234 ++++++
- lib/mpi/mpi-bit.c                   |  236 ++++++
- lib/mpi/mpi-cmp.c                   |   68 ++
- lib/mpi/mpi-div.c                   |  333 ++++++++
- lib/mpi/mpi-gcd.c                   |   59 ++
- lib/mpi/mpi-inline.c                |   31 +
- lib/mpi/mpi-inline.h                |  122 +++
- lib/mpi/mpi-internal.h              |  261 ++++++
- lib/mpi/mpi-inv.c                   |  187 +++++
- lib/mpi/mpi-mpow.c                  |  133 ++++
- lib/mpi/mpi-mul.c                   |  194 +++++
- lib/mpi/mpi-pow.c                   |  323 ++++++++
- lib/mpi/mpi-scan.c                  |  136 ++++
- lib/mpi/mpicoder.c                  |  365 +++++++++
- lib/mpi/mpih-cmp.c                  |   56 ++
- lib/mpi/mpih-div.c                  |  541 +++++++++++++
- lib/mpi/mpih-mul.c                  |  527 +++++++++++++
- lib/mpi/mpiutil.c                   |  208 +++++
- security/integrity/Kconfig          |   14 +
- security/integrity/Makefile         |    1 +
- security/integrity/digsig.c         |   48 ++
- security/integrity/evm/evm.h        |   12 +
- security/integrity/evm/evm_crypto.c |   66 ++-
- security/integrity/evm/evm_main.c   |   94 ++-
- security/integrity/integrity.h      |   20 +
- 41 files changed, 6797 insertions(+), 30 deletions(-)
- create mode 100644 Documentation/digsig.txt
- create mode 100644 include/linux/digsig.h
- create mode 100644 include/linux/mpi.h
- create mode 100644 lib/digsig.c
- create mode 100644 lib/mpi/Makefile
- create mode 100644 lib/mpi/generic_mpi-asm-defs.h
- create mode 100644 lib/mpi/generic_mpih-add1.c
- create mode 100644 lib/mpi/generic_mpih-lshift.c
- create mode 100644 lib/mpi/generic_mpih-mul1.c
- create mode 100644 lib/mpi/generic_mpih-mul2.c
- create mode 100644 lib/mpi/generic_mpih-mul3.c
- create mode 100644 lib/mpi/generic_mpih-rshift.c
- create mode 100644 lib/mpi/generic_mpih-sub1.c
- create mode 100644 lib/mpi/longlong.h
- create mode 100644 lib/mpi/mpi-add.c
- create mode 100644 lib/mpi/mpi-bit.c
- create mode 100644 lib/mpi/mpi-cmp.c
- create mode 100644 lib/mpi/mpi-div.c
- create mode 100644 lib/mpi/mpi-gcd.c
- create mode 100644 lib/mpi/mpi-inline.c
- create mode 100644 lib/mpi/mpi-inline.h
- create mode 100644 lib/mpi/mpi-internal.h
- create mode 100644 lib/mpi/mpi-inv.c
- create mode 100644 lib/mpi/mpi-mpow.c
- create mode 100644 lib/mpi/mpi-mul.c
- create mode 100644 lib/mpi/mpi-pow.c
- create mode 100644 lib/mpi/mpi-scan.c
- create mode 100644 lib/mpi/mpicoder.c
- create mode 100644 lib/mpi/mpih-cmp.c
- create mode 100644 lib/mpi/mpih-div.c
- create mode 100644 lib/mpi/mpih-mul.c
- create mode 100644 lib/mpi/mpiutil.c
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+---
+ security/integrity/Kconfig     |   14 +++++++++++
+ security/integrity/Makefile    |    1 +
+ security/integrity/digsig.c    |   48 ++++++++++++++++++++++++++++++++++++++++
+ security/integrity/integrity.h |   20 ++++++++++++++++
+ 4 files changed, 83 insertions(+), 0 deletions(-)
  create mode 100644 security/integrity/digsig.c
 
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index 4bf00ac..d87fa2a 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -3,5 +3,19 @@ config INTEGRITY
+ 	def_bool y
+ 	depends on IMA || EVM
+ 
++config INTEGRITY_DIGSIG
++	boolean "Digital signature verification using multiple keyrings"
++	depends on INTEGRITY
++	default n
++	select DIGSIG
++	help
++	  This option enables digital signature verification support
++	  using multiple keyrings. It defines separate keyrings for each
++	  of the different use cases - evm, ima, and modules.
++	  Different keyrings improves search performance, but also allow
++	  to "lock" certain keyring to prevent adding new keys.
++	  This is useful for evm and module keyrings, when keys are
++	  usually only added from initramfs.
++
+ source security/integrity/ima/Kconfig
+ source security/integrity/evm/Kconfig
+diff --git a/security/integrity/Makefile b/security/integrity/Makefile
+index 0ae44ae..bece056 100644
+--- a/security/integrity/Makefile
++++ b/security/integrity/Makefile
+@@ -3,6 +3,7 @@
+ #
+ 
+ obj-$(CONFIG_INTEGRITY) += integrity.o
++obj-$(CONFIG_INTEGRITY_DIGSIG) += digsig.o
+ 
+ integrity-y := iint.o
+ 
+diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
+new file mode 100644
+index 0000000..b5d1e01
+--- /dev/null
++++ b/security/integrity/digsig.c
+@@ -0,0 +1,48 @@
++/*
++ * Copyright (C) 2011 Intel Corporation
++ *
++ * Author:
++ * Dmitry Kasatkin <dmitry.kasatkin@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, version 2 of the License.
++ *
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/err.h>
++#include <linux/rbtree.h>
++#include <linux/key-type.h>
++#include <linux/digsig.h>
++
++#include "integrity.h"
++
++static struct key *keyring[INTEGRITY_KEYRING_MAX];
++
++static const char *keyring_name[INTEGRITY_KEYRING_MAX] = {
++	"_evm",
++	"_module",
++	"_ima",
++};
++
++int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
++					const char *digest, int digestlen)
++{
++	if (id >= INTEGRITY_KEYRING_MAX)
++		return -EINVAL;
++
++	if (!keyring[id]) {
++		keyring[id] =
++			request_key(&key_type_keyring, keyring_name[id], NULL);
++		if (IS_ERR(keyring[id])) {
++			pr_err("no %s keyring: %ld\n", keyring_name[id],
++							PTR_ERR(keyring[id]));
++			keyring[id] = NULL;
++			return PTR_ERR(keyring[id]);
++		}
++	}
++
++	return digsig_verify(keyring[id], sig, siglen, digest, digestlen);
++}
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index e898094..9fc723b 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -51,5 +51,25 @@ struct integrity_iint_cache {
+ struct integrity_iint_cache *integrity_iint_insert(struct inode *inode);
+ struct integrity_iint_cache *integrity_iint_find(struct inode *inode);
+ 
++#define INTEGRITY_KEYRING_EVM		0
++#define INTEGRITY_KEYRING_MODULE	1
++#define INTEGRITY_KEYRING_IMA		2
++#define INTEGRITY_KEYRING_MAX		3
++
++#ifdef CONFIG_INTEGRITY_DIGSIG
++
++int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
++					const char *digest, int digestlen);
++
++#else
++
++static inline int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
++					const char *digest, int digestlen)
++{
++	return -EOPNOTSUPP;
++}
++
++#endif /* CONFIG_INTEGRITY_DIGSIG */
++
+ /* set during initialization */
+ extern int iint_initialized;
 -- 
 1.7.4.1
-
