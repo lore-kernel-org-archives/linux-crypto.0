@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] talitos: handle descriptor not found in error path
-Date: Wed, 19 Oct 2011 17:52:43 +0200
-Message-ID: <20111019155243.GA28941@gondor.apana.org.au>
-References: <20110924191649.a42c86d2.kim.phillips@freescale.com> <20111018073613.GA13923@gondor.apana.org.au> <20111018111700.75b79365.kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: picoxcell: add dependency on HAVE_CLK
+Date: Thu, 20 Oct 2011 14:10:47 +0200
+Message-ID: <20111020121047.GA4001@gondor.apana.org.au>
+References: <1317421601-7487-1-git-send-email-jamie@jamieiles.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: svens@stackframe.org, linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: linux-crypto@vger.kernel.org
+To: Jamie Iles <jamie@jamieiles.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48832 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:41521 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752046Ab1JSPwx (ORCPT
+	with ESMTP id S1751043Ab1JTMKv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Oct 2011 11:52:53 -0400
+	Thu, 20 Oct 2011 08:10:51 -0400
 Content-Disposition: inline
-In-Reply-To: <20111018111700.75b79365.kim.phillips@freescale.com>
+In-Reply-To: <1317421601-7487-1-git-send-email-jamie@jamieiles.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 18, 2011 at 11:17:00AM -0500, Kim Phillips wrote:
->
-> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg05996.html
+On Fri, Sep 30, 2011 at 11:26:41PM +0100, Jamie Iles wrote:
+> The picoxcell crypto driver requires the clk API, but the platform in
+> mainline does not currently support it.  Add an explicit dependency on
+> HAVE_CLK to avoid build breakage.
 > 
-> It makes IPSec AH work for async crypto implementations.
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
 
-This needs to go through netdev@vger.kernel.org.
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
