@@ -1,32 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: picoxcell: add dependency on HAVE_CLK
-Date: Thu, 20 Oct 2011 14:10:47 +0200
-Message-ID: <20111020121047.GA4001@gondor.apana.org.au>
-References: <1317421601-7487-1-git-send-email-jamie@jamieiles.com>
+Subject: Re: [PATCH v2] crypto: ghash: Avoid null pointer dereference if no
+	key is set.
+Date: Thu, 20 Oct 2011 14:19:08 +0200
+Message-ID: <20111020121907.GB4001@gondor.apana.org.au>
+References: <20111014171358.GA15626@elliptictech.com> <1318614795-16658-1-git-send-email-nbowler@elliptictech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Jamie Iles <jamie@jamieiles.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Nick Bowler <nbowler@elliptictech.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41521 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:36061 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751043Ab1JTMKv (ORCPT
+	with ESMTP id S1752369Ab1JTMTN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Oct 2011 08:10:51 -0400
+	Thu, 20 Oct 2011 08:19:13 -0400
 Content-Disposition: inline
-In-Reply-To: <1317421601-7487-1-git-send-email-jamie@jamieiles.com>
+In-Reply-To: <1318614795-16658-1-git-send-email-nbowler@elliptictech.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 30, 2011 at 11:26:41PM +0100, Jamie Iles wrote:
-> The picoxcell crypto driver requires the clk API, but the platform in
-> mainline does not currently support it.  Add an explicit dependency on
-> HAVE_CLK to avoid build breakage.
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+On Fri, Oct 14, 2011 at 01:53:15PM -0400, Nick Bowler wrote:
+> The ghash_update function passes a pointer to gf128mul_4k_lle which will
+> be NULL if ghash_setkey is not called or if the most recent call to
+> ghash_setkey failed to allocate memory.  This causes an oops.  Fix this
+> up by returning an error code in the null case.
 
-Patch applied.  Thanks!
+Patch applied.  Will push to stable as well.
+
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
