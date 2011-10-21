@@ -1,33 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: blowfish-x86_64: fix ctr blocksize to 1
-Date: Fri, 21 Oct 2011 14:19:08 +0200
-Message-ID: <20111021121908.GA15139@gondor.apana.org.au>
-References: <20111010093215.7547.44692.stgit@localhost6.localdomain6> <20111021121749.GA15115@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crc32: Bolt on crc32c
+Date: Fri, 21 Oct 2011 14:28:03 +0200
+Message-ID: <20111021122803.GA15803@gondor.apana.org.au>
+References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53163 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751043Ab1JUMTK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Oct 2011 08:19:10 -0400
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: "Darrick J. Wong" <djwong@us.ibm.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20111021121749.GA15115@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 21, 2011 at 02:17:49PM +0200, Herbert Xu wrote:
-> On Mon, Oct 10, 2011 at 12:32:15PM +0300, Jussi Kivilinna wrote:
-> > Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+On Tue, Oct 04, 2011 at 04:54:03PM -0700, Darrick J. Wong wrote:
+> Reuse the existing crc32 code to stamp out a crc32c implementation.
 > 
-> What is the rationale for this? Blowfish is not a stream cipher.
+> Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
 
-Scratch that, I missed the bit about ctr.
+Did you want this to go through my tree? If so then there is a
+problem since it doesn't apply at all.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
