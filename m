@@ -1,44 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Hardware acceleration indication in af_alg
-Date: Fri, 21 Oct 2011 15:23:36 +0200
-Message-ID: <20111021132336.GA1080@gondor.apana.org.au>
-References: <20111018131351.GB24865@qi>
+Subject: Re: [PATCH 3/3] Add snappy interface to crypto API
+Date: Fri, 21 Oct 2011 15:24:44 +0200
+Message-ID: <20111021132444.GA1141@gondor.apana.org.au>
+References: <1319153941-26234-3-git-send-email-andi@firstfloor.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Matthias-Christian Ott <ott@mirix.org>
+Cc: linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	chris.mason@oracle.com, linux-crypto@vger.kernel.org,
+	ak@linux.intel.com, dedekind1@gmail.com, adrian.hunter@intel.com
+To: Andi Kleen <andi@firstfloor.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56592 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59357 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751325Ab1JUNXj (ORCPT
+	with ESMTP id S1751325Ab1JUNY6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Oct 2011 09:23:39 -0400
+	Fri, 21 Oct 2011 09:24:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20111018131351.GB24865@qi>
+In-Reply-To: <1319153941-26234-3-git-send-email-andi@firstfloor.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Matthias-Christian Ott <ott@mirix.org> wrote:
-> I did some experiments with af_alg and noticed that to be really
-> useful, it should indicate whether a certain algorithm is hardware
-> accelerated. I guess this has to be inferred by the priority of the
-> algorithm could be made available via a read-only socket option. Any
-> thoughts on this?
+Andi Kleen <andi@firstfloor.org> wrote:
+> From: Andi Kleen <ak@linux.intel.com>
 > 
-> I can imagine, an alternative approach and perhaps better approach
-> would be to measure the speed of the kernel provided algorithm against
-> a software implementation, but there are many other factors that could
-> influence the results. Therefore, it is perhaps better to just make
-> the assumption that hardware acceleration is faster which is made in
-> the kernel anyhow.
+> Mainly so that ubifs can use it.
+> 
+> Snappy is a better compressor in the same niche as LZO.
+> 
+> Only lightly tested so far. Experiences welcome.
+> 
+> Cc: herbert@gondor.apana.org.au
+> Cc: dedekind1@gmail.com
+> Cc: adrian.hunter@intel.com
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-You have to be careful to distinguish between hardware acceleration
-that is directly available to user-space (such as AESNI) and those
-that aren't.
-
-For the former it makes zero sense to go through the kernel as
-you'll only make it slower.  The latter case is the reason why
-this interface exists.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 Cheers,
 -- 
