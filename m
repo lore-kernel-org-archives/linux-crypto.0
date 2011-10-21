@@ -1,174 +1,115 @@
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 3/3] Add snappy interface to crypto API
-Date: Thu, 20 Oct 2011 16:39:01 -0700
-Message-ID: <1319153941-26234-3-git-send-email-andi@firstfloor.org>
-References: <1319153941-26234-1-git-send-email-andi@firstfloor.org>
-Cc: linux-btrfs@vger.kernel.org, chris.mason@oracle.com,
-	linux-crypto@vger.kernel.org, Andi Kleen <ak@linux.intel.com>,
-	herbert@gondor.apana.org.au, dedekind1@gmail.com,
-	adrian.hunter@intel.com
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-In-Reply-To: <1319153941-26234-1-git-send-email-andi@firstfloor.org>
-Sender: linux-btrfs-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: satpal parmar <systems.satpal@gmail.com>
+Subject: Cryptoapi: H/W accelerator/ IPsec interfaces
+Date: Fri, 21 Oct 2011 09:28:43 +0530
+Message-ID: <CAGgcXb7KDxGN_f0EDy-cvD8vULi1Uknr8yP+NRa5s5swU8sMOg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:35020 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753090Ab1JUD6o convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Oct 2011 23:58:44 -0400
+Received: by yxl42 with SMTP id 42so924282yxl.19
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Oct 2011 20:58:44 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Andi Kleen <ak@linux.intel.com>
+Hi All
+I am trying to work Openswan IPsec(2.6.33) =A0(NETKEY) with=A0NSS H/W
+cryptodrivers=A0=A0for ARM cortex based SoC running linux 2.6.37. I am
+facing this weird=A0problem=A0where when I ping I see (wireshark) ESP
+packets going =A0both side but I am not=A0receiving anything on=A0eithe=
+r
+side. See the log below.I could have assumed its h/W driver problem
+but since=A0its=A0happening=A0on both of=A0tunnel I am not able to conc=
+lude
+anything. Things are working fine without h/w=A0accelerator drivers.
+I am new user of =A0cryptoapi and have little idea on its internals. I
+appreciate=A0if=A0anyone=A0can help me understand:
+1.How/where/when (api level) =A0IPsec =A0request services of Crptoapi .
+2.How/where/when=A0Cryptoapi request services from H/W accelerators
+drivers registered to it.
+Any suggestion/pointers to resolve my problem will be a plus.
+Thanks in advance.
+SP
+++++++++++++++++++++++++++++++++++++
+LOG
+++++++++++++++++
+root@R3BTS-CP-PFS1.0# dmesg | grep nss
+nss_rng nss_rng: NSS Random Number Generator ver. 2.0
+nss_aes_mod_init: loading NSS AES driver
+nss-aes nss-aes: NSS AES hw accel rev: 3.2 (context 0 @0x41140000)
+nss-aes nss-aes: NSS AES hw accel rev: 3.2 (context 1 @0x41141000)
+nss-aes nss-aes: NSS AES hw accel rev: 3.2 (context 2 @0x411a0000)
+nss-aes nss-aes: NSS AES hw accel rev: 3.2 (context 3 @0x411a1000)
+nss_aes_probe: probe() done
+nss_des_mod_init: loading NSS DES driver
+nss-des nss-des: NSS DES hw accel rev: 2.2 (context 0 @0x41160000)
+nss-des nss-des: NSS DES hw accel rev: 2.2 (context 1 @0x41161000)
+nss_des_probe: probe() done
+nss_sham_mod_init: loading NSS SHA/MD5 driver
+nss-sham nss-sham: NSS SHA/MD5 hw accel rev: 4.3 (context 0 @0x41100000=
+)
+nss-sham nss-sham: NSS SHA/MD5 hw accel rev: 4.3 (context 1 @0x41101000=
+)
+nss-sham nss-sham: NSS SHA/MD5 hw accel rev: 4.3 (context 2 @0x411c0000=
+)
+nss-sham nss-sham: NSS SHA/MD5 hw accel rev: 4.3 (context 3 @0x411c1000=
+)
+nss_sham_probe: probe() done
 
-Mainly so that ubifs can use it.
+root@R3BTS-CP-PFS1.0# ping 192.168.11.45
+----------------------------------->Before IPSEC
+PING 192.168.11.45 (192.168.11.45): 56 data bytes
+64 bytes from=A0192.168.11.45: seq=3D0 ttl=3D63 time=3D10.186 ms
+64 bytes from=A0192.168.11.45: seq=3D1 ttl=3D63 time=3D0.483 ms
+64 bytes from=A0192.168.11.45: seq=3D2 ttl=3D63 time=3D0.323 ms
+64 bytes from=A0192.168.11.45: seq=3D3 ttl=3D63 time=3D0.304 ms
+^C
+--- 192.168.11.45 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max =3D 0.304/2.824/10.186 ms
+root@R3BTS-CP-PFS1.0# cp /home/ipsec.secrets /etc/
+root@R3BTS-CP-PFS1.0# sh /home/ipsec.secrets
+/home/ipsec.secrets: line 1:=A0192.168.11.45: not found
+root@R3BTS-CP-PFS1.0# sh /home/ipsec.secrets
+/home/ipsec.secrets: line 1:=A0192.168.11.45: not found
+root@R3BTS-CP-PFS1.0# sh /home/start_ipsec.sh
+ipsec_setup: Stopping Openswan IPsec...
+ipsec_setup: stop ordered, but IPsec appears to be already stopped!
+ipsec_setup: doing cleanup anyway...
+ipsec_setup: Starting Openswan IPsec U2.6.33/K2.6.37-svn2529...
+104 "test" #1: STATE_MAIN_I1: initiate
+003 "test" #1: ignoring unknown Vendor ID payload [4f456d406b6753464548=
+407f]
+003 "test" #1: received Vendor ID payload [Dead Peer Detection]
+003 "test" #1: received Vendor ID payload [RFC 3947] method set to=3D10=
+9
+106 "test" #1: STATE_MAIN_I2: sent MI2, expecting MR2
+003 "test" #1: NAT-Traversal: Result using RFC 3947 (NAT-Traversal):
+no NAT detected
+108 "test" #1: STATE_MAIN_I3: sent MI3, expecting MR3
+003 "test" #1: received Vendor ID payload [CAN-IKEv2]
+004 "test" #1: STATE_MAIN_I4: ISAKMP SA established
+{auth=3DOAKLEY_PRESHARED_KEY cipher=3Daes_128 prf=3Doakley_sha
+group=3Dmodp2048}
+117 "test" #2: STATE_QUICK_I1: initiate
+004 "test" #2: STATE_QUICK_I2: sent QI2, IPsec SA established tunnel
+mode {ESP=3D>0x0f41cfe1 <0x083a512b xfrm=3DAES_128-HMAC_SHA1 NATOA=3Dno=
+ne
+NATD=3Dnone DPD=3Dnone}
 
-Snappy is a better compressor in the same niche as LZO.
-
-Only lightly tested so far. Experiences welcome.
-
-Cc: herbert@gondor.apana.org.au
-Cc: dedekind1@gmail.com
-Cc: adrian.hunter@intel.com
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- crypto/Kconfig  |    9 +++++
- crypto/Makefile |    1 +
- crypto/snappy.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 109 insertions(+), 0 deletions(-)
- create mode 100644 crypto/snappy.c
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ae27b753..2c85991 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -823,6 +823,15 @@ config CRYPTO_LZO
- 	help
- 	  This is the LZO algorithm.
- 
-+config CRYPTO_SNAPPY
-+	tristate "Snappy compression algorithm"
-+	select CRYPTO_ALGAPI
-+	select SNAPPY
-+	help
-+	  snappy is a faster alternative to the lzo compression algorithm
-+	  with comparable compression. It is very fast on 64bit systems, but also
-+	  good on 32bit systems. It especially excels at already compressed data.
-+
- comment "Random Number Generation"
- 
- config CRYPTO_ANSI_CPRNG
-diff --git a/crypto/Makefile b/crypto/Makefile
-index ce5a813..cf92f6f 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -80,6 +80,7 @@ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
- obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
-+obj-$(CONFIG_CRYPTO_SNAPPY) += snappy.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
- obj-$(CONFIG_CRYPTO_RNG2) += krng.o
- obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
-diff --git a/crypto/snappy.c b/crypto/snappy.c
-new file mode 100644
-index 0000000..2f44d30
---- /dev/null
-+++ b/crypto/snappy.c
-@@ -0,0 +1,99 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2 as published by
-+ * the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program; if not, write to the Free Software Foundation, Inc., 51
-+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-+ *
-+ */
-+
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/crypto.h>
-+#include <linux/vmalloc.h>
-+#include <linux/snappy.h>
-+
-+struct snappy_ctx {
-+	struct snappy_env env;
-+};
-+
-+/* Only needed for compression actually */
-+static int snappy_init(struct crypto_tfm *tfm)
-+{
-+	struct snappy_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return snappy_init_env(&ctx->env);
-+}
-+
-+static void snappy_exit(struct crypto_tfm *tfm)
-+{
-+	struct snappy_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	snappy_free_env(&ctx->env);
-+}
-+
-+static int snp_compress(struct crypto_tfm *tfm, const u8 *src,
-+			    unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct snappy_ctx *ctx = crypto_tfm_ctx(tfm);
-+	size_t olen;
-+	int err;
-+
-+	/* XXXX very pessimistic. check in snappy? */
-+	if (*dlen < snappy_max_compressed_length(*dlen))
-+		return -EINVAL;
-+	err = snappy_compress(&ctx->env, src, slen, dst, &olen);
-+	*dlen = olen;
-+	return err;
-+}
-+
-+static int snp_decompress(struct crypto_tfm *tfm, const u8 *src,
-+			      unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	size_t ulen;
-+
-+	if (!snappy_uncompressed_length(src, slen, &ulen))
-+		return -EIO;
-+	if (*dlen < ulen)
-+		return -EINVAL;
-+	*dlen = ulen;
-+	return snappy_uncompress(src, slen, dst) ? 0 : -EIO;
-+}
-+
-+static struct crypto_alg alg = {
-+	.cra_name		= "snappy",
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct snappy_ctx),
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(alg.cra_list),
-+	.cra_init		= snappy_init,
-+	.cra_exit		= snappy_exit,
-+	.cra_u			= { .compress = {
-+	.coa_compress		= snp_compress,
-+	.coa_decompress		= snp_decompress } }
-+};
-+
-+static int __init snappy_mod_init(void)
-+{
-+	return crypto_register_alg(&alg);
-+}
-+
-+static void __exit snappy_mod_fini(void)
-+{
-+	crypto_unregister_alg(&alg);
-+}
-+
-+module_init(snappy_mod_init);
-+module_exit(snappy_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Snappy Compression Algorithm");
--- 
-1.7.4.4
-
+root@R3BTS-CP-PFS1.0# /etc/init.d/ipsec status
+IPsec running =A0- pluto pid: 477
+pluto pid 477
+2 tunnels up
+some eroutes exist
+root@R3BTS-CP-PFS1.0# ping 192.168.11.45
+PING 192.168.11.45 (192.168.11.45): 56 data bytes
+^C
+--- 192.168.11.45 ping statistics ---
+68 packets transmitted, 0 packets received, 100% packet
+loss------------>after ipsec.
