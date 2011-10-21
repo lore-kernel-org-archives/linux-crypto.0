@@ -1,66 +1,62 @@
-From: Matthias-Christian Ott <ott@mirix.org>
-Subject: Re: Hardware acceleration indication in af_alg
-Date: Fri, 21 Oct 2011 16:34:15 +0200
-Message-ID: <20111021143415.GE2050@qp>
-References: <20111018131351.GB24865@qi>
- <20111021132336.GA1080@gondor.apana.org.au>
- <20111021141541.GC2050@qp>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH 1/4] crc32: Bolt on crc32c
+Date: Fri, 21 Oct 2011 09:57:03 -0700
+Message-ID: <20111021165703.GS12447@tux1.beaverton.ibm.com>
+References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com> <20111021122803.GA15803@gondor.apana.org.au>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mirix.org ([78.46.130.147]:48080 "EHLO a.mirix.org"
+Received: from e7.ny.us.ibm.com ([32.97.182.137]:48220 "EHLO e7.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752600Ab1JUOeS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Oct 2011 10:34:18 -0400
-Received: from [fdb9:f9c0:d128:9208::1] (helo=qp)
-	by a.mirix.org with esmtpsa (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.76)
-	(envelope-from <ott@mirix.org>)
-	id 1RHGAq-00020i-Sr
-	for linux-crypto@vger.kernel.org; Fri, 21 Oct 2011 16:34:17 +0200
+	id S1752959Ab1JUQ5L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Oct 2011 12:57:11 -0400
+Received: from /spool/local
+	by e7.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
+	Fri, 21 Oct 2011 12:57:10 -0400
 Content-Disposition: inline
-In-Reply-To: <20111021141541.GC2050@qp>
+In-Reply-To: <20111021122803.GA15803@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 21, 2011 at 04:15:41PM +0200, Matthias-Christian Ott wrote:
-> On Fri, Oct 21, 2011 at 03:23:36PM +0200, Herbert Xu wrote:
-> > Matthias-Christian Ott <ott@mirix.org> wrote:
-> > > I did some experiments with af_alg and noticed that to be really
-> > > useful, it should indicate whether a certain algorithm is hardware
-> > > accelerated. I guess this has to be inferred by the priority of the
-> > > algorithm could be made available via a read-only socket option. Any
-> > > thoughts on this?
-> > > 
-> > > I can imagine, an alternative approach and perhaps better approach
-> > > would be to measure the speed of the kernel provided algorithm against
-> > > a software implementation, but there are many other factors that could
-> > > influence the results. Therefore, it is perhaps better to just make
-> > > the assumption that hardware acceleration is faster which is made in
-> > > the kernel anyhow.
+On Fri, Oct 21, 2011 at 02:28:03PM +0200, Herbert Xu wrote:
+> On Tue, Oct 04, 2011 at 04:54:03PM -0700, Darrick J. Wong wrote:
+> > Reuse the existing crc32 code to stamp out a crc32c implementation.
 > > 
-> > You have to be careful to distinguish between hardware acceleration
-> > that is directly available to user-space (such as AESNI) and those
-> > that aren't.
-> > 
-> > For the former it makes zero sense to go through the kernel as
-> > you'll only make it slower.  The latter case is the reason why
-> > this interface exists.
+> > Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
 > 
-> This is why I didn't consider hardware acceleration that is directly
-> available to user-space in the first place (I'm not aware of anything
-> except CPUs that is usable this way). So the question remains whether
-> e.g. the AES implementation provided through af_alg by the kernel is
-> faster (and thus most likely hardware accelerated) than a software
-> implementation. Since the kernel seems to make the assumption that
-> hardware acceleration is faster, I asked whether it would be possible to
-> pass this information to user-space as well.
+> Did you want this to go through my tree? If so then there is a
+> problem since it doesn't apply at all.
 
-Ignore that e-mail. The the recent user configuration patches
-by Stefan Klassert seem to expose the algorithm's priority via
-CRYPTOCFGA_PRIORITY_VAL. This should solve my problem, provided that
-the patches will be included.
+My patchset builds upon Bob Pearson's crc32 patchset from early September.  Do
+my patches fail to apply after applying his patchset?
 
-Regards,
-Matthias-Christian
+Or, to speed things along, should I simply repost both Bob's and my patches as
+one big series?
+
+Bob, have you sent out a new iteration of your patches since September 6th?
+
+--D
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-ext4" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
