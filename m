@@ -1,42 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/4] crc32: Bolt on crc32c
-Date: Fri, 21 Oct 2011 21:15:14 +0200
-Message-ID: <20111021191514.GA3997@gondor.apana.org.au>
-References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com> <20111021122803.GA15803@gondor.apana.org.au> <20111021165703.GS12447@tux1.beaverton.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
-	Theodore Tso <tytso@mit.edu>,
-	David Miller <davem@davemloft.net>,
-	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-ext4@vger.kernel.org
-To: "Darrick J. Wong" <djwong@us.ibm.com>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20111021165703.GS12447@tux1.beaverton.ibm.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Yong Zhang <yong.zhang0@gmail.com>
+Subject: [PATCH 28/49] crypto: irq: Remove IRQF_DISABLED
+Date: Sat, 22 Oct 2011 17:56:40 +0800
+Message-ID: <1319277421-9203-29-git-send-email-yong.zhang0@gmail.com>
+References: <1319277421-9203-1-git-send-email-yong.zhang0@gmail.com>
+Cc: tglx@linutronix.de, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:57970 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754292Ab1JVKKn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 Oct 2011 06:10:43 -0400
+In-Reply-To: <1319277421-9203-1-git-send-email-yong.zhang0@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 21, 2011 at 09:57:03AM -0700, Darrick J. Wong wrote:
-> 
-> My patchset builds upon Bob Pearson's crc32 patchset from early September.  Do
-> my patches fail to apply after applying his patchset?
-> 
-> Or, to speed things along, should I simply repost both Bob's and my patches as
-> one big series?
-> 
-> Bob, have you sent out a new iteration of your patches since September 6th?
+Since commit [e58aa3d2: genirq: Run irq handlers with interrupts disabled],
+We run all interrupt handlers with interrupts disabled
+and we even check and yell when an interrupt handler
+returns with interrupts enabled (see commit [b738a50a:
+genirq: Warn when handler enables interrupts]).
 
-I'm fine with you pushing this through whichever tree that Bob's
-patches are going through.
+So now this flag is a NOOP and can be removed.
 
-Cheers,
+Signed-off-by: Yong Zhang <yong.zhang0@gmail.com>
+---
+ drivers/crypto/mv_cesa.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 5c6f56f..7a10360 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1041,8 +1041,7 @@ static int mv_probe(struct platform_device *pdev)
+ 		goto err_unmap_sram;
+ 	}
+ 
+-	ret = request_irq(irq, crypto_int, IRQF_DISABLED, dev_name(&pdev->dev),
+-			cp);
++	ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev), cp);
+ 	if (ret)
+ 		goto err_thread;
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
