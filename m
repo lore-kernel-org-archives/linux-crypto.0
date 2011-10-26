@@ -1,54 +1,44 @@
-From: Valdis.Kletnieks@vt.edu
-Subject: [PATCH] fix typo in crypto/Kconfig
-Date: Tue, 25 Oct 2011 07:07:18 -0400
-Message-ID: <27363.1319540838@turing-police.cc.vt.edu>
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: linux-next: Tree for Oct 25 (crypto)
+Date: Tue, 25 Oct 2011 17:42:01 -0700
+Message-ID: <4EA75759.3050900@xenotime.net>
+References: <20111025203628.40a1b8a475e32053aa34dabe@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1319540838_3131P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:48071 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751864Ab1JYLHd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Oct 2011 07:07:33 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	Linus <torvalds@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20111025203628.40a1b8a475e32053aa34dabe@canb.auug.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
---==_Exmh_1319540838_3131P
-Content-Type: text/plain; charset=us-ascii
-
-Fix a typo in the Kconfig file help text.
-
-Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
-
---- linux-next/crypto/Kconfig.dist	2011-10-25 06:57:29.413596040 -0400
-+++ linux-next/crypto/Kconfig	2011-10-25 07:01:51.518647308 -0400
-@@ -104,7 +104,7 @@
- 	tristate "Userspace cryptographic algorithm configuration"
- 	select CRYPTO_MANAGER
- 	help
--	  Userapace configuration for cryptographic instantiations such as
-+	  Userspace configuration for cryptographic instantiations such as
- 	  cbc(aes).
- 
- config CRYPTO_MANAGER_DISABLE_TESTS
+On 10/25/11 02:36, Stephen Rothwell wrote:
+> Hi all,
 
 
---==_Exmh_1319540838_3131P
-Content-Type: application/pgp-signature
+When CONFIG_NET is not enabled:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
+ERROR: "nla_put" [crypto/rng.ko] undefined!
+ERROR: "nla_put" [crypto/pcompress.ko] undefined!
+ERROR: "netlink_kernel_release" [crypto/crypto_user.ko] undefined!
+ERROR: "netlink_kernel_create" [crypto/crypto_user.ko] undefined!
+ERROR: "init_net" [crypto/crypto_user.ko] undefined!
+ERROR: "netlink_unicast" [crypto/crypto_user.ko] undefined!
+ERROR: "__alloc_skb" [crypto/crypto_user.ko] undefined!
+ERROR: "skb_trim" [crypto/crypto_user.ko] undefined!
+ERROR: "skb_put" [crypto/crypto_user.ko] undefined!
+ERROR: "netlink_dump_start" [crypto/crypto_user.ko] undefined!
+ERROR: "nla_put" [crypto/crypto_user.ko] undefined!
+ERROR: "netlink_rcv_skb" [crypto/crypto_user.ko] undefined!
+ERROR: "nla_put" [crypto/crypto_hash.ko] undefined!
+ERROR: "nla_put" [crypto/crypto_blkcipher.ko] undefined!
+ERROR: "nla_put" [crypto/aead.ko] undefined!
 
-iD8DBQFOpphmcC3lWbTT17ARAiojAJ9xGtiMJrsIB06pLHHi8YgK7+wNBgCgzNfy
-BRiflJemi1Lf4zz0nkzLuNU=
-=z8QE
------END PGP SIGNATURE-----
 
---==_Exmh_1319540838_3131P--
+-- 
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
