@@ -1,40 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: Tree for Oct 25 (crypto)
-Date: Thu, 27 Oct 2011 09:45:44 +0200
-Message-ID: <20111027074544.GA19905@gondor.apana.org.au>
-References: <20111025203628.40a1b8a475e32053aa34dabe@canb.auug.org.au> <4EA75759.3050900@xenotime.net> <20111026062717.GA10230@gondor.apana.org.au> <7836.1319699116@turing-police.cc.vt.edu>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Time for a fresh slice-by-8 crc32.c posting?
+Date: Thu, 27 Oct 2011 11:32:21 -0700
+Message-ID: <20111027183221.GV12447@tux1.beaverton.ibm.com>
+References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com> <20111021122803.GA15803@gondor.apana.org.au> <20111021165703.GS12447@tux1.beaverton.ibm.com> <20111021191514.GA3997@gondor.apana.org.au> <20111026171556.GU12447@tux1.beaverton.ibm.com>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Randy Dunlap <rdunlap@xenotime.net>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Linus <torvalds@linux-foundation.org>,
-	linux-crypto@vger.kernel.org
-To: Valdis.Kletnieks@vt.edu
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
+	Theodore Tso <tytso@mit.edu>,
+	David Miller <davem@davemloft.net>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Bob Pearson <rpearson@systemfabricworks.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <7836.1319699116@turing-police.cc.vt.edu>
+In-Reply-To: <20111026171556.GU12447@tux1.beaverton.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 27, 2011 at 03:05:16AM -0400, Valdis.Kletnieks@vt.edu wrote:
-> On Wed, 26 Oct 2011 08:27:17 +0200, Herbert Xu said:
-> > On Tue, Oct 25, 2011 at 05:42:01PM -0700, Randy Dunlap wrote:
-> > > When CONFIG_NET is not enabled:
-> >
-> > Thanks, I'll add this patch.
-> 
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > +	select NET
-> 
-> Are there any use cases where a config (probably embedded) would wantq
-> CRYPTO_USER but not CRYPTO_NET?  Would seem a shame to pull in the entire
+Hi Bob,
 
-Since the CRYPTO_USER interface sits on top of netlink I don't
-see how you could possibly avoid NET.
+Would you mind posting your current crc32 patches to lkml again?  A couple of
+months have gone by, and it sure would be nice to replace the circa-July patch
+in -next with a newer one.  I recall that there were requests for some code
+changes even in Bob's 8/31 submission, so it'd be nice to have a fresh set from
+you with your latest changes.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'd also like to freshen my crc32c refactor patches and send them along too.
+
+To clarify, I tried the new crc32{,c}  on my ppc32 and it passed the self test.
+
+--D
+
+On Wed, Oct 26, 2011 at 10:16:10AM -0700, Darrick J. Wong wrote:
+> On Fri, Oct 21, 2011 at 09:15:14PM +0200, Herbert Xu wrote:
+> > On Fri, Oct 21, 2011 at 09:57:03AM -0700, Darrick J. Wong wrote:
+> > > 
+> > > My patchset builds upon Bob Pearson's crc32 patchset from early September.  Do
+> > > my patches fail to apply after applying his patchset?
+> > > 
+> > > Or, to speed things along, should I simply repost both Bob's and my patches as
+> > > one big series?
+> > > 
+> > > Bob, have you sent out a new iteration of your patches since September 6th?
+> > 
+> > I'm fine with you pushing this through whichever tree that Bob's
+> > patches are going through.
+> 
+> Bob,
+> 
+> Which tree (if any) are your patches going through?  
+> 
+> --D
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-ext4" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
