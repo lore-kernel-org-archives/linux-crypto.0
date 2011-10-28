@@ -1,65 +1,19 @@
-From: "Darrick J. Wong" <djwong@us.ibm.com>
-Subject: Time for a fresh slice-by-8 crc32.c posting?
-Date: Thu, 27 Oct 2011 11:32:21 -0700
-Message-ID: <20111027183221.GV12447@tux1.beaverton.ibm.com>
-References: <20111004235357.1560.12602.stgit@elm3c44.beaverton.ibm.com> <20111004235403.1560.55503.stgit@elm3c44.beaverton.ibm.com> <20111021122803.GA15803@gondor.apana.org.au> <20111021165703.GS12447@tux1.beaverton.ibm.com> <20111021191514.GA3997@gondor.apana.org.au> <20111026171556.GU12447@tux1.beaverton.ibm.com>
-Reply-To: djwong@us.ibm.com
+From: lisa hedstrand <lisa_hedstrand@indiatimes.com>
+Subject: Hi
+Date: Fri, 28 Oct 2011 16:48:51 +0530 (IST)
+Message-ID: <1595594061.935451319800731554.JavaMail.root__31043.7612970874$1319800735$gmane$org@tilmb17.indiatimes.com>
+Reply-To: lisa hedstrand <lisahedstrand@yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>,
-	Theodore Tso <tytso@mit.edu>,
-	David Miller <davem@davemloft.net>,
-	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-ext4@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Bob Pearson <rpearson@systemfabricworks.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20111026171556.GU12447@tux1.beaverton.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from trx4.indiatimes.com ([223.165.24.215]:39998 "EHLO
+	trx4.indiatimes.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755391Ab1J1LSq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Oct 2011 07:18:46 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Bob,
-
-Would you mind posting your current crc32 patches to lkml again?  A couple of
-months have gone by, and it sure would be nice to replace the circa-July patch
-in -next with a newer one.  I recall that there were requests for some code
-changes even in Bob's 8/31 submission, so it'd be nice to have a fresh set from
-you with your latest changes.
-
-I'd also like to freshen my crc32c refactor patches and send them along too.
-
-To clarify, I tried the new crc32{,c}  on my ppc32 and it passed the self test.
-
---D
-
-On Wed, Oct 26, 2011 at 10:16:10AM -0700, Darrick J. Wong wrote:
-> On Fri, Oct 21, 2011 at 09:15:14PM +0200, Herbert Xu wrote:
-> > On Fri, Oct 21, 2011 at 09:57:03AM -0700, Darrick J. Wong wrote:
-> > > 
-> > > My patchset builds upon Bob Pearson's crc32 patchset from early September.  Do
-> > > my patches fail to apply after applying his patchset?
-> > > 
-> > > Or, to speed things along, should I simply repost both Bob's and my patches as
-> > > one big series?
-> > > 
-> > > Bob, have you sent out a new iteration of your patches since September 6th?
-> > 
-> > I'm fine with you pushing this through whichever tree that Bob's
-> > patches are going through.
-> 
-> Bob,
-> 
-> Which tree (if any) are your patches going through?  
-> 
-> --D
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-ext4" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+My name is Miss Lisa Please accept my apology if my mode of contacting you will in any way offend you. I am compelled to contact you via this medium because i needed a friend from that part of the world. We will get to know each other in details if my proposition accepted. l am a student in UK but originally from USA.
