@@ -1,37 +1,42 @@
 From: Lisa Carlson-Mcwhirter <lcarlson@lcps.k12.nm.us>
-Subject: RE: Your mailbox storage limit has been
-Date: Sun, 30 Oct 2011 03:09:11 +0000
-Message-ID: <C83F56469920854F9FCCD1085C44D1B6371D2D9D__33069.0665440217$1319944744$gmane$org@EXCHANGE2.lcpsad.internal>
-References: <C83F56469920854F9FCCD1085C44D1B6371D1F85@EXCHANGE2.lcpsad.internal>
+Subject: =?iso-8859-1?Q?RE:_Il_limite_di_archiviazione_della_cassetta_postale_=E8_?=
+ =?iso-8859-1?Q?stata_superato?=
+Date: Sun, 30 Oct 2011 04:20:25 +0000
+Message-ID: <C83F56469920854F9FCCD1085C44D1B6371D468F@EXCHANGE2.lcpsad.internal>
+References: <C83F56469920854F9FCCD1085C44D1B6371D38C6@EXCHANGE2.lcpsad.internal>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: Lisa Carlson-Mcwhirter <lcarlson@lcps.k12.nm.us>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mbox.lcps.k12.nm.us ([207.108.244.13]:48497 "EHLO
+Received: from mbox.lcps.k12.nm.us ([207.108.244.13]:38589 "EHLO
 	mbox.lcps.k12.nm.us" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933352Ab1J3DS2 convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1750772Ab1J3EU1 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 29 Oct 2011 23:18:28 -0400
-In-Reply-To: <C83F56469920854F9FCCD1085C44D1B6371D1F85@EXCHANGE2.lcpsad.internal>
+	Sun, 30 Oct 2011 00:20:27 -0400
+In-Reply-To: <C83F56469920854F9FCCD1085C44D1B6371D38C6@EXCHANGE2.lcpsad.internal>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 ________________________________________
-From: Lisa Carlson-Mcwhirter
-Sent: Saturday, October 29, 2011 8:24 PM
+=46rom: Lisa Carlson-Mcwhirter
+Sent: Saturday, October 29, 2011 9:51 PM
 To: Lisa Carlson-Mcwhirter
-Subject: Your mailbox storage limit has been
+Subject: Il limite di archiviazione della cassetta postale =E8 stata su=
+perato
 
-Your mailbox storage limit has been
+Il limite di archiviazione della cassetta postale =E8 stata superato
 
-Your mailbox storage limit has been exceeded until you re-validate your
-mailbox you can not send or recieve e-mail.To re-validate your mailbox
-please CLICK the below link
+ Il limite di archiviazione della cassetta postale =E8 stata
 
-http://www.ndiweb.com/phpform/use/Adminhel/form1.html
+ superato fino a ri-confermare la
+ casella di posta non =E8 possibile inviare o ricevere
 
-Thanks
-System Administrator
+ e-mail.To ri-confermare la tua casella di posta
+ clicca sul link sottostante
+ http://is.gd/TsMQV0
+
+ grazie
+ amministratore di sistema
