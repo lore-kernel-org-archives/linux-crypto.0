@@ -1,69 +1,73 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
+From: Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: Crypto Update for 3.2
-Date: Mon, 31 Oct 2011 09:42:52 -0700
-Message-ID: <4EAED00C.3010908@xenotime.net>
-References: <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au> <20110315145940.GA15373@gondor.apana.org.au> <20110520235409.GA1722@gondor.apana.org.au> <20110724011752.GA14373@gondor.apana.org.au> <20111031040952.GA19659@gondor.apana.org.au>
+Date: Mon, 31 Oct 2011 10:16:55 -0700
+Message-ID: <CA+55aFw=quU1bVR_AZ0OBW4DkPWMfxvWu7smx9VcDe81vaGu9Q@mail.gmail.com>
+References: <20091204135530.GA29371@gondor.apana.org.au> <20100226004914.GA20812@gondor.apana.org.au>
+ <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au>
+ <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au>
+ <20110106000157.GA16089@gondor.apana.org.au> <20110315145940.GA15373@gondor.apana.org.au>
+ <20110520235409.GA1722@gondor.apana.org.au> <20110724011752.GA14373@gondor.apana.org.au>
+ <20111031040952.GA19659@gondor.apana.org.au> <4EAED00C.3010908@xenotime.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Randy Dunlap <rdunlap@xenotime.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from oproxy8-pub.bluehost.com ([69.89.22.20]:53393 "HELO
-	oproxy8-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S932268Ab1JaQnU (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:56688 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932861Ab1JaRRR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Oct 2011 12:43:20 -0400
-In-Reply-To: <20111031040952.GA19659@gondor.apana.org.au>
+	Mon, 31 Oct 2011 13:17:17 -0400
+In-Reply-To: <4EAED00C.3010908@xenotime.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/30/2011 09:09 PM, Herbert Xu wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
-> 
-> Hi Linus:
-> 
-> Here is the crypto update for 3.2:
-> 
-> * User-space interface for algorithm selection/configuration
-> * SSSE3 implementation of SHA1.
-> * X86-64 assembly implementation of blowfish.
-> * X86-64 assembly implementation of twofish.
-> * Misc fixes.
-> 
-> 
-> Please pull from
-> 
-> git://github.com/herbertx/crypto.git
-> 
-> 
-> The top commit object is
-> 
-> 	commit ea8bdfcff17599e5d80f93e2ae194fbbab7f8d5e
-> 	Author: Herbert Xu <herbert@gondor.apana.org.au>
-> 	Date:   Wed Oct 26 17:15:10 2011 +0200
-> 
-> 	    crypto: user - Add dependency on NET
+On Mon, Oct 31, 2011 at 9:42 AM, Randy Dunlap <rdunlap@xenotime.net> wr=
+ote:
+>
+> Actually adds "select NET", a reverse dependency. =A0:(
+>
+> Linus was quite vocal about not allowing MD to select BLOCK.
+> See https://lkml.org/lkml/2011/8/10/527
+> and https://lkml.org/lkml/2011/8/10/533
+>
+> To me this is very similar.
 
+I do agree.
 
-> Herbert Xu (4):
->       crypto: sha - Fix build error due to crypto_sha1_update
->       crypto: cryptd - Use subsys_initcall to prevent races with aesni
->       crypto: user - Initialise match in crypto_alg_match
->       crypto: user - Add dependency on NET
+"select" makes sense when it's a way for a user to not have to care
+about some small helper thing that is really not obvious for a casual
+user.
 
-Actually adds "select NET", a reverse dependency.  :(
+But darn it, if somebody has said "no networking", then some random
+small feature shouldn't suddenly select it.
 
-Linus was quite vocal about not allowing MD to select BLOCK.
-See https://lkml.org/lkml/2011/8/10/527
-and https://lkml.org/lkml/2011/8/10/533
+IOW, it's about "relative importance". We should use "select" when
+some feature that should be user-visible selects some details. And we
+should use "depends on" when there's a major subsystem that some small
+detail depends on.
 
-To me this is very similar.
+So classic and obvious uses where "select" is appropriate is when a
+driver needs some helper library to work (eg "select FW_LOADER" or
+"select CRC32").
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+And a classic and obvious case where "depends on" is the appropriate
+choice is when it depends on a major subsystem ("depends on PCI" or
+"depends on USB" or "depends on X86").
+
+And I think "NET" definitely falls into that second category - exactly
+the same way "BLOCK" fell into it. You don't "select" major subsystems
+- if somebody turned off the subsystem, we turn off the stuff that
+depends on it.
+
+(Of course, in reality, pretty much nobody turns off NET, I suspect.
+But if some embedded place really doesn't want it, then damn it, we
+shouldn't ask about the odd crypto user interfaces, because they
+really aren't major enough, and the embedded platform is clearly
+trying very hard to run small).
+
+                        Linus
