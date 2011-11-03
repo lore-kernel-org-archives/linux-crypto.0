@@ -1,48 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Hardware acceleration indication in af_alg
-Date: Thu, 3 Nov 2011 09:51:27 +1100
-Message-ID: <20111102225127.GA10130@gondor.apana.org.au>
-References: <20111101125940.GA5072@totoro>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: nmav@gnutls.org, linux-crypto@vger.kernel.org
-To: Jamie Iles <jamie@jamieiles.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] ansi_cprng: enforce key != seed in fips mode
+Date: Thu,  3 Nov 2011 16:24:45 -0400
+Message-ID: <1320351885-28555-1-git-send-email-jarod@redhat.com>
+Cc: Jarod Wilson <jarod@redhat.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Stephan Mueller <smueller@atsec.com>,
+	Steve Grubb <sgrubb@redhat.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41773 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752339Ab1KBWvi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Nov 2011 18:51:38 -0400
-Content-Disposition: inline
-In-Reply-To: <20111101125940.GA5072@totoro>
+Received: from mx1.redhat.com ([209.132.183.28]:34164 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751035Ab1KCUZH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Nov 2011 16:25:07 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Jamie Iles <jamie@jamieiles.com> wrote:
->
->> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
->> index de9adec..3e14cee 100644
->> --- a/include/linux/crypto.h
->> +++ b/include/linux/crypto.h
->> @@ -51,6 +51,11 @@
->>  #define CRYPTO_ALG_DYING             0x00000040
->>  #define CRYPTO_ALG_ASYNC             0x00000080
->>  
->> +/* Set this bit if the algorithm provided is hardware accelerated but
->> + * not available to userspace via instruction set or so.
->> + */
->> +#define CRYPTO_ALG_KERN_ONLY            0x00000100
-> 
-> Would it be a bit clearer if this was CRYPTO_ALG_IS_UNPRIVILIGED and was 
-> set the other way round (so instruction set based ones that users can 
-> use)?  I had to do a double take with KERN_ONLY.
+Apparently, NIST is tightening up its requirements for FIPS validation
+with respect to RNGs. Its always been required that in fips mode, the
+ansi cprng not be fed key and seed material that was identical, but
+they're now interpreting FIPS 140-2, section AS07.09 as requiring that
+the implementation itself must enforce the requirement. Easy fix, we
+just do a memcmp of key and seed in fips_cprng_reset and call it a day.
 
-Actually I think Nikos's suggestion is the right one.  Going the
-other way would be more intrusive.  Of course I'm open to a better
-name than KERN_ONLY.
+CC: Neil Horman <nhorman@tuxdriver.com>
+CC: Stephan Mueller <smueller@atsec.com>
+CC: Steve Grubb <sgrubb@redhat.com>
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+---
+ crypto/ansi_cprng.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Thanks!
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index ffa0245..a7fdcb4 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -414,10 +414,15 @@ static int fips_cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+ {
+ 	u8 rdata[DEFAULT_BLK_SZ];
++	u8 *key = seed + DEFAULT_BLK_SZ;
+ 	int rc;
+ 
+ 	struct prng_context *prng = crypto_rng_ctx(tfm);
+ 
++	/* fips strictly requires seed != key */
++	if (!memcmp(seed, key, DEFAULT_PRNG_KSZ))
++		return -EINVAL;
++
+ 	rc = cprng_reset(tfm, seed, slen);
+ 
+ 	if (!rc)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
