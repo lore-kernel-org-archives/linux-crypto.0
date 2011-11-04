@@ -1,73 +1,118 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH v2] ansi_cprng: enforce key != seed in fips mode
-Date: Fri, 4 Nov 2011 11:25:13 -0400
-Message-ID: <20111104152513.GC23232@hmsreliant.think-freely.org>
-References: <20111104105101.GA23232@hmsreliant.think-freely.org>
- <1320415285-4527-1-git-send-email-jarod@redhat.com>
+From: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Subject: RE: [PATCH] crypto: driver for tegra AES hardware
+Date: Fri, 4 Nov 2011 14:21:23 -0700
+Message-ID: <74CDBE0F657A3D45AFBB94109FB122FF173F9A4E83@HQMAIL01.nvidia.com>
+References: <1320405256-29374-1-git-send-email-vwadekar@nvidia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Stephan Mueller <smueller@atsec.com>,
-	Steve Grubb <sgrubb@redhat.com>, herbert@gondor.apana.org.au
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:47512 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755609Ab1KDPZW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Nov 2011 11:25:22 -0400
-Content-Disposition: inline
-In-Reply-To: <1320415285-4527-1-git-send-email-jarod@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+To: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
+	"herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org" <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
+	"davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1320405256-29374-1-git-send-email-vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 04, 2011 at 10:01:25AM -0400, Jarod Wilson wrote:
-> Apparently, NIST is tightening up its requirements for FIPS validation
-> with respect to RNGs. Its always been required that in fips mode, the
-> ansi cprng not be fed key and seed material that was identical, but
-> they're now interpreting FIPS 140-2, section AS07.09 as requiring that
-> the implementation itself must enforce the requirement. Easy fix, we
-> just do a memcmp of key and seed in fips_cprng_reset and call it a day.
-> 
-> v2: Per Neil's advice, ensure slen is sufficiently long before we
-> compare key and seed to avoid looking at potentially unallocated mem.
-> 
-> CC: Neil Horman <nhorman@tuxdriver.com>
-> CC: Stephan Mueller <smueller@atsec.com>
-> CC: Steve Grubb <sgrubb@redhat.com>
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
-Thanks Jarod.  Adding Herbert to the cc list so he can pull this into the crypto
-tree.
+Varun Wadekar wrote at Friday, November 04, 2011 5:14 AM:
+> From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
+If you teach git your full name, it'll omit this From: header from the
+email body, which will be a little more idiomatic:
 
-> ---
->  crypto/ansi_cprng.c |    8 ++++++++
->  1 files changed, 8 insertions(+), 0 deletions(-)
+git config --global sendemail.from "Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>"
+
+> driver supports ecb/cbc/ofb/ansi_x9.31rng modes,
+> 128, 192 and 256-bit key sizes.
 > 
-> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-> index ffa0245..6ddd99e 100644
-> --- a/crypto/ansi_cprng.c
-> +++ b/crypto/ansi_cprng.c
-> @@ -414,10 +414,18 @@ static int fips_cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
->  static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
->  {
->  	u8 rdata[DEFAULT_BLK_SZ];
-> +	u8 *key = seed + DEFAULT_BLK_SZ;
->  	int rc;
->  
->  	struct prng_context *prng = crypto_rng_ctx(tfm);
->  
-> +	if (slen < DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
-> +		return -EINVAL;
+> Change-Id: Ic7d8d6d76b8ab6712f3bc9048e2dee7b5ebd13ff
+
+Please remove the Change-Id lines from patches before posting them.
+
+> Signed-off-by: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+
+I ran this patch through checkpatch, and there's one error and some
+warnings to fix.
+
+> +config CRYPTO_DEV_TEGRA_AES
+> +	tristate "Support for TEGRA AES hw engine"
+> +	depends on ARCH_TEGRA_2x_SOC
+
+Is this HW specific to Tegra20 such that the driver won't be useful for
+Tegra30? In other words, should this depend on ARCH_TEGRA instead?
+
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+...
+>  obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
+> +obj-$(CONFIG_CRYPTO_DEV_TEGRA_AES) += tegra-aes.o
 > +
-> +	/* fips strictly requires seed != key */
-> +	if (!memcmp(seed, key, DEFAULT_PRNG_KSZ))
-> +		return -EINVAL;
+
+Can you please remove the extra blank line?
+
+> +static int tegra_aes_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct tegra_aes_dev *dd;
+> +	struct resource *res;
+> +	int err = -ENOMEM, i = 0, j;
 > +
->  	rc = cprng_reset(tfm, seed, slen);
->  
->  	if (!rc)
-> -- 
-> 1.7.1
-> 
-> 
+> +	if (aes_dev)
+> +		return -EEXIST;
+> +
+> +	dd = kzalloc(sizeof(struct tegra_aes_dev), GFP_KERNEL);
+
+If you use devm_kzalloc here, and other devm_*() functions throughout,
+you'll need a bunch less cleanup code in the failure path in probe(),
+and the teardown path in remove().
+
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+
+Don't you need to call request_mem_region() between get_resource() and
+ioremap()?
+
+> +	dd->io_base = ioremap(dd->phys_base, resource_size(res));
+
+There's a devm_ variant for this.
+
+> +	/* Initialize the vde clock */
+> +	dd->aes_clk = clk_get(dev, "vde");
+
+That clock doesn't exist in the mainline kernel; "bsev" exists for device
+"tegra-aes"...
+
+> +	err = clk_set_rate(dd->aes_clk, ULONG_MAX);
+
+That's a little fast... What rate should it be running at. Is this
+something the driver should be configuring, or should the board file or
+device-tree be configuring this?
+
+> +	err = request_irq(INT_VDE_BSE_V, aes_irq, IRQF_TRIGGER_HIGH,
+> +		"tegra-aes", dd);
+
+Shouldn't the IRQ number come from a resource rather than being hard-coded?
+
+> +static struct platform_driver tegra_aes_driver = {
+> +	.probe  = tegra_aes_probe,
+> +	.remove = __devexit_p(tegra_aes_remove),
+> +	.driver = {
+> +		.name   = "tegra-aes",
+> +		.owner  = THIS_MODULE,
+> +	},
+> +};
+
+Can you please allow instantiation from device-tree too; see drivers/
+gpio/gpio-tegra.c's tegra_gpio_of_match[] for an example.
+
+> diff --git a/drivers/crypto/tegra-aes.h b/drivers/crypto/tegra-aes.h
+
+> +#define ICMDQUE_WR		0x1000
+
+It'd be nice to prefix all the defines in this file with e.g. TEGRA_AES_
+so that they're guaranteed not to conflict with any unrelated defines.
+
+-- 
+nvpublic
