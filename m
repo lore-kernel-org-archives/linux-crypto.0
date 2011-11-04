@@ -1,172 +1,128 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2.2 6/7] integrity: digital signature verification
- using multiple keyrings
-Date: Fri, 04 Nov 2011 07:29:46 -0400
-Message-ID: <1320406187.2010.11.camel@falcor>
-References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
-	 <f094bd1603dcf682b8ab5fb41af7c5635cb04d23.1319025009.git.dmitry.kasatkin@intel.com>
+From: Henning Heinold <heinold-cPcqOTmdTlv31zTM6d8ziw@public.gmane.org>
+Subject: Re: [PATCH] crypto: driver for tegra AES hardware
+Date: Fri, 4 Nov 2011 14:54:36 +0100
+Message-ID: <20111104135436.GA29112@mail.familie-heinold.de>
+References: <1320405256-29374-1-git-send-email-vwadekar@nvidia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dhowells@redhat.com, herbert@gondor.apana.org.au
-To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e36.co.us.ibm.com ([32.97.110.154]:36406 "EHLO
-	e36.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754805Ab1KDLbN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Nov 2011 07:31:13 -0400
-Received: from /spool/local
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Fri, 4 Nov 2011 05:31:06 -0600
-In-Reply-To: <f094bd1603dcf682b8ab5fb41af7c5635cb04d23.1319025009.git.dmitry.kasatkin@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: multipart/mixed; boundary="NzB8fVQJ5HfG6fxh"
+Cc: herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1320405256-29374-1-git-send-email-vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2011-10-19 at 14:51 +0300, Dmitry Kasatkin wrote:
-> Define separate keyrings for each of the different use cases - evm, ima,
-> and modules. Using different keyrings improves search performance, and also
-> allows "locking" specific keyring to prevent adding new keys.
-> This is useful for evm and module keyrings, when keys are usually only
-> added from initramfs.
-> 
-> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 
-Thanks Dmitry!  Other than the couple of trailing whitespaces, the
-patches look good.  I think adding the word 'public', above, to 'adding
-new keys' clarifies that the keyrings are only used for the digital
-signatures.
+--NzB8fVQJ5HfG6fxh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Acked-by: Mimi Zohar <zohar@us.ibm.com>
+Hi Varun,
 
-> ---
->  security/integrity/Kconfig     |   14 +++++++++++
->  security/integrity/Makefile    |    1 +
->  security/integrity/digsig.c    |   48 ++++++++++++++++++++++++++++++++++++++++
->  security/integrity/integrity.h |   20 ++++++++++++++++
->  4 files changed, 83 insertions(+), 0 deletions(-)
->  create mode 100644 security/integrity/digsig.c
-> 
-> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-> index 4bf00ac..d87fa2a 100644
-> --- a/security/integrity/Kconfig
-> +++ b/security/integrity/Kconfig
-> @@ -3,5 +3,19 @@ config INTEGRITY
->  	def_bool y
->  	depends on IMA || EVM
-> 
-> +config INTEGRITY_DIGSIG
-> +	boolean "Digital signature verification using multiple keyrings"
-> +	depends on INTEGRITY
-> +	default n
-> +	select DIGSIG
-> +	help
-> +	  This option enables digital signature verification support
-> +	  using multiple keyrings. It defines separate keyrings for each
-> +	  of the different use cases - evm, ima, and modules.
-> +	  Different keyrings improves search performance, but also allow
-> +	  to "lock" certain keyring to prevent adding new keys.
-> +	  This is useful for evm and module keyrings, when keys are
-> +	  usually only added from initramfs.
-> +
->  source security/integrity/ima/Kconfig
->  source security/integrity/evm/Kconfig
-> diff --git a/security/integrity/Makefile b/security/integrity/Makefile
-> index 0ae44ae..bece056 100644
-> --- a/security/integrity/Makefile
-> +++ b/security/integrity/Makefile
-> @@ -3,6 +3,7 @@
->  #
-> 
->  obj-$(CONFIG_INTEGRITY) += integrity.o
-> +obj-$(CONFIG_INTEGRITY_DIGSIG) += digsig.o
-> 
->  integrity-y := iint.o
-> 
-> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-> new file mode 100644
-> index 0000000..b5d1e01
-> --- /dev/null
-> +++ b/security/integrity/digsig.c
-> @@ -0,0 +1,48 @@
-> +/*
-> + * Copyright (C) 2011 Intel Corporation
-> + *
-> + * Author:
-> + * Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, version 2 of the License.
-> + *
-> + */
-> +
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> +
-> +#include <linux/err.h>
-> +#include <linux/rbtree.h>
-> +#include <linux/key-type.h>
-> +#include <linux/digsig.h>
-> +
-> +#include "integrity.h"
-> +
-> +static struct key *keyring[INTEGRITY_KEYRING_MAX];
-> +
-> +static const char *keyring_name[INTEGRITY_KEYRING_MAX] = {
-> +	"_evm",
-> +	"_module",
-> +	"_ima",
-> +};
-> +
-> +int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-> +					const char *digest, int digestlen)
-> +{
-> +	if (id >= INTEGRITY_KEYRING_MAX)
-> +		return -EINVAL;
-> +
-> +	if (!keyring[id]) {
-> +		keyring[id] =
-> +			request_key(&key_type_keyring, keyring_name[id], NULL);
-> +		if (IS_ERR(keyring[id])) {
-> +			pr_err("no %s keyring: %ld\n", keyring_name[id],
-> +							PTR_ERR(keyring[id]));
-> +			keyring[id] = NULL;
-> +			return PTR_ERR(keyring[id]);
-> +		}
-> +	}
-> +
-> +	return digsig_verify(keyring[id], sig, siglen, digest, digestlen);
-> +}
-> diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-> index e898094..9fc723b 100644
-> --- a/security/integrity/integrity.h
-> +++ b/security/integrity/integrity.h
-> @@ -51,5 +51,25 @@ struct integrity_iint_cache {
->  struct integrity_iint_cache *integrity_iint_insert(struct inode *inode);
->  struct integrity_iint_cache *integrity_iint_find(struct inode *inode);
-> 
-> +#define INTEGRITY_KEYRING_EVM		0
-> +#define INTEGRITY_KEYRING_MODULE	1
-> +#define INTEGRITY_KEYRING_IMA		2
-> +#define INTEGRITY_KEYRING_MAX		3
-> +
-> +#ifdef CONFIG_INTEGRITY_DIGSIG
-> +
-> +int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-> +					const char *digest, int digestlen);
-> +
-> +#else
-> +
-> +static inline int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-> +					const char *digest, int digestlen)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +#endif /* CONFIG_INTEGRITY_DIGSIG */
-> +
->  /* set during initialization */
->  extern int iint_initialized;
+thanks that you come up with an "official" patch for the aes-stuff.
+
+Against which tree you did test the patch?
+
+I tested it against  git://git.kernel.org/pub/scm/linux/kernel/git/olof/tegra.git for-next
+choose to build it as module and got the following errors:
+
+drivers/crypto/tegra-aes.c: In function 'aes_start_crypt':
+drivers/crypto/tegra-aes.c:226:13: error: 'eng' undeclared (first use in this function)
+drivers/crypto/tegra-aes.c:226:13: note: each undeclared identifier is reported only once for each function it appears in
+drivers/crypto/tegra-aes.c: In function 'aes_irq':
+drivers/crypto/tegra-aes.c:614:18: error: 'intr_err_mask' undeclared (first use in this function)
+drivers/crypto/tegra-aes.c:620:1: warning: label 'done' defined but not used
+
+Which are problems inside the driver it self, which can be easy fixed:
+
+-       aes_writel(eng, 0xFFFFFFFF, INTR_STATUS);
++       aes_writel(dd, 0xFFFFFFFF, INTR_STATUS);
+
+-       aes_writel(dd, intr_err_mask, INTR_STATUS);
++       aes_writel(dd, INT_ERROR_MASK, INTR_STATUS);
+
+Second problem it don't build as modul 
+
+first:
+typo in
+MODULE_LICENSE("GPLv2") it needs a space MODULE_LICENSE("GPL v2")
+
+second:
+tegra_chip_uid function is not exported
+
+I have attched patch which fixes all the stuff besides the not used variable. 
+I did not runtime test it for 3.x kernels, but works backported to
+the 2.6.38-chromeos tree.
+
+Bye Henning 
+
+--NzB8fVQJ5HfG6fxh
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-arm-tegra-aes-fix-building-as-module.patch"
+
+>From 96d513a1688e4d1f53f79d099950cb0ad2899848 Mon Sep 17 00:00:00 2001
+From: Henning Heinold <heinold-cPcqOTmdTlv31zTM6d8ziw@public.gmane.org>
+Date: Fri, 4 Nov 2011 14:52:58 +0100
+Subject: [PATCH] arm:tegra:aes: fix building as module
+
+Signed-off-by: Henning Heinold <heinold-cPcqOTmdTlv31zTM6d8ziw@public.gmane.org>
+---
+ arch/arm/mach-tegra/fuse.c |    2 ++
+ drivers/crypto/tegra-aes.c |    6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/mach-tegra/fuse.c b/arch/arm/mach-tegra/fuse.c
+index 1fa26d9..ea49bd9 100644
+--- a/arch/arm/mach-tegra/fuse.c
++++ b/arch/arm/mach-tegra/fuse.c
+@@ -19,6 +19,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/io.h>
++#include <linux/module.h>
+ 
+ #include <mach/iomap.h>
+ 
+@@ -58,6 +59,7 @@ unsigned long long tegra_chip_uid(void)
+ 	hi = fuse_readl(FUSE_UID_HIGH);
+ 	return (hi << 32ull) | lo;
+ }
++EXPORT_SYMBOL(tegra_chip_uid);
+ 
+ int tegra_sku_id(void)
+ {
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index b180a93..c34bc94 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -223,7 +223,7 @@ static int aes_start_crypt(struct tegra_aes_dev *dd, u32 in_addr, u32 out_addr,
+ 	u32 value;
+ 
+ 	/* reset all the interrupt bits */
+-	aes_writel(eng, 0xFFFFFFFF, INTR_STATUS);
++	aes_writel(dd, 0xFFFFFFFF, INTR_STATUS);
+ 
+ 	/* enable error, dma xfer complete interrupts */
+ 	aes_writel(dd, 0x33, INT_ENB);
+@@ -611,7 +611,7 @@ static irqreturn_t aes_irq(int irq, void *dev_id)
+ 
+ 	dev_dbg(dd->dev, "irq_stat: 0x%x", value);
+ 	if (value & INT_ERROR_MASK)
+-		aes_writel(dd, intr_err_mask, INTR_STATUS);
++		aes_writel(dd, INT_ERROR_MASK, INTR_STATUS);
+ 
+ 	value = aes_readl(dd, INTR_STATUS);
+ 	if (!(value & ENGINE_BUSY_FIELD))
+@@ -1117,4 +1117,4 @@ module_exit(tegra_aes_module_exit);
+ 
+ MODULE_DESCRIPTION("Tegra AES/OFB/CPRNG hw acceleration support.");
+ MODULE_AUTHOR("NVIDIA Corporation");
+-MODULE_LICENSE("GPLv2");
++MODULE_LICENSE("GPL v2");
+-- 
+1.7.7.1
+
+
+--NzB8fVQJ5HfG6fxh--
