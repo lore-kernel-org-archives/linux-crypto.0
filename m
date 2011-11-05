@@ -1,8 +1,8 @@
 From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] crypto: driver for tegra AES hardware
-Date: Sat, 5 Nov 2011 12:58:20 +0530
-Message-ID: <4EB4E594.4080309@nvidia.com>
-References: <1320405256-29374-1-git-send-email-vwadekar@nvidia.com> <20111104135436.GA29112@mail.familie-heinold.de>
+Date: Sat, 5 Nov 2011 13:41:44 +0530
+Message-ID: <4EB4EFC0.1060702@nvidia.com>
+References: <1320405256-29374-1-git-send-email-vwadekar@nvidia.com> <74CDBE0F657A3D45AFBB94109FB122FF173F9A4E83@HQMAIL01.nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
@@ -10,60 +10,51 @@ Cc: "herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org" <herbert-F6s6mLi
 	"davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
 	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Henning Heinold <heinold-cPcqOTmdTlv31zTM6d8ziw@public.gmane.org>
+To: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111104135436.GA29112-/JE64I/RTDPrEm6qDNUMlj7Snszu6STo@public.gmane.org>
+In-Reply-To: <74CDBE0F657A3D45AFBB94109FB122FF173F9A4E83-C7FfzLzN0UxDw2glCA4ptUEOCMrvLtNR@public.gmane.org>
 Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Friday 04 November 2011 07:24 PM, Henning Heinold wrote:
-> Hi Varun,
->
-> thanks that you come up with an "official" patch for the aes-stuff.
->
-> Against which tree you did test the patch?
+>> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> Don't you need to call request_mem_region() between get_resource() and
+> ioremap()?
 
-I tested it against Linus's master branch but unfortunately, some other
-changes crept inside this patch due to which you saw that compilation
-errors.
+I am remapping the module register space. Used IORESOURCE_IO instead.
 
-> I tested it against  git://git.kernel.org/pub/scm/linux/kernel/git/olof/tegra.git for-next
-> choose to build it as module and got the following errors:
 >
-> drivers/crypto/tegra-aes.c: In function 'aes_start_crypt':
-> drivers/crypto/tegra-aes.c:226:13: error: 'eng' undeclared (first use in this function)
-> drivers/crypto/tegra-aes.c:226:13: note: each undeclared identifier is reported only once for each function it appears in
-> drivers/crypto/tegra-aes.c: In function 'aes_irq':
-> drivers/crypto/tegra-aes.c:614:18: error: 'intr_err_mask' undeclared (first use in this function)
-> drivers/crypto/tegra-aes.c:620:1: warning: label 'done' defined but not used
 >
-> Which are problems inside the driver it self, which can be easy fixed:
+>> +	/* Initialize the vde clock */
+>> +	dd->aes_clk = clk_get(dev, "vde");
+> That clock doesn't exist in the mainline kernel; "bsev" exists for device
+> "tegra-aes"...
 >
-> -       aes_writel(eng, 0xFFFFFFFF, INTR_STATUS);
-> +       aes_writel(dd, 0xFFFFFFFF, INTR_STATUS);
+
+We need to use the "vde" clock. I will submit a patch to add the "vde"
+clock. "bsev" might not be needed at the moment.
+
+>> +	err = clk_set_rate(dd->aes_clk, ULONG_MAX);
+> That's a little fast... What rate should it be running at. Is this
+> something the driver should be configuring, or should the board file or
+> device-tree be configuring this?
 >
-> -       aes_writel(dd, intr_err_mask, INTR_STATUS);
-> +       aes_writel(dd, INT_ERROR_MASK, INTR_STATUS);
->
-> Second problem it don't build as modul 
->
-> first:
-> typo in
-> MODULE_LICENSE("GPLv2") it needs a space MODULE_LICENSE("GPL v2")
 
-All the above changes will be present in my next patch.
+We need to run the hardware at the highest speed. AFAIK,
+clk_set_rate(ULONG_MAX) will set the clock rate at the max clock
+specified for the clock. Need to get every bit of performance from that
+piece of hardware.
 
-> second:
-> tegra_chip_uid function is not exported
+>> +static struct platform_driver tegra_aes_driver = {
+>> +	.probe  = tegra_aes_probe,
+>> +	.remove = __devexit_p(tegra_aes_remove),
+>> +	.driver = {
+>> +		.name   = "tegra-aes",
+>> +		.owner  = THIS_MODULE,
+>> +	},
+>> +};
+> Can you please allow instantiation from device-tree too; see drivers/
+> gpio/gpio-tegra.c's tegra_gpio_of_match[] for an example.
 
-Will submit a different patch to Olof and Stephen to get this change in
-the mach-tegra tree. If you want to post the fuse changes to them
-yourself, please go ahead.
-
-> I have attched patch which fixes all the stuff besides the not used variable. 
-> I did not runtime test it for 3.x kernels, but works backported to
-> the 2.6.38-chromeos tree.
-
-Thanks for your help.
-
-> Bye Henning 
+Actually, I am planning to add complete device tree support in the next
+patch. But if you insist, I can add partial support here and then
+complete it in the next patch.
