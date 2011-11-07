@@ -1,51 +1,85 @@
-From: Valdis.Kletnieks@vt.edu
-Subject: [PATCH][RESEND] fix typo in crypto/Kconfig
-Date: Mon, 07 Nov 2011 01:51:51 -0500
-Message-ID: <21323.1320648711@turing-police.cc.vt.edu>
+From: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Subject: RE: [PATCH] crypto: driver for tegra AES hardware
+Date: Mon, 7 Nov 2011 09:52:17 -0800
+Message-ID: <74CDBE0F657A3D45AFBB94109FB122FF173F9A508D@HQMAIL01.nvidia.com>
+References: <1320405256-29374-1-git-send-email-vwadekar@nvidia.com>
+ <74CDBE0F657A3D45AFBB94109FB122FF173F9A4E83@HQMAIL01.nvidia.com>
+ <4EB4EFC0.1060702@nvidia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:52072 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750894Ab1KGGwG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Nov 2011 01:52:06 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org" <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
+	"davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"Olof Johansson (olof-nZhT3qVonbNeoWH0uzbU5w@public.gmane.org)" <olof-nZhT3qVonbNeoWH0uzbU5w@public.gmane.org>,
+	"Colin Cross (ccross-z5hGa2qSFaRBDgjK7y7TUQ@public.gmane.org)" <ccross-z5hGa2qSFaRBDgjK7y7TUQ@public.gmane.org>
+To: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4EB4EFC0.1060702-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-(Sent this a while back, I don't see it in next-20111104, so resending)
+Varun Wadekar wrote at Saturday, November 05, 2011 2:12 AM:
+> >> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> > Don't you need to call request_mem_region() between get_resource() and
+> > ioremap()?
+> 
+> I am remapping the module register space. Used IORESOURCE_IO instead.
 
-Fix a typo in the Kconfig file help text.
+But you should be using IORESOURCE_MEM; that's what it is, and that's what
+all the other entries in arch/arm/mach-tegra/devices.c use.
 
-Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+And I don't think simply changing the type of the resource would remove
+the need to request that region of MEM or IO space.
 
---- linux-next/crypto/Kconfig.dist	2011-10-25 06:57:29.413596040 -0400
-+++ linux-next/crypto/Kconfig	2011-10-25 07:01:51.518647308 -0400
-@@ -104,7 +104,7 @@
- 	tristate "Userspace cryptographic algorithm configuration"
- 	select CRYPTO_MANAGER
- 	help
--	  Userapace configuration for cryptographic instantiations such as
-+	  Userspace configuration for cryptographic instantiations such as
- 	  cbc(aes).
- 
- config CRYPTO_MANAGER_DISABLE_TESTS
+> >> +	/* Initialize the vde clock */
+> >> +	dd->aes_clk = clk_get(dev, "vde");
+> > That clock doesn't exist in the mainline kernel; "bsev" exists for device
+> > "tegra-aes"...
+> 
+> We need to use the "vde" clock. I will submit a patch to add the "vde"
+> clock. "bsev" might not be needed at the moment.
 
+> [from another email by Varun]
+> Just checked and we have "vde" as a duplicate clock for "tegra-aes"
 
---==_Exmh_1319540838_3131P
-Content-Type: application/pgp-signature
+Ah right, I do see the CLK_DUPLICATE line. So, this is probably fine.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
+> >> +	err = clk_set_rate(dd->aes_clk, ULONG_MAX);
+> > That's a little fast... What rate should it be running at. Is this
+> > something the driver should be configuring, or should the board file or
+> > device-tree be configuring this?
+> 
+> We need to run the hardware at the highest speed. AFAIK,
+> clk_set_rate(ULONG_MAX) will set the clock rate at the max clock
+> specified for the clock. Need to get every bit of performance from that
+> piece of hardware.
 
-iD8DBQFOpphmcC3lWbTT17ARAiojAJ9xGtiMJrsIB06pLHHi8YgK7+wNBgCgzNfy
-BRiflJemi1Lf4zz0nkzLuNU=
-=z8QE
------END PGP SIGNATURE-----
+Hmmm. This still seems wrong. Hopefully somebody else more familiar with
+clocks will chime in either saying this is fine, or pointing out a better
+way to do this.
 
---==_Exmh_1319540838_3131P--
+> >> +static struct platform_driver tegra_aes_driver = {
+> >> +	.probe  = tegra_aes_probe,
+> >> +	.remove = __devexit_p(tegra_aes_remove),
+> >> +	.driver = {
+> >> +		.name   = "tegra-aes",
+> >> +		.owner  = THIS_MODULE,
+> >> +	},
+> >> +};
+> >>
+> > Can you please allow instantiation from device-tree too; see drivers/
+> > gpio/gpio-tegra.c's tegra_gpio_of_match[] for an example.
+> 
+> Actually, I am planning to add complete device tree support in the next
+> patch. But if you insist, I can add partial support here and then
+> complete it in the next patch.
+
+Why not just add complete device-tree support from the start? Since this
+driver uses no platform data, isn't the of match table the /only/ device-
+tree support this driver needs?
+
+-- 
+nvpublic
