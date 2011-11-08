@@ -1,37 +1,38 @@
-From: Daniil Stolnikov <danila.st@mail.ru>
+From: Alexey Dobriyan <adobriyan@gmail.com>
 Subject: Re: Add IPSec IP Range in Linux kernel
-Date: Tue, 8 Nov 2011 18:51:52 +0800
-Message-ID: <1936723309.20111108185152@mail.ru>
-References: <92909814.20111108111036@mail.ru> <1320733465.21617.4.camel@ppwaskie-mobl2>
-Reply-To: Daniil Stolnikov <danila.st@mail.ru>
+Date: Tue, 8 Nov 2011 14:08:24 +0200
+Message-ID: <CACVxJT887ATwt97iw7mPEkH+KXgy1WbsP_aUB_X-8uLQ+6YsLQ@mail.gmail.com>
+References: <92909814.20111108111036@mail.ru>
+	<1320733465.21617.4.camel@ppwaskie-mobl2>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	<linux-crypto@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <davem@davemloft.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: Daniil Stolnikov <danila.st@mail.ru>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-security-module@vger.kernel.org"
+	<linux-security-module@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
 To: Peter P Waskiewicz Jr <peter.p.waskiewicz.jr@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp3.mail.ru ([94.100.176.131]:49057 "EHLO smtp3.mail.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750892Ab1KHKwH convert rfc822-to-8bit (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:63178 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751298Ab1KHMIZ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Nov 2011 05:52:07 -0500
+	Tue, 8 Nov 2011 07:08:25 -0500
 In-Reply-To: <1320733465.21617.4.camel@ppwaskie-mobl2>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, Nov 8, 2011 at 8:24 AM, Peter P Waskiewicz Jr
+<peter.p.waskiewicz.jr@intel.com> wrote:
 > On Mon, 2011-11-07 at 19:10 -0800, Daniil Stolnikov wrote:
 >> Hello!
->> 
+>>
 >> Found that the stack IPSec in Linux does not support any IP range. Many people ask this question. The archives say strongswan said that their daemon supports a range, but the Linux IPSec stack supports only the subnets. I am writing to you to implement support for IP range in Linux. I think that a lot more people will appreciate this innovation.
-
+>
 > It'd be even better if you could write a patch for us to review.
 
-> Cheers,
-> -PJ
-
-I was a little not so put it:) I'd certainly be happy and he would write a patch, but I'm afraid do not have the necessary knowledge to implement IPSec Linux. I turned to you, the developers, but rather to urge you to implement this feature using IP range. I hope very much for your help and support. This is especially beneficial for all - the Linux kernel will be more flexible and more compatible with different devices and software.
-
-Regards
-Daniil Stolnikov
+oh, come on!
+changing addr_match() is trivial for ipv4 and easy for ipv6. :-)
