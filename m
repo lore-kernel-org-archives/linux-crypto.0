@@ -1,96 +1,37 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH] crypto: Unlink and free instances when deleted
-Date: Tue, 8 Nov 2011 10:09:17 +0100
-Message-ID: <20111108090917.GF22141@secunet.com>
+From: Daniil Stolnikov <danila.st@mail.ru>
+Subject: Re: Add IPSec IP Range in Linux kernel
+Date: Tue, 8 Nov 2011 18:51:52 +0800
+Message-ID: <1936723309.20111108185152@mail.ru>
+References: <92909814.20111108111036@mail.ru> <1320733465.21617.4.camel@ppwaskie-mobl2>
+Reply-To: Daniil Stolnikov <danila.st@mail.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	<linux-crypto@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <davem@davemloft.net>
+To: Peter P Waskiewicz Jr <peter.p.waskiewicz.jr@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:52831 "EHLO a.mx.secunet.com"
+Received: from smtp3.mail.ru ([94.100.176.131]:49057 "EHLO smtp3.mail.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751796Ab1KHJJV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Nov 2011 04:09:21 -0500
-Content-Disposition: inline
+	id S1750892Ab1KHKwH convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Nov 2011 05:52:07 -0500
+In-Reply-To: <1320733465.21617.4.camel@ppwaskie-mobl2>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We leak the crypto instance when we unregister an instance with
-crypto_del_alg(). Therefore we introduce crypto_unregister_instance()
-to unlink the crypto instance from the template's instances list and
-to free the recources of the instance properly.
+> On Mon, 2011-11-07 at 19:10 -0800, Daniil Stolnikov wrote:
+>> Hello!
+>> 
+>> Found that the stack IPSec in Linux does not support any IP range. Many people ask this question. The archives say strongswan said that their daemon supports a range, but the Linux IPSec stack supports only the subnets. I am writing to you to implement support for IP range in Linux. I think that a lot more people will appreciate this innovation.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/algapi.c         |   29 +++++++++++++++++++++++++++++
- crypto/crypto_user.c    |    2 +-
- include/crypto/algapi.h |    1 +
- 3 files changed, 31 insertions(+), 1 deletions(-)
+> It'd be even better if you could write a patch for us to review.
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 54dd4e3..9d4a9fe 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -518,6 +518,35 @@ err:
- }
- EXPORT_SYMBOL_GPL(crypto_register_instance);
- 
-+int crypto_unregister_instance(struct crypto_alg *alg)
-+{
-+	int err;
-+	struct crypto_instance *inst = (void *)alg;
-+	struct crypto_template *tmpl = inst->tmpl;
-+	LIST_HEAD(users);
-+
-+	if (!(alg->cra_flags & CRYPTO_ALG_INSTANCE))
-+		return -EINVAL;
-+
-+	BUG_ON(atomic_read(&alg->cra_refcnt) != 1);
-+
-+	down_write(&crypto_alg_sem);
-+
-+	hlist_del_init(&inst->list);
-+	err = crypto_remove_alg(alg, &users);
-+
-+	up_write(&crypto_alg_sem);
-+
-+	if (err)
-+		return err;
-+
-+	tmpl->free(inst);
-+	crypto_remove_final(&users);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_instance);
-+
- int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
- 		      struct crypto_instance *inst, u32 mask)
- {
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 0605a2b..3ba6ef5 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -298,7 +298,7 @@ static int crypto_del_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (atomic_read(&alg->cra_refcnt) != 1)
- 		return -EBUSY;
- 
--	return crypto_unregister_alg(alg);
-+	return crypto_unregister_instance(alg);
- }
- 
- static int crypto_add_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index ecc721d..418d270 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -134,6 +134,7 @@ struct crypto_template *crypto_lookup_template(const char *name);
- 
- int crypto_register_instance(struct crypto_template *tmpl,
- 			     struct crypto_instance *inst);
-+int crypto_unregister_instance(struct crypto_alg *alg);
- 
- int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
- 		      struct crypto_instance *inst, u32 mask);
--- 
-1.7.0.4
+> Cheers,
+> -PJ
+
+I was a little not so put it:) I'd certainly be happy and he would write a patch, but I'm afraid do not have the necessary knowledge to implement IPSec Linux. I turned to you, the developers, but rather to urge you to implement this feature using IP range. I hope very much for your help and support. This is especially beneficial for all - the Linux kernel will be more flexible and more compatible with different devices and software.
+
+Regards
+Daniil Stolnikov
