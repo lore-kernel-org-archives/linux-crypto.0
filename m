@@ -1,37 +1,40 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] crypto: talitos - fix descriptor buffer access code
-Date: Tue, 8 Nov 2011 19:39:30 -0600
-Message-ID: <20111108193930.b5c2cf0c3027aff90e7dbd7c@freescale.com>
-References: <20111108193457.db068c56fe6db067e4d9057c@freescale.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: Add IPSec IP Range in Linux kernel
+Date: Tue, 08 Nov 2011 20:42:53 -0500 (EST)
+Message-ID: <20111108.204253.891598837549584662.davem@davemloft.net>
+References: <CACVxJT887ATwt97iw7mPEkH+KXgy1WbsP_aUB_X-8uLQ+6YsLQ@mail.gmail.com>
+	<20111108.121620.2044664919065812135.davem@davemloft.net>
+	<1289495586.20111109093607@mail.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org, adobriyan@gmail.com,
+	peter.p.waskiewicz.jr@intel.com
+To: danila.st@mail.ru
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:46572
-	"EHLO DB3EHSOBE005.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752718Ab1KIBlO (ORCPT
+Received: from shards.monkeyblade.net ([198.137.202.13]:56647 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752718Ab1KIBnB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Nov 2011 20:41:14 -0500
-In-Reply-To: <20111108193457.db068c56fe6db067e4d9057c@freescale.com>
+	Tue, 8 Nov 2011 20:43:01 -0500
+In-Reply-To: <1289495586.20111109093607@mail.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 8 Nov 2011 19:34:57 -0600
-Kim Phillips <kim.phillips@freescale.com> wrote:
+From: Daniil Stolnikov <danila.st@mail.ru>
+Date: Wed, 9 Nov 2011 09:36:07 +0800
 
-> commit 3e721ae (crypto: talitos - handle descriptor not found in
-> error path) used the wrong offset method to access a channel's
-> descriptor buffer registers - the TALITOS_DESCBUF macro
-> doesn't take a channel argument.  Fix it to use the
-> base chan[x].reg offset instead.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
-> ---
+> I never imagined that it will cause some difficulties.
 
-scratch this - I got confused working on a merge branch.
+Ever feature has side effects and costs associated with it.  Some of
+which can be non-trivial.
 
-existing code is fine - ignore me.
+Like I said, if you want address ranges, ask the userland IPSEC daemon
+authors to synthesize it.
 
-Kim
+I'm really not able to devote the time necessary to explain every
+nuance of how we store IPSEC rules in the kernel side database and
+what implications that has for expanding the kind of match keys we
+support.
