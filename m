@@ -1,31 +1,44 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: Add IPSec IP Range in Linux kernel
-Date: Tue, 08 Nov 2011 12:16:20 -0500 (EST)
-Message-ID: <20111108.121620.2044664919065812135.davem@davemloft.net>
-References: <92909814.20111108111036@mail.ru>
-	<1320733465.21617.4.camel@ppwaskie-mobl2>
-	<CACVxJT887ATwt97iw7mPEkH+KXgy1WbsP_aUB_X-8uLQ+6YsLQ@mail.gmail.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH] crypto: talitos - fix descriptor buffer access code
+Date: Tue, 8 Nov 2011 19:34:57 -0600
+Message-ID: <20111108193457.db068c56fe6db067e4d9057c@freescale.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: peter.p.waskiewicz.jr@intel.com, danila.st@mail.ru,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-To: adobriyan@gmail.com
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([198.137.202.13]:51828 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752984Ab1KHRQ2 (ORCPT
+Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:28415
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751146Ab1KIBf5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Nov 2011 12:16:28 -0500
-In-Reply-To: <CACVxJT887ATwt97iw7mPEkH+KXgy1WbsP_aUB_X-8uLQ+6YsLQ@mail.gmail.com>
+	Tue, 8 Nov 2011 20:35:57 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Date: Tue, 8 Nov 2011 14:08:24 +0200
+commit 3e721ae (crypto: talitos - handle descriptor not found in
+error path) used the wrong offset method to access a channel's
+descriptor buffer registers - the TALITOS_DESCBUF macro
+doesn't take a channel argument.  Fix it to use the
+base chan[x].reg offset instead.
 
-> changing addr_match() is trivial for ipv4 and easy for ipv6. :-)
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/talitos.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-No, this is not happening.  This added complexity screws up all the hash table
-and lookup optimizations we have in the XFRM layer.
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index dbe76b5..98ffcc1 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -444,7 +444,7 @@ static void report_eu_error(struct device *dev, int ch, u32 desc_hdr)
+ 	int i;
+ 
+ 	if (!desc_hdr)
+-		desc_hdr = in_be32(priv->reg + TALITOS_DESCBUF(ch));
++		desc_hdr = in_be32(priv->chan[ch].reg + TALITOS_DESCBUF);
+ 
+ 	switch (desc_hdr & DESC_HDR_SEL0_MASK) {
+ 	case DESC_HDR_SEL0_AFEU:
+-- 
+1.7.7
