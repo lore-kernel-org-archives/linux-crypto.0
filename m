@@ -1,37 +1,74 @@
-From: Valdis.Kletnieks@vt.edu
-Subject: [PATCH V2] fix typo in crypto/Kconfig
-Date: Wed, 09 Nov 2011 01:29:20 -0500
-Message-ID: <20111.1320820160@turing-police.cc.vt.edu>
+From: Daniil Stolnikov <danila.st@mail.ru>
+Subject: Re: Add IPSec IP Range in Linux kernel
+Date: Wed, 9 Nov 2011 15:25:58 +0800
+Message-ID: <1674049620.20111109152558@mail.ru>
+References: <552673196.20111109103207@mail.ru> <20111109032729.GA11312@gondor.apana.org.au>
+Reply-To: Daniil Stolnikov <danila.st@mail.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=windows-1251
+Content-Transfer-Encoding: 8BIT
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	<linux-crypto@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <davem@davemloft.net>,
+	<adobriyan@gmail.com>, <peter.p.waskiewicz.jr@intel.com>,
+	<davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:37912 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751074Ab1KIG3d (ORCPT
+Received: from smtp3.mail.ru ([94.100.176.131]:41504 "EHLO smtp3.mail.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752443Ab1KIH0I convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Nov 2011 01:29:33 -0500
+	Wed, 9 Nov 2011 02:26:08 -0500
+In-Reply-To: <20111109032729.GA11312@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix a typo in the Kconfig file help text.
+> Simple, you break a range policy into parts that can be expressed
+> as network/mask and install multiple policies.  The actual policies
+> in the kernel just has to have the same effect as the one you
+> negotiated with the other side, it does not have to look the same.
 
-Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
----
-Third time's the charm? Rebased to next-20111108 ("depends on NET"
-caused the first 2 tries to not appy).
+> This is also why you can do the same thing with masks + netfilter.
 
---- linux-next/crypto/Kconfig.dist	2011-11-06 01:35:20.423166379 -0400
-+++ linux-next/crypto/Kconfig	2011-11-09 01:21:15.325935266 -0500
-@@ -105,7 +105,7 @@ config CRYPTO_USER
- 	depends on NET
- 	select CRYPTO_MANAGER
- 	help
--	  Userapace configuration for cryptographic instantiations such as
-+	  Userspace configuration for cryptographic instantiations such as
- 	  cbc(aes).
- 
- config CRYPTO_MANAGER_DISABLE_TESTS
+> Cheers,
+
+
+Please describe in detail, including the schema and sample configuration files!
+
+The fact that I have already tried some options and I did not. Here is a link to a Russian-language correspondence on my problem: http://www.opennet.ru/openforum/vsluhforumID10/4941.html.
+
+Once again, draw a diagram of which should be implemented:
+
+                 (server)                                                        (client 1)
+                 _______                                                          _______
+                 |      |                                                        |      |---192.168.7.1
+                 |      |                                                        |      |---192.168.7.2
+192.168.1.0/24---|      |192.168.5.1/24----------------------------192.168.5.2/24|      |---192.168.7.3
+                 |      |                       |                                |      |---192.168.7.4
+                 |______|                       |                                |______|---192.168.7.5      
+                                                |
+                                                |                                 (client 2)
+                                                |                                _______
+                                                |                                |      |---192.168.7.6
+                                                |                                |      |---192.168.7.7
+                                                -------------------192.168.5.3/24|      |---192.168.7.8
+                                                |                                |      |---192.168.7.9
+                                                |                                |______|---192.168.7.10
+                                                |
+                                                |                                 (client 3)
+                                                |                                _______
+                                                |                                |      |---192.168.7.11
+                                                |                                |      |---192.168.7.12
+                                                -------------------192.168.5.4/24|      |---192.168.7.13
+                                                                                 |      |---192.168.7.14
+                                                                                 |______|---192.168.7.15
+
+
+Tried to do the following:
+
+1) network to host. The connection of course been established, but not all traffic be encrypted.
+2) host to host. similarly to 1.
+3) network to IP range. I tried different configurations, but the connection did not succeed.
+
+So I came to the conclusion that when we point to the IP range zywall IPSec we actually prescribe what kind of traffic will be encrypted. The rest will be routed but no encryption. Correct if I'm wrong.
+If you are not working hard to lay out the configuration files!
