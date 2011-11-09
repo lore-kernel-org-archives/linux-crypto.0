@@ -1,36 +1,75 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Add IPSec IP Range in Linux kernel
-Date: Wed, 9 Nov 2011 11:27:30 +0800
-Message-ID: <20111109032729.GA11312@gondor.apana.org.au>
-References: <552673196.20111109103207@mail.ru>
+Subject: Re: [PATCH 6/7] crypto: serpent: add 8-way parallel x86_64/SSE2
+	assembler implementation
+Date: Wed, 9 Nov 2011 11:44:43 +0800
+Message-ID: <20111109034442.GA15096@gondor.apana.org.au>
+References: <20111017210247.13543.75430.stgit@localhost6.localdomain6> <20111017210318.13543.78194.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org, adobriyan@gmail.com,
-	peter.p.waskiewicz.jr@intel.com
-To: Daniil Stolnikov <danila.st@mail.ru>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:44159 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754529Ab1KIDoq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Nov 2011 22:44:46 -0500
 Content-Disposition: inline
-In-Reply-To: <552673196.20111109103207@mail.ru>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20111017210318.13543.78194.stgit@localhost6.localdomain6>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Daniil Stolnikov <danila.st@mail.ru> wrote:
->> Like I said, if you want address ranges, ask the userland IPSEC daemon
->> authors to synthesize it.
-> 
-> In this letter, the mailing list http://marc.info/?l=strongswan-users&m=130613736616488&w=4 strongswan-users say that their product has support for IP ranges, but the stack of Linux is based on network masks. So I do not understand how this would work without the support at the kernel level? How will coordination of policies?
+On Tue, Oct 18, 2011 at 12:03:18AM +0300, Jussi Kivilinna wrote:
+> Patch adds x86_64/SSE2 assembler implementation of serpent cipher. As=
+sembler
+> functions crypt data in eigth block chunks (two 4 block chunk SSE2 op=
+erations
+> in parallel to improve performance on out-of-order CPUs). Glue code i=
+s based
+> on one from AES-NI implementation, so requests from irq context are r=
+edirected
+> to cryptd.
 
-Simple, you break a range policy into parts that can be expressed
-as network/mask and install multiple policies.  The actual policies
-in the kernel just has to have the same effect as the one you
-negotiated with the other side, it does not have to look the same.
+This doesn't build for me:
 
-This is also why you can do the same thing with masks + netfilter.
+  CC [M]  arch/x86/crypto/serpent_sse2_glue.o
+arch/x86/crypto/serpent_sse2_glue.c:154: error: =E2=80=98THIS_MODULE=E2=
+=80=99 undeclared here (not in a function)
+arch/x86/crypto/serpent_sse2_glue.c:716: error: expected declaration sp=
+ecifiers or =E2=80=98...=E2=80=99 before string constant
+arch/x86/crypto/serpent_sse2_glue.c:716: warning: data definition has n=
+o type or storage class
+arch/x86/crypto/serpent_sse2_glue.c:716: warning: type defaults to =E2=80=
+=98int=E2=80=99 in declaration of =E2=80=98MODULE_DESCRIPTION=E2=80=99
+arch/x86/crypto/serpent_sse2_glue.c:716: warning: function declaration =
+isn=E2=80=99t a prototype
+arch/x86/crypto/serpent_sse2_glue.c:717: error: expected declaration sp=
+ecifiers or =E2=80=98...=E2=80=99 before string constant
+arch/x86/crypto/serpent_sse2_glue.c:717: warning: data definition has n=
+o type or storage class
+arch/x86/crypto/serpent_sse2_glue.c:717: warning: type defaults to =E2=80=
+=98int=E2=80=99 in declaration of =E2=80=98MODULE_LICENSE=E2=80=99
+arch/x86/crypto/serpent_sse2_glue.c:717: warning: function declaration =
+isn=E2=80=99t a prototype
+arch/x86/crypto/serpent_sse2_glue.c:718: error: expected declaration sp=
+ecifiers or =E2=80=98...=E2=80=99 before string constant
+arch/x86/crypto/serpent_sse2_glue.c:718: warning: data definition has n=
+o type or storage class
+arch/x86/crypto/serpent_sse2_glue.c:718: warning: type defaults to =E2=80=
+=98int=E2=80=99 in declaration of =E2=80=98MODULE_ALIAS=E2=80=99
+arch/x86/crypto/serpent_sse2_glue.c:718: warning: function declaration =
+isn=E2=80=99t a prototype
+make[2]: *** [arch/x86/crypto/serpent_sse2_glue.o] Error 1
+make[1]: *** [arch/x86/crypto] Error 2
+make: *** [arch/x86] Error 2
 
-Cheers,
--- 
+So I've applied patches 1-5, please resubmit 6-7 after you've
+fixed them up.
+
+Thanks,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
