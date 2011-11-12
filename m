@@ -1,28 +1,35 @@
-From: vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org
-Subject: [PATCH v2] crypto: driver for tegra AES hardware
-Date: Sat, 12 Nov 2011 15:54:54 +0530
-Message-ID: <1321093494-11849-1-git-send-email-vwadekar@nvidia.com>
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-To: herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: vwadekar@nvidia.com
+Subject: [PATCH v3] crypto: driver for tegra AES hardware
+Date: Sat, 12 Nov 2011 16:12:47 +0530
+Message-ID: <1321094567-16561-1-git-send-email-vwadekar@nvidia.com>
+Cc: linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
+	Varun Wadekar <vwadekar@nvidia.com>
+To: herbert@gondor.hengli.com.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from hqemgate04.nvidia.com ([216.228.121.35]:17789 "EHLO
+	hqemgate04.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752682Ab1KLKnX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 12 Nov 2011 05:43:23 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+From: Varun Wadekar <vwadekar@nvidia.com>
 
 driver supports ecb/cbc/ofb/ansi_x9.31rng modes,
 128, 192 and 256-bit key sizes
 
-Signed-off-by: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Varun Wadekar <vwadekar@nvidia.com>
 ---
-v2: fixed comments from Kim Phillips
+
+v3: Fixed comments from Stephen Warren. Please ignore
+the previous patch.
 
  drivers/crypto/Kconfig     |   11 +
  drivers/crypto/Makefile    |    1 +
- drivers/crypto/tegra-aes.c | 1089 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/tegra-aes.h |  103 +++++
- 4 files changed, 1204 insertions(+), 0 deletions(-)
+ drivers/crypto/tegra-aes.c | 1101 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/tegra-aes.h |  103 ++++
+ 4 files changed, 1216 insertions(+), 0 deletions(-)
  create mode 100644 drivers/crypto/tegra-aes.c
  create mode 100644 drivers/crypto/tegra-aes.h
 
@@ -57,10 +64,10 @@ index 53ea501..f3e64ea 100644
 +obj-$(CONFIG_CRYPTO_DEV_TEGRA_AES) += tegra-aes.o
 diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
 new file mode 100644
-index 0000000..6faea95
+index 0000000..d408b69
 --- /dev/null
 +++ b/drivers/crypto/tegra-aes.c
-@@ -0,0 +1,1089 @@
+@@ -0,0 +1,1101 @@
 +/*
 + * drivers/crypto/tegra-aes.c
 + *
@@ -215,7 +222,6 @@ index 0000000..6faea95
 +
 +struct tegra_aes_dev {
 +	struct device *dev;
-+	unsigned long phys_base;
 +	void __iomem *io_base;
 +	dma_addr_t ivkey_phys_base;
 +	void __iomem *ivkey_base;
@@ -957,17 +963,23 @@ index 0000000..6faea95
 +	crypto_init_queue(&dd->queue, TEGRA_AES_QUEUE_LENGTH);
 +
 +	/* Get the module base address */
-+	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 +	if (!res) {
 +		dev_err(dev, "invalid resource type: base\n");
 +		err = -ENODEV;
 +		goto out;
 +	}
-+	dd->phys_base = res->start;
 +
-+	dd->io_base = devm_ioremap(dev, dd->phys_base, resource_size(res));
++	if (!devm_request_mem_region(&pdev->dev, res->start,
++				     resource_size(res),
++				     dev_name(&pdev->dev))) {
++		dev_err(&pdev->dev, "Couldn't request MEM resource\n");
++		return -ENODEV;
++	}
++
++	dd->io_base = devm_ioremap(dev, res->start, resource_size(res));
 +	if (!dd->io_base) {
-+		dev_err(dev, "can't ioremap phys_base\n");
++		dev_err(dev, "can't ioremap register space\n");
 +		err = -ENOMEM;
 +		goto out;
 +	}
@@ -1123,12 +1135,19 @@ index 0000000..6faea95
 +	return 0;
 +}
 +
++static struct of_device_id tegra_aes_of_match[] __devinitdata = {
++	{ .compatible = "nvidia,tegra20-aes", },
++	{ .compatible = "nvidia,tegra30-aes", },
++	{ },
++};
++
 +static struct platform_driver tegra_aes_driver = {
 +	.probe  = tegra_aes_probe,
 +	.remove = __devexit_p(tegra_aes_remove),
 +	.driver = {
 +		.name   = "tegra-aes",
 +		.owner  = THIS_MODULE,
++		.of_match_table = tegra_aes_of_match,
 +	},
 +};
 +
