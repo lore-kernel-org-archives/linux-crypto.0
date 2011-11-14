@@ -1,40 +1,41 @@
-From: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Subject: RE: [PATCH v1] crypto: driver for tegra AES hardware
-Date: Mon, 14 Nov 2011 09:26:16 -0800
-Message-ID: <74CDBE0F657A3D45AFBB94109FB122FF1740805AB5@HQMAIL01.nvidia.com>
-References: <1320489734-9085-1-git-send-email-vwadekar@nvidia.com>
- <20111105181025.69918e625a169ccb30d9b7c8@freescale.com>
- <4EBE48E8.60205@nvidia.com>
+From: Stephen Warren <swarren@nvidia.com>
+Subject: RE: [PATCH v3] crypto: driver for tegra AES hardware
+Date: Mon, 14 Nov 2011 09:32:12 -0800
+Message-ID: <74CDBE0F657A3D45AFBB94109FB122FF1740805ABE@HQMAIL01.nvidia.com>
+References: <1321094567-16561-1-git-send-email-vwadekar@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8BIT
-Cc: "herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org" <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
-	"davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
-	Kim Phillips <kim.phillips-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4EBE48E8.60205-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Varun Wadekar <vwadekar@nvidia.com>,
+	"Olof Johansson (olof@lixom.net)" <olof@lixom.net>,
+	"Colin Cross (ccross@android.com)" <ccross@android.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from hqemgate03.nvidia.com ([216.228.121.140]:16844 "EHLO
+	hqemgate03.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753795Ab1KNRcT convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Nov 2011 12:32:19 -0500
+In-Reply-To: <1321094567-16561-1-git-send-email-vwadekar@nvidia.com>
 Content-Language: en-US
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Varun Wadekar wrote at Saturday, November 12, 2011 3:23 AM:
-> >> +	/* assign new context to device */
-> >> +	ctx->dd = dd;
-> >> +	dd->ctx = ctx;
-> >> +
-> >> +	if (ctx->flags & FLAGS_NEW_KEY) {
-> >> +		/* copy the key */
-> >> +		memset(dd->ivkey_base, 0, AES_HW_KEY_TABLE_LENGTH_BYTES);
-> >> +		memcpy(dd->ivkey_base, ctx->key, ctx->keylen);
-> > these really should be writes to mutually exclusive addresses.
-> 
-> Why?
+vwadekar@nvidia.com wrote at Saturday, November 12, 2011 3:43 AM:
+> driver supports ecb/cbc/ofb/ansi_x9.31rng modes,
+> 128, 192 and 256-bit key sizes
 
-To avoid redundant work; there's little point memset()ing a region that's
-going to be copied over the top of immediately afterwards.
+This will fail to build as a module unless your other patch "arm: tegra:
+export tegra_chip_uid" is also merged. You should mention this fact when
+posting the patch, below the --- line.
+
+I'll let Olof and the crypto maintainers comment on the solution they'd
+prefer for this, but perhaps it's: have one of the Tegra maintainers ack
+that other patch, then have the crypto maintainer merge both patches in
+order into the crypto tree.
 
 -- 
 nvpublic
