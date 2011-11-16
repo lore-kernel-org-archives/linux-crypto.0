@@ -1,38 +1,55 @@
-From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v5 0/2] *** SUBJECT HERE ***
-Date: Wed, 16 Nov 2011 13:54:08 +0530
-Message-ID: <1321431850-21906-1-git-send-email-vwadekar@nvidia.com>
-Cc: linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, olof-nZhT3qVonbNeoWH0uzbU5w@public.gmane.org, ccross-z5hGa2qSFaRBDgjK7y7TUQ@public.gmane.org,
-	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Varun Wadekar <vwadekar@nvidia.com>
+Subject: [PATCH v5 1/2] arm: tegra: export tegra_chip_uid
+Date: Wed, 16 Nov 2011 13:54:09 +0530
+Message-ID: <1321431850-21906-2-git-send-email-vwadekar@nvidia.com>
+References: <1321431850-21906-1-git-send-email-vwadekar@nvidia.com>
+Cc: linux-tegra@vger.kernel.org, olof@lixom.net, ccross@android.com,
+	Henning Heinold <heinold@inf.fu-berlin.de>,
+	Varun Wadekar <vwadekar@nvidia.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from hqemgate04.nvidia.com ([216.228.121.35]:1315 "EHLO
+	hqemgate04.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754971Ab1KPIYz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Nov 2011 03:24:55 -0500
+In-Reply-To: <1321431850-21906-1-git-send-email-vwadekar@nvidia.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The tegra crypto driver uses the tegra_chip_uid API for the RNG
-calculation. If one wants to build tegra-aes as a module, then
-tegra_chip_uid needs to be exported.
+From: Henning Heinold <heinold@inf.fu-berlin.de>
 
-I have also posted "arm: tegra: export tegra_chip_uid" to the mach-tegra
-maintainers to get this patch into their tree, but for compiling the
-"crypto: driver for Tegra AES hardware" patch, "arm: tegra: export tegra_chip_uid"
-has to be present.
+The crypto driver will need this api to use
+it in the RNG calculations. In order to build
+the crypto driver as a module, tegra_chip_uid
+has to be exported.
 
-I leave it to the linux-crypto maintainers to decide how they want to
-tackle this situation. In order to facilitate smooth compilation of the
-actual crytpo driver patch sending the tegra_chip_uid as well.
+Change-Id: I1372c06b8cfef74699ea9cd5cfca92648bcd982b
+Signed-off-by: Henning Heinold <heinold@inf.fu-berlin.de>
+Signed-off-by: Varun Wadekar <vwadekar@nvidia.com>
+---
+ arch/arm/mach-tegra/fuse.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Henning Heinold (1):
-  arm: tegra: export tegra_chip_uid
-
-Varun Wadekar (1):
-  crypto: driver for Tegra AES hardware
-
- arch/arm/mach-tegra/fuse.c |    2 +
- drivers/crypto/Kconfig     |   11 +
- drivers/crypto/Makefile    |    1 +
- drivers/crypto/tegra-aes.c | 1102 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/tegra-aes.h |  103 ++++
- 5 files changed, 1219 insertions(+), 0 deletions(-)
- create mode 100644 drivers/crypto/tegra-aes.c
- create mode 100644 drivers/crypto/tegra-aes.h
+diff --git a/arch/arm/mach-tegra/fuse.c b/arch/arm/mach-tegra/fuse.c
+index 1fa26d9..ea49bd9 100644
+--- a/arch/arm/mach-tegra/fuse.c
++++ b/arch/arm/mach-tegra/fuse.c
+@@ -19,6 +19,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/io.h>
++#include <linux/module.h>
+ 
+ #include <mach/iomap.h>
+ 
+@@ -58,6 +59,7 @@ unsigned long long tegra_chip_uid(void)
+ 	hi = fuse_readl(FUSE_UID_HIGH);
+ 	return (hi << 32ull) | lo;
+ }
++EXPORT_SYMBOL(tegra_chip_uid);
+ 
+ int tegra_sku_id(void)
+ {
+-- 
+1.7.1
