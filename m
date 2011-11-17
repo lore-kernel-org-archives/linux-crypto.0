@@ -1,49 +1,59 @@
-From: satpal parmar <systems.satpal@gmail.com>
-Subject: authenc_verify_ahash_done and H/W accelerator
-Date: Thu, 17 Nov 2011 17:49:30 +0530
-Message-ID: <CAGgcXb5zfa4fsyvN9HbU9NAr0d-ikp67N-=e_9cc+ro_c6xLJg@mail.gmail.com>
+From: Lee Nipper <lee.nipper@gmail.com>
+Subject: Re: [PATCH 1/5] crypto: talitos - add hmac algorithms
+Date: Thu, 17 Nov 2011 09:01:16 -0600
+Message-ID: <CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
+References: <20111116181916.e2473c5856b852dea7bcf83f@freescale.com>
+Reply-To: lee.nipper@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:59493 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757024Ab1KQMTc (ORCPT
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:45337 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757789Ab1KQPBR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Nov 2011 07:19:32 -0500
-Received: by ywt32 with SMTP id 32so938428ywt.19
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2011 04:19:32 -0800 (PST)
+	Thu, 17 Nov 2011 10:01:17 -0500
+Received: by ggnb2 with SMTP id b2so1149527ggn.19
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2011 07:01:17 -0800 (PST)
+In-Reply-To: <20111116181916.e2473c5856b852dea7bcf83f@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all!
+On Wed, Nov 16, 2011 at 6:19 PM, Kim Phillips
+<kim.phillips@freescale.com> wrote:
+> From: Lee Nipper <lee.nipper@gmail.com>
+>
+> Add these hmac algorithms to talitos:
+> =A0 =A0hmac(md5),
+> =A0 =A0hmac(sha1),
+> =A0 =A0hmac(sha224),
+> =A0 =A0hmac(sha256),
+> =A0 =A0hmac(sha384),
+> =A0 =A0hmac(sha512).
+> These are all type ahash.
+>
+> Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
+>
+> Fixed up to not register HMAC algorithms on sec2.0 devices.
+> Rationale (from Lee):
+>
+> on an 8349E Rev1.1, there's a problem with hmac for any talitos
+> hmac sequence requiring an intermediate hash context (Pointer
+> DWORD 1); the result is an incorrect hmac. =A0An intermediate hash
+> context is required for something longer than (65536-blocksize),
+> and for other cases when update/finup/final are used inefficiently.
+> Interestingly, a normal hash (without hmac) works perfectly
+> when using an intermediate context.
+>
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-I am currently debugging a  drivers for our crypto HW which offload
-IPSec (ESP for now) to HW. With SHA driver I am facing a strange
-problem. For reasons unknown to me  'authenc_verify_ahash_done' is
-failing (http://lxr.linux.no/linux+v2.6.37/crypto/authenc.c). This api
-got called from my SHA driver.
+Thanks Kim for re-submitting this patch, and the fix for avoiding
+sec2.0 problem.
 
-File:http://lxr.linux.no/linux+v2.6.37/crypto/authenc.c
+Since I don't have sec2.1+ h/w, I won't be able to hammer test it. :(
+Does AH IPsec now function with talitos hmac with this patch ?
 
-224        authsize = crypto_aead_authsize(authenc);
-225        cryptlen -= authsize;
-226        ihash = ahreq->result + authsize;
-227        scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
-228                                 authsize, 0);
-229
-230        err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG :
-0;   ------>> this is giving bad message.
-
-I am trying to understand authenc_verify_ahash_done to debug this
-issue. I do not know if authsize is wrong or scatterwalk_map_and_copy
-was a failure or struct crypto_async_request *areq received is
-corrupted. Since this API is not involved when I use s/w crypto I do
-not have any working example to follow. Just wondering if anyone come
-across any such problem or issue while developing H/W crypto driver.
-
-I am using Linux 2.6.37 for my development.
-
-Appreciate any suggestion/pointer regarding my problem.
-
-SP
+Cheers,
+Lee
