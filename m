@@ -1,59 +1,46 @@
-From: Lee Nipper <lee.nipper@gmail.com>
+From: Kim Phillips <kim.phillips@freescale.com>
 Subject: Re: [PATCH 1/5] crypto: talitos - add hmac algorithms
-Date: Thu, 17 Nov 2011 09:01:16 -0600
-Message-ID: <CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
+Date: Thu, 17 Nov 2011 11:15:07 -0600
+Message-ID: <20111117111507.134f0f1e72cb5b2d31fc8346@freescale.com>
 References: <20111116181916.e2473c5856b852dea7bcf83f@freescale.com>
-Reply-To: lee.nipper@gmail.com
+	<CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: <lee.nipper@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:45337 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757789Ab1KQPBR convert rfc822-to-8bit (ORCPT
+Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:58646 "EHLO
+	TX2EHSOBE008.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754149Ab1KQRQI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Nov 2011 10:01:17 -0500
-Received: by ggnb2 with SMTP id b2so1149527ggn.19
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2011 07:01:17 -0800 (PST)
-In-Reply-To: <20111116181916.e2473c5856b852dea7bcf83f@freescale.com>
+	Thu, 17 Nov 2011 12:16:08 -0500
+In-Reply-To: <CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 16, 2011 at 6:19 PM, Kim Phillips
-<kim.phillips@freescale.com> wrote:
-> From: Lee Nipper <lee.nipper@gmail.com>
->
-> Add these hmac algorithms to talitos:
-> =A0 =A0hmac(md5),
-> =A0 =A0hmac(sha1),
-> =A0 =A0hmac(sha224),
-> =A0 =A0hmac(sha256),
-> =A0 =A0hmac(sha384),
-> =A0 =A0hmac(sha512).
-> These are all type ahash.
->
-> Signed-off-by: Lee Nipper <lee.nipper@gmail.com>
->
-> Fixed up to not register HMAC algorithms on sec2.0 devices.
-> Rationale (from Lee):
->
-> on an 8349E Rev1.1, there's a problem with hmac for any talitos
-> hmac sequence requiring an intermediate hash context (Pointer
-> DWORD 1); the result is an incorrect hmac. =A0An intermediate hash
-> context is required for something longer than (65536-blocksize),
-> and for other cases when update/finup/final are used inefficiently.
-> Interestingly, a normal hash (without hmac) works perfectly
-> when using an intermediate context.
->
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+On Thu, 17 Nov 2011 09:01:16 -0600
+Lee Nipper <lee.nipper@gmail.com> wrote:
 
-Thanks Kim for re-submitting this patch, and the fix for avoiding
-sec2.0 problem.
+> Thanks Kim for re-submitting this patch, and the fix for avoiding
+> sec2.0 problem.
 
-Since I don't have sec2.1+ h/w, I won't be able to hammer test it. :(
-Does AH IPsec now function with talitos hmac with this patch ?
+thanks for the code - sorry it took so long - the AH fix below was a
+good motivator.
 
-Cheers,
-Lee
+> Since I don't have sec2.1+ h/w, I won't be able to hammer test it. :(
+
+truth be told, I only tested with the alg. registration time tests
+myself ;)
+
+> Does AH IPsec now function with talitos hmac with this patch ?
+
+once these:
+
+http://git.kernel.org/?p=linux/kernel/git/davem/net.git;a=commitdiff;h=b7ea81a58adc123a4e980cb0eff9eb5c144b5dc7
+
+http://git.kernel.org/?p=linux/kernel/git/davem/net.git;a=commitdiff;h=069294e813ed5f27f82613b027609bcda5f1b914
+
+go in, I'm sure it will :)
+
+Kim
