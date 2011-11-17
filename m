@@ -1,24 +1,49 @@
-From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v1] crypto: driver for tegra AES hardware
-Date: Thu, 17 Nov 2011 16:59:22 +0530
-Message-ID: <4EC4F012.1070205@nvidia.com>
-References: <1320489734-9085-1-git-send-email-vwadekar@nvidia.com>	<20111105181025.69918e625a169ccb30d9b7c8@freescale.com>	<4EBE48E8.60205@nvidia.com>	<74CDBE0F657A3D45AFBB94109FB122FF1740805AB5@HQMAIL01.nvidia.com>	<4EC1E642.2090309@nvidia.com>	<74CDBE0F657A3D45AFBB94109FB122FF1740805D40@HQMAIL01.nvidia.com>	<4EC362EA.3020204@nvidia.com>	<20111116025720.27e6b710e8b333612862bb2e@freescale.com>	<4EC37CBC.4060806@nvidia.com> <20111116031703.e006c81ebf5368365e7a22fb@freescale.com> <4EC3AC7D.4080705@nvidia.com>
+From: satpal parmar <systems.satpal@gmail.com>
+Subject: authenc_verify_ahash_done and H/W accelerator
+Date: Thu, 17 Nov 2011 17:49:30 +0530
+Message-ID: <CAGgcXb5zfa4fsyvN9HbU9NAr0d-ikp67N-=e_9cc+ro_c6xLJg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
-	"herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org" <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
-	"davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Kim Phillips <kim.phillips-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4EC3AC7D.4080705-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:59493 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757024Ab1KQMTc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Nov 2011 07:19:32 -0500
+Received: by ywt32 with SMTP id 32so938428ywt.19
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2011 04:19:32 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Hi all!
 
->> you're losing free performance.
-> I am really not comfortable having garbage in the keytable. 
+I am currently debugging a  drivers for our crypto HW which offload
+IPSec (ESP for now) to HW. With SHA driver I am facing a strange
+problem. For reasons unknown to me  'authenc_verify_ahash_done' is
+failing (http://lxr.linux.no/linux+v2.6.37/crypto/authenc.c). This api
+got called from my SHA driver.
 
-Kim, do you have any other solution in mind?
+File:http://lxr.linux.no/linux+v2.6.37/crypto/authenc.c
+
+224        authsize = crypto_aead_authsize(authenc);
+225        cryptlen -= authsize;
+226        ihash = ahreq->result + authsize;
+227        scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+228                                 authsize, 0);
+229
+230        err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG :
+0;   ------>> this is giving bad message.
+
+I am trying to understand authenc_verify_ahash_done to debug this
+issue. I do not know if authsize is wrong or scatterwalk_map_and_copy
+was a failure or struct crypto_async_request *areq received is
+corrupted. Since this API is not involved when I use s/w crypto I do
+not have any working example to follow. Just wondering if anyone come
+across any such problem or issue while developing H/W crypto driver.
+
+I am using Linux 2.6.37 for my development.
+
+Appreciate any suggestion/pointer regarding my problem.
+
+SP
