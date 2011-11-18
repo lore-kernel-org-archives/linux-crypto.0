@@ -1,46 +1,79 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 1/5] crypto: talitos - add hmac algorithms
-Date: Thu, 17 Nov 2011 11:15:07 -0600
-Message-ID: <20111117111507.134f0f1e72cb5b2d31fc8346@freescale.com>
-References: <20111116181916.e2473c5856b852dea7bcf83f@freescale.com>
-	<CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: <lee.nipper@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:58646 "EHLO
-	TX2EHSOBE008.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754149Ab1KQRQI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Nov 2011 12:16:08 -0500
-In-Reply-To: <CALg11mhubBSZU=MxX_MAw115w5fQT6_v7mbQ74E=ZdWX6yt_2A@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v6 0/2] crypto: driver for Tegra AES hardware
+Date: Fri, 18 Nov 2011 11:12:31 +0530
+Message-ID: <1321594953-13390-1-git-send-email-vwadekar@nvidia.com>
+Cc: linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, olof-nZhT3qVonbNeoWH0uzbU5w@public.gmane.org, ccross-z5hGa2qSFaRBDgjK7y7TUQ@public.gmane.org,
+	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 17 Nov 2011 09:01:16 -0600
-Lee Nipper <lee.nipper@gmail.com> wrote:
+The tegra crypto driver uses the tegra_chip_uid API for the RNG
+calculation. If one wants to build tegra-aes as a module, then
+tegra_chip_uid needs to be exported.
 
-> Thanks Kim for re-submitting this patch, and the fix for avoiding
-> sec2.0 problem.
+I have also posted "arm: tegra: export tegra_chip_uid" to the mach-tegra
+maintainers to get this patch into their tree, but for compiling the
+"crypto: driver for Tegra AES hardware" patch, "arm: tegra: export tegra_chip_uid"
+has to be present.
 
-thanks for the code - sorry it took so long - the AH fix below was a
-good motivator.
+I leave it to the linux-crypto maintainers to decide how they want to
+tackle this situation. In order to facilitate smooth compilation of the
+actual crytpo driver patch sending the tegra_chip_uid patch as well.
 
-> Since I don't have sec2.1+ h/w, I won't be able to hammer test it. :(
+v7:
+---
+Changed the memset/memcpy logic for copying of the key. Now memset and
+memcpy work on mutually exclusive addresses.
 
-truth be told, I only tested with the alg. registration time tests
-myself ;)
+v6:
+---
+Fixed the subject line in the cover letter and removed the
+'Change-Id: xxxx' lines from the commits
 
-> Does AH IPsec now function with talitos hmac with this patch ?
+v5:
+---
+Specifically mention the dependancy between "arm: tegra: export tegra_chip_uid"
+and "crypto: driver for Tegra AES hardware"
 
-once these:
+v4:
+---
+Mentioned the dependancy on the "arm: tegra: export tegra_chip_uid"
+patch
 
-http://git.kernel.org/?p=linux/kernel/git/davem/net.git;a=commitdiff;h=b7ea81a58adc123a4e980cb0eff9eb5c144b5dc7
+v3:
+---
+Add the following code from KimP in tegra_aes_handle_req
 
-http://git.kernel.org/?p=linux/kernel/git/davem/net.git;a=commitdiff;h=069294e813ed5f27f82613b027609bcda5f1b914
+tfm = crypto_ablkcipher_reqtfm(req);
+...
+ctx = crypto_ablkcipher_ctx(tfm);
+...
+dd->ivlen = crypto_ablkcipher_ivsize(tfm); 
 
-go in, I'm sure it will :)
+v2:
+---
+Fixed the enable/disable irq related comments from Kim Phillips and some
+other cosmetic changes.
 
-Kim
+v1:
+---
+Fixed the compilation issues that Henning reported. The driver now
+builds as a module. Use devm_* apis. Fixed other comments from StephenW
+and KimP.
+
+Henning Heinold (1):
+  arm: tegra: export tegra_chip_uid
+
+Varun Wadekar (1):
+  crypto: driver for Tegra AES hardware
+
+ arch/arm/mach-tegra/fuse.c |    2 +
+ drivers/crypto/Kconfig     |   11 +
+ drivers/crypto/Makefile    |    1 +
+ drivers/crypto/tegra-aes.c | 1102 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/tegra-aes.h |  103 ++++
+ 5 files changed, 1219 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/crypto/tegra-aes.c
+ create mode 100644 drivers/crypto/tegra-aes.h
