@@ -1,94 +1,68 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH -next] digsig: fix build errors
-Date: Mon, 21 Nov 2011 07:52:18 -0800
-Message-ID: <4ECA73B2.2010003@xenotime.net>
-References: <20111121133936.ae0ecadbf39ae50da6b842d1@canb.auug.org.au>	<4EC9EBD2.3040708@xenotime.net> <CALLzPKYmmah9EcXgN2ruRLoFSjV-ozn1pBMans=n2_ouB8Tqsg@mail.gmail.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH v2.2 1/7] crypto: GnuPG based MPI lib - source files
+ (part 1)
+Date: Tue, 22 Nov 2011 08:09:58 +1100
+Message-ID: <20111122080958.1104b58698ed93803b48c22c@canb.auug.org.au>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+	<fad5214d102c09d2a2bf971483efb6e0dbee3937.1319025009.git.dmitry.kasatkin@intel.com>
+	<20111119143337.cd84cfc59a78e0378dbd4089@canb.auug.org.au>
+	<CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
+	<alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
+	<CALLzPKa9dAKTWTsFJg5SUDM0LkywDMOc0AYpYvv_tfsYF2wHDA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw"
+Cc: James Morris <jmorris@namei.org>,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
+	herbert@gondor.hengli.com.au
 To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from oproxy3-pub.bluehost.com ([69.89.21.8]:44749 "HELO
-	oproxy3-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752143Ab1KUPyh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Nov 2011 10:54:37 -0500
-In-Reply-To: <CALLzPKYmmah9EcXgN2ruRLoFSjV-ozn1pBMans=n2_ouB8Tqsg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <CALLzPKa9dAKTWTsFJg5SUDM0LkywDMOc0AYpYvv_tfsYF2wHDA@mail.gmail.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 11/21/2011 02:32 AM, Kasatkin, Dmitry wrote:
-> On Mon, Nov 21, 2011 at 8:12 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->> From: Randy Dunlap <rdunlap@xenotime.net>
->>
->> Fix build errors by adding kconfig dependency on KEYS:
->>
->> lib/digsig.c:106:16: error: dereferencing pointer to incomplete type
->> lib/digsig.c:107:11: error: dereferencing pointer to incomplete type
->> lib/digsig.c:184:14: error: dereferencing pointer to incomplete type
->> lib/digsig.c:223:3: error: 'key_ref_t' undeclared (first use in this function)
->> lib/digsig.c:223:13: error: expected ';' before 'kref'
->> lib/digsig.c:224:3: error: 'kref' undeclared (first use in this function)
->> lib/digsig.c:224:3: error: implicit declaration of function 'keyring_search'
->> lib/digsig.c:231:3: error: implicit declaration of function 'request_key'
->>
->> and after changing lib/Kconfig:
->> warning: (INTEGRITY_DIGSIG) selects DIGSIG which has unmet direct dependencies (CRYPTO && KEYS)
->>
->> Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
->> Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
->> ---
->>  lib/Kconfig                |    4 ++--
->>  security/integrity/Kconfig |    2 +-
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> --- next-2011-1121.orig/lib/Kconfig
->> +++ next-2011-1121/lib/Kconfig
->> @@ -294,10 +294,10 @@ config MPILIB_EXTRA
->>
->>  config DIGSIG
->>        tristate "In-kernel signature checker"
->> -       depends on CRYPTO
->> +       depends on CRYPTO && KEYS
-> 
-> this patch was in /crypto dir before, now it is in /lib...
-> I think CRYPTO is not needed at all at the moment..
-> 
-> 
->>        select MPILIB
->>        help
->>          Digital signature verification. Currently only RSA is supported.
->> -         Implementation is done using GnuPG MPI library
->> +         Implementation is done using GnuPG MPI library.
->>
->>  endmenu
->> --- next-2011-1121.orig/security/integrity/Kconfig
->> +++ next-2011-1121/security/integrity/Kconfig
->> @@ -5,7 +5,7 @@ config INTEGRITY
->>
->>  config INTEGRITY_DIGSIG
->>        boolean "Digital signature verification using multiple keyrings"
->> -       depends on INTEGRITY
->> +       depends on INTEGRITY && CRYPTO && KEYS
-> 
-> Is it really needed, because 2 lines bellow is "select DIGSIG", which
-> will depend on KEYS??
+--Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Feel free to fix the build errors any way that you want to do it,
-but please get them fixed.  Don't leave it as is.
+Hi Dmitry,
 
-> 
->>        default n
->>        select DIGSIG
->>        help
->>
-> 
-> Thanks!
+On Mon, 21 Nov 2011 17:32:54 +0200 "Kasatkin, Dmitry" <dmitry.kasatkin@inte=
+l.com> wrote:
+>
+> In fact it does not break bisect, because compilation is enabled in
+> the 3rd patch.
 
+Ah. sorry, I missed that.
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
+
+--Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBCAAGBQJOyr4mAAoJEECxmPOUX5FEWDoP/0QdPpNJmx9hqaAx0JSTawWd
+rMRdprhi03tTUGDiRzDMF2AaPs47n8+bKNtPJys7Cy0mp+v2u1boHHsAsKK7D0pj
+hvLT4lC1UTwEheiK82ZruyxqMigdXWAzEgE8mL3va7Qr4Jovvpl4ZgaAX9hejWJF
+MCRv9EulTURXVfT47JElLXdU8s67wH+Cpnl0EbPKqOaxKtkHFt7cJVA/Lm7YsZrj
+0YPO2mcWjVxd0Aadjj4eYrQU/qAJLHwPbng6SOUX87TMQ+dwpTtxU+hzTMJTRof3
+or6aY9doGdpq0Qe3E6v8VCqSetRu82NNeQvKd2pfRiXDa4JGzkULr06SPN1/fjZD
+7e71k+Q6tu1iKeOiZ7bHjFANPE1OMssbZjNjR5bYnqYkQtEfRknKMoV0TvUR/RJI
+n6X1BpMdG4rDtSOR48rm7OmRvYzxkm2gGmEMdIh6sEK3Wgh0gyPs8fq+FcIGC2o5
+Jm6juAUrS1W8UpVtKC1/DvpexIrqEUxG4lo0W5srSTxoGZk2XSMlKZXZLaKyUz/j
+eSULaxDbOy8lwQG/Uh8N0yqUYkGRqIzvt4hJXMFciiFB1GpVf8NoT4D+CmB/xbKA
+ue2LKof0NQFDRK7rjUn3SD6rYBEvlT0xPFzP9cgj17D4jK/eRE11PCBXa3BjKaE0
+zlgzDl9sifSxyOmbqCAH
+=A/+B
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw--
