@@ -1,34 +1,51 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [PATCH v2.2 1/7] crypto: GnuPG based MPI lib - source files
- (part 1)
-Date: Mon, 21 Nov 2011 22:27:44 +1100 (EST)
-Message-ID: <alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
-References: <cover.1319025009.git.dmitry.kasatkin@intel.com> <fad5214d102c09d2a2bf971483efb6e0dbee3937.1319025009.git.dmitry.kasatkin@intel.com> <20111119143337.cd84cfc59a78e0378dbd4089@canb.auug.org.au>
- <CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: Re: [PATCH v2.2 1/7] crypto: GnuPG based MPI lib - source files (part 1)
+Date: Mon, 21 Nov 2011 17:32:54 +0200
+Message-ID: <CALLzPKa9dAKTWTsFJg5SUDM0LkywDMOc0AYpYvv_tfsYF2wHDA@mail.gmail.com>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
+	<fad5214d102c09d2a2bf971483efb6e0dbee3937.1319025009.git.dmitry.kasatkin@intel.com>
+	<20111119143337.cd84cfc59a78e0378dbd4089@canb.auug.org.au>
+	<CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
+	<alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
 	linux-security-module@vger.kernel.org,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
 	herbert@gondor.hengli.com.au
-To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: James Morris <jmorris@namei.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:53234 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752387Ab1KUPc4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Nov 2011 10:32:56 -0500
+In-Reply-To: <alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 21 Nov 2011, Kasatkin, Dmitry wrote:
+On Mon, Nov 21, 2011 at 1:27 PM, James Morris <jmorris@namei.org> wrote:
+> On Mon, 21 Nov 2011, Kasatkin, Dmitry wrote:
+>
+>> It can be easily split into 2 commits and one of them would not comply
+>> with mailing list limits.
+>>
+>> James, should I do anything about it?
+>
+> No, it's in my public tree now.
+>
 
-> It can be easily split into 2 commits and one of them would not comply
-> with mailing list limits.
-> 
-> James, should I do anything about it?
+Ok.
 
-No, it's in my public tree now.
+In fact it does not break bisect, because compilation is enabled in
+the 3rd patch.
 
+BR,
+Dmitry
 
-- James
--- 
-James Morris
-<jmorris@namei.org>
+>
+> - James
+> --
+> James Morris
+> <jmorris@namei.org>
+>
