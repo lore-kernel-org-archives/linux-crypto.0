@@ -1,97 +1,34 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH -next] digsig: fix build errors
-Date: Mon, 21 Nov 2011 12:32:48 +0200
-Message-ID: <CALLzPKYmmah9EcXgN2ruRLoFSjV-ozn1pBMans=n2_ouB8Tqsg@mail.gmail.com>
-References: <20111121133936.ae0ecadbf39ae50da6b842d1@canb.auug.org.au>
-	<4EC9EBD2.3040708@xenotime.net>
+From: James Morris <jmorris@namei.org>
+Subject: Re: [PATCH v2.2 1/7] crypto: GnuPG based MPI lib - source files
+ (part 1)
+Date: Mon, 21 Nov 2011 22:27:44 +1100 (EST)
+Message-ID: <alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com> <fad5214d102c09d2a2bf971483efb6e0dbee3937.1319025009.git.dmitry.kasatkin@intel.com> <20111119143337.cd84cfc59a78e0378dbd4089@canb.auug.org.au>
+ <CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga07.intel.com ([143.182.124.22]:24364 "EHLO
-	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754035Ab1KUKcv convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Nov 2011 05:32:51 -0500
-In-Reply-To: <4EC9EBD2.3040708@xenotime.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
+	herbert@gondor.hengli.com.au
+To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 21, 2011 at 8:12 AM, Randy Dunlap <rdunlap@xenotime.net> wr=
-ote:
-> From: Randy Dunlap <rdunlap@xenotime.net>
->
-> Fix build errors by adding kconfig dependency on KEYS:
->
-> lib/digsig.c:106:16: error: dereferencing pointer to incomplete type
-> lib/digsig.c:107:11: error: dereferencing pointer to incomplete type
-> lib/digsig.c:184:14: error: dereferencing pointer to incomplete type
-> lib/digsig.c:223:3: error: 'key_ref_t' undeclared (first use in this =
-function)
-> lib/digsig.c:223:13: error: expected ';' before 'kref'
-> lib/digsig.c:224:3: error: 'kref' undeclared (first use in this funct=
-ion)
-> lib/digsig.c:224:3: error: implicit declaration of function 'keyring_=
-search'
-> lib/digsig.c:231:3: error: implicit declaration of function 'request_=
-key'
->
-> and after changing lib/Kconfig:
-> warning: (INTEGRITY_DIGSIG) selects DIGSIG which has unmet direct dep=
-endencies (CRYPTO && KEYS)
->
-> Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-> Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-> ---
-> =C2=A0lib/Kconfig =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| =C2=A0 =C2=A04 ++--
-> =C2=A0security/integrity/Kconfig | =C2=A0 =C2=A02 +-
-> =C2=A02 files changed, 3 insertions(+), 3 deletions(-)
->
-> --- next-2011-1121.orig/lib/Kconfig
-> +++ next-2011-1121/lib/Kconfig
-> @@ -294,10 +294,10 @@ config MPILIB_EXTRA
->
-> =C2=A0config DIGSIG
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0tristate "In-kernel signature checker"
-> - =C2=A0 =C2=A0 =C2=A0 depends on CRYPTO
-> + =C2=A0 =C2=A0 =C2=A0 depends on CRYPTO && KEYS
+On Mon, 21 Nov 2011, Kasatkin, Dmitry wrote:
 
-this patch was in /crypto dir before, now it is in /lib...
-I think CRYPTO is not needed at all at the moment..
+> It can be easily split into 2 commits and one of them would not comply
+> with mailing list limits.
+> 
+> James, should I do anything about it?
+
+No, it's in my public tree now.
 
 
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0select MPILIB
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0help
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Digital signature verification. Cur=
-rently only RSA is supported.
-> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 Implementation is done using GnuPG MPI =
-library
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 Implementation is done using GnuPG MPI =
-library.
->
-> =C2=A0endmenu
-> --- next-2011-1121.orig/security/integrity/Kconfig
-> +++ next-2011-1121/security/integrity/Kconfig
-> @@ -5,7 +5,7 @@ config INTEGRITY
->
-> =C2=A0config INTEGRITY_DIGSIG
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0boolean "Digital signature verification us=
-ing multiple keyrings"
-> - =C2=A0 =C2=A0 =C2=A0 depends on INTEGRITY
-> + =C2=A0 =C2=A0 =C2=A0 depends on INTEGRITY && CRYPTO && KEYS
-
-Is it really needed, because 2 lines bellow is "select DIGSIG", which
-will depend on KEYS??
-
-
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0default n
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0select DIGSIG
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0help
->
-
-Thanks!
+- James
+-- 
+James Morris
+<jmorris@namei.org>
