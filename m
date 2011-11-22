@@ -1,68 +1,64 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH v2.2 1/7] crypto: GnuPG based MPI lib - source files
- (part 1)
-Date: Tue, 22 Nov 2011 08:09:58 +1100
-Message-ID: <20111122080958.1104b58698ed93803b48c22c@canb.auug.org.au>
-References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
-	<fad5214d102c09d2a2bf971483efb6e0dbee3937.1319025009.git.dmitry.kasatkin@intel.com>
-	<20111119143337.cd84cfc59a78e0378dbd4089@canb.auug.org.au>
-	<CALLzPKZ70YWb45k+8Z6ApH5MuN7HwBBTWbLcu-UtRkFU07cwmg@mail.gmail.com>
-	<alpine.LRH.2.00.1111212227130.20158@tundra.namei.org>
-	<CALLzPKa9dAKTWTsFJg5SUDM0LkywDMOc0AYpYvv_tfsYF2wHDA@mail.gmail.com>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: crypto_ahash_setkey
+Date: Wed, 23 Nov 2011 00:00:29 +0200
+Message-ID: <CALLzPKYbbYV9keL7DAFfHVzn3SqQv3-1X+cJCp2hn2-ey9UpOw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw"
-Cc: James Morris <jmorris@namei.org>,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
-	herbert@gondor.hengli.com.au
-To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <CALLzPKa9dAKTWTsFJg5SUDM0LkywDMOc0AYpYvv_tfsYF2wHDA@mail.gmail.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga10.intel.com ([192.55.52.92]:61598 "EHLO
+	fmsmga102.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758581Ab1KVWAb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Nov 2011 17:00:31 -0500
+Received: by qabg14 with SMTP id g14so2791038qab.4
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2011 14:00:30 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi Dmitry,
+I have noticed very odd behavior with hmac calculation on my dual
+core, 4 HTs PC.
+I am using async hash API to to calculate hmac over the page.
+I am using "hmac(sha1)" and the same key to calculate different pages.
 
-On Mon, 21 Nov 2011 17:32:54 +0200 "Kasatkin, Dmitry" <dmitry.kasatkin@inte=
-l.com> wrote:
->
-> In fact it does not break bisect, because compilation is enabled in
-> the 3rd patch.
+I have a work queue, which calculates the hmac like...
 
-Ah. sorry, I missed that.
+int()
+{
+    tfm = crypto_alloc_ahash(...);
+}
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+work_task()
+{
+     crypto_ahash_setkey(tfm, key, keylen);
+     crypto_ahash_digest(req);
+}
 
---Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw
-Content-Type: application/pgp-signature
+HMAC result "sometimes" is incorrect.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+But when I move crypto_ahash_setkey() do the initialization code then
+HMAC result is always correct...
+(key is the same, so I can initialize it only once)
 
-iQIcBAEBCAAGBQJOyr4mAAoJEECxmPOUX5FEWDoP/0QdPpNJmx9hqaAx0JSTawWd
-rMRdprhi03tTUGDiRzDMF2AaPs47n8+bKNtPJys7Cy0mp+v2u1boHHsAsKK7D0pj
-hvLT4lC1UTwEheiK82ZruyxqMigdXWAzEgE8mL3va7Qr4Jovvpl4ZgaAX9hejWJF
-MCRv9EulTURXVfT47JElLXdU8s67wH+Cpnl0EbPKqOaxKtkHFt7cJVA/Lm7YsZrj
-0YPO2mcWjVxd0Aadjj4eYrQU/qAJLHwPbng6SOUX87TMQ+dwpTtxU+hzTMJTRof3
-or6aY9doGdpq0Qe3E6v8VCqSetRu82NNeQvKd2pfRiXDa4JGzkULr06SPN1/fjZD
-7e71k+Q6tu1iKeOiZ7bHjFANPE1OMssbZjNjR5bYnqYkQtEfRknKMoV0TvUR/RJI
-n6X1BpMdG4rDtSOR48rm7OmRvYzxkm2gGmEMdIh6sEK3Wgh0gyPs8fq+FcIGC2o5
-Jm6juAUrS1W8UpVtKC1/DvpexIrqEUxG4lo0W5srSTxoGZk2XSMlKZXZLaKyUz/j
-eSULaxDbOy8lwQG/Uh8N0yqUYkGRqIzvt4hJXMFciiFB1GpVf8NoT4D+CmB/xbKA
-ue2LKof0NQFDRK7rjUn3SD6rYBEvlT0xPFzP9cgj17D4jK/eRE11PCBXa3BjKaE0
-zlgzDl9sifSxyOmbqCAH
-=A/+B
------END PGP SIGNATURE-----
+int()
+{
+     tfm = crypto_alloc_ahash(...);
+     crypto_ahash_setkey(tfm, key, keylen);
+}
 
---Signature=_Tue__22_Nov_2011_08_09_58_+1100_GzX+MaJJUMZGMzCw--
+work_task()
+{
+     crypto_ahash_digest(req);
+}
+
+It seems that crypto_ahash_setkey() somehow sometimes does wrong things...
+
+I hope my explanation is clear.
+
+Any ideas why it might happen?
+
+Thanks,
+
+- Dmitry
