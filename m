@@ -1,31 +1,31 @@
 From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
 Subject: Re: crypto_ahash_setkey
-Date: Wed, 23 Nov 2011 11:08:29 +0200
-Message-ID: <CALLzPKaSm9TncJc3932jxSYzp=krXRH_5wO5CFGDnCsDKvaLUQ@mail.gmail.com>
+Date: Wed, 23 Nov 2011 11:09:30 +0200
+Message-ID: <CALLzPKZtmW286CbHQHfkMeX=kOCfPLxkOHt+HOEXjCOfqs0RKA@mail.gmail.com>
 References: <CALLzPKYbbYV9keL7DAFfHVzn3SqQv3-1X+cJCp2hn2-ey9UpOw@mail.gmail.com>
-	<20111123074456.GA7875@gondor.apana.org.au>
+	<20111123060853.GH20943@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:63396 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757888Ab1KWJIc convert rfc822-to-8bit (ORCPT
+Received: from mga07.intel.com ([143.182.124.22]:29926 "EHLO
+	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753296Ab1KWJJc convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Nov 2011 04:08:32 -0500
-Received: by qyl16 with SMTP id 16so2335196qyl.25
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2011 01:08:30 -0800 (PST)
-In-Reply-To: <20111123074456.GA7875@gondor.apana.org.au>
+	Wed, 23 Nov 2011 04:09:32 -0500
+Received: by qyl16 with SMTP id 16so2338020qyl.25
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2011 01:09:30 -0800 (PST)
+In-Reply-To: <20111123060853.GH20943@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
-On Wed, Nov 23, 2011 at 9:44 AM, Herbert Xu <herbert@gondor.apana.org.a=
-u> wrote:
-> Kasatkin, Dmitry <dmitry.kasatkin@intel.com> wrote:
+On Wed, Nov 23, 2011 at 8:08 AM, Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+> Hi.
+>
+> On Wed, Nov 23, 2011 at 12:00:29AM +0200, Kasatkin, Dmitry wrote:
 >> Hi,
 >>
 >> I have noticed very odd behavior with hmac calculation on my dual
@@ -38,43 +38,39 @@ s.
 >>
 >> int()
 >> {
->> =C2=A0 =C2=A0tfm =3D crypto_alloc_ahash(...);
+>> =C2=A0 =C2=A0 tfm =3D crypto_alloc_ahash(...);
 >> }
 >>
 >> work_task()
 >> {
->> =C2=A0 =C2=A0 crypto_ahash_setkey(tfm, key, keylen);
->> =C2=A0 =C2=A0 crypto_ahash_digest(req);
+>> =C2=A0 =C2=A0 =C2=A0crypto_ahash_setkey(tfm, key, keylen);
+>> =C2=A0 =C2=A0 =C2=A0crypto_ahash_digest(req);
 >> }
 >>
 >> HMAC result "sometimes" is incorrect.
 >
-> Is your tfm shared by multiple instances of work_task? The key
-> is a property of the tfm, so you cannot have multiple users of a
-> tfm all changing keys at the same time.
-
-Yes. I know that....
-Work queue also uses WQ_NON_REENTRANT, so it should not be any races,
-and it should be possible to call crypto_ahash_setkey() without any pro=
-blems.
-
-This problem happens on 64 bit kernel.
-It does not happen on my QEMU 32 bit kernel,
-
-I will do some more tests...
-
+> Looks like a race. HMAC precalculates the hash of the ipaded/opaded k=
+ey
+> and saves this hash on the transform. So the setkey method should be =
+used
+> just once in the initialization path.
 >
-> The correct usage model allowing parallel use is to dedicate a
-> tfm to each key.
+>>
+>> But when I move crypto_ahash_setkey() do the initialization code the=
+n
+>> HMAC result is always correct...
+>> (key is the same, so I can initialize it only once)
+>>
+>> int()
+>> {
+>> =C2=A0 =C2=A0 =C2=A0tfm =3D crypto_alloc_ahash(...);
+>> =C2=A0 =C2=A0 =C2=A0crypto_ahash_setkey(tfm, key, keylen);
+>> }
 >
-
-Sure.
+> That's how it should be. And in this case it works, as you
+> already noticed :)
+>
+>
 
 Thanks...
-
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
+See my another reply...
