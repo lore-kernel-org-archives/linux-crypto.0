@@ -1,60 +1,72 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH] crypto: serpent-sse2 - should select CRYPTO_CRYPTD
-Date: Thu, 24 Nov 2011 10:35:29 -0800
-Message-ID: <4ECE8E71.1080606@xenotime.net>
-References: <4ECD527E.8000506@xenotime.net> <20111124063741.17986.23462.stgit@localhost6.localdomain6>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 3.2
+Date: Sat, 26 Nov 2011 10:34:14 +0800
+Message-ID: <20111126023413.GA31106@gondor.apana.org.au>
+References: <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20111021082259.GA13530@gondor.apana.org.au> <20111110230014.GA4470@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-next@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	LKML <linux-kernel@vger.kernel.org>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20111124063741.17986.23462.stgit@localhost6.localdomain6>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:45682 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753450Ab1KZCeX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Nov 2011 21:34:23 -0500
+Content-Disposition: inline
+In-Reply-To: <20111110230014.GA4470@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/23/2011 10:37 PM, Jussi Kivilinna wrote:
-> Since serpent_sse2_glue.c uses cryptd, CRYPTO_SERPENT_SSE2_X86_64 and
-> CRYPTO_SERPENT_SSE2_586 should be selecting CRYPTO_CRYPTD.
-> 
-> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+Hi Linus:
 
-Thanks.
+This push fixes a problem with mv_cesa the driver where it makes
+incorrect hashes on input chunks greater than 1920 bytes.
 
-> ---
->  crypto/Kconfig |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 16e0c13..b8d1b10 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -770,6 +770,7 @@ config CRYPTO_SERPENT_SSE2_X86_64
->  	tristate "Serpent cipher algorithm (x86_64/SSE2)"
->  	depends on X86 && 64BIT
->  	select CRYPTO_ALGAPI
-> +	select CRYPTO_CRYPTD
->  	select CRYPTO_SERPENT
->  	help
->  	  Serpent cipher algorithm, by Anderson, Biham & Knudsen.
-> @@ -787,6 +788,7 @@ config CRYPTO_SERPENT_SSE2_586
->  	tristate "Serpent cipher algorithm (i586/SSE2)"
->  	depends on X86 && !64BIT
->  	select CRYPTO_ALGAPI
-> +	select CRYPTO_CRYPTD
->  	select CRYPTO_SERPENT
->  	help
->  	  Serpent cipher algorithm, by Anderson, Biham & Knudsen.
-> 
+Please pull from
+
+git://github.com/herbertx/crypto.git
 
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+The top commit object is
+
+commit 274252862f386b7868f35bf5ceaa5391a8ccfdf3
+Author: Phil Sutter <phil.sutter@viprinet.com>
+Date:   Wed Nov 16 18:28:01 2011 +0100
+
+    crypto: mv_cesa - fix hashing of chunks > 1920 bytes
+
+
+Phil Sutter (1):
+      crypto: mv_cesa - fix hashing of chunks > 1920 bytes
+
+ drivers/crypto/mv_cesa.c |   12 +++++++-----
+ 1 files changed, 7 insertions(+), 5 deletions(-)
+ 
+Thanks,
+- -- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIVAwUBTtBP9McnHQpJsYunAQJpTg//XFdRLLF46ZZQID12VqrfBJB8VrzGWY0q
+QQQH+oe5lq9ppjkFz5Fk2fsNSj5a3kDtPQK9SBVl0TThC0BVuA3lNXEmcfnQoOjZ
+vj1KUl9zSiwVcKm/lkbzlDHdU6wE1MxwP8z3XEdMMs7Pj3YWf12XUZQSWkeeFiy0
+Tz5Oz9hbIpYLW+U458xjhoODJAk7JSItS+N2ud7JcqwV7nTsGqP95mDsbfiXi7Fn
+1FiXdFYogAyyqLPDi6EbENCEbIvfV1JEbg/S7LOe7akxZwlJg92cevGHS/oDbxuU
+N7/9nxgANbZBG3ApUw6UAJWSBuJBZ4C96ABc/LXY8ZzgwYNaiNloNMr1F/j+MZQ0
+AtP58bK6IcSw7QBi8qzKV7P0q/pAxOYnDeaS4Sla8Pb4MvEAblSJF45/YHBublrE
+Y5tMif4ib8Gy/yXF6bu0ohfP0LfKtXq5pZK6C0blcYdMyxKxcaQWx+6fATOWxdCL
+OcrY6q2/dYG+zXSWJs13/YfWFcn3sRdjnVqFo2ItUbvD3ZL9WSCKuhd9PUZPcxqW
+VEXKDaKA1G9aAn+KNkciZ48SiYCOMm4Xl6l11bsV2nx13i401KoM5hLcFv5CfZ89
+Xwu+j2N4mhlLxPG08H4zG19hLgOdpY0Ql5VsZPf3z4Bf0G+gnZC6StDgvfJHEX3Z
+sKy1PVqrB7U=
+=iYTU
+-----END PGP SIGNATURE-----
