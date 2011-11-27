@@ -1,237 +1,221 @@
 From: Cong Wang <amwang@redhat.com>
-Subject: [PATCH 09/62] crypto: remove the second argument of k[un]map_atomic()
-Date: Sun, 27 Nov 2011 13:26:49 +0800
-Message-ID: <1322371662-26166-10-git-send-email-amwang@redhat.com>
+Subject: [PATCH 08/62] x86: remove the second argument of k[un]map_atomic()
+Date: Sun, 27 Nov 2011 13:26:48 +0800
+Message-ID: <1322371662-26166-9-git-send-email-amwang@redhat.com>
 References: <1322371662-26166-1-git-send-email-amwang@redhat.com>
 Cc: akpm@linux-foundation.org, Cong Wang <amwang@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	linux-crypto@vger.kernel.org
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	Avi Kivity <avi@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Olaf Hering <olaf@aepfle.de>, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41413 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752615Ab1K0Fai (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 27 Nov 2011 00:30:38 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1322371662-26166-1-git-send-email-amwang@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
 Signed-off-by: Cong Wang <amwang@redhat.com>
 ---
- crypto/ahash.c                 |    4 ++--
- crypto/async_tx/async_memcpy.c |    8 ++++----
- crypto/blkcipher.c             |    8 ++++----
- crypto/ccm.c                   |    4 ++--
- crypto/scatterwalk.c           |    8 ++++----
- crypto/shash.c                 |    8 ++++----
- include/crypto/scatterwalk.h   |   28 +++-------------------------
- 7 files changed, 23 insertions(+), 45 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |   24 ++++++++++++------------
+ arch/x86/kernel/crash_dump_32.c    |    6 +++---
+ arch/x86/kvm/lapic.c               |    8 ++++----
+ arch/x86/kvm/paging_tmpl.h         |    4 ++--
+ arch/x86/kvm/x86.c                 |    8 ++++----
+ arch/x86/lib/usercopy_32.c         |    4 ++--
+ 6 files changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index ac93c99..33bc9b6 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -46,7 +46,7 @@ static int hash_walk_next(struct crypto_hash_walk *walk)
- 	unsigned int nbytes = min(walk->entrylen,
- 				  ((unsigned int)(PAGE_SIZE)) - offset);
- 
--	walk->data = crypto_kmap(walk->pg, 0);
-+	walk->data = kmap_atomic(walk->pg);
- 	walk->data += offset;
- 
- 	if (offset & alignmask) {
-@@ -93,7 +93,7 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
- 		return nbytes;
- 	}
- 
--	crypto_kunmap(walk->data, 0);
-+	kunmap_atomic(walk->data);
- 	crypto_yield(walk->flags);
- 
- 	if (err)
-diff --git a/crypto/async_tx/async_memcpy.c b/crypto/async_tx/async_memcpy.c
-index 0d5a90c..361b5e8 100644
---- a/crypto/async_tx/async_memcpy.c
-+++ b/crypto/async_tx/async_memcpy.c
-@@ -79,13 +79,13 @@ async_memcpy(struct page *dest, struct page *src, unsigned int dest_offset,
- 		/* wait for any prerequisite operations */
- 		async_tx_quiesce(&submit->depend_tx);
- 
--		dest_buf = kmap_atomic(dest, KM_USER0) + dest_offset;
--		src_buf = kmap_atomic(src, KM_USER1) + src_offset;
-+		dest_buf = kmap_atomic(dest) + dest_offset;
-+		src_buf = kmap_atomic(src) + src_offset;
- 
- 		memcpy(dest_buf, src_buf, len);
- 
--		kunmap_atomic(src_buf, KM_USER1);
--		kunmap_atomic(dest_buf, KM_USER0);
-+		kunmap_atomic(src_buf);
-+		kunmap_atomic(dest_buf);
- 
- 		async_tx_sync_epilog(submit);
- 	}
-diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-index 1e61d1a..4dd80c7 100644
---- a/crypto/blkcipher.c
-+++ b/crypto/blkcipher.c
-@@ -43,22 +43,22 @@ static int blkcipher_walk_first(struct blkcipher_desc *desc,
- 
- static inline void blkcipher_map_src(struct blkcipher_walk *walk)
- {
--	walk->src.virt.addr = scatterwalk_map(&walk->in, 0);
-+	walk->src.virt.addr = scatterwalk_map(&walk->in);
- }
- 
- static inline void blkcipher_map_dst(struct blkcipher_walk *walk)
- {
--	walk->dst.virt.addr = scatterwalk_map(&walk->out, 1);
-+	walk->dst.virt.addr = scatterwalk_map(&walk->out);
- }
- 
- static inline void blkcipher_unmap_src(struct blkcipher_walk *walk)
- {
--	scatterwalk_unmap(walk->src.virt.addr, 0);
-+	scatterwalk_unmap(walk->src.virt.addr);
- }
- 
- static inline void blkcipher_unmap_dst(struct blkcipher_walk *walk)
- {
--	scatterwalk_unmap(walk->dst.virt.addr, 1);
-+	scatterwalk_unmap(walk->dst.virt.addr);
- }
- 
- /* Get a spot of the specified length that does not straddle a page.
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index c36d654..32fe1bb 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -216,12 +216,12 @@ static void get_data_to_compute(struct crypto_cipher *tfm,
- 			scatterwalk_start(&walk, sg_next(walk.sg));
- 			n = scatterwalk_clamp(&walk, len);
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 545d0ce..152232d 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1107,12 +1107,12 @@ static int __driver_rfc4106_encrypt(struct aead_request *req)
+ 		one_entry_in_sg = 1;
+ 		scatterwalk_start(&src_sg_walk, req->src);
+ 		scatterwalk_start(&assoc_sg_walk, req->assoc);
+-		src = scatterwalk_map(&src_sg_walk, 0);
+-		assoc = scatterwalk_map(&assoc_sg_walk, 0);
++		src = scatterwalk_map(&src_sg_walk);
++		assoc = scatterwalk_map(&assoc_sg_walk);
+ 		dst = src;
+ 		if (unlikely(req->src != req->dst)) {
+ 			scatterwalk_start(&dst_sg_walk, req->dst);
+-			dst = scatterwalk_map(&dst_sg_walk, 0);
++			dst = scatterwalk_map(&dst_sg_walk);
  		}
--		data_src = scatterwalk_map(&walk, 0);
-+		data_src = scatterwalk_map(&walk);
  
- 		compute_mac(tfm, data_src, n, pctx);
- 		len -= n;
+ 	} else {
+@@ -1136,11 +1136,11 @@ static int __driver_rfc4106_encrypt(struct aead_request *req)
+ 	 * back to the packet. */
+ 	if (one_entry_in_sg) {
+ 		if (unlikely(req->src != req->dst)) {
+-			scatterwalk_unmap(dst, 0);
++			scatterwalk_unmap(dst);
+ 			scatterwalk_done(&dst_sg_walk, 0, 0);
+ 		}
+-		scatterwalk_unmap(src, 0);
+-		scatterwalk_unmap(assoc, 0);
++		scatterwalk_unmap(src);
++		scatterwalk_unmap(assoc);
+ 		scatterwalk_done(&src_sg_walk, 0, 0);
+ 		scatterwalk_done(&assoc_sg_walk, 0, 0);
+ 	} else {
+@@ -1189,12 +1189,12 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 		one_entry_in_sg = 1;
+ 		scatterwalk_start(&src_sg_walk, req->src);
+ 		scatterwalk_start(&assoc_sg_walk, req->assoc);
+-		src = scatterwalk_map(&src_sg_walk, 0);
+-		assoc = scatterwalk_map(&assoc_sg_walk, 0);
++		src = scatterwalk_map(&src_sg_walk);
++		assoc = scatterwalk_map(&assoc_sg_walk);
+ 		dst = src;
+ 		if (unlikely(req->src != req->dst)) {
+ 			scatterwalk_start(&dst_sg_walk, req->dst);
+-			dst = scatterwalk_map(&dst_sg_walk, 0);
++			dst = scatterwalk_map(&dst_sg_walk);
+ 		}
  
--		scatterwalk_unmap(data_src, 0);
-+		scatterwalk_unmap(data_src);
- 		scatterwalk_advance(&walk, n);
- 		scatterwalk_done(&walk, 0, len);
- 		if (len)
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index 41e529a..7281b8a 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -40,9 +40,9 @@ void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg)
- }
- EXPORT_SYMBOL_GPL(scatterwalk_start);
+ 	} else {
+@@ -1219,11 +1219,11 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
  
--void *scatterwalk_map(struct scatter_walk *walk, int out)
-+void *scatterwalk_map(struct scatter_walk *walk)
- {
--	return crypto_kmap(scatterwalk_page(walk), out) +
-+	return kmap_atomic(scatterwalk_page(walk)) +
- 	       offset_in_page(walk->offset);
- }
- EXPORT_SYMBOL_GPL(scatterwalk_map);
-@@ -83,9 +83,9 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 		if (len_this_page > nbytes)
- 			len_this_page = nbytes;
+ 	if (one_entry_in_sg) {
+ 		if (unlikely(req->src != req->dst)) {
+-			scatterwalk_unmap(dst, 0);
++			scatterwalk_unmap(dst);
+ 			scatterwalk_done(&dst_sg_walk, 0, 0);
+ 		}
+-		scatterwalk_unmap(src, 0);
+-		scatterwalk_unmap(assoc, 0);
++		scatterwalk_unmap(src);
++		scatterwalk_unmap(assoc);
+ 		scatterwalk_done(&src_sg_walk, 0, 0);
+ 		scatterwalk_done(&assoc_sg_walk, 0, 0);
+ 	} else {
+diff --git a/arch/x86/kernel/crash_dump_32.c b/arch/x86/kernel/crash_dump_32.c
+index 642f75a..11891ca 100644
+--- a/arch/x86/kernel/crash_dump_32.c
++++ b/arch/x86/kernel/crash_dump_32.c
+@@ -62,16 +62,16 @@ ssize_t copy_oldmem_page(unsigned long pfn, char *buf,
  
--		vaddr = scatterwalk_map(walk, out);
-+		vaddr = scatterwalk_map(walk);
- 		memcpy_dir(buf, vaddr, len_this_page, out);
--		scatterwalk_unmap(vaddr, out);
-+		scatterwalk_unmap(vaddr);
- 
- 		scatterwalk_advance(walk, len_this_page);
- 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 9100912..21fc12e 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -281,10 +281,10 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
- 	if (nbytes < min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset)) {
- 		void *data;
- 
--		data = crypto_kmap(sg_page(sg), 0);
-+		data = kmap_atomic(sg_page(sg));
- 		err = crypto_shash_digest(desc, data + offset, nbytes,
- 					  req->result);
--		crypto_kunmap(data, 0);
-+		kunmap_atomic(data);
- 		crypto_yield(desc->flags);
- 	} else
- 		err = crypto_shash_init(desc) ?:
-@@ -420,9 +420,9 @@ static int shash_compat_digest(struct hash_desc *hdesc, struct scatterlist *sg,
- 
- 		desc->flags = hdesc->flags;
- 
--		data = crypto_kmap(sg_page(sg), 0);
-+		data = kmap_atomic(sg_page(sg));
- 		err = crypto_shash_digest(desc, data + offset, nbytes, out);
--		crypto_kunmap(data, 0);
-+		kunmap_atomic(data);
- 		crypto_yield(desc->flags);
- 		goto out;
+ 	if (!userbuf) {
+ 		memcpy(buf, (vaddr + offset), csize);
+-		kunmap_atomic(vaddr, KM_PTE0);
++		kunmap_atomic(vaddr);
+ 	} else {
+ 		if (!kdump_buf_page) {
+ 			printk(KERN_WARNING "Kdump: Kdump buffer page not"
+ 				" allocated\n");
+-			kunmap_atomic(vaddr, KM_PTE0);
++			kunmap_atomic(vaddr);
+ 			return -EFAULT;
+ 		}
+ 		copy_page(kdump_buf_page, vaddr);
+-		kunmap_atomic(vaddr, KM_PTE0);
++		kunmap_atomic(vaddr);
+ 		if (copy_to_user(buf, (kdump_buf_page + offset), csize))
+ 			return -EFAULT;
  	}
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 4fd95a3..3744d2a 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -25,28 +25,6 @@
- #include <linux/scatterlist.h>
- #include <linux/sched.h>
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 54abb40..e462e30 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1282,9 +1282,9 @@ void kvm_lapic_sync_from_vapic(struct kvm_vcpu *vcpu)
+ 	if (!irqchip_in_kernel(vcpu->kvm) || !vcpu->arch.apic->vapic_addr)
+ 		return;
  
--static inline enum km_type crypto_kmap_type(int out)
--{
--	enum km_type type;
--
--	if (in_softirq())
--		type = out * (KM_SOFTIRQ1 - KM_SOFTIRQ0) + KM_SOFTIRQ0;
--	else
--		type = out * (KM_USER1 - KM_USER0) + KM_USER0;
--
--	return type;
--}
--
--static inline void *crypto_kmap(struct page *page, int out)
--{
--	return kmap_atomic(page, crypto_kmap_type(out));
--}
--
--static inline void crypto_kunmap(void *vaddr, int out)
--{
--	kunmap_atomic(vaddr, crypto_kmap_type(out));
--}
--
- static inline void crypto_yield(u32 flags)
- {
- 	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
-@@ -121,15 +99,15 @@ static inline struct page *scatterwalk_page(struct scatter_walk *walk)
- 	return sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
+-	vapic = kmap_atomic(vcpu->arch.apic->vapic_page, KM_USER0);
++	vapic = kmap_atomic(vcpu->arch.apic->vapic_page);
+ 	data = *(u32 *)(vapic + offset_in_page(vcpu->arch.apic->vapic_addr));
+-	kunmap_atomic(vapic, KM_USER0);
++	kunmap_atomic(vapic);
+ 
+ 	apic_set_tpr(vcpu->arch.apic, data & 0xff);
+ }
+@@ -1309,9 +1309,9 @@ void kvm_lapic_sync_to_vapic(struct kvm_vcpu *vcpu)
+ 		max_isr = 0;
+ 	data = (tpr & 0xff) | ((max_isr & 0xf0) << 8) | (max_irr << 24);
+ 
+-	vapic = kmap_atomic(vcpu->arch.apic->vapic_page, KM_USER0);
++	vapic = kmap_atomic(vcpu->arch.apic->vapic_page);
+ 	*(u32 *)(vapic + offset_in_page(vcpu->arch.apic->vapic_addr)) = data;
+-	kunmap_atomic(vapic, KM_USER0);
++	kunmap_atomic(vapic);
  }
  
--static inline void scatterwalk_unmap(void *vaddr, int out)
-+static inline void scatterwalk_unmap(void *vaddr)
- {
--	crypto_kunmap(vaddr, out);
-+	kunmap_atomic(vaddr);
- }
+ void kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr)
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 9299410..b7c5f7c 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -92,9 +92,9 @@ static int FNAME(cmpxchg_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 	if (unlikely(npages != 1))
+ 		return -EFAULT;
  
- void scatterwalk_start(struct scatter_walk *walk, struct scatterlist *sg);
- void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 			    size_t nbytes, int out);
--void *scatterwalk_map(struct scatter_walk *walk, int out);
-+void *scatterwalk_map(struct scatter_walk *walk);
- void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+-	table = kmap_atomic(page, KM_USER0);
++	table = kmap_atomic(page);
+ 	ret = CMPXCHG(&table[index], orig_pte, new_pte);
+-	kunmap_atomic(table, KM_USER0);
++	kunmap_atomic(table);
  
- void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 	kvm_release_page_dirty(page);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c38efd7..dfc7c23 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1200,12 +1200,12 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 	 */
+ 	vcpu->hv_clock.version += 2;
+ 
+-	shared_kaddr = kmap_atomic(vcpu->time_page, KM_USER0);
++	shared_kaddr = kmap_atomic(vcpu->time_page);
+ 
+ 	memcpy(shared_kaddr + vcpu->time_offset, &vcpu->hv_clock,
+ 	       sizeof(vcpu->hv_clock));
+ 
+-	kunmap_atomic(shared_kaddr, KM_USER0);
++	kunmap_atomic(shared_kaddr);
+ 
+ 	mark_page_dirty(v->kvm, vcpu->time >> PAGE_SHIFT);
+ 	return 0;
+@@ -4301,7 +4301,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 		goto emul_write;
+ 	}
+ 
+-	kaddr = kmap_atomic(page, KM_USER0);
++	kaddr = kmap_atomic(page);
+ 	kaddr += offset_in_page(gpa);
+ 	switch (bytes) {
+ 	case 1:
+@@ -4319,7 +4319,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 	default:
+ 		BUG();
+ 	}
+-	kunmap_atomic(kaddr, KM_USER0);
++	kunmap_atomic(kaddr);
+ 	kvm_release_page_dirty(page);
+ 
+ 	if (!exchanged)
+diff --git a/arch/x86/lib/usercopy_32.c b/arch/x86/lib/usercopy_32.c
+index e218d5d..d9b094c 100644
+--- a/arch/x86/lib/usercopy_32.c
++++ b/arch/x86/lib/usercopy_32.c
+@@ -760,9 +760,9 @@ survive:
+ 				break;
+ 			}
+ 
+-			maddr = kmap_atomic(pg, KM_USER0);
++			maddr = kmap_atomic(pg);
+ 			memcpy(maddr + offset, from, len);
+-			kunmap_atomic(maddr, KM_USER0);
++			kunmap_atomic(maddr);
+ 			set_page_dirty_lock(pg);
+ 			put_page(pg);
+ 			up_read(&current->mm->mmap_sem);
 -- 
 1.7.4.4
