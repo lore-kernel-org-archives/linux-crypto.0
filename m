@@ -1,354 +1,397 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 00/14][RFC] Crypto keys and module signing
-Date: Mon, 28 Nov 2011 16:27:53 +0000
-Message-ID: <8668.1322497673@redhat.com>
-References: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
-	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com
-To: keyrings@linux-nfs.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: [PATCH 02/14] Moved a long comment from lib/crc32.c to
+	Documentation/crc32.txt
+Date: Mon, 28 Nov 2011 14:37:16 -0800
+Message-ID: <20111128223716.28705.24210.stgit@elm3c44.beaverton.ibm.com>
+References: <20111128223659.28705.56719.stgit@elm3c44.beaverton.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Theodore Tso <tytso@mit.edu>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>, linux-ext4@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Darrick J. Wong" <djwong@us.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e31.co.us.ibm.com ([32.97.110.149]:51182 "EHLO
+	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752878Ab1K1Whs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Nov 2011 17:37:48 -0500
+Received: from /spool/local
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
+	Mon, 28 Nov 2011 15:37:47 -0700
+In-Reply-To: <20111128223659.28705.56719.stgit@elm3c44.beaverton.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+where it will more likely get read.
+	- Edited the resulting document to add an explanation of the slicing-by-n
+	  algorithm.
 
-Here are a set of patches that create a framework for using cryptographic keys
-within the kernel.  The basic crypto key has no requirements as to how the key
-is implemented; it's basically a jump table for the operations and an anchor
-for any relevant data.
-
-I have provided a couple of subtypes: DSA and RSA.  The DSA type has signature
-verification facilities available within the kernel, and is used for module
-signature verification.
-
-These two subtypes store their public key data attached to the key and
-implement the algorithms within the kernel.  However, it would be possible to
-merely refer to keys held in a hardware keystore (such as a TPM) and have the
-accessor methods offload the actual work to that keystore to be done in
-hardware.
-
-
-The patches break down into a number of areas:
-
- (0) Dmitry Kasatkin's MPI library patches - which I have not included here
-     but that can be obtained from the security GIT tree.
-
- (1) Utility: MPI function exports and make key_serial() handle a const pointer.
-
- (2) PGP defs and PGP packet parser; basic crypto key infrastructure.
-
- (3) DSA key and RSA key basic implementations.
-
- (4) PGP signature parser; signature verification operations.
-
- (5) DSA verification algorithm.
-
- (6) Module ELF verification and module signature verification.
-
-I have included the documentation for the crypto key type below.
-
-David
-
+Signed-off-by: George Spelvin <linux@horizon.com>
+Signed-off-by: Bob Pearson <rpearson@systemfabricworks.com>
 ---
-			    ======================
-			    CRYPTOGRAPHIC KEY TYPE
-			    ======================
-
-Contents:
-
-  - Overview.
-  - Key identification.
-  - Crypto subtypes.
-  - Accessing crypto keys.
-    - Signature verification.
-    - Initial pgp key loading.
-  - Implementing crypto subtypes.
-    - Registration.
-
-
-========
-OVERVIEW
-========
-
-The "crypto" key type is designed to be a container for cryptographic keys,
-without imposing any particular restrictions on the form of the cryptography or
-the key.
-
-The crypto key is given a subtype that defines what sort of data is associated
-with the key and what operations might be performed with it.  However, no
-requirement is made that the key data actually be loaded into the key or that
-the operations are done by the kernel.
-
-For instance, cryptographic hardware (such as a TPM) might be used to both
-retain the relevant key and provide operations using that key.  In such a case,
-the crypto key would then merely be an interface to the TPM driver.
-
-
-==================
-KEY IDENTIFICATION
-==================
-
-Because the identity of a key is not necessarily known or is not easily
-calculated when a crypto key is allocated, it may not be a simple matter to set
-a key description to something that's useful for determining whether this is
-the key you're looking for.  Furthermore, it may be necessary to perform a
-partial match upon the key identity.
-
-To help with this, when a key is loaded, the key subtype's instantiation
-routine calculates the key fingerprint and stores a copy in the key struct.
-
-The crypto key type's key matching function then performs more checks than just
-the straightforward comparison of the description with the criterion string:
-
- (1) If the criterion string is of the form "id:<hexdigits>" then the match
-     function will examine a key's fingerprint to see if the hex digits given
-     after the "id:" match the tail.  For instance:
-
-	keyctl search @s crypto id:5acc2142
-
-     will match a key with fingerprint:
-
-	1A00 2040 7601 7889 DE11  882C 3823 04AD 5ACC 2142
-
- (2) If the criterion string is of the form "<subtype>:<hexdigits>" then the
-     match will match the ID as in (1), but with the added restriction that
-     only keys of the specified subtype (e.g. dsa or rsa) will be matched.  For
-     instance:
-
-	keyctl search @s crypto dsa:5acc2142
-
-Looking in /proc/keys, the last 8 hex digits of the key fingerprint are
-displayed, along with the subtype:
-
-	1a39e171 I-----     1 perm 3f010000     0     0 crypto    modsign.0: dsa 5acc2142 []
-
-
-===============
-CRYPTO SUBTYPES
-===============
-
-The crypto key is just a simple container.  It contains no data of its own and
-does very little except provide a place to hang a function pointer table.  The
-key subtype does the actual work.
-
-When a crypto key is instantiated, it looks through its list of registered
-subtypes to try and find one that can handle the data blob it is given.  If the
-data blob begins with a byte with the top bit set, it is assumed to be a PGP
-packet format blob [RFC 4880] and is treated so.  The blob is parsed to find a
-PGP key, and then a subtype is looked for that says it can handle the
-appropriate algorithm type.
-
-
-=====================
-ACCESSING CRYPTO KEYS
-=====================
-
-To access crypto keys from within the kernel, the following inclusion is
-required:
-
-	#include <keys/crypto-type.h>
-
-This gives access to the key type:
-
-	struct key_type key_type_crypto;
-
-
-SIGNATURE VERIFICATION
-----------------------
-
-The four operations that can perform cryptographic signature verification,
-using a key to provide the public key:
-
- (1) Begin verification procedure.
-
-	struct crypto_key_verify_context *
-	verify_sig_begin(struct key *key, const void *sig, size_t siglen);
-
-     This function sets up a verification context from the specified key and
-     the signature blob.  The signature blob must be presented again at the end
-     of the procedure.  The key is checked against parameters in the signature,
-     and if it's not the right key then an error will be given.
-
-     If such a thing applies, the hashing algorithm, will be extracted from the
-     signature and the appropriate crypto module will be used.  -ENOPKG will be
-     returned if the hash algorithm is unavailable.
-
-     The return value is an opaque pointer to be passed to the other functions,
-     or a negative error code.
-
- (2) Indicate data to be verified.
-
-	int verify_sig_add_data(struct crypto_key_verify_context *ctx,
-				const void *data, size_t datalen);
-
-     This function is used to shovel data to the verification procedure so that
-     it can load it into the hash, pass it to hardware or whatever is
-     appropriate for the algorithm being employed.
-
-     The data is not canonicalised for the document type specified in the
-     signature.  The caller must do that.
-
-     It will return 0 if successful and a negative error code if not.
-
- (3) Complete the verification process.
-
-	int verify_sig_end(struct crypto_key_verify_context *ctx,
-			   const void *sig, size_t siglen);
-
-     This function performs the actual signature verification step and cleans
-     up the resources allocated at the beginning.  The signature must be
-     presented again as some of the data therein may need to be added to the
-     internal hash.
-
-     It will return -EKEYREJECTED if the signature didn't match, 0 if
-     successful and may return other errors as appropriate.
-
- (4) Cancel the verification process.
-
-	void verify_sig_cancel(struct crypto_key_verify_context *ctx);
-
-     This function cleans up the resources allocated at the beginning.  This is
-     not necessary if verify_sig_end() was called.
-
-
-To find a key to use for signature verification, the following function may be
-called:
-
-	struct key *request_crypto_key_for_PGP_sig(struct key *keyring,
-						  const u8 *sig, size_t siglen);
-
-This parses the specified signature blob to find the signing key identity and
-then searches the given keyring for a matching key.  It may also examine a
-hardware keystore (such as a TPM) for a usable signature matching service and
-generate a key to provide an access method to that service.
-
-
-INITIAL PGP KEY LOADING
------------------------
-
-A function is provided to perform an initial load of a set of public keys bound
-into a PGP keyring blob:
-
-	int load_PGP_keys(const u8 *pgpdata, size_t pgpdatalen,
-			  struct key *keyring, const char *descprefix);
-
-This takes the blob of data defined by pgpdata and pgpdatalen, extracts keys
-from them and adds them to the specified keyring.  The keys are labelled with
-descprefix plus a simple uniquifier - it is not expected that the description
-will be used to identify the key.  The description is required to prevent all
-but the last key being discarded when the keys are linked into the keyring.
-
-This function is only available during initial kernel set up.
-
-
-============================
-IMPLEMENTING CRYPTO SUBTYPES
-============================
-
-Each subtype is specified through a definition structure:
-
-	struct crypto_key_subtype {
-		struct module		*owner;
-		const char		*name;
-		enum pgp_pubkey_algo	pubkey_algo : 8;
-		unsigned short		info;
-
-		int (*instantiate)(struct key *key,
-				   const void *data, size_t datalen);
-
-		void (*revoke)(struct key *key);
-		void (*destroy)(struct key *key);
-
-		struct crypto_key_verify_context *(*verify_sig_begin)(
-			struct key *key, const u8 *sig, size_t siglen);
-		int (*verify_sig_add_data)(struct crypto_key_verify_context *ctx,
-					   const void *data, size_t datalen);
-		int (*verify_sig_end)(struct crypto_key_verify_context *ctx,
-				      const u8 *sig, size_t siglen);
-		void (*verify_sig_cancel)(struct crypto_key_verify_context *ctx);
-	};
-
-The owner and name fields should be set to the owning module and the name of
-the subtype.
-
-If the subtype represents a PGP public key algorithm the info field should have
-CRYPTO_KEY_IS_PUBKEY_ALGO OR'd into it and pubkey_algo should be set to the
-appropriate PGP_PUBKEY_ constant from the enumeration in <linux/pgp.h>.
-
-
-There are a number of operations defined by the subtype.  The first few are for
-management of the key itself:
-
- (1) instantiate().
-
-     Mandatory.  When the subtype is selected, the instantiate() method will be
-     given the key being instantiated and the data blob.  If the first byte of
-     the data blob has bit 7 set, then it's a PGP packet blob and can be parsed
-     with the routines declared in <linux/pgp.h>.
-
-     If the key has a fingerprint or other auxiliary identifier, this should be
-     determined or calculated and a copy attached to key->type_data.p[1].
-
-     If successful, the subtype must set key->type_data.p[0] to point to its
-     definition.
-
-     The subtype may use key->payload in anyway it sees fit.
-
- (2) revoke().
-
-     Optional.  Notification that the key has been revoked.  This provides the
-     subtype the opportunity to discard some memory, but care should be taken
-     as the key may be in use when this is called.
-
- (3) destroy().
-
-     Mandatory.  key->type_data.p[0] is cleared by the caller and the module
-     usage will be decremented upon return.  The memory pointed to by
-     key->type_data.[1] will be freed after this method returns.  This method
-     must free whatever key->payload refers to.
-
-
-There are then sets of method pointers to actually use the key for things:
-
- (*) Signature verification
-
-     Then there are functions to verify a signature using the public key stored in
-     this key:
-
-	(1) verify_sig_begin().
-	(2) verify_sig_add_data().
-	(3) verify_sig_end().
-	(4) verify_sig_cancel().
-
-     These correspond to the accessor functions mentioned in the previous
-     section.  The first function is optional - if it is not provided, then
-     verification is not a service available with this key.  The other three
-     are mandatory if the first is supplied and unnecessary otherwise.
-
-     The subtype should allocate a context in ->verify_sig_begin() and embed
-     the following struct in it:
-
-	struct crypto_key_verify_context {
-		struct key *key;
-	};
-
-     A pointer to this struct is then returned to the caller.  This is used by
-     the master routines to route the operations to the right place.  This is
-     passed to the _add_data, _end and _cancel routines - which should use
-     container_of() on it to get the full context.
-
-
-REGISTRATION
-------------
-
-Functions are provided to register and unregister key subtypes:
-
-	int register_crypto_key_subtype(struct crypto_key_subtype *subtype);
-	void unregister_crypto_key_subtype(struct crypto_key_subtype *subtype);
-
-Key subtypes may have the same name, provided they differ in some other
-criterion, such as the public key algorithm ID.  This makes it possible to
-handle algorithms such as RSA that have multiple algorithm IDs.
+ Documentation/00-INDEX  |    2 +
+ Documentation/crc32.txt |  183 +++++++++++++++++++++++++++++++++++++++++++++++
+ lib/crc32.c             |  129 +--------------------------------
+ 3 files changed, 187 insertions(+), 127 deletions(-)
+ create mode 100644 Documentation/crc32.txt
+
+
+diff --git a/Documentation/00-INDEX b/Documentation/00-INDEX
+index 65bbd26..e7b38a0 100644
+--- a/Documentation/00-INDEX
++++ b/Documentation/00-INDEX
+@@ -104,6 +104,8 @@ cpuidle/
+ 	- info on CPU_IDLE, CPU idle state management subsystem.
+ cputopology.txt
+ 	- documentation on how CPU topology info is exported via sysfs.
++crc32.txt
++	- brief tutorial on CRC computation
+ cris/
+ 	- directory with info about Linux on CRIS architecture.
+ crypto/
+diff --git a/Documentation/crc32.txt b/Documentation/crc32.txt
+new file mode 100644
+index 0000000..3d74ba4
+--- /dev/null
++++ b/Documentation/crc32.txt
+@@ -0,0 +1,183 @@
++A brief CRC tutorial.
++
++A CRC is a long-division remainder.  You add the CRC to the message,
++and the whole thing (message+CRC) is a multiple of the given
++CRC polynomial.  To check the CRC, you can either check that the
++CRC matches the recomputed value, *or* you can check that the
++remainder computed on the message+CRC is 0.  This latter approach
++is used by a lot of hardware implementations, and is why so many
++protocols put the end-of-frame flag after the CRC.
++
++It's actually the same long division you learned in school, except that
++- We're working in binary, so the digits are only 0 and 1, and
++- When dividing polynomials, there are no carries.  Rather than add and
++  subtract, we just xor.  Thus, we tend to get a bit sloppy about
++  the difference between adding and subtracting.
++
++Like all division, the remainder is always smaller than the divisor.
++To produce a 32-bit CRC, the divisor is actually a 33-bit CRC polynomial.
++Since it's 33 bits long, bit 32 is always going to be set, so usually the
++CRC is written in hex with the most significant bit omitted.  (If you're
++familiar with the IEEE 754 floating-point format, it's the same idea.)
++
++Note that a CRC is computed over a string of *bits*, so you have
++to decide on the endianness of the bits within each byte.  To get
++the best error-detecting properties, this should correspond to the
++order they're actually sent.  For example, standard RS-232 serial is
++little-endian; the most significant bit (sometimes used for parity)
++is sent last.  And when appending a CRC word to a message, you should
++do it in the right order, matching the endianness.
++
++Just like with ordinary division, you proceed one digit (bit) at a time.
++Each step of the division, division, you take one more digit (bit) of the
++dividend and append it to the current remainder.  Then you figure out the
++appropriate multiple of the divisor to subtract to being the remainder
++back into range.  In binary, this is easy - it has to be either 0 or 1,
++and to make the XOR cancel, it's just a copy of bit 32 of the remainder.
++
++When computing a CRC, we don't care about the quotient, so we can
++throw the quotient bit away, but subtract the appropriate multiple of
++the polynomial from the remainder and we're back to where we started,
++ready to process the next bit.
++
++A big-endian CRC written this way would be coded like:
++for (i = 0; i < input_bits; i++) {
++	multiple = remainder & 0x80000000 ? CRCPOLY : 0;
++	remainder = (remainder << 1 | next_input_bit()) ^ multiple;
++}
++
++Notice how, to get at bit 32 of the shifted remainder, we look
++at bit 31 of the remainder *before* shifting it.
++
++But also notice how the next_input_bit() bits we're shifting into
++the remainder don't actually affect any decision-making until
++32 bits later.  Thus, the first 32 cycles of this are pretty boring.
++Also, to add the CRC to a message, we need a 32-bit-long hole for it at
++the end, so we have to add 32 extra cycles shifting in zeros at the
++end of every message,
++
++These details lead to a standard trick: rearrange merging in the
++next_input_bit() until the moment it's needed.  Then the first 32 cycles
++can be precomputed, and merging in the final 32 zero bits to make room
++for the CRC can be skipped entirely.  This changes the code to:
++
++for (i = 0; i < input_bits; i++) {
++	remainder ^= next_input_bit() << 31;
++	multiple = (remainder & 0x80000000) ? CRCPOLY : 0;
++	remainder = (remainder << 1) ^ multiple;
++}
++
++With this optimization, the little-endian code is particularly simple:
++for (i = 0; i < input_bits; i++) {
++	remainder ^= next_input_bit();
++	multiple = (remainder & 1) ? CRCPOLY : 0;
++	remainder = (remainder >> 1) ^ multiple;
++}
++
++The most significant coefficient of the remainder polynomial is stored
++in the least significant bit of the binary "remainder" variable.
++The other details of endianness have been hidden in CRCPOLY (which must
++be bit-reversed) and next_input_bit().
++
++As long as next_input_bit is returning the bits in a sensible order, we don't
++*have* to wait until the last possible moment to merge in additional bits.
++We can do it 8 bits at a time rather than 1 bit at a time:
++for (i = 0; i < input_bytes; i++) {
++	remainder ^= next_input_byte() << 24;
++	for (j = 0; j < 8; j++) {
++		multiple = (remainder & 0x80000000) ? CRCPOLY : 0;
++		remainder = (remainder << 1) ^ multiple;
++	}
++}
++
++Or in little-endian:
++for (i = 0; i < input_bytes; i++) {
++	remainder ^= next_input_byte();
++	for (j = 0; j < 8; j++) {
++		multiple = (remainder & 1) ? CRCPOLY : 0;
++		remainder = (remainder >> 1) ^ multiple;
++	}
++}
++
++If the input is a multiple of 32 bits, you can even XOR in a 32-bit
++word at a time and increase the inner loop count to 32.
++
++You can also mix and match the two loop styles, for example doing the
++bulk of a message byte-at-a-time and adding bit-at-a-time processing
++for any fractional bytes at the end.
++
++To reduce the number of conditional branches, software commonly uses
++the byte-at-a-time table method, popularized by Dilip V. Sarwate,
++"Computation of Cyclic Redundancy Checks via Table Look-Up", Comm. ACM
++v.31 no.8 (August 1998) p. 1008-1013.
++
++Here, rather than just shifting one bit of the remainder to decide
++in the correct multiple to subtract, we can shift a byte at a time.
++This produces a 40-bit (rather than a 33-bit) intermediate remainder,
++and the correct multiple of the polynomial to subtract is found using
++a 256-entry lookup table indexed by the high 8 bits.
++
++(The table entries are simply the CRC-32 of the given one-byte messages.)
++
++When space is more constrained, smaller tables can be used, e.g. two
++4-bit shifts followed by a lookup in a 16-entry table.
++
++It is not practical to process much more than 8 bits at a time using this
++technique, because tables larger than 256 entries use too much memory and,
++more importantly, too much of the L1 cache.
++
++To get higher software performance, a "slicing" technique can be used.
++See "High Octane CRC Generation with the Intel Slicing-by-8 Algorithm",
++ftp://download.intel.com/technology/comms/perfnet/download/slicing-by-8.pdf
++
++This does not change the number of table lookups, but does increase
++the parallelism.  With the classic Sarwate algorithm, each table lookup
++must be completed before the index of the next can be computed.
++
++A "slicing by 2" technique would shift the remainder 16 bits at a time,
++producing a 48-bit intermediate remainder.  Rather than doing a single
++lookup in a 65536-entry table, the two high bytes are looked up in
++two different 256-entry tables.  Each contains the remainder required
++to cancel out the corresponding byte.  The tables are different because the
++polynomials to cancel are different.  One has non-zero coefficients from
++x^32 to x^39, while the other goes from x^40 to x^47.
++
++Since modern processors can handle many parallel memory operations, this
++takes barely longer than a single table look-up and thus performs almost
++twice as fast as the basic Sarwate algorithm.
++
++This can be extended to "slicing by 4" using 4 256-entry tables.
++Each step, 32 bits of data is fetched, XORed with the CRC, and the result
++broken into bytes and looked up in the tables.  Because the 32-bit shift
++leaves the low-order bits of the intermediate remainder zero, the
++final CRC is simply the XOR of the 4 table look-ups.
++
++But this still enforces sequential execution: a second group of table
++look-ups cannot begin until the previous groups 4 table look-ups have all
++been completed.  Thus, the processor's load/store unit is sometimes idle.
++
++To make maximum use of the processor, "slicing by 8" performs 8 look-ups
++in parallel.  Each step, the 32-bit CRC is shifted 64 bits and XORed
++with 64 bits of input data.  What is important to note is that 4 of
++those 8 bytes are simply copies of the input data; they do not depend
++on the previous CRC at all.  Thus, those 4 table look-ups may commence
++immediately, without waiting for the previous loop iteration.
++
++By always having 4 loads in flight, a modern superscalar processor can
++be kept busy and make full use of its L1 cache.
++
++Two more details about CRC implementation in the real world:
++
++Normally, appending zero bits to a message which is already a multiple
++of a polynomial produces a larger multiple of that polynomial.  Thus,
++a basic CRC will not detect appended zero bits (or bytes).  To enable
++a CRC to detect this condition, it's common to invert the CRC before
++appending it.  This makes the remainder of the message+crc come out not
++as zero, but some fixed non-zero value.  (The CRC of the inversion
++pattern, 0xffffffff.)
++
++The same problem applies to zero bits prepended to the message, and a
++similar solution is used.  Instead of starting the CRC computation with
++a remainder of 0, an initial remainder of all ones is used.  As long as
++you start the same way on decoding, it doesn't make a difference.
++
+diff --git a/lib/crc32.c b/lib/crc32.c
+index 23b08ba..7ac8b0d 100644
+--- a/lib/crc32.c
++++ b/lib/crc32.c
+@@ -20,6 +20,8 @@
+  * Version 2.  See the file COPYING for more details.
+  */
+ 
++/* see: Documentation/crc32.txt for a description of algorithms */
++
+ #include <linux/crc32.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -208,133 +210,6 @@ u32 __pure crc32_be(u32 crc, unsigned char const *p, size_t len)
+ EXPORT_SYMBOL(crc32_le);
+ EXPORT_SYMBOL(crc32_be);
+ 
+-/*
+- * A brief CRC tutorial.
+- *
+- * A CRC is a long-division remainder.  You add the CRC to the message,
+- * and the whole thing (message+CRC) is a multiple of the given
+- * CRC polynomial.  To check the CRC, you can either check that the
+- * CRC matches the recomputed value, *or* you can check that the
+- * remainder computed on the message+CRC is 0.  This latter approach
+- * is used by a lot of hardware implementations, and is why so many
+- * protocols put the end-of-frame flag after the CRC.
+- *
+- * It's actually the same long division you learned in school, except that
+- * - We're working in binary, so the digits are only 0 and 1, and
+- * - When dividing polynomials, there are no carries.  Rather than add and
+- *   subtract, we just xor.  Thus, we tend to get a bit sloppy about
+- *   the difference between adding and subtracting.
+- *
+- * A 32-bit CRC polynomial is actually 33 bits long.  But since it's
+- * 33 bits long, bit 32 is always going to be set, so usually the CRC
+- * is written in hex with the most significant bit omitted.  (If you're
+- * familiar with the IEEE 754 floating-point format, it's the same idea.)
+- *
+- * Note that a CRC is computed over a string of *bits*, so you have
+- * to decide on the endianness of the bits within each byte.  To get
+- * the best error-detecting properties, this should correspond to the
+- * order they're actually sent.  For example, standard RS-232 serial is
+- * little-endian; the most significant bit (sometimes used for parity)
+- * is sent last.  And when appending a CRC word to a message, you should
+- * do it in the right order, matching the endianness.
+- *
+- * Just like with ordinary division, the remainder is always smaller than
+- * the divisor (the CRC polynomial) you're dividing by.  Each step of the
+- * division, you take one more digit (bit) of the dividend and append it
+- * to the current remainder.  Then you figure out the appropriate multiple
+- * of the divisor to subtract to being the remainder back into range.
+- * In binary, it's easy - it has to be either 0 or 1, and to make the
+- * XOR cancel, it's just a copy of bit 32 of the remainder.
+- *
+- * When computing a CRC, we don't care about the quotient, so we can
+- * throw the quotient bit away, but subtract the appropriate multiple of
+- * the polynomial from the remainder and we're back to where we started,
+- * ready to process the next bit.
+- *
+- * A big-endian CRC written this way would be coded like:
+- * for (i = 0; i < input_bits; i++) {
+- * 	multiple = remainder & 0x80000000 ? CRCPOLY : 0;
+- * 	remainder = (remainder << 1 | next_input_bit()) ^ multiple;
+- * }
+- * Notice how, to get at bit 32 of the shifted remainder, we look
+- * at bit 31 of the remainder *before* shifting it.
+- *
+- * But also notice how the next_input_bit() bits we're shifting into
+- * the remainder don't actually affect any decision-making until
+- * 32 bits later.  Thus, the first 32 cycles of this are pretty boring.
+- * Also, to add the CRC to a message, we need a 32-bit-long hole for it at
+- * the end, so we have to add 32 extra cycles shifting in zeros at the
+- * end of every message,
+- *
+- * So the standard trick is to rearrage merging in the next_input_bit()
+- * until the moment it's needed.  Then the first 32 cycles can be precomputed,
+- * and merging in the final 32 zero bits to make room for the CRC can be
+- * skipped entirely.
+- * This changes the code to:
+- * for (i = 0; i < input_bits; i++) {
+- *      remainder ^= next_input_bit() << 31;
+- * 	multiple = (remainder & 0x80000000) ? CRCPOLY : 0;
+- * 	remainder = (remainder << 1) ^ multiple;
+- * }
+- * With this optimization, the little-endian code is simpler:
+- * for (i = 0; i < input_bits; i++) {
+- *      remainder ^= next_input_bit();
+- * 	multiple = (remainder & 1) ? CRCPOLY : 0;
+- * 	remainder = (remainder >> 1) ^ multiple;
+- * }
+- *
+- * Note that the other details of endianness have been hidden in CRCPOLY
+- * (which must be bit-reversed) and next_input_bit().
+- *
+- * However, as long as next_input_bit is returning the bits in a sensible
+- * order, we can actually do the merging 8 or more bits at a time rather
+- * than one bit at a time:
+- * for (i = 0; i < input_bytes; i++) {
+- * 	remainder ^= next_input_byte() << 24;
+- * 	for (j = 0; j < 8; j++) {
+- * 		multiple = (remainder & 0x80000000) ? CRCPOLY : 0;
+- * 		remainder = (remainder << 1) ^ multiple;
+- * 	}
+- * }
+- * Or in little-endian:
+- * for (i = 0; i < input_bytes; i++) {
+- * 	remainder ^= next_input_byte();
+- * 	for (j = 0; j < 8; j++) {
+- * 		multiple = (remainder & 1) ? CRCPOLY : 0;
+- * 		remainder = (remainder << 1) ^ multiple;
+- * 	}
+- * }
+- * If the input is a multiple of 32 bits, you can even XOR in a 32-bit
+- * word at a time and increase the inner loop count to 32.
+- *
+- * You can also mix and match the two loop styles, for example doing the
+- * bulk of a message byte-at-a-time and adding bit-at-a-time processing
+- * for any fractional bytes at the end.
+- *
+- * The only remaining optimization is to the byte-at-a-time table method.
+- * Here, rather than just shifting one bit of the remainder to decide
+- * in the correct multiple to subtract, we can shift a byte at a time.
+- * This produces a 40-bit (rather than a 33-bit) intermediate remainder,
+- * but again the multiple of the polynomial to subtract depends only on
+- * the high bits, the high 8 bits in this case.
+- *
+- * The multiple we need in that case is the low 32 bits of a 40-bit
+- * value whose high 8 bits are given, and which is a multiple of the
+- * generator polynomial.  This is simply the CRC-32 of the given
+- * one-byte message.
+- *
+- * Two more details: normally, appending zero bits to a message which
+- * is already a multiple of a polynomial produces a larger multiple of that
+- * polynomial.  To enable a CRC to detect this condition, it's common to
+- * invert the CRC before appending it.  This makes the remainder of the
+- * message+crc come out not as zero, but some fixed non-zero value.
+- *
+- * The same problem applies to zero bits prepended to the message, and
+- * a similar solution is used.  Instead of starting with a remainder of
+- * 0, an initial remainder of all ones is used.  As long as you start
+- * the same way on decoding, it doesn't make a difference.
+- */
+-
+ #ifdef UNITTEST
+ 
+ #include <stdlib.h>
