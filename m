@@ -1,40 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 08/62] x86: remove the second argument of
-	k[un]map_atomic()
-Date: Mon, 28 Nov 2011 20:47:19 +0800
-Message-ID: <20111128124719.GA16828@gondor.apana.org.au>
-References: <1322371662-26166-1-git-send-email-amwang@redhat.com> <1322371662-26166-9-git-send-email-amwang@redhat.com>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 02/14] KEYS: Permit key_serial() to be called with a const key
+ pointer
+Date: Mon, 28 Nov 2011 15:44:48 +0000
+Message-ID: <20111128154448.6009.8418.stgit@warthog.procyon.org.uk>
+References: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	Avi Kivity <avi@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Olaf Hering <olaf@aepfle.de>, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org
-To: Cong Wang <amwang@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56172 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751706Ab1K1Mrv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Nov 2011 07:47:51 -0500
-Content-Disposition: inline
-In-Reply-To: <1322371662-26166-9-git-send-email-amwang@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mitry.kasatkin@intel.com,
+	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
+	alan.cox@intel.com, David Howells <dhowells@redhat.com>
+To: keyrings@linux-nfs.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Nov 27, 2011 at 01:26:48PM +0800, Cong Wang wrote:
-> 
-> Signed-off-by: Cong Wang <amwang@redhat.com>
+Permit key_serial() to be called with a const key pointer.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ include/linux/key.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+diff --git a/include/linux/key.h b/include/linux/key.h
+index 183a6af..f87b51b 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -271,7 +271,7 @@ extern int keyring_add_key(struct key *keyring,
+ 
+ extern struct key *key_lookup(key_serial_t id);
+ 
+-static inline key_serial_t key_serial(struct key *key)
++static inline key_serial_t key_serial(const struct key *key)
+ {
+ 	return key ? key->serial : 0;
+ }
