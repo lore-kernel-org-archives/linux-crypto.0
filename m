@@ -1,356 +1,354 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 07/14] PGP: Add signature parser
-Date: Mon, 28 Nov 2011 15:45:52 +0000
-Message-ID: <20111128154552.6009.26257.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 00/14][RFC] Crypto keys and module signing
+Date: Mon, 28 Nov 2011 16:27:53 +0000
+Message-ID: <8668.1322497673@redhat.com>
 References: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mitry.kasatkin@intel.com,
+	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
 	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com, David Howells <dhowells@redhat.com>
+	alan.cox@intel.com
 To: keyrings@linux-nfs.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20111128154436.6009.77586.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add some PGP signature parsing helpers:
 
- (1) A function to parse V4 signature subpackets and pass the desired ones to
-     a processor function:
+Here are a set of patches that create a framework for using cryptographic keys
+within the kernel.  The basic crypto key has no requirements as to how the key
+is implemented; it's basically a jump table for the operations and an anchor
+for any relevant data.
 
-	int pgp_parse_sig_subpkts(const u8 *data, size_t datalen,
-				  struct pgp_parse_sig_context *ctx);
+I have provided a couple of subtypes: DSA and RSA.  The DSA type has signature
+verification facilities available within the kernel, and is used for module
+signature verification.
 
- (2) A function to parse out basic signature parameters from any PGP signature
-     such that the algorithms and public key can be selected:
+These two subtypes store their public key data attached to the key and
+implement the algorithms within the kernel.  However, it would be possible to
+merely refer to keys held in a hardware keystore (such as a TPM) and have the
+accessor methods offload the actual work to that keystore to be done in
+hardware.
 
-	int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-				 struct pgp_sig_parameters *p);
 
-Signed-off-by: David Howells <dhowells@redhat.com>
+The patches break down into a number of areas:
+
+ (0) Dmitry Kasatkin's MPI library patches - which I have not included here
+     but that can be obtained from the security GIT tree.
+
+ (1) Utility: MPI function exports and make key_serial() handle a const pointer.
+
+ (2) PGP defs and PGP packet parser; basic crypto key infrastructure.
+
+ (3) DSA key and RSA key basic implementations.
+
+ (4) PGP signature parser; signature verification operations.
+
+ (5) DSA verification algorithm.
+
+ (6) Module ELF verification and module signature verification.
+
+I have included the documentation for the crypto key type below.
+
+David
+
 ---
+			    ======================
+			    CRYPTOGRAPHIC KEY TYPE
+			    ======================
 
- include/linux/pgp.h       |   24 ++++
- security/keys/pgp_parse.c |  274 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 298 insertions(+), 0 deletions(-)
+Contents:
+
+  - Overview.
+  - Key identification.
+  - Crypto subtypes.
+  - Accessing crypto keys.
+    - Signature verification.
+    - Initial pgp key loading.
+  - Implementing crypto subtypes.
+    - Registration.
 
 
-diff --git a/include/linux/pgp.h b/include/linux/pgp.h
-index 7e86a06..29b9758 100644
---- a/include/linux/pgp.h
-+++ b/include/linux/pgp.h
-@@ -227,4 +227,28 @@ struct pgp_parse_pubkey {
- extern int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
- 				struct pgp_parse_pubkey *pk);
- 
-+struct pgp_parse_sig_context {
-+	unsigned long types_of_interest[128 / BITS_PER_LONG];
-+	int (*process_packet)(struct pgp_parse_sig_context *context,
-+			      enum pgp_sig_subpkt_type type,
-+			      const u8 *data,
-+			      size_t datalen);
-+};
-+
-+extern int pgp_parse_sig_packets(const u8 *data, size_t datalen,
-+				 struct pgp_parse_sig_context *ctx);
-+
-+struct pgp_sig_parameters {
-+	enum pgp_signature_type signature_type : 8;
-+	union {
-+		struct pgp_key_ID issuer;
-+		__be32 issuer32[2];
-+	};
-+	enum pgp_pubkey_algo pubkey_algo : 8;
-+	enum pgp_hash_algo hash_algo : 8;
-+};
-+
-+extern int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-+				struct pgp_sig_parameters *p);
-+
- #endif /* _LINUX_PGP_H */
-diff --git a/security/keys/pgp_parse.c b/security/keys/pgp_parse.c
-index fb8d64a..b7bfeb1 100644
---- a/security/keys/pgp_parse.c
-+++ b/security/keys/pgp_parse.c
-@@ -252,3 +252,277 @@ int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(pgp_parse_public_key);
-+
-+/**
-+ * pgp_parse_sig_subpkt_header - Parse a PGP V4 signature subpacket header
-+ * @_data: Start of the subpacket (updated to subpacket data)
-+ * @_datalen: Amount of data remaining in buffer (decreased)
-+ * @_type: Where the subpacket type will be returned
-+ *
-+ * Parse a PGP V4 signature subpacket header [RFC 4880: 5.2.3.1].
-+ *
-+ * Returns packet data size on success; non-zero on error.  If successful,
-+ * *_data and *_datalen will have been updated and *_headerlen will be set to
-+ * hold the length of the packet header.
-+ */
-+ssize_t pgp_parse_sig_subpkt_header(const u8 **_data, size_t *_datalen,
-+				    enum pgp_sig_subpkt_type *_type)
-+{
-+	enum pgp_sig_subpkt_type type;
-+	const u8 *data = *_data;
-+	size_t size, datalen = *_datalen;
-+
-+	pr_devel("-->pgp_parse_sig_subpkt_header(,%zu,,)", datalen);
-+
-+	if (datalen < 2)
-+		goto short_subpacket;
-+
-+	pr_devel("subpkt hdr %02x, %02x\n", data[0], data[1]);
-+
-+	switch (data[0]) {
-+	case 0x00 ... 0xbf:
-+		/* One-byte length */
-+		size = data[0];
-+		data++;
-+		datalen--;
-+		break;
-+	case 0xc0 ... 0xfe:
-+		/* Two-byte length */
-+		if (datalen < 3)
-+			goto short_subpacket;
-+		size = (data[0] - 192) * 256;
-+		size += data[1] + 192;
-+		data += 2;
-+		datalen -= 2;
-+		break;
-+	case 0xff:
-+		if (datalen < 6)
-+			goto short_subpacket;
-+		size  = data[1] << 24;
-+		size |= data[2] << 16;
-+		size |= data[3] << 8;
-+		size |= data[4];
-+		data += 5;
-+		datalen -= 5;
-+		break;
-+	}
-+
-+	/* The type octet is included in the size */
-+	if (size == 0) {
-+		pr_warning("Signature subpacket size can't be zero\n");
-+		return -EBADMSG;
-+	}
-+
-+	type = *data++ & ~PGP_SIG_SUBPKT_TYPE_CRITICAL_MASK;
-+	datalen--;
-+	size--;
-+
-+	pr_devel("datalen=%zu size=%zu", datalen, size);
-+	if (datalen < size)
-+		goto short_subpacket;
-+
-+	*_data = data;
-+	*_datalen = datalen;
-+	*_type = type;
-+	pr_devel("Found subpkt type=%u size=%zd\n", type, size);
-+	return size;
-+
-+short_subpacket:
-+	pr_warning("Attempt to parse short signature subpacket\n");
-+	return -EBADMSG;
-+}
-+
-+/**
-+ * pgp_parse_sig_subpkts - Parse a set of PGP V4 signatute subpackets
-+ * @_data: Data to be parsed (updated)
-+ * @_datalen: Amount of data (updated)
-+ * @ctx: Parsing context
-+ *
-+ * Parse a set of PGP signature subpackets [RFC 4880: 5.2.3].
-+ */
-+int pgp_parse_sig_subpkts(const u8 *data, size_t datalen,
-+			  struct pgp_parse_sig_context *ctx)
-+{
-+	enum pgp_sig_subpkt_type type;
-+	ssize_t pktlen;
-+	int ret;
-+
-+	pr_devel("-->pgp_parse_sig_subpkts(,%zu,,)", datalen);
-+
-+	while (datalen > 2) {
-+		pktlen = pgp_parse_sig_subpkt_header(&data, &datalen, &type);
-+		if (pktlen < 0)
-+			return pktlen;
-+		if (test_bit(type, ctx->types_of_interest)) {
-+			ret = ctx->process_packet(ctx, type, data, pktlen);
-+			if (ret < 0)
-+				return ret;
-+		}
-+		data += pktlen;
-+		datalen -= pktlen;
-+	}
-+
-+	if (datalen != 0) {
-+		pr_warning("Excess octets in signature subpacket stream\n");
-+		return -EBADMSG;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(pgp_parse_sig_subpkts);
-+
-+struct pgp_parse_sig_params_ctx {
-+	struct pgp_parse_sig_context base;
-+	struct pgp_sig_parameters *params;
-+	bool got_the_issuer;
-+};
-+
-+/*
-+ * Process a V4 signature subpacket.
-+ */
-+static int pgp_process_sig_params_subpkt(struct pgp_parse_sig_context *context,
-+					 enum pgp_sig_subpkt_type type,
-+					 const u8 *data,
-+					 size_t datalen)
-+{
-+	struct pgp_parse_sig_params_ctx *ctx =
-+		container_of(context, struct pgp_parse_sig_params_ctx, base);
-+
-+	if (ctx->got_the_issuer) {
-+		pr_warning("V4 signature packet has multiple issuers\n");
-+		return -EBADMSG;
-+	}
-+
-+	if (datalen != 8) {
-+		pr_warning("V4 signature issuer subpkt not 8 long (%zu)\n",
-+			   datalen);
-+		return -EBADMSG;
-+	}
-+
-+	memcpy(&ctx->params->issuer, data, 8);
-+	ctx->got_the_issuer = true;
-+	return 0;
-+}
-+
-+/**
-+ * pgp_parse_sig_params - Parse basic parameters from a PGP signature packet
-+ * @_data: Content of packet (updated)
-+ * @_datalen: Length of packet remaining (updated)
-+ * @p: The basic parameters
-+ *
-+ * Parse the basic parameters from a PGP signature packet [RFC 4880: 5.2] that
-+ * are needed to start off a signature verification operation.  The only ones
-+ * actually necessary are the signature type (which affects how the data is
-+ * transformed) and the has algorithm.
-+ *
-+ * We also extract the public key algorithm and the issuer's key ID as we'll
-+ * need those to determine if we actually have the public key available.  If
-+ * not, then we can't verify the signature anyway.
-+ *
-+ * Returns 0 if successful or a negative error code.  *_data and *_datalen are
-+ * updated to point to the 16-bit subset of the hash value and the set of MPIs.
-+ */
-+int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-+			 struct pgp_sig_parameters *p)
-+{
-+	enum pgp_signature_version version;
-+	const u8 *data = *_data;
-+	size_t datalen = *_datalen;
-+	int ret;
-+
-+	pr_devel("-->pgp_parse_sig_params(,%zu,,)", datalen);
-+
-+	if (datalen < 1)
-+		return -EBADMSG;
-+	version = *data;
-+
-+	if (version == PGP_SIG_VERSION_3) {
-+		const struct pgp_signature_v3_packet *v3 = (const void *)data;
-+
-+		if (datalen < sizeof(*v3)) {
-+			pr_warning("Short V3 signature packet\n");
-+			return -EBADMSG;
-+		}
-+		datalen -= sizeof(*v3);
-+		data += sizeof(*v3);
-+
-+		/* V3 has everything we need in the header */
-+		p->signature_type = v3->hashed.signature_type;
-+		p->issuer = v3->issuer;
-+		p->pubkey_algo = v3->pubkey_algo;
-+		p->hash_algo = v3->hash_algo;
-+
-+	} else if (version == PGP_SIG_VERSION_4) {
-+		const struct pgp_signature_v4_packet *v4 = (const void *)data;
-+		struct pgp_parse_sig_params_ctx ctx = {
-+			.base.process_packet = pgp_process_sig_params_subpkt,
-+			.params = p,
-+			.got_the_issuer = false,
-+		};
-+		size_t subdatalen;
-+
-+		if (datalen < sizeof(*v4) + 2 + 2 + 2) {
-+			pr_warning("Short V4 signature packet\n");
-+			return -EBADMSG;
-+		}
-+		datalen -= sizeof(*v4);
-+		data += sizeof(*v4);
-+
-+		/* V4 has most things in the header... */
-+		p->signature_type = v4->signature_type;
-+		p->pubkey_algo = v4->pubkey_algo;
-+		p->hash_algo = v4->hash_algo;
-+
-+		/* ... but we have to get the key ID from the subpackets, of
-+		 * which there are two sets. */
-+		__set_bit(PGP_SIG_ISSUER, ctx.base.types_of_interest);
-+
-+		subdatalen  = *data++ << 8;
-+		subdatalen |= *data++;
-+		datalen -= 2;
-+		if (subdatalen) {
-+			/* Hashed subpackets */
-+			pr_devel("hashed data: %zu (after %zu)\n",
-+				 subdatalen, sizeof(*v4));
-+			if (subdatalen > datalen + 2 + 2) {
-+				pr_warning("Short V4 signature packet [hdata]\n");
-+				return -EBADMSG;
-+			}
-+			ret = pgp_parse_sig_subpkts(data, subdatalen, &ctx.base);
-+			if (ret < 0)
-+				return ret;
-+			data += subdatalen;
-+			datalen += subdatalen;
-+		}
-+
-+		subdatalen  = *data++ << 8;
-+		subdatalen |= *data++;
-+		datalen -= 2;
-+		if (subdatalen) {
-+			/* Unhashed subpackets */
-+			pr_devel("unhashed data: %zu\n", subdatalen);
-+			if (subdatalen > datalen + 2) {
-+				pr_warning("Short V4 signature packet [udata]\n");
-+				return -EBADMSG;
-+			}
-+			ret = pgp_parse_sig_subpkts(data, subdatalen, &ctx.base);
-+			if (ret < 0)
-+				return ret;
-+			data += subdatalen;
-+			datalen += subdatalen;
-+		}
-+
-+		if (!ctx.got_the_issuer) {
-+			pr_warning("V4 signature packet lacks issuer\n");
-+			return -EBADMSG;
-+		}
-+	} else {
-+		pr_warning("Signature packet with unhandled version %d\n", version);
-+		return -EBADMSG;
-+	}
-+
-+	*_data = data;
-+	*_datalen = datalen;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(pgp_parse_sig_params);
+========
+OVERVIEW
+========
+
+The "crypto" key type is designed to be a container for cryptographic keys,
+without imposing any particular restrictions on the form of the cryptography or
+the key.
+
+The crypto key is given a subtype that defines what sort of data is associated
+with the key and what operations might be performed with it.  However, no
+requirement is made that the key data actually be loaded into the key or that
+the operations are done by the kernel.
+
+For instance, cryptographic hardware (such as a TPM) might be used to both
+retain the relevant key and provide operations using that key.  In such a case,
+the crypto key would then merely be an interface to the TPM driver.
+
+
+==================
+KEY IDENTIFICATION
+==================
+
+Because the identity of a key is not necessarily known or is not easily
+calculated when a crypto key is allocated, it may not be a simple matter to set
+a key description to something that's useful for determining whether this is
+the key you're looking for.  Furthermore, it may be necessary to perform a
+partial match upon the key identity.
+
+To help with this, when a key is loaded, the key subtype's instantiation
+routine calculates the key fingerprint and stores a copy in the key struct.
+
+The crypto key type's key matching function then performs more checks than just
+the straightforward comparison of the description with the criterion string:
+
+ (1) If the criterion string is of the form "id:<hexdigits>" then the match
+     function will examine a key's fingerprint to see if the hex digits given
+     after the "id:" match the tail.  For instance:
+
+	keyctl search @s crypto id:5acc2142
+
+     will match a key with fingerprint:
+
+	1A00 2040 7601 7889 DE11  882C 3823 04AD 5ACC 2142
+
+ (2) If the criterion string is of the form "<subtype>:<hexdigits>" then the
+     match will match the ID as in (1), but with the added restriction that
+     only keys of the specified subtype (e.g. dsa or rsa) will be matched.  For
+     instance:
+
+	keyctl search @s crypto dsa:5acc2142
+
+Looking in /proc/keys, the last 8 hex digits of the key fingerprint are
+displayed, along with the subtype:
+
+	1a39e171 I-----     1 perm 3f010000     0     0 crypto    modsign.0: dsa 5acc2142 []
+
+
+===============
+CRYPTO SUBTYPES
+===============
+
+The crypto key is just a simple container.  It contains no data of its own and
+does very little except provide a place to hang a function pointer table.  The
+key subtype does the actual work.
+
+When a crypto key is instantiated, it looks through its list of registered
+subtypes to try and find one that can handle the data blob it is given.  If the
+data blob begins with a byte with the top bit set, it is assumed to be a PGP
+packet format blob [RFC 4880] and is treated so.  The blob is parsed to find a
+PGP key, and then a subtype is looked for that says it can handle the
+appropriate algorithm type.
+
+
+=====================
+ACCESSING CRYPTO KEYS
+=====================
+
+To access crypto keys from within the kernel, the following inclusion is
+required:
+
+	#include <keys/crypto-type.h>
+
+This gives access to the key type:
+
+	struct key_type key_type_crypto;
+
+
+SIGNATURE VERIFICATION
+----------------------
+
+The four operations that can perform cryptographic signature verification,
+using a key to provide the public key:
+
+ (1) Begin verification procedure.
+
+	struct crypto_key_verify_context *
+	verify_sig_begin(struct key *key, const void *sig, size_t siglen);
+
+     This function sets up a verification context from the specified key and
+     the signature blob.  The signature blob must be presented again at the end
+     of the procedure.  The key is checked against parameters in the signature,
+     and if it's not the right key then an error will be given.
+
+     If such a thing applies, the hashing algorithm, will be extracted from the
+     signature and the appropriate crypto module will be used.  -ENOPKG will be
+     returned if the hash algorithm is unavailable.
+
+     The return value is an opaque pointer to be passed to the other functions,
+     or a negative error code.
+
+ (2) Indicate data to be verified.
+
+	int verify_sig_add_data(struct crypto_key_verify_context *ctx,
+				const void *data, size_t datalen);
+
+     This function is used to shovel data to the verification procedure so that
+     it can load it into the hash, pass it to hardware or whatever is
+     appropriate for the algorithm being employed.
+
+     The data is not canonicalised for the document type specified in the
+     signature.  The caller must do that.
+
+     It will return 0 if successful and a negative error code if not.
+
+ (3) Complete the verification process.
+
+	int verify_sig_end(struct crypto_key_verify_context *ctx,
+			   const void *sig, size_t siglen);
+
+     This function performs the actual signature verification step and cleans
+     up the resources allocated at the beginning.  The signature must be
+     presented again as some of the data therein may need to be added to the
+     internal hash.
+
+     It will return -EKEYREJECTED if the signature didn't match, 0 if
+     successful and may return other errors as appropriate.
+
+ (4) Cancel the verification process.
+
+	void verify_sig_cancel(struct crypto_key_verify_context *ctx);
+
+     This function cleans up the resources allocated at the beginning.  This is
+     not necessary if verify_sig_end() was called.
+
+
+To find a key to use for signature verification, the following function may be
+called:
+
+	struct key *request_crypto_key_for_PGP_sig(struct key *keyring,
+						  const u8 *sig, size_t siglen);
+
+This parses the specified signature blob to find the signing key identity and
+then searches the given keyring for a matching key.  It may also examine a
+hardware keystore (such as a TPM) for a usable signature matching service and
+generate a key to provide an access method to that service.
+
+
+INITIAL PGP KEY LOADING
+-----------------------
+
+A function is provided to perform an initial load of a set of public keys bound
+into a PGP keyring blob:
+
+	int load_PGP_keys(const u8 *pgpdata, size_t pgpdatalen,
+			  struct key *keyring, const char *descprefix);
+
+This takes the blob of data defined by pgpdata and pgpdatalen, extracts keys
+from them and adds them to the specified keyring.  The keys are labelled with
+descprefix plus a simple uniquifier - it is not expected that the description
+will be used to identify the key.  The description is required to prevent all
+but the last key being discarded when the keys are linked into the keyring.
+
+This function is only available during initial kernel set up.
+
+
+============================
+IMPLEMENTING CRYPTO SUBTYPES
+============================
+
+Each subtype is specified through a definition structure:
+
+	struct crypto_key_subtype {
+		struct module		*owner;
+		const char		*name;
+		enum pgp_pubkey_algo	pubkey_algo : 8;
+		unsigned short		info;
+
+		int (*instantiate)(struct key *key,
+				   const void *data, size_t datalen);
+
+		void (*revoke)(struct key *key);
+		void (*destroy)(struct key *key);
+
+		struct crypto_key_verify_context *(*verify_sig_begin)(
+			struct key *key, const u8 *sig, size_t siglen);
+		int (*verify_sig_add_data)(struct crypto_key_verify_context *ctx,
+					   const void *data, size_t datalen);
+		int (*verify_sig_end)(struct crypto_key_verify_context *ctx,
+				      const u8 *sig, size_t siglen);
+		void (*verify_sig_cancel)(struct crypto_key_verify_context *ctx);
+	};
+
+The owner and name fields should be set to the owning module and the name of
+the subtype.
+
+If the subtype represents a PGP public key algorithm the info field should have
+CRYPTO_KEY_IS_PUBKEY_ALGO OR'd into it and pubkey_algo should be set to the
+appropriate PGP_PUBKEY_ constant from the enumeration in <linux/pgp.h>.
+
+
+There are a number of operations defined by the subtype.  The first few are for
+management of the key itself:
+
+ (1) instantiate().
+
+     Mandatory.  When the subtype is selected, the instantiate() method will be
+     given the key being instantiated and the data blob.  If the first byte of
+     the data blob has bit 7 set, then it's a PGP packet blob and can be parsed
+     with the routines declared in <linux/pgp.h>.
+
+     If the key has a fingerprint or other auxiliary identifier, this should be
+     determined or calculated and a copy attached to key->type_data.p[1].
+
+     If successful, the subtype must set key->type_data.p[0] to point to its
+     definition.
+
+     The subtype may use key->payload in anyway it sees fit.
+
+ (2) revoke().
+
+     Optional.  Notification that the key has been revoked.  This provides the
+     subtype the opportunity to discard some memory, but care should be taken
+     as the key may be in use when this is called.
+
+ (3) destroy().
+
+     Mandatory.  key->type_data.p[0] is cleared by the caller and the module
+     usage will be decremented upon return.  The memory pointed to by
+     key->type_data.[1] will be freed after this method returns.  This method
+     must free whatever key->payload refers to.
+
+
+There are then sets of method pointers to actually use the key for things:
+
+ (*) Signature verification
+
+     Then there are functions to verify a signature using the public key stored in
+     this key:
+
+	(1) verify_sig_begin().
+	(2) verify_sig_add_data().
+	(3) verify_sig_end().
+	(4) verify_sig_cancel().
+
+     These correspond to the accessor functions mentioned in the previous
+     section.  The first function is optional - if it is not provided, then
+     verification is not a service available with this key.  The other three
+     are mandatory if the first is supplied and unnecessary otherwise.
+
+     The subtype should allocate a context in ->verify_sig_begin() and embed
+     the following struct in it:
+
+	struct crypto_key_verify_context {
+		struct key *key;
+	};
+
+     A pointer to this struct is then returned to the caller.  This is used by
+     the master routines to route the operations to the right place.  This is
+     passed to the _add_data, _end and _cancel routines - which should use
+     container_of() on it to get the full context.
+
+
+REGISTRATION
+------------
+
+Functions are provided to register and unregister key subtypes:
+
+	int register_crypto_key_subtype(struct crypto_key_subtype *subtype);
+	void unregister_crypto_key_subtype(struct crypto_key_subtype *subtype);
+
+Key subtypes may have the same name, provided they differ in some other
+criterion, such as the public key algorithm ID.  This makes it possible to
+handle algorithms such as RSA that have multiple algorithm IDs.
