@@ -1,60 +1,42 @@
-From: Cong Wang <amwang@redhat.com>
-Subject: [PATCH 12/62] crypto: remove the second argument of k[un]map_atomic()
-Date: Sun, 27 Nov 2011 13:26:52 +0800
-Message-ID: <1322371662-26166-13-git-send-email-amwang@redhat.com>
-References: <1322371662-26166-1-git-send-email-amwang@redhat.com>
-Cc: akpm@linux-foundation.org, Cong Wang <amwang@redhat.com>,
+From: Avi Kivity <avi@redhat.com>
+Subject: Re: [PATCH 08/62] x86: remove the second argument of k[un]map_atomic()
+Date: Mon, 28 Nov 2011 14:35:03 +0200
+Message-ID: <4ED37FF7.2060207@redhat.com>
+References: <1322371662-26166-1-git-send-email-amwang@redhat.com> <1322371662-26166-9-git-send-email-amwang@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1322371662-26166-1-git-send-email-amwang@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Olaf Hering <olaf@aepfle.de>, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org
+To: Cong Wang <amwang@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:10994 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753421Ab1K1MfZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Nov 2011 07:35:25 -0500
+In-Reply-To: <1322371662-26166-9-git-send-email-amwang@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On 11/27/2011 07:26 AM, Cong Wang wrote:
+> Signed-off-by: Cong Wang <amwang@redhat.com>
+> ---
 
-Signed-off-by: Cong Wang <amwang@redhat.com>
----
- drivers/crypto/hifn_795x.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/lapic.c               |    8 ++++----
+>  arch/x86/kvm/paging_tmpl.h         |    4 ++--
+>  arch/x86/kvm/x86.c                 |    8 ++++----
+>
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index fe765f4..76368f9 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -1731,9 +1731,9 @@ static int ablkcipher_get(void *saddr, unsigned int *srestp, unsigned int offset
- 	while (size) {
- 		copy = min3(srest, dst->length, size);
- 
--		daddr = kmap_atomic(sg_page(dst), KM_IRQ0);
-+		daddr = kmap_atomic(sg_page(dst));
- 		memcpy(daddr + dst->offset + offset, saddr, copy);
--		kunmap_atomic(daddr, KM_IRQ0);
-+		kunmap_atomic(daddr);
- 
- 		nbytes -= copy;
- 		size -= copy;
-@@ -1793,17 +1793,17 @@ static void hifn_process_ready(struct ablkcipher_request *req, int error)
- 				continue;
- 			}
- 
--			saddr = kmap_atomic(sg_page(t), KM_SOFTIRQ0);
-+			saddr = kmap_atomic(sg_page(t));
- 
- 			err = ablkcipher_get(saddr, &t->length, t->offset,
- 					dst, nbytes, &nbytes);
- 			if (err < 0) {
--				kunmap_atomic(saddr, KM_SOFTIRQ0);
-+				kunmap_atomic(saddr);
- 				break;
- 			}
- 
- 			idx += err;
--			kunmap_atomic(saddr, KM_SOFTIRQ0);
-+			kunmap_atomic(saddr);
- 		}
- 
- 		hifn_cipher_walk_exit(&rctx->walk);
+The kvm parts are:
+
+Acked-by: Avi Kivity <avi@redhat.com>
+
 -- 
-1.7.4.4
+error compiling committee.c: too many arguments to function
