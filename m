@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 06/16] KEYS: Add a DSA crypto key subtype [ver #2]
-Date: Tue, 29 Nov 2011 23:44:13 +0000
-Message-ID: <20111129234413.13625.56286.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 15/16] MODSIGN: Module ELF verifier [ver #2]
+Date: Tue, 29 Nov 2011 23:46:10 +0000
+Message-ID: <20111129234610.13625.39710.stgit@warthog.procyon.org.uk>
 References: <20111129234258.13625.21153.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -12,446 +12,549 @@ Cc: linux-crypto@vger.kernel.org,
 	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
 	alan.cox@intel.com, David Howells <dhowells@redhat.com>
 To: keyrings@linux-nfs.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:10660 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757058Ab1K3AiY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Nov 2011 19:38:24 -0500
 In-Reply-To: <20111129234258.13625.21153.stgit@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add a key subtype for handling DSA crypto keys.  For the moment it only
-provides a signature verification facility.
+Do preliminary verification of the ELF structure of a module.  This is used to
+make sure that the ELF structure can then be used to check the module signature
+and access the module data without breaking the module loader.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
+If the module's ELF metadata is determined to be bad, then ELIBBAD will be
+returned and a message will be logged to the kernel log.
+
+Signed-Off-By: David Howells <dhowells@redhat.com>
 ---
 
- security/Kconfig                   |   10 +
- security/keys/Makefile             |    2 
- security/keys/crypto_dsa.h         |   36 ++++
- security/keys/crypto_dsa_subtype.c |  338 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 386 insertions(+), 0 deletions(-)
- create mode 100644 security/keys/crypto_dsa.h
- create mode 100644 security/keys/crypto_dsa_subtype.c
+ init/Kconfig               |   11 +
+ kernel/Makefile            |    2 
+ kernel/module-verify-elf.c |  344 ++++++++++++++++++++++++++++++++++++++++++++
+ kernel/module-verify.c     |   41 +++++
+ kernel/module-verify.h     |   53 +++++++
+ kernel/module.c            |    6 +
+ 6 files changed, 457 insertions(+), 0 deletions(-)
+ create mode 100644 kernel/module-verify-elf.c
+ create mode 100644 kernel/module-verify.c
+ create mode 100644 kernel/module-verify.h
 
 
-diff --git a/security/Kconfig b/security/Kconfig
-index ef39878..48926af 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -62,6 +62,16 @@ config CRYPTO_KEY_TYPE
- 	  required for cryptographic operations such as encryption, decryption,
- 	  signature generation and signature verification.
+diff --git a/init/Kconfig b/init/Kconfig
+index 43298f9..42e685d 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1383,6 +1383,17 @@ config MODULE_SRCVERSION_ALL
+ 	  the version).  With this option, such a "srcversion" field
+ 	  will be created for all modules.  If unsure, say N.
  
-+config CRYPTO_KEY_DSA
-+	tristate "DSA key type"
-+	depends on CRYPTO_KEY_TYPE
-+	select CRYPTO
-+	select MPILIB
-+	select MPILIB_EXTRA
++config MODULE_VERIFY_ELF
++	bool "Module ELF structure verification"
++	depends on MODULES
 +	help
-+	  This option makes DSA cryptographic keys available.  They can be used
-+	  for signature verification.
++	  Check ELF structure of modules upon load
 +
- config KEYS_DEBUG_PROC_KEYS
- 	bool "Enable the /proc/keys file by which keys may be viewed"
- 	depends on KEYS
-diff --git a/security/keys/Makefile b/security/keys/Makefile
-index ca85b01..8c499b1 100644
---- a/security/keys/Makefile
-+++ b/security/keys/Makefile
-@@ -16,8 +16,10 @@ obj-y := \
- obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
- obj-$(CONFIG_ENCRYPTED_KEYS) += encrypted-keys/
- obj-$(CONFIG_CRYPTO_KEY_TYPE) += crypto_keys.o
-+obj-$(CONFIG_CRYPTO_KEY_DSA) += crypto_dsa.o
- obj-$(CONFIG_KEYS_COMPAT) += compat.o
- obj-$(CONFIG_PROC_FS) += proc.o
- obj-$(CONFIG_SYSCTL) += sysctl.o
++config MODULE_VERIFY
++	bool
++	depends on MODULES
++	default y if MODULE_VERIFY_ELF
++
+ endif # MODULES
  
- crypto_keys-y	:= crypto_type.o pgp_parse.o
-+crypto_dsa-y	:= crypto_dsa_subtype.o
-diff --git a/security/keys/crypto_dsa.h b/security/keys/crypto_dsa.h
+ config INIT_ALL_POSSIBLE
+diff --git a/kernel/Makefile b/kernel/Makefile
+index e898c5b..3c34fab 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -51,6 +51,8 @@ obj-$(CONFIG_DEBUG_SPINLOCK) += spinlock.o
+ obj-$(CONFIG_PROVE_LOCKING) += spinlock.o
+ obj-$(CONFIG_UID16) += uid16.o
+ obj-$(CONFIG_MODULES) += module.o
++obj-$(CONFIG_MODULE_VERIFY) += module-verify.o
++obj-$(CONFIG_MODULE_VERIFY_ELF) += module-verify-elf.o
+ obj-$(CONFIG_KALLSYMS) += kallsyms.o
+ obj-$(CONFIG_PM) += power/
+ obj-$(CONFIG_FREEZER) += power/
+diff --git a/kernel/module-verify-elf.c b/kernel/module-verify-elf.c
 new file mode 100644
-index 0000000..0455634
+index 0000000..4dea8d0
 --- /dev/null
-+++ b/security/keys/crypto_dsa.h
-@@ -0,0 +1,36 @@
-+/* DSA internal definitions
++++ b/kernel/module-verify-elf.c
+@@ -0,0 +1,344 @@
++/* module-verify-elf.c: module ELF verifier
 + *
-+ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
 + * Written by David Howells (dhowells@redhat.com)
 + *
 + * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
++ * modify it under the terms of the GNU General Public License
 + * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
++ * 2 of the License, or (at your option) any later version.
 + */
 +
-+#define DSA_NPKEY	4	/* number of MPI's in DSA public key */
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/elf.h>
++#include <linux/ctype.h>
++#include "module-verify.h"
 +
-+extern struct crypto_key_subtype DSA_crypto_key_subtype;
++#if 0
++#define _debug(FMT, ...) printk(FMT, ##__VA_ARGS__)
++#else
++#define _debug(FMT, ...) do {} while (0)
++#endif
 +
 +/*
-+ * public key record
++ * verify the ELF structure of a module
 + */
-+struct DSA_public_key {
-+	struct pgp_parse_pubkey pgp;
-+	union {
-+		MPI		pkey[DSA_NPKEY];
-+		struct {
-+			MPI	p;	/* DSA prime */
-+			MPI	q;	/* DSA group order */
-+			MPI	g;	/* DSA group generator */
-+			MPI	y;	/* DSA public-key value = g^x mod p */
-+		};
-+	};
-+};
++int module_verify_elf(struct module_verify_data *mvdata)
++{
++	const struct elf_note *note;
++	const Elf_Ehdr *hdr = mvdata->hdr;
++	const Elf_Shdr *section, *section2, *secstop;
++	const Elf_Rela *relas, *rela, *relastop;
++	const Elf_Rel *rels, *rel, *relstop;
++	const Elf_Sym *symbol, *symstop;
++	const void *start, *p, *stop;
++	const char *q, *qs;
++	size_t size, sssize, *secsize, tmp, tmp2;
++	long last;
++	int line;
 +
-+struct DSA_payload {
-+	u8		key_id[8];	/* ID of this key pair */
-+	u8		key_id_size;	/* Number of bytes in key_id */
-+	struct DSA_public_key	*public_key;
-+};
-diff --git a/security/keys/crypto_dsa_subtype.c b/security/keys/crypto_dsa_subtype.c
++	size = mvdata->size;
++	mvdata->nsects = hdr->e_shnum;
++
++#define elfcheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto elfcheck_error; } } while(0)
++
++#define seccheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto seccheck_error; } } while(0)
++
++#define symcheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto symcheck_error; } } while(0)
++
++#define relcheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto relcheck_error; } } while(0)
++
++#define relacheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto relacheck_error; } } while(0)
++
++#define notecheck(X)							\
++do { if (unlikely(!(X))) { line = __LINE__; goto notecheck_error; } } while(0)
++
++	/* validate the ELF header */
++	elfcheck(hdr->e_ehsize < size);
++	/*elfcheck(hdr->e_entry == 0);*/
++	elfcheck(hdr->e_phoff == 0);
++	elfcheck(hdr->e_phnum == 0);
++
++	elfcheck(hdr->e_shnum < SHN_LORESERVE);
++	elfcheck(hdr->e_shoff < size);
++	elfcheck(hdr->e_shoff >= hdr->e_ehsize);
++	elfcheck((hdr->e_shoff & (sizeof(long) - 1)) == 0);
++	elfcheck(hdr->e_shstrndx > 0);
++	elfcheck(hdr->e_shstrndx < hdr->e_shnum);
++	elfcheck(hdr->e_shentsize == sizeof(Elf_Shdr));
++
++	tmp = (size_t) hdr->e_shentsize * (size_t) hdr->e_shnum;
++	elfcheck(tmp <= size - hdr->e_shoff);
++
++	/* allocate a table to hold in-file section sizes */
++	mvdata->secsizes = kcalloc(hdr->e_shnum, sizeof(size_t), GFP_KERNEL);
++	if (!mvdata->secsizes)
++		return -ENOMEM;
++
++	/* validate the ELF section headers */
++	mvdata->sections = mvdata->buffer + hdr->e_shoff;
++	secstop = mvdata->sections + mvdata->nsects;
++
++	sssize = mvdata->sections[hdr->e_shstrndx].sh_size;
++	elfcheck(sssize > 0);
++
++	section = mvdata->sections;
++	seccheck(section->sh_type == SHT_NULL);
++	seccheck(section->sh_size == 0);
++	seccheck(section->sh_offset == 0);
++
++	secsize = mvdata->secsizes + 1;
++	for (section++; section < secstop; secsize++, section++) {
++		seccheck(section->sh_name < sssize);
++		seccheck(section->sh_link < hdr->e_shnum);
++
++		if (section->sh_entsize > 0)
++			seccheck(section->sh_size % section->sh_entsize == 0);
++
++		seccheck(section->sh_offset >= hdr->e_ehsize);
++		seccheck(section->sh_offset < size);
++
++		/* determine the section's in-file size */
++		tmp = size - section->sh_offset;
++		if (section->sh_offset < hdr->e_shoff)
++			tmp = hdr->e_shoff - section->sh_offset;
++
++		for (section2 = mvdata->sections + 1;
++		     section2 < secstop;
++		     section2++) {
++			if (section->sh_offset < section2->sh_offset) {
++				tmp2 = section2->sh_offset -
++					section->sh_offset;
++				if (tmp2 < tmp)
++					tmp = tmp2;
++			}
++		}
++		*secsize = tmp;
++
++		_debug("Section %ld: %zx bytes at %lx\n",
++		       section - mvdata->sections,
++		       *secsize,
++		       (unsigned long) section->sh_offset);
++
++		/* perform section type specific checks */
++		switch (section->sh_type) {
++		case SHT_NOBITS:
++			break;
++
++		case SHT_REL:
++			seccheck(section->sh_entsize == sizeof(Elf_Rel));
++			goto more_rel_checks;
++
++		case SHT_RELA:
++			seccheck(section->sh_entsize == sizeof(Elf_Rela));
++		more_rel_checks:
++			seccheck(section->sh_info > 0);
++			seccheck(section->sh_info < hdr->e_shnum);
++			goto more_sec_checks;
++
++		case SHT_SYMTAB:
++			seccheck(section->sh_entsize == sizeof(Elf_Sym));
++			goto more_sec_checks;
++
++		default:
++		more_sec_checks:
++			/* most types of section must be contained entirely
++			 * within the file */
++			seccheck(section->sh_size <= *secsize);
++			break;
++		}
++	}
++
++	/* validate the ELF section names */
++	section = &mvdata->sections[hdr->e_shstrndx];
++
++	seccheck(section->sh_offset != hdr->e_shoff);
++
++	mvdata->secstrings = mvdata->buffer + section->sh_offset;
++
++	last = -1;
++	for (section = mvdata->sections + 1; section < secstop; section++) {
++		const char *secname;
++		tmp = sssize - section->sh_name;
++		secname = mvdata->secstrings + section->sh_name;
++		seccheck(secname[0] != 0);
++		if (section->sh_name > last)
++			last = section->sh_name;
++	}
++
++	if (last > -1) {
++		tmp = sssize - last;
++		elfcheck(memchr(mvdata->secstrings + last, 0, tmp) != NULL);
++	}
++
++	/* look for various sections in the module */
++	for (section = mvdata->sections + 1; section < secstop; section++) {
++		switch (section->sh_type) {
++		case SHT_SYMTAB:
++			if (strcmp(mvdata->secstrings + section->sh_name,
++				   ".symtab") == 0
++			    ) {
++				seccheck(mvdata->symbols == NULL);
++				mvdata->symbols =
++					mvdata->buffer + section->sh_offset;
++				mvdata->nsyms =
++					section->sh_size / sizeof(Elf_Sym);
++				seccheck(section->sh_size > 0);
++			}
++			break;
++
++		case SHT_STRTAB:
++			if (strcmp(mvdata->secstrings + section->sh_name,
++				   ".strtab") == 0
++			    ) {
++				seccheck(mvdata->strings == NULL);
++				mvdata->strings =
++					mvdata->buffer + section->sh_offset;
++				sssize = mvdata->nstrings = section->sh_size;
++				seccheck(section->sh_size > 0);
++			}
++			break;
++		}
++	}
++
++	if (!mvdata->symbols) {
++		printk("Couldn't locate module symbol table\n");
++		goto format_error;
++	}
++
++	if (!mvdata->strings) {
++		printk("Couldn't locate module strings table\n");
++		goto format_error;
++	}
++
++	/* validate the symbol table */
++	symstop = mvdata->symbols + mvdata->nsyms;
++
++	symbol = mvdata->symbols;
++	symcheck(ELF_ST_TYPE(symbol[0].st_info) == STT_NOTYPE);
++	symcheck(symbol[0].st_shndx == SHN_UNDEF);
++	symcheck(symbol[0].st_value == 0);
++	symcheck(symbol[0].st_size == 0);
++
++	last = -1;
++	for (symbol++; symbol < symstop; symbol++) {
++		symcheck(symbol->st_name < sssize);
++		if (symbol->st_name > last)
++			last = symbol->st_name;
++		symcheck(symbol->st_shndx < mvdata->nsects ||
++			 symbol->st_shndx >= SHN_LORESERVE);
++	}
++
++	if (last > -1) {
++		tmp = sssize - last;
++		elfcheck(memchr(mvdata->strings + last, 0, tmp) != NULL);
++	}
++
++	/* validate each relocation table and note list as best we can */
++	for (section = mvdata->sections + 1; section < secstop; section++) {
++		section2 = mvdata->sections + section->sh_info;
++		start = mvdata->buffer + section->sh_offset;
++		stop = start + section->sh_size;
++
++		switch (section->sh_type) {
++		case SHT_REL:
++			rels = start;
++			relstop = stop;
++
++			for (rel = rels; rel < relstop; rel++) {
++				relcheck(rel->r_offset < section2->sh_size);
++				relcheck(ELF_R_SYM(rel->r_info) <
++					 mvdata->nsyms);
++			}
++
++			break;
++
++		case SHT_RELA:
++			relas = start;
++			relastop = stop;
++
++			for (rela = relas; rela < relastop; rela++) {
++				relacheck(rela->r_offset < section2->sh_size);
++				relacheck(ELF_R_SYM(rela->r_info) <
++					  mvdata->nsyms);
++			}
++
++			break;
++
++		case SHT_NOTE:
++			p = start;
++			while (p < stop) {
++				note = p;
++				notecheck(stop - p >= sizeof(*note));
++				p += sizeof(*note);
++				tmp = note->n_namesz;
++				if (tmp > 0) {
++					notecheck(stop - p >= tmp);
++					qs = p + tmp - 1;
++					notecheck(*qs == '\0');
++					for (q = p; q < qs; q++)
++						notecheck(*q != '\0');
++					tmp = roundup(tmp, 4);
++					notecheck(stop - p >= tmp);
++					p += tmp;
++				}
++				tmp = note->n_descsz;
++				if (tmp > 0) {
++					notecheck(stop - p >= tmp);
++					tmp = roundup(tmp, 4);
++					notecheck(stop - p >= tmp);
++					p += tmp;
++				}
++			}
++			seccheck(p == stop);
++			break;
++
++		default:
++			break;
++		}
++	}
++
++	_debug("ELF okay\n");
++	return 0;
++
++elfcheck_error:
++	printk("Verify ELF error (assertion %d)\n", line);
++	goto format_error;
++
++seccheck_error:
++	printk("Verify ELF error [sec %ld] (assertion %d)\n",
++	       (long)(section - mvdata->sections), line);
++	goto format_error;
++
++symcheck_error:
++	printk("Verify ELF error [sym %ld] (assertion %d)\n",
++	       (long)(symbol - mvdata->symbols), line);
++	goto format_error;
++
++relcheck_error:
++	printk("Verify ELF error [sec %ld rel %ld] (assertion %d)\n",
++	       (long)(section - mvdata->sections),
++	       (long)(rel - rels), line);
++	goto format_error;
++
++relacheck_error:
++	printk("Verify ELF error [sec %ld rela %ld] (assertion %d)\n",
++	       (long)(section - mvdata->sections),
++	       (long)(rela - relas), line);
++	goto format_error;
++
++notecheck_error:
++	printk("Verify ELF error [sec %ld note %ld] (assertion %d)\n",
++	       (long)(section - mvdata->sections),
++	       (long)(p - start), line);
++	goto format_error;
++
++format_error:
++	return -ELIBBAD;
++}
+diff --git a/kernel/module-verify.c b/kernel/module-verify.c
 new file mode 100644
-index 0000000..ae6133b
+index 0000000..875279f
 --- /dev/null
-+++ b/security/keys/crypto_dsa_subtype.c
-@@ -0,0 +1,338 @@
-+/* DSA crypto key subtype
++++ b/kernel/module-verify.c
+@@ -0,0 +1,41 @@
++/* module-verify.c: module verifier
 + *
-+ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
 + * Written by David Howells (dhowells@redhat.com)
 + *
-+ * This file is derived from GnuPG.
-+ *	Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
-+ *
-+ * GnuPG is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * GnuPG is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
 + */
 +
-+#define DEBUG
-+#define pr_fmt(fmt) "DSA: "fmt
-+#include <keys/crypto-subtype.h>
-+#include <linux/module.h>
 +#include <linux/kernel.h>
++#include <linux/module.h>
 +#include <linux/slab.h>
-+#include <linux/mpi.h>
-+#include <linux/pgp.h>
-+#include <crypto/hash.h>
-+#define __KDEBUG
-+#include "internal.h"
-+#include "crypto_dsa.h"
-+
-+MODULE_LICENSE("GPL");
-+
-+static inline void digest_putc(struct shash_desc *digest, uint8_t ch)
-+{
-+	crypto_shash_update(digest, &ch, 1);
-+}
++#include "module-verify.h"
 +
 +/*
-+ * Destroy the contents of a DSA payload
++ * verify a module's integrity
++ * - check the ELF is viable
 + */
-+static void DSA_destroy_payload(struct DSA_payload *dsa)
++int module_verify(const Elf_Ehdr *hdr, size_t size)
 +{
-+	int i;
-+
-+	if (dsa->public_key) {
-+		for (i = 0; i < DSA_NPKEY; i++)
-+			mpi_free(dsa->public_key->pkey[i]);
-+		kfree(dsa->public_key);
-+	}
-+	kfree(dsa);
-+}
-+
-+/*
-+ * Calculate the public key ID (RFC4880 12.2)
-+ */
-+static void DSA_calc_pk_keyid(struct shash_desc *digest,
-+			      struct DSA_public_key *pk)
-+{
-+	unsigned n;
-+	unsigned nb[DSA_NPKEY];
-+	unsigned nn[DSA_NPKEY];
-+	u8 *pp[DSA_NPKEY];
-+	u32 a32;
-+	int i;
-+	int npkey = DSA_NPKEY;
-+
-+	kenter("");
-+
-+	n = (pk->pgp.version < PGP_KEY_VERSION_4) ? 8 : 6;
-+	for (i = 0; i < npkey; i++) {
-+		nb[i] = mpi_get_nbits(pk->pkey[i]);
-+		pp[i] = mpi_get_buffer(pk->pkey[i], nn + i, NULL);
-+		n += 2 + nn[i];
-+	}
-+
-+	digest_putc(digest, 0x99);     /* ctb */
-+	digest_putc(digest, n >> 8);   /* 16-bit header length */
-+	digest_putc(digest, n);
-+	digest_putc(digest, pk->pgp.version);
-+
-+	a32 = pk->pgp.creation_time;
-+	digest_putc(digest, a32 >> 24);
-+	digest_putc(digest, a32 >> 16);
-+	digest_putc(digest, a32 >>  8);
-+	digest_putc(digest, a32 >>  0);
-+
-+	if (pk->pgp.version < PGP_KEY_VERSION_4) {
-+		u16 a16;
-+
-+		if( pk->pgp.expires_at)
-+			a16 = (pk->pgp.expires_at - pk->pgp.creation_time) / 86400UL;
-+		else
-+			a16 = 0;
-+		digest_putc(digest, a16 >> 8);
-+		digest_putc(digest, a16 >> 0);
-+	}
-+
-+	digest_putc(digest, PGP_PUBKEY_DSA);
-+
-+	for (i = 0; i < npkey; i++) {
-+		digest_putc(digest, nb[i] >> 8);
-+		digest_putc(digest, nb[i]);
-+		crypto_shash_update(digest, pp[i], nn[i]);
-+		kfree(pp[i]);
-+	}
-+
-+	kleave("");
-+}
-+
-+/*
-+ * Calculate and check the public key ID fingerprint against the key ID
-+ */
-+static int DSA_get_fingerprint(struct DSA_payload *dsa,
-+			       struct DSA_public_key *pk,
-+			       char **_fingerprint)
-+{
-+	struct crypto_shash *tfm;
-+	struct shash_desc *digest;
-+	int digest_size, offset;
-+	char *fingerprint;
-+	u8 *raw_fingerprint;
-+	int ret, i;
-+
-+	ret = -ENOMEM;
-+	tfm = crypto_alloc_shash(pk->pgp.version < PGP_KEY_VERSION_4 ?
-+				 "md5" : "sha1", 0, 0);
-+	if (!tfm)
-+		goto cleanup;
-+
-+	digest = kmalloc(sizeof(*digest) + crypto_shash_descsize(tfm),
-+			 GFP_KERNEL);
-+	if (!digest)
-+		goto cleanup_tfm;
-+
-+	digest->tfm = tfm;
-+	digest->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+	ret = crypto_shash_init(digest);
-+	if (ret < 0)
-+		goto cleanup_hash;
-+
-+	DSA_calc_pk_keyid(digest, pk);
-+
-+	digest_size = crypto_shash_digestsize(tfm);
-+
-+	raw_fingerprint = kmalloc(digest_size, GFP_KERNEL);
-+	if (!raw_fingerprint)
-+		goto cleanup_hash;
-+
-+	ret = crypto_shash_final(digest, raw_fingerprint);
-+	if (ret < 0)
-+		goto cleanup_raw_fingerprint;
-+
-+	fingerprint = kmalloc(digest_size * 2 + 1, GFP_KERNEL);
-+	if (!fingerprint)
-+		goto cleanup_raw_fingerprint;
-+
-+	offset = digest_size - 8;
-+	kdebug("offset %u/%u", offset, digest_size);
-+
-+	for (i = 0; i < digest_size; i++)
-+		sprintf(fingerprint + i * 2, "%02x", raw_fingerprint[i]);
-+	kdebug("fingerprint %s", fingerprint);
-+
-+	memcpy(&dsa->key_id, raw_fingerprint + offset, 8);
-+	dsa->key_id_size = 8;
-+
-+	*_fingerprint = fingerprint;
-+	fingerprint = NULL;
-+	ret = 0;
-+cleanup_raw_fingerprint:
-+	kfree(raw_fingerprint);
-+cleanup_hash:
-+	kfree(digest);
-+cleanup_tfm:
-+	crypto_free_shash(tfm);
-+cleanup:
-+	kleave(" = %d", ret);
-+	return ret;
-+}
-+
-+struct DSA_pk_parse_context {
-+	struct pgp_parse_context pgp;
-+	struct DSA_payload *dsa;
-+	struct DSA_public_key *pk;
-+	char *fingerprint;
-+};
-+
-+/*
-+ * Extract a public key or subkey from the PGP stream.
-+ */
-+static int DSA_parse_public_key(struct pgp_parse_context *context,
-+				enum pgp_packet_tag type,
-+				u8 headerlen,
-+				const u8 *data,
-+				size_t datalen)
-+{
-+	struct DSA_pk_parse_context *ctx =
-+		container_of(context, struct DSA_pk_parse_context, pgp);
-+	struct DSA_payload *dsa = ctx->dsa;
-+	struct DSA_public_key *pk;
-+	int i, ret;
-+
-+	kenter(",%u,%u,,%zu", type, headerlen, datalen);
-+
-+	if (dsa->public_key) {
-+		kleave(" = -ENOKEY [already]");
-+		return -ENOKEY;
-+	}
-+
-+	pk = kzalloc(sizeof(struct DSA_public_key), GFP_KERNEL);
-+	if (!pk)
-+		return -ENOMEM;
-+
-+	ret = pgp_parse_public_key(&data, &datalen, &pk->pgp);
-+	if (pk->pgp.pubkey_algo != PGP_PUBKEY_DSA) {
-+		pr_debug("Ignoring non-DSA public key [%u]\n",
-+			 pk->pgp.pubkey_algo);
-+		ret = -ENOKEY;
-+		goto cleanup;
-+	}
-+
-+	ret = -ENOMEM;
-+	for (i = 0; i < DSA_NPKEY; i++) {
-+		unsigned int remaining = datalen;
-+		pk->pkey[i] = mpi_read_from_buffer(data, &remaining);
-+		if (!pk->pkey[i])
-+			goto cleanup;
-+		data += remaining;
-+		datalen -= remaining;
-+	}
-+
-+	ret = DSA_get_fingerprint(dsa, pk, &ctx->fingerprint);
-+	if (ret < 0)
-+		goto cleanup;
-+
-+	dsa->public_key = pk;
-+	kleave(" = 0 [use]");
-+	return 0;
-+
-+cleanup:
-+	kdebug("cleanup");
-+	if (pk) {
-+		for (i = 0; i < DSA_NPKEY; i++)
-+			mpi_free(pk->pkey[i]);
-+		kfree(pk);
-+	}
-+	kleave(" = %d", ret);
-+	return ret;
-+}
-+
-+/*
-+ * Instantiate a DSA key
-+ */
-+static int DSA_instantiate(struct key *key,
-+			   const void *data, size_t datalen)
-+{
-+	struct DSA_pk_parse_context ctx;
-+	struct DSA_payload *dsa;
++	struct module_verify_data mvdata;
 +	int ret;
 +
-+	kenter("");
++	memset(&mvdata, 0, sizeof(mvdata));
++	mvdata.buffer	= hdr;
++	mvdata.hdr	= hdr;
++	mvdata.size	= size;
 +
-+	ret = key_payload_reserve(key, datalen);
-+	if (ret < 0)
-+		return ret;
-+
-+	dsa = kzalloc(sizeof(struct DSA_payload), GFP_KERNEL);
-+	if (!dsa)
-+		return -ENOMEM;
-+
-+	ctx.pgp.types_of_interest =
-+		(1 << PGP_PKT_PUBLIC_KEY) | (1 << PGP_PKT_PUBLIC_SUBKEY);
-+	ctx.pgp.process_packet = DSA_parse_public_key;
-+	ctx.dsa = dsa;
-+	ctx.pk = NULL;
-+	ctx.fingerprint = NULL;
-+
-+	ret = pgp_parse_packets(data, datalen, &ctx.pgp);
++	ret = module_verify_elf(&mvdata);
 +	if (ret < 0) {
-+		DSA_destroy_payload(dsa);
-+		kfree(ctx.fingerprint);
-+		key_payload_reserve(key, 0);
-+		return ret;
++		if (ret == -ELIBBAD)
++			printk("Module failed ELF checks\n");
++		goto error;
 +	}
 +
-+	key->type_data.p[0] = &DSA_crypto_key_subtype;
-+	key->type_data.p[1] = ctx.fingerprint;
-+	key->payload.data = dsa;
-+	return 0;
++error:
++	kfree(mvdata.secsizes);
++	kfree(mvdata.canonlist);
++	return ret;
 +}
-+
-+/*
-+ * Destroy a DSA key
+diff --git a/kernel/module-verify.h b/kernel/module-verify.h
+new file mode 100644
+index 0000000..20884fc
+--- /dev/null
++++ b/kernel/module-verify.h
+@@ -0,0 +1,53 @@
++/* module-verify.h: module verification definitions
++ *
++ * Copyright (C) 2004 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
 + */
-+static void DSA_destroy(struct key *key)
-+{
-+	if (key->payload.data)
-+		DSA_destroy_payload(key->payload.data);
-+}
 +
-+/*
-+ * DSA crypto key subtype
-+ */
-+struct crypto_key_subtype DSA_crypto_key_subtype = {
-+	.owner		= THIS_MODULE,
-+	.name		= "dsa",
-+	.pubkey_algo	= PGP_PUBKEY_DSA,
-+	.info		= CRYPTO_KEY_IS_PUBKEY_ALGO,
-+	.instantiate	= DSA_instantiate,
-+	.destroy	= DSA_destroy,
++#include <linux/types.h>
++#include <asm/module.h>
 +
-+	.verify_sig_begin	= DSA_verify_sig_begin,
-+	.verify_sig_add_data	= DSA_verify_sig_add_data,
-+	.verify_sig_end		= DSA_verify_sig_end,
-+	.verify_sig_cancel	= DSA_verify_sig_cancel,
++#ifdef CONFIG_MODULE_VERIFY
++struct module_verify_data {
++	const void		*buffer;	/* module buffer */
++	const Elf_Ehdr		*hdr;		/* ELF header */
++	const Elf_Shdr		*sections;	/* ELF section table */
++	const Elf_Sym		*symbols;	/* ELF symbol table */
++	const char		*secstrings;	/* ELF section string table */
++	const char		*strings;	/* ELF string table */
++	size_t			*secsizes;	/* section size list */
++	size_t			size;		/* module object size */
++	size_t			nsects;		/* number of sections */
++	size_t			nsyms;		/* number of symbols */
++	size_t			nstrings;	/* size of strings section */
++	size_t			signed_size;	/* count of bytes contributed to digest */
++	int			*canonlist;	/* list of canonicalised sections */
++	int			*canonmap;	/* section canonicalisation map */
++	int			ncanon;		/* number of canonicalised sections */
++	int			sig_index;	/* module signature section index */
++	uint8_t			xcsum;		/* checksum of bytes contributed to digest */
++	uint8_t			csum;		/* checksum of bytes representing a section */
 +};
 +
 +/*
-+ * Module stuff
++ * module-verify.c
 + */
-+static int __init DSA_init(void)
-+{
-+	return register_crypto_key_subtype(&DSA_crypto_key_subtype);
-+}
++extern int module_verify(const Elf_Ehdr *hdr, size_t size);
 +
-+static void __exit DSA_cleanup(void)
-+{
-+	unregister_crypto_key_subtype(&DSA_crypto_key_subtype);
-+}
++/*
++ * module-verify-elf.c
++ */
++#ifdef CONFIG_MODULE_VERIFY_ELF
++extern int module_verify_elf(struct module_verify_data *mvdata);
++#else
++#define module_verify_elf(m) (0)
++#endif
 +
-+module_init(DSA_init);
-+module_exit(DSA_cleanup);
-
++#else
++#define module_verify(h, s) (0)
++#endif
+diff --git a/kernel/module.c b/kernel/module.c
+index 178333c..8309389 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -58,6 +58,7 @@
+ #include <linux/jump_label.h>
+ #include <linux/pfn.h>
+ #include <linux/bsearch.h>
++#include "module-verify.h"
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/module.h>
+@@ -2365,6 +2366,11 @@ static int copy_and_check(struct load_info *info,
+ 		goto free_hdr;
+ 	}
+ 
++	/* Verify the module's contents */
++	err = module_verify(hdr, len);
++	if (err < 0)
++		goto free_hdr;
++
+ 	info->hdr = hdr;
+ 	info->len = len;
+ 	return 0;
