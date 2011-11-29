@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 08/16] PGP: Add signature parser [ver #2]
-Date: Tue, 29 Nov 2011 23:44:39 +0000
-Message-ID: <20111129234439.13625.26953.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 07/16] KEYS: Add a RSA crypto key subtype [ver #2]
+Date: Tue, 29 Nov 2011 23:44:26 +0000
+Message-ID: <20111129234426.13625.10612.stgit@warthog.procyon.org.uk>
 References: <20111129234258.13625.21153.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -13,348 +13,481 @@ Cc: linux-crypto@vger.kernel.org,
 	alan.cox@intel.com, David Howells <dhowells@redhat.com>
 To: keyrings@linux-nfs.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:11276 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:19684 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757217Ab1K3AEi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Nov 2011 19:04:38 -0500
+	id S1756843Ab1K3A16 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Nov 2011 19:27:58 -0500
 In-Reply-To: <20111129234258.13625.21153.stgit@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add some PGP signature parsing helpers:
-
- (1) A function to parse V4 signature subpackets and pass the desired ones to
-     a processor function:
-
-	int pgp_parse_sig_subpkts(const u8 *data, size_t datalen,
-				  struct pgp_parse_sig_context *ctx);
-
- (2) A function to parse out basic signature parameters from any PGP signature
-     such that the algorithms and public key can be selected:
-
-	int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-				 struct pgp_sig_parameters *p);
+Add a key subtype for handling RSA crypto keys.  For the moment it only
+provides a signature verification facility.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- include/linux/pgp.h       |   24 ++++
- security/keys/pgp_parse.c |  274 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 298 insertions(+), 0 deletions(-)
+ security/Kconfig                   |    9 +
+ security/keys/Makefile             |    2 
+ security/keys/crypto_rsa.h         |   36 +++
+ security/keys/crypto_rsa_subtype.c |  371 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 418 insertions(+), 0 deletions(-)
+ create mode 100644 security/keys/crypto_rsa.h
+ create mode 100644 security/keys/crypto_rsa_subtype.c
 
 
-diff --git a/include/linux/pgp.h b/include/linux/pgp.h
-index 7e86a06..29b9758 100644
---- a/include/linux/pgp.h
-+++ b/include/linux/pgp.h
-@@ -227,4 +227,28 @@ struct pgp_parse_pubkey {
- extern int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
- 				struct pgp_parse_pubkey *pk);
+diff --git a/security/Kconfig b/security/Kconfig
+index 48926af..4167b4f 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -72,6 +72,15 @@ config CRYPTO_KEY_DSA
+ 	  This option makes DSA cryptographic keys available.  They can be used
+ 	  for signature verification.
  
-+struct pgp_parse_sig_context {
-+	unsigned long types_of_interest[128 / BITS_PER_LONG];
-+	int (*process_packet)(struct pgp_parse_sig_context *context,
-+			      enum pgp_sig_subpkt_type type,
-+			      const u8 *data,
-+			      size_t datalen);
-+};
++config CRYPTO_KEY_RSA
++	tristate "RSA key type"
++	depends on CRYPTO_KEY_TYPE
++	select CRYPTO
++	select MPILIB
++	help
++	  This option makes RSA cryptographic keys available.  They can be used
++	  for signature verification.
 +
-+extern int pgp_parse_sig_packets(const u8 *data, size_t datalen,
-+				 struct pgp_parse_sig_context *ctx);
+ config KEYS_DEBUG_PROC_KEYS
+ 	bool "Enable the /proc/keys file by which keys may be viewed"
+ 	depends on KEYS
+diff --git a/security/keys/Makefile b/security/keys/Makefile
+index 8c499b1..0cb7d08 100644
+--- a/security/keys/Makefile
++++ b/security/keys/Makefile
+@@ -17,9 +17,11 @@ obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
+ obj-$(CONFIG_ENCRYPTED_KEYS) += encrypted-keys/
+ obj-$(CONFIG_CRYPTO_KEY_TYPE) += crypto_keys.o
+ obj-$(CONFIG_CRYPTO_KEY_DSA) += crypto_dsa.o
++obj-$(CONFIG_CRYPTO_KEY_RSA) += crypto_rsa.o
+ obj-$(CONFIG_KEYS_COMPAT) += compat.o
+ obj-$(CONFIG_PROC_FS) += proc.o
+ obj-$(CONFIG_SYSCTL) += sysctl.o
+ 
+ crypto_keys-y	:= crypto_type.o pgp_parse.o
+ crypto_dsa-y	:= crypto_dsa_subtype.o
++crypto_rsa-y	:= crypto_rsa_subtype.o
+diff --git a/security/keys/crypto_rsa.h b/security/keys/crypto_rsa.h
+new file mode 100644
+index 0000000..2ec8edc
+--- /dev/null
++++ b/security/keys/crypto_rsa.h
+@@ -0,0 +1,36 @@
++/* RSA internal definitions
++ *
++ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
 +
-+struct pgp_sig_parameters {
-+	enum pgp_signature_type signature_type : 8;
++#define RSA_NPKEY	2	/* number of MPI's in an RSA public key */
++
++extern struct crypto_key_subtype RSA_crypto_key_subtype;
++extern struct crypto_key_subtype RSA_crypto_key_subtype_2;
++extern struct crypto_key_subtype RSA_crypto_key_subtype_3;
++
++/*
++ * public key record
++ */
++struct RSA_public_key {
++	struct pgp_parse_pubkey pgp;
 +	union {
-+		struct pgp_key_ID issuer;
-+		__be32 issuer32[2];
++		MPI		pkey[RSA_NPKEY];
++		struct {
++			MPI	n;	/* RSA public modulus */
++			MPI	e;	/* RSA public encryption exponent */
++		};
 +	};
-+	enum pgp_pubkey_algo pubkey_algo : 8;
-+	enum pgp_hash_algo hash_algo : 8;
 +};
 +
-+extern int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-+				struct pgp_sig_parameters *p);
-+
- #endif /* _LINUX_PGP_H */
-diff --git a/security/keys/pgp_parse.c b/security/keys/pgp_parse.c
-index fb8d64a..b7bfeb1 100644
---- a/security/keys/pgp_parse.c
-+++ b/security/keys/pgp_parse.c
-@@ -252,3 +252,277 @@ int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(pgp_parse_public_key);
-+
-+/**
-+ * pgp_parse_sig_subpkt_header - Parse a PGP V4 signature subpacket header
-+ * @_data: Start of the subpacket (updated to subpacket data)
-+ * @_datalen: Amount of data remaining in buffer (decreased)
-+ * @_type: Where the subpacket type will be returned
++struct RSA_payload {
++	u8		key_id[8];	/* ID of this key pair */
++	u8		key_id_size;	/* Number of bytes in key_id */
++	struct RSA_public_key	*public_key;
++};
+diff --git a/security/keys/crypto_rsa_subtype.c b/security/keys/crypto_rsa_subtype.c
+new file mode 100644
+index 0000000..da0d4cf
+--- /dev/null
++++ b/security/keys/crypto_rsa_subtype.c
+@@ -0,0 +1,371 @@
++/* RSA crypto key subtype
 + *
-+ * Parse a PGP V4 signature subpacket header [RFC 4880: 5.2.3.1].
++ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
 + *
-+ * Returns packet data size on success; non-zero on error.  If successful,
-+ * *_data and *_datalen will have been updated and *_headerlen will be set to
-+ * hold the length of the packet header.
++ * This file is derived from GnuPG.
++ *	Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
++ *
++ * GnuPG is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * GnuPG is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 + */
-+ssize_t pgp_parse_sig_subpkt_header(const u8 **_data, size_t *_datalen,
-+				    enum pgp_sig_subpkt_type *_type)
++
++#define DEBUG
++#define pr_fmt(fmt) "RSA: "fmt
++#include <keys/crypto-subtype.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/mpi.h>
++#include <linux/pgp.h>
++#include <crypto/hash.h>
++#include "crypto_rsa.h"
++#define __KDEBUG
++#include "internal.h"
++
++MODULE_LICENSE("GPL");
++
++static inline void digest_putc(struct shash_desc *digest, uint8_t ch)
 +{
-+	enum pgp_sig_subpkt_type type;
-+	const u8 *data = *_data;
-+	size_t size, datalen = *_datalen;
-+
-+	pr_devel("-->pgp_parse_sig_subpkt_header(,%zu,,)", datalen);
-+
-+	if (datalen < 2)
-+		goto short_subpacket;
-+
-+	pr_devel("subpkt hdr %02x, %02x\n", data[0], data[1]);
-+
-+	switch (data[0]) {
-+	case 0x00 ... 0xbf:
-+		/* One-byte length */
-+		size = data[0];
-+		data++;
-+		datalen--;
-+		break;
-+	case 0xc0 ... 0xfe:
-+		/* Two-byte length */
-+		if (datalen < 3)
-+			goto short_subpacket;
-+		size = (data[0] - 192) * 256;
-+		size += data[1] + 192;
-+		data += 2;
-+		datalen -= 2;
-+		break;
-+	case 0xff:
-+		if (datalen < 6)
-+			goto short_subpacket;
-+		size  = data[1] << 24;
-+		size |= data[2] << 16;
-+		size |= data[3] << 8;
-+		size |= data[4];
-+		data += 5;
-+		datalen -= 5;
-+		break;
-+	}
-+
-+	/* The type octet is included in the size */
-+	if (size == 0) {
-+		pr_warning("Signature subpacket size can't be zero\n");
-+		return -EBADMSG;
-+	}
-+
-+	type = *data++ & ~PGP_SIG_SUBPKT_TYPE_CRITICAL_MASK;
-+	datalen--;
-+	size--;
-+
-+	pr_devel("datalen=%zu size=%zu", datalen, size);
-+	if (datalen < size)
-+		goto short_subpacket;
-+
-+	*_data = data;
-+	*_datalen = datalen;
-+	*_type = type;
-+	pr_devel("Found subpkt type=%u size=%zd\n", type, size);
-+	return size;
-+
-+short_subpacket:
-+	pr_warning("Attempt to parse short signature subpacket\n");
-+	return -EBADMSG;
++	crypto_shash_update(digest, &ch, 1);
 +}
 +
-+/**
-+ * pgp_parse_sig_subpkts - Parse a set of PGP V4 signatute subpackets
-+ * @_data: Data to be parsed (updated)
-+ * @_datalen: Amount of data (updated)
-+ * @ctx: Parsing context
-+ *
-+ * Parse a set of PGP signature subpackets [RFC 4880: 5.2.3].
++/*
++ * Destroy the contents of a RSA payload
 + */
-+int pgp_parse_sig_subpkts(const u8 *data, size_t datalen,
-+			  struct pgp_parse_sig_context *ctx)
++static void RSA_destroy_payload(struct RSA_payload *rsa)
 +{
-+	enum pgp_sig_subpkt_type type;
-+	ssize_t pktlen;
-+	int ret;
++	int i;
 +
-+	pr_devel("-->pgp_parse_sig_subpkts(,%zu,,)", datalen);
-+
-+	while (datalen > 2) {
-+		pktlen = pgp_parse_sig_subpkt_header(&data, &datalen, &type);
-+		if (pktlen < 0)
-+			return pktlen;
-+		if (test_bit(type, ctx->types_of_interest)) {
-+			ret = ctx->process_packet(ctx, type, data, pktlen);
-+			if (ret < 0)
-+				return ret;
-+		}
-+		data += pktlen;
-+		datalen -= pktlen;
++	if (rsa->public_key) {
++		for (i = 0; i < RSA_NPKEY; i++)
++			mpi_free(rsa->public_key->pkey[i]);
++		kfree(rsa->public_key);
 +	}
-+
-+	if (datalen != 0) {
-+		pr_warning("Excess octets in signature subpacket stream\n");
-+		return -EBADMSG;
-+	}
-+
-+	return 0;
++	kfree(rsa);
 +}
-+EXPORT_SYMBOL_GPL(pgp_parse_sig_subpkts);
 +
-+struct pgp_parse_sig_params_ctx {
-+	struct pgp_parse_sig_context base;
-+	struct pgp_sig_parameters *params;
-+	bool got_the_issuer;
++/*
++ * Calculate the public key ID (RFC4880 12.2)
++ */
++static void RSA_calc_pk_keyid(struct shash_desc *digest,
++			      struct RSA_public_key *pk)
++{
++	unsigned n;
++	unsigned nb[RSA_NPKEY];
++	unsigned nn[RSA_NPKEY];
++	u8 *pp[RSA_NPKEY];
++	u32 a32;
++	int i;
++	int npkey = RSA_NPKEY;
++
++	kenter("");
++
++	n = (pk->pgp.version < PGP_KEY_VERSION_4) ? 8 : 6;
++	for (i = 0; i < npkey; i++) {
++		nb[i] = mpi_get_nbits(pk->pkey[i]);
++		pp[i] = mpi_get_buffer(pk->pkey[i], nn + i, NULL);
++		n += 2 + nn[i];
++	}
++
++	digest_putc(digest, 0x99);     /* ctb */
++	digest_putc(digest, n >> 8);   /* 16-bit header length */
++	digest_putc(digest, n);
++	digest_putc(digest, pk->pgp.version);
++
++	a32 = pk->pgp.creation_time;
++	digest_putc(digest, a32 >> 24);
++	digest_putc(digest, a32 >> 16);
++	digest_putc(digest, a32 >>  8);
++	digest_putc(digest, a32 >>  0);
++
++	if (pk->pgp.version < PGP_KEY_VERSION_4) {
++		u16 a16;
++
++		if( pk->pgp.expires_at)
++			a16 = (pk->pgp.expires_at - pk->pgp.creation_time) / 86400UL;
++		else
++			a16 = 0;
++		digest_putc(digest, a16 >> 8);
++		digest_putc(digest, a16 >> 0);
++	}
++
++	digest_putc(digest, pk->pgp.pubkey_algo);
++
++	for (i = 0; i < npkey; i++) {
++		digest_putc(digest, nb[i] >> 8);
++		digest_putc(digest, nb[i]);
++		crypto_shash_update(digest, pp[i], nn[i]);
++		kfree(pp[i]);
++	}
++
++	kleave("");
++}
++
++/*
++ * Calculate and check the public key ID fingerprint against the key ID
++ */
++static int RSA_get_fingerprint(struct RSA_payload *rsa,
++			       struct RSA_public_key *pk,
++			       char **_fingerprint)
++{
++	struct crypto_shash *tfm;
++	struct shash_desc *digest;
++	int digest_size, offset;
++	char *fingerprint;
++	u8 *raw_fingerprint;
++	int ret, i;
++
++	ret = -ENOMEM;
++	tfm = crypto_alloc_shash(pk->pgp.version < PGP_KEY_VERSION_4 ?
++				 "md5" : "sha1", 0, 0);
++	if (!tfm)
++		goto cleanup;
++
++	digest = kmalloc(sizeof(*digest) + crypto_shash_descsize(tfm),
++			 GFP_KERNEL);
++	if (!digest)
++		goto cleanup_tfm;
++
++	digest->tfm = tfm;
++	digest->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++	ret = crypto_shash_init(digest);
++	if (ret < 0)
++		goto cleanup_hash;
++
++	RSA_calc_pk_keyid(digest, pk);
++
++	digest_size = crypto_shash_digestsize(tfm);
++
++	raw_fingerprint = kmalloc(digest_size, GFP_KERNEL);
++	if (!raw_fingerprint)
++		goto cleanup_hash;
++
++	ret = crypto_shash_final(digest, raw_fingerprint);
++	if (ret < 0)
++		goto cleanup_raw_fingerprint;
++
++	fingerprint = kmalloc(digest_size * 2 + 1, GFP_KERNEL);
++	if (!fingerprint)
++		goto cleanup_raw_fingerprint;
++
++	offset = digest_size - 8;
++	kdebug("offset %u/%u", offset, digest_size);
++
++	for (i = 0; i < digest_size; i++)
++		sprintf(fingerprint + i * 2, "%02x", raw_fingerprint[i]);
++	kdebug("fingerprint %s", fingerprint);
++
++	memcpy(&rsa->key_id, raw_fingerprint + offset, 8);
++	rsa->key_id_size = 8;
++
++	*_fingerprint = fingerprint;
++	fingerprint = NULL;
++	ret = 0;
++cleanup_raw_fingerprint:
++	kfree(raw_fingerprint);
++cleanup_hash:
++	kfree(digest);
++cleanup_tfm:
++	crypto_free_shash(tfm);
++cleanup:
++	kleave(" = %d", ret);
++	return ret;
++}
++
++struct RSA_pk_parse_context {
++	struct pgp_parse_context pgp;
++	struct RSA_payload *rsa;
++	struct RSA_public_key *pk;
++	char *fingerprint;
 +};
 +
 +/*
-+ * Process a V4 signature subpacket.
++ * Extract a public key or subkey from the PGP stream.
 + */
-+static int pgp_process_sig_params_subpkt(struct pgp_parse_sig_context *context,
-+					 enum pgp_sig_subpkt_type type,
-+					 const u8 *data,
-+					 size_t datalen)
++static int RSA_parse_public_key(struct pgp_parse_context *context,
++				enum pgp_packet_tag type,
++				u8 headerlen,
++				const u8 *data,
++				size_t datalen)
 +{
-+	struct pgp_parse_sig_params_ctx *ctx =
-+		container_of(context, struct pgp_parse_sig_params_ctx, base);
++	struct RSA_pk_parse_context *ctx =
++		container_of(context, struct RSA_pk_parse_context, pgp);
++	struct RSA_payload *rsa = ctx->rsa;
++	struct RSA_public_key *pk;
++	int i, ret;
 +
-+	if (ctx->got_the_issuer) {
-+		pr_warning("V4 signature packet has multiple issuers\n");
-+		return -EBADMSG;
++	kenter(",%u,%u,,%zu", type, headerlen, datalen);
++
++	if (rsa->public_key) {
++		kleave(" = -ENOKEY [already]");
++		return -ENOKEY;
 +	}
 +
-+	if (datalen != 8) {
-+		pr_warning("V4 signature issuer subpkt not 8 long (%zu)\n",
-+			   datalen);
-+		return -EBADMSG;
++	pk = kzalloc(sizeof(struct RSA_public_key), GFP_KERNEL);
++	if (!pk)
++		return -ENOMEM;
++
++	ret = pgp_parse_public_key(&data, &datalen, &pk->pgp);
++	if (pk->pgp.pubkey_algo != PGP_PUBKEY_RSA_ENC_OR_SIG &&
++	    pk->pgp.pubkey_algo != PGP_PUBKEY_RSA_ENC_ONLY &&
++	    pk->pgp.pubkey_algo != PGP_PUBKEY_RSA_SIG_ONLY) {
++		pr_debug("Ignoring non-RSA public key [%u]\n",
++			 pk->pgp.pubkey_algo);
++		ret = -ENOKEY;
++		goto cleanup;
 +	}
 +
-+	memcpy(&ctx->params->issuer, data, 8);
-+	ctx->got_the_issuer = true;
++	ret = -ENOMEM;
++	for (i = 0; i < RSA_NPKEY; i++) {
++		unsigned int remaining = datalen;
++		pk->pkey[i] = mpi_read_from_buffer(data, &remaining);
++		if (!pk->pkey[i])
++			goto cleanup;
++		data += remaining;
++		datalen -= remaining;
++	}
++
++	ret = RSA_get_fingerprint(rsa, pk, &ctx->fingerprint);
++	if (ret < 0)
++		goto cleanup;
++
++	rsa->public_key = pk;
++	kleave(" = 0 [use]");
 +	return 0;
++
++cleanup:
++	kdebug("cleanup");
++	if (pk) {
++		for (i = 0; i < RSA_NPKEY; i++)
++			mpi_free(pk->pkey[i]);
++		kfree(pk);
++	}
++	kleave(" = %d", ret);
++	return ret;
 +}
 +
-+/**
-+ * pgp_parse_sig_params - Parse basic parameters from a PGP signature packet
-+ * @_data: Content of packet (updated)
-+ * @_datalen: Length of packet remaining (updated)
-+ * @p: The basic parameters
-+ *
-+ * Parse the basic parameters from a PGP signature packet [RFC 4880: 5.2] that
-+ * are needed to start off a signature verification operation.  The only ones
-+ * actually necessary are the signature type (which affects how the data is
-+ * transformed) and the has algorithm.
-+ *
-+ * We also extract the public key algorithm and the issuer's key ID as we'll
-+ * need those to determine if we actually have the public key available.  If
-+ * not, then we can't verify the signature anyway.
-+ *
-+ * Returns 0 if successful or a negative error code.  *_data and *_datalen are
-+ * updated to point to the 16-bit subset of the hash value and the set of MPIs.
++/*
++ * Instantiate a RSA key
 + */
-+int pgp_parse_sig_params(const u8 **_data, size_t *_datalen,
-+			 struct pgp_sig_parameters *p)
++static int RSA_instantiate(struct key *key,
++			   const void *data, size_t datalen)
 +{
-+	enum pgp_signature_version version;
-+	const u8 *data = *_data;
-+	size_t datalen = *_datalen;
++	struct RSA_pk_parse_context ctx;
++	struct RSA_payload *rsa;
 +	int ret;
 +
-+	pr_devel("-->pgp_parse_sig_params(,%zu,,)", datalen);
++	ret = key_payload_reserve(key, datalen);
++	if (ret < 0)
++		return ret;
 +
-+	if (datalen < 1)
-+		return -EBADMSG;
-+	version = *data;
++	rsa = kzalloc(sizeof(struct RSA_payload), GFP_KERNEL);
++	if (!rsa)
++		return -ENOMEM;
 +
-+	if (version == PGP_SIG_VERSION_3) {
-+		const struct pgp_signature_v3_packet *v3 = (const void *)data;
++	ctx.pgp.types_of_interest = 1 << PGP_PKT_PUBLIC_KEY;
++	ctx.pgp.process_packet = RSA_parse_public_key;
++	ctx.rsa = rsa;
++	ctx.pk = NULL;
++	ctx.fingerprint = NULL;
 +
-+		if (datalen < sizeof(*v3)) {
-+			pr_warning("Short V3 signature packet\n");
-+			return -EBADMSG;
-+		}
-+		datalen -= sizeof(*v3);
-+		data += sizeof(*v3);
-+
-+		/* V3 has everything we need in the header */
-+		p->signature_type = v3->hashed.signature_type;
-+		p->issuer = v3->issuer;
-+		p->pubkey_algo = v3->pubkey_algo;
-+		p->hash_algo = v3->hash_algo;
-+
-+	} else if (version == PGP_SIG_VERSION_4) {
-+		const struct pgp_signature_v4_packet *v4 = (const void *)data;
-+		struct pgp_parse_sig_params_ctx ctx = {
-+			.base.process_packet = pgp_process_sig_params_subpkt,
-+			.params = p,
-+			.got_the_issuer = false,
-+		};
-+		size_t subdatalen;
-+
-+		if (datalen < sizeof(*v4) + 2 + 2 + 2) {
-+			pr_warning("Short V4 signature packet\n");
-+			return -EBADMSG;
-+		}
-+		datalen -= sizeof(*v4);
-+		data += sizeof(*v4);
-+
-+		/* V4 has most things in the header... */
-+		p->signature_type = v4->signature_type;
-+		p->pubkey_algo = v4->pubkey_algo;
-+		p->hash_algo = v4->hash_algo;
-+
-+		/* ... but we have to get the key ID from the subpackets, of
-+		 * which there are two sets. */
-+		__set_bit(PGP_SIG_ISSUER, ctx.base.types_of_interest);
-+
-+		subdatalen  = *data++ << 8;
-+		subdatalen |= *data++;
-+		datalen -= 2;
-+		if (subdatalen) {
-+			/* Hashed subpackets */
-+			pr_devel("hashed data: %zu (after %zu)\n",
-+				 subdatalen, sizeof(*v4));
-+			if (subdatalen > datalen + 2 + 2) {
-+				pr_warning("Short V4 signature packet [hdata]\n");
-+				return -EBADMSG;
-+			}
-+			ret = pgp_parse_sig_subpkts(data, subdatalen, &ctx.base);
-+			if (ret < 0)
-+				return ret;
-+			data += subdatalen;
-+			datalen += subdatalen;
-+		}
-+
-+		subdatalen  = *data++ << 8;
-+		subdatalen |= *data++;
-+		datalen -= 2;
-+		if (subdatalen) {
-+			/* Unhashed subpackets */
-+			pr_devel("unhashed data: %zu\n", subdatalen);
-+			if (subdatalen > datalen + 2) {
-+				pr_warning("Short V4 signature packet [udata]\n");
-+				return -EBADMSG;
-+			}
-+			ret = pgp_parse_sig_subpkts(data, subdatalen, &ctx.base);
-+			if (ret < 0)
-+				return ret;
-+			data += subdatalen;
-+			datalen += subdatalen;
-+		}
-+
-+		if (!ctx.got_the_issuer) {
-+			pr_warning("V4 signature packet lacks issuer\n");
-+			return -EBADMSG;
-+		}
-+	} else {
-+		pr_warning("Signature packet with unhandled version %d\n", version);
-+		return -EBADMSG;
++	ret = pgp_parse_packets(data, datalen, &ctx.pgp);
++	if (ret < 0) {
++		RSA_destroy_payload(rsa);
++		kfree(ctx.fingerprint);
++		key_payload_reserve(key, 0);
++		return ret;
 +	}
 +
-+	*_data = data;
-+	*_datalen = datalen;
++	key->type_data.p[0] = &RSA_crypto_key_subtype;
++	key->type_data.p[1] = ctx.fingerprint;
++	key->payload.data = rsa;
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(pgp_parse_sig_params);
++
++/*
++ * Destroy a RSA key
++ */
++static void RSA_destroy(struct key *key)
++{
++	if (key->payload.data)
++		RSA_destroy_payload(key->payload.data);
++}
++
++/*
++ * RSA crypto key subtype
++ */
++struct crypto_key_subtype RSA_crypto_key_subtype = {
++	.owner		= THIS_MODULE,
++	.name		= "rsa",
++	.pubkey_algo	= PGP_PUBKEY_RSA_ENC_OR_SIG,
++	.info		= CRYPTO_KEY_IS_PUBKEY_ALGO,
++	.instantiate	= RSA_instantiate,
++	.destroy	= RSA_destroy,
++};
++
++struct crypto_key_subtype RSA_crypto_key_subtype_2 = {
++	.owner		= THIS_MODULE,
++	.name		= "rsa",
++	.pubkey_algo	= PGP_PUBKEY_RSA_ENC_ONLY,
++	.info		= CRYPTO_KEY_IS_PUBKEY_ALGO,
++	.instantiate	= RSA_instantiate,
++	.destroy	= RSA_destroy,
++};
++
++struct crypto_key_subtype RSA_crypto_key_subtype_3 = {
++	.owner		= THIS_MODULE,
++	.name		= "rsa",
++	.pubkey_algo	= PGP_PUBKEY_RSA_SIG_ONLY,
++	.info		= CRYPTO_KEY_IS_PUBKEY_ALGO,
++	.instantiate	= RSA_instantiate,
++	.destroy	= RSA_destroy,
++};
++
++/*
++ * Module stuff
++ */
++static int __init RSA_init(void)
++{
++	int ret;
++
++	ret = register_crypto_key_subtype(&RSA_crypto_key_subtype);
++	if (ret < 0)
++		return ret;
++
++	ret = register_crypto_key_subtype(&RSA_crypto_key_subtype_2);
++	if (ret < 0)
++		goto error_1;
++
++	ret = register_crypto_key_subtype(&RSA_crypto_key_subtype_3);
++	if (ret < 0)
++		goto error_2;
++	return 0;
++
++error_2:
++	unregister_crypto_key_subtype(&RSA_crypto_key_subtype_2);
++error_1:
++	unregister_crypto_key_subtype(&RSA_crypto_key_subtype);
++	return ret;
++}
++
++static void __exit RSA_cleanup(void)
++{
++	unregister_crypto_key_subtype(&RSA_crypto_key_subtype);
++	unregister_crypto_key_subtype(&RSA_crypto_key_subtype_2);
++	unregister_crypto_key_subtype(&RSA_crypto_key_subtype_3);
++}
++
++module_init(RSA_init);
++module_exit(RSA_cleanup);
