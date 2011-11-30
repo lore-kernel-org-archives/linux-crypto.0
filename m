@@ -1,56 +1,43 @@
-From: Serge Hallyn <serge.hallyn@canonical.com>
-Subject: Re: [PATCH 02/16] MPILIB: Add a missing ENOMEM check [ver #2]
-Date: Wed, 30 Nov 2011 09:28:11 -0600
-Message-ID: <4ED64B8B.1050806@canonical.com>
-References: <20111129234258.13625.21153.stgit@warthog.procyon.org.uk> <20111129234323.13625.34554.stgit@warthog.procyon.org.uk>
+From: Leo Samulis <anagon@gmail.com>
+Subject: DM-Steg: New steganographic encryption module
+Date: Wed, 30 Nov 2011 16:27:14 +0000
+Message-ID: <CAO=0D2BDW9zuSWueEQUjffh-jSA5_JCqmf67keLKqw-+89dNXQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: keyrings@linux-nfs.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
-	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:51784 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752919Ab1K3P2T (ORCPT
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:36524 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753344Ab1K3Q1P (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Nov 2011 10:28:19 -0500
-In-Reply-To: <20111129234323.13625.34554.stgit@warthog.procyon.org.uk>
+	Wed, 30 Nov 2011 11:27:15 -0500
+Received: by vcbfk14 with SMTP id fk14so536636vcb.19
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2011 08:27:14 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/29/2011 05:43 PM, David Howells wrote:
-> Add a missing ENOMEM check.
->
-> Signed-off-by: David Howells<dhowells@redhat.com>
-> ---
->
->   lib/mpi/mpicoder.c |    2 ++
->   1 files changed, 2 insertions(+), 0 deletions(-)
->
->
-> diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-> index fe84bb9..6e225a8 100644
-> --- a/lib/mpi/mpicoder.c
-> +++ b/lib/mpi/mpicoder.c
-> @@ -255,6 +255,8 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
->   	if (!n)
->   		n++;		/* avoid zero length allocation */
->   	p = buffer = kmalloc(n, GFP_KERNEL);
-> +	if (p<  0)
-> +		return NULL;
+Hello folks,
 
-Sorry, maybe i'm having a confused morning, but shouldn't this check be 
-for p==NULL rather than p<0?
+I'd like to introduce DM-Steg. It's a device mapper module that
+provides deniable/steganographic encryption. DM-Steg provides similar
+capabilities to Rubberhose (a now defunct project by Julian Assange et
+al.) and more advanced deniable encryption than Truecrypt.
 
->
->   	for (i = a->nlimbs - 1; i>= 0; i--) {
->   		alimb = a->d[i];
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+DM-Steg can be used to hide any number of strongly encrypted volumes
+inside block devices or files. There is no way to determine how many
+volumes a block device contains or even if the block device is not
+random data. DM-Steg uses strong encryption yet still achives goood
+performance - up to 148 MB/s on my core 2 duo, and only 1% slowdown on
+kernel compiles.
+
+DM-Steg is working code and free software, so if you have any interest
+in deniable encryption, please head over to http://dmsteg.sf.net and
+grab the tarball!
+
+I've taken this project as far as I want so I'd very much like it if
+there's anyone in the OSS community who wants to take it further.
+Don't be shy! :)
+
+All the best,
+
+- Leo
