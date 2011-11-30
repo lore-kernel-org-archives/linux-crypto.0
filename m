@@ -1,43 +1,33 @@
-From: Leo Samulis <anagon@gmail.com>
-Subject: DM-Steg: New steganographic encryption module
-Date: Wed, 30 Nov 2011 16:27:14 +0000
-Message-ID: <CAO=0D2BDW9zuSWueEQUjffh-jSA5_JCqmf67keLKqw-+89dNXQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 02/16] MPILIB: Add a missing ENOMEM check [ver #2]
+Date: Wed, 30 Nov 2011 17:00:01 +0000
+Message-ID: <21008.1322672401@redhat.com>
+References: <4ED64B8B.1050806@canonical.com> <20111129234258.13625.21153.stgit@warthog.procyon.org.uk> <20111129234323.13625.34554.stgit@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
+	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
+	alan.cox@intel.com
+To: Serge Hallyn <serge.hallyn@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:36524 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753344Ab1K3Q1P (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Nov 2011 11:27:15 -0500
-Received: by vcbfk14 with SMTP id fk14so536636vcb.19
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2011 08:27:14 -0800 (PST)
+Received: from mx1.redhat.com ([209.132.183.28]:47850 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757888Ab1K3RAN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Nov 2011 12:00:13 -0500
+In-Reply-To: <4ED64B8B.1050806@canonical.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello folks,
+Serge Hallyn <serge.hallyn@canonical.com> wrote:
 
-I'd like to introduce DM-Steg. It's a device mapper module that
-provides deniable/steganographic encryption. DM-Steg provides similar
-capabilities to Rubberhose (a now defunct project by Julian Assange et
-al.) and more advanced deniable encryption than Truecrypt.
+> >   	p = buffer = kmalloc(n, GFP_KERNEL);
+> > +	if (p<  0)
+> > +		return NULL;
+> 
+> Sorry, maybe i'm having a confused morning, but shouldn't this check be for
+> p==NULL rather than p<0?
 
-DM-Steg can be used to hide any number of strongly encrypted volumes
-inside block devices or files. There is no way to determine how many
-volumes a block device contains or even if the block device is not
-random data. DM-Steg uses strong encryption yet still achives goood
-performance - up to 148 MB/s on my core 2 duo, and only 1% slowdown on
-kernel compiles.
+Bah.  You are, of course, right.  Updated for the next version.
 
-DM-Steg is working code and free software, so if you have any interest
-in deniable encryption, please head over to http://dmsteg.sf.net and
-grab the tarball!
-
-I've taken this project as far as I want so I'd very much like it if
-there's anyone in the OSS community who wants to take it further.
-Don't be shy! :)
-
-All the best,
-
-- Leo
+David
