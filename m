@@ -1,7 +1,8 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 02/21] MPILIB: Add a missing ENOMEM check [ver #3]
-Date: Fri, 02 Dec 2011 18:42:54 +0000
-Message-ID: <20111202184254.21874.48740.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 03/21] KEYS: Permit key_serial() to be called with a const key
+ pointer [ver #3]
+Date: Fri, 02 Dec 2011 18:43:05 +0000
+Message-ID: <20111202184305.21874.75852.stgit@warthog.procyon.org.uk>
 References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -17,25 +18,25 @@ In-Reply-To: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a missing ENOMEM check.
+Permit key_serial() to be called with a const key pointer.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- lib/mpi/mpicoder.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ include/linux/key.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index fe84bb9..716802b 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -255,6 +255,8 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
- 	if (!n)
- 		n++;		/* avoid zero length allocation */
- 	p = buffer = kmalloc(n, GFP_KERNEL);
-+	if (!p)
-+		return NULL;
+diff --git a/include/linux/key.h b/include/linux/key.h
+index 183a6af..f87b51b 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -271,7 +271,7 @@ extern int keyring_add_key(struct key *keyring,
  
- 	for (i = a->nlimbs - 1; i >= 0; i--) {
- 		alimb = a->d[i];
+ extern struct key *key_lookup(key_serial_t id);
+ 
+-static inline key_serial_t key_serial(struct key *key)
++static inline key_serial_t key_serial(const struct key *key)
+ {
+ 	return key ? key->serial : 0;
+ }
