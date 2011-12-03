@@ -1,44 +1,96 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5.2 00/14] crc32c: Add faster algorithm and self-test
-	code
-Date: Sat, 3 Dec 2011 19:00:50 +0800
-Message-ID: <20111203110049.GA31151@gondor.apana.org.au>
-References: <20111201201341.5876.83743.stgit@elm3c44.beaverton.ibm.com> <20111201202053.GG1495@noexit.corp.google.com> <20111201203122.GC23175@tux1.beaverton.ibm.com> <20111202002358.GA19842@gondor.apana.org.au> <20111203023037.GA16577@tux1.beaverton.ibm.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH 3.2] crypto: twofish-x86_64-3way - blacklist pentium4 and atom
+Date: Sat, 03 Dec 2011 16:10:04 +0200
+Message-ID: <20111203141004.4329.29784.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Theodore Tso <tytso@mit.edu>,
-	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>, linux-ext4@vger.kernel.org
-To: "Darrick J. Wong" <djwong@us.ibm.com>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20111203023037.GA16577@tux1.beaverton.ibm.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34825 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751502Ab1LCOKI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 3 Dec 2011 09:10:08 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 02, 2011 at 06:30:37PM -0800, Darrick J. Wong wrote:
-> On Fri, Dec 02, 2011 at 08:23:58AM +0800, Herbert Xu wrote:
-> > On Thu, Dec 01, 2011 at 12:31:22PM -0800, Darrick J. Wong wrote:
-> > .
-> > > They seem to call crc32c(), which is in crypto/crc32c.  If you're interested in
-> > 
-> > Nope, the crypto API layer will use the SSE implementation
-> > where available.  Only when it isn't available will the C version
-> > in crypto/ be used.
-> 
-> There's a SSE version other than what's in crc32c-intel?
+Performance of twofish-x86_64-3way on Intel Pentium 4 and Atom is lower than
+of twofish-x86_64 module. So blacklist these CPUs.
 
-crc32c-intel is what I meant.  My point is that it'll be used
-automatically.
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ arch/x86/crypto/twofish_glue_3way.c |   47 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 47 insertions(+), 0 deletions(-)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 5ede9c4..4897b6b 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
+@@ -25,6 +25,7 @@
+  *
+  */
+ 
++#include <asm/processor.h>
+ #include <linux/crypto.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+@@ -432,10 +433,56 @@ static struct crypto_alg blk_ctr_alg = {
+ 	},
+ };
+ 
++static bool is_blacklisted_cpu(void)
++{
++	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
++		return false;
++
++	if (boot_cpu_data.x86 == 0x06 &&
++		(boot_cpu_data.x86_model == 0x1c ||
++		 boot_cpu_data.x86_model == 0x26 ||
++		 boot_cpu_data.x86_model == 0x36)) {
++		/*
++		 * On Atom, twofish-3way is slower than original assembler
++		 * implementation. Twofish-3way trades off some performance in
++		 * storing blocks in 64bit registers to allow three blocks to
++		 * be processed parallel. Parallel operation then allows gaining
++		 * more performance than was trade off, on out-of-order CPUs.
++		 * However Atom does not benefit from this parallellism and
++		 * should be blacklisted.
++		 */
++		return true;
++	}
++
++	if (boot_cpu_data.x86 == 0x0f) {
++		/*
++		 * On Pentium 4, twofish-3way is slower than original assembler
++		 * implementation because excessive uses of 64bit rotate and
++		 * left-shifts (which are really slow on P4) needed to store and
++		 * handle 128bit block in two 64bit registers.
++		 */
++		return true;
++	}
++
++	return false;
++}
++
++static int force;
++module_param(force, int, 0);
++MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
++
+ int __init init(void)
+ {
+ 	int err;
+ 
++	if (!force && is_blacklisted_cpu()) {
++		printk(KERN_INFO
++			"twofish-x86_64-3way: performance on this CPU "
++			"would be suboptimal: disabling "
++			"twofish-x86_64-3way.\n");
++		return -ENODEV;
++	}
++
+ 	err = crypto_register_alg(&blk_ecb_alg);
+ 	if (err)
+ 		goto ecb_err;
