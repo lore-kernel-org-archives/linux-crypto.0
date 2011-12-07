@@ -1,28 +1,52 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [Keyrings] [RFC][PATCH 00/16] Crypto keys and module signing [ver #2]
-Date: Wed, 07 Dec 2011 14:29:32 +0000
-Message-ID: <28095.1323268172@redhat.com>
-References: <alpine.LRH.2.00.1112061151520.25445@tundra.namei.org> <4EDCABBD.9020401@intel.com> <20111129234258.13625.21153.stgit@warthog.procyon.org.uk> <776.1323085419@redhat.com>
-Cc: dhowells@redhat.com, "H. Peter Anvin" <h.peter.anvin@intel.com>,
-	keyrings@linux-nfs.org, alan.cox@intel.com,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, dmitry.kasatkin@intel.com,
-	linux-crypto@vger.kernel.org, arjan.van.de.ven@intel.com,
-	Herbert Xu <herbert@gondor.hengli.com.au>
-To: James Morris <jmorris@namei.org>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <alpine.LRH.2.00.1112061151520.25445@tundra.namei.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Seth Jennings <sjenning@linux.vnet.ibm.com>
+Subject: [PATCH 0/3] crypto: Add per-cpu transform helpers
+Date: Wed,  7 Dec 2011 12:59:07 -0600
+Message-ID: <1323284350-13784-1-git-send-email-sjenning@linux.vnet.ibm.com>
+Cc: Seth Jennings <sjenning@linux.vnet.ibm.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
+	Brian King <brking@linux.vnet.ibm.com>,
+	Robert Jennings <rcj@linux.vnet.ibm.com>
+To: "David S . Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e8.ny.us.ibm.com ([32.97.182.138]:38006 "EHLO e8.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757925Ab1LGS7r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Dec 2011 13:59:47 -0500
+Received: from /spool/local
+	by e8.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <sjenning@linux.vnet.ibm.com>;
+	Wed, 7 Dec 2011 13:59:43 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-James Morris <jmorris@namei.org> wrote:
+This patchset includes two new functions for the cryptographic library,
+crypto_alloc_percpu_tfms() and crypto_free_percpu_tfms(), which assist users
+in allocating and freeing per-cpu transforms.
 
-> > However, we don't have to include the DSA stuff in the kernel; I can always
-> > discard that patch from the upstream-aimed patchset.
-> 
-> I'd encourage dropping DSA, as there appears to be no legacy justification 
-> for its inclusion. 
+It also includes typing wrappers for the compression algorithm class.
 
-Okay, done that.
+The reason for this patch is that during my work to enable page compression
+via the cryptographic API in the zcache staging driver, and realized that I
+had rewritten some per-cpu transform code that already exists in the
+xfrm_ipcomp code.
 
-David
+In an effort to avoid duplication, this patchset moves the per-cpu code into
+helper functions in the cryptographic library and makes the necessary
+modifications to the xfrm_ipcomp code.
+
+After this change is (hopefully) merged, I will submit the zcache driver
+changes, which will be the second user of these helpers.
+
+Seth Jennings (3):
+  crypto: Add per-cpu transform alloc() and free()
+  crypto: Add inline per-cpu wrappers for compression
+  xfrm: Modify xfrm_ipcomp code to use new per-cpu helpers
+
+ crypto/api.c           |   62 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/crypto.h |   28 +++++++++++++++++++++
+ net/xfrm/xfrm_ipcomp.c |   34 ++++++--------------------
+ 3 files changed, 98 insertions(+), 26 deletions(-)
+
+-- 
+1.7.5.4
