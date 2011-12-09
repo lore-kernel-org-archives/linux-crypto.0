@@ -1,53 +1,40 @@
-From: Rusty Russell <rusty@ozlabs.org>
-Subject: Re: [PATCH 21/21] MODSIGN: Apply signature checking to modules on module load [ver #3]
-Date: Fri, 09 Dec 2011 21:48:45 +1030
-Message-ID: <87boriouwa.fsf@rustcorp.com.au>
-References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk> <20111202184651.21874.57769.stgit@warthog.procyon.org.uk>
+From: "=?UTF-8?B?IlNJTUtJTlMgTFREIg==?=" <simkinsltd@gmail.com>
+Subject: =?UTF-8?B?UHJvZHVjdCBPcmRlcg==?=
+Date: Fri, 09 Dec 2011 18:31:55 +0545
+Message-ID: <20111209124655.D2DE5343EF6__26935.3113290437$1323443014$gmane$org@ns1.info.com.np>
+Reply-To: "=?UTF-8?B?IlNJTUtJTlMgTFREIg==?=" <simkinsltd@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
-	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com, David Howells <dhowells@redhat.com>
-To: David Howells <dhowells@redhat.com>, keyrings@linux-nfs.org
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: <simkinsltd@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:57155 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751441Ab1LIMGY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Dec 2011 07:06:24 -0500
-In-Reply-To: <20111202184651.21874.57769.stgit@warthog.procyon.org.uk>
+Received: from makhamali.info.com.np ([203.78.160.38]:57248 "EHLO
+	ns1.info.com.np" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751693Ab1LIPCp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Dec 2011 10:02:45 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 02 Dec 2011 18:46:51 +0000, David Howells <dhowells@redhat.com> wrote:
-> Signed modules may be safely stripped as the signature only covers those parts
-> of the module the kernel actually uses and any ELF metadata required to deal
-> with them.  Any necessary ELF metadata that is affected by stripping is
-> canonicalised by the sig generator and the sig checker to hide strip effects.
-> 
-> This permits the debuginfo to be detached from the module and placed
-> in another spot so that gdb can find it when referring to that module
-> without the need for multiple signed versions of the module.  Such is
-> done by rpmbuild when producing RPMs.
-> 
-> It also permits the module to be stripped as far as possible for when modules
-> are being reduced prior to being included in an initial ramdisk composition.
 
-And adds a great deal of code in a supposedly security-sensitive path to
-achieve it.
 
-How about simply append a signature to the module?  That'd be about 20
-lines of code to carefully check the bounds of the module to figure out
-where the signature is.  You could even allow multiple signatures, then
-have one for stripped, and one for non-stripped versions.
+Hello,
 
-Sure, you now need to re-append that after stripping, but that's not the
-kernel's problem.
+I am Manager of SIMKINS LTD. USA, My company is interested in the
+purchase of your products.
 
-Cheers,
-Rusty.
-PS.  Yay for finding out about module patches via LWN!  How would you
-     get this in without my ack, FFS?
-  
-  
+Kindly send me an email with details of:
+
+*Minimum Order Quantity
+*Your delivery time
+*Payment terms
+*And your products warranty
+
+I await to hear from you urgently
+Mr Stefan Al Simkins.
+Purchasing Manager.
+SIMKINS LTD
+
+___________________________________
+NOCC, http://nocc.sourceforge.net
