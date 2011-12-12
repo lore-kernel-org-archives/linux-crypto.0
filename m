@@ -1,58 +1,76 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 1/7] crypto: talitos - fix bad kfree
-Date: Mon, 12 Dec 2011 14:59:10 -0600
-Message-ID: <1323723556-7100-2-git-send-email-kim.phillips@freescale.com>
+Subject: [PATCH 7/7] crypto: caam - remove DECO access initialization code
+Date: Mon, 12 Dec 2011 14:59:16 -0600
+Message-ID: <1323723556-7100-8-git-send-email-kim.phillips@freescale.com>
 References: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:8449 "EHLO
-	TX2EHSOBE009.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753965Ab1LLVAe (ORCPT
+Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:19008 "EHLO
+	TX2EHSOBE004.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754014Ab1LLVAf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Dec 2011 16:00:34 -0500
+	Mon, 12 Dec 2011 16:00:35 -0500
 In-Reply-To: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix a kfree to an invalid address which causes an oops when running
-on SEC v2.0 h/w (introduced in commit 702331b "crypto: talitos - add
-hmac algorithms").
+Access to the SEC4 DECOs (DEscriptor COntrollers) (for debug purposes)
+isn't supported or used, and its register access initialization code
+erroneously makes illegal i/o accesses that show up as errors when
+run under simulation.  Remove it until proper support (via DECORR)
+is added.
 
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/talitos.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/caam/ctrl.c |   13 -------------
+ drivers/crypto/caam/regs.h |    1 -
+ 2 files changed, 0 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 230509e..d376cc7 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2626,8 +2626,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg = &t_alg->algt.alg.hash.halg.base;
- 		alg->cra_init = talitos_cra_init_ahash;
- 		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
--		    !strncmp(alg->cra_name, "hmac", 4))
-+		    !strncmp(alg->cra_name, "hmac", 4)) {
-+			kfree(t_alg);
- 			return ERR_PTR(-ENOTSUPP);
-+		}
- 		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
- 		    (!strcmp(alg->cra_name, "sha224") ||
- 		     !strcmp(alg->cra_name, "hmac(sha224)"))) {
-@@ -2835,10 +2837,8 @@ static int talitos_probe(struct platform_device *ofdev)
- 			t_alg = talitos_alg_alloc(dev, &driver_algs[i]);
- 			if (IS_ERR(t_alg)) {
- 				err = PTR_ERR(t_alg);
--				if (err == -ENOTSUPP) {
--					kfree(t_alg);
-+				if (err == -ENOTSUPP)
- 					continue;
--				}
- 				goto err_out;
- 			}
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 048bb23..8ae3ba2 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -52,8 +52,6 @@ static int caam_probe(struct platform_device *pdev)
+ 	struct caam_ctrl __iomem *ctrl;
+ 	struct caam_full __iomem *topregs;
+ 	struct caam_drv_private *ctrlpriv;
+-	struct caam_deco **deco;
+-	u32 deconum;
+ #ifdef CONFIG_DEBUG_FS
+ 	struct caam_perfmon *perfmon;
+ #endif
+@@ -92,17 +90,6 @@ static int caam_probe(struct platform_device *pdev)
+ 	if (sizeof(dma_addr_t) == sizeof(u64))
+ 		dma_set_mask(dev, DMA_BIT_MASK(36));
  
+-	/* Find out how many DECOs are present */
+-	deconum = (rd_reg64(&topregs->ctrl.perfmon.cha_num) &
+-		   CHA_NUM_DECONUM_MASK) >> CHA_NUM_DECONUM_SHIFT;
+-
+-	ctrlpriv->deco = kmalloc(deconum * sizeof(struct caam_deco *),
+-				 GFP_KERNEL);
+-
+-	deco = (struct caam_deco __force **)&topregs->deco;
+-	for (d = 0; d < deconum; d++)
+-		ctrlpriv->deco[d] = deco[d];
+-
+ 	/*
+ 	 * Detect and enable JobRs
+ 	 * First, find out how many ring spec'ed, allocate references
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index aee394e..e9f7a70 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -657,7 +657,6 @@ struct caam_full {
+ 	u64 rsvd[512];
+ 	struct caam_assurance assure;
+ 	struct caam_queue_if qi;
+-	struct caam_deco *deco;
+ };
+ 
+ #endif /* REGS_H */
 -- 
 1.7.8
