@@ -1,177 +1,29 @@
-From: Rusty Russell <rusty@ozlabs.org>
-Subject: Re: [PATCH 21/21] MODSIGN: Apply signature checking to modules on module load [ver #3]
-Date: Mon, 12 Dec 2011 19:39:34 +1030
-Message-ID: <87ty56taup.fsf@rustcorp.com.au>
-References: <87obvfogc6.fsf@rustcorp.com.au> <8739csq5ac.fsf@rustcorp.com.au> <87boriouwa.fsf@rustcorp.com.au> <20111202184229.21874.25782.stgit@warthog.procyon.org.uk> <20111202184651.21874.57769.stgit@warthog.procyon.org.uk> <2657.1323456206@redhat.com> <30007.1323526114@redhat.com> <26644.1323652900@redhat.com>
+From: Joseph Evans <josephconsultancy1@gmail.com>
+Subject: Xmas Lening Aanbieding
+Date: Mon, 12 Dec 2011 05:11:54 -0800
+Message-ID: <CA+B1JgHAsBQcPs25J3R6CebckUYuaoWN000MHV7Mtt_13hgsnw__26228.2944437631$1323695536$gmane$org@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: dhowells@redhat.com, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
-	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com, Jon Masters <jcm@jonmasters.org>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <26644.1323652900@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:43535 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753205Ab1LLNMB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Dec 2011 08:12:01 -0500
+Received: by mail-gx0-f174.google.com with SMTP id k6so1076192ggd.19
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2011 05:12:01 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 12 Dec 2011 01:21:40 +0000, David Howells <dhowells@redhat.com> wrote:
-> Rusty Russell <rusty@ozlabs.org> wrote:
-> 
-> > I think you misunderstand, I'm talking about the modinfo command, not
-> > the .modinfo section.
-> 
-> Sorry, yes.  But why do you need to enhance modinfo?
+Wir sind auf dem XAMS Kredit Angebot mit so viel Bonus, bitte
+kontaktieren Sie mich, wenn Sie tun m=FCssen, jede Form von Darlehen vo=
+n
+unserer Firma.
+Gr=FC=DFe
 
-I was suggesting that you want it to print the signatures, or at least
-indicate their existence.  Maybe check them too, but that might be a bit
-too heavy for modinfo.
 
-> > But I need to know exactly what these version-dependent mangling of
-> > modules is.  Is it real?  Is it more than strip?  Is it so hard to fix
-> > that it makes sense to add 450 lines of dense kernel code to allow
-> > alteration of a module after signing?
-> 
-> The strip program (as far as I know that's the only binutil that we need worry
-> about) rearranges and reorders the section, symbol and relocation tables when
-> it discards stuff, and different versions of strip have done it
-> differently.
-
-OK, then you need to generate stripped modules as part of the build,
-too.  It's a bit of a pain, sure, but hardly a showstopper.
-
-> However, you said it should be fairly easy to jump over the ELF parcel to get
-> to the signature.  How do you plan on doing that?
-
-> I presume you would just parse sufficient of the ELF to find the
-> theoretical ELF EOF and then look there for a whole string of
-> signatures
-
-You could do that.  But there's an easier way.  Took me longer to figure
-out the damn crypto API than actually write the module part :(
-
-Subject: module: simple signature support.
-
-A signature contains a magic marker: it signs everything up to the
-magic marker (ie. just append them):
-	SUM=`md5sum drivers/block/loop.ko | cut -d\  -f1`; echo "@Module signature:$SUM" >> drivers/block/loop.ko
-
-We can have false positives, but at worst that make us report EINVAL
-(bad signature) instead of ENOENT (no signature).
-
-diff --git a/kernel/module.c b/kernel/module.c
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -2374,6 +2374,98 @@ free_hdr:
- 	return err;
- }
- 
-+/* CONFIG_MODULE_SIGN implies we don't trust modules: verify signature
-+ * before we interpret (almost) anything. */
-+#define MOD_SIGNATURE "@Module signature:"
-+
-+#include <linux/ctype.h>
-+#include <crypto/hash.h>
-+#include <crypto/md5.h>
-+
-+static int from_hex(char c)
-+{
-+	if (isdigit(c))
-+		return c - '0';
-+	if (isupper(c))
-+		return c - 'A' + 10;
-+	return c - 'a' + 10;
-+}
-+
-+/* A signature signs everything before it. */
-+static int try_signature(void *data, void *sig, unsigned long max_sig)
-+{
-+	unsigned long data_len = sig - data;
-+
-+	sig += strlen(MOD_SIGNATURE);
-+	max_sig -= strlen(MOD_SIGNATURE);
-+
-+	/* Dummy: accept md5 as signature. */
-+	{
-+		struct crypto_api_blows {
-+			struct shash_desc md5;
-+			char morestuff[100];
-+		} m;
-+		u8 digest[MD5_DIGEST_SIZE], expected[MD5_DIGEST_SIZE];
-+		char *s = sig;
-+		int i;
-+
-+		/* Not a signature? */
-+		if (max_sig < MD5_DIGEST_SIZE * 2) {
-+			printk("Too close to end (%lu)\n", max_sig);
-+			return -ENOENT;
-+		}
-+
-+		for (i = 0; i < MD5_DIGEST_SIZE * 2; i += 2) {
-+			/* Not a signature? */
-+			if (!isxdigit(s[i]) || !isxdigit(s[i+1])) {
-+				printk("Not hex digit (%c)\n", s[i]);
-+				return -ENOENT;
-+			}
-+			digest[i/2] = (from_hex(s[i])<<4) | from_hex(s[i+1]);
-+		}
-+
-+		m.md5.tfm = crypto_alloc_shash("md5", 0, 0);
-+		if (IS_ERR(m.md5.tfm))
-+			return PTR_ERR(m.md5.tfm);
-+		m.md5.flags = 0;
-+
-+		crypto_shash_digest(&m.md5, data, data_len, expected);
-+		crypto_free_shash(m.md5.tfm);
-+		
-+		if (memcmp(digest, expected, sizeof(digest)) != 0) {
-+			printk("Mismatch: given %02x%02x%02x...,"
-+			       " expect %02x%02x%02x...\n",
-+			       digest[0], digest[1], digest[2],
-+			       expected[0], expected[1], expected[2]);
-+			return -EINVAL;
-+		}
-+		printk("Found valid signature!\n");
-+		return 0;
-+	}
-+}
-+
-+/* -ENOENT if no signature found, -EINVAL if invalid, 0 if good. */
-+static int find_and_check_signatures(struct load_info *info)
-+{
-+	void *p = info->hdr, *end = p + info->len;
-+	const size_t sigsize = strlen(MOD_SIGNATURE);
-+	int err = -ENOENT;
-+
-+	/* Poor man's memmem. len > sigsize */
-+	while ((p = memchr(p, MOD_SIGNATURE[0], end - p))) {
-+		if (p + sigsize > end)
-+			break;
-+
-+		if (memcmp(p, MOD_SIGNATURE, sigsize) == 0) {
-+			err = try_signature(info->hdr, p, end - p);
-+			if (!err)
-+				break;
-+		}
-+		p++;
-+	}
-+	return err;
-+}
-+
- static void free_copy(struct load_info *info)
- {
- 	vfree(info->hdr);
-@@ -2819,6 +2911,11 @@ static struct module *load_module(void _
- 	if (err)
- 		return ERR_PTR(err);
- 
-+	/* Before we trust it, carefully check signatures. */
-+	err = find_and_check_signatures(&info);
-+	if (err)
-+		goto free_copy;
-+
- 	/* Figure out module layout, and allocate all the memory. */
- 	mod = layout_and_allocate(&info);
- 	if (IS_ERR(mod)) {
+We are on our xams loan special offer with so much bonus, please do
+contact me if you do need any form of loan from our firm.
+Regards
