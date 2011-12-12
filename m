@@ -1,106 +1,82 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 21/21] MODSIGN: Apply signature checking to modules on module load [ver #3]
-Date: Mon, 12 Dec 2011 16:11:27 +0000
-Message-ID: <21605.1323706287@redhat.com>
-References: <87ty56taup.fsf@rustcorp.com.au> <87obvfogc6.fsf@rustcorp.com.au> <8739csq5ac.fsf@rustcorp.com.au> <87boriouwa.fsf@rustcorp.com.au> <20111202184229.21874.25782.stgit@warthog.procyon.org.uk> <20111202184651.21874.57769.stgit@warthog.procyon.org.uk> <2657.1323456206@redhat.com> <30007.1323526114@redhat.com> <26644.1323652900@redhat.com>
-Cc: dhowells@redhat.com, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmitry.kasatkin@intel.com,
-	zohar@linux.vnet.ibm.com, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com, Jon Masters <jcm@jonmasters.org>
-To: Rusty Russell <rusty@ozlabs.org>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 1/1] Added CRYPTO_ALG_KERN_DRIVER_ONLY flag.
+Date: Mon, 12 Dec 2011 14:43:09 -0600
+Message-ID: <20111212144309.5c1db15ae58ad5167cddb6ec@freescale.com>
+References: <4EE4A172.9010308@gnutls.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:19613 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753192Ab1LLQLm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Dec 2011 11:11:42 -0500
-In-Reply-To: <87ty56taup.fsf@rustcorp.com.au>
+Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:17557
+	"EHLO DB3EHSOBE005.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753690Ab1LLUo3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Dec 2011 15:44:29 -0500
+In-Reply-To: <4EE4A172.9010308@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rusty Russell <rusty@ozlabs.org> wrote:
+On Sun, 11 Dec 2011 13:26:26 +0100
+Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
 
-> OK, then you need to generate stripped modules as part of the build,
-> too.  It's a bit of a pain, sure, but hardly a showstopper.
+> The added CRYPTO_ALG_KERN_DRIVER_ONLY flag indicates whether a cipher
+> is only available via a kernel driver. If the cipher implementation
+> might be available by using an instruction set or by porting the
+> kernel code, then it must not be set.
+> 
+> Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+> ---
+>  drivers/crypto/geode-aes.c        |    8 ++++--
+>  drivers/crypto/hifn_795x.c        |    3 +-
+>  drivers/crypto/ixp4xx_crypto.c    |    2 +
+>  drivers/crypto/mv_cesa.c          |   12 ++++++---
+>  drivers/crypto/n2_core.c          |    7 ++++-
+>  drivers/crypto/omap-aes.c         |    8 ++++-
+>  drivers/crypto/omap-sham.c        |    4 +++
+>  drivers/crypto/picoxcell_crypto.c |   46 +++++++++++++++++++++++++++--------
+>  drivers/crypto/s5p-sss.c          |    6 +++-
+>  drivers/crypto/talitos.c          |   48 ++++++++++++++++++++++++++----------
+>  include/linux/crypto.h            |    5 ++++
+>  11 files changed, 110 insertions(+), 39 deletions(-)
 
-They'd have to be maximally stripped so that mkinitrd doesn't do anything to
-them, but you'd then get the debuginfo from them into the packaging if you're
-on some distribution or other.  And you also provide an option to not strip
-them if whoever wants them unstripped.
+This appears to be based on an older version of the current master
+of Herbert's cryptodev tree on github [1] - it's missing the hmac
+algorithms introduced in commit 79b3a41 "crypto: talitos - add hmac
+algorithms", and a caam entry is missing (it's an offload engine,
+just like talitos). Something like:
 
-> A signature contains a magic marker
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index e73cf2e..e9acadb 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2205,7 +2205,8 @@ static struct caam_crypto_alg *caam_alg_alloc(struct device *ctrldev,
+ 	alg->cra_blocksize = template->blocksize;
+ 	alg->cra_alignmask = 0;
+ 	alg->cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->cra_flags = CRYPTO_ALG_ASYNC | template->type;
++	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY |
++			 template->type;
+ 	switch (template->type) {
+ 	case CRYPTO_ALG_TYPE_ABLKCIPHER:
+ 		alg->cra_type = &crypto_ablkcipher_type;
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 2d8c789..dc641c7 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2648,6 +2648,7 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 	alg->cra_priority = TALITOS_CRA_PRIORITY;
+ 	alg->cra_alignmask = 0;
+ 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
++	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	t_alg->dev = dev;
+ 
+should be fine for both talitos and caam drivers.
 
-I don't like this particularly - you can't guarantee that this won't be
-generated by the assembler quite by accident.  You should find the end of the
-ELF and work from there.  It should be a simple matter of parsing the header
-and the section table only, right?  Then you can look at the file offset +
-length of the last section in the file.  At that point, assuming this isn't
-coincident with the actual end of the file, you can try parsing what's
-thereafter as a signature.  If it is actual PGP, then an RFC4880 parser should
-recognise it as valid, and a signature packet should be seen.
+Thanks,
 
-> A signature contains a magic marker: it signs everything up to the
-> magic marker (ie. just append them):
-> 	SUM=`md5sum drivers/block/loop.ko | cut -d\  -f1`; echo "@Module signature:$SUM" >> drivers/block/loop.ko
+Kim
 
-That's not a useful signature, but I suspect you're just showing this as an
-example.
-
-> We can have false positives, but at worst that make us report EINVAL
-> (bad signature) instead of ENOENT (no signature).
-
-EKEYREJECTED please; that way it's the same as RHEL does now.
-
-> Took me longer to figure out the damn crypto API
-
-You don't actually need to use that.  The crypto API for the moment doesn't do
-crytographic signature verification.
-
-Look at:
-
-	http://git.kernel.org/?p=linux/kernel/git/dhowells/linux-modsign.git;a=shortlog;h=refs/heads/devel
-
->From tag cryptokeys-2011-12-07.  That's my crypto signature verification stuff
-in the kernel.  You can build on that.  The last patch in the sequence has
-some of the bits you need for actually generating the signature, though rather
-than editing the ELF, you'd just append all the signatures you actually need.
-
-The following file:
-
-http://git.kernel.org/?p=linux/kernel/git/dhowells/linux-modsign.git;a=blob;f=kernel/module-verify-sig.c;h=ced56816b2c47307a36cce0c6f829ea23fc5f2e6;hb=d71374f23e3a8c88c3ae20f62f04fb07a641f805
-
-has an example of how it can be used, but it's basically:
-
-	struct crypto_key_verify_context *mod_sig;
-	u8 *sig = <signature data>;
-	size_t sig_size = <signature data size>;
-
-	/* Find the crypto key for the module signature
-	 * - !!! if this tries to load the required hash algorithm module,
-	 *       we will deadlock!!!
-	 */
-	mod_sig = verify_sig_begin(modsign_keyring, sig, sig_size);
-	if (IS_ERR(mod_sig))
-		...
-
-returns -EBADMSG if none of its parsers recognise the signature, -ENOPKG if
-the signature is recognised, but we can't handle it (for instance if it's an
-unsupported hash algorithm), -ENOKEY if we recognise it, but there's no key
-available or -EKEYREJECTED if we recognised it, found the matching key, but
-the key couldn't be used to verify the signature for some reason.
-
-	/* Call repeatedly to shovel data into the crypto hash */
-	verify_sig_add_data(mod_sig, dataptr, datasize);
-
-	/* Call to finalise and actually perform the verification */
-	ret = verify_sig_end(mod_sig, sig, sig_size);
-
-or:
-
-	/* Call to cancel the verification */
-	verify_sig_cancel(mod_sig);
-
-This does all the work for you.
-
-David
+[1] git://github.com/herbertx/cryptodev.git
