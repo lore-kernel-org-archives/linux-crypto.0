@@ -1,562 +1,164 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 5/7] crypto: caam - more desc.h cleanups
-Date: Mon, 12 Dec 2011 14:59:14 -0600
-Message-ID: <1323723556-7100-6-git-send-email-kim.phillips@freescale.com>
-References: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH 14/14] crc32: Select an algorithm via kconfig
+Date: Mon, 12 Dec 2011 14:58:57 -0800
+Message-ID: <20111212225857.GM7137@tux1.beaverton.ibm.com>
+References: <20111201201341.5876.83743.stgit@elm3c44.beaverton.ibm.com> <20111201201517.5876.39207.stgit@elm3c44.beaverton.ibm.com> <20111202002505.GB19842@gondor.apana.org.au> <20111203023646.GB16577@tux1.beaverton.ibm.com>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:27811 "EHLO
-	TX2EHSOBE006.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754002Ab1LLVAq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Dec 2011 16:00:46 -0500
-In-Reply-To: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Theodore Tso <tytso@mit.edu>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>, linux-ext4@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Bob Pearson <rpearson@systemfabricworks.com>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20111203023646.GB16577@tux1.beaverton.ibm.com>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-manual removal of double-spaces - no non-whitespace changes.
+On Fri, Dec 02, 2011 at 06:36:46PM -0800, Darrick J. Wong wrote:
+> On Fri, Dec 02, 2011 at 08:25:05AM +0800, Herbert Xu wrote:
+> > On Thu, Dec 01, 2011 at 12:15:17PM -0800, Darrick J. Wong wrote:
+> > > Allow the kernel builder to choose a crc32* algorithm for the kernel.
+> > > 
+> > > Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
+> > 
+> > I don't like this at all.  How do you expect distros or indeed
+> > anyone to make this choice? For generic C implementations like
+> > this we should only have one, and not many.
+> 
+> Slice-by-8 should be picked automatically if the builder doesn't explicitly
+> pick another one.  The other choices are provided for people who want a slimmer
+> cache footprint.  I guess I could make the Kconfig file a bit more explicit
+> about slice-by-8 being default, or I guess we could just ignore this one patch
+> and thereby keeping us with the old method where anyone who wants the slimmer
+> implementations patches the #defines.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+Ok, here's a patch that makes it more explicit that sliceby8 is the default.
+I expect distros and anyone else to simply hit <Enter>.  The only people who
+should do otherwise are people who know they are building for machines that
+have small cache sizes such that the crc table fights for cache lines with the
+data being checksummed.
+
+I made a quick survey of CPU L1 cache quantities:
+
+All Intel CPUs since the Pentium MMX have > 8KiB of L1.
+All AMD CPUs since the K5 have had > 8KiB of L1.
+Most SPARC64 CPUs except the UltraSparc T1 and T2 CPUs have > 8KiB of L1.
+Most PowerPC CPUs since the 601 seem to have > 8KiB of L1.
+All IBM POWER CPUs since at least the POWER2 have had > 8KiB of L1.
+There are too many different ARM cores for me to track.   My smartphones and
+embedded ARM controllers all have > 8KIB of L1, but that's not enough to
+generalize.
+
+While I might've been tempted to agree with Herbert and hardwire the code to
+use slice by 8, there are enough CPUs out there that *could* have too-small L1
+caches that I'm not comfortable with _removing_ the Kconfig option to use a
+slimmer algorithm.  I can't gate the decision on 64-bitness either, since I've
+seen plenty of i386 CPUs that benefit from slice by 8, and the UltraSparc T2 is
+a 64-bit processor that seems likely to suffer cache thrashing.
+
+I think having a configurable menu that steers people towards slice by 8 is
+fine.  Bob, was there a reason for picking slice by 4 for 32-bit machines?
+
+D
 ---
- drivers/crypto/caam/desc.h |  335 ++++++++++++++++++++++----------------------
- 1 files changed, 167 insertions(+), 168 deletions(-)
+Allow the kernel builder to choose a crc32* algorithm for the kernel.
 
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 090c916..6984cc5 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -74,10 +74,10 @@
- #define HDR_START_IDX_SHIFT	16
+Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
+---
+
+ lib/Kconfig     |   43 +++++++++++++++++++++++++++++++++++++++++++
+ lib/crc32defs.h |   18 ++++++++++++++++++
+ 2 files changed, 61 insertions(+), 0 deletions(-)
+
+diff --git a/lib/Kconfig b/lib/Kconfig
+index cfddafc..029c0e3 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -70,6 +70,49 @@ config CRC32_SELFTEST
+ 	  and crc32_be over byte strings with random alignment and length
+ 	  and computes the total elapsed time and number of bytes processed.
  
- /* If shared descriptor header, 6-bit length */
--#define HDR_DESCLEN_SHR_MASK  0x3f
-+#define HDR_DESCLEN_SHR_MASK	0x3f
- 
- /* If non-shared header, 7-bit length */
--#define HDR_DESCLEN_MASK      0x7f
-+#define HDR_DESCLEN_MASK	0x7f
- 
- /* This is a TrustedDesc (if not SharedDesc) */
- #define HDR_TRUSTED		0x00004000
-@@ -120,8 +120,8 @@
-  * KEY/SEQ_KEY Command Constructs
-  */
- 
--/* Key Destination Class: 01 = Class 1, 02 - Class 2  */
--#define KEY_DEST_CLASS_SHIFT	25  /* use CLASS_1 or CLASS_2 */
-+/* Key Destination Class: 01 = Class 1, 02 - Class 2 */
-+#define KEY_DEST_CLASS_SHIFT	25	/* use CLASS_1 or CLASS_2 */
- #define KEY_DEST_CLASS_MASK	(0x03 << KEY_DEST_CLASS_SHIFT)
- 
- /* Scatter-Gather Table/Variable Length Field */
-@@ -186,12 +186,12 @@
- #define LDST_SGF		0x01000000
- #define LDST_VLF		LDST_SGF
- 
--/* Immediate - Key follows this command in descriptor	 */
-+/* Immediate - Key follows this command in descriptor */
- #define LDST_IMM_MASK		1
- #define LDST_IMM_SHIFT		23
- #define LDST_IMM		(LDST_IMM_MASK << LDST_IMM_SHIFT)
- 
--/* SRC/DST - Destination for LOAD, Source for STORE   */
-+/* SRC/DST - Destination for LOAD, Source for STORE */
- #define LDST_SRCDST_SHIFT	16
- #define LDST_SRCDST_MASK	(0x7f << LDST_SRCDST_SHIFT)
- 
-@@ -224,17 +224,17 @@
- #define LDST_SRCDST_WORD_DESCBUF	(0x40 << LDST_SRCDST_SHIFT)
- #define LDST_SRCDST_WORD_INFO_FIFO	(0x7a << LDST_SRCDST_SHIFT)
- 
--/* Offset in source/destination			       */
-+/* Offset in source/destination */
- #define LDST_OFFSET_SHIFT	8
- #define LDST_OFFSET_MASK	(0xff << LDST_OFFSET_SHIFT)
- 
- /* LDOFF definitions used when DST = LDST_SRCDST_WORD_DECOCTRL */
- /* These could also be shifted by LDST_OFFSET_SHIFT - this reads better */
--#define LDOFF_CHG_SHARE_SHIFT	     0
--#define LDOFF_CHG_SHARE_MASK	     (0x3 << LDOFF_CHG_SHARE_SHIFT)
--#define LDOFF_CHG_SHARE_NEVER	     (0x1 << LDOFF_CHG_SHARE_SHIFT)
--#define LDOFF_CHG_SHARE_OK_NO_PROP   (0x2 << LDOFF_CHG_SHARE_SHIFT)
--#define LDOFF_CHG_SHARE_OK_PROP      (0x3 << LDOFF_CHG_SHARE_SHIFT)
-+#define LDOFF_CHG_SHARE_SHIFT		0
-+#define LDOFF_CHG_SHARE_MASK		(0x3 << LDOFF_CHG_SHARE_SHIFT)
-+#define LDOFF_CHG_SHARE_NEVER		(0x1 << LDOFF_CHG_SHARE_SHIFT)
-+#define LDOFF_CHG_SHARE_OK_NO_PROP	(0x2 << LDOFF_CHG_SHARE_SHIFT)
-+#define LDOFF_CHG_SHARE_OK_PROP		(0x3 << LDOFF_CHG_SHARE_SHIFT)
- 
- #define LDOFF_ENABLE_AUTO_NFIFO		(1 << 2)
- #define LDOFF_DISABLE_AUTO_NFIFO	(1 << 3)
-@@ -245,24 +245,24 @@
- #define LDOFF_CHG_NONSEQLIODN_NON_SEQ	(0x2 << LDOFF_CHG_NONSEQLIODN_SHIFT)
- #define LDOFF_CHG_NONSEQLIODN_TRUSTED	(0x3 << LDOFF_CHG_NONSEQLIODN_SHIFT)
- 
--#define LDOFF_CHG_SEQLIODN_SHIFT     6
--#define LDOFF_CHG_SEQLIODN_MASK      (0x3 << LDOFF_CHG_SEQLIODN_SHIFT)
--#define LDOFF_CHG_SEQLIODN_SEQ	     (0x1 << LDOFF_CHG_SEQLIODN_SHIFT)
--#define LDOFF_CHG_SEQLIODN_NON_SEQ   (0x2 << LDOFF_CHG_SEQLIODN_SHIFT)
--#define LDOFF_CHG_SEQLIODN_TRUSTED   (0x3 << LDOFF_CHG_SEQLIODN_SHIFT)
-+#define LDOFF_CHG_SEQLIODN_SHIFT	6
-+#define LDOFF_CHG_SEQLIODN_MASK		(0x3 << LDOFF_CHG_SEQLIODN_SHIFT)
-+#define LDOFF_CHG_SEQLIODN_SEQ		(0x1 << LDOFF_CHG_SEQLIODN_SHIFT)
-+#define LDOFF_CHG_SEQLIODN_NON_SEQ	(0x2 << LDOFF_CHG_SEQLIODN_SHIFT)
-+#define LDOFF_CHG_SEQLIODN_TRUSTED	(0x3 << LDOFF_CHG_SEQLIODN_SHIFT)
- 
--/* Data length in bytes					*/
-+/* Data length in bytes	*/
- #define LDST_LEN_SHIFT		0
- #define LDST_LEN_MASK		(0xff << LDST_LEN_SHIFT)
- 
- /* Special Length definitions when dst=deco-ctrl */
--#define LDLEN_ENABLE_OSL_COUNT	    (1 << 7)
--#define LDLEN_RST_CHA_OFIFO_PTR     (1 << 6)
--#define LDLEN_RST_OFIFO		    (1 << 5)
--#define LDLEN_SET_OFIFO_OFF_VALID   (1 << 4)
--#define LDLEN_SET_OFIFO_OFF_RSVD    (1 << 3)
--#define LDLEN_SET_OFIFO_OFFSET_SHIFT 0
--#define LDLEN_SET_OFIFO_OFFSET_MASK (3 << LDLEN_SET_OFIFO_OFFSET_SHIFT)
-+#define LDLEN_ENABLE_OSL_COUNT		(1 << 7)
-+#define LDLEN_RST_CHA_OFIFO_PTR		(1 << 6)
-+#define LDLEN_RST_OFIFO			(1 << 5)
-+#define LDLEN_SET_OFIFO_OFF_VALID	(1 << 4)
-+#define LDLEN_SET_OFIFO_OFF_RSVD	(1 << 3)
-+#define LDLEN_SET_OFIFO_OFFSET_SHIFT	0
-+#define LDLEN_SET_OFIFO_OFFSET_MASK	(3 << LDLEN_SET_OFIFO_OFFSET_SHIFT)
- 
- /*
-  * FIFO_LOAD/FIFO_STORE/SEQ_FIFO_LOAD/SEQ_FIFO_STORE
-@@ -299,14 +299,14 @@
- #define FIFOLDST_VLF		(1 << FIFOLDST_SGF_SHIFT)
- 
- /* Immediate - Data follows command in descriptor */
--#define FIFOLD_IMM_SHIFT      23
--#define FIFOLD_IMM_MASK       (1 << FIFOLD_IMM_SHIFT)
--#define FIFOLD_IMM	      (1 << FIFOLD_IMM_SHIFT)
-+#define FIFOLD_IMM_SHIFT	23
-+#define FIFOLD_IMM_MASK		(1 << FIFOLD_IMM_SHIFT)
-+#define FIFOLD_IMM		(1 << FIFOLD_IMM_SHIFT)
- 
- /* Continue - Not the last FIFO store to come */
--#define FIFOST_CONT_SHIFT     23
--#define FIFOST_CONT_MASK      (1 << FIFOST_CONT_SHIFT)
--#define FIFOST_CONT_MASK      (1 << FIFOST_CONT_SHIFT)
-+#define FIFOST_CONT_SHIFT	23
-+#define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
-+#define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
- 
- /*
-  * Extended Length - use 32-bit extended length that
-@@ -377,13 +377,13 @@
- #define FIFOST_TYPE_PKHA_B	 (0x0d << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_AF_SBOX_JKEK (0x10 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_AF_SBOX_TKEK (0x21 << FIFOST_TYPE_SHIFT)
--#define FIFOST_TYPE_PKHA_E_JKEK  (0x22 << FIFOST_TYPE_SHIFT)
--#define FIFOST_TYPE_PKHA_E_TKEK  (0x23 << FIFOST_TYPE_SHIFT)
-+#define FIFOST_TYPE_PKHA_E_JKEK	 (0x22 << FIFOST_TYPE_SHIFT)
-+#define FIFOST_TYPE_PKHA_E_TKEK	 (0x23 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_KEY_KEK	 (0x24 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_KEY_TKEK	 (0x25 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_SPLIT_KEK	 (0x26 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_SPLIT_TKEK	 (0x27 << FIFOST_TYPE_SHIFT)
--#define FIFOST_TYPE_OUTFIFO_KEK  (0x28 << FIFOST_TYPE_SHIFT)
-+#define FIFOST_TYPE_OUTFIFO_KEK	 (0x28 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_OUTFIFO_TKEK (0x29 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_MESSAGE_DATA (0x30 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_RNGSTORE	 (0x34 << FIFOST_TYPE_SHIFT)
-@@ -612,7 +612,7 @@
- #define OP_PCL_TLS10_AES_256_CBC_SHA_16		 0xc021
- #define OP_PCL_TLS10_AES_256_CBC_SHA_17		 0xc022
- 
--/* #define OP_PCL_TLS10_3DES_EDE_CBC_MD5	    0x0023 */
-+/* #define OP_PCL_TLS10_3DES_EDE_CBC_MD5	0x0023 */
- 
- #define OP_PCL_TLS10_3DES_EDE_CBC_SHA		 0x001f
- #define OP_PCL_TLS10_3DES_EDE_CBC_SHA_2		 0x008b
-@@ -736,7 +736,7 @@
- #define OP_PCL_TLS11_AES_256_CBC_SHA_16		 0xc021
- #define OP_PCL_TLS11_AES_256_CBC_SHA_17		 0xc022
- 
--/* #define OP_PCL_TLS11_3DES_EDE_CBC_MD5	    0x0023 */
-+/* #define OP_PCL_TLS11_3DES_EDE_CBC_MD5	0x0023 */
- 
- #define OP_PCL_TLS11_3DES_EDE_CBC_SHA		 0x001f
- #define OP_PCL_TLS11_3DES_EDE_CBC_SHA_2		 0x008b
-@@ -858,7 +858,7 @@
- #define OP_PCL_TLS12_AES_256_CBC_SHA_16		 0xc021
- #define OP_PCL_TLS12_AES_256_CBC_SHA_17		 0xc022
- 
--/* #define OP_PCL_TLS12_3DES_EDE_CBC_MD5	    0x0023 */
-+/* #define OP_PCL_TLS12_3DES_EDE_CBC_MD5	0x0023 */
- 
- #define OP_PCL_TLS12_3DES_EDE_CBC_SHA		 0x001f
- #define OP_PCL_TLS12_3DES_EDE_CBC_SHA_2		 0x008b
-@@ -920,14 +920,14 @@
- 
- #define OP_PCL_TLS12_RC4_40_SHA			 0x0028
- 
--/* #define OP_PCL_TLS12_AES_128_CBC_SHA256	    0x003c */
-+/* #define OP_PCL_TLS12_AES_128_CBC_SHA256	0x003c */
- #define OP_PCL_TLS12_AES_128_CBC_SHA256_2	 0x003e
- #define OP_PCL_TLS12_AES_128_CBC_SHA256_3	 0x003f
- #define OP_PCL_TLS12_AES_128_CBC_SHA256_4	 0x0040
- #define OP_PCL_TLS12_AES_128_CBC_SHA256_5	 0x0067
- #define OP_PCL_TLS12_AES_128_CBC_SHA256_6	 0x006c
- 
--/* #define OP_PCL_TLS12_AES_256_CBC_SHA256	    0x003d */
-+/* #define OP_PCL_TLS12_AES_256_CBC_SHA256	0x003d */
- #define OP_PCL_TLS12_AES_256_CBC_SHA256_2	 0x0068
- #define OP_PCL_TLS12_AES_256_CBC_SHA256_3	 0x0069
- #define OP_PCL_TLS12_AES_256_CBC_SHA256_4	 0x006a
-@@ -996,7 +996,7 @@
- #define OP_PCL_DTLS_AES_256_CBC_SHA_16		 0xc021
- #define OP_PCL_DTLS_AES_256_CBC_SHA_17		 0xc022
- 
--/* #define OP_PCL_DTLS_3DES_EDE_CBC_MD5		    0x0023 */
-+/* #define OP_PCL_DTLS_3DES_EDE_CBC_MD5		0x0023 */
- 
- #define OP_PCL_DTLS_3DES_EDE_CBC_SHA		 0x001f
- #define OP_PCL_DTLS_3DES_EDE_CBC_SHA_2		 0x008b
-@@ -1181,92 +1181,92 @@
- #define OP_ALG_ENCRYPT		1
- 
- /* PKHA algorithm type set */
--#define OP_ALG_PK		     0x00800000
--#define OP_ALG_PK_FUN_MASK	     0x3f /* clrmem, modmath, or cpymem */
-+#define OP_ALG_PK		0x00800000
-+#define OP_ALG_PK_FUN_MASK	0x3f /* clrmem, modmath, or cpymem */
- 
- /* PKHA mode clear memory functions */
--#define OP_ALG_PKMODE_A_RAM	     0x80000
--#define OP_ALG_PKMODE_B_RAM	     0x40000
--#define OP_ALG_PKMODE_E_RAM	     0x20000
--#define OP_ALG_PKMODE_N_RAM	     0x10000
--#define OP_ALG_PKMODE_CLEARMEM	     0x00001
-+#define OP_ALG_PKMODE_A_RAM	0x80000
-+#define OP_ALG_PKMODE_B_RAM	0x40000
-+#define OP_ALG_PKMODE_E_RAM	0x20000
-+#define OP_ALG_PKMODE_N_RAM	0x10000
-+#define OP_ALG_PKMODE_CLEARMEM	0x00001
- 
- /* PKHA mode modular-arithmetic functions */
--#define OP_ALG_PKMODE_MOD_IN_MONTY   0x80000
--#define OP_ALG_PKMODE_MOD_OUT_MONTY  0x40000
--#define OP_ALG_PKMODE_MOD_F2M	     0x20000
--#define OP_ALG_PKMODE_MOD_R2_IN      0x10000
--#define OP_ALG_PKMODE_PRJECTV	     0x00800
--#define OP_ALG_PKMODE_TIME_EQ	     0x400
--#define OP_ALG_PKMODE_OUT_B	     0x000
--#define OP_ALG_PKMODE_OUT_A	     0x100
--#define OP_ALG_PKMODE_MOD_ADD	     0x002
--#define OP_ALG_PKMODE_MOD_SUB_AB     0x003
--#define OP_ALG_PKMODE_MOD_SUB_BA     0x004
--#define OP_ALG_PKMODE_MOD_MULT	     0x005
--#define OP_ALG_PKMODE_MOD_EXPO	     0x006
--#define OP_ALG_PKMODE_MOD_REDUCT     0x007
--#define OP_ALG_PKMODE_MOD_INV	     0x008
--#define OP_ALG_PKMODE_MOD_ECC_ADD    0x009
--#define OP_ALG_PKMODE_MOD_ECC_DBL    0x00a
--#define OP_ALG_PKMODE_MOD_ECC_MULT   0x00b
--#define OP_ALG_PKMODE_MOD_MONT_CNST  0x00c
--#define OP_ALG_PKMODE_MOD_CRT_CNST   0x00d
--#define OP_ALG_PKMODE_MOD_GCD	     0x00e
--#define OP_ALG_PKMODE_MOD_PRIMALITY  0x00f
-+#define OP_ALG_PKMODE_MOD_IN_MONTY	0x80000
-+#define OP_ALG_PKMODE_MOD_OUT_MONTY	0x40000
-+#define OP_ALG_PKMODE_MOD_F2M		0x20000
-+#define OP_ALG_PKMODE_MOD_R2_IN		0x10000
-+#define OP_ALG_PKMODE_PRJECTV		0x00800
-+#define OP_ALG_PKMODE_TIME_EQ		0x400
-+#define OP_ALG_PKMODE_OUT_B		0x000
-+#define OP_ALG_PKMODE_OUT_A		0x100
-+#define OP_ALG_PKMODE_MOD_ADD		0x002
-+#define OP_ALG_PKMODE_MOD_SUB_AB	0x003
-+#define OP_ALG_PKMODE_MOD_SUB_BA	0x004
-+#define OP_ALG_PKMODE_MOD_MULT		0x005
-+#define OP_ALG_PKMODE_MOD_EXPO		0x006
-+#define OP_ALG_PKMODE_MOD_REDUCT	0x007
-+#define OP_ALG_PKMODE_MOD_INV		0x008
-+#define OP_ALG_PKMODE_MOD_ECC_ADD	0x009
-+#define OP_ALG_PKMODE_MOD_ECC_DBL	0x00a
-+#define OP_ALG_PKMODE_MOD_ECC_MULT	0x00b
-+#define OP_ALG_PKMODE_MOD_MONT_CNST	0x00c
-+#define OP_ALG_PKMODE_MOD_CRT_CNST	0x00d
-+#define OP_ALG_PKMODE_MOD_GCD		0x00e
-+#define OP_ALG_PKMODE_MOD_PRIMALITY	0x00f
- 
- /* PKHA mode copy-memory functions */
--#define OP_ALG_PKMODE_SRC_REG_SHIFT  13
--#define OP_ALG_PKMODE_SRC_REG_MASK   (7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
--#define OP_ALG_PKMODE_DST_REG_SHIFT  10
--#define OP_ALG_PKMODE_DST_REG_MASK   (7 << OP_ALG_PKMODE_DST_REG_SHIFT)
--#define OP_ALG_PKMODE_SRC_SEG_SHIFT  8
--#define OP_ALG_PKMODE_SRC_SEG_MASK   (3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
--#define OP_ALG_PKMODE_DST_SEG_SHIFT  6
--#define OP_ALG_PKMODE_DST_SEG_MASK   (3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
--
--#define OP_ALG_PKMODE_SRC_REG_A      (0 << OP_ALG_PKMODE_SRC_REG_SHIFT)
--#define OP_ALG_PKMODE_SRC_REG_B      (1 << OP_ALG_PKMODE_SRC_REG_SHIFT)
--#define OP_ALG_PKMODE_SRC_REG_N      (3 << OP_ALG_PKMODE_SRC_REG_SHIFT)
--#define OP_ALG_PKMODE_DST_REG_A      (0 << OP_ALG_PKMODE_DST_REG_SHIFT)
--#define OP_ALG_PKMODE_DST_REG_B      (1 << OP_ALG_PKMODE_DST_REG_SHIFT)
--#define OP_ALG_PKMODE_DST_REG_E      (2 << OP_ALG_PKMODE_DST_REG_SHIFT)
--#define OP_ALG_PKMODE_DST_REG_N      (3 << OP_ALG_PKMODE_DST_REG_SHIFT)
--#define OP_ALG_PKMODE_SRC_SEG_0      (0 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
--#define OP_ALG_PKMODE_SRC_SEG_1      (1 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
--#define OP_ALG_PKMODE_SRC_SEG_2      (2 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
--#define OP_ALG_PKMODE_SRC_SEG_3      (3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
--#define OP_ALG_PKMODE_DST_SEG_0      (0 << OP_ALG_PKMODE_DST_SEG_SHIFT)
--#define OP_ALG_PKMODE_DST_SEG_1      (1 << OP_ALG_PKMODE_DST_SEG_SHIFT)
--#define OP_ALG_PKMODE_DST_SEG_2      (2 << OP_ALG_PKMODE_DST_SEG_SHIFT)
--#define OP_ALG_PKMODE_DST_SEG_3      (3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
--#define OP_ALG_PKMODE_CPYMEM_N_SZ    0x80
--#define OP_ALG_PKMODE_CPYMEM_SRC_SZ  0x81
-+#define OP_ALG_PKMODE_SRC_REG_SHIFT	13
-+#define OP_ALG_PKMODE_SRC_REG_MASK	(7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
-+#define OP_ALG_PKMODE_DST_REG_SHIFT	10
-+#define OP_ALG_PKMODE_DST_REG_MASK	(7 << OP_ALG_PKMODE_DST_REG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_SEG_SHIFT	8
-+#define OP_ALG_PKMODE_SRC_SEG_MASK	(3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
-+#define OP_ALG_PKMODE_DST_SEG_SHIFT	6
-+#define OP_ALG_PKMODE_DST_SEG_MASK	(3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++choice
++	prompt "CRC32 implementation"
++	depends on CRC32
++	default CRC32_SLICEBY8
 +
-+#define OP_ALG_PKMODE_SRC_REG_A		(0 << OP_ALG_PKMODE_SRC_REG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_REG_B		(1 << OP_ALG_PKMODE_SRC_REG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_REG_N		(3 << OP_ALG_PKMODE_SRC_REG_SHIFT)
-+#define OP_ALG_PKMODE_DST_REG_A		(0 << OP_ALG_PKMODE_DST_REG_SHIFT)
-+#define OP_ALG_PKMODE_DST_REG_B		(1 << OP_ALG_PKMODE_DST_REG_SHIFT)
-+#define OP_ALG_PKMODE_DST_REG_E		(2 << OP_ALG_PKMODE_DST_REG_SHIFT)
-+#define OP_ALG_PKMODE_DST_REG_N		(3 << OP_ALG_PKMODE_DST_REG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_SEG_0		(0 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_SEG_1		(1 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_SEG_2		(2 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
-+#define OP_ALG_PKMODE_SRC_SEG_3		(3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
-+#define OP_ALG_PKMODE_DST_SEG_0		(0 << OP_ALG_PKMODE_DST_SEG_SHIFT)
-+#define OP_ALG_PKMODE_DST_SEG_1		(1 << OP_ALG_PKMODE_DST_SEG_SHIFT)
-+#define OP_ALG_PKMODE_DST_SEG_2		(2 << OP_ALG_PKMODE_DST_SEG_SHIFT)
-+#define OP_ALG_PKMODE_DST_SEG_3		(3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
-+#define OP_ALG_PKMODE_CPYMEM_N_SZ	0x80
-+#define OP_ALG_PKMODE_CPYMEM_SRC_SZ	0x81
- 
- /*
-  * SEQ_IN_PTR Command Constructs
-  */
- 
- /* Release Buffers */
--#define SQIN_RBS	       0x04000000
-+#define SQIN_RBS	0x04000000
- 
- /* Sequence pointer is really a descriptor */
--#define SQIN_INL	       0x02000000
-+#define SQIN_INL	0x02000000
- 
- /* Sequence pointer is a scatter-gather table */
--#define SQIN_SGF	       0x01000000
-+#define SQIN_SGF	0x01000000
- 
- /* Appends to a previous pointer */
--#define SQIN_PRE	       0x00800000
-+#define SQIN_PRE	0x00800000
- 
- /* Use extended length following pointer */
--#define SQIN_EXT	       0x00400000
-+#define SQIN_EXT	0x00400000
- 
- /* Restore sequence with pointer/length */
--#define SQIN_RTO	       0x00200000
-+#define SQIN_RTO	0x00200000
- 
- /* Replace job descriptor */
--#define SQIN_RJD	       0x00100000
-+#define SQIN_RJD	0x00100000
- 
- #define SQIN_LEN_SHIFT		 0
- #define SQIN_LEN_MASK		(0xffff << SQIN_LEN_SHIFT)
-@@ -1276,19 +1276,19 @@
-  */
- 
- /* Sequence pointer is a scatter-gather table */
--#define SQOUT_SGF	       0x01000000
-+#define SQOUT_SGF	0x01000000
- 
- /* Appends to a previous pointer */
--#define SQOUT_PRE	       0x00800000
-+#define SQOUT_PRE	0x00800000
- 
- /* Restore sequence with pointer/length */
--#define SQOUT_RTO	       0x00200000
-+#define SQOUT_RTO	0x00200000
- 
- /* Use extended length following pointer */
--#define SQOUT_EXT	       0x00400000
-+#define SQOUT_EXT	0x00400000
- 
--#define SQOUT_LEN_SHIFT		  0
--#define SQOUT_LEN_MASK		 (0xffff << SQOUT_LEN_SHIFT)
-+#define SQOUT_LEN_SHIFT		0
-+#define SQOUT_LEN_MASK		(0xffff << SQOUT_LEN_SHIFT)
- 
- 
- /*
-@@ -1500,20 +1500,20 @@
- #define NFIFOENTRY_DEST_BOTH	(3 << NFIFOENTRY_DEST_SHIFT)
- 
- #define NFIFOENTRY_LC2_SHIFT	29
--#define NFIFOENTRY_LC2_MASK		(1 << NFIFOENTRY_LC2_SHIFT)
--#define NFIFOENTRY_LC2			(1 << NFIFOENTRY_LC2_SHIFT)
-+#define NFIFOENTRY_LC2_MASK	(1 << NFIFOENTRY_LC2_SHIFT)
-+#define NFIFOENTRY_LC2		(1 << NFIFOENTRY_LC2_SHIFT)
- 
- #define NFIFOENTRY_LC1_SHIFT	28
--#define NFIFOENTRY_LC1_MASK		(1 << NFIFOENTRY_LC1_SHIFT)
--#define NFIFOENTRY_LC1			(1 << NFIFOENTRY_LC1_SHIFT)
-+#define NFIFOENTRY_LC1_MASK	(1 << NFIFOENTRY_LC1_SHIFT)
-+#define NFIFOENTRY_LC1		(1 << NFIFOENTRY_LC1_SHIFT)
- 
- #define NFIFOENTRY_FC2_SHIFT	27
--#define NFIFOENTRY_FC2_MASK		(1 << NFIFOENTRY_FC2_SHIFT)
--#define NFIFOENTRY_FC2			(1 << NFIFOENTRY_FC2_SHIFT)
-+#define NFIFOENTRY_FC2_MASK	(1 << NFIFOENTRY_FC2_SHIFT)
-+#define NFIFOENTRY_FC2		(1 << NFIFOENTRY_FC2_SHIFT)
- 
- #define NFIFOENTRY_FC1_SHIFT	26
--#define NFIFOENTRY_FC1_MASK		(1 << NFIFOENTRY_FC1_SHIFT)
--#define NFIFOENTRY_FC1			(1 << NFIFOENTRY_FC1_SHIFT)
-+#define NFIFOENTRY_FC1_MASK	(1 << NFIFOENTRY_FC1_SHIFT)
-+#define NFIFOENTRY_FC1		(1 << NFIFOENTRY_FC1_SHIFT)
- 
- #define NFIFOENTRY_STYPE_SHIFT	24
- #define NFIFOENTRY_STYPE_MASK	(3 << NFIFOENTRY_STYPE_SHIFT)
-@@ -1525,60 +1525,59 @@
- #define NFIFOENTRY_DTYPE_SHIFT	20
- #define NFIFOENTRY_DTYPE_MASK	(0xF << NFIFOENTRY_DTYPE_SHIFT)
- 
--#define NFIFOENTRY_DTYPE_SBOX	   (0x0  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_AAD	   (0x1  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_IV	   (0x2  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_SAD	   (0x3  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_ICV	   (0xA  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_SKIP	   (0xE  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_MSG	   (0xF  << NFIFOENTRY_DTYPE_SHIFT)
--
--#define NFIFOENTRY_DTYPE_PK_A0	   (0x0  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_A1	   (0x1  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_A2	   (0x2  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_A3	   (0x3  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_B0	   (0x4  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_B1	   (0x5  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_B2	   (0x6  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_B3	   (0x7  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_N	   (0x8  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_E	   (0x9  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_A	   (0xC  << NFIFOENTRY_DTYPE_SHIFT)
--#define NFIFOENTRY_DTYPE_PK_B	   (0xD  << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_SBOX	(0x0 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_AAD	(0x1 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_IV	(0x2 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_SAD	(0x3 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_ICV	(0xA << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_SKIP	(0xE << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_MSG	(0xF << NFIFOENTRY_DTYPE_SHIFT)
++config CRC32_SLICEBY8
++	bool "Slice by 8 bytes"
++	help
++	  Calculate checksum 8 bytes at a time with a clever slicing algorithm.
++	  This is the fastest algorithm, but comes with a 8KiB lookup table.
++	  Most modern processors have enough cache to hold this table without
++	  thrashing the cache.
 +
-+#define NFIFOENTRY_DTYPE_PK_A0	(0x0 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_A1	(0x1 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_A2	(0x2 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_A3	(0x3 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_B0	(0x4 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_B1	(0x5 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_B2	(0x6 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_B3	(0x7 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_N	(0x8 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_E	(0x9 << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_A	(0xC << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_PK_B	(0xD << NFIFOENTRY_DTYPE_SHIFT)
- 
- 
- #define NFIFOENTRY_BND_SHIFT	19
--#define NFIFOENTRY_BND_MASK		(1 << NFIFOENTRY_BND_SHIFT)
--#define NFIFOENTRY_BND			(1 << NFIFOENTRY_BND_SHIFT)
-+#define NFIFOENTRY_BND_MASK	(1 << NFIFOENTRY_BND_SHIFT)
-+#define NFIFOENTRY_BND		(1 << NFIFOENTRY_BND_SHIFT)
- 
- #define NFIFOENTRY_PTYPE_SHIFT	16
- #define NFIFOENTRY_PTYPE_MASK	(0x7 << NFIFOENTRY_PTYPE_SHIFT)
- 
--#define NFIFOENTRY_PTYPE_ZEROS	       (0x0  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_RND_NOZEROS   (0x1  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_INCREMENT     (0x2  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_RND	       (0x3  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_ZEROS_NZ      (0x4  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_RND_NZ_LZ     (0x5  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_N	       (0x6  << NFIFOENTRY_PTYPE_SHIFT)
--#define NFIFOENTRY_PTYPE_RND_NZ_N      (0x7  << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_ZEROS		(0x0 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_RND_NOZEROS	(0x1 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_INCREMENT	(0x2 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_RND		(0x3 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_ZEROS_NZ	(0x4 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_RND_NZ_LZ	(0x5 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_N		(0x6 << NFIFOENTRY_PTYPE_SHIFT)
-+#define NFIFOENTRY_PTYPE_RND_NZ_N	(0x7 << NFIFOENTRY_PTYPE_SHIFT)
- 
--#define NFIFOENTRY_OC_SHIFT		15
--#define NFIFOENTRY_OC_MASK		(1 << NFIFOENTRY_OC_SHIFT)
--#define NFIFOENTRY_OC			(1 << NFIFOENTRY_OC_SHIFT)
-+#define NFIFOENTRY_OC_SHIFT	15
-+#define NFIFOENTRY_OC_MASK	(1 << NFIFOENTRY_OC_SHIFT)
-+#define NFIFOENTRY_OC		(1 << NFIFOENTRY_OC_SHIFT)
- 
- #define NFIFOENTRY_AST_SHIFT	14
--#define NFIFOENTRY_AST_MASK		(1 << NFIFOENTRY_OC_SHIFT)
--#define NFIFOENTRY_AST			(1 << NFIFOENTRY_OC_SHIFT)
-+#define NFIFOENTRY_AST_MASK	(1 << NFIFOENTRY_OC_SHIFT)
-+#define NFIFOENTRY_AST		(1 << NFIFOENTRY_OC_SHIFT)
- 
--#define NFIFOENTRY_BM_SHIFT		11
--#define NFIFOENTRY_BM_MASK		(1 << NFIFOENTRY_BM_SHIFT)
--#define NFIFOENTRY_BM			(1 << NFIFOENTRY_BM_SHIFT)
--
--#define NFIFOENTRY_PS_SHIFT		10
--#define NFIFOENTRY_PS_MASK		(1 << NFIFOENTRY_PS_SHIFT)
--#define NFIFOENTRY_PS			(1 << NFIFOENTRY_PS_SHIFT)
-+#define NFIFOENTRY_BM_SHIFT	11
-+#define NFIFOENTRY_BM_MASK	(1 << NFIFOENTRY_BM_SHIFT)
-+#define NFIFOENTRY_BM		(1 << NFIFOENTRY_BM_SHIFT)
- 
-+#define NFIFOENTRY_PS_SHIFT	10
-+#define NFIFOENTRY_PS_MASK	(1 << NFIFOENTRY_PS_SHIFT)
-+#define NFIFOENTRY_PS		(1 << NFIFOENTRY_PS_SHIFT)
- 
- #define NFIFOENTRY_DLEN_SHIFT	0
- #define NFIFOENTRY_DLEN_MASK	(0xFFF << NFIFOENTRY_DLEN_SHIFT)
-@@ -1591,15 +1590,15 @@
++	  This is the default implementation choice.  Choose this one unless
++	  you have a good reason not to.
++
++config CRC32_SLICEBY4
++	bool "Slice by 4 bytes"
++	help
++	  Calculate checksum 4 bytes at a time with a clever slicing algorithm.
++	  This is a bit slower than slice by 8, but has a smaller 4KiB lookup
++	  table.
++
++	  Only choose this option if you know what you are doing.
++
++config CRC32_SARWATE
++	bool "Sarwate's Algorithm (one byte at a time)"
++	help
++	  Calculate checksum a byte at a time using Sarwate's algorithm.  This
++	  is not particularly fast, but has a small 256 byte lookup table.
++
++	  Only choose this option if you know what you are doing.
++
++config CRC32_BIT
++	bool "Classic Algorithm (one bit at a time)"
++	help
++	  Calculate checksum one bit at a time.  This is VERY slow, but has
++	  no lookup table.  This is provided as a debugging option.
++
++	  Only choose this option if you are debugging crc32.
++
++endchoice
++
+ config CRC7
+ 	tristate "CRC7 functions"
+ 	help
+diff --git a/lib/crc32defs.h b/lib/crc32defs.h
+index 6fd1917..64cba2c 100644
+--- a/lib/crc32defs.h
++++ b/lib/crc32defs.h
+@@ -13,6 +13,24 @@
   */
+ #define CRC32C_POLY_LE 0x82F63B78
  
- /* IPSec ESP CBC Encap/Decap Options */
--#define PDBOPTS_ESPCBC_ARSNONE	0x00   /* no antireplay window		    */
--#define PDBOPTS_ESPCBC_ARS32	0x40   /* 32-entry antireplay window	    */
--#define PDBOPTS_ESPCBC_ARS64	0xc0   /* 64-entry antireplay window	    */
--#define PDBOPTS_ESPCBC_IVSRC	0x20   /* IV comes from internal random gen */
--#define PDBOPTS_ESPCBC_ESN	0x10   /* extended sequence included	    */
--#define PDBOPTS_ESPCBC_OUTFMT	0x08   /* output only decapsulation (decap) */
--#define PDBOPTS_ESPCBC_IPHDRSRC 0x08   /* IP header comes from PDB (encap)  */
--#define PDBOPTS_ESPCBC_INCIPHDR 0x04   /* Prepend IP header to output frame */
--#define PDBOPTS_ESPCBC_IPVSN	0x02   /* process IPv6 header		    */
--#define PDBOPTS_ESPCBC_TUNNEL	0x01   /* tunnel mode next-header byte	    */
-+#define PDBOPTS_ESPCBC_ARSNONE	0x00	/* no antireplay window	*/
-+#define PDBOPTS_ESPCBC_ARS32	0x40	/* 32-entry antireplay window */
-+#define PDBOPTS_ESPCBC_ARS64	0xc0	/* 64-entry antireplay window */
-+#define PDBOPTS_ESPCBC_IVSRC	0x20	/* IV comes from internal random gen */
-+#define PDBOPTS_ESPCBC_ESN	0x10	/* extended sequence included */
-+#define PDBOPTS_ESPCBC_OUTFMT	0x08	/* output only decapsulation (decap) */
-+#define PDBOPTS_ESPCBC_IPHDRSRC 0x08	/* IP header comes from PDB (encap) */
-+#define PDBOPTS_ESPCBC_INCIPHDR 0x04	/* Prepend IP header to output frame */
-+#define PDBOPTS_ESPCBC_IPVSN	0x02	/* process IPv6 header */
-+#define PDBOPTS_ESPCBC_TUNNEL	0x01	/* tunnel mode next-header byte */
- 
- #endif /* DESC_H */
--- 
-1.7.8
++/* Try to choose an implementation variant via Kconfig */
++#ifdef CONFIG_CRC32_SLICEBY8
++# define CRC_LE_BITS 64
++# define CRC_BE_BITS 64
++#endif
++#ifdef CONFIG_CRC32_SLICEBY4
++# define CRC_LE_BITS 32
++# define CRC_BE_BITS 32
++#endif
++#ifdef CONFIG_CRC32_SARWATE
++# define CRC_LE_BITS 8
++# define CRC_BE_BITS 8
++#endif
++#ifdef CONFIG_CRC32_BIT
++# define CRC_LE_BITS 1
++# define CRC_BE_BITS 1
++#endif
++
+ /*
+  * How many bits at a time to use.  Valid values are 1, 2, 4, 8, 32 and 64.
+  * For less performance-sensitive, use 4 or 8 to save table size.
+
