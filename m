@@ -1,76 +1,55 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 7/7] crypto: caam - remove DECO access initialization code
-Date: Mon, 12 Dec 2011 14:59:16 -0600
-Message-ID: <1323723556-7100-8-git-send-email-kim.phillips@freescale.com>
+Subject: [PATCH 3/7] crypto: talitos - convert talitos_error to struct device
+Date: Mon, 12 Dec 2011 14:59:12 -0600
+Message-ID: <1323723556-7100-4-git-send-email-kim.phillips@freescale.com>
 References: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:19008 "EHLO
-	TX2EHSOBE004.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754014Ab1LLVAf (ORCPT
+Received: from db3ehsobe001.messaging.microsoft.com ([213.199.154.139]:15401
+	"EHLO DB3EHSOBE001.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754006Ab1LLVAf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Mon, 12 Dec 2011 16:00:35 -0500
 In-Reply-To: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Access to the SEC4 DECOs (DEscriptor COntrollers) (for debug purposes)
-isn't supported or used, and its register access initialization code
-erroneously makes illegal i/o accesses that show up as errors when
-run under simulation.  Remove it until proper support (via DECORR)
-is added.
+SEC2/3 h/w doesn't have a dedicated interrupt for errors,
+and the only callsite for talitos_error has already done
+the type conversion, so simplify talitos_error to take a
+pointer to a struct device.
 
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c |   13 -------------
- drivers/crypto/caam/regs.h |    1 -
- 2 files changed, 0 insertions(+), 14 deletions(-)
+ drivers/crypto/talitos.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 048bb23..8ae3ba2 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -52,8 +52,6 @@ static int caam_probe(struct platform_device *pdev)
- 	struct caam_ctrl __iomem *ctrl;
- 	struct caam_full __iomem *topregs;
- 	struct caam_drv_private *ctrlpriv;
--	struct caam_deco **deco;
--	u32 deconum;
- #ifdef CONFIG_DEBUG_FS
- 	struct caam_perfmon *perfmon;
- #endif
-@@ -92,17 +90,6 @@ static int caam_probe(struct platform_device *pdev)
- 	if (sizeof(dma_addr_t) == sizeof(u64))
- 		dma_set_mask(dev, DMA_BIT_MASK(36));
- 
--	/* Find out how many DECOs are present */
--	deconum = (rd_reg64(&topregs->ctrl.perfmon.cha_num) &
--		   CHA_NUM_DECONUM_MASK) >> CHA_NUM_DECONUM_SHIFT;
--
--	ctrlpriv->deco = kmalloc(deconum * sizeof(struct caam_deco *),
--				 GFP_KERNEL);
--
--	deco = (struct caam_deco __force **)&topregs->deco;
--	for (d = 0; d < deconum; d++)
--		ctrlpriv->deco[d] = deco[d];
--
- 	/*
- 	 * Detect and enable JobRs
- 	 * First, find out how many ring spec'ed, allocate references
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index aee394e..e9f7a70 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -657,7 +657,6 @@ struct caam_full {
- 	u64 rsvd[512];
- 	struct caam_assurance assure;
- 	struct caam_queue_if qi;
--	struct caam_deco *deco;
- };
- 
- #endif /* REGS_H */
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 503d0d8..2d8c789 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -534,9 +534,8 @@ static void report_eu_error(struct device *dev, int ch, u32 desc_hdr)
+ /*
+  * recover from error interrupts
+  */
+-static void talitos_error(unsigned long data, u32 isr, u32 isr_lo)
++static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
+ {
+-	struct device *dev = (struct device *)data;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	unsigned int timeout = TALITOS_TIMEOUT;
+ 	int ch, error, reset_dev = 0, reset_ch = 0;
+@@ -628,7 +627,7 @@ static irqreturn_t talitos_interrupt_##name(int irq, void *data)	       \
+ 	out_be32(priv->reg + TALITOS_ICR_LO, isr_lo);			       \
+ 									       \
+ 	if (unlikely((isr & ~TALITOS_ISR_4CHDONE) & ch_err_mask || isr_lo))    \
+-		talitos_error((unsigned long)data, isr, isr_lo);	       \
++		talitos_error(dev, isr, isr_lo);			       \
+ 	else								       \
+ 		if (likely(isr & ch_done_mask)) {			       \
+ 			/* mask further done interrupts. */		       \
 -- 
 1.7.8
