@@ -1,82 +1,58 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 1/1] Added CRYPTO_ALG_KERN_DRIVER_ONLY flag.
-Date: Mon, 12 Dec 2011 14:43:09 -0600
-Message-ID: <20111212144309.5c1db15ae58ad5167cddb6ec@freescale.com>
-References: <4EE4A172.9010308@gnutls.org>
+Subject: [PATCH 1/7] crypto: talitos - fix bad kfree
+Date: Mon, 12 Dec 2011 14:59:10 -0600
+Message-ID: <1323723556-7100-2-git-send-email-kim.phillips@freescale.com>
+References: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:17557
-	"EHLO DB3EHSOBE005.bigfish.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753690Ab1LLUo3 (ORCPT
+Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:8449 "EHLO
+	TX2EHSOBE009.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753965Ab1LLVAe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Dec 2011 15:44:29 -0500
-In-Reply-To: <4EE4A172.9010308@gnutls.org>
+	Mon, 12 Dec 2011 16:00:34 -0500
+In-Reply-To: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 11 Dec 2011 13:26:26 +0100
-Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
+Fix a kfree to an invalid address which causes an oops when running
+on SEC v2.0 h/w (introduced in commit 702331b "crypto: talitos - add
+hmac algorithms").
 
-> The added CRYPTO_ALG_KERN_DRIVER_ONLY flag indicates whether a cipher
-> is only available via a kernel driver. If the cipher implementation
-> might be available by using an instruction set or by porting the
-> kernel code, then it must not be set.
-> 
-> Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-> ---
->  drivers/crypto/geode-aes.c        |    8 ++++--
->  drivers/crypto/hifn_795x.c        |    3 +-
->  drivers/crypto/ixp4xx_crypto.c    |    2 +
->  drivers/crypto/mv_cesa.c          |   12 ++++++---
->  drivers/crypto/n2_core.c          |    7 ++++-
->  drivers/crypto/omap-aes.c         |    8 ++++-
->  drivers/crypto/omap-sham.c        |    4 +++
->  drivers/crypto/picoxcell_crypto.c |   46 +++++++++++++++++++++++++++--------
->  drivers/crypto/s5p-sss.c          |    6 +++-
->  drivers/crypto/talitos.c          |   48 ++++++++++++++++++++++++++----------
->  include/linux/crypto.h            |    5 ++++
->  11 files changed, 110 insertions(+), 39 deletions(-)
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/talitos.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-This appears to be based on an older version of the current master
-of Herbert's cryptodev tree on github [1] - it's missing the hmac
-algorithms introduced in commit 79b3a41 "crypto: talitos - add hmac
-algorithms", and a caam entry is missing (it's an offload engine,
-just like talitos). Something like:
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index e73cf2e..e9acadb 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2205,7 +2205,8 @@ static struct caam_crypto_alg *caam_alg_alloc(struct device *ctrldev,
- 	alg->cra_blocksize = template->blocksize;
- 	alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct caam_ctx);
--	alg->cra_flags = CRYPTO_ALG_ASYNC | template->type;
-+	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY |
-+			 template->type;
- 	switch (template->type) {
- 	case CRYPTO_ALG_TYPE_ABLKCIPHER:
- 		alg->cra_type = &crypto_ablkcipher_type;
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 2d8c789..dc641c7 100644
+index 230509e..d376cc7 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -2648,6 +2648,7 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 	alg->cra_priority = TALITOS_CRA_PRIORITY;
- 	alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
-+	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
+@@ -2626,8 +2626,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 		alg = &t_alg->algt.alg.hash.halg.base;
+ 		alg->cra_init = talitos_cra_init_ahash;
+ 		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
+-		    !strncmp(alg->cra_name, "hmac", 4))
++		    !strncmp(alg->cra_name, "hmac", 4)) {
++			kfree(t_alg);
+ 			return ERR_PTR(-ENOTSUPP);
++		}
+ 		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
+ 		    (!strcmp(alg->cra_name, "sha224") ||
+ 		     !strcmp(alg->cra_name, "hmac(sha224)"))) {
+@@ -2835,10 +2837,8 @@ static int talitos_probe(struct platform_device *ofdev)
+ 			t_alg = talitos_alg_alloc(dev, &driver_algs[i]);
+ 			if (IS_ERR(t_alg)) {
+ 				err = PTR_ERR(t_alg);
+-				if (err == -ENOTSUPP) {
+-					kfree(t_alg);
++				if (err == -ENOTSUPP)
+ 					continue;
+-				}
+ 				goto err_out;
+ 			}
  
- 	t_alg->dev = dev;
- 
-should be fine for both talitos and caam drivers.
-
-Thanks,
-
-Kim
-
-[1] git://github.com/herbertx/cryptodev.git
+-- 
+1.7.8
