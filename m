@@ -1,44 +1,52 @@
 From: Jamie Iles <jamie@jamieiles.com>
-Subject: Re: drivers/crypto/picoxcell_crypto.c: boolean and / or confusion
-Date: Tue, 13 Dec 2011 09:50:41 +0000
-Message-ID: <20111213095041.GA2496@totoro>
-References: <4EE688FC.8090606@gmail.com>
- <1323733493.1812.10.camel@joe2Laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: roel <roel.kluin@gmail.com>, Jamie Iles <jamie@jamieiles.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Joe Perches <joe@perches.com>
+Subject: [PATCH] crypto: picoxcell: fix boolean and / or confusion
+Date: Tue, 13 Dec 2011 09:54:06 +0000
+Message-ID: <1323770046-3548-1-git-send-email-jamie@jamieiles.com>
+Cc: Jamie Iles <jamie@jamieiles.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:39256 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750873Ab1LMJuq (ORCPT
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:43356 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752064Ab1LMJyM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Dec 2011 04:50:46 -0500
-Content-Disposition: inline
-In-Reply-To: <1323733493.1812.10.camel@joe2Laptop>
+	Tue, 13 Dec 2011 04:54:12 -0500
+Received: by qadc12 with SMTP id c12so3154309qad.19
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2011 01:54:11 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Joe,
+The AES engine only supports 128 and 256 bit keys so we should correctly
+test for that.
 
-On Mon, Dec 12, 2011 at 03:44:53PM -0800, Joe Perches wrote:
-> On Tue, 2011-12-13 at 00:06 +0100, roel wrote:
-> > The test not [val1] or not [val2] always evaluates to true
-> 
-> Hey Jamie and Roel
-> 
-> Looking at drivers with:
-> 
-> $ grep -rP --include=*.[ch] "(\b[\w\[\]\>\._\-]+)\s*\!\=\s*[\w\[\]\>\._\-]+\s*\|\|\s*\1\s*\!\=" drivers
-> 
-> drivers/crypto/picoxcell_crypto.c:	if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
-> drivers/crypto/picoxcell_crypto.c:	} else if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
-> 
-> Most likely these should be && not ||.
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Reported-by: Joe Perches <joe@perches.com>
+Signed-off-by: Jamie Iles <jamie@jamieiles.com>
+---
+ drivers/crypto/picoxcell_crypto.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Yup, the original code was incorrect.  Patch to follow.  Thanks Joe!
-
-Jamie
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index a2b553e..925cc33 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -873,7 +873,7 @@ static int spacc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 	 * request for any other size (192 bits) then we need to do a software
+ 	 * fallback.
+ 	 */
+-	if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
++	if (len != AES_KEYSIZE_128 && len != AES_KEYSIZE_256 &&
+ 	    ctx->sw_cipher) {
+ 		/*
+ 		 * Set the fallback transform to use the same request flags as
+@@ -886,7 +886,7 @@ static int spacc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 		err = crypto_ablkcipher_setkey(ctx->sw_cipher, key, len);
+ 		if (err)
+ 			goto sw_setkey_failed;
+-	} else if ((len != AES_KEYSIZE_128 || len != AES_KEYSIZE_256) &&
++	} else if (len != AES_KEYSIZE_128 && len != AES_KEYSIZE_256 &&
+ 		   !ctx->sw_cipher)
+ 		err = -EINVAL;
+ 
+-- 
+1.7.4.1
