@@ -1,196 +1,66 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 1/1] Added CRYPTO_ALG_KERN_DRIVER_ONLY flag (2nd
- attempt)
-Date: Tue, 13 Dec 2011 10:10:17 -0600
-Message-ID: <20111213101017.aceb0df9285bd5701d61df39@freescale.com>
-References: <4EE712A0.3090601@gnutls.org>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: Re: [PATCH 14/14] crc32: Select an algorithm via kconfig
+Date: Tue, 13 Dec 2011 10:36:44 -0800
+Message-ID: <20111213183644.GO7137@tux1.beaverton.ibm.com>
+References: <20111201201341.5876.83743.stgit@elm3c44.beaverton.ibm.com> <20111201201517.5876.39207.stgit@elm3c44.beaverton.ibm.com> <20111202002505.GB19842@gondor.apana.org.au> <20111203023646.GB16577@tux1.beaverton.ibm.com> <20111212225857.GM7137@tux1.beaverton.ibm.com> <02ea01ccb923$48193ff0$d84bbfd0$@systemfabricworks.com> <20111213063228.GN7137@tux1.beaverton.ibm.com> <OF62576D22.A1ACD2B5-ONC1257965.002E3817-C1257965.002E6F16@transmode.se>
+Reply-To: djwong@us.ibm.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+	"'Andrew Morton'" <akpm@linux-foundation.org>,
+	"'Mingming Cao'" <cmm@us.ibm.com>,
+	"'Herbert Xu'" <herbert@gondor.apana.org.au>,
+	"'linux-crypto'" <linux-crypto@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	"'linux-fsdevel'" <linux-fsdevel@vger.kernel.org>,
+	"'linux-kernel'" <linux-kernel@vger.kernel.org>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	"'Theodore Tso'" <tytso@mit.edu>
+To: Joakim Tjernlund <joakim.tjernlund@transmode.se>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:42230 "EHLO
-	TX2EHSOBE009.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752676Ab1LMQLg (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Dec 2011 11:11:36 -0500
-In-Reply-To: <4EE712A0.3090601@gnutls.org>
+Received: from e6.ny.us.ibm.com ([32.97.182.146]:36222 "EHLO e6.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752728Ab1LMSnI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 Dec 2011 13:43:08 -0500
+Received: from /spool/local
+	by e6.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
+	Tue, 13 Dec 2011 13:43:06 -0500
+Content-Disposition: inline
+In-Reply-To: <OF62576D22.A1ACD2B5-ONC1257965.002E3817-C1257965.002E6F16@transmode.se>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 13 Dec 2011 09:53:52 +0100
-Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
+On Tue, Dec 13, 2011 at 09:27:10AM +0100, Joakim Tjernlund wrote:
+> "Darrick J. Wong" <djwong@us.ibm.com> wrote on 2011/12/13 07:32:28:
+> >
+> > On Mon, Dec 12, 2011 at 05:10:45PM -0600, Bob Pearson wrote:
+> > > That choice was for Joakim who measured better performance on his 32 bit PPC
+> > > platform with "by 4".
+> >
+> > Ok.  On my 1.33GHz PowerBook I get ~255MB/s with slice by 4 and ~270MB/s with
+> > slice by 8.  I think it's a PPC 7447, and definitely 32-bit.  In any case, it
+> > reports having 32K of L1D cache.
+> 
+> I tested Bobs early version on my mpc8321(266MHz, embedded CPU) and it was just
+> half the speed compared with current crc32.
 
-Niko,
+I wonder, given the patch "crc32: Speed up memory table access on powerpc"
+would you mind retesting to see if slice by 8 still trails slice by 4 on your
+powerpc?  I see that your mpc8321 has 16K of L1D cache and a 32-bit memory bus
+whereas my 7447 has a 64-bit memory bus.  I wonder if memory bus size could be
+a defining characteristic...?
 
-caam is ok.  For talitos, either this way:
+I tried it out the crc32c code on a s390x today; apparently by-8 trails by-4
+there too.  It's unfortunately difficult to figure out the hardware details of
+whatever's going on underneath that VM.
 
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index 230509e..5620788 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -2007,7 +2007,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(sha1),cbc(aes))",
->  			.cra_driver_name = "authenc-hmac-sha1-cbc-aes-talitos",
->  			.cra_blocksize = AES_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2033,7 +2035,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(sha1),cbc(des3_ede))",
->  			.cra_driver_name = "authenc-hmac-sha1-cbc-3des-talitos",
->  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2060,7 +2064,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(sha256),cbc(aes))",
->  			.cra_driver_name = "authenc-hmac-sha256-cbc-aes-talitos",
->  			.cra_blocksize = AES_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2086,7 +2092,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(sha256),cbc(des3_ede))",
->  			.cra_driver_name = "authenc-hmac-sha256-cbc-3des-talitos",
->  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2113,7 +2121,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(md5),cbc(aes))",
->  			.cra_driver_name = "authenc-hmac-md5-cbc-aes-talitos",
->  			.cra_blocksize = AES_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2139,7 +2149,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
->  			.cra_driver_name = "authenc-hmac-md5-cbc-3des-talitos",
->  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-> -			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
-> +			.cra_flags = CRYPTO_ALG_TYPE_AEAD |
-> +					CRYPTO_ALG_ASYNC |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_aead_type,
->  			.cra_aead = {
->  				.setkey = aead_setkey,
-> @@ -2168,7 +2180,8 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_driver_name = "cbc-aes-talitos",
->  			.cra_blocksize = AES_BLOCK_SIZE,
->  			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-> -                                     CRYPTO_ALG_ASYNC,
-> +				     CRYPTO_ALG_ASYNC |
-> +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_ablkcipher_type,
->  			.cra_ablkcipher = {
->  				.setkey = ablkcipher_setkey,
-> @@ -2190,7 +2203,8 @@ static struct talitos_alg_template driver_algs[] = {
->  			.cra_driver_name = "cbc-3des-talitos",
->  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
->  			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-> -                                     CRYPTO_ALG_ASYNC,
-> +				     CRYPTO_ALG_ASYNC |
-> +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  			.cra_type = &crypto_ablkcipher_type,
->  			.cra_ablkcipher = {
->  				.setkey = ablkcipher_setkey,
-> @@ -2221,7 +2235,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "md5-talitos",
->  				.cra_blocksize = MD5_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-> @@ -2242,7 +2257,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "sha1-talitos",
->  				.cra_blocksize = SHA1_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-> @@ -2263,7 +2279,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "sha224-talitos",
->  				.cra_blocksize = SHA224_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-> @@ -2284,7 +2301,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "sha256-talitos",
->  				.cra_blocksize = SHA256_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-> @@ -2305,7 +2323,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "sha384-talitos",
->  				.cra_blocksize = SHA384_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-> @@ -2326,7 +2345,8 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_driver_name = "sha512-talitos",
->  				.cra_blocksize = SHA512_BLOCK_SIZE,
->  				.cra_flags = CRYPTO_ALG_TYPE_AHASH |
-> -					     CRYPTO_ALG_ASYNC,
-> +					     CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_KERN_DRIVER_ONLY,
->  				.cra_type = &crypto_ahash_type
->  			}
->  		},
-
-or this way:
-
-> @@ -2647,6 +2667,7 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
->  	alg->cra_priority = TALITOS_CRA_PRIORITY;
->  	alg->cra_alignmask = 0;
->  	alg->cra_ctxsize = sizeof(struct talitos_ctx);
-> +	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
->  
->  	t_alg->dev = dev;
-
-but not both.
-
-My preference is the latter.  If you want to do it the former way,
-rebase on Herbert's latest cryptodev tree, because the new algorithm
-implementations are missing from this patch.
-
-Kim
+--D
+> 
+>  Jocke
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
