@@ -1,35 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3.2] crypto: twofish-x86_64-3way - blacklist pentium4
-	and atom
-Date: Tue, 20 Dec 2011 15:19:42 +0800
-Message-ID: <20111220071942.GA3870@gondor.apana.org.au>
-References: <20111203141004.4329.29784.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH 0/7] crypto: talitos/caam: SEC h/w v2.0 fix and cleanups
+Date: Tue, 20 Dec 2011 15:24:46 +0800
+Message-ID: <20111220072446.GA3913@gondor.apana.org.au>
+References: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37460 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:36973 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752047Ab1LTHTr (ORCPT
+	with ESMTP id S1751819Ab1LTHYt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Dec 2011 02:19:47 -0500
+	Tue, 20 Dec 2011 02:24:49 -0500
 Content-Disposition: inline
-In-Reply-To: <20111203141004.4329.29784.stgit@localhost6.localdomain6>
+In-Reply-To: <1323723556-7100-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 03, 2011 at 04:10:04PM +0200, Jussi Kivilinna wrote:
-> Performance of twofish-x86_64-3way on Intel Pentium 4 and Atom is lower than
-> of twofish-x86_64 module. So blacklist these CPUs.
+On Mon, Dec 12, 2011 at 02:59:09PM -0600, Kim Phillips wrote:
+> The first patch in the series fixes a boottime oops on SEC h/w v.2.0.
+> The rest are minor cleanups.
 > 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> The fourth - "crypto: caam - desc.h - convert spaces to tabs" -
+> is the result of running unexpand -a on desc.h, and may exceed list
+> message quota limits.  If this is the case, please execute unexpand
+> manually (or let me know how to better handle this situation).
+> Herbert, I'm cc'ing you on this, so you should receive all 7 patches.
 
-Please send patches based on cryptodev instead.  If necessary I
-can then rebase them to crypto.
-
-Thanks,
+All applied.  Thanks Kim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
