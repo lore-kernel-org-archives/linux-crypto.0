@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/7] crypto - lrw: remove dependency on EXPERIMENTAL
-Date: Tue, 20 Dec 2011 15:25:15 +0800
-Message-ID: <20111220072514.GC3913@gondor.apana.org.au>
-References: <20111213105251.14934.61565.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: picoxcell: fix boolean and / or confusion
+Date: Tue, 20 Dec 2011 15:25:01 +0800
+Message-ID: <20111220072501.GB3913@gondor.apana.org.au>
+References: <1323770046-3548-1-git-send-email-jamie@jamieiles.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Rik Snel <rsnel@cube.dyndns.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: linux-crypto@vger.kernel.org
+To: Jamie Iles <jamie@jamieiles.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:47882 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:56477 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752817Ab1LTHZR (ORCPT
+	with ESMTP id S1752638Ab1LTHZE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Dec 2011 02:25:17 -0500
+	Tue, 20 Dec 2011 02:25:04 -0500
 Content-Disposition: inline
-In-Reply-To: <20111213105251.14934.61565.stgit@localhost6.localdomain6>
+In-Reply-To: <1323770046-3548-1-git-send-email-jamie@jamieiles.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 13, 2011 at 12:52:51PM +0200, Jussi Kivilinna wrote:
-> LRW has been EXPERIMENTAL since it was introduced in 2006. I'd say by now
-> it has seen enough testing to justify removal of EXPERIMENTAL tag.
+On Tue, Dec 13, 2011 at 09:54:06AM +0000, Jamie Iles wrote:
+> The AES engine only supports 128 and 256 bit keys so we should correctly
+> test for that.
 > 
-> CC: Rik Snel <rsnel@cube.dyndns.org>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Reported-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Jamie Iles <jamie@jamieiles.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
