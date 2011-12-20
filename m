@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 2/2] crypto: blowfish-x86_64 - blacklist Pentium 4
-Date: Tue, 20 Dec 2011 12:20:21 +0200
-Message-ID: <20111220102021.13429.97507.stgit@localhost6.localdomain6>
+Subject: [PATCH 1/2] crypto: twofish-x86_64-3way - blacklist pentium4 and atom
+Date: Tue, 20 Dec 2011 12:20:16 +0200
+Message-ID: <20111220102016.13429.88526.stgit@localhost6.localdomain6>
 References: <20111220071942.GA3870@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,37 +10,36 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:52061 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753228Ab1LTKUo (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:57206 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752689Ab1LTKVC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Dec 2011 05:20:44 -0500
+	Tue, 20 Dec 2011 05:21:02 -0500
 In-Reply-To: <20111220071942.GA3870@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Implementation in blowfish-x86_64 uses 64bit rotations which are slow on P4,
-making blowfish-x86_64 slower than generic C implementation. Therefore
-blacklist P4.
+Performance of twofish-x86_64-3way on Intel Pentium 4 and Atom is lower than
+of twofish-x86_64 module. So blacklist these CPUs.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/blowfish_glue.c |   30 ++++++++++++++++++++++++++++++
- 1 files changed, 30 insertions(+), 0 deletions(-)
+ arch/x86/crypto/twofish_glue_3way.c |   47 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 47 insertions(+), 0 deletions(-)
 
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index b05aa16..2970110 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 7fee8c1..0afd134 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
 @@ -25,6 +25,7 @@
   *
   */
  
 +#include <asm/processor.h>
- #include <crypto/blowfish.h>
  #include <linux/crypto.h>
  #include <linux/init.h>
-@@ -446,10 +447,39 @@ static struct crypto_alg blk_ctr_alg = {
+ #include <linux/module.h>
+@@ -637,10 +638,56 @@ static struct crypto_alg blk_xts_alg = {
  	},
  };
  
@@ -49,11 +48,28 @@ index b05aa16..2970110 100644
 +	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
 +		return false;
 +
++	if (boot_cpu_data.x86 == 0x06 &&
++		(boot_cpu_data.x86_model == 0x1c ||
++		 boot_cpu_data.x86_model == 0x26 ||
++		 boot_cpu_data.x86_model == 0x36)) {
++		/*
++		 * On Atom, twofish-3way is slower than original assembler
++		 * implementation. Twofish-3way trades off some performance in
++		 * storing blocks in 64bit registers to allow three blocks to
++		 * be processed parallel. Parallel operation then allows gaining
++		 * more performance than was trade off, on out-of-order CPUs.
++		 * However Atom does not benefit from this parallellism and
++		 * should be blacklisted.
++		 */
++		return true;
++	}
++
 +	if (boot_cpu_data.x86 == 0x0f) {
 +		/*
-+		 * On Pentium 4, blowfish-x86_64 is slower than generic C
-+		 * implementation because use of 64bit rotates (which are really
-+		 * slow on P4). Therefore blacklist P4s.
++		 * On Pentium 4, twofish-3way is slower than original assembler
++		 * implementation because excessive uses of 64bit rotate and
++		 * left-shifts (which are really slow on P4) needed to store and
++		 * handle 128bit block in two 64bit registers.
 +		 */
 +		return true;
 +	}
@@ -65,18 +81,18 @@ index b05aa16..2970110 100644
 +module_param(force, int, 0);
 +MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
 +
- static int __init init(void)
+ int __init init(void)
  {
  	int err;
  
 +	if (!force && is_blacklisted_cpu()) {
 +		printk(KERN_INFO
-+			"blowfish-x86_64: performance on this CPU "
++			"twofish-x86_64-3way: performance on this CPU "
 +			"would be suboptimal: disabling "
-+			"blowfish-x86_64.\n");
++			"twofish-x86_64-3way.\n");
 +		return -ENODEV;
 +	}
 +
- 	err = crypto_register_alg(&bf_alg);
+ 	err = crypto_register_alg(&blk_ecb_alg);
  	if (err)
- 		goto bf_err;
+ 		goto ecb_err;
