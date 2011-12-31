@@ -1,29 +1,29 @@
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: HMAC and stuff
-Date: Thu, 29 Dec 2011 20:31:02 +0300
-Message-ID: <20111229173101.GA3706@p183.telecom.by>
+From: Gao feng <omarapazanadi@gmail.com>
+Subject: I have a Question about linux asynchronous crypto
+Date: Sat, 31 Dec 2011 18:11:27 +0800
+Message-ID: <4EFEDFCF.4010302@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:46582 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752204Ab1L2RbH (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:57886 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751382Ab1LaKLc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Dec 2011 12:31:07 -0500
-Received: by wibhm6 with SMTP id hm6so6428423wib.19
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2011 09:31:05 -0800 (PST)
-Content-Disposition: inline
+	Sat, 31 Dec 2011 05:11:32 -0500
+Received: by iaeh11 with SMTP id h11so26586871iae.19
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2011 02:11:32 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-aalg_list array contains list of "approved" HMAC algorightms.
-Do I understand correctly that to update this list some sort of
-official document like RFC has to be present?
+Hi all
 
-For example, it contains hmac(rmd160) entry, but doesn't contain hmac(rmd128)
-and other RIPEMD functions (there is even test for hmac(rmd128)).
+I saw the linux crypto code,and found there is no asynchronous crypto=20
+implemented by software,
+only the hardware such as talitos implements async crypto.
 
-Also, kernel has more cryptographic hash functions than there are allowed
-by ipsec code like Tiger hashes, Whirlpool etc. They are dead code, if
-IPSec code doesn't user to use them.
+I am right,or I miss someting=EF=BC=9F
+
+thanks all.
