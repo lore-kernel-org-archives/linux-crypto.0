@@ -1,30 +1,41 @@
-From: omara <omarapazanadi@gmail.com>
-Subject: Re: I have a Question about linux asynchronous crypto
-Date: Sun, 01 Jan 2012 12:46:14 +0800
-Message-ID: <4EFFE516.8060203@gmail.com>
-References: <4EFEE23D.7070602@gmail.com> <alpine.LRH.2.02.1112311013340.31442@well.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: HMAC and stuff
+Date: Fri, 6 Jan 2012 12:34:29 +1100
+Message-ID: <20120106013429.GA6401@gondor.apana.org.au>
+References: <20111229173101.GA3706@p183.telecom.by>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org
-To: Mark Allyn <allyn@well.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Alexey Dobriyan <adobriyan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:55026 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750990Ab2AAEqS (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:34474 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751582Ab2AFBee (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 31 Dec 2011 23:46:18 -0500
-Received: by iaeh11 with SMTP id h11so27580307iae.19
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2011 20:46:18 -0800 (PST)
-In-Reply-To: <alpine.LRH.2.02.1112311013340.31442@well.com>
+	Thu, 5 Jan 2012 20:34:34 -0500
+Content-Disposition: inline
+In-Reply-To: <20111229173101.GA3706@p183.telecom.by>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=E4=BA=8E 12-1-1 =E4=B8=8A=E5=8D=882:13, Mark Allyn =E5=86=99=E9=81=93:
->
-> As far as I can see, I agree. The generic implementations all seem to
-> be synchronous.
->
+Alexey Dobriyan <adobriyan@gmail.com> wrote:
+> aalg_list array contains list of "approved" HMAC algorightms.
+> Do I understand correctly that to update this list some sort of
+> official document like RFC has to be present?
 
-Thanks Allyn,I got it,happy new year to you.
+The table is mainly there for the benefit of af_key.  It should
+be relatively easy to make xfrm_user look up any algorithm by
+name only.
+
+However, we'll need to do something about representing those
+algorithms through the af_key interface since that one uses
+numeric IDs only.  The easiest is to pick an ID that we then
+forbid when used to create new SAs.
+
+Ccing netdev since this is really an IPsec issue, not crypto.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
