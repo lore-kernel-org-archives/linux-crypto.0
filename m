@@ -1,38 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: HMAC and stuff
-Date: Fri, 6 Jan 2012 12:34:29 +1100
-Message-ID: <20120106013429.GA6401@gondor.apana.org.au>
-References: <20111229173101.GA3706@p183.telecom.by>
+Subject: Re: I have a Question about linux asynchronous crypto
+Date: Fri, 6 Jan 2012 12:35:38 +1100
+Message-ID: <20120106013537.GA6453@gondor.apana.org.au>
+References: <alpine.LRH.2.02.1112311013340.31442@well.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: omarapazanadi@gmail.com, linux-crypto@vger.kernel.org
+To: Mark Allyn <allyn@well.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34474 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:47011 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751582Ab2AFBee (ORCPT
+	with ESMTP id S1755019Ab2AFBfo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jan 2012 20:34:34 -0500
+	Thu, 5 Jan 2012 20:35:44 -0500
 Content-Disposition: inline
-In-Reply-To: <20111229173101.GA3706@p183.telecom.by>
+In-Reply-To: <alpine.LRH.2.02.1112311013340.31442@well.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Alexey Dobriyan <adobriyan@gmail.com> wrote:
-> aalg_list array contains list of "approved" HMAC algorightms.
-> Do I understand correctly that to update this list some sort of
-> official document like RFC has to be present?
+Mark Allyn <allyn@well.com> wrote:
+> 
+> As far as I can see, I agree. The generic implementations all seem to
+> be synchronous.
 
-The table is mainly there for the benefit of af_key.  It should
-be relatively easy to make xfrm_user look up any algorithm by
-name only.
-
-However, we'll need to do something about representing those
-algorithms through the af_key interface since that one uses
-numeric IDs only.  The easiest is to pick an ID that we then
-forbid when used to create new SAs.
-
-Ccing netdev since this is really an IPsec issue, not crypto.
+We do have pcrypt which is a wrapper that turns any sync
+implementation into an async one by spreading requests across
+CPUs.
 
 Cheers,
 -- 
