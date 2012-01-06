@@ -1,49 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] Added CRYPTO_ALG_KERN_DRIVER_ONLY flag (3rd
-	attempt)
-Date: Fri, 6 Jan 2012 12:37:01 +1100
-Message-ID: <20120106013701.GA6484@gondor.apana.org.au>
-References: <4EE7B6B8.7070700@gnutls.org>
+Subject: Re: cryptodev tree on github
+Date: Fri, 6 Jan 2012 15:01:46 +1100
+Message-ID: <20120106040146.GA7684@gondor.apana.org.au>
+References: <20110923005403.cc2432a99e0278e825461770@canb.auug.org.au> <20110925045023.GA5126@gondor.apana.org.au> <20111021082016.GA13483@gondor.apana.org.au> <20111024210637.d715569b7b32656fea8cd926@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34322 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:44218 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754517Ab2AFBhE (ORCPT
+	with ESMTP id S932661Ab2AFEBy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jan 2012 20:37:04 -0500
+	Thu, 5 Jan 2012 23:01:54 -0500
 Content-Disposition: inline
-In-Reply-To: <4EE7B6B8.7070700@gnutls.org>
+In-Reply-To: <20111024210637.d715569b7b32656fea8cd926@canb.auug.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Nikos Mavrogiannopoulos <nmav@gnutls.org> wrote:
-> The added CRYPTO_ALG_KERN_DRIVER_ONLY indicates whether a cipher
-> is only available via a kernel driver. If the cipher implementation
-> might be available by using an instruction set or by porting the
-> kernel code, then it must not be set.
+On Mon, Oct 24, 2011 at 09:06:37PM +1100, Stephen Rothwell wrote:
+> Hi Herbert,
 > 
-> In addition it provides crypto_tfm_alg_flags() to obtain
-> this and other possible flags.
+> On Fri, 21 Oct 2011 10:20:16 +0200 Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >
+> > On Sun, Sep 25, 2011 at 02:50:23PM +1000, Herbert Xu wrote:
+> > > Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> > > 
+> > > > Are you also going to move crypto-curent?
+> > > 
+> > > I'll create that soon.  I'll let you know when it happens.
+> > 
+> > The crypto-current tree is now up at
+> > 
+> > 	git://github.com/herbertx/crypto.git
 > 
-> Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+> I have switched to that now.  Please let me know if/when you switch back
+> to kernel.org.
 
-For future reference a cc to me is appreciated.
+Hi Stephen:
 
-> +static inline u32 crypto_tfm_alg_flags(struct crypto_tfm *tfm)
-> +{
-> +       return tfm->__crt_alg->cra_flags;
-> +}
-> +
+Both crypto and cryptodev are now back on kernel.org:
 
-Who is going to use this? For one it's not type-safe as we try
-to avoid directly using crypto_tfm in kernel code.
+	/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+	/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
 
-Otherwise your patch looks OK.
-
-Cheers,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
