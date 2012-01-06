@@ -1,50 +1,161 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: cryptodev tree on github
-Date: Fri, 6 Jan 2012 15:01:46 +1100
-Message-ID: <20120106040146.GA7684@gondor.apana.org.au>
-References: <20110923005403.cc2432a99e0278e825461770@canb.auug.org.au> <20110925045023.GA5126@gondor.apana.org.au> <20111021082016.GA13483@gondor.apana.org.au> <20111024210637.d715569b7b32656fea8cd926@canb.auug.org.au>
+Subject: Crypto Update for 3.3
+Date: Fri, 6 Jan 2012 15:12:50 +1100
+Message-ID: <20120106041250.GA7759@gondor.apana.org.au>
+References: <20100226004914.GA20812@gondor.apana.org.au> <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au> <20110315145940.GA15373@gondor.apana.org.au> <20110520235409.GA1722@gondor.apana.org.au> <20110724011752.GA14373@gondor.apana.org.au> <20111031040952.GA19659@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44218 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:51669 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932661Ab2AFEBy (ORCPT
+	with ESMTP id S1758616Ab2AFEM7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jan 2012 23:01:54 -0500
+	Thu, 5 Jan 2012 23:12:59 -0500
 Content-Disposition: inline
-In-Reply-To: <20111024210637.d715569b7b32656fea8cd926@canb.auug.org.au>
+In-Reply-To: <20111031040952.GA19659@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 24, 2011 at 09:06:37PM +1100, Stephen Rothwell wrote:
-> Hi Herbert,
-> 
-> On Fri, 21 Oct 2011 10:20:16 +0200 Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Sun, Sep 25, 2011 at 02:50:23PM +1000, Herbert Xu wrote:
-> > > Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> > > 
-> > > > Are you also going to move crypto-curent?
-> > > 
-> > > I'll create that soon.  I'll let you know when it happens.
-> > 
-> > The crypto-current tree is now up at
-> > 
-> > 	git://github.com/herbertx/crypto.git
-> 
-> I have switched to that now.  Please let me know if/when you switch back
-> to kernel.org.
+Hi Linus:
 
-Hi Stephen:
+Here is the crypto update for 3.3:
 
-Both crypto and cryptodev are now back on kernel.org:
+* New test vectors (serpent, xts-twofish).
+* Speed test for asynchronous ciphers.
+* SSE2 assembly implementation of serpent.
+* Support for LRW and XTS in X86-64 assembly implementation of twofish.
+* More MD5 combos for caam.
+* Channel remap on talitos for better affinity.
+* Direct support for HMAC on talitos.
+* Misc fixes.
 
-	/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-	/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
 
-Thanks!
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Axel Lin (2):
+      char: hw_random: convert drivers/char/hw_random/* to use module_platform_driver()
+      crypto: convert drivers/crypto/* to use module_platform_driver()
+
+Jamie Iles (1):
+      crypto: picoxcell - fix boolean and / or confusion
+
+Jarod Wilson (1):
+      crypto: ansi_cprng - enforce key != seed in fips mode
+
+Jussi Kivilinna (36):
+      crypto: testmgr - add new serpent test vectors
+      crypto: tcrypt - add test_acipher_speed
+      crypto: tcrypt - add serpent speed tests
+      crypto: serpent - export common functions for x86_64/i386-sse2 assembler implementations
+      crypto: serpent - rename module from serpent to serpent_generic
+      crypto: lrw - fix memleak
+      crypto: lrw - use blocksize constant
+      crypto: lrw - split gf128mul table initialization from setkey
+      crypto: lrw - add interface for parallelized cipher implementions
+      crypto: testmgr - add lrw(serpent) test vectors
+      crypto: tcrypt - add lrw(serpent) tests
+      crypto: testmgr - add lrw(twofish) test vectors
+      crypto: tcrypt - add lrw(twofish) tests
+      crypto: twofish-x86_64-3way - add lrw support
+      crypto: xts - use blocksize constant
+      crypto: xts: add interface for parallelized cipher implementations
+      crypto: testmgr - add xts(serpent) test vectors
+      crypto: tcrypt - add xts(serpent) tests
+      crypto: testmgr - add xts(twofish) test vectors
+      crypto: tcrypt - add xts(twofish) tests
+      crypto: twofish-x86_64-3way - add xts support
+      crypto: serpent - add 8-way parallel x86_64/SSE2 assembler implementation
+      crypto: serpent - add 4-way parallel i586/SSE2 assembler implementation
+      crypto: serpent-sse2 - add lrw support
+      crypto: serpent-sse2 - add xts support
+      crypto: serpent-sse2 - clear CRYPTO_TFM_REQ_MAY_SLEEP in lrw and xts modes
+      crypto: serpent - cleanup checkpatch errors and warnings
+      crypto: serpent - rename serpent.c to serpent_generic.c
+      crypto: serpent-sse2 - should select CRYPTO_CRYPTD
+      crypto: lrw - remove dependency on EXPERIMENTAL
+      crypto: xts - remove dependency on EXPERIMENTAL
+      crypto: twofish-x86_64-3way - select LRW and XTS
+      crypto: twofish-x86_64-3way - remove unneeded LRW/XTS #ifdefs
+      crypto: serpent-sse2 - select LRW and XTS
+      crypto: serpent-sse2 - remove unneeded LRW/XTS #ifdefs
+      crypto: gf128mul - remove leftover "(EXPERIMENTAL)" in Kconfig
+
+Kim Phillips (11):
+      crypto: talitos - be less noisy on startup
+      crypto: talitos - prepare driver for channel remap support
+      crypto: talitos - support for channel remap and 2nd IRQ
+      crypto: caam - add support for MD5 algorithm variants
+      crypto: talitos - fix bad kfree
+      crypto: talitos - remove NO_IRQ references
+      crypto: talitos - convert talitos_error to struct device
+      crypto: caam - desc.h - convert spaces to tabs
+      crypto: caam - more desc.h cleanups
+      crypto: caam - fix polarity of "propagate error" logic
+      crypto: caam - remove DECO access initialization code
+
+Lee Nipper (1):
+      crypto: talitos - add hmac algorithms
+
+Steffen Klassert (1):
+      crypto: Unlink and free instances when deleted
+
+Valdis.Kletnieks@vt.edu (1):
+      crypto: fix typo in crypto/Kconfig
+
+ arch/x86/crypto/Makefile                     |    4 +
+ arch/x86/crypto/serpent-sse2-i586-asm_32.S   |  638 ++++++
+ arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |  761 +++++++
+ arch/x86/crypto/serpent_sse2_glue.c          | 1070 ++++++++++
+ arch/x86/crypto/twofish_glue_3way.c          |  218 ++
+ arch/x86/include/asm/serpent.h               |   63 +
+ crypto/Kconfig                               |   52 +-
+ crypto/Makefile                              |    2 +-
+ crypto/algapi.c                              |   29 +
+ crypto/ansi_cprng.c                          |    8 +
+ crypto/crypto_user.c                         |    2 +-
+ crypto/lrw.c                                 |  156 ++-
+ crypto/serpent.c                             |  587 ------
+ crypto/serpent_generic.c                     |  684 +++++++
+ crypto/tcrypt.c                              |  310 +++
+ crypto/tcrypt.h                              |    2 +
+ crypto/testmgr.c                             |  150 ++
+ crypto/testmgr.h                             | 2759 +++++++++++++++++++++++++-
+ crypto/twofish_common.c                      |   13 +-
+ crypto/xts.c                                 |   79 +-
+ drivers/char/hw_random/atmel-rng.c           |   12 +-
+ drivers/char/hw_random/n2-drv.c              |   13 +-
+ drivers/char/hw_random/octeon-rng.c          |   13 +-
+ drivers/char/hw_random/pasemi-rng.c          |   12 +-
+ drivers/char/hw_random/picoxcell-rng.c       |   12 +-
+ drivers/char/hw_random/ppc4xx-rng.c          |   12 +-
+ drivers/char/hw_random/timeriomem-rng.c      |   13 +-
+ drivers/crypto/amcc/crypto4xx_core.c         |   13 +-
+ drivers/crypto/caam/caamalg.c                |   67 +-
+ drivers/crypto/caam/compat.h                 |    1 +
+ drivers/crypto/caam/ctrl.c                   |   26 +-
+ drivers/crypto/caam/desc.h                   | 2265 +++++++++++-----------
+ drivers/crypto/caam/desc_constr.h            |    7 +-
+ drivers/crypto/caam/regs.h                   |    1 -
+ drivers/crypto/mv_cesa.c                     |   12 +-
+ drivers/crypto/picoxcell_crypto.c            |   16 +-
+ drivers/crypto/s5p-sss.c                     |   13 +-
+ drivers/crypto/talitos.c                     |  493 ++++-
+ drivers/crypto/talitos.h                     |   45 +-
+ include/crypto/algapi.h                      |    1 +
+ include/crypto/lrw.h                         |   43 +
+ include/crypto/serpent.h                     |   27 +
+ include/crypto/twofish.h                     |    2 +
+ include/crypto/xts.h                         |   27 +
+ 44 files changed, 8684 insertions(+), 2049 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
