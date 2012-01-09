@@ -1,42 +1,41 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH 3/4] drivers/crypto/ixp4xx_crypto.c: convert GFP_KERNEL to GFP_ATOMIC
-Date: Mon,  9 Jan 2012 10:40:49 +0100
-Message-ID: <1326102050-30265-3-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: [PATCH] crypto: caam - fix gcc 4.6 warning
+Date: Mon, 9 Jan 2012 10:27:40 -0600
+Message-ID: <20120109102740.82e4ac0f8425930b6a34ac1c@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from am1ehsobe001.messaging.microsoft.com ([213.199.154.204]:54679
+	"EHLO AM1EHSOBE001.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932170Ab2AIQ3D (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Jan 2012 11:29:03 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <julia.lawall@lip6.fr>
+drivers/crypto/caam/ctrl.c: In function 'caam_probe':
+drivers/crypto/caam/ctrl.c:49:6: warning: unused variable 'd' [-Wunused-variable]
 
-The function is called with locks held and thus should not use GFP_KERNEL.
-
-The semantic patch that makes this report is available
-in scripts/coccinelle/locks/call_kern.cocci.
-
-More information about semantic patching is available at
-http://coccinelle.lip6.fr/
-
-Signed-off-by: Julia Lawall <julia.lawall@lip6.fr>
-
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/ixp4xx_crypto.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/ctrl.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 4c20c5b..bc349cc 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -265,7 +265,7 @@ static int setup_crypt_desc(void)
- 	BUILD_BUG_ON(sizeof(struct crypt_ctl) != 64);
- 	crypt_virt = dma_alloc_coherent(dev,
- 			NPE_QLEN * sizeof(struct crypt_ctl),
--			&crypt_phys, GFP_KERNEL);
-+			&crypt_phys, GFP_ATOMIC);
- 	if (!crypt_virt)
- 		return -ENOMEM;
- 	memset(crypt_virt, 0, NPE_QLEN * sizeof(struct crypt_ctl));
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 8ae3ba2..c5f61c5 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -46,7 +46,7 @@ static int caam_remove(struct platform_device *pdev)
+ /* Probe routine for CAAM top (controller) level */
+ static int caam_probe(struct platform_device *pdev)
+ {
+-	int d, ring, rspec;
++	int ring, rspec;
+ 	struct device *dev;
+ 	struct device_node *nprop, *np;
+ 	struct caam_ctrl __iomem *ctrl;
+-- 
+1.7.8.3
