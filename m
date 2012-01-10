@@ -1,191 +1,52 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 1/2] crypto: caam - add sha224 and sha384 variants to
- existing AEAD algorithms
-Date: Mon, 9 Jan 2012 18:26:44 -0600
-Message-ID: <20120109182644.13645da93d24a84ff6611b49@freescale.com>
+Subject: [PATCH 2/2] crypto: caam - be less noisy on startup
+Date: Mon, 9 Jan 2012 18:26:49 -0600
+Message-ID: <20120109182649.fa0b081b599151e80855bd38@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Hemant Agrawal <hemant@freescale.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:50044
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933521Ab2AJA2I (ORCPT
+Received: from db3ehsobe003.messaging.microsoft.com ([213.199.154.141]:27450
+	"EHLO DB3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S933521Ab2AJA2L (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Jan 2012 19:28:08 -0500
+	Mon, 9 Jan 2012 19:28:11 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Hemant Agrawal <hemant@freescale.com>
+sha224 and 384 support extends caam noise to 21 lines.  Do the same
+as commit 5b859b6 "crypto: talitos - be less noisy on startup", but
+for caam, and display:
 
-Signed-off-by: Hemant Agrawal <hemant@freescale.com>
+caam ffe300000.crypto: fsl,sec-v4.0 algorithms registered in /proc/crypto
+
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c |  115 +++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 115 insertions(+), 0 deletions(-)
+ drivers/crypto/caam/caamalg.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index e73cf2e..f6b8dcc 100644
+index f6b8dcc..9526024 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -1844,6 +1844,25 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha224),cbc(aes))",
-+		.driver_name = "authenc-hmac-sha224-cbc-aes-caam",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = AES_BLOCK_SIZE,
-+			.maxauthsize = SHA224_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
-+	},
-+	{
- 		.name = "authenc(hmac(sha256),cbc(aes))",
- 		.driver_name = "authenc-hmac-sha256-cbc-aes-caam",
- 		.blocksize = AES_BLOCK_SIZE,
-@@ -1864,6 +1883,26 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha384),cbc(aes))",
-+		.driver_name = "authenc-hmac-sha384-cbc-aes-caam",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = AES_BLOCK_SIZE,
-+			.maxauthsize = SHA384_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
-+	},
-+
-+	{
- 		.name = "authenc(hmac(sha512),cbc(aes))",
- 		.driver_name = "authenc-hmac-sha512-cbc-aes-caam",
- 		.blocksize = AES_BLOCK_SIZE,
-@@ -1922,6 +1961,25 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha224),cbc(des3_ede))",
-+		.driver_name = "authenc-hmac-sha224-cbc-des3_ede-caam",
-+		.blocksize = DES3_EDE_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = DES3_EDE_BLOCK_SIZE,
-+			.maxauthsize = SHA224_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
-+	},
-+	{
- 		.name = "authenc(hmac(sha256),cbc(des3_ede))",
- 		.driver_name = "authenc-hmac-sha256-cbc-des3_ede-caam",
- 		.blocksize = DES3_EDE_BLOCK_SIZE,
-@@ -1942,6 +2000,25 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha384),cbc(des3_ede))",
-+		.driver_name = "authenc-hmac-sha384-cbc-des3_ede-caam",
-+		.blocksize = DES3_EDE_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = DES3_EDE_BLOCK_SIZE,
-+			.maxauthsize = SHA384_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
-+	},
-+	{
- 		.name = "authenc(hmac(sha512),cbc(des3_ede))",
- 		.driver_name = "authenc-hmac-sha512-cbc-des3_ede-caam",
- 		.blocksize = DES3_EDE_BLOCK_SIZE,
-@@ -2000,6 +2077,25 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha224),cbc(des))",
-+		.driver_name = "authenc-hmac-sha224-cbc-des-caam",
-+		.blocksize = DES_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = DES_BLOCK_SIZE,
-+			.maxauthsize = SHA224_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
-+	},
-+	{
- 		.name = "authenc(hmac(sha256),cbc(des))",
- 		.driver_name = "authenc-hmac-sha256-cbc-des-caam",
- 		.blocksize = DES_BLOCK_SIZE,
-@@ -2020,6 +2116,25 @@ static struct caam_alg_template driver_algs[] = {
- 		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
- 	},
- 	{
-+		.name = "authenc(hmac(sha384),cbc(des))",
-+		.driver_name = "authenc-hmac-sha384-cbc-des-caam",
-+		.blocksize = DES_BLOCK_SIZE,
-+		.template_aead = {
-+			.setkey = aead_setkey,
-+			.setauthsize = aead_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = DES_BLOCK_SIZE,
-+			.maxauthsize = SHA384_DIGEST_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
-+		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
-+				   OP_ALG_AAI_HMAC_PRECOMP,
-+		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
-+	},
-+	{
- 		.name = "authenc(hmac(sha512),cbc(des))",
- 		.driver_name = "authenc-hmac-sha512-cbc-des-caam",
- 		.blocksize = DES_BLOCK_SIZE,
+@@ -2400,12 +2400,12 @@ static int __init caam_algapi_init(void)
+ 			dev_warn(ctrldev, "%s alg registration failed\n",
+ 				t_alg->crypto_alg.cra_driver_name);
+ 			kfree(t_alg);
+-		} else {
++		} else
+ 			list_add_tail(&t_alg->entry, &priv->alg_list);
+-			dev_info(ctrldev, "%s\n",
+-				 t_alg->crypto_alg.cra_driver_name);
+-		}
+ 	}
++	if (!list_empty(&priv->alg_list))
++		dev_info(ctrldev, "%s algorithms registered in /proc/crypto\n",
++			 (char *)of_get_property(dev_node, "compatible", NULL));
+ 
+ 	return err;
+ }
 -- 
 1.7.8.3
