@@ -1,29 +1,89 @@
-From: Mark Brown <broonie-yzvPICuk2AATkU/dhu1WVueM+bqZidxxQQ4Iyu8u01E@public.gmane.org>
-Subject: Re: [PATCH v8 2/2] crypto: driver for Tegra AES hardware
-Date: Tue, 10 Jan 2012 05:29:00 +0000
-Message-ID: <20120110052900.GB5433@sirena.org.uk>
-References: <1324034755-3295-1-git-send-email-vwadekar@nvidia.com>
- <1324034755-3295-3-git-send-email-vwadekar@nvidia.com>
- <4F0A7AA9.6020104@nvidia.com>
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: sha512: make it work, undo percpu message schedule
+Date: Wed, 11 Jan 2012 03:00:40 +0300
+Message-ID: <20120111000040.GA3801@p183.telecom.by>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	ken@codelabs.ch
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:45668 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751576Ab2AKAAq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 10 Jan 2012 19:00:46 -0500
 Content-Disposition: inline
-In-Reply-To: <4F0A7AA9.6020104-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 09, 2012 at 10:57:05AM +0530, Varun Wadekar wrote:
-> Is this patch good to go? I did not receive any comments, so I am
-> assuming that this patch is good but might have slipped from the
-> maintainers' list of patches to review.
+commit f9e2bca6c22d75a289a349f869701214d63b5060
+aka "crypto: sha512 - Move message schedule W[80] to static percpu area"
+created global message schedule area.
 
-> Can some one please review/ack these changes so that we can move
-> forward in the review process?
+If sha512_update will ever be entered twice, hilarity ensures.
 
-You've not CCed the relevant maintainers on the patches so there's a
-reasonable chance they haven't even seen them, much less reviewed them.
-You should *always* CC maintainers on patches.
+Probably the easiest way to notice incorrect hashes being calculated is
+to run 2 ping floods over AH with hmac(sha512):
+
+	#!/usr/sbin/setkey -f
+	flush;
+	spdflush;
+	add IP1 IP2 ah 25 -A hmac-sha512 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000025;
+	add IP2 IP1 ah 52 -A hmac-sha512 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000052;
+	spdadd IP1 IP2 any -P out ipsec ah/transport//require;
+	spdadd IP2 IP1 any -P in  ipsec ah/transport//require;
+
+XfrmInStateProtoError will start ticking with -EBADMSG being returned
+from ah_input(). This never happens with, say, hmac(sha1).
+
+I personally don't understand this changelog entry:
+
+	"The message schedule W (u64[80]) is too big for the stack."
+
+Hash context is dynamically allocated.
+
+W[80] stack usage can be trimmed like in SHA-1, this is for separate patch.
+
+P. S.: If only one ping flood runs, XfrmInStateProtoError will also tick
+	but very slowly. I personally can't explain this.
+
+With patch applied (on BOTH sides), XfrmInStateProtoError does not tick
+with multiple bidirectional ping flood streams like it doesn't tick
+with SHA-1.
+
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
+
+ crypto/sha512_generic.c |    6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -21,8 +21,6 @@
+ #include <linux/percpu.h>
+ #include <asm/byteorder.h>
+ 
+-static DEFINE_PER_CPU(u64[80], msg_schedule);
+-
+ static inline u64 Ch(u64 x, u64 y, u64 z)
+ {
+         return z ^ (x & (y ^ z));
+@@ -89,7 +87,7 @@ sha512_transform(u64 *state, const u8 *input)
+ 	u64 a, b, c, d, e, f, g, h, t1, t2;
+ 
+ 	int i;
+-	u64 *W = get_cpu_var(msg_schedule);
++	u64 W[80];
+ 
+ 	/* load the input */
+         for (i = 0; i < 16; i++)
+@@ -128,8 +126,6 @@ sha512_transform(u64 *state, const u8 *input)
+ 
+ 	/* erase our data */
+ 	a = b = c = d = e = f = g = h = t1 = t2 = 0;
+-	memset(W, 0, sizeof(__get_cpu_var(msg_schedule)));
+-	put_cpu_var(msg_schedule);
+ }
+ 
+ static int
