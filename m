@@ -1,60 +1,37 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: sha512: make it work, undo percpu message schedule
-Date: Fri, 13 Jan 2012 07:48:38 +0100
-Message-ID: <1326437318.2617.17.camel@edumazet-laptop>
-References: <20120111000040.GA3801@p183.telecom.by>
-	 <20120111003611.GA12257@gondor.apana.org.au>
-	 <20120113062256.GC12501@secunet.com>
+Date: Fri, 13 Jan 2012 17:50:41 +1100
+Message-ID: <20120113065040.GA18680@gondor.apana.org.au>
+References: <20120111000040.GA3801@p183.telecom.by> <20120111003611.GA12257@gondor.apana.org.au> <20120113062256.GC12501@secunet.com> <1326437318.2617.17.camel@edumazet-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Alexey Dobriyan <adobriyan@gmail.com>,
 	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
 	ken@codelabs.ch
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Eric Dumazet <eric.dumazet@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:63647 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751071Ab2AMGso (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:33252 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752232Ab2AMGus (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Jan 2012 01:48:44 -0500
-In-Reply-To: <20120113062256.GC12501@secunet.com>
+	Fri, 13 Jan 2012 01:50:48 -0500
+Content-Disposition: inline
+In-Reply-To: <1326437318.2617.17.camel@edumazet-laptop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le vendredi 13 janvier 2012 =C3=A0 07:22 +0100, Steffen Klassert a =C3=A9=
-crit :
-> On Wed, Jan 11, 2012 at 11:36:11AM +1100, Herbert Xu wrote:
-> > On Wed, Jan 11, 2012 at 03:00:40AM +0300, Alexey Dobriyan wrote:
-> > > commit f9e2bca6c22d75a289a349f869701214d63b5060
-> > > aka "crypto: sha512 - Move message schedule W[80] to static percp=
-u area"
-> > > created global message schedule area.
-> > >=20
-> > > If sha512_update will ever be entered twice, hilarity ensures.
-> >=20
-> > Hmm, do you know why this happens? On the face of it this shouldn't
-> > be possible as preemption is disabled.
-> >=20
->=20
-> I did not try to reproduce, but this looks like a race of the 'local =
-out'
-> and the receive packet path. On 'lokal out' bottom halves are enabled=
-,
-> so could be interrupted by the NET_RX_SOFTIRQ while doing a sha512_up=
-date.
-> The NET_RX_SOFTIRQ could invoke sha512_update too, that would corrupt=
- the
-> hash value. My guess could be checked easily by disabling the bottom =
-halves
-> before the percpu value is fetched.
+On Fri, Jan 13, 2012 at 07:48:38AM +0100, Eric Dumazet wrote:
+>
+> Another solution is using two blocks, one used from interrupt context.
+> 
+> static DEFINE_PER_CPU(u64[80], msg_schedule);
+> static DEFINE_PER_CPU(u64[80], msg_schedule_irq);
+> 
+> (Like we do for SNMP mibs on !x86 arches)
 
-Good catch. It can be generalized to any interrupts (soft and hard)
-
-Another solution is using two blocks, one used from interrupt context.
-
-static DEFINE_PER_CPU(u64[80], msg_schedule);
-static DEFINE_PER_CPU(u64[80], msg_schedule_irq);
-
-(Like we do for SNMP mibs on !x86 arches)
+Yes that sounds good.  Thanks Eric!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
