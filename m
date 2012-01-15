@@ -1,56 +1,62 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/3] sha512: make it work, undo percpu message schedule
-Date: Sat, 14 Jan 2012 23:00:39 +0100
-Message-ID: <1326578439.5287.43.camel@edumazet-laptop>
-References: <20120111000040.GA3801@p183.telecom.by>
-	 <20120111003611.GA12257@gondor.apana.org.au>
-	 <20120112235514.GA5065@p183.telecom.by>
-	 <20120113070813.GA20068@gondor.apana.org.au>
-	 <1326450942.2272.20.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-	 <1326451301.2272.23.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-	 <1326452246.2272.31.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-	 <CACVxJT9FOYdRFZJ0WRe+5ty4t4XLwgHKWaoZBWB+Zjm-yCEMEA@mail.gmail.com>
-	 <1326458053.3826.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-	 <20120114182024.GA4207@p183.telecom.by>
-	 <20120114182737.GB4207@p183.telecom.by>
-	 <1326577610.5287.38.camel@edumazet-laptop>
-	 <CA+55aFxfKyqm9eC_XajLYJ6D5YhHn_9K0pkG+caZDhxrAwvA0w@mail.gmail.com>
+Date: Sun, 15 Jan 2012 12:43:04 +1100
+Message-ID: <20120115014303.GA27370@gondor.apana.org.au>
+References: <20120111003611.GA12257@gondor.apana.org.au> <20120112235514.GA5065@p183.telecom.by> <20120113070813.GA20068@gondor.apana.org.au> <1326450942.2272.20.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC> <1326451301.2272.23.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC> <1326452246.2272.31.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC> <CACVxJT9FOYdRFZJ0WRe+5ty4t4XLwgHKWaoZBWB+Zjm-yCEMEA@mail.gmail.com> <1326458053.3826.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC> <20120114182024.GA4207@p183.telecom.by> <20120114182737.GB4207@p183.telecom.by>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Alexey Dobriyan <adobriyan@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
 	ken@codelabs.ch, Steffen Klassert <steffen.klassert@secunet.com>,
-	security@kernel.org
-To: Linus Torvalds <torvalds@linux-foundation.org>
+	Eric Dumazet <eric.dumazet@gmail.com>, security@kernel.org
+To: Alexey Dobriyan <adobriyan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:63695 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751124Ab2ANWAn (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:58801 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751095Ab2AOBnO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Jan 2012 17:00:43 -0500
-In-Reply-To: <CA+55aFxfKyqm9eC_XajLYJ6D5YhHn_9K0pkG+caZDhxrAwvA0w@mail.gmail.com>
+	Sat, 14 Jan 2012 20:43:14 -0500
+Content-Disposition: inline
+In-Reply-To: <20120114182737.GB4207@p183.telecom.by>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le samedi 14 janvier 2012 =C3=A0 13:52 -0800, Linus Torvalds a =C3=A9cr=
-it :
-> On Sat, Jan 14, 2012 at 1:46 PM, Eric Dumazet <eric.dumazet@gmail.com=
-> wrote:
-> >
-> > This is too risky, and we provided an alternate patch, not just for=
- fun.
->=20
-> Did you see the second patch?
->=20
+On Sat, Jan 14, 2012 at 09:27:37PM +0300, Alexey Dobriyan wrote:
+> commit f9e2bca6c22d75a289a349f869701214d63b5060
+> aka "crypto: sha512 - Move message schedule W[80] to static percpu area"
+> created global message schedule area.
+> 
+> If sha512_update will ever be entered twice, hash will be silently
+> calculated incorrectly.
+> 
+> Probably the easiest way to notice incorrect hashes being calculated is
+> to run 2 ping floods over AH with hmac(sha512):
+> 
+> 	#!/usr/sbin/setkey -f
+> 	flush;
+> 	spdflush;
+> 	add IP1 IP2 ah 25 -A hmac-sha512 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000025;
+> 	add IP2 IP1 ah 52 -A hmac-sha512 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000052;
+> 	spdadd IP1 IP2 any -P out ipsec ah/transport//require;
+> 	spdadd IP2 IP1 any -P in  ipsec ah/transport//require;
+> 
+> XfrmInStateProtoError will start ticking with -EBADMSG being returned
+> from ah_input(). This never happens with, say, hmac(sha1).
+> 
+> With patch applied (on BOTH sides), XfrmInStateProtoError does not tick
+> with multiple bidirectional ping flood streams like it doesn't tick
+> with SHA-1.
+> 
+> After this patch sha512_transform() will start using ~750 bytes of stack on x86_64.
+> This is OK for simple loads, for something more heavy, stack reduction will be done
+> separatedly.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> Cc: stable@vger.kernel.org
 
-I saw it and felt it was not a stable material.
+OK, I've applied patches 1-2 to crypto and patch 3 to cryptodev.
 
-And Herbert sent an alternate patch, then I sent a V3 patch.
-
-> The one that got rid of the *stupid* 80-entry array?
->=20
-
-Maybe, I didnt wrote this code, and I am very glad this code can be
-smarter and all.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
