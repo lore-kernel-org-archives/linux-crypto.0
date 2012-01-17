@@ -1,36 +1,34 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 07/21] KEYS: Create a key type that can be used for general cryptographic operations [ver #3]
-Date: Tue, 17 Jan 2012 15:32:20 +0000
-Message-ID: <21109.1326814340@redhat.com>
-References: <1326718394.2276.1.camel@falcor> <20111202184229.21874.25782.stgit@warthog.procyon.org.uk> <20111202184354.21874.57647.stgit@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, keyrings@linux-nfs.org,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, arjan.van.de.ven@intel.com,
-	alan.cox@intel.com
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>, dmitry.kasatkin@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1326718394.2276.1.camel@falcor>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Francis Moreau <francis.moro@gmail.com>
+Subject: question about crypto module dependency
+Date: Tue, 17 Jan 2012 19:34:25 +0100
+Message-ID: <CAC9WiBj0oK+mWqnGVPEPAOTKMKeedsD4Wwwv_a0YbmOm2ejyfg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:35102 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751266Ab2AQSe0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Jan 2012 13:34:26 -0500
+Received: by bkas6 with SMTP id s6so1979256bka.19
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2012 10:34:25 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+Hello,
 
-> Nice! Basically the 'crypto' key type ties crypto/ with security/keys.
-> Other than the posted pgp key parser used for verifying kernel module
-> signatures, I assume another use case could be to expose kernel
-> cryptography to userspace.  As there was a submission
-> https://lkml.org/lkml/2010/8/20/103 to do just this, there must be
-> userspace apps that would benefit.  This architecture would address a
-> number of concerns raised with the prior submission. (Refer to
-> http://lwn.net/Articles/401548/.)
+I'm wondering how this scenario is supposed to work: let's say a
+module A uses 'crc32c' function in lib/libcrc32c.c. In its turn this
+function calls crypto_shash_update() which is exported by
+crypto/shash.c. But now no module implementing "crc32c" has still been
+loaded although crc32c.ko is available. Therefore the initial load of
+module A fails although all required modules by the system are
+present.
 
-:-)
+If the above is correct, how should it be handled ?
 
-> You'd probably want to move the 'crypto' key type to its own directory.
-
-Yeah.
-
-I'd also like to see if Dmitry's work can be absorbes into this infrastructure.
-
-David
+Thanks
+-- 
+Francis
