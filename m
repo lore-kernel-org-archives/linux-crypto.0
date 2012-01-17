@@ -1,75 +1,36 @@
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: [PATCH 2/3] sha512: reduce stack usage to safe number
-Date: Tue, 17 Jan 2012 14:03:09 +0200
-Message-ID: <CACVxJT_cZAdxNOFTpK5seUXFZU+YB3zbe6LF1nnyzo32ae14xw@mail.gmail.com>
-References: <AE90C24D6B3A694183C094C60CF0A2F6D8AF43@saturn3.aculab.com>
-	<1326709382.2255.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: David Laight <David.Laight@aculab.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	ken@codelabs.ch, Steffen Klassert <steffen.klassert@secunet.com>,
-	security@kernel.org
-To: Eric Dumazet <eric.dumazet@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:51621 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753037Ab2AQMDK convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Jan 2012 07:03:10 -0500
-In-Reply-To: <1326709382.2255.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 07/21] KEYS: Create a key type that can be used for general cryptographic operations [ver #3]
+Date: Tue, 17 Jan 2012 15:32:20 +0000
+Message-ID: <21109.1326814340@redhat.com>
+References: <1326718394.2276.1.camel@falcor> <20111202184229.21874.25782.stgit@warthog.procyon.org.uk> <20111202184354.21874.57647.stgit@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, arjan.van.de.ven@intel.com,
+	alan.cox@intel.com
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>, dmitry.kasatkin@intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1326718394.2276.1.camel@falcor>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 1/16/12, Eric Dumazet <eric.dumazet@gmail.com> wrote:
-> Le lundi 16 janvier 2012 =E0 09:56 +0000, David Laight a =E9crit :
->> Doesn't this badly overflow W[] ..
->>
->> > +#define SHA512_0_15(i, a, b, c, d, e, f, g, h) \
->> > +	t1 =3D h + e1(e) + Ch(e, f, g) + sha512_K[i] + W[i];	\
->> ...
->> > +	for (i =3D 0; i < 16; i +=3D 8) {
->> ...
->> > +		SHA512_0_15(i + 7, b, c, d, e, f, g, h, a);
->> > +	}
->>
->> 	David
->>
->>
->
-> No overflow since loop is done for only i=3D0 and i=3D8
->
-> By the way, I suspect previous code was chosen years ago because this
-> version uses less stack but adds much more code bloat.
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-I think W[80] was use because it's the most straightforward way to
-write this code
-by following spec.
+> Nice! Basically the 'crypto' key type ties crypto/ with security/keys.
+> Other than the posted pgp key parser used for verifying kernel module
+> signatures, I assume another use case could be to expose kernel
+> cryptography to userspace.  As there was a submission
+> https://lkml.org/lkml/2010/8/20/103 to do just this, there must be
+> userspace apps that would benefit.  This architecture would address a
+> number of concerns raised with the prior submission. (Refer to
+> http://lwn.net/Articles/401548/.)
 
-All SHA definitions have full message schedule pseudocoded
-before hash computation.
+:-)
 
-> size crypto/sha512_generic.o crypto/sha512_generic_old.o
->    text	   data	    bss	    dec	    hex	filename
->   17369	    704	      0	  18073	   4699	crypto/sha512_generic.o
->    8249	    704	      0	   8953	   22f9	crypto/sha512_generic_old.o
+> You'd probably want to move the 'crypto' key type to its own directory.
 
-This is because SHA-512 is fundamentally 64-bit algorithm multiplied by
-excessive unrolling.
+Yeah.
 
-Surprisingly, doing variable renaming by hand like in spec:
-t1 =3D ...
-t2 =3D ...
-h =3D g;
-g =3D f;
-f =3D e;
-e =3D d + T1;
-d =3D c;
-c =3D b;
-b =3D a;
-a =3D t1 + t2;
+I'd also like to see if Dmitry's work can be absorbes into this infrastructure.
 
-bring stack space on i386 under control too.
+David
