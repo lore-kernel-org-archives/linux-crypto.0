@@ -1,60 +1,69 @@
-From: Francis Moreau <francis.moro@gmail.com>
-Subject: Re: question about crypto module dependency
-Date: Wed, 18 Jan 2012 08:49:13 +0100
-Message-ID: <CAC9WiBjQ9qEqNWSKj_c56ekex-nbkLQejO=HhZgRnOSZn0iJkA@mail.gmail.com>
-References: <CAC9WiBj0oK+mWqnGVPEPAOTKMKeedsD4Wwwv_a0YbmOm2ejyfg@mail.gmail.com>
-	<20120118053933.GA23562@gondor.apana.org.au>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: Re: [PATCH 07/21] KEYS: Create a key type that can be used for
+ general cryptographic operations [ver #3]
+Date: Wed, 18 Jan 2012 12:56:15 +0200
+Message-ID: <CALLzPKY87L_GTP57MwA=iz4Cn3inboBszJ5OfOSYtUcRJn4KQg@mail.gmail.com>
+References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
+	<20111202184354.21874.57647.stgit@warthog.procyon.org.uk>
+	<1326718394.2276.1.camel@falcor>
+	<21109.1326814340@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, keyrings@linux-nfs.org,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, arjan.van.de.ven@intel.com,
+	alan.cox@intel.com
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:57386 "EHLO
-	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753111Ab2ARHtN (ORCPT
+Received: from mga10.intel.com ([192.55.52.92]:19304 "EHLO
+	fmsmga102.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752938Ab2ARK4S convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jan 2012 02:49:13 -0500
-Received: by obcva7 with SMTP id va7so6847297obc.19
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2012 23:49:13 -0800 (PST)
-In-Reply-To: <20120118053933.GA23562@gondor.apana.org.au>
+	Wed, 18 Jan 2012 05:56:18 -0500
+In-Reply-To: <21109.1326814340@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2012 at 6:39 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Francis Moreau <francis.moro@gmail.com> wrote:
->> Hello,
->>
->> I'm wondering how this scenario is supposed to work: let's say a
->> module A uses 'crc32c' function in lib/libcrc32c.c. In its turn this
->> function calls crypto_shash_update() which is exported by
->> crypto/shash.c. But now no module implementing "crc32c" has still been
->> loaded although crc32c.ko is available. Therefore the initial load of
->> module A fails although all required modules by the system are
->> present.
->>
->> If the above is correct, how should it be handled ?
+On Tue, Jan 17, 2012 at 5:32 PM, David Howells <dhowells@redhat.com> wr=
+ote:
+> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 >
-> We'd need to adjust the init priority of libcrc32c and whatever
-> it depends on.
-
-Could you give me some details beacause I don't see how that would work...
-
-Currently we have this : libcrc32c -> shash
-
-where '->' means depend on.
-
-However I think we should have this: libcrc32c -> shash -> crc32c, to
-get all modules properly loaded when using libcrc32c.
-
-But it seems not possible because of the way shash is doing the load
-of its backends dynamically: it requires that the backend has already
-been registered.
-
+>> Nice! Basically the 'crypto' key type ties crypto/ with security/key=
+s.
+>> Other than the posted pgp key parser used for verifying kernel modul=
+e
+>> signatures, I assume another use case could be to expose kernel
+>> cryptography to userspace. =C2=A0As there was a submission
+>> https://lkml.org/lkml/2010/8/20/103 to do just this, there must be
+>> userspace apps that would benefit. =C2=A0This architecture would add=
+ress a
+>> number of concerns raised with the prior submission. (Refer to
+>> http://lwn.net/Articles/401548/.)
 >
-> What is the user in question?
+> :-)
+>
+>> You'd probably want to move the 'crypto' key type to its own directo=
+ry.
+>
+> Yeah.
+>
+> I'd also like to see if Dmitry's work can be absorbes into this infra=
+structure.
+>
 
-btrfs
+Hi David,
 
-Thanks.
--- 
-Francis
+Crypto keys is very nice idea.
+We thought some time ago about having dedicated key type for handling
+public key cryptography operations,
+but did not go that far. Also I did not want to mess-up with GnuPG
+formats and just made straight-forward RSA implementation,
+which can be handled by any crypto library, such as openssl.
+We can easily take GPG signing scheme into use for IMA/EVM when it
+gets to upstream.
+
+- Dmitry
+
+> David
