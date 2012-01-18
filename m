@@ -1,49 +1,72 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: question about crypto module dependency
-Date: Thu, 19 Jan 2012 09:25:16 +1100
-Message-ID: <20120118222516.GA30542@gondor.apana.org.au>
-References: <CAC9WiBj0oK+mWqnGVPEPAOTKMKeedsD4Wwwv_a0YbmOm2ejyfg@mail.gmail.com> <20120118053933.GA23562@gondor.apana.org.au> <CAC9WiBjQ9qEqNWSKj_c56ekex-nbkLQejO=HhZgRnOSZn0iJkA@mail.gmail.com> <20120118121325.GA25822@gondor.apana.org.au> <CAC9WiBh7VcnSD5ghN+ds9RvzXOwnKqoAYNUgbdsoxNmmG=cNhw@mail.gmail.com>
+From: "Darrick J. Wong" <djwong@us.ibm.com>
+Subject: [PATCH 01/13] crc32: removed two instances of trailing whitespaces
+Date: Wed, 18 Jan 2012 14:27:40 -0800
+Message-ID: <20120118222740.4079.56984.stgit@elm3c44.beaverton.ibm.com>
+References: <20120118222733.4079.13377.stgit@elm3c44.beaverton.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Francis Moreau <francis.moro@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Theodore Tso <tytso@mit.edu>,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Mingming Cao <cmm@us.ibm.com>, linux-ext4@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Darrick J. Wong" <djwong@us.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53306 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753197Ab2ARWZS (ORCPT
+Received: from e37.co.us.ibm.com ([32.97.110.158]:48372 "EHLO
+	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752959Ab2ARW1t (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jan 2012 17:25:18 -0500
-Content-Disposition: inline
-In-Reply-To: <CAC9WiBh7VcnSD5ghN+ds9RvzXOwnKqoAYNUgbdsoxNmmG=cNhw@mail.gmail.com>
+	Wed, 18 Jan 2012 17:27:49 -0500
+Received: from /spool/local
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <djwong@us.ibm.com>;
+	Wed, 18 Jan 2012 15:27:48 -0700
+In-Reply-To: <20120118222733.4079.13377.stgit@elm3c44.beaverton.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2012 at 02:56:45PM +0100, Francis Moreau wrote:
->
-> What do you mean with "at module init time" ?
-> 
-> My point is:
-> 
->   $ grep btrfs /lib/modules/3.2.1/modules.dep
->   kernel/fs/btrfs/btrfs.ko: kernel/lib/zlib_deflate/zlib_deflate.ko
-> kernel/lib/libcrc32c.ko
-> 
-> and
-> 
->   $ grep libcrc32c.ko: /lib/modules/3.2.1-1.1-desktop/modules.dep
->   kernel/lib/libcrc32c.ko:
-> 
-> So there's no dependency here to 'pull' a crc32c backend, therefore
-> "crypto_alloc_shash("crc32c", 0, 0)" used by libcrc32c at load time
-> fails.
+- remove trailing whitespace from lib/crc32.c
+	- remove trailing whitespace from lib/crc32defs.h
 
-We have a Kconfig dependency and the rest is taken care of by
-modprobe.
+From: Bob Pearson <rpearson@systemfabricworks.com>
+Signed-off-by: Bob Pearson <rpearson@systemfabricworks.com>
+[djwong@us.ibm.com: changelog tweaks]
+Signed-off-by: Darrick J. Wong <djwong@us.ibm.com>
+---
+ lib/crc32.c     |    2 +-
+ lib/crc32defs.h |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Perhaps your problem is really with mkinitramfs?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/lib/crc32.c b/lib/crc32.c
+index 4b35d2b..ffea0c9 100644
+--- a/lib/crc32.c
++++ b/lib/crc32.c
+@@ -317,7 +317,7 @@ EXPORT_SYMBOL(crc32_be);
+  * in the correct multiple to subtract, we can shift a byte at a time.
+  * This produces a 40-bit (rather than a 33-bit) intermediate remainder,
+  * but again the multiple of the polynomial to subtract depends only on
+- * the high bits, the high 8 bits in this case.  
++ * the high bits, the high 8 bits in this case.
+  *
+  * The multiple we need in that case is the low 32 bits of a 40-bit
+  * value whose high 8 bits are given, and which is a multiple of the
+diff --git a/lib/crc32defs.h b/lib/crc32defs.h
+index 9b6773d..f5a5401 100644
+--- a/lib/crc32defs.h
++++ b/lib/crc32defs.h
+@@ -8,7 +8,7 @@
+ 
+ /* How many bits at a time to use.  Requires a table of 4<<CRC_xx_BITS bytes. */
+ /* For less performance-sensitive, use 4 */
+-#ifndef CRC_LE_BITS 
++#ifndef CRC_LE_BITS
+ # define CRC_LE_BITS 8
+ #endif
+ #ifndef CRC_BE_BITS
