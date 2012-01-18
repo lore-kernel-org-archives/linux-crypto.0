@@ -1,56 +1,107 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH 08/21] KEYS: Add signature verification facility [ver #3]
-Date: Wed, 18 Jan 2012 17:20:40 +0200
-Message-ID: <CALLzPKZ8voNPoyfTznq+_gPThbW6rqdGKLBztZ8qkesM2qtziQ@mail.gmail.com>
-References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
-	<20111202184406.21874.65285.stgit@warthog.procyon.org.uk>
-	<CALLzPKZFShWGxxic8zMfTxoj6Q+t7-sC90wp5J790VRmg-O09g@mail.gmail.com>
-	<26123.1326889583@redhat.com>
-	<CALLzPKb4EycNZAd_80x-+p-iJ94CHerngOFZZmdrLpoJ+bYRMQ@mail.gmail.com>
-	<29789.1326899624@redhat.com>
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: [PATCH 4/3] sha512: reduce stack usage even on i386
+Date: Wed, 18 Jan 2012 21:02:10 +0300
+Message-ID: <20120118180210.GA22733@p183.telecom.by>
+References: <AE90C24D6B3A694183C094C60CF0A2F6D8AF43@saturn3.aculab.com>
+ <1326709382.2255.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC>
+ <CACVxJT_cZAdxNOFTpK5seUXFZU+YB3zbe6LF1nnyzo32ae14xw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: keyrings@linux-nfs.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, zohar@linux.vnet.ibm.com,
-	arjan.van.de.ven@intel.com, alan.cox@intel.com
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <29789.1326899624@redhat.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: David Laight <David.Laight@aculab.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	ken@codelabs.ch, Steffen Klassert <steffen.klassert@secunet.com>,
+	security@kernel.org, Eric Dumazet <eric.dumazet@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:46168 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932252Ab2ARSCR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Jan 2012 13:02:17 -0500
+Content-Disposition: inline
+In-Reply-To: <CACVxJT_cZAdxNOFTpK5seUXFZU+YB3zbe6LF1nnyzo32ae14xw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2012 at 5:13 PM, David Howells <dhowells@redhat.com> wr=
-ote:
-> Kasatkin, Dmitry <dmitry.kasatkin@intel.com> wrote:
->
->> Yes. it is clear...
->> Would it be possible to have pass data (uncompleted) hash?
->
-> Yes, provided it's not finalised. =C2=A0Also, with the current code i=
-t would have
-> to be a shash, but I think I should be able to support the passing in=
- of an
-> async hash by exporting the state from that and importing the state i=
-nto a
-> shash using the crypto layer export and import functions.
->
+Fix still excessive stack usage on i386.
 
-I thought about export/import.
-But I think export/Import is hash driver implementation specific...
-Cannot use ahash state for shash...
+There is too much loop unrolling going on, despite W[16] being used,
+gcc screws up this for some reason. So, don't be smart, use simple code
+from SHA-512 definition, this keeps code size _and_ stack usage back
+under control even on i386:
 
-As you said in repose to later patch, you could provide some function  =
-to
-build a final metadata buffer out of signature to finalize the hash...
+	-14b:   81 ec 9c 03 00 00       sub    $0x39c,%esp
+	+149:   81 ec 64 01 00 00       sub    $0x164,%esp
 
-- Dmitry
+	$ size ../sha512_generic-i386-00*
+	   text    data     bss     dec     hex filename
+	  15521     712       0   16233    3f69 ../sha512_generic-i386-000.o
+	   4225     712       0    4937    1349 ../sha512_generic-i386-001.o
 
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: stable@vger.kernel.org
+---
 
-> David
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ crypto/sha512_generic.c |   42 ++++++++++++++++++++----------------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
+
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -95,35 +95,33 @@ sha512_transform(u64 *state, const u8 *input)
+ #define SHA512_0_15(i, a, b, c, d, e, f, g, h)			\
+ 	t1 = h + e1(e) + Ch(e, f, g) + sha512_K[i] + W[i];	\
+ 	t2 = e0(a) + Maj(a, b, c);				\
+-	d += t1;						\
+-	h = t1 + t2
++	h = g;							\
++	g = f;							\
++	f = e;							\
++	e = d + t1;						\
++	d = c;							\
++	c = b;							\
++	b = a;							\
++	a = t1 + t2
+ 
+ #define SHA512_16_79(i, a, b, c, d, e, f, g, h)			\
+ 	BLEND_OP(i, W);						\
+-	t1 = h + e1(e) + Ch(e, f, g) + sha512_K[i] + W[(i)&15];	\
++	t1 = h + e1(e) + Ch(e, f, g) + sha512_K[i] + W[i & 15];	\
+ 	t2 = e0(a) + Maj(a, b, c);				\
+-	d += t1;						\
+-	h = t1 + t2
+-
+-	for (i = 0; i < 16; i += 8) {
++	h = g;							\
++	g = f;							\
++	f = e;							\
++	e = d + t1;						\
++	d = c;							\
++	c = b;							\
++	b = a;							\
++	a = t1 + t2
++
++	for (i = 0; i < 16; i++) {
+ 		SHA512_0_15(i, a, b, c, d, e, f, g, h);
+-		SHA512_0_15(i + 1, h, a, b, c, d, e, f, g);
+-		SHA512_0_15(i + 2, g, h, a, b, c, d, e, f);
+-		SHA512_0_15(i + 3, f, g, h, a, b, c, d, e);
+-		SHA512_0_15(i + 4, e, f, g, h, a, b, c, d);
+-		SHA512_0_15(i + 5, d, e, f, g, h, a, b, c);
+-		SHA512_0_15(i + 6, c, d, e, f, g, h, a, b);
+-		SHA512_0_15(i + 7, b, c, d, e, f, g, h, a);
+ 	}
+-	for (i = 16; i < 80; i += 8) {
++	for (i = 16; i < 80; i++) {
+ 		SHA512_16_79(i, a, b, c, d, e, f, g, h);
+-		SHA512_16_79(i + 1, h, a, b, c, d, e, f, g);
+-		SHA512_16_79(i + 2, g, h, a, b, c, d, e, f);
+-		SHA512_16_79(i + 3, f, g, h, a, b, c, d, e);
+-		SHA512_16_79(i + 4, e, f, g, h, a, b, c, d);
+-		SHA512_16_79(i + 5, d, e, f, g, h, a, b, c);
+-		SHA512_16_79(i + 6, c, d, e, f, g, h, a, b);
+-		SHA512_16_79(i + 7, b, c, d, e, f, g, h, a);
+ 	}
+ 
+ 	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
