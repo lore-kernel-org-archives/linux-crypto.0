@@ -1,86 +1,54 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH 16/21] KEYS: PGP-based public key signature verification
- [ver #3]
-Date: Wed, 18 Jan 2012 15:34:48 +0200
-Message-ID: <CALLzPKb6v-F-Hh+TAifQyABb3TrSRy5Th8kc-3W48pykEoTc-Q@mail.gmail.com>
-References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
-	<20111202184548.21874.69507.stgit@warthog.procyon.org.uk>
-	<CALLzPKbQb26jAqkkduSQGDDtFuNiCDf5F-HVYB-RJjF4+KLLeQ@mail.gmail.com>
-	<26583.1326890996@redhat.com>
+From: Francis Moreau <francis.moro@gmail.com>
+Subject: Re: question about crypto module dependency
+Date: Wed, 18 Jan 2012 14:56:45 +0100
+Message-ID: <CAC9WiBh7VcnSD5ghN+ds9RvzXOwnKqoAYNUgbdsoxNmmG=cNhw@mail.gmail.com>
+References: <CAC9WiBj0oK+mWqnGVPEPAOTKMKeedsD4Wwwv_a0YbmOm2ejyfg@mail.gmail.com>
+	<20120118053933.GA23562@gondor.apana.org.au>
+	<CAC9WiBjQ9qEqNWSKj_c56ekex-nbkLQejO=HhZgRnOSZn0iJkA@mail.gmail.com>
+	<20120118121325.GA25822@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: keyrings@linux-nfs.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, zohar@linux.vnet.ibm.com,
-	arjan.van.de.ven@intel.com, alan.cox@intel.com
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <26583.1326890996@redhat.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:47120 "EHLO
+	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757530Ab2ARN4q (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Jan 2012 08:56:46 -0500
+Received: by obcva7 with SMTP id va7so7280761obc.19
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2012 05:56:45 -0800 (PST)
+In-Reply-To: <20120118121325.GA25822@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2012 at 2:49 PM, David Howells <dhowells@redhat.com> wr=
-ote:
-> Kasatkin, Dmitry <dmitry.kasatkin@intel.com> wrote:
+On Wed, Jan 18, 2012 at 1:13 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, Jan 18, 2012 at 08:49:13AM +0100, Francis Moreau wrote:
+>>
+>> > What is the user in question?
+>>
+>> btrfs
 >
->> Synchronous hash SHASH is used only for software hash implementation=
-=2E..
->> HW acceleration is not supported by this hash.
->> It is good for short data.
->> But when calculating a hash over long data as files can be,
->> async hash AHASH is a preferred choice as enables HW acceleration.
->
-> Indeed. =C2=A0The asynchronous hash is a pain to use in the kernel, t=
-hough, for a
-> couple of reasons: kernel addresses don't necessarily correspond to a=
-ddresses
-> the h/w accel will see and you have to handle the h/w not signalling
-> completion. =C2=A0Herbert created shash to make it easier, and for mo=
-dule signing,
-> they're perfectly sufficient.
+> Hmm, why does it need to do crc32c at module init time?
 >
 
-Well, from client side, API is not that more complicate.
-It is just about scatterlist. Rest is handled by particular driver/HW.
+What do you mean with "at module init time" ?
 
-I agree, modules are not that big and SHASH is perfect choice for that.=
-=2E.
+My point is:
 
->> As in my response to [PATCH 08/21] KEYS: Add signature verification =
-facility
->> [ver #3] It would be nice to have API to pass pre-computed hash, the=
-n client
->> might tackle async peculiarities by itself...
->
-> True. =C2=A0If you can give me the completed hash data, then I don't =
-need to care
-> how you managed it. =C2=A0If you give me an uncompleted hash, I then =
-have to deal
-> with the async hash in the kernel.
->
-> It might make sense for me to provide an API call to give you the pos=
-tamble you
-> need to add to the hash to complete it. =C2=A0That call could also in=
-dicate which
-> hash you require and could also be combined with the call to find the
-> appropriate key.
->
+  $ grep btrfs /lib/modules/3.2.1/modules.dep
+  kernel/fs/btrfs/btrfs.ko: kernel/lib/zlib_deflate/zlib_deflate.ko
+kernel/lib/libcrc32c.ko
 
-Indeed, some blob with metadata to update before closing the hash
-would work well.
+and
 
-PS.. As I understand, it is PGP spec which requires such processing.
-Otherwise, plain data hash could be used to produce another hash for si=
-gning,
-similar to what has been done in digsig project.... I have used the
-same approach for IMA.
+  $ grep libcrc32c.ko: /lib/modules/3.2.1-1.1-desktop/modules.dep
+  kernel/lib/libcrc32c.ko:
 
-Thanks!
+So there's no dependency here to 'pull' a crc32c backend, therefore
+"crypto_alloc_shash("crc32c", 0, 0)" used by libcrc32c at load time
+fails.
 
-> David
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks
+-- 
+Francis
