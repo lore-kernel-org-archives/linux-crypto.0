@@ -1,9 +1,10 @@
 From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH 08/21] KEYS: Add signature verification facility [ver #3]
-Date: Wed, 18 Jan 2012 13:20:54 +0200
-Message-ID: <CALLzPKZFShWGxxic8zMfTxoj6Q+t7-sC90wp5J790VRmg-O09g@mail.gmail.com>
+Subject: Re: [PATCH 16/21] KEYS: PGP-based public key signature verification
+ [ver #3]
+Date: Wed, 18 Jan 2012 13:36:20 +0200
+Message-ID: <CALLzPKbQb26jAqkkduSQGDDtFuNiCDf5F-HVYB-RJjF4+KLLeQ@mail.gmail.com>
 References: <20111202184229.21874.25782.stgit@warthog.procyon.org.uk>
-	<20111202184406.21874.65285.stgit@warthog.procyon.org.uk>
+	<20111202184548.21874.69507.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -13,383 +14,78 @@ Cc: keyrings@linux-nfs.org, linux-crypto@vger.kernel.org,
 	arjan.van.de.ven@intel.com, alan.cox@intel.com
 To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga07.intel.com ([143.182.124.22]:5132 "EHLO
-	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750969Ab2ARLU4 convert rfc822-to-8bit (ORCPT
+Received: from mga05.intel.com ([192.55.52.89]:57501 "EHLO
+	fmsmga101.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756084Ab2ARLgV convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jan 2012 06:20:56 -0500
-In-Reply-To: <20111202184406.21874.65285.stgit@warthog.procyon.org.uk>
+	Wed, 18 Jan 2012 06:36:21 -0500
+In-Reply-To: <20111202184548.21874.69507.stgit@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 2, 2011 at 8:44 PM, David Howells <dhowells@redhat.com> wro=
+On Fri, Dec 2, 2011 at 8:45 PM, David Howells <dhowells@redhat.com> wro=
 te:
-> Add a facility whereby a key subtype may be asked to verify a signatu=
-re against
-> the data it is purported to have signed.
+> Provide handlers for PGP-based public-key algorithm signature verific=
+ation.
+> This does most of the work involved in signature verification as most=
+ of it is
+> public-key algorithm agnostic. =C2=A0The public-key verification algo=
+rithm itself
+> is just the last little bit and is supplied the complete hash data to=
+ process.
 >
-> This adds four routines:
->
-> =C2=A0(1) struct crypto_key_verify_context *
-> =C2=A0 =C2=A0 verify_sig_begin(struct key *keyring, const void *sig, =
-size_t siglen);
->
-> =C2=A0 =C2=A0 This sets up a verification context for the given signa=
-ture using
-> =C2=A0 =C2=A0 information in that signature to select a key from the =
-specified keyring
-> =C2=A0 =C2=A0 and to request a hash algorithm from the crypto layer.
->
-> =C2=A0(2) int verify_sig_add_data(struct crypto_key_verify_context *c=
-tx,
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 const void *data, size_t datalen);
->
-> =C2=A0 =C2=A0 Incrementally supply data to be signed. =C2=A0May be ca=
-lled multiple times.
->
-Hello,
-
-It would also nice to have an API to supply pre-computed data hash.
-=46or example IMA uses the same functionality to compute the hash of th=
-e
-file content,
-and then, based on security.ima type decided either verify it using jus=
-t hash,
-or use digital signature.
-We could pass a hash as data. But may be we do not want to have extra
-operation and compute hash over hash.
-
-- Dmitry
-
-> =C2=A0(3) int verify_sig_end(struct crypto_key_verify_context *ctx,
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0const void *sig, size_t siglen);
->
-> =C2=A0 =C2=A0 Complete the verification process and return the result=
-=2E =C2=A0-EKEYREJECTED
-> =C2=A0 =C2=A0 will indicate that the verification failed and 0 will i=
-ndicate success.
-> =C2=A0 =C2=A0 Other errors are also possible.
->
-> =C2=A0(4) void verify_sig_cancel(struct crypto_key_verify_context *ct=
-x);
->
-> =C2=A0 =C2=A0 Cancel the verification process.
+> This requires glue logic putting on top to make use of it - something=
+ the next
+> patch provides.
 >
 > Signed-off-by: David Howells <dhowells@redhat.com>
 > ---
 >
-> =C2=A0Documentation/security/keys-crypto.txt | =C2=A0101 ++++++++++++=
-+++++++++++++++++
-> =C2=A0include/keys/crypto-subtype.h =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-| =C2=A0 21 ++++++
-> =C2=A0include/keys/crypto-type.h =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 | =C2=A0 =C2=A09 +++
-> =C2=A0security/keys/Makefile =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 | =C2=A0 =C2=A02 -
-> =C2=A0security/keys/crypto_verify.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-| =C2=A0111 ++++++++++++++++++++++++++++++++
-> =C2=A05 files changed, 243 insertions(+), 1 deletions(-)
-> =C2=A0create mode 100644 security/keys/crypto_verify.c
+> =C2=A0security/keys/Makefile =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=
+=A03
+> =C2=A0security/keys/pgp_parser.h =C2=A0 =C2=A0 | =C2=A0 =C2=A06 +
+> =C2=A0security/keys/pgp_pubkey_sig.c | =C2=A0323 ++++++++++++++++++++=
+++++++++++++++++++++
+> =C2=A03 files changed, 331 insertions(+), 1 deletions(-)
+> =C2=A0create mode 100644 security/keys/pgp_pubkey_sig.c
 >
 >
-> diff --git a/Documentation/security/keys-crypto.txt b/Documentation/s=
-ecurity/keys-crypto.txt
-> index 97dee80..a964717 100644
-> --- a/Documentation/security/keys-crypto.txt
-> +++ b/Documentation/security/keys-crypto.txt
-> @@ -7,6 +7,7 @@ Contents:
-> =C2=A0 - Overview.
-> =C2=A0 - Key identification.
-> =C2=A0 - Accessing crypto keys.
-> + =C2=A0 =C2=A0- Signature verification.
-> =C2=A0 - Implementing crypto parsers.
-> =C2=A0 - Implementing crypto subtypes.
->
-> @@ -89,6 +90,65 @@ This gives access to the key type:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0struct key_type key_type_crypto;
->
->
-> +SIGNATURE VERIFICATION
-> +----------------------
-> +
-> +The four operations that can perform cryptographic signature verific=
-ation,
-> +using one of a set of keys to provide the public key:
-> +
-> + (1) Begin verification procedure.
-> +
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_verify_context *
-> + =C2=A0 =C2=A0 =C2=A0 verify_sig_begin(struct key *keyring, const vo=
-id *sig, size_t siglen);
-> +
-> + =C2=A0 =C2=A0 This function sets up a verification context from the=
- information in the
-> + =C2=A0 =C2=A0 signature and looks for a suitable key in the keyring=
-=2E =C2=A0The signature blob
-> + =C2=A0 =C2=A0 must be presented again at the end of the procedure. =
-=C2=A0The keys will be
-> + =C2=A0 =C2=A0 checked against parameters in the signature, and if t=
-he matching one is
-> + =C2=A0 =C2=A0 not found then -ENOKEY will be returned.
-> +
-> + =C2=A0 =C2=A0 The hashing algorithm, if such a thing applies, will =
-be determined from
-> + =C2=A0 =C2=A0 information in the signature and the appropriate cryp=
-to module will be
-> + =C2=A0 =C2=A0 used. =C2=A0-ENOPKG will be returned if the hash algo=
-rithm is unavailable.
-> +
-> + =C2=A0 =C2=A0 The return value is an opaque pointer to be passed to=
- the other functions,
-> + =C2=A0 =C2=A0 or a negative error code.
-> +
-> + (2) Indicate data to be verified.
-> +
-> + =C2=A0 =C2=A0 =C2=A0 int verify_sig_add_data(struct crypto_key_veri=
-fy_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const void *data, size_t datalen);
-> +
-> + =C2=A0 =C2=A0 This function is used to shovel data to the verificat=
-ion procedure so that
-> + =C2=A0 =C2=A0 it can load it into the hash, pass it to hardware or =
-whatever is
-> + =C2=A0 =C2=A0 appropriate for the algorithm being employed.
-> +
-> + =C2=A0 =C2=A0 The data is not canonicalised for the document type s=
-pecified in the
-> + =C2=A0 =C2=A0 signature. =C2=A0The caller must do that.
-> +
-> + =C2=A0 =C2=A0 It will return 0 if successful and a negative error c=
-ode if not.
-> +
-> + (3) Complete the verification process.
-> +
-> + =C2=A0 =C2=A0 =C2=A0 int verify_sig_end(struct crypto_key_verify_co=
-ntext *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0const void *sig, size_t siglen);
-> +
-> + =C2=A0 =C2=A0 This function performs the actual signature verificat=
-ion step and cleans
-> + =C2=A0 =C2=A0 up the resources allocated at the beginning. =C2=A0Th=
-e signature must be
-> + =C2=A0 =C2=A0 presented again as some of the data therein may need =
-to be added to the
-> + =C2=A0 =C2=A0 internal hash.
-> +
-> + =C2=A0 =C2=A0 It will return -EKEYREJECTED if the signature didn't =
-match, 0 if
-> + =C2=A0 =C2=A0 successful and may return other errors as appropriate=
-=2E
-> +
-> + (4) Cancel the verification process.
-> +
-> + =C2=A0 =C2=A0 =C2=A0 void verify_sig_cancel(struct crypto_key_verif=
-y_context *ctx);
-> +
-> + =C2=A0 =C2=A0 This function cleans up the resources allocated at th=
-e beginning. =C2=A0This is
-> + =C2=A0 =C2=A0 not necessary if verify_sig_end() was called.
-> +
-> +
-> =C2=A0=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> =C2=A0IMPLEMENTING CRYPTO PARSERS
-> =C2=A0=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> @@ -96,6 +156,7 @@ IMPLEMENTING CRYPTO PARSERS
-> =C2=A0The crypto key type keeps a list of registered data parsers. =C2=
-=A0An example of
-> =C2=A0such a parser is one that parses OpenPGP packet formatted data =
-[RFC 4880].
->
-> +
-> =C2=A0During key instantiation each parser in the list is tried until=
- one doesn't
-> =C2=A0return -EBADMSG.
->
-> @@ -107,6 +168,8 @@ The parser definition structure looks like the fo=
-llowing:
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int (*instanti=
-ate)(struct key *key,
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const void *data, siz=
-e_t datalen);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct crypto_key_=
-verify_context *(*verify_sig_begin)(
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 struct key *keyring, const u8 *sig, size_t siglen);
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0};
->
-> =C2=A0The owner and name fields should be set to the owning module an=
-d the name of
-> @@ -135,6 +198,44 @@ but it is expected that at least one will be def=
-ined.
-> =C2=A0 =C2=A0 =C2=A0algorithm such as RSA and DSA this will likely be=
- a printable hex version
-> =C2=A0 =C2=A0 =C2=A0of the key's fingerprint.
->
-> + (2) verify_sig_begin().
-> +
-> + =C2=A0 =C2=A0 This is similar in concept to the instantiate() funct=
-ion, except that it
-> + =C2=A0 =C2=A0 is given a signature blob to parse rather than a key =
-data blob.
-> +
-> + =C2=A0 =C2=A0 If the data format is not recognised, -EBADMSG should=
- be returned. =C2=A0If it
-> + =C2=A0 =C2=A0 is recognised, but the signature verification process=
- cannot for some
-> + =C2=A0 =C2=A0 reason be set up, some other negative error code shou=
-ld be returned.
-> + =C2=A0 =C2=A0 -ENOKEY should be used to indicate that no matching k=
-ey is available and
-> + =C2=A0 =C2=A0 -ENOPKG should be returned if the hash algorithm or t=
-he verification
-> + =C2=A0 =C2=A0 algorithm are unavailable.
-> +
-> + =C2=A0 =C2=A0 If successful, the parser should allocate a verificat=
-ion context and embed
-> + =C2=A0 =C2=A0 the following struct in it:
-> +
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_verify_context {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct key *key;
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int (*add_data)(st=
-ruct crypto_key_verify_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const void *data, size_t datalen);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int (*end)(struct =
-crypto_key_verify_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0const u8 *sig, size_t siglen);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 void (*cancel)(str=
-uct crypto_key_verify_context *ctx);
-> + =C2=A0 =C2=A0 =C2=A0 };
-> +
-> + =C2=A0 =C2=A0 and return a pointer to this to the caller, who will =
-then pass it to the
-> + =C2=A0 =C2=A0 verification operation wrappers described in the "Sig=
-nature Verification"
-> + =C2=A0 =C2=A0 section. =C2=A0The three operation pointers here corr=
-espond exactly to those
-> + =C2=A0 =C2=A0 wrappers and are all mandatory. =C2=A0container_of() =
-should be used to retrieve
-> + =C2=A0 =C2=A0 the actual context.
-> +
-> + =C2=A0 =C2=A0 Note that the crypto key type retains a reference on =
-the parser module for
-> + =C2=A0 =C2=A0 the lifetime of this context, though the operation po=
-inters need not point
-> + =C2=A0 =C2=A0 into this module.
-> +
-> + =C2=A0 =C2=A0 The parser should also record a pointer to the key se=
-lected and take a
-> + =C2=A0 =C2=A0 reference on that key with key_get().
-> +
-> +
-> =C2=A0Functions are provided to register and unregister parsers:
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0int register_crypto_key_parser(struct cryp=
-to_key_parser *parser);
-> diff --git a/include/keys/crypto-subtype.h b/include/keys/crypto-subt=
-ype.h
-> index fa87555..f2b927a 100644
-> --- a/include/keys/crypto-subtype.h
-> +++ b/include/keys/crypto-subtype.h
-> @@ -20,6 +20,20 @@
-> =C2=A0extern struct key_type key_type_crypto;
->
-> =C2=A0/*
-> + * Context base for signature verification methods. =C2=A0Allocated =
-by the subtype
-> + * and presumably embedded in something appropriate.
-> + */
-> +struct crypto_key_verify_context {
-> + =C2=A0 =C2=A0 =C2=A0 struct key *key;
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_parser *parser;
-> + =C2=A0 =C2=A0 =C2=A0 int (*add_data)(struct crypto_key_verify_conte=
-xt *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 const void *data, size_t datalen);
-> + =C2=A0 =C2=A0 =C2=A0 int (*end)(struct crypto_key_verify_context *c=
-tx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const=
- u8 *sig, size_t siglen);
-> + =C2=A0 =C2=A0 =C2=A0 void (*cancel)(struct crypto_key_verify_contex=
-t *ctx);
-> +};
-> +
-> +/*
-> =C2=A0* Keys of this type declare a subtype that indicates the handle=
-rs and
-> =C2=A0* capabilities.
-> =C2=A0*/
-> @@ -48,6 +62,13 @@ struct crypto_key_parser {
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 * Return EBADMSG if not recognised.
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 */
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0int (*instantiate)(struct key *key, const =
-void *data, size_t datalen);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 /* Attempt to recognise a signature blob and f=
-ind a matching key.
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0*
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0* Return EBADMSG if not recognised.
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_verify_context *(*verify_sig=
-_begin)(
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct key *keyrin=
-g, const u8 *sig, size_t siglen);
-> =C2=A0};
->
-> =C2=A0extern int register_crypto_key_parser(struct crypto_key_parser =
-*);
-> diff --git a/include/keys/crypto-type.h b/include/keys/crypto-type.h
-> index 47c00c7..6b93366 100644
-> --- a/include/keys/crypto-type.h
-> +++ b/include/keys/crypto-type.h
-> @@ -18,6 +18,15 @@
->
-> =C2=A0extern struct key_type key_type_crypto;
->
-> +struct crypto_key_verify_context;
-> +extern struct crypto_key_verify_context *verify_sig_begin(
-> + =C2=A0 =C2=A0 =C2=A0 struct key *key, const void *sig, size_t sigle=
-n);
-> +extern int verify_sig_add_data(struct crypto_key_verify_context *ctx=
-,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const void *data, size_t datalen);
-> +extern int verify_sig_end(struct crypto_key_verify_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 const void *sig, size_t siglen);
-> +extern void verify_sig_cancel(struct crypto_key_verify_context *ctx)=
-;
-> +
-> =C2=A0/*
-> =C2=A0* The payload is at the discretion of the subtype.
-> =C2=A0*/
 > diff --git a/security/keys/Makefile b/security/keys/Makefile
-> index 67fceaa..8462904 100644
+> index 242a087..fc1968e 100644
 > --- a/security/keys/Makefile
 > +++ b/security/keys/Makefile
-> @@ -26,4 +26,4 @@ obj-$(CONFIG_TRUSTED_KEYS) +=3D trusted.o
-> =C2=A0obj-$(CONFIG_ENCRYPTED_KEYS) +=3D encrypted-keys/
-> =C2=A0obj-$(CONFIG_CRYPTO_KEY_TYPE) +=3D crypto_keys.o
+> @@ -34,4 +34,5 @@ obj-$(CONFIG_CRYPTO_KEY_PGP_PARSER) +=3D pgp_parser=
+=2Eo
+> =C2=A0crypto_keys-y :=3D crypto_type.o crypto_verify.o
 >
-> -crypto_keys-y :=3D crypto_type.o
-> +crypto_keys-y :=3D crypto_type.o crypto_verify.o
-> diff --git a/security/keys/crypto_verify.c b/security/keys/crypto_ver=
-ify.c
+> =C2=A0pgp_parser-y :=3D \
+> - =C2=A0 =C2=A0 =C2=A0 pgp_key_parser.o
+> + =C2=A0 =C2=A0 =C2=A0 pgp_key_parser.o \
+> + =C2=A0 =C2=A0 =C2=A0 pgp_pubkey_sig.o
+> diff --git a/security/keys/pgp_parser.h b/security/keys/pgp_parser.h
+> index 1cda231..a6192ce 100644
+> --- a/security/keys/pgp_parser.h
+> +++ b/security/keys/pgp_parser.h
+> @@ -21,3 +21,9 @@
+> =C2=A0*/
+> =C2=A0extern const
+> =C2=A0struct public_key_algorithm *pgp_public_key_algorithms[PGP_PUBK=
+EY__LAST];
+> +
+> +/*
+> + * pgp_pubkey_sig.c
+> + */
+> +extern struct crypto_key_verify_context *pgp_pkey_verify_sig_begin(
+> + =C2=A0 =C2=A0 =C2=A0 struct key *crypto_key, const u8 *sigdata, siz=
+e_t siglen);
+> diff --git a/security/keys/pgp_pubkey_sig.c b/security/keys/pgp_pubke=
+y_sig.c
 > new file mode 100644
-> index 0000000..65f734c
+> index 0000000..b4b7cb0
 > --- /dev/null
-> +++ b/security/keys/crypto_verify.c
-> @@ -0,0 +1,111 @@
-> +/* Signature verification with a crypto key
+> +++ b/security/keys/pgp_pubkey_sig.c
+> @@ -0,0 +1,323 @@
+> +/* Handling for PGP public key signature data [RFC 4880]
 > + *
 > + * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
 > + * Written by David Howells (dhowells@redhat.com)
@@ -398,134 +94,472 @@ ify.c
 > + * modify it under the terms of the GNU General Public Licence
 > + * as published by the Free Software Foundation; either version
 > + * 2 of the Licence, or (at your option) any later version.
-> + *
-> + * See Documentation/security/keys-crypto.txt
 > + */
 > +
-> +#include <keys/crypto-subtype.h>
+> +#define pr_fmt(fmt) "PGPSIG: "fmt
 > +#include <linux/module.h>
-> +#include "crypto_keys.h"
+> +#include <linux/kernel.h>
+> +#include <linux/slab.h>
+> +#include <linux/pgp.h>
+> +#include "public_key.h"
+> +#include "pgp_parser.h"
 > +
-> +/**
-> + * verify_sig_begin - Initiate the use of a crypto key to verify a s=
-ignature
-> + * @keyring: The public keys to verify against
-> + * @sig: The signature data
-> + * @siglen: The signature length
-> + *
-> + * Returns a context or an error.
-> + */
-> +struct crypto_key_verify_context *verify_sig_begin(
-> + =C2=A0 =C2=A0 =C2=A0 struct key *keyring, const void *sig, size_t s=
-iglen)
+> +const struct {
+> + =C2=A0 =C2=A0 =C2=A0 enum pkey_hash_algo algo : 8;
+> +} pgp_pubkey_hash[PGP_HASH__LAST] =3D {
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_MD5].algo =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =3D PKEY_HASH_MD5,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_SHA1].algo =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0=3D PKEY_HASH_SHA1,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_RIPE_MD_160].algo =C2=A0 =C2=A0 =3D =
+PKEY_HASH_RIPE_MD_160,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_SHA256].algo =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=3D PKEY_HASH_SHA256,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_SHA384].algo =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=3D PKEY_HASH_SHA384,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_SHA512].algo =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=3D PKEY_HASH_SHA512,
+> + =C2=A0 =C2=A0 =C2=A0 [PGP_HASH_SHA224].algo =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=3D PKEY_HASH_SHA224,
+> +};
+> +
+> +static int pgp_pkey_verify_sig_add_data(struct crypto_key_verify_con=
+text *ctx,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const v=
+oid *data, size_t datalen);
+> +static int pgp_pkey_verify_sig_end(struct crypto_key_verify_context =
+*ctx,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const u8 *sig, size_t =
+siglen);
+> +static void pgp_pkey_verify_sig_cancel(struct crypto_key_verify_cont=
+ext *ctx);
+> +
+> +struct pgp_pkey_sig_parse_context {
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_parse_context pgp;
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_sig_parameters params;
+> +};
+> +
+> +static int pgp_pkey_parse_signature(struct pgp_parse_context *contex=
+t,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 enum pgp_packet_tag t=
+ype,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 headerlen,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const u8 *data,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t datalen)
 > +{
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_verify_context *ret;
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_parser *parser;
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_pkey_sig_parse_context *ctx =3D
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 container_of(conte=
+xt, struct pgp_pkey_sig_parse_context, pgp);
 > +
-> + =C2=A0 =C2=A0 =C2=A0 pr_devel("=3D=3D>%s()\n", __func__);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 if (siglen =3D=3D 0 || !sig)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EI=
-NVAL);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 down_read(&crypto_key_parsers_sem);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D ERR_PTR(-EBADMSG);
-> + =C2=A0 =C2=A0 =C2=A0 list_for_each_entry(parser, &crypto_key_parser=
-s, link) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (parser->verify=
-_sig_begin) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 if (!try_module_get(parser->owner))
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;
-> +
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 pr_debug("Trying parser '%s'\n", parser->name);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 ret =3D parser->verify_sig_begin(keyring, sig, siglen);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 if (IS_ERR(ret))
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 module_put(parser->owner);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 else
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret->parser =3D parser;
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 if (ret !=3D ERR_PTR(-EBADMSG)) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pr_debug("Parser recognised the for=
-mat"
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"=
- (ret %ld)\n",
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0P=
-TR_ERR(ret));
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 }
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 up_read(&crypto_key_parsers_sem);
-> + =C2=A0 =C2=A0 =C2=A0 pr_devel("<=3D=3D%s() =3D %p\n", __func__, ret=
-);
-> + =C2=A0 =C2=A0 =C2=A0 return ret;
+> + =C2=A0 =C2=A0 =C2=A0 return pgp_parse_sig_params(&data, &datalen, &=
+ctx->params);
 > +}
-> +EXPORT_SYMBOL_GPL(verify_sig_begin);
 > +
-> +/**
-> + * verify_sig_add_data - Incrementally provide data to be verified
-> + * @ctx: The context from verify_sig_begin()
-> + * @data: Data
-> + * @datalen: The amount of @data
+> +/*
+> + * Begin the process of verifying a DSA signature.
 > + *
-> + * This may be called multiple times.
+> + * This involves allocating the hash into which first the data and t=
+hen the
+> + * metadata will be put, and parsing the signature to check that it =
+matches the
+> + * key.
 > + */
-> +int verify_sig_add_data(struct crypto_key_verify_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 const void *data, size_t datalen)
+> +struct crypto_key_verify_context *pgp_pkey_verify_sig_begin(
+> + =C2=A0 =C2=A0 =C2=A0 struct key *crypto_key, const u8 *sigdata, siz=
+e_t siglen)
 > +{
-> + =C2=A0 =C2=A0 =C2=A0 return ctx->add_data(ctx, data, datalen);
-> +}
-> +EXPORT_SYMBOL_GPL(verify_sig_add_data);
-> +
-> +/**
-> + * verify_sig_end - Finalise signature verification and return resul=
-t
-> + * @ctx: The context from verify_sig_begin()
-> + * @sig: The signature data
-> + * @siglen: The signature length
-> + */
-> +int verify_sig_end(struct crypto_key_verify_context *ctx,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const=
- void *sig, size_t siglen)
-> +{
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_parser *parser =3D ctx->pars=
-er;
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_pkey_sig_parse_context p;
+> + =C2=A0 =C2=A0 =C2=A0 struct public_key_signature *sig;
+> + =C2=A0 =C2=A0 =C2=A0 struct crypto_shash *tfm;
+> + =C2=A0 =C2=A0 =C2=A0 const struct public_key *key =3D crypto_key->p=
+ayload.data;
+> + =C2=A0 =C2=A0 =C2=A0 size_t digest_size, desc_size;
 > + =C2=A0 =C2=A0 =C2=A0 int ret;
 > +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D ctx->end(ctx, sig, siglen);
-> + =C2=A0 =C2=A0 =C2=A0 module_put(parser->owner);
+> + =C2=A0 =C2=A0 =C2=A0 kenter("{%d},,%zu", key_serial(crypto_key), si=
+glen);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (!key) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -ENOK=
+EY [no public key]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OKEY);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 p.pgp.types_of_interest =3D (1 << PGP_PKT_SIGN=
+ATURE);
+> + =C2=A0 =C2=A0 =C2=A0 p.pgp.process_packet =3D pgp_pkey_parse_signat=
+ure;
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D pgp_parse_packets(sigdata, siglen, &p.=
+pgp);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret < 0)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(ret=
+);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (p.params.pubkey_algo >=3D PGP_PUBKEY__LAST=
+ ||
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 !pgp_public_key_algorithms[p.par=
+ams.pubkey_algo]) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pr_debug("Unsuppor=
+ted public key algorithm %u\n",
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0p.params.pubkey_algo);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OKEY);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (pgp_public_key_algorithms[p.params.pubkey_=
+algo] !=3D key->algo) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -ENOK=
+EY [wrong pk algo]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OKEY);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (!(key->capabilities & PKEY_CAN_VERIFY)) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -EKEY=
+REJECTED [key can't verify]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EK=
+EYREJECTED);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (p.params.hash_algo >=3D PGP_HASH__LAST ||
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 !pgp_hash_algorithms[p.params.ha=
+sh_algo]) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -ENOP=
+KG [hash]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OPKG);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 pr_debug("Signature generated with %s hash\n",
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pgp_hash_alg=
+orithms[p.params.hash_algo]);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (memcmp(&p.params.issuer, key->key_id, 8) !=
+=3D 0) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -ENOK=
+EY [wrong key ID]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OKEY);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (p.params.signature_type !=3D PGP_SIG_BINAR=
+Y_DOCUMENT_SIG &&
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 p.params.signature_type !=3D PGP=
+_SIG_STANDALONE_SIG) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* We don't want t=
+o canonicalise */
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -EOPN=
+OTSUPP [canon]");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EO=
+PNOTSUPP);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* Allocate the hashing algorithm we're going =
+to need and find out how
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0* big the hash operational data will be.
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> + =C2=A0 =C2=A0 =C2=A0 tfm =3D crypto_alloc_shash(pgp_hash_algorithms=
+[p.params.hash_algo], 0, 0);
+> + =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(tfm))
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return PTR_ERR(tfm=
+) =3D=3D -ENOENT ?
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 ERR_PTR(-ENOPKG) : ERR_CAST(tfm);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 desc_size =3D crypto_shash_descsize(tfm);
+> + =C2=A0 =C2=A0 =C2=A0 digest_size =3D crypto_shash_digestsize(tfm);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* We allocate the hash operational data stora=
+ge on the end of our
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0* context data.
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> + =C2=A0 =C2=A0 =C2=A0 sig =3D kzalloc(sizeof(*sig) + desc_size + dig=
+est_size, GFP_KERNEL);
+> + =C2=A0 =C2=A0 =C2=A0 if (!sig) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 crypto_free_shash(=
+tfm);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(-EN=
+OMEM);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 sig->base.key =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =3D crypto_key;
+> + =C2=A0 =C2=A0 =C2=A0 sig->base.add_data =C2=A0 =C2=A0 =C2=A0=3D pgp=
+_pkey_verify_sig_add_data;
+> + =C2=A0 =C2=A0 =C2=A0 sig->base.end =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =3D pgp_pkey_verify_sig_end;
+> + =C2=A0 =C2=A0 =C2=A0 sig->base.cancel =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D=
+ pgp_pkey_verify_sig_cancel;
+> + =C2=A0 =C2=A0 =C2=A0 sig->pkey_hash_algo =C2=A0 =C2=A0 =3D pgp_pubk=
+ey_hash[p.params.hash_algo].algo;
+> + =C2=A0 =C2=A0 =C2=A0 sig->digest =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =3D (u8 *)sig + sizeof(*sig) + desc_size;
+> + =C2=A0 =C2=A0 =C2=A0 sig->digest_size =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D=
+ digest_size;
+> + =C2=A0 =C2=A0 =C2=A0 sig->hash.tfm =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =3D tfm;
+> + =C2=A0 =C2=A0 =C2=A0 sig->hash.flags =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D=
+ CRYPTO_TFM_REQ_MAY_SLEEP;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D crypto_shash_init(&sig->hash);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret < 0) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 crypto_free_shash(=
+sig->hash.tfm);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kfree(sig);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ERR_PTR(ret=
+);
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 key_get(sig->base.key);
+> + =C2=A0 =C2=A0 =C2=A0 kleave(" =3D %p", sig);
+> + =C2=A0 =C2=A0 =C2=A0 return &sig->base;
+> +}
+> +
+> +/*
+> + * Load data into the hash
+> + */
+> +static int pgp_pkey_verify_sig_add_data(struct crypto_key_verify_con=
+text *ctx,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const v=
+oid *data, size_t datalen)
+> +{
+> + =C2=A0 =C2=A0 =C2=A0 struct public_key_signature *sig =3D
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 container_of(ctx, =
+struct public_key_signature, base);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 return crypto_shash_update(&sig->hash, data, d=
+atalen);
+> +}
+
+Hello,
+
+Synchronous hash SHASH is used only for software hash implementation...
+HW acceleration is not supported by this hash.
+It is good for short data.
+But when calculating a hash over long data as files can be,
+async hash AHASH is a preferred choice as enables HW acceleration.
+
+As in my response to
+[PATCH 08/21] KEYS: Add signature verification facility [ver #3]
+It would be nice to have API to pass pre-computed hash,
+then client might tackle async peculiarities by itself...
+
+- Dmitry
+
+> +
+> +struct pgp_pkey_sig_digest_context {
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_parse_context pgp;
+> + =C2=A0 =C2=A0 =C2=A0 const struct public_key *key;
+> + =C2=A0 =C2=A0 =C2=A0 struct public_key_signature *sig;
+> +};
+> +
+> +/*
+> + * Extract required metadata from the signature packet and add what =
+we need to
+> + * to the hash.
+> + */
+> +static int pgp_pkey_digest_signature(struct pgp_parse_context *conte=
+xt,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0enum pgp_packet=
+_tag type,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u8 headerlen,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const u8 *data,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t datalen)
+> +{
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_pkey_sig_digest_context *ctx =3D
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 container_of(conte=
+xt, struct pgp_pkey_sig_digest_context, pgp);
+> + =C2=A0 =C2=A0 =C2=A0 enum pgp_signature_version version;
+> + =C2=A0 =C2=A0 =C2=A0 int i;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 kenter(",%u,%u,,%zu", type, headerlen, datalen=
+);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 version =3D *data;
+> + =C2=A0 =C2=A0 =C2=A0 if (version =3D=3D PGP_SIG_VERSION_3) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* We just include=
+ an excerpt of the metadata from a V3
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* signature.
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 crypto_shash_updat=
+e(&ctx->sig->hash, data + 1, 5);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 data +=3D sizeof(s=
+truct pgp_signature_v3_packet);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 datalen -=3D sizeo=
+f(struct pgp_signature_v3_packet);
+> + =C2=A0 =C2=A0 =C2=A0 } else if (version =3D=3D PGP_SIG_VERSION_4) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* We add the whol=
+e metadata header and some of the hashed data
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* for a V4 s=
+ignature, plus a trailer.
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t hashedsz, u=
+nhashedsz;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 trailer[6];
+> +
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hashedsz =3D 4 + 2=
+ + (data[4] << 8) + data[5];
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 crypto_shash_updat=
+e(&ctx->sig->hash, data, hashedsz);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[0] =3D ver=
+sion;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[1] =3D 0xf=
+fU;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[2] =3D has=
+hedsz >> 24;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[3] =3D has=
+hedsz >> 16;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[4] =3D has=
+hedsz >> 8;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trailer[5] =3D has=
+hedsz;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 crypto_shash_updat=
+e(&ctx->sig->hash, trailer, 6);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 data +=3D hashedsz=
+;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 datalen -=3D hashe=
+dsz;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unhashedsz =3D 2 +=
+ (data[0] << 8) + data[1];
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 data +=3D unhashed=
+sz;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 datalen -=3D unhas=
+hedsz;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (datalen <=3D 2) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -EBAD=
+MSG");
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -EBADMSG;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* There's a quick check on the hash available=
+=2E */
+> + =C2=A0 =C2=A0 =C2=A0 ctx->sig->signed_hash_msw[0] =3D *data++;
+> + =C2=A0 =C2=A0 =C2=A0 ctx->sig->signed_hash_msw[1] =3D *data++;
+> + =C2=A0 =C2=A0 =C2=A0 datalen -=3D 2;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* And then the cryptographic data, which we'l=
+l need for the
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0* algorithm.
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i < ctx->key->algo->n_sig_mpi; i=
+++) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned int remai=
+ning =3D datalen;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (remaining =3D=3D=
+ 0) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 pr_debug("short %zu mpi %d\n", datalen, i);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 return -EBADMSG;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx->sig->mpi[i] =3D=
+ mpi_read_from_buffer(data, &remaining);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!ctx->sig->mpi=
+[i])
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 return -ENOMEM;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 data +=3D remainin=
+g;
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 datalen -=3D remai=
+ning;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (datalen !=3D 0) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kleave(" =3D -EBAD=
+MSG [trailer %zu]", datalen);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -EBADMSG;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 kleave(" =3D 0");
+> + =C2=A0 =C2=A0 =C2=A0 return 0;
+> +}
+> +
+> +/*
+> + * The data is now all loaded into the hash; load the metadata, fina=
+lise the
+> + * hash and perform the verification step.
+> + */
+> +static int pgp_pkey_verify_sig_end(struct crypto_key_verify_context =
+*ctx,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const u8 *sigdata, siz=
+e_t siglen)
+> +{
+> + =C2=A0 =C2=A0 =C2=A0 struct public_key_signature *sig =3D
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 container_of(ctx, =
+struct public_key_signature, base);
+> + =C2=A0 =C2=A0 =C2=A0 const struct public_key *key =3D sig->base.key=
+->payload.data;
+> + =C2=A0 =C2=A0 =C2=A0 struct pgp_pkey_sig_digest_context p;
+> + =C2=A0 =C2=A0 =C2=A0 int ret;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 kenter("");
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* Firstly we add metadata, starting with some=
+ of the data from the
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0* signature packet */
+> + =C2=A0 =C2=A0 =C2=A0 p.pgp.types_of_interest =3D (1 << PGP_PKT_SIGN=
+ATURE);
+> + =C2=A0 =C2=A0 =C2=A0 p.pgp.process_packet =3D pgp_pkey_digest_signa=
+ture;
+> + =C2=A0 =C2=A0 =C2=A0 p.key =3D key;
+> + =C2=A0 =C2=A0 =C2=A0 p.sig =3D sig;
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D pgp_parse_packets(sigdata, siglen, &p.=
+pgp);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret < 0)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto error_free_ct=
+x;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 crypto_shash_final(&sig->hash, sig->digest);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D key->algo->verify(key, sig);
+> +
+> +error_free_ctx:
+> + =C2=A0 =C2=A0 =C2=A0 pgp_pkey_verify_sig_cancel(ctx);
+> + =C2=A0 =C2=A0 =C2=A0 kleave(" =3D %d", ret);
 > + =C2=A0 =C2=A0 =C2=A0 return ret;
 > +}
-> +EXPORT_SYMBOL_GPL(verify_sig_end);
 > +
-> +/**
-> + * verify_sig_end - Cancel signature verification
-> + * @ctx: The context from verify_sig_begin()
+> +/*
+> + * Cancel an in-progress data loading
 > + */
-> +void verify_sig_cancel(struct crypto_key_verify_context *ctx)
+> +static void pgp_pkey_verify_sig_cancel(struct crypto_key_verify_cont=
+ext *ctx)
 > +{
-> + =C2=A0 =C2=A0 =C2=A0 struct crypto_key_parser *parser =3D ctx->pars=
-er;
+> + =C2=A0 =C2=A0 =C2=A0 struct public_key_signature *sig =3D
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 container_of(ctx, =
+struct public_key_signature, base);
+> + =C2=A0 =C2=A0 =C2=A0 int i;
 > +
-> + =C2=A0 =C2=A0 =C2=A0 ctx->cancel(ctx);
-> + =C2=A0 =C2=A0 =C2=A0 module_put(parser->owner);
+> + =C2=A0 =C2=A0 =C2=A0 kenter("");
+> +
+> + =C2=A0 =C2=A0 =C2=A0 /* !!! Do we need to tell the crypto layer to =
+cancel too? */
+> + =C2=A0 =C2=A0 =C2=A0 crypto_free_shash(sig->hash.tfm);
+> + =C2=A0 =C2=A0 =C2=A0 key_put(sig->base.key);
+> + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i < ARRAY_SIZE(sig->mpi); i++)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mpi_free(sig->mpi[=
+i]);
+> + =C2=A0 =C2=A0 =C2=A0 kfree(sig);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 kleave("");
 > +}
-> +EXPORT_SYMBOL_GPL(verify_sig_cancel);
 >
