@@ -1,118 +1,60 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto: Add bulk algorithm registration interface
-Date: Wed, 18 Jan 2012 08:33:48 +0200
-Message-ID: <20120118083348.160829xsyfgjym68@www.81.fi>
-References: <1326843266-16782-1-git-send-email-broonie@opensource.wolfsonmicro.com>
+From: Francis Moreau <francis.moro@gmail.com>
+Subject: Re: question about crypto module dependency
+Date: Wed, 18 Jan 2012 08:49:13 +0100
+Message-ID: <CAC9WiBjQ9qEqNWSKj_c56ekex-nbkLQejO=HhZgRnOSZn0iJkA@mail.gmail.com>
+References: <CAC9WiBj0oK+mWqnGVPEPAOTKMKeedsD4Wwwv_a0YbmOm2ejyfg@mail.gmail.com>
+	<20120118053933.GA23562@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:47807 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754954Ab2ARGdv (ORCPT
+Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:57386 "EHLO
+	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753111Ab2ARHtN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jan 2012 01:33:51 -0500
-In-Reply-To: <1326843266-16782-1-git-send-email-broonie@opensource.wolfsonmicro.com>
-Content-Disposition: inline
+	Wed, 18 Jan 2012 02:49:13 -0500
+Received: by obcva7 with SMTP id va7so6847297obc.19
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2012 23:49:13 -0800 (PST)
+In-Reply-To: <20120118053933.GA23562@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Mark Brown <broonie@opensource.wolfsonmicro.com>:
+On Wed, Jan 18, 2012 at 6:39 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Francis Moreau <francis.moro@gmail.com> wrote:
+>> Hello,
+>>
+>> I'm wondering how this scenario is supposed to work: let's say a
+>> module A uses 'crc32c' function in lib/libcrc32c.c. In its turn this
+>> function calls crypto_shash_update() which is exported by
+>> crypto/shash.c. But now no module implementing "crc32c" has still been
+>> loaded although crc32c.ko is available. Therefore the initial load of
+>> module A fails although all required modules by the system are
+>> present.
+>>
+>> If the above is correct, how should it be handled ?
+>
+> We'd need to adjust the init priority of libcrc32c and whatever
+> it depends on.
 
-> Hardware crypto engines frequently need to register a selection of
-> different algorithms with the core. Simplify their code slightly,
-> especially the error handling, by providing functions to register a
-> number of algorithms in a single call.
->
-> Signed-off-by: Mark Brown <broonie@opensource.wolfsonmicro.com>
-> ---
->  crypto/algapi.c        |   35 +++++++++++++++++++++++++++++++++++
->  include/linux/crypto.h |    2 ++
->  2 files changed, 37 insertions(+), 0 deletions(-)
->
-> diff --git a/crypto/algapi.c b/crypto/algapi.c
-> index 9d4a9fe..056571b 100644
-> --- a/crypto/algapi.c
-> +++ b/crypto/algapi.c
-> @@ -405,6 +405,41 @@ int crypto_unregister_alg(struct crypto_alg *alg)
->  }
->  EXPORT_SYMBOL_GPL(crypto_unregister_alg);
->
-> +int crypto_register_algs(struct crypto_alg *algs, int count)
-> +{
-> +	int i, ret;
-> +
-> +	for (i = 0; i < count; i++) {
-> +		ret = crypto_register_alg(&algs[i]);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	for (--i; i >= 0; --i)
-> +		crypto_unregister_alg(&algs[i]);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_register_algs);
-> +
-> +int crypto_unregister_algs(struct crypto_alg *algs, int count)
-> +{
-> +	int i, ret;
-> +
-> +	for (i = 0; i < count; i++) {
+Could you give me some details beacause I don't see how that would work...
 
-Most crypto engines/modules appear to do unregistering in reverse  
-order, so I think this should too.
+Currently we have this : libcrc32c -> shash
 
-And if changed to reverse order, error case in crypto_register_algs  
-could be replaced with
-  err:
-  	if (i > 0)
-  		crypto_unregister_algs(algs, i);
-  	return err;
+where '->' means depend on.
 
-> +		ret = crypto_unregister_alg(&algs[i]);
-> +		if (ret)
-> +			pr_err("Failed to unregister %s %s: %d\n",
-> +			       algs[i].cra_driver_name, algs[i].cra_name, ret);
-> +	}
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_unregister_algs);
-> +
->  int crypto_register_template(struct crypto_template *tmpl)
->  {
->  	struct crypto_template *q;
-> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-> index a8fa654..48ce547 100644
-> --- a/include/linux/crypto.h
-> +++ b/include/linux/crypto.h
-> @@ -314,6 +314,8 @@ struct crypto_alg {
->   */
->  int crypto_register_alg(struct crypto_alg *alg);
->  int crypto_unregister_alg(struct crypto_alg *alg);
-> +int crypto_register_algs(struct crypto_alg *algs, int count);
-> +int crypto_unregister_algs(struct crypto_alg *algs, int count);
+However I think we should have this: libcrc32c -> shash -> crc32c, to
+get all modules properly loaded when using libcrc32c.
+
+But it seems not possible because of the way shash is doing the load
+of its backends dynamically: it requires that the backend has already
+been registered.
+
 >
->  /*
->   * Algorithm query interface.
-> --
-> 1.7.7.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+> What is the user in question?
+
+btrfs
+
+Thanks.
+-- 
+Francis
