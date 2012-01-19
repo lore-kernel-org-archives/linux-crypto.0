@@ -1,78 +1,73 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v5.4 00/13] crc32c: Add faster algorithm and self-test
- code
-Date: Wed, 18 Jan 2012 15:01:14 -0800
-Message-ID: <20120118150114.2e2dac2d.akpm@linux-foundation.org>
-References: <20120118222733.4079.13377.stgit@elm3c44.beaverton.ibm.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: caam - fix gcc 4.6 warning
+Date: Wed, 18 Jan 2012 18:34:34 -0600
+Message-ID: <20120118183434.16fc1a747ab6c79ee68076a2@freescale.com>
+References: <20120109102740.82e4ac0f8425930b6a34ac1c@freescale.com>
+	<20120113053918.GG13918@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Theodore Tso <tytso@mit.edu>,
-	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Mingming Cao <cmm@us.ibm.com>, linux-ext4@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org
-To: "Darrick J. Wong" <djwong@us.ibm.com>
+Cc: <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:55436 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752085Ab2ARXBQ (ORCPT
+Received: from ch1ehsobe003.messaging.microsoft.com ([216.32.181.183]:46437
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754766Ab2ASAgT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jan 2012 18:01:16 -0500
-In-Reply-To: <20120118222733.4079.13377.stgit@elm3c44.beaverton.ibm.com>
+	Wed, 18 Jan 2012 19:36:19 -0500
+In-Reply-To: <20120113053918.GG13918@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 18 Jan 2012 14:27:33 -0800
-"Darrick J. Wong" <djwong@us.ibm.com> wrote:
+On Fri, 13 Jan 2012 16:39:18 +1100
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-> This patchset (re)uses Bob Pearson's crc32 slice-by-8 code to stamp out a
-> software crc32c implementation.  It removes the crc32c implementation in
-> crypto/ in favor of using the stamped-out one in lib/.  There is also a change
-> to Kconfig so that the kernel builder can pick an implementation best suited
-> for the hardware.
+> On Mon, Jan 09, 2012 at 10:27:40AM -0600, Kim Phillips wrote:
+> > drivers/crypto/caam/ctrl.c: In function 'caam_probe':
+> > drivers/crypto/caam/ctrl.c:49:6: warning: unused variable 'd' [-Wunused-variable]
+> > 
+> > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 > 
-> The motivation for this patchset is that I am working on adding full metadata
-> checksumming to ext4.  As far as performance impact of adding checksumming
-> goes, I see nearly no change with a standard mail server ffsb simulation.  On a
-> test that involves only file creation and deletion and extent tree writes, I
-> see a drop of about 50 pcercent with the current kernel crc32c implementation;
-> this improves to a drop of about 20 percent with the enclosed crc32c code.
-> 
-> When metadata is usually a small fraction of total IO, this new implementation
-> doesn't help much because metadata is usually a small fraction of total IO.
-> However, when we are doing IO that is almost all metadata (such as rm -rf'ing a
-> tree), then this patch speeds up the operation substantially.
-> 
-> Incidentally, given that iscsi, sctp, and btrfs also use crc32c, this patchset
-> should improve their speed as well.  I have not yet quantified that, however.
-> This latest submission combines Bob's patches from late August 2011 with mine
-> so that they can be one coherent patch set.  Please excuse my inability to
-> combine some of the patches; I've been advised to leave Bob's patches alone and
-> build atop them instead. :/
-> 
-> Since the last posting, I've also collected some crc32c test results on a bunch
-> of different x86/powerpc/sparc platforms.  The results can be viewed here:
-> http://goo.gl/sgt3i ; the "crc32-kern-le" and "crc32c" columns describe the
-> performance of the kernel's current crc32 and crc32c software implementations.
-> The "crc32c-by8-le" column shows crc32c performance with this patchset applied.
-> I expect crc32 performance to be roughly the same.
-> 
-> The two _boost columns at the right side of the spreadsheet shows how much
-> faster the new implementation is over the old one.  As you can see, crc32 rises
-> substantially, and crc32c experiences a huge increase.
+> Both patches applied.
 
-I grabbed this lot, so it will turn up in linux-next soon.
+Hi Herbert, I see you've applied:
 
-There are quite a lot of clients of the crc32 code.  net, netfilter and
-wireless are prominent, but there are others everywhere.
+e863f9c crypto: caam - add sha224 and sha384 variants to existing AEAD algorithm
+0113529 crypto: caam - be less noisy on startup
 
-So I cc'ed various other mailing lists just as a heads-up that this
-work is inbound and will hopefully yield performance improvements.  But
-of course, it might also yield bugs.
+to the cryptodev tree, but not the one at the start of this thread,
+which needs to go into your crypto tree (it's a fix for v3.3).  I'm
+resending it below in case it was lost.
+
+Thanks,
+
+Kim
+
+>From 3b85bc6b93ff561d9d9f85b455734eb26487e875 Mon Sep 17 00:00:00 2001
+From: Kim Phillips <kim.phillips@freescale.com>
+Date: Tue, 20 Dec 2011 18:24:30 -0600
+Subject: [PATCH] crypto: caam - fix gcc 4.6 warning
+
+drivers/crypto/caam/ctrl.c: In function 'caam_probe':
+drivers/crypto/caam/ctrl.c:49:6: warning: unused variable 'd' [-Wunused-variable]
+
+Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/caam/ctrl.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 8ae3ba2..c5f61c5 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -46,7 +46,7 @@ static int caam_remove(struct platform_device *pdev)
+ /* Probe routine for CAAM top (controller) level */
+ static int caam_probe(struct platform_device *pdev)
+ {
+-	int d, ring, rspec;
++	int ring, rspec;
+ 	struct device *dev;
+ 	struct device_node *nprop, *np;
+ 	struct caam_ctrl __iomem *ctrl;
+-- 
+1.7.8.3
