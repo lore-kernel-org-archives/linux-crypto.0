@@ -1,47 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - fix gcc 4.6 warning
-Date: Thu, 26 Jan 2012 13:37:55 +1100
-Message-ID: <20120126023755.GC10696@gondor.apana.org.au>
-References: <20120109102740.82e4ac0f8425930b6a34ac1c@freescale.com> <20120113053918.GG13918@gondor.apana.org.au> <20120118183434.16fc1a747ab6c79ee68076a2@freescale.com>
+Subject: Crypto Fixes for 3.3
+Date: Thu, 26 Jan 2012 13:43:42 +1100
+Message-ID: <20120126024342.GA12492@gondor.apana.org.au>
+References: <20100427135547.GA4008@gondor.apana.org.au> <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:55200 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:41383 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751204Ab2AZCh7 (ORCPT
+	with ESMTP id S1751204Ab2AZCns (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Jan 2012 21:37:59 -0500
+	Wed, 25 Jan 2012 21:43:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20120118183434.16fc1a747ab6c79ee68076a2@freescale.com>
+In-Reply-To: <20110629235153.GA16559@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2012 at 06:34:34PM -0600, Kim Phillips wrote:
-> On Fri, 13 Jan 2012 16:39:18 +1100
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > On Mon, Jan 09, 2012 at 10:27:40AM -0600, Kim Phillips wrote:
-> > > drivers/crypto/caam/ctrl.c: In function 'caam_probe':
-> > > drivers/crypto/caam/ctrl.c:49:6: warning: unused variable 'd' [-Wunused-variable]
-> > > 
-> > > Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
-> > 
-> > Both patches applied.
-> 
-> Hi Herbert, I see you've applied:
-> 
-> e863f9c crypto: caam - add sha224 and sha384 variants to existing AEAD algorithm
-> 0113529 crypto: caam - be less noisy on startup
-> 
-> to the cryptodev tree, but not the one at the start of this thread,
-> which needs to go into your crypto tree (it's a fix for v3.3).  I'm
-> resending it below in case it was lost.
+Hi Linus:
 
-I've applied it to cryptodev as I don't think this is important
-enough to warrant going into crypto right away.
+This push fixes a race condition in sha512 that affects users
+who use it in process context and softirq context concurrently,
+in particular, this affects IPsec.  The result of the race is
+the production of incorrect hashes, which for IPsec leands to
+loss of connectivity.
 
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Alexey Dobriyan (2):
+      crypto: sha512 - make it work, undo percpu message schedule
+      crypto: sha512 - reduce stack usage to safe number
+
+ crypto/sha512_generic.c |   62 +++++++++++++++++++++++++---------------------
+ 1 files changed, 34 insertions(+), 28 deletions(-)
+ 
 Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
