@@ -1,45 +1,90 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/3] sha512: reduce stack usage even on i386
-Date: Sat, 28 Jan 2012 09:32:50 +1100
-Message-ID: <20120127223250.GA9384@gondor.apana.org.au>
-References: <AE90C24D6B3A694183C094C60CF0A2F6D8AF43@saturn3.aculab.com> <1326709382.2255.4.camel@edumazet-HP-Compaq-6005-Pro-SFF-PC> <CACVxJT_cZAdxNOFTpK5seUXFZU+YB3zbe6LF1nnyzo32ae14xw@mail.gmail.com> <20120118180210.GA22733@p183.telecom.by> <20120126023502.GA10696@gondor.apana.org.au> <20120127175130.GA742@p183.telecom.by>
+From: Mark Allyn <allyn@well.com>
+Subject: Re: Question on __crypto_alg_lookup
+Date: Fri, 27 Jan 2012 14:51:31 -0800 (PST)
+Message-ID: <alpine.LRH.2.02.1201271449500.11453@well.com>
+References: <alpine.LRH.2.02.1201271415230.23638@well.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Laight <David.Laight@aculab.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	ken@codelabs.ch, Steffen Klassert <steffen.klassert@secunet.com>,
-	security@kernel.org, Eric Dumazet <eric.dumazet@gmail.com>
-To: Alexey Dobriyan <adobriyan@gmail.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33290 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751651Ab2A0WdE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Jan 2012 17:33:04 -0500
-Content-Disposition: inline
-In-Reply-To: <20120127175130.GA742@p183.telecom.by>
+Received: from newsmtp.well.com ([107.20.247.102]:57165 "EHLO newsmtp.well.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751419Ab2A0Wvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Jan 2012 17:51:32 -0500
+Received: from well.com (well.com [10.110.241.121])
+	by newsmtp.well.com (8.14.3/8.14.3) with ESMTP id q0RMpVlE021102
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Jan 2012 14:51:31 -0800
+In-Reply-To: <alpine.LRH.2.02.1201271415230.23638@well.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 27, 2012 at 08:51:30PM +0300, Alexey Dobriyan wrote:
+
+Here is a related questions that might help me . . .
+
+Do any of you know of a ahash and ablkcipher driver that is known to have 
+worked with dm-crypt? I would like to look at that code.
+
+The drivers that I have look at so far seem to set the cra_flags the same 
+as I have; I want to know if there is a driver that is known to have 
+worked and look at it's cra_flags settings.
+
+Thank you
+
+Truly,
+
+Mark Allyn
+Portland, Oregon
+www.allyn.com
+971-563-7588
+
+On Fri, 27 Jan 2012, Mark Allyn wrote:
+
 >
-> I think this is because your tree contained "%16" code instead if "&15".
-> Now that it contains "&15" it should become applicable.
-
-OK.
-
-> --------------------------------------------------------------------------
-> [PATCH] sha512: reduce stack usage even on i386
-
-Can you try the approach that git takes with using asm to read
-and write W (see previous email from Linus in respone to my push
-request)? As it stands your patch is simply relying on gcc's
-ability to optimise.  At least with asm volatile we know that
-gcc will leave it alone.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Folks:
+>
+> In __crypto_alg_lookup, at about line 85 of api.c, there is the following:
+>
+>                 if ((q->cra_flags ^ type) & mask)
+>                         continue;
+>
+> There is no commenting on this at all.
+>
+> Can someone please explain what this is for and just what is this trying
+> to filter?
+>
+> I am trying to get dm-crypt to work with a ahash device that we have.
+>
+> The dm-crypt is calling crypto_alloc_hash with "sha256" type 0, and mask 0x 
+> 80
+>
+> My driver is setting these flags:
+>
+>                 .cra_flags              = CRYPTO_ALG_TYPE_AHASH |
+>                                                 CRYPTO_ALG_ASYNC,
+>
+> The search seems to be failing at the above sequence in __crypto_alg_lookup.
+>
+> Is dm-crypt supposed to work with ahash?
+>
+> The Documentation/crypto does not seem to include much information
+> on using the ahash and ablkcipher infrastructure.
+>
+> There is one document called async-tx-api.txt that seems to have no
+> correlation with the ahash or ablkcipher stuff. Is it still valid?
+>
+> Is there another place I can look for decent documentation?
+>
+> Thank you
+>
+> Truly,
+>
+> Mark Allyn
+> Portland, Oregon
+> www.allyn.com
+> 971-563-7588
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
