@@ -1,58 +1,53 @@
-From: Jesper Juhl <jj@chaosbits.net>
-Subject: [PATCH] In crypto_add_alg(), 'exact' wants to be initialized to 0
-Date: Sun, 29 Jan 2012 23:39:22 +0100 (CET)
-Message-ID: <alpine.LNX.2.00.1201292337390.27749@swampdragon.chaosbits.net>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: borislamsv2@gmail.com
+Subject: Server Rental Service in Hong Kong
+Date: Sat, 28 Jan 2012 15:55:31 +0800 (HKT)
+Message-ID: <3KWzR__23362.5502828092$1327896330$gmane$org@gcn.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 124-248-200-30.sunnyvision.com ([124.248.200.30]:42804 "EHLO
+	smtp3.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1753542Ab2A3EFX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 29 Jan 2012 23:05:23 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-We declare 'exact' without initializing it and then do:
+Dear All,
 
-[...]
-	if (strlen(p->cru_driver_name))
-		exact = 1;
+We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
 
-	if (priority && !exact)
-		return -EINVAL;
+Dell=99 PowerEdge=99 EnterpriseRack Mount Server
+-Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
+-8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
+-500GB, 3.5", 6Gbps SAS x 2
+-Raid 1 Mirroring Protection
+-Remote KVM (iDRAC6 Enterprise)
 
-[...]
+Dell(TM) PowerEdge(TM) R410 Rack Mount Server
+-Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
+-4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
+-500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
+-iDRAC6 Enterprise or Express (Remote KVM Management)
 
-If the first 'if' is not true, then the second will test an
-uninitialized 'exact'.
-As far as I can tell, what we want is for 'exact' to be initialized to
-0 (zero/false).
+Every Dedicated Server Hosting Solution Also Includes: 
+ 
+Software Specification 
+- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
+- Full root-level access 
+- Data Center Facilities 
+- Shared Local & International Bandwidth 
+- 2 IP Addresses Allocation 
+- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
+- FM200=93based fire suppression system 
+- 24x7 CRAC Air Conditioning and Humidity Control 
+- 24x7 Security Control 
+- 24x7 Remote Hand Service 
 
-Signed-off-by: Jesper Juhl <jj@chaosbits.net>
----
- crypto/crypto_user.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Pls send us email for further information.Thanks,
 
-  Compile tested only.
+Boris 
+boris@dedicatedserver.com.hk 
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 16f8693..36a2af7 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -304,7 +304,7 @@ static int crypto_del_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- static int crypto_add_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			  struct nlattr **attrs)
- {
--	int exact;
-+	int exact = 0;
- 	const char *name;
- 	struct crypto_alg *alg;
- 	struct crypto_user_alg *p = nlmsg_data(nlh);
--- 
-1.7.8.4
-
-
--- 
-Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
-Don't top-post http://www.catb.org/jargon/html/T/top-post.html
-Plain text mails only, please.
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
