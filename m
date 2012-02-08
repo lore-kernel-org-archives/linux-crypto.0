@@ -1,45 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] In crypto_add_alg(), 'exact' wants to be initialized
-	to 0
-Date: Sun, 5 Feb 2012 15:12:52 +1100
-Message-ID: <20120205041251.GA8219@gondor.apana.org.au>
-References: <alpine.LNX.2.00.1201292337390.27749@swampdragon.chaosbits.net> <CAHdPZaP4aArSh7G15KhP2ombW8Zs2L4osQ0xi0W829oBZSuTtg@mail.gmail.com> <alpine.LNX.2.00.1202012050390.8577@swampdragon.chaosbits.net> <20120202075122.GA23142@secunet.com> <alpine.LNX.2.00.1202021541440.12088@swampdragon.chaosbits.net> <20120203062425.GH23142@secunet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jesper Juhl <jj@chaosbits.net>,
-	"devendra.aaru" <devendra.aaru@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+From: woody@dedicatedserver.com.hk
+Subject: Cloud server solutions - more stable, powerful, flexible and cheap
+Date: Wed,  8 Feb 2012 17:54:38 +0800 (HKT)
+Message-ID: <0YW8JICv__8600.29397667876$1328696116$gmane$org@tpts7.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56351 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754356Ab2BEENK (ORCPT
+Received: from 124-248-200-46.sunnyvision.com ([124.248.200.46]:52691 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750845Ab2BHKOV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 4 Feb 2012 23:13:10 -0500
-Content-Disposition: inline
-In-Reply-To: <20120203062425.GH23142@secunet.com>
+	Wed, 8 Feb 2012 05:14:21 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 03, 2012 at 07:24:25AM +0100, Steffen Klassert wrote:
-> On Thu, Feb 02, 2012 at 03:42:43PM +0100, Jesper Juhl wrote:
-> > On Thu, 2 Feb 2012, Steffen Klassert wrote:
-> > > 
-> > > Your first patch is correct.
-> > > 
-> > Thank you for the explanation.
-> > 
-> > Can I take that to mean that I can add your Acked-by: if/when I resend the 
-> > patch?
-> > 
-> 
-> Sure,
-> 
-> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Have a nice day
 
-Patch applied.  Thanks a lot!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We are one of the top Cloud Solution provider base in Hong Kong, with over 10+ years experience,
+we providing better than good and lower cost service of CLoud Hosting (Cloud Server / Hosting / CDN)
+
+Starting at $1.99, let's come to experience and enjoy our powerful cloud system.
+
+Thanks for your time and appreciated to look arround our website.
+
+http://www.dedicatedserver.com.hk/ 
+
+Best Regards,
+The 36cloud Team
+
+
+
+
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
