@@ -1,35 +1,37 @@
-From: woody@dedicatedserver.com.hk
-Subject: Cloud server solutions - more stable, powerful, flexible and cheap
-Date: Wed,  8 Feb 2012 17:54:38 +0800 (HKT)
-Message-ID: <0YW8JICv__8600.29397667876$1328696116$gmane$org@tpts7.seed.net.tw>
+From: boris@dedicatedserver.com.hk
+Subject: Run Your Dedicated Server with Sufficient IP
+Date: Wed,  8 Feb 2012 21:50:53 +0800 (HKT)
+Message-ID: <HQJLOMpsl__13681.2635035769$1328711358$gmane$org@pchome.com.tw>
 Content-Type: text/plain;
 Content-Transfer-Encoding: Quoted-Printable
 To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-46.sunnyvision.com ([124.248.200.46]:52691 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750845Ab2BHKOV (ORCPT
+Received: from 124-248-200-42.sunnyvision.com ([124.248.200.42]:46543 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752188Ab2BHO3H (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Feb 2012 05:14:21 -0500
+	Wed, 8 Feb 2012 09:29:07 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Have a nice day
+With servers located off-site, enterprises can devote all their bandwidth resources to company email communication, file transfer, networked applications, and other Internet needs.
+Our dedicated server plan include:
 
-We are one of the top Cloud Solution provider base in Hong Kong, with over 10+ years experience,
-we providing better than good and lower cost service of CLoud Hosting (Cloud Server / Hosting / CDN)
-
-Starting at $1.99, let's come to experience and enjoy our powerful cloud system.
-
-Thanks for your time and appreciated to look arround our website.
-
-http://www.dedicatedserver.com.hk/ 
-
+o    7/24/365 Support via Helpdesk
+o    Plesk Panel
+o    IPV4 / IPV6
+o    Unlimited FTP accounts
+o    Unlimited Email Accounts
+o    Unlimited datatransfer bandwidth
+o    PHP 5
+o    Spam Assassin
+o    Allow multi-domain hosting
+o    Daily/Weekly Backup
+ 
+For more details, please send email to boris@dedicatedserver.com.hk
+ 
 Best Regards,
-The 36cloud Team
-
-
-
-
-
-If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
+Boris Lam
+Senior Sales Executive
+Dedicated Server Hong Kong
+Mobile: (852)9408 8762
