@@ -1,68 +1,54 @@
-From: boris@dedicatedserver.com.hk
-Subject: Datacenter Colocation Service in Hong Kong
-Date: Thu,  9 Feb 2012 23:59:04 +0800 (HKT)
-Message-ID: <nEJKwNJ91SFOA__34625.0222101391$1328812997$gmane$org@seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: [PATCH] X86, crypto: Remove dead code from
+ twofish_glue_3way.c::init()
+Date: Thu, 9 Feb 2012 23:02:16 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1202092300300.32491@swampdragon.chaosbits.net>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: trivial@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
+To: x86@kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-41.sunnyvision.com ([124.248.200.41]:49483 "EHLO
-	teamb03.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1754136Ab2BISnL (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:26550 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758294Ab2BIWBk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Feb 2012 13:43:11 -0500
+	Thu, 9 Feb 2012 17:01:40 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear All,
+We can never reach the line just after the 'return 0'
+statement. Remove it.
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ arch/x86/crypto/twofish_glue_3way.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 7fee8c1..adba7b3 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
+@@ -659,7 +659,6 @@ int __init init(void)
  
-Our Data center:
-
-Over 20,000ft Data Center in Hong Kong (Kowloon side) with Control Center
-
-Holds Certificate of ISO/IEC 27001:2005
-
-Standard of TIA-942 Tier 3+ Facilities
-
--          FM200 and HSSD =A1V strengthens fire resistance and limits potential damage
-
--          CRAC system =A1V maintains constant temperatures and relative humidity to minimize redundancy control
-
--          Diesel Power Generator =A1V provide full power outage support for entire data centre operation with limitless diesel tank back up located in ground floor of building.
-
--          UPS =A1V offers N+1 full load configuration
-
+ 	return 0;
  
-Standard 1 Rack Package
+-	crypto_unregister_alg(&blk_xts_alg);
+ blk_xts_err:
+ 	crypto_unregister_alg(&blk_lrw_alg);
+ blk_lrw_err:
+-- 
+1.7.9
 
--          1 Rack of Industrial Standard Rack
 
--          One 100Mbps Internet Connectivity Port
+PS. Please CC me on replies.
 
--          Shared Access to SunnyVision Internet backbone
- (BGP4 Peering to 2Gbps to Local (HKIX) + 300Mbps to Oversea Carrier (Singtel, NTT, Reach, ChinaNet)
-
--          Free 32 IPs Addresses Allocation and Basic Configuration
-
--          Free Reverse DNS (Pre-configured)
-
--          Un-limit Data Transfer Bandwidth
-
--          Standard Data Center Facilities: UPS / CRAC / FM200
-
--          24x7 Security Control and Monitoring
-
--          24x7 Technical Support
-
--          Traffic Monitoring: Web access MRTG Report
-
- 
-Price : USD $1,100 per month
- 
-For more details, please send email to boris@dedicatedserver.com.hk
- 
-Best Regards,
-Boris Lam
-Senior Sales Executive
-Dedicated Server Hong Kong
-Mobile: (852)9408 8762
+-- 
+Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
