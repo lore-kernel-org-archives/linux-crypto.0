@@ -1,52 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.3
-Date: Tue, 14 Feb 2012 14:35:04 +1100
-Message-ID: <20120214033504.GA26895@gondor.apana.org.au>
-References: <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au>
+Subject: Re: [PATCH] X86, crypto: Remove dead code from
+	twofish_glue_3way.c::init()
+Date: Tue, 14 Feb 2012 19:34:59 +1100
+Message-ID: <20120214083458.GB28942@gondor.apana.org.au>
+References: <alpine.LNX.2.00.1202092300300.32491@swampdragon.chaosbits.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Cc: x86@kernel.org, trivial@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
+To: Jesper Juhl <jj@chaosbits.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44002 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59759 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754523Ab2BNDfK (ORCPT
+	with ESMTP id S1751300Ab2BNIfJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 Feb 2012 22:35:10 -0500
+	Tue, 14 Feb 2012 03:35:09 -0500
 Content-Disposition: inline
-In-Reply-To: <20120126024342.GA12492@gondor.apana.org.au>
+In-Reply-To: <alpine.LNX.2.00.1202092300300.32491@swampdragon.chaosbits.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Feb 09, 2012 at 11:02:16PM +0100, Jesper Juhl wrote:
+> We can never reach the line just after the 'return 0'
+> statement. Remove it.
+> 
+> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
 
-This push updates the sha512 fix so that it doesn't cause excessive
-stack usage on i386.  This is done by reverting to the original
-code, and avoiding the W duplication by moving its initialisation
-into the loop.
-
-As the underlying code is in fact the one that we have used for years,
-I'm pushing this now instead of postponing to the next cycle.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (2):
-      crypto: sha512 - Use binary and instead of modulus
-      crypto: sha512 - Avoid stack bloat on i386
-
- crypto/sha512_generic.c |   70 ++++++++++++++++++++++-------------------------
- 1 files changed, 33 insertions(+), 37 deletions(-)
-
-Thanks,
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
