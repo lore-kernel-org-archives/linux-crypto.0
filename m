@@ -1,40 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: David Miller <davem@davemloft.net>
 Subject: Re: sha-512...
-Date: Wed, 15 Feb 2012 15:01:28 +1100
-Message-ID: <20120215040128.GA8738@gondor.apana.org.au>
+Date: Wed, 15 Feb 2012 00:11:13 -0500 (EST)
+Message-ID: <20120215.001113.86424501006520715.davem@davemloft.net>
 References: <20120214.225833.303014660389989764.davem@davemloft.net>
+	<20120215040128.GA8738@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+To: herbert@gondor.hengli.com.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35846 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752509Ab2BOEBa (ORCPT
+Received: from shards.monkeyblade.net ([198.137.202.13]:52377 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751558Ab2BOFLU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Feb 2012 23:01:30 -0500
-Content-Disposition: inline
-In-Reply-To: <20120214.225833.303014660389989764.davem@davemloft.net>
+	Wed, 15 Feb 2012 00:11:20 -0500
+In-Reply-To: <20120215040128.GA8738@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 14, 2012 at 10:58:33PM -0500, David Miller wrote:
+From: Herbert Xu <herbert@gondor.hengli.com.au>
+Date: Wed, 15 Feb 2012 15:01:28 +1100
+
+> On Tue, Feb 14, 2012 at 10:58:33PM -0500, David Miller wrote:
+>> 
+>> FYI, I just started seeing this on sparc32 after all those
+>> sha512 "optimizations":
+>> 
+>> crypto/sha512_generic.c: In function 'sha512_transform':
+>> crypto/sha512_generic.c:135:1: warning: the frame size of 1136 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> FYI, I just started seeing this on sparc32 after all those
-> sha512 "optimizations":
+> Is that with the latest patch applied?
 > 
-> crypto/sha512_generic.c: In function 'sha512_transform':
-> crypto/sha512_generic.c:135:1: warning: the frame size of 1136 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+> 	crypto: sha512 - Avoid stack bloat on i386
+> 
+> If so then this is not good.
 
-Is that with the latest patch applied?
+Yes.  And, of course, with that commit reverted it's even worse.
+Reverting it makes the stack frame twice as large.
 
-	crypto: sha512 - Avoid stack bloat on i386
+> What was the original stack usage, i.e., if you revert to the
+> original percpu code?
 
-If so then this is not good.  What was the original stack usage,
-i.e., if you revert to the original percpu code?
+If I revert:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+commit 3a92d687c8015860a19213e3c102cad6b722f83c
+commit 58d7d18b5268febb8b1391c6dffc8e2aaa751fcd
+commit 51fc6dc8f948047364f7d42a4ed89b416c6cc0a3
+commit 84e31fdb7c797a7303e0cc295cb9bc8b73fb872d
+
+the stackframe goes down to 888 bytes.
+
+More detailed, the progression is:
+
+master						1136
+revert 3a92d687c8015860a19213e3c102cad6b722f83c	2408
+revert 58d7d18b5268febb8b1391c6dffc8e2aaa751fcd	2408
+revert 51fc6dc8f948047364f7d42a4ed89b416c6cc0a3	1520
+revert 84e31fdb7c797a7303e0cc295cb9bc8b73fb872d	888
