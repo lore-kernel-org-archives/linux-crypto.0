@@ -1,30 +1,52 @@
-From: Ann Adams <Ann.Adams@smilebrands.com>
-Subject: (unknown)
-Date: Wed, 15 Feb 2012 09:47:44 -0800
-Message-ID: <62F82CB44658DF47AFBF4FC7BF35DEFE355A31EE77__10652.0797395662$1329328089$gmane$org@EXCMBX.bnd.corp>
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: Re: sha-512...
+Date: Wed, 15 Feb 2012 22:27:52 +0300
+Message-ID: <20120215192751.GA27144@p183.telecom.by>
+References: <20120215040128.GA8738@gondor.apana.org.au>
+ <20120215.001113.86424501006520715.davem@davemloft.net>
+ <20120215051608.GA9126@gondor.apana.org.au>
+ <20120215.002352.2053362114668441348.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	torvalds@linux-foundation.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout.smilebrands.com ([66.104.72.207]:22188 "EHLO
-	snaex01.bnd.corp" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753700Ab2BORrt convert rfc822-to-8bit (ORCPT
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:32862 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751610Ab2BOT16 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Feb 2012 12:47:49 -0500
-Subject: 
-Content-Language: en-US
+	Wed, 15 Feb 2012 14:27:58 -0500
+Received: by bkcjm19 with SMTP id jm19so1292167bkc.19
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2012 11:27:56 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20120215.002352.2053362114668441348.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Feb 15, 2012 at 12:23:52AM -0500, David Miller wrote:
+> From: Herbert Xu <herbert@gondor.hengli.com.au>
+> Date: Wed, 15 Feb 2012 16:16:08 +1100
+> 
+> > OK, so we grew by 1136 - 888 = 248.  Keep in mind that 128 of
+> > that is expected since we moved W onto the stack.
+> 
+> Right.
+> 
+> > I guess we could go back to the percpu solution, what do you
+> > think?
+> 
+> I'm not entirely sure, we might have to.
+> 
+> sha512 is notorious for generating terrible code with gcc on 32-bit
+> targets, so...  The sha512 test in the glibc testsuite tends to
+> timeout on 32-bit sparc. :-)
 
+Cherrypicking ror64() commit largely fixes the issue (on sparc-defconfig):
 
+	00000000 <sha512_transform>:
+	       0:       9d e3 bc 78     save  %sp, -904, %sp
 
-Hi
-  Sorry for the sudden contact with you via email, but please i have looked
-  For you in the past few months now without any good result that is why i
-  am using this medium, i would appreciate if you did contact me for a brief
-  Discussion my Phone number is (+44) 703 595 6471 and email is michaelachambers@live.co.uk
-    Thanks In Advance
-    Michael Aiden
-Note: All corresponding email should be sent to michaelachambers@live.co.uk  for an immediate attention.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+b85a088f15f2070b7180735a231012843a5ac96c
+"crypto: sha512 - use standard ror64()"
