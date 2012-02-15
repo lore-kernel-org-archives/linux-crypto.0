@@ -1,39 +1,30 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: sha-512...
-Date: Wed, 15 Feb 2012 00:23:52 -0500 (EST)
-Message-ID: <20120215.002352.2053362114668441348.davem@davemloft.net>
-References: <20120215040128.GA8738@gondor.apana.org.au>
-	<20120215.001113.86424501006520715.davem@davemloft.net>
-	<20120215051608.GA9126@gondor.apana.org.au>
+From: Ann Adams <Ann.Adams@smilebrands.com>
+Subject: (unknown)
+Date: Wed, 15 Feb 2012 09:47:44 -0800
+Message-ID: <62F82CB44658DF47AFBF4FC7BF35DEFE355A31EE77__10652.0797395662$1329328089$gmane$org@EXCMBX.bnd.corp>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, torvalds@linux-foundation.org,
-	adobriyan@gmail.com
-To: herbert@gondor.hengli.com.au
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([198.137.202.13]:52487 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751571Ab2BOFX7 (ORCPT
+Received: from mailout.smilebrands.com ([66.104.72.207]:22188 "EHLO
+	snaex01.bnd.corp" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753700Ab2BORrt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Feb 2012 00:23:59 -0500
-In-Reply-To: <20120215051608.GA9126@gondor.apana.org.au>
+	Wed, 15 Feb 2012 12:47:49 -0500
+Subject: 
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.hengli.com.au>
-Date: Wed, 15 Feb 2012 16:16:08 +1100
 
-> OK, so we grew by 1136 - 888 = 248.  Keep in mind that 128 of
-> that is expected since we moved W onto the stack.
 
-Right.
 
-> I guess we could go back to the percpu solution, what do you
-> think?
-
-I'm not entirely sure, we might have to.
-
-sha512 is notorious for generating terrible code with gcc on 32-bit
-targets, so...  The sha512 test in the glibc testsuite tends to
-timeout on 32-bit sparc. :-)
+Hi
+  Sorry for the sudden contact with you via email, but please i have looked
+  For you in the past few months now without any good result that is why i
+  am using this medium, i would appreciate if you did contact me for a brief
+  Discussion my Phone number is (+44) 703 595 6471 and email is michaelachambers@live.co.uk
+    Thanks In Advance
+    Michael Aiden
+Note: All corresponding email should be sent to michaelachambers@live.co.uk  for an immediate attention.
