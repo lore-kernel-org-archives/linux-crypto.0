@@ -1,41 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: sha-512...
-Date: Thu, 16 Feb 2012 11:16:34 +1100
-Message-ID: <20120216001634.GA18494@gondor.apana.org.au>
-References: <20120215051608.GA9126@gondor.apana.org.au> <20120215.002352.2053362114668441348.davem@davemloft.net> <20120215192751.GA27144@p183.telecom.by> <20120215.160010.95041058128954427.davem@davemloft.net>
+Subject: Re: Crypto Fixes for 3.3
+Date: Thu, 16 Feb 2012 16:32:00 +1100
+Message-ID: <20120216053200.GA20581@gondor.apana.org.au>
+References: <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au> <20120214033504.GA26895@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: adobriyan@gmail.com, linux-crypto@vger.kernel.org,
-	torvalds@linux-foundation.org
-To: David Miller <davem@davemloft.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60756 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:35953 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752691Ab2BPAQp (ORCPT
+	with ESMTP id S1751214Ab2BPFcJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Feb 2012 19:16:45 -0500
+	Thu, 16 Feb 2012 00:32:09 -0500
 Content-Disposition: inline
-In-Reply-To: <20120215.160010.95041058128954427.davem@davemloft.net>
+In-Reply-To: <20120214033504.GA26895@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 15, 2012 at 04:00:10PM -0500, David Miller wrote:
->
-> In fact, in my tree, this change brings the stack allocation instruction
-> down to:
-> 
->         save    %sp, -824, %sp  !
-> 
-> which is actually BETTER than what the old per-cpu code got:
-> 
->         save    %sp, -984, %sp  !
-> 
-> Therefore I highly recommend we apply that ror() change to Linus's
-> tree now. :-)
+Hi Linus:
 
-Great, I'll push that out today.
+Dave reported that even with the latest stack bloat reduction
+fix for i386, the stack usage of sha512 still exceeded 1024 bytes
+on sparc32.  However, with Alexey's ror64 patch applied, the stack
+usage goes back down to a more respectable 824.
 
-Thanks,!
+So I've moved the ror64 patch from cryptodev to crypto and I'm
+pushing it to you now.
+ 
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Alexey Dobriyan (1):
+      crypto: sha512 - use standard ror64()
+
+ crypto/sha512_generic.c |   13 ++++---------
+ include/linux/bitops.h  |   20 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 9 deletions(-)
+ 
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
