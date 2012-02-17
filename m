@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 3/6] crypto: blowfish-x86_64 - use crypto_[un]register_algs
-Date: Fri, 17 Feb 2012 22:48:48 +0200
-Message-ID: <20120217204848.3744.45044.stgit@localhost6.localdomain6>
+Subject: [PATCH 4/6] crypto: serpent-sse2 - combine ablk_*_init functions
+Date: Fri, 17 Feb 2012 22:48:53 +0200
+Message-ID: <20120217204853.3744.10263.stgit@localhost6.localdomain6>
 References: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,247 +10,146 @@ Cc: linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:43903 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752628Ab2BQUsv (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34778 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754149Ab2BQUs4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Feb 2012 15:48:51 -0500
+	Fri, 17 Feb 2012 15:48:56 -0500
 In-Reply-To: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Combine all crypto_alg to be registered and use new crypto_[un]register_algs
-functions. Simplifies init/exit code and reduce object size.
+Driver name in ablk_*_init functions can be constructed runtime. Therefore
+use single function ablk_init to reduce object size.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/blowfish_glue.c |  163 ++++++++++++++++-----------------------
- 1 files changed, 65 insertions(+), 98 deletions(-)
+ arch/x86/crypto/serpent_sse2_glue.c |   71 ++++++-----------------------------
+ 1 files changed, 13 insertions(+), 58 deletions(-)
 
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index 2970110..73bc8a9 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -77,27 +77,6 @@ static void blowfish_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	blowfish_dec_blk(crypto_tfm_ctx(tfm), dst, src);
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index 5520c75..4b21be8 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -676,68 +676,23 @@ static void ablk_exit(struct crypto_tfm *tfm)
+ 	cryptd_free_ablkcipher(ctx->cryptd_tfm);
  }
  
--static struct crypto_alg bf_alg = {
--	.cra_name		=	"blowfish",
--	.cra_driver_name	=	"blowfish-asm",
--	.cra_priority		=	200,
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	BF_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct bf_ctx),
--	.cra_alignmask		=	3,
--	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(bf_alg.cra_list),
--	.cra_u			=	{
--		.cipher = {
--			.cia_min_keysize	=	BF_MIN_KEY_SIZE,
--			.cia_max_keysize	=	BF_MAX_KEY_SIZE,
--			.cia_setkey		=	blowfish_setkey,
--			.cia_encrypt		=	blowfish_encrypt,
--			.cia_decrypt		=	blowfish_decrypt,
--		}
--	}
--};
--
- static int ecb_crypt(struct blkcipher_desc *desc, struct blkcipher_walk *walk,
- 		     void (*fn)(struct bf_ctx *, u8 *, const u8 *),
- 		     void (*fn_4way)(struct bf_ctx *, u8 *, const u8 *))
-@@ -161,28 +140,6 @@ static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 	return ecb_crypt(desc, &walk, blowfish_dec_blk, blowfish_dec_blk_4way);
- }
- 
--static struct crypto_alg blk_ecb_alg = {
--	.cra_name		= "ecb(blowfish)",
--	.cra_driver_name	= "ecb-blowfish-asm",
--	.cra_priority		= 300,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= BF_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct bf_ctx),
--	.cra_alignmask		= 0,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(blk_ecb_alg.cra_list),
--	.cra_u = {
--		.blkcipher = {
--			.min_keysize	= BF_MIN_KEY_SIZE,
--			.max_keysize	= BF_MAX_KEY_SIZE,
--			.setkey		= blowfish_setkey,
--			.encrypt	= ecb_encrypt,
--			.decrypt	= ecb_decrypt,
--		},
--	},
--};
--
- static unsigned int __cbc_encrypt(struct blkcipher_desc *desc,
- 				  struct blkcipher_walk *walk)
+-static void ablk_init_common(struct crypto_tfm *tfm,
+-			     struct cryptd_ablkcipher *cryptd_tfm)
++static int ablk_init(struct crypto_tfm *tfm)
  {
-@@ -308,29 +265,6 @@ static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 	return err;
- }
- 
--static struct crypto_alg blk_cbc_alg = {
--	.cra_name		= "cbc(blowfish)",
--	.cra_driver_name	= "cbc-blowfish-asm",
--	.cra_priority		= 300,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= BF_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct bf_ctx),
--	.cra_alignmask		= 0,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(blk_cbc_alg.cra_list),
--	.cra_u = {
--		.blkcipher = {
--			.min_keysize	= BF_MIN_KEY_SIZE,
--			.max_keysize	= BF_MAX_KEY_SIZE,
--			.ivsize		= BF_BLOCK_SIZE,
--			.setkey		= blowfish_setkey,
--			.encrypt	= cbc_encrypt,
--			.decrypt	= cbc_decrypt,
--		},
--	},
--};
+ 	struct async_serpent_ctx *ctx = crypto_tfm_ctx(tfm);
 -
- static void ctr_crypt_final(struct bf_ctx *ctx, struct blkcipher_walk *walk)
- {
- 	u8 *ctrblk = walk->iv;
-@@ -424,7 +358,67 @@ static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 	return err;
- }
- 
--static struct crypto_alg blk_ctr_alg = {
-+static struct crypto_alg bf_algs[4] = { {
-+	.cra_name		= "blowfish",
-+	.cra_driver_name	= "blowfish-asm",
-+	.cra_priority		= 200,
-+	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize		= BF_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct bf_ctx),
-+	.cra_alignmask		= 3,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(bf_algs[0].cra_list),
-+	.cra_u = {
-+		.cipher = {
-+			.cia_min_keysize	= BF_MIN_KEY_SIZE,
-+			.cia_max_keysize	= BF_MAX_KEY_SIZE,
-+			.cia_setkey		= blowfish_setkey,
-+			.cia_encrypt		= blowfish_encrypt,
-+			.cia_decrypt		= blowfish_decrypt,
-+		}
-+	}
-+}, {
-+	.cra_name		= "ecb(blowfish)",
-+	.cra_driver_name	= "ecb-blowfish-asm",
-+	.cra_priority		= 300,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= BF_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct bf_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(bf_algs[1].cra_list),
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= BF_MIN_KEY_SIZE,
-+			.max_keysize	= BF_MAX_KEY_SIZE,
-+			.setkey		= blowfish_setkey,
-+			.encrypt	= ecb_encrypt,
-+			.decrypt	= ecb_decrypt,
-+		},
-+	},
-+}, {
-+	.cra_name		= "cbc(blowfish)",
-+	.cra_driver_name	= "cbc-blowfish-asm",
-+	.cra_priority		= 300,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= BF_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct bf_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_list		= LIST_HEAD_INIT(bf_algs[2].cra_list),
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= BF_MIN_KEY_SIZE,
-+			.max_keysize	= BF_MAX_KEY_SIZE,
-+			.ivsize		= BF_BLOCK_SIZE,
-+			.setkey		= blowfish_setkey,
-+			.encrypt	= cbc_encrypt,
-+			.decrypt	= cbc_decrypt,
-+		},
-+	},
-+}, {
- 	.cra_name		= "ctr(blowfish)",
- 	.cra_driver_name	= "ctr-blowfish-asm",
- 	.cra_priority		= 300,
-@@ -434,7 +428,7 @@ static struct crypto_alg blk_ctr_alg = {
- 	.cra_alignmask		= 0,
- 	.cra_type		= &crypto_blkcipher_type,
- 	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(blk_ctr_alg.cra_list),
-+	.cra_list		= LIST_HEAD_INIT(bf_algs[3].cra_list),
- 	.cra_u = {
- 		.blkcipher = {
- 			.min_keysize	= BF_MIN_KEY_SIZE,
-@@ -445,7 +439,7 @@ static struct crypto_alg blk_ctr_alg = {
- 			.decrypt	= ctr_crypt,
- 		},
- 	},
--};
-+} };
- 
- static bool is_blacklisted_cpu(void)
- {
-@@ -470,8 +464,6 @@ MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
- 
- static int __init init(void)
- {
--	int err;
+-	ctx->cryptd_tfm = cryptd_tfm;
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
+-		crypto_ablkcipher_reqsize(&cryptd_tfm->base);
+-}
 -
- 	if (!force && is_blacklisted_cpu()) {
- 		printk(KERN_INFO
- 			"blowfish-x86_64: performance on this CPU "
-@@ -480,37 +472,12 @@ static int __init init(void)
- 		return -ENODEV;
- 	}
+-static int ablk_ecb_init(struct crypto_tfm *tfm)
+-{
+ 	struct cryptd_ablkcipher *cryptd_tfm;
++	char drv_name[CRYPTO_MAX_ALG_NAME];
  
--	err = crypto_register_alg(&bf_alg);
--	if (err)
--		goto bf_err;
--	err = crypto_register_alg(&blk_ecb_alg);
--	if (err)
--		goto ecb_err;
--	err = crypto_register_alg(&blk_cbc_alg);
--	if (err)
--		goto cbc_err;
--	err = crypto_register_alg(&blk_ctr_alg);
--	if (err)
--		goto ctr_err;
--
+-	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-ecb-serpent-sse2", 0, 0);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-	ablk_init_common(tfm, cryptd_tfm);
 -	return 0;
+-}
 -
--ctr_err:
--	crypto_unregister_alg(&blk_cbc_alg);
--cbc_err:
--	crypto_unregister_alg(&blk_ecb_alg);
--ecb_err:
--	crypto_unregister_alg(&bf_alg);
--bf_err:
--	return err;
-+	return crypto_register_algs(bf_algs, ARRAY_SIZE(bf_algs));
+-static int ablk_cbc_init(struct crypto_tfm *tfm)
+-{
+-	struct cryptd_ablkcipher *cryptd_tfm;
++	snprintf(drv_name, sizeof(drv_name), "__driver-%s",
++					crypto_tfm_alg_driver_name(tfm));
+ 
+-	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-cbc-serpent-sse2", 0, 0);
++	cryptd_tfm = cryptd_alloc_ablkcipher(drv_name, 0, 0);
+ 	if (IS_ERR(cryptd_tfm))
+ 		return PTR_ERR(cryptd_tfm);
+-	ablk_init_common(tfm, cryptd_tfm);
+-	return 0;
+-}
+ 
+-static int ablk_ctr_init(struct crypto_tfm *tfm)
+-{
+-	struct cryptd_ablkcipher *cryptd_tfm;
+-
+-	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-ctr-serpent-sse2", 0, 0);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-	ablk_init_common(tfm, cryptd_tfm);
+-	return 0;
+-}
+-
+-static int ablk_lrw_init(struct crypto_tfm *tfm)
+-{
+-	struct cryptd_ablkcipher *cryptd_tfm;
+-
+-	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-lrw-serpent-sse2", 0, 0);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-	ablk_init_common(tfm, cryptd_tfm);
+-	return 0;
+-}
+-
+-static int ablk_xts_init(struct crypto_tfm *tfm)
+-{
+-	struct cryptd_ablkcipher *cryptd_tfm;
++	ctx->cryptd_tfm = cryptd_tfm;
++	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
++		crypto_ablkcipher_reqsize(&cryptd_tfm->base);
+ 
+-	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-xts-serpent-sse2", 0, 0);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-	ablk_init_common(tfm, cryptd_tfm);
+ 	return 0;
  }
  
- static void __exit fini(void)
- {
--	crypto_unregister_alg(&blk_ctr_alg);
--	crypto_unregister_alg(&blk_cbc_alg);
--	crypto_unregister_alg(&blk_ecb_alg);
--	crypto_unregister_alg(&bf_alg);
-+	crypto_unregister_algs(bf_algs, ARRAY_SIZE(bf_algs));
- }
- 
- module_init(init);
+@@ -858,7 +813,7 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_list		= LIST_HEAD_INIT(serpent_algs[5].cra_list),
+-	.cra_init		= ablk_ecb_init,
++	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+ 		.ablkcipher = {
+@@ -880,7 +835,7 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_list		= LIST_HEAD_INIT(serpent_algs[6].cra_list),
+-	.cra_init		= ablk_cbc_init,
++	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+ 		.ablkcipher = {
+@@ -903,7 +858,7 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_list		= LIST_HEAD_INIT(serpent_algs[7].cra_list),
+-	.cra_init		= ablk_ctr_init,
++	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+ 		.ablkcipher = {
+@@ -927,7 +882,7 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_list		= LIST_HEAD_INIT(serpent_algs[8].cra_list),
+-	.cra_init		= ablk_lrw_init,
++	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+ 		.ablkcipher = {
+@@ -952,7 +907,7 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_list		= LIST_HEAD_INIT(serpent_algs[9].cra_list),
+-	.cra_init		= ablk_xts_init,
++	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+ 		.ablkcipher = {
