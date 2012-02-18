@@ -1,42 +1,74 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 6/6] crypto: twofish-x86_64/i586 - set alignmask to zero
-Date: Fri, 17 Feb 2012 22:49:03 +0200
-Message-ID: <20120217204903.3744.60713.stgit@localhost6.localdomain6>
-References: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: otto@dedicatedserver.com.hk
+Subject: Web Design Service
+Date: Sat, 18 Feb 2012 14:39:58 +0800 (HKT)
+Message-ID: <SjLtTv0ogn4Q1G@mail.sysnet.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: otto@europeconcern.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34794 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753625Ab2BQUtF (ORCPT
+Received: from 124-248-200-48.sunnyvision.com ([124.248.200.48]:44953 "EHLO
+	teamb03.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752155Ab2BRIp3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Feb 2012 15:49:05 -0500
-In-Reply-To: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
+	Sat, 18 Feb 2012 03:45:29 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-x86 has fast unaligned accesses, so twofish-x86_64/i586 does not need to enforce
-alignment.
+Dear Sir / Madam, 
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
----
- arch/x86/crypto/twofish_glue.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Good morning, this is Otto from DS Hong Kong. 
 
-diff --git a/arch/x86/crypto/twofish_glue.c b/arch/x86/crypto/twofish_glue.c
-index dc6b3fb..359ae08 100644
---- a/arch/x86/crypto/twofish_glue.c
-+++ b/arch/x86/crypto/twofish_glue.c
-@@ -68,7 +68,7 @@ static struct crypto_alg alg = {
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	TF_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct twofish_ctx),
--	.cra_alignmask		=	3,
-+	.cra_alignmask		=	0,
- 	.cra_module		=	THIS_MODULE,
- 	.cra_list		=	LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u			=	{
+We are a web design house and programming service provider. As 14 years experience, we are professional to develop a website for your business. 
+
+In the Chinese New Year Festival, we have the following offer for your corporate. Please check. 
+
+Service=09Package
+
+Web Development and Programing Service
+*********************************************************
+1)=09Website Design Service =09=09=09($13,000)
+
+=09Maximum 10 Web Pages Development                                                 
+=09(Site Map will be confirmed later)
+=09All the tailor-made webpage design is included:
+-=09Theme / Visual Concept Development;
+-=09Design Study and Analysis / Art Direction;
+-=09Original Artwork & Layout Design;
+-=09Steady Web page development;
+-=09HTML Development for Search Engine Applicable;
+
+2)=09Web Programing Service =09=09=09($15,000)
+
+Content Management System (For 5 web pages)                                 
+-=09Standard CMS function for add / edit fields 
+-=09Max. 10 fields per each CMS section
+-=09CMS fields only for Text fields and photos upload fields
+-=09Photos upload only support (.jpg / .png / .bmp) 
+-=09Each field for one photos
+-=0920 pages / section for CMS function
+-=09Database support with un-limit data create;
+-=09Admin Panel with Login function (1 login account)
+
+
+*********************************************************
+
+Promotion Price: =09HKD $28,000.00
+Lead Time: =09=0932 working days
+
+If you have more special requirement, please let us know and we will provide more detail to you. 
+
+Please feel free to contact me.The following is my contact information. 
+
+Contact No: (852) 5108 9664
+
+Skype: yschiu2001 (yschiu2001@yahoo.com.hk)
+
+MSN: yschiu2001@yahoo.com.hk
+
+Email: otto@dedicatedserver.com.hk
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or remove your email from the list. 
+
+Best Regards
+Otto Chiu
+Dedicated Server Hong Kong
