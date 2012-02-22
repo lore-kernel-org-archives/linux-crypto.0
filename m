@@ -1,83 +1,45 @@
-From: design@dedicatedserver.com.hk
-Subject: Cloud server Promotion!!
-Date: Thu, 23 Feb 2012 01:53:28 +0800 (HKT)
-Message-ID: <wxAaC8hBkjR039__41049.0202055827$1329939935$gmane$org@gcn.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Subject: Re: mv_cesa hash functions
+Date: Wed, 22 Feb 2012 21:10:46 +0100
+Message-ID: <4F454BC6.7000409@gnutls.org>
+References: <005b01ccf162$64bd0520$2e370f60$@org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: 'Sebastian Andrzej Siewior' <sebastian@breakpoint.cc>,
+	uri@jdland.co.il, linux-crypto@vger.kernel.org
+To: Frank <frank@debian-nas.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-59.sunnyvision.com ([124.248.200.59]:36386 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754690Ab2BVTpN (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:40287 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752369Ab2BVUFJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Feb 2012 14:45:13 -0500
+	Wed, 22 Feb 2012 15:05:09 -0500
+Received: by wics10 with SMTP id s10so291819wic.19
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2012 12:05:08 -0800 (PST)
+In-Reply-To: <005b01ccf162$64bd0520$2e370f60$@org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear all, 
+On 02/22/2012 02:03 PM, Frank wrote:
 
-Please see below price list for cloud server package.
+> Hi,
+> 
+> After doing some trials with hardware crypto offloading through usermode interfaces (af_alg and cryptodev) to Marvell CESA accelerated ciphers and hash functions with the 3.2.4 kernel's mv_cesa in Debian Wheezy on a Marvell Kirkwood system, I've noticed the following kernel output when I load the mv_cesa kernel module:
+> 
+> [490889.448060] alg: hash: Test 1 failed for mv-sha1
+> [490889.452786] 00000000: c1 94 3f 2e a2 41 ce 88 d5 47 07 43 c4 a8 17 5d
+> [490889.459368] 00000010: 77 e8 47 ca
+> [490889.464321] alg: hash: Test 1 failed for mv-hmac-sha1
+> [490889.469493] 00000000: 06 71 4d 7c cc cc b5 cf 1b d6 c7 ab d0 25 c4 21
+> [490889.476068] 00000010: 66 0b 8e 70
+> Using SHA1 in a ssl/tls handshake fails in tests with mv_cesa loaded, which might be related to this.
 
-SuperCloud 512
-=A1E Dedicated CPU: 1.8GHZ
-=A1E Dedicated RAM: 512MB
-=A1E Disk Space: 20GB
-=A1E Bandwidth: 200GB
-HK$199/month
 
-SuperCloud 768
-=A1E Dedicated CPU: 2.4GHZ
-=A1E Dedicated RAM: 768MB
-=A1E Disk Space: 40GB
-=A1E Bandwidth: 300GB
-HK$399/month
+It might be related. I noticed the same issue in userspace with
+/dev/crypto. It can be solved by adding a 50 ms delay after the
+encryption, decryption and hashing operations. (a delay less than that
+didn't work).
 
-SuperCloud 1024
-=A1E Dedicated CPU: 3.0GHZ
-=A1E Dedicated RAM: 1024MB
-=A1E Disk Space: 60GB
-=A1E Bandwidth: 400GB
-HK$599/month
-
-SuperCloud 1536
-=A1E Dedicated CPU: 3.6GHZ
-=A1E Dedicated RAM: 1536MB
-=A1E Disk Space: 80GB
-=A1E Bandwidth: 600GB
-HK$699/month
-
-SuperCloud 2048
-=A1E Dedicated CPU: 4.2GHZ
-=A1E Dedicated RAM: 2048MB
-=A1E Disk Space: 100GB
-=A1E Bandwidth: 800GB
-HK$799/month
-
-SuperCoud 4096
-=A1E Dedicated CPU: 5.4GHZ
-=A1E Dedicated RAM: 4096MB
-=A1E Disk Space: 150GB
-=A1E Bandwidth: 1600GB
-HK$999/month
-
-SuperCloud 8G
-=A1E Dedicated CPU: 9.6GHZ
-=A1E Dedicated RAM: 8GB
-=A1E Disk Space: 300GB
-=A1E Bandwidth: 3000GB
-HK$1,299/month
-
-SuperCloud 12G
-=A1E Dedicated CPU: 12GHZ
-=A1E Dedicated RAM: 12GB
-=A1E Disk Space: 500GB
-=A1E Bandwidth: 5000GB
-HK$1,499/month
-
-Should you have any need. Please feel free to contact me, Thanks.
-
-Best Regards,
-Eric Chan
-Senior Sales Executive
-
-If you do not wish to further receive this event message, email subscriber@dedicatedserver.com.hk to unsubscribe this message or remove your email from the list.
+regards,
+Nikos
