@@ -1,34 +1,36 @@
-From: woodyng1985@yahoo.com.hk
-Subject: Hong Kong Server Rental Solution
-Date: Tue, 21 Feb 2012 00:11:56 +0800 (HKT)
-Message-ID: <RLnNqu__13547.3016104244$1329765307$gmane$org@microsoft.com>
+From: "Frank" <frank@debian-nas.org>
+Subject: mv_cesa hash functions
+Date: Wed, 22 Feb 2012 14:03:38 +0100
+Message-ID: <005b01ccf162$64bd0520$2e370f60$@org>
+Mime-Version: 1.0
 Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-crypto@vger.kernel.org>
+To: "'Sebastian Andrzej Siewior'" <sebastian@breakpoint.cc>,
+	<uri@jdland.co.il>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-57.sunnyvision.com ([124.248.200.57]:55116 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753098Ab2BTTO4 (ORCPT
+Received: from mail.leavis.eu ([46.182.104.51]:42064 "EHLO mail.leavis.eu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751186Ab2BVNYM convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Feb 2012 14:14:56 -0500
+	Wed, 22 Feb 2012 08:24:12 -0500
+Content-Language: en-us
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-For now, our TIA TIER 3+ IDC Dedicated Server Rental service is on a discount period!!
+Hi,
 
--=09   Intel(R) Xeon(R) E3-1220 Processor (3.10GHz, 8M Cache, Turbo, 4C/4T, 80W)
--=09   4GB RAM, 1x4GB, 1333MHz, DDR-3, Single Ranked UDIMMs
--=09   500GB, 3.5", SATA II x 2 Enterprise Hard Disk
--=09   Raid 1 Mirroring Protection
--                  Un-limit Data Transfer Bandwidth
+After doing some trials with hardware crypto offloading through usermode interfaces (af_alg and cryptodev) to Marvell CESA accelerated ciphers and hash functions with the 3.2.4 kernel's mv_cesa in Debian Wheezy on a Marvell Kirkwood system, I've noticed the following kernel output when I load the mv_cesa kernel module:
 
+[490889.448060] alg: hash: Test 1 failed for mv-sha1
+[490889.452786] 00000000: c1 94 3f 2e a2 41 ce 88 d5 47 07 43 c4 a8 17 5d
+[490889.459368] 00000010: 77 e8 47 ca
+[490889.464321] alg: hash: Test 1 failed for mv-hmac-sha1
+[490889.469493] 00000000: 06 71 4d 7c cc cc b5 cf 1b d6 c7 ab d0 25 c4 21
+[490889.476068] 00000010: 66 0b 8e 70
 
-Please contact +852 6756 9148 or email to woody@dedicatedserver.com.hk for any enquiry. Thanks.
+Using SHA1 in a ssl/tls handshake fails in tests with mv_cesa loaded, which might be related to this.
 
-
-Best Regards,
-Woody Ng
-
-
-
-If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
+Regards,
+Frank
