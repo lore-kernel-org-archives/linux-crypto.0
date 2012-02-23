@@ -1,64 +1,53 @@
-From: otto@dedicatedserver.com.hk
-Subject: Professional Web Design Service
-Date: Thu, 23 Feb 2012 12:39:34 +0800 (HKT)
-Message-ID: <QsEvCVDKLNo__28350.5281004638$1330002405$gmane$org@tpts4.seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: mv_cesa hash functions
+Date: Thu, 23 Feb 2012 15:17:15 +0100
+Message-ID: <20120223141715.GA3506@breakpoint.cc>
+References: <005b01ccf162$64bd0520$2e370f60$@org>
+ <4F454BC6.7000409@gnutls.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Frank <frank@debian-nas.org>, uri@jdland.co.il,
+	linux-crypto@vger.kernel.org
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-58.sunnyvision.com ([124.248.200.58]:46861 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752231Ab2BWNGi (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([85.10.199.196]:52176 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752642Ab2BWORW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Feb 2012 08:06:38 -0500
+	Thu, 23 Feb 2012 09:17:22 -0500
+Content-Disposition: inline
+In-Reply-To: <4F454BC6.7000409@gnutls.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Sir / Madam, 
+On Wed, Feb 22, 2012 at 09:10:46PM +0100, Nikos Mavrogiannopoulos wrote:
+> On 02/22/2012 02:03 PM, Frank wrote:
+> 
+> > Hi,
+> > 
+> > After doing some trials with hardware crypto offloading through usermode interfaces (af_alg and cryptodev) to Marvell CESA accelerated ciphers and hash functions with the 3.2.4 kernel's mv_cesa in Debian Wheezy on a Marvell Kirkwood system, I've noticed the following kernel output when I load the mv_cesa kernel module:
+> > 
+> > [490889.448060] alg: hash: Test 1 failed for mv-sha1
+> > [490889.452786] 00000000: c1 94 3f 2e a2 41 ce 88 d5 47 07 43 c4 a8 17 5d
+> > [490889.459368] 00000010: 77 e8 47 ca
+> > [490889.464321] alg: hash: Test 1 failed for mv-hmac-sha1
+> > [490889.469493] 00000000: 06 71 4d 7c cc cc b5 cf 1b d6 c7 ab d0 25 c4 21
+> > [490889.476068] 00000010: 66 0b 8e 70
+> > Using SHA1 in a ssl/tls handshake fails in tests with mv_cesa loaded, which might be related to this.
+> 
+> 
+> It might be related. I noticed the same issue in userspace with
+> /dev/crypto. It can be solved by adding a 50 ms delay after the
+> encryption, decryption and hashing operations. (a delay less than that
+> didn't work).
 
-Good morning, this is Otto from DS Hong Kong. 
+It might a missing cache flush before/after the opration or before passing
+the data to userland. I've seen that some hash operation fail which are not
+perfromed in one go but via the start, update, end path. However I had no
+time to get to the bottom of this.
 
-We are a web design house and programming service provider. As 14 years experience, we are professional to develop a website for your business. 
+> 
+> regards,
+> Nikos
 
-If you are looking for the web design or related programming service, we are offering the following special offer for our client. 
-
-*********************************************************
-1) Web Page Development
-- Maximum 20 Web Page 
-- Art and Theme Design Include
-- Unlimited web layout revise
-
-2) Content Management System
-- HTML Editor 
-- Support Product, Photo and Text updating. 
-- Maximum 10 Web Page 
-- Admin Panel with 1 Admin Login
-
-
-*********************************************************
-
-Promotion Price: =09HKD $28,000.00
-Lead Time: =09=0932 working days
-
-Our Reference
-http://mirabell.com.hk/slideshow/index.html
-http://www.gome.com.hk/
-http://www.joy-peace.com/
-
-If you have more special requirement, please let us know and we will provide more detail to you. 
-
-Please feel free to contact me.The following is my contact information. 
-
-Contact No: (852) 5108 9664
-
-Skype: yschiu2001 (yschiu2001@yahoo.com.hk)
-
-MSN: yschiu2001@yahoo.com.hk
-
-Email: otto@dedicatedserver.com.hk
-
-If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or remove your email from the list. 
-
-Best Regards
-Otto Chiu
-Dedicated Server Hong Kong
+Sebastian
