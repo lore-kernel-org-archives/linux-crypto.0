@@ -1,77 +1,73 @@
-From: Phil Sutter <phil@nwl.cc>
-Subject: Re: mv_cesa hash functions
-Date: Thu, 23 Feb 2012 19:34:39 +0100
-Message-ID: <20120223183439.GA18545@orbit.nwl.cc>
-References: <005b01ccf162$64bd0520$2e370f60$@org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: 'Sebastian Andrzej Siewior' <sebastian@breakpoint.cc>,
-	uri@jdland.co.il, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.arm.linux.org.uk,
-	Simon Baatz <simon2012@baatz.info>
-To: Frank <frank@debian-nas.org>
+From: otto@cloudluca.com
+Subject: Web Design Service
+Date: Fri, 24 Feb 2012 01:13:10 +0800 (HKT)
+Message-ID: <mwz__34359.7390725792$1330041554$gmane$org@ara.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orbit.nwl.cc ([91.121.141.167]:44504 "EHLO orbit.nwl.cc"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752588Ab2BWSpF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Feb 2012 13:45:05 -0500
-Content-Disposition: inline
-In-Reply-To: <005b01ccf162$64bd0520$2e370f60$@org>
+Received: from 124-248-200-54.sunnyvision.com ([124.248.200.54]:36234 "EHLO
+	teamb02.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S932219Ab2BWX6p (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Feb 2012 18:58:45 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Dear Sir / Madam, 
 
-On Wed, Feb 22, 2012 at 02:03:38PM +0100, Frank wrote:
-> After doing some trials with hardware crypto offloading through usermode interfaces (af_alg and cryptodev) to Marvell CESA accelerated ciphers and hash functions with the 3.2.4 kernel's mv_cesa in Debian Wheezy on a Marvell Kirkwood system, I've noticed the following kernel output when I load the mv_cesa kernel module:
-> 
-> [490889.448060] alg: hash: Test 1 failed for mv-sha1
-> [490889.452786] 00000000: c1 94 3f 2e a2 41 ce 88 d5 47 07 43 c4 a8 17 5d
-> [490889.459368] 00000010: 77 e8 47 ca
-> [490889.464321] alg: hash: Test 1 failed for mv-hmac-sha1
-> [490889.469493] 00000000: 06 71 4d 7c cc cc b5 cf 1b d6 c7 ab d0 25 c4 21
-> [490889.476068] 00000010: 66 0b 8e 70
+Good morning, this is Otto from Cloudluca.com. 
 
-I've tracked down the problem to commit 6ef8450, "crypto: mv_cesa - make
-count_sgs() null-pointer proof". So apparently it was me who broke it.
+We are a web design house and programming service provider. As 14 years experience, we are professional to develop a website for your business. 
 
-The simpification introduced by that commit assumes a zero 'nbytes'
-field in the ahash_request struct passed to mv_hash_final, but
-crypto/testmgr.c calls crypto_ahash_update() and crypto_ahash_final()
-without altering the ahash_request in between.
+In the Chinese New Year Festival, we have the following offer for your corporate. Please check. 
 
-Herbert, please clarify: is it intended behaviour that ahash_alg's final
-callback ignores possibly present data in the request? If I wanted to
-finalise a hash operation with some final data, would I then use the
-finup callback instead? (Note the implied question of the actual
-difference between the two callbacks.)
+Service=09Package
 
-If my assumptions are correct, fixing this issue would be as easy as
-adding a call to ahash_request_set_crypt() to mv_hash_final(). Or
-manually zeroing req->nbytes, but that's probably unclean. Anyway, if
-the 'final' callback is always to ignore request data, why doesn't the
-API do this already? At least mv_cesa could use a single function for
-both callbacks then.
+Web Development and Programing Service
+*********************************************************
+1)=09Website Design Service =09=09=09($13,000)
 
-> Using SHA1 in a ssl/tls handshake fails in tests with mv_cesa loaded, which might be related to this.
+=09Maximum 10 Web Pages Development                                                 
+=09(Site Map will be confirmed later)
+=09All the tailor-made webpage design is included:
+-=09Theme / Visual Concept Development;
+-=09Design Study and Analysis / Art Direction;
+-=09Original Artwork & Layout Design;
+-=09Steady Web page development;
+-=09HTML Development for Search Engine Applicable;
 
-You are using cryptodev-linux for that, right? If so, this should be
-unrelated since cryptodev-linux always calls crypto_ahash_final() with
-an empty request payload (from cryptodev_cipher.c):
+2)=09Web Programing Service =09=09=09($15,000)
 
-| ahash_request_set_crypt(hdata->async.request, NULL, output, 0);
-| 
-| ret = crypto_ahash_final(hdata->async.request);
+Content Management System (For 5 web pages)                                 
+-=09Standard CMS function for add / edit fields 
+-=09Max. 10 fields per each CMS section
+-=09CMS fields only for Text fields and photos upload fields
+-=09Photos upload only support (.jpg / .png / .bmp) 
+-=09Each field for one photos
+-=0920 pages / section for CMS function
+-=09Database support with un-limit data create;
+-=09Admin Panel with Login function (1 login account)
 
-But you might suffer from another problem, which is only present on ARM
-machines with VIVT cache and linux >= 2.6.37: due to commit f8b63c1,
-"ARM: 6382/1: Remove superfluous flush_kernel_dcache_page()" which
-prevents pages being flushed from inside the scatterlist iterator API.
-This patch seems to introduce problems in other places (namely NFS), too
-but I sadly did not have time to investigate this further. I will post a
-possible (cryptodev-internal) solution to cryptodev-linux-devel@gna.org,
-maybe this fixes the problem with openssl.
 
-Greetings, Phil
+*********************************************************
+
+Promotion Price: =09HKD $28,000.00
+Lead Time: =09=0932 working days
+
+If you have more special requirement, please let us know and we will provide more detail to you. 
+
+Please feel free to contact me.The following is my contact information. 
+
+Contact No: (852) 5108 9664
+
+Skype: yschiu2001 (yschiu2001@yahoo.com.hk)
+
+MSN: yschiu2001@yahoo.com.hk
+
+Email: otto@dedicatedserver.com.hk
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or remove your email from the list. 
+
+Best Regards
+Otto Chiu
