@@ -1,103 +1,82 @@
-From: timlee@sina.com
-Subject: =?GBK?B?UmWjukhpdCBPT1BTIG9uIEZQVSBzYXZlIGFuZCByZXN0b3JlIHdoaWxlIHVzZWluZyBBRVNOSSBmb3IgSVBTZWMgIG9uIDMyIGJpdCBTeXN0ZW0=?=
-Date: Thu, 23 Feb 2012 10:55:55 +0800
-Message-ID: <20120223025744.9EADF153401@mail3-79.sinamail.sina.com.cn>
+From: Andreas Westin <andreas.westin@stericsson.com>
+Subject: [PATCH 0/2] crypto: ux500 crypto and hash driver
+Date: Thu, 23 Feb 2012 13:58:55 +0100
+Message-ID: <1330001937-2108-1-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-To: linux-crypto <linux-crypto@vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+	Andreas Westin <andreas.westin@stericsson.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail7-217.sinamail.sina.com.cn ([202.108.7.217]:54957 "EHLO
-	smtp.sina.com.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751664Ab2BWC5r (ORCPT
+Received: from eu1sys200aog107.obsmtp.com ([207.126.144.123]:36247 "EHLO
+	eu1sys200aog107.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751901Ab2BWNE3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Feb 2012 21:57:47 -0500
-Received: from irxd5-183.sinamail.sina.com.cn (unknown [10.55.5.183])
-	by smtp.sina.com.cn (SINAMAIL) with ESMTP id 4B59CABCEF7
-	for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2012 10:57:45 +0800 (CST)
+	Thu, 23 Feb 2012 08:04:29 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-QW5vdGhlciBPb3BzIG1lc3NhZ2VzIGZvciBGUFUgcmVzdG9yZSBhcmUgYXMgYmVsb3c6DQo8c25p
-cD4NCklQOiBbPGMxMDBiY2JlPl0gX19tYXRoX3N0YXRlX3Jlc3RvcmUrMHg1ZS8weDgwDQpPb3Bz
-OiAwMDAwIFsjMV0gU01QDQpsYXN0IHN5c2ZzIGZpbGU6IC9zeXMvbW9kdWxlL3NlcnBlbnQvaW5p
-dHN0YXRlDQoNCjwwPiBDYWxsIFRyYWNlOg0KPyBkb19kZXZpY2Vfbm90X2F2YWlsYWJsZSsweDAv
-MHgyMA0KbWF0Y2hfc3RhdGVfcmVzdG9yZSsweDM5LzB4NTANCmRvX2RldmljZV9ub3RfYXZhaWxh
-YmxlKzB4MTAvMHgyMA0KZXJyb3JfY29kZSsweDY3LzB4NmMNCj9mbHVzaF90aHJlYWQrMHgzZi8w
-eDcwDQpmbHVzaF9vbGRfZXhlYysweDQxOS8weDU5MA0KbG9hZF9lbGZfYmluYXJ5KzB4MjVjLzB4
-MTI5MA0KP2RlZmF1bHRfc3Bpbl9sb2NrX2ZsYWdzKzB4OC8weDEwDQo/X3Jhd19zcGluX2xvY2tf
-ZmxhZ3MrMHgyZi8weDUwDQo/cGFnZV9hZGRyZXNzKzB4ZDMvMHhlMA0KP2RlZmF1bHRfc3Bpbl9s
-b2NrX2ZsYWdzKzB4OC8weDEwDQo/X3Jhd19zcGluX2xvY2tfZmxhZ3MrMHgyZi8weDUwDQo/cGFn
-ZV9hZGRyZXNzKzB4ZDMvMHhlMA0KP2t1bm1hcF9oaWdoKzB4NmYvMHhhMA0KP19jb3B5X2Zyb21f
-dXNlcisweDQ0LzB4NzANCnNlYXJjaF9iaW5hcnlfaGFuZGxlcisweGIyLzB4MmIwDQo/bG9hZF9l
-bGZfYmluYXJ5KzB4MC8weDEyOTANCmRvX2V4ZWN2ZSsweDM3LzB4NzANCnB0cmVnc19leGVjdmUr
-MHgxMi8weDE4DQo/c3lzZW50ZXJfZG9fY2FsbCsweDEyLzB4MjgNCjwvc25pcD4NCg0KZGVjb2Rl
-cw0KPHNuaXA+DQoweGMxMDBiY2JlIGluIGZ4cnN0b3JfY2hlY2tpbmcgKCkgYXQgL2xpbnV4LXNv
-dXJjZS0yLjYuMzgvYXJjaC94ODYvaW5jbHVkZS9hc20vaTM4Ny5oOjE5OA0KMTk4ICAgICAgICAg
-ICAgIGFsdGVybmF0aXZlX2lucHV0KA0KKGdkYikgYnQNCiMwICAweGMxMDBiY2JlIGluIGZ4cnN0
-b3JfY2hlY2tpbmcgKCkgYXQgL2xpbnV4LXNvdXJjZS0yLjYuMzgvYXJjaC94ODYvaW5jbHVkZS9h
-c20vaTM4Ny5oOjE5OA0KIzEgIGZwdV9meHJzdG9yX2NoZWNraW5nICgpIGF0IC9saW51eC1zb3Vy
-Y2UtMi42LjM4L2FyY2gveDg2L2luY2x1ZGUvYXNtL2kzODcuaDoyNjcNCiMyICBmcHVfcmVzdG9y
-ZV9jaGVja2luZyAoKSBhdCAvbGludXgtc291cmNlLTIuNi4zOC9hcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9pMzg3Lmg6Mjc1DQojMyAgcmVzdG9yZV9mcHVfY2hlY2tpbmcgKCkgYXQgL2xpbnV4LXNvdXJj
-ZS0yLjYuMzgvYXJjaC94ODYvaW5jbHVkZS9hc20vaTM4Ny5oOjI4MA0KIzQgIF9fbWF0aF9zdGF0
-ZV9yZXN0b3JlICgpIGF0IGFyY2gveDg2L2tlcm5lbC90cmFwcy5jOjgyNg0KIzUgIDB4YzEwMGJk
-MTkgaW4gbWF0aF9zdGF0ZV9yZXN0b3JlICgpIGF0IGFyY2gveDg2L2tlcm5lbC90cmFwcy5jOjg2
-OA0KIzYgIDB4YzE1MjM2NDAgaW4gZG9fZGV2aWNlX25vdF9hdmFpbGFibGUgKHJlZ3M9MHhmMDA5
-N2UyNCwgZXJyb3JfY29kZT08dmFsdWUgb3B0aW1pemVkIG91dD4pIGF0IGFyY2gveDg2L2tlcm5l
-bC90cmFwcy5jOjg4Ng0KIzcgIDxzaWduYWwgaGFuZGxlciBjYWxsZWQ+DQojOCAgX19jbGVhcl9m
-cHUgKCkgYXQgL2xpbnV4LXNvdXJjZS0yLjYuMzgvYXJjaC94ODYvaW5jbHVkZS9hc20vaTM4Ny5o
-OjMwMg0KIzkgIGNsZWFyX2ZwdSAoKSBhdCAvbGludXgtc291cmNlLTIuNi4zOC9hcmNoL3g4Ni9p
-bmNsdWRlL2FzbS9pMzg3Lmg6Mzg2DQojMTAgZmx1c2hfdGhyZWFkICgpIGF0IGFyY2gveDg2L2tl
-cm5lbC9wcm9jZXNzLmM6MTMyDQojMTEgMHhjMTEzMjIyOSBpbiBmbHVzaF9vbGRfZXhlYyAoYnBy
-bT0weGYwMThkNjAwKSBhdCBmcy9leGVjLmM6MTA0OA0KIzEyIDB4YzExNmJmMWMgaW4gbG9hZF9l
-bGZfYmluYXJ5IChicHJtPTB4ZjAxOGQ2MDAsIHJlZ3M9MHhmMDA5N2ZiNCkgYXQgZnMvYmluZm10
-X2VsZi5jOjcxMQ0KIzEzIDB4YzExMzE3ZDIgaW4gc2VhcmNoX2JpbmFyeV9oYW5kbGVyIChicHJt
-PTB4ZjAxOGQ2MDAsIHJlZ3M9MHhmMDA5N2ZiNCkgYXQgZnMvZXhlYy5jOjEzMjkNCiMxNCAweGMx
-MTMyZDJmIGluIGRvX2V4ZWN2ZSAoZmlsZW5hbWU9PHZhbHVlIG9wdGltaXplZCBvdXQ+LCBhcmd2
-PTB4YmZlZjQwNzQsIGVudnA9MHhiZmVmNDA3YywgcmVncz0weGYwMDk3ZmI0KSBhdCBmcy9leGVj
-LmM6MTQ1MA0KIzE1IDB4YzEwMTI4ZTcgaW4gc3lzX2V4ZWN2ZSAobmFtZT08dmFsdWUgb3B0aW1p
-emVkIG91dD4sIGFyZ3Y9MHhiZmVmNDA3NCwgZW52cD0weGJmZWY0MDdjLCByZWdzPTB4ZjAwOTdm
-YjQpIGF0IGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmM6MzIwDQojMTYgMHhjMTAwYWFlZSBpbiA/
-PyAoKSBhdCBhcmNoL3g4Ni9rZXJuZWwvZW50cnlfMzIuUzo3MjkNCiMxNyA8c2lnbmFsIGhhbmRs
-ZXIgY2FsbGVkPg0KIzE4IDB4Yjc4ZGE0MjQgaW4gPz8gKCkNCkNhbm5vdCBhY2Nlc3MgbWVtb3J5
-IGF0IGFkZHJlc3MgMHhiZmVmM2Y2NA0KKGdkYikNCg0KQ29kZTogMmYgODUgYzkgNzUgMmIgODMg
-NGIgMGMgMDEgODAgODYgODAgMDEgMDAgMDAgMDEgOGIgMWMgMjQgOGIgNzQgMjQgMDQgOGIgN2Mg
-MjQgMDggODkgZWMgNWQgYzMgOGQgYjYgMDAgMDAgMDAgMDAgOGIgODYgNGMgMDMgMDAgMDAgPDBm
-PiBhZSAwOCBlYiBkNSBlOCAzOCA3NiAwMiAwMCA5MCA4MyBjOCAwOCBlOCAzZiA3NiAwMiAwMCA5
-MCBiOA0KDQpyb290QGRuc3VidW50dTovbGludXgtc291cmNlLTIuNi4zOCMgZWNobyAiQ29kZTog
-MmYgODUgYzkgNzUgMmIgODMgNGIgMGMgMDEgODAgODYgODAgMDEgMDAgMDAgMDEgOGIgMWMgMjQg
-OGIgNzQgMjQgMDQgOGIgN2MgMjQgMDggODkgZWMgNWQgYzMgOGQgYjYgMDAgMDAgMDAgMDAgOGIg
-ODYgNGMgMDMgMDAgMDAgPDBmPiBhZSAwOCBlYiBkNSBlOCAzOCA3NiAwMiAwMCA5MCA4MyBjOCAw
-OCBlOCAzZiA3NiAwMiAwMCA5MCBiOCIgfCAuL3NjcmlwdHMvZGVjb2RlY29kZQ0KQ29kZTogMmYg
-ODUgYzkgNzUgMmIgODMgNGIgMGMgMDEgODAgODYgODAgMDEgMDAgMDAgMDEgOGIgMWMgMjQgOGIg
-NzQgMjQgMDQgOGIgN2MgMjQgMDggODkgZWMgNWQgYzMgOGQgYjYgMDAgMDAgMDAgMDAgOGIgODYg
-NGMgMDMgMDAgMDAgPDBmPiBhZSAwOCBlYiBkNSBlOCAzOCA3NiAwMiAwMCA5MCA4MyBjOCAwOCBl
-OCAzZiA3NiAwMiAwMCA5MCBiOA0KQWxsIGNvZGUNCj09PT09PT09DQogICAwOiAgIDJmICAgICAg
-ICAgICAgICAgICAgICAgIGRhcw0KICAgMTogICA4NSBjOSAgICAgICAgICAgICAgICAgICB0ZXN0
-ICAgJWVjeCwlZWN4DQogICAzOiAgIDc1IDJiICAgICAgICAgICAgICAgICAgIGpuZSAgICAweDMw
-DQogICA1OiAgIDgzIDRiIDBjIDAxICAgICAgICAgICAgIG9ybCAgICAkMHgxLDB4YyglZWJ4KQ0K
-ICAgOTogICA4MCA4NiA4MCAwMSAwMCAwMCAwMSAgICBhZGRiICAgJDB4MSwweDE4MCglZXNpKQ0K
-ICAxMDogICA4YiAxYyAyNCAgICAgICAgICAgICAgICBtb3YgICAgKCVlc3ApLCVlYngNCiAgMTM6
-ICAgOGIgNzQgMjQgMDQgICAgICAgICAgICAgbW92ICAgIDB4NCglZXNwKSwlZXNpDQogIDE3OiAg
-IDhiIDdjIDI0IDA4ICAgICAgICAgICAgIG1vdiAgICAweDgoJWVzcCksJWVkaQ0KICAxYjogICA4
-OSBlYyAgICAgICAgICAgICAgICAgICBtb3YgICAgJWVicCwlZXNwDQogIDFkOiAgIDVkICAgICAg
-ICAgICAgICAgICAgICAgIHBvcCAgICAlZWJwDQogIDFlOiAgIGMzICAgICAgICAgICAgICAgICAg
-ICAgIHJldA0KICAxZjogICA4ZCBiNiAwMCAwMCAwMCAwMCAgICAgICBsZWEgICAgMHgwKCVlc2kp
-LCVlc2kNCiAgMjU6ICAgOGIgODYgNGMgMDMgMDAgMDAgICAgICAgbW92ICAgIDB4MzRjKCVlc2kp
-LCVlYXgNCiAgMmI6KiAgMGYgYWUgMDggICAgICAgICAgICAgICAgZnhyc3RvciAoJWVheCkgICAg
-IDwtLSB0cmFwcGluZyBpbnN0cnVjdGlvbg0KICAyZTogICBlYiBkNSAgICAgICAgICAgICAgICAg
-ICBqbXAgICAgMHg1DQogIDMwOiAgIGU4IDM4IDc2IDAyIDAwICAgICAgICAgIGNhbGwgICAweDI3
-NjZkDQogIDM1OiAgIDkwICAgICAgICAgICAgICAgICAgICAgIG5vcA0KICAzNjogICA4MyBjOCAw
-OCAgICAgICAgICAgICAgICBvciAgICAgJDB4OCwlZWF4DQogIDM5OiAgIGU4IDNmIDc2IDAyIDAw
-ICAgICAgICAgIGNhbGwgICAweDI3NjdkDQogIDNlOiAgIDkwICAgICAgICAgICAgICAgICAgICAg
-IG5vcA0KICAzZjogICBiOCAgICAgICAgICAgICAgICAgICAgICAuYnl0ZSAweGI4DQoNCkNvZGUg
-c3RhcnRpbmcgd2l0aCB0aGUgZmF1bHRpbmcgaW5zdHJ1Y3Rpb24NCj09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT0NCiAgIDA6ICAgMGYgYWUgMDggICAgICAgICAgICAg
-ICAgZnhyc3RvciAoJWVheCkNCiAgIDM6ICAgZWIgZDUgICAgICAgICAgICAgICAgICAgam1wICAg
-IDB4ZmZmZmZmZGENCiAgIDU6ICAgZTggMzggNzYgMDIgMDAgICAgICAgICAgY2FsbCAgIDB4Mjc2
-NDINCiAgIGE6ICAgOTAgICAgICAgICAgICAgICAgICAgICAgbm9wDQogICBiOiAgIDgzIGM4IDA4
-ICAgICAgICAgICAgICAgIG9yICAgICAkMHg4LCVlYXgNCiAgIGU6ICAgZTggM2YgNzYgMDIgMDAg
-ICAgICAgICAgY2FsbCAgIDB4Mjc2NTINCiAgMTM6ICAgOTAgICAgICAgICAgICAgICAgICAgICAg
-bm9wDQogIDE0OiAgIGI4ICAgICAgICAgICAgICAgICAgICAgIC5ieXRlIDB4YjgNCjwvc25pcD4N
-Cg0KDQpUaGFua3MgJiBSZWdhcmRzDQoNClRpbUxlZQ==
+Hi,
+
+This adds a driver for the ST-Ericsson ux500 hardware
+crypto and hash module.
+
+It supports:
+* AES with 128, 192 and 256bit keysize and ECB, CBC and CTR modes.
+* DES and 3DES
+* SHA-1 and SHA-256
+
+One patch for the driver and one for core support.
+
+/Andreas
+
+Andreas Westin (2):
+  crypto: ux500 - Add driver for CRYP/HASH hardware.
+  mach-ux500: Crypto: core support for CRYP/HASH module.
+
+ arch/arm/mach-ux500/board-mop500.c              |   48 +
+ arch/arm/mach-ux500/board-u5500.c               |   48 +
+ arch/arm/mach-ux500/clock.c                     |   18 +-
+ arch/arm/mach-ux500/devices-common.c            |   16 +
+ arch/arm/mach-ux500/devices-common.h            |   23 +
+ arch/arm/mach-ux500/devices-db5500.h            |    5 +
+ arch/arm/mach-ux500/devices-db8500.h            |    5 +
+ arch/arm/mach-ux500/include/mach/crypto-ux500.h |   21 +
+ arch/arm/mach-ux500/include/mach/devices.h      |    3 +
+ arch/arm/mach-ux500/ste-dma40-db5500.h          |    9 +-
+ drivers/crypto/Kconfig                          |   11 +
+ drivers/crypto/Makefile                         |    1 +
+ drivers/crypto/ux500/Kconfig                    |   29 +
+ drivers/crypto/ux500/Makefile                   |    8 +
+ drivers/crypto/ux500/cryp/Makefile              |   13 +
+ drivers/crypto/ux500/cryp/cryp.c                |  418 +++++
+ drivers/crypto/ux500/cryp/cryp.h                |  308 +++
+ drivers/crypto/ux500/cryp/cryp_core.c           | 2276 +++++++++++++++++++++++
+ drivers/crypto/ux500/cryp/cryp_irq.c            |   45 +
+ drivers/crypto/ux500/cryp/cryp_irq.h            |   31 +
+ drivers/crypto/ux500/cryp/cryp_irqp.h           |  125 ++
+ drivers/crypto/ux500/cryp/cryp_p.h              |  124 ++
+ drivers/crypto/ux500/hash/Makefile              |   11 +
+ drivers/crypto/ux500/hash/hash_alg.h            |  387 ++++
+ drivers/crypto/ux500/hash/hash_alg_p.h          |   26 +
+ drivers/crypto/ux500/hash/hash_core.c           | 2036 ++++++++++++++++++++
+ 26 files changed, 6034 insertions(+), 11 deletions(-)
+ create mode 100644 arch/arm/mach-ux500/include/mach/crypto-ux500.h
+ create mode 100644 drivers/crypto/ux500/Kconfig
+ create mode 100644 drivers/crypto/ux500/Makefile
+ create mode 100644 drivers/crypto/ux500/cryp/Makefile
+ create mode 100644 drivers/crypto/ux500/cryp/cryp.c
+ create mode 100644 drivers/crypto/ux500/cryp/cryp.h
+ create mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
+ create mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
+ create mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
+ create mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
+ create mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
+ create mode 100644 drivers/crypto/ux500/hash/Makefile
+ create mode 100644 drivers/crypto/ux500/hash/hash_alg.h
+ create mode 100644 drivers/crypto/ux500/hash/hash_alg_p.h
+ create mode 100644 drivers/crypto/ux500/hash/hash_core.c
+
+-- 
+1.7.9
