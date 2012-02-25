@@ -1,37 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: mv_cesa hash functions
-Date: Sat, 25 Feb 2012 18:38:12 +1100
-Message-ID: <20120225073806.GA19079@gondor.apana.org.au>
-References: <005b01ccf162$64bd0520$2e370f60$@org> <20120223183439.GA18545@orbit.nwl.cc>
+Subject: Re: Hit OOPS on FPU save and restore while useing AESNI for IPSec
+	on 32 bit System
+Date: Sat, 25 Feb 2012 19:37:02 +1100
+Message-ID: <20120225083702.GA19389@gondor.apana.org.au>
+References: <20120223021435.BEE08153400@mail3-79.sinamail.sina.com.cn>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Frank <frank@debian-nas.org>,
-	'Sebastian Andrzej Siewior' <sebastian@breakpoint.cc>,
-	uri@jdland.co.il, linux-crypto@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.arm.linux.org.uk,
-	Simon Baatz <simon2012@baatz.info>
+Cc: linux-crypto@vger.kernel.org
+To: timlee@sina.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:33647 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:48605 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754250Ab2BYIJE (ORCPT
+	with ESMTP id S1752640Ab2BYIhH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 25 Feb 2012 03:09:04 -0500
+	Sat, 25 Feb 2012 03:37:07 -0500
 Content-Disposition: inline
-In-Reply-To: <20120223183439.GA18545@orbit.nwl.cc>
+In-Reply-To: <20120223021435.BEE08153400@mail3-79.sinamail.sina.com.cn>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 23, 2012 at 07:34:39PM +0100, Phil Sutter wrote:
->
-> Herbert, please clarify: is it intended behaviour that ahash_alg's final
-> callback ignores possibly present data in the request? If I wanted to
-> finalise a hash operation with some final data, would I then use the
-> finup callback instead? (Note the implied question of the actual
-> difference between the two callbacks.)
+timlee@sina.com wrote:
+> Hi All,
+> 
+> Recently I hit an OOPS on FPU save/restore in Linux version 2.6.38.8 using aesni_intel_asm.S and aesni_intel_glue.c for native IPSec(netkey) on 32bit System. The same OOPS were found in versions 2.6.39.4, 3.0.x and 3.1.x.But I did not hit this problem in 64 bit system for all these versions.
+> 
+> My platform information: 
+> "Linux dnsubuntu 2.6.38.8 #7 SMP Sat Nov 12 03:11:12 CST 2011 i686 i686 i386 GNU/Linux"
 
-final should ignore any data present in the request.  So we should
-fix this up in mv_cesa.
+Please try the latest git tree (rc4).  It should be fixed.
 
 Cheers,
 -- 
