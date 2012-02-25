@@ -1,36 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: ux500 - Add driver for CRYP/HASH hardware.
-Date: Sat, 25 Feb 2012 20:21:31 +1100
-Message-ID: <20120225092130.GA19592@gondor.apana.org.au>
-References: <1330091841-10709-1-git-send-email-andreas.westin@stericsson.com> <1330091841-10709-2-git-send-email-andreas.westin@stericsson.com>
+Subject: Re: [PATCH 1/6] crypto: serpent-sse2 - use crypto_[un]register_algs
+Date: Sat, 25 Feb 2012 20:22:24 +1100
+Message-ID: <20120225092224.GA19638@gondor.apana.org.au>
+References: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:40366 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:56119 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755316Ab2BYJVi (ORCPT
+	with ESMTP id S1755316Ab2BYJW1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 25 Feb 2012 04:21:38 -0500
+	Sat, 25 Feb 2012 04:22:27 -0500
 Content-Disposition: inline
-In-Reply-To: <1330091841-10709-2-git-send-email-andreas.westin@stericsson.com>
+In-Reply-To: <20120217204837.3744.54155.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 24, 2012 at 02:57:20PM +0100, Andreas Westin wrote:
-> This crypto hardware module is used in ST-Ericsson U8500
-> boards. It supports AES, DES, SHA-1 and SHA-2. This driver implements
-> support for AES-ECB, CBC and CTR, DES, 3DES and both supported SHA modes.
+On Fri, Feb 17, 2012 at 10:48:37PM +0200, Jussi Kivilinna wrote:
+> Combine all crypto_alg to be registered and use new crypto_[un]register_algs
+> functions. Simplifies init/exit code and reduce object size.
 > 
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Andreas Westin <andreas.westin@stericsson.com>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-Sorry, your patch doesn't apply against the cryptodev tree.  So
-either it was damaged in transit, or you based it on something else.
-
-Cheers,
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
