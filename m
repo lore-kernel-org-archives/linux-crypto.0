@@ -1,33 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Hit OOPS on FPU save and restore while useing AESNI for IPSec
-	on 32 bit System
-Date: Sat, 25 Feb 2012 19:37:02 +1100
-Message-ID: <20120225083702.GA19389@gondor.apana.org.au>
-References: <20120223021435.BEE08153400@mail3-79.sinamail.sina.com.cn>
+Subject: Re: [PATCH 1/2] crypto: ux500 - Add driver for CRYP/HASH hardware.
+Date: Sat, 25 Feb 2012 20:21:31 +1100
+Message-ID: <20120225092130.GA19592@gondor.apana.org.au>
+References: <1330091841-10709-1-git-send-email-andreas.westin@stericsson.com> <1330091841-10709-2-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: timlee@sina.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:48605 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:40366 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752640Ab2BYIhH (ORCPT
+	with ESMTP id S1755316Ab2BYJVi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 25 Feb 2012 03:37:07 -0500
+	Sat, 25 Feb 2012 04:21:38 -0500
 Content-Disposition: inline
-In-Reply-To: <20120223021435.BEE08153400@mail3-79.sinamail.sina.com.cn>
+In-Reply-To: <1330091841-10709-2-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-timlee@sina.com wrote:
-> Hi All,
+On Fri, Feb 24, 2012 at 02:57:20PM +0100, Andreas Westin wrote:
+> This crypto hardware module is used in ST-Ericsson U8500
+> boards. It supports AES, DES, SHA-1 and SHA-2. This driver implements
+> support for AES-ECB, CBC and CTR, DES, 3DES and both supported SHA modes.
 > 
-> Recently I hit an OOPS on FPU save/restore in Linux version 2.6.38.8 using aesni_intel_asm.S and aesni_intel_glue.c for native IPSec(netkey) on 32bit System. The same OOPS were found in versions 2.6.39.4, 3.0.x and 3.1.x.But I did not hit this problem in 64 bit system for all these versions.
-> 
-> My platform information: 
-> "Linux dnsubuntu 2.6.38.8 #7 SMP Sat Nov 12 03:11:12 CST 2011 i686 i686 i386 GNU/Linux"
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Andreas Westin <andreas.westin@stericsson.com>
 
-Please try the latest git tree (rc4).  It should be fixed.
+Sorry, your patch doesn't apply against the cryptodev tree.  So
+either it was damaged in transit, or you based it on something else.
 
 Cheers,
 -- 
