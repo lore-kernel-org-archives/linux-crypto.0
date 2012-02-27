@@ -1,40 +1,34 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: [PATCH] crypto: mv_cesa - fix final callback not ignoring input data
-Date: Mon, 27 Feb 2012 12:17:04 +0100
-Message-ID: <1330341424-27438-1-git-send-email-phil.sutter@viprinet.com>
-References: <20120225073806.GA19079@gondor.apana.org.au>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, <stable@kernel.org>,
-	#@zimbra.vipri.net, 3.0+@zimbra.vipri.net
-To: linux-crypto@vger.kernel.org
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 0/2 v2] crypto: ux500 crypto and hash driver
+Date: Mon, 27 Feb 2012 13:28:20 -0600
+Message-ID: <20120227132820.3c9f16427a9531670c681937@freescale.com>
+References: <1330335138-14868-1-git-send-email-andreas.westin@stericsson.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
+To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:37150 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751886Ab2B0L0z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Feb 2012 06:26:55 -0500
-In-Reply-To: <20120225073806.GA19079@gondor.apana.org.au>
+Received: from am1ehsobe003.messaging.microsoft.com ([213.199.154.206]:25807
+	"EHLO AM1EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753982Ab2B0T34 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Feb 2012 14:29:56 -0500
+In-Reply-To: <1330335138-14868-1-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Broken by commit 6ef84509f3d439ed2d43ea40080643efec37f54f for users
-passing a request with non-zero 'nbytes' field, like e.g. testmgr.
+On Mon, 27 Feb 2012 10:32:16 +0100
+Andreas Westin <andreas.westin@stericsson.com> wrote:
 
-Cc: <stable@kernel.org> # 3.0+
-Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
----
- drivers/crypto/mv_cesa.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> Andreas Westin (2):
+>   crypto: ux500 - Add driver for CRYP/HASH hardware.
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 597235a..0d40cf6 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -714,6 +714,7 @@ static int mv_hash_final(struct ahash_request *req)
- {
- 	struct mv_req_hash_ctx *ctx = ahash_request_ctx(req);
- 
-+	ahash_request_set_crypt(req, NULL, req->result, 0);
- 	mv_update_hash_req_ctx(ctx, 1, 0);
- 	return mv_handle_req(&req->base);
- }
--- 
-1.7.3.4
+so I haven't been able to receive and review patch 1/2, presumably
+due to mailing list size limits...resend in smaller pieces?
+
+Thanks,
+
+Kim
