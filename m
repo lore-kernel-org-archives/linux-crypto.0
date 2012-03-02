@@ -1,39 +1,48 @@
-From: "TimLee" <timlee@sina.com>
-Subject: Re: Hit OOPS on FPU save and restore while useing AESNI for IPSecon 32 bit System
-Date: Wed, 29 Feb 2012 20:31:15 +0800
-Message-ID: <39C8AAAC60E1470E881F8CFA08C8CC6E@network2e674ff>
-References: <20120225083702.GA19389@gondor.apana.org.au>
+From: satpal parmar <systems.satpal@gmail.com>
+Subject: Openswan IPsec: ARM cortex SoC board to board ping works but board to
+ Ubuntu does not
+Date: Fri, 2 Mar 2012 16:11:18 +0530
+Message-ID: <CAGgcXb7dMetJ0OS498X9Fn3Py6OAfWhN2j+kA1HzyJFzbfJ_tg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: base64
-Cc: <linux-crypto@vger.kernel.org>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+To: users@openswan.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail3-167.sinamail.sina.com.cn ([202.108.3.167]:60100 "EHLO
-	smtp.sina.com.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S966222Ab2CAN21 (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:52169 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753048Ab2CBKlT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Mar 2012 08:28:27 -0500
-Received: from irxd5-201.sinamail.sina.com.cn (unknown [10.55.5.201])
-	by smtp.sina.com.cn (SINAMAIL) with ESMTP id BCB17C7DB97
-	for <linux-crypto@vger.kernel.org>; Thu,  1 Mar 2012 20:10:43 +0800 (CST)
+	Fri, 2 Mar 2012 05:41:19 -0500
+Received: by pbcup15 with SMTP id up15so2001293pbc.19
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Mar 2012 02:41:18 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-DQoNCj4gdGltbGVlQHNpbmEuY29tIHdyb3RlOg0KPj4gSGkgQWxsLA0KPj4gDQo+PiBSZWNlbnRs
-eSBJIGhpdCBhbiBPT1BTIG9uIEZQVSBzYXZlL3Jlc3RvcmUgaW4gTGludXggdmVyc2lvbiAyLjYu
-MzguOCB1c2luZyBhZXNuaV9pbnRlbF9hc20uUyBhbmQgYWVzbmlfaW50ZWxfZ2x1ZS5jIGZvciBu
-YXRpdmUgSVBTZWMobmV0a2V5KSBvbiAzMmJpdCBTeXN0ZW0uIFRoZSBzYW1lIE9PUFMgd2VyZSBm
-b3VuZCBpbiB2ZXJzaW9ucyAyLjYuMzkuNCwgMy4wLnggYW5kIDMuMS54LkJ1dCBJIGRpZCBub3Qg
-aGl0IHRoaXMgcHJvYmxlbSBpbiA2NCBiaXQgc3lzdGVtIGZvciBhbGwgdGhlc2UgdmVyc2lvbnMu
-DQo+PiANCj4+IE15IHBsYXRmb3JtIGluZm9ybWF0aW9uOiANCj4+ICJMaW51eCBkbnN1YnVudHUg
-Mi42LjM4LjggIzcgU01QIFNhdCBOb3YgMTIgMDM6MTE6MTIgQ1NUIDIwMTEgaTY4NiBpNjg2IGkz
-ODYgR05VL0xpbnV4Ig0KPiANCj4gUGxlYXNlIHRyeSB0aGUgbGF0ZXN0IGdpdCB0cmVlIChyYzQp
-LiAgSXQgc2hvdWxkIGJlIGZpeGVkLg0KPiANCj4gQ2hlZXJzLA0KPiAtLSANCg0KVGhhbmtzIGZv
-ciB5b3VyIGFkdmljZS4gIEkgaGF2ZSBkb25lIHRoZSBzYW1lIHRlc3Qgb24gdmVyc2lvbiAzLjMu
-MC1yYzMgYW5kIDMuMy4wLXJjNC4gIEZvciB2ZXJzaW9uIDMuMy4wLXJjMywgdGhlIE9vcHMgcHJv
-YmxlbSBjYW4gYmUgZWFzaWx5IHJlcGVhdGVkIGluIDEgdG8gNSBtaW5zLiAgRm9yIHZlcnNpb24g
-My4zLjAtcmM0LCBJIGhhdmUgdGVzdGVkIGFyb3VuZCAyNCBob3Vycywgbm8gT29vcHMgaXMgZm91
-bmQgYW55bW9yZS4gVGhlIHByb2JsZW0gSSBoaXQgaXMgcHJvdmVkIHRvIGJlIHNvbHZlZCBpbiB0
-aGVzZSBwYXRjaGVzLg0KDQpSZWdhcmRzDQpUaW1MZWU=
+Hi All !
+
+I recently ported Openswan on ARM cortex based SOC running linux
+2.6.37 (ipsec netkey stack) and openswan 2.6.23. On this board I have
+H/W accelerator support for AES/DES/SHA.
+(http://processors.wiki.ti.com/index.php/Installing_AM387x_C6A814x_DM814x_Crypto_Support).
+AES/DES crypto operation are working fine and I am able to ping
+through IPsec tunnel from my board to PC and vice versa. However when
+I am trying ping with SHA-MD5 I am not able to ping  to and from
+Ubuntu machine .
+
+My ubuntu machine details:
+root@vnl-desktop:~# uname -a
+Linux vnl-desktop 2.6.32-33-generic #72-Ubuntu SMP Fri Jul 29 21:08:37
+UTC 2011 i686 GNU/Linux
+
+MYost probably it could be a IPsec configuration issue on Ubuntu
+machine but I am not able to locate  what configuration could affect
+behavior of only one crypto algorithm. Since I am using same
+configuration for IPsec for testing all Crypto algo supported in H/W
+(DES/AES/SHA-MD5 )and  I am successfully able to ping through IPSec
+tunnel for DES and AES.
+
+Just wondering if any one came across any such issue before. Do we
+have separate config for SHA-MD5?
+
+Appreciate any help /pointer reagrading this issue.
+
+-SP
