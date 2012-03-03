@@ -1,42 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.3
-Date: Sat, 3 Mar 2012 16:36:09 +1100
-Message-ID: <20120303053609.GA7867@gondor.apana.org.au>
-References: <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au> <20120214033504.GA26895@gondor.apana.org.au> <20120216053200.GA20581@gondor.apana.org.au>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH] camellia: simplify key setup and CAMELLIA_ROUNDSM macro
+Date: Sat, 03 Mar 2012 13:59:00 +0200
+Message-ID: <20120303115900.25935.68751.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20120216053200.GA20581@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:34926 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753464Ab2CCL7E (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 3 Mar 2012 06:59:04 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+camellia_setup_tail() applies 'inverse of the last half of P-function' to
+subkeys, which is unneeded if keys are applied directly to yl/yr in
+CAMELLIA_ROUNDSM.
 
-This push fixes a bug in mv_cesa that causes all hash operations
-that supply data on a final operation to fail.
+Patch speeds up key setup and should speed up CAMELLIA_ROUNDSM as applying
+key to yl/yr early has less register dependencies.
 
-Please pull from
+Quick tcrypt camellia results:
+ x86_64, AMD Phenom II, ~5% faster
+ x86_64, Intel Core 2, ~0.5% faster
+ i386, Intel Atom N270, ~1% faster
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ crypto/camellia.c |   24 +++---------------------
+ 1 files changed, 3 insertions(+), 21 deletions(-)
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Phil Sutter (1):
-      crypto: mv_cesa - fix final callback not ignoring input data
-
- drivers/crypto/mv_cesa.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/camellia.c b/crypto/camellia.c
+index 64cff46..7ae4bcd 100644
+--- a/crypto/camellia.c
++++ b/crypto/camellia.c
+@@ -382,7 +382,6 @@ static void camellia_setup_tail(u32 *subkey, u32 *subL, u32 *subR, int max)
+ {
+ 	u32 dw, tl, tr;
+ 	u32 kw4l, kw4r;
+-	int i;
+ 
+ 	/* absorb kw2 to other subkeys */
+ 	/* round 2 */
+@@ -557,24 +556,6 @@ static void camellia_setup_tail(u32 *subkey, u32 *subL, u32 *subR, int max)
+ 		SUBKEY_L(32) = subL[32] ^ subL[31]; /* kw3 */
+ 		SUBKEY_R(32) = subR[32] ^ subR[31];
+ 	}
+-
+-	/* apply the inverse of the last half of P-function */
+-	i = 2;
+-	do {
+-		dw = SUBKEY_L(i + 0) ^ SUBKEY_R(i + 0); dw = rol32(dw, 8);/* round 1 */
+-		SUBKEY_R(i + 0) = SUBKEY_L(i + 0) ^ dw; SUBKEY_L(i + 0) = dw;
+-		dw = SUBKEY_L(i + 1) ^ SUBKEY_R(i + 1); dw = rol32(dw, 8);/* round 2 */
+-		SUBKEY_R(i + 1) = SUBKEY_L(i + 1) ^ dw; SUBKEY_L(i + 1) = dw;
+-		dw = SUBKEY_L(i + 2) ^ SUBKEY_R(i + 2); dw = rol32(dw, 8);/* round 3 */
+-		SUBKEY_R(i + 2) = SUBKEY_L(i + 2) ^ dw; SUBKEY_L(i + 2) = dw;
+-		dw = SUBKEY_L(i + 3) ^ SUBKEY_R(i + 3); dw = rol32(dw, 8);/* round 4 */
+-		SUBKEY_R(i + 3) = SUBKEY_L(i + 3) ^ dw; SUBKEY_L(i + 3) = dw;
+-		dw = SUBKEY_L(i + 4) ^ SUBKEY_R(i + 4); dw = rol32(dw, 8);/* round 5 */
+-		SUBKEY_R(i + 4) = SUBKEY_L(i + 4) ^ dw; SUBKEY_L(i + 4) = dw;
+-		dw = SUBKEY_L(i + 5) ^ SUBKEY_R(i + 5); dw = rol32(dw, 8);/* round 6 */
+-		SUBKEY_R(i + 5) = SUBKEY_L(i + 5) ^ dw; SUBKEY_L(i + 5) = dw;
+-		i += 8;
+-	} while (i < max);
+ }
+ 
+ static void camellia_setup128(const unsigned char *key, u32 *subkey)
+@@ -869,6 +850,8 @@ static void camellia_setup192(const unsigned char *key, u32 *subkey)
+ 
+ #define CAMELLIA_ROUNDSM(xl, xr, kl, kr, yl, yr, il, ir)		\
+     do {								\
++	yl ^= kl;							\
++	yr ^= kr;							\
+ 	ir =  camellia_sp1110[(u8)xr];					\
+ 	il =  camellia_sp1110[    (xl >> 24)];				\
+ 	ir ^= camellia_sp0222[    (xr >> 24)];				\
+@@ -877,8 +860,7 @@ static void camellia_setup192(const unsigned char *key, u32 *subkey)
+ 	il ^= camellia_sp3033[(u8)(xl >> 8)];				\
+ 	ir ^= camellia_sp4404[(u8)(xr >> 8)];				\
+ 	il ^= camellia_sp4404[(u8)xl];					\
+-	il ^= kl;							\
+-	ir ^= il ^ kr;							\
++	ir ^= il;							\
+ 	yl ^= ir;							\
+ 	yr ^= ror32(il, 8) ^ ir;						\
+     } while (0)
