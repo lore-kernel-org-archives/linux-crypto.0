@@ -1,88 +1,42 @@
-From: "C.J. Adams-Collier KF7BMP" <cjac@colliertech.org>
-Subject: Re: Openswan IPsec: ARM cortex SoC board to board ping works but
- board to Ubuntu does not
-Date: Fri, 02 Mar 2012 19:58:01 -0800
-Message-ID: <1330747081.4973.2.camel@foxtrot.cjac.ntr.f5net.com>
-References: <CAGgcXb7dMetJ0OS498X9Fn3Py6OAfWhN2j+kA1HzyJFzbfJ_tg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 3.3
+Date: Sat, 3 Mar 2012 16:36:09 +1100
+Message-ID: <20120303053609.GA7867@gondor.apana.org.au>
+References: <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au> <20120214033504.GA26895@gondor.apana.org.au> <20120216053200.GA20581@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-0c5AY7y29aJer5gS7tba"
-Cc: users@openswan.org, linux-crypto@vger.kernel.org
-To: satpal parmar <systems.satpal@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pz0-f52.google.com ([209.85.210.52]:38671 "EHLO
-	mail-pz0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752138Ab2CCD6S (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Mar 2012 22:58:18 -0500
-Received: by dadp12 with SMTP id p12so2593691dad.11
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Mar 2012 19:58:18 -0800 (PST)
-In-Reply-To: <CAGgcXb7dMetJ0OS498X9Fn3Py6OAfWhN2j+kA1HzyJFzbfJ_tg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20120216053200.GA20581@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
+
+Hi Linus:
+
+This push fixes a bug in mv_cesa that causes all hash operations
+that supply data on a final operation to fail.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
 
---=-0c5AY7y29aJer5gS7tba
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Phil Sutter (1):
+      crypto: mv_cesa - fix final callback not ignoring input data
 
-Hi there!  Have you found any kernel error messages in /var/log/kern.log
-or similar?  I heard rumor of a recent mv_cesa issues.  What's lsmod say?
+ drivers/crypto/mv_cesa.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-On Fri, 2012-03-02 at 16:11 +0530, satpal parmar wrote:
-> Hi All !
->=20
-> I recently ported Openswan on ARM cortex based SOC running linux
-> 2.6.37 (ipsec netkey stack) and openswan 2.6.23. On this board I have
-> H/W accelerator support for AES/DES/SHA.
-> (http://processors.wiki.ti.com/index.php/Installing_AM387x_C6A814x_DM814x=
-_Crypto_Support).
-> AES/DES crypto operation are working fine and I am able to ping
-> through IPsec tunnel from my board to PC and vice versa. However when
-> I am trying ping with SHA-MD5 I am not able to ping  to and from
-> Ubuntu machine .
->=20
-> My ubuntu machine details:
-> root@vnl-desktop:~# uname -a
-> Linux vnl-desktop 2.6.32-33-generic #72-Ubuntu SMP Fri Jul 29 21:08:37
-> UTC 2011 i686 GNU/Linux
->=20
-> MYost probably it could be a IPsec configuration issue on Ubuntu
-> machine but I am not able to locate  what configuration could affect
-> behavior of only one crypto algorithm. Since I am using same
-> configuration for IPsec for testing all Crypto algo supported in H/W
-> (DES/AES/SHA-MD5 )and  I am successfully able to ping through IPSec
-> tunnel for DES and AES.
->=20
-> Just wondering if any one came across any such issue before. Do we
-> have separate config for SHA-MD5?
->=20
-> Appreciate any help /pointer reagrading this issue.
->=20
-> -SP
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" i=
-n
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=-0c5AY7y29aJer5gS7tba
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQEcBAABCAAGBQJPUZbJAAoJEEyimPmPQm23yvEIAIgmAzsGtN358kKmmUNPixS1
-zhV1knrOrmTyBpPRjvZUBFW8PU9dXdoXp3e0wXnQ1PprHZRoT6OWXvN7YxFD2E3Y
-iN/FL0LG9m0zlc3jPuD+kSe2myqtkYC/NGz0GpjpcV04zoOZ2kl3TSr0w4IrqZOA
-ePSwdLUjPgd7i97I2bMbaT8Lk8QBvhjQpAmTT4t2gmwCKXtfC2zAjMBbu2UYZPQu
-uRPHeDpFXOL+9c8qRlb6rrwuGTXhFYbGIdrGUz3WN2kpfheItT0qrI8nMVgwywhe
-o8H6lJRsHoL3hAE7xa/NG4qT0R+xu0lZuPL0nSPO/avSy0GEbN287F+3+CzbNto=
-=KsKg
------END PGP SIGNATURE-----
-
---=-0c5AY7y29aJer5gS7tba--
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
