@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 5/6] crypto: camellia - rename camellia.c to camellia_generic.c
-Date: Mon, 05 Mar 2012 20:26:42 +0200
-Message-ID: <20120305182642.25411.50893.stgit@localhost6.localdomain6>
+Subject: [PATCH 6/6] crypto: camellia - add assembler implementation for x86_64
+Date: Mon, 05 Mar 2012 20:26:47 +0200
+Message-ID: <20120305182647.25411.25661.stgit@localhost6.localdomain6>
 References: <20120305182616.25411.58251.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,1158 +10,134 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:36491 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757374Ab2CES1d (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:33317 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757228Ab2CES1a (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Mar 2012 13:27:33 -0500
+	Mon, 5 Mar 2012 13:27:30 -0500
 In-Reply-To: <20120305182616.25411.58251.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Patch adds x86_64 assembler implementation of Camellia block cipher. Two set of
+functions are provided. First set is regular 'one-block at time' encrypt/decrypt
+functions. Second is 'two-block at time' functions that gain performance increase
+on out-of-order CPUs. Performance of 2-way functions should be equal to 1-way
+functions with in-order CPUs.
+
+Patch has been tested with tcrypt and automated filesystem tests.
+
+Tcrypt benchmark results:
+
+AMD Phenom II 1055T (fam:16, model:10):
+
+camellia-asm vs camellia_generic:
+128bit key:                                             (lrw:256bit)    (xts:256bit)
+size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+16B     1.27x   1.22x   1.30x   1.42x   1.30x   1.34x   1.19x   1.05x   1.23x   1.24x
+64B     1.74x   1.79x   1.43x   1.87x   1.81x   1.87x   1.48x   1.38x   1.55x   1.62x
+256B    1.90x   1.87x   1.43x   1.94x   1.94x   1.95x   1.63x   1.62x   1.67x   1.70x
+1024B   1.96x   1.93x   1.43x   1.95x   1.98x   2.01x   1.67x   1.69x   1.74x   1.80x
+8192B   1.96x   1.96x   1.39x   1.93x   2.01x   2.03x   1.72x   1.64x   1.71x   1.76x
+
+256bit key:                                             (lrw:384bit)    (xts:512bit)
+size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+16B     1.23x   1.23x   1.33x   1.39x   1.34x   1.38x   1.04x   1.18x   1.21x   1.29x
+64B     1.72x   1.69x   1.42x   1.78x   1.81x   1.89x   1.57x   1.52x   1.56x   1.65x
+256B    1.85x   1.88x   1.42x   1.86x   1.93x   1.96x   1.69x   1.65x   1.70x   1.75x
+1024B   1.88x   1.86x   1.45x   1.95x   1.96x   1.95x   1.77x   1.71x   1.77x   1.78x
+8192B   1.91x   1.86x   1.42x   1.91x   2.03x   1.98x   1.73x   1.71x   1.78x   1.76x
+
+camellia-asm vs aes-asm (8kB block):
+         128bit  256bit
+ecb-enc  1.15x   1.22x
+ecb-dec  1.16x   1.16x
+cbc-enc  0.85x   0.90x
+cbc-dec  1.20x   1.23x
+ctr-enc  1.28x   1.30x
+ctr-dec  1.27x   1.28x
+lrw-enc  1.12x   1.16x
+lrw-dec  1.08x   1.10x
+xts-enc  1.11x   1.15x
+xts-dec  1.14x   1.15x
+
+Intel Core2 T8100 (fam:6, model:23, step:6):
+
+camellia-asm vs camellia_generic:
+128bit key:                                             (lrw:256bit)    (xts:256bit)
+size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+16B     1.10x   1.12x   1.14x   1.16x   1.16x   1.15x   1.02x   1.02x   1.08x   1.08x
+64B     1.61x   1.60x   1.17x   1.68x   1.67x   1.66x   1.43x   1.42x   1.44x   1.42x
+256B    1.65x   1.73x   1.17x   1.77x   1.81x   1.80x   1.54x   1.53x   1.58x   1.54x
+1024B   1.76x   1.74x   1.18x   1.80x   1.85x   1.85x   1.60x   1.59x   1.65x   1.60x
+8192B   1.77x   1.75x   1.19x   1.81x   1.85x   1.86x   1.63x   1.61x   1.66x   1.62x
+
+256bit key:                                             (lrw:384bit)    (xts:512bit)
+size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+16B     1.10x   1.07x   1.13x   1.16x   1.11x   1.16x   1.03x   1.02x   1.08x   1.07x
+64B     1.61x   1.62x   1.15x   1.66x   1.63x   1.68x   1.47x   1.46x   1.47x   1.44x
+256B    1.71x   1.70x   1.16x   1.75x   1.69x   1.79x   1.58x   1.57x   1.59x   1.55x
+1024B   1.78x   1.72x   1.17x   1.75x   1.80x   1.80x   1.63x   1.62x   1.65x   1.62x
+8192B   1.76x   1.73x   1.17x   1.78x   1.80x   1.81x   1.64x   1.62x   1.68x   1.64x
+
+camellia-asm vs aes-asm (8kB block):
+         128bit  256bit
+ecb-enc  1.17x   1.21x
+ecb-dec  1.17x   1.20x
+cbc-enc  0.80x   0.82x
+cbc-dec  1.22x   1.24x
+ctr-enc  1.25x   1.26x
+ctr-dec  1.25x   1.26x
+lrw-enc  1.14x   1.18x
+lrw-dec  1.13x   1.17x
+xts-enc  1.14x   1.18x
+xts-dec  1.14x   1.17x
+
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/Makefile           |    1 
- crypto/camellia.c         | 1102 ---------------------------------------------
- crypto/camellia_generic.c | 1102 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 1102 insertions(+), 1103 deletions(-)
- delete mode 100644 crypto/camellia.c
- create mode 100644 crypto/camellia_generic.c
+ arch/x86/crypto/Makefile                 |    2 
+ arch/x86/crypto/camellia-x86_64-asm_64.S |  521 ++++++++
+ arch/x86/crypto/camellia_glue.c          | 1953 ++++++++++++++++++++++++++++++
+ crypto/Kconfig                           |   18 
+ 4 files changed, 2494 insertions(+), 0 deletions(-)
+ create mode 100644 arch/x86/crypto/camellia-x86_64-asm_64.S
+ create mode 100644 arch/x86/crypto/camellia_glue.c
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4355943..30f33d6 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -67,7 +67,6 @@ obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
- obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
- obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
- obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
--camellia_generic-y = camellia.o
- obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
- obj-$(CONFIG_CRYPTO_CAST5) += cast5.o
- obj-$(CONFIG_CRYPTO_CAST6) += cast6.o
-diff --git a/crypto/camellia.c b/crypto/camellia.c
-deleted file mode 100644
-index f7aaaaf..0000000
---- a/crypto/camellia.c
-+++ /dev/null
-@@ -1,1102 +0,0 @@
--/*
-- * Copyright (C) 2006
-- * NTT (Nippon Telegraph and Telephone Corporation).
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License
-- * as published by the Free Software Foundation; either version 2
-- * of the License, or (at your option) any later version.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write to the Free Software
-- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-- */
--
--/*
-- * Algorithm Specification
-- *  http://info.isl.ntt.co.jp/crypt/eng/camellia/specifications.html
-- */
--
--/*
-- *
-- * NOTE --- NOTE --- NOTE --- NOTE
-- * This implementation assumes that all memory addresses passed
-- * as parameters are four-byte aligned.
-- *
-- */
--
--#include <linux/crypto.h>
--#include <linux/errno.h>
--#include <linux/init.h>
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/bitops.h>
--#include <asm/unaligned.h>
--
--static const u32 camellia_sp1110[256] = {
--	0x70707000, 0x82828200, 0x2c2c2c00, 0xececec00,
--	0xb3b3b300, 0x27272700, 0xc0c0c000, 0xe5e5e500,
--	0xe4e4e400, 0x85858500, 0x57575700, 0x35353500,
--	0xeaeaea00, 0x0c0c0c00, 0xaeaeae00, 0x41414100,
--	0x23232300, 0xefefef00, 0x6b6b6b00, 0x93939300,
--	0x45454500, 0x19191900, 0xa5a5a500, 0x21212100,
--	0xededed00, 0x0e0e0e00, 0x4f4f4f00, 0x4e4e4e00,
--	0x1d1d1d00, 0x65656500, 0x92929200, 0xbdbdbd00,
--	0x86868600, 0xb8b8b800, 0xafafaf00, 0x8f8f8f00,
--	0x7c7c7c00, 0xebebeb00, 0x1f1f1f00, 0xcecece00,
--	0x3e3e3e00, 0x30303000, 0xdcdcdc00, 0x5f5f5f00,
--	0x5e5e5e00, 0xc5c5c500, 0x0b0b0b00, 0x1a1a1a00,
--	0xa6a6a600, 0xe1e1e100, 0x39393900, 0xcacaca00,
--	0xd5d5d500, 0x47474700, 0x5d5d5d00, 0x3d3d3d00,
--	0xd9d9d900, 0x01010100, 0x5a5a5a00, 0xd6d6d600,
--	0x51515100, 0x56565600, 0x6c6c6c00, 0x4d4d4d00,
--	0x8b8b8b00, 0x0d0d0d00, 0x9a9a9a00, 0x66666600,
--	0xfbfbfb00, 0xcccccc00, 0xb0b0b000, 0x2d2d2d00,
--	0x74747400, 0x12121200, 0x2b2b2b00, 0x20202000,
--	0xf0f0f000, 0xb1b1b100, 0x84848400, 0x99999900,
--	0xdfdfdf00, 0x4c4c4c00, 0xcbcbcb00, 0xc2c2c200,
--	0x34343400, 0x7e7e7e00, 0x76767600, 0x05050500,
--	0x6d6d6d00, 0xb7b7b700, 0xa9a9a900, 0x31313100,
--	0xd1d1d100, 0x17171700, 0x04040400, 0xd7d7d700,
--	0x14141400, 0x58585800, 0x3a3a3a00, 0x61616100,
--	0xdedede00, 0x1b1b1b00, 0x11111100, 0x1c1c1c00,
--	0x32323200, 0x0f0f0f00, 0x9c9c9c00, 0x16161600,
--	0x53535300, 0x18181800, 0xf2f2f200, 0x22222200,
--	0xfefefe00, 0x44444400, 0xcfcfcf00, 0xb2b2b200,
--	0xc3c3c300, 0xb5b5b500, 0x7a7a7a00, 0x91919100,
--	0x24242400, 0x08080800, 0xe8e8e800, 0xa8a8a800,
--	0x60606000, 0xfcfcfc00, 0x69696900, 0x50505000,
--	0xaaaaaa00, 0xd0d0d000, 0xa0a0a000, 0x7d7d7d00,
--	0xa1a1a100, 0x89898900, 0x62626200, 0x97979700,
--	0x54545400, 0x5b5b5b00, 0x1e1e1e00, 0x95959500,
--	0xe0e0e000, 0xffffff00, 0x64646400, 0xd2d2d200,
--	0x10101000, 0xc4c4c400, 0x00000000, 0x48484800,
--	0xa3a3a300, 0xf7f7f700, 0x75757500, 0xdbdbdb00,
--	0x8a8a8a00, 0x03030300, 0xe6e6e600, 0xdadada00,
--	0x09090900, 0x3f3f3f00, 0xdddddd00, 0x94949400,
--	0x87878700, 0x5c5c5c00, 0x83838300, 0x02020200,
--	0xcdcdcd00, 0x4a4a4a00, 0x90909000, 0x33333300,
--	0x73737300, 0x67676700, 0xf6f6f600, 0xf3f3f300,
--	0x9d9d9d00, 0x7f7f7f00, 0xbfbfbf00, 0xe2e2e200,
--	0x52525200, 0x9b9b9b00, 0xd8d8d800, 0x26262600,
--	0xc8c8c800, 0x37373700, 0xc6c6c600, 0x3b3b3b00,
--	0x81818100, 0x96969600, 0x6f6f6f00, 0x4b4b4b00,
--	0x13131300, 0xbebebe00, 0x63636300, 0x2e2e2e00,
--	0xe9e9e900, 0x79797900, 0xa7a7a700, 0x8c8c8c00,
--	0x9f9f9f00, 0x6e6e6e00, 0xbcbcbc00, 0x8e8e8e00,
--	0x29292900, 0xf5f5f500, 0xf9f9f900, 0xb6b6b600,
--	0x2f2f2f00, 0xfdfdfd00, 0xb4b4b400, 0x59595900,
--	0x78787800, 0x98989800, 0x06060600, 0x6a6a6a00,
--	0xe7e7e700, 0x46464600, 0x71717100, 0xbababa00,
--	0xd4d4d400, 0x25252500, 0xababab00, 0x42424200,
--	0x88888800, 0xa2a2a200, 0x8d8d8d00, 0xfafafa00,
--	0x72727200, 0x07070700, 0xb9b9b900, 0x55555500,
--	0xf8f8f800, 0xeeeeee00, 0xacacac00, 0x0a0a0a00,
--	0x36363600, 0x49494900, 0x2a2a2a00, 0x68686800,
--	0x3c3c3c00, 0x38383800, 0xf1f1f100, 0xa4a4a400,
--	0x40404000, 0x28282800, 0xd3d3d300, 0x7b7b7b00,
--	0xbbbbbb00, 0xc9c9c900, 0x43434300, 0xc1c1c100,
--	0x15151500, 0xe3e3e300, 0xadadad00, 0xf4f4f400,
--	0x77777700, 0xc7c7c700, 0x80808000, 0x9e9e9e00,
--};
--
--static const u32 camellia_sp0222[256] = {
--	0x00e0e0e0, 0x00050505, 0x00585858, 0x00d9d9d9,
--	0x00676767, 0x004e4e4e, 0x00818181, 0x00cbcbcb,
--	0x00c9c9c9, 0x000b0b0b, 0x00aeaeae, 0x006a6a6a,
--	0x00d5d5d5, 0x00181818, 0x005d5d5d, 0x00828282,
--	0x00464646, 0x00dfdfdf, 0x00d6d6d6, 0x00272727,
--	0x008a8a8a, 0x00323232, 0x004b4b4b, 0x00424242,
--	0x00dbdbdb, 0x001c1c1c, 0x009e9e9e, 0x009c9c9c,
--	0x003a3a3a, 0x00cacaca, 0x00252525, 0x007b7b7b,
--	0x000d0d0d, 0x00717171, 0x005f5f5f, 0x001f1f1f,
--	0x00f8f8f8, 0x00d7d7d7, 0x003e3e3e, 0x009d9d9d,
--	0x007c7c7c, 0x00606060, 0x00b9b9b9, 0x00bebebe,
--	0x00bcbcbc, 0x008b8b8b, 0x00161616, 0x00343434,
--	0x004d4d4d, 0x00c3c3c3, 0x00727272, 0x00959595,
--	0x00ababab, 0x008e8e8e, 0x00bababa, 0x007a7a7a,
--	0x00b3b3b3, 0x00020202, 0x00b4b4b4, 0x00adadad,
--	0x00a2a2a2, 0x00acacac, 0x00d8d8d8, 0x009a9a9a,
--	0x00171717, 0x001a1a1a, 0x00353535, 0x00cccccc,
--	0x00f7f7f7, 0x00999999, 0x00616161, 0x005a5a5a,
--	0x00e8e8e8, 0x00242424, 0x00565656, 0x00404040,
--	0x00e1e1e1, 0x00636363, 0x00090909, 0x00333333,
--	0x00bfbfbf, 0x00989898, 0x00979797, 0x00858585,
--	0x00686868, 0x00fcfcfc, 0x00ececec, 0x000a0a0a,
--	0x00dadada, 0x006f6f6f, 0x00535353, 0x00626262,
--	0x00a3a3a3, 0x002e2e2e, 0x00080808, 0x00afafaf,
--	0x00282828, 0x00b0b0b0, 0x00747474, 0x00c2c2c2,
--	0x00bdbdbd, 0x00363636, 0x00222222, 0x00383838,
--	0x00646464, 0x001e1e1e, 0x00393939, 0x002c2c2c,
--	0x00a6a6a6, 0x00303030, 0x00e5e5e5, 0x00444444,
--	0x00fdfdfd, 0x00888888, 0x009f9f9f, 0x00656565,
--	0x00878787, 0x006b6b6b, 0x00f4f4f4, 0x00232323,
--	0x00484848, 0x00101010, 0x00d1d1d1, 0x00515151,
--	0x00c0c0c0, 0x00f9f9f9, 0x00d2d2d2, 0x00a0a0a0,
--	0x00555555, 0x00a1a1a1, 0x00414141, 0x00fafafa,
--	0x00434343, 0x00131313, 0x00c4c4c4, 0x002f2f2f,
--	0x00a8a8a8, 0x00b6b6b6, 0x003c3c3c, 0x002b2b2b,
--	0x00c1c1c1, 0x00ffffff, 0x00c8c8c8, 0x00a5a5a5,
--	0x00202020, 0x00898989, 0x00000000, 0x00909090,
--	0x00474747, 0x00efefef, 0x00eaeaea, 0x00b7b7b7,
--	0x00151515, 0x00060606, 0x00cdcdcd, 0x00b5b5b5,
--	0x00121212, 0x007e7e7e, 0x00bbbbbb, 0x00292929,
--	0x000f0f0f, 0x00b8b8b8, 0x00070707, 0x00040404,
--	0x009b9b9b, 0x00949494, 0x00212121, 0x00666666,
--	0x00e6e6e6, 0x00cecece, 0x00ededed, 0x00e7e7e7,
--	0x003b3b3b, 0x00fefefe, 0x007f7f7f, 0x00c5c5c5,
--	0x00a4a4a4, 0x00373737, 0x00b1b1b1, 0x004c4c4c,
--	0x00919191, 0x006e6e6e, 0x008d8d8d, 0x00767676,
--	0x00030303, 0x002d2d2d, 0x00dedede, 0x00969696,
--	0x00262626, 0x007d7d7d, 0x00c6c6c6, 0x005c5c5c,
--	0x00d3d3d3, 0x00f2f2f2, 0x004f4f4f, 0x00191919,
--	0x003f3f3f, 0x00dcdcdc, 0x00797979, 0x001d1d1d,
--	0x00525252, 0x00ebebeb, 0x00f3f3f3, 0x006d6d6d,
--	0x005e5e5e, 0x00fbfbfb, 0x00696969, 0x00b2b2b2,
--	0x00f0f0f0, 0x00313131, 0x000c0c0c, 0x00d4d4d4,
--	0x00cfcfcf, 0x008c8c8c, 0x00e2e2e2, 0x00757575,
--	0x00a9a9a9, 0x004a4a4a, 0x00575757, 0x00848484,
--	0x00111111, 0x00454545, 0x001b1b1b, 0x00f5f5f5,
--	0x00e4e4e4, 0x000e0e0e, 0x00737373, 0x00aaaaaa,
--	0x00f1f1f1, 0x00dddddd, 0x00595959, 0x00141414,
--	0x006c6c6c, 0x00929292, 0x00545454, 0x00d0d0d0,
--	0x00787878, 0x00707070, 0x00e3e3e3, 0x00494949,
--	0x00808080, 0x00505050, 0x00a7a7a7, 0x00f6f6f6,
--	0x00777777, 0x00939393, 0x00868686, 0x00838383,
--	0x002a2a2a, 0x00c7c7c7, 0x005b5b5b, 0x00e9e9e9,
--	0x00eeeeee, 0x008f8f8f, 0x00010101, 0x003d3d3d,
--};
--
--static const u32 camellia_sp3033[256] = {
--	0x38003838, 0x41004141, 0x16001616, 0x76007676,
--	0xd900d9d9, 0x93009393, 0x60006060, 0xf200f2f2,
--	0x72007272, 0xc200c2c2, 0xab00abab, 0x9a009a9a,
--	0x75007575, 0x06000606, 0x57005757, 0xa000a0a0,
--	0x91009191, 0xf700f7f7, 0xb500b5b5, 0xc900c9c9,
--	0xa200a2a2, 0x8c008c8c, 0xd200d2d2, 0x90009090,
--	0xf600f6f6, 0x07000707, 0xa700a7a7, 0x27002727,
--	0x8e008e8e, 0xb200b2b2, 0x49004949, 0xde00dede,
--	0x43004343, 0x5c005c5c, 0xd700d7d7, 0xc700c7c7,
--	0x3e003e3e, 0xf500f5f5, 0x8f008f8f, 0x67006767,
--	0x1f001f1f, 0x18001818, 0x6e006e6e, 0xaf00afaf,
--	0x2f002f2f, 0xe200e2e2, 0x85008585, 0x0d000d0d,
--	0x53005353, 0xf000f0f0, 0x9c009c9c, 0x65006565,
--	0xea00eaea, 0xa300a3a3, 0xae00aeae, 0x9e009e9e,
--	0xec00ecec, 0x80008080, 0x2d002d2d, 0x6b006b6b,
--	0xa800a8a8, 0x2b002b2b, 0x36003636, 0xa600a6a6,
--	0xc500c5c5, 0x86008686, 0x4d004d4d, 0x33003333,
--	0xfd00fdfd, 0x66006666, 0x58005858, 0x96009696,
--	0x3a003a3a, 0x09000909, 0x95009595, 0x10001010,
--	0x78007878, 0xd800d8d8, 0x42004242, 0xcc00cccc,
--	0xef00efef, 0x26002626, 0xe500e5e5, 0x61006161,
--	0x1a001a1a, 0x3f003f3f, 0x3b003b3b, 0x82008282,
--	0xb600b6b6, 0xdb00dbdb, 0xd400d4d4, 0x98009898,
--	0xe800e8e8, 0x8b008b8b, 0x02000202, 0xeb00ebeb,
--	0x0a000a0a, 0x2c002c2c, 0x1d001d1d, 0xb000b0b0,
--	0x6f006f6f, 0x8d008d8d, 0x88008888, 0x0e000e0e,
--	0x19001919, 0x87008787, 0x4e004e4e, 0x0b000b0b,
--	0xa900a9a9, 0x0c000c0c, 0x79007979, 0x11001111,
--	0x7f007f7f, 0x22002222, 0xe700e7e7, 0x59005959,
--	0xe100e1e1, 0xda00dada, 0x3d003d3d, 0xc800c8c8,
--	0x12001212, 0x04000404, 0x74007474, 0x54005454,
--	0x30003030, 0x7e007e7e, 0xb400b4b4, 0x28002828,
--	0x55005555, 0x68006868, 0x50005050, 0xbe00bebe,
--	0xd000d0d0, 0xc400c4c4, 0x31003131, 0xcb00cbcb,
--	0x2a002a2a, 0xad00adad, 0x0f000f0f, 0xca00caca,
--	0x70007070, 0xff00ffff, 0x32003232, 0x69006969,
--	0x08000808, 0x62006262, 0x00000000, 0x24002424,
--	0xd100d1d1, 0xfb00fbfb, 0xba00baba, 0xed00eded,
--	0x45004545, 0x81008181, 0x73007373, 0x6d006d6d,
--	0x84008484, 0x9f009f9f, 0xee00eeee, 0x4a004a4a,
--	0xc300c3c3, 0x2e002e2e, 0xc100c1c1, 0x01000101,
--	0xe600e6e6, 0x25002525, 0x48004848, 0x99009999,
--	0xb900b9b9, 0xb300b3b3, 0x7b007b7b, 0xf900f9f9,
--	0xce00cece, 0xbf00bfbf, 0xdf00dfdf, 0x71007171,
--	0x29002929, 0xcd00cdcd, 0x6c006c6c, 0x13001313,
--	0x64006464, 0x9b009b9b, 0x63006363, 0x9d009d9d,
--	0xc000c0c0, 0x4b004b4b, 0xb700b7b7, 0xa500a5a5,
--	0x89008989, 0x5f005f5f, 0xb100b1b1, 0x17001717,
--	0xf400f4f4, 0xbc00bcbc, 0xd300d3d3, 0x46004646,
--	0xcf00cfcf, 0x37003737, 0x5e005e5e, 0x47004747,
--	0x94009494, 0xfa00fafa, 0xfc00fcfc, 0x5b005b5b,
--	0x97009797, 0xfe00fefe, 0x5a005a5a, 0xac00acac,
--	0x3c003c3c, 0x4c004c4c, 0x03000303, 0x35003535,
--	0xf300f3f3, 0x23002323, 0xb800b8b8, 0x5d005d5d,
--	0x6a006a6a, 0x92009292, 0xd500d5d5, 0x21002121,
--	0x44004444, 0x51005151, 0xc600c6c6, 0x7d007d7d,
--	0x39003939, 0x83008383, 0xdc00dcdc, 0xaa00aaaa,
--	0x7c007c7c, 0x77007777, 0x56005656, 0x05000505,
--	0x1b001b1b, 0xa400a4a4, 0x15001515, 0x34003434,
--	0x1e001e1e, 0x1c001c1c, 0xf800f8f8, 0x52005252,
--	0x20002020, 0x14001414, 0xe900e9e9, 0xbd00bdbd,
--	0xdd00dddd, 0xe400e4e4, 0xa100a1a1, 0xe000e0e0,
--	0x8a008a8a, 0xf100f1f1, 0xd600d6d6, 0x7a007a7a,
--	0xbb00bbbb, 0xe300e3e3, 0x40004040, 0x4f004f4f,
--};
--
--static const u32 camellia_sp4404[256] = {
--	0x70700070, 0x2c2c002c, 0xb3b300b3, 0xc0c000c0,
--	0xe4e400e4, 0x57570057, 0xeaea00ea, 0xaeae00ae,
--	0x23230023, 0x6b6b006b, 0x45450045, 0xa5a500a5,
--	0xeded00ed, 0x4f4f004f, 0x1d1d001d, 0x92920092,
--	0x86860086, 0xafaf00af, 0x7c7c007c, 0x1f1f001f,
--	0x3e3e003e, 0xdcdc00dc, 0x5e5e005e, 0x0b0b000b,
--	0xa6a600a6, 0x39390039, 0xd5d500d5, 0x5d5d005d,
--	0xd9d900d9, 0x5a5a005a, 0x51510051, 0x6c6c006c,
--	0x8b8b008b, 0x9a9a009a, 0xfbfb00fb, 0xb0b000b0,
--	0x74740074, 0x2b2b002b, 0xf0f000f0, 0x84840084,
--	0xdfdf00df, 0xcbcb00cb, 0x34340034, 0x76760076,
--	0x6d6d006d, 0xa9a900a9, 0xd1d100d1, 0x04040004,
--	0x14140014, 0x3a3a003a, 0xdede00de, 0x11110011,
--	0x32320032, 0x9c9c009c, 0x53530053, 0xf2f200f2,
--	0xfefe00fe, 0xcfcf00cf, 0xc3c300c3, 0x7a7a007a,
--	0x24240024, 0xe8e800e8, 0x60600060, 0x69690069,
--	0xaaaa00aa, 0xa0a000a0, 0xa1a100a1, 0x62620062,
--	0x54540054, 0x1e1e001e, 0xe0e000e0, 0x64640064,
--	0x10100010, 0x00000000, 0xa3a300a3, 0x75750075,
--	0x8a8a008a, 0xe6e600e6, 0x09090009, 0xdddd00dd,
--	0x87870087, 0x83830083, 0xcdcd00cd, 0x90900090,
--	0x73730073, 0xf6f600f6, 0x9d9d009d, 0xbfbf00bf,
--	0x52520052, 0xd8d800d8, 0xc8c800c8, 0xc6c600c6,
--	0x81810081, 0x6f6f006f, 0x13130013, 0x63630063,
--	0xe9e900e9, 0xa7a700a7, 0x9f9f009f, 0xbcbc00bc,
--	0x29290029, 0xf9f900f9, 0x2f2f002f, 0xb4b400b4,
--	0x78780078, 0x06060006, 0xe7e700e7, 0x71710071,
--	0xd4d400d4, 0xabab00ab, 0x88880088, 0x8d8d008d,
--	0x72720072, 0xb9b900b9, 0xf8f800f8, 0xacac00ac,
--	0x36360036, 0x2a2a002a, 0x3c3c003c, 0xf1f100f1,
--	0x40400040, 0xd3d300d3, 0xbbbb00bb, 0x43430043,
--	0x15150015, 0xadad00ad, 0x77770077, 0x80800080,
--	0x82820082, 0xecec00ec, 0x27270027, 0xe5e500e5,
--	0x85850085, 0x35350035, 0x0c0c000c, 0x41410041,
--	0xefef00ef, 0x93930093, 0x19190019, 0x21210021,
--	0x0e0e000e, 0x4e4e004e, 0x65650065, 0xbdbd00bd,
--	0xb8b800b8, 0x8f8f008f, 0xebeb00eb, 0xcece00ce,
--	0x30300030, 0x5f5f005f, 0xc5c500c5, 0x1a1a001a,
--	0xe1e100e1, 0xcaca00ca, 0x47470047, 0x3d3d003d,
--	0x01010001, 0xd6d600d6, 0x56560056, 0x4d4d004d,
--	0x0d0d000d, 0x66660066, 0xcccc00cc, 0x2d2d002d,
--	0x12120012, 0x20200020, 0xb1b100b1, 0x99990099,
--	0x4c4c004c, 0xc2c200c2, 0x7e7e007e, 0x05050005,
--	0xb7b700b7, 0x31310031, 0x17170017, 0xd7d700d7,
--	0x58580058, 0x61610061, 0x1b1b001b, 0x1c1c001c,
--	0x0f0f000f, 0x16160016, 0x18180018, 0x22220022,
--	0x44440044, 0xb2b200b2, 0xb5b500b5, 0x91910091,
--	0x08080008, 0xa8a800a8, 0xfcfc00fc, 0x50500050,
--	0xd0d000d0, 0x7d7d007d, 0x89890089, 0x97970097,
--	0x5b5b005b, 0x95950095, 0xffff00ff, 0xd2d200d2,
--	0xc4c400c4, 0x48480048, 0xf7f700f7, 0xdbdb00db,
--	0x03030003, 0xdada00da, 0x3f3f003f, 0x94940094,
--	0x5c5c005c, 0x02020002, 0x4a4a004a, 0x33330033,
--	0x67670067, 0xf3f300f3, 0x7f7f007f, 0xe2e200e2,
--	0x9b9b009b, 0x26260026, 0x37370037, 0x3b3b003b,
--	0x96960096, 0x4b4b004b, 0xbebe00be, 0x2e2e002e,
--	0x79790079, 0x8c8c008c, 0x6e6e006e, 0x8e8e008e,
--	0xf5f500f5, 0xb6b600b6, 0xfdfd00fd, 0x59590059,
--	0x98980098, 0x6a6a006a, 0x46460046, 0xbaba00ba,
--	0x25250025, 0x42420042, 0xa2a200a2, 0xfafa00fa,
--	0x07070007, 0x55550055, 0xeeee00ee, 0x0a0a000a,
--	0x49490049, 0x68680068, 0x38380038, 0xa4a400a4,
--	0x28280028, 0x7b7b007b, 0xc9c900c9, 0xc1c100c1,
--	0xe3e300e3, 0xf4f400f4, 0xc7c700c7, 0x9e9e009e,
--};
--
--
--#define CAMELLIA_MIN_KEY_SIZE        16
--#define CAMELLIA_MAX_KEY_SIZE        32
--#define CAMELLIA_BLOCK_SIZE          16
--#define CAMELLIA_TABLE_BYTE_LEN     272
--
--/*
-- * NB: L and R below stand for 'left' and 'right' as in written numbers.
-- * That is, in (xxxL,xxxR) pair xxxL holds most significant digits,
-- * _not_ least significant ones!
-- */
--
--
--/* key constants */
--
--#define CAMELLIA_SIGMA1L (0xA09E667FL)
--#define CAMELLIA_SIGMA1R (0x3BCC908BL)
--#define CAMELLIA_SIGMA2L (0xB67AE858L)
--#define CAMELLIA_SIGMA2R (0x4CAA73B2L)
--#define CAMELLIA_SIGMA3L (0xC6EF372FL)
--#define CAMELLIA_SIGMA3R (0xE94F82BEL)
--#define CAMELLIA_SIGMA4L (0x54FF53A5L)
--#define CAMELLIA_SIGMA4R (0xF1D36F1CL)
--#define CAMELLIA_SIGMA5L (0x10E527FAL)
--#define CAMELLIA_SIGMA5R (0xDE682D1DL)
--#define CAMELLIA_SIGMA6L (0xB05688C2L)
--#define CAMELLIA_SIGMA6R (0xB3E6C1FDL)
--
--/*
-- *  macros
-- */
--#define ROLDQ(ll, lr, rl, rr, w0, w1, bits) ({		\
--	w0 = ll;					\
--	ll = (ll << bits) + (lr >> (32 - bits));	\
--	lr = (lr << bits) + (rl >> (32 - bits));	\
--	rl = (rl << bits) + (rr >> (32 - bits));	\
--	rr = (rr << bits) + (w0 >> (32 - bits));	\
--})
--
--#define ROLDQo32(ll, lr, rl, rr, w0, w1, bits) ({	\
--	w0 = ll;					\
--	w1 = lr;					\
--	ll = (lr << (bits - 32)) + (rl >> (64 - bits));	\
--	lr = (rl << (bits - 32)) + (rr >> (64 - bits));	\
--	rl = (rr << (bits - 32)) + (w0 >> (64 - bits));	\
--	rr = (w0 << (bits - 32)) + (w1 >> (64 - bits));	\
--})
--
--#define CAMELLIA_F(xl, xr, kl, kr, yl, yr, il, ir, t0, t1) ({	\
--	il = xl ^ kl;						\
--	ir = xr ^ kr;						\
--	t0 = il >> 16;						\
--	t1 = ir >> 16;						\
--	yl = camellia_sp1110[(u8)(ir)]				\
--	   ^ camellia_sp0222[(u8)(t1 >> 8)]			\
--	   ^ camellia_sp3033[(u8)(t1)]				\
--	   ^ camellia_sp4404[(u8)(ir >> 8)];			\
--	yr = camellia_sp1110[(u8)(t0 >> 8)]			\
--	   ^ camellia_sp0222[(u8)(t0)]				\
--	   ^ camellia_sp3033[(u8)(il >> 8)]			\
--	   ^ camellia_sp4404[(u8)(il)];				\
--	yl ^= yr;						\
--	yr = ror32(yr, 8);					\
--	yr ^= yl;						\
--})
--
--#define SUBKEY_L(INDEX) (subkey[(INDEX)*2])
--#define SUBKEY_R(INDEX) (subkey[(INDEX)*2 + 1])
--
--static void camellia_setup_tail(u32 *subkey, u32 *subL, u32 *subR, int max)
--{
--	u32 dw, tl, tr;
--	u32 kw4l, kw4r;
--
--	/* absorb kw2 to other subkeys */
--	/* round 2 */
--	subL[3] ^= subL[1]; subR[3] ^= subR[1];
--	/* round 4 */
--	subL[5] ^= subL[1]; subR[5] ^= subR[1];
--	/* round 6 */
--	subL[7] ^= subL[1]; subR[7] ^= subR[1];
--	subL[1] ^= subR[1] & ~subR[9];
--	dw = subL[1] & subL[9],
--		subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl2) */
--	/* round 8 */
--	subL[11] ^= subL[1]; subR[11] ^= subR[1];
--	/* round 10 */
--	subL[13] ^= subL[1]; subR[13] ^= subR[1];
--	/* round 12 */
--	subL[15] ^= subL[1]; subR[15] ^= subR[1];
--	subL[1] ^= subR[1] & ~subR[17];
--	dw = subL[1] & subL[17],
--		subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl4) */
--	/* round 14 */
--	subL[19] ^= subL[1]; subR[19] ^= subR[1];
--	/* round 16 */
--	subL[21] ^= subL[1]; subR[21] ^= subR[1];
--	/* round 18 */
--	subL[23] ^= subL[1]; subR[23] ^= subR[1];
--	if (max == 24) {
--		/* kw3 */
--		subL[24] ^= subL[1]; subR[24] ^= subR[1];
--
--	/* absorb kw4 to other subkeys */
--		kw4l = subL[25]; kw4r = subR[25];
--	} else {
--		subL[1] ^= subR[1] & ~subR[25];
--		dw = subL[1] & subL[25],
--			subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl6) */
--		/* round 20 */
--		subL[27] ^= subL[1]; subR[27] ^= subR[1];
--		/* round 22 */
--		subL[29] ^= subL[1]; subR[29] ^= subR[1];
--		/* round 24 */
--		subL[31] ^= subL[1]; subR[31] ^= subR[1];
--		/* kw3 */
--		subL[32] ^= subL[1]; subR[32] ^= subR[1];
--
--	/* absorb kw4 to other subkeys */
--		kw4l = subL[33]; kw4r = subR[33];
--		/* round 23 */
--		subL[30] ^= kw4l; subR[30] ^= kw4r;
--		/* round 21 */
--		subL[28] ^= kw4l; subR[28] ^= kw4r;
--		/* round 19 */
--		subL[26] ^= kw4l; subR[26] ^= kw4r;
--		kw4l ^= kw4r & ~subR[24];
--		dw = kw4l & subL[24],
--			kw4r ^= rol32(dw, 1); /* modified for FL(kl5) */
--	}
--	/* round 17 */
--	subL[22] ^= kw4l; subR[22] ^= kw4r;
--	/* round 15 */
--	subL[20] ^= kw4l; subR[20] ^= kw4r;
--	/* round 13 */
--	subL[18] ^= kw4l; subR[18] ^= kw4r;
--	kw4l ^= kw4r & ~subR[16];
--	dw = kw4l & subL[16],
--		kw4r ^= rol32(dw, 1); /* modified for FL(kl3) */
--	/* round 11 */
--	subL[14] ^= kw4l; subR[14] ^= kw4r;
--	/* round 9 */
--	subL[12] ^= kw4l; subR[12] ^= kw4r;
--	/* round 7 */
--	subL[10] ^= kw4l; subR[10] ^= kw4r;
--	kw4l ^= kw4r & ~subR[8];
--	dw = kw4l & subL[8],
--		kw4r ^= rol32(dw, 1); /* modified for FL(kl1) */
--	/* round 5 */
--	subL[6] ^= kw4l; subR[6] ^= kw4r;
--	/* round 3 */
--	subL[4] ^= kw4l; subR[4] ^= kw4r;
--	/* round 1 */
--	subL[2] ^= kw4l; subR[2] ^= kw4r;
--	/* kw1 */
--	subL[0] ^= kw4l; subR[0] ^= kw4r;
--
--	/* key XOR is end of F-function */
--	SUBKEY_L(0) = subL[0] ^ subL[2];/* kw1 */
--	SUBKEY_R(0) = subR[0] ^ subR[2];
--	SUBKEY_L(2) = subL[3];       /* round 1 */
--	SUBKEY_R(2) = subR[3];
--	SUBKEY_L(3) = subL[2] ^ subL[4]; /* round 2 */
--	SUBKEY_R(3) = subR[2] ^ subR[4];
--	SUBKEY_L(4) = subL[3] ^ subL[5]; /* round 3 */
--	SUBKEY_R(4) = subR[3] ^ subR[5];
--	SUBKEY_L(5) = subL[4] ^ subL[6]; /* round 4 */
--	SUBKEY_R(5) = subR[4] ^ subR[6];
--	SUBKEY_L(6) = subL[5] ^ subL[7]; /* round 5 */
--	SUBKEY_R(6) = subR[5] ^ subR[7];
--	tl = subL[10] ^ (subR[10] & ~subR[8]);
--	dw = tl & subL[8],  /* FL(kl1) */
--		tr = subR[10] ^ rol32(dw, 1);
--	SUBKEY_L(7) = subL[6] ^ tl; /* round 6 */
--	SUBKEY_R(7) = subR[6] ^ tr;
--	SUBKEY_L(8) = subL[8];       /* FL(kl1) */
--	SUBKEY_R(8) = subR[8];
--	SUBKEY_L(9) = subL[9];       /* FLinv(kl2) */
--	SUBKEY_R(9) = subR[9];
--	tl = subL[7] ^ (subR[7] & ~subR[9]);
--	dw = tl & subL[9],  /* FLinv(kl2) */
--		tr = subR[7] ^ rol32(dw, 1);
--	SUBKEY_L(10) = tl ^ subL[11]; /* round 7 */
--	SUBKEY_R(10) = tr ^ subR[11];
--	SUBKEY_L(11) = subL[10] ^ subL[12]; /* round 8 */
--	SUBKEY_R(11) = subR[10] ^ subR[12];
--	SUBKEY_L(12) = subL[11] ^ subL[13]; /* round 9 */
--	SUBKEY_R(12) = subR[11] ^ subR[13];
--	SUBKEY_L(13) = subL[12] ^ subL[14]; /* round 10 */
--	SUBKEY_R(13) = subR[12] ^ subR[14];
--	SUBKEY_L(14) = subL[13] ^ subL[15]; /* round 11 */
--	SUBKEY_R(14) = subR[13] ^ subR[15];
--	tl = subL[18] ^ (subR[18] & ~subR[16]);
--	dw = tl & subL[16], /* FL(kl3) */
--		tr = subR[18] ^ rol32(dw, 1);
--	SUBKEY_L(15) = subL[14] ^ tl; /* round 12 */
--	SUBKEY_R(15) = subR[14] ^ tr;
--	SUBKEY_L(16) = subL[16];     /* FL(kl3) */
--	SUBKEY_R(16) = subR[16];
--	SUBKEY_L(17) = subL[17];     /* FLinv(kl4) */
--	SUBKEY_R(17) = subR[17];
--	tl = subL[15] ^ (subR[15] & ~subR[17]);
--	dw = tl & subL[17], /* FLinv(kl4) */
--		tr = subR[15] ^ rol32(dw, 1);
--	SUBKEY_L(18) = tl ^ subL[19]; /* round 13 */
--	SUBKEY_R(18) = tr ^ subR[19];
--	SUBKEY_L(19) = subL[18] ^ subL[20]; /* round 14 */
--	SUBKEY_R(19) = subR[18] ^ subR[20];
--	SUBKEY_L(20) = subL[19] ^ subL[21]; /* round 15 */
--	SUBKEY_R(20) = subR[19] ^ subR[21];
--	SUBKEY_L(21) = subL[20] ^ subL[22]; /* round 16 */
--	SUBKEY_R(21) = subR[20] ^ subR[22];
--	SUBKEY_L(22) = subL[21] ^ subL[23]; /* round 17 */
--	SUBKEY_R(22) = subR[21] ^ subR[23];
--	if (max == 24) {
--		SUBKEY_L(23) = subL[22];     /* round 18 */
--		SUBKEY_R(23) = subR[22];
--		SUBKEY_L(24) = subL[24] ^ subL[23]; /* kw3 */
--		SUBKEY_R(24) = subR[24] ^ subR[23];
--	} else {
--		tl = subL[26] ^ (subR[26] & ~subR[24]);
--		dw = tl & subL[24], /* FL(kl5) */
--			tr = subR[26] ^ rol32(dw, 1);
--		SUBKEY_L(23) = subL[22] ^ tl; /* round 18 */
--		SUBKEY_R(23) = subR[22] ^ tr;
--		SUBKEY_L(24) = subL[24];     /* FL(kl5) */
--		SUBKEY_R(24) = subR[24];
--		SUBKEY_L(25) = subL[25];     /* FLinv(kl6) */
--		SUBKEY_R(25) = subR[25];
--		tl = subL[23] ^ (subR[23] & ~subR[25]);
--		dw = tl & subL[25], /* FLinv(kl6) */
--			tr = subR[23] ^ rol32(dw, 1);
--		SUBKEY_L(26) = tl ^ subL[27]; /* round 19 */
--		SUBKEY_R(26) = tr ^ subR[27];
--		SUBKEY_L(27) = subL[26] ^ subL[28]; /* round 20 */
--		SUBKEY_R(27) = subR[26] ^ subR[28];
--		SUBKEY_L(28) = subL[27] ^ subL[29]; /* round 21 */
--		SUBKEY_R(28) = subR[27] ^ subR[29];
--		SUBKEY_L(29) = subL[28] ^ subL[30]; /* round 22 */
--		SUBKEY_R(29) = subR[28] ^ subR[30];
--		SUBKEY_L(30) = subL[29] ^ subL[31]; /* round 23 */
--		SUBKEY_R(30) = subR[29] ^ subR[31];
--		SUBKEY_L(31) = subL[30];     /* round 24 */
--		SUBKEY_R(31) = subR[30];
--		SUBKEY_L(32) = subL[32] ^ subL[31]; /* kw3 */
--		SUBKEY_R(32) = subR[32] ^ subR[31];
--	}
--}
--
--static void camellia_setup128(const unsigned char *key, u32 *subkey)
--{
--	u32 kll, klr, krl, krr;
--	u32 il, ir, t0, t1, w0, w1;
--	u32 subL[26];
--	u32 subR[26];
--
--	/**
--	 *  k == kll || klr || krl || krr (|| is concatenation)
--	 */
--	kll = get_unaligned_be32(key);
--	klr = get_unaligned_be32(key + 4);
--	krl = get_unaligned_be32(key + 8);
--	krr = get_unaligned_be32(key + 12);
--
--	/* generate KL dependent subkeys */
--	/* kw1 */
--	subL[0] = kll; subR[0] = klr;
--	/* kw2 */
--	subL[1] = krl; subR[1] = krr;
--	/* rotation left shift 15bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k3 */
--	subL[4] = kll; subR[4] = klr;
--	/* k4 */
--	subL[5] = krl; subR[5] = krr;
--	/* rotation left shift 15+30bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
--	/* k7 */
--	subL[10] = kll; subR[10] = klr;
--	/* k8 */
--	subL[11] = krl; subR[11] = krr;
--	/* rotation left shift 15+30+15bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k10 */
--	subL[13] = krl; subR[13] = krr;
--	/* rotation left shift 15+30+15+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
--	/* kl3 */
--	subL[16] = kll; subR[16] = klr;
--	/* kl4 */
--	subL[17] = krl; subR[17] = krr;
--	/* rotation left shift 15+30+15+17+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
--	/* k13 */
--	subL[18] = kll; subR[18] = klr;
--	/* k14 */
--	subL[19] = krl; subR[19] = krr;
--	/* rotation left shift 15+30+15+17+17+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
--	/* k17 */
--	subL[22] = kll; subR[22] = klr;
--	/* k18 */
--	subL[23] = krl; subR[23] = krr;
--
--	/* generate KA */
--	kll = subL[0]; klr = subR[0];
--	krl = subL[1]; krr = subR[1];
--	CAMELLIA_F(kll, klr,
--		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
--		   w0, w1, il, ir, t0, t1);
--	krl ^= w0; krr ^= w1;
--	CAMELLIA_F(krl, krr,
--		   CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R,
--		   kll, klr, il, ir, t0, t1);
--	/* current status == (kll, klr, w0, w1) */
--	CAMELLIA_F(kll, klr,
--		   CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R,
--		   krl, krr, il, ir, t0, t1);
--	krl ^= w0; krr ^= w1;
--	CAMELLIA_F(krl, krr,
--		   CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R,
--		   w0, w1, il, ir, t0, t1);
--	kll ^= w0; klr ^= w1;
--
--	/* generate KA dependent subkeys */
--	/* k1, k2 */
--	subL[2] = kll; subR[2] = klr;
--	subL[3] = krl; subR[3] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k5,k6 */
--	subL[6] = kll; subR[6] = klr;
--	subL[7] = krl; subR[7] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* kl1, kl2 */
--	subL[8] = kll; subR[8] = klr;
--	subL[9] = krl; subR[9] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k9 */
--	subL[12] = kll; subR[12] = klr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k11, k12 */
--	subL[14] = kll; subR[14] = klr;
--	subL[15] = krl; subR[15] = krr;
--	ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
--	/* k15, k16 */
--	subL[20] = kll; subR[20] = klr;
--	subL[21] = krl; subR[21] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
--	/* kw3, kw4 */
--	subL[24] = kll; subR[24] = klr;
--	subL[25] = krl; subR[25] = krr;
--
--	camellia_setup_tail(subkey, subL, subR, 24);
--}
--
--static void camellia_setup256(const unsigned char *key, u32 *subkey)
--{
--	u32 kll, klr, krl, krr;        /* left half of key */
--	u32 krll, krlr, krrl, krrr;    /* right half of key */
--	u32 il, ir, t0, t1, w0, w1;    /* temporary variables */
--	u32 subL[34];
--	u32 subR[34];
--
--	/**
--	 *  key = (kll || klr || krl || krr || krll || krlr || krrl || krrr)
--	 *  (|| is concatenation)
--	 */
--	kll = get_unaligned_be32(key);
--	klr = get_unaligned_be32(key + 4);
--	krl = get_unaligned_be32(key + 8);
--	krr = get_unaligned_be32(key + 12);
--	krll = get_unaligned_be32(key + 16);
--	krlr = get_unaligned_be32(key + 20);
--	krrl = get_unaligned_be32(key + 24);
--	krrr = get_unaligned_be32(key + 28);
--
--	/* generate KL dependent subkeys */
--	/* kw1 */
--	subL[0] = kll; subR[0] = klr;
--	/* kw2 */
--	subL[1] = krl; subR[1] = krr;
--	ROLDQo32(kll, klr, krl, krr, w0, w1, 45);
--	/* k9 */
--	subL[12] = kll; subR[12] = klr;
--	/* k10 */
--	subL[13] = krl; subR[13] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* kl3 */
--	subL[16] = kll; subR[16] = klr;
--	/* kl4 */
--	subL[17] = krl; subR[17] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
--	/* k17 */
--	subL[22] = kll; subR[22] = klr;
--	/* k18 */
--	subL[23] = krl; subR[23] = krr;
--	ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
--	/* k23 */
--	subL[30] = kll; subR[30] = klr;
--	/* k24 */
--	subL[31] = krl; subR[31] = krr;
--
--	/* generate KR dependent subkeys */
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
--	/* k3 */
--	subL[4] = krll; subR[4] = krlr;
--	/* k4 */
--	subL[5] = krrl; subR[5] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
--	/* kl1 */
--	subL[8] = krll; subR[8] = krlr;
--	/* kl2 */
--	subL[9] = krrl; subR[9] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
--	/* k13 */
--	subL[18] = krll; subR[18] = krlr;
--	/* k14 */
--	subL[19] = krrl; subR[19] = krrr;
--	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
--	/* k19 */
--	subL[26] = krll; subR[26] = krlr;
--	/* k20 */
--	subL[27] = krrl; subR[27] = krrr;
--	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
--
--	/* generate KA */
--	kll = subL[0] ^ krll; klr = subR[0] ^ krlr;
--	krl = subL[1] ^ krrl; krr = subR[1] ^ krrr;
--	CAMELLIA_F(kll, klr,
--		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
--		   w0, w1, il, ir, t0, t1);
--	krl ^= w0; krr ^= w1;
--	CAMELLIA_F(krl, krr,
--		   CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R,
--		   kll, klr, il, ir, t0, t1);
--	kll ^= krll; klr ^= krlr;
--	CAMELLIA_F(kll, klr,
--		   CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R,
--		   krl, krr, il, ir, t0, t1);
--	krl ^= w0 ^ krrl; krr ^= w1 ^ krrr;
--	CAMELLIA_F(krl, krr,
--		   CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R,
--		   w0, w1, il, ir, t0, t1);
--	kll ^= w0; klr ^= w1;
--
--	/* generate KB */
--	krll ^= kll; krlr ^= klr;
--	krrl ^= krl; krrr ^= krr;
--	CAMELLIA_F(krll, krlr,
--		   CAMELLIA_SIGMA5L, CAMELLIA_SIGMA5R,
--		   w0, w1, il, ir, t0, t1);
--	krrl ^= w0; krrr ^= w1;
--	CAMELLIA_F(krrl, krrr,
--		   CAMELLIA_SIGMA6L, CAMELLIA_SIGMA6R,
--		   w0, w1, il, ir, t0, t1);
--	krll ^= w0; krlr ^= w1;
--
--	/* generate KA dependent subkeys */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
--	/* k5 */
--	subL[6] = kll; subR[6] = klr;
--	/* k6 */
--	subL[7] = krl; subR[7] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
--	/* k11 */
--	subL[14] = kll; subR[14] = klr;
--	/* k12 */
--	subL[15] = krl; subR[15] = krr;
--	/* rotation left shift 32bit */
--	/* kl5 */
--	subL[24] = klr; subR[24] = krl;
--	/* kl6 */
--	subL[25] = krr; subR[25] = kll;
--	/* rotation left shift 49 from k11,k12 -> k21,k22 */
--	ROLDQo32(kll, klr, krl, krr, w0, w1, 49);
--	/* k21 */
--	subL[28] = kll; subR[28] = klr;
--	/* k22 */
--	subL[29] = krl; subR[29] = krr;
--
--	/* generate KB dependent subkeys */
--	/* k1 */
--	subL[2] = krll; subR[2] = krlr;
--	/* k2 */
--	subL[3] = krrl; subR[3] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
--	/* k7 */
--	subL[10] = krll; subR[10] = krlr;
--	/* k8 */
--	subL[11] = krrl; subR[11] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
--	/* k15 */
--	subL[20] = krll; subR[20] = krlr;
--	/* k16 */
--	subL[21] = krrl; subR[21] = krrr;
--	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 51);
--	/* kw3 */
--	subL[32] = krll; subR[32] = krlr;
--	/* kw4 */
--	subL[33] = krrl; subR[33] = krrr;
--
--	camellia_setup_tail(subkey, subL, subR, 32);
--}
--
--static void camellia_setup192(const unsigned char *key, u32 *subkey)
--{
--	unsigned char kk[32];
--	u32 krll, krlr, krrl, krrr;
--
--	memcpy(kk, key, 24);
--	memcpy((unsigned char *)&krll, key+16, 4);
--	memcpy((unsigned char *)&krlr, key+20, 4);
--	krrl = ~krll;
--	krrr = ~krlr;
--	memcpy(kk+24, (unsigned char *)&krrl, 4);
--	memcpy(kk+28, (unsigned char *)&krrr, 4);
--	camellia_setup256(kk, subkey);
--}
--
--
--/*
-- * Encrypt/decrypt
-- */
--#define CAMELLIA_FLS(ll, lr, rl, rr, kll, klr, krl, krr, t0, t1, t2, t3) ({ \
--	t0 = kll;							\
--	t2 = krr;							\
--	t0 &= ll;							\
--	t2 |= rr;							\
--	rl ^= t2;							\
--	lr ^= rol32(t0, 1);						\
--	t3 = krl;							\
--	t1 = klr;							\
--	t3 &= rl;							\
--	t1 |= lr;							\
--	ll ^= t1;							\
--	rr ^= rol32(t3, 1);						\
--})
--
--#define CAMELLIA_ROUNDSM(xl, xr, kl, kr, yl, yr, il, ir) ({		\
--	yl ^= kl;							\
--	yr ^= kr;							\
--	ir =  camellia_sp1110[(u8)xr];					\
--	il =  camellia_sp1110[(u8)(xl >> 24)];				\
--	ir ^= camellia_sp0222[(u8)(xr >> 24)];				\
--	il ^= camellia_sp0222[(u8)(xl >> 16)];				\
--	ir ^= camellia_sp3033[(u8)(xr >> 16)];				\
--	il ^= camellia_sp3033[(u8)(xl >> 8)];				\
--	ir ^= camellia_sp4404[(u8)(xr >> 8)];				\
--	il ^= camellia_sp4404[(u8)xl];					\
--	ir ^= il;							\
--	yl ^= ir;							\
--	yr ^= ror32(il, 8) ^ ir;					\
--})
--
--/* max = 24: 128bit encrypt, max = 32: 256bit encrypt */
--static void camellia_do_encrypt(const u32 *subkey, u32 *io, unsigned max)
--{
--	u32 il, ir, t0, t1;            /* temporary variables */
--
--	/* pre whitening but absorb kw2 */
--	io[0] ^= SUBKEY_L(0);
--	io[1] ^= SUBKEY_R(0);
--
--	/* main iteration */
--#define ROUNDS(i) ({ \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 2), SUBKEY_R(i + 2), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 3), SUBKEY_R(i + 3), \
--			 io[0], io[1], il, ir); \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 4), SUBKEY_R(i + 4), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 5), SUBKEY_R(i + 5), \
--			 io[0], io[1], il, ir); \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 6), SUBKEY_R(i + 6), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 7), SUBKEY_R(i + 7), \
--			 io[0], io[1], il, ir); \
--})
--#define FLS(i) ({ \
--	CAMELLIA_FLS(io[0], io[1], io[2], io[3], \
--		     SUBKEY_L(i + 0), SUBKEY_R(i + 0), \
--		     SUBKEY_L(i + 1), SUBKEY_R(i + 1), \
--		     t0, t1, il, ir); \
--})
--
--	ROUNDS(0);
--	FLS(8);
--	ROUNDS(8);
--	FLS(16);
--	ROUNDS(16);
--	if (max == 32) {
--		FLS(24);
--		ROUNDS(24);
--	}
--
--#undef ROUNDS
--#undef FLS
--
--	/* post whitening but kw4 */
--	io[2] ^= SUBKEY_L(max);
--	io[3] ^= SUBKEY_R(max);
--	/* NB: io[0],[1] should be swapped with [2],[3] by caller! */
--}
--
--static void camellia_do_decrypt(const u32 *subkey, u32 *io, unsigned i)
--{
--	u32 il, ir, t0, t1;            /* temporary variables */
--
--	/* pre whitening but absorb kw2 */
--	io[0] ^= SUBKEY_L(i);
--	io[1] ^= SUBKEY_R(i);
--
--	/* main iteration */
--#define ROUNDS(i) ({ \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 7), SUBKEY_R(i + 7), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 6), SUBKEY_R(i + 6), \
--			 io[0], io[1], il, ir); \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 5), SUBKEY_R(i + 5), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 4), SUBKEY_R(i + 4), \
--			 io[0], io[1], il, ir); \
--	CAMELLIA_ROUNDSM(io[0], io[1], \
--			 SUBKEY_L(i + 3), SUBKEY_R(i + 3), \
--			 io[2], io[3], il, ir); \
--	CAMELLIA_ROUNDSM(io[2], io[3], \
--			 SUBKEY_L(i + 2), SUBKEY_R(i + 2), \
--			 io[0], io[1], il, ir); \
--})
--#define FLS(i) ({ \
--	CAMELLIA_FLS(io[0], io[1], io[2], io[3], \
--		     SUBKEY_L(i + 1), SUBKEY_R(i + 1), \
--		     SUBKEY_L(i + 0), SUBKEY_R(i + 0), \
--		     t0, t1, il, ir); \
--})
--
--	if (i == 32) {
--		ROUNDS(24);
--		FLS(24);
--	}
--	ROUNDS(16);
--	FLS(16);
--	ROUNDS(8);
--	FLS(8);
--	ROUNDS(0);
--
--#undef ROUNDS
--#undef FLS
--
--	/* post whitening but kw4 */
--	io[2] ^= SUBKEY_L(0);
--	io[3] ^= SUBKEY_R(0);
--	/* NB: 0,1 should be swapped with 2,3 by caller! */
--}
--
--
--struct camellia_ctx {
--	int key_length;
--	u32 key_table[CAMELLIA_TABLE_BYTE_LEN / sizeof(u32)];
--};
--
--static int
--camellia_set_key(struct crypto_tfm *tfm, const u8 *in_key,
--		 unsigned int key_len)
--{
--	struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
--	const unsigned char *key = (const unsigned char *)in_key;
--	u32 *flags = &tfm->crt_flags;
--
--	if (key_len != 16 && key_len != 24 && key_len != 32) {
--		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
--		return -EINVAL;
--	}
--
--	cctx->key_length = key_len;
--
--	switch (key_len) {
--	case 16:
--		camellia_setup128(key, cctx->key_table);
--		break;
--	case 24:
--		camellia_setup192(key, cctx->key_table);
--		break;
--	case 32:
--		camellia_setup256(key, cctx->key_table);
--		break;
--	}
--
--	return 0;
--}
--
--static void camellia_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
--{
--	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
--	const __be32 *src = (const __be32 *)in;
--	__be32 *dst = (__be32 *)out;
--	unsigned int max;
--
--	u32 tmp[4];
--
--	tmp[0] = be32_to_cpu(src[0]);
--	tmp[1] = be32_to_cpu(src[1]);
--	tmp[2] = be32_to_cpu(src[2]);
--	tmp[3] = be32_to_cpu(src[3]);
--
--	if (cctx->key_length == 16)
--		max = 24;
--	else
--		max = 32; /* for key lengths of 24 and 32 */
--
--	camellia_do_encrypt(cctx->key_table, tmp, max);
--
--	/* do_encrypt returns 0,1 swapped with 2,3 */
--	dst[0] = cpu_to_be32(tmp[2]);
--	dst[1] = cpu_to_be32(tmp[3]);
--	dst[2] = cpu_to_be32(tmp[0]);
--	dst[3] = cpu_to_be32(tmp[1]);
--}
--
--static void camellia_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
--{
--	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
--	const __be32 *src = (const __be32 *)in;
--	__be32 *dst = (__be32 *)out;
--	unsigned int max;
--
--	u32 tmp[4];
--
--	tmp[0] = be32_to_cpu(src[0]);
--	tmp[1] = be32_to_cpu(src[1]);
--	tmp[2] = be32_to_cpu(src[2]);
--	tmp[3] = be32_to_cpu(src[3]);
--
--	if (cctx->key_length == 16)
--		max = 24;
--	else
--		max = 32; /* for key lengths of 24 and 32 */
--
--	camellia_do_decrypt(cctx->key_table, tmp, max);
--
--	/* do_decrypt returns 0,1 swapped with 2,3 */
--	dst[0] = cpu_to_be32(tmp[2]);
--	dst[1] = cpu_to_be32(tmp[3]);
--	dst[2] = cpu_to_be32(tmp[0]);
--	dst[3] = cpu_to_be32(tmp[1]);
--}
--
--static struct crypto_alg camellia_alg = {
--	.cra_name		=	"camellia",
--	.cra_driver_name	=	"camellia-generic",
--	.cra_priority		=	100,
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	CAMELLIA_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct camellia_ctx),
--	.cra_alignmask		=	3,
--	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(camellia_alg.cra_list),
--	.cra_u			=	{
--		.cipher = {
--			.cia_min_keysize	=	CAMELLIA_MIN_KEY_SIZE,
--			.cia_max_keysize	=	CAMELLIA_MAX_KEY_SIZE,
--			.cia_setkey		=	camellia_set_key,
--			.cia_encrypt		=	camellia_encrypt,
--			.cia_decrypt		=	camellia_decrypt
--		}
--	}
--};
--
--static int __init camellia_init(void)
--{
--	return crypto_register_alg(&camellia_alg);
--}
--
--static void __exit camellia_fini(void)
--{
--	crypto_unregister_alg(&camellia_alg);
--}
--
--module_init(camellia_init);
--module_exit(camellia_fini);
--
--MODULE_DESCRIPTION("Camellia Cipher Algorithm");
--MODULE_LICENSE("GPL");
--MODULE_ALIAS("camellia");
-diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 2b0b963..e191ac0 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -8,6 +8,7 @@ obj-$(CONFIG_CRYPTO_SALSA20_586) += salsa20-i586.o
+ obj-$(CONFIG_CRYPTO_SERPENT_SSE2_586) += serpent-sse2-i586.o
+ 
+ obj-$(CONFIG_CRYPTO_AES_X86_64) += aes-x86_64.o
++obj-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
+ obj-$(CONFIG_CRYPTO_BLOWFISH_X86_64) += blowfish-x86_64.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
+@@ -25,6 +26,7 @@ salsa20-i586-y := salsa20-i586-asm_32.o salsa20_glue.o
+ serpent-sse2-i586-y := serpent-sse2-i586-asm_32.o serpent_sse2_glue.o
+ 
+ aes-x86_64-y := aes-x86_64-asm_64.o aes_glue.o
++camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
+ blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
+ twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
+ twofish-x86_64-3way-y := twofish-x86_64-asm_64-3way.o twofish_glue_3way.o
+diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
 new file mode 100644
-index 0000000..f7aaaaf
+index 0000000..2cde386
 --- /dev/null
-+++ b/crypto/camellia_generic.c
-@@ -0,0 +1,1102 @@
++++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
+@@ -0,0 +1,521 @@
 +/*
-+ * Copyright (C) 2006
-+ * NTT (Nippon Telegraph and Telephone Corporation).
++ * Camellia Cipher Algorithm (x86_64)
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
++ * Copyright (C) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
 + * This program is distributed in the hope that it will be useful,
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1170,313 +146,1326 @@ index 0000000..f7aaaaf
 + *
 + * You should have received a copy of the GNU General Public License
 + * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-+ */
-+
-+/*
-+ * Algorithm Specification
-+ *  http://info.isl.ntt.co.jp/crypt/eng/camellia/specifications.html
-+ */
-+
-+/*
-+ *
-+ * NOTE --- NOTE --- NOTE --- NOTE
-+ * This implementation assumes that all memory addresses passed
-+ * as parameters are four-byte aligned.
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
 + *
 + */
 +
-+#include <linux/crypto.h>
-+#include <linux/errno.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/bitops.h>
++.file "camellia-x86_64-asm_64.S"
++.text
++
++.extern camellia_sp10011110;
++.extern camellia_sp22000222;
++.extern camellia_sp03303033;
++.extern camellia_sp00444404;
++.extern camellia_sp02220222;
++.extern camellia_sp30333033;
++.extern camellia_sp44044404;
++.extern camellia_sp11101110;
++
++#define sp10011110 camellia_sp10011110
++#define sp22000222 camellia_sp22000222
++#define sp03303033 camellia_sp03303033
++#define sp00444404 camellia_sp00444404
++#define sp02220222 camellia_sp02220222
++#define sp30333033 camellia_sp30333033
++#define sp44044404 camellia_sp44044404
++#define sp11101110 camellia_sp11101110
++
++#define CAMELLIA_TABLE_BYTE_LEN 272
++
++/* struct camellia_ctx: */
++#define key_table 0
++#define key_length CAMELLIA_TABLE_BYTE_LEN
++
++/* register macros */
++#define CTX %rdi
++#define RIO %rsi
++#define RIOd %esi
++
++#define RAB0 %rax
++#define RCD0 %rcx
++#define RAB1 %rbx
++#define RCD1 %rdx
++
++#define RAB0d %eax
++#define RCD0d %ecx
++#define RAB1d %ebx
++#define RCD1d %edx
++
++#define RAB0bl %al
++#define RCD0bl %cl
++#define RAB1bl %bl
++#define RCD1bl %dl
++
++#define RAB0bh %ah
++#define RCD0bh %ch
++#define RAB1bh %bh
++#define RCD1bh %dh
++
++#define RT0 %rsi
++#define RT1 %rbp
++#define RT2 %r8
++
++#define RT0d %esi
++#define RT1d %ebp
++#define RT2d %r8d
++
++#define RT2bl %r8b
++
++#define RXOR %r9
++#define RRBP %r10
++#define RDST %r11
++
++#define RXORd %r9d
++#define RXORbl %r9b
++
++#define xor2ror16(T0, T1, tmp1, tmp2, ab, dst) \
++	movzbl ab ## bl,		tmp2 ## d; \
++	movzbl ab ## bh,		tmp1 ## d; \
++	rorq $16,			ab; \
++	xorq T0(, tmp2, 8),		dst; \
++	xorq T1(, tmp1, 8),		dst;
++
++/**********************************************************************
++  1-way camellia
++ **********************************************************************/
++#define roundsm(ab, subkey, cd) \
++	movq (key_table + ((subkey) * 2) * 4)(CTX),	RT2; \
++	\
++	xor2ror16(sp00444404, sp03303033, RT0, RT1, ab ## 0, cd ## 0); \
++	xor2ror16(sp22000222, sp10011110, RT0, RT1, ab ## 0, RT2); \
++	xor2ror16(sp11101110, sp44044404, RT0, RT1, ab ## 0, cd ## 0); \
++	xor2ror16(sp30333033, sp02220222, RT0, RT1, ab ## 0, RT2); \
++	\
++	xorq RT2,					cd ## 0;
++
++#define fls(l, r, kl, kr) \
++	movl (key_table + ((kl) * 2) * 4)(CTX),		RT0d; \
++	andl l ## 0d,					RT0d; \
++	roll $1,					RT0d; \
++	shlq $32,					RT0; \
++	xorq RT0,					l ## 0; \
++	movq (key_table + ((kr) * 2) * 4)(CTX),		RT1; \
++	orq r ## 0,					RT1; \
++	shrq $32,					RT1; \
++	xorq RT1,					r ## 0; \
++	\
++	movq (key_table + ((kl) * 2) * 4)(CTX),		RT2; \
++	orq l ## 0,					RT2; \
++	shrq $32,					RT2; \
++	xorq RT2,					l ## 0; \
++	movl (key_table + ((kr) * 2) * 4)(CTX),		RT0d; \
++	andl r ## 0d,					RT0d; \
++	roll $1,					RT0d; \
++	shlq $32,					RT0; \
++	xorq RT0,					r ## 0;
++
++#define enc_rounds(i) \
++	roundsm(RAB, i + 2, RCD); \
++	roundsm(RCD, i + 3, RAB); \
++	roundsm(RAB, i + 4, RCD); \
++	roundsm(RCD, i + 5, RAB); \
++	roundsm(RAB, i + 6, RCD); \
++	roundsm(RCD, i + 7, RAB);
++
++#define enc_fls(i) \
++	fls(RAB, RCD, i + 0, i + 1);
++
++#define enc_inpack() \
++	movq (RIO),			RAB0; \
++	bswapq				RAB0; \
++	rolq $32,			RAB0; \
++	movq 4*2(RIO),			RCD0; \
++	bswapq				RCD0; \
++	rorq $32,			RCD0; \
++	xorq key_table(CTX),		RAB0;
++
++#define enc_outunpack(op, max) \
++	xorq key_table(CTX, max, 8),	RCD0; \
++	rorq $32,			RCD0; \
++	bswapq				RCD0; \
++	op ## q RCD0,			(RIO); \
++	rolq $32,			RAB0; \
++	bswapq				RAB0; \
++	op ## q RAB0,			4*2(RIO);
++
++#define dec_rounds(i) \
++	roundsm(RAB, i + 7, RCD); \
++	roundsm(RCD, i + 6, RAB); \
++	roundsm(RAB, i + 5, RCD); \
++	roundsm(RCD, i + 4, RAB); \
++	roundsm(RAB, i + 3, RCD); \
++	roundsm(RCD, i + 2, RAB);
++
++#define dec_fls(i) \
++	fls(RAB, RCD, i + 1, i + 0);
++
++#define dec_inpack(max) \
++	movq (RIO),			RAB0; \
++	bswapq				RAB0; \
++	rolq $32,			RAB0; \
++	movq 4*2(RIO),			RCD0; \
++	bswapq				RCD0; \
++	rorq $32,			RCD0; \
++	xorq key_table(CTX, max, 8),	RAB0;
++
++#define dec_outunpack() \
++	xorq key_table(CTX),		RCD0; \
++	rorq $32,			RCD0; \
++	bswapq				RCD0; \
++	movq RCD0,			(RIO); \
++	rolq $32,			RAB0; \
++	bswapq				RAB0; \
++	movq RAB0,			4*2(RIO);
++
++.global __camellia_enc_blk;
++.type   __camellia_enc_blk,@function;
++
++__camellia_enc_blk:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 *	%rcx: bool xor
++	 */
++	movq %rbp, RRBP;
++
++	movq %rcx, RXOR;
++	movq %rsi, RDST;
++	movq %rdx, RIO;
++
++	enc_inpack();
++
++	enc_rounds(0);
++	enc_fls(8);
++	enc_rounds(8);
++	enc_fls(16);
++	enc_rounds(16);
++	movl $24, RT1d; /* max */
++
++	cmpb $16, key_length(CTX);
++	je __enc_done;
++
++	enc_fls(24);
++	enc_rounds(24);
++	movl $32, RT1d; /* max */
++
++__enc_done:
++	testb RXORbl, RXORbl;
++	movq RDST, RIO;
++
++	jnz __enc_xor;
++
++	enc_outunpack(mov, RT1);
++
++	movq RRBP, %rbp;
++	ret;
++
++__enc_xor:
++	enc_outunpack(xor, RT1);
++
++	movq RRBP, %rbp;
++	ret;
++
++.global camellia_dec_blk;
++.type   camellia_dec_blk,@function;
++
++camellia_dec_blk:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 */
++	cmpl $16, key_length(CTX);
++	movl $32, RT2d;
++	movl $24, RXORd;
++	cmovel RXORd, RT2d; /* max */
++
++	movq %rbp, RRBP;
++	movq %rsi, RDST;
++	movq %rdx, RIO;
++
++	dec_inpack(RT2);
++
++	cmpb $24, RT2bl;
++	je __dec_rounds16;
++
++	dec_rounds(24);
++	dec_fls(24);
++
++__dec_rounds16:
++	dec_rounds(16);
++	dec_fls(16);
++	dec_rounds(8);
++	dec_fls(8);
++	dec_rounds(0);
++
++	movq RDST, RIO;
++
++	dec_outunpack();
++
++	movq RRBP, %rbp;
++	ret;
++
++/**********************************************************************
++  2-way camellia
++ **********************************************************************/
++#define roundsm2(ab, subkey, cd) \
++	movq (key_table + ((subkey) * 2) * 4)(CTX),	RT2; \
++	xorq RT2,					cd ## 1; \
++	\
++	xor2ror16(sp00444404, sp03303033, RT0, RT1, ab ## 0, cd ## 0); \
++	xor2ror16(sp22000222, sp10011110, RT0, RT1, ab ## 0, RT2); \
++	xor2ror16(sp11101110, sp44044404, RT0, RT1, ab ## 0, cd ## 0); \
++	xor2ror16(sp30333033, sp02220222, RT0, RT1, ab ## 0, RT2); \
++	\
++		xor2ror16(sp00444404, sp03303033, RT0, RT1, ab ## 1, cd ## 1); \
++		xorq RT2,					cd ## 0; \
++		xor2ror16(sp22000222, sp10011110, RT0, RT1, ab ## 1, cd ## 1); \
++		xor2ror16(sp11101110, sp44044404, RT0, RT1, ab ## 1, cd ## 1); \
++		xor2ror16(sp30333033, sp02220222, RT0, RT1, ab ## 1, cd ## 1);
++
++#define fls2(l, r, kl, kr) \
++	movl (key_table + ((kl) * 2) * 4)(CTX),		RT0d; \
++	andl l ## 0d,					RT0d; \
++	roll $1,					RT0d; \
++	shlq $32,					RT0; \
++	xorq RT0,					l ## 0; \
++	movq (key_table + ((kr) * 2) * 4)(CTX),		RT1; \
++	orq r ## 0,					RT1; \
++	shrq $32,					RT1; \
++	xorq RT1,					r ## 0; \
++	\
++		movl (key_table + ((kl) * 2) * 4)(CTX),		RT2d; \
++		andl l ## 1d,					RT2d; \
++		roll $1,					RT2d; \
++		shlq $32,					RT2; \
++		xorq RT2,					l ## 1; \
++		movq (key_table + ((kr) * 2) * 4)(CTX),		RT0; \
++		orq r ## 1,					RT0; \
++		shrq $32,					RT0; \
++		xorq RT0,					r ## 1; \
++	\
++	movq (key_table + ((kl) * 2) * 4)(CTX),		RT1; \
++	orq l ## 0,					RT1; \
++	shrq $32,					RT1; \
++	xorq RT1,					l ## 0; \
++	movl (key_table + ((kr) * 2) * 4)(CTX),		RT2d; \
++	andl r ## 0d,					RT2d; \
++	roll $1,					RT2d; \
++	shlq $32,					RT2; \
++	xorq RT2,					r ## 0; \
++	\
++		movq (key_table + ((kl) * 2) * 4)(CTX),		RT0; \
++		orq l ## 1,					RT0; \
++		shrq $32,					RT0; \
++		xorq RT0,					l ## 1; \
++		movl (key_table + ((kr) * 2) * 4)(CTX),		RT1d; \
++		andl r ## 1d,					RT1d; \
++		roll $1,					RT1d; \
++		shlq $32,					RT1; \
++		xorq RT1,					r ## 1;
++
++#define enc_rounds2(i) \
++	roundsm2(RAB, i + 2, RCD); \
++	roundsm2(RCD, i + 3, RAB); \
++	roundsm2(RAB, i + 4, RCD); \
++	roundsm2(RCD, i + 5, RAB); \
++	roundsm2(RAB, i + 6, RCD); \
++	roundsm2(RCD, i + 7, RAB);
++
++#define enc_fls2(i) \
++	fls2(RAB, RCD, i + 0, i + 1);
++
++#define enc_inpack2() \
++	movq (RIO),			RAB0; \
++	bswapq				RAB0; \
++	rorq $32,			RAB0; \
++	movq 4*2(RIO),			RCD0; \
++	bswapq				RCD0; \
++	rolq $32,			RCD0; \
++	xorq key_table(CTX),		RAB0; \
++	\
++		movq 8*2(RIO),			RAB1; \
++		bswapq				RAB1; \
++		rorq $32,			RAB1; \
++		movq 12*2(RIO),			RCD1; \
++		bswapq				RCD1; \
++		rolq $32,			RCD1; \
++		xorq key_table(CTX),		RAB1;
++
++#define enc_outunpack2(op, max) \
++	xorq key_table(CTX, max, 8),	RCD0; \
++	rolq $32,			RCD0; \
++	bswapq				RCD0; \
++	op ## q RCD0,			(RIO); \
++	rorq $32,			RAB0; \
++	bswapq				RAB0; \
++	op ## q RAB0,			4*2(RIO); \
++	\
++		xorq key_table(CTX, max, 8),	RCD1; \
++		rolq $32,			RCD1; \
++		bswapq				RCD1; \
++		op ## q RCD1,			8*2(RIO); \
++		rorq $32,			RAB1; \
++		bswapq				RAB1; \
++		op ## q RAB1,			12*2(RIO);
++
++#define dec_rounds2(i) \
++	roundsm2(RAB, i + 7, RCD); \
++	roundsm2(RCD, i + 6, RAB); \
++	roundsm2(RAB, i + 5, RCD); \
++	roundsm2(RCD, i + 4, RAB); \
++	roundsm2(RAB, i + 3, RCD); \
++	roundsm2(RCD, i + 2, RAB);
++
++#define dec_fls2(i) \
++	fls2(RAB, RCD, i + 1, i + 0);
++
++#define dec_inpack2(max) \
++	movq (RIO),			RAB0; \
++	bswapq				RAB0; \
++	rorq $32,			RAB0; \
++	movq 4*2(RIO),			RCD0; \
++	bswapq				RCD0; \
++	rolq $32,			RCD0; \
++	xorq key_table(CTX, max, 8),	RAB0; \
++	\
++		movq 8*2(RIO),			RAB1; \
++		bswapq				RAB1; \
++		rorq $32,			RAB1; \
++		movq 12*2(RIO),			RCD1; \
++		bswapq				RCD1; \
++		rolq $32,			RCD1; \
++		xorq key_table(CTX, max, 8),	RAB1;
++
++#define dec_outunpack2() \
++	xorq key_table(CTX),		RCD0; \
++	rolq $32,			RCD0; \
++	bswapq				RCD0; \
++	movq RCD0,			(RIO); \
++	rorq $32,			RAB0; \
++	bswapq				RAB0; \
++	movq RAB0,			4*2(RIO); \
++	\
++		xorq key_table(CTX),		RCD1; \
++		rolq $32,			RCD1; \
++		bswapq				RCD1; \
++		movq RCD1,			8*2(RIO); \
++		rorq $32,			RAB1; \
++		bswapq				RAB1; \
++		movq RAB1,			12*2(RIO);
++
++.global __camellia_enc_blk_2way;
++.type   __camellia_enc_blk_2way,@function;
++
++__camellia_enc_blk_2way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 *	%rcx: bool xor
++	 */
++	pushq %rbx;
++
++	movq %rbp, RRBP;
++	movq %rcx, RXOR;
++	movq %rsi, RDST;
++	movq %rdx, RIO;
++
++	enc_inpack2();
++
++	enc_rounds2(0);
++	enc_fls2(8);
++	enc_rounds2(8);
++	enc_fls2(16);
++	enc_rounds2(16);
++	movl $24, RT2d; /* max */
++
++	cmpb $16, key_length(CTX);
++	je __enc2_done;
++
++	enc_fls2(24);
++	enc_rounds2(24);
++	movl $32, RT2d; /* max */
++
++__enc2_done:
++	test RXORbl, RXORbl;
++	movq RDST, RIO;
++	jnz __enc2_xor;
++
++	enc_outunpack2(mov, RT2);
++
++	movq RRBP, %rbp;
++	popq %rbx;
++	ret;
++
++__enc2_xor:
++	enc_outunpack2(xor, RT2);
++
++	movq RRBP, %rbp;
++	popq %rbx;
++	ret;
++
++.global camellia_dec_blk_2way;
++.type   camellia_dec_blk_2way,@function;
++
++camellia_dec_blk_2way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 */
++	cmpl $16, key_length(CTX);
++	movl $32, RT2d;
++	movl $24, RXORd;
++	cmovel RXORd, RT2d; /* max */
++
++	movq %rbx, RXOR;
++	movq %rbp, RRBP;
++	movq %rsi, RDST;
++	movq %rdx, RIO;
++
++	dec_inpack2(RT2);
++
++	cmpb $24, RT2bl;
++	je __dec2_rounds16;
++
++	dec_rounds2(24);
++	dec_fls2(24);
++
++__dec2_rounds16:
++	dec_rounds2(16);
++	dec_fls2(16);
++	dec_rounds2(8);
++	dec_fls2(8);
++	dec_rounds2(0);
++
++	movq RDST, RIO;
++
++	dec_outunpack2();
++
++	movq RRBP, %rbp;
++	movq RXOR, %rbx;
++	ret;
++
+diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
+new file mode 100644
+index 0000000..0d9d196
+--- /dev/null
++++ b/arch/x86/crypto/camellia_glue.c
+@@ -0,0 +1,1953 @@
++/*
++ * Glue Code for assembler optimized version of Camellia
++ *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * Camellia parts based on code by:
++ *  Copyright (C) 2006 NTT (Nippon Telegraph and Telephone Corporation)
++ * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
++ *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
++ * CTR part based on code (crypto/ctr.c) by:
++ *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
++ *
++ */
++
++#include <asm/processor.h>
 +#include <asm/unaligned.h>
++#include <linux/crypto.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/types.h>
++#include <crypto/algapi.h>
++#include <crypto/b128ops.h>
++#include <crypto/lrw.h>
++#include <crypto/xts.h>
 +
-+static const u32 camellia_sp1110[256] = {
-+	0x70707000, 0x82828200, 0x2c2c2c00, 0xececec00,
-+	0xb3b3b300, 0x27272700, 0xc0c0c000, 0xe5e5e500,
-+	0xe4e4e400, 0x85858500, 0x57575700, 0x35353500,
-+	0xeaeaea00, 0x0c0c0c00, 0xaeaeae00, 0x41414100,
-+	0x23232300, 0xefefef00, 0x6b6b6b00, 0x93939300,
-+	0x45454500, 0x19191900, 0xa5a5a500, 0x21212100,
-+	0xededed00, 0x0e0e0e00, 0x4f4f4f00, 0x4e4e4e00,
-+	0x1d1d1d00, 0x65656500, 0x92929200, 0xbdbdbd00,
-+	0x86868600, 0xb8b8b800, 0xafafaf00, 0x8f8f8f00,
-+	0x7c7c7c00, 0xebebeb00, 0x1f1f1f00, 0xcecece00,
-+	0x3e3e3e00, 0x30303000, 0xdcdcdc00, 0x5f5f5f00,
-+	0x5e5e5e00, 0xc5c5c500, 0x0b0b0b00, 0x1a1a1a00,
-+	0xa6a6a600, 0xe1e1e100, 0x39393900, 0xcacaca00,
-+	0xd5d5d500, 0x47474700, 0x5d5d5d00, 0x3d3d3d00,
-+	0xd9d9d900, 0x01010100, 0x5a5a5a00, 0xd6d6d600,
-+	0x51515100, 0x56565600, 0x6c6c6c00, 0x4d4d4d00,
-+	0x8b8b8b00, 0x0d0d0d00, 0x9a9a9a00, 0x66666600,
-+	0xfbfbfb00, 0xcccccc00, 0xb0b0b000, 0x2d2d2d00,
-+	0x74747400, 0x12121200, 0x2b2b2b00, 0x20202000,
-+	0xf0f0f000, 0xb1b1b100, 0x84848400, 0x99999900,
-+	0xdfdfdf00, 0x4c4c4c00, 0xcbcbcb00, 0xc2c2c200,
-+	0x34343400, 0x7e7e7e00, 0x76767600, 0x05050500,
-+	0x6d6d6d00, 0xb7b7b700, 0xa9a9a900, 0x31313100,
-+	0xd1d1d100, 0x17171700, 0x04040400, 0xd7d7d700,
-+	0x14141400, 0x58585800, 0x3a3a3a00, 0x61616100,
-+	0xdedede00, 0x1b1b1b00, 0x11111100, 0x1c1c1c00,
-+	0x32323200, 0x0f0f0f00, 0x9c9c9c00, 0x16161600,
-+	0x53535300, 0x18181800, 0xf2f2f200, 0x22222200,
-+	0xfefefe00, 0x44444400, 0xcfcfcf00, 0xb2b2b200,
-+	0xc3c3c300, 0xb5b5b500, 0x7a7a7a00, 0x91919100,
-+	0x24242400, 0x08080800, 0xe8e8e800, 0xa8a8a800,
-+	0x60606000, 0xfcfcfc00, 0x69696900, 0x50505000,
-+	0xaaaaaa00, 0xd0d0d000, 0xa0a0a000, 0x7d7d7d00,
-+	0xa1a1a100, 0x89898900, 0x62626200, 0x97979700,
-+	0x54545400, 0x5b5b5b00, 0x1e1e1e00, 0x95959500,
-+	0xe0e0e000, 0xffffff00, 0x64646400, 0xd2d2d200,
-+	0x10101000, 0xc4c4c400, 0x00000000, 0x48484800,
-+	0xa3a3a300, 0xf7f7f700, 0x75757500, 0xdbdbdb00,
-+	0x8a8a8a00, 0x03030300, 0xe6e6e600, 0xdadada00,
-+	0x09090900, 0x3f3f3f00, 0xdddddd00, 0x94949400,
-+	0x87878700, 0x5c5c5c00, 0x83838300, 0x02020200,
-+	0xcdcdcd00, 0x4a4a4a00, 0x90909000, 0x33333300,
-+	0x73737300, 0x67676700, 0xf6f6f600, 0xf3f3f300,
-+	0x9d9d9d00, 0x7f7f7f00, 0xbfbfbf00, 0xe2e2e200,
-+	0x52525200, 0x9b9b9b00, 0xd8d8d800, 0x26262600,
-+	0xc8c8c800, 0x37373700, 0xc6c6c600, 0x3b3b3b00,
-+	0x81818100, 0x96969600, 0x6f6f6f00, 0x4b4b4b00,
-+	0x13131300, 0xbebebe00, 0x63636300, 0x2e2e2e00,
-+	0xe9e9e900, 0x79797900, 0xa7a7a700, 0x8c8c8c00,
-+	0x9f9f9f00, 0x6e6e6e00, 0xbcbcbc00, 0x8e8e8e00,
-+	0x29292900, 0xf5f5f500, 0xf9f9f900, 0xb6b6b600,
-+	0x2f2f2f00, 0xfdfdfd00, 0xb4b4b400, 0x59595900,
-+	0x78787800, 0x98989800, 0x06060600, 0x6a6a6a00,
-+	0xe7e7e700, 0x46464600, 0x71717100, 0xbababa00,
-+	0xd4d4d400, 0x25252500, 0xababab00, 0x42424200,
-+	0x88888800, 0xa2a2a200, 0x8d8d8d00, 0xfafafa00,
-+	0x72727200, 0x07070700, 0xb9b9b900, 0x55555500,
-+	0xf8f8f800, 0xeeeeee00, 0xacacac00, 0x0a0a0a00,
-+	0x36363600, 0x49494900, 0x2a2a2a00, 0x68686800,
-+	0x3c3c3c00, 0x38383800, 0xf1f1f100, 0xa4a4a400,
-+	0x40404000, 0x28282800, 0xd3d3d300, 0x7b7b7b00,
-+	0xbbbbbb00, 0xc9c9c900, 0x43434300, 0xc1c1c100,
-+	0x15151500, 0xe3e3e300, 0xadadad00, 0xf4f4f400,
-+	0x77777700, 0xc7c7c700, 0x80808000, 0x9e9e9e00,
++#define CAMELLIA_MIN_KEY_SIZE	16
++#define CAMELLIA_MAX_KEY_SIZE	32
++#define CAMELLIA_BLOCK_SIZE	16
++#define CAMELLIA_TABLE_BYTE_LEN	272
++
++struct camellia_ctx {
++	u64 key_table[CAMELLIA_TABLE_BYTE_LEN / sizeof(u64)];
++	u32 key_length;
 +};
 +
-+static const u32 camellia_sp0222[256] = {
-+	0x00e0e0e0, 0x00050505, 0x00585858, 0x00d9d9d9,
-+	0x00676767, 0x004e4e4e, 0x00818181, 0x00cbcbcb,
-+	0x00c9c9c9, 0x000b0b0b, 0x00aeaeae, 0x006a6a6a,
-+	0x00d5d5d5, 0x00181818, 0x005d5d5d, 0x00828282,
-+	0x00464646, 0x00dfdfdf, 0x00d6d6d6, 0x00272727,
-+	0x008a8a8a, 0x00323232, 0x004b4b4b, 0x00424242,
-+	0x00dbdbdb, 0x001c1c1c, 0x009e9e9e, 0x009c9c9c,
-+	0x003a3a3a, 0x00cacaca, 0x00252525, 0x007b7b7b,
-+	0x000d0d0d, 0x00717171, 0x005f5f5f, 0x001f1f1f,
-+	0x00f8f8f8, 0x00d7d7d7, 0x003e3e3e, 0x009d9d9d,
-+	0x007c7c7c, 0x00606060, 0x00b9b9b9, 0x00bebebe,
-+	0x00bcbcbc, 0x008b8b8b, 0x00161616, 0x00343434,
-+	0x004d4d4d, 0x00c3c3c3, 0x00727272, 0x00959595,
-+	0x00ababab, 0x008e8e8e, 0x00bababa, 0x007a7a7a,
-+	0x00b3b3b3, 0x00020202, 0x00b4b4b4, 0x00adadad,
-+	0x00a2a2a2, 0x00acacac, 0x00d8d8d8, 0x009a9a9a,
-+	0x00171717, 0x001a1a1a, 0x00353535, 0x00cccccc,
-+	0x00f7f7f7, 0x00999999, 0x00616161, 0x005a5a5a,
-+	0x00e8e8e8, 0x00242424, 0x00565656, 0x00404040,
-+	0x00e1e1e1, 0x00636363, 0x00090909, 0x00333333,
-+	0x00bfbfbf, 0x00989898, 0x00979797, 0x00858585,
-+	0x00686868, 0x00fcfcfc, 0x00ececec, 0x000a0a0a,
-+	0x00dadada, 0x006f6f6f, 0x00535353, 0x00626262,
-+	0x00a3a3a3, 0x002e2e2e, 0x00080808, 0x00afafaf,
-+	0x00282828, 0x00b0b0b0, 0x00747474, 0x00c2c2c2,
-+	0x00bdbdbd, 0x00363636, 0x00222222, 0x00383838,
-+	0x00646464, 0x001e1e1e, 0x00393939, 0x002c2c2c,
-+	0x00a6a6a6, 0x00303030, 0x00e5e5e5, 0x00444444,
-+	0x00fdfdfd, 0x00888888, 0x009f9f9f, 0x00656565,
-+	0x00878787, 0x006b6b6b, 0x00f4f4f4, 0x00232323,
-+	0x00484848, 0x00101010, 0x00d1d1d1, 0x00515151,
-+	0x00c0c0c0, 0x00f9f9f9, 0x00d2d2d2, 0x00a0a0a0,
-+	0x00555555, 0x00a1a1a1, 0x00414141, 0x00fafafa,
-+	0x00434343, 0x00131313, 0x00c4c4c4, 0x002f2f2f,
-+	0x00a8a8a8, 0x00b6b6b6, 0x003c3c3c, 0x002b2b2b,
-+	0x00c1c1c1, 0x00ffffff, 0x00c8c8c8, 0x00a5a5a5,
-+	0x00202020, 0x00898989, 0x00000000, 0x00909090,
-+	0x00474747, 0x00efefef, 0x00eaeaea, 0x00b7b7b7,
-+	0x00151515, 0x00060606, 0x00cdcdcd, 0x00b5b5b5,
-+	0x00121212, 0x007e7e7e, 0x00bbbbbb, 0x00292929,
-+	0x000f0f0f, 0x00b8b8b8, 0x00070707, 0x00040404,
-+	0x009b9b9b, 0x00949494, 0x00212121, 0x00666666,
-+	0x00e6e6e6, 0x00cecece, 0x00ededed, 0x00e7e7e7,
-+	0x003b3b3b, 0x00fefefe, 0x007f7f7f, 0x00c5c5c5,
-+	0x00a4a4a4, 0x00373737, 0x00b1b1b1, 0x004c4c4c,
-+	0x00919191, 0x006e6e6e, 0x008d8d8d, 0x00767676,
-+	0x00030303, 0x002d2d2d, 0x00dedede, 0x00969696,
-+	0x00262626, 0x007d7d7d, 0x00c6c6c6, 0x005c5c5c,
-+	0x00d3d3d3, 0x00f2f2f2, 0x004f4f4f, 0x00191919,
-+	0x003f3f3f, 0x00dcdcdc, 0x00797979, 0x001d1d1d,
-+	0x00525252, 0x00ebebeb, 0x00f3f3f3, 0x006d6d6d,
-+	0x005e5e5e, 0x00fbfbfb, 0x00696969, 0x00b2b2b2,
-+	0x00f0f0f0, 0x00313131, 0x000c0c0c, 0x00d4d4d4,
-+	0x00cfcfcf, 0x008c8c8c, 0x00e2e2e2, 0x00757575,
-+	0x00a9a9a9, 0x004a4a4a, 0x00575757, 0x00848484,
-+	0x00111111, 0x00454545, 0x001b1b1b, 0x00f5f5f5,
-+	0x00e4e4e4, 0x000e0e0e, 0x00737373, 0x00aaaaaa,
-+	0x00f1f1f1, 0x00dddddd, 0x00595959, 0x00141414,
-+	0x006c6c6c, 0x00929292, 0x00545454, 0x00d0d0d0,
-+	0x00787878, 0x00707070, 0x00e3e3e3, 0x00494949,
-+	0x00808080, 0x00505050, 0x00a7a7a7, 0x00f6f6f6,
-+	0x00777777, 0x00939393, 0x00868686, 0x00838383,
-+	0x002a2a2a, 0x00c7c7c7, 0x005b5b5b, 0x00e9e9e9,
-+	0x00eeeeee, 0x008f8f8f, 0x00010101, 0x003d3d3d,
++/* regular block cipher functions */
++asmlinkage void __camellia_enc_blk(struct camellia_ctx *ctx, u8 *dst,
++				   const u8 *src, bool xor);
++asmlinkage void camellia_dec_blk(struct camellia_ctx *ctx, u8 *dst,
++				 const u8 *src);
++
++/* 2-way parallel cipher functions */
++asmlinkage void __camellia_enc_blk_2way(struct camellia_ctx *ctx, u8 *dst,
++					const u8 *src, bool xor);
++asmlinkage void camellia_dec_blk_2way(struct camellia_ctx *ctx, u8 *dst,
++				      const u8 *src);
++
++static inline void camellia_enc_blk(struct camellia_ctx *ctx, u8 *dst,
++				    const u8 *src)
++{
++	__camellia_enc_blk(ctx, dst, src, false);
++}
++
++static inline void camellia_enc_blk_xor(struct camellia_ctx *ctx, u8 *dst,
++					const u8 *src)
++{
++	__camellia_enc_blk(ctx, dst, src, true);
++}
++
++static inline void camellia_enc_blk_2way(struct camellia_ctx *ctx, u8 *dst,
++					 const u8 *src)
++{
++	__camellia_enc_blk_2way(ctx, dst, src, false);
++}
++
++static inline void camellia_enc_blk_xor_2way(struct camellia_ctx *ctx, u8 *dst,
++					     const u8 *src)
++{
++	__camellia_enc_blk_2way(ctx, dst, src, true);
++}
++
++static void camellia_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
++{
++	camellia_enc_blk(crypto_tfm_ctx(tfm), dst, src);
++}
++
++static void camellia_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
++{
++	camellia_dec_blk(crypto_tfm_ctx(tfm), dst, src);
++}
++
++/* camellia sboxes */
++const u64 camellia_sp10011110[256] = {
++	0x7000007070707000, 0x8200008282828200, 0x2c00002c2c2c2c00,
++	0xec0000ecececec00, 0xb30000b3b3b3b300, 0x2700002727272700,
++	0xc00000c0c0c0c000, 0xe50000e5e5e5e500, 0xe40000e4e4e4e400,
++	0x8500008585858500, 0x5700005757575700, 0x3500003535353500,
++	0xea0000eaeaeaea00, 0x0c00000c0c0c0c00, 0xae0000aeaeaeae00,
++	0x4100004141414100, 0x2300002323232300, 0xef0000efefefef00,
++	0x6b00006b6b6b6b00, 0x9300009393939300, 0x4500004545454500,
++	0x1900001919191900, 0xa50000a5a5a5a500, 0x2100002121212100,
++	0xed0000edededed00, 0x0e00000e0e0e0e00, 0x4f00004f4f4f4f00,
++	0x4e00004e4e4e4e00, 0x1d00001d1d1d1d00, 0x6500006565656500,
++	0x9200009292929200, 0xbd0000bdbdbdbd00, 0x8600008686868600,
++	0xb80000b8b8b8b800, 0xaf0000afafafaf00, 0x8f00008f8f8f8f00,
++	0x7c00007c7c7c7c00, 0xeb0000ebebebeb00, 0x1f00001f1f1f1f00,
++	0xce0000cececece00, 0x3e00003e3e3e3e00, 0x3000003030303000,
++	0xdc0000dcdcdcdc00, 0x5f00005f5f5f5f00, 0x5e00005e5e5e5e00,
++	0xc50000c5c5c5c500, 0x0b00000b0b0b0b00, 0x1a00001a1a1a1a00,
++	0xa60000a6a6a6a600, 0xe10000e1e1e1e100, 0x3900003939393900,
++	0xca0000cacacaca00, 0xd50000d5d5d5d500, 0x4700004747474700,
++	0x5d00005d5d5d5d00, 0x3d00003d3d3d3d00, 0xd90000d9d9d9d900,
++	0x0100000101010100, 0x5a00005a5a5a5a00, 0xd60000d6d6d6d600,
++	0x5100005151515100, 0x5600005656565600, 0x6c00006c6c6c6c00,
++	0x4d00004d4d4d4d00, 0x8b00008b8b8b8b00, 0x0d00000d0d0d0d00,
++	0x9a00009a9a9a9a00, 0x6600006666666600, 0xfb0000fbfbfbfb00,
++	0xcc0000cccccccc00, 0xb00000b0b0b0b000, 0x2d00002d2d2d2d00,
++	0x7400007474747400, 0x1200001212121200, 0x2b00002b2b2b2b00,
++	0x2000002020202000, 0xf00000f0f0f0f000, 0xb10000b1b1b1b100,
++	0x8400008484848400, 0x9900009999999900, 0xdf0000dfdfdfdf00,
++	0x4c00004c4c4c4c00, 0xcb0000cbcbcbcb00, 0xc20000c2c2c2c200,
++	0x3400003434343400, 0x7e00007e7e7e7e00, 0x7600007676767600,
++	0x0500000505050500, 0x6d00006d6d6d6d00, 0xb70000b7b7b7b700,
++	0xa90000a9a9a9a900, 0x3100003131313100, 0xd10000d1d1d1d100,
++	0x1700001717171700, 0x0400000404040400, 0xd70000d7d7d7d700,
++	0x1400001414141400, 0x5800005858585800, 0x3a00003a3a3a3a00,
++	0x6100006161616100, 0xde0000dededede00, 0x1b00001b1b1b1b00,
++	0x1100001111111100, 0x1c00001c1c1c1c00, 0x3200003232323200,
++	0x0f00000f0f0f0f00, 0x9c00009c9c9c9c00, 0x1600001616161600,
++	0x5300005353535300, 0x1800001818181800, 0xf20000f2f2f2f200,
++	0x2200002222222200, 0xfe0000fefefefe00, 0x4400004444444400,
++	0xcf0000cfcfcfcf00, 0xb20000b2b2b2b200, 0xc30000c3c3c3c300,
++	0xb50000b5b5b5b500, 0x7a00007a7a7a7a00, 0x9100009191919100,
++	0x2400002424242400, 0x0800000808080800, 0xe80000e8e8e8e800,
++	0xa80000a8a8a8a800, 0x6000006060606000, 0xfc0000fcfcfcfc00,
++	0x6900006969696900, 0x5000005050505000, 0xaa0000aaaaaaaa00,
++	0xd00000d0d0d0d000, 0xa00000a0a0a0a000, 0x7d00007d7d7d7d00,
++	0xa10000a1a1a1a100, 0x8900008989898900, 0x6200006262626200,
++	0x9700009797979700, 0x5400005454545400, 0x5b00005b5b5b5b00,
++	0x1e00001e1e1e1e00, 0x9500009595959500, 0xe00000e0e0e0e000,
++	0xff0000ffffffff00, 0x6400006464646400, 0xd20000d2d2d2d200,
++	0x1000001010101000, 0xc40000c4c4c4c400, 0x0000000000000000,
++	0x4800004848484800, 0xa30000a3a3a3a300, 0xf70000f7f7f7f700,
++	0x7500007575757500, 0xdb0000dbdbdbdb00, 0x8a00008a8a8a8a00,
++	0x0300000303030300, 0xe60000e6e6e6e600, 0xda0000dadadada00,
++	0x0900000909090900, 0x3f00003f3f3f3f00, 0xdd0000dddddddd00,
++	0x9400009494949400, 0x8700008787878700, 0x5c00005c5c5c5c00,
++	0x8300008383838300, 0x0200000202020200, 0xcd0000cdcdcdcd00,
++	0x4a00004a4a4a4a00, 0x9000009090909000, 0x3300003333333300,
++	0x7300007373737300, 0x6700006767676700, 0xf60000f6f6f6f600,
++	0xf30000f3f3f3f300, 0x9d00009d9d9d9d00, 0x7f00007f7f7f7f00,
++	0xbf0000bfbfbfbf00, 0xe20000e2e2e2e200, 0x5200005252525200,
++	0x9b00009b9b9b9b00, 0xd80000d8d8d8d800, 0x2600002626262600,
++	0xc80000c8c8c8c800, 0x3700003737373700, 0xc60000c6c6c6c600,
++	0x3b00003b3b3b3b00, 0x8100008181818100, 0x9600009696969600,
++	0x6f00006f6f6f6f00, 0x4b00004b4b4b4b00, 0x1300001313131300,
++	0xbe0000bebebebe00, 0x6300006363636300, 0x2e00002e2e2e2e00,
++	0xe90000e9e9e9e900, 0x7900007979797900, 0xa70000a7a7a7a700,
++	0x8c00008c8c8c8c00, 0x9f00009f9f9f9f00, 0x6e00006e6e6e6e00,
++	0xbc0000bcbcbcbc00, 0x8e00008e8e8e8e00, 0x2900002929292900,
++	0xf50000f5f5f5f500, 0xf90000f9f9f9f900, 0xb60000b6b6b6b600,
++	0x2f00002f2f2f2f00, 0xfd0000fdfdfdfd00, 0xb40000b4b4b4b400,
++	0x5900005959595900, 0x7800007878787800, 0x9800009898989800,
++	0x0600000606060600, 0x6a00006a6a6a6a00, 0xe70000e7e7e7e700,
++	0x4600004646464600, 0x7100007171717100, 0xba0000babababa00,
++	0xd40000d4d4d4d400, 0x2500002525252500, 0xab0000abababab00,
++	0x4200004242424200, 0x8800008888888800, 0xa20000a2a2a2a200,
++	0x8d00008d8d8d8d00, 0xfa0000fafafafa00, 0x7200007272727200,
++	0x0700000707070700, 0xb90000b9b9b9b900, 0x5500005555555500,
++	0xf80000f8f8f8f800, 0xee0000eeeeeeee00, 0xac0000acacacac00,
++	0x0a00000a0a0a0a00, 0x3600003636363600, 0x4900004949494900,
++	0x2a00002a2a2a2a00, 0x6800006868686800, 0x3c00003c3c3c3c00,
++	0x3800003838383800, 0xf10000f1f1f1f100, 0xa40000a4a4a4a400,
++	0x4000004040404000, 0x2800002828282800, 0xd30000d3d3d3d300,
++	0x7b00007b7b7b7b00, 0xbb0000bbbbbbbb00, 0xc90000c9c9c9c900,
++	0x4300004343434300, 0xc10000c1c1c1c100, 0x1500001515151500,
++	0xe30000e3e3e3e300, 0xad0000adadadad00, 0xf40000f4f4f4f400,
++	0x7700007777777700, 0xc70000c7c7c7c700, 0x8000008080808000,
++	0x9e00009e9e9e9e00,
 +};
 +
-+static const u32 camellia_sp3033[256] = {
-+	0x38003838, 0x41004141, 0x16001616, 0x76007676,
-+	0xd900d9d9, 0x93009393, 0x60006060, 0xf200f2f2,
-+	0x72007272, 0xc200c2c2, 0xab00abab, 0x9a009a9a,
-+	0x75007575, 0x06000606, 0x57005757, 0xa000a0a0,
-+	0x91009191, 0xf700f7f7, 0xb500b5b5, 0xc900c9c9,
-+	0xa200a2a2, 0x8c008c8c, 0xd200d2d2, 0x90009090,
-+	0xf600f6f6, 0x07000707, 0xa700a7a7, 0x27002727,
-+	0x8e008e8e, 0xb200b2b2, 0x49004949, 0xde00dede,
-+	0x43004343, 0x5c005c5c, 0xd700d7d7, 0xc700c7c7,
-+	0x3e003e3e, 0xf500f5f5, 0x8f008f8f, 0x67006767,
-+	0x1f001f1f, 0x18001818, 0x6e006e6e, 0xaf00afaf,
-+	0x2f002f2f, 0xe200e2e2, 0x85008585, 0x0d000d0d,
-+	0x53005353, 0xf000f0f0, 0x9c009c9c, 0x65006565,
-+	0xea00eaea, 0xa300a3a3, 0xae00aeae, 0x9e009e9e,
-+	0xec00ecec, 0x80008080, 0x2d002d2d, 0x6b006b6b,
-+	0xa800a8a8, 0x2b002b2b, 0x36003636, 0xa600a6a6,
-+	0xc500c5c5, 0x86008686, 0x4d004d4d, 0x33003333,
-+	0xfd00fdfd, 0x66006666, 0x58005858, 0x96009696,
-+	0x3a003a3a, 0x09000909, 0x95009595, 0x10001010,
-+	0x78007878, 0xd800d8d8, 0x42004242, 0xcc00cccc,
-+	0xef00efef, 0x26002626, 0xe500e5e5, 0x61006161,
-+	0x1a001a1a, 0x3f003f3f, 0x3b003b3b, 0x82008282,
-+	0xb600b6b6, 0xdb00dbdb, 0xd400d4d4, 0x98009898,
-+	0xe800e8e8, 0x8b008b8b, 0x02000202, 0xeb00ebeb,
-+	0x0a000a0a, 0x2c002c2c, 0x1d001d1d, 0xb000b0b0,
-+	0x6f006f6f, 0x8d008d8d, 0x88008888, 0x0e000e0e,
-+	0x19001919, 0x87008787, 0x4e004e4e, 0x0b000b0b,
-+	0xa900a9a9, 0x0c000c0c, 0x79007979, 0x11001111,
-+	0x7f007f7f, 0x22002222, 0xe700e7e7, 0x59005959,
-+	0xe100e1e1, 0xda00dada, 0x3d003d3d, 0xc800c8c8,
-+	0x12001212, 0x04000404, 0x74007474, 0x54005454,
-+	0x30003030, 0x7e007e7e, 0xb400b4b4, 0x28002828,
-+	0x55005555, 0x68006868, 0x50005050, 0xbe00bebe,
-+	0xd000d0d0, 0xc400c4c4, 0x31003131, 0xcb00cbcb,
-+	0x2a002a2a, 0xad00adad, 0x0f000f0f, 0xca00caca,
-+	0x70007070, 0xff00ffff, 0x32003232, 0x69006969,
-+	0x08000808, 0x62006262, 0x00000000, 0x24002424,
-+	0xd100d1d1, 0xfb00fbfb, 0xba00baba, 0xed00eded,
-+	0x45004545, 0x81008181, 0x73007373, 0x6d006d6d,
-+	0x84008484, 0x9f009f9f, 0xee00eeee, 0x4a004a4a,
-+	0xc300c3c3, 0x2e002e2e, 0xc100c1c1, 0x01000101,
-+	0xe600e6e6, 0x25002525, 0x48004848, 0x99009999,
-+	0xb900b9b9, 0xb300b3b3, 0x7b007b7b, 0xf900f9f9,
-+	0xce00cece, 0xbf00bfbf, 0xdf00dfdf, 0x71007171,
-+	0x29002929, 0xcd00cdcd, 0x6c006c6c, 0x13001313,
-+	0x64006464, 0x9b009b9b, 0x63006363, 0x9d009d9d,
-+	0xc000c0c0, 0x4b004b4b, 0xb700b7b7, 0xa500a5a5,
-+	0x89008989, 0x5f005f5f, 0xb100b1b1, 0x17001717,
-+	0xf400f4f4, 0xbc00bcbc, 0xd300d3d3, 0x46004646,
-+	0xcf00cfcf, 0x37003737, 0x5e005e5e, 0x47004747,
-+	0x94009494, 0xfa00fafa, 0xfc00fcfc, 0x5b005b5b,
-+	0x97009797, 0xfe00fefe, 0x5a005a5a, 0xac00acac,
-+	0x3c003c3c, 0x4c004c4c, 0x03000303, 0x35003535,
-+	0xf300f3f3, 0x23002323, 0xb800b8b8, 0x5d005d5d,
-+	0x6a006a6a, 0x92009292, 0xd500d5d5, 0x21002121,
-+	0x44004444, 0x51005151, 0xc600c6c6, 0x7d007d7d,
-+	0x39003939, 0x83008383, 0xdc00dcdc, 0xaa00aaaa,
-+	0x7c007c7c, 0x77007777, 0x56005656, 0x05000505,
-+	0x1b001b1b, 0xa400a4a4, 0x15001515, 0x34003434,
-+	0x1e001e1e, 0x1c001c1c, 0xf800f8f8, 0x52005252,
-+	0x20002020, 0x14001414, 0xe900e9e9, 0xbd00bdbd,
-+	0xdd00dddd, 0xe400e4e4, 0xa100a1a1, 0xe000e0e0,
-+	0x8a008a8a, 0xf100f1f1, 0xd600d6d6, 0x7a007a7a,
-+	0xbb00bbbb, 0xe300e3e3, 0x40004040, 0x4f004f4f,
++const u64 camellia_sp22000222[256] = {
++	0xe0e0000000e0e0e0, 0x0505000000050505, 0x5858000000585858,
++	0xd9d9000000d9d9d9, 0x6767000000676767, 0x4e4e0000004e4e4e,
++	0x8181000000818181, 0xcbcb000000cbcbcb, 0xc9c9000000c9c9c9,
++	0x0b0b0000000b0b0b, 0xaeae000000aeaeae, 0x6a6a0000006a6a6a,
++	0xd5d5000000d5d5d5, 0x1818000000181818, 0x5d5d0000005d5d5d,
++	0x8282000000828282, 0x4646000000464646, 0xdfdf000000dfdfdf,
++	0xd6d6000000d6d6d6, 0x2727000000272727, 0x8a8a0000008a8a8a,
++	0x3232000000323232, 0x4b4b0000004b4b4b, 0x4242000000424242,
++	0xdbdb000000dbdbdb, 0x1c1c0000001c1c1c, 0x9e9e0000009e9e9e,
++	0x9c9c0000009c9c9c, 0x3a3a0000003a3a3a, 0xcaca000000cacaca,
++	0x2525000000252525, 0x7b7b0000007b7b7b, 0x0d0d0000000d0d0d,
++	0x7171000000717171, 0x5f5f0000005f5f5f, 0x1f1f0000001f1f1f,
++	0xf8f8000000f8f8f8, 0xd7d7000000d7d7d7, 0x3e3e0000003e3e3e,
++	0x9d9d0000009d9d9d, 0x7c7c0000007c7c7c, 0x6060000000606060,
++	0xb9b9000000b9b9b9, 0xbebe000000bebebe, 0xbcbc000000bcbcbc,
++	0x8b8b0000008b8b8b, 0x1616000000161616, 0x3434000000343434,
++	0x4d4d0000004d4d4d, 0xc3c3000000c3c3c3, 0x7272000000727272,
++	0x9595000000959595, 0xabab000000ababab, 0x8e8e0000008e8e8e,
++	0xbaba000000bababa, 0x7a7a0000007a7a7a, 0xb3b3000000b3b3b3,
++	0x0202000000020202, 0xb4b4000000b4b4b4, 0xadad000000adadad,
++	0xa2a2000000a2a2a2, 0xacac000000acacac, 0xd8d8000000d8d8d8,
++	0x9a9a0000009a9a9a, 0x1717000000171717, 0x1a1a0000001a1a1a,
++	0x3535000000353535, 0xcccc000000cccccc, 0xf7f7000000f7f7f7,
++	0x9999000000999999, 0x6161000000616161, 0x5a5a0000005a5a5a,
++	0xe8e8000000e8e8e8, 0x2424000000242424, 0x5656000000565656,
++	0x4040000000404040, 0xe1e1000000e1e1e1, 0x6363000000636363,
++	0x0909000000090909, 0x3333000000333333, 0xbfbf000000bfbfbf,
++	0x9898000000989898, 0x9797000000979797, 0x8585000000858585,
++	0x6868000000686868, 0xfcfc000000fcfcfc, 0xecec000000ececec,
++	0x0a0a0000000a0a0a, 0xdada000000dadada, 0x6f6f0000006f6f6f,
++	0x5353000000535353, 0x6262000000626262, 0xa3a3000000a3a3a3,
++	0x2e2e0000002e2e2e, 0x0808000000080808, 0xafaf000000afafaf,
++	0x2828000000282828, 0xb0b0000000b0b0b0, 0x7474000000747474,
++	0xc2c2000000c2c2c2, 0xbdbd000000bdbdbd, 0x3636000000363636,
++	0x2222000000222222, 0x3838000000383838, 0x6464000000646464,
++	0x1e1e0000001e1e1e, 0x3939000000393939, 0x2c2c0000002c2c2c,
++	0xa6a6000000a6a6a6, 0x3030000000303030, 0xe5e5000000e5e5e5,
++	0x4444000000444444, 0xfdfd000000fdfdfd, 0x8888000000888888,
++	0x9f9f0000009f9f9f, 0x6565000000656565, 0x8787000000878787,
++	0x6b6b0000006b6b6b, 0xf4f4000000f4f4f4, 0x2323000000232323,
++	0x4848000000484848, 0x1010000000101010, 0xd1d1000000d1d1d1,
++	0x5151000000515151, 0xc0c0000000c0c0c0, 0xf9f9000000f9f9f9,
++	0xd2d2000000d2d2d2, 0xa0a0000000a0a0a0, 0x5555000000555555,
++	0xa1a1000000a1a1a1, 0x4141000000414141, 0xfafa000000fafafa,
++	0x4343000000434343, 0x1313000000131313, 0xc4c4000000c4c4c4,
++	0x2f2f0000002f2f2f, 0xa8a8000000a8a8a8, 0xb6b6000000b6b6b6,
++	0x3c3c0000003c3c3c, 0x2b2b0000002b2b2b, 0xc1c1000000c1c1c1,
++	0xffff000000ffffff, 0xc8c8000000c8c8c8, 0xa5a5000000a5a5a5,
++	0x2020000000202020, 0x8989000000898989, 0x0000000000000000,
++	0x9090000000909090, 0x4747000000474747, 0xefef000000efefef,
++	0xeaea000000eaeaea, 0xb7b7000000b7b7b7, 0x1515000000151515,
++	0x0606000000060606, 0xcdcd000000cdcdcd, 0xb5b5000000b5b5b5,
++	0x1212000000121212, 0x7e7e0000007e7e7e, 0xbbbb000000bbbbbb,
++	0x2929000000292929, 0x0f0f0000000f0f0f, 0xb8b8000000b8b8b8,
++	0x0707000000070707, 0x0404000000040404, 0x9b9b0000009b9b9b,
++	0x9494000000949494, 0x2121000000212121, 0x6666000000666666,
++	0xe6e6000000e6e6e6, 0xcece000000cecece, 0xeded000000ededed,
++	0xe7e7000000e7e7e7, 0x3b3b0000003b3b3b, 0xfefe000000fefefe,
++	0x7f7f0000007f7f7f, 0xc5c5000000c5c5c5, 0xa4a4000000a4a4a4,
++	0x3737000000373737, 0xb1b1000000b1b1b1, 0x4c4c0000004c4c4c,
++	0x9191000000919191, 0x6e6e0000006e6e6e, 0x8d8d0000008d8d8d,
++	0x7676000000767676, 0x0303000000030303, 0x2d2d0000002d2d2d,
++	0xdede000000dedede, 0x9696000000969696, 0x2626000000262626,
++	0x7d7d0000007d7d7d, 0xc6c6000000c6c6c6, 0x5c5c0000005c5c5c,
++	0xd3d3000000d3d3d3, 0xf2f2000000f2f2f2, 0x4f4f0000004f4f4f,
++	0x1919000000191919, 0x3f3f0000003f3f3f, 0xdcdc000000dcdcdc,
++	0x7979000000797979, 0x1d1d0000001d1d1d, 0x5252000000525252,
++	0xebeb000000ebebeb, 0xf3f3000000f3f3f3, 0x6d6d0000006d6d6d,
++	0x5e5e0000005e5e5e, 0xfbfb000000fbfbfb, 0x6969000000696969,
++	0xb2b2000000b2b2b2, 0xf0f0000000f0f0f0, 0x3131000000313131,
++	0x0c0c0000000c0c0c, 0xd4d4000000d4d4d4, 0xcfcf000000cfcfcf,
++	0x8c8c0000008c8c8c, 0xe2e2000000e2e2e2, 0x7575000000757575,
++	0xa9a9000000a9a9a9, 0x4a4a0000004a4a4a, 0x5757000000575757,
++	0x8484000000848484, 0x1111000000111111, 0x4545000000454545,
++	0x1b1b0000001b1b1b, 0xf5f5000000f5f5f5, 0xe4e4000000e4e4e4,
++	0x0e0e0000000e0e0e, 0x7373000000737373, 0xaaaa000000aaaaaa,
++	0xf1f1000000f1f1f1, 0xdddd000000dddddd, 0x5959000000595959,
++	0x1414000000141414, 0x6c6c0000006c6c6c, 0x9292000000929292,
++	0x5454000000545454, 0xd0d0000000d0d0d0, 0x7878000000787878,
++	0x7070000000707070, 0xe3e3000000e3e3e3, 0x4949000000494949,
++	0x8080000000808080, 0x5050000000505050, 0xa7a7000000a7a7a7,
++	0xf6f6000000f6f6f6, 0x7777000000777777, 0x9393000000939393,
++	0x8686000000868686, 0x8383000000838383, 0x2a2a0000002a2a2a,
++	0xc7c7000000c7c7c7, 0x5b5b0000005b5b5b, 0xe9e9000000e9e9e9,
++	0xeeee000000eeeeee, 0x8f8f0000008f8f8f, 0x0101000000010101,
++	0x3d3d0000003d3d3d,
 +};
 +
-+static const u32 camellia_sp4404[256] = {
-+	0x70700070, 0x2c2c002c, 0xb3b300b3, 0xc0c000c0,
-+	0xe4e400e4, 0x57570057, 0xeaea00ea, 0xaeae00ae,
-+	0x23230023, 0x6b6b006b, 0x45450045, 0xa5a500a5,
-+	0xeded00ed, 0x4f4f004f, 0x1d1d001d, 0x92920092,
-+	0x86860086, 0xafaf00af, 0x7c7c007c, 0x1f1f001f,
-+	0x3e3e003e, 0xdcdc00dc, 0x5e5e005e, 0x0b0b000b,
-+	0xa6a600a6, 0x39390039, 0xd5d500d5, 0x5d5d005d,
-+	0xd9d900d9, 0x5a5a005a, 0x51510051, 0x6c6c006c,
-+	0x8b8b008b, 0x9a9a009a, 0xfbfb00fb, 0xb0b000b0,
-+	0x74740074, 0x2b2b002b, 0xf0f000f0, 0x84840084,
-+	0xdfdf00df, 0xcbcb00cb, 0x34340034, 0x76760076,
-+	0x6d6d006d, 0xa9a900a9, 0xd1d100d1, 0x04040004,
-+	0x14140014, 0x3a3a003a, 0xdede00de, 0x11110011,
-+	0x32320032, 0x9c9c009c, 0x53530053, 0xf2f200f2,
-+	0xfefe00fe, 0xcfcf00cf, 0xc3c300c3, 0x7a7a007a,
-+	0x24240024, 0xe8e800e8, 0x60600060, 0x69690069,
-+	0xaaaa00aa, 0xa0a000a0, 0xa1a100a1, 0x62620062,
-+	0x54540054, 0x1e1e001e, 0xe0e000e0, 0x64640064,
-+	0x10100010, 0x00000000, 0xa3a300a3, 0x75750075,
-+	0x8a8a008a, 0xe6e600e6, 0x09090009, 0xdddd00dd,
-+	0x87870087, 0x83830083, 0xcdcd00cd, 0x90900090,
-+	0x73730073, 0xf6f600f6, 0x9d9d009d, 0xbfbf00bf,
-+	0x52520052, 0xd8d800d8, 0xc8c800c8, 0xc6c600c6,
-+	0x81810081, 0x6f6f006f, 0x13130013, 0x63630063,
-+	0xe9e900e9, 0xa7a700a7, 0x9f9f009f, 0xbcbc00bc,
-+	0x29290029, 0xf9f900f9, 0x2f2f002f, 0xb4b400b4,
-+	0x78780078, 0x06060006, 0xe7e700e7, 0x71710071,
-+	0xd4d400d4, 0xabab00ab, 0x88880088, 0x8d8d008d,
-+	0x72720072, 0xb9b900b9, 0xf8f800f8, 0xacac00ac,
-+	0x36360036, 0x2a2a002a, 0x3c3c003c, 0xf1f100f1,
-+	0x40400040, 0xd3d300d3, 0xbbbb00bb, 0x43430043,
-+	0x15150015, 0xadad00ad, 0x77770077, 0x80800080,
-+	0x82820082, 0xecec00ec, 0x27270027, 0xe5e500e5,
-+	0x85850085, 0x35350035, 0x0c0c000c, 0x41410041,
-+	0xefef00ef, 0x93930093, 0x19190019, 0x21210021,
-+	0x0e0e000e, 0x4e4e004e, 0x65650065, 0xbdbd00bd,
-+	0xb8b800b8, 0x8f8f008f, 0xebeb00eb, 0xcece00ce,
-+	0x30300030, 0x5f5f005f, 0xc5c500c5, 0x1a1a001a,
-+	0xe1e100e1, 0xcaca00ca, 0x47470047, 0x3d3d003d,
-+	0x01010001, 0xd6d600d6, 0x56560056, 0x4d4d004d,
-+	0x0d0d000d, 0x66660066, 0xcccc00cc, 0x2d2d002d,
-+	0x12120012, 0x20200020, 0xb1b100b1, 0x99990099,
-+	0x4c4c004c, 0xc2c200c2, 0x7e7e007e, 0x05050005,
-+	0xb7b700b7, 0x31310031, 0x17170017, 0xd7d700d7,
-+	0x58580058, 0x61610061, 0x1b1b001b, 0x1c1c001c,
-+	0x0f0f000f, 0x16160016, 0x18180018, 0x22220022,
-+	0x44440044, 0xb2b200b2, 0xb5b500b5, 0x91910091,
-+	0x08080008, 0xa8a800a8, 0xfcfc00fc, 0x50500050,
-+	0xd0d000d0, 0x7d7d007d, 0x89890089, 0x97970097,
-+	0x5b5b005b, 0x95950095, 0xffff00ff, 0xd2d200d2,
-+	0xc4c400c4, 0x48480048, 0xf7f700f7, 0xdbdb00db,
-+	0x03030003, 0xdada00da, 0x3f3f003f, 0x94940094,
-+	0x5c5c005c, 0x02020002, 0x4a4a004a, 0x33330033,
-+	0x67670067, 0xf3f300f3, 0x7f7f007f, 0xe2e200e2,
-+	0x9b9b009b, 0x26260026, 0x37370037, 0x3b3b003b,
-+	0x96960096, 0x4b4b004b, 0xbebe00be, 0x2e2e002e,
-+	0x79790079, 0x8c8c008c, 0x6e6e006e, 0x8e8e008e,
-+	0xf5f500f5, 0xb6b600b6, 0xfdfd00fd, 0x59590059,
-+	0x98980098, 0x6a6a006a, 0x46460046, 0xbaba00ba,
-+	0x25250025, 0x42420042, 0xa2a200a2, 0xfafa00fa,
-+	0x07070007, 0x55550055, 0xeeee00ee, 0x0a0a000a,
-+	0x49490049, 0x68680068, 0x38380038, 0xa4a400a4,
-+	0x28280028, 0x7b7b007b, 0xc9c900c9, 0xc1c100c1,
-+	0xe3e300e3, 0xf4f400f4, 0xc7c700c7, 0x9e9e009e,
++const u64 camellia_sp03303033[256] = {
++	0x0038380038003838, 0x0041410041004141, 0x0016160016001616,
++	0x0076760076007676, 0x00d9d900d900d9d9, 0x0093930093009393,
++	0x0060600060006060, 0x00f2f200f200f2f2, 0x0072720072007272,
++	0x00c2c200c200c2c2, 0x00abab00ab00abab, 0x009a9a009a009a9a,
++	0x0075750075007575, 0x0006060006000606, 0x0057570057005757,
++	0x00a0a000a000a0a0, 0x0091910091009191, 0x00f7f700f700f7f7,
++	0x00b5b500b500b5b5, 0x00c9c900c900c9c9, 0x00a2a200a200a2a2,
++	0x008c8c008c008c8c, 0x00d2d200d200d2d2, 0x0090900090009090,
++	0x00f6f600f600f6f6, 0x0007070007000707, 0x00a7a700a700a7a7,
++	0x0027270027002727, 0x008e8e008e008e8e, 0x00b2b200b200b2b2,
++	0x0049490049004949, 0x00dede00de00dede, 0x0043430043004343,
++	0x005c5c005c005c5c, 0x00d7d700d700d7d7, 0x00c7c700c700c7c7,
++	0x003e3e003e003e3e, 0x00f5f500f500f5f5, 0x008f8f008f008f8f,
++	0x0067670067006767, 0x001f1f001f001f1f, 0x0018180018001818,
++	0x006e6e006e006e6e, 0x00afaf00af00afaf, 0x002f2f002f002f2f,
++	0x00e2e200e200e2e2, 0x0085850085008585, 0x000d0d000d000d0d,
++	0x0053530053005353, 0x00f0f000f000f0f0, 0x009c9c009c009c9c,
++	0x0065650065006565, 0x00eaea00ea00eaea, 0x00a3a300a300a3a3,
++	0x00aeae00ae00aeae, 0x009e9e009e009e9e, 0x00ecec00ec00ecec,
++	0x0080800080008080, 0x002d2d002d002d2d, 0x006b6b006b006b6b,
++	0x00a8a800a800a8a8, 0x002b2b002b002b2b, 0x0036360036003636,
++	0x00a6a600a600a6a6, 0x00c5c500c500c5c5, 0x0086860086008686,
++	0x004d4d004d004d4d, 0x0033330033003333, 0x00fdfd00fd00fdfd,
++	0x0066660066006666, 0x0058580058005858, 0x0096960096009696,
++	0x003a3a003a003a3a, 0x0009090009000909, 0x0095950095009595,
++	0x0010100010001010, 0x0078780078007878, 0x00d8d800d800d8d8,
++	0x0042420042004242, 0x00cccc00cc00cccc, 0x00efef00ef00efef,
++	0x0026260026002626, 0x00e5e500e500e5e5, 0x0061610061006161,
++	0x001a1a001a001a1a, 0x003f3f003f003f3f, 0x003b3b003b003b3b,
++	0x0082820082008282, 0x00b6b600b600b6b6, 0x00dbdb00db00dbdb,
++	0x00d4d400d400d4d4, 0x0098980098009898, 0x00e8e800e800e8e8,
++	0x008b8b008b008b8b, 0x0002020002000202, 0x00ebeb00eb00ebeb,
++	0x000a0a000a000a0a, 0x002c2c002c002c2c, 0x001d1d001d001d1d,
++	0x00b0b000b000b0b0, 0x006f6f006f006f6f, 0x008d8d008d008d8d,
++	0x0088880088008888, 0x000e0e000e000e0e, 0x0019190019001919,
++	0x0087870087008787, 0x004e4e004e004e4e, 0x000b0b000b000b0b,
++	0x00a9a900a900a9a9, 0x000c0c000c000c0c, 0x0079790079007979,
++	0x0011110011001111, 0x007f7f007f007f7f, 0x0022220022002222,
++	0x00e7e700e700e7e7, 0x0059590059005959, 0x00e1e100e100e1e1,
++	0x00dada00da00dada, 0x003d3d003d003d3d, 0x00c8c800c800c8c8,
++	0x0012120012001212, 0x0004040004000404, 0x0074740074007474,
++	0x0054540054005454, 0x0030300030003030, 0x007e7e007e007e7e,
++	0x00b4b400b400b4b4, 0x0028280028002828, 0x0055550055005555,
++	0x0068680068006868, 0x0050500050005050, 0x00bebe00be00bebe,
++	0x00d0d000d000d0d0, 0x00c4c400c400c4c4, 0x0031310031003131,
++	0x00cbcb00cb00cbcb, 0x002a2a002a002a2a, 0x00adad00ad00adad,
++	0x000f0f000f000f0f, 0x00caca00ca00caca, 0x0070700070007070,
++	0x00ffff00ff00ffff, 0x0032320032003232, 0x0069690069006969,
++	0x0008080008000808, 0x0062620062006262, 0x0000000000000000,
++	0x0024240024002424, 0x00d1d100d100d1d1, 0x00fbfb00fb00fbfb,
++	0x00baba00ba00baba, 0x00eded00ed00eded, 0x0045450045004545,
++	0x0081810081008181, 0x0073730073007373, 0x006d6d006d006d6d,
++	0x0084840084008484, 0x009f9f009f009f9f, 0x00eeee00ee00eeee,
++	0x004a4a004a004a4a, 0x00c3c300c300c3c3, 0x002e2e002e002e2e,
++	0x00c1c100c100c1c1, 0x0001010001000101, 0x00e6e600e600e6e6,
++	0x0025250025002525, 0x0048480048004848, 0x0099990099009999,
++	0x00b9b900b900b9b9, 0x00b3b300b300b3b3, 0x007b7b007b007b7b,
++	0x00f9f900f900f9f9, 0x00cece00ce00cece, 0x00bfbf00bf00bfbf,
++	0x00dfdf00df00dfdf, 0x0071710071007171, 0x0029290029002929,
++	0x00cdcd00cd00cdcd, 0x006c6c006c006c6c, 0x0013130013001313,
++	0x0064640064006464, 0x009b9b009b009b9b, 0x0063630063006363,
++	0x009d9d009d009d9d, 0x00c0c000c000c0c0, 0x004b4b004b004b4b,
++	0x00b7b700b700b7b7, 0x00a5a500a500a5a5, 0x0089890089008989,
++	0x005f5f005f005f5f, 0x00b1b100b100b1b1, 0x0017170017001717,
++	0x00f4f400f400f4f4, 0x00bcbc00bc00bcbc, 0x00d3d300d300d3d3,
++	0x0046460046004646, 0x00cfcf00cf00cfcf, 0x0037370037003737,
++	0x005e5e005e005e5e, 0x0047470047004747, 0x0094940094009494,
++	0x00fafa00fa00fafa, 0x00fcfc00fc00fcfc, 0x005b5b005b005b5b,
++	0x0097970097009797, 0x00fefe00fe00fefe, 0x005a5a005a005a5a,
++	0x00acac00ac00acac, 0x003c3c003c003c3c, 0x004c4c004c004c4c,
++	0x0003030003000303, 0x0035350035003535, 0x00f3f300f300f3f3,
++	0x0023230023002323, 0x00b8b800b800b8b8, 0x005d5d005d005d5d,
++	0x006a6a006a006a6a, 0x0092920092009292, 0x00d5d500d500d5d5,
++	0x0021210021002121, 0x0044440044004444, 0x0051510051005151,
++	0x00c6c600c600c6c6, 0x007d7d007d007d7d, 0x0039390039003939,
++	0x0083830083008383, 0x00dcdc00dc00dcdc, 0x00aaaa00aa00aaaa,
++	0x007c7c007c007c7c, 0x0077770077007777, 0x0056560056005656,
++	0x0005050005000505, 0x001b1b001b001b1b, 0x00a4a400a400a4a4,
++	0x0015150015001515, 0x0034340034003434, 0x001e1e001e001e1e,
++	0x001c1c001c001c1c, 0x00f8f800f800f8f8, 0x0052520052005252,
++	0x0020200020002020, 0x0014140014001414, 0x00e9e900e900e9e9,
++	0x00bdbd00bd00bdbd, 0x00dddd00dd00dddd, 0x00e4e400e400e4e4,
++	0x00a1a100a100a1a1, 0x00e0e000e000e0e0, 0x008a8a008a008a8a,
++	0x00f1f100f100f1f1, 0x00d6d600d600d6d6, 0x007a7a007a007a7a,
++	0x00bbbb00bb00bbbb, 0x00e3e300e300e3e3, 0x0040400040004040,
++	0x004f4f004f004f4f,
 +};
 +
++const u64 camellia_sp00444404[256] = {
++	0x0000707070700070, 0x00002c2c2c2c002c, 0x0000b3b3b3b300b3,
++	0x0000c0c0c0c000c0, 0x0000e4e4e4e400e4, 0x0000575757570057,
++	0x0000eaeaeaea00ea, 0x0000aeaeaeae00ae, 0x0000232323230023,
++	0x00006b6b6b6b006b, 0x0000454545450045, 0x0000a5a5a5a500a5,
++	0x0000edededed00ed, 0x00004f4f4f4f004f, 0x00001d1d1d1d001d,
++	0x0000929292920092, 0x0000868686860086, 0x0000afafafaf00af,
++	0x00007c7c7c7c007c, 0x00001f1f1f1f001f, 0x00003e3e3e3e003e,
++	0x0000dcdcdcdc00dc, 0x00005e5e5e5e005e, 0x00000b0b0b0b000b,
++	0x0000a6a6a6a600a6, 0x0000393939390039, 0x0000d5d5d5d500d5,
++	0x00005d5d5d5d005d, 0x0000d9d9d9d900d9, 0x00005a5a5a5a005a,
++	0x0000515151510051, 0x00006c6c6c6c006c, 0x00008b8b8b8b008b,
++	0x00009a9a9a9a009a, 0x0000fbfbfbfb00fb, 0x0000b0b0b0b000b0,
++	0x0000747474740074, 0x00002b2b2b2b002b, 0x0000f0f0f0f000f0,
++	0x0000848484840084, 0x0000dfdfdfdf00df, 0x0000cbcbcbcb00cb,
++	0x0000343434340034, 0x0000767676760076, 0x00006d6d6d6d006d,
++	0x0000a9a9a9a900a9, 0x0000d1d1d1d100d1, 0x0000040404040004,
++	0x0000141414140014, 0x00003a3a3a3a003a, 0x0000dededede00de,
++	0x0000111111110011, 0x0000323232320032, 0x00009c9c9c9c009c,
++	0x0000535353530053, 0x0000f2f2f2f200f2, 0x0000fefefefe00fe,
++	0x0000cfcfcfcf00cf, 0x0000c3c3c3c300c3, 0x00007a7a7a7a007a,
++	0x0000242424240024, 0x0000e8e8e8e800e8, 0x0000606060600060,
++	0x0000696969690069, 0x0000aaaaaaaa00aa, 0x0000a0a0a0a000a0,
++	0x0000a1a1a1a100a1, 0x0000626262620062, 0x0000545454540054,
++	0x00001e1e1e1e001e, 0x0000e0e0e0e000e0, 0x0000646464640064,
++	0x0000101010100010, 0x0000000000000000, 0x0000a3a3a3a300a3,
++	0x0000757575750075, 0x00008a8a8a8a008a, 0x0000e6e6e6e600e6,
++	0x0000090909090009, 0x0000dddddddd00dd, 0x0000878787870087,
++	0x0000838383830083, 0x0000cdcdcdcd00cd, 0x0000909090900090,
++	0x0000737373730073, 0x0000f6f6f6f600f6, 0x00009d9d9d9d009d,
++	0x0000bfbfbfbf00bf, 0x0000525252520052, 0x0000d8d8d8d800d8,
++	0x0000c8c8c8c800c8, 0x0000c6c6c6c600c6, 0x0000818181810081,
++	0x00006f6f6f6f006f, 0x0000131313130013, 0x0000636363630063,
++	0x0000e9e9e9e900e9, 0x0000a7a7a7a700a7, 0x00009f9f9f9f009f,
++	0x0000bcbcbcbc00bc, 0x0000292929290029, 0x0000f9f9f9f900f9,
++	0x00002f2f2f2f002f, 0x0000b4b4b4b400b4, 0x0000787878780078,
++	0x0000060606060006, 0x0000e7e7e7e700e7, 0x0000717171710071,
++	0x0000d4d4d4d400d4, 0x0000abababab00ab, 0x0000888888880088,
++	0x00008d8d8d8d008d, 0x0000727272720072, 0x0000b9b9b9b900b9,
++	0x0000f8f8f8f800f8, 0x0000acacacac00ac, 0x0000363636360036,
++	0x00002a2a2a2a002a, 0x00003c3c3c3c003c, 0x0000f1f1f1f100f1,
++	0x0000404040400040, 0x0000d3d3d3d300d3, 0x0000bbbbbbbb00bb,
++	0x0000434343430043, 0x0000151515150015, 0x0000adadadad00ad,
++	0x0000777777770077, 0x0000808080800080, 0x0000828282820082,
++	0x0000ecececec00ec, 0x0000272727270027, 0x0000e5e5e5e500e5,
++	0x0000858585850085, 0x0000353535350035, 0x00000c0c0c0c000c,
++	0x0000414141410041, 0x0000efefefef00ef, 0x0000939393930093,
++	0x0000191919190019, 0x0000212121210021, 0x00000e0e0e0e000e,
++	0x00004e4e4e4e004e, 0x0000656565650065, 0x0000bdbdbdbd00bd,
++	0x0000b8b8b8b800b8, 0x00008f8f8f8f008f, 0x0000ebebebeb00eb,
++	0x0000cececece00ce, 0x0000303030300030, 0x00005f5f5f5f005f,
++	0x0000c5c5c5c500c5, 0x00001a1a1a1a001a, 0x0000e1e1e1e100e1,
++	0x0000cacacaca00ca, 0x0000474747470047, 0x00003d3d3d3d003d,
++	0x0000010101010001, 0x0000d6d6d6d600d6, 0x0000565656560056,
++	0x00004d4d4d4d004d, 0x00000d0d0d0d000d, 0x0000666666660066,
++	0x0000cccccccc00cc, 0x00002d2d2d2d002d, 0x0000121212120012,
++	0x0000202020200020, 0x0000b1b1b1b100b1, 0x0000999999990099,
++	0x00004c4c4c4c004c, 0x0000c2c2c2c200c2, 0x00007e7e7e7e007e,
++	0x0000050505050005, 0x0000b7b7b7b700b7, 0x0000313131310031,
++	0x0000171717170017, 0x0000d7d7d7d700d7, 0x0000585858580058,
++	0x0000616161610061, 0x00001b1b1b1b001b, 0x00001c1c1c1c001c,
++	0x00000f0f0f0f000f, 0x0000161616160016, 0x0000181818180018,
++	0x0000222222220022, 0x0000444444440044, 0x0000b2b2b2b200b2,
++	0x0000b5b5b5b500b5, 0x0000919191910091, 0x0000080808080008,
++	0x0000a8a8a8a800a8, 0x0000fcfcfcfc00fc, 0x0000505050500050,
++	0x0000d0d0d0d000d0, 0x00007d7d7d7d007d, 0x0000898989890089,
++	0x0000979797970097, 0x00005b5b5b5b005b, 0x0000959595950095,
++	0x0000ffffffff00ff, 0x0000d2d2d2d200d2, 0x0000c4c4c4c400c4,
++	0x0000484848480048, 0x0000f7f7f7f700f7, 0x0000dbdbdbdb00db,
++	0x0000030303030003, 0x0000dadadada00da, 0x00003f3f3f3f003f,
++	0x0000949494940094, 0x00005c5c5c5c005c, 0x0000020202020002,
++	0x00004a4a4a4a004a, 0x0000333333330033, 0x0000676767670067,
++	0x0000f3f3f3f300f3, 0x00007f7f7f7f007f, 0x0000e2e2e2e200e2,
++	0x00009b9b9b9b009b, 0x0000262626260026, 0x0000373737370037,
++	0x00003b3b3b3b003b, 0x0000969696960096, 0x00004b4b4b4b004b,
++	0x0000bebebebe00be, 0x00002e2e2e2e002e, 0x0000797979790079,
++	0x00008c8c8c8c008c, 0x00006e6e6e6e006e, 0x00008e8e8e8e008e,
++	0x0000f5f5f5f500f5, 0x0000b6b6b6b600b6, 0x0000fdfdfdfd00fd,
++	0x0000595959590059, 0x0000989898980098, 0x00006a6a6a6a006a,
++	0x0000464646460046, 0x0000babababa00ba, 0x0000252525250025,
++	0x0000424242420042, 0x0000a2a2a2a200a2, 0x0000fafafafa00fa,
++	0x0000070707070007, 0x0000555555550055, 0x0000eeeeeeee00ee,
++	0x00000a0a0a0a000a, 0x0000494949490049, 0x0000686868680068,
++	0x0000383838380038, 0x0000a4a4a4a400a4, 0x0000282828280028,
++	0x00007b7b7b7b007b, 0x0000c9c9c9c900c9, 0x0000c1c1c1c100c1,
++	0x0000e3e3e3e300e3, 0x0000f4f4f4f400f4, 0x0000c7c7c7c700c7,
++	0x00009e9e9e9e009e,
++};
 +
-+#define CAMELLIA_MIN_KEY_SIZE        16
-+#define CAMELLIA_MAX_KEY_SIZE        32
-+#define CAMELLIA_BLOCK_SIZE          16
-+#define CAMELLIA_TABLE_BYTE_LEN     272
++const u64 camellia_sp02220222[256] = {
++	0x00e0e0e000e0e0e0, 0x0005050500050505, 0x0058585800585858,
++	0x00d9d9d900d9d9d9, 0x0067676700676767, 0x004e4e4e004e4e4e,
++	0x0081818100818181, 0x00cbcbcb00cbcbcb, 0x00c9c9c900c9c9c9,
++	0x000b0b0b000b0b0b, 0x00aeaeae00aeaeae, 0x006a6a6a006a6a6a,
++	0x00d5d5d500d5d5d5, 0x0018181800181818, 0x005d5d5d005d5d5d,
++	0x0082828200828282, 0x0046464600464646, 0x00dfdfdf00dfdfdf,
++	0x00d6d6d600d6d6d6, 0x0027272700272727, 0x008a8a8a008a8a8a,
++	0x0032323200323232, 0x004b4b4b004b4b4b, 0x0042424200424242,
++	0x00dbdbdb00dbdbdb, 0x001c1c1c001c1c1c, 0x009e9e9e009e9e9e,
++	0x009c9c9c009c9c9c, 0x003a3a3a003a3a3a, 0x00cacaca00cacaca,
++	0x0025252500252525, 0x007b7b7b007b7b7b, 0x000d0d0d000d0d0d,
++	0x0071717100717171, 0x005f5f5f005f5f5f, 0x001f1f1f001f1f1f,
++	0x00f8f8f800f8f8f8, 0x00d7d7d700d7d7d7, 0x003e3e3e003e3e3e,
++	0x009d9d9d009d9d9d, 0x007c7c7c007c7c7c, 0x0060606000606060,
++	0x00b9b9b900b9b9b9, 0x00bebebe00bebebe, 0x00bcbcbc00bcbcbc,
++	0x008b8b8b008b8b8b, 0x0016161600161616, 0x0034343400343434,
++	0x004d4d4d004d4d4d, 0x00c3c3c300c3c3c3, 0x0072727200727272,
++	0x0095959500959595, 0x00ababab00ababab, 0x008e8e8e008e8e8e,
++	0x00bababa00bababa, 0x007a7a7a007a7a7a, 0x00b3b3b300b3b3b3,
++	0x0002020200020202, 0x00b4b4b400b4b4b4, 0x00adadad00adadad,
++	0x00a2a2a200a2a2a2, 0x00acacac00acacac, 0x00d8d8d800d8d8d8,
++	0x009a9a9a009a9a9a, 0x0017171700171717, 0x001a1a1a001a1a1a,
++	0x0035353500353535, 0x00cccccc00cccccc, 0x00f7f7f700f7f7f7,
++	0x0099999900999999, 0x0061616100616161, 0x005a5a5a005a5a5a,
++	0x00e8e8e800e8e8e8, 0x0024242400242424, 0x0056565600565656,
++	0x0040404000404040, 0x00e1e1e100e1e1e1, 0x0063636300636363,
++	0x0009090900090909, 0x0033333300333333, 0x00bfbfbf00bfbfbf,
++	0x0098989800989898, 0x0097979700979797, 0x0085858500858585,
++	0x0068686800686868, 0x00fcfcfc00fcfcfc, 0x00ececec00ececec,
++	0x000a0a0a000a0a0a, 0x00dadada00dadada, 0x006f6f6f006f6f6f,
++	0x0053535300535353, 0x0062626200626262, 0x00a3a3a300a3a3a3,
++	0x002e2e2e002e2e2e, 0x0008080800080808, 0x00afafaf00afafaf,
++	0x0028282800282828, 0x00b0b0b000b0b0b0, 0x0074747400747474,
++	0x00c2c2c200c2c2c2, 0x00bdbdbd00bdbdbd, 0x0036363600363636,
++	0x0022222200222222, 0x0038383800383838, 0x0064646400646464,
++	0x001e1e1e001e1e1e, 0x0039393900393939, 0x002c2c2c002c2c2c,
++	0x00a6a6a600a6a6a6, 0x0030303000303030, 0x00e5e5e500e5e5e5,
++	0x0044444400444444, 0x00fdfdfd00fdfdfd, 0x0088888800888888,
++	0x009f9f9f009f9f9f, 0x0065656500656565, 0x0087878700878787,
++	0x006b6b6b006b6b6b, 0x00f4f4f400f4f4f4, 0x0023232300232323,
++	0x0048484800484848, 0x0010101000101010, 0x00d1d1d100d1d1d1,
++	0x0051515100515151, 0x00c0c0c000c0c0c0, 0x00f9f9f900f9f9f9,
++	0x00d2d2d200d2d2d2, 0x00a0a0a000a0a0a0, 0x0055555500555555,
++	0x00a1a1a100a1a1a1, 0x0041414100414141, 0x00fafafa00fafafa,
++	0x0043434300434343, 0x0013131300131313, 0x00c4c4c400c4c4c4,
++	0x002f2f2f002f2f2f, 0x00a8a8a800a8a8a8, 0x00b6b6b600b6b6b6,
++	0x003c3c3c003c3c3c, 0x002b2b2b002b2b2b, 0x00c1c1c100c1c1c1,
++	0x00ffffff00ffffff, 0x00c8c8c800c8c8c8, 0x00a5a5a500a5a5a5,
++	0x0020202000202020, 0x0089898900898989, 0x0000000000000000,
++	0x0090909000909090, 0x0047474700474747, 0x00efefef00efefef,
++	0x00eaeaea00eaeaea, 0x00b7b7b700b7b7b7, 0x0015151500151515,
++	0x0006060600060606, 0x00cdcdcd00cdcdcd, 0x00b5b5b500b5b5b5,
++	0x0012121200121212, 0x007e7e7e007e7e7e, 0x00bbbbbb00bbbbbb,
++	0x0029292900292929, 0x000f0f0f000f0f0f, 0x00b8b8b800b8b8b8,
++	0x0007070700070707, 0x0004040400040404, 0x009b9b9b009b9b9b,
++	0x0094949400949494, 0x0021212100212121, 0x0066666600666666,
++	0x00e6e6e600e6e6e6, 0x00cecece00cecece, 0x00ededed00ededed,
++	0x00e7e7e700e7e7e7, 0x003b3b3b003b3b3b, 0x00fefefe00fefefe,
++	0x007f7f7f007f7f7f, 0x00c5c5c500c5c5c5, 0x00a4a4a400a4a4a4,
++	0x0037373700373737, 0x00b1b1b100b1b1b1, 0x004c4c4c004c4c4c,
++	0x0091919100919191, 0x006e6e6e006e6e6e, 0x008d8d8d008d8d8d,
++	0x0076767600767676, 0x0003030300030303, 0x002d2d2d002d2d2d,
++	0x00dedede00dedede, 0x0096969600969696, 0x0026262600262626,
++	0x007d7d7d007d7d7d, 0x00c6c6c600c6c6c6, 0x005c5c5c005c5c5c,
++	0x00d3d3d300d3d3d3, 0x00f2f2f200f2f2f2, 0x004f4f4f004f4f4f,
++	0x0019191900191919, 0x003f3f3f003f3f3f, 0x00dcdcdc00dcdcdc,
++	0x0079797900797979, 0x001d1d1d001d1d1d, 0x0052525200525252,
++	0x00ebebeb00ebebeb, 0x00f3f3f300f3f3f3, 0x006d6d6d006d6d6d,
++	0x005e5e5e005e5e5e, 0x00fbfbfb00fbfbfb, 0x0069696900696969,
++	0x00b2b2b200b2b2b2, 0x00f0f0f000f0f0f0, 0x0031313100313131,
++	0x000c0c0c000c0c0c, 0x00d4d4d400d4d4d4, 0x00cfcfcf00cfcfcf,
++	0x008c8c8c008c8c8c, 0x00e2e2e200e2e2e2, 0x0075757500757575,
++	0x00a9a9a900a9a9a9, 0x004a4a4a004a4a4a, 0x0057575700575757,
++	0x0084848400848484, 0x0011111100111111, 0x0045454500454545,
++	0x001b1b1b001b1b1b, 0x00f5f5f500f5f5f5, 0x00e4e4e400e4e4e4,
++	0x000e0e0e000e0e0e, 0x0073737300737373, 0x00aaaaaa00aaaaaa,
++	0x00f1f1f100f1f1f1, 0x00dddddd00dddddd, 0x0059595900595959,
++	0x0014141400141414, 0x006c6c6c006c6c6c, 0x0092929200929292,
++	0x0054545400545454, 0x00d0d0d000d0d0d0, 0x0078787800787878,
++	0x0070707000707070, 0x00e3e3e300e3e3e3, 0x0049494900494949,
++	0x0080808000808080, 0x0050505000505050, 0x00a7a7a700a7a7a7,
++	0x00f6f6f600f6f6f6, 0x0077777700777777, 0x0093939300939393,
++	0x0086868600868686, 0x0083838300838383, 0x002a2a2a002a2a2a,
++	0x00c7c7c700c7c7c7, 0x005b5b5b005b5b5b, 0x00e9e9e900e9e9e9,
++	0x00eeeeee00eeeeee, 0x008f8f8f008f8f8f, 0x0001010100010101,
++	0x003d3d3d003d3d3d,
++};
 +
-+/*
-+ * NB: L and R below stand for 'left' and 'right' as in written numbers.
-+ * That is, in (xxxL,xxxR) pair xxxL holds most significant digits,
-+ * _not_ least significant ones!
-+ */
++const u64 camellia_sp30333033[256] = {
++	0x3800383838003838, 0x4100414141004141, 0x1600161616001616,
++	0x7600767676007676, 0xd900d9d9d900d9d9, 0x9300939393009393,
++	0x6000606060006060, 0xf200f2f2f200f2f2, 0x7200727272007272,
++	0xc200c2c2c200c2c2, 0xab00ababab00abab, 0x9a009a9a9a009a9a,
++	0x7500757575007575, 0x0600060606000606, 0x5700575757005757,
++	0xa000a0a0a000a0a0, 0x9100919191009191, 0xf700f7f7f700f7f7,
++	0xb500b5b5b500b5b5, 0xc900c9c9c900c9c9, 0xa200a2a2a200a2a2,
++	0x8c008c8c8c008c8c, 0xd200d2d2d200d2d2, 0x9000909090009090,
++	0xf600f6f6f600f6f6, 0x0700070707000707, 0xa700a7a7a700a7a7,
++	0x2700272727002727, 0x8e008e8e8e008e8e, 0xb200b2b2b200b2b2,
++	0x4900494949004949, 0xde00dedede00dede, 0x4300434343004343,
++	0x5c005c5c5c005c5c, 0xd700d7d7d700d7d7, 0xc700c7c7c700c7c7,
++	0x3e003e3e3e003e3e, 0xf500f5f5f500f5f5, 0x8f008f8f8f008f8f,
++	0x6700676767006767, 0x1f001f1f1f001f1f, 0x1800181818001818,
++	0x6e006e6e6e006e6e, 0xaf00afafaf00afaf, 0x2f002f2f2f002f2f,
++	0xe200e2e2e200e2e2, 0x8500858585008585, 0x0d000d0d0d000d0d,
++	0x5300535353005353, 0xf000f0f0f000f0f0, 0x9c009c9c9c009c9c,
++	0x6500656565006565, 0xea00eaeaea00eaea, 0xa300a3a3a300a3a3,
++	0xae00aeaeae00aeae, 0x9e009e9e9e009e9e, 0xec00ececec00ecec,
++	0x8000808080008080, 0x2d002d2d2d002d2d, 0x6b006b6b6b006b6b,
++	0xa800a8a8a800a8a8, 0x2b002b2b2b002b2b, 0x3600363636003636,
++	0xa600a6a6a600a6a6, 0xc500c5c5c500c5c5, 0x8600868686008686,
++	0x4d004d4d4d004d4d, 0x3300333333003333, 0xfd00fdfdfd00fdfd,
++	0x6600666666006666, 0x5800585858005858, 0x9600969696009696,
++	0x3a003a3a3a003a3a, 0x0900090909000909, 0x9500959595009595,
++	0x1000101010001010, 0x7800787878007878, 0xd800d8d8d800d8d8,
++	0x4200424242004242, 0xcc00cccccc00cccc, 0xef00efefef00efef,
++	0x2600262626002626, 0xe500e5e5e500e5e5, 0x6100616161006161,
++	0x1a001a1a1a001a1a, 0x3f003f3f3f003f3f, 0x3b003b3b3b003b3b,
++	0x8200828282008282, 0xb600b6b6b600b6b6, 0xdb00dbdbdb00dbdb,
++	0xd400d4d4d400d4d4, 0x9800989898009898, 0xe800e8e8e800e8e8,
++	0x8b008b8b8b008b8b, 0x0200020202000202, 0xeb00ebebeb00ebeb,
++	0x0a000a0a0a000a0a, 0x2c002c2c2c002c2c, 0x1d001d1d1d001d1d,
++	0xb000b0b0b000b0b0, 0x6f006f6f6f006f6f, 0x8d008d8d8d008d8d,
++	0x8800888888008888, 0x0e000e0e0e000e0e, 0x1900191919001919,
++	0x8700878787008787, 0x4e004e4e4e004e4e, 0x0b000b0b0b000b0b,
++	0xa900a9a9a900a9a9, 0x0c000c0c0c000c0c, 0x7900797979007979,
++	0x1100111111001111, 0x7f007f7f7f007f7f, 0x2200222222002222,
++	0xe700e7e7e700e7e7, 0x5900595959005959, 0xe100e1e1e100e1e1,
++	0xda00dadada00dada, 0x3d003d3d3d003d3d, 0xc800c8c8c800c8c8,
++	0x1200121212001212, 0x0400040404000404, 0x7400747474007474,
++	0x5400545454005454, 0x3000303030003030, 0x7e007e7e7e007e7e,
++	0xb400b4b4b400b4b4, 0x2800282828002828, 0x5500555555005555,
++	0x6800686868006868, 0x5000505050005050, 0xbe00bebebe00bebe,
++	0xd000d0d0d000d0d0, 0xc400c4c4c400c4c4, 0x3100313131003131,
++	0xcb00cbcbcb00cbcb, 0x2a002a2a2a002a2a, 0xad00adadad00adad,
++	0x0f000f0f0f000f0f, 0xca00cacaca00caca, 0x7000707070007070,
++	0xff00ffffff00ffff, 0x3200323232003232, 0x6900696969006969,
++	0x0800080808000808, 0x6200626262006262, 0x0000000000000000,
++	0x2400242424002424, 0xd100d1d1d100d1d1, 0xfb00fbfbfb00fbfb,
++	0xba00bababa00baba, 0xed00ededed00eded, 0x4500454545004545,
++	0x8100818181008181, 0x7300737373007373, 0x6d006d6d6d006d6d,
++	0x8400848484008484, 0x9f009f9f9f009f9f, 0xee00eeeeee00eeee,
++	0x4a004a4a4a004a4a, 0xc300c3c3c300c3c3, 0x2e002e2e2e002e2e,
++	0xc100c1c1c100c1c1, 0x0100010101000101, 0xe600e6e6e600e6e6,
++	0x2500252525002525, 0x4800484848004848, 0x9900999999009999,
++	0xb900b9b9b900b9b9, 0xb300b3b3b300b3b3, 0x7b007b7b7b007b7b,
++	0xf900f9f9f900f9f9, 0xce00cecece00cece, 0xbf00bfbfbf00bfbf,
++	0xdf00dfdfdf00dfdf, 0x7100717171007171, 0x2900292929002929,
++	0xcd00cdcdcd00cdcd, 0x6c006c6c6c006c6c, 0x1300131313001313,
++	0x6400646464006464, 0x9b009b9b9b009b9b, 0x6300636363006363,
++	0x9d009d9d9d009d9d, 0xc000c0c0c000c0c0, 0x4b004b4b4b004b4b,
++	0xb700b7b7b700b7b7, 0xa500a5a5a500a5a5, 0x8900898989008989,
++	0x5f005f5f5f005f5f, 0xb100b1b1b100b1b1, 0x1700171717001717,
++	0xf400f4f4f400f4f4, 0xbc00bcbcbc00bcbc, 0xd300d3d3d300d3d3,
++	0x4600464646004646, 0xcf00cfcfcf00cfcf, 0x3700373737003737,
++	0x5e005e5e5e005e5e, 0x4700474747004747, 0x9400949494009494,
++	0xfa00fafafa00fafa, 0xfc00fcfcfc00fcfc, 0x5b005b5b5b005b5b,
++	0x9700979797009797, 0xfe00fefefe00fefe, 0x5a005a5a5a005a5a,
++	0xac00acacac00acac, 0x3c003c3c3c003c3c, 0x4c004c4c4c004c4c,
++	0x0300030303000303, 0x3500353535003535, 0xf300f3f3f300f3f3,
++	0x2300232323002323, 0xb800b8b8b800b8b8, 0x5d005d5d5d005d5d,
++	0x6a006a6a6a006a6a, 0x9200929292009292, 0xd500d5d5d500d5d5,
++	0x2100212121002121, 0x4400444444004444, 0x5100515151005151,
++	0xc600c6c6c600c6c6, 0x7d007d7d7d007d7d, 0x3900393939003939,
++	0x8300838383008383, 0xdc00dcdcdc00dcdc, 0xaa00aaaaaa00aaaa,
++	0x7c007c7c7c007c7c, 0x7700777777007777, 0x5600565656005656,
++	0x0500050505000505, 0x1b001b1b1b001b1b, 0xa400a4a4a400a4a4,
++	0x1500151515001515, 0x3400343434003434, 0x1e001e1e1e001e1e,
++	0x1c001c1c1c001c1c, 0xf800f8f8f800f8f8, 0x5200525252005252,
++	0x2000202020002020, 0x1400141414001414, 0xe900e9e9e900e9e9,
++	0xbd00bdbdbd00bdbd, 0xdd00dddddd00dddd, 0xe400e4e4e400e4e4,
++	0xa100a1a1a100a1a1, 0xe000e0e0e000e0e0, 0x8a008a8a8a008a8a,
++	0xf100f1f1f100f1f1, 0xd600d6d6d600d6d6, 0x7a007a7a7a007a7a,
++	0xbb00bbbbbb00bbbb, 0xe300e3e3e300e3e3, 0x4000404040004040,
++	0x4f004f4f4f004f4f,
++};
 +
++const u64 camellia_sp44044404[256] = {
++	0x7070007070700070, 0x2c2c002c2c2c002c, 0xb3b300b3b3b300b3,
++	0xc0c000c0c0c000c0, 0xe4e400e4e4e400e4, 0x5757005757570057,
++	0xeaea00eaeaea00ea, 0xaeae00aeaeae00ae, 0x2323002323230023,
++	0x6b6b006b6b6b006b, 0x4545004545450045, 0xa5a500a5a5a500a5,
++	0xeded00ededed00ed, 0x4f4f004f4f4f004f, 0x1d1d001d1d1d001d,
++	0x9292009292920092, 0x8686008686860086, 0xafaf00afafaf00af,
++	0x7c7c007c7c7c007c, 0x1f1f001f1f1f001f, 0x3e3e003e3e3e003e,
++	0xdcdc00dcdcdc00dc, 0x5e5e005e5e5e005e, 0x0b0b000b0b0b000b,
++	0xa6a600a6a6a600a6, 0x3939003939390039, 0xd5d500d5d5d500d5,
++	0x5d5d005d5d5d005d, 0xd9d900d9d9d900d9, 0x5a5a005a5a5a005a,
++	0x5151005151510051, 0x6c6c006c6c6c006c, 0x8b8b008b8b8b008b,
++	0x9a9a009a9a9a009a, 0xfbfb00fbfbfb00fb, 0xb0b000b0b0b000b0,
++	0x7474007474740074, 0x2b2b002b2b2b002b, 0xf0f000f0f0f000f0,
++	0x8484008484840084, 0xdfdf00dfdfdf00df, 0xcbcb00cbcbcb00cb,
++	0x3434003434340034, 0x7676007676760076, 0x6d6d006d6d6d006d,
++	0xa9a900a9a9a900a9, 0xd1d100d1d1d100d1, 0x0404000404040004,
++	0x1414001414140014, 0x3a3a003a3a3a003a, 0xdede00dedede00de,
++	0x1111001111110011, 0x3232003232320032, 0x9c9c009c9c9c009c,
++	0x5353005353530053, 0xf2f200f2f2f200f2, 0xfefe00fefefe00fe,
++	0xcfcf00cfcfcf00cf, 0xc3c300c3c3c300c3, 0x7a7a007a7a7a007a,
++	0x2424002424240024, 0xe8e800e8e8e800e8, 0x6060006060600060,
++	0x6969006969690069, 0xaaaa00aaaaaa00aa, 0xa0a000a0a0a000a0,
++	0xa1a100a1a1a100a1, 0x6262006262620062, 0x5454005454540054,
++	0x1e1e001e1e1e001e, 0xe0e000e0e0e000e0, 0x6464006464640064,
++	0x1010001010100010, 0x0000000000000000, 0xa3a300a3a3a300a3,
++	0x7575007575750075, 0x8a8a008a8a8a008a, 0xe6e600e6e6e600e6,
++	0x0909000909090009, 0xdddd00dddddd00dd, 0x8787008787870087,
++	0x8383008383830083, 0xcdcd00cdcdcd00cd, 0x9090009090900090,
++	0x7373007373730073, 0xf6f600f6f6f600f6, 0x9d9d009d9d9d009d,
++	0xbfbf00bfbfbf00bf, 0x5252005252520052, 0xd8d800d8d8d800d8,
++	0xc8c800c8c8c800c8, 0xc6c600c6c6c600c6, 0x8181008181810081,
++	0x6f6f006f6f6f006f, 0x1313001313130013, 0x6363006363630063,
++	0xe9e900e9e9e900e9, 0xa7a700a7a7a700a7, 0x9f9f009f9f9f009f,
++	0xbcbc00bcbcbc00bc, 0x2929002929290029, 0xf9f900f9f9f900f9,
++	0x2f2f002f2f2f002f, 0xb4b400b4b4b400b4, 0x7878007878780078,
++	0x0606000606060006, 0xe7e700e7e7e700e7, 0x7171007171710071,
++	0xd4d400d4d4d400d4, 0xabab00ababab00ab, 0x8888008888880088,
++	0x8d8d008d8d8d008d, 0x7272007272720072, 0xb9b900b9b9b900b9,
++	0xf8f800f8f8f800f8, 0xacac00acacac00ac, 0x3636003636360036,
++	0x2a2a002a2a2a002a, 0x3c3c003c3c3c003c, 0xf1f100f1f1f100f1,
++	0x4040004040400040, 0xd3d300d3d3d300d3, 0xbbbb00bbbbbb00bb,
++	0x4343004343430043, 0x1515001515150015, 0xadad00adadad00ad,
++	0x7777007777770077, 0x8080008080800080, 0x8282008282820082,
++	0xecec00ececec00ec, 0x2727002727270027, 0xe5e500e5e5e500e5,
++	0x8585008585850085, 0x3535003535350035, 0x0c0c000c0c0c000c,
++	0x4141004141410041, 0xefef00efefef00ef, 0x9393009393930093,
++	0x1919001919190019, 0x2121002121210021, 0x0e0e000e0e0e000e,
++	0x4e4e004e4e4e004e, 0x6565006565650065, 0xbdbd00bdbdbd00bd,
++	0xb8b800b8b8b800b8, 0x8f8f008f8f8f008f, 0xebeb00ebebeb00eb,
++	0xcece00cecece00ce, 0x3030003030300030, 0x5f5f005f5f5f005f,
++	0xc5c500c5c5c500c5, 0x1a1a001a1a1a001a, 0xe1e100e1e1e100e1,
++	0xcaca00cacaca00ca, 0x4747004747470047, 0x3d3d003d3d3d003d,
++	0x0101000101010001, 0xd6d600d6d6d600d6, 0x5656005656560056,
++	0x4d4d004d4d4d004d, 0x0d0d000d0d0d000d, 0x6666006666660066,
++	0xcccc00cccccc00cc, 0x2d2d002d2d2d002d, 0x1212001212120012,
++	0x2020002020200020, 0xb1b100b1b1b100b1, 0x9999009999990099,
++	0x4c4c004c4c4c004c, 0xc2c200c2c2c200c2, 0x7e7e007e7e7e007e,
++	0x0505000505050005, 0xb7b700b7b7b700b7, 0x3131003131310031,
++	0x1717001717170017, 0xd7d700d7d7d700d7, 0x5858005858580058,
++	0x6161006161610061, 0x1b1b001b1b1b001b, 0x1c1c001c1c1c001c,
++	0x0f0f000f0f0f000f, 0x1616001616160016, 0x1818001818180018,
++	0x2222002222220022, 0x4444004444440044, 0xb2b200b2b2b200b2,
++	0xb5b500b5b5b500b5, 0x9191009191910091, 0x0808000808080008,
++	0xa8a800a8a8a800a8, 0xfcfc00fcfcfc00fc, 0x5050005050500050,
++	0xd0d000d0d0d000d0, 0x7d7d007d7d7d007d, 0x8989008989890089,
++	0x9797009797970097, 0x5b5b005b5b5b005b, 0x9595009595950095,
++	0xffff00ffffff00ff, 0xd2d200d2d2d200d2, 0xc4c400c4c4c400c4,
++	0x4848004848480048, 0xf7f700f7f7f700f7, 0xdbdb00dbdbdb00db,
++	0x0303000303030003, 0xdada00dadada00da, 0x3f3f003f3f3f003f,
++	0x9494009494940094, 0x5c5c005c5c5c005c, 0x0202000202020002,
++	0x4a4a004a4a4a004a, 0x3333003333330033, 0x6767006767670067,
++	0xf3f300f3f3f300f3, 0x7f7f007f7f7f007f, 0xe2e200e2e2e200e2,
++	0x9b9b009b9b9b009b, 0x2626002626260026, 0x3737003737370037,
++	0x3b3b003b3b3b003b, 0x9696009696960096, 0x4b4b004b4b4b004b,
++	0xbebe00bebebe00be, 0x2e2e002e2e2e002e, 0x7979007979790079,
++	0x8c8c008c8c8c008c, 0x6e6e006e6e6e006e, 0x8e8e008e8e8e008e,
++	0xf5f500f5f5f500f5, 0xb6b600b6b6b600b6, 0xfdfd00fdfdfd00fd,
++	0x5959005959590059, 0x9898009898980098, 0x6a6a006a6a6a006a,
++	0x4646004646460046, 0xbaba00bababa00ba, 0x2525002525250025,
++	0x4242004242420042, 0xa2a200a2a2a200a2, 0xfafa00fafafa00fa,
++	0x0707000707070007, 0x5555005555550055, 0xeeee00eeeeee00ee,
++	0x0a0a000a0a0a000a, 0x4949004949490049, 0x6868006868680068,
++	0x3838003838380038, 0xa4a400a4a4a400a4, 0x2828002828280028,
++	0x7b7b007b7b7b007b, 0xc9c900c9c9c900c9, 0xc1c100c1c1c100c1,
++	0xe3e300e3e3e300e3, 0xf4f400f4f4f400f4, 0xc7c700c7c7c700c7,
++	0x9e9e009e9e9e009e,
++};
++
++const u64 camellia_sp11101110[256] = {
++	0x7070700070707000, 0x8282820082828200, 0x2c2c2c002c2c2c00,
++	0xececec00ececec00, 0xb3b3b300b3b3b300, 0x2727270027272700,
++	0xc0c0c000c0c0c000, 0xe5e5e500e5e5e500, 0xe4e4e400e4e4e400,
++	0x8585850085858500, 0x5757570057575700, 0x3535350035353500,
++	0xeaeaea00eaeaea00, 0x0c0c0c000c0c0c00, 0xaeaeae00aeaeae00,
++	0x4141410041414100, 0x2323230023232300, 0xefefef00efefef00,
++	0x6b6b6b006b6b6b00, 0x9393930093939300, 0x4545450045454500,
++	0x1919190019191900, 0xa5a5a500a5a5a500, 0x2121210021212100,
++	0xededed00ededed00, 0x0e0e0e000e0e0e00, 0x4f4f4f004f4f4f00,
++	0x4e4e4e004e4e4e00, 0x1d1d1d001d1d1d00, 0x6565650065656500,
++	0x9292920092929200, 0xbdbdbd00bdbdbd00, 0x8686860086868600,
++	0xb8b8b800b8b8b800, 0xafafaf00afafaf00, 0x8f8f8f008f8f8f00,
++	0x7c7c7c007c7c7c00, 0xebebeb00ebebeb00, 0x1f1f1f001f1f1f00,
++	0xcecece00cecece00, 0x3e3e3e003e3e3e00, 0x3030300030303000,
++	0xdcdcdc00dcdcdc00, 0x5f5f5f005f5f5f00, 0x5e5e5e005e5e5e00,
++	0xc5c5c500c5c5c500, 0x0b0b0b000b0b0b00, 0x1a1a1a001a1a1a00,
++	0xa6a6a600a6a6a600, 0xe1e1e100e1e1e100, 0x3939390039393900,
++	0xcacaca00cacaca00, 0xd5d5d500d5d5d500, 0x4747470047474700,
++	0x5d5d5d005d5d5d00, 0x3d3d3d003d3d3d00, 0xd9d9d900d9d9d900,
++	0x0101010001010100, 0x5a5a5a005a5a5a00, 0xd6d6d600d6d6d600,
++	0x5151510051515100, 0x5656560056565600, 0x6c6c6c006c6c6c00,
++	0x4d4d4d004d4d4d00, 0x8b8b8b008b8b8b00, 0x0d0d0d000d0d0d00,
++	0x9a9a9a009a9a9a00, 0x6666660066666600, 0xfbfbfb00fbfbfb00,
++	0xcccccc00cccccc00, 0xb0b0b000b0b0b000, 0x2d2d2d002d2d2d00,
++	0x7474740074747400, 0x1212120012121200, 0x2b2b2b002b2b2b00,
++	0x2020200020202000, 0xf0f0f000f0f0f000, 0xb1b1b100b1b1b100,
++	0x8484840084848400, 0x9999990099999900, 0xdfdfdf00dfdfdf00,
++	0x4c4c4c004c4c4c00, 0xcbcbcb00cbcbcb00, 0xc2c2c200c2c2c200,
++	0x3434340034343400, 0x7e7e7e007e7e7e00, 0x7676760076767600,
++	0x0505050005050500, 0x6d6d6d006d6d6d00, 0xb7b7b700b7b7b700,
++	0xa9a9a900a9a9a900, 0x3131310031313100, 0xd1d1d100d1d1d100,
++	0x1717170017171700, 0x0404040004040400, 0xd7d7d700d7d7d700,
++	0x1414140014141400, 0x5858580058585800, 0x3a3a3a003a3a3a00,
++	0x6161610061616100, 0xdedede00dedede00, 0x1b1b1b001b1b1b00,
++	0x1111110011111100, 0x1c1c1c001c1c1c00, 0x3232320032323200,
++	0x0f0f0f000f0f0f00, 0x9c9c9c009c9c9c00, 0x1616160016161600,
++	0x5353530053535300, 0x1818180018181800, 0xf2f2f200f2f2f200,
++	0x2222220022222200, 0xfefefe00fefefe00, 0x4444440044444400,
++	0xcfcfcf00cfcfcf00, 0xb2b2b200b2b2b200, 0xc3c3c300c3c3c300,
++	0xb5b5b500b5b5b500, 0x7a7a7a007a7a7a00, 0x9191910091919100,
++	0x2424240024242400, 0x0808080008080800, 0xe8e8e800e8e8e800,
++	0xa8a8a800a8a8a800, 0x6060600060606000, 0xfcfcfc00fcfcfc00,
++	0x6969690069696900, 0x5050500050505000, 0xaaaaaa00aaaaaa00,
++	0xd0d0d000d0d0d000, 0xa0a0a000a0a0a000, 0x7d7d7d007d7d7d00,
++	0xa1a1a100a1a1a100, 0x8989890089898900, 0x6262620062626200,
++	0x9797970097979700, 0x5454540054545400, 0x5b5b5b005b5b5b00,
++	0x1e1e1e001e1e1e00, 0x9595950095959500, 0xe0e0e000e0e0e000,
++	0xffffff00ffffff00, 0x6464640064646400, 0xd2d2d200d2d2d200,
++	0x1010100010101000, 0xc4c4c400c4c4c400, 0x0000000000000000,
++	0x4848480048484800, 0xa3a3a300a3a3a300, 0xf7f7f700f7f7f700,
++	0x7575750075757500, 0xdbdbdb00dbdbdb00, 0x8a8a8a008a8a8a00,
++	0x0303030003030300, 0xe6e6e600e6e6e600, 0xdadada00dadada00,
++	0x0909090009090900, 0x3f3f3f003f3f3f00, 0xdddddd00dddddd00,
++	0x9494940094949400, 0x8787870087878700, 0x5c5c5c005c5c5c00,
++	0x8383830083838300, 0x0202020002020200, 0xcdcdcd00cdcdcd00,
++	0x4a4a4a004a4a4a00, 0x9090900090909000, 0x3333330033333300,
++	0x7373730073737300, 0x6767670067676700, 0xf6f6f600f6f6f600,
++	0xf3f3f300f3f3f300, 0x9d9d9d009d9d9d00, 0x7f7f7f007f7f7f00,
++	0xbfbfbf00bfbfbf00, 0xe2e2e200e2e2e200, 0x5252520052525200,
++	0x9b9b9b009b9b9b00, 0xd8d8d800d8d8d800, 0x2626260026262600,
++	0xc8c8c800c8c8c800, 0x3737370037373700, 0xc6c6c600c6c6c600,
++	0x3b3b3b003b3b3b00, 0x8181810081818100, 0x9696960096969600,
++	0x6f6f6f006f6f6f00, 0x4b4b4b004b4b4b00, 0x1313130013131300,
++	0xbebebe00bebebe00, 0x6363630063636300, 0x2e2e2e002e2e2e00,
++	0xe9e9e900e9e9e900, 0x7979790079797900, 0xa7a7a700a7a7a700,
++	0x8c8c8c008c8c8c00, 0x9f9f9f009f9f9f00, 0x6e6e6e006e6e6e00,
++	0xbcbcbc00bcbcbc00, 0x8e8e8e008e8e8e00, 0x2929290029292900,
++	0xf5f5f500f5f5f500, 0xf9f9f900f9f9f900, 0xb6b6b600b6b6b600,
++	0x2f2f2f002f2f2f00, 0xfdfdfd00fdfdfd00, 0xb4b4b400b4b4b400,
++	0x5959590059595900, 0x7878780078787800, 0x9898980098989800,
++	0x0606060006060600, 0x6a6a6a006a6a6a00, 0xe7e7e700e7e7e700,
++	0x4646460046464600, 0x7171710071717100, 0xbababa00bababa00,
++	0xd4d4d400d4d4d400, 0x2525250025252500, 0xababab00ababab00,
++	0x4242420042424200, 0x8888880088888800, 0xa2a2a200a2a2a200,
++	0x8d8d8d008d8d8d00, 0xfafafa00fafafa00, 0x7272720072727200,
++	0x0707070007070700, 0xb9b9b900b9b9b900, 0x5555550055555500,
++	0xf8f8f800f8f8f800, 0xeeeeee00eeeeee00, 0xacacac00acacac00,
++	0x0a0a0a000a0a0a00, 0x3636360036363600, 0x4949490049494900,
++	0x2a2a2a002a2a2a00, 0x6868680068686800, 0x3c3c3c003c3c3c00,
++	0x3838380038383800, 0xf1f1f100f1f1f100, 0xa4a4a400a4a4a400,
++	0x4040400040404000, 0x2828280028282800, 0xd3d3d300d3d3d300,
++	0x7b7b7b007b7b7b00, 0xbbbbbb00bbbbbb00, 0xc9c9c900c9c9c900,
++	0x4343430043434300, 0xc1c1c100c1c1c100, 0x1515150015151500,
++	0xe3e3e300e3e3e300, 0xadadad00adadad00, 0xf4f4f400f4f4f400,
++	0x7777770077777700, 0xc7c7c700c7c7c700, 0x8080800080808000,
++	0x9e9e9e009e9e9e00,
++};
 +
 +/* key constants */
-+
 +#define CAMELLIA_SIGMA1L (0xA09E667FL)
 +#define CAMELLIA_SIGMA1R (0x3BCC908BL)
 +#define CAMELLIA_SIGMA2L (0xB67AE858L)
@@ -1490,657 +1479,468 @@ index 0000000..f7aaaaf
 +#define CAMELLIA_SIGMA6L (0xB05688C2L)
 +#define CAMELLIA_SIGMA6R (0xB3E6C1FDL)
 +
-+/*
-+ *  macros
-+ */
-+#define ROLDQ(ll, lr, rl, rr, w0, w1, bits) ({		\
-+	w0 = ll;					\
-+	ll = (ll << bits) + (lr >> (32 - bits));	\
-+	lr = (lr << bits) + (rl >> (32 - bits));	\
-+	rl = (rl << bits) + (rr >> (32 - bits));	\
-+	rr = (rr << bits) + (w0 >> (32 - bits));	\
++/* macros */
++#define ROLDQ(l, r, bits) ({ \
++	u64 t = l;					\
++	l = (l << bits) | (r >> (64 - bits));		\
++	r = (r << bits) | (t >> (64 - bits));		\
 +})
 +
-+#define ROLDQo32(ll, lr, rl, rr, w0, w1, bits) ({	\
-+	w0 = ll;					\
-+	w1 = lr;					\
-+	ll = (lr << (bits - 32)) + (rl >> (64 - bits));	\
-+	lr = (rl << (bits - 32)) + (rr >> (64 - bits));	\
-+	rl = (rr << (bits - 32)) + (w0 >> (64 - bits));	\
-+	rr = (w0 << (bits - 32)) + (w1 >> (64 - bits));	\
++#define CAMELLIA_F(x, kl, kr, y) ({ \
++	u64 ii = x ^ (((u64)kl << 32) | kr);				\
++	y = camellia_sp11101110[(uint8_t)ii];				\
++	y ^= camellia_sp44044404[(uint8_t)(ii >> 8)];			\
++	ii >>= 16;							\
++	y ^= camellia_sp30333033[(uint8_t)ii];				\
++	y ^= camellia_sp02220222[(uint8_t)(ii >> 8)];			\
++	ii >>= 16;							\
++	y ^= camellia_sp00444404[(uint8_t)ii];				\
++	y ^= camellia_sp03303033[(uint8_t)(ii >> 8)];			\
++	ii >>= 16;							\
++	y ^= camellia_sp22000222[(uint8_t)ii];				\
++	y ^= camellia_sp10011110[(uint8_t)(ii >> 8)];			\
++	y = ror64(y, 32);						\
 +})
 +
-+#define CAMELLIA_F(xl, xr, kl, kr, yl, yr, il, ir, t0, t1) ({	\
-+	il = xl ^ kl;						\
-+	ir = xr ^ kr;						\
-+	t0 = il >> 16;						\
-+	t1 = ir >> 16;						\
-+	yl = camellia_sp1110[(u8)(ir)]				\
-+	   ^ camellia_sp0222[(u8)(t1 >> 8)]			\
-+	   ^ camellia_sp3033[(u8)(t1)]				\
-+	   ^ camellia_sp4404[(u8)(ir >> 8)];			\
-+	yr = camellia_sp1110[(u8)(t0 >> 8)]			\
-+	   ^ camellia_sp0222[(u8)(t0)]				\
-+	   ^ camellia_sp3033[(u8)(il >> 8)]			\
-+	   ^ camellia_sp4404[(u8)(il)];				\
-+	yl ^= yr;						\
-+	yr = ror32(yr, 8);					\
-+	yr ^= yl;						\
-+})
++#define SET_SUBKEY_LR(INDEX, sRL) (subkey[(INDEX)] = ror64((sRL), 32))
 +
-+#define SUBKEY_L(INDEX) (subkey[(INDEX)*2])
-+#define SUBKEY_R(INDEX) (subkey[(INDEX)*2 + 1])
-+
-+static void camellia_setup_tail(u32 *subkey, u32 *subL, u32 *subR, int max)
++static void camellia_setup_tail(u64 *subkey, u64 *subRL, int max)
 +{
++	u64 kw4, tt;
 +	u32 dw, tl, tr;
-+	u32 kw4l, kw4r;
 +
 +	/* absorb kw2 to other subkeys */
 +	/* round 2 */
-+	subL[3] ^= subL[1]; subR[3] ^= subR[1];
++	subRL[3] ^= subRL[1];
 +	/* round 4 */
-+	subL[5] ^= subL[1]; subR[5] ^= subR[1];
++	subRL[5] ^= subRL[1];
 +	/* round 6 */
-+	subL[7] ^= subL[1]; subR[7] ^= subR[1];
-+	subL[1] ^= subR[1] & ~subR[9];
-+	dw = subL[1] & subL[9],
-+		subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl2) */
++	subRL[7] ^= subRL[1];
++
++	subRL[1] ^= (subRL[1] & ~subRL[9]) << 32;
++	/* modified for FLinv(kl2) */
++	dw = (subRL[1] & subRL[9]) >> 32,
++		subRL[1] ^= rol32(dw, 1);
++
 +	/* round 8 */
-+	subL[11] ^= subL[1]; subR[11] ^= subR[1];
++	subRL[11] ^= subRL[1];
 +	/* round 10 */
-+	subL[13] ^= subL[1]; subR[13] ^= subR[1];
++	subRL[13] ^= subRL[1];
 +	/* round 12 */
-+	subL[15] ^= subL[1]; subR[15] ^= subR[1];
-+	subL[1] ^= subR[1] & ~subR[17];
-+	dw = subL[1] & subL[17],
-+		subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl4) */
++	subRL[15] ^= subRL[1];
++
++	subRL[1] ^= (subRL[1] & ~subRL[17]) << 32;
++	/* modified for FLinv(kl4) */
++	dw = (subRL[1] & subRL[17]) >> 32,
++		subRL[1] ^= rol32(dw, 1);
++
 +	/* round 14 */
-+	subL[19] ^= subL[1]; subR[19] ^= subR[1];
++	subRL[19] ^= subRL[1];
 +	/* round 16 */
-+	subL[21] ^= subL[1]; subR[21] ^= subR[1];
++	subRL[21] ^= subRL[1];
 +	/* round 18 */
-+	subL[23] ^= subL[1]; subR[23] ^= subR[1];
++	subRL[23] ^= subRL[1];
++
 +	if (max == 24) {
 +		/* kw3 */
-+		subL[24] ^= subL[1]; subR[24] ^= subR[1];
++		subRL[24] ^= subRL[1];
 +
-+	/* absorb kw4 to other subkeys */
-+		kw4l = subL[25]; kw4r = subR[25];
++		/* absorb kw4 to other subkeys */
++		kw4 = subRL[25];
 +	} else {
-+		subL[1] ^= subR[1] & ~subR[25];
-+		dw = subL[1] & subL[25],
-+			subR[1] ^= rol32(dw, 1); /* modified for FLinv(kl6) */
-+		/* round 20 */
-+		subL[27] ^= subL[1]; subR[27] ^= subR[1];
-+		/* round 22 */
-+		subL[29] ^= subL[1]; subR[29] ^= subR[1];
-+		/* round 24 */
-+		subL[31] ^= subL[1]; subR[31] ^= subR[1];
-+		/* kw3 */
-+		subL[32] ^= subL[1]; subR[32] ^= subR[1];
++		subRL[1] ^= (subRL[1] & ~subRL[25]) << 32;
++		/* modified for FLinv(kl6) */
++		dw = (subRL[1] & subRL[25]) >> 32,
++			subRL[1] ^= rol32(dw, 1);
 +
-+	/* absorb kw4 to other subkeys */
-+		kw4l = subL[33]; kw4r = subR[33];
++		/* round 20 */
++		subRL[27] ^= subRL[1];
++		/* round 22 */
++		subRL[29] ^= subRL[1];
++		/* round 24 */
++		subRL[31] ^= subRL[1];
++		/* kw3 */
++		subRL[32] ^= subRL[1];
++
++		/* absorb kw4 to other subkeys */
++		kw4 = subRL[33];
 +		/* round 23 */
-+		subL[30] ^= kw4l; subR[30] ^= kw4r;
++		subRL[30] ^= kw4;
 +		/* round 21 */
-+		subL[28] ^= kw4l; subR[28] ^= kw4r;
++		subRL[28] ^= kw4;
 +		/* round 19 */
-+		subL[26] ^= kw4l; subR[26] ^= kw4r;
-+		kw4l ^= kw4r & ~subR[24];
-+		dw = kw4l & subL[24],
-+			kw4r ^= rol32(dw, 1); /* modified for FL(kl5) */
++		subRL[26] ^= kw4;
++
++		kw4 ^= (kw4 & ~subRL[24]) << 32;
++		/* modified for FL(kl5) */
++		dw = (kw4 & subRL[24]) >> 32,
++			kw4 ^= rol32(dw, 1);
 +	}
++
 +	/* round 17 */
-+	subL[22] ^= kw4l; subR[22] ^= kw4r;
++	subRL[22] ^= kw4;
 +	/* round 15 */
-+	subL[20] ^= kw4l; subR[20] ^= kw4r;
++	subRL[20] ^= kw4;
 +	/* round 13 */
-+	subL[18] ^= kw4l; subR[18] ^= kw4r;
-+	kw4l ^= kw4r & ~subR[16];
-+	dw = kw4l & subL[16],
-+		kw4r ^= rol32(dw, 1); /* modified for FL(kl3) */
++	subRL[18] ^= kw4;
++
++	kw4 ^= (kw4 & ~subRL[16]) << 32;
++	/* modified for FL(kl3) */
++	dw = (kw4 & subRL[16]) >> 32,
++		kw4 ^= rol32(dw, 1);
++
 +	/* round 11 */
-+	subL[14] ^= kw4l; subR[14] ^= kw4r;
++	subRL[14] ^= kw4;
 +	/* round 9 */
-+	subL[12] ^= kw4l; subR[12] ^= kw4r;
++	subRL[12] ^= kw4;
 +	/* round 7 */
-+	subL[10] ^= kw4l; subR[10] ^= kw4r;
-+	kw4l ^= kw4r & ~subR[8];
-+	dw = kw4l & subL[8],
-+		kw4r ^= rol32(dw, 1); /* modified for FL(kl1) */
++	subRL[10] ^= kw4;
++
++	kw4 ^= (kw4 & ~subRL[8]) << 32;
++	/* modified for FL(kl1) */
++	dw = (kw4 & subRL[8]) >> 32,
++		kw4 ^= rol32(dw, 1);
++
 +	/* round 5 */
-+	subL[6] ^= kw4l; subR[6] ^= kw4r;
++	subRL[6] ^= kw4;
 +	/* round 3 */
-+	subL[4] ^= kw4l; subR[4] ^= kw4r;
++	subRL[4] ^= kw4;
 +	/* round 1 */
-+	subL[2] ^= kw4l; subR[2] ^= kw4r;
++	subRL[2] ^= kw4;
 +	/* kw1 */
-+	subL[0] ^= kw4l; subR[0] ^= kw4r;
++	subRL[0] ^= kw4;
 +
 +	/* key XOR is end of F-function */
-+	SUBKEY_L(0) = subL[0] ^ subL[2];/* kw1 */
-+	SUBKEY_R(0) = subR[0] ^ subR[2];
-+	SUBKEY_L(2) = subL[3];       /* round 1 */
-+	SUBKEY_R(2) = subR[3];
-+	SUBKEY_L(3) = subL[2] ^ subL[4]; /* round 2 */
-+	SUBKEY_R(3) = subR[2] ^ subR[4];
-+	SUBKEY_L(4) = subL[3] ^ subL[5]; /* round 3 */
-+	SUBKEY_R(4) = subR[3] ^ subR[5];
-+	SUBKEY_L(5) = subL[4] ^ subL[6]; /* round 4 */
-+	SUBKEY_R(5) = subR[4] ^ subR[6];
-+	SUBKEY_L(6) = subL[5] ^ subL[7]; /* round 5 */
-+	SUBKEY_R(6) = subR[5] ^ subR[7];
-+	tl = subL[10] ^ (subR[10] & ~subR[8]);
-+	dw = tl & subL[8],  /* FL(kl1) */
-+		tr = subR[10] ^ rol32(dw, 1);
-+	SUBKEY_L(7) = subL[6] ^ tl; /* round 6 */
-+	SUBKEY_R(7) = subR[6] ^ tr;
-+	SUBKEY_L(8) = subL[8];       /* FL(kl1) */
-+	SUBKEY_R(8) = subR[8];
-+	SUBKEY_L(9) = subL[9];       /* FLinv(kl2) */
-+	SUBKEY_R(9) = subR[9];
-+	tl = subL[7] ^ (subR[7] & ~subR[9]);
-+	dw = tl & subL[9],  /* FLinv(kl2) */
-+		tr = subR[7] ^ rol32(dw, 1);
-+	SUBKEY_L(10) = tl ^ subL[11]; /* round 7 */
-+	SUBKEY_R(10) = tr ^ subR[11];
-+	SUBKEY_L(11) = subL[10] ^ subL[12]; /* round 8 */
-+	SUBKEY_R(11) = subR[10] ^ subR[12];
-+	SUBKEY_L(12) = subL[11] ^ subL[13]; /* round 9 */
-+	SUBKEY_R(12) = subR[11] ^ subR[13];
-+	SUBKEY_L(13) = subL[12] ^ subL[14]; /* round 10 */
-+	SUBKEY_R(13) = subR[12] ^ subR[14];
-+	SUBKEY_L(14) = subL[13] ^ subL[15]; /* round 11 */
-+	SUBKEY_R(14) = subR[13] ^ subR[15];
-+	tl = subL[18] ^ (subR[18] & ~subR[16]);
-+	dw = tl & subL[16], /* FL(kl3) */
-+		tr = subR[18] ^ rol32(dw, 1);
-+	SUBKEY_L(15) = subL[14] ^ tl; /* round 12 */
-+	SUBKEY_R(15) = subR[14] ^ tr;
-+	SUBKEY_L(16) = subL[16];     /* FL(kl3) */
-+	SUBKEY_R(16) = subR[16];
-+	SUBKEY_L(17) = subL[17];     /* FLinv(kl4) */
-+	SUBKEY_R(17) = subR[17];
-+	tl = subL[15] ^ (subR[15] & ~subR[17]);
-+	dw = tl & subL[17], /* FLinv(kl4) */
-+		tr = subR[15] ^ rol32(dw, 1);
-+	SUBKEY_L(18) = tl ^ subL[19]; /* round 13 */
-+	SUBKEY_R(18) = tr ^ subR[19];
-+	SUBKEY_L(19) = subL[18] ^ subL[20]; /* round 14 */
-+	SUBKEY_R(19) = subR[18] ^ subR[20];
-+	SUBKEY_L(20) = subL[19] ^ subL[21]; /* round 15 */
-+	SUBKEY_R(20) = subR[19] ^ subR[21];
-+	SUBKEY_L(21) = subL[20] ^ subL[22]; /* round 16 */
-+	SUBKEY_R(21) = subR[20] ^ subR[22];
-+	SUBKEY_L(22) = subL[21] ^ subL[23]; /* round 17 */
-+	SUBKEY_R(22) = subR[21] ^ subR[23];
++	SET_SUBKEY_LR(0, subRL[0] ^ subRL[2]);			/* kw1 */
++	SET_SUBKEY_LR(2, subRL[3]);				/* round 1 */
++	SET_SUBKEY_LR(3, subRL[2] ^ subRL[4]);			/* round 2 */
++	SET_SUBKEY_LR(4, subRL[3] ^ subRL[5]);			/* round 3 */
++	SET_SUBKEY_LR(5, subRL[4] ^ subRL[6]);			/* round 4 */
++	SET_SUBKEY_LR(6, subRL[5] ^ subRL[7]);			/* round 5 */
++
++	tl = (subRL[10] >> 32) ^ (subRL[10] & ~subRL[8]);
++	dw = tl & (subRL[8] >> 32),				/* FL(kl1) */
++		tr = subRL[10] ^ rol32(dw, 1);
++	tt = (tr | ((u64)tl << 32));
++
++	SET_SUBKEY_LR(7, subRL[6] ^ tt);			/* round 6 */
++	SET_SUBKEY_LR(8, subRL[8]);				/* FL(kl1) */
++	SET_SUBKEY_LR(9, subRL[9]);				/* FLinv(kl2) */
++
++	tl = (subRL[7] >> 32) ^ (subRL[7] & ~subRL[9]);
++	dw = tl & (subRL[9] >> 32),				/* FLinv(kl2) */
++		tr = subRL[7] ^ rol32(dw, 1);
++	tt = (tr | ((u64)tl << 32));
++
++	SET_SUBKEY_LR(10, subRL[11] ^ tt);			/* round 7 */
++	SET_SUBKEY_LR(11, subRL[10] ^ subRL[12]);		/* round 8 */
++	SET_SUBKEY_LR(12, subRL[11] ^ subRL[13]);		/* round 9 */
++	SET_SUBKEY_LR(13, subRL[12] ^ subRL[14]);		/* round 10 */
++	SET_SUBKEY_LR(14, subRL[13] ^ subRL[15]);		/* round 11 */
++
++	tl = (subRL[18] >> 32) ^ (subRL[18] & ~subRL[16]);
++	dw = tl & (subRL[16] >> 32),				/* FL(kl3) */
++		tr = subRL[18] ^ rol32(dw, 1);
++	tt = (tr | ((u64)tl << 32));
++
++	SET_SUBKEY_LR(15, subRL[14] ^ tt);			/* round 12 */
++	SET_SUBKEY_LR(16, subRL[16]);				/* FL(kl3) */
++	SET_SUBKEY_LR(17, subRL[17]);				/* FLinv(kl4) */
++
++	tl = (subRL[15] >> 32) ^ (subRL[15] & ~subRL[17]);
++	dw = tl & (subRL[17] >> 32),				/* FLinv(kl4) */
++		tr = subRL[15] ^ rol32(dw, 1);
++	tt = (tr | ((u64)tl << 32));
++
++	SET_SUBKEY_LR(18, subRL[19] ^ tt);			/* round 13 */
++	SET_SUBKEY_LR(19, subRL[18] ^ subRL[20]);		/* round 14 */
++	SET_SUBKEY_LR(20, subRL[19] ^ subRL[21]);		/* round 15 */
++	SET_SUBKEY_LR(21, subRL[20] ^ subRL[22]);		/* round 16 */
++	SET_SUBKEY_LR(22, subRL[21] ^ subRL[23]);		/* round 17 */
++
 +	if (max == 24) {
-+		SUBKEY_L(23) = subL[22];     /* round 18 */
-+		SUBKEY_R(23) = subR[22];
-+		SUBKEY_L(24) = subL[24] ^ subL[23]; /* kw3 */
-+		SUBKEY_R(24) = subR[24] ^ subR[23];
++		SET_SUBKEY_LR(23, subRL[22]);			/* round 18 */
++		SET_SUBKEY_LR(24, subRL[24] ^ subRL[23]);	/* kw3 */
 +	} else {
-+		tl = subL[26] ^ (subR[26] & ~subR[24]);
-+		dw = tl & subL[24], /* FL(kl5) */
-+			tr = subR[26] ^ rol32(dw, 1);
-+		SUBKEY_L(23) = subL[22] ^ tl; /* round 18 */
-+		SUBKEY_R(23) = subR[22] ^ tr;
-+		SUBKEY_L(24) = subL[24];     /* FL(kl5) */
-+		SUBKEY_R(24) = subR[24];
-+		SUBKEY_L(25) = subL[25];     /* FLinv(kl6) */
-+		SUBKEY_R(25) = subR[25];
-+		tl = subL[23] ^ (subR[23] & ~subR[25]);
-+		dw = tl & subL[25], /* FLinv(kl6) */
-+			tr = subR[23] ^ rol32(dw, 1);
-+		SUBKEY_L(26) = tl ^ subL[27]; /* round 19 */
-+		SUBKEY_R(26) = tr ^ subR[27];
-+		SUBKEY_L(27) = subL[26] ^ subL[28]; /* round 20 */
-+		SUBKEY_R(27) = subR[26] ^ subR[28];
-+		SUBKEY_L(28) = subL[27] ^ subL[29]; /* round 21 */
-+		SUBKEY_R(28) = subR[27] ^ subR[29];
-+		SUBKEY_L(29) = subL[28] ^ subL[30]; /* round 22 */
-+		SUBKEY_R(29) = subR[28] ^ subR[30];
-+		SUBKEY_L(30) = subL[29] ^ subL[31]; /* round 23 */
-+		SUBKEY_R(30) = subR[29] ^ subR[31];
-+		SUBKEY_L(31) = subL[30];     /* round 24 */
-+		SUBKEY_R(31) = subR[30];
-+		SUBKEY_L(32) = subL[32] ^ subL[31]; /* kw3 */
-+		SUBKEY_R(32) = subR[32] ^ subR[31];
++		tl = (subRL[26] >> 32) ^ (subRL[26] & ~subRL[24]);
++		dw = tl & (subRL[24] >> 32),			/* FL(kl5) */
++			tr = subRL[26] ^ rol32(dw, 1);
++		tt = (tr | ((u64)tl << 32));
++
++		SET_SUBKEY_LR(23, subRL[22] ^ tt);		/* round 18 */
++		SET_SUBKEY_LR(24, subRL[24]);			/* FL(kl5) */
++		SET_SUBKEY_LR(25, subRL[25]);			/* FLinv(kl6) */
++
++		tl = (subRL[23] >> 32) ^ (subRL[23] & ~subRL[25]);
++		dw = tl & (subRL[25] >> 32),			/* FLinv(kl6) */
++			tr = subRL[23] ^ rol32(dw, 1);
++		tt = (tr | ((u64)tl << 32));
++
++		SET_SUBKEY_LR(26, subRL[27] ^ tt);		/* round 19 */
++		SET_SUBKEY_LR(27, subRL[26] ^ subRL[28]);	/* round 20 */
++		SET_SUBKEY_LR(28, subRL[27] ^ subRL[29]);	/* round 21 */
++		SET_SUBKEY_LR(29, subRL[28] ^ subRL[30]);	/* round 22 */
++		SET_SUBKEY_LR(30, subRL[29] ^ subRL[31]);	/* round 23 */
++		SET_SUBKEY_LR(31, subRL[30]);			/* round 24 */
++		SET_SUBKEY_LR(32, subRL[32] ^ subRL[31]);	/* kw3 */
 +	}
 +}
 +
-+static void camellia_setup128(const unsigned char *key, u32 *subkey)
++static void camellia_setup128(const unsigned char *key, u64 *subkey)
 +{
-+	u32 kll, klr, krl, krr;
-+	u32 il, ir, t0, t1, w0, w1;
-+	u32 subL[26];
-+	u32 subR[26];
++	u64 kl, kr, ww;
++	u64 subRL[26];
 +
 +	/**
-+	 *  k == kll || klr || krl || krr (|| is concatenation)
++	 *  k == kl || kr (|| is concatenation)
 +	 */
-+	kll = get_unaligned_be32(key);
-+	klr = get_unaligned_be32(key + 4);
-+	krl = get_unaligned_be32(key + 8);
-+	krr = get_unaligned_be32(key + 12);
++	kl = get_unaligned_be64(key);
++	kr = get_unaligned_be64(key + 8);
 +
 +	/* generate KL dependent subkeys */
 +	/* kw1 */
-+	subL[0] = kll; subR[0] = klr;
++	subRL[0] = kl;
 +	/* kw2 */
-+	subL[1] = krl; subR[1] = krr;
++	subRL[1] = kr;
++
 +	/* rotation left shift 15bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	ROLDQ(kl, kr, 15);
++
 +	/* k3 */
-+	subL[4] = kll; subR[4] = klr;
++	subRL[4] = kl;
 +	/* k4 */
-+	subL[5] = krl; subR[5] = krr;
++	subRL[5] = kr;
++
 +	/* rotation left shift 15+30bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
++	ROLDQ(kl, kr, 30);
++
 +	/* k7 */
-+	subL[10] = kll; subR[10] = klr;
++	subRL[10] = kl;
 +	/* k8 */
-+	subL[11] = krl; subR[11] = krr;
++	subRL[11] = kr;
++
 +	/* rotation left shift 15+30+15bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	ROLDQ(kl, kr, 15);
++
 +	/* k10 */
-+	subL[13] = krl; subR[13] = krr;
++	subRL[13] = kr;
 +	/* rotation left shift 15+30+15+17 bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
++	ROLDQ(kl, kr, 17);
++
 +	/* kl3 */
-+	subL[16] = kll; subR[16] = klr;
++	subRL[16] = kl;
 +	/* kl4 */
-+	subL[17] = krl; subR[17] = krr;
++	subRL[17] = kr;
++
 +	/* rotation left shift 15+30+15+17+17 bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
++	ROLDQ(kl, kr, 17);
++
 +	/* k13 */
-+	subL[18] = kll; subR[18] = klr;
++	subRL[18] = kl;
 +	/* k14 */
-+	subL[19] = krl; subR[19] = krr;
++	subRL[19] = kr;
++
 +	/* rotation left shift 15+30+15+17+17+17 bit */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
++	ROLDQ(kl, kr, 17);
++
 +	/* k17 */
-+	subL[22] = kll; subR[22] = klr;
++	subRL[22] = kl;
 +	/* k18 */
-+	subL[23] = krl; subR[23] = krr;
++	subRL[23] = kr;
 +
 +	/* generate KA */
-+	kll = subL[0]; klr = subR[0];
-+	krl = subL[1]; krr = subR[1];
-+	CAMELLIA_F(kll, klr,
-+		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
-+		   w0, w1, il, ir, t0, t1);
-+	krl ^= w0; krr ^= w1;
-+	CAMELLIA_F(krl, krr,
-+		   CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R,
-+		   kll, klr, il, ir, t0, t1);
++	kl = subRL[0];
++	kr = subRL[1];
++	CAMELLIA_F(kl, CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R, ww);
++	kr ^= ww;
++	CAMELLIA_F(kr, CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R, kl);
++
 +	/* current status == (kll, klr, w0, w1) */
-+	CAMELLIA_F(kll, klr,
-+		   CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R,
-+		   krl, krr, il, ir, t0, t1);
-+	krl ^= w0; krr ^= w1;
-+	CAMELLIA_F(krl, krr,
-+		   CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R,
-+		   w0, w1, il, ir, t0, t1);
-+	kll ^= w0; klr ^= w1;
++	CAMELLIA_F(kl, CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R, kr);
++	kr ^= ww;
++	CAMELLIA_F(kr, CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R, ww);
++	kl ^= ww;
 +
 +	/* generate KA dependent subkeys */
 +	/* k1, k2 */
-+	subL[2] = kll; subR[2] = klr;
-+	subL[3] = krl; subR[3] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	subRL[2] = kl;
++	subRL[3] = kr;
++	ROLDQ(kl, kr, 15);
 +	/* k5,k6 */
-+	subL[6] = kll; subR[6] = klr;
-+	subL[7] = krl; subR[7] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	subRL[6] = kl;
++	subRL[7] = kr;
++	ROLDQ(kl, kr, 15);
 +	/* kl1, kl2 */
-+	subL[8] = kll; subR[8] = klr;
-+	subL[9] = krl; subR[9] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	subRL[8] = kl;
++	subRL[9] = kr;
++	ROLDQ(kl, kr, 15);
 +	/* k9 */
-+	subL[12] = kll; subR[12] = klr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	subRL[12] = kl;
++	ROLDQ(kl, kr, 15);
 +	/* k11, k12 */
-+	subL[14] = kll; subR[14] = klr;
-+	subL[15] = krl; subR[15] = krr;
-+	ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
++	subRL[14] = kl;
++	subRL[15] = kr;
++	ROLDQ(kl, kr, 34);
 +	/* k15, k16 */
-+	subL[20] = kll; subR[20] = klr;
-+	subL[21] = krl; subR[21] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
++	subRL[20] = kl;
++	subRL[21] = kr;
++	ROLDQ(kl, kr, 17);
 +	/* kw3, kw4 */
-+	subL[24] = kll; subR[24] = klr;
-+	subL[25] = krl; subR[25] = krr;
++	subRL[24] = kl;
++	subRL[25] = kr;
 +
-+	camellia_setup_tail(subkey, subL, subR, 24);
++	camellia_setup_tail(subkey, subRL, 24);
 +}
 +
-+static void camellia_setup256(const unsigned char *key, u32 *subkey)
++static void camellia_setup256(const unsigned char *key, u64 *subkey)
 +{
-+	u32 kll, klr, krl, krr;        /* left half of key */
-+	u32 krll, krlr, krrl, krrr;    /* right half of key */
-+	u32 il, ir, t0, t1, w0, w1;    /* temporary variables */
-+	u32 subL[34];
-+	u32 subR[34];
++	u64 kl, kr;			/* left half of key */
++	u64 krl, krr;			/* right half of key */
++	u64 ww;				/* temporary variables */
++	u64 subRL[34];
 +
 +	/**
-+	 *  key = (kll || klr || krl || krr || krll || krlr || krrl || krrr)
-+	 *  (|| is concatenation)
++	 *  key = (kl || kr || krl || krr) (|| is concatenation)
 +	 */
-+	kll = get_unaligned_be32(key);
-+	klr = get_unaligned_be32(key + 4);
-+	krl = get_unaligned_be32(key + 8);
-+	krr = get_unaligned_be32(key + 12);
-+	krll = get_unaligned_be32(key + 16);
-+	krlr = get_unaligned_be32(key + 20);
-+	krrl = get_unaligned_be32(key + 24);
-+	krrr = get_unaligned_be32(key + 28);
++	kl = get_unaligned_be64(key);
++	kr = get_unaligned_be64(key + 8);
++	krl = get_unaligned_be64(key + 16);
++	krr = get_unaligned_be64(key + 24);
 +
 +	/* generate KL dependent subkeys */
 +	/* kw1 */
-+	subL[0] = kll; subR[0] = klr;
++	subRL[0] = kl;
 +	/* kw2 */
-+	subL[1] = krl; subR[1] = krr;
-+	ROLDQo32(kll, klr, krl, krr, w0, w1, 45);
++	subRL[1] = kr;
++	ROLDQ(kl, kr, 45);
 +	/* k9 */
-+	subL[12] = kll; subR[12] = klr;
++	subRL[12] = kl;
 +	/* k10 */
-+	subL[13] = krl; subR[13] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	subRL[13] = kr;
++	ROLDQ(kl, kr, 15);
 +	/* kl3 */
-+	subL[16] = kll; subR[16] = klr;
++	subRL[16] = kl;
 +	/* kl4 */
-+	subL[17] = krl; subR[17] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
++	subRL[17] = kr;
++	ROLDQ(kl, kr, 17);
 +	/* k17 */
-+	subL[22] = kll; subR[22] = klr;
++	subRL[22] = kl;
 +	/* k18 */
-+	subL[23] = krl; subR[23] = krr;
-+	ROLDQo32(kll, klr, krl, krr, w0, w1, 34);
++	subRL[23] = kr;
++	ROLDQ(kl, kr, 34);
 +	/* k23 */
-+	subL[30] = kll; subR[30] = klr;
++	subRL[30] = kl;
 +	/* k24 */
-+	subL[31] = krl; subR[31] = krr;
++	subRL[31] = kr;
 +
 +	/* generate KR dependent subkeys */
-+	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
++	ROLDQ(krl, krr, 15);
 +	/* k3 */
-+	subL[4] = krll; subR[4] = krlr;
++	subRL[4] = krl;
 +	/* k4 */
-+	subL[5] = krrl; subR[5] = krrr;
-+	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
++	subRL[5] = krr;
++	ROLDQ(krl, krr, 15);
 +	/* kl1 */
-+	subL[8] = krll; subR[8] = krlr;
++	subRL[8] = krl;
 +	/* kl2 */
-+	subL[9] = krrl; subR[9] = krrr;
-+	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
++	subRL[9] = krr;
++	ROLDQ(krl, krr, 30);
 +	/* k13 */
-+	subL[18] = krll; subR[18] = krlr;
++	subRL[18] = krl;
 +	/* k14 */
-+	subL[19] = krrl; subR[19] = krrr;
-+	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
++	subRL[19] = krr;
++	ROLDQ(krl, krr, 34);
 +	/* k19 */
-+	subL[26] = krll; subR[26] = krlr;
++	subRL[26] = krl;
 +	/* k20 */
-+	subL[27] = krrl; subR[27] = krrr;
-+	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 34);
++	subRL[27] = krr;
++	ROLDQ(krl, krr, 34);
 +
 +	/* generate KA */
-+	kll = subL[0] ^ krll; klr = subR[0] ^ krlr;
-+	krl = subL[1] ^ krrl; krr = subR[1] ^ krrr;
-+	CAMELLIA_F(kll, klr,
-+		   CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R,
-+		   w0, w1, il, ir, t0, t1);
-+	krl ^= w0; krr ^= w1;
-+	CAMELLIA_F(krl, krr,
-+		   CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R,
-+		   kll, klr, il, ir, t0, t1);
-+	kll ^= krll; klr ^= krlr;
-+	CAMELLIA_F(kll, klr,
-+		   CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R,
-+		   krl, krr, il, ir, t0, t1);
-+	krl ^= w0 ^ krrl; krr ^= w1 ^ krrr;
-+	CAMELLIA_F(krl, krr,
-+		   CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R,
-+		   w0, w1, il, ir, t0, t1);
-+	kll ^= w0; klr ^= w1;
++	kl = subRL[0] ^ krl;
++	kr = subRL[1] ^ krr;
++
++	CAMELLIA_F(kl, CAMELLIA_SIGMA1L, CAMELLIA_SIGMA1R, ww);
++	kr ^= ww;
++	CAMELLIA_F(kr, CAMELLIA_SIGMA2L, CAMELLIA_SIGMA2R, kl);
++	kl ^= krl;
++	CAMELLIA_F(kl, CAMELLIA_SIGMA3L, CAMELLIA_SIGMA3R, kr);
++	kr ^= ww ^ krr;
++	CAMELLIA_F(kr, CAMELLIA_SIGMA4L, CAMELLIA_SIGMA4R, ww);
++	kl ^= ww;
 +
 +	/* generate KB */
-+	krll ^= kll; krlr ^= klr;
-+	krrl ^= krl; krrr ^= krr;
-+	CAMELLIA_F(krll, krlr,
-+		   CAMELLIA_SIGMA5L, CAMELLIA_SIGMA5R,
-+		   w0, w1, il, ir, t0, t1);
-+	krrl ^= w0; krrr ^= w1;
-+	CAMELLIA_F(krrl, krrr,
-+		   CAMELLIA_SIGMA6L, CAMELLIA_SIGMA6R,
-+		   w0, w1, il, ir, t0, t1);
-+	krll ^= w0; krlr ^= w1;
++	krl ^= kl;
++	krr ^= kr;
++	CAMELLIA_F(krl, CAMELLIA_SIGMA5L, CAMELLIA_SIGMA5R, ww);
++	krr ^= ww;
++	CAMELLIA_F(krr, CAMELLIA_SIGMA6L, CAMELLIA_SIGMA6R, ww);
++	krl ^= ww;
 +
 +	/* generate KA dependent subkeys */
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
++	ROLDQ(kl, kr, 15);
 +	/* k5 */
-+	subL[6] = kll; subR[6] = klr;
++	subRL[6] = kl;
 +	/* k6 */
-+	subL[7] = krl; subR[7] = krr;
-+	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
++	subRL[7] = kr;
++	ROLDQ(kl, kr, 30);
 +	/* k11 */
-+	subL[14] = kll; subR[14] = klr;
++	subRL[14] = kl;
 +	/* k12 */
-+	subL[15] = krl; subR[15] = krr;
++	subRL[15] = kr;
 +	/* rotation left shift 32bit */
++	ROLDQ(kl, kr, 32);
 +	/* kl5 */
-+	subL[24] = klr; subR[24] = krl;
++	subRL[24] = kl;
 +	/* kl6 */
-+	subL[25] = krr; subR[25] = kll;
-+	/* rotation left shift 49 from k11,k12 -> k21,k22 */
-+	ROLDQo32(kll, klr, krl, krr, w0, w1, 49);
++	subRL[25] = kr;
++	/* rotation left shift 17 from k11,k12 -> k21,k22 */
++	ROLDQ(kl, kr, 17);
 +	/* k21 */
-+	subL[28] = kll; subR[28] = klr;
++	subRL[28] = kl;
 +	/* k22 */
-+	subL[29] = krl; subR[29] = krr;
++	subRL[29] = kr;
 +
 +	/* generate KB dependent subkeys */
 +	/* k1 */
-+	subL[2] = krll; subR[2] = krlr;
++	subRL[2] = krl;
 +	/* k2 */
-+	subL[3] = krrl; subR[3] = krrr;
-+	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
++	subRL[3] = krr;
++	ROLDQ(krl, krr, 30);
 +	/* k7 */
-+	subL[10] = krll; subR[10] = krlr;
++	subRL[10] = krl;
 +	/* k8 */
-+	subL[11] = krrl; subR[11] = krrr;
-+	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
++	subRL[11] = krr;
++	ROLDQ(krl, krr, 30);
 +	/* k15 */
-+	subL[20] = krll; subR[20] = krlr;
++	subRL[20] = krl;
 +	/* k16 */
-+	subL[21] = krrl; subR[21] = krrr;
-+	ROLDQo32(krll, krlr, krrl, krrr, w0, w1, 51);
++	subRL[21] = krr;
++	ROLDQ(krl, krr, 51);
 +	/* kw3 */
-+	subL[32] = krll; subR[32] = krlr;
++	subRL[32] = krl;
 +	/* kw4 */
-+	subL[33] = krrl; subR[33] = krrr;
++	subRL[33] = krr;
 +
-+	camellia_setup_tail(subkey, subL, subR, 32);
++	camellia_setup_tail(subkey, subRL, 32);
 +}
 +
-+static void camellia_setup192(const unsigned char *key, u32 *subkey)
++static void camellia_setup192(const unsigned char *key, u64 *subkey)
 +{
 +	unsigned char kk[32];
-+	u32 krll, krlr, krrl, krrr;
++	u64 krl, krr;
 +
 +	memcpy(kk, key, 24);
-+	memcpy((unsigned char *)&krll, key+16, 4);
-+	memcpy((unsigned char *)&krlr, key+20, 4);
-+	krrl = ~krll;
-+	krrr = ~krlr;
-+	memcpy(kk+24, (unsigned char *)&krrl, 4);
-+	memcpy(kk+28, (unsigned char *)&krrr, 4);
++	memcpy((unsigned char *)&krl, key+16, 8);
++	krr = ~krl;
++	memcpy(kk+24, (unsigned char *)&krr, 8);
 +	camellia_setup256(kk, subkey);
 +}
 +
-+
-+/*
-+ * Encrypt/decrypt
-+ */
-+#define CAMELLIA_FLS(ll, lr, rl, rr, kll, klr, krl, krr, t0, t1, t2, t3) ({ \
-+	t0 = kll;							\
-+	t2 = krr;							\
-+	t0 &= ll;							\
-+	t2 |= rr;							\
-+	rl ^= t2;							\
-+	lr ^= rol32(t0, 1);						\
-+	t3 = krl;							\
-+	t1 = klr;							\
-+	t3 &= rl;							\
-+	t1 |= lr;							\
-+	ll ^= t1;							\
-+	rr ^= rol32(t3, 1);						\
-+})
-+
-+#define CAMELLIA_ROUNDSM(xl, xr, kl, kr, yl, yr, il, ir) ({		\
-+	yl ^= kl;							\
-+	yr ^= kr;							\
-+	ir =  camellia_sp1110[(u8)xr];					\
-+	il =  camellia_sp1110[(u8)(xl >> 24)];				\
-+	ir ^= camellia_sp0222[(u8)(xr >> 24)];				\
-+	il ^= camellia_sp0222[(u8)(xl >> 16)];				\
-+	ir ^= camellia_sp3033[(u8)(xr >> 16)];				\
-+	il ^= camellia_sp3033[(u8)(xl >> 8)];				\
-+	ir ^= camellia_sp4404[(u8)(xr >> 8)];				\
-+	il ^= camellia_sp4404[(u8)xl];					\
-+	ir ^= il;							\
-+	yl ^= ir;							\
-+	yr ^= ror32(il, 8) ^ ir;					\
-+})
-+
-+/* max = 24: 128bit encrypt, max = 32: 256bit encrypt */
-+static void camellia_do_encrypt(const u32 *subkey, u32 *io, unsigned max)
++static int __camellia_setkey(struct camellia_ctx *cctx,
++			     const unsigned char *key,
++			     unsigned int key_len, u32 *flags)
 +{
-+	u32 il, ir, t0, t1;            /* temporary variables */
-+
-+	/* pre whitening but absorb kw2 */
-+	io[0] ^= SUBKEY_L(0);
-+	io[1] ^= SUBKEY_R(0);
-+
-+	/* main iteration */
-+#define ROUNDS(i) ({ \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 2), SUBKEY_R(i + 2), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 3), SUBKEY_R(i + 3), \
-+			 io[0], io[1], il, ir); \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 4), SUBKEY_R(i + 4), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 5), SUBKEY_R(i + 5), \
-+			 io[0], io[1], il, ir); \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 6), SUBKEY_R(i + 6), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 7), SUBKEY_R(i + 7), \
-+			 io[0], io[1], il, ir); \
-+})
-+#define FLS(i) ({ \
-+	CAMELLIA_FLS(io[0], io[1], io[2], io[3], \
-+		     SUBKEY_L(i + 0), SUBKEY_R(i + 0), \
-+		     SUBKEY_L(i + 1), SUBKEY_R(i + 1), \
-+		     t0, t1, il, ir); \
-+})
-+
-+	ROUNDS(0);
-+	FLS(8);
-+	ROUNDS(8);
-+	FLS(16);
-+	ROUNDS(16);
-+	if (max == 32) {
-+		FLS(24);
-+		ROUNDS(24);
-+	}
-+
-+#undef ROUNDS
-+#undef FLS
-+
-+	/* post whitening but kw4 */
-+	io[2] ^= SUBKEY_L(max);
-+	io[3] ^= SUBKEY_R(max);
-+	/* NB: io[0],[1] should be swapped with [2],[3] by caller! */
-+}
-+
-+static void camellia_do_decrypt(const u32 *subkey, u32 *io, unsigned i)
-+{
-+	u32 il, ir, t0, t1;            /* temporary variables */
-+
-+	/* pre whitening but absorb kw2 */
-+	io[0] ^= SUBKEY_L(i);
-+	io[1] ^= SUBKEY_R(i);
-+
-+	/* main iteration */
-+#define ROUNDS(i) ({ \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 7), SUBKEY_R(i + 7), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 6), SUBKEY_R(i + 6), \
-+			 io[0], io[1], il, ir); \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 5), SUBKEY_R(i + 5), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 4), SUBKEY_R(i + 4), \
-+			 io[0], io[1], il, ir); \
-+	CAMELLIA_ROUNDSM(io[0], io[1], \
-+			 SUBKEY_L(i + 3), SUBKEY_R(i + 3), \
-+			 io[2], io[3], il, ir); \
-+	CAMELLIA_ROUNDSM(io[2], io[3], \
-+			 SUBKEY_L(i + 2), SUBKEY_R(i + 2), \
-+			 io[0], io[1], il, ir); \
-+})
-+#define FLS(i) ({ \
-+	CAMELLIA_FLS(io[0], io[1], io[2], io[3], \
-+		     SUBKEY_L(i + 1), SUBKEY_R(i + 1), \
-+		     SUBKEY_L(i + 0), SUBKEY_R(i + 0), \
-+		     t0, t1, il, ir); \
-+})
-+
-+	if (i == 32) {
-+		ROUNDS(24);
-+		FLS(24);
-+	}
-+	ROUNDS(16);
-+	FLS(16);
-+	ROUNDS(8);
-+	FLS(8);
-+	ROUNDS(0);
-+
-+#undef ROUNDS
-+#undef FLS
-+
-+	/* post whitening but kw4 */
-+	io[2] ^= SUBKEY_L(0);
-+	io[3] ^= SUBKEY_R(0);
-+	/* NB: 0,1 should be swapped with 2,3 by caller! */
-+}
-+
-+
-+struct camellia_ctx {
-+	int key_length;
-+	u32 key_table[CAMELLIA_TABLE_BYTE_LEN / sizeof(u32)];
-+};
-+
-+static int
-+camellia_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+		 unsigned int key_len)
-+{
-+	struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
-+	const unsigned char *key = (const unsigned char *)in_key;
-+	u32 *flags = &tfm->crt_flags;
-+
 +	if (key_len != 16 && key_len != 24 && key_len != 32) {
 +		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
 +		return -EINVAL;
@@ -2163,96 +1963,678 @@ index 0000000..f7aaaaf
 +	return 0;
 +}
 +
-+static void camellia_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++static int camellia_setkey(struct crypto_tfm *tfm, const u8 *in_key,
++			   unsigned int key_len)
 +{
-+	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
-+	const __be32 *src = (const __be32 *)in;
-+	__be32 *dst = (__be32 *)out;
-+	unsigned int max;
-+
-+	u32 tmp[4];
-+
-+	tmp[0] = be32_to_cpu(src[0]);
-+	tmp[1] = be32_to_cpu(src[1]);
-+	tmp[2] = be32_to_cpu(src[2]);
-+	tmp[3] = be32_to_cpu(src[3]);
-+
-+	if (cctx->key_length == 16)
-+		max = 24;
-+	else
-+		max = 32; /* for key lengths of 24 and 32 */
-+
-+	camellia_do_encrypt(cctx->key_table, tmp, max);
-+
-+	/* do_encrypt returns 0,1 swapped with 2,3 */
-+	dst[0] = cpu_to_be32(tmp[2]);
-+	dst[1] = cpu_to_be32(tmp[3]);
-+	dst[2] = cpu_to_be32(tmp[0]);
-+	dst[3] = cpu_to_be32(tmp[1]);
++	return __camellia_setkey(crypto_tfm_ctx(tfm), in_key, key_len,
++				 &tfm->crt_flags);
 +}
 +
-+static void camellia_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++static int ecb_crypt(struct blkcipher_desc *desc, struct blkcipher_walk *walk,
++		     void (*fn)(struct camellia_ctx *, u8 *, const u8 *),
++		     void (*fn_2way)(struct camellia_ctx *, u8 *, const u8 *))
 +{
-+	const struct camellia_ctx *cctx = crypto_tfm_ctx(tfm);
-+	const __be32 *src = (const __be32 *)in;
-+	__be32 *dst = (__be32 *)out;
-+	unsigned int max;
++	struct camellia_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	unsigned int nbytes;
++	int err;
 +
-+	u32 tmp[4];
++	err = blkcipher_walk_virt(desc, walk);
 +
-+	tmp[0] = be32_to_cpu(src[0]);
-+	tmp[1] = be32_to_cpu(src[1]);
-+	tmp[2] = be32_to_cpu(src[2]);
-+	tmp[3] = be32_to_cpu(src[3]);
++	while ((nbytes = walk->nbytes)) {
++		u8 *wsrc = walk->src.virt.addr;
++		u8 *wdst = walk->dst.virt.addr;
 +
-+	if (cctx->key_length == 16)
-+		max = 24;
-+	else
-+		max = 32; /* for key lengths of 24 and 32 */
++		/* Process two block batch */
++		if (nbytes >= bsize * 2) {
++			do {
++				fn_2way(ctx, wdst, wsrc);
 +
-+	camellia_do_decrypt(cctx->key_table, tmp, max);
++				wsrc += bsize * 2;
++				wdst += bsize * 2;
++				nbytes -= bsize * 2;
++			} while (nbytes >= bsize * 2);
 +
-+	/* do_decrypt returns 0,1 swapped with 2,3 */
-+	dst[0] = cpu_to_be32(tmp[2]);
-+	dst[1] = cpu_to_be32(tmp[3]);
-+	dst[2] = cpu_to_be32(tmp[0]);
-+	dst[3] = cpu_to_be32(tmp[1]);
-+}
-+
-+static struct crypto_alg camellia_alg = {
-+	.cra_name		=	"camellia",
-+	.cra_driver_name	=	"camellia-generic",
-+	.cra_priority		=	100,
-+	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize		=	CAMELLIA_BLOCK_SIZE,
-+	.cra_ctxsize		=	sizeof(struct camellia_ctx),
-+	.cra_alignmask		=	3,
-+	.cra_module		=	THIS_MODULE,
-+	.cra_list		=	LIST_HEAD_INIT(camellia_alg.cra_list),
-+	.cra_u			=	{
-+		.cipher = {
-+			.cia_min_keysize	=	CAMELLIA_MIN_KEY_SIZE,
-+			.cia_max_keysize	=	CAMELLIA_MAX_KEY_SIZE,
-+			.cia_setkey		=	camellia_set_key,
-+			.cia_encrypt		=	camellia_encrypt,
-+			.cia_decrypt		=	camellia_decrypt
++			if (nbytes < bsize)
++				goto done;
 +		}
++
++		/* Handle leftovers */
++		do {
++			fn(ctx, wdst, wsrc);
++
++			wsrc += bsize;
++			wdst += bsize;
++			nbytes -= bsize;
++		} while (nbytes >= bsize);
++
++done:
++		err = blkcipher_walk_done(desc, walk, nbytes);
 +	}
++
++	return err;
++}
++
++static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	return ecb_crypt(desc, &walk, camellia_enc_blk, camellia_enc_blk_2way);
++}
++
++static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	return ecb_crypt(desc, &walk, camellia_dec_blk, camellia_dec_blk_2way);
++}
++
++static unsigned int __cbc_encrypt(struct blkcipher_desc *desc,
++				  struct blkcipher_walk *walk)
++{
++	struct camellia_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 *iv = (u128 *)walk->iv;
++
++	do {
++		u128_xor(dst, src, iv);
++		camellia_enc_blk(ctx, (u8 *)dst, (u8 *)dst);
++		iv = dst;
++
++		src += 1;
++		dst += 1;
++		nbytes -= bsize;
++	} while (nbytes >= bsize);
++
++	u128_xor((u128 *)walk->iv, (u128 *)walk->iv, iv);
++	return nbytes;
++}
++
++static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		nbytes = __cbc_encrypt(desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	return err;
++}
++
++static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
++				  struct blkcipher_walk *walk)
++{
++	struct camellia_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 ivs[2 - 1];
++	u128 last_iv;
++
++	/* Start of the last block. */
++	src += nbytes / bsize - 1;
++	dst += nbytes / bsize - 1;
++
++	last_iv = *src;
++
++	/* Process two block batch */
++	if (nbytes >= bsize * 2) {
++		do {
++			nbytes -= bsize * (2 - 1);
++			src -= 2 - 1;
++			dst -= 2 - 1;
++
++			ivs[0] = src[0];
++
++			camellia_dec_blk_2way(ctx, (u8 *)dst, (u8 *)src);
++
++			u128_xor(dst + 1, dst + 1, ivs + 0);
++
++			nbytes -= bsize;
++			if (nbytes < bsize)
++				goto done;
++
++			u128_xor(dst, dst, src - 1);
++			src -= 1;
++			dst -= 1;
++		} while (nbytes >= bsize * 2);
++
++		if (nbytes < bsize)
++			goto done;
++	}
++
++	/* Handle leftovers */
++	for (;;) {
++		camellia_dec_blk(ctx, (u8 *)dst, (u8 *)src);
++
++		nbytes -= bsize;
++		if (nbytes < bsize)
++			break;
++
++		u128_xor(dst, dst, src - 1);
++		src -= 1;
++		dst -= 1;
++	}
++
++done:
++	u128_xor(dst, dst, (u128 *)walk->iv);
++	*(u128 *)walk->iv = last_iv;
++
++	return nbytes;
++}
++
++static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		nbytes = __cbc_decrypt(desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	return err;
++}
++
++static inline void u128_to_be128(be128 *dst, const u128 *src)
++{
++	dst->a = cpu_to_be64(src->a);
++	dst->b = cpu_to_be64(src->b);
++}
++
++static inline void be128_to_u128(u128 *dst, const be128 *src)
++{
++	dst->a = be64_to_cpu(src->a);
++	dst->b = be64_to_cpu(src->b);
++}
++
++static inline void u128_inc(u128 *i)
++{
++	i->b++;
++	if (!i->b)
++		i->a++;
++}
++
++static void ctr_crypt_final(struct blkcipher_desc *desc,
++			    struct blkcipher_walk *walk)
++{
++	struct camellia_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	u8 keystream[CAMELLIA_BLOCK_SIZE];
++	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
++	unsigned int nbytes = walk->nbytes;
++	u128 ctrblk;
++
++	memcpy(keystream, src, nbytes);
++	camellia_enc_blk_xor(ctx, keystream, walk->iv);
++	memcpy(dst, keystream, nbytes);
++
++	be128_to_u128(&ctrblk, (be128 *)walk->iv);
++	u128_inc(&ctrblk);
++	u128_to_be128((be128 *)walk->iv, &ctrblk);
++}
++
++static unsigned int __ctr_crypt(struct blkcipher_desc *desc,
++				struct blkcipher_walk *walk)
++{
++	struct camellia_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 ctrblk;
++	be128 ctrblocks[2];
++
++	be128_to_u128(&ctrblk, (be128 *)walk->iv);
++
++	/* Process two block batch */
++	if (nbytes >= bsize * 2) {
++		do {
++			if (dst != src) {
++				dst[0] = src[0];
++				dst[1] = src[1];
++			}
++
++			/* create ctrblks for parallel encrypt */
++			u128_to_be128(&ctrblocks[0], &ctrblk);
++			u128_inc(&ctrblk);
++			u128_to_be128(&ctrblocks[1], &ctrblk);
++			u128_inc(&ctrblk);
++
++			camellia_enc_blk_xor_2way(ctx, (u8 *)dst,
++						 (u8 *)ctrblocks);
++
++			src += 2;
++			dst += 2;
++			nbytes -= bsize * 2;
++		} while (nbytes >= bsize * 2);
++
++		if (nbytes < bsize)
++			goto done;
++	}
++
++	/* Handle leftovers */
++	do {
++		if (dst != src)
++			*dst = *src;
++
++		u128_to_be128(&ctrblocks[0], &ctrblk);
++		u128_inc(&ctrblk);
++
++		camellia_enc_blk_xor(ctx, (u8 *)dst, (u8 *)ctrblocks);
++
++		src += 1;
++		dst += 1;
++		nbytes -= bsize;
++	} while (nbytes >= bsize);
++
++done:
++	u128_to_be128((be128 *)walk->iv, &ctrblk);
++	return nbytes;
++}
++
++static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		     struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt_block(desc, &walk, CAMELLIA_BLOCK_SIZE);
++
++	while ((nbytes = walk.nbytes) >= CAMELLIA_BLOCK_SIZE) {
++		nbytes = __ctr_crypt(desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	if (walk.nbytes) {
++		ctr_crypt_final(desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, 0);
++	}
++
++	return err;
++}
++
++static void encrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
++{
++	const unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	struct camellia_ctx *ctx = priv;
++	int i;
++
++	while (nbytes >= 2 * bsize) {
++		camellia_enc_blk_2way(ctx, srcdst, srcdst);
++		srcdst += bsize * 2;
++		nbytes -= bsize * 2;
++	}
++
++	for (i = 0; i < nbytes / bsize; i++, srcdst += bsize)
++		camellia_enc_blk(ctx, srcdst, srcdst);
++}
++
++static void decrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
++{
++	const unsigned int bsize = CAMELLIA_BLOCK_SIZE;
++	struct camellia_ctx *ctx = priv;
++	int i;
++
++	while (nbytes >= 2 * bsize) {
++		camellia_dec_blk_2way(ctx, srcdst, srcdst);
++		srcdst += bsize * 2;
++		nbytes -= bsize * 2;
++	}
++
++	for (i = 0; i < nbytes / bsize; i++, srcdst += bsize)
++		camellia_dec_blk(ctx, srcdst, srcdst);
++}
++
++struct camellia_lrw_ctx {
++	struct lrw_table_ctx lrw_table;
++	struct camellia_ctx camellia_ctx;
 +};
 +
-+static int __init camellia_init(void)
++static int lrw_camellia_setkey(struct crypto_tfm *tfm, const u8 *key,
++			      unsigned int keylen)
 +{
-+	return crypto_register_alg(&camellia_alg);
++	struct camellia_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
++	int err;
++
++	err = __camellia_setkey(&ctx->camellia_ctx, key,
++				keylen - CAMELLIA_BLOCK_SIZE,
++				&tfm->crt_flags);
++	if (err)
++		return err;
++
++	return lrw_init_table(&ctx->lrw_table,
++			      key + keylen - CAMELLIA_BLOCK_SIZE);
 +}
 +
-+static void __exit camellia_fini(void)
++static int lrw_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
 +{
-+	crypto_unregister_alg(&camellia_alg);
++	struct camellia_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[2 * 4];
++	struct lrw_crypt_req req = {
++		.tbuf = buf,
++		.tbuflen = sizeof(buf),
++
++		.table_ctx = &ctx->lrw_table,
++		.crypt_ctx = &ctx->camellia_ctx,
++		.crypt_fn = encrypt_callback,
++	};
++
++	return lrw_crypt(desc, dst, src, nbytes, &req);
 +}
 +
-+module_init(camellia_init);
-+module_exit(camellia_fini);
++static int lrw_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[2 * 4];
++	struct lrw_crypt_req req = {
++		.tbuf = buf,
++		.tbuflen = sizeof(buf),
 +
-+MODULE_DESCRIPTION("Camellia Cipher Algorithm");
++		.table_ctx = &ctx->lrw_table,
++		.crypt_ctx = &ctx->camellia_ctx,
++		.crypt_fn = decrypt_callback,
++	};
++
++	return lrw_crypt(desc, dst, src, nbytes, &req);
++}
++
++static void lrw_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct camellia_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	lrw_free_table(&ctx->lrw_table);
++}
++
++struct camellia_xts_ctx {
++	struct camellia_ctx tweak_ctx;
++	struct camellia_ctx crypt_ctx;
++};
++
++static int xts_camellia_setkey(struct crypto_tfm *tfm, const u8 *key,
++			      unsigned int keylen)
++{
++	struct camellia_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++	u32 *flags = &tfm->crt_flags;
++	int err;
++
++	/* key consists of keys of equal size concatenated, therefore
++	 * the length must be even
++	 */
++	if (keylen % 2) {
++		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
++	}
++
++	/* first half of xts-key is for crypt */
++	err = __camellia_setkey(&ctx->crypt_ctx, key, keylen / 2, flags);
++	if (err)
++		return err;
++
++	/* second half of xts-key is for tweak */
++	return __camellia_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2,
++				flags);
++}
++
++static int xts_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[2 * 4];
++	struct xts_crypt_req req = {
++		.tbuf = buf,
++		.tbuflen = sizeof(buf),
++
++		.tweak_ctx = &ctx->tweak_ctx,
++		.tweak_fn = XTS_TWEAK_CAST(camellia_enc_blk),
++		.crypt_ctx = &ctx->crypt_ctx,
++		.crypt_fn = encrypt_callback,
++	};
++
++	return xts_crypt(desc, dst, src, nbytes, &req);
++}
++
++static int xts_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[2 * 4];
++	struct xts_crypt_req req = {
++		.tbuf = buf,
++		.tbuflen = sizeof(buf),
++
++		.tweak_ctx = &ctx->tweak_ctx,
++		.tweak_fn = XTS_TWEAK_CAST(camellia_enc_blk),
++		.crypt_ctx = &ctx->crypt_ctx,
++		.crypt_fn = decrypt_callback,
++	};
++
++	return xts_crypt(desc, dst, src, nbytes, &req);
++}
++
++static struct crypto_alg camellia_algs[6] = { {
++	.cra_name		= "camellia",
++	.cra_driver_name	= "camellia-asm",
++	.cra_priority		= 200,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct camellia_ctx),
++	.cra_alignmask		= 0,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[0].cra_list),
++	.cra_u			= {
++		.cipher = {
++			.cia_min_keysize = CAMELLIA_MIN_KEY_SIZE,
++			.cia_max_keysize = CAMELLIA_MAX_KEY_SIZE,
++			.cia_setkey	 = camellia_setkey,
++			.cia_encrypt	 = camellia_encrypt,
++			.cia_decrypt	 = camellia_decrypt
++		}
++	}
++}, {
++	.cra_name		= "ecb(camellia)",
++	.cra_driver_name	= "ecb-camellia-asm",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct camellia_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[1].cra_list),
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	= CAMELLIA_MAX_KEY_SIZE,
++			.setkey		= camellia_setkey,
++			.encrypt	= ecb_encrypt,
++			.decrypt	= ecb_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "cbc(camellia)",
++	.cra_driver_name	= "cbc-camellia-asm",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct camellia_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[2].cra_list),
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	= CAMELLIA_MAX_KEY_SIZE,
++			.ivsize		= CAMELLIA_BLOCK_SIZE,
++			.setkey		= camellia_setkey,
++			.encrypt	= cbc_encrypt,
++			.decrypt	= cbc_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "ctr(camellia)",
++	.cra_driver_name	= "ctr-camellia-asm",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= 1,
++	.cra_ctxsize		= sizeof(struct camellia_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[3].cra_list),
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	= CAMELLIA_MAX_KEY_SIZE,
++			.ivsize		= CAMELLIA_BLOCK_SIZE,
++			.setkey		= camellia_setkey,
++			.encrypt	= ctr_crypt,
++			.decrypt	= ctr_crypt,
++		},
++	},
++}, {
++	.cra_name		= "lrw(camellia)",
++	.cra_driver_name	= "lrw-camellia-asm",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct camellia_lrw_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[4].cra_list),
++	.cra_exit		= lrw_exit_tfm,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= CAMELLIA_MIN_KEY_SIZE +
++						CAMELLIA_BLOCK_SIZE,
++			.max_keysize	= CAMELLIA_MAX_KEY_SIZE +
++						CAMELLIA_BLOCK_SIZE,
++			.ivsize		= CAMELLIA_BLOCK_SIZE,
++			.setkey		= lrw_camellia_setkey,
++			.encrypt	= lrw_encrypt,
++			.decrypt	= lrw_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "xts(camellia)",
++	.cra_driver_name	= "xts-camellia-asm",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct camellia_xts_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_list		= LIST_HEAD_INIT(camellia_algs[5].cra_list),
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= CAMELLIA_MIN_KEY_SIZE * 2,
++			.max_keysize	= CAMELLIA_MAX_KEY_SIZE * 2,
++			.ivsize		= CAMELLIA_BLOCK_SIZE,
++			.setkey		= xts_camellia_setkey,
++			.encrypt	= xts_encrypt,
++			.decrypt	= xts_decrypt,
++		},
++	},
++} };
++
++static bool is_blacklisted_cpu(void)
++{
++	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
++		return false;
++
++	if (boot_cpu_data.x86 == 0x0f) {
++		/*
++		 * On Pentium 4, camellia-asm is slower than original assembler
++		 * implementation because excessive uses of 64bit rotate and
++		 * left-shifts (which are really slow on P4) needed to store and
++		 * handle 128bit block in two 64bit registers.
++		 */
++		return true;
++	}
++
++	return false;
++}
++
++static int force;
++module_param(force, int, 0);
++MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
++
++int __init init(void)
++{
++	if (!force && is_blacklisted_cpu()) {
++		printk(KERN_INFO
++			"camellia-x86_64: performance on this CPU "
++			"would be suboptimal: disabling "
++			"camellia-x86_64.\n");
++		return -ENODEV;
++	}
++
++	return crypto_register_algs(camellia_algs, ARRAY_SIZE(camellia_algs));
++}
++
++void __exit fini(void)
++{
++	crypto_unregister_algs(camellia_algs, ARRAY_SIZE(camellia_algs));
++}
++
++module_init(init);
++module_exit(fini);
++
 +MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Camellia Cipher Algorithm, asm optimized");
 +MODULE_ALIAS("camellia");
++MODULE_ALIAS("camellia-asm");
++
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e6cfe1a..6318edd 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -654,6 +654,24 @@ config CRYPTO_CAMELLIA
+ 	  See also:
+ 	  <https://info.isl.ntt.co.jp/crypt/eng/camellia/index_s.html>
+ 
++config CRYPTO_CAMELLIA_X86_64
++	tristate "Camellia cipher algorithm (x86_64)"
++	depends on (X86 || UML_X86) && 64BIT
++	depends on CRYPTO
++	select CRYPTO_ALGAPI
++	select CRYPTO_LRW
++	select CRYPTO_XTS
++	help
++	  Camellia cipher algorithm module (x86_64).
++
++	  Camellia is a symmetric key block cipher developed jointly
++	  at NTT and Mitsubishi Electric Corporation.
++
++	  The Camellia specifies three key sizes: 128, 192 and 256 bits.
++
++	  See also:
++	  <https://info.isl.ntt.co.jp/crypt/eng/camellia/index_s.html>
++
+ config CRYPTO_CAST5
+ 	tristate "CAST5 (CAST-128) cipher algorithm"
+ 	select CRYPTO_ALGAPI
