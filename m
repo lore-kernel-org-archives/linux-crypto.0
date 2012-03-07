@@ -1,59 +1,31 @@
-From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH] xfrm: fix hmac(sha256) truncation length
-Date: Wed,  7 Mar 2012 15:12:37 -0500
-Message-ID: <1331151157-19149-1-git-send-email-jarod@redhat.com>
-Cc: Jarod Wilson <jarod@redhat.com>,
-	Paul Wouters <pwouters@redhat.com>,
-	Herber Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Martin Willi <martin@strongswan.org>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org
+From: woodyng1985@yahoo.com.hk
+Subject: Cloud server for FREE
+Date: Thu,  8 Mar 2012 05:04:13 +0800 (HKT)
+Message-ID: <z3GcH__35626.539545092$1331154292$gmane$org@tpts1.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37919 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757043Ab2CGUNE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Mar 2012 15:13:04 -0500
+Received: from 124-248-200-57.sunnyvision.com ([124.248.200.57]:51830 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751889Ab2CGVEn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 7 Mar 2012 16:04:43 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit bc74b0c8af17458ecae77f725e507ab5fd100105 added proper hmac sha384
-and sha512 variants with truncation lengths of 192 and 256 respectively,
-per RFC4868:
+Dear User,
 
-http://www.ietf.org/rfc/rfc4868.txt
+For now. you can using our cloud server for FREE by the following link:
 
-The already-present hmac sha256 variant was left as-is, with a truncation
-length of 96 bits, per an earlier draft of the RFC, as I understand it (it
-predates 2.6.12-rc2, didn't look further back). This doesn't play well out
-of the box with various other ipsec devices that properly implement the
-current RFC value of 128-bit truncation for hmac sha256. Easy fix,
-assuming there's not some reason I'm not clued into about why this might
-have intentionally been left as-is.
+http://www.36cloud.com/cloud_promotion_2012q1/
 
-CC: Paul Wouters <pwouters@redhat.com>
-CC: Herber Xu <herbert@gondor.apana.org.au>
-CC: David S. Miller <davem@davemloft.net>
-CC: Martin Willi <martin@strongswan.org>
-CC: netdev@vger.kernel.org
-CC: linux-crypto@vger.kernel.org
-Signed-off-by: Jarod Wilson <jarod@redhat.com>
----
- net/xfrm/xfrm_algo.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hope you can enjoy our CLOUD server for Web, Email, Shared Drive VPN, Streaming, Game, FTP....or other purpose. 
 
-diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
-index 791ab2e..f2b3ce2 100644
---- a/net/xfrm/xfrm_algo.c
-+++ b/net/xfrm/xfrm_algo.c
-@@ -203,7 +203,7 @@ static struct xfrm_algo_desc aalg_list[] = {
- 
- 	.uinfo = {
- 		.auth = {
--			.icv_truncbits = 96,
-+			.icv_truncbits = 128,
- 			.icv_fullbits = 256,
- 		}
- 	},
--- 
-1.7.1
+Many thanks.
+
+Best Regards,
+The 36cloud Team
+
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
