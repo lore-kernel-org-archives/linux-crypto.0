@@ -1,31 +1,72 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] xfrm: fix hmac(sha256) truncation length
-Date: Thu, 8 Mar 2012 11:37:42 +1100
-Message-ID: <20120308003741.GA14995@gondor.apana.org.au>
-References: <1331151157-19149-1-git-send-email-jarod@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Paul Wouters <pwouters@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Martin Willi <martin@strongswan.org>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1331151157-19149-1-git-send-email-jarod@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: design@dedicatedserver.com.hk
+Subject: Web development service
+Date: Thu,  8 Mar 2012 19:24:14 +0800 (HKT)
+Message-ID: <dM7mqsjpXH6I1__39922.9528884918$1331206860$gmane$org@pavo.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 124-248-200-58.sunnyvision.com ([124.248.200.58]:47442 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1756370Ab2CHLkD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Mar 2012 06:40:03 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 07, 2012 at 03:12:37PM -0500, Jarod Wilson wrote:
-> Commit bc74b0c8af17458ecae77f725e507ab5fd100105 added proper hmac sha384
-> and sha512 variants with truncation lengths of 192 and 256 respectively,
-> per RFC4868:
+Dear all,
+Please see below is our general job reference and web design package, 
 
-No, it was done deliberately to maintain backwards compatibility.
-Userspace should set the truncbits explicitly from now on.
+Total 12 pages web design service
+- Two language version
+- All the webpage design is included:
+- Theme development;
+- Design Study;
+- Original Layout / Artwork Design;
+- Steady HTML / Flash Web page development;
+- Search Engine Applicable;
+- Basic Graphic Flash Banner x1;
+- All text contents, logos and related product photos should be provided by client
+ Product eCatalogue (Product Page)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- CMS Function of add /edit Products with Contents & Photos
+- Maximum 10 fields include Photos and Contents
+- Text Editor for Detail Contents (if need)
+- Support text descriptions and photos updating
+- 1 Level categories management
+- Database support with un-limit Products create
+- Not include Data input
+- Standard Admin panel with login function (1 admin account)
+Content management system (Activities page)
+
+- Basic CMS function of add / edit items
+- Max. 5 fields per item
+- Support photos and text descriptions
+- Front-end support 1 page only (Comapny activities page)
+- Database support with un-limit Products create
+- Not include Data input
+- Integrated Admin Panel
+Enquiry form function (Contact Us)
+- Form to mail
+Package price : $38,000
+
+Yoy may click the hyperlink to see some of our design reference.
+
+Job reference
+
+http://www.hk-belle.com/
+http://www.mirabell.com.hk/
+http://www.nikijodi.com/
+http://www.joy-peace.com/
+http://www.staccato.com
+http://www.chicks.com.hk/
+
+Program reference
+http://www.gloryskygroup.com/index.aspx=3Flang=3Dbig5
+http://www.mydriver.com.hk/
+ 
+Best Regards,
+Eric Chan
+Senior Sales Executive
+
+If you do not wish to further receive this event message, email subscriber@dedicatedserver.com.hk to unsubscribe this message
