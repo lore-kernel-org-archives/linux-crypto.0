@@ -1,31 +1,31 @@
-From: woodyng1985@yahoo.com.hk
-Subject: Cloud server for FREE
-Date: Thu,  8 Mar 2012 05:04:13 +0800 (HKT)
-Message-ID: <z3GcH__35626.539545092$1331154292$gmane$org@tpts1.seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-57.sunnyvision.com ([124.248.200.57]:51830 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751889Ab2CGVEn (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Mar 2012 16:04:43 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] xfrm: fix hmac(sha256) truncation length
+Date: Thu, 8 Mar 2012 11:37:42 +1100
+Message-ID: <20120308003741.GA14995@gondor.apana.org.au>
+References: <1331151157-19149-1-git-send-email-jarod@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, Paul Wouters <pwouters@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Martin Willi <martin@strongswan.org>, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Jarod Wilson <jarod@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1331151157-19149-1-git-send-email-jarod@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Dear User,
+On Wed, Mar 07, 2012 at 03:12:37PM -0500, Jarod Wilson wrote:
+> Commit bc74b0c8af17458ecae77f725e507ab5fd100105 added proper hmac sha384
+> and sha512 variants with truncation lengths of 192 and 256 respectively,
+> per RFC4868:
 
-For now. you can using our cloud server for FREE by the following link:
+No, it was done deliberately to maintain backwards compatibility.
+Userspace should set the truncbits explicitly from now on.
 
-http://www.36cloud.com/cloud_promotion_2012q1/
-
-Hope you can enjoy our CLOUD server for Web, Email, Shared Drive VPN, Streaming, Game, FTP....or other purpose. 
-
-Many thanks.
-
-Best Regards,
-The 36cloud Team
-
-
-If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
