@@ -1,40 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] xfrm: fix hmac(sha256) truncation length
-Date: Sat, 10 Mar 2012 00:45:42 +1100
-Message-ID: <20120309134541.GA28309@gondor.apana.org.au>
-References: <1331151157-19149-1-git-send-email-jarod@redhat.com> <20120308003741.GA14995@gondor.apana.org.au> <4F5A0876.3060408@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Paul Wouters <pwouters@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Martin Willi <martin@strongswan.org>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: [PATCH] crypto: fix build failure in mv_cesa.c (missing of header)
+Date: Fri,  9 Mar 2012 14:58:25 -0500
+Message-ID: <1331323105-21034-1-git-send-email-paul.gortmaker@windriver.com>
+Cc: linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
+	Paul Gortmaker <paul.gortmaker@windriver.com>
+To: michael@walle.cc, jason@lakedaemon.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:34369 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753867Ab2CINps (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:47281 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030655Ab2CIT6h (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Mar 2012 08:45:48 -0500
-Content-Disposition: inline
-In-Reply-To: <4F5A0876.3060408@redhat.com>
+	Fri, 9 Mar 2012 14:58:37 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 09, 2012 at 08:41:10AM -0500, Jarod Wilson wrote:
->
-> Okay, I suspected that might be the case. No plans to ever invert that,  
-> so that userspace has to explicitly set the shorter truncbits for  
-> backwards compat?
+Commit 737b75872487f560397ba34846a19823b1addf88 (linux-next)
 
-That's up to the userspace implementation.  If its configuration
-allows explicit trunc bits then just use whatever the user says.
-Otherwise it'll have to make a policy decision.  For example, a
-big warning when upgrading and changing the default to the correct
-value.
+    "ARM: kirkwood: mv_cesa devicetree bindings"
 
-Cheers,
+fails to compile as follows:
+
+ CC      drivers/crypto/mv_cesa.o
+ drivers/crypto/mv_cesa.c:1139: error: implicit declaration of function 'of_match_ptr'
+ drivers/crypto/mv_cesa.c:1139: error: 'mv_cesa_dt_ids' undeclared here (not in a function)
+ drivers/crypto/mv_cesa.c:1139: error: initializer element is not constant
+ drivers/crypto/mv_cesa.c:1139: error: (near initialization for 'marvell_crypto.driver.of_match_table')
+
+because it is missing the linux/of.h header file.
+
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index b7a3d48..093e214 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -10,6 +10,7 @@
+ #include <crypto/algapi.h>
+ #include <linux/crypto.h>
+ #include <linux/interrupt.h>
++#include <linux/of.h>
+ #include <linux/io.h>
+ #include <linux/kthread.h>
+ #include <linux/platform_device.h>
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.1
