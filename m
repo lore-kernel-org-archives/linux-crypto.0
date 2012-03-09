@@ -1,38 +1,40 @@
-From: Jarod Wilson <jarod@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] xfrm: fix hmac(sha256) truncation length
-Date: Fri, 09 Mar 2012 08:41:10 -0500
-Message-ID: <4F5A0876.3060408@redhat.com>
-References: <1331151157-19149-1-git-send-email-jarod@redhat.com> <20120308003741.GA14995@gondor.apana.org.au>
+Date: Sat, 10 Mar 2012 00:45:42 +1100
+Message-ID: <20120309134541.GA28309@gondor.apana.org.au>
+References: <1331151157-19149-1-git-send-email-jarod@redhat.com> <20120308003741.GA14995@gondor.apana.org.au> <4F5A0876.3060408@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, Paul Wouters <pwouters@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Martin Willi <martin@strongswan.org>, netdev@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54375 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753867Ab2CINlW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Mar 2012 08:41:22 -0500
-In-Reply-To: <20120308003741.GA14995@gondor.apana.org.au>
+Received: from sting.hengli.com.au ([178.18.18.71]:34369 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753867Ab2CINps (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Mar 2012 08:45:48 -0500
+Content-Disposition: inline
+In-Reply-To: <4F5A0876.3060408@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote:
-> On Wed, Mar 07, 2012 at 03:12:37PM -0500, Jarod Wilson wrote:
->> Commit bc74b0c8af17458ecae77f725e507ab5fd100105 added proper hmac sha384
->> and sha512 variants with truncation lengths of 192 and 256 respectively,
->> per RFC4868:
+On Fri, Mar 09, 2012 at 08:41:10AM -0500, Jarod Wilson wrote:
 >
-> No, it was done deliberately to maintain backwards compatibility.
-> Userspace should set the truncbits explicitly from now on.
+> Okay, I suspected that might be the case. No plans to ever invert that,  
+> so that userspace has to explicitly set the shorter truncbits for  
+> backwards compat?
 
-Okay, I suspected that might be the case. No plans to ever invert that, 
-so that userspace has to explicitly set the shorter truncbits for 
-backwards compat?
+That's up to the userspace implementation.  If its configuration
+allows explicit trunc bits then just use whatever the user says.
+Otherwise it'll have to make a policy decision.  For example, a
+big warning when upgrading and changing the default to the correct
+value.
 
+Cheers,
 -- 
-Jarod Wilson
-jarod@redhat.com.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
