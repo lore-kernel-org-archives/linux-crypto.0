@@ -1,40 +1,55 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 0/2] padata fixes
-Date: Fri, 9 Mar 2012 07:18:28 +0100
-Message-ID: <20120309061828.GI15404@secunet.com>
+Subject: [PATCH 1/2] padata: Fix race in the serialization path
+Date: Fri, 9 Mar 2012 07:20:12 +0100
+Message-ID: <20120309062012.GJ15404@secunet.com>
+References: <20120309061828.GI15404@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:56864 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751298Ab2CIGSc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Mar 2012 01:18:32 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20120309061828.GI15404@secunet.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patchset fixes two races that I found when I tested padata
-in combination with pcrypt ablkcipher algorithms (still unpublished)
-and dm-crypt. The mainline codebase seems not to trigger them, however
-we need to fix these races before I can push the pcrypt ablkcipher
-extensions.
+When a padata object is queued to the serialization queue, another
+cpu might process and free the padata object. So don't dereference
+it after queueing to the serialization queue.
 
-The patchset is based on the crypto-2.6 tree and is also available via git:
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ kernel/padata.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-The following changes since commit f8f54e190ddb4ed697036b60f5e2ae6dd45b801c:
-  Phil Sutter (1):
-        crypto: mv_cesa - fix final callback not ignoring input data
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/linux-stk padata-fixes
-
-Steffen Klassert (2):
-      padata: Fix race in the serialization path
-      padata: Fix race on sequence number wrap
-
- include/linux/padata.h |    6 ++----
- kernel/padata.c        |   44 ++++++++++++++------------------------------
- 2 files changed, 16 insertions(+), 34 deletions(-)
+diff --git a/kernel/padata.c b/kernel/padata.c
+index b452599..aa99295 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -230,6 +230,7 @@ out:
+ 
+ static void padata_reorder(struct parallel_data *pd)
+ {
++	int cb_cpu;
+ 	struct padata_priv *padata;
+ 	struct padata_serial_queue *squeue;
+ 	struct padata_instance *pinst = pd->pinst;
+@@ -270,13 +271,14 @@ static void padata_reorder(struct parallel_data *pd)
+ 			return;
+ 		}
+ 
+-		squeue = per_cpu_ptr(pd->squeue, padata->cb_cpu);
++		cb_cpu = padata->cb_cpu;
++		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
+ 
+ 		spin_lock(&squeue->serial.lock);
+ 		list_add_tail(&padata->list, &squeue->serial.list);
+ 		spin_unlock(&squeue->serial.lock);
+ 
+-		queue_work_on(padata->cb_cpu, pinst->wq, &squeue->work);
++		queue_work_on(cb_cpu, pinst->wq, &squeue->work);
+ 	}
+ 
+ 	spin_unlock_bh(&pd->lock);
+-- 
+1.7.0.4
