@@ -1,75 +1,99 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH] crypto: fix build failure in mv_cesa.c (missing of
- header)
-Date: Sat, 10 Mar 2012 20:42:26 -0500
-Message-ID: <20120311014226.GU5050@titan.lakedaemon.net>
-References: <1331323105-21034-1-git-send-email-paul.gortmaker@windriver.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH v2.2 2/7] crypto: GnuPG based MPI lib - header files
+ (part 2)
+Date: Sun, 11 Mar 2012 10:55:28 +0100 (CET)
+Message-ID: <alpine.DEB.2.00.1203111046110.4778@ayla.of.borg>
+References: <cover.1319025009.git.dmitry.kasatkin@intel.com> <af9b876508ebc83431312aef67b3ae920780bd5c.1319025009.git.dmitry.kasatkin@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: michael@walle.cc, linux-crypto@vger.kernel.org,
-	linux-next@vger.kernel.org
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Linux Kernel Development <linux-kernel@vger.kernel.org>,
+	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
+	herbert@gondor.apana.org.au,
+	Linux/m68k <linux-m68k@lists.linux-m68k.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-01-ewr.mailhop.org ([204.13.248.71]:36839 "EHLO
-	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751960Ab2CKBma (ORCPT
+Received: from gerard.telenet-ops.be ([195.130.132.48]:46078 "EHLO
+	gerard.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752148Ab2CKJzc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 10 Mar 2012 20:42:30 -0500
-Content-Disposition: inline
-In-Reply-To: <1331323105-21034-1-git-send-email-paul.gortmaker@windriver.com>
+	Sun, 11 Mar 2012 05:55:32 -0400
+In-Reply-To: <af9b876508ebc83431312aef67b3ae920780bd5c.1319025009.git.dmitry.kasatkin@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 09, 2012 at 02:58:25PM -0500, Paul Gortmaker wrote:
-> Commit 737b75872487f560397ba34846a19823b1addf88 (linux-next)
+On Wed, 19 Oct 2011, Dmitry Kasatkin wrote:
+> Adds the multi-precision-integer maths library which was originally taken
+> from GnuPG and ported to the kernel by (among others) David Howells.
+> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
+> The difference is that checkpatch reported errors and warnings have been fixed.
 > 
->     "ARM: kirkwood: mv_cesa devicetree bindings"
-> 
-> fails to compile as follows:
-> 
->  CC      drivers/crypto/mv_cesa.o
->  drivers/crypto/mv_cesa.c:1139: error: implicit declaration of function 'of_match_ptr'
->  drivers/crypto/mv_cesa.c:1139: error: 'mv_cesa_dt_ids' undeclared here (not in a function)
->  drivers/crypto/mv_cesa.c:1139: error: initializer element is not constant
->  drivers/crypto/mv_cesa.c:1139: error: (near initialization for 'marvell_crypto.driver.of_match_table')
-> 
-> because it is missing the linux/of.h header file.
-> 
-> Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+> This library is used to implemenet RSA digital signature verification
+> used in IMA/EVM integrity protection subsystem.
 
-Paul,
+> --- /dev/null
+> +++ b/lib/mpi/longlong.h
 
-Thanks for the patch.  Unfortunately, I'm not learning fast enough.  ;-)
-This series has been in a lot of flux lately, as you've experienced.
+> +	/* If udiv_qrnnd was not defined for this processor, use __udiv_qrnnd_c.  */
+> +#if !defined(udiv_qrnnd)
+> +#define UDIV_NEEDS_NORMALIZATION 1
+> +#define udiv_qrnnd __udiv_qrnnd_c
+> +#endif
+> +
+> +#undef count_leading_zeros
 
-The good news is, after talking with Olaf and Arnd, I think I have a
-good workflow figured out.  Hopefully, failures like this won't happen
-in the future.
+Why is this #undef here? It's not present in mpi/longlong.h from Ubuntu's
+gnupg-1.4.10, and causing ...
 
-As an fyi, I'm probably going to take kirkwood_dt_staging down (or, label
-it broken ;-) )  I intended it as a publicly viewable branch of "what's
-coming down the pipe", but it's not working out the way I intended.
+> +#if !defined(count_leading_zeros)
+> +	extern
+> +#ifdef __STDC__
+> +			const
+> +#endif
+> +			unsigned char __clz_tab[];
+> +#define count_leading_zeros(count, x) \
+> +do { \
+> +	UWtype __xr = (x); \
+> +	UWtype __a; \
+> +	\
+> +	if (W_TYPE_SIZE <= 32) { \
+> +		__a = __xr < ((UWtype) 1 << 2*__BITS4) \
+> +		? (__xr < ((UWtype) 1 << __BITS4) ? 0 : __BITS4) \
+> +		: (__xr < ((UWtype) 1 << 3*__BITS4) ?  2*__BITS4 : 3*__BITS4); \
+> +	} \
+> +	else { \
+> +		for (__a = W_TYPE_SIZE - 8; __a > 0; __a -= 8) \
+> +			if (((__xr >> __a) & 0xff) != 0) \
+> +				break; \
+> +	} \
+> +	\
+> +	(count) = W_TYPE_SIZE - (__clz_tab[__xr >> __a] + __a); \
+> +} while (0)
+> +	/* This version gives a well-defined value for zero. */
+> +#define COUNT_LEADING_ZEROS_0 W_TYPE_SIZE
 
-As for mv_cesa, it's next on my list.  As soon as I figure out the irq
-stuff.
+lib/mpi/longlong.h:1483:1: warning: "COUNT_LEADING_ZEROS_0" redefined
+lib/mpi/longlong.h:610:1: warning: this is the location of the previous definition
 
-Thanks for testing.
+on m68k/allmodconfig.
 
-Jason.
+I'm also wondering why this warning is not seen on other arches, e.g. PPC
+#defines COUNT_LEADING_ZEROS_0 to 32, just like m68k.
 
-> 
-> diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-> index b7a3d48..093e214 100644
-> --- a/drivers/crypto/mv_cesa.c
-> +++ b/drivers/crypto/mv_cesa.c
-> @@ -10,6 +10,7 @@
->  #include <crypto/algapi.h>
->  #include <linux/crypto.h>
->  #include <linux/interrupt.h>
-> +#include <linux/of.h>
->  #include <linux/io.h>
->  #include <linux/kthread.h>
->  #include <linux/platform_device.h>
-> -- 
-> 1.7.9.1
-> 
+> +#endif
+
+I suppose the plan is to clean up this header file, as lots of its
+functionality is already present in the kernel sources in some other way
+(e.g. arch/m68k/lib/muldi3.c)?
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
