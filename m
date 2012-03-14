@@ -1,34 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] x86_64 assembler implementation of camellia block
-	cipher
-Date: Wed, 14 Mar 2012 20:31:10 +1100
-Message-ID: <20120314093110.GB2847@gondor.apana.org.au>
-References: <20120305182616.25411.58251.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH 0/2] padata fixes
+Date: Wed, 14 Mar 2012 20:31:43 +1100
+Message-ID: <20120314093143.GC2847@gondor.apana.org.au>
+References: <20120309061828.GI15404@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:47643 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:47674 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1030710Ab2CNJbM (ORCPT
+	with ESMTP id S932065Ab2CNJbo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Mar 2012 05:31:12 -0400
+	Wed, 14 Mar 2012 05:31:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20120305182616.25411.58251.stgit@localhost6.localdomain6>
+In-Reply-To: <20120309061828.GI15404@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 05, 2012 at 08:26:16PM +0200, Jussi Kivilinna wrote:
-> Patches 1-2 add new tests and test vectors for camellia.
-> Patches 3-5 rename 'camellia' module to 'camellia_generic'.
-> Patch 6 adds x86_64 implementation of camellia.
-> 
-> Series depends on patch:
->   http://marc.info/?l=linux-crypto-vger&m=133077599602729&w=2
+On Fri, Mar 09, 2012 at 07:18:28AM +0100, Steffen Klassert wrote:
+> This patchset fixes two races that I found when I tested padata
+> in combination with pcrypt ablkcipher algorithms (still unpublished)
+> and dm-crypt. The mainline codebase seems not to trigger them, however
+> we need to fix these races before I can push the pcrypt ablkcipher
+> extensions.
 
-All applied.  Thanks!
+Since these don't trigger in mainline I've applied them to cryptodev.
+
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
