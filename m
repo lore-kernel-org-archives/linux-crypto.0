@@ -1,64 +1,33 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH 2/2] crypto: twofish-x86_64-3way - module init/exit functions
- should be static
-Date: Thu, 15 Mar 2012 15:49:41 -0700
-Message-ID: <4F627205.4070606@xenotime.net>
-References: <4F620F37.4070404@xenotime.net> <20120315201157.11667.30754.stgit@localhost6.localdomain6>
+From: Andreas WESTIN <andreas.westin@stericsson.com>
+Subject: Re: [PATCH 0/3 v3] crypto: ux500 crypto and hash driver
+Date: Fri, 16 Mar 2012 08:50:35 +0100
+Message-ID: <4F62F0CB.7080408@stericsson.com>
+References: <1331714748-25136-1-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20120315201157.11667.30754.stgit@localhost6.localdomain6>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
-
-On 03/15/2012 01:11 PM, Jussi Kivilinna wrote:
-
-> This caused conflict with camellia-x86_64 when compiled into kernel, same
-> function names and not static.
-> 
-> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+	"David S. Miller" <davem@davemloft.net>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from eu1sys200aog115.obsmtp.com ([207.126.144.139]:51190 "EHLO
+	eu1sys200aog115.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1031019Ab2CPHuu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Mar 2012 03:50:50 -0400
+In-Reply-To: <1331714748-25136-1-git-send-email-andreas.westin@stericsson.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
-Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+On 2012-03-14 09:45, Andreas WESTIN wrote:
+> Hi,
+>
+> I've split the driver into two parts one for hash and one
+> for crypto, hopefully it gets through this time.
 
-Thanks.
+So it didn't get through this time either, I've put the patches at:
 
-> ---
->  arch/x86/crypto/twofish_glue_3way.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-> index 408fc0c..922ab24 100644
-> --- a/arch/x86/crypto/twofish_glue_3way.c
-> +++ b/arch/x86/crypto/twofish_glue_3way.c
-> @@ -668,7 +668,7 @@ static int force;
->  module_param(force, int, 0);
->  MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
->  
-> -int __init init(void)
-> +static int __init init(void)
->  {
->  	if (!force && is_blacklisted_cpu()) {
->  		printk(KERN_INFO
-> @@ -681,7 +681,7 @@ int __init init(void)
->  	return crypto_register_algs(tf_algs, ARRAY_SIZE(tf_algs));
->  }
->  
-> -void __exit fini(void)
-> +static void __exit fini(void)
->  {
->  	crypto_unregister_algs(tf_algs, ARRAY_SIZE(tf_algs));
->  }
-> 
+http://www.df.lth.se/~triad/ux500-crypto/
 
-
-
--- 
-~Randy
+/Andreas
