@@ -1,403 +1,144 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: balancing crypto with NAPI flow vs. tasklet (was: Re: Hi,)
-Date: Mon, 19 Mar 2012 18:38:00 -0500
-Message-ID: <20120319183800.bec23f19adeabf00c3cbc973@freescale.com>
-References: <1331556267-3920-1-git-send-email-horia.geanta@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Update for 3.3
+Date: Tue, 20 Mar 2012 14:27:36 +1100
+Message-ID: <20120320032736.GA21367@gondor.apana.org.au>
+References: <20100519020603.GA19654@gondor.apana.org.au> <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au> <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au> <20110315145940.GA15373@gondor.apana.org.au> <20110520235409.GA1722@gondor.apana.org.au> <20110724011752.GA14373@gondor.apana.org.au> <20111031040952.GA19659@gondor.apana.org.au> <20120106041250.GA7759@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<herbert@gondor.hengli.com.au>, <davem@davemloft.net>,
-	<Sandeep.Malik@freescale.com>
-To: <horia.geanta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe010.messaging.microsoft.com ([216.32.180.30]:1369 "EHLO
-	va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754345Ab2CSXjq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Mar 2012 19:39:46 -0400
-In-Reply-To: <1331556267-3920-1-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20120106041250.GA7759@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 12 Mar 2012 14:44:27 +0200
-<horia.geanta@freescale.com> wrote:
+Hi Linus:
 
-> This patch replaces the back-half implementation of talitos crypto engine from
-> tasklet to NAPI. The decision to do this was based on improved performance
-> (around 7%).
-> A similiar patch (not posted yet) was tested for caam crypto engine, with
-> 10-15% improvement over tasklet.
-> 
-> Since having crypto engines use the net softirq is probably not acceptable,
-> I would like to hear your comments on what options do I have to make this
-> upstreamable.
-> Besides current approach, I am considering the following:
-> - defining a new softirq for crypto engines, having a higher priority than the
-> NET_RX_SOFTIRQ
+Here is the crypto update for 3.4:
 
-but the priority just has to be equal to NET_RX_SOFTIRQ to get the
-net--crypto performance balance, not necessarily higher IIRC.
+* sha512 bug fixes (already in your tree).
+* SHA224/SHA384 AEAD support in caam.
+* X86-64 optimised version of Camellia.
+* Tegra AES support.
+* Bulk algorithm registration interface to make driver registration easier.
+* padata race fixes.
+* Misc fixes.
 
-> - using tasklet_hi_schedule instead of tasklet_schedule
 
-this has done close to nothing for performance in my experience -
-but there is no other tasklet competing for the slice in my IPSec
-fwding tests either.
+Please pull from
 
-> Let me know if any of these two fits better or if something else is preferred.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Herbert/Dave,
 
-Is it ok for a crypto driver to depend on NET?  If not, how should
-the NAPI-style flow be abstracted out of NET?
+Alexey Dobriyan (4):
+      crypto: sha512 - make it work, undo percpu message schedule
+      crypto: sha512 - reduce stack usage to safe number
+      crypto: sha512 - use standard ror64()
+      crypto: sha512 - use standard ror64()
+
+Hemant Agrawal (1):
+      crypto: caam - add sha224 and sha384 variants to existing AEAD algorithms
+
+Henning Heinold (1):
+      arm: tegra: export tegra_chip_uid
+
+Herbert Xu (3):
+      crypto: sha512 - Use binary and instead of modulus
+      crypto: sha512 - Avoid stack bloat on i386
+      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
+
+Jesper Juhl (3):
+      crypto: In crypto_add_alg(), 'exact' wants to be initialized to 0
+      crypto: twofish-x86 - Remove dead code from twofish_glue_3way.c::init()
+      crypto: serpent-sse2 - remove dead code from serpent_sse2_glue.c::serpent_sse2_init()
+
+Julia Lawall (2):
+      hwrng: tx4939 - use devm_request_and_ioremap
+      crypto: ixp4xx - convert GFP_KERNEL to GFP_ATOMIC
+
+Jussi Kivilinna (16):
+      crypto: twofish-x86_64-3way - blacklist pentium4 and atom
+      crypto: blowfish-x86_64 - blacklist Pentium 4
+      crypto: serpent-sse2 - change transpose_4x4 to only use integer instructions
+      crypto: serpent-sse2 - use crypto_[un]register_algs
+      crypto: twofish-x86_64-3way - use crypto_[un]register_algs
+      crypto: blowfish-x86_64 - use crypto_[un]register_algs
+      crypto: serpent-sse2 - combine ablk_*_init functions
+      crypto: blowfish-x86_64 - set alignmask to zero
+      crypto: twofish-x86_64/i586 - set alignmask to zero
+      crypto: camellia - simplify key setup and CAMELLIA_ROUNDSM macro
+      crypto: testmgr - add more camellia test vectors
+      crypto: tcrypt - add more camellia tests
+      crypto: camellia - rename camellia module to camellia_generic
+      crypto: camellia - fix checkpatch warnings
+      crypto: camellia - rename camellia.c to camellia_generic.c
+      crypto: camellia - add assembler implementation for x86_64
+
+Kim Phillips (2):
+      crypto: caam - be less noisy on startup
+      crypto: caam - fix gcc 4.6 warning
+
+Mark Brown (1):
+      crypto: Add bulk algorithm registration interface
+
+Nikos Mavrogiannopoulos (1):
+      crypto: Add CRYPTO_ALG_KERN_DRIVER_ONLY flag
+
+Steffen Klassert (2):
+      padata: Fix race in the serialization path
+      padata: Fix race on sequence number wrap
+
+Varun Wadekar (1):
+      crypto: driver for Tegra AES hardware
+
+ arch/arm/mach-tegra/fuse.c                   |    2 +
+ arch/x86/crypto/Makefile                     |    2 +
+ arch/x86/crypto/blowfish_glue.c              |  191 ++--
+ arch/x86/crypto/camellia-x86_64-asm_64.S     |  520 +++++++
+ arch/x86/crypto/camellia_glue.c              | 1952 ++++++++++++++++++++++++++
+ arch/x86/crypto/serpent-sse2-i586-asm_32.S   |   29 +-
+ arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |   29 +-
+ arch/x86/crypto/serpent_sse2_glue.c          |  394 ++----
+ arch/x86/crypto/twofish_glue.c               |    2 +-
+ arch/x86/crypto/twofish_glue_3way.c          |  265 ++--
+ crypto/Kconfig                               |   18 +
+ crypto/Makefile                              |    2 +-
+ crypto/algapi.c                              |   35 +
+ crypto/camellia.c                            | 1116 ---------------
+ crypto/camellia_generic.c                    | 1102 +++++++++++++++
+ crypto/crypto_user.c                         |    2 +-
+ crypto/sha512_generic.c                      |   59 +-
+ crypto/tcrypt.c                              |   12 +
+ crypto/testmgr.c                             |   45 +
+ crypto/testmgr.h                             | 1383 ++++++++++++++++++-
+ drivers/char/hw_random/tx4939-rng.c          |    5 +-
+ drivers/crypto/Kconfig                       |   11 +
+ drivers/crypto/Makefile                      |    1 +
+ drivers/crypto/caam/caamalg.c                |  126 ++-
+ drivers/crypto/caam/ctrl.c                   |    2 +-
+ drivers/crypto/geode-aes.c                   |    6 +-
+ drivers/crypto/hifn_795x.c                   |    3 +-
+ drivers/crypto/ixp4xx_crypto.c               |    4 +-
+ drivers/crypto/mv_cesa.c                     |   12 +-
+ drivers/crypto/n2_core.c                     |    7 +-
+ drivers/crypto/omap-aes.c                    |    8 +-
+ drivers/crypto/omap-sham.c                   |    4 +
+ drivers/crypto/picoxcell_crypto.c            |   46 +-
+ drivers/crypto/s5p-sss.c                     |    6 +-
+ drivers/crypto/talitos.c                     |    1 +
+ drivers/crypto/tegra-aes.c                   | 1096 +++++++++++++++
+ drivers/crypto/tegra-aes.h                   |  103 ++
+ include/linux/bitops.h                       |   20 +
+ include/linux/crypto.h                       |    7 +
+ include/linux/padata.h                       |    6 +-
+ kernel/padata.c                              |   44 +-
+ 41 files changed, 6936 insertions(+), 1742 deletions(-)
 
 Thanks,
-
-Kim
-
-> Thank you
-> 
-> From 20f30ef6fdfe641f1c30f94320891715ffee33a2 Mon Sep 17 00:00:00 2001
-> From: Sandeep Malik <Sandeep.Malik@freescale.com>
-> Date: Sat, 12 Jun 2010 14:08:47 +0800
-> Subject: [RFC,PATCH] crypto: talitos - Replace the tasklet implementation with NAPI
-> 
-> This patch updates the current tasklet implement to NAPI so as
-> the system is more balanced in the terms that the packet submission
-> and the packet forwarding after being processed can be done at
-> the same priority.
-> 
-> Signed-off-by: Sandeep Malik <Sandeep.Malik@freescale.com>
-> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
-> ---
->  drivers/crypto/Kconfig   |    2 +-
->  drivers/crypto/talitos.c |  145 +++++++++++++++++++++++++++++++++-------------
->  drivers/crypto/talitos.h |    4 +-
->  3 files changed, 109 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index e707979..682096b 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -218,7 +218,7 @@ config CRYPTO_DEV_TALITOS
->  	select CRYPTO_ALGAPI
->  	select CRYPTO_AUTHENC
->  	select HW_RANDOM
-> -	depends on FSL_SOC
-> +	depends on FSL_SOC && NET
->  	help
->  	  Say 'Y' here to use the Freescale Security Engine (SEC)
->  	  to offload cryptographic algorithm computation.
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index dc641c7..f368579 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -1,7 +1,7 @@
->  /*
->   * talitos - Freescale Integrated Security Engine (SEC) device driver
->   *
-> - * Copyright (c) 2008-2011 Freescale Semiconductor, Inc.
-> + * Copyright (c) 2008-2012 Freescale Semiconductor, Inc.
->   *
->   * Scatterlist Crypto API glue code copied from files with the following:
->   * Copyright (c) 2006-2007 Herbert Xu <herbert@gondor.apana.org.au>
-> @@ -37,6 +37,7 @@
->  #include <linux/io.h>
->  #include <linux/spinlock.h>
->  #include <linux/rtnetlink.h>
-> +#include <linux/netdevice.h>
->  #include <linux/slab.h>
->  
->  #include <crypto/algapi.h>
-> @@ -121,6 +122,7 @@ struct talitos_channel {
->  struct talitos_private {
->  	struct device *dev;
->  	struct platform_device *ofdev;
-> +	struct net_device __percpu *netdev;
->  	void __iomem *reg;
->  	int irq[2];
->  
-> @@ -145,8 +147,8 @@ struct talitos_private {
->  	/* next channel to be assigned next incoming descriptor */
->  	atomic_t last_chan ____cacheline_aligned;
->  
-> -	/* request callback tasklet */
-> -	struct tasklet_struct done_task[2];
-> +	/* request callback napi */
-> +	struct napi_struct __percpu *done_task[2];
->  
->  	/* list of registered algorithms */
->  	struct list_head alg_list;
-> @@ -349,17 +351,18 @@ static int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
->  /*
->   * process what was done, notify callback of error if not
->   */
-> -static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
-> +static int flush_channel(struct device *dev, int ch, int error, int reset_ch,
-> +			 int weight)
->  {
->  	struct talitos_private *priv = dev_get_drvdata(dev);
->  	struct talitos_request *request, saved_req;
->  	unsigned long flags;
-> -	int tail, status;
-> +	int tail, status, count = 0;
->  
->  	spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
->  
->  	tail = priv->chan[ch].tail;
-> -	while (priv->chan[ch].fifo[tail].desc) {
-> +	while (priv->chan[ch].fifo[tail].desc && (count < weight)) {
->  		request = &priv->chan[ch].fifo[tail];
->  
->  		/* descriptors with their done bits set don't get the error */
-> @@ -396,43 +399,55 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
->  				   status);
->  		/* channel may resume processing in single desc error case */
->  		if (error && !reset_ch && status == error)
-> -			return;
-> +			return 0;
->  		spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
->  		tail = priv->chan[ch].tail;
-> +		count++;
->  	}
->  
->  	spin_unlock_irqrestore(&priv->chan[ch].tail_lock, flags);
-> +
-> +	return count;
->  }
->  
->  /*
->   * process completed requests for channels that have done status
->   */
-> -#define DEF_TALITOS_DONE(name, ch_done_mask)				\
-> -static void talitos_done_##name(unsigned long data)			\
-> +#define DEF_TALITOS_DONE(name, ch_done_mask, num_ch)			\
-> +static int talitos_done_##name(struct napi_struct *napi, int budget)	\
->  {									\
-> -	struct device *dev = (struct device *)data;			\
-> +	struct device *dev = &napi->dev->dev;				\
->  	struct talitos_private *priv = dev_get_drvdata(dev);		\
-> +	int budget_per_ch, work_done = 0;				\
->  									\
-> +	budget_per_ch = budget / num_ch;				\
->  	if (ch_done_mask & 1)						\
-> -		flush_channel(dev, 0, 0, 0);				\
-> +		work_done += flush_channel(dev, 0, 0, 0, budget_per_ch);\
->  	if (priv->num_channels == 1)					\
->  		goto out;						\
->  	if (ch_done_mask & (1 << 2))					\
-> -		flush_channel(dev, 1, 0, 0);				\
-> +		work_done += flush_channel(dev, 1, 0, 0, budget_per_ch);\
->  	if (ch_done_mask & (1 << 4))					\
-> -		flush_channel(dev, 2, 0, 0);				\
-> +		work_done += flush_channel(dev, 2, 0, 0, budget_per_ch);\
->  	if (ch_done_mask & (1 << 6))					\
-> -		flush_channel(dev, 3, 0, 0);				\
-> +		work_done += flush_channel(dev, 3, 0, 0, budget_per_ch);\
->  									\
->  out:									\
-> -	/* At this point, all completed channels have been processed */	\
-> -	/* Unmask done interrupts for channels completed later on. */	\
-> -	setbits32(priv->reg + TALITOS_IMR, ch_done_mask);		\
-> -	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);	\
-> +	if (work_done < budget) {					\
-> +		napi_complete(napi);					\
-> +		/* At this point, all completed channels have been */	\
-> +		/* processed. Unmask done interrupts for channels */	\
-> +		/* completed later on. */				\
-> +		setbits32(priv->reg + TALITOS_IMR, ch_done_mask);	\
-> +		setbits32(priv->reg + TALITOS_IMR_LO,			\
-> +			  TALITOS_IMR_LO_INIT);				\
-> +	}								\
-> +									\
-> +	return work_done;						\
->  }
-> -DEF_TALITOS_DONE(4ch, TALITOS_ISR_4CHDONE)
-> -DEF_TALITOS_DONE(ch0_2, TALITOS_ISR_CH_0_2_DONE)
-> -DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE)
-> +DEF_TALITOS_DONE(4ch, TALITOS_ISR_4CHDONE, 4)
-> +DEF_TALITOS_DONE(ch0_2, TALITOS_ISR_CH_0_2_DONE, 2)
-> +DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE, 2)
->  
->  /*
->   * locate current (offending) descriptor
-> @@ -582,7 +597,7 @@ static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
->  		if (v_lo & TALITOS_CCPSR_LO_SRL)
->  			dev_err(dev, "scatter return/length error\n");
->  
-> -		flush_channel(dev, ch, error, reset_ch);
-> +		flush_channel(dev, ch, error, reset_ch, priv->fifo_len);
->  
->  		if (reset_ch) {
->  			reset_channel(dev, ch);
-> @@ -606,14 +621,14 @@ static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
->  
->  		/* purge request queues */
->  		for (ch = 0; ch < priv->num_channels; ch++)
-> -			flush_channel(dev, ch, -EIO, 1);
-> +			flush_channel(dev, ch, -EIO, 1, priv->fifo_len);
->  
->  		/* reset and reinitialize the device */
->  		init_device(dev);
->  	}
->  }
->  
-> -#define DEF_TALITOS_INTERRUPT(name, ch_done_mask, ch_err_mask, tlet)	       \
-> +#define DEF_TALITOS_INTERRUPT(name, ch_done_mask, ch_err_mask, sirq)	       \
->  static irqreturn_t talitos_interrupt_##name(int irq, void *data)	       \
->  {									       \
->  	struct device *dev = data;					       \
-> @@ -633,7 +648,8 @@ static irqreturn_t talitos_interrupt_##name(int irq, void *data)	       \
->  			/* mask further done interrupts. */		       \
->  			clrbits32(priv->reg + TALITOS_IMR, ch_done_mask);      \
->  			/* done_task will unmask done interrupts at exit */    \
-> -			tasklet_schedule(&priv->done_task[tlet]);	       \
-> +			napi_schedule(per_cpu_ptr(priv->done_task[sirq],       \
-> +						  smp_processor_id()));	       \
->  		}							       \
->  									       \
->  	return (isr & (ch_done_mask | ch_err_mask) || isr_lo) ? IRQ_HANDLED :  \
-> @@ -2555,7 +2571,7 @@ static int talitos_remove(struct platform_device *ofdev)
->  	struct device *dev = &ofdev->dev;
->  	struct talitos_private *priv = dev_get_drvdata(dev);
->  	struct talitos_crypto_alg *t_alg, *n;
-> -	int i;
-> +	int i, j;
->  
->  	list_for_each_entry_safe(t_alg, n, &priv->alg_list, entry) {
->  		switch (t_alg->algt.type) {
-> @@ -2574,25 +2590,32 @@ static int talitos_remove(struct platform_device *ofdev)
->  	if (hw_supports(dev, DESC_HDR_SEL0_RNG))
->  		talitos_unregister_rng(dev);
->  
-> -	for (i = 0; i < priv->num_channels; i++)
-> -		kfree(priv->chan[i].fifo);
-> -
-> -	kfree(priv->chan);
-> -
->  	for (i = 0; i < 2; i++)
->  		if (priv->irq[i]) {
->  			free_irq(priv->irq[i], dev);
->  			irq_dispose_mapping(priv->irq[i]);
-> +
-> +			for_each_possible_cpu(j) {
-> +				napi_disable(per_cpu_ptr(priv->done_task[i],
-> +							 j));
-> +				netif_napi_del(per_cpu_ptr(priv->done_task[i],
-> +							   j));
-> +			}
-> +
-> +			free_percpu(priv->done_task[i]);
->  		}
->  
-> -	tasklet_kill(&priv->done_task[0]);
-> -	if (priv->irq[1])
-> -		tasklet_kill(&priv->done_task[1]);
-> +	for (i = 0; i < priv->num_channels; i++)
-> +		kfree(priv->chan[i].fifo);
-> +
-> +	kfree(priv->chan);
->  
->  	iounmap(priv->reg);
->  
->  	dev_set_drvdata(dev, NULL);
->  
-> +	free_percpu(priv->netdev);
-> +
->  	kfree(priv);
->  
->  	return 0;
-> @@ -2718,19 +2741,61 @@ static int talitos_probe(struct platform_device *ofdev)
->  	dev_set_drvdata(dev, priv);
->  
->  	priv->ofdev = ofdev;
-> +	priv->dev = dev;
-> +
-> +	priv->netdev = alloc_percpu(struct net_device);
-> +	if (!priv->netdev) {
-> +		dev_err(dev, "failed to allocate netdevice\n");
-> +		err = -ENOMEM;
-> +		goto err_out;
-> +	}
-> +
-> +	for_each_possible_cpu(i) {
-> +		err = init_dummy_netdev(per_cpu_ptr(priv->netdev, i));
-> +		if (err) {
-> +			dev_err(dev, "failed to initialize dummy netdevice\n");
-> +			goto err_out;
-> +		}
-> +		(per_cpu_ptr(priv->netdev, i))->dev = *dev;
-> +	}
->  
->  	err = talitos_probe_irq(ofdev);
->  	if (err)
->  		goto err_out;
->  
-> +	priv->done_task[0] = alloc_percpu(struct napi_struct);
-> +	if (!priv->done_task[0]) {
-> +		dev_err(dev, "failed to allocate napi for 1st irq\n");
-> +		err = -ENOMEM;
-> +		goto err_out;
-> +	}
-> +
->  	if (!priv->irq[1]) {
-> -		tasklet_init(&priv->done_task[0], talitos_done_4ch,
-> -			     (unsigned long)dev);
-> +		for_each_possible_cpu(i) {
-> +			netif_napi_add(per_cpu_ptr(priv->netdev, i),
-> +				       per_cpu_ptr(priv->done_task[0], i),
-> +				       talitos_done_4ch, TALITOS_NAPI_WEIGHT);
-> +			napi_enable(per_cpu_ptr(priv->done_task[0], i));
-> +		}
->  	} else {
-> -		tasklet_init(&priv->done_task[0], talitos_done_ch0_2,
-> -			     (unsigned long)dev);
-> -		tasklet_init(&priv->done_task[1], talitos_done_ch1_3,
-> -			     (unsigned long)dev);
-> +		priv->done_task[1] = alloc_percpu(struct napi_struct);
-> +		if (!priv->done_task[1]) {
-> +			dev_err(dev, "failed to allocate napi for 2nd irq\n");
-> +			err = -ENOMEM;
-> +			goto err_out;
-> +		}
-> +
-> +		for_each_possible_cpu(i) {
-> +			netif_napi_add(per_cpu_ptr(priv->netdev, i),
-> +				       per_cpu_ptr(priv->done_task[0], i),
-> +				       talitos_done_ch0_2, TALITOS_NAPI_WEIGHT);
-> +			napi_enable(per_cpu_ptr(priv->done_task[0], i));
-> +
-> +			netif_napi_add(per_cpu_ptr(priv->netdev, i),
-> +				       per_cpu_ptr(priv->done_task[1], i),
-> +				       talitos_done_ch1_3, TALITOS_NAPI_WEIGHT);
-> +			napi_enable(per_cpu_ptr(priv->done_task[1], i));
-> +		}
->  	}
->  
->  	INIT_LIST_HEAD(&priv->alg_list);
-> diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
-> index 3c17395..ba62abc 100644
-> --- a/drivers/crypto/talitos.h
-> +++ b/drivers/crypto/talitos.h
-> @@ -1,7 +1,7 @@
->  /*
->   * Freescale SEC (talitos) device register and descriptor header defines
->   *
-> - * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
-> + * Copyright (c) 2006-2012 Freescale Semiconductor, Inc.
->   *
->   * Redistribution and use in source and binary forms, with or without
->   * modification, are permitted provided that the following conditions
-> @@ -28,6 +28,8 @@
->   *
->   */
->  
-> +#define TALITOS_NAPI_WEIGHT     12
-> +
->  /*
->   * TALITOS_xxx_LO addresses point to the low data bits (32-63) of the register
->   */
-> -- 
-> 1.7.3.4
-> 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
