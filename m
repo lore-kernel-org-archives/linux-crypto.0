@@ -1,8 +1,8 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH 15/17] powerpc: crypto: sysfs routines and docs for the nx
- device driver
-Date: Wed, 21 Mar 2012 16:41:20 -0500
-Message-ID: <1332366080.3858.52.camel@key-ThinkPad-W510>
+Subject: [PATCH 13/17] powerpc: crypto: SHA512 hash routines for nx
+ encryption
+Date: Wed, 21 Mar 2012 16:40:52 -0500
+Message-ID: <1332366052.3858.48.camel@key-ThinkPad-W510>
 References: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -15,83 +15,23 @@ In-Reply-To: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These routines add sysfs files supporting the Power7+ in-Nest encryption
-accelerator driver.
+These routines add support for SHA-512 hashing on the Power7+ CPU's
+in-Nest accelerator driver.
 
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- Documentation/powerpc/pfo-nx-crypto.txt |   52 ++++++++
- arch/powerpc/crypto/nx/nx_sysfs.c       |  194 +++++++++++++++++++++++++++++++
- 2 files changed, 246 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/powerpc/pfo-nx-crypto.txt
- create mode 100644 arch/powerpc/crypto/nx/nx_sysfs.c
+ arch/powerpc/crypto/nx/nx-sha512.c |  259 ++++++++++++++++++++++++++++++++++++
+ 1 files changed, 259 insertions(+), 0 deletions(-)
+ create mode 100644 arch/powerpc/crypto/nx/nx-sha512.c
 
-diff --git a/Documentation/powerpc/pfo-nx-crypto.txt b/Documentation/powerpc/pfo-nx-crypto.txt
+diff --git a/arch/powerpc/crypto/nx/nx-sha512.c b/arch/powerpc/crypto/nx/nx-sha512.c
 new file mode 100644
-index 0000000..63440d3
+index 0000000..4f8a43b
 --- /dev/null
-+++ b/Documentation/powerpc/pfo-nx-crypto.txt
-@@ -0,0 +1,52 @@
-+
-+Documentation for the sysfs interfaces provided by the nx-crypto driver, built
-+in arch/powerpc/crypto/nx.
-+
-+The driver provides 2 sets of sysfs files, 1 for confirming that the device is
-+actually being used and 1 for error detection.
-+
-+All sysfs files can be found in:
-+
-+	/sys/bus/vio/drivers/nx
-+
-+Error Detection
-+===============
-+
-+errors:
-+- A u32 providing a total count of errors since the driver was loaded. The
-+only errors counted here are those returned from the hcall, H_COP_OP.
-+
-+last_error:
-+- The most recent non-zero return code from the H_COP_OP hcall. -EBUSY is not
-+recorded here (the hcall will retry until -EBUSY goes away).
-+
-+last_error_pid:
-+- The process ID of the process who received the most recent error from the
-+hcall.
-+
-+Notes on error detection:
-+  H_RH_PARM (invalid hardware resource ID) and H_HARDWARE (hardware failure)
-+are not recorded in the errors or last_error sysfs files, since they are
-+signals to the driver to fall back to software.
-+
-+Device Use
-+==========
-+
-+aes_bytes:
-+- The total number of bytes encrypted using AES in any of the driver's
-+supported modes.
-+
-+aes_ops:
-+- The total number of AES operations submitted to the hardware.
-+
-+sha256_bytes:
-+- The total number of bytes hashed by the hardware using SHA-256.
-+
-+sha256_ops:
-+- The total number of SHA-256 operations submitted to the hardware.
-+
-+sha512_bytes:
-+- The total number of bytes hashed by the hardware using SHA-512.
-+
-+sha512_ops:
-+- The total number of SHA-512 operations submitted to the hardware.
-diff --git a/arch/powerpc/crypto/nx/nx_sysfs.c b/arch/powerpc/crypto/nx/nx_sysfs.c
-new file mode 100644
-index 0000000..02c84e7
---- /dev/null
-+++ b/arch/powerpc/crypto/nx/nx_sysfs.c
-@@ -0,0 +1,194 @@
++++ b/arch/powerpc/crypto/nx/nx-sha512.c
+@@ -0,0 +1,259 @@
 +/**
-+ * sysfs routines supporting the Power 7+ Nest Accelerators driver
++ * SHA-512 routines supporting the Power 7+ Nest Accelerators driver
 + *
 + * Copyright (C) 2011-2012 International Business Machines Inc.
 + *
@@ -111,178 +51,243 @@ index 0000000..02c84e7
 + * Author: Kent Yoder <yoder1@us.ibm.com>
 + */
 +
-+#include <linux/device.h>
-+#include <linux/kobject.h>
-+#include <linux/string.h>
-+#include <linux/sysfs.h>
++#include <crypto/internal/hash.h>
++#include <crypto/sha.h>
 +#include <linux/module.h>
-+#include <linux/init.h>
-+#include <linux/crypto.h>
-+#include <crypto/hash.h>
 +#include <asm/vio.h>
 +
 +#include "nx_csbcpb.h"
 +#include "nx.h"
 +
 +
-+/* sysfs attributes and callbacks
-+ *
-+ * For documentation on these attributes, please see:
-+ *
-+ * Documentation/powerpc/pfo-nx-crypto.txt
-+ */
-+static ssize_t
-+nx_attr_show_sha256_ops(struct device_driver *driver, char *buf)
++static int nx_sha512_init(struct shash_desc *desc)
 +{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.sha256_ops));
-+}
-+static DRIVER_ATTR(sha256_ops, S_IRUGO, nx_attr_show_sha256_ops, NULL);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_sg *out_sg;
 +
-+static ssize_t
-+nx_attr_show_sha256_bytes(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%ld\n",
-+		       atomic64_read(&nx_driver.stats.sha256_bytes));
-+}
-+static DRIVER_ATTR(sha256_bytes, S_IRUGO, nx_attr_show_sha256_bytes, NULL);
++	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
 +
-+static ssize_t
-+nx_attr_show_sha512_ops(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.sha512_ops));
-+}
-+static DRIVER_ATTR(sha512_ops, S_IRUGO, nx_attr_show_sha512_ops, NULL);
++	memset(sctx, 0, sizeof *sctx);
 +
-+static ssize_t
-+nx_attr_show_sha512_bytes(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%ld\n",
-+		       atomic64_read(&nx_driver.stats.sha512_bytes));
-+}
-+static DRIVER_ATTR(sha512_bytes, S_IRUGO, nx_attr_show_sha512_bytes, NULL);
++	nx_ctx->ap = &nx_ctx->props[NX_PROPS_SHA512];
 +
-+static ssize_t
-+nx_attr_show_aes_ops(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.aes_ops));
-+}
-+static DRIVER_ATTR(aes_ops, S_IRUGO, nx_attr_show_aes_ops, NULL);
++	nx_ctx->csbcpb->cpb.hdr.digest_size = NX_DS_SHA512;
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
++				  SHA512_DIGEST_SIZE, nx_ctx->ap->sglen);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
 +
-+static ssize_t
-+nx_attr_show_aes_bytes(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%ld\n", atomic64_read(&nx_driver.stats.aes_bytes));
++	return 0;
 +}
-+static DRIVER_ATTR(aes_bytes, S_IRUGO, nx_attr_show_aes_bytes, NULL);
 +
-+static ssize_t
-+nx_attr_show_sync_ops(struct device_driver *driver, char *buf)
++static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
++			    unsigned int len)
 +{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.sync_ops));
-+}
-+static DRIVER_ATTR(sync_ops, S_IRUGO, nx_attr_show_sync_ops, NULL);
-+
-+static ssize_t
-+nx_attr_show_errors(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.errors));
-+}
-+static DRIVER_ATTR(errors, S_IRUGO, nx_attr_show_errors, NULL);
-+
-+static ssize_t
-+nx_attr_show_last_error(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%d\n", atomic_read(&nx_driver.stats.last_error));
-+}
-+static DRIVER_ATTR(last_error, S_IRUGO, nx_attr_show_last_error, NULL);
-+
-+static ssize_t
-+nx_attr_show_last_error_pid(struct device_driver *driver, char *buf)
-+{
-+	return sprintf(buf, "%d\n",
-+		       atomic_read(&nx_driver.stats.last_error_pid));
-+}
-+static DRIVER_ATTR(last_error_pid, S_IRUGO, nx_attr_show_last_error_pid, NULL);
-+
-+int
-+nx_sysfs_init(struct device_driver *drv)
-+{
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
++	struct nx_sg *in_sg;
++	u64 to_process, leftover, spbc_bits;
 +	int rc;
 +
-+	rc = driver_create_file(drv, &driver_attr_aes_ops);
++	if (csbcpb->cpb.hdr.fdm.continuation == 1) {
++		/* we've hit the nx chip previously and we're updating again,
++		 * so copy over the partial digest */
++		memcpy(csbcpb->cpb.sha512.input_partial_digest,
++		       csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
++	}
++
++	/* 2 cases for total data len:
++	 *  1: <= SHA512_BLOCK_SIZE: copy into state, return 0
++	 *  2: > SHA512_BLOCK_SIZE: process X blocks, copy in leftover
++	 */
++	if ((u64)len + sctx->count[0] <= SHA512_BLOCK_SIZE) {
++		memcpy(sctx->buf + sctx->count[0], data, len);
++		sctx->count[0] += len;
++		return 0;
++	}
++
++	/* to_process: the SHA512_BLOCK_SIZE data chunk to process in this
++	 * update */
++	to_process = (sctx->count[0] + len) & ~(SHA512_BLOCK_SIZE - 1);
++	leftover = (sctx->count[0] + len) & (SHA512_BLOCK_SIZE - 1);
++
++	if (sctx->count[0]) {
++		in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)sctx->buf,
++					 sctx->count[0], nx_ctx->ap->sglen);
++		in_sg = nx_build_sg_list(in_sg, (u8 *)data,
++					 to_process - sctx->count[0],
++					 nx_ctx->ap->sglen);
++		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
++					sizeof(struct nx_sg);
++	} else {
++		in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)data,
++					 to_process, nx_ctx->ap->sglen);
++		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
++					sizeof(struct nx_sg);
++	}
++
++	csbcpb->cpb.hdr.fdm.intermediate = 1;
++
++	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen)
++		return -EINVAL;
++
++	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
 +	if (rc)
 +		goto out;
 +
-+	rc = driver_create_file(drv, &driver_attr_aes_bytes);
-+	if (rc)
-+		goto out2_unreg;
++	atomic_inc(&(nx_ctx->stats->sha512_ops));
 +
-+	rc = driver_create_file(drv, &driver_attr_sync_ops);
-+	if (rc)
-+		goto out3_unreg;
++	/* copy the leftover back into the state struct */
++	memcpy(sctx->buf, data + len - leftover, leftover);
++	sctx->count[0] = leftover;
 +
-+	rc = driver_create_file(drv, &driver_attr_sha256_ops);
-+	if (rc)
-+		goto out4_unreg;
++	spbc_bits = csbcpb->cpb.sha512.spbc * 8;
++	csbcpb->cpb.sha512.message_bit_length_lo += spbc_bits;
++	if (csbcpb->cpb.sha512.message_bit_length_lo < spbc_bits)
++		csbcpb->cpb.sha512.message_bit_length_hi++;
 +
-+	rc = driver_create_file(drv, &driver_attr_sha256_bytes);
-+	if (rc)
-+		goto out5_unreg;
-+
-+	rc = driver_create_file(drv, &driver_attr_sha512_ops);
-+	if (rc)
-+		goto out6_unreg;
-+
-+	rc = driver_create_file(drv, &driver_attr_sha512_bytes);
-+	if (rc)
-+		goto out7_unreg;
-+
-+	rc = driver_create_file(drv, &driver_attr_errors);
-+	if (rc)
-+		goto out8_unreg;
-+
-+	rc = driver_create_file(drv, &driver_attr_last_error);
-+	if (rc)
-+		goto out9_unreg;
-+
-+	rc = driver_create_file(drv, &driver_attr_last_error_pid);
-+	if (rc)
-+		goto out10_unreg;
-+
-+	goto out;
-+
-+out10_unreg:
-+	driver_remove_file(drv, &driver_attr_last_error);
-+out9_unreg:
-+	driver_remove_file(drv, &driver_attr_errors);
-+out8_unreg:
-+	driver_remove_file(drv, &driver_attr_sha512_bytes);
-+out7_unreg:
-+	driver_remove_file(drv, &driver_attr_sha512_ops);
-+out6_unreg:
-+	driver_remove_file(drv, &driver_attr_sha256_bytes);
-+out5_unreg:
-+	driver_remove_file(drv, &driver_attr_sha256_ops);
-+out4_unreg:
-+	driver_remove_file(drv, &driver_attr_sync_ops);
-+out3_unreg:
-+	driver_remove_file(drv, &driver_attr_aes_bytes);
-+out2_unreg:
-+	driver_remove_file(drv, &driver_attr_aes_ops);
++	/* everything after the first update is continuation */
++	csbcpb->cpb.hdr.fdm.continuation = 1;
 +out:
 +	return rc;
 +}
 +
-+void
-+nx_sysfs_fini(struct device_driver *drv)
++static int nx_sha512_final(struct shash_desc *desc, u8 *out)
 +{
-+	driver_remove_file(drv, &driver_attr_sync_ops);
-+	driver_remove_file(drv, &driver_attr_aes_bytes);
-+	driver_remove_file(drv, &driver_attr_aes_ops);
-+	driver_remove_file(drv, &driver_attr_sha256_bytes);
-+	driver_remove_file(drv, &driver_attr_sha256_ops);
-+	driver_remove_file(drv, &driver_attr_sha512_bytes);
-+	driver_remove_file(drv, &driver_attr_sha512_ops);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
++	struct nx_sg *in_sg, *out_sg;
++	u64 count0;
++	int rc;
++
++	if (csbcpb->cpb.hdr.fdm.continuation == 1) {
++		/* we've hit the nx chip previously, now we're finalizing,
++		 * so copy over the partial digest */
++		memcpy(csbcpb->cpb.sha512.input_partial_digest,
++		       csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
++	}
++
++	/* final is represented by continuing the operation and indicating that
++	 * this is not an intermediate operation */
++	csbcpb->cpb.hdr.fdm.intermediate = 0;
++
++	count0 = sctx->count[0] * 8;
++
++	csbcpb->cpb.sha512.message_bit_length_lo += count0;
++	if (csbcpb->cpb.sha512.message_bit_length_lo < count0)
++		csbcpb->cpb.sha512.message_bit_length_hi++;
++
++	in_sg = nx_build_sg_list(nx_ctx->in_sg, sctx->buf, sctx->count[0],
++				 nx_ctx->ap->sglen);
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, SHA512_DIGEST_SIZE,
++				  nx_ctx->ap->sglen);
++	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
++	if (!nx_ctx->op.outlen)
++		return -EINVAL;
++
++	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
++	if (rc)
++		goto out;
++
++	atomic_inc(&(nx_ctx->stats->sha512_ops));
++	atomic64_add(csbcpb->cpb.sha512.message_bit_length_lo,
++		     &(nx_ctx->stats->sha512_bytes));
++
++	memcpy(out, csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
++out:
++	return rc;
 +}
++
++static int nx_sha512_export(struct shash_desc *desc, void *out)
++{
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
++	struct sha512_state *octx = out;
++
++	/* move message_bit_length (128 bits) into count and convert its value
++	 * to bytes */
++	octx->count[0] = csbcpb->cpb.sha512.message_bit_length_lo >> 3 |
++			 ((csbcpb->cpb.sha512.message_bit_length_hi & 7) << 61);
++	octx->count[1] = csbcpb->cpb.sha512.message_bit_length_hi >> 3;
++
++	octx->count[0] += sctx->count[0];
++	if (octx->count[0] < sctx->count[0])
++		octx->count[1]++;
++
++	memcpy(octx->buf, sctx->buf, sizeof(octx->buf));
++
++	/* if no data has been processed yet, we need to export SHA512's
++	 * initial data, in case this context gets imported into a software
++	 * context */
++	if (csbcpb->cpb.sha512.message_bit_length_hi ||
++	    csbcpb->cpb.sha512.message_bit_length_lo)
++		memcpy(octx->state, csbcpb->cpb.sha512.message_digest,
++		       SHA512_DIGEST_SIZE);
++	else {
++		octx->state[0] = SHA512_H0;
++		octx->state[1] = SHA512_H1;
++		octx->state[2] = SHA512_H2;
++		octx->state[3] = SHA512_H3;
++		octx->state[4] = SHA512_H4;
++		octx->state[5] = SHA512_H5;
++		octx->state[6] = SHA512_H6;
++		octx->state[7] = SHA512_H7;
++	}
++
++	return 0;
++}
++
++static int nx_sha512_import(struct shash_desc *desc, const void *in)
++{
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
++	const struct sha512_state *ictx = in;
++
++	memcpy(sctx->buf, ictx->buf, sizeof(ictx->buf));
++	sctx->count[0] = ictx->count[0] & 0x3f;
++	csbcpb->cpb.sha512.message_bit_length_lo = (ictx->count[0] & ~0x3f)
++							<< 3;
++	csbcpb->cpb.sha512.message_bit_length_hi = ictx->count[1] << 3 |
++						   ictx->count[0] >> 61;
++
++	if (csbcpb->cpb.sha512.message_bit_length_hi ||
++	    csbcpb->cpb.sha512.message_bit_length_lo) {
++		memcpy(csbcpb->cpb.sha512.message_digest, ictx->state,
++		       SHA512_DIGEST_SIZE);
++
++		csbcpb->cpb.hdr.fdm.continuation = 1;
++		csbcpb->cpb.hdr.fdm.intermediate = 1;
++	}
++
++	return 0;
++}
++
++struct shash_alg nx_shash_sha512_alg = {
++	.digestsize = SHA512_DIGEST_SIZE,
++	.init       = nx_sha512_init,
++	.update     = nx_sha512_update,
++	.final      = nx_sha512_final,
++	.export     = nx_sha512_export,
++	.import     = nx_sha512_import,
++	.descsize   = sizeof(struct sha512_state),
++	.statesize  = sizeof(struct sha512_state),
++	.base       = {
++		.cra_name        = "sha512",
++		.cra_driver_name = "sha512-nx",
++		.cra_priority    = 300,
++		.cra_flags       = CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize   = SHA512_BLOCK_SIZE,
++		.cra_module      = THIS_MODULE,
++		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
++		.cra_init        = nx_crypto_ctx_sha_init,
++		.cra_exit        = nx_crypto_ctx_exit,
++	}
++};
 -- 
 1.7.1
