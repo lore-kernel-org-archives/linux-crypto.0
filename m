@@ -1,8 +1,8 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH 00/17] Platform Facilities Option and crypto accelerator
- driver
-Date: Wed, 21 Mar 2012 16:28:17 -0500
-Message-ID: <1332365297.3858.5.camel@key-ThinkPad-W510>
+Subject: [PATCH 01/17] powerpc: Add new hvcall constants to support PFO
+Date: Wed, 21 Mar 2012 16:37:34 -0500
+Message-ID: <1332365854.3858.24.camel@key-ThinkPad-W510>
+References: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
@@ -10,91 +10,71 @@ Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
 	benh@kernel.crashing.org, linuxppc-dev@lists.ozlabs.org
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e33.co.us.ibm.com ([32.97.110.151]:56196 "EHLO
-	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753148Ab2CUV21 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Mar 2012 17:28:27 -0400
+Received: from e4.ny.us.ibm.com ([32.97.182.144]:36527 "EHLO e4.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758023Ab2CUVhX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Mar 2012 17:37:23 -0400
 Received: from /spool/local
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	by e4.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
-	Wed, 21 Mar 2012 15:28:25 -0600
+	Wed, 21 Mar 2012 17:37:21 -0400
+In-Reply-To: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch series adds support for a new device type, the Platform
-Facilities Option (PFO).  PFO resources are a set of accelerators that
-share some system resources managed by the VIO bus.  This patchset
-includes the basic support for the devices in the VIO bus code along
-with drivers for the random number generator and the cryptographic
-accelerators.
+From: Robert Jennings <rcj@linux.vnet.ibm.com>
 
-Please cc me on replies.
+The Platform Facilities Option (PFO) adds several new h_calls and
+more return codes.
 
-Thanks,
-Kent
+Signed-off-by: Robert Jennings <rcj@linux.vnet.ibm.com>
+Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
+---
+ arch/powerpc/include/asm/hvcall.h |   25 +++++++++++++++++++++++--
+ 1 files changed, 23 insertions(+), 2 deletions(-)
 
-Kent Yoder (12):
-  powerpc: crypto: AES-CBC mode routines for nx encryption
-  powerpc: crypto: AES-CCM mode routines for nx encryption
-  powerpc: crypto: AES-CTR mode routines for nx encryption
-  powerpc: crypto: AES-ECB mode routines for nx encryption
-  powerpc: crypto: AES-GCM mode routines for nx encryption
-  powerpc: crypto: AES-XCBC mode routines for nx encryption
-  powerpc: crypto: SHA256 hash routines for nx encryption
-  powerpc: crypto: SHA512 hash routines for nx encryption
-  powerpc: crypto: nx driver code supporting nx encryption
-  powerpc: crypto: sysfs routines and docs for the nx device driver
-  powerpc: crypto: Build files for the nx device driver
-  powerpc: crypto: enable the PFO-based encryption device
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index 1c324ff..6122523 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -77,8 +77,27 @@
+ #define H_MR_CONDITION  -43
+ #define H_NOT_ENOUGH_RESOURCES -44
+ #define H_R_STATE       -45
+-#define H_RESCINDEND    -46
+-#define H_MULTI_THREADS_ACTIVE -9005
++#define H_RESCINDED     -46
++#define H_P2		-55
++#define H_P3		-56
++#define H_P4		-57
++#define H_P5		-58
++#define H_P6		-59
++#define H_P7		-60
++#define H_P8		-61
++#define H_P9		-62
++#define H_TOO_BIG	-64
++#define H_OVERLAP	-68
++#define H_INTERRUPT	-69
++#define H_BAD_DATA	-70
++#define H_NOT_ACTIVE	-71
++#define H_SG_LIST	-72
++#define H_OP_MODE	-73
++#define H_COP_HW	-74
++#define H_UNSUPPORTED_FLAG_START	-256
++#define H_UNSUPPORTED_FLAG_END		-511
++#define H_MULTI_THREADS_ACTIVE	-9005
++#define H_OUTSTANDING_COP_OPS	-9006
+ 
 
-Michael Neuling (1):
-  hwrng: pseries - PFO-based hwrng driver
-
-Robert Jennings (4):
-  powerpc: Add new hvcall constants to support PFO
-  powerpc: Add pseries update notifier for OFDT prop changes
-  powerpc: Add PFO support to the VIO bus
-  pseries: Enabled the PFO-based RNG accelerator
-
- Documentation/powerpc/pfo-nx-crypto.txt     |   52 ++
- arch/powerpc/Makefile                       |    1 +
- arch/powerpc/crypto/nx/Makefile             |   11 +
- arch/powerpc/crypto/nx/nx-aes-cbc.c         |  135 +++++
- arch/powerpc/crypto/nx/nx-aes-ccm.c         |  466 ++++++++++++++++++
- arch/powerpc/crypto/nx/nx-aes-ctr.c         |  175 +++++++
- arch/powerpc/crypto/nx/nx-aes-ecb.c         |  133 +++++
- arch/powerpc/crypto/nx/nx-aes-gcm.c         |  352 +++++++++++++
- arch/powerpc/crypto/nx/nx-aes-xcbc.c        |  230 +++++++++
- arch/powerpc/crypto/nx/nx-sha256.c          |  240 +++++++++
- arch/powerpc/crypto/nx/nx-sha512.c          |  259 ++++++++++
- arch/powerpc/crypto/nx/nx.c                 |  710 +++++++++++++++++++++++++++
- arch/powerpc/crypto/nx/nx.h                 |  190 +++++++
- arch/powerpc/crypto/nx/nx_csbcpb.h          |  246 +++++++++
- arch/powerpc/crypto/nx/nx_sysfs.c           |  194 ++++++++
- arch/powerpc/include/asm/hvcall.h           |   25 +-
- arch/powerpc/include/asm/pSeries_reconfig.h |   12 +
- arch/powerpc/include/asm/vio.h              |   46 ++
- arch/powerpc/kernel/prom_init.c             |   19 +-
- arch/powerpc/kernel/vio.c                   |  274 +++++++++--
- arch/powerpc/platforms/pseries/reconfig.c   |    7 +
- drivers/char/hw_random/Kconfig              |   13 +
- drivers/char/hw_random/Makefile             |    1 +
- drivers/char/hw_random/pseries-rng.c        |   99 ++++
- drivers/crypto/Kconfig                      |   18 +
- 25 files changed, 3865 insertions(+), 43 deletions(-)
- create mode 100644 Documentation/powerpc/pfo-nx-crypto.txt
- create mode 100644 arch/powerpc/crypto/nx/Makefile
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-cbc.c
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-ccm.c
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-ctr.c
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-ecb.c
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-gcm.c
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-xcbc.c
- create mode 100644 arch/powerpc/crypto/nx/nx-sha256.c
- create mode 100644 arch/powerpc/crypto/nx/nx-sha512.c
- create mode 100644 arch/powerpc/crypto/nx/nx.c
- create mode 100644 arch/powerpc/crypto/nx/nx.h
- create mode 100644 arch/powerpc/crypto/nx/nx_csbcpb.h
- create mode 100644 arch/powerpc/crypto/nx/nx_sysfs.c
- create mode 100644 drivers/char/hw_random/pseries-rng.c
+ /* Long Busy is a condition that can be returned by the firmware
+@@ -240,6 +259,8 @@
+ #define H_GET_MPP		0x2D4
+ #define H_HOME_NODE_ASSOCIATIVITY 0x2EC
+ #define H_BEST_ENERGY		0x2F4
++#define H_RANDOM		0x300
++#define H_COP			0x304
+ #define H_GET_MPP_X		0x314
+ #define MAX_HCALL_OPCODE	H_GET_MPP_X
+ 
+-- 
+1.7.1
