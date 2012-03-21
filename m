@@ -1,8 +1,8 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH 06/17] powerpc: crypto: AES-CBC mode routines for nx
+Subject: [PATCH 09/17] powerpc: crypto: AES-ECB mode routines for nx
  encryption
-Date: Wed, 21 Mar 2012 16:39:28 -0500
-Message-ID: <1332365968.3858.34.camel@key-ThinkPad-W510>
+Date: Wed, 21 Mar 2012 16:40:10 -0500
+Message-ID: <1332366010.3858.40.camel@key-ThinkPad-W510>
 References: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -15,23 +15,23 @@ In-Reply-To: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These routines add support for AES in CBC mode on the Power7+ CPU's
+These routines add support for AES in ECB mode on the Power7+ CPU's
 in-Nest accelerator driver.
 
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- arch/powerpc/crypto/nx/nx-aes-cbc.c |  135 +++++++++++++++++++++++++++++++++++
- 1 files changed, 135 insertions(+), 0 deletions(-)
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-cbc.c
+ arch/powerpc/crypto/nx/nx-aes-ecb.c |  133 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 133 insertions(+), 0 deletions(-)
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-ecb.c
 
-diff --git a/arch/powerpc/crypto/nx/nx-aes-cbc.c b/arch/powerpc/crypto/nx/nx-aes-cbc.c
+diff --git a/arch/powerpc/crypto/nx/nx-aes-ecb.c b/arch/powerpc/crypto/nx/nx-aes-ecb.c
 new file mode 100644
-index 0000000..01fa5cb
+index 0000000..7ceef65
 --- /dev/null
-+++ b/arch/powerpc/crypto/nx/nx-aes-cbc.c
-@@ -0,0 +1,135 @@
++++ b/arch/powerpc/crypto/nx/nx-aes-ecb.c
+@@ -0,0 +1,133 @@
 +/**
-+ * AES CBC routines supporting the Power 7+ Nest Accelerators driver
++ * AES ECB routines supporting the Power 7+ Nest Accelerators driver
 + *
 + * Copyright (C) 2011-2012 International Business Machines Inc.
 + *
@@ -62,12 +62,12 @@ index 0000000..01fa5cb
 +#include "nx.h"
 +
 +
-+static int cbc_aes_nx_set_key(struct crypto_tfm *tfm,
++static int ecb_aes_nx_set_key(struct crypto_tfm *tfm,
 +			      const u8          *in_key,
 +			      unsigned int       key_len)
 +{
 +	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
 +
 +	nx_ctx_init(nx_ctx, HCOP_FC_AES);
 +
@@ -88,13 +88,13 @@ index 0000000..01fa5cb
 +		return -EINVAL;
 +	}
 +
-+	csbcpb->cpb.hdr.mode = NX_MODE_AES_CBC;
-+	memcpy(csbcpb->cpb.aes_cbc.key, in_key, key_len);
++	csbcpb->cpb.hdr.mode = NX_MODE_AES_ECB;
++	memcpy(csbcpb->cpb.aes_ecb.key, in_key, key_len);
 +
 +	return 0;
 +}
 +
-+static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
++static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
 +			    struct scatterlist    *dst,
 +			    struct scatterlist    *src,
 +			    unsigned int           nbytes,
@@ -109,8 +109,7 @@ index 0000000..01fa5cb
 +
 +	csbcpb->cpb.hdr.fdm.ende = enc;
 +
-+	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes,
-+			       csbcpb->cpb.aes_cbc.iv);
++	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, NULL);
 +	if (rc)
 +		goto out;
 +
@@ -128,41 +127,40 @@ index 0000000..01fa5cb
 +	return rc;
 +}
 +
-+static int cbc_aes_nx_encrypt(struct blkcipher_desc *desc,
++static int ecb_aes_nx_encrypt(struct blkcipher_desc *desc,
 +			      struct scatterlist    *dst,
 +			      struct scatterlist    *src,
 +			      unsigned int           nbytes)
 +{
-+	return cbc_aes_nx_crypt(desc, dst, src, nbytes, 1);
++	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 1);
 +}
 +
-+static int cbc_aes_nx_decrypt(struct blkcipher_desc *desc,
++static int ecb_aes_nx_decrypt(struct blkcipher_desc *desc,
 +			      struct scatterlist    *dst,
 +			      struct scatterlist    *src,
 +			      unsigned int           nbytes)
 +{
-+	return cbc_aes_nx_crypt(desc, dst, src, nbytes, 0);
++	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 0);
 +}
 +
-+struct crypto_alg nx_cbc_aes_alg = {
-+	.cra_name        = "cbc(aes)",
-+	.cra_driver_name = "cbc-aes-nx",
++struct crypto_alg nx_ecb_aes_alg = {
++	.cra_name        = "ecb(aes)",
++	.cra_driver_name = "ecb-aes-nx",
 +	.cra_priority    = 300,
 +	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
 +	.cra_blocksize   = AES_BLOCK_SIZE,
 +	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
 +	.cra_type        = &crypto_blkcipher_type,
 +	.cra_module      = THIS_MODULE,
-+	.cra_list        = LIST_HEAD_INIT(nx_cbc_aes_alg.cra_list),
-+	.cra_init        = nx_crypto_ctx_aes_cbc_init,
++	.cra_list        = LIST_HEAD_INIT(nx_ecb_aes_alg.cra_list),
++	.cra_init        = nx_crypto_ctx_aes_ecb_init,
 +	.cra_exit        = nx_crypto_ctx_exit,
 +	.cra_blkcipher = {
 +		.min_keysize = AES_MIN_KEY_SIZE,
 +		.max_keysize = AES_MAX_KEY_SIZE,
-+		.ivsize      = AES_BLOCK_SIZE,
-+		.setkey      = cbc_aes_nx_set_key,
-+		.encrypt     = cbc_aes_nx_encrypt,
-+		.decrypt     = cbc_aes_nx_decrypt,
++		.setkey      = ecb_aes_nx_set_key,
++		.encrypt     = ecb_aes_nx_encrypt,
++		.decrypt     = ecb_aes_nx_decrypt,
 +	}
 +};
 -- 
