@@ -1,209 +1,113 @@
-From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH 08/17] powerpc: crypto: AES-CTR mode routines for nx
- encryption
-Date: Wed, 21 Mar 2012 16:40:01 -0500
-Message-ID: <1332366001.3858.38.camel@key-ThinkPad-W510>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 15/17] powerpc: crypto: sysfs routines and docs for the
+ nx device driver
+Date: Wed, 21 Mar 2012 15:11:22 -0700
+Message-ID: <20120321221122.GA30748@kroah.com>
 References: <1332365297.3858.5.camel@key-ThinkPad-W510>
+ <1332366080.3858.52.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
-	benh@kernel.crashing.org, linuxppc-dev@lists.ozlabs.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1332365297.3858.5.camel@key-ThinkPad-W510>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	rcj@linux.vnet.ibm.com, benh@kernel.crashing.org,
+	linuxppc-dev@lists.ozlabs.org
+To: Kent Yoder <key@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:57269 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756583Ab2CUWL0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Mar 2012 18:11:26 -0400
+Received: by pbcun15 with SMTP id un15so1081255pbc.19
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Mar 2012 15:11:25 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1332366080.3858.52.camel@key-ThinkPad-W510>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-These routines add support for AES in CTR mode on the Power7+ CPU's
-in-Nest accelerator driver.
+On Wed, Mar 21, 2012 at 04:41:20PM -0500, Kent Yoder wrote:
+> These routines add sysfs files supporting the Power7+ in-Nest encryption
+> accelerator driver.
+> 
+> Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
+> ---
+>  Documentation/powerpc/pfo-nx-crypto.txt |   52 ++++++++
 
-Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
----
- arch/powerpc/crypto/nx/nx-aes-ctr.c |  175 +++++++++++++++++++++++++++++++++++
- 1 files changed, 175 insertions(+), 0 deletions(-)
- create mode 100644 arch/powerpc/crypto/nx/nx-aes-ctr.c
+Please put sysfs file information in Documentation/ABI/ where it
+belongs.
 
-diff --git a/arch/powerpc/crypto/nx/nx-aes-ctr.c b/arch/powerpc/crypto/nx/nx-aes-ctr.c
-new file mode 100644
-index 0000000..a1ea44e
---- /dev/null
-+++ b/arch/powerpc/crypto/nx/nx-aes-ctr.c
-@@ -0,0 +1,175 @@
-+/**
-+ * AES CTR routines supporting the Power 7+ Nest Accelerators driver
-+ *
-+ * Copyright (C) 2011-2012 International Business Machines Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 only.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-+ *
-+ * Author: Kent Yoder <yoder1@us.ibm.com>
-+ */
-+
-+#include <crypto/aes.h>
-+#include <crypto/ctr.h>
-+#include <crypto/algapi.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/crypto.h>
-+#include <asm/vio.h>
-+
-+#include "nx_csbcpb.h"
-+#include "nx.h"
-+
-+
-+static int ctr_aes_nx_set_key(struct crypto_tfm *tfm,
-+			      const u8          *in_key,
-+			      unsigned int       key_len)
-+{
-+	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
-+
-+	nx_ctx_init(nx_ctx, HCOP_FC_AES);
-+
-+	switch (key_len) {
-+	case AES_KEYSIZE_128:
-+		csbcpb->cpb.hdr.key_size = NX_KS_AES_128;
-+		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_128];
-+		break;
-+	case AES_KEYSIZE_192:
-+		csbcpb->cpb.hdr.key_size = NX_KS_AES_192;
-+		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_192];
-+		break;
-+	case AES_KEYSIZE_256:
-+		csbcpb->cpb.hdr.key_size = NX_KS_AES_256;
-+		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_256];
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	csbcpb->cpb.hdr.mode = NX_MODE_AES_CTR;
-+	memcpy(csbcpb->cpb.aes_ctr.key, in_key, key_len);
-+
-+	return 0;
-+}
-+
-+static int ctr3686_aes_nx_set_key(struct crypto_tfm *tfm,
-+				  const u8          *in_key,
-+				  unsigned int       key_len)
-+{
-+	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-+
-+	if (key_len < CTR_RFC3686_NONCE_SIZE)
-+		return -EINVAL;
-+
-+	memcpy(nx_ctx->priv.ctr.iv,
-+	       in_key + key_len - CTR_RFC3686_NONCE_SIZE,
-+	       CTR_RFC3686_NONCE_SIZE);
-+
-+	key_len -= CTR_RFC3686_NONCE_SIZE;
-+
-+	return ctr_aes_nx_set_key(tfm, in_key, key_len);
-+}
-+
-+static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
-+			    struct scatterlist    *dst,
-+			    struct scatterlist    *src,
-+			    unsigned int           nbytes)
-+{
-+	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
-+	int rc;
-+
-+	if (nbytes > nx_ctx->ap->databytelen)
-+		return -EINVAL;
-+
-+	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes,
-+			       csbcpb->cpb.aes_ctr.iv);
-+	if (rc)
-+		goto out;
-+
-+	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen)
-+		return -EINVAL;
-+
-+	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
-+	if (rc)
-+		goto out;
-+
-+	atomic_inc(&(nx_ctx->stats->aes_ops));
-+	atomic64_add(csbcpb->csb.processed_byte_count,
-+		     &(nx_ctx->stats->aes_bytes));
-+out:
-+	return rc;
-+}
-+
-+static int ctr3686_aes_nx_crypt(struct blkcipher_desc *desc,
-+				struct scatterlist    *dst,
-+				struct scatterlist    *src,
-+				unsigned int           nbytes)
-+{
-+	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
-+	u8 *iv = nx_ctx->priv.ctr.iv;
-+
-+	memcpy(iv + CTR_RFC3686_NONCE_SIZE,
-+	       desc->info, CTR_RFC3686_IV_SIZE);
-+	iv[15] = 1;
-+
-+	desc->info = nx_ctx->priv.ctr.iv;
-+
-+	return ctr_aes_nx_crypt(desc, dst, src, nbytes);
-+}
-+
-+struct crypto_alg nx_ctr_aes_alg = {
-+	.cra_name        = "ctr(aes)",
-+	.cra_driver_name = "ctr-aes-nx",
-+	.cra_priority    = 300,
-+	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize   = 1,
-+	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
-+	.cra_type        = &crypto_blkcipher_type,
-+	.cra_module      = THIS_MODULE,
-+	.cra_list        = LIST_HEAD_INIT(nx_ctr_aes_alg.cra_list),
-+	.cra_init        = nx_crypto_ctx_aes_ctr_init,
-+	.cra_exit        = nx_crypto_ctx_exit,
-+	.cra_blkcipher = {
-+		.min_keysize = AES_MIN_KEY_SIZE,
-+		.max_keysize = AES_MAX_KEY_SIZE,
-+		.ivsize      = AES_BLOCK_SIZE,
-+		.setkey      = ctr_aes_nx_set_key,
-+		.encrypt     = ctr_aes_nx_crypt,
-+		.decrypt     = ctr_aes_nx_crypt,
-+	}
-+};
-+
-+struct crypto_alg nx_ctr3686_aes_alg = {
-+	.cra_name        = "rfc3686(ctr(aes))",
-+	.cra_driver_name = "rfc3686-ctr-aes-nx",
-+	.cra_priority    = 300,
-+	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize   = 1,
-+	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
-+	.cra_type        = &crypto_blkcipher_type,
-+	.cra_module      = THIS_MODULE,
-+	.cra_list        = LIST_HEAD_INIT(nx_ctr3686_aes_alg.cra_list),
-+	.cra_init        = nx_crypto_ctx_aes_ctr_init,
-+	.cra_exit        = nx_crypto_ctx_exit,
-+	.cra_blkcipher = {
-+		.min_keysize = AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-+		.max_keysize = AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-+		.ivsize      = CTR_RFC3686_IV_SIZE,
-+		.geniv       = "seqiv",
-+		.setkey      = ctr3686_aes_nx_set_key,
-+		.encrypt     = ctr3686_aes_nx_crypt,
-+		.decrypt     = ctr3686_aes_nx_crypt,
-+	}
-+};
--- 
-1.7.1
+>  arch/powerpc/crypto/nx/nx_sysfs.c       |  194 +++++++++++++++++++++++++++++++
+>  2 files changed, 246 insertions(+), 0 deletions(-)
+>  create mode 100644 Documentation/powerpc/pfo-nx-crypto.txt
+>  create mode 100644 arch/powerpc/crypto/nx/nx_sysfs.c
+> 
+> diff --git a/Documentation/powerpc/pfo-nx-crypto.txt b/Documentation/powerpc/pfo-nx-crypto.txt
+> new file mode 100644
+> index 0000000..63440d3
+> --- /dev/null
+> +++ b/Documentation/powerpc/pfo-nx-crypto.txt
+> @@ -0,0 +1,52 @@
+> +
+> +Documentation for the sysfs interfaces provided by the nx-crypto driver, built
+> +in arch/powerpc/crypto/nx.
+> +
+> +The driver provides 2 sets of sysfs files, 1 for confirming that the device is
+> +actually being used and 1 for error detection.
+
+Shouldn't the first just be debugfs files, as no "normal" user will ever
+care about such a thing?
+
+Actually, why are these sysfs files at all, how about all of this going
+into debugfs?
+
+
+> +Error Detection
+> +===============
+
+<snip>
+
+What can anyone do with any of these files?  What use are they to users?
+
+> +Device Use
+> +==========
+
+Again, what does a user care about these items for?
+
+> +int
+> +nx_sysfs_init(struct device_driver *drv)
+> +{
+> +	int rc;
+> +
+> +	rc = driver_create_file(drv, &driver_attr_aes_ops);
+> +	if (rc)
+> +		goto out;
+
+<snip>
+
+Oh, ${DIETY}, no.  Please don't create files one by one, we do have
+functions that do all of this for you automatically, why aren't you
+using them?
+
+> +void
+> +nx_sysfs_fini(struct device_driver *drv)
+> +{
+> +	driver_remove_file(drv, &driver_attr_sync_ops);
+> +	driver_remove_file(drv, &driver_attr_aes_bytes);
+> +	driver_remove_file(drv, &driver_attr_aes_ops);
+> +	driver_remove_file(drv, &driver_attr_sha256_bytes);
+> +	driver_remove_file(drv, &driver_attr_sha256_ops);
+> +	driver_remove_file(drv, &driver_attr_sha512_bytes);
+> +	driver_remove_file(drv, &driver_attr_sha512_ops);
+
+Same here, don't do this, do it all at once.
+
+> +}
+
+Who is calling these functions?  Where in the device lifecycle are the
+files being created?  Did you just race userspace with how they are
+created, or are you doing it "properly"?  (hint, odds are, as you are
+trying to manually create and remove these by hand, you aren't doing it
+properly...)
+
+thanks,
+
+greg k-h
