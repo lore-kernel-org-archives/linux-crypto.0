@@ -1,123 +1,100 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH v2.2 2/7] crypto: GnuPG based MPI lib - header files (part 2)
-Date: Wed, 21 Mar 2012 09:39:32 +0100
-Message-ID: <CAMuHMdWLixmQ-iSiShRjFHgxPp9MZxUQDA=oYasdZd3WwmqGYg@mail.gmail.com>
-References: <cover.1319025009.git.dmitry.kasatkin@intel.com>
-	<af9b876508ebc83431312aef67b3ae920780bd5c.1319025009.git.dmitry.kasatkin@intel.com>
-	<alpine.DEB.2.00.1203111046110.4778@ayla.of.borg>
+From: Kent Yoder <key@linux.vnet.ibm.com>
+Subject: [PATCH 00/17] Platform Facilities Option and crypto accelerator
+ driver
+Date: Wed, 21 Mar 2012 16:28:17 -0500
+Message-ID: <1332365297.3858.5.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Linux Kernel Development <linux-kernel@vger.kernel.org>,
-	zohar@linux.vnet.ibm.com, dhowells@redhat.com,
-	herbert@gondor.apana.org.au,
-	"Linux/m68k" <linux-m68k@lists.linux-m68k.org>
-To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <alpine.DEB.2.00.1203111046110.4778@ayla.of.borg>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
+	benh@kernel.crashing.org, linuxppc-dev@lists.ozlabs.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e33.co.us.ibm.com ([32.97.110.151]:56196 "EHLO
+	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753148Ab2CUV21 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Mar 2012 17:28:27 -0400
+Received: from /spool/local
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
+	Wed, 21 Mar 2012 15:28:25 -0600
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Ping?
+This patch series adds support for a new device type, the Platform
+Facilities Option (PFO).  PFO resources are a set of accelerators that
+share some system resources managed by the VIO bus.  This patchset
+includes the basic support for the devices in the VIO bus code along
+with drivers for the random number generator and the cryptographic
+accelerators.
 
-On Sun, Mar 11, 2012 at 10:55, Geert Uytterhoeven <geert@linux-m68k.org=
-> wrote:
-> On Wed, 19 Oct 2011, Dmitry Kasatkin wrote:
->> Adds the multi-precision-integer maths library which was originally =
-taken
->> from GnuPG and ported to the kernel by (among others) David Howells.
->> This version is taken from Fedora kernel 2.6.32-71.14.1.el6.
->> The difference is that checkpatch reported errors and warnings have =
-been fixed.
->>
->> This library is used to implemenet RSA digital signature verificatio=
-n
->> used in IMA/EVM integrity protection subsystem.
->
->> --- /dev/null
->> +++ b/lib/mpi/longlong.h
->
->> + =C2=A0 =C2=A0 /* If udiv_qrnnd was not defined for this processor,=
- use __udiv_qrnnd_c. =C2=A0*/
->> +#if !defined(udiv_qrnnd)
->> +#define UDIV_NEEDS_NORMALIZATION 1
->> +#define udiv_qrnnd __udiv_qrnnd_c
->> +#endif
->> +
->> +#undef count_leading_zeros
->
-> Why is this #undef here? It's not present in mpi/longlong.h from Ubun=
-tu's
-> gnupg-1.4.10, and causing ...
->
->> +#if !defined(count_leading_zeros)
->> + =C2=A0 =C2=A0 extern
->> +#ifdef __STDC__
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 const
->> +#endif
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 unsigned char __clz_tab[];
->> +#define count_leading_zeros(count, x) \
->> +do { \
->> + =C2=A0 =C2=A0 UWtype __xr =3D (x); \
->> + =C2=A0 =C2=A0 UWtype __a; \
->> + =C2=A0 =C2=A0 \
->> + =C2=A0 =C2=A0 if (W_TYPE_SIZE <=3D 32) { \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 __a =3D __xr < ((UWtype)=
- 1 << 2*__BITS4) \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ? (__xr < ((UWtype) 1 <<=
- __BITS4) ? 0 : __BITS4) \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 : (__xr < ((UWtype) 1 <<=
- 3*__BITS4) ? =C2=A02*__BITS4 : 3*__BITS4); \
->> + =C2=A0 =C2=A0 } \
->> + =C2=A0 =C2=A0 else { \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (__a =3D W_TYPE_SIZE=
- - 8; __a > 0; __a -=3D 8) \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 if (((__xr >> __a) & 0xff) !=3D 0) \
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break; \
->> + =C2=A0 =C2=A0 } \
->> + =C2=A0 =C2=A0 \
->> + =C2=A0 =C2=A0 (count) =3D W_TYPE_SIZE - (__clz_tab[__xr >> __a] + =
-__a); \
->> +} while (0)
->> + =C2=A0 =C2=A0 /* This version gives a well-defined value for zero.=
- */
->> +#define COUNT_LEADING_ZEROS_0 W_TYPE_SIZE
->
-> lib/mpi/longlong.h:1483:1: warning: "COUNT_LEADING_ZEROS_0" redefined
-> lib/mpi/longlong.h:610:1: warning: this is the location of the previo=
-us definition
->
-> on m68k/allmodconfig.
->
-> I'm also wondering why this warning is not seen on other arches, e.g.=
- PPC
-> #defines COUNT_LEADING_ZEROS_0 to 32, just like m68k.
->
->> +#endif
->
-> I suppose the plan is to clean up this header file, as lots of its
-> functionality is already present in the kernel sources in some other =
-way
-> (e.g. arch/m68k/lib/muldi3.c)?
+Please cc me on replies.
 
-Gr{oetje,eeting}s,
+Thanks,
+Kent
 
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 Geert
+Kent Yoder (12):
+  powerpc: crypto: AES-CBC mode routines for nx encryption
+  powerpc: crypto: AES-CCM mode routines for nx encryption
+  powerpc: crypto: AES-CTR mode routines for nx encryption
+  powerpc: crypto: AES-ECB mode routines for nx encryption
+  powerpc: crypto: AES-GCM mode routines for nx encryption
+  powerpc: crypto: AES-XCBC mode routines for nx encryption
+  powerpc: crypto: SHA256 hash routines for nx encryption
+  powerpc: crypto: SHA512 hash routines for nx encryption
+  powerpc: crypto: nx driver code supporting nx encryption
+  powerpc: crypto: sysfs routines and docs for the nx device driver
+  powerpc: crypto: Build files for the nx device driver
+  powerpc: crypto: enable the PFO-based encryption device
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-=
-m68k.org
+Michael Neuling (1):
+  hwrng: pseries - PFO-based hwrng driver
 
-In personal conversations with technical people, I call myself a hacker=
-=2E But
-when I'm talking to journalists I just say "programmer" or something li=
-ke that.
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0=C2=A0 -- Linus Torvalds
+Robert Jennings (4):
+  powerpc: Add new hvcall constants to support PFO
+  powerpc: Add pseries update notifier for OFDT prop changes
+  powerpc: Add PFO support to the VIO bus
+  pseries: Enabled the PFO-based RNG accelerator
+
+ Documentation/powerpc/pfo-nx-crypto.txt     |   52 ++
+ arch/powerpc/Makefile                       |    1 +
+ arch/powerpc/crypto/nx/Makefile             |   11 +
+ arch/powerpc/crypto/nx/nx-aes-cbc.c         |  135 +++++
+ arch/powerpc/crypto/nx/nx-aes-ccm.c         |  466 ++++++++++++++++++
+ arch/powerpc/crypto/nx/nx-aes-ctr.c         |  175 +++++++
+ arch/powerpc/crypto/nx/nx-aes-ecb.c         |  133 +++++
+ arch/powerpc/crypto/nx/nx-aes-gcm.c         |  352 +++++++++++++
+ arch/powerpc/crypto/nx/nx-aes-xcbc.c        |  230 +++++++++
+ arch/powerpc/crypto/nx/nx-sha256.c          |  240 +++++++++
+ arch/powerpc/crypto/nx/nx-sha512.c          |  259 ++++++++++
+ arch/powerpc/crypto/nx/nx.c                 |  710 +++++++++++++++++++++++++++
+ arch/powerpc/crypto/nx/nx.h                 |  190 +++++++
+ arch/powerpc/crypto/nx/nx_csbcpb.h          |  246 +++++++++
+ arch/powerpc/crypto/nx/nx_sysfs.c           |  194 ++++++++
+ arch/powerpc/include/asm/hvcall.h           |   25 +-
+ arch/powerpc/include/asm/pSeries_reconfig.h |   12 +
+ arch/powerpc/include/asm/vio.h              |   46 ++
+ arch/powerpc/kernel/prom_init.c             |   19 +-
+ arch/powerpc/kernel/vio.c                   |  274 +++++++++--
+ arch/powerpc/platforms/pseries/reconfig.c   |    7 +
+ drivers/char/hw_random/Kconfig              |   13 +
+ drivers/char/hw_random/Makefile             |    1 +
+ drivers/char/hw_random/pseries-rng.c        |   99 ++++
+ drivers/crypto/Kconfig                      |   18 +
+ 25 files changed, 3865 insertions(+), 43 deletions(-)
+ create mode 100644 Documentation/powerpc/pfo-nx-crypto.txt
+ create mode 100644 arch/powerpc/crypto/nx/Makefile
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-cbc.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-ccm.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-ctr.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-ecb.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-gcm.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-aes-xcbc.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-sha256.c
+ create mode 100644 arch/powerpc/crypto/nx/nx-sha512.c
+ create mode 100644 arch/powerpc/crypto/nx/nx.c
+ create mode 100644 arch/powerpc/crypto/nx/nx.h
+ create mode 100644 arch/powerpc/crypto/nx/nx_csbcpb.h
+ create mode 100644 arch/powerpc/crypto/nx/nx_sysfs.c
+ create mode 100644 drivers/char/hw_random/pseries-rng.c
