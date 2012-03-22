@@ -1,33 +1,53 @@
-From: Anton Blanchard <anton@samba.org>
-Subject: Re: [PATCH 05/17] pseries: Enabled the PFO-based RNG accelerator
-Date: Thu, 22 Mar 2012 20:55:56 +1100
-Message-ID: <20120322205556.054c6169@kryten>
-References: <1332365297.3858.5.camel@key-ThinkPad-W510>
-	<1332365949.3858.32.camel@key-ThinkPad-W510>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, rcj@linux.vnet.ibm.com,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Kent Yoder <key@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1332365949.3858.32.camel@key-ThinkPad-W510>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: boris@cloudluca.com
+Subject: Server Rental Service in Hong Kong
+Date: Thu, 22 Mar 2012 18:11:54 +0800 (HKT)
+Message-ID: <g2xmE1@gcn.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 124-248-200-65.sunnyvision.com ([124.248.200.65]:36563 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1755978Ab2CVKk4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 22 Mar 2012 06:40:56 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Dear All,
 
-Hi,
+We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
 
-+#if defined(CONFIG_HW_RANDOM_PSERIES) || \
-+	defined(CONFIG_HW_RANDOM_PSERIES_MODULE)
-+#define OV5_PFO_HW_RNG		0x80	/* PFO Random Number
-Generator */ +#else
-+#define OV5_PFO_HW_RNG		0x00
-+#endif
+Dell=3F PowerEdge=3F EnterpriseRack Mount Server
+-Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
+-8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
+-500GB, 3.5", 6Gbps SAS x 2
+-Raid 1 Mirroring Protection
+-Remote KVM (iDRAC6 Enterprise)
 
-Milton tipped me off about this. We really don't want to be doing
-ibm,client-architecture reboots every time a config option is changed.
+Dell(TM) PowerEdge(TM) R410 Rack Mount Server
+-Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
+-4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
+-500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
+-iDRAC6 Enterprise or Express (Remote KVM Management)
 
-Let's just hardwire it on.
+Every Dedicated Server Hosting Solution Also Includes: 
+ 
+Software Specification 
+- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
+- Full root-level access 
+- Data Center Facilities 
+- Shared Local & International Bandwidth 
+- 2 IP Addresses Allocation 
+- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
+- FM200=A1=A7based fire suppression system 
+- 24x7 CRAC Air Conditioning and Humidity Control 
+- 24x7 Security Control 
+- 24x7 Remote Hand Service 
 
-Anton
+Pls send us email for further information.Thanks,
+
+Boris 
+boris@cloudluca.com
+
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
