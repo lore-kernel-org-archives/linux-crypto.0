@@ -1,8 +1,8 @@
 From: Andreas WESTIN <andreas.westin@stericsson.com>
-Subject: Re: [PATCH 1/3] crypto: ux500: Add driver for CRYP hardware.
-Date: Thu, 22 Mar 2012 09:45:45 +0100
-Message-ID: <4F6AE6B9.5030907@stericsson.com>
-References: <1331714748-25136-1-git-send-email-andreas.westin@stericsson.com> <1331714748-25136-2-git-send-email-andreas.westin@stericsson.com> <20120320193510.d979777aca3d1af0b6ac12dd@freescale.com>
+Subject: Re: [PATCH 2/3] crypto: ux500: Add driver for HASH hardware
+Date: Thu, 22 Mar 2012 09:45:55 +0100
+Message-ID: <4F6AE6C3.6000801@stericsson.com>
+References: <1331714748-25136-1-git-send-email-andreas.westin@stericsson.com> <1331714748-25136-3-git-send-email-andreas.westin@stericsson.com> <20120320193514.5654abff6d656e79f1035717@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -11,447 +11,184 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eu1sys200aog105.obsmtp.com ([207.126.144.119]:41364 "EHLO
-	eu1sys200aog105.obsmtp.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S964887Ab2CVIqO (ORCPT
+Received: from eu1sys200aog119.obsmtp.com ([207.126.144.147]:46076 "EHLO
+	eu1sys200aog119.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S964898Ab2CVIqP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Mar 2012 04:46:14 -0400
-In-Reply-To: <20120320193510.d979777aca3d1af0b6ac12dd@freescale.com>
+	Thu, 22 Mar 2012 04:46:15 -0400
+In-Reply-To: <20120320193514.5654abff6d656e79f1035717@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Kim,
+
 
 On 2012-03-21 01:35, Kim Phillips wrote:
-> On Wed, 14 Mar 2012 09:45:46 +0100
+> On Wed, 14 Mar 2012 09:45:47 +0100
 > Andreas Westin<andreas.westin@stericsson.com>  wrote:
 >
->> +config CRYPTO_DEV_UX500
->> +     tristate "Driver for ST-Ericsson UX500 crypto hardware acceleration"
->
->> +     #depends on ARCH_U8500
->
-> guessing this should be either removed or modified to include u5500?
-
-Yes, I'll look into it.
-
->> +config CRYPTO_DEV_UX500_CRYP
->> +     tristate "UX500 crypto driver for CRYP block"
->> +     depends on CRYPTO_DEV_UX500
->> +     select CRYPTO_DES
->> +     help
->> +       This is the driver for the crypto block CRYP.
->
-> what will its module be called?
-
-I will extend the information in help.
-
->> +config CRYPTO_DEV_UX500_DEBUG
->> +     bool "Activate ux500 platform debug-mode for crypto and hash block"
->> +     depends on CRYPTO_DEV_UX500_CRYP || CRYPTO_DEV_UX500_HASH
->> +     default n
->> +     help
->> +       Say Y if you want to add debug prints to ux500_hash and
->> +       ux500_cryp devices.
->
-> there are better ways to do this now - see dynamic-debug-howto.txt.
-
-This is for compiling the driver with -O0, it makes it easier to debug 
-with a hardware debugger. It's not strictly necessary so it can be removed.
-
->> +     int peripheralID2 = 0;
->
-> mixed-case name
-
-Will fix.
-
+>> diff --git a/drivers/crypto/ux500/hash/hash_alg_p.h b/drivers/crypto/ux500/hash/hash_alg_p.h
+>> new file mode 100644
+>> index 0000000..a44047a
+>> --- /dev/null
+>> +++ b/drivers/crypto/ux500/hash/hash_alg_p.h
+>> @@ -0,0 +1,20 @@
+>> +/*
+>> + * Copyright (C) ST-Ericsson SA 2010
+>> + * Author :  Robert Marklund<robert.marklund@stericsson.com>
+>> + * License terms: GNU General Public License (GPL) version 2
+>> +*/
 >> +
->> +     if (NULL == device_data)
->> +             return -EINVAL;
+>> +#ifndef _HASH_P_H_
+>> +#define _HASH_P_H_
 >> +
->> +     if (cpu_is_u8500())
->> +             peripheralID2 = CRYP_PERIPHERAL_ID2_DB8500;
->> +     else if (cpu_is_u5500())
->> +             peripheralID2 = CRYP_PERIPHERAL_ID2_DB5500;
+>> +/*--------------------------------------------------------------------------*
+>> + * Includes                                                                 *
+>> + *--------------------------------------------------------------------------*/
+>> +#include "hash_alg.h"
 >> +
->> +     /* Check Peripheral and Pcell Id Register for CRYP */
->> +     if ((CRYP_PERIPHERAL_ID0 ==
->> +             readl_relaxed(&device_data->base->periphId0))
->> +&&  (CRYP_PERIPHERAL_ID1 ==
->> +                 readl_relaxed(&device_data->base->periphId1))
->> +&&  (peripheralID2 ==
->> +                 readl_relaxed(&device_data->base->periphId2))
->> +&&  (CRYP_PERIPHERAL_ID3 ==
->> +                 readl_relaxed(&device_data->base->periphId3))
->> +&&  (CRYP_PCELL_ID0 ==
->> +                 readl_relaxed(&device_data->base->pcellId0))
->> +&&  (CRYP_PCELL_ID1 ==
->> +                 readl_relaxed(&device_data->base->pcellId1))
->> +&&  (CRYP_PCELL_ID2 ==
->> +                 readl_relaxed(&device_data->base->pcellId2))
->> +&&  (CRYP_PCELL_ID3 ==
->> +                 readl_relaxed(&device_data->base->pcellId3))) {
->
-> mixed-case names
-
-Yes.
-
->> +             return 0;
->> +     }
+>> +/*--------------------------------------------------------------------------*
+>> + * Defines                                                                  *
+>> + *--------------------------------------------------------------------------*/
 >> +
->> +     return -EPERM;
->> +}
+>> +#endif /* End _HASH_P_H_ */
 >> +
->> +/**
->> + * cryp_activity - This routine enables/disable the cryptography function.
->> + * @device_data: Pointer to the device data struct for base address.
->> + * @cryp_activity: Enable/Disable functionality
->> + */
->> +void cryp_activity(struct cryp_device_data *device_data,
->> +                enum cryp_crypen cryp_crypen)
 >
-> comment should say @cryp_crypen:
+> this header file doesn't look very useful just including another
+> header.
 
-Yes.
+You are right, it will be removed.
 
->> +void cryp_flush_inoutfifo(struct cryp_device_data *device_data)
->> +{
->> +     /*
->> +      * We always need to disble the hardware before trying to flush the
+>> +static int hash_mode;
+>> +module_param(hash_mode, int, 0);
+>> +MODULE_PARM_DESC(hash_mode, "CPU or DMA mode. CPU = 0 (default), DMA = 1");
 >
->                               disable
 >
->> +              * After the keyprepartion for decrypting is done you should set
->
->                               key preparation
->
->> +int cryp_configure_key_values(struct cryp_device_data *device_data,
->> +                           enum cryp_key_reg_index key_reg_index,
->> +                           struct cryp_key_value key_value)
->> +{
->> +     while (cryp_is_logic_busy(device_data))
->> +             cpu_relax();
->> +
->> +     switch (key_reg_index) {
->> +     case CRYP_KEY_REG_1:
->> +             writel_relaxed(key_value.key_value_left,
->> +&device_data->base->key_1_l);
->
-> alignment issues, presumably after a s/writel/writel_relaxed/g
-> during development (should make it easy to re-check all occurrences).
-
-I'm not sure I follow, could you explain what you mean ?
-
->> +/**
->> + * cryp_write_indata - This routine writes 32 bit data into the data input
->> + *                  register of the cryptography IP.
->> + * @device_data: Pointer to the device data struct for base address.
->> + * @write_data: Data word to write
->> + */
->> +int cryp_write_indata(struct cryp_device_data *device_data, u32 write_data)
->> +{
->> +     writel_relaxed(write_data,&device_data->base->din);
->> +
->> +     return 0;
->> +}
->> +
->> +/**
->> + * cryp_read_outdata - This routine reads the data from the data output
->> + *                  register of the CRYP logic
->> + * @device_data: Pointer to the device data struct for base address.
->> + * @read_data: Read the data from the output FIFO.
->> + */
->> +int cryp_read_outdata(struct cryp_device_data *device_data, u32 *read_data)
->> +{
->> +     *read_data = readl_relaxed(&device_data->base->dout);
->> +
->> +     return 0;
->> +}
->
-> I would say these should be made void, static, inline, etc., but
-> they only have one callsite each - are they necessary at all?
-
-Yes they are not necessary.
-
->> + * Protection configuration structure for setting privilage access
->
->                                                       privileged
->
->> + * CRYP power management specifc structure.
->
->                              specific
 >
 >> +/**
->> + * uint8p_to_uint32_be - 4*uint8 to uint32 big endian
->> + * @in: Data to convert.
+>> + * Pre-calculated empty message digests.
 >> + */
->> +static inline u32 uint8p_to_uint32_be(u8 *in)
->> +{
->> +     return  (u32)in[0]<<24 |
->> +             ((u32)in[1]<<16) |
->> +             ((u32)in[2]<<8) |
->> +             ((u32)in[3]);
->> +}
->
-> use cpu_to_be32
-
-Ok.
-
->> +/**
->> + * swap_bits_in_byte - mirror the bits in a byte
->> + * @b: the byte to be mirrored
->> + * The bits are swapped the following way:
->> + *  Byte b include bits 0-7, nibble 1 (n1) include bits 0-3 and
->> + *  nibble 2 (n2) bits 4-7.
->> + *
->> + *  Nibble 1 (n1):
->> + *  (The "old" (moved) bit is replaced with a zero)
->> + *  1. Move bit 6 and 7, 4 positions to the left.
->> + *  2. Move bit 3 and 5, 2 positions to the left.
->> + *  3. Move bit 1-4, 1 position to the left.
->> + *
->> + *  Nibble 2 (n2):
->> + *  1. Move bit 0 and 1, 4 positions to the right.
->> + *  2. Move bit 2 and 4, 2 positions to the right.
->> + *  3. Move bit 3-6, 1 position to the right.
->> + *
->> + *  Combine the two nibbles to a complete and swapped byte.
->> + */
->> +
->> +static inline u8 swap_bits_in_byte(u8 b)
->
-> can't exactly tell - is this because the h/w needs its keys
-> provided in bitwise-reverse order?  and for decryption only?
-
-Yes this a requirement from the hardware.
-
->> +{
->> +#define R_SHIFT_4_MASK  (0xc0) /* Bits 6 and 7, right shift 4 */
->> +#define R_SHIFT_2_MASK  (0x28) /* (After right shift 4) Bits 3 and 5,
->> +                               right shift 2 */
->> +#define R_SHIFT_1_MASK  (0x1e) /* (After right shift 2) Bits 1-4,
->> +                               right shift 1 */
->> +#define L_SHIFT_4_MASK  (0x03) /* Bits 0 and 1, left shift 4 */
->> +#define L_SHIFT_2_MASK  (0x14) /* (After left shift 4) Bits 2 and 4,
->> +                               left shift 2 */
->> +#define L_SHIFT_1_MASK  (0x78) /* (After left shift 1) Bits 3-6,
->> +                               left shift 1 */
->
-> unnecessary parens
-
-Ok.
-
->> +static irqreturn_t cryp_interrupt_handler(int irq, void *param)
->> +{
->> +     struct cryp_ctx *ctx;
->> +     int i;
->> +     struct cryp_device_data *device_data;
->> +
->> +     if (param == NULL) {
->> +             BUG_ON(!param);
->> +             return IRQ_HANDLED;
->> +     }
->
-> this makes no sense - plus, when would !param be true in the first
-> place?
-
-Perhaps it can never be NULL, in that case I'll remove it.
-
->> +
->> +     /* The device is coming from the one found in hw_crypt_noxts. */
->> +     device_data = (struct cryp_device_data *)param;
->> +
->> +     ctx = device_data->current_ctx;
->> +
->> +     if (ctx == NULL) {
->> +             BUG_ON(!ctx);
->> +             return IRQ_HANDLED;
->> +     }
->
-> same here
-
-Same here.
-
->> +
->> +     dev_dbg(ctx->device->dev, "[%s] (len: %d) %s, ", __func__, ctx->outlen,
->> +             cryp_pending_irq_src(device_data, CRYP_IRQ_SRC_OUTPUT_FIFO) ?
->> +             "out" : "in");
->> +
->> +     if (cryp_pending_irq_src(device_data,
->> +                              CRYP_IRQ_SRC_OUTPUT_FIFO)) {
->> +             if (ctx->outlen / ctx->blocksize>  0) {
->> +                     for (i = 0; i<  ctx->blocksize / 4; i++) {
->> +                             cryp_read_outdata(device_data,
->> +                                              (u32 *)ctx->outdata);
->> +                             ctx->outdata += 4;
->> +                             ctx->outlen -= 4;
->> +                     }
->> +
->> +                     if (ctx->outlen == 0) {
->> +                             cryp_disable_irq_src(device_data,
->> +                                                  CRYP_IRQ_SRC_OUTPUT_FIFO);
->> +                     }
->> +             }
->> +     } else if (cryp_pending_irq_src(device_data,
->> +                                     CRYP_IRQ_SRC_INPUT_FIFO)) {
->> +             if (ctx->datalen / ctx->blocksize>  0) {
->> +                     for (i = 0 ; i<  ctx->blocksize / 4; i++) {
->> +                             cryp_write_indata(device_data,
->> +                                              *((u32 *)ctx->indata));
->> +                             ctx->indata += 4;
->> +                             ctx->datalen -= 4;
->> +                     }
->> +
->> +                     if (ctx->datalen == 0)
->> +                             cryp_disable_irq_src(device_data,
->> +                                                CRYP_IRQ_SRC_INPUT_FIFO);
->> +
->> +                     if (ctx->config.algomode == CRYP_ALGO_AES_XTS) {
->> +                             CRYP_PUT_BITS(&device_data->base->cr,
->> +                                           CRYP_START_ENABLE,
->> +                                           CRYP_CR_START_POS,
->> +                                           CRYP_CR_START_MASK);
->> +
->> +                             cryp_wait_until_done(device_data);
->> +                     }
->> +             }
->> +     }
->> +
->> +     return IRQ_HANDLED;
->> +}
->
-> curious again - why are irq's being disabled in the IRQ handler, and
-> then only reenabled upon a new request - why can't they stay
-> enabled?  Is this due to the 'polling mode' option somehow not being
-> mutually exclusive with an interrupt-based request?
-
-They are disabled since they are generated in the output case as soon as 
-data is available in the FIFO and in the input case when the FIFO is 
-empty. The function is not re-entrant and not disabling them will result 
-in a hang.
-
->> +static int mode_is_aes(enum cryp_algo_mode mode)
->> +{
->> +     return  (CRYP_ALGO_AES_ECB == mode) ||
->> +             (CRYP_ALGO_AES_CBC == mode) ||
->> +             (CRYP_ALGO_AES_CTR == mode) ||
->> +             (CRYP_ALGO_AES_XTS == mode);
->
-> unnecessary inner parens
-
-Ok.
-
->> +     if (ctx->updated == 0) {
->> +             cryp_flush_inoutfifo(device_data);
->> +             if (cfg_keys(ctx) != 0) {
->> +                     dev_err(ctx->device->dev, "[%s]: cfg_keys failed!",
->> +                             __func__);
->> +                     return -EPERM;
->
-> -EINVAL?
-
-Yes probably better.
-
->> +             }
->> +
->> +             if ((ctx->iv)&&
->> +                 (CRYP_ALGO_AES_ECB != ctx->config.algomode)&&
->> +                 (CRYP_ALGO_DES_ECB != ctx->config.algomode)&&
->> +                 (CRYP_ALGO_TDES_ECB != ctx->config.algomode)) {
->
-> unnecessary inner parens
-
-Ok.
-
->> +             if (!ctx->device->dma.sg_dst_len) {
->> +                     dev_dbg(ctx->device->dev,
->> +                             "[%s]: Could not map the sg list "
->> +                             "(FROM_DEVICE)", __func__);
->
-> message text strings are allowed to exceed the 80 char line limit,
-> for grep-ability reasons.
-
-Ok didn't know that.
-
->> +                     regulator_disable(
->> +                                            device_data->pwr_regulator);
->
-> join last 2 lines
-
-Yes.
-
->> +             /*
->> +              * ctx->outlen is decremented in the cryp_interrupt_handler
->> +              * function. We had to add cpu_relax() (barrier) to make sure
->> +              * that gcc didn't optimze away this variable.
->
->                                     optimize
->
->> +              */
->> +             while (ctx->outlen>  0)
->> +                     cpu_relax();
->
-> do we need a timeout check in case h/w goes in the weeds?
-
-I would say no, we have have never seen that happen.
-
->> +static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->> +{
->> +     struct cryp_ctx *ctx = crypto_tfm_ctx(tfm);
->> +
->> +     pr_debug(DEV_DBG_NAME " [%s]", __func__);
->> +
->> +     ctx->blocksize = crypto_tfm_alg_blocksize(tfm);
->> +
->> +     ctx->config.algodir = CRYP_ALGORITHM_ENCRYPT;
->> +     ctx->config.algomode = CRYP_ALGO_AES_ECB;
->> +
->> +     ctx->indata = in;
->> +     ctx->outdata = out;
->> +     ctx->datalen = ctx->blocksize;
->> +
->> +     if (cryp_hw_calculate(ctx))
->> +             pr_err("ux500_cryp:crypX: [%s]: cryp_hw_calculate() failed!",
->> +                             __func__);
->
-> shouldn't this error be propagated to the higher level API?
-
-Yes possibly, can this be done via crypto_tfm ?
-
->> +}
->
->> +/**
->> + * struct crypto_alg aes_alg
->> + */
->> +static struct crypto_alg aes_alg = {
->> +     .cra_name               =       "aes",
->> +     .cra_driver_name        =       "aes-ux500",
->> +     .cra_priority           =       300,
->> +     .cra_flags              =       CRYPTO_ALG_TYPE_CIPHER,
->> +     .cra_blocksize          =       AES_BLOCK_SIZE,
->> +     .cra_ctxsize            =       sizeof(struct cryp_ctx),
->> +     .cra_alignmask          =       3,
->> +     .cra_module             =       THIS_MODULE,
->> +     .cra_list               =       LIST_HEAD_INIT(aes_alg.cra_list),
->> +     .cra_u                  =       {
->> +             .cipher = {
->> +                     .cia_min_keysize        =       AES_MIN_KEY_SIZE,
->> +                     .cia_max_keysize        =       AES_MAX_KEY_SIZE,
->> +                     .cia_setkey             =       aes_setkey,
->> +                     .cia_encrypt            =       aes_encrypt,
->> +                     .cia_decrypt            =       aes_decrypt
->> +             }
->> +     }
+>> +static u8 zero_message_hash_sha1[SHA1_DIGEST_SIZE] = {
+>> +	0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d,
+>> +	0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
+>> +	0xaf, 0xd8, 0x07, 0x09
 >> +};
 >
-> each of the entry points already assign algodir, algomode, and
-> blocksize; why not add the corresponding values in a template struct
-> here, that embeds the crypto_alg structs instead (see struct
-> talitos_alg_template).  The code would be greatly simplified.
-> Don't know if it would help, but see also commit 4b00434 "crypto:
-> Add bulk algorithm registration interface" (in Herbert's crypto-2.6
-> tree).
+> Please explain why these are not equal to SHA1_H0 values, etc.
 
-Ok, I will change it.
+They have been calculated with openSSL, why they differ is strange though.
+
+>> +static void hash_hw_write_key(struct hash_device_data *device_data,
+>> +		const u8 *key, unsigned int keylen)
+>> +{
+>> +	u32 word = 0;
+>> +	int nwords = 1;
+>> +
+>> +	HASH_CLEAR_BITS(&device_data->base->str, HASH_STR_NBLW_MASK);
+>> +
+>> +	while (keylen>= 4) {
+>> +		word = ((u32) (key[3]&  0xff)<<  24) |
+>> +			((u32) (key[2]&  0xff)<<  16) |
+>> +			((u32) (key[1]&  0xff)<<  8) |
+>> +			((u32) (key[0]&  0xff));
+>
+> assuming this isn't a cpu--h/w endian conversion, there's something
+> in include/linux/swab.h that's reusable here.
+
+Yes I will see if there is a function that does this.
+
+>> +/**
+>> + * hash_save_state - Function that saves the state of hardware.
+>> + * @device_data:	Pointer to the device structure.
+>> + * @device_state:	The strucure where the hardware state should be saved.
+>> + *
+>> + * Reentrancy: Non Re-entrant
+>
+> I can't tell - is the driver taking care of the locking, or does
+> this mean the driver does not work with e.g., PREEMPT on?
+
+It's an old comment, it no longer applies.
+
+>> + */
+>> +int hash_save_state(struct hash_device_data *device_data,
+>> +		struct hash_state *device_state)
+>> +{
+>> +	u32 temp_cr;
+>> +	u32 count;
+>> +	int hash_mode = HASH_OPER_MODE_HASH;
+>> +
+>> +	if (NULL == device_state) {
+>> +		dev_err(device_data->dev, "[%s] HASH_INVALID_PARAMETER!",
+>> +				__func__);
+>> +		return -EPERM;
+>
+> -ENOTSUPP, no?
+
+Yes.
+
+>> +/**
+>> + * hash_check_hw - This routine checks for peripheral Ids and PCell Ids.
+>> + * @device_data:
+>> + *
+>> + */
+>> +int hash_check_hw(struct hash_device_data *device_data)
+>> +{
+>> +	int ret = 0;
+>> +
+>> +	if (NULL == device_data) {
+>
+> when would this be called with NULL?
+
+Never, I will remove it.
+
+>> +		ret = -EPERM;
+>> +		pr_err(DEV_DBG_NAME " [%s] HASH_INVALID_PARAMETER!",
+>> +			__func__);
+>> +		goto out;
+>> +	}
+>> +
+>> +	/* Checking Peripheral Ids  */
+>> +	if ((HASH_P_ID0 == readl_relaxed(&device_data->base->periphid0))
+>> +		&&  (HASH_P_ID1 == readl_relaxed(&device_data->base->periphid1))
+>> +		&&  (HASH_P_ID2 == readl_relaxed(&device_data->base->periphid2))
+>> +		&&  (HASH_P_ID3 == readl_relaxed(&device_data->base->periphid3))
+>> +		&&  (HASH_CELL_ID0 == readl_relaxed(&device_data->base->cellid0))
+>> +		&&  (HASH_CELL_ID1 == readl_relaxed(&device_data->base->cellid1))
+>> +		&&  (HASH_CELL_ID2 == readl_relaxed(&device_data->base->cellid2))
+>> +		&&  (HASH_CELL_ID3 == readl_relaxed(&device_data->base->cellid3))
+>> +	   ) {
+>
+> unnecessary inner parens
+
+Yes.
+
+>> +		ret = 0;
+>> +		goto out;
+>
+> just return 0
+
+Ok.
+
+>> +	} else {
+>> +		ret = -EPERM;
+>> +		dev_err(device_data->dev, "[%s] HASH_UNSUPPORTED_HW!",
+>> +				__func__);
+>> +		goto out;
+>> +	}
+>> +out:
+>> +	return ret;
+>> +}
+>
+> drop the else keyword, then just dev_err and return -ENOTSUPP.
+
+Ok.
+
+>> +/**
+>> + * hash_algs_register_all -
+>> + */
+>> +static int ahash_algs_register_all(struct hash_device_data *device_data)
+>
+> see my comment on alg. registration to patch 1/3.
+
+Yes will change it.
 
 /Andreas
