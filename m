@@ -1,50 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.4
-Date: Thu, 22 Mar 2012 12:20:46 +1100
-Message-ID: <20120322012046.GA8854@gondor.apana.org.au>
-References: <20100603100550.GA30681@gondor.apana.org.au> <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: Re: [PATCH 14/17] powerpc: crypto: nx driver code supporting nx
+ encryption
+Date: Thu, 22 Mar 2012 12:50:04 +1100
+Message-ID: <1332381004.2982.65.camel@pasglop>
+References: <1332365297.3858.5.camel@key-ThinkPad-W510>
+	 <1332366068.3858.50.camel@key-ThinkPad-W510>
+	 <20120321221517.GB30748@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Kent Yoder <key@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
+	linuxppc-dev@lists.ozlabs.org
+To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:55783 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755988Ab2CVBUx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Mar 2012 21:20:53 -0400
-Content-Disposition: inline
-In-Reply-To: <20120126024342.GA12492@gondor.apana.org.au>
+Received: from gate.crashing.org ([63.228.1.57]:39953 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1030577Ab2CVBuR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Mar 2012 21:50:17 -0400
+In-Reply-To: <20120321221517.GB30748@kroah.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Wed, 2012-03-21 at 15:15 -0700, Greg KH wrote:
+> 
+> Really?  vio drivers are supposed to look like this with the .name and
+> .owner field manually being set in the static initialization of the
+> driver?  That's sad, and should be fixed, the vio core should do this
+> type of thing for you. 
 
-This push fixes a build problem where two crypto modules both
-try to export the same symbols (which shouldn't have been exported
-in the first place).
+Yeah, they still do it the old way, nobody got to fix that yet, should
+be pretty easy though.
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Jussi Kivilinna (2):
-      crypto: camellia-x86_64 - module init/exit functions should be static
-      crypto: twofish-x86_64-3way - module init/exit functions should be static
-
- arch/x86/crypto/camellia_glue.c     |    4 ++--
- arch/x86/crypto/twofish_glue_3way.c |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Cheers,
+Ben.
