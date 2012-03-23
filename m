@@ -1,36 +1,39 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] powerpc/crypto: caam - add backward compatible string
- sec4.0
-Date: Thu, 22 Mar 2012 19:15:09 -0500
-Message-ID: <20120322191509.9e049a78b87a10f71bc6ebeb@freescale.com>
-References: <1332310150-8274-1-git-send-email-Shengzhou.Liu@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: camellia-x86_64 - module init/exit
+	functions should be static
+Date: Fri, 23 Mar 2012 08:42:10 +0800
+Message-ID: <20120323004209.GA20518@gondor.apana.org.au>
+References: <4F620F37.4070404@xenotime.net> <20120315201151.11667.63183.stgit@localhost6.localdomain6> <4F6A74E3.7080901@xenotime.net> <20120322004646.GA8489@gondor.apana.org.au> <4F6B9709.1040701@zytor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <herbert@gondor.hengli.com.au>
-To: Shengzhou Liu <Shengzhou.Liu@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Randy Dunlap <rdunlap@xenotime.net>,
+	Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:36426
-	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1031572Ab2CWAQt (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:33199 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753416Ab2CWAmW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Mar 2012 20:16:49 -0400
-In-Reply-To: <1332310150-8274-1-git-send-email-Shengzhou.Liu@freescale.com>
+	Thu, 22 Mar 2012 20:42:22 -0400
+Content-Disposition: inline
+In-Reply-To: <4F6B9709.1040701@zytor.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 21 Mar 2012 14:09:10 +0800
-Shengzhou Liu <Shengzhou.Liu@freescale.com> wrote:
-
-> In some device trees of previous version, there were string "fsl,sec4.0".
-> To be backward compatible with device trees, we have CAAM driver first
-> check "fsl,sec-v4.0", if it fails, then check for "fsl,sec4.0".
+On Thu, Mar 22, 2012 at 02:18:01PM -0700, H. Peter Anvin wrote:
+>
+> > Thanks for the reminder, I'll push these through today.
 > 
-> Signed-off-by: Shengzhou Liu <Shengzhou.Liu@freescale.com>
-> ---
+> Please push these to Linus ASAP, it is breaking the x86-64 allyesconfig
+> build upstream right now.
 
-Acked-by: Kim Phillips <kim.phillips@freescale.com>
+I've pushed them through.
 
 Thanks,
-
-Kim
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
