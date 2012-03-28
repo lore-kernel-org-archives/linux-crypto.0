@@ -1,18 +1,19 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH 2/3] padata: Use the online cpumask as the default
-Date: Wed, 28 Mar 2012 08:43:21 +0200
-Message-ID: <20120328064321.GF16191@secunet.com>
-References: <20120328064157.GD16191@secunet.com>
+Subject: [PATCH] crypto: pcrypt - Use the online cpumask as the default
+Date: Wed, 28 Mar 2012 08:51:03 +0200
+Message-ID: <20120328065103.GH16191@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc: Peter Zijlstra <peterz@infradead.org>, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:49325 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751209Ab2C1GvG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Mar 2012 02:51:06 -0400
 Content-Disposition: inline
-In-Reply-To: <20120328064157.GD16191@secunet.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 We use the active cpumask to determine the superset of cpus
 to use for parallelization. However, the active cpumask is
@@ -23,46 +24,36 @@ cpumask instead.
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- kernel/padata.c |    8 ++++----
+ crypto/pcrypt.c |    8 ++++----
  1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 7875088..de3d0d9 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -356,13 +356,13 @@ static int padata_setup_cpumasks(struct parallel_data *pd,
- 	if (!alloc_cpumask_var(&pd->cpumask.pcpu, GFP_KERNEL))
- 		return -ENOMEM;
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 29a89da..b2c99dc 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -280,11 +280,11 @@ static int pcrypt_aead_init_tfm(struct crypto_tfm *tfm)
  
--	cpumask_and(pd->cpumask.pcpu, pcpumask, cpu_active_mask);
-+	cpumask_and(pd->cpumask.pcpu, pcpumask, cpu_online_mask);
- 	if (!alloc_cpumask_var(&pd->cpumask.cbcpu, GFP_KERNEL)) {
- 		free_cpumask_var(pd->cpumask.cbcpu);
- 		return -ENOMEM;
+ 	ictx->tfm_count++;
+ 
+-	cpu_index = ictx->tfm_count % cpumask_weight(cpu_active_mask);
++	cpu_index = ictx->tfm_count % cpumask_weight(cpu_online_mask);
+ 
+-	ctx->cb_cpu = cpumask_first(cpu_active_mask);
++	ctx->cb_cpu = cpumask_first(cpu_online_mask);
+ 	for (cpu = 0; cpu < cpu_index; cpu++)
+-		ctx->cb_cpu = cpumask_next(ctx->cb_cpu, cpu_active_mask);
++		ctx->cb_cpu = cpumask_next(ctx->cb_cpu, cpu_online_mask);
+ 
+ 	cipher = crypto_spawn_aead(crypto_instance_ctx(inst));
+ 
+@@ -472,7 +472,7 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
+ 		goto err_free_padata;
  	}
  
--	cpumask_and(pd->cpumask.cbcpu, cbcpumask, cpu_active_mask);
-+	cpumask_and(pd->cpumask.cbcpu, cbcpumask, cpu_online_mask);
- 	return 0;
- }
+-	cpumask_and(mask->mask, cpu_possible_mask, cpu_active_mask);
++	cpumask_and(mask->mask, cpu_possible_mask, cpu_online_mask);
+ 	rcu_assign_pointer(pcrypt->cb_cpumask, mask);
  
-@@ -566,7 +566,7 @@ EXPORT_SYMBOL(padata_unregister_cpumask_notifier);
- static bool padata_validate_cpumask(struct padata_instance *pinst,
- 				    const struct cpumask *cpumask)
- {
--	if (!cpumask_intersects(cpumask, cpu_active_mask)) {
-+	if (!cpumask_intersects(cpumask, cpu_online_mask)) {
- 		pinst->flags |= PADATA_INVALID;
- 		return false;
- 	}
-@@ -680,7 +680,7 @@ static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
- {
- 	struct parallel_data *pd;
- 
--	if (cpumask_test_cpu(cpu, cpu_active_mask)) {
-+	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
- 		pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
- 				     pinst->cpumask.cbcpu);
- 		if (!pd)
+ 	pcrypt->nblock.notifier_call = pcrypt_cpumask_change_notify;
 -- 
 1.7.0.4
