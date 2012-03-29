@@ -1,82 +1,57 @@
-From: "roosa, william MAJ RES" <william-roosa@us.army.mil>
-Subject: Re: Status of aes in Debian/Ubuntu? (UNCLASSIFIED)
-Date: Thu, 29 Mar 2012 07:00:36 -0400
-Message-ID: <7540e2c9ee52.4f740894@us.army.mil>
-References: <20120328121744.GY32725@vnl.com>
- <1332952631.8994.44.camel@foxtrot.cjac.ntr.f5net.com>
- <20120328190322.GA16113@greengrey.org>
- <20120328204234.GD10584@vnl.com> <4F737F41.1090309@redhat.com>
- <20120328213305.GG10584@vnl.com>
+From: Hamid Nassiby <h.nassiby@gmail.com>
+Subject: Re: Old PADATA patch vs crypto-2.6 tree
+Date: Thu, 29 Mar 2012 23:18:27 +0430
+Message-ID: <CAFuf8QMwdPXu4exzLo_Co7MaLxLJCLjragNWsaV=e2q3CjXsfA@mail.gmail.com>
+References: <CAFB-WE9o5TDZrxiFz=Lbe=87XdcHw4wEcEwtC3FKJ_DR2_MYCA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	"C.J. Adams-Collier KF7BMP" <cjac@colliertech.org>,
-	Ryan Corder <ryanc@greengrey.org>
-To: Milan Broz <mbroz@redhat.com>, Dale Amon <amon@vnl.com>
+Cc: linux-crypto@vger.kernel.org
+To: Sebastien Agnolini <sebastien.agnolini@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mxoutdr1.us.army.mil ([143.69.242.38]:44048 "EHLO
-	mxoutdr1.us.army.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752967Ab2C2LAh convert rfc822-to-8bit (ORCPT
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:63207 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932349Ab2C2Ss7 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Mar 2012 07:00:37 -0400
-Content-Language: en
-In-Reply-To: <20120328213305.GG10584@vnl.com>
+	Thu, 29 Mar 2012 14:48:59 -0400
+Received: by bkcik5 with SMTP id ik5so2301379bkc.19
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Mar 2012 11:48:58 -0700 (PDT)
+In-Reply-To: <CAFB-WE9o5TDZrxiFz=Lbe=87XdcHw4wEcEwtC3FKJ_DR2_MYCA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Classification: UNCLASSIFIED
+You must instantiate pcrypt using crconf app or tcrypt module;
 
-Seems to hang when it can't find the kernel headers.
-If you forget that they can come with the package for a moment and just=
- install them directly.  If you've been away for some time you probably=
- did not get the memo that systems don't come with the headers or kerne=
-l source code by default so you have to go get that package.......
-Such is the brave new world where things are done for us by others.
-
-Bill
-
-William Roosa
-MAJ, SF
-703-268-8311 (cell)
-703-545-1509 (w)
-william-roosa@us.army.mil
-De Oppreso Liber
-=EF=BA=97=EF=BA=A4=EF=BA=AD=EF=BB=B4=EF=BA=AE =EF=BA=81=EF=BB=9E =D9=85=
-=D8=B6=D8=B7=D9=87=D8=AF=EF=BB=B4=EF=BB=A6
-
-On 03/28/12, Dale Amon  <amon@vnl.com> wrote:
-
-> On Wed, Mar 28, 2012 at 11:14:41PM +0200, Milan Broz wrote:
-> > If you want something simple, use LUKS. cryptsetup
-> > and dmcrypt is in all distributions by default.
-> > Truecrypt uses dmcrypt by default as backend as well.
->=20
-> Looking around a bit, it appears that cryptsetup is in
-> the ubuntu server set up disk.
->=20
-> > Of course, if you want use loop-aes, you have to
-> > patch all utilities and kernel, it is not so complicated.
->=20
-> I'm not wedded to it... as I noted I have been out of
-> the loop, crypt or otherwise, for half a decade.
->=20
-> > (cryptsetup can run loop-aes compatible mode as well and
-> > can allocate loop device as well. But it is your
-> > choice what encryption and utility to use to use
-> > of course.)
-> >=20
-> > For default losetup from util-linux, encryption option
-> > is in fact deprecated in favor to cryptsetup.
->=20
-> Okay. Now do cryptsetup and the others work in a pretty
-> standard way? ie, put them in your /etc/fstab and
-> just feed them a password when you want to mount? Or if
-> it is a loopback image, you just do the usual
->=20
-> 	mount -o loop file /mnt
->=20
-> ?
---=20
-
-Classification: UNCLASSIFIED
+On Wed, Mar 28, 2012 at 4:23 PM, Sebastien Agnolini
+<sebastien.agnolini@gmail.com> wrote:
+>
+> Hey,
+>
+> How activate the IPsec parallelization ?
+> I compiled the crypto-2.6 kernel with this param :
+> CONFIG_CRYPTO_... =3D y
+> CONFIG_PADATA =3D y
+> CONFIG_SMP=3Dy
+> After installation on 2 servers (IPSEC tunnel), i don't detect the IP=
+sec
+> parallelization.
+> The algorithm is loaded (present in /proc/crypto), but only one core =
+works.
+>
+> So, What are the other parameters that I forgot for the compilation o=
+f the
+> kernel? IRQ, IO, Scheduler parameters... Am i missing something ?
+> I thought that the parallelization was automatically started. True ?
+> What are the conditions to observe a parallel work ?
+> A "little" documentation will be Welcome.
+>
+> I'd like compare the bandwidth of my test platform using the =AB old =
+=BB PADATA
+> patch.
+>
+> Sebastien
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypt=
+o" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
