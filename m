@@ -1,38 +1,87 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: user - Fix lookup of algorithms with IV
-	generator
-Date: Fri, 30 Mar 2012 17:21:13 +0800
-Message-ID: <20120330092112.GC27551@gondor.apana.org.au>
-References: <20120329070347.GD1021@secunet.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: Old PADATA patch vs crypto-2.6 tree
+Date: Fri, 30 Mar 2012 11:30:08 +0200
+Message-ID: <20120330093007.GF1021@secunet.com>
+References: <CAFB-WE9o5TDZrxiFz=Lbe=87XdcHw4wEcEwtC3FKJ_DR2_MYCA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sebastien Agnolini <sebastien.agnolini@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:39377 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755181Ab2C3JVO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Mar 2012 05:21:14 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:50646 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755411Ab2C3JaQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 30 Mar 2012 05:30:16 -0400
 Content-Disposition: inline
-In-Reply-To: <20120329070347.GD1021@secunet.com>
+In-Reply-To: <CAFB-WE9o5TDZrxiFz=Lbe=87XdcHw4wEcEwtC3FKJ_DR2_MYCA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 29, 2012 at 09:03:47AM +0200, Steffen Klassert wrote:
-> We lookup algorithms with crypto_alg_mod_lookup() when instantiating via
-> crypto_add_alg(). However, algorithms that are wrapped by an IV genearator
-> (e.g. aead or genicv type algorithms) need special care. The userspace
-> process hangs until it gets a timeout when we use crypto_alg_mod_lookup()
-> to lookup these algorithms. So export the lookup functions for these
-> algorithms and use them in crypto_add_alg().
+On Wed, Mar 28, 2012 at 01:53:41PM +0200, Sebastien Agnolini wrote:
+> Hey,
 > 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> How activate the IPsec parallelization ?
 
-Both applied to crypto.
+You need to instantiate pcrypt.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+You need either crconf (linux-3.2 or newer with the crypto userconfig
+api enabled) or the tcrypt module to instantiate pcrypt.
+
+With crconf:
+
+You can get crconf from https://sourceforge.net/projects/crconf/
+Use the git tree for the newest version. After installing crconf
+do e.g.
+
+crconf add driver "pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type 3
+
+
+With tcrypt:
+
+modprobe tcrypt alg="pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type=3
+
+The modprobe will return with an error, don't worry about it, thats ok.
+
+
+
+Once you've did one of the above, your /proc/crypto should show
+something like:
+
+name         : authenc(hmac(sha1),cbc(aes))
+driver       : pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))
+module       : pcrypt
+priority     : 2100
+refcnt       : 1
+selftest     : passed
+type         : aead
+async        : yes
+blocksize    : 16
+ivsize       : 16
+maxauthsize  : 20
+geniv        : <built-in>
+
+
+Now pcrypt is instantiated, e.g. all new IPsec states (that do
+hmac-sha1, cbc-aes) will use it.
+
+
+> I compiled the crypto-2.6 kernel with this param :
+> CONFIG_CRYPTO_... = y
+> CONFIG_PADATA = y
+> CONFIG_SMP=y
+> After installation on 2 servers (IPSEC tunnel), i don't detect the IPsec
+> parallelization.
+> The algorithm is loaded (present in /proc/crypto), but only one core works.
+> 
+> So, What are the other parameters that I forgot for the compilation of the
+> kernel? IRQ, IO, Scheduler parameters... Am i missing something ?
+> I thought that the parallelization was automatically started. True ?
+
+No, see above.
+
+> What are the conditions to observe a parallel work ?
+
+padata/pcrypt uses workqueues for parallelization, so you should see a
+lot of busy kworkers when you put your IPsec network under load.
+Also the refcnt (/proc/crypto) of the pcrypt algorithm should increase
+when you add IPsec states.
