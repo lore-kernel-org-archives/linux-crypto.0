@@ -1,64 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.4
-Date: Mon, 2 Apr 2012 17:45:16 +0800
-Message-ID: <20120402094516.GA23763@gondor.apana.org.au>
-References: <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au> <20120322012046.GA8854@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: woody@dedicatedserver.com.hk
+Subject: Cloud Hosting and Cloud Server
+Date: Mon,  2 Apr 2012 21:07:35 +0800 (HKT)
+Message-ID: <P5lKJ@tcts1.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:40627 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751075Ab2DBJpZ (ORCPT
+Received: from 124-248-200-68.sunnyvision.com ([124.248.200.68]:58178 "EHLO
+	teamb02.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752492Ab2DBNlF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Apr 2012 05:45:25 -0400
-Content-Disposition: inline
-In-Reply-To: <20120322012046.GA8854@gondor.apana.org.au>
+	Mon, 2 Apr 2012 09:41:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Dear All,
 
-This push fixes a number of issues:
+We are one of the top Cloud Solution provider base in Hong Kong, with over 10+ years experience,
+we providing better than good and lower cost service of CLoud Hosting (Cloud Server / Hosting / CDN)
 
-* Fix for CPU hotplug hang in padata.
-* Avoid using cpu_active inappropriately in pcrypt and padata.
-* Fix for user-space algorithm lookup hang with IV generators.
-* Fix for netlink dump of algorithms where stuff went missing due
-  to incorrect calculation of message size.
+Starting at $1.99, let's come to experience and enjoy our powerful cloud system.
 
-Please pull from
+Thanks for your time and appreciated to look arround our website.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+http://www.dedicatedserver.com.hk/ 
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Best Regards,
+The 36cloud Team
 
 
-Steffen Klassert (6):
-      padata: Add a reference to the api documentation
-      padata: Use the online cpumask as the default
-      padata: Fix cpu hotplug
-      crypto: pcrypt - Use the online cpumask as the default
-      crypto: user - Fix lookup of algorithms with IV generator
-      crypto: user - Fix size of netlink dump message
 
- crypto/ablkcipher.c                |    4 +-
- crypto/aead.c                      |    4 +-
- crypto/crypto_user.c               |   80 +++++++++++++++++++++++++++++++++++-
- crypto/pcrypt.c                    |    8 ++--
- include/crypto/internal/aead.h     |    2 +
- include/crypto/internal/skcipher.h |    2 +
- include/linux/cryptouser.h         |    3 +
- kernel/padata.c                    |   13 ++++--
- 8 files changed, 103 insertions(+), 13 deletions(-)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
+
+Any questions, please feel free to contact our CS at cs@36cloud.com . 
+
+We are highly appreciated your attention, and just come to experience our powerful cloud server service.
+
+Best Regards,
+The 36cloud CS team
+Email: cs@36cloud.com 
+Website: http://www.36cloud.com
+**************************************************************************
+
+
+If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
