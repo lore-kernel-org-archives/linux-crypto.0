@@ -1,105 +1,64 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: talitos - properly lock access to global talitos registers
-Date: Fri, 30 Mar 2012 17:49:53 +0300
-Message-ID: <1333118993-17522-1-git-send-email-horia.geanta@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.4
+Date: Mon, 2 Apr 2012 17:45:16 +0800
+Message-ID: <20120402094516.GA23763@gondor.apana.org.au>
+References: <20100716022648.GA28219@gondor.apana.org.au> <20100722055043.GA25689@gondor.apana.org.au> <20100903060055.GA28915@gondor.apana.org.au> <20100903110722.GA31826@gondor.apana.org.au> <20101215115035.GA25248@gondor.apana.org.au> <20110216053911.GA10999@gondor.apana.org.au> <20110328071322.GA6569@gondor.apana.org.au> <20110629235153.GA16559@gondor.apana.org.au> <20120126024342.GA12492@gondor.apana.org.au> <20120322012046.GA8854@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: <linux-crypto@vger.kernel.org>
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe006.messaging.microsoft.com ([216.32.180.16]:40154
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751153Ab2C3Oum (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:40627 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751075Ab2DBJpZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 Mar 2012 10:50:42 -0400
+	Mon, 2 Apr 2012 05:45:25 -0400
+Content-Disposition: inline
+In-Reply-To: <20120322012046.GA8854@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Access to global talitos registers must be protected for the case when
-affinities are configured such that primary and secondary talitos irqs
-run on different cpus.
+Hi Linus:
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
- drivers/crypto/talitos.c |   20 +++++++++++++++++---
- 1 files changed, 17 insertions(+), 3 deletions(-)
+This push fixes a number of issues:
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index dc641c7..921039e 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -124,6 +124,9 @@ struct talitos_private {
- 	void __iomem *reg;
- 	int irq[2];
- 
-+	/* SEC global registers lock  */
-+	spinlock_t reg_lock ____cacheline_aligned;
-+
- 	/* SEC version geometry (from device tree node) */
- 	unsigned int num_channels;
- 	unsigned int chfifo_len;
-@@ -412,6 +415,7 @@ static void talitos_done_##name(unsigned long data)			\
- {									\
- 	struct device *dev = (struct device *)data;			\
- 	struct talitos_private *priv = dev_get_drvdata(dev);		\
-+	unsigned long flags;						\
- 									\
- 	if (ch_done_mask & 1)						\
- 		flush_channel(dev, 0, 0, 0);				\
-@@ -427,8 +431,10 @@ static void talitos_done_##name(unsigned long data)			\
- out:									\
- 	/* At this point, all completed channels have been processed */	\
- 	/* Unmask done interrupts for channels completed later on. */	\
-+	spin_lock_irqsave(&priv->reg_lock, flags);			\
- 	setbits32(priv->reg + TALITOS_IMR, ch_done_mask);		\
- 	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);	\
-+	spin_unlock_irqrestore(&priv->reg_lock, flags);			\
- }
- DEF_TALITOS_DONE(4ch, TALITOS_ISR_4CHDONE)
- DEF_TALITOS_DONE(ch0_2, TALITOS_ISR_CH_0_2_DONE)
-@@ -619,22 +625,28 @@ static irqreturn_t talitos_interrupt_##name(int irq, void *data)	       \
- 	struct device *dev = data;					       \
- 	struct talitos_private *priv = dev_get_drvdata(dev);		       \
- 	u32 isr, isr_lo;						       \
-+	unsigned long flags;						       \
- 									       \
-+	spin_lock_irqsave(&priv->reg_lock, flags);			       \
- 	isr = in_be32(priv->reg + TALITOS_ISR);				       \
- 	isr_lo = in_be32(priv->reg + TALITOS_ISR_LO);			       \
- 	/* Acknowledge interrupt */					       \
- 	out_be32(priv->reg + TALITOS_ICR, isr & (ch_done_mask | ch_err_mask)); \
- 	out_be32(priv->reg + TALITOS_ICR_LO, isr_lo);			       \
- 									       \
--	if (unlikely((isr & ~TALITOS_ISR_4CHDONE) & ch_err_mask || isr_lo))    \
--		talitos_error(dev, isr, isr_lo);			       \
--	else								       \
-+	if (unlikely(isr & ch_err_mask || isr_lo)) {			       \
-+		spin_unlock_irqrestore(&priv->reg_lock, flags);		       \
-+		talitos_error(dev, isr & ch_err_mask, isr_lo);		       \
-+	}								       \
-+	else {								       \
- 		if (likely(isr & ch_done_mask)) {			       \
- 			/* mask further done interrupts. */		       \
- 			clrbits32(priv->reg + TALITOS_IMR, ch_done_mask);      \
- 			/* done_task will unmask done interrupts at exit */    \
- 			tasklet_schedule(&priv->done_task[tlet]);	       \
- 		}							       \
-+		spin_unlock_irqrestore(&priv->reg_lock, flags);		       \
-+	}								       \
- 									       \
- 	return (isr & (ch_done_mask | ch_err_mask) || isr_lo) ? IRQ_HANDLED :  \
- 								IRQ_NONE;      \
-@@ -2719,6 +2731,8 @@ static int talitos_probe(struct platform_device *ofdev)
- 
- 	priv->ofdev = ofdev;
- 
-+	spin_lock_init(&priv->reg_lock);
-+
- 	err = talitos_probe_irq(ofdev);
- 	if (err)
- 		goto err_out;
+* Fix for CPU hotplug hang in padata.
+* Avoid using cpu_active inappropriately in pcrypt and padata.
+* Fix for user-space algorithm lookup hang with IV generators.
+* Fix for netlink dump of algorithms where stuff went missing due
+  to incorrect calculation of message size.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Steffen Klassert (6):
+      padata: Add a reference to the api documentation
+      padata: Use the online cpumask as the default
+      padata: Fix cpu hotplug
+      crypto: pcrypt - Use the online cpumask as the default
+      crypto: user - Fix lookup of algorithms with IV generator
+      crypto: user - Fix size of netlink dump message
+
+ crypto/ablkcipher.c                |    4 +-
+ crypto/aead.c                      |    4 +-
+ crypto/crypto_user.c               |   80 +++++++++++++++++++++++++++++++++++-
+ crypto/pcrypt.c                    |    8 ++--
+ include/crypto/internal/aead.h     |    2 +
+ include/crypto/internal/skcipher.h |    2 +
+ include/linux/cryptouser.h         |    3 +
+ kernel/padata.c                    |   13 ++++--
+ 8 files changed, 103 insertions(+), 13 deletions(-)
+
+Thanks,
 -- 
-1.7.3.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
