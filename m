@@ -1,58 +1,58 @@
 From: Jim Kukunas <james.t.kukunas@linux.intel.com>
-Subject: [PATCH 2/2] crypto: disable preemption while benchmarking RAID5 xor checksumming
-Date: Tue,  3 Apr 2012 16:56:19 -0700
-Message-ID: <1333497379-2640-3-git-send-email-james.t.kukunas@linux.intel.com>
+Subject: [PATCH 1/2] crypto: wait for a full jiffy in do_xor_speed
+Date: Tue,  3 Apr 2012 16:56:18 -0700
+Message-ID: <1333497379-2640-2-git-send-email-james.t.kukunas@linux.intel.com>
 References: <4F7ACF94.5080505@anonymous.org.uk>
  <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
 Cc: linux-crypto@vger.kernel.org
 To: linux-raid@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:31481 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:19318 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755418Ab2DCX4G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	id S1755257Ab2DCX4G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
 	Tue, 3 Apr 2012 19:56:06 -0400
 In-Reply-To: <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-With CONFIG_PREEMPT=y, we need to disable preemption while benchmarking
-RAID5 xor checksumming to ensure we're actually measuring what we think
-we're measuring.
+In the existing do_xor_speed(), there is no guarantee that we actually
+run do_2() for a full jiffy. We get the current jiffy, then run do_2()
+until the next jiffy.
+
+Instead, let's get the current jiffy, then wait until the next jiffy
+to start our test.
 
 Signed-off-by: Jim Kukunas <james.t.kukunas@linux.intel.com>
 ---
- crypto/xor.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ crypto/xor.c |    8 +++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/xor.c b/crypto/xor.c
-index 8788443..84daa11 100644
+index b75182d..8788443 100644
 --- a/crypto/xor.c
 +++ b/crypto/xor.c
-@@ -21,6 +21,7 @@
- #include <linux/gfp.h>
- #include <linux/raid/xor.h>
- #include <linux/jiffies.h>
-+#include <linux/preempt.h>
- #include <asm/xor.h>
+@@ -63,7 +63,7 @@ static void
+ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ {
+ 	int speed;
+-	unsigned long now;
++	unsigned long now, j;
+ 	int i, count, max;
  
- /* The xor routines to use.  */
-@@ -69,6 +70,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
  	tmpl->next = template_list;
- 	template_list = tmpl;
- 
-+	preempt_disable();
-+
- 	/*
- 	 * Count the number of XORs done during a whole jiffy, and use
- 	 * this to calculate the speed of checksumming.  We use a 2-page
-@@ -91,6 +94,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 			max = count;
- 	}
- 
-+	preempt_enable();
-+
- 	speed = max * (HZ * BENCH_SIZE / 1024);
- 	tmpl->speed = speed;
- 
+@@ -76,9 +76,11 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ 	 */
+ 	max = 0;
+ 	for (i = 0; i < 5; i++) {
+-		now = jiffies;
++		j = jiffies;
+ 		count = 0;
+-		while (jiffies == now) {
++		while ((now = jiffies) == j)
++			cpu_relax();
++		while (time_before(jiffies, now + 1)) {
+ 			mb(); /* prevent loop optimzation */
+ 			tmpl->do_2(BENCH_SIZE, b1, b2);
+ 			mb();
 -- 
 1.7.8.5
