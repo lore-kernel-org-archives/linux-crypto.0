@@ -1,78 +1,58 @@
 From: Jim Kukunas <james.t.kukunas@linux.intel.com>
-Subject: Re: RAID5 XOR speed vs RAID6 Q speed (was Re: AVX RAID5 xor checksumming)
-Date: Tue,  3 Apr 2012 16:56:17 -0700
-Message-ID: <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
+Subject: [PATCH 2/2] crypto: disable preemption while benchmarking RAID5 xor checksumming
+Date: Tue,  3 Apr 2012 16:56:19 -0700
+Message-ID: <1333497379-2640-3-git-send-email-james.t.kukunas@linux.intel.com>
 References: <4F7ACF94.5080505@anonymous.org.uk>
+ <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
 Cc: linux-crypto@vger.kernel.org
 To: linux-raid@vger.kernel.org
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <4F7ACF94.5080505@anonymous.org.uk>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:31481 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755418Ab2DCX4G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Apr 2012 19:56:06 -0400
+In-Reply-To: <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 03, 2012 at 11:23:16AM +0100, John Robinson wrote:
-> On 02/04/2012 23:48, Jim Kukunas wrote:
-> > On Sat, Mar 31, 2012 at 12:38:56PM +0100, John Robinson wrote:
-> [...]
-> >> I just noticed in my logs the other day (recent el5 kernel on a Core 2):
-> >>
-> >> raid5: automatically using best checksumming function: generic_sse
-> >>      generic_sse:  7805.000 MB/sec
-> >> raid5: using function: generic_sse (7805.000 MB/sec)
-> [...]
-> >> raid6: using algorithm sse2x4 (8237 MB/s)
-> >>
-> >> I was just wondering how it's possible to do the RAID6 Q calculation
-> >> faster than the RAID5 XOR calculation - or am I reading this log excerpt
-> >> wrongly?
-> >
-> > Out of curiosity, are you running with CONFIG_PREEMPT=y?
->
-> No. Here's an excerpt from my .config:
->
-> # CONFIG_PREEMPT_NONE is not set
-> CONFIG_PREEMPT_VOLUNTARY=y
-> # CONFIG_PREEMPT is not set
-> CONFIG_PREEMPT_BKL=y
-> CONFIG_PREEMPT_NOTIFIERS=y
->
-> But this is a Xen dom0 kernel, 2.6.18-308.1.1.el5.centos.plusxen. Now, a
-> non-Xen kernel (2.6.18-308.1.1.el5) says:
-> raid5: automatically using best checksumming function: generic_sse
->     generic_sse: 11892.000 MB/sec
-> raid5: using function: generic_sse (11892.000 MB/sec)
-> raid6: int64x1   2644 MB/s
-> raid6: int64x2   3238 MB/s
-> raid6: int64x4   3011 MB/s
-> raid6: int64x8   2503 MB/s
-> raid6: sse2x1    5375 MB/s
-> raid6: sse2x2    5851 MB/s
-> raid6: sse2x4    9136 MB/s
-> raid6: using algorithm sse2x4 (9136 MB/s)
->
-> Looks like it loses a chunk of performance running as a Xen dom0.
->
-> Even still, 11892 MB/s for XOR vs 9136 MB/s for XOR+Q - it still seems
-> remarkable that the XOR can't be done several times faster than the Q.
+With CONFIG_PREEMPT=y, we need to disable preemption while benchmarking
+RAID5 xor checksumming to ensure we're actually measuring what we think
+we're measuring.
 
-Taking a look at do_xor_speed, I see two issues which might be the cause
-of the disparity you reported.
+Signed-off-by: Jim Kukunas <james.t.kukunas@linux.intel.com>
+---
+ crypto/xor.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-0) In the RAID5 xor benchmark, we get the current jiffy, then run do_2() until
-the jiffy increments. This means we could potentially be testing for less
-than a full jiffy. The RAID6 benchmark handles this by obtaining the current
-jiffy, then calling cpu_relax() until the jiffy increments, and then running
-the test. This is addressed by my first patch.
-
-1) The only way I could reproduce your findings of a higher throughput for
-RAID6 than for RAID5 xor checksumming was with CONFIG_PREEMPT=y. It seems
-that you encountered this while running as XEN dom0. Currently, we disable
-preemption during the RAID6 benchmark, but don't in the RAID5 benchmark. 
-This is addressed by my second patch.
-
-I've added linux-crypto to the discussion as both of these patches affect
-code in crypto/
-
-Thanks.
-
-
+diff --git a/crypto/xor.c b/crypto/xor.c
+index 8788443..84daa11 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -21,6 +21,7 @@
+ #include <linux/gfp.h>
+ #include <linux/raid/xor.h>
+ #include <linux/jiffies.h>
++#include <linux/preempt.h>
+ #include <asm/xor.h>
+ 
+ /* The xor routines to use.  */
+@@ -69,6 +70,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ 	tmpl->next = template_list;
+ 	template_list = tmpl;
+ 
++	preempt_disable();
++
+ 	/*
+ 	 * Count the number of XORs done during a whole jiffy, and use
+ 	 * this to calculate the speed of checksumming.  We use a 2-page
+@@ -91,6 +94,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ 			max = count;
+ 	}
+ 
++	preempt_enable();
++
+ 	speed = max * (HZ * BENCH_SIZE / 1024);
+ 	tmpl->speed = speed;
+ 
+-- 
+1.7.8.5
