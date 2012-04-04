@@ -1,58 +1,66 @@
-From: Jim Kukunas <james.t.kukunas@linux.intel.com>
-Subject: [PATCH 1/2] crypto: wait for a full jiffy in do_xor_speed
-Date: Tue,  3 Apr 2012 16:56:18 -0700
-Message-ID: <1333497379-2640-2-git-send-email-james.t.kukunas@linux.intel.com>
-References: <4F7ACF94.5080505@anonymous.org.uk>
- <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
-Cc: linux-crypto@vger.kernel.org
-To: linux-raid@vger.kernel.org
+From: Borislav Petkov <bp@amd64.org>
+Subject: [PATCH] crypto, xor: Sanitize checksumming function selection output
+Date: Wed,  4 Apr 2012 15:06:10 +0200
+Message-ID: <1333544770-21303-1-git-send-email-bp@amd64.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Borislav Petkov <borislav.petkov@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:19318 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755257Ab2DCX4G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Apr 2012 19:56:06 -0400
-In-Reply-To: <1333497379-2640-1-git-send-email-james.t.kukunas@linux.intel.com>
+Received: from s15943758.onlinehome-server.info ([217.160.130.188]:48339 "EHLO
+	mail.x86-64.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756209Ab2DDNGW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Apr 2012 09:06:22 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In the existing do_xor_speed(), there is no guarantee that we actually
-run do_2() for a full jiffy. We get the current jiffy, then run do_2()
-until the next jiffy.
+From: Borislav Petkov <borislav.petkov@amd.com>
 
-Instead, let's get the current jiffy, then wait until the next jiffy
-to start our test.
+Currently, it says
 
-Signed-off-by: Jim Kukunas <james.t.kukunas@linux.intel.com>
+[    1.015541] xor: automatically using best checksumming function: generic_sse
+[    1.040769]    generic_sse:  6679.000 MB/sec
+[    1.045377] xor: using function: generic_sse (6679.000 MB/sec)
+
+and repeats the function name three times unnecessarily. Change it into
+
+[    1.015115] xor: automatically using best checksumming function:
+[    1.040794]    generic_sse:  6680.000 MB/sec
+
+and save us a line in dmesg.
+
+No functional change.
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Borislav Petkov <borislav.petkov@amd.com>
 ---
- crypto/xor.c |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+ crypto/xor.c |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/xor.c b/crypto/xor.c
-index b75182d..8788443 100644
+index b75182d8ab14..664b6dfa9e2c 100644
 --- a/crypto/xor.c
 +++ b/crypto/xor.c
-@@ -63,7 +63,7 @@ static void
- do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- {
- 	int speed;
--	unsigned long now;
-+	unsigned long now, j;
- 	int i, count, max;
+@@ -129,9 +129,9 @@ calibrate_xor_blocks(void)
  
- 	tmpl->next = template_list;
-@@ -76,9 +76,11 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 	 */
- 	max = 0;
- 	for (i = 0; i < 5; i++) {
--		now = jiffies;
-+		j = jiffies;
- 		count = 0;
--		while (jiffies == now) {
-+		while ((now = jiffies) == j)
-+			cpu_relax();
-+		while (time_before(jiffies, now + 1)) {
- 			mb(); /* prevent loop optimzation */
- 			tmpl->do_2(BENCH_SIZE, b1, b2);
- 			mb();
+ 	if (fastest) {
+ 		printk(KERN_INFO "xor: automatically using best "
+-			"checksumming function: %s\n",
+-			fastest->name);
++				 "checksumming function:\n");
+ 		xor_speed(fastest);
++		goto out;
+ 	} else {
+ 		printk(KERN_INFO "xor: measuring software checksum speed\n");
+ 		XOR_TRY_TEMPLATES;
+@@ -146,6 +146,7 @@ calibrate_xor_blocks(void)
+ 
+ #undef xor_speed
+ 
++ out:
+ 	free_pages((unsigned long)b1, 2);
+ 
+ 	active_template = fastest;
 -- 
-1.7.8.5
+1.7.9.3.362.g71319
