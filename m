@@ -1,39 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3 v4] crypto: ux500: Add driver for HASH hardware
-Date: Mon, 9 Apr 2012 15:09:19 +0800
-Message-ID: <20120409070919.GA30624@gondor.apana.org.au>
-References: <1333098168-30706-1-git-send-email-andreas.westin@stericsson.com> <1333098168-30706-3-git-send-email-andreas.westin@stericsson.com>
+Subject: Re: [PATCH] crypto: talitos - properly lock access to global
+	talitos registers
+Date: Mon, 9 Apr 2012 15:14:36 +0800
+Message-ID: <20120409071423.GA30875@gondor.apana.org.au>
+References: <1333118993-17522-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, kim.phillips@freescale.com
-To: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:60979 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:50793 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752919Ab2DIHJ2 (ORCPT
+	with ESMTP id S1752919Ab2DIHPA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Apr 2012 03:09:28 -0400
+	Mon, 9 Apr 2012 03:15:00 -0400
 Content-Disposition: inline
-In-Reply-To: <1333098168-30706-3-git-send-email-andreas.westin@stericsson.com>
+In-Reply-To: <1333118993-17522-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 30, 2012 at 11:02:47AM +0200, Andreas Westin wrote:
->
-> +/**
-> + * hash_hw_update - Updates current HASH computation hashing another part of
-> + *                  the message.
-> + * @req:	Byte array containing the message to be hashed (caller
-> + *		allocated).
-> + *
-> + * Reentrancy: Non Re-entrant
-> + */
+On Fri, Mar 30, 2012 at 05:49:53PM +0300, Horia Geanta wrote:
+> Access to global talitos registers must be protected for the case when
+> affinities are configured such that primary and secondary talitos irqs
+> run on different cpus.
+> 
+> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
-As the crypto API is reentrant this comment suggests that this
-driver cannot be accepted as is.
-
-Cheers,
+Applied to crypto.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
