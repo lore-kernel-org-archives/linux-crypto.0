@@ -1,8 +1,8 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH v2 15/17] powerpc: crypto: debugfs routines and docs for the
- nx device driver
-Date: Tue, 10 Apr 2012 10:11:06 -0500
-Message-ID: <1334070666.16827.31.camel@key-ThinkPad-W510>
+Subject: [PATCH v2 09/17] powerpc: crypto: AES-ECB mode routines for nx
+ encryption
+Date: Tue, 10 Apr 2012 10:10:11 -0500
+Message-ID: <1334070611.16827.19.camel@key-ThinkPad-W510>
 References: <1334070249.16827.1.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -16,76 +16,23 @@ In-Reply-To: <1334070249.16827.1.camel@key-ThinkPad-W510>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These routines add debugfs files supporting the Power7+ in-Nest encryption
-accelerator driver.
+These routines add support for AES in ECB mode on the Power7+ CPU's
+in-Nest accelerator driver.
 
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- Documentation/ABI/testing/debugfs-pfo-nx-crypto |   45 ++++++++++
- drivers/crypto/nx/nx_debugfs.c                  |  103 +++++++++++++++++++++++
- 2 files changed, 148 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/ABI/testing/debugfs-pfo-nx-crypto
- create mode 100644 drivers/crypto/nx/nx_debugfs.c
+ drivers/crypto/nx/nx-aes-ecb.c |  138 ++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 138 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/crypto/nx/nx-aes-ecb.c
 
-diff --git a/Documentation/ABI/testing/debugfs-pfo-nx-crypto b/Documentation/ABI/testing/debugfs-pfo-nx-crypto
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
 new file mode 100644
-index 0000000..685d5a4
+index 0000000..6db5a71
 --- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-pfo-nx-crypto
-@@ -0,0 +1,45 @@
-+What:		/sys/kernel/debug/nx-crypto/*
-+Date:		March 2012
-+KernelVersion:	3.4
-+Contact:	Kent Yoder <key@linux.vnet.ibm.com>
-+Description:
-+
-+  These debugfs interfaces are built by the nx-crypto driver, built in
-+arch/powerpc/crypto/nx.
-+
-+Error Detection
-+===============
-+
-+errors:
-+- A u32 providing a total count of errors since the driver was loaded. The
-+only errors counted here are those returned from the hcall, H_COP_OP.
-+
-+last_error:
-+- The most recent non-zero return code from the H_COP_OP hcall. -EBUSY is not
-+recorded here (the hcall will retry until -EBUSY goes away).
-+
-+last_error_pid:
-+- The process ID of the process who received the most recent error from the
-+hcall.
-+
-+Device Use
-+==========
-+
-+aes_bytes:
-+- The total number of bytes encrypted using AES in any of the driver's
-+supported modes.
-+
-+aes_ops:
-+- The total number of AES operations submitted to the hardware.
-+
-+sha256_bytes:
-+- The total number of bytes hashed by the hardware using SHA-256.
-+
-+sha256_ops:
-+- The total number of SHA-256 operations submitted to the hardware.
-+
-+sha512_bytes:
-+- The total number of bytes hashed by the hardware using SHA-512.
-+
-+sha512_ops:
-+- The total number of SHA-512 operations submitted to the hardware.
-diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
-new file mode 100644
-index 0000000..7ab2e8d
---- /dev/null
-+++ b/drivers/crypto/nx/nx_debugfs.c
-@@ -0,0 +1,103 @@
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -0,0 +1,138 @@
 +/**
-+ * debugfs routines supporting the Power 7+ Nest Accelerators driver
++ * AES ECB routines supporting the Power 7+ Nest Accelerators driver
 + *
 + * Copyright (C) 2011-2012 International Business Machines Inc.
 + *
@@ -105,87 +52,122 @@ index 0000000..7ab2e8d
 + * Author: Kent Yoder <yoder1@us.ibm.com>
 + */
 +
-+#include <linux/device.h>
-+#include <linux/kobject.h>
-+#include <linux/string.h>
-+#include <linux/debugfs.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
 +#include <linux/module.h>
-+#include <linux/init.h>
++#include <linux/types.h>
 +#include <linux/crypto.h>
-+#include <crypto/hash.h>
 +#include <asm/vio.h>
 +
 +#include "nx_csbcpb.h"
 +#include "nx.h"
 +
-+#ifdef CONFIG_DEBUG_FS
 +
-+/*
-+ * debugfs
-+ *
-+ * For documentation on these attributes, please see:
-+ *
-+ * Documentation/ABI/testing/debugfs-pfo-nx-crypto
-+ */
-+
-+int nx_debugfs_init(struct nx_crypto_driver *drv)
++static int ecb_aes_nx_set_key(struct crypto_tfm *tfm,
++			      const u8          *in_key,
++			      unsigned int       key_len)
 +{
-+	struct nx_debugfs *dfs = &drv->dfs;
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
++	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
 +
-+	dfs->dfs_root = debugfs_create_dir(NX_NAME, NULL);
++	nx_ctx_init(nx_ctx, HCOP_FC_AES);
 +
-+	dfs->dfs_aes_ops =
-+		debugfs_create_u32("aes_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root, (u32 *)&drv->stats.aes_ops);
-+	dfs->dfs_sha256_ops =
-+		debugfs_create_u32("sha256_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.sha256_ops);
-+	dfs->dfs_sha512_ops =
-+		debugfs_create_u32("sha512_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.sha512_ops);
-+	dfs->dfs_aes_bytes =
-+		debugfs_create_u64("aes_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.aes_bytes);
-+	dfs->dfs_sha256_bytes =
-+		debugfs_create_u64("sha256_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.sha256_bytes);
-+	dfs->dfs_sha512_bytes =
-+		debugfs_create_u64("sha512_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.sha512_bytes);
-+	dfs->dfs_errors =
-+		debugfs_create_u32("errors",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root, (u32 *)&drv->stats.errors);
-+	dfs->dfs_last_error =
-+		debugfs_create_u32("last_error",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.last_error);
-+	dfs->dfs_last_error_pid =
-+		debugfs_create_u32("last_error_pid",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.last_error_pid);
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_128);
++		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_128];
++		break;
++	case AES_KEYSIZE_192:
++		NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_192);
++		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_192];
++		break;
++	case AES_KEYSIZE_256:
++		NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_256);
++		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_256];
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	csbcpb->cpb.hdr.mode = NX_MODE_AES_ECB;
++	memcpy(csbcpb->cpb.aes_ecb.key, in_key, key_len);
++
 +	return 0;
 +}
 +
-+void
-+nx_debugfs_fini(struct nx_crypto_driver *drv)
++static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
++			    struct scatterlist    *dst,
++			    struct scatterlist    *src,
++			    unsigned int           nbytes,
++			    int                    enc)
 +{
-+	debugfs_remove_recursive(drv->dfs.dfs_root);
++	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
++	int rc;
++
++	if (nbytes > nx_ctx->ap->databytelen)
++		return -EINVAL;
++
++	if (enc)
++		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
++	else
++		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
++
++	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, NULL);
++	if (rc)
++		goto out;
++
++	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
++		rc = -EINVAL;
++		goto out;
++	}
++
++	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
++	if (rc)
++		goto out;
++
++	atomic_inc(&(nx_ctx->stats->aes_ops));
++	atomic64_add(csbcpb->csb.processed_byte_count,
++		     &(nx_ctx->stats->aes_bytes));
++out:
++	return rc;
 +}
 +
-+#endif
++static int ecb_aes_nx_encrypt(struct blkcipher_desc *desc,
++			      struct scatterlist    *dst,
++			      struct scatterlist    *src,
++			      unsigned int           nbytes)
++{
++	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 1);
++}
++
++static int ecb_aes_nx_decrypt(struct blkcipher_desc *desc,
++			      struct scatterlist    *dst,
++			      struct scatterlist    *src,
++			      unsigned int           nbytes)
++{
++	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 0);
++}
++
++struct crypto_alg nx_ecb_aes_alg = {
++	.cra_name        = "ecb(aes)",
++	.cra_driver_name = "ecb-aes-nx",
++	.cra_priority    = 300,
++	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize   = AES_BLOCK_SIZE,
++	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
++	.cra_type        = &crypto_blkcipher_type,
++	.cra_module      = THIS_MODULE,
++	.cra_list        = LIST_HEAD_INIT(nx_ecb_aes_alg.cra_list),
++	.cra_init        = nx_crypto_ctx_aes_ecb_init,
++	.cra_exit        = nx_crypto_ctx_exit,
++	.cra_blkcipher = {
++		.min_keysize = AES_MIN_KEY_SIZE,
++		.max_keysize = AES_MAX_KEY_SIZE,
++		.setkey      = ecb_aes_nx_set_key,
++		.encrypt     = ecb_aes_nx_encrypt,
++		.decrypt     = ecb_aes_nx_decrypt,
++	}
++};
 -- 
 1.7.1
