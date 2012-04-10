@@ -1,269 +1,99 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH v2 11/17] powerpc: crypto: AES-XCBC mode routines for nx
- encryption
-Date: Tue, 10 Apr 2012 10:10:31 -0500
-Message-ID: <1334070631.16827.23.camel@key-ThinkPad-W510>
+Subject: [PATCH v2 02/17] powerpc: Add pseries update notifier for OFDT prop
+ changes
+Date: Tue, 10 Apr 2012 10:08:20 -0500
+Message-ID: <1334070500.16827.5.camel@key-ThinkPad-W510>
 References: <1334070249.16827.1.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
-	key@linux.vnet.ibm.com, benh@kernel.crashing.org,
-	linuxppc-dev@lists.ozlabs.org
+Cc: key@linux.vnet.ibm.com, rcj@linux.vnet.ibm.com,
+ linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 In-Reply-To: <1334070249.16827.1.camel@key-ThinkPad-W510>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
 List-Id: linux-crypto.vger.kernel.org
 
-These routines add support for AES in XCBC mode on the Power7+ CPU's
-in-Nest accelerator driver.
+This adds an update notifier mechanism for changes to properties in the
+device tree.  One use of this would be a device driver that needs to act
+on changes to it's properties in the device tree after a live migration
+or a dynamic activation that is triggered by updates to ofdt properties.
 
+Signed-off-by: Robert Jennings <rcj@linux.vnet.ibm.com>
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-xcbc.c |  234 +++++++++++++++++++++++++++++++++++++++
- 1 files changed, 234 insertions(+), 0 deletions(-)
- create mode 100644 drivers/crypto/nx/nx-aes-xcbc.c
+ arch/powerpc/include/asm/pSeries_reconfig.h |   12 ++++++++++++
+ arch/powerpc/platforms/pseries/reconfig.c   |    7 +++++++
+ 2 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-xcbc.c b/drivers/crypto/nx/nx-aes-xcbc.c
-new file mode 100644
-index 0000000..f0eadb1
---- /dev/null
-+++ b/drivers/crypto/nx/nx-aes-xcbc.c
-@@ -0,0 +1,234 @@
+diff --git a/arch/powerpc/include/asm/pSeries_reconfig.h b/arch/powerpc/include/asm/pSeries_reconfig.h
+index 23cd6cc..c07edfe 100644
+--- a/arch/powerpc/include/asm/pSeries_reconfig.h
++++ b/arch/powerpc/include/asm/pSeries_reconfig.h
+@@ -13,6 +13,18 @@
+ #define PSERIES_RECONFIG_REMOVE		0x0002
+ #define PSERIES_DRCONF_MEM_ADD		0x0003
+ #define PSERIES_DRCONF_MEM_REMOVE	0x0004
++#define PSERIES_UPDATE_PROPERTY		0x0005
++
 +/**
-+ * AES XCBC routines supporting the Power 7+ Nest Accelerators driver
++ * pSeries_reconfig_notify - Notifier value structure for OFDT property updates
 + *
-+ * Copyright (C) 2011-2012 International Business Machines Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 only.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-+ *
-+ * Author: Kent Yoder <yoder1@us.ibm.com>
++ * @node: Device tree node which owns the property being updated
++ * @property: Updated property
 + */
-+
-+#include <crypto/internal/hash.h>
-+#include <crypto/aes.h>
-+#include <crypto/algapi.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/crypto.h>
-+#include <asm/vio.h>
-+
-+#include "nx_csbcpb.h"
-+#include "nx.h"
-+
-+
-+struct xcbc_state {
-+	u8 state[AES_BLOCK_SIZE];
-+	unsigned int count;
-+	u8 buffer[AES_BLOCK_SIZE];
++struct pSeries_reconfig_prop_update {
++	struct device_node *node;
++	struct property *property;
 +};
+ 
+ #ifdef CONFIG_PPC_PSERIES
+ extern int pSeries_reconfig_notifier_register(struct notifier_block *);
+diff --git a/arch/powerpc/platforms/pseries/reconfig.c b/arch/powerpc/platforms/pseries/reconfig.c
+index 168651a..7b3bf76 100644
+--- a/arch/powerpc/platforms/pseries/reconfig.c
++++ b/arch/powerpc/platforms/pseries/reconfig.c
+@@ -103,11 +103,13 @@ int pSeries_reconfig_notifier_register(struct notifier_block *nb)
+ {
+ 	return blocking_notifier_chain_register(&pSeries_reconfig_chain, nb);
+ }
++EXPORT_SYMBOL_GPL(pSeries_reconfig_notifier_register);
+ 
+ void pSeries_reconfig_notifier_unregister(struct notifier_block *nb)
+ {
+ 	blocking_notifier_chain_unregister(&pSeries_reconfig_chain, nb);
+ }
++EXPORT_SYMBOL_GPL(pSeries_reconfig_notifier_unregister);
+ 
+ int pSeries_reconfig_notify(unsigned long action, void *p)
+ {
+@@ -426,6 +428,7 @@ static int do_remove_property(char *buf, size_t bufsize)
+ static int do_update_property(char *buf, size_t bufsize)
+ {
+ 	struct device_node *np;
++	struct pSeries_reconfig_prop_update upd_value;
+ 	unsigned char *value;
+ 	char *name, *end, *next_prop;
+ 	int rc, length;
+@@ -454,6 +457,10 @@ static int do_update_property(char *buf, size_t bufsize)
+ 		return -ENODEV;
+ 	}
+ 
++	upd_value.node = np;
++	upd_value.property = newprop;
++	pSeries_reconfig_notify(PSERIES_UPDATE_PROPERTY, &upd_value);
 +
-+static int nx_xcbc_set_key(struct crypto_shash *desc,
-+			   const u8            *in_key,
-+			   unsigned int         key_len)
-+{
-+	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc);
-+
-+	switch (key_len) {
-+	case AES_KEYSIZE_128:
-+		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_128];
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	memcpy(nx_ctx->priv.xcbc.key, in_key, key_len);
-+
-+	return 0;
-+}
-+
-+static int nx_xcbc_init(struct shash_desc *desc)
-+{
-+	struct xcbc_state *sctx = shash_desc_ctx(desc);
-+	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
-+	struct nx_sg *out_sg;
-+
-+	nx_ctx_init(nx_ctx, HCOP_FC_AES);
-+
-+	memset(sctx, 0, sizeof *sctx);
-+
-+	NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_128);
-+	csbcpb->cpb.hdr.mode = NX_MODE_AES_XCBC_MAC;
-+
-+	memcpy(csbcpb->cpb.aes_xcbc.key, nx_ctx->priv.xcbc.key, AES_BLOCK_SIZE);
-+	memset(nx_ctx->priv.xcbc.key, 0, sizeof *nx_ctx->priv.xcbc.key);
-+
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
-+				  AES_BLOCK_SIZE, nx_ctx->ap->sglen);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
-+
-+	return 0;
-+}
-+
-+static int nx_xcbc_update(struct shash_desc *desc,
-+			  const u8          *data,
-+			  unsigned int       len)
-+{
-+	struct xcbc_state *sctx = shash_desc_ctx(desc);
-+	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
-+	struct nx_sg *in_sg;
-+	u32 to_process, leftover;
-+	int rc = 0;
-+
-+	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
-+		/* we've hit the nx chip previously and we're updating again,
-+		 * so copy over the partial digest */
-+		memcpy(csbcpb->cpb.aes_xcbc.cv,
-+		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
-+	}
-+
-+	/* 2 cases for total data len:
-+	 *  1: <= AES_BLOCK_SIZE: copy into state, return 0
-+	 *  2: > AES_BLOCK_SIZE: process X blocks, copy in leftover
-+	 */
-+	if (len + sctx->count <= AES_BLOCK_SIZE) {
-+		memcpy(sctx->buffer + sctx->count, data, len);
-+		sctx->count += len;
-+		goto out;
-+	}
-+
-+	/* to_process: the AES_BLOCK_SIZE data chunk to process in this
-+	 * update */
-+	to_process = (sctx->count + len) & ~(AES_BLOCK_SIZE - 1);
-+	leftover = (sctx->count + len) & (AES_BLOCK_SIZE - 1);
-+
-+	/* the hardware will not accept a 0 byte operation for this algorithm
-+	 * and the operation MUST be finalized to be correct. So if we happen
-+	 * to get an update that falls on a block sized boundary, we must
-+	 * save off the last block to finalize with later. */
-+	if (!leftover) {
-+		to_process -= AES_BLOCK_SIZE;
-+		leftover = AES_BLOCK_SIZE;
-+	}
-+
-+	if (sctx->count) {
-+		in_sg = nx_build_sg_list(nx_ctx->in_sg, sctx->buffer,
-+					 sctx->count, nx_ctx->ap->sglen);
-+		in_sg = nx_build_sg_list(in_sg, (u8 *)data,
-+					 to_process - sctx->count,
-+					 nx_ctx->ap->sglen);
-+		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
-+					sizeof(struct nx_sg);
-+	} else {
-+		in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)data, to_process,
-+					 nx_ctx->ap->sglen);
-+		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
-+					sizeof(struct nx_sg);
-+	}
-+
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
-+
-+	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
-+		rc = -EINVAL;
-+		goto out;
-+	}
-+
-+	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
-+	if (rc)
-+		goto out;
-+
-+	atomic_inc(&(nx_ctx->stats->aes_ops));
-+
-+	/* copy the leftover back into the state struct */
-+	memcpy(sctx->buffer, data + len - leftover, leftover);
-+	sctx->count = leftover;
-+
-+	/* everything after the first update is continuation */
-+	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
-+out:
-+	return rc;
-+}
-+
-+static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct xcbc_state *sctx = shash_desc_ctx(desc);
-+	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
-+	struct nx_sg *in_sg, *out_sg;
-+	int rc = 0;
-+
-+	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
-+		/* we've hit the nx chip previously, now we're finalizing,
-+		 * so copy over the partial digest */
-+		memcpy(csbcpb->cpb.aes_xcbc.cv,
-+		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
-+	} else if (sctx->count == 0) {
-+		/* we've never seen an update, so this is a 0 byte op. The
-+		 * hardware cannot handle a 0 byte op, so just copy out the
-+		 * known 0 byte result. This is cheaper than allocating a
-+		 * software context to do a 0 byte op */
-+		u8 data[] = { 0x75, 0xf0, 0x25, 0x1d, 0x52, 0x8a, 0xc0, 0x1c,
-+			      0x45, 0x73, 0xdf, 0xd5, 0x84, 0xd7, 0x9f, 0x29 };
-+		memcpy(out, data, sizeof(data));
-+		goto out;
-+	}
-+
-+	/* final is represented by continuing the operation and indicating that
-+	 * this is not an intermediate operation */
-+	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
-+
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)sctx->buffer,
-+				 sctx->count, nx_ctx->ap->sglen);
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, AES_BLOCK_SIZE,
-+				  nx_ctx->ap->sglen);
-+
-+	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
-+
-+	if (!nx_ctx->op.outlen) {
-+		rc = -EINVAL;
-+		goto out;
-+	}
-+
-+	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
-+	if (rc)
-+		goto out;
-+
-+	atomic_inc(&(nx_ctx->stats->aes_ops));
-+
-+	memcpy(out, csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
-+out:
-+	return rc;
-+}
-+
-+struct shash_alg nx_shash_aes_xcbc_alg = {
-+	.digestsize = AES_BLOCK_SIZE,
-+	.init       = nx_xcbc_init,
-+	.update     = nx_xcbc_update,
-+	.final      = nx_xcbc_final,
-+	.setkey     = nx_xcbc_set_key,
-+	.descsize   = sizeof(struct xcbc_state),
-+	.statesize  = sizeof(struct xcbc_state),
-+	.base       = {
-+		.cra_name        = "xcbc(aes)",
-+		.cra_driver_name = "xcbc-aes-nx",
-+		.cra_priority    = 300,
-+		.cra_flags       = CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize   = AES_BLOCK_SIZE,
-+		.cra_module      = THIS_MODULE,
-+		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
-+		.cra_init        = nx_crypto_ctx_aes_xcbc_init,
-+		.cra_exit        = nx_crypto_ctx_exit,
-+	}
-+};
+ 	rc = prom_update_property(np, newprop, oldprop);
+ 	if (rc)
+ 		return rc;
 -- 
 1.7.1
