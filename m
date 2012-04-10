@@ -1,75 +1,89 @@
-From: Andreas Westin <andreas.westin@stericsson.com>
-Subject: [PATCH 0/3 v5] crypto: ux500 crypto and hash driver
-Date: Tue, 10 Apr 2012 14:03:43 +0200
-Message-ID: <1334059426-6806-1-git-send-email-andreas.westin@stericsson.com>
+From: Kent Yoder <key@linux.vnet.ibm.com>
+Subject: [PATCH v2 00/17] Platform Facilities Option and crypto accelerators
+Date: Tue, 10 Apr 2012 10:04:09 -0500
+Message-ID: <1334070249.16827.1.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <kim.phillips@freescale.com>,
-	Andreas Westin <andreas.westin@stericsson.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eu1sys200aog116.obsmtp.com ([207.126.144.141]:49193 "EHLO
-	eu1sys200aog116.obsmtp.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752764Ab2DJMEU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Apr 2012 08:04:20 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
+	key@linux.vnet.ibm.com, benh@kernel.crashing.org,
+	linuxppc-dev@lists.ozlabs.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Removed incorrect comments.
+ChangeLog for v2:
+- move crypto driver sysfs stuff to debugfs (Greg K-H)
+- Remove CONFIG_ dependencies for the CMO bits (Anton Blanchard)
+- move nx driver code to drivers/crypto (Kumar Gala)
+- Add inline comment for nx_build_sg_list (Rob Jennings)
+- make sure kmalloc'd pointers are aligned (Rob Jennings)
+- get rid of bitfields in nx_csbcpb.h (Rob Jennings)
+- Compile against Ben Herrenschmidt's ppc device naming patch
+- Rebase against latest upstream
 
-This adds a driver for the ST-Ericsson ux500 crypto hardware
-module. It supports AES, DES and 3DES, the driver implements
-support for AES-ECB,CBC and CTR.
+Kent Yoder (12):
+  powerpc: crypto: AES-CBC mode routines for nx encryption
+  powerpc: crypto: AES-CCM mode routines for nx encryption
+  powerpc: crypto: AES-CTR mode routines for nx encryption
+  powerpc: crypto: AES-ECB mode routines for nx encryption
+  powerpc: crypto: AES-GCM mode routines for nx encryption
+  powerpc: crypto: AES-XCBC mode routines for nx encryption
+  powerpc: crypto: SHA256 hash routines for nx encryption
+  powerpc: crypto: SHA512 hash routines for nx encryption
+  powerpc: crypto: nx driver code supporting nx encryption
+  powerpc: crypto: debugfs routines and docs for the nx device driver
+  powerpc: crypto: Build files for the nx device driver
+  powerpc: crypto: enable the PFO-based encryption device
 
-Patches are also available at: http://www.df.lth.se/~triad/ux500-crypto/
+Michael Neuling (1):
+  hwrng: pseries - PFO-based hwrng driver
 
-Andreas Westin (3):
-  crypto: ux500: Add driver for CRYP hardware.
-  crypto: ux500: Add driver for HASH hardware
-  mach-ux500: Crypto: core support for CRYP/HASH module.
+Robert Jennings (4):
+  powerpc: Add new hvcall constants to support PFO
+  powerpc: Add pseries update notifier for OFDT prop changes
+  powerpc: Add PFO support to the VIO bus
+  pseries: Enabled the PFO-based RNG accelerator
 
- arch/arm/mach-ux500/board-mop500.c              |   48 +
- arch/arm/mach-ux500/board-u5500.c               |   48 +
- arch/arm/mach-ux500/clock.c                     |   18 +-
- arch/arm/mach-ux500/devices-common.c            |   16 +
- arch/arm/mach-ux500/devices-common.h            |   23 +
- arch/arm/mach-ux500/devices-db5500.h            |    4 +
- arch/arm/mach-ux500/devices-db8500.h            |    4 +
- arch/arm/mach-ux500/include/mach/crypto-ux500.h |   21 +
- arch/arm/mach-ux500/include/mach/devices.h      |    3 +
- arch/arm/mach-ux500/ste-dma40-db5500.h          |    9 +-
- drivers/crypto/Kconfig                          |   11 +
- drivers/crypto/Makefile                         |    1 +
- drivers/crypto/ux500/Kconfig                    |   30 +
- drivers/crypto/ux500/Makefile                   |    8 +
- drivers/crypto/ux500/cryp/Makefile              |   13 +
- drivers/crypto/ux500/cryp/cryp.c                |  391 +++++
- drivers/crypto/ux500/cryp/cryp.h                |  308 ++++
- drivers/crypto/ux500/cryp/cryp_core.c           | 1785 ++++++++++++++++++++
- drivers/crypto/ux500/cryp/cryp_irq.c            |   45 +
- drivers/crypto/ux500/cryp/cryp_irq.h            |   31 +
- drivers/crypto/ux500/cryp/cryp_irqp.h           |  125 ++
- drivers/crypto/ux500/cryp/cryp_p.h              |  124 ++
- drivers/crypto/ux500/hash/Makefile              |   11 +
- drivers/crypto/ux500/hash/hash_alg.h            |  387 +++++
- drivers/crypto/ux500/hash/hash_core.c           | 2006 +++++++++++++++++++++++
- 25 files changed, 5459 insertions(+), 11 deletions(-)
- create mode 100644 arch/arm/mach-ux500/include/mach/crypto-ux500.h
- create mode 100644 drivers/crypto/ux500/Kconfig
- create mode 100644 drivers/crypto/ux500/Makefile
- create mode 100644 drivers/crypto/ux500/cryp/Makefile
- create mode 100644 drivers/crypto/ux500/cryp/cryp.c
- create mode 100644 drivers/crypto/ux500/cryp/cryp.h
- create mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
- create mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
- create mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
- create mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
- create mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
- create mode 100644 drivers/crypto/ux500/hash/Makefile
- create mode 100644 drivers/crypto/ux500/hash/hash_alg.h
- create mode 100644 drivers/crypto/ux500/hash/hash_core.c
-
--- 
-1.7.9.4
+ Documentation/ABI/testing/debugfs-pfo-nx-crypto |   45 ++
+ arch/powerpc/Makefile                           |    1 +
+ arch/powerpc/include/asm/hvcall.h               |   25 +-
+ arch/powerpc/include/asm/pSeries_reconfig.h     |   12 +
+ arch/powerpc/include/asm/vio.h                  |   46 ++
+ arch/powerpc/kernel/prom_init.c                 |    9 +-
+ arch/powerpc/kernel/vio.c                       |  273 ++++++++--
+ arch/powerpc/platforms/pseries/reconfig.c       |    7 +
+ drivers/char/hw_random/Kconfig                  |   13 +
+ drivers/char/hw_random/Makefile                 |    1 +
+ drivers/char/hw_random/pseries-rng.c            |   96 +++
+ drivers/crypto/Kconfig                          |   17 +
+ drivers/crypto/nx/Makefile                      |   11 +
+ drivers/crypto/nx/nx-aes-cbc.c                  |  140 +++++
+ drivers/crypto/nx/nx-aes-ccm.c                  |  465 +++++++++++++++
+ drivers/crypto/nx/nx-aes-ctr.c                  |  177 ++++++
+ drivers/crypto/nx/nx-aes-ecb.c                  |  138 +++++
+ drivers/crypto/nx/nx-aes-gcm.c                  |  353 +++++++++++
+ drivers/crypto/nx/nx-aes-xcbc.c                 |  234 ++++++++
+ drivers/crypto/nx/nx-sha256.c                   |  244 ++++++++
+ drivers/crypto/nx/nx-sha512.c                   |  263 +++++++++
+ drivers/crypto/nx/nx.c                          |  711 +++++++++++++++++++++++
+ drivers/crypto/nx/nx.h                          |  192 ++++++
+ drivers/crypto/nx/nx_csbcpb.h                   |  205 +++++++
+ drivers/crypto/nx/nx_debugfs.c                  |  103 ++++
+ 25 files changed, 3739 insertions(+), 42 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-pfo-nx-crypto
+ create mode 100644 drivers/char/hw_random/pseries-rng.c
+ create mode 100644 drivers/crypto/nx/Makefile
+ create mode 100644 drivers/crypto/nx/nx-aes-cbc.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ccm.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ctr.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ecb.c
+ create mode 100644 drivers/crypto/nx/nx-aes-gcm.c
+ create mode 100644 drivers/crypto/nx/nx-aes-xcbc.c
+ create mode 100644 drivers/crypto/nx/nx-sha256.c
+ create mode 100644 drivers/crypto/nx/nx-sha512.c
+ create mode 100644 drivers/crypto/nx/nx.c
+ create mode 100644 drivers/crypto/nx/nx.h
+ create mode 100644 drivers/crypto/nx/nx_csbcpb.h
+ create mode 100644 drivers/crypto/nx/nx_debugfs.c
