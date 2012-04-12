@@ -1,139 +1,110 @@
-From: James Morris <jmorris@namei.org>
-Subject: [ANN] Linux Security Summit 2012 - Announcement and CFP
-Date: Thu, 12 Apr 2012 23:36:08 +1000 (EST)
-Message-ID: <alpine.LRH.2.02.1204122333400.17266@tundra.namei.org>
-References: <alpine.LRH.2.00.1104041833360.354@tundra.namei.org>
+From: Kent Yoder <key@linux.vnet.ibm.com>
+Subject: [PATCH v3 00/17] Platform Facilities Option and crypto accelerators
+Date: Thu, 12 Apr 2012 10:00:25 -0500
+Message-ID: <1334242825.18090.4.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-kernel@vger.kernel.org, lwn@lwn.net,
-	fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
-	ubuntu-hardened@lists.ubuntu.com,
-	tomoyo-users-en@lists.sourceforge.jp,
-	netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Audit-ML <linux-audit@redhat.com>,
-	Linux Security Summit Program Committee
-	<lss-pc@ext.namei.org>, gentoo-hardened@gentoo.org,
-	David Howells <dhowells@redhat.com>
-To: linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
+	key@linux.vnet.ibm.com, benh@kernel.crashing.org,
+	linuxppc-dev@lists.ozlabs.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tundra.namei.org ([65.99.196.166]:34106 "EHLO tundra.namei.org"
+Received: from e9.ny.us.ibm.com ([32.97.182.139]:53206 "EHLO e9.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934228Ab2DLNgh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Apr 2012 09:36:37 -0400
-In-Reply-To: <alpine.LRH.2.00.1104041833360.354@tundra.namei.org>
+	id S965214Ab2DLO7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Apr 2012 10:59:39 -0400
+Received: from /spool/local
+	by e9.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
+	Thu, 12 Apr 2012 10:59:38 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-==========================================================================
-                 ANNOUNCEMENT AND CALL FOR PARTICIPATION
+This patch series adds support for a new device type, the Platform
+Facilities Option (PFO).  PFO resources are a set of accelerators that
+share some system resources managed by the VIO bus.  This patchset
+includes the basic support for the devices in the VIO bus code along
+with drivers for the random number generator and the cryptographic
+accelerators.
 
-                       LINUX SECURITY SUMMIT 2012
-                           SAN DIEGO, CA, USA
-==========================================================================
+Thanks,
+Kent
 
+ChangeLog for v3:
+- reorder patches putting nx driver first (Dave Miller)
 
-DESCRIPTION
+ChangeLog for v2:
+- move crypto driver sysfs stuff to debugfs (Greg K-H)
+- Remove CONFIG_ dependencies for the CMO bits (Anton Blanchard)
+- move nx driver code to drivers/crypto (Kumar Gala)
+- Add inline comment for nx_build_sg_list (Rob Jennings)
+- make sure kmalloc'd pointers are aligned (Rob Jennings)
+- get rid of bitfields in nx_csbcpb.h (Rob Jennings)
+- Compile against Ben Herrenschmidt's ppc device naming patch
+- Rebase against latest upstream
 
-  The Linux Security Summit (LSS) is a technical forum for collaboration
-  between Linux developers, researchers, and end users.  Its primary aim
-  is to foster community efforts in analyzing and solving Linux security
-  challenges.
+Kent Yoder (12):
+  powerpc: crypto: nx driver code supporting nx encryption
+  powerpc: crypto: AES-CBC mode routines for nx encryption
+  powerpc: crypto: AES-CCM mode routines for nx encryption
+  powerpc: crypto: AES-CTR mode routines for nx encryption
+  powerpc: crypto: AES-ECB mode routines for nx encryption
+  powerpc: crypto: AES-GCM mode routines for nx encryption
+  powerpc: crypto: AES-XCBC mode routines for nx encryption
+  powerpc: crypto: SHA256 hash routines for nx encryption
+  powerpc: crypto: SHA512 hash routines for nx encryption
+  powerpc: crypto: debugfs routines and docs for the nx device driver
+  powerpc: crypto: Build files for the nx device driver
+  powerpc: crypto: enable the PFO-based encryption device
 
-  The format of the summit will be:
-  
-    * Refereed presentations
-    * Short talks
-    * Roundtable discussions
-    * Breakout development sessions 
+Michael Neuling (1):
+  hwrng: pseries - PFO-based hwrng driver
 
+Robert Jennings (4):
+  powerpc: Add new hvcall constants to support PFO
+  powerpc: Add pseries update notifier for OFDT prop changes
+  powerpc: Add PFO support to the VIO bus
+  pseries: Enabled the PFO-based RNG accelerator
 
-WEB SITE
-
-  http://kernsec.org/wiki/index.php/Linux_Security_Summit_2012
-
-
-DATES / LOCATION
-
-  The Linux Security Summit for 2012 will be held across 30 and 31 August
-  in San Diego, CA, USA.  It will be co-located with LinuxCon[1], as well
-  as Linux Plumbers and the Kernel Summit.
- 
-  Note that Linux Security Summit attendees and speakers must be registered
-  to attend LinuxCon.  See the LinuxCon site for details on registration,
-  travel, and accommodation:
-  
-    https://events.linuxfoundation.org/events/linuxcon
-
-  The Linux Security Summit CFP is now open, and will close on 23rd of May.
-  
-  Accepted speakers will be notified by 1st of June.
-
-
-WHO SHOULD ATTEND
-
-  The event is open to all registered LinuxCon attendees.
-  
-  You do not have to be a "security person" to attend -- we're seeking a
-  diverse range of attendees, and welcome the participation of general
-  developers, researchers, operations, and end-users.
-
-
-CALL FOR PARTICIPATION
-
-  The program committee currently seeks proposals for:
-
-  * Refereed Presentations:
-      45 minutes in length, including at least 10 minutes of discussion.
-      Papers are encouraged.
-  
-  * Short Talks:
-      30 minutes in length, discussion-oriented.  Slides should be minimal.
-
-  * Roundtable Discussion Topics
-
-   
-  Topic areas include, but are not limited to:
-  
-    * System hardening
-    * Access control
-    * Cryptography
-    * Integrity control
-    * Hardware security
-    * Networking
-    * Storage
-    * Virtualization
-    * Desktop
-    * Tools
-    * Management
-    * Case studies
-    * Emerging technologies, threats & techniques 
-    
-  Proposals should be submitted in plain text via email to the program
-  committee at:  lss-pc (_at_) ext.namei.org
-
-  Abstracts should be approximately 150 words in total.
-
-
-PROGRAM COMMITTEE
-
-  The Linux Security Summit for 2012 is organized by:
-
-    * James Morris, Oracle
-    * Serge Hallyn, Canonical
-    * Paul Moore, Red Hat
-    * Stephen Smalley, NSA
-    * Joshua Brindle, Tresys
-    * Tetsuo Handa, NTT Data
-    * Herbert Xu, Red Hat
-    * John Johansen, Canonical
-    * Kees Cook, Google
-    * Casey Schaufler, Intel
-
-  The program committee may be contacted as a group via email:
-
-     lss-pc (_at_) ext.namei.org
-   
-
-REFERENCES  
-
-  [1] https://events.linuxfoundation.org/events/linuxcon
+ Documentation/ABI/testing/debugfs-pfo-nx-crypto |   45 ++
+ arch/powerpc/Makefile                           |    1 +
+ arch/powerpc/include/asm/hvcall.h               |   25 +-
+ arch/powerpc/include/asm/pSeries_reconfig.h     |   12 +
+ arch/powerpc/include/asm/vio.h                  |   46 ++
+ arch/powerpc/kernel/prom_init.c                 |    9 +-
+ arch/powerpc/kernel/vio.c                       |  273 ++++++++--
+ arch/powerpc/platforms/pseries/reconfig.c       |    7 +
+ drivers/char/hw_random/Kconfig                  |   13 +
+ drivers/char/hw_random/Makefile                 |    1 +
+ drivers/char/hw_random/pseries-rng.c            |   96 +++
+ drivers/crypto/Kconfig                          |   17 +
+ drivers/crypto/nx/Makefile                      |   11 +
+ drivers/crypto/nx/nx-aes-cbc.c                  |  140 +++++
+ drivers/crypto/nx/nx-aes-ccm.c                  |  465 +++++++++++++++
+ drivers/crypto/nx/nx-aes-ctr.c                  |  177 ++++++
+ drivers/crypto/nx/nx-aes-ecb.c                  |  138 +++++
+ drivers/crypto/nx/nx-aes-gcm.c                  |  353 +++++++++++
+ drivers/crypto/nx/nx-aes-xcbc.c                 |  234 ++++++++
+ drivers/crypto/nx/nx-sha256.c                   |  244 ++++++++
+ drivers/crypto/nx/nx-sha512.c                   |  263 +++++++++
+ drivers/crypto/nx/nx.c                          |  711 +++++++++++++++++++++++
+ drivers/crypto/nx/nx.h                          |  192 ++++++
+ drivers/crypto/nx/nx_csbcpb.h                   |  205 +++++++
+ drivers/crypto/nx/nx_debugfs.c                  |  103 ++++
+ 25 files changed, 3739 insertions(+), 42 deletions(-)
+ create mode 100644 Documentation/ABI/testing/debugfs-pfo-nx-crypto
+ create mode 100644 drivers/char/hw_random/pseries-rng.c
+ create mode 100644 drivers/crypto/nx/Makefile
+ create mode 100644 drivers/crypto/nx/nx-aes-cbc.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ccm.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ctr.c
+ create mode 100644 drivers/crypto/nx/nx-aes-ecb.c
+ create mode 100644 drivers/crypto/nx/nx-aes-gcm.c
+ create mode 100644 drivers/crypto/nx/nx-aes-xcbc.c
+ create mode 100644 drivers/crypto/nx/nx-sha256.c
+ create mode 100644 drivers/crypto/nx/nx-sha512.c
+ create mode 100644 drivers/crypto/nx/nx.c
+ create mode 100644 drivers/crypto/nx/nx.h
+ create mode 100644 drivers/crypto/nx/nx_csbcpb.h
+ create mode 100644 drivers/crypto/nx/nx_debugfs.c
