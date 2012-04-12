@@ -1,91 +1,45 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH v3 15/17] powerpc: crypto: debugfs routines and docs for the
- nx device driver
-Date: Thu, 12 Apr 2012 10:38:54 -0500
-Message-ID: <1334245134.18090.36.camel@key-ThinkPad-W510>
+Subject: [PATCH v3 12/17] powerpc: crypto: AES-XCBC mode routines for nx
+ encryption
+Date: Thu, 12 Apr 2012 10:38:13 -0500
+Message-ID: <1334245093.18090.30.camel@key-ThinkPad-W510>
 References: <1334242825.18090.4.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
-	key@linux.vnet.ibm.com, benh@kernel.crashing.org,
-	linuxppc-dev@lists.ozlabs.org
+Cc: key@linux.vnet.ibm.com, rcj@linux.vnet.ibm.com,
+ linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 In-Reply-To: <1334242825.18090.4.camel@key-ThinkPad-W510>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
 List-Id: linux-crypto.vger.kernel.org
 
-These routines add debugfs files supporting the Power7+ in-Nest encryption
-accelerator driver.
+These routines add support for AES in XCBC mode on the Power7+ CPU's
+in-Nest accelerator driver.
 
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- Documentation/ABI/testing/debugfs-pfo-nx-crypto |   45 ++++++++++
- drivers/crypto/nx/nx_debugfs.c                  |  103 +++++++++++++++++++++++
- 2 files changed, 148 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/ABI/testing/debugfs-pfo-nx-crypto
- create mode 100644 drivers/crypto/nx/nx_debugfs.c
+ drivers/crypto/nx/nx-aes-xcbc.c |  234 +++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 234 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/crypto/nx/nx-aes-xcbc.c
 
-diff --git a/Documentation/ABI/testing/debugfs-pfo-nx-crypto b/Documentation/ABI/testing/debugfs-pfo-nx-crypto
+diff --git a/drivers/crypto/nx/nx-aes-xcbc.c b/drivers/crypto/nx/nx-aes-xcbc.c
 new file mode 100644
-index 0000000..685d5a4
+index 0000000..f0eadb1
 --- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-pfo-nx-crypto
-@@ -0,0 +1,45 @@
-+What:		/sys/kernel/debug/nx-crypto/*
-+Date:		March 2012
-+KernelVersion:	3.4
-+Contact:	Kent Yoder <key@linux.vnet.ibm.com>
-+Description:
-+
-+  These debugfs interfaces are built by the nx-crypto driver, built in
-+arch/powerpc/crypto/nx.
-+
-+Error Detection
-+===============
-+
-+errors:
-+- A u32 providing a total count of errors since the driver was loaded. The
-+only errors counted here are those returned from the hcall, H_COP_OP.
-+
-+last_error:
-+- The most recent non-zero return code from the H_COP_OP hcall. -EBUSY is not
-+recorded here (the hcall will retry until -EBUSY goes away).
-+
-+last_error_pid:
-+- The process ID of the process who received the most recent error from the
-+hcall.
-+
-+Device Use
-+==========
-+
-+aes_bytes:
-+- The total number of bytes encrypted using AES in any of the driver's
-+supported modes.
-+
-+aes_ops:
-+- The total number of AES operations submitted to the hardware.
-+
-+sha256_bytes:
-+- The total number of bytes hashed by the hardware using SHA-256.
-+
-+sha256_ops:
-+- The total number of SHA-256 operations submitted to the hardware.
-+
-+sha512_bytes:
-+- The total number of bytes hashed by the hardware using SHA-512.
-+
-+sha512_ops:
-+- The total number of SHA-512 operations submitted to the hardware.
-diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
-new file mode 100644
-index 0000000..7ab2e8d
---- /dev/null
-+++ b/drivers/crypto/nx/nx_debugfs.c
-@@ -0,0 +1,103 @@
++++ b/drivers/crypto/nx/nx-aes-xcbc.c
+@@ -0,0 +1,234 @@
 +/**
-+ * debugfs routines supporting the Power 7+ Nest Accelerators driver
++ * AES XCBC routines supporting the Power 7+ Nest Accelerators driver
 + *
 + * Copyright (C) 2011-2012 International Business Machines Inc.
 + *
@@ -105,87 +59,218 @@ index 0000000..7ab2e8d
 + * Author: Kent Yoder <yoder1@us.ibm.com>
 + */
 +
-+#include <linux/device.h>
-+#include <linux/kobject.h>
-+#include <linux/string.h>
-+#include <linux/debugfs.h>
++#include <crypto/internal/hash.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
 +#include <linux/module.h>
-+#include <linux/init.h>
++#include <linux/types.h>
 +#include <linux/crypto.h>
-+#include <crypto/hash.h>
 +#include <asm/vio.h>
 +
 +#include "nx_csbcpb.h"
 +#include "nx.h"
 +
-+#ifdef CONFIG_DEBUG_FS
 +
-+/*
-+ * debugfs
-+ *
-+ * For documentation on these attributes, please see:
-+ *
-+ * Documentation/ABI/testing/debugfs-pfo-nx-crypto
-+ */
++struct xcbc_state {
++	u8 state[AES_BLOCK_SIZE];
++	unsigned int count;
++	u8 buffer[AES_BLOCK_SIZE];
++};
 +
-+int nx_debugfs_init(struct nx_crypto_driver *drv)
++static int nx_xcbc_set_key(struct crypto_shash *desc,
++			   const u8            *in_key,
++			   unsigned int         key_len)
 +{
-+	struct nx_debugfs *dfs = &drv->dfs;
++	struct nx_crypto_ctx *nx_ctx = crypto_shash_ctx(desc);
 +
-+	dfs->dfs_root = debugfs_create_dir(NX_NAME, NULL);
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		nx_ctx->ap = &nx_ctx->props[NX_PROPS_AES_128];
++		break;
++	default:
++		return -EINVAL;
++	}
 +
-+	dfs->dfs_aes_ops =
-+		debugfs_create_u32("aes_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root, (u32 *)&drv->stats.aes_ops);
-+	dfs->dfs_sha256_ops =
-+		debugfs_create_u32("sha256_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.sha256_ops);
-+	dfs->dfs_sha512_ops =
-+		debugfs_create_u32("sha512_ops",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.sha512_ops);
-+	dfs->dfs_aes_bytes =
-+		debugfs_create_u64("aes_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.aes_bytes);
-+	dfs->dfs_sha256_bytes =
-+		debugfs_create_u64("sha256_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.sha256_bytes);
-+	dfs->dfs_sha512_bytes =
-+		debugfs_create_u64("sha512_bytes",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u64 *)&drv->stats.sha512_bytes);
-+	dfs->dfs_errors =
-+		debugfs_create_u32("errors",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root, (u32 *)&drv->stats.errors);
-+	dfs->dfs_last_error =
-+		debugfs_create_u32("last_error",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.last_error);
-+	dfs->dfs_last_error_pid =
-+		debugfs_create_u32("last_error_pid",
-+				   S_IRUSR | S_IRGRP | S_IROTH,
-+				   dfs->dfs_root,
-+				   (u32 *)&drv->stats.last_error_pid);
++	memcpy(nx_ctx->priv.xcbc.key, in_key, key_len);
++
 +	return 0;
 +}
 +
-+void
-+nx_debugfs_fini(struct nx_crypto_driver *drv)
++static int nx_xcbc_init(struct shash_desc *desc)
 +{
-+	debugfs_remove_recursive(drv->dfs.dfs_root);
++	struct xcbc_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
++	struct nx_sg *out_sg;
++
++	nx_ctx_init(nx_ctx, HCOP_FC_AES);
++
++	memset(sctx, 0, sizeof *sctx);
++
++	NX_CPB_SET_KEY_SIZE(csbcpb, NX_KS_AES_128);
++	csbcpb->cpb.hdr.mode = NX_MODE_AES_XCBC_MAC;
++
++	memcpy(csbcpb->cpb.aes_xcbc.key, nx_ctx->priv.xcbc.key, AES_BLOCK_SIZE);
++	memset(nx_ctx->priv.xcbc.key, 0, sizeof *nx_ctx->priv.xcbc.key);
++
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
++				  AES_BLOCK_SIZE, nx_ctx->ap->sglen);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
++	return 0;
 +}
 +
-+#endif
++static int nx_xcbc_update(struct shash_desc *desc,
++			  const u8          *data,
++			  unsigned int       len)
++{
++	struct xcbc_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
++	struct nx_sg *in_sg;
++	u32 to_process, leftover;
++	int rc = 0;
++
++	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
++		/* we've hit the nx chip previously and we're updating again,
++		 * so copy over the partial digest */
++		memcpy(csbcpb->cpb.aes_xcbc.cv,
++		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
++	}
++
++	/* 2 cases for total data len:
++	 *  1: <= AES_BLOCK_SIZE: copy into state, return 0
++	 *  2: > AES_BLOCK_SIZE: process X blocks, copy in leftover
++	 */
++	if (len + sctx->count <= AES_BLOCK_SIZE) {
++		memcpy(sctx->buffer + sctx->count, data, len);
++		sctx->count += len;
++		goto out;
++	}
++
++	/* to_process: the AES_BLOCK_SIZE data chunk to process in this
++	 * update */
++	to_process = (sctx->count + len) & ~(AES_BLOCK_SIZE - 1);
++	leftover = (sctx->count + len) & (AES_BLOCK_SIZE - 1);
++
++	/* the hardware will not accept a 0 byte operation for this algorithm
++	 * and the operation MUST be finalized to be correct. So if we happen
++	 * to get an update that falls on a block sized boundary, we must
++	 * save off the last block to finalize with later. */
++	if (!leftover) {
++		to_process -= AES_BLOCK_SIZE;
++		leftover = AES_BLOCK_SIZE;
++	}
++
++	if (sctx->count) {
++		in_sg = nx_build_sg_list(nx_ctx->in_sg, sctx->buffer,
++					 sctx->count, nx_ctx->ap->sglen);
++		in_sg = nx_build_sg_list(in_sg, (u8 *)data,
++					 to_process - sctx->count,
++					 nx_ctx->ap->sglen);
++		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
++					sizeof(struct nx_sg);
++	} else {
++		in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)data, to_process,
++					 nx_ctx->ap->sglen);
++		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
++					sizeof(struct nx_sg);
++	}
++
++	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
++
++	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
++		rc = -EINVAL;
++		goto out;
++	}
++
++	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
++	if (rc)
++		goto out;
++
++	atomic_inc(&(nx_ctx->stats->aes_ops));
++
++	/* copy the leftover back into the state struct */
++	memcpy(sctx->buffer, data + len - leftover, leftover);
++	sctx->count = leftover;
++
++	/* everything after the first update is continuation */
++	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
++out:
++	return rc;
++}
++
++static int nx_xcbc_final(struct shash_desc *desc, u8 *out)
++{
++	struct xcbc_state *sctx = shash_desc_ctx(desc);
++	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
++	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
++	struct nx_sg *in_sg, *out_sg;
++	int rc = 0;
++
++	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
++		/* we've hit the nx chip previously, now we're finalizing,
++		 * so copy over the partial digest */
++		memcpy(csbcpb->cpb.aes_xcbc.cv,
++		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
++	} else if (sctx->count == 0) {
++		/* we've never seen an update, so this is a 0 byte op. The
++		 * hardware cannot handle a 0 byte op, so just copy out the
++		 * known 0 byte result. This is cheaper than allocating a
++		 * software context to do a 0 byte op */
++		u8 data[] = { 0x75, 0xf0, 0x25, 0x1d, 0x52, 0x8a, 0xc0, 0x1c,
++			      0x45, 0x73, 0xdf, 0xd5, 0x84, 0xd7, 0x9f, 0x29 };
++		memcpy(out, data, sizeof(data));
++		goto out;
++	}
++
++	/* final is represented by continuing the operation and indicating that
++	 * this is not an intermediate operation */
++	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
++
++	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *)sctx->buffer,
++				 sctx->count, nx_ctx->ap->sglen);
++	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, AES_BLOCK_SIZE,
++				  nx_ctx->ap->sglen);
++
++	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
++	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
++
++	if (!nx_ctx->op.outlen) {
++		rc = -EINVAL;
++		goto out;
++	}
++
++	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op);
++	if (rc)
++		goto out;
++
++	atomic_inc(&(nx_ctx->stats->aes_ops));
++
++	memcpy(out, csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
++out:
++	return rc;
++}
++
++struct shash_alg nx_shash_aes_xcbc_alg = {
++	.digestsize = AES_BLOCK_SIZE,
++	.init       = nx_xcbc_init,
++	.update     = nx_xcbc_update,
++	.final      = nx_xcbc_final,
++	.setkey     = nx_xcbc_set_key,
++	.descsize   = sizeof(struct xcbc_state),
++	.statesize  = sizeof(struct xcbc_state),
++	.base       = {
++		.cra_name        = "xcbc(aes)",
++		.cra_driver_name = "xcbc-aes-nx",
++		.cra_priority    = 300,
++		.cra_flags       = CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize   = AES_BLOCK_SIZE,
++		.cra_module      = THIS_MODULE,
++		.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
++		.cra_init        = nx_crypto_ctx_aes_xcbc_init,
++		.cra_exit        = nx_crypto_ctx_exit,
++	}
++};
 -- 
 1.7.1
