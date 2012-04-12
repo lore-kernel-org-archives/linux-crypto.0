@@ -1,110 +1,78 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH v3 00/17] Platform Facilities Option and crypto accelerators
-Date: Thu, 12 Apr 2012 10:00:25 -0500
-Message-ID: <1334242825.18090.4.camel@key-ThinkPad-W510>
+Subject: [PATCH v3 01/17] powerpc: Add new hvcall constants to support PFO
+Date: Thu, 12 Apr 2012 10:04:01 -0500
+Message-ID: <1334243041.18090.6.camel@key-ThinkPad-W510>
+References: <1334242825.18090.4.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
-	key@linux.vnet.ibm.com, benh@kernel.crashing.org,
-	linuxppc-dev@lists.ozlabs.org
+Cc: key@linux.vnet.ibm.com, rcj@linux.vnet.ibm.com,
+ linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e9.ny.us.ibm.com ([32.97.182.139]:53206 "EHLO e9.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965214Ab2DLO7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Apr 2012 10:59:39 -0400
-Received: from /spool/local
-	by e9.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
-	Thu, 12 Apr 2012 10:59:38 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1334242825.18090.4.camel@key-ThinkPad-W510>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch series adds support for a new device type, the Platform
-Facilities Option (PFO).  PFO resources are a set of accelerators that
-share some system resources managed by the VIO bus.  This patchset
-includes the basic support for the devices in the VIO bus code along
-with drivers for the random number generator and the cryptographic
-accelerators.
+The Platform Facilities Option (PFO) adds several new h_calls and
+more return codes.
 
-Thanks,
-Kent
+Signed-off-by: Robert Jennings <rcj@linux.vnet.ibm.com>
+Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
+---
+ arch/powerpc/include/asm/hvcall.h |   25 +++++++++++++++++++++++--
+ 1 files changed, 23 insertions(+), 2 deletions(-)
 
-ChangeLog for v3:
-- reorder patches putting nx driver first (Dave Miller)
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index 1c324ff..6122523 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -77,8 +77,27 @@
+ #define H_MR_CONDITION  -43
+ #define H_NOT_ENOUGH_RESOURCES -44
+ #define H_R_STATE       -45
+-#define H_RESCINDEND    -46
+-#define H_MULTI_THREADS_ACTIVE -9005
++#define H_RESCINDED     -46
++#define H_P2		-55
++#define H_P3		-56
++#define H_P4		-57
++#define H_P5		-58
++#define H_P6		-59
++#define H_P7		-60
++#define H_P8		-61
++#define H_P9		-62
++#define H_TOO_BIG	-64
++#define H_OVERLAP	-68
++#define H_INTERRUPT	-69
++#define H_BAD_DATA	-70
++#define H_NOT_ACTIVE	-71
++#define H_SG_LIST	-72
++#define H_OP_MODE	-73
++#define H_COP_HW	-74
++#define H_UNSUPPORTED_FLAG_START	-256
++#define H_UNSUPPORTED_FLAG_END		-511
++#define H_MULTI_THREADS_ACTIVE	-9005
++#define H_OUTSTANDING_COP_OPS	-9006
+ 
 
-ChangeLog for v2:
-- move crypto driver sysfs stuff to debugfs (Greg K-H)
-- Remove CONFIG_ dependencies for the CMO bits (Anton Blanchard)
-- move nx driver code to drivers/crypto (Kumar Gala)
-- Add inline comment for nx_build_sg_list (Rob Jennings)
-- make sure kmalloc'd pointers are aligned (Rob Jennings)
-- get rid of bitfields in nx_csbcpb.h (Rob Jennings)
-- Compile against Ben Herrenschmidt's ppc device naming patch
-- Rebase against latest upstream
-
-Kent Yoder (12):
-  powerpc: crypto: nx driver code supporting nx encryption
-  powerpc: crypto: AES-CBC mode routines for nx encryption
-  powerpc: crypto: AES-CCM mode routines for nx encryption
-  powerpc: crypto: AES-CTR mode routines for nx encryption
-  powerpc: crypto: AES-ECB mode routines for nx encryption
-  powerpc: crypto: AES-GCM mode routines for nx encryption
-  powerpc: crypto: AES-XCBC mode routines for nx encryption
-  powerpc: crypto: SHA256 hash routines for nx encryption
-  powerpc: crypto: SHA512 hash routines for nx encryption
-  powerpc: crypto: debugfs routines and docs for the nx device driver
-  powerpc: crypto: Build files for the nx device driver
-  powerpc: crypto: enable the PFO-based encryption device
-
-Michael Neuling (1):
-  hwrng: pseries - PFO-based hwrng driver
-
-Robert Jennings (4):
-  powerpc: Add new hvcall constants to support PFO
-  powerpc: Add pseries update notifier for OFDT prop changes
-  powerpc: Add PFO support to the VIO bus
-  pseries: Enabled the PFO-based RNG accelerator
-
- Documentation/ABI/testing/debugfs-pfo-nx-crypto |   45 ++
- arch/powerpc/Makefile                           |    1 +
- arch/powerpc/include/asm/hvcall.h               |   25 +-
- arch/powerpc/include/asm/pSeries_reconfig.h     |   12 +
- arch/powerpc/include/asm/vio.h                  |   46 ++
- arch/powerpc/kernel/prom_init.c                 |    9 +-
- arch/powerpc/kernel/vio.c                       |  273 ++++++++--
- arch/powerpc/platforms/pseries/reconfig.c       |    7 +
- drivers/char/hw_random/Kconfig                  |   13 +
- drivers/char/hw_random/Makefile                 |    1 +
- drivers/char/hw_random/pseries-rng.c            |   96 +++
- drivers/crypto/Kconfig                          |   17 +
- drivers/crypto/nx/Makefile                      |   11 +
- drivers/crypto/nx/nx-aes-cbc.c                  |  140 +++++
- drivers/crypto/nx/nx-aes-ccm.c                  |  465 +++++++++++++++
- drivers/crypto/nx/nx-aes-ctr.c                  |  177 ++++++
- drivers/crypto/nx/nx-aes-ecb.c                  |  138 +++++
- drivers/crypto/nx/nx-aes-gcm.c                  |  353 +++++++++++
- drivers/crypto/nx/nx-aes-xcbc.c                 |  234 ++++++++
- drivers/crypto/nx/nx-sha256.c                   |  244 ++++++++
- drivers/crypto/nx/nx-sha512.c                   |  263 +++++++++
- drivers/crypto/nx/nx.c                          |  711 +++++++++++++++++++++++
- drivers/crypto/nx/nx.h                          |  192 ++++++
- drivers/crypto/nx/nx_csbcpb.h                   |  205 +++++++
- drivers/crypto/nx/nx_debugfs.c                  |  103 ++++
- 25 files changed, 3739 insertions(+), 42 deletions(-)
- create mode 100644 Documentation/ABI/testing/debugfs-pfo-nx-crypto
- create mode 100644 drivers/char/hw_random/pseries-rng.c
- create mode 100644 drivers/crypto/nx/Makefile
- create mode 100644 drivers/crypto/nx/nx-aes-cbc.c
- create mode 100644 drivers/crypto/nx/nx-aes-ccm.c
- create mode 100644 drivers/crypto/nx/nx-aes-ctr.c
- create mode 100644 drivers/crypto/nx/nx-aes-ecb.c
- create mode 100644 drivers/crypto/nx/nx-aes-gcm.c
- create mode 100644 drivers/crypto/nx/nx-aes-xcbc.c
- create mode 100644 drivers/crypto/nx/nx-sha256.c
- create mode 100644 drivers/crypto/nx/nx-sha512.c
- create mode 100644 drivers/crypto/nx/nx.c
- create mode 100644 drivers/crypto/nx/nx.h
- create mode 100644 drivers/crypto/nx/nx_csbcpb.h
- create mode 100644 drivers/crypto/nx/nx_debugfs.c
+ /* Long Busy is a condition that can be returned by the firmware
+@@ -240,6 +259,8 @@
+ #define H_GET_MPP		0x2D4
+ #define H_HOME_NODE_ASSOCIATIVITY 0x2EC
+ #define H_BEST_ENERGY		0x2F4
++#define H_RANDOM		0x300
++#define H_COP			0x304
+ #define H_GET_MPP_X		0x314
+ #define MAX_HCALL_OPCODE	H_GET_MPP_X
+ 
+-- 
+1.7.1
