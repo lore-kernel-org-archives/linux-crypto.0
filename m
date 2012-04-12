@@ -1,8 +1,7 @@
 From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: [PATCH v3 02/17] powerpc: Add pseries update notifier for OFDT prop
- changes
-Date: Thu, 12 Apr 2012 10:04:11 -0500
-Message-ID: <1334243051.18090.8.camel@key-ThinkPad-W510>
+Subject: [PATCH v3 05/17] pseries: Enabled the PFO-based RNG accelerator
+Date: Thu, 12 Apr 2012 10:17:51 -0500
+Message-ID: <1334243871.18090.15.camel@key-ThinkPad-W510>
 References: <1334242825.18090.4.camel@key-ThinkPad-W510>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -12,90 +11,61 @@ Cc: linux-crypto@vger.kernel.org, rcj@linux.vnet.ibm.com,
 	linuxppc-dev@lists.ozlabs.org
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e32.co.us.ibm.com ([32.97.110.150]:51695 "EHLO
-	e32.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932203Ab2DLPJI (ORCPT
+Received: from e34.co.us.ibm.com ([32.97.110.152]:37609 "EHLO
+	e34.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933900Ab2DLPVh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Apr 2012 11:09:08 -0400
+	Thu, 12 Apr 2012 11:21:37 -0400
 Received: from /spool/local
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
-	Thu, 12 Apr 2012 09:09:03 -0600
+	Thu, 12 Apr 2012 09:21:36 -0600
 In-Reply-To: <1334242825.18090.4.camel@key-ThinkPad-W510>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This adds an update notifier mechanism for changes to properties in the
-device tree.  One use of this would be a device driver that needs to act
-on changes to it's properties in the device tree after a live migration
-or a dynamic activation that is triggered by updates to ofdt properties.
+This patch adds the cas bits to advertise support for the Platform
+Facilities Option (PFO) based random number generator accerator.
+The pseries-rng driver provides support for this hardware feature.
 
 Signed-off-by: Robert Jennings <rcj@linux.vnet.ibm.com>
 Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- arch/powerpc/include/asm/pSeries_reconfig.h |   12 ++++++++++++
- arch/powerpc/platforms/pseries/reconfig.c   |    7 +++++++
- 2 files changed, 19 insertions(+), 0 deletions(-)
+ arch/powerpc/kernel/prom_init.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/pSeries_reconfig.h b/arch/powerpc/include/asm/pSeries_reconfig.h
-index 23cd6cc..c07edfe 100644
---- a/arch/powerpc/include/asm/pSeries_reconfig.h
-+++ b/arch/powerpc/include/asm/pSeries_reconfig.h
-@@ -13,6 +13,18 @@
- #define PSERIES_RECONFIG_REMOVE		0x0002
- #define PSERIES_DRCONF_MEM_ADD		0x0003
- #define PSERIES_DRCONF_MEM_REMOVE	0x0004
-+#define PSERIES_UPDATE_PROPERTY		0x0005
-+
-+/**
-+ * pSeries_reconfig_notify - Notifier value structure for OFDT property updates
-+ *
-+ * @node: Device tree node which owns the property being updated
-+ * @property: Updated property
-+ */
-+struct pSeries_reconfig_prop_update {
-+	struct device_node *node;
-+	struct property *property;
-+};
+diff --git a/arch/powerpc/kernel/prom_init.c b/arch/powerpc/kernel/prom_init.c
+index 9986027..26f6317 100644
+--- a/arch/powerpc/kernel/prom_init.c
++++ b/arch/powerpc/kernel/prom_init.c
+@@ -701,6 +701,7 @@ static void __init early_cmdline_parse(void)
+ #define OV5_XCMO			0x00
+ #endif
+ #define OV5_TYPE1_AFFINITY	0x80	/* Type 1 NUMA affinity */
++#define OV5_PFO_HW_RNG		0x80	/* PFO Random Number Generator */
  
- #ifdef CONFIG_PPC_PSERIES
- extern int pSeries_reconfig_notifier_register(struct notifier_block *);
-diff --git a/arch/powerpc/platforms/pseries/reconfig.c b/arch/powerpc/platforms/pseries/reconfig.c
-index 168651a..7b3bf76 100644
---- a/arch/powerpc/platforms/pseries/reconfig.c
-+++ b/arch/powerpc/platforms/pseries/reconfig.c
-@@ -103,11 +103,13 @@ int pSeries_reconfig_notifier_register(struct notifier_block *nb)
- {
- 	return blocking_notifier_chain_register(&pSeries_reconfig_chain, nb);
- }
-+EXPORT_SYMBOL_GPL(pSeries_reconfig_notifier_register);
+ /* Option Vector 6: IBM PAPR hints */
+ #define OV6_LINUX		0x02	/* Linux is our OS */
+@@ -748,7 +749,7 @@ static unsigned char ibm_architecture_vec[] = {
+ 	0,				/* don't halt */
  
- void pSeries_reconfig_notifier_unregister(struct notifier_block *nb)
- {
- 	blocking_notifier_chain_unregister(&pSeries_reconfig_chain, nb);
- }
-+EXPORT_SYMBOL_GPL(pSeries_reconfig_notifier_unregister);
+ 	/* option vector 5: PAPR/OF options */
+-	13 - 2,				/* length */
++	18 - 2,				/* length */
+ 	0,				/* don't ignore, don't halt */
+ 	OV5_LPAR | OV5_SPLPAR | OV5_LARGE_PAGES | OV5_DRCONF_MEMORY |
+ 	OV5_DONATE_DEDICATE_CPU | OV5_MSI,
+@@ -764,6 +765,11 @@ static unsigned char ibm_architecture_vec[] = {
+ 	 */
+ #define IBM_ARCH_VEC_NRCORES_OFFSET	100
+ 	W(NR_CPUS),			/* number of cores supported */
++	0,
++	0,
++	0,
++	0,
++	OV5_PFO_HW_RNG,
  
- int pSeries_reconfig_notify(unsigned long action, void *p)
- {
-@@ -426,6 +428,7 @@ static int do_remove_property(char *buf, size_t bufsize)
- static int do_update_property(char *buf, size_t bufsize)
- {
- 	struct device_node *np;
-+	struct pSeries_reconfig_prop_update upd_value;
- 	unsigned char *value;
- 	char *name, *end, *next_prop;
- 	int rc, length;
-@@ -454,6 +457,10 @@ static int do_update_property(char *buf, size_t bufsize)
- 		return -ENODEV;
- 	}
- 
-+	upd_value.node = np;
-+	upd_value.property = newprop;
-+	pSeries_reconfig_notify(PSERIES_UPDATE_PROPERTY, &upd_value);
-+
- 	rc = prom_update_property(np, newprop, oldprop);
- 	if (rc)
- 		return rc;
+ 	/* option vector 6: IBM PAPR hints */
+ 	4 - 2,				/* length */
 -- 
 1.7.1
