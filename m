@@ -1,22 +1,42 @@
-From: Dale Amon <amon@vnl.com>
-Subject: Re: cryptsetup stopped working
-Date: Fri, 13 Apr 2012 00:43:06 +0100
-Message-ID: <20120412234306.GC3257@vnl.com>
-References: <20120412225940.GA3257@vnl.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: amon@vnl.com
-To: Dale Amon <amon@vnl.com>, linux-crypto@vger.kernel.org
+From: Julia Lawall <Julia.Lawall@lip6.fr>
+Subject: [PATCH] drivers/crypto/amcc/crypto4xx_core.c: move up err_request_irq label
+Date: Sat, 14 Apr 2012 22:48:41 +0200
+Message-ID: <1334436521-28622-1-git-send-email-Julia.Lawall@lip6.fr>
+Cc: kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grendel.xisp.net ([96.255.255.193]:41372 "EHLO ba-blue.xisp.net"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756715Ab2DLXnW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Apr 2012 19:43:22 -0400
-Content-Disposition: inline
-In-Reply-To: <20120412225940.GA3257@vnl.com>
+Received: from mgw2.diku.dk ([130.225.96.92]:38906 "EHLO mgw2.diku.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755951Ab2DNUss (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 14 Apr 2012 16:48:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Never mind. I typed 'yes' instead of 'YES'
-and the error message I was getting was 
-utterly misleading.
+From: Julia Lawall <Julia.Lawall@lip6.fr>
+
+Move the err_request_irq error label up to reflect that tasklet_init and
+irq_of_parse_and_map have taken place.
+
+Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+
+---
+ drivers/crypto/amcc/crypto4xx_core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 13f8e1a..802e851 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1244,9 +1244,9 @@ err_start_dev:
+ 	iounmap(core_dev->dev->ce_base);
+ err_iomap:
+ 	free_irq(core_dev->irq, dev);
++err_request_irq:
+ 	irq_dispose_mapping(core_dev->irq);
+ 	tasklet_kill(&core_dev->tasklet);
+-err_request_irq:
+ 	crypto4xx_destroy_sdr(core_dev->dev);
+ err_build_sdr:
+ 	crypto4xx_destroy_gdr(core_dev->dev);
