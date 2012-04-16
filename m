@@ -1,42 +1,37 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH] drivers/crypto/amcc/crypto4xx_core.c: move up err_request_irq label
-Date: Sat, 14 Apr 2012 22:48:41 +0200
-Message-ID: <1334436521-28622-1-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Problem with crypto when initializing TKIP
+Date: Mon, 16 Apr 2012 20:48:39 +0800
+Message-ID: <20120416124839.GA5985@gondor.apana.org.au>
+References: <4F8BAE2F.5090200@lwfinger.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	driverdevel <devel@driverdev.osuosl.org>,
+	wireless <linux-wireless@vger.kernel.org>,
+	Jan Simonson <jan@simonson.se>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Larry Finger <Larry.Finger@lwfinger.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:38906 "EHLO mgw2.diku.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755951Ab2DNUss (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Apr 2012 16:48:48 -0400
+Received: from sting.hengli.com.au ([178.18.18.71]:47327 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753493Ab2DPMsv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Apr 2012 08:48:51 -0400
+Content-Disposition: inline
+In-Reply-To: <4F8BAE2F.5090200@lwfinger.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <Julia.Lawall@lip6.fr>
+On Mon, Apr 16, 2012 at 12:29:19AM -0500, Larry Finger wrote:
+>
+> The value of ok is NOTIFY_OK, which leads to a return of -ENOENT and
+> a failure of the initialization.
 
-Move the err_request_irq error label up to reflect that tasklet_init and
-irq_of_parse_and_map have taken place.
+NOTIFY_OK means that we have no notifiers installed.  Did you
+compile/load CRYPTO_MANAGER?
 
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-
----
- drivers/crypto/amcc/crypto4xx_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 13f8e1a..802e851 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1244,9 +1244,9 @@ err_start_dev:
- 	iounmap(core_dev->dev->ce_base);
- err_iomap:
- 	free_irq(core_dev->irq, dev);
-+err_request_irq:
- 	irq_dispose_mapping(core_dev->irq);
- 	tasklet_kill(&core_dev->tasklet);
--err_request_irq:
- 	crypto4xx_destroy_sdr(core_dev->dev);
- err_build_sdr:
- 	crypto4xx_destroy_gdr(core_dev->dev);
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
