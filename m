@@ -1,70 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.4
-Date: Fri, 20 Apr 2012 22:16:08 +0800
-Message-ID: <20120420141608.GA9686@gondor.apana.org.au>
-References: <20100722055043.GA25689@gondor.apana.org.au>
- <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120322012046.GA8854@gondor.apana.org.au>
- <20120402094516.GA23763@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: boris@dedicatedserver.com.hk
+Subject: Server Rental Service in HK
+Date: Sun, 22 Apr 2012 08:42:50 +0800 (HKT)
+Message-ID: <qwU2XnokJCBDWI@tpts5.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:43151 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753931Ab2DTOQQ (ORCPT
+Received: from 124-248-200-86.sunnyvision.com ([124.248.200.86]:44031 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751915Ab2DVBJN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Apr 2012 10:16:16 -0400
-Content-Disposition: inline
-In-Reply-To: <20120402094516.GA23763@gondor.apana.org.au>
+	Sat, 21 Apr 2012 21:09:13 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Dear All,
 
-This push fixes a number of issues:
+We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
 
-* Locking fix for talitos driver.
-* Fix 64-bit counter overflow in SHA-512.
-* Build fix for ixp4xx.
+Dell=3F PowerEdge=3F EnterpriseRack Mount Server
+-Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
+-8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
+-500GB, 3.5", 6Gbps SAS x 2
+-Raid 1 Mirroring Protection
+-Remote KVM (iDRAC6 Enterprise)
 
+Dell(TM) PowerEdge(TM) R410 Rack Mount Server
+-Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
+-4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
+-500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
+-iDRAC6 Enterprise or Express (Remote KVM Management)
 
-Please pull from
+Every Dedicated Server Hosting Solution Also Includes: 
+ 
+Software Specification 
+- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
+- Full root-level access 
+- Data Center Facilities 
+- Shared Local & International Bandwidth 
+- 2 IP Addresses Allocation 
+- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
+- FM200=A1=A7based fire suppression system 
+- 24x7 CRAC Air Conditioning and Humidity Control 
+- 24x7 Security Control 
+- 24x7 Remote Hand Service 
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Pls send us email for further information.Thanks,
 
-or
+Boris 
+boris@dedicatedserver.com.hk
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Horia Geanta (1):
-      crypto: talitos - properly lock access to global talitos register=
-s
-
-Kent Yoder (1):
-      crypto: sha512 - Fix byte counter overflow in SHA-512
-
-Micha=C5=82 Wr=C3=B3bel (1):
-      crypto: ixp4xx - include fix
-
- crypto/sha512_generic.c        |    2 +-
- drivers/crypto/ixp4xx_crypto.c |    1 +
- drivers/crypto/talitos.c       |   20 +++++++++++++++++---
- 3 files changed, 19 insertions(+), 4 deletions(-)
-=20
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
