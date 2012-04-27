@@ -1,36 +1,36 @@
-From: woody@cloudluca.com
-Subject: Advanced Cloud Hosting/Server
-Date: Wed, 25 Apr 2012 21:15:06 +0800 (HKT)
-Message-ID: <b1gU9OBqPnS@tpts4.seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] drivers/crypto/amcc/crypto4xx_core.c: move up
+ err_request_irq label
+Date: Fri, 27 Apr 2012 11:31:52 +1000
+Message-ID: <20120427013152.GA32567@gondor.apana.org.au>
+References: <1334436521-28622-1-git-send-email-Julia.Lawall@lip6.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Julia Lawall <Julia.Lawall@lip6.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-82.sunnyvision.com ([124.248.200.82]:47500 "EHLO
-	teamb02.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1759039Ab2DYNrg (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:39906 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754632Ab2D0BcE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Apr 2012 09:47:36 -0400
+	Thu, 26 Apr 2012 21:32:04 -0400
+Content-Disposition: inline
+In-Reply-To: <1334436521-28622-1-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear All,
+On Sat, Apr 14, 2012 at 10:48:41PM +0200, Julia Lawall wrote:
+> From: Julia Lawall <Julia.Lawall@lip6.fr>
+> 
+> Move the err_request_irq error label up to reflect that tasklet_init and
+> irq_of_parse_and_map have taken place.
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
 
-Shoud you need Web, Email, EDM, Streaming, FTP.......server or hosting space=3F
-
-We have providing better and lower cost service of Cloud Hosting (Cloud Server / Hosting / CDN)
-
-Just USD$1.99 for experience, let's come to join us and enjoy our powerful and stable cloud system.
-
-Please kindly visit our website as following link for more details. Thank you very much.
-
-http://www.cloudluca.com/ 
-
-Best Regards,
-The 36cloud Team
-
-
-
-
-
-If you do not wish to further receive this event message, email "subscriber@dedicatedserver.com.hk" to unsubscribe this message or revoe your email from the list.
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
