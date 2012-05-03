@@ -1,64 +1,53 @@
-From: "Western Union" <w-online@wu.com>
-Subject: $5000 AVAILABLE FOR PICK UP
-Date: Tue, 01 May 2012 17:14:51 +0200
-Message-ID: <20120501171451.193421we09oa3mcg__29258.0247078606$1335884762$gmane$org@webmail.ladresse.com>
-Reply-To: westernuniononlineservice@gmail.com
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	DelSp=Yes	format=flowed
-Content-Transfer-Encoding: 7BIT
-To: undisclosed-recipients:;
+From: boris@dedicatedserver.com.hk
+Subject: Server Rental Service in Hong Kong
+Date: Fri,  4 May 2012 02:25:10 +0800 (HKT)
+Message-ID: <SpL3@tcts.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.ladresse.com ([62.23.106.22]:45281 "EHLO mail.ladresse.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750743Ab2EAPFO convert rfc822-to-8bit (ORCPT
+Received: from 124-248-200-90.sunnyvision.com ([124.248.200.90]:60837 "EHLO
+	teamb03.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1754702Ab2ECStz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 May 2012 11:05:14 -0400
-Content-Disposition: inline
+	Thu, 3 May 2012 14:49:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Dear All,
 
+We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
 
--- 
+Dell=3F PowerEdge=3F EnterpriseRack Mount Server
+-Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
+-8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
+-500GB, 3.5", 6Gbps SAS x 2
+-Raid 1 Mirroring Protection
+-Remote KVM (iDRAC6 Enterprise)
 
-Dear Beneficiary?
-This is to inform you that we have already sent
-you USD5000.00 dollars through Western union
-as we have been mandated by United Nations
-and ECOWAS which are supporting individual
-due to the worldwide economy meltdown, to
-transfer to you the full compensation sum
-payment of $1.800,000.00 USD via western
-union by this government.
+Dell(TM) PowerEdge(TM) R410 Rack Mount Server
+-Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
+-4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
+-500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
+-iDRAC6 Enterprise or Express (Remote KVM Management)
 
-In this regards, We decided to email the
-relevant details for you to be able to pick up
-this USD5000.00 to enable us send another
-USD5000.00 by tomorrow as you know we will be
-sending you only $5000.00 per day.You can
-track at before going to pick it up the link
+Every Dedicated Server Hosting Solution Also Includes: 
+ 
+Software Specification 
+- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
+- Full root-level access 
+- Data Center Facilities 
+- Shared Local & International Bandwidth 
+- 2 IP Addresses Allocation 
+- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
+- FM200=A1=A7based fire suppression system 
+- 24x7 CRAC Air Conditioning and Humidity Control 
+- 24x7 Security Control 
+- 24x7 Remote Hand Service 
 
-https://wumt.westernunion.com/asp/orderStatus.asp?country=global
+Pls send us email for further information.Thanks,
 
-Mr.John Balo.
-Chief Operating Officer,
-Western Union.
-Tell: +2348182570719
-Email: johnbalo33@w.cn
-call or email the above details once you picked
-up this USD5000.00
+Boris 
+boris@dedicatedserver.com.hk
 
-Here is the western union information to pick up
-the compensation Pick Up Information
-
-Sender's first name:.........Godwin
-Sender's last name:..........Onyia
-MTCN.................... 6890479748
-
-Amount Sent: $5000USD
-I am waiting for your call once you pick up this transfer.
-Best Regards,
-Mrs.Sandra Morris.
-Co-Ordinator,
-WESTERN UNION.
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
