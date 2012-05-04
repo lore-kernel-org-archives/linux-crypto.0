@@ -1,53 +1,38 @@
-From: boris@dedicatedserver.com.hk
-Subject: Server Rental Service in Hong Kong
-Date: Fri,  4 May 2012 02:25:10 +0800 (HKT)
-Message-ID: <SpL3@tcts.seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v7 0/3] crypto: ux500 crypto and hash driver
+Date: Fri, 4 May 2012 19:56:52 +1000
+Message-ID: <20120504095651.GA6994@gondor.apana.org.au>
+References: <1335773479-10441-1-git-send-email-andreas.westin@stericsson.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kim.phillips@freescale.com
+To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-90.sunnyvision.com ([124.248.200.90]:60837 "EHLO
-	teamb03.edmhongkong.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1754702Ab2ECStz (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:50397 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752293Ab2EDJ5B (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 May 2012 14:49:55 -0400
+	Fri, 4 May 2012 05:57:01 -0400
+Content-Disposition: inline
+In-Reply-To: <1335773479-10441-1-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear All,
+On Mon, Apr 30, 2012 at 10:11:16AM +0200, Andreas Westin wrote:
+> Resending, something seems to have gone wrong the first time.
+> 
+> Changed config to depend on correct ARCH, also removed an
+> unnecessary if statement check in the hash driver.
+> 
+> This adds a driver for the ST-Ericsson ux500 crypto hardware
+> module. It supports AES, DES and 3DES, the driver implements
+> support for AES-ECB,CBC and CTR.
+> 
+> Patches are also available at: http://www.df.lth.se/~triad/ux500-crypto/
 
-We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
-
-Dell=3F PowerEdge=3F EnterpriseRack Mount Server
--Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
--8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
--500GB, 3.5", 6Gbps SAS x 2
--Raid 1 Mirroring Protection
--Remote KVM (iDRAC6 Enterprise)
-
-Dell(TM) PowerEdge(TM) R410 Rack Mount Server
--Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
--4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
--500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
--iDRAC6 Enterprise or Express (Remote KVM Management)
-
-Every Dedicated Server Hosting Solution Also Includes: 
- 
-Software Specification 
-- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
-- Full root-level access 
-- Data Center Facilities 
-- Shared Local & International Bandwidth 
-- 2 IP Addresses Allocation 
-- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
-- FM200=A1=A7based fire suppression system 
-- 24x7 CRAC Air Conditioning and Humidity Control 
-- 24x7 Security Control 
-- 24x7 Remote Hand Service 
-
-Pls send us email for further information.Thanks,
-
-Boris 
-boris@dedicatedserver.com.hk
-
-If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
+All applied to cryptodev.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
