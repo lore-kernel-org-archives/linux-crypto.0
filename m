@@ -1,43 +1,43 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: CRYPTO_ALG_ASYNC
-Date: Thu, 10 May 2012 13:52:00 +0300
-Message-ID: <CALLzPKaWQsC0ZqYvoF5gvV8JPkqs-GXcgGTwBd2-RppewZRC_Q@mail.gmail.com>
-References: <CALLzPKYc0wBtTiNtDGgY09D_7MJPtwBoQ1AS_U-Jsg02+hEPOA@mail.gmail.com>
-	<20120510101611.GA21025@gondor.apana.org.au>
-	<CALLzPKZWvFvPeA2ZKkRBPKA9WK7oDtzymDmG4Y-u=pmq8khXNA@mail.gmail.com>
-	<20120510104736.GA21213@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2 0/3] Update for ux500 CRYP and HASH
+Date: Thu, 10 May 2012 10:55:11 +0000
+Message-ID: <201205101055.11562.arnd@arndb.de>
+References: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, sfr@canb.auug.org.au,
+	lee.jones@linaro.org, linus.walleij@linaro.org
+To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:28561 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754358Ab2EJKwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 May 2012 06:52:01 -0400
-Received: by dano14 with SMTP id o14so5358824dan.25
-        for <linux-crypto@vger.kernel.org>; Thu, 10 May 2012 03:52:00 -0700 (PDT)
-In-Reply-To: <20120510104736.GA21213@gondor.apana.org.au>
+Received: from moutng.kundenserver.de ([212.227.126.187]:52037 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759118Ab2EJKzU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 May 2012 06:55:20 -0400
+In-Reply-To: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 10, 2012 at 1:47 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, May 10, 2012 at 01:31:10PM +0300, Kasatkin, Dmitry wrote:
->>
->> But why do we need it for AHASH or ABLKCIPHER?
->> It is obvious without it that they can be async?
->
-> It makes sense for ahash/ablkcipher since even though you're
-> using the async API you can still request for a sync implementation.
+On Thursday 10 May 2012, Andreas Westin wrote:
+> Hi,
+> 
+> V2 of the patches.
+> 
+> * Removed symbol export
+> * Removed usage of SOC specific functions in the drivers.
+> * Readded overlooked config for DMA in mach-ux500.
+> 
+> After some internal discussion we felt that the now implemented
+> hardware identification solution is cleaner than the suggested
+> solution.
+> 
+> The hardware identification patch applies cleanly to
+> the cryptodev tree.
 
-What I can see this flag is not tested and used.
-Where is the place of code where it "returns" sync implementation?
+Looks good to me,
 
-- Dmitry
-
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Arnd Bergmann <arnd@arndb.de>
