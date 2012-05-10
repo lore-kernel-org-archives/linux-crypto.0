@@ -1,43 +1,42 @@
-From: Arnd Bergmann <arnd@arndb.de>
+From: Linus Walleij <linus.walleij@linaro.org>
 Subject: Re: [PATCH v2 0/3] Update for ux500 CRYP and HASH
-Date: Thu, 10 May 2012 10:55:11 +0000
-Message-ID: <201205101055.11562.arnd@arndb.de>
+Date: Thu, 10 May 2012 15:18:04 +0200
+Message-ID: <CACRpkdapMo4vd=hbuR5T+PrH8D2QpGgPX3gTcswuUCxdkZ80Eg@mail.gmail.com>
 References: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, sfr@canb.auug.org.au,
-	lee.jones@linaro.org, linus.walleij@linaro.org
+	linux-crypto@vger.kernel.org, arnd@arndb.de, sfr@canb.auug.org.au,
+	lee.jones@linaro.org
 To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:52037 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759118Ab2EJKzU (ORCPT
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:33381 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753340Ab2EJNSF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 May 2012 06:55:20 -0400
+	Thu, 10 May 2012 09:18:05 -0400
+Received: by gglu4 with SMTP id u4so908491ggl.19
+        for <linux-crypto@vger.kernel.org>; Thu, 10 May 2012 06:18:04 -0700 (PDT)
 In-Reply-To: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 10 May 2012, Andreas Westin wrote:
-> Hi,
-> 
-> V2 of the patches.
-> 
+On Thu, May 10, 2012 at 10:14 AM, Andreas Westin
+<andreas.westin@stericsson.com> wrote:
+
 > * Removed symbol export
 > * Removed usage of SOC specific functions in the drivers.
 > * Readded overlooked config for DMA in mach-ux500.
-> 
+>
 > After some internal discussion we felt that the now implemented
 > hardware identification solution is cleaner than the suggested
 > solution.
-> 
+>
 > The hardware identification patch applies cleanly to
 > the cryptodev tree.
 
-Looks good to me,
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Yours,
+Linus Walleij
