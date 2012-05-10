@@ -1,77 +1,60 @@
-From: Robert Jennings <rcj@linux.vnet.ibm.com>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Subject: Re: [PATCH v3 03/17] powerpc: Add PFO support to the VIO bus
-Date: Thu, 10 May 2012 14:08:35 -0500
-Message-ID: <20120510190835.GB12304@linux.vnet.ibm.com>
+Date: Fri, 11 May 2012 07:58:18 +1000
+Message-ID: <1336687098.3881.63.camel@pasglop>
 References: <1334242825.18090.4.camel@key-ThinkPad-W510>
- <1334243302.18090.10.camel@key-ThinkPad-W510>
- <1335841603.3621.8.camel@pasglop>
+	 <1334243302.18090.10.camel@key-ThinkPad-W510>
+	 <1335841603.3621.8.camel@pasglop>
+	 <20120510190835.GB12304@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Cc: Kent Yoder <key@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Robert Jennings <rcj@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e9.ny.us.ibm.com ([32.97.182.139]:34032 "EHLO e9.ny.us.ibm.com"
+Received: from gate.crashing.org ([63.228.1.57]:36048 "EHLO gate.crashing.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761489Ab2EJTJE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 May 2012 15:09:04 -0400
-Received: from /spool/local
-	by e9.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <rcjenn@linux.vnet.ibm.com>;
-	Thu, 10 May 2012 15:09:00 -0400
-Content-Disposition: inline
-In-Reply-To: <1335841603.3621.8.camel@pasglop>
+	id S1761686Ab2EJV61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 May 2012 17:58:27 -0400
+In-Reply-To: <20120510190835.GB12304@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Benjamin Herrenschmidt (benh@kernel.crashing.org) wrote:
-> Hrm... I don't like that much:
-> 
-> > +	if (op->timeout)
-> > +		deadline = jiffies + msecs_to_jiffies(op->timeout);
-> > +
-> > +	while (true) {
-> > +		hret = plpar_hcall_norets(H_COP, op->flags,
-> > +				vdev->resource_id,
-> > +				op->in, op->inlen, op->out,
-> > +				op->outlen, op->csbcpb);
-> > +
-> > +		if (hret == H_SUCCESS ||
-> > +		    (hret != H_NOT_ENOUGH_RESOURCES &&
-> > +		     hret != H_BUSY && hret != H_RESOURCE) ||
-> > +		    (op->timeout && time_after(deadline, jiffies)))
-> > +			break;
-> > +
-> > +		dev_dbg(dev, "%s: hcall ret(%ld), retrying.\n", __func__, hret);
-> > +	}
-> > +
-> 
-> Is this meant to be called in atomic context ? If not, maybe it should
-> at the very least do a cond_resched() ?
-> 
-> Else, what about ceding the processor ? Or at the very least reducing
-> the thread priority for a bit ?
-> 
-> Shouldn't we also enforce to always have a timeout ? IE. Something like
-> 30s or so if nothing specified to avoid having the kernel just hard
-> lock...
-> 
-> In general I don't like that sort of synchronous code, I'd rather return
-> the busy status up the chain which gives a chance to the caller to take
-> more appropriate measures depending on what it's doing, but that really
-> depends what you use that synchronous call for. I suppose if it's for
-> configuration type operations, it's ok...
+On Thu, 2012-05-10 at 14:08 -0500, Robert Jennings wrote:
+> * Benjamin Herrenschmidt (benh@kernel.crashing.org) wrote:
 
-This function is called in atomic context, it is used by PFO-type device
-drivers to perform operations with the nest accelerator unit (like
-crypto acceleration).
+> > Is this meant to be called in atomic context ? If not, maybe it should
+> > at the very least do a cond_resched() ?
+> > 
+> > Else, what about ceding the processor ? Or at the very least reducing
+> > the thread priority for a bit ?
+> > 
+> > Shouldn't we also enforce to always have a timeout ? IE. Something like
+> > 30s or so if nothing specified to avoid having the kernel just hard
+> > lock...
+> > 
+> > In general I don't like that sort of synchronous code, I'd rather return
+> > the busy status up the chain which gives a chance to the caller to take
+> > more appropriate measures depending on what it's doing, but that really
+> > depends what you use that synchronous call for. I suppose if it's for
+> > configuration type operations, it's ok...
+> 
+> This function is called in atomic context, it is used by PFO-type device
+> drivers to perform operations with the nest accelerator unit (like
+> crypto acceleration).
+> 
+> Having the timeout and retries in this function is the wrong thing to do.
+> We'll resubmit this without the loop and the caller will be responsible for
+> retrying the operations.
+>
+> I would rather have the caller cede the processor or alter thread
+> priority where appropriate than doing that in this function.  I don't
+> think this should be done in this crypto driver.
 
-Having the timeout and retries in this function is the wrong thing to do.
-We'll resubmit this without the loop and the caller will be responsible for
-retrying the operations.
+That sounds right indeed... as long as the upper crypto layer has a
+concept of "try again later"... if it doesn't it will result in random
+funny failures :-)
 
-I would rather have the caller cede the processor or alter thread
-priority where appropriate than doing that in this function.  I don't
-think this should be done in this crypto driver.
-
---Rob Jennings
+Cheers,
+Ben.
