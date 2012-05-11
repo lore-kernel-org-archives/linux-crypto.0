@@ -1,375 +1,888 @@
-From: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Subject: RE: SPAM: [PATCH 3/3] arm: tegra: governor: change governor using
- cpufreq interface
-Date: Fri, 11 May 2012 18:06:01 +0530
-Message-ID: <EC245B9844DE6242B3F3C3BED1ECD10F6D1AE9921C@BGMAIL02.nvidia.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH 1/2] crypto: aesni-intel: use crypto_[un]register_algs
+Date: Fri, 11 May 2012 16:00:48 +0300
+Message-ID: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Huang Ying <ying.huang@intel.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:37453 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757321Ab2EKNAx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 May 2012 09:00:53 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-General Apology!
-Please ignore the mail as it was accidentally sent. 
-Please treat this and previous mail as spam.
+Combine all crypto_alg to be registered and use new crypto_[un]register_algs
+functions. Simplifies init/exit code and reduce object size.
 
-Thanks & Regards,
-Puneet Saxena
------Original Message-----
-From: Puneet Saxena 
-Sent: Friday, May 11, 2012 6:03 PM
-To: cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org; linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Puneet Saxena
-Subject: [PATCH 3/3] arm: tegra: governor: change governor using cpufreq interface
-
-From: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-
-Older code sets "conservative" governor in early-suspend using sysfs entries.This implementation changes governor in early-suspend using cpufreq interfaces.
-
-bug 871958
-
-Change-Id: I721afb6184982a063dc5f330da31f8fb88481cfd
-Signed-off-by: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Cc: Huang Ying <ying.huang@intel.com>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/arm/mach-tegra/board-enterprise-panel.c |   18 ++--
- arch/arm/mach-tegra/board-kai-panel.c        |   19 +---
- arch/arm/mach-tegra/board-ventana-panel.c    |   17 +--
- arch/arm/mach-tegra/board-whistler-panel.c   |   19 ++--
- arch/arm/mach-tegra/board.h                  |   17 ++--
- arch/arm/mach-tegra/common.c                 |  134 +++++++-------------------
- 6 files changed, 71 insertions(+), 153 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |  727 +++++++++++++++---------------------
+ 1 file changed, 305 insertions(+), 422 deletions(-)
 
-diff --git a/arch/arm/mach-tegra/board-enterprise-panel.c b/arch/arm/mach-tegra/board-enterprise-panel.c
-index 8ac2e66..368d8c6 100644
---- a/arch/arm/mach-tegra/board-enterprise-panel.c
-+++ b/arch/arm/mach-tegra/board-enterprise-panel.c
-@@ -816,17 +816,12 @@ static void enterprise_panel_early_suspend(struct early_suspend *h)
- 		fb_blank(registered_fb[0], FB_BLANK_POWERDOWN);
- 	if (num_registered_fb > 1)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL); -#ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_save_default_governor();
--	cpufreq_set_conservative_governor();
--	cpufreq_set_conservative_governor_param("up_threshold",
--			SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("down_threshold",
--			SET_CONSERVATIVE_GOVERNOR_DOWN_THRESHOLD);
- 
--	cpufreq_set_conservative_governor_param("freq_step",
--			SET_CONSERVATIVE_GOVERNOR_FREQ_STEP);
-+#ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
-+	cpufreq_store_default_gov();
-+	if (cpufreq_change_gov(cpufreq_conservative_gov))
-+		pr_err("Early_suspend: Error changing governor to %s\n",
-+				cpufreq_conservative_gov);
- #endif
- }
- 
-@@ -835,7 +830,8 @@ static void enterprise_panel_late_resume(struct early_suspend *h)
- 	unsigned i;
- 
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_restore_default_governor();
-+	if (cpufreq_restore_default_gov())
-+		pr_err("Early_suspend: Unable to restore governor\n");
- #endif
- 	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-kai-panel.c b/arch/arm/mach-tegra/board-kai-panel.c
-index 53661ce..0a68387 100644
---- a/arch/arm/mach-tegra/board-kai-panel.c
-+++ b/arch/arm/mach-tegra/board-kai-panel.c
-@@ -620,27 +620,20 @@ static void kai_panel_early_suspend(struct early_suspend *h)
- 		fb_blank(registered_fb[0], FB_BLANK_POWERDOWN);
- 	if (num_registered_fb > 1)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);
--
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_save_default_governor();
--	cpufreq_set_conservative_governor();
--	cpufreq_set_conservative_governor_param("up_threshold",
--			SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("down_threshold",
--			SET_CONSERVATIVE_GOVERNOR_DOWN_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("freq_step",
--		SET_CONSERVATIVE_GOVERNOR_FREQ_STEP);
-+	cpufreq_store_default_gov();
-+	if (cpufreq_change_gov(cpufreq_conservative_gov))
-+		pr_err("Early_suspend: Error changing governor to %s\n",
-+				cpufreq_conservative_gov);
- #endif
--
- }
- 
- static void kai_panel_late_resume(struct early_suspend *h)  {
- 	unsigned i;
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_restore_default_governor();
-+	if (cpufreq_restore_default_gov())
-+		pr_err("Early_suspend: Unable to restore governor\n");
- #endif
- 	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-ventana-panel.c b/arch/arm/mach-tegra/board-ventana-panel.c
-index 4cacd3d..84e75a4 100644
---- a/arch/arm/mach-tegra/board-ventana-panel.c
-+++ b/arch/arm/mach-tegra/board-ventana-panel.c
-@@ -366,16 +366,10 @@ static void ventana_panel_early_suspend(struct early_suspend *h)
- 	if (num_registered_fb > 1)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_save_default_governor();
--	cpufreq_set_conservative_governor();
--        cpufreq_set_conservative_governor_param("up_threshold",
--			SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("down_threshold",
--			SET_CONSERVATIVE_GOVERNOR_DOWN_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("freq_step",
--		SET_CONSERVATIVE_GOVERNOR_FREQ_STEP);
-+	cpufreq_store_default_gov();
-+	if (cpufreq_change_gov(cpufreq_conservative_gov))
-+		pr_err("Early_suspend: Error changing governor to %s\n",
-+				cpufreq_conservative_gov);
- #endif
- }
- 
-@@ -383,7 +377,8 @@ static void ventana_panel_late_resume(struct early_suspend *h)  {
- 	unsigned i;
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_restore_default_governor();
-+	if (cpufreq_restore_default_gov())
-+		pr_err("Early_suspend: Unable to restore governor\n");
- #endif
- 	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-whistler-panel.c b/arch/arm/mach-tegra/board-whistler-panel.c
-index 74075d4..7582c77 100644
---- a/arch/arm/mach-tegra/board-whistler-panel.c
-+++ b/arch/arm/mach-tegra/board-whistler-panel.c
-@@ -318,25 +318,22 @@ static void whistler_panel_early_suspend(struct early_suspend *h)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);
- 
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_save_default_governor();
--	cpufreq_set_conservative_governor();
--        cpufreq_set_conservative_governor_param("up_threshold",
--			SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("down_threshold",
--			SET_CONSERVATIVE_GOVERNOR_DOWN_THRESHOLD);
--
--	cpufreq_set_conservative_governor_param("freq_step",
--		SET_CONSERVATIVE_GOVERNOR_FREQ_STEP);
-+	cpufreq_store_default_gov();
-+	if (cpufreq_change_gov(cpufreq_conservative_gov))
-+		pr_err("Early_suspend: Error changing governor to %s\n",
-+				cpufreq_conservative_gov);
- #endif
- }
- 
- static void whistler_panel_late_resume(struct early_suspend *h)  {
- 	unsigned i;
-+
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--	cpufreq_restore_default_governor();
-+	if (cpufreq_restore_default_gov())
-+		pr_err("Early_suspend: Unable to restore governor\n");
- #endif
-+
- 	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);  } diff --git a/arch/arm/mach-tegra/board.h b/arch/arm/mach-tegra/board.h index c7ab065..63095ce 100644
---- a/arch/arm/mach-tegra/board.h
-+++ b/arch/arm/mach-tegra/board.h
-@@ -157,16 +157,17 @@ void tegra_get_board_info(struct board_info *);  void tegra_get_pmu_board_info(struct board_info *bi);  void tegra_get_display_board_info(struct board_info *bi);  void tegra_get_camera_board_info(struct board_info *bi);
-+
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--#define SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD 		95
--#define SET_CONSERVATIVE_GOVERNOR_DOWN_THRESHOLD 	50
--#define SET_CONSERVATIVE_GOVERNOR_FREQ_STEP 		3
--
--void cpufreq_save_default_governor(void);
--void cpufreq_restore_default_governor(void);
--void cpufreq_set_conservative_governor(void);
--void cpufreq_set_conservative_governor_param(char *name, int value);
-+#define MAX_GOV_NAME_LEN 16
-+extern char cpufreq_default_gov[][MAX_GOV_NAME_LEN];
-+extern char *cpufreq_conservative_gov;
-+
-+void cpufreq_store_default_gov(void);
-+int cpufreq_restore_default_gov(void);
-+int cpufreq_change_gov(char *target_gov);
- #endif
-+
- int get_core_edp(void);
- enum panel_type get_panel_type(void);
- int tegra_get_modem_id(void);
-diff --git a/arch/arm/mach-tegra/common.c b/arch/arm/mach-tegra/common.c index aef4201..78bd77d 100644
---- a/arch/arm/mach-tegra/common.c
-+++ b/arch/arm/mach-tegra/common.c
-@@ -28,6 +28,7 @@
- #include <linux/memblock.h>
- #include <linux/bitops.h>
- #include <linux/sched.h>
-+#include <linux/cpufreq.h>
- 
- #include <asm/hardware/cache-l2x0.h>
- #include <asm/system.h>
-@@ -953,118 +954,53 @@ void __init tegra_release_bootloader_fb(void)  }
- 
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
--static char cpufreq_gov_default[32];
--static char *cpufreq_gov_conservative = "conservative"; -static char *cpufreq_sysfs_place_holder="/sys/devices/system/cpu/cpu%i/cpufreq/scaling_governor";
--static char *cpufreq_gov_conservative_param="/sys/devices/system/cpu/cpufreq/conservative/%s";
-+char cpufreq_default_gov[CONFIG_NR_CPUS][MAX_GOV_NAME_LEN];
-+char *cpufreq_conservative_gov = "conservative";
- 
--static void cpufreq_set_governor(char *governor)
-+void cpufreq_store_default_gov(void)
- {
--	struct file *scaling_gov = NULL;
--	mm_segment_t old_fs;
--	char    buf[128];
--	int i = 0;
--	loff_t offset = 0;
-+	unsigned int cpu;
-+	struct cpufreq_policy *policy;
- 
--	if (governor == NULL)
--		return;
--
--	/* change to KERNEL_DS address limit */
--	old_fs = get_fs();
--	set_fs(KERNEL_DS);
--#ifndef CONFIG_TEGRA_AUTO_HOTPLUG
--	for_each_online_cpu(i)
--#endif
--	{
--		sprintf(buf, cpufreq_sysfs_place_holder, i);
--		scaling_gov = filp_open(buf, O_RDWR, 0);
--		if (scaling_gov != NULL) {
--			if (scaling_gov->f_op != NULL &&
--				scaling_gov->f_op->write != NULL)
--				scaling_gov->f_op->write(scaling_gov,
--						governor,
--						strlen(governor),
--						&offset);
--			else
--				pr_err("f_op might be null\n");
--
--			filp_close(scaling_gov, NULL);
--		} else {
--			pr_err("%s. Can't open %s\n", __func__, buf);
-+	for (cpu = 0; cpu < CONFIG_NR_CPUS; cpu++) {
-+		policy = cpufreq_cpu_get(cpu);
-+		if (policy) {
-+			sprintf(cpufreq_default_gov[cpu], "%s",
-+					policy->governor->name);
-+			cpufreq_cpu_put(policy);
- 		}
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index c799352..20c6220 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -222,27 +222,6 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  	}
--	set_fs(old_fs);
  }
  
--void cpufreq_save_default_governor(void)
-+int cpufreq_change_gov(char *target_gov)
- {
--	struct file *scaling_gov = NULL;
--	mm_segment_t old_fs;
--	char    buf[128];
--	loff_t offset = 0;
--
--	/* change to KERNEL_DS address limit */
--	old_fs = get_fs();
--	set_fs(KERNEL_DS);
--
--	buf[127] = 0;
--	sprintf(buf, cpufreq_sysfs_place_holder,0);
--	scaling_gov = filp_open(buf, O_RDONLY, 0);
--	if (scaling_gov != NULL) {
--		if (scaling_gov->f_op != NULL &&
--			scaling_gov->f_op->read != NULL)
--			scaling_gov->f_op->read(scaling_gov,
--					cpufreq_gov_default,
--					32,
--					&offset);
--		else
--			pr_err("f_op might be null\n");
--
--		filp_close(scaling_gov, NULL);
--	} else {
--		pr_err("%s. Can't open %s\n", __func__, buf);
+-static struct crypto_alg aesni_alg = {
+-	.cra_name		= "aes",
+-	.cra_driver_name	= "aes-aesni",
+-	.cra_priority		= 300,
+-	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
+-	.cra_alignmask		= 0,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(aesni_alg.cra_list),
+-	.cra_u	= {
+-		.cipher	= {
+-			.cia_min_keysize	= AES_MIN_KEY_SIZE,
+-			.cia_max_keysize	= AES_MAX_KEY_SIZE,
+-			.cia_setkey		= aes_set_key,
+-			.cia_encrypt		= aes_encrypt,
+-			.cia_decrypt		= aes_decrypt
+-		}
 -	}
--	set_fs(old_fs);
--}
-+	unsigned int cpu = 0;
- 
--void cpufreq_restore_default_governor(void)
--{
--	cpufreq_set_governor(cpufreq_gov_default);
-+#ifndef CONFIG_TEGRA_AUTO_HOTPLUG
-+	for_each_online_cpu(cpu)
-+#endif
-+	return cpufreq_set_gov(target_gov, cpu);
- }
- 
--void cpufreq_set_conservative_governor_param(char *name, int value)
-+int cpufreq_restore_default_gov(void)
+-};
+-
+ static void __aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
--	struct file *gov_param = NULL;
--	mm_segment_t old_fs;
--	static char buf[128], param_value[8];
--	loff_t offset = 0;
--
--	/* change to KERNEL_DS address limit */
--	old_fs = get_fs();
--	set_fs(KERNEL_DS);
--
--	sprintf(param_value, "%d", value);
--	sprintf(buf, cpufreq_gov_conservative_param, name);
--	gov_param = filp_open(buf, O_RDWR, 0);
--	if (gov_param != NULL) {
--		if (gov_param->f_op != NULL &&
--			gov_param->f_op->write != NULL)
--			gov_param->f_op->write(gov_param,
--					param_value,
--					strlen(param_value),
--					&offset);
--		else
--			pr_err("f_op might be null\n");
-+	int ret = 0;
-+	unsigned int cpu;
- 
--		filp_close(gov_param, NULL);
--	} else {
--		pr_err("%s. Can't open %s\n", __func__, buf);
-+	for (cpu = 0; cpu < CONFIG_NR_CPUS; cpu++) {
-+		if (strlen((const char *)&cpufreq_default_gov[cpu])) {
-+			ret = cpufreq_set_gov(cpufreq_default_gov[cpu], cpu);
-+			if (ret < 0)
-+				/* Unable to restore gov for the cpu as
-+				 * It was online on suspend and becomes
-+				 * offline on resume.
-+				 */
-+				pr_info("Unable to restore gov:%s for cpu:%d,"
-+						, cpufreq_default_gov[cpu]
-+							, cpu);
-+		}
-+		cpufreq_default_gov[cpu][0] = '\0';
- 	}
--	set_fs(old_fs);
--}
--
--void cpufreq_set_conservative_governor(void)
--{
--	cpufreq_set_governor(cpufreq_gov_conservative);
-+	return ret;
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+@@ -257,27 +236,6 @@ static void __aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	aesni_dec(ctx, dst, src);
  }
- #endif /* CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND */
---
-1.7.1
+ 
+-static struct crypto_alg __aesni_alg = {
+-	.cra_name		= "__aes-aesni",
+-	.cra_driver_name	= "__driver-aes-aesni",
+-	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
+-	.cra_alignmask		= 0,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(__aesni_alg.cra_list),
+-	.cra_u	= {
+-		.cipher	= {
+-			.cia_min_keysize	= AES_MIN_KEY_SIZE,
+-			.cia_max_keysize	= AES_MAX_KEY_SIZE,
+-			.cia_setkey		= aes_set_key,
+-			.cia_encrypt		= __aes_encrypt,
+-			.cia_decrypt		= __aes_decrypt
+-		}
+-	}
+-};
+-
+ static int ecb_encrypt(struct blkcipher_desc *desc,
+ 		       struct scatterlist *dst, struct scatterlist *src,
+ 		       unsigned int nbytes)
+@@ -326,28 +284,6 @@ static int ecb_decrypt(struct blkcipher_desc *desc,
+ 	return err;
+ }
+ 
+-static struct crypto_alg blk_ecb_alg = {
+-	.cra_name		= "__ecb-aes-aesni",
+-	.cra_driver_name	= "__driver-ecb-aes-aesni",
+-	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_blkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(blk_ecb_alg.cra_list),
+-	.cra_u = {
+-		.blkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= aes_set_key,
+-			.encrypt	= ecb_encrypt,
+-			.decrypt	= ecb_decrypt,
+-		},
+-	},
+-};
+-
+ static int cbc_encrypt(struct blkcipher_desc *desc,
+ 		       struct scatterlist *dst, struct scatterlist *src,
+ 		       unsigned int nbytes)
+@@ -396,28 +332,6 @@ static int cbc_decrypt(struct blkcipher_desc *desc,
+ 	return err;
+ }
+ 
+-static struct crypto_alg blk_cbc_alg = {
+-	.cra_name		= "__cbc-aes-aesni",
+-	.cra_driver_name	= "__driver-cbc-aes-aesni",
+-	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_blkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(blk_cbc_alg.cra_list),
+-	.cra_u = {
+-		.blkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= aes_set_key,
+-			.encrypt	= cbc_encrypt,
+-			.decrypt	= cbc_decrypt,
+-		},
+-	},
+-};
+-
+ #ifdef CONFIG_X86_64
+ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+ 			    struct blkcipher_walk *walk)
+@@ -461,29 +375,6 @@ static int ctr_crypt(struct blkcipher_desc *desc,
+ 
+ 	return err;
+ }
+-
+-static struct crypto_alg blk_ctr_alg = {
+-	.cra_name		= "__ctr-aes-aesni",
+-	.cra_driver_name	= "__driver-ctr-aes-aesni",
+-	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		= 1,
+-	.cra_ctxsize		= sizeof(struct crypto_aes_ctx)+AESNI_ALIGN-1,
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_blkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(blk_ctr_alg.cra_list),
+-	.cra_u = {
+-		.blkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= aes_set_key,
+-			.encrypt	= ctr_crypt,
+-			.decrypt	= ctr_crypt,
+-		},
+-	},
+-};
+ #endif
+ 
+ static int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
+@@ -572,30 +463,6 @@ static int ablk_ecb_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static struct crypto_alg ablk_ecb_alg = {
+-	.cra_name		= "ecb(aes)",
+-	.cra_driver_name	= "ecb-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_ecb_alg.cra_list),
+-	.cra_init		= ablk_ecb_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_decrypt,
+-		},
+-	},
+-};
+-
+ static int ablk_cbc_init(struct crypto_tfm *tfm)
+ {
+ 	struct cryptd_ablkcipher *cryptd_tfm;
+@@ -607,31 +474,6 @@ static int ablk_cbc_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static struct crypto_alg ablk_cbc_alg = {
+-	.cra_name		= "cbc(aes)",
+-	.cra_driver_name	= "cbc-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_cbc_alg.cra_list),
+-	.cra_init		= ablk_cbc_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_decrypt,
+-		},
+-	},
+-};
+-
+ #ifdef CONFIG_X86_64
+ static int ablk_ctr_init(struct crypto_tfm *tfm)
+ {
+@@ -644,32 +486,6 @@ static int ablk_ctr_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static struct crypto_alg ablk_ctr_alg = {
+-	.cra_name		= "ctr(aes)",
+-	.cra_driver_name	= "ctr-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= 1,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_ctr_alg.cra_list),
+-	.cra_init		= ablk_ctr_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_encrypt,
+-			.geniv		= "chainiv",
+-		},
+-	},
+-};
+-
+ #ifdef HAS_CTR
+ static int ablk_rfc3686_ctr_init(struct crypto_tfm *tfm)
+ {
+@@ -682,32 +498,6 @@ static int ablk_rfc3686_ctr_init(struct crypto_tfm *tfm)
+ 	ablk_init_common(tfm, cryptd_tfm);
+ 	return 0;
+ }
+-
+-static struct crypto_alg ablk_rfc3686_ctr_alg = {
+-	.cra_name		= "rfc3686(ctr(aes))",
+-	.cra_driver_name	= "rfc3686-ctr-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= 1,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_rfc3686_ctr_alg.cra_list),
+-	.cra_init		= ablk_rfc3686_ctr_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize = AES_MIN_KEY_SIZE+CTR_RFC3686_NONCE_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE+CTR_RFC3686_NONCE_SIZE,
+-			.ivsize	     = CTR_RFC3686_IV_SIZE,
+-			.setkey	     = ablk_set_key,
+-			.encrypt     = ablk_encrypt,
+-			.decrypt     = ablk_decrypt,
+-			.geniv	     = "seqiv",
+-		},
+-	},
+-};
+ #endif
+ #endif
+ 
+@@ -723,31 +513,6 @@ static int ablk_lrw_init(struct crypto_tfm *tfm)
+ 	ablk_init_common(tfm, cryptd_tfm);
+ 	return 0;
+ }
+-
+-static struct crypto_alg ablk_lrw_alg = {
+-	.cra_name		= "lrw(aes)",
+-	.cra_driver_name	= "lrw-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_lrw_alg.cra_list),
+-	.cra_init		= ablk_lrw_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE + AES_BLOCK_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE + AES_BLOCK_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_decrypt,
+-		},
+-	},
+-};
+ #endif
+ 
+ #ifdef HAS_PCBC
+@@ -762,31 +527,6 @@ static int ablk_pcbc_init(struct crypto_tfm *tfm)
+ 	ablk_init_common(tfm, cryptd_tfm);
+ 	return 0;
+ }
+-
+-static struct crypto_alg ablk_pcbc_alg = {
+-	.cra_name		= "pcbc(aes)",
+-	.cra_driver_name	= "pcbc-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_pcbc_alg.cra_list),
+-	.cra_init		= ablk_pcbc_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_decrypt,
+-		},
+-	},
+-};
+ #endif
+ 
+ #ifdef HAS_XTS
+@@ -801,31 +541,6 @@ static int ablk_xts_init(struct crypto_tfm *tfm)
+ 	ablk_init_common(tfm, cryptd_tfm);
+ 	return 0;
+ }
+-
+-static struct crypto_alg ablk_xts_alg = {
+-	.cra_name		= "xts(aes)",
+-	.cra_driver_name	= "xts-aes-aesni",
+-	.cra_priority		= 400,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct async_aes_ctx),
+-	.cra_alignmask		= 0,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(ablk_xts_alg.cra_list),
+-	.cra_init		= ablk_xts_init,
+-	.cra_exit		= ablk_exit,
+-	.cra_u = {
+-		.ablkcipher = {
+-			.min_keysize	= 2 * AES_MIN_KEY_SIZE,
+-			.max_keysize	= 2 * AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= ablk_set_key,
+-			.encrypt	= ablk_encrypt,
+-			.decrypt	= ablk_decrypt,
+-		},
+-	},
+-};
+ #endif
+ 
+ #ifdef CONFIG_X86_64
+@@ -1050,32 +765,6 @@ static int rfc4106_decrypt(struct aead_request *req)
+ 	}
+ }
+ 
+-static struct crypto_alg rfc4106_alg = {
+-	.cra_name = "rfc4106(gcm(aes))",
+-	.cra_driver_name = "rfc4106-gcm-aesni",
+-	.cra_priority = 400,
+-	.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
+-	.cra_blocksize = 1,
+-	.cra_ctxsize = sizeof(struct aesni_rfc4106_gcm_ctx) + AESNI_ALIGN,
+-	.cra_alignmask = 0,
+-	.cra_type = &crypto_nivaead_type,
+-	.cra_module = THIS_MODULE,
+-	.cra_list = LIST_HEAD_INIT(rfc4106_alg.cra_list),
+-	.cra_init = rfc4106_init,
+-	.cra_exit = rfc4106_exit,
+-	.cra_u = {
+-		.aead = {
+-			.setkey = rfc4106_set_key,
+-			.setauthsize = rfc4106_set_authsize,
+-			.encrypt = rfc4106_encrypt,
+-			.decrypt = rfc4106_decrypt,
+-			.geniv = "seqiv",
+-			.ivsize = 8,
+-			.maxauthsize = 16,
+-		},
+-	},
+-};
+-
+ static int __driver_rfc4106_encrypt(struct aead_request *req)
+ {
+ 	u8 one_entry_in_sg = 0;
+@@ -1233,26 +922,316 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 	}
+ 	return retval;
+ }
++#endif
+ 
+-static struct crypto_alg __rfc4106_alg = {
+-	.cra_name		= "__gcm-aes-aesni",
+-	.cra_driver_name	= "__driver-gcm-aes-aesni",
++static struct crypto_alg aesni_algs[] = { {
++	.cra_name		= "aes",
++	.cra_driver_name	= "aes-aesni",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
++				  AESNI_ALIGN - 1,
++	.cra_alignmask		= 0,
++	.cra_module		= THIS_MODULE,
++	.cra_u	= {
++		.cipher	= {
++			.cia_min_keysize	= AES_MIN_KEY_SIZE,
++			.cia_max_keysize	= AES_MAX_KEY_SIZE,
++			.cia_setkey		= aes_set_key,
++			.cia_encrypt		= aes_encrypt,
++			.cia_decrypt		= aes_decrypt
++		}
++	}
++}, {
++	.cra_name		= "__aes-aesni",
++	.cra_driver_name	= "__driver-aes-aesni",
++	.cra_priority		= 0,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
++				  AESNI_ALIGN - 1,
++	.cra_alignmask		= 0,
++	.cra_module		= THIS_MODULE,
++	.cra_u	= {
++		.cipher	= {
++			.cia_min_keysize	= AES_MIN_KEY_SIZE,
++			.cia_max_keysize	= AES_MAX_KEY_SIZE,
++			.cia_setkey		= aes_set_key,
++			.cia_encrypt		= __aes_encrypt,
++			.cia_decrypt		= __aes_decrypt
++		}
++	}
++}, {
++	.cra_name		= "__ecb-aes-aesni",
++	.cra_driver_name	= "__driver-ecb-aes-aesni",
++	.cra_priority		= 0,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
++				  AESNI_ALIGN - 1,
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.setkey		= aes_set_key,
++			.encrypt	= ecb_encrypt,
++			.decrypt	= ecb_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "__cbc-aes-aesni",
++	.cra_driver_name	= "__driver-cbc-aes-aesni",
++	.cra_priority		= 0,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
++				  AESNI_ALIGN - 1,
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.setkey		= aes_set_key,
++			.encrypt	= cbc_encrypt,
++			.decrypt	= cbc_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "ecb(aes)",
++	.cra_driver_name	= "ecb-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_ecb_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "cbc(aes)",
++	.cra_driver_name	= "cbc-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_cbc_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_decrypt,
++		},
++	},
++#ifdef CONFIG_X86_64
++}, {
++	.cra_name		= "__ctr-aes-aesni",
++	.cra_driver_name	= "__driver-ctr-aes-aesni",
++	.cra_priority		= 0,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= 1,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
++				  AESNI_ALIGN - 1,
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= aes_set_key,
++			.encrypt	= ctr_crypt,
++			.decrypt	= ctr_crypt,
++		},
++	},
++}, {
++	.cra_name		= "ctr(aes)",
++	.cra_driver_name	= "ctr-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= 1,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_ctr_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_encrypt,
++			.geniv		= "chainiv",
++		},
++	},
++}, {
++	.cra_name		= "__gcm-aes-aesni",
++	.cra_driver_name	= "__driver-gcm-aes-aesni",
+ 	.cra_priority		= 0,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_AEAD,
+ 	.cra_blocksize		= 1,
+-	.cra_ctxsize	= sizeof(struct aesni_rfc4106_gcm_ctx) + AESNI_ALIGN,
++	.cra_ctxsize		= sizeof(struct aesni_rfc4106_gcm_ctx) +
++				  AESNI_ALIGN,
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_aead_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(__rfc4106_alg.cra_list),
+ 	.cra_u = {
+ 		.aead = {
+ 			.encrypt	= __driver_rfc4106_encrypt,
+ 			.decrypt	= __driver_rfc4106_decrypt,
+ 		},
+ 	},
+-};
++}, {
++	.cra_name		= "rfc4106(gcm(aes))",
++	.cra_driver_name	= "rfc4106-gcm-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= 1,
++	.cra_ctxsize		= sizeof(struct aesni_rfc4106_gcm_ctx) +
++				  AESNI_ALIGN,
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_nivaead_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= rfc4106_init,
++	.cra_exit		= rfc4106_exit,
++	.cra_u = {
++		.aead = {
++			.setkey		= rfc4106_set_key,
++			.setauthsize	= rfc4106_set_authsize,
++			.encrypt	= rfc4106_encrypt,
++			.decrypt	= rfc4106_decrypt,
++			.geniv		= "seqiv",
++			.ivsize		= 8,
++			.maxauthsize	= 16,
++		},
++	},
++#ifdef HAS_CTR
++}, {
++	.cra_name		= "rfc3686(ctr(aes))",
++	.cra_driver_name	= "rfc3686-ctr-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= 1,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_rfc3686_ctr_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize = AES_MIN_KEY_SIZE +
++				       CTR_RFC3686_NONCE_SIZE,
++			.max_keysize = AES_MAX_KEY_SIZE +
++				       CTR_RFC3686_NONCE_SIZE,
++			.ivsize	     = CTR_RFC3686_IV_SIZE,
++			.setkey	     = ablk_set_key,
++			.encrypt     = ablk_encrypt,
++			.decrypt     = ablk_decrypt,
++			.geniv	     = "seqiv",
++		},
++	},
++#endif
++#endif
++#ifdef HAS_LRW
++}, {
++	.cra_name		= "lrw(aes)",
++	.cra_driver_name	= "lrw-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_lrw_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE + AES_BLOCK_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE + AES_BLOCK_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_decrypt,
++		},
++	},
++#endif
++#ifdef HAS_PCBC
++}, {
++	.cra_name		= "pcbc(aes)",
++	.cra_driver_name	= "pcbc-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_pcbc_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_decrypt,
++		},
++	},
++#endif
++#ifdef HAS_XTS
++}, {
++	.cra_name		= "xts(aes)",
++	.cra_driver_name	= "xts-aes-aesni",
++	.cra_priority		= 400,
++	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct async_aes_ctx),
++	.cra_alignmask		= 0,
++	.cra_type		= &crypto_ablkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= ablk_xts_init,
++	.cra_exit		= ablk_exit,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize	= 2 * AES_MIN_KEY_SIZE,
++			.max_keysize	= 2 * AES_MAX_KEY_SIZE,
++			.ivsize		= AES_BLOCK_SIZE,
++			.setkey		= ablk_set_key,
++			.encrypt	= ablk_encrypt,
++			.decrypt	= ablk_decrypt,
++		},
++	},
+ #endif
++} };
+ 
+ 
+ static const struct x86_cpu_id aesni_cpu_id[] = {
+@@ -1263,120 +1242,24 @@ MODULE_DEVICE_TABLE(x86cpu, aesni_cpu_id);
+ 
+ static int __init aesni_init(void)
+ {
+-	int err;
++	int err, i;
+ 
+ 	if (!x86_match_cpu(aesni_cpu_id))
+ 		return -ENODEV;
+ 
+-	if ((err = crypto_fpu_init()))
+-		goto fpu_err;
+-	if ((err = crypto_register_alg(&aesni_alg)))
+-		goto aes_err;
+-	if ((err = crypto_register_alg(&__aesni_alg)))
+-		goto __aes_err;
+-	if ((err = crypto_register_alg(&blk_ecb_alg)))
+-		goto blk_ecb_err;
+-	if ((err = crypto_register_alg(&blk_cbc_alg)))
+-		goto blk_cbc_err;
+-	if ((err = crypto_register_alg(&ablk_ecb_alg)))
+-		goto ablk_ecb_err;
+-	if ((err = crypto_register_alg(&ablk_cbc_alg)))
+-		goto ablk_cbc_err;
+-#ifdef CONFIG_X86_64
+-	if ((err = crypto_register_alg(&blk_ctr_alg)))
+-		goto blk_ctr_err;
+-	if ((err = crypto_register_alg(&ablk_ctr_alg)))
+-		goto ablk_ctr_err;
+-	if ((err = crypto_register_alg(&__rfc4106_alg)))
+-		goto __aead_gcm_err;
+-	if ((err = crypto_register_alg(&rfc4106_alg)))
+-		goto aead_gcm_err;
+-#ifdef HAS_CTR
+-	if ((err = crypto_register_alg(&ablk_rfc3686_ctr_alg)))
+-		goto ablk_rfc3686_ctr_err;
+-#endif
+-#endif
+-#ifdef HAS_LRW
+-	if ((err = crypto_register_alg(&ablk_lrw_alg)))
+-		goto ablk_lrw_err;
+-#endif
+-#ifdef HAS_PCBC
+-	if ((err = crypto_register_alg(&ablk_pcbc_alg)))
+-		goto ablk_pcbc_err;
+-#endif
+-#ifdef HAS_XTS
+-	if ((err = crypto_register_alg(&ablk_xts_alg)))
+-		goto ablk_xts_err;
+-#endif
+-	return err;
++	err = crypto_fpu_init();
++	if (err)
++		return err;
+ 
+-#ifdef HAS_XTS
+-ablk_xts_err:
+-#endif
+-#ifdef HAS_PCBC
+-	crypto_unregister_alg(&ablk_pcbc_alg);
+-ablk_pcbc_err:
+-#endif
+-#ifdef HAS_LRW
+-	crypto_unregister_alg(&ablk_lrw_alg);
+-ablk_lrw_err:
+-#endif
+-#ifdef CONFIG_X86_64
+-#ifdef HAS_CTR
+-	crypto_unregister_alg(&ablk_rfc3686_ctr_alg);
+-ablk_rfc3686_ctr_err:
+-#endif
+-	crypto_unregister_alg(&rfc4106_alg);
+-aead_gcm_err:
+-	crypto_unregister_alg(&__rfc4106_alg);
+-__aead_gcm_err:
+-	crypto_unregister_alg(&ablk_ctr_alg);
+-ablk_ctr_err:
+-	crypto_unregister_alg(&blk_ctr_alg);
+-blk_ctr_err:
+-#endif
+-	crypto_unregister_alg(&ablk_cbc_alg);
+-ablk_cbc_err:
+-	crypto_unregister_alg(&ablk_ecb_alg);
+-ablk_ecb_err:
+-	crypto_unregister_alg(&blk_cbc_alg);
+-blk_cbc_err:
+-	crypto_unregister_alg(&blk_ecb_alg);
+-blk_ecb_err:
+-	crypto_unregister_alg(&__aesni_alg);
+-__aes_err:
+-	crypto_unregister_alg(&aesni_alg);
+-aes_err:
+-fpu_err:
+-	return err;
++	for (i = 0; i < ARRAY_SIZE(aesni_algs); i++)
++		INIT_LIST_HEAD(&aesni_algs[i].cra_list);
++
++	return crypto_register_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+ }
+ 
+ static void __exit aesni_exit(void)
+ {
+-#ifdef HAS_XTS
+-	crypto_unregister_alg(&ablk_xts_alg);
+-#endif
+-#ifdef HAS_PCBC
+-	crypto_unregister_alg(&ablk_pcbc_alg);
+-#endif
+-#ifdef HAS_LRW
+-	crypto_unregister_alg(&ablk_lrw_alg);
+-#endif
+-#ifdef CONFIG_X86_64
+-#ifdef HAS_CTR
+-	crypto_unregister_alg(&ablk_rfc3686_ctr_alg);
+-#endif
+-	crypto_unregister_alg(&rfc4106_alg);
+-	crypto_unregister_alg(&__rfc4106_alg);
+-	crypto_unregister_alg(&ablk_ctr_alg);
+-	crypto_unregister_alg(&blk_ctr_alg);
+-#endif
+-	crypto_unregister_alg(&ablk_cbc_alg);
+-	crypto_unregister_alg(&ablk_ecb_alg);
+-	crypto_unregister_alg(&blk_cbc_alg);
+-	crypto_unregister_alg(&blk_ecb_alg);
+-	crypto_unregister_alg(&__aesni_alg);
+-	crypto_unregister_alg(&aesni_alg);
++	crypto_unregister_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+ 
+ 	crypto_fpu_exit();
+ }
