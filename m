@@ -1,156 +1,31 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 2/2] crypto: aesni-intel: move more common code to
- ablk_init_common
-Date: Fri, 11 May 2012 16:00:54 +0300
-Message-ID: <20120511130054.26495.76435.stgit@localhost6.localdomain6>
-References: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
+From: Rodel Miguel <rodelfmiguel@gmail.com>
+Subject: Writing Asynchronous Block Ciphers
+Date: Sat, 12 May 2012 00:58:24 +0800
+Message-ID: <CAPihpKCc3pmf3g0vEMxq3XOo9xccwG1ZT2gqM7vRacfFBdFAEQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Huang Ying <ying.huang@intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:51872 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757656Ab2EKNLN (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:62438 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932600Ab2EKQ60 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 May 2012 09:11:13 -0400
-In-Reply-To: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
+	Fri, 11 May 2012 12:58:26 -0400
+Received: by pbbrp8 with SMTP id rp8so3535561pbb.19
+        for <linux-crypto@vger.kernel.org>; Fri, 11 May 2012 09:58:26 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ablk_*_init functions share more common code than what is currently in
-ablk_init_common. Move all of the common code to ablk_init_common.
+Hello,
 
-Cc: Huang Ying <ying.huang@intel.com>
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
----
- arch/x86/crypto/aesni-intel_glue.c |   70 ++++++++----------------------------
- 1 file changed, 15 insertions(+), 55 deletions(-)
+I would like to know if anyone has a tutorial/document link in writing
+a CRYPTO_ALG_TYPE_ABLKCIPHER crypto device driver?  I am looking at
+drivers/cipher/mv_cesa.c but there are lots of things going on which
+are hardware context related.  I would like to know what the minimum
+requirements for an asynchronous block cipher drivers are before I
+hand over (DMA) the collected data to my encryption hardware.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 20c6220..ac7f5cd 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -442,61 +442,42 @@ static void ablk_exit(struct crypto_tfm *tfm)
- 	cryptd_free_ablkcipher(ctx->cryptd_tfm);
- }
- 
--static void ablk_init_common(struct crypto_tfm *tfm,
--			     struct cryptd_ablkcipher *cryptd_tfm)
-+static int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name)
- {
- 	struct async_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct cryptd_ablkcipher *cryptd_tfm;
-+
-+	cryptd_tfm = cryptd_alloc_ablkcipher(drv_name, 0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
- 
- 	ctx->cryptd_tfm = cryptd_tfm;
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
- 		crypto_ablkcipher_reqsize(&cryptd_tfm->base);
-+
-+	return 0;
- }
- 
- static int ablk_ecb_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-ecb-aes-aesni", 0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "__driver-ecb-aes-aesni");
- }
- 
- static int ablk_cbc_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-cbc-aes-aesni", 0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "__driver-cbc-aes-aesni");
- }
- 
- #ifdef CONFIG_X86_64
- static int ablk_ctr_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("__driver-ctr-aes-aesni", 0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "__driver-ctr-aes-aesni");
- }
- 
- #ifdef HAS_CTR
- static int ablk_rfc3686_ctr_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher(
--		"rfc3686(__driver-ctr-aes-aesni)", 0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "rfc3686(__driver-ctr-aes-aesni)");
- }
- #endif
- #endif
-@@ -504,42 +485,21 @@ static int ablk_rfc3686_ctr_init(struct crypto_tfm *tfm)
- #ifdef HAS_LRW
- static int ablk_lrw_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("fpu(lrw(__driver-aes-aesni))",
--					     0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "fpu(lrw(__driver-aes-aesni))");
- }
- #endif
- 
- #ifdef HAS_PCBC
- static int ablk_pcbc_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("fpu(pcbc(__driver-aes-aesni))",
--					     0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "fpu(pcbc(__driver-aes-aesni))");
- }
- #endif
- 
- #ifdef HAS_XTS
- static int ablk_xts_init(struct crypto_tfm *tfm)
- {
--	struct cryptd_ablkcipher *cryptd_tfm;
--
--	cryptd_tfm = cryptd_alloc_ablkcipher("fpu(xts(__driver-aes-aesni))",
--					     0, 0);
--	if (IS_ERR(cryptd_tfm))
--		return PTR_ERR(cryptd_tfm);
--	ablk_init_common(tfm, cryptd_tfm);
--	return 0;
-+	return ablk_init_common(tfm, "fpu(xts(__driver-aes-aesni))");
- }
- #endif
- 
+Thanks in advance for your help!
+
+Kind Regards,
+Rodel
