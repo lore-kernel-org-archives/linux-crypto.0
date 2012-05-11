@@ -1,23 +1,36 @@
-From: Mrs Sabah Halif <mangrove@dephut.go.id>
-Subject: (unknown)
-Date: Sun, 6 May 2012 01:59:22 +0700 (WIT)
-Message-ID: <6892760.345591336244362205.JavaMail.root__21236.2864091576$1336702290$gmane$org@zm>
-Reply-To: Mrs Sabah Halif <sabah.halif12@hotmail.com>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: async hash & hmac
+Date: Fri, 11 May 2012 11:58:03 +0300
+Message-ID: <CALLzPKYuFWAbzB8EQ=QxWe+kpFqkEZRVJVimtVUNsw39miUntA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 9.subnet118-97-90.static.astinet.telkom.net.id ([118.97.90.9]:50304
-	"EHLO zm.dephut.go.id" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1758485Ab2EKCLP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 May 2012 22:11:15 -0400
-Subject: 
+Received: from mga09.intel.com ([134.134.136.24]:13799 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752152Ab2EKI6D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 May 2012 04:58:03 -0400
+Received: by dano14 with SMTP id o14so9760959dan.25
+        for <linux-crypto@vger.kernel.org>; Fri, 11 May 2012 01:58:03 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hello,
 
+When allocating hmac like: crypto_alloc_ahash("hmac(sha1)", ..),
+it is actually fallsback to  "shash" hmac and software shash hash
+implementation..
+Even when HW accelerator provides AHASH it will not be used with hmac.
 
--- 
-Good day,my name is Mrs Sabah Halif  i have a business proposal please contact me for details.
+Basically HW driver needs to provide its own implementation for async
+hmac, like I did for omap-sham.
+
+		.cra_name		= "hmac(sha1)",
+		.cra_driver_name	= "omap-hmac-sha1",
+
+Is that correct, right?
+
+Thanks.
+
+- Dmitry
