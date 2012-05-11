@@ -1,26 +1,41 @@
-From: <puneets@nvidia.com>
-Subject: [PATCH 3/3] arm: tegra: governor: change governor using cpufreq interface
-Date: Fri, 11 May 2012 18:02:36 +0530
-Message-ID: <1336739556-579-4-git-send-email-puneets@nvidia.com>
+From: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+Subject: RE: SPAM: [PATCH 3/3] arm: tegra: governor: change governor using
+ cpufreq interface
+Date: Fri, 11 May 2012 18:06:01 +0530
+Message-ID: <EC245B9844DE6242B3F3C3BED1ECD10F6D1AE9921C@BGMAIL02.nvidia.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>, <linux-tegra@vger.kernel.org>,
-	Puneet Saxena <puneets@nvidia.com>
-To: <cpufreq@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Return-path: <cpufreq-owner@vger.kernel.org>
-Sender: cpufreq-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Language: en-US
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Puneet Saxena <puneets@nvidia.com>
+General Apology!
+Please ignore the mail as it was accidentally sent. 
+Please treat this and previous mail as spam.
 
-Older code sets "conservative" governor in early-suspend
-using sysfs entries.This implementation changes governor
-in early-suspend using cpufreq interfaces.
+Thanks & Regards,
+Puneet Saxena
+-----Original Message-----
+From: Puneet Saxena 
+Sent: Friday, May 11, 2012 6:03 PM
+To: cpufreq-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org; linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Puneet Saxena
+Subject: [PATCH 3/3] arm: tegra: governor: change governor using cpufreq interface
+
+From: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+
+Older code sets "conservative" governor in early-suspend using sysfs entries.This implementation changes governor in early-suspend using cpufreq interfaces.
 
 bug 871958
 
 Change-Id: I721afb6184982a063dc5f330da31f8fb88481cfd
-Signed-off-by: Puneet Saxena <puneets@nvidia.com>
+Signed-off-by: Puneet Saxena <puneets-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 ---
  arch/arm/mach-tegra/board-enterprise-panel.c |   18 ++--
  arch/arm/mach-tegra/board-kai-panel.c        |   19 +---
@@ -37,8 +52,7 @@ index 8ac2e66..368d8c6 100644
 @@ -816,17 +816,12 @@ static void enterprise_panel_early_suspend(struct early_suspend *h)
  		fb_blank(registered_fb[0], FB_BLANK_POWERDOWN);
  	if (num_registered_fb > 1)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);
--#ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
+ 		fb_blank(registered_fb[1], FB_BLANK_NORMAL); -#ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -	cpufreq_save_default_governor();
 -	cpufreq_set_conservative_governor();
 -	cpufreq_set_conservative_governor_param("up_threshold",
@@ -66,8 +80,7 @@ index 8ac2e66..368d8c6 100644
 +		pr_err("Early_suspend: Unable to restore governor\n");
  #endif
  	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);
-diff --git a/arch/arm/mach-tegra/board-kai-panel.c b/arch/arm/mach-tegra/board-kai-panel.c
+ 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-kai-panel.c b/arch/arm/mach-tegra/board-kai-panel.c
 index 53661ce..0a68387 100644
 --- a/arch/arm/mach-tegra/board-kai-panel.c
 +++ b/arch/arm/mach-tegra/board-kai-panel.c
@@ -95,8 +108,7 @@ index 53661ce..0a68387 100644
 -
  }
  
- static void kai_panel_late_resume(struct early_suspend *h)
- {
+ static void kai_panel_late_resume(struct early_suspend *h)  {
  	unsigned i;
  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -	cpufreq_restore_default_governor();
@@ -104,15 +116,13 @@ index 53661ce..0a68387 100644
 +		pr_err("Early_suspend: Unable to restore governor\n");
  #endif
  	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);
-diff --git a/arch/arm/mach-tegra/board-ventana-panel.c b/arch/arm/mach-tegra/board-ventana-panel.c
+ 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-ventana-panel.c b/arch/arm/mach-tegra/board-ventana-panel.c
 index 4cacd3d..84e75a4 100644
 --- a/arch/arm/mach-tegra/board-ventana-panel.c
 +++ b/arch/arm/mach-tegra/board-ventana-panel.c
 @@ -366,16 +366,10 @@ static void ventana_panel_early_suspend(struct early_suspend *h)
  	if (num_registered_fb > 1)
- 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);
- #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
+ 		fb_blank(registered_fb[1], FB_BLANK_NORMAL);  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -	cpufreq_save_default_governor();
 -	cpufreq_set_conservative_governor();
 -        cpufreq_set_conservative_governor_param("up_threshold",
@@ -130,8 +140,7 @@ index 4cacd3d..84e75a4 100644
  #endif
  }
  
-@@ -383,7 +377,8 @@ static void ventana_panel_late_resume(struct early_suspend *h)
- {
+@@ -383,7 +377,8 @@ static void ventana_panel_late_resume(struct early_suspend *h)  {
  	unsigned i;
  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -	cpufreq_restore_default_governor();
@@ -139,8 +148,7 @@ index 4cacd3d..84e75a4 100644
 +		pr_err("Early_suspend: Unable to restore governor\n");
  #endif
  	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);
-diff --git a/arch/arm/mach-tegra/board-whistler-panel.c b/arch/arm/mach-tegra/board-whistler-panel.c
+ 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK); diff --git a/arch/arm/mach-tegra/board-whistler-panel.c b/arch/arm/mach-tegra/board-whistler-panel.c
 index 74075d4..7582c77 100644
 --- a/arch/arm/mach-tegra/board-whistler-panel.c
 +++ b/arch/arm/mach-tegra/board-whistler-panel.c
@@ -165,8 +173,7 @@ index 74075d4..7582c77 100644
  #endif
  }
  
- static void whistler_panel_late_resume(struct early_suspend *h)
- {
+ static void whistler_panel_late_resume(struct early_suspend *h)  {
  	unsigned i;
 +
  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
@@ -176,16 +183,10 @@ index 74075d4..7582c77 100644
  #endif
 +
  	for (i = 0; i < num_registered_fb; i++)
- 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);
- }
-diff --git a/arch/arm/mach-tegra/board.h b/arch/arm/mach-tegra/board.h
-index c7ab065..63095ce 100644
+ 		fb_blank(registered_fb[i], FB_BLANK_UNBLANK);  } diff --git a/arch/arm/mach-tegra/board.h b/arch/arm/mach-tegra/board.h index c7ab065..63095ce 100644
 --- a/arch/arm/mach-tegra/board.h
 +++ b/arch/arm/mach-tegra/board.h
-@@ -157,16 +157,17 @@ void tegra_get_board_info(struct board_info *);
- void tegra_get_pmu_board_info(struct board_info *bi);
- void tegra_get_display_board_info(struct board_info *bi);
- void tegra_get_camera_board_info(struct board_info *bi);
+@@ -157,16 +157,17 @@ void tegra_get_board_info(struct board_info *);  void tegra_get_pmu_board_info(struct board_info *bi);  void tegra_get_display_board_info(struct board_info *bi);  void tegra_get_camera_board_info(struct board_info *bi);
 +
  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -#define SET_CONSERVATIVE_GOVERNOR_UP_THRESHOLD 		95
@@ -208,8 +209,7 @@ index c7ab065..63095ce 100644
  int get_core_edp(void);
  enum panel_type get_panel_type(void);
  int tegra_get_modem_id(void);
-diff --git a/arch/arm/mach-tegra/common.c b/arch/arm/mach-tegra/common.c
-index aef4201..78bd77d 100644
+diff --git a/arch/arm/mach-tegra/common.c b/arch/arm/mach-tegra/common.c index aef4201..78bd77d 100644
 --- a/arch/arm/mach-tegra/common.c
 +++ b/arch/arm/mach-tegra/common.c
 @@ -28,6 +28,7 @@
@@ -220,13 +220,11 @@ index aef4201..78bd77d 100644
  
  #include <asm/hardware/cache-l2x0.h>
  #include <asm/system.h>
-@@ -953,118 +954,53 @@ void __init tegra_release_bootloader_fb(void)
- }
+@@ -953,118 +954,53 @@ void __init tegra_release_bootloader_fb(void)  }
  
  #ifdef CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND
 -static char cpufreq_gov_default[32];
--static char *cpufreq_gov_conservative = "conservative";
--static char *cpufreq_sysfs_place_holder="/sys/devices/system/cpu/cpu%i/cpufreq/scaling_governor";
+-static char *cpufreq_gov_conservative = "conservative"; -static char *cpufreq_sysfs_place_holder="/sys/devices/system/cpu/cpu%i/cpufreq/scaling_governor";
 -static char *cpufreq_gov_conservative_param="/sys/devices/system/cpu/cpufreq/conservative/%s";
 +char cpufreq_default_gov[CONFIG_NR_CPUS][MAX_GOV_NAME_LEN];
 +char *cpufreq_conservative_gov = "conservative";
@@ -373,6 +371,5 @@ index aef4201..78bd77d 100644
 +	return ret;
  }
  #endif /* CONFIG_TEGRA_CONVSERVATIVE_GOV_ON_EARLYSUPSEND */
--- 
+--
 1.7.1
-
