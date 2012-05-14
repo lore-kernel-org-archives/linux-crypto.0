@@ -1,42 +1,46 @@
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: Re: [PATCH v3 03/17] powerpc: Add PFO support to the VIO bus
-Date: Mon, 14 May 2012 10:32:07 +1000
-Message-ID: <1336955527.6727.2.camel@pasglop>
-References: <1334242825.18090.4.camel@key-ThinkPad-W510>
-	 <1334243302.18090.10.camel@key-ThinkPad-W510>
-	 <1335841603.3621.8.camel@pasglop>
-	 <20120510190835.GB12304@linux.vnet.ibm.com>
-	 <1336687098.3881.63.camel@pasglop>
+From: Rodel Miguel <rodelfmiguel@gmail.com>
+Subject: CRYPTO_ALG_TYPE_ABLKCIPHER concepts guide
+Date: Mon, 14 May 2012 12:46:52 +0800
+Message-ID: <CAPihpKCBxW6kFF9ZZLB9Y7P-EqbTEo_bnbPoCOZB16dxUT1APA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Kent Yoder <key@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Robert Jennings <rcj@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1336687098.3881.63.camel@pasglop>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:63593 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751771Ab2ENEqx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 May 2012 00:46:53 -0400
+Received: by yhmm54 with SMTP id m54so3865842yhm.19
+        for <linux-crypto@vger.kernel.org>; Sun, 13 May 2012 21:46:52 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2012-05-11 at 07:58 +1000, Benjamin Herrenschmidt wrote:
-> > 
-> > Having the timeout and retries in this function is the wrong thing to do.
-> > We'll resubmit this without the loop and the caller will be responsible for
-> > retrying the operations.
-> >
-> > I would rather have the caller cede the processor or alter thread
-> > priority where appropriate than doing that in this function.  I don't
-> > think this should be done in this crypto driver.
-> 
-> That sounds right indeed... as long as the upper crypto layer has a
-> concept of "try again later"... if it doesn't it will result in random
-> funny failures :-)
+Hello Experts,
 
-Ping ?
+I am writing a driver for my AES encryption hardware.  It is a
+hardware which can do encryption of 4k bytes of data every time.  I
+have tried creating a driver based on geode-aes.c code which uses the
+CRYPTO_ALG_TYPE_BLKCIPHER interface.  While testing the driver, I
+found out that the limit for this type of API is 512 bytes of data
+sent on every encryption/decryption call.  I have sent the dm-crypt
+mailing list a query about this and they said that this limit cannot
+be changed at the moment.
 
-So I'm merging 1 to 5 (ie, up to and including the hwrng driver). I will
-still merge the rest if you send a fix for that in the next day or so
-but not much longer.
+I am now looking at a different type of crypto API which is the
+CRYPTO_ALG_TYPE_ABLKCIPHER but I could not find any
+tutorials/documentation which would guide to the minimum code required
+to create this type of driver.  I looked at the mv_cesa.c but I am
+still quite lost at the procedures in doing this type of driver.  The
+reason I want to explore this driver is that I am assuming that the
+CRYPTO_ALG_TYPE_ABLKCIPHER type of interface would allow me to collect
+4k bytes of data first before doing DMA to my hardware for
+encryption/decryption.  Is this a correct assumption?
 
-Cheers,
-Ben.
+Is there a good documentation that would lay out the requirements to
+write an asynchronous type of block cipher?
+
+Thank you very much for your help!
+
+Kind Regards,
+Rodel
