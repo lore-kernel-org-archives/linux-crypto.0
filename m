@@ -1,36 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mv_cesa requires on CRYPTO_HASH to build
-Date: Sun, 13 May 2012 07:04:13 +1000
-Message-ID: <20120512210413.GA6593@gondor.apana.org.au>
-References: <1336812308-32501-1-git-send-email-alex@digriz.org.uk>
- <20120512140219.GB16338@titan.lakedaemon.net>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: Re: [PATCH v3 03/17] powerpc: Add PFO support to the VIO bus
+Date: Mon, 14 May 2012 10:32:07 +1000
+Message-ID: <1336955527.6727.2.camel@pasglop>
+References: <1334242825.18090.4.camel@key-ThinkPad-W510>
+	 <1334243302.18090.10.camel@key-ThinkPad-W510>
+	 <1335841603.3621.8.camel@pasglop>
+	 <20120510190835.GB12304@linux.vnet.ibm.com>
+	 <1336687098.3881.63.camel@pasglop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexander Clouter <alex@digriz.org.uk>,
-	linux-crypto@vger.kernel.org
-To: Jason Cooper <jason@lakedaemon.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:60132 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756474Ab2ELVES (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 May 2012 17:04:18 -0400
-Content-Disposition: inline
-In-Reply-To: <20120512140219.GB16338@titan.lakedaemon.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Kent Yoder <key@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Robert Jennings <rcj@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1336687098.3881.63.camel@pasglop>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, May 12, 2012 at 10:02:19AM -0400, Jason Cooper wrote:
-> Herbert,
+On Fri, 2012-05-11 at 07:58 +1000, Benjamin Herrenschmidt wrote:
+> > 
+> > Having the timeout and retries in this function is the wrong thing to do.
+> > We'll resubmit this without the loop and the caller will be responsible for
+> > retrying the operations.
+> >
+> > I would rather have the caller cede the processor or alter thread
+> > priority where appropriate than doing that in this function.  I don't
+> > think this should be done in this crypto driver.
 > 
-> I'm putting together a pull request of fixes for arm:kirkwood
-> 3.4/stable, shall I add this to my tree, or would you like to take it in
-> through yours?
+> That sounds right indeed... as long as the upper crypto layer has a
+> concept of "try again later"... if it doesn't it will result in random
+> funny failures :-)
 
-Feel free to push it through you tree.
+Ping ?
 
-Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So I'm merging 1 to 5 (ie, up to and including the hwrng driver). I will
+still merge the rest if you send a fix for that in the next day or so
+but not much longer.
+
+Cheers,
+Ben.
