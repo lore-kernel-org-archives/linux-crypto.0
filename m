@@ -1,47 +1,51 @@
-From: "Mr.Saeed Ahmed." <seal@co.net>
-Subject: Will You Be Trusted?
-Date: Wed, 09 May 2012 02:27:58 -0400
-Message-ID: <20120509022758.yrl0e5oxkwcswg4w__49715.2484175333$1337061045$gmane$org@webmail.educacao.niteroi.rj.gov.br>
-Reply-To: mr.saeed01@linuxmail.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/3] Update for ux500 CRYP and HASH
+Date: Tue, 15 May 2012 17:26:11 +1000
+Message-ID: <20120515072610.GA24175@gondor.apana.org.au>
+References: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
-Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, arnd@arndb.de, sfr@canb.auug.org.au,
+	lee.jones@linaro.org, linus.walleij@linaro.org
+To: Andreas Westin <andreas.westin@stericsson.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from educacao.niteroi.urbi.com.br ([200.152.56.131]:38312 "EHLO
-	FMEmail.localdomain" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751416Ab2EOFtx (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:47041 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757110Ab2EOH0Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 May 2012 01:49:53 -0400
+	Tue, 15 May 2012 03:26:25 -0400
 Content-Disposition: inline
+In-Reply-To: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Thu, May 10, 2012 at 10:14:05AM +0200, Andreas Westin wrote:
+> Hi,
+> 
+> V2 of the patches.
+> 
+> * Removed symbol export
+> * Removed usage of SOC specific functions in the drivers.
+> * Readded overlooked config for DMA in mach-ux500.
+> 
+> After some internal discussion we felt that the now implemented
+> hardware identification solution is cleaner than the suggested
+> solution.
+> 
+> The hardware identification patch applies cleanly to
+> the cryptodev tree.
+> 
+> Regards
+> Andreas
+> 
+> Andreas Westin (3):
+>   mach-ux500: Crypto: core support for CRYP/HASH module.
+>   crypto: ux500: Update DMA handling for 3.4
+>   crypto: ux500: Cleanup hardware identification
 
-
-Dear Friend,
-
-As you read this, I don't want you to feel sorry for me,because, I
-believe everyone will die someday,and am contacting you because
-I really do need your help and I want you to help me with all your
-effort and time for just seven to fourteen workings days of your time.I
-want you to be honest and truthful with me that you will help me
-with my last wish as a dying man.
-
-Please i need a reliable person who will usethe Money($18 milliondollars)to
-build orphanage home or charity organization.
-
-Please kindly reply to my most confidential email if you are really
-interested in helping me please: mr.saeed01@linuxmail.org
-
-
-God be with you.
-
-Mr.Saeed Ahmed.
-
-----------------------------------------------------------------
-FME Webmail
-www.educacao.niteroi.rj.gov.br
+All applied.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
