@@ -1,50 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/3] Update for ux500 CRYP and HASH
-Date: Tue, 15 May 2012 17:26:11 +1000
-Message-ID: <20120515072610.GA24175@gondor.apana.org.au>
-References: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
+Subject: Re: [PATCH 1/2] crypto: aesni-intel: use crypto_[un]register_algs
+Date: Tue, 15 May 2012 17:28:04 +1000
+Message-ID: <20120515072804.GB24175@gondor.apana.org.au>
+References: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, arnd@arndb.de, sfr@canb.auug.org.au,
-	lee.jones@linaro.org, linus.walleij@linaro.org
-To: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Huang Ying <ying.huang@intel.com>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:47041 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:53156 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757110Ab2EOH0Z (ORCPT
+	with ESMTP id S1757113Ab2EOH2J (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 May 2012 03:26:25 -0400
+	Tue, 15 May 2012 03:28:09 -0400
 Content-Disposition: inline
-In-Reply-To: <1336637648-10064-1-git-send-email-andreas.westin@stericsson.com>
+In-Reply-To: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 10, 2012 at 10:14:05AM +0200, Andreas Westin wrote:
-> Hi,
+On Fri, May 11, 2012 at 04:00:48PM +0300, Jussi Kivilinna wrote:
+> Combine all crypto_alg to be registered and use new crypto_[un]register_algs
+> functions. Simplifies init/exit code and reduce object size.
 > 
-> V2 of the patches.
-> 
-> * Removed symbol export
-> * Removed usage of SOC specific functions in the drivers.
-> * Readded overlooked config for DMA in mach-ux500.
-> 
-> After some internal discussion we felt that the now implemented
-> hardware identification solution is cleaner than the suggested
-> solution.
-> 
-> The hardware identification patch applies cleanly to
-> the cryptodev tree.
-> 
-> Regards
-> Andreas
-> 
-> Andreas Westin (3):
->   mach-ux500: Crypto: core support for CRYP/HASH module.
->   crypto: ux500: Update DMA handling for 3.4
->   crypto: ux500: Cleanup hardware identification
+> Cc: Huang Ying <ying.huang@intel.com>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-All applied.  Thanks a lot!
+Both patches applied.  Thanks Jussi.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
