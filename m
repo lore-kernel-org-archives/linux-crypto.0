@@ -1,34 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: aesni-intel: use crypto_[un]register_algs
-Date: Tue, 15 May 2012 17:28:04 +1000
-Message-ID: <20120515072804.GB24175@gondor.apana.org.au>
-References: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Huang Ying <ying.huang@intel.com>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+From: boris@dedicatedserver.com.hk
+Subject: Streaming Service
+Date: Wed, 16 May 2012 03:35:20 +0800 (HKT)
+Message-ID: <lAdFbHg@iris.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:53156 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757113Ab2EOH2J (ORCPT
+Received: from 124-248-200-93.sunnyvision.com ([124.248.200.93]:32855 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S966670Ab2EOUAo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 May 2012 03:28:09 -0400
-Content-Disposition: inline
-In-Reply-To: <20120511130048.26495.55851.stgit@localhost6.localdomain6>
+	Tue, 15 May 2012 16:00:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 11, 2012 at 04:00:48PM +0300, Jussi Kivilinna wrote:
-> Combine all crypto_alg to be registered and use new crypto_[un]register_algs
-> functions. Simplifies init/exit code and reduce object size.
-> 
-> Cc: Huang Ying <ying.huang@intel.com>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Our Streaming Server is powerful and optimized server for live and on-demand audio/ video streaming content delivery. 
+Our Streaming Server features with high performance streaming throughput, network & storage I/O and optimized configurations for its high scalability and reliability.
+Our server supports latest Windows Media Technologies such as Fast Streaming, Fast Cache, Fast Start, Wireless Streaming as well as feature-rich add-on modules such as sophisticated content management, monitoring, logging reports, billing, authentications, load-balancing & clustering for all needs. 
 
-Both patches applied.  Thanks Jussi.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Pls send us email for further information.Thanks,
+
+Boris 
+boris@dedicatedserver.com.hk
+
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
