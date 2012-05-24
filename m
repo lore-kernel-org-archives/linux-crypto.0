@@ -1,55 +1,97 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: Crypto Update for 3.5
-Date: Thu, 24 May 2012 08:36:24 +0000
-Message-ID: <201205240836.24845.arnd@arndb.de>
-References: <20101024061625.GA23715@gondor.apana.org.au> <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com> <20120524002126.GA28104@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Lee Jones <lee.jones@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: sha1 - use Kbuild supplied flags for AVX test
+Date: Thu, 24 May 2012 11:13:42 +0200
+Message-ID: <1337850822-1855-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.171]:65215 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753668Ab2EXIgj (ORCPT
+Received: from grimli.r00tworld.net ([83.169.44.195]:59373 "EHLO
+	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753625Ab2EXJVx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 May 2012 04:36:39 -0400
-In-Reply-To: <20120524002126.GA28104@gondor.apana.org.au>
+	Thu, 24 May 2012 05:21:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 24 May 2012, Herbert Xu wrote:
-> On Wed, May 23, 2012 at 04:06:35PM -0700, Linus Torvalds wrote:
-> > On Tue, May 22, 2012 at 6:35 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > >
-> > > Here is the crypto update for 3.5:
-> > 
-> > I pulled this, but quite frankly, some of it looks like utter garbage.
-> > 
-> > There's a declaration for dbx500_add_platform_device_noirq() that does
-> > not exist and is not used anywhere. Why? It was added in commit
-> > 585d188f8072, and I see no rhyme or reason to it.
-> 
-> I can't see why that was added there either.
-> 
-> Adding Arnd/Linus Walleij to see if they can tell us whether
-> it should go or stay.
+Commit ea4d26ae ("raid5: add AVX optimized RAID5 checksumming")
+introduced x86/ arch wide defines for AFLAGS and CFLAGS indicating AVX
+support in binutils based on the same test we have in x86/crypto/ right
+now. To minimize duplication drop our implementation in favour to the
+one in x86/.
 
-It should go. For all I can tell, this was the result of Lee Jones
-doing major cleanups to the ux500 platform for this merge window
-in parallel with the crypto driver getting added following the
-older code pattern. The crypto patch had to be reworked for this
-and apparently a hunk from the older version survived.
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+---
 
-The entire file in which it was added is going to be removed
-in one of the next kernel versions once we can boot all ux500 machines
-using only device tree definitions, so it will be taken care of.
+This should be applied to cryptodev-2.6.git after it contains the above
+mentioned commit, e.g. after cryptodev-2.6.git rebased to/merged v3.5-rc1.
 
-	Arnd
+ arch/x86/crypto/Makefile          |    7 -------
+ arch/x86/crypto/sha1_ssse3_asm.S  |    2 +-
+ arch/x86/crypto/sha1_ssse3_glue.c |    6 +++---
+ 3 files changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index e191ac0..479f95a 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -34,12 +34,5 @@ salsa20-x86_64-y := salsa20-x86_64-asm_64.o salsa20_glue.o
+ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
+ 
+ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+-
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+-
+-# enable AVX support only when $(AS) can actually assemble the instructions
+-ifeq ($(call as-instr,vpxor %xmm0$(comma)%xmm1$(comma)%xmm2,yes,no),yes)
+-AFLAGS_sha1_ssse3_asm.o += -DSHA1_ENABLE_AVX_SUPPORT
+-CFLAGS_sha1_ssse3_glue.o += -DSHA1_ENABLE_AVX_SUPPORT
+-endif
+ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index b2c2f57..49d6987 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -468,7 +468,7 @@ W_PRECALC_SSSE3
+  */
+ SHA1_VECTOR_ASM     sha1_transform_ssse3
+ 
+-#ifdef SHA1_ENABLE_AVX_SUPPORT
++#ifdef CONFIG_AS_AVX
+ 
+ .macro W_PRECALC_AVX
+ 
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index f916499..4a11a9d 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -35,7 +35,7 @@
+ 
+ asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
+ 				     unsigned int rounds);
+-#ifdef SHA1_ENABLE_AVX_SUPPORT
++#ifdef CONFIG_AS_AVX
+ asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
+ 				   unsigned int rounds);
+ #endif
+@@ -184,7 +184,7 @@ static struct shash_alg alg = {
+ 	}
+ };
+ 
+-#ifdef SHA1_ENABLE_AVX_SUPPORT
++#ifdef CONFIG_AS_AVX
+ static bool __init avx_usable(void)
+ {
+ 	u64 xcr0;
+@@ -209,7 +209,7 @@ static int __init sha1_ssse3_mod_init(void)
+ 	if (cpu_has_ssse3)
+ 		sha1_transform_asm = sha1_transform_ssse3;
+ 
+-#ifdef SHA1_ENABLE_AVX_SUPPORT
++#ifdef CONFIG_AS_AVX
+ 	/* allow AVX to override SSSE3, it's a little faster */
+ 	if (avx_usable())
+ 		sha1_transform_asm = sha1_transform_avx;
+-- 
+1.5.6.5
