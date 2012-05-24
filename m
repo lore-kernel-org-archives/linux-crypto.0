@@ -1,55 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Linus Walleij <linus.walleij@linaro.org>
 Subject: Re: Crypto Update for 3.5
-Date: Thu, 24 May 2012 10:21:26 +1000
-Message-ID: <20120524002126.GA28104@gondor.apana.org.au>
-References: <20101024061625.GA23715@gondor.apana.org.au>
- <20110106000157.GA16089@gondor.apana.org.au>
- <20110315145940.GA15373@gondor.apana.org.au>
- <20110520235409.GA1722@gondor.apana.org.au>
- <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20120320032736.GA21367@gondor.apana.org.au>
- <20120523013528.GA20781@gondor.apana.org.au>
- <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
+Date: Thu, 24 May 2012 09:03:52 +0200
+Message-ID: <CACRpkdZHYqj71F2KG0S+W_n8SL0cRQ-D2ON6OWtsGR6XRJnRWQ@mail.gmail.com>
+References: <20100521104404.GA29530@gondor.apana.org.au>
+	<20100804140448.GA4042@gondor.apana.org.au>
+	<20101024061625.GA23715@gondor.apana.org.au>
+	<20110106000157.GA16089@gondor.apana.org.au>
+	<20110315145940.GA15373@gondor.apana.org.au>
+	<20110520235409.GA1722@gondor.apana.org.au>
+	<20110724011752.GA14373@gondor.apana.org.au>
+	<20111031040952.GA19659@gondor.apana.org.au>
+	<20120106041250.GA7759@gondor.apana.org.au>
+	<20120320032736.GA21367@gondor.apana.org.au>
+	<20120523013528.GA20781@gondor.apana.org.au>
+	<CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Westin <andreas.westin@stericsson.com>,
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Andreas Westin <andreas.westin@stericsson.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
+	Lee Jones <lee.jones@linaro.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:40404 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751255Ab2EXAVg (ORCPT
+Received: from mail-qc0-f174.google.com ([209.85.216.174]:54075 "EHLO
+	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750887Ab2EXHDx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 May 2012 20:21:36 -0400
-Content-Disposition: inline
+	Thu, 24 May 2012 03:03:53 -0400
+Received: by qcro28 with SMTP id o28so5439602qcr.19
+        for <linux-crypto@vger.kernel.org>; Thu, 24 May 2012 00:03:52 -0700 (PDT)
 In-Reply-To: <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 23, 2012 at 04:06:35PM -0700, Linus Torvalds wrote:
-> On Tue, May 22, 2012 at 6:35 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > Here is the crypto update for 3.5:
-> 
-> I pulled this, but quite frankly, some of it looks like utter garbage.
-> 
+On Thu, May 24, 2012 at 1:06 AM, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+
 > There's a declaration for dbx500_add_platform_device_noirq() that does
 > not exist and is not used anywhere. Why? It was added in commit
 > 585d188f8072, and I see no rhyme or reason to it.
+>
+> I only noticed because I happened to get a conflict due to the
+> location it was added. I removed it. WTF is going on?
 
-I can't see why that was added there either.
+AFAICT this was retrofitted to get a booting kernel on
+the cryptodev base which was based on something old like
+v3.2 just some weeks back. (Now it's upgraded to mainline, great!)
 
-Adding Arnd/Linus Walleij to see if they can tell us whether
-it should go or stay.
+Greg was pushing for us to allocate all devices dynamically at
+one point, but there was no real infrastructure for it and some local
+implementations to meet that requirement, that's why these
+functions pop up and down. We're working on it with device tree
+etc, mea culpa...
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yours,
+Linus Walleij
