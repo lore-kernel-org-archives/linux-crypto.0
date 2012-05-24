@@ -1,41 +1,55 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Crypto Update for 3.5
-Date: Wed, 23 May 2012 16:06:35 -0700
-Message-ID: <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
-References: <20100521104404.GA29530@gondor.apana.org.au> <20100804140448.GA4042@gondor.apana.org.au>
- <20101024061625.GA23715@gondor.apana.org.au> <20110106000157.GA16089@gondor.apana.org.au>
- <20110315145940.GA15373@gondor.apana.org.au> <20110520235409.GA1722@gondor.apana.org.au>
- <20110724011752.GA14373@gondor.apana.org.au> <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au> <20120320032736.GA21367@gondor.apana.org.au>
+Date: Thu, 24 May 2012 10:21:26 +1000
+Message-ID: <20120524002126.GA28104@gondor.apana.org.au>
+References: <20101024061625.GA23715@gondor.apana.org.au>
+ <20110106000157.GA16089@gondor.apana.org.au>
+ <20110315145940.GA15373@gondor.apana.org.au>
+ <20110520235409.GA1722@gondor.apana.org.au>
+ <20110724011752.GA14373@gondor.apana.org.au>
+ <20111031040952.GA19659@gondor.apana.org.au>
+ <20120106041250.GA7759@gondor.apana.org.au>
+ <20120320032736.GA21367@gondor.apana.org.au>
  <20120523013528.GA20781@gondor.apana.org.au>
+ <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Andreas Westin <andreas.westin@stericsson.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas Westin <andreas.westin@stericsson.com>
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linus.walleij@linaro.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:52882 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753436Ab2EWXG5 (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:40404 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751255Ab2EXAVg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 May 2012 19:06:57 -0400
-In-Reply-To: <20120523013528.GA20781@gondor.apana.org.au>
+	Wed, 23 May 2012 20:21:36 -0400
+Content-Disposition: inline
+In-Reply-To: <CA+55aFwR=wZfpXPTn9e+ZbEB4srVOHVZFz_STg9jxngmhJxT=w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 22, 2012 at 6:35 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Here is the crypto update for 3.5:
+On Wed, May 23, 2012 at 04:06:35PM -0700, Linus Torvalds wrote:
+> On Tue, May 22, 2012 at 6:35 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >
+> > Here is the crypto update for 3.5:
+> 
+> I pulled this, but quite frankly, some of it looks like utter garbage.
+> 
+> There's a declaration for dbx500_add_platform_device_noirq() that does
+> not exist and is not used anywhere. Why? It was added in commit
+> 585d188f8072, and I see no rhyme or reason to it.
 
-I pulled this, but quite frankly, some of it looks like utter garbage.
+I can't see why that was added there either.
 
-There's a declaration for dbx500_add_platform_device_noirq() that does
-not exist and is not used anywhere. Why? It was added in commit
-585d188f8072, and I see no rhyme or reason to it.
+Adding Arnd/Linus Walleij to see if they can tell us whether
+it should go or stay.
 
-I only noticed because I happened to get a conflict due to the
-location it was added. I removed it. WTF is going on?
-
-                         Linus
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
