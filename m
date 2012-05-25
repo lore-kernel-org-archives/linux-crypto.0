@@ -1,452 +1,467 @@
 From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: [PATCH 13/13] mv_cesa, mv_tdma: outsource common dma-pool handling code
-Date: Fri, 25 May 2012 18:08:39 +0200
-Message-ID: <1337962119-5509-14-git-send-email-phil.sutter@viprinet.com>
+Subject: [PATCH 06/13] mv_cesa: use TDMA engine for data transfers
+Date: Fri, 25 May 2012 18:08:32 +0200
+Message-ID: <1337962119-5509-7-git-send-email-phil.sutter@viprinet.com>
 References: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:47883 "EHLO zimbra.vipri.net"
+Received: from zimbra.vipri.net ([89.207.250.15]:47889 "EHLO zimbra.vipri.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753598Ab2EYQIy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 May 2012 12:08:54 -0400
+	id S1753598Ab2EYQI5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 May 2012 12:08:57 -0400
 In-Reply-To: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Simply chose the same DMA mask value as for mvsdio and ehci.
 
 Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
 ---
- drivers/crypto/dma_desclist.h |   79 +++++++++++++++++++++++++++++++++++
- drivers/crypto/mv_cesa.c      |   81 +++++++++----------------------------
- drivers/crypto/mv_tdma.c      |   91 ++++++++++++-----------------------------
- 3 files changed, 125 insertions(+), 126 deletions(-)
- create mode 100644 drivers/crypto/dma_desclist.h
+ arch/arm/plat-orion/common.c |    6 +
+ drivers/crypto/mv_cesa.c     |  214 +++++++++++++++++++++++++++++++++---------
+ 2 files changed, 175 insertions(+), 45 deletions(-)
 
-diff --git a/drivers/crypto/dma_desclist.h b/drivers/crypto/dma_desclist.h
-new file mode 100644
-index 0000000..c471ad6
---- /dev/null
-+++ b/drivers/crypto/dma_desclist.h
-@@ -0,0 +1,79 @@
-+#ifndef __DMA_DESCLIST__
-+#define __DMA_DESCLIST__
+diff --git a/arch/arm/plat-orion/common.c b/arch/arm/plat-orion/common.c
+index 74daf5e..dd3a327 100644
+--- a/arch/arm/plat-orion/common.c
++++ b/arch/arm/plat-orion/common.c
+@@ -916,9 +916,15 @@ static struct resource orion_crypto_resources[] = {
+ 	},
+ };
+ 
++static u64 mv_crypto_dmamask = DMA_BIT_MASK(32);
 +
-+struct dma_desc {
-+	void *virt;
-+	dma_addr_t phys;
-+};
-+
-+struct dma_desclist {
-+	struct dma_pool *itempool;
-+	struct dma_desc *desclist;
-+	unsigned long length;
-+	unsigned long usage;
-+};
-+
-+#define DESCLIST_ITEM(dl, x)		((dl).desclist[(x)].virt)
-+#define DESCLIST_ITEM_DMA(dl, x)	((dl).desclist[(x)].phys)
-+#define DESCLIST_FULL(dl)		((dl).length == (dl).usage)
-+
-+static inline int
-+init_dma_desclist(struct dma_desclist *dl, struct device *dev,
-+		size_t size, size_t align, size_t boundary)
-+{
-+#define STRX(x) #x
-+#define STR(x) STRX(x)
-+	dl->itempool = dma_pool_create(
-+			"DMA Desclist Pool at "__FILE__"("STR(__LINE__)")",
-+			dev, size, align, boundary);
-+#undef STR
-+#undef STRX
-+	if (!dl->itempool)
-+		return 1;
-+	dl->desclist = NULL;
-+	dl->length = dl->usage = 0;
-+	return 0;
-+}
-+
-+static inline int
-+set_dma_desclist_size(struct dma_desclist *dl, unsigned long nelem)
-+{
-+	/* need to increase size first if requested */
-+	if (nelem > dl->length) {
-+		struct dma_desc *newmem;
-+		int newsize = nelem * sizeof(struct dma_desc);
-+
-+		newmem = krealloc(dl->desclist, newsize, GFP_KERNEL);
-+		if (!newmem)
-+			return -ENOMEM;
-+		dl->desclist = newmem;
-+	}
-+
-+	/* allocate/free dma descriptors, adjusting dl->length on the go */
-+	for (; dl->length < nelem; dl->length++) {
-+		DESCLIST_ITEM(*dl, dl->length) = dma_pool_alloc(dl->itempool,
-+				GFP_KERNEL, &DESCLIST_ITEM_DMA(*dl, dl->length));
-+		if (!DESCLIST_ITEM(*dl, dl->length))
-+			return -ENOMEM;
-+	}
-+	for (; dl->length > nelem; dl->length--)
-+		dma_pool_free(dl->itempool, DESCLIST_ITEM(*dl, dl->length - 1),
-+				DESCLIST_ITEM_DMA(*dl, dl->length - 1));
-+
-+	/* ignore size decreases but those to zero */
-+	if (!nelem) {
-+		kfree(dl->desclist);
-+		dl->desclist = 0;
-+	}
-+	return 0;
-+}
-+
-+static inline void
-+fini_dma_desclist(struct dma_desclist *dl)
-+{
-+	set_dma_desclist_size(dl, 0);
-+	dma_pool_destroy(dl->itempool);
-+	dl->length = dl->usage = 0;
-+}
-+
-+#endif /* __DMA_DESCLIST__ */
+ static struct platform_device orion_crypto = {
+ 	.name           = "mv_crypto",
+ 	.id             = -1,
++	.dev		= {
++		.dma_mask = &mv_crypto_dmamask,
++		.coherent_dma_mask = DMA_BIT_MASK(32),
++	},
+ };
+ 
+ void __init orion_crypto_init(unsigned long mapbase,
 diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 9a2f413..367aa18 100644
+index 4a989ea..e10da2b 100644
 --- a/drivers/crypto/mv_cesa.c
 +++ b/drivers/crypto/mv_cesa.c
-@@ -23,6 +23,7 @@
+@@ -9,6 +9,7 @@
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+ #include <linux/crypto.h>
++#include <linux/dma-mapping.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/kthread.h>
+@@ -20,11 +21,14 @@
+ #include <crypto/sha.h>
  
  #include "mv_cesa.h"
- #include "mv_tdma.h"
-+#include "dma_desclist.h"
++#include "mv_tdma.h"
  
  #define MV_CESA	"MV-CESA:"
  #define MAX_HW_HASH_SIZE	0xFFFF
-@@ -99,11 +100,6 @@ struct sec_accel_sram {
- #define sa_ivo	type.hash.ivo
+ #define MV_CESA_EXPIRE		500 /* msec */
+ 
++static int count_sgs(struct scatterlist *, unsigned int);
++
+ /*
+  * STM:
+  *   /---------------------------------------\
+@@ -49,7 +53,6 @@ enum engine_status {
+  * @src_start:		offset to add to src start position (scatter list)
+  * @crypt_len:		length of current hw crypt/hash process
+  * @hw_nbytes:		total bytes to process in hw for this request
+- * @copy_back:		whether to copy data back (crypt) or not (hash)
+  * @sg_dst_left:	bytes left dst to process in this scatter list
+  * @dst_start:		offset to add to dst start position (scatter list)
+  * @hw_processed_bytes:	number of bytes processed by hw (request).
+@@ -70,7 +73,6 @@ struct req_progress {
+ 	int crypt_len;
+ 	int hw_nbytes;
+ 	/* dst mostly */
+-	int copy_back;
+ 	int sg_dst_left;
+ 	int dst_start;
+ 	int hw_processed_bytes;
+@@ -95,8 +97,10 @@ struct sec_accel_sram {
  } __attribute__((packed));
  
--struct u32_mempair {
--	u32 *vaddr;
--	dma_addr_t daddr;
--};
--
  struct crypto_priv {
- 	struct device *dev;
++	struct device *dev;
  	void __iomem *reg;
-@@ -127,14 +123,14 @@ struct crypto_priv {
- 	struct sec_accel_sram sa_sram;
- 	dma_addr_t sa_sram_dma;
+ 	void __iomem *sram;
++	u32 sram_phys;
+ 	int irq;
+ 	struct task_struct *queue_th;
  
--	struct dma_pool *u32_pool;
--	struct u32_mempair *u32_list;
--	int u32_list_len;
--	int u32_usage;
-+	struct dma_desclist desclist;
+@@ -113,6 +117,7 @@ struct crypto_priv {
+ 	int has_hmac_sha1;
+ 
+ 	struct sec_accel_sram sa_sram;
++	dma_addr_t sa_sram_dma;
  };
  
  static struct crypto_priv *cpg;
- 
-+#define ITEM(x)		((u32 *)DESCLIST_ITEM(cpg->desclist, x))
-+#define ITEM_DMA(x)	DESCLIST_ITEM_DMA(cpg->desclist, x)
-+
- struct mv_ctx {
- 	u8 aes_enc_key[AES_KEY_LEN];
- 	u32 aes_dec_key[8];
-@@ -202,52 +198,17 @@ static void mv_setup_timer(void)
+@@ -181,6 +186,23 @@ static void mv_setup_timer(void)
  			jiffies + msecs_to_jiffies(MV_CESA_EXPIRE));
  }
  
--#define U32_ITEM(x)		(cpg->u32_list[x].vaddr)
--#define U32_ITEM_DMA(x)		(cpg->u32_list[x].daddr)
--
--static inline int set_u32_poolsize(int nelem)
--{
--	/* need to increase size first if requested */
--	if (nelem > cpg->u32_list_len) {
--		struct u32_mempair *newmem;
--		int newsize = nelem * sizeof(struct u32_mempair);
--
--		newmem = krealloc(cpg->u32_list, newsize, GFP_KERNEL);
--		if (!newmem)
--			return -ENOMEM;
--		cpg->u32_list = newmem;
--	}
--
--	/* allocate/free dma descriptors, adjusting cpg->u32_list_len on the go */
--	for (; cpg->u32_list_len < nelem; cpg->u32_list_len++) {
--		U32_ITEM(cpg->u32_list_len) = dma_pool_alloc(cpg->u32_pool,
--				GFP_KERNEL, &U32_ITEM_DMA(cpg->u32_list_len));
--		if (!U32_ITEM((cpg->u32_list_len)))
--			return -ENOMEM;
--	}
--	for (; cpg->u32_list_len > nelem; cpg->u32_list_len--)
--		dma_pool_free(cpg->u32_pool, U32_ITEM(cpg->u32_list_len - 1),
--				U32_ITEM_DMA(cpg->u32_list_len - 1));
--
--	/* ignore size decreases but those to zero */
--	if (!nelem) {
--		kfree(cpg->u32_list);
--		cpg->u32_list = 0;
--	}
--	return 0;
--}
--
- static inline void mv_tdma_u32_copy(dma_addr_t dst, u32 val)
++static inline bool
++mv_dma_map_sg(struct scatterlist *sg, int nbytes, enum dma_data_direction dir)
++{
++	int nents = count_sgs(sg, nbytes);
++
++	if (nbytes && dma_map_sg(cpg->dev, sg, nents, dir) != nents)
++		return false;
++	return true;
++}
++
++static inline void
++mv_dma_unmap_sg(struct scatterlist *sg, int nbytes, enum dma_data_direction dir)
++{
++	if (nbytes)
++		dma_unmap_sg(cpg->dev, sg, count_sgs(sg, nbytes), dir);
++}
++
+ static void compute_aes_dec_key(struct mv_ctx *ctx)
  {
--	if (unlikely(cpg->u32_usage == cpg->u32_list_len)
--	    && set_u32_poolsize(cpg->u32_list_len << 1)) {
--		printk(KERN_ERR MV_CESA "resizing poolsize to %d failed\n",
--				cpg->u32_list_len << 1);
-+	if (unlikely(DESCLIST_FULL(cpg->desclist)) &&
-+	    set_dma_desclist_size(&cpg->desclist, cpg->desclist.length << 1)) {
-+		printk(KERN_ERR MV_CESA "resizing poolsize to %lu failed\n",
-+				cpg->desclist.length << 1);
- 		return;
+ 	struct crypto_aes_ctx gen_aes_key;
+@@ -255,12 +277,66 @@ static void copy_src_to_buf(struct req_progress *p, char *dbuf, int len)
  	}
--	*(U32_ITEM(cpg->u32_usage)) = val;
--	mv_tdma_memcpy(dst, U32_ITEM_DMA(cpg->u32_usage), sizeof(u32));
--	cpg->u32_usage++;
-+	*ITEM(cpg->desclist.usage) = val;
-+	mv_tdma_memcpy(dst, ITEM_DMA(cpg->desclist.usage), sizeof(u32));
-+	cpg->desclist.usage++;
  }
  
- static inline bool
-@@ -649,7 +610,7 @@ static void dequeue_complete_req(void)
++static void dma_copy_src_to_buf(struct req_progress *p, dma_addr_t dbuf, int len)
++{
++	dma_addr_t sbuf;
++	int copy_len;
++
++	while (len) {
++		if (!p->sg_src_left) {
++			/* next sg please */
++			p->src_sg = sg_next(p->src_sg);
++			BUG_ON(!p->src_sg);
++			p->sg_src_left = sg_dma_len(p->src_sg);
++			p->src_start = 0;
++		}
++
++		sbuf = sg_dma_address(p->src_sg) + p->src_start;
++
++		copy_len = min(p->sg_src_left, len);
++		mv_tdma_memcpy(dbuf, sbuf, copy_len);
++
++		p->src_start += copy_len;
++		p->sg_src_left -= copy_len;
++
++		len -= copy_len;
++		dbuf += copy_len;
++	}
++}
++
++static void dma_copy_buf_to_dst(struct req_progress *p, dma_addr_t sbuf, int len)
++{
++	dma_addr_t dbuf;
++	int copy_len;
++
++	while (len) {
++		if (!p->sg_dst_left) {
++			/* next sg please */
++			p->dst_sg = sg_next(p->dst_sg);
++			BUG_ON(!p->dst_sg);
++			p->sg_dst_left = sg_dma_len(p->dst_sg);
++			p->dst_start = 0;
++		}
++
++		dbuf = sg_dma_address(p->dst_sg) + p->dst_start;
++
++		copy_len = min(p->sg_dst_left, len);
++		mv_tdma_memcpy(dbuf, sbuf, copy_len);
++
++		p->dst_start += copy_len;
++		p->sg_dst_left -= copy_len;
++
++		len -= copy_len;
++		sbuf += copy_len;
++	}
++}
++
+ static void setup_data_in(void)
+ {
+ 	struct req_progress *p = &cpg->p;
+ 	int data_in_sram =
+ 	    min(p->hw_nbytes - p->hw_processed_bytes, cpg->max_req_size);
+-	copy_src_to_buf(p, cpg->sram + SRAM_DATA_IN_START + p->crypt_len,
++	dma_copy_src_to_buf(p, cpg->sram_phys + SRAM_DATA_IN_START + p->crypt_len,
+ 			data_in_sram - p->crypt_len);
+ 	p->crypt_len = data_in_sram;
+ }
+@@ -307,22 +383,39 @@ static void mv_init_crypt_config(struct ablkcipher_request *req)
+ 	op->enc_key_p = SRAM_DATA_KEY_P;
+ 	op->enc_len = cpg->p.crypt_len;
+ 
+-	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
++	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
++			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
++	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG, cpg->sa_sram_dma,
+ 			sizeof(struct sec_accel_sram));
+ 
++	mv_tdma_separator();
++	dma_copy_buf_to_dst(&cpg->p, cpg->sram_phys + SRAM_DATA_OUT_START, cpg->p.crypt_len);
++
+ 	/* GO */
+ 	mv_setup_timer();
++	mv_tdma_trigger();
+ 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ }
+ 
+ static void mv_update_crypt_config(void)
+ {
++	struct sec_accel_config *op = &cpg->sa_sram.op;
++
+ 	/* update the enc_len field only */
+-	memcpy(cpg->sram + SRAM_CONFIG + 2 * sizeof(u32),
+-			&cpg->p.crypt_len, sizeof(u32));
++
++	op->enc_len = cpg->p.crypt_len;
++
++	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma + 2 * sizeof(u32),
++			sizeof(u32), DMA_TO_DEVICE);
++	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG + 2 * sizeof(u32),
++			cpg->sa_sram_dma + 2 * sizeof(u32), sizeof(u32));
++
++	mv_tdma_separator();
++	dma_copy_buf_to_dst(&cpg->p, cpg->sram_phys + SRAM_DATA_OUT_START, cpg->p.crypt_len);
+ 
+ 	/* GO */
+ 	mv_setup_timer();
++	mv_tdma_trigger();
+ 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ }
+ 
+@@ -331,6 +424,13 @@ static void mv_crypto_algo_completion(void)
+ 	struct ablkcipher_request *req = ablkcipher_request_cast(cpg->cur_req);
+ 	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+ 
++	if (req->src == req->dst) {
++		mv_dma_unmap_sg(req->src, req->nbytes, DMA_BIDIRECTIONAL);
++	} else {
++		mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
++		mv_dma_unmap_sg(req->dst, req->nbytes, DMA_FROM_DEVICE);
++	}
++
+ 	if (req_ctx->op != COP_AES_CBC)
+ 		return ;
+ 
+@@ -390,11 +490,20 @@ static void mv_init_hash_config(struct ahash_request *req)
+ 		writel(req_ctx->state[4], cpg->reg + DIGEST_INITIAL_VAL_E);
+ 	}
+ 
+-	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
++	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
++			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
++	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG, cpg->sa_sram_dma,
+ 			sizeof(struct sec_accel_sram));
+ 
++	mv_tdma_separator();
++
++	/* XXX: this fixes some ugly register fuckup bug in the tdma engine
++	 *      (no need to sync since the data is ignored anyway) */
++	mv_tdma_memcpy(cpg->sa_sram_dma, cpg->sram_phys + SRAM_CONFIG, 1);
++
+ 	/* GO */
+ 	mv_setup_timer();
++	mv_tdma_trigger();
+ 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ }
+ 
+@@ -424,13 +533,26 @@ static void mv_update_hash_config(void)
+ 		&& (req_ctx->count <= MAX_HW_HASH_SIZE);
+ 
+ 	op->config |= is_last ? CFG_LAST_FRAG : CFG_MID_FRAG;
+-	memcpy(cpg->sram + SRAM_CONFIG, &op->config, sizeof(u32));
++	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
++			sizeof(u32), DMA_TO_DEVICE);
++	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG,
++			cpg->sa_sram_dma, sizeof(u32));
+ 
+ 	op->mac_digest = MAC_DIGEST_P(SRAM_DIGEST_BUF) | MAC_FRAG_LEN(p->crypt_len);
+-	memcpy(cpg->sram + SRAM_CONFIG + 6 * sizeof(u32), &op->mac_digest, sizeof(u32));
++	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma + 6 * sizeof(u32),
++			sizeof(u32), DMA_TO_DEVICE);
++	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG + 6 * sizeof(u32),
++			cpg->sa_sram_dma + 6 * sizeof(u32), sizeof(u32));
++
++	mv_tdma_separator();
++
++	/* XXX: this fixes some ugly register fuckup bug in the tdma engine
++	 *      (no need to sync since the data is ignored anyway) */
++	mv_tdma_memcpy(cpg->sa_sram_dma, cpg->sram_phys + SRAM_CONFIG, 1);
+ 
+ 	/* GO */
+ 	mv_setup_timer();
++	mv_tdma_trigger();
+ 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ }
+ 
+@@ -504,43 +626,18 @@ static void mv_hash_algo_completion(void)
+ 	} else {
+ 		mv_save_digest_state(ctx);
+ 	}
++
++	mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
+ }
+ 
+ static void dequeue_complete_req(void)
+ {
  	struct crypto_async_request *req = cpg->cur_req;
+-	void *buf;
+ 	cpg->p.hw_processed_bytes += cpg->p.crypt_len;
+-	if (cpg->p.copy_back) {
+-		int need_copy_len = cpg->p.crypt_len;
+-		int sram_offset = 0;
+-		do {
+-			int dst_copy;
+-
+-			if (!cpg->p.sg_dst_left) {
+-				/* next sg please */
+-				cpg->p.dst_sg = sg_next(cpg->p.dst_sg);
+-				BUG_ON(!cpg->p.dst_sg);
+-				cpg->p.sg_dst_left = cpg->p.dst_sg->length;
+-				cpg->p.dst_start = 0;
+-			}
+-
+-			buf = sg_virt(cpg->p.dst_sg) + cpg->p.dst_start;
+-
+-			dst_copy = min(need_copy_len, cpg->p.sg_dst_left);
+-
+-			memcpy(buf,
+-			       cpg->sram + SRAM_DATA_OUT_START + sram_offset,
+-			       dst_copy);
+-			sram_offset += dst_copy;
+-			cpg->p.sg_dst_left -= dst_copy;
+-			need_copy_len -= dst_copy;
+-			cpg->p.dst_start += dst_copy;
+-		} while (need_copy_len > 0);
+-	}
+-
+ 	cpg->p.crypt_len = 0;
  
- 	mv_tdma_clear();
--	cpg->u32_usage = 0;
-+	cpg->desclist.usage = 0;
- 
++	mv_tdma_clear();
++
  	BUG_ON(cpg->eng_st != ENGINE_W_DEQUEUE);
+ 	if (cpg->p.hw_processed_bytes < cpg->p.hw_nbytes) {
+ 		/* process next scatter list entry */
+@@ -582,15 +679,28 @@ static void mv_start_new_crypt_req(struct ablkcipher_request *req)
+ 	p->hw_nbytes = req->nbytes;
+ 	p->complete = mv_crypto_algo_completion;
+ 	p->process = mv_update_crypt_config;
+-	p->copy_back = 1;
++
++	/* assume inplace request */
++	if (req->src == req->dst) {
++		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_BIDIRECTIONAL))
++			return;
++	} else {
++		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_TO_DEVICE))
++			return;
++
++		if (!mv_dma_map_sg(req->dst, req->nbytes, DMA_FROM_DEVICE)) {
++			mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
++			return;
++		}
++	}
  
-@@ -1326,13 +1287,12 @@ static int mv_probe(struct platform_device *pdev)
- 	cp->sa_sram_dma = dma_map_single(&pdev->dev, &cp->sa_sram,
- 			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
+ 	p->src_sg = req->src;
+ 	p->dst_sg = req->dst;
+ 	if (req->nbytes) {
+ 		BUG_ON(!req->src);
+ 		BUG_ON(!req->dst);
+-		p->sg_src_left = req->src->length;
+-		p->sg_dst_left = req->dst->length;
++		p->sg_src_left = sg_dma_len(req->src);
++		p->sg_dst_left = sg_dma_len(req->dst);
+ 	}
  
--	cpg->u32_pool = dma_pool_create("CESA U32 Item Pool",
--			&pdev->dev, sizeof(u32), MV_DMA_ALIGN, 0);
--	if (!cpg->u32_pool) {
-+	if (init_dma_desclist(&cpg->desclist, &pdev->dev,
-+				sizeof(u32), MV_DMA_ALIGN, 0)) {
+ 	setup_data_in();
+@@ -602,6 +712,7 @@ static void mv_start_new_hash_req(struct ahash_request *req)
+ 	struct req_progress *p = &cpg->p;
+ 	struct mv_req_hash_ctx *ctx = ahash_request_ctx(req);
+ 	int hw_bytes, old_extra_bytes, rc;
++
+ 	cpg->cur_req = &req->base;
+ 	memset(p, 0, sizeof(struct req_progress));
+ 	hw_bytes = req->nbytes + ctx->extra_bytes;
+@@ -631,6 +742,11 @@ static void mv_start_new_hash_req(struct ahash_request *req)
+ 			p->crypt_len = old_extra_bytes;
+ 		}
+ 
++		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_TO_DEVICE)) {
++			printk(KERN_ERR "%s: out of memory\n", __func__);
++			return;
++		}
++
+ 		setup_data_in();
+ 		mv_init_hash_config(req);
+ 	} else {
+@@ -966,14 +1082,14 @@ irqreturn_t crypto_int(int irq, void *priv)
+ 	u32 val;
+ 
+ 	val = readl(cpg->reg + SEC_ACCEL_INT_STATUS);
+-	if (!(val & SEC_INT_ACCEL0_DONE))
++	if (!(val & SEC_INT_ACC0_IDMA_DONE))
+ 		return IRQ_NONE;
+ 
+ 	if (!del_timer(&cpg->completion_timer)) {
+ 		printk(KERN_WARNING MV_CESA
+ 		       "got an interrupt but no pending timer?\n");
+ 	}
+-	val &= ~SEC_INT_ACCEL0_DONE;
++	val &= ~SEC_INT_ACC0_IDMA_DONE;
+ 	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
+ 	BUG_ON(cpg->eng_st != ENGINE_BUSY);
+ 	cpg->eng_st = ENGINE_W_DEQUEUE;
+@@ -1112,6 +1228,7 @@ static int mv_probe(struct platform_device *pdev)
+ 	}
+ 	cp->sram_size = resource_size(res);
+ 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
++	cp->sram_phys = res->start;
+ 	cp->sram = ioremap(res->start, cp->sram_size);
+ 	if (!cp->sram) {
  		ret = -ENOMEM;
- 		goto err_mapping;
- 	}
--	if (set_u32_poolsize(MV_DMA_INIT_POOLSIZE)) {
-+	if (set_dma_desclist_size(&cpg->desclist, MV_DMA_INIT_POOLSIZE)) {
- 		printk(KERN_ERR MV_CESA "failed to initialise poolsize\n");
- 		goto err_pool;
- 	}
-@@ -1341,7 +1301,7 @@ static int mv_probe(struct platform_device *pdev)
+@@ -1127,6 +1244,7 @@ static int mv_probe(struct platform_device *pdev)
+ 
+ 	platform_set_drvdata(pdev, cp);
+ 	cpg = cp;
++	cpg->dev = &pdev->dev;
+ 
+ 	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
+ 	if (IS_ERR(cp->queue_th)) {
+@@ -1140,10 +1258,14 @@ static int mv_probe(struct platform_device *pdev)
+ 		goto err_thread;
+ 
+ 	writel(0, cpg->reg + SEC_ACCEL_INT_STATUS);
+-	writel(SEC_INT_ACCEL0_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
+-	writel(SEC_CFG_STOP_DIG_ERR, cpg->reg + SEC_ACCEL_CFG);
++	writel(SEC_INT_ACC0_IDMA_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
++	writel((SEC_CFG_STOP_DIG_ERR | SEC_CFG_CH0_W_IDMA |
++	        SEC_CFG_ACT_CH0_IDMA), cpg->reg + SEC_ACCEL_CFG);
+ 	writel(SRAM_CONFIG, cpg->reg + SEC_ACCEL_DESC_P0);
+ 
++	cp->sa_sram_dma = dma_map_single(&pdev->dev, &cp->sa_sram,
++			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
++
+ 	ret = crypto_register_alg(&mv_aes_alg_ecb);
  	if (ret) {
  		printk(KERN_WARNING MV_CESA
- 		       "Could not register aes-ecb driver\n");
--		goto err_poolsize;
-+		goto err_pool;
- 	}
- 
- 	ret = crypto_register_alg(&mv_aes_alg_cbc);
-@@ -1368,10 +1328,8 @@ static int mv_probe(struct platform_device *pdev)
- 	return 0;
- err_unreg_ecb:
- 	crypto_unregister_alg(&mv_aes_alg_ecb);
--err_poolsize:
--	set_u32_poolsize(0);
- err_pool:
--	dma_pool_destroy(cpg->u32_pool);
-+	fini_dma_desclist(&cpg->desclist);
- err_mapping:
- 	dma_unmap_single(&pdev->dev, cpg->sa_sram_dma,
- 			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
-@@ -1403,8 +1361,7 @@ static int mv_remove(struct platform_device *pdev)
+@@ -1202,6 +1324,8 @@ static int mv_remove(struct platform_device *pdev)
+ 		crypto_unregister_ahash(&mv_hmac_sha1_alg);
+ 	kthread_stop(cp->queue_th);
  	free_irq(cp->irq, cp);
- 	dma_unmap_single(&pdev->dev, cpg->sa_sram_dma,
- 			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
--	set_u32_poolsize(0);
--	dma_pool_destroy(cpg->u32_pool);
-+	fini_dma_desclist(&cpg->desclist);
++	dma_unmap_single(&pdev->dev, cpg->sa_sram_dma,
++			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
  	memset(cp->sram, 0, cp->sram_size);
  	iounmap(cp->sram);
  	iounmap(cp->reg);
-diff --git a/drivers/crypto/mv_tdma.c b/drivers/crypto/mv_tdma.c
-index aa5316a..d8e8c3f 100644
---- a/drivers/crypto/mv_tdma.c
-+++ b/drivers/crypto/mv_tdma.c
-@@ -17,6 +17,7 @@
- #include <linux/platform_device.h>
- 
- #include "mv_tdma.h"
-+#include "dma_desclist.h"
- 
- #define MV_TDMA "MV-TDMA: "
- 
-@@ -30,57 +31,17 @@ struct tdma_desc {
- 	u32 next;
- } __attribute__((packed));
- 
--struct desc_mempair {
--	struct tdma_desc *vaddr;
--	dma_addr_t daddr;
--};
--
- struct tdma_priv {
- 	struct device *dev;
- 	void __iomem *reg;
- 	int irq;
- 	/* protecting the dma descriptors and stuff */
- 	spinlock_t lock;
--	struct dma_pool *descpool;
--	struct desc_mempair *desclist;
--	int desclist_len;
--	int desc_usage;
-+	struct dma_desclist desclist;
- } tpg;
- 
--#define DESC(x)		(tpg.desclist[x].vaddr)
--#define DESC_DMA(x)	(tpg.desclist[x].daddr)
--
--static inline int set_poolsize(int nelem)
--{
--	/* need to increase size first if requested */
--	if (nelem > tpg.desclist_len) {
--		struct desc_mempair *newmem;
--		int newsize = nelem * sizeof(struct desc_mempair);
--
--		newmem = krealloc(tpg.desclist, newsize, GFP_KERNEL);
--		if (!newmem)
--			return -ENOMEM;
--		tpg.desclist = newmem;
--	}
--
--	/* allocate/free dma descriptors, adjusting tpg.desclist_len on the go */
--	for (; tpg.desclist_len < nelem; tpg.desclist_len++) {
--		DESC(tpg.desclist_len) = dma_pool_alloc(tpg.descpool,
--				GFP_KERNEL, &DESC_DMA(tpg.desclist_len));
--		if (!DESC((tpg.desclist_len)))
--			return -ENOMEM;
--	}
--	for (; tpg.desclist_len > nelem; tpg.desclist_len--)
--		dma_pool_free(tpg.descpool, DESC(tpg.desclist_len - 1),
--				DESC_DMA(tpg.desclist_len - 1));
--
--	/* ignore size decreases but those to zero */
--	if (!nelem) {
--		kfree(tpg.desclist);
--		tpg.desclist = 0;
--	}
--	return 0;
--}
-+#define ITEM(x)		((struct tdma_desc *)DESCLIST_ITEM(tpg.desclist, x))
-+#define ITEM_DMA(x)	DESCLIST_ITEM_DMA(tpg.desclist, x)
- 
- static inline void wait_for_tdma_idle(void)
- {
-@@ -100,17 +61,18 @@ static inline void switch_tdma_engine(bool state)
- 
- static struct tdma_desc *get_new_last_desc(void)
- {
--	if (unlikely(tpg.desc_usage == tpg.desclist_len) &&
--	    set_poolsize(tpg.desclist_len << 1)) {
--		printk(KERN_ERR MV_TDMA "failed to increase DMA pool to %d\n",
--				tpg.desclist_len << 1);
-+	if (unlikely(DESCLIST_FULL(tpg.desclist)) &&
-+	    set_dma_desclist_size(&tpg.desclist, tpg.desclist.length << 1)) {
-+		printk(KERN_ERR MV_TDMA "failed to increase DMA pool to %lu\n",
-+				tpg.desclist.length << 1);
- 		return NULL;
- 	}
- 
--	if (likely(tpg.desc_usage))
--		DESC(tpg.desc_usage - 1)->next = DESC_DMA(tpg.desc_usage);
-+	if (likely(tpg.desclist.usage))
-+		ITEM(tpg.desclist.usage - 1)->next =
-+			ITEM_DMA(tpg.desclist.usage);
- 
--	return DESC(tpg.desc_usage++);
-+	return ITEM(tpg.desclist.usage++);
- }
- 
- static inline void mv_tdma_desc_dump(void)
-@@ -118,17 +80,17 @@ static inline void mv_tdma_desc_dump(void)
- 	struct tdma_desc *tmp;
- 	int i;
- 
--	if (!tpg.desc_usage) {
-+	if (!tpg.desclist.usage) {
- 		printk(KERN_WARNING MV_TDMA "DMA descriptor list is empty\n");
- 		return;
- 	}
- 
- 	printk(KERN_WARNING MV_TDMA "DMA descriptor list:\n");
--	for (i = 0; i < tpg.desc_usage; i++) {
--		tmp = DESC(i);
-+	for (i = 0; i < tpg.desclist.usage; i++) {
-+		tmp = ITEM(i);
- 		printk(KERN_WARNING MV_TDMA "entry %d at 0x%x: dma addr 0x%x, "
- 		       "src 0x%x, dst 0x%x, count %u, own %d, next 0x%x", i,
--		       (u32)tmp, DESC_DMA(i) , tmp->src, tmp->dst,
-+		       (u32)tmp, ITEM_DMA(i) , tmp->src, tmp->dst,
- 		       tmp->count & ~TDMA_OWN_BIT, !!(tmp->count & TDMA_OWN_BIT),
- 		       tmp->next);
- 	}
-@@ -167,7 +129,7 @@ void mv_tdma_clear(void)
- 	writel(0, tpg.reg + TDMA_CURR_DESC);
- 	writel(0, tpg.reg + TDMA_NEXT_DESC);
- 
--	tpg.desc_usage = 0;
-+	tpg.desclist.usage = 0;
- 
- 	switch_tdma_engine(1);
- 
-@@ -183,7 +145,7 @@ void mv_tdma_trigger(void)
- 
- 	spin_lock(&tpg.lock);
- 
--	writel(DESC_DMA(0), tpg.reg + TDMA_NEXT_DESC);
-+	writel(ITEM_DMA(0), tpg.reg + TDMA_NEXT_DESC);
- 
- 	spin_unlock(&tpg.lock);
- }
-@@ -287,13 +249,15 @@ static int mv_probe(struct platform_device *pdev)
- 		goto out_unmap_reg;
- 	}
- 
--	tpg.descpool = dma_pool_create("TDMA Descriptor Pool", tpg.dev,
--			sizeof(struct tdma_desc), MV_DMA_ALIGN, 0);
--	if (!tpg.descpool) {
-+	if (init_dma_desclist(&tpg.desclist, tpg.dev,
-+			sizeof(struct tdma_desc), MV_DMA_ALIGN, 0)) {
- 		rc = -ENOMEM;
- 		goto out_free_irq;
- 	}
--	set_poolsize(MV_DMA_INIT_POOLSIZE);
-+	if (set_dma_desclist_size(&tpg.desclist, MV_DMA_INIT_POOLSIZE)) {
-+		rc = -ENOMEM;
-+		goto out_free_desclist;
-+	}
- 
- 	platform_set_drvdata(pdev, &tpg);
- 
-@@ -327,8 +291,8 @@ static int mv_probe(struct platform_device *pdev)
- out_free_all:
- 	switch_tdma_engine(0);
- 	platform_set_drvdata(pdev, NULL);
--	set_poolsize(0);
--	dma_pool_destroy(tpg.descpool);
-+out_free_desclist:
-+	fini_dma_desclist(&tpg.desclist);
- out_free_irq:
- 	free_irq(tpg.irq, &tpg);
- out_unmap_reg:
-@@ -341,8 +305,7 @@ static int mv_remove(struct platform_device *pdev)
- {
- 	switch_tdma_engine(0);
- 	platform_set_drvdata(pdev, NULL);
--	set_poolsize(0);
--	dma_pool_destroy(tpg.descpool);
-+	fini_dma_desclist(&tpg.desclist);
- 	free_irq(tpg.irq, &tpg);
- 	iounmap(tpg.reg);
- 	tpg.dev = NULL;
 -- 
 1.7.3.4
