@@ -1,34 +1,30 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: RFC: support for MV_CESA with TDMA
-Date: Fri, 25 May 2012 18:08:26 +0200
-Message-ID: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+From: "robothroli company" <info@cagle.com>
+Subject: (unknown)
+Date: Fri, 25 May 2012 14:45:54 +0100
+Message-ID: <1179bde6ebe1caaacb0dddb6780534c7.squirrel__17601.1802898303$1337992495$gmane$org@mail.cafconc.cd>
+Reply-To: robothroli@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:47939 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756285Ab2EYQJF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 May 2012 12:09:05 -0400
+Received: from [217.171.93.200] ([217.171.93.200]:58914 "EHLO mail.cafconc.cd"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1753273Ab2EZAeo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 May 2012 20:34:44 -0400
+Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
 
-The following patch series adds support for the TDMA engine built into
-Marvell's Kirkwood-based SoCs, and enhances mv_cesa.c in order to use it
-for speeding up crypto operations. Kirkwood hardware contains a security
-accelerator, which can control DMA as well as crypto engines. It allows
-for operation with minimal software intervenience, which the following
-patches implement: using a chain of DMA descriptors, data input,
-configuration, engine startup and data output repeat fully automatically
-until the whole input data has been handled.
+ i am robothroli, Purchase manager from roli Merchant Ltd. We are
+Import/export Company based in taiwan. We are interested in purchasing
+your product and I would like to make an inquiry. Please inform me on:
 
-The point for this being RFC is backwards-compatibility: earlier
-hardware (Orion) ships a (slightly) different DMA engine (IDMA) along
-with the same crypto engine, so in fact mv_cesa.c is in use on these
-platforms, too. But since I don't possess hardware of this kind, I am
-not able to make this code IDMA-compatible. Also, due to the quite
-massive reorganisation of code flow, I don't really see how to make TDMA
-support optional in mv_cesa.c.
+Sample availability and price
+Minimum order quantity
+FOB Prices
 
-Greetings, Phil
+Sincerely
+Purchase Manager
+robothroli
