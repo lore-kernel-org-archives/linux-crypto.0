@@ -1,114 +1,161 @@
 From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: [PATCH 1/4] mv_cesa: add an expiry timer in case anything goes wrong
-Date: Fri, 25 May 2012 15:54:46 +0200
-Message-ID: <1337954089-12702-1-git-send-email-phil.sutter@viprinet.com>
+Subject: [PATCH 11/13] mv_cesa: implement descriptor chaining for hashes, too
+Date: Fri, 25 May 2012 18:08:37 +0200
+Message-ID: <1337962119-5509-12-git-send-email-phil.sutter@viprinet.com>
+References: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:45590 "EHLO zimbra.vipri.net"
+Received: from zimbra.vipri.net ([89.207.250.15]:47871 "EHLO zimbra.vipri.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751203Ab2EYOCS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 May 2012 10:02:18 -0400
+	id S1752348Ab2EYQIx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 May 2012 12:08:53 -0400
+In-Reply-To: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The timer triggers when 500ms have gone by after triggering the engine
-and no completion interrupt was received. The callback then tries to
-sanitise things as well as possible.
 
 Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
 ---
- drivers/crypto/mv_cesa.c |   41 +++++++++++++++++++++++++++++++----------
- 1 files changed, 31 insertions(+), 10 deletions(-)
+ drivers/crypto/mv_cesa.c |   89 ++++++++++++++++++----------------------------
+ 1 files changed, 35 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index e6ecc5f..8327bed 100644
+index 5dba9df..9afed2d 100644
 --- a/drivers/crypto/mv_cesa.c
 +++ b/drivers/crypto/mv_cesa.c
-@@ -23,6 +23,7 @@
- 
- #define MV_CESA	"MV-CESA:"
- #define MAX_HW_HASH_SIZE	0xFFFF
-+#define MV_CESA_EXPIRE		500 /* msec */
- 
- /*
-  * STM:
-@@ -85,6 +86,7 @@ struct crypto_priv {
- 	spinlock_t lock;
- 	struct crypto_queue queue;
- 	enum engine_status eng_st;
-+	struct timer_list completion_timer;
- 	struct crypto_async_request *cur_req;
- 	struct req_progress p;
- 	int max_req_size;
-@@ -136,6 +138,29 @@ struct mv_req_hash_ctx {
- 	int count_add;
- };
- 
-+static void mv_completion_timer_callback(unsigned long unused)
-+{
-+	int active = readl(cpg->reg + SEC_ACCEL_CMD) & SEC_CMD_EN_SEC_ACCL0;
-+
-+	printk(KERN_ERR MV_CESA
-+	       "completion timer expired (CESA %sactive), cleaning up.\n",
-+	       active ? "" : "in");
-+
-+	del_timer(&cpg->completion_timer);
-+	writel(SEC_CMD_DISABLE_SEC, cpg->reg + SEC_ACCEL_CMD);
-+	while(readl(cpg->reg + SEC_ACCEL_CMD) & SEC_CMD_DISABLE_SEC)
-+		printk(KERN_INFO MV_CESA "%s: waiting for engine finishing\n", __func__);
-+	cpg->eng_st = ENGINE_W_DEQUEUE;
-+	wake_up_process(cpg->queue_th);
-+}
-+
-+static void mv_setup_timer(void)
-+{
-+	setup_timer(&cpg->completion_timer, &mv_completion_timer_callback, 0);
-+	mod_timer(&cpg->completion_timer,
-+			jiffies + msecs_to_jiffies(MV_CESA_EXPIRE));
-+}
-+
- static void compute_aes_dec_key(struct mv_ctx *ctx)
- {
- 	struct crypto_aes_ctx gen_aes_key;
-@@ -271,12 +296,8 @@ static void mv_process_current_q(int first_block)
- 			sizeof(struct sec_accel_config));
- 
- 	/* GO */
-+	mv_setup_timer();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+@@ -536,34 +536,14 @@ static void mv_init_hash_config(struct ahash_request *req)
+ 			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
+ 	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG, cpg->sa_sram_dma,
+ 			sizeof(struct sec_accel_sram));
 -
--	/*
--	 * XXX: add timer if the interrupt does not occur for some mystery
--	 * reason
--	 */
+-	mv_tdma_separator();
+-
+-	if (req->result) {
+-		req_ctx->result_dma = dma_map_single(cpg->dev, req->result,
+-				req_ctx->digestsize, DMA_FROM_DEVICE);
+-		mv_tdma_memcpy(req_ctx->result_dma,
+-				cpg->sram_phys + SRAM_DIGEST_BUF, req_ctx->digestsize);
+-	} else {
+-		/* XXX: this fixes some ugly register fuckup bug in the tdma engine
+-		 *      (no need to sync since the data is ignored anyway) */
+-		mv_tdma_memcpy(cpg->sa_sram_dma,
+-				cpg->sram_phys + SRAM_CONFIG, 1);
+-	}
+-
+-	/* GO */
+-	mv_setup_timer();
+-	mv_tdma_trigger();
+-	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
  }
  
- static void mv_crypto_algo_completion(void)
-@@ -355,12 +376,8 @@ static void mv_process_hash_current(int first_block)
- 	memcpy(cpg->sram + SRAM_CONFIG, &op, sizeof(struct sec_accel_config));
+-static void mv_update_hash_config(void)
++static void mv_update_hash_config(struct ahash_request *req)
+ {
+-	struct ahash_request *req = ahash_request_cast(cpg->cur_req);
+ 	struct mv_req_hash_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct req_progress *p = &cpg->p;
+-	struct sec_accel_config *op = &cpg->sa_sram.op;
+ 	int is_last;
++	u32 val;
  
- 	/* GO */
-+	mv_setup_timer();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ 	/* update only the config (for changed fragment state) and
+ 	 * mac_digest (for changed frag len) fields */
+@@ -571,10 +551,10 @@ static void mv_update_hash_config(void)
+ 	switch (req_ctx->op) {
+ 	case COP_SHA1:
+ 	default:
+-		op->config = CFG_OP_MAC_ONLY | CFG_MACM_SHA1;
++		val = CFG_OP_MAC_ONLY | CFG_MACM_SHA1;
+ 		break;
+ 	case COP_HMAC_SHA1:
+-		op->config = CFG_OP_MAC_ONLY | CFG_MACM_HMAC_SHA1;
++		val = CFG_OP_MAC_ONLY | CFG_MACM_HMAC_SHA1;
+ 		break;
+ 	}
+ 
+@@ -582,36 +562,11 @@ static void mv_update_hash_config(void)
+ 		&& (p->hw_processed_bytes + p->crypt_len >= p->hw_nbytes)
+ 		&& (req_ctx->count <= MAX_HW_HASH_SIZE);
+ 
+-	op->config |= is_last ? CFG_LAST_FRAG : CFG_MID_FRAG;
+-	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
+-			sizeof(u32), DMA_TO_DEVICE);
+-	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG,
+-			cpg->sa_sram_dma, sizeof(u32));
 -
--	/*
--	* XXX: add timer if the interrupt does not occur for some mystery
--	* reason
--	*/
+-	op->mac_digest = MAC_DIGEST_P(SRAM_DIGEST_BUF) | MAC_FRAG_LEN(p->crypt_len);
+-	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma + 6 * sizeof(u32),
+-			sizeof(u32), DMA_TO_DEVICE);
+-	mv_tdma_memcpy(cpg->sram_phys + SRAM_CONFIG + 6 * sizeof(u32),
+-			cpg->sa_sram_dma + 6 * sizeof(u32), sizeof(u32));
+-
+-	mv_tdma_separator();
+-
+-	if (req->result) {
+-		req_ctx->result_dma = dma_map_single(cpg->dev, req->result,
+-				req_ctx->digestsize, DMA_FROM_DEVICE);
+-		mv_tdma_memcpy(req_ctx->result_dma,
+-				cpg->sram_phys + SRAM_DIGEST_BUF, req_ctx->digestsize);
+-	} else {
+-		/* XXX: this fixes some ugly register fuckup bug in the tdma engine
+-		 *      (no need to sync since the data is ignored anyway) */
+-		mv_tdma_memcpy(cpg->sa_sram_dma,
+-				cpg->sram_phys + SRAM_CONFIG, 1);
+-	}
++	val |= is_last ? CFG_LAST_FRAG : CFG_MID_FRAG;
++	mv_tdma_u32_copy(cpg->sram_phys + SRAM_CONFIG, val);
+ 
+-	/* GO */
+-	mv_setup_timer();
+-	mv_tdma_trigger();
+-	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
++	val = MAC_DIGEST_P(SRAM_DIGEST_BUF) | MAC_FRAG_LEN(p->crypt_len);
++	mv_tdma_u32_copy(cpg->sram_phys + SRAM_CONFIG + 6 * sizeof(u32), val);
  }
  
  static inline int mv_hash_import_sha1_ctx(const struct mv_req_hash_ctx *ctx,
-@@ -886,6 +903,10 @@ irqreturn_t crypto_int(int irq, void *priv)
- 	if (!(val & SEC_INT_ACCEL0_DONE))
- 		return IRQ_NONE;
+@@ -835,7 +790,6 @@ static void mv_start_new_hash_req(struct ahash_request *req)
  
-+	if (!del_timer(&cpg->completion_timer)) {
-+		printk(KERN_WARNING MV_CESA
-+		       "got an interrupt but no pending timer?\n");
+ 	p->hw_nbytes = hw_bytes;
+ 	p->complete = mv_hash_algo_completion;
+-	p->process = mv_update_hash_config;
+ 
+ 	if (unlikely(old_extra_bytes)) {
+ 		dma_sync_single_for_device(cpg->dev, ctx->buffer_dma,
+@@ -847,6 +801,33 @@ static void mv_start_new_hash_req(struct ahash_request *req)
+ 
+ 	setup_data_in();
+ 	mv_init_hash_config(req);
++	mv_tdma_separator();
++	cpg->p.hw_processed_bytes += cpg->p.crypt_len;
++	while (cpg->p.hw_processed_bytes < cpg->p.hw_nbytes) {
++		cpg->p.crypt_len = 0;
++
++		setup_data_in();
++		mv_update_hash_config(req);
++		mv_tdma_separator();
++		cpg->p.hw_processed_bytes += cpg->p.crypt_len;
 +	}
- 	val &= ~SEC_INT_ACCEL0_DONE;
- 	writel(val, cpg->reg + FPGA_INT_STATUS);
- 	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
++	if (req->result) {
++		ctx->result_dma = dma_map_single(cpg->dev, req->result,
++				ctx->digestsize, DMA_FROM_DEVICE);
++		mv_tdma_memcpy(ctx->result_dma,
++				cpg->sram_phys + SRAM_DIGEST_BUF,
++				ctx->digestsize);
++	} else {
++		/* XXX: this fixes some ugly register fuckup bug in the tdma engine
++		 *      (no need to sync since the data is ignored anyway) */
++		mv_tdma_memcpy(cpg->sa_sram_dma,
++				cpg->sram_phys + SRAM_CONFIG, 1);
++	}
++
++	/* GO */
++	mv_setup_timer();
++	mv_tdma_trigger();
++	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
+ }
+ 
+ static int queue_manag(void *data)
 -- 
 1.7.3.4
