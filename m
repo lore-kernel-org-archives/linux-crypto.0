@@ -1,40 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aesni-intel - fix unaligned cbc decrypt for
- x86-32
-Date: Thu, 31 May 2012 20:55:06 +1000
-Message-ID: <20120531105506.GB6266@gondor.apana.org.au>
-References: <1338334988-20025-1-git-send-email-minipli@googlemail.com>
+From: Jhon Cole <colejhon1@gmail.com>
+Subject: POSTING OFFER OF YOUR ADD.
+Date: Wed, 30 May 2012 19:56:13 -0400
+Message-ID: <cec3c75bc263dec0deecea23f8ce0391@www.waqarzaka.com>
+Reply-To: colejhon1@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Daniel <garkein@mailueberfall.de>, linux-crypto@vger.kernel.org
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:42165 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751581Ab2EaKzM (ORCPT
+Received: from unassigned.psychz.net ([74.117.62.59]:58622 "EHLO
+	gold.host786.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1757496Ab2EaNeJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 May 2012 06:55:12 -0400
-Content-Disposition: inline
-In-Reply-To: <1338334988-20025-1-git-send-email-minipli@googlemail.com>
+	Thu, 31 May 2012 09:34:09 -0400
+Received: from nobody by gold.host786.com with local (Exim 4.77)
+	(envelope-from <nobody@gold.host786.com>)
+	id 1SZskP-0006dt-Da
+	for linux-crypto@vger.kernel.org; Wed, 30 May 2012 19:56:13 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 30, 2012 at 01:43:08AM +0200, Mathias Krause wrote:
-> The 32 bit variant of cbc(aes) decrypt is using instructions requiring
-> 128 bit aligned memory locations but fails to ensure this constraint in
-> the code. Fix this by loading the data into intermediate registers with
-> load unaligned instructions.
-> 
-> This fixes reported general protection faults related to aesni.
-> 
-> References: https://bugzilla.kernel.org/show_bug.cgi?id=43223
-> Reported-by: Daniel <garkein@mailueberfall.de>
-> Cc: stable@kernel.org [v2.6.39+]
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Hello,
+Are you a good cleaner ( House cleaning) ,kindly reply if yes  cause i got an offer for you.
 
-Patch applied to crypto.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards
