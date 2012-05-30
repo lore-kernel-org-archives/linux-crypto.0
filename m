@@ -1,53 +1,77 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] crypto: aesni-intel - fix unaligned cbc decrypt for x86-32
-Date: Wed, 30 May 2012 01:43:08 +0200
-Message-ID: <1338334988-20025-1-git-send-email-minipli@googlemail.com>
-Cc: Daniel <garkein@mailueberfall.de>, linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from grimli.r00tworld.net ([83.169.44.195]:52546 "EHLO
-	mail.r00tworld.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756010Ab2E2XnK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 May 2012 19:43:10 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH] crypto: serpent - add x86_64/avx assembler implementation
+Date: Tue, 29 May 2012 19:27:43 -0700
+Message-ID: <m2396il7xc.fsf@firstfloor.org>
+References: <20120527145112.GF17705@kronos.redsun>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Tilo =?utf-8?Q?M=C3=BCller?=
+	<tilo.mueller@informatik.uni-erlangen.de>
+To: Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20120527145112.GF17705@kronos.redsun> (Johannes Goetzfried's
+	message of "Sun, 27 May 2012 16:51:12 +0200")
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The 32 bit variant of cbc(aes) decrypt is using instructions requiring
-128 bit aligned memory locations but fails to ensure this constraint in
-the code. Fix this by loading the data into intermediate registers with
-load unaligned instructions.
+Johannes Goetzfried
+<Johannes.Goetzfried@informatik.stud.uni-erlangen.de> writes:
+> +
+> +static int __init serpent_init(void)
+> +{
+> +	u64 xcr0;
+> +
+> +	if (!cpu_has_avx || !cpu_has_osxsave) {
+> +		printk(KERN_INFO "AVX instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+> +	if ((xcr0 & (XSTATE_SSE | XSTATE_YMM)) != (XSTATE_SSE | XSTATE_YMM)) {
+> +		printk(KERN_INFO "AVX detected but unusable.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	return crypto_register_algs(serpent_algs, ARRAY_SIZE(serpent_algs));
+> +}
+> +
+> +static void __exit serpent_exit(void)
+> +{
+> +	crypto_unregister_algs(serpent_algs, ARRAY_SIZE(serpent_algs));
+> +}
+> +
+> +module_init(serpent_init);
+> +module_exit(serpent_exit);
+> +
+> +MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX optimized");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS("serpent");
 
-This fixes reported general protection faults related to aesni.
+The driver needs CPUID annotations now (since 3.3), so that it can be 
+autoloaded.  Something like:
 
-References: https://bugzilla.kernel.org/show_bug.cgi?id=43223
-Reported-by: Daniel <garkein@mailueberfall.de>
-Cc: stable@kernel.org [v2.6.39+]
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
----
- arch/x86/crypto/aesni-intel_asm.S |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+#include <asm/cpu_device_id.h>
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index be6d9e3..3470624 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -2460,10 +2460,12 @@ ENTRY(aesni_cbc_dec)
- 	pxor IN3, STATE4
- 	movaps IN4, IV
- #else
--	pxor (INP), STATE2
--	pxor 0x10(INP), STATE3
- 	pxor IN1, STATE4
- 	movaps IN2, IV
-+	movups (INP), IN1
-+	pxor IN1, STATE2
-+	movups 0x10(INP), IN2
-+	pxor IN2, STATE3
- #endif
- 	movups STATE1, (OUTP)
- 	movups STATE2, 0x10(OUTP)
+
+static const struct x86_cpu_id avx_cpu_id[] = {
+        X86_FEATURE_MATCH(X86_FEATURE_AVX),
+        {}
+};
+MODULE_DEVICE_TABLE(x86cpu, avx_cpu_id);
+
+
+Replace the manual check in init with
+
+            if (!x86_match_cpu(avx_cpu_id))
+                return -ENODEV;
+
+Also drivers should never print anything when they cannot find hardware.
+Remove that printk.
+
+-Andi
+
 -- 
-1.7.10
+ak@linux.intel.com -- Speaking for myself only
