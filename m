@@ -1,98 +1,53 @@
-From: Prashant Gaikwad <pgaikwad@nvidia.com>
-Subject: [PATCH v3 9/9] crypto: add clk_prepare/clk_unprepare
-Date: Tue, 5 Jun 2012 09:59:43 +0530
-Message-ID: <1338870583-8704-10-git-send-email-pgaikwad@nvidia.com>
-References: <1338870583-8704-1-git-send-email-pgaikwad@nvidia.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <swarren@wwwdotorg.org>, <linux@arm.linux.org.uk>,
-	<olof@lixom.net>, <ccross@android.com>,
-	Prashant Gaikwad <pgaikwad@nvidia.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>
-To: <linux-tegra@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
+From: borislamsv2@gmail.com
+Subject: Server Rental Service in Hong Kong
+Date: Mon,  4 Jun 2012 16:45:13 +0800 (HKT)
+Message-ID: <Oxt7fy9qztjdh__9408.21550689197$1338886383$gmane$org@venus.seed.net.tw>
+Content-Type: text/plain;
+Content-Transfer-Encoding: Quoted-Printable
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate03.nvidia.com ([216.228.121.140]:16756 "EHLO
-	hqemgate03.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753248Ab2FEE3y (ORCPT
+Received: from 124-248-200-93.sunnyvision.com ([124.248.200.93]:58214 "EHLO
+	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1757875Ab2FEIwm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jun 2012 00:29:54 -0400
-In-Reply-To: <1338870583-8704-1-git-send-email-pgaikwad@nvidia.com>
+	Tue, 5 Jun 2012 04:52:42 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use clk_prepare/clk_unprepare as required by the generic clk framework.
+Dear All,
 
-Signed-off-by: Prashant Gaikwad <pgaikwad@nvidia.com>
----
-Please ignore previous versions. Updated commit message and
-maintainers properly in this version. No other change.
+We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
 
-This patch should go through Tegra tree since other patches to port Tegra
-to generic clock framework are dependent on it. Posting here to get ack from
-the maintainers.
+Dell=3F PowerEdge=3F EnterpriseRack Mount Server
+-Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
+-8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
+-500GB, 3.5", 6Gbps SAS x 2
+-Raid 1 Mirroring Protection
+-Remote KVM (iDRAC6 Enterprise)
 
- drivers/crypto/tegra-aes.c |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+Dell(TM) PowerEdge(TM) R410 Rack Mount Server
+-Intel(R) Quad Core E5606 Xeon(R) CPU, 2.13GHz, 4M Cache, 4.86 GT/s QPI
+-4GB Memory (2x2GB), 1333MHz Dual Ranked RDIMMs Fully-Buffered
+-500GB 7.2K RPM SATAII 3.5" Hard Drive x 2
+-iDRAC6 Enterprise or Express (Remote KVM Management)
 
-diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
-index 422a976..ac236f6 100644
---- a/drivers/crypto/tegra-aes.c
-+++ b/drivers/crypto/tegra-aes.c
-@@ -572,7 +572,7 @@ static void aes_workqueue_handler(struct work_struct *work)
- 	struct tegra_aes_dev *dd = aes_dev;
- 	int ret;
+Every Dedicated Server Hosting Solution Also Includes: 
  
--	ret = clk_enable(dd->aes_clk);
-+	ret = clk_prepare_enable(dd->aes_clk);
- 	if (ret)
- 		BUG_ON("clock enable failed");
- 
-@@ -581,7 +581,7 @@ static void aes_workqueue_handler(struct work_struct *work)
- 		ret = tegra_aes_handle_req(dd);
- 	} while (!ret);
- 
--	clk_disable(dd->aes_clk);
-+	clk_disable_unprepare(dd->aes_clk);
- }
- 
- static irqreturn_t aes_irq(int irq, void *dev_id)
-@@ -673,7 +673,7 @@ static int tegra_aes_get_random(struct crypto_rng *tfm, u8 *rdata,
- 	/* take mutex to access the aes hw */
- 	mutex_lock(&aes_lock);
- 
--	ret = clk_enable(dd->aes_clk);
-+	ret = clk_prepare_enable(dd->aes_clk);
- 	if (ret)
- 		return ret;
- 
-@@ -700,7 +700,7 @@ static int tegra_aes_get_random(struct crypto_rng *tfm, u8 *rdata,
- 	}
- 
- out:
--	clk_disable(dd->aes_clk);
-+	clk_disable_unprepare(dd->aes_clk);
- 	mutex_unlock(&aes_lock);
- 
- 	dev_dbg(dd->dev, "%s: done\n", __func__);
-@@ -758,7 +758,7 @@ static int tegra_aes_rng_reset(struct crypto_rng *tfm, u8 *seed,
- 
- 	dd->flags = FLAGS_ENCRYPT | FLAGS_RNG;
- 
--	ret = clk_enable(dd->aes_clk);
-+	ret = clk_prepare_enable(dd->aes_clk);
- 	if (ret)
- 		return ret;
- 
-@@ -788,7 +788,7 @@ static int tegra_aes_rng_reset(struct crypto_rng *tfm, u8 *seed,
- 	memcpy(dd->dt, dt, DEFAULT_RNG_BLK_SZ);
- 
- out:
--	clk_disable(dd->aes_clk);
-+	clk_disable_unprepare(dd->aes_clk);
- 	mutex_unlock(&aes_lock);
- 
- 	dev_dbg(dd->dev, "%s: done\n", __func__);
--- 
-1.7.4.1
+Software Specification 
+- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
+- Full root-level access 
+- Data Center Facilities 
+- Shared Local & International Bandwidth 
+- 2 IP Addresses Allocation 
+- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
+- FM200=A1=A7based fire suppression system 
+- 24x7 CRAC Air Conditioning and Humidity Control 
+- 24x7 Security Control 
+- 24x7 Remote Hand Service 
+
+Pls send us email for further information.Thanks,
+
+Boris 
+boris@dedicatedserver.com.hk
+
+If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
