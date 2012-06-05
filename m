@@ -1,20 +1,24 @@
 From: Prashant Gaikwad <pgaikwad@nvidia.com>
-Subject: [PATCH v2 9/9] crypto: add clk_prepare/clk_unprepare
-Date: Tue, 5 Jun 2012 09:49:26 +0530
-Message-ID: <1338869966-8430-10-git-send-email-pgaikwad@nvidia.com>
-References: <1338869966-8430-1-git-send-email-pgaikwad@nvidia.com>
+Subject: [PATCH v3 9/9] crypto: add clk_prepare/clk_unprepare
+Date: Tue, 5 Jun 2012 09:59:43 +0530
+Message-ID: <1338870583-8704-10-git-send-email-pgaikwad@nvidia.com>
+References: <1338870583-8704-1-git-send-email-pgaikwad@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+Cc: <swarren@wwwdotorg.org>, <linux@arm.linux.org.uk>,
+	<olof@lixom.net>, <ccross@android.com>,
+	Prashant Gaikwad <pgaikwad@nvidia.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>
-To: <pgaikwad@nvidia.com>
+To: <linux-tegra@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate03.nvidia.com ([216.228.121.140]:16006 "EHLO
+Received: from hqemgate03.nvidia.com ([216.228.121.140]:16756 "EHLO
 	hqemgate03.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751188Ab2FEETT (ORCPT
+	with ESMTP id S1753248Ab2FEE3y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Jun 2012 00:19:19 -0400
-In-Reply-To: <1338869966-8430-1-git-send-email-pgaikwad@nvidia.com>
+	Tue, 5 Jun 2012 00:29:54 -0400
+In-Reply-To: <1338870583-8704-1-git-send-email-pgaikwad@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -22,6 +26,9 @@ Use clk_prepare/clk_unprepare as required by the generic clk framework.
 
 Signed-off-by: Prashant Gaikwad <pgaikwad@nvidia.com>
 ---
+Please ignore previous versions. Updated commit message and
+maintainers properly in this version. No other change.
+
 This patch should go through Tegra tree since other patches to port Tegra
 to generic clock framework are dependent on it. Posting here to get ack from
 the maintainers.
