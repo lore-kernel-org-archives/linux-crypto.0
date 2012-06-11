@@ -1,49 +1,61 @@
-From: borislamsv2@gmail.com
-Subject: Server Rental & datacenter rack rental service in Hong Kong
-Date: Mon, 11 Jun 2012 19:51:03 +0800 (HKT)
-Message-ID: <AQxi__16299.7168991298$1339417182$gmane$org@pavo.seed.net.tw>
-Content-Type: text/plain;
-Content-Transfer-Encoding: Quoted-Printable
-To: unlisted-recipients:; (no To-header on input)
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.5
+Date: Mon, 11 Jun 2012 22:00:27 +0900
+Message-ID: <20120611130027.GA6407@gondor.apana.org.au>
+References: <20100716022648.GA28219@gondor.apana.org.au>
+ <20100722055043.GA25689@gondor.apana.org.au>
+ <20100903060055.GA28915@gondor.apana.org.au>
+ <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120322012046.GA8854@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 124-248-200-94.sunnyvision.com ([124.248.200.94]:33852 "EHLO
-	teamb04.edmhongkong.com" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754118Ab2FKMTi (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:59093 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752286Ab2FKNAg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Jun 2012 08:19:38 -0400
+	Mon, 11 Jun 2012 09:00:36 -0400
+Content-Disposition: inline
+In-Reply-To: <20120322012046.GA8854@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear All,
+Hi Linus:
 
-We have our own datacenter in Hong Kong & provide email/application/web rental service to clients.We are APNIC member & provide clean IP to clients.
+This push fixes an unaligned fault on x86-32 with aesni-intel
+and an RNG failure with atmel-rng (repeated bits).
 
-Dell=3F PowerEdge=3F EnterpriseRack Mount Server
--Intel(R) Xeon(R) E3-1240 Processor (3.3GHz, 8M Cache, Turbo, 4C/8T, 80W)
--8GB RAM, 2x4GB, 1333MHz, DDR-3, Dual Ranked UDIMMs
--500GB, 3.5", 6Gbps SAS x 2
--Raid 1 Mirroring Protection
--Remote KVM (iDRAC6 Enterprise)
 
-Every Dedicated Server Hosting Solution Also Includes: 
- 
-Software Specification 
-- CentOS / Fedora / Debian / FreeBSD / Ubuntu / Redhat Linux 
-- Full root-level access 
-- Data Center Facilities 
-- Shared Local & International Bandwidth 
-- 2 IP Addresses Allocation 
-- Un-interruptible Power Supply (UPS) backed up by private diesel generator 
-- FM200=A1=A7based fire suppression system 
-- 24x7 CRAC Air Conditioning and Humidity Control 
-- 24x7 Security Control 
-- 24x7 Remote Hand Service 
+Please pull from
 
-Pls send us email for further information.Thanks,
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Boris 
-boris@dedicatedserver.com.hk
+or
 
-(852)94088762
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-If you do not wish to further receive this event message, email "borislamsv2@gmail.com" to unsubscribe this message or remove your email from the list.
+
+Mathias Krause (1):
+      crypto: aesni-intel - fix unaligned cbc decrypt for x86-32
+
+Peter Korsgaard (1):
+      hwrng: atmel-rng - fix race condition leading to repeated bits
+
+ arch/x86/crypto/aesni-intel_asm.S  |    6 ++++--
+ drivers/char/hw_random/atmel-rng.c |    7 +++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
