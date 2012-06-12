@@ -1,184 +1,64 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: [PATCH 01/13] mv_cesa: do not use scatterlist iterators
-Date: Tue, 12 Jun 2012 19:17:15 +0200
-Message-ID: <1339521447-17721-2-git-send-email-phil.sutter@viprinet.com>
-References: <20120612113941.GA14757@gondor.apana.org.au>
- <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: [PATCH] crypto: aes - make assembler implementation default
+ for i386 and x86-64
+Date: Tue, 12 Jun 2012 21:25:18 +0300
+Message-ID: <20120612212518.22246qw5kuyn2osg@www.81.fi>
+References: <20120530215333.32995tjzj9dr4jwo@www.81.fi>
+ <20120609145055.12766.42439.stgit@localhost6.localdomain6>
+ <20120612082651.GA13419@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:58662 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753819Ab2FLRR7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 13:17:59 -0400
-In-Reply-To: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:44915 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752262Ab2FLSZW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jun 2012 14:25:22 -0400
+In-Reply-To: <20120612082651.GA13419@gondor.apana.org.au>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The big problem is they cannot be used to iterate over DMA mapped
-scatterlists, so get rid of them in order to add DMA functionality to
-mv_cesa.
+Quoting Herbert Xu <herbert@gondor.apana.org.au>:
 
-Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
----
- drivers/crypto/mv_cesa.c |   57 ++++++++++++++++++++++-----------------------
- 1 files changed, 28 insertions(+), 29 deletions(-)
+> On Sat, Jun 09, 2012 at 05:50:55PM +0300, Jussi Kivilinna wrote:
+>> AES is often built-in and therefore implementations other than aes-generic
+>> don't get autoloaded by module-aliases. This is solved for aes-ni by cpuid
+>> autoloading, but for x86-64/i586 assembler implementation cpuid matching
+>> does not make much sense (aes-generic built-in but overridden by x86-64/i586
+>> assembler implementation module). Instead change Kconfig so that assembler
+>> implementation is default on x86-64 and i386.
+>>
+>> This patch also splits common parts exported to assembler implementations
+>> from aes-generic to new module aes-common.
+>>
+>> Patch tested on x86-64, compile tested on i386 and arm.
+>>
+>> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+>
+> I like the idea but I'm not sure about where we draw the line.
+> E.g., why not enable padlock, or for that matter every single
+> hardware implementation of AES?
+>
+> This can get unwieldy very quickly.
+>
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 0d40717..818a5c7 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -44,8 +44,8 @@ enum engine_status {
- 
- /**
-  * struct req_progress - used for every crypt request
-- * @src_sg_it:		sg iterator for src
-- * @dst_sg_it:		sg iterator for dst
-+ * @src_sg:		sg list for src
-+ * @dst_sg:		sg list for dst
-  * @sg_src_left:	bytes left in src to process (scatter list)
-  * @src_start:		offset to add to src start position (scatter list)
-  * @crypt_len:		length of current hw crypt/hash process
-@@ -60,8 +60,8 @@ enum engine_status {
-  * track of progress within current scatterlist.
-  */
- struct req_progress {
--	struct sg_mapping_iter src_sg_it;
--	struct sg_mapping_iter dst_sg_it;
-+	struct scatterlist *src_sg;
-+	struct scatterlist *dst_sg;
- 	void (*complete) (void);
- 	void (*process) (int is_first);
- 
-@@ -212,19 +212,19 @@ static int mv_setkey_aes(struct crypto_ablkcipher *cipher, const u8 *key,
- 
- static void copy_src_to_buf(struct req_progress *p, char *dbuf, int len)
- {
--	int ret;
- 	void *sbuf;
- 	int copy_len;
- 
- 	while (len) {
- 		if (!p->sg_src_left) {
--			ret = sg_miter_next(&p->src_sg_it);
--			BUG_ON(!ret);
--			p->sg_src_left = p->src_sg_it.length;
-+			/* next sg please */
-+			p->src_sg = sg_next(p->src_sg);
-+			BUG_ON(!p->src_sg);
-+			p->sg_src_left = p->src_sg->length;
- 			p->src_start = 0;
- 		}
- 
--		sbuf = p->src_sg_it.addr + p->src_start;
-+		sbuf = sg_virt(p->src_sg) + p->src_start;
- 
- 		copy_len = min(p->sg_src_left, len);
- 		memcpy(dbuf, sbuf, copy_len);
-@@ -307,9 +307,6 @@ static void mv_crypto_algo_completion(void)
- 	struct ablkcipher_request *req = ablkcipher_request_cast(cpg->cur_req);
- 	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
- 
--	sg_miter_stop(&cpg->p.src_sg_it);
--	sg_miter_stop(&cpg->p.dst_sg_it);
--
- 	if (req_ctx->op != COP_AES_CBC)
- 		return ;
- 
-@@ -439,7 +436,6 @@ static void mv_hash_algo_completion(void)
- 
- 	if (ctx->extra_bytes)
- 		copy_src_to_buf(&cpg->p, ctx->buffer, ctx->extra_bytes);
--	sg_miter_stop(&cpg->p.src_sg_it);
- 
- 	if (likely(ctx->last_chunk)) {
- 		if (likely(ctx->count <= MAX_HW_HASH_SIZE)) {
-@@ -459,7 +455,6 @@ static void dequeue_complete_req(void)
- {
- 	struct crypto_async_request *req = cpg->cur_req;
- 	void *buf;
--	int ret;
- 	cpg->p.hw_processed_bytes += cpg->p.crypt_len;
- 	if (cpg->p.copy_back) {
- 		int need_copy_len = cpg->p.crypt_len;
-@@ -468,14 +463,14 @@ static void dequeue_complete_req(void)
- 			int dst_copy;
- 
- 			if (!cpg->p.sg_dst_left) {
--				ret = sg_miter_next(&cpg->p.dst_sg_it);
--				BUG_ON(!ret);
--				cpg->p.sg_dst_left = cpg->p.dst_sg_it.length;
-+				/* next sg please */
-+				cpg->p.dst_sg = sg_next(cpg->p.dst_sg);
-+				BUG_ON(!cpg->p.dst_sg);
-+				cpg->p.sg_dst_left = cpg->p.dst_sg->length;
- 				cpg->p.dst_start = 0;
- 			}
- 
--			buf = cpg->p.dst_sg_it.addr;
--			buf += cpg->p.dst_start;
-+			buf = sg_virt(cpg->p.dst_sg) + cpg->p.dst_start;
- 
- 			dst_copy = min(need_copy_len, cpg->p.sg_dst_left);
- 
-@@ -525,7 +520,6 @@ static int count_sgs(struct scatterlist *sl, unsigned int total_bytes)
- static void mv_start_new_crypt_req(struct ablkcipher_request *req)
- {
- 	struct req_progress *p = &cpg->p;
--	int num_sgs;
- 
- 	cpg->cur_req = &req->base;
- 	memset(p, 0, sizeof(struct req_progress));
-@@ -534,11 +528,14 @@ static void mv_start_new_crypt_req(struct ablkcipher_request *req)
- 	p->process = mv_process_current_q;
- 	p->copy_back = 1;
- 
--	num_sgs = count_sgs(req->src, req->nbytes);
--	sg_miter_start(&p->src_sg_it, req->src, num_sgs, SG_MITER_FROM_SG);
--
--	num_sgs = count_sgs(req->dst, req->nbytes);
--	sg_miter_start(&p->dst_sg_it, req->dst, num_sgs, SG_MITER_TO_SG);
-+	p->src_sg = req->src;
-+	p->dst_sg = req->dst;
-+	if (req->nbytes) {
-+		BUG_ON(!req->src);
-+		BUG_ON(!req->dst);
-+		p->sg_src_left = req->src->length;
-+		p->sg_dst_left = req->dst->length;
-+	}
- 
- 	mv_process_current_q(1);
- }
-@@ -547,7 +544,7 @@ static void mv_start_new_hash_req(struct ahash_request *req)
- {
- 	struct req_progress *p = &cpg->p;
- 	struct mv_req_hash_ctx *ctx = ahash_request_ctx(req);
--	int num_sgs, hw_bytes, old_extra_bytes, rc;
-+	int hw_bytes, old_extra_bytes, rc;
- 	cpg->cur_req = &req->base;
- 	memset(p, 0, sizeof(struct req_progress));
- 	hw_bytes = req->nbytes + ctx->extra_bytes;
-@@ -560,8 +557,11 @@ static void mv_start_new_hash_req(struct ahash_request *req)
- 	else
- 		ctx->extra_bytes = 0;
- 
--	num_sgs = count_sgs(req->src, req->nbytes);
--	sg_miter_start(&p->src_sg_it, req->src, num_sgs, SG_MITER_FROM_SG);
-+	p->src_sg = req->src;
-+	if (req->nbytes) {
-+		BUG_ON(!req->src);
-+		p->sg_src_left = req->src->length;
-+	}
- 
- 	if (hw_bytes) {
- 		p->hw_nbytes = hw_bytes;
-@@ -578,7 +578,6 @@ static void mv_start_new_hash_req(struct ahash_request *req)
- 	} else {
- 		copy_src_to_buf(p, ctx->buffer + old_extra_bytes,
- 				ctx->extra_bytes - old_extra_bytes);
--		sg_miter_stop(&p->src_sg_it);
- 		if (ctx->last_chunk)
- 			rc = mv_hash_final_fallback(req);
- 		else
--- 
-1.7.3.4
+Well, how about letting arch specific assembler implementations  
+replace aes-generic
+completely.. in this case add "depends on !X86" on CRYPTO_AES_GENERIC.  
+Hardware
+modules get autoloaded (cpuid/pci/platform/etc) but generic assembler  
+implementation
+might as well be replacement as it cannot autoload depending on  
+hardware support (or
+it can, but will be always loaded).
+
+-Jussi
