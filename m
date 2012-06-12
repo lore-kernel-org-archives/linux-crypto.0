@@ -1,32 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler
- implementation
-Date: Tue, 12 Jun 2012 18:05:26 +0800
-Message-ID: <20120612100526.GE14078@gondor.apana.org.au>
-References: <20120528135424.GI17705@kronos.redsun>
+Subject: Re: [PATCH 1/3] crypto: tcrypt: add ecb(arc4) speed tests
+Date: Tue, 12 Jun 2012 18:06:07 +0800
+Message-ID: <20120612100607.GG14078@gondor.apana.org.au>
+References: <20120609152535.16420.13917.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Tilo =?iso-8859-1?Q?M=FCller?=
-	<Tilo.Mueller@informatik.uni-erlangen.de>
-To: Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sting.hengli.com.au ([178.18.18.71]:53864 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750985Ab2FLKGJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jun 2012 06:06:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20120528135424.GI17705@kronos.redsun>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20120609152535.16420.13917.stgit@localhost6.localdomain6>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 28, 2012 at 03:54:24PM +0200, Johannes Goetzfried wrote:
-> This patch adds a x86_64/avx assembler implementation of the Twofish block
-> cipher. The implementation processes eight blocks in parallel (two 4 block
-> chunk AVX operations). The table-lookups are done in general-purpose registers.
-> For small blocksizes the 3way-parallel functions from the twofish-x86_64-3way
-> module are called. A good performance increase is provided for blocksizes
-> greater or equal to 128B.
-> 
-> Patch has been tested with tcrypt and automated filesystem tests.
+On Sat, Jun 09, 2012 at 06:25:35PM +0300, Jussi Kivilinna wrote:
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
 All applied.  Thanks!
 -- 
