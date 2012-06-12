@@ -1,467 +1,207 @@
 From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: [PATCH 06/13] mv_cesa: use DMA engine for data transfers
-Date: Tue, 12 Jun 2012 19:17:20 +0200
-Message-ID: <1339521447-17721-7-git-send-email-phil.sutter@viprinet.com>
+Subject: [PATCH 03/13] mv_cesa: prepare the full sram config in dram
+Date: Tue, 12 Jun 2012 19:17:17 +0200
+Message-ID: <1339521447-17721-4-git-send-email-phil.sutter@viprinet.com>
 References: <20120612113941.GA14757@gondor.apana.org.au>
  <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:58621 "EHLO zimbra.vipri.net"
+Received: from zimbra.vipri.net ([89.207.250.15]:58626 "EHLO zimbra.vipri.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752891Ab2FLRRt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 13:17:49 -0400
+	id S1753675Ab2FLRRu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jun 2012 13:17:50 -0400
 In-Reply-To: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This way reconfiguring the cryptographic accelerator consists of a
+single step (memcpy here), which in future can be done by the tdma
+engine.
+
+This patch introduces some ugly IV copying, necessary for input buffers
+above 1920bytes. But this will go away later.
 
 Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
 ---
- arch/arm/plat-orion/common.c |    6 +
- drivers/crypto/mv_cesa.c     |  214 +++++++++++++++++++++++++++++++++---------
- 2 files changed, 175 insertions(+), 45 deletions(-)
+ drivers/crypto/mv_cesa.c |   83 ++++++++++++++++++++++++++++-----------------
+ 1 files changed, 52 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm/plat-orion/common.c b/arch/arm/plat-orion/common.c
-index 61fd837..0c6c695 100644
---- a/arch/arm/plat-orion/common.c
-+++ b/arch/arm/plat-orion/common.c
-@@ -924,9 +924,15 @@ static struct resource orion_crypto_resources[] = {
- 	},
- };
- 
-+static u64 mv_crypto_dmamask = DMA_BIT_MASK(32);
-+
- static struct platform_device orion_crypto = {
- 	.name           = "mv_crypto",
- 	.id             = -1,
-+	.dev		= {
-+		.dma_mask = &mv_crypto_dmamask,
-+		.coherent_dma_mask = DMA_BIT_MASK(32),
-+	},
- };
- 
- void __init orion_crypto_init(unsigned long mapbase,
 diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index ad21c72..cdbc82e 100644
+index 59c2ed2..80dcf16 100644
 --- a/drivers/crypto/mv_cesa.c
 +++ b/drivers/crypto/mv_cesa.c
-@@ -9,6 +9,7 @@
- #include <crypto/aes.h>
- #include <crypto/algapi.h>
- #include <linux/crypto.h>
-+#include <linux/dma-mapping.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/kthread.h>
-@@ -21,11 +22,14 @@
- #include <crypto/sha.h>
- 
- #include "mv_cesa.h"
-+#include "mv_dma.h"
- 
- #define MV_CESA	"MV-CESA:"
- #define MAX_HW_HASH_SIZE	0xFFFF
- #define MV_CESA_EXPIRE		500 /* msec */
- 
-+static int count_sgs(struct scatterlist *, unsigned int);
-+
- /*
-  * STM:
-  *   /---------------------------------------\
-@@ -50,7 +54,6 @@ enum engine_status {
-  * @src_start:		offset to add to src start position (scatter list)
-  * @crypt_len:		length of current hw crypt/hash process
-  * @hw_nbytes:		total bytes to process in hw for this request
-- * @copy_back:		whether to copy data back (crypt) or not (hash)
-  * @sg_dst_left:	bytes left dst to process in this scatter list
-  * @dst_start:		offset to add to dst start position (scatter list)
-  * @hw_processed_bytes:	number of bytes processed by hw (request).
-@@ -71,7 +74,6 @@ struct req_progress {
- 	int crypt_len;
- 	int hw_nbytes;
- 	/* dst mostly */
--	int copy_back;
- 	int sg_dst_left;
- 	int dst_start;
+@@ -77,6 +77,24 @@ struct req_progress {
  	int hw_processed_bytes;
-@@ -96,8 +98,10 @@ struct sec_accel_sram {
- } __attribute__((packed));
+ };
  
++struct sec_accel_sram {
++	struct sec_accel_config op;
++	union {
++		struct {
++			u32 key[8];
++			u32 iv[4];
++		} crypt;
++		struct {
++			u32 ivi[5];
++			u32 ivo[5];
++		} hash;
++	} type;
++#define sa_key	type.crypt.key
++#define sa_iv	type.crypt.iv
++#define sa_ivi	type.hash.ivi
++#define sa_ivo	type.hash.ivo
++} __attribute__((packed));
++
  struct crypto_priv {
-+	struct device *dev;
  	void __iomem *reg;
  	void __iomem *sram;
-+	u32 sram_phys;
- 	int irq;
- 	struct clk *clk;
- 	struct task_struct *queue_th;
-@@ -115,6 +119,7 @@ struct crypto_priv {
+@@ -95,6 +113,8 @@ struct crypto_priv {
+ 	int sram_size;
+ 	int has_sha1;
  	int has_hmac_sha1;
- 
- 	struct sec_accel_sram sa_sram;
-+	dma_addr_t sa_sram_dma;
++
++	struct sec_accel_sram sa_sram;
  };
  
  static struct crypto_priv *cpg;
-@@ -183,6 +188,23 @@ static void mv_setup_timer(void)
- 			jiffies + msecs_to_jiffies(MV_CESA_EXPIRE));
- }
- 
-+static inline bool
-+mv_dma_map_sg(struct scatterlist *sg, int nbytes, enum dma_data_direction dir)
-+{
-+	int nents = count_sgs(sg, nbytes);
-+
-+	if (nbytes && dma_map_sg(cpg->dev, sg, nents, dir) != nents)
-+		return false;
-+	return true;
-+}
-+
-+static inline void
-+mv_dma_unmap_sg(struct scatterlist *sg, int nbytes, enum dma_data_direction dir)
-+{
-+	if (nbytes)
-+		dma_unmap_sg(cpg->dev, sg, count_sgs(sg, nbytes), dir);
-+}
-+
- static void compute_aes_dec_key(struct mv_ctx *ctx)
- {
- 	struct crypto_aes_ctx gen_aes_key;
-@@ -257,12 +279,66 @@ static void copy_src_to_buf(struct req_progress *p, char *dbuf, int len)
- 	}
- }
- 
-+static void dma_copy_src_to_buf(struct req_progress *p, dma_addr_t dbuf, int len)
-+{
-+	dma_addr_t sbuf;
-+	int copy_len;
-+
-+	while (len) {
-+		if (!p->sg_src_left) {
-+			/* next sg please */
-+			p->src_sg = sg_next(p->src_sg);
-+			BUG_ON(!p->src_sg);
-+			p->sg_src_left = sg_dma_len(p->src_sg);
-+			p->src_start = 0;
-+		}
-+
-+		sbuf = sg_dma_address(p->src_sg) + p->src_start;
-+
-+		copy_len = min(p->sg_src_left, len);
-+		mv_dma_memcpy(dbuf, sbuf, copy_len);
-+
-+		p->src_start += copy_len;
-+		p->sg_src_left -= copy_len;
-+
-+		len -= copy_len;
-+		dbuf += copy_len;
-+	}
-+}
-+
-+static void dma_copy_buf_to_dst(struct req_progress *p, dma_addr_t sbuf, int len)
-+{
-+	dma_addr_t dbuf;
-+	int copy_len;
-+
-+	while (len) {
-+		if (!p->sg_dst_left) {
-+			/* next sg please */
-+			p->dst_sg = sg_next(p->dst_sg);
-+			BUG_ON(!p->dst_sg);
-+			p->sg_dst_left = sg_dma_len(p->dst_sg);
-+			p->dst_start = 0;
-+		}
-+
-+		dbuf = sg_dma_address(p->dst_sg) + p->dst_start;
-+
-+		copy_len = min(p->sg_dst_left, len);
-+		mv_dma_memcpy(dbuf, sbuf, copy_len);
-+
-+		p->dst_start += copy_len;
-+		p->sg_dst_left -= copy_len;
-+
-+		len -= copy_len;
-+		sbuf += copy_len;
-+	}
-+}
-+
- static void setup_data_in(void)
- {
- 	struct req_progress *p = &cpg->p;
- 	int data_in_sram =
- 	    min(p->hw_nbytes - p->hw_processed_bytes, cpg->max_req_size);
--	copy_src_to_buf(p, cpg->sram + SRAM_DATA_IN_START + p->crypt_len,
-+	dma_copy_src_to_buf(p, cpg->sram_phys + SRAM_DATA_IN_START + p->crypt_len,
- 			data_in_sram - p->crypt_len);
- 	p->crypt_len = data_in_sram;
- }
-@@ -309,22 +385,39 @@ static void mv_init_crypt_config(struct ablkcipher_request *req)
- 	op->enc_key_p = SRAM_DATA_KEY_P;
- 	op->enc_len = cpg->p.crypt_len;
- 
--	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
-+	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
-+			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
-+	mv_dma_memcpy(cpg->sram_phys + SRAM_CONFIG, cpg->sa_sram_dma,
- 			sizeof(struct sec_accel_sram));
- 
-+	mv_dma_separator();
-+	dma_copy_buf_to_dst(&cpg->p, cpg->sram_phys + SRAM_DATA_OUT_START, cpg->p.crypt_len);
-+
- 	/* GO */
- 	mv_setup_timer();
-+	mv_dma_trigger();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
- }
- 
- static void mv_update_crypt_config(void)
- {
-+	struct sec_accel_config *op = &cpg->sa_sram.op;
-+
- 	/* update the enc_len field only */
--	memcpy(cpg->sram + SRAM_CONFIG + 2 * sizeof(u32),
--			&cpg->p.crypt_len, sizeof(u32));
-+
-+	op->enc_len = cpg->p.crypt_len;
-+
-+	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma + 2 * sizeof(u32),
-+			sizeof(u32), DMA_TO_DEVICE);
-+	mv_dma_memcpy(cpg->sram_phys + SRAM_CONFIG + 2 * sizeof(u32),
-+			cpg->sa_sram_dma + 2 * sizeof(u32), sizeof(u32));
-+
-+	mv_dma_separator();
-+	dma_copy_buf_to_dst(&cpg->p, cpg->sram_phys + SRAM_DATA_OUT_START, cpg->p.crypt_len);
- 
- 	/* GO */
- 	mv_setup_timer();
-+	mv_dma_trigger();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
- }
- 
-@@ -333,6 +426,13 @@ static void mv_crypto_algo_completion(void)
+@@ -252,48 +272,49 @@ static void mv_process_current_q(int first_block)
  	struct ablkcipher_request *req = ablkcipher_request_cast(cpg->cur_req);
+ 	struct mv_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
  	struct mv_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+-	struct sec_accel_config op;
++	struct sec_accel_config *op = &cpg->sa_sram.op;
  
-+	if (req->src == req->dst) {
-+		mv_dma_unmap_sg(req->src, req->nbytes, DMA_BIDIRECTIONAL);
-+	} else {
-+		mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
-+		mv_dma_unmap_sg(req->dst, req->nbytes, DMA_FROM_DEVICE);
-+	}
-+
- 	if (req_ctx->op != COP_AES_CBC)
- 		return ;
- 
-@@ -392,11 +492,20 @@ static void mv_init_hash_config(struct ahash_request *req)
- 		writel(req_ctx->state[4], cpg->reg + DIGEST_INITIAL_VAL_E);
+ 	switch (req_ctx->op) {
+ 	case COP_AES_ECB:
+-		op.config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_ECB;
++		op->config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_ECB;
+ 		break;
+ 	case COP_AES_CBC:
+ 	default:
+-		op.config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_CBC;
+-		op.enc_iv = ENC_IV_POINT(SRAM_DATA_IV) |
++		op->config = CFG_OP_CRYPT_ONLY | CFG_ENCM_AES | CFG_ENC_MODE_CBC;
++		op->enc_iv = ENC_IV_POINT(SRAM_DATA_IV) |
+ 			ENC_IV_BUF_POINT(SRAM_DATA_IV_BUF);
+-		if (first_block)
+-			memcpy(cpg->sram + SRAM_DATA_IV, req->info, 16);
++		if (!first_block)
++			memcpy(req->info, cpg->sram + SRAM_DATA_IV_BUF, 16);
++		memcpy(cpg->sa_sram.sa_iv, req->info, 16);
+ 		break;
  	}
- 
--	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
-+	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
-+			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
-+	mv_dma_memcpy(cpg->sram_phys + SRAM_CONFIG, cpg->sa_sram_dma,
- 			sizeof(struct sec_accel_sram));
- 
-+	mv_dma_separator();
-+
-+	/* XXX: this fixes some ugly register fuckup bug in the tdma engine
-+	 *      (no need to sync since the data is ignored anyway) */
-+	mv_dma_memcpy(cpg->sa_sram_dma, cpg->sram_phys + SRAM_CONFIG, 1);
-+
- 	/* GO */
- 	mv_setup_timer();
-+	mv_dma_trigger();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
- }
- 
-@@ -426,13 +535,26 @@ static void mv_update_hash_config(void)
- 		&& (req_ctx->count <= MAX_HW_HASH_SIZE);
- 
- 	op->config |= is_last ? CFG_LAST_FRAG : CFG_MID_FRAG;
--	memcpy(cpg->sram + SRAM_CONFIG, &op->config, sizeof(u32));
-+	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma,
-+			sizeof(u32), DMA_TO_DEVICE);
-+	mv_dma_memcpy(cpg->sram_phys + SRAM_CONFIG,
-+			cpg->sa_sram_dma, sizeof(u32));
- 
- 	op->mac_digest = MAC_DIGEST_P(SRAM_DIGEST_BUF) | MAC_FRAG_LEN(p->crypt_len);
--	memcpy(cpg->sram + SRAM_CONFIG + 6 * sizeof(u32), &op->mac_digest, sizeof(u32));
-+	dma_sync_single_for_device(cpg->dev, cpg->sa_sram_dma + 6 * sizeof(u32),
-+			sizeof(u32), DMA_TO_DEVICE);
-+	mv_dma_memcpy(cpg->sram_phys + SRAM_CONFIG + 6 * sizeof(u32),
-+			cpg->sa_sram_dma + 6 * sizeof(u32), sizeof(u32));
-+
-+	mv_dma_separator();
-+
-+	/* XXX: this fixes some ugly register fuckup bug in the tdma engine
-+	 *      (no need to sync since the data is ignored anyway) */
-+	mv_dma_memcpy(cpg->sa_sram_dma, cpg->sram_phys + SRAM_CONFIG, 1);
- 
- 	/* GO */
- 	mv_setup_timer();
-+	mv_dma_trigger();
- 	writel(SEC_CMD_EN_SEC_ACCL0, cpg->reg + SEC_ACCEL_CMD);
- }
- 
-@@ -506,43 +628,18 @@ static void mv_hash_algo_completion(void)
+ 	if (req_ctx->decrypt) {
+-		op.config |= CFG_DIR_DEC;
+-		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_dec_key, AES_KEY_LEN);
++		op->config |= CFG_DIR_DEC;
++		memcpy(cpg->sa_sram.sa_key, ctx->aes_dec_key, AES_KEY_LEN);
  	} else {
- 		mv_save_digest_state(ctx);
+-		op.config |= CFG_DIR_ENC;
+-		memcpy(cpg->sram + SRAM_DATA_KEY_P, ctx->aes_enc_key, AES_KEY_LEN);
++		op->config |= CFG_DIR_ENC;
++		memcpy(cpg->sa_sram.sa_key, ctx->aes_enc_key, AES_KEY_LEN);
  	}
-+
-+	mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
- }
  
- static void dequeue_complete_req(void)
- {
- 	struct crypto_async_request *req = cpg->cur_req;
--	void *buf;
- 	cpg->p.hw_processed_bytes += cpg->p.crypt_len;
--	if (cpg->p.copy_back) {
--		int need_copy_len = cpg->p.crypt_len;
--		int sram_offset = 0;
--		do {
--			int dst_copy;
--
--			if (!cpg->p.sg_dst_left) {
--				/* next sg please */
--				cpg->p.dst_sg = sg_next(cpg->p.dst_sg);
--				BUG_ON(!cpg->p.dst_sg);
--				cpg->p.sg_dst_left = cpg->p.dst_sg->length;
--				cpg->p.dst_start = 0;
--			}
--
--			buf = sg_virt(cpg->p.dst_sg) + cpg->p.dst_start;
--
--			dst_copy = min(need_copy_len, cpg->p.sg_dst_left);
--
--			memcpy(buf,
--			       cpg->sram + SRAM_DATA_OUT_START + sram_offset,
--			       dst_copy);
--			sram_offset += dst_copy;
--			cpg->p.sg_dst_left -= dst_copy;
--			need_copy_len -= dst_copy;
--			cpg->p.dst_start += dst_copy;
--		} while (need_copy_len > 0);
--	}
--
- 	cpg->p.crypt_len = 0;
- 
-+	mv_dma_clear();
-+
- 	BUG_ON(cpg->eng_st != ENGINE_W_DEQUEUE);
- 	if (cpg->p.hw_processed_bytes < cpg->p.hw_nbytes) {
- 		/* process next scatter list entry */
-@@ -584,15 +681,28 @@ static void mv_start_new_crypt_req(struct ablkcipher_request *req)
- 	p->hw_nbytes = req->nbytes;
- 	p->complete = mv_crypto_algo_completion;
- 	p->process = mv_update_crypt_config;
--	p->copy_back = 1;
-+
-+	/* assume inplace request */
-+	if (req->src == req->dst) {
-+		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_BIDIRECTIONAL))
-+			return;
-+	} else {
-+		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_TO_DEVICE))
-+			return;
-+
-+		if (!mv_dma_map_sg(req->dst, req->nbytes, DMA_FROM_DEVICE)) {
-+			mv_dma_unmap_sg(req->src, req->nbytes, DMA_TO_DEVICE);
-+			return;
-+		}
-+	}
- 
- 	p->src_sg = req->src;
- 	p->dst_sg = req->dst;
- 	if (req->nbytes) {
- 		BUG_ON(!req->src);
- 		BUG_ON(!req->dst);
--		p->sg_src_left = req->src->length;
--		p->sg_dst_left = req->dst->length;
-+		p->sg_src_left = sg_dma_len(req->src);
-+		p->sg_dst_left = sg_dma_len(req->dst);
+ 	switch (ctx->key_len) {
+ 	case AES_KEYSIZE_128:
+-		op.config |= CFG_AES_LEN_128;
++		op->config |= CFG_AES_LEN_128;
+ 		break;
+ 	case AES_KEYSIZE_192:
+-		op.config |= CFG_AES_LEN_192;
++		op->config |= CFG_AES_LEN_192;
+ 		break;
+ 	case AES_KEYSIZE_256:
+-		op.config |= CFG_AES_LEN_256;
++		op->config |= CFG_AES_LEN_256;
+ 		break;
  	}
+-	op.enc_p = ENC_P_SRC(SRAM_DATA_IN_START) |
++	op->enc_p = ENC_P_SRC(SRAM_DATA_IN_START) |
+ 		ENC_P_DST(SRAM_DATA_OUT_START);
+-	op.enc_key_p = SRAM_DATA_KEY_P;
++	op->enc_key_p = SRAM_DATA_KEY_P;
  
  	setup_data_in();
-@@ -604,6 +714,7 @@ static void mv_start_new_hash_req(struct ahash_request *req)
+-	op.enc_len = cpg->p.crypt_len;
+-	memcpy(cpg->sram + SRAM_CONFIG, &op,
+-			sizeof(struct sec_accel_config));
++	op->enc_len = cpg->p.crypt_len;
++	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
++			sizeof(struct sec_accel_sram));
+ 
+ 	/* GO */
+ 	mv_setup_timer();
+@@ -317,30 +338,30 @@ static void mv_process_hash_current(int first_block)
+ 	const struct mv_tfm_hash_ctx *tfm_ctx = crypto_tfm_ctx(req->base.tfm);
+ 	struct mv_req_hash_ctx *req_ctx = ahash_request_ctx(req);
  	struct req_progress *p = &cpg->p;
- 	struct mv_req_hash_ctx *ctx = ahash_request_ctx(req);
- 	int hw_bytes, old_extra_bytes, rc;
-+
- 	cpg->cur_req = &req->base;
- 	memset(p, 0, sizeof(struct req_progress));
- 	hw_bytes = req->nbytes + ctx->extra_bytes;
-@@ -633,6 +744,11 @@ static void mv_start_new_hash_req(struct ahash_request *req)
- 			p->crypt_len = old_extra_bytes;
- 		}
+-	struct sec_accel_config op = { 0 };
++	struct sec_accel_config *op = &cpg->sa_sram.op;
+ 	int is_last;
  
-+		if (!mv_dma_map_sg(req->src, req->nbytes, DMA_TO_DEVICE)) {
-+			printk(KERN_ERR "%s: out of memory\n", __func__);
-+			return;
-+		}
-+
- 		setup_data_in();
- 		mv_init_hash_config(req);
+ 	switch (req_ctx->op) {
+ 	case COP_SHA1:
+ 	default:
+-		op.config = CFG_OP_MAC_ONLY | CFG_MACM_SHA1;
++		op->config = CFG_OP_MAC_ONLY | CFG_MACM_SHA1;
+ 		break;
+ 	case COP_HMAC_SHA1:
+-		op.config = CFG_OP_MAC_ONLY | CFG_MACM_HMAC_SHA1;
+-		memcpy(cpg->sram + SRAM_HMAC_IV_IN,
++		op->config = CFG_OP_MAC_ONLY | CFG_MACM_HMAC_SHA1;
++		memcpy(cpg->sa_sram.sa_ivi,
+ 				tfm_ctx->ivs, sizeof(tfm_ctx->ivs));
+ 		break;
+ 	}
+ 
+-	op.mac_src_p =
++	op->mac_src_p =
+ 		MAC_SRC_DATA_P(SRAM_DATA_IN_START) |
+ 		MAC_SRC_TOTAL_LEN((u32)req_ctx->count);
+ 
+ 	setup_data_in();
+ 
+-	op.mac_digest =
++	op->mac_digest =
+ 		MAC_DIGEST_P(SRAM_DIGEST_BUF) | MAC_FRAG_LEN(p->crypt_len);
+-	op.mac_iv =
++	op->mac_iv =
+ 		MAC_INNER_IV_P(SRAM_HMAC_IV_IN) |
+ 		MAC_OUTER_IV_P(SRAM_HMAC_IV_OUT);
+ 
+@@ -349,16 +370,16 @@ static void mv_process_hash_current(int first_block)
+ 		&& (req_ctx->count <= MAX_HW_HASH_SIZE);
+ 	if (req_ctx->first_hash) {
+ 		if (is_last)
+-			op.config |= CFG_NOT_FRAG;
++			op->config |= CFG_NOT_FRAG;
+ 		else
+-			op.config |= CFG_FIRST_FRAG;
++			op->config |= CFG_FIRST_FRAG;
+ 
+ 		req_ctx->first_hash = 0;
  	} else {
-@@ -968,14 +1084,14 @@ irqreturn_t crypto_int(int irq, void *priv)
- 	u32 val;
+ 		if (is_last)
+-			op.config |= CFG_LAST_FRAG;
++			op->config |= CFG_LAST_FRAG;
+ 		else
+-			op.config |= CFG_MID_FRAG;
++			op->config |= CFG_MID_FRAG;
  
- 	val = readl(cpg->reg + SEC_ACCEL_INT_STATUS);
--	if (!(val & SEC_INT_ACCEL0_DONE))
-+	if (!(val & SEC_INT_ACC0_IDMA_DONE))
- 		return IRQ_NONE;
- 
- 	if (!del_timer(&cpg->completion_timer)) {
- 		printk(KERN_WARNING MV_CESA
- 		       "got an interrupt but no pending timer?\n");
+ 		if (first_block) {
+ 			writel(req_ctx->state[0], cpg->reg + DIGEST_INITIAL_VAL_A);
+@@ -369,8 +390,8 @@ static void mv_process_hash_current(int first_block)
+ 		}
  	}
--	val &= ~SEC_INT_ACCEL0_DONE;
-+	val &= ~SEC_INT_ACC0_IDMA_DONE;
- 	writel(val, cpg->reg + FPGA_INT_STATUS);
- 	writel(val, cpg->reg + SEC_ACCEL_INT_STATUS);
- 	BUG_ON(cpg->eng_st != ENGINE_BUSY);
-@@ -1115,6 +1231,7 @@ static int mv_probe(struct platform_device *pdev)
- 	}
- 	cp->sram_size = resource_size(res);
- 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
-+	cp->sram_phys = res->start;
- 	cp->sram = ioremap(res->start, cp->sram_size);
- 	if (!cp->sram) {
- 		ret = -ENOMEM;
-@@ -1130,6 +1247,7 @@ static int mv_probe(struct platform_device *pdev)
  
- 	platform_set_drvdata(pdev, cp);
- 	cpg = cp;
-+	cpg->dev = &pdev->dev;
+-	memcpy(cpg->sram + SRAM_CONFIG, &op,
+-			sizeof(struct sec_accel_config));
++	memcpy(cpg->sram + SRAM_CONFIG, &cpg->sa_sram,
++			sizeof(struct sec_accel_sram));
  
- 	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
- 	if (IS_ERR(cp->queue_th)) {
-@@ -1149,10 +1267,14 @@ static int mv_probe(struct platform_device *pdev)
- 		clk_prepare_enable(cp->clk);
- 
- 	writel(0, cpg->reg + SEC_ACCEL_INT_STATUS);
--	writel(SEC_INT_ACCEL0_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
--	writel(SEC_CFG_STOP_DIG_ERR, cpg->reg + SEC_ACCEL_CFG);
-+	writel(SEC_INT_ACC0_IDMA_DONE, cpg->reg + SEC_ACCEL_INT_MASK);
-+	writel((SEC_CFG_STOP_DIG_ERR | SEC_CFG_CH0_W_IDMA |
-+	        SEC_CFG_ACT_CH0_IDMA), cpg->reg + SEC_ACCEL_CFG);
- 	writel(SRAM_CONFIG, cpg->reg + SEC_ACCEL_DESC_P0);
- 
-+	cp->sa_sram_dma = dma_map_single(&pdev->dev, &cp->sa_sram,
-+			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
-+
- 	ret = crypto_register_alg(&mv_aes_alg_ecb);
- 	if (ret) {
- 		printk(KERN_WARNING MV_CESA
-@@ -1211,6 +1333,8 @@ static int mv_remove(struct platform_device *pdev)
- 		crypto_unregister_ahash(&mv_hmac_sha1_alg);
- 	kthread_stop(cp->queue_th);
- 	free_irq(cp->irq, cp);
-+	dma_unmap_single(&pdev->dev, cpg->sa_sram_dma,
-+			sizeof(struct sec_accel_sram), DMA_TO_DEVICE);
- 	memset(cp->sram, 0, cp->sram_size);
- 	iounmap(cp->sram);
- 	iounmap(cp->reg);
+ 	/* GO */
+ 	mv_setup_timer();
 -- 
 1.7.3.4
