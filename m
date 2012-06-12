@@ -1,49 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aes - make assembler implementation default
- for i386 and x86-64
-Date: Tue, 12 Jun 2012 16:26:51 +0800
-Message-ID: <20120612082651.GA13419@gondor.apana.org.au>
-References: <20120530215333.32995tjzj9dr4jwo@www.81.fi>
- <20120609145055.12766.42439.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: sha1 - use Kbuild supplied flags for AVX test
+Date: Tue, 12 Jun 2012 18:02:50 +0800
+Message-ID: <20120612100250.GA14078@gondor.apana.org.au>
+References: <1337850822-1855-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:47489 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:54809 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751535Ab2FLI1D (ORCPT
+	with ESMTP id S1750995Ab2FLKCy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 04:27:03 -0400
+	Tue, 12 Jun 2012 06:02:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20120609145055.12766.42439.stgit@localhost6.localdomain6>
+In-Reply-To: <1337850822-1855-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jun 09, 2012 at 05:50:55PM +0300, Jussi Kivilinna wrote:
-> AES is often built-in and therefore implementations other than aes-generic
-> don't get autoloaded by module-aliases. This is solved for aes-ni by cpuid
-> autoloading, but for x86-64/i586 assembler implementation cpuid matching
-> does not make much sense (aes-generic built-in but overridden by x86-64/i586
-> assembler implementation module). Instead change Kconfig so that assembler
-> implementation is default on x86-64 and i386.
+On Thu, May 24, 2012 at 11:13:42AM +0200, Mathias Krause wrote:
+> Commit ea4d26ae ("raid5: add AVX optimized RAID5 checksumming")
+> introduced x86/ arch wide defines for AFLAGS and CFLAGS indicating AVX
+> support in binutils based on the same test we have in x86/crypto/ right
+> now. To minimize duplication drop our implementation in favour to the
+> one in x86/.
 > 
-> This patch also splits common parts exported to assembler implementations
-> from aes-generic to new module aes-common.
-> 
-> Patch tested on x86-64, compile tested on i386 and arm.
-> 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Signed-off-by: Mathias Krause <minipli@googlemail.com>
 
-I like the idea but I'm not sure about where we draw the line.
-E.g., why not enable padlock, or for that matter every single
-hardware implementation of AES?
-
-This can get unwieldy very quickly.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
