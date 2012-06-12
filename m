@@ -1,36 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: RFC: support for MV_CESA with TDMA
-Date: Tue, 12 Jun 2012 18:04:37 +0800
-Message-ID: <20120612100437.GD14078@gondor.apana.org.au>
-References: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
+Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler
+ implementation
+Date: Tue, 12 Jun 2012 18:05:26 +0800
+Message-ID: <20120612100526.GE14078@gondor.apana.org.au>
+References: <20120528135424.GI17705@kronos.redsun>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Phil Sutter <phil.sutter@viprinet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:47383 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751853Ab2FLKEl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 06:04:41 -0400
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Tilo =?iso-8859-1?Q?M=FCller?=
+	<Tilo.Mueller@informatik.uni-erlangen.de>
+To: Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20120528135424.GI17705@kronos.redsun>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 25, 2012 at 06:08:26PM +0200, Phil Sutter wrote:
->
-> The point for this being RFC is backwards-compatibility: earlier
-> hardware (Orion) ships a (slightly) different DMA engine (IDMA) along
-> with the same crypto engine, so in fact mv_cesa.c is in use on these
-> platforms, too. But since I don't possess hardware of this kind, I am
-> not able to make this code IDMA-compatible. Also, due to the quite
-> massive reorganisation of code flow, I don't really see how to make TDMA
-> support optional in mv_cesa.c.
+On Mon, May 28, 2012 at 03:54:24PM +0200, Johannes Goetzfried wrote:
+> This patch adds a x86_64/avx assembler implementation of the Twofish block
+> cipher. The implementation processes eight blocks in parallel (two 4 block
+> chunk AVX operations). The table-lookups are done in general-purpose registers.
+> For small blocksizes the 3way-parallel functions from the twofish-x86_64-3way
+> module are called. A good performance increase is provided for blocksizes
+> greater or equal to 128B.
+> 
+> Patch has been tested with tcrypt and automated filesystem tests.
 
-So does this break existing functionality or not?
-
-Cheers,
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
