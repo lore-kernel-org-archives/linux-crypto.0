@@ -1,33 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: Add new test cases for Blackfin CRC crypto
- driver.
-Date: Tue, 12 Jun 2012 18:03:08 +0800
-Message-ID: <20120612100308.GB14078@gondor.apana.org.au>
-References: <1337939654-12222-1-git-send-email-sonic.adi@gmail.com>
+Subject: Re: [PATCH 2/4] mv_cesa: no need to write to that FPGA_INT_STATUS
+ field
+Date: Tue, 12 Jun 2012 18:03:55 +0800
+Message-ID: <20120612100355.GC14078@gondor.apana.org.au>
+References: <1337954089-12702-1-git-send-email-phil.sutter@viprinet.com>
+ <1337954089-12702-2-git-send-email-phil.sutter@viprinet.com>
+ <4FC2DBC8.2070805@gmail.com>
+ <20120529114529.GB5711@philter.vipri.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	uclinux-dist-devel@blackfin.uclinux.org,
-	Sonic Zhang <sonic.zhang@analog.com>
-To: Sonic Zhang <sonic.adi@gmail.com>
+Cc: "cloudy.linux" <cloudy.linux@gmail.com>,
+	linux-crypto@vger.kernel.org
+To: Phil Sutter <phil.sutter@viprinet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:48027 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:58604 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750995Ab2FLKDO (ORCPT
+	with ESMTP id S1751092Ab2FLKEA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 06:03:14 -0400
+	Tue, 12 Jun 2012 06:04:00 -0400
 Content-Disposition: inline
-In-Reply-To: <1337939654-12222-1-git-send-email-sonic.adi@gmail.com>
+In-Reply-To: <20120529114529.GB5711@philter.vipri.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 25, 2012 at 05:54:13PM +0800, Sonic Zhang wrote:
-> From: Sonic Zhang <sonic.zhang@analog.com>
+On Tue, May 29, 2012 at 01:45:29PM +0200, Phil Sutter wrote:
 > 
-> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+> Oh, that explains why it's not needed on Kirkwood but still left there.
+> I could make it compile-time optional, depending on ARCH_ORION5X e.g. or
+> simply drop the patch and leave it alone since it really doesn't hurt
+> that much. 
 
-Both patches applied.  Thanks!
+OK I've skipped number two and applied the other three.
+
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
