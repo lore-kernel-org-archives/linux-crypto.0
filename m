@@ -1,29 +1,68 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] crypto: tcrypt: add ecb(arc4) speed tests
-Date: Tue, 12 Jun 2012 18:06:07 +0800
-Message-ID: <20120612100607.GG14078@gondor.apana.org.au>
-References: <20120609152535.16420.13917.stgit@localhost6.localdomain6>
+From: Phil Sutter <phil.sutter@viprinet.com>
+Subject: Re: RFC: support for MV_CESA with TDMA
+Date: Tue, 12 Jun 2012 12:24:52 +0200
+Message-ID: <20120612102452.GE9122@philter.vipri.net>
+References: <1337962119-5509-1-git-send-email-phil.sutter@viprinet.com>
+ <20120612100437.GD14078@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:53864 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750985Ab2FLKGJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Jun 2012 06:06:09 -0400
+Received: from zimbra.vipri.net ([89.207.250.15]:50852 "EHLO zimbra.vipri.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751193Ab2FLKZD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Jun 2012 06:25:03 -0400
 Content-Disposition: inline
-In-Reply-To: <20120609152535.16420.13917.stgit@localhost6.localdomain6>
+In-Reply-To: <20120612100437.GD14078@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jun 09, 2012 at 06:25:35PM +0300, Jussi Kivilinna wrote:
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+On Tue, Jun 12, 2012 at 06:04:37PM +0800, Herbert Xu wrote:
+> On Fri, May 25, 2012 at 06:08:26PM +0200, Phil Sutter wrote:
+> >
+> > The point for this being RFC is backwards-compatibility: earlier
+> > hardware (Orion) ships a (slightly) different DMA engine (IDMA) alo=
+ng
+> > with the same crypto engine, so in fact mv_cesa.c is in use on thes=
+e
+> > platforms, too. But since I don't possess hardware of this kind, I =
+am
+> > not able to make this code IDMA-compatible. Also, due to the quite
+> > massive reorganisation of code flow, I don't really see how to make=
+ TDMA
+> > support optional in mv_cesa.c.
+>=20
+> So does this break existing functionality or not?
 
-All applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+It does break mv_cesa on Orion-based devices (precisely those with IDMA
+instead of TDMA). I am currently working on a version which supports
+IDMA, too. Since all CESA-equipped hardware comes with either TDMA or
+IDMA, that version then should improve all platforms without breaking
+any.
+
+Greetings, Phil
+
+
+Phil Sutter
+Software Engineer
+
+--=20
+
+
+Viprinet GmbH
+Mainzer Str. 43
+55411 Bingen am Rhein
+Germany
+
+Phone/Zentrale:         +49-6721-49030-0
+Direct line/Durchwahl:  +49-6721-49030-134
+=46ax:                    +49-6721-49030-209
+
+phil.sutter@viprinet.com
+http://www.viprinet.com
+
+Registered office/Sitz der Gesellschaft: Bingen am Rhein
+Commercial register/Handelsregister: Amtsgericht Mainz HRB40380
+CEO/Gesch=C3=A4ftsf=C3=BChrer: Simon Kissel
