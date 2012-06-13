@@ -1,55 +1,39 @@
 From: Seth Jennings <sjenning@linux.vnet.ibm.com>
-Subject: [PATCH 1/2] drivers: crypto: move nx build to driver/crypto Makefile
-Date: Wed, 13 Jun 2012 13:22:42 -0500
-Message-ID: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
+Subject: [PATCH 2/2] drivers: crypto: fix typo in nx driver config option
+Date: Wed, 13 Jun 2012 13:22:43 -0500
+Message-ID: <1339611763-14603-2-git-send-email-sjenning@linux.vnet.ibm.com>
+References: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Cc: Seth Jennings <sjenning@linux.vnet.ibm.com>,
 	Paul Mackerras <paulus@samba.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Kent Yoder <key@linux.vnet.ibm.com>
+	linux-crypto@vger.kernel.org, trivial@kernel.org,
+	Kent Yoder <key@linux.vnet.ibm.com>
 To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
-
-When the nx driver was pulled, the Makefile that actually
-builds it is arch/powerpc/Makefile. This is unnatural.
-
-This patch moves the line that builds the nx driver from
-arch/powerpc/Makefile to drivers/crypto/Makefile where it
-belongs.
 
 Cc: Kent Yoder <key@linux.vnet.ibm.com>
 Signed-off-by: Seth Jennings <sjenning@linux.vnet.ibm.com>
 ---
- arch/powerpc/Makefile   |    1 -
- drivers/crypto/Makefile |    3 ++-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 950d1f7..159e94f 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -149,7 +149,6 @@ core-$(CONFIG_KVM) 		+= arch/powerpc/kvm/
- core-$(CONFIG_PERF_EVENTS)	+= arch/powerpc/perf/
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 1092a77..b9b11a6 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -298,7 +298,7 @@ config CRYPTO_DEV_TEGRA_AES
+ 	  will be called tegra-aes.
  
- drivers-$(CONFIG_OPROFILE)	+= arch/powerpc/oprofile/
--drivers-$(CONFIG_CRYPTO_DEV_NX) += drivers/crypto/nx/
- 
- # Default to zImage, override when needed
- all: zImage
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 0139032..67b4fbf 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -14,4 +14,5 @@ obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
- obj-$(CONFIG_CRYPTO_DEV_PICOXCELL) += picoxcell_crypto.o
- obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_TEGRA_AES) += tegra-aes.o
--obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-\ No newline at end of file
-+obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-+obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
+ config CRYPTO_DEV_NX
+-	tristate "Support for Power7+ in-Nest cryptographic accleration"
++	tristate "Support for Power7+ in-Nest cryptographic acceleration"
+ 	depends on PPC64 && IBMVIO
+ 	select CRYPTO_AES
+ 	select CRYPTO_CBC
 -- 
 1.7.9.5
