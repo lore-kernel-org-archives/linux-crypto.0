@@ -1,71 +1,50 @@
-From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/2] drivers: crypto: move nx build to driver/crypto
- Makefile
-Date: Wed, 13 Jun 2012 13:45:30 -0500
-Message-ID: <1339613130.28242.12.camel@key-ThinkPad-W510>
-References: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
+From: Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+Subject: Re: linux-next: Tree for Jun 13 (crypto)
+Date: Wed, 13 Jun 2012 21:05:40 +0200
+Message-ID: <20120613190540.GY17705@kronos.redsun>
+References: <20120613155440.14672516ffaf5b01f91bb0a2@canb.auug.org.au>
+ <4FD8BB95.4000307@xenotime.net>
+ <20120613200317.20733xjrnmv47y04@www.81.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Seth Jennings <sjenning@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e39.co.us.ibm.com ([32.97.110.160]:45016 "EHLO
-	e39.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754361Ab2FMSoj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 Jun 2012 14:44:39 -0400
-Received: from /spool/local
-	by e39.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
-	Wed, 13 Jun 2012 12:44:39 -0600
-In-Reply-To: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Randy Dunlap <rdunlap@xenotime.net>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.hengli.com.au>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20120613200317.20733xjrnmv47y04@www.81.fi>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2012-06-13 at 13:22 -0500, Seth Jennings wrote:
-> When the nx driver was pulled, the Makefile that actually
-> builds it is arch/powerpc/Makefile. This is unnatural.
+On Wed, Jun 13, 2012 at 08:03:17PM +0300, Jussi Kivilinna wrote:
+> >arch/x86/crypto/serpent-avx-x86_64.o: In function `serpent_xts_decrypt':
+> >(.text+0x856c): multiple definition of `serpent_xts_decrypt'
+> >arch/x86/crypto/serpent-sse2-x86_64.o:(.text+0xae8): first defined here
 > 
-> This patch moves the line that builds the nx driver from
-> arch/powerpc/Makefile to drivers/crypto/Makefile where it
-> belongs.
+> Reverting commit e2f4d85d5b2049a90859aa10de914ed31a4f17a4, "crypto:
+> serpent - add common glue code for avx and sse2 implementation",
+> should help for most.
+> 
+> >arch/x86/crypto/serpent-avx-x86_64.o: In function `serpent_dec_blk_8way':
+> >(.text+0x3d70): multiple definition of `serpent_dec_blk_8way'
+> >arch/x86/crypto/serpent-avx-x86_64.o: In function `__serpent_enc_blk_8way':
+> >(.text+0x0): multiple definition of `__serpent_enc_blk_8way'
+> 
+> Attached patch should solve these (patch depends on above revert).
 
-Acked-by: Kent Yoder <key@linux.vnet.ibm.com>
+I'm really sorry about this, it shouldn't have happened. The most easiest
+solution to this problem would be to make the choice between
+CRYPTO_SERPENT_SSE2_X86_64 and CRYPTO_SERPENT_AVX_X86_64 an exclusive-or choice
+in crypto/Kconfig. I don't think there is an use-case, where somebody would
+want to link both implementations into the same kernel image or even load both
+implementations as module. This would avoid duplicating the glue-code again.
 
-> Cc: Kent Yoder <key@linux.vnet.ibm.com>
-> Signed-off-by: Seth Jennings <sjenning@linux.vnet.ibm.com>
-> ---
->  arch/powerpc/Makefile   |    1 -
->  drivers/crypto/Makefile |    3 ++-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-> index 950d1f7..159e94f 100644
-> --- a/arch/powerpc/Makefile
-> +++ b/arch/powerpc/Makefile
-> @@ -149,7 +149,6 @@ core-$(CONFIG_KVM) 		+= arch/powerpc/kvm/
->  core-$(CONFIG_PERF_EVENTS)	+= arch/powerpc/perf/
-> 
->  drivers-$(CONFIG_OPROFILE)	+= arch/powerpc/oprofile/
-> -drivers-$(CONFIG_CRYPTO_DEV_NX) += drivers/crypto/nx/
-> 
->  # Default to zImage, override when needed
->  all: zImage
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index 0139032..67b4fbf 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -14,4 +14,5 @@ obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_PICOXCELL) += picoxcell_crypto.o
->  obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
->  obj-$(CONFIG_CRYPTO_DEV_TEGRA_AES) += tegra-aes.o
-> -obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-> \ No newline at end of file
-> +obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-> +obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
+Another possibility would be to add a serpent-common-x86_64 module, but this
+wouldn't be a trivial change and imo a little bit too much just to avoid
+duplicating this code.
+
+- Johannes
