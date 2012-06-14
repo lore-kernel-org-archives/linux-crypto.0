@@ -1,43 +1,58 @@
-From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: Re: [PATCH 2/2] drivers: crypto: fix typo in nx driver config option
-Date: Wed, 13 Jun 2012 15:23:53 -0500
-Message-ID: <1339619033.28242.24.camel@key-ThinkPad-W510>
-References: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
-	 <1339611763-14603-2-git-send-email-sjenning@linux.vnet.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: Tree for Jun 13 (crypto)
+Date: Thu, 14 Jun 2012 10:16:12 +0800
+Message-ID: <20120614021612.GA29544@gondor.apana.org.au>
+References: <20120613155440.14672516ffaf5b01f91bb0a2@canb.auug.org.au>
+ <4FD8BB95.4000307@xenotime.net>
+ <20120613200317.20733xjrnmv47y04@www.81.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, trivial@kernel.org
-To: Seth Jennings <sjenning@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Randy Dunlap <rdunlap@xenotime.net>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
+	Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1339611763-14603-2-git-send-email-sjenning@linux.vnet.ibm.com>
+Content-Disposition: inline
+In-Reply-To: <20120613200317.20733xjrnmv47y04@www.81.fi>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 2012-06-13 at 13:22 -0500, Seth Jennings wrote:
-> Cc: Kent Yoder <key@linux.vnet.ibm.com>
-> Signed-off-by: Seth Jennings <sjenning@linux.vnet.ibm.com>
-> ---
->  drivers/crypto/Kconfig |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Acked-by: Kent Yoder <key@linux.vnet.ibm.com>
-
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 1092a77..b9b11a6 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -298,7 +298,7 @@ config CRYPTO_DEV_TEGRA_AES
->  	  will be called tegra-aes.
+On Wed, Jun 13, 2012 at 08:03:17PM +0300, Jussi Kivilinna wrote:
 > 
->  config CRYPTO_DEV_NX
-> -	tristate "Support for Power7+ in-Nest cryptographic accleration"
-> +	tristate "Support for Power7+ in-Nest cryptographic acceleration"
->  	depends on PPC64 && IBMVIO
->  	select CRYPTO_AES
->  	select CRYPTO_CBC
+> Reverting commit e2f4d85d5b2049a90859aa10de914ed31a4f17a4, "crypto:
+> serpent - add common glue code for avx and sse2 implementation",
+> should help for most.
+> 
+> >arch/x86/crypto/serpent-avx-x86_64.o: In function `serpent_dec_blk_8way':
+> >(.text+0x3d70): multiple definition of `serpent_dec_blk_8way'
+> >arch/x86/crypto/serpent-avx-x86_64.o: In function `__serpent_enc_blk_8way':
+> >(.text+0x0): multiple definition of `__serpent_enc_blk_8way'
+> 
+> Attached patch should solve these (patch depends on above revert).
+> 
+> -Jussi
+
+> crypto: serpent-sse2/avx - allow both to be built into kernel
+> 
+> From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> 
+> Rename serpent-avx assembler functions so that they do not collide with
+> serpent-sse2 assembler functions when linking both versions in to same
+> kernel image.
+> 
+> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
+> Cc: Johannes Goetzfried <Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+
+OK I have reverted e2f4d85d and applied your patch.  In the process
+I have rebased all patches on top of the original one so watch out if
+you're pulling my tree.
+
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
