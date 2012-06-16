@@ -1,61 +1,47 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: Re: RFC: support for MV_CESA with IDMA or TDMA
-Date: Fri, 15 Jun 2012 11:51:24 +0200
-Message-ID: <20120615095124.GK9122@philter.vipri.net>
-References: <20120612113941.GA14757@gondor.apana.org.au>
- <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
- <4FDA928C.6030601@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: "cloudy.linux" <cloudy.linux@gmail.com>
+From: Simon Baatz <gmbnomis@gmail.com>
+Subject: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
+Date: Sat, 16 Jun 2012 02:20:19 +0200
+Message-ID: <1339806021-14271-1-git-send-email-gmbnomis@gmail.com>
+References: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
+Cc: linux-crypto@vger.kernel.org
+To: phil.sutter@viprinet.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:34146 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756246Ab2FOJvd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Jun 2012 05:51:33 -0400
-Content-Disposition: inline
-In-Reply-To: <4FDA928C.6030601@gmail.com>
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:65156 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754267Ab2FPAVA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Jun 2012 20:21:00 -0400
+Received: by wgbdr13 with SMTP id dr13so3615073wgb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Jun 2012 17:20:59 -0700 (PDT)
+In-Reply-To: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hi Phil,
 
-On Fri, Jun 15, 2012 at 09:40:28AM +0800, cloudy.linux wrote:
-> I would like to have a try on those patches. But what version of kern=
-el=20
-> should I apply those patches on?
+thanks for providing these patches; it's great to finally see DMA
+support for CESA in the kernel. Additionally, the implementation seems
+to be fine regarding cache incoherencies (at least my test in [*]
+works).
 
-Sorry for the caused confusion. I have applied those patches to linus'
-git, preceded by the three accepted ones of the earlier four. Yay.
+I have two patches for your patchset...
 
-Long story short, please just fetch git://nwl.cc/~n0-1/linux.git and
-checkout the 'cesa-dma' branch. It's exactly what I formatted the
-patches from.
+- Fix for mv_init_engine error handling
 
-Greetings, Phil
+- My system locked up hard when mv_dma and mv_cesa were built as
+  modules. mv_cesa has code to enable the crypto clock in 3.5, but
+  mv_dma already accesses the CESA engine before. Thus, we need to
+  enable this clock here, too.
 
+[*] http://www.spinics.net/lists/arm-kernel/msg176913.html
 
-Phil Sutter
-Software Engineer
+Simon Baatz (2):
+  mv_dma: fix mv_init_engine() error case
+  ARM: Orion: mv_dma: Add support for clk
 
---=20
+ arch/arm/mach-kirkwood/common.c |    1 +
+ drivers/crypto/mv_dma.c         |   18 +++++++++++++++---
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
-
-Viprinet GmbH
-Mainzer Str. 43
-55411 Bingen am Rhein
-Germany
-
-Phone/Zentrale:         +49-6721-49030-0
-Direct line/Durchwahl:  +49-6721-49030-134
-=46ax:                    +49-6721-49030-209
-
-phil.sutter@viprinet.com
-http://www.viprinet.com
-
-Registered office/Sitz der Gesellschaft: Bingen am Rhein
-Commercial register/Handelsregister: Amtsgericht Mainz HRB40380
-CEO/Gesch=C3=A4ftsf=C3=BChrer: Simon Kissel
+-- 
+1.7.9.5
