@@ -1,169 +1,502 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 06/11] crypto: serpent-avx: remove duplicated glue code and
- use shared glue code from glue_helper
-Date: Mon, 18 Jun 2012 14:07:24 +0300
-Message-ID: <20120618110724.28985.89866.stgit@localhost6.localdomain6>
+Subject: [PATCH 05/11] crypto: serpent-sse2 - split generic glue code to new
+ helper module
+Date: Mon, 18 Jun 2012 14:07:19 +0300
+Message-ID: <20120618110719.28985.63181.stgit@localhost6.localdomain6>
 References: <20120618110652.28985.70075.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:58439 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751185Ab2FRLH1 (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:50784 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750786Ab2FRLHZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jun 2012 07:07:27 -0400
+	Mon, 18 Jun 2012 07:07:25 -0400
 In-Reply-To: <20120618110652.28985.70075.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Now that shared glue code is available, convert serpent-avx to use it.
+Now that serpent-sse2 glue code has been made generic, it can be split to
+separate module.
 
-Cc: Johannes Goetzfried <Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/serpent_avx_glue.c |  398 +++++++++---------------------------
- crypto/Kconfig                     |    1 
- 2 files changed, 95 insertions(+), 304 deletions(-)
+ arch/x86/crypto/Makefile                  |    1 
+ arch/x86/crypto/glue_helper.c             |  307 +++++++++++++++++++++++++
+ arch/x86/crypto/serpent_sse2_glue.c       |  352 -----------------------------
+ arch/x86/include/asm/crypto/glue_helper.h |  115 +++++++++
+ crypto/Kconfig                            |    7 +
+ 5 files changed, 431 insertions(+), 351 deletions(-)
+ create mode 100644 arch/x86/crypto/glue_helper.c
+ create mode 100644 arch/x86/include/asm/crypto/glue_helper.h
 
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 31eb567..c61b91a 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -36,357 +36,147 @@
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index ad74691..e908e5d 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -3,6 +3,7 @@
+ #
+ 
+ obj-$(CONFIG_CRYPTO_ABLK_HELPER_X86) += ablk_helper.o
++obj-$(CONFIG_CRYPTO_GLUE_HELPER_X86) += glue_helper.o
+ 
+ obj-$(CONFIG_CRYPTO_AES_586) += aes-i586.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_586) += twofish-i586.o
+diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
+new file mode 100644
+index 0000000..4854f0f
+--- /dev/null
++++ b/arch/x86/crypto/glue_helper.c
+@@ -0,0 +1,307 @@
++/*
++ * Shared glue code for 128bit block ciphers
++ *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
++ *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
++ * CTR part based on code (crypto/ctr.c) by:
++ *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
++ *
++ */
++
++#include <linux/module.h>
++#include <crypto/b128ops.h>
++#include <crypto/lrw.h>
++#include <crypto/xts.h>
++#include <asm/crypto/glue_helper.h>
++#include <crypto/scatterwalk.h>
++
++static int __glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
++				   struct blkcipher_desc *desc,
++				   struct blkcipher_walk *walk)
++{
++	void *ctx = crypto_blkcipher_ctx(desc->tfm);
++	const unsigned int bsize = 128 / 8;
++	unsigned int nbytes, i, func_bytes;
++	bool fpu_enabled = false;
++	int err;
++
++	err = blkcipher_walk_virt(desc, walk);
++
++	while ((nbytes = walk->nbytes)) {
++		u8 *wsrc = walk->src.virt.addr;
++		u8 *wdst = walk->dst.virt.addr;
++
++		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
++					     desc, fpu_enabled, nbytes);
++
++		for (i = 0; i < gctx->num_funcs; i++) {
++			func_bytes = bsize * gctx->funcs[i].num_blocks;
++
++			/* Process multi-block batch */
++			if (nbytes >= func_bytes) {
++				do {
++					gctx->funcs[i].fn_u.ecb(ctx, wdst,
++								wsrc);
++
++					wsrc += func_bytes;
++					wdst += func_bytes;
++					nbytes -= func_bytes;
++				} while (nbytes >= func_bytes);
++
++				if (nbytes < bsize)
++					goto done;
++			}
++		}
++
++done:
++		err = blkcipher_walk_done(desc, walk, nbytes);
++	}
++
++	glue_fpu_end(fpu_enabled);
++	return err;
++}
++
++int glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
++			  struct blkcipher_desc *desc, struct scatterlist *dst,
++			  struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	return __glue_ecb_crypt_128bit(gctx, desc, &walk);
++}
++EXPORT_SYMBOL_GPL(glue_ecb_crypt_128bit);
++
++static unsigned int __glue_cbc_encrypt_128bit(const common_glue_func_t fn,
++					      struct blkcipher_desc *desc,
++					      struct blkcipher_walk *walk)
++{
++	void *ctx = crypto_blkcipher_ctx(desc->tfm);
++	const unsigned int bsize = 128 / 8;
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 *iv = (u128 *)walk->iv;
++
++	do {
++		u128_xor(dst, src, iv);
++		fn(ctx, (u8 *)dst, (u8 *)dst);
++		iv = dst;
++
++		src += 1;
++		dst += 1;
++		nbytes -= bsize;
++	} while (nbytes >= bsize);
++
++	u128_xor((u128 *)walk->iv, (u128 *)walk->iv, iv);
++	return nbytes;
++}
++
++int glue_cbc_encrypt_128bit(const common_glue_func_t fn,
++			    struct blkcipher_desc *desc,
++			    struct scatterlist *dst,
++			    struct scatterlist *src, unsigned int nbytes)
++{
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		nbytes = __glue_cbc_encrypt_128bit(fn, desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(glue_cbc_encrypt_128bit);
++
++static unsigned int
++__glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
++			  struct blkcipher_desc *desc,
++			  struct blkcipher_walk *walk)
++{
++	void *ctx = crypto_blkcipher_ctx(desc->tfm);
++	const unsigned int bsize = 128 / 8;
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 last_iv;
++	unsigned int num_blocks, func_bytes;
++	unsigned int i;
++
++	/* Start of the last block. */
++	src += nbytes / bsize - 1;
++	dst += nbytes / bsize - 1;
++
++	last_iv = *src;
++
++	for (i = 0; i < gctx->num_funcs; i++) {
++		num_blocks = gctx->funcs[i].num_blocks;
++		func_bytes = bsize * num_blocks;
++
++		/* Process multi-block batch */
++		if (nbytes >= func_bytes) {
++			do {
++				nbytes -= func_bytes - bsize;
++				src -= num_blocks - 1;
++				dst -= num_blocks - 1;
++
++				gctx->funcs[i].fn_u.cbc(ctx, dst, src);
++
++				nbytes -= bsize;
++				if (nbytes < bsize)
++					goto done;
++
++				u128_xor(dst, dst, src - 1);
++				src -= 1;
++				dst -= 1;
++			} while (nbytes >= func_bytes);
++
++			if (nbytes < bsize)
++				goto done;
++		}
++	}
++
++done:
++	u128_xor(dst, dst, (u128 *)walk->iv);
++	*(u128 *)walk->iv = last_iv;
++
++	return nbytes;
++}
++
++int glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
++			    struct blkcipher_desc *desc,
++			    struct scatterlist *dst,
++			    struct scatterlist *src, unsigned int nbytes)
++{
++	const unsigned int bsize = 128 / 8;
++	bool fpu_enabled = false;
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
++					     desc, fpu_enabled, nbytes);
++		nbytes = __glue_cbc_decrypt_128bit(gctx, desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	glue_fpu_end(fpu_enabled);
++	return err;
++}
++EXPORT_SYMBOL_GPL(glue_cbc_decrypt_128bit);
++
++static void glue_ctr_crypt_final_128bit(const common_glue_ctr_func_t fn_ctr,
++					struct blkcipher_desc *desc,
++					struct blkcipher_walk *walk)
++{
++	void *ctx = crypto_blkcipher_ctx(desc->tfm);
++	u8 *src = (u8 *)walk->src.virt.addr;
++	u8 *dst = (u8 *)walk->dst.virt.addr;
++	unsigned int nbytes = walk->nbytes;
++	u128 ctrblk;
++	u128 tmp;
++
++	be128_to_u128(&ctrblk, (be128 *)walk->iv);
++
++	memcpy(&tmp, src, nbytes);
++	fn_ctr(ctx, &tmp, &tmp, &ctrblk);
++	memcpy(dst, &tmp, nbytes);
++
++	u128_to_be128((be128 *)walk->iv, &ctrblk);
++}
++EXPORT_SYMBOL_GPL(glue_ctr_crypt_final_128bit);
++
++static unsigned int __glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
++					    struct blkcipher_desc *desc,
++					    struct blkcipher_walk *walk)
++{
++	const unsigned int bsize = 128 / 8;
++	void *ctx = crypto_blkcipher_ctx(desc->tfm);
++	unsigned int nbytes = walk->nbytes;
++	u128 *src = (u128 *)walk->src.virt.addr;
++	u128 *dst = (u128 *)walk->dst.virt.addr;
++	u128 ctrblk;
++	unsigned int num_blocks, func_bytes;
++	unsigned int i;
++
++	be128_to_u128(&ctrblk, (be128 *)walk->iv);
++
++	/* Process multi-block batch */
++	for (i = 0; i < gctx->num_funcs; i++) {
++		num_blocks = gctx->funcs[i].num_blocks;
++		func_bytes = bsize * num_blocks;
++
++		if (nbytes >= func_bytes) {
++			do {
++				gctx->funcs[i].fn_u.ctr(ctx, dst, src, &ctrblk);
++
++				src += num_blocks;
++				dst += num_blocks;
++				nbytes -= func_bytes;
++			} while (nbytes >= func_bytes);
++
++			if (nbytes < bsize)
++				goto done;
++		}
++	}
++
++done:
++	u128_to_be128((be128 *)walk->iv, &ctrblk);
++	return nbytes;
++}
++
++int glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
++			  struct blkcipher_desc *desc, struct scatterlist *dst,
++			  struct scatterlist *src, unsigned int nbytes)
++{
++	const unsigned int bsize = 128 / 8;
++	bool fpu_enabled = false;
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt_block(desc, &walk, bsize);
++
++	while ((nbytes = walk.nbytes) >= bsize) {
++		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
++					     desc, fpu_enabled, nbytes);
++		nbytes = __glue_ctr_crypt_128bit(gctx, desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++
++	glue_fpu_end(fpu_enabled);
++
++	if (walk.nbytes) {
++		glue_ctr_crypt_final_128bit(
++			gctx->funcs[gctx->num_funcs - 1].fn_u.ctr, desc, &walk);
++		err = blkcipher_walk_done(desc, &walk, 0);
++	}
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(glue_ctr_crypt_128bit);
++
++MODULE_LICENSE("GPL");
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index 8c86239..49a32ee 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -41,359 +41,9 @@
  #include <crypto/ctr.h>
  #include <crypto/lrw.h>
  #include <crypto/xts.h>
 -#include <asm/i387.h>
- #include <asm/xcr.h>
- #include <asm/xsave.h>
- #include <asm/serpent-avx.h>
+ #include <asm/serpent-sse2.h>
  #include <asm/crypto/ablk_helper.h>
 -#include <crypto/scatterwalk.h>
 -#include <linux/workqueue.h>
 -#include <linux/spinlock.h>
-+#include <asm/crypto/glue_helper.h>
- 
--static inline bool serpent_fpu_begin(bool fpu_enabled, unsigned int nbytes)
-+static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- {
+-
+-typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
+-typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
+-typedef void (*common_glue_ctr_func_t)(void *ctx, u128 *dst, const u128 *src,
+-				       u128 *iv);
+-
+-#define GLUE_FUNC_CAST(fn) ((common_glue_func_t)(fn))
+-#define GLUE_CBC_FUNC_CAST(fn) ((common_glue_cbc_func_t)(fn))
+-#define GLUE_CTR_FUNC_CAST(fn) ((common_glue_ctr_func_t)(fn))
+-
+-struct common_glue_func_entry {
+-	unsigned int num_blocks; /* number of blocks that @fn will process */
+-	union {
+-		common_glue_func_t ecb;
+-		common_glue_cbc_func_t cbc;
+-		common_glue_ctr_func_t ctr;
+-	} fn_u;
+-};
+-
+-struct common_glue_ctx {
+-	unsigned int num_funcs;
+-	int fpu_blocks_limit; /* -1 means fpu not needed at all */
+-
+-	/*
+-	 * First funcs entry must have largest num_blocks and last funcs entry
+-	 * must have num_blocks == 1!
+-	 */
+-	struct common_glue_func_entry funcs[];
+-};
+-
+-static inline bool glue_fpu_begin(unsigned int bsize, int fpu_blocks_limit,
+-				  struct blkcipher_desc *desc,
+-				  bool fpu_enabled, unsigned int nbytes)
+-{
+-	if (likely(fpu_blocks_limit < 0))
+-		return false;
+-
 -	if (fpu_enabled)
 -		return true;
 -
--	/* AVX is only used when chunk to be processed is large enough, so
--	 * do not enable FPU until it is necessary.
+-	/*
+-	 * Vector-registers are only used when chunk to be processed is large
+-	 * enough, so do not enable FPU until it is necessary.
 -	 */
--	if (nbytes < SERPENT_BLOCK_SIZE * SERPENT_PARALLEL_BLOCKS)
+-	if (nbytes < bsize * (unsigned int)fpu_blocks_limit)
 -		return false;
+-
+-	if (desc) {
+-		/* prevent sleeping if FPU is in use */
+-		desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+-	}
 -
 -	kernel_fpu_begin();
 -	return true;
 -}
 -
--static inline void serpent_fpu_end(bool fpu_enabled)
+-static inline void glue_fpu_end(bool fpu_enabled)
 -{
 -	if (fpu_enabled)
 -		kernel_fpu_end();
 -}
 -
--static int ecb_crypt(struct blkcipher_desc *desc, struct blkcipher_walk *walk,
--		     bool enc)
+-static int __glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
+-				   struct blkcipher_desc *desc,
+-				   struct blkcipher_walk *walk)
 -{
+-	void *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	const unsigned int bsize = 128 / 8;
+-	unsigned int nbytes, i, func_bytes;
 -	bool fpu_enabled = false;
--	struct serpent_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize = SERPENT_BLOCK_SIZE;
--	unsigned int nbytes;
 -	int err;
-+	u128 ivs[SERPENT_PARALLEL_BLOCKS - 1];
-+	unsigned int j;
- 
+-
 -	err = blkcipher_walk_virt(desc, walk);
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+	for (j = 0; j < SERPENT_PARALLEL_BLOCKS - 1; j++)
-+		ivs[j] = src[j];
- 
+-
 -	while ((nbytes = walk->nbytes)) {
 -		u8 *wsrc = walk->src.virt.addr;
 -		u8 *wdst = walk->dst.virt.addr;
 -
--		fpu_enabled = serpent_fpu_begin(fpu_enabled, nbytes);
+-		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
+-					     desc, fpu_enabled, nbytes);
 -
--		/* Process multi-block batch */
--		if (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS) {
--			do {
--				if (enc)
--					serpent_enc_blk_xway(ctx, wdst, wsrc);
--				else
--					serpent_dec_blk_xway(ctx, wdst, wsrc);
+-		for (i = 0; i < gctx->num_funcs; i++) {
+-			func_bytes = bsize * gctx->funcs[i].num_blocks;
 -
--				wsrc += bsize * SERPENT_PARALLEL_BLOCKS;
--				wdst += bsize * SERPENT_PARALLEL_BLOCKS;
--				nbytes -= bsize * SERPENT_PARALLEL_BLOCKS;
--			} while (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS);
+-			/* Process multi-block batch */
+-			if (nbytes >= func_bytes) {
+-				do {
+-					gctx->funcs[i].fn_u.ecb(ctx, wdst,
+-								wsrc);
 -
--			if (nbytes < bsize)
--				goto done;
+-					wsrc += func_bytes;
+-					wdst += func_bytes;
+-					nbytes -= func_bytes;
+-				} while (nbytes >= func_bytes);
+-
+-				if (nbytes < bsize)
+-					goto done;
+-			}
 -		}
--
--		/* Handle leftovers */
--		do {
--			if (enc)
--				__serpent_encrypt(ctx, wdst, wsrc);
--			else
--				__serpent_decrypt(ctx, wdst, wsrc);
--
--			wsrc += bsize;
--			wdst += bsize;
--			nbytes -= bsize;
--		} while (nbytes >= bsize);
 -
 -done:
 -		err = blkcipher_walk_done(desc, walk, nbytes);
 -	}
-+	serpent_dec_blk_xway(ctx, (u8 *)dst, (u8 *)src);
- 
--	serpent_fpu_end(fpu_enabled);
+-
+-	glue_fpu_end(fpu_enabled);
 -	return err;
-+	for (j = 0; j < SERPENT_PARALLEL_BLOCKS - 1; j++)
-+		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
- }
- 
--static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
-+static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
- {
+-}
+-
+-int glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
+-			  struct blkcipher_desc *desc, struct scatterlist *dst,
+-			  struct scatterlist *src, unsigned int nbytes)
+-{
 -	struct blkcipher_walk walk;
 -
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
--	return ecb_crypt(desc, &walk, true);
+-	return __glue_ecb_crypt_128bit(gctx, desc, &walk);
 -}
-+	be128 ctrblk;
- 
--static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
+-
+-static unsigned int __glue_cbc_encrypt_128bit(const common_glue_func_t fn,
+-					      struct blkcipher_desc *desc,
+-					      struct blkcipher_walk *walk)
 -{
--	struct blkcipher_walk walk;
-+	u128_to_be128(&ctrblk, iv);
-+	u128_inc(iv);
- 
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	return ecb_crypt(desc, &walk, false);
-+	__serpent_encrypt(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
-+	u128_xor(dst, src, (u128 *)&ctrblk);
- }
- 
--static unsigned int __cbc_encrypt(struct blkcipher_desc *desc,
--				  struct blkcipher_walk *walk)
-+static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
-+				   u128 *iv)
- {
--	struct serpent_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize = SERPENT_BLOCK_SIZE;
+-	void *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	const unsigned int bsize = 128 / 8;
 -	unsigned int nbytes = walk->nbytes;
 -	u128 *src = (u128 *)walk->src.virt.addr;
 -	u128 *dst = (u128 *)walk->dst.virt.addr;
@@ -171,7 +504,7 @@ index 31eb567..c61b91a 100644
 -
 -	do {
 -		u128_xor(dst, src, iv);
--		__serpent_encrypt(ctx, (u8 *)dst, (u8 *)dst);
+-		fn(ctx, (u8 *)dst, (u8 *)dst);
 -		iv = dst;
 -
 -		src += 1;
@@ -182,43 +515,39 @@ index 31eb567..c61b91a 100644
 -	u128_xor((u128 *)walk->iv, (u128 *)walk->iv, iv);
 -	return nbytes;
 -}
-+	be128 ctrblks[SERPENT_PARALLEL_BLOCKS];
-+	unsigned int i;
- 
--static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		       struct scatterlist *src, unsigned int nbytes)
+-
+-int glue_cbc_encrypt_128bit(const common_glue_func_t fn,
+-			    struct blkcipher_desc *desc,
+-			    struct scatterlist *dst,
+-			    struct scatterlist *src, unsigned int nbytes)
 -{
 -	struct blkcipher_walk walk;
 -	int err;
 -
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
 -	err = blkcipher_walk_virt(desc, &walk);
-+	for (i = 0; i < SERPENT_PARALLEL_BLOCKS; i++) {
-+		if (dst != src)
-+			dst[i] = src[i];
- 
+-
 -	while ((nbytes = walk.nbytes)) {
--		nbytes = __cbc_encrypt(desc, &walk);
+-		nbytes = __glue_cbc_encrypt_128bit(fn, desc, &walk);
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
-+		u128_to_be128(&ctrblks[i], iv);
-+		u128_inc(iv);
- 	}
- 
+-	}
+-
 -	return err;
-+	serpent_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
- }
- 
--static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
--				  struct blkcipher_walk *walk)
+-}
+-
+-static unsigned int
+-__glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
+-			  struct blkcipher_desc *desc,
+-			  struct blkcipher_walk *walk)
 -{
--	struct serpent_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize = SERPENT_BLOCK_SIZE;
+-	void *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	const unsigned int bsize = 128 / 8;
 -	unsigned int nbytes = walk->nbytes;
 -	u128 *src = (u128 *)walk->src.virt.addr;
 -	u128 *dst = (u128 *)walk->dst.virt.addr;
--	u128 ivs[SERPENT_PARALLEL_BLOCKS - 1];
 -	u128 last_iv;
--	int i;
+-	unsigned int num_blocks, func_bytes;
+-	unsigned int i;
 -
 -	/* Start of the last block. */
 -	src += nbytes / bsize - 1;
@@ -226,272 +555,321 @@ index 31eb567..c61b91a 100644
 -
 -	last_iv = *src;
 -
--	/* Process multi-block batch */
--	if (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS) {
--		do {
--			nbytes -= bsize * (SERPENT_PARALLEL_BLOCKS - 1);
--			src -= SERPENT_PARALLEL_BLOCKS - 1;
--			dst -= SERPENT_PARALLEL_BLOCKS - 1;
+-	for (i = 0; i < gctx->num_funcs; i++) {
+-		num_blocks = gctx->funcs[i].num_blocks;
+-		func_bytes = bsize * num_blocks;
 -
--			for (i = 0; i < SERPENT_PARALLEL_BLOCKS - 1; i++)
--				ivs[i] = src[i];
+-		/* Process multi-block batch */
+-		if (nbytes >= func_bytes) {
+-			do {
+-				nbytes -= func_bytes - bsize;
+-				src -= num_blocks - 1;
+-				dst -= num_blocks - 1;
 -
--			serpent_dec_blk_xway(ctx, (u8 *)dst, (u8 *)src);
+-				gctx->funcs[i].fn_u.cbc(ctx, dst, src);
 -
--			for (i = 0; i < SERPENT_PARALLEL_BLOCKS - 1; i++)
--				u128_xor(dst + (i + 1), dst + (i + 1), ivs + i);
+-				nbytes -= bsize;
+-				if (nbytes < bsize)
+-					goto done;
 -
--			nbytes -= bsize;
+-				u128_xor(dst, dst, src - 1);
+-				src -= 1;
+-				dst -= 1;
+-			} while (nbytes >= func_bytes);
+-
 -			if (nbytes < bsize)
 -				goto done;
--
--			u128_xor(dst, dst, src - 1);
--			src -= 1;
--			dst -= 1;
--		} while (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
+-		}
 -	}
 -
--	/* Handle leftovers */
--	for (;;) {
--		__serpent_decrypt(ctx, (u8 *)dst, (u8 *)src);
--
--		nbytes -= bsize;
--		if (nbytes < bsize)
--			break;
-+static const struct common_glue_ctx serpent_enc = {
-+	.num_funcs = 2,
-+	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-+
-+	.funcs = { {
-+		.num_blocks = SERPENT_PARALLEL_BLOCKS,
-+		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_enc_blk_xway) }
-+	}, {
-+		.num_blocks = 1,
-+		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_encrypt) }
-+	} }
-+};
- 
--		u128_xor(dst, dst, src - 1);
--		src -= 1;
--		dst -= 1;
--	}
-+static const struct common_glue_ctx serpent_ctr = {
-+	.num_funcs = 2,
-+	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-+
-+	.funcs = { {
-+		.num_blocks = SERPENT_PARALLEL_BLOCKS,
-+		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_crypt_ctr_xway) }
-+	}, {
-+		.num_blocks = 1,
-+		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_crypt_ctr) }
-+	} }
-+};
- 
 -done:
 -	u128_xor(dst, dst, (u128 *)walk->iv);
 -	*(u128 *)walk->iv = last_iv;
-+static const struct common_glue_ctx serpent_dec = {
-+	.num_funcs = 2,
-+	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-+
-+	.funcs = { {
-+		.num_blocks = SERPENT_PARALLEL_BLOCKS,
-+		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_dec_blk_xway) }
-+	}, {
-+		.num_blocks = 1,
-+		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_decrypt) }
-+	} }
-+};
- 
+-
 -	return nbytes;
 -}
-+static const struct common_glue_ctx serpent_dec_cbc = {
-+	.num_funcs = 2,
-+	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-+
-+	.funcs = { {
-+		.num_blocks = SERPENT_PARALLEL_BLOCKS,
-+		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(serpent_decrypt_cbc_xway) }
-+	}, {
-+		.num_blocks = 1,
-+		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(__serpent_decrypt) }
-+	} }
-+};
- 
--static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
- 		       struct scatterlist *src, unsigned int nbytes)
- {
+-
+-int glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
+-			    struct blkcipher_desc *desc,
+-			    struct scatterlist *dst,
+-			    struct scatterlist *src, unsigned int nbytes)
+-{
+-	const unsigned int bsize = 128 / 8;
 -	bool fpu_enabled = false;
 -	struct blkcipher_walk walk;
 -	int err;
 -
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
 -	err = blkcipher_walk_virt(desc, &walk);
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
 -
 -	while ((nbytes = walk.nbytes)) {
--		fpu_enabled = serpent_fpu_begin(fpu_enabled, nbytes);
--		nbytes = __cbc_decrypt(desc, &walk);
+-		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
+-					     desc, fpu_enabled, nbytes);
+-		nbytes = __glue_cbc_decrypt_128bit(gctx, desc, &walk);
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
 -	}
 -
--	serpent_fpu_end(fpu_enabled);
+-	glue_fpu_end(fpu_enabled);
 -	return err;
-+	return glue_ecb_crypt_128bit(&serpent_enc, desc, dst, src, nbytes);
- }
- 
+-}
+-
 -static inline void u128_to_be128(be128 *dst, const u128 *src)
-+static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
- {
+-{
 -	dst->a = cpu_to_be64(src->a);
 -	dst->b = cpu_to_be64(src->b);
-+	return glue_ecb_crypt_128bit(&serpent_dec, desc, dst, src, nbytes);
- }
- 
+-}
+-
 -static inline void be128_to_u128(u128 *dst, const be128 *src)
-+static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
- {
+-{
 -	dst->a = be64_to_cpu(src->a);
 -	dst->b = be64_to_cpu(src->b);
-+	return glue_cbc_encrypt_128bit(GLUE_FUNC_CAST(__serpent_encrypt), desc,
-+				     dst, src, nbytes);
- }
- 
+-}
+-
 -static inline void u128_inc(u128 *i)
-+static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
- {
+-{
 -	i->b++;
 -	if (!i->b)
 -		i->a++;
-+	return glue_cbc_decrypt_128bit(&serpent_dec_cbc, desc, dst, src,
-+				       nbytes);
- }
- 
--static void ctr_crypt_final(struct blkcipher_desc *desc,
--			    struct blkcipher_walk *walk)
-+static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		     struct scatterlist *src, unsigned int nbytes)
- {
--	struct serpent_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	u8 *ctrblk = walk->iv;
--	u8 keystream[SERPENT_BLOCK_SIZE];
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
+-}
+-
+-static void glue_ctr_crypt_final_128bit(const common_glue_ctr_func_t fn_ctr,
+-					struct blkcipher_desc *desc,
+-					struct blkcipher_walk *walk)
+-{
+-	void *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	u8 *src = (u8 *)walk->src.virt.addr;
+-	u8 *dst = (u8 *)walk->dst.virt.addr;
 -	unsigned int nbytes = walk->nbytes;
+-	u128 ctrblk;
+-	u128 tmp;
 -
--	__serpent_encrypt(ctx, keystream, ctrblk);
--	crypto_xor(keystream, src, nbytes);
--	memcpy(dst, keystream, nbytes);
+-	be128_to_u128(&ctrblk, (be128 *)walk->iv);
 -
--	crypto_inc(ctrblk, SERPENT_BLOCK_SIZE);
-+	return glue_ctr_crypt_128bit(&serpent_ctr, desc, dst, src, nbytes);
- }
- 
--static unsigned int __ctr_crypt(struct blkcipher_desc *desc,
--				struct blkcipher_walk *walk)
-+static inline bool serpent_fpu_begin(bool fpu_enabled, unsigned int nbytes)
- {
--	struct serpent_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize = SERPENT_BLOCK_SIZE;
+-	memcpy(&tmp, src, nbytes);
+-	fn_ctr(ctx, &tmp, &tmp, &ctrblk);
+-	memcpy(dst, &tmp, nbytes);
+-
+-	u128_to_be128((be128 *)walk->iv, &ctrblk);
+-}
+-
+-static unsigned int __glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
+-					    struct blkcipher_desc *desc,
+-					    struct blkcipher_walk *walk)
+-{
+-	const unsigned int bsize = 128 / 8;
+-	void *ctx = crypto_blkcipher_ctx(desc->tfm);
 -	unsigned int nbytes = walk->nbytes;
 -	u128 *src = (u128 *)walk->src.virt.addr;
 -	u128 *dst = (u128 *)walk->dst.virt.addr;
 -	u128 ctrblk;
--	be128 ctrblocks[SERPENT_PARALLEL_BLOCKS];
--	int i;
+-	unsigned int num_blocks, func_bytes;
+-	unsigned int i;
 -
 -	be128_to_u128(&ctrblk, (be128 *)walk->iv);
 -
 -	/* Process multi-block batch */
--	if (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS) {
--		do {
--			/* create ctrblks for parallel encrypt */
--			for (i = 0; i < SERPENT_PARALLEL_BLOCKS; i++) {
--				if (dst != src)
--					dst[i] = src[i];
+-	for (i = 0; i < gctx->num_funcs; i++) {
+-		num_blocks = gctx->funcs[i].num_blocks;
+-		func_bytes = bsize * num_blocks;
 -
--				u128_to_be128(&ctrblocks[i], &ctrblk);
--				u128_inc(&ctrblk);
--			}
+-		if (nbytes >= func_bytes) {
+-			do {
+-				gctx->funcs[i].fn_u.ctr(ctx, dst, src, &ctrblk);
 -
--			serpent_enc_blk_xway_xor(ctx, (u8 *)dst,
--						 (u8 *)ctrblocks);
+-				src += num_blocks;
+-				dst += num_blocks;
+-				nbytes -= func_bytes;
+-			} while (nbytes >= func_bytes);
 -
--			src += SERPENT_PARALLEL_BLOCKS;
--			dst += SERPENT_PARALLEL_BLOCKS;
--			nbytes -= bsize * SERPENT_PARALLEL_BLOCKS;
--		} while (nbytes >= bsize * SERPENT_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
+-			if (nbytes < bsize)
+-				goto done;
+-		}
 -	}
--
--	/* Handle leftovers */
--	do {
--		if (dst != src)
--			*dst = *src;
--
--		u128_to_be128(&ctrblocks[0], &ctrblk);
--		u128_inc(&ctrblk);
--
--		__serpent_encrypt(ctx, (u8 *)ctrblocks, (u8 *)ctrblocks);
--		u128_xor(dst, dst, (u128 *)ctrblocks);
--
--		src += 1;
--		dst += 1;
--		nbytes -= bsize;
--	} while (nbytes >= bsize);
 -
 -done:
 -	u128_to_be128((be128 *)walk->iv, &ctrblk);
 -	return nbytes;
-+	return glue_fpu_begin(SERPENT_BLOCK_SIZE, SERPENT_PARALLEL_BLOCKS,
-+			      NULL, fpu_enabled, nbytes);
- }
- 
--static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--		     struct scatterlist *src, unsigned int nbytes)
-+static inline void serpent_fpu_end(bool fpu_enabled)
- {
+-}
+-
+-int glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
+-			  struct blkcipher_desc *desc, struct scatterlist *dst,
+-			  struct scatterlist *src, unsigned int nbytes)
+-{
+-	const unsigned int bsize = 128 / 8;
 -	bool fpu_enabled = false;
 -	struct blkcipher_walk walk;
 -	int err;
 -
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt_block(desc, &walk, SERPENT_BLOCK_SIZE);
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+-	err = blkcipher_walk_virt_block(desc, &walk, bsize);
 -
--	while ((nbytes = walk.nbytes) >= SERPENT_BLOCK_SIZE) {
--		fpu_enabled = serpent_fpu_begin(fpu_enabled, nbytes);
--		nbytes = __ctr_crypt(desc, &walk);
+-	while ((nbytes = walk.nbytes) >= bsize) {
+-		fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
+-					     desc, fpu_enabled, nbytes);
+-		nbytes = __glue_ctr_crypt_128bit(gctx, desc, &walk);
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
 -	}
 -
--	serpent_fpu_end(fpu_enabled);
+-	glue_fpu_end(fpu_enabled);
 -
 -	if (walk.nbytes) {
--		ctr_crypt_final(desc, &walk);
+-		glue_ctr_crypt_final_128bit(
+-			gctx->funcs[gctx->num_funcs - 1].fn_u.ctr, desc, &walk);
 -		err = blkcipher_walk_done(desc, &walk, 0);
 -	}
 -
 -	return err;
-+	glue_fpu_end(fpu_enabled);
- }
+-}
++#include <asm/crypto/glue_helper.h>
  
- struct crypt_priv {
+ static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
+ {
+diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
+new file mode 100644
+index 0000000..3e408bd
+--- /dev/null
++++ b/arch/x86/include/asm/crypto/glue_helper.h
+@@ -0,0 +1,115 @@
++/*
++ * Shared glue code for 128bit block ciphers
++ */
++
++#ifndef _CRYPTO_GLUE_HELPER_H
++#define _CRYPTO_GLUE_HELPER_H
++
++#include <linux/kernel.h>
++#include <linux/crypto.h>
++#include <asm/i387.h>
++#include <crypto/b128ops.h>
++
++typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
++typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
++typedef void (*common_glue_ctr_func_t)(void *ctx, u128 *dst, const u128 *src,
++				       u128 *iv);
++
++#define GLUE_FUNC_CAST(fn) ((common_glue_func_t)(fn))
++#define GLUE_CBC_FUNC_CAST(fn) ((common_glue_cbc_func_t)(fn))
++#define GLUE_CTR_FUNC_CAST(fn) ((common_glue_ctr_func_t)(fn))
++
++struct common_glue_func_entry {
++	unsigned int num_blocks; /* number of blocks that @fn will process */
++	union {
++		common_glue_func_t ecb;
++		common_glue_cbc_func_t cbc;
++		common_glue_ctr_func_t ctr;
++	} fn_u;
++};
++
++struct common_glue_ctx {
++	unsigned int num_funcs;
++	int fpu_blocks_limit; /* -1 means fpu not needed at all */
++
++	/*
++	 * First funcs entry must have largest num_blocks and last funcs entry
++	 * must have num_blocks == 1!
++	 */
++	struct common_glue_func_entry funcs[];
++};
++
++static inline bool glue_fpu_begin(unsigned int bsize, int fpu_blocks_limit,
++				  struct blkcipher_desc *desc,
++				  bool fpu_enabled, unsigned int nbytes)
++{
++	if (likely(fpu_blocks_limit < 0))
++		return false;
++
++	if (fpu_enabled)
++		return true;
++
++	/*
++	 * Vector-registers are only used when chunk to be processed is large
++	 * enough, so do not enable FPU until it is necessary.
++	 */
++	if (nbytes < bsize * (unsigned int)fpu_blocks_limit)
++		return false;
++
++	if (desc) {
++		/* prevent sleeping if FPU is in use */
++		desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	}
++
++	kernel_fpu_begin();
++	return true;
++}
++
++static inline void glue_fpu_end(bool fpu_enabled)
++{
++	if (fpu_enabled)
++		kernel_fpu_end();
++}
++
++static inline void u128_to_be128(be128 *dst, const u128 *src)
++{
++	dst->a = cpu_to_be64(src->a);
++	dst->b = cpu_to_be64(src->b);
++}
++
++static inline void be128_to_u128(u128 *dst, const be128 *src)
++{
++	dst->a = be64_to_cpu(src->a);
++	dst->b = be64_to_cpu(src->b);
++}
++
++static inline void u128_inc(u128 *i)
++{
++	i->b++;
++	if (!i->b)
++		i->a++;
++}
++
++extern int glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
++				 struct blkcipher_desc *desc,
++				 struct scatterlist *dst,
++				 struct scatterlist *src, unsigned int nbytes);
++
++extern int glue_cbc_encrypt_128bit(const common_glue_func_t fn,
++				   struct blkcipher_desc *desc,
++				   struct scatterlist *dst,
++				   struct scatterlist *src,
++				   unsigned int nbytes);
++
++extern int glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
++				   struct blkcipher_desc *desc,
++				   struct scatterlist *dst,
++				   struct scatterlist *src,
++				   unsigned int nbytes);
++
++extern int glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
++				 struct blkcipher_desc *desc,
++				 struct scatterlist *dst,
++				 struct scatterlist *src, unsigned int nbytes);
++
++#endif /* _CRYPTO_GLUE_HELPER_H */
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 92b4697..a86c2fb 100644
+index 471cc46..92b4697 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -842,6 +842,7 @@ config CRYPTO_SERPENT_AVX_X86_64
+@@ -179,6 +179,11 @@ config CRYPTO_ABLK_HELPER_X86
+ 	depends on X86
+ 	select CRYPTO_CRYPTD
+ 
++config CRYPTO_GLUE_HELPER_X86
++	tristate
++	depends on X86
++	select CRYPTO_ALGAPI
++
+ comment "Authenticated Encryption with Associated Data"
+ 
+ config CRYPTO_CCM
+@@ -793,6 +798,7 @@ config CRYPTO_SERPENT_SSE2_X86_64
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+ 	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SERPENT
+ 	select CRYPTO_LRW
+ 	select CRYPTO_XTS
+@@ -814,6 +820,7 @@ config CRYPTO_SERPENT_SSE2_586
  	select CRYPTO_ALGAPI
  	select CRYPTO_CRYPTD
  	select CRYPTO_ABLK_HELPER_X86
