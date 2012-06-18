@@ -1,50 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.5
-Date: Mon, 18 Jun 2012 16:24:41 +0800
-Message-ID: <20120618082441.GA24732@gondor.apana.org.au>
-References: <20100722055043.GA25689@gondor.apana.org.au>
- <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120322012046.GA8854@gondor.apana.org.au>
- <20120611130027.GA6407@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: aes - make assembler implementation default
+ for i386 and x86-64
+Date: Mon, 18 Jun 2012 17:02:01 +0800
+Message-ID: <20120618090201.GA25104@gondor.apana.org.au>
+References: <20120530215333.32995tjzj9dr4jwo@www.81.fi>
+ <20120609145055.12766.42439.stgit@localhost6.localdomain6>
+ <20120612082651.GA13419@gondor.apana.org.au>
+ <20120612212518.22246qw5kuyn2osg@www.81.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Cc: linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+	Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sting.hengli.com.au ([178.18.18.71]:33235 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753628Ab2FRJCO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Jun 2012 05:02:14 -0400
 Content-Disposition: inline
-In-Reply-To: <20120611130027.GA6407@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20120612212518.22246qw5kuyn2osg@www.81.fi>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Tue, Jun 12, 2012 at 09:25:18PM +0300, Jussi Kivilinna wrote:
+>
+> Well, how about letting arch specific assembler implementations
+> replace aes-generic
+> completely.. in this case add "depends on !X86" on
+> CRYPTO_AES_GENERIC. Hardware
+> modules get autoloaded (cpuid/pci/platform/etc) but generic
+> assembler implementation
+> might as well be replacement as it cannot autoload depending on
+> hardware support (or
+> it can, but will be always loaded).
 
-This push fixes another bug in the atmel-rng that made it produce
-completely useless output.
+Perhaps we can just force a modprobe of a given algorithm at least
+once for each boot (when requested for the first time).  I think
+that should be easy to implement and should solve your problem
+scenario.
 
+What do you think?
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Peter Korsgaard (1):
-      hwrng: atmel-rng - fix data valid check
-
- drivers/char/hw_random/atmel-rng.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
- 
 Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
