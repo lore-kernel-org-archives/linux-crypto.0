@@ -1,99 +1,161 @@
-From: Simon Baatz <gmbnomis@gmail.com>
-Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
-Date: Mon, 18 Jun 2012 22:12:36 +0200
-Message-ID: <20120618201235.GA20755@schnuecks.de>
-References: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
- <1339806021-14271-1-git-send-email-gmbnomis@gmail.com>
- <20120618134718.GL9122@philter.vipri.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: algapi - Move larval completion into algboss
+Date: Tue, 19 Jun 2012 13:46:12 +0800
+Message-ID: <20120619054612.GA31820@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Simon Baatz <gmbnomis@gmail.com>, linux-crypto@vger.kernel.org,
-	cloudy.linux@gmail.com, andrew@lunn.ch
-To: Phil Sutter <phil.sutter@viprinet.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ee0-f46.google.com ([74.125.83.46]:61148 "EHLO
-	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751388Ab2FRUMj (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:37883 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751942Ab2FSFqO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 Jun 2012 16:12:39 -0400
-Received: by eeit10 with SMTP id t10so1749992eei.19
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Jun 2012 13:12:38 -0700 (PDT)
+	Tue, 19 Jun 2012 01:46:14 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by fornost.hengli.com.au with esmtp (Exim 4.72 #1 (Debian))
+	id 1SgrGW-0000Xv-U2
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Jun 2012 15:46:13 +1000
+Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.72)
+	(envelope-from <herbert@gondor.apana.org.au>)
+	id 1SgrGW-0008IO-NN
+	for linux-crypto@vger.kernel.org; Tue, 19 Jun 2012 13:46:12 +0800
 Content-Disposition: inline
-In-Reply-To: <20120618134718.GL9122@philter.vipri.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Phil,
+Hi:
 
-On Mon, Jun 18, 2012 at 03:47:18PM +0200, Phil Sutter wrote:
-> On Sat, Jun 16, 2012 at 02:20:19AM +0200, Simon Baatz wrote:
-> > thanks for providing these patches; it's great to finally see DMA
-> > support for CESA in the kernel. Additionally, the implementation seems
-> > to be fine regarding cache incoherencies (at least my test in [*]
-> > works).
-> 
-> Thanks for testing and the fixes. Could you also specify the platform
-> you are testing on?
+crypto: algapi - Move larval completion into algboss
 
-This is a Marvell Kirkwood MV88F6281-A1. 
+It has been observed that sometimes the crypto allocation code
+will get stuck for 60 seconds or multiples thereof.  This is
+usually caused by an algorithm failing to pass the self-test.
 
-I see one effect that I don't fully understand. 
-Similar to the previous implementation, the system is mostly in
-kernel space when accessing an encrypted dm-crypt device:
+If an algorithm fails to be constructed, we will immediately notify
+all larval waiters.  However, if it succeeds in construction, but
+then fails the self-test, we won't notify anyone at all.
 
-# cryptsetup --cipher=aes-cbc-plain --key-size=128 create c_sda2 /dev/sda2 
-Enter passphrase: 
-# dd if=/dev/mapper/c_sda2 of=/dev/null bs=64k count=2048
-2048+0 records in
-2048+0 records out
-134217728 bytes (134 MB) copied, 10.7324 s, 12.5 MB/s
+This patch fixes this by merging the notification in the case
+where the algorithm fails to be constructed with that of the
+the case where it pases the self-test.  This way regardless of
+what happens, we'll give the larval waiters an answer.
 
-Doing an "mpstat 1" at the same time gives:
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-21:21:42     CPU    %usr   %nice    %sys %iowait    %irq   %soft ...
-21:21:45     all    0.00    0.00    0.00    0.00    0.00    0.00
-21:21:46     all    0.00    0.00   79.00    0.00    0.00    2.00
-21:21:47     all    0.00    0.00   95.00    0.00    0.00    5.00
-21:21:48     all    0.00    0.00   94.00    0.00    0.00    6.00
-21:21:49     all    0.00    0.00   96.00    0.00    0.00    4.00
-...
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 056571b..c3b9bfe 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -24,22 +24,6 @@
+ 
+ static LIST_HEAD(crypto_template_list);
+ 
+-void crypto_larval_error(const char *name, u32 type, u32 mask)
+-{
+-	struct crypto_alg *alg;
+-
+-	alg = crypto_alg_lookup(name, type, mask);
+-
+-	if (alg) {
+-		if (crypto_is_larval(alg)) {
+-			struct crypto_larval *larval = (void *)alg;
+-			complete_all(&larval->completion);
+-		}
+-		crypto_mod_put(alg);
+-	}
+-}
+-EXPORT_SYMBOL_GPL(crypto_larval_error);
+-
+ static inline int crypto_set_driver_name(struct crypto_alg *alg)
+ {
+ 	static const char suffix[] = "-generic";
+@@ -295,7 +279,6 @@ found:
+ 				continue;
+ 
+ 			larval->adult = alg;
+-			complete_all(&larval->completion);
+ 			continue;
+ 		}
+ 
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 791d194..368a832 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include <crypto/internal/aead.h>
++#include <linux/completion.h>
+ #include <linux/ctype.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+@@ -47,6 +48,8 @@ struct cryptomgr_param {
+ 	char larval[CRYPTO_MAX_ALG_NAME];
+ 	char template[CRYPTO_MAX_ALG_NAME];
+ 
++	struct completion completion;
++
+ 	u32 otype;
+ 	u32 omask;
+ };
+@@ -66,7 +69,7 @@ static int cryptomgr_probe(void *data)
+ 
+ 	tmpl = crypto_lookup_template(param->template);
+ 	if (!tmpl)
+-		goto err;
++		goto out;
+ 
+ 	do {
+ 		if (tmpl->create) {
+@@ -83,16 +86,10 @@ static int cryptomgr_probe(void *data)
+ 
+ 	crypto_tmpl_put(tmpl);
+ 
+-	if (err)
+-		goto err;
+-
+ out:
++	complete(&param->completion);
+ 	kfree(param);
+ 	module_put_and_exit(0);
+-
+-err:
+-	crypto_larval_error(param->larval, param->otype, param->omask);
+-	goto out;
+ }
+ 
+ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+@@ -192,10 +189,15 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+ 
+ 	memcpy(param->larval, larval->alg.cra_name, CRYPTO_MAX_ALG_NAME);
+ 
++	init_completion(&param->completion);
++
+ 	thread = kthread_run(cryptomgr_probe, param, "cryptomgr_probe");
+ 	if (IS_ERR(thread))
+ 		goto err_free_param;
+ 
++	wait_for_completion_interruptible_timeout(&param->completion, 60 * HZ);
++	complete_all(&larval->completion);
++
+ 	return NOTIFY_STOP;
+ 
+ err_free_param:
+diff --git a/crypto/internal.h b/crypto/internal.h
+index b865ca1..9ebedae 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -83,7 +83,6 @@ void crypto_exit_compress_ops(struct crypto_tfm *tfm);
+ struct crypto_larval *crypto_larval_alloc(const char *name, u32 type, u32 mask);
+ void crypto_larval_kill(struct crypto_alg *alg);
+ struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask);
+-void crypto_larval_error(const char *name, u32 type, u32 mask);
+ void crypto_alg_tested(const char *name, int err);
+ 
+ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 
-The underlying device is a SATA drive and should not be the limit:
-
-# dd if=/dev/sda2 of=/dev/null bs=64k count=2048
-2048+0 records in
-2048+0 records out
-134217728 bytes (134 MB) copied, 1.79804 s, 74.6 MB/s
-
-I did not dare hope the DMA implementation to be much faster than the
-old one, but I would have expected a rather low CPU usage using DMA. 
-Do you have an idea where the kernel spends its time?  (Am I hitting
-a non/only partially accelerated path here?)
-
-> > - My system locked up hard when mv_dma and mv_cesa were built as
-> >   modules. mv_cesa has code to enable the crypto clock in 3.5, but
-> >   mv_dma already accesses the CESA engine before. Thus, we need to
-> >   enable this clock here, too.
-> 
-> I have folded them into my patch series, thanks again. I somewhat miss
-> the orion_clkdev_add() part for orion5x platforms, but also fail to find
-> any equivalent place in the correspondent subdirectory. So I hope it is
-> OK like this.
-
-The change follows the original clk changes by Andrew. I don't know
-orion5x, but apparently, only kirkwood has such fine grained clock
-gates:
-
-/* Create clkdev entries for all orion platforms except kirkwood.
-   Kirkwood has gated clocks for some of its peripherals, so creates
-   its own clkdev entries. For all the other orion devices, create
-   clkdev entries to the tclk. */
-
-(from plat-orion/common.c)
-
-This is why the clock enabling code in the modules ignores the case
-that the clock can't be found.  I think the clocks defined by
-plat-orion are for those drivers that need the actual TCLK rate (but
-there is no clock gate functionality here).
-
-- Simon
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
