@@ -1,30 +1,41 @@
-From: Ronen Shitrit <rshitrit@gmail.com>
-Subject: GCM counter inc
-Date: Wed, 20 Jun 2012 11:44:14 +0300
-Message-ID: <CAHFzjDAWhbM+MYAGs1P+6Ewb1VBG6z2n4c6HGYphMGpFdt8xTA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] Generic crypto counters
+Date: Wed, 20 Jun 2012 17:24:14 +0800
+Message-ID: <20120620092414.GA8928@gondor.apana.org.au>
+References: <1339744473.8069.28.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Jan Glauber <jang@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f174.google.com ([209.85.217.174]:56632 "EHLO
-	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753148Ab2FTIoQ (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:40833 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751884Ab2FTJYV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Jun 2012 04:44:16 -0400
-Received: by lbbgm6 with SMTP id gm6so294877lbb.19
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Jun 2012 01:44:15 -0700 (PDT)
+	Wed, 20 Jun 2012 05:24:21 -0400
+Content-Disposition: inline
+In-Reply-To: <1339744473.8069.28.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi
+On Fri, Jun 15, 2012 at 09:14:33AM +0200, Jan Glauber wrote:
+>
+> Simple counters for the number of processed bytes per algorithm is
+> something which I wanted to have for some time now. The reason is that
+> its not obvious to tell if the hardware or software implementation
+> was used. The only way to determine this currently is to look at the
+> speed of the operation or add debug output, both methods kind of suck.
 
-According to the GCM NIST publication, the counter increment should be
-module 32 bit.
-Looking into the crypto code, I can see that when using gcm(aes) the
-gcm will use the ctr over aes,
-ctr.c is using the crypto_inc with size of blocksize, which is 16 for AES.
-in case crypto_inc will overflow in 32bit it will inc the next 32bit...
+You can query /proc/crypto and look at the ref count to see which
+algorithm is in use.
 
-Is this a bug or am I missing something?
+However, I'm certainly not against having usage counters since they
+would be quite useful in their own right.  BTW, we now have a user-
+space interface in crypto/crypto_user.c.  So when you add stuff to
+/proc/crypto please consider adding it to crypto_user as well.
 
-Regards
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
