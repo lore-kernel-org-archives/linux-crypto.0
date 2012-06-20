@@ -1,60 +1,45 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto: aes - make assembler implementation default
- for i386 and x86-64
-Date: Wed, 20 Jun 2012 14:49:07 +0300
-Message-ID: <20120620144907.19996rt0vpgn7zys@www.81.fi>
-References: <20120530215333.32995tjzj9dr4jwo@www.81.fi>
- <20120609145055.12766.42439.stgit@localhost6.localdomain6>
- <20120612082651.GA13419@gondor.apana.org.au>
- <20120612212518.22246qw5kuyn2osg@www.81.fi>
- <20120618090201.GA25104@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: tcrypt - Add mode 500 for ablkcipher test
+Date: Wed, 20 Jun 2012 14:54:43 +0300
+Message-ID: <20120620145443.86813sdrpknxwzs4@www.81.fi>
+References: <1340190704-6445-1-git-send-email-arun.murthy@stericsson.com>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=ISO-8859-1;
  DelSp="Yes";
  format="flowed"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20120618090201.GA25104@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	Berne Hebark <berne.hebark@stericsson.com>
+To: Arun Murthy <arun.murthy@stericsson.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:37409 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754775Ab2FTLyq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 Jun 2012 07:54:46 -0400
+In-Reply-To: <1340190704-6445-1-git-send-email-arun.murthy@stericsson.com>
 Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Herbert Xu <herbert@gondor.apana.org.au>:
+Quoting Arun Murthy <arun.murthy@stericsson.com>:
 
-> On Tue, Jun 12, 2012 at 09:25:18PM +0300, Jussi Kivilinna wrote:
->>
->> Well, how about letting arch specific assembler implementations
->> replace aes-generic
->> completely.. in this case add "depends on !X86" on
->> CRYPTO_AES_GENERIC. Hardware
->> modules get autoloaded (cpuid/pci/platform/etc) but generic
->> assembler implementation
->> might as well be replacement as it cannot autoload depending on
->> hardware support (or
->> it can, but will be always loaded).
+> The existing mode 200 performs ecb(aes), cbc(aes), ctr(aes),  
+> ecb(des), cbc(des)
+> ecb(des3_ede), cbc(des3_ede) for synchronous block cihper. For  
+> crypto hardware
+> drivers ablkcipher's are used and hence add new mode 500 and its variants to
+> perform the tests in asynchronous block cipher.
 >
-> Perhaps we can just force a modprobe of a given algorithm at least
-> once for each boot (when requested for the first time).  I think
-> that should be easy to implement and should solve your problem
-> scenario.
->
-> What do you think?
+> Signed-off-by: Arun Murthy <arun.murthy@stericsson.com>
+> Signed-off-by: Berne Hebark <berne.hebark@stericsson.com>
+> Acked-by: Srinidhi Kasagar <srinidhi.kasagar@stericsson.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-Well, that could work.
+Which tree are you using?
+
+Commit 3f3baf359dd3cc56fbaf9a2fb1a425ce7c18dbff added async cipher  
+speed tests for v3.3.
 
 -Jussi
-
-
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
->
