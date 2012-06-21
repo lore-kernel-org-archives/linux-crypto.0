@@ -1,79 +1,51 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
-Date: Wed, 20 Jun 2012 17:41:31 +0200
-Message-ID: <20120620154131.GR9122@philter.vipri.net>
-References: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
- <1339806021-14271-1-git-send-email-gmbnomis@gmail.com>
- <20120618134718.GL9122@philter.vipri.net>
- <20120618201235.GA20755@schnuecks.de>
- <4FE1D09E.4040104@gmail.com>
+From: Arun MURTHY <arun.murthy@stericsson.com>
+Subject: RE: [PATCH] crypto: tcrypt - Add mode 500 for ablkcipher test
+Date: Thu, 21 Jun 2012 06:20:47 +0200
+Message-ID: <F45880696056844FA6A73F415B568C69595AFC1A06@EXDCVYMBSTM006.EQ1STM.local>
+References: <1340190704-6445-1-git-send-email-arun.murthy@stericsson.com>
+ <20120620145443.86813sdrpknxwzs4@www.81.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, andrew@lunn.ch,
-	Simon Baatz <gmbnomis@gmail.com>
-To: "cloudy.linux" <cloudy.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Berne HEBARK <berne.hebark@stericsson.com>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:33776 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756779Ab2FTPlk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Jun 2012 11:41:40 -0400
-Content-Disposition: inline
-In-Reply-To: <4FE1D09E.4040104@gmail.com>
+Received: from eu1sys200aog106.obsmtp.com ([207.126.144.121]:55110 "EHLO
+	eu1sys200aog106.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751900Ab2FUEV7 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 21 Jun 2012 00:21:59 -0400
+In-Reply-To: <20120620145443.86813sdrpknxwzs4@www.81.fi>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Cloudy,
+> Quoting Arun Murthy <arun.murthy@stericsson.com>:
+> 
+> > The existing mode 200 performs ecb(aes), cbc(aes), ctr(aes),
+> > ecb(des), cbc(des)
+> > ecb(des3_ede), cbc(des3_ede) for synchronous block cihper. For
+> > crypto hardware
+> > drivers ablkcipher's are used and hence add new mode 500 and its
+> variants to
+> > perform the tests in asynchronous block cipher.
+> >
+> > Signed-off-by: Arun Murthy <arun.murthy@stericsson.com>
+> > Signed-off-by: Berne Hebark <berne.hebark@stericsson.com>
+> > Acked-by: Srinidhi Kasagar <srinidhi.kasagar@stericsson.com>
+> > Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> 
+> Which tree are you using?
+> 
+> Commit 3f3baf359dd3cc56fbaf9a2fb1a425ce7c18dbff added async cipher
+> speed tests for v3.3.
+> 
 
-On Wed, Jun 20, 2012 at 09:31:10PM +0800, cloudy.linux wrote:
-> On 2012-6-19 4:12, Simon Baatz wrote:
-> > I see one effect that I don't fully understand.
-> > Similar to the previous implementation, the system is mostly in
-> > kernel space when accessing an encrypted dm-crypt device:
->=20
-> Today I also compiled the patched 3.5.0-rc3 for another NAS box with=20
-> MV88F6282-Rev-A0 (LS-WVL), I noticed one thing that when the CESA eng=
-ine=20
-> was used, the interrupt number of mv_crypto kept rising, but the=20
-> interrupt number of mv_tdma was always zero.
+Sorry for spamming, unknowingly I was working on a different branch.
 
-Yes, that is exactly how it should be: the DMA engine is configured to
-run "attached" to CESA, meaning that when CESA is triggered from
-mv_cesa.c, it first enables the DMA engine. Using a special descriptor
-in the chain, the DMA engine knows when to stop and signals CESA again
-so it can start the crypto operation. Afterwards, CESA triggers the DMA
-engine again for copying back the results (or more specific: process th=
-e
-remaining descriptors in the chain after the special one). After a
-descriptor with it's next descriptor field being zero has been handled,
-CESA is signaled again which in turn generates the interrupt to signal
-the software. So no DMA interrupt needed, and no software interaction i=
-n
-between data copying and crypto operation, of course. :)
-
-Greetings, Phil
-
-PS: I am currently working at the address decoding problem, will get
-back to in a few days when I have something to test. So stay tuned!
-
-Phil Sutter
-Software Engineer
-
---=20
-
-
-Viprinet GmbH
-Mainzer Str. 43
-55411 Bingen am Rhein
-Germany
-
-Phone/Zentrale:         +49-6721-49030-0
-Direct line/Durchwahl:  +49-6721-49030-134
-=46ax:                    +49-6721-49030-209
-
-phil.sutter@viprinet.com
-http://www.viprinet.com
-
-Registered office/Sitz der Gesellschaft: Bingen am Rhein
-Commercial register/Handelsregister: Amtsgericht Mainz HRB40380
-CEO/Gesch=C3=A4ftsf=C3=BChrer: Simon Kissel
+Thanks and Regards,
+Arun R Murthy
+-------------
