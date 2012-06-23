@@ -1,557 +1,143 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 08/20] crypto: caam - refactor key_gen, sg
-Date: Fri, 22 Jun 2012 19:48:45 -0500
-Message-ID: <1340412537-2325-3-git-send-email-kim.phillips@freescale.com>
+Subject: [PATCH 06/20] crypto: caam - support external seq in/out lengths
+Date: Fri, 22 Jun 2012 19:48:43 -0500
+Message-ID: <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
 References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
- <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.208] ([213.199.154.208]:19056 "EHLO
+Received: from [213.199.154.209] ([213.199.154.209]:48689 "EHLO
 	am1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S933196Ab2FWAwD (ORCPT
+	by vger.kernel.org with ESMTP id S933255Ab2FWAwI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2012 20:52:03 -0400
-In-Reply-To: <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
+	Fri, 22 Jun 2012 20:52:08 -0400
+In-Reply-To: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Yuan Kang <Yuan.Kang@freescale.com>
 
-create separate files for split key generation and scatterlist functions.
+functions for external storage of seq in/out lengths,
+i.e., for 32-bit lengths.
+
+These type-dependent functions automatically determine whether to
+store the length internally (embedded in the command header word) or
+externally (after the address pointer), based on size of the type
+given.
 
 Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/Makefile      |   2 +-
- drivers/crypto/caam/caamalg.c     | 197 ++------------------------------------
- drivers/crypto/caam/desc.h        |  10 ++
- drivers/crypto/caam/key_gen.c     | 122 +++++++++++++++++++++++
- drivers/crypto/caam/key_gen.h     |  17 ++++
- drivers/crypto/caam/sg_link_tbl.h |  84 ++++++++++++++++
- 6 files changed, 242 insertions(+), 190 deletions(-)
- create mode 100644 drivers/crypto/caam/key_gen.c
- create mode 100644 drivers/crypto/caam/key_gen.h
- create mode 100644 drivers/crypto/caam/sg_link_tbl.h
+ drivers/crypto/caam/caamalg.c     |  5 ++--
+ drivers/crypto/caam/desc_constr.h | 49 +++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 50 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index ef39011..4447e57 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -5,4 +5,4 @@
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
- 
--caam-objs := ctrl.o jr.o error.o
-+caam-objs := ctrl.o jr.o error.o key_gen.o
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index a4e266f..ea0295d 100644
+index 5c10dc5..d0f8df1 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -51,6 +51,8 @@
- #include "desc_constr.h"
- #include "jr.h"
- #include "error.h"
-+#include "sg_link_tbl.h"
-+#include "key_gen.h"
+@@ -37,9 +37,10 @@
+  * | ShareDesc Pointer |
+  * | SEQ_OUT_PTR       |
+  * | (output buffer)   |
++ * | (output length)   |
+  * | SEQ_IN_PTR        |
+  * | (input buffer)    |
+- * | LOAD (to DECO)    |
++ * | (input length)    |
+  * ---------------------
+  */
  
- /*
-  * crypto alg
-@@ -453,121 +455,12 @@ static int aead_setauthsize(struct crypto_aead *authenc,
- 	return 0;
+@@ -62,7 +63,7 @@
+ #define CAAM_MAX_IV_LENGTH		16
+ 
+ /* length of descriptors text */
+-#define DESC_JOB_IO_LEN			(CAAM_CMD_SZ * 3 + CAAM_PTR_SZ * 3)
++#define DESC_JOB_IO_LEN			(CAAM_CMD_SZ * 5 + CAAM_PTR_SZ * 3)
+ 
+ #define DESC_AEAD_BASE			(4 * CAAM_CMD_SZ)
+ #define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 16 * CAAM_CMD_SZ)
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 8e1056f..c85c1f0 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -117,6 +117,15 @@ static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
+ 	append_ptr(desc, ptr);
  }
  
--struct split_key_result {
--	struct completion completion;
--	int err;
--};
--
--static void split_key_done(struct device *dev, u32 *desc, u32 err,
--			   void *context)
-+static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
-+			      u32 authkeylen)
++/* Write length after pointer, rather than inside command */
++static inline void append_cmd_ptr_extlen(u32 *desc, dma_addr_t ptr,
++					 unsigned int len, u32 command)
++{
++	append_cmd(desc, command);
++	append_ptr(desc, ptr);
++	append_cmd(desc, len);
++}
++
+ static inline void append_cmd_data(u32 *desc, void *data, int len,
+ 				   u32 command)
  {
--	struct split_key_result *res = context;
--
--#ifdef DEBUG
--	dev_err(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--#endif
--
--	if (err) {
--		char tmp[CAAM_ERROR_STR_MAX];
--
--		dev_err(dev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
--	}
--
--	res->err = err;
--
--	complete(&res->completion);
--}
--
--/*
--get a split ipad/opad key
--
--Split key generation-----------------------------------------------
--
--[00] 0xb0810008    jobdesc: stidx=1 share=never len=8
--[01] 0x04000014        key: class2->keyreg len=20
--			@0xffe01000
--[03] 0x84410014  operation: cls2-op sha1 hmac init dec
--[04] 0x24940000     fifold: class2 msgdata-last2 len=0 imm
--[05] 0xa4000001       jump: class2 local all ->1 [06]
--[06] 0x64260028    fifostr: class2 mdsplit-jdk len=40
--			@0xffe04000
--*/
--static u32 gen_split_key(struct caam_ctx *ctx, const u8 *key_in, u32 authkeylen)
--{
--	struct device *jrdev = ctx->jrdev;
--	u32 *desc;
--	struct split_key_result result;
--	dma_addr_t dma_addr_in, dma_addr_out;
--	int ret = 0;
--
--	desc = kmalloc(CAAM_CMD_SZ * 6 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
--
--	init_job_desc(desc, 0);
--
--	dma_addr_in = dma_map_single(jrdev, (void *)key_in, authkeylen,
--				     DMA_TO_DEVICE);
--	if (dma_mapping_error(jrdev, dma_addr_in)) {
--		dev_err(jrdev, "unable to map key input memory\n");
--		kfree(desc);
--		return -ENOMEM;
--	}
--	append_key(desc, dma_addr_in, authkeylen, CLASS_2 |
--		       KEY_DEST_CLASS_REG);
--
--	/* Sets MDHA up into an HMAC-INIT */
--	append_operation(desc, ctx->alg_op | OP_ALG_DECRYPT |
--			     OP_ALG_AS_INIT);
--
--	/*
--	 * do a FIFO_LOAD of zero, this will trigger the internal key expansion
--	   into both pads inside MDHA
--	 */
--	append_fifo_load_as_imm(desc, NULL, 0, LDST_CLASS_2_CCB |
--				FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST2);
--
--	/*
--	 * FIFO_STORE with the explicit split-key content store
--	 * (0x26 output type)
--	 */
--	dma_addr_out = dma_map_single(jrdev, ctx->key, ctx->split_key_pad_len,
--				      DMA_FROM_DEVICE);
--	if (dma_mapping_error(jrdev, dma_addr_out)) {
--		dev_err(jrdev, "unable to map key output memory\n");
--		kfree(desc);
--		return -ENOMEM;
--	}
--	append_fifo_store(desc, dma_addr_out, ctx->split_key_len,
--			  LDST_CLASS_2_CCB | FIFOST_TYPE_SPLIT_KEK);
--
--#ifdef DEBUG
--	print_hex_dump(KERN_ERR, "ctx.key@"xstr(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, key_in, authkeylen, 1);
--	print_hex_dump(KERN_ERR, "jobdesc@"xstr(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc), 1);
--#endif
--
--	result.err = 0;
--	init_completion(&result.completion);
--
--	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
--	if (!ret) {
--		/* in progress */
--		wait_for_completion_interruptible(&result.completion);
--		ret = result.err;
--#ifdef DEBUG
--		print_hex_dump(KERN_ERR, "ctx.key@"xstr(__LINE__)": ",
--			       DUMP_PREFIX_ADDRESS, 16, 4, ctx->key,
--			       ctx->split_key_pad_len, 1);
--#endif
--	}
--
--	dma_unmap_single(jrdev, dma_addr_out, ctx->split_key_pad_len,
--			 DMA_FROM_DEVICE);
--	dma_unmap_single(jrdev, dma_addr_in, authkeylen, DMA_TO_DEVICE);
--
--	kfree(desc);
--
--	return ret;
-+	return gen_split_key(ctx->jrdev, ctx->key, ctx->split_key_len,
-+			       ctx->split_key_pad_len, key_in, authkeylen,
-+			       ctx->alg_op);
+@@ -166,13 +175,22 @@ static inline void append_##cmd(u32 *desc, dma_addr_t ptr, unsigned int len, \
+ 	append_cmd_ptr(desc, ptr, len, CMD_##op | options); \
  }
+ APPEND_CMD_PTR(key, KEY)
+-APPEND_CMD_PTR(seq_in_ptr, SEQ_IN_PTR)
+-APPEND_CMD_PTR(seq_out_ptr, SEQ_OUT_PTR)
+ APPEND_CMD_PTR(load, LOAD)
+ APPEND_CMD_PTR(store, STORE)
+ APPEND_CMD_PTR(fifo_load, FIFO_LOAD)
+ APPEND_CMD_PTR(fifo_store, FIFO_STORE)
  
- static int aead_setkey(struct crypto_aead *aead,
-@@ -611,7 +504,7 @@ static int aead_setkey(struct crypto_aead *aead,
- 		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
- #endif
++#define APPEND_SEQ_PTR_INTLEN(cmd, op) \
++static inline void append_seq_##cmd##_ptr_intlen(u32 *desc, dma_addr_t ptr, \
++						 unsigned int len, \
++						 u32 options) \
++{ \
++	PRINT_POS; \
++	append_cmd_ptr(desc, ptr, len, CMD_SEQ_##op##_PTR | options); \
++}
++APPEND_SEQ_PTR_INTLEN(in, IN)
++APPEND_SEQ_PTR_INTLEN(out, OUT)
++
+ #define APPEND_CMD_PTR_TO_IMM(cmd, op) \
+ static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
+ 					 unsigned int len, u32 options) \
+@@ -183,6 +201,33 @@ static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
+ APPEND_CMD_PTR_TO_IMM(load, LOAD);
+ APPEND_CMD_PTR_TO_IMM(fifo_load, FIFO_LOAD);
  
--	ret = gen_split_key(ctx, key, authkeylen);
-+	ret = gen_split_aead_key(ctx, key, authkeylen);
- 	if (ret) {
- 		goto badkey;
- 	}
-@@ -758,14 +651,6 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	return ret;
- }
- 
--struct link_tbl_entry {
--	u64 ptr;
--	u32 len;
--	u8 reserved;
--	u8 buf_pool_id;
--	u16 offset;
--};
--
++#define APPEND_CMD_PTR_EXTLEN(cmd, op) \
++static inline void append_##cmd##_extlen(u32 *desc, dma_addr_t ptr, \
++					 unsigned int len, u32 options) \
++{ \
++	PRINT_POS; \
++	append_cmd_ptr_extlen(desc, ptr, len, CMD_##op | SQIN_EXT | options); \
++}
++APPEND_CMD_PTR_EXTLEN(seq_in_ptr, SEQ_IN_PTR)
++APPEND_CMD_PTR_EXTLEN(seq_out_ptr, SEQ_OUT_PTR)
++
++/*
++ * Determine whether to store length internally or externally depending on
++ * the size of its type
++ */
++#define APPEND_CMD_PTR_LEN(cmd, op, type) \
++static inline void append_##cmd(u32 *desc, dma_addr_t ptr, \
++				type len, u32 options) \
++{ \
++	PRINT_POS; \
++	if (sizeof(type) > sizeof(u16)) \
++		append_##cmd##_extlen(desc, ptr, len, options); \
++	else \
++		append_##cmd##_intlen(desc, ptr, len, options); \
++}
++APPEND_CMD_PTR_LEN(seq_in_ptr, SEQ_IN_PTR, u32)
++APPEND_CMD_PTR_LEN(seq_out_ptr, SEQ_OUT_PTR, u32)
++
  /*
-  * aead_edesc - s/w-extended aead descriptor
-  * @assoc_nents: number of segments in associated data (SPI+Seq) scatterlist
-@@ -1027,50 +912,6 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	ablkcipher_request_complete(req, err);
- }
- 
--static void sg_to_link_tbl_one(struct link_tbl_entry *link_tbl_ptr,
--			       dma_addr_t dma, u32 len, u32 offset)
--{
--	link_tbl_ptr->ptr = dma;
--	link_tbl_ptr->len = len;
--	link_tbl_ptr->reserved = 0;
--	link_tbl_ptr->buf_pool_id = 0;
--	link_tbl_ptr->offset = offset;
--#ifdef DEBUG
--	print_hex_dump(KERN_ERR, "link_tbl_ptr@"xstr(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, link_tbl_ptr,
--		       sizeof(struct link_tbl_entry), 1);
--#endif
--}
--
--/*
-- * convert scatterlist to h/w link table format
-- * but does not have final bit; instead, returns last entry
-- */
--static struct link_tbl_entry *sg_to_link_tbl(struct scatterlist *sg,
--					     int sg_count, struct link_tbl_entry
--					     *link_tbl_ptr, u32 offset)
--{
--	while (sg_count) {
--		sg_to_link_tbl_one(link_tbl_ptr, sg_dma_address(sg),
--				   sg_dma_len(sg), offset);
--		link_tbl_ptr++;
--		sg = sg_next(sg);
--		sg_count--;
--	}
--	return link_tbl_ptr - 1;
--}
--
--/*
-- * convert scatterlist to h/w link table format
-- * scatterlist must have been previously dma mapped
-- */
--static void sg_to_link_tbl_last(struct scatterlist *sg, int sg_count,
--				struct link_tbl_entry *link_tbl_ptr, u32 offset)
--{
--	link_tbl_ptr = sg_to_link_tbl(sg, sg_count, link_tbl_ptr, offset);
--	link_tbl_ptr->len |= 0x40000000;
--}
--
- /*
-  * Fill in aead job descriptor
-  */
-@@ -1272,28 +1113,6 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
- }
- 
- /*
-- * derive number of elements in scatterlist
-- */
--static int sg_count(struct scatterlist *sg_list, int nbytes)
--{
--	struct scatterlist *sg = sg_list;
--	int sg_nents = 0;
--
--	while (nbytes > 0) {
--		sg_nents++;
--		nbytes -= sg->length;
--		if (!sg_is_last(sg) && (sg + 1)->length == 0)
--			BUG(); /* Not support chaining */
--		sg = scatterwalk_sg_next(sg);
--	}
--
--	if (likely(sg_nents == 1))
--		return 0;
--
--	return sg_nents;
--}
--
--/*
-  * allocate and map the aead extended descriptor
-  */
- static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index af25e76..48c1927 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -8,6 +8,16 @@
- #ifndef DESC_H
- #define DESC_H
- 
-+struct link_tbl_entry {
-+	u64 ptr;
-+#define LINK_TBL_LEN_FIN 0x40000000
-+#define LINK_TBL_LEN_EXT 0x80000000
-+	u32 len;
-+	u8 reserved;
-+	u8 buf_pool_id;
-+	u16 offset;
-+};
-+
- /* Max size of any CAAM descriptor in 32-bit words, inclusive of header */
- #define MAX_CAAM_DESCSIZE	64
- 
-diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
-new file mode 100644
-index 0000000..0028881
---- /dev/null
-+++ b/drivers/crypto/caam/key_gen.c
-@@ -0,0 +1,122 @@
-+/*
-+ * CAAM/SEC 4.x functions for handling key-generation jobs
-+ *
-+ * Copyright 2008-2011 Freescale Semiconductor, Inc.
-+ *
-+ */
-+#include "compat.h"
-+#include "jr.h"
-+#include "error.h"
-+#include "desc_constr.h"
-+#include "key_gen.h"
-+
-+void split_key_done(struct device *dev, u32 *desc, u32 err,
-+			   void *context)
-+{
-+	struct split_key_result *res = context;
-+
-+#ifdef DEBUG
-+	dev_err(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
-+#endif
-+
-+	if (err) {
-+		char tmp[CAAM_ERROR_STR_MAX];
-+
-+		dev_err(dev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
-+	}
-+
-+	res->err = err;
-+
-+	complete(&res->completion);
-+}
-+EXPORT_SYMBOL(split_key_done);
-+/*
-+get a split ipad/opad key
-+
-+Split key generation-----------------------------------------------
-+
-+[00] 0xb0810008    jobdesc: stidx=1 share=never len=8
-+[01] 0x04000014        key: class2->keyreg len=20
-+			@0xffe01000
-+[03] 0x84410014  operation: cls2-op sha1 hmac init dec
-+[04] 0x24940000     fifold: class2 msgdata-last2 len=0 imm
-+[05] 0xa4000001       jump: class2 local all ->1 [06]
-+[06] 0x64260028    fifostr: class2 mdsplit-jdk len=40
-+			@0xffe04000
-+*/
-+u32 gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
-+		  int split_key_pad_len, const u8 *key_in, u32 keylen,
-+		  u32 alg_op)
-+{
-+	u32 *desc;
-+	struct split_key_result result;
-+	dma_addr_t dma_addr_in, dma_addr_out;
-+	int ret = 0;
-+
-+	desc = kmalloc(CAAM_CMD_SZ * 6 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
-+
-+	init_job_desc(desc, 0);
-+
-+	dma_addr_in = dma_map_single(jrdev, (void *)key_in, keylen,
-+				     DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_addr_in)) {
-+		dev_err(jrdev, "unable to map key input memory\n");
-+		kfree(desc);
-+		return -ENOMEM;
-+	}
-+	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
-+
-+	/* Sets MDHA up into an HMAC-INIT */
-+	append_operation(desc, alg_op | OP_ALG_DECRYPT | OP_ALG_AS_INIT);
-+
-+	/*
-+	 * do a FIFO_LOAD of zero, this will trigger the internal key expansion
-+	 * into both pads inside MDHA
-+	 */
-+	append_fifo_load_as_imm(desc, NULL, 0, LDST_CLASS_2_CCB |
-+				FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST2);
-+
-+	/*
-+	 * FIFO_STORE with the explicit split-key content store
-+	 * (0x26 output type)
-+	 */
-+	dma_addr_out = dma_map_single(jrdev, key_out, split_key_pad_len,
-+				      DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_addr_out)) {
-+		dev_err(jrdev, "unable to map key output memory\n");
-+		kfree(desc);
-+		return -ENOMEM;
-+	}
-+	append_fifo_store(desc, dma_addr_out, split_key_len,
-+			  LDST_CLASS_2_CCB | FIFOST_TYPE_SPLIT_KEK);
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "ctx.key@"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, key_in, keylen, 1);
-+	print_hex_dump(KERN_ERR, "jobdesc@"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc), 1);
-+#endif
-+
-+	result.err = 0;
-+	init_completion(&result.completion);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
-+	if (!ret) {
-+		/* in progress */
-+		wait_for_completion_interruptible(&result.completion);
-+		ret = result.err;
-+#ifdef DEBUG
-+		print_hex_dump(KERN_ERR, "ctx.key@"xstr(__LINE__)": ",
-+			       DUMP_PREFIX_ADDRESS, 16, 4, key_out,
-+			       split_key_pad_len, 1);
-+#endif
-+	}
-+
-+	dma_unmap_single(jrdev, dma_addr_out, split_key_pad_len,
-+			 DMA_FROM_DEVICE);
-+	dma_unmap_single(jrdev, dma_addr_in, keylen, DMA_TO_DEVICE);
-+
-+	kfree(desc);
-+
-+	return ret;
-+}
-diff --git a/drivers/crypto/caam/key_gen.h b/drivers/crypto/caam/key_gen.h
-new file mode 100644
-index 0000000..d95d290
---- /dev/null
-+++ b/drivers/crypto/caam/key_gen.h
-@@ -0,0 +1,17 @@
-+/*
-+ * CAAM/SEC 4.x definitions for handling key-generation jobs
-+ *
-+ * Copyright 2008-2011 Freescale Semiconductor, Inc.
-+ *
-+ */
-+
-+struct split_key_result {
-+	struct completion completion;
-+	int err;
-+};
-+
-+void split_key_done(struct device *dev, u32 *desc, u32 err, void *context);
-+
-+u32 gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
-+		    int split_key_pad_len, const u8 *key_in, u32 keylen,
-+		    u32 alg_op);
-diff --git a/drivers/crypto/caam/sg_link_tbl.h b/drivers/crypto/caam/sg_link_tbl.h
-new file mode 100644
-index 0000000..6df4349
---- /dev/null
-+++ b/drivers/crypto/caam/sg_link_tbl.h
-@@ -0,0 +1,84 @@
-+/*
-+ * CAAM/SEC 4.x functions for using scatterlists in caam driver
-+ *
-+ * Copyright 2008-2011 Freescale Semiconductor, Inc.
-+ *
-+ */
-+
-+struct link_tbl_entry;
-+
-+/*
-+ * convert single dma address to h/w link table format
-+ */
-+static inline void sg_to_link_tbl_one(struct link_tbl_entry *link_tbl_ptr,
-+				      dma_addr_t dma, u32 len, u32 offset)
-+{
-+	link_tbl_ptr->ptr = dma;
-+	link_tbl_ptr->len = len;
-+	link_tbl_ptr->reserved = 0;
-+	link_tbl_ptr->buf_pool_id = 0;
-+	link_tbl_ptr->offset = offset;
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "link_tbl_ptr@: ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, link_tbl_ptr,
-+		       sizeof(struct link_tbl_entry), 1);
-+#endif
-+}
-+
-+/*
-+ * convert scatterlist to h/w link table format
-+ * but does not have final bit; instead, returns last entry
-+ */
-+static inline struct link_tbl_entry *
-+sg_to_link_tbl(struct scatterlist *sg, int sg_count,
-+	       struct link_tbl_entry *link_tbl_ptr, u32 offset)
-+{
-+	while (sg_count) {
-+		sg_to_link_tbl_one(link_tbl_ptr, sg_dma_address(sg),
-+				   sg_dma_len(sg), offset);
-+		link_tbl_ptr++;
-+		sg = sg_next(sg);
-+		sg_count--;
-+	}
-+	return link_tbl_ptr - 1;
-+}
-+
-+/*
-+ * convert scatterlist to h/w link table format
-+ * scatterlist must have been previously dma mapped
-+ */
-+static inline void sg_to_link_tbl_last(struct scatterlist *sg, int sg_count,
-+				       struct link_tbl_entry *link_tbl_ptr,
-+				       u32 offset)
-+{
-+	link_tbl_ptr = sg_to_link_tbl(sg, sg_count, link_tbl_ptr, offset);
-+	link_tbl_ptr->len |= LINK_TBL_LEN_FIN;
-+}
-+
-+/* count number of elements in scatterlist */
-+static inline int __sg_count(struct scatterlist *sg_list, int nbytes)
-+{
-+	struct scatterlist *sg = sg_list;
-+	int sg_nents = 0;
-+
-+	while (nbytes > 0) {
-+		sg_nents++;
-+		nbytes -= sg->length;
-+		if (!sg_is_last(sg) && (sg + 1)->length == 0)
-+			BUG(); /* Not support chaining */
-+		sg = scatterwalk_sg_next(sg);
-+	}
-+
-+	return sg_nents;
-+}
-+
-+/* derive number of elements in scatterlist, but return 0 for 1 */
-+static inline int sg_count(struct scatterlist *sg_list, int nbytes)
-+{
-+	int sg_nents = __sg_count(sg_list, nbytes);
-+
-+	if (likely(sg_nents == 1))
-+		return 0;
-+
-+	return sg_nents;
-+}
+  * 2nd variant for commands whose specified immediate length differs
+  * from length of immediate data provided, e.g., split keys
 -- 
 1.7.11.1
