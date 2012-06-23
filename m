@@ -1,69 +1,58 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 02/20] crypto: caam - fix input job ring element dma mapping size
-Date: Fri, 22 Jun 2012 19:42:36 -0500
-Message-ID: <1340412174-1784-3-git-send-email-kim.phillips@freescale.com>
+Subject: [PATCH 03/20] crypto: caam - fix start index for Protocol shared descriptors
+Date: Fri, 22 Jun 2012 19:42:37 -0500
+Message-ID: <1340412174-1784-4-git-send-email-kim.phillips@freescale.com>
 References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	Yashpal Dutta <yashpal.dutta@freescale.com>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe001.messaging.microsoft.com ([216.32.181.181]:53429
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756689Ab2FWApC (ORCPT
+Received: from db3ehsobe003.messaging.microsoft.com ([213.199.154.141]:29954
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756689Ab2FWApF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2012 20:45:02 -0400
+	Fri, 22 Jun 2012 20:45:05 -0400
 In-Reply-To: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SEC4 h/w gets configured in 32- vs. 36-bit physical
-addressing modes depending on the size of dma_addr_t,
-which is not always equal to sizeof(u32 *).
+From: Yashpal Dutta <yashpal.dutta@freescale.com>
 
-Also fixed alignment of a dma_unmap call whilst in there.
+In case of protocol acceleration descriptors, Shared descriptor header must
+carry size of header length + PDB length in words which will be skipped by
+DECO while processing descriptor to provide first command word offset
 
+Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/jr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/crypto/caam/desc_constr.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 340fa32..6ce4c41 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -376,7 +376,7 @@ static int caam_jr_init(struct device *dev)
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 348b882..0d31e27 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -1,7 +1,7 @@
+ /*
+  * caam descriptor construction helper functions
+  *
+- * Copyright 2008-2011 Freescale Semiconductor, Inc.
++ * Copyright 2008-2012 Freescale Semiconductor, Inc.
+  */
  
- 	/* Setup rings */
- 	inpbusaddr = dma_map_single(dev, jrp->inpring,
--				    sizeof(u32 *) * JOBR_DEPTH,
-+				    sizeof(dma_addr_t) * JOBR_DEPTH,
- 				    DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, inpbusaddr)) {
- 		dev_err(dev, "caam_jr_init(): can't map input ring\n");
-@@ -391,9 +391,9 @@ static int caam_jr_init(struct device *dev)
- 				    DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, outbusaddr)) {
- 		dev_err(dev, "caam_jr_init(): can't map output ring\n");
--			dma_unmap_single(dev, inpbusaddr,
--					 sizeof(u32 *) * JOBR_DEPTH,
--					 DMA_BIDIRECTIONAL);
-+		dma_unmap_single(dev, inpbusaddr,
-+				 sizeof(dma_addr_t) * JOBR_DEPTH,
-+				 DMA_BIDIRECTIONAL);
- 		kfree(jrp->inpring);
- 		kfree(jrp->outring);
- 		kfree(jrp->entinfo);
-@@ -447,7 +447,7 @@ int caam_jr_shutdown(struct device *dev)
- 	dma_unmap_single(dev, outbusaddr,
- 			 sizeof(struct jr_outentry) * JOBR_DEPTH,
- 			 DMA_BIDIRECTIONAL);
--	dma_unmap_single(dev, inpbusaddr, sizeof(u32 *) * JOBR_DEPTH,
-+	dma_unmap_single(dev, inpbusaddr, sizeof(dma_addr_t) * JOBR_DEPTH,
- 			 DMA_BIDIRECTIONAL);
- 	kfree(jrp->outring);
- 	kfree(jrp->inpring);
+ #include "desc.h"
+@@ -64,7 +64,7 @@ static inline void init_sh_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
+ {
+ 	u32 pdb_len = pdb_bytes / CAAM_CMD_SZ + 1;
+ 
+-	init_sh_desc(desc, ((pdb_len << HDR_START_IDX_SHIFT) + pdb_len) |
++	init_sh_desc(desc, (((pdb_len + 1) << HDR_START_IDX_SHIFT) + pdb_len) |
+ 		     options);
+ }
+ 
 -- 
 1.7.11.1
