@@ -1,7 +1,7 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 19/20] crypto: caam - consolidate memory barriers from job ring en/dequeue
-Date: Fri, 22 Jun 2012 19:48:56 -0500
-Message-ID: <1340412537-2325-14-git-send-email-kim.phillips@freescale.com>
+Subject: [PATCH 13/20] crypto: caam - hwrng support
+Date: Fri, 22 Jun 2012 19:48:50 -0500
+Message-ID: <1340412537-2325-8-git-send-email-kim.phillips@freescale.com>
 References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
  <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
 Mime-Version: 1.0
@@ -10,58 +10,377 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:3785
+Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:19223
 	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756821Ab2FWAu5 (ORCPT
+	by vger.kernel.org with ESMTP id S1756736Ab2FWAu4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2012 20:50:57 -0400
+	Fri, 22 Jun 2012 20:50:56 -0400
 In-Reply-To: <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Memory barriers are implied by the i/o register write implementation
-(at least on Power).  So we can remove the redundant wmb() in
-caam_jr_enqueue, and, in dequeue(), hoist the h/w done notification
-write up to before we need to increment the head of the ring, and
-save an smp_mb.
+From: Yuan Kang <Yuan.Kang@freescale.com>
 
+caam_read copies random bytes from two buffers into output.
+
+caam rng can fill empty buffer 0xffff bytes at a time,
+but the buffer sizes are rounded down to multiple of cacheline size.
+
+Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/jr.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/Kconfig   |  13 ++
+ drivers/crypto/caam/Makefile  |   1 +
+ drivers/crypto/caam/caamrng.c | 309 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 323 insertions(+)
+ create mode 100644 drivers/crypto/caam/caamrng.c
 
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 7ae5e51..0adaad1 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -94,7 +94,8 @@ static void caam_jr_dequeue(unsigned long devarg)
- 		userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
- 		userstatus = jrp->outring[hw_idx].jrstatus;
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index e61b7f5..502a7f3 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -82,3 +82,16 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
  
--		smp_mb();
-+		/* set done */
-+		wr_reg32(&jrp->rregs->outring_rmvd, 1);
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called caamhash.
++
++config CRYPTO_DEV_FSL_CAAM_RNG_API
++	tristate "Register caam device for hwrng API"
++	depends on CRYPTO_DEV_FSL_CAAM
++	default y
++	select CRYPTO_RNG
++	select HW_RANDOM
++	help
++	  Selecting this will register the SEC4 hardware rng to
++	  the hw_random API for suppying the kernel entropy pool.
++
++	  To compile this as a module, choose M here: the module
++	  will be called caamrng.
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index 9ef1cb0..b1eb448 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -5,5 +5,6 @@
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
++obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
  
- 		jrp->out_ring_read_index = (jrp->out_ring_read_index + 1) &
- 					   (JOBR_DEPTH - 1);
-@@ -114,9 +115,6 @@ static void caam_jr_dequeue(unsigned long devarg)
- 			jrp->tail = tail;
- 		}
- 
--		/* set done */
--		wr_reg32(&jrp->rregs->outring_rmvd, 1);
--
- 		spin_unlock_bh(&jrp->outlock);
- 
- 		/* Finally, execute user's callback */
-@@ -265,8 +263,6 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 				    (JOBR_DEPTH - 1);
- 	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
- 
--	wmb();
--
- 	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
- 
- 	spin_unlock(&jrp->inplock);
+ caam-objs := ctrl.o jr.o error.o key_gen.o
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+new file mode 100644
+index 0000000..e2bfe16
+--- /dev/null
++++ b/drivers/crypto/caam/caamrng.c
+@@ -0,0 +1,309 @@
++/*
++ * caam - Freescale FSL CAAM support for hw_random
++ *
++ * Copyright 2011 Freescale Semiconductor, Inc.
++ *
++ * Based on caamalg.c crypto API driver.
++ *
++ * relationship between job descriptors to shared descriptors:
++ *
++ * ---------------                     --------------
++ * | JobDesc #0  |-------------------->| ShareDesc  |
++ * | *(buffer 0) |      |------------->| (generate) |
++ * ---------------      |              | (move)     |
++ *                      |              | (store)    |
++ * ---------------      |              --------------
++ * | JobDesc #1  |------|
++ * | *(buffer 1) |
++ * ---------------
++ *
++ * A job desc looks like this:
++ *
++ * ---------------------
++ * | Header            |
++ * | ShareDesc Pointer |
++ * | SEQ_OUT_PTR       |
++ * | (output buffer)   |
++ * ---------------------
++ *
++ * The SharedDesc never changes, and each job descriptor points to one of two
++ * buffers for each device, from which the data will be copied into the
++ * requested destination
++ */
++
++#include <linux/hw_random.h>
++#include <linux/completion.h>
++#include <linux/atomic.h>
++
++#include "compat.h"
++
++#include "regs.h"
++#include "intern.h"
++#include "desc_constr.h"
++#include "jr.h"
++#include "error.h"
++
++/*
++ * Maximum buffer size: maximum number of random, cache-aligned bytes that
++ * will be generated and moved to seq out ptr (extlen not allowed)
++ */
++#define RN_BUF_SIZE			(0xffff / L1_CACHE_BYTES * \
++					 L1_CACHE_BYTES)
++
++/* length of descriptors */
++#define DESC_JOB_O_LEN			(CAAM_CMD_SZ * 2 + CAAM_PTR_SZ * 2)
++#define DESC_RNG_LEN			(10 * CAAM_CMD_SZ)
++
++/* Buffer, its dma address and lock */
++struct buf_data {
++	u8 buf[RN_BUF_SIZE];
++	dma_addr_t addr;
++	struct completion filled;
++	u32 hw_desc[DESC_JOB_O_LEN];
++#define BUF_NOT_EMPTY 0
++#define BUF_EMPTY 1
++#define BUF_PENDING 2  /* Empty, but with job pending --don't submit another */
++	atomic_t empty;
++};
++
++/* rng per-device context */
++struct caam_rng_ctx {
++	struct device *jrdev;
++	dma_addr_t sh_desc_dma;
++	u32 sh_desc[DESC_RNG_LEN];
++	unsigned int cur_buf_idx;
++	int current_buf;
++	struct buf_data bufs[2];
++};
++
++static struct caam_rng_ctx rng_ctx;
++
++static inline void rng_unmap_buf(struct device *jrdev, struct buf_data *bd)
++{
++	if (bd->addr)
++		dma_unmap_single(jrdev, bd->addr, RN_BUF_SIZE,
++				 DMA_FROM_DEVICE);
++}
++
++static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
++{
++	struct device *jrdev = ctx->jrdev;
++
++	if (ctx->sh_desc_dma)
++		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
++				 DMA_TO_DEVICE);
++	rng_unmap_buf(jrdev, &ctx->bufs[0]);
++	rng_unmap_buf(jrdev, &ctx->bufs[1]);
++}
++
++static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
++{
++	struct buf_data *bd;
++
++	bd = (struct buf_data *)((char *)desc -
++	      offsetof(struct buf_data, hw_desc));
++
++	if (err) {
++		char tmp[CAAM_ERROR_STR_MAX];
++
++		dev_err(jrdev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
++	}
++
++	atomic_set(&bd->empty, BUF_NOT_EMPTY);
++	complete(&bd->filled);
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "rng refreshed buf@: ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, bd->buf, RN_BUF_SIZE, 1);
++#endif
++}
++
++static inline int submit_job(struct caam_rng_ctx *ctx, int to_current)
++{
++	struct buf_data *bd = &ctx->bufs[!(to_current ^ ctx->current_buf)];
++	struct device *jrdev = ctx->jrdev;
++	u32 *desc = bd->hw_desc;
++	int err;
++
++	dev_dbg(jrdev, "submitting job %d\n", !(to_current ^ ctx->current_buf));
++	init_completion(&bd->filled);
++	err = caam_jr_enqueue(jrdev, desc, rng_done, ctx);
++	if (err)
++		complete(&bd->filled); /* don't wait on failed job*/
++	else
++		atomic_inc(&bd->empty); /* note if pending */
++
++	return err;
++}
++
++static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	struct caam_rng_ctx *ctx = &rng_ctx;
++	struct buf_data *bd = &ctx->bufs[ctx->current_buf];
++	int next_buf_idx, copied_idx;
++	int err;
++
++	if (atomic_read(&bd->empty)) {
++		/* try to submit job if there wasn't one */
++		if (atomic_read(&bd->empty) == BUF_EMPTY) {
++			err = submit_job(ctx, 1);
++			/* if can't submit job, can't even wait */
++			if (err)
++				return 0;
++		}
++		/* no immediate data, so exit if not waiting */
++		if (!wait)
++			return 0;
++
++		/* waiting for pending job */
++		if (atomic_read(&bd->empty))
++			wait_for_completion(&bd->filled);
++	}
++
++	next_buf_idx = ctx->cur_buf_idx + max;
++	dev_dbg(ctx->jrdev, "%s: start reading at buffer %d, idx %d\n",
++		 __func__, ctx->current_buf, ctx->cur_buf_idx);
++
++	/* if enough data in current buffer */
++	if (next_buf_idx < RN_BUF_SIZE) {
++		memcpy(data, bd->buf + ctx->cur_buf_idx, max);
++		ctx->cur_buf_idx = next_buf_idx;
++		return max;
++	}
++
++	/* else, copy what's left... */
++	copied_idx = RN_BUF_SIZE - ctx->cur_buf_idx;
++	memcpy(data, bd->buf + ctx->cur_buf_idx, copied_idx);
++	ctx->cur_buf_idx = 0;
++	atomic_set(&bd->empty, BUF_EMPTY);
++
++	/* ...refill... */
++	submit_job(ctx, 1);
++
++	/* and use next buffer */
++	ctx->current_buf = !ctx->current_buf;
++	dev_dbg(ctx->jrdev, "switched to buffer %d\n", ctx->current_buf);
++
++	/* since there already is some data read, don't wait */
++	return copied_idx + caam_read(rng, data + copied_idx,
++				      max - copied_idx, false);
++}
++
++static inline void rng_create_sh_desc(struct caam_rng_ctx *ctx)
++{
++	struct device *jrdev = ctx->jrdev;
++	u32 *desc = ctx->sh_desc;
++
++	init_sh_desc(desc, HDR_SHARE_WAIT);
++
++	/* Propagate errors from shared to job descriptor */
++	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
++
++	/* Generate random bytes */
++	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
++
++	/* Store bytes */
++	append_seq_fifo_store(desc, RN_BUF_SIZE, FIFOST_TYPE_RNGSTORE);
++
++	ctx->sh_desc_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
++					  DMA_TO_DEVICE);
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "rng shdesc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
++		       desc, desc_bytes(desc), 1);
++#endif
++}
++
++static inline void rng_create_job_desc(struct caam_rng_ctx *ctx, int buf_id)
++{
++	struct device *jrdev = ctx->jrdev;
++	struct buf_data *bd = &ctx->bufs[buf_id];
++	u32 *desc = bd->hw_desc;
++	int sh_len = desc_len(ctx->sh_desc);
++
++	init_job_desc_shared(desc, ctx->sh_desc_dma, sh_len, HDR_SHARE_DEFER |
++			     HDR_REVERSE);
++
++	bd->addr = dma_map_single(jrdev, bd->buf, RN_BUF_SIZE, DMA_FROM_DEVICE);
++
++	append_seq_out_ptr_intlen(desc, bd->addr, RN_BUF_SIZE, 0);
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "rng job desc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
++		       desc, desc_bytes(desc), 1);
++#endif
++}
++
++static void caam_cleanup(struct hwrng *rng)
++{
++	int i;
++	struct buf_data *bd;
++
++	for (i = 0; i < 2; i++) {
++		bd = &rng_ctx.bufs[i];
++		if (atomic_read(&bd->empty) == BUF_PENDING)
++			wait_for_completion(&bd->filled);
++	}
++
++	rng_unmap_ctx(&rng_ctx);
++}
++
++static void caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
++{
++	struct buf_data *bd = &ctx->bufs[buf_id];
++
++	rng_create_job_desc(ctx, buf_id);
++	atomic_set(&bd->empty, BUF_EMPTY);
++	submit_job(ctx, buf_id == ctx->current_buf);
++	wait_for_completion(&bd->filled);
++}
++
++static void caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
++{
++	ctx->jrdev = jrdev;
++	rng_create_sh_desc(ctx);
++	ctx->current_buf = 0;
++	ctx->cur_buf_idx = 0;
++	caam_init_buf(ctx, 0);
++	caam_init_buf(ctx, 1);
++}
++
++static struct hwrng caam_rng = {
++	.name		= "rng-caam",
++	.cleanup	= caam_cleanup,
++	.read		= caam_read,
++};
++
++static void __exit caam_rng_exit(void)
++{
++	hwrng_unregister(&caam_rng);
++}
++
++static int __init caam_rng_init(void)
++{
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	struct caam_drv_private *priv;
++
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node)
++		return -ENODEV;
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return -ENODEV;
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	caam_init_rng(&rng_ctx, priv->jrdev[0]);
++
++	dev_info(priv->jrdev[0], "registering rng-caam\n");
++	return hwrng_register(&caam_rng);
++}
++
++module_init(caam_rng_init);
++module_exit(caam_rng_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("FSL CAAM support for hw_random API");
++MODULE_AUTHOR("Freescale Semiconductor - NMG");
 -- 
 1.7.11.1
