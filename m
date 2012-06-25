@@ -1,143 +1,64 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 06/20] crypto: caam - support external seq in/out lengths
-Date: Fri, 22 Jun 2012 19:48:43 -0500
-Message-ID: <1340412537-2325-1-git-send-email-kim.phillips@freescale.com>
-References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
+From: Phil Sutter <phil.sutter@viprinet.com>
+Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
+Date: Mon, 25 Jun 2012 15:40:50 +0200
+Message-ID: <20120625134050.GB12294@philter.vipri.net>
+References: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
+ <1339806021-14271-1-git-send-email-gmbnomis@gmail.com>
+ <20120618134718.GL9122@philter.vipri.net>
+ <20120618201235.GA20755@schnuecks.de>
+ <4FE1D09E.4040104@gmail.com>
+ <20120620154131.GR9122@philter.vipri.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, andrew@lunn.ch,
+	Simon Baatz <gmbnomis@gmail.com>
+To: "cloudy.linux" <cloudy.linux@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.209] ([213.199.154.209]:48689 "EHLO
-	am1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S933255Ab2FWAwI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Jun 2012 20:52:08 -0400
-In-Reply-To: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
+Received: from zimbra.vipri.net ([89.207.250.15]:48387 "EHLO zimbra.vipri.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755576Ab2FYNlA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Jun 2012 09:41:00 -0400
+Content-Disposition: inline
+In-Reply-To: <20120620154131.GR9122@philter.vipri.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Yuan Kang <Yuan.Kang@freescale.com>
+Hi,
 
-functions for external storage of seq in/out lengths,
-i.e., for 32-bit lengths.
+On Wed, Jun 20, 2012 at 05:41:31PM +0200, Phil Sutter wrote:
+> PS: I am currently working at the address decoding problem, will get
+> back to in a few days when I have something to test. So stay tuned!
 
-These type-dependent functions automatically determine whether to
-store the length internally (embedded in the command header word) or
-externally (after the address pointer), based on size of the type
-given.
+I have updated the cesa-dma branch at git://nwl.cc/~n0-1/linux.git with
+code setting the decoding windows. I hope this fixes the issues on
+orion. I decided not to publish the changes regarding the second DMA
+channel for now, as this seems to be support for a second crypto sessio=
+n
+(handled consecutively, so no real improvement) which is not supported
+anyway.
 
-Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
- drivers/crypto/caam/caamalg.c     |  5 ++--
- drivers/crypto/caam/desc_constr.h | 49 +++++++++++++++++++++++++++++++++++++--
- 2 files changed, 50 insertions(+), 4 deletions(-)
+Greetings, Phil
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 5c10dc5..d0f8df1 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -37,9 +37,10 @@
-  * | ShareDesc Pointer |
-  * | SEQ_OUT_PTR       |
-  * | (output buffer)   |
-+ * | (output length)   |
-  * | SEQ_IN_PTR        |
-  * | (input buffer)    |
-- * | LOAD (to DECO)    |
-+ * | (input length)    |
-  * ---------------------
-  */
- 
-@@ -62,7 +63,7 @@
- #define CAAM_MAX_IV_LENGTH		16
- 
- /* length of descriptors text */
--#define DESC_JOB_IO_LEN			(CAAM_CMD_SZ * 3 + CAAM_PTR_SZ * 3)
-+#define DESC_JOB_IO_LEN			(CAAM_CMD_SZ * 5 + CAAM_PTR_SZ * 3)
- 
- #define DESC_AEAD_BASE			(4 * CAAM_CMD_SZ)
- #define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 16 * CAAM_CMD_SZ)
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 8e1056f..c85c1f0 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -117,6 +117,15 @@ static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
- 	append_ptr(desc, ptr);
- }
- 
-+/* Write length after pointer, rather than inside command */
-+static inline void append_cmd_ptr_extlen(u32 *desc, dma_addr_t ptr,
-+					 unsigned int len, u32 command)
-+{
-+	append_cmd(desc, command);
-+	append_ptr(desc, ptr);
-+	append_cmd(desc, len);
-+}
-+
- static inline void append_cmd_data(u32 *desc, void *data, int len,
- 				   u32 command)
- {
-@@ -166,13 +175,22 @@ static inline void append_##cmd(u32 *desc, dma_addr_t ptr, unsigned int len, \
- 	append_cmd_ptr(desc, ptr, len, CMD_##op | options); \
- }
- APPEND_CMD_PTR(key, KEY)
--APPEND_CMD_PTR(seq_in_ptr, SEQ_IN_PTR)
--APPEND_CMD_PTR(seq_out_ptr, SEQ_OUT_PTR)
- APPEND_CMD_PTR(load, LOAD)
- APPEND_CMD_PTR(store, STORE)
- APPEND_CMD_PTR(fifo_load, FIFO_LOAD)
- APPEND_CMD_PTR(fifo_store, FIFO_STORE)
- 
-+#define APPEND_SEQ_PTR_INTLEN(cmd, op) \
-+static inline void append_seq_##cmd##_ptr_intlen(u32 *desc, dma_addr_t ptr, \
-+						 unsigned int len, \
-+						 u32 options) \
-+{ \
-+	PRINT_POS; \
-+	append_cmd_ptr(desc, ptr, len, CMD_SEQ_##op##_PTR | options); \
-+}
-+APPEND_SEQ_PTR_INTLEN(in, IN)
-+APPEND_SEQ_PTR_INTLEN(out, OUT)
-+
- #define APPEND_CMD_PTR_TO_IMM(cmd, op) \
- static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
- 					 unsigned int len, u32 options) \
-@@ -183,6 +201,33 @@ static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
- APPEND_CMD_PTR_TO_IMM(load, LOAD);
- APPEND_CMD_PTR_TO_IMM(fifo_load, FIFO_LOAD);
- 
-+#define APPEND_CMD_PTR_EXTLEN(cmd, op) \
-+static inline void append_##cmd##_extlen(u32 *desc, dma_addr_t ptr, \
-+					 unsigned int len, u32 options) \
-+{ \
-+	PRINT_POS; \
-+	append_cmd_ptr_extlen(desc, ptr, len, CMD_##op | SQIN_EXT | options); \
-+}
-+APPEND_CMD_PTR_EXTLEN(seq_in_ptr, SEQ_IN_PTR)
-+APPEND_CMD_PTR_EXTLEN(seq_out_ptr, SEQ_OUT_PTR)
-+
-+/*
-+ * Determine whether to store length internally or externally depending on
-+ * the size of its type
-+ */
-+#define APPEND_CMD_PTR_LEN(cmd, op, type) \
-+static inline void append_##cmd(u32 *desc, dma_addr_t ptr, \
-+				type len, u32 options) \
-+{ \
-+	PRINT_POS; \
-+	if (sizeof(type) > sizeof(u16)) \
-+		append_##cmd##_extlen(desc, ptr, len, options); \
-+	else \
-+		append_##cmd##_intlen(desc, ptr, len, options); \
-+}
-+APPEND_CMD_PTR_LEN(seq_in_ptr, SEQ_IN_PTR, u32)
-+APPEND_CMD_PTR_LEN(seq_out_ptr, SEQ_OUT_PTR, u32)
-+
- /*
-  * 2nd variant for commands whose specified immediate length differs
-  * from length of immediate data provided, e.g., split keys
--- 
-1.7.11.1
+
+Phil Sutter
+Software Engineer
+
+--=20
+
+
+Viprinet GmbH
+Mainzer Str. 43
+55411 Bingen am Rhein
+Germany
+
+Phone/Zentrale:         +49-6721-49030-0
+Direct line/Durchwahl:  +49-6721-49030-134
+=46ax:                    +49-6721-49030-209
+
+phil.sutter@viprinet.com
+http://www.viprinet.com
+
+Registered office/Sitz der Gesellschaft: Bingen am Rhein
+Commercial register/Handelsregister: Amtsgericht Mainz HRB40380
+CEO/Gesch=C3=A4ftsf=C3=BChrer: Simon Kissel
