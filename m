@@ -1,40 +1,42 @@
-From: Simon Baatz <gmbnomis@gmail.com>
-Subject: [PATCH 0/1] MV_CESA with DMA: Clk init fixes
-Date: Tue, 26 Jun 2012 22:31:51 +0200
-Message-ID: <1340742712-5821-1-git-send-email-gmbnomis@gmail.com>
-References: <20120618134718.GL9122@philter.vipri.net>
-Cc: linux-crypto@vger.kernel.org, cloudy.linux@gmail.com
-To: phil.sutter@viprinet.com
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH] crypto/arc4: now arc needs blockcipher support
+Date: Wed, 27 Jun 2012 08:54:57 +0800
+Message-ID: <CACXcFmkrKWyyWEkud_p=vWDX1aUi2YSpA0b4KYRQ6sJArOb_sQ@mail.gmail.com>
+References: <20120626161346.GB6509@breakpoint.cc>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:58204 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751565Ab2FZUcF (ORCPT
+Received: from mail-ee0-f46.google.com ([74.125.83.46]:48567 "EHLO
+	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755150Ab2F0Ay7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Jun 2012 16:32:05 -0400
-Received: by weyu7 with SMTP id u7so230193wey.19
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2012 13:32:03 -0700 (PDT)
-In-Reply-To: <20120618134718.GL9122@philter.vipri.net>
+	Tue, 26 Jun 2012 20:54:59 -0400
+Received: by eeit10 with SMTP id t10so159497eei.19
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2012 17:54:58 -0700 (PDT)
+In-Reply-To: <20120626161346.GB6509@breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Phil,
+On Wed, Jun 27, 2012 at 12:13 AM, Sebastian Andrzej Siewior
+<sebastian@breakpoint.cc> wrote:
+> Since commit ce6dd368 ("crypto: arc4 - improve performance by adding
+> ecb(arc4)) we need to pull in a blkcipher.
+>
+> |ERROR: "crypto_blkcipher_type" [crypto/arc4.ko] undefined!
+> |ERROR: "blkcipher_walk_done" [crypto/arc4.ko] undefined!
+> |ERROR: "blkcipher_walk_virt" [crypto/arc4.ko] undefined!
+>
+> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+> ---
+>
+> On a side note: do we pull in the blkcipher block mode for each cipher now to
+> gain some extra performance like the openssl project? I was under the
+> impression that is in general not worth it.
 
-I just found the time to test your updates. Alas, the mv_dma module
-hangs at boot again.  The culprit seems to be setup_mbus_windows(),
-which is called before the clock is turned on but accesses the DMA
-engine.
+Arc4 is a stream cipher, NOT a block cipher. They are completely different
+things, and the requirements for using them securely are different. In
+particular, modes like ECB apply to block ciphers not to stream ciphers.
 
-I shifted the clock init code a bit and while doing so, fixed some error
-case handling for mv_dma and mv_cesa.  See proposed patch in next mail.
-   
-- Simon
-
-Simon Baatz (1):
-  mv_dma: mv_cesa: fixes for clock init
-
- drivers/crypto/mv_cesa.c |    7 ++++++-
- drivers/crypto/mv_dma.c  |   44 +++++++++++++++++++++++++++++---------------
- 2 files changed, 35 insertions(+), 16 deletions(-)
-
--- 
-1.7.9.5
+Unless these changes have been thoroughly analyzed by several
+people who actually know crypto, they should be immediately reverted.
