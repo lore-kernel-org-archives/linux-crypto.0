@@ -1,148 +1,126 @@
-From: Alex Porosanu <alexandru.porosanu@freescale.com>
-Subject: [PATCH] ERA retrieval and printing for SEC device
-Date: Wed, 27 Jun 2012 10:47:41 +0300
-Message-ID: <1340783261-7494-1-git-send-email-alexandru.porosanu@freescale.com>
+From: Bharat Bhushan <r65777@freescale.com>
+Subject: [PATCH] Using alloc_coherent for caam job rings
+Date: Wed, 27 Jun 2012 10:58:32 +0530
+Message-ID: <1340774912-19042-1-git-send-email-bharat.bhushan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-To: <linux-crypto@vger.kernel.org>
+Cc: Bharat Bhushan <Bharat.Bhushan@freescale.com>,
+	Bharat Bhushan <bharat.bhushan@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.139] ([213.199.154.139]:14249 "EHLO
-	db3outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751012Ab2F0EuA (ORCPT
+Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:8446 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750708Ab2F0FX7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jun 2012 00:50:00 -0400
-Received: from mail80-db3 (localhost [127.0.0.1])	by mail80-db3-R.bigfish.com
- (Postfix) with ESMTP id 9C26DC02BF	for <linux-crypto@vger.kernel.org>; Wed,
- 27 Jun 2012 04:47:36 +0000 (UTC)
-Received: from DB3EHSMHS010.bigfish.com (unknown [10.3.81.248])	by
- mail80-db3.bigfish.com (Postfix) with ESMTP id 5C8D6400046	for
- <linux-crypto@vger.kernel.org>; Wed, 27 Jun 2012 04:47:08 +0000 (UTC)
-Received: from localhost.localdomain ([10.171.77.122])	by
- tx30smr01.am.freescale.net (8.14.3/8.14.0) with ESMTP id q5R4mk0L016493	for
- <linux-crypto@vger.kernel.org>; Tue, 26 Jun 2012 21:48:47 -0700
+	Wed, 27 Jun 2012 01:23:59 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support for retrieving and printing of
-SEC ERA information. It is useful for knowing beforehand
-what features exist from the SEC point of view on a
-certain SoC. Only era-s 1 to 4 are currently supported;
-other eras will appear as unknown.
+From: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 
-Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
+The caam job rings (input/output job ring) are allocated using
+dma_map_single(). These job rings can be visualized as the ring
+buffers in which the jobs are en-queued/de-queued. The s/w enqueues
+the jobs in input job ring which h/w dequeues and after processing
+it copies the jobs in output job ring. Software then de-queues the
+job from output ring. Using dma_map/unmap_single() is not preferred
+way to allocate memory for this type of requirements because this
+adds un-necessary complexity.
+
+Example, if bounce buffer (SWIOTLB) will get used then to make any
+change visible in this memory to other processing unit requires
+dmap_unmap_single() or dma_sync_single_for_cpu/device(). The
+dma_unmap_single() can not be used as this will free the bounce
+buffer, this will require changing the job rings on running system
+and I seriously doubt that it will be not possible or very complex
+to implement. Also using dma_sync_single_for_cpu/device() will also
+add unnecessary complexity.
+
+The simple and preferred way is using dma_alloc_coherent() for these
+type of memory requirements.
+
+This resolves the Linux boot crash issue when "swiotlb=force" is set
+in bootargs on systems which have memory more than 4G.
+
+Signed-off-by: Bharat Bhushan <bharat.bhushan@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c |   41 +++++++++++++++++++++++++++++++++++++++--
- drivers/crypto/caam/ctrl.h |   13 +++++++++++++
- drivers/crypto/caam/regs.h |    6 ++++++
- 3 files changed, 58 insertions(+), 2 deletions(-)
- create mode 100644 drivers/crypto/caam/ctrl.h
+This patch is based on "git://git.freescale.com/crypto/cryptodev.git master" 
+which have Kim Phillip's "[PATCH 00/20] crypto: caam - driver updates"
+patches, which are already sent uptream.
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 77557eb..5fde51e 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -9,6 +9,7 @@
- #include "regs.h"
- #include "intern.h"
- #include "jr.h"
-+#include "ctrl.h"
+ drivers/crypto/caam/jr.c |   45 +++++++++------------------------------------
+ 1 files changed, 9 insertions(+), 36 deletions(-)
+
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 7074a1a..53c8c51 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -339,10 +339,11 @@ static int caam_jr_init(struct device *dev)
+ 	if (error)
+ 		return error;
  
- static int caam_remove(struct platform_device *pdev)
- {
-@@ -43,10 +44,44 @@ static int caam_remove(struct platform_device *pdev)
+-	jrp->inpring = kzalloc(sizeof(dma_addr_t) * JOBR_DEPTH,
+-			       GFP_KERNEL | GFP_DMA);
+-	jrp->outring = kzalloc(sizeof(struct jr_outentry) *
+-			       JOBR_DEPTH, GFP_KERNEL | GFP_DMA);
++	jrp->inpring = dma_alloc_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
++					  &inpbusaddr, GFP_KERNEL);
++
++	jrp->outring = dma_alloc_coherent(dev, sizeof(struct jr_outentry) *
++					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
+ 
+ 	jrp->entinfo = kzalloc(sizeof(struct caam_jrentry_info) * JOBR_DEPTH,
+ 			       GFP_KERNEL);
+@@ -358,31 +359,6 @@ static int caam_jr_init(struct device *dev)
+ 		jrp->entinfo[i].desc_addr_dma = !0;
+ 
+ 	/* Setup rings */
+-	inpbusaddr = dma_map_single(dev, jrp->inpring,
+-				    sizeof(dma_addr_t) * JOBR_DEPTH,
+-				    DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, inpbusaddr)) {
+-		dev_err(dev, "caam_jr_init(): can't map input ring\n");
+-		kfree(jrp->inpring);
+-		kfree(jrp->outring);
+-		kfree(jrp->entinfo);
+-		return -EIO;
+-	}
+-
+-	outbusaddr = dma_map_single(dev, jrp->outring,
+-				    sizeof(struct jr_outentry) * JOBR_DEPTH,
+-				    DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, outbusaddr)) {
+-		dev_err(dev, "caam_jr_init(): can't map output ring\n");
+-		dma_unmap_single(dev, inpbusaddr,
+-				 sizeof(dma_addr_t) * JOBR_DEPTH,
+-				 DMA_BIDIRECTIONAL);
+-		kfree(jrp->inpring);
+-		kfree(jrp->outring);
+-		kfree(jrp->entinfo);
+-		return -EIO;
+-	}
+-
+ 	jrp->inp_ring_write_index = 0;
+ 	jrp->out_ring_read_index = 0;
+ 	jrp->head = 0;
+@@ -426,13 +402,10 @@ int caam_jr_shutdown(struct device *dev)
+ 	/* Free rings */
+ 	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
+ 	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
+-	dma_unmap_single(dev, outbusaddr,
+-			 sizeof(struct jr_outentry) * JOBR_DEPTH,
+-			 DMA_BIDIRECTIONAL);
+-	dma_unmap_single(dev, inpbusaddr, sizeof(dma_addr_t) * JOBR_DEPTH,
+-			 DMA_BIDIRECTIONAL);
+-	kfree(jrp->outring);
+-	kfree(jrp->inpring);
++	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
++			  jrp->inpring, inpbusaddr);
++	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
++			  jrp->outring, outbusaddr);
+ 	kfree(jrp->entinfo);
+ 
  	return ret;
- }
- 
-+/**
-+ * caam_get_era() - Return the ERA of the SEC on SoC, based
-+ * on the SEC_VID register.
-+ * Returns the ERA number (1..4) or -ENOTSUPP if the ERA is unknown.
-+ * @caam_id - the value of the SEC_VID register
-+ **/
-+int caam_get_era(u64 caam_id)
-+{
-+	struct sec_vid *sec_vid = (struct sec_vid *)&caam_id;
-+	const struct {
-+		u16 ip_id;
-+		u8 maj_rev;
-+		u8 era;
-+	} caam_eras[] = {
-+		{0x0A10, 1, 1},
-+		{0x0A10, 2, 2},
-+		{0x0A12, 1, 3},
-+		{0x0A14, 1, 3},
-+		{0x0A14, 2, 4},
-+		{0x0A16, 1, 4},
-+		{0x0A11, 1, 4}
-+	};
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(caam_eras); i++)
-+		if (caam_eras[i].ip_id == sec_vid->ip_id &&
-+			caam_eras[i].maj_rev == sec_vid->maj_rev)
-+				return caam_eras[i].era;
-+
-+	return -ENOTSUPP;
-+}
-+EXPORT_SYMBOL(caam_get_era);
-+
- /* Probe routine for CAAM top (controller) level */
- static int caam_probe(struct platform_device *pdev)
- {
- 	int ring, rspec;
-+	u64 caam_id;
- 	struct device *dev;
- 	struct device_node *nprop, *np;
- 	struct caam_ctrl __iomem *ctrl;
-@@ -146,9 +181,11 @@ static int caam_probe(struct platform_device *pdev)
- 	/* Initialize queue allocator lock */
- 	spin_lock_init(&ctrlpriv->jr_alloc_lock);
- 
-+	caam_id = rd_reg64(&topregs->ctrl.perfmon.caam_id);
-+
- 	/* Report "alive" for developer to see */
--	dev_info(dev, "device ID = 0x%016llx\n",
--		 rd_reg64(&topregs->ctrl.perfmon.caam_id));
-+	dev_info(dev, "device ID = 0x%016llx (Era %d)\n", caam_id,
-+		 caam_get_era(caam_id));
- 	dev_info(dev, "job rings = %d, qi = %d\n",
- 		 ctrlpriv->total_jobrs, ctrlpriv->qi_present);
- 
-diff --git a/drivers/crypto/caam/ctrl.h b/drivers/crypto/caam/ctrl.h
-new file mode 100644
-index 0000000..980d44e
---- /dev/null
-+++ b/drivers/crypto/caam/ctrl.h
-@@ -0,0 +1,13 @@
-+/*
-+ * CAAM control-plane driver backend public-level include definitions
-+ *
-+ * Copyright 2012 Freescale Semiconductor, Inc.
-+ */
-+
-+#ifndef CTRL_H
-+#define CTRL_H
-+
-+/* Prototypes for backend-level services exposed to APIs */
-+int caam_get_era(u64 caam_id);
-+
-+#endif /* CTRL_H */
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index e9f7a70..2055a70 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -117,6 +117,12 @@ struct jr_outentry {
- #define CHA_NUM_DECONUM_SHIFT	56
- #define CHA_NUM_DECONUM_MASK	(0xfull << CHA_NUM_DECONUM_SHIFT)
- 
-+struct sec_vid {
-+	u16 ip_id;
-+	u8 maj_rev;
-+	u8 min_rev;
-+};
-+
- struct caam_perfmon {
- 	/* Performance Monitor Registers			f00-f9f */
- 	u64 req_dequeued;	/* PC_REQ_DEQ - Dequeued Requests	     */
 -- 
-1.7.7.6
+1.7.0.4
