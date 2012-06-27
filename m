@@ -1,60 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/20] crypto: caam - driver updates
-Date: Wed, 27 Jun 2012 14:51:44 +0800
-Message-ID: <20120627065144.GD22920@gondor.apana.org.au>
-References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto/arc4: now arc needs blockcipher support
+Date: Wed, 27 Jun 2012 14:52:47 +0800
+Message-ID: <20120627065247.GE22920@gondor.apana.org.au>
+References: <20120626161346.GB6509@breakpoint.cc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	linux-crypto@vger.kernel.org
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:33330 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:50451 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751960Ab2F0Gvr (ORCPT
+	with ESMTP id S1750811Ab2F0Gwx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jun 2012 02:51:47 -0400
+	Wed, 27 Jun 2012 02:52:53 -0400
 Content-Disposition: inline
-In-Reply-To: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
+In-Reply-To: <20120626161346.GB6509@breakpoint.cc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 22, 2012 at 07:42:34PM -0500, Kim Phillips wrote:
-> The following updates bring the upstream CAAM driver mostly up to date wrt
-> Freescale's SDK 1.2 release:
+On Tue, Jun 26, 2012 at 06:13:46PM +0200, Sebastian Andrzej Siewior wrote:
+> Since commit ce6dd368 ("crypto: arc4 - improve performance by adding
+> ecb(arc4)) we need to pull in a blkcipher.
 > 
-> patch 1 is a cosmetic fix
+> |ERROR: "crypto_blkcipher_type" [crypto/arc4.ko] undefined!
+> |ERROR: "blkcipher_walk_done" [crypto/arc4.ko] undefined!
+> |ERROR: "blkcipher_walk_virt" [crypto/arc4.ko] undefined!
 > 
-> patch 2 is a mapping size fix
-> 
-> patches 3-5 are protocol descriptor generation updates (not currently used
-> in the kernel driver, but these header files are shared with other projects in
-> the SDK; hope that's ok).
-> 
-> patches 6-9 refactor code in preparation for ahash and hwrng support; and
-> patch 7 removes the job ring registration interface in favour of user-managed
-> selection and sharing of rings (see caam_rng_init, which simply chooses
-> job ring 0 for all its operations).
-> 
-> patches 10-12 add ahash support (keyed and unkeyed)
-> 
-> patch 13 adds hwrng support
-> 
-> patches 14-15 add support for the SEC v5.x series, which most notably gets a
-> new RNG (tested on P5040 h/w)
-> 
-> patches 16-20 contain various performance improvements
+> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-All applied.  Thanks Kim!
+Patch applied.  Thanks!
 
-> There are two patches remaining in the SDK that I'm holding off for now,
-> as I believe they need more testing: use NAPI instead of tasklet, and
-> set descriptor sharing type to SERIAL.
+> On a side note: do we pull in the blkcipher block mode for each cipher now to
+> gain some extra performance like the openssl project? I was under the
+> impression that is in general not worth it.
 
-While using the NAPI concept definitely makes sense, I'm still
-unsure about using napi_struct directly in crypto code.  Dave,
-did you have a chance to look at their patch to use NAPI in their
-crypto driver?
+You mean normal block ciphers? Does it really make that much
+of a difference?
 
 Cheers,
 -- 
