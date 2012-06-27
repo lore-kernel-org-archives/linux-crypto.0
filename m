@@ -1,126 +1,43 @@
-From: Bharat Bhushan <r65777@freescale.com>
-Subject: [PATCH] Using alloc_coherent for caam job rings
-Date: Wed, 27 Jun 2012 10:58:32 +0530
-Message-ID: <1340774912-19042-1-git-send-email-bharat.bhushan@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] drivers: crypto: move nx build to driver/crypto
+ Makefile
+Date: Wed, 27 Jun 2012 14:49:00 +0800
+Message-ID: <20120627064859.GB22920@gondor.apana.org.au>
+References: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Bharat Bhushan <Bharat.Bhushan@freescale.com>,
-	Bharat Bhushan <bharat.bhushan@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<kim.phillips@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Kent Yoder <key@linux.vnet.ibm.com>
+To: Seth Jennings <sjenning@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:8446 "EHLO
-	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750708Ab2F0FX7 (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:44003 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751850Ab2F0GtW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jun 2012 01:23:59 -0400
+	Wed, 27 Jun 2012 02:49:22 -0400
+Content-Disposition: inline
+In-Reply-To: <1339611763-14603-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+On Wed, Jun 13, 2012 at 01:22:42PM -0500, Seth Jennings wrote:
+> When the nx driver was pulled, the Makefile that actually
+> builds it is arch/powerpc/Makefile. This is unnatural.
+> 
+> This patch moves the line that builds the nx driver from
+> arch/powerpc/Makefile to drivers/crypto/Makefile where it
+> belongs.
+> 
+> Cc: Kent Yoder <key@linux.vnet.ibm.com>
+> Signed-off-by: Seth Jennings <sjenning@linux.vnet.ibm.com>
 
-The caam job rings (input/output job ring) are allocated using
-dma_map_single(). These job rings can be visualized as the ring
-buffers in which the jobs are en-queued/de-queued. The s/w enqueues
-the jobs in input job ring which h/w dequeues and after processing
-it copies the jobs in output job ring. Software then de-queues the
-job from output ring. Using dma_map/unmap_single() is not preferred
-way to allocate memory for this type of requirements because this
-adds un-necessary complexity.
+Both patches applied.
 
-Example, if bounce buffer (SWIOTLB) will get used then to make any
-change visible in this memory to other processing unit requires
-dmap_unmap_single() or dma_sync_single_for_cpu/device(). The
-dma_unmap_single() can not be used as this will free the bounce
-buffer, this will require changing the job rings on running system
-and I seriously doubt that it will be not possible or very complex
-to implement. Also using dma_sync_single_for_cpu/device() will also
-add unnecessary complexity.
-
-The simple and preferred way is using dma_alloc_coherent() for these
-type of memory requirements.
-
-This resolves the Linux boot crash issue when "swiotlb=force" is set
-in bootargs on systems which have memory more than 4G.
-
-Signed-off-by: Bharat Bhushan <bharat.bhushan@freescale.com>
----
-This patch is based on "git://git.freescale.com/crypto/cryptodev.git master" 
-which have Kim Phillip's "[PATCH 00/20] crypto: caam - driver updates"
-patches, which are already sent uptream.
-
- drivers/crypto/caam/jr.c |   45 +++++++++------------------------------------
- 1 files changed, 9 insertions(+), 36 deletions(-)
-
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 7074a1a..53c8c51 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -339,10 +339,11 @@ static int caam_jr_init(struct device *dev)
- 	if (error)
- 		return error;
- 
--	jrp->inpring = kzalloc(sizeof(dma_addr_t) * JOBR_DEPTH,
--			       GFP_KERNEL | GFP_DMA);
--	jrp->outring = kzalloc(sizeof(struct jr_outentry) *
--			       JOBR_DEPTH, GFP_KERNEL | GFP_DMA);
-+	jrp->inpring = dma_alloc_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
-+					  &inpbusaddr, GFP_KERNEL);
-+
-+	jrp->outring = dma_alloc_coherent(dev, sizeof(struct jr_outentry) *
-+					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
- 
- 	jrp->entinfo = kzalloc(sizeof(struct caam_jrentry_info) * JOBR_DEPTH,
- 			       GFP_KERNEL);
-@@ -358,31 +359,6 @@ static int caam_jr_init(struct device *dev)
- 		jrp->entinfo[i].desc_addr_dma = !0;
- 
- 	/* Setup rings */
--	inpbusaddr = dma_map_single(dev, jrp->inpring,
--				    sizeof(dma_addr_t) * JOBR_DEPTH,
--				    DMA_BIDIRECTIONAL);
--	if (dma_mapping_error(dev, inpbusaddr)) {
--		dev_err(dev, "caam_jr_init(): can't map input ring\n");
--		kfree(jrp->inpring);
--		kfree(jrp->outring);
--		kfree(jrp->entinfo);
--		return -EIO;
--	}
--
--	outbusaddr = dma_map_single(dev, jrp->outring,
--				    sizeof(struct jr_outentry) * JOBR_DEPTH,
--				    DMA_BIDIRECTIONAL);
--	if (dma_mapping_error(dev, outbusaddr)) {
--		dev_err(dev, "caam_jr_init(): can't map output ring\n");
--		dma_unmap_single(dev, inpbusaddr,
--				 sizeof(dma_addr_t) * JOBR_DEPTH,
--				 DMA_BIDIRECTIONAL);
--		kfree(jrp->inpring);
--		kfree(jrp->outring);
--		kfree(jrp->entinfo);
--		return -EIO;
--	}
--
- 	jrp->inp_ring_write_index = 0;
- 	jrp->out_ring_read_index = 0;
- 	jrp->head = 0;
-@@ -426,13 +402,10 @@ int caam_jr_shutdown(struct device *dev)
- 	/* Free rings */
- 	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
- 	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
--	dma_unmap_single(dev, outbusaddr,
--			 sizeof(struct jr_outentry) * JOBR_DEPTH,
--			 DMA_BIDIRECTIONAL);
--	dma_unmap_single(dev, inpbusaddr, sizeof(dma_addr_t) * JOBR_DEPTH,
--			 DMA_BIDIRECTIONAL);
--	kfree(jrp->outring);
--	kfree(jrp->inpring);
-+	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
-+			  jrp->inpring, inpbusaddr);
-+	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
-+			  jrp->outring, outbusaddr);
- 	kfree(jrp->entinfo);
- 
- 	return ret;
+Thanks!
 -- 
-1.7.0.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
