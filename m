@@ -1,45 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/arc4: now arc needs blockcipher support
-Date: Wed, 27 Jun 2012 14:52:47 +0800
-Message-ID: <20120627065247.GE22920@gondor.apana.org.au>
-References: <20120626161346.GB6509@breakpoint.cc>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 00/20] crypto: caam - driver updates
+Date: Wed, 27 Jun 2012 01:17:25 -0700 (PDT)
+Message-ID: <20120627.011725.957557737426563044.davem@davemloft.net>
+References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
+	<20120627065144.GD22920@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-	linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: kim.phillips@freescale.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:50451 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750811Ab2F0Gwx (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:40259 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752804Ab2F0IRZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Jun 2012 02:52:53 -0400
-Content-Disposition: inline
-In-Reply-To: <20120626161346.GB6509@breakpoint.cc>
+	Wed, 27 Jun 2012 04:17:25 -0400
+In-Reply-To: <20120627065144.GD22920@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 26, 2012 at 06:13:46PM +0200, Sebastian Andrzej Siewior wrote:
-> Since commit ce6dd368 ("crypto: arc4 - improve performance by adding
-> ecb(arc4)) we need to pull in a blkcipher.
-> 
-> |ERROR: "crypto_blkcipher_type" [crypto/arc4.ko] undefined!
-> |ERROR: "blkcipher_walk_done" [crypto/arc4.ko] undefined!
-> |ERROR: "blkcipher_walk_virt" [crypto/arc4.ko] undefined!
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 27 Jun 2012 14:51:44 +0800
 
-Patch applied.  Thanks!
+> While using the NAPI concept definitely makes sense, I'm still
+> unsure about using napi_struct directly in crypto code.  Dave,
+> did you have a chance to look at their patch to use NAPI in their
+> crypto driver?
 
-> On a side note: do we pull in the blkcipher block mode for each cipher now to
-> gain some extra performance like the openssl project? I was under the
-> impression that is in general not worth it.
-
-You mean normal block ciphers? Does it really make that much
-of a difference?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'll take a look at it tomorrow, thanks.
