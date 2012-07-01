@@ -1,52 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/20] crypto: caam - driver updates
-Date: Sat, 30 Jun 2012 20:59:40 +0800
-Message-ID: <20120630125940.GA12039@gondor.apana.org.au>
-References: <1340412174-1784-1-git-send-email-kim.phillips@freescale.com>
- <20120627065144.GD22920@gondor.apana.org.au>
- <20120630.011851.1964175776825322391.davem@davemloft.net>
+From: =?UTF-8?q?Eric=20B=C3=A9nard?= <eric@eukrea.com>
+Subject: [PATCH 0/5] AT91SAM9G46/M11: add crypto drivers
+Date: Sun,  1 Jul 2012 19:19:42 +0200
+Message-ID: <1341163187-14946-1-git-send-email-eric@eukrea.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kim.phillips@freescale.com, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: nicolas.ferre@atmel.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, plagnioj@jcrosoft.com, nicolas@eukrea.com,
+	eric@eukrea.com
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:57570 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753006Ab2F3Nyq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 30 Jun 2012 09:54:46 -0400
-Content-Disposition: inline
-In-Reply-To: <20120630.011851.1964175776825322391.davem@davemloft.net>
+Received: from smtp3-g21.free.fr ([212.27.42.3]:33362 "EHLO smtp3-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753555Ab2GARUf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 1 Jul 2012 13:20:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jun 30, 2012 at 01:18:51AM -0700, David Miller wrote:
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Date: Wed, 27 Jun 2012 14:51:44 +0800
-> 
-> > While using the NAPI concept definitely makes sense, I'm still
-> > unsure about using napi_struct directly in crypto code.  Dave,
-> > did you have a chance to look at their patch to use NAPI in their
-> > crypto driver?
-> 
-> So I think using the existing napi context is overkill for a crypto
-> driver, there is so much stuff in that structure that will not be used
-> and just end up being wasted space.
-> 
-> Better to create a crypto_napi struct that caters more closely to
-> just what crypto driver need.
+This patch serie adds the support for the crypto engine available in
+the Atmel SAM9G46 http://www.atmel.com/devices/SAM9G46.aspx and SAM9M11
+http://www.atmel.com/devices/SAM9M11.aspx
 
-Yeah I agree completely.
+For each driver the choice between PDC/DMA or PIO was optimized to
+maximize the performances (benchmarks will soon be available on
+the linux4sam wiki http://www.at91.com/).
 
-In fact, now that I have had a bit more time to think this through
-it seems that what they need isn't necessarily NAPI but better
-management of the tasklet to achieve the same level of turnaround
-performance as provided by NAPI + net_rx_action.
+These drivers were tested on both devices : the last patch adds a few
+missing tests to tcrypt.
 
-I'll try to spend some time on this next week.
+This work was sponsored by Atmel.
 
-Thanks,
+Nicolas Royer (5):
+  ARM: AT91SAM9G45: add crypto peripherals
+  crypto: add Atmel AES driver
+  crypto: add Atmel DES/TDES driver
+  crypto: add Atmel SHA1/SHA256 driver
+  crypto: add new tests to tcrypt
+
+ arch/arm/mach-at91/at91sam9g45.c              |   13 +-
+ arch/arm/mach-at91/at91sam9g45_devices.c      |  128 +++
+ arch/arm/mach-at91/include/mach/at91sam9g45.h |    2 +
+ crypto/tcrypt.c                               |   50 +-
+ drivers/crypto/Kconfig                        |   47 +
+ drivers/crypto/Makefile                       |    5 +-
+ drivers/crypto/atmel-aes-regs.h               |   62 ++
+ drivers/crypto/atmel-aes.c                    | 1206 ++++++++++++++++++++++++
+ drivers/crypto/atmel-sha-regs.h               |   46 +
+ drivers/crypto/atmel-sha.c                    | 1112 ++++++++++++++++++++++
+ drivers/crypto/atmel-tdes-regs.h              |   89 ++
+ drivers/crypto/atmel-tdes.c                   | 1215 +++++++++++++++++++++++++
+ include/linux/platform_data/atmel-aes.h       |   22 +
+ 13 files changed, 3990 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/crypto/atmel-aes-regs.h
+ create mode 100644 drivers/crypto/atmel-aes.c
+ create mode 100644 drivers/crypto/atmel-sha-regs.h
+ create mode 100644 drivers/crypto/atmel-sha.c
+ create mode 100644 drivers/crypto/atmel-tdes-regs.h
+ create mode 100644 drivers/crypto/atmel-tdes.c
+ create mode 100644 include/linux/platform_data/atmel-aes.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.7.6
