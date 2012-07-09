@@ -1,95 +1,78 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: linux-next: Tree for July 2 (crypto/hifn_795x)
-Date: Mon, 09 Jul 2012 20:54:41 +0300
-Message-ID: <20120709205441.11422bntesq3cdno@www.81.fi>
-References: <20120702172334.2618cae84cc57b4ec5a63ed7@canb.auug.org.au>
- <4FF1CBF2.8060303@xenotime.net>
-Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="=_28zo09nk67fo"
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <4FF1CBF2.8060303@xenotime.net>
-Sender: linux-next-owner@vger.kernel.org
+From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 1/6] workqueue: don't use WQ_HIGHPRI for unbound workqueues
+Date: Mon,  9 Jul 2012 11:41:50 -0700
+Message-ID: <1341859315-17759-2-git-send-email-tj@kernel.org>
+References: <1341859315-17759-1-git-send-email-tj@kernel.org>
+Cc: torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, joshhunt00-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org, rni-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, bpm-sJ/iWh9BUns@public.gmane.org, elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org,
+	johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org, Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1341859315-17759-1-git-send-email-tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This message is in MIME format.
+Unbound wqs aren't concurrency-managed and try to execute work items
+as soon as possible.  This is currently achieved by implicitly setting
+%WQ_HIGHPRI on all unbound workqueues; however, WQ_HIGHPRI
+implementation is about to be restructured and this usage won't be
+valid anymore.
 
---=_28zo09nk67fo
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 7bit
+Add an explicit chain-wakeup path for unbound workqueues in
+process_one_work() instead of piggy backing on %WQ_HIGHPRI.
 
-Quoting Randy Dunlap <rdunlap@xenotime.net>:
-
-> On 07/02/2012 12:23 AM, Stephen Rothwell wrote:
->
->> Hi all,
->>
->> Changes since 20120629:
->>
->
->
-> on i386:
->
->
-> ERROR: "__divdi3" [drivers/crypto/hifn_795x.ko] undefined!
->
-
-This is caused by commit feb7b7ab928afa97a79a9c424e4e0691f49d63be.  
-hifn_795x has "DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq)", which  
-should be changed to DIV_ROUND_UP_ULL now that NSEC_PER_SEC is 64bit  
-on 32bit archs. Patch to fix hifn_795x is attached (only compile  
-tested).
-
--Jussi
-
-
---=_28zo09nk67fo
-Content-Type: text/x-patch;
- charset=ISO-8859-1;
- name="01-crypto-hifn_795x-fix-64bit-division-and-undefined-__divdi3.patch"
-Content-Disposition: attachment;
- filename*0="01-crypto-hifn_795x-fix-64bit-division-and-undefined-__divdi3.pat";
- filename*1="ch"
-Content-Transfer-Encoding: 7bit
-
-crypto: hifn_795x - fix 64bit division and undefined __divdi3 on 32bit archs
-
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-
-Commit feb7b7ab928afa97a79a9c424e4e0691f49d63be changed NSEC_PER_SEC to 64-bit
-constant, which causes "DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq)" to
-generate __divdi3 call on 32-bit archs. Fix this by changing DIV_ROUND_UP to
-DIV_ROUND_UP_ULL.
-
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Signed-off-by: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 ---
- drivers/crypto/hifn_795x.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ kernel/workqueue.c |   18 +++++++++++-------
+ 1 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index c9c4bef..df14358 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -821,8 +821,8 @@ static int hifn_register_rng(struct hifn_device *dev)
- 	/*
- 	 * We must wait at least 256 Pk_clk cycles between two reads of the rng.
- 	 */
--	dev->rng_wait_time	= DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq) *
--				  256;
-+	dev->rng_wait_time	= DIV_ROUND_UP_ULL(NSEC_PER_SEC,
-+						   dev->pk_clk_freq) * 256;
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 9a3128d..27637c2 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -580,6 +580,10 @@ static bool __need_more_worker(struct global_cwq *gcwq)
+ /*
+  * Need to wake up a worker?  Called from anything but currently
+  * running workers.
++ *
++ * Note that, because unbound workers never contribute to nr_running, this
++ * function will always return %true for unbound gcwq as long as the
++ * worklist isn't empty.
+  */
+ static bool need_more_worker(struct global_cwq *gcwq)
+ {
+@@ -1867,6 +1871,13 @@ __acquires(&gcwq->lock)
+ 	if (unlikely(cpu_intensive))
+ 		worker_set_flags(worker, WORKER_CPU_INTENSIVE, true);
  
- 	dev->rng.name		= dev->name;
- 	dev->rng.data_present	= hifn_rng_data_present,
-
---=_28zo09nk67fo--
++	/*
++	 * Unbound gcwq isn't concurrency managed and work items should be
++	 * executed ASAP.  Wake up another worker if necessary.
++	 */
++	if ((worker->flags & WORKER_UNBOUND) && need_more_worker(gcwq))
++		wake_up_worker(gcwq);
++
+ 	spin_unlock_irq(&gcwq->lock);
+ 
+ 	work_clear_pending(work);
+@@ -2984,13 +2995,6 @@ struct workqueue_struct *__alloc_workqueue_key(const char *fmt,
+ 	if (flags & WQ_MEM_RECLAIM)
+ 		flags |= WQ_RESCUER;
+ 
+-	/*
+-	 * Unbound workqueues aren't concurrency managed and should be
+-	 * dispatched to workers immediately.
+-	 */
+-	if (flags & WQ_UNBOUND)
+-		flags |= WQ_HIGHPRI;
+-
+ 	max_active = max_active ?: WQ_DFL_ACTIVE;
+ 	max_active = wq_clamp_max_active(max_active, flags, wq->name);
+ 
+-- 
+1.7.7.3
