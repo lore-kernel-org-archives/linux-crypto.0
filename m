@@ -1,53 +1,95 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] crypto: testmgr - make the assoc data and iv contiguous
- for aead tests
-Date: Mon, 9 Jul 2012 11:26:32 -0500
-Message-ID: <20120709112632.66137bd25ff3bbad799d8ae5@freescale.com>
-References: <1341821863-16074-1-git-send-email-horia.geanta@freescale.com>
-	<20120709081935.GA12103@gondor.apana.org.au>
-	<FD18E5D573A8AB48A365D4D78185DE99234333@039-SN1MPN1-001.039d.mgd.msft.net>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: linux-next: Tree for July 2 (crypto/hifn_795x)
+Date: Mon, 09 Jul 2012 20:54:41 +0300
+Message-ID: <20120709205441.11422bntesq3cdno@www.81.fi>
+References: <20120702172334.2618cae84cc57b4ec5a63ed7@canb.auug.org.au>
+ <4FF1CBF2.8060303@xenotime.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: multipart/mixed;
+ boundary="=_28zo09nk67fo"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:10543
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752095Ab2GIQ2h (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Jul 2012 12:28:37 -0400
-In-Reply-To: <FD18E5D573A8AB48A365D4D78185DE99234333@039-SN1MPN1-001.039d.mgd.msft.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <4FF1CBF2.8060303@xenotime.net>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 9 Jul 2012 03:38:54 -0500
-Geanta Neag Horia Ioan-B05471 <B05471@freescale.com> wrote:
+This message is in MIME format.
 
-> On Mon, 9 Jul 2012 11:19:35 +0300, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > On Mon, Jul 09, 2012 at 11:17:43AM +0300, Horia Geanta wrote:
-> >> In case of AEAD, some crypto engines expect assoc data and iv to be
-> >> contiguous. This is how native IPsec works; make testmgr's behaviour
-> >> the same. (Alternative would be to fix this in the crypto engine
-> >> drivers, but this is pricy since it would involve memory allocation and
-> >> copy in the hot path.)
-> >> 
-> >> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
-> > 
-> > I think we should fix the buggy driver instead.
+--=_28zo09nk67fo
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 
-technically it's buggy h/w.  Even though SEC 2/3 descriptors have
-separate fields for assoc and iv data, the h/w produces incorrect
-results if they are disjoint.
+Quoting Randy Dunlap <rdunlap@xenotime.net>:
 
-> Ok, then we'll see how to work around the HW limitation in the driver,
-> without affecting performance too much.
+> On 07/02/2012 12:23 AM, Stephen Rothwell wrote:
+>
+>> Hi all,
+>>
+>> Changes since 20120629:
+>>
+>
+>
+> on i386:
+>
+>
+> ERROR: "__divdi3" [drivers/crypto/hifn_795x.ko] undefined!
+>
 
-If it comes down to more than a simple unlikely(assoc_addr +
-assoclen == iv_addr) check, then we may want to introduce a
-TALITOS_STRICT config, which may be further made dependent on 
-!CRYPTO_MANAGER_DISABLE_TESTS.
+This is caused by commit feb7b7ab928afa97a79a9c424e4e0691f49d63be.  
+hifn_795x has "DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq)", which  
+should be changed to DIV_ROUND_UP_ULL now that NSEC_PER_SEC is 64bit  
+on 32bit archs. Patch to fix hifn_795x is attached (only compile  
+tested).
 
-Kim
+-Jussi
+
+
+--=_28zo09nk67fo
+Content-Type: text/x-patch;
+ charset=ISO-8859-1;
+ name="01-crypto-hifn_795x-fix-64bit-division-and-undefined-__divdi3.patch"
+Content-Disposition: attachment;
+ filename*0="01-crypto-hifn_795x-fix-64bit-division-and-undefined-__divdi3.pat";
+ filename*1="ch"
+Content-Transfer-Encoding: 7bit
+
+crypto: hifn_795x - fix 64bit division and undefined __divdi3 on 32bit archs
+
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+
+Commit feb7b7ab928afa97a79a9c424e4e0691f49d63be changed NSEC_PER_SEC to 64-bit
+constant, which causes "DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq)" to
+generate __divdi3 call on 32-bit archs. Fix this by changing DIV_ROUND_UP to
+DIV_ROUND_UP_ULL.
+
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ drivers/crypto/hifn_795x.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index c9c4bef..df14358 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -821,8 +821,8 @@ static int hifn_register_rng(struct hifn_device *dev)
+ 	/*
+ 	 * We must wait at least 256 Pk_clk cycles between two reads of the rng.
+ 	 */
+-	dev->rng_wait_time	= DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq) *
+-				  256;
++	dev->rng_wait_time	= DIV_ROUND_UP_ULL(NSEC_PER_SEC,
++						   dev->pk_clk_freq) * 256;
+ 
+ 	dev->rng.name		= dev->name;
+ 	dev->rng.data_present	= hifn_rng_data_present,
+
+--=_28zo09nk67fo--
