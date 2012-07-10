@@ -1,19 +1,23 @@
 From: Qiang Liu <qiang.liu@freescale.com>
 Subject: [PATCH 0/3] Raid: enable talitos xor offload for improving performance
-Date: Tue, 10 Jul 2012 13:54:41 +0800
-Message-ID: <1341899685-18665-1-git-send-email-qiang.liu@freescale.com>
+Date: Tue, 10 Jul 2012 13:56:45 +0800
+Message-ID: <1341899809-20630-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <leoli@freescale.com>, <kim.phillips@freescale.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe002.messaging.microsoft.com ([216.32.180.12]:53278
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751770Ab2GJGPv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Jul 2012 02:15:51 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
 The following 4 patches enabling fsl-dma and talitos offload raid
 operations for improving raid performance and balancing CPU load.
