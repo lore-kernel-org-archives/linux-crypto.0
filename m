@@ -1,7 +1,8 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 10/14] crypto: whirlpool - use crypto_[un]register_shashes
-Date: Wed, 11 Jul 2012 14:20:41 +0300
-Message-ID: <20120711112041.6875.84893.stgit@localhost6.localdomain6>
+Subject: [PATCH 11/14] crypto: cleanup - remove unneeded crypto_alg.cra_list
+ initializations
+Date: Wed, 11 Jul 2012 14:20:46 +0300
+Message-ID: <20120711112046.6875.90685.stgit@localhost6.localdomain6>
 References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,98 +11,217 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:37338 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757148Ab2GKLUr (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34196 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757207Ab2GKLUs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:20:47 -0400
+	Wed, 11 Jul 2012 07:20:48 -0400
 In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Combine all shash algs to be registered and use new crypto_[un]register_shashes
-functions. This simplifies init/exit code.
+Initialization of cra_list is currently mixed, most ciphers initialize this
+field and most shashes do not. Initialization however is not needed at all
+since cra_list is initialized/overwritten in __crypto_register_alg() with
+list_add(). Therefore perform cleanup to remove all unneeded initializations
+of this field in 'crypto/'.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/wp512.c |   39 ++++++---------------------------------
- 1 file changed, 6 insertions(+), 33 deletions(-)
+ crypto/aes_generic.c      |    1 -
+ crypto/anubis.c           |    1 -
+ crypto/blowfish_generic.c |    1 -
+ crypto/camellia_generic.c |    1 -
+ crypto/cast5.c            |    1 -
+ crypto/cast6.c            |    1 -
+ crypto/deflate.c          |    1 -
+ crypto/fcrypt.c           |    1 -
+ crypto/ghash-generic.c    |    1 -
+ crypto/khazad.c           |    1 -
+ crypto/krng.c             |    1 -
+ crypto/lzo.c              |    1 -
+ crypto/salsa20_generic.c  |    1 -
+ crypto/seed.c             |    1 -
+ crypto/twofish_generic.c  |    1 -
+ 15 files changed, 15 deletions(-)
 
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index 71719a2..180f1d6 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -1119,7 +1119,7 @@ static int wp256_final(struct shash_desc *desc, u8 *out)
- 	return 0;
- }
- 
--static struct shash_alg wp512 = {
-+static struct shash_alg wp_algs[3] = { {
- 	.digestsize	=	WP512_DIGEST_SIZE,
- 	.init		=	wp512_init,
- 	.update		=	wp512_update,
-@@ -1131,9 +1131,7 @@ static struct shash_alg wp512 = {
- 		.cra_blocksize	=	WP512_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
--};
--
--static struct shash_alg wp384 = {
-+}, {
- 	.digestsize	=	WP384_DIGEST_SIZE,
- 	.init		=	wp512_init,
- 	.update		=	wp512_update,
-@@ -1145,9 +1143,7 @@ static struct shash_alg wp384 = {
- 		.cra_blocksize	=	WP512_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
--};
--
--static struct shash_alg wp256 = {
-+}, {
- 	.digestsize	=	WP256_DIGEST_SIZE,
- 	.init		=	wp512_init,
- 	.update		=	wp512_update,
-@@ -1159,39 +1155,16 @@ static struct shash_alg wp256 = {
- 		.cra_blocksize	=	WP512_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
--};
-+} };
- 
- static int __init wp512_mod_init(void)
- {
--	int ret = 0;
--
--	ret = crypto_register_shash(&wp512);
--
--	if (ret < 0)
--		goto out;
--
--	ret = crypto_register_shash(&wp384);
--	if (ret < 0)
--	{
--		crypto_unregister_shash(&wp512);
--		goto out;
--	}
--
--	ret = crypto_register_shash(&wp256);
--	if (ret < 0)
--	{
--		crypto_unregister_shash(&wp512);
--		crypto_unregister_shash(&wp384);
--	}
--out:
--	return ret;
-+	return crypto_register_shashes(wp_algs, ARRAY_SIZE(wp_algs));
- }
- 
- static void __exit wp512_mod_fini(void)
- {
--	crypto_unregister_shash(&wp512);
--	crypto_unregister_shash(&wp384);
--	crypto_unregister_shash(&wp256);
-+	crypto_unregister_shashes(wp_algs, ARRAY_SIZE(wp_algs));
- }
- 
- MODULE_ALIAS("wp384");
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index a68c73d..47f2e5c 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -1448,7 +1448,6 @@ static struct crypto_alg aes_alg = {
+ 	.cra_ctxsize		=	sizeof(struct crypto_aes_ctx),
+ 	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(aes_alg.cra_list),
+ 	.cra_u			=	{
+ 		.cipher = {
+ 			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
+diff --git a/crypto/anubis.c b/crypto/anubis.c
+index 77530d5..008c8a4 100644
+--- a/crypto/anubis.c
++++ b/crypto/anubis.c
+@@ -678,7 +678,6 @@ static struct crypto_alg anubis_alg = {
+ 	.cra_ctxsize		=	sizeof (struct anubis_ctx),
+ 	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(anubis_alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	ANUBIS_MIN_KEY_SIZE,
+ 	.cia_max_keysize	=	ANUBIS_MAX_KEY_SIZE,
+diff --git a/crypto/blowfish_generic.c b/crypto/blowfish_generic.c
+index 6f269b5..8baf544 100644
+--- a/crypto/blowfish_generic.c
++++ b/crypto/blowfish_generic.c
+@@ -115,7 +115,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize		=	sizeof(struct bf_ctx),
+ 	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	BF_MIN_KEY_SIZE,
+ 	.cia_max_keysize	=	BF_MAX_KEY_SIZE,
+diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
+index f7aaaaf..75efa20 100644
+--- a/crypto/camellia_generic.c
++++ b/crypto/camellia_generic.c
+@@ -1072,7 +1072,6 @@ static struct crypto_alg camellia_alg = {
+ 	.cra_ctxsize		=	sizeof(struct camellia_ctx),
+ 	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(camellia_alg.cra_list),
+ 	.cra_u			=	{
+ 		.cipher = {
+ 			.cia_min_keysize	=	CAMELLIA_MIN_KEY_SIZE,
+diff --git a/crypto/cast5.c b/crypto/cast5.c
+index 4a230dd..fffcb37 100644
+--- a/crypto/cast5.c
++++ b/crypto/cast5.c
+@@ -779,7 +779,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize 	= sizeof(struct cast5_ctx),
+ 	.cra_alignmask	= 3,
+ 	.cra_module 	= THIS_MODULE,
+-	.cra_list 	= LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u 		= {
+ 		.cipher = {
+ 			.cia_min_keysize = CAST5_MIN_KEY_SIZE,
+diff --git a/crypto/cast6.c b/crypto/cast6.c
+index e0c15a6..04264f5 100644
+--- a/crypto/cast6.c
++++ b/crypto/cast6.c
+@@ -519,7 +519,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize = sizeof(struct cast6_ctx),
+ 	.cra_alignmask = 3,
+ 	.cra_module = THIS_MODULE,
+-	.cra_list = LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u = {
+ 		  .cipher = {
+ 			     .cia_min_keysize = CAST6_MIN_KEY_SIZE,
+diff --git a/crypto/deflate.c b/crypto/deflate.c
+index b0165ec..b57d70e 100644
+--- a/crypto/deflate.c
++++ b/crypto/deflate.c
+@@ -199,7 +199,6 @@ static struct crypto_alg alg = {
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+ 	.cra_ctxsize		= sizeof(struct deflate_ctx),
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_init		= deflate_init,
+ 	.cra_exit		= deflate_exit,
+ 	.cra_u			= { .compress = {
+diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
+index c33107e..3b2cf56 100644
+--- a/crypto/fcrypt.c
++++ b/crypto/fcrypt.c
+@@ -396,7 +396,6 @@ static struct crypto_alg fcrypt_alg = {
+ 	.cra_ctxsize		=	sizeof(struct fcrypt_ctx),
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_alignmask		=	3,
+-	.cra_list		=	LIST_HEAD_INIT(fcrypt_alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	8,
+ 	.cia_max_keysize	=	8,
+diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
+index 7835b8f..9d3f0c6 100644
+--- a/crypto/ghash-generic.c
++++ b/crypto/ghash-generic.c
+@@ -153,7 +153,6 @@ static struct shash_alg ghash_alg = {
+ 		.cra_blocksize		= GHASH_BLOCK_SIZE,
+ 		.cra_ctxsize		= sizeof(struct ghash_ctx),
+ 		.cra_module		= THIS_MODULE,
+-		.cra_list		= LIST_HEAD_INIT(ghash_alg.base.cra_list),
+ 		.cra_exit		= ghash_exit_tfm,
+ 	},
+ };
+diff --git a/crypto/khazad.c b/crypto/khazad.c
+index 527e4e3..60e7cd6 100644
+--- a/crypto/khazad.c
++++ b/crypto/khazad.c
+@@ -853,7 +853,6 @@ static struct crypto_alg khazad_alg = {
+ 	.cra_ctxsize		=	sizeof (struct khazad_ctx),
+ 	.cra_alignmask		=	7,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(khazad_alg.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	KHAZAD_KEY_SIZE,
+ 	.cia_max_keysize	=	KHAZAD_KEY_SIZE,
+diff --git a/crypto/krng.c b/crypto/krng.c
+index 4328bb3..a2d2b72 100644
+--- a/crypto/krng.c
++++ b/crypto/krng.c
+@@ -35,7 +35,6 @@ static struct crypto_alg krng_alg = {
+ 	.cra_ctxsize		= 0,
+ 	.cra_type		= &crypto_rng_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(krng_alg.cra_list),
+ 	.cra_u			= {
+ 		.rng = {
+ 			.rng_make_random	= krng_get_random,
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index b5e7707..1c2aa69 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -81,7 +81,6 @@ static struct crypto_alg alg = {
+ 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
+ 	.cra_ctxsize		= sizeof(struct lzo_ctx),
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_init		= lzo_init,
+ 	.cra_exit		= lzo_exit,
+ 	.cra_u			= { .compress = {
+diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
+index eac10c1..9a4770c 100644
+--- a/crypto/salsa20_generic.c
++++ b/crypto/salsa20_generic.c
+@@ -221,7 +221,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize        =   sizeof(struct salsa20_ctx),
+ 	.cra_alignmask      =	3,
+ 	.cra_module         =   THIS_MODULE,
+-	.cra_list           =   LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u              =   {
+ 		.blkcipher = {
+ 			.setkey         =   setkey,
+diff --git a/crypto/seed.c b/crypto/seed.c
+index d3e422f..9c904d6 100644
+--- a/crypto/seed.c
++++ b/crypto/seed.c
+@@ -449,7 +449,6 @@ static struct crypto_alg seed_alg = {
+ 	.cra_ctxsize		=	sizeof(struct seed_ctx),
+ 	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(seed_alg.cra_list),
+ 	.cra_u			=	{
+ 		.cipher = {
+ 			.cia_min_keysize	=	SEED_KEY_SIZE,
+diff --git a/crypto/twofish_generic.c b/crypto/twofish_generic.c
+index 1f07b84..2d50005 100644
+--- a/crypto/twofish_generic.c
++++ b/crypto/twofish_generic.c
+@@ -188,7 +188,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize        =   sizeof(struct twofish_ctx),
+ 	.cra_alignmask      =	3,
+ 	.cra_module         =   THIS_MODULE,
+-	.cra_list           =   LIST_HEAD_INIT(alg.cra_list),
+ 	.cra_u              =   { .cipher = {
+ 	.cia_min_keysize    =   TF_MIN_KEY_SIZE,
+ 	.cia_max_keysize    =   TF_MAX_KEY_SIZE,
