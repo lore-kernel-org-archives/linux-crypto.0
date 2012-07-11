@@ -1,20 +1,21 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 04/14] crypto: serpent - use crypto_[un]register_algs
-Date: Wed, 11 Jul 2012 14:20:10 +0300
-Message-ID: <20120711112010.6875.37469.stgit@localhost6.localdomain6>
+Subject: [PATCH 05/14] crypto: ansi_cprng - use crypto_[un]register_algs
+Date: Wed, 11 Jul 2012 14:20:15 +0300
+Message-ID: <20120711112015.6875.75821.stgit@localhost6.localdomain6>
 References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Neil Horman <nhorman@tuxdriver.com>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:40621 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752808Ab2GKLUN (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34029 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752808Ab2GKLUT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:20:13 -0400
+	Wed, 11 Jul 2012 07:20:19 -0400
 In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -22,98 +23,114 @@ List-ID: <linux-crypto.vger.kernel.org>
 Combine all crypto_alg to be registered and use new crypto_[un]register_algs
 functions. This simplifies init/exit code.
 
+Cc: Neil Horman <nhorman@tuxdriver.com>
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/serpent_generic.c |   53 ++++++++++++++++------------------------------
- 1 file changed, 19 insertions(+), 34 deletions(-)
+ crypto/ansi_cprng.c |   63 +++++++++++++++++++--------------------------------
+ 1 file changed, 23 insertions(+), 40 deletions(-)
 
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index 8f32cf3..7ddbd7e 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -567,24 +567,6 @@ static void serpent_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	__serpent_decrypt(ctx, dst, src);
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index 6ddd99e..c0bb377 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -382,26 +382,6 @@ static int cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+ 	return 0;
  }
  
--static struct crypto_alg serpent_alg = {
--	.cra_name		=	"serpent",
--	.cra_driver_name	=	"serpent-generic",
--	.cra_priority		=	100,
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct serpent_ctx),
--	.cra_alignmask		=	3,
--	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
--	.cra_u			=	{ .cipher = {
--	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
--	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
--	.cia_setkey		=	serpent_setkey,
--	.cia_encrypt		=	serpent_encrypt,
--	.cia_decrypt		=	serpent_decrypt } }
+-static struct crypto_alg rng_alg = {
+-	.cra_name		= "stdrng",
+-	.cra_driver_name	= "ansi_cprng",
+-	.cra_priority		= 100,
+-	.cra_flags		= CRYPTO_ALG_TYPE_RNG,
+-	.cra_ctxsize		= sizeof(struct prng_context),
+-	.cra_type		= &crypto_rng_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(rng_alg.cra_list),
+-	.cra_init		= cprng_init,
+-	.cra_exit		= cprng_exit,
+-	.cra_u			= {
+-		.rng = {
+-			.rng_make_random	= cprng_get_random,
+-			.rng_reset		= cprng_reset,
+-			.seedsize = DEFAULT_PRNG_KSZ + 2*DEFAULT_BLK_SZ,
+-		}
+-	}
 -};
 -
- static int tnepres_setkey(struct crypto_tfm *tfm, const u8 *key,
- 			  unsigned int keylen)
- {
-@@ -637,41 +619,44 @@ static void tnepres_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	d[3] = swab32(rd[0]);
+ #ifdef CONFIG_CRYPTO_FIPS
+ static int fips_cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+ 			    unsigned int dlen)
+@@ -438,8 +418,27 @@ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+ out:
+ 	return rc;
  }
++#endif
  
--static struct crypto_alg tnepres_alg = {
-+static struct crypto_alg srp_algs[2] = { {
-+	.cra_name		=	"serpent",
-+	.cra_driver_name	=	"serpent-generic",
-+	.cra_priority		=	100,
-+	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
-+	.cra_ctxsize		=	sizeof(struct serpent_ctx),
-+	.cra_alignmask		=	3,
-+	.cra_module		=	THIS_MODULE,
-+	.cra_u			=	{ .cipher = {
-+	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
-+	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
-+	.cia_setkey		=	serpent_setkey,
-+	.cia_encrypt		=	serpent_encrypt,
-+	.cia_decrypt		=	serpent_decrypt } }
+-static struct crypto_alg fips_rng_alg = {
++static struct crypto_alg rng_algs[] = { {
++	.cra_name		= "stdrng",
++	.cra_driver_name	= "ansi_cprng",
++	.cra_priority		= 100,
++	.cra_flags		= CRYPTO_ALG_TYPE_RNG,
++	.cra_ctxsize		= sizeof(struct prng_context),
++	.cra_type		= &crypto_rng_type,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= cprng_init,
++	.cra_exit		= cprng_exit,
++	.cra_u			= {
++		.rng = {
++			.rng_make_random	= cprng_get_random,
++			.rng_reset		= cprng_reset,
++			.seedsize = DEFAULT_PRNG_KSZ + 2*DEFAULT_BLK_SZ,
++		}
++	}
++#ifdef CONFIG_CRYPTO_FIPS
 +}, {
- 	.cra_name		=	"tnepres",
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct serpent_ctx),
- 	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
- 	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
- 	.cia_setkey		=	tnepres_setkey,
- 	.cia_encrypt		=	tnepres_encrypt,
- 	.cia_decrypt		=	tnepres_decrypt } }
+ 	.cra_name		= "fips(ansi_cprng)",
+ 	.cra_driver_name	= "fips_ansi_cprng",
+ 	.cra_priority		= 300,
+@@ -447,7 +446,6 @@ static struct crypto_alg fips_rng_alg = {
+ 	.cra_ctxsize		= sizeof(struct prng_context),
+ 	.cra_type		= &crypto_rng_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(rng_alg.cra_list),
+ 	.cra_init		= cprng_init,
+ 	.cra_exit		= cprng_exit,
+ 	.cra_u			= {
+@@ -457,33 +455,18 @@ static struct crypto_alg fips_rng_alg = {
+ 			.seedsize = DEFAULT_PRNG_KSZ + 2*DEFAULT_BLK_SZ,
+ 		}
+ 	}
 -};
+ #endif
 +} };
  
- static int __init serpent_mod_init(void)
+ /* Module initalization */
+ static int __init prng_mod_init(void)
  {
--	int ret = crypto_register_alg(&serpent_alg);
+-	int rc = 0;
 -
--	if (ret)
--		return ret;
+-	rc = crypto_register_alg(&rng_alg);
+-#ifdef CONFIG_CRYPTO_FIPS
+-	if (rc)
+-		goto out;
 -
--	ret = crypto_register_alg(&tnepres_alg);
+-	rc = crypto_register_alg(&fips_rng_alg);
 -
--	if (ret)
--		crypto_unregister_alg(&serpent_alg);
--
--	return ret;
-+	return crypto_register_algs(srp_algs, ARRAY_SIZE(srp_algs));
+-out:
+-#endif
+-	return rc;
++	return crypto_register_algs(rng_algs, ARRAY_SIZE(rng_algs));
  }
  
- static void __exit serpent_mod_fini(void)
+ static void __exit prng_mod_fini(void)
  {
--	crypto_unregister_alg(&tnepres_alg);
--	crypto_unregister_alg(&serpent_alg);
-+	crypto_unregister_algs(srp_algs, ARRAY_SIZE(srp_algs));
+-	crypto_unregister_alg(&rng_alg);
+-#ifdef CONFIG_CRYPTO_FIPS
+-	crypto_unregister_alg(&fips_rng_alg);
+-#endif
+-	return;
++	crypto_unregister_algs(rng_algs, ARRAY_SIZE(rng_algs));
  }
  
- module_init(serpent_mod_init);
+ MODULE_LICENSE("GPL");
