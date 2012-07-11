@@ -1,8 +1,8 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 00/14] crypto: cleanup - alg and shash init/exit cleanups and
- remove unneeded cra_list initializations
-Date: Wed, 11 Jul 2012 14:19:50 +0300
-Message-ID: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
+Subject: [PATCH 02/14] crypto: crypto_null - use crypto_[un]register_algs
+Date: Wed, 11 Jul 2012 14:20:00 +0300
+Message-ID: <20120711112000.6875.40518.stgit@localhost6.localdomain6>
+References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -10,94 +10,141 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:40487 "EHLO
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:40525 "EHLO
 	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753271Ab2GKLT6 (ORCPT
+	with ESMTP id S1753271Ab2GKLUD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:19:58 -0400
+	Wed, 11 Jul 2012 07:20:03 -0400
+In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Patches 1-5 change various cipher modules to use new crypto_register_algs and
-crypto_unregister_algs.
+Combine all crypto_alg to be registered and use new crypto_[un]register_algs
+functions. This simplifies init/exit code.
 
-Patch 6 adds new crypto_register_shashes and crypto_unregister_shashes
-functions for registering multiple shash algorithms at same time.
-
-Patches 7-10 change various shash modules to use new crypto_register_shashes
-and crypto_unregister_shashes.
-
-Patches 11-14 remove unneeded .cra_list initializations.
-
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
+ crypto/crypto_null.c |   57 ++++++++++++++++----------------------------------
+ 1 file changed, 18 insertions(+), 39 deletions(-)
 
-Jussi Kivilinna (14):
-      crypto: tea - use crypto_[un]register_algs
-      crypto: crypto_null - use crypto_[un]register_algs
-      crypto: des - use crypto_[un]register_algs
-      crypto: serpent - use crypto_[un]register_algs
-      crypto: ansi_cprng - use crypto_[un]register_algs
-      crypto: add crypto_[un]register_shashes for [un]registering multiple shash entries at once
-      crypto: tiger - use crypto_[un]register_shashes
-      crypto: sha256 - use crypto_[un]register_shashes
-      crypto: sha512 - use crypto_[un]register_shashes
-      crypto: whirlpool - use crypto_[un]register_shashes
-      crypto: cleanup - remove unneeded crypto_alg.cra_list initializations
-      crypto: arch/x86 - cleanup - remove unneeded crypto_alg.cra_list initializations
-      crypto: drivers - remove cra_list initialization
-      crypto: arch/s390 - cleanup - remove unneeded cra_list initialization
-
-
- arch/s390/crypto/aes_s390.c                |    5 --
- arch/s390/crypto/des_s390.c                |   10 ----
- arch/s390/crypto/ghash_s390.c              |    1 
- arch/x86/crypto/aes_glue.c                 |    1 
- arch/x86/crypto/aesni-intel_glue.c         |    5 --
- arch/x86/crypto/blowfish_glue.c            |    4 --
- arch/x86/crypto/camellia_glue.c            |    6 ---
- arch/x86/crypto/ghash-clmulni-intel_glue.c |    2 -
- arch/x86/crypto/salsa20_glue.c             |    1 
- arch/x86/crypto/serpent_avx_glue.c         |   10 ----
- arch/x86/crypto/serpent_sse2_glue.c        |   10 ----
- arch/x86/crypto/twofish_avx_glue.c         |   10 ----
- arch/x86/crypto/twofish_glue.c             |    1 
- arch/x86/crypto/twofish_glue_3way.c        |    5 --
- crypto/aes_generic.c                       |    1 
- crypto/ansi_cprng.c                        |   63 ++++++++++------------------
- crypto/anubis.c                            |    1 
- crypto/blowfish_generic.c                  |    1 
- crypto/camellia_generic.c                  |    1 
- crypto/cast5.c                             |    1 
- crypto/cast6.c                             |    1 
- crypto/crypto_null.c                       |   57 ++++++++-----------------
- crypto/deflate.c                           |    1 
- crypto/des_generic.c                       |   25 ++---------
- crypto/fcrypt.c                            |    1 
- crypto/ghash-generic.c                     |    1 
- crypto/khazad.c                            |    1 
- crypto/krng.c                              |    1 
- crypto/lzo.c                               |    1 
- crypto/salsa20_generic.c                   |    1 
- crypto/seed.c                              |    1 
- crypto/serpent_generic.c                   |   53 ++++++++----------------
- crypto/sha256_generic.c                    |   25 ++---------
- crypto/sha512_generic.c                    |   20 ++-------
- crypto/shash.c                             |   36 ++++++++++++++++
- crypto/tea.c                               |   41 +++---------------
- crypto/tgr192.c                            |   38 +++--------------
- crypto/twofish_generic.c                   |    1 
- crypto/wp512.c                             |   39 +++--------------
- drivers/crypto/atmel-aes.c                 |    2 -
- drivers/crypto/atmel-tdes.c                |    1 
- drivers/crypto/geode-aes.c                 |    3 -
- drivers/crypto/nx/nx-aes-cbc.c             |    1 
- drivers/crypto/nx/nx-aes-ccm.c             |    2 -
- drivers/crypto/nx/nx-aes-ctr.c             |    2 -
- drivers/crypto/nx/nx-aes-ecb.c             |    1 
- drivers/crypto/nx/nx-aes-gcm.c             |    2 -
- drivers/crypto/omap-aes.c                  |    1 
- drivers/crypto/padlock-aes.c               |    3 -
- drivers/crypto/s5p-sss.c                   |    1 
- drivers/crypto/tegra-aes.c                 |    2 -
- include/crypto/internal/hash.h             |    2 +
- 52 files changed, 132 insertions(+), 374 deletions(-)
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index 07a8a96..fee7265 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -94,18 +94,6 @@ static int skcipher_null_crypt(struct blkcipher_desc *desc,
+ 	return err;
+ }
+ 
+-static struct crypto_alg compress_null = {
+-	.cra_name		=	"compress_null",
+-	.cra_flags		=	CRYPTO_ALG_TYPE_COMPRESS,
+-	.cra_blocksize		=	NULL_BLOCK_SIZE,
+-	.cra_ctxsize		=	0,
+-	.cra_module		=	THIS_MODULE,
+-	.cra_list		=       LIST_HEAD_INIT(compress_null.cra_list),
+-	.cra_u			=	{ .compress = {
+-	.coa_compress 		=	null_compress,
+-	.coa_decompress		=	null_compress } }
+-};
+-
+ static struct shash_alg digest_null = {
+ 	.digestsize		=	NULL_DIGEST_SIZE,
+ 	.setkey   		=	null_hash_setkey,
+@@ -122,22 +110,19 @@ static struct shash_alg digest_null = {
+ 	}
+ };
+ 
+-static struct crypto_alg cipher_null = {
++static struct crypto_alg null_algs[3] = { {
+ 	.cra_name		=	"cipher_null",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+ 	.cra_blocksize		=	NULL_BLOCK_SIZE,
+ 	.cra_ctxsize		=	0,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(cipher_null.cra_list),
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	NULL_KEY_SIZE,
+ 	.cia_max_keysize	=	NULL_KEY_SIZE,
+ 	.cia_setkey		= 	null_setkey,
+ 	.cia_encrypt		=	null_crypt,
+ 	.cia_decrypt		=	null_crypt } }
+-};
+-
+-static struct crypto_alg skcipher_null = {
++}, {
+ 	.cra_name		=	"ecb(cipher_null)",
+ 	.cra_driver_name	=	"ecb-cipher_null",
+ 	.cra_priority		=	100,
+@@ -146,7 +131,6 @@ static struct crypto_alg skcipher_null = {
+ 	.cra_type		=	&crypto_blkcipher_type,
+ 	.cra_ctxsize		=	0,
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(skcipher_null.cra_list),
+ 	.cra_u			=	{ .blkcipher = {
+ 	.min_keysize		=	NULL_KEY_SIZE,
+ 	.max_keysize		=	NULL_KEY_SIZE,
+@@ -154,7 +138,16 @@ static struct crypto_alg skcipher_null = {
+ 	.setkey			= 	null_setkey,
+ 	.encrypt		=	skcipher_null_crypt,
+ 	.decrypt		=	skcipher_null_crypt } }
+-};
++}, {
++	.cra_name		=	"compress_null",
++	.cra_flags		=	CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_blocksize		=	NULL_BLOCK_SIZE,
++	.cra_ctxsize		=	0,
++	.cra_module		=	THIS_MODULE,
++	.cra_u			=	{ .compress = {
++	.coa_compress		=	null_compress,
++	.coa_decompress		=	null_compress } }
++} };
+ 
+ MODULE_ALIAS("compress_null");
+ MODULE_ALIAS("digest_null");
+@@ -164,40 +157,26 @@ static int __init crypto_null_mod_init(void)
+ {
+ 	int ret = 0;
+ 
+-	ret = crypto_register_alg(&cipher_null);
++	ret = crypto_register_algs(null_algs, ARRAY_SIZE(null_algs));
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = crypto_register_alg(&skcipher_null);
+-	if (ret < 0)
+-		goto out_unregister_cipher;
+-
+ 	ret = crypto_register_shash(&digest_null);
+ 	if (ret < 0)
+-		goto out_unregister_skcipher;
++		goto out_unregister_algs;
+ 
+-	ret = crypto_register_alg(&compress_null);
+-	if (ret < 0)
+-		goto out_unregister_digest;
++	return 0;
+ 
++out_unregister_algs:
++	crypto_unregister_algs(null_algs, ARRAY_SIZE(null_algs));
+ out:
+ 	return ret;
+-
+-out_unregister_digest:
+-	crypto_unregister_shash(&digest_null);
+-out_unregister_skcipher:
+-	crypto_unregister_alg(&skcipher_null);
+-out_unregister_cipher:
+-	crypto_unregister_alg(&cipher_null);
+-	goto out;
+ }
+ 
+ static void __exit crypto_null_mod_fini(void)
+ {
+-	crypto_unregister_alg(&compress_null);
+ 	crypto_unregister_shash(&digest_null);
+-	crypto_unregister_alg(&skcipher_null);
+-	crypto_unregister_alg(&cipher_null);
++	crypto_unregister_algs(null_algs, ARRAY_SIZE(null_algs));
+ }
+ 
+ module_init(crypto_null_mod_init);
