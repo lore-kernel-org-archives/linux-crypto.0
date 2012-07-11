@@ -1,109 +1,115 @@
 From: "Ira W. Snyder" <iws@ovro.caltech.edu>
-Subject: Re: [PATCH v2 2/4] fsl-dma: remove attribute DMA_INTERRUPT of
- dmaengine
-Date: Wed, 11 Jul 2012 09:17:13 -0700
-Message-ID: <20120711161713.GC17539@ovro.caltech.edu>
-References: <1341997253-18424-1-git-send-email-qiang.liu@freescale.com>
+Subject: Re: [PATCH v2 3/4] fsl-dma: change the release process of dma
+ descriptor
+Date: Wed, 11 Jul 2012 09:30:58 -0700
+Message-ID: <20120711163058.GD17539@ovro.caltech.edu>
+References: <1341997285-18459-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Vinod Koul <vinod.koul@intel.com>, herbert@gondor.hengli.com.au,
- linux-crypto@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
- linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Vinod Koul <vinod.koul@intel.com>,
+	herbert@gondor.hengli.com.au,
+	Dan Williams <dan.j.williams@intel.com>, davem@davemloft.net
 To: Qiang Liu <qiang.liu@freescale.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ovro.ovro.caltech.edu ([192.100.16.2]:37683 "EHLO
+	ovro.ovro.caltech.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756418Ab2GKQbD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Jul 2012 12:31:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1341997253-18424-1-git-send-email-qiang.liu@freescale.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1341997285-18459-1-git-send-email-qiang.liu@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 11, 2012 at 05:00:53PM +0800, Qiang Liu wrote:
-> Delete attribute DMA_INTERRUPT because fsl-dma doesn't support this function,
-> exception will be thrown if talitos is used to offload xor at the same time.
+On Wed, Jul 11, 2012 at 05:01:25PM +0800, Qiang Liu wrote:
+> Modify the release process of dma descriptor for avoiding exception when
+> enable config NET_DMA, release dma descriptor from 1st to last second, the
+> last descriptor which is reserved in current descriptor register may not be
+> completed, race condition will be raised if free current descriptor.
+> 
+> A race condition which is raised when use both of talitos and dmaengine to
+> offload xor is because napi scheduler (NET_DMA is enabled) will sync all
+> pending requests in dma channels, it affects the process of raid operations.
+> The descriptor is freed which is submitted just now, but async_tx must check
+> whether this depend tx descriptor is acked, there are poison contents in the
+> invalid address, then BUG_ON() is thrown, so this descriptor will be freed
+> in the next time.
 > 
 
-Both drivers/misc/carma/carma-fpga.c and
-drivers/misc/carma/carma-fpga-program.c expect the DMA_INTERRUPT
-property, though they do not use it. The mask is set for historical
-reasons. It is safe to delete the line "dma_cap_set(DMA_INTERRUPT, mask);"
-from both drivers.
+This patch seems to be covering up a bug in the driver, rather than
+actually fixing it.
 
-I don't know which other drivers may expect this feature to be present.
-These are only the ones which I maintain.
-
-Other than that, you can add my:
-Acked-by: Ira W. Snyder <iws@ovro.caltech.edu>
+When it was written, it was expected that dma_do_tasklet() would run
+only when the controller was idle.
 
 > Cc: Dan Williams <dan.j.williams@intel.com>
 > Cc: Vinod Koul <vinod.koul@intel.com>
 > Cc: Li Yang <leoli@freescale.com>
 > Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
 > ---
->  drivers/dma/fsldma.c |   31 -------------------------------
->  1 files changed, 0 insertions(+), 31 deletions(-)
+>  drivers/dma/fsldma.c |   15 ++++++++++++---
+>  1 files changed, 12 insertions(+), 3 deletions(-)
 > 
 > diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
-> index 8f84761..4f2f212 100644
+> index 4f2f212..0ba3e40 100644
 > --- a/drivers/dma/fsldma.c
 > +++ b/drivers/dma/fsldma.c
-> @@ -543,35 +543,6 @@ static void fsl_dma_free_chan_resources(struct dma_chan *dchan)
->  }
+> @@ -1035,14 +1035,22 @@ static irqreturn_t fsldma_chan_irq(int irq, void *data)
+>  static void dma_do_tasklet(unsigned long data)
+>  {
+>  	struct fsldma_chan *chan = (struct fsldma_chan *)data;
+> -	struct fsl_desc_sw *desc, *_desc;
+> +	struct fsl_desc_sw *desc, *_desc, *prev = NULL;
+>  	LIST_HEAD(ld_cleanup);
+>  	unsigned long flags;
+> +	dma_addr_t curr_phys = get_cdar(chan);
 > 
->  static struct dma_async_tx_descriptor *
-> -fsl_dma_prep_interrupt(struct dma_chan *dchan, unsigned long flags)
-> -{
-> -	struct fsldma_chan *chan;
-> -	struct fsl_desc_sw *new;
-> -
-> -	if (!dchan)
-> -		return NULL;
-> -
-> -	chan = to_fsl_chan(dchan);
-> -
-> -	new = fsl_dma_alloc_descriptor(chan);
-> -	if (!new) {
-> -		chan_err(chan, "%s\n", msg_ld_oom);
-> -		return NULL;
-> -	}
-> -
-> -	new->async_tx.cookie = -EBUSY;
-> -	new->async_tx.flags = flags;
-> -
-> -	/* Insert the link descriptor to the LD ring */
-> -	list_add_tail(&new->node, &new->tx_list);
-> -
-> -	/* Set End-of-link to the last link descriptor of new list */
-> -	set_ld_eol(chan, new);
-> -
-> -	return &new->async_tx;
-> -}
-> -
-> -static struct dma_async_tx_descriptor *
->  fsl_dma_prep_memcpy(struct dma_chan *dchan,
->  	dma_addr_t dma_dst, dma_addr_t dma_src,
->  	size_t len, unsigned long flags)
-> @@ -1352,12 +1323,10 @@ static int __devinit fsldma_of_probe(struct platform_device *op)
->  	fdev->irq = irq_of_parse_and_map(op->dev.of_node, 0);
+>  	chan_dbg(chan, "tasklet entry\n");
 > 
->  	dma_cap_set(DMA_MEMCPY, fdev->common.cap_mask);
-> -	dma_cap_set(DMA_INTERRUPT, fdev->common.cap_mask);
->  	dma_cap_set(DMA_SG, fdev->common.cap_mask);
->  	dma_cap_set(DMA_SLAVE, fdev->common.cap_mask);
->  	fdev->common.device_alloc_chan_resources = fsl_dma_alloc_chan_resources;
->  	fdev->common.device_free_chan_resources = fsl_dma_free_chan_resources;
-> -	fdev->common.device_prep_dma_interrupt = fsl_dma_prep_interrupt;
->  	fdev->common.device_prep_dma_memcpy = fsl_dma_prep_memcpy;
->  	fdev->common.device_prep_dma_sg = fsl_dma_prep_sg;
->  	fdev->common.device_tx_status = fsl_tx_status;
+>  	spin_lock_irqsave(&chan->desc_lock, flags);
+> 
+> +	/* find the descriptor which is already completed */
+> +	list_for_each_entry_safe(desc, _desc, &chan->ld_running, node) {
+> +		if (prev && desc->async_tx.phys == curr_phys)
+> +			break;
+> +		prev = desc;
+> +	}
+> +
+
+If the DMA controller was still busy processing transactions, you should
+have gotten the printout "irq: controller not idle!" from
+fsldma_chan_irq() just before it scheduled the dma_do_tasklet() to run.
+If you did not get this printout, how was dma_do_tasklet() entered with
+the controller still busy? I don't understand how it can happen.
+
+If you test without your spin_lock_bh() and spin_unlock_bh() conversion
+patch, do you still hit the error?
+
+What happens if a user submits exactly one DMA transaction, and then
+leaves the system idle? The callback for the last descriptor in the
+chain will never get run, right? That's a bug.
+
+>  	/* update the cookie if we have some descriptors to cleanup */
+>  	if (!list_empty(&chan->ld_running)) {
+>  		dma_cookie_t cookie;
+> @@ -1058,13 +1066,14 @@ static void dma_do_tasklet(unsigned long data)
+>  	 * move the descriptors to a temporary list so we can drop the lock
+>  	 * during the entire cleanup operation
+>  	 */
+> -	list_splice_tail_init(&chan->ld_running, &ld_cleanup);
+> +	list_cut_position(&ld_cleanup, &chan->ld_running, &prev->node);
+> 
+>  	/* the hardware is now idle and ready for more */
+>  	chan->idle = true;
+> 
+>  	/*
+> -	 * Start any pending transactions automatically
+> +	 * Start any pending transactions automatically if current descriptor
+> +	 * list is completed
+>  	 *
+>  	 * In the ideal case, we keep the DMA controller busy while we go
+>  	 * ahead and free the descriptors below.
 > --
 > 1.7.5.1
 > 
