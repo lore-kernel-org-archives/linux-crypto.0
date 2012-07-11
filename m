@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 09/14] crypto: sha512 - use crypto_[un]register_shashes
-Date: Wed, 11 Jul 2012 14:20:36 +0300
-Message-ID: <20120711112035.6875.29251.stgit@localhost6.localdomain6>
+Subject: [PATCH 10/14] crypto: whirlpool - use crypto_[un]register_shashes
+Date: Wed, 11 Jul 2012 14:20:41 +0300
+Message-ID: <20120711112041.6875.84893.stgit@localhost6.localdomain6>
 References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,11 +10,11 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34118 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757148Ab2GKLUi (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:37338 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757148Ab2GKLUr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:20:38 -0400
+	Wed, 11 Jul 2012 07:20:47 -0400
 In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -24,58 +24,84 @@ functions. This simplifies init/exit code.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/sha512_generic.c |   20 +++++---------------
- 1 file changed, 5 insertions(+), 15 deletions(-)
+ crypto/wp512.c |   39 ++++++---------------------------------
+ 1 file changed, 6 insertions(+), 33 deletions(-)
 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index dd30f40..71fcf36 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -242,7 +242,7 @@ static int sha384_final(struct shash_desc *desc, u8 *hash)
+diff --git a/crypto/wp512.c b/crypto/wp512.c
+index 71719a2..180f1d6 100644
+--- a/crypto/wp512.c
++++ b/crypto/wp512.c
+@@ -1119,7 +1119,7 @@ static int wp256_final(struct shash_desc *desc, u8 *out)
  	return 0;
  }
  
--static struct shash_alg sha512 = {
-+static struct shash_alg sha512_algs[2] = { {
- 	.digestsize	=	SHA512_DIGEST_SIZE,
- 	.init		=	sha512_init,
- 	.update		=	sha512_update,
-@@ -254,9 +254,7 @@ static struct shash_alg sha512 = {
- 		.cra_blocksize	=	SHA512_BLOCK_SIZE,
+-static struct shash_alg wp512 = {
++static struct shash_alg wp_algs[3] = { {
+ 	.digestsize	=	WP512_DIGEST_SIZE,
+ 	.init		=	wp512_init,
+ 	.update		=	wp512_update,
+@@ -1131,9 +1131,7 @@ static struct shash_alg wp512 = {
+ 		.cra_blocksize	=	WP512_BLOCK_SIZE,
  		.cra_module	=	THIS_MODULE,
  	}
 -};
 -
--static struct shash_alg sha384 = {
+-static struct shash_alg wp384 = {
 +}, {
- 	.digestsize	=	SHA384_DIGEST_SIZE,
- 	.init		=	sha384_init,
- 	.update		=	sha512_update,
-@@ -268,24 +266,16 @@ static struct shash_alg sha384 = {
- 		.cra_blocksize	=	SHA384_BLOCK_SIZE,
+ 	.digestsize	=	WP384_DIGEST_SIZE,
+ 	.init		=	wp512_init,
+ 	.update		=	wp512_update,
+@@ -1145,9 +1143,7 @@ static struct shash_alg wp384 = {
+ 		.cra_blocksize	=	WP512_BLOCK_SIZE,
+ 		.cra_module	=	THIS_MODULE,
+ 	}
+-};
+-
+-static struct shash_alg wp256 = {
++}, {
+ 	.digestsize	=	WP256_DIGEST_SIZE,
+ 	.init		=	wp512_init,
+ 	.update		=	wp512_update,
+@@ -1159,39 +1155,16 @@ static struct shash_alg wp256 = {
+ 		.cra_blocksize	=	WP512_BLOCK_SIZE,
  		.cra_module	=	THIS_MODULE,
  	}
 -};
 +} };
  
- static int __init sha512_generic_mod_init(void)
+ static int __init wp512_mod_init(void)
  {
--        int ret = 0;
+-	int ret = 0;
 -
--        if ((ret = crypto_register_shash(&sha384)) < 0)
--                goto out;
--        if ((ret = crypto_register_shash(&sha512)) < 0)
--                crypto_unregister_shash(&sha384);
+-	ret = crypto_register_shash(&wp512);
+-
+-	if (ret < 0)
+-		goto out;
+-
+-	ret = crypto_register_shash(&wp384);
+-	if (ret < 0)
+-	{
+-		crypto_unregister_shash(&wp512);
+-		goto out;
+-	}
+-
+-	ret = crypto_register_shash(&wp256);
+-	if (ret < 0)
+-	{
+-		crypto_unregister_shash(&wp512);
+-		crypto_unregister_shash(&wp384);
+-	}
 -out:
--        return ret;
-+	return crypto_register_shashes(sha512_algs, ARRAY_SIZE(sha512_algs));
+-	return ret;
++	return crypto_register_shashes(wp_algs, ARRAY_SIZE(wp_algs));
  }
  
- static void __exit sha512_generic_mod_fini(void)
+ static void __exit wp512_mod_fini(void)
  {
--        crypto_unregister_shash(&sha384);
--        crypto_unregister_shash(&sha512);
-+	crypto_unregister_shashes(sha512_algs, ARRAY_SIZE(sha512_algs));
+-	crypto_unregister_shash(&wp512);
+-	crypto_unregister_shash(&wp384);
+-	crypto_unregister_shash(&wp256);
++	crypto_unregister_shashes(wp_algs, ARRAY_SIZE(wp_algs));
  }
  
- module_init(sha512_generic_mod_init);
+ MODULE_ALIAS("wp384");
