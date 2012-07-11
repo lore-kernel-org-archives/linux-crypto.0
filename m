@@ -1,42 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] ERA retrieval and printing for SEC device
-Date: Wed, 11 Jul 2012 11:24:23 +0800
-Message-ID: <20120711032423.GB5263@gondor.apana.org.au>
-References: <1340783261-7494-1-git-send-email-alexandru.porosanu@freescale.com>
- <20120627145604.e9d27b9e8273be53aa4715fc@freescale.com>
+Subject: Re: [PATCH] crypto: aesni-intel - fix wrong kfree pointer
+Date: Wed, 11 Jul 2012 11:24:44 +0800
+Message-ID: <20120711032444.GC5263@gondor.apana.org.au>
+References: <1340897162-5046-1-git-send-email-mbroz@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Alex Porosanu <alexandru.porosanu@freescale.com>,
-	linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: linux-crypto@vger.kernel.org
+To: Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:54613 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:46375 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753282Ab2GKDYY (ORCPT
+	with ESMTP id S1753745Ab2GKDYr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Jul 2012 23:24:24 -0400
+	Tue, 10 Jul 2012 23:24:47 -0400
 Content-Disposition: inline
-In-Reply-To: <20120627145604.e9d27b9e8273be53aa4715fc@freescale.com>
+In-Reply-To: <1340897162-5046-1-git-send-email-mbroz@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 27, 2012 at 07:56:04PM +0000, Kim Phillips wrote:
-> From: Alex Porosanu <alexandru.porosanu@freescale.com>
+On Thu, Jun 28, 2012 at 05:26:02PM +0200, Milan Broz wrote:
+> kfree(new_key_mem) in rfc4106_set_key() should be called on malloced pointer,
+> not on aligned one, otherwise it can cause invalid pointer on free.
 > 
-> This patch adds support for retrieving and printing of
-> SEC ERA information. It is useful for knowing beforehand
-> what features exist from the SEC point of view on a
-> certain SoC. Only era-s 1 to 4 are currently supported;
-> other eras will appear as unknown.
+> (Seen at least once when running tcrypt tests with debug kernel.)
 > 
-> Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
-> 
-> - rebased onto current cryptodev master
-> - made caam_eras static
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Signed-off-by: Milan Broz <mbroz@redhat.com>
 
-Patch applied.  Thanks Kim!
+Good catch.  Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
