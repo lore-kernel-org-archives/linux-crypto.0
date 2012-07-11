@@ -1,7 +1,7 @@
 From: Qiang Liu <qiang.liu@freescale.com>
-Subject: [PATCH v2 2/4] fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
-Date: Wed, 11 Jul 2012 17:00:53 +0800
-Message-ID: <1341997253-18424-1-git-send-email-qiang.liu@freescale.com>
+Subject: [PATCH v2 3/4] fsl-dma: change the release process of dma descriptor
+Date: Wed, 11 Jul 2012 17:01:25 +0800
+Message-ID: <1341997285-18459-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <kim.phillips@freescale.com>, <herbert@gondor.hengli.com.au>,
@@ -11,77 +11,79 @@ Cc: <kim.phillips@freescale.com>, <herbert@gondor.hengli.com.au>,
 	Li Yang <leoli@freescale.com>
 To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe005.messaging.microsoft.com ([216.32.180.31]:58756
+Received: from va3ehsobe010.messaging.microsoft.com ([216.32.180.30]:24593
 	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751835Ab2GKJWL (ORCPT
+	by vger.kernel.org with ESMTP id S1751835Ab2GKJWp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 05:22:11 -0400
+	Wed, 11 Jul 2012 05:22:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Delete attribute DMA_INTERRUPT because fsl-dma doesn't support this function,
-exception will be thrown if talitos is used to offload xor at the same time.
+Modify the release process of dma descriptor for avoiding exception when
+enable config NET_DMA, release dma descriptor from 1st to last second, the
+last descriptor which is reserved in current descriptor register may not be
+completed, race condition will be raised if free current descriptor.
+
+A race condition which is raised when use both of talitos and dmaengine to
+offload xor is because napi scheduler (NET_DMA is enabled) will sync all
+pending requests in dma channels, it affects the process of raid operations.
+The descriptor is freed which is submitted just now, but async_tx must check
+whether this depend tx descriptor is acked, there are poison contents in the
+invalid address, then BUG_ON() is thrown, so this descriptor will be freed
+in the next time.
 
 Cc: Dan Williams <dan.j.williams@intel.com>
 Cc: Vinod Koul <vinod.koul@intel.com>
 Cc: Li Yang <leoli@freescale.com>
 Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
 ---
- drivers/dma/fsldma.c |   31 -------------------------------
- 1 files changed, 0 insertions(+), 31 deletions(-)
+ drivers/dma/fsldma.c |   15 ++++++++++++---
+ 1 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
-index 8f84761..4f2f212 100644
+index 4f2f212..0ba3e40 100644
 --- a/drivers/dma/fsldma.c
 +++ b/drivers/dma/fsldma.c
-@@ -543,35 +543,6 @@ static void fsl_dma_free_chan_resources(struct dma_chan *dchan)
- }
+@@ -1035,14 +1035,22 @@ static irqreturn_t fsldma_chan_irq(int irq, void *data)
+ static void dma_do_tasklet(unsigned long data)
+ {
+ 	struct fsldma_chan *chan = (struct fsldma_chan *)data;
+-	struct fsl_desc_sw *desc, *_desc;
++	struct fsl_desc_sw *desc, *_desc, *prev = NULL;
+ 	LIST_HEAD(ld_cleanup);
+ 	unsigned long flags;
++	dma_addr_t curr_phys = get_cdar(chan);
 
- static struct dma_async_tx_descriptor *
--fsl_dma_prep_interrupt(struct dma_chan *dchan, unsigned long flags)
--{
--	struct fsldma_chan *chan;
--	struct fsl_desc_sw *new;
--
--	if (!dchan)
--		return NULL;
--
--	chan = to_fsl_chan(dchan);
--
--	new = fsl_dma_alloc_descriptor(chan);
--	if (!new) {
--		chan_err(chan, "%s\n", msg_ld_oom);
--		return NULL;
--	}
--
--	new->async_tx.cookie = -EBUSY;
--	new->async_tx.flags = flags;
--
--	/* Insert the link descriptor to the LD ring */
--	list_add_tail(&new->node, &new->tx_list);
--
--	/* Set End-of-link to the last link descriptor of new list */
--	set_ld_eol(chan, new);
--
--	return &new->async_tx;
--}
--
--static struct dma_async_tx_descriptor *
- fsl_dma_prep_memcpy(struct dma_chan *dchan,
- 	dma_addr_t dma_dst, dma_addr_t dma_src,
- 	size_t len, unsigned long flags)
-@@ -1352,12 +1323,10 @@ static int __devinit fsldma_of_probe(struct platform_device *op)
- 	fdev->irq = irq_of_parse_and_map(op->dev.of_node, 0);
+ 	chan_dbg(chan, "tasklet entry\n");
 
- 	dma_cap_set(DMA_MEMCPY, fdev->common.cap_mask);
--	dma_cap_set(DMA_INTERRUPT, fdev->common.cap_mask);
- 	dma_cap_set(DMA_SG, fdev->common.cap_mask);
- 	dma_cap_set(DMA_SLAVE, fdev->common.cap_mask);
- 	fdev->common.device_alloc_chan_resources = fsl_dma_alloc_chan_resources;
- 	fdev->common.device_free_chan_resources = fsl_dma_free_chan_resources;
--	fdev->common.device_prep_dma_interrupt = fsl_dma_prep_interrupt;
- 	fdev->common.device_prep_dma_memcpy = fsl_dma_prep_memcpy;
- 	fdev->common.device_prep_dma_sg = fsl_dma_prep_sg;
- 	fdev->common.device_tx_status = fsl_tx_status;
+ 	spin_lock_irqsave(&chan->desc_lock, flags);
+
++	/* find the descriptor which is already completed */
++	list_for_each_entry_safe(desc, _desc, &chan->ld_running, node) {
++		if (prev && desc->async_tx.phys == curr_phys)
++			break;
++		prev = desc;
++	}
++
+ 	/* update the cookie if we have some descriptors to cleanup */
+ 	if (!list_empty(&chan->ld_running)) {
+ 		dma_cookie_t cookie;
+@@ -1058,13 +1066,14 @@ static void dma_do_tasklet(unsigned long data)
+ 	 * move the descriptors to a temporary list so we can drop the lock
+ 	 * during the entire cleanup operation
+ 	 */
+-	list_splice_tail_init(&chan->ld_running, &ld_cleanup);
++	list_cut_position(&ld_cleanup, &chan->ld_running, &prev->node);
+
+ 	/* the hardware is now idle and ready for more */
+ 	chan->idle = true;
+
+ 	/*
+-	 * Start any pending transactions automatically
++	 * Start any pending transactions automatically if current descriptor
++	 * list is completed
+ 	 *
+ 	 * In the ideal case, we keep the DMA controller busy while we go
+ 	 * ahead and free the descriptors below.
 --
 1.7.5.1
