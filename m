@@ -1,7 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 03/14] crypto: des - use crypto_[un]register_algs
-Date: Wed, 11 Jul 2012 14:20:05 +0300
-Message-ID: <20120711112005.6875.6929.stgit@localhost6.localdomain6>
+Subject: [PATCH 04/14] crypto: serpent - use crypto_[un]register_algs
+Date: Wed, 11 Jul 2012 14:20:10 +0300
+Message-ID: <20120711112010.6875.37469.stgit@localhost6.localdomain6>
 References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,11 +10,11 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:33955 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752808Ab2GKLUI (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:40621 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752808Ab2GKLUN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:20:08 -0400
+	Wed, 11 Jul 2012 07:20:13 -0400
 In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -24,75 +24,96 @@ functions. This simplifies init/exit code.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/des_generic.c |   25 +++++--------------------
- 1 file changed, 5 insertions(+), 20 deletions(-)
+ crypto/serpent_generic.c |   53 ++++++++++++++++------------------------------
+ 1 file changed, 19 insertions(+), 34 deletions(-)
 
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index 873818d..f6cf63f 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -943,59 +943,44 @@ static void des3_ede_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	d[1] = cpu_to_le32(L);
+diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+index 8f32cf3..7ddbd7e 100644
+--- a/crypto/serpent_generic.c
++++ b/crypto/serpent_generic.c
+@@ -567,24 +567,6 @@ static void serpent_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	__serpent_decrypt(ctx, dst, src);
  }
  
--static struct crypto_alg des_alg = {
-+static struct crypto_alg des_algs[2] = { {
- 	.cra_name		=	"des",
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	DES_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct des_ctx),
- 	.cra_module		=	THIS_MODULE,
- 	.cra_alignmask		=	3,
--	.cra_list		=	LIST_HEAD_INIT(des_alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	DES_KEY_SIZE,
- 	.cia_max_keysize	=	DES_KEY_SIZE,
- 	.cia_setkey		=	des_setkey,
- 	.cia_encrypt		=	des_encrypt,
- 	.cia_decrypt		=	des_decrypt } }
+-static struct crypto_alg serpent_alg = {
+-	.cra_name		=	"serpent",
+-	.cra_driver_name	=	"serpent-generic",
+-	.cra_priority		=	100,
+-	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
+-	.cra_ctxsize		=	sizeof(struct serpent_ctx),
+-	.cra_alignmask		=	3,
+-	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
+-	.cra_u			=	{ .cipher = {
+-	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
+-	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
+-	.cia_setkey		=	serpent_setkey,
+-	.cia_encrypt		=	serpent_encrypt,
+-	.cia_decrypt		=	serpent_decrypt } }
 -};
 -
--static struct crypto_alg des3_ede_alg = {
+ static int tnepres_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			  unsigned int keylen)
+ {
+@@ -637,41 +619,44 @@ static void tnepres_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	d[3] = swab32(rd[0]);
+ }
+ 
+-static struct crypto_alg tnepres_alg = {
++static struct crypto_alg srp_algs[2] = { {
++	.cra_name		=	"serpent",
++	.cra_driver_name	=	"serpent-generic",
++	.cra_priority		=	100,
++	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
++	.cra_ctxsize		=	sizeof(struct serpent_ctx),
++	.cra_alignmask		=	3,
++	.cra_module		=	THIS_MODULE,
++	.cra_u			=	{ .cipher = {
++	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
++	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
++	.cia_setkey		=	serpent_setkey,
++	.cia_encrypt		=	serpent_encrypt,
++	.cia_decrypt		=	serpent_decrypt } }
 +}, {
- 	.cra_name		=	"des3_ede",
+ 	.cra_name		=	"tnepres",
  	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	DES3_EDE_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct des3_ede_ctx),
- 	.cra_module		=	THIS_MODULE,
+ 	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
+ 	.cra_ctxsize		=	sizeof(struct serpent_ctx),
  	.cra_alignmask		=	3,
--	.cra_list		=	LIST_HEAD_INIT(des3_ede_alg.cra_list),
+ 	.cra_module		=	THIS_MODULE,
+-	.cra_list		=	LIST_HEAD_INIT(serpent_alg.cra_list),
  	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	DES3_EDE_KEY_SIZE,
- 	.cia_max_keysize	=	DES3_EDE_KEY_SIZE,
- 	.cia_setkey		=	des3_ede_setkey,
- 	.cia_encrypt		=	des3_ede_encrypt,
- 	.cia_decrypt		=	des3_ede_decrypt } }
+ 	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
+ 	.cia_max_keysize	=	SERPENT_MAX_KEY_SIZE,
+ 	.cia_setkey		=	tnepres_setkey,
+ 	.cia_encrypt		=	tnepres_encrypt,
+ 	.cia_decrypt		=	tnepres_decrypt } }
 -};
 +} };
  
- MODULE_ALIAS("des3_ede");
- 
- static int __init des_generic_mod_init(void)
+ static int __init serpent_mod_init(void)
  {
--	int ret = 0;
+-	int ret = crypto_register_alg(&serpent_alg);
 -
--	ret = crypto_register_alg(&des_alg);
--	if (ret < 0)
--		goto out;
+-	if (ret)
+-		return ret;
 -
--	ret = crypto_register_alg(&des3_ede_alg);
--	if (ret < 0)
--		crypto_unregister_alg(&des_alg);
--out:
+-	ret = crypto_register_alg(&tnepres_alg);
+-
+-	if (ret)
+-		crypto_unregister_alg(&serpent_alg);
+-
 -	return ret;
-+	return crypto_register_algs(des_algs, ARRAY_SIZE(des_algs));
++	return crypto_register_algs(srp_algs, ARRAY_SIZE(srp_algs));
  }
  
- static void __exit des_generic_mod_fini(void)
+ static void __exit serpent_mod_fini(void)
  {
--	crypto_unregister_alg(&des3_ede_alg);
--	crypto_unregister_alg(&des_alg);
-+	crypto_unregister_algs(des_algs, ARRAY_SIZE(des_algs));
+-	crypto_unregister_alg(&tnepres_alg);
+-	crypto_unregister_alg(&serpent_alg);
++	crypto_unregister_algs(srp_algs, ARRAY_SIZE(srp_algs));
  }
  
- module_init(des_generic_mod_init);
+ module_init(serpent_mod_init);
