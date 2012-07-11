@@ -1,8 +1,8 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 11/14] crypto: cleanup - remove unneeded crypto_alg.cra_list
- initializations
-Date: Wed, 11 Jul 2012 14:20:46 +0300
-Message-ID: <20120711112046.6875.90685.stgit@localhost6.localdomain6>
+Subject: [PATCH 12/14] crypto: arch/x86 - cleanup - remove unneeded
+ crypto_alg.cra_list initializations
+Date: Wed, 11 Jul 2012 14:20:51 +0300
+Message-ID: <20120711112051.6875.39344.stgit@localhost6.localdomain6>
 References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,11 +11,11 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34196 "EHLO
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:34240 "EHLO
 	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757207Ab2GKLUs (ORCPT
+	with ESMTP id S1757305Ab2GKLUz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Jul 2012 07:20:48 -0400
+	Wed, 11 Jul 2012 07:20:55 -0400
 In-Reply-To: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -24,176 +24,171 @@ Initialization of cra_list is currently mixed, most ciphers initialize this
 field and most shashes do not. Initialization however is not needed at all
 since cra_list is initialized/overwritten in __crypto_register_alg() with
 list_add(). Therefore perform cleanup to remove all unneeded initializations
-of this field in 'crypto/'.
+of this field in 'arch/x86/crypto/'.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/aes_generic.c      |    1 -
- crypto/anubis.c           |    1 -
- crypto/blowfish_generic.c |    1 -
- crypto/camellia_generic.c |    1 -
- crypto/cast5.c            |    1 -
- crypto/cast6.c            |    1 -
- crypto/deflate.c          |    1 -
- crypto/fcrypt.c           |    1 -
- crypto/ghash-generic.c    |    1 -
- crypto/khazad.c           |    1 -
- crypto/krng.c             |    1 -
- crypto/lzo.c              |    1 -
- crypto/salsa20_generic.c  |    1 -
- crypto/seed.c             |    1 -
- crypto/twofish_generic.c  |    1 -
- 15 files changed, 15 deletions(-)
+ arch/x86/crypto/aes_glue.c                 |    1 -
+ arch/x86/crypto/aesni-intel_glue.c         |    5 +----
+ arch/x86/crypto/blowfish_glue.c            |    4 ----
+ arch/x86/crypto/camellia_glue.c            |    6 ------
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |    2 --
+ arch/x86/crypto/salsa20_glue.c             |    1 -
+ arch/x86/crypto/serpent_avx_glue.c         |   10 ----------
+ arch/x86/crypto/serpent_sse2_glue.c        |   10 ----------
+ arch/x86/crypto/twofish_avx_glue.c         |   10 ----------
+ arch/x86/crypto/twofish_glue.c             |    1 -
+ arch/x86/crypto/twofish_glue_3way.c        |    5 -----
+ 11 files changed, 1 insertion(+), 54 deletions(-)
 
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index a68c73d..47f2e5c 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -1448,7 +1448,6 @@ static struct crypto_alg aes_alg = {
- 	.cra_ctxsize		=	sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(aes_alg.cra_list),
- 	.cra_u			=	{
- 		.cipher = {
- 			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
-diff --git a/crypto/anubis.c b/crypto/anubis.c
-index 77530d5..008c8a4 100644
---- a/crypto/anubis.c
-+++ b/crypto/anubis.c
-@@ -678,7 +678,6 @@ static struct crypto_alg anubis_alg = {
- 	.cra_ctxsize		=	sizeof (struct anubis_ctx),
- 	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(anubis_alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	ANUBIS_MIN_KEY_SIZE,
- 	.cia_max_keysize	=	ANUBIS_MAX_KEY_SIZE,
-diff --git a/crypto/blowfish_generic.c b/crypto/blowfish_generic.c
-index 6f269b5..8baf544 100644
---- a/crypto/blowfish_generic.c
-+++ b/crypto/blowfish_generic.c
-@@ -115,7 +115,6 @@ static struct crypto_alg alg = {
- 	.cra_ctxsize		=	sizeof(struct bf_ctx),
- 	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	BF_MIN_KEY_SIZE,
- 	.cia_max_keysize	=	BF_MAX_KEY_SIZE,
-diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
-index f7aaaaf..75efa20 100644
---- a/crypto/camellia_generic.c
-+++ b/crypto/camellia_generic.c
-@@ -1072,7 +1072,6 @@ static struct crypto_alg camellia_alg = {
- 	.cra_ctxsize		=	sizeof(struct camellia_ctx),
- 	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(camellia_alg.cra_list),
- 	.cra_u			=	{
- 		.cipher = {
- 			.cia_min_keysize	=	CAMELLIA_MIN_KEY_SIZE,
-diff --git a/crypto/cast5.c b/crypto/cast5.c
-index 4a230dd..fffcb37 100644
---- a/crypto/cast5.c
-+++ b/crypto/cast5.c
-@@ -779,7 +779,6 @@ static struct crypto_alg alg = {
- 	.cra_ctxsize 	= sizeof(struct cast5_ctx),
- 	.cra_alignmask	= 3,
- 	.cra_module 	= THIS_MODULE,
--	.cra_list 	= LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u 		= {
- 		.cipher = {
- 			.cia_min_keysize = CAST5_MIN_KEY_SIZE,
-diff --git a/crypto/cast6.c b/crypto/cast6.c
-index e0c15a6..04264f5 100644
---- a/crypto/cast6.c
-+++ b/crypto/cast6.c
-@@ -519,7 +519,6 @@ static struct crypto_alg alg = {
- 	.cra_ctxsize = sizeof(struct cast6_ctx),
- 	.cra_alignmask = 3,
- 	.cra_module = THIS_MODULE,
--	.cra_list = LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u = {
- 		  .cipher = {
- 			     .cia_min_keysize = CAST6_MIN_KEY_SIZE,
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index b0165ec..b57d70e 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -199,7 +199,6 @@ static struct crypto_alg alg = {
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct deflate_ctx),
+diff --git a/arch/x86/crypto/aes_glue.c b/arch/x86/crypto/aes_glue.c
+index 59b37de..aafe8ce 100644
+--- a/arch/x86/crypto/aes_glue.c
++++ b/arch/x86/crypto/aes_glue.c
+@@ -40,7 +40,6 @@ static struct crypto_alg aes_alg = {
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
  	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(alg.cra_list),
- 	.cra_init		= deflate_init,
- 	.cra_exit		= deflate_exit,
- 	.cra_u			= { .compress = {
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index c33107e..3b2cf56 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -396,7 +396,6 @@ static struct crypto_alg fcrypt_alg = {
- 	.cra_ctxsize		=	sizeof(struct fcrypt_ctx),
- 	.cra_module		=	THIS_MODULE,
- 	.cra_alignmask		=	3,
--	.cra_list		=	LIST_HEAD_INIT(fcrypt_alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	8,
- 	.cia_max_keysize	=	8,
-diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
-index 7835b8f..9d3f0c6 100644
---- a/crypto/ghash-generic.c
-+++ b/crypto/ghash-generic.c
-@@ -153,7 +153,6 @@ static struct shash_alg ghash_alg = {
+-	.cra_list		= LIST_HEAD_INIT(aes_alg.cra_list),
+ 	.cra_u	= {
+ 		.cipher	= {
+ 			.cia_min_keysize	= AES_MIN_KEY_SIZE,
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 34fdcff..648347a 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1118,7 +1118,7 @@ MODULE_DEVICE_TABLE(x86cpu, aesni_cpu_id);
+ 
+ static int __init aesni_init(void)
+ {
+-	int err, i;
++	int err;
+ 
+ 	if (!x86_match_cpu(aesni_cpu_id))
+ 		return -ENODEV;
+@@ -1127,9 +1127,6 @@ static int __init aesni_init(void)
+ 	if (err)
+ 		return err;
+ 
+-	for (i = 0; i < ARRAY_SIZE(aesni_algs); i++)
+-		INIT_LIST_HEAD(&aesni_algs[i].cra_list);
+-
+ 	return crypto_register_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+ }
+ 
+diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
+index 7967474..50ec333 100644
+--- a/arch/x86/crypto/blowfish_glue.c
++++ b/arch/x86/crypto/blowfish_glue.c
+@@ -367,7 +367,6 @@ static struct crypto_alg bf_algs[4] = { {
+ 	.cra_ctxsize		= sizeof(struct bf_ctx),
+ 	.cra_alignmask		= 0,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(bf_algs[0].cra_list),
+ 	.cra_u = {
+ 		.cipher = {
+ 			.cia_min_keysize	= BF_MIN_KEY_SIZE,
+@@ -387,7 +386,6 @@ static struct crypto_alg bf_algs[4] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(bf_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= BF_MIN_KEY_SIZE,
+@@ -407,7 +405,6 @@ static struct crypto_alg bf_algs[4] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(bf_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= BF_MIN_KEY_SIZE,
+@@ -428,7 +425,6 @@ static struct crypto_alg bf_algs[4] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(bf_algs[3].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= BF_MIN_KEY_SIZE,
+diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
+index eeb2b3b..7a74d7b 100644
+--- a/arch/x86/crypto/camellia_glue.c
++++ b/arch/x86/crypto/camellia_glue.c
+@@ -1601,7 +1601,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_ctxsize		= sizeof(struct camellia_ctx),
+ 	.cra_alignmask		= 0,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[0].cra_list),
+ 	.cra_u			= {
+ 		.cipher = {
+ 			.cia_min_keysize = CAMELLIA_MIN_KEY_SIZE,
+@@ -1621,7 +1620,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
+@@ -1641,7 +1639,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
+@@ -1662,7 +1659,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[3].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE,
+@@ -1683,7 +1679,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[4].cra_list),
+ 	.cra_exit		= lrw_exit_tfm,
+ 	.cra_u = {
+ 		.blkcipher = {
+@@ -1707,7 +1702,6 @@ static struct crypto_alg camellia_algs[6] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(camellia_algs[5].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= CAMELLIA_MIN_KEY_SIZE * 2,
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index b4bf0a6..6759dd1 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -150,7 +150,6 @@ static struct shash_alg ghash_alg = {
  		.cra_blocksize		= GHASH_BLOCK_SIZE,
  		.cra_ctxsize		= sizeof(struct ghash_ctx),
  		.cra_module		= THIS_MODULE,
 -		.cra_list		= LIST_HEAD_INIT(ghash_alg.base.cra_list),
- 		.cra_exit		= ghash_exit_tfm,
  	},
  };
-diff --git a/crypto/khazad.c b/crypto/khazad.c
-index 527e4e3..60e7cd6 100644
---- a/crypto/khazad.c
-+++ b/crypto/khazad.c
-@@ -853,7 +853,6 @@ static struct crypto_alg khazad_alg = {
- 	.cra_ctxsize		=	sizeof (struct khazad_ctx),
- 	.cra_alignmask		=	7,
- 	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(khazad_alg.cra_list),
- 	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	KHAZAD_KEY_SIZE,
- 	.cia_max_keysize	=	KHAZAD_KEY_SIZE,
-diff --git a/crypto/krng.c b/crypto/krng.c
-index 4328bb3..a2d2b72 100644
---- a/crypto/krng.c
-+++ b/crypto/krng.c
-@@ -35,7 +35,6 @@ static struct crypto_alg krng_alg = {
- 	.cra_ctxsize		= 0,
- 	.cra_type		= &crypto_rng_type,
- 	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(krng_alg.cra_list),
- 	.cra_u			= {
- 		.rng = {
- 			.rng_make_random	= krng_get_random,
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index b5e7707..1c2aa69 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -81,7 +81,6 @@ static struct crypto_alg alg = {
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct lzo_ctx),
- 	.cra_module		= THIS_MODULE,
--	.cra_list		= LIST_HEAD_INIT(alg.cra_list),
- 	.cra_init		= lzo_init,
- 	.cra_exit		= lzo_exit,
- 	.cra_u			= { .compress = {
-diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
-index eac10c1..9a4770c 100644
---- a/crypto/salsa20_generic.c
-+++ b/crypto/salsa20_generic.c
-@@ -221,7 +221,6 @@ static struct crypto_alg alg = {
+ 
+@@ -288,7 +287,6 @@ static struct ahash_alg ghash_async_alg = {
+ 			.cra_blocksize		= GHASH_BLOCK_SIZE,
+ 			.cra_type		= &crypto_ahash_type,
+ 			.cra_module		= THIS_MODULE,
+-			.cra_list		= LIST_HEAD_INIT(ghash_async_alg.halg.base.cra_list),
+ 			.cra_init		= ghash_async_init_tfm,
+ 			.cra_exit		= ghash_async_exit_tfm,
+ 		},
+diff --git a/arch/x86/crypto/salsa20_glue.c b/arch/x86/crypto/salsa20_glue.c
+index bccb76d..a3a3c02 100644
+--- a/arch/x86/crypto/salsa20_glue.c
++++ b/arch/x86/crypto/salsa20_glue.c
+@@ -97,7 +97,6 @@ static struct crypto_alg alg = {
  	.cra_ctxsize        =   sizeof(struct salsa20_ctx),
  	.cra_alignmask      =	3,
  	.cra_module         =   THIS_MODULE,
@@ -201,27 +196,311 @@ index eac10c1..9a4770c 100644
  	.cra_u              =   {
  		.blkcipher = {
  			.setkey         =   setkey,
-diff --git a/crypto/seed.c b/crypto/seed.c
-index d3e422f..9c904d6 100644
---- a/crypto/seed.c
-+++ b/crypto/seed.c
-@@ -449,7 +449,6 @@ static struct crypto_alg seed_alg = {
- 	.cra_ctxsize		=	sizeof(struct seed_ctx),
- 	.cra_alignmask		=	3,
+diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
+index b36bdac..3f543a0 100644
+--- a/arch/x86/crypto/serpent_avx_glue.c
++++ b/arch/x86/crypto/serpent_avx_glue.c
+@@ -390,7 +390,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[0].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -410,7 +409,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -430,7 +428,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -451,7 +448,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[3].cra_list),
+ 	.cra_exit		= lrw_exit_tfm,
+ 	.cra_u = {
+ 		.blkcipher = {
+@@ -475,7 +471,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[4].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE * 2,
+@@ -496,7 +491,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[5].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -518,7 +512,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[6].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -541,7 +534,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[7].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -565,7 +557,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[8].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -590,7 +581,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[9].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index d679c86..9107a99 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -393,7 +393,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[0].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -413,7 +412,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -433,7 +431,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE,
+@@ -454,7 +451,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[3].cra_list),
+ 	.cra_exit		= lrw_exit_tfm,
+ 	.cra_u = {
+ 		.blkcipher = {
+@@ -478,7 +474,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[4].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= SERPENT_MIN_KEY_SIZE * 2,
+@@ -499,7 +494,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[5].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -521,7 +515,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[6].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -544,7 +537,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[7].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -568,7 +560,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[8].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -593,7 +584,6 @@ static struct crypto_alg serpent_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(serpent_algs[9].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
+index 782b67d..e7708b5 100644
+--- a/arch/x86/crypto/twofish_avx_glue.c
++++ b/arch/x86/crypto/twofish_avx_glue.c
+@@ -378,7 +378,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[0].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -398,7 +397,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -418,7 +416,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -439,7 +436,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[3].cra_list),
+ 	.cra_exit		= lrw_twofish_exit_tfm,
+ 	.cra_u = {
+ 		.blkcipher = {
+@@ -463,7 +459,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[4].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE * 2,
+@@ -484,7 +479,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[5].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -506,7 +500,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[6].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -529,7 +522,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[7].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -553,7 +545,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[8].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+@@ -578,7 +569,6 @@ static struct crypto_alg twofish_algs[10] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(twofish_algs[9].cra_list),
+ 	.cra_init		= ablk_init,
+ 	.cra_exit		= ablk_exit,
+ 	.cra_u = {
+diff --git a/arch/x86/crypto/twofish_glue.c b/arch/x86/crypto/twofish_glue.c
+index 359ae08..0a52023 100644
+--- a/arch/x86/crypto/twofish_glue.c
++++ b/arch/x86/crypto/twofish_glue.c
+@@ -70,7 +70,6 @@ static struct crypto_alg alg = {
+ 	.cra_ctxsize		=	sizeof(struct twofish_ctx),
+ 	.cra_alignmask		=	0,
  	.cra_module		=	THIS_MODULE,
--	.cra_list		=	LIST_HEAD_INIT(seed_alg.cra_list),
+-	.cra_list		=	LIST_HEAD_INIT(alg.cra_list),
  	.cra_u			=	{
  		.cipher = {
- 			.cia_min_keysize	=	SEED_KEY_SIZE,
-diff --git a/crypto/twofish_generic.c b/crypto/twofish_generic.c
-index 1f07b84..2d50005 100644
---- a/crypto/twofish_generic.c
-+++ b/crypto/twofish_generic.c
-@@ -188,7 +188,6 @@ static struct crypto_alg alg = {
- 	.cra_ctxsize        =   sizeof(struct twofish_ctx),
- 	.cra_alignmask      =	3,
- 	.cra_module         =   THIS_MODULE,
--	.cra_list           =   LIST_HEAD_INIT(alg.cra_list),
- 	.cra_u              =   { .cipher = {
- 	.cia_min_keysize    =   TF_MIN_KEY_SIZE,
- 	.cia_max_keysize    =   TF_MAX_KEY_SIZE,
+ 			.cia_min_keysize	=	TF_MIN_KEY_SIZE,
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 15f9347..aa3eb35 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
+@@ -342,7 +342,6 @@ static struct crypto_alg tf_algs[5] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(tf_algs[0].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -362,7 +361,6 @@ static struct crypto_alg tf_algs[5] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(tf_algs[1].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -383,7 +381,6 @@ static struct crypto_alg tf_algs[5] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(tf_algs[2].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE,
+@@ -404,7 +401,6 @@ static struct crypto_alg tf_algs[5] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(tf_algs[3].cra_list),
+ 	.cra_exit		= lrw_twofish_exit_tfm,
+ 	.cra_u = {
+ 		.blkcipher = {
+@@ -426,7 +422,6 @@ static struct crypto_alg tf_algs[5] = { {
+ 	.cra_alignmask		= 0,
+ 	.cra_type		= &crypto_blkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+-	.cra_list		= LIST_HEAD_INIT(tf_algs[4].cra_list),
+ 	.cra_u = {
+ 		.blkcipher = {
+ 			.min_keysize	= TF_MIN_KEY_SIZE * 2,
