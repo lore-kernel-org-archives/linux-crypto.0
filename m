@@ -1,11 +1,10 @@
 From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH 3/6] workqueue: use @pool instead of @gcwq or @cpu
- where applicable
-Date: Thu, 12 Jul 2012 10:06:18 -0700
-Message-ID: <20120712170618.GB20167@google.com>
+Subject: Re: [PATCH 2/6] workqueue: factor out worker_pool from global_cwq
+Date: Thu, 12 Jul 2012 10:07:52 -0700
+Message-ID: <20120712170752.GC20167@google.com>
 References: <1341859315-17759-1-git-send-email-tj@kernel.org>
- <1341859315-17759-4-git-send-email-tj@kernel.org>
- <CA+8MBbKtCODJxv0zQ2uL_wRE9U6F6tdOVwYSMv9=OQNLGzcVXQ@mail.gmail.com>
+ <1341859315-17759-3-git-send-email-tj@kernel.org>
+ <87ehok8bmb.fsf@sejong.aot.lge.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
@@ -16,39 +15,40 @@ Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
 	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
 	gustavo@padovan.org, johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com
-To: Tony Luck <tony.luck@intel.com>
+To: Namhyung Kim <namhyung@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gg0-f174.google.com ([209.85.161.174]:50580 "EHLO
-	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932521Ab2GLRGY (ORCPT
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:47226 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932725Ab2GLRH6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Jul 2012 13:06:24 -0400
+	Thu, 12 Jul 2012 13:07:58 -0400
 Content-Disposition: inline
-In-Reply-To: <CA+8MBbKtCODJxv0zQ2uL_wRE9U6F6tdOVwYSMv9=OQNLGzcVXQ@mail.gmail.com>
+In-Reply-To: <87ehok8bmb.fsf@sejong.aot.lge.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello, Tony.
+Hello, Namhyung.
 
-On Tue, Jul 10, 2012 at 04:30:36PM -0700, Tony Luck wrote:
-> On Mon, Jul 9, 2012 at 11:41 AM, Tejun Heo <tj@kernel.org> wrote:
-> > @@ -1234,7 +1235,7 @@ static void worker_enter_idle(struct worker *worker)
-> >          */
-> >         WARN_ON_ONCE(gcwq->trustee_state == TRUSTEE_DONE &&
-> >                      pool->nr_workers == pool->nr_idle &&
-> > -                    atomic_read(get_gcwq_nr_running(gcwq->cpu)));
-> > +                    atomic_read(get_pool_nr_running(pool)));
-> >  }
+Sorry about the delay.
+
+On Tue, Jul 10, 2012 at 01:48:44PM +0900, Namhyung Kim wrote:
+> > +	struct list_head	idle_list;	/* X: list of idle workers */
+> > +	struct timer_list	idle_timer;	/* L: worker idle timeout */
+> > +	struct timer_list	mayday_timer;	/* L: SOS timer for dworkers */
 > 
-> Just had this WARN_ON_ONCE trigger on ia64 booting next-20120710. I
-> haven't bisected ... just noticed  that two patches in this series tinker
-> with lines in this check. next-20120706 didn't generate the WARN.
+> What is 'dworkers'?
 
-Sorry about the delay.  The warning is spurious.  As now there are
-multiple pools, nr_running check should be done before
-pool->nr_workers check.  Will post fix soon.
+My stupid finger pressing 'd' when I never meant to. :)
 
-Thank you.
+> > -	/* workers are chained either in the idle_list or busy_hash */
+> > -	struct list_head	idle_list;	/* X: list of idle workers */
+> > +	/* workers are chained either in busy_head or pool idle_list */
+> 
+> s/busy_head/busy_hash/ ?
+
+Will fix.
+
+Thanks.
 
 -- 
 tejun
