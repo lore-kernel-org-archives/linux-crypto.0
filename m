@@ -1,40 +1,110 @@
-From: Timur Tabi <b04825@freescale.com>
-Subject: Re: [linuxppc-release] [PATCH v2 4/4] fsl-dma: use spin_lock_bh to
- instead of spin_lock_irqsave
-Date: Thu, 12 Jul 2012 13:23:47 -0500
-Message-ID: <4FFF1633.1080308@freescale.com>
-References: <1341997326-18495-1-git-send-email-qiang.liu@freescale.com> <4FFD952D.8040201@freescale.com> <BCB48C05FCE8BC4D9E61E841ECBE6DB70C0987@039-SN2MPN1-011.039d.mgd.msft.net>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH 6/6] workqueue: reimplement WQ_HIGHPRI using a separate
+ worker_pool
+Date: Thu, 12 Jul 2012 14:45:14 -0700
+Message-ID: <20120712214514.GD20167@google.com>
+References: <1341859315-17759-7-git-send-email-tj@kernel.org>
+ <20120712130648.GA19214@localhost>
+ <20120712170519.GA20167@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	Vinod Koul <vinod.koul@intel.com>,
-	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Li Yang-R58472 <r58472@freescale.com>,
-	"davem@davemloft.net" <davem@davemloft.net>
-To: Liu Qiang-B32616 <B32616@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
+	vgoyal@redhat.com, vwadekar@nvidia.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
+	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com,
+	Tony Luck <tony.luck@intel.com>
+To: Fengguang Wu <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:33324
-	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751112Ab2GLSXy (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:58868 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964784Ab2GLVpT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Jul 2012 14:23:54 -0400
-In-Reply-To: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C0987@039-SN2MPN1-011.039d.mgd.msft.net>
+	Thu, 12 Jul 2012 17:45:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20120712170519.GA20167@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Liu Qiang-B32616 wrote:
-> I compared my test result before and after this patch, write performance can
-> improved by 15%. I will send the latest patches sooner because of Ira's concern.
-> I will give a complete description about the improvement of spin_lock_bh().
+Hello, again.
+
+On Thu, Jul 12, 2012 at 10:05:19AM -0700, Tejun Heo wrote:
+> On Thu, Jul 12, 2012 at 09:06:48PM +0800, Fengguang Wu wrote:
+> > [    0.207977] WARNING: at /c/kernel-tests/mm/kernel/workqueue.c:1217 worker_enter_idle+0x2b8/0x32b()
+> > [    0.207977] Modules linked in:
+> > [    0.207977] Pid: 1, comm: swapper/0 Not tainted 3.5.0-rc6-08414-g9645fff #15
+> > [    0.207977] Call Trace:
+> > [    0.207977]  [<ffffffff81087189>] ? worker_enter_idle+0x2b8/0x32b
+> > [    0.207977]  [<ffffffff810559d9>] warn_slowpath_common+0xae/0xdb
+> > [    0.207977]  [<ffffffff81055a2e>] warn_slowpath_null+0x28/0x31
+> > [    0.207977]  [<ffffffff81087189>] worker_enter_idle+0x2b8/0x32b
+> > [    0.207977]  [<ffffffff81087222>] start_worker+0x26/0x42
+> > [    0.207977]  [<ffffffff81c8b261>] init_workqueues+0x2d2/0x59a
+> > [    0.207977]  [<ffffffff81c8af8f>] ? usermodehelper_init+0x8a/0x8a
+> > [    0.207977]  [<ffffffff81000284>] do_one_initcall+0xce/0x272
+> > [    0.207977]  [<ffffffff81c6f650>] kernel_init+0x12e/0x3c1
+> > [    0.207977]  [<ffffffff814b9b74>] kernel_thread_helper+0x4/0x10
+> > [    0.207977]  [<ffffffff814b80b0>] ? retint_restore_args+0x13/0x13
+> > [    0.207977]  [<ffffffff81c6f522>] ? start_kernel+0x737/0x737
+> > [    0.207977]  [<ffffffff814b9b70>] ? gs_change+0x13/0x13
 > 
-> About your question, spin_lock_bh is used in the case of bottom/half as its
-> name, there is no need to protect a running/pending list with spin_lock_irqsave.
+> Yeah, I forgot to flip the WARN_ON_ONCE() condition so that it checks
+> nr_running before looking at pool->nr_running.  The warning is
+> spurious.  Will post fix soon.
 
-Please respin the patch and include this information in the patch description.
+I was wrong and am now dazed and confused.  That's from
+init_workqueues() where only cpu0 is running.  How the hell did
+nr_running manage to become non-zero at that point?  Can you please
+apply the following patch and report the boot log?  Thank you.
 
--- 
-Timur Tabi
-Linux kernel developer at Freescale
+---
+ kernel/workqueue.c |   13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -699,8 +699,10 @@ void wq_worker_waking_up(struct task_str
+ {
+ 	struct worker *worker = kthread_data(task);
+ 
+-	if (!(worker->flags & WORKER_NOT_RUNNING))
++	if (!(worker->flags & WORKER_NOT_RUNNING)) {
++		WARN_ON_ONCE(cpu != worker->pool->gcwq->cpu);
+ 		atomic_inc(get_pool_nr_running(worker->pool));
++	}
+ }
+ 
+ /**
+@@ -730,6 +732,7 @@ struct task_struct *wq_worker_sleeping(s
+ 
+ 	/* this can only happen on the local cpu */
+ 	BUG_ON(cpu != raw_smp_processor_id());
++	WARN_ON_ONCE(cpu != worker->pool->gcwq->cpu);
+ 
+ 	/*
+ 	 * The counterpart of the following dec_and_test, implied mb,
+@@ -3855,6 +3858,10 @@ static int __init init_workqueues(void)
+ 		for (i = 0; i < BUSY_WORKER_HASH_SIZE; i++)
+ 			INIT_HLIST_HEAD(&gcwq->busy_hash[i]);
+ 
++		if (cpu != WORK_CPU_UNBOUND)
++			printk("XXX cpu=%d gcwq=%p base=%p\n", cpu, gcwq,
++			       per_cpu_ptr(&pool_nr_running, cpu));
++
+ 		for_each_worker_pool(pool, gcwq) {
+ 			pool->gcwq = gcwq;
+ 			INIT_LIST_HEAD(&pool->worklist);
+@@ -3868,6 +3875,10 @@ static int __init init_workqueues(void)
+ 				    (unsigned long)pool);
+ 
+ 			ida_init(&pool->worker_ida);
++
++			printk("XXX cpu=%d nr_running=%d @ %p\n", gcwq->cpu,
++			       atomic_read(get_pool_nr_running(pool)),
++			       get_pool_nr_running(pool));
+ 		}
+ 
+ 		gcwq->trustee_state = TRUSTEE_DONE;
