@@ -1,767 +1,466 @@
-From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: [PATCH UPDATED 2/6] workqueue: factor out worker_pool from
- global_cwq
-Date: Thu, 12 Jul 2012 14:49:52 -0700
-Message-ID: <20120712214952.GE20167@google.com>
-References: <1341859315-17759-1-git-send-email-tj@kernel.org>
- <1341859315-17759-3-git-send-email-tj@kernel.org>
+From: Tony Luck <tony.luck@gmail.com>
+Subject: Re: [PATCH 6/6] workqueue: reimplement WQ_HIGHPRI using a separate worker_pool
+Date: Thu, 12 Jul 2012 15:16:30 -0700
+Message-ID: <CA+8MBb+ghRpmtrk=t5-6MqrPMZt+a69UoAWaubyKBeptGdBrWA@mail.gmail.com>
+References: <1341859315-17759-7-git-send-email-tj@kernel.org>
+	<20120712130648.GA19214@localhost>
+	<20120712170519.GA20167@google.com>
+	<20120712214514.GD20167@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, joshhunt00-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org, rni-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, bpm-sJ/iWh9BUns@public.gmane.org, elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org,
-	johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1341859315-17759-3-git-send-email-tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: multipart/mixed; boundary=f46d042f91c8c173ce04c4a95099
+Cc: Fengguang Wu <fengguang.wu@intel.com>,
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
+	vgoyal@redhat.com, vwadekar@nvidia.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
+	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com
+To: Tejun Heo <tj@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:62476 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964858Ab2GLWQb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Jul 2012 18:16:31 -0400
+In-Reply-To: <20120712214514.GD20167@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
->From bd7bdd43dcb81bb08240b9401b36a104f77dc135 Mon Sep 17 00:00:00 2001
-From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Date: Thu, 12 Jul 2012 14:46:37 -0700
+--f46d042f91c8c173ce04c4a95099
+Content-Type: text/plain; charset=ISO-8859-1
 
-Move worklist and all worker management fields from global_cwq into
-the new struct worker_pool.  worker_pool points back to the containing
-gcwq.  worker and cpu_workqueue_struct are updated to point to
-worker_pool instead of gcwq too.
+On Thu, Jul 12, 2012 at 2:45 PM, Tejun Heo <tj@kernel.org> wrote:
+> I was wrong and am now dazed and confused.  That's from
+> init_workqueues() where only cpu0 is running.  How the hell did
+> nr_running manage to become non-zero at that point?  Can you please
+> apply the following patch and report the boot log?  Thank you.
 
-This change is mechanical and doesn't introduce any functional
-difference other than rearranging of fields and an added level of
-indirection in some places.  This is to prepare for multiple pools per
-gcwq.
+Patch applied on top of next-20120712 (which still has the same problem).
 
-v2: Comment typo fixes as suggested by Namhyung.
+dmesg output attached
 
-Signed-off-by: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Cc: Namhyung Kim <namhyung-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
----
-Minor update.  git branches updated accoringly.  Thanks.
+-Tony
 
- include/trace/events/workqueue.h |    2 +-
- kernel/workqueue.c               |  216 ++++++++++++++++++++-----------------
- 2 files changed, 118 insertions(+), 100 deletions(-)
+--f46d042f91c8c173ce04c4a95099
+Content-Type: text/plain; charset=US-ASCII; name="dmesg.txt"
+Content-Disposition: attachment; filename="dmesg.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_h4kectia0
 
-diff --git a/include/trace/events/workqueue.h b/include/trace/events/workqueue.h
-index 4018f50..f28d1b6 100644
---- a/include/trace/events/workqueue.h
-+++ b/include/trace/events/workqueue.h
-@@ -54,7 +54,7 @@ TRACE_EVENT(workqueue_queue_work,
- 		__entry->function	= work->func;
- 		__entry->workqueue	= cwq->wq;
- 		__entry->req_cpu	= req_cpu;
--		__entry->cpu		= cwq->gcwq->cpu;
-+		__entry->cpu		= cwq->pool->gcwq->cpu;
- 	),
- 
- 	TP_printk("work struct=%p function=%pf workqueue=%p req_cpu=%u cpu=%u",
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 27637c2..61f1544 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -115,6 +115,7 @@ enum {
-  */
- 
- struct global_cwq;
-+struct worker_pool;
- 
- /*
-  * The poor guys doing the actual heavy lifting.  All on-duty workers
-@@ -131,7 +132,7 @@ struct worker {
- 	struct cpu_workqueue_struct *current_cwq; /* L: current_work's cwq */
- 	struct list_head	scheduled;	/* L: scheduled works */
- 	struct task_struct	*task;		/* I: worker task */
--	struct global_cwq	*gcwq;		/* I: the associated gcwq */
-+	struct worker_pool	*pool;		/* I: the associated pool */
- 	/* 64 bytes boundary on 64bit, 32 on 32bit */
- 	unsigned long		last_active;	/* L: last active timestamp */
- 	unsigned int		flags;		/* X: flags */
-@@ -139,6 +140,21 @@ struct worker {
- 	struct work_struct	rebind_work;	/* L: rebind worker to cpu */
- };
- 
-+struct worker_pool {
-+	struct global_cwq	*gcwq;		/* I: the owning gcwq */
-+
-+	struct list_head	worklist;	/* L: list of pending works */
-+	int			nr_workers;	/* L: total number of workers */
-+	int			nr_idle;	/* L: currently idle ones */
-+
-+	struct list_head	idle_list;	/* X: list of idle workers */
-+	struct timer_list	idle_timer;	/* L: worker idle timeout */
-+	struct timer_list	mayday_timer;	/* L: SOS timer for workers */
-+
-+	struct ida		worker_ida;	/* L: for worker IDs */
-+	struct worker		*first_idle;	/* L: first idle worker */
-+};
-+
- /*
-  * Global per-cpu workqueue.  There's one and only one for each cpu
-  * and all works are queued and processed here regardless of their
-@@ -146,27 +162,18 @@ struct worker {
-  */
- struct global_cwq {
- 	spinlock_t		lock;		/* the gcwq lock */
--	struct list_head	worklist;	/* L: list of pending works */
- 	unsigned int		cpu;		/* I: the associated cpu */
- 	unsigned int		flags;		/* L: GCWQ_* flags */
- 
--	int			nr_workers;	/* L: total number of workers */
--	int			nr_idle;	/* L: currently idle ones */
--
--	/* workers are chained either in the idle_list or busy_hash */
--	struct list_head	idle_list;	/* X: list of idle workers */
-+	/* workers are chained either in busy_hash or pool idle_list */
- 	struct hlist_head	busy_hash[BUSY_WORKER_HASH_SIZE];
- 						/* L: hash of busy workers */
- 
--	struct timer_list	idle_timer;	/* L: worker idle timeout */
--	struct timer_list	mayday_timer;	/* L: SOS timer for dworkers */
--
--	struct ida		worker_ida;	/* L: for worker IDs */
-+	struct worker_pool	pool;		/* the worker pools */
- 
- 	struct task_struct	*trustee;	/* L: for gcwq shutdown */
- 	unsigned int		trustee_state;	/* L: trustee state */
- 	wait_queue_head_t	trustee_wait;	/* trustee wait */
--	struct worker		*first_idle;	/* L: first idle worker */
- } ____cacheline_aligned_in_smp;
- 
- /*
-@@ -175,7 +182,7 @@ struct global_cwq {
-  * aligned at two's power of the number of flag bits.
-  */
- struct cpu_workqueue_struct {
--	struct global_cwq	*gcwq;		/* I: the associated gcwq */
-+	struct worker_pool	*pool;		/* I: the associated pool */
- 	struct workqueue_struct *wq;		/* I: the owning workqueue */
- 	int			work_color;	/* L: current color */
- 	int			flush_color;	/* L: flushing color */
-@@ -555,7 +562,7 @@ static struct global_cwq *get_work_gcwq(struct work_struct *work)
- 
- 	if (data & WORK_STRUCT_CWQ)
- 		return ((struct cpu_workqueue_struct *)
--			(data & WORK_STRUCT_WQ_DATA_MASK))->gcwq;
-+			(data & WORK_STRUCT_WQ_DATA_MASK))->pool->gcwq;
- 
- 	cpu = data >> WORK_STRUCT_FLAG_BITS;
- 	if (cpu == WORK_CPU_NONE)
-@@ -587,13 +594,13 @@ static bool __need_more_worker(struct global_cwq *gcwq)
-  */
- static bool need_more_worker(struct global_cwq *gcwq)
- {
--	return !list_empty(&gcwq->worklist) && __need_more_worker(gcwq);
-+	return !list_empty(&gcwq->pool.worklist) && __need_more_worker(gcwq);
- }
- 
- /* Can I start working?  Called from busy but !running workers. */
- static bool may_start_working(struct global_cwq *gcwq)
- {
--	return gcwq->nr_idle;
-+	return gcwq->pool.nr_idle;
- }
- 
- /* Do I need to keep working?  Called from currently running workers. */
-@@ -601,7 +608,7 @@ static bool keep_working(struct global_cwq *gcwq)
- {
- 	atomic_t *nr_running = get_gcwq_nr_running(gcwq->cpu);
- 
--	return !list_empty(&gcwq->worklist) &&
-+	return !list_empty(&gcwq->pool.worklist) &&
- 		(atomic_read(nr_running) <= 1 ||
- 		 gcwq->flags & GCWQ_HIGHPRI_PENDING);
- }
-@@ -622,8 +629,8 @@ static bool need_to_manage_workers(struct global_cwq *gcwq)
- static bool too_many_workers(struct global_cwq *gcwq)
- {
- 	bool managing = gcwq->flags & GCWQ_MANAGING_WORKERS;
--	int nr_idle = gcwq->nr_idle + managing; /* manager is considered idle */
--	int nr_busy = gcwq->nr_workers - nr_idle;
-+	int nr_idle = gcwq->pool.nr_idle + managing; /* manager is considered idle */
-+	int nr_busy = gcwq->pool.nr_workers - nr_idle;
- 
- 	return nr_idle > 2 && (nr_idle - 2) * MAX_IDLE_WORKERS_RATIO >= nr_busy;
- }
-@@ -635,10 +642,10 @@ static bool too_many_workers(struct global_cwq *gcwq)
- /* Return the first worker.  Safe with preemption disabled */
- static struct worker *first_worker(struct global_cwq *gcwq)
- {
--	if (unlikely(list_empty(&gcwq->idle_list)))
-+	if (unlikely(list_empty(&gcwq->pool.idle_list)))
- 		return NULL;
- 
--	return list_first_entry(&gcwq->idle_list, struct worker, entry);
-+	return list_first_entry(&gcwq->pool.idle_list, struct worker, entry);
- }
- 
- /**
-@@ -696,7 +703,8 @@ struct task_struct *wq_worker_sleeping(struct task_struct *task,
- 				       unsigned int cpu)
- {
- 	struct worker *worker = kthread_data(task), *to_wakeup = NULL;
--	struct global_cwq *gcwq = get_gcwq(cpu);
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 	atomic_t *nr_running = get_gcwq_nr_running(cpu);
- 
- 	if (worker->flags & WORKER_NOT_RUNNING)
-@@ -716,7 +724,7 @@ struct task_struct *wq_worker_sleeping(struct task_struct *task,
- 	 * could be manipulating idle_list, so dereferencing idle_list
- 	 * without gcwq lock is safe.
- 	 */
--	if (atomic_dec_and_test(nr_running) && !list_empty(&gcwq->worklist))
-+	if (atomic_dec_and_test(nr_running) && !list_empty(&pool->worklist))
- 		to_wakeup = first_worker(gcwq);
- 	return to_wakeup ? to_wakeup->task : NULL;
- }
-@@ -737,7 +745,8 @@ struct task_struct *wq_worker_sleeping(struct task_struct *task,
- static inline void worker_set_flags(struct worker *worker, unsigned int flags,
- 				    bool wakeup)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 
- 	WARN_ON_ONCE(worker->task != current);
- 
-@@ -752,7 +761,7 @@ static inline void worker_set_flags(struct worker *worker, unsigned int flags,
- 
- 		if (wakeup) {
- 			if (atomic_dec_and_test(nr_running) &&
--			    !list_empty(&gcwq->worklist))
-+			    !list_empty(&pool->worklist))
- 				wake_up_worker(gcwq);
- 		} else
- 			atomic_dec(nr_running);
-@@ -773,7 +782,7 @@ static inline void worker_set_flags(struct worker *worker, unsigned int flags,
-  */
- static inline void worker_clr_flags(struct worker *worker, unsigned int flags)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct global_cwq *gcwq = worker->pool->gcwq;
- 	unsigned int oflags = worker->flags;
- 
- 	WARN_ON_ONCE(worker->task != current);
-@@ -894,9 +903,9 @@ static inline struct list_head *gcwq_determine_ins_pos(struct global_cwq *gcwq,
- 	struct work_struct *twork;
- 
- 	if (likely(!(cwq->wq->flags & WQ_HIGHPRI)))
--		return &gcwq->worklist;
-+		return &gcwq->pool.worklist;
- 
--	list_for_each_entry(twork, &gcwq->worklist, entry) {
-+	list_for_each_entry(twork, &gcwq->pool.worklist, entry) {
- 		struct cpu_workqueue_struct *tcwq = get_work_cwq(twork);
- 
- 		if (!(tcwq->wq->flags & WQ_HIGHPRI))
-@@ -924,7 +933,7 @@ static void insert_work(struct cpu_workqueue_struct *cwq,
- 			struct work_struct *work, struct list_head *head,
- 			unsigned int extra_flags)
- {
--	struct global_cwq *gcwq = cwq->gcwq;
-+	struct global_cwq *gcwq = cwq->pool->gcwq;
- 
- 	/* we own @work, set data and link */
- 	set_work_cwq(work, cwq, extra_flags);
-@@ -1196,7 +1205,8 @@ EXPORT_SYMBOL_GPL(queue_delayed_work_on);
-  */
- static void worker_enter_idle(struct worker *worker)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 
- 	BUG_ON(worker->flags & WORKER_IDLE);
- 	BUG_ON(!list_empty(&worker->entry) &&
-@@ -1204,15 +1214,15 @@ static void worker_enter_idle(struct worker *worker)
- 
- 	/* can't use worker_set_flags(), also called from start_worker() */
- 	worker->flags |= WORKER_IDLE;
--	gcwq->nr_idle++;
-+	pool->nr_idle++;
- 	worker->last_active = jiffies;
- 
- 	/* idle_list is LIFO */
--	list_add(&worker->entry, &gcwq->idle_list);
-+	list_add(&worker->entry, &pool->idle_list);
- 
- 	if (likely(!(worker->flags & WORKER_ROGUE))) {
--		if (too_many_workers(gcwq) && !timer_pending(&gcwq->idle_timer))
--			mod_timer(&gcwq->idle_timer,
-+		if (too_many_workers(gcwq) && !timer_pending(&pool->idle_timer))
-+			mod_timer(&pool->idle_timer,
- 				  jiffies + IDLE_WORKER_TIMEOUT);
- 	} else
- 		wake_up_all(&gcwq->trustee_wait);
-@@ -1223,7 +1233,7 @@ static void worker_enter_idle(struct worker *worker)
- 	 * warning may trigger spuriously.  Check iff trustee is idle.
- 	 */
- 	WARN_ON_ONCE(gcwq->trustee_state == TRUSTEE_DONE &&
--		     gcwq->nr_workers == gcwq->nr_idle &&
-+		     pool->nr_workers == pool->nr_idle &&
- 		     atomic_read(get_gcwq_nr_running(gcwq->cpu)));
- }
- 
-@@ -1238,11 +1248,11 @@ static void worker_enter_idle(struct worker *worker)
-  */
- static void worker_leave_idle(struct worker *worker)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct worker_pool *pool = worker->pool;
- 
- 	BUG_ON(!(worker->flags & WORKER_IDLE));
- 	worker_clr_flags(worker, WORKER_IDLE);
--	gcwq->nr_idle--;
-+	pool->nr_idle--;
- 	list_del_init(&worker->entry);
- }
- 
-@@ -1279,7 +1289,7 @@ static void worker_leave_idle(struct worker *worker)
- static bool worker_maybe_bind_and_lock(struct worker *worker)
- __acquires(&gcwq->lock)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct global_cwq *gcwq = worker->pool->gcwq;
- 	struct task_struct *task = worker->task;
- 
- 	while (true) {
-@@ -1321,7 +1331,7 @@ __acquires(&gcwq->lock)
- static void worker_rebind_fn(struct work_struct *work)
- {
- 	struct worker *worker = container_of(work, struct worker, rebind_work);
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct global_cwq *gcwq = worker->pool->gcwq;
- 
- 	if (worker_maybe_bind_and_lock(worker))
- 		worker_clr_flags(worker, WORKER_REBIND);
-@@ -1362,13 +1372,14 @@ static struct worker *alloc_worker(void)
- static struct worker *create_worker(struct global_cwq *gcwq, bool bind)
- {
- 	bool on_unbound_cpu = gcwq->cpu == WORK_CPU_UNBOUND;
-+	struct worker_pool *pool = &gcwq->pool;
- 	struct worker *worker = NULL;
- 	int id = -1;
- 
- 	spin_lock_irq(&gcwq->lock);
--	while (ida_get_new(&gcwq->worker_ida, &id)) {
-+	while (ida_get_new(&pool->worker_ida, &id)) {
- 		spin_unlock_irq(&gcwq->lock);
--		if (!ida_pre_get(&gcwq->worker_ida, GFP_KERNEL))
-+		if (!ida_pre_get(&pool->worker_ida, GFP_KERNEL))
- 			goto fail;
- 		spin_lock_irq(&gcwq->lock);
- 	}
-@@ -1378,7 +1389,7 @@ static struct worker *create_worker(struct global_cwq *gcwq, bool bind)
- 	if (!worker)
- 		goto fail;
- 
--	worker->gcwq = gcwq;
-+	worker->pool = pool;
- 	worker->id = id;
- 
- 	if (!on_unbound_cpu)
-@@ -1409,7 +1420,7 @@ static struct worker *create_worker(struct global_cwq *gcwq, bool bind)
- fail:
- 	if (id >= 0) {
- 		spin_lock_irq(&gcwq->lock);
--		ida_remove(&gcwq->worker_ida, id);
-+		ida_remove(&pool->worker_ida, id);
- 		spin_unlock_irq(&gcwq->lock);
- 	}
- 	kfree(worker);
-@@ -1428,7 +1439,7 @@ fail:
- static void start_worker(struct worker *worker)
- {
- 	worker->flags |= WORKER_STARTED;
--	worker->gcwq->nr_workers++;
-+	worker->pool->nr_workers++;
- 	worker_enter_idle(worker);
- 	wake_up_process(worker->task);
- }
-@@ -1444,7 +1455,8 @@ static void start_worker(struct worker *worker)
-  */
- static void destroy_worker(struct worker *worker)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 	int id = worker->id;
- 
- 	/* sanity check frenzy */
-@@ -1452,9 +1464,9 @@ static void destroy_worker(struct worker *worker)
- 	BUG_ON(!list_empty(&worker->scheduled));
- 
- 	if (worker->flags & WORKER_STARTED)
--		gcwq->nr_workers--;
-+		pool->nr_workers--;
- 	if (worker->flags & WORKER_IDLE)
--		gcwq->nr_idle--;
-+		pool->nr_idle--;
- 
- 	list_del_init(&worker->entry);
- 	worker->flags |= WORKER_DIE;
-@@ -1465,7 +1477,7 @@ static void destroy_worker(struct worker *worker)
- 	kfree(worker);
- 
- 	spin_lock_irq(&gcwq->lock);
--	ida_remove(&gcwq->worker_ida, id);
-+	ida_remove(&pool->worker_ida, id);
- }
- 
- static void idle_worker_timeout(unsigned long __gcwq)
-@@ -1479,11 +1491,12 @@ static void idle_worker_timeout(unsigned long __gcwq)
- 		unsigned long expires;
- 
- 		/* idle_list is kept in LIFO order, check the last one */
--		worker = list_entry(gcwq->idle_list.prev, struct worker, entry);
-+		worker = list_entry(gcwq->pool.idle_list.prev, struct worker,
-+				    entry);
- 		expires = worker->last_active + IDLE_WORKER_TIMEOUT;
- 
- 		if (time_before(jiffies, expires))
--			mod_timer(&gcwq->idle_timer, expires);
-+			mod_timer(&gcwq->pool.idle_timer, expires);
- 		else {
- 			/* it's been idle for too long, wake up manager */
- 			gcwq->flags |= GCWQ_MANAGE_WORKERS;
-@@ -1504,7 +1517,7 @@ static bool send_mayday(struct work_struct *work)
- 		return false;
- 
- 	/* mayday mayday mayday */
--	cpu = cwq->gcwq->cpu;
-+	cpu = cwq->pool->gcwq->cpu;
- 	/* WORK_CPU_UNBOUND can't be set in cpumask, use cpu 0 instead */
- 	if (cpu == WORK_CPU_UNBOUND)
- 		cpu = 0;
-@@ -1527,13 +1540,13 @@ static void gcwq_mayday_timeout(unsigned long __gcwq)
- 		 * allocation deadlock.  Send distress signals to
- 		 * rescuers.
- 		 */
--		list_for_each_entry(work, &gcwq->worklist, entry)
-+		list_for_each_entry(work, &gcwq->pool.worklist, entry)
- 			send_mayday(work);
- 	}
- 
- 	spin_unlock_irq(&gcwq->lock);
- 
--	mod_timer(&gcwq->mayday_timer, jiffies + MAYDAY_INTERVAL);
-+	mod_timer(&gcwq->pool.mayday_timer, jiffies + MAYDAY_INTERVAL);
- }
- 
- /**
-@@ -1568,14 +1581,14 @@ restart:
- 	spin_unlock_irq(&gcwq->lock);
- 
- 	/* if we don't make progress in MAYDAY_INITIAL_TIMEOUT, call for help */
--	mod_timer(&gcwq->mayday_timer, jiffies + MAYDAY_INITIAL_TIMEOUT);
-+	mod_timer(&gcwq->pool.mayday_timer, jiffies + MAYDAY_INITIAL_TIMEOUT);
- 
- 	while (true) {
- 		struct worker *worker;
- 
- 		worker = create_worker(gcwq, true);
- 		if (worker) {
--			del_timer_sync(&gcwq->mayday_timer);
-+			del_timer_sync(&gcwq->pool.mayday_timer);
- 			spin_lock_irq(&gcwq->lock);
- 			start_worker(worker);
- 			BUG_ON(need_to_create_worker(gcwq));
-@@ -1592,7 +1605,7 @@ restart:
- 			break;
- 	}
- 
--	del_timer_sync(&gcwq->mayday_timer);
-+	del_timer_sync(&gcwq->pool.mayday_timer);
- 	spin_lock_irq(&gcwq->lock);
- 	if (need_to_create_worker(gcwq))
- 		goto restart;
-@@ -1622,11 +1635,12 @@ static bool maybe_destroy_workers(struct global_cwq *gcwq)
- 		struct worker *worker;
- 		unsigned long expires;
- 
--		worker = list_entry(gcwq->idle_list.prev, struct worker, entry);
-+		worker = list_entry(gcwq->pool.idle_list.prev, struct worker,
-+				    entry);
- 		expires = worker->last_active + IDLE_WORKER_TIMEOUT;
- 
- 		if (time_before(jiffies, expires)) {
--			mod_timer(&gcwq->idle_timer, expires);
-+			mod_timer(&gcwq->pool.idle_timer, expires);
- 			break;
- 		}
- 
-@@ -1659,7 +1673,7 @@ static bool maybe_destroy_workers(struct global_cwq *gcwq)
-  */
- static bool manage_workers(struct worker *worker)
- {
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct global_cwq *gcwq = worker->pool->gcwq;
- 	bool ret = false;
- 
- 	if (gcwq->flags & GCWQ_MANAGING_WORKERS)
-@@ -1732,7 +1746,7 @@ static void cwq_activate_first_delayed(struct cpu_workqueue_struct *cwq)
- {
- 	struct work_struct *work = list_first_entry(&cwq->delayed_works,
- 						    struct work_struct, entry);
--	struct list_head *pos = gcwq_determine_ins_pos(cwq->gcwq, cwq);
-+	struct list_head *pos = gcwq_determine_ins_pos(cwq->pool->gcwq, cwq);
- 
- 	trace_workqueue_activate_work(work);
- 	move_linked_works(work, pos, NULL);
-@@ -1808,7 +1822,8 @@ __releases(&gcwq->lock)
- __acquires(&gcwq->lock)
- {
- 	struct cpu_workqueue_struct *cwq = get_work_cwq(work);
--	struct global_cwq *gcwq = cwq->gcwq;
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 	struct hlist_head *bwh = busy_worker_head(gcwq, work);
- 	bool cpu_intensive = cwq->wq->flags & WQ_CPU_INTENSIVE;
- 	work_func_t f = work->func;
-@@ -1854,10 +1869,10 @@ __acquires(&gcwq->lock)
- 	 * wake up another worker; otherwise, clear HIGHPRI_PENDING.
- 	 */
- 	if (unlikely(gcwq->flags & GCWQ_HIGHPRI_PENDING)) {
--		struct work_struct *nwork = list_first_entry(&gcwq->worklist,
--						struct work_struct, entry);
-+		struct work_struct *nwork = list_first_entry(&pool->worklist,
-+					 struct work_struct, entry);
- 
--		if (!list_empty(&gcwq->worklist) &&
-+		if (!list_empty(&pool->worklist) &&
- 		    get_work_cwq(nwork)->wq->flags & WQ_HIGHPRI)
- 			wake_up_worker(gcwq);
- 		else
-@@ -1950,7 +1965,8 @@ static void process_scheduled_works(struct worker *worker)
- static int worker_thread(void *__worker)
- {
- 	struct worker *worker = __worker;
--	struct global_cwq *gcwq = worker->gcwq;
-+	struct worker_pool *pool = worker->pool;
-+	struct global_cwq *gcwq = pool->gcwq;
- 
- 	/* tell the scheduler that this is a workqueue worker */
- 	worker->task->flags |= PF_WQ_WORKER;
-@@ -1990,7 +2006,7 @@ recheck:
- 
- 	do {
- 		struct work_struct *work =
--			list_first_entry(&gcwq->worklist,
-+			list_first_entry(&pool->worklist,
- 					 struct work_struct, entry);
- 
- 		if (likely(!(*work_data_bits(work) & WORK_STRUCT_LINKED))) {
-@@ -2064,14 +2080,15 @@ repeat:
- 	for_each_mayday_cpu(cpu, wq->mayday_mask) {
- 		unsigned int tcpu = is_unbound ? WORK_CPU_UNBOUND : cpu;
- 		struct cpu_workqueue_struct *cwq = get_cwq(tcpu, wq);
--		struct global_cwq *gcwq = cwq->gcwq;
-+		struct worker_pool *pool = cwq->pool;
-+		struct global_cwq *gcwq = pool->gcwq;
- 		struct work_struct *work, *n;
- 
- 		__set_current_state(TASK_RUNNING);
- 		mayday_clear_cpu(cpu, wq->mayday_mask);
- 
- 		/* migrate to the target cpu if possible */
--		rescuer->gcwq = gcwq;
-+		rescuer->pool = pool;
- 		worker_maybe_bind_and_lock(rescuer);
- 
- 		/*
-@@ -2079,7 +2096,7 @@ repeat:
- 		 * process'em.
- 		 */
- 		BUG_ON(!list_empty(&rescuer->scheduled));
--		list_for_each_entry_safe(work, n, &gcwq->worklist, entry)
-+		list_for_each_entry_safe(work, n, &pool->worklist, entry)
- 			if (get_work_cwq(work) == cwq)
- 				move_linked_works(work, scheduled, &n);
- 
-@@ -2216,7 +2233,7 @@ static bool flush_workqueue_prep_cwqs(struct workqueue_struct *wq,
- 
- 	for_each_cwq_cpu(cpu, wq) {
- 		struct cpu_workqueue_struct *cwq = get_cwq(cpu, wq);
--		struct global_cwq *gcwq = cwq->gcwq;
-+		struct global_cwq *gcwq = cwq->pool->gcwq;
- 
- 		spin_lock_irq(&gcwq->lock);
- 
-@@ -2432,9 +2449,9 @@ reflush:
- 		struct cpu_workqueue_struct *cwq = get_cwq(cpu, wq);
- 		bool drained;
- 
--		spin_lock_irq(&cwq->gcwq->lock);
-+		spin_lock_irq(&cwq->pool->gcwq->lock);
- 		drained = !cwq->nr_active && list_empty(&cwq->delayed_works);
--		spin_unlock_irq(&cwq->gcwq->lock);
-+		spin_unlock_irq(&cwq->pool->gcwq->lock);
- 
- 		if (drained)
- 			continue;
-@@ -2474,7 +2491,7 @@ static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr,
- 		 */
- 		smp_rmb();
- 		cwq = get_work_cwq(work);
--		if (unlikely(!cwq || gcwq != cwq->gcwq))
-+		if (unlikely(!cwq || gcwq != cwq->pool->gcwq))
- 			goto already_gone;
- 	} else if (wait_executing) {
- 		worker = find_worker_executing_work(gcwq, work);
-@@ -3017,7 +3034,7 @@ struct workqueue_struct *__alloc_workqueue_key(const char *fmt,
- 		struct global_cwq *gcwq = get_gcwq(cpu);
- 
- 		BUG_ON((unsigned long)cwq & WORK_STRUCT_FLAG_MASK);
--		cwq->gcwq = gcwq;
-+		cwq->pool = &gcwq->pool;
- 		cwq->wq = wq;
- 		cwq->flush_color = -1;
- 		cwq->max_active = max_active;
-@@ -3344,7 +3361,7 @@ static int __cpuinit trustee_thread(void *__gcwq)
- 
- 	gcwq->flags |= GCWQ_MANAGING_WORKERS;
- 
--	list_for_each_entry(worker, &gcwq->idle_list, entry)
-+	list_for_each_entry(worker, &gcwq->pool.idle_list, entry)
- 		worker->flags |= WORKER_ROGUE;
- 
- 	for_each_busy_worker(worker, i, pos, gcwq)
-@@ -3369,7 +3386,7 @@ static int __cpuinit trustee_thread(void *__gcwq)
- 	atomic_set(get_gcwq_nr_running(gcwq->cpu), 0);
- 
- 	spin_unlock_irq(&gcwq->lock);
--	del_timer_sync(&gcwq->idle_timer);
-+	del_timer_sync(&gcwq->pool.idle_timer);
- 	spin_lock_irq(&gcwq->lock);
- 
- 	/*
-@@ -3391,17 +3408,17 @@ static int __cpuinit trustee_thread(void *__gcwq)
- 	 * may be frozen works in freezable cwqs.  Don't declare
- 	 * completion while frozen.
- 	 */
--	while (gcwq->nr_workers != gcwq->nr_idle ||
-+	while (gcwq->pool.nr_workers != gcwq->pool.nr_idle ||
- 	       gcwq->flags & GCWQ_FREEZING ||
- 	       gcwq->trustee_state == TRUSTEE_IN_CHARGE) {
- 		int nr_works = 0;
- 
--		list_for_each_entry(work, &gcwq->worklist, entry) {
-+		list_for_each_entry(work, &gcwq->pool.worklist, entry) {
- 			send_mayday(work);
- 			nr_works++;
- 		}
- 
--		list_for_each_entry(worker, &gcwq->idle_list, entry) {
-+		list_for_each_entry(worker, &gcwq->pool.idle_list, entry) {
- 			if (!nr_works--)
- 				break;
- 			wake_up_process(worker->task);
-@@ -3428,11 +3445,11 @@ static int __cpuinit trustee_thread(void *__gcwq)
- 	 * all workers till we're canceled.
- 	 */
- 	do {
--		rc = trustee_wait_event(!list_empty(&gcwq->idle_list));
--		while (!list_empty(&gcwq->idle_list))
--			destroy_worker(list_first_entry(&gcwq->idle_list,
-+		rc = trustee_wait_event(!list_empty(&gcwq->pool.idle_list));
-+		while (!list_empty(&gcwq->pool.idle_list))
-+			destroy_worker(list_first_entry(&gcwq->pool.idle_list,
- 							struct worker, entry));
--	} while (gcwq->nr_workers && rc >= 0);
-+	} while (gcwq->pool.nr_workers && rc >= 0);
- 
- 	/*
- 	 * At this point, either draining has completed and no worker
-@@ -3441,7 +3458,7 @@ static int __cpuinit trustee_thread(void *__gcwq)
- 	 * Tell the remaining busy ones to rebind once it finishes the
- 	 * currently scheduled works by scheduling the rebind_work.
- 	 */
--	WARN_ON(!list_empty(&gcwq->idle_list));
-+	WARN_ON(!list_empty(&gcwq->pool.idle_list));
- 
- 	for_each_busy_worker(worker, i, pos, gcwq) {
- 		struct work_struct *rebind_work = &worker->rebind_work;
-@@ -3522,7 +3539,7 @@ static int __devinit workqueue_cpu_callback(struct notifier_block *nfb,
- 		kthread_bind(new_trustee, cpu);
- 		/* fall through */
- 	case CPU_UP_PREPARE:
--		BUG_ON(gcwq->first_idle);
-+		BUG_ON(gcwq->pool.first_idle);
- 		new_worker = create_worker(gcwq, false);
- 		if (!new_worker) {
- 			if (new_trustee)
-@@ -3544,8 +3561,8 @@ static int __devinit workqueue_cpu_callback(struct notifier_block *nfb,
- 		wait_trustee_state(gcwq, TRUSTEE_IN_CHARGE);
- 		/* fall through */
- 	case CPU_UP_PREPARE:
--		BUG_ON(gcwq->first_idle);
--		gcwq->first_idle = new_worker;
-+		BUG_ON(gcwq->pool.first_idle);
-+		gcwq->pool.first_idle = new_worker;
- 		break;
- 
- 	case CPU_DYING:
-@@ -3562,8 +3579,8 @@ static int __devinit workqueue_cpu_callback(struct notifier_block *nfb,
- 		gcwq->trustee_state = TRUSTEE_BUTCHER;
- 		/* fall through */
- 	case CPU_UP_CANCELED:
--		destroy_worker(gcwq->first_idle);
--		gcwq->first_idle = NULL;
-+		destroy_worker(gcwq->pool.first_idle);
-+		gcwq->pool.first_idle = NULL;
- 		break;
- 
- 	case CPU_DOWN_FAILED:
-@@ -3581,11 +3598,11 @@ static int __devinit workqueue_cpu_callback(struct notifier_block *nfb,
- 		 * take a look.
- 		 */
- 		spin_unlock_irq(&gcwq->lock);
--		kthread_bind(gcwq->first_idle->task, cpu);
-+		kthread_bind(gcwq->pool.first_idle->task, cpu);
- 		spin_lock_irq(&gcwq->lock);
- 		gcwq->flags |= GCWQ_MANAGE_WORKERS;
--		start_worker(gcwq->first_idle);
--		gcwq->first_idle = NULL;
-+		start_worker(gcwq->pool.first_idle);
-+		gcwq->pool.first_idle = NULL;
- 		break;
- 	}
- 
-@@ -3794,22 +3811,23 @@ static int __init init_workqueues(void)
- 		struct global_cwq *gcwq = get_gcwq(cpu);
- 
- 		spin_lock_init(&gcwq->lock);
--		INIT_LIST_HEAD(&gcwq->worklist);
-+		gcwq->pool.gcwq = gcwq;
-+		INIT_LIST_HEAD(&gcwq->pool.worklist);
- 		gcwq->cpu = cpu;
- 		gcwq->flags |= GCWQ_DISASSOCIATED;
- 
--		INIT_LIST_HEAD(&gcwq->idle_list);
-+		INIT_LIST_HEAD(&gcwq->pool.idle_list);
- 		for (i = 0; i < BUSY_WORKER_HASH_SIZE; i++)
- 			INIT_HLIST_HEAD(&gcwq->busy_hash[i]);
- 
--		init_timer_deferrable(&gcwq->idle_timer);
--		gcwq->idle_timer.function = idle_worker_timeout;
--		gcwq->idle_timer.data = (unsigned long)gcwq;
-+		init_timer_deferrable(&gcwq->pool.idle_timer);
-+		gcwq->pool.idle_timer.function = idle_worker_timeout;
-+		gcwq->pool.idle_timer.data = (unsigned long)gcwq;
- 
--		setup_timer(&gcwq->mayday_timer, gcwq_mayday_timeout,
-+		setup_timer(&gcwq->pool.mayday_timer, gcwq_mayday_timeout,
- 			    (unsigned long)gcwq);
- 
--		ida_init(&gcwq->worker_ida);
-+		ida_init(&gcwq->pool.worker_ida);
- 
- 		gcwq->trustee_state = TRUSTEE_DONE;
- 		init_waitqueue_head(&gcwq->trustee_wait);
--- 
-1.7.7.3
+TGludXggdmVyc2lvbiAzLjUuMC1yYzYtengxLXNtcC1uZXh0LTIwMTIwNzEyLTEtZzEyNzUxNzAg
+KGFlZ2xAbGludXgtYnhiMSkgKGdjYyB2ZXJzaW9uIDQuMy40IFtnY2MtNF8zLWJyYW5jaCByZXZp
+c2lvbiAxNTI5NzNdIChTVVNFIExpbnV4KSApICMxIFNNUCBUaHUgSnVsIDEyIDE1OjA5OjE3IFBE
+VCAyMDEyCkVGSSB2MS4xMCBieSBIUDogU0FMc3lzdGFiPTB4M2ZlZmEwMDAgQUNQSSAyLjA9MHgz
+ZmQ1ZTAwMCBTTUJJT1M9MHgzZmVmYzAwMCBIQ0RQPTB4M2ZkNWMwMDAKRWFybHkgc2VyaWFsIGNv
+bnNvbGUgYXQgTU1JTyAweGZmNWUwMDAwIChvcHRpb25zICc5NjAwJykKYm9vdGNvbnNvbGUgW3Vh
+cnQwXSBlbmFibGVkClBDRFA6IHYwIGF0IDB4M2ZkNWMwMDAKRXhwbGljaXQgImNvbnNvbGU9Ijsg
+aWdub3JpbmcgUENEUApBQ1BJOiBSU0RQIDAwMDAwMDAwM2ZkNWUwMDAgMDAwMjggKHYwMiAgICAg
+SFApCkFDUEk6IFhTRFQgMDAwMDAwMDAzZmQ1ZTAyYyAwMDA5NCAodjAxICAgICBIUCAgIHJ4MjYy
+MCAwMDAwMDAwMCAgIEhQIDAwMDAwMDAwKQpBQ1BJOiBGQUNQIDAwMDAwMDAwM2ZkNjczOTAgMDAw
+RjQgKHYwMyAgICAgSFAgICByeDI2MjAgMDAwMDAwMDAgICBIUCAwMDAwMDAwMCkKQUNQSSBXYXJu
+aW5nOiAzMi82NFggbGVuZ3RoIG1pc21hdGNoIGluIEdwZTBCbG9jazogMzIvMTYgKDIwMTIwNTE4
+L3RiZmFkdC01NjUpCkFDUEkgV2FybmluZzogMzIvNjRYIGxlbmd0aCBtaXNtYXRjaCBpbiBHcGUx
+QmxvY2s6IDMyLzE2ICgyMDEyMDUxOC90YmZhZHQtNTY1KQpBQ1BJOiBEU0RUIDAwMDAwMDAwM2Zk
+NWUxMDAgMDVGM0MgKHYwMSAgICAgSFAgICByeDI2MjAgMDAwMDAwMDcgSU5UTCAwMjAxMjA0NCkK
+QUNQSTogRkFDUyAwMDAwMDAwMDNmZDY3NDg4IDAwMDQwCkFDUEk6IFNQQ1IgMDAwMDAwMDAzZmQ2
+NzRjOCAwMDA1MCAodjAxICAgICBIUCAgIHJ4MjYyMCAwMDAwMDAwMCAgIEhQIDAwMDAwMDAwKQpB
+Q1BJOiBEQkdQIDAwMDAwMDAwM2ZkNjc1MTggMDAwMzQgKHYwMSAgICAgSFAgICByeDI2MjAgMDAw
+MDAwMDAgICBIUCAwMDAwMDAwMCkKQUNQSTogQVBJQyAwMDAwMDAwMDNmZDY3NjEwIDAwMEIwICh2
+MDEgICAgIEhQICAgcngyNjIwIDAwMDAwMDAwICAgSFAgMDAwMDAwMDApCkFDUEk6IFNQTUkgMDAw
+MDAwMDAzZmQ2NzU1MCAwMDA1MCAodjA0ICAgICBIUCAgIHJ4MjYyMCAwMDAwMDAwMCAgIEhQIDAw
+MDAwMDAwKQpBQ1BJOiBDUEVQIDAwMDAwMDAwM2ZkNjc1YTAgMDAwMzQgKHYwMSAgICAgSFAgICBy
+eDI2MjAgMDAwMDAwMDAgICBIUCAwMDAwMDAwMCkKQUNQSTogU1NEVCAwMDAwMDAwMDNmZDY0MDQw
+IDAwMUQ2ICh2MDEgICAgIEhQICAgcngyNjIwIDAwMDAwMDA2IElOVEwgMDIwMTIwNDQpCkFDUEk6
+IFNTRFQgMDAwMDAwMDAzZmQ2NDIyMCAwMDcwMiAodjAxICAgICBIUCAgIHJ4MjYyMCAwMDAwMDAw
+NiBJTlRMIDAyMDEyMDQ0KQpBQ1BJOiBTU0RUIDAwMDAwMDAwM2ZkNjQ5MzAgMDBBMTYgKHYwMSAg
+ICAgSFAgICByeDI2MjAgMDAwMDAwMDYgSU5UTCAwMjAxMjA0NCkKQUNQSTogU1NEVCAwMDAwMDAw
+MDNmZDY1MzUwIDAwQTE2ICh2MDEgICAgIEhQICAgcngyNjIwIDAwMDAwMDA2IElOVEwgMDIwMTIw
+NDQpCkFDUEk6IFNTRFQgMDAwMDAwMDAzZmQ2NWQ3MCAwMEExNiAodjAxICAgICBIUCAgIHJ4MjYy
+MCAwMDAwMDAwNiBJTlRMIDAyMDEyMDQ0KQpBQ1BJOiBTU0RUIDAwMDAwMDAwM2ZkNjY3OTAgMDBB
+MTYgKHYwMSAgICAgSFAgICByeDI2MjAgMDAwMDAwMDYgSU5UTCAwMjAxMjA0NCkKQUNQSTogU1NE
+VCAwMDAwMDAwMDNmZDY3MWIwIDAwMEVCICh2MDEgICAgIEhQICAgcngyNjIwIDAwMDAwMDA2IElO
+VEwgMDIwMTIwNDQpCkFDUEk6IFNTRFQgMDAwMDAwMDAzZmQ2NzJhMCAwMDBFRiAodjAxICAgICBI
+UCAgIHJ4MjYyMCAwMDAwMDAwNiBJTlRMIDAyMDEyMDQ0KQpBQ1BJOiBMb2NhbCBBUElDIGFkZHJl
+c3MgYzAwMDAwMDBmZWUwMDAwMAoyIENQVXMgYXZhaWxhYmxlLCAyIENQVXMgdG90YWwKd2Fybmlu
+Zzogc2tpcHBpbmcgcGh5c2ljYWwgcGFnZSAwCkluaXRpYWwgcmFtZGlzayBhdDogMHhlMDAwMDA0
+MDdlOWJiMDAwICg2MDcxNjk4IGJ5dGVzKQpTQUwgMy4xOiBIUCB2ZXJzaW9uIDMuMTUKU0FMIFBs
+YXRmb3JtIGZlYXR1cmVzOiBOb25lClNBTDogQVAgd2FrZXVwIHVzaW5nIGV4dGVybmFsIGludGVy
+cnVwdCB2ZWN0b3IgMHhmZgpNQ0EgcmVsYXRlZCBpbml0aWFsaXphdGlvbiBkb25lCndhcm5pbmc6
+IHNraXBwaW5nIHBoeXNpY2FsIHBhZ2UgMApab25lIHJhbmdlczoKICBETUEgICAgICBbbWVtIDB4
+MDAwMDQwMDAtMHhmZmZmZmZmZl0KICBOb3JtYWwgICBbbWVtIDB4MTAwMDAwMDAwLTB4NDA3ZmZj
+N2ZmZl0KTW92YWJsZSB6b25lIHN0YXJ0IGZvciBlYWNoIG5vZGUKRWFybHkgbWVtb3J5IG5vZGUg
+cmFuZ2VzCiAgbm9kZSAgIDA6IFttZW0gMHgwMDAwNDAwMC0weDNmNGViZmZmXQogIG5vZGUgICAw
+OiBbbWVtIDB4M2ZjMDAwMDAtMHgzZmQ1YmZmZl0KICBub2RlICAgMDogW21lbSAweDQwNDAwMDAw
+MDAtMHg0MDdmZDJiZmZmXQogIG5vZGUgICAwOiBbbWVtIDB4NDA3ZmQ5ODAwMC0weDQwN2ZlMDdm
+ZmZdCiAgbm9kZSAgIDA6IFttZW0gMHg0MDdmZTgwMDAwLTB4NDA3ZmZjN2ZmZl0KT24gbm9kZSAw
+IHRvdGFscGFnZXM6IDEzMDM3OApmcmVlX2FyZWFfaW5pdF9ub2RlOiBub2RlIDAsIHBnZGF0IGEw
+MDAwMDAxMDEyZWUzODAsIG5vZGVfbWVtX21hcCBhMDAwN2ZmZmM3OTAwMDM4CiAgRE1BIHpvbmU6
+IDg5NiBwYWdlcyB1c2VkIGZvciBtZW1tYXAKICBETUEgem9uZTogMCBwYWdlcyByZXNlcnZlZAog
+IERNQSB6b25lOiA2NDAxNyBwYWdlcywgTElGTyBiYXRjaDo3CiAgTm9ybWFsIHpvbmU6IDU2ODk2
+IHBhZ2VzIHVzZWQgZm9yIG1lbW1hcAogIE5vcm1hbCB6b25lOiA4NTY5IHBhZ2VzLCBMSUZPIGJh
+dGNoOjEKVmlydHVhbCBtZW1fbWFwIHN0YXJ0cyBhdCAweGEwMDA3ZmZmYzc5MDAwMDAKcGNwdS1h
+bGxvYzogczExMzkyIHI4MTkyIGQyNDI1NjAgdTI2MjE0NCBhbGxvYz0xNioxNjM4NApwY3B1LWFs
+bG9jOiBbMF0gMCBbMF0gMSAKQnVpbHQgMSB6b25lbGlzdHMgaW4gWm9uZSBvcmRlciwgbW9iaWxp
+dHkgZ3JvdXBpbmcgb2ZmLiAgVG90YWwgcGFnZXM6IDcyNTg2Cktlcm5lbCBjb21tYW5kIGxpbmU6
+IEJPT1RfSU1BR0U9c2NzaTA6XGVmaVxTdVNFXGwtengxLXNtcC5neiByb290PS9kZXYvZGlzay9i
+eS1pZC9zY3NpLTIwMDAwMGUxMTAwYTVkNWYyLXBhcnQyICBjb25zb2xlPXVhcnQsbW1pbywweGZm
+NWUwMDAwIApQSUQgaGFzaCB0YWJsZSBlbnRyaWVzOiA0MDk2IChvcmRlcjogMSwgMzI3NjggYnl0
+ZXMpCkRlbnRyeSBjYWNoZSBoYXNoIHRhYmxlIGVudHJpZXM6IDI2MjE0NCAob3JkZXI6IDcsIDIw
+OTcxNTIgYnl0ZXMpCklub2RlLWNhY2hlIGhhc2ggdGFibGUgZW50cmllczogMTMxMDcyIChvcmRl
+cjogNiwgMTA0ODU3NiBieXRlcykKTWVtb3J5OiAyMDQ4MTc2ay8yMDg2MDY0ayBhdmFpbGFibGUg
+KDEzODIwayBjb2RlLCAzNzg4OGsgcmVzZXJ2ZWQsIDU5MjBrIGRhdGEsIDg0OGsgaW5pdCkKU0xV
+QjogR2Vuc2xhYnM9MTcsIEhXYWxpZ249MTI4LCBPcmRlcj0wLTMsIE1pbk9iamVjdHM9MCwgQ1BV
+cz0yLCBOb2Rlcz0xCkhpZXJhcmNoaWNhbCBSQ1UgaW1wbGVtZW50YXRpb24uCglSQ1UgcmVzdHJp
+Y3RpbmcgQ1BVcyBmcm9tIE5SX0NQVVM9MTYgdG8gbnJfY3B1X2lkcz0yLgpOUl9JUlFTOjc2OApB
+Q1BJOiBMb2NhbCBBUElDIGFkZHJlc3MgYzAwMDAwMDBmZWUwMDAwMApHU0kgMzYgKGxldmVsLCBs
+b3cpIC0+IENQVSAwICgweDAwMDApIHZlY3RvciA0OApDUFUgMDogYmFzZSBmcmVxPTE5OS45OTlN
+SHosIElUQyByYXRpbz0xMy8yLCBJVEMgZnJlcT0xMjk5Ljk5NE1IeisvLTY1MHBwbQpDb25zb2xl
+OiBjb2xvdXIgZHVtbXkgZGV2aWNlIDgweDI1CkNhbGlicmF0aW5nIGRlbGF5IGxvb3AuLi4gMTk0
+NS42MCBCb2dvTUlQUyAobHBqPTM4OTEyMDApCnBpZF9tYXg6IGRlZmF1bHQ6IDMyNzY4IG1pbmlt
+dW06IDMwMQpNb3VudC1jYWNoZSBoYXNoIHRhYmxlIGVudHJpZXM6IDEwMjQKQUNQSTogQ29yZSBy
+ZXZpc2lvbiAyMDEyMDUxOApCb290IHByb2Nlc3NvciBpZCAweDAvMHgwClhYWCBjcHU9MCBnY3dx
+PWUwMDAwMDQwNDAwMDBkODAgYmFzZT1lMDAwMDA0MDQwMDAyMDAwClhYWCBjcHU9MCBucl9ydW5u
+aW5nPTAgQCBlMDAwMDA0MDQwMDAyMDAwClhYWCBjcHU9MCBucl9ydW5uaW5nPTAgQCBlMDAwMDA0
+MDQwMDAyMDA4ClhYWCBjcHU9MSBnY3dxPWUwMDAwMDQwNDAwNDBkODAgYmFzZT1lMDAwMDA0MDQw
+MDQyMDAwClhYWCBjcHU9MSBucl9ydW5uaW5nPTAgQCBlMDAwMDA0MDQwMDQyMDAwClhYWCBjcHU9
+MSBucl9ydW5uaW5nPTAgQCBlMDAwMDA0MDQwMDQyMDA4ClhYWCBjcHU9MTYgbnJfcnVubmluZz0w
+IEAgYTAwMDAwMDEwMTM0NzY2OApYWFggY3B1PTE2IG5yX3J1bm5pbmc9MCBAIGEwMDAwMDAxMDEz
+NDc2NzAKLS0tLS0tLS0tLS0tWyBjdXQgaGVyZSBdLS0tLS0tLS0tLS0tCldBUk5JTkc6IGF0IGtl
+cm5lbC93b3JrcXVldWUuYzoxMjIwIHdvcmtlcl9lbnRlcl9pZGxlKzB4MmQwLzB4NGEwKCkKTW9k
+dWxlcyBsaW5rZWQgaW46CgpDYWxsIFRyYWNlOgogWzxhMDAwMDAwMTAwMDE1NGUwPl0gc2hvd19z
+dGFjaysweDgwLzB4YTAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzcD1lMDAwMDA0
+MDYwMGY3YzMwIGJzcD1lMDAwMDA0MDYwMGYwZGE4CiBbPGEwMDAwMDAxMDBkNmM0YzA+XSBkdW1w
+X3N0YWNrKzB4MzAvMHg1MAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwPWUwMDAw
+MDQwNjAwZjdlMDAgYnNwPWUwMDAwMDQwNjAwZjBkOTAKIFs8YTAwMDAwMDEwMDA3MzBhMD5dIHdh
+cm5fc2xvd3BhdGhfY29tbW9uKzB4YzAvMHgxMDAKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBzcD1lMDAwMDA0MDYwMGY3ZTAwIGJzcD1lMDAwMDA0MDYwMGYwZDUwCiBbPGEwMDAwMDAx
+MDAwNzMxMjA+XSB3YXJuX3Nsb3dwYXRoX251bGwrMHg0MC8weDYwCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3A9ZTAwMDAwNDA2MDBmN2UwMCBic3A9ZTAwMDAwNDA2MDBmMGQyOAog
+WzxhMDAwMDAwMTAwMGFhYWIwPl0gd29ya2VyX2VudGVyX2lkbGUrMHgyZDAvMHg0YTAKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBzcD1lMDAwMDA0MDYwMGY3ZTAwIGJzcD1lMDAwMDA0
+MDYwMGYwY2YwCiBbPGEwMDAwMDAxMDAwYWQwMDA+XSB3b3JrZXJfdGhyZWFkKzB4NGEwLzB4YmUw
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3A9ZTAwMDAwNDA2MDBmN2UwMCBic3A9
+ZTAwMDAwNDA2MDBmMGMyOAogWzxhMDAwMDAwMTAwMGJkYzEwPl0ga3RocmVhZCsweDExMC8weDE0
+MAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwPWUwMDAwMDQwNjAwZjdlMDAgYnNw
+PWUwMDAwMDQwNjAwZjBiZTgKIFs8YTAwMDAwMDEwMDAxMzUxMD5dIGtlcm5lbF90aHJlYWRfaGVs
+cGVyKzB4MzAvMHg2MAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwPWUwMDAwMDQw
+NjAwZjdlMzAgYnNwPWUwMDAwMDQwNjAwZjBiYzAKIFs8YTAwMDAwMDEwMDAwYTBjMD5dIHN0YXJ0
+X2tlcm5lbF90aHJlYWQrMHgyMC8weDQwCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+c3A9ZTAwMDAwNDA2MDBmN2UzMCBic3A9ZTAwMDAwNDA2MDBmMGJjMAotLS1bIGVuZCB0cmFjZSBl
+OTg0MGUwY2I5OTRjYjgyIF0tLS0KRml4ZWQgQlNQIGIwIHZhbHVlIGZyb20gQ1BVIDEKQ1BVIDE6
+IHN5bmNocm9uaXplZCBJVEMgd2l0aCBDUFUgMCAobGFzdCBkaWZmIC0xMiBjeWNsZXMsIG1heGVy
+ciA1ODUgY3ljbGVzKQpDUFUgMTogYmFzZSBmcmVxPTE5OS45OTlNSHosIElUQyByYXRpbz0xMy8y
+LCBJVEMgZnJlcT0xMjk5Ljk5NE1IeisvLTY1MHBwbQpCcm91Z2h0IHVwIDIgQ1BVcwpUb3RhbCBv
+ZiAyIHByb2Nlc3NvcnMgYWN0aXZhdGVkICgzODkxLjIwIEJvZ29NSVBTKS4KRE1JIDIuMyBwcmVz
+ZW50LgpETUk6IGhwIHNlcnZlciByeDI2MjAgICAgICAgICAgICAgICAgICAgLCBCSU9TIDAzLjE3
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgMDMvMzEvMjAwNQpORVQ6IFJlZ2lzdGVyZWQgcHJvdG9jb2wgZmFtaWx5IDE2CkFDUEk6IGJ1
+cyB0eXBlIHBjaSByZWdpc3RlcmVkCmJpbzogY3JlYXRlIHNsYWIgPGJpby0wPiBhdCAwCkFDUEk6
+IEFkZGVkIF9PU0koTW9kdWxlIERldmljZSkKQUNQSTogQWRkZWQgX09TSShQcm9jZXNzb3IgRGV2
+aWNlKQpBQ1BJOiBBZGRlZCBfT1NJKDMuMCBfU0NQIEV4dGVuc2lvbnMpCkFDUEk6IEFkZGVkIF9P
+U0koUHJvY2Vzc29yIEFnZ3JlZ2F0b3IgRGV2aWNlKQpBQ1BJOiBFQzogTG9vayB1cCBFQyBpbiBE
+U0RUCkFDUEk6IEludGVycHJldGVyIGVuYWJsZWQKQUNQSTogKHN1cHBvcnRzIFMwIFM1KQpBQ1BJ
+OiBVc2luZyBJT1NBUElDIGZvciBpbnRlcnJ1cHQgcm91dGluZwpBQ1BJOiBQQ0kgUm9vdCBCcmlk
+Z2UgW1BDSTBdIChkb21haW4gMDAwMCBbYnVzIDAwLTFmXSkKcGNpX3Jvb3QgSFdQMDAwMjowMDog
+aG9zdCBicmlkZ2Ugd2luZG93IFtpbyAgMHgwMDAwLTB4MWZmZl0KcGNpX3Jvb3QgSFdQMDAwMjow
+MDogaG9zdCBicmlkZ2Ugd2luZG93IFttZW0gMHg4MDAwMDAwMC0weDhmZmZmZmZmXQpwY2lfcm9v
+dCBIV1AwMDAyOjAwOiBob3N0IGJyaWRnZSB3aW5kb3cgW21lbSAweDgwMDA0MDAwMDAwLTB4ODAx
+MDNmZmZmZmVdClBDSSBob3N0IGJyaWRnZSB0byBidXMgMDAwMDowMApwY2lfYnVzIDAwMDA6MDA6
+IGJ1c25fcmVzOiBbYnVzIDAwLTFmXSBpcyBpbnNlcnRlZCB1bmRlciBkb21haW4gW2J1cyAwMC1m
+Zl0KcGNpX2J1cyAwMDAwOjAwOiByb290IGJ1cyByZXNvdXJjZSBbYnVzIDAwLTFmXQpwY2lfYnVz
+IDAwMDA6MDA6IHJvb3QgYnVzIHJlc291cmNlIFtpbyAgMHgwMDAwLTB4MWZmZl0KcGNpX2J1cyAw
+MDAwOjAwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4ODAwMDAwMDAtMHg4ZmZmZmZmZl0KcGNp
+X2J1cyAwMDAwOjAwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4ODAwMDQwMDAwMDAtMHg4MDEw
+M2ZmZmZmZV0KcGNpIDAwMDA6MDA6MDEuMDogWzEwMzM6MDAzNV0gdHlwZSAwMCBjbGFzcyAweDBj
+MDMxMApwY2kgMDAwMDowMDowMS4wOiByZWcgMTA6IFttZW0gMHg4MDAwMjAwMC0weDgwMDAyZmZm
+XQpwY2kgMDAwMDowMDowMS4wOiBzdXBwb3J0cyBEMSBEMgpwY2kgMDAwMDowMDowMS4wOiBQTUUj
+IHN1cHBvcnRlZCBmcm9tIEQwIEQxIEQyIEQzaG90CnBjaSAwMDAwOjAwOjAxLjE6IFsxMDMzOjAw
+MzVdIHR5cGUgMDAgY2xhc3MgMHgwYzAzMTAKcGNpIDAwMDA6MDA6MDEuMTogcmVnIDEwOiBbbWVt
+IDB4ODAwMDEwMDAtMHg4MDAwMWZmZl0KcGNpIDAwMDA6MDA6MDEuMTogc3VwcG9ydHMgRDEgRDIK
+cGNpIDAwMDA6MDA6MDEuMTogUE1FIyBzdXBwb3J0ZWQgZnJvbSBEMCBEMSBEMiBEM2hvdApwY2kg
+MDAwMDowMDowMS4yOiBbMTAzMzowMGUwXSB0eXBlIDAwIGNsYXNzIDB4MGMwMzIwCnBjaSAwMDAw
+OjAwOjAxLjI6IHJlZyAxMDogW21lbSAweDgwMDAwMDAwLTB4ODAwMDAwZmZdCnBjaSAwMDAwOjAw
+OjAxLjI6IHN1cHBvcnRzIEQxIEQyCnBjaSAwMDAwOjAwOjAxLjI6IFBNRSMgc3VwcG9ydGVkIGZy
+b20gRDAgRDEgRDIgRDNob3QKcGNpIDAwMDA6MDA6MDIuMDogWzEwOTU6MDY0OV0gdHlwZSAwMCBj
+bGFzcyAweDAxMDE4ZgpwY2kgMDAwMDowMDowMi4wOiByZWcgMTA6IFtpbyAgMHgwZDE4LTB4MGQx
+Zl0KcGNpIDAwMDA6MDA6MDIuMDogcmVnIDE0OiBbaW8gIDB4MGQyNC0weDBkMjddCnBjaSAwMDAw
+OjAwOjAyLjA6IHJlZyAxODogW2lvICAweDBkMTAtMHgwZDE3XQpwY2kgMDAwMDowMDowMi4wOiBy
+ZWcgMWM6IFtpbyAgMHgwZDIwLTB4MGQyM10KcGNpIDAwMDA6MDA6MDIuMDogcmVnIDIwOiBbaW8g
+IDB4MGQwMC0weDBkMGZdCnBjaSAwMDAwOjAwOjAyLjA6IHN1cHBvcnRzIEQxIEQyCkFDUEk6IFBD
+SSBJbnRlcnJ1cHQgUm91dGluZyBUYWJsZSBbXF9TQl8uU0JBMC5QQ0kwLl9QUlRdCiBwY2kwMDAw
+OjAwOiBVbmFibGUgdG8gcmVxdWVzdCBfT1NDIGNvbnRyb2wgKF9PU0Mgc3VwcG9ydCBtYXNrOiAw
+eDA5KQpBQ1BJOiBQQ0kgUm9vdCBCcmlkZ2UgW1BDSTFdIChkb21haW4gMDAwMCBbYnVzIDIwLTNm
+XSkKcGNpX3Jvb3QgSFdQMDAwMjowMTogaG9zdCBicmlkZ2Ugd2luZG93IFttZW0gMHhmZjVlMDAw
+MC0weGZmNWUwMDA3XQpwY2lfcm9vdCBIV1AwMDAyOjAxOiBob3N0IGJyaWRnZSB3aW5kb3cgW21l
+bSAweGZmNWUyMDAwLTB4ZmY1ZTIwMDddCnBjaV9yb290IEhXUDAwMDI6MDE6IGhvc3QgYnJpZGdl
+IHdpbmRvdyBbaW8gIDB4MjAwMC0weDJmZmZdCnBjaV9yb290IEhXUDAwMDI6MDE6IGhvc3QgYnJp
+ZGdlIHdpbmRvdyBbbWVtIDB4OTAwMDAwMDAtMHg5N2ZmZmZmZl0KcGNpX3Jvb3QgSFdQMDAwMjow
+MTogaG9zdCBicmlkZ2Ugd2luZG93IFttZW0gMHg5MDAwNDAwMDAwMC0weDkwMTAzZmZmZmZlXQpQ
+Q0kgaG9zdCBicmlkZ2UgdG8gYnVzIDAwMDA6MjAKcGNpX2J1cyAwMDAwOjIwOiBidXNuX3Jlczog
+W2J1cyAyMC0zZl0gaXMgaW5zZXJ0ZWQgdW5kZXIgZG9tYWluIFtidXMgMDAtZmZdCnBjaV9idXMg
+MDAwMDoyMDogcm9vdCBidXMgcmVzb3VyY2UgW2J1cyAyMC0zZl0KcGNpX2J1cyAwMDAwOjIwOiBy
+b290IGJ1cyByZXNvdXJjZSBbaW8gIDB4MjAwMC0weDJmZmZdCnBjaV9idXMgMDAwMDoyMDogcm9v
+dCBidXMgcmVzb3VyY2UgW21lbSAweDkwMDAwMDAwLTB4OTdmZmZmZmZdCnBjaV9idXMgMDAwMDoy
+MDogcm9vdCBidXMgcmVzb3VyY2UgW21lbSAweDkwMDA0MDAwMDAwLTB4OTAxMDNmZmZmZmVdCnBj
+aSAwMDAwOjIwOjAxLjA6IFsxMDAwOjAwMzBdIHR5cGUgMDAgY2xhc3MgMHgwMTAwMDAKcGNpIDAw
+MDA6MjA6MDEuMDogcmVnIDEwOiBbaW8gIDB4MjEwMC0weDIxZmZdCnBjaSAwMDAwOjIwOjAxLjA6
+IHJlZyAxNDogW21lbSAweDkwM2EwMDAwLTB4OTAzYmZmZmYgNjRiaXRdCnBjaSAwMDAwOjIwOjAx
+LjA6IHJlZyAxYzogW21lbSAweDkwMzgwMDAwLTB4OTAzOWZmZmYgNjRiaXRdCnBjaSAwMDAwOjIw
+OjAxLjA6IHJlZyAzMDogW21lbSAweDkwMTAwMDAwLTB4OTAxZmZmZmYgcHJlZl0KcGNpIDAwMDA6
+MjA6MDEuMDogc3VwcG9ydHMgRDEgRDIKcGNpIDAwMDA6MjA6MDEuMTogWzEwMDA6MDAzMF0gdHlw
+ZSAwMCBjbGFzcyAweDAxMDAwMApwY2kgMDAwMDoyMDowMS4xOiByZWcgMTA6IFtpbyAgMHgyMDAw
+LTB4MjBmZl0KcGNpIDAwMDA6MjA6MDEuMTogcmVnIDE0OiBbbWVtIDB4OTAzNjAwMDAtMHg5MDM3
+ZmZmZiA2NGJpdF0KcGNpIDAwMDA6MjA6MDEuMTogcmVnIDFjOiBbbWVtIDB4OTAzNDAwMDAtMHg5
+MDM1ZmZmZiA2NGJpdF0KcGNpIDAwMDA6MjA6MDEuMTogcmVnIDMwOiBbbWVtIDB4OTAwMDAwMDAt
+MHg5MDBmZmZmZiBwcmVmXQpwY2kgMDAwMDoyMDowMS4xOiBzdXBwb3J0cyBEMSBEMgpwY2kgMDAw
+MDoyMDowMi4wOiBbODA4NjoxMDc5XSB0eXBlIDAwIGNsYXNzIDB4MDIwMDAwCnBjaSAwMDAwOjIw
+OjAyLjA6IHJlZyAxMDogW21lbSAweDkwMzIwMDAwLTB4OTAzM2ZmZmYgNjRiaXRdCnBjaSAwMDAw
+OjIwOjAyLjA6IHJlZyAxODogW21lbSAweDkwMjgwMDAwLTB4OTAyZmZmZmYgNjRiaXRdCnBjaSAw
+MDAwOjIwOjAyLjA6IHJlZyAyMDogW2lvICAweDIyNDAtMHgyMjdmXQpwY2kgMDAwMDoyMDowMi4w
+OiByZWcgMzA6IFttZW0gMHg5MDIwMDAwMC0weDkwMjdmZmZmIHByZWZdCnBjaSAwMDAwOjIwOjAy
+LjA6IFBNRSMgc3VwcG9ydGVkIGZyb20gRDAgRDNob3QgRDNjb2xkCnBjaSAwMDAwOjIwOjAyLjE6
+IFs4MDg2OjEwNzldIHR5cGUgMDAgY2xhc3MgMHgwMjAwMDAKcGNpIDAwMDA6MjA6MDIuMTogcmVn
+IDEwOiBbbWVtIDB4OTAzMDAwMDAtMHg5MDMxZmZmZiA2NGJpdF0KcGNpIDAwMDA6MjA6MDIuMTog
+cmVnIDIwOiBbaW8gIDB4MjIwMC0weDIyM2ZdCnBjaSAwMDAwOjIwOjAyLjE6IFBNRSMgc3VwcG9y
+dGVkIGZyb20gRDAgRDNob3QgRDNjb2xkCkFDUEk6IFBDSSBJbnRlcnJ1cHQgUm91dGluZyBUYWJs
+ZSBbXF9TQl8uU0JBMC5QQ0kxLl9QUlRdCiBwY2kwMDAwOjIwOiBVbmFibGUgdG8gcmVxdWVzdCBf
+T1NDIGNvbnRyb2wgKF9PU0Mgc3VwcG9ydCBtYXNrOiAweDA5KQpBQ1BJOiBQQ0kgUm9vdCBCcmlk
+Z2UgW1BDSTJdIChkb21haW4gMDAwMCBbYnVzIDQwLTVmXSkKcGNpX3Jvb3QgSFdQMDAwMjowMjog
+aG9zdCBicmlkZ2Ugd2luZG93IFtpbyAgMHgzMDAwLTB4NWZmZl0KcGNpX3Jvb3QgSFdQMDAwMjow
+MjogaG9zdCBicmlkZ2Ugd2luZG93IFttZW0gMHg5ODAwMDAwMC0weGFmZmZmZmZmXQpwY2lfcm9v
+dCBIV1AwMDAyOjAyOiBob3N0IGJyaWRnZSB3aW5kb3cgW21lbSAweGEwMDA0MDAwMDAwLTB4YTAx
+MDNmZmZmZmVdClBDSSBob3N0IGJyaWRnZSB0byBidXMgMDAwMDo0MApwY2lfYnVzIDAwMDA6NDA6
+IGJ1c25fcmVzOiBbYnVzIDQwLTVmXSBpcyBpbnNlcnRlZCB1bmRlciBkb21haW4gW2J1cyAwMC1m
+Zl0KcGNpX2J1cyAwMDAwOjQwOiByb290IGJ1cyByZXNvdXJjZSBbYnVzIDQwLTVmXQpwY2lfYnVz
+IDAwMDA6NDA6IHJvb3QgYnVzIHJlc291cmNlIFtpbyAgMHgzMDAwLTB4NWZmZl0KcGNpX2J1cyAw
+MDAwOjQwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4OTgwMDAwMDAtMHhhZmZmZmZmZl0KcGNp
+X2J1cyAwMDAwOjQwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4YTAwMDQwMDAwMDAtMHhhMDEw
+M2ZmZmZmZV0KQUNQSTogUENJIEludGVycnVwdCBSb3V0aW5nIFRhYmxlIFtcX1NCXy5TQkEwLlBD
+STIuX1BSVF0KIHBjaTAwMDA6NDA6IFVuYWJsZSB0byByZXF1ZXN0IF9PU0MgY29udHJvbCAoX09T
+QyBzdXBwb3J0IG1hc2s6IDB4MDkpCkFDUEk6IFBDSSBSb290IEJyaWRnZSBbUENJM10gKGRvbWFp
+biAwMDAwIFtidXMgNjAtN2ZdKQpwY2lfcm9vdCBIV1AwMDAyOjAzOiBob3N0IGJyaWRnZSB3aW5k
+b3cgW2lvICAweDYwMDAtMHg3ZmZmXQpwY2lfcm9vdCBIV1AwMDAyOjAzOiBob3N0IGJyaWRnZSB3
+aW5kb3cgW21lbSAweGIwMDAwMDAwLTB4YzdmZmZmZmZdCnBjaV9yb290IEhXUDAwMDI6MDM6IGhv
+c3QgYnJpZGdlIHdpbmRvdyBbbWVtIDB4YjAwMDQwMDAwMDAtMHhiMDEwM2ZmZmZmZV0KUENJIGhv
+c3QgYnJpZGdlIHRvIGJ1cyAwMDAwOjYwCnBjaV9idXMgMDAwMDo2MDogYnVzbl9yZXM6IFtidXMg
+NjAtN2ZdIGlzIGluc2VydGVkIHVuZGVyIGRvbWFpbiBbYnVzIDAwLWZmXQpwY2lfYnVzIDAwMDA6
+NjA6IHJvb3QgYnVzIHJlc291cmNlIFtidXMgNjAtN2ZdCnBjaV9idXMgMDAwMDo2MDogcm9vdCBi
+dXMgcmVzb3VyY2UgW2lvICAweDYwMDAtMHg3ZmZmXQpwY2lfYnVzIDAwMDA6NjA6IHJvb3QgYnVz
+IHJlc291cmNlIFttZW0gMHhiMDAwMDAwMC0weGM3ZmZmZmZmXQpwY2lfYnVzIDAwMDA6NjA6IHJv
+b3QgYnVzIHJlc291cmNlIFttZW0gMHhiMDAwNDAwMDAwMC0weGIwMTAzZmZmZmZlXQpBQ1BJOiBQ
+Q0kgSW50ZXJydXB0IFJvdXRpbmcgVGFibGUgW1xfU0JfLlNCQTAuUENJMy5fUFJUXQogcGNpMDAw
+MDo2MDogVW5hYmxlIHRvIHJlcXVlc3QgX09TQyBjb250cm9sIChfT1NDIHN1cHBvcnQgbWFzazog
+MHgwOSkKQUNQSTogUENJIFJvb3QgQnJpZGdlIFtQQ0k0XSAoZG9tYWluIDAwMDAgW2J1cyA4MC1i
+Zl0pCnBjaV9yb290IEhXUDAwMDI6MDQ6IGhvc3QgYnJpZGdlIHdpbmRvdyBbaW8gIDB4ODAwMC0w
+eGJmZmZdCnBjaV9yb290IEhXUDAwMDI6MDQ6IGhvc3QgYnJpZGdlIHdpbmRvdyBbbWVtIDB4Yzgw
+MDAwMDAtMHhkZmZmZmZmZl0KcGNpX3Jvb3QgSFdQMDAwMjowNDogaG9zdCBicmlkZ2Ugd2luZG93
+IFttZW0gMHhjMDAwNDAwMDAwMC0weGMwMTAzZmZmZmZlXQpQQ0kgaG9zdCBicmlkZ2UgdG8gYnVz
+IDAwMDA6ODAKcGNpX2J1cyAwMDAwOjgwOiBidXNuX3JlczogW2J1cyA4MC1iZl0gaXMgaW5zZXJ0
+ZWQgdW5kZXIgZG9tYWluIFtidXMgMDAtZmZdCnBjaV9idXMgMDAwMDo4MDogcm9vdCBidXMgcmVz
+b3VyY2UgW2J1cyA4MC1iZl0KcGNpX2J1cyAwMDAwOjgwOiByb290IGJ1cyByZXNvdXJjZSBbaW8g
+IDB4ODAwMC0weGJmZmZdCnBjaV9idXMgMDAwMDo4MDogcm9vdCBidXMgcmVzb3VyY2UgW21lbSAw
+eGM4MDAwMDAwLTB4ZGZmZmZmZmZdCnBjaV9idXMgMDAwMDo4MDogcm9vdCBidXMgcmVzb3VyY2Ug
+W21lbSAweGMwMDA0MDAwMDAwLTB4YzAxMDNmZmZmZmVdCkFDUEk6IFBDSSBJbnRlcnJ1cHQgUm91
+dGluZyBUYWJsZSBbXF9TQl8uU0JBMC5QQ0k0Ll9QUlRdCiBwY2kwMDAwOjgwOiBVbmFibGUgdG8g
+cmVxdWVzdCBfT1NDIGNvbnRyb2wgKF9PU0Mgc3VwcG9ydCBtYXNrOiAweDA5KQpBQ1BJOiBQQ0kg
+Um9vdCBCcmlkZ2UgW1BDSTZdIChkb21haW4gMDAwMCBbYnVzIGMwLWRmXSkKcGNpX3Jvb3QgSFdQ
+MDAwMjowNTogaG9zdCBicmlkZ2Ugd2luZG93IFtpbyAgMHhjMDAwLTB4ZGZmZl0KcGNpX3Jvb3Qg
+SFdQMDAwMjowNTogaG9zdCBicmlkZ2Ugd2luZG93IFttZW0gMHhlMDAwMDAwMC0weGVmZmZmZmZm
+XQpwY2lfcm9vdCBIV1AwMDAyOjA1OiBob3N0IGJyaWRnZSB3aW5kb3cgW21lbSAweGUwMDA0MDAw
+MDAwLTB4ZTAxMDNmZmZmZmVdClBDSSBob3N0IGJyaWRnZSB0byBidXMgMDAwMDpjMApwY2lfYnVz
+IDAwMDA6YzA6IGJ1c25fcmVzOiBbYnVzIGMwLWRmXSBpcyBpbnNlcnRlZCB1bmRlciBkb21haW4g
+W2J1cyAwMC1mZl0KcGNpX2J1cyAwMDAwOmMwOiByb290IGJ1cyByZXNvdXJjZSBbYnVzIGMwLWRm
+XQpwY2lfYnVzIDAwMDA6YzA6IHJvb3QgYnVzIHJlc291cmNlIFtpbyAgMHhjMDAwLTB4ZGZmZl0K
+cGNpX2J1cyAwMDAwOmMwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4ZTAwMDAwMDAtMHhlZmZm
+ZmZmZl0KcGNpX2J1cyAwMDAwOmMwOiByb290IGJ1cyByZXNvdXJjZSBbbWVtIDB4ZTAwMDQwMDAw
+MDAtMHhlMDEwM2ZmZmZmZV0KQUNQSTogUENJIEludGVycnVwdCBSb3V0aW5nIFRhYmxlIFtcX1NC
+Xy5TQkEwLlBDSTYuX1BSVF0KIHBjaTAwMDA6YzA6IFVuYWJsZSB0byByZXF1ZXN0IF9PU0MgY29u
+dHJvbCAoX09TQyBzdXBwb3J0IG1hc2s6IDB4MDkpCnZnYWFyYjogbG9hZGVkClNDU0kgc3Vic3lz
+dGVtIGluaXRpYWxpemVkCkFDUEk6IGJ1cyB0eXBlIHVzYiByZWdpc3RlcmVkCnVzYmNvcmU6IHJl
+Z2lzdGVyZWQgbmV3IGludGVyZmFjZSBkcml2ZXIgdXNiZnMKdXNiY29yZTogcmVnaXN0ZXJlZCBu
+ZXcgaW50ZXJmYWNlIGRyaXZlciBodWIKdXNiY29yZTogcmVnaXN0ZXJlZCBuZXcgZGV2aWNlIGRy
+aXZlciB1c2IKQWR2YW5jZWQgTGludXggU291bmQgQXJjaGl0ZWN0dXJlIERyaXZlciBWZXJzaW9u
+IDEuMC4yNS4KSU9DOiB6eDEgMi4zIEhQQSAweGZlZDAxMDAwIElPVkEgc3BhY2UgMTAyNE1iIGF0
+IDB4NDAwMDAwMDAKU3dpdGNoaW5nIHRvIGNsb2Nrc291cmNlIGl0YwpwbnA6IFBuUCBBQ1BJIGlu
+aXQKQUNQSTogYnVzIHR5cGUgcG5wIHJlZ2lzdGVyZWQKcG5wIDAwOjAwOiBbbWVtIDB4ZmVkMDAw
+MDAtMHhmZWQwN2ZmZl0KcG5wIDAwOjAwOiBQbHVnIGFuZCBQbGF5IEFDUEkgZGV2aWNlLCBJRHMg
+SFdQMDAwMSBQTlAwYTA1IChhY3RpdmUpCnBucCAwMDowMTogW21lbSAweGZmNWIwMDAwLTB4ZmY1
+YjAwMDNdCnBucCAwMDowMTogUGx1ZyBhbmQgUGxheSBBQ1BJIGRldmljZSwgSURzIElQSTAwMDEg
+KGFjdGl2ZSkKcG5wIDAwOjAyOiBbYnVzIDAwLTFmXQpwbnAgMDA6MDI6IFttZW0gMHhmZWQyMDAw
+MC0weGZlZDIxZmZmXQpwbnAgMDA6MDI6IFtpbyAgMHgwMDAwLTB4MWZmZiB3aW5kb3ddCnBucCAw
+MDowMjogW21lbSAweDgwMDAwMDAwLTB4OGZmZmZmZmYgd2luZG93XQpwbnAgMDA6MDI6IFttZW0g
+MHg4MDAwNDAwMDAwMC0weDgwMTAzZmZmZmZlIHdpbmRvd10KcG5wIDAwOjAyOiBQbHVnIGFuZCBQ
+bGF5IEFDUEkgZGV2aWNlLCBJRHMgSFdQMDAwMiBQTlAwYTAzIChhY3RpdmUpCnBucCAwMDowMzog
+W2J1cyAyMC0zZl0KcG5wIDAwOjAzOiBbbWVtIDB4ZmY1ZTAwMDAtMHhmZjVlMDAwNyB3aW5kb3dd
+CnBucCAwMDowMzogW21lbSAweGZmNWUyMDAwLTB4ZmY1ZTIwMDcgd2luZG93XQpwbnAgMDA6MDM6
+IFttZW0gMHhmZWQyMjAwMC0weGZlZDIzZmZmXQpwbnAgMDA6MDM6IFtpbyAgMHgyMDAwLTB4MmZm
+ZiB3aW5kb3ddCnBucCAwMDowMzogW21lbSAweDkwMDAwMDAwLTB4OTdmZmZmZmYgd2luZG93XQpw
+bnAgMDA6MDM6IFttZW0gMHg5MDAwNDAwMDAwMC0weDkwMTAzZmZmZmZlIHdpbmRvd10KcG5wIDAw
+OjAzOiBQbHVnIGFuZCBQbGF5IEFDUEkgZGV2aWNlLCBJRHMgSFdQMDAwMiBQTlAwYTAzIChhY3Rp
+dmUpCkdTSSAzNCAobGV2ZWwsIGxvdykgLT4gQ1BVIDEgKDB4MDEwMCkgdmVjdG9yIDQ5CnBucCAw
+MDowNDogW2lycSA0OV0KcG5wIDAwOjA0OiBbbWVtIDB4ZmY1ZTAwMDAtMHhmZjVlMDAwN10KcG5w
+IDAwOjA0OiBQbHVnIGFuZCBQbGF5IEFDUEkgZGV2aWNlLCBJRHMgUE5QMDUwMSAoYWN0aXZlKQpH
+U0kgMzUgKGxldmVsLCBsb3cpIC0+IENQVSAwICgweDAwMDApIHZlY3RvciA1MApwbnAgMDA6MDU6
+IFtpcnEgNTBdCnBucCAwMDowNTogW21lbSAweGZmNWUyMDAwLTB4ZmY1ZTIwMDddCnBucCAwMDow
+NTogUGx1ZyBhbmQgUGxheSBBQ1BJIGRldmljZSwgSURzIFBOUDA1MDEgKGFjdGl2ZSkKcG5wIDAw
+OjA2OiBbYnVzIDQwLTVmXQpwbnAgMDA6MDY6IFttZW0gMHhmZWQyNDAwMC0weGZlZDI1ZmZmXQpw
+bnAgMDA6MDY6IFtpbyAgMHgzMDAwLTB4NWZmZiB3aW5kb3ddCnBucCAwMDowNjogW21lbSAweDk4
+MDAwMDAwLTB4YWZmZmZmZmYgd2luZG93XQpwbnAgMDA6MDY6IFttZW0gMHhhMDAwNDAwMDAwMC0w
+eGEwMTAzZmZmZmZlIHdpbmRvd10KcG5wIDAwOjA2OiBQbHVnIGFuZCBQbGF5IEFDUEkgZGV2aWNl
+LCBJRHMgSFdQMDAwMiBQTlAwYTAzIChhY3RpdmUpCnBucCAwMDowNzogW2J1cyA2MC03Zl0KcG5w
+IDAwOjA3OiBbbWVtIDB4ZmVkMjYwMDAtMHhmZWQyN2ZmZl0KcG5wIDAwOjA3OiBbaW8gIDB4NjAw
+MC0weDdmZmYgd2luZG93XQpwbnAgMDA6MDc6IFttZW0gMHhiMDAwMDAwMC0weGM3ZmZmZmZmIHdp
+bmRvd10KcG5wIDAwOjA3OiBbbWVtIDB4YjAwMDQwMDAwMDAtMHhiMDEwM2ZmZmZmZSB3aW5kb3dd
+CnBucCAwMDowNzogUGx1ZyBhbmQgUGxheSBBQ1BJIGRldmljZSwgSURzIEhXUDAwMDIgUE5QMGEw
+MyAoYWN0aXZlKQpwbnAgMDA6MDg6IFtidXMgODAtYmZdCnBucCAwMDowODogW21lbSAweGZlZDI4
+MDAwLTB4ZmVkMjlmZmZdCnBucCAwMDowODogW2lvICAweDgwMDAtMHhiZmZmIHdpbmRvd10KcG5w
+IDAwOjA4OiBbbWVtIDB4YzgwMDAwMDAtMHhkZmZmZmZmZiB3aW5kb3ddCnBucCAwMDowODogW21l
+bSAweGMwMDA0MDAwMDAwLTB4YzAxMDNmZmZmZmUgd2luZG93XQpwbnAgMDA6MDg6IFBsdWcgYW5k
+IFBsYXkgQUNQSSBkZXZpY2UsIElEcyBIV1AwMDAyIFBOUDBhMDMgKGFjdGl2ZSkKcG5wIDAwOjA5
+OiBbYnVzIGMwLWRmXQpwbnAgMDA6MDk6IFttZW0gMHhmZWQyYzAwMC0weGZlZDJkZmZmXQpwbnAg
+MDA6MDk6IFtpbyAgMHhjMDAwLTB4ZGZmZiB3aW5kb3ddCnBucCAwMDowOTogW21lbSAweGUwMDAw
+MDAwLTB4ZWZmZmZmZmYgd2luZG93XQpwbnAgMDA6MDk6IFttZW0gMHhlMDAwNDAwMDAwMC0weGUw
+MTAzZmZmZmZlIHdpbmRvd10KcG5wIDAwOjA5OiBQbHVnIGFuZCBQbGF5IEFDUEkgZGV2aWNlLCBJ
+RHMgSFdQMDAwMiBQTlAwYTAzIChhY3RpdmUpCnBucDogUG5QIEFDUEk6IGZvdW5kIDEwIGRldmlj
+ZXMKQUNQSTogQUNQSSBidXMgdHlwZSBwbnAgdW5yZWdpc3RlcmVkCk5FVDogUmVnaXN0ZXJlZCBw
+cm90b2NvbCBmYW1pbHkgMgpJUCByb3V0ZSBjYWNoZSBoYXNoIHRhYmxlIGVudHJpZXM6IDE2Mzg0
+IChvcmRlcjogMywgMTMxMDcyIGJ5dGVzKQpUQ1AgZXN0YWJsaXNoZWQgaGFzaCB0YWJsZSBlbnRy
+aWVzOiA2NTUzNiAob3JkZXI6IDYsIDEwNDg1NzYgYnl0ZXMpClRDUCBiaW5kIGhhc2ggdGFibGUg
+ZW50cmllczogNjU1MzYgKG9yZGVyOiA2LCAxMDQ4NTc2IGJ5dGVzKQpUQ1A6IEhhc2ggdGFibGVz
+IGNvbmZpZ3VyZWQgKGVzdGFibGlzaGVkIDY1NTM2IGJpbmQgNjU1MzYpClRDUDogcmVubyByZWdp
+c3RlcmVkClVEUCBoYXNoIHRhYmxlIGVudHJpZXM6IDEwMjQgKG9yZGVyOiAxLCAzMjc2OCBieXRl
+cykKVURQLUxpdGUgaGFzaCB0YWJsZSBlbnRyaWVzOiAxMDI0IChvcmRlcjogMSwgMzI3NjggYnl0
+ZXMpCk5FVDogUmVnaXN0ZXJlZCBwcm90b2NvbCBmYW1pbHkgMQpSUEM6IFJlZ2lzdGVyZWQgbmFt
+ZWQgVU5JWCBzb2NrZXQgdHJhbnNwb3J0IG1vZHVsZS4KUlBDOiBSZWdpc3RlcmVkIHVkcCB0cmFu
+c3BvcnQgbW9kdWxlLgpSUEM6IFJlZ2lzdGVyZWQgdGNwIHRyYW5zcG9ydCBtb2R1bGUuClJQQzog
+UmVnaXN0ZXJlZCB0Y3AgTkZTdjQuMSBiYWNrY2hhbm5lbCB0cmFuc3BvcnQgbW9kdWxlLgpHU0kg
+MTYgKGxldmVsLCBsb3cpIC0+IENQVSAxICgweDAxMDApIHZlY3RvciA1MQpHU0kgMTYgKGxldmVs
+LCBsb3cpIC0+IENQVSAxICgweDAxMDApIHZlY3RvciA1MSB1bnJlZ2lzdGVyZWQKR1NJIDE3IChs
+ZXZlbCwgbG93KSAtPiBDUFUgMCAoMHgwMDAwKSB2ZWN0b3IgNTEKR1NJIDE3IChsZXZlbCwgbG93
+KSAtPiBDUFUgMCAoMHgwMDAwKSB2ZWN0b3IgNTEgdW5yZWdpc3RlcmVkCkdTSSAxOCAobGV2ZWws
+IGxvdykgLT4gQ1BVIDEgKDB4MDEwMCkgdmVjdG9yIDUxCkdTSSAxOCAobGV2ZWwsIGxvdykgLT4g
+Q1BVIDEgKDB4MDEwMCkgdmVjdG9yIDUxIHVucmVnaXN0ZXJlZApQQ0k6IENMUyAxMjggYnl0ZXMs
+IGRlZmF1bHQgMTI4ClRyeWluZyB0byB1bnBhY2sgcm9vdGZzIGltYWdlIGFzIGluaXRyYW1mcy4u
+LgpGcmVlaW5nIGluaXRyZCBtZW1vcnk6IDU5MjBrQiBmcmVlZApwZXJmbW9uOiB2ZXJzaW9uIDIu
+MCBJUlEgMjM4CnBlcmZtb246IEl0YW5pdW0gMiBQTVUgZGV0ZWN0ZWQsIDE2IFBNQ3MsIDE4IFBN
+RHMsIDQgY291bnRlcnMgKDQ3IGJpdHMpClBBTCBJbmZvcm1hdGlvbiBGYWNpbGl0eSB2MC41CnBl
+cmZtb246IGFkZGVkIHNhbXBsaW5nIGZvcm1hdCBkZWZhdWx0X2Zvcm1hdApwZXJmbW9uX2RlZmF1
+bHRfc21wbDogZGVmYXVsdF9mb3JtYXQgdjIuMCByZWdpc3RlcmVkCkh1Z2VUTEIgcmVnaXN0ZXJl
+ZCAyNTYgTUIgcGFnZSBzaXplLCBwcmUtYWxsb2NhdGVkIDAgcGFnZXMKTkZTOiBSZWdpc3Rlcmlu
+ZyB0aGUgaWRfcmVzb2x2ZXIga2V5IHR5cGUKS2V5IHR5cGUgaWRfcmVzb2x2ZXIgcmVnaXN0ZXJl
+ZApJbnN0YWxsaW5nIGtuZnNkIChjb3B5cmlnaHQgKEMpIDE5OTYgb2tpckBtb25hZC5zd2IuZGUp
+Lgptc2dtbmkgaGFzIGJlZW4gc2V0IHRvIDQwMTEKQmxvY2sgbGF5ZXIgU0NTSSBnZW5lcmljIChi
+c2cpIGRyaXZlciB2ZXJzaW9uIDAuNCBsb2FkZWQgKG1ham9yIDI1NCkKaW8gc2NoZWR1bGVyIG5v
+b3AgcmVnaXN0ZXJlZAppbyBzY2hlZHVsZXIgZGVhZGxpbmUgcmVnaXN0ZXJlZAppbyBzY2hlZHVs
+ZXIgY2ZxIHJlZ2lzdGVyZWQgKGRlZmF1bHQpCnBjaV9ob3RwbHVnOiBQQ0kgSG90IFBsdWcgUENJ
+IENvcmUgdmVyc2lvbjogMC41CmFjcGlwaHA6IEFDUEkgSG90IFBsdWcgUENJIENvbnRyb2xsZXIg
+RHJpdmVyIHZlcnNpb246IDAuNQppbnB1dDogUG93ZXIgQnV0dG9uIGFzIC9kZXZpY2VzL0xOWFNZ
+U1RNOjAwL0xOWFBXUkJOOjAwL2lucHV0L2lucHV0MApBQ1BJOiBQb3dlciBCdXR0b24gW1BXUkZd
+CmlucHV0OiBTbGVlcCBCdXR0b24gYXMgL2RldmljZXMvTE5YU1lTVE06MDAvTE5YU0xQQk46MDAv
+aW5wdXQvaW5wdXQxCkFDUEk6IFNsZWVwIEJ1dHRvbiBbU0xQRl0KdGhlcm1hbCBMTlhUSEVSTTow
+MDogcmVnaXN0ZXJlZCBhcyB0aGVybWFsX3pvbmUwCkFDUEk6IFRoZXJtYWwgWm9uZSBbVEhNMF0g
+KDI3IEMpClNlcmlhbDogODI1MC8xNjU1MCBkcml2ZXIsIDQgcG9ydHMsIElSUSBzaGFyaW5nIGVu
+YWJsZWQKMDA6MDQ6IHR0eVMwIGF0IE1NSU8gMHhmZjVlMDAwMCAoaXJxID0gNDkpIGlzIGEgMTY1
+NTBBCmNvbnNvbGUgW3R0eVMwXSBlbmFibGVkLCBib290Y29uc29sZSBkaXNhYmxlZAowMDowNTog
+dHR5UzEgYXQgTU1JTyAweGZmNWUyMDAwIChpcnEgPSA1MCkgaXMgYSAxNjU1MEEKRUZJIFRpbWUg
+U2VydmljZXMgRHJpdmVyIHYwLjQKTGludXggYWdwZ2FydCBpbnRlcmZhY2UgdjAuMTAzCltkcm1d
+IEluaXRpYWxpemVkIGRybSAxLjEuMCAyMDA2MDgxMApbZHJtXSByYWRlb24gZGVmYXVsdGluZyB0
+byB1c2Vyc3BhY2UgbW9kZXNldHRpbmcuCmJyZDogbW9kdWxlIGxvYWRlZApsb29wOiBtb2R1bGUg
+bG9hZGVkClVuaWZvcm0gTXVsdGktUGxhdGZvcm0gRS1JREUgZHJpdmVyCmNtZDY0eCAwMDAwOjAw
+OjAyLjA6IElERSBjb250cm9sbGVyICgweDEwOTU6MHgwNjQ5IHJldiAweDAyKQpHU0kgMjEgKGxl
+dmVsLCBsb3cpIC0+IENQVSAwICgweDAwMDApIHZlY3RvciA1MQpjbWQ2NHggMDAwMDowMDowMi4w
+OiBJREUgcG9ydCBkaXNhYmxlZApjbWQ2NHggMDAwMDowMDowMi4wOiAxMDAlIG5hdGl2ZSBtb2Rl
+IG9uIGlycSA1NAogICAgaWRlMDogQk0tRE1BIGF0IDB4MGQwMC0weDBkMDcKUHJvYmluZyBJREUg
+aW50ZXJmYWNlIGlkZTAuLi4KaGRhOiBfTkVDIERWRCsvLVJXIE5ELTY2NTBBLCBBVEFQSSBDRC9E
+VkQtUk9NIGRyaXZlCmhkYTogaG9zdCBtYXggUElPNSB3YW50ZWQgUElPMjU1KGF1dG8tdHVuZSkg
+c2VsZWN0ZWQgUElPNApoZGE6IE1XRE1BMiBtb2RlIHNlbGVjdGVkCmlkZTAgYXQgMHhkMTgtMHhk
+MWYsMHhkMjYgb24gaXJxIDU0CmlkZS1nZCBkcml2ZXIgMS4xOAppZGUtY2QgZHJpdmVyIDUuMDAK
+aWRlLWNkOiBoZGE6IEFUQVBJIDI0WCBEVkQtUk9NIERWRC1SIENELVIvUlcgZHJpdmUsIDIwNDhr
+QiBDYWNoZQpjZHJvbTogVW5pZm9ybSBDRC1ST00gZHJpdmVyIFJldmlzaW9uOiAzLjIwCnN0OiBW
+ZXJzaW9uIDIwMTAxMjE5LCBmaXhlZCBidWZzaXplIDMyNzY4LCBzL2cgc2VncyAyNTYKb3NzdCA6
+STogVGFwZSBkcml2ZXIgd2l0aCBPblN0cmVhbSBzdXBwb3J0IHZlcnNpb24gMC45OS40Cm9zc3Qg
+Okk6ICRJZDogb3NzdC5jLHYgMS43MyAyMDA1LzAxLzAxIDIxOjEzOjM0IHdyaWVkZSBFeHAgJApl
+MTAwOiBJbnRlbChSKSBQUk8vMTAwIE5ldHdvcmsgRHJpdmVyLCAzLjUuMjQtazItTkFQSQplMTAw
+OiBDb3B5cmlnaHQoYykgMTk5OS0yMDA2IEludGVsIENvcnBvcmF0aW9uCmUxMDAwOiBJbnRlbChS
+KSBQUk8vMTAwMCBOZXR3b3JrIERyaXZlciAtIHZlcnNpb24gNy4zLjIxLWs4LU5BUEkKZTEwMDA6
+IENvcHlyaWdodCAoYykgMTk5OS0yMDA2IEludGVsIENvcnBvcmF0aW9uLgpHU0kgMjkgKGxldmVs
+LCBsb3cpIC0+IENQVSAxICgweDAxMDApIHZlY3RvciA1MgplMTAwMCAwMDAwOjIwOjAyLjA6IGV0
+aDA6IChQQ0ktWDo2Nk1Iejo2NC1iaXQpIDAwOjEzOjIxOjViOmY2OjlhCmUxMDAwIDAwMDA6MjA6
+MDIuMDogZXRoMDogSW50ZWwoUikgUFJPLzEwMDAgTmV0d29yayBDb25uZWN0aW9uCkdTSSAzMCAo
+bGV2ZWwsIGxvdykgLT4gQ1BVIDAgKDB4MDAwMCkgdmVjdG9yIDUzCmUxMDAwIDAwMDA6MjA6MDIu
+MTogZXRoMTogKFBDSS1YOjY2TUh6OjY0LWJpdCkgMDA6MTM6MjE6NWI6ZjY6OWIKZTEwMDAgMDAw
+MDoyMDowMi4xOiBldGgxOiBJbnRlbChSKSBQUk8vMTAwMCBOZXR3b3JrIENvbm5lY3Rpb24KRnVz
+aW9uIE1QVCBiYXNlIGRyaXZlciAzLjA0LjIwCkNvcHlyaWdodCAoYykgMTk5OS0yMDA4IExTSSBD
+b3Jwb3JhdGlvbgpGdXNpb24gTVBUIFNQSSBIb3N0IGRyaXZlciAzLjA0LjIwCkdTSSAyNyAobGV2
+ZWwsIGxvdykgLT4gQ1BVIDEgKDB4MDEwMCkgdmVjdG9yIDU0Cm1wdGJhc2U6IGlvYzA6IEluaXRp
+YXRpbmcgYnJpbmd1cAppb2MwOiBMU0k1M0MxMDMwIEMwOiBDYXBhYmlsaXRpZXM9e0luaXRpYXRv
+cixUYXJnZXR9CnNjc2kwIDogaW9jMDogTFNJNTNDMTAzMCBDMCwgRndSZXY9MDEwMzIzNDFoLCBQ
+b3J0cz0xLCBNYXhRPTI1NSwgSVJRPTU3CnNjc2kgMDowOjA6MDogRGlyZWN0LUFjY2VzcyAgICAg
+SFAgMzYuNEcgTUFVMzAzNk5DICAgICAgICBIUEMyIFBROiAwIEFOU0k6IDMKc2NzaSB0YXJnZXQw
+OjA6MDogQmVnaW5uaW5nIERvbWFpbiBWYWxpZGF0aW9uCnNjc2kgdGFyZ2V0MDowOjA6IEVuZGlu
+ZyBEb21haW4gVmFsaWRhdGlvbgpzY3NpIHRhcmdldDA6MDowOiBGQVNULTE2MCBXSURFIFNDU0kg
+MzIwLjAgTUIvcyBEVCBJVSBRQVMgUlRJIFdSRkxPVyBQQ09NUCAoNi4yNSBucywgb2Zmc2V0IDEy
+NykKc2QgMDowOjA6MDogQXR0YWNoZWQgc2NzaSBnZW5lcmljIHNnMCB0eXBlIDAKc2QgMDowOjA6
+MDogW3NkYV0gNzExMzI5NjAgNTEyLWJ5dGUgbG9naWNhbCBibG9ja3M6ICgzNi40IEdCLzMzLjkg
+R2lCKQpzY3NpIDA6MDoxOjA6IERpcmVjdC1BY2Nlc3MgICAgIEhQIDM2LjRHIE1BVTMwMzZOQyAg
+ICAgICAgSFBDMiBQUTogMCBBTlNJOiAzCnNjc2kgdGFyZ2V0MDowOjE6IEJlZ2lubmluZyBEb21h
+aW4gVmFsaWRhdGlvbgpzZCAwOjA6MDowOiBbc2RhXSBXcml0ZSBQcm90ZWN0IGlzIG9mZgpzZCAw
+OjA6MDowOiBbc2RhXSBNb2RlIFNlbnNlOiBjZiAwMCAxMCAwOApzZCAwOjA6MDowOiBbc2RhXSBX
+cml0ZSBjYWNoZTogZGlzYWJsZWQsIHJlYWQgY2FjaGU6IGVuYWJsZWQsIHN1cHBvcnRzIERQTyBh
+bmQgRlVBCnNjc2kgdGFyZ2V0MDowOjE6IEVuZGluZyBEb21haW4gVmFsaWRhdGlvbgpzY3NpIHRh
+cmdldDA6MDoxOiBGQVNULTE2MCBXSURFIFNDU0kgMzIwLjAgTUIvcyBEVCBJVSBRQVMgUlRJIFdS
+RkxPVyBQQ09NUCAoNi4yNSBucywgb2Zmc2V0IDEyNykKc2QgMDowOjE6MDogQXR0YWNoZWQgc2Nz
+aSBnZW5lcmljIHNnMSB0eXBlIDAKc2QgMDowOjE6MDogW3NkYl0gNzExMzI5NjAgNTEyLWJ5dGUg
+bG9naWNhbCBibG9ja3M6ICgzNi40IEdCLzMzLjkgR2lCKQogc2RhOiBzZGExCnNkIDA6MDoxOjA6
+IFtzZGJdIFdyaXRlIFByb3RlY3QgaXMgb2ZmCnNkIDA6MDoxOjA6IFtzZGJdIE1vZGUgU2Vuc2U6
+IGNmIDAwIDEwIDA4CnNkIDA6MDoxOjA6IFtzZGJdIFdyaXRlIGNhY2hlOiBkaXNhYmxlZCwgcmVh
+ZCBjYWNoZTogZW5hYmxlZCwgc3VwcG9ydHMgRFBPIGFuZCBGVUEKc2QgMDowOjA6MDogW3NkYV0g
+QXR0YWNoZWQgU0NTSSBkaXNrCkdTSSAyOCAobGV2ZWwsIGxvdykgLT4gQ1BVIDAgKDB4MDAwMCkg
+dmVjdG9yIDU1Cm1wdGJhc2U6IGlvYzE6IEluaXRpYXRpbmcgYnJpbmd1cAppb2MxOiBMU0k1M0Mx
+MDMwIEMwOiBDYXBhYmlsaXRpZXM9e0luaXRpYXRvcixUYXJnZXR9CnNjc2kxIDogaW9jMTogTFNJ
+NTNDMTAzMCBDMCwgRndSZXY9MDEwMzIzNDFoLCBQb3J0cz0xLCBNYXhRPTI1NSwgSVJRPTU4CiBz
+ZGI6IHNkYjEgc2RiMgpzZCAwOjA6MTowOiBbc2RiXSBBdHRhY2hlZCBTQ1NJIGRpc2sKRnVzaW9u
+IE1QVCBGQyBIb3N0IGRyaXZlciAzLjA0LjIwCmVoY2lfaGNkOiBVU0IgMi4wICdFbmhhbmNlZCcg
+SG9zdCBDb250cm9sbGVyIChFSENJKSBEcml2ZXIKR1NJIDE4IChsZXZlbCwgbG93KSAtPiBDUFUg
+MSAoMHgwMTAwKSB2ZWN0b3IgNTYKZWhjaV9oY2QgMDAwMDowMDowMS4yOiBFSENJIEhvc3QgQ29u
+dHJvbGxlcgplaGNpX2hjZCAwMDAwOjAwOjAxLjI6IG5ldyBVU0IgYnVzIHJlZ2lzdGVyZWQsIGFz
+c2lnbmVkIGJ1cyBudW1iZXIgMQplaGNpX2hjZCAwMDAwOjAwOjAxLjI6IGlycSA1MywgaW8gbWVt
+IDB4ODAwMDAwMDAKZWhjaV9oY2QgMDAwMDowMDowMS4yOiBVU0IgMi4wIHN0YXJ0ZWQsIEVIQ0kg
+MC45NQpodWIgMS0wOjEuMDogVVNCIGh1YiBmb3VuZApodWIgMS0wOjEuMDogNSBwb3J0cyBkZXRl
+Y3RlZApvaGNpX2hjZDogVVNCIDEuMSAnT3BlbicgSG9zdCBDb250cm9sbGVyIChPSENJKSBEcml2
+ZXIKR1NJIDE2IChsZXZlbCwgbG93KSAtPiBDUFUgMCAoMHgwMDAwKSB2ZWN0b3IgNTcKb2hjaV9o
+Y2QgMDAwMDowMDowMS4wOiBPSENJIEhvc3QgQ29udHJvbGxlcgpvaGNpX2hjZCAwMDAwOjAwOjAx
+LjA6IG5ldyBVU0IgYnVzIHJlZ2lzdGVyZWQsIGFzc2lnbmVkIGJ1cyBudW1iZXIgMgpvaGNpX2hj
+ZCAwMDAwOjAwOjAxLjA6IGlycSA1MSwgaW8gbWVtIDB4ODAwMDIwMDAKaHViIDItMDoxLjA6IFVT
+QiBodWIgZm91bmQKaHViIDItMDoxLjA6IDMgcG9ydHMgZGV0ZWN0ZWQKR1NJIDE3IChsZXZlbCwg
+bG93KSAtPiBDUFUgMSAoMHgwMTAwKSB2ZWN0b3IgNTgKb2hjaV9oY2QgMDAwMDowMDowMS4xOiBP
+SENJIEhvc3QgQ29udHJvbGxlcgpvaGNpX2hjZCAwMDAwOjAwOjAxLjE6IG5ldyBVU0IgYnVzIHJl
+Z2lzdGVyZWQsIGFzc2lnbmVkIGJ1cyBudW1iZXIgMwpvaGNpX2hjZCAwMDAwOjAwOjAxLjE6IGly
+cSA1MiwgaW8gbWVtIDB4ODAwMDEwMDAKaHViIDMtMDoxLjA6IFVTQiBodWIgZm91bmQKaHViIDMt
+MDoxLjA6IDIgcG9ydHMgZGV0ZWN0ZWQKdWhjaV9oY2Q6IFVTQiBVbml2ZXJzYWwgSG9zdCBDb250
+cm9sbGVyIEludGVyZmFjZSBkcml2ZXIKSW5pdGlhbGl6aW5nIFVTQiBNYXNzIFN0b3JhZ2UgZHJp
+dmVyLi4uCnVzYmNvcmU6IHJlZ2lzdGVyZWQgbmV3IGludGVyZmFjZSBkcml2ZXIgdXNiLXN0b3Jh
+Z2UKVVNCIE1hc3MgU3RvcmFnZSBzdXBwb3J0IHJlZ2lzdGVyZWQuCm1vdXNlZGV2OiBQUy8yIG1v
+dXNlIGRldmljZSBjb21tb24gZm9yIGFsbCBtaWNlCmkyYyAvZGV2IGVudHJpZXMgZHJpdmVyCkVG
+SSBWYXJpYWJsZXMgRmFjaWxpdHkgdjAuMDggMjAwNC1NYXktMTcKdXNiY29yZTogcmVnaXN0ZXJl
+ZCBuZXcgaW50ZXJmYWNlIGRyaXZlciB1c2JoaWQKdXNiaGlkOiBVU0IgSElEIGNvcmUgZHJpdmVy
+ClRDUDogY3ViaWMgcmVnaXN0ZXJlZApORVQ6IFJlZ2lzdGVyZWQgcHJvdG9jb2wgZmFtaWx5IDE3
+CktleSB0eXBlIGRuc19yZXNvbHZlciByZWdpc3RlcmVkCkFMU0EgZGV2aWNlIGxpc3Q6CiAgTm8g
+c291bmRjYXJkcyBmb3VuZC4KRnJlZWluZyB1bnVzZWQga2VybmVsIG1lbW9yeTogODQ4a0IgZnJl
+ZWQKdWRldmQgKDEzNik6IC9wcm9jLzEzNi9vb21fYWRqIGlzIGRlcHJlY2F0ZWQsIHBsZWFzZSB1
+c2UgL3Byb2MvMTM2L29vbV9zY29yZV9hZGogaW5zdGVhZC4KdWRldmQgdmVyc2lvbiAxMjggc3Rh
+cnRlZApFWFQzLWZzIChzZGIyKTogKG5vKWFjbCBvcHRpb25zIG5vdCBzdXBwb3J0ZWQKa2pvdXJu
+YWxkIHN0YXJ0aW5nLiAgQ29tbWl0IGludGVydmFsIDUgc2Vjb25kcwpFWFQzLWZzIChzZGIyKTog
+dXNpbmcgaW50ZXJuYWwgam91cm5hbApFWFQzLWZzIChzZGIyKTogbW91bnRlZCBmaWxlc3lzdGVt
+IHdpdGggb3JkZXJlZCBkYXRhIG1vZGUKRVhUMy1mcyAoc2RiMik6IChubylhY2wgb3B0aW9ucyBu
+b3Qgc3VwcG9ydGVkCnVkZXZkIHZlcnNpb24gMTI4IHN0YXJ0ZWQKRnVzaW9uIE1QVCBtaXNjIGRl
+dmljZSAoaW9jdGwpIGRyaXZlciAzLjA0LjIwCm1wdGN0bDogUmVnaXN0ZXJlZCB3aXRoIEZ1c2lv
+biBNUFQgYmFzZSBkcml2ZXIKbXB0Y3RsOiAvZGV2L21wdGN0bCBAIChtYWpvcixtaW5vcj0xMCwy
+MjApCkVYVDMtZnMgKHNkYTEpOiAobm8pYWNsIG9wdGlvbnMgbm90IHN1cHBvcnRlZApram91cm5h
+bGQgc3RhcnRpbmcuICBDb21taXQgaW50ZXJ2YWwgNSBzZWNvbmRzCkVYVDMtZnMgKHNkYTEpOiB1
+c2luZyBpbnRlcm5hbCBqb3VybmFsCkVYVDMtZnMgKHNkYTEpOiBtb3VudGVkIGZpbGVzeXN0ZW0g
+d2l0aCBvcmRlcmVkIGRhdGEgbW9kZQplMTAwMDogZXRoMCBOSUMgTGluayBpcyBVcCAxMDAgTWJw
+cyBGdWxsIER1cGxleCwgRmxvdyBDb250cm9sOiBSWAo=
+--f46d042f91c8c173ce04c4a95099--
