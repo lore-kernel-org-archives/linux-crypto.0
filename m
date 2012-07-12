@@ -1,53 +1,54 @@
-From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 6/6] workqueue: reimplement WQ_HIGHPRI using a separate
- worker_pool
-Date: Thu, 12 Jul 2012 10:05:19 -0700
-Message-ID: <20120712170519.GA20167@google.com>
-References: <1341859315-17759-7-git-send-email-tj@kernel.org>
- <20120712130648.GA19214@localhost>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH 3/6] workqueue: use @pool instead of @gcwq or @cpu
+ where applicable
+Date: Thu, 12 Jul 2012 10:06:18 -0700
+Message-ID: <20120712170618.GB20167@google.com>
+References: <1341859315-17759-1-git-send-email-tj@kernel.org>
+ <1341859315-17759-4-git-send-email-tj@kernel.org>
+ <CA+8MBbKtCODJxv0zQ2uL_wRE9U6F6tdOVwYSMv9=OQNLGzcVXQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	joshhunt00-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org, rni-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org,
-	vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, bpm-sJ/iWh9BUns@public.gmane.org,
-	elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org,
-	gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org, johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
-To: Fengguang Wu <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
+	vgoyal@redhat.com, vwadekar@nvidia.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
+	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com
+To: Tony Luck <tony.luck@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:50580 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932521Ab2GLRGY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Jul 2012 13:06:24 -0400
 Content-Disposition: inline
-In-Reply-To: <20120712130648.GA19214@localhost>
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CA+8MBbKtCODJxv0zQ2uL_wRE9U6F6tdOVwYSMv9=OQNLGzcVXQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello, Fengguang.
+Hello, Tony.
 
-On Thu, Jul 12, 2012 at 09:06:48PM +0800, Fengguang Wu wrote:
-> [    0.207977] WARNING: at /c/kernel-tests/mm/kernel/workqueue.c:1217 worker_enter_idle+0x2b8/0x32b()
-> [    0.207977] Modules linked in:
-> [    0.207977] Pid: 1, comm: swapper/0 Not tainted 3.5.0-rc6-08414-g9645fff #15
-> [    0.207977] Call Trace:
-> [    0.207977]  [<ffffffff81087189>] ? worker_enter_idle+0x2b8/0x32b
-> [    0.207977]  [<ffffffff810559d9>] warn_slowpath_common+0xae/0xdb
-> [    0.207977]  [<ffffffff81055a2e>] warn_slowpath_null+0x28/0x31
-> [    0.207977]  [<ffffffff81087189>] worker_enter_idle+0x2b8/0x32b
-> [    0.207977]  [<ffffffff81087222>] start_worker+0x26/0x42
-> [    0.207977]  [<ffffffff81c8b261>] init_workqueues+0x2d2/0x59a
-> [    0.207977]  [<ffffffff81c8af8f>] ? usermodehelper_init+0x8a/0x8a
-> [    0.207977]  [<ffffffff81000284>] do_one_initcall+0xce/0x272
-> [    0.207977]  [<ffffffff81c6f650>] kernel_init+0x12e/0x3c1
-> [    0.207977]  [<ffffffff814b9b74>] kernel_thread_helper+0x4/0x10
-> [    0.207977]  [<ffffffff814b80b0>] ? retint_restore_args+0x13/0x13
-> [    0.207977]  [<ffffffff81c6f522>] ? start_kernel+0x737/0x737
-> [    0.207977]  [<ffffffff814b9b70>] ? gs_change+0x13/0x13
+On Tue, Jul 10, 2012 at 04:30:36PM -0700, Tony Luck wrote:
+> On Mon, Jul 9, 2012 at 11:41 AM, Tejun Heo <tj@kernel.org> wrote:
+> > @@ -1234,7 +1235,7 @@ static void worker_enter_idle(struct worker *worker)
+> >          */
+> >         WARN_ON_ONCE(gcwq->trustee_state == TRUSTEE_DONE &&
+> >                      pool->nr_workers == pool->nr_idle &&
+> > -                    atomic_read(get_gcwq_nr_running(gcwq->cpu)));
+> > +                    atomic_read(get_pool_nr_running(pool)));
+> >  }
+> 
+> Just had this WARN_ON_ONCE trigger on ia64 booting next-20120710. I
+> haven't bisected ... just noticed  that two patches in this series tinker
+> with lines in this check. next-20120706 didn't generate the WARN.
 
-Yeah, I forgot to flip the WARN_ON_ONCE() condition so that it checks
-nr_running before looking at pool->nr_running.  The warning is
-spurious.  Will post fix soon.
+Sorry about the delay.  The warning is spurious.  As now there are
+multiple pools, nr_running check should be done before
+pool->nr_workers check.  Will post fix soon.
 
-Thanks.
+Thank you.
 
 -- 
 tejun
