@@ -1,7 +1,7 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 2/3] crypto: caam - add backward compatible string sec4.0
-Date: Fri, 13 Jul 2012 17:49:21 -0500
-Message-ID: <20120713174921.4cc549f090987a312ba25d31@freescale.com>
+Subject: [PATCH 3/3] crypto: caam - set descriptor sharing type to SERIAL
+Date: Fri, 13 Jul 2012 17:49:28 -0500
+Message-ID: <20120713174928.2f09fea79e1fbd7abda4c3ce@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
@@ -9,81 +9,105 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe001.messaging.microsoft.com ([216.32.180.184]:20286
+Received: from co1ehsobe002.messaging.microsoft.com ([216.32.180.185]:20392
 	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755103Ab2GMWvW (ORCPT
+	by vger.kernel.org with ESMTP id S1755167Ab2GMWv3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Jul 2012 18:51:22 -0400
+	Fri, 13 Jul 2012 18:51:29 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Shengzhou Liu <Shengzhou.Liu@freescale.com>
+SHARE_WAIT, whilst more optimal for association-less crypto,
+has the ability to start thrashing the CCB descriptor/key
+caches, given high levels of traffic across multiple security
+associations (and thus keys).
 
-In some device trees of previous version, there were string "fsl,sec4.0".
-To be backward compatible with device trees, we first check "fsl,sec-v4.0",
-if it fails, then check for "fsl,sec4.0".
-
-Signed-off-by: Shengzhou Liu <Shengzhou.Liu@freescale.com>
-
-extended to include new hash and rng code, which was omitted from
-the previous version of this patch during a rebase of the SDK
-version.
+Switch to using the SERIAL sharing type, which prefers
+the last used CCB for the SA.  On a 2-DECO platform
+such as the P3041, this can improve performance by
+about 3.7%.
 
 Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c | 14 ++++++++++----
- drivers/crypto/caam/caamrng.c  |  7 +++++--
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/caamalg.c  | 8 ++++----
+ drivers/crypto/caam/caamhash.c | 4 ++--
+ drivers/crypto/caam/caamrng.c  | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index d772105..2916614 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -205,7 +205,7 @@ static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
+ {
+ 	u32 *key_jump_cmd;
+ 
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 
+ 	/* Skip if already shared */
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+@@ -302,7 +302,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	desc = ctx->sh_desc_dec;
+ 
+ 	/* aead_decrypt shared descriptor */
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 
+ 	/* Skip if already shared */
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+@@ -564,7 +564,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 
+ 	/* ablkcipher_encrypt shared descriptor */
+ 	desc = ctx->sh_desc_enc;
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 	/* Skip if already shared */
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
+@@ -605,7 +605,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 	/* ablkcipher_decrypt shared descriptor */
+ 	desc = ctx->sh_desc_dec;
+ 
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
+ 	/* Skip if already shared */
+ 	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+ 				   JUMP_COND_SHRD);
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 895aaf2..dca3c19 100644
+index dca3c19..fbf3fe8 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -1736,8 +1736,11 @@ static void __exit caam_algapi_hash_exit(void)
- 	struct caam_hash_alg *t_alg, *n;
+@@ -225,7 +225,7 @@ static inline void init_sh_desc_key_ahash(u32 *desc, struct caam_hash_ctx *ctx)
+ {
+ 	u32 *key_jump_cmd;
  
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
--	if (!dev_node)
--		return;
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return;
-+	}
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
  
- 	pdev = of_find_device_by_node(dev_node);
- 	if (!pdev)
-@@ -1812,8 +1815,11 @@ static int __init caam_algapi_hash_init(void)
- 	int i = 0, err = 0;
+ 	if (ctx->split_key_len) {
+ 		/* Skip if already shared */
+@@ -311,7 +311,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 	/* ahash_update shared descriptor */
+ 	desc = ctx->sh_desc_update;
  
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
--	if (!dev_node)
--		return -ENODEV;
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
  
- 	pdev = of_find_device_by_node(dev_node);
- 	if (!pdev)
+ 	/* Import context from software */
+ 	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
 diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index e2bfe16..ccedb54 100644
+index ccedb54..d1939a9 100644
 --- a/drivers/crypto/caam/caamrng.c
 +++ b/drivers/crypto/caam/caamrng.c
-@@ -284,8 +284,11 @@ static int __init caam_rng_init(void)
- 	struct caam_drv_private *priv;
+@@ -193,7 +193,7 @@ static inline void rng_create_sh_desc(struct caam_rng_ctx *ctx)
+ 	struct device *jrdev = ctx->jrdev;
+ 	u32 *desc = ctx->sh_desc;
  
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
--	if (!dev_node)
--		return -ENODEV;
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
+-	init_sh_desc(desc, HDR_SHARE_WAIT);
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
  
- 	pdev = of_find_device_by_node(dev_node);
- 	if (!pdev)
+ 	/* Propagate errors from shared to job descriptor */
+ 	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
 -- 
 1.7.11.2
