@@ -1,54 +1,43 @@
-From: Kent Yoder <key@linux.vnet.ibm.com>
-Subject: Re: [PATCH 13/14] crypto: drivers - remove cra_list initialization
-Date: Fri, 13 Jul 2012 12:00:57 -0500
-Message-ID: <20120713170057.GA30312@linux.vnet.ibm.com>
-References: <20120711111949.6875.60269.stgit@localhost6.localdomain6>
- <20120711112056.6875.58905.stgit@localhost6.localdomain6>
+From: Tony Luck <tony.luck@gmail.com>
+Subject: Re: [PATCH 6/6] workqueue: reimplement WQ_HIGHPRI using a separate worker_pool
+Date: Fri, 13 Jul 2012 10:51:32 -0700
+Message-ID: <CA+8MBbLWxf4=95BHoVC4h-TM5S393Hhttx2BgdD-vUtHxpiYnA@mail.gmail.com>
+References: <1341859315-17759-7-git-send-email-tj@kernel.org>
+	<20120712130648.GA19214@localhost>
+	<20120712170519.GA20167@google.com>
+	<20120712214514.GD20167@google.com>
+	<CA+8MBb+ghRpmtrk=t5-6MqrPMZt+a69UoAWaubyKBeptGdBrWA@mail.gmail.com>
+	<20120712223221.GF20167@google.com>
+	<CA+8MBbJQVF3-CUU8MPWgm7OifD-C8=U2=uPF3JH9XNvAWVAX6A@mail.gmail.com>
+	<20120712233645.GG20167@google.com>
+	<CA+8MBbJbjKmH29Yapih9anxXTsNy7C2TWgtnFX3-Gm6cNyCY3g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>,
-	Michal Ludvig <michal@logix.cz>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	linux-geode@lists.infradead.org,
-	Varun Wadekar <vwadekar@nvidia.com>,
-	Eric =?iso-8859-1?Q?B=E9nard?= <eric@eukrea.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Fengguang Wu <fengguang.wu@intel.com>,
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
+	vgoyal@redhat.com, vwadekar@nvidia.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
+	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com
+To: Tejun Heo <tj@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e32.co.us.ibm.com ([32.97.110.150]:52393 "EHLO
-	e32.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932288Ab2GMRB2 (ORCPT
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:53653 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751623Ab2GMRvd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Jul 2012 13:01:28 -0400
-Received: from /spool/local
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
-	Fri, 13 Jul 2012 11:01:28 -0600
-Received: from d01relay04.pok.ibm.com (d01relay04.pok.ibm.com [9.56.227.236])
-	by d01dlp03.pok.ibm.com (Postfix) with ESMTP id 3650CC90080
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jul 2012 13:01:23 -0400 (EDT)
-Received: from d03av02.boulder.ibm.com (d03av02.boulder.ibm.com [9.17.195.168])
-	by d01relay04.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id q6DH1Mge392846
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jul 2012 13:01:22 -0400
-Received: from d03av02.boulder.ibm.com (loopback [127.0.0.1])
-	by d03av02.boulder.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id q6DH1ASs004526
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Jul 2012 11:01:15 -0600
-Content-Disposition: inline
-In-Reply-To: <20120711112056.6875.58905.stgit@localhost6.localdomain6>
+	Fri, 13 Jul 2012 13:51:33 -0400
+In-Reply-To: <CA+8MBbJbjKmH29Yapih9anxXTsNy7C2TWgtnFX3-Gm6cNyCY3g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 11, 2012 at 02:20:56PM +0300, Jussi Kivilinna wrote:
-> Initialization of cra_list is currently mixed, most ciphers initialize this
-> field and most shashes do not. Initialization however is not needed at all
-> since cra_list is initialized/overwritten in __crypto_register_alg() with
-> list_add(). Therefore perform cleanup to remove all unneeded initializations
-> of this field in 'crypto/drivers/'.
+On Thu, Jul 12, 2012 at 4:46 PM, Tony Luck <tony.luck@gmail.com> wrote:
+> Still hasn't come back in three reboots.  I have to leave now, can continue
+> tomorrow.
 
-Acked-by: Kent Yoder <key@linux.vnet.ibm.com>
+Tired of rebooting ... seems that it is very hard to hit this with
+this patch :-(
 
-Thanks,
-Kent
+-Tony
