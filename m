@@ -1,177 +1,73 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 1/3 v2] crypto: caam - fix possible deadlock condition
-Date: Fri, 13 Jul 2012 18:04:23 -0500
-Message-ID: <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
-References: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH 6/6] workqueue: reimplement WQ_HIGHPRI using a separate
+ worker_pool
+Date: Fri, 13 Jul 2012 20:41:22 -0700
+Message-ID: <20120714034122.GA5638@dhcp-172-17-108-109.mtv.corp.google.com>
+References: <1341859315-17759-7-git-send-email-tj@kernel.org>
+ <20120712130648.GA19214@localhost>
+ <20120712170519.GA20167@google.com>
+ <20120712214514.GD20167@google.com>
+ <20120713020800.GA14026@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
+	vgoyal@redhat.com, vwadekar@nvidia.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
+	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com,
+	Tony Luck <tony.luck@intel.com>
+To: Fengguang Wu <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.206] ([213.199.154.206]:54765 "EHLO
-	am1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1752087Ab2GMXHi (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:52949 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757524Ab2GNDl3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Jul 2012 19:07:38 -0400
-In-Reply-To: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
+	Fri, 13 Jul 2012 23:41:29 -0400
+Content-Disposition: inline
+In-Reply-To: <20120713020800.GA14026@localhost>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-commit "crypto: caam - use non-irq versions of spinlocks for job rings"
-made two bad assumptions:
+Hello,
 
-(a) The caam_jr_enqueue lock isn't used in softirq context.
-Not true: jr_enqueue can be interrupted by an incoming net
-interrupt and the received packet may be sent for encryption,
-via caam_jr_enqueue in softirq context, thereby inducing a
-deadlock.
+On Fri, Jul 13, 2012 at 10:08:00AM +0800, Fengguang Wu wrote:
+> [    0.165669] Performance Events: unsupported Netburst CPU model 6 no PMU driver, software events only.
+> [    0.167001] XXX cpu=0 gcwq=ffff88000dc0cfc0 base=ffff88000dc11e80
+> [    0.167989] XXX cpu=0 nr_running=0 @ ffff88000dc11e80
+> [    0.168988] XXX cpu=0 nr_running=0 @ ffff88000dc11e88
+> [    0.169988] XXX cpu=1 gcwq=ffff88000dd0cfc0 base=ffff88000dd11e80
+> [    0.170988] XXX cpu=1 nr_running=0 @ ffff88000dd11e80
+> [    0.171987] XXX cpu=1 nr_running=0 @ ffff88000dd11e88
+> [    0.172988] XXX cpu=8 nr_running=0 @ ffffffff81d7c430
+> [    0.173987] XXX cpu=8 nr_running=12 @ ffffffff81d7c438
 
-This is evidenced when running netperf over an IPSec tunnel
-between two P4080's, with spinlock debugging turned on:
+Heh, I found it.  get_pool_nr_running() stores the nr_running array to
+use in a local pointer to array and then returns pointer to the
+specific element from there depending on the priority.
 
-[  892.092569] BUG: spinlock lockup on CPU#7, netperf/10634, e8bf5f70
-[  892.098747] Call Trace:
-[  892.101197] [eff9fc10] [c00084c0] show_stack+0x48/0x15c (unreliable)
-[  892.107563] [eff9fc50] [c0239c2c] do_raw_spin_lock+0x16c/0x174
-[  892.113399] [eff9fc80] [c0596494] _raw_spin_lock+0x3c/0x50
-[  892.118889] [eff9fc90] [c0445e74] caam_jr_enqueue+0xf8/0x250
-[  892.124550] [eff9fcd0] [c044a644] aead_decrypt+0x6c/0xc8
-[  892.129625] BUG: spinlock lockup on CPU#5, swapper/5/0, e8bf5f70
-[  892.129629] Call Trace:
-[  892.129637] [effa7c10] [c00084c0] show_stack+0x48/0x15c (unreliable)
-[  892.129645] [effa7c50] [c0239c2c] do_raw_spin_lock+0x16c/0x174
-[  892.129652] [effa7c80] [c0596494] _raw_spin_lock+0x3c/0x50
-[  892.129660] [effa7c90] [c0445e74] caam_jr_enqueue+0xf8/0x250
-[  892.129666] [effa7cd0] [c044a644] aead_decrypt+0x6c/0xc8
-[  892.129674] [effa7d00] [c0509724] esp_input+0x178/0x334
-[  892.129681] [effa7d50] [c0519778] xfrm_input+0x77c/0x818
-[  892.129688] [effa7da0] [c050e344] xfrm4_rcv_encap+0x20/0x30
-[  892.129697] [effa7db0] [c04b90c8] ip_local_deliver+0x190/0x408
-[  892.129703] [effa7de0] [c04b966c] ip_rcv+0x32c/0x898
-[  892.129709] [effa7e10] [c048b998] __netif_receive_skb+0x27c/0x4e8
-[  892.129715] [effa7e80] [c048d744] netif_receive_skb+0x4c/0x13c
-[  892.129726] [effa7eb0] [c03c28ac] _dpa_rx+0x1a8/0x354
-[  892.129732] [effa7ef0] [c03c2ac4] ingress_rx_default_dqrr+0x6c/0x108
-[  892.129742] [effa7f10] [c0467ae0] qman_poll_dqrr+0x170/0x1d4
-[  892.129748] [effa7f40] [c03c153c] dpaa_eth_poll+0x20/0x94
-[  892.129754] [effa7f60] [c048dbd0] net_rx_action+0x13c/0x1f4
-[  892.129763] [effa7fa0] [c003d1b8] __do_softirq+0x108/0x1b0
-[  892.129769] [effa7ff0] [c000df58] call_do_softirq+0x14/0x24
-[  892.129775] [ebacfe70] [c0004868] do_softirq+0xd8/0x104
-[  892.129780] [ebacfe90] [c003d5a4] irq_exit+0xb8/0xd8
-[  892.129786] [ebacfea0] [c0004498] do_IRQ+0xa4/0x1b0
-[  892.129792] [ebacfed0] [c000fad8] ret_from_except+0x0/0x18
-[  892.129798] [ebacff90] [c0009010] cpu_idle+0x94/0xf0
-[  892.129804] [ebacffb0] [c059ff88] start_secondary+0x42c/0x430
-[  892.129809] [ebacfff0] [c0001e28] __secondary_start+0x30/0x84
-[  892.281474]
-[  892.282959] [eff9fd00] [c0509724] esp_input+0x178/0x334
-[  892.288186] [eff9fd50] [c0519778] xfrm_input+0x77c/0x818
-[  892.293499] [eff9fda0] [c050e344] xfrm4_rcv_encap+0x20/0x30
-[  892.299074] [eff9fdb0] [c04b90c8] ip_local_deliver+0x190/0x408
-[  892.304907] [eff9fde0] [c04b966c] ip_rcv+0x32c/0x898
-[  892.309872] [eff9fe10] [c048b998] __netif_receive_skb+0x27c/0x4e8
-[  892.315966] [eff9fe80] [c048d744] netif_receive_skb+0x4c/0x13c
-[  892.321803] [eff9feb0] [c03c28ac] _dpa_rx+0x1a8/0x354
-[  892.326855] [eff9fef0] [c03c2ac4] ingress_rx_default_dqrr+0x6c/0x108
-[  892.333212] [eff9ff10] [c0467ae0] qman_poll_dqrr+0x170/0x1d4
-[  892.338872] [eff9ff40] [c03c153c] dpaa_eth_poll+0x20/0x94
-[  892.344271] [eff9ff60] [c048dbd0] net_rx_action+0x13c/0x1f4
-[  892.349846] [eff9ffa0] [c003d1b8] __do_softirq+0x108/0x1b0
-[  892.355338] [eff9fff0] [c000df58] call_do_softirq+0x14/0x24
-[  892.360910] [e7169950] [c0004868] do_softirq+0xd8/0x104
-[  892.366135] [e7169970] [c003d5a4] irq_exit+0xb8/0xd8
-[  892.371101] [e7169980] [c0004498] do_IRQ+0xa4/0x1b0
-[  892.375979] [e71699b0] [c000fad8] ret_from_except+0x0/0x18
-[  892.381466] [e7169a70] [c0445e74] caam_jr_enqueue+0xf8/0x250
-[  892.387127] [e7169ab0] [c044ad4c] aead_givencrypt+0x6ac/0xa70
-[  892.392873] [e7169b20] [c050a0b8] esp_output+0x2b4/0x570
-[  892.398186] [e7169b80] [c0519b9c] xfrm_output_resume+0x248/0x7c0
-[  892.404194] [e7169bb0] [c050e89c] xfrm4_output_finish+0x18/0x28
-[  892.410113] [e7169bc0] [c050e8f4] xfrm4_output+0x48/0x98
-[  892.415427] [e7169bd0] [c04beac0] ip_local_out+0x48/0x98
-[  892.420740] [e7169be0] [c04bec7c] ip_queue_xmit+0x16c/0x490
-[  892.426314] [e7169c10] [c04d6128] tcp_transmit_skb+0x35c/0x9a4
-[  892.432147] [e7169c70] [c04d6f98] tcp_write_xmit+0x200/0xa04
-[  892.437808] [e7169cc0] [c04c8ccc] tcp_sendmsg+0x994/0xcec
-[  892.443213] [e7169d40] [c04eebfc] inet_sendmsg+0xd0/0x164
-[  892.448617] [e7169d70] [c04792f8] sock_sendmsg+0x8c/0xbc
-[  892.453931] [e7169e40] [c047aecc] sys_sendto+0xc0/0xfc
-[  892.459069] [e7169f10] [c047b934] sys_socketcall+0x110/0x25c
-[  892.464729] [e7169f40] [c000f480] ret_from_syscall+0x0/0x3c
+	atomic_t (*nr_running)[NR_WORKER_POOLS];
 
-(b) since the caam_jr_dequeue lock is only used in bh context,
-then semantically it should use _bh spin_lock types.  spin_lock_bh
-semantics are to disable back-halves, and used when a lock is shared
-between softirq (bh) context and process and/or h/w IRQ context.
-Since the lock is only used within softirq context, and this tasklet
-is atomic, there is no need to do the additional work to disable
-back halves.
+	/* set @nr_running to the array to use */
+	return nr_running[worker_pool_pri(pool)];
 
-This patch adds back-half disabling protection to caam_jr_enqueue
-spin_locks to fix (a), and drops it from caam_jr_dequeue to fix (b).
+The [] operator in the return statement is indexing to the arrays
+instead of the array elements, so if the index is 1, the above
+statement offsets nr_running by sizeof(atomic_t [NR_WORKER_POOLS])
+instead of sizeof(atomic_t).  This should have been
+&(*nr_running)[worker_pool_pri(pool)] instead.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
-The offending commit currently only resides in the cryptodev tree;
-so this patch, and the rest in this series, only apply there.
+So, highpri ends up dereferencing out-of-bounds and depending on
+variable layout, it may see garbage value from the beginning (what you
+were seeing) or get interfered afterwards (what Tony was seeing).
+This also explains why I didn't see it and Tony can no longer
+reproduce it after debug patch.
 
-Hopefully this makes sense.  Now where's that brown paper bag...
+Will post updated patches.
 
-version 2: actually include the fix for dequeue/part (b).
+Thank you.
 
- drivers/crypto/caam/jr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 53c8c51..93d1407 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -63,7 +63,7 @@ static void caam_jr_dequeue(unsigned long devarg)
- 
- 		head = ACCESS_ONCE(jrp->head);
- 
--		spin_lock_bh(&jrp->outlock);
-+		spin_lock(&jrp->outlock);
- 
- 		sw_idx = tail = jrp->tail;
- 		hw_idx = jrp->out_ring_read_index;
-@@ -115,7 +115,7 @@ static void caam_jr_dequeue(unsigned long devarg)
- 			jrp->tail = tail;
- 		}
- 
--		spin_unlock_bh(&jrp->outlock);
-+		spin_unlock(&jrp->outlock);
- 
- 		/* Finally, execute user's callback */
- 		usercall(dev, userdesc, userstatus, userarg);
-@@ -236,14 +236,14 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 		return -EIO;
- 	}
- 
--	spin_lock(&jrp->inplock);
-+	spin_lock_bh(&jrp->inplock);
- 
- 	head = jrp->head;
- 	tail = ACCESS_ONCE(jrp->tail);
- 
- 	if (!rd_reg32(&jrp->rregs->inpring_avail) ||
- 	    CIRC_SPACE(head, tail, JOBR_DEPTH) <= 0) {
--		spin_unlock(&jrp->inplock);
-+		spin_unlock_bh(&jrp->inplock);
- 		dma_unmap_single(dev, desc_dma, desc_size, DMA_TO_DEVICE);
- 		return -EBUSY;
- 	}
-@@ -265,7 +265,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 
- 	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
- 
--	spin_unlock(&jrp->inplock);
-+	spin_unlock_bh(&jrp->inplock);
- 
- 	return 0;
- }
 -- 
-1.7.11.2
+tejun
