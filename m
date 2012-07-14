@@ -1,72 +1,97 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 5/6] workqueue: introduce NR_WORKER_POOLS and for_each_worker_pool()
-Date: Fri, 13 Jul 2012 21:27:03 -0700
-Message-ID: <CA+55aFyeauqCqrWsx4U2TB2ENrugZXYj+4vw3Fd0kGaeWBP3RA@mail.gmail.com>
+From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 5/6] workqueue: introduce NR_WORKER_POOLS and
+ for_each_worker_pool()
+Date: Fri, 13 Jul 2012 21:44:38 -0700
+Message-ID: <20120714044438.GA7718@dhcp-172-17-108-109.mtv.corp.google.com>
 References: <1341859315-17759-1-git-send-email-tj@kernel.org>
- <1341859315-17759-6-git-send-email-tj@kernel.org> <20120714035538.GB5638@dhcp-172-17-108-109.mtv.corp.google.com>
+ <1341859315-17759-6-git-send-email-tj@kernel.org>
+ <20120714035538.GB5638@dhcp-172-17-108-109.mtv.corp.google.com>
+ <CA+55aFyeauqCqrWsx4U2TB2ENrugZXYj+4vw3Fd0kGaeWBP3RA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-kernel@vger.kernel.org, joshhunt00@gmail.com,
-	axboe@kernel.dk, rni@google.com, vgoyal@redhat.com,
-	vwadekar@nvidia.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	swhiteho@redhat.com, bpm@sgi.com, elder@kernel.org,
-	xfs@oss.sgi.com, marcel@holtmann.org, gustavo@padovan.org,
-	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	martin.petersen@oracle.com
-To: Tejun Heo <tj@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:34782 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753395Ab2GNE1Z (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Jul 2012 00:27:25 -0400
-In-Reply-To: <20120714035538.GB5638@dhcp-172-17-108-109.mtv.corp.google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, joshhunt00-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org, rni-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, bpm-sJ/iWh9BUns@public.gmane.org, elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org, gustavo-THi1TnShQwVAfugRpC6u6w@public.gmane.org,
+	johan.hedberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CA+55aFyeauqCqrWsx4U2TB2ENrugZXYj+4vw3Fd0kGaeWBP3RA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Seeing code like this
+Hello, Linus.
 
-+       return &(*nr_running)[0];
+On Fri, Jul 13, 2012 at 09:27:03PM -0700, Linus Torvalds wrote:
+> Seeing code like this
+> 
+> +       return &(*nr_running)[0];
+> 
+> just makes me go "WTF?"
 
-just makes me go "WTF?"
+I was going WTF too.  This was the smallest fix and I wanted to make
+it minimal because there's another stack of patches on top of it.
+Planning to just fold nr_running into worker_pool afterwards which
+will remove the whole function.
 
-Why are you taking the address of something you just dereferenced (the
-"& [0]" part).
+> Why are you taking the address of something you just dereferenced (the
+> "& [0]" part).
 
-And you actually do that *twice*, except the inner one is more
-complicated. When you assign nr_runing, you take the address of it, so
-the "*nr_running" is actually just the same kind of odd thing (except
-in reverse - you take dereference something you just took the
-address-of).
+nr_running is atomic_t (*nr_running)[2].  Ignoring the pointer to
+array part, it's just returning the address of N'th element of the
+array.  ARRAY + N == &ARRAY[N].
 
-Seriously, this to me is a sign of *deeply* confused code. And the
-fact that your first version of that code was buggy *EXACTLY* due to
-this confusion should have made you take a step back.
+> And you actually do that *twice*, except the inner one is more
+> complicated. When you assign nr_runing, you take the address of it, so
+> the "*nr_running" is actually just the same kind of odd thing (except
+> in reverse - you take dereference something you just took the
+> address-of).
+> 
+> Seriously, this to me is a sign of *deeply* confused code. And the
+> fact that your first version of that code was buggy *EXACTLY* due to
+> this confusion should have made you take a step back.
 
-As far as I can tell, what you actually want that function to do is:
+Type-wise, I don't think it's confused.  Ah okay, you're looking at
+the fifth patch in isolation.  Upto this point, the index is always 0.
+I'm puttin it in as a placeholder for the next patch which makes use
+of non-zero index.  This patch is supposed to prepare everything for
+multiple pools and thus non-zero index.
 
-  static atomic_t *get_pool_nr_running(struct worker_pool *pool)
-  {
-    int cpu = pool->gcwq->cpu;
+> As far as I can tell, what you actually want that function to do is:
+> 
+>   static atomic_t *get_pool_nr_running(struct worker_pool *pool)
+>   {
+>     int cpu = pool->gcwq->cpu;
+> 
+>     if (cpu != WORK_CPU_UNBOUND)
+>         return per_cpu(pool_nr_running, cpu);
+> 
+>     return unbound_pool_nr_running;
+>   }
 
-    if (cpu != WORK_CPU_UNBOUND)
-        return per_cpu(pool_nr_running, cpu);
+More like the folloiwng in the end.
 
-    return unbound_pool_nr_running;
-  }
+static atomic_t *get_pool_nr_running(struct worker_pool *pool)
+{
+	int cpu = pool->gcwq->cpu;
+	int is_highpri = pool_is_highpri(pool);
 
-Notice how there isn't an 'address-of' operator anywhere in sight
-there. Those things are arrays, they get turned into "atomic_t *"
-automatically. And there isn't a single dereference (not a '*', and
-not a "[0]" - they are the exact same thing, btw) in sight either.
+	if (cpu != WORK_CPU_UNBOUND)
+		return &per_cpu(pool_nr_running, cpu)[is_highpri];
 
-What am I missing? Are there some new drugs that all the cool kids
-chew that I should be trying? Because I really don't think the kinds
-of insane "take the address of a dereference" games are a good idea.
-They really look to me like somebody is having a really bad drug
-experience.
+	return &unbound_pool_nr_running[is_highpri];
+}
 
-I didn't test the code, btw. I just looked at the patch and went WTF.
+> I didn't test the code, btw. I just looked at the patch and went WTF.
 
-                Linus
+Eh... yeah, with or without [2], this is WTF.  I'll just refresh it
+with the above version.
+
+Thanks.
+
+-- 
+tejun
