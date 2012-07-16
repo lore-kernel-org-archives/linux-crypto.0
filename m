@@ -1,45 +1,40 @@
-From: Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
-Date: Mon, 16 Jul 2012 16:03:44 +0200
-Message-ID: <20120716140344.GH2489@lunn.ch>
-References: <1339521447-17721-1-git-send-email-phil.sutter@viprinet.com>
- <1339806021-14271-1-git-send-email-gmbnomis@gmail.com>
- <20120618134718.GL9122@philter.vipri.net>
- <20120618201235.GA20755@schnuecks.de>
- <20120619115123.GN9122@philter.vipri.net>
- <4FE09637.2020802@gmail.com>
- <20120619171304.GQ9122@philter.vipri.net>
- <4FE12478.2030104@gmail.com>
- <20120716093225.GB2489@lunn.ch>
- <20120716135216.GA18870@philter.vipri.net>
+From: Tabi Timur-B04825 <B04825@freescale.com>
+Subject: Re: [linuxppc-release] [PATCH v3 4/4] fsl-dma: use spin_lock_bh to
+ instead of spin_lock_irqsave
+Date: Mon, 16 Jul 2012 14:25:18 +0000
+Message-ID: <5004244D.4000106@freescale.com>
+References: <1342411780-29930-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"cloudy.linux" <cloudy.linux@gmail.com>,
-	Simon Baatz <gmbnomis@gmail.com>, linux-crypto@vger.kernel.org
-To: Phil Sutter <phil.sutter@viprinet.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	Vinod Koul <vinod.koul@intel.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Li Yang-R58472 <r58472@freescale.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+To: Liu Qiang-B32616 <B32616@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from londo.lunn.ch ([80.238.139.98]:55196 "EHLO londo.lunn.ch"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753323Ab2GPOD4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Jul 2012 10:03:56 -0400
-Content-Disposition: inline
-In-Reply-To: <20120716135216.GA18870@philter.vipri.net>
+Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:49484
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752678Ab2GPOZY convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Jul 2012 10:25:24 -0400
+In-Reply-To: <1342411780-29930-1-git-send-email-qiang.liu@freescale.com>
+Content-Language: en-US
+Content-ID: <5765241592447A4E9A74A072F8F14E81@mgd.freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 16, 2012 at 03:52:16PM +0200, Phil Sutter wrote:
-> Hey Andrew,
-> 
-> On Mon, Jul 16, 2012 at 11:32:25AM +0200, Andrew Lunn wrote:
-> > I've not been following this thread too closely..
-> > 
-> > Do you have any patches you want included into mainline?
-> 
-> No need to fix anything mainline
+Qiang Liu wrote:
+> Use spin_lock_bh to instead of spin_lock_irqsave for improving performance.
 
-O.K. I thought there was a problem with user space using it, some
-flushes missing somewhere? Or VM mapping problem? Has that been fixed?
+You forgot to include the evidence that performance has improved, as well 
+as an explanation why it's okay to use spin_lock_bh, and why it's faster. 
+  I told you to respin the patch with that information in the patch 
+description.
 
-	Thanks
-		Andrew
+-- 
+Timur Tabi
+Linux kernel developer at Freescale
