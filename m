@@ -1,43 +1,51 @@
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: [PATCH UPDATED 6/6] workqueue: reimplement WQ_HIGHPRI using a
- separate worker_pool
-Date: Sat, 14 Jul 2012 16:18:02 +0800
-Message-ID: <20120714081802.GA30812@localhost>
-References: <1341859315-17759-1-git-send-email-tj@kernel.org>
- <1341859315-17759-7-git-send-email-tj@kernel.org>
- <20120714035650.GC5638@dhcp-172-17-108-109.mtv.corp.google.com>
+From: Qiang Liu <qiang.liu@freescale.com>
+Subject: [PATCH v3 0/4] Raid: enable talitos xor offload for improving performance
+Date: Mon, 16 Jul 2012 12:07:16 +0800
+Message-ID: <1342411636-29770-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-	joshhunt00@gmail.com, axboe@kernel.dk, rni@google.com,
-	vgoyal@redhat.com, vwadekar@nvidia.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, swhiteho@redhat.com, bpm@sgi.com,
-	elder@kernel.org, xfs@oss.sgi.com, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, martin.petersen@oracle.com,
-	Tony Luck <tony.luck@intel.com>
-To: Tejun Heo <tj@kernel.org>
+Content-Type: text/plain
+Cc: <leoli@freescale.com>, <kim.phillips@freescale.com>,
+	<dan.j.williams@intel.com>, <herbert@gondor.hengli.com.au>,
+	<qiang.liu@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:47466 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757204Ab2GNISR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Jul 2012 04:18:17 -0400
-Content-Disposition: inline
-In-Reply-To: <20120714035650.GC5638@dhcp-172-17-108-109.mtv.corp.google.com>
+Received: from va3ehsobe004.messaging.microsoft.com ([216.32.180.14]:14043
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750823Ab2GPE2z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Jul 2012 00:28:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> v2: nr_running indexing bug in get_pool_nr_running() fixed.
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Reported-by: Josh Hunt <joshhunt00@gmail.com>
-> LKML-Reference: <CAKA=qzaHqwZ8eqpLNFjxnO2fX-tgAOjmpvxgBFjv6dJeQaOW1w@mail.gmail.com>
-> Cc: Tony Luck <tony.luck@intel.com>
-> Cc: Fengguang Wu <fengguang.wu@intel.com>
-> ---
-> git branch updated accordingly.  Thanks.
+The following 4 patches enabling fsl-dma and talitos offload raid
+operations for improving raid performance and balancing CPU load.
 
-It works now, thank you very much!
+Write performance will be improved by 25-30% tested by iozone.
+Write performance is improved about 2% after using spin_lock_bh replace
+spin_lock_irqsave.
+CPU load will be reduced by 8%.
 
-Tested-by: Fengguang Wu <fengguang.wu@intel.com>
+Changes in v3:
+	- change release process of fsl-dma descriptor for resolve the
+	potential race condition
+	- add test result when use spin_lock_bh replace spin_lock_irqsave
+	- modify the benchmark results according to the latest patch
+
+Changes in v2:
+	- rebase onto cryptodev tree
+	- split the patch 3/4 up to 3 independent patches
+	- remove the patch 4/4, the fix is not for cryptodev tree
+
+
+Qiang Liu (4):
+      Talitos: Support for async_tx XOR offload
+      fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
+      fsl-dma: change release process of dma descriptor for supporting async_tx
+      fsl-dma: use spin_lock_bh to instead of spin_lock_irqsave
+
+ drivers/crypto/Kconfig   |    9 +
+ drivers/crypto/talitos.c |  410 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/talitos.h |   53 ++++++
+ drivers/dma/fsldma.c     |  436 +++++++++++++++++++++++++---------------------
+ drivers/dma/fsldma.h     |    1 +
+ 5 files changed, 708 insertions(+), 201 deletions(-)
