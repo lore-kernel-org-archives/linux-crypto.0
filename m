@@ -1,65 +1,60 @@
 From: Liu Qiang-B32616 <B32616@freescale.com>
-Subject: RE: [PATCH v3 3/4] fsl-dma: change release process of dma
- descriptor for supporting async_tx
-Date: Tue, 17 Jul 2012 04:03:06 +0000
-Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C2748@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <1342411709-29895-1-git-send-email-qiang.liu@freescale.com>
- <CADRPPNS-cOwCTVYnjq==W-f1-AAWctyOFg_6bkSDZPtM8Jf+Lw@mail.gmail.com>
+Subject: RE: [linuxppc-release] [PATCH v3 4/4] fsl-dma: use spin_lock_bh to
+ instead of spin_lock_irqsave
+Date: Tue, 17 Jul 2012 04:23:22 +0000
+Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C2788@039-SN2MPN1-011.039d.mgd.msft.net>
+References: <1342411780-29930-1-git-send-email-qiang.liu@freescale.com>
+ <5004244D.4000106@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"Ira W. Snyder" <iws@ovro.caltech.edu>,
 	Vinod Koul <vinod.koul@intel.com>,
 	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
 	Dan Williams <dan.j.williams@intel.com>,
+	Li Yang-R58472 <r58472@freescale.com>,
 	"davem@davemloft.net" <davem@davemloft.net>
-To: Li Yang-R58472 <r58472@freescale.com>
+To: Tabi Timur-B04825 <B04825@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe001.messaging.microsoft.com ([216.32.180.184]:8329
-	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750695Ab2GQEDS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Jul 2012 00:03:18 -0400
-In-Reply-To: <CADRPPNS-cOwCTVYnjq==W-f1-AAWctyOFg_6bkSDZPtM8Jf+Lw@mail.gmail.com>
+Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:4844
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750806Ab2GQEX1 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Jul 2012 00:23:27 -0400
+In-Reply-To: <5004244D.4000106@freescale.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jcnlwdG8tb3duZXJA
-dmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtY3J5cHRvLQ0KPiBvd25lckB2Z2VyLmtlcm5l
-bC5vcmddIE9uIEJlaGFsZiBPZiBMaSBZYW5nDQo+IFNlbnQ6IFR1ZXNkYXksIEp1bHkgMTcsIDIw
-MTIgMTE6MzcgQU0NCj4gVG86IExpdSBRaWFuZy1CMzI2MTYNCj4gQ2M6IGxpbnV4LWNyeXB0b0B2
-Z2VyLmtlcm5lbC5vcmc7IGxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnOyBJcmEgVy4NCj4g
-U255ZGVyOyBWaW5vZCBLb3VsOyBoZXJiZXJ0QGdvbmRvci5oZW5nbGkuY29tLmF1OyBEYW4gV2ls
-bGlhbXM7DQo+IGRhdmVtQGRhdmVtbG9mdC5uZXQNCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MyAz
-LzRdIGZzbC1kbWE6IGNoYW5nZSByZWxlYXNlIHByb2Nlc3Mgb2YgZG1hDQo+IGRlc2NyaXB0b3Ig
-Zm9yIHN1cHBvcnRpbmcgYXN5bmNfdHgNCj4gDQo+IE9uIE1vbiwgSnVsIDE2LCAyMDEyIGF0IDEy
-OjA4IFBNLCBRaWFuZyBMaXUgPHFpYW5nLmxpdUBmcmVlc2NhbGUuY29tPg0KPiB3cm90ZToNCj4g
-PiBGaXggdGhlIHBvdGVudGlhbCByaXNrIHdoZW4gZW5hYmxlIGNvbmZpZyBORVRfRE1BIGFuZCBB
-U1lOQ19UWC4NCj4gPiBBc3luY190eCBpcyBsYWNrIG9mIHN1cHBvcnQgaW4gY3VycmVudCByZWxl
-YXNlIHByb2Nlc3Mgb2YgZG1hDQo+ID4gZGVzY3JpcHRvciwgYWxsIGRlc2NyaXB0b3JzIHdpbGwg
-YmUgcmVsZWFzZWQgd2hhdGV2ZXIgaXMgYWNrZWQgb3INCj4gPiBuby1hY2tlZCBieSBhc3luY190
-eCwgc28gdGhlcmUgaXMgYSBwb3RlbnRpYWwgcmFjZSBjb25kaXRpb24gd2hlbiBkbWENCj4gPiBl
-bmdpbmUgaXMgdWVzZCBieSBvdGhlcnMgY2xpZW50cyAoZS5nLiB3aGVuIGVuYWJsZSBORVRfRE1B
-IHRvIG9mZmxvYWQNCj4gVENQKS4NCj4gPg0KPiA+IEluIG91ciBjYXNlLCBhIHJhY2UgY29uZGl0
-aW9uIHdoaWNoIGlzIHJhaXNlZCB3aGVuIHVzZSBib3RoIG9mIHRhbGl0b3MNCj4gPiBhbmQgZG1h
-ZW5naW5lIHRvIG9mZmxvYWQgeG9yIGlzIGJlY2F1c2UgbmFwaSBzY2hlZHVsZXIgd2lsbCBzeW5j
-IGFsbA0KPiA+IHBlbmRpbmcgcmVxdWVzdHMgaW4gZG1hIGNoYW5uZWxzLCBpdCBhZmZlY3RzIHRo
-ZSBwcm9jZXNzIG9mIHJhaWQNCj4gPiBvcGVyYXRpb25zIGR1ZSB0byBhY2tfdHggaXMgbm90IGNo
-ZWNrZWQgaW4gZnNsIGRtYS4gVGhlIG5vLWFja2VkDQo+ID4gZGVzY3JpcHRvciBpcyBmcmVlZCB3
-aGljaCBpcyBzdWJtaXR0ZWQganVzdCBub3csIGFzIGEgZGVwZW5kZW50IHR4LA0KPiA+IHRoaXMg
-ZnJlZWQgZGVzY3JpcHRvciB0cmlnZ2VyDQo+ID4gQlVHX09OKGFzeW5jX3R4X3Rlc3RfYWNrKGRl
-cGVuZF90eCkpIGluIGFzeW5jX3R4X3N1Ym1pdCgpLg0KPiA+DQo+ID4gQ2M6IERhbiBXaWxsaWFt
-cyA8ZGFuLmoud2lsbGlhbXNAaW50ZWwuY29tPg0KPiA+IENjOiBWaW5vZCBLb3VsIDx2aW5vZC5r
-b3VsQGludGVsLmNvbT4NCj4gPiBDYzogTGkgWWFuZyA8bGVvbGlAZnJlZXNjYWxlLmNvbT4NCj4g
-PiBDYzogSXJhIFcuIFNueWRlciA8aXdzQG92cm8uY2FsdGVjaC5lZHU+DQo+ID4gU2lnbmVkLW9m
-Zi1ieTogUWlhbmcgTGl1IDxxaWFuZy5saXVAZnJlZXNjYWxlLmNvbT4NCj4gDQo+IEFsc28gc2Vw
-YXJhdGUgdGhlIGZ1bmN0aW9uIG9yZGVyaW5nIGNoYW5nZSBhbmQgcmVhbCBjb2RlIGNoYW5nZSBp
-bnRvDQo+IGRpZmZlcmVudCBwYXRjaGVzIHdoZW4geW91IHdvcmsgb24gdGhlIG5leHQgcGF0Y2gg
-c2V0Lg0KQWNjZXB0LCBJIHdpbGwgc3BpbHQgaXQgdXAgaW4gdjQuIFRoYW5rcy4NCg0KPiANCj4g
-LSBMZW8NCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxp
-bmUgInVuc3Vic2NyaWJlIGxpbnV4LWNyeXB0byINCj4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdl
-IHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gaW5mbw0KPiBhdCAg
-aHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQoNCg==
+> -----Original Message-----
+> From: Tabi Timur-B04825
+> Sent: Monday, July 16, 2012 10:25 PM
+> To: Liu Qiang-B32616
+> Cc: linux-crypto@vger.kernel.org; linuxppc-dev@lists.ozlabs.org; Vinod
+> Koul; herbert@gondor.hengli.com.au; Dan Williams; Li Yang-R58472;
+> davem@davemloft.net
+> Subject: Re: [linuxppc-release] [PATCH v3 4/4] fsl-dma: use spin_lock_bh
+> to instead of spin_lock_irqsave
+> 
+> Qiang Liu wrote:
+> > Use spin_lock_bh to instead of spin_lock_irqsave for improving
+> performance.
+> 
+> You forgot to include the evidence that performance has improved, as well
+> as an explanation why it's okay to use spin_lock_bh, and why it's faster.
+>   I told you to respin the patch with that information in the patch
+> description.
+I attached the test result in v3 0/4, performance is improved by 2%.
+For my understanding, there is not any place to access descriptor lists
+in fsl-dma interrupt service handler except its tasklet, spin_lock_bh()
+is born for this. Interrupts will be turned off and context will be save in
+irqsave, there is needless to use irqsave in our case. You can refer to the
+implement of mv_xor.c or ioap-adma.c.
+If you think my explanation is ok, I can add it in the patch.
+Thanks.
+
+> 
+> --
+> Timur Tabi
+> Linux kernel developer at Freescale
