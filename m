@@ -1,50 +1,82 @@
-From: Li Yang <leoli@freescale.com>
-Subject: Re: [PATCH v3 3/4] fsl-dma: change release process of dma descriptor
- for supporting async_tx
-Date: Tue, 17 Jul 2012 11:36:41 +0800
-Message-ID: <CADRPPNS-cOwCTVYnjq==W-f1-AAWctyOFg_6bkSDZPtM8Jf+Lw@mail.gmail.com>
-References: <1342411709-29895-1-git-send-email-qiang.liu@freescale.com>
+From: Liu Qiang-B32616 <B32616@freescale.com>
+Subject: RE: [PATCH v3 0/4] Raid: enable talitos xor offload for improving
+ performance
+Date: Tue, 17 Jul 2012 04:01:57 +0000
+Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C2735@039-SN2MPN1-011.039d.mgd.msft.net>
+References: <1342411636-29770-1-git-send-email-qiang.liu@freescale.com>
+ <20120716200423.830d174e69fc0aafb40d2858@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Ira W. Snyder" <iws@ovro.caltech.edu>,
-	Vinod Koul <vinod.koul@intel.com>,
-	herbert@gondor.hengli.com.au,
-	Dan Williams <dan.j.williams@intel.com>, davem@davemloft.net
-To: Qiang Liu <qiang.liu@freescale.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	Li Yang-R58472 <r58472@freescale.com>,
+	"dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>
+To: Phillips Kim-R1AAHA <R1AAHA@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gg0-f174.google.com ([209.85.161.174]:47783 "EHLO
-	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753112Ab2GQDgm (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Jul 2012 23:36:42 -0400
-Received: by gglu4 with SMTP id u4so5745565ggl.19
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Jul 2012 20:36:41 -0700 (PDT)
-In-Reply-To: <1342411709-29895-1-git-send-email-qiang.liu@freescale.com>
+Received: from co1ehsobe002.messaging.microsoft.com ([216.32.180.185]:27755
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750695Ab2GQECE convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Jul 2012 00:02:04 -0400
+In-Reply-To: <20120716200423.830d174e69fc0aafb40d2858@freescale.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 16, 2012 at 12:08 PM, Qiang Liu <qiang.liu@freescale.com> wrote:
-> Fix the potential risk when enable config NET_DMA and ASYNC_TX.
-> Async_tx is lack of support in current release process of dma descriptor,
-> all descriptors will be released whatever is acked or no-acked by async_tx,
-> so there is a potential race condition when dma engine is uesd by others
-> clients (e.g. when enable NET_DMA to offload TCP).
->
-> In our case, a race condition which is raised when use both of talitos
-> and dmaengine to offload xor is because napi scheduler will sync all
-> pending requests in dma channels, it affects the process of raid operations
-> due to ack_tx is not checked in fsl dma. The no-acked descriptor is freed
-> which is submitted just now, as a dependent tx, this freed descriptor trigger
-> BUG_ON(async_tx_test_ack(depend_tx)) in async_tx_submit().
->
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Vinod Koul <vinod.koul@intel.com>
-> Cc: Li Yang <leoli@freescale.com>
-> Cc: Ira W. Snyder <iws@ovro.caltech.edu>
-> Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
+> -----Original Message-----
+> From: Phillips Kim-R1AAHA
+> Sent: Tuesday, July 17, 2012 9:04 AM
+> To: Liu Qiang-B32616
+> Cc: linux-crypto@vger.kernel.org; linuxppc-dev@lists.ozlabs.org; Li Yang-
+> R58472; dan.j.williams@intel.com; herbert@gondor.hengli.com.au
+> Subject: Re: [PATCH v3 0/4] Raid: enable talitos xor offload for
+> improving performance
+> 
+> On Mon, 16 Jul 2012 12:07:16 +0800
+> Qiang Liu <qiang.liu@freescale.com> wrote:
+> 
+> >  drivers/crypto/Kconfig   |    9 +
+> >  drivers/crypto/talitos.c |  410
+> +++++++++++++++++++++++++++++++++++++++++++
+> >  drivers/crypto/talitos.h |   53 ++++++
+> >  drivers/dma/fsldma.c     |  436 +++++++++++++++++++++++++-------------
+> --------
+> >  drivers/dma/fsldma.h     |    1 +
+> >  5 files changed, 708 insertions(+), 201 deletions(-)
+> 
+> Given the pending talitos patches, this patchseries doesn't apply
+> cleanly:  can you rebase onto [1], which is based on Herbert's
+> cryptodev tree and contain's Horia's four patches?  They didn't get
+> any negative comments, so I assume eventually they will be applied,
+> and doing so will make Herbert's life easier.
+> 
+> I applied the series on Herbert's cryptodev, and while fsldma
+> already had this build warning:
+> 
+> drivers/dma/fsldma.c: In function 'fsl_dma_tx_submit':
+> drivers/dma/fsldma.c:636:2: warning: 'cookie' may be used uninitialized
+> in this function [-Wuninitialized]
+Kim, I will fix it in an another separate patch.
 
-Also separate the function ordering change and real code change into
-different patches when you work on the next patch set.
+> 
+> this patchseries introduces a new one:
+> 
+> drivers/dma/fsldma.c: In function 'dma_do_tasklet':
+> drivers/dma/fsldma.c:1134:16: warning: unused variable 'flags' [-Wunused-
+> variable]
+Sorry, my bad. I will correct it in v4 5/6 (according to Li Yang's comments,
+v3 3/4 should be split up). Thanks.
 
-- Leo
+> 
+> I'll wait for a re-post, after these and Ira's comments are
+> addressed, before trying to test again.
+I agree, I think his comments is very important.
+
+> 
+> Thanks,
+> 
+> Kim
+> 
+> [1] git://git.freescale.com/crypto/cryptodev.git
