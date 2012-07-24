@@ -1,429 +1,739 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH] crypto: aesni_intel - improve lrw and xts performance by
- utilizing parallel AES-NI hardware pipelines
-Date: Sun, 22 Jul 2012 18:18:37 +0300
-Message-ID: <20120722151837.28864.2550.stgit@localhost6.localdomain6>
+From: Alexander Boyko <alexander_boyko@xyratex.com>
+Subject: [PATCH v1] crypto api: add crc32 pclmulqdq implementation and wrappers
+ for table implementation
+Date: Tue, 24 Jul 2012 17:53:14 +0400
+Message-ID: <500EA8CA.6040705@xyratex.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Huang Ying <ying.huang@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:54284 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751006Ab2GVPSl (ORCPT
+Received: from xyratex195.xyratex.com ([194.131.166.195]:43918 "EHLO
+	XY01EX21.xy01.xyratex.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754683Ab2GXOIT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Jul 2012 11:18:41 -0400
+	Tue, 24 Jul 2012 10:08:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use parallel LRW and XTS encryption facilities to better utilize AES-NI
-hardware pipelines and gain extra performance.
+From: Alexander Boyko <alexander_boyko@xyratex.com>
 
-Tcrypt benchmark results (async), old vs new ratios:
+This patch adds crc32 algorithms to shash crypto api. One is wrapper to 
+generic crc32_le function. Second is crc32 pclmulqdq implementation. It 
+use hardware provided PCLMULQDQ instruction to accelerate the CRC32
+disposal. This instruction present from Intel Westmere and AMD Bulldozer 
+CPUs.
 
-Intel Core i5-2450M CPU (fam: 6, model: 42, step: 7)
+kernel 3.5rc7
 
-aes:128bit
-        lrw:256bit      xts:256bit
-size    lrw-enc lrw-dec xts-dec xts-dec
-16B     0.99x   1.00x   1.22x   1.19x
-64B     1.38x   1.50x   1.58x   1.61x
-256B    2.04x   2.02x   2.27x   2.29x
-1024B   2.56x   2.54x   2.89x   2.92x
-8192B   2.85x   2.99x   3.40x   3.23x
-
-aes:192bit
-        lrw:320bit      xts:384bit
-size    lrw-enc lrw-dec xts-dec xts-dec
-16B     1.08x   1.08x   1.16x   1.17x
-64B     1.48x   1.54x   1.59x   1.65x
-256B    2.18x   2.17x   2.29x   2.28x
-1024B   2.67x   2.67x   2.87x   3.05x
-8192B   2.93x   2.84x   3.28x   3.33x
-
-aes:256bit
-        lrw:348bit      xts:512bit
-size    lrw-enc lrw-dec xts-dec xts-dec
-16B     1.07x   1.07x   1.18x   1.19x
-64B     1.56x   1.56x   1.70x   1.71x
-256B    2.22x   2.24x   2.46x   2.46x
-1024B   2.76x   2.77x   3.13x   3.05x
-8192B   2.99x   3.05x   3.40x   3.30x
-
-Cc: Huang Ying <ying.huang@intel.com>
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Signed-off-by: Alexander Boyko <alexander_boyko@xyratex.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c |  253 +++++++++++++++++++++++++++++++-----
- crypto/Kconfig                     |    2 
- 2 files changed, 220 insertions(+), 35 deletions(-)
+  arch/x86/crypto/Makefile            |    3
+  arch/x86/crypto/crc32-pclmul_asm.S  |  246 ++++++++++++++++++++++++++
+  arch/x86/crypto/crc32-pclmul_glue.c |  202 +++++++++++++++++++++
+  crypto/Kconfig                      |   21 ++
+  crypto/Makefile                     |    1
+  crypto/crc32.c                      |  158 ++++++++++++++++
+  6 files changed, 631 insertions(+)
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index e191ac0..5a0c931 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -19,6 +19,7 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += 
+ghash-clmulni-intel.o
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 648347a..7c04d0d 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -28,6 +28,9 @@
- #include <crypto/aes.h>
- #include <crypto/cryptd.h>
- #include <crypto/ctr.h>
-+#include <crypto/b128ops.h>
-+#include <crypto/lrw.h>
-+#include <crypto/xts.h>
- #include <asm/cpu_device_id.h>
- #include <asm/i387.h>
- #include <asm/crypto/aes.h>
-@@ -41,18 +44,10 @@
- #define HAS_CTR
- #endif
- 
--#if defined(CONFIG_CRYPTO_LRW) || defined(CONFIG_CRYPTO_LRW_MODULE)
--#define HAS_LRW
--#endif
--
- #if defined(CONFIG_CRYPTO_PCBC) || defined(CONFIG_CRYPTO_PCBC_MODULE)
- #define HAS_PCBC
- #endif
- 
--#if defined(CONFIG_CRYPTO_XTS) || defined(CONFIG_CRYPTO_XTS_MODULE)
--#define HAS_XTS
--#endif
--
- /* This data is stored at the end of the crypto_tfm struct.
-  * It's a type of per "session" data storage location.
-  * This needs to be 16 byte aligned.
-@@ -79,6 +74,16 @@ struct aesni_hash_subkey_req_data {
- #define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE-1))
- #define RFC4106_HASH_SUBKEY_SIZE 16
- 
-+struct aesni_lrw_ctx {
-+	struct lrw_table_ctx lrw_table;
-+	u8 raw_aes_ctx[sizeof(struct crypto_aes_ctx) + AESNI_ALIGN - 1];
-+};
+  obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+  obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
++obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
+
+  aes-i586-y := aes-i586-asm_32.o aes_glue.o
+  twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
+@@ -37,6 +38,8 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o 
+fpu.o
+
+  ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o 
+ghash-clmulni-intel_glue.o
+
++crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
 +
-+struct aesni_xts_ctx {
-+	u8 raw_tweak_ctx[sizeof(struct crypto_aes_ctx) + AESNI_ALIGN - 1];
-+	u8 raw_crypt_ctx[sizeof(struct crypto_aes_ctx) + AESNI_ALIGN - 1];
-+};
+  # enable AVX support only when $(AS) can actually assemble the 
+instructions
+  ifeq ($(call as-instr,vpxor %xmm0$(comma)%xmm1$(comma)%xmm2,yes,no),yes)
+  AFLAGS_sha1_ssse3_asm.o += -DSHA1_ENABLE_AVX_SUPPORT
+diff --git a/arch/x86/crypto/crc32-pclmul_asm.S 
+b/arch/x86/crypto/crc32-pclmul_asm.S
+new file mode 100644
+index 0000000..c833501
+--- /dev/null
++++ b/arch/x86/crypto/crc32-pclmul_asm.S
+@@ -0,0 +1,246 @@
++/* GPL HEADER START
++ *
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 only,
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License version 2 for more details (a copy is included
++ * in the LICENSE file that accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License
++ * version 2 along with this program; If not, see 
+http://www.gnu.org/licenses
++ *
++ * Please  visit http://www.xyratex.com/contact if you need additional
++ * information or have any questions.
++ *
++ * GPL HEADER END
++ */
 +
- asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 			     unsigned int key_len);
- asmlinkage void aesni_enc(struct crypto_aes_ctx *ctx, u8 *out,
-@@ -398,13 +403,6 @@ static int ablk_rfc3686_ctr_init(struct crypto_tfm *tfm)
- #endif
- #endif
- 
--#ifdef HAS_LRW
--static int ablk_lrw_init(struct crypto_tfm *tfm)
--{
--	return ablk_init_common(tfm, "fpu(lrw(__driver-aes-aesni))");
--}
--#endif
--
- #ifdef HAS_PCBC
- static int ablk_pcbc_init(struct crypto_tfm *tfm)
- {
-@@ -412,12 +410,160 @@ static int ablk_pcbc_init(struct crypto_tfm *tfm)
- }
- #endif
- 
--#ifdef HAS_XTS
--static int ablk_xts_init(struct crypto_tfm *tfm)
-+static void lrw_xts_encrypt_callback(void *ctx, u8 *blks, unsigned int nbytes)
- {
--	return ablk_init_common(tfm, "fpu(xts(__driver-aes-aesni))");
-+	aesni_ecb_enc(ctx, blks, blks, nbytes);
-+}
++/*
++ * Copyright 2012 Xyratex Technology Limited
++ *
++ * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
++ * calculation.
++ * CRC32 polynomial:0x04c11db7(BE)/0xEDB88320(LE)
++ * PCLMULQDQ is a new instruction in Intel SSE4.2, the reference can be 
+found
++ * at:
++ * http://www.intel.com/products/processor/manuals/
++ * Intel(R) 64 and IA-32 Architectures Software Developer's Manual
++ * Volume 2B: Instruction Set Reference, N-Z
++ *
++ * Authors:   Gregory Prestas <Gregory_Prestas@us.xyratex.com>
++ *	      Alexander Boyko <Alexander_Boyko@xyratex.com>
++ */
 +
-+static void lrw_xts_decrypt_callback(void *ctx, u8 *blks, unsigned int nbytes)
++#include <linux/linkage.h>
++#include <asm/inst.h>
++
++
++.align 16
++/*
++ * [x4*128+32 mod P(x) << 32)]'  << 1   = 0x154442bd4
++ * #define CONSTANT_R1  0x154442bd4LL
++ *
++ * [(x4*128-32 mod P(x) << 32)]' << 1   = 0x1c6e41596
++ * #define CONSTANT_R2  0x1c6e41596LL
++ */
++.Lconstant_R2R1:
++	.octa 0x00000001c6e415960000000154442bd4
++/*
++ * [(x128+32 mod P(x) << 32)]'   << 1   = 0x1751997d0
++ * #define CONSTANT_R3  0x1751997d0LL
++ *
++ * [(x128-32 mod P(x) << 32)]'   << 1   = 0x0ccaa009e
++ * #define CONSTANT_R4  0x0ccaa009eLL
++ */
++.Lconstant_R4R3:
++	.octa 0x00000000ccaa009e00000001751997d0
++/*
++ * [(x64 mod P(x) << 32)]'       << 1   = 0x163cd6124
++ * #define CONSTANT_R5  0x163cd6124LL
++ */
++.Lconstant_R5:
++	.octa 0x00000000000000000000000163cd6124
++.Lconstant_mask32:
++	.octa 0x000000000000000000000000FFFFFFFF
++/*
++ * #define CRCPOLY_TRUE_LE_FULL 0x1DB710641LL
++ *
++ * Barrett Reduction constant (u64`) = u` = (x**64 / P(x))` = 0x1F7011641LL
++ * #define CONSTANT_RU  0x1F7011641LL
++ */
++.Lconstant_RUpoly:
++	.octa 0x00000001F701164100000001DB710641
++
++#define CONSTANT %xmm0
++
++#ifdef __x86_64__
++#define BUF     %rdi
++#define LEN     %rsi
++#define CRC     %edx
++#else
++#define BUF     %eax
++#define LEN     %edx
++#define CRC     %ecx
++#endif
++
++
++
++.text
++/**
++ *      Calculate crc32
++ *      BUF - buffer (16 bytes aligned)
++ *      LEN - sizeof buffer (16 bytes aligned), LEN should be grater 
+than 63
++ *      CRC - initial crc32
++ *      return %eax crc32
++ *      uint crc32_pclmul_le_16(unsigned char const *buffer,
++ *	                     size_t len, uint crc32)
++ */
++.globl crc32_pclmul_le_16
++.align 4, 0x90
++crc32_pclmul_le_16:/* buffer and buffer size are 16 bytes aligned */
++	movdqa  (BUF), %xmm1
++	movdqa  0x10(BUF), %xmm2
++	movdqa  0x20(BUF), %xmm3
++	movdqa  0x30(BUF), %xmm4
++	movd    CRC, CONSTANT
++	pxor    CONSTANT, %xmm1
++	sub     $0x40, LEN
++	add     $0x40, BUF
++#ifndef __x86_64__
++	/* This is for position independent code(-fPIC) support for 32bit */
++	call    delta
++delta:
++	pop     %ecx
++#endif
++	cmp     $0x40, LEN
++	jb      less_64
++
++#ifdef __x86_64__
++	movdqa .Lconstant_R2R1(%rip), CONSTANT
++#else
++	movdqa .Lconstant_R2R1 - delta(%ecx), CONSTANT
++#endif
++
++loop_64:/*  64 bytes Full cache line folding */
++	prefetchnta    0x40(BUF)
++	movdqa  %xmm1, %xmm5
++	movdqa  %xmm2, %xmm6
++	movdqa  %xmm3, %xmm7
++#ifdef __x86_64__
++	movdqa  %xmm4, %xmm8
++#endif
++	PCLMULQDQ 00, CONSTANT, %xmm1
++	PCLMULQDQ 00, CONSTANT, %xmm2
++	PCLMULQDQ 00, CONSTANT, %xmm3
++#ifdef __x86_64__
++	PCLMULQDQ 00, CONSTANT, %xmm4
++#endif
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	PCLMULQDQ 0x11, CONSTANT, %xmm6
++	PCLMULQDQ 0x11, CONSTANT, %xmm7
++#ifdef __x86_64__
++	PCLMULQDQ 0x11, CONSTANT, %xmm8
++#endif
++	pxor    %xmm5, %xmm1
++	pxor    %xmm6, %xmm2
++	pxor    %xmm7, %xmm3
++#ifdef __x86_64__
++	pxor    %xmm8, %xmm4
++#else
++	/* xmm8 unsupported for x32 */
++	movdqa  %xmm4, %xmm5
++	PCLMULQDQ 00, CONSTANT, %xmm4
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	pxor    %xmm5, %xmm4
++#endif
++
++	pxor    (BUF), %xmm1
++	pxor    0x10(BUF), %xmm2
++	pxor    0x20(BUF), %xmm3
++	pxor    0x30(BUF), %xmm4
++
++	sub     $0x40, LEN
++	add     $0x40, BUF
++	cmp     $0x40, LEN
++	jge     loop_64
++less_64:/*  Folding cache line into 128bit */
++#ifdef __x86_64__
++	movdqa  .Lconstant_R4R3(%rip), CONSTANT
++#else
++	movdqa  .Lconstant_R4R3 - delta(%ecx), CONSTANT
++#endif
++	prefetchnta     (BUF)
++
++	movdqa  %xmm1, %xmm5
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	pxor    %xmm5, %xmm1
++	pxor    %xmm2, %xmm1
++
++	movdqa  %xmm1, %xmm5
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	pxor    %xmm5, %xmm1
++	pxor    %xmm3, %xmm1
++
++	movdqa  %xmm1, %xmm5
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	pxor    %xmm5, %xmm1
++	pxor    %xmm4, %xmm1
++
++	cmp     $0x10, LEN
++	jb      fold_64
++loop_16:/* Folding rest buffer into 128bit */
++	movdqa  %xmm1, %xmm5
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	PCLMULQDQ 0x11, CONSTANT, %xmm5
++	pxor    %xmm5, %xmm1
++	pxor    (BUF), %xmm1
++	sub     $0x10, LEN
++	add     $0x10, BUF
++	cmp     $0x10, LEN
++	jge     loop_16
++
++fold_64:
++	/* perform the last 64 bit fold, also adds 32 zeroes
++	 * to the input stream */
++	PCLMULQDQ 0x01, %xmm1, CONSTANT /* R4 * xmm1.low */
++	psrldq  $0x08, %xmm1
++	pxor    CONSTANT, %xmm1
++
++	/* final 32-bit fold */
++	movdqa  %xmm1, %xmm2
++#ifdef __x86_64__
++	movdqa  .Lconstant_R5(%rip), CONSTANT
++	movdqa  .Lconstant_mask32(%rip), %xmm3
++#else
++	movdqa  .Lconstant_R5 - delta(%ecx), CONSTANT
++	movdqa  .Lconstant_mask32 - delta(%ecx), %xmm3
++#endif
++	psrldq  $0x04, %xmm2
++	pand    %xmm3, %xmm1
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	pxor    %xmm2, %xmm1
++
++	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
++#ifdef __x86_64__
++	movdqa  .Lconstant_RUpoly(%rip), CONSTANT
++#else
++	movdqa  .Lconstant_RUpoly - delta(%ecx), CONSTANT
++#endif
++	movdqa  %xmm1, %xmm2
++	pand    %xmm3, %xmm1
++	PCLMULQDQ 0x10, CONSTANT, %xmm1
++	pand    %xmm3, %xmm1
++	PCLMULQDQ 0x00, CONSTANT, %xmm1
++	pxor    %xmm2, %xmm1
++	pextrd  $0x01, %xmm1, %eax
++
++	ret
+diff --git a/arch/x86/crypto/crc32-pclmul_glue.c 
+b/arch/x86/crypto/crc32-pclmul_glue.c
+new file mode 100644
+index 0000000..0c7647e
+--- /dev/null
++++ b/arch/x86/crypto/crc32-pclmul_glue.c
+@@ -0,0 +1,202 @@
++/* GPL HEADER START
++ *
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 only,
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License version 2 for more details (a copy is included
++ * in the LICENSE file that accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License
++ * version 2 along with this program; If not, see 
+http://www.gnu.org/licenses
++ *
++ * Please  visit http://www.xyratex.com/contact if you need additional
++ * information or have any questions.
++ *
++ * GPL HEADER END
++ */
++
++/*
++ * Copyright 2012 Xyratex Technology Limited
++ *
++ * Wrappers for kernel crypto shash api to pclmulqdq crc32 imlementation.
++ */
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/string.h>
++#include <linux/kernel.h>
++#include <linux/crc32.h>
++#include <crypto/internal/hash.h>
++
++#include <asm/cpufeature.h>
++#include <asm/cpu_device_id.h>
++#include <asm/i387.h>
++
++#define CHKSUM_BLOCK_SIZE	1
++#define CHKSUM_DIGEST_SIZE	4
++
++#define PCLMUL_MIN_LEN		64L     /* minimum size of buffer
++					 * for crc32_pclmul_le_16 */
++#define SCALE_F			16L	/* size of xmm register */
++#define SCALE_F_MASK		(SCALE_F - 1)
++
++asmlinkage u32 crc32_pclmul_le_16(unsigned char const *buffer, size_t len,
++				  u32 crc32);
++
++static u32 __attribute__((pure))
++	crc32_pclmul_le(u32 crc, unsigned char const *p, size_t len)
 +{
-+	aesni_ecb_dec(ctx, blks, blks, nbytes);
-+}
++	unsigned int iquotient;
++	unsigned int iremainder;
++	unsigned int prealign;
 +
-+static int lrw_aesni_setkey(struct crypto_tfm *tfm, const u8 *key,
-+			    unsigned int keylen)
-+{
-+	struct aesni_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
-+	int err;
++	if (len < PCLMUL_MIN_LEN + SCALE_F_MASK)
++		return crc32_le(crc, p, len);
 +
-+	err = aes_set_key_common(tfm, ctx->raw_aes_ctx, key,
-+				 keylen - AES_BLOCK_SIZE);
-+	if (err)
-+		return err;
++	if ((long)p & SCALE_F_MASK) {
++		/* align p to 16 byte */
++		prealign = SCALE_F - ((long)p & SCALE_F_MASK);
 +
-+	return lrw_init_table(&ctx->lrw_table, key + keylen - AES_BLOCK_SIZE);
-+}
-+
-+static void lrw_aesni_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct aesni_lrw_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	lrw_free_table(&ctx->lrw_table);
-+}
-+
-+static int lrw_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
-+{
-+	struct aesni_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[8];
-+	struct lrw_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
-+
-+		.table_ctx = &ctx->lrw_table,
-+		.crypt_ctx = aes_ctx(ctx->raw_aes_ctx),
-+		.crypt_fn = lrw_xts_encrypt_callback,
-+	};
-+	int ret;
-+
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++		crc = crc32_le(crc, p, prealign);
++		len -= prealign;
++		p = (unsigned char *)(((unsigned long)p + SCALE_F_MASK) &
++				     ~SCALE_F_MASK);
++	}
++	iquotient = len & (~SCALE_F_MASK);
++	iremainder = len & SCALE_F_MASK;
 +
 +	kernel_fpu_begin();
-+	ret = lrw_crypt(desc, dst, src, nbytes, &req);
++	crc = crc32_pclmul_le_16(p, iquotient, crc);
 +	kernel_fpu_end();
 +
-+	return ret;
++	if (iremainder)
++		crc = crc32_le(crc, p + iquotient, iremainder);
++
++	return crc;
 +}
 +
-+static int lrw_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
++static int crc32_pclmul_cra_init(struct crypto_tfm *tfm)
 +{
-+	struct aesni_lrw_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[8];
-+	struct lrw_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
++	u32 *key = crypto_tfm_ctx(tfm);
 +
-+		.table_ctx = &ctx->lrw_table,
-+		.crypt_ctx = aes_ctx(ctx->raw_aes_ctx),
-+		.crypt_fn = lrw_xts_decrypt_callback,
-+	};
-+	int ret;
++	*key = 0;
 +
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	kernel_fpu_begin();
-+	ret = lrw_crypt(desc, dst, src, nbytes, &req);
-+	kernel_fpu_end();
-+
-+	return ret;
++	return 0;
 +}
 +
-+static int xts_aesni_setkey(struct crypto_tfm *tfm, const u8 *key,
-+			    unsigned int keylen)
++static int crc32_pclmul_setkey(struct crypto_shash *hash, const u8 *key,
++			unsigned int keylen)
 +{
-+	struct aesni_xts_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 *flags = &tfm->crt_flags;
-+	int err;
++	u32 *mctx = crypto_shash_ctx(hash);
 +
-+	/* key consists of keys of equal size concatenated, therefore
-+	 * the length must be even
-+	 */
-+	if (keylen % 2) {
-+		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++	if (keylen != sizeof(u32)) {
++		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
 +		return -EINVAL;
 +	}
-+
-+	/* first half of xts-key is for crypt */
-+	err = aes_set_key_common(tfm, ctx->raw_crypt_ctx, key, keylen / 2);
-+	if (err)
-+		return err;
-+
-+	/* second half of xts-key is for tweak */
-+	return aes_set_key_common(tfm, ctx->raw_tweak_ctx, key + keylen / 2,
-+				  keylen / 2);
++	*mctx = le32_to_cpup((__le32 *)key);
++	return 0;
 +}
 +
-+
-+static int xts_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
++static int crc32_pclmul_init(struct shash_desc *desc)
 +{
-+	struct aesni_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[8];
-+	struct xts_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
++	u32 *mctx = crypto_shash_ctx(desc->tfm);
++	u32 *crcp = shash_desc_ctx(desc);
 +
-+		.tweak_ctx = aes_ctx(ctx->raw_tweak_ctx),
-+		.tweak_fn = XTS_TWEAK_CAST(aesni_enc),
-+		.crypt_ctx = aes_ctx(ctx->raw_crypt_ctx),
-+		.crypt_fn = lrw_xts_encrypt_callback,
-+	};
-+	int ret;
++	*crcp = *mctx;
 +
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	kernel_fpu_begin();
-+	ret = xts_crypt(desc, dst, src, nbytes, &req);
-+	kernel_fpu_end();
-+
-+	return ret;
++	return 0;
 +}
 +
-+static int xts_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
-+		       struct scatterlist *src, unsigned int nbytes)
++static int crc32_pclmul_update(struct shash_desc *desc, const u8 *data,
++			       unsigned int len)
 +{
-+	struct aesni_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	be128 buf[8];
-+	struct xts_crypt_req req = {
-+		.tbuf = buf,
-+		.tbuflen = sizeof(buf),
++	u32 *crcp = shash_desc_ctx(desc);
 +
-+		.tweak_ctx = aes_ctx(ctx->raw_tweak_ctx),
-+		.tweak_fn = XTS_TWEAK_CAST(aesni_enc),
-+		.crypt_ctx = aes_ctx(ctx->raw_crypt_ctx),
-+		.crypt_fn = lrw_xts_decrypt_callback,
-+	};
-+	int ret;
++	*crcp = crc32_pclmul_le(*crcp, data, len);
++	return 0;
++}
 +
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++/* No final XOR 0xFFFFFFFF, like crc32_le */
++static int __crc32_pclmul_finup(u32 *crcp, const u8 *data, unsigned int 
+len,
++				u8 *out)
++{
++	*(__le32 *)out = cpu_to_le32(crc32_pclmul_le(*crcp, data, len));
++	return 0;
++}
 +
-+	kernel_fpu_begin();
-+	ret = xts_crypt(desc, dst, src, nbytes, &req);
-+	kernel_fpu_end();
++static int crc32_pclmul_finup(struct shash_desc *desc, const u8 *data,
++			      unsigned int len, u8 *out)
++{
++	return __crc32_pclmul_finup(shash_desc_ctx(desc), data, len, out);
++}
 +
-+	return ret;
- }
--#endif
- 
- #ifdef CONFIG_X86_64
- static int rfc4106_init(struct crypto_tfm *tfm)
-@@ -1035,10 +1181,10 @@ static struct crypto_alg aesni_algs[] = { {
- 	},
- #endif
- #endif
--#ifdef HAS_LRW
-+#ifdef HAS_PCBC
- }, {
--	.cra_name		= "lrw(aes)",
--	.cra_driver_name	= "lrw-aes-aesni",
-+	.cra_name		= "pcbc(aes)",
-+	.cra_driver_name	= "pcbc-aes-aesni",
- 	.cra_priority		= 400,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
-@@ -1046,12 +1192,12 @@ static struct crypto_alg aesni_algs[] = { {
- 	.cra_alignmask		= 0,
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_lrw_init,
-+	.cra_init		= ablk_pcbc_init,
- 	.cra_exit		= ablk_exit,
- 	.cra_u = {
- 		.ablkcipher = {
--			.min_keysize	= AES_MIN_KEY_SIZE + AES_BLOCK_SIZE,
--			.max_keysize	= AES_MAX_KEY_SIZE + AES_BLOCK_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
- 			.ivsize		= AES_BLOCK_SIZE,
- 			.setkey		= ablk_set_key,
- 			.encrypt	= ablk_encrypt,
-@@ -1059,10 +1205,50 @@ static struct crypto_alg aesni_algs[] = { {
- 		},
- 	},
- #endif
--#ifdef HAS_PCBC
- }, {
--	.cra_name		= "pcbc(aes)",
--	.cra_driver_name	= "pcbc-aes-aesni",
-+	.cra_name		= "__lrw-aes-aesni",
-+	.cra_driver_name	= "__driver-lrw-aes-aesni",
-+	.cra_priority		= 0,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct aesni_lrw_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_exit		= lrw_aesni_exit_tfm,
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE + AES_BLOCK_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE + AES_BLOCK_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= lrw_aesni_setkey,
-+			.encrypt	= lrw_encrypt,
-+			.decrypt	= lrw_decrypt,
-+		},
-+	},
-+}, {
-+	.cra_name		= "__xts-aes-aesni",
-+	.cra_driver_name	= "__driver-xts-aes-aesni",
-+	.cra_priority		= 0,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct aesni_xts_ctx),
-+	.cra_alignmask		= 0,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-+			.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= xts_aesni_setkey,
-+			.encrypt	= xts_encrypt,
-+			.decrypt	= xts_decrypt,
-+		},
-+	},
-+}, {
-+	.cra_name		= "lrw(aes)",
-+	.cra_driver_name	= "lrw-aes-aesni",
- 	.cra_priority		= 400,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
-@@ -1070,20 +1256,18 @@ static struct crypto_alg aesni_algs[] = { {
- 	.cra_alignmask		= 0,
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_pcbc_init,
-+	.cra_init		= ablk_init,
- 	.cra_exit		= ablk_exit,
- 	.cra_u = {
- 		.ablkcipher = {
--			.min_keysize	= AES_MIN_KEY_SIZE,
--			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE + AES_BLOCK_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE + AES_BLOCK_SIZE,
- 			.ivsize		= AES_BLOCK_SIZE,
- 			.setkey		= ablk_set_key,
- 			.encrypt	= ablk_encrypt,
- 			.decrypt	= ablk_decrypt,
- 		},
- 	},
--#endif
--#ifdef HAS_XTS
- }, {
- 	.cra_name		= "xts(aes)",
- 	.cra_driver_name	= "xts-aes-aesni",
-@@ -1094,7 +1278,7 @@ static struct crypto_alg aesni_algs[] = { {
- 	.cra_alignmask		= 0,
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
--	.cra_init		= ablk_xts_init,
-+	.cra_init		= ablk_init,
- 	.cra_exit		= ablk_exit,
- 	.cra_u = {
- 		.ablkcipher = {
-@@ -1106,7 +1290,6 @@ static struct crypto_alg aesni_algs[] = { {
- 			.decrypt	= ablk_decrypt,
- 		},
- 	},
--#endif
- } };
- 
- 
++static int crc32_pclmul_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*(__le32 *)out = cpu_to_le32p(crcp);
++	return 0;
++}
++
++static int crc32_pclmul_digest(struct shash_desc *desc, const u8 *data,
++			       unsigned int len, u8 *out)
++{
++	return __crc32_pclmul_finup(crypto_shash_ctx(desc->tfm), data, len,
++				    out);
++}
++
++static struct shash_alg alg = {
++	.setkey		= crc32_pclmul_setkey,
++	.init		= crc32_pclmul_init,
++	.update		= crc32_pclmul_update,
++	.final		= crc32_pclmul_final,
++	.finup		= crc32_pclmul_finup,
++	.digest		= crc32_pclmul_digest,
++	.descsize	= sizeof(u32),
++	.digestsize	= CHKSUM_DIGEST_SIZE,
++	.base		= {
++			.cra_name		= "crc32",
++			.cra_driver_name	= "crc32-pclmul",
++			.cra_priority		= 200,
++			.cra_blocksize		= CHKSUM_BLOCK_SIZE,
++			.cra_ctxsize		= sizeof(u32),
++			.cra_module		= THIS_MODULE,
++			.cra_init		= crc32_pclmul_cra_init,
++	}
++};
++
++static const struct x86_cpu_id crc32pclmul_cpu_id[] = {
++	X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, crc32pclmul_cpu_id);
++
++
++static int __init crc32_pclmul_mod_init(void)
++{
++
++	if (!x86_match_cpu(crc32pclmul_cpu_id)) {
++		pr_info("PCLMULQDQ-NI instructions are not detected.\n");
++		return -ENODEV;
++	}
++	return crypto_register_shash(&alg);
++}
++
++static void __exit crc32_pclmul_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(crc32_pclmul_mod_init);
++module_exit(crc32_pclmul_mod_fini);
++
++MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
++MODULE_LICENSE("GPL");
++
++MODULE_ALIAS("crc32");
++MODULE_ALIAS("crc32-pclmul");
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index a323805..e376d70 100644
+index 8e84225..744eae8 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -564,6 +564,8 @@ config CRYPTO_AES_NI_INTEL
- 	select CRYPTO_CRYPTD
- 	select CRYPTO_ABLK_HELPER_X86
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_LRW
-+	select CRYPTO_XTS
- 	help
- 	  Use Intel AES-NI instructions for AES algorithm.
- 
+@@ -326,6 +326,27 @@ config CRYPTO_CRC32C_INTEL
+  	  gain performance compared with software implementation.
+  	  Module will be crc32c-intel.
+
++config CRYPTO_CRC32
++	tristate "CRC32 CRC algorithm"
++	select CRYPTO_HASH
++	select CRC32
++	help
++	  CRC-32-IEEE 802.3 cyclic redundancy-check algorithm.
++	  Shash crypto api wrappers to crc32_le function.
++
++config CRYPTO_CRC32_PCLMUL
++	tristate "CRC32 PCLMULQDQ hardware acceleration"
++	depends on X86
++	select CRYPTO_HASH
++	select CRC32
++	help
++	  From Intel Westmere and AMD Bulldozer processor with SSE4.2
++	  and PCLMULQDQ supported, the processor will support
++	  CRC32 PCLMULQDQ implementation using hardware accelerated PCLMULQDQ
++	  instruction. This option will create 'crc32-plcmul' module,
++	  which will enable any routine to use the CRC-32-IEEE 802.3 checksum
++	  and gain better performance as compared with the table implementation.
++
+  config CRYPTO_GHASH
+  	tristate "GHASH digest algorithm"
+  	select CRYPTO_GF128MUL
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 30f33d6..5c44998 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -80,6 +80,7 @@ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+  obj-$(CONFIG_CRYPTO_ZLIB) += zlib.o
+  obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+  obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
++obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
+  obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+  obj-$(CONFIG_CRYPTO_LZO) += lzo.o
+  obj-$(CONFIG_CRYPTO_RNG2) += rng.o
+diff --git a/crypto/crc32.c b/crypto/crc32.c
+new file mode 100644
+index 0000000..9d1c415
+--- /dev/null
++++ b/crypto/crc32.c
+@@ -0,0 +1,158 @@
++/* GPL HEADER START
++ *
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 only,
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License version 2 for more details (a copy is included
++ * in the LICENSE file that accompanied this code).
++ *
++ * You should have received a copy of the GNU General Public License
++ * version 2 along with this program; If not, see 
+http://www.gnu.org/licenses
++ *
++ * Please  visit http://www.xyratex.com/contact if you need additional
++ * information or have any questions.
++ *
++ * GPL HEADER END
++ */
++
++/*
++ * Copyright 2012 Xyratex Technology Limited
++ */
++
++/*
++ * This is crypto api shash wrappers to crc32_le.
++ */
++
++#include <linux/crc32.h>
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/string.h>
++#include <linux/kernel.h>
++
++#define CHKSUM_BLOCK_SIZE	1
++#define CHKSUM_DIGEST_SIZE	4
++
++static u32 __crc32_le(u32 crc, unsigned char const *p, size_t len)
++{
++	return crc32_le(crc, p, len);
++}
++
++/** No default init with ~0 */
++static int crc32_cra_init(struct crypto_tfm *tfm)
++{
++	u32 *key = crypto_tfm_ctx(tfm);
++
++	*key = 0;
++
++	return 0;
++}
++
++
++/*
++ * Setting the seed allows arbitrary accumulators and flexible XOR policy
++ * If your algorithm starts with ~0, then XOR with ~0 before you set
++ * the seed.
++ */
++static int crc32_setkey(struct crypto_shash *hash, const u8 *key,
++			unsigned int keylen)
++{
++	u32 *mctx = crypto_shash_ctx(hash);
++
++	if (keylen != sizeof(u32)) {
++		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++	*mctx = le32_to_cpup((__le32 *)key);
++	return 0;
++}
++
++static int crc32_init(struct shash_desc *desc)
++{
++	u32 *mctx = crypto_shash_ctx(desc->tfm);
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*crcp = *mctx;
++
++	return 0;
++}
++
++static int crc32_update(struct shash_desc *desc, const u8 *data,
++			unsigned int len)
++{
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*crcp = __crc32_le(*crcp, data, len);
++	return 0;
++}
++
++/* No final XOR 0xFFFFFFFF, like crc32_le */
++static int __crc32_finup(u32 *crcp, const u8 *data, unsigned int len,
++			 u8 *out)
++{
++	*(__le32 *)out = cpu_to_le32(__crc32_le(*crcp, data, len));
++	return 0;
++}
++
++static int crc32_finup(struct shash_desc *desc, const u8 *data,
++		       unsigned int len, u8 *out)
++{
++	return __crc32_finup(shash_desc_ctx(desc), data, len, out);
++}
++
++static int crc32_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*(__le32 *)out = cpu_to_le32p(crcp);
++	return 0;
++}
++
++static int crc32_digest(struct shash_desc *desc, const u8 *data,
++			unsigned int len, u8 *out)
++{
++	return __crc32_finup(crypto_shash_ctx(desc->tfm), data, len,
++			     out);
++}
++static struct shash_alg alg = {
++	.setkey		= crc32_setkey,
++	.init		= crc32_init,
++	.update		= crc32_update,
++	.final		= crc32_final,
++	.finup		= crc32_finup,
++	.digest		= crc32_digest,
++	.descsize	= sizeof(u32),
++	.digestsize	= CHKSUM_DIGEST_SIZE,
++	.base		= {
++		.cra_name		= "crc32",
++		.cra_driver_name	= "crc32-table",
++		.cra_priority		= 100,
++		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
++		.cra_ctxsize		= sizeof(u32),
++		.cra_module		= THIS_MODULE,
++		.cra_init		= crc32_cra_init,
++	}
++};
++
++static int __init crc32_mod_init(void)
++{
++	return crypto_register_shash(&alg);
++}
++
++static void __exit crc32_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(crc32_mod_init);
++module_exit(crc32_mod_fini);
++
++MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
++MODULE_DESCRIPTION("CRC32 calculations wrapper for lib/crc32");
++MODULE_LICENSE("GPL");
+--
