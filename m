@@ -1,72 +1,36 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH v1] crypto api: add crc32 pclmulqdq implementation and
- wrappers for table implementation
-Date: Tue, 24 Jul 2012 23:40:07 +0300
-Message-ID: <20120724234007.50311b69zskfiecg@www.81.fi>
-References: <500EA8CA.6040705@xyratex.com>
+From: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
+Subject: iproute2 - IPsec ESN support
+Date: Wed, 25 Jul 2012 06:14:52 +0000
+Message-ID: <FD18E5D573A8AB48A365D4D78185DE992602BD@039-SN1MPN1-001.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Alexander Boyko <alexander_boyko@xyratex.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: Stephen Hemminger <shemminger@vyatta.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:55627 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755637Ab2GXUkK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Jul 2012 16:40:10 -0400
-In-Reply-To: <500EA8CA.6040705@xyratex.com>
-Content-Disposition: inline
+Received: from va3ehsobe004.messaging.microsoft.com ([216.32.180.14]:2212 "EHLO
+	va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750792Ab2GYGO5 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Jul 2012 02:14:57 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Alexander Boyko <alexander_boyko@xyratex.com>:
+Hello,
 
-> From: Alexander Boyko <alexander_boyko@xyratex.com>
->
-> This patch adds crc32 algorithms to shash crypto api. One is wrapper  
-> to generic crc32_le function. Second is crc32 pclmulqdq  
-> implementation. It use hardware provided PCLMULQDQ instruction to  
-> accelerate the CRC32
-> disposal. This instruction present from Intel Westmere and AMD  
-> Bulldozer CPUs.
->
-> kernel 3.5rc7
->
-> Signed-off-by: Alexander Boyko <alexander_boyko@xyratex.com>
+Is there any way to create an IPsec tunnel and indicate using
+extended sequnce numbers?
 
-<snip>
+It seems that currently iproute2 doesn't support this.
+Grepping for "esn" reveals that XFRM_STATE_ESN shows only in kernel headers.
 
-> +static u32 __attribute__((pure))
-> +	crc32_pclmul_le(u32 crc, unsigned char const *p, size_t len)
-> +{
-> +	unsigned int iquotient;
-> +	unsigned int iremainder;
-> +	unsigned int prealign;
-> +
-> +	if (len < PCLMUL_MIN_LEN + SCALE_F_MASK)
-> +		return crc32_le(crc, p, len);
-> +
-> +	if ((long)p & SCALE_F_MASK) {
-> +		/* align p to 16 byte */
-> +		prealign = SCALE_F - ((long)p & SCALE_F_MASK);
-> +
-> +		crc = crc32_le(crc, p, prealign);
-> +		len -= prealign;
-> +		p = (unsigned char *)(((unsigned long)p + SCALE_F_MASK) &
-> +				     ~SCALE_F_MASK);
-> +	}
-> +	iquotient = len & (~SCALE_F_MASK);
-> +	iremainder = len & SCALE_F_MASK;
-> +
-> +	kernel_fpu_begin();
-> +	crc = crc32_pclmul_le_16(p, iquotient, crc);
-> +	kernel_fpu_end();
+The only relevant thing I found was a RFC sent by Steffen (Cc-ed),
+but it was never applied (don't know why):
+[RFC] iproute2: Add IPsec extended sequence number support
+http://patchwork.ozlabs.org/patch/85962/
 
-You need to check if FPU is available to kernel with irq_fpu_usable()  
-before kernel_fpu_begin()/kernel_fpu_end() block.
-
--Jussi
+Thank you,
+Horia
