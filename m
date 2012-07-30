@@ -1,121 +1,57 @@
-From: Liu Qiang-B32616 <B32616@freescale.com>
-Subject: RE: [PATCH v4 0/7] Raid: enable talitos xor offload for improving
- performance
-Date: Mon, 30 Jul 2012 02:06:10 +0000
-Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C569F@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <1343380531-11953-1-git-send-email-qiang.liu@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: Tree for July 2 (crypto/hifn_795x)
+Date: Mon, 30 Jul 2012 15:49:18 +0800
+Message-ID: <20120730074918.GA5515@gondor.apana.org.au>
+References: <20120702172334.2618cae84cc57b4ec5a63ed7@canb.auug.org.au>
+ <4FF1CBF2.8060303@xenotime.net>
+ <20120709205441.11422bntesq3cdno@www.81.fi>
+ <4FFB4FC6.7020509@xenotime.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Li Yang-R58472 <r58472@freescale.com>,
- Phillips Kim-R1AAHA <R1AAHA@freescale.com>
-To: Liu Qiang-B32616 <B32616@freescale.com>, "linux-crypto@vger.kernel.org"
- <linux-crypto@vger.kernel.org>, "vinod.koul@intel.com"
- <vinod.koul@intel.com>, "dan.j.williams@intel.com"
- <dan.j.williams@intel.com>, "herbert@gondor.hengli.com.au"
- <herbert@gondor.hengli.com.au>, "linuxppc-dev@lists.ozlabs.org"
- <linuxppc-dev@lists.ozlabs.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1343380531-11953-1-git-send-email-qiang.liu@freescale.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sting.hengli.com.au ([178.18.18.71]:45626 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751108Ab2G3Ht3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Jul 2012 03:49:29 -0400
+Content-Disposition: inline
+In-Reply-To: <4FFB4FC6.7020509@xenotime.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Mon, Jul 09, 2012 at 09:40:22PM +0000, Randy Dunlap wrote:
+> On 07/09/2012 10:54 AM, Jussi Kivilinna wrote:
+> 
+> > Quoting Randy Dunlap <rdunlap@xenotime.net>:
+> > 
+> >> On 07/02/2012 12:23 AM, Stephen Rothwell wrote:
+> >>
+> >>> Hi all,
+> >>>
+> >>> Changes since 20120629:
+> >>>
+> >>
+> >>
+> >> on i386:
+> >>
+> >>
+> >> ERROR: "__divdi3" [drivers/crypto/hifn_795x.ko] undefined!
+> >>
+> > 
+> > This is caused by commit feb7b7ab928afa97a79a9c424e4e0691f49d63be. hifn_795x has "DIV_ROUND_UP(NSEC_PER_SEC, dev->pk_clk_freq)", which should be changed to DIV_ROUND_UP_ULL now that NSEC_PER_SEC is 64bit on 32bit archs. Patch to fix hifn_795x is attached (only compile tested).
+> 
+> 
+> 
+> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
 
-Vinod, Dan, ping?
-
-
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
-> owner@vger.kernel.org] On Behalf Of qiang.liu@freescale.com
-> Sent: Friday, July 27, 2012 5:16 PM
-> To: linux-crypto@vger.kernel.org; vinod.koul@intel.com;
-> dan.j.williams@intel.com; herbert@gondor.hengli.com.au; linuxppc-
-> dev@lists.ozlabs.org
-> Cc: Li Yang-R58472; Phillips Kim-R1AAHA
-> Subject: [PATCH v4 0/7] Raid: enable talitos xor offload for improving
-> performance
-> 
-> Hi,
-> 
-> The following 7 patches enabling fsl-dma and talitos offload raid
-> operations for improving raid performance and balancing CPU load.
-> 
-> Write performance will be improved by 25-30% tested by iozone.
-> Write performance is improved about 2% after using spin_lock_bh replace
-> spin_lock_irqsave.
-> CPU load will be reduced by 8%.
-> 
-> Changes in V4:
-> 	- fix an error in talitos when dest addr is same with src addr,
-> dest
-> 	should be freed only one time if src is same with dest addr;
-> 	- correct coding style in fsl-dma according to Ira's comments;
-> 	- fix a race condition in fsl-dma fsl_tx_status(), remove the
-> interface
-> 	which is used to free descriptors in queue ld_completed, this
-> interface
-> 	has been included in fsldma_cleanup_descriptor(), in v3, there is
-> one
-> 	place missed spin_lock protect;
-> 	- split the original patch 3/4 up to 2 patches 3/7 and 4/7
-> according to
-> 	Li Yang's comments.
-> 	- fix a warning of unitialized cookie;
-> 	- add memory copy self test in fsl-dma;
-> 	- add more detail description about use spin_lock_bh() to instead
-> of
-> 	spin_lock_irqsave() according to Timur's comments;
-> 
-> Changes in v3:
-> 	- change release process of fsl-dma descriptor for resolve the
-> 	potential race condition
-> 	- add test result when use spin_lock_bh replace spin_lock_irqsave
-> 	- modify the benchmark results according to the latest patch
-> 
-> Changes in v2:
-> 	- rebase onto cryptodev tree
-> 	- split the patch 3/4 up to 3 independent patches
-> 	- remove the patch 4/4, the fix is not for cryptodev tree
-> 
-> 
-> Qiang Liu (4):
->       Talitos: Support for async_tx XOR offload
->       fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
->       fsl-dma: change release process of dma descriptor for supporting
-> async_tx
->       fsl-dma: use spin_lock_bh to instead of spin_lock_irqsave
-> 
-> Qiang Liu (7):
->       Talitos: Support for async_tx XOR offload
->       fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
->       fsl-dma: change release process of dma descriptor for supporting
-> async_tx
->       fsl-dma: move the function ahead of its invoke function
->       fsl-dma: use spin_lock_bh to instead of spin_lock_irqsave
->       fsl-dma: fix a warning of unitialized cookie
->       fsl-dma: add memcpy self test interface
-> 
->  drivers/crypto/Kconfig   |    9 +
->  drivers/crypto/talitos.c |  413 ++++++++++++++++++++++++++++++++++
->  drivers/crypto/talitos.h |   53 +++++
->  drivers/dma/fsldma.c     |  550 +++++++++++++++++++++++++++++-----------
-> ------
->  drivers/dma/fsldma.h     |    1 +
->  5 files changed, 822 insertions(+), 204 deletions(-)
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
