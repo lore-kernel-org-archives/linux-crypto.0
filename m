@@ -1,39 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] crypto: add x86_64/avx assembler implementation of
- cast5 and cast6
-Date: Mon, 30 Jul 2012 15:55:25 +0800
-Message-ID: <20120730075525.GC5515@gondor.apana.org.au>
-References: <cover.1342027375.git.johannes@goetzfried-amberg.de>
+Subject: Re: [PATCH 1/3 v2] crypto: caam - fix possible deadlock condition
+Date: Mon, 30 Jul 2012 15:56:04 +0800
+Message-ID: <20120730075603.GD5515@gondor.apana.org.au>
+References: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
+ <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Tilo Mueller <tilo.mueller@informatik.uni-erlangen.de>
-To: Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:41251 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:59482 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752297Ab2G3Hz3 (ORCPT
+	with ESMTP id S1752712Ab2G3H4G (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Jul 2012 03:55:29 -0400
+	Mon, 30 Jul 2012 03:56:06 -0400
 Content-Disposition: inline
-In-Reply-To: <cover.1342027375.git.johannes@goetzfried-amberg.de>
+In-Reply-To: <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 11, 2012 at 07:36:46PM +0200, Johannes Goetzfried wrote:
-> This patchset adds x86_64/avx assembler implementations of the Cast5 and the
-> Cast6 cipher.
+On Fri, Jul 13, 2012 at 06:04:23PM -0500, Kim Phillips wrote:
+> commit "crypto: caam - use non-irq versions of spinlocks for job rings"
+> made two bad assumptions:
 > 
-> Johannes Goetzfried (6):
->   crypto: cast5 - prepare generic module for optimized implementations
->   crypto: testmgr - add larger cast5 testvectors
->   crypto: cast5 - add x86_64/avx assembler implementation
->   crypto: cast6 - prepare generic module for optimized implementations
->   crypto: testmgr - add larger cast6 testvectors
->   crypto: cast6 - add x86_64/avx assembler implementation
+> (a) The caam_jr_enqueue lock isn't used in softirq context.
+> Not true: jr_enqueue can be interrupted by an incoming net
+> interrupt and the received packet may be sent for encryption,
+> via caam_jr_enqueue in softirq context, thereby inducing a
+> deadlock.
+> 
+> This is evidenced when running netperf over an IPSec tunnel
+> between two P4080's, with spinlock debugging turned on:
 
-Nice work.  All applied.  Thanks.
+All patches applied.  Thanks Kim.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
