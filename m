@@ -1,39 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3 v2] crypto: caam - fix possible deadlock condition
-Date: Mon, 30 Jul 2012 15:56:04 +0800
-Message-ID: <20120730075603.GD5515@gondor.apana.org.au>
-References: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
- <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
+Subject: Re: [PATCH 0/4] powerpc/crypto: IBM Power7+ in-Nest compression
+ support
+Date: Mon, 30 Jul 2012 15:56:28 +0800
+Message-ID: <20120730075628.GE5515@gondor.apana.org.au>
+References: <1342708961-28587-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Kim Phillips <kim.phillips@freescale.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Robert Jennings <rcj@linux.vnet.ibm.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Kent Yoder <key@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
+To: Seth Jennings <sjenning@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:59482 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:48041 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752712Ab2G3H4G (ORCPT
+	with ESMTP id S1753714Ab2G3H4t (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Jul 2012 03:56:06 -0400
+	Mon, 30 Jul 2012 03:56:49 -0400
 Content-Disposition: inline
-In-Reply-To: <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
+In-Reply-To: <1342708961-28587-1-git-send-email-sjenning@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 13, 2012 at 06:04:23PM -0500, Kim Phillips wrote:
-> commit "crypto: caam - use non-irq versions of spinlocks for job rings"
-> made two bad assumptions:
+On Thu, Jul 19, 2012 at 09:42:37AM -0500, Seth Jennings wrote:
+> This is a continuation of support for the Power7+ in-Nest
+> hardware accelerator.
 > 
-> (a) The caam_jr_enqueue lock isn't used in softirq context.
-> Not true: jr_enqueue can be interrupted by an incoming net
-> interrupt and the received packet may be sent for encryption,
-> via caam_jr_enqueue in softirq context, thereby inducing a
-> deadlock.
+> https://lkml.org/lkml/2012/4/12/223
 > 
-> This is evidenced when running netperf over an IPSec tunnel
-> between two P4080's, with spinlock debugging turned on:
+> This patchset adds the hardware driver and the cryptographic
+> driver for hardware accelerated compression, which uses a
+> hardware-optimized algorithm named 842.
+> 
+> The hardware driver has limits on generic compression and is
+> geared toward compressing units that are of PAGE_SIZE for
+> in-kernel memory compression.
+> 
+> Based on linux-next (20120717)
+> 
+> Seth Jennings (4):
 
-All patches applied.  Thanks Kim.
+All applied.  Thanks Seth.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
