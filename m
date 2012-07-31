@@ -1,68 +1,50 @@
 From: "Ira W. Snyder" <iws@ovro.caltech.edu>
-Subject: [PATCH 7/7] carma: remove unnecessary DMA_INTERRUPT capability
-Date: Tue, 31 Jul 2012 16:45:52 -0700
-Message-ID: <1343778352-5549-8-git-send-email-iws@ovro.caltech.edu>
+Subject: [PATCH 6/7] fsl-dma: fix a warning of unitialized cookie
+Date: Tue, 31 Jul 2012 16:45:51 -0700
+Message-ID: <1343778352-5549-7-git-send-email-iws@ovro.caltech.edu>
 References: <1343778352-5549-1-git-send-email-iws@ovro.caltech.edu>
 Cc: linuxppc-dev@lists.ozlabs.org, B32616@freescale.com,
-	"Ira W. Snyder" <iws@ovro.caltech.edu>
+	Qiang Liu <qiang.liu@freescale.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Li Yang <leoli@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ovro.ovro.caltech.edu ([192.100.16.2]:59640 "EHLO
+Received: from ovro.ovro.caltech.edu ([192.100.16.2]:59636 "EHLO
 	ovro.ovro.caltech.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756462Ab2GaXqB (ORCPT
+	with ESMTP id S1756260Ab2GaXqA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 Jul 2012 19:46:01 -0400
+	Tue, 31 Jul 2012 19:46:00 -0400
 In-Reply-To: <1343778352-5549-1-git-send-email-iws@ovro.caltech.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: "Ira W. Snyder" <iws@ovro.caltech.edu>
+From: Qiang Liu <qiang.liu@freescale.com>
 
-These drivers set the DMA_INTERRUPT capability bit when requesting a DMA
-controller channel. This was historical, and is no longer needed.
+Fix a warning of unitialized value when compile with -Wuninitialized.
 
-Recent changes to the drivers/dma/fsldma.c driver have removed support
-for this flag. This makes the carma drivers unable to find a DMA channel
-with the required capabilities.
-
-Signed-off-by: Ira W. Snyder <iws@ovro.caltech.edu>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Vinod Koul <vinod.koul@intel.com>
+Cc: Li Yang <leoli@freescale.com>
+Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
+Cc: Kim Phillips <kim.phillips@freescale.com>
 ---
- drivers/misc/carma/carma-fpga-program.c |    1 -
- drivers/misc/carma/carma-fpga.c         |    3 +--
- 2 files changed, 1 insertions(+), 3 deletions(-)
+ drivers/dma/fsldma.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/misc/carma/carma-fpga-program.c b/drivers/misc/carma/carma-fpga-program.c
-index a2d25e4..eaddfe9 100644
---- a/drivers/misc/carma/carma-fpga-program.c
-+++ b/drivers/misc/carma/carma-fpga-program.c
-@@ -978,7 +978,6 @@ static int fpga_of_probe(struct platform_device *op)
- 	dev_set_drvdata(priv->dev, priv);
- 	dma_cap_zero(mask);
- 	dma_cap_set(DMA_MEMCPY, mask);
--	dma_cap_set(DMA_INTERRUPT, mask);
- 	dma_cap_set(DMA_SLAVE, mask);
- 	dma_cap_set(DMA_SG, mask);
+diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
+index 380c1b7..8588cf7 100644
+--- a/drivers/dma/fsldma.c
++++ b/drivers/dma/fsldma.c
+@@ -523,7 +523,7 @@ static dma_cookie_t fsl_dma_tx_submit(struct dma_async_tx_descriptor *tx)
+ 	struct fsldma_chan *chan = to_fsl_chan(tx->chan);
+ 	struct fsl_desc_sw *desc = tx_to_fsl_desc(tx);
+ 	struct fsl_desc_sw *child;
+-	dma_cookie_t cookie;
++	dma_cookie_t cookie = 0;
  
-diff --git a/drivers/misc/carma/carma-fpga.c b/drivers/misc/carma/carma-fpga.c
-index 8c279da..861b298 100644
---- a/drivers/misc/carma/carma-fpga.c
-+++ b/drivers/misc/carma/carma-fpga.c
-@@ -666,7 +666,7 @@ static int data_submit_dma(struct fpga_device *priv, struct data_buf *buf)
- 	src = SYS_FPGA_BLOCK;
- 	tx = chan->device->device_prep_dma_memcpy(chan, dst, src,
- 						  REG_BLOCK_SIZE,
--						  DMA_PREP_INTERRUPT);
-+						  0);
- 	if (!tx) {
- 		dev_err(priv->dev, "unable to prep SYS-FPGA DMA\n");
- 		return -ENOMEM;
-@@ -1333,7 +1333,6 @@ static int data_of_probe(struct platform_device *op)
- 
- 	dma_cap_zero(mask);
- 	dma_cap_set(DMA_MEMCPY, mask);
--	dma_cap_set(DMA_INTERRUPT, mask);
- 	dma_cap_set(DMA_SLAVE, mask);
- 	dma_cap_set(DMA_SG, mask);
+ 	spin_lock_irq(&chan->desc_lock);
  
 -- 
 1.7.8.6
