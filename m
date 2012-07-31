@@ -1,457 +1,210 @@
-From: Liu Qiang-B32616 <B32616@freescale.com>
-Subject: RE: [PATCH v4 3/7] fsl-dma: change release process of dma
- descriptor for supporting async_tx
-Date: Tue, 31 Jul 2012 04:09:28 +0000
-Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70C5D24@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <1343380569-12013-1-git-send-email-qiang.liu@freescale.com>
- <20120730211004.GA12430@ovro.caltech.edu>
+From: "cloudy.linux" <cloudy.linux@gmail.com>
+Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
+Date: Tue, 31 Jul 2012 20:12:02 +0800
+Message-ID: <5017CB92.9010708@gmail.com>
+References: <20120618201235.GA20755@schnuecks.de> <4FE1D09E.4040104@gmail.com> <20120620154131.GR9122@philter.vipri.net> <20120625134050.GB12294@philter.vipri.net> <4FE874BD.2020909@gmail.com> <4FE88C63.8010103@gmail.com> <20120625215928.GA3853@philter.vipri.net> <4FEEAC54.10503@gmail.com> <20120706153018.GB24676@philter.vipri.net> <4FF91CE7.7090205@gmail.com> <20120709125450.GB30493@philter.vipri.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"dan.j.williams@gmail.com" <dan.j.williams@gmail.com>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Li Yang-R58472 <r58472@freescale.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: "Ira W. Snyder" <iws@ovro.caltech.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, andrew@lunn.ch,
+	Simon Baatz <gmbnomis@gmail.com>
+To: Phil Sutter <phil.sutter@viprinet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe006.messaging.microsoft.com ([213.199.154.209]:13155
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751408Ab2GaEJl convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 Jul 2012 00:09:41 -0400
-In-Reply-To: <20120730211004.GA12430@ovro.caltech.edu>
-Content-Language: en-US
+Received: from mail-ee0-f46.google.com ([74.125.83.46]:54545 "EHLO
+	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756012Ab2GaMMT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 31 Jul 2012 08:12:19 -0400
+Received: by eeil10 with SMTP id l10so1601407eei.19
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Jul 2012 05:12:18 -0700 (PDT)
+In-Reply-To: <20120709125450.GB30493@philter.vipri.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> -----Original Message-----
-> From: Ira W. Snyder [mailto:iws@ovro.caltech.edu]
-> Sent: Tuesday, July 31, 2012 5:10 AM
-> To: Liu Qiang-B32616
-> Cc: linux-crypto@vger.kernel.org; linuxppc-dev@lists.ozlabs.org; Phillips
-> Kim-R1AAHA; herbert@gondor.hengli.com.au; davem@davemloft.net; Dan
-> Williams; Vinod Koul; Li Yang-R58472
-> Subject: Re: [PATCH v4 3/7] fsl-dma: change release process of dma
-> descriptor for supporting async_tx
-> 
-> On Fri, Jul 27, 2012 at 05:16:09PM +0800, qiang.liu@freescale.com wrote:
-> > From: Qiang Liu <qiang.liu@freescale.com>
-> >
-> > Fix the potential risk when enable config NET_DMA and ASYNC_TX.
-> > Async_tx is lack of support in current release process of dma
-> descriptor,
-> > all descriptors will be released whatever is acked or no-acked by
-> async_tx,
-> > so there is a potential race condition when dma engine is uesd by
-> others
-> > clients (e.g. when enable NET_DMA to offload TCP).
-> >
-> > In our case, a race condition which is raised when use both of talitos
-> > and dmaengine to offload xor is because napi scheduler will sync all
-> > pending requests in dma channels, it affects the process of raid
-> operations
-> > due to ack_tx is not checked in fsl dma. The no-acked descriptor is
-> freed
-> > which is submitted just now, as a dependent tx, this freed descriptor
-> trigger
-> > BUG_ON(async_tx_test_ack(depend_tx)) in async_tx_submit().
-> >
-> 
-> I'm preparing an alternative version of this patch that I think is
-> easier to understand (it is much shorter). I'll post it up here as soon
-> as I finish testing.
-Can you give a simple description/idea about your patch? My patch is for fix the
-problems when I build a raid environment with talitos offload xor.
-I think the new interface is clear enough and similar with the implement of other dma devices.
+Hi Phil
 
-And do you have any comments about this patch?
+On 2012-7-9 20:54, Phil Sutter wrote:
+> Hi,
+>
+> On Sun, Jul 08, 2012 at 01:38:47PM +0800, cloudy.linux wrote:
+>> Newest result. Still couldn't boot up. This time the source was cloned
+>> from your git repository.
+>>
+>> MV-DMA: window at bar0: target 0, attr 14, base 0, size 8000000
+>> MV-DMA: window at bar1: target 5, attr 0, base f2200000, size 10000
+>> MV-DMA: IDMA engine up and running, IRQ 23
+>> MV-DMA: idma_print_and_clear_irq: address miss @0!
+>> MV-DMA: tpg.reg + DMA_CTRL = 0x80001d04
+>> MV-DMA: tpg.reg + DMA_BYTE_COUNT = 0x0
+>> MV-DMA: tpg.reg + DMA_SRC_ADDR = 0x0
+>> MV-DMA: tpg.reg + DMA_DST_ADDR = 0x0
+>> MV-DMA: tpg.reg + DMA_NEXT_DESC = 0x79b1000
+>> MV-DMA: tpg.reg + DMA_CURR_DESC = 0x0
+>> MV-DMA: DMA descriptor list:
+>> MV-DMA: entry 0 at 0xffdbb000: dma addr 0x79b1000, src 0x79b4000, dst
+>> 0xf2200080, count 16, own 1, next 0x79b1010
+>> MV-DMA: entry 1 at 0xffdbb010: dma addr 0x79b1010, src 0x799c28c, dst
+>> 0xf2200000, count 80, own 1, next 0x79b1020
+>> MV-DMA: entry 2 at 0xffdbb020: dma addr 0x79b1020, src 0x0, dst 0x0,
+>> count 0, own 0, next 0x79b1030
+>> MV-DMA: entry 3 at 0xffdbb030: dma addr 0x79b1030, src 0xf2200080, dst
+>> 0x79b4000, count 16, own 1, next 0x0
+>> MV-CESA:got an interrupt but no pending timer?
+>
+> Sucks. What's making me wonder here is, address decoding of address 0x0
+> actually shouldn't fail, since window 0 includes this address.
+>
+> For now, I have pushed two new commits to my public git, adding more
+> debugging output for decoding window logic and interrupt case as well as
+> decoding window permission fix and changing from FETCH_ND to programming
+> the first DMA descriptor's values manually.
+>
+> In the long term, I probably should try to get access to some
+> appropriate hardware myself. This is rather a quiz game than actual bug
+> tracking.
+>
+> Greetings, Phil
+>
+>
+> Phil Sutter
+> Software Engineer
+>
 
-> 
-> It would be nice to know how to easily reproduce this bug, without
-> needing to set up a RAID system. I don't have access to any such
-> hardware. A driver similar to drivers/dma/dmatest.c (using the async_tx
-> API instead) would be wonderful.
-You can refer to raid5.c if you do not want to use hardware. Or you can use
-you ram (or other storage devices) to build a raid env to test.
-Thanks.
+Sorry for taking so long time to try the latest code. Just came back 
+from a vacation and tried several days to get a tight sleep.
 
-> 
-> Thanks,
-> Ira
-> 
-> > TASK = ee1a94a0[1390] 'md0_raid5' THREAD: ecf40000 CPU: 0
-> > GPR00: 00000001 ecf41ca0 ee44/921a94a0 0000003f 00000001 c00593e4
-> 00000000 00000001
-> > GPR08: 00000000 a7a7a7a7 00000001 045/920000002 42028042 100a38d4
-> ed576d98 00000000
-> > GPR16: ed5a11b0 00000000 2b162000 00000200 046/920000000 2d555000
-> ed3015e8 c15a7aa0
-> > GPR24: 00000000 c155fc40 00000000 ecb63220 ecf41d28 e47/92f640bb0
-> ef640c30 ecf41ca0
-> > NIP [c02b048c] async_tx_submit+0x6c/0x2b4
-> > LR [c02b068c] async_tx_submit+0x26c/0x2b4
-> > Call Trace:
-> > [ecf41ca0] [c02b068c] async_tx_submit+0x26c/0x2b448/92 (unreliable)
-> > [ecf41cd0] [c02b0a4c] async_memcpy+0x240/0x25c
-> > [ecf41d20] [c0421064] async_copy_data+0xa0/0x17c
-> > [ecf41d70] [c0421cf4] __raid_run_ops+0x874/0xe10
-> > [ecf41df0] [c0426ee4] handle_stripe+0x820/0x25e8
-> > [ecf41e90] [c0429080] raid5d+0x3d4/0x5b4
-> > [ecf41f40] [c04329b8] md_thread+0x138/0x16c
-> > [ecf41f90] [c008277c] kthread+0x8c/0x90
-> > [ecf41ff0] [c0011630] kernel_thread+0x4c/0x68
-> >
-> > Cc: Dan Williams <dan.j.williams@intel.com>
-> > Cc: Vinod Koul <vinod.koul@intel.com>
-> > Cc: Li Yang <leoli@freescale.com>
-> > Cc: Ira W. Snyder <iws@ovro.caltech.edu>
-> > Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
-> > ---
-> >  drivers/dma/fsldma.c |  242 +++++++++++++++++++++++++++++++++++-------
-> --------
-> >  drivers/dma/fsldma.h |    1 +
-> >  2 files changed, 172 insertions(+), 71 deletions(-)
-> >
-> > diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
-> > index 4f2f212..87f52c0 100644
-> > --- a/drivers/dma/fsldma.c
-> > +++ b/drivers/dma/fsldma.c
-> > @@ -400,6 +400,125 @@ out_splice:
-> >  	list_splice_tail_init(&desc->tx_list, &chan->ld_pending);
-> >  }
-> >
-> > +static void fsldma_cleanup_descriptor(struct fsldma_chan *chan);
-> > +static void fsl_chan_xfer_ld_queue(struct fsldma_chan *chan);
-> > +
-> > +/**
-> > + * fsldma_clean_completed_descriptor - free all descriptors which
-> > + * has been completed and acked
-> > + * @chan: Freescale DMA channel
-> > + *
-> > + * This function is used on all completed and acked descriptors.
-> > + * All descriptors should only be freed in this function.
-> > + */
-> > +static int
-> > +fsldma_clean_completed_descriptor(struct fsldma_chan *chan)
-> > +{
-> > +	struct fsl_desc_sw *desc, *_desc;
-> > +
-> > +	/* Run the callback for each descriptor, in order */
-> > +	list_for_each_entry_safe(desc, _desc, &chan->ld_completed, node) {
-> > +
-> > +		if (async_tx_test_ack(&desc->async_tx)) {
-> > +			/* Remove from the list of transactions */
-> > +			list_del(&desc->node);
-> > +#ifdef FSL_DMA_LD_DEBUG
-> > +			chan_dbg(chan, "LD %p free\n", desc);
-> > +#endif
-> > +			dma_pool_free(chan->desc_pool, desc,
-> > +					desc->async_tx.phys);
-> > +		}
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/**
-> > + * fsldma_run_tx_complete_actions - cleanup and free a single link
-> descriptor
-> > + * @chan: Freescale DMA channel
-> > + * @desc: descriptor to cleanup and free
-> > + * @cookie: Freescale DMA transaction identifier
-> > + *
-> > + * This function is used on a descriptor which has been executed by
-> the DMA
-> > + * controller. It will run any callbacks, submit any dependencies.
-> > + */
-> > +static dma_cookie_t fsldma_run_tx_complete_actions(struct fsl_desc_sw
-> *desc,
-> > +		struct fsldma_chan *chan, dma_cookie_t cookie)
-> > +{
-> > +	struct dma_async_tx_descriptor *txd = &desc->async_tx;
-> > +	struct device *dev = chan->common.device->dev;
-> > +	dma_addr_t src = get_desc_src(chan, desc);
-> > +	dma_addr_t dst = get_desc_dst(chan, desc);
-> > +	u32 len = get_desc_cnt(chan, desc);
-> > +
-> > +	BUG_ON(txd->cookie < 0);
-> > +
-> > +	if (txd->cookie > 0) {
-> > +		cookie = txd->cookie;
-> > +
-> > +		/* Run the link descriptor callback function */
-> > +		if (txd->callback) {
-> > +#ifdef FSL_DMA_LD_DEBUG
-> > +			chan_dbg(chan, "LD %p callback\n", desc);
-> > +#endif
-> > +			txd->callback(txd->callback_param);
-> > +		}
-> > +
-> > +		/* Unmap the dst buffer, if requested */
-> > +		if (!(txd->flags & DMA_COMPL_SKIP_DEST_UNMAP)) {
-> > +			if (txd->flags & DMA_COMPL_DEST_UNMAP_SINGLE)
-> > +				dma_unmap_single(dev, dst, len, DMA_FROM_DEVICE);
-> > +			else
-> > +				dma_unmap_page(dev, dst, len, DMA_FROM_DEVICE);
-> > +		}
-> > +
-> > +		/* Unmap the src buffer, if requested */
-> > +		if (!(txd->flags & DMA_COMPL_SKIP_SRC_UNMAP)) {
-> > +			if (txd->flags & DMA_COMPL_SRC_UNMAP_SINGLE)
-> > +				dma_unmap_single(dev, src, len, DMA_TO_DEVICE);
-> > +			else
-> > +				dma_unmap_page(dev, src, len, DMA_TO_DEVICE);
-> > +		}
-> > +	}
-> > +
-> > +	/* Run any dependencies */
-> > +	dma_run_dependencies(txd);
-> > +
-> > +	return cookie;
-> > +}
-> > +
-> > +/**
-> > + * fsldma_clean_running_descriptor - move the completed descriptor
-> from
-> > + * ld_running to ld_completed
-> > + * @chan: Freescale DMA channel
-> > + * @desc: the descriptor which is completed
-> > + *
-> > + * Free the descriptor directly if acked by async_tx api, or move it
-> to
-> > + * queue ld_completed.
-> > + */
-> > +static int
-> > +fsldma_clean_running_descriptor(struct fsldma_chan *chan,
-> > +		struct fsl_desc_sw *desc)
-> > +{
-> > +	/* Remove from the list of transactions */
-> > +	list_del(&desc->node);
-> > +	/*
-> > +	 * the client is allowed to attach dependent operations
-> > +	 * until 'ack' is set
-> > +	 */
-> > +	if (!async_tx_test_ack(&desc->async_tx)) {
-> > +		/*
-> > +		 * Move this descriptor to the list of descriptors which is
-> > +		 * completed, but still awaiting the 'ack' bit to be set.
-> > +		 */
-> > +		list_add_tail(&desc->node, &chan->ld_completed);
-> > +		return 0;
-> > +	}
-> > +
-> > +	dma_pool_free(chan->desc_pool, desc, desc->async_tx.phys);
-> > +	return 0;
-> > +}
-> > +
-> >  static dma_cookie_t fsl_dma_tx_submit(struct dma_async_tx_descriptor
-> *tx)
-> >  {
-> >  	struct fsldma_chan *chan = to_fsl_chan(tx->chan);
-> > @@ -534,8 +653,10 @@ static void fsl_dma_free_chan_resources(struct
-> dma_chan *dchan)
-> >
-> >  	chan_dbg(chan, "free all channel resources\n");
-> >  	spin_lock_irqsave(&chan->desc_lock, flags);
-> > +	fsldma_cleanup_descriptor(chan);
-> >  	fsldma_free_desc_list(chan, &chan->ld_pending);
-> >  	fsldma_free_desc_list(chan, &chan->ld_running);
-> > +	fsldma_free_desc_list(chan, &chan->ld_completed);
-> >  	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> >
-> >  	dma_pool_destroy(chan->desc_pool);
-> > @@ -819,46 +940,53 @@ static int fsl_dma_device_control(struct dma_chan
-> *dchan,
-> >   * controller. It will run any callbacks, submit any dependencies, and
-> then
-> >   * free the descriptor.
-> >   */
-> > -static void fsldma_cleanup_descriptor(struct fsldma_chan *chan,
-> > -				      struct fsl_desc_sw *desc)
-> > +static void fsldma_cleanup_descriptor(struct fsldma_chan *chan)
-> >  {
-> > -	struct dma_async_tx_descriptor *txd = &desc->async_tx;
-> > -	struct device *dev = chan->common.device->dev;
-> > -	dma_addr_t src = get_desc_src(chan, desc);
-> > -	dma_addr_t dst = get_desc_dst(chan, desc);
-> > -	u32 len = get_desc_cnt(chan, desc);
-> > +	struct fsl_desc_sw *desc, *_desc;
-> > +	dma_cookie_t cookie = 0;
-> > +	dma_addr_t curr_phys = get_cdar(chan);
-> > +	int idle = dma_is_idle(chan);
-> > +	int seen_current = 0;
-> >
-> > -	/* Run the link descriptor callback function */
-> > -	if (txd->callback) {
-> > -#ifdef FSL_DMA_LD_DEBUG
-> > -		chan_dbg(chan, "LD %p callback\n", desc);
-> > -#endif
-> > -		txd->callback(txd->callback_param);
-> > -	}
-> > +	fsldma_clean_completed_descriptor(chan);
-> >
-> > -	/* Run any dependencies */
-> > -	dma_run_dependencies(txd);
-> > +	/* Run the callback for each descriptor, in order */
-> > +	list_for_each_entry_safe(desc, _desc, &chan->ld_running, node) {
-> > +		/*
-> > +		 * do not advance past the current descriptor loaded into the
-> > +		 * hardware channel, subsequent descriptors are either in
-> > +		 * process or have not been submitted
-> > +		 */
-> > +		if (seen_current)
-> > +			break;
-> >
-> > -	/* Unmap the dst buffer, if requested */
-> > -	if (!(txd->flags & DMA_COMPL_SKIP_DEST_UNMAP)) {
-> > -		if (txd->flags & DMA_COMPL_DEST_UNMAP_SINGLE)
-> > -			dma_unmap_single(dev, dst, len, DMA_FROM_DEVICE);
-> > -		else
-> > -			dma_unmap_page(dev, dst, len, DMA_FROM_DEVICE);
-> > -	}
-> > +		/*
-> > +		 * stop the search if we reach the current descriptor and the
-> > +		 * channel is busy
-> > +		 */
-> > +		if (desc->async_tx.phys == curr_phys) {
-> > +			seen_current = 1;
-> > +			if (!idle)
-> > +				break;
-> > +		}
-> > +
-> > +		cookie = fsldma_run_tx_complete_actions(desc, chan, cookie);
-> > +
-> > +		if (fsldma_clean_running_descriptor(chan, desc))
-> > +			break;
-> >
-> > -	/* Unmap the src buffer, if requested */
-> > -	if (!(txd->flags & DMA_COMPL_SKIP_SRC_UNMAP)) {
-> > -		if (txd->flags & DMA_COMPL_SRC_UNMAP_SINGLE)
-> > -			dma_unmap_single(dev, src, len, DMA_TO_DEVICE);
-> > -		else
-> > -			dma_unmap_page(dev, src, len, DMA_TO_DEVICE);
-> >  	}
-> >
-> > -#ifdef FSL_DMA_LD_DEBUG
-> > -	chan_dbg(chan, "LD %p free\n", desc);
-> > -#endif
-> > -	dma_pool_free(chan->desc_pool, desc, txd->phys);
-> > +	/*
-> > +	 * Start any pending transactions automatically
-> > +	 *
-> > +	 * In the ideal case, we keep the DMA controller busy while we go
-> > +	 * ahead and free the descriptors below.
-> > +	 */
-> > +	fsl_chan_xfer_ld_queue(chan);
-> > +
-> > +	if (cookie > 0)
-> > +		chan->common.completed_cookie = cookie;
-> >  }
-> >
-> >  /**
-> > @@ -954,11 +1082,15 @@ static enum dma_status fsl_tx_status(struct
-> dma_chan *dchan,
-> >  	enum dma_status ret;
-> >  	unsigned long flags;
-> >
-> > -	spin_lock_irqsave(&chan->desc_lock, flags);
-> >  	ret = dma_cookie_status(dchan, cookie, txstate);
-> > +	if (ret == DMA_SUCCESS)
-> > +		return ret;
-> > +
-> > +	spin_lock_irqsave(&chan->desc_lock, flags);
-> > +	fsldma_cleanup_descriptor(chan);
-> >  	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> >
-> > -	return ret;
-> > +	return dma_cookie_status(dchan, cookie, txstate);
-> >  }
-> >
-> >  /*--------------------------------------------------------------------
-> --------*/
-> > @@ -1035,52 +1167,19 @@ static irqreturn_t fsldma_chan_irq(int irq,
-> void *data)
-> >  static void dma_do_tasklet(unsigned long data)
-> >  {
-> >  	struct fsldma_chan *chan = (struct fsldma_chan *)data;
-> > -	struct fsl_desc_sw *desc, *_desc;
-> > -	LIST_HEAD(ld_cleanup);
-> >  	unsigned long flags;
-> >
-> >  	chan_dbg(chan, "tasklet entry\n");
-> >
-> >  	spin_lock_irqsave(&chan->desc_lock, flags);
-> >
-> > -	/* update the cookie if we have some descriptors to cleanup */
-> > -	if (!list_empty(&chan->ld_running)) {
-> > -		dma_cookie_t cookie;
-> > -
-> > -		desc = to_fsl_desc(chan->ld_running.prev);
-> > -		cookie = desc->async_tx.cookie;
-> > -		dma_cookie_complete(&desc->async_tx);
-> > -
-> > -		chan_dbg(chan, "completed_cookie=%d\n", cookie);
-> > -	}
-> > -
-> > -	/*
-> > -	 * move the descriptors to a temporary list so we can drop the lock
-> > -	 * during the entire cleanup operation
-> > -	 */
-> > -	list_splice_tail_init(&chan->ld_running, &ld_cleanup);
-> > -
-> >  	/* the hardware is now idle and ready for more */
-> >  	chan->idle = true;
-> >
-> > -	/*
-> > -	 * Start any pending transactions automatically
-> > -	 *
-> > -	 * In the ideal case, we keep the DMA controller busy while we go
-> > -	 * ahead and free the descriptors below.
-> > -	 */
-> > -	fsl_chan_xfer_ld_queue(chan);
-> > -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> > -
-> > -	/* Run the callback for each descriptor, in order */
-> > -	list_for_each_entry_safe(desc, _desc, &ld_cleanup, node) {
-> > +	/* Run all cleanup for this descriptor */
-> > +	fsldma_cleanup_descriptor(chan);
-> >
-> > -		/* Remove from the list of transactions */
-> > -		list_del(&desc->node);
-> > -
-> > -		/* Run all cleanup for this descriptor */
-> > -		fsldma_cleanup_descriptor(chan, desc);
-> > -	}
-> > +	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> >
-> >  	chan_dbg(chan, "tasklet exit\n");
-> >  }
-> > @@ -1262,6 +1361,7 @@ static int __devinit fsl_dma_chan_probe(struct
-> fsldma_device *fdev,
-> >  	spin_lock_init(&chan->desc_lock);
-> >  	INIT_LIST_HEAD(&chan->ld_pending);
-> >  	INIT_LIST_HEAD(&chan->ld_running);
-> > +	INIT_LIST_HEAD(&chan->ld_completed);
-> >  	chan->idle = true;
-> >
-> >  	chan->common.device = &fdev->common;
-> > diff --git a/drivers/dma/fsldma.h b/drivers/dma/fsldma.h
-> > index f5c3879..7ede908 100644
-> > --- a/drivers/dma/fsldma.h
-> > +++ b/drivers/dma/fsldma.h
-> > @@ -140,6 +140,7 @@ struct fsldma_chan {
-> >  	spinlock_t desc_lock;		/* Descriptor operation lock */
-> >  	struct list_head ld_pending;	/* Link descriptors queue */
-> >  	struct list_head ld_running;	/* Link descriptors queue */
-> > +	struct list_head ld_completed;	/* Link descriptors queue */
-> >  	struct dma_chan common;		/* DMA common channel */
-> >  	struct dma_pool *desc_pool;	/* Descriptors pool */
-> >  	struct device *dev;		/* Channel device */
-> > --
-> > 1.7.5.1
-> >
-> >
+The latest console output:
+
+MV-DMA: window at bar0: target 0, attr 14, base 0, size 8000000
+MV-DMA: idma_set_deco_win: win(0): BAR 0x7ff0000, size 0x0, enable 
+0xffff, prot 0xc031295c
+MV-DMA: window at bar1: target 5, attr 0, base f2200000, size 10000
+MV-DMA: idma_set_deco_win: win(1): BAR 0x0, size 0x0, enable 0xffff, 
+prot 0xc031295c
+MV-DMA: IDMA engine up and running, IRQ 23
+MV-DMA: idma_print_and_clear_irq: cause 0x3, select 0x1, addr 0x79b4000
+MV-DMA: idma_print_and_clear_irq: address miss @0!
+MV-DMA: tpg.reg + DMA_CTRL = 0x80001d04
+MV-DMA: tpg.reg + DMA_BYTE_COUNT = 0x80000010
+MV-DMA: tpg.reg + DMA_SRC_ADDR = 0x79b4000
+MV-DMA: tpg.reg + DMA_DST_ADDR = 0xf2200080
+MV-DMA: tpg.reg + DMA_NEXT_DESC = 0x79b1010
+MV-DMA: tpg.reg + DMA_CURR_DESC = 0x0
+MV-DMA: DMA descriptor list:
+MV-DMA: entry 0 at 0xffdbb000: dma addr 0x79b1000, src 0x79b4000, dst 
+0xf2200080, count 16, own 1, next 0x79b1010
+MV-DMA: entry 1 at 0xffdbb010: dma addr 0x79b1010, src 0x799c28c, dst 
+0xf2200000, count 80, own 1, next 0x79b1020
+MV-DMA: entry 2 at 0xffdbb020: dma addr 0x79b1020, src 0x0, dst 0x0, 
+count 0, own 0, next 0x79b1030
+MV-DMA: entry 3 at 0xffdbb030: dma addr 0x79b1030, src 0xf2200080, dst 
+0x79b4000, count 16, own 1, next 0x0
+MV-CESA:got an interrupt but no pending timer?
+------------[ cut here ]------------
+kernel BUG at drivers/crypto/mv_cesa.c:1126!
+Internal error: Oops - BUG: 0 [#1] ARM
+Modules linked in:
+CPU: 0    Not tainted  (3.5.0-rc2+ #4)
+pc : [<c01df9d8>]    lr : [<c0015810>]    psr: 20000093
+sp : c79b9e68  ip : c79b9db8  fp : c79b9e7c
+r10: c02f2164  r9 : c0306322  r8 : 0000001c
+r7 : 00000000  r6 : 00000000  r5 : c0312988  r4 : 00000002
+r3 : c799c200  r2 : 0000de20  r1 : fdd90000  r0 : fdd90000
+Flags: nzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+Control: a005317f  Table: 00004000  DAC: 00000017
+Process mv_crypto (pid: 276, stack limit = 0xc79b8270)
+Stack: (0xc79b9e68 to 0xc79ba000)
+9e60:                   c79afc40 0000001c c79b9eb4 c79b9e80 c0047694 
+c01df950
+9e80: c7824540 00000001 c79b9eac c02f2164 0000001c 00000000 c79b9f5c 
+c79bbe18
+9ea0: c02ecc18 c02ef0a0 c79b9ecc c79b9eb8 c0047844 c0047650 00022000 
+c02f2164
+9ec0: c79b9ee4 c79b9ed0 c0049b4c c0047824 c0049ac4 c02ff738 c79b9ef4 
+c79b9ee8
+9ee0: c0046fd0 c0049ad4 c79b9f14 c79b9ef8 c000985c c0046fb0 c01dc330 
+c01dee08
+9f00: a0000013 fdd20200 c79b9f24 c79b9f18 c0008170 c0009834 c79b9fbc 
+c79b9f28
+9f20: c0008c14 c0008170 0000009b 00000001 fdd90000 0000de00 c0312988 
+c799c200
+9f40: c7936cc0 c79ac780 c79bbe18 c02ecc18 c02ef0a0 c79b9fbc 00000010 
+c79b9f70
+9f60: c01dc330 c01dee08 a0000013 ffffffff 00000000 c79b9f80 c025d9fc 
+c0035000
+9f80: c78897a0 c7827de8 c79b8000 c02ecc18 00000013 c7827de8 c799c200 
+c01de718
+9fa0: 00000013 00000000 00000000 00000000 c79b9ff4 c79b9fc0 c002da78 
+c01de728
+9fc0: c7827de8 00000000 c799c200 00000000 c79b9fd0 c79b9fd0 00000000 
+c7827de8
+9fe0: c002d9e8 c0018354 00000000 c79b9ff8 c0018354 c002d9f8 01e6e7fe 
+01e6e7ff
+Backtrace:
+Function entered at [<c01df940>] from [<c0047694>]
+  r5:0000001c r4:c79afc40
+Function entered at [<c0047640>] from [<c0047844>]
+Function entered at [<c0047814>] from [<c0049b4c>]
+  r4:c02f2164 r3:00022000
+Function entered at [<c0049ac4>] from [<c0046fd0>]
+  r4:c02ff738 r3:c0049ac4
+Function entered at [<c0046fa0>] from [<c000985c>]
+Function entered at [<c0009824>] from [<c0008170>]
+  r6:fdd20200 r5:a0000013 r4:c01dee08 r3:c01dc330
+Function entered at [<c0008160>] from [<c0008c14>]
+Exception stack(0xc79b9f28 to 0xc79b9f70)
+9f20:                   0000009b 00000001 fdd90000 0000de00 c0312988 
+c799c200
+9f40: c7936cc0 c79ac780 c79bbe18 c02ecc18 c02ef0a0 c79b9fbc 00000010 
+c79b9f70
+9f60: c01dc330 c01dee08 a0000013 ffffffff
+Function entered at [<c01de718>] from [<c002da78>]
+Function entered at [<c002d9e8>] from [<c0018354>]
+  r6:c0018354 r5:c002d9e8 r4:c7827de8
+Code: e89da830 e59f000c eb01ec39 eaffffe9 (e7f001f2)
+MV-DMA: idma_print_and_clear_irq: cause 0x3, select 0x1, addr 0x0
+MV-DMA: idma_print_and_clear_irq: address miss @0!
+MV-DMA: tpg.reg + DMA_CTRL = 0x80001d04
+MV-DMA: tpg.reg + DMA_BYTE_COUNT = 0x0
+MV-DMA: tpg.reg + DMA_SRC_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_DST_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_NEXT_DESC = 0x0
+MV-DMA: tpg.reg + DMA_CURR_DESC = 0x0
+MV-DMA: DMA descriptor list:
+MV-DMA: entry 0 at 0xffdbb000: dma addr 0x79b1000, src 0x79b4000, dst 
+0xf2200080, count 16, own 1, next 0x79b1010
+MV-DMA: entry 1 at 0xffdbb010: dma addr 0x79b1010, src 0x799c28c, dst 
+0xf2200000, count 80, own 1, next 0x79b1020
+MV-DMA: entry 2 at 0xffdbb020: dma addr 0x79b1020, src 0x0, dst 0x0, 
+count 0, own 0, next 0x79b1030
+MV-DMA: entry 3 at 0xffdbb030: dma addr 0x79b1030, src 0xf2200080, dst 
+0x79b4000, count 16, own 1, next 0x0
+MV-DMA: idma_print_and_clear_irq: cause 0x3, select 0x1, addr 0x0
+MV-DMA: idma_print_and_clear_irq: address miss @0!
+MV-DMA: tpg.reg + DMA_CTRL = 0x80001d04
+MV-DMA: tpg.reg + DMA_BYTE_COUNT = 0x0
+MV-DMA: tpg.reg + DMA_SRC_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_DST_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_NEXT_DESC = 0x0
+MV-DMA: tpg.reg + DMA_CURR_DESC = 0x0
+MV-DMA: DMA descriptor list:
+MV-DMA: entry 0 at 0xffdbb000: dma addr 0x79b1000, src 0x79b4000, dst 
+0xf2200080, count 16, own 1, next 0x79b1010
+MV-DMA: entry 1 at 0xffdbb010: dma addr 0x79b1010, src 0x799c28c, dst 
+0xf2200000, count 80, own 1, next 0x79b1020
+MV-DMA: entry 2 at 0xffdbb020: dma addr 0x79b1020, src 0x0, dst 0x0, 
+count 0, own 0, next 0x79b1030
+MV-DMA: entry 3 at 0xffdbb030: dma addr 0x79b1030, src 0xf2200080, dst 
+0x79b4000, count 16, own 1, next 0x0
+MV-DMA: idma_print_and_clear_irq: cause 0x3, select 0x1, addr 0x0
+MV-DMA: idma_print_and_clear_irq: address miss @0!
+MV-DMA: tpg.reg + DMA_CTRL = 0x80001d04
+MV-DMA: tpg.reg + DMA_BYTE_COUNT = 0x0
+MV-DMA: tpg.reg + DMA_SRC_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_DST_ADDR = 0x0
+MV-DMA: tpg.reg + DMA_NEXT_DESC = 0x0
+MV-DMA: tpg.reg + DMA_CURR_DESC = 0x0
+...
+
+Best Regards
+Cloudy
