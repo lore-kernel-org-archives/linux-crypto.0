@@ -1,192 +1,136 @@
-From: "Ira W. Snyder" <iws@ovro.caltech.edu>
-Subject: Re: [PATCH v5 5/6] fsl-dma: use spin_lock_bh to instead of
- spin_lock_irqsave
-Date: Wed, 1 Aug 2012 10:30:59 -0700
-Message-ID: <20120801173059.GF11359@ovro.caltech.edu>
-References: <1343811009-25466-1-git-send-email-qiang.liu@freescale.com>
+From: Liu Qiang-B32616 <B32616@freescale.com>
+Subject: RE: [PATCH v5 2/6] fsl-dma: remove attribute DMA_INTERRUPT of
+ dmaengine
+Date: Thu, 2 Aug 2012 04:52:23 +0000
+Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70CFD5F@039-SN2MPN1-011.039d.mgd.msft.net>
+References: <1343810948-25343-1-git-send-email-qiang.liu@freescale.com>
+ <20120801163553.GC11359@ovro.caltech.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, dan.j.williams@gmail.com,
-	Vinod Koul <vinod.koul@intel.com>,
-	Timur Tabi <timur@freescale.com>, herbert@gondor.hengli.com.au,
-	Dan Williams <dan.j.williams@intel.com>, davem@davemloft.net
-To: qiang.liu@freescale.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ovro.ovro.caltech.edu ([192.100.16.2]:36144 "EHLO
-	ovro.ovro.caltech.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753236Ab2HARbD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Aug 2012 13:31:03 -0400
-Content-Disposition: inline
-In-Reply-To: <1343811009-25466-1-git-send-email-qiang.liu@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ Vinod Koul <vinod.koul@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "dan.j.williams@gmail.com" <dan.j.williams@gmail.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "davem@davemloft.net" <davem@davemloft.net>
+To: "Ira W. Snyder" <iws@ovro.caltech.edu>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20120801163553.GC11359@ovro.caltech.edu>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 01, 2012 at 04:50:09PM +0800, qiang.liu@freescale.com wrote:
-> From: Qiang Liu <qiang.liu@freescale.com>
+> -----Original Message-----
+> From: Ira W. Snyder [mailto:iws@ovro.caltech.edu]
+> Sent: Thursday, August 02, 2012 12:36 AM
+> To: Liu Qiang-B32616
+> Cc: linux-crypto@vger.kernel.org; linuxppc-dev@lists.ozlabs.org; linux-
+> kernel@vger.kernel.org; dan.j.williams@gmail.com; Vinod Koul;
+> herbert@gondor.hengli.com.au; Dan Williams; davem@davemloft.net
+> Subject: Re: [PATCH v5 2/6] fsl-dma: remove attribute DMA_INTERRUPT of
+> dmaengine
 > 
-> - use spin_lock_bh() is the right way to use async_tx api,
-> dma_run_dependencies() should not be protected by spin_lock_irqsave();
-> - use spin_lock_bh to instead of spin_lock_irqsave for improving performance,
-> There is not any place to access descriptor queues in fsl-dma ISR except its
-> tasklet, spin_lock_bh() is more proper here. Interrupts will be turned off and
-> context will be save in irqsave, there is needless to use irqsave..
+> On Wed, Aug 01, 2012 at 04:49:08PM +0800, qiang.liu@freescale.com wrote:
+> > From: Qiang Liu <qiang.liu@freescale.com>
+> >
+> > Delete attribute DMA_INTERRUPT because fsl-dma doesn't support this
+> > function, exception will be thrown if talitos is used to offload xor at
+> the same time.
+> >
 > 
+> I have no problem with this patch.
+> 
+> However, it ***WILL BREAK*** both drivers in drivers/misc/carma. Please
+> add my patch 7/7 titled "[PATCH 7/7] carma: remove unnecessary
+> DMA_INTERRUPT capability" to your series. I suggest placing it
+> immediately after this patch in your series.
+> 
+> The carma drivers use the fsldma driver exclusively.
+Fine, thanks.
 
-This description is not very clear English. I understand it is not your
-native language. Let me try to help.
-
-"""
-The use of spin_lock_irqsave() is a stronger locking mechanism than is
-required throughout the driver. The minimum locking required should be
-used instead.
-
-Change all instances of spin_lock_irqsave() to spin_lock_bh(). All
-manipulation of protected fields is done using tasklet context or
-weaker, which makes spin_lock_bh() the correct choice.
-"""
-
-Other than that,
-Acked-by: Ira W. Snyder <iws@ovro.caltech.edu>
-
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Vinod Koul <vinod.koul@intel.com>
-> Cc: Li Yang <leoli@freescale.com>
-> Cc: Timur Tabi <timur@freescale.com>
-> Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
-> ---
->  drivers/dma/fsldma.c |   30 ++++++++++++------------------
->  1 files changed, 12 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
-> index bb883c0..e3814aa 100644
-> --- a/drivers/dma/fsldma.c
-> +++ b/drivers/dma/fsldma.c
-> @@ -645,10 +645,9 @@ static dma_cookie_t fsl_dma_tx_submit(struct dma_async_tx_descriptor *tx)
->  	struct fsldma_chan *chan = to_fsl_chan(tx->chan);
->  	struct fsl_desc_sw *desc = tx_to_fsl_desc(tx);
->  	struct fsl_desc_sw *child;
-> -	unsigned long flags;
->  	dma_cookie_t cookie;
-> 
-> -	spin_lock_irqsave(&chan->desc_lock, flags);
-> +	spin_lock_bh(&chan->desc_lock);
-> 
->  	/*
->  	 * assign cookies to all of the software descriptors
-> @@ -661,7 +660,7 @@ static dma_cookie_t fsl_dma_tx_submit(struct dma_async_tx_descriptor *tx)
->  	/* put this transaction onto the tail of the pending queue */
->  	append_ld_queue(chan, desc);
-> 
-> -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +	spin_unlock_bh(&chan->desc_lock);
-> 
->  	return cookie;
->  }
-> @@ -770,15 +769,14 @@ static void fsldma_free_desc_list_reverse(struct fsldma_chan *chan,
->  static void fsl_dma_free_chan_resources(struct dma_chan *dchan)
->  {
->  	struct fsldma_chan *chan = to_fsl_chan(dchan);
-> -	unsigned long flags;
-> 
->  	chan_dbg(chan, "free all channel resources\n");
-> -	spin_lock_irqsave(&chan->desc_lock, flags);
-> +	spin_lock_bh(&chan->desc_lock);
->  	fsldma_cleanup_descriptor(chan);
->  	fsldma_free_desc_list(chan, &chan->ld_pending);
->  	fsldma_free_desc_list(chan, &chan->ld_running);
->  	fsldma_free_desc_list(chan, &chan->ld_completed);
-> -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +	spin_unlock_bh(&chan->desc_lock);
-> 
->  	dma_pool_destroy(chan->desc_pool);
->  	chan->desc_pool = NULL;
-> @@ -997,7 +995,6 @@ static int fsl_dma_device_control(struct dma_chan *dchan,
->  {
->  	struct dma_slave_config *config;
->  	struct fsldma_chan *chan;
-> -	unsigned long flags;
->  	int size;
-> 
->  	if (!dchan)
-> @@ -1007,7 +1004,7 @@ static int fsl_dma_device_control(struct dma_chan *dchan,
-> 
->  	switch (cmd) {
->  	case DMA_TERMINATE_ALL:
-> -		spin_lock_irqsave(&chan->desc_lock, flags);
-> +		spin_lock_bh(&chan->desc_lock);
-> 
->  		/* Halt the DMA engine */
->  		dma_halt(chan);
-> @@ -1017,7 +1014,7 @@ static int fsl_dma_device_control(struct dma_chan *dchan,
->  		fsldma_free_desc_list(chan, &chan->ld_running);
->  		chan->idle = true;
-> 
-> -		spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +		spin_unlock_bh(&chan->desc_lock);
->  		return 0;
-> 
->  	case DMA_SLAVE_CONFIG:
-> @@ -1059,11 +1056,10 @@ static int fsl_dma_device_control(struct dma_chan *dchan,
->  static void fsl_dma_memcpy_issue_pending(struct dma_chan *dchan)
->  {
->  	struct fsldma_chan *chan = to_fsl_chan(dchan);
-> -	unsigned long flags;
-> 
-> -	spin_lock_irqsave(&chan->desc_lock, flags);
-> +	spin_lock_bh(&chan->desc_lock);
->  	fsl_chan_xfer_ld_queue(chan);
-> -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +	spin_unlock_bh(&chan->desc_lock);
->  }
-> 
->  /**
-> @@ -1076,15 +1072,14 @@ static enum dma_status fsl_tx_status(struct dma_chan *dchan,
->  {
->  	struct fsldma_chan *chan = to_fsl_chan(dchan);
->  	enum dma_status ret;
-> -	unsigned long flags;
-> 
->  	ret = dma_cookie_status(dchan, cookie, txstate);
->  	if (ret == DMA_SUCCESS)
->  		return ret;
-> 
-> -	spin_lock_irqsave(&chan->desc_lock, flags);
-> +	spin_lock_bh(&chan->desc_lock);
->  	fsldma_cleanup_descriptor(chan);
-> -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +	spin_unlock_bh(&chan->desc_lock);
-> 
->  	return dma_cookie_status(dchan, cookie, txstate);
->  }
-> @@ -1163,11 +1158,10 @@ static irqreturn_t fsldma_chan_irq(int irq, void *data)
->  static void dma_do_tasklet(unsigned long data)
->  {
->  	struct fsldma_chan *chan = (struct fsldma_chan *)data;
-> -	unsigned long flags;
-> 
->  	chan_dbg(chan, "tasklet entry\n");
-> 
-> -	spin_lock_irqsave(&chan->desc_lock, flags);
-> +	spin_lock_bh(&chan->desc_lock);
-> 
->  	/* the hardware is now idle and ready for more */
->  	chan->idle = true;
-> @@ -1175,7 +1169,7 @@ static void dma_do_tasklet(unsigned long data)
->  	/* Run all cleanup for this descriptor */
->  	fsldma_cleanup_descriptor(chan);
-> 
-> -	spin_unlock_irqrestore(&chan->desc_lock, flags);
-> +	spin_unlock_bh(&chan->desc_lock);
-> 
->  	chan_dbg(chan, "tasklet exit\n");
->  }
-> --
-> 1.7.5.1
-> 
-> 
-> _______________________________________________
-> Linuxppc-dev mailing list
-> Linuxppc-dev@lists.ozlabs.org
-> https://lists.ozlabs.org/listinfo/linuxppc-dev
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: Vinod Koul <vinod.koul@intel.com>
+> > Cc: Li Yang <leoli@freescale.com>
+> > Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
+> > Acked-by: Ira W. Snyder <iws@ovro.caltech.edu>
+> > ---
+> >  drivers/dma/fsldma.c |   31 -------------------------------
+> >  1 files changed, 0 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c index
+> > 8f84761..4f2f212 100644
+> > --- a/drivers/dma/fsldma.c
+> > +++ b/drivers/dma/fsldma.c
+> > @@ -543,35 +543,6 @@ static void fsl_dma_free_chan_resources(struct
+> > dma_chan *dchan)  }
+> >
+> >  static struct dma_async_tx_descriptor *
+> > -fsl_dma_prep_interrupt(struct dma_chan *dchan, unsigned long flags)
+> > -{
+> > -	struct fsldma_chan *chan;
+> > -	struct fsl_desc_sw *new;
+> > -
+> > -	if (!dchan)
+> > -		return NULL;
+> > -
+> > -	chan = to_fsl_chan(dchan);
+> > -
+> > -	new = fsl_dma_alloc_descriptor(chan);
+> > -	if (!new) {
+> > -		chan_err(chan, "%s\n", msg_ld_oom);
+> > -		return NULL;
+> > -	}
+> > -
+> > -	new->async_tx.cookie = -EBUSY;
+> > -	new->async_tx.flags = flags;
+> > -
+> > -	/* Insert the link descriptor to the LD ring */
+> > -	list_add_tail(&new->node, &new->tx_list);
+> > -
+> > -	/* Set End-of-link to the last link descriptor of new list */
+> > -	set_ld_eol(chan, new);
+> > -
+> > -	return &new->async_tx;
+> > -}
+> > -
+> > -static struct dma_async_tx_descriptor *  fsl_dma_prep_memcpy(struct
+> > dma_chan *dchan,
+> >  	dma_addr_t dma_dst, dma_addr_t dma_src,
+> >  	size_t len, unsigned long flags)
+> > @@ -1352,12 +1323,10 @@ static int __devinit fsldma_of_probe(struct
+> platform_device *op)
+> >  	fdev->irq = irq_of_parse_and_map(op->dev.of_node, 0);
+> >
+> >  	dma_cap_set(DMA_MEMCPY, fdev->common.cap_mask);
+> > -	dma_cap_set(DMA_INTERRUPT, fdev->common.cap_mask);
+> >  	dma_cap_set(DMA_SG, fdev->common.cap_mask);
+> >  	dma_cap_set(DMA_SLAVE, fdev->common.cap_mask);
+> >  	fdev->common.device_alloc_chan_resources =
+> fsl_dma_alloc_chan_resources;
+> >  	fdev->common.device_free_chan_resources =
+> fsl_dma_free_chan_resources;
+> > -	fdev->common.device_prep_dma_interrupt = fsl_dma_prep_interrupt;
+> >  	fdev->common.device_prep_dma_memcpy = fsl_dma_prep_memcpy;
+> >  	fdev->common.device_prep_dma_sg = fsl_dma_prep_sg;
+> >  	fdev->common.device_tx_status = fsl_tx_status;
+> > --
+> > 1.7.5.1
+> >
+> >
+> > _______________________________________________
+> > Linuxppc-dev mailing list
+> > Linuxppc-dev@lists.ozlabs.org
+> > https://lists.ozlabs.org/listinfo/linuxppc-dev
