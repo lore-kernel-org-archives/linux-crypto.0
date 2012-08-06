@@ -1,292 +1,52 @@
 From: <qiang.liu@freescale.com>
-Subject: [PATCH v6 4/8] fsl-dma: move functions to avoid forward declarations
-Date: Mon, 6 Aug 2012 18:14:18 +0800
-Message-ID: <1344248058-9238-1-git-send-email-qiang.liu@freescale.com>
+Subject: [PATCH v6 7/8] fsl-dma: fix a warning of unitialized cookie
+Date: Mon, 6 Aug 2012 18:14:58 +0800
+Message-ID: <1344248098-9360-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: arnd@arndb.de, "Ira W. Snyder" <iws@ovro.caltech.edu>,
- gregkh@linuxfoundation.org, Qiang Liu <qiang.liu@freescale.com>,
- herbert@gondor.hengli.com.au, davem@davemloft.net
+Content-Type: text/plain
+Cc: <kim.phillips@freescale.com>, <herbert@gondor.hengli.com.au>,
+	<davem@davemloft.net>, <arnd@arndb.de>,
+	<gregkh@linuxfoundation.org>, Qiang Liu <qiang.liu@freescale.com>,
+	Li Yang <leoli@freescale.com>
 To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
- <dan.j.williams@intel.com>, <linux-kernel@vger.kernel.org>,
- <dan.j.williams@gmail.com>, <vinod.koul@intel.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+	<dan.j.williams@intel.com>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@gmail.com>, <vinod.koul@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [216.32.180.189] ([216.32.180.189]:28575 "EHLO
+	co1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1755763Ab2HFKlg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 Aug 2012 06:41:36 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Qiang Liu <qiang.liu@freescale.com>
 
-These functions will be modified in the next patch in the series. By
-moving the function in a patch separate from the changes, it will make
-review easier.
+Fix a warning of unitialized value when compile with -Wuninitialized.
 
 Cc: Dan Williams <dan.j.williams@intel.com>
 Cc: Dan Williams <dan.j.williams@gmail.com>
 Cc: Vinod Koul <vinod.koul@intel.com>
 Cc: Li Yang <leoli@freescale.com>
-Signed-off-by: Ira W. Snyder <iws@ovro.caltech.edu>
 Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
+Reported-by: Kim Phillips <kim.phillips@freescale.com>
+Acked-by: Ira W. Snyder <iws@ovro.caltech.edu>
 ---
- drivers/dma/fsldma.c |  230 +++++++++++++++++++++++++-------------------------
- 1 files changed, 115 insertions(+), 115 deletions(-)
+ drivers/dma/fsldma.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/drivers/dma/fsldma.c b/drivers/dma/fsldma.c
-index d4720d3..36490a3 100644
+index 3f809df..6275bdf 100644
 --- a/drivers/dma/fsldma.c
 +++ b/drivers/dma/fsldma.c
-@@ -472,6 +472,121 @@ static struct fsl_desc_sw *fsl_dma_alloc_descriptor(struct fsldma_chan *chan)
- }
+@@ -405,7 +405,7 @@ static dma_cookie_t fsl_dma_tx_submit(struct dma_async_tx_descriptor *tx)
+ 	struct fsldma_chan *chan = to_fsl_chan(tx->chan);
+ 	struct fsl_desc_sw *desc = tx_to_fsl_desc(tx);
+ 	struct fsl_desc_sw *child;
+-	dma_cookie_t cookie;
++	dma_cookie_t cookie = 0;
 
- /**
-+ * fsl_chan_xfer_ld_queue - transfer any pending transactions
-+ * @chan : Freescale DMA channel
-+ *
-+ * HARDWARE STATE: idle
-+ * LOCKING: must hold chan->desc_lock
-+ */
-+static void fsl_chan_xfer_ld_queue(struct fsldma_chan *chan)
-+{
-+	struct fsl_desc_sw *desc;
-+
-+	/*
-+	 * If the list of pending descriptors is empty, then we
-+	 * don't need to do any work at all
-+	 */
-+	if (list_empty(&chan->ld_pending)) {
-+		chan_dbg(chan, "no pending LDs\n");
-+		return;
-+	}
-+
-+	/*
-+	 * The DMA controller is not idle, which means that the interrupt
-+	 * handler will start any queued transactions when it runs after
-+	 * this transaction finishes
-+	 */
-+	if (!chan->idle) {
-+		chan_dbg(chan, "DMA controller still busy\n");
-+		return;
-+	}
-+
-+	/*
-+	 * If there are some link descriptors which have not been
-+	 * transferred, we need to start the controller
-+	 */
-+
-+	/*
-+	 * Move all elements from the queue of pending transactions
-+	 * onto the list of running transactions
-+	 */
-+	chan_dbg(chan, "idle, starting controller\n");
-+	desc = list_first_entry(&chan->ld_pending, struct fsl_desc_sw, node);
-+	list_splice_tail_init(&chan->ld_pending, &chan->ld_running);
-+
-+	/*
-+	 * The 85xx DMA controller doesn't clear the channel start bit
-+	 * automatically at the end of a transfer. Therefore we must clear
-+	 * it in software before starting the transfer.
-+	 */
-+	if ((chan->feature & FSL_DMA_IP_MASK) == FSL_DMA_IP_85XX) {
-+		u32 mode;
-+
-+		mode = DMA_IN(chan, &chan->regs->mr, 32);
-+		mode &= ~FSL_DMA_MR_CS;
-+		DMA_OUT(chan, &chan->regs->mr, mode, 32);
-+	}
-+
-+	/*
-+	 * Program the descriptor's address into the DMA controller,
-+	 * then start the DMA transaction
-+	 */
-+	set_cdar(chan, desc->async_tx.phys);
-+	get_cdar(chan);
-+
-+	dma_start(chan);
-+	chan->idle = false;
-+}
-+
-+/**
-+ * fsldma_cleanup_descriptor - cleanup and free a single link descriptor
-+ * @chan: Freescale DMA channel
-+ * @desc: descriptor to cleanup and free
-+ *
-+ * This function is used on a descriptor which has been executed by the DMA
-+ * controller. It will run any callbacks, submit any dependencies, and then
-+ * free the descriptor.
-+ */
-+static void fsldma_cleanup_descriptor(struct fsldma_chan *chan,
-+				      struct fsl_desc_sw *desc)
-+{
-+	struct dma_async_tx_descriptor *txd = &desc->async_tx;
-+	struct device *dev = chan->common.device->dev;
-+	dma_addr_t src = get_desc_src(chan, desc);
-+	dma_addr_t dst = get_desc_dst(chan, desc);
-+	u32 len = get_desc_cnt(chan, desc);
-+
-+	/* Run the link descriptor callback function */
-+	if (txd->callback) {
-+#ifdef FSL_DMA_LD_DEBUG
-+		chan_dbg(chan, "LD %p callback\n", desc);
-+#endif
-+		txd->callback(txd->callback_param);
-+	}
-+
-+	/* Run any dependencies */
-+	dma_run_dependencies(txd);
-+
-+	/* Unmap the dst buffer, if requested */
-+	if (!(txd->flags & DMA_COMPL_SKIP_DEST_UNMAP)) {
-+		if (txd->flags & DMA_COMPL_DEST_UNMAP_SINGLE)
-+			dma_unmap_single(dev, dst, len, DMA_FROM_DEVICE);
-+		else
-+			dma_unmap_page(dev, dst, len, DMA_FROM_DEVICE);
-+	}
-+
-+	/* Unmap the src buffer, if requested */
-+	if (!(txd->flags & DMA_COMPL_SKIP_SRC_UNMAP)) {
-+		if (txd->flags & DMA_COMPL_SRC_UNMAP_SINGLE)
-+			dma_unmap_single(dev, src, len, DMA_TO_DEVICE);
-+		else
-+			dma_unmap_page(dev, src, len, DMA_TO_DEVICE);
-+	}
-+
-+	fsl_dma_free_descriptor(chan, desc);
-+}
-+
-+/**
-  * fsl_dma_alloc_chan_resources - Allocate resources for DMA channel.
-  * @chan : Freescale DMA channel
-  *
-@@ -816,121 +931,6 @@ static int fsl_dma_device_control(struct dma_chan *dchan,
- }
+ 	spin_lock_bh(&chan->desc_lock);
 
- /**
-- * fsldma_cleanup_descriptor - cleanup and free a single link descriptor
-- * @chan: Freescale DMA channel
-- * @desc: descriptor to cleanup and free
-- *
-- * This function is used on a descriptor which has been executed by the DMA
-- * controller. It will run any callbacks, submit any dependencies, and then
-- * free the descriptor.
-- */
--static void fsldma_cleanup_descriptor(struct fsldma_chan *chan,
--				      struct fsl_desc_sw *desc)
--{
--	struct dma_async_tx_descriptor *txd = &desc->async_tx;
--	struct device *dev = chan->common.device->dev;
--	dma_addr_t src = get_desc_src(chan, desc);
--	dma_addr_t dst = get_desc_dst(chan, desc);
--	u32 len = get_desc_cnt(chan, desc);
--
--	/* Run the link descriptor callback function */
--	if (txd->callback) {
--#ifdef FSL_DMA_LD_DEBUG
--		chan_dbg(chan, "LD %p callback\n", desc);
--#endif
--		txd->callback(txd->callback_param);
--	}
--
--	/* Run any dependencies */
--	dma_run_dependencies(txd);
--
--	/* Unmap the dst buffer, if requested */
--	if (!(txd->flags & DMA_COMPL_SKIP_DEST_UNMAP)) {
--		if (txd->flags & DMA_COMPL_DEST_UNMAP_SINGLE)
--			dma_unmap_single(dev, dst, len, DMA_FROM_DEVICE);
--		else
--			dma_unmap_page(dev, dst, len, DMA_FROM_DEVICE);
--	}
--
--	/* Unmap the src buffer, if requested */
--	if (!(txd->flags & DMA_COMPL_SKIP_SRC_UNMAP)) {
--		if (txd->flags & DMA_COMPL_SRC_UNMAP_SINGLE)
--			dma_unmap_single(dev, src, len, DMA_TO_DEVICE);
--		else
--			dma_unmap_page(dev, src, len, DMA_TO_DEVICE);
--	}
--
--	fsl_dma_free_descriptor(chan, desc);
--}
--
--/**
-- * fsl_chan_xfer_ld_queue - transfer any pending transactions
-- * @chan : Freescale DMA channel
-- *
-- * HARDWARE STATE: idle
-- * LOCKING: must hold chan->desc_lock
-- */
--static void fsl_chan_xfer_ld_queue(struct fsldma_chan *chan)
--{
--	struct fsl_desc_sw *desc;
--
--	/*
--	 * If the list of pending descriptors is empty, then we
--	 * don't need to do any work at all
--	 */
--	if (list_empty(&chan->ld_pending)) {
--		chan_dbg(chan, "no pending LDs\n");
--		return;
--	}
--
--	/*
--	 * The DMA controller is not idle, which means that the interrupt
--	 * handler will start any queued transactions when it runs after
--	 * this transaction finishes
--	 */
--	if (!chan->idle) {
--		chan_dbg(chan, "DMA controller still busy\n");
--		return;
--	}
--
--	/*
--	 * If there are some link descriptors which have not been
--	 * transferred, we need to start the controller
--	 */
--
--	/*
--	 * Move all elements from the queue of pending transactions
--	 * onto the list of running transactions
--	 */
--	chan_dbg(chan, "idle, starting controller\n");
--	desc = list_first_entry(&chan->ld_pending, struct fsl_desc_sw, node);
--	list_splice_tail_init(&chan->ld_pending, &chan->ld_running);
--
--	/*
--	 * The 85xx DMA controller doesn't clear the channel start bit
--	 * automatically at the end of a transfer. Therefore we must clear
--	 * it in software before starting the transfer.
--	 */
--	if ((chan->feature & FSL_DMA_IP_MASK) == FSL_DMA_IP_85XX) {
--		u32 mode;
--
--		mode = DMA_IN(chan, &chan->regs->mr, 32);
--		mode &= ~FSL_DMA_MR_CS;
--		DMA_OUT(chan, &chan->regs->mr, mode, 32);
--	}
--
--	/*
--	 * Program the descriptor's address into the DMA controller,
--	 * then start the DMA transaction
--	 */
--	set_cdar(chan, desc->async_tx.phys);
--	get_cdar(chan);
--
--	dma_start(chan);
--	chan->idle = false;
--}
--
--/**
-  * fsl_dma_memcpy_issue_pending - Issue the DMA start command
-  * @chan : Freescale DMA channel
-  */
 --
 1.7.5.1
