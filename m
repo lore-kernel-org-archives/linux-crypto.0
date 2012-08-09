@@ -1,407 +1,104 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH 2/2] crypto: talitos - consolidate common cra_* assignments
-Date: Wed, 8 Aug 2012 20:33:34 -0500
-Message-ID: <20120808203334.714fac505024e11ed7afa06a@freescale.com>
-References: <1343917001-20001-1-git-send-email-horia.geanta@freescale.com>
-	<1343917001-20001-5-git-send-email-horia.geanta@freescale.com>
-	<20120806204751.1f6277ba8f7b1de92fd128ac@freescale.com>
-	<FD18E5D573A8AB48A365D4D78185DE9929291E@039-SN1MPN1-001.039d.mgd.msft.net>
-	<FD18E5D573A8AB48A365D4D78185DE99293799@039-SN1MPN1-001.039d.mgd.msft.net>
-	<20120807212748.d805c751b83e14e20b397cc1@freescale.com>
+From: <qiang.liu@freescale.com>
+Subject: [PATCH v7 0/8] Raid: enable talitos xor offload for improving performance
+Date: Thu, 9 Aug 2012 16:19:35 +0800
+Message-ID: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
+Content-Type: text/plain
+Cc: <leoli@freescale.com>, <kim.phillips@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <vinod.koul@intel.com>,
+	<dan.j.williams@intel.com>, <herbert@gondor.hengli.com.au>,
+	<arnd@arndb.de>, <gregkh@linuxfoundation.org>,
+	<linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe006.messaging.microsoft.com ([216.32.181.186]:43656
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750822Ab2HIBfn (ORCPT
+Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:46845
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753618Ab2HIIqd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Aug 2012 21:35:43 -0400
-In-Reply-To: <20120807212748.d805c751b83e14e20b397cc1@freescale.com>
+	Thu, 9 Aug 2012 04:46:33 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-the entry points and geniv definitions for all aead,
-ablkcipher, and hash algorithms are all common; move them to a
-single assignment in talitos_alg_alloc().
+Hi all,
 
-This assumes it's ok to assign a setkey() on non-hmac algs.
+The following 8 patches enabling fsl-dma and talitos offload raid
+operations for improving raid performance and balancing CPU load.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
+These patches include talitos, fsl-dma and carma module (caram uses
+some features of fsl-dma).
 
- drivers/crypto/talitos.c | 163 +++++------------------------------------------
- 1 file changed, 17 insertions(+), 146 deletions(-)
+Write performance will be improved by 25-30% tested by iozone.
+Write performance is improved about 2% after using spin_lock_bh replace
+spin_lock_irqsave.
+CPU load will be reduced by 8%.
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index df4a266..f414983 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2380,12 +2380,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = SHA1_DIGEST_SIZE,
- 			}
-@@ -2405,12 +2399,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = SHA1_DIGEST_SIZE,
- 			}
-@@ -2431,12 +2419,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = SHA224_DIGEST_SIZE,
- 			}
-@@ -2456,12 +2438,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = SHA224_DIGEST_SIZE,
- 			}
-@@ -2482,12 +2458,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = SHA256_DIGEST_SIZE,
- 			}
-@@ -2507,12 +2477,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = SHA256_DIGEST_SIZE,
- 			}
-@@ -2533,12 +2497,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = SHA384_DIGEST_SIZE,
- 			}
-@@ -2558,12 +2516,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = SHA384_DIGEST_SIZE,
- 			}
-@@ -2584,12 +2536,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = SHA512_DIGEST_SIZE,
- 			}
-@@ -2609,12 +2555,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = SHA512_DIGEST_SIZE,
- 			}
-@@ -2635,12 +2575,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = AES_BLOCK_SIZE,
- 				.maxauthsize = MD5_DIGEST_SIZE,
- 			}
-@@ -2660,12 +2594,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
- 			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
- 			.cra_aead = {
--				.setkey = aead_setkey,
--				.setauthsize = aead_setauthsize,
--				.encrypt = aead_encrypt,
--				.decrypt = aead_decrypt,
--				.givencrypt = aead_givencrypt,
--				.geniv = "<built-in>",
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
- 				.maxauthsize = MD5_DIGEST_SIZE,
- 			}
-@@ -2688,10 +2616,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-                                      CRYPTO_ALG_ASYNC,
- 			.cra_ablkcipher = {
--				.setkey = ablkcipher_setkey,
--				.encrypt = ablkcipher_encrypt,
--				.decrypt = ablkcipher_decrypt,
--				.geniv = "eseqiv",
- 				.min_keysize = AES_MIN_KEY_SIZE,
- 				.max_keysize = AES_MAX_KEY_SIZE,
- 				.ivsize = AES_BLOCK_SIZE,
-@@ -2709,10 +2633,6 @@ static struct talitos_alg_template driver_algs[] = {
- 			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-                                      CRYPTO_ALG_ASYNC,
- 			.cra_ablkcipher = {
--				.setkey = ablkcipher_setkey,
--				.encrypt = ablkcipher_encrypt,
--				.decrypt = ablkcipher_decrypt,
--				.geniv = "eseqiv",
- 				.min_keysize = DES3_EDE_KEY_SIZE,
- 				.max_keysize = DES3_EDE_KEY_SIZE,
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
-@@ -2726,11 +2646,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	/* AHASH algorithms. */
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = MD5_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "md5",
-@@ -2746,11 +2661,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = SHA1_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "sha1",
-@@ -2766,11 +2676,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = SHA224_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "sha224",
-@@ -2786,11 +2691,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = SHA256_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "sha256",
-@@ -2806,11 +2706,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = SHA384_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "sha384",
-@@ -2826,11 +2721,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
- 			.halg.digestsize = SHA512_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "sha512",
-@@ -2846,12 +2736,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = MD5_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(md5)",
-@@ -2867,12 +2751,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = SHA1_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(sha1)",
-@@ -2888,12 +2766,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = SHA224_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(sha224)",
-@@ -2909,12 +2781,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = SHA256_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(sha256)",
-@@ -2930,12 +2796,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = SHA384_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(sha384)",
-@@ -2951,12 +2811,6 @@ static struct talitos_alg_template driver_algs[] = {
- 	},
- 	{	.type = CRYPTO_ALG_TYPE_AHASH,
- 		.alg.hash = {
--			.init = ahash_init,
--			.update = ahash_update,
--			.final = ahash_final,
--			.finup = ahash_finup,
--			.digest = ahash_digest,
--			.setkey = ahash_setkey,
- 			.halg.digestsize = SHA512_DIGEST_SIZE,
- 			.halg.base = {
- 				.cra_name = "hmac(sha512)",
-@@ -3122,16 +2976,33 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg = &t_alg->algt.alg.crypto;
- 		alg->cra_init = talitos_cra_init;
- 		alg->cra_type = &crypto_ablkcipher_type;
-+		alg->cra_ablkcipher.setkey = ablkcipher_setkey;
-+		alg->cra_ablkcipher.encrypt = ablkcipher_encrypt;
-+		alg->cra_ablkcipher.decrypt = ablkcipher_decrypt;
-+		alg->cra_ablkcipher.geniv = "eseqiv";
- 		break;
- 	case CRYPTO_ALG_TYPE_AEAD:
- 		alg = &t_alg->algt.alg.crypto;
- 		alg->cra_init = talitos_cra_init_aead;
- 		alg->cra_type = &crypto_aead_type;
-+		alg->cra_aead.setkey = aead_setkey;
-+		alg->cra_aead.setauthsize = aead_setauthsize;
-+		alg->cra_aead.encrypt = aead_encrypt;
-+		alg->cra_aead.decrypt = aead_decrypt;
-+		alg->cra_aead.givencrypt = aead_givencrypt;
-+		alg->cra_aead.geniv = "<built-in>";
- 		break;
- 	case CRYPTO_ALG_TYPE_AHASH:
- 		alg = &t_alg->algt.alg.hash.halg.base;
- 		alg->cra_init = talitos_cra_init_ahash;
- 		alg->cra_type = &crypto_ahash_type;
-+		t_alg->algt.alg.hash.init = ahash_init;
-+		t_alg->algt.alg.hash.update = ahash_update;
-+		t_alg->algt.alg.hash.final = ahash_final;
-+		t_alg->algt.alg.hash.finup = ahash_finup;
-+		t_alg->algt.alg.hash.digest = ahash_digest;
-+		t_alg->algt.alg.hash.setkey = ahash_setkey;
-+
- 		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
- 		    !strncmp(alg->cra_name, "hmac", 4)) {
- 			kfree(t_alg);
--- 
-1.7.11.3
+"fwiw, I gave v5 a test-drive, setting up a RAID5 array on ramdisks
+[1], and this patchseries, along with FSL_DMA && NET_DMA set seems
+to be holding water, so this series gets my:"
+
+Tested-by: Kim Phillips <kim.phillips@freescale.com>
+
+[1] mdadm --create --verbose --force /dev/md0 --level=raid5 --raid-devices=4 \
+	/dev/ram[0123]
+
+Changes in v7:
+	- add test result which is provided by Kim Phillips;
+	- correct one coding style issue in patch 5/8;
+	- add comments by Arnd Bergmann in patch 6/8;
+
+Changes in v6:
+	- swap the order of original patch 3/6 and 4/6;
+	- merge Ira's patch to reduce the size of original patch;
+	- merge Ira's patch of carma in 8/8;
+	- update documents and descriptions according to Ira's advice;
+
+Changes in v5:
+	- add detail description in patch 3/6 about the process of completed
+	descriptor, the process is in align with fsl-dma Reference Manual,
+	illustrate the potential risk and how to reproduce it;
+	- drop the patch 7/7 in v4 according to Timur's comments;
+
+Changes in v4:
+	- fix an error in talitos when dest addr is same with src addr, dest
+	should be freed only one time if src is same with dest addr;
+	- correct coding style in fsl-dma according to Ira's comments;
+	- fix a race condition in fsl-dma fsl_tx_status(), remove the interface
+	which is used to free descriptors in queue ld_completed, this interface
+	has been included in fsldma_cleanup_descriptor(), in v3, there is one
+	place missed spin_lock protect;
+	- split the original patch 3/4 up to 2 patches 3/7 and 4/7 according to
+	Li Yang's comments;
+	- fix a warning of unitialized cookie;
+	- add memory copy self test in fsl-dma;
+	- add more detail description about use spin_lock_bh() to instead of
+	spin_lock_irqsave() according to Timur's comments.
+
+Changes in v3:
+	- change release process of fsl-dma descriptor for resolve the
+	potential race condition;
+	- add test result when use spin_lock_bh replace spin_lock_irqsave;
+	- modify the benchmark results according to the latest patch.
+
+Changes in v2:
+	- rebase onto cryptodev tree;
+	- split the patch 3/4 up to 3 independent patches;
+	- remove the patch 4/4, the fix is not for cryptodev tree;
+
+Qiang Liu (8):
+      Talitos: Support for async_tx XOR offload
+      fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
+      fsl-dma: add fsl_dma_free_descriptor() to reduce code duplication
+      fsl-dma: move functions to avoid forward declarations
+      fsl-dma: change release process of dma descriptor for supporting async_tx
+      fsl-dma: use spin_lock_bh to instead of spin_lock_irqsave
+      fsl-dma: fix a warning of unitialized cookie
+      carma: remove unnecessary DMA_INTERRUPT capability
+
+ drivers/crypto/Kconfig                  |    9 +
+ drivers/crypto/talitos.c                |  413 ++++++++++++++++++++++++++
+ drivers/crypto/talitos.h                |   53 ++++
+ drivers/dma/fsldma.c                    |  488 +++++++++++++++++--------------
+ drivers/dma/fsldma.h                    |   17 +-
+ drivers/misc/carma/carma-fpga-program.c |    1 -
+ drivers/misc/carma/carma-fpga.c         |    2 +-
+ 7 files changed, 761 insertions(+), 222 deletions(-)
