@@ -1,120 +1,65 @@
-From: "Ira W. Snyder" <iws@ovro.caltech.edu>
-Subject: Re: [PATCH v7 0/8] Raid: enable talitos xor offload for improving
- performance
-Date: Thu, 9 Aug 2012 10:03:07 -0700
-Message-ID: <20120809170307.GG14264@ovro.caltech.edu>
-References: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 1/3 v2] crypto: caam - fix possible deadlock condition
+Date: Thu, 9 Aug 2012 19:00:14 -0500
+Message-ID: <20120809190014.336b166aa62b608d23896ae0@freescale.com>
+References: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
+	<20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
+	<20120730075603.GD5515@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, vinod.koul@intel.com,
-	dan.j.williams@intel.com, herbert@gondor.hengli.com.au,
-	arnd@arndb.de, gregkh@linuxfoundation.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	dan.j.williams@gmail.com
-To: qiang.liu@freescale.com
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ovro.ovro.caltech.edu ([192.100.16.2]:48209 "EHLO
-	ovro.ovro.caltech.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751293Ab2HIRDL (ORCPT
+Received: from db3ehsobe004.messaging.microsoft.com ([213.199.154.142]:16127
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756041Ab2HJACZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Aug 2012 13:03:11 -0400
-Content-Disposition: inline
-In-Reply-To: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
+	Thu, 9 Aug 2012 20:02:25 -0400
+In-Reply-To: <20120730075603.GD5515@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 09, 2012 at 04:19:35PM +0800, qiang.liu@freescale.com wrote:
-> Hi all,
-> 
-> The following 8 patches enabling fsl-dma and talitos offload raid
-> operations for improving raid performance and balancing CPU load.
-> 
-> These patches include talitos, fsl-dma and carma module (caram uses
-> some features of fsl-dma).
-> 
-> Write performance will be improved by 25-30% tested by iozone.
-> Write performance is improved about 2% after using spin_lock_bh replace
-> spin_lock_irqsave.
-> CPU load will be reduced by 8%.
-> 
-> "fwiw, I gave v5 a test-drive, setting up a RAID5 array on ramdisks
-> [1], and this patchseries, along with FSL_DMA && NET_DMA set seems
-> to be holding water, so this series gets my:"
-> 
-> Tested-by: Kim Phillips <kim.phillips@freescale.com>
-> 
+On Mon, 30 Jul 2012 15:56:04 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-The fsldma parts of the series all look great to me.
+> On Fri, Jul 13, 2012 at 06:04:23PM -0500, Kim Phillips wrote:
+> > commit "crypto: caam - use non-irq versions of spinlocks for job rings"
+> > made two bad assumptions:
+> > 
+> > (a) The caam_jr_enqueue lock isn't used in softirq context.
+> > Not true: jr_enqueue can be interrupted by an incoming net
+> > interrupt and the received packet may be sent for encryption,
+> > via caam_jr_enqueue in softirq context, thereby inducing a
+> > deadlock.
+> > 
+> > This is evidenced when running netperf over an IPSec tunnel
+> > between two P4080's, with spinlock debugging turned on:
+> 
+> All patches applied.  Thanks Kim.
+
+Herbert, just wanted to make sure that at least the first patch in
+this series were also applied to the crypto tree, i.e., for 3.6
+release because it fixes a potential deadlock condition.  The second
+patch should, too, but it's less important IMO.
+
+These are the commits to cherry pick from cryptodev into crypto:
+
+4a90507 crypto: caam - fix possible deadlock condition
+95bcaa3 crypto: caam - add backward compatible string sec4.0 (optional)
+
+The third is this one:
+
+61bb86b crypto: caam - set descriptor sharing type to SERIAL
+
+which technically is a performance improvement, and I'm ok with
+leaving it out of v3.6.
+
+Sorry for not making that clear from the start; sometimes it's tough
+to tell what will make it into cryptodev prior to the merge window
+opening (or rather as that time approaches).
 
 Thanks,
-Ira
 
-> [1] mdadm --create --verbose --force /dev/md0 --level=raid5 --raid-devices=4 \
-> 	/dev/ram[0123]
-> 
-> Changes in v7:
-> 	- add test result which is provided by Kim Phillips;
-> 	- correct one coding style issue in patch 5/8;
-> 	- add comments by Arnd Bergmann in patch 6/8;
-> 
-> Changes in v6:
-> 	- swap the order of original patch 3/6 and 4/6;
-> 	- merge Ira's patch to reduce the size of original patch;
-> 	- merge Ira's patch of carma in 8/8;
-> 	- update documents and descriptions according to Ira's advice;
-> 
-> Changes in v5:
-> 	- add detail description in patch 3/6 about the process of completed
-> 	descriptor, the process is in align with fsl-dma Reference Manual,
-> 	illustrate the potential risk and how to reproduce it;
-> 	- drop the patch 7/7 in v4 according to Timur's comments;
-> 
-> Changes in v4:
-> 	- fix an error in talitos when dest addr is same with src addr, dest
-> 	should be freed only one time if src is same with dest addr;
-> 	- correct coding style in fsl-dma according to Ira's comments;
-> 	- fix a race condition in fsl-dma fsl_tx_status(), remove the interface
-> 	which is used to free descriptors in queue ld_completed, this interface
-> 	has been included in fsldma_cleanup_descriptor(), in v3, there is one
-> 	place missed spin_lock protect;
-> 	- split the original patch 3/4 up to 2 patches 3/7 and 4/7 according to
-> 	Li Yang's comments;
-> 	- fix a warning of unitialized cookie;
-> 	- add memory copy self test in fsl-dma;
-> 	- add more detail description about use spin_lock_bh() to instead of
-> 	spin_lock_irqsave() according to Timur's comments.
-> 
-> Changes in v3:
-> 	- change release process of fsl-dma descriptor for resolve the
-> 	potential race condition;
-> 	- add test result when use spin_lock_bh replace spin_lock_irqsave;
-> 	- modify the benchmark results according to the latest patch.
-> 
-> Changes in v2:
-> 	- rebase onto cryptodev tree;
-> 	- split the patch 3/4 up to 3 independent patches;
-> 	- remove the patch 4/4, the fix is not for cryptodev tree;
-> 
-> Qiang Liu (8):
->       Talitos: Support for async_tx XOR offload
->       fsl-dma: remove attribute DMA_INTERRUPT of dmaengine
->       fsl-dma: add fsl_dma_free_descriptor() to reduce code duplication
->       fsl-dma: move functions to avoid forward declarations
->       fsl-dma: change release process of dma descriptor for supporting async_tx
->       fsl-dma: use spin_lock_bh to instead of spin_lock_irqsave
->       fsl-dma: fix a warning of unitialized cookie
->       carma: remove unnecessary DMA_INTERRUPT capability
-> 
->  drivers/crypto/Kconfig                  |    9 +
->  drivers/crypto/talitos.c                |  413 ++++++++++++++++++++++++++
->  drivers/crypto/talitos.h                |   53 ++++
->  drivers/dma/fsldma.c                    |  488 +++++++++++++++++--------------
->  drivers/dma/fsldma.h                    |   17 +-
->  drivers/misc/carma/carma-fpga-program.c |    1 -
->  drivers/misc/carma/carma-fpga.c         |    2 +-
->  7 files changed, 761 insertions(+), 222 deletions(-)
-> 
-> _______________________________________________
-> Linuxppc-dev mailing list
-> Linuxppc-dev@lists.ozlabs.org
-> https://lists.ozlabs.org/listinfo/linuxppc-dev
+Kim
