@@ -1,70 +1,57 @@
-From: Liu Qiang-B32616 <B32616@freescale.com>
-Subject: RE: [PATCH v7 0/8] Raid: enable talitos xor offload for improving
- performance
-Date: Wed, 15 Aug 2012 07:59:54 +0000
-Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70E40F1@039-SN2MPN1-013.039d.mgd.msft.net>
-References: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
-	<20120809170307.GG14264@ovro.caltech.edu>
-	<BCB48C05FCE8BC4D9E61E841ECBE6DB70E3D47@039-SN2MPN1-013.039d.mgd.msft.net>
- <CAA9_cme4tHrx14JaSaHwgcGq79qQK5bv8E205fbC3ega5OpUiQ@mail.gmail.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler
+ implementation
+Date: Wed, 15 Aug 2012 11:42:16 +0300
+Message-ID: <20120815114216.209814z4mq3hxqe8@www.81.fi>
+References: <20120527144919.GE17705@kronos.redsun>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "vinod.koul@intel.com" <vinod.koul@intel.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Ira W. Snyder" <iws@ovro.caltech.edu>
-To: Dan Williams <djbw@fb.com>,
-	"dan.j.williams@gmail.com" <dan.j.williams@gmail.com>
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Tilo =?iso-8859-1?b?TfxsbGVy?=
+	<tilo.mueller@informatik.uni-erlangen.de>
+To: Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe006.messaging.microsoft.com ([216.32.180.16]:31977
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751420Ab2HOH76 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Aug 2012 03:59:58 -0400
-In-Reply-To: <CAA9_cme4tHrx14JaSaHwgcGq79qQK5bv8E205fbC3ega5OpUiQ@mail.gmail.com>
-Content-Language: en-US
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:41390 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753212Ab2HOImT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 Aug 2012 04:42:19 -0400
+In-Reply-To: <20120527144919.GE17705@kronos.redsun>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> -----Original Message-----
-> From: dan.j.williams@gmail.com [mailto:dan.j.williams@gmail.com] On
-> Behalf Of Dan Williams
-> Sent: Wednesday, August 15, 2012 4:02 AM
-> To: Liu Qiang-B32616
-> Cc: dan.j.williams@intel.com; vinod.koul@intel.com; arnd@arndb.de;
-> herbert@gondor.apana.org.au; gregkh@linuxfoundation.org; linuxppc-
-> dev@lists.ozlabs.org; linux-kernel@vger.kernel.org; linux-
-> crypto@vger.kernel.org; Ira W. Snyder
-> Subject: Re: [PATCH v7 0/8] Raid: enable talitos xor offload for
-> improving performance
-> 
-> On Tue, Aug 14, 2012 at 2:04 AM, Liu Qiang-B32616 <B32616@freescale.com>
-> wrote:
-> > Hi Vinod,
-> >
-> > Would you like to apply this series from patch 2/8 to 7/8) in your tree?
-> > The link as below,
-> > http://patchwork.ozlabs.org/patch/176023/
-> > http://patchwork.ozlabs.org/patch/176024/
-> > http://patchwork.ozlabs.org/patch/176025/
-> > http://patchwork.ozlabs.org/patch/176026/
-> > http://patchwork.ozlabs.org/patch/176027/
-> > http://patchwork.ozlabs.org/patch/176028/
-> >
-> 
-> Hi, sorry for the recent silence I've been transitioning and am now
-> just catching up.  I'll take a look and then it's fine for these to go
-> through Vinod's tree.
-Hello Dan,
+Quoting Johannes Goetzfried  
+<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>:
 
-Please review, this issue has been continued since many years. I hope we can fix
-it this time. Thanks.
+> This patch adds a x86_64/avx assembler implementation of the Twofish block
+> cipher. The implementation processes eight blocks in parallel (two 4 block
+> chunk AVX operations). The table-lookups are done in general-purpose  
+> registers.
+> For small blocksizes the 3way-parallel functions from the twofish-x86_64-3way
+> module are called. A good performance increase is provided for blocksizes
+> greater or equal to 128B.
+>
+> Patch has been tested with tcrypt and automated filesystem tests.
+>
+> Tcrypt benchmark results:
+>
+> Intel Core i5-2500 CPU (fam:6, model:42, step:7)
 
-> 
-> --
-> Dan
+I started thinking about the performance on AMD Bulldozer.  
+vmovq/vmovd/vpextr*/vpinsr* between FPU and general purpose registers  
+on AMD CPU is alot slower (latencies from 8 to 12 cycles) than on  
+Intel sandy-bridge (where instructions have latency of 1 to 2). See:  
+http://www.agner.org/optimize/instruction_tables.pdf
+
+It would be really good, if implementation could be tested on AMD CPU  
+to determinate, if it causes performance regression. However I don't  
+have access to machine with such CPU.
+
+-Jussi
