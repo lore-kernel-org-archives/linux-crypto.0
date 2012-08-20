@@ -1,59 +1,64 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3 v2] crypto: caam - fix possible deadlock condition
-Date: Mon, 20 Aug 2012 16:30:53 +0800
-Message-ID: <20120820083053.GA22914@gondor.apana.org.au>
-References: <20120713174915.645ffcc5c30160d69a5adc16@freescale.com>
- <20120713180423.25043873b8fc99f7cb2d843b@freescale.com>
- <20120730075603.GD5515@gondor.apana.org.au>
- <20120809190014.336b166aa62b608d23896ae0@freescale.com>
+Subject: Re: [PATCH] crypto: aesni_intel - improve lrw and xts performance
+ by utilizing parallel AES-NI hardware pipelines
+Date: Mon, 20 Aug 2012 16:31:19 +0800
+Message-ID: <20120820083119.GA22951@gondor.apana.org.au>
+References: <20120722151837.28864.2550.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org, Huang Ying <ying.huang@intel.com>,
 	"David S. Miller" <davem@davemloft.net>
-To: Kim Phillips <kim.phillips@freescale.com>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:40164 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:57487 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755823Ab2HTIaz (ORCPT
+	with ESMTP id S1755394Ab2HTIbX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Aug 2012 04:30:55 -0400
+	Mon, 20 Aug 2012 04:31:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20120809190014.336b166aa62b608d23896ae0@freescale.com>
+In-Reply-To: <20120722151837.28864.2550.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 09, 2012 at 07:00:14PM -0500, Kim Phillips wrote:
-> On Mon, 30 Jul 2012 15:56:04 +0800
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Sun, Jul 22, 2012 at 06:18:37PM +0300, Jussi Kivilinna wrote:
+> Use parallel LRW and XTS encryption facilities to better utilize AES-NI
+> hardware pipelines and gain extra performance.
 > 
-> > On Fri, Jul 13, 2012 at 06:04:23PM -0500, Kim Phillips wrote:
-> > > commit "crypto: caam - use non-irq versions of spinlocks for job rings"
-> > > made two bad assumptions:
-> > > 
-> > > (a) The caam_jr_enqueue lock isn't used in softirq context.
-> > > Not true: jr_enqueue can be interrupted by an incoming net
-> > > interrupt and the received packet may be sent for encryption,
-> > > via caam_jr_enqueue in softirq context, thereby inducing a
-> > > deadlock.
-> > > 
-> > > This is evidenced when running netperf over an IPSec tunnel
-> > > between two P4080's, with spinlock debugging turned on:
-> > 
-> > All patches applied.  Thanks Kim.
+> Tcrypt benchmark results (async), old vs new ratios:
 > 
-> Herbert, just wanted to make sure that at least the first patch in
-> this series were also applied to the crypto tree, i.e., for 3.6
-> release because it fixes a potential deadlock condition.  The second
-> patch should, too, but it's less important IMO.
+> Intel Core i5-2450M CPU (fam: 6, model: 42, step: 7)
 > 
-> These are the commits to cherry pick from cryptodev into crypto:
+> aes:128bit
+>         lrw:256bit      xts:256bit
+> size    lrw-enc lrw-dec xts-dec xts-dec
+> 16B     0.99x   1.00x   1.22x   1.19x
+> 64B     1.38x   1.50x   1.58x   1.61x
+> 256B    2.04x   2.02x   2.27x   2.29x
+> 1024B   2.56x   2.54x   2.89x   2.92x
+> 8192B   2.85x   2.99x   3.40x   3.23x
 > 
-> 4a90507 crypto: caam - fix possible deadlock condition
-> 95bcaa3 crypto: caam - add backward compatible string sec4.0 (optional)
+> aes:192bit
+>         lrw:320bit      xts:384bit
+> size    lrw-enc lrw-dec xts-dec xts-dec
+> 16B     1.08x   1.08x   1.16x   1.17x
+> 64B     1.48x   1.54x   1.59x   1.65x
+> 256B    2.18x   2.17x   2.29x   2.28x
+> 1024B   2.67x   2.67x   2.87x   3.05x
+> 8192B   2.93x   2.84x   3.28x   3.33x
+> 
+> aes:256bit
+>         lrw:348bit      xts:512bit
+> size    lrw-enc lrw-dec xts-dec xts-dec
+> 16B     1.07x   1.07x   1.18x   1.19x
+> 64B     1.56x   1.56x   1.70x   1.71x
+> 256B    2.22x   2.24x   2.46x   2.46x
+> 1024B   2.76x   2.77x   3.13x   3.05x
+> 8192B   2.99x   3.05x   3.40x   3.30x
+> 
+> Cc: Huang Ying <ying.huang@intel.com>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-OK, I'll add these two patches to crypto-2.6.
-
-Thanks,
+Patch applied.  Thanks Jussi!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
