@@ -1,410 +1,1125 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler implementation
-Date: Wed, 22 Aug 2012 07:35:12 +0300
-Message-ID: <20120822041825.12398.99246.stgit@localhost6.localdomain6>
-References: <20120820173213.GD4060@x1.osrc.amd.com>
+From: <b29237@freescale.com>
+Subject: [PATCH] RAID/DMA/caamxor: support XOR offload by CAAM
+Date: Wed, 22 Aug 2012 15:05:50 +0800
+Message-ID: <1345619150-21268-1-git-send-email-b29237@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tilo =?utf-8?q?M=C3=BCller?=
-	<tilo.mueller@informatik.uni-erlangen.de>,
-	linux-kernel@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
+Content-Type: text/plain
+Cc: <naveenburmi@freescale.com>, Xuelin Shi <b29237@freescale.com>
+To: <dan.j.williams@gmail.com>, <vinod.koul@intel.com>,
+	<herbert@gondor.hengli.com.au>, <r1aaha@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:39294 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751146Ab2HVEfQ convert rfc822-to-8bit (ORCPT
+Received: from co1ehsobe001.messaging.microsoft.com ([216.32.180.184]:7374
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755983Ab2HVHf0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Aug 2012 00:35:16 -0400
-In-Reply-To: <20120820173213.GD4060@x1.osrc.amd.com>
+	Wed, 22 Aug 2012 03:35:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Borislav Petkov <bp@alien8.de>:
+From: Xuelin Shi <b29237@freescale.com>
 
->=20
-> Here you go:
->=20
-> [   52.282208]
-> [   52.282208] testing speed of async ecb(twofish) encryption
+Add XOR offloading functionality by CAAM and interface with async_tx layer
+so that it can be used for RAID parity computation.
 
-Thanks!
-
-Looks that encryption lost ~0.4% while decryption gained ~1.8%.
-
-=46or 256 byte test, it's still slightly slower than twofish-3way (~3%)=
-=2E For 1k
-and 8k tests, it's ~5% faster.
-
-Here's very last test-patch, testing different ordering of fpu<->cpu re=
-g
-instructions at few places.
-
+Signed-off-by: Naveen Burmi <naveenburmi@freescale.com>
+Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
+Signed-off-by: Xuelin Shi <b29237@freescale.com>
 ---
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S |  232 ++++++++++++++++++-=
---------
- 1 file changed, 154 insertions(+), 78 deletions(-)
+ drivers/crypto/caam/Kconfig       |   15 +
+ drivers/crypto/caam/Makefile      |    1 +
+ drivers/crypto/caam/caamxor.c     |  880 +++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/desc_constr.h |   53 +++-
+ drivers/crypto/caam/intern.h      |    7 +
+ drivers/crypto/caam/jr.c          |    8 +-
+ 6 files changed, 959 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/crypto/caam/caamxor.c
 
-diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/cry=
-pto/twofish-avx-x86_64-asm_64.S
-index 35f4557..693963a 100644
---- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-@@ -4,6 +4,8 @@
-  * Copyright (C) 2012 Johannes Goetzfried
-  *     <Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
-  *
-+ * Copyright =C2=A9 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 65c7668..643ca0a 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -98,3 +98,18 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called caamrng.
++
++config CRYPTO_DEV_FSL_CAAM_DMAXOR_API
++	tristate "Freescale CAAM XOR support"
++	depends on CRYPTO_DEV_FSL_CAAM && EXPERIMENTAL
++	default n
++	select DMA_ENGINE
++	select ASYNC_XOR
++	help
++	  Selecting this will offload the xor-parity-calculation for
++	  users of the Asynchronous Transfers/Transforms API (such as
++	  md-raid5 driver) to the SEC4.
++
++
++	  To compile this as a module, choose M here: the module
++	  will be called caamxor.
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index b1eb448..457192c 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -6,5 +6,6 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
++obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_DMAXOR_API) += caamxor.o
+ 
+ caam-objs := ctrl.o jr.o error.o key_gen.o
+diff --git a/drivers/crypto/caam/caamxor.c b/drivers/crypto/caam/caamxor.c
+new file mode 100644
+index 0000000..f060cff
+--- /dev/null
++++ b/drivers/crypto/caam/caamxor.c
+@@ -0,0 +1,880 @@
++/*
++ * caam - Freescale Integrated Security Engine (SEC) device driver
++ * Support for off-loading XOR Parity Calculations to CAAM.
 + *
-  * This program is free software; you can redistribute it and/or modif=
-y
-  * it under the terms of the GNU General Public License as published b=
-y
-  * the Free Software Foundation; either version 2 of the License, or
-@@ -47,16 +49,21 @@
- #define RC2 %xmm6
- #define RD2 %xmm7
-=20
--#define RX %xmm8
--#define RY %xmm9
-+#define RX0 %xmm8
-+#define RY0 %xmm9
++ * Copyright 2011 Freescale Semiconductor, Inc
++ *
++ * relationship between job descriptors, shared descriptors and sources:
++ * ------------------------------           -------------------
++ * | ShareDesc                  |<------\   | JobDesc         |
++ * |   Load src pointers to ctx |        \--| ShareDesc ptr   |
++ * | new src jump dst:          |<-----\    | SEQ_OUT_PTR     |
++ * |   Load ith src             |      |    | (output buffer) |
++ * | new src mv dst:            |      |    | (output length) |
++ * |   (ith src commands)       |      |    | SEQ_IN_PTR      |
++ * | load:                      |<---\ |    | (src commands)  |----\
++ * |   Seq load chunk           |    | |    -------------------    |
++ * | return:                    |<---|-|-\                         |
++ * |   XOR quarter chunk        |    | | |                         |
++ * |   Pass complete?           |----^-^---\                       |
++ * |   Half chunk left?         |----^-+ | |                       |
++ * |   Default                  |----^-^-+ |                       |
++ * | store:                     |<---|-|-|-/                       |
++ * |   Seq store chunk          |    | | |    -------------------  |
++ * |   No data left to write?   |X   | | |    | first src ptr   |<-/
++ * |   Put src1 chunk in result |    | | |    | first src len   |
++ * |   Default                  |----^-+ |  /-| shared hdr jump |
++ * | first:                     |<---|-|-|-/  | nop (if needed) |
++ * |   No data left to read?    |----^-^-+    -------------------
++ * |   Seq load chunk           |    | | |    | ith src ptr     |
++ * |   Load src2                |    | | |    | ith src len     |
++ * |   Not first pass?          |----^-^-/    | load src i + 1  |
++ * | first pass:                |    | |      | nop (if needed) |
++ * |   Put src1 chunk in result |    | |      -------------------
++ * |   set output size          |    | |      | last src ptr    |
++ * |   Default                  |----^-/      | last src len    |
++ * | last:                      |<---|--------| shared hdr jump |
++ * |   Update index             |    |        | nop (if needed) |
++ * |   Load src1                |    |        -------------------
++ * |   Default                  |----/
++ * ------------------------------
++ *
++ */
 +
-+#define RX1 %xmm10
-+#define RY1 %xmm11
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/dmaengine.h>
 +
-+#define RK1 %xmm12
-+#define RK2 %xmm13
-=20
--#define RK1 %xmm10
--#define RK2 %xmm11
-+#define RT %xmm14
-=20
--#define RID1  %rax
--#define RID1b %al
--#define RID2  %rbx
--#define RID2b %bl
-+#define RID1  %rbp
-+#define RID1d %ebp
-+#define RID2  %rsi
-+#define RID2d %esi
-=20
- #define RGI1   %rdx
- #define RGI1bl %dl
-@@ -65,6 +72,13 @@
- #define RGI2bl %cl
- #define RGI2bh %ch
-=20
-+#define RGI3   %rax
-+#define RGI3bl %al
-+#define RGI3bh %ah
-+#define RGI4   %rbx
-+#define RGI4bl %bl
-+#define RGI4bh %bh
++#include "compat.h"
++#include "regs.h"
++#include "jr.h"
++#include "error.h"
++#include "intern.h"
++#include "desc.h"
++#include "desc_constr.h"
 +
- #define RGS1  %r8
- #define RGS1d %r8d
- #define RGS2  %r9
-@@ -73,40 +87,58 @@
- #define RGS3d %r10d
-=20
-=20
--#define lookup_32bit(t0, t1, t2, t3, src, dst) \
--	movb		src ## bl,        RID1b;     \
--	movb		src ## bh,        RID2b;     \
-+#define lookup_32bit(t0, t1, t2, t3, src, dst, interleave_op, il_reg) =
-\
-+	movzbl		src ## bl,        RID1d;     \
-+	movzbl		src ## bh,        RID2d;     \
-+	shrq $16,	src;                         \
- 	movl		t0(CTX, RID1, 4), dst ## d;  \
- 	xorl		t1(CTX, RID2, 4), dst ## d;  \
--	shrq $16,	src;                         \
--	movb		src ## bl,        RID1b;     \
--	movb		src ## bh,        RID2b;     \
-+	movzbl		src ## bl,        RID1d;     \
-+	movzbl		src ## bh,        RID2d;     \
-+	interleave_op(il_reg);			     \
- 	xorl		t2(CTX, RID1, 4), dst ## d;  \
- 	xorl		t3(CTX, RID2, 4), dst ## d;
-=20
--#define G(a, x, t0, t1, t2, t3) \
--	vmovq		a,    RGI1;               \
--	vpsrldq $8,	a,    x;                  \
--	vmovq		x,    RGI2;               \
--	\
--	lookup_32bit(t0, t1, t2, t3, RGI1, RGS1); \
--	shrq $16,	RGI1;                     \
--	lookup_32bit(t0, t1, t2, t3, RGI1, RGS2); \
--	shlq $32,	RGS2;                     \
--	orq		RGS1, RGS2;               \
--	\
--	lookup_32bit(t0, t1, t2, t3, RGI2, RGS1); \
--	shrq $16,	RGI2;                     \
--	lookup_32bit(t0, t1, t2, t3, RGI2, RGS3); \
--	shlq $32,	RGS3;                     \
--	orq		RGS1, RGS3;               \
--	\
--	vmovq		RGS2, x;                  \
--	vpinsrq $1,	RGS3, x, x;
-+#define dummy(d) /* do nothing */
-=20
--#define encround(a, b, c, d, x, y) \
--	G(a, x, s0, s1, s2, s3);           \
--	G(b, y, s1, s2, s3, s0);           \
-+#define shr_next(reg) \
-+	shrq $16,	reg;
++#define MAX_INITIAL_DESCS	64
++#define MAX_XOR_SRCS		8
 +
-+#define G_enc(gi1, gi2, x, t0, t1, t2, t3) \
-+	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS1, shr_next, ##gi1);  \
-+	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS2, dummy, none);      \
-+	shlq $32,	RGS2;                                        \
-+	orq		RGS1, RGS2;                                  \
-+	\
-+	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS3, shr_next, ##gi2);  \
-+	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS1, dummy, none);      \
-+	shlq $32,	RGS1;                                        \
-+	orq		RGS1, RGS3;
++#define JOB_DESC_BYTES		(4 * CAAM_CMD_SZ + 3 * CAAM_PTR_SZ)
++#define JOB_DESC_LEN		(JOB_DESC_BYTES / CAAM_CMD_SZ)
++#define CMD_DESC_LEN		32
 +
-+#define encround_head_2(a, b, c, d, x1, y1, x2, y2) \
-+	vmovq			b ## 1, RGI3;	\
-+	vpextrq $1,		b ## 1, RGI4;   \
-+	G_enc(RGI1, RGI2, x1, s0, s1, s2, s3);      \
-+	vmovq			a ## 2, RGI1;   \
-+	vpextrq $1,		a ## 2, RGI2;   \
-+	vmovq		RGS2, x1;                   \
-+	vpinsrq $1,	RGS3, x1, x1;               \
-+	G_enc(RGI3, RGI4, y1, s1, s2, s3, s0);      \
-+	vmovq			b ## 2, RGI3;   \
-+	vpextrq $1,		b ## 2, RGI4;   \
-+	vmovq		RGS2, y1;                   \
-+	vpinsrq $1,	RGS3, y1, y1;               \
-+	G_enc(RGI1, RGI2, x2, s0, s1, s2, s3);      \
-+	vmovq		RGS2, x2;                   \
-+	vpinsrq $1,	RGS3, x2, x2;               \
-+	G_enc(RGI3, RGI4, y2, s1, s2, s3, s0);      \
-+	vmovq		RGS2, y2;                   \
-+	vpinsrq $1,	RGS3, y2, y2;
++#define LONG_PTR		(CAAM_PTR_SZ > CAAM_CMD_SZ)
 +
-+#define encround_tail(a, b, c, d, x, y) \
-+	vpslld $1,		d, RT;     \
-+	vpsrld $(32 - 1),	d, d;      \
-+	vpor			d, RT,  d; \
- 	vpaddd			x, y,   x; \
- 	vpaddd			y, x,   y; \
- 	vpaddd			x, RK1, x; \
-@@ -115,14 +147,40 @@
- 	vpsrld $1,		c, x;      \
- 	vpslld $(32 - 1),	c, c;      \
- 	vpor			c, x,   c; \
--	vpslld $1,		d, x;      \
--	vpsrld $(32 - 1),	d, d;      \
--	vpor			d, x,   d; \
- 	vpxor			d, y,   d;
-=20
--#define decround(a, b, c, d, x, y) \
--	G(a, x, s0, s1, s2, s3);           \
--	G(b, y, s1, s2, s3, s0);           \
-+#define G_dec(gi1, gi2, x, t0, t1, t2, t3) \
-+	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS1, shr_next, ##gi1);  \
-+	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS2, dummy, none);      \
-+	shlq $32,	RGS2;                                        \
-+	orq		RGS1, RGS2;                                  \
-+	vmovq		RGS2, x;                                     \
-+	\
-+	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS3, shr_next, ##gi2);  \
-+	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS1, dummy, none);      \
-+	shlq $32,	RGS1;                                        \
-+	orq		RGS1, RGS3;
++#define CTX1_SLOTS		4
++#define SRC_CMD_BYTES		(4 * CAAM_CMD_SZ)
++#define SRC_CMD_LEN		(SRC_CMD_BYTES / CAAM_CMD_SZ)
++#define CHUNK_SIZE		128
++#define CHUNK_SIZE_H		64
++#define CHUNK_SIZE_Q		32
++#define REG_SIZE		8
 +
-+#define decround_head_2(a, b, c, d, x1, y1, x2, y2) \
-+	vmovq			b ## 1, RGI3;   \
-+	vpextrq $1,		b ## 1, RGI4;   \
-+	G_dec(RGI1, RGI2, x1, s0, s1, s2, s3);      \
-+	vmovq			a ## 2, RGI1;   \
-+	vpextrq $1,		a ## 2, RGI2;   \
-+	vpinsrq $1,	RGS3, x1, x1;               \
-+	G_dec(RGI3, RGI4, y1, s1, s2, s3, s0);      \
-+	vmovq			b ## 2, RGI3;   \
-+	vpextrq $1,		b ## 2, RGI4;   \
-+	vpinsrq $1,	RGS3, y1, y1;               \
-+	G_dec(RGI1, RGI2, x2, s0, s1, s2, s3);      \
-+	vpinsrq $1,	RGS3, x2, x2;               \
-+	G_dec(RGI3, RGI4, y2, s1, s2, s3, s0);      \
-+	vpinsrq $1,	RGS3, y2, y2;
++#define CMD_MOVE_OVERFLOW_LEN	1
 +
-+#define decround_tail(a, b, c, d, x, y) \
-+	vpslld $1,		c, RT;     \
-+	vpsrld $(32 - 1),	c, c;      \
-+	vpor			c, RT,  c; \
- 	vpaddd			x, y,   x; \
- 	vpaddd			y, x,   y; \
- 	vpaddd			y, RK2, y; \
-@@ -130,32 +188,44 @@
- 	vpsrld $1,		d, y;      \
- 	vpslld $(32 - 1),	d, d;      \
- 	vpor			d, y,   d; \
--	vpslld $1,		c, y;      \
--	vpsrld $(32 - 1),	c, c;      \
--	vpor			c, y,   c; \
- 	vpaddd			x, RK1, x; \
- 	vpxor			x, c,   c;
-=20
--#define encrypt_round(n, a, b, c, d) \
--	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;           \
--	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;           \
--	encround(a ## 1, b ## 1, c ## 1, d ## 1, RX, RY); \
--	encround(a ## 2, b ## 2, c ## 2, d ## 2, RX, RY);
--
--#define decrypt_round(n, a, b, c, d) \
--	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;           \
--	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;           \
--	decround(a ## 1, b ## 1, c ## 1, d ## 1, RX, RY); \
--	decround(a ## 2, b ## 2, c ## 2, d ## 2, RX, RY);
-+#define preload_rgi(c) \
-+	vmovq			c, RGI1; \
-+	vpextrq $1,		c, RGI2;
++#define LABEL_SRC_JMP_BYTES	(5 * CAAM_CMD_SZ)
++#define LABEL_SRC_JMP		(LABEL_SRC_JMP_BYTES / CAAM_CMD_SZ)
++#define LABEL_SRC_MV_BYTES	(CAAM_CMD_SZ + LABEL_SRC_JMP_BYTES)
++#define LABEL_SRC_MV		(LABEL_SRC_MV_BYTES / CAAM_CMD_SZ)
++#define LABEL_FIRST_BYTES	(28 * CAAM_CMD_SZ + LABEL_SRC_MV_BYTES)
++#define LABEL_FIRST		(LABEL_FIRST_BYTES / CAAM_CMD_SZ)
++#define LABEL_LAST_BYTES	(13 * CAAM_CMD_SZ + LABEL_FIRST_BYTES)
++#define LABEL_LAST		(LABEL_LAST_BYTES / CAAM_CMD_SZ)
++#define SH_DESC_BYTES		(5 * CAAM_CMD_SZ + LABEL_LAST_BYTES)
++#define SH_DESC_LEN		(SH_DESC_BYTES / CAAM_CMD_SZ)
 +
-+#define encrypt_round(n, a, b, c, d, preload) \
-+	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;                  \
-+	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;                  \
-+	encround_head_2(a, b, c, d, RX0, RY0, RX1, RY1);         \
-+	encround_tail(a ## 1, b ## 1, c ## 1, d ## 1, RX0, RY0); \
-+	preload(c ## 1);                                         \
-+	encround_tail(a ## 2, b ## 2, c ## 2, d ## 2, RX1, RY1);
++#ifdef DEBUG
++/* for print_hex_dumps with line references */
++#define xstr(s) str(s)
++#define str(s) (#s)
++#define debug(format, arg...) printk(format, arg)
++#else
++#define debug(format, arg...)
++#endif
 +
-+#define decrypt_round(n, a, b, c, d, preload) \
-+	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;                  \
-+	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;                  \
-+	decround_head_2(a, b, c, d, RX0, RY0, RX1, RY1);         \
-+	decround_tail(a ## 1, b ## 1, c ## 1, d ## 1, RX0, RY0); \
-+	preload(c ## 1);                                         \
-+	decround_tail(a ## 2, b ## 2, c ## 2, d ## 2, RX1, RY1);
-=20
- #define encrypt_cycle(n) \
--	encrypt_round((2*n), RA, RB, RC, RD);       \
--	encrypt_round(((2*n) + 1), RC, RD, RA, RB);
-+	encrypt_round((2*n), RA, RB, RC, RD, preload_rgi); \
-+	encrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi);
++struct caam_xor_sh_desc {
++	u32 desc[SH_DESC_LEN + CMD_MOVE_OVERFLOW_LEN];
++	dma_addr_t sh_desc_phys;
++};
 +
-+#define encrypt_cycle_last(n) \
-+	encrypt_round((2*n), RA, RB, RC, RD, preload_rgi); \
-+	encrypt_round(((2*n) + 1), RC, RD, RA, RB, dummy);
-=20
- #define decrypt_cycle(n) \
--	decrypt_round(((2*n) + 1), RC, RD, RA, RB); \
--	decrypt_round((2*n), RA, RB, RC, RD);
-+	decrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi); \
-+	decrypt_round((2*n), RA, RB, RC, RD, preload_rgi);
-=20
-+#define decrypt_cycle_last(n) \
-+	decrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi); \
-+	decrypt_round((2*n), RA, RB, RC, RD, dummy);
-=20
- #define transpose_4x4(x0, x1, x2, x3, t0, t1, t2) \
- 	vpunpckldq		x1, x0, t0; \
-@@ -216,17 +286,19 @@ __twofish_enc_blk_8way:
- 	 *	%rcx: bool, if true: xor output
- 	 */
-=20
-+	pushq %rbp;
- 	pushq %rbx;
- 	pushq %rcx;
-=20
- 	vmovdqu w(CTX), RK1;
-=20
- 	leaq (4*4*4)(%rdx), %rax;
--	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RK1, RX, RY, RK2);
--	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX, RY, RK2);
-+	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RK1, RX0, RY0, RK2);
-+	vmovq		RA1, RGI1;
-+	vpextrq $1,	RA1, RGI2;
-+	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
-=20
--	xorq RID1, RID1;
--	xorq RID2, RID2;
-+	movq %rsi, %r11;
-=20
- 	encrypt_cycle(0);
- 	encrypt_cycle(1);
-@@ -235,26 +307,27 @@ __twofish_enc_blk_8way:
- 	encrypt_cycle(4);
- 	encrypt_cycle(5);
- 	encrypt_cycle(6);
--	encrypt_cycle(7);
-+	encrypt_cycle_last(7);
-=20
- 	vmovdqu (w+4*4)(CTX), RK1;
-=20
- 	popq %rcx;
- 	popq %rbx;
-+	popq %rbp;
-=20
--	leaq (4*4*4)(%rsi), %rax;
-+	leaq (4*4*4)(%r11), %rax;
-=20
- 	testb %cl, %cl;
- 	jnz __enc_xor8;
-=20
--	outunpack_blocks(%rsi, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
--	outunpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
-+	outunpack_blocks(%r11, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
-+	outunpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
-=20
- 	ret;
-=20
- __enc_xor8:
--	outunpack_xor_blocks(%rsi, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
--	outunpack_xor_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
-+	outunpack_xor_blocks(%r11, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
-+	outunpack_xor_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
-=20
- 	ret;
-=20
-@@ -269,16 +342,18 @@ twofish_dec_blk_8way:
- 	 *	%rdx: src
- 	 */
-=20
-+	pushq %rbp;
- 	pushq %rbx;
-=20
- 	vmovdqu (w+4*4)(CTX), RK1;
-=20
- 	leaq (4*4*4)(%rdx), %rax;
--	inpack_blocks(%rdx, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
--	inpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
-+	inpack_blocks(%rdx, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
-+	vmovq		RC1, RGI1;
-+	vpextrq $1,	RC1, RGI2;
-+	inpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
-=20
--	xorq RID1, RID1;
--	xorq RID2, RID2;
-+	movq %rsi, %r11;
-=20
- 	decrypt_cycle(7);
- 	decrypt_cycle(6);
-@@ -287,14 +362,15 @@ twofish_dec_blk_8way:
- 	decrypt_cycle(3);
- 	decrypt_cycle(2);
- 	decrypt_cycle(1);
--	decrypt_cycle(0);
-+	decrypt_cycle_last(0);
-=20
- 	vmovdqu (w)(CTX), RK1;
-=20
- 	popq %rbx;
-+	popq %rbp;
-=20
--	leaq (4*4*4)(%rsi), %rax;
--	outunpack_blocks(%rsi, RA1, RB1, RC1, RD1, RK1, RX, RY, RK2);
--	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX, RY, RK2);
-+	leaq (4*4*4)(%r11), %rax;
-+	outunpack_blocks(%r11, RA1, RB1, RC1, RD1, RK1, RX0, RY0, RK2);
-+	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
-=20
- 	ret;
++struct caam_dma_async_tx_desc {
++	struct dma_async_tx_descriptor async_tx;
++	struct list_head node;
++	struct caam_dma_jr *dma_jr;
++	u32 job_desc[JOB_DESC_LEN];
++	u32 cmd_desc[CMD_DESC_LEN];
++	dma_addr_t cmd_desc_phys;
++	dma_addr_t dest;
++	dma_addr_t src[MAX_XOR_SRCS];
++	u32 src_cnt;
++	u32 dma_len;
++};
++
++struct caam_dma_desc_pool {
++	int desc_cnt;
++	struct list_head head;
++};
++
++/*
++ * caam_dma_jr - job ring/channel data
++ * @completed_cookie: cookie of latest latest, completed job
++ * @chan: dma channel used by async_tx API
++ * @desc_lock: lock on job descriptor
++ * @submit_q: queue of pending (submitted, but not enqueued) jobs
++ * @done_lock: lock on done_not_acked
++ * @done_not_acked: jobs that have been completed by jr, but maybe not acked
++ * @handle_done: tasklet for cleaning done_not_acked
++ * @caam_hw_jr: jr device data
++ * @pool_lock: lock on soft_desc
++ * @soft_desc: pool of pre-allocated caam_dma_async_tx_desc structures
++ */
++struct caam_dma_jr {
++	dma_cookie_t completed_cookie;
++	struct dma_chan chan;
++	struct device *dev;
++	spinlock_t desc_lock;
++	struct list_head submit_q;
++	spinlock_t done_lock;
++	struct list_head done_not_acked;
++	struct tasklet_struct handle_done;
++	struct caam_drv_private_jr *caam_hw_jr;
++	spinlock_t pool_lock;
++	struct caam_dma_desc_pool *soft_desc;
++};
++
++static inline u32 load_source(u32 ctx, u32 offset, u32 target)
++{
++	return ctx | MOVE_DEST_DESCBUF | SRC_CMD_BYTES |
++	       (target << (2 + MOVE_OFFSET_SHIFT)) |
++	       (offset << MOVE_AUX_SHIFT);
++}
++
++static inline u32 *write_load_source(u32 *desc, u32 ctx, u32 offset, u32 target)
++{
++	return write_move(desc, load_source(ctx, offset, target));
++}
++
++/* generate source commands and job descriptor for each request */
++static void prepare_caam_xor_desc(struct device *dev,
++				  struct caam_dma_async_tx_desc *desc,
++				  dma_addr_t sh_desc_phys,
++				  dma_addr_t dest, dma_addr_t *src,
++				  u32 src_cnt, size_t len)
++{
++	u32 label_src_mv = LABEL_SRC_MV + CMD_MOVE_OVERFLOW_LEN;
++	u32 label_first = LABEL_FIRST + CMD_MOVE_OVERFLOW_LEN;
++	u32 label_last = LABEL_LAST + CMD_MOVE_OVERFLOW_LEN;
++	u32 sh_desc_len = SH_DESC_LEN + CMD_MOVE_OVERFLOW_LEN;
++	int i;
++	u32 *job_descptr = desc->job_desc;
++	u32 *cmd_desc = desc->cmd_desc;
++
++	desc->dest = dest;
++	memcpy(desc->src, src, src_cnt*sizeof(dma_addr_t));
++	desc->src_cnt = src_cnt;
++	desc->dma_len = len;
++
++	/* first source: jump to special commands */
++	cmd_desc = write_ptr(cmd_desc, src[0]);
++	cmd_desc = write_cmd(cmd_desc, len);
++	init_sh_desc(cmd_desc, (label_first & HDR_START_IDX_MASK) <<
++		      HDR_START_IDX_SHIFT);
++	cmd_desc++;
++	if (!LONG_PTR)
++		cmd_desc = write_nop(cmd_desc, 1);
++
++	i = 1;
++	/* sources that load next source from first context */
++	while (i < src_cnt - 1 && i < CTX1_SLOTS - 1) {
++		cmd_desc = write_ptr(cmd_desc, src[i]);
++		cmd_desc = write_cmd(cmd_desc, len);
++		cmd_desc = write_load_source(cmd_desc, MOVE_SRC_CLASS1CTX, i +
++					     1, label_src_mv);
++		if (!LONG_PTR)
++			cmd_desc = write_nop(cmd_desc, 1);
++		i++;
++	}
++	/* sources that load next source from second context */
++	while (i < src_cnt - 1) {
++		cmd_desc = write_ptr(cmd_desc, src[i]);
++		cmd_desc = write_cmd(cmd_desc, len);
++		cmd_desc = write_load_source(cmd_desc, MOVE_SRC_CLASS2CTX, i +
++					     1, label_src_mv);
++		if (!LONG_PTR)
++			cmd_desc = write_nop(cmd_desc, 1);
++		i++;
++	}
++
++	/* last source: jump to special commands */
++	cmd_desc = write_ptr(cmd_desc, src[i]);
++	cmd_desc = write_cmd(cmd_desc, len);
++	init_sh_desc(cmd_desc, (label_last & HDR_START_IDX_MASK) <<
++		      HDR_START_IDX_SHIFT);
++	cmd_desc++;
++	if (!LONG_PTR)
++		cmd_desc = write_nop(cmd_desc, 1);
++
++	desc->cmd_desc_phys = dma_map_single(dev, desc->cmd_desc,
++					     CMD_DESC_LEN * sizeof(u32),
++					     DMA_TO_DEVICE);
++	init_job_desc_shared(job_descptr, sh_desc_phys, sh_desc_len,
++			     HDR_SHARE_WAIT | HDR_REVERSE);
++
++	append_seq_out_ptr(job_descptr, dest, len, 0);
++	append_seq_in_ptr_intlen(job_descptr, desc->cmd_desc_phys,
++					MAX_XOR_SRCS * SRC_CMD_BYTES, 0);
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "job desc @"xstr(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, job_descptr, CAAM_CMD_SZ *
++		       desc_len(job_descptr), 1);
++	print_hex_dump(KERN_ERR, "srcs @"xstr(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, src, src_cnt * CAAM_PTR_SZ,
++		       1);
++	print_hex_dump(KERN_ERR, "src cmd@"xstr(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc->cmd_desc,
++		       SRC_CMD_BYTES * src_cnt, 1);
++#endif
++}
++
++/* generate shared descriptor for each device */
++static void prepare_caam_xor_sh_desc(u32 *descptr, u32 src_cnt)
++{
++	bool overflow;
++	u32 label_src_jmp, label_src_mv;
++	u32 *store_jump_cmd;
++	u32 label_load, label_return, label_store;
++
++	overflow = src_cnt > CTX1_SLOTS;
++	label_src_jmp = LABEL_SRC_JMP + CMD_MOVE_OVERFLOW_LEN;
++	label_src_mv = label_src_jmp + 1;
++	init_sh_desc(descptr, HDR_SHARE_SERIAL);
++	/* Store up to 4 sources in ctx1 */
++	append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
++		   LDST_CLASS_1_CCB | (overflow ?
++		   (CTX1_SLOTS * SRC_CMD_BYTES) : (src_cnt * SRC_CMD_BYTES)));
++
++	/* Store any overflow in ctx2 */
++	if (overflow)
++		append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
++			   LDST_CLASS_2_CCB | (src_cnt - 4) * 16);
++	else
++		append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
++			   LDST_CLASS_2_CCB | 4 * 16);
++
++	append_cmd(descptr, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
++
++	/* Load first source */
++	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 0, label_src_mv) |
++		    MOVE_WAITCOMP);
++
++	/* Refresh shared descriptor */
++	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
++		   ((label_src_jmp & HDR_START_IDX_MASK) <<
++		    HDR_START_IDX_SHIFT));
++
++	/* Load source and run loaded commands */
++	append_cmd(descptr, CMD_SEQ_IN_PTR | SQIN_EXT);
++	append_len(descptr, SRC_CMD_LEN);
++
++	/* Skip read data */
++	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
++
++	/* Load chunk to ififo */
++	label_load = desc_len(descptr);
++	append_seq_fifo_load(descptr, CHUNK_SIZE, FIFOLD_TYPE_PK |
++			     LDST_CLASS_1_CCB);
++
++	/* Update added number of bytes in ififo */
++	append_math_add_imm_u32(descptr, VARSEQOUTLEN, VARSEQOUTLEN, IMM,
++				CHUNK_SIZE);
++
++	/* Load chunk from ififo to math registers via DECO alignment block*/
++	append_load_imm_u32(descptr, NFIFOENTRY_LC1 | NFIFOENTRY_DTYPE_MSG |
++			    CHUNK_SIZE, LDST_SRCDST_WORD_INFO_FIFO);
++	label_return = desc_len(descptr);
++	append_move(descptr, MOVE_WAITCOMP | MOVE_SRC_INFIFO |
++		    MOVE_DEST_MATH0 | CHUNK_SIZE_Q);
++
++	/* XOR math registers with ofifo */
++	append_math_xor(descptr, REG0, REG0, OUTFIFO, REG_SIZE);
++	append_math_xor(descptr, REG1, REG1, OUTFIFO, REG_SIZE);
++	append_math_xor(descptr, REG2, REG2, OUTFIFO, REG_SIZE);
++	append_math_xor(descptr, REG3, REG3, OUTFIFO, REG_SIZE);
++
++	/* Move result to ofifo */
++	append_move(descptr, MOVE_SRC_MATH0 | MOVE_WAITCOMP |
++		    MOVE_DEST_OUTFIFO | CHUNK_SIZE_Q);
++
++	/* Update reduced number of bytes in ififo */
++	append_math_sub_imm_u32(descptr, VARSEQOUTLEN, VARSEQOUTLEN, IMM,
++				CHUNK_SIZE_Q);
++
++	/* If ififo has no more data, store chunk */
++	store_jump_cmd = append_jump(descptr, JUMP_TEST_ALL |
++				     JUMP_COND_MATH_Z);
++
++	/* If half of chunk left, use next source */
++	append_math_sub_imm_u32(descptr, NONE, VARSEQOUTLEN, IMM,
++				CHUNK_SIZE_H);
++	append_jump_to(descptr, JUMP_TEST_ALL | JUMP_COND_MATH_Z,
++		       label_src_jmp);
++
++	/* Else, keep XORing */
++	append_jump_to(descptr, 0, label_return);
++
++	/* Store */
++	label_store = desc_len(descptr);
++	set_jump_tgt_here(descptr, store_jump_cmd);
++
++	/* Store chunk to seqout */
++	append_seq_fifo_store(descptr, CHUNK_SIZE, FIFOST_TYPE_MESSAGE_DATA);
++
++	/* Halt if no more data */
++	append_math_sub(descptr, NONE, SEQOUTLEN, ONE, CAAM_CMD_SZ);
++	append_jump(descptr, JUMP_TYPE_HALT_USER | JUMP_TEST_ALL |
++			JUMP_COND_MATH_N);
++
++	/* Load first source's next chunk to ofifo */
++	append_move(descptr, MOVE_SRC_INFIFO | MOVE_DEST_OUTFIFO |
++			MOVE_WAITCOMP | CHUNK_SIZE);
++
++	/* Goto source */
++	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
++		   ((label_src_jmp & HDR_START_IDX_MASK) <<
++		     HDR_START_IDX_SHIFT));
++
++	/* First source, skip read data */
++	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
++
++	/* If no more data to read, go XOR read data */
++	append_math_sub(descptr, NONE, SEQINLEN, ONE, CAAM_CMD_SZ);
++	append_jump_to(descptr, JUMP_TEST_ALL | JUMP_COND_MATH_N,
++		       label_return);
++
++	/* Otherwise, load chunk from first source to DECO alignment block */
++	append_seq_fifo_load(descptr, CHUNK_SIZE, FIFOLD_TYPE_PK |
++			     LDST_CLASS_1_CCB);
++	append_load_imm_u32(descptr, NFIFOENTRY_LC1 | NFIFOENTRY_DTYPE_MSG |
++			    CHUNK_SIZE, LDST_SRCDST_WORD_INFO_FIFO);
++
++	/* Load second source */
++	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 1, label_src_mv));
++
++	/* XOR previous pass if this is not first pass */
++	append_math_sub(descptr, NONE, VARSEQINLEN, ONE, CAAM_CMD_SZ);
++	append_jump_to(descptr, JUMP_TEST_INVALL | JUMP_COND_MATH_N,
++		       label_return);
++
++	/* Else, move chunk for DECO alignment block to ofifo */
++	append_move(descptr, MOVE_SRC_INFIFO | MOVE_DEST_OUTFIFO |
++				MOVE_WAITCOMP | CHUNK_SIZE);
++
++	/* and track number of bytes to write*/
++	append_math_add_imm_u32(descptr, SEQOUTLEN, SEQINLEN, IMM, CHUNK_SIZE);
++
++	/* Goto source */
++	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
++		   ((label_src_jmp & HDR_START_IDX_MASK) <<
++		     HDR_START_IDX_SHIFT));
++
++	/* Last source, skip read data */
++	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
++
++	/* Update number of bytes to skip */
++	append_math_add_imm_u32(descptr, VARSEQINLEN, VARSEQINLEN, IMM,
++				CHUNK_SIZE);
++
++	/* Load first source */
++	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 0, label_src_mv));
++
++	/* Goto data loading */
++	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
++		   ((label_load & HDR_START_IDX_MASK) << HDR_START_IDX_SHIFT));
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "shdesc @"xstr(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, descptr, CAAM_CMD_SZ *
++		       desc_len(descptr), 1);
++#endif
++}
++
++static enum dma_status caam_jr_tx_status(struct dma_chan *chan,
++					 dma_cookie_t cookie,
++					 struct dma_tx_state *txstate)
++{
++	struct caam_dma_jr *jr = NULL;
++	dma_cookie_t last_used;
++	dma_cookie_t last_complete;
++
++	jr = container_of(chan, struct caam_dma_jr, chan);
++
++	last_used = chan->cookie;
++	last_complete = jr->completed_cookie;
++
++	dma_set_tx_state(txstate, last_complete, last_used, 0);
++
++	return dma_async_is_complete(cookie, last_complete, last_used);
++}
++
++static inline void try_clear_desc(struct caam_dma_jr *dma_jr)
++{
++	spin_lock_bh(&dma_jr->done_lock);
++	if (!list_empty(&dma_jr->done_not_acked)) {
++		spin_unlock_bh(&dma_jr->done_lock);
++		tasklet_schedule(&dma_jr->handle_done);
++	} else {
++		spin_unlock_bh(&dma_jr->done_lock);
++	}
++}
++
++/*
++ * tasklet function for checking requests that are completed,
++ * but may not have been acked --delete only if acked
++ */
++static void check_done(unsigned long data)
++{
++	struct caam_dma_jr *dma_jr = (struct caam_dma_jr *) data;
++	struct caam_dma_async_tx_desc *desc, *_desc;
++
++	spin_lock_bh(&dma_jr->done_lock);
++	list_for_each_entry_safe(desc, _desc, &dma_jr->done_not_acked, node) {
++		spin_unlock_bh(&dma_jr->done_lock);
++		if (async_tx_test_ack(&desc->async_tx)) {
++			spin_lock_bh(&dma_jr->done_lock);
++			list_del(&desc->node);
++			spin_unlock_bh(&dma_jr->done_lock);
++			spin_lock_bh(&dma_jr->pool_lock);
++			if (dma_jr->soft_desc->desc_cnt < MAX_INITIAL_DESCS) {
++				INIT_LIST_HEAD(&desc->node);
++				list_add(&desc->node, &dma_jr->soft_desc->head);
++				dma_jr->soft_desc->desc_cnt++;
++				spin_unlock_bh(&dma_jr->pool_lock);
++			} else {
++				spin_unlock_bh(&dma_jr->pool_lock);
++				kfree(desc);
++			}
++		}
++		spin_lock_bh(&dma_jr->done_lock);
++	}
++	spin_unlock_bh(&dma_jr->done_lock);
++}
++
++static void caam_dma_xor_done(struct device *dev, u32 *hwdesc, u32 status,
++			      void *auxarg)
++{
++	struct caam_dma_async_tx_desc *desc;
++	struct caam_dma_jr *dma_jr;
++	dma_async_tx_callback callback;
++	void *callback_param;
++	struct device *jrdev;
++	enum dma_ctrl_flags flags;
++
++	desc = (struct caam_dma_async_tx_desc *)auxarg;
++	dma_jr = desc->dma_jr;
++	jrdev = dma_jr->caam_hw_jr->parentdev;
++	flags = desc->async_tx.flags;
++
++	if (status) {
++		char tmp[256];
++		dev_err(dev, "%s\n", caam_jr_strstatus(tmp, status));
++	}
++
++	dma_run_dependencies(&desc->async_tx);
++
++	spin_lock_bh(&dma_jr->desc_lock);
++	if (dma_jr->completed_cookie < desc->async_tx.cookie) {
++		dma_jr->completed_cookie = desc->async_tx.cookie;
++		if (dma_jr->completed_cookie == DMA_MAX_COOKIE)
++			dma_jr->completed_cookie = DMA_MIN_COOKIE;
++	}
++	spin_unlock_bh(&dma_jr->desc_lock);
++
++	callback = desc->async_tx.callback;
++	callback_param = desc->async_tx.callback_param;
++
++	dma_unmap_single(jrdev, desc->cmd_desc_phys,
++			CMD_DESC_LEN * sizeof(u32), DMA_TO_DEVICE);
++
++	if (likely(!(flags & DMA_COMPL_SKIP_DEST_UNMAP)))
++		dma_unmap_page(jrdev, desc->dest, desc->dma_len,
++						DMA_BIDIRECTIONAL);
++
++	if (likely(!(flags & DMA_COMPL_SKIP_SRC_UNMAP))) {
++		u32 i;
++		for (i = 0; i < desc->src_cnt; i++) {
++			if (desc->src[i] == desc->dest)
++				continue;
++			dma_unmap_page(jrdev, desc->src[i],
++					desc->dma_len, DMA_TO_DEVICE);
++		}
++	}
++
++	if (async_tx_test_ack(&desc->async_tx)) {
++		spin_lock_bh(&dma_jr->pool_lock);
++		if (dma_jr->soft_desc->desc_cnt < MAX_INITIAL_DESCS) {
++			list_add(&desc->node, &dma_jr->soft_desc->head);
++			dma_jr->soft_desc->desc_cnt++;
++			spin_unlock_bh(&dma_jr->pool_lock);
++		} else {
++			spin_unlock_bh(&dma_jr->pool_lock);
++			kfree(desc);
++		}
++	} else {
++		spin_lock_bh(&dma_jr->done_lock);
++		INIT_LIST_HEAD(&desc->node);
++		list_add_tail(&desc->node, &dma_jr->done_not_acked);
++		spin_unlock_bh(&dma_jr->done_lock);
++	}
++	try_clear_desc(dma_jr);
++
++	if (callback)
++		callback(callback_param);
++}
++
++static void caam_jr_issue_pending(struct dma_chan *chan)
++{
++	struct caam_dma_jr *dma_jr = NULL;
++	struct caam_dma_async_tx_desc *desc, *_desc;
++	struct device *dev;
++
++	dma_jr = container_of(chan, struct caam_dma_jr, chan);
++	dev = dma_jr->dev;
++
++	spin_lock_bh(&dma_jr->desc_lock);
++	list_for_each_entry_safe(desc, _desc, &dma_jr->submit_q, node) {
++		desc->dma_jr = dma_jr;
++		if (caam_jr_enqueue(dev, desc->job_desc,
++				    caam_dma_xor_done, desc) < 0) {
++			spin_unlock_bh(&dma_jr->desc_lock);
++			return;
++		}
++
++		list_del(&desc->node);
++	}
++
++	spin_unlock_bh(&dma_jr->desc_lock);
++}
++
++static dma_cookie_t caam_jr_tx_submit(struct dma_async_tx_descriptor *tx)
++{
++	struct caam_dma_async_tx_desc *desc = NULL;
++	struct caam_dma_jr *jr = NULL;
++	dma_cookie_t cookie;
++
++	desc = container_of(tx, struct caam_dma_async_tx_desc, async_tx);
++	jr = container_of(tx->chan, struct caam_dma_jr, chan);
++
++	spin_lock_bh(&jr->desc_lock);
++
++	cookie = jr->chan.cookie + 1;
++	if (cookie < DMA_MIN_COOKIE)
++		cookie = DMA_MIN_COOKIE;
++
++	desc->async_tx.cookie = cookie;
++	jr->chan.cookie = desc->async_tx.cookie;
++	list_add_tail(&desc->node, &jr->submit_q);
++
++	spin_unlock_bh(&jr->desc_lock);
++
++	return cookie;
++}
++
++static struct dma_async_tx_descriptor *
++caam_jr_prep_dma_xor(struct dma_chan *chan, dma_addr_t dest, dma_addr_t *src,
++		     unsigned int src_cnt, size_t len, unsigned long flags)
++{
++	struct caam_dma_jr *jr = NULL;
++	struct caam_dma_async_tx_desc *desc = NULL;
++	struct caam_drv_private *priv;
++
++	jr = container_of(chan, struct caam_dma_jr, chan);
++
++	if (src_cnt > MAX_XOR_SRCS) {
++		dev_err(jr->dev, "%d srcs exceed max supported %d srcs\n",
++							src_cnt, MAX_XOR_SRCS);
++		return NULL;
++	}
++
++	spin_lock_bh(&jr->pool_lock);
++	if (jr->soft_desc->desc_cnt) {
++		desc = container_of(jr->soft_desc->head.next,
++				    struct caam_dma_async_tx_desc, node);
++		jr->soft_desc->desc_cnt--;
++		list_del(&desc->node);
++	}
++	spin_unlock_bh(&jr->pool_lock);
++
++	if (!desc) {
++		desc = kzalloc(sizeof(struct caam_dma_async_tx_desc),
++			       GFP_KERNEL);
++		if (!desc) {
++			dev_err(jr->dev, "Out of memory for XOR async tx\n");
++			try_clear_desc(jr);
++
++			return ERR_PTR(-ENOMEM);
++		}
++
++		desc->async_tx.tx_submit = caam_jr_tx_submit;
++	}
++
++	dma_async_tx_descriptor_init(&desc->async_tx, &jr->chan);
++
++	priv = dev_get_drvdata(jr->caam_hw_jr->parentdev);
++
++	prepare_caam_xor_desc(jr->caam_hw_jr->parentdev, desc,
++			      priv->xor_sh_desc[0].sh_desc_phys, dest,
++			      src, src_cnt, len);
++
++	desc->async_tx.flags = flags;
++	desc->async_tx.cookie = -EBUSY;
++	return &desc->async_tx;
++}
++
++static void caam_jr_free_chan_resources(struct dma_chan *chan)
++{
++	struct caam_dma_jr *jr = container_of(chan, struct caam_dma_jr, chan);
++	struct caam_dma_async_tx_desc *desc;
++	struct list_head *current_node;
++
++	current_node = jr->soft_desc->head.next;
++	while (jr->soft_desc->desc_cnt > 0) {
++		desc = container_of(current_node, struct caam_dma_async_tx_desc,
++				    node);
++		current_node = current_node->next;
++		list_del(&desc->node);
++		kfree(desc);
++		jr->soft_desc->desc_cnt--;
++	}
++
++	kfree(jr->soft_desc);
++
++	return;
++}
++
++static int caam_jr_alloc_chan_resources(struct dma_chan *chan)
++{
++	struct caam_dma_jr *jr = container_of(chan, struct caam_dma_jr, chan);
++	struct caam_dma_async_tx_desc *desc;
++	unsigned int i;
++
++	jr->soft_desc = kzalloc(sizeof(struct caam_dma_desc_pool), GFP_KERNEL);
++	if (!jr->soft_desc) {
++		pr_err("%s: Failed to allocate resources for DMA channel\n",
++		       __func__);
++		return -ENOMEM;
++	}
++
++	INIT_LIST_HEAD(&jr->soft_desc->head);
++	for (i = 0; i < MAX_INITIAL_DESCS; i++) {
++		desc = kzalloc(sizeof(struct caam_dma_async_tx_desc),
++			       GFP_KERNEL);
++		if (!desc)
++			return -ENOMEM;
++
++		desc->async_tx.tx_submit = caam_jr_tx_submit;
++		jr->soft_desc->desc_cnt++;
++		list_add_tail(&desc->node, &jr->soft_desc->head);
++	}
++
++	return 0;
++}
++
++static int caam_jr_chan_bind(struct device *ctrldev, struct device *dev)
++{
++	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
++	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(dev);
++	struct dma_device *dma_dev = &priv->dma_dev;
++	struct caam_dma_jr *dma_jr;
++
++	dma_jr = kzalloc(sizeof(struct caam_dma_jr), GFP_KERNEL);
++	if (!dma_jr) {
++		dev_err(dev, "Failed to allocate memory for caam job queue\n");
++		return -ENOMEM;
++	}
++
++	dma_jr->chan.device = dma_dev;
++	dma_jr->chan.private = dma_jr;
++
++	INIT_LIST_HEAD(&dma_jr->submit_q);
++	spin_lock_init(&dma_jr->desc_lock);
++	spin_lock_init(&dma_jr->pool_lock);
++	list_add_tail(&dma_jr->chan.device_node, &dma_dev->channels);
++	dma_dev->chancnt++;
++
++	dma_jr->caam_hw_jr = jrpriv;
++	dma_jr->dev = dev;
++	jrpriv->jrdev = dev;
++
++	INIT_LIST_HEAD(&dma_jr->done_not_acked);
++	spin_lock_init(&dma_jr->done_lock);
++	tasklet_init(&dma_jr->handle_done, check_done, (unsigned long) dma_jr);
++
++	return 0;
++}
++
++static inline void caam_jr_chan_unbind(struct device *ctrldev,
++				       struct dma_chan *chan)
++{
++	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
++	struct dma_device *dma_dev = &priv->dma_dev;
++
++	list_del(&chan->device_node);
++	dma_dev->chancnt--;
++}
++
++static inline void caam_jr_free(struct dma_chan *chan)
++{
++	struct caam_dma_jr *dma_jr = container_of(chan, struct caam_dma_jr,
++						  chan);
++
++	list_del(&chan->device_node);
++	kfree(dma_jr);
++}
++
++static int caam_jr_dma_init(struct device *ctrldev)
++{
++	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
++	struct dma_device *dma_dev = NULL;
++	struct caam_xor_sh_desc *sh_desc;
++	int i;
++
++	priv->xor_sh_desc =
++	    kzalloc(sizeof(struct caam_xor_sh_desc), GFP_KERNEL);
++	if (!priv->xor_sh_desc) {
++		dev_err(ctrldev,
++			"Failed to allocate memory for XOR Shared"
++			"descriptor\n");
++		return -ENOMEM;
++	}
++
++	sh_desc = priv->xor_sh_desc;
++	prepare_caam_xor_sh_desc(sh_desc->desc, MAX_XOR_SRCS);
++	sh_desc->sh_desc_phys = dma_map_single(ctrldev, &sh_desc->desc,
++						SH_DESC_LEN * sizeof(u32),
++						DMA_TO_DEVICE);
++
++	dma_dev = &priv->dma_dev;
++	dma_dev->dev = ctrldev;
++	INIT_LIST_HEAD(&dma_dev->channels);
++
++	dma_dev->max_xor = MAX_XOR_SRCS;
++
++	/*
++	 * xor transaction must be 128 bytes aligned. For unaligned
++	 * transaction, xor-parity calculations will not be off-loaded
++	 * to caam
++	 */
++	dma_dev->xor_align = 8;
++	dma_cap_set(DMA_XOR, dma_dev->cap_mask);
++
++	dma_dev->device_alloc_chan_resources = caam_jr_alloc_chan_resources;
++	dma_dev->device_tx_status = caam_jr_tx_status;
++	dma_dev->device_issue_pending = caam_jr_issue_pending;
++	dma_dev->device_prep_dma_xor = caam_jr_prep_dma_xor;
++	dma_dev->device_free_chan_resources = caam_jr_free_chan_resources;
++
++	for (i = 0; i < priv->total_jobrs; i++)
++		caam_jr_chan_bind(ctrldev, priv->jrdev[i]);
++
++	dma_async_device_register(dma_dev);
++	dev_info(ctrldev, "caam xor support with %d job rings\n",
++		 priv->total_jobrs);
++
++	return 0;
++}
++
++static void caam_jr_dma_exit(struct device *ctrldev)
++{
++	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
++	struct dma_device *dma_dev = &priv->dma_dev;
++	struct dma_chan *chan, *_chan;
++	struct list_head to_free;
++	int i;
++
++	i = 0;
++	INIT_LIST_HEAD(&to_free);
++	/* before unregistering device, remove channels... */
++	list_for_each_entry_safe(chan, _chan, &dma_dev->channels, device_node) {
++		caam_jr_chan_unbind(ctrldev, chan);
++		list_add_tail(&chan->device_node, &to_free);
++		i++;
++	}
++
++	dma_async_device_unregister(dma_dev);
++
++	/*
++	 * ...but don't delete them until device has been unregistered, so
++	 * that deleted channels will not be used
++	 */
++	list_for_each_entry_safe(chan, _chan, &to_free, device_node) {
++		caam_jr_free(chan);
++	}
++
++	for (i = 0; i < (MAX_XOR_SRCS - 2); i++) {
++		dma_unmap_single(ctrldev, priv->xor_sh_desc[i].sh_desc_phys,
++				 SH_DESC_LEN * sizeof(u32), DMA_TO_DEVICE);
++	}
++
++	kfree(priv->xor_sh_desc);
++	dev_info(ctrldev, "caam xor support disabled\n");
++}
++
++static int __init caam_xor_init(void)
++{
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	struct caam_drv_private *priv;
++	int err = 0;
++
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node)
++		return -ENODEV;
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return -ENODEV;
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	atomic_set(&priv->tfm_count, -1);
++
++	/* register caam device */
++	err = caam_jr_dma_init(ctrldev);
++	if (err)
++		dev_err(ctrldev, "error in xor initialization: %d\n", err);
++
++	return err;
++}
++
++static void __exit caam_xor_exit(void)
++{
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	struct caam_drv_private *priv;
++
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node)
++		return;
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return;
++
++	ctrldev = &pdev->dev;
++	of_node_put(dev_node);
++	priv = dev_get_drvdata(ctrldev);
++
++	caam_jr_dma_exit(ctrldev);
++}
++
++module_init(caam_xor_init);
++module_exit(caam_xor_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("FSL CAAM support for crypto API");
++MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index c85c1f0..d06bf68 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -9,11 +9,13 @@
+ #define IMMEDIATE (1 << 23)
+ #define CAAM_CMD_SZ sizeof(u32)
+ #define CAAM_PTR_SZ sizeof(dma_addr_t)
++#define CAAM_PTR_LEN (CAAM_PTR_SZ / CAAM_CMD_SZ)
+ #define CAAM_DESC_BYTES_MAX (CAAM_CMD_SZ * MAX_CAAM_DESCSIZE)
+ 
+ #ifdef DEBUG
+-#define PRINT_POS do { printk(KERN_DEBUG "%02d: %s\n", desc_len(desc),\
+-			      &__func__[sizeof("append")]); } while (0)
++#define PRINT_POS do { pr_debug("%02d: %s\n", desc_len(desc),\
++				&__func__[sizeof("append")]);\
++		} while (0)
+ #else
+ #define PRINT_POS
+ #endif
+@@ -82,6 +84,20 @@ static inline void append_ptr(u32 *desc, dma_addr_t ptr)
+ 	(*desc) += CAAM_PTR_SZ / CAAM_CMD_SZ;
+ }
+ 
++/* Write command without affecting header, and return pointer to next word */
++static inline u32 *write_ptr(u32 *desc, dma_addr_t ptr)
++{
++	memcpy(desc, &ptr, CAAM_PTR_SZ);
++
++	return desc + CAAM_PTR_LEN;
++}
++
++/* Increase descriptor length */
++static inline void append_len(u32 *desc, unsigned int len)
++{
++	(*desc) += len;
++}
++
+ static inline void init_job_desc_shared(u32 *desc, dma_addr_t ptr, int len,
+ 					u32 options)
+ {
+@@ -110,6 +126,14 @@ static inline void append_cmd(u32 *desc, u32 command)
+ 	(*desc)++;
+ }
+ 
++/* Write command without affecting header, and return pointer to next word */
++static inline u32 *write_cmd(u32 *desc, u32 command)
++{
++	*desc = command;
++
++	return desc + 1;
++}
++
+ static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
+ 				  u32 command)
+ {
+@@ -143,11 +167,28 @@ static inline u32 *append_jump(u32 *desc, u32 options)
+ 	return cmd;
+ }
+ 
++/* Given destination, as offset from header, append jump */
++static inline void append_jump_to(u32 *desc, u32 options, u32 target)
++{
++	PRINT_POS;
++
++	append_jump(desc, options | ((target - desc_len(desc)) &
++		    JUMP_OFFSET_MASK));
++}
++
+ static inline void set_jump_tgt_here(u32 *desc, u32 *jump_cmd)
+ {
+ 	*jump_cmd = *jump_cmd | (desc_len(desc) - (jump_cmd - desc));
+ }
+ 
++/* len words have no commands */
++static inline u32 *write_nop(u32 *desc, int len)
++{
++	*desc = CMD_JUMP | len;
++
++	return desc + len;
++}
++
+ #define APPEND_CMD(cmd, op) \
+ static inline void append_##cmd(u32 *desc, u32 options) \
+ { \
+@@ -157,6 +198,14 @@ static inline void append_##cmd(u32 *desc, u32 options) \
+ APPEND_CMD(operation, OPERATION)
+ APPEND_CMD(move, MOVE)
+ 
++#define WRITE_CMD(cmd, op) \
++static inline u32 *write_##cmd(u32 *desc, u32 options) \
++{ \
++	PRINT_POS; \
++	return write_cmd(desc, CMD_##op | options); \
++}
++WRITE_CMD(move, MOVE)
++
+ #define APPEND_CMD_LEN(cmd, op) \
+ static inline void append_##cmd(u32 *desc, unsigned int len, u32 options) \
+ { \
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 5cd4c1b..2b41e31 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -26,6 +26,8 @@
+ #define JOBR_INTC_COUNT_THLD 0
+ #endif
+ 
++#define CAAM_NAPI_WEIGHT	63
++
+ /*
+  * Storage for tracking each in-process entry moving across a ring
+  * Each entry on an output ring needs one of these
+@@ -58,6 +60,7 @@ struct caam_drv_private_jr {
+ 	int out_ring_read_index;	/* Output index "tail" */
+ 	int tail;			/* entinfo (s/w ring) tail index */
+ 	struct jr_outentry *outring;	/* Base of output ring, DMA-safe */
++	struct device *jrdev;
+ };
+ 
+ /*
+@@ -91,6 +94,10 @@ struct caam_drv_private {
+ 	/* list of registered hash algorithms (mk generic context handle?) */
+ 	struct list_head hash_list;
+ 
++	/* For DMA-XOR support */
++	struct dma_device dma_dev;
++	struct caam_xor_sh_desc *xor_sh_desc;
++
+ 	/*
+ 	 * debugfs entries for developer view into driver/device
+ 	 * variables at runtime.
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 53c8c51..8dc81cf 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -80,8 +80,8 @@ static void caam_jr_dequeue(unsigned long devarg)
+ 		/* we should never fail to find a matching descriptor */
+ 		BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
+ 
+-		/* Unmap just-run descriptor so we can post-process */
+-		dma_unmap_single(dev, jrp->outring[hw_idx].desc,
++		/* Unmap just-run job descriptor so we can post-process */
++		dma_unmap_single(jrp->jrdev, jrp->outring[hw_idx].desc,
+ 				 jrp->entinfo[sw_idx].desc_size,
+ 				 DMA_TO_DEVICE);
+ 
+@@ -230,7 +230,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 	dma_addr_t desc_dma;
+ 
+ 	desc_size = (*desc & HDR_JD_LENGTH_MASK) * sizeof(u32);
+-	desc_dma = dma_map_single(dev, desc, desc_size, DMA_TO_DEVICE);
++	desc_dma = dma_map_single(jrp->jrdev, desc, desc_size, DMA_TO_DEVICE);
+ 	if (dma_mapping_error(dev, desc_dma)) {
+ 		dev_err(dev, "caam_jr_enqueue(): can't map jobdesc\n");
+ 		return -EIO;
+@@ -466,6 +466,8 @@ int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+ 	else
+ 		dma_set_mask(jrdev, DMA_BIT_MASK(32));
+ 
++	jrpriv->jrdev = jrdev;
++
+ 	/* Identify the interrupt */
+ 	jrpriv->irq = of_irq_to_resource(np, 0, NULL);
+ 
+-- 
+1.7.0.4
