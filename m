@@ -1,1125 +1,1278 @@
-From: <b29237@freescale.com>
-Subject: [PATCH] RAID/DMA/caamxor: support XOR offload by CAAM
-Date: Wed, 22 Aug 2012 15:05:50 +0800
-Message-ID: <1345619150-21268-1-git-send-email-b29237@freescale.com>
+From: David Miller <davem@davemloft.net>
+Subject: [PATCH] sparc64: Add AES driver making use of the new aes opcodes.
+Date: Wed, 22 Aug 2012 02:21:18 -0700 (PDT)
+Message-ID: <20120822.022118.64713091452626424.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <naveenburmi@freescale.com>, Xuelin Shi <b29237@freescale.com>
-To: <dan.j.williams@gmail.com>, <vinod.koul@intel.com>,
-	<herbert@gondor.hengli.com.au>, <r1aaha@freescale.com>,
-	<linux-crypto@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<linux-kernel@vger.kernel.org>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: sparclinux@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe001.messaging.microsoft.com ([216.32.180.184]:7374
-	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755983Ab2HVHf0 (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:51181 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758810Ab2HVJVV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Aug 2012 03:35:26 -0400
+	Wed, 22 Aug 2012 05:21:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Xuelin Shi <b29237@freescale.com>
 
-Add XOR offloading functionality by CAAM and interface with async_tx layer
-so that it can be used for RAID parity computation.
-
-Signed-off-by: Naveen Burmi <naveenburmi@freescale.com>
-Signed-off-by: Yuan Kang <Yuan.Kang@freescale.com>
-Signed-off-by: Xuelin Shi <b29237@freescale.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 ---
- drivers/crypto/caam/Kconfig       |   15 +
- drivers/crypto/caam/Makefile      |    1 +
- drivers/crypto/caam/caamxor.c     |  880 +++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/desc_constr.h |   53 +++-
- drivers/crypto/caam/intern.h      |    7 +
- drivers/crypto/caam/jr.c          |    8 +-
- 6 files changed, 959 insertions(+), 5 deletions(-)
- create mode 100644 drivers/crypto/caam/caamxor.c
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 65c7668..643ca0a 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -98,3 +98,18 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+Currently supports ECB and CBC block modes.  I'll add CTR and maybe
+some others when I get a chance.
+
+If you're familiar with Intel AESNI stuff, these instructions provide
+nearly identical functionality.  The difference is that we only have
+64-bit float registers, so it takes two instructions to do a round.
+The other difference is that the instructions are setup such that we
+work from a single expanded key to do both encryption and decryption,
+rather than a seperate one for each.
+
+As for other encryption algorithms, these chips can do DES (which I
+plan to work on next), Camellia, and Kasumi.  We have a generic
+Camellia implementation and thus test vectors, so I'm likely to work
+on support for that.  For Kasumi, we lack a generic implementation and
+test vectors, and thus I'm very much not motivated to do anything with
+it :-)
+
+Finally I'll probably add support at some point for the crc32c
+instruction as well.
+
+ arch/sparc/crypto/Makefile   |    4 +
+ arch/sparc/crypto/aes_asm.S  |  836 ++++++++++++++++++++++++++++++++++++++++++
+ arch/sparc/crypto/aes_glue.c |  323 ++++++++++++++++
+ crypto/Kconfig               |   28 ++
+ 4 files changed, 1191 insertions(+)
+ create mode 100644 arch/sparc/crypto/aes_asm.S
+ create mode 100644 arch/sparc/crypto/aes_glue.c
+
+diff --git a/arch/sparc/crypto/Makefile b/arch/sparc/crypto/Makefile
+index 5356698..5034324 100644
+--- a/arch/sparc/crypto/Makefile
++++ b/arch/sparc/crypto/Makefile
+@@ -7,7 +7,11 @@ obj-$(CONFIG_CRYPTO_SHA256_SPARC64) += sha256-sparc64.o
+ obj-$(CONFIG_CRYPTO_SHA512_SPARC64) += sha512-sparc64.o
+ obj-$(CONFIG_CRYPTO_MD5_SPARC64) += md5-sparc64.o
  
- 	  To compile this as a module, choose M here: the module
- 	  will be called caamrng.
++obj-$(CONFIG_CRYPTO_AES_SPARC64) += aes-sparc64.o
 +
-+config CRYPTO_DEV_FSL_CAAM_DMAXOR_API
-+	tristate "Freescale CAAM XOR support"
-+	depends on CRYPTO_DEV_FSL_CAAM && EXPERIMENTAL
-+	default n
-+	select DMA_ENGINE
-+	select ASYNC_XOR
-+	help
-+	  Selecting this will offload the xor-parity-calculation for
-+	  users of the Asynchronous Transfers/Transforms API (such as
-+	  md-raid5 driver) to the SEC4.
+ sha1-sparc64-y := sha1_asm.o sha1_glue.o
+ sha256-sparc64-y := sha256_asm.o sha256_glue.o
+ sha512-sparc64-y := sha512_asm.o sha512_glue.o
+ md5-sparc64-y := md5_asm.o md5_glue.o
 +
-+
-+	  To compile this as a module, choose M here: the module
-+	  will be called caamxor.
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index b1eb448..457192c 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -6,5 +6,6 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
-+obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_DMAXOR_API) += caamxor.o
- 
- caam-objs := ctrl.o jr.o error.o key_gen.o
-diff --git a/drivers/crypto/caam/caamxor.c b/drivers/crypto/caam/caamxor.c
++aes-sparc64-y := aes_asm.o aes_glue.o
+diff --git a/arch/sparc/crypto/aes_asm.S b/arch/sparc/crypto/aes_asm.S
 new file mode 100644
-index 0000000..f060cff
+index 0000000..f656dc7
 --- /dev/null
-+++ b/drivers/crypto/caam/caamxor.c
-@@ -0,0 +1,880 @@
-+/*
-+ * caam - Freescale Integrated Security Engine (SEC) device driver
-+ * Support for off-loading XOR Parity Calculations to CAAM.
++++ b/arch/sparc/crypto/aes_asm.S
+@@ -0,0 +1,836 @@
++#include <linux/linkage.h>
++#include <asm/visasm.h>
++
++#define F3F(x,y,z)	(((x)<<30)|((y)<<19)|((z)<<5))
++
++#define FPD_ENCODE(x)	(((x) >> 5) | ((x) & ~(0x20)))
++
++#define RS1(x)		(FPD_ENCODE(x) << 14)
++#define RS2(x)		(FPD_ENCODE(x) <<  0)
++#define RS3(x)		(FPD_ENCODE(x) <<  9)
++#define RD(x)		(FPD_ENCODE(x) << 25)
++#define IMM5(x)		((x)           <<  9)
++
++#define AES_EROUND01(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 0)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_EROUND23(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 1)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_DROUND01(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 2)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_DROUND23(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 3)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_EROUND01_L(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 4)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_EROUND23_L(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 5)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_DROUND01_L(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 6)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_DROUND23_L(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 7)|RS1(a)|RS2(b)|RS3(c)|RD(d));
++#define AES_KEXPAND1(a,b,c,d)	\
++	.word	(F3F(2, 0x19, 8)|RS1(a)|RS2(b)|IMM5(c)|RD(d));
++#define AES_KEXPAND0(a,b,c)	\
++	.word	(F3F(2, 0x36, 0x130)|RS1(a)|RS2(b)|RD(c));
++#define AES_KEXPAND2(a,b,c)	\
++	.word	(F3F(2, 0x36, 0x131)|RS1(a)|RS2(b)|RD(c));
++
++#define MOVXTOD_G3_F4		\
++	.word	0x89b02303;
++#define MOVXTOD_G7_F6		\
++	.word	0x8db02307;
++#define MOVXTOD_G3_F0		\
++	.word	0x81b02303;
++#define MOVXTOD_G7_F2		\
++	.word	0x85b02307;
++#define MOVXTOD_O0_F0		\
++	.word	0x81b02308;
++#define MOVXTOD_O1_F2		\
++	.word	0x85b02309;
++
++#define ENCRYPT_TWO_ROUNDS(KEY_BASE, I0, I1, T0, T1) \
++	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
++	AES_EROUND23(KEY_BASE +  2, I0, I1, T1) \
++	AES_EROUND01(KEY_BASE +  4, T0, T1, I0) \
++	AES_EROUND23(KEY_BASE +  6, T0, T1, I1)
++
++#define ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE, I0, I1, T0, T1) \
++	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
++	AES_EROUND23(KEY_BASE +  2, I0, I1, T1) \
++	AES_EROUND01_L(KEY_BASE +  4, T0, T1, I0) \
++	AES_EROUND23_L(KEY_BASE +  6, T0, T1, I1)
++
++	/* 10 rounds */
++#define ENCRYPT_128(KEY_BASE, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  8, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 16, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 24, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 32, I0, I1, T0, T1)
++
++	/* 12 rounds */
++#define ENCRYPT_192(KEY_BASE, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  8, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 16, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 24, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 32, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 40, I0, I1, T0, T1)
++
++	/* 14 rounds */
++#define ENCRYPT_256(KEY_BASE, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE +  8, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 16, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 24, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 32, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS(KEY_BASE + 40, I0, I1, T0, T1) \
++	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 48, I0, I1, T0, T1)
++
++#define DECRYPT_TWO_ROUNDS(KEY_TOP, I0, I1, T0, T1) \
++	AES_DROUND23(KEY_TOP -  2, I0, I1, T1) \
++	AES_DROUND01(KEY_TOP -  4, I0, I1, T0) \
++	AES_DROUND23(KEY_TOP -  6, T0, T1, I1) \
++	AES_DROUND01(KEY_TOP -  8, T0, T1, I0)
++
++#define DECRYPT_TWO_ROUNDS_LAST(KEY_TOP, I0, I1, T0, T1) \
++	AES_DROUND23(KEY_TOP -  2, I0, I1, T1) \
++	AES_DROUND01(KEY_TOP -  4, I0, I1, T0) \
++	AES_DROUND23_L(KEY_TOP -  6, T0, T1, I1) \
++	AES_DROUND01_L(KEY_TOP -  8, T0, T1, I0)
++
++	/* 10 rounds */
++#define DECRYPT_128(KEY_TOP, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  0, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  8, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 16, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 24, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS_LAST(KEY_TOP - 32, I0, I1, T0, T1)
++
++	/* 12 rounds */
++#define DECRYPT_192(KEY_TOP, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  0, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  8, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 16, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 24, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 32, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS_LAST(KEY_TOP - 40, I0, I1, T0, T1)
++
++	/* 14 rounds */
++#define DECRYPT_256(KEY_TOP, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  0, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP -  8, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 16, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 24, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 32, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS(KEY_TOP - 40, I0, I1, T0, T1) \
++	DECRYPT_TWO_ROUNDS_LAST(KEY_TOP - 48, I0, I1, T0, T1)
++
++ENTRY(aes_sparc64_key_expand)
++	/* %o0=input_key, %o1=output_key, %o2=key_len */
++	VISEntry
++	ld	[%o0 + 0x00], %f0
++	ld	[%o0 + 0x04], %f1
++	ld	[%o0 + 0x08], %f2
++	ld	[%o0 + 0x0c], %f3
++
++	std	%f0, [%o1 + 0x00]
++	std	%f2, [%o1 + 0x08]
++	add	%o1, 0x10, %o1
++
++	cmp	%o2, 24
++	bl	2f
++	 nop
++
++	be	1f
++	 nop
++
++	/* 256-bit key expansion */
++	ld	[%o0 + 0x10], %f4
++	ld	[%o0 + 0x14], %f5
++	ld	[%o0 + 0x18], %f6
++	ld	[%o0 + 0x1c], %f7
++
++	std	%f4, [%o1 + 0x00]
++	std	%f6, [%o1 + 0x08]
++	add	%o1, 0x10, %o1
++
++	AES_KEXPAND1(0, 6, 0x0, 8)
++	AES_KEXPAND2(2, 8, 10)
++	AES_KEXPAND0(4, 10, 12)
++	AES_KEXPAND2(6, 12, 14)
++	AES_KEXPAND1(8, 14, 0x1, 16)
++	AES_KEXPAND2(10, 16, 18)
++	AES_KEXPAND0(12, 18, 20)
++	AES_KEXPAND2(14, 20, 22)
++	AES_KEXPAND1(16, 22, 0x2, 24)
++	AES_KEXPAND2(18, 24, 26)
++	AES_KEXPAND0(20, 26, 28)
++	AES_KEXPAND2(22, 28, 30)
++	AES_KEXPAND1(24, 30, 0x3, 32)
++	AES_KEXPAND2(26, 32, 34)
++	AES_KEXPAND0(28, 34, 36)
++	AES_KEXPAND2(30, 36, 38)
++	AES_KEXPAND1(32, 38, 0x4, 40)
++	AES_KEXPAND2(34, 40, 42)
++	AES_KEXPAND0(36, 42, 44)
++	AES_KEXPAND2(38, 44, 46)
++	AES_KEXPAND1(40, 46, 0x5, 48)
++	AES_KEXPAND2(42, 48, 50)
++	AES_KEXPAND0(44, 50, 52)
++	AES_KEXPAND2(46, 52, 54)
++	AES_KEXPAND1(48, 54, 0x6, 56)
++	AES_KEXPAND2(50, 56, 58)
++
++	std	%f8, [%o1 + 0x00]
++	std	%f10, [%o1 + 0x08]
++	std	%f12, [%o1 + 0x10]
++	std	%f14, [%o1 + 0x18]
++	std	%f16, [%o1 + 0x20]
++	std	%f18, [%o1 + 0x28]
++	std	%f20, [%o1 + 0x30]
++	std	%f22, [%o1 + 0x38]
++	std	%f24, [%o1 + 0x40]
++	std	%f26, [%o1 + 0x48]
++	std	%f28, [%o1 + 0x50]
++	std	%f30, [%o1 + 0x58]
++	std	%f32, [%o1 + 0x60]
++	std	%f34, [%o1 + 0x68]
++	std	%f36, [%o1 + 0x70]
++	std	%f38, [%o1 + 0x78]
++	std	%f40, [%o1 + 0x80]
++	std	%f42, [%o1 + 0x88]
++	std	%f44, [%o1 + 0x90]
++	std	%f46, [%o1 + 0x98]
++	std	%f48, [%o1 + 0xa0]
++	std	%f50, [%o1 + 0xa8]
++	std	%f52, [%o1 + 0xb0]
++	std	%f54, [%o1 + 0xb8]
++	std	%f56, [%o1 + 0xc0]
++	ba,pt	%xcc, 80f
++	 std	%f58, [%o1 + 0xc8]
++
++1:	
++	/* 192-bit key expansion */
++	ld	[%o0 + 0x10], %f4
++	ld	[%o0 + 0x14], %f5
++
++	std	%f4, [%o1 + 0x00]
++	add	%o1, 0x08, %o1
++
++	AES_KEXPAND1(0, 4, 0x0, 6)
++	AES_KEXPAND2(2, 6, 8)
++	AES_KEXPAND2(4, 8, 10)
++	AES_KEXPAND1(6, 10, 0x1, 12)
++	AES_KEXPAND2(8, 12, 14)
++	AES_KEXPAND2(10, 14, 16)
++	AES_KEXPAND1(12, 16, 0x2, 18)
++	AES_KEXPAND2(14, 18, 20)
++	AES_KEXPAND2(16, 20, 22)
++	AES_KEXPAND1(18, 22, 0x3, 24)
++	AES_KEXPAND2(20, 24, 26)
++	AES_KEXPAND2(22, 26, 28)
++	AES_KEXPAND1(24, 28, 0x4, 30)
++	AES_KEXPAND2(26, 30, 32)
++	AES_KEXPAND2(28, 32, 34)
++	AES_KEXPAND1(30, 34, 0x5, 36)
++	AES_KEXPAND2(32, 36, 38)
++	AES_KEXPAND2(34, 38, 40)
++	AES_KEXPAND1(36, 40, 0x6, 42)
++	AES_KEXPAND2(38, 42, 44)
++	AES_KEXPAND2(40, 44, 46)
++	AES_KEXPAND1(42, 46, 0x7, 48)
++	AES_KEXPAND2(44, 48, 50)
++
++	std	%f6, [%o1 + 0x00]
++	std	%f8, [%o1 + 0x08]
++	std	%f10, [%o1 + 0x10]
++	std	%f12, [%o1 + 0x18]
++	std	%f14, [%o1 + 0x20]
++	std	%f16, [%o1 + 0x28]
++	std	%f18, [%o1 + 0x30]
++	std	%f20, [%o1 + 0x38]
++	std	%f22, [%o1 + 0x40]
++	std	%f24, [%o1 + 0x48]
++	std	%f26, [%o1 + 0x50]
++	std	%f28, [%o1 + 0x58]
++	std	%f30, [%o1 + 0x60]
++	std	%f32, [%o1 + 0x68]
++	std	%f34, [%o1 + 0x70]
++	std	%f36, [%o1 + 0x78]
++	std	%f38, [%o1 + 0x80]
++	std	%f40, [%o1 + 0x88]
++	std	%f42, [%o1 + 0x90]
++	std	%f44, [%o1 + 0x98]
++	std	%f46, [%o1 + 0xa0]
++	std	%f48, [%o1 + 0xa8]
++	ba,pt	%xcc, 80f
++	 std	%f50, [%o1 + 0xb0]
++
++2:
++	/* 128-bit key expansion */
++	AES_KEXPAND1(0, 2, 0x0, 4)
++	AES_KEXPAND2(2, 4, 6)
++	AES_KEXPAND1(4, 6, 0x1, 8)
++	AES_KEXPAND2(6, 8, 10)
++	AES_KEXPAND1(8, 10, 0x2, 12)
++	AES_KEXPAND2(10, 12, 14)
++	AES_KEXPAND1(12, 14, 0x3, 16)
++	AES_KEXPAND2(14, 16, 18)
++	AES_KEXPAND1(16, 18, 0x4, 20)
++	AES_KEXPAND2(18, 20, 22)
++	AES_KEXPAND1(20, 22, 0x5, 24)
++	AES_KEXPAND2(22, 24, 26)
++	AES_KEXPAND1(24, 26, 0x6, 28)
++	AES_KEXPAND2(26, 28, 30)
++	AES_KEXPAND1(28, 30, 0x7, 32)
++	AES_KEXPAND2(30, 32, 34)
++	AES_KEXPAND1(32, 34, 0x8, 36)
++	AES_KEXPAND2(34, 36, 38)
++	AES_KEXPAND1(36, 38, 0x9, 40)
++	AES_KEXPAND2(38, 40, 42)
++
++	std	%f4, [%o1 + 0x00]
++	std	%f6, [%o1 + 0x08]
++	std	%f8, [%o1 + 0x10]
++	std	%f10, [%o1 + 0x18]
++	std	%f12, [%o1 + 0x20]
++	std	%f14, [%o1 + 0x28]
++	std	%f16, [%o1 + 0x30]
++	std	%f18, [%o1 + 0x38]
++	std	%f20, [%o1 + 0x40]
++	std	%f22, [%o1 + 0x48]
++	std	%f24, [%o1 + 0x50]
++	std	%f26, [%o1 + 0x58]
++	std	%f28, [%o1 + 0x60]
++	std	%f30, [%o1 + 0x68]
++	std	%f32, [%o1 + 0x70]
++	std	%f34, [%o1 + 0x78]
++	std	%f36, [%o1 + 0x80]
++	std	%f38, [%o1 + 0x88]
++	std	%f40, [%o1 + 0x90]
++	std	%f42, [%o1 + 0x98]
++80:
++	retl
++	 VISExit
++ENDPROC(aes_sparc64_key_expand)
++
++ENTRY(aes_sparc64_encrypt)
++	/* %o0=key, %o1=input, %o2=output, %o3=key_len */
++	VISEntry
++	ld		[%o1 + 0x00], %f4
++	ld		[%o1 + 0x04], %f5
++	ld		[%o1 + 0x08], %f6
++	ld		[%o1 + 0x0c], %f7
++
++	ldd		[%o0 + 0x00], %f8
++	ldd		[%o0 + 0x08], %f10
++	cmp		%o3, 24
++	fxor		%f8, %f4, %f4
++	bl		2f
++	 fxor		%f10, %f6, %f6
++
++	be		1f
++	 ldd		[%o0 + 0x10], %f8
++
++	ldd		[%o0 + 0x18], %f10
++	ldd		[%o0 + 0x20], %f12
++	ldd		[%o0 + 0x28], %f14
++	add		%o0, 0x20, %o0
++
++	ENCRYPT_TWO_ROUNDS(8, 4, 6, 0, 2)
++
++	ldd		[%o0 + 0x10], %f8
++
++1:
++	ldd		[%o0 + 0x18], %f10
++	ldd		[%o0 + 0x20], %f12
++	ldd		[%o0 + 0x28], %f14
++	add		%o0, 0x20, %o0
++
++	ENCRYPT_TWO_ROUNDS(8, 4, 6, 0, 2)
++
++2:
++	ldd		[%o0 + 0x10], %f12
++	ldd		[%o0 + 0x18], %f14
++	ldd		[%o0 + 0x20], %f16
++	ldd		[%o0 + 0x28], %f18
++	ldd		[%o0 + 0x30], %f20
++	ldd		[%o0 + 0x38], %f22
++	ldd		[%o0 + 0x40], %f24
++	ldd		[%o0 + 0x48], %f26
++	ldd		[%o0 + 0x50], %f28
++	ldd		[%o0 + 0x58], %f30
++	ldd		[%o0 + 0x60], %f32
++	ldd		[%o0 + 0x68], %f34
++	ldd		[%o0 + 0x70], %f36
++	ldd		[%o0 + 0x78], %f38
++	ldd		[%o0 + 0x80], %f40
++	ldd		[%o0 + 0x88], %f42
++	ldd		[%o0 + 0x90], %f44
++	ldd		[%o0 + 0x98], %f46
++	ldd		[%o0 + 0xa0], %f48
++	ldd		[%o0 + 0xa8], %f50
++
++
++	ENCRYPT_128(12, 4, 6, 0, 2)
++
++	st		%f4, [%o2 + 0x00]
++	st		%f5, [%o2 + 0x04]
++	st		%f6, [%o2 + 0x08]
++	st		%f7, [%o2 + 0x0c]
++
++	retl
++	 VISExit
++ENDPROC(aes_sparc64_encrypt)
++
++ENTRY(aes_sparc64_decrypt)
++	/* %o0=key, %o1=input, %o2=output, %o3=key_len, %o4=exp_key_len */
++	VISEntry
++	ld		[%o1 + 0x00], %f4
++	add		%o0, %o4, %o0
++	ld		[%o1 + 0x04], %f5
++	ld		[%o1 + 0x08], %f6
++	ld		[%o1 + 0x0c], %f7
++	
++	ldd		[%o0 - 0x08], %f8
++	ldd		[%o0 - 0x10], %f10
++
++	cmp		%o3, 24
++	fxor		%f10, %f4, %f4
++	bl		2f
++	 fxor		%f8, %f6, %f6
++
++	be		1f
++	 ldd		[%o0 - 0x30], %f8
++
++	ldd		[%o0 - 0x28], %f10
++	ldd		[%o0 - 0x20], %f12
++	ldd		[%o0 - 0x18], %f14
++	sub		%o0, 0x20, %o0
++
++	DECRYPT_TWO_ROUNDS(16, 4, 6, 0, 2)
++
++	ldd		[%o0 - 0x30], %f8
++1:
++	ldd		[%o0 - 0x28], %f10
++	ldd		[%o0 - 0x20], %f12
++	ldd		[%o0 - 0x18], %f14
++	sub		%o0, 0x20, %o0
++
++	DECRYPT_TWO_ROUNDS(16, 4, 6, 0, 2)
++2:
++	ldd		[%o0 - 0xb0], %f12
++	ldd		[%o0 - 0xa8], %f14
++	ldd		[%o0 - 0xa0], %f16
++	ldd		[%o0 - 0x98], %f18
++	ldd		[%o0 - 0x90], %f20
++	ldd		[%o0 - 0x88], %f22
++	ldd		[%o0 - 0x80], %f24
++	ldd		[%o0 - 0x78], %f26
++	ldd		[%o0 - 0x70], %f28
++	ldd		[%o0 - 0x68], %f30
++	ldd		[%o0 - 0x60], %f32
++	ldd		[%o0 - 0x58], %f34
++	ldd		[%o0 - 0x50], %f36
++	ldd		[%o0 - 0x48], %f38
++	ldd		[%o0 - 0x40], %f40
++	ldd		[%o0 - 0x38], %f42
++	ldd		[%o0 - 0x30], %f44
++	ldd		[%o0 - 0x28], %f46
++	ldd		[%o0 - 0x20], %f48
++	ldd		[%o0 - 0x18], %f50
++
++	DECRYPT_128(52, 4, 6, 0, 2)
++
++	st		%f4, [%o2 + 0x00]
++	st		%f5, [%o2 + 0x04]
++	st		%f6, [%o2 + 0x08]
++	st		%f7, [%o2 + 0x0c]
++
++	retl
++	 VISExit
++ENDPROC(aes_sparc64_decrypt)
++
++ENTRY(aes_sparc64_load_decrypt_keys)
++	/* %o0=key */
++	ba,pt		%xcc, aes_sparc64_load_encrypt_keys
++	 sub		%o0, 0x10, %o0
++ENDPROC(aes_sparc64_load_decrypt_keys)
++
++ENTRY(aes_sparc64_load_encrypt_keys)
++	/* %o0=key */
++	VISEntry
++	ldd		[%o0 + 0x10], %f8
++	ldd		[%o0 + 0x18], %f10
++	ldd		[%o0 + 0x20], %f12
++	ldd		[%o0 + 0x28], %f14
++	ldd		[%o0 + 0x30], %f16
++	ldd		[%o0 + 0x38], %f18
++	ldd		[%o0 + 0x40], %f20
++	ldd		[%o0 + 0x48], %f22
++	ldd		[%o0 + 0x50], %f24
++	ldd		[%o0 + 0x58], %f26
++	ldd		[%o0 + 0x60], %f28
++	ldd		[%o0 + 0x68], %f30
++	ldd		[%o0 + 0x70], %f32
++	ldd		[%o0 + 0x78], %f34
++	ldd		[%o0 + 0x80], %f36
++	ldd		[%o0 + 0x88], %f38
++	ldd		[%o0 + 0x90], %f40
++	ldd		[%o0 + 0x98], %f42
++	ldd		[%o0 + 0xa0], %f44
++	ldd		[%o0 + 0xa8], %f46
++	ldd		[%o0 + 0xb0], %f48
++	ldd		[%o0 + 0xb8], %f50
++	ldd		[%o0 + 0xc0], %f52
++	ldd		[%o0 + 0xc8], %f54
++	ldd		[%o0 + 0xd0], %f56
++	ldd		[%o0 + 0xd8], %f58
++	ldd		[%o0 + 0xe0], %f60
++	retl
++	 ldd		[%o0 + 0xe8], %f62
++ENDPROC(aes_sparc64_load_encrypt_keys)
++
++ENTRY(aes_sparc64_ecb_encrypt)
++	/* %o0=key, %o1=input, %o2=output, %o3=key_len, %o4=len */
++	ldx		[%o0 + 0x00], %g1
++	ldx		[%o0 + 0x08], %g2
++	cmp		%o3, 24
++	bl		2f
++	 nop
++	be		1f
++	 nop
++
++0:
++	/* 256-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	ENCRYPT_256(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 0b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++
++1:
++	/* 192-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	ENCRYPT_192(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 1b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++
++2:
++	/* 128-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	ENCRYPT_128(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 2b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++ENDPROC(aes_sparc64_ecb_encrypt)
++
++ENTRY(aes_sparc64_ecb_decrypt)
++	/* %o0=&key[key_len], %o1=input, %o2=output, %o3=key_len, %o4=len, %o5=iv */
++	ldx		[%o0 - 0x10], %g1
++	ldx		[%o0 - 0x08], %g2
++	cmp		%o3, 24
++	bl		2f
++	 nop
++	be		1f
++	 nop
++
++0:
++	/* 256-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_256(64, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 0b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++
++1:
++	/* 192-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_192(56, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 1b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++
++2:
++	/* 128-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_128(48, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 2b
++	 add		%o2, 0x10, %o2
++
++	retl
++	 nop
++ENDPROC(aes_sparc64_ecb_decrypt)
++
++ENTRY(aes_sparc64_cbc_encrypt)
++	/* %o0=key, %o1=input, %o2=output, %o3=key_len, %o4=len */
++	ldd		[%o5 + 0x00], %f4
++	ldd		[%o5 + 0x08], %f6
++	ldx		[%o0 + 0x00], %g1
++	ldx		[%o0 + 0x08], %g2
++	cmp		%o3, 24
++	bl		2f
++	 nop
++	be		1f
++	 nop
++
++0:
++	/* 256-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F0
++	MOVXTOD_G7_F2
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	ENCRYPT_256(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 0b
++	 add		%o2, 0x10, %o2
++
++	std		%f4, [%o5 + 0x00]
++	std		%f6, [%o5 + 0x08]
++
++	retl
++	 nop
++
++1:
++	/* 192-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F0
++	MOVXTOD_G7_F2
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	ENCRYPT_192(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 1b
++	 add		%o2, 0x10, %o2
++
++	std		%f4, [%o5 + 0x00]
++	std		%f6, [%o5 + 0x08]
++
++	retl
++	 nop
++
++2:
++	/* 128-bit key */
++	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
++	add		%o1, 0x10, %o1
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F0
++	MOVXTOD_G7_F2
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	ENCRYPT_128(8, 4, 6, 0, 2)
++
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 2b
++	 add		%o2, 0x10, %o2
++
++	std		%f4, [%o5 + 0x00]
++	std		%f6, [%o5 + 0x08]
++
++	retl
++	 nop
++ENDPROC(aes_sparc64_cbc_encrypt)
++
++ENTRY(aes_sparc64_cbc_decrypt)
++	/* %o0=&key[key_len], %o1=key_len, %o2=input, %o3=output, %o4=len, %o5=iv */
++	ldx		[%o0 - 0x10], %g1
++	ldx		[%o0 - 0x08], %g2
++	cmp		%o1, 24
++	ldx		[%o5 + 0x00], %o0
++	bl		2f
++	 ldx		[%o5 + 0x08], %o1
++	be		1f
++	 nop
++
++0:
++	/* 256-bit key */
++	ldx		[%o2 + 0x00], %g3
++	ldx		[%o2 + 0x08], %g7
++	add		%o2, 0x10, %o2
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_256(64, 4, 6, 0, 2)
++
++	MOVXTOD_O0_F0
++	MOVXTOD_O1_F2
++	xor		%g1, %g3, %o0
++	xor		%g2, %g7, %o1
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	std		%f4, [%o3 + 0x00]
++	std		%f6, [%o3 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 0b
++	 add		%o3, 0x10, %o3
++
++	stx		%o0, [%o5 + 0x00]
++	stx		%o1, [%o5 + 0x08]
++
++	retl
++	 nop
++
++1:
++	/* 192-bit key */
++	ldx		[%o2 + 0x00], %g3
++	ldx		[%o2 + 0x08], %g7
++	add		%o2, 0x10, %o2
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_192(56, 4, 6, 0, 2)
++
++	MOVXTOD_O0_F0
++	MOVXTOD_O1_F2
++	xor		%g1, %g3, %o0
++	xor		%g2, %g7, %o1
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	std		%f4, [%o3 + 0x00]
++	std		%f6, [%o3 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 1b
++	 add		%o3, 0x10, %o3
++
++	stx		%o0, [%o5 + 0x00]
++	stx		%o1, [%o5 + 0x08]
++
++	retl
++	 nop
++
++2:
++	/* 128-bit key */
++	ldx		[%o2 + 0x00], %g3
++	ldx		[%o2 + 0x08], %g7
++	add		%o2, 0x10, %o2
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++
++	DECRYPT_128(48, 4, 6, 0, 2)
++
++	MOVXTOD_O0_F0
++	MOVXTOD_O1_F2
++	xor		%g1, %g3, %o0
++	xor		%g2, %g7, %o1
++	fxor		%f4, %f0, %f4
++	fxor		%f6, %f2, %f6
++
++	std		%f4, [%o3 + 0x00]
++	std		%f6, [%o3 + 0x08]
++	subcc		%o4, 0x10, %o4
++	bne,pt		%xcc, 2b
++	 add		%o3, 0x10, %o3
++
++	stx		%o0, [%o5 + 0x00]
++	stx		%o1, [%o5 + 0x08]
++
++	retl
++	 nop
++ENDPROC(aes_sparc64_cbc_decrypt)
+diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
+new file mode 100644
+index 0000000..a87c5fa
+--- /dev/null
++++ b/arch/sparc/crypto/aes_glue.c
+@@ -0,0 +1,323 @@
++/* Glue code for AES encryption optimized for sparc64 crypto opcodes.
 + *
-+ * Copyright 2011 Freescale Semiconductor, Inc
++ * This is based largely upon arch/x86/crypto/aesni-intel_glue.c
 + *
-+ * relationship between job descriptors, shared descriptors and sources:
-+ * ------------------------------           -------------------
-+ * | ShareDesc                  |<------\   | JobDesc         |
-+ * |   Load src pointers to ctx |        \--| ShareDesc ptr   |
-+ * | new src jump dst:          |<-----\    | SEQ_OUT_PTR     |
-+ * |   Load ith src             |      |    | (output buffer) |
-+ * | new src mv dst:            |      |    | (output length) |
-+ * |   (ith src commands)       |      |    | SEQ_IN_PTR      |
-+ * | load:                      |<---\ |    | (src commands)  |----\
-+ * |   Seq load chunk           |    | |    -------------------    |
-+ * | return:                    |<---|-|-\                         |
-+ * |   XOR quarter chunk        |    | | |                         |
-+ * |   Pass complete?           |----^-^---\                       |
-+ * |   Half chunk left?         |----^-+ | |                       |
-+ * |   Default                  |----^-^-+ |                       |
-+ * | store:                     |<---|-|-|-/                       |
-+ * |   Seq store chunk          |    | | |    -------------------  |
-+ * |   No data left to write?   |X   | | |    | first src ptr   |<-/
-+ * |   Put src1 chunk in result |    | | |    | first src len   |
-+ * |   Default                  |----^-+ |  /-| shared hdr jump |
-+ * | first:                     |<---|-|-|-/  | nop (if needed) |
-+ * |   No data left to read?    |----^-^-+    -------------------
-+ * |   Seq load chunk           |    | | |    | ith src ptr     |
-+ * |   Load src2                |    | | |    | ith src len     |
-+ * |   Not first pass?          |----^-^-/    | load src i + 1  |
-+ * | first pass:                |    | |      | nop (if needed) |
-+ * |   Put src1 chunk in result |    | |      -------------------
-+ * |   set output size          |    | |      | last src ptr    |
-+ * |   Default                  |----^-/      | last src len    |
-+ * | last:                      |<---|--------| shared hdr jump |
-+ * |   Update index             |    |        | nop (if needed) |
-+ * |   Load src1                |    |        -------------------
-+ * |   Default                  |----/
-+ * ------------------------------
++ * Copyright (C) 2008, Intel Corp.
++ *    Author: Huang Ying <ying.huang@intel.com>
 + *
++ * Added RFC4106 AES-GCM support for 128-bit keys under the AEAD
++ * interface for 64-bit kernels.
++ *    Authors: Adrian Hoban <adrian.hoban@intel.com>
++ *             Gabriele Paoloni <gabriele.paoloni@intel.com>
++ *             Tadeusz Struk (tadeusz.struk@intel.com)
++ *             Aidan O'Mahony (aidan.o.mahony@intel.com)
++ *    Copyright (c) 2010, Intel Corporation.
 + */
 +
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/dmaengine.h>
++#include <linux/crypto.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/types.h>
++#include <crypto/algapi.h>
++#include <crypto/aes.h>
 +
-+#include "compat.h"
-+#include "regs.h"
-+#include "jr.h"
-+#include "error.h"
-+#include "intern.h"
-+#include "desc.h"
-+#include "desc_constr.h"
++#include <asm/fpumacro.h>
++#include <asm/pstate.h>
++#include <asm/elf.h>
 +
-+#define MAX_INITIAL_DESCS	64
-+#define MAX_XOR_SRCS		8
-+
-+#define JOB_DESC_BYTES		(4 * CAAM_CMD_SZ + 3 * CAAM_PTR_SZ)
-+#define JOB_DESC_LEN		(JOB_DESC_BYTES / CAAM_CMD_SZ)
-+#define CMD_DESC_LEN		32
-+
-+#define LONG_PTR		(CAAM_PTR_SZ > CAAM_CMD_SZ)
-+
-+#define CTX1_SLOTS		4
-+#define SRC_CMD_BYTES		(4 * CAAM_CMD_SZ)
-+#define SRC_CMD_LEN		(SRC_CMD_BYTES / CAAM_CMD_SZ)
-+#define CHUNK_SIZE		128
-+#define CHUNK_SIZE_H		64
-+#define CHUNK_SIZE_Q		32
-+#define REG_SIZE		8
-+
-+#define CMD_MOVE_OVERFLOW_LEN	1
-+
-+#define LABEL_SRC_JMP_BYTES	(5 * CAAM_CMD_SZ)
-+#define LABEL_SRC_JMP		(LABEL_SRC_JMP_BYTES / CAAM_CMD_SZ)
-+#define LABEL_SRC_MV_BYTES	(CAAM_CMD_SZ + LABEL_SRC_JMP_BYTES)
-+#define LABEL_SRC_MV		(LABEL_SRC_MV_BYTES / CAAM_CMD_SZ)
-+#define LABEL_FIRST_BYTES	(28 * CAAM_CMD_SZ + LABEL_SRC_MV_BYTES)
-+#define LABEL_FIRST		(LABEL_FIRST_BYTES / CAAM_CMD_SZ)
-+#define LABEL_LAST_BYTES	(13 * CAAM_CMD_SZ + LABEL_FIRST_BYTES)
-+#define LABEL_LAST		(LABEL_LAST_BYTES / CAAM_CMD_SZ)
-+#define SH_DESC_BYTES		(5 * CAAM_CMD_SZ + LABEL_LAST_BYTES)
-+#define SH_DESC_LEN		(SH_DESC_BYTES / CAAM_CMD_SZ)
-+
-+#ifdef DEBUG
-+/* for print_hex_dumps with line references */
-+#define xstr(s) str(s)
-+#define str(s) (#s)
-+#define debug(format, arg...) printk(format, arg)
-+#else
-+#define debug(format, arg...)
-+#endif
-+
-+struct caam_xor_sh_desc {
-+	u32 desc[SH_DESC_LEN + CMD_MOVE_OVERFLOW_LEN];
-+	dma_addr_t sh_desc_phys;
++struct crypto_sparc64_aes_ctx {
++	u64 key[AES_MAX_KEYLENGTH / sizeof(u64)];
++	u32 key_length;
++	u32 expanded_key_length;
 +};
 +
-+struct caam_dma_async_tx_desc {
-+	struct dma_async_tx_descriptor async_tx;
-+	struct list_head node;
-+	struct caam_dma_jr *dma_jr;
-+	u32 job_desc[JOB_DESC_LEN];
-+	u32 cmd_desc[CMD_DESC_LEN];
-+	dma_addr_t cmd_desc_phys;
-+	dma_addr_t dest;
-+	dma_addr_t src[MAX_XOR_SRCS];
-+	u32 src_cnt;
-+	u32 dma_len;
-+};
++extern void aes_sparc64_key_expand(const u32 *in_key, u64 *output_key,
++				   unsigned int key_len);
 +
-+struct caam_dma_desc_pool {
-+	int desc_cnt;
-+	struct list_head head;
-+};
-+
-+/*
-+ * caam_dma_jr - job ring/channel data
-+ * @completed_cookie: cookie of latest latest, completed job
-+ * @chan: dma channel used by async_tx API
-+ * @desc_lock: lock on job descriptor
-+ * @submit_q: queue of pending (submitted, but not enqueued) jobs
-+ * @done_lock: lock on done_not_acked
-+ * @done_not_acked: jobs that have been completed by jr, but maybe not acked
-+ * @handle_done: tasklet for cleaning done_not_acked
-+ * @caam_hw_jr: jr device data
-+ * @pool_lock: lock on soft_desc
-+ * @soft_desc: pool of pre-allocated caam_dma_async_tx_desc structures
-+ */
-+struct caam_dma_jr {
-+	dma_cookie_t completed_cookie;
-+	struct dma_chan chan;
-+	struct device *dev;
-+	spinlock_t desc_lock;
-+	struct list_head submit_q;
-+	spinlock_t done_lock;
-+	struct list_head done_not_acked;
-+	struct tasklet_struct handle_done;
-+	struct caam_drv_private_jr *caam_hw_jr;
-+	spinlock_t pool_lock;
-+	struct caam_dma_desc_pool *soft_desc;
-+};
-+
-+static inline u32 load_source(u32 ctx, u32 offset, u32 target)
++static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
++		       unsigned int key_len)
 +{
-+	return ctx | MOVE_DEST_DESCBUF | SRC_CMD_BYTES |
-+	       (target << (2 + MOVE_OFFSET_SHIFT)) |
-+	       (offset << MOVE_AUX_SHIFT);
-+}
++	struct crypto_sparc64_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	u32 *flags = &tfm->crt_flags;
 +
-+static inline u32 *write_load_source(u32 *desc, u32 ctx, u32 offset, u32 target)
-+{
-+	return write_move(desc, load_source(ctx, offset, target));
-+}
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		ctx->expanded_key_length = 0xb0;
++		break;
 +
-+/* generate source commands and job descriptor for each request */
-+static void prepare_caam_xor_desc(struct device *dev,
-+				  struct caam_dma_async_tx_desc *desc,
-+				  dma_addr_t sh_desc_phys,
-+				  dma_addr_t dest, dma_addr_t *src,
-+				  u32 src_cnt, size_t len)
-+{
-+	u32 label_src_mv = LABEL_SRC_MV + CMD_MOVE_OVERFLOW_LEN;
-+	u32 label_first = LABEL_FIRST + CMD_MOVE_OVERFLOW_LEN;
-+	u32 label_last = LABEL_LAST + CMD_MOVE_OVERFLOW_LEN;
-+	u32 sh_desc_len = SH_DESC_LEN + CMD_MOVE_OVERFLOW_LEN;
-+	int i;
-+	u32 *job_descptr = desc->job_desc;
-+	u32 *cmd_desc = desc->cmd_desc;
++	case AES_KEYSIZE_192:
++		ctx->expanded_key_length = 0xd0;
++		break;
 +
-+	desc->dest = dest;
-+	memcpy(desc->src, src, src_cnt*sizeof(dma_addr_t));
-+	desc->src_cnt = src_cnt;
-+	desc->dma_len = len;
++	case AES_KEYSIZE_256:
++		ctx->expanded_key_length = 0xf0;
++		break;
 +
-+	/* first source: jump to special commands */
-+	cmd_desc = write_ptr(cmd_desc, src[0]);
-+	cmd_desc = write_cmd(cmd_desc, len);
-+	init_sh_desc(cmd_desc, (label_first & HDR_START_IDX_MASK) <<
-+		      HDR_START_IDX_SHIFT);
-+	cmd_desc++;
-+	if (!LONG_PTR)
-+		cmd_desc = write_nop(cmd_desc, 1);
-+
-+	i = 1;
-+	/* sources that load next source from first context */
-+	while (i < src_cnt - 1 && i < CTX1_SLOTS - 1) {
-+		cmd_desc = write_ptr(cmd_desc, src[i]);
-+		cmd_desc = write_cmd(cmd_desc, len);
-+		cmd_desc = write_load_source(cmd_desc, MOVE_SRC_CLASS1CTX, i +
-+					     1, label_src_mv);
-+		if (!LONG_PTR)
-+			cmd_desc = write_nop(cmd_desc, 1);
-+		i++;
-+	}
-+	/* sources that load next source from second context */
-+	while (i < src_cnt - 1) {
-+		cmd_desc = write_ptr(cmd_desc, src[i]);
-+		cmd_desc = write_cmd(cmd_desc, len);
-+		cmd_desc = write_load_source(cmd_desc, MOVE_SRC_CLASS2CTX, i +
-+					     1, label_src_mv);
-+		if (!LONG_PTR)
-+			cmd_desc = write_nop(cmd_desc, 1);
-+		i++;
++	default:
++		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
 +	}
 +
-+	/* last source: jump to special commands */
-+	cmd_desc = write_ptr(cmd_desc, src[i]);
-+	cmd_desc = write_cmd(cmd_desc, len);
-+	init_sh_desc(cmd_desc, (label_last & HDR_START_IDX_MASK) <<
-+		      HDR_START_IDX_SHIFT);
-+	cmd_desc++;
-+	if (!LONG_PTR)
-+		cmd_desc = write_nop(cmd_desc, 1);
-+
-+	desc->cmd_desc_phys = dma_map_single(dev, desc->cmd_desc,
-+					     CMD_DESC_LEN * sizeof(u32),
-+					     DMA_TO_DEVICE);
-+	init_job_desc_shared(job_descptr, sh_desc_phys, sh_desc_len,
-+			     HDR_SHARE_WAIT | HDR_REVERSE);
-+
-+	append_seq_out_ptr(job_descptr, dest, len, 0);
-+	append_seq_in_ptr_intlen(job_descptr, desc->cmd_desc_phys,
-+					MAX_XOR_SRCS * SRC_CMD_BYTES, 0);
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "job desc @"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, job_descptr, CAAM_CMD_SZ *
-+		       desc_len(job_descptr), 1);
-+	print_hex_dump(KERN_ERR, "srcs @"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, src, src_cnt * CAAM_PTR_SZ,
-+		       1);
-+	print_hex_dump(KERN_ERR, "src cmd@"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, desc->cmd_desc,
-+		       SRC_CMD_BYTES * src_cnt, 1);
-+#endif
-+}
-+
-+/* generate shared descriptor for each device */
-+static void prepare_caam_xor_sh_desc(u32 *descptr, u32 src_cnt)
-+{
-+	bool overflow;
-+	u32 label_src_jmp, label_src_mv;
-+	u32 *store_jump_cmd;
-+	u32 label_load, label_return, label_store;
-+
-+	overflow = src_cnt > CTX1_SLOTS;
-+	label_src_jmp = LABEL_SRC_JMP + CMD_MOVE_OVERFLOW_LEN;
-+	label_src_mv = label_src_jmp + 1;
-+	init_sh_desc(descptr, HDR_SHARE_SERIAL);
-+	/* Store up to 4 sources in ctx1 */
-+	append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
-+		   LDST_CLASS_1_CCB | (overflow ?
-+		   (CTX1_SLOTS * SRC_CMD_BYTES) : (src_cnt * SRC_CMD_BYTES)));
-+
-+	/* Store any overflow in ctx2 */
-+	if (overflow)
-+		append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
-+			   LDST_CLASS_2_CCB | (src_cnt - 4) * 16);
-+	else
-+		append_cmd(descptr, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
-+			   LDST_CLASS_2_CCB | 4 * 16);
-+
-+	append_cmd(descptr, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
-+
-+	/* Load first source */
-+	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 0, label_src_mv) |
-+		    MOVE_WAITCOMP);
-+
-+	/* Refresh shared descriptor */
-+	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
-+		   ((label_src_jmp & HDR_START_IDX_MASK) <<
-+		    HDR_START_IDX_SHIFT));
-+
-+	/* Load source and run loaded commands */
-+	append_cmd(descptr, CMD_SEQ_IN_PTR | SQIN_EXT);
-+	append_len(descptr, SRC_CMD_LEN);
-+
-+	/* Skip read data */
-+	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
-+
-+	/* Load chunk to ififo */
-+	label_load = desc_len(descptr);
-+	append_seq_fifo_load(descptr, CHUNK_SIZE, FIFOLD_TYPE_PK |
-+			     LDST_CLASS_1_CCB);
-+
-+	/* Update added number of bytes in ififo */
-+	append_math_add_imm_u32(descptr, VARSEQOUTLEN, VARSEQOUTLEN, IMM,
-+				CHUNK_SIZE);
-+
-+	/* Load chunk from ififo to math registers via DECO alignment block*/
-+	append_load_imm_u32(descptr, NFIFOENTRY_LC1 | NFIFOENTRY_DTYPE_MSG |
-+			    CHUNK_SIZE, LDST_SRCDST_WORD_INFO_FIFO);
-+	label_return = desc_len(descptr);
-+	append_move(descptr, MOVE_WAITCOMP | MOVE_SRC_INFIFO |
-+		    MOVE_DEST_MATH0 | CHUNK_SIZE_Q);
-+
-+	/* XOR math registers with ofifo */
-+	append_math_xor(descptr, REG0, REG0, OUTFIFO, REG_SIZE);
-+	append_math_xor(descptr, REG1, REG1, OUTFIFO, REG_SIZE);
-+	append_math_xor(descptr, REG2, REG2, OUTFIFO, REG_SIZE);
-+	append_math_xor(descptr, REG3, REG3, OUTFIFO, REG_SIZE);
-+
-+	/* Move result to ofifo */
-+	append_move(descptr, MOVE_SRC_MATH0 | MOVE_WAITCOMP |
-+		    MOVE_DEST_OUTFIFO | CHUNK_SIZE_Q);
-+
-+	/* Update reduced number of bytes in ififo */
-+	append_math_sub_imm_u32(descptr, VARSEQOUTLEN, VARSEQOUTLEN, IMM,
-+				CHUNK_SIZE_Q);
-+
-+	/* If ififo has no more data, store chunk */
-+	store_jump_cmd = append_jump(descptr, JUMP_TEST_ALL |
-+				     JUMP_COND_MATH_Z);
-+
-+	/* If half of chunk left, use next source */
-+	append_math_sub_imm_u32(descptr, NONE, VARSEQOUTLEN, IMM,
-+				CHUNK_SIZE_H);
-+	append_jump_to(descptr, JUMP_TEST_ALL | JUMP_COND_MATH_Z,
-+		       label_src_jmp);
-+
-+	/* Else, keep XORing */
-+	append_jump_to(descptr, 0, label_return);
-+
-+	/* Store */
-+	label_store = desc_len(descptr);
-+	set_jump_tgt_here(descptr, store_jump_cmd);
-+
-+	/* Store chunk to seqout */
-+	append_seq_fifo_store(descptr, CHUNK_SIZE, FIFOST_TYPE_MESSAGE_DATA);
-+
-+	/* Halt if no more data */
-+	append_math_sub(descptr, NONE, SEQOUTLEN, ONE, CAAM_CMD_SZ);
-+	append_jump(descptr, JUMP_TYPE_HALT_USER | JUMP_TEST_ALL |
-+			JUMP_COND_MATH_N);
-+
-+	/* Load first source's next chunk to ofifo */
-+	append_move(descptr, MOVE_SRC_INFIFO | MOVE_DEST_OUTFIFO |
-+			MOVE_WAITCOMP | CHUNK_SIZE);
-+
-+	/* Goto source */
-+	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
-+		   ((label_src_jmp & HDR_START_IDX_MASK) <<
-+		     HDR_START_IDX_SHIFT));
-+
-+	/* First source, skip read data */
-+	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
-+
-+	/* If no more data to read, go XOR read data */
-+	append_math_sub(descptr, NONE, SEQINLEN, ONE, CAAM_CMD_SZ);
-+	append_jump_to(descptr, JUMP_TEST_ALL | JUMP_COND_MATH_N,
-+		       label_return);
-+
-+	/* Otherwise, load chunk from first source to DECO alignment block */
-+	append_seq_fifo_load(descptr, CHUNK_SIZE, FIFOLD_TYPE_PK |
-+			     LDST_CLASS_1_CCB);
-+	append_load_imm_u32(descptr, NFIFOENTRY_LC1 | NFIFOENTRY_DTYPE_MSG |
-+			    CHUNK_SIZE, LDST_SRCDST_WORD_INFO_FIFO);
-+
-+	/* Load second source */
-+	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 1, label_src_mv));
-+
-+	/* XOR previous pass if this is not first pass */
-+	append_math_sub(descptr, NONE, VARSEQINLEN, ONE, CAAM_CMD_SZ);
-+	append_jump_to(descptr, JUMP_TEST_INVALL | JUMP_COND_MATH_N,
-+		       label_return);
-+
-+	/* Else, move chunk for DECO alignment block to ofifo */
-+	append_move(descptr, MOVE_SRC_INFIFO | MOVE_DEST_OUTFIFO |
-+				MOVE_WAITCOMP | CHUNK_SIZE);
-+
-+	/* and track number of bytes to write*/
-+	append_math_add_imm_u32(descptr, SEQOUTLEN, SEQINLEN, IMM, CHUNK_SIZE);
-+
-+	/* Goto source */
-+	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
-+		   ((label_src_jmp & HDR_START_IDX_MASK) <<
-+		     HDR_START_IDX_SHIFT));
-+
-+	/* Last source, skip read data */
-+	append_seq_fifo_load(descptr, 0, KEY_VLF | FIFOLD_CLASS_SKIP);
-+
-+	/* Update number of bytes to skip */
-+	append_math_add_imm_u32(descptr, VARSEQINLEN, VARSEQINLEN, IMM,
-+				CHUNK_SIZE);
-+
-+	/* Load first source */
-+	append_move(descptr, load_source(MOVE_SRC_CLASS1CTX, 0, label_src_mv));
-+
-+	/* Goto data loading */
-+	append_cmd(descptr, CMD_SHARED_DESC_HDR | HDR_SHARE_NEVER | HDR_ONE |
-+		   ((label_load & HDR_START_IDX_MASK) << HDR_START_IDX_SHIFT));
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "shdesc @"xstr(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, descptr, CAAM_CMD_SZ *
-+		       desc_len(descptr), 1);
-+#endif
-+}
-+
-+static enum dma_status caam_jr_tx_status(struct dma_chan *chan,
-+					 dma_cookie_t cookie,
-+					 struct dma_tx_state *txstate)
-+{
-+	struct caam_dma_jr *jr = NULL;
-+	dma_cookie_t last_used;
-+	dma_cookie_t last_complete;
-+
-+	jr = container_of(chan, struct caam_dma_jr, chan);
-+
-+	last_used = chan->cookie;
-+	last_complete = jr->completed_cookie;
-+
-+	dma_set_tx_state(txstate, last_complete, last_used, 0);
-+
-+	return dma_async_is_complete(cookie, last_complete, last_used);
-+}
-+
-+static inline void try_clear_desc(struct caam_dma_jr *dma_jr)
-+{
-+	spin_lock_bh(&dma_jr->done_lock);
-+	if (!list_empty(&dma_jr->done_not_acked)) {
-+		spin_unlock_bh(&dma_jr->done_lock);
-+		tasklet_schedule(&dma_jr->handle_done);
-+	} else {
-+		spin_unlock_bh(&dma_jr->done_lock);
-+	}
-+}
-+
-+/*
-+ * tasklet function for checking requests that are completed,
-+ * but may not have been acked --delete only if acked
-+ */
-+static void check_done(unsigned long data)
-+{
-+	struct caam_dma_jr *dma_jr = (struct caam_dma_jr *) data;
-+	struct caam_dma_async_tx_desc *desc, *_desc;
-+
-+	spin_lock_bh(&dma_jr->done_lock);
-+	list_for_each_entry_safe(desc, _desc, &dma_jr->done_not_acked, node) {
-+		spin_unlock_bh(&dma_jr->done_lock);
-+		if (async_tx_test_ack(&desc->async_tx)) {
-+			spin_lock_bh(&dma_jr->done_lock);
-+			list_del(&desc->node);
-+			spin_unlock_bh(&dma_jr->done_lock);
-+			spin_lock_bh(&dma_jr->pool_lock);
-+			if (dma_jr->soft_desc->desc_cnt < MAX_INITIAL_DESCS) {
-+				INIT_LIST_HEAD(&desc->node);
-+				list_add(&desc->node, &dma_jr->soft_desc->head);
-+				dma_jr->soft_desc->desc_cnt++;
-+				spin_unlock_bh(&dma_jr->pool_lock);
-+			} else {
-+				spin_unlock_bh(&dma_jr->pool_lock);
-+				kfree(desc);
-+			}
-+		}
-+		spin_lock_bh(&dma_jr->done_lock);
-+	}
-+	spin_unlock_bh(&dma_jr->done_lock);
-+}
-+
-+static void caam_dma_xor_done(struct device *dev, u32 *hwdesc, u32 status,
-+			      void *auxarg)
-+{
-+	struct caam_dma_async_tx_desc *desc;
-+	struct caam_dma_jr *dma_jr;
-+	dma_async_tx_callback callback;
-+	void *callback_param;
-+	struct device *jrdev;
-+	enum dma_ctrl_flags flags;
-+
-+	desc = (struct caam_dma_async_tx_desc *)auxarg;
-+	dma_jr = desc->dma_jr;
-+	jrdev = dma_jr->caam_hw_jr->parentdev;
-+	flags = desc->async_tx.flags;
-+
-+	if (status) {
-+		char tmp[256];
-+		dev_err(dev, "%s\n", caam_jr_strstatus(tmp, status));
-+	}
-+
-+	dma_run_dependencies(&desc->async_tx);
-+
-+	spin_lock_bh(&dma_jr->desc_lock);
-+	if (dma_jr->completed_cookie < desc->async_tx.cookie) {
-+		dma_jr->completed_cookie = desc->async_tx.cookie;
-+		if (dma_jr->completed_cookie == DMA_MAX_COOKIE)
-+			dma_jr->completed_cookie = DMA_MIN_COOKIE;
-+	}
-+	spin_unlock_bh(&dma_jr->desc_lock);
-+
-+	callback = desc->async_tx.callback;
-+	callback_param = desc->async_tx.callback_param;
-+
-+	dma_unmap_single(jrdev, desc->cmd_desc_phys,
-+			CMD_DESC_LEN * sizeof(u32), DMA_TO_DEVICE);
-+
-+	if (likely(!(flags & DMA_COMPL_SKIP_DEST_UNMAP)))
-+		dma_unmap_page(jrdev, desc->dest, desc->dma_len,
-+						DMA_BIDIRECTIONAL);
-+
-+	if (likely(!(flags & DMA_COMPL_SKIP_SRC_UNMAP))) {
-+		u32 i;
-+		for (i = 0; i < desc->src_cnt; i++) {
-+			if (desc->src[i] == desc->dest)
-+				continue;
-+			dma_unmap_page(jrdev, desc->src[i],
-+					desc->dma_len, DMA_TO_DEVICE);
-+		}
-+	}
-+
-+	if (async_tx_test_ack(&desc->async_tx)) {
-+		spin_lock_bh(&dma_jr->pool_lock);
-+		if (dma_jr->soft_desc->desc_cnt < MAX_INITIAL_DESCS) {
-+			list_add(&desc->node, &dma_jr->soft_desc->head);
-+			dma_jr->soft_desc->desc_cnt++;
-+			spin_unlock_bh(&dma_jr->pool_lock);
-+		} else {
-+			spin_unlock_bh(&dma_jr->pool_lock);
-+			kfree(desc);
-+		}
-+	} else {
-+		spin_lock_bh(&dma_jr->done_lock);
-+		INIT_LIST_HEAD(&desc->node);
-+		list_add_tail(&desc->node, &dma_jr->done_not_acked);
-+		spin_unlock_bh(&dma_jr->done_lock);
-+	}
-+	try_clear_desc(dma_jr);
-+
-+	if (callback)
-+		callback(callback_param);
-+}
-+
-+static void caam_jr_issue_pending(struct dma_chan *chan)
-+{
-+	struct caam_dma_jr *dma_jr = NULL;
-+	struct caam_dma_async_tx_desc *desc, *_desc;
-+	struct device *dev;
-+
-+	dma_jr = container_of(chan, struct caam_dma_jr, chan);
-+	dev = dma_jr->dev;
-+
-+	spin_lock_bh(&dma_jr->desc_lock);
-+	list_for_each_entry_safe(desc, _desc, &dma_jr->submit_q, node) {
-+		desc->dma_jr = dma_jr;
-+		if (caam_jr_enqueue(dev, desc->job_desc,
-+				    caam_dma_xor_done, desc) < 0) {
-+			spin_unlock_bh(&dma_jr->desc_lock);
-+			return;
-+		}
-+
-+		list_del(&desc->node);
-+	}
-+
-+	spin_unlock_bh(&dma_jr->desc_lock);
-+}
-+
-+static dma_cookie_t caam_jr_tx_submit(struct dma_async_tx_descriptor *tx)
-+{
-+	struct caam_dma_async_tx_desc *desc = NULL;
-+	struct caam_dma_jr *jr = NULL;
-+	dma_cookie_t cookie;
-+
-+	desc = container_of(tx, struct caam_dma_async_tx_desc, async_tx);
-+	jr = container_of(tx->chan, struct caam_dma_jr, chan);
-+
-+	spin_lock_bh(&jr->desc_lock);
-+
-+	cookie = jr->chan.cookie + 1;
-+	if (cookie < DMA_MIN_COOKIE)
-+		cookie = DMA_MIN_COOKIE;
-+
-+	desc->async_tx.cookie = cookie;
-+	jr->chan.cookie = desc->async_tx.cookie;
-+	list_add_tail(&desc->node, &jr->submit_q);
-+
-+	spin_unlock_bh(&jr->desc_lock);
-+
-+	return cookie;
-+}
-+
-+static struct dma_async_tx_descriptor *
-+caam_jr_prep_dma_xor(struct dma_chan *chan, dma_addr_t dest, dma_addr_t *src,
-+		     unsigned int src_cnt, size_t len, unsigned long flags)
-+{
-+	struct caam_dma_jr *jr = NULL;
-+	struct caam_dma_async_tx_desc *desc = NULL;
-+	struct caam_drv_private *priv;
-+
-+	jr = container_of(chan, struct caam_dma_jr, chan);
-+
-+	if (src_cnt > MAX_XOR_SRCS) {
-+		dev_err(jr->dev, "%d srcs exceed max supported %d srcs\n",
-+							src_cnt, MAX_XOR_SRCS);
-+		return NULL;
-+	}
-+
-+	spin_lock_bh(&jr->pool_lock);
-+	if (jr->soft_desc->desc_cnt) {
-+		desc = container_of(jr->soft_desc->head.next,
-+				    struct caam_dma_async_tx_desc, node);
-+		jr->soft_desc->desc_cnt--;
-+		list_del(&desc->node);
-+	}
-+	spin_unlock_bh(&jr->pool_lock);
-+
-+	if (!desc) {
-+		desc = kzalloc(sizeof(struct caam_dma_async_tx_desc),
-+			       GFP_KERNEL);
-+		if (!desc) {
-+			dev_err(jr->dev, "Out of memory for XOR async tx\n");
-+			try_clear_desc(jr);
-+
-+			return ERR_PTR(-ENOMEM);
-+		}
-+
-+		desc->async_tx.tx_submit = caam_jr_tx_submit;
-+	}
-+
-+	dma_async_tx_descriptor_init(&desc->async_tx, &jr->chan);
-+
-+	priv = dev_get_drvdata(jr->caam_hw_jr->parentdev);
-+
-+	prepare_caam_xor_desc(jr->caam_hw_jr->parentdev, desc,
-+			      priv->xor_sh_desc[0].sh_desc_phys, dest,
-+			      src, src_cnt, len);
-+
-+	desc->async_tx.flags = flags;
-+	desc->async_tx.cookie = -EBUSY;
-+	return &desc->async_tx;
-+}
-+
-+static void caam_jr_free_chan_resources(struct dma_chan *chan)
-+{
-+	struct caam_dma_jr *jr = container_of(chan, struct caam_dma_jr, chan);
-+	struct caam_dma_async_tx_desc *desc;
-+	struct list_head *current_node;
-+
-+	current_node = jr->soft_desc->head.next;
-+	while (jr->soft_desc->desc_cnt > 0) {
-+		desc = container_of(current_node, struct caam_dma_async_tx_desc,
-+				    node);
-+		current_node = current_node->next;
-+		list_del(&desc->node);
-+		kfree(desc);
-+		jr->soft_desc->desc_cnt--;
-+	}
-+
-+	kfree(jr->soft_desc);
-+
-+	return;
-+}
-+
-+static int caam_jr_alloc_chan_resources(struct dma_chan *chan)
-+{
-+	struct caam_dma_jr *jr = container_of(chan, struct caam_dma_jr, chan);
-+	struct caam_dma_async_tx_desc *desc;
-+	unsigned int i;
-+
-+	jr->soft_desc = kzalloc(sizeof(struct caam_dma_desc_pool), GFP_KERNEL);
-+	if (!jr->soft_desc) {
-+		pr_err("%s: Failed to allocate resources for DMA channel\n",
-+		       __func__);
-+		return -ENOMEM;
-+	}
-+
-+	INIT_LIST_HEAD(&jr->soft_desc->head);
-+	for (i = 0; i < MAX_INITIAL_DESCS; i++) {
-+		desc = kzalloc(sizeof(struct caam_dma_async_tx_desc),
-+			       GFP_KERNEL);
-+		if (!desc)
-+			return -ENOMEM;
-+
-+		desc->async_tx.tx_submit = caam_jr_tx_submit;
-+		jr->soft_desc->desc_cnt++;
-+		list_add_tail(&desc->node, &jr->soft_desc->head);
-+	}
++	aes_sparc64_key_expand((const u32 *)in_key, &ctx->key[0], key_len);
++	ctx->key_length = key_len;
 +
 +	return 0;
 +}
 +
-+static int caam_jr_chan_bind(struct device *ctrldev, struct device *dev)
++extern void aes_sparc64_encrypt(const u64 *key, const u32 *input,
++				u32 *output, unsigned int key_len);
++
++static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
 +{
-+	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
-+	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(dev);
-+	struct dma_device *dma_dev = &priv->dma_dev;
-+	struct caam_dma_jr *dma_jr;
++	struct crypto_sparc64_aes_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+	dma_jr = kzalloc(sizeof(struct caam_dma_jr), GFP_KERNEL);
-+	if (!dma_jr) {
-+		dev_err(dev, "Failed to allocate memory for caam job queue\n");
-+		return -ENOMEM;
-+	}
-+
-+	dma_jr->chan.device = dma_dev;
-+	dma_jr->chan.private = dma_jr;
-+
-+	INIT_LIST_HEAD(&dma_jr->submit_q);
-+	spin_lock_init(&dma_jr->desc_lock);
-+	spin_lock_init(&dma_jr->pool_lock);
-+	list_add_tail(&dma_jr->chan.device_node, &dma_dev->channels);
-+	dma_dev->chancnt++;
-+
-+	dma_jr->caam_hw_jr = jrpriv;
-+	dma_jr->dev = dev;
-+	jrpriv->jrdev = dev;
-+
-+	INIT_LIST_HEAD(&dma_jr->done_not_acked);
-+	spin_lock_init(&dma_jr->done_lock);
-+	tasklet_init(&dma_jr->handle_done, check_done, (unsigned long) dma_jr);
-+
-+	return 0;
++	aes_sparc64_encrypt(&ctx->key[0], (const u32 *) src,
++			    (u32 *) dst, ctx->key_length);
 +}
 +
-+static inline void caam_jr_chan_unbind(struct device *ctrldev,
-+				       struct dma_chan *chan)
-+{
-+	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
-+	struct dma_device *dma_dev = &priv->dma_dev;
++extern void aes_sparc64_decrypt(const u64 *key, const u32 *input,
++				u32 *output, unsigned int key_len,
++				unsigned int expanded_key_len);
 +
-+	list_del(&chan->device_node);
-+	dma_dev->chancnt--;
++static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
++{
++	struct crypto_sparc64_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	aes_sparc64_decrypt(&ctx->key[0], (const u32 *) src,
++			    (u32 *) dst, ctx->key_length,
++			    ctx->expanded_key_length);
 +}
 +
-+static inline void caam_jr_free(struct dma_chan *chan)
-+{
-+	struct caam_dma_jr *dma_jr = container_of(chan, struct caam_dma_jr,
-+						  chan);
++extern void aes_sparc64_load_encrypt_keys(u64 *key);
++extern void aes_sparc64_load_decrypt_keys(u64 *key);
 +
-+	list_del(&chan->device_node);
-+	kfree(dma_jr);
++#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE-1))
++
++extern void aes_sparc64_ecb_encrypt(u64 *key, const u32 *input, u32 *output,
++				    unsigned int key_len, unsigned int len);
++
++static int ecb_encrypt(struct blkcipher_desc *desc,
++		       struct scatterlist *dst, struct scatterlist *src,
++		       unsigned int nbytes)
++{
++	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	aes_sparc64_load_encrypt_keys(&ctx->key[0]);
++	while ((nbytes = walk.nbytes)) {
++		unsigned int block_len = nbytes & AES_BLOCK_MASK;
++
++		if (likely(block_len)) {
++			aes_sparc64_ecb_encrypt(&ctx->key[0],
++						(const u32 *)walk.src.virt.addr,
++						(u32 *) walk.dst.virt.addr,
++						ctx->key_length, block_len);
++		}
++		nbytes &= AES_BLOCK_SIZE - 1;
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++	fprs_write(0);
++	return err;
 +}
 +
-+static int caam_jr_dma_init(struct device *ctrldev)
++extern void aes_sparc64_ecb_decrypt(u64 *ekey, const u32 *input, u32 *output,
++				    unsigned int key_len, unsigned int len);
++
++static int ecb_decrypt(struct blkcipher_desc *desc,
++		       struct scatterlist *dst, struct scatterlist *src,
++		       unsigned int nbytes)
 +{
-+	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
-+	struct dma_device *dma_dev = NULL;
-+	struct caam_xor_sh_desc *sh_desc;
-+	int i;
++	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	u64 *key_end;
++	int err;
 +
-+	priv->xor_sh_desc =
-+	    kzalloc(sizeof(struct caam_xor_sh_desc), GFP_KERNEL);
-+	if (!priv->xor_sh_desc) {
-+		dev_err(ctrldev,
-+			"Failed to allocate memory for XOR Shared"
-+			"descriptor\n");
-+		return -ENOMEM;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	aes_sparc64_load_decrypt_keys(&ctx->key[0]);
++	key_end = &ctx->key[ctx->expanded_key_length / sizeof(u64)];
++	while ((nbytes = walk.nbytes)) {
++		unsigned int block_len = nbytes & AES_BLOCK_MASK;
++
++		aes_sparc64_ecb_decrypt(key_end, (const u32 *) walk.src.virt.addr,
++					(u32 *) walk.dst.virt.addr, ctx->key_length,
++					block_len);
++		nbytes &= AES_BLOCK_SIZE - 1;
++		err = blkcipher_walk_done(desc, &walk, nbytes);
 +	}
-+
-+	sh_desc = priv->xor_sh_desc;
-+	prepare_caam_xor_sh_desc(sh_desc->desc, MAX_XOR_SRCS);
-+	sh_desc->sh_desc_phys = dma_map_single(ctrldev, &sh_desc->desc,
-+						SH_DESC_LEN * sizeof(u32),
-+						DMA_TO_DEVICE);
-+
-+	dma_dev = &priv->dma_dev;
-+	dma_dev->dev = ctrldev;
-+	INIT_LIST_HEAD(&dma_dev->channels);
-+
-+	dma_dev->max_xor = MAX_XOR_SRCS;
-+
-+	/*
-+	 * xor transaction must be 128 bytes aligned. For unaligned
-+	 * transaction, xor-parity calculations will not be off-loaded
-+	 * to caam
-+	 */
-+	dma_dev->xor_align = 8;
-+	dma_cap_set(DMA_XOR, dma_dev->cap_mask);
-+
-+	dma_dev->device_alloc_chan_resources = caam_jr_alloc_chan_resources;
-+	dma_dev->device_tx_status = caam_jr_tx_status;
-+	dma_dev->device_issue_pending = caam_jr_issue_pending;
-+	dma_dev->device_prep_dma_xor = caam_jr_prep_dma_xor;
-+	dma_dev->device_free_chan_resources = caam_jr_free_chan_resources;
-+
-+	for (i = 0; i < priv->total_jobrs; i++)
-+		caam_jr_chan_bind(ctrldev, priv->jrdev[i]);
-+
-+	dma_async_device_register(dma_dev);
-+	dev_info(ctrldev, "caam xor support with %d job rings\n",
-+		 priv->total_jobrs);
-+
-+	return 0;
-+}
-+
-+static void caam_jr_dma_exit(struct device *ctrldev)
-+{
-+	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
-+	struct dma_device *dma_dev = &priv->dma_dev;
-+	struct dma_chan *chan, *_chan;
-+	struct list_head to_free;
-+	int i;
-+
-+	i = 0;
-+	INIT_LIST_HEAD(&to_free);
-+	/* before unregistering device, remove channels... */
-+	list_for_each_entry_safe(chan, _chan, &dma_dev->channels, device_node) {
-+		caam_jr_chan_unbind(ctrldev, chan);
-+		list_add_tail(&chan->device_node, &to_free);
-+		i++;
-+	}
-+
-+	dma_async_device_unregister(dma_dev);
-+
-+	/*
-+	 * ...but don't delete them until device has been unregistered, so
-+	 * that deleted channels will not be used
-+	 */
-+	list_for_each_entry_safe(chan, _chan, &to_free, device_node) {
-+		caam_jr_free(chan);
-+	}
-+
-+	for (i = 0; i < (MAX_XOR_SRCS - 2); i++) {
-+		dma_unmap_single(ctrldev, priv->xor_sh_desc[i].sh_desc_phys,
-+				 SH_DESC_LEN * sizeof(u32), DMA_TO_DEVICE);
-+	}
-+
-+	kfree(priv->xor_sh_desc);
-+	dev_info(ctrldev, "caam xor support disabled\n");
-+}
-+
-+static int __init caam_xor_init(void)
-+{
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	struct caam_drv_private *priv;
-+	int err = 0;
-+
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node)
-+		return -ENODEV;
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev)
-+		return -ENODEV;
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	atomic_set(&priv->tfm_count, -1);
-+
-+	/* register caam device */
-+	err = caam_jr_dma_init(ctrldev);
-+	if (err)
-+		dev_err(ctrldev, "error in xor initialization: %d\n", err);
++	fprs_write(0);
 +
 +	return err;
 +}
 +
-+static void __exit caam_xor_exit(void)
++extern void aes_sparc64_cbc_encrypt(u64 *key, const u32 *input, u32 *output,
++				    unsigned int key_len, unsigned int len,
++				    u64 *iv);
++
++static int cbc_encrypt(struct blkcipher_desc *desc,
++		       struct scatterlist *dst, struct scatterlist *src,
++		       unsigned int nbytes)
 +{
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	struct caam_drv_private *priv;
++	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	int err;
 +
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node)
-+		return;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
 +
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev)
-+		return;
++	aes_sparc64_load_encrypt_keys(&ctx->key[0]);
++	while ((nbytes = walk.nbytes)) {
++		unsigned int block_len = nbytes & AES_BLOCK_MASK;
 +
-+	ctrldev = &pdev->dev;
-+	of_node_put(dev_node);
-+	priv = dev_get_drvdata(ctrldev);
-+
-+	caam_jr_dma_exit(ctrldev);
++		if (likely(block_len)) {
++			aes_sparc64_cbc_encrypt(&ctx->key[0],
++						(const u32 *)walk.src.virt.addr,
++						(u32 *) walk.dst.virt.addr,
++						ctx->key_length, block_len,
++						(u64 *) walk.iv);
++		}
++		nbytes &= AES_BLOCK_SIZE - 1;
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++	fprs_write(0);
++	return err;
 +}
 +
-+module_init(caam_xor_init);
-+module_exit(caam_xor_exit);
++extern void aes_sparc64_cbc_decrypt(u64 *ekey, unsigned int key_len,
++				    const u32 *input, u32 *output,
++				    unsigned int len, u64 *iv);
++
++static int cbc_decrypt(struct blkcipher_desc *desc,
++		       struct scatterlist *dst, struct scatterlist *src,
++		       unsigned int nbytes)
++{
++	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	u64 *key_end;
++	int err;
++
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	aes_sparc64_load_decrypt_keys(&ctx->key[0]);
++	key_end = &ctx->key[ctx->expanded_key_length / sizeof(u64)];
++	while ((nbytes = walk.nbytes)) {
++		unsigned int block_len = nbytes & AES_BLOCK_MASK;
++
++		aes_sparc64_cbc_decrypt(key_end, ctx->key_length,
++					(const u32 *) walk.src.virt.addr,
++					(u32 *) walk.dst.virt.addr,
++					block_len, (u64 *) walk.iv);
++		nbytes &= AES_BLOCK_SIZE - 1;
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++	fprs_write(0);
++
++	return err;
++}
++
++static struct crypto_alg algs[] = { {
++	.cra_name		= "aes",
++	.cra_driver_name	= "aes-sparc64",
++	.cra_priority		= 150,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
++	.cra_alignmask		= 3,
++	.cra_module		= THIS_MODULE,
++	.cra_u	= {
++		.cipher	= {
++			.cia_min_keysize	= AES_MIN_KEY_SIZE,
++			.cia_max_keysize	= AES_MAX_KEY_SIZE,
++			.cia_setkey		= aes_set_key,
++			.cia_encrypt		= aes_encrypt,
++			.cia_decrypt		= aes_decrypt
++		}
++	}
++}, {
++	.cra_name		= "ecb(aes)",
++	.cra_driver_name	= "ecb-aes-sparc64",
++	.cra_priority		= 150,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
++	.cra_alignmask		= 7,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.setkey		= aes_set_key,
++			.encrypt	= ecb_encrypt,
++			.decrypt	= ecb_decrypt,
++		},
++	},
++}, {
++	.cra_name		= "cbc(aes)",
++	.cra_driver_name	= "cbc-aes-sparc64",
++	.cra_priority		= 150,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
++	.cra_alignmask		= 7,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize	= AES_MIN_KEY_SIZE,
++			.max_keysize	= AES_MAX_KEY_SIZE,
++			.setkey		= aes_set_key,
++			.encrypt	= cbc_encrypt,
++			.decrypt	= cbc_decrypt,
++		},
++	},
++} };
++
++static bool __init sparc64_has_aes_opcode(void)
++{
++	unsigned long cfr;
++
++	if (!(sparc64_elf_hwcap & HWCAP_SPARC_CRYPTO))
++		return false;
++
++	__asm__ __volatile__("rd %%asr26, %0" : "=r" (cfr));
++	if (!(cfr & CFR_AES))
++		return false;
++
++	return true;
++}
++
++static int __init aes_sparc64_mod_init(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(algs); i++)
++		INIT_LIST_HEAD(&algs[i].cra_list);
++
++	if (sparc64_has_aes_opcode()) {
++		pr_info("Using sparc64 aes opcodes optimized AES implementation\n");
++		return crypto_register_algs(algs, ARRAY_SIZE(algs));
++	}
++	pr_info("sparc64 aes opcodes not available.\n");
++	return -ENODEV;
++}
++
++static void __exit aes_sparc64_mod_fini(void)
++{
++	crypto_unregister_algs(algs, ARRAY_SIZE(algs));
++}
++
++module_init(aes_sparc64_mod_init);
++module_exit(aes_sparc64_mod_fini);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("FSL CAAM support for crypto API");
-+MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index c85c1f0..d06bf68 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -9,11 +9,13 @@
- #define IMMEDIATE (1 << 23)
- #define CAAM_CMD_SZ sizeof(u32)
- #define CAAM_PTR_SZ sizeof(dma_addr_t)
-+#define CAAM_PTR_LEN (CAAM_PTR_SZ / CAAM_CMD_SZ)
- #define CAAM_DESC_BYTES_MAX (CAAM_CMD_SZ * MAX_CAAM_DESCSIZE)
- 
- #ifdef DEBUG
--#define PRINT_POS do { printk(KERN_DEBUG "%02d: %s\n", desc_len(desc),\
--			      &__func__[sizeof("append")]); } while (0)
-+#define PRINT_POS do { pr_debug("%02d: %s\n", desc_len(desc),\
-+				&__func__[sizeof("append")]);\
-+		} while (0)
- #else
- #define PRINT_POS
- #endif
-@@ -82,6 +84,20 @@ static inline void append_ptr(u32 *desc, dma_addr_t ptr)
- 	(*desc) += CAAM_PTR_SZ / CAAM_CMD_SZ;
- }
- 
-+/* Write command without affecting header, and return pointer to next word */
-+static inline u32 *write_ptr(u32 *desc, dma_addr_t ptr)
-+{
-+	memcpy(desc, &ptr, CAAM_PTR_SZ);
++MODULE_DESCRIPTION("AES Secure Hash Algorithm, sparc64 aes opcode accelerated");
 +
-+	return desc + CAAM_PTR_LEN;
-+}
-+
-+/* Increase descriptor length */
-+static inline void append_len(u32 *desc, unsigned int len)
-+{
-+	(*desc) += len;
-+}
-+
- static inline void init_job_desc_shared(u32 *desc, dma_addr_t ptr, int len,
- 					u32 options)
- {
-@@ -110,6 +126,14 @@ static inline void append_cmd(u32 *desc, u32 command)
- 	(*desc)++;
- }
++MODULE_ALIAS("aes");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 4cb1ab0..49f867b 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -624,6 +624,34 @@ config CRYPTO_AES_NI_INTEL
+ 	  ECB, CBC, LRW, PCBC, XTS. The 64 bit version has additional
+ 	  acceleration for CTR.
  
-+/* Write command without affecting header, and return pointer to next word */
-+static inline u32 *write_cmd(u32 *desc, u32 command)
-+{
-+	*desc = command;
++config CRYPTO_AES_SPARC64
++	tristate "AES cipher algorithms (SPARC64)"
++	depends on SPARC64
++	select CRYPTO_CRYPTD
++	select CRYPTO_ALGAPI
++	help
++	  Use SPARC64 crypto opcodes for AES algorithm.
 +
-+	return desc + 1;
-+}
++	  AES cipher algorithms (FIPS-197). AES uses the Rijndael
++	  algorithm.
 +
- static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
- 				  u32 command)
- {
-@@ -143,11 +167,28 @@ static inline u32 *append_jump(u32 *desc, u32 options)
- 	return cmd;
- }
- 
-+/* Given destination, as offset from header, append jump */
-+static inline void append_jump_to(u32 *desc, u32 options, u32 target)
-+{
-+	PRINT_POS;
++	  Rijndael appears to be consistently a very good performer in
++	  both hardware and software across a wide range of computing
++	  environments regardless of its use in feedback or non-feedback
++	  modes. Its key setup time is excellent, and its key agility is
++	  good. Rijndael's very low memory requirements make it very well
++	  suited for restricted-space environments, in which it also
++	  demonstrates excellent performance. Rijndael's operations are
++	  among the easiest to defend against power and timing attacks.
 +
-+	append_jump(desc, options | ((target - desc_len(desc)) &
-+		    JUMP_OFFSET_MASK));
-+}
++	  The AES specifies three key sizes: 128, 192 and 256 bits
 +
- static inline void set_jump_tgt_here(u32 *desc, u32 *jump_cmd)
- {
- 	*jump_cmd = *jump_cmd | (desc_len(desc) - (jump_cmd - desc));
- }
- 
-+/* len words have no commands */
-+static inline u32 *write_nop(u32 *desc, int len)
-+{
-+	*desc = CMD_JUMP | len;
++	  See <http://csrc.nist.gov/encryption/aes/> for more information.
 +
-+	return desc + len;
-+}
++	  In addition to AES cipher algorithm support, the acceleration
++	  for some popular block cipher mode is supported too, including
++	  ECB and CBC.
 +
- #define APPEND_CMD(cmd, op) \
- static inline void append_##cmd(u32 *desc, u32 options) \
- { \
-@@ -157,6 +198,14 @@ static inline void append_##cmd(u32 *desc, u32 options) \
- APPEND_CMD(operation, OPERATION)
- APPEND_CMD(move, MOVE)
- 
-+#define WRITE_CMD(cmd, op) \
-+static inline u32 *write_##cmd(u32 *desc, u32 options) \
-+{ \
-+	PRINT_POS; \
-+	return write_cmd(desc, CMD_##op | options); \
-+}
-+WRITE_CMD(move, MOVE)
-+
- #define APPEND_CMD_LEN(cmd, op) \
- static inline void append_##cmd(u32 *desc, unsigned int len, u32 options) \
- { \
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 5cd4c1b..2b41e31 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -26,6 +26,8 @@
- #define JOBR_INTC_COUNT_THLD 0
- #endif
- 
-+#define CAAM_NAPI_WEIGHT	63
-+
- /*
-  * Storage for tracking each in-process entry moving across a ring
-  * Each entry on an output ring needs one of these
-@@ -58,6 +60,7 @@ struct caam_drv_private_jr {
- 	int out_ring_read_index;	/* Output index "tail" */
- 	int tail;			/* entinfo (s/w ring) tail index */
- 	struct jr_outentry *outring;	/* Base of output ring, DMA-safe */
-+	struct device *jrdev;
- };
- 
- /*
-@@ -91,6 +94,10 @@ struct caam_drv_private {
- 	/* list of registered hash algorithms (mk generic context handle?) */
- 	struct list_head hash_list;
- 
-+	/* For DMA-XOR support */
-+	struct dma_device dma_dev;
-+	struct caam_xor_sh_desc *xor_sh_desc;
-+
- 	/*
- 	 * debugfs entries for developer view into driver/device
- 	 * variables at runtime.
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 53c8c51..8dc81cf 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -80,8 +80,8 @@ static void caam_jr_dequeue(unsigned long devarg)
- 		/* we should never fail to find a matching descriptor */
- 		BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
- 
--		/* Unmap just-run descriptor so we can post-process */
--		dma_unmap_single(dev, jrp->outring[hw_idx].desc,
-+		/* Unmap just-run job descriptor so we can post-process */
-+		dma_unmap_single(jrp->jrdev, jrp->outring[hw_idx].desc,
- 				 jrp->entinfo[sw_idx].desc_size,
- 				 DMA_TO_DEVICE);
- 
-@@ -230,7 +230,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 	dma_addr_t desc_dma;
- 
- 	desc_size = (*desc & HDR_JD_LENGTH_MASK) * sizeof(u32);
--	desc_dma = dma_map_single(dev, desc, desc_size, DMA_TO_DEVICE);
-+	desc_dma = dma_map_single(jrp->jrdev, desc, desc_size, DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, desc_dma)) {
- 		dev_err(dev, "caam_jr_enqueue(): can't map jobdesc\n");
- 		return -EIO;
-@@ -466,6 +466,8 @@ int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
- 	else
- 		dma_set_mask(jrdev, DMA_BIT_MASK(32));
- 
-+	jrpriv->jrdev = jrdev;
-+
- 	/* Identify the interrupt */
- 	jrpriv->irq = of_irq_to_resource(np, 0, NULL);
- 
+ config CRYPTO_ANUBIS
+ 	tristate "Anubis cipher algorithm"
+ 	select CRYPTO_ALGAPI
 -- 
-1.7.0.4
+1.7.10.4
