@@ -1,114 +1,316 @@
-From: Jason Garrett-Glaser <jason@x264.com>
-Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler implementation
-Date: Wed, 22 Aug 2012 17:05:07 -0700
-Message-ID: <CABS55+BAk0QCXpJsbs6WyN4i5Q2Rt1k2fDhgs=bvbfuaBjhsEA@mail.gmail.com>
-References: <20120822133136.GC6899@x1.osrc.amd.com> <20120822191516.8483.64529.stgit@localhost6.localdomain6>
+From: David Miller <davem@davemloft.net>
+Subject: [PATCH] sparc64: Add CRC32C driver making use of the new crc32c
+ opcode.
+Date: Wed, 22 Aug 2012 20:52:31 -0700 (PDT)
+Message-ID: <20120822.205231.113785660704668571.davem@davemloft.net>
+References: <20120822.022118.64713091452626424.davem@davemloft.net>
+	<20120822134040.GA7440@gondor.apana.org.au>
+	<20120822.143111.2226960299830142976.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Borislav Petkov <bp@alien8.de>,
-	Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?ISO-8859-1?Q?Tilo_M=FCller?=
-	<tilo.mueller@informatik.uni-erlangen.de>,
-	linux-kernel@vger.kernel.org
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f174.google.com ([209.85.217.174]:56203 "EHLO
-	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755697Ab2HWAFu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Aug 2012 20:05:50 -0400
-In-Reply-To: <20120822191516.8483.64529.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: sparclinux@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <20120822.143111.2226960299830142976.davem@davemloft.net>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 22, 2012 at 12:20 PM, Jussi Kivilinna
-<jussi.kivilinna@mbnet.fi> wrote:
-> Quoting Borislav Petkov <bp@alien8.de>:
->
->> On Wed, Aug 22, 2012 at 07:35:12AM +0300, Jussi Kivilinna wrote:
->>> Looks that encryption lost ~0.4% while decryption gained ~1.8%.
->>>
->>> For 256 byte test, it's still slightly slower than twofish-3way
->>> (~3%). For 1k
->>> and 8k tests, it's ~5% faster.
->>>
->>> Here's very last test-patch, testing different ordering of fpu<->cpu reg
->>> instructions at few places.
->>
->> Hehe,.
->>
->> I don't mind testing patches, no worries there. Here are the results
->> this time, doesn't look better than the last run, AFAICT.
->>
->
-> Actually it does look better, at least for encryption. Decryption had different
-> ordering for test, which appears to be bad on bulldozer as it is on
-> sandy-bridge.
->
-> So, yet another patch then :)
->
-> Interleaving at some new places (reordered lookup_32bit()s in G-macro) and
-> doing one of the round rotations one round ahead. Also introduces some
-> more paralellism inside lookup_32bit.
 
-Outsider looking in here, but avoiding the 256-way lookup tables
-entirely might be faster.  Looking at the twofish code, one byte-wise
-calculation looks like this:
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
 
-    a0 = x >> 4; b0 = x & 15;
-    a1 = a0 ^ b0; b1 = ror4[b0] ^ ashx[a0];
-    a2 = qt0[n][a1]; b2 = qt1[n][b1];
-    a3 = a2 ^ b2; b3 = ror4[b2] ^ ashx[a2];
-    a4 = qt2[n][a3]; b4 = qt3[n][b3];
-    return (b4 << 4) | a4;
+This was largely straightforward, except for two things.
 
-This means that you can do something like this pseudocode (Intel
-syntax).  pshufb on ymm registers is AVX2, but splitting it into xmm
-operations would probably be fine (as would using this for just a pure
-SSE implementation!).  On AVX2 you' have to double the tables for both
-ways, naturally.
+1) The tests assume that the 32-bit crc is stored in the context in
+   cpu endian.  The sparc64 crc32c opcode wants to work with a little
+   endian mode, but sparc64 is big-endian.
 
-constants:
-pb_0x0f = {0x0f,0x0f,0x0f ... }
-ashx: lookup table
-ror4: lookup table
-qt0[n]: lookup table
-qt1[n]: lookup table
-qt2[n]: lookup table
-qt3[n]: lookup table
+   This requirement is codified in the crc32c test:
 
-vpand    b0,     in, pb_0x0f
-vpsrlw   a0,     in, 4
-vpand    a0,     a0, pb_0x0f    ; effectively vpsrlb, but that doesn't exist
+		*(u32 *)sdesc.ctx = le32_to_cpu(420553207);
+		err = crypto_shash_final(&sdesc.shash, (u8 *)&val);
+		if (err) {
+			printk(KERN_ERR "alg: crc32c: Operation failed for "
+			       "%s: %d\n", driver, err);
+			break;
+		}
 
-vpxor    a1,     a0, b0
-vpshufb  a0,   ashx, a0
-vpshufb  b0,   ror4, b0
-vpxor    b1,     a0, b0
+		if (val != ~420553207) {
+			printk(KERN_ERR "alg: crc32c: Test failed for %s: "
+			       "%d\n", driver, val);
 
-vpshufb  a2, qt0[n], a1
-vpshufb  b2, qt1[n], b1
+   So I trick things.  I store the crc in the context as the crypto
+   layer expects, but when I load it into and out of the FPU registers
+   I use little endian loads and stores.
 
-vpxor    a3,     a2, b2
-vpshufb  a3,   ashx, a2
-vpshufb  b3,   ror4, b2
-vpxor    b3,     a2, b2
+2) The instruction only supports crc'ing 8 bytes at a time, so for any
+   sub 8-byte calculations I call down into the C version.
 
-vpshufb  a4, qt2[n], a3
-vpshufb  b4, qt3[n], b3
+ arch/sparc/crypto/Makefile      |    4 +
+ arch/sparc/crypto/crc32c_asm.S  |   29 +++++++
+ arch/sparc/crypto/crc32c_glue.c |  177 +++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig                  |    9 ++
+ 4 files changed, 219 insertions(+)
+ create mode 100644 arch/sparc/crypto/crc32c_asm.S
+ create mode 100644 arch/sparc/crypto/crc32c_glue.c
 
-vpsllw   b4,     b4, 4          ; effectively vpsrlb, but that doesn't exist
-vpor    out,     a4, b4
+diff --git a/arch/sparc/crypto/Makefile b/arch/sparc/crypto/Makefile
+index 5034324..c6ca941 100644
+--- a/arch/sparc/crypto/Makefile
++++ b/arch/sparc/crypto/Makefile
+@@ -9,9 +9,13 @@ obj-$(CONFIG_CRYPTO_MD5_SPARC64) += md5-sparc64.o
+ 
+ obj-$(CONFIG_CRYPTO_AES_SPARC64) += aes-sparc64.o
+ 
++obj-$(CONFIG_CRYPTO_CRC32C_SPARC64) += crc32c-sparc64.o
++
+ sha1-sparc64-y := sha1_asm.o sha1_glue.o
+ sha256-sparc64-y := sha256_asm.o sha256_glue.o
+ sha512-sparc64-y := sha512_asm.o sha512_glue.o
+ md5-sparc64-y := md5_asm.o md5_glue.o
+ 
+ aes-sparc64-y := aes_asm.o aes_glue.o
++
++crc32c-sparc64-y := crc32c_asm.o crc32c_glue.o
+diff --git a/arch/sparc/crypto/crc32c_asm.S b/arch/sparc/crypto/crc32c_asm.S
+new file mode 100644
+index 0000000..cb479ec
+--- /dev/null
++++ b/arch/sparc/crypto/crc32c_asm.S
+@@ -0,0 +1,29 @@
++#include <linux/linkage.h>
++#include <asm/visasm.h>
++#include <asm/asi.h>
++
++#define F3F(x,y,z)	(((x)<<30)|((y)<<19)|((z)<<5))
++
++#define FPD_ENCODE(x)	(((x) >> 5) | ((x) & ~(0x20)))
++
++#define RS1(x)		(FPD_ENCODE(x) << 14)
++#define RS2(x)		(FPD_ENCODE(x) <<  0)
++#define RD(x)		(FPD_ENCODE(x) << 25)
++
++#define CRC32C(a,b,c)	\
++	.word		(F3F(2,0x36,0x147)|RS1(a)|RS2(b)|RD(c));
++
++ENTRY(crc32c_sparc64)
++	/* %o0=crc32p, %o1=data_ptr, %o2=len */
++	VISEntryHalf
++	lda	[%o0] ASI_PL, %f1
++1:	ldd	[%o1], %f2
++	CRC32C(0,2,0)
++	subcc	%o2, 8, %o2
++	bne,pt	%icc, 1b
++	 add	%o1, 0x8, %o1
++	sta	%f1, [%o0] ASI_PL
++	VISExitHalf
++2:	retl
++	 nop
++ENDPROC(crc32c_sparc64)
+diff --git a/arch/sparc/crypto/crc32c_glue.c b/arch/sparc/crypto/crc32c_glue.c
+new file mode 100644
+index 0000000..ec31cdb
+--- /dev/null
++++ b/arch/sparc/crypto/crc32c_glue.c
+@@ -0,0 +1,177 @@
++/* Glue code for CRC32C optimized for sparc64 crypto opcodes.
++ *
++ * This is based largely upon arch/x86/crypto/crc32c-intel.c
++ *
++ * Copyright (C) 2008 Intel Corporation
++ * Authors: Austin Zhang <austin_zhang@linux.intel.com>
++ *          Kent Liu <kent.liu@intel.com>
++ */
++
++#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
++
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/string.h>
++#include <linux/kernel.h>
++#include <linux/crc32.h>
++
++#include <crypto/internal/hash.h>
++
++#include <asm/pstate.h>
++#include <asm/elf.h>
++
++/*
++ * Setting the seed allows arbitrary accumulators and flexible XOR policy
++ * If your algorithm starts with ~0, then XOR with ~0 before you set
++ * the seed.
++ */
++static int crc32c_sparc64_setkey(struct crypto_shash *hash, const u8 *key,
++				 unsigned int keylen)
++{
++	u32 *mctx = crypto_shash_ctx(hash);
++
++	if (keylen != sizeof(u32)) {
++		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++	*(__le32 *)mctx = le32_to_cpup((__le32 *)key);
++	return 0;
++}
++
++static int crc32c_sparc64_init(struct shash_desc *desc)
++{
++	u32 *mctx = crypto_shash_ctx(desc->tfm);
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*crcp = *mctx;
++
++	return 0;
++}
++
++extern void crc32c_sparc64(u32 *crcp, const u64 *data, unsigned int len);
++
++static void crc32c_compute(u32 *crcp, const u64 *data, unsigned int len)
++{
++	unsigned int asm_len;
++
++	asm_len = len & ~7U;
++	if (asm_len) {
++		crc32c_sparc64(crcp, data, asm_len);
++		data += asm_len / 8;
++		len -= asm_len;
++	}
++	if (len)
++		*crcp = __crc32c_le(*crcp, (const unsigned char *) data, len);
++}
++
++static int crc32c_sparc64_update(struct shash_desc *desc, const u8 *data,
++				 unsigned int len)
++{
++	u32 *crcp = shash_desc_ctx(desc);
++
++	crc32c_compute(crcp, (const u64 *) data, len);
++
++	return 0;
++}
++
++static int __crc32c_sparc64_finup(u32 *crcp, const u8 *data, unsigned int len,
++				  u8 *out)
++{
++	u32 tmp = *crcp;
++
++	crc32c_compute(&tmp, (const u64 *) data, len);
++
++	*(__le32 *) out = ~cpu_to_le32(tmp);
++	return 0;
++}
++
++static int crc32c_sparc64_finup(struct shash_desc *desc, const u8 *data,
++				unsigned int len, u8 *out)
++{
++	return __crc32c_sparc64_finup(shash_desc_ctx(desc), data, len, out);
++}
++
++static int crc32c_sparc64_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *crcp = shash_desc_ctx(desc);
++
++	*(__le32 *) out = ~cpu_to_le32p(crcp);
++	return 0;
++}
++
++static int crc32c_sparc64_digest(struct shash_desc *desc, const u8 *data,
++				 unsigned int len, u8 *out)
++{
++	return __crc32c_sparc64_finup(crypto_shash_ctx(desc->tfm), data, len,
++				      out);
++}
++
++static int crc32c_sparc64_cra_init(struct crypto_tfm *tfm)
++{
++	u32 *key = crypto_tfm_ctx(tfm);
++
++	*key = ~0;
++
++	return 0;
++}
++
++#define CHKSUM_BLOCK_SIZE	1
++#define CHKSUM_DIGEST_SIZE	4
++
++static struct shash_alg alg = {
++	.setkey			=	crc32c_sparc64_setkey,
++	.init			=	crc32c_sparc64_init,
++	.update			=	crc32c_sparc64_update,
++	.final			=	crc32c_sparc64_final,
++	.finup			=	crc32c_sparc64_finup,
++	.digest			=	crc32c_sparc64_digest,
++	.descsize		=	sizeof(u32),
++	.digestsize		=	CHKSUM_DIGEST_SIZE,
++	.base			=	{
++		.cra_name		=	"crc32c",
++		.cra_driver_name	=	"crc32c-sparc64",
++		.cra_priority		=	150,
++		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
++		.cra_ctxsize		=	sizeof(u32),
++		.cra_alignmask		=	7,
++		.cra_module		=	THIS_MODULE,
++		.cra_init		=	crc32c_sparc64_cra_init,
++	}
++};
++
++static bool __init sparc64_has_crc32c_opcode(void)
++{
++	unsigned long cfr;
++
++	if (!(sparc64_elf_hwcap & HWCAP_SPARC_CRYPTO))
++		return false;
++
++	__asm__ __volatile__("rd %%asr26, %0" : "=r" (cfr));
++	if (!(cfr & CFR_CRC32C))
++		return false;
++
++	return true;
++}
++
++static int __init crc32c_sparc64_mod_init(void)
++{
++	if (sparc64_has_crc32c_opcode()) {
++		pr_info("Using sparc64 crc32c opcode optimized CRC32C implementation\n");
++		return crypto_register_shash(&alg);
++	}
++	pr_info("sparc64 crc32c opcode not available.\n");
++	return -ENODEV;
++}
++
++static void __exit crc32c_sparc64_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(crc32c_sparc64_mod_init);
++module_exit(crc32c_sparc64_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("CRC32c (Castagnoli), sparc64 crc32c opcode accelerated");
++
++MODULE_ALIAS("crc32c");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 49f867b..83993ea 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -336,6 +336,15 @@ config CRYPTO_CRC32C_INTEL
+ 	  gain performance compared with software implementation.
+ 	  Module will be crc32c-intel.
+ 
++config CRYPTO_CRC32C_SPARC64
++	tristate "CRC32c CRC algorithm (SPARC64)"
++	depends on SPARC64
++	select CRYPTO_HASH
++	select CRC32
++	help
++	  CRC32c CRC algorithm implemented using sparc64 crypto instructions,
++	  when available.
++
+ config CRYPTO_GHASH
+ 	tristate "GHASH digest algorithm"
+ 	select CRYPTO_GF128MUL
+-- 
+1.7.10.4
 
-That's 15 instructions (plus maybe a move or two) to do 16 lookups for
-SSE (~9 cycles by my guessing on a Nehalem).  AVX would run into the
-problem of lots of extra vinsert/vextract (just going 16-byte might be
-better, might be not, depending on execution units).  AVX2 would be
-super fast (15 for 32).
-
-If this works, this could be quite a bit faster with the table-based approach.
-
-Jason
