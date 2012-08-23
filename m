@@ -1,46 +1,43 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] sparc64: Add CRC32C driver making use of the new
- crc32c opcode.
-Date: Thu, 23 Aug 2012 09:20:43 -0700 (PDT)
-Message-ID: <20120823.092043.1156875617277157051.davem@davemloft.net>
-References: <20120822.143111.2226960299830142976.davem@davemloft.net>
-	<20120822.205231.113785660704668571.davem@davemloft.net>
-	<20120823083654.GA13395@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: sparclinux@vger.kernel.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+From: Ben Collins <ben.c@servergy.com>
+Subject: [PATCH] crypto/caam: Export gen_split_key symbol for other modules
+Date: Thu, 23 Aug 2012 18:39:57 -0400
+Message-ID: <BD4C563D-C5E9-494F-91DD-EA145917FCEC@servergy.com>
+Mime-Version: 1.0 (Apple Message framework v1278)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Yuan Kang <Yuan.Kang@freescale.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:40966 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750788Ab2HWQUq (ORCPT
+Received: from exprod6og101.obsmtp.com ([64.18.1.181]:53963 "HELO
+	exprod6og101.obsmtp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752963Ab2HWWqs convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Aug 2012 12:20:46 -0400
-In-Reply-To: <20120823083654.GA13395@gondor.apana.org.au>
+	Thu, 23 Aug 2012 18:46:48 -0400
+Received: by pbbrq2 with SMTP id rq2so2087747pbb.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Aug 2012 15:46:47 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 23 Aug 2012 16:36:54 +0800
+In 3.6-rc3, without this patch, the following error occurs with a modular build:
 
-> On Wed, Aug 22, 2012 at 08:52:31PM -0700, David Miller wrote:
->> 
->> Signed-off-by: David S. Miller <davem@davemloft.net>
-> 
-> Looks good to me.
+ERROR: "gen_split_key" [drivers/crypto/caam/caamhash.ko] undefined!
+ERROR: "gen_split_key" [drivers/crypto/caam/caamalg.ko] undefined!
 
-Thanks for reviewing.
+Signed-off-by: Ben Collins <ben.c@servergy.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Yuan Kang <Yuan.Kang@freescale.com>
 
->> This was largely straightforward, except for two things.
->> 
->> 1) The tests assume that the 32-bit crc is stored in the context in
->>    cpu endian.  The sparc64 crc32c opcode wants to work with a little
->>    endian mode, but sparc64 is big-endian.
-> 
-> We can still change this as nothing outside the kernel relies
-> on the format of the context.  For the time being all that's
-> required is that it be identical between software and hardware
-> implementations.
+diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+index 0028881..d216cd3 100644
+--- a/drivers/crypto/caam/key_gen.c
++++ b/drivers/crypto/caam/key_gen.c
+@@ -120,3 +120,4 @@ u32 gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL(gen_split_key);
 
-Ok, let's just leave it alone for now :-)
+--
+Ben Collins
+Servergy, Inc.
