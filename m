@@ -1,42 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 5/5] crypto: talitos - add IPsec ESN support
-Date: Tue, 28 Aug 2012 08:52:13 -0700
-Message-ID: <20120828155213.GA15705@gondor.apana.org.au>
-References: <1344440805-20324-1-git-send-email-horia.geanta@freescale.com>
- <20120808202215.da5ef82b25f655956cabae80@freescale.com>
- <20120820083212.GE22951@gondor.apana.org.au>
- <FD18E5D573A8AB48A365D4D78185DE992E16AB@039-SN1MPN1-001.039d.mgd.msft.net>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler implementation
+Date: Tue, 28 Aug 2012 18:25:23 +0200
+Message-ID: <20120828162523.GA16804@x1.osrc.amd.com>
+References: <20120822133136.GC6899@x1.osrc.amd.com>
+ <20120822191516.8483.64529.stgit@localhost6.localdomain6>
+ <20120823143614.GA11936@x1.osrc.amd.com>
+ <20120828121743.27185dq47e19rtwk@www.81.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
+Content-Type: text/plain; charset=utf-8
+Cc: Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Tilo =?utf-8?B?TcODwrxsbGVy?=
+	<tilo.mueller@informatik.uni-erlangen.de>,
+	linux-kernel@vger.kernel.org
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:48619 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752909Ab2H1PwS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Aug 2012 11:52:18 -0400
+Received: from mail.skyhub.de ([78.46.96.112]:44729 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753140Ab2H1QZS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 28 Aug 2012 12:25:18 -0400
 Content-Disposition: inline
-In-Reply-To: <FD18E5D573A8AB48A365D4D78185DE992E16AB@039-SN1MPN1-001.039d.mgd.msft.net>
+In-Reply-To: <20120828121743.27185dq47e19rtwk@www.81.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 28, 2012 at 03:47:19PM +0000, Geanta Neag Horia Ioan-B05471 wrote:
->
-> What about patches [1-4]/5 ?
-> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg07507.html
+On Tue, Aug 28, 2012 at 12:17:43PM +0300, Jussi Kivilinna wrote:
+> With this patch twofish-avx is faster than twofish-3way for 256, 1k
+> and 8k tests.
 > 
-> Patch 5/5 won't work without these.
-> 4/5 adds "support for handling non-contiguous assoc data and iv", which is
-> exactly how native IPsec submits SPI + ESN to talitos.
+> size    old-vs-new      new-vs-3way     old-vs-3way
+>         ecb-enc ecb-dec ecb-enc ecb-dec ecb-enc ecb-dec
+> 256     1.10x   1.11x   1.01x   1.01x   0.92x   0.91x
+> 1k      1.11x   1.12x   1.08x   1.07x   0.97x   0.96x
+> 8k      1.11x   1.13x   1.10x   1.08x   0.99x   0.97x
 
-Oops, I picked up your v2 which only had the last patch.  I'll fix
-this up.
+Not bad, that's 10ish percent improvement, after all.
 
-Thanks,
+Thanks.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards/Gruss,
+Boris.
