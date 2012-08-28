@@ -1,385 +1,412 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto: twofish - add x86_64/avx assembler
- implementation
-Date: Tue, 28 Aug 2012 12:17:43 +0300
-Message-ID: <20120828121743.27185dq47e19rtwk@www.81.fi>
-References: <20120822133136.GC6899@x1.osrc.amd.com>
- <20120822191516.8483.64529.stgit@localhost6.localdomain6>
- <20120823143614.GA11936@x1.osrc.amd.com>
+Subject: [PATCH 1/3] [v2] crypto: twofish-avx - tune assembler code for more
+ performance
+Date: Tue, 28 Aug 2012 14:24:43 +0300
+Message-ID: <20120828112443.22504.68633.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Johannes Goetzfried
 	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>,
-	linux-crypto@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tilo =?iso-8859-1?b?TcO8bGxlcg==?=
-	<tilo.mueller@informatik.uni-erlangen.de>,
-	linux-kernel@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:45785 "EHLO
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:50605 "EHLO
 	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751151Ab2H1JRs (ORCPT
+	with ESMTP id S1750876Ab2H1LYs convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Aug 2012 05:17:48 -0400
-In-Reply-To: <20120823143614.GA11936@x1.osrc.amd.com>
-Content-Disposition: inline
+	Tue, 28 Aug 2012 07:24:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Borislav Petkov <bp@alien8.de>:
+Patch replaces 'movb' instructions with 'movzbl' to break false registe=
+r
+dependencies and interleaves instructions better for out-of-order sched=
+uling.
 
-> On Wed, Aug 22, 2012 at 10:20:03PM +0300, Jussi Kivilinna wrote:
->> Actually it does look better, at least for encryption. Decryption  
->> had different
->> ordering for test, which appears to be bad on bulldozer as it is on
->> sandy-bridge.
->>
->> So, yet another patch then :)
->
-> Here you go:
+Tested on Intel Core i5-2450M and AMD FX-8100.
 
-Thanks!
+tcrypt ECB results:
 
-With this patch twofish-avx is faster than twofish-3way for 256, 1k  
-and 8k tests.
+Intel Core i5-2450M:
 
 size    old-vs-new      new-vs-3way     old-vs-3way
-         ecb-enc ecb-dec ecb-enc ecb-dec ecb-enc ecb-dec
+        enc     dec     enc     dec     enc     dec
+256     1.12x   1.13x   1.36x   1.37x   1.21x   1.22x
+1k      1.14x   1.14x   1.48x   1.49x   1.29x   1.31x
+8k      1.14x   1.14x   1.50x   1.52x   1.32x   1.33x
+
+AMD FX-8100:
+
+size    old-vs-new      new-vs-3way     old-vs-3way
+        enc     dec     enc     dec     enc     dec
 256     1.10x   1.11x   1.01x   1.01x   0.92x   0.91x
 1k      1.11x   1.12x   1.08x   1.07x   0.97x   0.96x
 8k      1.11x   1.13x   1.10x   1.08x   0.99x   0.97x
 
--Jussi
+[v2]
+ - Do instruction interleaving another way to avoid adding new FPU<=3D>=
+CPU
+   register moves as these cause performance drop on Bulldozer.
+ - Further interleaving improvements for better out-of-order scheduling=
+=2E
 
->
-> [  153.736745]
-> [  153.736745] testing speed of async ecb(twofish) encryption
-> [  153.745806] test 0 (128 bit key, 16 byte blocks): 4832343  
-> operations in 1 seconds (77317488 bytes)
-> [  154.752525] test 1 (128 bit key, 64 byte blocks): 2049979  
-> operations in 1 seconds (131198656 bytes)
-> [  155.755195] test 2 (128 bit key, 256 byte blocks): 620439  
-> operations in 1 seconds (158832384 bytes)
-> [  156.761694] test 3 (128 bit key, 1024 byte blocks): 173900  
-> operations in 1 seconds (178073600 bytes)
-> [  157.768282] test 4 (128 bit key, 8192 byte blocks): 22366  
-> operations in 1 seconds (183222272 bytes)
-> [  158.774815] test 5 (192 bit key, 16 byte blocks): 4850741  
-> operations in 1 seconds (77611856 bytes)
-> [  159.781498] test 6 (192 bit key, 64 byte blocks): 2046772  
-> operations in 1 seconds (130993408 bytes)
-> [  160.788163] test 7 (192 bit key, 256 byte blocks): 619915  
-> operations in 1 seconds (158698240 bytes)
-> [  161.794636] test 8 (192 bit key, 1024 byte blocks): 173442  
-> operations in 1 seconds (177604608 bytes)
-> [  162.801242] test 9 (192 bit key, 8192 byte blocks): 22083  
-> operations in 1 seconds (180903936 bytes)
-> [  163.807793] test 10 (256 bit key, 16 byte blocks): 4862951  
-> operations in 1 seconds (77807216 bytes)
-> [  164.814449] test 11 (256 bit key, 64 byte blocks): 2050036  
-> operations in 1 seconds (131202304 bytes)
-> [  165.821121] test 12 (256 bit key, 256 byte blocks): 620349  
-> operations in 1 seconds (158809344 bytes)
-> [  166.827621] test 13 (256 bit key, 1024 byte blocks): 173917  
-> operations in 1 seconds (178091008 bytes)
-> [  167.834218] test 14 (256 bit key, 8192 byte blocks): 22362  
-> operations in 1 seconds (183189504 bytes)
-> [  168.840798]
-> [  168.840798] testing speed of async ecb(twofish) decryption
-> [  168.849968] test 0 (128 bit key, 16 byte blocks): 4889899  
-> operations in 1 seconds (78238384 bytes)
-> [  169.855439] test 1 (128 bit key, 64 byte blocks): 2052293  
-> operations in 1 seconds (131346752 bytes)
-> [  170.862113] test 2 (128 bit key, 256 byte blocks): 616979  
-> operations in 1 seconds (157946624 bytes)
-> [  171.868631] test 3 (128 bit key, 1024 byte blocks): 172773  
-> operations in 1 seconds (176919552 bytes)
-> [  172.875244] test 4 (128 bit key, 8192 byte blocks): 22224  
-> operations in 1 seconds (182059008 bytes)
-> [  173.881777] test 5 (192 bit key, 16 byte blocks): 4893653  
-> operations in 1 seconds (78298448 bytes)
-> [  174.888451] test 6 (192 bit key, 64 byte blocks): 2048078  
-> operations in 1 seconds (131076992 bytes)
-> [  175.895131] test 7 (192 bit key, 256 byte blocks): 619204  
-> operations in 1 seconds (158516224 bytes)
-> [  176.901651] test 8 (192 bit key, 1024 byte blocks): 172569  
-> operations in 1 seconds (176710656 bytes)
-> [  177.908253] test 9 (192 bit key, 8192 byte blocks): 21888  
-> operations in 1 seconds (179306496 bytes)
-> [  178.914781] test 10 (256 bit key, 16 byte blocks): 4921751  
-> operations in 1 seconds (78748016 bytes)
-> [  179.917481] test 11 (256 bit key, 64 byte blocks): 2051219  
-> operations in 1 seconds (131278016 bytes)
-> [  180.920147] test 12 (256 bit key, 256 byte blocks): 618536  
-> operations in 1 seconds (158345216 bytes)
-> [  181.926637] test 13 (256 bit key, 1024 byte blocks): 172886  
-> operations in 1 seconds (177035264 bytes)
-> [  182.933249] test 14 (256 bit key, 8192 byte blocks): 22222  
-> operations in 1 seconds (182042624 bytes)
-> [  183.939803]
-> [  183.939803] testing speed of async cbc(twofish) encryption
-> [  183.953902] test 0 (128 bit key, 16 byte blocks): 5195403  
-> operations in 1 seconds (83126448 bytes)
-> [  184.962487] test 1 (128 bit key, 64 byte blocks): 1912010  
-> operations in 1 seconds (122368640 bytes)
-> [  185.969150] test 2 (128 bit key, 256 byte blocks): 540125  
-> operations in 1 seconds (138272000 bytes)
-> [  186.975650] test 3 (128 bit key, 1024 byte blocks): 140631  
-> operations in 1 seconds (144006144 bytes)
-> [  187.982411] test 4 (128 bit key, 8192 byte blocks): 17737  
-> operations in 1 seconds (145301504 bytes)
-> [  188.988782] test 5 (192 bit key, 16 byte blocks): 5182287  
-> operations in 1 seconds (82916592 bytes)
-> [  189.995435] test 6 (192 bit key, 64 byte blocks): 1912356  
-> operations in 1 seconds (122390784 bytes)
-> [  191.002093] test 7 (192 bit key, 256 byte blocks): 540991  
-> operations in 1 seconds (138493696 bytes)
-> [  192.008600] test 8 (192 bit key, 1024 byte blocks): 140791  
-> operations in 1 seconds (144169984 bytes)
-> [  193.015197] test 9 (192 bit key, 8192 byte blocks): 17609  
-> operations in 1 seconds (144252928 bytes)
-> [  194.021740] test 10 (256 bit key, 16 byte blocks): 5191521  
-> operations in 1 seconds (83064336 bytes)
-> [  195.028534] test 11 (256 bit key, 64 byte blocks): 1906226  
-> operations in 1 seconds (121998464 bytes)
-> [  196.035069] test 12 (256 bit key, 256 byte blocks): 540479  
-> operations in 1 seconds (138362624 bytes)
-> [  197.041579] test 13 (256 bit key, 1024 byte blocks): 140654  
-> operations in 1 seconds (144029696 bytes)
-> [  198.048164] test 14 (256 bit key, 8192 byte blocks): 17741  
-> operations in 1 seconds (145334272 bytes)
-> [  199.054717]
-> [  199.054717] testing speed of async cbc(twofish) decryption
-> [  199.064019] test 0 (128 bit key, 16 byte blocks): 4783914  
-> operations in 1 seconds (76542624 bytes)
-> [  200.069414] test 1 (128 bit key, 64 byte blocks): 1954641  
-> operations in 1 seconds (125097024 bytes)
-> [  201.076079] test 2 (128 bit key, 256 byte blocks): 604230  
-> operations in 1 seconds (154682880 bytes)
-> [  202.082586] test 3 (128 bit key, 1024 byte blocks): 167613  
-> operations in 1 seconds (171635712 bytes)
-> [  203.089199] test 4 (128 bit key, 8192 byte blocks): 21451  
-> operations in 1 seconds (175726592 bytes)
-> [  204.095716] test 5 (192 bit key, 16 byte blocks): 4795759  
-> operations in 1 seconds (76732144 bytes)
-> [  205.102390] test 6 (192 bit key, 64 byte blocks): 1953134  
-> operations in 1 seconds (125000576 bytes)
-> [  206.109055] test 7 (192 bit key, 256 byte blocks): 599761  
-> operations in 1 seconds (153538816 bytes)
-> [  207.115564] test 8 (192 bit key, 1024 byte blocks): 166437  
-> operations in 1 seconds (170431488 bytes)
-> [  208.122184] test 9 (192 bit key, 8192 byte blocks): 20789  
-> operations in 1 seconds (170303488 bytes)
-> [  209.128728] test 10 (256 bit key, 16 byte blocks): 4794873  
-> operations in 1 seconds (76717968 bytes)
-> [  210.135375] test 11 (256 bit key, 64 byte blocks): 1953978  
-> operations in 1 seconds (125054592 bytes)
-> [  211.142039] test 12 (256 bit key, 256 byte blocks): 604269  
-> operations in 1 seconds (154692864 bytes)
-> [  212.148556] test 13 (256 bit key, 1024 byte blocks): 167571  
-> operations in 1 seconds (171592704 bytes)
-> [  213.155143] test 14 (256 bit key, 8192 byte blocks): 21453  
-> operations in 1 seconds (175742976 bytes)
-> [  214.161698]
-> [  214.161698] testing speed of async ctr(twofish) encryption
-> [  214.175571] test 0 (128 bit key, 16 byte blocks): 4581950  
-> operations in 1 seconds (73311200 bytes)
-> [  215.184354] test 1 (128 bit key, 64 byte blocks): 1944709  
-> operations in 1 seconds (124461376 bytes)
-> [  216.191166] test 2 (128 bit key, 256 byte blocks): 594086  
-> operations in 1 seconds (152086016 bytes)
-> [  217.197536] test 3 (128 bit key, 1024 byte blocks): 163216  
-> operations in 1 seconds (167133184 bytes)
-> [  218.204149] test 4 (128 bit key, 8192 byte blocks): 21075  
-> operations in 1 seconds (172646400 bytes)
-> [  219.210813] test 5 (192 bit key, 16 byte blocks): 4705554  
-> operations in 1 seconds (75288864 bytes)
-> [  220.217330] test 6 (192 bit key, 64 byte blocks): 1963988  
-> operations in 1 seconds (125695232 bytes)
-> [  221.224004] test 7 (192 bit key, 256 byte blocks): 581953  
-> operations in 1 seconds (148979968 bytes)
-> [  222.230513] test 8 (192 bit key, 1024 byte blocks): 162790  
-> operations in 1 seconds (166696960 bytes)
-> [  223.237126] test 9 (192 bit key, 8192 byte blocks): 20706  
-> operations in 1 seconds (169623552 bytes)
-> [  224.243642] test 10 (256 bit key, 16 byte blocks): 4437112  
-> operations in 1 seconds (70993792 bytes)
-> [  225.250324] test 11 (256 bit key, 64 byte blocks): 1963735  
-> operations in 1 seconds (125679040 bytes)
-> [  226.256990] test 12 (256 bit key, 256 byte blocks): 596765  
-> operations in 1 seconds (152771840 bytes)
-> [  227.263498] test 13 (256 bit key, 1024 byte blocks): 163385  
-> operations in 1 seconds (167306240 bytes)
-> [  228.270232] test 14 (256 bit key, 8192 byte blocks): 20950  
-> operations in 1 seconds (171622400 bytes)
-> [  229.276657]
-> [  229.276657] testing speed of async ctr(twofish) decryption
-> [  229.285975] test 0 (128 bit key, 16 byte blocks): 4571340  
-> operations in 1 seconds (73141440 bytes)
-> [  230.291288] test 1 (128 bit key, 64 byte blocks): 1949949  
-> operations in 1 seconds (124796736 bytes)
-> [  231.297951] test 2 (128 bit key, 256 byte blocks): 591529  
-> operations in 1 seconds (151431424 bytes)
-> [  232.304470] test 3 (128 bit key, 1024 byte blocks): 163609  
-> operations in 1 seconds (167535616 bytes)
-> [  233.311073] test 4 (128 bit key, 8192 byte blocks): 20975  
-> operations in 1 seconds (171827200 bytes)
-> [  234.317581] test 5 (192 bit key, 16 byte blocks): 4639461  
-> operations in 1 seconds (74231376 bytes)
-> [  235.324307] test 6 (192 bit key, 64 byte blocks): 1963173  
-> operations in 1 seconds (125643072 bytes)
-> [  236.330929] test 7 (192 bit key, 256 byte blocks): 585030  
-> operations in 1 seconds (149767680 bytes)
-> [  237.337445] test 8 (192 bit key, 1024 byte blocks): 162872  
-> operations in 1 seconds (166780928 bytes)
-> [  238.344050] test 9 (192 bit key, 8192 byte blocks): 20728  
-> operations in 1 seconds (169803776 bytes)
-> [  239.350603] test 10 (256 bit key, 16 byte blocks): 4443427  
-> operations in 1 seconds (71094832 bytes)
-> [  240.357259] test 11 (256 bit key, 64 byte blocks): 1965011  
-> operations in 1 seconds (125760704 bytes)
-> [  241.363914] test 12 (256 bit key, 256 byte blocks): 590193  
-> operations in 1 seconds (151089408 bytes)
-> [  242.370422] test 13 (256 bit key, 1024 byte blocks): 163370  
-> operations in 1 seconds (167290880 bytes)
-> [  243.377018] test 14 (256 bit key, 8192 byte blocks): 20969  
-> operations in 1 seconds (171778048 bytes)
-> [  244.383546]
-> [  244.383546] testing speed of async lrw(twofish) encryption
-> [  244.398118] test 0 (256 bit key, 16 byte blocks): 3582956  
-> operations in 1 seconds (57327296 bytes)
-> [  245.406230] test 1 (256 bit key, 64 byte blocks): 1618011  
-> operations in 1 seconds (103552704 bytes)
-> [  246.412911] test 2 (256 bit key, 256 byte blocks): 502411  
-> operations in 1 seconds (128617216 bytes)
-> [  247.419427] test 3 (256 bit key, 1024 byte blocks): 140501  
-> operations in 1 seconds (143873024 bytes)
-> [  248.422071] test 4 (256 bit key, 8192 byte blocks): 18166  
-> operations in 1 seconds (148815872 bytes)
-> [  249.424613] test 5 (320 bit key, 16 byte blocks): 3576354  
-> operations in 1 seconds (57221664 bytes)
-> [  250.431245] test 6 (320 bit key, 64 byte blocks): 1626817  
-> operations in 1 seconds (104116288 bytes)
-> [  251.437908] test 7 (320 bit key, 256 byte blocks): 504222  
-> operations in 1 seconds (129080832 bytes)
-> [  252.444407] test 8 (320 bit key, 1024 byte blocks): 140962  
-> operations in 1 seconds (144345088 bytes)
-> [  253.451020] test 9 (320 bit key, 8192 byte blocks): 17955  
-> operations in 1 seconds (147087360 bytes)
-> [  254.457555] test 10 (384 bit key, 16 byte blocks): 3558173  
-> operations in 1 seconds (56930768 bytes)
-> [  255.464210] test 11 (384 bit key, 64 byte blocks): 1630951  
-> operations in 1 seconds (104380864 bytes)
-> [  256.470866] test 12 (384 bit key, 256 byte blocks): 504089  
-> operations in 1 seconds (129046784 bytes)
-> [  257.477383] test 13 (384 bit key, 1024 byte blocks): 141065  
-> operations in 1 seconds (144450560 bytes)
-> [  258.483979] test 14 (384 bit key, 8192 byte blocks): 18168  
-> operations in 1 seconds (148832256 bytes)
-> [  259.490542]
-> [  259.490542] testing speed of async lrw(twofish) decryption
-> [  259.499858] test 0 (256 bit key, 16 byte blocks): 3557489  
-> operations in 1 seconds (56919824 bytes)
-> [  260.505175] test 1 (256 bit key, 64 byte blocks): 1630277  
-> operations in 1 seconds (104337728 bytes)
-> [  261.511865] test 2 (256 bit key, 256 byte blocks): 503750  
-> operations in 1 seconds (128960000 bytes)
-> [  262.518383] test 3 (256 bit key, 1024 byte blocks): 140698  
-> operations in 1 seconds (144074752 bytes)
-> [  263.524988] test 4 (256 bit key, 8192 byte blocks): 18124  
-> operations in 1 seconds (148471808 bytes)
-> [  264.531487] test 5 (320 bit key, 16 byte blocks): 3579978  
-> operations in 1 seconds (57279648 bytes)
-> [  265.538179] test 6 (320 bit key, 64 byte blocks): 1632251  
-> operations in 1 seconds (104464064 bytes)
-> [  266.544843] test 7 (320 bit key, 256 byte blocks): 502180  
-> operations in 1 seconds (128558080 bytes)
-> [  267.551350] test 8 (320 bit key, 1024 byte blocks): 139727  
-> operations in 1 seconds (143080448 bytes)
-> [  268.557964] test 9 (320 bit key, 8192 byte blocks): 17731  
-> operations in 1 seconds (145252352 bytes)
-> [  269.564481] test 10 (384 bit key, 16 byte blocks): 3570236  
-> operations in 1 seconds (57123776 bytes)
-> [  270.571162] test 11 (384 bit key, 64 byte blocks): 1623126  
-> operations in 1 seconds (103880064 bytes)
-> [  271.577828] test 12 (384 bit key, 256 byte blocks): 504857  
-> operations in 1 seconds (129243392 bytes)
-> [  272.584346] test 13 (384 bit key, 1024 byte blocks): 140801  
-> operations in 1 seconds (144180224 bytes)
-> [  273.586961] test 14 (384 bit key, 8192 byte blocks): 18139  
-> operations in 1 seconds (148594688 bytes)
-> [  274.589525]
-> [  274.589525] testing speed of async xts(twofish) encryption
-> [  274.603741] test 0 (256 bit key, 16 byte blocks): 3098851  
-> operations in 1 seconds (49581616 bytes)
-> [  275.612164] test 1 (256 bit key, 64 byte blocks): 1577161  
-> operations in 1 seconds (100938304 bytes)
-> [  276.618836] test 2 (256 bit key, 256 byte blocks): 525612  
-> operations in 1 seconds (134556672 bytes)
-> [  277.625459] test 3 (256 bit key, 1024 byte blocks): 150507  
-> operations in 1 seconds (154119168 bytes)
-> [  278.632105] test 4 (256 bit key, 8192 byte blocks): 19633  
-> operations in 1 seconds (160833536 bytes)
-> [  279.638587] test 5 (384 bit key, 16 byte blocks): 3092237  
-> operations in 1 seconds (49475792 bytes)
-> [  280.645261] test 6 (384 bit key, 64 byte blocks): 1576545  
-> operations in 1 seconds (100898880 bytes)
-> [  281.651795] test 7 (384 bit key, 256 byte blocks): 526516  
-> operations in 1 seconds (134788096 bytes)
-> [  282.658305] test 8 (384 bit key, 1024 byte blocks): 150782  
-> operations in 1 seconds (154400768 bytes)
-> [  283.664935] test 9 (384 bit key, 8192 byte blocks): 19632  
-> operations in 1 seconds (160825344 bytes)
-> [  284.671425] test 10 (512 bit key, 16 byte blocks): 3164770  
-> operations in 1 seconds (50636320 bytes)
-> [  285.678254] test 11 (512 bit key, 64 byte blocks): 1586822  
-> operations in 1 seconds (101556608 bytes)
-> [  286.684781] test 12 (512 bit key, 256 byte blocks): 527705  
-> operations in 1 seconds (135092480 bytes)
-> [  287.691290] test 13 (512 bit key, 1024 byte blocks): 150918  
-> operations in 1 seconds (154540032 bytes)
-> [  288.697885] test 14 (512 bit key, 8192 byte blocks): 19640  
-> operations in 1 seconds (160890880 bytes)
-> [  289.704422]
-> [  289.704422] testing speed of async xts(twofish) decryption
-> [  289.713733] test 0 (256 bit key, 16 byte blocks): 3082480  
-> operations in 1 seconds (49319680 bytes)
-> [  290.719098] test 1 (256 bit key, 64 byte blocks): 1571464  
-> operations in 1 seconds (100573696 bytes)
-> [  291.725752] test 2 (256 bit key, 256 byte blocks): 528360  
-> operations in 1 seconds (135260160 bytes)
-> [  292.732271] test 3 (256 bit key, 1024 byte blocks): 150115  
-> operations in 1 seconds (153717760 bytes)
-> [  293.738874] test 4 (256 bit key, 8192 byte blocks): 19513  
-> operations in 1 seconds (159850496 bytes)
-> [  294.745427] test 5 (384 bit key, 16 byte blocks): 3087055  
-> operations in 1 seconds (49392880 bytes)
-> [  295.752083] test 6 (384 bit key, 64 byte blocks): 1572391  
-> operations in 1 seconds (100633024 bytes)
-> [  296.754760] test 7 (384 bit key, 256 byte blocks): 527241  
-> operations in 1 seconds (134973696 bytes)
-> [  297.757259] test 8 (384 bit key, 1024 byte blocks): 150210  
-> operations in 1 seconds (153815040 bytes)
-> [  298.763871] test 9 (384 bit key, 8192 byte blocks): 19504  
-> operations in 1 seconds (159776768 bytes)
-> [  299.770425] test 10 (512 bit key, 16 byte blocks): 3157185  
-> operations in 1 seconds (50514960 bytes)
-> [  300.777072] test 11 (512 bit key, 64 byte blocks): 1579551  
-> operations in 1 seconds (101091264 bytes)
-> [  301.783745] test 12 (512 bit key, 256 byte blocks): 526692  
-> operations in 1 seconds (134833152 bytes)
-> [  302.790244] test 13 (512 bit key, 1024 byte blocks): 150220  
-> operations in 1 seconds (153825280 bytes)
-> [  303.796840] test 14 (512 bit key, 8192 byte blocks): 19498  
-> operations in 1 seconds (159727616 bytes)
->
-> --
-> Regards/Gruss,
-> Boris.
->
->
+Tested-by: Borislav Petkov <bp@alien8.de>
+Cc: Johannes Goetzfried <Johannes.Goetzfried@informatik.stud.uni-erlang=
+en.de>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S |  227 +++++++++++++++++--=
+--------
+ 1 file changed, 142 insertions(+), 85 deletions(-)
+
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/cry=
+pto/twofish-avx-x86_64-asm_64.S
+index 35f4557..1585abb 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -4,6 +4,8 @@
+  * Copyright (C) 2012 Johannes Goetzfried
+  *     <Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+  *
++ * Copyright =C2=A9 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
+  * This program is free software; you can redistribute it and/or modif=
+y
+  * it under the terms of the GNU General Public License as published b=
+y
+  * the Free Software Foundation; either version 2 of the License, or
+@@ -47,16 +49,22 @@
+ #define RC2 %xmm6
+ #define RD2 %xmm7
+=20
+-#define RX %xmm8
+-#define RY %xmm9
++#define RX0 %xmm8
++#define RY0 %xmm9
++
++#define RX1 %xmm10
++#define RY1 %xmm11
+=20
+-#define RK1 %xmm10
+-#define RK2 %xmm11
++#define RK1 %xmm12
++#define RK2 %xmm13
+=20
+-#define RID1  %rax
+-#define RID1b %al
+-#define RID2  %rbx
+-#define RID2b %bl
++#define RT %xmm14
++#define RR %xmm15
++
++#define RID1  %rbp
++#define RID1d %ebp
++#define RID2  %rsi
++#define RID2d %esi
+=20
+ #define RGI1   %rdx
+ #define RGI1bl %dl
+@@ -65,6 +73,13 @@
+ #define RGI2bl %cl
+ #define RGI2bh %ch
+=20
++#define RGI3   %rax
++#define RGI3bl %al
++#define RGI3bh %ah
++#define RGI4   %rbx
++#define RGI4bl %bl
++#define RGI4bh %bh
++
+ #define RGS1  %r8
+ #define RGS1d %r8d
+ #define RGS2  %r9
+@@ -73,89 +88,123 @@
+ #define RGS3d %r10d
+=20
+=20
+-#define lookup_32bit(t0, t1, t2, t3, src, dst) \
+-	movb		src ## bl,        RID1b;     \
+-	movb		src ## bh,        RID2b;     \
+-	movl		t0(CTX, RID1, 4), dst ## d;  \
+-	xorl		t1(CTX, RID2, 4), dst ## d;  \
++#define lookup_32bit(t0, t1, t2, t3, src, dst, interleave_op, il_reg) =
+\
++	movzbl		src ## bl,        RID1d;     \
++	movzbl		src ## bh,        RID2d;     \
+ 	shrq $16,	src;                         \
+-	movb		src ## bl,        RID1b;     \
+-	movb		src ## bh,        RID2b;     \
++	movl		t0(CTX, RID1, 4), dst ## d;  \
++	movl		t1(CTX, RID2, 4), RID2d;     \
++	movzbl		src ## bl,        RID1d;     \
++	xorl		RID2d,            dst ## d;  \
++	movzbl		src ## bh,        RID2d;     \
++	interleave_op(il_reg);			     \
+ 	xorl		t2(CTX, RID1, 4), dst ## d;  \
+ 	xorl		t3(CTX, RID2, 4), dst ## d;
+=20
+-#define G(a, x, t0, t1, t2, t3) \
+-	vmovq		a,    RGI1;               \
+-	vpsrldq $8,	a,    x;                  \
+-	vmovq		x,    RGI2;               \
++#define dummy(d) /* do nothing */
++
++#define shr_next(reg) \
++	shrq $16,	reg;
++
++#define G(gi1, gi2, x, t0, t1, t2, t3) \
++	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS1, shr_next, ##gi1);  \
++	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS3, shr_next, ##gi2);  \
++	\
++	lookup_32bit(t0, t1, t2, t3, ##gi1, RGS2, dummy, none);      \
++	shlq $32,	RGS2;                                        \
++	orq		RGS1, RGS2;                                  \
++	lookup_32bit(t0, t1, t2, t3, ##gi2, RGS1, dummy, none);      \
++	shlq $32,	RGS1;                                        \
++	orq		RGS1, RGS3;
++
++#define round_head_2(a, b, x1, y1, x2, y2) \
++	vmovq		b ## 1, RGI3;           \
++	vpextrq $1,	b ## 1, RGI4;           \
+ 	\
+-	lookup_32bit(t0, t1, t2, t3, RGI1, RGS1); \
+-	shrq $16,	RGI1;                     \
+-	lookup_32bit(t0, t1, t2, t3, RGI1, RGS2); \
+-	shlq $32,	RGS2;                     \
+-	orq		RGS1, RGS2;               \
++	G(RGI1, RGI2, x1, s0, s1, s2, s3);      \
++	vmovq		a ## 2, RGI1;           \
++	vpextrq $1,	a ## 2, RGI2;           \
++	vmovq		RGS2, x1;               \
++	vpinsrq $1,	RGS3, x1, x1;           \
+ 	\
+-	lookup_32bit(t0, t1, t2, t3, RGI2, RGS1); \
+-	shrq $16,	RGI2;                     \
+-	lookup_32bit(t0, t1, t2, t3, RGI2, RGS3); \
+-	shlq $32,	RGS3;                     \
+-	orq		RGS1, RGS3;               \
++	G(RGI3, RGI4, y1, s1, s2, s3, s0);      \
++	vmovq		b ## 2, RGI3;           \
++	vpextrq $1,	b ## 2, RGI4;           \
++	vmovq		RGS2, y1;               \
++	vpinsrq $1,	RGS3, y1, y1;           \
+ 	\
+-	vmovq		RGS2, x;                  \
+-	vpinsrq $1,	RGS3, x, x;
++	G(RGI1, RGI2, x2, s0, s1, s2, s3);      \
++	vmovq		RGS2, x2;               \
++	vpinsrq $1,	RGS3, x2, x2;           \
++	\
++	G(RGI3, RGI4, y2, s1, s2, s3, s0);      \
++	vmovq		RGS2, y2;               \
++	vpinsrq $1,	RGS3, y2, y2;
+=20
+-#define encround(a, b, c, d, x, y) \
+-	G(a, x, s0, s1, s2, s3);           \
+-	G(b, y, s1, s2, s3, s0);           \
++#define encround_tail(a, b, c, d, x, y, prerotate) \
+ 	vpaddd			x, y,   x; \
++	vpaddd			x, RK1, RT;\
++	prerotate(b);			   \
++	vpxor			RT, c,  c; \
+ 	vpaddd			y, x,   y; \
+-	vpaddd			x, RK1, x; \
+ 	vpaddd			y, RK2, y; \
+-	vpxor			x, c,   c; \
+-	vpsrld $1,		c, x;      \
++	vpsrld $1,		c, RT;     \
+ 	vpslld $(32 - 1),	c, c;      \
+-	vpor			c, x,   c; \
+-	vpslld $1,		d, x;      \
+-	vpsrld $(32 - 1),	d, d;      \
+-	vpor			d, x,   d; \
+-	vpxor			d, y,   d;
+-
+-#define decround(a, b, c, d, x, y) \
+-	G(a, x, s0, s1, s2, s3);           \
+-	G(b, y, s1, s2, s3, s0);           \
++	vpor			c, RT,  c; \
++	vpxor			d, y,   d; \
++
++#define decround_tail(a, b, c, d, x, y, prerotate) \
+ 	vpaddd			x, y,   x; \
++	vpaddd			x, RK1, RT;\
++	prerotate(a);			   \
++	vpxor			RT, c,  c; \
+ 	vpaddd			y, x,   y; \
+ 	vpaddd			y, RK2, y; \
+ 	vpxor			d, y,   d; \
+ 	vpsrld $1,		d, y;      \
+ 	vpslld $(32 - 1),	d, d;      \
+ 	vpor			d, y,   d; \
+-	vpslld $1,		c, y;      \
+-	vpsrld $(32 - 1),	c, c;      \
+-	vpor			c, y,   c; \
+-	vpaddd			x, RK1, x; \
+-	vpxor			x, c,   c;
+-
+-#define encrypt_round(n, a, b, c, d) \
+-	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;           \
+-	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;           \
+-	encround(a ## 1, b ## 1, c ## 1, d ## 1, RX, RY); \
+-	encround(a ## 2, b ## 2, c ## 2, d ## 2, RX, RY);
+-
+-#define decrypt_round(n, a, b, c, d) \
+-	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;           \
+-	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;           \
+-	decround(a ## 1, b ## 1, c ## 1, d ## 1, RX, RY); \
+-	decround(a ## 2, b ## 2, c ## 2, d ## 2, RX, RY);
++
++#define rotate_1l(x) \
++	vpslld $1,		x, RR;     \
++	vpsrld $(32 - 1),	x, x;      \
++	vpor			x, RR,  x;
++
++#define preload_rgi(c) \
++	vmovq			c, RGI1; \
++	vpextrq $1,		c, RGI2;
++
++#define encrypt_round(n, a, b, c, d, preload, prerotate) \
++	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;                  \
++	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;                  \
++	round_head_2(a, b, RX0, RY0, RX1, RY1);                  \
++	encround_tail(a ## 1, b ## 1, c ## 1, d ## 1, RX0, RY0, prerotate); \
++	preload(c ## 1);                                         \
++	encround_tail(a ## 2, b ## 2, c ## 2, d ## 2, RX1, RY1, prerotate);
++
++#define decrypt_round(n, a, b, c, d, preload, prerotate) \
++	vbroadcastss (k+4*(2*(n)))(CTX),   RK1;                  \
++	vbroadcastss (k+4*(2*(n)+1))(CTX), RK2;                  \
++	round_head_2(a, b, RX0, RY0, RX1, RY1);                  \
++	decround_tail(a ## 1, b ## 1, c ## 1, d ## 1, RX0, RY0, prerotate); \
++	preload(c ## 1);                                         \
++	decround_tail(a ## 2, b ## 2, c ## 2, d ## 2, RX1, RY1, prerotate);
+=20
+ #define encrypt_cycle(n) \
+-	encrypt_round((2*n), RA, RB, RC, RD);       \
+-	encrypt_round(((2*n) + 1), RC, RD, RA, RB);
++	encrypt_round((2*n), RA, RB, RC, RD, preload_rgi, rotate_1l); \
++	encrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi, rotate_1l);
++
++#define encrypt_cycle_last(n) \
++	encrypt_round((2*n), RA, RB, RC, RD, preload_rgi, rotate_1l); \
++	encrypt_round(((2*n) + 1), RC, RD, RA, RB, dummy, dummy);
+=20
+ #define decrypt_cycle(n) \
+-	decrypt_round(((2*n) + 1), RC, RD, RA, RB); \
+-	decrypt_round((2*n), RA, RB, RC, RD);
++	decrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi, rotate_1l); \
++	decrypt_round((2*n), RA, RB, RC, RD, preload_rgi, rotate_1l);
+=20
++#define decrypt_cycle_last(n) \
++	decrypt_round(((2*n) + 1), RC, RD, RA, RB, preload_rgi, rotate_1l); \
++	decrypt_round((2*n), RA, RB, RC, RD, dummy, dummy);
+=20
+ #define transpose_4x4(x0, x1, x2, x3, t0, t1, t2) \
+ 	vpunpckldq		x1, x0, t0; \
+@@ -216,17 +265,20 @@ __twofish_enc_blk_8way:
+ 	 *	%rcx: bool, if true: xor output
+ 	 */
+=20
++	pushq %rbp;
+ 	pushq %rbx;
+ 	pushq %rcx;
+=20
+ 	vmovdqu w(CTX), RK1;
+=20
+ 	leaq (4*4*4)(%rdx), %rax;
+-	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RK1, RX, RY, RK2);
+-	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX, RY, RK2);
++	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RK1, RX0, RY0, RK2);
++	preload_rgi(RA1);
++	rotate_1l(RD1);
++	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
++	rotate_1l(RD2);
+=20
+-	xorq RID1, RID1;
+-	xorq RID2, RID2;
++	movq %rsi, %r11;
+=20
+ 	encrypt_cycle(0);
+ 	encrypt_cycle(1);
+@@ -235,26 +287,27 @@ __twofish_enc_blk_8way:
+ 	encrypt_cycle(4);
+ 	encrypt_cycle(5);
+ 	encrypt_cycle(6);
+-	encrypt_cycle(7);
++	encrypt_cycle_last(7);
+=20
+ 	vmovdqu (w+4*4)(CTX), RK1;
+=20
+ 	popq %rcx;
+ 	popq %rbx;
++	popq %rbp;
+=20
+-	leaq (4*4*4)(%rsi), %rax;
++	leaq (4*4*4)(%r11), %rax;
+=20
+ 	testb %cl, %cl;
+ 	jnz __enc_xor8;
+=20
+-	outunpack_blocks(%rsi, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
+-	outunpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
++	outunpack_blocks(%r11, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
++	outunpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
+=20
+ 	ret;
+=20
+ __enc_xor8:
+-	outunpack_xor_blocks(%rsi, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
+-	outunpack_xor_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
++	outunpack_xor_blocks(%r11, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
++	outunpack_xor_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
+=20
+ 	ret;
+=20
+@@ -269,16 +322,19 @@ twofish_dec_blk_8way:
+ 	 *	%rdx: src
+ 	 */
+=20
++	pushq %rbp;
+ 	pushq %rbx;
+=20
+ 	vmovdqu (w+4*4)(CTX), RK1;
+=20
+ 	leaq (4*4*4)(%rdx), %rax;
+-	inpack_blocks(%rdx, RC1, RD1, RA1, RB1, RK1, RX, RY, RK2);
+-	inpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX, RY, RK2);
++	inpack_blocks(%rdx, RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
++	preload_rgi(RC1);
++	rotate_1l(RA1);
++	inpack_blocks(%rax, RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
++	rotate_1l(RA2);
+=20
+-	xorq RID1, RID1;
+-	xorq RID2, RID2;
++	movq %rsi, %r11;
+=20
+ 	decrypt_cycle(7);
+ 	decrypt_cycle(6);
+@@ -287,14 +343,15 @@ twofish_dec_blk_8way:
+ 	decrypt_cycle(3);
+ 	decrypt_cycle(2);
+ 	decrypt_cycle(1);
+-	decrypt_cycle(0);
++	decrypt_cycle_last(0);
+=20
+ 	vmovdqu (w)(CTX), RK1;
+=20
+ 	popq %rbx;
++	popq %rbp;
+=20
+-	leaq (4*4*4)(%rsi), %rax;
+-	outunpack_blocks(%rsi, RA1, RB1, RC1, RD1, RK1, RX, RY, RK2);
+-	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX, RY, RK2);
++	leaq (4*4*4)(%r11), %rax;
++	outunpack_blocks(%r11, RA1, RB1, RC1, RD1, RK1, RX0, RY0, RK2);
++	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
+=20
+ 	ret;
