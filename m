@@ -1,74 +1,253 @@
-From: Liu Qiang-B32616 <B32616@freescale.com>
-Subject: RE: [PATCH v7 0/8] Raid: enable talitos xor offload for improving
- performance
-Date: Thu, 30 Aug 2012 06:20:05 +0000
-Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70FC695@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
- <20120809170307.GG14264@ovro.caltech.edu>
- <BCB48C05FCE8BC4D9E61E841ECBE6DB70E3D47@039-SN2MPN1-013.039d.mgd.msft.net>
- <CAA9_cme4tHrx14JaSaHwgcGq79qQK5bv8E205fbC3ega5OpUiQ@mail.gmail.com>
- <BCB48C05FCE8BC4D9E61E841ECBE6DB70FC3CA@039-SN2MPN1-011.039d.mgd.msft.net>
- <1346251975.27020.2.camel@localhost.localdomain>
+From: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
+Subject: RE: [PATCH v7 1/8] Talitos: Support for async_tx XOR offload
+Date: Thu, 30 Aug 2012 14:23:29 +0000
+Message-ID: <FD18E5D573A8AB48A365D4D78185DE992E5C0D@039-SN1MPN1-001.039d.mgd.msft.net>
+References: <1344500448-10927-1-git-send-email-qiang.liu@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "arnd@arndb.de" <arnd@arndb.de>, "Ira W.
- Snyder" <iws@ovro.caltech.edu>, "vinod.koul@intel.com" <vinod.koul@intel.com>,
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-To: Dan Williams <djbw@fb.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1346251975.27020.2.camel@localhost.localdomain>
+Content-Transfer-Encoding: 8BIT
+Cc: Li Yang-R58472 <r58472@freescale.com>,
+	Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
+	"vinod.koul@intel.com" <vinod.koul@intel.com>,
+	"dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	Liu Qiang-B32616 <B32616@freescale.com>
+To: Liu Qiang-B32616 <B32616@freescale.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"dan.j.williams@gmail.com" <dan.j.williams@gmail.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from db3ehsobe006.messaging.microsoft.com ([213.199.154.144]:16057
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752167Ab2H3OXg convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Aug 2012 10:23:36 -0400
+In-Reply-To: <1344500448-10927-1-git-send-email-qiang.liu@freescale.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> -----Original Message-----
-> From: Dan Williams [mailto:djbw@fb.com]
-> Sent: Wednesday, August 29, 2012 10:53 PM
-> To: Liu Qiang-B32616
-> Cc: vinod.koul@intel.com; arnd@arndb.de; herbert@gondor.apana.org.au;
-> gregkh@linuxfoundation.org; linuxppc-dev@lists.ozlabs.org; linux-
-> kernel@vger.kernel.org; linux-crypto@vger.kernel.org; Ira W. Snyder
-> Subject: Re: [PATCH v7 0/8] Raid: enable talitos xor offload for
-> improving performance
+On Thu, 9 Aug 2012 11:20:48 +0300, qiang.liu@freescale.com wrote:
+> From: Qiang Liu <qiang.liu@freescale.com>
 > 
-> On Wed, 2012-08-29 at 11:15 +0000, Liu Qiang-B32616 wrote:
-> > Hi Dan,
-> >
-> > Ping?
-> > Can you apply these patches? Thanks.
-> >
+> Expose Talitos's XOR functionality to be used for RAID parity
+> calculation via the Async_tx layer.
 > 
-> I'm working my way through them.
-> 
-> The first thing I notice is that xor_chan->desc_lock is taken
-> inconsistently.  I.e. spin_lock_irqsave() in talitos_process_pending()
-> and spin_lock_bh() everywhere else.  Have you run these patches with
-> lockdep?
-Thanks for your reply.
-LOCKDEP is enabled as you suggested, there is not any info about "inconsistent lock state" displayed.
-I don't know whether it's enough.
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Dipen Dudhat <Dipen.Dudhat@freescale.com>
+> Signed-off-by: Maneesh Gupta <Maneesh.Gupta@freescale.com>
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Signed-off-by: Vishnu Suresh <Vishnu@freescale.com>
+> Signed-off-by: Qiang Liu <qiang.liu@freescale.com>
+> ---
+>  drivers/crypto/Kconfig   |    9 +
+>  drivers/crypto/talitos.c |  413 ++++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/talitos.h |   53 ++++++
+>  3 files changed, 475 insertions(+), 0 deletions(-)
 
-I'm confused about the attribute of DMA_INTERRUPT, my understanding is this interface is only used to trigger an interrupt (make sure all former operations are finished before switching to other channels), but fsl-dma will trigger an interrupt by "Programmed Error". I'm wondering whether other hardware are same with fsl-dma (the interrupt is a normal interrupt, but not an error) i.e. xscale-iop?
-If other hardware also trigger an interrupt by an abnormal error, maybe my patch 2/8 should be reverted because it violates the rules of this attribute.
 
-BTW, could you please reply in the patch if you have any comments. Thanks.
+> +static void talitos_xor_run_tx_complete_actions(struct talitos_xor_desc *desc,
+> +		struct talitos_xor_chan *xor_chan)
+> +{
+> +	struct device *dev = xor_chan->dev;
+> +	dma_addr_t dest, addr;
+> +	unsigned int src_cnt = desc->unmap_src_cnt;
+> +	unsigned int len = desc->unmap_len;
+> +	enum dma_ctrl_flags flags = desc->async_tx.flags;
+> +	struct dma_async_tx_descriptor *tx = &desc->async_tx;
+> +
+> +	/* unmap dma addresses */
+> +	dest = desc->hwdesc.ptr[6].ptr;
+> +	if (likely(!(flags & DMA_COMPL_SKIP_DEST_UNMAP)))
+> +		dma_unmap_page(dev, dest, len, DMA_BIDIRECTIONAL);
+> +
+> +	desc->idx = 6 - src_cnt;
+> +	if (likely(!(flags & DMA_COMPL_SKIP_SRC_UNMAP))) {
+> +		while(desc->idx < 6) {
+> +			addr = desc->hwdesc.ptr[desc->idx++].ptr;
+> +			if (addr == dest)
+> +				continue;
+> +			dma_unmap_page(dev, addr, len, DMA_TO_DEVICE);
+> +		}
+> +	}
 
+No need for braces around the while block.
+
+> +	/* run dependent operations */
+> +	dma_run_dependencies(tx);
+> +}
+
+
+> +static void talitos_release_xor(struct device *dev, struct talitos_desc *hwdesc,
+> +				void *context, int error)
+> +{
+> +	struct talitos_xor_desc *desc = context;
+> +	struct talitos_xor_chan *xor_chan;
+> +	dma_async_tx_callback callback;
+> +	void *callback_param;
+> +
+> +	if (unlikely(error))
+> +		dev_err(dev, "xor operation: talitos error %d\n", error);
+> +
+> +	xor_chan = container_of(desc->async_tx.chan, struct talitos_xor_chan,
+> +				common);
+> +	spin_lock_bh(&xor_chan->desc_lock);
+> +	if (xor_chan->completed_cookie < desc->async_tx.cookie)
+> +		xor_chan->completed_cookie = desc->async_tx.cookie;
+> +
+> +	callback = desc->async_tx.callback;
+> +	callback_param = desc->async_tx.callback_param;
+> +
+> +	if (callback) {
+> +		spin_unlock_bh(&xor_chan->desc_lock);
+> +		callback(callback_param);
+> +		spin_lock_bh(&xor_chan->desc_lock);
+> +	}
+
+Since callback_param is used only here, maybe:
+
+if (callback) {
+	void *callback_param = desc->async_tx.callback_param;
+
+	spin_unlock_bh(&xor_chan->desc_lock);
+	callback(callback_param);
+	spin_lock_bh(&xor_chan->desc_lock);
+}
+
+> +
+> +	talitos_xor_run_tx_complete_actions(desc, xor_chan);
+> +
+> +	list_del(&desc->node);
+> +	list_add_tail(&desc->node, &xor_chan->free_desc);
+> +	spin_unlock_bh(&xor_chan->desc_lock);
+> +	if (!list_empty(&xor_chan->pending_q))
+> +		talitos_process_pending(xor_chan);
+> +}
+
+
+> +static int talitos_alloc_chan_resources(struct dma_chan *chan)
+> +{
+> +	struct talitos_xor_chan *xor_chan;
+> +	struct talitos_xor_desc *desc;
+> +	LIST_HEAD(tmp_list);
+> +	int i;
+> +
+> +	xor_chan = container_of(chan, struct talitos_xor_chan, common);
+> +
+> +	if (!list_empty(&xor_chan->free_desc))
+> +		return xor_chan->total_desc;
+> +
+> +	for (i = 0; i < TALITOS_MAX_DESCRIPTOR_NR; i++) {
+> +		desc = talitos_xor_alloc_descriptor(xor_chan,
+> +				GFP_KERNEL | GFP_DMA);
+
+talitos_xor_alloc_descriptor() is called here without holding
+the xor_chan->desc_lock and it increments xor_chan->total_desc.
+Isn't this an issue ?
+
+> +		if (!desc) {
+> +			dev_err(xor_chan->common.device->dev,
+> +				"Only %d initial descriptors\n", i);
+> +			break;
+> +		}
+> +		list_add_tail(&desc->node, &tmp_list);
+> +	}
+> +
+> +	if (!i)
+> +		return -ENOMEM;
+> +
+> +	/* At least one desc is allocated */
+> +	spin_lock_bh(&xor_chan->desc_lock);
+> +	list_splice_init(&tmp_list, &xor_chan->free_desc);
+> +	spin_unlock_bh(&xor_chan->desc_lock);
+> +
+> +	return xor_chan->total_desc;
+> +}
+
+
+> +/**
+> + * talitos_register_dma_async - Initialize the Freescale XOR ADMA device
+> + * It is registered as a DMA device with the capability to perform
+> + * XOR operation with the Async_tx layer.
+> + * The various queues and channel resources are also allocated.
+> + */
+> +static int talitos_register_async_tx(struct device *dev, int max_xor_srcs)
+> +{
+> +	struct talitos_private *priv = dev_get_drvdata(dev);
+> +	struct dma_device *dma_dev = &priv->dma_dev_common;
+> +	struct talitos_xor_chan *xor_chan;
+> +	int err;
+> +
+> +	xor_chan = kzalloc(sizeof(struct talitos_xor_chan), GFP_KERNEL);
+> +	if (!xor_chan) {
+> +		dev_err(dev, "unable to allocate xor channel\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dma_dev->dev = dev;
+> +	dma_dev->device_alloc_chan_resources = talitos_alloc_chan_resources;
+> +	dma_dev->device_free_chan_resources = talitos_free_chan_resources;
+> +	dma_dev->device_prep_dma_xor = talitos_prep_dma_xor;
+> +	dma_dev->max_xor = max_xor_srcs;
+> +	dma_dev->device_tx_status = talitos_is_tx_complete;
+> +	dma_dev->device_issue_pending = talitos_issue_pending;
+> +	INIT_LIST_HEAD(&dma_dev->channels);
+> +	dma_cap_set(DMA_XOR, dma_dev->cap_mask);
+> +
+> +	xor_chan->dev = dev;
+> +	xor_chan->common.device = dma_dev;
+> +	xor_chan->total_desc = 0;
+> +	INIT_LIST_HEAD(&xor_chan->submit_q);
+> +	INIT_LIST_HEAD(&xor_chan->pending_q);
+> +	INIT_LIST_HEAD(&xor_chan->in_progress_q);
+> +	INIT_LIST_HEAD(&xor_chan->free_desc);
+> +	spin_lock_init(&xor_chan->desc_lock);
+> +
+> +	list_add_tail(&xor_chan->common.device_node, &dma_dev->channels);
+> +	dma_dev->chancnt++;
+> +
+> +	err = dma_async_device_register(dma_dev);
+> +	if (err) {
+> +		dev_err(dev, "Unable to register XOR with Async_tx\n");
+> +		goto err_out;
+
+Replace the jump with talitos_unregister_async_xor(dev) and
+remove code under err_out label.
+
+> +	}
+> +
+> +	return err;
+> +
+> +err_out:
+> +	talitos_unregister_async_xor(dev);
+> +	return err;
+> +}
+> +#endif
+
+
+> diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
+> index 61a1405..fc9d125 100644
+> --- a/drivers/crypto/talitos.h
+> +++ b/drivers/crypto/talitos.h
+> @@ -30,6 +30,7 @@
 > 
-> --
-> Dan
-> 
-> 
+>  #define TALITOS_TIMEOUT 100000
+>  #define TALITOS_MAX_DATA_LEN 65535
+> +#define TALITOS_MAX_DESCRIPTOR_NR 256
+
+This refers only to xor descriptors, so renaming it similar to
+TALITOS_MAX_XOR_DESCRIPTOR_NR would make sense.
+
+Besides these:
+1. As Dan Williams mentioned, you should explain why you are using
+both spin_lock_bh and spin_lock_irqsave on the same lock.
+2. I don't see anything added to talitos_remove(). Shouldn't
+talitos_unregister_async_xor() be called? Anything else?
+Have you tested with talitos built as a module?
+
+Horia
