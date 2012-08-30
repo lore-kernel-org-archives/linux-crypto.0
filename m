@@ -1,248 +1,331 @@
 From: David Miller <davem@davemloft.net>
-Subject: [PATCH 2/5] sparc64: Add ctr mode support to AES driver.
-Date: Thu, 30 Aug 2012 11:46:26 -0400 (EDT)
-Message-ID: <20120830.114626.150800464951430349.davem@davemloft.net>
+Subject: [PATCH 3/5] sparc64: Unroll ECB encryption loops in AES driver.
+Date: Thu, 30 Aug 2012 11:46:32 -0400 (EDT)
+Message-ID: <20120830.114632.1559527747457990687.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 To: sparclinux@vger.kernel.org
-Return-path: <sparclinux-owner@vger.kernel.org>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([149.20.54.216]:36785 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752544Ab2H3Pqf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Aug 2012 11:46:35 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+
+The AES opcodes have a 3 cycle latency, so by doing 32-bytes at a
+time we avoid a pipeline bubble in between every round.
+
+For the 256-bit key case, it looks like we're doing more work in
+order to reload the KEY registers during the loop to make space
+for scarce temporaries.  But the load dual issues with the AES
+operations so we get the KEY reloads essentially for free.
+
+Before:
+
+testing speed of ecb(aes) encryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 264 cycles (16 bytes)
+test 1 (128 bit key, 64 byte blocks): 1 operation in 231 cycles (64 bytes)
+test 2 (128 bit key, 256 byte blocks): 1 operation in 329 cycles (256 bytes)
+test 3 (128 bit key, 1024 byte blocks): 1 operation in 715 cycles (1024 bytes)
+test 4 (128 bit key, 8192 byte blocks): 1 operation in 4248 cycles (8192 bytes)
+test 5 (192 bit key, 16 byte blocks): 1 operation in 221 cycles (16 bytes)
+test 6 (192 bit key, 64 byte blocks): 1 operation in 234 cycles (64 bytes)
+test 7 (192 bit key, 256 byte blocks): 1 operation in 359 cycles (256 bytes)
+test 8 (192 bit key, 1024 byte blocks): 1 operation in 803 cycles (1024 bytes)
+test 9 (192 bit key, 8192 byte blocks): 1 operation in 5366 cycles (8192 bytes)
+test 10 (256 bit key, 16 byte blocks): 1 operation in 209 cycles (16 bytes)
+test 11 (256 bit key, 64 byte blocks): 1 operation in 255 cycles (64 bytes)
+test 12 (256 bit key, 256 byte blocks): 1 operation in 379 cycles (256 bytes)
+test 13 (256 bit key, 1024 byte blocks): 1 operation in 938 cycles (1024 bytes)
+test 14 (256 bit key, 8192 byte blocks): 1 operation in 6041 cycles (8192 bytes)
+
+After:
+
+testing speed of ecb(aes) encryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 266 cycles (16 bytes)
+test 1 (128 bit key, 64 byte blocks): 1 operation in 256 cycles (64 bytes)
+test 2 (128 bit key, 256 byte blocks): 1 operation in 305 cycles (256 bytes)
+test 3 (128 bit key, 1024 byte blocks): 1 operation in 676 cycles (1024 bytes)
+test 4 (128 bit key, 8192 byte blocks): 1 operation in 3981 cycles (8192 bytes)
+test 5 (192 bit key, 16 byte blocks): 1 operation in 210 cycles (16 bytes)
+test 6 (192 bit key, 64 byte blocks): 1 operation in 233 cycles (64 bytes)
+test 7 (192 bit key, 256 byte blocks): 1 operation in 340 cycles (256 bytes)
+test 8 (192 bit key, 1024 byte blocks): 1 operation in 766 cycles (1024 bytes)
+test 9 (192 bit key, 8192 byte blocks): 1 operation in 5136 cycles (8192 bytes)
+test 10 (256 bit key, 16 byte blocks): 1 operation in 206 cycles (16 bytes)
+test 11 (256 bit key, 64 byte blocks): 1 operation in 268 cycles (64 bytes)
+test 12 (256 bit key, 256 byte blocks): 1 operation in 368 cycles (256 bytes)
+test 13 (256 bit key, 1024 byte blocks): 1 operation in 890 cycles (1024 bytes)
+test 14 (256 bit key, 8192 byte blocks): 1 operation in 5718 cycles (8192 bytes)
 
 Signed-off-by: David S. Miller <davem@davemloft.net>
 ---
- arch/sparc/crypto/aes_asm.S  |   95 ++++++++++++++++++++++++++++++++++++++++++
- arch/sparc/crypto/aes_glue.c |   62 +++++++++++++++++++++++++++
- 2 files changed, 157 insertions(+)
+ arch/sparc/crypto/aes_asm.S |  166 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 148 insertions(+), 18 deletions(-)
 
 diff --git a/arch/sparc/crypto/aes_asm.S b/arch/sparc/crypto/aes_asm.S
-index 50faae0..7a975d6 100644
+index 7a975d6..33d59c6 100644
 --- a/arch/sparc/crypto/aes_asm.S
 +++ b/arch/sparc/crypto/aes_asm.S
-@@ -44,6 +44,8 @@
- 	.word	0x85b02307;
- #define MOVXTOD_O0_F0		\
- 	.word	0x81b02308;
-+#define MOVXTOD_O5_F0		\
-+	.word	0x81b0230d;
+@@ -48,6 +48,10 @@
+ 	.word	0x81b0230d;
  #define MOVXTOD_O5_F2		\
  	.word	0x85b0230d;
++#define MOVXTOD_G3_F60		\
++	.word	0xbbb02303;
++#define MOVXTOD_G7_F62		\
++	.word	0xbfb02307;
  
-@@ -1137,3 +1139,96 @@ ENTRY(aes_sparc64_cbc_decrypt_256)
- 	retl
+ #define ENCRYPT_TWO_ROUNDS(KEY_BASE, I0, I1, T0, T1) \
+ 	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
+@@ -55,12 +59,32 @@
+ 	AES_EROUND01(KEY_BASE +  4, T0, T1, I0) \
+ 	AES_EROUND23(KEY_BASE +  6, T0, T1, I1)
+ 
++#define ENCRYPT_TWO_ROUNDS_2(KEY_BASE, I0, I1, I2, I3, T0, T1, T2, T3) \
++	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
++	AES_EROUND23(KEY_BASE +  2, I0, I1, T1) \
++	AES_EROUND01(KEY_BASE +  0, I2, I3, T2) \
++	AES_EROUND23(KEY_BASE +  2, I2, I3, T3) \
++	AES_EROUND01(KEY_BASE +  4, T0, T1, I0) \
++	AES_EROUND23(KEY_BASE +  6, T0, T1, I1) \
++	AES_EROUND01(KEY_BASE +  4, T2, T3, I2) \
++	AES_EROUND23(KEY_BASE +  6, T2, T3, I3)
++
+ #define ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE, I0, I1, T0, T1) \
+ 	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
+ 	AES_EROUND23(KEY_BASE +  2, I0, I1, T1) \
+ 	AES_EROUND01_L(KEY_BASE +  4, T0, T1, I0) \
+ 	AES_EROUND23_L(KEY_BASE +  6, T0, T1, I1)
+ 
++#define ENCRYPT_TWO_ROUNDS_LAST_2(KEY_BASE, I0, I1, I2, I3, T0, T1, T2, T3) \
++	AES_EROUND01(KEY_BASE +  0, I0, I1, T0) \
++	AES_EROUND23(KEY_BASE +  2, I0, I1, T1) \
++	AES_EROUND01(KEY_BASE +  0, I2, I3, T2) \
++	AES_EROUND23(KEY_BASE +  2, I2, I3, T3) \
++	AES_EROUND01_L(KEY_BASE +  4, T0, T1, I0) \
++	AES_EROUND23_L(KEY_BASE +  6, T0, T1, I1) \
++	AES_EROUND01_L(KEY_BASE +  4, T2, T3, I2) \
++	AES_EROUND23_L(KEY_BASE +  6, T2, T3, I3)
++
+ 	/* 10 rounds */
+ #define ENCRYPT_128(KEY_BASE, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
+@@ -69,6 +93,13 @@
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE + 24, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 32, I0, I1, T0, T1)
+ 
++#define ENCRYPT_128_2(KEY_BASE, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE +  0, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE +  8, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE + 16, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE + 24, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_LAST_2(KEY_BASE + 32, I0, I1, I2, I3, T0, T1, T2, T3)
++
+ 	/* 12 rounds */
+ #define ENCRYPT_192(KEY_BASE, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
+@@ -78,6 +109,14 @@
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE + 32, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 40, I0, I1, T0, T1)
+ 
++#define ENCRYPT_192_2(KEY_BASE, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE +  0, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE +  8, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE + 16, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE + 24, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE + 32, I0, I1, I2, I3, T0, T1, T2, T3) \
++	ENCRYPT_TWO_ROUNDS_LAST_2(KEY_BASE + 40, I0, I1, I2, I3, T0, T1, T2, T3)
++
+ 	/* 14 rounds */
+ #define ENCRYPT_256(KEY_BASE, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE +  0, I0, I1, T0, T1) \
+@@ -88,6 +127,34 @@
+ 	ENCRYPT_TWO_ROUNDS(KEY_BASE + 40, I0, I1, T0, T1) \
+ 	ENCRYPT_TWO_ROUNDS_LAST(KEY_BASE + 48, I0, I1, T0, T1)
+ 
++#define ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE, I0, I1, I2, I3, TMP_BASE) \
++	ENCRYPT_TWO_ROUNDS_2(KEY_BASE, I0, I1, I2, I3, \
++			     TMP_BASE + 0, TMP_BASE + 2, TMP_BASE + 4, TMP_BASE + 6)
++
++#define ENCRYPT_256_2(KEY_BASE, I0, I1, I2, I3) \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE +  0, I0, I1, I2, I3, KEY_BASE + 48) \
++	ldd	[%o0 + 0xd0], %f56; \
++	ldd	[%o0 + 0xd8], %f58; \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE +  8, I0, I1, I2, I3, KEY_BASE +  0) \
++	ldd	[%o0 + 0xe0], %f60; \
++	ldd	[%o0 + 0xe8], %f62; \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE + 16, I0, I1, I2, I3, KEY_BASE +  0) \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE + 24, I0, I1, I2, I3, KEY_BASE +  0) \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE + 32, I0, I1, I2, I3, KEY_BASE +  0) \
++	ENCRYPT_256_TWO_ROUNDS_2(KEY_BASE + 40, I0, I1, I2, I3, KEY_BASE +  0) \
++	AES_EROUND01(KEY_BASE +  48, I0, I1, KEY_BASE + 0) \
++	AES_EROUND23(KEY_BASE +  50, I0, I1, KEY_BASE + 2) \
++	AES_EROUND01(KEY_BASE +  48, I2, I3, KEY_BASE + 4) \
++	AES_EROUND23(KEY_BASE +  50, I2, I3, KEY_BASE + 6) \
++	AES_EROUND01_L(KEY_BASE +  52, KEY_BASE + 0, KEY_BASE + 2, I0) \
++	AES_EROUND23_L(KEY_BASE +  54, KEY_BASE + 0, KEY_BASE + 2, I1) \
++	ldd	[%o0 + 0x10], %f8; \
++	ldd	[%o0 + 0x18], %f10; \
++	AES_EROUND01_L(KEY_BASE +  52, KEY_BASE + 4, KEY_BASE + 6, I2) \
++	AES_EROUND23_L(KEY_BASE +  54, KEY_BASE + 4, KEY_BASE + 6, I3) \
++	ldd	[%o0 + 0x20], %f12; \
++	ldd	[%o0 + 0x28], %f14;
++
+ #define DECRYPT_TWO_ROUNDS(KEY_BASE, I0, I1, T0, T1) \
+ 	AES_DROUND23(KEY_BASE +  0, I0, I1, T1) \
+ 	AES_DROUND01(KEY_BASE +  2, I0, I1, T0) \
+@@ -832,10 +899,34 @@ ENDPROC(aes_sparc64_load_decrypt_keys_256)
+ ENTRY(aes_sparc64_ecb_encrypt_128)
+ 	/* %o0=key, %o1=input, %o2=output, %o3=len */
+ 	ldx		[%o0 + 0x00], %g1
+-	ldx		[%o0 + 0x08], %g2
++	subcc		%o3, 0x10, %o3
++	be		10f
++	 ldx		[%o0 + 0x08], %g2
+ 1:	ldx		[%o1 + 0x00], %g3
+ 	ldx		[%o1 + 0x08], %g7
+-	add		%o1, 0x10, %o1
++	ldx		[%o1 + 0x10], %o4
++	ldx		[%o1 + 0x18], %o5
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++	xor		%g1, %o4, %g3
++	xor		%g2, %o5, %g7
++	MOVXTOD_G3_F60
++	MOVXTOD_G7_F62
++	ENCRYPT_128_2(8, 4, 6, 60, 62, 0, 2, 56, 58)
++	std		%f4, [%o2 + 0x00]
++	std		%f6, [%o2 + 0x08]
++	std		%f60, [%o2 + 0x10]
++	std		%f62, [%o2 + 0x18]
++	sub		%o3, 0x20, %o3
++	add		%o1, 0x20, %o1
++	brgz		%o3, 1b
++	 add		%o2, 0x20, %o2
++	brlz,pt		%o3, 11f
++	 nop
++10:	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
+ 	xor		%g1, %g3, %g3
+ 	xor		%g2, %g7, %g7
+ 	MOVXTOD_G3_F4
+@@ -843,10 +934,7 @@ ENTRY(aes_sparc64_ecb_encrypt_128)
+ 	ENCRYPT_128(8, 4, 6, 0, 2)
+ 	std		%f4, [%o2 + 0x00]
+ 	std		%f6, [%o2 + 0x08]
+-	subcc		%o3, 0x10, %o3
+-	bne,pt		%xcc, 1b
+-	 add		%o2, 0x10, %o2
+-	retl
++11:	retl
  	 nop
- ENDPROC(aes_sparc64_cbc_decrypt_256)
-+
-+	.align		32
-+ENTRY(aes_sparc64_ctr_crypt_128)
-+	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
-+	ldx		[%o4 + 0x00], %g3
-+	ldx		[%o4 + 0x08], %g7
-+	ldx		[%o0 + 0x00], %g1
-+	ldx		[%o0 + 0x08], %g2
-+1:	xor		%g1, %g3, %o5
-+	MOVXTOD_O5_F0
-+	xor		%g2, %g7, %o5
-+	MOVXTOD_O5_F2
-+	add		%g7, 1, %g7
-+	add		%g3, 1, %o5
-+	movrz		%g7, %o5, %g3
-+	ENCRYPT_128(8, 0, 2, 4, 6)
-+	ldd		[%o1 + 0x00], %f4
-+	ldd		[%o1 + 0x08], %f6
-+	fxor		%f4, %f0, %f4
-+	fxor		%f6, %f2, %f6
+ ENDPROC(aes_sparc64_ecb_encrypt_128)
+ 
+@@ -854,10 +942,34 @@ ENDPROC(aes_sparc64_ecb_encrypt_128)
+ ENTRY(aes_sparc64_ecb_encrypt_192)
+ 	/* %o0=key, %o1=input, %o2=output, %o3=len */
+ 	ldx		[%o0 + 0x00], %g1
+-	ldx		[%o0 + 0x08], %g2
++	subcc		%o3, 0x10, %o3
++	be		10f
++	 ldx		[%o0 + 0x08], %g2
+ 1:	ldx		[%o1 + 0x00], %g3
+ 	ldx		[%o1 + 0x08], %g7
+-	add		%o1, 0x10, %o1
++	ldx		[%o1 + 0x10], %o4
++	ldx		[%o1 + 0x18], %o5
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++	xor		%g1, %o4, %g3
++	xor		%g2, %o5, %g7
++	MOVXTOD_G3_F60
++	MOVXTOD_G7_F62
++	ENCRYPT_192_2(8, 4, 6, 60, 62, 0, 2, 56, 58)
 +	std		%f4, [%o2 + 0x00]
 +	std		%f6, [%o2 + 0x08]
-+	subcc		%o3, 0x10, %o3
-+	add		%o1, 0x10, %o1
-+	bne,pt		%xcc, 1b
-+	 add		%o2, 0x10, %o2
-+	stx		%g3, [%o4 + 0x00]
-+	stx		%g7, [%o4 + 0x08]
-+	retl
++	std		%f60, [%o2 + 0x10]
++	std		%f62, [%o2 + 0x18]
++	sub		%o3, 0x20, %o3
++	add		%o1, 0x20, %o1
++	brgz		%o3, 1b
++	 add		%o2, 0x20, %o2
++	brlz,pt		%o3, 11f
 +	 nop
-+ENDPROC(aes_sparc64_ctr_crypt_128)
-+
-+	.align		32
-+ENTRY(aes_sparc64_ctr_crypt_192)
-+	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
-+	ldx		[%o4 + 0x00], %g3
-+	ldx		[%o4 + 0x08], %g7
-+	ldx		[%o0 + 0x00], %g1
-+	ldx		[%o0 + 0x08], %g2
-+1:	xor		%g1, %g3, %o5
-+	MOVXTOD_O5_F0
-+	xor		%g2, %g7, %o5
-+	MOVXTOD_O5_F2
-+	add		%g7, 1, %g7
-+	add		%g3, 1, %o5
-+	movrz		%g7, %o5, %g3
-+	ENCRYPT_192(8, 0, 2, 4, 6)
-+	ldd		[%o1 + 0x00], %f4
-+	ldd		[%o1 + 0x08], %f6
-+	fxor		%f4, %f0, %f4
-+	fxor		%f6, %f2, %f6
++10:	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
+ 	xor		%g1, %g3, %g3
+ 	xor		%g2, %g7, %g7
+ 	MOVXTOD_G3_F4
+@@ -865,10 +977,7 @@ ENTRY(aes_sparc64_ecb_encrypt_192)
+ 	ENCRYPT_192(8, 4, 6, 0, 2)
+ 	std		%f4, [%o2 + 0x00]
+ 	std		%f6, [%o2 + 0x08]
+-	subcc		%o3, 0x10, %o3
+-	bne,pt		%xcc, 1b
+-	 add		%o2, 0x10, %o2
+-	retl
++11:	retl
+ 	 nop
+ ENDPROC(aes_sparc64_ecb_encrypt_192)
+ 
+@@ -876,10 +985,34 @@ ENDPROC(aes_sparc64_ecb_encrypt_192)
+ ENTRY(aes_sparc64_ecb_encrypt_256)
+ 	/* %o0=key, %o1=input, %o2=output, %o3=len */
+ 	ldx		[%o0 + 0x00], %g1
+-	ldx		[%o0 + 0x08], %g2
++	subcc		%o3, 0x10, %o3
++	be		10f
++	 ldx		[%o0 + 0x08], %g2
+ 1:	ldx		[%o1 + 0x00], %g3
+ 	ldx		[%o1 + 0x08], %g7
+-	add		%o1, 0x10, %o1
++	ldx		[%o1 + 0x10], %o4
++	ldx		[%o1 + 0x18], %o5
++	xor		%g1, %g3, %g3
++	xor		%g2, %g7, %g7
++	MOVXTOD_G3_F4
++	MOVXTOD_G7_F6
++	xor		%g1, %o4, %g3
++	xor		%g2, %o5, %g7
++	MOVXTOD_G3_F0
++	MOVXTOD_G7_F2
++	ENCRYPT_256_2(8, 4, 6, 0, 2)
 +	std		%f4, [%o2 + 0x00]
 +	std		%f6, [%o2 + 0x08]
-+	subcc		%o3, 0x10, %o3
-+	add		%o1, 0x10, %o1
-+	bne,pt		%xcc, 1b
-+	 add		%o2, 0x10, %o2
-+	stx		%g3, [%o4 + 0x00]
-+	stx		%g7, [%o4 + 0x08]
-+	retl
++	std		%f0, [%o2 + 0x10]
++	std		%f2, [%o2 + 0x18]
++	sub		%o3, 0x20, %o3
++	add		%o1, 0x20, %o1
++	brgz		%o3, 1b
++	 add		%o2, 0x20, %o2
++	brlz,pt		%o3, 11f
 +	 nop
-+ENDPROC(aes_sparc64_ctr_crypt_192)
-+
-+	.align		32
-+ENTRY(aes_sparc64_ctr_crypt_256)
-+	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
-+	ldx		[%o4 + 0x00], %g3
-+	ldx		[%o4 + 0x08], %g7
-+	ldx		[%o0 + 0x00], %g1
-+	ldx		[%o0 + 0x08], %g2
-+1:	xor		%g1, %g3, %o5
-+	MOVXTOD_O5_F0
-+	xor		%g2, %g7, %o5
-+	MOVXTOD_O5_F2
-+	add		%g7, 1, %g7
-+	add		%g3, 1, %o5
-+	movrz		%g7, %o5, %g3
-+	ENCRYPT_256(8, 0, 2, 4, 6)
-+	ldd		[%o1 + 0x00], %f4
-+	ldd		[%o1 + 0x08], %f6
-+	fxor		%f4, %f0, %f4
-+	fxor		%f6, %f2, %f6
-+	std		%f4, [%o2 + 0x00]
-+	std		%f6, [%o2 + 0x08]
-+	subcc		%o3, 0x10, %o3
-+	add		%o1, 0x10, %o1
-+	bne,pt		%xcc, 1b
-+	 add		%o2, 0x10, %o2
-+	stx		%g3, [%o4 + 0x00]
-+	stx		%g7, [%o4 + 0x08]
-+	retl
-+	 nop
-+ENDPROC(aes_sparc64_ctr_crypt_256)
-diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
-index 0b1de0b..f457fc6 100644
---- a/arch/sparc/crypto/aes_glue.c
-+++ b/arch/sparc/crypto/aes_glue.c
-@@ -39,6 +39,8 @@ struct aes_ops {
- 			    unsigned int len, u64 *iv);
- 	void (*cbc_decrypt)(const u64 *key, const u64 *input, u64 *output,
- 			    unsigned int len, u64 *iv);
-+	void (*ctr_crypt)(const u64 *key, const u64 *input, u64 *output,
-+			  unsigned int len, u64 *iv);
- };
++10:	ldx		[%o1 + 0x00], %g3
++	ldx		[%o1 + 0x08], %g7
+ 	xor		%g1, %g3, %g3
+ 	xor		%g2, %g7, %g7
+ 	MOVXTOD_G3_F4
+@@ -887,10 +1020,7 @@ ENTRY(aes_sparc64_ecb_encrypt_256)
+ 	ENCRYPT_256(8, 4, 6, 0, 2)
+ 	std		%f4, [%o2 + 0x00]
+ 	std		%f6, [%o2 + 0x08]
+-	subcc		%o3, 0x10, %o3
+-	bne,pt		%xcc, 1b
+-	 add		%o2, 0x10, %o2
+-	retl
++11:	retl
+ 	 nop
+ ENDPROC(aes_sparc64_ecb_encrypt_256)
  
- struct crypto_sparc64_aes_ctx {
-@@ -108,6 +110,16 @@ extern void aes_sparc64_cbc_decrypt_256(const u64 *key, const u64 *input,
- 					u64 *output, unsigned int len,
- 					u64 *iv);
- 
-+extern void aes_sparc64_ctr_crypt_128(const u64 *key, const u64 *input,
-+				      u64 *output, unsigned int len,
-+				      u64 *iv);
-+extern void aes_sparc64_ctr_crypt_192(const u64 *key, const u64 *input,
-+				      u64 *output, unsigned int len,
-+				      u64 *iv);
-+extern void aes_sparc64_ctr_crypt_256(const u64 *key, const u64 *input,
-+				      u64 *output, unsigned int len,
-+				      u64 *iv);
-+
- struct aes_ops aes128_ops = {
- 	.encrypt		= aes_sparc64_encrypt_128,
- 	.decrypt		= aes_sparc64_decrypt_128,
-@@ -117,6 +129,7 @@ struct aes_ops aes128_ops = {
- 	.ecb_decrypt		= aes_sparc64_ecb_decrypt_128,
- 	.cbc_encrypt		= aes_sparc64_cbc_encrypt_128,
- 	.cbc_decrypt		= aes_sparc64_cbc_decrypt_128,
-+	.ctr_crypt		= aes_sparc64_ctr_crypt_128,
- };
- 
- struct aes_ops aes192_ops = {
-@@ -128,6 +141,7 @@ struct aes_ops aes192_ops = {
- 	.ecb_decrypt		= aes_sparc64_ecb_decrypt_192,
- 	.cbc_encrypt		= aes_sparc64_cbc_encrypt_192,
- 	.cbc_decrypt		= aes_sparc64_cbc_decrypt_192,
-+	.ctr_crypt		= aes_sparc64_ctr_crypt_192,
- };
- 
- struct aes_ops aes256_ops = {
-@@ -139,6 +153,7 @@ struct aes_ops aes256_ops = {
- 	.ecb_decrypt		= aes_sparc64_ecb_decrypt_256,
- 	.cbc_encrypt		= aes_sparc64_cbc_encrypt_256,
- 	.cbc_decrypt		= aes_sparc64_cbc_decrypt_256,
-+	.ctr_crypt		= aes_sparc64_ctr_crypt_256,
- };
- 
- extern void aes_sparc64_key_expand(const u32 *in_key, u64 *output_key,
-@@ -310,6 +325,34 @@ static int cbc_decrypt(struct blkcipher_desc *desc,
- 	return err;
- }
- 
-+static int ctr_crypt(struct blkcipher_desc *desc,
-+		     struct scatterlist *dst, struct scatterlist *src,
-+		     unsigned int nbytes)
-+{
-+	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct blkcipher_walk walk;
-+	int err;
-+
-+	blkcipher_walk_init(&walk, dst, src, nbytes);
-+	err = blkcipher_walk_virt(desc, &walk);
-+
-+	ctx->ops->load_encrypt_keys(&ctx->key[0]);
-+	while ((nbytes = walk.nbytes)) {
-+		unsigned int block_len = nbytes & AES_BLOCK_MASK;
-+
-+		if (likely(block_len)) {
-+			ctx->ops->ctr_crypt(&ctx->key[0],
-+					    (const u64 *)walk.src.virt.addr,
-+					    (u64 *) walk.dst.virt.addr,
-+					    block_len, (u64 *) walk.iv);
-+		}
-+		nbytes &= AES_BLOCK_SIZE - 1;
-+		err = blkcipher_walk_done(desc, &walk, nbytes);
-+	}
-+	fprs_write(0);
-+	return err;
-+}
-+
- static struct crypto_alg algs[] = { {
- 	.cra_name		= "aes",
- 	.cra_driver_name	= "aes-sparc64",
-@@ -366,6 +409,25 @@ static struct crypto_alg algs[] = { {
- 			.decrypt	= cbc_decrypt,
- 		},
- 	},
-+}, {
-+	.cra_name		= "ctr(aes)",
-+	.cra_driver_name	= "ctr-aes-sparc64",
-+	.cra_priority		= 150,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_blocksize		= AES_BLOCK_SIZE,
-+	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
-+	.cra_alignmask		= 7,
-+	.cra_type		= &crypto_blkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_u = {
-+		.blkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aes_set_key,
-+			.encrypt	= ctr_crypt,
-+			.decrypt	= ctr_crypt,
-+		},
-+	},
- } };
- 
- static bool __init sparc64_has_aes_opcode(void)
 -- 
 1.7.10.4
-
