@@ -1,57 +1,74 @@
-From: Seth Jennings <sjenning@linux.vnet.ibm.com>
-Subject: Re: [PATCH] crypto: 842 - remove .cra_list initialization
-Date: Wed, 29 Aug 2012 17:12:49 -0500
-Message-ID: <503E93E1.3070408@linux.vnet.ibm.com>
-References: <20120829203725.6424.60519.stgit@localhost6.localdomain6>
+From: Liu Qiang-B32616 <B32616@freescale.com>
+Subject: RE: [PATCH v7 0/8] Raid: enable talitos xor offload for improving
+ performance
+Date: Thu, 30 Aug 2012 06:20:05 +0000
+Message-ID: <BCB48C05FCE8BC4D9E61E841ECBE6DB70FC695@039-SN2MPN1-011.039d.mgd.msft.net>
+References: <1344500375-8457-1-git-send-email-qiang.liu@freescale.com>
+ <20120809170307.GG14264@ovro.caltech.edu>
+ <BCB48C05FCE8BC4D9E61E841ECBE6DB70E3D47@039-SN2MPN1-013.039d.mgd.msft.net>
+ <CAA9_cme4tHrx14JaSaHwgcGq79qQK5bv8E205fbC3ega5OpUiQ@mail.gmail.com>
+ <BCB48C05FCE8BC4D9E61E841ECBE6DB70FC3CA@039-SN2MPN1-011.039d.mgd.msft.net>
+ <1346251975.27020.2.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	Robert Jennings <rcj@linux.vnet.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e3.ny.us.ibm.com ([32.97.182.143]:59020 "EHLO e3.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753853Ab2H2WNB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Aug 2012 18:13:01 -0400
-Received: from /spool/local
-	by e3.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <sjenning@linux.vnet.ibm.com>;
-	Wed, 29 Aug 2012 18:12:59 -0400
-Received: from d01relay05.pok.ibm.com (d01relay05.pok.ibm.com [9.56.227.237])
-	by d01dlp03.pok.ibm.com (Postfix) with ESMTP id D54A1C90041
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Aug 2012 18:12:51 -0400 (EDT)
-Received: from d01av03.pok.ibm.com (d01av03.pok.ibm.com [9.56.224.217])
-	by d01relay05.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id q7TMCpEF109636
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Aug 2012 18:12:51 -0400
-Received: from d01av03.pok.ibm.com (loopback [127.0.0.1])
-	by d01av03.pok.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id q7TMCoxq009995
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Aug 2012 19:12:51 -0300
-In-Reply-To: <20120829203725.6424.60519.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ "arnd@arndb.de" <arnd@arndb.de>, "Ira W.
+ Snyder" <iws@ovro.caltech.edu>, "vinod.koul@intel.com" <vinod.koul@intel.com>,
+ "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Dan Williams <djbw@fb.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1346251975.27020.2.camel@localhost.localdomain>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On 08/29/2012 03:37 PM, Jussi Kivilinna wrote:
-> .cra_list initialization is unneeded and have been removed from all other
-> crypto modules except 842.
+> -----Original Message-----
+> From: Dan Williams [mailto:djbw@fb.com]
+> Sent: Wednesday, August 29, 2012 10:53 PM
+> To: Liu Qiang-B32616
+> Cc: vinod.koul@intel.com; arnd@arndb.de; herbert@gondor.apana.org.au;
+> gregkh@linuxfoundation.org; linuxppc-dev@lists.ozlabs.org; linux-
+> kernel@vger.kernel.org; linux-crypto@vger.kernel.org; Ira W. Snyder
+> Subject: Re: [PATCH v7 0/8] Raid: enable talitos xor offload for
+> improving performance
 > 
-> Cc: Robert Jennings <rcj@linux.vnet.ibm.com>
-> Cc: Seth Jennings <sjenning@linux.vnet.ibm.com>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> On Wed, 2012-08-29 at 11:15 +0000, Liu Qiang-B32616 wrote:
+> > Hi Dan,
+> >
+> > Ping?
+> > Can you apply these patches? Thanks.
+> >
 > 
-> ---
+> I'm working my way through them.
 > 
-> I don't have ppc64 cross-compiler set up, so I couldn't test this. However
-> patch is obvious and should work.
+> The first thing I notice is that xor_chan->desc_lock is taken
+> inconsistently.  I.e. spin_lock_irqsave() in talitos_process_pending()
+> and spin_lock_bh() everywhere else.  Have you run these patches with
+> lockdep?
+Thanks for your reply.
+LOCKDEP is enabled as you suggested, there is not any info about "inconsistent lock state" displayed.
+I don't know whether it's enough.
 
-Applied on top of next-20120824 and it builds on ppc64, just
-for peace of mind :)
+I'm confused about the attribute of DMA_INTERRUPT, my understanding is this interface is only used to trigger an interrupt (make sure all former operations are finished before switching to other channels), but fsl-dma will trigger an interrupt by "Programmed Error". I'm wondering whether other hardware are same with fsl-dma (the interrupt is a normal interrupt, but not an error) i.e. xscale-iop?
+If other hardware also trigger an interrupt by an abnormal error, maybe my patch 2/8 should be reverted because it violates the rules of this attribute.
 
-I see the other patch in next that did this for all the others.
+BTW, could you please reply in the patch if you have any comments. Thanks.
 
-Acked-by: Seth Jennings <sjenning@linux.vnet.ibm.com>
-
---
-Seth
+> 
+> --
+> Dan
+> 
+> 
