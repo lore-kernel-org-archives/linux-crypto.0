@@ -1,96 +1,73 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: caam - add IPsec ESN support
-Date: Tue, 4 Sep 2012 19:18:00 +0300
-Message-ID: <1346775480-15520-1-git-send-email-horia.geanta@freescale.com>
+From: Dan Williams <djbw@fb.com>
+Subject: Re: [PATCH v7 1/8] Talitos: Support for async_tx XOR offload
+Date: Tue, 4 Sep 2012 18:19:45 -0700
+Message-ID: <CAA9_cmfT1R2+r9_8g0giMJz+wvrNce6T6GPDpvUTtcA-UyAZNQ@mail.gmail.com>
+References: <1344500448-10927-1-git-send-email-qiang.liu@freescale.com>
+	<CAA9_cmdqmuhAcaqfkjvKSpsTL350BAJcY8pn6U=SJ9Nok1-XuA@mail.gmail.com>
+	<BCB48C05FCE8BC4D9E61E841ECBE6DB70FFB67@039-SN2MPN1-011.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe002.messaging.microsoft.com ([216.32.180.185]:28732
-	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756989Ab2IDNUj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Sep 2012 09:20:39 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	Li Yang-R58472 <r58472@freescale.com>,
+	Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
+	"vinod.koul@intel.com" <vinod.koul@intel.com>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	Dave Jiang <dave.jiang@gmail.com>
+To: Liu Qiang-B32616 <B32616@freescale.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <BCB48C05FCE8BC4D9E61E841ECBE6DB70FFB67@039-SN2MPN1-011.039d.mgd.msft.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Support for ESNs (extended sequence numbers).
-Tested with strongswan by connecting back-to-back P1010RDB with P2020RDB.
+On Tue, Sep 4, 2012 at 5:28 AM, Liu Qiang-B32616 <B32616@freescale.com> wrote:
+>> Will this engine be coordinating with another to handle memory copies?
+>>  The dma mapping code for async_tx/raid is broken when dma mapping
+>> requests overlap or cross dma device boundaries [1].
+>>
+>> [1]: http://marc.info/?l=linux-arm-kernel&m=129407269402930&w=2
+> Yes, it needs fsl-dma to handle memcpy copies.
+> I read your link, the unmap address is stored in talitos hwdesc, the address will be unmapped when async_tx ack this descriptor, I know fsl-dma won't wait this ack flag in current kernel, so I fix it in fsl-dma patch 5/8. Do you mean that?
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
- drivers/crypto/caam/caamalg.c |   27 +++++++++++++++++++++++++--
- drivers/crypto/caam/compat.h  |    1 +
- 2 files changed, 26 insertions(+), 2 deletions(-)
+Unfortunately no.  I'm open to other suggestions. but as far as I can
+see it requires deeper changes to rip out the dma mapping that happens
+in async_tx and the automatic unmapping done by drivers.  It should
+all be pushed to the client (md).
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 6b48295..5928e2f 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1650,7 +1650,11 @@ struct caam_alg_template {
- };
- 
- static struct caam_alg_template driver_algs[] = {
--	/* single-pass ipsec_esp descriptor */
-+	/*
-+	 * single-pass ipsec_esp descriptor
-+	 * authencesn(*,*) is also registered, although not present
-+	 * explicitly here.
-+	 */
- 	{
- 		.name = "authenc(hmac(md5),cbc(aes))",
- 		.driver_name = "authenc-hmac-md5-cbc-aes-caam",
-@@ -2213,7 +2217,9 @@ static int __init caam_algapi_init(void)
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
- 		/* TODO: check if h/w supports alg */
- 		struct caam_crypto_alg *t_alg;
-+		bool done = false;
- 
-+authencesn:
- 		t_alg = caam_alg_alloc(ctrldev, &driver_algs[i]);
- 		if (IS_ERR(t_alg)) {
- 			err = PTR_ERR(t_alg);
-@@ -2227,8 +2233,25 @@ static int __init caam_algapi_init(void)
- 			dev_warn(ctrldev, "%s alg registration failed\n",
- 				t_alg->crypto_alg.cra_driver_name);
- 			kfree(t_alg);
--		} else
-+		} else {
- 			list_add_tail(&t_alg->entry, &priv->alg_list);
-+			if (driver_algs[i].type == CRYPTO_ALG_TYPE_AEAD &&
-+			    !memcmp(driver_algs[i].name, "authenc", 7) &&
-+			    !done) {
-+				char *name;
-+
-+				name = driver_algs[i].name;
-+				memmove(name + 10, name + 7, strlen(name) - 7);
-+				memcpy(name + 7, "esn", 3);
-+
-+				name = driver_algs[i].driver_name;
-+				memmove(name + 10, name + 7, strlen(name) - 7);
-+				memcpy(name + 7, "esn", 3);
-+
-+				done = true;
-+				goto authencesn;
-+			}
-+		}
- 	}
- 	if (!list_empty(&priv->alg_list))
- 		dev_info(ctrldev, "%s algorithms registered in /proc/crypto\n",
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index 762aeff..cf15e78 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -23,6 +23,7 @@
- #include <linux/types.h>
- #include <linux/debugfs.h>
- #include <linux/circ_buf.h>
-+#include <linux/string.h>
- #include <net/xfrm.h>
- 
- #include <crypto/algapi.h>
--- 
-1.7.7.6
+Currently async_tx hides hardware details from md such that it doesn't
+even care if the operation is offloaded to hardware at all, but that
+takes things too far.  In the worst case an copy->xor chain handled by
+multiple channels results in :
+
+1/ dma_map(copy_chan...)
+2/ dma_map(xor_chan...)
+3/ <exec copy>
+4/ dma_unmap(copy_chan...)
+5/ <exec xor> <---initiated by the copy_chan
+6/ dma_unmap(xor_chan...)
+
+Step 2 violates the dma api since the buffers belong to the xor_chan
+until unmap.  Step 5 also causes the random completion context of the
+copy channel to bleed into submission context of the xor channel which
+is problematic.  So the order needs to be:
+
+1/ dma_map(copy_chan...)
+2/ <exec copy>
+3/ dma_unmap(copy_chan...)
+4/ dma_map(xor_chan...)
+5/ <exec xor> <--initiated by md in a static context
+6/ dma_unmap(xor_chan...)
+
+Also, if xor_chan and copy_chan lie with the same dma mapping domain
+(iommu or parent device) then we can map the stripe once and skip the
+extra maintenance for the duration of the chain of operations.  This
+dumps a lot of hardware details on md, but I think it is the only way
+to get consistent semantics when arbitrary offload devices are
+involved.
+
+--
+Dan
