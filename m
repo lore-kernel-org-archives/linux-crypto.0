@@ -1,73 +1,71 @@
-From: Dan Williams <djbw@fb.com>
-Subject: Re: [PATCH v7 1/8] Talitos: Support for async_tx XOR offload
-Date: Tue, 4 Sep 2012 18:19:45 -0700
-Message-ID: <CAA9_cmfT1R2+r9_8g0giMJz+wvrNce6T6GPDpvUTtcA-UyAZNQ@mail.gmail.com>
-References: <1344500448-10927-1-git-send-email-qiang.liu@freescale.com>
-	<CAA9_cmdqmuhAcaqfkjvKSpsTL350BAJcY8pn6U=SJ9Nok1-XuA@mail.gmail.com>
-	<BCB48C05FCE8BC4D9E61E841ECBE6DB70FFB67@039-SN2MPN1-011.039d.mgd.msft.net>
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: Re: [PATCH] crypto: geode-aes: Use module_pci_driver
+Date: Thu, 6 Sep 2012 09:41:06 +0530
+Message-ID: <CAK9yfHzoZScpD=BPjoSVGr+p7B5Xb0E8M-zMAc9-cyGCfL7Jug@mail.gmail.com>
+References: <1346062531-27827-1-git-send-email-sachin.kamat@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	Li Yang-R58472 <r58472@freescale.com>,
-	Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
-	"vinod.koul@intel.com" <vinod.koul@intel.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	Dave Jiang <dave.jiang@gmail.com>
-To: Liu Qiang-B32616 <B32616@freescale.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <BCB48C05FCE8BC4D9E61E841ECBE6DB70FFB67@039-SN2MPN1-011.039d.mgd.msft.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-geode@lists.infradead.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, sachin.kamat@linaro.org, patches@linaro.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vb0-f46.google.com ([209.85.212.46]:49774 "EHLO
+	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750736Ab2IFELH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Sep 2012 00:11:07 -0400
+Received: by vbbff1 with SMTP id ff1so965353vbb.19
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Sep 2012 21:11:06 -0700 (PDT)
+In-Reply-To: <1346062531-27827-1-git-send-email-sachin.kamat@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 4, 2012 at 5:28 AM, Liu Qiang-B32616 <B32616@freescale.com> wrote:
->> Will this engine be coordinating with another to handle memory copies?
->>  The dma mapping code for async_tx/raid is broken when dma mapping
->> requests overlap or cross dma device boundaries [1].
->>
->> [1]: http://marc.info/?l=linux-arm-kernel&m=129407269402930&w=2
-> Yes, it needs fsl-dma to handle memcpy copies.
-> I read your link, the unmap address is stored in talitos hwdesc, the address will be unmapped when async_tx ack this descriptor, I know fsl-dma won't wait this ack flag in current kernel, so I fix it in fsl-dma patch 5/8. Do you mean that?
+Hi,
 
-Unfortunately no.  I'm open to other suggestions. but as far as I can
-see it requires deeper changes to rip out the dma mapping that happens
-in async_tx and the automatic unmapping done by drivers.  It should
-all be pushed to the client (md).
+Any comments on this patch?
 
-Currently async_tx hides hardware details from md such that it doesn't
-even care if the operation is offloaded to hardware at all, but that
-takes things too far.  In the worst case an copy->xor chain handled by
-multiple channels results in :
+On 27 August 2012 15:45, Sachin Kamat <sachin.kamat@linaro.org> wrote:
+> module_pci_driver makes the code simpler by eliminating
+> module_init and module_exit calls.
+>
+> Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+> ---
+>  drivers/crypto/geode-aes.c |   15 +--------------
+>  1 files changed, 1 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+> index 933fb4b4..51f196d 100644
+> --- a/drivers/crypto/geode-aes.c
+> +++ b/drivers/crypto/geode-aes.c
+> @@ -585,21 +585,8 @@ static struct pci_driver geode_aes_driver = {
+>         .remove = __devexit_p(geode_aes_remove)
+>  };
+>
+> -static int __init
+> -geode_aes_init(void)
+> -{
+> -       return pci_register_driver(&geode_aes_driver);
+> -}
+> -
+> -static void __exit
+> -geode_aes_exit(void)
+> -{
+> -       pci_unregister_driver(&geode_aes_driver);
+> -}
+> +module_pci_driver(geode_aes_driver);
+>
+>  MODULE_AUTHOR("Advanced Micro Devices, Inc.");
+>  MODULE_DESCRIPTION("Geode LX Hardware AES driver");
+>  MODULE_LICENSE("GPL");
+> -
+> -module_init(geode_aes_init);
+> -module_exit(geode_aes_exit);
+> --
+> 1.7.4.1
+>
 
-1/ dma_map(copy_chan...)
-2/ dma_map(xor_chan...)
-3/ <exec copy>
-4/ dma_unmap(copy_chan...)
-5/ <exec xor> <---initiated by the copy_chan
-6/ dma_unmap(xor_chan...)
 
-Step 2 violates the dma api since the buffers belong to the xor_chan
-until unmap.  Step 5 also causes the random completion context of the
-copy channel to bleed into submission context of the xor channel which
-is problematic.  So the order needs to be:
 
-1/ dma_map(copy_chan...)
-2/ <exec copy>
-3/ dma_unmap(copy_chan...)
-4/ dma_map(xor_chan...)
-5/ <exec xor> <--initiated by md in a static context
-6/ dma_unmap(xor_chan...)
-
-Also, if xor_chan and copy_chan lie with the same dma mapping domain
-(iommu or parent device) then we can map the stripe once and skip the
-extra maintenance for the duration of the chain of operations.  This
-dumps a lot of hardware details on md, but I think it is the only way
-to get consistent semantics when arbitrary offload devices are
-involved.
-
---
-Dan
+-- 
+With warm regards,
+Sachin
