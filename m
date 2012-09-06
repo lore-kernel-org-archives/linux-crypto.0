@@ -1,26 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] sparc64: AES driver improvements
-Date: Thu, 6 Sep 2012 12:49:31 -0700
-Message-ID: <20120906194931.GB22661@gondor.apana.org.au>
-References: <20120830.114555.1966388095294836244.davem@davemloft.net>
+Subject: Re: [PATCH] crypto/caam: Export gen_split_key symbol for other
+ modules
+Date: Thu, 6 Sep 2012 13:11:43 -0700
+Message-ID: <20120906201143.GA24197@gondor.apana.org.au>
+References: <BD4C563D-C5E9-494F-91DD-EA145917FCEC@servergy.com>
+ <20120824183550.0f27912aaf947cc035dabb9b@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: sparclinux@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <sparclinux-owner@vger.kernel.org>
+Cc: Ben Collins <ben.c@servergy.com>, linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sting.hengli.com.au ([178.18.18.71]:46133 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751612Ab2IFULw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Sep 2012 16:11:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20120830.114555.1966388095294836244.davem@davemloft.net>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20120824183550.0f27912aaf947cc035dabb9b@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 30, 2012 at 11:45:55AM -0400, David Miller wrote:
+On Fri, Aug 24, 2012 at 06:35:50PM -0500, Kim Phillips wrote:
+> On Thu, 23 Aug 2012 18:39:57 -0400
+> Ben Collins <ben.c@servergy.com> wrote:
 > 
-> This patch series adds CTR mode support to the sparc64 AES driver
-> and then unrolls the loops that we can to get better performance.
+> > In 3.6-rc3, without this patch, the following error occurs with a modular build:
+> > 
+> > ERROR: "gen_split_key" [drivers/crypto/caam/caamhash.ko] undefined!
+> > ERROR: "gen_split_key" [drivers/crypto/caam/caamalg.ko] undefined!
+> > 
+> > Signed-off-by: Ben Collins <ben.c@servergy.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: Yuan Kang <Yuan.Kang@freescale.com>
 > 
-> Signed-off-by: David S. Miller <davem@davemloft.net>
+> Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
-Nice work :)
+Patch applied to crypto.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
