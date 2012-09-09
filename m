@@ -1,83 +1,83 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Linux 3.6-rc5
-Date: Sun, 09 Sep 2012 23:54:04 +0300
-Message-ID: <20120909235404.747466tf3h2pbf48@www.81.fi>
+Date: Sun, 9 Sep 2012 14:00:00 -0700
+Message-ID: <20120909210000.GA10293@gondor.apana.org.au>
 References: <CA+55aFwnPfdyTTG6WTuhChomg=t9nSS18xracq3iQ3F5+PWOog@mail.gmail.com>
  <87har7h84h.fsf@silenus.orebokech.com>
- <20120909155424.862635h7ncykg9s0@www.81.fi>
- <CA+55aFyM52LaD_fF+dwjF1aKKeVCpHpBVqAQeEAZLB+Mnrgsig@mail.gmail.com>
- <20120909185358.GA9782@gondor.apana.org.au>
+ <20120909191958.GB9782@gondor.apana.org.au>
+ <20120909200910.GA11919@r00tworld.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Romain Francoise <romain@orebokech.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Romain Francoise <romain@orebokech.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:38894 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752216Ab2IIUyI (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:51748 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751192Ab2IIVAI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 9 Sep 2012 16:54:08 -0400
-In-Reply-To: <20120909185358.GA9782@gondor.apana.org.au>
+	Sun, 9 Sep 2012 17:00:08 -0400
 Content-Disposition: inline
+In-Reply-To: <20120909200910.GA11919@r00tworld.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Herbert Xu <herbert@gondor.apana.org.au>:
-
-> On Sun, Sep 09, 2012 at 08:35:56AM -0700, Linus Torvalds wrote:
->> On Sun, Sep 9, 2012 at 5:54 AM, Jussi Kivilinna
->> <jussi.kivilinna@mbnet.fi> wrote:
->> >
->> > Does reverting e46e9a46386bca8e80a6467b5c643dc494861896 help?
->> >
->> > That commit added crypto selftest for authenc(hmac(sha1),cbc(aes)) in 3.6,
->> > and probably made this bug visible (but not directly causing it).
->>
->> So Romain said it does - where do we go from here? Revert testing it,
->> or fix the authenc() case? I'd prefer the fix..
+On Sun, Sep 09, 2012 at 10:09:10PM +0200, Mathias Krause wrote:
 >
-> I'm working on this right now.  If we don't get anywhere in a
-> couple of days we can revert the test vector patch.
->
+> It happens with the C variants of SHA1 and AES, too. You can easily
+> trigger the bug with Steffen's crconf[1]:
+> 
+> $ crconf add alg "authenc(hmac(sha1-generic),cbc(aes-generic))" type 3
+> 
+> So the problem is likely not related to sha1-ssse3.ko or aesni-intel.ko.
 
-It seems that authenc is chaining empty assoc scatterlist, which causes
-BUG_ON(!sg->length) set off in crypto/scatterwalk.c.
+Thanks! I think this patch should fix the problem.  Can someone
+please confirm this?
 
-Following fixes the bug and self-test passes, but not sure if it's correct
-(note, copy-paste to 'broken' email client, most likely does not apply etc):
+crypto: authenc - Fix crash with zero-length assoc data
+
+The authenc code doesn't deal with zero-length associated data
+correctly and ends up constructing a zero-length sg entry which
+causes a crash when it's fed into the crypto system.
+
+This patch fixes this by avoiding the code-path that triggers
+the SG construction if we have no associated data.
+
+This isn't the most optimal fix as it means that we'll end up
+using the fallback code-path even when we could still execute
+the digest function.  However, this isn't a big deal as nobody
+but the test path would supply zero-length associated data.
+
+Reported-by: Romain Francoise <romain@orebokech.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 5ef7ba6..2373af5 100644
+index 5ef7ba6..d0583a4 100644
 --- a/crypto/authenc.c
 +++ b/crypto/authenc.c
-@@ -336,7 +336,7 @@ static int crypto_authenc_genicv(struct  
-aead_request *req, u8 *iv,
-                 cryptlen += ivsize;
-         }
+@@ -336,7 +336,7 @@ static int crypto_authenc_genicv(struct aead_request *req, u8 *iv,
+ 		cryptlen += ivsize;
+ 	}
+ 
+-	if (sg_is_last(assoc)) {
++	if (req->assoclen && sg_is_last(assoc)) {
+ 		authenc_ahash_fn = crypto_authenc_ahash;
+ 		sg_init_table(asg, 2);
+ 		sg_set_page(asg, sg_page(assoc), assoc->length, assoc->offset);
+@@ -490,7 +490,7 @@ static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
+ 		cryptlen += ivsize;
+ 	}
+ 
+-	if (sg_is_last(assoc)) {
++	if (req->assoclen && sg_is_last(assoc)) {
+ 		authenc_ahash_fn = crypto_authenc_ahash;
+ 		sg_init_table(asg, 2);
+ 		sg_set_page(asg, sg_page(assoc), assoc->length, assoc->offset);
 
--       if (sg_is_last(assoc)) {
-+       if (req->assoclen > 0 && sg_is_last(assoc)) {
-                 authenc_ahash_fn = crypto_authenc_ahash;
-                 sg_init_table(asg, 2);
-                 sg_set_page(asg, sg_page(assoc), assoc->length,  
-assoc->offset);
-
-
-Also does crypto_authenc_iverify() need same fix?
-
--Jussi
-
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
->
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
