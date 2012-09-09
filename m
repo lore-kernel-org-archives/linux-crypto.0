@@ -1,46 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Linux 3.6-rc5
-Date: Sun, 9 Sep 2012 11:53:58 -0700
-Message-ID: <20120909185358.GA9782@gondor.apana.org.au>
-References: <CA+55aFwnPfdyTTG6WTuhChomg=t9nSS18xracq3iQ3F5+PWOog@mail.gmail.com>
- <87har7h84h.fsf@silenus.orebokech.com>
- <20120909155424.862635h7ncykg9s0@www.81.fi>
- <CA+55aFyM52LaD_fF+dwjF1aKKeVCpHpBVqAQeEAZLB+Mnrgsig@mail.gmail.com>
+From: Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>
+Subject: Re: [PATCH] Crypto: CESA: Add support for DT based instantiation.
+Date: Sun, 9 Sep 2012 15:13:31 -0400
+Message-ID: <20120909191331.GD4575@titan.lakedaemon.net>
+References: <1346696974-23443-1-git-send-email-andrew@lunn.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-	Romain Francoise <romain@orebokech.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:34473 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754173Ab2IISyJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 9 Sep 2012 14:54:09 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree-discuss-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux ARM <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+To: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
+Return-path: <devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CA+55aFyM52LaD_fF+dwjF1aKKeVCpHpBVqAQeEAZLB+Mnrgsig@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1346696974-23443-1-git-send-email-andrew-g2DYL2Zd6BY@public.gmane.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/devicetree-discuss>,
+ <mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/devicetree-discuss/>
+List-Post: <mailto:devicetree-discuss-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+List-Help: <mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/devicetree-discuss>,
+ <mailto:devicetree-discuss-request-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org?subject=subscribe>
+Errors-To: devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+Sender: "devicetree-discuss"
+ <devicetree-discuss-bounces+gldd-devicetree-discuss=m.gmane.org-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Sep 09, 2012 at 08:35:56AM -0700, Linus Torvalds wrote:
-> On Sun, Sep 9, 2012 at 5:54 AM, Jussi Kivilinna
-> <jussi.kivilinna@mbnet.fi> wrote:
-> >
-> > Does reverting e46e9a46386bca8e80a6467b5c643dc494861896 help?
-> >
-> > That commit added crypto selftest for authenc(hmac(sha1),cbc(aes)) in 3.6,
-> > and probably made this bug visible (but not directly causing it).
+On Mon, Sep 03, 2012 at 08:29:34PM +0200, Andrew Lunn wrote:
+> Based on work by Michael Waller and Jason Cooper.
 > 
-> So Romain said it does - where do we go from here? Revert testing it,
-> or fix the authenc() case? I'd prefer the fix..
+> Added support for getting the interrupt number and address of SRAM
+> from DT.
+> 
+> Signed-off-by: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
 
-I'm working on this right now.  If we don't get anywhere in a
-couple of days we can revert the test vector patch.
+Applied to:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+git://git.infradead.org/users/jcooper/linux.git kirkwood/dt
+
+thx,
+
+Jason.
