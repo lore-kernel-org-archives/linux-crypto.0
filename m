@@ -1,54 +1,56 @@
-From: Romain Francoise <romain@orebokech.com>
-Subject: Re: Linux 3.6-rc5
-Date: Mon, 10 Sep 2012 19:18:17 +0200
-Message-ID: <878vchdcfa.fsf@silenus.orebokech.com>
-References: <CA+55aFwnPfdyTTG6WTuhChomg=t9nSS18xracq3iQ3F5+PWOog@mail.gmail.com>
-	<87har7h84h.fsf@silenus.orebokech.com>
-	<20120909191958.GB9782@gondor.apana.org.au>
-	<20120909200910.GA11919@r00tworld.net>
-	<20120909210000.GA10293@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 3.6
+Date: Mon, 10 Sep 2012 21:10:13 -0700
+Message-ID: <20120911041013.GA20157@gondor.apana.org.au>
+References: <20100716022648.GA28219@gondor.apana.org.au>
+ <20100722055043.GA25689@gondor.apana.org.au>
+ <20100903060055.GA28915@gondor.apana.org.au>
+ <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Mathias Krause <minipli@googlemail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stringer.orebokech.com ([88.190.240.207]:44576 "EHLO
-	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754626Ab2IJRST (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:38243 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751111Ab2IKEKV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Sep 2012 13:18:19 -0400
-In-Reply-To: <20120909210000.GA10293@gondor.apana.org.au> (Herbert Xu's
-	message of "Sun, 9 Sep 2012 14:00:00 -0700")
+	Tue, 11 Sep 2012 00:10:21 -0400
+Content-Disposition: inline
+In-Reply-To: <20120823083242.GA23102@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+Hi Linus:
 
-> Thanks! I think this patch should fix the problem.  Can someone
-> please confirm this?
+This push fixes the authenc self-test crash as well as a missing
+export of a symbol used by a module.
 
-Works for me as well, thanks!
+Please pull from
 
-> crypto: authenc - Fix crash with zero-length assoc data
->
-> The authenc code doesn't deal with zero-length associated data
-> correctly and ends up constructing a zero-length sg entry which
-> causes a crash when it's fed into the crypto system.
->
-> This patch fixes this by avoiding the code-path that triggers
-> the SG construction if we have no associated data.
->
-> This isn't the most optimal fix as it means that we'll end up
-> using the fallback code-path even when we could still execute
-> the digest function.  However, this isn't a big deal as nobody
-> but the test path would supply zero-length associated data.
->
-> Reported-by: Romain Francoise <romain@orebokech.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Feel free to change this to:
+or
 
-Reported-and-tested-by: Romain Francoise <romain@orebokech.com>
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Ben Collins (1):
+      crypto/caam: Export gen_split_key symbol for other modules
+
+Herbert Xu (1):
+      crypto: authenc - Fix crash with zero-length assoc data
+   
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
