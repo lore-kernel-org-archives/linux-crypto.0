@@ -1,7 +1,8 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 13/16] X.509: Add simple ASN.1 grammar compiler
-Date: Fri, 14 Sep 2012 00:49:55 +0100
-Message-ID: <20120913234955.3575.54.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 16/16] X.509: Add a crypto key parser for binary (DER) X.509
+ certificates
+Date: Fri, 14 Sep 2012 00:50:23 +0100
+Message-ID: <20120913235023.3575.67327.stgit@warthog.procyon.org.uk>
 References: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,1824 +16,939 @@ In-Reply-To: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a simple ASN.1 grammar compiler.  This produces a bytecode output that can
-be fed to a decoder to inform the decoder how to interpret the ASN.1 stream it
-is trying to parse.
+Add a crypto key parser for binary (DER) encoded X.509 certificates.  The
+certificate is parsed and, if possible, the signature is verified.
 
-Action functions can be specified in the grammar by interpolating:
+An X.509 key can be added like this:
 
-	({ foo })
+	# keyctl padd crypto bar @s </tmp/x509.cert
+	15768135
 
-after a type, for example:
-	
-	SubjectPublicKeyInfo ::= SEQUENCE {
-		algorithm		AlgorithmIdentifier,
-		subjectPublicKey	BIT STRING ({ do_key_data })
-		}
+and displayed like this:
 
-The decoder is expected to call these after matching this type and parsing the
-contents if it is a constructed type.
+	# cat /proc/keys
+	00f09a47 I--Q---     1 perm 39390000     0     0 asymmetri bar: X509.RSA e9fd6d08 []
 
-The grammar compiler does not currently support the SET type (though it does
-support SET OF) as I can't see a good way of tracking which members have been
-encountered yet without using up extra stack space.
+Note that this only works with binary certificates.  PEM encoded certificates
+are ignored by the parser.
 
-Currently, the grammar compiler will fail if more than 256 bytes of bytecode
-would be produced or more than 256 actions have been specified as it uses
-8-bit jump values and action indices to keep space usage down.
+Note also that the X.509 key ID is not congruent with the PGP key ID, but for
+the moment, they will match.
+
+If a NULL or "" name is given to add_key(), then the parser will generate a key
+description from the CertificateSerialNumber and Name fields of the
+TBSCertificate:
+
+	00aefc4e I--Q---     1 perm 39390000     0     0 asymmetri bfbc0cd76d050ea4:/C=GB/L=Cambridge/O=Red Hat/CN=kernel key: X509.RSA 0c688c7b []
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- include/linux/asn1.h              |   67 ++
- include/linux/asn1_ber_bytecode.h |   87 ++
- init/Kconfig                      |    8 
- scripts/.gitignore                |    1 
- scripts/Makefile                  |    2 
- scripts/Makefile.build            |   11 
- scripts/asn1_compiler.c           | 1544 +++++++++++++++++++++++++++++++++++++
- 7 files changed, 1720 insertions(+)
- create mode 100644 include/linux/asn1.h
- create mode 100644 include/linux/asn1_ber_bytecode.h
- create mode 100644 scripts/asn1_compiler.c
+ crypto/asymmetric_keys/.gitignore         |    1 
+ crypto/asymmetric_keys/Kconfig            |   10 +
+ crypto/asymmetric_keys/Makefile           |   17 +
+ crypto/asymmetric_keys/x509.asn1          |   60 +++
+ crypto/asymmetric_keys/x509_cert_parser.c |  503 +++++++++++++++++++++++++++++
+ crypto/asymmetric_keys/x509_parser.h      |   37 ++
+ crypto/asymmetric_keys/x509_public_key.c  |  206 ++++++++++++
+ crypto/asymmetric_keys/x509_rsakey.asn1   |    4 
+ 8 files changed, 838 insertions(+)
+ create mode 100644 crypto/asymmetric_keys/.gitignore
+ create mode 100644 crypto/asymmetric_keys/x509.asn1
+ create mode 100644 crypto/asymmetric_keys/x509_cert_parser.c
+ create mode 100644 crypto/asymmetric_keys/x509_parser.h
+ create mode 100644 crypto/asymmetric_keys/x509_public_key.c
+ create mode 100644 crypto/asymmetric_keys/x509_rsakey.asn1
 
 
-diff --git a/include/linux/asn1.h b/include/linux/asn1.h
+diff --git a/crypto/asymmetric_keys/.gitignore b/crypto/asymmetric_keys/.gitignore
 new file mode 100644
-index 0000000..5c3f4e4
+index 0000000..ee32837
 --- /dev/null
-+++ b/include/linux/asn1.h
-@@ -0,0 +1,67 @@
-+/* ASN.1 BER/DER/CER encoding definitions
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#ifndef _LINUX_ASN1_H
-+#define _LINUX_ASN1_H
-+
-+/* Class */
-+enum asn1_class {
-+	ASN1_UNIV	= 0,	/* Universal */
-+	ASN1_APPL	= 1,	/* Application */
-+	ASN1_CONT	= 2,	/* Context */
-+	ASN1_PRIV	= 3	/* Private */
-+};
-+#define ASN1_CLASS_BITS	0xc0
-+
-+
-+enum asn1_method {
-+	ASN1_PRIM	= 0,	/* Primitive */
-+	ASN1_CONS	= 1	/* Constructed */
-+};
-+#define ASN1_CONS_BIT	0x20
-+
-+/* Tag */
-+enum asn1_tag {
-+	ASN1_EOC	= 0,	/* End Of Contents or N/A */
-+	ASN1_BOOL	= 1,	/* Boolean */
-+	ASN1_INT	= 2,	/* Integer */
-+	ASN1_BTS	= 3,	/* Bit String */
-+	ASN1_OTS	= 4,	/* Octet String */
-+	ASN1_NULL	= 5,	/* Null */
-+	ASN1_OID	= 6,	/* Object Identifier  */
-+	ASN1_ODE	= 7,	/* Object Description */
-+	ASN1_EXT	= 8,	/* External */
-+	ASN1_REAL	= 9,	/* Real float */
-+	ASN1_ENUM	= 10,	/* Enumerated */
-+	ASN1_EPDV	= 11,	/* Embedded PDV */
-+	ASN1_UTF8STR	= 12,	/* UTF8 String */
-+	ASN1_RELOID	= 13,	/* Relative OID */
-+	/* 14 - Reserved */
-+	/* 15 - Reserved */
-+	ASN1_SEQ	= 16,	/* Sequence and Sequence of */
-+	ASN1_SET	= 17,	/* Set and Set of */
-+	ASN1_NUMSTR	= 18,	/* Numerical String */
-+	ASN1_PRNSTR	= 19,	/* Printable String */
-+	ASN1_TEXSTR	= 20,	/* T61 String / Teletext String */
-+	ASN1_VIDSTR	= 21,	/* Videotex String */
-+	ASN1_IA5STR	= 22,	/* IA5 String */
-+	ASN1_UNITIM	= 23,	/* Universal Time */
-+	ASN1_GENTIM	= 24,	/* General Time */
-+	ASN1_GRASTR	= 25,	/* Graphic String */
-+	ASN1_VISSTR	= 26,	/* Visible String */
-+	ASN1_GENSTR	= 27,	/* General String */
-+	ASN1_UNISTR	= 28,	/* Universal String */
-+	ASN1_CHRSTR	= 29,	/* Character String */
-+	ASN1_BMPSTR	= 30,	/* BMP String */
-+	ASN1_LONG_TAG	= 31	/* Long form tag */
-+};
-+
-+#endif /* _LINUX_ASN1_H */
-diff --git a/include/linux/asn1_ber_bytecode.h b/include/linux/asn1_ber_bytecode.h
-new file mode 100644
-index 0000000..945d44a
---- /dev/null
-+++ b/include/linux/asn1_ber_bytecode.h
-@@ -0,0 +1,87 @@
-+/* ASN.1 BER/DER/CER parsing state machine internal definitions
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#ifndef _LINUX_ASN1_BER_BYTECODE_H
-+#define _LINUX_ASN1_BER_BYTECODE_H
-+
-+#ifdef __KERNEL__
-+#include <linux/types.h>
-+#endif
-+#include <linux/asn1.h>
-+
-+typedef int (*asn1_action_t)(void *context,
-+			     size_t hdrlen, /* In case of ANY type */
-+			     unsigned char tag, /* In case of ANY type */
-+			     const void *value, size_t vlen);
-+
-+struct asn1_decoder {
-+	const unsigned char *machine;
-+	size_t machlen;
-+	const asn1_action_t *actions;
-+};
-+
-+enum asn1_opcode {
-+	/* The tag-matching ops come first and the odd-numbered slots
-+	 * are for OR_SKIP ops.
-+	 */
-+#define ASN1_OP_MATCH__SKIP		  0x01
-+#define ASN1_OP_MATCH__ACT		  0x02
-+#define ASN1_OP_MATCH__JUMP		  0x04
-+#define ASN1_OP_MATCH__ANY		  0x08
-+#define ASN1_OP_MATCH__COND		  0x10
-+
-+	ASN1_OP_MATCH			= 0x00,
-+	ASN1_OP_MATCH_OR_SKIP		= 0x01,
-+	ASN1_OP_MATCH_ACT		= 0x02,
-+	ASN1_OP_MATCH_ACT_OR_SKIP	= 0x03,
-+	ASN1_OP_MATCH_JUMP		= 0x04,
-+	ASN1_OP_MATCH_JUMP_OR_SKIP	= 0x05,
-+	ASN1_OP_MATCH_ANY		= 0x08,
-+	ASN1_OP_MATCH_ANY_ACT		= 0x0a,
-+	/* Everything before here matches unconditionally */
-+
-+	ASN1_OP_COND_MATCH_OR_SKIP	= 0x11,
-+	ASN1_OP_COND_MATCH_ACT_OR_SKIP	= 0x13,
-+	ASN1_OP_COND_MATCH_JUMP_OR_SKIP	= 0x15,
-+	ASN1_OP_COND_MATCH_ANY		= 0x18,
-+	ASN1_OP_COND_MATCH_ANY_ACT	= 0x1a,
-+
-+	/* Everything before here will want a tag from the data */
-+#define ASN1_OP__MATCHES_TAG ASN1_OP_COND_MATCH_ANY_ACT
-+
-+	/* These are here to help fill up space */
-+	ASN1_OP_COND_FAIL		= 0x1b,
-+	ASN1_OP_COMPLETE		= 0x1c,
-+	ASN1_OP_ACT			= 0x1d,
-+	ASN1_OP_RETURN			= 0x1e,
-+
-+	/* The following eight have bit 0 -> SET, 1 -> OF, 2 -> ACT */
-+	ASN1_OP_END_SEQ			= 0x20,
-+	ASN1_OP_END_SET			= 0x21,
-+	ASN1_OP_END_SEQ_OF		= 0x22,
-+	ASN1_OP_END_SET_OF		= 0x23,
-+	ASN1_OP_END_SEQ_ACT		= 0x24,
-+	ASN1_OP_END_SET_ACT		= 0x25,
-+	ASN1_OP_END_SEQ_OF_ACT		= 0x26,
-+	ASN1_OP_END_SET_OF_ACT		= 0x27,
-+#define ASN1_OP_END__SET		  0x01
-+#define ASN1_OP_END__OF			  0x02
-+#define ASN1_OP_END__ACT		  0x04
-+
-+	ASN1_OP__NR
-+};
-+
-+#define _tag(CLASS, CP, TAG) ((ASN1_##CLASS << 6) | (ASN1_##CP << 5) | ASN1_##TAG)
-+#define _tagn(CLASS, CP, TAG) ((ASN1_##CLASS << 6) | (ASN1_##CP << 5) | TAG)
-+#define _jump_target(N) (N)
-+#define _action(N) (N)
-+
-+#endif /* _LINUX_ASN1_BER_BYTECODE_H */
-diff --git a/init/Kconfig b/init/Kconfig
-index af6c7f8..a31db1f 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1612,4 +1612,12 @@ config PADATA
- 	depends on SMP
- 	bool
++++ b/crypto/asymmetric_keys/.gitignore
+@@ -0,0 +1 @@
++*-asn1.[ch]
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 561759d..6d2c2ea 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -25,4 +25,14 @@ config PUBLIC_KEY_ALGO_RSA
+ 	help
+ 	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
  
-+config ASN1
-+	tristate "Simple ASN.1 grammar compiler and stream decoder"
++config X509_CERTIFICATE_PARSER
++	tristate "X.509 certificate parser"
++	depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE
++	select ASN1
++	select OID_REGISTRY
 +	help
-+	  Build a simple ASN.1 grammar compiler that produces a bytecode output
-+	  that can be interpreted by the ASN.1 stream decoder and used to
-+	  inform it as to what tags are to be expected in a stream and what
-+	  functions to call on what tags.
++	  This option procides support for parsing X.509 format blobs for key
++	  data and provides the ability to instantiate a crypto key from a
++	  public key packet found inside the certificate.
 +
- source "kernel/Kconfig.locks"
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-index 65f362d..fb070fa 100644
---- a/scripts/.gitignore
-+++ b/scripts/.gitignore
-@@ -10,3 +10,4 @@ ihex2fw
- recordmcount
- docproc
- sortextable
-+asn1_compiler
-diff --git a/scripts/Makefile b/scripts/Makefile
-index a55b006..01e7adb 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -16,8 +16,10 @@ hostprogs-$(CONFIG_VT)           += conmakehash
- hostprogs-$(CONFIG_IKCONFIG)     += bin2c
- hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
- hostprogs-$(CONFIG_BUILDTIME_EXTABLE_SORT) += sortextable
-+hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 7c92691..0727204 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -8,3 +8,20 @@ asymmetric_keys-y := asymmetric_type.o signature.o
  
- HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
-+HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
- 
- always		:= $(hostprogs-y) $(hostprogs-m)
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ff1720d..0e801c3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -354,6 +354,17 @@ quiet_cmd_cpp_lds_S = LDS     $@
- $(obj)/%.lds: $(src)/%.lds.S FORCE
- 	$(call if_changed_dep,cpp_lds_S)
- 
-+# ASN.1 grammar
-+# ---------------------------------------------------------------------------
-+quiet_cmd_asn1_compiler = ASN.1   $@
-+      cmd_asn1_compiler = $(objtree)/scripts/asn1_compiler $< \
-+				$(subst .h,.c,$@) $(subst .c,.h,$@)
+ obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
+ obj-$(CONFIG_PUBLIC_KEY_ALGO_RSA) += rsa.o
 +
-+.PRECIOUS: $(objtree)/$(obj)/%-asn1.c $(objtree)/$(obj)/%-asn1.h
++#
++# X.509 Certificate handling
++#
++obj-$(CONFIG_X509_CERTIFICATE_PARSER) += x509_key_parser.o
++x509_key_parser-y := \
++	x509-asn1.o \
++	x509_rsakey-asn1.o \
++	x509_cert_parser.o \
++	x509_public_key.o
 +
-+$(obj)/%-asn1.c $(obj)/%-asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
-+	$(call cmd,asn1_compiler)
++$(obj)/x509_cert_parser.o: $(obj)/x509-asn1.h $(obj)/x509_rsakey-asn1.h
++$(obj)/x509-asn1.o: $(obj)/x509-asn1.c $(obj)/x509-asn1.h
++$(obj)/x509_rsakey-asn1.o: $(obj)/x509_rsakey-asn1.c $(obj)/x509_rsakey-asn1.h
 +
- # Build the compiled-in targets
- # ---------------------------------------------------------------------------
- 
-diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
++clean-files	+= x509-asn1.c x509-asn1.h
++clean-files	+= x509_rsakey-asn1.c x509_rsakey-asn1.h
+diff --git a/crypto/asymmetric_keys/x509.asn1 b/crypto/asymmetric_keys/x509.asn1
 new file mode 100644
-index 0000000..77a1599
+index 0000000..a7ad4fc
 --- /dev/null
-+++ b/scripts/asn1_compiler.c
-@@ -0,0 +1,1544 @@
-+/* Simplified ASN.1 notation parser
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
++++ b/crypto/asymmetric_keys/x509.asn1
+@@ -0,0 +1,60 @@
++Certificate ::= SEQUENCE {
++	tbsCertificate		TBSCertificate ({ x509_note_tbs_certificate }),
++	signatureAlgorithm	AlgorithmIdentifier,
++	signature		BIT STRING ({ x509_note_signature })
++	} ({ x509_note_cert_start })
 +
-+#include <stdarg.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <ctype.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <sys/stat.h>
-+#include <linux/asn1_ber_bytecode.h>
-+
-+enum token_type {
-+	DIRECTIVE_ABSENT,
-+	DIRECTIVE_ALL,
-+	DIRECTIVE_ANY,
-+	DIRECTIVE_APPLICATION,
-+	DIRECTIVE_AUTOMATIC,
-+	DIRECTIVE_BEGIN,
-+	DIRECTIVE_BIT,
-+	DIRECTIVE_BMPString,
-+	DIRECTIVE_BOOLEAN,
-+	DIRECTIVE_BY,
-+	DIRECTIVE_CHARACTER,
-+	DIRECTIVE_CHOICE,
-+	DIRECTIVE_CLASS,
-+	DIRECTIVE_COMPONENT,
-+	DIRECTIVE_COMPONENTS,
-+	DIRECTIVE_CONSTRAINED,
-+	DIRECTIVE_CONTAINING,
-+	DIRECTIVE_DEFAULT,
-+	DIRECTIVE_DEFINED,
-+	DIRECTIVE_DEFINITIONS,
-+	DIRECTIVE_EMBEDDED,
-+	DIRECTIVE_ENCODED,
-+	DIRECTIVE_ENCODING_CONTROL,
-+	DIRECTIVE_END,
-+	DIRECTIVE_ENUMERATED,
-+	DIRECTIVE_EXCEPT,
-+	DIRECTIVE_EXPLICIT,
-+	DIRECTIVE_EXPORTS,
-+	DIRECTIVE_EXTENSIBILITY,
-+	DIRECTIVE_EXTERNAL,
-+	DIRECTIVE_FALSE,
-+	DIRECTIVE_FROM,
-+	DIRECTIVE_GeneralizedTime,
-+	DIRECTIVE_GeneralString,
-+	DIRECTIVE_GraphicString,
-+	DIRECTIVE_IA5String,
-+	DIRECTIVE_IDENTIFIER,
-+	DIRECTIVE_IMPLICIT,
-+	DIRECTIVE_IMPLIED,
-+	DIRECTIVE_IMPORTS,
-+	DIRECTIVE_INCLUDES,
-+	DIRECTIVE_INSTANCE,
-+	DIRECTIVE_INSTRUCTIONS,
-+	DIRECTIVE_INTEGER,
-+	DIRECTIVE_INTERSECTION,
-+	DIRECTIVE_ISO646String,
-+	DIRECTIVE_MAX,
-+	DIRECTIVE_MIN,
-+	DIRECTIVE_MINUS_INFINITY,
-+	DIRECTIVE_NULL,
-+	DIRECTIVE_NumericString,
-+	DIRECTIVE_OBJECT,
-+	DIRECTIVE_OCTET,
-+	DIRECTIVE_OF,
-+	DIRECTIVE_OPTIONAL,
-+	DIRECTIVE_ObjectDescriptor,
-+	DIRECTIVE_PATTERN,
-+	DIRECTIVE_PDV,
-+	DIRECTIVE_PLUS_INFINITY,
-+	DIRECTIVE_PRESENT,
-+	DIRECTIVE_PRIVATE,
-+	DIRECTIVE_PrintableString,
-+	DIRECTIVE_REAL,
-+	DIRECTIVE_RELATIVE_OID,
-+	DIRECTIVE_SEQUENCE,
-+	DIRECTIVE_SET,
-+	DIRECTIVE_SIZE,
-+	DIRECTIVE_STRING,
-+	DIRECTIVE_SYNTAX,
-+	DIRECTIVE_T61String,
-+	DIRECTIVE_TAGS,
-+	DIRECTIVE_TRUE,
-+	DIRECTIVE_TeletexString,
-+	DIRECTIVE_UNION,
-+	DIRECTIVE_UNIQUE,
-+	DIRECTIVE_UNIVERSAL,
-+	DIRECTIVE_UTCTime,
-+	DIRECTIVE_UTF8String,
-+	DIRECTIVE_UniversalString,
-+	DIRECTIVE_VideotexString,
-+	DIRECTIVE_VisibleString,
-+	DIRECTIVE_WITH,
-+	NR__DIRECTIVES,
-+	TOKEN_ASSIGNMENT = NR__DIRECTIVES,
-+	TOKEN_OPEN_CURLY,
-+	TOKEN_CLOSE_CURLY,
-+	TOKEN_OPEN_SQUARE,
-+	TOKEN_CLOSE_SQUARE,
-+	TOKEN_OPEN_ACTION,
-+	TOKEN_CLOSE_ACTION,
-+	TOKEN_COMMA,
-+	TOKEN_NUMBER,
-+	TOKEN_TYPE_NAME,
-+	TOKEN_ELEMENT_NAME,
-+	NR__TOKENS
-+};
-+
-+static const unsigned char token_to_tag[NR__TOKENS] = {
-+	/* EOC goes first */
-+	[DIRECTIVE_BOOLEAN]		= ASN1_BOOL,
-+	[DIRECTIVE_INTEGER]		= ASN1_INT,
-+	[DIRECTIVE_BIT]			= ASN1_BTS,
-+	[DIRECTIVE_OCTET]		= ASN1_OTS,
-+	[DIRECTIVE_NULL]		= ASN1_NULL,
-+	[DIRECTIVE_OBJECT]		= ASN1_OID,
-+	[DIRECTIVE_ObjectDescriptor]	= ASN1_ODE,
-+	[DIRECTIVE_EXTERNAL]		= ASN1_EXT,
-+	[DIRECTIVE_REAL]		= ASN1_REAL,
-+	[DIRECTIVE_ENUMERATED]		= ASN1_ENUM,
-+	[DIRECTIVE_EMBEDDED]		= 0,
-+	[DIRECTIVE_UTF8String]		= ASN1_UTF8STR,
-+	[DIRECTIVE_RELATIVE_OID]	= ASN1_RELOID,
-+	/* 14 */
-+	/* 15 */
-+	[DIRECTIVE_SEQUENCE]		= ASN1_SEQ,
-+	[DIRECTIVE_SET]			= ASN1_SET,
-+	[DIRECTIVE_NumericString]	= ASN1_NUMSTR,
-+	[DIRECTIVE_PrintableString]	= ASN1_PRNSTR,
-+	[DIRECTIVE_T61String]		= ASN1_TEXSTR,
-+	[DIRECTIVE_TeletexString]	= ASN1_TEXSTR,
-+	[DIRECTIVE_VideotexString]	= ASN1_VIDSTR,
-+	[DIRECTIVE_IA5String]		= ASN1_IA5STR,
-+	[DIRECTIVE_UTCTime]		= ASN1_UNITIM,
-+	[DIRECTIVE_GeneralizedTime]	= ASN1_GENTIM,
-+	[DIRECTIVE_GraphicString]	= ASN1_GRASTR,
-+	[DIRECTIVE_VisibleString]	= ASN1_VISSTR,
-+	[DIRECTIVE_GeneralString]	= ASN1_GENSTR,
-+	[DIRECTIVE_UniversalString]	= ASN1_UNITIM,
-+	[DIRECTIVE_CHARACTER]		= ASN1_CHRSTR,
-+	[DIRECTIVE_BMPString]		= ASN1_BMPSTR,
-+};
-+
-+static const char asn1_classes[4][5] = {
-+	[ASN1_UNIV]	= "UNIV",
-+	[ASN1_APPL]	= "APPL",
-+	[ASN1_CONT]	= "CONT",
-+	[ASN1_PRIV]	= "PRIV"
-+};
-+
-+static const char asn1_methods[2][5] = {
-+	[ASN1_UNIV]	= "PRIM",
-+	[ASN1_APPL]	= "CONS"
-+};
-+
-+static const char *const asn1_universal_tags[32] = {
-+	"EOC",
-+	"BOOL",
-+	"INT",
-+	"BTS",
-+	"OTS",
-+	"NULL",
-+	"OID",
-+	"ODE",
-+	"EXT",
-+	"REAL",
-+	"ENUM",
-+	"EPDV",
-+	"UTF8STR",
-+	"RELOID",
-+	NULL,		/* 14 */
-+	NULL,		/* 15 */
-+	"SEQ",
-+	"SET",
-+	"NUMSTR",
-+	"PRNSTR",
-+	"TEXSTR",
-+	"VIDSTR",
-+	"IA5STR",
-+	"UNITIM",
-+	"GENTIM",
-+	"GRASTR",
-+	"VISSTR",
-+	"GENSTR",
-+	"UNISTR",
-+	"CHRSTR",
-+	"BMPSTR",
-+	NULL		/* 31 */
-+};
-+
-+static const char *filename;
-+static const char *grammar_name;
-+static const char *outputname;
-+static const char *headername;
-+
-+static const char *const directives[NR__DIRECTIVES] = {
-+	"ABSENT",
-+	"ALL",
-+	"ANY",
-+	"APPLICATION",
-+	"AUTOMATIC",
-+	"BEGIN",
-+	"BIT",
-+	"BMPString",
-+	"BOOLEAN",
-+	"BY",
-+	"CHARACTER",
-+	"CHOICE",
-+	"CLASS",
-+	"COMPONENT",
-+	"COMPONENTS",
-+	"CONSTRAINED",
-+	"CONTAINING",
-+	"DEFAULT",
-+	"DEFINED",
-+	"DEFINITIONS",
-+	"EMBEDDED",
-+	"ENCODED",
-+	"ENCODING-CONTROL",
-+	"END",
-+	"ENUMERATED",
-+	"EXCEPT",
-+	"EXPLICIT",
-+	"EXPORTS",
-+	"EXTENSIBILITY",
-+	"EXTERNAL",
-+	"FALSE",
-+	"FROM",
-+	"GeneralString",
-+	"GeneralizedTime",
-+	"GraphicString",
-+	"IA5String",
-+	"IDENTIFIER",
-+	"IMPLICIT",
-+	"IMPLIED",
-+	"IMPORTS",
-+	"INCLUDES",
-+	"INSTANCE",
-+	"INSTRUCTIONS",
-+	"INTEGER",
-+	"INTERSECTION",
-+	"ISO646String",
-+	"MAX",
-+	"MIN",
-+	"MINUS-INFINITY",
-+	"NULL",
-+	"NumericString",
-+	"OBJECT",
-+	"OCTET",
-+	"OF",
-+	"OPTIONAL",
-+	"ObjectDescriptor",
-+	"PATTERN",
-+	"PDV",
-+	"PLUS-INFINITY",
-+	"PRESENT",
-+	"PRIVATE",
-+	"PrintableString",
-+	"REAL",
-+	"RELATIVE-OID",
-+	"SEQUENCE",
-+	"SET",
-+	"SIZE",
-+	"STRING",
-+	"SYNTAX",
-+	"T61String",
-+	"TAGS",
-+	"TRUE",
-+	"TeletexString",
-+	"UNION",
-+	"UNIQUE",
-+	"UNIVERSAL",
-+	"UTCTime",
-+	"UTF8String",
-+	"UniversalString",
-+	"VideotexString",
-+	"VisibleString",
-+	"WITH"
-+};
-+
-+struct action {
-+	struct action	*next;
-+	unsigned char	index;
-+	char		name[];
-+};
-+
-+static struct action *action_list;
-+static unsigned nr_actions;
-+
-+struct token {
-+	unsigned short	line;
-+	enum token_type	token_type : 8;
-+	unsigned char	size;
-+	struct action	*action;
-+	const char	*value;
-+	struct type	*type;
-+};
-+
-+static struct token *token_list;
-+static unsigned nr_tokens;
-+
-+static int directive_compare(const void *_key, const void *_pdir)
-+{
-+	const struct token *token = _key;
-+	const char *const *pdir = _pdir, *dir = *pdir;
-+	size_t dlen, clen;
-+	int val;
-+
-+	dlen = strlen(dir);
-+	clen = (dlen < token->size) ? dlen : token->size;
-+
-+	//printf("cmp(%*.*s,%s) = ",
-+	//       (int)token->size, (int)token->size, token->value,
-+	//       dir);
-+
-+	val = memcmp(token->value, dir, clen);
-+	if (val != 0) {
-+		//printf("%d [cmp]\n", val);
-+		return val;
++TBSCertificate ::= SEQUENCE {
++	version           [ 0 ]	Version DEFAULT,
++	serialNumber		CertificateSerialNumber ({ x509_note_serial }),
++	signature		AlgorithmIdentifier ({ x509_note_pkey_algo }),
++	issuer			Name ({ x509_note_issuer }),
++	validity		Validity,
++	subject			Name ({ x509_note_subject }),
++	subjectPublicKeyInfo	SubjectPublicKeyInfo,
++	issuerUniqueID    [ 1 ]	IMPLICIT UniqueIdentifier OPTIONAL,
++	subjectUniqueID   [ 2 ]	IMPLICIT UniqueIdentifier OPTIONAL,
++	extensions        [ 3 ]	Extensions OPTIONAL
 +	}
 +
-+	if (dlen == token->size) {
-+		//printf("0\n");
++Version ::= INTEGER
++CertificateSerialNumber ::= INTEGER
++
++AlgorithmIdentifier ::= SEQUENCE {
++	algorithm		OBJECT IDENTIFIER ({ x509_note_OID }),
++	parameters		ANY OPTIONAL
++}
++
++Name ::= SEQUENCE OF RelativeDistinguishedName
++
++RelativeDistinguishedName ::= SET OF AttributeValueAssertion
++
++AttributeValueAssertion ::= SEQUENCE {
++	attributeType		OBJECT IDENTIFIER ({ x509_note_OID }),
++	attributeValue		ANY ({ x509_extract_name_segment })
++	}
++
++Validity ::= SEQUENCE {
++	notBefore		Time ({ x509_note_not_before }),
++	notAfter		Time ({ x509_note_not_after })
++	}
++
++Time ::= CHOICE {
++	utcTime			UTCTime,
++	generalTime		GeneralizedTime
++	}
++
++SubjectPublicKeyInfo ::= SEQUENCE {
++	algorithm		AlgorithmIdentifier,
++	subjectPublicKey	BIT STRING ({ x509_extract_key_data })
++	}
++
++UniqueIdentifier ::= BIT STRING
++
++Extensions ::= SEQUENCE OF Extension
++
++Extension ::= SEQUENCE {
++	extnid			OBJECT IDENTIFIER ({ x509_note_OID }),
++	critical		BOOLEAN DEFAULT,
++	extnValue		OCTET STRING ({ x509_process_extension })
++	}
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+new file mode 100644
+index 0000000..cdcfce8
+--- /dev/null
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -0,0 +1,503 @@
++/* X.509 certificate parser
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++#undef DEBUG
++#define pr_fmt(fmt) "X.509: "fmt
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/err.h>
++#include <linux/oid_registry.h>
++#include "public_key.h"
++#include "x509_parser.h"
++#include "x509-asn1.h"
++#include "x509_rsakey-asn1.h"
++
++struct x509_parse_context {
++	struct x509_certificate	*cert;		/* Certificate being constructed */
++	unsigned long	data;			/* Start of data */
++	const void	*cert_start;		/* Start of cert content */
++	const void	*key;			/* Key data */
++	size_t		key_size;		/* Size of key data */
++	enum OID	last_oid;		/* Last OID encountered */
++	enum OID	algo_oid;		/* Algorithm OID */
++	unsigned char	nr_mpi;			/* Number of MPIs stored */
++	int		namesize;		/* Usage of namebuffer */
++	char		namebuffer[256];	/* Name building buffer */
++};
++
++/*
++ * Free an X.509 certificate
++ */
++void x509_free_certificate(struct x509_certificate *cert)
++{
++	if (cert) {
++		public_key_destroy(cert->pub);
++		kfree(cert->serial);
++		kfree(cert->issuer);
++		kfree(cert->subject);
++		kfree(cert->fingerprint);
++		kfree(cert->authority);
++		kfree(cert);
++	}
++}
++
++/*
++ * Parse an X.509 certificate
++ */
++struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
++{
++	struct x509_certificate *cert;
++	struct x509_parse_context *ctx;
++	long ret;
++
++	ret = -ENOMEM;
++	cert = kzalloc(sizeof(struct x509_certificate), GFP_KERNEL);
++	if (!cert)
++		goto error_no_cert;
++	cert->pub = kzalloc(sizeof(struct public_key), GFP_KERNEL);
++	if (!cert->pub)
++		goto error_no_ctx;
++	ctx = kzalloc(sizeof(struct x509_parse_context), GFP_KERNEL);
++	if (!ctx)
++		goto error_no_ctx;
++
++	ctx->cert = cert;
++	ctx->data = (unsigned long)data;
++
++	/* Attempt to decode the certificate */
++	ret = asn1_ber_decoder(&x509_decoder, ctx, data, datalen);
++	if (ret < 0)
++		goto error_decode;
++
++	/* Decode the public key */
++	ret = asn1_ber_decoder(&x509_rsakey_decoder, ctx,
++			       ctx->key, ctx->key_size);
++	if (ret < 0)
++		goto error_decode;
++
++	kfree(ctx);
++	return cert;
++
++error_decode:
++	kfree(ctx);
++error_no_ctx:
++	x509_free_certificate(cert);
++error_no_cert:
++	return ERR_PTR(ret);
++}
++
++/*
++ * Note an OID when we find one for later processing when we know how
++ * to interpret it.
++ */
++int x509_note_OID(void *context, size_t hdrlen,
++	     unsigned char tag,
++	     const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	ctx->last_oid = look_up_OID(value, vlen);
++	if (ctx->last_oid == OID__NR) {
++		char buffer[50];
++		sprint_oid(value, vlen, buffer, sizeof(buffer));
++		printk("X.509: Unknown OID: [%zu] %s: %d\n",
++		       (unsigned long)value - ctx->data, buffer, ctx->last_oid);
++	}
++	return 0;
++}
++
++/*
++ * Save the position of the TBS data so that we can check the signature over it
++ * later.
++ */
++int x509_note_tbs_certificate(void *context, size_t hdrlen,
++			      unsigned char tag,
++			      const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	pr_debug("x509_note_tbs_certificate(,%02x,%ld,%zu)!\n",
++		 tag, (unsigned long)value - ctx->data, vlen);
++
++	ctx->cert->tbs = value;
++	ctx->cert->tbs_size = vlen;
++	return 0;
++}
++
++/*
++ * Note the start position of the certificate content with respect to the TBS
++ * data and use this to compute the length of the TBS header which is needed
++ * for the signature check.
++ */
++int x509_note_cert_start(void *context, size_t hdrlen,
++			 unsigned char tag,
++			 const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	ptrdiff_t hdrsize;
++
++	pr_debug("x509_note_cert_start(,%02x,%ld,%zu)!\n",
++		 tag, (unsigned long)value - ctx->data, vlen);
++
++	hdrsize = ctx->cert->tbs - value;
++	ctx->cert->tbs = value;
++	ctx->cert->tbs_size += hdrsize;
++	return 0;
++}
++
++/*
++ * Record the public key algorithm
++ */
++int x509_note_pkey_algo(void *context, size_t hdrlen,
++			unsigned char tag,
++			const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	pr_debug("PubKey Algo: %u\n", ctx->last_oid);
++
++	switch (ctx->last_oid) {
++	case OID_md2WithRSAEncryption:
++	case OID_md3WithRSAEncryption:
++	default:
++		return -ENOPKG; /* Unsupported combination */
++
++	case OID_md4WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_MD5;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++
++	case OID_sha1WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_SHA1;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++
++	case OID_sha256WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_SHA256;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++
++	case OID_sha384WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_SHA384;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++
++	case OID_sha512WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_SHA512;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++
++	case OID_sha224WithRSAEncryption:
++		ctx->cert->sig_hash_algo = PKEY_HASH_SHA224;
++		ctx->cert->sig_pkey_algo = PKEY_ALGO_RSA;
++		break;
++	}
++
++	ctx->algo_oid = ctx->last_oid;
++	return 0;
++}
++
++/*
++ * Note the whereabouts and type of the signature.
++ */
++int x509_note_signature(void *context, size_t hdrlen,
++			unsigned char tag,
++			const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	pr_debug("Signature type: %u size %zu\n", ctx->last_oid, vlen);
++
++	if (ctx->last_oid != ctx->algo_oid) {
++		pr_warn("X.509: Got cert with pkey (%u) and sig (%u) algorithm OIDs\n",
++			ctx->algo_oid, ctx->last_oid);
++		return -EINVAL;
++	}
++
++	ctx->cert->sig = value;
++	ctx->cert->sig_size = vlen;
++	return 0;
++}
++
++/*
++ * Extract name segments into the assembly buffer and tag them with prefixes
++ * appropriate to the attribute OID.
++ */
++int x509_extract_name_segment(void *context, size_t hdrlen,
++			      unsigned char tag,
++			      const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	const char *prefix;
++	char pbuf[4];
++
++	switch (ctx->last_oid) {
++	case OID_commonName:		prefix = "CN";	break;
++	case OID_surname:		prefix = "S";	break;
++	case OID_countryName:		prefix = "C";	break;
++	case OID_locality:		prefix = "L";	break;
++	case OID_stateOrProvinceName:	prefix = "ST";	break;
++	case OID_organizationName:	prefix = "O";	break;
++	case OID_organizationUnitName:	prefix = "OU";	break;
++	case OID_title:			prefix = "T";	break;
++	case OID_name:			prefix = "N";	break;
++	case OID_givenName:		prefix = "G";	break;
++	case OID_initials:		prefix = "I";	break;
++	case OID_generationalQualifier:	prefix = "GQ";	break;
++	default:
++		sprintf(pbuf, "?%u", ctx->last_oid);
++		prefix = pbuf;
++		break;
++	}
++
++	ctx->namesize += snprintf(ctx->namebuffer + ctx->namesize,
++				  sizeof(ctx->namebuffer) - ctx->namesize,
++				  "/%s=%*.*s",
++				  prefix,
++				  (int)vlen, (int)vlen, (const char *)value);
++	if (ctx->namesize > sizeof(ctx->namebuffer) - 1)
++		ctx->namesize = sizeof(ctx->namebuffer) - 1;
++
++	return 0;
++}
++
++/*
++ * Take a copy of the issuer name.
++ */
++int x509_note_issuer(void *context, size_t hdrlen,
++		     unsigned char tag,
++		     const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	pr_debug("Issuer: %s\n", ctx->namebuffer);
++
++	ctx->cert->issuer = kmalloc(ctx->namesize + 1, GFP_KERNEL);
++	if (!ctx->cert->issuer)
++		return -ENOMEM;
++	memcpy(ctx->cert->issuer, ctx->namebuffer, ctx->namesize);
++	ctx->cert->issuer[ctx->namesize] = 0;
++	ctx->namesize = 0;
++	return 0;
++}
++
++/*
++ * Take a copy of the subject name.
++ */
++int x509_note_subject(void *context, size_t hdrlen,
++		      unsigned char tag,
++		      const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	pr_debug("Subject: %s\n", ctx->namebuffer);
++
++	ctx->cert->subject = kmalloc(ctx->namesize + 1, GFP_KERNEL);
++	if (!ctx->cert->subject)
++		return -ENOMEM;
++	memcpy(ctx->cert->subject, ctx->namebuffer, ctx->namesize);
++	ctx->cert->subject[ctx->namesize] = 0;
++	ctx->namesize = 0;
++	return 0;
++}
++
++/*
++ * Extract the data for the public key algorithm
++ */
++int x509_extract_key_data(void *context, size_t hdrlen,
++			  unsigned char tag,
++			  const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	if (ctx->last_oid != OID_rsaEncryption)
++		return -ENOPKG;
++
++	/* There seems to be an extraneous 0 byte on the front of the data */
++	ctx->cert->pkey_algo = PKEY_ALGO_RSA;
++	ctx->key = value + 1;
++	ctx->key_size = vlen - 1;
++	return 0;
++}
++
++/*
++ * Extract a RSA public key value
++ */
++int rsa_extract_mpi(void *context, size_t hdrlen,
++		    unsigned char tag,
++		    const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	MPI mpi;
++
++	if (ctx->nr_mpi >= ARRAY_SIZE(ctx->cert->pub->mpi)) {
++		pr_err("Too many public keys in certificate\n");
++		return -EBADMSG;
++	}
++
++	mpi = mpi_read_raw_data(value, vlen);
++	if (!mpi)
++		return -ENOMEM;
++
++	ctx->cert->pub->mpi[ctx->nr_mpi++] = mpi;
++	return 0;
++}
++
++/*
++ * Process certificate extensions that are used to qualify the certificate.
++ */
++int x509_process_extension(void *context, size_t hdrlen,
++			   unsigned char tag,
++			   const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	const unsigned char *v = value;
++	char *f;
++	int i;
++
++	pr_debug("Extension: %u\n", ctx->last_oid);
++
++	if (ctx->last_oid == OID_subjectKeyIdentifier) {
++		/* Get hold of the key fingerprint */
++		if (vlen < 3)
++			return -EBADMSG;
++		if (v[0] != ASN1_OTS || v[1] != vlen - 2)
++			return -EBADMSG;
++		v += 2;
++		vlen -= 2;
++
++		f = kmalloc(vlen * 2 + 1, GFP_KERNEL);
++		if (!f)
++			return -ENOMEM;
++		for (i = 0; i < vlen; i++)
++			sprintf(f + i * 2, "%02x", v[i]);
++		pr_debug("fingerprint %s\n", f);
++		ctx->cert->fingerprint = f;
++
++		ctx->cert->pub->key_id_size = i =
++			min(vlen, sizeof(ctx->cert->pub->key_id));
++		memcpy(ctx->cert->pub->key_id, v + vlen - i, i);
 +		return 0;
 +	}
-+	//printf("%d\n", (int)dlen - (int)token->size);
-+	return dlen - token->size; /* shorter -> negative */
-+}
 +
-+/*
-+ * Tokenise an ASN.1 grammar
-+ */
-+static void tokenise(char *buffer, char *end)
-+{
-+	struct token *tokens;
-+	char *line, *nl, *p, *q;
-+	unsigned tix, lineno;
++	if (ctx->last_oid == OID_authorityKeyIdentifier) {
++		/* Get hold of the CA key fingerprint */
++		if (vlen < 5)
++			return -EBADMSG;
++		if (v[0] != (ASN1_SEQ | (ASN1_CONS << 5)) ||
++		    v[1] != vlen - 2 ||
++		    v[2] != (ASN1_CONT << 6) ||
++		    v[3] != vlen - 4)
++			return -EBADMSG;
++		v += 4;
++		vlen -= 4;
 +
-+	/* Assume we're going to have half as many tokens as we have
-+	 * characters
-+	 */
-+	token_list = tokens = calloc((end - buffer) / 2, sizeof(struct token));
-+	if (!tokens) {
-+		perror(NULL);
-+		exit(1);
-+	}
-+	tix = 0;
-+
-+	lineno = 0;
-+	while (buffer < end) {
-+		/* First of all, break out a line */
-+		lineno++;
-+		line = buffer;
-+		nl = memchr(line, '\n', end - buffer);
-+		if (!nl) {
-+			buffer = nl = end;
-+		} else {
-+			buffer = nl + 1;
-+			*nl = '\0';
-+		}
-+
-+		/* Remove "--" comments */
-+		p = line;
-+	next_comment:
-+		while ((p = memchr(p, '-', nl - p))) {
-+			if (p[1] == '-') {
-+				/* Found a comment; see if there's a terminator */
-+				q = p + 2;
-+				while ((q = memchr(q, '-', nl - q))) {
-+					if (q[1] == '-') {
-+						/* There is - excise the comment */
-+						q += 2;
-+						memmove(p, q, nl - q);
-+						goto next_comment;
-+					}
-+					q++;
-+				}
-+				*p = '\0';
-+				nl = p;
-+				break;
-+			} else {
-+				p++;
-+			}
-+		}
-+
-+		p = line;
-+		while (p < nl) {
-+			/* Skip white space */
-+			while (p < nl && isspace(*p))
-+				*(p++) = 0;
-+			if (p >= nl)
-+				break;
-+
-+			tokens[tix].line = lineno;
-+			tokens[tix].value = p;
-+
-+			/* Handle string tokens */
-+			if (isalpha(*p)) {
-+				const char **dir;
-+
-+				/* Can be a directive, type name or element
-+				 * name.  Find the end of the name.
-+				 */
-+				q = p + 1;
-+				while (q < nl && (isalnum(*q) || *q == '-' || *q == '_'))
-+					q++;
-+				tokens[tix].size = q - p;
-+				p = q;
-+
-+				/* If it begins with a lowercase letter then
-+				 * it's an element name
-+				 */
-+				if (islower(tokens[tix].value[0])) {
-+					tokens[tix++].token_type = TOKEN_ELEMENT_NAME;
-+					continue;
-+				}
-+
-+				/* Otherwise we need to search the directive
-+				 * table
-+				 */
-+				dir = bsearch(&tokens[tix], directives,
-+					      sizeof(directives) / sizeof(directives[1]),
-+					      sizeof(directives[1]),
-+					      directive_compare);
-+				if (dir) {
-+					tokens[tix++].token_type = dir - directives;
-+					continue;
-+				}
-+
-+				tokens[tix++].token_type = TOKEN_TYPE_NAME;
-+				continue;
-+			}
-+
-+			/* Handle numbers */
-+			if (isdigit(*p)) {
-+				/* Find the end of the number */
-+				q = p + 1;
-+				while (q < nl && (isdigit(*q)))
-+					q++;
-+				tokens[tix].size = q - p;
-+				p = q;
-+				tokens[tix++].token_type = TOKEN_NUMBER;
-+				continue;
-+			}
-+
-+			if (nl - p >= 3) {
-+				if (memcmp(p, "::=", 3) == 0) {
-+					p += 3;
-+					tokens[tix].size = 3;
-+					tokens[tix++].token_type = TOKEN_ASSIGNMENT;
-+					continue;
-+				}
-+			}
-+
-+			if (nl - p >= 2) {
-+				if (memcmp(p, "({", 2) == 0) {
-+					p += 2;
-+					tokens[tix].size = 2;
-+					tokens[tix++].token_type = TOKEN_OPEN_ACTION;
-+					continue;
-+				}
-+				if (memcmp(p, "})", 2) == 0) {
-+					p += 2;
-+					tokens[tix].size = 2;
-+					tokens[tix++].token_type = TOKEN_CLOSE_ACTION;
-+					continue;
-+				}
-+			}
-+
-+			if (nl - p >= 1) {
-+				tokens[tix].size = 1;
-+				switch (*p) {
-+				case '{':
-+					p += 1;
-+					tokens[tix++].token_type = TOKEN_OPEN_CURLY;
-+					continue;
-+				case '}':
-+					p += 1;
-+					tokens[tix++].token_type = TOKEN_CLOSE_CURLY;
-+					continue;
-+				case '[':
-+					p += 1;
-+					tokens[tix++].token_type = TOKEN_OPEN_SQUARE;
-+					continue;
-+				case ']':
-+					p += 1;
-+					tokens[tix++].token_type = TOKEN_CLOSE_SQUARE;
-+					continue;
-+				case ',':
-+					p += 1;
-+					tokens[tix++].token_type = TOKEN_COMMA;
-+					continue;
-+				default:
-+					break;
-+				}
-+			}
-+
-+			fprintf(stderr, "%s:%u: Unknown character in grammar: '%c'\n",
-+				filename, lineno, *p);
-+			exit(1);
-+		}
-+	}
-+
-+	nr_tokens = tix;
-+	printf("Extracted %u tokens\n", nr_tokens);
-+
-+#if 0
-+	{
-+		int n;
-+		for (n = 0; n < nr_tokens; n++)
-+			printf("Token %3u: '%*.*s'\n",
-+			       n,
-+			       (int)token_list[n].size, (int)token_list[n].size,
-+			       token_list[n].value);
-+	}
-+#endif
-+}
-+
-+static void build_type_list(void);
-+static void parse(void);
-+static void render(FILE *out, FILE *hdr);
-+
-+/*
-+ *
-+ */
-+int main(int argc, char **argv)
-+{
-+	struct stat st;
-+	ssize_t readlen;
-+	FILE *out, *hdr;
-+	char *buffer, *p;
-+	int fd;
-+
-+	if (argc != 4) {
-+		fprintf(stderr, "Format: %s <grammar-file> <c-file> <hdr-file>\n",
-+			argv[0]);
-+		exit(2);
-+	}
-+
-+	filename = argv[1];
-+	outputname = argv[2];
-+	headername = argv[3];
-+
-+	fd = open(filename, O_RDONLY);
-+	if (fd < 0) {
-+		perror(filename);
-+		exit(1);
-+	}
-+
-+	if (fstat(fd, &st) < 0) {
-+		perror(filename);
-+		exit(1);
-+	}
-+
-+	if (!(buffer = malloc(st.st_size + 1))) {
-+		perror(NULL);
-+		exit(1);
-+	}
-+
-+	if ((readlen = read(fd, buffer, st.st_size)) < 0) {
-+		perror(filename);
-+		exit(1);
-+	}
-+
-+	if (close(fd) < 0) {
-+		perror(filename);
-+		exit(1);
-+	}
-+
-+	if (readlen != st.st_size) {
-+		fprintf(stderr, "%s: Short read\n", filename);
-+		exit(1);
-+	}
-+
-+	p = strrchr(argv[1], '/');
-+	p = p ? p + 1 : argv[1];
-+	grammar_name = strdup(p);
-+	if (!p) {
-+		perror(NULL);
-+		exit(1);
-+	}
-+	p = strchr(grammar_name, '.');
-+	if (p)
-+		*p = '\0';
-+
-+	buffer[readlen] = 0;
-+	tokenise(buffer, buffer + readlen);
-+	build_type_list();
-+	parse();
-+
-+	out = fopen(outputname, "w");
-+	if (!out) {
-+		perror(outputname);
-+		exit(1);
-+	}
-+
-+	hdr = fopen(headername, "w");
-+	if (!out) {
-+		perror(headername);
-+		exit(1);
-+	}
-+
-+	render(out, hdr);
-+
-+	if (fclose(out) < 0) {
-+		perror(outputname);
-+		exit(1);
-+	}
-+
-+	if (fclose(hdr) < 0) {
-+		perror(headername);
-+		exit(1);
++		f = kmalloc(vlen * 2 + 1, GFP_KERNEL);
++		if (!f)
++			return -ENOMEM;
++		for (i = 0; i < vlen; i++)
++			sprintf(f + i * 2, "%02x", v[i]);
++		pr_debug("authority   %s\n", f);
++		ctx->cert->authority = f;
++		return 0;
 +	}
 +
 +	return 0;
 +}
 +
-+enum compound {
-+	NOT_COMPOUND,
-+	SET,
-+	SET_OF,
-+	SEQUENCE,
-+	SEQUENCE_OF,
-+	CHOICE,
-+	ANY,
-+	TYPE_REF,
-+	TAG_OVERRIDE
-+};
-+
-+struct element {
-+	struct type	*type_def;
-+	struct token	*name;
-+	struct token	*type;
-+	struct action	*action;
-+	struct element	*children;
-+	struct element	*next;
-+	struct element	*render_next;
-+	struct element	*list_next;
-+	uint8_t		n_elements;
-+	enum compound	compound : 8;
-+	enum asn1_class	class : 8;
-+	enum asn1_method method : 8;
-+	uint8_t		tag;
-+	unsigned	entry_index;
-+	unsigned	flags;
-+#define ELEMENT_IMPLICIT	0x0001
-+#define ELEMENT_EXPLICIT	0x0002
-+#define ELEMENT_MARKED		0x0004
-+#define ELEMENT_RENDERED	0x0008
-+#define ELEMENT_SKIPPABLE	0x0010
-+#define ELEMENT_CONDITIONAL	0x0020
-+};
-+
-+struct type {
-+	struct token	*name;
-+	struct token	*def;
-+	struct element	*element;
-+	unsigned	ref_count;
-+	unsigned	flags;
-+#define TYPE_STOP_MARKER	0x0001
-+#define TYPE_BEGIN		0x0002
-+};
-+
-+static struct type *type_list;
-+static struct type **type_index;
-+static unsigned nr_types;
-+
-+static int type_index_compare(const void *_a, const void *_b)
++/*
++ * Record the certificate serial number.
++ */
++int x509_note_serial(void *context, size_t hdrlen,
++		     unsigned char tag,
++		     const void *value, size_t vlen)
 +{
-+	const struct type *const *a = _a, *const *b = _b;
++	struct x509_parse_context *ctx = context;
++	char *serial;
 +
-+	if ((*a)->name->size != (*b)->name->size)
-+		return (*a)->name->size - (*b)->name->size;
-+	else
-+		return memcmp((*a)->name->value, (*b)->name->value,
-+			      (*a)->name->size);
-+}
++	for (; vlen > 0; vlen--, value++)
++		if (*(const u8 *)value != 0)
++			break;
 +
-+static int type_finder(const void *_key, const void *_ti)
-+{
-+	const struct token *token = _key;
-+	const struct type *const *ti = _ti;
-+	const struct type *type = *ti;
++	serial = kmalloc(vlen * 2 + 1, GFP_KERNEL);
++	if (!serial)
++		return -ENOMEM;
++	ctx->cert->serial = serial;
 +
-+	if (token->size != type->name->size)
-+		return token->size - type->name->size;
-+	else
-+		return memcmp(token->value, type->name->value,
-+			      token->size);
++	/* Note: this limits the field width to a maximum of 64 */
++	sprintf(serial, "%*phN", (int)vlen, value);
++
++	pr_devel("Serial: %s\n", serial);
++	return 0;
 +}
 +
 +/*
-+ * Build up a list of types and a sorted index to that list.
++ * Record a certificate time.
 + */
-+static void build_type_list(void)
++static int x509_note_time(time_t *_time,  size_t hdrlen,
++			  unsigned char tag,
++			  const unsigned char *value, size_t vlen)
 +{
-+	struct type *types;
-+	unsigned nr, t, n;
++	unsigned YY, MM, DD, hh, mm, ss;
++	const unsigned char *p = value;
 +
-+	nr = 0;
-+	for (n = 0; n < nr_tokens - 1; n++)
-+		if (token_list[n + 0].token_type == TOKEN_TYPE_NAME &&
-+		    token_list[n + 1].token_type == TOKEN_ASSIGNMENT)
-+			nr++;
++#define dec2bin(X) ((X) - '0')
++#define DD2bin(P) ({ unsigned x = dec2bin(P[0]) * 10 + dec2bin(P[1]); P += 2; x; })
 +
-+	if (nr == 0) {
-+		fprintf(stderr, "%s: No defined types\n", filename);
-+		exit(1);
++	if (tag == ASN1_UNITIM) {
++		/* UTCTime: YYMMDDHHMMSSZ */
++		if (vlen != 13)
++			goto unsupported_time;
++		YY = DD2bin(p);
++		if (YY > 50)
++			YY += 1900;
++		else
++			YY += 2000;
++	} else if (tag == ASN1_GENTIM) {
++		/* GenTime: YYYYMMDDHHMMSSZ */
++		if (vlen != 15)
++			goto unsupported_time;
++		YY = DD2bin(p) * 100 + DD2bin(p);
++	} else {
++		goto unsupported_time;
 +	}
 +
-+	nr_types = nr;
-+	types = type_list = calloc(nr + 1, sizeof(type_list[0]));
-+	if (!type_list) {
-+		perror(NULL);
-+		exit(1);
-+	}
-+	type_index = calloc(nr, sizeof(type_index[0]));
-+	if (!type_index) {
-+		perror(NULL);
-+		exit(1);
-+	}
++	MM = DD2bin(p);
++	DD = DD2bin(p);
++	hh = DD2bin(p);
++	mm = DD2bin(p);
++	ss = DD2bin(p);
 +
-+	t = 0;
-+	types[t].flags |= TYPE_BEGIN;
-+	for (n = 0; n < nr_tokens - 1; n++) {
-+		if (token_list[n + 0].token_type == TOKEN_TYPE_NAME &&
-+		    token_list[n + 1].token_type == TOKEN_ASSIGNMENT) {
-+			types[t].name = &token_list[n];
-+			type_index[t] = &types[t];
-+			t++;
-+		}
-+	}
-+	types[t].name = &token_list[n + 1];
-+	types[t].flags |= TYPE_STOP_MARKER;
++	if (*p != 'Z')
++		goto unsupported_time;
 +
-+	qsort(type_index, nr, sizeof(type_index[0]), type_index_compare);
++	*_time = mktime(YY, MM, DD, hh, mm, ss);
++	return 0;
 +
-+	printf("Extracted %u types\n", nr_types);
-+#if 0
-+	for (n = 0; n < nr_types; n++) {
-+		struct type *type = type_index[n];
-+		printf("- %*.*s\n",
-+		       (int)type->name->size,
-+		       (int)type->name->size,
-+		       type->name->value);
-+	}
++unsupported_time:
++	pr_warn("X.509: Got unsupported time [tag %02x]: '%*.*s'\n",
++		tag, (int)vlen, (int)vlen, value);
++	return -EBADMSG;
++}
++
++int x509_note_not_before(void *context, size_t hdrlen,
++			 unsigned char tag,
++			 const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	return x509_note_time(&ctx->cert->valid_from, hdrlen, tag, value, vlen);
++}
++
++int x509_note_not_after(void *context, size_t hdrlen,
++			unsigned char tag,
++			const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	return x509_note_time(&ctx->cert->valid_to, hdrlen, tag, value, vlen);
++}
+diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
+new file mode 100644
+index 0000000..b38789a
+--- /dev/null
++++ b/crypto/asymmetric_keys/x509_parser.h
+@@ -0,0 +1,37 @@
++/* X.509 certificate parser internal definitions
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#include <crypto/public_key.h>
++
++struct x509_certificate {
++	struct x509_certificate *next;
++	struct public_key *pub;			/* Public key details */
++	char		*serial;		/* Certificate serial number */
++	char		*issuer;		/* Name of certificate issuer */
++	char		*subject;		/* Name of certificate subject */
++	char		*fingerprint;		/* Key fingerprint as hex */
++	char		*authority;		/* Authority key fingerprint as hex */
++	time_t		valid_from;
++	time_t		valid_to;
++	enum pkey_algo	pkey_algo : 8;		/* Public key algorithm */
++	enum pkey_algo	sig_pkey_algo : 8;	/* Signature public key algorithm */
++	enum pkey_hash_algo sig_hash_algo : 8;	/* Signature hash algorithm */
++	const void	*tbs;			/* Signed data */
++	size_t		tbs_size;		/* Size of signed data */
++	const void	*sig;			/* Signature data */
++	size_t		sig_size;		/* Size of sigature */
++};
++
++/*
++ * x509_cert_parser.c
++ */
++extern void x509_free_certificate(struct x509_certificate *cert);
++extern struct x509_certificate *x509_cert_parse(const void *data, size_t datalen);
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+new file mode 100644
+index 0000000..a44c22c
+--- /dev/null
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -0,0 +1,206 @@
++/* Instantiate a public key crypto key from an X.509 Certificate
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#define pr_fmt(fmt) "X.509: "fmt
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/err.h>
++#include <linux/mpi.h>
++#include <linux/asn1_decoder.h>
++#include <keys/asymmetric-subtype.h>
++#include <keys/asymmetric-parser.h>
++#include <crypto/hash.h>
++#include "asymmetric_keys.h"
++#include "public_key.h"
++#include "x509_parser.h"
++
++static const
++struct public_key_algorithm *x509_public_key_algorithms[PKEY_ALGO__LAST] = {
++	[PKEY_ALGO_DSA]		= NULL,
++#if defined(CONFIG_PUBLIC_KEY_ALGO_RSA) || \
++	defined(CONFIG_PUBLIC_KEY_ALGO_RSA_MODULE)
++	[PKEY_ALGO_RSA]		= &RSA_public_key_algorithm,
 +#endif
-+}
-+
-+static struct element *parse_type(struct token **_cursor, struct token *stop,
-+				  struct token *name);
++};
 +
 +/*
-+ * Parse the token stream
++ * Check the signature on a certificate using the provided public key
 + */
-+static void parse(void)
++static int x509_check_signature(const struct public_key *pub,
++				const struct x509_certificate *cert)
 +{
-+	struct token *cursor;
-+	struct type *type;
++	struct public_key_signature *sig;
++	struct crypto_shash *tfm;
++	struct shash_desc *desc;
++	size_t digest_size, desc_size;
++	int ret;
 +
-+	/* Parse one type definition statement at a time */
-+	type = type_list;
-+	do {
-+		cursor = type->name;
++	pr_devel("==>%s()\n", __func__);
++	
++	/* Allocate the hashing algorithm we're going to need and find out how
++	 * big the hash operational data will be.
++	 */
++	tfm = crypto_alloc_shash(pkey_hash_algo[cert->sig_hash_algo], 0, 0);
++	if (IS_ERR(tfm))
++		return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
 +
-+		if (cursor[0].token_type != TOKEN_TYPE_NAME ||
-+		    cursor[1].token_type != TOKEN_ASSIGNMENT)
-+			abort();
-+		cursor += 2;
++	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
++	digest_size = crypto_shash_digestsize(tfm);
 +
-+		type->element = parse_type(&cursor, type[1].name, NULL);
-+		type->element->type_def = type;
++	/* We allocate the hash operational data storage on the end of our
++	 * context data.
++	 */
++	ret = -ENOMEM;
++	sig = kzalloc(sizeof(*sig) + desc_size + digest_size, GFP_KERNEL);
++	if (!sig)
++		goto error_no_sig;
 +
-+		if (cursor != type[1].name) {
-+			fprintf(stderr, "%s:%d: Parse error at token '%*.*s'\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
++	sig->pkey_hash_algo	= cert->sig_hash_algo;
++	sig->digest		= (u8 *)sig + sizeof(*sig) + desc_size;
++	sig->digest_size	= digest_size;
 +
-+	} while (type++, !(type->flags & TYPE_STOP_MARKER));
++	desc = (void *)sig + sizeof(*sig);
++	desc->tfm	= tfm;
++	desc->flags	= CRYPTO_TFM_REQ_MAY_SLEEP;
 +
-+	printf("Extracted %u actions\n", nr_actions);
-+}
++	ret = crypto_shash_init(desc);
++	if (ret < 0)
++		goto error;
 +
-+static struct element *element_list;
++	ret = -ENOMEM;
++	sig->rsa.s = mpi_read_raw_data(cert->sig, cert->sig_size);
++	if (!sig->rsa.s)
++		goto error;
 +
-+static struct element *alloc_elem(struct token *type)
-+{
-+	struct element *e = calloc(1, sizeof(*e));
-+	if (!e) {
-+		perror(NULL);
-+		exit(1);
-+	}
-+	e->list_next = element_list;
-+	element_list = e;
-+	return e;
-+}
++	ret = crypto_shash_update(desc, cert->tbs, cert->tbs_size);
++	if (ret < 0)
++		goto error_mpi;
 +
-+static struct element *parse_compound(struct token **_cursor, struct token *end,
-+				      int alternates);
++	sig->digest[0] = 0xa5;
++	sig->digest[1] = 0x5a;
 +
-+/*
-+ * Parse one type definition statement
-+ */
-+static struct element *parse_type(struct token **_cursor, struct token *end,
-+				  struct token *name)
-+{
-+	struct element *top, *element;
-+	struct action *action, **ppaction;
-+	struct token *cursor = *_cursor;
-+	struct type **ref;
-+	char *p;
-+	int labelled = 0, implicit = 0;
++	ret = crypto_shash_final(desc, sig->digest);
++	if (ret < 0)
++		goto error_mpi;
 +
-+	top = element = alloc_elem(cursor);
-+	element->class = ASN1_UNIV;
-+	element->method = ASN1_PRIM;
-+	element->tag = token_to_tag[cursor->token_type];
-+	element->name = name;
++	ret = pub->algo->verify_signature(pub, sig);
 +
-+	/* Extract the tag value if one given */
-+	if (cursor->token_type == TOKEN_OPEN_SQUARE) {
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		switch (cursor->token_type) {
-+		case DIRECTIVE_UNIVERSAL:
-+			element->class = ASN1_UNIV;
-+			cursor++;
-+			break;
-+		case DIRECTIVE_APPLICATION:
-+			element->class = ASN1_APPL;
-+			cursor++;
-+			break;
-+		case TOKEN_NUMBER:
-+			element->class = ASN1_CONT;
-+			break;
-+		case DIRECTIVE_PRIVATE:
-+			element->class = ASN1_PRIV;
-+			cursor++;
-+			break;
-+		default:
-+			fprintf(stderr, "%s:%d: Unrecognised tag class token '%*.*s'\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
++	pr_debug("Cert Verification: %d\n", ret);
 +
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != TOKEN_NUMBER) {
-+			fprintf(stderr, "%s:%d: Missing tag number '%*.*s'\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
++error_mpi:
++	mpi_free(sig->rsa.s);
++error:
++	kfree(sig);
++error_no_sig:
++	crypto_free_shash(tfm);
 +
-+		element->tag &= ~0x1f;
-+		element->tag |= strtoul(cursor->value, &p, 10);
-+		if (p - cursor->value != cursor->size)
-+			abort();
-+		cursor++;
-+
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != TOKEN_CLOSE_SQUARE) {
-+			fprintf(stderr, "%s:%d: Missing closing square bracket '%*.*s'\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		labelled = 1;
-+	}
-+
-+	/* Handle implicit and explicit markers */
-+	if (cursor->token_type == DIRECTIVE_IMPLICIT) {
-+		element->flags |= ELEMENT_IMPLICIT;
-+		implicit = 1;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+	} else if (cursor->token_type == DIRECTIVE_EXPLICIT) {
-+		element->flags |= ELEMENT_EXPLICIT;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+	}
-+
-+	if (labelled) {
-+		if (!implicit)
-+			element->method |= ASN1_CONS;
-+		element->compound = implicit ? TAG_OVERRIDE : SEQUENCE;
-+		element->children = alloc_elem(cursor);
-+		element = element->children;
-+		element->class = ASN1_UNIV;
-+		element->method = ASN1_PRIM;
-+		element->tag = token_to_tag[cursor->token_type];
-+		element->name = name;
-+	}
-+
-+	/* Extract the type we're expecting here */
-+	element->type = cursor;
-+	switch (cursor->token_type) {
-+	case DIRECTIVE_ANY:
-+		element->compound = ANY;
-+		cursor++;
-+		break;
-+
-+	case DIRECTIVE_NULL:
-+	case DIRECTIVE_BOOLEAN:
-+	case DIRECTIVE_ENUMERATED:
-+	case DIRECTIVE_INTEGER:
-+		element->compound = NOT_COMPOUND;
-+		cursor++;
-+		break;
-+
-+	case DIRECTIVE_EXTERNAL:
-+		element->method = ASN1_CONS;
-+
-+	case DIRECTIVE_BMPString:
-+	case DIRECTIVE_GeneralString:
-+	case DIRECTIVE_GraphicString:
-+	case DIRECTIVE_IA5String:
-+	case DIRECTIVE_ISO646String:
-+	case DIRECTIVE_NumericString:
-+	case DIRECTIVE_PrintableString:
-+	case DIRECTIVE_T61String:
-+	case DIRECTIVE_TeletexString:
-+	case DIRECTIVE_UniversalString:
-+	case DIRECTIVE_UTF8String:
-+	case DIRECTIVE_VideotexString:
-+	case DIRECTIVE_VisibleString:
-+	case DIRECTIVE_ObjectDescriptor:
-+	case DIRECTIVE_GeneralizedTime:
-+	case DIRECTIVE_UTCTime:
-+		element->compound = NOT_COMPOUND;
-+		cursor++;
-+		break;
-+
-+	case DIRECTIVE_BIT:
-+	case DIRECTIVE_OCTET:
-+		element->compound = NOT_COMPOUND;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != DIRECTIVE_STRING)
-+			goto parse_error;
-+		cursor++;
-+		break;
-+
-+	case DIRECTIVE_OBJECT:
-+		element->compound = NOT_COMPOUND;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != DIRECTIVE_IDENTIFIER)
-+			goto parse_error;
-+		cursor++;
-+		break;
-+
-+	case TOKEN_TYPE_NAME:
-+		element->compound = TYPE_REF;
-+		ref = bsearch(cursor, type_index, nr_types, sizeof(type_index[0]),
-+			      type_finder);
-+		if (!ref) {
-+			fprintf(stderr, "%s:%d: Type '%*.*s' undefined\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
-+		cursor->type = *ref;
-+		(*ref)->ref_count++;
-+		cursor++;
-+		break;
-+
-+	case DIRECTIVE_CHOICE:
-+		element->compound = CHOICE;
-+		cursor++;
-+		element->children = parse_compound(&cursor, end, 1);
-+		break;
-+
-+	case DIRECTIVE_SEQUENCE:
-+		element->compound = SEQUENCE;
-+		element->method = ASN1_CONS;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type == DIRECTIVE_OF) {
-+			element->compound = SEQUENCE_OF;
-+			cursor++;
-+			if (cursor >= end)
-+				goto overrun_error;
-+			element->children = parse_type(&cursor, end, NULL);
-+		} else {
-+			element->children = parse_compound(&cursor, end, 0);
-+		}
-+		break;
-+
-+	case DIRECTIVE_SET:
-+		element->compound = SET;
-+		element->method = ASN1_CONS;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type == DIRECTIVE_OF) {
-+			element->compound = SET_OF;
-+			cursor++;
-+			if (cursor >= end)
-+				goto parse_error;
-+			element->children = parse_type(&cursor, end, NULL);
-+		} else {
-+			element->children = parse_compound(&cursor, end, 1);
-+		}
-+		break;
-+
-+	default:
-+		fprintf(stderr, "%s:%d: Token '%*.*s' does not introduce a type\n",
-+			filename, cursor->line,
-+			(int)cursor->size, (int)cursor->size, cursor->value);
-+		exit(1);
-+	}
-+
-+	/* Handle elements that are optional */
-+	if (cursor < end && (cursor->token_type == DIRECTIVE_OPTIONAL ||
-+			     cursor->token_type == DIRECTIVE_DEFAULT)
-+	    ) {
-+		cursor++;
-+		top->flags |= ELEMENT_SKIPPABLE;
-+	}
-+
-+	if (cursor < end && cursor->token_type == TOKEN_OPEN_ACTION) {
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != TOKEN_ELEMENT_NAME) {
-+			fprintf(stderr, "%s:%d: Token '%*.*s' is not an action function name\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
-+
-+		action = malloc(sizeof(struct action) + cursor->size + 1);
-+		if (!action) {
-+			perror(NULL);
-+			exit(1);
-+		}
-+		action->index = 0;
-+		memcpy(action->name, cursor->value, cursor->size);
-+		action->name[cursor->size] = 0;
-+
-+		for (ppaction = &action_list;
-+		     *ppaction;
-+		     ppaction = &(*ppaction)->next
-+		     ) {
-+			int cmp = strcmp(action->name, (*ppaction)->name);
-+			if (cmp == 0) {
-+				free(action);
-+				action = *ppaction;
-+				goto found;
-+			}
-+			if (cmp < 0) {
-+				action->next = *ppaction;
-+				*ppaction = action;
-+				nr_actions++;
-+				goto found;
-+			}
-+		}
-+		action->next = NULL;
-+		*ppaction = action;
-+		nr_actions++;
-+	found:
-+
-+		element->action = action;
-+		cursor->action = action;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != TOKEN_CLOSE_ACTION) {
-+			fprintf(stderr, "%s:%d: Missing close action, got '%*.*s'\n",
-+				filename, cursor->line,
-+				(int)cursor->size, (int)cursor->size, cursor->value);
-+			exit(1);
-+		}
-+		cursor++;
-+	}
-+
-+	*_cursor = cursor;
-+	return top;
-+
-+parse_error:
-+	fprintf(stderr, "%s:%d: Unexpected token '%*.*s'\n",
-+		filename, cursor->line,
-+		(int)cursor->size, (int)cursor->size, cursor->value);
-+	exit(1);
-+
-+overrun_error:
-+	fprintf(stderr, "%s: Unexpectedly hit EOF\n", filename);
-+	exit(1);
++	pr_devel("<==%s() = %d\n", __func__, ret);
++	return ret;
 +}
 +
 +/*
-+ * Parse a compound type list
++ * Attempt to parse a data blob for a key as an X509 certificate.
 + */
-+static struct element *parse_compound(struct token **_cursor, struct token *end,
-+				      int alternates)
++static int x509_key_preparse(struct key_preparsed_payload *prep)
 +{
-+	struct element *children, **child_p = &children, *element;
-+	struct token *cursor = *_cursor, *name;
++	struct x509_certificate *cert;
++	time_t now;
++	size_t srlen, sulen;
++	char *desc = NULL;
++	int ret;
 +
-+	if (cursor->token_type != TOKEN_OPEN_CURLY) {
-+		fprintf(stderr, "%s:%d: Expected compound to start with brace not '%*.*s'\n",
-+			filename, cursor->line,
-+			(int)cursor->size, (int)cursor->size, cursor->value);
-+		exit(1);
++	cert = x509_cert_parse(prep->data, prep->datalen);
++	if (IS_ERR(cert))
++		return PTR_ERR(cert);
++
++	pr_devel("Cert Issuer: %s\n", cert->issuer);
++	pr_devel("Cert Subject: %s\n", cert->subject);
++	pr_devel("Cert Key Algo: %s\n", pkey_algo[cert->pkey_algo]);
++	pr_devel("Cert Valid: %lu - %lu\n", cert->valid_from, cert->valid_to);
++	pr_devel("Cert Signature: %s + %s\n",
++		 pkey_algo[cert->sig_pkey_algo],
++		 pkey_hash_algo[cert->sig_hash_algo]);
++
++	now = CURRENT_TIME.tv_sec;
++	if (now < cert->valid_from) {
++		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
++		ret = -EKEYREJECTED;
++		goto error_free_cert;
 +	}
-+	cursor++;
-+	if (cursor >= end)
-+		goto overrun_error;
-+
-+	if (cursor->token_type == TOKEN_OPEN_CURLY) {
-+		fprintf(stderr, "%s:%d: Empty compound\n",
-+			filename, cursor->line);
-+		exit(1);
-+	}
-+
-+	for (;;) {
-+		name = NULL;
-+		if (cursor->token_type == TOKEN_ELEMENT_NAME) {
-+			name = cursor;
-+			cursor++;
-+			if (cursor >= end)
-+				goto overrun_error;
-+		}
-+
-+		element = parse_type(&cursor, end, name);
-+		if (alternates)
-+			element->flags |= ELEMENT_SKIPPABLE | ELEMENT_CONDITIONAL;
-+
-+		*child_p = element;
-+		child_p = &element->next;
-+
-+		if (cursor >= end)
-+			goto overrun_error;
-+		if (cursor->token_type != TOKEN_COMMA)
-+			break;
-+		cursor++;
-+		if (cursor >= end)
-+			goto overrun_error;
++	if (now >= cert->valid_to) {
++		pr_warn("Cert %s has expired\n", cert->fingerprint);
++		ret = -EKEYEXPIRED;
++		goto error_free_cert;
 +	}
 +
-+	children->flags &= ~ELEMENT_CONDITIONAL;
++	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
++	cert->pub->id_type = PKEY_ID_X509;
 +
-+	if (cursor->token_type != TOKEN_CLOSE_CURLY) {
-+		fprintf(stderr, "%s:%d: Expected compound closure, got '%*.*s'\n",
-+			filename, cursor->line,
-+			(int)cursor->size, (int)cursor->size, cursor->value);
-+		exit(1);
++	/* Check the signature on the key */
++	if (strcmp(cert->fingerprint, cert->authority) == 0) {
++		ret = x509_check_signature(cert->pub, cert);
++		if (ret < 0)
++			goto error_free_cert;
 +	}
-+	cursor++;
 +
-+	*_cursor = cursor;
-+	return children;
++	/* Propose a description */
++	srlen = strlen(cert->serial);
++	sulen = strlen(cert->subject);
++	ret = -ENOMEM;
++	desc = kmalloc(srlen + sulen + 2, GFP_KERNEL);
++	if (!desc)
++		goto error_free_cert;
++	memcpy(desc, cert->serial, srlen);
++	desc[srlen] = ':';
++	memcpy(desc + srlen + 1, cert->subject, sulen);
++	desc[srlen + sulen + 1] = 0;
 +
-+overrun_error:
-+	fprintf(stderr, "%s: Unexpectedly hit EOF\n", filename);
-+	exit(1);
++	/* We're pinning the module by being linked against it */
++	__module_get(public_key_subtype.owner);
++	prep->type_data[0] = &public_key_subtype;
++	prep->type_data[1] = cert->fingerprint;
++	prep->payload = cert->pub;
++	prep->description = desc;
++	prep->quotalen = 100;
++
++	/* We've finished with the certificate */
++	cert->pub = NULL;
++	cert->fingerprint = NULL;
++	desc = NULL;
++	ret = 0;
++
++error_free_cert:
++	x509_free_certificate(cert);
++	return ret;
 +}
 +
-+static void render_element(FILE *out, struct element *e, struct element *tag);
-+static void render_out_of_line_list(FILE *out);
-+
-+static int nr_entries;
-+static int render_depth = 1;
-+static struct element *render_list, **render_list_p = &render_list;
-+
-+__attribute__((format(printf, 2, 3)))
-+static void render_opcode(FILE *out, const char *fmt, ...)
-+{
-+	va_list va;
-+
-+	if (out) {
-+		fprintf(out, "\t[%4d] =%*s", nr_entries, render_depth, "");
-+		va_start(va, fmt);
-+		vfprintf(out, fmt, va);
-+		va_end(va);
-+	}
-+	nr_entries++;
-+}
-+
-+__attribute__((format(printf, 2, 3)))
-+static void render_more(FILE *out, const char *fmt, ...)
-+{
-+	va_list va;
-+
-+	if (out) {
-+		va_start(va, fmt);
-+		vfprintf(out, fmt, va);
-+		va_end(va);
-+	}
-+}
++static struct asymmetric_key_parser x509_key_parser = {
++	.owner	= THIS_MODULE,
++	.name	= "x509",
++	.parse	= x509_key_preparse,
++};
 +
 +/*
-+ * Render the grammar into a state machine definition.
++ * Module stuff
 + */
-+static void render(FILE *out, FILE *hdr)
++static int __init x509_key_init(void)
 +{
-+	struct element *e;
-+	struct action *action;
-+	struct type *root;
-+	int index;
-+
-+	fprintf(hdr, "/*\n");
-+	fprintf(hdr, " * Automatically generated by asn1_compiler.  Do not edit\n");
-+	fprintf(hdr, " *\n");
-+	fprintf(hdr, " * ASN.1 parser for %s\n", grammar_name);
-+	fprintf(hdr, " */\n");
-+	fprintf(hdr, "#include <linux/asn1_decoder.h>\n");
-+	fprintf(hdr, "\n");
-+	fprintf(hdr, "extern const struct asn1_decoder %s_decoder;\n", grammar_name);
-+	if (ferror(hdr)) {
-+		perror(headername);
-+		exit(1);
-+	}
-+
-+	fprintf(out, "/*\n");
-+	fprintf(out, " * Automatically generated by asn1_compiler.  Do not edit\n");
-+	fprintf(out, " *\n");
-+	fprintf(out, " * ASN.1 parser for %s\n", grammar_name);
-+	fprintf(out, " */\n");
-+	fprintf(out, "#include <linux/asn1_ber_bytecode.h>\n");
-+	fprintf(out, "#include \"%s-asn1.h\"\n", grammar_name);
-+	fprintf(out, "\n");
-+	if (ferror(out)) {
-+		perror(outputname);
-+		exit(1);
-+	}
-+
-+	/* Tabulate the action functions we might have to call */
-+	fprintf(hdr, "\n");
-+	index = 0;
-+	for (action = action_list; action; action = action->next) {
-+		action->index = index++;
-+		fprintf(hdr,
-+			"extern int %s(void *, size_t, unsigned char,"
-+			" const void *, size_t);\n",
-+			action->name);
-+	}
-+	fprintf(hdr, "\n");
-+
-+	fprintf(out, "enum %s_actions {\n", grammar_name);
-+	for (action = action_list; action; action = action->next)
-+		fprintf(out, "\tACT_%s = %u,\n",
-+			action->name, action->index);
-+	fprintf(out, "\tNR__%s_actions = %u\n", grammar_name, nr_actions);
-+	fprintf(out, "};\n");
-+
-+	fprintf(out, "\n");
-+	fprintf(out, "static const asn1_action_t %s_action_table[NR__%s_actions] = {\n",
-+		grammar_name, grammar_name);
-+	for (action = action_list; action; action = action->next)
-+		fprintf(out, "\t[%4u] = %s,\n", action->index, action->name);
-+	fprintf(out, "};\n");
-+
-+	if (ferror(out)) {
-+		perror(outputname);
-+		exit(1);
-+	}
-+
-+	/* We do two passes - the first one calculates all the offsets */
-+	printf("Pass 1\n");
-+	nr_entries = 0;
-+	root = &type_list[0];
-+	render_element(NULL, root->element, NULL);
-+	render_opcode(NULL, "ASN1_OP_COMPLETE,\n");
-+	render_out_of_line_list(NULL);
-+
-+	for (e = element_list; e; e = e->list_next)
-+		e->flags &= ~ELEMENT_RENDERED;
-+
-+	/* And then we actually render */
-+	printf("Pass 2\n");
-+	fprintf(out, "\n");
-+	fprintf(out, "static const unsigned char %s_machine[] = {\n",
-+		grammar_name);
-+
-+	nr_entries = 0;
-+	root = &type_list[0];
-+	render_element(out, root->element, NULL);
-+	render_opcode(out, "ASN1_OP_COMPLETE,\n");
-+	render_out_of_line_list(out);
-+
-+	fprintf(out, "};\n");
-+
-+	fprintf(out, "\n");
-+	fprintf(out, "const struct asn1_decoder %s_decoder = {\n", grammar_name);
-+	fprintf(out, "\t.machine = %s_machine,\n", grammar_name);
-+	fprintf(out, "\t.machlen = sizeof(%s_machine),\n", grammar_name);
-+	fprintf(out, "\t.actions = %s_action_table,\n", grammar_name);
-+	fprintf(out, "};\n");
++	return register_asymmetric_key_parser(&x509_key_parser);
 +}
 +
-+/*
-+ * Render the out-of-line elements
-+ */
-+static void render_out_of_line_list(FILE *out)
++static void __exit x509_key_exit(void)
 +{
-+	struct element *e, *ce;
-+	const char *act;
-+	int entry;
-+
-+	while ((e = render_list)) {
-+		render_list = e->render_next;
-+		if (!render_list)
-+			render_list_p = &render_list;
-+
-+		render_more(out, "\n");
-+		e->entry_index = entry = nr_entries;
-+		render_depth++;
-+		for (ce = e->children; ce; ce = ce->next)
-+			render_element(out, ce, NULL);
-+		render_depth--;
-+
-+		act = e->action ? "_ACT" : "";
-+		switch (e->compound) {
-+		case SEQUENCE:
-+			render_opcode(out, "ASN1_OP_END_SEQ%s,\n", act);
-+			break;
-+		case SEQUENCE_OF:
-+			render_opcode(out, "ASN1_OP_END_SEQ_OF%s,\n", act);
-+			render_opcode(out, "_jump_target(%u),\n", entry);
-+			break;
-+		case SET:
-+			render_opcode(out, "ASN1_OP_END_SET%s,\n", act);
-+			break;
-+		case SET_OF:
-+			render_opcode(out, "ASN1_OP_END_SET_OF%s,\n", act);
-+			render_opcode(out, "_jump_target(%u),\n", entry);
-+			break;
-+		}
-+		if (e->action)
-+			render_opcode(out, "_action(ACT_%s),\n",
-+				      e->action->name);
-+		render_opcode(out, "ASN1_OP_RETURN,\n");
-+	}
++	unregister_asymmetric_key_parser(&x509_key_parser);
 +}
 +
-+/*
-+ * Render an element.
-+ */
-+static void render_element(FILE *out, struct element *e, struct element *tag)
-+{
-+	struct element *ec;
-+	const char *cond, *act;
-+	int entry, skippable = 0, outofline = 0;
-+
-+	if (e->flags & ELEMENT_SKIPPABLE ||
-+	    (tag && tag->flags & ELEMENT_SKIPPABLE))
-+		skippable = 1;
-+
-+	if ((e->type_def && e->type_def->ref_count > 1) ||
-+	    skippable)
-+		outofline = 1;
-+
-+	if (e->type_def && out) {
-+		render_more(out, "\t// %*.*s\n",
-+			    (int)e->type_def->name->size, (int)e->type_def->name->size,
-+			    e->type_def->name->value);
++module_init(x509_key_init);
++module_exit(x509_key_exit);
+diff --git a/crypto/asymmetric_keys/x509_rsakey.asn1 b/crypto/asymmetric_keys/x509_rsakey.asn1
+new file mode 100644
+index 0000000..4ec7cc6
+--- /dev/null
++++ b/crypto/asymmetric_keys/x509_rsakey.asn1
+@@ -0,0 +1,4 @@
++RSAPublicKey ::= SEQUENCE {
++	modulus			INTEGER ({ rsa_extract_mpi }),	-- n
++	publicExponent		INTEGER ({ rsa_extract_mpi })	-- e
 +	}
-+
-+	/* Render the operation */
-+	cond = (e->flags & ELEMENT_CONDITIONAL ||
-+		(tag && tag->flags & ELEMENT_CONDITIONAL)) ? "COND_" : "";
-+	act = e->action ? "_ACT" : "";
-+	switch (e->compound) {
-+	case ANY:
-+		render_opcode(out, "ASN1_OP_%sMATCH_ANY%s,", cond, act);
-+		if (e->name)
-+			render_more(out, "\t\t// %*.*s",
-+				    (int)e->name->size, (int)e->name->size,
-+				    e->name->value);
-+		render_more(out, "\n");
-+		goto dont_render_tag;
-+
-+	case TAG_OVERRIDE:
-+		render_element(out, e->children, e);
-+		return;
-+
-+	case SEQUENCE:
-+	case SEQUENCE_OF:
-+	case SET:
-+	case SET_OF:
-+		render_opcode(out, "ASN1_OP_%sMATCH%s%s,",
-+			      cond,
-+			      outofline ? "_JUMP" : "",
-+			      skippable ? "_OR_SKIP" : "");
-+		break;
-+
-+	case CHOICE:
-+		goto dont_render_tag;
-+
-+	case TYPE_REF:
-+		if (e->class == ASN1_UNIV && e->method == ASN1_PRIM && e->tag == 0)
-+			goto dont_render_tag;
-+	default:
-+		render_opcode(out, "ASN1_OP_%sMATCH%s%s,",
-+			      cond, act,
-+			      skippable ? "_OR_SKIP" : "");
-+		break;
-+	}
-+
-+	if (e->name)
-+		render_more(out, "\t\t// %*.*s",
-+			    (int)e->name->size, (int)e->name->size,
-+			    e->name->value);
-+	render_more(out, "\n");
-+
-+	/* Render the tag */
-+	if (!tag)
-+		tag = e;
-+	if (tag->class == ASN1_UNIV &&
-+	    tag->tag != 14 &&
-+	    tag->tag != 15 &&
-+	    tag->tag != 31)
-+		render_opcode(out, "_tag(%s, %s, %s),\n",
-+			      asn1_classes[tag->class],
-+			      asn1_methods[tag->method | e->method],
-+			      asn1_universal_tags[tag->tag]);
-+	else
-+		render_opcode(out, "_tagn(%s, %s, %2u),\n",
-+			      asn1_classes[tag->class],
-+			      asn1_methods[tag->method | e->method],
-+			      tag->tag);
-+	tag = NULL;
-+dont_render_tag:
-+
-+	/* Deal with compound types */
-+	switch (e->compound) {
-+	case TYPE_REF:
-+		render_element(out, e->type->type->element, tag);
-+		if (e->action)
-+			render_opcode(out, "ASN1_OP_ACT,\n");
-+		break;
-+
-+	case SEQUENCE:
-+		if (outofline) {
-+			/* Render out-of-line for multiple use or
-+			 * skipability */
-+			render_opcode(out, "_jump_target(%u),", e->entry_index);
-+			if (e->type_def && e->type_def->name)
-+				render_more(out, "\t\t// --> %*.*s",
-+					    (int)e->type_def->name->size,
-+					    (int)e->type_def->name->size,
-+					    e->type_def->name->value);
-+			render_more(out, "\n");
-+			if (!(e->flags & ELEMENT_RENDERED)) {
-+				e->flags |= ELEMENT_RENDERED;
-+				*render_list_p = e;
-+				render_list_p = &e->render_next;
-+			}
-+			return;
-+		} else {
-+			/* Render inline for single use */
-+			render_depth++;
-+			for (ec = e->children; ec; ec = ec->next)
-+				render_element(out, ec, NULL);
-+			render_depth--;
-+			render_opcode(out, "ASN1_OP_END_SEQ%s,\n", act);
-+		}
-+		break;
-+
-+	case SEQUENCE_OF:
-+	case SET_OF:
-+		if (outofline) {
-+			/* Render out-of-line for multiple use or
-+			 * skipability */
-+			render_opcode(out, "_jump_target(%u),", e->entry_index);
-+			if (e->type_def && e->type_def->name)
-+				render_more(out, "\t\t// --> %*.*s",
-+					    (int)e->type_def->name->size,
-+					    (int)e->type_def->name->size,
-+					    e->type_def->name->value);
-+			render_more(out, "\n");
-+			if (!(e->flags & ELEMENT_RENDERED)) {
-+				e->flags |= ELEMENT_RENDERED;
-+				*render_list_p = e;
-+				render_list_p = &e->render_next;
-+			}
-+			return;
-+		} else {
-+			/* Render inline for single use */
-+			entry = nr_entries;
-+			render_depth++;
-+			render_element(out, e->children, NULL);
-+			render_depth--;
-+			if (e->compound == SEQUENCE_OF)
-+				render_opcode(out, "ASN1_OP_END_SEQ_OF%s,\n", act);
-+			else
-+				render_opcode(out, "ASN1_OP_END_SET_OF%s,\n", act);
-+			render_opcode(out, "_jump_target(%u),\n", entry);
-+		}
-+		break;
-+
-+	case SET:
-+		/* I can't think of a nice way to do SET support without having
-+		 * a stack of bitmasks to make sure no element is repeated.
-+		 * The bitmask has also to be checked that no non-optional
-+		 * elements are left out whilst not preventing optional
-+		 * elements from being left out.
-+		 */
-+		fprintf(stderr, "The ASN.1 SET type is not currently supported.\n");
-+		exit(1);
-+
-+	case CHOICE:
-+		for (ec = e->children; ec; ec = ec->next)
-+			render_element(out, ec, NULL);
-+		if (!skippable)
-+			render_opcode(out, "ASN1_OP_COND_FAIL,\n");
-+		if (e->action)
-+			render_opcode(out, "ASN1_OP_ACT,\n");
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	if (e->action)
-+		render_opcode(out, "_action(ACT_%s),\n", e->action->name);
-+}
