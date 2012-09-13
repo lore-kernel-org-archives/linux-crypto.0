@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 10/16] RSA: Fix signature verification for shorter signatures
-Date: Fri, 14 Sep 2012 00:49:31 +0100
-Message-ID: <20120913234931.3575.10461.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 15/16] MPILIB: Provide a function to read raw data into an MPI
+Date: Fri, 14 Sep 2012 00:50:14 +0100
+Message-ID: <20120913235014.3575.79467.stgit@warthog.procyon.org.uk>
 References: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,51 +15,104 @@ In-Reply-To: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-gpg can produce a signature file where length of signature is less than the
-modulus size because the amount of space an MPI takes up is kept as low as
-possible by discarding leading zeros.  This regularly happens for several
-modules during the build.
+Provide a function to read raw data of a predetermined size into an MPI rather
+than expecting the size to be encoded within the data.  The data is assumed to
+represent an unsigned integer, and the resulting MPI will be positive.
 
-Fix it by relaxing check in RSA verification code.
+The function looks like this:
 
-Thanks to Tomas Mraz and Miloslav Trmac for help.
+	MPI mpi_read_raw_data(const void *, size_t);
 
-Signed-off-by: Milan Broz <mbroz@redhat.com>
+This is useful for reading ASN.1 integer primitives where the length is encoded
+in the ASN.1 metadata.
+
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- crypto/asymmetric_keys/rsa.c |   14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ include/linux/mpi.h |    1 +
+ lib/mpi/mpicoder.c  |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
 
 
-diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
-index 9b31ee2..4a6a069 100644
---- a/crypto/asymmetric_keys/rsa.c
-+++ b/crypto/asymmetric_keys/rsa.c
-@@ -224,15 +224,23 @@ static int RSA_verify_signature(const struct public_key *key,
- 		return -ENOTSUPP;
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index d02cca6..5af1b81 100644
+--- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -76,6 +76,7 @@ void mpi_swap(MPI a, MPI b);
  
- 	/* (1) Check the signature size against the public key modulus size */
--	k = (mpi_get_nbits(key->rsa.n) + 7) / 8;
-+	k = mpi_get_nbits(key->rsa.n);
-+	tsize = mpi_get_nbits(sig->rsa.s);
+ /*-- mpicoder.c --*/
+ MPI do_encode_md(const void *sha_buffer, unsigned nbits);
++MPI mpi_read_raw_data(const void *xbuffer, size_t nbytes);
+ MPI mpi_read_from_buffer(const void *buffer, unsigned *ret_nread);
+ int mpi_fromstr(MPI val, const char *str);
+ u32 mpi_get_keyid(MPI a, u32 *keyid);
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index f0fa659..3962b7f 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -18,10 +18,65 @@
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+  */
  
--	tsize = (mpi_get_nbits(sig->rsa.s) + 7) / 8;
-+	/* According to RFC 4880 sec 3.2, length of MPI is computed starting
-+	 * from most significant bit.  So the RFC 3447 sec 8.2.2 size check
-+	 * must be relaxed to conform with shorter signatures - so we fail here
-+	 * only if signature length is longer than modulus size.
-+	 */
- 	pr_devel("step 1: k=%zu size(S)=%zu\n", k, tsize);
--	if (tsize != k) {
-+	if (k < tsize) {
- 		ret = -EBADMSG;
- 		goto error;
- 	}
++#include <linux/bitops.h>
++#include <asm-generic/bitops/count_zeros.h>
+ #include "mpi-internal.h"
  
-+	/* Round up and convert to octets */
-+	k = (k + 7) / 8;
+ #define MAX_EXTERN_MPI_BITS 16384
+ 
++/**
++ * mpi_read_raw_data - Read a raw byte stream as a positive integer
++ * @xbuffer: The data to read
++ * @nbytes: The amount of data to read
++ */
++MPI mpi_read_raw_data(const void *xbuffer, size_t nbytes)
++{
++	const uint8_t *buffer = xbuffer;
++	int i, j;
++	unsigned nbits, nlimbs;
++	mpi_limb_t a;
++	MPI val = NULL;
 +
- 	/* (2b) Apply the RSAVP1 verification primitive to the public key */
- 	ret = RSAVP1(key, sig->rsa.s, &m);
- 	if (ret < 0)
++	while (nbytes >= 0 && buffer[0] == 0) {
++		buffer++;
++		nbytes--;
++	}
++
++	nbits = nbytes * 8;
++	if (nbits > MAX_EXTERN_MPI_BITS) {
++		pr_info("MPI: mpi too large (%u bits)\n", nbits);
++		return NULL;
++	}
++	if (nbytes > 0)
++		nbits -= count_leading_zeros(buffer[0]);
++	else
++		nbits = 0;
++
++	nlimbs = (nbytes + BYTES_PER_MPI_LIMB - 1) / BYTES_PER_MPI_LIMB;
++	val = mpi_alloc(nlimbs);
++	if (!val)
++		return NULL;
++	val->nbits = nbits;
++	val->sign = 0;
++	val->nlimbs = nlimbs;
++
++	if (nbytes > 0) {
++		i = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
++		i %= BYTES_PER_MPI_LIMB;
++		for (j = nlimbs; j > 0; j--) {
++			a = 0;
++			for (; i < BYTES_PER_MPI_LIMB; i++) {
++				a <<= 8;
++				a |= *buffer++;
++			}
++			i = 0;
++			val->d[j - 1] = a;
++		}
++	}
++	return val;
++}
++EXPORT_SYMBOL_GPL(mpi_read_raw_data);
++
+ MPI mpi_read_from_buffer(const void *xbuffer, unsigned *ret_nread)
+ {
+ 	const uint8_t *buffer = xbuffer;
