@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 14/16] X.509: Add an ASN.1 decoder
-Date: Fri, 14 Sep 2012 00:50:05 +0100
-Message-ID: <20120913235005.3575.46218.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 12/16] X.509: Add utility functions to render OIDs as strings
+Date: Fri, 14 Sep 2012 00:49:47 +0100
+Message-ID: <20120913234947.3575.9661.stgit@warthog.procyon.org.uk>
 References: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,561 +15,130 @@ In-Reply-To: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add an ASN.1 BER/DER/CER decoder.  This uses the bytecode from the ASN.1
-compiler in the previous patch to inform it as to what to expect to find in the
-encoded byte stream.  The output from the compiler also tells it what functions
-to call on what tags, thus allowing the caller to retrieve information.
+Add a pair of utility functions to render OIDs as strings.  The first takes an
+encoded OID and turns it into a "a.b.c.d" form string:
 
-The decoder is called as follows:
+	int sprint_oid(const void *data, size_t datasize,
+		       char *buffer, size_t bufsize);
 
-	int asn1_decoder(const struct asn1_decoder *decoder,
-			 void *context,
-			 const unsigned char *data,
-			 size_t datalen);
+The second takes an OID enum index and calls the first on the data held
+therein:
 
-The decoder argument points to the bytecode from the ASN.1 compiler.  context
-is the caller's context and is passed to the action functions.  data and
-datalen define the byte stream to be decoded.
-
-
-Note that the decoder is currently limited to datalen being less than 64K.
-This reduces the amount of stack space used by the decoder because ASN.1 is a
-nested construct.  Similarly, the decoder is limited to a maximum of 10 levels
-of constructed data outside of a leaf node also in an effort to keep stack
-usage down.
-
-These restrictions can be raised if necessary.
+	int sprint_OID(enum OID oid, char *buffer, size_t bufsize);
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- include/linux/asn1_decoder.h |   24 ++
- lib/Makefile                 |    2 
- lib/asn1_decoder.c           |  473 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 499 insertions(+)
- create mode 100644 include/linux/asn1_decoder.h
- create mode 100644 lib/asn1_decoder.c
+ include/linux/oid_registry.h |    2 +
+ lib/oid_registry.c           |   81 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
 
 
-diff --git a/include/linux/asn1_decoder.h b/include/linux/asn1_decoder.h
-new file mode 100644
-index 0000000..fa2ff5b
---- /dev/null
-+++ b/include/linux/asn1_decoder.h
-@@ -0,0 +1,24 @@
-+/* ASN.1 decoder
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#ifndef _LINUX_ASN1_DECODER_H
-+#define _LINUX_ASN1_DECODER_H
-+
-+#include <linux/asn1.h>
-+
-+struct asn1_decoder;
-+
-+extern int asn1_ber_decoder(const struct asn1_decoder *decoder,
-+			    void *context,
-+			    const unsigned char *data,
-+			    size_t datalen);
-+
-+#endif /* _LINUX_ASN1_DECODER_H */
-diff --git a/lib/Makefile b/lib/Makefile
-index b042896..ca856b6 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -140,6 +140,8 @@ $(foreach file, $(libfdt_files), \
- 	$(eval CFLAGS_$(file) = -I$(src)/../scripts/dtc/libfdt))
- lib-$(CONFIG_LIBFDT) += $(libfdt_files)
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 5928546..6926db7 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -86,5 +86,7 @@ enum OID {
+ };
  
-+obj-$(CONFIG_ASN1) += asn1_decoder.o
-+
- hostprogs-y	:= gen_crc32table
- clean-files	:= crc32table.h
+ extern enum OID look_up_OID(const void *data, size_t datasize);
++extern int sprint_oid(const void *, size_t, char *, size_t);
++extern int sprint_OID(enum OID, char *, size_t);
  
-diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
-new file mode 100644
-index 0000000..8179f3c
---- /dev/null
-+++ b/lib/asn1_decoder.c
-@@ -0,0 +1,473 @@
-+/* Decoder for ASN.1 BER/DER/CER encoded bytestream
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#include <linux/export.h>
+ #endif /* _LINUX_OID_REGISTRY_H */
+diff --git a/lib/oid_registry.c b/lib/oid_registry.c
+index 33cfd17..d8de11f 100644
+--- a/lib/oid_registry.c
++++ b/lib/oid_registry.c
+@@ -11,6 +11,9 @@
+ 
+ #include <linux/export.h>
+ #include <linux/oid_registry.h>
 +#include <linux/kernel.h>
 +#include <linux/errno.h>
-+#include <linux/asn1_decoder.h>
-+#include <linux/asn1_ber_bytecode.h>
-+
-+static const unsigned char asn1_op_lengths[ASN1_OP__NR] = {
-+	/*					OPC TAG JMP ACT */
-+	[ASN1_OP_MATCH]				= 1 + 1,
-+	[ASN1_OP_MATCH_OR_SKIP]			= 1 + 1,
-+	[ASN1_OP_MATCH_ACT]			= 1 + 1     + 1,
-+	[ASN1_OP_MATCH_ACT_OR_SKIP]		= 1 + 1     + 1,
-+	[ASN1_OP_MATCH_JUMP]			= 1 + 1 + 1,
-+	[ASN1_OP_MATCH_JUMP_OR_SKIP]		= 1 + 1 + 1,
-+	[ASN1_OP_MATCH_ANY]			= 1,
-+	[ASN1_OP_MATCH_ANY_ACT]			= 1         + 1,
-+	[ASN1_OP_COND_MATCH_OR_SKIP]		= 1 + 1,
-+	[ASN1_OP_COND_MATCH_ACT_OR_SKIP]	= 1 + 1     + 1,
-+	[ASN1_OP_COND_MATCH_JUMP_OR_SKIP]	= 1 + 1 + 1,
-+	[ASN1_OP_COND_MATCH_ANY]		= 1,
-+	[ASN1_OP_COND_MATCH_ANY_ACT]		= 1         + 1,
-+	[ASN1_OP_COND_FAIL]			= 1,
-+	[ASN1_OP_COMPLETE]			= 1,
-+	[ASN1_OP_ACT]				= 1         + 1,
-+	[ASN1_OP_RETURN]			= 1,
-+	[ASN1_OP_END_SEQ]			= 1,
-+	[ASN1_OP_END_SEQ_OF]			= 1     + 1,
-+	[ASN1_OP_END_SET]			= 1,
-+	[ASN1_OP_END_SET_OF]			= 1     + 1,
-+	[ASN1_OP_END_SEQ_ACT]			= 1         + 1,
-+	[ASN1_OP_END_SEQ_OF_ACT]		= 1     + 1 + 1,
-+	[ASN1_OP_END_SET_ACT]			= 1         + 1,
-+	[ASN1_OP_END_SET_OF_ACT]		= 1     + 1 + 1,
-+};
++#include <linux/bug.h>
+ #include "oid_registry_data.c"
+ 
+ /**
+@@ -87,3 +90,81 @@ enum OID look_up_OID(const void *data, size_t datasize)
+ 	return OID__NR;
+ }
+ EXPORT_SYMBOL_GPL(look_up_OID);
 +
 +/*
-+ * Find the length of an indefinite length object
++ * sprint_OID - Print an Object Identifier into a buffer
++ * @data: The encoded OID to print
++ * @datasize: The size of the encoded OID
++ * @buffer: The buffer to render into
++ * @bufsize: The size of the buffer
++ *
++ * The OID is rendered into the buffer in "a.b.c.d" format and the number of
++ * bytes is returned.  -EBADMSG is returned if the data could not be intepreted
++ * and -ENOBUFS if the buffer was too small.
 + */
-+static int asn1_find_indefinite_length(const unsigned char *data, size_t datalen,
-+				       const char **_errmsg, size_t *_err_dp)
++int sprint_oid(const void *data, size_t datasize, char *buffer, size_t bufsize)
 +{
-+	unsigned char tag, tmp;
-+	size_t dp = 0, len, n;
-+	int indef_level = 1;
++	const unsigned char *v = data, *end = v + datasize;
++	unsigned long num;
++	unsigned char n;
++	size_t ret;
++	int count;
 +
-+next_tag:
-+	if (unlikely(datalen - dp < 2)) {
-+		if (datalen == dp)
-+			goto missing_eoc;
-+		goto data_overrun_error;
++	if (v >= end)
++		return -EBADMSG;
++
++	n = *v++;
++	ret = count = snprintf(buffer, bufsize, "%u.%u", n / 40, n % 40);
++	buffer += count;
++	bufsize -= count;
++	if (bufsize == 0)
++		return -ENOBUFS;
++
++	while (v < end) {
++		num = 0;
++		n = *v++;
++		if (!(n & 0x80)) {
++			num = n;
++		} else {
++			num = n & 0x7f;
++			do {
++				if (v >= end)
++					return -EBADMSG;
++				n = *v++;
++				num <<= 7;
++				num |= n & 0x7f;
++			} while (n & 0x80);
++		}
++		ret += count = snprintf(buffer, bufsize, ".%lu", num);
++		buffer += count;
++		bufsize -= count;
++		if (bufsize == 0)
++			return -ENOBUFS;
 +	}
 +
-+	/* Extract a tag from the data */
-+	tag = data[dp++];
-+	if (tag == 0) {
-+		/* It appears to be an EOC. */
-+		if (data[dp++] != 0)
-+			goto invalid_eoc;
-+		if (--indef_level <= 0)
-+			return dp;
-+		goto next_tag;
-+	}
-+
-+	if (unlikely((tag & 0x1f) == 0x1f)) {
-+		do {
-+			if (unlikely(datalen - dp < 2))
-+				goto data_overrun_error;
-+			tmp = data[dp++];
-+		} while (tmp & 0x80);
-+	}
-+
-+	/* Extract the length */
-+	len = data[dp++];
-+	if (len < 0x7f) {
-+		dp += len;
-+		goto next_tag;
-+	}
-+
-+	if (unlikely(len == 0x80)) {
-+		/* Indefinite length */
-+		if (unlikely((tag & ASN1_CONS_BIT) == ASN1_PRIM << 5))
-+			goto indefinite_len_primitive;
-+		indef_level++;
-+		goto next_tag;
-+	}
-+
-+	n = len - 0x80;
-+	if (unlikely(n > sizeof(size_t) - 1))
-+		goto length_too_long;
-+	if (unlikely(n > datalen - dp))
-+		goto data_overrun_error;
-+	for (len = 0; n > 0; n--) {
-+		len <<= 8;
-+		len |= data[dp++];
-+	}
-+	dp += len;
-+	goto next_tag;
-+
-+length_too_long:
-+	*_errmsg = "Unsupported length";
-+	goto error;
-+indefinite_len_primitive:
-+	*_errmsg = "Indefinite len primitive not permitted";
-+	goto error;
-+invalid_eoc:
-+	*_errmsg = "Invalid length EOC";
-+	goto error;
-+data_overrun_error:
-+	*_errmsg = "Data overrun error";
-+	goto error;
-+missing_eoc:
-+	*_errmsg = "Missing EOC in indefinite len cons";
-+error:
-+	*_err_dp = dp;
-+	return -1;
++	return ret;
 +}
++EXPORT_SYMBOL_GPL(sprint_oid);
 +
 +/**
-+ * asn1_ber_decoder - Decoder BER/DER/CER ASN.1 according to pattern
-+ * @decoder: The decoder definition (produced by asn1_compiler)
-+ * @context: The caller's context (to be passed to the action functions)
-+ * @data: The encoded data
-+ * @datasize: The size of the encoded data
++ * sprint_OID - Print an Object Identifier into a buffer
++ * @oid: The OID to print
++ * @buffer: The buffer to render into
++ * @bufsize: The size of the buffer
 + *
-+ * Decode BER/DER/CER encoded ASN.1 data according to a bytecode pattern
-+ * produced by asn1_compiler.  Action functions are called on marked tags to
-+ * allow the caller to retrieve significant data.
-+ *
-+ * LIMITATIONS:
-+ *
-+ * To keep down the amount of stack used by this function, the following limits
-+ * have been imposed:
-+ *
-+ *  (1) This won't handle datalen > 65535 without increasing the size of the
-+ *	cons stack elements and length_too_long checking.
-+ *
-+ *  (2) The stack of constructed types is 10 deep.  If the depth of non-leaf
-+ *	constructed types exceeds this, the decode will fail.
-+ *
-+ *  (3) The SET type (not the SET OF type) isn't really supported as tracking
-+ *	what members of the set have been seen is a pain.
++ * The OID is rendered into the buffer in "a.b.c.d" format and the number of
++ * bytes is returned.
 + */
-+int asn1_ber_decoder(const struct asn1_decoder *decoder,
-+		     void *context,
-+		     const unsigned char *data,
-+		     size_t datalen)
++int sprint_OID(enum OID oid, char *buffer, size_t bufsize)
 +{
-+	const unsigned char *machine = decoder->machine;
-+	const asn1_action_t *actions = decoder->actions;
-+	size_t machlen = decoder->machlen;
-+	enum asn1_opcode op;
-+	unsigned char tag = 0, csp = 0, jsp = 0, optag = 0;
-+	const char *errmsg;
-+	size_t pc = 0, dp = 0, tdp = 0, len = 0, hdr = 0;
 +	int ret;
 +
-+	unsigned char flags = 0;
-+#define FLAG_INDEFINITE_LENGTH	0x01
-+#define FLAG_MATCHED		0x02
-+#define FLAG_CONS		0x20 /* Corresponds to CONS bit in the opcode tag
-+				      * - ie. whether or not we are going to parse
-+				      *   a compound type.
-+				      */
++	BUG_ON(oid >= OID__NR);
 +
-+#define NR_CONS_STACK 10
-+	unsigned short cons_dp_stack[NR_CONS_STACK];
-+	unsigned short cons_datalen_stack[NR_CONS_STACK];
-+#define NR_JUMP_STACK 10
-+	unsigned char jump_stack[NR_JUMP_STACK];
-+
-+	if (datalen > 65535)
-+		return -EMSGSIZE;
-+
-+next_op:
-+	pr_debug("next_op: pc=\e[32m%zu\e[m/%zu dp=\e[33m%zu\e[m/%zu C=%d J=%d\n",
-+		 pc, machlen, dp, datalen, csp, jsp);
-+	if (unlikely(pc >= machlen))
-+		goto machine_overrun_error;
-+	op = machine[pc];
-+	if (unlikely(pc + asn1_op_lengths[op] > machlen))
-+		goto machine_overrun_error;
-+
-+	/* If this command is meant to match a tag, then do that before
-+	 * evaluating the command.
-+	 */
-+	if (op <= ASN1_OP__MATCHES_TAG) {
-+		unsigned char tmp;
-+
-+		/* Skip conditional matches if possible */
-+		if ((op & ASN1_OP_MATCH__COND &&
-+		     flags & FLAG_MATCHED) ||
-+		    dp == datalen) {
-+			pc += asn1_op_lengths[op];
-+			goto next_op;
-+		}
-+
-+		flags = 0;
-+		hdr = dp;
-+
-+		/* Extract a tag from the data */
-+		if (unlikely(dp >= datalen - 1))
-+			goto data_overrun_error;
-+		tag = data[dp++];
-+		if (unlikely((tag & 0x1f) == 0x1f))
-+			goto long_tag_not_supported;
-+
-+		if (op & ASN1_OP_MATCH__ANY) {
-+			pr_debug("- any %02x\n", tag);
-+		} else {
-+			/* Extract the tag from the machine
-+			 * - Either CONS or PRIM are permitted in the data if
-+			 *   CONS is not set in the op stream, otherwise CONS
-+			 *   is mandatory.
-+			 */
-+			optag = machine[pc + 1];
-+			flags |= optag & FLAG_CONS;
-+
-+			/* Determine whether the tag matched */
-+			tmp = optag ^ tag;
-+			tmp &= ~(optag & ASN1_CONS_BIT);
-+			pr_debug("- match? %02x %02x %02x\n", tag, optag, tmp);
-+			if (tmp != 0) {
-+				/* All odd-numbered tags are MATCH_OR_SKIP. */
-+				if (op & ASN1_OP_MATCH__SKIP) {
-+					pc += asn1_op_lengths[op];
-+					dp--;
-+					goto next_op;
-+				}
-+				goto tag_mismatch;
-+			}
-+		}
-+		flags |= FLAG_MATCHED;
-+
-+		len = data[dp++];
-+		if (len > 0x7f) {
-+			if (unlikely(len == 0x80)) {
-+				/* Indefinite length */
-+				if (unlikely(!(tag & ASN1_CONS_BIT)))
-+					goto indefinite_len_primitive;
-+				flags |= FLAG_INDEFINITE_LENGTH;
-+				if (unlikely(2 > datalen - dp))
-+					goto data_overrun_error;
-+			} else {
-+				int n = len - 0x80;
-+				if (unlikely(n > 2))
-+					goto length_too_long;
-+				if (unlikely(dp >= datalen - n))
-+					goto data_overrun_error;
-+				for (len = 0; n > 0; n--) {
-+					len <<= 8;
-+					len |= data[dp++];
-+				}
-+				if (unlikely(len > datalen - dp))
-+					goto data_overrun_error;
-+			}
-+		}
-+
-+		if (flags & FLAG_CONS) {
-+			/* For expected compound forms, we stack the positions
-+			 * of the start and end of the data.
-+			 */
-+			if (unlikely(csp >= NR_CONS_STACK))
-+				goto cons_stack_overflow;
-+			cons_dp_stack[csp] = dp;
-+			if (!(flags & FLAG_INDEFINITE_LENGTH)) {
-+				cons_datalen_stack[csp] = datalen;
-+				datalen = dp + len;
-+			} else {
-+				cons_datalen_stack[csp] = 0;
-+			}
-+			csp++;
-+		}
-+
-+		pr_debug("- TAG: %02x %zu%s\n",
-+			 tag, len, flags & FLAG_CONS ? " CONS" : "");
-+		tdp = dp;
-+	}
-+
-+	/* Decide how to handle the operation */
-+	switch (op) {
-+	case ASN1_OP_MATCH_ANY_ACT:
-+	case ASN1_OP_COND_MATCH_ANY_ACT:
-+		ret = actions[machine[pc + 1]](context, dp - hdr, tag, data + dp, len);
-+		if (ret < 0)
-+			return ret;
-+		goto skip_data;
-+
-+	case ASN1_OP_MATCH_ACT:
-+	case ASN1_OP_MATCH_ACT_OR_SKIP:
-+	case ASN1_OP_COND_MATCH_ACT_OR_SKIP:
-+		ret = actions[machine[pc + 2]](context, dp - hdr, tag, data + dp, len);
-+		if (ret < 0)
-+			return ret;
-+		goto skip_data;
-+
-+	case ASN1_OP_MATCH:
-+	case ASN1_OP_MATCH_OR_SKIP:
-+	case ASN1_OP_MATCH_ANY:
-+	case ASN1_OP_COND_MATCH_OR_SKIP:
-+	case ASN1_OP_COND_MATCH_ANY:
-+	skip_data:
-+		if (!(flags & FLAG_CONS)) {
-+			if (flags & FLAG_INDEFINITE_LENGTH) {
-+				len = asn1_find_indefinite_length(
-+					data + dp, datalen - dp, &errmsg, &dp);
-+				if (len < 0)
-+					goto error;
-+			}
-+			pr_debug("- LEAF: %zu\n", len);
-+			dp += len;
-+		}
-+		pc += asn1_op_lengths[op];
-+		goto next_op;
-+
-+	case ASN1_OP_MATCH_JUMP:
-+	case ASN1_OP_MATCH_JUMP_OR_SKIP:
-+	case ASN1_OP_COND_MATCH_JUMP_OR_SKIP:
-+		pr_debug("- MATCH_JUMP\n");
-+		if (unlikely(jsp == NR_JUMP_STACK))
-+			goto jump_stack_overflow;
-+		jump_stack[jsp++] = pc + asn1_op_lengths[op];
-+		pc = machine[pc + 2];
-+		goto next_op;
-+
-+	case ASN1_OP_COND_FAIL:
-+		if (unlikely(!(flags & FLAG_MATCHED)))
-+			goto tag_mismatch;
-+		pc += asn1_op_lengths[op];
-+		goto next_op;
-+
-+	case ASN1_OP_COMPLETE:
-+		if (unlikely(jsp != 0 || csp != 0)) {
-+			pr_err("ASN.1 decoder error: Stacks not empty at completion (%u, %u)\n",
-+			       jsp, csp);
-+			return -EBADMSG;
-+		}
-+		return 0;
-+
-+	case ASN1_OP_END_SET:
-+	case ASN1_OP_END_SET_ACT:
-+		if (unlikely(!(flags & FLAG_MATCHED)))
-+			goto tag_mismatch;
-+	case ASN1_OP_END_SEQ:
-+	case ASN1_OP_END_SET_OF:
-+	case ASN1_OP_END_SEQ_OF:
-+	case ASN1_OP_END_SEQ_ACT:
-+	case ASN1_OP_END_SET_OF_ACT:
-+	case ASN1_OP_END_SEQ_OF_ACT:
-+		if (unlikely(csp <= 0))
-+			goto cons_stack_underflow;
-+		csp--;
-+		tdp = cons_dp_stack[csp];
-+		len = datalen;
-+		datalen = cons_datalen_stack[csp];
-+		pr_debug("- end cons t=%zu dp=%zu l=%zu/%zu\n",
-+			 tdp, dp, len, datalen);
-+		if (datalen == 0) {
-+			/* Indefinite length - check for the EOC. */
-+			datalen = len;
-+			if (unlikely(datalen - dp < 2))
-+				goto data_overrun_error;
-+			if (data[dp++] != 0) {
-+				if (op & ASN1_OP_END__OF) {
-+					dp--;
-+					csp++;
-+					pc = machine[pc + 1];
-+					pr_debug("- continue\n");
-+					goto next_op;
-+				}
-+				goto missing_eoc;
-+			}
-+			if (data[dp++] != 0)
-+				goto invalid_eoc;
-+			len = dp - tdp - 2;
-+		} else {
-+			if (dp < len && (op & ASN1_OP_END__OF)) {
-+				datalen = len;
-+				csp++;
-+				pc = machine[pc + 1];
-+				pr_debug("- continue\n");
-+				goto next_op;
-+			}
-+			if (dp != len)
-+				goto cons_length_error;
-+			len -= tdp;
-+			pr_debug("- cons len l=%zu d=%zu\n", len, dp - tdp);
-+		}
-+
-+		if (op & ASN1_OP_END__ACT) {
-+			unsigned char act;
-+			if (op & ASN1_OP_END__OF)
-+				act = machine[pc + 2];
-+			else
-+				act = machine[pc + 1];
-+			ret = actions[act](context, dp - hdr, 0, data + tdp, len);
-+		}
-+		pc += asn1_op_lengths[op];
-+		goto next_op;
-+
-+	case ASN1_OP_ACT:
-+		ret = actions[machine[pc + 1]](context, dp - hdr, tag, data + tdp, len);
-+		pc += asn1_op_lengths[op];
-+		goto next_op;
-+
-+	case ASN1_OP_RETURN:
-+		if (unlikely(jsp <= 0))
-+			goto jump_stack_underflow;
-+		pc = jump_stack[--jsp];
-+		goto next_op;
-+
-+	default:
-+		break;
-+	}
-+
-+	/* Shouldn't reach here */
-+	pr_err("ASN.1 decoder error: Found reserved opcode (%u)\n", op);
-+	return -EBADMSG;
-+
-+data_overrun_error:
-+	errmsg = "Data overrun error";
-+	goto error;
-+machine_overrun_error:
-+	errmsg = "Machine overrun error";
-+	goto error;
-+jump_stack_underflow:
-+	errmsg = "Jump stack underflow";
-+	goto error;
-+jump_stack_overflow:
-+	errmsg = "Jump stack overflow";
-+	goto error;
-+cons_stack_underflow:
-+	errmsg = "Cons stack underflow";
-+	goto error;
-+cons_stack_overflow:
-+	errmsg = "Cons stack overflow";
-+	goto error;
-+cons_length_error:
-+	errmsg = "Cons length error";
-+	goto error;
-+missing_eoc:
-+	errmsg = "Missing EOC in indefinite len cons";
-+	goto error;
-+invalid_eoc:
-+	errmsg = "Invalid length EOC";
-+	goto error;
-+length_too_long:
-+	errmsg = "Unsupported length";
-+	goto error;
-+indefinite_len_primitive:
-+	errmsg = "Indefinite len primitive not permitted";
-+	goto error;
-+tag_mismatch:
-+	errmsg = "Unexpected tag";
-+	goto error;
-+long_tag_not_supported:
-+	errmsg = "Long tag not supported";
-+error:
-+	pr_debug("\nASN1: %s [m=%zu d=%zu ot=%02x t=%02x l=%zu]\n",
-+		 errmsg, pc, dp, optag, tag, len);
-+	return -EBADMSG;
++	ret = sprint_oid(oid_data + oid_index[oid],
++			 oid_index[oid + 1] - oid_index[oid],
++			 buffer, bufsize);
++	BUG_ON(ret == -EBADMSG);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(asn1_ber_decoder);
++EXPORT_SYMBOL_GPL(sprint_OID);
