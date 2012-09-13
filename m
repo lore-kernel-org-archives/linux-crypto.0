@@ -1,8 +1,7 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 07/16] KEYS: Provide signature verification with an asymmetric
- key
-Date: Fri, 14 Sep 2012 00:49:06 +0100
-Message-ID: <20120913234906.3575.85399.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 04/16] KEYS: Implement asymmetric key type
+Date: Fri, 14 Sep 2012 00:48:40 +0100
+Message-ID: <20120913234840.3575.95516.stgit@warthog.procyon.org.uk>
 References: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -16,76 +15,278 @@ In-Reply-To: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Provide signature verification using an asymmetric-type key to indicate the
-public key to be used.
+Create a key type that can be used to represent an asymmetric key type for use
+in appropriate cryptographic operations, such as encryption, decryption,
+signature generation and signature verification.
 
-The API is a single function that can be found in crypto/public_key.h:
+The key type is "asymmetric" and can provide access to a variety of
+cryptographic algorithms.
 
-	int verify_signature(const struct key *key,
-			     const struct public_key_signature *sig)
-
-The first argument is the appropriate key to be used and the second argument
-is the parsed signature data:
-
-	struct public_key_signature {
-		u8 *digest;
-		u16 digest_size;
-		enum pkey_hash_algo pkey_hash_algo : 8;
-		union {
-			MPI mpi[2];
-			struct {
-				MPI s;		/* m^d mod n */
-			} rsa;
-			struct {
-				MPI r;
-				MPI s;
-			} dsa;
-		};
-	};
-
-This should be filled in prior to calling the function.  The hash algorithm
-should already have been called and the hash finalised and the output should
-be in a buffer pointed to by the 'digest' member.
-
-Any extra data to be added to the hash by the hash format (eg. PGP) should
-have been added by the caller prior to finalising the hash.
-
-It is assumed that the signature is made up of a number of MPI values.  If an
-algorithm becomes available for which this is not the case, the above structure
-will have to change.
-
-It is also assumed that it will have been checked that the signature algorithm
-matches the key algorithm.
+Possibly, this would be better as "public_key" - but that has the disadvantage
+that "public key" is an overloaded term.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- crypto/asymmetric_keys/Makefile    |    2 +
- crypto/asymmetric_keys/signature.c |   49 ++++++++++++++++++++++++++++++++++++
- include/crypto/public_key.h        |    4 +++
- 3 files changed, 54 insertions(+), 1 deletion(-)
- create mode 100644 crypto/asymmetric_keys/signature.c
+ crypto/Kconfig                           |    1 
+ crypto/Makefile                          |    1 
+ crypto/asymmetric_keys/Kconfig           |   13 +++
+ crypto/asymmetric_keys/Makefile          |    7 +
+ crypto/asymmetric_keys/asymmetric_keys.h |   15 +++
+ crypto/asymmetric_keys/asymmetric_type.c |  156 ++++++++++++++++++++++++++++++
+ include/keys/asymmetric-subtype.h        |   55 +++++++++++
+ include/keys/asymmetric-type.h           |   25 +++++
+ 8 files changed, 273 insertions(+)
+ create mode 100644 crypto/asymmetric_keys/Kconfig
+ create mode 100644 crypto/asymmetric_keys/Makefile
+ create mode 100644 crypto/asymmetric_keys/asymmetric_keys.h
+ create mode 100644 crypto/asymmetric_keys/asymmetric_type.c
+ create mode 100644 include/keys/asymmetric-subtype.h
+ create mode 100644 include/keys/asymmetric-type.h
 
 
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 5ed46ee..8dcdf0c 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -4,6 +4,6 @@
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index a323805..1ca0b24 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1043,5 +1043,6 @@ config CRYPTO_USER_API_SKCIPHER
+ 	  key cipher algorithms.
  
- obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys.o
+ source "drivers/crypto/Kconfig"
++source crypto/asymmetric_keys/Kconfig
  
--asymmetric_keys-y := asymmetric_type.o
-+asymmetric_keys-y := asymmetric_type.o signature.o
- 
- obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
-diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
+ endif	# if CRYPTO
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 30f33d6..ced472e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -96,3 +96,4 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ #
+ obj-$(CONFIG_XOR_BLOCKS) += xor.o
+ obj-$(CONFIG_ASYNC_CORE) += async_tx/
++obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
 new file mode 100644
-index 0000000..50b3f88
+index 0000000..cad29b3
 --- /dev/null
-+++ b/crypto/asymmetric_keys/signature.c
-@@ -0,0 +1,49 @@
-+/* Signature verification with an asymmetric key
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -0,0 +1,13 @@
++menuconfig ASYMMETRIC_KEY_TYPE
++	tristate "Asymmetric (public-key cryptographic) key type"
++	depends on KEYS
++	help
++	  This option provides support for a key type that holds the data for
++	  the asymmetric keys used for public key cryptographic operations such
++	  as encryption, decryption, signature generation and signature
++	  verification.
++
++if ASYMMETRIC_KEY_TYPE
++
++
++endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+new file mode 100644
+index 0000000..b725bcc
+--- /dev/null
++++ b/crypto/asymmetric_keys/Makefile
+@@ -0,0 +1,7 @@
++#
++# Makefile for asymmetric cryptographic keys
++#
++
++obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys.o
++
++asymmetric_keys-y := asymmetric_type.o
+diff --git a/crypto/asymmetric_keys/asymmetric_keys.h b/crypto/asymmetric_keys/asymmetric_keys.h
+new file mode 100644
+index 0000000..515b634
+--- /dev/null
++++ b/crypto/asymmetric_keys/asymmetric_keys.h
+@@ -0,0 +1,15 @@
++/* Internal definitions for asymmetric key type
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++static inline const char *asymmetric_key_id(const struct key *key)
++{
++	return key->type_data.p[1];
++}
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+new file mode 100644
+index 0000000..bfb0424
+--- /dev/null
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -0,0 +1,156 @@
++/* Asymmetric public-key cryptography key type
++ *
++ * See Documentation/security/asymmetric-keys.txt
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++#include <keys/asymmetric-subtype.h>
++#include <linux/seq_file.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include "asymmetric_keys.h"
++
++MODULE_LICENSE("GPL");
++
++/*
++ * Match asymmetric keys on (part of) their name
++ * We have some shorthand methods for matching keys.  We allow:
++ *
++ *	"<desc>"	- request a key by description
++ *	"id:<id>"	- request a key matching the ID
++ *	"<subtype>:<id>" - request a key of a subtype
++ */
++static int asymmetric_key_match(const struct key *key, const void *description)
++{
++	const struct asymmetric_key_subtype *subtype = asymmetric_key_subtype(key);
++	const char *spec = description;
++	const char *id, *kid;
++	ptrdiff_t speclen;
++	size_t idlen, kidlen;
++
++	if (!subtype || !spec || !*spec)
++		return 0;
++
++	/* See if the full key description matches as is */
++	if (key->description && strcmp(key->description, description) == 0)
++		return 1;
++
++	/* All tests from here on break the criterion description into a
++	 * specifier, a colon and then an identifier.
++	 */
++	id = strchr(spec, ':');
++	if (!id)
++		return 0;
++
++	speclen = id - spec;
++	id++;
++
++	/* Anything after here requires a partial match on the ID string */
++	kid = asymmetric_key_id(key);
++	if (!kid)
++		return 0;
++
++	idlen = strlen(id);
++	kidlen = strlen(kid);
++	if (idlen > kidlen)
++		return 0;
++
++	kid += kidlen - idlen;
++	if (strcasecmp(id, kid) != 0)
++		return 0;
++
++	if (speclen == 2 &&
++	    memcmp(spec, "id", 2) == 0)
++		return 1;
++
++	if (speclen == subtype->name_len &&
++	    memcmp(spec, subtype->name, speclen) == 0)
++		return 1;
++
++	return 0;
++}
++
++/*
++ * Describe the asymmetric key
++ */
++static void asymmetric_key_describe(const struct key *key, struct seq_file *m)
++{
++	const struct asymmetric_key_subtype *subtype = asymmetric_key_subtype(key);
++	const char *kid = asymmetric_key_id(key);
++	size_t n;
++
++	seq_puts(m, key->description);
++
++	if (subtype) {
++		seq_puts(m, ": ");
++		subtype->describe(key, m);
++
++		if (kid) {
++			seq_putc(m, ' ');
++			n = strlen(kid);
++			if (n <= 8)
++				seq_puts(m, kid);
++			else
++				seq_puts(m, kid + n - 8);
++		}
++
++		seq_puts(m, " [");
++		/* put something here to indicate the key's capabilities */
++		seq_putc(m, ']');
++	}
++}
++
++/*
++ * Instantiate a asymmetric_key defined key.  The key was preparsed, so we just
++ * have to transfer the data here.
++ */
++static int asymmetric_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
++{
++	return -EOPNOTSUPP;
++}
++
++/*
++ * dispose of the data dangling from the corpse of a asymmetric key
++ */
++static void asymmetric_key_destroy(struct key *key)
++{
++	struct asymmetric_key_subtype *subtype = asymmetric_key_subtype(key);
++	if (subtype) {
++		subtype->destroy(key->payload.data);
++		module_put(subtype->owner);
++		key->type_data.p[0] = NULL;
++	}
++	kfree(key->type_data.p[1]);
++	key->type_data.p[1] = NULL;
++}
++
++struct key_type key_type_asymmetric = {
++	.name		= "asymmetric",
++	.instantiate	= asymmetric_key_instantiate,
++	.match		= asymmetric_key_match,
++	.destroy	= asymmetric_key_destroy,
++	.describe	= asymmetric_key_describe,
++};
++EXPORT_SYMBOL_GPL(key_type_asymmetric);
++
++/*
++ * Module stuff
++ */
++static int __init asymmetric_key_init(void)
++{
++	return register_key_type(&key_type_asymmetric);
++}
++
++static void __exit asymmetric_key_cleanup(void)
++{
++	unregister_key_type(&key_type_asymmetric);
++}
++
++module_init(asymmetric_key_init);
++module_exit(asymmetric_key_cleanup);
+diff --git a/include/keys/asymmetric-subtype.h b/include/keys/asymmetric-subtype.h
+new file mode 100644
+index 0000000..4b840e8
+--- /dev/null
++++ b/include/keys/asymmetric-subtype.h
+@@ -0,0 +1,55 @@
++/* Asymmetric public-key cryptography key subtype
 + *
 + * See Documentation/security/asymmetric-keys.txt
 + *
@@ -98,52 +299,76 @@ index 0000000..50b3f88
 + * 2 of the Licence, or (at your option) any later version.
 + */
 +
-+#include <keys/asymmetric-subtype.h>
-+#include <linux/module.h>
-+#include <linux/err.h>
-+#include <crypto/public_key.h>
-+#include "asymmetric_keys.h"
++#ifndef _KEYS_ASYMMETRIC_SUBTYPE_H
++#define _KEYS_ASYMMETRIC_SUBTYPE_H
++
++#include <linux/seq_file.h>
++#include <keys/asymmetric-type.h>
++
++struct public_key_signature;
++
++/*
++ * Keys of this type declare a subtype that indicates the handlers and
++ * capabilities.
++ */
++struct asymmetric_key_subtype {
++	struct module		*owner;
++	const char		*name;
++	unsigned short		name_len;	/* length of name */
++
++	/* Describe a key of this subtype for /proc/keys */
++	void (*describe)(const struct key *key, struct seq_file *m);
++
++	/* Destroy a key of this subtype */
++	void (*destroy)(void *payload);
++
++	/* Verify the signature on a key of this subtype (optional) */
++	int (*verify_signature)(const struct key *key,
++				const struct public_key_signature *sig);
++};
 +
 +/**
-+ * verify_signature - Initiate the use of an asymmetric key to verify a signature
-+ * @key: The asymmetric key to verify against
-+ * @sig: The signature to check
++ * asymmetric_key_subtype - Get the subtype from an asymmetric key
++ * @key: The key of interest.
 + *
-+ * Returns 0 if successful or else an error.
++ * Retrieves and returns the subtype pointer of the asymmetric key from the
++ * type-specific data attached to the key.
 + */
-+int verify_signature(const struct key *key,
-+		     const struct public_key_signature *sig)
++static inline
++struct asymmetric_key_subtype *asymmetric_key_subtype(const struct key *key)
 +{
-+	const struct asymmetric_key_subtype *subtype;
-+	int ret;
-+
-+	pr_devel("==>%s()\n", __func__);
-+
-+	if (key->type != &key_type_asymmetric)
-+		return -EINVAL;
-+	subtype = asymmetric_key_subtype(key);
-+	if (!subtype ||
-+	    !key->payload.data)
-+		return -EINVAL;
-+	if (!subtype->verify_signature)
-+		return -ENOTSUPP;
-+
-+	ret = subtype->verify_signature(key, sig);
-+
-+	pr_devel("<==%s() = %d\n", __func__, ret);
-+	return ret;
++	return key->type_data.p[0];
 +}
-+EXPORT_SYMBOL_GPL(verify_signature);
-diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-index 65d9879..eb25eb2 100644
---- a/include/crypto/public_key.h
-+++ b/include/crypto/public_key.h
-@@ -106,4 +106,8 @@ struct public_key_signature {
- 	};
- };
- 
-+struct key;
-+extern int verify_signature(const struct key *key,
-+			    const struct public_key_signature *sig);
 +
- #endif /* _LINUX_PUBLIC_KEY_H */
++#endif /* _KEYS_ASYMMETRIC_SUBTYPE_H */
+diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
+new file mode 100644
+index 0000000..7dd4734
+--- /dev/null
++++ b/include/keys/asymmetric-type.h
+@@ -0,0 +1,25 @@
++/* Asymmetric Public-key cryptography key type interface
++ *
++ * See Documentation/security/asymmetric-keys.txt
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#ifndef _KEYS_ASYMMETRIC_TYPE_H
++#define _KEYS_ASYMMETRIC_TYPE_H
++
++#include <linux/key-type.h>
++
++extern struct key_type key_type_asymmetric;
++
++/*
++ * The payload is at the discretion of the subtype.
++ */
++
++#endif /* _KEYS_ASYMMETRIC_TYPE_H */
