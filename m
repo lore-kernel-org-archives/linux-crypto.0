@@ -1,35 +1,44 @@
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Subject: Re: [PATCH 14/16] X.509: Add an ASN.1 decoder
-Date: Fri, 14 Sep 2012 10:39:30 +0100
-Message-ID: <20120914103930.1e16ad8b@pyramind.ukuu.org.uk>
-References: <20120913234802.3575.77103.stgit@warthog.procyon.org.uk>
-	<20120913235005.3575.46218.stgit@warthog.procyon.org.uk>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: caam - fix error IDs for SEC v5.x RNG4
+Date: Sat, 15 Sep 2012 03:33:54 +0300
+Message-ID: <1347669234-31464-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.hengli.com.au, rusty@rustcorp.com.au,
-	linux-crypto@vger.kernel.org, zohar@us.ibm.com,
-	dmitry.kasatkin@intel.com, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20120913235005.3575.46218.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from db3ehsobe002.messaging.microsoft.com ([213.199.154.140]:8713
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759078Ab2INVi0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Sep 2012 17:38:26 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 14 Sep 2012 00:50:05 +0100
-David Howells <dhowells@redhat.com> wrote:
+According to SEC v5.0-v5.3 reference manuals.
 
-> Add an ASN.1 BER/DER/CER decoder.  This uses the bytecode from the ASN.1
-> compiler in the previous patch to inform it as to what to expect to find in the
-> encoded byte stream.  The output from the compiler also tells it what functions
-> to call on what tags, thus allowing the caller to retrieve information.
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+Acked-by: Kim Phillips <kim.phillips@freescale.com>
+---
+ drivers/crypto/caam/error.c |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-Why do this in the kernel.That appears to be completely insane. Can you
-prove it runs in a short bounded time for all inputs, has it been fuzz
-tested extensively ?
-
-This kind of crap belongs in user space. Parse it in userspace, pass same
-structures and objects to the kernel.
-
-Alan
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 9955ed9..30b8f74 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -77,10 +77,8 @@ static void report_ccb_status(u32 status, char *outstr)
+ 		"Not instantiated",
+ 		"Test instantiate",
+ 		"Prediction resistance",
+-		"",
+ 		"Prediction resistance and test request",
+ 		"Uninstantiate",
+-		"",
+ 		"Secure key generation",
+ 	};
+ 	u8 cha_id = (status & JRSTA_CCBERR_CHAID_MASK) >>
+-- 
+1.7.7.6
