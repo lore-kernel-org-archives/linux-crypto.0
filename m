@@ -1,65 +1,69 @@
-From: Garg Vakul-B16394 <B16394@freescale.com>
-Subject: RE: [PATCH][1.3][SEC] Added entry for P5040 in SEC-VID to SEC-ERA
- mapping table.
-Date: Mon, 17 Sep 2012 08:32:11 +0000
-Message-ID: <065BBB7616BCE543832A2EF096986B940F4F87@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <1347866443-22469-1-git-send-email-vakul@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Garg Vakul-B16394 <B16394@freescale.com>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe004.messaging.microsoft.com ([216.32.180.187]:16880
-	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754940Ab2IQIcR convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Sep 2012 04:32:17 -0400
-Received: from mail103-co1 (localhost [127.0.0.1])	by
- mail103-co1-R.bigfish.com (Postfix) with ESMTP id 26BBB560163	for
- <linux-crypto@vger.kernel.org>; Mon, 17 Sep 2012 08:32:17 +0000 (UTC)
-Received: from CO1EHSMHS026.bigfish.com (unknown [10.243.78.249])	by
- mail103-co1.bigfish.com (Postfix) with ESMTP id B3D1C18005C	for
- <linux-crypto@vger.kernel.org>; Mon, 17 Sep 2012 08:32:14 +0000 (UTC)
-In-Reply-To: <1347866443-22469-1-git-send-email-vakul@freescale.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Peter Senna Tschudin <peter.senna@gmail.com>
+Subject: [PATCH 2/4] drivers/crypto/hifn_795x.c: fix error return code
+Date: Mon, 17 Sep 2012 19:28:26 +0200
+Message-ID: <1347902908-19006-2-git-send-email-peter.senna@gmail.com>
+References: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Peter Senna Tschudin <peter.senna@gmail.com>
+To: <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Please ignore this patch.
-I have sent another patch which supersedes this.
+From: Peter Senna Tschudin <peter.senna@gmail.com>
 
+Convert a nonnegative error return code to a negative one, as returned
+elsewhere in the function.
 
-> -----Original Message-----
-> From: Garg Vakul-B16394
-> Sent: Monday, September 17, 2012 12:51 PM
-> To: linux-crypto@vger.kernel.org
-> Cc: Garg Vakul-B16394
-> Subject: [PATCH][1.3][SEC] Added entry for P5040 in SEC-VID to SEC-ERA
-> mapping table.
-> 
-> On P5040, SEC-ERA does not print correctly. This is because SEC-VID to
-> SEC-ERA mapping table does not contain information for P5040. This patch
-> adds this information.
-> 
-> Signed-off-by: Vakul Garg <vakul@freescale.com>
-> ---
->  drivers/crypto/caam/ctrl.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-> index b3fecfa..81ed4bc 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -176,7 +176,8 @@ int caam_get_era(u64 caam_id)
->  		{0x0A14, 1, 3},
->  		{0x0A14, 2, 4},
->  		{0x0A16, 1, 4},
-> -		{0x0A11, 1, 4}
-> +		{0x0A11, 1, 4},
-> +		{0x0A13, 1, 5}
->  	};
->  	int i;
-> 
-> --
-> 1.7.7.6
+A simplified version of the semantic match that finds this problem is as
+follows: (http://coccinelle.lip6.fr/)
+
+// <smpl>
+(
+if@p1 (\(ret < 0\|ret != 0\))
+ { ... return ret; }
+|
+ret@p1 = 0
+)
+... when != ret = e1
+    when != &ret
+*if(...)
+{
+  ... when != ret = e2
+      when forall
+ return ret;
+}
+// </smpl>
+
+Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
+---
+ drivers/crypto/hifn_795x.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index df14358..fda3296 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2611,14 +2611,17 @@ static int __devinit hifn_probe(struct pci_dev *pdev, const struct pci_device_id
+ 		size = pci_resource_len(pdev, i);
+ 
+ 		dev->bar[i] = ioremap_nocache(addr, size);
+-		if (!dev->bar[i])
++		if (!dev->bar[i]) {
++			err = -ENOMEM;
+ 			goto err_out_unmap_bars;
++		}
+ 	}
+ 
+ 	dev->desc_virt = pci_alloc_consistent(pdev, sizeof(struct hifn_dma),
+ 			&dev->desc_dma);
+ 	if (!dev->desc_virt) {
+ 		dprintk("Failed to allocate descriptor rings.\n");
++		err = -ENOMEM;
+ 		goto err_out_unmap_bars;
+ 	}
+ 	memset(dev->desc_virt, 0, sizeof(struct hifn_dma));
+-- 
+1.7.11.4
