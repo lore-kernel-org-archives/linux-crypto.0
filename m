@@ -1,14 +1,13 @@
 From: Peter Senna Tschudin <peter.senna@gmail.com>
-Subject: [PATCH 2/4] drivers/crypto/hifn_795x.c: fix error return code
-Date: Mon, 17 Sep 2012 19:28:26 +0200
-Message-ID: <1347902908-19006-2-git-send-email-peter.senna@gmail.com>
-References: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Peter Senna Tschudin <peter.senna@gmail.com>
+Subject: [PATCH 1/4] drivers/crypto/ux500/cryp/cryp_core.c: fix error return code
+Date: Mon, 17 Sep 2012 19:28:25 +0200
+Message-ID: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
+Cc: davem@davemloft.net, linus.walleij@linaro.org,
+	andreas.westin@stericsson.com, rjw@sisk.pl, peter.senna@gmail.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
@@ -39,31 +38,20 @@ ret@p1 = 0
 
 Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
 ---
- drivers/crypto/hifn_795x.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index df14358..fda3296 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -2611,14 +2611,17 @@ static int __devinit hifn_probe(struct pci_dev *pdev, const struct pci_device_id
- 		size = pci_resource_len(pdev, i);
- 
- 		dev->bar[i] = ioremap_nocache(addr, size);
--		if (!dev->bar[i])
-+		if (!dev->bar[i]) {
-+			err = -ENOMEM;
- 			goto err_out_unmap_bars;
-+		}
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 1c307e1..715c0fe 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1486,6 +1486,7 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 	if (!res_irq) {
+ 		dev_err(dev, "[%s]: IORESOURCE_IRQ unavailable",
+ 			__func__);
++		ret = -ENODEV;
+ 		goto out_power;
  	}
  
- 	dev->desc_virt = pci_alloc_consistent(pdev, sizeof(struct hifn_dma),
- 			&dev->desc_dma);
- 	if (!dev->desc_virt) {
- 		dprintk("Failed to allocate descriptor rings.\n");
-+		err = -ENOMEM;
- 		goto err_out_unmap_bars;
- 	}
- 	memset(dev->desc_virt, 0, sizeof(struct hifn_dma));
 -- 
 1.7.11.4
