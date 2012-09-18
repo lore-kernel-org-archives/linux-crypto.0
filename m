@@ -1,63 +1,30 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH] crypto: caam - increase TRNG clocks per sample
-Date: Mon, 17 Sep 2012 18:21:55 -0500
-Message-ID: <20120917182155.ef1d5aab06d07e5db9dcd6cc@freescale.com>
+From: David Miller <davem@davemloft.net>
+Subject: cbc(des)
+Date: Mon, 17 Sep 2012 23:06:41 -0400 (EDT)
+Message-ID: <20120917.230641.1507824806487249244.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>
-To: <linux-crypto@vger.kernel.org>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe002.messaging.microsoft.com ([216.32.181.182]:3981
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754975Ab2IQXYU (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:36140 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932087Ab2IRDGn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Sep 2012 19:24:20 -0400
+	Mon, 17 Sep 2012 23:06:43 -0400
+Received: from localhost (cpe-66-108-116-58.nyc.res.rr.com [66.108.116.58])
+	by shards.monkeyblade.net (Postfix) with ESMTPSA id E8294587E18
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Sep 2012 20:06:44 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-we need to configure the TRNG to use more clocks per sample
-to handle the two back-to-back 64KiB random descriptor requests
-on higher frequency P5040s.
 
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
-fixes booting on the p5040, but since p5040 support isn't in
-3.6, this can wait for 3.7.
+I just noticed that none of the testmgr.h cbc(des) test cases
+actually exercise doing more than one loop over the input data.
 
-Also, Herbert, this:
+Therefore, the updating of the IV in the inner loop is never exercised
+and if you get it wrong the crypto layer test cases will not catch it.
 
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg07586.html
-
-got dropped on the floor.
-
- drivers/crypto/caam/ctrl.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 414ba20..bf20dd8 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -129,7 +129,7 @@ static int instantiate_rng(struct device *jrdev)
- 
- /*
-  * By default, the TRNG runs for 200 clocks per sample;
-- * 800 clocks per sample generates better entropy.
-+ * 1600 clocks per sample generates better entropy.
-  */
- static void kick_trng(struct platform_device *pdev)
- {
-@@ -144,9 +144,9 @@ static void kick_trng(struct platform_device *pdev)
- 
- 	/* put RNG4 into program mode */
- 	setbits32(&r4tst->rtmctl, RTMCTL_PRGM);
--	/* 800 clocks per sample */
-+	/* 1600 clocks per sample */
- 	val = rd_reg32(&r4tst->rtsdctl);
--	val = (val & ~RTSDCTL_ENT_DLY_MASK) | (800 << RTSDCTL_ENT_DLY_SHIFT);
-+	val = (val & ~RTSDCTL_ENT_DLY_MASK) | (1600 << RTSDCTL_ENT_DLY_SHIFT);
- 	wr_reg32(&r4tst->rtsdctl, val);
- 	/* min. freq. count */
- 	wr_reg32(&r4tst->rtfrqmin, 400);
--- 
-1.7.12
+The cbc(des3_ede) test cases, on the other hand, have a 128 byte input
+test for both encryption and decryption, so do not fail to cover this
+aspect of the implementation.
