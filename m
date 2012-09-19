@@ -1,60 +1,46 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 0/3] crypto: talitos fixes for 3.6-rc7
-Date: Wed, 19 Sep 2012 21:53:37 +0300
-Message-ID: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto:caam - Improved support of CAAM era retrieval.
+Date: Wed, 19 Sep 2012 16:21:45 -0500
+Message-ID: <20120919162145.a15eb11c1a0ef25f5717e8c9@freescale.com>
+References: <1348044311-23506-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>
+To: Vakul Garg <vakul@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.144] ([213.199.154.144]:1256 "EHLO
-	db3outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S932070Ab2ISP7T (ORCPT
+Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:40571 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751787Ab2ISVYA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Sep 2012 11:59:19 -0400
+	Wed, 19 Sep 2012 17:24:00 -0400
+Received: from mail233-tx2 (localhost [127.0.0.1])	by
+ mail233-tx2-R.bigfish.com (Postfix) with ESMTP id 2447DD00188	for
+ <linux-crypto@vger.kernel.org>; Wed, 19 Sep 2012 21:23:59 +0000 (UTC)
+Received: from TX2EHSMHS023.bigfish.com (unknown [10.9.14.253])	by
+ mail233-tx2.bigfish.com (Postfix) with ESMTP id D61B16800AC	for
+ <linux-crypto@vger.kernel.org>; Wed, 19 Sep 2012 21:23:56 +0000 (UTC)
+In-Reply-To: <1348044311-23506-1-git-send-email-vakul@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+missing patch version
 
-I know these patches come late and might not be included in 3.6.
-But two of them are already sitting in cryptodev tree for some time.
-(Don't know where my head was :/).
+On Wed, 19 Sep 2012 14:15:11 +0530
+Vakul Garg <vakul@freescale.com> wrote:
 
-These patches are needed since:
-e46e9a crypto: testmgr - add aead cbc aes hmac sha1,256,512 test vectors
-made its way in 3.6-rc2 and is exposing two shortcomings of talitos:
-- inability to handle non-contiguous assoc data and iv - fixed by 2/3
-- inability to handle zero-length assoc data - fixed by 3/3
+> CAAM era retrieval api caam_get_era() currently supports devices upto ERA-4.
+> The CAAM era is looked up from a table mapping SECVID register to an ERA number.
+> Post ERA-6, era can be directly read from register CCBVID. This patch enhances
+> api caam_get_era() to support additional pre ERA-6 devices in the mapping table.
+> For ERA-6 and later devices, it returns ERA directly by reading CCBVID.
 
-Patch 1/3 is the same as:
-605425 crypto: talitos - fix icv management on outbound direction
-from cryptodev tree.
+wrap this text to ~75 cols please
 
-Patch 2/3 is a rewritten version (so it applies cleanly) of:
-79fd31 crypto: talitos - support for assoc data provided as scatterlist
-from cryptodev tree.
+> +	if (ccb_vid->era)
+> +		return ccb_vid->era;
+> +	else
 
-Patch 3/3 is a new patch that covers the unusual case when assoc data length
-is zero. It fixes for talitos what
-9b2f4c crypto: authenc - Fix crash with zero-length assoc data
-from crypto tree fixes for native crypto.
-(http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg07662.html)
+unnecessary else
 
-AFAICT, patches apply cleanly both on crypto and 3.6-rc6 ToT.
-
-Thanks,
-Horia
-
-Horia Geanta (3):
-  crypto: talitos - fix icv management on outbound direction
-  crypto: talitos - support for assoc data provided as scatterlist
-  crypto: talitos - corrrectly handle zero-length assoc data
-
- drivers/crypto/talitos.c |  189 +++++++++++++++++++++++++++++++++-------------
- 1 files changed, 137 insertions(+), 52 deletions(-)
-
--- 
-1.7.7.6
+Kim
