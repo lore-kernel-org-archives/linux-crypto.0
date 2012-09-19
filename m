@@ -1,8 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 3/3] crypto: talitos - corrrectly handle zero-length assoc data
-Date: Wed, 19 Sep 2012 21:53:40 +0300
-Message-ID: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
-References: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 0/3] crypto: talitos fixes for 3.6-rc7
+Date: Wed, 19 Sep 2012 21:53:37 +0300
+Message-ID: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
@@ -10,85 +9,52 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [216.32.180.30] ([216.32.180.30]:26722 "EHLO
-	va3outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S932079Ab2ISP7H (ORCPT
+Received: from [213.199.154.144] ([213.199.154.144]:1256 "EHLO
+	db3outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S932070Ab2ISP7T (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Sep 2012 11:59:07 -0400
-In-Reply-To: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
+	Wed, 19 Sep 2012 11:59:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-talitos does not handle well zero-length assoc data.
->From dmesg:
-talitos ffe30000.crypto: master data transfer error
-talitos ffe30000.crypto: gather return/length error
+Hi Herbert,
 
-Check whether assoc data is provided by inspecting assoclen,
-not assoc pointer.
-This is needed in order to pass testmgr tests.
+I know these patches come late and might not be included in 3.6.
+But two of them are already sitting in cryptodev tree for some time.
+(Don't know where my head was :/).
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
- drivers/crypto/talitos.c |   21 ++++++++++++++++-----
- 1 files changed, 16 insertions(+), 5 deletions(-)
+These patches are needed since:
+e46e9a crypto: testmgr - add aead cbc aes hmac sha1,256,512 test vectors
+made its way in 3.6-rc2 and is exposing two shortcomings of talitos:
+- inability to handle non-contiguous assoc data and iv - fixed by 2/3
+- inability to handle zero-length assoc data - fixed by 3/3
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 9975718..3ebc1bf 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -805,7 +805,7 @@ static void ipsec_esp_unmap(struct device *dev,
- 
- 	if (edesc->assoc_chained)
- 		talitos_unmap_sg_chain(dev, areq->assoc, DMA_TO_DEVICE);
--	else
-+	else if (areq->assoclen)
- 		/* assoc_nents counts also for IV in non-contiguous cases */
- 		dma_unmap_sg(dev, areq->assoc,
- 			     edesc->assoc_nents ? edesc->assoc_nents - 1 : 1,
-@@ -989,7 +989,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
- 					   edesc->dma_len, DMA_BIDIRECTIONAL);
- 	} else {
--		to_talitos_ptr(&desc->ptr[1], sg_dma_address(areq->assoc));
-+		if (areq->assoclen)
-+			to_talitos_ptr(&desc->ptr[1],
-+				       sg_dma_address(areq->assoc));
-+		else
-+			to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
- 		desc->ptr[1].j_extent = 0;
- 	}
- 
-@@ -1199,10 +1203,10 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	if (iv)
-+	if (ivsize)
- 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
- 
--	if (assoc) {
-+	if (assoclen) {
- 		/*
- 		 * Currently it is assumed that iv is provided whenever assoc
- 		 * is.
-@@ -1250,9 +1254,16 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 
- 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
- 	if (!edesc) {
--		talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
-+		if (assoc_chained)
-+			talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
-+		else if (assoclen)
-+			dma_unmap_sg(dev, assoc,
-+				     assoc_nents ? assoc_nents - 1 : 1,
-+				     DMA_TO_DEVICE);
-+
- 		if (iv_dma)
- 			dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
-+
- 		dev_err(dev, "could not allocate edescriptor\n");
- 		return ERR_PTR(-ENOMEM);
- 	}
+Patch 1/3 is the same as:
+605425 crypto: talitos - fix icv management on outbound direction
+from cryptodev tree.
+
+Patch 2/3 is a rewritten version (so it applies cleanly) of:
+79fd31 crypto: talitos - support for assoc data provided as scatterlist
+from cryptodev tree.
+
+Patch 3/3 is a new patch that covers the unusual case when assoc data length
+is zero. It fixes for talitos what
+9b2f4c crypto: authenc - Fix crash with zero-length assoc data
+from crypto tree fixes for native crypto.
+(http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg07662.html)
+
+AFAICT, patches apply cleanly both on crypto and 3.6-rc6 ToT.
+
+Thanks,
+Horia
+
+Horia Geanta (3):
+  crypto: talitos - fix icv management on outbound direction
+  crypto: talitos - support for assoc data provided as scatterlist
+  crypto: talitos - corrrectly handle zero-length assoc data
+
+ drivers/crypto/talitos.c |  189 +++++++++++++++++++++++++++++++++-------------
+ 1 files changed, 137 insertions(+), 52 deletions(-)
+
 -- 
 1.7.7.6
