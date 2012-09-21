@@ -1,52 +1,33 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH] crypto: tcrypt - add missing tests for camellia and ghash
-Date: Fri, 21 Sep 2012 10:27:10 +0300
-Message-ID: <20120921072710.11930.17414.stgit@localhost6.localdomain6>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 1/2] crypto: testmgr - make test_skcipher also test
+ 'dst != src' code paths
+Date: Fri, 21 Sep 2012 12:11:50 -0400 (EDT)
+Message-ID: <20120921.121150.1604585021528101229.davem@davemloft.net>
+References: <20120921072647.11790.19493.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: jussi.kivilinna@mbnet.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:41422 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755821Ab2IUH1M (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:49491 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754407Ab2IUQLw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Sep 2012 03:27:12 -0400
+	Fri, 21 Sep 2012 12:11:52 -0400
+In-Reply-To: <20120921072647.11790.19493.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add missing tests for ctr(camellia), lrw(camellia), xts(camellia) and ghash,
-as these have test vectors available.
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Date: Fri, 21 Sep 2012 10:26:47 +0300
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
----
- crypto/tcrypt.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+> Currrently test_skcipher uses same buffer for destination and source. However
+> in any places, 'dst != src' take different path than 'dst == src' case.
+> 
+> Therefore make test_skcipher also run tests with destination buffer being
+> different than source buffer.
+> 
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 871076b..6e8874b 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1118,6 +1118,9 @@ static int do_test(int m)
- 	case 32:
- 		ret += tcrypt_test("ecb(camellia)");
- 		ret += tcrypt_test("cbc(camellia)");
-+		ret += tcrypt_test("ctr(camellia)");
-+		ret += tcrypt_test("lrw(camellia)");
-+		ret += tcrypt_test("xts(camellia)");
- 		break;
- 	case 33:
- 		ret += tcrypt_test("sha224");
-@@ -1171,6 +1174,10 @@ static int do_test(int m)
- 		ret += tcrypt_test("rfc4309(ccm(aes))");
- 		break;
- 
-+	case 46:
-+		ret += tcrypt_test("ghash");
-+		break;
-+
- 	case 100:
- 		ret += tcrypt_test("hmac(md5)");
- 		break;
+Acked-by: David S. Miller <davem@davemloft.net>
