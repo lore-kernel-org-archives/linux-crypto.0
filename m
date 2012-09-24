@@ -1,30 +1,57 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: tcrypt - add missing tests for camellia and
- ghash
-Date: Fri, 21 Sep 2012 12:12:04 -0400 (EDT)
-Message-ID: <20120921.121204.1043966198515282180.davem@davemloft.net>
-References: <20120921072710.11930.17414.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: jussi.kivilinna@mbnet.fi
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:49499 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752541Ab2IUQMF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Sep 2012 12:12:05 -0400
-In-Reply-To: <20120921072710.11930.17414.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: [PATCH 0/1] dm-integrity: integrity protection device-mapper target
+Date: Mon, 24 Sep 2012 12:55:06 +0300
+Message-ID: <cover.1348480396.git.dmitry.kasatkin@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Date: Fri, 21 Sep 2012 10:27:10 +0300
+There are two existing offline integrity models: file level integrity
+(linux-integrity subsystem EVM/IMA-appraisal) and block level integrity
+(dm-verity, dm-crypt).
 
-> Add missing tests for ctr(camellia), lrw(camellia), xts(camellia) and ghash,
-> as these have test vectors available.
-> 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+This patch provides a new block level method called device-mapper "integrity"
+target (dm-integrity), which provides transparent cryptographic integrity
+protection of the underlying read-write block device using hash-based message
+authentication codes (HMACs). The HMACs can be stored on the same or different
+block device.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+dm-integrity uses an encrypted key type, stored on the kernel keyring, to
+obtain a secret key for use in cryptographic operations. Encrypted keys are
+never exposed in plain text to user space. The encrypted keys are encrypted
+using master key, which can either be a user defined or trusted key type.
+The secret key, which is usually device specific, binds integrity data to the
+device. As a result data blocks and corresponding HMACs cannot simply be
+copied over from other file systems.
+
+EVM/IMA-appraisal provides file level integrity protection. The advantages
+are that it is policy based, file measurements are available for remote
+attestation, and files can be digitally signed to provide authenticity.
+
+Both dm-verity and dm-crypt provide block level integrity protection.
+dm-verity provides block level integrity protection for read-only file
+systems, while dm-crypt provides block level integrity protection, with
+minimum penalty, for filesystems requiring full disk encryption.
+
+dm-integrity provides a lighter weight read-write block level integrity
+protection for file systems not requiring full disk encryption, but
+which do require writability.
+
+- Dmitry
+
+Dmitry Kasatkin (1):
+  dm-integrity: integrity protection device-mapper target
+
+ Documentation/device-mapper/dm-integrity.txt |  125 ++++
+ drivers/md/Kconfig                           |   12 +
+ drivers/md/Makefile                          |    1 +
+ drivers/md/dm-integrity.c                    | 1019 ++++++++++++++++++++++++++
+ 4 files changed, 1157 insertions(+)
+ create mode 100644 Documentation/device-mapper/dm-integrity.txt
+ create mode 100644 drivers/md/dm-integrity.c
+
+-- 
+1.7.9.5
