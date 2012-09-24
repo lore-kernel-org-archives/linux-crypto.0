@@ -1,53 +1,42 @@
-From: Arun Murthy <arunrmurthy.83@gmail.com>
-Subject: Re: [PATCH 1/4] drivers/crypto/ux500/cryp/cryp_core.c: fix error
- return code
-Date: Mon, 24 Sep 2012 17:31:55 +0530
-Message-ID: <CAAnUQp3g6hGo1m6yZG76ifGxpuQRzYBk51ZsaNAVkgYLwMhjZw@mail.gmail.com>
-References: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: [PATCH 0/1] dm-integrity: integrity protection device-mapper
+ target
+Date: Mon, 24 Sep 2012 15:47:02 +0200
+Message-ID: <50606456.7020607@redhat.com>
+References: <cover.1348480396.git.dmitry.kasatkin@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linus.walleij@linaro.org, andreas.westin@stericsson.com,
-	rjw@sisk.pl, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Peter Senna Tschudin <peter.senna@gmail.com>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, dm-devel@redhat.com,
+	linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ey0-f194.google.com ([209.85.215.194]:57989 "EHLO
-	mail-ey0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753557Ab2IXMPG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Sep 2012 08:15:06 -0400
-In-Reply-To: <1347902908-19006-1-git-send-email-peter.senna@gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:32216 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754136Ab2IXNrL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Sep 2012 09:47:11 -0400
+In-Reply-To: <cover.1348480396.git.dmitry.kasatkin@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 17, 2012 at 10:58 PM, Peter Senna Tschudin
-<peter.senna@gmail.com> wrote:
-> From: Peter Senna Tschudin <peter.senna@gmail.com>
->
-> Convert a nonnegative error return code to a negative one, as returned
-> elsewhere in the function.
->
-> A simplified version of the semantic match that finds this problem is as
-> follows: (http://coccinelle.lip6.fr/)
->
-> // <smpl>
-> (
-> if@p1 (\(ret < 0\|ret != 0\))
->  { ... return ret; }
-> |
-> ret@p1 = 0
-> )
-> ... when != ret = e1
->     when != &ret
-> *if(...)
-> {
->   ... when != ret = e2
->       when forall
->  return ret;
-> }
-> // </smpl>
->
-> Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
+On 09/24/2012 11:55 AM, Dmitry Kasatkin wrote:
+> Both dm-verity and dm-crypt provide block level integrity protection.
 
-Reviewed-by: Arun Murthy <arunrmurthy83@gmail.com>
+This is not correct. dm-crypt is transparent block encryption target,
+where always size of plaintext == size of ciphertext.
+
+So it can provide confidentiality but it CANNOT provide integrity protection.
+
+We need extra space to store auth tag which dmcrypt cannot provide currently.
+
+> dm-integrity provides a lighter weight read-write block level integrity
+> protection for file systems not requiring full disk encryption, but
+> which do require writability.
+
+Obvious question: can be dm-verity extended to provide read-write integrity?
+
+I would prefer to use standard mode like GCM to provide both encryption and
+integrity protection than inventing something new.
+
+Milan
