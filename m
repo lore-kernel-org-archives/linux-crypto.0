@@ -1,28 +1,30 @@
-From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+From: Tomas Mraz <tmraz@redhat.com>
 Subject: Re: Wrong system clock vs X.509 date specifiers
-Date: Tue, 25 Sep 2012 17:00:20 +0100
-Message-ID: <20120925170020.07cf0b26@pyramind.ukuu.org.uk>
+Date: Tue, 25 Sep 2012 18:02:57 +0200
+Message-ID: <1348588977.22489.55.camel@vespa.frost.loc>
 References: <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>
-	<5555.1348531649@warthog.procyon.org.uk>
-	<21845.1348585794@warthog.procyon.org.uk>
-	<30071.1348587320@warthog.procyon.org.uk>
+	 <5555.1348531649@warthog.procyon.org.uk>
+	 <21845.1348585794@warthog.procyon.org.uk>
+	 <30071.1348587320@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="ISO-8859-2"
 Content-Transfer-Encoding: 7bit
-Cc: rusty@rustcorp.com.au, herbert@gondor.hengli.com.au,
-	pjones@redhat.com, jwboyer@redhat.com,
-	linux-crypto@vger.kernel.org,
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, rusty@rustcorp.com.au,
+	herbert@gondor.hengli.com.au, pjones@redhat.com,
+	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
 To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:12413 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756837Ab2IYQDU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Sep 2012 12:03:20 -0400
 In-Reply-To: <30071.1348587320@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 25 Sep 2012 16:35:20 +0100
-David Howells <dhowells@redhat.com> wrote:
-
+On Tue, 2012-09-25 at 16:35 +0100, David Howells wrote: 
 > Alan Cox <alan@lxorguk.ukuu.org.uk> wrote:
 > 
 > > Generate a certificate that is valid from a few minutes before the
@@ -31,10 +33,9 @@ David Howells <dhowells@redhat.com> wrote:
 > 
 > That doesn't seem to be possible with openssl req.  What would you recommend?
 
-LD_PRELOAD ? or fixing it if GNUTLS certtool can't do the needed. We
-shouldn't botch security checks in kernel code to work around crappy
-userspace tools.
-
-Alan
-
-
+You can use openssl ca that allows to set arbitrary start date to
+generate selfsigned certs as well (-selfsign option).
+-- 
+Tomas Mraz
+No matter how far down the wrong road you've gone, turn back.
+                                              Turkish proverb
