@@ -1,72 +1,42 @@
 From: David Howells <dhowells@redhat.com>
-Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Tue, 25 Sep 2012 17:15:06 +0100
-Message-ID: <8373.1348589706@warthog.procyon.org.uk>
-References: <CALLzPKaMV=te6XWS5zi43RYa4uJ9sADDizcsM_3=sOa9wayGCQ@mail.gmail.com> <5555.1348531649@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
-	rusty@rustcorp.com.au, pjones@redhat.com, jwboyer@redhat.com,
+Subject: Re: Wrong system clock vs X.509 date specifiers
+Date: Tue, 25 Sep 2012 18:31:25 +0100
+Message-ID: <12475.1348594285@warthog.procyon.org.uk>
+References: <1348588977.22489.55.camel@vespa.frost.loc> <20120925163037.20ba3f3c@pyramind.ukuu.org.uk> <5555.1348531649@warthog.procyon.org.uk> <21845.1348585794@warthog.procyon.org.uk> <30071.1348587320@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	rusty@rustcorp.com.au, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
 	linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+To: Tomas Mraz <tmraz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:64206 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:49102 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758162Ab2IYQPR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Sep 2012 12:15:17 -0400
-In-Reply-To: <CALLzPKaMV=te6XWS5zi43RYa4uJ9sADDizcsM_3=sOa9wayGCQ@mail.gmail.com>
+	id S1753893Ab2IYRbn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Sep 2012 13:31:43 -0400
+In-Reply-To: <1348588977.22489.55.camel@vespa.frost.loc>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Kasatkin, Dmitry <dmitry.kasatkin@intel.com> wrote:
+Tomas Mraz <tmraz@redhat.com> wrote:
 
-> Just one question about key description...
-> request_asymmetric_key uses format for key  description: "<signer>: <key-id>".
-> Preparsing code creates description from those values.
-> I see that key id is not 8 bytes anymore but full hash size of 20 bytes.
+> You can use openssl ca that allows to set arbitrary start date to
+> generate selfsigned certs as well (-selfsign option).
 
-Remember:  This is for viewing via /proc/keys and KEYCTL_DESCRIBE as much as
-for matching.
+That seems to require some stuff I don't have installed:
 
-> For practical reasons for IMA it might be nice to save some space in
-> xattrs and use shorter key id/description.
+warthog>openssl ca -in signing_key.priv -extensions v3_ca -out newcert.pem
+Using configuration from /etc/pki/tls/openssl.cnf
+Error opening CA private key /etc/pki/CA/private/cakey.pem
+140244246955872:error:0200100D:system library:fopen:Permission denied:bss_file.c:398:fopen('/etc/pki/CA/private/cakey.pem','r')
+140244246955872:error:20074002:BIO routines:FILE_CTRL:system lib:bss_file.c:400:
+unable to load CA private key
+unable to write 'random state'
 
-That's reasonable.
+(the /etc/pki/CA/private/ dir is inaccessible if not root and doesn't in any
+case contain cakey.pem).
 
-> As I understand from implementation, if key name is provided with "keyctl
-> add", it will not be replaced with preparsed value.
-
-Correct.
-
-> And we can actually use any keyid we want?
-
-Yes.
-
-Note: The key type ->match() function is not required to limit itself to a
-direct strcmp().  It is at liberty to partially match the description or any
-other data attached to the key.
-
-Look at asymmetric_key_match() in crypto/asymmetric/asymmetric_type.c.  If you
-do a search for:
-
-	"id:<hex-string>"
-
-this will do a partial tail match on the key fingerprint:
-
-[root@andromeda ~]# keyctl padd asymmetric "" @s </tmp/uefi-x509 
-289786205
-[root@andromeda ~]# cat /proc/keys
-1145c95d I--Q---     1 perm 39390000     0     0 asymmetri Red Hat Test Certificate: 3580cf35d76b3b667a40df66691cbcf87353b23c: X509.RSA 7353b23c []
-...
-[root@andromeda ~]# keyctl search @s asymmetric "id:53b23c"
-289786205
-
-
-As an optimisation, it might be worth internally calling keyring_search_aux()
-with our own match function that takes a binary key ID and storing the
-fingerprint as binary rather than hex (attached to key->type_data.p[1]).
-
-The type match function can only take text strings as it has to be invoked
-from userspace.
+Do I need to start with all the CA stuff in the right places to use it?
 
 David
