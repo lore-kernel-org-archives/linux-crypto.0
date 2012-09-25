@@ -1,41 +1,93 @@
-From: Tomas Mraz <tmraz@redhat.com>
-Subject: Re: Wrong system clock vs X.509 date specifiers
-Date: Tue, 25 Sep 2012 18:02:57 +0200
-Message-ID: <1348588977.22489.55.camel@vespa.frost.loc>
-References: <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>
-	 <5555.1348531649@warthog.procyon.org.uk>
-	 <21845.1348585794@warthog.procyon.org.uk>
-	 <30071.1348587320@warthog.procyon.org.uk>
+From: Guru Shetty <gurushettylists@gmail.com>
+Subject: Bug in crypto module?
+Date: Tue, 25 Sep 2012 09:04:33 -0700
+Message-ID: <CANR7Ex+H_M6jqLegrrXVsZWefnO=SPbvr9DmVWROW1Cq1-X4MA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-2"
-Content-Transfer-Encoding: 7bit
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, rusty@rustcorp.com.au,
-	herbert@gondor.hengli.com.au, pjones@redhat.com,
-	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:12413 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756837Ab2IYQDU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Sep 2012 12:03:20 -0400
-In-Reply-To: <30071.1348587320@warthog.procyon.org.uk>
+Received: from mail-qc0-f174.google.com ([209.85.216.174]:34759 "EHLO
+	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754277Ab2IYQEe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Sep 2012 12:04:34 -0400
+Received: by qcro28 with SMTP id o28so129444qcr.19
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Sep 2012 09:04:34 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2012-09-25 at 16:35 +0100, David Howells wrote: 
-> Alan Cox <alan@lxorguk.ukuu.org.uk> wrote:
-> 
-> > Generate a certificate that is valid from a few minutes before the
-> > wallclock time. It's a certificate policy question not a kernel hackery
-> > one.
-> 
-> That doesn't seem to be possible with openssl req.  What would you recommend?
+Hello All,
 
-You can use openssl ca that allows to set arbitrary start date to
-generate selfsigned certs as well (-selfsign option).
--- 
-Tomas Mraz
-No matter how far down the wrong road you've gone, turn back.
-                                              Turkish proverb
+( I think my mails are being blocked by the mail server. I have been
+trying different ways to get it past the filters. Apologies, if all my
+tries succeed past the filter at a later time.)
+
+I have been seeing a bunch of kernel crashes while using aesni_intel
+module and IPSEC.
+
+I have so far reproduced the kernel crashes while using the AES-GCM
+encryption algorithms(I am using strongswan). It is very easily
+reproducible in the 3.2 kernel (stable branch). It is also
+reproducible in 3.3, 3.4 and 3.5 kernel stable branches (The
+reproduction is a little harder with newer kernels. I have seen 2-3
+kernel crashes in Linux 3.5 after running netperf traffic for over
+week.)
+
+In the 3.2 kernel, the crash happens once every 15 minutes(average) of
+netperf TCP traffic.
+
+I have seen this with both Intel (82599EB 10-Gigabit) and Broadcom
+(BCM57711 10-Gigabit PCIe) NICs.
+I can provide more information if anyone needs it.
+
+Here is the backtrace as seen in the crash utility.
+
+
+PID: 125    TASK: ffff880bee255bc0  CPU: 3   COMMAND: "kworker/3:1"
+ #0 [ffff880c0fc63710] machine_kexec at ffffffff8103842a
+ #1 [ffff880c0fc63780] crash_kexec at ffffffff810b4448
+ #2 [ffff880c0fc63850] oops_end at ffffffff8165ab68
+ #3 [ffff880c0fc63880] die at ffffffff810168d8
+ #4 [ffff880c0fc638b0] do_general_protection at ffffffff8165a6e2
+ #5 [ffff880c0fc638e0] general_protection at ffffffff8165a105
+    [exception RIP: crypto_enqueue_request+43]
+    RIP: ffffffff812dd77b  RSP: ffff880c0fc63990  RFLAGS: 00010206
+    RAX: 00000000ffffff8d  RBX: ffff8817d74e3a08  RCX: 0000000000000000
+    RDX: dead000000200200  RSI: ffff8817d74e3a60  RDI: ffffe8f3cfc61ef0
+    RBP: ffff880c0fc63990   R8: 0000000000000000   R9: ffff8817d74e3b18
+    R10: 000000007b3dc352  R11: 0000000000000001  R12: 0000000000000003
+    R13: ffffe8f3cfc61ef0  R14: ffff880bc6ff3800  R15: 0000000000000001
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #6 [ffff880c0fc63998] cryptd_enqueue_request at ffffffffa02d9106 [cryptd]
+ #7 [ffff880c0fc639c8] cryptd_aead_decrypt_enqueue at ffffffffa02d92c0 [cryptd]
+ #8 [ffff880c0fc639d8] rfc4106_decrypt at ffffffffa02ec2bf [aesni_intel]
+ #9 [ffff880c0fc63a08] esp_input at ffffffffa029da65 [esp4]
+#10 [ffff880c0fc63a98] xfrm_input at ffffffff815cb9c4
+#11 [ffff880c0fc63b08] xfrm4_rcv_encap at ffffffff815c148c
+#12 [ffff880c0fc63b18] xfrm4_rcv at ffffffff815c14b4
+#13 [ffff880c0fc63b28] ip_local_deliver_finish at ffffffff815749ed
+#14 [ffff880c0fc63b58] ip_local_deliver at ffffffff81574d58
+#15 [ffff880c0fc63b88] ip_rcv_finish at ffffffff815746c1
+#16 [ffff880c0fc63bb8] ip_rcv at ffffffff81574f95
+#17 [ffff880c0fc63bf8] __netif_receive_skb at ffffffff81540523
+#18 [ffff880c0fc63c58] netif_receive_skb at ffffffff81541300
+#19 [ffff880c0fc63c88] napi_skb_finish at ffffffff81541450
+#20 [ffff880c0fc63ca8] napi_gro_receive at ffffffff81541a55
+#21 [ffff880c0fc63ce8] bnx2x_rx_int at ffffffffa01850c8 [bnx2x]
+#22 [ffff880c0fc63e18] bnx2x_poll at ffffffffa0187409 [bnx2x]
+#23 [ffff880c0fc63e68] net_rx_action at ffffffff81541ca4
+#24 [ffff880c0fc63ed8] __do_softirq at ffffffff8106ea58
+#25 [ffff880c0fc63f48] call_softirq at ffffffff8166422c
+#26 [ffff880c0fc63f60] do_softirq at ffffffff81015305
+#27 [ffff880c0fc63f80] irq_exit at ffffffff8106ee3e
+#28 [ffff880c0fc63f90] smp_apic_timer_interrupt at ffffffff81664bce
+#29 [ffff880c0fc63fb0] apic_timer_interrupt at ffffffff81662a9e
+--- <IRQ stack> ---
+#30 [ffff880bedd939f0] apic_timer_interrupt at ffffffff81662a9e
+    RIP: ffffffffffffff10  RSP: 0000000000000202  RFLAGS: 00000010
+    RAX: 00007ffffffff000  RBX: ffff880bedd93ac8  RCX: ffff880bee255bc0
+    RDX: 0000000000000000  RSI: 0000000000000000  RDI: 0000000000000001
+    RBP: ffffffff8103dcf9   R8: 000000000000007d   R9: 0000000000000000
+   R10: 0000000000000011  R11: ffffffff81659c5e  R12: ffff880bedd93a18
+    R13: 0044b82fa09b5a53  R14: ffff880bedd93a3e  R15: 000000000000003a
+    ORIG_RAX: ffff880bedd41888  CS: ffffffff810b2a4f  SS: ffff880bedd93aa8
