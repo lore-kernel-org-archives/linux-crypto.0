@@ -1,55 +1,53 @@
-From: Tomas Mraz <tmraz@redhat.com>
-Subject: Re: Wrong system clock vs X.509 date specifiers
-Date: Tue, 25 Sep 2012 20:39:07 +0200
-Message-ID: <1348598347.22489.57.camel@vespa.frost.loc>
-References: <1348588977.22489.55.camel@vespa.frost.loc>
-	 <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>
-	 <5555.1348531649@warthog.procyon.org.uk>
-	 <21845.1348585794@warthog.procyon.org.uk>
-	 <30071.1348587320@warthog.procyon.org.uk>
-	 <12475.1348594285@warthog.procyon.org.uk>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH 0/3] Optimize CRC32C calculation using PCLMULQDQ in
+ crc32c-intel module
+Date: Tue, 25 Sep 2012 14:50:08 -0700
+Message-ID: <1348609808.9977.205.camel@schen9-DESK>
+References: <cover.1348599489.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-2"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, rusty@rustcorp.com.au,
-	herbert@gondor.hengli.com.au, pjones@redhat.com,
-	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: David Howells <dhowells@redhat.com>
+Cc: Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Chaohong Guo <chaohong.guo@intel.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:10429 "EHLO mx1.redhat.com"
+Received: from mga02.intel.com ([134.134.136.20]:2419 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751991Ab2IYSj3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Sep 2012 14:39:29 -0400
-In-Reply-To: <12475.1348594285@warthog.procyon.org.uk>
+	id S1750768Ab2IYVuJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Sep 2012 17:50:09 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2012-09-25 at 18:31 +0100, David Howells wrote: 
-> Tomas Mraz <tmraz@redhat.com> wrote:
-> 
-> > You can use openssl ca that allows to set arbitrary start date to
-> > generate selfsigned certs as well (-selfsign option).
-> 
-> That seems to require some stuff I don't have installed:
-> 
-> warthog>openssl ca -in signing_key.priv -extensions v3_ca -out newcert.pem
-> Using configuration from /etc/pki/tls/openssl.cnf
-> Error opening CA private key /etc/pki/CA/private/cakey.pem
-> 140244246955872:error:0200100D:system library:fopen:Permission denied:bss_file.c:398:fopen('/etc/pki/CA/private/cakey.pem','r')
-> 140244246955872:error:20074002:BIO routines:FILE_CTRL:system lib:bss_file.c:400:
-> unable to load CA private key
-> unable to write 'random state'
-> 
-> (the /etc/pki/CA/private/ dir is inaccessible if not root and doesn't in any
-> case contain cakey.pem).
-> 
-> Do I need to start with all the CA stuff in the right places to use it?
+This patch series optimized CRC32C calculations with PCLMULQDQ
+instruction for crc32c-intel module.  It speeds up the original
+implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
+more.  The tcrypt module was enhanced for doing speed test
+on crc32c calculations.
 
-You can configure it to point to a different directories. But yes, you
-have to create a CA cert and so on. 
+Tim
+
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+Tim Chen (3):
+  Rename crc32c-intel.c to crc32c-intel_glue.c
+  Optimize CRC32C calculation with PCLMULQDQ instruction
+  Added speed test in tcrypt for crc32c
+
+ arch/x86/crypto/Makefile                           |    1 +
+ .../crypto/{crc32c-intel.c => crc32c-intel_glue.c} |   75 ++++
+ arch/x86/crypto/crc32c-pcl-intel-asm.S             |  460 ++++++++++++++++++++
+ crypto/tcrypt.c                                    |    4 +
+ 4 files changed, 540 insertions(+), 0 deletions(-)
+ rename arch/x86/crypto/{crc32c-intel.c => crc32c-intel_glue.c} (70%)
+ create mode 100644 arch/x86/crypto/crc32c-pcl-intel-asm.S
+
 -- 
-Tomas Mraz
-No matter how far down the wrong road you've gone, turn back.
-                                              Turkish proverb
+1.7.7.6
