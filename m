@@ -1,80 +1,42 @@
-From: Gao feng <gaofeng@cn.fujitsu.com>
-Subject: [patch v2 04/11] nf_conntrack_netlink: pass nf_conntrack_netlink module to netlink_dump_start
-Date: Wed, 26 Sep 2012 16:41:21 +0800
-Message-ID: <1348648888-24943-4-git-send-email-gaofeng@cn.fujitsu.com>
-References: <1348648888-24943-1-git-send-email-gaofeng@cn.fujitsu.com>
-Cc: netfilter-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	pablo@netfilter.org, stephen.hemminger@vyatta.com, jengelh@inai.de,
-	Gao feng <gaofeng@cn.fujitsu.com>
-To: davem@davemloft.net, eric.dumazet@gmail.com,
-	steffen.klassert@secunet.com
-Return-path: <netfilter-devel-owner@vger.kernel.org>
-In-Reply-To: <1348648888-24943-1-git-send-email-gaofeng@cn.fujitsu.com>
-Sender: netfilter-devel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Wed, 26 Sep 2012 10:09:35 +0100
+Message-ID: <8168.1348650575@warthog.procyon.org.uk>
+References: <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: Rusty Russell <rusty@rustcorp.com.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:26657 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753325Ab2IZJJs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 26 Sep 2012 05:09:48 -0400
+In-Reply-To: <87ehlp30pd.fsf@rustcorp.com.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-use proper netlink_dump_control.done and .module to avoid panic.
+Rusty Russell <rusty@rustcorp.com.au> wrote:
 
-Signed-off-by: Gao feng <gaofeng@cn.fujitsu.com>
----
- net/netfilter/nf_conntrack_netlink.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+> We do a very simple search for a particular string appended to the module
+> (which is cache-hot and about to be SHA'd anyway).  There's both a config
+> option and a boot parameter which control whether we accept (and taint) or
+> fail with unsigned modules.
 
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index 9807f32..509a257 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -706,6 +706,7 @@ static int ctnetlink_done(struct netlink_callback *cb)
- 		nf_ct_put((struct nf_conn *)cb->args[1]);
- 	if (cb->data)
- 		kfree(cb->data);
-+	netlink_dump_done(cb);
- 	return 0;
- }
- 
-@@ -1022,6 +1023,7 @@ ctnetlink_get_conntrack(struct sock *ctnl, struct sk_buff *skb,
- 		struct netlink_dump_control c = {
- 			.dump = ctnetlink_dump_table,
- 			.done = ctnetlink_done,
-+			.module = THIS_MODULE,
- 		};
- #ifdef CONFIG_NF_CONNTRACK_MARK
- 		if (cda[CTA_MARK] && cda[CTA_MARK_MASK]) {
-@@ -1706,6 +1708,8 @@ ctnetlink_stat_ct_cpu(struct sock *ctnl, struct sk_buff *skb,
- 	if (nlh->nlmsg_flags & NLM_F_DUMP) {
- 		struct netlink_dump_control c = {
- 			.dump = ctnetlink_ct_stat_cpu_dump,
-+			.done = netlink_dump_done,
-+			.module = THIS_MODULE,
- 		};
- 		return netlink_dump_start(ctnl, skb, nlh, &c);
- 	}
-@@ -2141,6 +2145,7 @@ static int ctnetlink_exp_done(struct netlink_callback *cb)
- {
- 	if (cb->args[1])
- 		nf_ct_expect_put((struct nf_conntrack_expect *)cb->args[1]);
-+	netlink_dump_done(cb);
- 	return 0;
- }
- 
-@@ -2222,6 +2227,7 @@ ctnetlink_get_expect(struct sock *ctnl, struct sk_buff *skb,
- 		struct netlink_dump_control c = {
- 			.dump = ctnetlink_exp_dump_table,
- 			.done = ctnetlink_exp_done,
-+			.module = THIS_MODULE,
- 		};
- 		return netlink_dump_start(ctnl, skb, nlh, &c);
- 	}
-@@ -2660,6 +2666,8 @@ ctnetlink_stat_exp_cpu(struct sock *ctnl, struct sk_buff *skb,
- 	if (nlh->nlmsg_flags & NLM_F_DUMP) {
- 		struct netlink_dump_control c = {
- 			.dump = ctnetlink_exp_stat_cpu_dump,
-+			.done = netlink_dump_done,
-+			.module = THIS_MODULE,
- 		};
- 		return netlink_dump_start(ctnl, skb, nlh, &c);
- 	}
--- 
-1.7.7.6
+I've adjusted your patch description to this:
 
+    We do a very simple search for a particular string appended to the module
+    (which is cache-hot and about to be SHA'd anyway).  There's both a config
+    option and a boot parameter which control whether we accept or fail with
+    unsigned modules and modules that are signed with an unknown key.
+
+    If module signing is enabled, the kernel will be tainted if a module is
+    accepted that is unsigned or has a signature for which we don't have the
+    key.
+
+I think it's worth mentioning the policy for unknown keys and worth making
+clear under what circumstances we mean the kernel to be tainted.
+
+David
