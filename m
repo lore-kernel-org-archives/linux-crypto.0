@@ -1,42 +1,45 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 0/3] Optimize CRC32C calculation using PCLMULQDQ in
- crc32c-intel module
-Date: Wed, 26 Sep 2012 12:55:16 -0400 (EDT)
-Message-ID: <20120926.125516.829958573312746035.davem@davemloft.net>
-References: <cover.1348599489.git.tim.c.chen@linux.intel.com>
-	<1348609808.9977.205.camel@schen9-DESK>
+From: Pablo Neira Ayuso <pablo-Cap9r6Oaw4JrovVCs/uTlw@public.gmane.org>
+Subject: Re: [PATCH 02/11] inet_diag: pass inet_diag module to
+ netlink_dump_start
+Date: Wed, 26 Sep 2012 19:26:14 +0200
+Message-ID: <20120926172614.GA22353@1984>
+References: <1348635140-20225-1-git-send-email-gaofeng@cn.fujitsu.com>
+ <1348635140-20225-2-git-send-email-gaofeng@cn.fujitsu.com>
+ <20120926090714.618a4b39@nehalam.linuxnetplumber.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, hpa@zytor.com,
-	wajdi.k.feghali@intel.com, james.guilford@intel.com,
-	david.m.cote@intel.com, suresh.b.siddha@intel.com,
-	chaohong.guo@intel.com, austin_zhang@linux.intel.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: tim.c.chen@linux.intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:45193 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754062Ab2IZQzY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Sep 2012 12:55:24 -0400
-In-Reply-To: <1348609808.9977.205.camel@schen9-DESK>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Gao feng <gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	netfilter-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, eric.dumazet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	jengelh-9+2X+4sQBs8@public.gmane.org, stephen.hemminger-ZtmgI6mnKB3QT0dZR+AlfA@public.gmane.org
+To: Stephen Hemminger <shemminger-ZtmgI6mnKB3QT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20120926090714.618a4b39-We1ePj4FEcvRI77zikRAJc56i+j3xesD0e7PPNI6Mm0@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Date: Tue, 25 Sep 2012 14:50:08 -0700
-
-> This patch series optimized CRC32C calculations with PCLMULQDQ
-> instruction for crc32c-intel module.  It speeds up the original
-> implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
-> more.  The tcrypt module was enhanced for doing speed test
-> on crc32c calculations.
+On Wed, Sep 26, 2012 at 09:07:14AM -0700, Stephen Hemminger wrote:
+> On Wed, 26 Sep 2012 12:52:11 +0800
+> Gao feng <gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org> wrote:
 > 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> >  			struct netlink_dump_control c = {
+> >  				.dump = inet_diag_dump_compat,
+> > +				.done = netlink_dump_done,
+> > +				.module = THIS_MODULE,
+> >  			};
+> 
+> Since these are immutable, why the netlink_dump_control structures
+> on the stack (which requires code to generate at runtime), and instead
+> make them global
+> 
+> static const struct netlink_dump_control unix_diag_ctrl = {
+> ...
 
-Great work.
-
-I intend to do something nearly identical on sparc64 since we have
-similar instructions in the form of "xmulx" and "xmulxhi" which return
-the lower and upper 64-bits (respectively) of a XOR multiply.
+I made that code. I can send a patch to statify those
+netlink_dump_control structures.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
