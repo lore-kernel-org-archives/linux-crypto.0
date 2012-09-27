@@ -1,138 +1,60 @@
-From: Gao feng <gaofeng@cn.fujitsu.com>
-Subject: Re: [patch v2 04/11] nf_conntrack_netlink: pass nf_conntrack_netlink
- module to netlink_dump_start
-Date: Thu, 27 Sep 2012 08:14:26 +0800
-Message-ID: <50639A62.4000800@cn.fujitsu.com>
-References: <1348648888-24943-1-git-send-email-gaofeng@cn.fujitsu.com> <1348648888-24943-4-git-send-email-gaofeng@cn.fujitsu.com> <20120926092632.GA21589@1984> <5062CE07.1080704@cn.fujitsu.com> <20120926095837.GA23815@1984> <5062F6A9.7020309@cn.fujitsu.com> <20120926150430.GA12438@1984>
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Thu, 27 Sep 2012 09:42:59 +0930
+Message-ID: <87bogs492s.fsf@rustcorp.com.au>
+References: <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: davem@davemloft.net, eric.dumazet@gmail.com,
-	steffen.klassert@secunet.com, netfilter-devel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org, stephen.hemminger@vyatta.com,
-	jengelh@inai.de
-To: Pablo Neira Ayuso <pablo@netfilter.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:25177 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1751796Ab2I0AO2 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Sep 2012 20:14:28 -0400
-In-Reply-To: <20120926150430.GA12438@1984>
+Received: from ozlabs.org ([203.10.76.45]:41776 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753806Ab2I0CFj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 26 Sep 2012 22:05:39 -0400
+In-Reply-To: <8168.1348650575@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=E4=BA=8E 2012=E5=B9=B409=E6=9C=8826=E6=97=A5 23:04, Pablo Neira Ayuso =
-=E5=86=99=E9=81=93:
-> On Wed, Sep 26, 2012 at 08:35:53PM +0800, Gao feng wrote:
->> =E4=BA=8E 2012=E5=B9=B409=E6=9C=8826=E6=97=A5 17:58, Pablo Neira Ayu=
-so =E5=86=99=E9=81=93:
->>> On Wed, Sep 26, 2012 at 05:42:31PM +0800, Gao feng wrote:
->>>> Hi Pablo:
->>>>
->>>> =E4=BA=8E 2012=E5=B9=B409=E6=9C=8826=E6=97=A5 17:26, Pablo Neira A=
-yuso =E5=86=99=E9=81=93:
->>>>> On Wed, Sep 26, 2012 at 04:41:21PM +0800, Gao feng wrote:
->>>>>> use proper netlink_dump_control.done and .module to avoid panic.
->>>>>>
->>>>>> Signed-off-by: Gao feng <gaofeng@cn.fujitsu.com>
->>>>>> ---
->>>>>>  net/netfilter/nf_conntrack_netlink.c |    8 ++++++++
->>>>>>  1 files changed, 8 insertions(+), 0 deletions(-)
->>>>>>
->>>>>> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilte=
-r/nf_conntrack_netlink.c
->>>>>> index 9807f32..509a257 100644
->>>>>> --- a/net/netfilter/nf_conntrack_netlink.c
->>>>>> +++ b/net/netfilter/nf_conntrack_netlink.c
->>>>>> @@ -706,6 +706,7 @@ static int ctnetlink_done(struct netlink_cal=
-lback *cb)
->>>>>>  		nf_ct_put((struct nf_conn *)cb->args[1]);
->>>>>>  	if (cb->data)
->>>>>>  		kfree(cb->data);
->>>>>> +	netlink_dump_done(cb);
->>>>>
->>>>> I think you can call netlink_dump_done from af_netlink.c:
->>>>>
->>>>> static int netlink_dump(struct sock *sk)=20
->>>>>         ...
->>>>>         if (cb->done) {
->>>>>                 cb->done(cb);
->>>>>                 netlink_dump_done(...);
->>>>>         }
->>>>>
->>>>> Thus, you don't need to change netlink_dump_control in every netl=
-ink
->>>>> subsystem.
->>>>
->>>> because cb->done is called by netlink_sock_destruct too,it's very =
-usefully
->>>> when userspace program only send dump request to kernel without re=
-ading
->>>> data from kernel.
->>>
->>> Then add that to netlink_sock_destruct as well. If possible, I pref=
-er
->>> if this remains in the netlink core to avoid leaking module refcoun=
-t
->>> if you forget to call netlink_dump_done.
->>
->> make sense, I will update it in next version.
->> Thanks!
->=20
-> Great. Remove also netlink_dump_done and just use module_put instead
-> after cb->done. That new function you added is so small that there is
-> no way to justify its addition.
->=20
->>>
->>>>>
->>>>>>  	return 0;
->>>>>>  }
->>>>>> =20
->>>>>> @@ -1022,6 +1023,7 @@ ctnetlink_get_conntrack(struct sock *ctnl,=
- struct sk_buff *skb,
->>>>>>  		struct netlink_dump_control c =3D {
->>>>>>  			.dump =3D ctnetlink_dump_table,
->>>>>>  			.done =3D ctnetlink_done,
->>>>>> +			.module =3D THIS_MODULE,
->>>>>
->>>>> You can do something similar to:
->>>>>
->>>>> 9f00d97 netlink: hide struct module parameter in netlink_kernel_c=
-reate
->>>>>
->>>>> by definiting netlink_dump_start as static inline and using
->>>>> THIS_MODULE from there.
->>>>>
->>>>> If I'm not missing anything, with those two changes, you will not=
- need
->>>>> to modify any caller and it will result one single patch.
->>>>>
->>>>
->>>> You can see the patch [11/11], THIS_MODULE in infiniband/core/cma.=
-c
->>>> means module rdma_cm,but we call netlink_dump_start in infiniband/=
-core/netlink.c
->>>
->>> You can still use __netlink_dump_start for that case, which allows =
-you
->>> to specify a custom struct module * parameter. But for most cases,
->>> netlink_dump_start (which hides THIS_MODULE) should be fine.
->>
->> I don't know how to deal with module_put in this way.
->> and I think my  way is simple enough.
->=20
-> Not sure what problem with module_put you're refering to.
->=20
+David Howells <dhowells@redhat.com> writes:
 
-forget this,I'm wrong.
+> Rusty Russell <rusty@rustcorp.com.au> wrote:
+>
+>> We do a very simple search for a particular string appended to the module
+>> (which is cache-hot and about to be SHA'd anyway).  There's both a config
+>> option and a boot parameter which control whether we accept (and taint) or
+>> fail with unsigned modules.
+>
+> I've adjusted your patch description to this:
+>
+>     We do a very simple search for a particular string appended to the module
+>     (which is cache-hot and about to be SHA'd anyway).  There's both a config
+>     option and a boot parameter which control whether we accept or fail with
+>     unsigned modules and modules that are signed with an unknown key.
+>
+>     If module signing is enabled, the kernel will be tainted if a module is
+>     accepted that is unsigned or has a signature for which we don't have the
+>     key.
+>
+> I think it's worth mentioning the policy for unknown keys and worth making
+> clear under what circumstances we mean the kernel to be tainted.
 
-> I think you can make this patchset way smaller with the change I'm
-> proposing.
->=20
+Great!  I checked your Kconfig help, too, which is states it clearly:
 
-I know,but I choose simple and directviewing, not smaller.
-I think these two function will make people confuse.
+config MODULE_SIG_FORCE
+	bool "Require modules to be validly signed"
+	depends on MODULE_SIG
+	help
+	  Reject unsigned modules or signed modules for which we don't have a
+	  key.  Without this, such modules will simply taint the kernel.
 
-Thanks!
+
+Which is really nice, since the kernel Kconfig help messages tend to
+suck.
+
+Thanks,
+Rusty.
