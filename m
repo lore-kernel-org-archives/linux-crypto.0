@@ -1,37 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt - add missing tests for camellia and
- ghash
-Date: Wed, 26 Sep 2012 22:45:34 -0700
-Message-ID: <20120927054534.GH22311@gondor.apana.org.au>
-References: <20120921072710.11930.17414.stgit@localhost6.localdomain6>
- <20120921.121204.1043966198515282180.davem@davemloft.net>
+Subject: Re: [PATCH 0/3] Optimize CRC32C calculation using PCLMULQDQ in
+ crc32c-intel module
+Date: Wed, 26 Sep 2012 22:45:51 -0700
+Message-ID: <20120927054551.GI22311@gondor.apana.org.au>
+References: <cover.1348599489.git.tim.c.chen@linux.intel.com>
+ <1348609808.9977.205.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: jussi.kivilinna@mbnet.fi, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Chaohong Guo <chaohong.guo@intel.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:42937 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:45726 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755846Ab2I0Fph (ORCPT
+	with ESMTP id S1753682Ab2I0FqA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2012 01:45:37 -0400
+	Thu, 27 Sep 2012 01:46:00 -0400
 Content-Disposition: inline
-In-Reply-To: <20120921.121204.1043966198515282180.davem@davemloft.net>
+In-Reply-To: <1348609808.9977.205.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 21, 2012 at 12:12:04PM -0400, David Miller wrote:
-> From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-> Date: Fri, 21 Sep 2012 10:27:10 +0300
+On Tue, Sep 25, 2012 at 02:50:08PM -0700, Tim Chen wrote:
+> This patch series optimized CRC32C calculations with PCLMULQDQ
+> instruction for crc32c-intel module.  It speeds up the original
+> implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
+> more.  The tcrypt module was enhanced for doing speed test
+> on crc32c calculations.
 > 
-> > Add missing tests for ctr(camellia), lrw(camellia), xts(camellia) and ghash,
-> > as these have test vectors available.
-> > 
-> > Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Tim
 > 
-> Acked-by: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-Patch applied.  Thanks!
+All applied.  Thanks Tim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
