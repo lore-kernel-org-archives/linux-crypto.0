@@ -1,58 +1,53 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH 0/3 v2] Optimize CRC32C calculation using PCLMULQDQ in
- crc32c-intel module
-Date: Thu, 27 Sep 2012 15:44:14 -0700
-Message-ID: <1348785854.17632.15.camel@schen9-DESK>
+Subject: [PATCH 1/3 v2] Rename crc32c-intel.c to crc32c-intel_glue.c
+Date: Thu, 27 Sep 2012 15:44:17 -0700
+Message-ID: <1348785857.17632.16.camel@schen9-DESK>
 References: <cover.1348784343.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Fengguang Wu <fengguang.wu@intel.com>,
-	David Cote <david.m.cote@intel.com>,
-	Suresh Siddha <suresh.b.siddha@intel.com>,
+Cc: Suresh Siddha <suresh.b.siddha@intel.com>,
 	Chaohong Guo <chaohong.guo@intel.com>,
 	Austin Zhang <austin_zhang@linux.intel.com>,
 	linux-kernel <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org,
 	James Guilford <james.guilford@intel.com>,
 	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Min Li <min.a.li@intel.com>
+	Min Li <min.a.li@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Fengguang Wu <fengguang.wu@intel.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1348784343.git.tim.c.chen@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Version 2
-This version of the patch series fixes compilation errors for
-32 bit x86 targets.
-
-Version 1
-This patch series optimized CRC32C calculations with PCLMULQDQ
-instruction for crc32c-intel module.  It speeds up the original
-implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
-more.  The tcrypt module was enhanced for doing speed test
-on crc32c calculations.
-
-Tim
+This patch renames the crc32c-intel.c file to crc32c-intel_glue.c file
+in preparation for linking with the new crc32c-pcl-intel-asm.S file,
+which contains optimized crc32c calculation based on PCLMULQDQ
+instruction.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
+ arch/x86/crypto/Makefile                           |    1 +
+ .../crypto/{crc32c-intel.c => crc32c-intel_glue.c} |    0
+ 2 files changed, 1 insertions(+), 0 deletions(-)
+ rename arch/x86/crypto/{crc32c-intel.c => crc32c-intel_glue.c} (100%)
 
-Tim Chen (3):
-  Rename crc32c-intel.c to crc32c-intel_glue.c
-  Optimize CRC32C calculation with PCLMULQDQ instruction
-  Added speed test in tcrypt for crc32c
-
- arch/x86/crypto/Makefile                           |    2 +
- .../crypto/{crc32c-intel.c => crc32c-intel_glue.c} |   81 ++++
- arch/x86/crypto/crc32c-pcl-intel-asm_64.S          |  460 ++++++++++++++++++++
- crypto/Kconfig                                     |   10 +
- crypto/tcrypt.c                                    |    4 +
- 5 files changed, 557 insertions(+), 0 deletions(-)
- rename arch/x86/crypto/{crc32c-intel.c => crc32c-intel_glue.c} (69%)
- create mode 100644 arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index e908e5d..edd2268 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -43,3 +43,4 @@ serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
+ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
++crc32c-intel-y := crc32c-intel_glue.o
+diff --git a/arch/x86/crypto/crc32c-intel.c b/arch/x86/crypto/crc32c-intel_glue.c
+similarity index 100%
+rename from arch/x86/crypto/crc32c-intel.c
+rename to arch/x86/crypto/crc32c-intel_glue.c
 -- 
 1.7.7.6
