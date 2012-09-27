@@ -1,35 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: x86/glue_helper - fix storing of new IV in CBC
- encryption
-Date: Wed, 26 Sep 2012 22:31:45 -0700
-Message-ID: <20120927053145.GA22225@gondor.apana.org.au>
-References: <20120919064030.10037.69526.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: caam - fix error IDs for SEC v5.x RNG4
+Date: Wed, 26 Sep 2012 22:43:27 -0700
+Message-ID: <20120927054327.GA22311@gondor.apana.org.au>
+References: <1347669234-31464-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:49743 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:40929 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754825Ab2I0Fbs (ORCPT
+	with ESMTP id S1755525Ab2I0Fn3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2012 01:31:48 -0400
+	Thu, 27 Sep 2012 01:43:29 -0400
 Content-Disposition: inline
-In-Reply-To: <20120919064030.10037.69526.stgit@localhost6.localdomain6>
+In-Reply-To: <1347669234-31464-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 19, 2012 at 09:40:30AM +0300, Jussi Kivilinna wrote:
-> Glue_helper incorrectly XORs new IV over old IV at end of CBC encryption
-> function when it should store. This causes CBC encryption to give
-> incorrect output on multi-page encryption requests.
+On Sat, Sep 15, 2012 at 03:33:54AM +0300, Horia Geanta wrote:
+> According to SEC v5.0-v5.3 reference manuals.
 > 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+> Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
-Patch applied to crypto.
-
-Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
