@@ -1,38 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: talitos fixes for 3.6-rc7
-Date: Wed, 26 Sep 2012 22:25:40 -0700
-Message-ID: <20120927052539.GA22160@gondor.apana.org.au>
-References: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
+Subject: Re: [PATCH] crypto: x86/glue_helper - fix storing of new IV in CBC
+ encryption
+Date: Wed, 26 Sep 2012 22:31:45 -0700
+Message-ID: <20120927053145.GA22225@gondor.apana.org.au>
+References: <20120919064030.10037.69526.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Horia Geanta <horia.geanta@freescale.com>
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:55850 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:49743 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754555Ab2I0FZn (ORCPT
+	with ESMTP id S1754825Ab2I0Fbs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2012 01:25:43 -0400
+	Thu, 27 Sep 2012 01:31:48 -0400
 Content-Disposition: inline
-In-Reply-To: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
+In-Reply-To: <20120919064030.10037.69526.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 19, 2012 at 09:53:37PM +0300, Horia Geanta wrote:
-> Hi Herbert,
+On Wed, Sep 19, 2012 at 09:40:30AM +0300, Jussi Kivilinna wrote:
+> Glue_helper incorrectly XORs new IV over old IV at end of CBC encryption
+> function when it should store. This causes CBC encryption to give
+> incorrect output on multi-page encryption requests.
 > 
-> I know these patches come late and might not be included in 3.6.
-> But two of them are already sitting in cryptodev tree for some time.
-> (Don't know where my head was :/).
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-I'm hesitant to put these patches in at this stage.  For the
-problems fixed by them do we have simpler fixes for 3.6? For
-example, by reverting changesets that introduced the issue if
-it's a regression, or disabling the buggy functionality?
+Patch applied to crypto.
 
-Thanks,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
