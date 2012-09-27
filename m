@@ -1,47 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] Optimize CRC32C calculation using PCLMULQDQ in
- crc32c-intel module
-Date: Wed, 26 Sep 2012 22:45:51 -0700
-Message-ID: <20120927054551.GI22311@gondor.apana.org.au>
-References: <cover.1348599489.git.tim.c.chen@linux.intel.com>
- <1348609808.9977.205.camel@schen9-DESK>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: Re: [PATCH 0/3] crypto: talitos fixes for 3.6-rc7
+Date: Thu, 27 Sep 2012 11:01:50 +0300
+Message-ID: <506407EE.50406@freescale.com>
+References: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com> <20120927052539.GA22160@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	David Cote <david.m.cote@intel.com>,
-	Suresh Siddha <suresh.b.siddha@intel.com>,
-	Chaohong Guo <chaohong.guo@intel.com>,
-	Austin Zhang <austin_zhang@linux.intel.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+	Kim Phillips <kim.phillips@freescale.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:45726 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753682Ab2I0FqA (ORCPT
+Received: from co1ehsobe004.messaging.microsoft.com ([216.32.180.187]:56039
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752288Ab2I0ICR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2012 01:46:00 -0400
-Content-Disposition: inline
-In-Reply-To: <1348609808.9977.205.camel@schen9-DESK>
+	Thu, 27 Sep 2012 04:02:17 -0400
+In-Reply-To: <20120927052539.GA22160@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 25, 2012 at 02:50:08PM -0700, Tim Chen wrote:
-> This patch series optimized CRC32C calculations with PCLMULQDQ
-> instruction for crc32c-intel module.  It speeds up the original
-> implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
-> more.  The tcrypt module was enhanced for doing speed test
-> on crc32c calculations.
-> 
-> Tim
-> 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+On 9/27/2012 8:25 AM, Herbert Xu wrote:
+> On Wed, Sep 19, 2012 at 09:53:37PM +0300, Horia Geanta wrote:
+>> Hi Herbert,
+>>
+>> I know these patches come late and might not be included in 3.6.
+>> But two of them are already sitting in cryptodev tree for some time.
+>> (Don't know where my head was :/).
+>
+> I'm hesitant to put these patches in at this stage.  For the
 
-All applied.  Thanks Tim!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+That's understandable.
+
+> problems fixed by them do we have simpler fixes for 3.6? For
+> example, by reverting changesets that introduced the issue if
+
+Reverting
+e46e9a crypto: testmgr - add aead cbc aes hmac sha1,256,512 test vectors
+(added in 3.6-rc2) would also do fine.
+
+Of course, it would be added back in during 3.7 merge window, with the 
+other talitos-specific patches currently sitting in cryptodev.
+
+What I'm trying to say here is that allowing the patch to go in 3.6 
+without all the other is incorrect. Sorry for not posting all of them as 
+a patchset.
+
+Again, this patch (e46e9a) is not the culprit, it merely exposes the 
+deficiencies in the talitos driver.
+AFAICT, these cases (zero assoc data, noncontiguous iv and assoc data) 
+have never been handled correctly in the driver.
+
+> it's a regression, or disabling the buggy functionality?
+
+Don't think so, it's core functionality.
+
+>
+> Thanks,
+>
