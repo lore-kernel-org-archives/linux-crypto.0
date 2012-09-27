@@ -1,32 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] crypto: testmgr - allow non-multi page and multi
- page skcipher tests from same test template
-Date: Wed, 26 Sep 2012 22:44:52 -0700
-Message-ID: <20120927054452.GE22311@gondor.apana.org.au>
-References: <20120919064249.10607.45593.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: cast5/avx - fix storing of new IV in CBC
+ encryption
+Date: Wed, 26 Sep 2012 22:45:06 -0700
+Message-ID: <20120927054506.GF22311@gondor.apana.org.au>
+References: <20120919112456.12812.51190.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>
 To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:37392 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:52620 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755581Ab2I0Foz (ORCPT
+	with ESMTP id S1752823Ab2I0FpH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Sep 2012 01:44:55 -0400
+	Thu, 27 Sep 2012 01:45:07 -0400
 Content-Disposition: inline
-In-Reply-To: <20120919064249.10607.45593.stgit@localhost6.localdomain6>
+In-Reply-To: <20120919112456.12812.51190.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 19, 2012 at 09:42:49AM +0300, Jussi Kivilinna wrote:
-> Allow non-multi page and multi page skcipher tests to be run on same test template, to avoid
-> duplicating data.
+On Wed, Sep 19, 2012 at 02:24:57PM +0300, Jussi Kivilinna wrote:
+> cast5/avx incorrectly XORs new IV over old IV at end of CBC encryption
+> function when it should store. This causes CBC encryption to give
+> incorrect output on multi-page encryption requests.
 > 
 > Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
-All three patches applied.  Thanks!
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
