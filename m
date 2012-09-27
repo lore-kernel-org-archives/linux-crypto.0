@@ -1,43 +1,39 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Wed, 26 Sep 2012 22:04:03 -0400
-Message-ID: <1348711443.17807.12.camel@falcor>
-References: <5555.1348531649@warthog.procyon.org.uk>
-	 <87ehlp30pd.fsf@rustcorp.com.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3] crypto: talitos fixes for 3.6-rc7
+Date: Wed, 26 Sep 2012 22:25:40 -0700
+Message-ID: <20120927052539.GA22160@gondor.apana.org.au>
+References: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells@redhat.com>, herbert@gondor.hengli.com.au,
-	pjones@redhat.com, jwboyer@redhat.com,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: Rusty Russell <rusty@rustcorp.com.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e3.ny.us.ibm.com ([32.97.182.143]:39545 "EHLO e3.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751125Ab2I0CJn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Sep 2012 22:09:43 -0400
-Received: from /spool/local
-	by e3.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Wed, 26 Sep 2012 22:09:41 -0400
-In-Reply-To: <87ehlp30pd.fsf@rustcorp.com.au>
+Received: from sting.hengli.com.au ([178.18.18.71]:55850 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754555Ab2I0FZn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Sep 2012 01:25:43 -0400
+Content-Disposition: inline
+In-Reply-To: <1348080820-22250-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2012-09-26 at 13:16 +0930, Rusty Russell wrote:
-> David Howells <dhowells@redhat.com> writes:
-> > The module signing patches provide:
-> >
-> >  - Some fixes to Rusty's patch.  Also an additional patch to extend the policy
-> >    handling for modules signed with an unknown key and to handle FIPS mode.
+On Wed, Sep 19, 2012 at 09:53:37PM +0300, Horia Geanta wrote:
+> Hi Herbert,
 > 
-> Ok, I merged some of this (after our previous accidentally-off-list
-> discussion).
+> I know these patches come late and might not be included in 3.6.
+> But two of them are already sitting in cryptodev tree for some time.
+> (Don't know where my head was :/).
 
-Rusty, have you pushed this branch out yet?
+I'm hesitant to put these patches in at this stage.  For the
+problems fixed by them do we have simpler fixes for 3.6? For
+example, by reverting changesets that introduced the issue if
+it's a regression, or disabling the buggy functionality?
 
-thanks,
-
-Mimi
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
