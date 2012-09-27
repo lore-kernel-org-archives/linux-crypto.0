@@ -1,60 +1,43 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Thu, 27 Sep 2012 09:42:59 +0930
-Message-ID: <87bogs492s.fsf@rustcorp.com.au>
-References: <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk>
+Date: Wed, 26 Sep 2012 22:04:03 -0400
+Message-ID: <1348711443.17807.12.camel@falcor>
+References: <5555.1348531649@warthog.procyon.org.uk>
+	 <87ehlp30pd.fsf@rustcorp.com.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells@redhat.com>, herbert@gondor.hengli.com.au,
 	pjones@redhat.com, jwboyer@redhat.com,
 	linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: David Howells <dhowells@redhat.com>
+To: Rusty Russell <rusty@rustcorp.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:41776 "EHLO ozlabs.org"
+Received: from e3.ny.us.ibm.com ([32.97.182.143]:39545 "EHLO e3.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753806Ab2I0CFj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Sep 2012 22:05:39 -0400
-In-Reply-To: <8168.1348650575@warthog.procyon.org.uk>
+	id S1751125Ab2I0CJn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 26 Sep 2012 22:09:43 -0400
+Received: from /spool/local
+	by e3.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Wed, 26 Sep 2012 22:09:41 -0400
+In-Reply-To: <87ehlp30pd.fsf@rustcorp.com.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-David Howells <dhowells@redhat.com> writes:
+On Wed, 2012-09-26 at 13:16 +0930, Rusty Russell wrote:
+> David Howells <dhowells@redhat.com> writes:
+> > The module signing patches provide:
+> >
+> >  - Some fixes to Rusty's patch.  Also an additional patch to extend the policy
+> >    handling for modules signed with an unknown key and to handle FIPS mode.
+> 
+> Ok, I merged some of this (after our previous accidentally-off-list
+> discussion).
 
-> Rusty Russell <rusty@rustcorp.com.au> wrote:
->
->> We do a very simple search for a particular string appended to the module
->> (which is cache-hot and about to be SHA'd anyway).  There's both a config
->> option and a boot parameter which control whether we accept (and taint) or
->> fail with unsigned modules.
->
-> I've adjusted your patch description to this:
->
->     We do a very simple search for a particular string appended to the module
->     (which is cache-hot and about to be SHA'd anyway).  There's both a config
->     option and a boot parameter which control whether we accept or fail with
->     unsigned modules and modules that are signed with an unknown key.
->
->     If module signing is enabled, the kernel will be tainted if a module is
->     accepted that is unsigned or has a signature for which we don't have the
->     key.
->
-> I think it's worth mentioning the policy for unknown keys and worth making
-> clear under what circumstances we mean the kernel to be tainted.
+Rusty, have you pushed this branch out yet?
 
-Great!  I checked your Kconfig help, too, which is states it clearly:
+thanks,
 
-config MODULE_SIG_FORCE
-	bool "Require modules to be validly signed"
-	depends on MODULE_SIG
-	help
-	  Reject unsigned modules or signed modules for which we don't have a
-	  key.  Without this, such modules will simply taint the kernel.
-
-
-Which is really nice, since the kernel Kconfig help messages tend to
-suck.
-
-Thanks,
-Rusty.
+Mimi
