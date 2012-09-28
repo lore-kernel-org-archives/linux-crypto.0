@@ -1,47 +1,46 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+From: Rusty Russell <rusty@rustcorp.com.au>
 Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Fri, 28 Sep 2012 08:27:07 +0200
-Message-ID: <CAMuHMdVGfKEeGwwf-B1rukhhdXWBYfBp2MiYbHe09P6RHkUbyw@mail.gmail.com>
-References: <5555.1348531649@warthog.procyon.org.uk>
-	<87ehlp30pd.fsf@rustcorp.com.au>
+Date: Fri, 28 Sep 2012 16:24:06 +0930
+Message-ID: <87d3163aep.fsf@rustcorp.com.au>
+References: <5555.1348531649@warthog.procyon.org.uk> <87ehlp30pd.fsf@rustcorp.com.au> <1348711443.17807.12.camel@falcor>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: David Howells <dhowells@redhat.com>, herbert@gondor.hengli.com.au,
 	pjones@redhat.com, jwboyer@redhat.com,
 	linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: Rusty Russell <rusty@rustcorp.com.au>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f174.google.com ([209.85.216.174]:36795 "EHLO
-	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751093Ab2I1G1I (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Sep 2012 02:27:08 -0400
-In-Reply-To: <87ehlp30pd.fsf@rustcorp.com.au>
+Received: from ozlabs.org ([203.10.76.45]:60804 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751340Ab2I1GzM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Sep 2012 02:55:12 -0400
+In-Reply-To: <1348711443.17807.12.camel@falcor>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 26, 2012 at 5:46 AM, Rusty Russell <rusty@rustcorp.com.au> wrote:
-> You previously wrote:
->> You can't compare them that easily.  One has a FIPS-mode panic and the other
->> doesn't.  Do we want to panic if we reject an unsigned module in enforcing
->> mode when we're in FIPS mode?
+Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
+
+> On Wed, 2012-09-26 at 13:16 +0930, Rusty Russell wrote:
+>> David Howells <dhowells@redhat.com> writes:
+>> > The module signing patches provide:
+>> >
+>> >  - Some fixes to Rusty's patch.  Also an additional patch to extend the policy
+>> >    handling for modules signed with an unknown key and to handle FIPS mode.
+>> 
+>> Ok, I merged some of this (after our previous accidentally-off-list
+>> discussion).
 >
-> It's a line ball, but I think consistency wins.  Not a validly signed
-> module => panic.
+> Rusty, have you pushed this branch out yet?
+>
+> thanks,
+>
+> Mimi
 
-Just wondering, what's the advantage of doing panic over just
-rejecting the module?
-Panic is a DoS?
+git://git.kernel.org/pub/scm/linux/kernel/git/rusty/linux.git modules-next
 
-Gr{oetje,eeting}s,
+(That's *not* where linux-next currently pulls from)
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Cheers,
+Rusty.
