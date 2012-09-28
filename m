@@ -1,92 +1,133 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: aesni intel and kernel crashes.
-Date: Fri, 28 Sep 2012 15:41:50 +0300
-Message-ID: <20120928154150.178522ssx9low1es@www.81.fi>
-References: <CA+sc+0T3CFwv6JdcLA66=pD=6LcaQOJZnvDGqp3o4LKN85ZbZg@mail.gmail.com>
+From: Yashpal Dutta <yashpal.dutta@freescale.com>
+Subject: [PATCH] crypto: caam - Pages pinned with get_user_pages requires kmap
+Date: Sat, 29 Sep 2012 04:11:35 +0545
+Message-ID: <1348871195-22467-1-git-send-email-yashpal.dutta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: Gurucharan Shetty <gurucharan.shetty@gmail.com>
+Content-Type: text/plain
+Cc: Yashpal Dutta <yashpal.dutta@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:42557 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757674Ab2I1Mlx (ORCPT
+Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:48000
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757648Ab2I1RV0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Sep 2012 08:41:53 -0400
-In-Reply-To: <CA+sc+0T3CFwv6JdcLA66=pD=6LcaQOJZnvDGqp3o4LKN85ZbZg@mail.gmail.com>
-Content-Disposition: inline
+	Fri, 28 Sep 2012 13:21:26 -0400
+Received: from mail215-ch1 (localhost [127.0.0.1])	by
+ mail215-ch1-R.bigfish.com (Postfix) with ESMTP id A09E42A00C6	for
+ <linux-crypto@vger.kernel.org>; Fri, 28 Sep 2012 17:21:25 +0000 (UTC)
+Received: from CH1EHSMHS039.bigfish.com (snatpool1.int.messaging.microsoft.com
+ [10.43.68.247])	by mail215-ch1.bigfish.com (Postfix) with ESMTP id
+ D75E84E0056	for <linux-crypto@vger.kernel.org>; Fri, 28 Sep 2012 17:21:23
+ +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Gurucharan Shetty <gurucharan.shetty@gmail.com>:
+Following crash occur if user pinned pages are send to SEC driver for digest
+creation:
 
-> Hello All,
->
->  I have been seeing a bunch of kernel crashes while using aesni_intel
-> module and IPSEC.
-*snip*
->  #6 [ffff880c0fc63998] cryptd_enqueue_request at ffffffffa02d9106 [cryptd]
->  #7 [ffff880c0fc639c8] cryptd_aead_decrypt_enqueue at  
-> ffffffffa02d92c0 [cryptd]
->  #8 [ffff880c0fc639d8] rfc4106_decrypt at ffffffffa02ec2bf [aesni_intel]
->  #9 [ffff880c0fc63a08] esp_input at ffffffffa029da65 [esp4]
-> #10 [ffff880c0fc63a98] xfrm_input at ffffffff815cb9c4
-> #11 [ffff880c0fc63b08] xfrm4_rcv_encap at ffffffff815c148c
-> #12 [ffff880c0fc63b18] xfrm4_rcv at ffffffff815c14b4
-> #13 [ffff880c0fc63b28] ip_local_deliver_finish at ffffffff815749ed
-> #14 [ffff880c0fc63b58] ip_local_deliver at ffffffff81574d58
-> #15 [ffff880c0fc63b88] ip_rcv_finish at ffffffff815746c1
-> #16 [ffff880c0fc63bb8] ip_rcv at ffffffff81574f95
-> #17 [ffff880c0fc63bf8] __netif_receive_skb at ffffffff81540523
-> #18 [ffff880c0fc63c58] netif_receive_skb at ffffffff81541300
-> #19 [ffff880c0fc63c88] napi_skb_finish at ffffffff81541450
-> #20 [ffff880c0fc63ca8] napi_gro_receive at ffffffff81541a55
-> #21 [ffff880c0fc63ce8] bnx2x_rx_int at ffffffffa01850c8 [bnx2x]
-> #22 [ffff880c0fc63e18] bnx2x_poll at ffffffffa0187409 [bnx2x]
-> #23 [ffff880c0fc63e68] net_rx_action at ffffffff81541ca4
-> #24 [ffff880c0fc63ed8] __do_softirq at ffffffff8106ea58
-> #25 [ffff880c0fc63f48] call_softirq at ffffffff8166422c
-> #26 [ffff880c0fc63f60] do_softirq at ffffffff81015305
-> #27 [ffff880c0fc63f80] irq_exit at ffffffff8106ee3e
-> #28 [ffff880c0fc63f90] smp_apic_timer_interrupt at ffffffff81664bce
-> #29 [ffff880c0fc63fb0] apic_timer_interrupt at ffffffff81662a9e
-> --- <IRQ stack> ---
-> #30 [ffff880bedd939f0] apic_timer_interrupt at ffffffff81662a9e
->     RIP: ffffffffffffff10  RSP: 0000000000000202  RFLAGS: 00000010
->     RAX: 00007ffffffff000  RBX: ffff880bedd93ac8  RCX: ffff880bee255bc0
->     RDX: 0000000000000000  RSI: 0000000000000000  RDI: 0000000000000001
->     RBP: ffffffff8103dcf9   R8: 000000000000007d   R9: 0000000000000000
->    R10: 0000000000000011  R11: ffffffff81659c5e  R12: ffff880bedd93a18
->     R13: 0044b82fa09b5a53  R14: ffff880bedd93a3e  R15: 000000000000003a
->     ORIG_RAX: ffff880bedd41888  CS: ffffffff810b2a4f  SS: ffff880bedd93aa8
-*snip*
-> [ 3673.935620] Process kworker/3:1 (pid: 125, threadinfo
-> ffff880bedd92000, task ffff880bee255bc0)
-> [ 3673.935697] Stack:
-> [ 3673.935747]  ffffffffa02d9b46 ffff880bedd93e60 ffffe8f3cfc61f10
-> ffff880bee3e1200
-> [ 3673.935954]  ffff880c0fc7aa00 ffff880bedd93e70 ffffffff81084f9a
-> ffff880bedd93fd8
-> [ 3673.936161]  0000000000013780 ffff880bee2916f0 ffff880bee255bc0
-> ffff880c0fc7aa05
-> [ 3673.936367] Call Trace:
-> [ 3673.936421]  [<ffffffffa02d9b46>] ? cryptd_queue_worker+0x56/0x80 [cryptd]
-> [ 3673.936486]  [<ffffffff81084f9a>] process_one_work+0x11a/0x480
-> [ 3673.936546]  [<ffffffff81085d44>] worker_thread+0x164/0x370
-> [ 3673.936605]  [<ffffffff81085be0>] ? manage_workers.isra.29+0x130/0x130
-> [ 3673.936666]  [<ffffffff8108a59c>] kthread+0x8c/0xa0
-> [ 3673.936725]  [<ffffffff81664134>] kernel_thread_helper+0x4/0x10
-> [ 3673.936785]  [<ffffffff8108a510>] ? flush_kthread_worker+0xa0/0xa0
-> [ 3673.936844]  [<ffffffff81664130>] ? gs_change+0x13/0x13
+Unable to handle kernel paging request for data at address 0x00000f48
+Faulting instruction address: 0xc0017f1c
+Oops: Kernel access of bad area, sig: 11 [#1]
+SMP NR_CPUS=8 P4080 DS
+Modules linked in: qoriq_dbg
+NIP: c0017f1c LR: c04053a8 CTR: c000c9e4
+REGS: e29bbb10 TRAP: 0300 Not tainted (3.0.34-rt55)
+MSR: 00029002 <EE,ME,CE> CR: 28248422 XER: 00000000
+DEAR: 00000f48, ESR: 00000000
+TASK = e917caf0[2249] 'openssl' THREAD: e29ba000 CPU: 2
+GPR00: 00000040 e29bbbc0 e917caf0 e2805c68 00000f44 00000004 e2805c64 00000000
+GPR08: 00000000 c0772400 00000000 c07723f8 48244422 100867b4 00000005 00000044
+GPR16: f0400000 00000004 00000000 f67f0f08 00000044 c0760000 e28b9c00 00000000
+GPR24: e2805c68 00000040 00000000 29a7f100 e9a7f028 e9665ec8 e2805c00 e6c07840
+NIP [c0017f1c] memcpy+0x3c/0x9c
+LR [c04053a8] ahash_update_first+0x2a8/0x814
+Call Trace:
+[e29bbbc0] [c0405388] ahash_update_first+0x288/0x814 (unreliable)
+[e29bbc20] [c0402bf8] ahash_update+0x18/0x28
+[e29bbc30] [c01e06c0] cryptodev_hash_update+0x44/0xcc
+[e29bbc40] [c01df5ec] hash_n_crypt.isra.0+0xdc/0x160
+[e29bbc60] [c01dfaa4] crypto_run+0x194/0x360
+[e29bbc90] [c01df1dc] cryptodev_ioctl+0x510/0x844
+[e29bbea0] [c00d0870] do_vfs_ioctl+0xa4/0x764
+[e29bbf10] [c00d0f70] sys_ioctl+0x40/0x70
 
-cryptd uses get_cpu/put_cpu in cryptd_enqueue_request and  
-preempt_disable/preempt_enable in cryptd_queue_worker to protect  
-cpu_queue->queue. However cryptd_enqueue_request is called from  
-interrupt context. That probably is source of the problem.
+Direct IO mapped pages using get_user_pages in kernel require kmap before
+reading/writing and subsequently kunmap in CAAM driver.
 
--Jussi
+Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
+---
+ drivers/crypto/caam/sg_sw_sec4.h |   34 +++++++++++++++++++++++++---------
+ 1 files changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+index e0037c8..12ebae1 100644
+--- a/drivers/crypto/caam/sg_sw_sec4.h
++++ b/drivers/crypto/caam/sg_sw_sec4.h
+@@ -117,6 +117,21 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
+ 	return nents;
+ }
+ 
++/* Map SG page in kernel virtual address space and copy */
++static inline void sg_map_copy(u8 *dest, struct scatterlist *sg,
++					int len, int offset)
++{
++	u8 *mapped_addr;
++
++	/*
++	 * Page here can be user-space pinned using get_user_pages
++	 * Same must be kmapped before use and kunmapped subsequently
++	 */
++	mapped_addr = kmap(sg_page(sg));
++	memcpy(dest, mapped_addr + offset, len);
++	kunmap(sg_page(sg));
++}
++
+ /* Copy from len bytes of sg to dest, starting from beginning */
+ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
+ {
+@@ -124,15 +139,15 @@ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
+ 	int cpy_index = 0, next_cpy_index = current_sg->length;
+ 
+ 	while (next_cpy_index < len) {
+-		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
+-		       current_sg->length);
++		sg_map_copy(dest + cpy_index, current_sg, current_sg->length,
++				current_sg->offset);
+ 		current_sg = scatterwalk_sg_next(current_sg);
+ 		cpy_index = next_cpy_index;
+ 		next_cpy_index += current_sg->length;
+ 	}
+ 	if (cpy_index < len)
+-		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
+-		       len - cpy_index);
++		sg_map_copy(dest + cpy_index, current_sg, len-cpy_index,
++				current_sg->offset);
+ }
+ 
+ /* Copy sg data, from to_skip to end, to dest */
+@@ -140,7 +155,7 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
+ 				      int to_skip, unsigned int end)
+ {
+ 	struct scatterlist *current_sg = sg;
+-	int sg_index, cpy_index;
++	int sg_index, cpy_index, offset;
+ 
+ 	sg_index = current_sg->length;
+ 	while (sg_index <= to_skip) {
+@@ -148,9 +163,10 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
+ 		sg_index += current_sg->length;
+ 	}
+ 	cpy_index = sg_index - to_skip;
+-	memcpy(dest, (u8 *) sg_virt(current_sg) +
+-	       current_sg->length - cpy_index, cpy_index);
+-	current_sg = scatterwalk_sg_next(current_sg);
+-	if (end - sg_index)
++	offset = current_sg->offset + current_sg->length - cpy_index;
++	sg_map_copy(dest, current_sg, cpy_index, offset);
++	if (end - sg_index) {
++		current_sg = scatterwalk_sg_next(current_sg);
+ 		sg_copy(dest + cpy_index, current_sg, end - sg_index);
++	}
+ }
+-- 
+1.7.0.4
