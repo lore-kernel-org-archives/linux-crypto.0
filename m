@@ -1,7 +1,7 @@
 From: David Howells <dhowells@redhat.com>
 Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Sat, 29 Sep 2012 08:13:25 +0100
-Message-ID: <29407.1348902805@warthog.procyon.org.uk>
+Date: Sat, 29 Sep 2012 08:16:50 +0100
+Message-ID: <29451.1348903010@warthog.procyon.org.uk>
 References: <87wqzdnwus.fsf@rustcorp.com.au> <87ipay3cof.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27378.1348819793@warthog.procyon.org.uk>
 Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
 	pjones@redhat.com, jwboyer@redhat.com,
@@ -9,29 +9,30 @@ Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
 To: Rusty Russell <rusty@rustcorp.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:64165 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757946Ab2I2HOa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 29 Sep 2012 03:14:30 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <87wqzdnwus.fsf@rustcorp.com.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Rusty Russell <rusty@rustcorp.com.au> wrote:
 
-> [    2.808075] Loading module verification certificates
-> [    2.809331] X.509: Cert 6e03943da0f3b015ba6ed7f5e0cac4fe48680994 has expired
-> [    2.810500] MODSIGN: Problem loading in-kernel X.509 certificate (-127)
+> I noticed the Cert number didn't change with rebuilds: "distclean"
+> didn't remove some files:
+> 
+> $ git clean -f -f -x -d
+> Removing extra_certificates
+> Removing signing_key.priv
+> Removing signing_key.x509
+> Removing signing_key.x509.keyid
+> Removing signing_key.x509.signer
+> Removing x509.genkey
 
-Hmmm...  Other people have seen that.
+I'm not sure whether distclean should remove those, since they can be
+externally supplied, or whether x509.genkey should have a Makefile dependency
+on kernel/Makefile.
 
-Ahhhhh!
-
-I wonder if the problem is that the certificate is valid for 100 years....
-That might well cause an overflow on a 32-bit system.
-
-Could you try changing the '36500' in kernel/Makefile to something shorter,
-like 365?
+I lean towards 'yes' when I'm altering kernel/Makefile trying to get things
+right, and 'no' when I'm doing a make distclean to change my config or
+changing kernel/Makefile for some unrelated reason.
 
 David
