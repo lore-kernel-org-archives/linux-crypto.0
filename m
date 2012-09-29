@@ -1,133 +1,73 @@
-From: Yashpal Dutta <yashpal.dutta@freescale.com>
-Subject: [PATCH] crypto: caam - Pages pinned with get_user_pages requires kmap
-Date: Sat, 29 Sep 2012 04:11:35 +0545
-Message-ID: <1348871195-22467-1-git-send-email-yashpal.dutta@freescale.com>
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Sat, 29 Sep 2012 16:23:31 +0930
+Message-ID: <87wqzdnwus.fsf@rustcorp.com.au>
+References: <87ipay3cof.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27378.1348819793@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Yashpal Dutta <yashpal.dutta@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <kim.phillips@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:48000
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757648Ab2I1RV0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Sep 2012 13:21:26 -0400
-Received: from mail215-ch1 (localhost [127.0.0.1])	by
- mail215-ch1-R.bigfish.com (Postfix) with ESMTP id A09E42A00C6	for
- <linux-crypto@vger.kernel.org>; Fri, 28 Sep 2012 17:21:25 +0000 (UTC)
-Received: from CH1EHSMHS039.bigfish.com (snatpool1.int.messaging.microsoft.com
- [10.43.68.247])	by mail215-ch1.bigfish.com (Postfix) with ESMTP id
- D75E84E0056	for <linux-crypto@vger.kernel.org>; Fri, 28 Sep 2012 17:21:23
- +0000 (UTC)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <27378.1348819793@warthog.procyon.org.uk>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Following crash occur if user pinned pages are send to SEC driver for digest
-creation:
+David Howells <dhowells@redhat.com> writes:
+> Rusty Russell <rusty@rustcorp.com.au> wrote:
+>
+>> And after those three fixes, I still get all fail:
+>> 
+>> [    3.361036] Request for unknown module key 'Magrathea: Glacier signing key: 6
+>> e03943da0f3b015ba6ed7f5e0cac4fe48680994' err -11
+>
+> Can you look back further in your kernel output, see if you can spot the bit
+> where it's trying to load the keys.  Look for things from modsign_pubkey.c:
+>
+> 	pr_notice("Loading module verification certificates\n");
+> 	...
+> 			pr_err("MODSIGN: Problem loading in-kernel X.509 certificate (%ld)\n",
+> 			       PTR_ERR(key));
+> 		else
+> 			pr_notice("MODSIGN: Loaded cert '%s'\n",
+> 				  key_ref_to_ptr(key)->description);
+>
+>> CONFIG_CRYPTO_SHA1=m
+>
+> Hmmm...  I suspect it's that.  We need a hash to verify the key's own
+> signature too - and if you're using the key my autogen patch created for you,
+> I think that would be SHA1, so that must be built in too.
 
-Unable to handle kernel paging request for data at address 0x00000f48
-Faulting instruction address: 0xc0017f1c
-Oops: Kernel access of bad area, sig: 11 [#1]
-SMP NR_CPUS=8 P4080 DS
-Modules linked in: qoriq_dbg
-NIP: c0017f1c LR: c04053a8 CTR: c000c9e4
-REGS: e29bbb10 TRAP: 0300 Not tainted (3.0.34-rt55)
-MSR: 00029002 <EE,ME,CE> CR: 28248422 XER: 00000000
-DEAR: 00000f48, ESR: 00000000
-TASK = e917caf0[2249] 'openssl' THREAD: e29ba000 CPU: 2
-GPR00: 00000040 e29bbbc0 e917caf0 e2805c68 00000f44 00000004 e2805c64 00000000
-GPR08: 00000000 c0772400 00000000 c07723f8 48244422 100867b4 00000005 00000044
-GPR16: f0400000 00000004 00000000 f67f0f08 00000044 c0760000 e28b9c00 00000000
-GPR24: e2805c68 00000040 00000000 29a7f100 e9a7f028 e9665ec8 e2805c00 e6c07840
-NIP [c0017f1c] memcpy+0x3c/0x9c
-LR [c04053a8] ahash_update_first+0x2a8/0x814
-Call Trace:
-[e29bbbc0] [c0405388] ahash_update_first+0x288/0x814 (unreliable)
-[e29bbc20] [c0402bf8] ahash_update+0x18/0x28
-[e29bbc30] [c01e06c0] cryptodev_hash_update+0x44/0xcc
-[e29bbc40] [c01df5ec] hash_n_crypt.isra.0+0xdc/0x160
-[e29bbc60] [c01dfaa4] crypto_run+0x194/0x360
-[e29bbc90] [c01df1dc] cryptodev_ioctl+0x510/0x844
-[e29bbea0] [c00d0870] do_vfs_ioctl+0xa4/0x764
-[e29bbf10] [c00d0f70] sys_ioctl+0x40/0x70
+Right, I chose SHA-512 because everyone knows it's 512 times more secure
+than SHA-1.
 
-Direct IO mapped pages using get_user_pages in kernel require kmap before
-reading/writing and subsequently kunmap in CAAM driver.
+I cherry-picked those two patches, and now I see:
 
-Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
----
- drivers/crypto/caam/sg_sw_sec4.h |   34 +++++++++++++++++++++++++---------
- 1 files changed, 25 insertions(+), 9 deletions(-)
+[    2.808075] Loading module verification certificates
+[    2.809331] X.509: Cert 6e03943da0f3b015ba6ed7f5e0cac4fe48680994 has expired
+[    2.810500] MODSIGN: Problem loading in-kernel X.509 certificate (-127)
 
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index e0037c8..12ebae1 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -117,6 +117,21 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
- 	return nents;
- }
- 
-+/* Map SG page in kernel virtual address space and copy */
-+static inline void sg_map_copy(u8 *dest, struct scatterlist *sg,
-+					int len, int offset)
-+{
-+	u8 *mapped_addr;
-+
-+	/*
-+	 * Page here can be user-space pinned using get_user_pages
-+	 * Same must be kmapped before use and kunmapped subsequently
-+	 */
-+	mapped_addr = kmap(sg_page(sg));
-+	memcpy(dest, mapped_addr + offset, len);
-+	kunmap(sg_page(sg));
-+}
-+
- /* Copy from len bytes of sg to dest, starting from beginning */
- static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
- {
-@@ -124,15 +139,15 @@ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
- 	int cpy_index = 0, next_cpy_index = current_sg->length;
- 
- 	while (next_cpy_index < len) {
--		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
--		       current_sg->length);
-+		sg_map_copy(dest + cpy_index, current_sg, current_sg->length,
-+				current_sg->offset);
- 		current_sg = scatterwalk_sg_next(current_sg);
- 		cpy_index = next_cpy_index;
- 		next_cpy_index += current_sg->length;
- 	}
- 	if (cpy_index < len)
--		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
--		       len - cpy_index);
-+		sg_map_copy(dest + cpy_index, current_sg, len-cpy_index,
-+				current_sg->offset);
- }
- 
- /* Copy sg data, from to_skip to end, to dest */
-@@ -140,7 +155,7 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
- 				      int to_skip, unsigned int end)
- {
- 	struct scatterlist *current_sg = sg;
--	int sg_index, cpy_index;
-+	int sg_index, cpy_index, offset;
- 
- 	sg_index = current_sg->length;
- 	while (sg_index <= to_skip) {
-@@ -148,9 +163,10 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
- 		sg_index += current_sg->length;
- 	}
- 	cpy_index = sg_index - to_skip;
--	memcpy(dest, (u8 *) sg_virt(current_sg) +
--	       current_sg->length - cpy_index, cpy_index);
--	current_sg = scatterwalk_sg_next(current_sg);
--	if (end - sg_index)
-+	offset = current_sg->offset + current_sg->length - cpy_index;
-+	sg_map_copy(dest, current_sg, cpy_index, offset);
-+	if (end - sg_index) {
-+		current_sg = scatterwalk_sg_next(current_sg);
- 		sg_copy(dest + cpy_index, current_sg, end - sg_index);
-+	}
- }
--- 
-1.7.0.4
+I noticed the Cert number didn't change with rebuilds: "distclean"
+didn't remove some files:
+
+$ git clean -f -f -x -d
+Removing extra_certificates
+Removing signing_key.priv
+Removing signing_key.x509
+Removing signing_key.x509.keyid
+Removing signing_key.x509.signer
+Removing x509.genkey
+
+Removing them didn't fix it either, but at least I got a new certificate.
+
+This is x86-32 BTW.  I've put the complete, built tree (minus .git dir)
+up at http://ozlabs.org/~rusty/linux-for-dhowells.tar.xz
+
+Here's how I run it:
+kvm -nographic -m 256 -net user,restrict=off -net nic,model=virtio -drive file=$QEMUIMAGE,index=0,media=disk,if=virtio -drive file=$QEMUIMAGEB,index=1,media=disk,if=virtio -kernel arch/x86/boot/bzImage -append "ro root=/dev/vda1 console=ttyS0 $*"
+
+Thanks,
+Rusty.
