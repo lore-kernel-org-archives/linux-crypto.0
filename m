@@ -1,43 +1,47 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [GIT PULL] Asymmetric keys and module signing
-Date: Tue, 02 Oct 2012 15:07:45 +0100
-Message-ID: <23688.1349186865@warthog.procyon.org.uk>
-References: <874nmd4d2o.fsf@rustcorp.com.au> <87wqzdnwus.fsf@rustcorp.com.au> <87ipay3cof.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27378.1348819793@warthog.procyon.org.uk> <29451.1348903010@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
-	pjones@redhat.com, jwboyer@redhat.com,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: Rusty Russell <rusty@rustcorp.com.au>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <874nmd4d2o.fsf@rustcorp.com.au>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH] crypto: tegra: remove include of <mach/clk.h>
+Date: Tue,  2 Oct 2012 16:17:40 -0600
+Message-ID: <1349216260-917-1-git-send-email-swarren@wwwdotorg.org>
+Cc: linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
+	Stephen Warren <swarren@nvidia.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:48942 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751669Ab2JBWRq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Oct 2012 18:17:46 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Rusty Russell <rusty@rustcorp.com.au> wrote:
+From: Stephen Warren <swarren@nvidia.com>
 
-> Right.  I think we need to use different names for generated vs supplied
-> files
+Nothing from this file is used, and the file will hopefully be deleted
+soon.
 
-The problem with supplied files is people who do allyesconfig, allmodconfig
-and randconfig just to test things finding that their builds break.  The
-kernel build magic is not really set up to handle external files like this.  I
-suppose make logic can be used to conditionally include stuff that might not
-exist.
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
+---
+Herbert, if this patch can get into 3.7 (it's late, I know) then that
+would be great. If not, may I please request an ack so I can take the
+change through the Tegra tree in 3.8, since I will probably have cleanup
+patches that depend on this change. Thanks.
+---
+ drivers/crypto/tegra-aes.c |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-> BTW, you missed a Signed-off-by: on your "MODSIGN: Use the same digest
-> for the autogen key sig as for the module sig" patch.  Please update.
-
-Done.
-
-I've also added a patch to convert the system clock to a struct tm and to
-produce a struct tm within the ASN.1 decode and then compare those rather than
-time_t values as a way to deal with the validity time overflow problem.  We
-may have to be able to handle certificates that we haven't generated that
-stretch beyond 2038 (I wonder if we might find such in the UEFI key database
-for example.
-
-Another way of dealing with this could be to make mktime() within the kernel
-produce a u64 rather than an unsigned long, and then compare those.
-
-David
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index ac236f6..88d860b 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -41,8 +41,6 @@
+ #include <linux/completion.h>
+ #include <linux/workqueue.h>
+ 
+-#include <mach/clk.h>
+-
+ #include <crypto/scatterwalk.h>
+ #include <crypto/aes.h>
+ #include <crypto/internal/rng.h>
+-- 
+1.7.0.4
