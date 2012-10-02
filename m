@@ -1,31 +1,92 @@
 From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 1/2] modsign: don't use bashism in sh scripts.
-Date: Tue, 02 Oct 2012 11:54:51 +0930
-Message-ID: <87a9w54nm4.fsf@rustcorp.com.au>
-References: <87obkq3czk.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27405.1348819833@warthog.procyon.org.uk>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Tue, 02 Oct 2012 12:58:03 +0930
+Message-ID: <87626t4kos.fsf@rustcorp.com.au>
+References: <87wqzdnwus.fsf@rustcorp.com.au> <87ipay3cof.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27378.1348819793@warthog.procyon.org.uk> <29407.1348902805@warthog.procyon.org.uk> <20121001204150.GA20849@hansolo.jdub.homelinux.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
-	pjones@redhat.com, jwboyer@redhat.com,
+Cc: herbert@gondor.hengli.com.au, pjones@redhat.com,
 	linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <27405.1348819833@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
+To: Josh Boyer <jwboyer@redhat.com>,
+	David Howells <dhowells@redhat.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <20121001204150.GA20849@hansolo.jdub.homelinux.org>
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-David Howells <dhowells@redhat.com> writes:
+Josh Boyer <jwboyer@redhat.com> writes:
 
-> Rusty Russell <rusty@rustcorp.com.au> wrote:
+> On Sat, Sep 29, 2012 at 08:13:25AM +0100, David Howells wrote:
+>> Rusty Russell <rusty@rustcorp.com.au> wrote:
+>> 
+>> > [    2.808075] Loading module verification certificates
+>> > [    2.809331] X.509: Cert 6e03943da0f3b015ba6ed7f5e0cac4fe48680994 has expired
+>> > [    2.810500] MODSIGN: Problem loading in-kernel X.509 certificate (-127)
+>> 
+>> Hmmm...  Other people have seen that.
+>> 
+>> Ahhhhh!
+>> 
+>> I wonder if the problem is that the certificate is valid for 100 years....
+>> That might well cause an overflow on a 32-bit system.
 >
->> -    source ./.config
->> +    . ./.config
+> That does seem quite plausible.  The comparisons are done with time_t,
+> which boils down to 'long' and 100 years in seconds would overflow
+> LONG_MAX.
 >
-> Does that make a difference?
+>> Could you try changing the '36500' in kernel/Makefile to something shorter,
+>> like 365?
+>
+> I tried two values today.  One close to LONG_MAX (24800 or ~68 years),
+> and 10 years (3650).  The former still seemed to overflow, but
+> specifying a 10yr lifetime appears to have worked.
 
-It does on Ubuntu, where /bin/sh => dash.  "source" is a bashism.
+That's because the timestamp is absolute, right?  Indeed, that seems to
+be the limit here.
 
-Cheers,
-Rusty.
+Here's my solution (tested, and it breaks if you change 2147300000 to
+2147600000 as expected):
+
+>From 2a4b91c2c29739191c6f7db9abee9296ae505c39 Mon Sep 17 00:00:00 2001
+From: Rusty Russell <rusty@rustcorp.com.au>
+Date: Tue, 2 Oct 2012 12:55:06 +0930
+Subject: [PATCH] MODSIGN: fix expiry of auto-generated certificates on 32-bit
+ systems
+
+100-year certificates make time_t wrap, resulting in:
+
+[    2.835272] X.509: Cert a94f6776f3f5483b0764011d1fcc6c0298362e63 has expired
+[    2.836346] MODSIGN: Problem loading in-kernel X.509 certificate (-127)
+
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+
+diff --git a/kernel/Makefile b/kernel/Makefile
+index e951adf..86336c9 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -168,6 +168,13 @@ endif
+ ifeq ($(sign_key_with_hash),)
+ $(error Could not determine digest type to use from kernel config)
+ endif
++ifeq ($(CONFIG_64BIT),y)
++# 100 years is beyond my best-before date, anyway.
++end_of_time_days=36500
++else
++# Until 32-bit time_t wraps, with some slack.
++end_of_time_days=$(shell expr \( 2147300000 - `date -u +%s` \) / 86400 )
++endif
+ 
+ signing_key.priv signing_key.x509: x509.genkey
+ 	@echo "###"
+@@ -180,7 +187,8 @@ signing_key.priv signing_key.x509: x509.genkey
+ 	@echo "###"
+ 	@echo "###     rngd -r /dev/hwrandom"
+ 	@echo "###"
+-	openssl req -new -nodes -utf8 $(sign_key_with_hash) -days 36500 -batch \
++	openssl req -new -nodes -utf8 $(sign_key_with_hash) \
++		-days $(end_of_time_days) -batch \
+ 		-x509 -config x509.genkey \
+ 		-outform DER -out signing_key.x509 \
+ 		-keyout signing_key.priv
