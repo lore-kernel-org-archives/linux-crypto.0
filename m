@@ -1,74 +1,53 @@
-From: Gao feng <gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
-Subject: [patch v3 11/11] infiniband: pass rdma_cm module to netlink_dump_start
-Date: Thu, 4 Oct 2012 12:41:29 +0800
-Message-ID: <1349325689-16104-11-git-send-email-gaofeng@cn.fujitsu.com>
-References: <1349325689-16104-1-git-send-email-gaofeng@cn.fujitsu.com>
-Cc: netfilter-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	pablo-Cap9r6Oaw4JrovVCs/uTlw@public.gmane.org, stephen.hemminger-ZtmgI6mnKB3QT0dZR+AlfA@public.gmane.org, jengelh-9+2X+4sQBs8@public.gmane.org,
-	Gao feng <gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>,
-	Roland Dreier <roland-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Sean Hefty <sean.hefty-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-To: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, eric.dumazet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1349325689-16104-1-git-send-email-gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Thu, 04 Oct 2012 08:52:51 +0930
+Message-ID: <87ehlf2l9w.fsf@rustcorp.com.au>
+References: <874nmd4d2o.fsf@rustcorp.com.au> <87wqzdnwus.fsf@rustcorp.com.au> <87ipay3cof.fsf@rustcorp.com.au> <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk> <27378.1348819793@warthog.procyon.org.uk> <29451.1348903010@warthog.procyon.org.uk> <23688.1349186865@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: dhowells@redhat.com, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ozlabs.org ([203.10.76.45]:52214 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753290Ab2JDBYE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Oct 2012 21:24:04 -0400
+In-Reply-To: <23688.1349186865@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-set netlink_dump_control.module to avoid panic.
+David Howells <dhowells@redhat.com> writes:
 
-Signed-off-by: Gao feng <gaofeng-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
-Cc: Roland Dreier <roland-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Cc: Sean Hefty <sean.hefty-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
----
- drivers/infiniband/core/cma.c     |    3 ++-
- drivers/infiniband/core/netlink.c |    1 +
- include/rdma/rdma_netlink.h       |    1 +
- 3 files changed, 4 insertions(+), 1 deletions(-)
+> Rusty Russell <rusty@rustcorp.com.au> wrote:
+>
+>> Right.  I think we need to use different names for generated vs supplied
+>> files
+>
+> The problem with supplied files is people who do allyesconfig, allmodconfig
+> and randconfig just to test things finding that their builds break.  The
+> kernel build magic is not really set up to handle external files like this.  I
+> suppose make logic can be used to conditionally include stuff that might not
+> exist.
+>
+>> BTW, you missed a Signed-off-by: on your "MODSIGN: Use the same digest
+>> for the autogen key sig as for the module sig" patch.  Please update.
+>
+> Done.
+>
+> I've also added a patch to convert the system clock to a struct tm and to
+> produce a struct tm within the ASN.1 decode and then compare those rather than
+> time_t values as a way to deal with the validity time overflow problem.  We
+> may have to be able to handle certificates that we haven't generated that
+> stretch beyond 2038 (I wonder if we might find such in the UEFI key database
+> for example.
 
-diff --git a/drivers/infiniband/core/cma.c b/drivers/infiniband/core/cma.c
-index 26b3760..4fff27a 100644
---- a/drivers/infiniband/core/cma.c
-+++ b/drivers/infiniband/core/cma.c
-@@ -3498,7 +3498,8 @@ out:
- }
- 
- static const struct ibnl_client_cbs cma_cb_table[] = {
--	[RDMA_NL_RDMA_CM_ID_STATS] = { .dump = cma_get_id_stats },
-+	[RDMA_NL_RDMA_CM_ID_STATS] = { .dump = cma_get_id_stats,
-+				       .module = THIS_MODULE },
- };
- 
- static int __init cma_init(void)
-diff --git a/drivers/infiniband/core/netlink.c b/drivers/infiniband/core/netlink.c
-index fe10a94..da06abd 100644
---- a/drivers/infiniband/core/netlink.c
-+++ b/drivers/infiniband/core/netlink.c
-@@ -154,6 +154,7 @@ static int ibnl_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
- 			{
- 				struct netlink_dump_control c = {
- 					.dump = client->cb_table[op].dump,
-+					.module = client->cb_table[op].module,
- 				};
- 				return netlink_dump_start(nls, skb, nlh, &c);
- 			}
-diff --git a/include/rdma/rdma_netlink.h b/include/rdma/rdma_netlink.h
-index 3c5363a..bd3d8b2 100644
---- a/include/rdma/rdma_netlink.h
-+++ b/include/rdma/rdma_netlink.h
-@@ -39,6 +39,7 @@ struct rdma_cm_id_stats {
- 
- struct ibnl_client_cbs {
- 	int (*dump)(struct sk_buff *skb, struct netlink_callback *nlcb);
-+	struct module *module;
- };
- 
- int ibnl_init(void);
--- 
-1.7.7.6
+OK, cherry-picked to replace my hack.
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+It's in linux-next, and I will push in the next two days.
+
+Thanks,
+Rusty.
