@@ -1,33 +1,47 @@
-From: Jeff Garzik <jgarzik@pobox.com>
-Subject: Re: [PATCH v0] Add SHA-3 hash algorithm
-Date: Wed, 03 Oct 2012 03:17:34 -0400
-Message-ID: <506BE68E.5000004@pobox.com>
-References: <20121003054542.GA2416@havoc.gtf.org> <20121003.020619.772556428995851933.davem@davemloft.net> <506BE0E7.1070701@pobox.com> <20121003071119.GA2571@gondor.apana.org.au>
+From: David Rientjes <rientjes@google.com>
+Subject: [patch] MODSIGN: Fix build error with strict typechecking
+Date: Wed, 3 Oct 2012 10:50:33 -0700 (PDT)
+Message-ID: <alpine.DEB.2.00.1210031045060.29765@chino.kir.corp.google.com>
+References: <87bogs492s.fsf@rustcorp.com.au> <87ehlp30pd.fsf@rustcorp.com.au> <5555.1348531649@warthog.procyon.org.uk> <8168.1348650575@warthog.procyon.org.uk> <16088.1348736905@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: herbert@gondor.hengli.com.au, pjones@redhat.com,
+	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: David Howells <dhowells@redhat.com>,
+	Rusty Russell <rusty@rustcorp.com.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20121003071119.GA2571@gondor.apana.org.au>
+In-Reply-To: <16088.1348736905@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 10/03/2012 03:11 AM, Herbert Xu wrote:
-> On Wed, Oct 03, 2012 at 02:53:27AM -0400, Jeff Garzik wrote:
->>
->> Maybe my patch is the best we can do in the current kernel, if
->> dynamic digest size is not currently possible. Register "sha3_224",
->> "sha3_256", ... as you describe, and wait for actual users to appear
->> with unsupported digest sizes.
->
-> Let's see what people use before we do anything more fancy.
->
-> If the variants really start proliferating, we can add a template
-> called "trunc" and then have things like "trunc(sha3,224)", etc.
+"MODSIGN: Provide module signing public keys to the kernel" causes a build 
+error when CONFIG_UIDGID_STRICT_TYPE_CHECKS is enabled:
 
-If they start proliferating, you really just want a single "sha3(n)", 
-one single shash_alg registered at driver init time.
+kernel/modsign_pubkey.c: In function 'module_verify_init':
+kernel/modsign_pubkey.c:47: error: incompatible type for argument 3 of 'key_alloc'
+include/linux/key.h:195: note: expected 'kuid_t' but argument is of type 'int'
+kernel/modsign_pubkey.c:47: error: incompatible type for argument 4 of 'key_alloc'
+include/linux/key.h:195: note: expected 'kgid_t' but argument is of type 'int'
 
-	Jeff
+Cast the parameters accordingly.
+
+Signed-off-by: David Rientjes <rientjes@google.com>
+---
+ kernel/modsign_pubkey.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/kernel/modsign_pubkey.c b/kernel/modsign_pubkey.c
+--- a/kernel/modsign_pubkey.c
++++ b/kernel/modsign_pubkey.c
+@@ -41,7 +41,8 @@ static __init int module_verify_init(void)
+ 	pr_notice("Initialise module verification\n");
+ 
+ 	modsign_keyring = key_alloc(&key_type_keyring, ".module_sign",
+-				    0, 0, current_cred(),
++				    KUIDT_INIT(0), KGIDT_INIT(0),
++				    current_cred(),
+ 				    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
+ 				    KEY_USR_VIEW | KEY_USR_READ,
+ 				    KEY_ALLOC_NOT_IN_QUOTA);
