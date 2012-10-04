@@ -1,37 +1,49 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH -next] asymmetric keys: fix printk format warning
-Date: Thu, 04 Oct 2012 12:48:27 +0930
-Message-ID: <874nma3oxo.fsf@rustcorp.com.au>
-References: <20121003173007.c322d79c31676b9494a6bfd5@canb.auug.org.au> <506CC48E.2020303@xenotime.net> <20121004090806.70274213735de74211f4334d@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Randy Dunlap <rdunlap@xenotime.net>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20121004090806.70274213735de74211f4334d@canb.auug.org.au>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gao feng <gaofeng@cn.fujitsu.com>
+Subject: [patch v3 02/11] inet_diag: pass inet_diag module to netlink_dump_start
+Date: Thu, 4 Oct 2012 12:41:20 +0800
+Message-ID: <1349325689-16104-2-git-send-email-gaofeng@cn.fujitsu.com>
+References: <1349325689-16104-1-git-send-email-gaofeng@cn.fujitsu.com>
+Cc: netfilter-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	pablo@netfilter.org, stephen.hemminger@vyatta.com, jengelh@inai.de,
+	Gao feng <gaofeng@cn.fujitsu.com>
+To: davem@davemloft.net, eric.dumazet@gmail.com,
+	steffen.klassert@secunet.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from cn.fujitsu.com ([222.73.24.84]:62440 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1751567Ab2JDElk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Oct 2012 00:41:40 -0400
+In-Reply-To: <1349325689-16104-1-git-send-email-gaofeng@cn.fujitsu.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Stephen Rothwell <sfr@canb.auug.org.au> writes:
+set netlink_dump_control.module to avoid panic.
 
-> [Lets also cc Rusty who committed the patch ...]
->
-> On Wed, 03 Oct 2012 16:04:46 -0700 Randy Dunlap <rdunlap@xenotime.net> wrote:
->>
->> From: Randy Dunlap <rdunlap@xenotime.net>
->> 
->> Fix printk format warning in x509_cert_parser.c:
->> 
->> crypto/asymmetric_keys/x509_cert_parser.c: In function 'x509_note_OID':
->> crypto/asymmetric_keys/x509_cert_parser.c:113:3: warning: format '%zu' expects type 'size_t', but argument 2 has type 'long unsigned int'
->> 
->> Builds cleanly on i386 and x86_64.
+Signed-off-by: Gao feng <gaofeng@cn.fujitsu.com>
+---
+ net/ipv4/inet_diag.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Thanks, applied.
-
-Rusty.
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 535584c..5ffd7bc 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -981,6 +981,7 @@ static int inet_diag_rcv_msg_compat(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 		{
+ 			struct netlink_dump_control c = {
+ 				.dump = inet_diag_dump_compat,
++				.module = THIS_MODULE,
+ 			};
+ 			return netlink_dump_start(net->diag_nlsk, skb, nlh, &c);
+ 		}
+@@ -1010,6 +1011,7 @@ static int inet_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
+ 		{
+ 			struct netlink_dump_control c = {
+ 				.dump = inet_diag_dump,
++				.module = THIS_MODULE,
+ 			};
+ 			return netlink_dump_start(net->diag_nlsk, skb, h, &c);
+ 		}
+-- 
+1.7.7.6
