@@ -1,47 +1,66 @@
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: [PATCH -next] asymmetric keys: fix printk format warning
-Date: Wed, 03 Oct 2012 16:04:46 -0700
-Message-ID: <506CC48E.2020303@xenotime.net>
-References: <20121003173007.c322d79c31676b9494a6bfd5@canb.auug.org.au>
+From: Ben Hutchings <bhutchings@solarflare.com>
+Subject: Re: [patch v3 01/11] netlink: add reference of module in
+ netlink_dump_start
+Date: Thu, 4 Oct 2012 16:41:42 +0100
+Message-ID: <1349365302.2817.1.camel@bwh-desktop.uk.solarflarecom.com>
+References: <1349325689-16104-1-git-send-email-gaofeng@cn.fujitsu.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20121003173007.c322d79c31676b9494a6bfd5@canb.auug.org.au>
-Sender: linux-next-owner@vger.kernel.org
+Cc: <davem@davemloft.net>, <eric.dumazet@gmail.com>,
+	<steffen.klassert@secunet.com>, <netfilter-devel@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <pablo@netfilter.org>,
+	<stephen.hemminger@vyatta.com>, <jengelh@inai.de>
+To: Gao feng <gaofeng@cn.fujitsu.com>
+Return-path: <netfilter-devel-owner@vger.kernel.org>
+In-Reply-To: <1349325689-16104-1-git-send-email-gaofeng@cn.fujitsu.com>
+Sender: netfilter-devel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Randy Dunlap <rdunlap@xenotime.net>
+On Thu, 2012-10-04 at 12:41 +0800, Gao feng wrote:
+> I get a panic when I use ss -a and rmmod inet_diag at the
+> same time.
+> 
+> it's because netlink_dump use inet_diag_dump witch function
+> belongs to module inet_diag.
+> 
+> I search the codes and find many modules have the same problem.
+> We need add reference of the module witch the cb->dump belongs
+> to.
+> 
+> Thanks for all help from Stephen,Jan,Eric,Steffen and Pablo.
+> 
+> Change From v2:
+> 
+> delete netlink_dump_done,and call module_put in netlink_dump
+> and netlink_sock_destruct.
+[...]
+> @@ -1794,19 +1798,28 @@ int netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+>  		return -ECONNREFUSED;
+>  	}
+>  	nlk = nlk_sk(sk);
+> -	/* A dump is in progress... */
+> +
+>  	mutex_lock(nlk->cb_mutex);
+> +	/* A dump is in progress... */
+>  	if (nlk->cb) {
+>  		mutex_unlock(nlk->cb_mutex);
+>  		netlink_destroy_callback(cb);
+> -		sock_put(sk);
+> -		return -EBUSY;
+> +		ret = -EBUSY;
+> +		goto out;
+>  	}
+> +	/* add reference of module witch cb->dump belong to */
+[...]
 
-Fix printk format warning in x509_cert_parser.c:
+'which' not 'witch' :-)
 
-crypto/asymmetric_keys/x509_cert_parser.c: In function 'x509_note_OID':
-crypto/asymmetric_keys/x509_cert_parser.c:113:3: warning: format '%zu' expects type 'size_t', but argument 2 has type 'long unsigned int'
+Ben.
 
-Builds cleanly on i386 and x86_64.
+-- 
+Ben Hutchings, Staff Engineer, Solarflare
+Not speaking for my employer; that's the marketing department's job.
+They asked us to note that Solarflare product names are trademarked.
 
-Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
----
- crypto/asymmetric_keys/x509_cert_parser.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- linux-next-20121003.orig/crypto/asymmetric_keys/x509_cert_parser.c
-+++ linux-next-20121003/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -110,7 +110,7 @@ int x509_note_OID(void *context, size_t
- 	if (ctx->last_oid == OID__NR) {
- 		char buffer[50];
- 		sprint_oid(value, vlen, buffer, sizeof(buffer));
--		pr_debug("Unknown OID: [%zu] %s\n",
-+		pr_debug("Unknown OID: [%lu] %s\n",
- 			 (unsigned long)value - ctx->data, buffer);
- 	}
- 	return 0;
