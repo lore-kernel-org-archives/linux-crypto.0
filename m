@@ -1,46 +1,100 @@
-From: =?UTF-8?B?UMOpdGVyIFVqZmFsdXNp?= <peter.ujfalusi@ti.com>
-Subject: Re: [PATCH 1/2] ARM: OMAP: Trivial driver changes to remove include
- plat/cpu.h
-Date: Tue, 09 Oct 2012 11:03:10 +0200
-Message-ID: <5073E84E.4090408@ti.com>
-References: <20121008173452.10603.53886.stgit@muffinssi> <20121008173557.10603.18539.stgit@muffinssi>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: Re: [GIT PULL] Asymmetric keys and module signing
+Date: Tue, 9 Oct 2012 13:55:30 +0300
+Message-ID: <CALLzPKZaayux=ocJucr=rrzcDx0DxRxv0xLpkt4ZPVU7pbw0kg@mail.gmail.com>
+References: <874nmd4d2o.fsf@rustcorp.com.au>
+	<87wqzdnwus.fsf@rustcorp.com.au>
+	<87ipay3cof.fsf@rustcorp.com.au>
+	<87bogs492s.fsf@rustcorp.com.au>
+	<87ehlp30pd.fsf@rustcorp.com.au>
+	<5555.1348531649@warthog.procyon.org.uk>
+	<8168.1348650575@warthog.procyon.org.uk>
+	<16088.1348736905@warthog.procyon.org.uk>
+	<27378.1348819793@warthog.procyon.org.uk>
+	<29451.1348903010@warthog.procyon.org.uk>
+	<23688.1349186865@warthog.procyon.org.uk>
+	<87ehlf2l9w.fsf@rustcorp.com.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	linux-omap@vger.kernel.org,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Vinod Koul <vinod.koul@intel.com>, Dan Williams <djbw@fb.com>,
-	linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Liam Girdwood <lrg@ti.com>,
-	Deepak Saxena <dsaxena@plexity.net>,
-	Chris Ball <cjb@laptop.org>, Matt Mackall <mpm@selenic.com>,
-	Venkatraman S <svenkatr@ti.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jarkko Nikula <jarkko.nikula@bitmer.com>,
-	linux-crypto@vger.kernel.org
-To: Tony Lindgren <tony@atomide.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from na3sys009aog126.obsmtp.com ([74.125.149.155]:39778 "EHLO
-	na3sys009aog126.obsmtp.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752029Ab2JIJBp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Oct 2012 05:01:45 -0400
-Received: by mail-oa0-f46.google.com with SMTP id h16so4797963oag.19
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Oct 2012 02:01:44 -0700 (PDT)
-In-Reply-To: <20121008173557.10603.18539.stgit@muffinssi>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: David Howells <dhowells@redhat.com>, herbert@gondor.hengli.com.au,
+	pjones@redhat.com, jwboyer@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: Rusty Russell <rusty@rustcorp.com.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <87ehlf2l9w.fsf@rustcorp.com.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/08/2012 07:35 PM, Tony Lindgren wrote:
+On Thu, Oct 4, 2012 at 2:22 AM, Rusty Russell <rusty@rustcorp.com.au> w=
+rote:
+> David Howells <dhowells@redhat.com> writes:
+>
+>> Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>
+>>> Right.  I think we need to use different names for generated vs sup=
+plied
+>>> files
+>>
+>> The problem with supplied files is people who do allyesconfig, allmo=
+dconfig
+>> and randconfig just to test things finding that their builds break. =
+ The
+>> kernel build magic is not really set up to handle external files lik=
+e this.  I
+>> suppose make logic can be used to conditionally include stuff that m=
+ight not
+>> exist.
+>>
+>>> BTW, you missed a Signed-off-by: on your "MODSIGN: Use the same dig=
+est
+>>> for the autogen key sig as for the module sig" patch.  Please updat=
+e.
+>>
+>> Done.
+>>
+>> I've also added a patch to convert the system clock to a struct tm a=
+nd to
+>> produce a struct tm within the ASN.1 decode and then compare those r=
+ather than
+>> time_t values as a way to deal with the validity time overflow probl=
+em.  We
+>> may have to be able to handle certificates that we haven't generated=
+ that
+>> stretch beyond 2038 (I wonder if we might find such in the UEFI key =
+database
+>> for example.
+>
+> OK, cherry-picked to replace my hack.
+>
+> It's in linux-next, and I will push in the next two days.
+>
 
-> - omap-dma.c and omap-pcm.c can test the arch locally as
->   omap1 and omap2 cannot be compiled together because of
->   conflicting compiler flags
 
->  sound/soc/omap/omap-pcm.c         |    9 +++++++--
+http://git.kernel.org/?p=3Dlinux/kernel/git/rusty/linux.git;a=3Dcommit;=
+h=3Da15e196c5543d1d2d7f0cd70e62351aeb1f8b871
 
-Tony: is this going to be included in 3.7?
+It breaks bisect..
 
-Acked-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+  CC      kernel/module_signing.o
+kernel/module_signing.c: In function =E2=80=98mod_verify_sig=E2=80=99:
+kernel/module_signing.c:21:10: error: =E2=80=98ENOKEY=E2=80=99 undeclar=
+ed (first use
+in this function)
+kernel/module_signing.c:21:10: note: each undeclared identifier is
+reported only once for each function it appears in
+kernel/module_signing.c:22:1: warning: control reaches end of non-void
+function [-Wreturn-type]
+make[1]: *** [kernel/module_signing.o] Error 1
+make: *** [kernel] Error 2
+make: *** Waiting for unfinished jobs....
+
+> Thanks,
+> Rusty.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypt=
+o" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
