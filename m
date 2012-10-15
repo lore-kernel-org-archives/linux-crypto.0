@@ -1,54 +1,54 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PULL] modules
-Date: Mon, 15 Oct 2012 19:46:40 +1030
-Message-ID: <87mwzo3xjb.fsf@rustcorp.com.au>
-References: <87fw5m7ipz.fsf@rustcorp.com.au> <CA+55aFyGuy8P4Uaanmv7DncjsN6cvQxvWrrMKKnF=67J+BkshQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/3 v2] Optimize CRC32C calculation using PCLMULQDQ in
+ crc32c-intel module
+Date: Mon, 15 Oct 2012 22:31:35 +0800
+Message-ID: <20121015143135.GA25426@gondor.apana.org.au>
+References: <cover.1348784343.git.tim.c.chen@linux.intel.com>
+ <1348785854.17632.15.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Alex Lyashkov <umka@cloudlinux.com>,
-	Arnd Bergmann <arnd@arndb.com>,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Josh Boyer <jwboyer@redhat.com>, linux-crypto@vger.kernel.org,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Milan Broz <mbroz@redhat.com>,
-	Ralf Baechle <ralf@linux-mips.org>,
-	Randy Dunlap <rdunlap@xenotime.net>,
-	Sam Ravnborg <sam@ravnborg.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Fengguang Wu <fengguang.wu@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Chaohong Guo <chaohong.guo@intel.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Min Li <min.a.li@intel.com>
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:46887 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752432Ab2JOLso (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Oct 2012 07:48:44 -0400
-In-Reply-To: <CA+55aFyGuy8P4Uaanmv7DncjsN6cvQxvWrrMKKnF=67J+BkshQ@mail.gmail.com>
+Received: from sting.hengli.com.au ([178.18.18.71]:58133 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750896Ab2JOOcX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Oct 2012 10:32:23 -0400
+Content-Disposition: inline
+In-Reply-To: <1348785854.17632.15.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Linus Torvalds <torvalds@linux-foundation.org> writes:
+On Thu, Sep 27, 2012 at 03:44:14PM -0700, Tim Chen wrote:
+> Version 2
+> This version of the patch series fixes compilation errors for
+> 32 bit x86 targets.
+> 
+> Version 1
+> This patch series optimized CRC32C calculations with PCLMULQDQ
+> instruction for crc32c-intel module.  It speeds up the original
+> implementation by 1.6x for 1K buffer and by 3x for buffer 4k or
+> more.  The tcrypt module was enhanced for doing speed test
+> on crc32c calculations.
+> 
+> Tim
+> 
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-> On Wed, Oct 10, 2012 at 2:57 AM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>
->> ----------------------------------------------------------------
->> module signing is the highlight, but it's an all-over David Howells frenzy...
->>
->> ----------------------------------------------------------------
->
-> Hmm. What happened here? It *looks* from your pull request like you
-> had a tag, and you usually do, but there's no tag anywhere..
->
-> I've pulled and resolved the branch, and I'm going through it now, but
-> I'd like this verified before I push out if it all looks fine..
->
->           Linus
-
-Ah, I missed pushing the tag.  I used to fabricate a git tree for you
-from my quilt series, and that script did the right thing.
-
-Thanks,
-Rusty.
+All applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
