@@ -1,34 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stephen Warren <swarren@wwwdotorg.org>
 Subject: Re: [PATCH] crypto: tegra: remove include of <mach/clk.h>
-Date: Mon, 15 Oct 2012 22:33:29 +0800
-Message-ID: <20121015143328.GC25426@gondor.apana.org.au>
-References: <1349216260-917-1-git-send-email-swarren@wwwdotorg.org>
+Date: Mon, 15 Oct 2012 11:39:17 -0600
+Message-ID: <507C4A45.4050900@wwwdotorg.org>
+References: <1349216260-917-1-git-send-email-swarren@wwwdotorg.org> <20121015143328.GC25426@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
 	linux-tegra@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
-To: Stephen Warren <swarren@wwwdotorg.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:58815 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751131Ab2JOOdx (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:55319 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751603Ab2JORjU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Oct 2012 10:33:53 -0400
-Content-Disposition: inline
-In-Reply-To: <1349216260-917-1-git-send-email-swarren@wwwdotorg.org>
+	Mon, 15 Oct 2012 13:39:20 -0400
+In-Reply-To: <20121015143328.GC25426@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 02, 2012 at 04:17:40PM -0600, Stephen Warren wrote:
-> From: Stephen Warren <swarren@nvidia.com>
+On 10/15/2012 08:33 AM, Herbert Xu wrote:
+> On Tue, Oct 02, 2012 at 04:17:40PM -0600, Stephen Warren wrote:
+>> From: Stephen Warren <swarren@nvidia.com>
+>>
+>> Nothing from this file is used, and the file will hopefully be deleted
+>> soon.
+>>
+>> Signed-off-by: Stephen Warren <swarren@nvidia.com>
 > 
-> Nothing from this file is used, and the file will hopefully be deleted
-> soon.
-> 
-> Signed-off-by: Stephen Warren <swarren@nvidia.com>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks, applied to Tegra's for-3.8/cleanup.
