@@ -1,20 +1,18 @@
-From: Stephan Mueller <stephan.mueller@atsec.com>
-Subject: Re: FIPS-mode panic? (was Re: [PULL] modules)
-Date: Mon, 15 Oct 2012 13:28:47 +0200
-Message-ID: <507BF36F.10205@atsec.com>
-References: <CA+55aFyVcTT4tKTVvhzXz3t4uw=MDLU00NAAOacWt6i3xovERg@mail.gmail.com> <87fw5m7ipz.fsf@rustcorp.com.au> <CA+55aFyGuy8P4Uaanmv7DncjsN6cvQxvWrrMKKnF=67J+BkshQ@mail.gmail.com> <15269.1350287454@warthog.procyon.org.uk>
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PULL] modules
+Date: Mon, 15 Oct 2012 19:46:40 +1030
+Message-ID: <87mwzo3xjb.fsf@rustcorp.com.au>
+References: <87fw5m7ipz.fsf@rustcorp.com.au> <CA+55aFyGuy8P4Uaanmv7DncjsN6cvQxvWrrMKKnF=67J+BkshQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	LKML <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>,
 	Alex Lyashkov <umka@cloudlinux.com>,
 	Arnd Bergmann <arnd@arndb.com>,
 	Dan Carpenter <dan.carpenter@oracle.com>,
+	David Howells <dhowells@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Josh Boyer <jwboyer@redhat.com>, linux-crypto@vger.kernel.org,
 	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
 	Matthew Garrett <mjg59@srcf.ucam.org>,
@@ -22,56 +20,35 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	Ralf Baechle <ralf@linux-mips.org>,
 	Randy Dunlap <rdunlap@xenotime.net>,
 	Sam Ravnborg <sam@ravnborg.org>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <15269.1350287454@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ozlabs.org ([203.10.76.45]:46887 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752432Ab2JOLso (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Oct 2012 07:48:44 -0400
+In-Reply-To: <CA+55aFyGuy8P4Uaanmv7DncjsN6cvQxvWrrMKKnF=67J+BkshQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 15.10.2012 09:50:54, +0200, David Howells <dhowells@redhat.com> wrote:
+Linus Torvalds <torvalds@linux-foundation.org> writes:
 
-Hi David,
-
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> 
->> Hmm. So this thing makes me wonder:
+> On Wed, Oct 10, 2012 at 2:57 AM, Rusty Russell <rusty@rustcorp.com.au> wrote:
 >>
->>         /* Not having a signature is only an error if we're strict. */
->>         if (err < 0 && fips_enabled)
->>                 panic("Module verification failed with error %d in FIPS mode\n",
->>                       err);
+>> ----------------------------------------------------------------
+>> module signing is the highlight, but it's an all-over David Howells frenzy...
 >>
->> do we really want to panic (even in fips_enabled mode)?
-> 
-> That's what the FIPS people want.  As I understand it, if there's some
-> indication that the crypto stuff is compromised, the box should be shut down
-> immediately.
-> 
-> I've added Stephan Mueller to see if he can illuminate further.
-> 
-> David
-> 
+>> ----------------------------------------------------------------
+>
+> Hmm. What happened here? It *looks* from your pull request like you
+> had a tag, and you usually do, but there's no tag anywhere..
+>
+> I've pulled and resolved the branch, and I'm going through it now, but
+> I'd like this verified before I push out if it all looks fine..
+>
+>           Linus
 
-The requirement for a FIPS 140-2 module is to disable the entire module
-if any component of its self test or integrity test failed.
+Ah, I missed pushing the tag.  I used to fabricate a git tree for you
+from my quilt series, and that script did the right thing.
 
-In the kernel, we have the FIPS 140-2 module of the kernel crypto API
-(the API itself plus the relevant kernel modules implementing the
-ciphers, block chaining modes, etc). Therefore, the requirement would be
-translated into the following: the kernel crypto API must be disabled if
-any of the self test or integrity tests failed. The self tests are the
-known answer tests in the kernel crypto API test manager. The integrity
-tests are the DSA signature checks of the kernel modules (at least the
-kernel crypto API ones) plus the static kernel binary itself (for the
-static kernel crypto API part -- this is done outside the kernel).
-
-The requirement to disable the module implies that the module is
-technically unavailable.
-
-There are two solutions that were contemplated for disabling the module:
-having a kind of global status of the crypto API that makes it
-non-responsive in case of an integrity/self-test error. The other
-solution is to simply terminate the entire kernel. As the former one
-also will lead to a kernel failure eventually as many parts of the
-kernel depend on the crypto API, the implementation of the latter option
-was chosen.
+Thanks,
+Rusty.
