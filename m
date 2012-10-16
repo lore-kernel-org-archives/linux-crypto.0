@@ -1,53 +1,72 @@
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 1/2] ARM: OMAP: Trivial driver changes to
- remove include plat/cpu.h
-Date: Mon, 15 Oct 2012 17:07:23 -0700
-Message-ID: <20121016000722.GH15569@atomide.com>
-References: <20121008173452.10603.53886.stgit@muffinssi>
- <20121008173557.10603.18539.stgit@muffinssi>
- <5073E84E.4090408@ti.com> <20121010001943.GK12552@atomide.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: alsa-devel@alsa-project.org, Deepak Saxena <dsaxena@plexity.net>,
- Venkatraman S <svenkatr@ti.com>, Vinod Koul <vinod.koul@intel.com>,
- Matt Mackall <mpm@selenic.com>,
- Mark Brown <broonie@opensource.wolfsonmicro.com>, linux-mmc@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Herbert Xu <herbert@gondor.hengli.com.au>,
- Jarkko Nikula <jarkko.nikula@bitmer.com>, Chris Ball <cjb@laptop.org>,
- Dan Williams <djbw@fb.com>, linux-omap@vger.kernel.org,
- Liam Girdwood <lrg@ti.com>, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org
-To: =?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@ti.com>
-Return-path: <alsa-devel-bounces@alsa-project.org>
-Content-Disposition: inline
-In-Reply-To: <20121010001943.GK12552@atomide.com>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
+From: Yuanhan Liu <yuanhan.liu@linux.intel.com>
+Subject: [PATCH 5/5] crypto: suspend/resume callbacks should be conditionally compiled on CONFIG_PM_SLEEP
+Date: Tue, 16 Oct 2012 22:59:05 +0800
+Message-ID: <1350399545-11179-5-git-send-email-yuanhan.liu@linux.intel.com>
+References: <1350399545-11179-1-git-send-email-yuanhan.liu@linux.intel.com>
+Cc: Yuanhan Liu <yuanhan.liu@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Fengguang Wu <fengguang.wu@intel.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1350399545-11179-1-git-send-email-yuanhan.liu@linux.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-KiBUb255IExpbmRncmVuIDx0b255QGF0b21pZGUuY29tPiBbMTIxMDA5IDE3OjIxXToKPiAqIFDD
-qXRlciBVamZhbHVzaSA8cGV0ZXIudWpmYWx1c2lAdGkuY29tPiBbMTIxMDA5IDAyOjAzXToKPiA+
-IE9uIDEwLzA4LzIwMTIgMDc6MzUgUE0sIFRvbnkgTGluZGdyZW4gd3JvdGU6Cj4gPiAKPiA+ID4g
-LSBvbWFwLWRtYS5jIGFuZCBvbWFwLXBjbS5jIGNhbiB0ZXN0IHRoZSBhcmNoIGxvY2FsbHkgYXMK
-PiA+ID4gICBvbWFwMSBhbmQgb21hcDIgY2Fubm90IGJlIGNvbXBpbGVkIHRvZ2V0aGVyIGJlY2F1
-c2Ugb2YKPiA+ID4gICBjb25mbGljdGluZyBjb21waWxlciBmbGFncwo+ID4gCj4gPiA+ICBzb3Vu
-ZC9zb2Mvb21hcC9vbWFwLXBjbS5jICAgICAgICAgfCAgICA5ICsrKysrKystLQo+ID4gCj4gPiBU
-b255OiBpcyB0aGlzIGdvaW5nIHRvIGJlIGluY2x1ZGVkIGluIDMuNz8KPiAKPiBIbW0gSSBndWVz
-cyB3ZSBjb3VsZCB0cnkgdG8gZ2V0IHRoaXMgb3V0IG9mIHRoZSB3YXkKPiB0byBjdXQgZG93biB0
-aGUgZGVwZW5kZW5jaWVzLiBMZXQncyBpZiBtYWludGFpbmVycwo+IG9mIHRoZSBvdGhlciBhZmZl
-Y3RlZCBkcml2ZXJzIHRoaXMgaXMgT0sgZm9yIHRoZQo+IC1yYyBzZXJpZXMuCgpJdCBzZWVtcyB0
-aGF0IG5vYm9keSBuZWVkcyB0aGVzZSB1bnRpbCBmb3IgdjMuOCwgc28gSSdsbApiZSBhcHBseWlu
-ZyB0aGlzIGludG8gb21hcC1mb3ItdjMuOC9jbGVhbnVwLWhlYWRlcnMtcHJlcGFyZQpicmFuY2gg
-c29vbi4KCkFueWJvZHkgZWxzZSBjYXJlIHRvIGFjaz8KClJlZ2FyZHMsCgpUb255Cl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkFsc2EtZGV2ZWwgbWFpbGlu
-ZyBsaXN0CkFsc2EtZGV2ZWxAYWxzYS1wcm9qZWN0Lm9yZwpodHRwOi8vbWFpbG1hbi5hbHNhLXBy
-b2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vYWxzYS1kZXZlbAo=
+This will fix warnings like following when CONFIG_PM_SLEEP is not set:
+
+        warning: 'xxx_suspend' defined but not used [-Wunused-function]
+        warning: 'xxx_resume' defined but not used [-Wunused-function]
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Yuanhan Liu <yuanhan.liu@linux.intel.com>
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+---
+ drivers/crypto/ux500/cryp/cryp_core.c |    2 ++
+ drivers/crypto/ux500/hash/hash_core.c |    2 ++
+ 2 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index bc615cc..21b50ea 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1662,6 +1662,7 @@ static void ux500_cryp_shutdown(struct platform_device *pdev)
+ 
+ }
+ 
++#ifdef CONFIG_PM_SLEEP
+ static int ux500_cryp_suspend(struct device *dev)
+ {
+ 	int ret;
+@@ -1742,6 +1743,7 @@ static int ux500_cryp_resume(struct device *dev)
+ 
+ 	return ret;
+ }
++#endif
+ 
+ static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
+ 
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 632c333..906559f 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -1892,6 +1892,7 @@ static void ux500_hash_shutdown(struct platform_device *pdev)
+ 				__func__);
+ }
+ 
++#ifdef CONFIG_PM_SLEEP
+ /**
+  * ux500_hash_suspend - Function that suspends the hash device.
+  * @dev:	Device to suspend.
+@@ -1959,6 +1960,7 @@ static int ux500_hash_resume(struct device *dev)
+ 
+ 	return ret;
+ }
++#endif
+ 
+ static SIMPLE_DEV_PM_OPS(ux500_hash_pm, ux500_hash_suspend, ux500_hash_resume);
+ 
+-- 
+1.7.7.6
