@@ -1,33 +1,53 @@
-From: Stephen Warren <swarren@wwwdotorg.org>
-Subject: Re: [PATCH] crypto: tegra: remove include of <mach/clk.h>
-Date: Mon, 15 Oct 2012 11:39:17 -0600
-Message-ID: <507C4A45.4050900@wwwdotorg.org>
-References: <1349216260-917-1-git-send-email-swarren@wwwdotorg.org> <20121015143328.GC25426@gondor.apana.org.au>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 1/2] ARM: OMAP: Trivial driver changes to
+ remove include plat/cpu.h
+Date: Mon, 15 Oct 2012 17:07:23 -0700
+Message-ID: <20121016000722.GH15569@atomide.com>
+References: <20121008173452.10603.53886.stgit@muffinssi>
+ <20121008173557.10603.18539.stgit@muffinssi>
+ <5073E84E.4090408@ti.com> <20121010001943.GK12552@atomide.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:55319 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751603Ab2JORjU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Oct 2012 13:39:20 -0400
-In-Reply-To: <20121015143328.GC25426@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: alsa-devel@alsa-project.org, Deepak Saxena <dsaxena@plexity.net>,
+ Venkatraman S <svenkatr@ti.com>, Vinod Koul <vinod.koul@intel.com>,
+ Matt Mackall <mpm@selenic.com>,
+ Mark Brown <broonie@opensource.wolfsonmicro.com>, linux-mmc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Herbert Xu <herbert@gondor.hengli.com.au>,
+ Jarkko Nikula <jarkko.nikula@bitmer.com>, Chris Ball <cjb@laptop.org>,
+ Dan Williams <djbw@fb.com>, linux-omap@vger.kernel.org,
+ Liam Girdwood <lrg@ti.com>, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org
+To: =?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@ti.com>
+Return-path: <alsa-devel-bounces@alsa-project.org>
+Content-Disposition: inline
+In-Reply-To: <20121010001943.GK12552@atomide.com>
+List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
+List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
+List-Post: <mailto:alsa-devel@alsa-project.org>
+List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
+List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
+Errors-To: alsa-devel-bounces@alsa-project.org
+Sender: alsa-devel-bounces@alsa-project.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/15/2012 08:33 AM, Herbert Xu wrote:
-> On Tue, Oct 02, 2012 at 04:17:40PM -0600, Stephen Warren wrote:
->> From: Stephen Warren <swarren@nvidia.com>
->>
->> Nothing from this file is used, and the file will hopefully be deleted
->> soon.
->>
->> Signed-off-by: Stephen Warren <swarren@nvidia.com>
-> 
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Thanks, applied to Tegra's for-3.8/cleanup.
+KiBUb255IExpbmRncmVuIDx0b255QGF0b21pZGUuY29tPiBbMTIxMDA5IDE3OjIxXToKPiAqIFDD
+qXRlciBVamZhbHVzaSA8cGV0ZXIudWpmYWx1c2lAdGkuY29tPiBbMTIxMDA5IDAyOjAzXToKPiA+
+IE9uIDEwLzA4LzIwMTIgMDc6MzUgUE0sIFRvbnkgTGluZGdyZW4gd3JvdGU6Cj4gPiAKPiA+ID4g
+LSBvbWFwLWRtYS5jIGFuZCBvbWFwLXBjbS5jIGNhbiB0ZXN0IHRoZSBhcmNoIGxvY2FsbHkgYXMK
+PiA+ID4gICBvbWFwMSBhbmQgb21hcDIgY2Fubm90IGJlIGNvbXBpbGVkIHRvZ2V0aGVyIGJlY2F1
+c2Ugb2YKPiA+ID4gICBjb25mbGljdGluZyBjb21waWxlciBmbGFncwo+ID4gCj4gPiA+ICBzb3Vu
+ZC9zb2Mvb21hcC9vbWFwLXBjbS5jICAgICAgICAgfCAgICA5ICsrKysrKystLQo+ID4gCj4gPiBU
+b255OiBpcyB0aGlzIGdvaW5nIHRvIGJlIGluY2x1ZGVkIGluIDMuNz8KPiAKPiBIbW0gSSBndWVz
+cyB3ZSBjb3VsZCB0cnkgdG8gZ2V0IHRoaXMgb3V0IG9mIHRoZSB3YXkKPiB0byBjdXQgZG93biB0
+aGUgZGVwZW5kZW5jaWVzLiBMZXQncyBpZiBtYWludGFpbmVycwo+IG9mIHRoZSBvdGhlciBhZmZl
+Y3RlZCBkcml2ZXJzIHRoaXMgaXMgT0sgZm9yIHRoZQo+IC1yYyBzZXJpZXMuCgpJdCBzZWVtcyB0
+aGF0IG5vYm9keSBuZWVkcyB0aGVzZSB1bnRpbCBmb3IgdjMuOCwgc28gSSdsbApiZSBhcHBseWlu
+ZyB0aGlzIGludG8gb21hcC1mb3ItdjMuOC9jbGVhbnVwLWhlYWRlcnMtcHJlcGFyZQpicmFuY2gg
+c29vbi4KCkFueWJvZHkgZWxzZSBjYXJlIHRvIGFjaz8KClJlZ2FyZHMsCgpUb255Cl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkFsc2EtZGV2ZWwgbWFpbGlu
+ZyBsaXN0CkFsc2EtZGV2ZWxAYWxzYS1wcm9qZWN0Lm9yZwpodHRwOi8vbWFpbG1hbi5hbHNhLXBy
+b2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vYWxzYS1kZXZlbAo=
