@@ -1,72 +1,68 @@
-From: Yuanhan Liu <yuanhan.liu@linux.intel.com>
-Subject: [PATCH 5/5] crypto: suspend/resume callbacks should be conditionally compiled on CONFIG_PM_SLEEP
-Date: Tue, 16 Oct 2012 22:59:05 +0800
-Message-ID: <1350399545-11179-5-git-send-email-yuanhan.liu@linux.intel.com>
-References: <1350399545-11179-1-git-send-email-yuanhan.liu@linux.intel.com>
-Cc: Yuanhan Liu <yuanhan.liu@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 1/2] ARM: OMAP: Trivial driver changes to remove
+ include plat/cpu.h
+Date: Wed, 17 Oct 2012 11:13:31 -0700
+Message-ID: <20121017181330.GV15569@atomide.com>
+References: <20121008173452.10603.53886.stgit@muffinssi>
+ <20121008173557.10603.18539.stgit@muffinssi>
+ <5073E84E.4090408@ti.com>
+ <20121010001943.GK12552@atomide.com>
+ <20121016000722.GH15569@atomide.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+	linux-omap@vger.kernel.org,
+	Mark Brown <broonie@opensource.wolfsonmicro.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	Vinod Koul <vinod.koul@intel.com>, Dan Williams <djbw@fb.com>,
+	linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Liam Girdwood <lrg@ti.com>,
+	Deepak Saxena <dsaxena@plexity.net>,
+	Chris Ball <cjb@laptop.org>, Matt Mackall <mpm@selenic.com>,
+	Venkatraman S <svenkatr@ti.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Fengguang Wu <fengguang.wu@intel.com>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1350399545-11179-1-git-send-email-yuanhan.liu@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Jarkko Nikula <jarkko.nikula@bitmer.com>,
+	linux-crypto@vger.kernel.org
+To: =?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@ti.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:49709 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756577Ab2JQSNl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Oct 2012 14:13:41 -0400
+Content-Disposition: inline
+In-Reply-To: <20121016000722.GH15569@atomide.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This will fix warnings like following when CONFIG_PM_SLEEP is not set:
+* Tony Lindgren <tony@atomide.com> [121015 17:09]:
+> * Tony Lindgren <tony@atomide.com> [121009 17:21]:
+> > * P=C3=A9ter Ujfalusi <peter.ujfalusi@ti.com> [121009 02:03]:
+> > > On 10/08/2012 07:35 PM, Tony Lindgren wrote:
+> > >=20
+> > > > - omap-dma.c and omap-pcm.c can test the arch locally as
+> > > >   omap1 and omap2 cannot be compiled together because of
+> > > >   conflicting compiler flags
+> > >=20
+> > > >  sound/soc/omap/omap-pcm.c         |    9 +++++++--
+> > >=20
+> > > Tony: is this going to be included in 3.7?
+> >=20
+> > Hmm I guess we could try to get this out of the way
+> > to cut down the dependencies. Let's if maintainers
+> > of the other affected drivers this is OK for the
+> > -rc series.
+>=20
+> It seems that nobody needs these until for v3.8, so I'll
+> be applying this into omap-for-v3.8/cleanup-headers-prepare
+> branch soon.
+>=20
+> Anybody else care to ack?
 
-        warning: 'xxx_suspend' defined but not used [-Wunused-function]
-        warning: 'xxx_resume' defined but not used [-Wunused-function]
+OK pushed out now with just that patch in the branch in case
+driver branches need to merge it in too to avoid conflicts.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Yuanhan Liu <yuanhan.liu@linux.intel.com>
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
----
- drivers/crypto/ux500/cryp/cryp_core.c |    2 ++
- drivers/crypto/ux500/hash/hash_core.c |    2 ++
- 2 files changed, 4 insertions(+), 0 deletions(-)
+Regards,
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index bc615cc..21b50ea 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1662,6 +1662,7 @@ static void ux500_cryp_shutdown(struct platform_device *pdev)
- 
- }
- 
-+#ifdef CONFIG_PM_SLEEP
- static int ux500_cryp_suspend(struct device *dev)
- {
- 	int ret;
-@@ -1742,6 +1743,7 @@ static int ux500_cryp_resume(struct device *dev)
- 
- 	return ret;
- }
-+#endif
- 
- static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
- 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 632c333..906559f 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1892,6 +1892,7 @@ static void ux500_hash_shutdown(struct platform_device *pdev)
- 				__func__);
- }
- 
-+#ifdef CONFIG_PM_SLEEP
- /**
-  * ux500_hash_suspend - Function that suspends the hash device.
-  * @dev:	Device to suspend.
-@@ -1959,6 +1960,7 @@ static int ux500_hash_resume(struct device *dev)
- 
- 	return ret;
- }
-+#endif
- 
- static SIMPLE_DEV_PM_OPS(ux500_hash_pm, ux500_hash_suspend, ux500_hash_resume);
- 
--- 
-1.7.7.6
+Tony
