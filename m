@@ -1,68 +1,65 @@
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 1/2] ARM: OMAP: Trivial driver changes to remove
- include plat/cpu.h
-Date: Wed, 17 Oct 2012 11:13:31 -0700
-Message-ID: <20121017181330.GV15569@atomide.com>
-References: <20121008173452.10603.53886.stgit@muffinssi>
- <20121008173557.10603.18539.stgit@muffinssi>
- <5073E84E.4090408@ti.com>
- <20121010001943.GK12552@atomide.com>
- <20121016000722.GH15569@atomide.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH] Re: aesni intel and kernel crashes.
+Date: Thu, 18 Oct 2012 14:52:49 +0300
+Message-ID: <20121018115249.22157.69385.stgit@localhost6.localdomain6>
+References: <CA+sc+0T3CFwv6JdcLA66=pD=6LcaQOJZnvDGqp3o4LKN85ZbZg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	linux-omap@vger.kernel.org,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Vinod Koul <vinod.koul@intel.com>, Dan Williams <djbw@fb.com>,
-	linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Liam Girdwood <lrg@ti.com>,
-	Deepak Saxena <dsaxena@plexity.net>,
-	Chris Ball <cjb@laptop.org>, Matt Mackall <mpm@selenic.com>,
-	Venkatraman S <svenkatr@ti.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jarkko Nikula <jarkko.nikula@bitmer.com>,
-	linux-crypto@vger.kernel.org
-To: =?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@ti.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Gurucharan Shetty <gurucharan.shetty@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:49709 "EHLO
-	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756577Ab2JQSNl (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:35270 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753545Ab2JRLwx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Oct 2012 14:13:41 -0400
-Content-Disposition: inline
-In-Reply-To: <20121016000722.GH15569@atomide.com>
+	Thu, 18 Oct 2012 07:52:53 -0400
+In-Reply-To: <CA+sc+0T3CFwv6JdcLA66=pD=6LcaQOJZnvDGqp3o4LKN85ZbZg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Tony Lindgren <tony@atomide.com> [121015 17:09]:
-> * Tony Lindgren <tony@atomide.com> [121009 17:21]:
-> > * P=C3=A9ter Ujfalusi <peter.ujfalusi@ti.com> [121009 02:03]:
-> > > On 10/08/2012 07:35 PM, Tony Lindgren wrote:
-> > >=20
-> > > > - omap-dma.c and omap-pcm.c can test the arch locally as
-> > > >   omap1 and omap2 cannot be compiled together because of
-> > > >   conflicting compiler flags
-> > >=20
-> > > >  sound/soc/omap/omap-pcm.c         |    9 +++++++--
-> > >=20
-> > > Tony: is this going to be included in 3.7?
-> >=20
-> > Hmm I guess we could try to get this out of the way
-> > to cut down the dependencies. Let's if maintainers
-> > of the other affected drivers this is OK for the
-> > -rc series.
->=20
-> It seems that nobody needs these until for v3.8, so I'll
-> be applying this into omap-for-v3.8/cleanup-headers-prepare
-> branch soon.
->=20
-> Anybody else care to ack?
+Does this patch help?
 
-OK pushed out now with just that patch in the branch in case
-driver branches need to merge it in too to avoid conflicts.
+It applies cleanly to 3.2.x, if that version easier for you to reproduce the
+issue.
 
-Regards,
+...
 
-Tony
+cryptd_queue_worker attempts to prevent simultanious accesses to crypto-work
+queue by cryptd_enqueue_request using preempt_disable/preempt_enable. However
+cryptd_enqueue_request might be called from interrupt context, so add
+local_irq_save/local_irq_restore to prevent data corruption and panics.
+---
+ crypto/cryptd.c |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 671d4d6..8f62d06 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -133,16 +133,23 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+  * do. */
+ static void cryptd_queue_worker(struct work_struct *work)
+ {
++	unsigned long flags;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 	struct crypto_async_request *req, *backlog;
+ 
+ 	cpu_queue = container_of(work, struct cryptd_cpu_queue, work);
+-	/* Only handle one request at a time to avoid hogging crypto
++	/*
++	 * Only handle one request at a time to avoid hogging crypto
+ 	 * workqueue. preempt_disable/enable is used to prevent
+-	 * being preempted by cryptd_enqueue_request() */
++	 * being preempted by cryptd_enqueue_request(). local_irq_save/restore
++	 * is used to prevent cryptd_enqueue_request() being accessed from
++	 * interrupts.
++	 */
++	local_irq_save(flags);
+ 	preempt_disable();
+ 	backlog = crypto_get_backlog(&cpu_queue->queue);
+ 	req = crypto_dequeue_request(&cpu_queue->queue);
++	local_irq_restore(flags);
+ 	preempt_enable();
+ 
+ 	if (!req)
