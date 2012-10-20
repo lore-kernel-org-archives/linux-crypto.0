@@ -1,8 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 1/5] crypto: x86/glue_helper - use le128 instead of u128 for
- CTR mode
-Date: Sat, 20 Oct 2012 15:06:36 +0300
-Message-ID: <20121020120636.19422.89149.stgit@localhost6.localdomain6>
+Subject: [PATCH 2/5] crypto: cast6/avx - avoid using temporary stack buffers
+Date: Sat, 20 Oct 2012 15:06:41 +0300
+Message-ID: <20121020120641.19422.97531.stgit@localhost6.localdomain6>
 References: <20121020120431.19422.17000.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,383 +10,533 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:43694 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755163Ab2JTMGk (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:56110 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755163Ab2JTMGo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Oct 2012 08:06:40 -0400
+	Sat, 20 Oct 2012 08:06:44 -0400
 In-Reply-To: <20121020120431.19422.17000.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-'u128' currently used for CTR mode is on little-endian 'long long' swapped
-and would require extra swap operations by SSE/AVX code. Use of le128
-instead of u128 allows IV calculations to be done with vector registers
-easier.
+Introduce new assembler functions to avoid use temporary stack buffers in
+glue code. This also allows use of vector instructions for xoring output
+in CTR and CBC modes and construction of IVs for CTR mode.
+
+ECB mode sees ~0.5% decrease in speed because added one extra function
+call. CBC mode decryption and CTR mode benefit from vector operations
+and gain ~2%.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/camellia_glue.c           |   16 ++++++++--------
- arch/x86/crypto/cast6_avx_glue.c          |   12 ++++++------
- arch/x86/crypto/glue_helper.c             |   12 ++++++------
- arch/x86/crypto/serpent_avx_glue.c        |   12 ++++++------
- arch/x86/crypto/serpent_sse2_glue.c       |   12 ++++++------
- arch/x86/crypto/twofish_avx_glue.c        |    6 +++---
- arch/x86/crypto/twofish_glue_3way.c       |   20 ++++++++++----------
- arch/x86/include/asm/crypto/glue_helper.h |   28 +++++++++++++++++-----------
- arch/x86/include/asm/crypto/twofish.h     |    4 ++--
- 9 files changed, 64 insertions(+), 58 deletions(-)
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S |  190 +++++++++++++++++++----------
+ arch/x86/crypto/cast6_avx_glue.c          |   71 ++---------
+ arch/x86/crypto/glue_helper-asm-avx.S     |   91 ++++++++++++++
+ 3 files changed, 227 insertions(+), 125 deletions(-)
+ create mode 100644 arch/x86/crypto/glue_helper-asm-avx.S
 
-diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
-index 42ffd2b..021a008 100644
---- a/arch/x86/crypto/camellia_glue.c
-+++ b/arch/x86/crypto/camellia_glue.c
-@@ -1317,21 +1317,21 @@ static void camellia_decrypt_cbc_2way(void *ctx, u128 *dst, const u128 *src)
- 	u128_xor(&dst[1], &dst[1], &iv);
- }
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 218d283..83a5381 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -23,6 +23,8 @@
+  *
+  */
  
--static void camellia_crypt_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
-+static void camellia_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
- {
- 	be128 ctrblk;
++#include "glue_helper-asm-avx.S"
++
+ .file "cast6-avx-x86_64-asm_64.S"
  
- 	if (dst != src)
- 		*dst = *src;
+ .extern cast6_s1
+@@ -205,11 +207,7 @@
+ 	vpunpcklqdq		x3, t2, x2; \
+ 	vpunpckhqdq		x3, t2, x3;
  
--	u128_to_be128(&ctrblk, iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblk, iv);
-+	le128_inc(iv);
+-#define inpack_blocks(in, x0, x1, x2, x3, t0, t1, t2, rmask) \
+-	vmovdqu (0*4*4)(in),	x0; \
+-	vmovdqu (1*4*4)(in),	x1; \
+-	vmovdqu (2*4*4)(in),	x2; \
+-	vmovdqu (3*4*4)(in),	x3; \
++#define inpack_blocks(x0, x1, x2, x3, t0, t1, t2, rmask) \
+ 	vpshufb rmask, x0,	x0; \
+ 	vpshufb rmask, x1,	x1; \
+ 	vpshufb rmask, x2,	x2; \
+@@ -217,39 +215,21 @@
+ 	\
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
  
- 	camellia_enc_blk_xor(ctx, (u8 *)dst, (u8 *)&ctrblk);
- }
+-#define outunpack_blocks(out, x0, x1, x2, x3, t0, t1, t2, rmask) \
++#define outunpack_blocks(x0, x1, x2, x3, t0, t1, t2, rmask) \
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2) \
+ 	\
+ 	vpshufb rmask,		x0, x0;       \
+ 	vpshufb rmask,		x1, x1;       \
+ 	vpshufb rmask,		x2, x2;       \
+-	vpshufb rmask,		x3, x3;       \
+-	vmovdqu x0,		(0*4*4)(out); \
+-	vmovdqu	x1,		(1*4*4)(out); \
+-	vmovdqu	x2,		(2*4*4)(out); \
+-	vmovdqu	x3,		(3*4*4)(out);
+-
+-#define outunpack_xor_blocks(out, x0, x1, x2, x3, t0, t1, t2, rmask) \
+-	transpose_4x4(x0, x1, x2, x3, t0, t1, t2) \
+-	\
+-	vpshufb rmask,		x0, x0;       \
+-	vpshufb rmask,		x1, x1;       \
+-	vpshufb rmask,		x2, x2;       \
+-	vpshufb rmask,		x3, x3;       \
+-	vpxor (0*4*4)(out),	x0, x0;       \
+-	vmovdqu	x0,		(0*4*4)(out); \
+-	vpxor (1*4*4)(out),	x1, x1;       \
+-	vmovdqu	x1,		(1*4*4)(out); \
+-	vpxor (2*4*4)(out),	x2, x2;       \
+-	vmovdqu x2,		(2*4*4)(out); \
+-	vpxor (3*4*4)(out),	x3, x3;       \
+-	vmovdqu x3,		(3*4*4)(out);
++	vpshufb rmask,		x3, x3;
  
- static void camellia_crypt_ctr_2way(void *ctx, u128 *dst, const u128 *src,
--				    u128 *iv)
-+				    le128 *iv)
- {
- 	be128 ctrblks[2];
+ .data
  
-@@ -1340,10 +1340,10 @@ static void camellia_crypt_ctr_2way(void *ctx, u128 *dst, const u128 *src,
- 		dst[1] = src[1];
- 	}
+ .align 16
+ .Lbswap_mask:
+ 	.byte 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12
++.Lbswap128_mask:
++	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+ .Lrkr_enc_Q_Q_QBAR_QBAR:
+ 	.byte 0, 1, 2, 3, 4, 5, 6, 7, 11, 10, 9, 8, 15, 14, 13, 12
+ .Lrkr_enc_QBAR_QBAR_QBAR_QBAR:
+@@ -269,31 +249,26 @@
  
--	u128_to_be128(&ctrblks[0], iv);
--	u128_inc(iv);
--	u128_to_be128(&ctrblks[1], iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblks[0], iv);
-+	le128_inc(iv);
-+	le128_to_be128(&ctrblks[1], iv);
-+	le128_inc(iv);
+ .text
  
- 	camellia_enc_blk_xor_2way(ctx, (u8 *)dst, (u8 *)ctrblks);
- }
+-.align 16
+-.global __cast6_enc_blk_8way
+-.type   __cast6_enc_blk_8way,@function;
++.align 8
++.type   __cast6_enc_blk8,@function;
+ 
+-__cast6_enc_blk_8way:
++__cast6_enc_blk8:
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst
+-	 *	%rdx: src
+-	 *	%rcx: bool, if true: xor output
++	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
++	 * output:
++	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+ 	 */
+ 
+ 	pushq %rbp;
+ 	pushq %rbx;
+-	pushq %rcx;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+ 
+-	leaq (4*4*4)(%rdx), %rax;
+-	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+-	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+-
+-	movq %rsi, %r11;
++	inpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
++	inpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+ 
+ 	preload_rkr(0, dummy, none);
+ 	Q(0);
+@@ -311,36 +286,25 @@ __cast6_enc_blk_8way:
+ 	QBAR(10);
+ 	QBAR(11);
+ 
+-	popq %rcx;
+ 	popq %rbx;
+ 	popq %rbp;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+-	leaq (4*4*4)(%r11), %rax;
+-
+-	testb %cl, %cl;
+-	jnz __enc_xor8;
+-
+-	outunpack_blocks(%r11, RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+-	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+-
+-	ret;
+ 
+-__enc_xor8:
+-	outunpack_xor_blocks(%r11, RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+-	outunpack_xor_blocks(%rax, RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
++	outunpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
++	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+ 
+ 	ret;
+ 
+-.align 16
+-.global cast6_dec_blk_8way
+-.type   cast6_dec_blk_8way,@function;
++.align 8
++.type   __cast6_dec_blk8,@function;
+ 
+-cast6_dec_blk_8way:
++__cast6_dec_blk8:
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst
+-	 *	%rdx: src
++	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
++	 * output:
++	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: decrypted blocks
+ 	 */
+ 
+ 	pushq %rbp;
+@@ -350,11 +314,8 @@ cast6_dec_blk_8way:
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+ 
+-	leaq (4*4*4)(%rdx), %rax;
+-	inpack_blocks(%rdx, RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+-	inpack_blocks(%rax, RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+-
+-	movq %rsi, %r11;
++	inpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
++	inpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+ 
+ 	preload_rkr(2, shuffle, .Lrkr_dec_Q_Q_Q_Q);
+ 	Q(11);
+@@ -376,8 +337,103 @@ cast6_dec_blk_8way:
+ 	popq %rbp;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+-	leaq (4*4*4)(%r11), %rax;
+-	outunpack_blocks(%r11, RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+-	outunpack_blocks(%rax, RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
++	outunpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
++	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
++
++	ret;
++
++.align 8
++.global cast6_ecb_enc_8way
++.type   cast6_ecb_enc_8way,@function;
++
++cast6_ecb_enc_8way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 */
++
++	movq %rsi, %r11;
++
++	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	call __cast6_enc_blk8;
++
++	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	ret;
++
++.align 8
++.global cast6_ecb_dec_8way
++.type   cast6_ecb_dec_8way,@function;
++
++cast6_ecb_dec_8way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 */
++
++	movq %rsi, %r11;
++
++	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	call __cast6_dec_blk8;
++
++	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	ret;
++
++.align 8
++.global cast6_cbc_dec_8way
++.type   cast6_cbc_dec_8way,@function;
++
++cast6_cbc_dec_8way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 */
++
++	pushq %r12;
++
++	movq %rsi, %r11;
++	movq %rdx, %r12;
++
++	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	call __cast6_dec_blk8;
++
++	store_cbc_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	popq %r12;
++
++	ret;
++
++.align 8
++.global cast6_ctr_8way
++.type   cast6_ctr_8way,@function;
++
++cast6_ctr_8way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst
++	 *	%rdx: src
++	 *	%rcx: iv (little endian, 128bit)
++	 */
++
++	pushq %r12;
++
++	movq %rsi, %r11;
++	movq %rdx, %r12;
++
++	load_ctr_8way(%rcx, .Lbswap128_mask, RA1, RB1, RC1, RD1, RA2, RB2, RC2,
++		      RD2, RX, RKR, RKM);
++
++	call __cast6_enc_blk8;
++
++	store_ctr_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
++
++	popq %r12;
+ 
+ 	ret;
 diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
-index 15e5f85..1dfd33b 100644
+index 1dfd33b..92f7ca2 100644
 --- a/arch/x86/crypto/cast6_avx_glue.c
 +++ b/arch/x86/crypto/cast6_avx_glue.c
-@@ -78,19 +78,19 @@ static void cast6_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- 		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
- }
+@@ -40,43 +40,15 @@
  
--static void cast6_crypt_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
-+static void cast6_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
+ #define CAST6_PARALLEL_BLOCKS 8
+ 
+-asmlinkage void __cast6_enc_blk_8way(struct cast6_ctx *ctx, u8 *dst,
+-				     const u8 *src, bool xor);
+-asmlinkage void cast6_dec_blk_8way(struct cast6_ctx *ctx, u8 *dst,
++asmlinkage void cast6_ecb_enc_8way(struct cast6_ctx *ctx, u8 *dst,
++				   const u8 *src);
++asmlinkage void cast6_ecb_dec_8way(struct cast6_ctx *ctx, u8 *dst,
+ 				   const u8 *src);
+ 
+-static inline void cast6_enc_blk_xway(struct cast6_ctx *ctx, u8 *dst,
+-				      const u8 *src)
+-{
+-	__cast6_enc_blk_8way(ctx, dst, src, false);
+-}
+-
+-static inline void cast6_enc_blk_xway_xor(struct cast6_ctx *ctx, u8 *dst,
+-					  const u8 *src)
+-{
+-	__cast6_enc_blk_8way(ctx, dst, src, true);
+-}
+-
+-static inline void cast6_dec_blk_xway(struct cast6_ctx *ctx, u8 *dst,
+-				      const u8 *src)
+-{
+-	cast6_dec_blk_8way(ctx, dst, src);
+-}
+-
+-
+-static void cast6_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
+-{
+-	u128 ivs[CAST6_PARALLEL_BLOCKS - 1];
+-	unsigned int j;
+-
+-	for (j = 0; j < CAST6_PARALLEL_BLOCKS - 1; j++)
+-		ivs[j] = src[j];
+-
+-	cast6_dec_blk_xway(ctx, (u8 *)dst, (u8 *)src);
+-
+-	for (j = 0; j < CAST6_PARALLEL_BLOCKS - 1; j++)
+-		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
+-}
++asmlinkage void cast6_cbc_dec_8way(struct cast6_ctx *ctx, u8 *dst,
++				   const u8 *src);
++asmlinkage void cast6_ctr_8way(struct cast6_ctx *ctx, u8 *dst, const u8 *src,
++			       le128 *iv);
+ 
+ static void cast6_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
  {
- 	be128 ctrblk;
- 
--	u128_to_be128(&ctrblk, iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblk, iv);
-+	le128_inc(iv);
- 
- 	__cast6_encrypt(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
+@@ -89,30 +61,13 @@ static void cast6_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
  	u128_xor(dst, src, (u128 *)&ctrblk);
  }
  
- static void cast6_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
--				   u128 *iv)
-+				 le128 *iv)
- {
- 	be128 ctrblks[CAST6_PARALLEL_BLOCKS];
- 	unsigned int i;
-@@ -99,8 +99,8 @@ static void cast6_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
- 		if (dst != src)
- 			dst[i] = src[i];
+-static void cast6_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
+-				 le128 *iv)
+-{
+-	be128 ctrblks[CAST6_PARALLEL_BLOCKS];
+-	unsigned int i;
+-
+-	for (i = 0; i < CAST6_PARALLEL_BLOCKS; i++) {
+-		if (dst != src)
+-			dst[i] = src[i];
+-
+-		le128_to_be128(&ctrblks[i], iv);
+-		le128_inc(iv);
+-	}
+-
+-	cast6_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
+-}
+-
+ static const struct common_glue_ctx cast6_enc = {
+ 	.num_funcs = 2,
+ 	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
  
--		u128_to_be128(&ctrblks[i], iv);
--		u128_inc(iv);
-+		le128_to_be128(&ctrblks[i], iv);
-+		le128_inc(iv);
+ 	.funcs = { {
+ 		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .ecb = GLUE_FUNC_CAST(cast6_enc_blk_xway) }
++		.fn_u = { .ecb = GLUE_FUNC_CAST(cast6_ecb_enc_8way) }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .ecb = GLUE_FUNC_CAST(__cast6_encrypt) }
+@@ -125,7 +80,7 @@ static const struct common_glue_ctx cast6_ctr = {
+ 
+ 	.funcs = { {
+ 		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(cast6_crypt_ctr_xway) }
++		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(cast6_ctr_8way) }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(cast6_crypt_ctr) }
+@@ -138,7 +93,7 @@ static const struct common_glue_ctx cast6_dec = {
+ 
+ 	.funcs = { {
+ 		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .ecb = GLUE_FUNC_CAST(cast6_dec_blk_xway) }
++		.fn_u = { .ecb = GLUE_FUNC_CAST(cast6_ecb_dec_8way) }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .ecb = GLUE_FUNC_CAST(__cast6_decrypt) }
+@@ -151,7 +106,7 @@ static const struct common_glue_ctx cast6_dec_cbc = {
+ 
+ 	.funcs = { {
+ 		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(cast6_decrypt_cbc_xway) }
++		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(cast6_cbc_dec_8way) }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(__cast6_decrypt) }
+@@ -215,7 +170,7 @@ static void encrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
+ 	ctx->fpu_enabled = cast6_fpu_begin(ctx->fpu_enabled, nbytes);
+ 
+ 	if (nbytes == bsize * CAST6_PARALLEL_BLOCKS) {
+-		cast6_enc_blk_xway(ctx->ctx, srcdst, srcdst);
++		cast6_ecb_enc_8way(ctx->ctx, srcdst, srcdst);
+ 		return;
  	}
  
- 	cast6_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
-diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
-index 30b3927..22ce4f6 100644
---- a/arch/x86/crypto/glue_helper.c
-+++ b/arch/x86/crypto/glue_helper.c
-@@ -221,16 +221,16 @@ static void glue_ctr_crypt_final_128bit(const common_glue_ctr_func_t fn_ctr,
- 	u8 *src = (u8 *)walk->src.virt.addr;
- 	u8 *dst = (u8 *)walk->dst.virt.addr;
- 	unsigned int nbytes = walk->nbytes;
--	u128 ctrblk;
-+	le128 ctrblk;
- 	u128 tmp;
+@@ -232,7 +187,7 @@ static void decrypt_callback(void *priv, u8 *srcdst, unsigned int nbytes)
+ 	ctx->fpu_enabled = cast6_fpu_begin(ctx->fpu_enabled, nbytes);
  
--	be128_to_u128(&ctrblk, (be128 *)walk->iv);
-+	be128_to_le128(&ctrblk, (be128 *)walk->iv);
- 
- 	memcpy(&tmp, src, nbytes);
- 	fn_ctr(ctx, &tmp, &tmp, &ctrblk);
- 	memcpy(dst, &tmp, nbytes);
- 
--	u128_to_be128((be128 *)walk->iv, &ctrblk);
-+	le128_to_be128((be128 *)walk->iv, &ctrblk);
- }
- EXPORT_SYMBOL_GPL(glue_ctr_crypt_final_128bit);
- 
-@@ -243,11 +243,11 @@ static unsigned int __glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
- 	unsigned int nbytes = walk->nbytes;
- 	u128 *src = (u128 *)walk->src.virt.addr;
- 	u128 *dst = (u128 *)walk->dst.virt.addr;
--	u128 ctrblk;
-+	le128 ctrblk;
- 	unsigned int num_blocks, func_bytes;
- 	unsigned int i;
- 
--	be128_to_u128(&ctrblk, (be128 *)walk->iv);
-+	be128_to_le128(&ctrblk, (be128 *)walk->iv);
- 
- 	/* Process multi-block batch */
- 	for (i = 0; i < gctx->num_funcs; i++) {
-@@ -269,7 +269,7 @@ static unsigned int __glue_ctr_crypt_128bit(const struct common_glue_ctx *gctx,
+ 	if (nbytes == bsize * CAST6_PARALLEL_BLOCKS) {
+-		cast6_dec_blk_xway(ctx->ctx, srcdst, srcdst);
++		cast6_ecb_dec_8way(ctx->ctx, srcdst, srcdst);
+ 		return;
  	}
  
- done:
--	u128_to_be128((be128 *)walk->iv, &ctrblk);
-+	le128_to_be128((be128 *)walk->iv, &ctrblk);
- 	return nbytes;
- }
- 
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 3f543a0..2aa31ad 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -56,19 +56,19 @@ static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- 		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
- }
- 
--static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
-+static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
- {
- 	be128 ctrblk;
- 
--	u128_to_be128(&ctrblk, iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblk, iv);
-+	le128_inc(iv);
- 
- 	__serpent_encrypt(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
- 	u128_xor(dst, src, (u128 *)&ctrblk);
- }
- 
- static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
--				   u128 *iv)
-+				   le128 *iv)
- {
- 	be128 ctrblks[SERPENT_PARALLEL_BLOCKS];
- 	unsigned int i;
-@@ -77,8 +77,8 @@ static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
- 		if (dst != src)
- 			dst[i] = src[i];
- 
--		u128_to_be128(&ctrblks[i], iv);
--		u128_inc(iv);
-+		le128_to_be128(&ctrblks[i], iv);
-+		le128_inc(iv);
- 	}
- 
- 	serpent_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 9107a99..97a356e 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -59,19 +59,19 @@ static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- 		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
- }
- 
--static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
-+static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
- {
- 	be128 ctrblk;
- 
--	u128_to_be128(&ctrblk, iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblk, iv);
-+	le128_inc(iv);
- 
- 	__serpent_encrypt(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
- 	u128_xor(dst, src, (u128 *)&ctrblk);
- }
- 
- static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
--				   u128 *iv)
-+				   le128 *iv)
- {
- 	be128 ctrblks[SERPENT_PARALLEL_BLOCKS];
- 	unsigned int i;
-@@ -80,8 +80,8 @@ static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
- 		if (dst != src)
- 			dst[i] = src[i];
- 
--		u128_to_be128(&ctrblks[i], iv);
--		u128_inc(iv);
-+		le128_to_be128(&ctrblks[i], iv);
-+		le128_inc(iv);
- 	}
- 
- 	serpent_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index e7708b5..810e45d 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -90,7 +90,7 @@ static void twofish_dec_blk_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- }
- 
- static void twofish_enc_blk_ctr_xway(void *ctx, u128 *dst, const u128 *src,
--				     u128 *iv)
-+				     le128 *iv)
- {
- 	be128 ctrblks[TWOFISH_PARALLEL_BLOCKS];
- 	unsigned int i;
-@@ -99,8 +99,8 @@ static void twofish_enc_blk_ctr_xway(void *ctx, u128 *dst, const u128 *src,
- 		if (dst != src)
- 			dst[i] = src[i];
- 
--		u128_to_be128(&ctrblks[i], iv);
--		u128_inc(iv);
-+		le128_to_be128(&ctrblks[i], iv);
-+		le128_inc(iv);
- 	}
- 
- 	twofish_enc_blk_xway_xor(ctx, (u8 *)dst, (u8 *)ctrblks);
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index aa3eb35..13e63b3 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -62,15 +62,15 @@ void twofish_dec_blk_cbc_3way(void *ctx, u128 *dst, const u128 *src)
- }
- EXPORT_SYMBOL_GPL(twofish_dec_blk_cbc_3way);
- 
--void twofish_enc_blk_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
-+void twofish_enc_blk_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
- {
- 	be128 ctrblk;
- 
- 	if (dst != src)
- 		*dst = *src;
- 
--	u128_to_be128(&ctrblk, iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblk, iv);
-+	le128_inc(iv);
- 
- 	twofish_enc_blk(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
- 	u128_xor(dst, dst, (u128 *)&ctrblk);
-@@ -78,7 +78,7 @@ void twofish_enc_blk_ctr(void *ctx, u128 *dst, const u128 *src, u128 *iv)
- EXPORT_SYMBOL_GPL(twofish_enc_blk_ctr);
- 
- void twofish_enc_blk_ctr_3way(void *ctx, u128 *dst, const u128 *src,
--				     u128 *iv)
-+			      le128 *iv)
- {
- 	be128 ctrblks[3];
- 
-@@ -88,12 +88,12 @@ void twofish_enc_blk_ctr_3way(void *ctx, u128 *dst, const u128 *src,
- 		dst[2] = src[2];
- 	}
- 
--	u128_to_be128(&ctrblks[0], iv);
--	u128_inc(iv);
--	u128_to_be128(&ctrblks[1], iv);
--	u128_inc(iv);
--	u128_to_be128(&ctrblks[2], iv);
--	u128_inc(iv);
-+	le128_to_be128(&ctrblks[0], iv);
-+	le128_inc(iv);
-+	le128_to_be128(&ctrblks[1], iv);
-+	le128_inc(iv);
-+	le128_to_be128(&ctrblks[2], iv);
-+	le128_inc(iv);
- 
- 	twofish_enc_blk_xor_3way(ctx, (u8 *)dst, (u8 *)ctrblks);
- }
-diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
-index 3e408bd..e2d65b0 100644
---- a/arch/x86/include/asm/crypto/glue_helper.h
-+++ b/arch/x86/include/asm/crypto/glue_helper.h
-@@ -13,7 +13,7 @@
- typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
- typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
- typedef void (*common_glue_ctr_func_t)(void *ctx, u128 *dst, const u128 *src,
--				       u128 *iv);
-+				       le128 *iv);
- 
- #define GLUE_FUNC_CAST(fn) ((common_glue_func_t)(fn))
- #define GLUE_CBC_FUNC_CAST(fn) ((common_glue_cbc_func_t)(fn))
-@@ -71,23 +71,29 @@ static inline void glue_fpu_end(bool fpu_enabled)
- 		kernel_fpu_end();
- }
- 
--static inline void u128_to_be128(be128 *dst, const u128 *src)
-+static inline void le128_to_be128(be128 *dst, const le128 *src)
- {
--	dst->a = cpu_to_be64(src->a);
--	dst->b = cpu_to_be64(src->b);
-+	dst->a = cpu_to_be64(le64_to_cpu(src->a));
-+	dst->b = cpu_to_be64(le64_to_cpu(src->b));
- }
- 
--static inline void be128_to_u128(u128 *dst, const be128 *src)
-+static inline void be128_to_le128(le128 *dst, const be128 *src)
- {
--	dst->a = be64_to_cpu(src->a);
--	dst->b = be64_to_cpu(src->b);
-+	dst->a = cpu_to_le64(be64_to_cpu(src->a));
-+	dst->b = cpu_to_le64(be64_to_cpu(src->b));
- }
- 
--static inline void u128_inc(u128 *i)
-+static inline void le128_inc(le128 *i)
- {
--	i->b++;
--	if (!i->b)
--		i->a++;
-+	u64 a = le64_to_cpu(i->a);
-+	u64 b = le64_to_cpu(i->b);
+diff --git a/arch/x86/crypto/glue_helper-asm-avx.S b/arch/x86/crypto/glue_helper-asm-avx.S
+new file mode 100644
+index 0000000..f7b6ea2
+--- /dev/null
++++ b/arch/x86/crypto/glue_helper-asm-avx.S
+@@ -0,0 +1,91 @@
++/*
++ * Shared glue code for 128bit block ciphers, AVX assembler macros
++ *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ */
 +
-+	b++;
-+	if (!b)
-+		a++;
++#define load_8way(src, x0, x1, x2, x3, x4, x5, x6, x7) \
++	vmovdqu (0*16)(src), x0; \
++	vmovdqu (1*16)(src), x1; \
++	vmovdqu (2*16)(src), x2; \
++	vmovdqu (3*16)(src), x3; \
++	vmovdqu (4*16)(src), x4; \
++	vmovdqu (5*16)(src), x5; \
++	vmovdqu (6*16)(src), x6; \
++	vmovdqu (7*16)(src), x7;
 +
-+	i->a = cpu_to_le64(a);
-+	i->b = cpu_to_le64(b);
- }
- 
- extern int glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
-diff --git a/arch/x86/include/asm/crypto/twofish.h b/arch/x86/include/asm/crypto/twofish.h
-index 9d2c514..878c51c 100644
---- a/arch/x86/include/asm/crypto/twofish.h
-+++ b/arch/x86/include/asm/crypto/twofish.h
-@@ -31,9 +31,9 @@ asmlinkage void twofish_dec_blk_3way(struct twofish_ctx *ctx, u8 *dst,
- /* helpers from twofish_x86_64-3way module */
- extern void twofish_dec_blk_cbc_3way(void *ctx, u128 *dst, const u128 *src);
- extern void twofish_enc_blk_ctr(void *ctx, u128 *dst, const u128 *src,
--				u128 *iv);
-+				le128 *iv);
- extern void twofish_enc_blk_ctr_3way(void *ctx, u128 *dst, const u128 *src,
--				     u128 *iv);
-+				     le128 *iv);
- 
- extern int lrw_twofish_setkey(struct crypto_tfm *tfm, const u8 *key,
- 			      unsigned int keylen);
++#define store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7) \
++	vmovdqu x0, (0*16)(dst); \
++	vmovdqu x1, (1*16)(dst); \
++	vmovdqu x2, (2*16)(dst); \
++	vmovdqu x3, (3*16)(dst); \
++	vmovdqu x4, (4*16)(dst); \
++	vmovdqu x5, (5*16)(dst); \
++	vmovdqu x6, (6*16)(dst); \
++	vmovdqu x7, (7*16)(dst);
++
++#define store_cbc_8way(src, dst, x0, x1, x2, x3, x4, x5, x6, x7) \
++	vpxor (0*16)(src), x1, x1; \
++	vpxor (1*16)(src), x2, x2; \
++	vpxor (2*16)(src), x3, x3; \
++	vpxor (3*16)(src), x4, x4; \
++	vpxor (4*16)(src), x5, x5; \
++	vpxor (5*16)(src), x6, x6; \
++	vpxor (6*16)(src), x7, x7; \
++	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
++
++#define inc_le128(x, minus_one, tmp) \
++	vpcmpeqq minus_one, x, tmp; \
++	vpsubq minus_one, x, x; \
++	vpslldq $8, tmp, tmp; \
++	vpsubq tmp, x, x;
++
++#define load_ctr_8way(iv, bswap, x0, x1, x2, x3, x4, x5, x6, x7, t0, t1, t2) \
++	vpcmpeqd t0, t0, t0; \
++	vpsrldq $8, t0, t0; /* low: -1, high: 0 */ \
++	vmovdqa bswap, t1; \
++	\
++	/* load IV and byteswap */ \
++	vmovdqu (iv), x7; \
++	vpshufb t1, x7, x0; \
++	\
++	/* construct IVs */ \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x1; \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x2; \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x3; \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x4; \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x5; \
++	inc_le128(x7, t0, t2); \
++	vpshufb t1, x7, x6; \
++	inc_le128(x7, t0, t2); \
++	vmovdqa x7, t2; \
++	vpshufb t1, x7, x7; \
++	inc_le128(t2, t0, t1); \
++	vmovdqu t2, (iv);
++
++#define store_ctr_8way(src, dst, x0, x1, x2, x3, x4, x5, x6, x7) \
++	vpxor (0*16)(src), x0, x0; \
++	vpxor (1*16)(src), x1, x1; \
++	vpxor (2*16)(src), x2, x2; \
++	vpxor (3*16)(src), x3, x3; \
++	vpxor (4*16)(src), x4, x4; \
++	vpxor (5*16)(src), x5, x5; \
++	vpxor (6*16)(src), x6, x6; \
++	vpxor (7*16)(src), x7, x7; \
++	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
