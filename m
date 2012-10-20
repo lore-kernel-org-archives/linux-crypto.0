@@ -1,47 +1,67 @@
-From: Gurucharan Shetty <gurucharan.shetty@gmail.com>
-Subject: Re: [PATCH] Re: aesni intel and kernel crashes.
-Date: Fri, 19 Oct 2012 16:05:12 -0700
-Message-ID: <CA+sc+0Qga4+P79=nCvJn6igsugA19+pPVBFZgXgwWyZ0gn84ZA@mail.gmail.com>
-References: <CA+sc+0T3CFwv6JdcLA66=pD=6LcaQOJZnvDGqp3o4LKN85ZbZg@mail.gmail.com>
- <20121018115249.22157.69385.stgit@localhost6.localdomain6>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH] crypto: cryptd - disable interrupts in cryptd_queue_worker to
+ prevent data corruption
+Date: Sat, 20 Oct 2012 12:13:14 +0300
+Message-ID: <20121020091314.32511.49390.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto <linux-crypto@vger.kernel.org>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: stable@kernel.org, Gurucharan Shetty <gurucharan.shetty@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:45235 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932113Ab2JSXFe (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:57792 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753868Ab2JTJNT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Oct 2012 19:05:34 -0400
-Received: by mail-wi0-f178.google.com with SMTP id hr7so743384wib.1
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2012 16:05:33 -0700 (PDT)
-In-Reply-To: <20121018115249.22157.69385.stgit@localhost6.localdomain6>
+	Sat, 20 Oct 2012 05:13:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 18 October 2012 04:52, Jussi Kivilinna <jussi.kivilinna@mbnet.fi> wrote:
-> Does this patch help?
->
-> It applies cleanly to 3.2.x, if that version easier for you to reproduce the
-> issue.
->
-> ...
->
-> cryptd_queue_worker attempts to prevent simultanious accesses to crypto-work
-> queue by cryptd_enqueue_request using preempt_disable/preempt_enable. However
-> cryptd_enqueue_request might be called from interrupt context, so add
-> local_irq_save/local_irq_restore to prevent data corruption and panics.
-> ---
->  crypto/cryptd.c |   11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-I applied this patch on 3.2.y and I have been running tests for the
-past 30+ hours. I have not seen the crash yet (Previously I would see
-a crash on an average every 15 min.). It looks like it does help.
-Thanks much for the patch.
+cryptd_queue_worker attempts to prevent simultaneous accesses to crypto
+workqueue by cryptd_enqueue_request using preempt_disable/preempt_enable.
+However cryptd_enqueue_request might be called from interrupt context,
+so add local_irq_save/local_irq_restore to prevent data corruption and
+panics.
 
-I will continue the tests for the next week or so for any other bugs.
+Bug report at http://marc.info/?l=linux-crypto-vger&m=134858649616319&w=2
 
-Thanks,
-Guru
+Cc: stable@kernel.org
+Reported-by: Gurucharan Shetty <gurucharan.shetty@gmail.com>
+Tested-by: Gurucharan Shetty <gurucharan.shetty@gmail.com>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ crypto/cryptd.c |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 671d4d6..8f62d06 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -133,16 +133,23 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+  * do. */
+ static void cryptd_queue_worker(struct work_struct *work)
+ {
++	unsigned long flags;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 	struct crypto_async_request *req, *backlog;
+ 
+ 	cpu_queue = container_of(work, struct cryptd_cpu_queue, work);
+-	/* Only handle one request at a time to avoid hogging crypto
++	/*
++	 * Only handle one request at a time to avoid hogging crypto
+ 	 * workqueue. preempt_disable/enable is used to prevent
+-	 * being preempted by cryptd_enqueue_request() */
++	 * being preempted by cryptd_enqueue_request(). local_irq_save/restore
++	 * is used to prevent cryptd_enqueue_request() being accessed from
++	 * interrupts.
++	 */
++	local_irq_save(flags);
+ 	preempt_disable();
+ 	backlog = crypto_get_backlog(&cpu_queue->queue);
+ 	req = crypto_dequeue_request(&cpu_queue->queue);
++	local_irq_restore(flags);
+ 	preempt_enable();
+ 
+ 	if (!req)
