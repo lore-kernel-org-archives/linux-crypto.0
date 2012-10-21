@@ -1,36 +1,59 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto: cryptd - disable interrupts in
- cryptd_queue_worker to prevent data corruption
-Date: Sun, 21 Oct 2012 00:24:38 +0300
-Message-ID: <20121021002438.18361lrqj69x27c0@www.dalek.fi>
-References: <20121020091314.32511.49390.stgit@localhost6.localdomain6>
- <20121020.134311.245082179756055004.davem@davemloft.net>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH] crypto: fix missing unlock on error case
+Date: Sun, 21 Oct 2012 19:56:42 +0800
+Message-ID: <CAPgLHd8f2UorFGa57n94k_7cbD8G3XNYVOkmHPqhySs2Nd0pNw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, gurucharan.shetty@gmail.com,
-	herbert@gondor.apana.org.au
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: yongjun_wei@trendmicro.com.cn, linux-crypto@vger.kernel.org,
+	devicetree-discuss@lists.ozlabs.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	grant.likely@secretlab.ca, rob.herring@calxeda.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:52065 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752030Ab2JTVYl (ORCPT
+Received: from mail-qc0-f174.google.com ([209.85.216.174]:35541 "EHLO
+	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752728Ab2JUL4n (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Oct 2012 17:24:41 -0400
-In-Reply-To: <20121020.134311.245082179756055004.davem@davemloft.net>
-Content-Disposition: inline
+	Sun, 21 Oct 2012 07:56:43 -0400
+Received: by mail-qc0-f174.google.com with SMTP id o22so999108qcr.19
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Oct 2012 04:56:42 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting David Miller <davem@davemloft.net>:
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
->
-> You should be disabling software interrupts, not hardware ones.
->
+Add the missing unlock on the error handling path in function
+tegra_aes_get_random() and tegra_aes_rng_reset().
 
-Ok, I'll roll out v2.
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ drivers/crypto/tegra-aes.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
--Jussi
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index 37185e6..19adf1c 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -674,8 +674,10 @@ static int tegra_aes_get_random(struct crypto_rng *tfm, u8 *rdata,
+ 	mutex_lock(&aes_lock);
+ 
+ 	ret = clk_prepare_enable(dd->aes_clk);
+-	if (ret)
++	if (ret) {
++		mutex_unlock(&aes_lock);
+ 		return ret;
++	}
+ 
+ 	ctx->dd = dd;
+ 	dd->ctx = ctx;
+@@ -759,8 +761,10 @@ static int tegra_aes_rng_reset(struct crypto_rng *tfm, u8 *seed,
+ 	dd->flags = FLAGS_ENCRYPT | FLAGS_RNG;
+ 
+ 	ret = clk_prepare_enable(dd->aes_clk);
+-	if (ret)
++	if (ret) {
++		mutex_unlock(&aes_lock);
+ 		return ret;
++	}
+ 
+ 	aes_set_key(dd);
+ 
