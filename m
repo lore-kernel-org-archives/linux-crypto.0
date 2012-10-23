@@ -1,49 +1,58 @@
-From: Phil Sutter <phil.sutter@viprinet.com>
-Subject: Re: [PATCH 0/2] Fixes for MV_CESA with IDMA or TDMA
-Date: Tue, 23 Oct 2012 19:11:40 +0200
-Message-ID: <20121023171139.GH9930@philter.vipri.net>
-References: <20120620154131.GR9122@philter.vipri.net>
- <20120625134050.GB12294@philter.vipri.net>
- <4FE874BD.2020909@gmail.com>
- <4FE88C63.8010103@gmail.com>
- <20120625215928.GA3853@philter.vipri.net>
- <4FEEAC54.10503@gmail.com>
- <20120706153018.GB24676@philter.vipri.net>
- <4FF91CE7.7090205@gmail.com>
- <20120709125450.GB30493@philter.vipri.net>
- <5017CB92.9010708@gmail.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [PATCH 1/2] crypto: tcrypt - add async speed test for camellia cipher
+Date: Tue, 23 Oct 2012 20:57:55 +0300
+Message-ID: <20121023175755.5552.23566.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, andrew@lunn.ch,
-	Simon Baatz <gmbnomis@gmail.com>
-To: "cloudy.linux" <cloudy.linux@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zimbra.vipri.net ([89.207.250.15]:36843 "EHLO zimbra.vipri.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756995Ab2JWRSg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Oct 2012 13:18:36 -0400
-Content-Disposition: inline
-In-Reply-To: <5017CB92.9010708@gmail.com>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:58383 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756761Ab2JWR56 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Oct 2012 13:57:58 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey,
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ crypto/tcrypt.c |   23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-On Tue, Jul 31, 2012 at 08:12:02PM +0800, cloudy.linux wrote:
-> Sorry for taking so long time to try the latest code. Just came back 
-> from a vacation and tried several days to get a tight sleep.
-
-My apologies for having a ~3months lag. Somehow I have totally forgotten
-about your mail in my inbox and just recently found it again.
-
-Luckily, I received testing hardware from a colleague a few days ago on
-which I can reproduce the problems at hand. So for now, I can do the
-testing on my own. Thanks a lot for yours!
-
-I'll get back to you (probably via linux-crypto) as soon as I have some
-useful progress. Could be that I have to implement bigger changes in
-code flow for Orion, as the IDMA seems to lag this "Enhanced Software
-Flow" functionality (how the Kirkwood datasheet calls it) I am relying
-upon in my current code. Will see.
-
-Best wishes, Phil
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 71b58c6..7ae2130 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1728,6 +1728,29 @@ static int do_test(int m)
+ 				   speed_template_32_64);
+ 		break;
+ 
++	case 508:
++		test_acipher_speed("ecb(camellia)", ENCRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("ecb(camellia)", DECRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("cbc(camellia)", ENCRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("cbc(camellia)", DECRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("ctr(camellia)", ENCRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("ctr(camellia)", DECRYPT, sec, NULL, 0,
++				   speed_template_16_32);
++		test_acipher_speed("lrw(camellia)", ENCRYPT, sec, NULL, 0,
++				   speed_template_32_48);
++		test_acipher_speed("lrw(camellia)", DECRYPT, sec, NULL, 0,
++				   speed_template_32_48);
++		test_acipher_speed("xts(camellia)", ENCRYPT, sec, NULL, 0,
++				   speed_template_32_64);
++		test_acipher_speed("xts(camellia)", DECRYPT, sec, NULL, 0,
++				   speed_template_32_64);
++		break;
++
+ 	case 1000:
+ 		test_available();
+ 		break;
