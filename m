@@ -1,50 +1,51 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH 2/3] crypto: camellia-x86_64 - share common functions
- and move structures and function definitions to header file
-Date: Wed, 24 Oct 2012 10:35:13 +0300
-Message-ID: <20121024103513.11123nsgi8jnitq8@www.dalek.fi>
-References: <20121023180251.6263.14957.stgit@localhost6.localdomain6>
- <20121023180257.6263.93870.stgit@localhost6.localdomain6>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/6] New test vectors for camellia, blowfish, serpent,
+ aes, des and des3_ede
+Date: Wed, 24 Oct 2012 21:11:34 +0800
+Message-ID: <20121024131134.GA3251@gondor.apana.org.au>
+References: <20121020115050.17179.44149.stgit@localhost6.localdomain6>
+ <20121020.135110.1138754268310415632.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Content-Type: text/plain; charset=us-ascii
+Cc: jussi.kivilinna@mbnet.fi, linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:41518 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934401Ab2JXHfR (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:40748 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752402Ab2JXNLk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Oct 2012 03:35:17 -0400
-In-Reply-To: <20121023180257.6263.93870.stgit@localhost6.localdomain6>
+	Wed, 24 Oct 2012 09:11:40 -0400
 Content-Disposition: inline
+In-Reply-To: <20121020.135110.1138754268310415632.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I guess yesterday was one of those days, when nothing goes right. Obviously
-this patch is missing the header file that was split from camellia_glue.c.
+On Sat, Oct 20, 2012 at 01:51:10PM -0400, David Miller wrote:
+> From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Date: Sat, 20 Oct 2012 14:52:41 +0300
+> 
+> > Test vectors for camellia, blowfish and serpent are expanded for future
+> > implementations.
+> > 
+> > New test vectors for aes, des and des3_ede are added to test existing
+> > implementations.
+> > 
+> > ---
+> > 
+> > Jussi Kivilinna (6):
+> >       crypto: testmgr - expand camellia test vectors
+> >       crypto: testmgr - expand blowfish test vectors
+> >       crypto: testmgr - expand serpent test vectors
+> >       crypto: testmgr - add new larger AES testvectors
+> >       crypto: testmgr - add new larger DES testvectors
+> >       crypto: testmgr - add new larger DES3_EDE testvectors
+> 
+> Thanks for doing this work:
+> 
+> Acked-by: David S. Miller <davem@davemloft.net>
 
-On top of that I managed to overwrite the not-commited header file when
-rebasing AVX2 patchset on top of these. So after remaking this patch, I
-need to retest everything. So I'll take few days of distance to this work
-and resend this patchset again in a few days or so.
-
-Sorry for the hassle.
-
--Jussi
-
-Quoting Jussi Kivilinna <jussi.kivilinna@mbnet.fi>:
-
-> Prepare camellia-x86_64 functions to be reused from AVX/AESNI implementation
-> module.
->
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-> ---
->  arch/x86/crypto/camellia_glue.c |   80  
-> +++++++++++----------------------------
->  1 file changed, 23 insertions(+), 57 deletions(-)
+All applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
