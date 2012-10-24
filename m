@@ -1,62 +1,50 @@
-From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v2 4/7] ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
-Date: Tue, 23 Oct 2012 19:36:04 -0700
-Message-ID: <1351046167-4882-5-git-send-email-mgreer@animalcreek.com>
-References: <1351046167-4882-1-git-send-email-mgreer@animalcreek.com>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, dmitry.kasatkin@intel.com,
-	rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
-	khilman@deeprootsystems.com,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1351046167-4882-1-git-send-email-mgreer@animalcreek.com>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: [PATCH 2/3] crypto: camellia-x86_64 - share common functions
+ and move structures and function definitions to header file
+Date: Wed, 24 Oct 2012 10:35:13 +0300
+Message-ID: <20121024103513.11123nsgi8jnitq8@www.dalek.fi>
+References: <20121023180251.6263.14957.stgit@localhost6.localdomain6>
+ <20121023180257.6263.93870.stgit@localhost6.localdomain6>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:41518 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934401Ab2JXHfR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Oct 2012 03:35:17 -0400
+In-Reply-To: <20121023180257.6263.93870.stgit@localhost6.localdomain6>
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: "Mark A. Greer" <mgreer@animalcreek.com>
+I guess yesterday was one of those days, when nothing goes right. Obviously
+this patch is missing the header file that was split from camellia_glue.c.
 
-Remove the error message that prints when there is no SHA IP
-present to make it consistent with all the other IPs.
+On top of that I managed to overwrite the not-commited header file when
+rebasing AVX2 patchset on top of these. So after remaking this patch, I
+need to retest everything. So I'll take few days of distance to this work
+and resend this patchset again in a few days or so.
 
-CC: Paul Walmsley <paul@pwsan.com>
-Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
----
- arch/arm/mach-omap2/devices.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+Sorry for the hassle.
 
-diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
-index f38ac9d..f41c793 100644
---- a/arch/arm/mach-omap2/devices.c
-+++ b/arch/arm/mach-omap2/devices.c
-@@ -456,20 +456,15 @@ static void omap_init_rng(void)
- 
- static void __init omap_init_sham(void)
- {
--	if (cpu_is_omap24xx() || cpu_is_omap34xx()) {
--		struct omap_hwmod *oh;
--		struct platform_device *pdev;
-+	struct omap_hwmod *oh;
-+	struct platform_device *pdev;
- 
--		oh = omap_hwmod_lookup("sham");
--		if (!oh)
--			return;
-+	oh = omap_hwmod_lookup("sham");
-+	if (!oh)
-+		return;
- 
--		pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL,
--					 0, 0);
--		WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
--	} else {
--		pr_err("%s: platform not supported\n", __func__);
--	}
-+	pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL, 0, 0);
-+	WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
- }
- 
- #if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
--- 
-1.7.12
+-Jussi
 
+Quoting Jussi Kivilinna <jussi.kivilinna@mbnet.fi>:
+
+> Prepare camellia-x86_64 functions to be reused from AVX/AESNI implementation
+> module.
+>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> ---
+>  arch/x86/crypto/camellia_glue.c |   80  
+> +++++++++++----------------------------
+>  1 file changed, 23 insertions(+), 57 deletions(-)
