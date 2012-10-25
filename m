@@ -1,43 +1,48 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] crypto - ablk_helper: add module parameter to allow
- testing cryptd redirection of requests
-Date: Thu, 25 Oct 2012 17:29:06 +0300
-Message-ID: <20121025172906.12984eq3c2esm680@www.dalek.fi>
-References: <20121021174529.11043.15034.stgit@localhost6.localdomain6>
- <20121024131702.GE3251@gondor.apana.org.au>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH] crypto: tegra-aes - fix error-valued pointer dereference
+Date: Thu, 25 Oct 2012 22:55:04 +0800
+Message-ID: <CAPgLHd8CSEYpdGHfmwOjbH4EPszYjB01mvGMczmbMmJss_L2XA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: yongjun_wei@trendmicro.com.cn, linux-crypto@vger.kernel.org,
+	devicetree-discuss@lists.ozlabs.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	grant.likely@secretlab.ca, rob.herring@calxeda.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:53061 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759687Ab2JYO3M (ORCPT
+Received: from mail-qc0-f174.google.com ([209.85.216.174]:37028 "EHLO
+	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933227Ab2JYOzF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Oct 2012 10:29:12 -0400
-In-Reply-To: <20121024131702.GE3251@gondor.apana.org.au>
-Content-Disposition: inline
+	Thu, 25 Oct 2012 10:55:05 -0400
+Received: by mail-qc0-f174.google.com with SMTP id o22so763130qcr.19
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2012 07:55:05 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Herbert Xu <herbert@gondor.apana.org.au>:
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-> On Sun, Oct 21, 2012 at 08:45:29PM +0300, Jussi Kivilinna wrote:
->> Add module parameter to allow forcing redirection of crypto requests to
->> cryptd worker threads. This allows these code paths to be actually tested
->> (easier).
->>
->> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
->
-> Wouldn't this be applicable in other spots too? Perhaps we need
-> something that just makes irq_fpu_usable return false?
+clk_put(dd->aes_clk) will dereference an error-valued pointer since the
+dd->aes_clk is a ERR_PTR() value. The correct check is call clk_put()
+if !IS_ERR(dd->aes_clk).
 
-That would make sense. Maybe some sort of debug config option which  
-gives kernel that forces irq_fpu_usable to false?
+dpatch engine is used to auto generate this patch.
+(https://github.com/weiyj/dpatch)
 
--Jussi
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ drivers/crypto/tegra-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index 37185e6..bb4195a 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -1031,7 +1031,7 @@ out:
+ 	if (dd->buf_out)
+ 		dma_free_coherent(dev, AES_HW_DMA_BUFFER_SIZE_BYTES,
+ 			dd->buf_out, dd->dma_buf_out);
+-	if (IS_ERR(dd->aes_clk))
++	if (!IS_ERR(dd->aes_clk))
+ 		clk_put(dd->aes_clk);
+ 	if (aes_wq)
+ 		destroy_workqueue(aes_wq);
