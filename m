@@ -1,48 +1,47 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH] crypto: tegra-aes - fix error-valued pointer dereference
-Date: Thu, 25 Oct 2012 22:55:04 +0800
-Message-ID: <CAPgLHd8CSEYpdGHfmwOjbH4EPszYjB01mvGMczmbMmJss_L2XA@mail.gmail.com>
+From: Kevin Hilman <khilman@deeprootsystems.com>
+Subject: Re: [PATCH v2 5/7] crypto: omap-sham: Convert to use pm_runtime API
+Date: Thu, 25 Oct 2012 17:34:02 -0700
+Message-ID: <87lieunkat.fsf@deeprootsystems.com>
+References: <1351046167-4882-1-git-send-email-mgreer@animalcreek.com>
+	<1351046167-4882-6-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: yongjun_wei@trendmicro.com.cn, linux-crypto@vger.kernel.org,
-	devicetree-discuss@lists.ozlabs.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	grant.likely@secretlab.ca, rob.herring@calxeda.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f174.google.com ([209.85.216.174]:37028 "EHLO
-	mail-qc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933227Ab2JYOzF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Oct 2012 10:55:05 -0400
-Received: by mail-qc0-f174.google.com with SMTP id o22so763130qcr.19
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2012 07:55:05 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, dmitry.kasatkin@intel.com,
+	rmk+kernel@arm.linux.org.uk, paul@pwsan.com
+To: "Mark A. Greer" <mgreer@animalcreek.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1351046167-4882-6-git-send-email-mgreer@animalcreek.com> (Mark
+	A. Greer's message of "Tue, 23 Oct 2012 19:36:05 -0700")
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Hi Mark,
 
-clk_put(dd->aes_clk) will dereference an error-valued pointer since the
-dd->aes_clk is a ERR_PTR() value. The correct check is call clk_put()
-if !IS_ERR(dd->aes_clk).
+"Mark A. Greer" <mgreer@animalcreek.com> writes:
 
-dpatch engine is used to auto generate this patch.
-(https://github.com/weiyj/dpatch)
+> From: "Mark A. Greer" <mgreer@animalcreek.com>
+>
+> Convert the omap-sham crypto driver to use the
+> pm_runtime API instead of the clk API.
+>
+> CC: Kevin Hilman <khilman@deeprootsystems.com>
+> CC: Paul Walmsley <paul@pwsan.com>
+> CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+> Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 
-Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
----
- drivers/crypto/tegra-aes.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I can't pretend to fully understand this driver, It looks like the
+current code is doing a bit more fine-grained clock gating, and leaving
+the IP clocked only when needed.
 
-diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
-index 37185e6..bb4195a 100644
---- a/drivers/crypto/tegra-aes.c
-+++ b/drivers/crypto/tegra-aes.c
-@@ -1031,7 +1031,7 @@ out:
- 	if (dd->buf_out)
- 		dma_free_coherent(dev, AES_HW_DMA_BUFFER_SIZE_BYTES,
- 			dd->buf_out, dd->dma_buf_out);
--	if (IS_ERR(dd->aes_clk))
-+	if (!IS_ERR(dd->aes_clk))
- 		clk_put(dd->aes_clk);
- 	if (aes_wq)
- 		destroy_workqueue(aes_wq);
+The proposed version does a 'get' in probe and a 'put' in remove, which
+means the IP will always be enabled (and thus preventing low-power
+states), even when it's not in use.
+
+If that's really needed, it should be thoroughly described in the
+changelog, otherwise I suggest doing the runtime PM 'get' and 'put' in
+roughtly the same spots as the current clk enable/disable which makes
+this a more straight-forward conversion.
+
+Kevin
