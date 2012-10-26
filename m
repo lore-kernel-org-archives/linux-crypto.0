@@ -1,30 +1,55 @@
 From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 2/3] [v2] crypto: camellia-x86_64 - share common
- functions and move structures and function definitions to header file
-Date: Fri, 26 Oct 2012 14:47:22 -0400 (EDT)
-Message-ID: <20121026.144722.1375937559078031487.davem@davemloft.net>
+Subject: Re: [PATCH 3/3] [v2] crypto: camellia - add AES-NI/AVX/x86_64
+ assembler implementation of camellia cipher
+Date: Fri, 26 Oct 2012 14:48:22 -0400 (EDT)
+Message-ID: <20121026.144822.1482747794128519588.davem@davemloft.net>
 References: <20121026114845.3373.17236.stgit@localhost6.localdomain6>
-	<20121026114856.3373.67242.stgit@localhost6.localdomain6>
+	<20121026114901.3373.26413.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 To: jussi.kivilinna@mbnet.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:49970 "EHLO
+Received: from shards.monkeyblade.net ([149.20.54.216]:49978 "EHLO
 	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753515Ab2JZSr0 (ORCPT
+	with ESMTP id S1753766Ab2JZSsZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Oct 2012 14:47:26 -0400
-In-Reply-To: <20121026114856.3373.67242.stgit@localhost6.localdomain6>
+	Fri, 26 Oct 2012 14:48:25 -0400
+In-Reply-To: <20121026114901.3373.26413.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Date: Fri, 26 Oct 2012 14:48:56 +0300
+Date: Fri, 26 Oct 2012 14:49:01 +0300
 
-> Prepare camellia-x86_64 functions to be reused from AVX/AESNI implementation
-> module.
+> This patch adds AES-NI/AVX/x86_64 assembler implementation of Camellia block
+> cipher. Implementation process data in sixteen block chunks, which are
+> byte-sliced and AES SubBytes is reused for Camellia s-box with help of pre-
+> and post-filtering.
+> 
+> Patch has been tested with tcrypt and automated filesystem tests.
+> 
+> tcrypt test results:
+> 
+> Intel Core i5-2450M:
+> 
+> camellia-aesni-avx vs camellia-asm-x86_64-2way:
+> 128bit key:                                             (lrw:256bit)    (xts:256bit)
+> size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+> 16B     0.98x   0.96x   0.99x   0.96x   0.96x   0.95x   0.95x   0.94x   0.97x   0.98x
+> 64B     0.99x   0.98x   1.00x   0.98x   0.98x   0.99x   0.98x   0.93x   0.99x   0.98x
+> 256B    2.28x   2.28x   1.01x   2.29x   2.25x   2.24x   1.96x   1.97x   1.91x   1.90x
+> 1024B   2.57x   2.56x   1.00x   2.57x   2.51x   2.53x   2.19x   2.17x   2.19x   2.22x
+> 8192B   2.49x   2.49x   1.00x   2.53x   2.48x   2.49x   2.17x   2.17x   2.22x   2.22x
+> 
+> 256bit key:                                             (lrw:384bit)    (xts:512bit)
+> size    ecb-enc ecb-dec cbc-enc cbc-dec ctr-enc ctr-dec lrw-enc lrw-dec xts-enc xts-dec
+> 16B     0.97x   0.98x   0.99x   0.97x   0.97x   0.96x   0.97x   0.98x   0.98x   0.99x
+> 64B     1.00x   1.00x   1.01x   0.99x   0.98x   0.99x   0.99x   0.99x   0.99x   0.99x
+> 256B    2.37x   2.37x   1.01x   2.39x   2.35x   2.33x   2.10x   2.11x   1.99x   2.02x
+> 1024B   2.58x   2.60x   1.00x   2.58x   2.56x   2.56x   2.28x   2.29x   2.28x   2.29x
+> 8192B   2.50x   2.52x   1.00x   2.56x   2.51x   2.51x   2.24x   2.25x   2.26x   2.29x
 > 
 > Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 
