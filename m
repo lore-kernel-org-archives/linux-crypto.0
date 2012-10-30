@@ -1,57 +1,38 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH] [RFC] crypto: sha1/arm - fix build with CONFIG_THUMB2_KERNEL
-Date: Tue, 30 Oct 2012 12:07:43 +0200
-Message-ID: <20121030100742.17910.70241.stgit@localhost6.localdomain6>
+From: Behan Webster <behanw@converseincode.com>
+Subject: [PATCH 0/2] Removing the use of VLAIS from the Linux Kernel
+Date: Tue, 30 Oct 2012 14:37:27 -0400
+Message-ID: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: David McCullough <ucdevel@gmail.com>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:53026 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758146Ab2J3KHq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Oct 2012 06:07:46 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Behan Webster <behanw@converseincode.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Building cryptodev-2.6 tree with CONFIG_THUMB2_KERNEL=y and
-CONFIG_CRYPTO_SHA1_ARM=y give following error:
+The use of variable length arrays in structs (VLAIS) in the Linux Kerne=
+l code
+precludes the use of compilers which don't implement VLAIS (for instanc=
+e the
+Clang compiler). The LLVMLinux Project is working towards the ability o=
+f
+providing the Linux kernel developer the choice of using the Clang comp=
+iler
+toolchain. This is a part of a series of patches which remove the use o=
+f VLAIS
+from crypto code, dm-crypt, jbd2, libcrc32c, netfilter, and usb gadget.=
+ Other
+patches to allow Clang to be used will follow.
 
-   AS      arch/arm/crypto/sha1-armv4-large.o
-arch/arm/crypto/sha1-armv4-large.S: Assembler messages:
-arch/arm/crypto/sha1-armv4-large.S:197: Error: r13 not allowed here --
-`teq r14,sp'
-arch/arm/crypto/sha1-armv4-large.S:377: Error: r13 not allowed here --
-`teq r14,sp'
-arch/arm/crypto/sha1-armv4-large.S:469: Error: r13 not allowed here --
-`teq r14,sp'
+Jan-Simon M=C3=B6ller (2):
+  Remove VLAIS usage from crypto/hmac.c
+  Remove VLAIS usage from crypto/testmgr.c
 
-Build can be fixed with adding '.arm' at head of sha1-armv4-large.S.
-However I'm not sure if this correct fix as this is my first stab
-at arm assembler and I could not get CONFIG_THUMB2_KERNEL boot up
-on 'qemu-system-arm -M vexpress-a9' to verify correctness. So this
-is only build tested.
+ crypto/hmac.c    |   27 +++++++++++++--------------
+ crypto/testmgr.c |   23 +++++++++++++----------
+ 2 files changed, 26 insertions(+), 24 deletions(-)
 
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-crypto@vger.kernel.org
-Cc: David McCullough <ucdevel@gmail.com>
----
- arch/arm/crypto/sha1-armv4-large.S |    2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
-index 7050ab1..e8a55eb 100644
---- a/arch/arm/crypto/sha1-armv4-large.S
-+++ b/arch/arm/crypto/sha1-armv4-large.S
-@@ -53,6 +53,8 @@
- 
- .text
- 
-+.arm
-+
- .global	sha1_block_data_order
- .type	sha1_block_data_order,%function
- 
+--=20
+1.7.9.5
