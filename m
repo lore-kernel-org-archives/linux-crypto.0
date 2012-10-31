@@ -1,99 +1,84 @@
-From: Behan Webster <behanw@converseincode.com>
-Subject: [PATCH 1/2] Remove VLAIS usage from crypto/hmac.c
-Date: Tue, 30 Oct 2012 14:37:28 -0400
-Message-ID: <1351622249-18084-2-git-send-email-behanw@converseincode.com>
-References: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
+From: David McCullough <ucdevel@gmail.com>
+Subject: Re: [PATCH] [RFC] crypto: sha1/arm - fix build with
+ CONFIG_THUMB2_KERNEL
+Date: Wed, 31 Oct 2012 10:25:00 +1000
+Message-ID: <20121031002457.GB6972@spottygum.com>
+References: <20121030100742.17910.70241.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
-	pageexec@freemail.hu, Behan Webster <behanw@converseincode.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ia0-f174.google.com ([209.85.210.174]:50484 "EHLO
-	mail-ia0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758205Ab2J3ShQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Oct 2012 14:37:16 -0400
-Received: by mail-ia0-f174.google.com with SMTP id y32so408619iag.19
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Oct 2012 11:37:15 -0700 (PDT)
-In-Reply-To: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: David McCullough <ucdevel@gmail.com>, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20121030100742.17910.70241.stgit@localhost6.localdomain6>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
-The use of variable length arrays in structs (VLAIS) in the Linux Kerne=
-l code
-precludes the use of compilers which don't implement VLAIS (for instanc=
-e the
-Clang compiler). This patch instead allocates the appropriate amount of=
- memory
-using an char array.
+Jussi Kivilinna wrote the following:
+> Building cryptodev-2.6 tree with CONFIG_THUMB2_KERNEL=y and
+> CONFIG_CRYPTO_SHA1_ARM=y give following error:
+> 
+>    AS      arch/arm/crypto/sha1-armv4-large.o
+> arch/arm/crypto/sha1-armv4-large.S: Assembler messages:
+> arch/arm/crypto/sha1-armv4-large.S:197: Error: r13 not allowed here --
+> `teq r14,sp'
+> arch/arm/crypto/sha1-armv4-large.S:377: Error: r13 not allowed here --
+> `teq r14,sp'
+> arch/arm/crypto/sha1-armv4-large.S:469: Error: r13 not allowed here --
+> `teq r14,sp'
+> 
+> Build can be fixed with adding '.arm' at head of sha1-armv4-large.S.
+> However I'm not sure if this correct fix as this is my first stab
+> at arm assembler and I could not get CONFIG_THUMB2_KERNEL boot up
+> on 'qemu-system-arm -M vexpress-a9' to verify correctness. So this
+> is only build tested.
 
-Patch from series at
-http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20120507/14=
-2707.html
-by PaX Team.
+That fixes the problem for the assembler,  in that you have forced it to
+treat the code as 32 bit (non-thumb).
 
-Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
-Cc: pageexec@freemail.hu
-Signed-off-by: Behan Webster <behanw@converseincode.com>
----
- crypto/hmac.c |   27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+I know you can mix thumb and non-thumb code,  and it seems that as long as
+all parties know what code is in what mode it should work.
 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 8d9544c..1061255 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -52,20 +52,19 @@ static int hmac_setkey(struct crypto_shash *parent,
- 	struct hmac_ctx *ctx =3D align_ptr(opad + ss,
- 					 crypto_tfm_ctx_alignment());
- 	struct crypto_shash *hash =3D ctx->hash;
--	struct {
--		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(hash)];
--	} desc;
-+	char desc[sizeof(struct shash_desc) + crypto_shash_descsize(hash)
-+		+ CRYPTO_MINALIGN] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *shash =3D (struct shash_desc *)desc;
- 	unsigned int i;
-=20
--	desc.shash.tfm =3D hash;
--	desc.shash.flags =3D crypto_shash_get_flags(parent) &
--			    CRYPTO_TFM_REQ_MAY_SLEEP;
-+	shash->tfm =3D hash;
-+	shash->flags =3D crypto_shash_get_flags(parent)
-+		& CRYPTO_TFM_REQ_MAY_SLEEP;
-=20
- 	if (keylen > bs) {
- 		int err;
-=20
--		err =3D crypto_shash_digest(&desc.shash, inkey, keylen, ipad);
-+		err =3D crypto_shash_digest(shash, inkey, keylen, ipad);
- 		if (err)
- 			return err;
-=20
-@@ -81,12 +80,12 @@ static int hmac_setkey(struct crypto_shash *parent,
- 		opad[i] ^=3D 0x5c;
- 	}
-=20
--	return crypto_shash_init(&desc.shash) ?:
--	       crypto_shash_update(&desc.shash, ipad, bs) ?:
--	       crypto_shash_export(&desc.shash, ipad) ?:
--	       crypto_shash_init(&desc.shash) ?:
--	       crypto_shash_update(&desc.shash, opad, bs) ?:
--	       crypto_shash_export(&desc.shash, opad);
-+	return crypto_shash_init(shash) ?:
-+	       crypto_shash_update(shash, ipad, bs) ?:
-+	       crypto_shash_export(shash, ipad) ?:
-+	       crypto_shash_init(shash) ?:
-+	       crypto_shash_update(shash, opad, bs) ?:
-+	       crypto_shash_export(shash, opad);
- }
-=20
- static int hmac_export(struct shash_desc *pdesc, void *out)
---=20
-1.7.9.5
+Unfortunately I don't know enough about it be sure this is a valid fix.
+I think we need a long term arm expert to pass judgement on this one,
+unless of source you manage to get it tested.  I don't have any thumb
+targets I can try it on, sory,
+
+Cheers,
+Davidm
+
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: David McCullough <ucdevel@gmail.com>
+> ---
+>  arch/arm/crypto/sha1-armv4-large.S |    2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
+> index 7050ab1..e8a55eb 100644
+> --- a/arch/arm/crypto/sha1-armv4-large.S
+> +++ b/arch/arm/crypto/sha1-armv4-large.S
+> @@ -53,6 +53,8 @@
+>  
+>  .text
+>  
+> +.arm
+> +
+>  .global	sha1_block_data_order
+>  .type	sha1_block_data_order,%function
+>  
+> 
+
+-- 
+David McCullough,  davidm@spottygum.com,   Ph: 0410 560 763
