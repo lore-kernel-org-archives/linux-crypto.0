@@ -1,84 +1,90 @@
-From: David McCullough <ucdevel@gmail.com>
-Subject: Re: [PATCH] [RFC] crypto: sha1/arm - fix build with
- CONFIG_THUMB2_KERNEL
-Date: Wed, 31 Oct 2012 10:25:00 +1000
-Message-ID: <20121031002457.GB6972@spottygum.com>
-References: <20121030100742.17910.70241.stgit@localhost6.localdomain6>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: [PATCH 2/2] Remove VLAIS usage from crypto/testmgr.c
+Date: Wed, 31 Oct 2012 10:45:20 +0200
+Message-ID: <20121031104520.45391yrgl3tgaza8@www.dalek.fi>
+References: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
+ <1351622249-18084-3-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: David McCullough <ucdevel@gmail.com>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1;
+	DelSp=Yes	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jan-Simon =?iso-8859-1?b?TfZsbGVy?= <dl9pf@gmx.de>,
+	pageexec@freemail.hu
+To: Behan Webster <behanw@converseincode.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:37523 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935028Ab2JaIpY convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 31 Oct 2012 04:45:24 -0400
+In-Reply-To: <1351622249-18084-3-git-send-email-behanw@converseincode.com>
 Content-Disposition: inline
-In-Reply-To: <20121030100742.17910.70241.stgit@localhost6.localdomain6>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: linux-arm-kernel-bounces@lists.infradead.org
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Quoting Behan Webster <behanw@converseincode.com>:
 
-Jussi Kivilinna wrote the following:
-> Building cryptodev-2.6 tree with CONFIG_THUMB2_KERNEL=y and
-> CONFIG_CRYPTO_SHA1_ARM=y give following error:
-> 
->    AS      arch/arm/crypto/sha1-armv4-large.o
-> arch/arm/crypto/sha1-armv4-large.S: Assembler messages:
-> arch/arm/crypto/sha1-armv4-large.S:197: Error: r13 not allowed here --
-> `teq r14,sp'
-> arch/arm/crypto/sha1-armv4-large.S:377: Error: r13 not allowed here --
-> `teq r14,sp'
-> arch/arm/crypto/sha1-armv4-large.S:469: Error: r13 not allowed here --
-> `teq r14,sp'
-> 
-> Build can be fixed with adding '.arm' at head of sha1-armv4-large.S.
-> However I'm not sure if this correct fix as this is my first stab
-> at arm assembler and I could not get CONFIG_THUMB2_KERNEL boot up
-> on 'qemu-system-arm -M vexpress-a9' to verify correctness. So this
-> is only build tested.
-
-That fixes the problem for the assembler,  in that you have forced it to
-treat the code as 32 bit (non-thumb).
-
-I know you can mix thumb and non-thumb code,  and it seems that as long as
-all parties know what code is in what mode it should work.
-
-Unfortunately I don't know enough about it be sure this is a valid fix.
-I think we need a long term arm expert to pass judgement on this one,
-unless of source you manage to get it tested.  I don't have any thumb
-targets I can try it on, sory,
-
-Cheers,
-Davidm
-
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: David McCullough <ucdevel@gmail.com>
+> From: Jan-Simon M=F6ller <dl9pf@gmx.de>
+>
+> The use of variable length arrays in structs (VLAIS) in the Linux Ker=
+nel code
+> precludes the use of compilers which don't implement VLAIS (for insta=
+nce the
+> Clang compiler). This patch instead allocates the appropriate amount =
+=20
+> of memory
+> using an char array.
+>
+> Patch from series at
+> http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20120507/=
+142707.html
+> by PaX Team.
+>
+> Signed-off-by: Jan-Simon M=F6ller <dl9pf@gmx.de>
+> Cc: pageexec@freemail.hu
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
 > ---
->  arch/arm/crypto/sha1-armv4-large.S |    2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
-> index 7050ab1..e8a55eb 100644
-> --- a/arch/arm/crypto/sha1-armv4-large.S
-> +++ b/arch/arm/crypto/sha1-armv4-large.S
-> @@ -53,6 +53,8 @@
->  
->  .text
->  
-> +.arm
-> +
->  .global	sha1_block_data_order
->  .type	sha1_block_data_order,%function
->  
-> 
+>  crypto/testmgr.c |   23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 941d75c..5b7b3a6 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1578,16 +1578,19 @@ static int alg_test_crc32c(const struct =20
+> alg_test_desc *desc,
+>  	}
+>
+>  	do {
+> -		struct {
+> -			struct shash_desc shash;
+> -			char ctx[crypto_shash_descsize(tfm)];
+> -		} sdesc;
+> -
+> -		sdesc.shash.tfm =3D tfm;
+> -		sdesc.shash.flags =3D 0;
+> -
+> -		*(u32 *)sdesc.ctx =3D le32_to_cpu(420553207);
+> -		err =3D crypto_shash_final(&sdesc.shash, (u8 *)&val);
+> +		char sdesc[sizeof(struct shash_desc)
+> +			+ crypto_shash_descsize(tfm)
+> +			+ CRYPTO_MINALIGN] CRYPTO_MINALIGN_ATTR;
+> +		struct shash_desc *shash =3D (struct shash_desc *)sdesc;
+> +		u32 *ctx =3D (u32 *)((unsigned long)(sdesc
+> +			+ sizeof(struct shash_desc) + CRYPTO_MINALIGN - 1)
+> +			& ~(CRYPTO_MINALIGN - 1));
 
--- 
-David McCullough,  davidm@spottygum.com,   Ph: 0410 560 763
+I think you should use '(u32 *)shash_desc_ctx(shash)' instead of =20
+getting ctx pointer manually.
+
+> +
+> +		shash->tfm =3D tfm;
+> +		shash->flags =3D 0;
+> +
+> +		*ctx =3D le32_to_cpu(420553207);
+> +		err =3D crypto_shash_final(shash, (u8 *)&val);
+>  		if (err) {
+>  			printk(KERN_ERR "alg: crc32c: Operation failed for "
+>  			       "%s: %d\n", driver, err);
