@@ -1,45 +1,41 @@
-From: Christoph Lameter <cl@linux.com>
-Subject: Re: [PATCH 6/9] kernel: padata : use this_cpu_ptr per-cpu helper
-Date: Wed, 31 Oct 2012 17:45:48 +0000
-Message-ID: <0000013ab7edd68d-5524bd32-c5a1-4cd8-a467-ca565ee4c854-000000@email.amazonses.com>
-References: <50910A10.3090004@gmail.com>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: steffen.klassert@secunet.com,
-	Kernel-Maillist <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Shan Wei <shanwei88@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <50910A10.3090004@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH] crypto/omap aes: select BLKCIPHER2
+Date: Wed, 31 Oct 2012 20:08:37 +0100
+Message-ID: <1351710517-9516-1-git-send-email-bigeasy@linutronix.de>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from www.linutronix.de ([62.245.132.108]:59300 "EHLO
+	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757319Ab2JaTIm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 31 Oct 2012 15:08:42 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 31 Oct 2012, Shan Wei wrote:
+without it:
+|drivers/built-in.o:(.data+0x14588): undefined reference to `crypto_ablkcipher_type'
+|drivers/built-in.o:(.data+0x14668): undefined reference to `crypto_ablkcipher_type'
 
-> From: Shan Wei <davidshan@tencent.com>
->
->
-> Signed-off-by: Shan Wei <davidshan@tencent.com>
-> ---
->  kernel/padata.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 89fe3d1..70dffe8 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -204,7 +204,7 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
->  		goto out;
->  	}
->
-> -	queue = per_cpu_ptr(pd->pqueue, smp_processor_id());
-> +	queue = this_cpu_ptr(pd->pqueue);
->  	if (queue->cpu_index == next_queue->cpu_index) {
+Not sure when this broke.
 
-Its simpler to just remove the per_cpu op completely and change the if
-statement to
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ drivers/crypto/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
 
-	if (this_cpu_read(pd->pqueue->cpu_index) == next_queue->cpu_index))
-{
-
-..
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 308c7fb..ac7235a 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -254,6 +254,7 @@ config CRYPTO_DEV_OMAP_AES
+ 	tristate "Support for OMAP AES hw engine"
+ 	depends on ARCH_OMAP2 || ARCH_OMAP3
+ 	select CRYPTO_AES
++	select CRYPTO_BLKCIPHER2
+ 	help
+ 	  OMAP processors have AES module accelerator. Select this if you
+ 	  want to use the OMAP module for AES algorithms.
+-- 
+1.7.10.4
