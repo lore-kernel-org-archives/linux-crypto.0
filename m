@@ -1,41 +1,32 @@
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH] crypto/omap aes: select BLKCIPHER2
-Date: Wed, 31 Oct 2012 20:08:37 +0100
-Message-ID: <1351710517-9516-1-git-send-email-bigeasy@linutronix.de>
-Cc: linux-crypto@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] Removing the use of VLAIS from the Linux Kernel
+Date: Thu, 1 Nov 2012 08:41:46 +0800
+Message-ID: <20121101004146.GA26586@gondor.apana.org.au>
+References: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
+ <20121031.124132.230333168753346325.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: behanw@converseincode.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:59300 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757319Ab2JaTIm (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:34185 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1761176Ab2KAAlx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Oct 2012 15:08:42 -0400
+	Wed, 31 Oct 2012 20:41:53 -0400
+Content-Disposition: inline
+In-Reply-To: <20121031.124132.230333168753346325.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-without it:
-|drivers/built-in.o:(.data+0x14588): undefined reference to `crypto_ablkcipher_type'
-|drivers/built-in.o:(.data+0x14668): undefined reference to `crypto_ablkcipher_type'
+On Wed, Oct 31, 2012 at 12:41:32PM -0400, David Miller wrote:
+> 
+> I don't think imposing the limitations of a non-gcc compiler
+> is rasonable.
 
-Not sure when this broke.
-
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- drivers/crypto/Kconfig |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 308c7fb..ac7235a 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -254,6 +254,7 @@ config CRYPTO_DEV_OMAP_AES
- 	tristate "Support for OMAP AES hw engine"
- 	depends on ARCH_OMAP2 || ARCH_OMAP3
- 	select CRYPTO_AES
-+	select CRYPTO_BLKCIPHER2
- 	help
- 	  OMAP processors have AES module accelerator. Select this if you
- 	  want to use the OMAP module for AES algorithms.
+I agree.
 -- 
-1.7.10.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
