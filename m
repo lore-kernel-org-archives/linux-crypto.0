@@ -1,32 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Removing the use of VLAIS from the Linux Kernel
-Date: Thu, 1 Nov 2012 08:41:46 +0800
-Message-ID: <20121101004146.GA26586@gondor.apana.org.au>
-References: <1351622249-18084-1-git-send-email-behanw@converseincode.com>
- <20121031.124132.230333168753346325.davem@davemloft.net>
+From: Shan Wei <shanwei88@gmail.com>
+Subject: [PATCH v2 5/9] kernel: padata : use this_cpu_read per-cpu helper
+Date: Sat, 03 Nov 2012 00:01:39 +0800
+Message-ID: <5093EE63.5000005@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: behanw@converseincode.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:34185 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1761176Ab2KAAlx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Oct 2012 20:41:53 -0400
-Content-Disposition: inline
-In-Reply-To: <20121031.124132.230333168753346325.davem@davemloft.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: steffen.klassert@secunet.com,
+	Kernel-Maillist <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, cl@linux-foundation.org,
+	Shan Wei <shanwei88@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 31, 2012 at 12:41:32PM -0400, David Miller wrote:
-> 
-> I don't think imposing the limitations of a non-gcc compiler
-> is rasonable.
+From: Shan Wei <davidshan@tencent.com>
 
-I agree.
+
+Signed-off-by: Shan Wei <davidshan@tencent.com>
+---
+ kernel/padata.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 89fe3d1..cf94137 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -171,7 +171,7 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ {
+ 	int cpu, num_cpus;
+ 	unsigned int next_nr, next_index;
+-	struct padata_parallel_queue *queue, *next_queue;
++	struct padata_parallel_queue *next_queue;
+ 	struct padata_priv *padata;
+ 	struct padata_list *reorder;
+ 
+@@ -204,8 +204,7 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 		goto out;
+ 	}
+ 
+-	queue = per_cpu_ptr(pd->pqueue, smp_processor_id());
+-	if (queue->cpu_index == next_queue->cpu_index) {
++	if (this_cpu_read(pd->pqueue->cpu_index) == next_queue->cpu_index) {
+ 		padata = ERR_PTR(-ENODATA);
+ 		goto out;
+ 	}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
