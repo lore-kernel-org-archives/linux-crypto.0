@@ -1,8 +1,8 @@
 From: Jarod Wilson <jarod@redhat.com>
-Subject: [PATCH v2] random: prime last_data value per fips requirements
-Date: Tue,  6 Nov 2012 10:35:53 -0500
-Message-ID: <1352216153-25359-1-git-send-email-jarod@redhat.com>
-References: <20121106152203.GA24076@redhat.com>
+Subject: [PATCH v3] random: prime last_data value per fips requirements
+Date: Tue,  6 Nov 2012 10:42:42 -0500
+Message-ID: <1352216562-25659-1-git-send-email-jarod@redhat.com>
+References: <1352216153-25359-1-git-send-email-jarod@redhat.com>
 Cc: Jarod Wilson <jarod@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -10,11 +10,11 @@ Cc: Jarod Wilson <jarod@redhat.com>,
 	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:16751 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:45848 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751326Ab2KFPgU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2012 10:36:20 -0500
-In-Reply-To: <20121106152203.GA24076@redhat.com>
+	id S1751154Ab2KFPm7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 Nov 2012 10:42:59 -0500
+In-Reply-To: <1352216153-25359-1-git-send-email-jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -27,6 +27,9 @@ checks aren't being run against stale and possibly known data.
 v2: streamline code flow a bit, eliminating extra loop and spinlock in the
 case where we need to prime, and account for the extra primer bits.
 
+v3: extract_buf() can't be called with spinlock already held, so bring
+back some extra lock/unlock calls.
+
 CC: Herbert Xu <herbert@gondor.apana.org.au>
 CC: "David S. Miller" <davem@davemloft.net>
 CC: Neil Horman <nhorman@tuxdriver.com>
@@ -34,11 +37,11 @@ CC: Matt Mackall <mpm@selenic.com>
 CC: linux-crypto@vger.kernel.org
 Signed-off-by: Jarod Wilson <jarod@redhat.com>
 ---
- drivers/char/random.c |   15 +++++++++++++++
- 1 files changed, 15 insertions(+), 0 deletions(-)
+ drivers/char/random.c |   17 +++++++++++++++++
+ 1 files changed, 17 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index b86eae9..6bdd57f 100644
+index b86eae9..d0139df 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
 @@ -437,6 +437,7 @@ struct entropy_store {
@@ -60,23 +63,25 @@ index b86eae9..6bdd57f 100644
  	trace_extract_entropy(r->name, nbytes, r->entropy_count, _RET_IP_);
  	xfer_secondary_pool(r, nbytes);
  	nbytes = account(r, nbytes, min, reserved);
-@@ -968,6 +973,15 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+@@ -967,6 +972,17 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+ 		if (fips_enabled) {
  			unsigned long flags;
  
- 			spin_lock_irqsave(&r->lock, flags);
 +
 +			/* prime last_data value if need be, per fips 140-2 */
 +			if (!r->last_data_init) {
++				spin_lock_irqsave(&r->lock, flags);
 +				memcpy(r->last_data, tmp, EXTRACT_SIZE);
 +				r->last_data_init = true;
 +				nbytes -= EXTRACT_SIZE;
++				spin_unlock_irqrestore(&r->lock, flags);
 +				extract_buf(r, tmp);
 +			}
 +
+ 			spin_lock_irqsave(&r->lock, flags);
  			if (!memcmp(tmp, r->last_data, EXTRACT_SIZE))
  				panic("Hardware RNG duplicated output!\n");
- 			memcpy(r->last_data, tmp, EXTRACT_SIZE);
-@@ -1086,6 +1100,7 @@ static void init_std_data(struct entropy_store *r)
+@@ -1086,6 +1102,7 @@ static void init_std_data(struct entropy_store *r)
  
  	r->entropy_count = 0;
  	r->entropy_total = 0;
