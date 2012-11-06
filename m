@@ -1,84 +1,88 @@
 From: Jarod Wilson <jarod@redhat.com>
-Subject: Re: [PATCH] random: prime last_data value per fips requirements
-Date: Tue, 6 Nov 2012 10:22:03 -0500
-Message-ID: <20121106152203.GA24076@redhat.com>
-References: <1352149210-4790-1-git-send-email-jarod@redhat.com>
- <20121106120523.GA2805@hmsreliant.think-freely.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
+Subject: [PATCH v2] random: prime last_data value per fips requirements
+Date: Tue,  6 Nov 2012 10:35:53 -0500
+Message-ID: <1352216153-25359-1-git-send-email-jarod@redhat.com>
+References: <20121106152203.GA24076@redhat.com>
+Cc: Jarod Wilson <jarod@redhat.com>,
 	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	Neil Horman <nhorman@tuxdriver.com>,
 	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52668 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:16751 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751168Ab2KFPWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2012 10:22:40 -0500
-Content-Disposition: inline
-In-Reply-To: <20121106120523.GA2805@hmsreliant.think-freely.org>
+	id S1751326Ab2KFPgU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 Nov 2012 10:36:20 -0500
+In-Reply-To: <20121106152203.GA24076@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 06, 2012 at 07:05:23AM -0500, Neil Horman wrote:
-> On Mon, Nov 05, 2012 at 04:00:10PM -0500, Jarod Wilson wrote:
-> > The value stored in last_data must be primed for FIPS 140-2 purposes. Upon
-> > first use, either on system startup or after an RNDCLEARPOOL ioctl, we
-> > need to take an initial random sample, store it internally in last_data,
-> > then pass along the value after that to the requester, so that consistency
-> > checks aren't being run against stale and possibly known data.
-> > 
-> > CC: Herbert Xu <herbert@gondor.apana.org.au>
-> > CC: "David S. Miller" <davem@davemloft.net>
-> > CC: Neil Horman <nhorman@tuxdriver.com>
-> > CC: Matt Mackall <mpm@selenic.com>
-> > CC: linux-crypto@vger.kernel.org
-> > Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> > ---
-> >  drivers/char/random.c |   11 +++++++++++
-> >  1 files changed, 11 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/drivers/char/random.c b/drivers/char/random.c
-> > index b86eae9..24d17b8 100644
-> > --- a/drivers/char/random.c
-> > +++ b/drivers/char/random.c
-> > @@ -437,6 +437,7 @@ struct entropy_store {
-> >  	int entropy_count;
-> >  	int entropy_total;
-> >  	unsigned int initialized:1;
-> > +	bool last_data_init;
-> >  	__u8 last_data[EXTRACT_SIZE];
-> >  };
-> >  
-> > @@ -967,6 +968,15 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
-> >  		if (fips_enabled) {
-> >  			unsigned long flags;
-> >  
-> > +			/* prime last_data value if need be, per fips 140-2 */
-> > +			if (!r->last_data_init) {
-> > +				spin_lock_irqsave(&r->lock, flags);
-> > +				memcpy(r->last_data, tmp, EXTRACT_SIZE);
-> > +				r->last_data_init = true;
-> > +				spin_unlock_irqrestore(&r->lock, flags);
-> > +				continue;
-> Continue?  Is that left over from earlier work?  Or did you have some other
-> purpose in mind for it?
+The value stored in last_data must be primed for FIPS 140-2 purposes. Upon
+first use, either on system startup or after an RNDCLEARPOOL ioctl, we
+need to take an initial random sample, store it internally in last_data,
+then pass along the value after that to the requester, so that consistency
+checks aren't being run against stale and possibly known data.
 
-The continue takes you back to the top of the while loop for another
-extract_buf() call, but continue could simply be replaced with another
-extract_buf() call, so we don't have to restart the loop and check
-last_data_init again. Otherwise, we're going to fail the memcmp and panic,
-because tmp and r->last_data will be identical.
+v2: streamline code flow a bit, eliminating extra loop and spinlock in the
+case where we need to prime, and account for the extra primer bits.
 
-> Also, not that its in a hot path or anything, but it might be nice to
-> consolodate this code such that you only lock and unlock r->flags once instead
-> of twice here.
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Neil Horman <nhorman@tuxdriver.com>
+CC: Matt Mackall <mpm@selenic.com>
+CC: linux-crypto@vger.kernel.org
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+---
+ drivers/char/random.c |   15 +++++++++++++++
+ 1 files changed, 15 insertions(+), 0 deletions(-)
 
-I thought about that, but figured it would be more trouble and possibly
-more code to execute than it was worth in the normal case. But I can spin
-up a v2 that tries to be a bit cleaner here.
-
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index b86eae9..6bdd57f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -437,6 +437,7 @@ struct entropy_store {
+ 	int entropy_count;
+ 	int entropy_total;
+ 	unsigned int initialized:1;
++	bool last_data_init;
+ 	__u8 last_data[EXTRACT_SIZE];
+ };
+ 
+@@ -957,6 +958,10 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+ 	ssize_t ret = 0, i;
+ 	__u8 tmp[EXTRACT_SIZE];
+ 
++	/* if last_data isn't primed, we need EXTRACT_SIZE extra bytes */
++	if (fips_enabled && !r->last_data_init)
++		nbytes += EXTRACT_SIZE;
++
+ 	trace_extract_entropy(r->name, nbytes, r->entropy_count, _RET_IP_);
+ 	xfer_secondary_pool(r, nbytes);
+ 	nbytes = account(r, nbytes, min, reserved);
+@@ -968,6 +973,15 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+ 			unsigned long flags;
+ 
+ 			spin_lock_irqsave(&r->lock, flags);
++
++			/* prime last_data value if need be, per fips 140-2 */
++			if (!r->last_data_init) {
++				memcpy(r->last_data, tmp, EXTRACT_SIZE);
++				r->last_data_init = true;
++				nbytes -= EXTRACT_SIZE;
++				extract_buf(r, tmp);
++			}
++
+ 			if (!memcmp(tmp, r->last_data, EXTRACT_SIZE))
+ 				panic("Hardware RNG duplicated output!\n");
+ 			memcpy(r->last_data, tmp, EXTRACT_SIZE);
+@@ -1086,6 +1100,7 @@ static void init_std_data(struct entropy_store *r)
+ 
+ 	r->entropy_count = 0;
+ 	r->entropy_total = 0;
++	r->last_data_init = false;
+ 	mix_pool_bytes(r, &now, sizeof(now), NULL);
+ 	for (i = r->poolinfo->POOLBYTES; i > 0; i -= sizeof(rv)) {
+ 		if (!arch_get_random_long(&rv))
 -- 
-Jarod Wilson
-jarod@redhat.com
+1.7.1
