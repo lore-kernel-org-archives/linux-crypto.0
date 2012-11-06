@@ -1,102 +1,58 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH v3] random: prime last_data value per fips requirements
-Date: Tue, 6 Nov 2012 11:12:46 -0500
-Message-ID: <20121106161246.GB2805@hmsreliant.think-freely.org>
-References: <1352216153-25359-1-git-send-email-jarod@redhat.com>
- <1352216562-25659-1-git-send-email-jarod@redhat.com>
+From: Nicolas Royer <nicolas@eukrea.com>
+Subject: [PATCH 1/5] ARM: AT91SAM9G45: fix crypto peripherals irq issue due to
+ sparse irq support.
+Date: Tue,  6 Nov 2012 17:31:03 +0100
+Message-ID: <1352219463-30360-1-git-send-email-nicolas@eukrea.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:48737 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751851Ab2KFQNi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2012 11:13:38 -0500
-Content-Disposition: inline
-In-Reply-To: <1352216562-25659-1-git-send-email-jarod@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: herbert@gondor.apana.org.au, nicolas.ferre@atmel.com,
+ stable@vger.kernel.org, linux-crypto@vger.kernel.org, eric@eukrea.com,
+ plagnioj@jcrosoft.com, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org, Nicolas Royer <nicolas@eukrea.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 06, 2012 at 10:42:42AM -0500, Jarod Wilson wrote:
-> The value stored in last_data must be primed for FIPS 140-2 purposes. Upon
-> first use, either on system startup or after an RNDCLEARPOOL ioctl, we
-> need to take an initial random sample, store it internally in last_data,
-> then pass along the value after that to the requester, so that consistency
-> checks aren't being run against stale and possibly known data.
-> 
-> v2: streamline code flow a bit, eliminating extra loop and spinlock in the
-> case where we need to prime, and account for the extra primer bits.
-> 
-> v3: extract_buf() can't be called with spinlock already held, so bring
-> back some extra lock/unlock calls.
-> 
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Neil Horman <nhorman@tuxdriver.com>
-> CC: Matt Mackall <mpm@selenic.com>
-> CC: linux-crypto@vger.kernel.org
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
-> ---
->  drivers/char/random.c |   17 +++++++++++++++++
->  1 files changed, 17 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index b86eae9..d0139df 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -437,6 +437,7 @@ struct entropy_store {
->  	int entropy_count;
->  	int entropy_total;
->  	unsigned int initialized:1;
-> +	bool last_data_init;
->  	__u8 last_data[EXTRACT_SIZE];
->  };
->  
-> @@ -957,6 +958,10 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
->  	ssize_t ret = 0, i;
->  	__u8 tmp[EXTRACT_SIZE];
->  
-> +	/* if last_data isn't primed, we need EXTRACT_SIZE extra bytes */
-> +	if (fips_enabled && !r->last_data_init)
-> +		nbytes += EXTRACT_SIZE;
-> +
->  	trace_extract_entropy(r->name, nbytes, r->entropy_count, _RET_IP_);
->  	xfer_secondary_pool(r, nbytes);
->  	nbytes = account(r, nbytes, min, reserved);
-> @@ -967,6 +972,17 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
->  		if (fips_enabled) {
->  			unsigned long flags;
->  
-> +
-> +			/* prime last_data value if need be, per fips 140-2 */
-> +			if (!r->last_data_init) {
-> +				spin_lock_irqsave(&r->lock, flags);
-> +				memcpy(r->last_data, tmp, EXTRACT_SIZE);
-> +				r->last_data_init = true;
-> +				nbytes -= EXTRACT_SIZE;
-> +				spin_unlock_irqrestore(&r->lock, flags);
-> +				extract_buf(r, tmp);
-> +			}
-> +
->  			spin_lock_irqsave(&r->lock, flags);
->  			if (!memcmp(tmp, r->last_data, EXTRACT_SIZE))
->  				panic("Hardware RNG duplicated output!\n");
-> @@ -1086,6 +1102,7 @@ static void init_std_data(struct entropy_store *r)
->  
->  	r->entropy_count = 0;
->  	r->entropy_total = 0;
-> +	r->last_data_init = false;
->  	mix_pool_bytes(r, &now, sizeof(now), NULL);
->  	for (i = r->poolinfo->POOLBYTES; i > 0; i -= sizeof(rv)) {
->  		if (!arch_get_random_long(&rv))
-> -- 
-> 1.7.1
-> 
-> 
-Thanks Jarod.
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
+U3BhcmUgaXJxIHN1cHBvcnQgaW50cm9kdWNlZCBieSBjb21taXQgIjhmZTgyYTUgQVJNOiBhdDkx
+OiBzcGFyc2UgaXJxIHN1cHBvcnQiCmludm9sdmVzIHRvIGFkZCB0aGUgTlJfSVJRU19MRUdBQ1kg
+b2Zmc2V0IHRvIGlycSBudW1iZXIuCgpTaWduZWQtb2ZmLWJ5OiBOaWNvbGFzIFJveWVyIDxuaWNv
+bGFzQGV1a3JlYS5jb20+CkFja2VkLWJ5OiBOaWNvbGFzIEZlcnJlIDxuaWNvbGFzLmZlcnJlQGF0
+bWVsLmNvbT4KQWNrZWQtYnk6IEVyaWMgQsOpbmFyZCA8ZXJpY0BldWtyZWEuY29tPgpUZXN0ZWQt
+Ynk6IEVyaWMgQsOpbmFyZCA8ZXJpY0BldWtyZWEuY29tPgpDYzogc3RhYmxlQHZnZXIua2VybmVs
+Lm9yZyAjIDMuNgotLS0KIGFyY2gvYXJtL21hY2gtYXQ5MS9hdDkxc2FtOWc0NV9kZXZpY2VzLmMg
+fCAgIDEyICsrKysrKy0tLS0tLQogMSBmaWxlcyBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDYg
+ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vbWFjaC1hdDkxL2F0OTFzYW05ZzQ1
+X2RldmljZXMuYyBiL2FyY2gvYXJtL21hY2gtYXQ5MS9hdDkxc2FtOWc0NV9kZXZpY2VzLmMKaW5k
+ZXggYjE1OTYwNy4uZmNkMjMzYyAxMDA2NDQKLS0tIGEvYXJjaC9hcm0vbWFjaC1hdDkxL2F0OTFz
+YW05ZzQ1X2RldmljZXMuYworKysgYi9hcmNoL2FybS9tYWNoLWF0OTEvYXQ5MXNhbTlnNDVfZGV2
+aWNlcy5jCkBAIC0xODQxLDggKzE4NDEsOCBAQCBzdGF0aWMgc3RydWN0IHJlc291cmNlIHNoYV9y
+ZXNvdXJjZXNbXSA9IHsKIAkJLmZsYWdzCT0gSU9SRVNPVVJDRV9NRU0sCiAJfSwKIAlbMV0gPSB7
+Ci0JCS5zdGFydAk9IEFUOTFTQU05RzQ1X0lEX0FFU1RERVNTSEEsCi0JCS5lbmQJPSBBVDkxU0FN
+OUc0NV9JRF9BRVNUREVTU0hBLAorCQkuc3RhcnQJPSBOUl9JUlFTX0xFR0FDWSArIEFUOTFTQU05
+RzQ1X0lEX0FFU1RERVNTSEEsCisJCS5lbmQJPSBOUl9JUlFTX0xFR0FDWSArIEFUOTFTQU05RzQ1
+X0lEX0FFU1RERVNTSEEsCiAJCS5mbGFncwk9IElPUkVTT1VSQ0VfSVJRLAogCX0sCiB9OwpAQCAt
+MTg3NCw4ICsxODc0LDggQEAgc3RhdGljIHN0cnVjdCByZXNvdXJjZSB0ZGVzX3Jlc291cmNlc1td
+ID0gewogCQkuZmxhZ3MJPSBJT1JFU09VUkNFX01FTSwKIAl9LAogCVsxXSA9IHsKLQkJLnN0YXJ0
+CT0gQVQ5MVNBTTlHNDVfSURfQUVTVERFU1NIQSwKLQkJLmVuZAk9IEFUOTFTQU05RzQ1X0lEX0FF
+U1RERVNTSEEsCisJCS5zdGFydAk9IE5SX0lSUVNfTEVHQUNZICsgQVQ5MVNBTTlHNDVfSURfQUVT
+VERFU1NIQSwKKwkJLmVuZAk9IE5SX0lSUVNfTEVHQUNZICsgQVQ5MVNBTTlHNDVfSURfQUVTVERF
+U1NIQSwKIAkJLmZsYWdzCT0gSU9SRVNPVVJDRV9JUlEsCiAJfSwKIH07CkBAIC0xOTEwLDggKzE5
+MTAsOCBAQCBzdGF0aWMgc3RydWN0IHJlc291cmNlIGFlc19yZXNvdXJjZXNbXSA9IHsKIAkJLmZs
+YWdzCT0gSU9SRVNPVVJDRV9NRU0sCiAJfSwKIAlbMV0gPSB7Ci0JCS5zdGFydAk9IEFUOTFTQU05
+RzQ1X0lEX0FFU1RERVNTSEEsCi0JCS5lbmQJPSBBVDkxU0FNOUc0NV9JRF9BRVNUREVTU0hBLAor
+CQkuc3RhcnQJPSBOUl9JUlFTX0xFR0FDWSArIEFUOTFTQU05RzQ1X0lEX0FFU1RERVNTSEEsCisJ
+CS5lbmQJPSBOUl9JUlFTX0xFR0FDWSArIEFUOTFTQU05RzQ1X0lEX0FFU1RERVNTSEEsCiAJCS5m
+bGFncwk9IElPUkVTT1VSQ0VfSVJRLAogCX0sCiB9OwotLSAKMS43LjYuNQoKCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
+bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
+dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
