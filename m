@@ -1,96 +1,62 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v3 0/7] crypto: omap-sham updates
-Date: Tue,  6 Nov 2012 19:57:06 -0700
-Message-ID: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH v3 4/7] ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
+Date: Tue,  6 Nov 2012 19:57:10 -0700
+Message-ID: <1352257033-32495-5-git-send-email-mgreer@animalcreek.com>
+References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net, dmitry.kasatkin@intel.com,
 	rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
 	khilman@deeprootsystems.com,
 	"Mark A. Greer" <mgreer@animalcreek.com>
 To: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail20.dotsterhost.com ([66.11.232.73]:34388 "EHLO
-	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752611Ab2KGC5b (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2012 21:57:31 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-Changes since v2:
-	- Reworked pm_runtime calls to match where original clk_*
-	  calls were so provide better PM (as per Kevin Hilman's
-	  comments).
+Remove the error message that prints when there is no SHA IP
+present to make it consistent with all the other IPs.
 
-Changes since v1:
-	- Removed the check of CM_IDLEST to see if the module exists
-	  and instead add the hwmod data for all omap2's and omap3 GP's.
-	- Placed new sha_ick clk entries after the 'omap-sham' entry
-	  in the clockxxx_data.c files
-	- Removed cpu_is_xxx() checks in
-	  arch/arm/mach-omap2/devices.c:omap_init_sham()
-	- Rebased on the latest k.o. kernel
+CC: Paul Walmsley <paul@pwsan.com>
+Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ arch/arm/mach-omap2/devices.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-
-This series updates the crypto omap-sham driver and supporting
-infrastructure.
-
-Notes:
-
-a) Based on v3.7-rc4
-
-b) Since these patches will likely go though the OMAP tree (and not
-   through the crypto tree), it would be nice if the crypto guy(s)
-   would ACK or NACK patches 5-7 which modify the
-   drivers/crypto/omap-sham.c driver.
-
-c) These have only been tested on an omap2420 h4 and an am37x evm.  If you
-   have different hardware available and a few minutes, please test them.
-   A quick and easy test is to enable tcrypt as a module
-   (CONFIG_CRYPTO_TEST=m), boot, then run 'modprobe tcrypt sec=2 mode=403'.
-   'CONFIG_CRYPTO_SHA1' and 'CONFIG_CRYPTO_DEV_OMAP_SHAM' also have to be
-   enabled.  A quick 'grep omap-sham /proc/interrupts' will tell you if
-   the omap-sham driver was really used.
-
-d) To test these patches, you will likely need...
-   i) The patch included here:
-	   http://marc.info/?l=kernel-janitors&m=134910841909057&w=2
-   ii) This patch from linux-omap/master:
-	   27615a9 (ARM: OMAP: Trivial driver changes to remove include
-			   plat/cpu.h)
-   iii) This patch from Paul Walmsley:
-	   http://www.spinics.net/lists/linux-omap/msg79436.html
-
-e) If you prefer, a version you can test is available at
-   git@github.com:mgreeraz/linux-mag.git wip/crypto/sham-v3+test
-
-f) There is a reduction in DMA performance after switching to dmaengine
-   (see http://www.spinics.net/lists/linux-omap/msg79855.html)
-
-g) Many thanks to Jon Hunter for testing on his omap2420 h4.
-
-Mark A. Greer (7):
-  ARM: OMAP2xxx: hwmod: Convert SHAM crypto device data to hwmod
-  ARM: OMAP2xxx: hwmod: Add DMA support for SHAM module
-  ARM: OMAP3xxx: hwmod: Convert SHAM crypto device data to hwmod
-  ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
-  crypto: omap-sham: Convert to use pm_runtime API
-  crypto: omap-sham: Add code to use dmaengine API
-  crypto: omap_sham: Remove usage of private DMA API
-
- arch/arm/mach-omap2/clock2430_data.c               |   1 +
- arch/arm/mach-omap2/clock3xxx_data.c               |   1 +
- arch/arm/mach-omap2/devices.c                      |  73 ++------
- arch/arm/mach-omap2/omap_hwmod_2420_data.c         |   1 +
- arch/arm/mach-omap2/omap_hwmod_2430_data.c         |   1 +
- .../mach-omap2/omap_hwmod_2xxx_interconnect_data.c |  18 ++
- arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c |  43 +++++
- arch/arm/mach-omap2/omap_hwmod_3xxx_data.c         |  60 +++++++
- arch/arm/mach-omap2/omap_hwmod_common_data.h       |   2 +
- drivers/crypto/omap-sham.c                         | 195 +++++++++++----------
- 10 files changed, 245 insertions(+), 150 deletions(-)
-
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index f38ac9d..f41c793 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -456,20 +456,15 @@ static void omap_init_rng(void)
+ 
+ static void __init omap_init_sham(void)
+ {
+-	if (cpu_is_omap24xx() || cpu_is_omap34xx()) {
+-		struct omap_hwmod *oh;
+-		struct platform_device *pdev;
++	struct omap_hwmod *oh;
++	struct platform_device *pdev;
+ 
+-		oh = omap_hwmod_lookup("sham");
+-		if (!oh)
+-			return;
++	oh = omap_hwmod_lookup("sham");
++	if (!oh)
++		return;
+ 
+-		pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL,
+-					 0, 0);
+-		WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
+-	} else {
+-		pr_err("%s: platform not supported\n", __func__);
+-	}
++	pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL, 0, 0);
++	WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
+ }
+ 
+ #if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
 -- 
 1.7.12
+
