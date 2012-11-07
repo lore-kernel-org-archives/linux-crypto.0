@@ -1,133 +1,102 @@
-From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v3 5/7] crypto: omap-sham: Convert to use pm_runtime API
-Date: Tue,  6 Nov 2012 19:57:11 -0700
-Message-ID: <1352257033-32495-6-git-send-email-mgreer@animalcreek.com>
-References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, dmitry.kasatkin@intel.com,
-	rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
-	khilman@deeprootsystems.com,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail20.dotsterhost.com ([66.11.232.73]:34605 "EHLO
-	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752906Ab2KGC5k (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Nov 2012 21:57:40 -0500
-In-Reply-To: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+Subject: Re: [PATCH 2/5] ARM: AT91SAM9G45: same platform data structure for
+ all crypto peripherals
+Date: Wed, 7 Nov 2012 16:26:15 +0100
+Message-ID: <20121107152615.GD4576@game.jcrosoft.org>
+References: <1352219544-30416-1-git-send-email-nicolas@eukrea.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: herbert@gondor.apana.org.au, nicolas.ferre@atmel.com,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, eric@eukrea.com,
+ davem@davemloft.net, linux-arm-kernel@lists.infradead.org
+To: Nicolas Royer <nicolas@eukrea.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1352219544-30416-1-git-send-email-nicolas@eukrea.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: "Mark A. Greer" <mgreer@animalcreek.com>
+On 17:32 Tue 06 Nov     , Nicolas Royer wrote:
+> Only AES use DMA in AT91SAM9G45 (TDES and SHA use PDC).
+> =
 
-Convert the omap-sham crypto driver to use the
-pm_runtime API instead of the clk API.
+> However latest Atmel TDES and SHA IP releases use DMA instead of PDC.
+>   --> Atmel TDES and SHA drivers need DMA platform data for those IP rele=
+ases.
+> =
 
-CC: Kevin Hilman <khilman@deeprootsystems.com>
-CC: Paul Walmsley <paul@pwsan.com>
-CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
----
- drivers/crypto/omap-sham.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
+> Goal of this patch is to use the same platform data structure for all Atm=
+el
+> crypto peripherals. This structure contains information about DMA interfa=
+ce.
+> =
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index a3fd6fc..85d43b2 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -22,12 +22,12 @@
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/kernel.h>
--#include <linux/clk.h>
- #include <linux/irq.h>
- #include <linux/io.h>
- #include <linux/platform_device.h>
- #include <linux/scatterlist.h>
- #include <linux/dma-mapping.h>
-+#include <linux/pm_runtime.h>
- #include <linux/delay.h>
- #include <linux/crypto.h>
- #include <linux/cryptohash.h>
-@@ -141,7 +141,6 @@ struct omap_sham_dev {
- 	struct device		*dev;
- 	void __iomem		*io_base;
- 	int			irq;
--	struct clk		*iclk;
- 	spinlock_t		lock;
- 	int			err;
- 	int			dma;
-@@ -238,7 +237,7 @@ static void omap_sham_copy_ready_hash(struct ahash_request *req)
- 
- static int omap_sham_hw_init(struct omap_sham_dev *dd)
- {
--	clk_enable(dd->iclk);
-+	pm_runtime_get_sync(dd->dev);
- 
- 	if (!test_bit(FLAGS_INIT, &dd->flags)) {
- 		omap_sham_write_mask(dd, SHA_REG_MASK,
-@@ -653,7 +652,8 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
- 	/* atomic operation is not needed here */
- 	dd->flags &= ~(BIT(FLAGS_BUSY) | BIT(FLAGS_FINAL) | BIT(FLAGS_CPU) |
- 			BIT(FLAGS_DMA_READY) | BIT(FLAGS_OUTPUT_READY));
--	clk_disable(dd->iclk);
-+
-+	pm_runtime_put_sync(dd->dev);
- 
- 	if (req->base.complete)
- 		req->base.complete(&req->base, err);
-@@ -1198,14 +1198,6 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- 	if (err)
- 		goto dma_err;
- 
--	/* Initializing the clock */
--	dd->iclk = clk_get(dev, "ick");
--	if (IS_ERR(dd->iclk)) {
--		dev_err(dev, "clock intialization failed.\n");
--		err = PTR_ERR(dd->iclk);
--		goto clk_err;
--	}
--
- 	dd->io_base = ioremap(dd->phys_base, SZ_4K);
- 	if (!dd->io_base) {
- 		dev_err(dev, "can't ioremap\n");
-@@ -1213,11 +1205,14 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- 		goto io_err;
- 	}
- 
--	clk_enable(dd->iclk);
-+	pm_runtime_enable(dev);
-+	pm_runtime_get_sync(dev);
-+
- 	dev_info(dev, "hw accel on OMAP rev %u.%u\n",
- 		(omap_sham_read(dd, SHA_REG_REV) & SHA_REG_REV_MAJOR) >> 4,
- 		omap_sham_read(dd, SHA_REG_REV) & SHA_REG_REV_MINOR);
--	clk_disable(dd->iclk);
-+
-+	pm_runtime_put_sync(&pdev->dev);
- 
- 	spin_lock(&sham.lock);
- 	list_add_tail(&dd->list, &sham.dev_list);
-@@ -1235,9 +1230,8 @@ err_algs:
- 	for (j = 0; j < i; j++)
- 		crypto_unregister_ahash(&algs[j]);
- 	iounmap(dd->io_base);
-+	pm_runtime_disable(dev);
- io_err:
--	clk_put(dd->iclk);
--clk_err:
- 	omap_sham_dma_cleanup(dd);
- dma_err:
- 	if (dd->irq >= 0)
-@@ -1266,7 +1260,7 @@ static int __devexit omap_sham_remove(struct platform_device *pdev)
- 		crypto_unregister_ahash(&algs[i]);
- 	tasklet_kill(&dd->done_task);
- 	iounmap(dd->io_base);
--	clk_put(dd->iclk);
-+	pm_runtime_disable(&pdev->dev);
- 	omap_sham_dma_cleanup(dd);
- 	if (dd->irq >= 0)
- 		free_irq(dd->irq, dd);
--- 
-1.7.12
+> Signed-off-by: Nicolas Royer <nicolas@eukrea.com>
+> Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+> Acked-by: Eric B=E9nard <eric@eukrea.com>
+> Tested-by: Eric B=E9nard <eric@eukrea.com>
+> ---
+>  arch/arm/mach-at91/at91sam9g45_devices.c   |    8 ++++----
+>  include/linux/platform_data/atmel-aes.h    |   22 ----------------------
+>  include/linux/platform_data/crypto-atmel.h |   22 ++++++++++++++++++++++
+>  3 files changed, 26 insertions(+), 26 deletions(-)
+>  delete mode 100644 include/linux/platform_data/atmel-aes.h
+>  create mode 100644 include/linux/platform_data/crypto-atmel.h
+> =
+
+> diff --git a/arch/arm/mach-at91/at91sam9g45_devices.c b/arch/arm/mach-at9=
+1/at91sam9g45_devices.c
+> index fcd233c..a48dcb4 100644
+> --- a/arch/arm/mach-at91/at91sam9g45_devices.c
+> +++ b/arch/arm/mach-at91/at91sam9g45_devices.c
+> @@ -18,7 +18,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/i2c-gpio.h>
+>  #include <linux/atmel-mci.h>
+> -#include <linux/platform_data/atmel-aes.h>
+> +#include <linux/platform_data/crypto-atmel.h>
+>  =
+
+>  #include <linux/platform_data/at91_adc.h>
+>  =
+
+> @@ -1900,7 +1900,7 @@ static void __init at91_add_device_tdes(void) {}
+>   * -------------------------------------------------------------------- =
+*/
+>  =
+
+>  #if defined(CONFIG_CRYPTO_DEV_ATMEL_AES) || defined(CONFIG_CRYPTO_DEV_AT=
+MEL_AES_MODULE)
+> -static struct aes_platform_data aes_data;
+> +static struct crypto_platform_data aes_data;
+>  static u64 aes_dmamask =3D DMA_BIT_MASK(32);
+>  =
+
+>  static struct resource aes_resources[] =3D {
+> @@ -1931,9 +1931,9 @@ static struct platform_device at91sam9g45_aes_devic=
+e =3D {
+>  static void __init at91_add_device_aes(void)
+>  {
+>  	struct at_dma_slave	*atslave;
+> -	struct aes_dma_data	*alt_atslave;
+> +	struct crypto_dma_data	*alt_atslave;
+>  =
+
+> -	alt_atslave =3D kzalloc(sizeof(struct aes_dma_data), GFP_KERNEL);
+> +	alt_atslave =3D kzalloc(sizeof(struct crypto_dma_data), GFP_KERNEL);
+we do not check the result of kzalloc ouch
+
+and why we allocate it?
+
+Best Regards,
+J.
+J.
