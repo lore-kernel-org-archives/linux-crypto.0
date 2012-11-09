@@ -1,55 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.7
-Date: Fri, 9 Nov 2012 17:30:05 +0800
-Message-ID: <20121109093005.GA25632@gondor.apana.org.au>
-References: <20100716022648.GA28219@gondor.apana.org.au>
- <20100722055043.GA25689@gondor.apana.org.au>
- <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: tegra-aes - fix error-valued pointer
+ dereference
+Date: Fri, 9 Nov 2012 17:34:18 +0800
+Message-ID: <20121109093418.GA25720@gondor.apana.org.au>
+References: <CAPgLHd8CSEYpdGHfmwOjbH4EPszYjB01mvGMczmbMmJss_L2XA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: davem@davemloft.net, grant.likely@secretlab.ca,
+	rob.herring@calxeda.com, yongjun_wei@trendmicro.com.cn,
+	linux-crypto@vger.kernel.org, devicetree-discuss@lists.ozlabs.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:47282 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:35590 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750976Ab2KIJaN (ORCPT
+	with ESMTP id S1750976Ab2KIJee (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Nov 2012 04:30:13 -0500
+	Fri, 9 Nov 2012 04:34:34 -0500
 Content-Disposition: inline
-In-Reply-To: <20120823083242.GA23102@gondor.apana.org.au>
+In-Reply-To: <CAPgLHd8CSEYpdGHfmwOjbH4EPszYjB01mvGMczmbMmJss_L2XA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Oct 25, 2012 at 10:55:04PM +0800, Wei Yongjun wrote:
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+> 
+> clk_put(dd->aes_clk) will dereference an error-valued pointer since the
+> dd->aes_clk is a ERR_PTR() value. The correct check is call clk_put()
+> if !IS_ERR(dd->aes_clk).
+> 
+> dpatch engine is used to auto generate this patch.
+> (https://github.com/weiyj/dpatch)
+> 
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-This push fixes a potential panic in cryptd which may occur with
-crypto drivers such as aesni-intel.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Jussi Kivilinna (1):
-      crypto: cryptd - disable softirqs in cryptd_queue_worker to prevent data corruption
-
- crypto/cryptd.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
