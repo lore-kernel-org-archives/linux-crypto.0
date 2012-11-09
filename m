@@ -1,31 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/omap aes: select BLKCIPHER2
-Date: Fri, 9 Nov 2012 17:35:02 +0800
-Message-ID: <20121109093502.GC25720@gondor.apana.org.au>
-References: <1351710517-9516-1-git-send-email-bigeasy@linutronix.de>
+Subject: Re: [PATCH] crypto: picoxcell: Add terminating entry for
+ platform_device_id table
+Date: Fri, 9 Nov 2012 17:35:16 +0800
+Message-ID: <20121109093516.GD25720@gondor.apana.org.au>
+References: <1352043385.11324.4.camel@phoenix>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jamie Iles <jamie@jamieiles.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Axel Lin <axel.lin@ingics.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:52174 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:39007 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750976Ab2KIJfG (ORCPT
+	with ESMTP id S1750976Ab2KIJfX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Nov 2012 04:35:06 -0500
+	Fri, 9 Nov 2012 04:35:23 -0500
 Content-Disposition: inline
-In-Reply-To: <1351710517-9516-1-git-send-email-bigeasy@linutronix.de>
+In-Reply-To: <1352043385.11324.4.camel@phoenix>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 31, 2012 at 08:08:37PM +0100, Sebastian Andrzej Siewior wrote:
-> without it:
-> |drivers/built-in.o:(.data+0x14588): undefined reference to `crypto_ablkcipher_type'
-> |drivers/built-in.o:(.data+0x14668): undefined reference to `crypto_ablkcipher_type'
+On Sun, Nov 04, 2012 at 11:36:25PM +0800, Axel Lin wrote:
+> The platform_device_id table is supposed to be zero-terminated.
 > 
-> Not sure when this broke.
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Axel Lin <axel.lin@ingics.com>
 
 Patch applied.  Thanks!
 -- 
