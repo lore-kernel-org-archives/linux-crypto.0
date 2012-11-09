@@ -1,10 +1,9 @@
 From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH v3 3/7] ARM: OMAP3xxx: hwmod: Convert SHAM crypto device
- data to hwmod
-Date: Fri, 9 Nov 2012 18:11:48 +0200
-Message-ID: <CALLzPKZO9Uotd_D4yfJLDDm38oDPw1dPy2jZ_9PvwoLYCxEtcg@mail.gmail.com>
+Subject: Re: [PATCH v3 7/7] crypto: omap_sham: Remove usage of private DMA API
+Date: Fri, 9 Nov 2012 18:28:16 +0200
+Message-ID: <CALLzPKY9fRSwgSTw-t9-wRbCHVbKPA=m+RsTWW4=CaxtDCczcQ@mail.gmail.com>
 References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
-	<1352257033-32495-4-git-send-email-mgreer@animalcreek.com>
+	<1352257033-32495-8-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -12,196 +11,313 @@ Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	davem@davemloft.net, rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
 	khilman@deeprootsystems.com
 To: "Mark A. Greer" <mgreer@animalcreek.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:21536 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751565Ab2KIQLz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Nov 2012 11:11:55 -0500
-Received: by mail-qa0-f70.google.com with SMTP id s11so1490584qaa.1
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Nov 2012 08:11:49 -0800 (PST)
-In-Reply-To: <1352257033-32495-4-git-send-email-mgreer@animalcreek.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1352257033-32495-8-git-send-email-mgreer@animalcreek.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 On Wed, Nov 7, 2012 at 4:57 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
 > From: "Mark A. Greer" <mgreer@animalcreek.com>
 >
-> Convert the device data for the OMAP3 SHAM2 (SHA1/MD5) crypto IP
-> from explicit platform_data to hwmod.
+> Remove usage of the private OMAP DMA API.
+> The dmaengine API will be used instead.
 >
-> CC: Paul Walmsley <paul@pwsan.com>
+> CC: Russell King <rmk+kernel@arm.linux.org.uk>
+> CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 > Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 > ---
->  arch/arm/mach-omap2/clock3xxx_data.c       |  1 +
->  arch/arm/mach-omap2/devices.c              | 42 ++-------------------
->  arch/arm/mach-omap2/omap_hwmod_3xxx_data.c | 60 ++++++++++++++++++++++++++++++
->  3 files changed, 64 insertions(+), 39 deletions(-)
+>  drivers/crypto/omap-sham.c | 117 ---------------------------------------------
+>  1 file changed, 117 deletions(-)
 >
-> diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
-> index 1f42c9d..6f14d9b 100644
-> --- a/arch/arm/mach-omap2/clock3xxx_data.c
-> +++ b/arch/arm/mach-omap2/clock3xxx_data.c
-> @@ -3342,6 +3342,7 @@ static struct omap_clk omap3xxx_clks[] = {
->         CLK(NULL,       "icr_ick",      &icr_ick,       CK_34XX | CK_36XX),
->         CLK("omap-aes", "ick",  &aes2_ick,      CK_34XX | CK_36XX),
->         CLK("omap-sham",        "ick",  &sha12_ick,     CK_34XX | CK_36XX),
-> +       CLK(NULL,       "sha12_ick",    &sha12_ick,     CK_34XX | CK_36XX),
->         CLK(NULL,       "des2_ick",     &des2_ick,      CK_34XX | CK_36XX),
->         CLK("omap_hsmmc.1",     "ick",  &mmchs2_ick,    CK_3XXX),
->         CLK("omap_hsmmc.0",     "ick",  &mmchs1_ick,    CK_3XXX),
-> diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
-> index f18fa50..f38ac9d 100644
-> --- a/arch/arm/mach-omap2/devices.c
-> +++ b/arch/arm/mach-omap2/devices.c
-> @@ -36,6 +36,7 @@
->  #include "devices.h"
->  #include "cm2xxx_3xxx.h"
->  #include "cm-regbits-24xx.h"
-> +#include "cm-regbits-34xx.h"
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index b57277c..ebb5255 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -13,8 +13,6 @@
+>   * Some ideas are from old omap-sha1-md5.c driver.
+>   */
 >
->  #define L3_MODULES_MAX_LEN 12
->  #define L3_MODULES 3
-> @@ -453,38 +454,9 @@ static void omap_init_rng(void)
->         WARN(IS_ERR(pdev), "Can't build omap_device for omap_rng\n");
->  }
->
-> -#if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
+> -#define OMAP_SHAM_DMA_PRIVATE
 > -
-> -#ifdef CONFIG_ARCH_OMAP3
-> -static struct resource omap3_sham_resources[] = {
-> -       {
-> -               .start  = OMAP34XX_SEC_SHA1MD5_BASE,
-> -               .end    = OMAP34XX_SEC_SHA1MD5_BASE + 0x64,
-> -               .flags  = IORESOURCE_MEM,
-> -       },
-> -       {
-> -               .start  = 49 + OMAP_INTC_START,
-> -               .flags  = IORESOURCE_IRQ,
-> -       },
-> -       {
-> -               .start  = OMAP34XX_DMA_SHA1MD5_RX,
-> -               .flags  = IORESOURCE_DMA,
-> -       }
-> -};
-
-Ok... it is also for OMAP3..
-
-> -static int omap3_sham_resources_sz = ARRAY_SIZE(omap3_sham_resources);
-> -#else
-> -#define omap3_sham_resources           NULL
-> -#define omap3_sham_resources_sz                0
+>  #define pr_fmt(fmt) "%s: " fmt, __func__
+>
+>  #include <linux/err.h>
+> @@ -29,10 +27,8 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/dma-mapping.h>
+> -#ifndef OMAP_SHAM_DMA_PRIVATE
+>  #include <linux/dmaengine.h>
+>  #include <linux/omap-dma.h>
+> -#endif
+>  #include <linux/pm_runtime.h>
+>  #include <linux/delay.h>
+>  #include <linux/crypto.h>
+> @@ -43,12 +39,6 @@
+>  #include <crypto/hash.h>
+>  #include <crypto/internal/hash.h>
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -#include <plat/cpu.h>
+> -#include <plat/dma.h>
+> -#include <mach/irqs.h>
 > -#endif
 > -
-> -static struct platform_device sham_device = {
-> -       .name           = "omap-sham",
-> -       .id             = -1,
-> -};
-> -
-> -static void omap_init_sham(void)
-> +static void __init omap_init_sham(void)
+>  #define SHA_REG_DIGEST(x)              (0x00 + ((x) * 0x04))
+>  #define SHA_REG_DIN(x)                 (0x1C + ((x) * 0x04))
+>
+> @@ -120,9 +110,7 @@ struct omap_sham_reqctx {
+>
+>         /* walk state */
+>         struct scatterlist      *sg;
+> -#ifndef OMAP_SHAM_DMA_PRIVATE
+>         struct scatterlist      sgl;
+> -#endif
+>         unsigned int            offset; /* offset in current sg */
+>         unsigned int            total;  /* total request */
+>
+> @@ -156,12 +144,7 @@ struct omap_sham_dev {
+>         int                     irq;
+>         spinlock_t              lock;
+>         int                     err;
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       int                     dma;
+> -       int                     dma_lch;
+> -#else
+>         struct dma_chan         *dma_lch;
+> -#endif
+>         struct tasklet_struct   done_task;
+>
+>         unsigned long           flags;
+> @@ -331,7 +314,6 @@ static int omap_sham_xmit_cpu(struct omap_sham_dev *dd, const u8 *buf,
+>         return -EINPROGRESS;
+>  }
+>
+> -#ifndef OMAP_SHAM_DMA_PRIVATE
+>  static void omap_sham_dma_callback(void *param)
 >  {
-> -       if (cpu_is_omap24xx()) {
-> +       if (cpu_is_omap24xx() || cpu_is_omap34xx()) {
->                 struct omap_hwmod *oh;
->                 struct platform_device *pdev;
->
-> @@ -495,18 +467,10 @@ static void omap_init_sham(void)
->                 pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL,
->                                          0, 0);
->                 WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
-> -       } else if (cpu_is_omap34xx()) {
-> -               sham_device.resource = omap3_sham_resources;
-> -               sham_device.num_resources = omap3_sham_resources_sz;
-> -               platform_device_register(&sham_device);
->         } else {
->                 pr_err("%s: platform not supported\n", __func__);
-> -               return;
->         }
+>         struct omap_sham_dev *dd = param;
+> @@ -339,34 +321,18 @@ static void omap_sham_dma_callback(void *param)
+>         set_bit(FLAGS_DMA_READY, &dd->flags);
+>         tasklet_schedule(&dd->done_task);
 >  }
-> -#else
-> -static inline void omap_init_sham(void) { }
 > -#endif
 >
->  #if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
+>  static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+>                               size_t length, int final, int is_sg)
+>  {
+>         struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       int len32;
+> -#else
+>         struct dma_async_tx_descriptor *tx;
+>         struct dma_slave_config cfg;
+>         int ret;
+> -#endif
 >
-> diff --git a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
-> index f67b7ee..785a0c5 100644
-> --- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
-> +++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
-> @@ -3543,6 +3543,65 @@ static struct omap_hwmod_ocp_if omap3xxx_l3_main__gpmc = {
->         .user           = OCP_USER_MPU | OCP_USER_SDMA,
->  };
+>         dev_dbg(dd->dev, "xmit_dma: digcnt: %d, length: %d, final: %d\n",
+>                                                 ctx->digcnt, length, final);
 >
-> +/* l4_core -> SHAM2 (SHA1/MD5) (similar to omap24xx) */
-> +static struct omap_hwmod_class_sysconfig omap3_sham_sysc = {
-> +       .rev_offs       = 0x5c,
-> +       .sysc_offs      = 0x60,
-> +       .syss_offs      = 0x64,
-> +       .sysc_flags     = (SYSC_HAS_SOFTRESET | SYSC_HAS_AUTOIDLE |
-> +                          SYSS_HAS_RESET_STATUS),
-> +       .sysc_fields    = &omap_hwmod_sysc_type1,
-> +};
-> +
-> +static struct omap_hwmod_class omap3xxx_sham_class = {
-> +       .name   = "sham",
-> +       .sysc   = &omap3_sham_sysc,
-> +};
-> +
-> +struct omap_hwmod_irq_info omap3_sham_mpu_irqs[] = {
-> +       { .irq = 49 + OMAP_INTC_START, },
-> +       { .irq = -1 }
-> +};
-> +
-> +struct omap_hwmod_dma_info omap3_sham_sdma_reqs[] = {
-> +       { .name = "rx", .dma_req = OMAP34XX_DMA_SHA1MD5_RX, },
-> +       { .dma_req = -1 }
-> +};
-> +
-> +struct omap_hwmod omap3xxx_sham_hwmod = {
-> +       .name           = "sham",
-> +       .mpu_irqs       = omap3_sham_mpu_irqs,
-> +       .sdma_reqs      = omap3_sham_sdma_reqs,
-> +       .main_clk       = "sha12_ick",
-> +       .prcm           = {
-> +               .omap2 = {
-> +                       .module_offs = CORE_MOD,
-> +                       .prcm_reg_id = 1,
-> +                       .module_bit = OMAP3430_EN_SHA12_SHIFT,
-> +                       .idlest_reg_id = 1,
-> +                       .idlest_idle_bit = OMAP3430_ST_SHA12_SHIFT,
-> +               },
-> +       },
-> +       .class          = &omap3xxx_sham_class,
-> +};
-> +
-> +static struct omap_hwmod_addr_space omap3xxx_sham_addrs[] = {
-> +       {
-> +               .pa_start       = 0x480c3000,
-> +               .pa_end         = 0x480c3000 + 0x64 - 1,
-> +               .flags          = ADDR_TYPE_RT
-> +       },
-> +       { }
-> +};
-> +
-> +static struct omap_hwmod_ocp_if omap3xxx_l4_core__sham = {
-> +       .master         = &omap3xxx_l4_core_hwmod,
-> +       .slave          = &omap3xxx_sham_hwmod,
-> +       .clk            = "sha12_ick",
-> +       .addr           = omap3xxx_sham_addrs,
-> +       .user           = OCP_USER_MPU | OCP_USER_SDMA,
-> +};
-> +
->  static struct omap_hwmod_ocp_if *omap3xxx_hwmod_ocp_ifs[] __initdata = {
->         &omap3xxx_l3_main__l4_core,
->         &omap3xxx_l3_main__l4_per,
-> @@ -3596,6 +3655,7 @@ static struct omap_hwmod_ocp_if *omap3xxx_hwmod_ocp_ifs[] __initdata = {
->  /* GP-only hwmod links */
->  static struct omap_hwmod_ocp_if *omap3xxx_gp_hwmod_ocp_ifs[] __initdata = {
->         &omap3xxx_l4_sec__timer12,
-> +       &omap3xxx_l4_core__sham,
->         NULL
->  };
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       len32 = DIV_ROUND_UP(length, sizeof(u32));
+> -
+> -       omap_set_dma_transfer_params(dd->dma_lch, OMAP_DMA_DATA_TYPE_S32, len32,
+> -                       1, OMAP_DMA_SYNC_PACKET, dd->dma,
+> -                               OMAP_DMA_DST_SYNC_PREFETCH);
+> -
+> -       omap_set_dma_src_params(dd->dma_lch, 0, OMAP_DMA_AMODE_POST_INC,
+> -                               dma_addr, 0, 0);
+> -
+> -#else
+>         memset(&cfg, 0, sizeof(cfg));
 >
+>         cfg.dst_addr = dd->phys_base + SHA_REG_DIN(0);
+> @@ -406,7 +372,6 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+>
+>         tx->callback = omap_sham_dma_callback;
+>         tx->callback_param = dd;
+> -#endif
+>
+>         omap_sham_write_ctrl(dd, length, final, 1);
+>
+> @@ -417,12 +382,8 @@ static int omap_sham_xmit_dma(struct omap_sham_dev *dd, dma_addr_t dma_addr,
+>
+>         set_bit(FLAGS_DMA_ACTIVE, &dd->flags);
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       omap_start_dma(dd->dma_lch);
+> -#else
+>         dmaengine_submit(tx);
+>         dma_async_issue_pending(dd->dma_lch);
+> -#endif
+>
+>         return -EINPROGRESS;
+>  }
+> @@ -528,7 +489,6 @@ static int omap_sham_update_dma_start(struct omap_sham_dev *dd)
+>         if (ctx->bufcnt || ctx->offset)
+>                 return omap_sham_update_dma_slow(dd);
+>
+> -#ifndef OMAP_SHAM_DMA_PRIVATE
+>         /*
+>          * Don't use the sg interface when the transfer size is less
+>          * than the number of elements in a DMA frame.  Otherwise,
+> @@ -537,7 +497,6 @@ static int omap_sham_update_dma_start(struct omap_sham_dev *dd)
+>          */
+>         if (ctx->total < (DST_MAXBURST * sizeof(u32)))
+>                 return omap_sham_update_dma_slow(dd);
+> -#endif
+>
+>         dev_dbg(dd->dev, "fast: digcnt: %d, bufcnt: %u, total: %u\n",
+>                         ctx->digcnt, ctx->bufcnt, ctx->total);
+> @@ -599,11 +558,7 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+>  {
+>         struct omap_sham_reqctx *ctx = ahash_request_ctx(dd->req);
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       omap_stop_dma(dd->dma_lch);
+> -#else
+>         dmaengine_terminate_all(dd->dma_lch);
+> -#endif
+>
+>         if (ctx->flags & BIT(FLAGS_SG)) {
+>                 dma_unmap_sg(dd->dev, ctx->sg, 1, DMA_TO_DEVICE);
+> @@ -807,18 +762,6 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+>         if (err)
+>                 goto err1;
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       omap_set_dma_dest_params(dd->dma_lch, 0,
+> -                       OMAP_DMA_AMODE_CONSTANT,
+> -                       dd->phys_base + SHA_REG_DIN(0), 0, 16);
+> -
+> -       omap_set_dma_dest_burst_mode(dd->dma_lch,
+> -                       OMAP_DMA_DATA_BURST_16);
+> -
+> -       omap_set_dma_src_burst_mode(dd->dma_lch,
+> -                       OMAP_DMA_DATA_BURST_4);
+
+Burst mode significantly improves performance.
+How do you configure burst mode with new API?
+
+- Dmitry
+
+> -#endif
+> -
+>         if (ctx->digcnt)
+>                 /* request has changed - restore hash */
+>                 omap_sham_copy_hash(req, 0);
+> @@ -1209,55 +1152,13 @@ static irqreturn_t omap_sham_irq(int irq, void *dev_id)
+>         return IRQ_HANDLED;
+>  }
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -static void omap_sham_dma_callback(int lch, u16 ch_status, void *data)
+> -{
+> -       struct omap_sham_dev *dd = data;
+> -
+> -       if (ch_status != OMAP_DMA_BLOCK_IRQ) {
+> -               pr_err("omap-sham DMA error status: 0x%hx\n", ch_status);
+> -               dd->err = -EIO;
+> -               clear_bit(FLAGS_INIT, &dd->flags);/* request to re-initialize */
+> -       }
+> -
+> -       set_bit(FLAGS_DMA_READY, &dd->flags);
+> -       tasklet_schedule(&dd->done_task);
+> -}
+> -
+> -static int omap_sham_dma_init(struct omap_sham_dev *dd)
+> -{
+> -       int err;
+> -
+> -       dd->dma_lch = -1;
+> -
+> -       err = omap_request_dma(dd->dma, dev_name(dd->dev),
+> -                       omap_sham_dma_callback, dd, &dd->dma_lch);
+> -       if (err) {
+> -               dev_err(dd->dev, "Unable to request DMA channel\n");
+> -               return err;
+> -       }
+> -
+> -       return 0;
+> -}
+> -
+> -static void omap_sham_dma_cleanup(struct omap_sham_dev *dd)
+> -{
+> -       if (dd->dma_lch >= 0) {
+> -               omap_free_dma(dd->dma_lch);
+> -               dd->dma_lch = -1;
+> -       }
+> -}
+> -#endif
+> -
+>  static int __devinit omap_sham_probe(struct platform_device *pdev)
+>  {
+>         struct omap_sham_dev *dd;
+>         struct device *dev = &pdev->dev;
+>         struct resource *res;
+> -#ifndef OMAP_SHAM_DMA_PRIVATE
+>         dma_cap_mask_t mask;
+>         unsigned dma_chan;
+> -#endif
+>         int err, i, j;
+>
+>         dd = kzalloc(sizeof(struct omap_sham_dev), GFP_KERNEL);
+> @@ -1292,11 +1193,7 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
+>                 err = -ENODEV;
+>                 goto res_err;
+>         }
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       dd->dma = res->start;
+> -#else
+>         dma_chan = res->start;
+> -#endif
+>
+>         /* Get the IRQ */
+>         dd->irq = platform_get_irq(pdev,  0);
+> @@ -1313,11 +1210,6 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
+>                 goto res_err;
+>         }
+>
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       err = omap_sham_dma_init(dd);
+> -       if (err)
+> -               goto dma_err;
+> -#else
+>         dma_cap_zero(mask);
+>         dma_cap_set(DMA_SLAVE, mask);
+>
+> @@ -1328,7 +1220,6 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
+>                 err = -ENXIO;
+>                 goto dma_err;
+>         }
+> -#endif
+>
+>         dd->io_base = ioremap(dd->phys_base, SZ_4K);
+>         if (!dd->io_base) {
+> @@ -1364,11 +1255,7 @@ err_algs:
+>         iounmap(dd->io_base);
+>         pm_runtime_disable(dev);
+>  io_err:
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       omap_sham_dma_cleanup(dd);
+> -#else
+>         dma_release_channel(dd->dma_lch);
+> -#endif
+>  dma_err:
+>         if (dd->irq >= 0)
+>                 free_irq(dd->irq, dd);
+> @@ -1397,11 +1284,7 @@ static int __devexit omap_sham_remove(struct platform_device *pdev)
+>         tasklet_kill(&dd->done_task);
+>         iounmap(dd->io_base);
+>         pm_runtime_disable(&pdev->dev);
+> -#ifdef OMAP_SHAM_DMA_PRIVATE
+> -       omap_sham_dma_cleanup(dd);
+> -#else
+>         dma_release_channel(dd->dma_lch);
+> -#endif
+>         if (dd->irq >= 0)
+>                 free_irq(dd->irq, dd);
+>         kfree(dd);
 > --
 > 1.7.12
 >
