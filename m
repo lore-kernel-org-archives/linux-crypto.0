@@ -1,43 +1,51 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v3] random: prime last_data value per fips requirements
-Date: Thu, 8 Nov 2012 07:20:01 -0500
-Message-ID: <20121108122001.GC5859@thunk.org>
-References: <1352216153-25359-1-git-send-email-jarod@redhat.com>
- <1352216562-25659-1-git-send-email-jarod@redhat.com>
+From: Shan Wei <shanwei88@gmail.com>
+Subject: [PATCH v3 5/9] kernel: padata : use __this_cpu_read per-cpu helper
+Date: Fri, 09 Nov 2012 10:21:20 +0800
+Message-ID: <509C68A0.1070004@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Neil Horman <nhorman@tuxdriver.com>,
-	Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: steffen.klassert@secunet.com,
+	Kernel-Maillist <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, cl@linux-foundation.org,
+	Shan Wei <shanwei88@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1352216562-25659-1-git-send-email-jarod@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 06, 2012 at 10:42:42AM -0500, Jarod Wilson wrote:
-> The value stored in last_data must be primed for FIPS 140-2 purposes. Upon
-> first use, either on system startup or after an RNDCLEARPOOL ioctl, we
-> need to take an initial random sample, store it internally in last_data,
-> then pass along the value after that to the requester, so that consistency
-> checks aren't being run against stale and possibly known data.
-> 
-> v2: streamline code flow a bit, eliminating extra loop and spinlock in the
-> case where we need to prime, and account for the extra primer bits.
-> 
-> v3: extract_buf() can't be called with spinlock already held, so bring
-> back some extra lock/unlock calls.
-> 
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Neil Horman <nhorman@tuxdriver.com>
-> CC: Matt Mackall <mpm@selenic.com>
-> CC: linux-crypto@vger.kernel.org
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+From: Shan Wei <davidshan@tencent.com>
 
-Thanks, applied to the /dev/random git tree.
+For bottom halves off, __this_cpu_read is better.
 
-						- Ted
+Signed-off-by: Shan Wei <davidshan@tencent.com>
+---
+v3: use __this_cpu_read instead of this_cpu_read.
+---
+ kernel/padata.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 89fe3d1..072f4ee 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -171,7 +171,7 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ {
+ 	int cpu, num_cpus;
+ 	unsigned int next_nr, next_index;
+-	struct padata_parallel_queue *queue, *next_queue;
++	struct padata_parallel_queue *next_queue;
+ 	struct padata_priv *padata;
+ 	struct padata_list *reorder;
+ 
+@@ -204,8 +204,7 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 		goto out;
+ 	}
+ 
+-	queue = per_cpu_ptr(pd->pqueue, smp_processor_id());
+-	if (queue->cpu_index == next_queue->cpu_index) {
++	if (__this_cpu_read(pd->pqueue->cpu_index) == next_queue->cpu_index) {
+ 		padata = ERR_PTR(-ENODATA);
+ 		goto out;
+ 	}
+-- 
+1.7.1
