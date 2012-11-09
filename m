@@ -1,48 +1,74 @@
-From: Paul Walmsley <paul@pwsan.com>
-Subject: Re: [PATCH v3 1/7] ARM: OMAP2xxx: hwmod: Convert SHAM crypto device
- data to hwmod
-Date: Fri, 9 Nov 2012 17:11:51 +0000 (UTC)
-Message-ID: <alpine.DEB.2.00.1211091709000.20703@utopia.booyaka.com>
-References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com> <1352257033-32495-2-git-send-email-mgreer@animalcreek.com> <CALLzPKY7TCFe0yvpwJFNf8U2=h4k1Jcb8g9Q0UpGM8qv2FcSwg@mail.gmail.com> <20121109170703.GA13898@animalcreek.com>
+From: "Mark A. Greer" <mgreer@animalcreek.com>
+Subject: Re: [PATCH v3 7/7] crypto: omap_sham: Remove usage of private DMA
+ API
+Date: Fri, 9 Nov 2012 10:17:45 -0700
+Message-ID: <20121109171745.GB13898@animalcreek.com>
+References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
+ <1352257033-32495-8-git-send-email-mgreer@animalcreek.com>
+ <CALLzPKY9fRSwgSTw-t9-wRbCHVbKPA=m+RsTWW4=CaxtDCczcQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>,
-	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, rmk+kernel@arm.linux.org.uk,
+	davem@davemloft.net, rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
 	khilman@deeprootsystems.com
-To: "Mark A. Greer" <mgreer@animalcreek.com>
+To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from utopia.booyaka.com ([74.50.51.50]:59036 "EHLO
-	utopia.booyaka.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753530Ab2KIRLx (ORCPT
+Received: from mail20.dotsterhost.com ([66.11.232.73]:40675 "EHLO
+	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751726Ab2KIRRv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Nov 2012 12:11:53 -0500
-In-Reply-To: <20121109170703.GA13898@animalcreek.com>
+	Fri, 9 Nov 2012 12:17:51 -0500
+Content-Disposition: inline
+In-Reply-To: <CALLzPKY9fRSwgSTw-t9-wRbCHVbKPA=m+RsTWW4=CaxtDCczcQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 9 Nov 2012, Mark A. Greer wrote:
+On Fri, Nov 09, 2012 at 06:28:16PM +0200, Kasatkin, Dmitry wrote:
+> On Wed, Nov 7, 2012 at 4:57 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
+> > From: "Mark A. Greer" <mgreer@animalcreek.com>
+> >
+> > Remove usage of the private OMAP DMA API.
+> > The dmaengine API will be used instead.
+> >
+> > CC: Russell King <rmk+kernel@arm.linux.org.uk>
+> > CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+> > Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+> > ---
+> >  drivers/crypto/omap-sham.c | 117 ---------------------------------------------
+> >  1 file changed, 117 deletions(-)
+> >
+> > diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> > index b57277c..ebb5255 100644
+> > --- a/drivers/crypto/omap-sham.c
+> > +++ b/drivers/crypto/omap-sham.c
 
-> On Fri, Nov 09, 2012 at 06:10:20PM +0200, Kasatkin, Dmitry wrote:
->
-> > Why not using macros as it was before?
-> > 
-> > OMAP24XX_SEC_SHA1MD5_BASE
+> > @@ -807,18 +762,6 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+> >         if (err)
+> >                 goto err1;
+> >
+> > -#ifdef OMAP_SHAM_DMA_PRIVATE
+> > -       omap_set_dma_dest_params(dd->dma_lch, 0,
+> > -                       OMAP_DMA_AMODE_CONSTANT,
+> > -                       dd->phys_base + SHA_REG_DIN(0), 0, 16);
+> > -
+> > -       omap_set_dma_dest_burst_mode(dd->dma_lch,
+> > -                       OMAP_DMA_DATA_BURST_16);
+> > -
+> > -       omap_set_dma_src_burst_mode(dd->dma_lch,
+> > -                       OMAP_DMA_DATA_BURST_4);
 > 
-> I am following the precedent set in the existing code of that file
-> which uses the actual address instead of a macro (except for uart).
-> 
-> I have no preference but I believe that is how Paul prefers it.
-> 
-> Paul?
+> Burst mode significantly improves performance.
+> How do you configure burst mode with new API?
 
-My upstream prefers the raw addresses, I believe, under the rationale that 
-it allows the macro definitions to be removed from arch/arm/mach-omap2.  
-This reduces the total number of lines of code in that directory - and 
-this is currently an overriding concern of my upstreams.
+This is (or should be) taken care of by the dmaengine infrastructure.
+I've noted that there's an issue and there is a discussion about it
+here:
 
-So, yes the address format in your patch is fine.
+	http://www.spinics.net/lists/linux-omap/msg79855.html
 
+We probably need to extend the dmaengine API to allow API-users to
+request specific tweaks/optimizations/whatever but that's MHO.
 
-- Paul
+Mark
+--
