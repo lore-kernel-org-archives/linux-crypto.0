@@ -1,9 +1,8 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 2/2] crypto: testmgr - clean alg_test_null entries in
- alg_test_descs[]
-Date: Tue, 13 Nov 2012 11:47:37 +0200
-Message-ID: <20121113094737.25071.88732.stgit@localhost6.localdomain6>
-References: <20121113094732.25071.31295.stgit@localhost6.localdomain6>
+Subject: [PATCH] crypto: testmgr - add larger crc32c test vector to test FPU
+ path in crc32c_intel
+Date: Tue, 13 Nov 2012 12:02:30 +0200
+Message-ID: <20121113100230.27179.21791.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -11,510 +10,308 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:46192 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753903Ab2KMJrk (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:54514 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753173Ab2KMKCg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Nov 2012 04:47:40 -0500
-In-Reply-To: <20121113094732.25071.31295.stgit@localhost6.localdomain6>
+	Tue, 13 Nov 2012 05:02:36 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently alg_test_null entries set .suite values to zero, which is unneeded.
-So perform clean-up of null test entries.
-
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- crypto/testmgr.c |  372 ------------------------------------------------------
- 1 file changed, 372 deletions(-)
+ crypto/testmgr.h |  267 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 264 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b8695bf..37b4c07 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1638,300 +1638,66 @@ static const struct alg_test_desc alg_test_descs[] = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 17db4a9..189aeb6 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -41,7 +41,7 @@ struct hash_testvec {
+ 	char *plaintext;
+ 	char *digest;
+ 	unsigned char tap[MAX_TAP];
+-	unsigned char psize;
++	unsigned short psize;
+ 	unsigned char np;
+ 	unsigned char ksize;
+ };
+@@ -25214,7 +25214,7 @@ static struct hash_testvec michael_mic_tv_template[] = {
+ /*
+  * CRC32C test vectors
+  */
+-#define CRC32C_TEST_VECTORS 14
++#define CRC32C_TEST_VECTORS 15
+ 
+ static struct hash_testvec crc32c_tv_template[] = {
  	{
- 		.alg = "__cbc-cast5-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__cbc-cast6-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__cbc-serpent-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__cbc-serpent-sse2",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__cbc-twofish-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-aes-aesni",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-camellia-aesni",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-cast5-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-cast6-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-serpent-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-serpent-sse2",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-cbc-twofish-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-aes-aesni",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-camellia-aesni",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-cast5-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-cast6-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-serpent-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-serpent-sse2",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__driver-ecb-twofish-avx",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "__ghash-pclmulqdqni",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.hash = {
--				.vecs = NULL,
--				.count = 0
--			}
--		}
- 	}, {
- 		.alg = "ansi_cprng",
- 		.test = alg_test_cprng,
-@@ -2160,165 +1926,39 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "cryptd(__driver-cbc-aes-aesni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-cbc-camellia-aesni)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-aes-aesni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-camellia-aesni)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-cast5-avx)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-cast6-avx)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-serpent-avx)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-serpent-sse2)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-ecb-twofish-avx)",
- 		.test = alg_test_null,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__driver-gcm-aes-aesni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "cryptd(__ghash-pclmulqdqni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.hash = {
--				.vecs = NULL,
--				.count = 0
--			}
--		}
- 	}, {
- 		.alg = "ctr(aes)",
- 		.test = alg_test_skcipher,
-@@ -2489,18 +2129,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "ecb(__aes-aesni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
--		.suite = {
--			.cipher = {
--				.enc = {
--					.vecs = NULL,
--					.count = 0
--				},
--				.dec = {
--					.vecs = NULL,
--					.count = 0
--				}
--			}
--		}
- 	}, {
- 		.alg = "ecb(aes)",
- 		.test = alg_test_skcipher,
+@@ -25385,7 +25385,268 @@ static struct hash_testvec crc32c_tv_template[] = {
+ 		.digest = "\x75\xd3\xc5\x24",
+ 		.np = 2,
+ 		.tap = { 31, 209 }
+-	},
++	}, {
++		.key = "\xff\xff\xff\xff",
++		.ksize = 4,
++		.plaintext =	"\x6e\x05\x79\x10\xa7\x1b\xb2\x49"
++				"\xe0\x54\xeb\x82\x19\x8d\x24\xbb"
++				"\x2f\xc6\x5d\xf4\x68\xff\x96\x0a"
++				"\xa1\x38\xcf\x43\xda\x71\x08\x7c"
++				"\x13\xaa\x1e\xb5\x4c\xe3\x57\xee"
++				"\x85\x1c\x90\x27\xbe\x32\xc9\x60"
++				"\xf7\x6b\x02\x99\x0d\xa4\x3b\xd2"
++				"\x46\xdd\x74\x0b\x7f\x16\xad\x21"
++				"\xb8\x4f\xe6\x5a\xf1\x88\x1f\x93"
++				"\x2a\xc1\x35\xcc\x63\xfa\x6e\x05"
++				"\x9c\x10\xa7\x3e\xd5\x49\xe0\x77"
++				"\x0e\x82\x19\xb0\x24\xbb\x52\xe9"
++				"\x5d\xf4\x8b\x22\x96\x2d\xc4\x38"
++				"\xcf\x66\xfd\x71\x08\x9f\x13\xaa"
++				"\x41\xd8\x4c\xe3\x7a\x11\x85\x1c"
++				"\xb3\x27\xbe\x55\xec\x60\xf7\x8e"
++				"\x02\x99\x30\xc7\x3b\xd2\x69\x00"
++				"\x74\x0b\xa2\x16\xad\x44\xdb\x4f"
++				"\xe6\x7d\x14\x88\x1f\xb6\x2a\xc1"
++				"\x58\xef\x63\xfa\x91\x05\x9c\x33"
++				"\xca\x3e\xd5\x6c\x03\x77\x0e\xa5"
++				"\x19\xb0\x47\xde\x52\xe9\x80\x17"
++				"\x8b\x22\xb9\x2d\xc4\x5b\xf2\x66"
++				"\xfd\x94\x08\x9f\x36\xcd\x41\xd8"
++				"\x6f\x06\x7a\x11\xa8\x1c\xb3\x4a"
++				"\xe1\x55\xec\x83\x1a\x8e\x25\xbc"
++				"\x30\xc7\x5e\xf5\x69\x00\x97\x0b"
++				"\xa2\x39\xd0\x44\xdb\x72\x09\x7d"
++				"\x14\xab\x1f\xb6\x4d\xe4\x58\xef"
++				"\x86\x1d\x91\x28\xbf\x33\xca\x61"
++				"\xf8\x6c\x03\x9a\x0e\xa5\x3c\xd3"
++				"\x47\xde\x75\x0c\x80\x17\xae\x22"
++				"\xb9\x50\xe7\x5b\xf2\x89\x20\x94"
++				"\x2b\xc2\x36\xcd\x64\xfb\x6f\x06"
++				"\x9d\x11\xa8\x3f\xd6\x4a\xe1\x78"
++				"\x0f\x83\x1a\xb1\x25\xbc\x53\xea"
++				"\x5e\xf5\x8c\x00\x97\x2e\xc5\x39"
++				"\xd0\x67\xfe\x72\x09\xa0\x14\xab"
++				"\x42\xd9\x4d\xe4\x7b\x12\x86\x1d"
++				"\xb4\x28\xbf\x56\xed\x61\xf8\x8f"
++				"\x03\x9a\x31\xc8\x3c\xd3\x6a\x01"
++				"\x75\x0c\xa3\x17\xae\x45\xdc\x50"
++				"\xe7\x7e\x15\x89\x20\xb7\x2b\xc2"
++				"\x59\xf0\x64\xfb\x92\x06\x9d\x34"
++				"\xcb\x3f\xd6\x6d\x04\x78\x0f\xa6"
++				"\x1a\xb1\x48\xdf\x53\xea\x81\x18"
++				"\x8c\x23\xba\x2e\xc5\x5c\xf3\x67"
++				"\xfe\x95\x09\xa0\x37\xce\x42\xd9"
++				"\x70\x07\x7b\x12\xa9\x1d\xb4\x4b"
++				"\xe2\x56\xed\x84\x1b\x8f\x26\xbd"
++				"\x31\xc8\x5f\xf6\x6a\x01\x98\x0c"
++				"\xa3\x3a\xd1\x45\xdc\x73\x0a\x7e"
++				"\x15\xac\x20\xb7\x4e\xe5\x59\xf0"
++				"\x87\x1e\x92\x29\xc0\x34\xcb\x62"
++				"\xf9\x6d\x04\x9b\x0f\xa6\x3d\xd4"
++				"\x48\xdf\x76\x0d\x81\x18\xaf\x23"
++				"\xba\x51\xe8\x5c\xf3\x8a\x21\x95"
++				"\x2c\xc3\x37\xce\x65\xfc\x70\x07"
++				"\x9e\x12\xa9\x40\xd7\x4b\xe2\x79"
++				"\x10\x84\x1b\xb2\x26\xbd\x54\xeb"
++				"\x5f\xf6\x8d\x01\x98\x2f\xc6\x3a"
++				"\xd1\x68\xff\x73\x0a\xa1\x15\xac"
++				"\x43\xda\x4e\xe5\x7c\x13\x87\x1e"
++				"\xb5\x29\xc0\x57\xee\x62\xf9\x90"
++				"\x04\x9b\x32\xc9\x3d\xd4\x6b\x02"
++				"\x76\x0d\xa4\x18\xaf\x46\xdd\x51"
++				"\xe8\x7f\x16\x8a\x21\xb8\x2c\xc3"
++				"\x5a\xf1\x65\xfc\x93\x07\x9e\x35"
++				"\xcc\x40\xd7\x6e\x05\x79\x10\xa7"
++				"\x1b\xb2\x49\xe0\x54\xeb\x82\x19"
++				"\x8d\x24\xbb\x2f\xc6\x5d\xf4\x68"
++				"\xff\x96\x0a\xa1\x38\xcf\x43\xda"
++				"\x71\x08\x7c\x13\xaa\x1e\xb5\x4c"
++				"\xe3\x57\xee\x85\x1c\x90\x27\xbe"
++				"\x32\xc9\x60\xf7\x6b\x02\x99\x0d"
++				"\xa4\x3b\xd2\x46\xdd\x74\x0b\x7f"
++				"\x16\xad\x21\xb8\x4f\xe6\x5a\xf1"
++				"\x88\x1f\x93\x2a\xc1\x35\xcc\x63"
++				"\xfa\x6e\x05\x9c\x10\xa7\x3e\xd5"
++				"\x49\xe0\x77\x0e\x82\x19\xb0\x24"
++				"\xbb\x52\xe9\x5d\xf4\x8b\x22\x96"
++				"\x2d\xc4\x38\xcf\x66\xfd\x71\x08"
++				"\x9f\x13\xaa\x41\xd8\x4c\xe3\x7a"
++				"\x11\x85\x1c\xb3\x27\xbe\x55\xec"
++				"\x60\xf7\x8e\x02\x99\x30\xc7\x3b"
++				"\xd2\x69\x00\x74\x0b\xa2\x16\xad"
++				"\x44\xdb\x4f\xe6\x7d\x14\x88\x1f"
++				"\xb6\x2a\xc1\x58\xef\x63\xfa\x91"
++				"\x05\x9c\x33\xca\x3e\xd5\x6c\x03"
++				"\x77\x0e\xa5\x19\xb0\x47\xde\x52"
++				"\xe9\x80\x17\x8b\x22\xb9\x2d\xc4"
++				"\x5b\xf2\x66\xfd\x94\x08\x9f\x36"
++				"\xcd\x41\xd8\x6f\x06\x7a\x11\xa8"
++				"\x1c\xb3\x4a\xe1\x55\xec\x83\x1a"
++				"\x8e\x25\xbc\x30\xc7\x5e\xf5\x69"
++				"\x00\x97\x0b\xa2\x39\xd0\x44\xdb"
++				"\x72\x09\x7d\x14\xab\x1f\xb6\x4d"
++				"\xe4\x58\xef\x86\x1d\x91\x28\xbf"
++				"\x33\xca\x61\xf8\x6c\x03\x9a\x0e"
++				"\xa5\x3c\xd3\x47\xde\x75\x0c\x80"
++				"\x17\xae\x22\xb9\x50\xe7\x5b\xf2"
++				"\x89\x20\x94\x2b\xc2\x36\xcd\x64"
++				"\xfb\x6f\x06\x9d\x11\xa8\x3f\xd6"
++				"\x4a\xe1\x78\x0f\x83\x1a\xb1\x25"
++				"\xbc\x53\xea\x5e\xf5\x8c\x00\x97"
++				"\x2e\xc5\x39\xd0\x67\xfe\x72\x09"
++				"\xa0\x14\xab\x42\xd9\x4d\xe4\x7b"
++				"\x12\x86\x1d\xb4\x28\xbf\x56\xed"
++				"\x61\xf8\x8f\x03\x9a\x31\xc8\x3c"
++				"\xd3\x6a\x01\x75\x0c\xa3\x17\xae"
++				"\x45\xdc\x50\xe7\x7e\x15\x89\x20"
++				"\xb7\x2b\xc2\x59\xf0\x64\xfb\x92"
++				"\x06\x9d\x34\xcb\x3f\xd6\x6d\x04"
++				"\x78\x0f\xa6\x1a\xb1\x48\xdf\x53"
++				"\xea\x81\x18\x8c\x23\xba\x2e\xc5"
++				"\x5c\xf3\x67\xfe\x95\x09\xa0\x37"
++				"\xce\x42\xd9\x70\x07\x7b\x12\xa9"
++				"\x1d\xb4\x4b\xe2\x56\xed\x84\x1b"
++				"\x8f\x26\xbd\x31\xc8\x5f\xf6\x6a"
++				"\x01\x98\x0c\xa3\x3a\xd1\x45\xdc"
++				"\x73\x0a\x7e\x15\xac\x20\xb7\x4e"
++				"\xe5\x59\xf0\x87\x1e\x92\x29\xc0"
++				"\x34\xcb\x62\xf9\x6d\x04\x9b\x0f"
++				"\xa6\x3d\xd4\x48\xdf\x76\x0d\x81"
++				"\x18\xaf\x23\xba\x51\xe8\x5c\xf3"
++				"\x8a\x21\x95\x2c\xc3\x37\xce\x65"
++				"\xfc\x70\x07\x9e\x12\xa9\x40\xd7"
++				"\x4b\xe2\x79\x10\x84\x1b\xb2\x26"
++				"\xbd\x54\xeb\x5f\xf6\x8d\x01\x98"
++				"\x2f\xc6\x3a\xd1\x68\xff\x73\x0a"
++				"\xa1\x15\xac\x43\xda\x4e\xe5\x7c"
++				"\x13\x87\x1e\xb5\x29\xc0\x57\xee"
++				"\x62\xf9\x90\x04\x9b\x32\xc9\x3d"
++				"\xd4\x6b\x02\x76\x0d\xa4\x18\xaf"
++				"\x46\xdd\x51\xe8\x7f\x16\x8a\x21"
++				"\xb8\x2c\xc3\x5a\xf1\x65\xfc\x93"
++				"\x07\x9e\x35\xcc\x40\xd7\x6e\x05"
++				"\x79\x10\xa7\x1b\xb2\x49\xe0\x54"
++				"\xeb\x82\x19\x8d\x24\xbb\x2f\xc6"
++				"\x5d\xf4\x68\xff\x96\x0a\xa1\x38"
++				"\xcf\x43\xda\x71\x08\x7c\x13\xaa"
++				"\x1e\xb5\x4c\xe3\x57\xee\x85\x1c"
++				"\x90\x27\xbe\x32\xc9\x60\xf7\x6b"
++				"\x02\x99\x0d\xa4\x3b\xd2\x46\xdd"
++				"\x74\x0b\x7f\x16\xad\x21\xb8\x4f"
++				"\xe6\x5a\xf1\x88\x1f\x93\x2a\xc1"
++				"\x35\xcc\x63\xfa\x6e\x05\x9c\x10"
++				"\xa7\x3e\xd5\x49\xe0\x77\x0e\x82"
++				"\x19\xb0\x24\xbb\x52\xe9\x5d\xf4"
++				"\x8b\x22\x96\x2d\xc4\x38\xcf\x66"
++				"\xfd\x71\x08\x9f\x13\xaa\x41\xd8"
++				"\x4c\xe3\x7a\x11\x85\x1c\xb3\x27"
++				"\xbe\x55\xec\x60\xf7\x8e\x02\x99"
++				"\x30\xc7\x3b\xd2\x69\x00\x74\x0b"
++				"\xa2\x16\xad\x44\xdb\x4f\xe6\x7d"
++				"\x14\x88\x1f\xb6\x2a\xc1\x58\xef"
++				"\x63\xfa\x91\x05\x9c\x33\xca\x3e"
++				"\xd5\x6c\x03\x77\x0e\xa5\x19\xb0"
++				"\x47\xde\x52\xe9\x80\x17\x8b\x22"
++				"\xb9\x2d\xc4\x5b\xf2\x66\xfd\x94"
++				"\x08\x9f\x36\xcd\x41\xd8\x6f\x06"
++				"\x7a\x11\xa8\x1c\xb3\x4a\xe1\x55"
++				"\xec\x83\x1a\x8e\x25\xbc\x30\xc7"
++				"\x5e\xf5\x69\x00\x97\x0b\xa2\x39"
++				"\xd0\x44\xdb\x72\x09\x7d\x14\xab"
++				"\x1f\xb6\x4d\xe4\x58\xef\x86\x1d"
++				"\x91\x28\xbf\x33\xca\x61\xf8\x6c"
++				"\x03\x9a\x0e\xa5\x3c\xd3\x47\xde"
++				"\x75\x0c\x80\x17\xae\x22\xb9\x50"
++				"\xe7\x5b\xf2\x89\x20\x94\x2b\xc2"
++				"\x36\xcd\x64\xfb\x6f\x06\x9d\x11"
++				"\xa8\x3f\xd6\x4a\xe1\x78\x0f\x83"
++				"\x1a\xb1\x25\xbc\x53\xea\x5e\xf5"
++				"\x8c\x00\x97\x2e\xc5\x39\xd0\x67"
++				"\xfe\x72\x09\xa0\x14\xab\x42\xd9"
++				"\x4d\xe4\x7b\x12\x86\x1d\xb4\x28"
++				"\xbf\x56\xed\x61\xf8\x8f\x03\x9a"
++				"\x31\xc8\x3c\xd3\x6a\x01\x75\x0c"
++				"\xa3\x17\xae\x45\xdc\x50\xe7\x7e"
++				"\x15\x89\x20\xb7\x2b\xc2\x59\xf0"
++				"\x64\xfb\x92\x06\x9d\x34\xcb\x3f"
++				"\xd6\x6d\x04\x78\x0f\xa6\x1a\xb1"
++				"\x48\xdf\x53\xea\x81\x18\x8c\x23"
++				"\xba\x2e\xc5\x5c\xf3\x67\xfe\x95"
++				"\x09\xa0\x37\xce\x42\xd9\x70\x07"
++				"\x7b\x12\xa9\x1d\xb4\x4b\xe2\x56"
++				"\xed\x84\x1b\x8f\x26\xbd\x31\xc8"
++				"\x5f\xf6\x6a\x01\x98\x0c\xa3\x3a"
++				"\xd1\x45\xdc\x73\x0a\x7e\x15\xac"
++				"\x20\xb7\x4e\xe5\x59\xf0\x87\x1e"
++				"\x92\x29\xc0\x34\xcb\x62\xf9\x6d"
++				"\x04\x9b\x0f\xa6\x3d\xd4\x48\xdf"
++				"\x76\x0d\x81\x18\xaf\x23\xba\x51"
++				"\xe8\x5c\xf3\x8a\x21\x95\x2c\xc3"
++				"\x37\xce\x65\xfc\x70\x07\x9e\x12"
++				"\xa9\x40\xd7\x4b\xe2\x79\x10\x84"
++				"\x1b\xb2\x26\xbd\x54\xeb\x5f\xf6"
++				"\x8d\x01\x98\x2f\xc6\x3a\xd1\x68"
++				"\xff\x73\x0a\xa1\x15\xac\x43\xda"
++				"\x4e\xe5\x7c\x13\x87\x1e\xb5\x29"
++				"\xc0\x57\xee\x62\xf9\x90\x04\x9b"
++				"\x32\xc9\x3d\xd4\x6b\x02\x76\x0d"
++				"\xa4\x18\xaf\x46\xdd\x51\xe8\x7f"
++				"\x16\x8a\x21\xb8\x2c\xc3\x5a\xf1"
++				"\x65\xfc\x93\x07\x9e\x35\xcc\x40"
++				"\xd7\x6e\x05\x79\x10\xa7\x1b\xb2"
++				"\x49\xe0\x54\xeb\x82\x19\x8d\x24"
++				"\xbb\x2f\xc6\x5d\xf4\x68\xff\x96"
++				"\x0a\xa1\x38\xcf\x43\xda\x71\x08"
++				"\x7c\x13\xaa\x1e\xb5\x4c\xe3\x57"
++				"\xee\x85\x1c\x90\x27\xbe\x32\xc9"
++				"\x60\xf7\x6b\x02\x99\x0d\xa4\x3b"
++				"\xd2\x46\xdd\x74\x0b\x7f\x16\xad"
++				"\x21\xb8\x4f\xe6\x5a\xf1\x88\x1f"
++				"\x93\x2a\xc1\x35\xcc\x63\xfa\x6e"
++				"\x05\x9c\x10\xa7\x3e\xd5\x49\xe0"
++				"\x77\x0e\x82\x19\xb0\x24\xbb\x52"
++				"\xe9\x5d\xf4\x8b\x22\x96\x2d\xc4"
++				"\x38\xcf\x66\xfd\x71\x08\x9f\x13"
++				"\xaa\x41\xd8\x4c\xe3\x7a\x11\x85"
++				"\x1c\xb3\x27\xbe\x55\xec\x60\xf7"
++				"\x8e\x02\x99\x30\xc7\x3b\xd2\x69"
++				"\x00\x74\x0b\xa2\x16\xad\x44\xdb"
++				"\x4f\xe6\x7d\x14\x88\x1f\xb6\x2a"
++				"\xc1\x58\xef\x63\xfa\x91\x05\x9c"
++				"\x33\xca\x3e\xd5\x6c\x03\x77\x0e"
++				"\xa5\x19\xb0\x47\xde\x52\xe9\x80"
++				"\x17\x8b\x22\xb9\x2d\xc4\x5b\xf2"
++				"\x66\xfd\x94\x08\x9f\x36\xcd\x41"
++				"\xd8\x6f\x06\x7a\x11\xa8\x1c\xb3"
++				"\x4a\xe1\x55\xec\x83\x1a\x8e\x25"
++				"\xbc\x30\xc7\x5e\xf5\x69\x00\x97"
++				"\x0b\xa2\x39\xd0\x44\xdb\x72\x09"
++				"\x7d\x14\xab\x1f\xb6\x4d\xe4\x58"
++				"\xef\x86\x1d\x91\x28\xbf\x33\xca"
++				"\x61\xf8\x6c\x03\x9a\x0e\xa5\x3c"
++				"\xd3\x47\xde\x75\x0c\x80\x17\xae"
++				"\x22\xb9\x50\xe7\x5b\xf2\x89\x20"
++				"\x94\x2b\xc2\x36\xcd\x64\xfb\x6f"
++				"\x06\x9d\x11\xa8\x3f\xd6\x4a\xe1"
++				"\x78\x0f\x83\x1a\xb1\x25\xbc\x53"
++				"\xea\x5e\xf5\x8c\x00\x97\x2e\xc5"
++				"\x39\xd0\x67\xfe\x72\x09\xa0\x14"
++				"\xab\x42\xd9\x4d\xe4\x7b\x12\x86"
++				"\x1d\xb4\x28\xbf\x56\xed\x61\xf8"
++				"\x8f\x03\x9a\x31\xc8\x3c\xd3\x6a"
++				"\x01\x75\x0c\xa3\x17\xae\x45\xdc"
++				"\x50\xe7\x7e\x15\x89\x20\xb7\x2b"
++				"\xc2\x59\xf0\x64\xfb\x92\x06\x9d"
++				"\x34\xcb\x3f\xd6\x6d\x04\x78\x0f"
++				"\xa6\x1a\xb1\x48\xdf\x53\xea\x81"
++				"\x18\x8c\x23\xba\x2e\xc5\x5c\xf3"
++				"\x67\xfe\x95\x09\xa0\x37\xce\x42"
++				"\xd9\x70\x07\x7b\x12\xa9\x1d\xb4"
++				"\x4b\xe2\x56\xed\x84\x1b\x8f\x26"
++				"\xbd\x31\xc8\x5f\xf6\x6a\x01\x98",
++		.psize = 2048,
++		.digest = "\xec\x26\x4d\x95",
++	}
+ };
+ 
+ /*
