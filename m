@@ -1,36 +1,39 @@
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] X.509: Do not rely on implicit time.h include
-Date: Thu, 15 Nov 2012 15:37:50 +0100
-Message-ID: <1352990270-25825-1-git-send-email-mmarek@suse.cz>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: dhowells@redhat.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43452 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1767975Ab2KOOiD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Nov 2012 09:38:03 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Nicolas Ferre <nicolas.ferre@atmel.com>
+Subject: Re: [PATCH 1/5] ARM: AT91SAM9G45: fix crypto peripherals irq issue
+ due to sparse irq support.
+Date: Fri, 16 Nov 2012 11:33:51 +0100
+Message-ID: <50A6168F.90105@atmel.com>
+References: <1352219463-30360-1-git-send-email-nicolas@eukrea.com> <20121107152729.GE4576@game.jcrosoft.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+To: Nicolas Royer <nicolas@eukrea.com>, <eric@eukrea.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20121107152729.GE4576@game.jcrosoft.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-x509_parser.h needs struct tm, so include the header that declares it.
+On 11/07/2012 04:27 PM, Jean-Christophe PLAGNIOL-VILLARD :
+> On 17:31 Tue 06 Nov     , Nicolas Royer wrote:
+>> Spare irq support introduced by commit "8fe82a5 ARM: at91: sparse ir=
+q support"
+>> involves to add the NR_IRQS_LEGACY offset to irq number.
+>>
+>> Signed-off-by: Nicolas Royer <nicolas@eukrea.com>
+>> Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+>> Acked-by: Eric B=E9nard <eric@eukrea.com>
+>> Tested-by: Eric B=E9nard <eric@eukrea.com>
+>> Cc: stable@vger.kernel.org # 3.6
+>=20
+> ok will see if we can have it for 3.7
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- crypto/asymmetric_keys/x509_parser.h |    1 +
- 1 file changed, 1 insertion(+)
+Queued in our at91-fixes pull request for 3.7-final.
 
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index f86dc5f..9383923 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -10,6 +10,7 @@
-  */
- 
- #include <crypto/public_key.h>
-+#include <linux/time.h>
- 
- struct x509_certificate {
- 	struct x509_certificate *next;
--- 
-1.7.10.4
+Thanks a lot, best regards,
+--=20
+Nicolas Ferre
