@@ -1,93 +1,161 @@
-From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: Re: [PATCH v3 7/7] crypto: omap_sham: Remove usage of private DMA
- API
-Date: Fri, 16 Nov 2012 15:40:19 -0700
-Message-ID: <20121116224019.GB25182@animalcreek.com>
-References: <1352257033-32495-1-git-send-email-mgreer@animalcreek.com>
- <1352257033-32495-8-git-send-email-mgreer@animalcreek.com>
- <CALLzPKY9fRSwgSTw-t9-wRbCHVbKPA=m+RsTWW4=CaxtDCczcQ@mail.gmail.com>
- <20121109171745.GB13898@animalcreek.com>
- <CALLzPKZ0qC-mm4tLsywzGi7jtnK8aSQcbW5sGxr2Z1g6hyBpsA@mail.gmail.com>
- <20121114164755.GA16925@animalcreek.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: Crypto causes panic in scatterwalk_done with large/multiple
+ buffers
+Date: Sat, 17 Nov 2012 02:42:20 +0200
+Message-ID: <20121117024220.12381ph1ph0fu3q8@www.dalek.fi>
+References: <50A4AFEE.9030206@lundman.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
-	khilman@deeprootsystems.com
-To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Content-Type: multipart/mixed;
+ boundary="=_1mu6qmiecf34"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: Jorgen Lundman <lundman@lundman.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail20.dotsterhost.com ([66.11.232.73]:57254 "EHLO
-	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753665Ab2KPWkU (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:42500 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753864Ab2KQAmY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Nov 2012 17:40:20 -0500
-Content-Disposition: inline
-In-Reply-To: <20121114164755.GA16925@animalcreek.com>
+	Fri, 16 Nov 2012 19:42:24 -0500
+In-Reply-To: <50A4AFEE.9030206@lundman.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 14, 2012 at 09:47:55AM -0700, Mark A. Greer wrote:
-> On Tue, Nov 13, 2012 at 11:47:57PM -0800, Kasatkin, Dmitry wrote:
-> > On Fri, Nov 9, 2012 at 9:17 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
-> > > On Fri, Nov 09, 2012 at 06:28:16PM +0200, Kasatkin, Dmitry wrote:
-> > >> On Wed, Nov 7, 2012 at 4:57 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
-> > >> > From: "Mark A. Greer" <mgreer@animalcreek.com>
-> > >> >
-> > >> > Remove usage of the private OMAP DMA API.
-> > >> > The dmaengine API will be used instead.
-> > >> >
-> > >> > CC: Russell King <rmk+kernel@arm.linux.org.uk>
-> > >> > CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-> > >> > Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
-> > >> > ---
-> > >> >  drivers/crypto/omap-sham.c | 117 ---------------------------------------------
-> > >> >  1 file changed, 117 deletions(-)
-> > >> >
-> > >> > diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-> > >> > index b57277c..ebb5255 100644
-> > >> > --- a/drivers/crypto/omap-sham.c
-> > >> > +++ b/drivers/crypto/omap-sham.c
-> > >
-> > >> > @@ -807,18 +762,6 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
-> > >> >         if (err)
-> > >> >                 goto err1;
-> > >> >
-> > >> > -#ifdef OMAP_SHAM_DMA_PRIVATE
-> > >> > -       omap_set_dma_dest_params(dd->dma_lch, 0,
-> > >> > -                       OMAP_DMA_AMODE_CONSTANT,
-> > >> > -                       dd->phys_base + SHA_REG_DIN(0), 0, 16);
-> > >> > -
-> > >> > -       omap_set_dma_dest_burst_mode(dd->dma_lch,
-> > >> > -                       OMAP_DMA_DATA_BURST_16);
-> > >> > -
-> > >> > -       omap_set_dma_src_burst_mode(dd->dma_lch,
-> > >> > -                       OMAP_DMA_DATA_BURST_4);
-> > >>
-> > >> Burst mode significantly improves performance.
-> > >> How do you configure burst mode with new API?
-> > >
-> > > This is (or should be) taken care of by the dmaengine infrastructure.
-> > > I've noted that there's an issue and there is a discussion about it
-> > > here:
-> > >
-> > >         http://www.spinics.net/lists/linux-omap/msg79855.html
-> > >
-> > > We probably need to extend the dmaengine API to allow API-users to
-> > > request specific tweaks/optimizations/whatever but that's MHO.
-> > >
-> > 
-> > Hello,
-> > 
-> > I am in favor of new APIs.
-> > The only my concern is that it performs worse..
-> > 
-> > Is it possible to keep burst mode setting there?
-> 
-> I'm going to respin the patch the I posted in the email thread above
-> to only set bursting for non-cyclic DMAs.
+This message is in MIME format.
 
-Just sent.  Should be in your inbox shortly.
+--=_1mu6qmiecf34
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 
-Mark
---
+Hello,
+
+I managed to reproduce something similiar with small buffers...
+
+Does attached patch help in your case?
+
+-Jussi
+
+Quoting Jorgen Lundman <lundman@lundman.net>:
+
+>
+> I have a situation where I setup scatterlists as:
+>
+>  input scatterlist of 1, address ffffc90003627000 len 0x20000.
+>
+> output scatterlist of 2, address 0 ffffc90002d45000 len 0x20000
+>                          address 1 ffff88003b079d98 len 0x000c
+>
+> When I call crypto_aead_encrypt(req); it will die with:
+>
+> kernel: [  925.151113] BUG: unable to handle kernel paging request at
+> ffffeb04000b5140
+> kernel: [  925.151253] IP: [<ffffffff812f4880>] scatterwalk_done+0x50/0x60
+> kernel: [  925.151325] PGD 0
+> kernel: [  925.151381] Oops: 0000 [#1] SMP
+> kernel: [  925.151442] CPU 1
+> kernel: [  925.154255]  [<ffffffff812f7640>] blkcipher_walk_done+0xb0/0x230
+> kernel: [  925.154255]  [<ffffffffa02e9169>]  
+> crypto_ctr_crypt+0x129/0x2b0 [ctr]
+> kernel: [  925.154255]  [<ffffffff812fe580>] ? crypto_aes_set_key+0x40/0x40
+> kernel: [  925.154255]  [<ffffffff812f6cbd>] async_encrypt+0x3d/0x40
+> kernel: [  925.154255]  [<ffffffffa0149326>] crypto_ccm_encrypt+0x246/0x290
+> [ccm]
+> kernel: [  925.154255]  [<ffffffffa01633bd>] crypto_encrypt+0x26d/0x2d0
+>
+>
+>
+> What is interesting about that is, if I allocate a linear buffer instead:
+>
+>   dst = kmalloc(cryptlen, GFP_KERNEL); // 0x20000 + 0x000c
+>   sg_init_table(sg, 1 );
+>   sg_set_buf(&sg[0], dst, cryptlen);
+>
+>   crypto_aead_encrypt(req);
+>
+> will no longer panic. However, when I try to copy the linear buffer back to
+> scatterlist;
+>
+>
+>   scatterwalk_map_and_copy(dst, sg, 0, cryptlen, 1);
+>
+>
+> then it will panic there instead.
+>
+>
+> However, if I replace it with the call:
+>
+>     sg_copy_from_buffer(sg, sg_nents(sg),
+>                         dst, cryptlen);
+>
+> everything works! <-
+>
+> So, what am I doing wrong that makes scatterwalk_map_and_copy() fail, and
+> sg_copy_from_buffer() work fine? It would be nice if I could fix it, so I
+> did not need to copy to a temporary buffer.
+>
+> Lund
+>
+> --
+> Jorgen Lundman       | <lundman@lundman.net>
+> Unix Administrator   | +81 (0)3 -5456-2687 ext 1017 (work)
+> Shibuya-ku, Tokyo    | +81 (0)90-5578-8500          (cell)
+> Japan                | +81 (0)3 -3375-1767          (home)
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+
+
+
+--=_1mu6qmiecf34
+Content-Type: text/x-patch;
+ charset=ISO-8859-1;
+ name="05-fix-broken-scatterwalk_sg_chain.patch"
+Content-Disposition: attachment;
+ filename="05-fix-broken-scatterwalk_sg_chain.patch"
+Content-Transfer-Encoding: 7bit
+
+crypto: scatterwalk - fix broken scatterlist manipulation
+
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+
+scatterlist_sg_chain() manipulates scatterlist structures directly in wrong
+way, chaining without marking 'chain' bit 0x01. This can in some cases lead
+to problems, such as triggering BUG_ON(!sg->length) in scatterwalk_start().
+
+So instead of reinventing wheel, change scatterwalk to use existing functions
+from scatterlist API.
+---
+ include/crypto/scatterwalk.h |    8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 3744d2a..d31870c 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -34,16 +34,12 @@ static inline void crypto_yield(u32 flags)
+ static inline void scatterwalk_sg_chain(struct scatterlist *sg1, int num,
+ 					struct scatterlist *sg2)
+ {
+-	sg_set_page(&sg1[num - 1], (void *)sg2, 0, 0);
+-	sg1[num - 1].page_link &= ~0x02;
++	sg_chain(sg1, num, sg2);
+ }
+ 
+ static inline struct scatterlist *scatterwalk_sg_next(struct scatterlist *sg)
+ {
+-	if (sg_is_last(sg))
+-		return NULL;
+-
+-	return (++sg)->length ? sg : (void *)sg_page(sg);
++	return sg_next(sg);
+ }
+ 
+ static inline void scatterwalk_crypto_chain(struct scatterlist *head,
+
+--=_1mu6qmiecf34--
