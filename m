@@ -1,99 +1,202 @@
-From: Jorgen Lundman <lundman@lundman.net>
-Subject: Re: Crypto causes panic in scatterwalk_done with large/multiple buffers
-Date: Mon, 19 Nov 2012 09:29:22 +0900
-Message-ID: <50A97D62.1000604@lundman.net>
-References: <50A4AFEE.9030206@lundman.net> <20121117024220.12381ph1ph0fu3q8@www.dalek.fi> <20121117103901.664145ijlv5r29wk@www.dalek.fi> <50A82BD1.4000505@lundman.net> <20121118194033.20427f1141j4ic4c@www.dalek.fi>
+From: Bill Pemberton <wfp5p@virginia.edu>
+Subject: [PATCH 053/493] crypto: remove use of __devexit_p
+Date: Mon, 19 Nov 2012 13:20:02 -0500
+Message-ID: <1353349642-3677-53-git-send-email-wfp5p@virginia.edu>
+References: <1353349642-3677-1-git-send-email-wfp5p@virginia.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-	linux-crypto@vger.kernel.org
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.lundman.net ([210.157.1.114]:43065 "EHLO mail.lundman.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752722Ab2KSA30 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Nov 2012 19:29:26 -0500
-In-Reply-To: <20121118194033.20427f1141j4ic4c@www.dalek.fi>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-geode@lists.infradead.org,
+ "David S. Miller" <davem@davemloft.net>
+To: gregkh@linuxfoundation.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1353349642-3677-1-git-send-email-wfp5p@virginia.edu>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-> 
-> From what I now researched, you must not pass vmalloc'd memory to
-> sg_set_buf() as it internally uses virt_to_page() to get page of buffer
-> address. You most likely need to walk through your vmalloc'd buffer and
-> pass all individual pages to scatterlist with sg_set_page().
+CONFIG_HOTPLUG is going away as an option so __devexit_p is no longer
+needed.
 
-I was told the same, so I wrote something that called vmalloc_to_page() for
-each PAGE_SIZE of the vmalloced memory, with offsets, and created large
-scatterlists (well, around ~120 or so).
+Signed-off-by: Bill Pemberton <wfp5p@virginia.edu>
+Cc: Herbert Xu <herbert@gondor.apana.org.au> 
+Cc: "David S. Miller" <davem@davemloft.net> 
+Cc: linux-crypto@vger.kernel.org 
+Cc: linux-geode@lists.infradead.org 
+Cc: linux-arm-kernel@lists.infradead.org 
+---
+ drivers/crypto/atmel-aes.c        | 2 +-
+ drivers/crypto/atmel-sha.c        | 2 +-
+ drivers/crypto/atmel-tdes.c       | 2 +-
+ drivers/crypto/bfin_crc.c         | 2 +-
+ drivers/crypto/caam/ctrl.c        | 2 +-
+ drivers/crypto/geode-aes.c        | 2 +-
+ drivers/crypto/hifn_795x.c        | 2 +-
+ drivers/crypto/mv_cesa.c          | 2 +-
+ drivers/crypto/n2_core.c          | 4 ++--
+ drivers/crypto/picoxcell_crypto.c | 2 +-
+ drivers/crypto/tegra-aes.c        | 2 +-
+ 11 files changed, 12 insertions(+), 12 deletions(-)
 
-Made no difference at all, still dies in scatterwalk_done.
-
-Looking at blkcipher (ccm->ctr->blkcipher) and I see it has methods for
-_phys(), _virt(), _virt_block(), _fast(), _slow() and _copy(). I was quite
-interested in the copy() method, since that is what I am doing at the top.
-
-No idea how I affect those types of use. phys and virt seem to be handled
-internally, and virt_block() is what ctr.c uses.
-
-This made me think the vmalloc thing isn't my problem.
-
-Then I copied ccm.c, ctr.c and blkcipher.c to my own module, just so that I
-could commend out:
-
-
-static void Xscatterwalk_pagedone(struct scatter_walk *walk, int out,
-                                 unsigned int more)
-{
-
-    if (out) {
-        struct page *page;
-
-        page = sg_page(walk->sg) + ((walk->offset - 1) >> PAGE_SHIFT);
-
-#if 0
-        /*
-         * This call causes panic, so all these sources are just to
-         * avoid this call.
-         *
-         * Once this issue has been fixed, we can remove the entire
-         * "sun-ccm(aes)" module.
-         *
-         */
-        if (!PageSlab(page))
-            flush_dcache_page(page);
-#endif
-    }
-
-    if (more) {
-
-
-And making the two functions, Xscatterwalk_done() and
-Xscatterwalk_copychunks(), to call my version instead.
-
-Wouldn't you know, all panics are gone. The misaligned buffer panic, gone.
-Reverted back to just passing vmalloc() memory, no problems.
-
-I have been running multi-gig bonnie++ for 24 hours (file system related
-crypto). I am trusting that it is working now.
-
-Tested with 3.2.0-0.bpo.3-amd64 and 3.5.0-17-generic.
-
-> This is strange as crypto subsystem's internal test mechanism uses such
-> offsetted buffers.
-> 
-
-I'm sure it does. I run my tests about 100 times and it usually dies around
-~40th.
-
-
-I appreciate your help,
-
-Lund
-
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 8061336..3cfa548 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -1185,7 +1185,7 @@ static int __devexit atmel_aes_remove(struct platform_device *pdev)
+ 
+ static struct platform_driver atmel_aes_driver = {
+ 	.probe		= atmel_aes_probe,
+-	.remove		= __devexit_p(atmel_aes_remove),
++	.remove		= atmel_aes_remove,
+ 	.driver		= {
+ 		.name	= "atmel_aes",
+ 		.owner	= THIS_MODULE,
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index bcdf55f..4fb07609 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -1093,7 +1093,7 @@ static int __devexit atmel_sha_remove(struct platform_device *pdev)
+ 
+ static struct platform_driver atmel_sha_driver = {
+ 	.probe		= atmel_sha_probe,
+-	.remove		= __devexit_p(atmel_sha_remove),
++	.remove		= atmel_sha_remove,
+ 	.driver		= {
+ 		.name	= "atmel_sha",
+ 		.owner	= THIS_MODULE,
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 7495f98..530474f 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -1195,7 +1195,7 @@ static int __devexit atmel_tdes_remove(struct platform_device *pdev)
+ 
+ static struct platform_driver atmel_tdes_driver = {
+ 	.probe		= atmel_tdes_probe,
+-	.remove		= __devexit_p(atmel_tdes_remove),
++	.remove		= atmel_tdes_remove,
+ 	.driver		= {
+ 		.name	= "atmel_tdes",
+ 		.owner	= THIS_MODULE,
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index 5398580..eecaae2 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -731,7 +731,7 @@ static int __devexit bfin_crypto_crc_remove(struct platform_device *pdev)
+ 
+ static struct platform_driver bfin_crypto_crc_driver = {
+ 	.probe     = bfin_crypto_crc_probe,
+-	.remove    = __devexit_p(bfin_crypto_crc_remove),
++	.remove    = bfin_crypto_crc_remove,
+ 	.suspend   = bfin_crypto_crc_suspend,
+ 	.resume    = bfin_crypto_crc_resume,
+ 	.driver    = {
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index bf20dd8..1c56f63 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -420,7 +420,7 @@ static struct platform_driver caam_driver = {
+ 		.of_match_table = caam_match,
+ 	},
+ 	.probe       = caam_probe,
+-	.remove      = __devexit_p(caam_remove),
++	.remove      = caam_remove,
+ };
+ 
+ module_platform_driver(caam_driver);
+diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+index 51f196d..3217baf 100644
+--- a/drivers/crypto/geode-aes.c
++++ b/drivers/crypto/geode-aes.c
+@@ -582,7 +582,7 @@ static struct pci_driver geode_aes_driver = {
+ 	.name = "Geode LX AES",
+ 	.id_table = geode_aes_tbl,
+ 	.probe = geode_aes_probe,
+-	.remove = __devexit_p(geode_aes_remove)
++	.remove = geode_aes_remove
+ };
+ 
+ module_pci_driver(geode_aes_driver);
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index fda3296..4c2f467 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2740,7 +2740,7 @@ static struct pci_driver hifn_pci_driver = {
+ 	.name     = "hifn795x",
+ 	.id_table = hifn_pci_tbl,
+ 	.probe    = hifn_probe,
+-	.remove   = __devexit_p(hifn_remove),
++	.remove   = hifn_remove,
+ };
+ 
+ static int __init hifn_init(void)
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 24ccae4..ce6290e 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1184,7 +1184,7 @@ MODULE_DEVICE_TABLE(of, mv_cesa_of_match_table);
+ 
+ static struct platform_driver marvell_crypto = {
+ 	.probe		= mv_probe,
+-	.remove		= __devexit_p(mv_remove),
++	.remove		= mv_remove,
+ 	.driver		= {
+ 		.owner	= THIS_MODULE,
+ 		.name	= "mv_crypto",
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index aab2574..2741ef5 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -2217,7 +2217,7 @@ static struct platform_driver n2_crypto_driver = {
+ 		.of_match_table	=	n2_crypto_match,
+ 	},
+ 	.probe		=	n2_crypto_probe,
+-	.remove		=	__devexit_p(n2_crypto_remove),
++	.remove		=	n2_crypto_remove,
+ };
+ 
+ static struct of_device_id n2_mau_match[] = {
+@@ -2245,7 +2245,7 @@ static struct platform_driver n2_mau_driver = {
+ 		.of_match_table	=	n2_mau_match,
+ 	},
+ 	.probe		=	n2_mau_probe,
+-	.remove		=	__devexit_p(n2_mau_remove),
++	.remove		=	n2_mau_remove,
+ };
+ 
+ static int __init n2_init(void)
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index c983f86..a279f93 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1868,7 +1868,7 @@ static const struct platform_device_id spacc_id_table[] = {
+ 
+ static struct platform_driver spacc_driver = {
+ 	.probe		= spacc_probe,
+-	.remove		= __devexit_p(spacc_remove),
++	.remove		= spacc_remove,
+ 	.driver		= {
+ 		.name	= "picochip,spacc",
+ #ifdef CONFIG_PM
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index eb32fd8..75f8a55 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -1082,7 +1082,7 @@ static struct of_device_id tegra_aes_of_match[] __devinitdata = {
+ 
+ static struct platform_driver tegra_aes_driver = {
+ 	.probe  = tegra_aes_probe,
+-	.remove = __devexit_p(tegra_aes_remove),
++	.remove = tegra_aes_remove,
+ 	.driver = {
+ 		.name   = "tegra-aes",
+ 		.owner  = THIS_MODULE,
 -- 
-Jorgen Lundman       | <lundman@lundman.net>
-Unix Administrator   | +81 (0)3 -5456-2687 ext 1017 (work)
-Shibuya-ku, Tokyo    | +81 (0)90-5578-8500          (cell)
-Japan                | +81 (0)3 -3375-1767          (home)
+1.8.0
