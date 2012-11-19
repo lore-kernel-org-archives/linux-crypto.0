@@ -1,7 +1,7 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v4 2/8] ARM: OMAP2xxx: hwmod: Add DMA support for SHAM module
-Date: Mon, 19 Nov 2012 11:54:55 -0700
-Message-ID: <1353351301-6453-3-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH v4 4/8] ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
+Date: Mon, 19 Nov 2012 11:54:57 -0700
+Message-ID: <1353351301-6453-5-git-send-email-mgreer@animalcreek.com>
 References: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net, dmitry.kasatkin@intel.com,
@@ -9,58 +9,54 @@ Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	khilman@deeprootsystems.com,
 	"Mark A. Greer" <mgreer@animalcreek.com>
 To: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail20.dotsterhost.com ([66.11.232.73]:47417 "EHLO
-	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753972Ab2KSSz4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Nov 2012 13:55:56 -0500
+Return-path: <linux-omap-owner@vger.kernel.org>
 In-Reply-To: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-The current OMAP2 SHAM support doesn't enable DMA
-so add that support so it can use DMA just like OMAP3.
+Remove the error message that prints when there is no SHA IP
+present to make it consistent with all the other IPs.
 
 CC: Paul Walmsley <paul@pwsan.com>
 Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 ---
- arch/arm/mach-omap2/omap_hwmod_2xxx_interconnect_data.c | 2 +-
- arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c      | 6 ++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/arm/mach-omap2/devices.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm/mach-omap2/omap_hwmod_2xxx_interconnect_data.c b/arch/arm/mach-omap2/omap_hwmod_2xxx_interconnect_data.c
-index bb314c5..4b4fd5f 100644
---- a/arch/arm/mach-omap2/omap_hwmod_2xxx_interconnect_data.c
-+++ b/arch/arm/mach-omap2/omap_hwmod_2xxx_interconnect_data.c
-@@ -405,5 +405,5 @@ struct omap_hwmod_ocp_if omap2xxx_l4_core__sham = {
- 	.slave		= &omap2xxx_sham_hwmod,
- 	.clk		= "sha_ick",
- 	.addr		= omap2xxx_sham_addrs,
--	.user		= OCP_USER_MPU,
-+	.user		= OCP_USER_MPU | OCP_USER_SDMA,
- };
-diff --git a/arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c b/arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c
-index a041670..703b269 100644
---- a/arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c
-+++ b/arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c
-@@ -873,9 +873,15 @@ struct omap_hwmod_irq_info omap2_sham_mpu_irqs[] = {
- 	{ .irq = -1 }
- };
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index 015c259..7ecce5e 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -457,20 +457,15 @@ static void omap_init_rng(void)
  
-+struct omap_hwmod_dma_info omap2_sham_sdma_chs[] = {
-+	{ .name = "rx", .dma_req = OMAP24XX_DMA_SHA1MD5_RX },
-+	{ .dma_req = -1 }
-+};
-+
- struct omap_hwmod omap2xxx_sham_hwmod = {
- 	.name		= "sham",
- 	.mpu_irqs	= omap2_sham_mpu_irqs,
-+	.sdma_reqs	= omap2_sham_sdma_chs,
- 	.main_clk	= "l4_ck",
- 	.prcm		= {
- 		.omap2 = {
+ static void __init omap_init_sham(void)
+ {
+-	if (cpu_is_omap24xx() || cpu_is_omap34xx()) {
+-		struct omap_hwmod *oh;
+-		struct platform_device *pdev;
++	struct omap_hwmod *oh;
++	struct platform_device *pdev;
+ 
+-		oh = omap_hwmod_lookup("sham");
+-		if (!oh)
+-			return;
++	oh = omap_hwmod_lookup("sham");
++	if (!oh)
++		return;
+ 
+-		pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL,
+-					 0, 0);
+-		WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
+-	} else {
+-		pr_err("%s: platform not supported\n", __func__);
+-	}
++	pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL, 0, 0);
++	WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
+ }
+ 
+ #if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
 -- 
 1.7.12
+
