@@ -1,30 +1,25 @@
 From: Bill Pemberton <wfp5p@virginia.edu>
-Subject: [PATCH 053/493] crypto: remove use of __devexit_p
-Date: Mon, 19 Nov 2012 13:20:02 -0500
-Message-ID: <1353349642-3677-53-git-send-email-wfp5p@virginia.edu>
+Subject: [PATCH 397/493] crypto: remove use of __devexit
+Date: Mon, 19 Nov 2012 13:25:46 -0500
+Message-ID: <1353349642-3677-397-git-send-email-wfp5p@virginia.edu>
 References: <1353349642-3677-1-git-send-email-wfp5p@virginia.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-geode@lists.infradead.org,
- "David S. Miller" <davem@davemloft.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org
 To: gregkh@linuxfoundation.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from viridian.itc.Virginia.EDU ([128.143.12.139]:41487 "EHLO
+	viridian.itc.virginia.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754249Ab2KSSew (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 Nov 2012 13:34:52 -0500
 In-Reply-To: <1353349642-3677-1-git-send-email-wfp5p@virginia.edu>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: linux-arm-kernel-bounces@lists.infradead.org
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-CONFIG_HOTPLUG is going away as an option so __devexit_p is no longer
-needed.
+CONFIG_HOTPLUG is going away as an option so __devexit is no
+longer needed.
 
 Signed-off-by: Bill Pemberton <wfp5p@virginia.edu>
 Cc: Herbert Xu <herbert@gondor.apana.org.au> 
@@ -37,166 +32,175 @@ Cc: linux-arm-kernel@lists.infradead.org
  drivers/crypto/atmel-sha.c        | 2 +-
  drivers/crypto/atmel-tdes.c       | 2 +-
  drivers/crypto/bfin_crc.c         | 2 +-
- drivers/crypto/caam/ctrl.c        | 2 +-
  drivers/crypto/geode-aes.c        | 2 +-
  drivers/crypto/hifn_795x.c        | 2 +-
- drivers/crypto/mv_cesa.c          | 2 +-
- drivers/crypto/n2_core.c          | 4 ++--
+ drivers/crypto/n2_core.c          | 6 +++---
+ drivers/crypto/nx/nx.c            | 2 +-
+ drivers/crypto/omap-sham.c        | 2 +-
  drivers/crypto/picoxcell_crypto.c | 2 +-
  drivers/crypto/tegra-aes.c        | 2 +-
- 11 files changed, 12 insertions(+), 12 deletions(-)
+ 11 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 8061336..3cfa548 100644
+index 931d436..c9d9d5c 100644
 --- a/drivers/crypto/atmel-aes.c
 +++ b/drivers/crypto/atmel-aes.c
-@@ -1185,7 +1185,7 @@ static int __devexit atmel_aes_remove(struct platform_device *pdev)
+@@ -1152,7 +1152,7 @@ aes_dd_err:
+ 	return err;
+ }
  
- static struct platform_driver atmel_aes_driver = {
- 	.probe		= atmel_aes_probe,
--	.remove		= __devexit_p(atmel_aes_remove),
-+	.remove		= atmel_aes_remove,
- 	.driver		= {
- 		.name	= "atmel_aes",
- 		.owner	= THIS_MODULE,
+-static int __devexit atmel_aes_remove(struct platform_device *pdev)
++static int atmel_aes_remove(struct platform_device *pdev)
+ {
+ 	static struct atmel_aes_dev *aes_dd;
+ 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index bcdf55f..4fb07609 100644
+index 17f8862..4918e94 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -1093,7 +1093,7 @@ static int __devexit atmel_sha_remove(struct platform_device *pdev)
+@@ -1063,7 +1063,7 @@ sha_dd_err:
+ 	return err;
+ }
  
- static struct platform_driver atmel_sha_driver = {
- 	.probe		= atmel_sha_probe,
--	.remove		= __devexit_p(atmel_sha_remove),
-+	.remove		= atmel_sha_remove,
- 	.driver		= {
- 		.name	= "atmel_sha",
- 		.owner	= THIS_MODULE,
+-static int __devexit atmel_sha_remove(struct platform_device *pdev)
++static int atmel_sha_remove(struct platform_device *pdev)
+ {
+ 	static struct atmel_sha_dev *sha_dd;
+ 
 diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 7495f98..530474f 100644
+index f4b9907..7c73fbb 100644
 --- a/drivers/crypto/atmel-tdes.c
 +++ b/drivers/crypto/atmel-tdes.c
-@@ -1195,7 +1195,7 @@ static int __devexit atmel_tdes_remove(struct platform_device *pdev)
+@@ -1162,7 +1162,7 @@ tdes_dd_err:
+ 	return err;
+ }
  
- static struct platform_driver atmel_tdes_driver = {
- 	.probe		= atmel_tdes_probe,
--	.remove		= __devexit_p(atmel_tdes_remove),
-+	.remove		= atmel_tdes_remove,
- 	.driver		= {
- 		.name	= "atmel_tdes",
- 		.owner	= THIS_MODULE,
+-static int __devexit atmel_tdes_remove(struct platform_device *pdev)
++static int atmel_tdes_remove(struct platform_device *pdev)
+ {
+ 	static struct atmel_tdes_dev *tdes_dd;
+ 
 diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index 5398580..eecaae2 100644
+index 904b646..a22f1a9 100644
 --- a/drivers/crypto/bfin_crc.c
 +++ b/drivers/crypto/bfin_crc.c
-@@ -731,7 +731,7 @@ static int __devexit bfin_crypto_crc_remove(struct platform_device *pdev)
+@@ -707,7 +707,7 @@ out_error_free_mem:
+  *	bfin_crypto_crc_remove - Initialize module
+  *
+  */
+-static int __devexit bfin_crypto_crc_remove(struct platform_device *pdev)
++static int bfin_crypto_crc_remove(struct platform_device *pdev)
+ {
+ 	struct bfin_crypto_crc *crc = platform_get_drvdata(pdev);
  
- static struct platform_driver bfin_crypto_crc_driver = {
- 	.probe     = bfin_crypto_crc_probe,
--	.remove    = __devexit_p(bfin_crypto_crc_remove),
-+	.remove    = bfin_crypto_crc_remove,
- 	.suspend   = bfin_crypto_crc_suspend,
- 	.resume    = bfin_crypto_crc_resume,
- 	.driver    = {
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index bf20dd8..1c56f63 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -420,7 +420,7 @@ static struct platform_driver caam_driver = {
- 		.of_match_table = caam_match,
- 	},
- 	.probe       = caam_probe,
--	.remove      = __devexit_p(caam_remove),
-+	.remove      = caam_remove,
- };
- 
- module_platform_driver(caam_driver);
 diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-index 51f196d..3217baf 100644
+index f3793a2..6bde3ea 100644
 --- a/drivers/crypto/geode-aes.c
 +++ b/drivers/crypto/geode-aes.c
-@@ -582,7 +582,7 @@ static struct pci_driver geode_aes_driver = {
- 	.name = "Geode LX AES",
- 	.id_table = geode_aes_tbl,
- 	.probe = geode_aes_probe,
--	.remove = __devexit_p(geode_aes_remove)
-+	.remove = geode_aes_remove
+@@ -498,7 +498,7 @@ static struct crypto_alg geode_ecb_alg = {
+ 	}
  };
  
- module_pci_driver(geode_aes_driver);
+-static void __devexit
++static void
+ geode_aes_remove(struct pci_dev *dev)
+ {
+ 	crypto_unregister_alg(&geode_alg);
 diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index fda3296..4c2f467 100644
+index f909d99..ebf130e 100644
 --- a/drivers/crypto/hifn_795x.c
 +++ b/drivers/crypto/hifn_795x.c
-@@ -2740,7 +2740,7 @@ static struct pci_driver hifn_pci_driver = {
- 	.name     = "hifn795x",
- 	.id_table = hifn_pci_tbl,
- 	.probe    = hifn_probe,
--	.remove   = __devexit_p(hifn_remove),
-+	.remove   = hifn_remove,
- };
+@@ -2696,7 +2696,7 @@ err_out_disable_pci_device:
+ 	return err;
+ }
  
- static int __init hifn_init(void)
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 24ccae4..ce6290e 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1184,7 +1184,7 @@ MODULE_DEVICE_TABLE(of, mv_cesa_of_match_table);
- 
- static struct platform_driver marvell_crypto = {
- 	.probe		= mv_probe,
--	.remove		= __devexit_p(mv_remove),
-+	.remove		= mv_remove,
- 	.driver		= {
- 		.owner	= THIS_MODULE,
- 		.name	= "mv_crypto",
+-static void __devexit hifn_remove(struct pci_dev *pdev)
++static void hifn_remove(struct pci_dev *pdev)
+ {
+ 	int i;
+ 	struct hifn_device *dev;
 diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index aab2574..2741ef5 100644
+index 10e1033..0c286fc 100644
 --- a/drivers/crypto/n2_core.c
 +++ b/drivers/crypto/n2_core.c
-@@ -2217,7 +2217,7 @@ static struct platform_driver n2_crypto_driver = {
- 		.of_match_table	=	n2_crypto_match,
- 	},
- 	.probe		=	n2_crypto_probe,
--	.remove		=	__devexit_p(n2_crypto_remove),
-+	.remove		=	n2_crypto_remove,
- };
+@@ -1545,7 +1545,7 @@ out:
+ 	return err;
+ }
  
- static struct of_device_id n2_mau_match[] = {
-@@ -2245,7 +2245,7 @@ static struct platform_driver n2_mau_driver = {
- 		.of_match_table	=	n2_mau_match,
- 	},
- 	.probe		=	n2_mau_probe,
--	.remove		=	__devexit_p(n2_mau_remove),
-+	.remove		=	n2_mau_remove,
- };
+-static void __devexit n2_unregister_algs(void)
++static void n2_unregister_algs(void)
+ {
+ 	mutex_lock(&spu_lock);
+ 	if (!--algs_registered)
+@@ -2077,7 +2077,7 @@ out_free_n2cp:
+ 	return err;
+ }
  
- static int __init n2_init(void)
+-static int __devexit n2_crypto_remove(struct platform_device *dev)
++static int n2_crypto_remove(struct platform_device *dev)
+ {
+ 	struct n2_crypto *np = dev_get_drvdata(&dev->dev);
+ 
+@@ -2179,7 +2179,7 @@ out_free_ncp:
+ 	return err;
+ }
+ 
+-static int __devexit n2_mau_remove(struct platform_device *dev)
++static int n2_mau_remove(struct platform_device *dev)
+ {
+ 	struct n2_mau *mp = dev_get_drvdata(&dev->dev);
+ 
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index e19228e..17afbf9 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -653,7 +653,7 @@ static int nx_probe(struct vio_dev *viodev,
+ 	return nx_register_algs();
+ }
+ 
+-static int __devexit nx_remove(struct vio_dev *viodev)
++static int nx_remove(struct vio_dev *viodev)
+ {
+ 	dev_dbg(&viodev->dev, "entering nx_remove for UA 0x%x\n",
+ 		viodev->unit_address);
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index fb037ff..89fba10 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1250,7 +1250,7 @@ data_err:
+ 	return err;
+ }
+ 
+-static int __devexit omap_sham_remove(struct platform_device *pdev)
++static int omap_sham_remove(struct platform_device *pdev)
+ {
+ 	static struct omap_sham_dev *dd;
+ 	int i;
 diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index c983f86..a279f93 100644
+index 6eb91e6..2096d46 100644
 --- a/drivers/crypto/picoxcell_crypto.c
 +++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1868,7 +1868,7 @@ static const struct platform_device_id spacc_id_table[] = {
+@@ -1841,7 +1841,7 @@ static int spacc_probe(struct platform_device *pdev)
+ 	return ret;
+ }
  
- static struct platform_driver spacc_driver = {
- 	.probe		= spacc_probe,
--	.remove		= __devexit_p(spacc_remove),
-+	.remove		= spacc_remove,
- 	.driver		= {
- 		.name	= "picochip,spacc",
- #ifdef CONFIG_PM
+-static int __devexit spacc_remove(struct platform_device *pdev)
++static int spacc_remove(struct platform_device *pdev)
+ {
+ 	struct spacc_alg *alg, *next;
+ 	struct spacc_engine *engine = platform_get_drvdata(pdev);
 diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
-index eb32fd8..75f8a55 100644
+index 40eed65..85ea752 100644
 --- a/drivers/crypto/tegra-aes.c
 +++ b/drivers/crypto/tegra-aes.c
-@@ -1082,7 +1082,7 @@ static struct of_device_id tegra_aes_of_match[] __devinitdata = {
+@@ -1047,7 +1047,7 @@ out:
+ 	return err;
+ }
  
- static struct platform_driver tegra_aes_driver = {
- 	.probe  = tegra_aes_probe,
--	.remove = __devexit_p(tegra_aes_remove),
-+	.remove = tegra_aes_remove,
- 	.driver = {
- 		.name   = "tegra-aes",
- 		.owner  = THIS_MODULE,
+-static int __devexit tegra_aes_remove(struct platform_device *pdev)
++static int tegra_aes_remove(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct tegra_aes_dev *dd = platform_get_drvdata(pdev);
 -- 
 1.8.0
