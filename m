@@ -1,103 +1,204 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v4 0/8] crypto: omap-sham updates
-Date: Mon, 19 Nov 2012 11:54:53 -0700
-Message-ID: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH v4 3/8] ARM: OMAP3xxx: hwmod: Convert SHAM crypto device data to hwmod
+Date: Mon, 19 Nov 2012 11:54:56 -0700
+Message-ID: <1353351301-6453-4-git-send-email-mgreer@animalcreek.com>
+References: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net, dmitry.kasatkin@intel.com,
 	rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
 	khilman@deeprootsystems.com,
 	"Mark A. Greer" <mgreer@animalcreek.com>
 To: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-omap-owner@vger.kernel.org>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail20.dotsterhost.com ([66.11.232.73]:47562 "EHLO
+	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754112Ab2KSSz7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 Nov 2012 13:55:59 -0500
+In-Reply-To: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-Changes since v3:
-	- Added hwmod support for SIDLEMODE.  This requires adding
-	  a specific omap_hwmod_sysc_fields structure since there
-	  are not generic ones that have the correct offsets.
-	- Added patch to remove the cpu check from the omap-sham
-	  driver.  This can likely be ignored since there is a patch
-	  that already does this in Tony's branch.  I added it to
-	  make it easier for others to test while Tony's patch makes
-	  its way to the k.o.
+Convert the device data for the OMAP3 SHAM2 (SHA1/MD5) crypto IP
+from explicit platform_data to hwmod.
 
-Changes since v2:
-	- Reworked pm_runtime calls to match where original clk_*
-	  calls were so provide better PM (as per Kevin Hilman's
-	  comments).
+CC: Paul Walmsley <paul@pwsan.com>
+Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ arch/arm/mach-omap2/clock3xxx_data.c       |  1 +
+ arch/arm/mach-omap2/devices.c              | 42 ++-----------------
+ arch/arm/mach-omap2/omap_hwmod_3xxx_data.c | 66 ++++++++++++++++++++++++++++++
+ 3 files changed, 70 insertions(+), 39 deletions(-)
 
-Changes since v1:
-	- Removed the check of CM_IDLEST to see if the module exists
-	  and instead add the hwmod data for all omap2's and omap3 GP's.
-	- Placed new sha_ick clk entries after the 'omap-sham' entry
-	  in the clockxxx_data.c files
-	- Removed cpu_is_xxx() checks in
-	  arch/arm/mach-omap2/devices.c:omap_init_sham()
-	- Rebased on the latest k.o. kernel
-
-
-This series updates the crypto omap-sham driver and supporting
-infrastructure.
-
-Notes:
-
-a) Based on 3587b1b (fanotify: fix FAN_Q_OVERFLOW case of fanotify_read()).
-
-b) Since these patches will likely go though the OMAP tree (and not
-   through the crypto tree), it would be nice if the crypto guy(s)
-   would ACK or NACK patches 5-7 which modify the
-   drivers/crypto/omap-sham.c driver.
-
-c) These have only been tested on an omap2420 h4 and an am37x evm.  If you
-   have different hardware available and a few minutes, please test them.
-   A quick and easy test is to enable tcrypt as a module
-   (CONFIG_CRYPTO_TEST=m), boot, then run 'modprobe tcrypt sec=2 mode=403'.
-   'CONFIG_CRYPTO_SHA1' and 'CONFIG_CRYPTO_DEV_OMAP_SHAM' also have to be
-   enabled.  A quick 'grep omap-sham /proc/interrupts' will tell you if
-   the omap-sham driver was really used.
-
-d) To test these patches, you will likely need...
-   i) The patch included here:
-	   http://marc.info/?l=kernel-janitors&m=134910841909057&w=2
-   ii) This patch from linux-omap/master:
-	   27615a9 (ARM: OMAP: Trivial driver changes to remove include
-			   plat/cpu.h)
-   iii) This patch from Paul Walmsley:
-	   http://www.spinics.net/lists/linux-omap/msg79436.html
-
-e) If you prefer, a version you can test is available at
-   git@github.com:mgreeraz/linux-mag.git wip/crypto/sham-v3+test
-
-f) There is a reduction in DMA performance after switching to dmaengine
-   (see http://www.spinics.net/lists/linux-omap/msg79855.html)
-
-g) Many thanks to Jon Hunter for testing on his omap2420 h4.
-
-Mark A. Greer (8):
-  ARM: OMAP2xxx: hwmod: Convert SHAM crypto device data to hwmod
-  ARM: OMAP2xxx: hwmod: Add DMA support for SHAM module
-  ARM: OMAP3xxx: hwmod: Convert SHAM crypto device data to hwmod
-  ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
-  crypto: omap-sham: Remove cpu_is/omap_type check from driver
-  crypto: omap-sham: Convert to use pm_runtime API
-  crypto: omap-sham: Add code to use dmaengine API
-  crypto: omap_sham: Remove usage of private DMA API
-
- arch/arm/mach-omap2/clock2430_data.c               |   1 +
- arch/arm/mach-omap2/clock3xxx_data.c               |   1 +
- arch/arm/mach-omap2/devices.c                      |  73 ++------
- arch/arm/mach-omap2/omap_hwmod_2420_data.c         |   1 +
- arch/arm/mach-omap2/omap_hwmod_2430_data.c         |   1 +
- .../mach-omap2/omap_hwmod_2xxx_interconnect_data.c |  18 ++
- arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c |  43 +++++
- arch/arm/mach-omap2/omap_hwmod_3xxx_data.c         |  66 +++++++
- arch/arm/mach-omap2/omap_hwmod_common_data.h       |   2 +
- drivers/crypto/omap-sham.c                         | 202 +++++++++++----------
- 10 files changed, 251 insertions(+), 157 deletions(-)
-
+diff --git a/arch/arm/mach-omap2/clock3xxx_data.c b/arch/arm/mach-omap2/clock3xxx_data.c
+index 1f42c9d..6f14d9b 100644
+--- a/arch/arm/mach-omap2/clock3xxx_data.c
++++ b/arch/arm/mach-omap2/clock3xxx_data.c
+@@ -3342,6 +3342,7 @@ static struct omap_clk omap3xxx_clks[] = {
+ 	CLK(NULL,	"icr_ick",	&icr_ick,	CK_34XX | CK_36XX),
+ 	CLK("omap-aes",	"ick",	&aes2_ick,	CK_34XX | CK_36XX),
+ 	CLK("omap-sham",	"ick",	&sha12_ick,	CK_34XX | CK_36XX),
++	CLK(NULL,	"sha12_ick",	&sha12_ick,	CK_34XX | CK_36XX),
+ 	CLK(NULL,	"des2_ick",	&des2_ick,	CK_34XX | CK_36XX),
+ 	CLK("omap_hsmmc.1",	"ick",	&mmchs2_ick,	CK_3XXX),
+ 	CLK("omap_hsmmc.0",	"ick",	&mmchs1_ick,	CK_3XXX),
+diff --git a/arch/arm/mach-omap2/devices.c b/arch/arm/mach-omap2/devices.c
+index 9d95654..015c259 100644
+--- a/arch/arm/mach-omap2/devices.c
++++ b/arch/arm/mach-omap2/devices.c
+@@ -37,6 +37,7 @@
+ #include "devices.h"
+ #include "cm2xxx_3xxx.h"
+ #include "cm-regbits-24xx.h"
++#include "cm-regbits-34xx.h"
+ 
+ #define L3_MODULES_MAX_LEN 12
+ #define L3_MODULES 3
+@@ -454,38 +455,9 @@ static void omap_init_rng(void)
+ 	WARN(IS_ERR(pdev), "Can't build omap_device for omap_rng\n");
+ }
+ 
+-#if defined(CONFIG_CRYPTO_DEV_OMAP_SHAM) || defined(CONFIG_CRYPTO_DEV_OMAP_SHAM_MODULE)
+-
+-#ifdef CONFIG_ARCH_OMAP3
+-static struct resource omap3_sham_resources[] = {
+-	{
+-		.start	= OMAP34XX_SEC_SHA1MD5_BASE,
+-		.end	= OMAP34XX_SEC_SHA1MD5_BASE + 0x64,
+-		.flags	= IORESOURCE_MEM,
+-	},
+-	{
+-		.start	= 49 + OMAP_INTC_START,
+-		.flags	= IORESOURCE_IRQ,
+-	},
+-	{
+-		.start	= OMAP34XX_DMA_SHA1MD5_RX,
+-		.flags	= IORESOURCE_DMA,
+-	}
+-};
+-static int omap3_sham_resources_sz = ARRAY_SIZE(omap3_sham_resources);
+-#else
+-#define omap3_sham_resources		NULL
+-#define omap3_sham_resources_sz		0
+-#endif
+-
+-static struct platform_device sham_device = {
+-	.name		= "omap-sham",
+-	.id		= -1,
+-};
+-
+-static void omap_init_sham(void)
++static void __init omap_init_sham(void)
+ {
+-	if (cpu_is_omap24xx()) {
++	if (cpu_is_omap24xx() || cpu_is_omap34xx()) {
+ 		struct omap_hwmod *oh;
+ 		struct platform_device *pdev;
+ 
+@@ -496,18 +468,10 @@ static void omap_init_sham(void)
+ 		pdev = omap_device_build("omap-sham", -1, oh, NULL, 0, NULL,
+ 					 0, 0);
+ 		WARN(IS_ERR(pdev), "Can't build omap_device for omap-sham\n");
+-	} else if (cpu_is_omap34xx()) {
+-		sham_device.resource = omap3_sham_resources;
+-		sham_device.num_resources = omap3_sham_resources_sz;
+-		platform_device_register(&sham_device);
+ 	} else {
+ 		pr_err("%s: platform not supported\n", __func__);
+-		return;
+ 	}
+ }
+-#else
+-static inline void omap_init_sham(void) { }
+-#endif
+ 
+ #if defined(CONFIG_CRYPTO_DEV_OMAP_AES) || defined(CONFIG_CRYPTO_DEV_OMAP_AES_MODULE)
+ 
+diff --git a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+index f67b7ee..a65972b 100644
+--- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
++++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+@@ -3543,6 +3543,71 @@ static struct omap_hwmod_ocp_if omap3xxx_l3_main__gpmc = {
+ 	.user		= OCP_USER_MPU | OCP_USER_SDMA,
+ };
+ 
++/* l4_core -> SHAM2 (SHA1/MD5) (similar to omap24xx) */
++static struct omap_hwmod_sysc_fields omap3_sham_sysc_fields = {
++	.sidle_shift	= 4,
++	.srst_shift	= 1,
++	.autoidle_shift	= 0,
++};
++
++static struct omap_hwmod_class_sysconfig omap3_sham_sysc = {
++	.rev_offs	= 0x5c,
++	.sysc_offs	= 0x60,
++	.syss_offs	= 0x64,
++	.sysc_flags	= (SYSC_HAS_SIDLEMODE | SYSC_HAS_SOFTRESET |
++			   SYSC_HAS_AUTOIDLE | SYSS_HAS_RESET_STATUS),
++	.sysc_fields	= &omap3_sham_sysc_fields,
++};
++
++static struct omap_hwmod_class omap3xxx_sham_class = {
++	.name	= "sham",
++	.sysc	= &omap3_sham_sysc,
++};
++
++struct omap_hwmod_irq_info omap3_sham_mpu_irqs[] = {
++	{ .irq = 49 + OMAP_INTC_START, },
++	{ .irq = -1 }
++};
++
++struct omap_hwmod_dma_info omap3_sham_sdma_reqs[] = {
++	{ .name = "rx", .dma_req = OMAP34XX_DMA_SHA1MD5_RX, },
++	{ .dma_req = -1 }
++};
++
++struct omap_hwmod omap3xxx_sham_hwmod = {
++	.name		= "sham",
++	.mpu_irqs	= omap3_sham_mpu_irqs,
++	.sdma_reqs	= omap3_sham_sdma_reqs,
++	.main_clk	= "sha12_ick",
++	.prcm		= {
++		.omap2 = {
++			.module_offs = CORE_MOD,
++			.prcm_reg_id = 1,
++			.module_bit = OMAP3430_EN_SHA12_SHIFT,
++			.idlest_reg_id = 1,
++			.idlest_idle_bit = OMAP3430_ST_SHA12_SHIFT,
++		},
++	},
++	.class		= &omap3xxx_sham_class,
++};
++
++static struct omap_hwmod_addr_space omap3xxx_sham_addrs[] = {
++	{
++		.pa_start	= 0x480c3000,
++		.pa_end		= 0x480c3000 + 0x64 - 1,
++		.flags		= ADDR_TYPE_RT
++	},
++	{ }
++};
++
++static struct omap_hwmod_ocp_if omap3xxx_l4_core__sham = {
++	.master		= &omap3xxx_l4_core_hwmod,
++	.slave		= &omap3xxx_sham_hwmod,
++	.clk		= "sha12_ick",
++	.addr		= omap3xxx_sham_addrs,
++	.user		= OCP_USER_MPU | OCP_USER_SDMA,
++};
++
+ static struct omap_hwmod_ocp_if *omap3xxx_hwmod_ocp_ifs[] __initdata = {
+ 	&omap3xxx_l3_main__l4_core,
+ 	&omap3xxx_l3_main__l4_per,
+@@ -3596,6 +3661,7 @@ static struct omap_hwmod_ocp_if *omap3xxx_hwmod_ocp_ifs[] __initdata = {
+ /* GP-only hwmod links */
+ static struct omap_hwmod_ocp_if *omap3xxx_gp_hwmod_ocp_ifs[] __initdata = {
+ 	&omap3xxx_l4_sec__timer12,
++	&omap3xxx_l4_core__sham,
+ 	NULL
+ };
+ 
 -- 
 1.7.12
-
