@@ -1,74 +1,99 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: Crypto causes panic in scatterwalk_done with large/multiple
- buffers
-Date: Sun, 18 Nov 2012 19:40:33 +0200
-Message-ID: <20121118194033.20427f1141j4ic4c@www.dalek.fi>
-References: <50A4AFEE.9030206@lundman.net>
- <20121117024220.12381ph1ph0fu3q8@www.dalek.fi>
- <20121117103901.664145ijlv5r29wk@www.dalek.fi>
- <50A82BD1.4000505@lundman.net>
+From: Jorgen Lundman <lundman@lundman.net>
+Subject: Re: Crypto causes panic in scatterwalk_done with large/multiple buffers
+Date: Mon, 19 Nov 2012 09:29:22 +0900
+Message-ID: <50A97D62.1000604@lundman.net>
+References: <50A4AFEE.9030206@lundman.net> <20121117024220.12381ph1ph0fu3q8@www.dalek.fi> <20121117103901.664145ijlv5r29wk@www.dalek.fi> <50A82BD1.4000505@lundman.net> <20121118194033.20427f1141j4ic4c@www.dalek.fi>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Jorgen Lundman <lundman@lundman.net>
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	linux-crypto@vger.kernel.org
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:41431 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752306Ab2KRRkh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Nov 2012 12:40:37 -0500
-In-Reply-To: <50A82BD1.4000505@lundman.net>
-Content-Disposition: inline
+Received: from mail.lundman.net ([210.157.1.114]:43065 "EHLO mail.lundman.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752722Ab2KSA30 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 18 Nov 2012 19:29:26 -0500
+In-Reply-To: <20121118194033.20427f1141j4ic4c@www.dalek.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Jorgen Lundman <lundman@lundman.net>:
+> 
+> From what I now researched, you must not pass vmalloc'd memory to
+> sg_set_buf() as it internally uses virt_to_page() to get page of buffer
+> address. You most likely need to walk through your vmalloc'd buffer and
+> pass all individual pages to scatterlist with sg_set_page().
 
->>
->> Appearently this patch only fixed my debug printk loop that used sg_next
->> from scatterlist API instead of scatterwalk_sg_next from scatterwalk API.
->> Sorry for the noise.
->>
->
-> Thanks for looking at this. I think I am dealing with 2 problems, one is
-> that occasionally my buffers are from vmalloc, and needs to have some logic
-> using vmalloc_to_page().  But I don't know if ciphers should handle that
-> internally, blkcipher.c certainly seems to have several modes, although I
-> do not see how to *set* them.
+I was told the same, so I wrote something that called vmalloc_to_page() for
+each PAGE_SIZE of the vmalloced memory, with offsets, and created large
+scatterlists (well, around ~120 or so).
 
- From what I now researched, you must not pass vmalloc'd memory to  
-sg_set_buf() as it internally uses virt_to_page() to get page of  
-buffer address. You most likely need to walk through your vmalloc'd  
-buffer and pass all individual pages to scatterlist with sg_set_page().
+Made no difference at all, still dies in scatterwalk_done.
 
->
-> Second problem is most likely what you were looking at. It is quite easy to
-> make the crypto code die.
->
-> For example, if I use "ccm(aes)" which can take the dst buffer, plus a hmac
-> buffer;
->
->   cipher = kmalloc( ciphersize, ...
->   hmac = kmalloc( 16, ...
->   sg_set_buf( &sg[0], cipher, ciphersize);
->   sg_set_buf( &sg[1], hmac, 16);
->   aead_encrypt()...
->
-> and all is well, but if you shift hmac address away from PAGE boundary, like:
->
->   hmac = kmalloc( 16 + 32, ...
->   hmac += 32;
->   sg_set_buf( &sg[1], hmac, 16);
->
-> ie, allocate a larger buffer, and put the pointer into the page a bit. And
-> it will die in scatterwalk very often. +32 isnt magical, any non-zero
-> number works.
+Looking at blkcipher (ccm->ctr->blkcipher) and I see it has methods for
+_phys(), _virt(), _virt_block(), _fast(), _slow() and _copy(). I was quite
+interested in the copy() method, since that is what I am doing at the top.
 
-This is strange as crypto subsystem's internal test mechanism uses  
-such offsetted buffers.
+No idea how I affect those types of use. phys and virt seem to be handled
+internally, and virt_block() is what ctr.c uses.
 
--Jussi
+This made me think the vmalloc thing isn't my problem.
+
+Then I copied ccm.c, ctr.c and blkcipher.c to my own module, just so that I
+could commend out:
+
+
+static void Xscatterwalk_pagedone(struct scatter_walk *walk, int out,
+                                 unsigned int more)
+{
+
+    if (out) {
+        struct page *page;
+
+        page = sg_page(walk->sg) + ((walk->offset - 1) >> PAGE_SHIFT);
+
+#if 0
+        /*
+         * This call causes panic, so all these sources are just to
+         * avoid this call.
+         *
+         * Once this issue has been fixed, we can remove the entire
+         * "sun-ccm(aes)" module.
+         *
+         */
+        if (!PageSlab(page))
+            flush_dcache_page(page);
+#endif
+    }
+
+    if (more) {
+
+
+And making the two functions, Xscatterwalk_done() and
+Xscatterwalk_copychunks(), to call my version instead.
+
+Wouldn't you know, all panics are gone. The misaligned buffer panic, gone.
+Reverted back to just passing vmalloc() memory, no problems.
+
+I have been running multi-gig bonnie++ for 24 hours (file system related
+crypto). I am trusting that it is working now.
+
+Tested with 3.2.0-0.bpo.3-amd64 and 3.5.0-17-generic.
+
+> This is strange as crypto subsystem's internal test mechanism uses such
+> offsetted buffers.
+> 
+
+I'm sure it does. I run my tests about 100 times and it usually dies around
+~40th.
+
+
+I appreciate your help,
+
+Lund
+
+-- 
+Jorgen Lundman       | <lundman@lundman.net>
+Unix Administrator   | +81 (0)3 -5456-2687 ext 1017 (work)
+Shibuya-ku, Tokyo    | +81 (0)90-5578-8500          (cell)
+Japan                | +81 (0)3 -3375-1767          (home)
