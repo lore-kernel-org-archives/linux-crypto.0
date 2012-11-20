@@ -1,48 +1,53 @@
-From: Milan Broz <mbroz@redhat.com>
-Subject: Tcrypt  hmac(crc32) test can work only on Blackfin
-Date: Tue, 20 Nov 2012 15:03:31 +0100
-Message-ID: <50AB8DB3.6040008@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>, Sonic.Zhang@analog.com
-To: linux-crypto@vger.kernel.org
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: testmgr - remove superfluous initializers for xts(aes)
+Date: Wed, 21 Nov 2012 00:29:31 +0100
+Message-ID: <1353454171-24217-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>,
+	Jarod Wilson <jarod@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:5036 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751883Ab2KTOEA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Nov 2012 09:04:00 -0500
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:55710 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751594Ab2KTX3z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Nov 2012 18:29:55 -0500
+Received: by mail-bk0-f46.google.com with SMTP id q16so2680824bkw.19
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2012 15:29:54 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+The test vectors for 'xts(aes)' contain superfluous initializers.
+Remove them.
 
-commit a482b081a2d4d74d16bc9ea8779f9f6055f95852
-Author: Sonic Zhang <sonic.zhang@analog.com>
-Date:   Fri May 25 17:54:13 2012 +0800
-    crypto: testmgr - Add new test cases for Blackfin CRC crypto driver
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Cc: Jarod Wilson <jarod@redhat.com>
+---
+ crypto/testmgr.h |    4 ----
+ 1 file changed, 4 deletions(-)
 
-added tcrypt mode=110 test for hmac(crc32)
-
-It seems, that this mode is only directly implemented by Blackfin
-driver and must fail on all other architectures because:
-
-- nobody implements "crc32" but "crc32c"
-
-- the block size is 1 and digest size is 4 for crc32[c], so
-hmac(crc32c) must fail because ds > block_size (test in hmac_create)
-
-And it doesn't fail here because you implement it directly and
-not using hmac.c...
-
-Just try modprobe tcrypt mode=110 on so other arch
-  alg: hash: Failed to load transform for hmac(crc32): -2
-
-Why was such one-device dependent test vector added?
-
-IMHO either it should provide crc32c (as do generic, sparc or x86 hw drivers)
-or the block size for crc32c should be 4... (and test vector is wrong then)
-
-But now we have test vector which must fail for most of systems.
-
-Milan
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 17db4a9..b5667a4 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -15011,8 +15011,6 @@ static struct cipher_testvec aes_xts_enc_tv_template[] = {
+ 		.klen	= 64,
+ 		.iv	= "\xff\x00\x00\x00\x00\x00\x00\x00"
+ 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+ 		.input	= "\x00\x01\x02\x03\x04\x05\x06\x07"
+ 			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+ 			  "\x10\x11\x12\x13\x14\x15\x16\x17"
+@@ -15355,8 +15353,6 @@ static struct cipher_testvec aes_xts_dec_tv_template[] = {
+ 		.klen	= 64,
+ 		.iv	= "\xff\x00\x00\x00\x00\x00\x00\x00"
+ 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+ 		.input	= "\x1c\x3b\x3a\x10\x2f\x77\x03\x86"
+ 			  "\xe4\x83\x6c\x99\xe3\x70\xcf\x9b"
+ 			  "\xea\x00\x80\x3f\x5e\x48\x23\x57"
+-- 
+1.7.10.4
