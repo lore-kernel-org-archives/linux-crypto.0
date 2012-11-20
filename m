@@ -1,63 +1,48 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH 0/7] crypto: omap-aes updates
-Date: Tue, 20 Nov 2012 14:08:26 +0200
-Message-ID: <CALLzPKZ20iQXGw9k4sxiVW0VOTdV5pw6Gz8W8V4SRpe=qVY+4w@mail.gmail.com>
-References: <1353351832-6685-1-git-send-email-mgreer@animalcreek.com>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Tcrypt  hmac(crc32) test can work only on Blackfin
+Date: Tue, 20 Nov 2012 15:03:31 +0100
+Message-ID: <50AB8DB3.6040008@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
-	khilman@deeprootsystems.com
-To: "Mark A. Greer" <mgreer@animalcreek.com>
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1353351832-6685-1-git-send-email-mgreer@animalcreek.com>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>, Sonic.Zhang@analog.com
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:5036 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751883Ab2KTOEA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Nov 2012 09:04:00 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Great. You also worked on AES...
-Will take a loos asap.
+Hi,
 
-On Mon, Nov 19, 2012 at 9:03 PM, Mark A. Greer <mgreer@animalcreek.com> wrote:
-> From: "Mark A. Greer" <mgreer@animalcreek.com>
->
-> This series updates the crypto omap-aes driver and supporting
-> infrastructure.
->
-> Notes:
->
-> a) Based on omap-sham patches recently submitted, XXX
->
-> b) Since these patches will likely go though the OMAP tree (and not
->    through the crypto tree), it would be nice if the crypto guy(s)
->    would ACK or NACK patches 4-7 which modify the
->    drivers/crypto/omap-sham.c driver.
->
-> c) These have only been tested on an omap2420 h4 and an am37x evm.
->
-> d) Many thanks to Jon Hunter for testing on his omap2420 h4.
->
-> Mark A. Greer (7):
->   ARM: OMAP2xxx: hwmod: Convert AES crypto devcie data to hwmod
->   ARM: OMAP3xxx: hwmod: Convert AES crypto device data to hwmod
->   ARM: OMAP2+: Remove unnecessary message when no AES IP is present
->   crypto: omap-aes: Remove cpu_is/omap_type check from driver
->   crypto: omap-aes: Convert to use pm_runtime API
->   crypto: omap-aes: Add code to use dmaengine API
->   crypto: omap-aes: Remove usage of private DMA API
->
->  arch/arm/mach-omap2/clock2430_data.c               |   1 +
->  arch/arm/mach-omap2/clock3xxx_data.c               |   1 +
->  arch/arm/mach-omap2/devices.c                      |  75 +-------
->  arch/arm/mach-omap2/omap_hwmod_2420_data.c         |   1 +
->  arch/arm/mach-omap2/omap_hwmod_2430_data.c         |   1 +
->  .../mach-omap2/omap_hwmod_2xxx_interconnect_data.c |  18 ++
->  arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c |  38 ++++
->  arch/arm/mach-omap2/omap_hwmod_3xxx_data.c         |  62 +++++++
->  arch/arm/mach-omap2/omap_hwmod_common_data.h       |   2 +
->  drivers/crypto/omap-aes.c                          | 202 ++++++++++++---------
->  10 files changed, 251 insertions(+), 150 deletions(-)
->
-> --
-> 1.7.12
->
+commit a482b081a2d4d74d16bc9ea8779f9f6055f95852
+Author: Sonic Zhang <sonic.zhang@analog.com>
+Date:   Fri May 25 17:54:13 2012 +0800
+    crypto: testmgr - Add new test cases for Blackfin CRC crypto driver
+
+added tcrypt mode=110 test for hmac(crc32)
+
+It seems, that this mode is only directly implemented by Blackfin
+driver and must fail on all other architectures because:
+
+- nobody implements "crc32" but "crc32c"
+
+- the block size is 1 and digest size is 4 for crc32[c], so
+hmac(crc32c) must fail because ds > block_size (test in hmac_create)
+
+And it doesn't fail here because you implement it directly and
+not using hmac.c...
+
+Just try modprobe tcrypt mode=110 on so other arch
+  alg: hash: Failed to load transform for hmac(crc32): -2
+
+Why was such one-device dependent test vector added?
+
+IMHO either it should provide crc32c (as do generic, sparc or x86 hw drivers)
+or the block size for crc32c should be 4... (and test vector is wrong then)
+
+But now we have test vector which must fail for most of systems.
+
+Milan
