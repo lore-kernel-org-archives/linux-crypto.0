@@ -1,53 +1,74 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] crypto: testmgr - remove superfluous initializers for xts(aes)
-Date: Wed, 21 Nov 2012 00:29:31 +0100
-Message-ID: <1353454171-24217-1-git-send-email-minipli@googlemail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>,
-	Jarod Wilson <jarod@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bk0-f46.google.com ([209.85.214.46]:55710 "EHLO
-	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751594Ab2KTX3z (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Nov 2012 18:29:55 -0500
-Received: by mail-bk0-f46.google.com with SMTP id q16so2680824bkw.19
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2012 15:29:54 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH v4 5/8] crypto: omap-sham: Remove cpu_is/omap_type
+ check from driver
+Date: Tue, 20 Nov 2012 17:02:58 -0800
+Message-ID: <20121121010257.GR18567@atomide.com>
+References: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
+ <1353351301-6453-6-git-send-email-mgreer@animalcreek.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, dmitry.kasatkin@intel.com,
+	rmk+kernel@arm.linux.org.uk, paul@pwsan.com,
+	khilman@deeprootsystems.com
+To: "Mark A. Greer" <mgreer@animalcreek.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1353351301-6453-6-git-send-email-mgreer@animalcreek.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The test vectors for 'xts(aes)' contain superfluous initializers.
-Remove them.
+* Mark A. Greer <mgreer@animalcreek.com> [121119 10:58]:
+> From: "Mark A. Greer" <mgreer@animalcreek.com>
+> 
+> The omap-sham driver should not check the CPU class or the
+> type of OMAP device its on.  The platform code should do
+> that instead.
 
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
-Cc: Jarod Wilson <jarod@redhat.com>
----
- crypto/testmgr.h |    4 ----
- 1 file changed, 4 deletions(-)
+I think I already have a similar patch queued in linux next.
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 17db4a9..b5667a4 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -15011,8 +15011,6 @@ static struct cipher_testvec aes_xts_enc_tv_template[] = {
- 		.klen	= 64,
- 		.iv	= "\xff\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.input	= "\x00\x01\x02\x03\x04\x05\x06\x07"
- 			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
- 			  "\x10\x11\x12\x13\x14\x15\x16\x17"
-@@ -15355,8 +15353,6 @@ static struct cipher_testvec aes_xts_dec_tv_template[] = {
- 		.klen	= 64,
- 		.iv	= "\xff\x00\x00\x00\x00\x00\x00\x00"
- 			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
--			  "\x00\x00\x00\x00\x00\x00\x00\x00",
- 		.input	= "\x1c\x3b\x3a\x10\x2f\x77\x03\x86"
- 			  "\xe4\x83\x6c\x99\xe3\x70\xcf\x9b"
- 			  "\xea\x00\x80\x3f\x5e\x48\x23\x57"
--- 
-1.7.10.4
+Regards,
+
+Tony
+ 
+> CC: Paul Walmsley <paul@pwsan.com>
+> CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+> Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+> ---
+>  drivers/crypto/omap-sham.c | 8 --------
+>  1 file changed, 8 deletions(-)
+> 
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index a3fd6fc..f50387c 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -37,7 +37,6 @@
+>  #include <crypto/hash.h>
+>  #include <crypto/internal/hash.h>
+>  
+> -#include <plat/cpu.h>
+>  #include <plat/dma.h>
+>  #include <mach/irqs.h>
+>  
+> @@ -1289,13 +1288,6 @@ static int __init omap_sham_mod_init(void)
+>  {
+>  	pr_info("loading %s driver\n", "omap-sham");
+>  
+> -	if (!cpu_class_is_omap2() ||
+> -		(omap_type() != OMAP2_DEVICE_TYPE_SEC &&
+> -			omap_type() != OMAP2_DEVICE_TYPE_EMU)) {
+> -		pr_err("Unsupported cpu\n");
+> -		return -ENODEV;
+> -	}
+> -
+>  	return platform_driver_register(&omap_sham_driver);
+>  }
+>  
+> -- 
+> 1.7.12
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-omap" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
