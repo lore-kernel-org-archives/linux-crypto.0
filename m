@@ -1,8 +1,9 @@
 From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH v4 0/8] crypto: omap-sham updates
-Date: Wed, 5 Dec 2012 12:28:28 +0200
-Message-ID: <CALLzPKa9OdxAQBhUV-c0yBfRRuAmN-BCGLV9jbUsHaPzC5veqw@mail.gmail.com>
-References: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
+Subject: Re: [PATCH 0/7] crypto: omap-aes updates
+Date: Wed, 5 Dec 2012 12:28:46 +0200
+Message-ID: <CALLzPKaR8W+T1BfdzYVPE37sMna5OZBLn-JzpF+d5wufNX6_yQ@mail.gmail.com>
+References: <1353351832-6685-1-git-send-email-mgreer@animalcreek.com>
+	<CALLzPKZ20iQXGw9k4sxiVW0VOTdV5pw6Gz8W8V4SRpe=qVY+4w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -11,13 +12,14 @@ Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	khilman@deeprootsystems.com
 To: "Mark A. Greer" <mgreer@animalcreek.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:54567 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753665Ab2LEK2a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Dec 2012 05:28:30 -0500
-Received: by mail-ia0-f198.google.com with SMTP id m10so11988723iam.1
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Dec 2012 02:28:29 -0800 (PST)
-In-Reply-To: <1353351301-6453-1-git-send-email-mgreer@animalcreek.com>
+Received: from mga07.intel.com ([143.182.124.22]:57290 "EHLO
+	azsmga101.ch.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753714Ab2LEK2s (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Dec 2012 05:28:48 -0500
+Received: by mail-ob0-f197.google.com with SMTP id v19so22971130obq.4
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Dec 2012 02:28:46 -0800 (PST)
+In-Reply-To: <CALLzPKZ20iQXGw9k4sxiVW0VOTdV5pw6Gz8W8V4SRpe=qVY+4w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -29,93 +31,51 @@ But in general changes are OK for me.
 - Dmitry
 
 
-On Mon, Nov 19, 2012 at 8:54 PM, Mark A. Greer <mgreer@animalcreek.com> wrote:
-> From: "Mark A. Greer" <mgreer@animalcreek.com>
+On Tue, Nov 20, 2012 at 2:08 PM, Kasatkin, Dmitry
+<dmitry.kasatkin@intel.com> wrote:
+> Great. You also worked on AES...
+> Will take a loos asap.
 >
-> Changes since v3:
->         - Added hwmod support for SIDLEMODE.  This requires adding
->           a specific omap_hwmod_sysc_fields structure since there
->           are not generic ones that have the correct offsets.
->         - Added patch to remove the cpu check from the omap-sham
->           driver.  This can likely be ignored since there is a patch
->           that already does this in Tony's branch.  I added it to
->           make it easier for others to test while Tony's patch makes
->           its way to the k.o.
->
-> Changes since v2:
->         - Reworked pm_runtime calls to match where original clk_*
->           calls were so provide better PM (as per Kevin Hilman's
->           comments).
->
-> Changes since v1:
->         - Removed the check of CM_IDLEST to see if the module exists
->           and instead add the hwmod data for all omap2's and omap3 GP's.
->         - Placed new sha_ick clk entries after the 'omap-sham' entry
->           in the clockxxx_data.c files
->         - Removed cpu_is_xxx() checks in
->           arch/arm/mach-omap2/devices.c:omap_init_sham()
->         - Rebased on the latest k.o. kernel
->
->
-> This series updates the crypto omap-sham driver and supporting
-> infrastructure.
->
-> Notes:
->
-> a) Based on 3587b1b (fanotify: fix FAN_Q_OVERFLOW case of fanotify_read()).
->
-> b) Since these patches will likely go though the OMAP tree (and not
->    through the crypto tree), it would be nice if the crypto guy(s)
->    would ACK or NACK patches 5-7 which modify the
->    drivers/crypto/omap-sham.c driver.
->
-> c) These have only been tested on an omap2420 h4 and an am37x evm.  If you
->    have different hardware available and a few minutes, please test them.
->    A quick and easy test is to enable tcrypt as a module
->    (CONFIG_CRYPTO_TEST=m), boot, then run 'modprobe tcrypt sec=2 mode=403'.
->    'CONFIG_CRYPTO_SHA1' and 'CONFIG_CRYPTO_DEV_OMAP_SHAM' also have to be
->    enabled.  A quick 'grep omap-sham /proc/interrupts' will tell you if
->    the omap-sham driver was really used.
->
-> d) To test these patches, you will likely need...
->    i) The patch included here:
->            http://marc.info/?l=kernel-janitors&m=134910841909057&w=2
->    ii) This patch from linux-omap/master:
->            27615a9 (ARM: OMAP: Trivial driver changes to remove include
->                            plat/cpu.h)
->    iii) This patch from Paul Walmsley:
->            http://www.spinics.net/lists/linux-omap/msg79436.html
->
-> e) If you prefer, a version you can test is available at
->    git@github.com:mgreeraz/linux-mag.git wip/crypto/sham-v3+test
->
-> f) There is a reduction in DMA performance after switching to dmaengine
->    (see http://www.spinics.net/lists/linux-omap/msg79855.html)
->
-> g) Many thanks to Jon Hunter for testing on his omap2420 h4.
->
-> Mark A. Greer (8):
->   ARM: OMAP2xxx: hwmod: Convert SHAM crypto device data to hwmod
->   ARM: OMAP2xxx: hwmod: Add DMA support for SHAM module
->   ARM: OMAP3xxx: hwmod: Convert SHAM crypto device data to hwmod
->   ARM: OMAP2+: Remove unnecessary message when no SHA IP is present
->   crypto: omap-sham: Remove cpu_is/omap_type check from driver
->   crypto: omap-sham: Convert to use pm_runtime API
->   crypto: omap-sham: Add code to use dmaengine API
->   crypto: omap_sham: Remove usage of private DMA API
->
->  arch/arm/mach-omap2/clock2430_data.c               |   1 +
->  arch/arm/mach-omap2/clock3xxx_data.c               |   1 +
->  arch/arm/mach-omap2/devices.c                      |  73 ++------
->  arch/arm/mach-omap2/omap_hwmod_2420_data.c         |   1 +
->  arch/arm/mach-omap2/omap_hwmod_2430_data.c         |   1 +
->  .../mach-omap2/omap_hwmod_2xxx_interconnect_data.c |  18 ++
->  arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c |  43 +++++
->  arch/arm/mach-omap2/omap_hwmod_3xxx_data.c         |  66 +++++++
->  arch/arm/mach-omap2/omap_hwmod_common_data.h       |   2 +
->  drivers/crypto/omap-sham.c                         | 202 +++++++++++----------
->  10 files changed, 251 insertions(+), 157 deletions(-)
->
-> --
-> 1.7.12
->
+> On Mon, Nov 19, 2012 at 9:03 PM, Mark A. Greer <mgreer@animalcreek.com> wrote:
+>> From: "Mark A. Greer" <mgreer@animalcreek.com>
+>>
+>> This series updates the crypto omap-aes driver and supporting
+>> infrastructure.
+>>
+>> Notes:
+>>
+>> a) Based on omap-sham patches recently submitted, XXX
+>>
+>> b) Since these patches will likely go though the OMAP tree (and not
+>>    through the crypto tree), it would be nice if the crypto guy(s)
+>>    would ACK or NACK patches 4-7 which modify the
+>>    drivers/crypto/omap-sham.c driver.
+>>
+>> c) These have only been tested on an omap2420 h4 and an am37x evm.
+>>
+>> d) Many thanks to Jon Hunter for testing on his omap2420 h4.
+>>
+>> Mark A. Greer (7):
+>>   ARM: OMAP2xxx: hwmod: Convert AES crypto devcie data to hwmod
+>>   ARM: OMAP3xxx: hwmod: Convert AES crypto device data to hwmod
+>>   ARM: OMAP2+: Remove unnecessary message when no AES IP is present
+>>   crypto: omap-aes: Remove cpu_is/omap_type check from driver
+>>   crypto: omap-aes: Convert to use pm_runtime API
+>>   crypto: omap-aes: Add code to use dmaengine API
+>>   crypto: omap-aes: Remove usage of private DMA API
+>>
+>>  arch/arm/mach-omap2/clock2430_data.c               |   1 +
+>>  arch/arm/mach-omap2/clock3xxx_data.c               |   1 +
+>>  arch/arm/mach-omap2/devices.c                      |  75 +-------
+>>  arch/arm/mach-omap2/omap_hwmod_2420_data.c         |   1 +
+>>  arch/arm/mach-omap2/omap_hwmod_2430_data.c         |   1 +
+>>  .../mach-omap2/omap_hwmod_2xxx_interconnect_data.c |  18 ++
+>>  arch/arm/mach-omap2/omap_hwmod_2xxx_ipblock_data.c |  38 ++++
+>>  arch/arm/mach-omap2/omap_hwmod_3xxx_data.c         |  62 +++++++
+>>  arch/arm/mach-omap2/omap_hwmod_common_data.h       |   2 +
+>>  drivers/crypto/omap-aes.c                          | 202 ++++++++++++---------
+>>  10 files changed, 251 insertions(+), 150 deletions(-)
+>>
+>> --
+>> 1.7.12
+>>
