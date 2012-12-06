@@ -1,60 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Tcrypt  hmac(crc32) test can work only on Blackfin
-Date: Thu, 6 Dec 2012 17:07:10 +0800
-Message-ID: <20121206090710.GA15642@gondor.apana.org.au>
-References: <50AB8DB3.6040008@redhat.com>
- <DB904C5425BA6F4E8424B3B51A1414D173F34B2A37@NWD2CMBX1.ad.analog.com>
- <50ACC2AD.2060100@redhat.com>
- <20121122023308.GA19138@gondor.apana.org.au>
- <DB904C5425BA6F4E8424B3B51A1414D173F34B2D8E@NWD2CMBX1.ad.analog.com>
+Subject: Re: [PATCH] crypto: cast5/cast6 - move lookup tables to shared
+ module
+Date: Thu, 6 Dec 2012 17:19:03 +0800
+Message-ID: <20121206091903.GA15870@gondor.apana.org.au>
+References: <20121113094314.23872.30309.stgit@localhost6.localdomain6>
+ <20121113.135304.281580343771830320.davem@davemloft.net>
+ <20121113215020.841366cnfloetcsg@www.dalek.fi>
+ <20121113.145246.1782542703964753357.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Milan Broz <mbroz@redhat.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Zhang, Sonic" <Sonic.Zhang@analog.com>
+Cc: jussi.kivilinna@mbnet.fi, linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:50716 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:34261 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S964788Ab2LFJHT (ORCPT
+	with ESMTP id S1754060Ab2LFJTK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Dec 2012 04:07:19 -0500
+	Thu, 6 Dec 2012 04:19:10 -0500
 Content-Disposition: inline
-In-Reply-To: <DB904C5425BA6F4E8424B3B51A1414D173F34B2D8E@NWD2CMBX1.ad.analog.com>
+In-Reply-To: <20121113.145246.1782542703964753357.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 22, 2012 at 03:38:45AM -0500, Zhang, Sonic wrote:
+On Tue, Nov 13, 2012 at 02:52:46PM -0500, David Miller wrote:
+> From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> Date: Tue, 13 Nov 2012 21:50:20 +0200
 > 
-> >On Wed, Nov 21, 2012 at 01:01:49PM +0100, Milan Broz wrote:
+> > Quoting David Miller <davem@davemloft.net>:
+> > 
+> >> From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+> >> Date: Tue, 13 Nov 2012 11:43:14 +0200
 > >>
-> >> On 11/21/2012 12:29 PM, Zhang, Sonic wrote:
-> >> > Is there a policy that the CRC test vector in testmgr.h should
-> >> > support all CRC drivers?
-> >> > If so, I am fine to drop this test vector.
+> >>> CAST5 and CAST6 both use same lookup tables, which can be moved shared
+> >>> module
+> >>> 'cast_common'.
+> >>>
+> >>> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 > >>
-> >> Question for Herbert...
-> >> But the problem I see is that it confuses people, it simply returns
-> >> fail everytime (except Blackfin platform).
+> >> Does this work if you make CAST5 modular and CAST6 static, or vice
+> >> versa?
 > >>
-> >> My mail originates from bug report "tcrypt tests started failing", and
-> >> it was not obvious why (for people not familiar with tcrypt internals,
-> >> they just tried all test modes available).
-> >
-> >We should just make a generic version of crc32 available.
-> >
+> > 
+> > Yes, dependencies force common module to be built-in/static in both
+> > cases and will be build as module only if both cast5 and cast6 are
+> > also.
 > 
-> Hi Herbert and Broz,
+> Fair enough:
 > 
-> Unfortunately, after investigating the hardware manual of Blackfin CRC engine and the CRC algorithm, I have to say the Blackfin CRC driver can't use current crc32c test vector in testmgr.h. Blackfin CRC engine only supports big endian CRC algorithm, while current crypto crc32c driver uses little endian CRC algorithm. The big endian CRC digest is different from that of the little endian.
-> 
-> There are 2 solutions. One is to add a big endian crc32c test vector. The other is to keep the Blackfin specific test vector. However, neither meets Broz's expectation of a generic crc32 test vector.
-> 
-> Any idea?
+> Acked-by: David S. Miller <davem@davemloft.net>
 
-I think we should just remove the blackfin crc driver altogether
-as nothing in the kernel ever uses hmac(crc32).
-
-Cheers,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
