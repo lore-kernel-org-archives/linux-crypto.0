@@ -1,85 +1,52 @@
-From: "Zhang, Sonic" <Sonic.Zhang@analog.com>
-Subject: RE: Tcrypt  hmac(crc32) test can work only on Blackfin
-Date: Thu, 6 Dec 2012 04:58:04 -0500
-Message-ID: <DB904C5425BA6F4E8424B3B51A1414D173F4E333B2@NWD2CMBX1.ad.analog.com>
-References: <50AB8DB3.6040008@redhat.com>
- <DB904C5425BA6F4E8424B3B51A1414D173F34B2A37@NWD2CMBX1.ad.analog.com>
- <50ACC2AD.2060100@redhat.com> <20121122023308.GA19138@gondor.apana.org.au>
- <DB904C5425BA6F4E8424B3B51A1414D173F34B2D8E@NWD2CMBX1.ad.analog.com>
- <20121206090710.GA15642@gondor.apana.org.au>
+From: Vakul Garg <vakul@freescale.com>
+Subject: [PATCH] Revert "crypto: caam - Updated SEC-4.0 device tree binding for ERA information."
+Date: Fri, 7 Dec 2012 14:27:29 +0530
+Message-ID: <1354870649-3656-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Milan Broz <mbroz@redhat.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Content-Type: text/plain
+To: <linux-crypto@vger.kernel.org>, <linuxppc-dev@ozlabs.org>,
+	<devicetree-discuss@lists.ozlabs.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [216.32.181.183] ([216.32.181.183]:9173 "EHLO
-	ch1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1753468Ab2LFJ7U convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Dec 2012 04:59:20 -0500
-In-Reply-To: <20121206090710.GA15642@gondor.apana.org.au>
-Content-Language: en-US
+Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:32900 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754929Ab2LGI7T (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 7 Dec 2012 03:59:19 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+This reverts commit a2c0911c09190125f52c9941b9d187f601c2f7be.
 
->-----Original Message-----
->From: Herbert Xu [mailto:herbert@gondor.hengli.com.au]
->Sent: Thursday, December 06, 2012 5:07 PM
->To: Zhang, Sonic
->Cc: Milan Broz; linux-crypto@vger.kernel.org
->Subject: Re: Tcrypt hmac(crc32) test can work only on Blackfin
->
->On Thu, Nov 22, 2012 at 03:38:45AM -0500, Zhang, Sonic wrote:
->>
->> >On Wed, Nov 21, 2012 at 01:01:49PM +0100, Milan Broz wrote:
->> >>
->> >> On 11/21/2012 12:29 PM, Zhang, Sonic wrote:
->> >> > Is there a policy that the CRC test vector in testmgr.h should
->> >> > support all CRC drivers?
->> >> > If so, I am fine to drop this test vector.
->> >>
->> >> Question for Herbert...
->> >> But the problem I see is that it confuses people, it simply returns
->> >> fail everytime (except Blackfin platform).
->> >>
->> >> My mail originates from bug report "tcrypt tests started failing",
->> >> and it was not obvious why (for people not familiar with tcrypt
->> >> internals, they just tried all test modes available).
->> >
->> >We should just make a generic version of crc32 available.
->> >
->>
->> Hi Herbert and Broz,
->>
->> Unfortunately, after investigating the hardware manual of Blackfin CRC engine
->and the CRC algorithm, I have to say the Blackfin CRC driver can't use current
->crc32c test vector in testmgr.h. Blackfin CRC engine only supports big endian
->CRC algorithm, while current crypto crc32c driver uses little endian CRC
->algorithm. The big endian CRC digest is different from that of the little endian.
->>
->> There are 2 solutions. One is to add a big endian crc32c test vector. The other
->is to keep the Blackfin specific test vector. However, neither meets Broz's
->expectation of a generic crc32 test vector.
->>
->> Any idea?
->
->I think we should just remove the blackfin crc driver altogether as nothing in the
->kernel ever uses hmac(crc32).
->
+Signed-off-by: Vakul Garg <vakul@freescale.com>
+---
+Instead of adding SEC era information in crypto node's compatible, a new
+property 'fsl,sec-era' is being introduced into crypto node.
 
-Blackfin Linux applications may use the crypto bfin_crc driver. I wish you could remove the blackfin crc test patch from testmgr, while keeping the driver as it is.
+ .../devicetree/bindings/crypto/fsl-sec4.txt        |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-
-Thanks,
-
-Sonic
-
->Cheers,
->--
->Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
->http://gondor.apana.org.au/~herbert/
->PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index fc9ce6f..bd7ce12 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -54,8 +54,7 @@ PROPERTIES
+    - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,sec-v4.0". Also includes SEC
+-           ERA versions (optional) with which the device is compatible.
++      Definition: Must include "fsl,sec-v4.0"
+ 
+    - #address-cells
+        Usage: required
+@@ -107,7 +106,7 @@ PROPERTIES
+ 
+ EXAMPLE
+ 	crypto@300000 {
+-		compatible = "fsl,sec-v4.0", "fsl,sec-era-v2.0";
++		compatible = "fsl,sec-v4.0";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		reg = <0x300000 0x10000>;
+-- 
+1.7.7.6
