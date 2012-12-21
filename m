@@ -1,129 +1,62 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH 03/10] crypto: omap-aes - Convert to use pm_runtime API
-Date: Fri, 21 Dec 2012 10:04:53 -0700
-Message-ID: <1356109500-11719-4-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH 08/10] crypto: omap-aes - Convert to dma_request_slave_channel_compat()
+Date: Fri, 21 Dec 2012 10:04:58 -0700
+Message-ID: <1356109500-11719-9-git-send-email-mgreer@animalcreek.com>
 References: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	"Mark A. Greer" <mgreer@animalcreek.com>,
-	Kevin Hilman <khilman@deeprootsystems.com>,
 	Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 To: davem@davemloft.net, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail20.dotsterhost.com ([66.11.232.73]:49682 "EHLO
+Received: from mail20.dotsterhost.com ([66.11.232.73]:49734 "EHLO
 	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751949Ab2LURFK (ORCPT
+	with ESMTP id S1752439Ab2LURFM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Dec 2012 12:05:10 -0500
+	Fri, 21 Dec 2012 12:05:12 -0500
 In-Reply-To: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-Convert the omap-aes crypto driver to use the
-pm_runtime API instead of the clk API.
+Use the dma_request_slave_channel_compat() call instead of
+the dma_request_channel() call to request a DMA channel.
+This allows the omap-aes driver use different DMA engines.
 
-CC: Kevin Hilman <khilman@deeprootsystems.com>
 CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 ---
- drivers/crypto/omap-aes.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+ drivers/crypto/omap-aes.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 33cd783..c229852 100644
+index 68bf22d..e28788e 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -19,10 +19,10 @@
- #include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
--#include <linux/clk.h>
- #include <linux/platform_device.h>
- #include <linux/scatterlist.h>
- #include <linux/dma-mapping.h>
-+#include <linux/pm_runtime.h>
- #include <linux/io.h>
- #include <linux/crypto.h>
- #include <linux/interrupt.h>
-@@ -96,7 +96,6 @@ struct omap_aes_dev {
- 	struct list_head	list;
- 	unsigned long		phys_base;
- 	void __iomem		*io_base;
--	struct clk		*iclk;
- 	struct omap_aes_ctx	*ctx;
- 	struct device		*dev;
- 	unsigned long		flags;
-@@ -167,7 +166,7 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
- 	 * It may be long delays between requests.
- 	 * Device might go to off mode to save power.
- 	 */
--	clk_enable(dd->iclk);
-+	pm_runtime_get_sync(dd->dev);
+@@ -296,15 +296,19 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ 	dma_cap_zero(mask);
+ 	dma_cap_set(DMA_SLAVE, mask);
  
- 	if (!(dd->flags & FLAGS_INIT)) {
- 		dd->flags |= FLAGS_INIT;
-@@ -518,7 +517,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 
- 	pr_debug("err: %d\n", err);
- 
--	clk_disable(dd->iclk);
-+	pm_runtime_put_sync(dd->dev);
- 	dd->flags &= ~FLAGS_BUSY;
- 
- 	req->base.complete(&req->base, err);
-@@ -813,26 +812,21 @@ static int omap_aes_probe(struct platform_device *pdev)
- 	else
- 		dd->dma_in = res->start;
- 
--	/* Initializing the clock */
--	dd->iclk = clk_get(dev, "ick");
--	if (IS_ERR(dd->iclk)) {
--		dev_err(dev, "clock intialization failed.\n");
--		err = PTR_ERR(dd->iclk);
--		goto err_res;
--	}
--
- 	dd->io_base = ioremap(dd->phys_base, SZ_4K);
- 	if (!dd->io_base) {
- 		dev_err(dev, "can't ioremap\n");
- 		err = -ENOMEM;
--		goto err_io;
-+		goto err_res;
+-	dd->dma_lch_in = dma_request_channel(mask, omap_dma_filter_fn,
+-					     &dd->dma_in);
++	dd->dma_lch_in = dma_request_slave_channel_compat(mask,
++							  omap_dma_filter_fn,
++							  &dd->dma_in,
++							  dd->dev, "rx");
+ 	if (!dd->dma_lch_in) {
+ 		dev_err(dd->dev, "Unable to request in DMA channel\n");
+ 		goto err_dma_in;
  	}
  
--	clk_enable(dd->iclk);
-+	pm_runtime_enable(dev);
-+	pm_runtime_get_sync(dev);
-+
- 	reg = omap_aes_read(dd, AES_REG_REV);
- 	dev_info(dev, "OMAP AES hw accel rev: %u.%u\n",
- 		 (reg & AES_REG_REV_MAJOR) >> 4, reg & AES_REG_REV_MINOR);
--	clk_disable(dd->iclk);
-+
-+	pm_runtime_put_sync(dev);
- 
- 	tasklet_init(&dd->done_task, omap_aes_done_task, (unsigned long)dd);
- 	tasklet_init(&dd->queue_task, omap_aes_queue_task, (unsigned long)dd);
-@@ -862,8 +856,7 @@ err_dma:
- 	tasklet_kill(&dd->done_task);
- 	tasklet_kill(&dd->queue_task);
- 	iounmap(dd->io_base);
--err_io:
--	clk_put(dd->iclk);
-+	pm_runtime_disable(dev);
- err_res:
- 	kfree(dd);
- 	dd = NULL;
-@@ -891,7 +884,7 @@ static int omap_aes_remove(struct platform_device *pdev)
- 	tasklet_kill(&dd->queue_task);
- 	omap_aes_dma_cleanup(dd);
- 	iounmap(dd->io_base);
--	clk_put(dd->iclk);
-+	pm_runtime_disable(dd->dev);
- 	kfree(dd);
- 	dd = NULL;
- 
+-	dd->dma_lch_out = dma_request_channel(mask, omap_dma_filter_fn,
+-					     &dd->dma_out);
++	dd->dma_lch_out = dma_request_slave_channel_compat(mask,
++							   omap_dma_filter_fn,
++							   &dd->dma_out,
++							   dd->dev, "tx");
+ 	if (!dd->dma_lch_out) {
+ 		dev_err(dd->dev, "Unable to request out DMA channel\n");
+ 		goto err_dma_out;
 -- 
 1.7.12
