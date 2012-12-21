@@ -1,59 +1,55 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH 00/10] crypto: omap-aes - Updates & New Functionality
-Date: Fri, 21 Dec 2012 10:04:50 -0700
-Message-ID: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH 01/10] crypto: omap-aes - Remmove unnecessary pr_info noise
+Date: Fri, 21 Dec 2012 10:04:51 -0700
+Message-ID: <1356109500-11719-2-git-send-email-mgreer@animalcreek.com>
+References: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	"Mark A. Greer" <mgreer@animalcreek.com>
+	"Mark A. Greer" <mgreer@animalcreek.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-omap-owner@vger.kernel.org>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail20.dotsterhost.com ([66.11.232.73]:49609 "EHLO
+	mail20.dotsterhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752515Ab2LURFK (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Dec 2012 12:05:10 -0500
+In-Reply-To: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-[This supersedes the omap-aes driver patches sent in the
- "crypto: omap-aes updates" series sent a few weeks ago.]
+Remove the unnecessary pr_info() calls from omap_aes_probe()
+and omap_aes_mod_init().
 
-This patch series does several things to the omap-aes crypto
-driver including:
- - converting to use pm_runtime
- - adding suspend/resume support
- - converting to use dmaengine API
- - adding device tree support
- - adding OMAP4/AM33XX support
- - adding CTR support
- - some misc. cleanups
+CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ drivers/crypto/omap-aes.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-The patches are based on the current k.o. kernel, plus:
- - the ARM hwmod, etc patches from 
-   "[PATCH 00/15] OMAP SHAM & AES Crypto Updates"
-   (http://marc.info/?l=linux-omap&m=135610732120447&w=2)
- - the EDMA dmaengine patches submitted by Matt Porter
-   "[RFC PATCH v3 00/16] DMA Engine support for AM33XX]"
-   (https://lkml.org/lkml/2012/10/18/256)
- - some misc patches required by the EDMA patches
- - a hack to fix the compilation error that the current k.o. kernel has
-
-A working examle is here:
-
-	git@github.com:mgreeraz/linux-mag.git submitted/crypto/aes
-
-Mark A. Greer (10):
-  crypto: omap-aes - Remmove unnecessary pr_info noise
-  crypto: omap-aes - Don't reset controller for every operation
-  crypto: omap-aes - Convert to use pm_runtime API
-  crypto: omap-aes - Add suspend/resume support
-  crypto: omap-aes - Add code to use dmaengine API
-  crypto: omap-aes - Remove usage of private DMA API
-  crypto: omap-aes - Add Device Tree Support
-  crypto: omap-aes - Convert to dma_request_slave_channel_compat()
-  crypto: omap-aes - Add OMAP4/AM33XX AES Support
-  crypto: omap-aes - Add CTR algorithm Support
-
- drivers/crypto/omap-aes.c | 654 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 480 insertions(+), 174 deletions(-)
-
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index e66e8ee..481da71 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -880,8 +880,6 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 			goto err_algs;
+ 	}
+ 
+-	pr_info("probe() done\n");
+-
+ 	return 0;
+ err_algs:
+ 	for (j = 0; j < i; j++)
+@@ -938,8 +936,6 @@ static struct platform_driver omap_aes_driver = {
+ 
+ static int __init omap_aes_mod_init(void)
+ {
+-	pr_info("loading %s driver\n", "omap-aes");
+-
+ 	return  platform_driver_register(&omap_aes_driver);
+ }
+ 
 -- 
 1.7.12
-
