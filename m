@@ -1,247 +1,59 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH 6/9] crypto: omap-sham - Add Device Tree Support
-Date: Fri, 21 Dec 2012 10:04:06 -0700
-Message-ID: <1356109449-11624-7-git-send-email-mgreer@animalcreek.com>
-References: <1356109449-11624-1-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH 00/10] crypto: omap-aes - Updates & New Functionality
+Date: Fri, 21 Dec 2012 10:04:50 -0700
+Message-ID: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	"Mark A. Greer" <mgreer@animalcreek.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+	"Mark A. Greer" <mgreer@animalcreek.com>
 To: davem@davemloft.net, herbert@gondor.apana.org.au
 Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1356109449-11624-1-git-send-email-mgreer@animalcreek.com>
 Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-Add Device Tree suport to the omap-sham crypto
-driver.  Currently, only support for OMAP2 and
-OMAP3 is being added but support for OMAP4 will
-be added in a subsequent patch.
+[This supersedes the omap-aes driver patches sent in the
+ "crypto: omap-aes updates" series sent a few weeks ago.]
 
-CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
----
- drivers/crypto/omap-sham.c | 139 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 106 insertions(+), 33 deletions(-)
+This patch series does several things to the omap-aes crypto
+driver including:
+ - converting to use pm_runtime
+ - adding suspend/resume support
+ - converting to use dmaengine API
+ - adding device tree support
+ - adding OMAP4/AM33XX support
+ - adding CTR support
+ - some misc. cleanups
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index f6b270e..860cad8 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -30,6 +30,10 @@
- #include <linux/dmaengine.h>
- #include <linux/omap-dma.h>
- #include <linux/pm_runtime.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/of_address.h>
-+#include <linux/of_irq.h>
- #include <linux/delay.h>
- #include <linux/crypto.h>
- #include <linux/cryptohash.h>
-@@ -145,6 +149,7 @@ struct omap_sham_dev {
- 	int			irq;
- 	spinlock_t		lock;
- 	int			err;
-+	unsigned int		dma;
- 	struct dma_chan		*dma_lch;
- 	struct tasklet_struct	done_task;
- 
-@@ -1155,13 +1160,99 @@ static irqreturn_t omap_sham_irq(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
-+#ifdef CONFIG_OF
-+static const struct of_device_id omap_sham_of_match[] = {
-+	{
-+		.compatible	= "ti,omap2-sham",
-+	},
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, omap_sham_of_match);
-+
-+static int omap_sham_get_res_of(struct omap_sham_dev *dd,
-+		struct device *dev, struct resource *res)
-+{
-+	struct device_node *node = dev->of_node;
-+	const struct of_device_id *match;
-+	int err = 0;
-+
-+	match = of_match_device(of_match_ptr(omap_sham_of_match), dev);
-+	if (!match) {
-+		dev_err(dev, "no compatible OF match\n");
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	err = of_address_to_resource(node, 0, res);
-+	if (err < 0) {
-+		dev_err(dev, "can't translate OF node address\n");
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	dd->irq = of_irq_to_resource(node, 0, NULL);
-+	if (!dd->irq) {
-+		dev_err(dev, "can't translate OF irq value\n");
-+		err = -EINVAL;
-+		goto err;
-+	}
-+
-+	dd->dma = -1; /* Dummy value that's unused */
-+
-+err:
-+	return err;
-+}
-+#else
-+static int omap_sham_get_res_dev(struct omap_sham_dev *dd,
-+		struct device *dev, struct resource *res)
-+{
-+	return -EINVAL;
-+}
-+#endif
-+
-+static int omap_sham_get_res_pdev(struct omap_sham_dev *dd,
-+		struct platform_device *pdev, struct resource *res)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct resource *r;
-+	int err = 0;
-+
-+	/* Get the base address */
-+	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	if (!r) {
-+		dev_err(dev, "no MEM resource info\n");
-+		err = -ENODEV;
-+		goto err;
-+	}
-+	memcpy(res, r, sizeof(*res));
-+
-+	/* Get the IRQ */
-+	dd->irq = platform_get_irq(pdev, 0);
-+	if (dd->irq < 0) {
-+		dev_err(dev, "no IRQ resource info\n");
-+		err = dd->irq;
-+		goto err;
-+	}
-+
-+	/* Get the DMA */
-+	r = platform_get_resource(pdev, IORESOURCE_DMA, 0);
-+	if (!r) {
-+		dev_err(dev, "no DMA resource info\n");
-+		err = -ENODEV;
-+		goto err;
-+	}
-+	dd->dma = r->start;
-+
-+err:
-+	return err;
-+}
-+
- static int __devinit omap_sham_probe(struct platform_device *pdev)
- {
- 	struct omap_sham_dev *dd;
- 	struct device *dev = &pdev->dev;
--	struct resource *res;
-+	struct resource res;
- 	dma_cap_mask_t mask;
--	unsigned dma_chan;
- 	int err, i, j;
- 
- 	dd = kzalloc(sizeof(struct omap_sham_dev), GFP_KERNEL);
-@@ -1178,33 +1269,18 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- 	tasklet_init(&dd->done_task, omap_sham_done_task, (unsigned long)dd);
- 	crypto_init_queue(&dd->queue, OMAP_SHAM_QUEUE_LENGTH);
- 
--	dd->irq = -1;
--
--	/* Get the base address */
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res) {
--		dev_err(dev, "no MEM resource info\n");
--		err = -ENODEV;
--		goto res_err;
--	}
--	dd->phys_base = res->start;
--
--	/* Get the DMA */
--	res = platform_get_resource(pdev, IORESOURCE_DMA, 0);
--	if (!res) {
--		dev_err(dev, "no DMA resource info\n");
--		err = -ENODEV;
-+	err = (dev->of_node) ? omap_sham_get_res_of(dd, dev, &res) :
-+			       omap_sham_get_res_pdev(dd, pdev, &res);
-+	if (err)
- 		goto res_err;
--	}
--	dma_chan = res->start;
- 
--	/* Get the IRQ */
--	dd->irq = platform_get_irq(pdev,  0);
--	if (dd->irq < 0) {
--		dev_err(dev, "no IRQ resource info\n");
--		err = dd->irq;
-+	dd->io_base = devm_request_and_ioremap(dev, &res);
-+	if (!dd->io_base) {
-+		dev_err(dev, "can't ioremap\n");
-+		err = -ENOMEM;
- 		goto res_err;
- 	}
-+	dd->phys_base = res.start;
- 
- 	err = request_irq(dd->irq, omap_sham_irq,
- 			IRQF_TRIGGER_LOW, dev_name(dev), dd);
-@@ -1216,10 +1292,10 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- 	dma_cap_zero(mask);
- 	dma_cap_set(DMA_SLAVE, mask);
- 
--	dd->dma_lch = dma_request_channel(mask, omap_dma_filter_fn, &dma_chan);
-+	dd->dma_lch = dma_request_channel(mask, omap_dma_filter_fn, &dd->dma);
- 	if (!dd->dma_lch) {
- 		dev_err(dev, "unable to obtain RX DMA engine channel %u\n",
--			dma_chan);
-+			dd->dma);
- 		err = -ENXIO;
- 		goto dma_err;
- 	}
-@@ -1255,13 +1331,11 @@ static int __devinit omap_sham_probe(struct platform_device *pdev)
- err_algs:
- 	for (j = 0; j < i; j++)
- 		crypto_unregister_ahash(&algs[j]);
--	iounmap(dd->io_base);
- 	pm_runtime_disable(dev);
- io_err:
- 	dma_release_channel(dd->dma_lch);
- dma_err:
--	if (dd->irq >= 0)
--		free_irq(dd->irq, dd);
-+	free_irq(dd->irq, dd);
- res_err:
- 	kfree(dd);
- 	dd = NULL;
-@@ -1285,11 +1359,9 @@ static int __devexit omap_sham_remove(struct platform_device *pdev)
- 	for (i = 0; i < ARRAY_SIZE(algs); i++)
- 		crypto_unregister_ahash(&algs[i]);
- 	tasklet_kill(&dd->done_task);
--	iounmap(dd->io_base);
- 	pm_runtime_disable(&pdev->dev);
- 	dma_release_channel(dd->dma_lch);
--	if (dd->irq >= 0)
--		free_irq(dd->irq, dd);
-+	free_irq(dd->irq, dd);
- 	kfree(dd);
- 	dd = NULL;
- 
-@@ -1321,6 +1393,7 @@ static struct platform_driver omap_sham_driver = {
- 		.name	= "omap-sham",
- 		.owner	= THIS_MODULE,
- 		.pm	= &omap_sham_pm_ops,
-+		.of_match_table	= omap_sham_of_match,
- 	},
- };
- 
+The patches are based on the current k.o. kernel, plus:
+ - the ARM hwmod, etc patches from 
+   "[PATCH 00/15] OMAP SHAM & AES Crypto Updates"
+   (http://marc.info/?l=linux-omap&m=135610732120447&w=2)
+ - the EDMA dmaengine patches submitted by Matt Porter
+   "[RFC PATCH v3 00/16] DMA Engine support for AM33XX]"
+   (https://lkml.org/lkml/2012/10/18/256)
+ - some misc patches required by the EDMA patches
+ - a hack to fix the compilation error that the current k.o. kernel has
+
+A working examle is here:
+
+	git@github.com:mgreeraz/linux-mag.git submitted/crypto/aes
+
+Mark A. Greer (10):
+  crypto: omap-aes - Remmove unnecessary pr_info noise
+  crypto: omap-aes - Don't reset controller for every operation
+  crypto: omap-aes - Convert to use pm_runtime API
+  crypto: omap-aes - Add suspend/resume support
+  crypto: omap-aes - Add code to use dmaengine API
+  crypto: omap-aes - Remove usage of private DMA API
+  crypto: omap-aes - Add Device Tree Support
+  crypto: omap-aes - Convert to dma_request_slave_channel_compat()
+  crypto: omap-aes - Add OMAP4/AM33XX AES Support
+  crypto: omap-aes - Add CTR algorithm Support
+
+ drivers/crypto/omap-aes.c | 654 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 480 insertions(+), 174 deletions(-)
+
 -- 
 1.7.12
 
