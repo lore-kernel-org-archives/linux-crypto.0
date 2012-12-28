@@ -1,38 +1,44 @@
-From: Sandra Schlichting <littlesandra88@gmail.com>
-Subject: Workaround for tcrypt bug?
-Date: Wed, 26 Dec 2012 02:34:46 +0100
-Message-ID: <CAELiMBOPsPOWNe6+LahiBqGteucai0xrqY+eQ0nxkghjAEsy-A@mail.gmail.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: [RFC PATCH 0/3] Make rfc3686 template work with asynchronous block
+ ciphers
+Date: Fri, 28 Dec 2012 12:04:48 +0200
+Message-ID: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f173.google.com ([209.85.216.173]:49588 "EHLO
-	mail-qc0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752639Ab2LZBll (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:50863 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751437Ab2L1KEv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Dec 2012 20:41:41 -0500
-Received: by mail-qc0-f173.google.com with SMTP id b12so4162483qca.4
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Dec 2012 17:41:41 -0800 (PST)
+	Fri, 28 Dec 2012 05:04:51 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all,
+I'm not sure how this patchset should be dealt with (should 1st patch go
+through different tree than 2nd and 3rd?), so therefore it's RFC.
 
-On my Fedora 17 64bit AMD desktop computer I get this error
+Second patch makes rfc3686 template work with asynchronous block ciphers and
+third patch changes aesni-intel to use this template. First patch fixed problem
+in xfrm_algo found with help of 2nd and 3rd patches and without 1st patch
+2nd patch breaks aes-ctr with IPSEC.
 
-[root@amd ~]# uname -a
-Linux amd 3.6.10-2.fc17.x86_64 #1 SMP Tue Dec 11 18:07:34 UTC 2012
-x86_64 x86_64 x86_64 GNU/Linux
-[root@amd ~]# modprobe tcrypt sec=1 type=1000
-ERROR: could not insert 'tcrypt': No such file or directory
-[root@amd ~]# tail -f /var/log/messages
-Dec 26 02:32:04 amd kernel: [ 1908.753473] alg: hash: Failed to load
-transform for hmac(crc32): -2
-Dec 26 02:32:04 amd kernel: [ 1908.765333] alg: hash: Failed to load
-transform for hmac(crc32): -2
-Dec 26 02:32:04 amd kernel: [ 1908.772012] tcrypt: one or more tests failed!
 
-Does anyone know of a way to workaround this?
+---
 
-Hugs,
-Sandra
+Jussi Kivilinna (3):
+      xfrm_algo: probe asynchronous block ciphers instead of synchronous
+      crypto: ctr - make rfc3686 asynchronous block cipher
+      crypto: aesni-intel - remove rfc3686(ctr(aes)), utilize rfc3686 from ctr-module instead
+
+
+ arch/x86/crypto/aesni-intel_glue.c |   37 --------
+ crypto/ctr.c                       |  173 +++++++++++++++++++++++-------------
+ crypto/tcrypt.c                    |    4 +
+ crypto/tcrypt.h                    |    1 
+ net/xfrm/xfrm_algo.c               |    3 -
+ 5 files changed, 116 insertions(+), 102 deletions(-)
