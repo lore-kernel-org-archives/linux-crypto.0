@@ -1,343 +1,229 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [RFC PATCH 2/3] crypto: ctr - make rfc3686 asynchronous block cipher
-Date: Fri, 28 Dec 2012 12:04:58 +0200
-Message-ID: <20121228100458.11073.45987.stgit@localhost6.localdomain6>
-References: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
+From: Russ Dill <russ.dill@gmail.com>
+Subject: Re: [PATCH 07/10] crypto: omap-aes - Add Device Tree Support
+Date: Fri, 28 Dec 2012 02:06:02 -0800
+Message-ID: <CA+Bv8XYz6mUJs82qAz=pvhkNDFe_Vp5Nv6918UPMGFAuAaU5Jw@mail.gmail.com>
+References: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
+ <1356109500-11719-8-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:50902 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752020Ab2L1KFC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Dec 2012 05:05:02 -0500
-In-Reply-To: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Dmitry Kasatkin <dmitry.kasatkin@intel.com>, linux-crypto@vger.kernel.org,
+ "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, davem@davemloft.net,
+ Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: "Mark A. Greer" <mgreer@animalcreek.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1356109500-11719-8-git-send-email-mgreer@animalcreek.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Some hardware crypto drivers register asynchronous ctr(aes), which is left
-unused in IPSEC because rfc3686 template only supports synchronous block
-ciphers. Some other drivers register rfc3686(ctr(aes)) to workaround this
-limitation but not all.
+On Fri, Dec 21, 2012 at 10:04 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
+> From: "Mark A. Greer" <mgreer@animalcreek.com>
+>
+> Add Device Tree suport to the omap-aes crypto
+> driver.  Currently, only support for OMAP2 and
+> OMAP3 is being added but support for OMAP4 will
+> be added in a subsequent patch.
+>
+> CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+> Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+> ---
+>  drivers/crypto/omap-aes.c | 119 ++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 93 insertions(+), 26 deletions(-)
+>
+> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+> index faf522f..68bf22d 100644
+> --- a/drivers/crypto/omap-aes.c
+> +++ b/drivers/crypto/omap-aes.c
+> @@ -25,6 +25,9 @@
+>  #include <linux/dmaengine.h>
+>  #include <linux/omap-dma.h>
+>  #include <linux/pm_runtime.h>
+> +#include <linux/of.h>
+> +#include <linux/of_device.h>
+> +#include <linux/of_address.h>
+>  #include <linux/io.h>
+>  #include <linux/crypto.h>
+>  #include <linux/interrupt.h>
+> @@ -819,11 +822,93 @@ static struct crypto_alg algs[] = {
+>  }
+>  };
+>
+> +#ifdef CONFIG_OF
+> +static const struct of_device_id omap_aes_of_match[] = {
+> +       {
+> +               .compatible     = "ti,omap2-aes",
+> +       },
+> +       {},
+> +};
+> +MODULE_DEVICE_TABLE(of, omap_aes_of_match);
 
-This patch changes rfc3686 to use asynchronous block ciphers, to allow async
-ctr(aes) algorithms to be utilized automatically by IPSEC.
+I think you mean for the above section to be outside of the '#ifdef
+CONFIG_OF' block.
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
----
- crypto/ctr.c    |  173 +++++++++++++++++++++++++++++++++++--------------------
- crypto/tcrypt.c |    4 +
- crypto/tcrypt.h |    1 
- 3 files changed, 115 insertions(+), 63 deletions(-)
+> +static int omap_aes_get_res_of(struct omap_aes_dev *dd,
+> +               struct device *dev, struct resource *res)
+> +{
+> +       struct device_node *node = dev->of_node;
+> +       const struct of_device_id *match;
+> +       int err = 0;
+> +
+> +       match = of_match_device(of_match_ptr(omap_aes_of_match), dev);
+> +       if (!match) {
+> +               dev_err(dev, "no compatible OF match\n");
+> +               err = -EINVAL;
+> +               goto err;
+> +       }
+> +
+> +       err = of_address_to_resource(node, 0, res);
+> +       if (err < 0) {
+> +               dev_err(dev, "can't translate OF node address\n");
+> +               err = -EINVAL;
+> +               goto err;
+> +       }
+> +
+> +       dd->dma_out = -1; /* Dummy value that's unused */
+> +       dd->dma_in = -1; /* Dummy value that's unused */
+> +
+> +err:
+> +       return err;
+> +}
+> +#else
+> +static int omap_aes_get_res_dev(struct omap_aes_dev *dd,
+> +               struct device *dev, struct resource *res)
+> +{
+> +       return -EINVAL;
+> +}
 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 4ca7222..1f2997c 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -12,6 +12,7 @@
- 
- #include <crypto/algapi.h>
- #include <crypto/ctr.h>
-+#include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -25,10 +26,15 @@ struct crypto_ctr_ctx {
- };
- 
- struct crypto_rfc3686_ctx {
--	struct crypto_blkcipher *child;
-+	struct crypto_ablkcipher *child;
- 	u8 nonce[CTR_RFC3686_NONCE_SIZE];
- };
- 
-+struct crypto_rfc3686_req_ctx {
-+	u8 iv[CTR_RFC3686_BLOCK_SIZE];
-+	struct ablkcipher_request subreq CRYPTO_MINALIGN_ATTR;
-+};
-+
- static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
- 			     unsigned int keylen)
- {
-@@ -243,11 +249,11 @@ static struct crypto_template crypto_ctr_tmpl = {
- 	.module = THIS_MODULE,
- };
- 
--static int crypto_rfc3686_setkey(struct crypto_tfm *parent, const u8 *key,
--				 unsigned int keylen)
-+static int crypto_rfc3686_setkey(struct crypto_ablkcipher *parent,
-+				 const u8 *key, unsigned int keylen)
- {
--	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(parent);
--	struct crypto_blkcipher *child = ctx->child;
-+	struct crypto_rfc3686_ctx *ctx = crypto_ablkcipher_ctx(parent);
-+	struct crypto_ablkcipher *child = ctx->child;
- 	int err;
- 
- 	/* the nonce is stored in bytes at end of key */
-@@ -259,59 +265,64 @@ static int crypto_rfc3686_setkey(struct crypto_tfm *parent, const u8 *key,
- 
- 	keylen -= CTR_RFC3686_NONCE_SIZE;
- 
--	crypto_blkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
--	crypto_blkcipher_set_flags(child, crypto_tfm_get_flags(parent) &
--					  CRYPTO_TFM_REQ_MASK);
--	err = crypto_blkcipher_setkey(child, key, keylen);
--	crypto_tfm_set_flags(parent, crypto_blkcipher_get_flags(child) &
--				     CRYPTO_TFM_RES_MASK);
-+	crypto_ablkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_ablkcipher_set_flags(child, crypto_ablkcipher_get_flags(parent) &
-+				    CRYPTO_TFM_REQ_MASK);
-+	err = crypto_ablkcipher_setkey(child, key, keylen);
-+	crypto_ablkcipher_set_flags(parent, crypto_ablkcipher_get_flags(child) &
-+				    CRYPTO_TFM_RES_MASK);
- 
- 	return err;
- }
- 
--static int crypto_rfc3686_crypt(struct blkcipher_desc *desc,
--				struct scatterlist *dst,
--				struct scatterlist *src, unsigned int nbytes)
-+static int crypto_rfc3686_crypt(struct ablkcipher_request *req)
- {
--	struct crypto_blkcipher *tfm = desc->tfm;
--	struct crypto_rfc3686_ctx *ctx = crypto_blkcipher_ctx(tfm);
--	struct crypto_blkcipher *child = ctx->child;
--	unsigned long alignmask = crypto_blkcipher_alignmask(tfm);
--	u8 ivblk[CTR_RFC3686_BLOCK_SIZE + alignmask];
--	u8 *iv = PTR_ALIGN(ivblk + 0, alignmask + 1);
--	u8 *info = desc->info;
--	int err;
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
-+	struct crypto_rfc3686_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct crypto_ablkcipher *child = ctx->child;
-+	unsigned long align = crypto_ablkcipher_alignmask(tfm);
-+	struct crypto_rfc3686_req_ctx *rctx =
-+		(void *)PTR_ALIGN((u8 *)ablkcipher_request_ctx(req), align + 1);
-+	struct ablkcipher_request *subreq = &rctx->subreq;
-+	u8 *iv = rctx->iv;
- 
- 	/* set up counter block */
- 	memcpy(iv, ctx->nonce, CTR_RFC3686_NONCE_SIZE);
--	memcpy(iv + CTR_RFC3686_NONCE_SIZE, info, CTR_RFC3686_IV_SIZE);
-+	memcpy(iv + CTR_RFC3686_NONCE_SIZE, req->info, CTR_RFC3686_IV_SIZE);
- 
- 	/* initialize counter portion of counter block */
- 	*(__be32 *)(iv + CTR_RFC3686_NONCE_SIZE + CTR_RFC3686_IV_SIZE) =
- 		cpu_to_be32(1);
- 
--	desc->tfm = child;
--	desc->info = iv;
--	err = crypto_blkcipher_encrypt_iv(desc, dst, src, nbytes);
--	desc->tfm = tfm;
--	desc->info = info;
-+	ablkcipher_request_set_tfm(subreq, child);
-+	ablkcipher_request_set_callback(subreq, req->base.flags,
-+					req->base.complete, req->base.data);
-+	ablkcipher_request_set_crypt(subreq, req->src, req->dst, req->nbytes,
-+				     iv);
- 
--	return err;
-+	return crypto_ablkcipher_encrypt(subreq);
- }
- 
- static int crypto_rfc3686_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_skcipher_spawn *spawn = crypto_instance_ctx(inst);
- 	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct crypto_blkcipher *cipher;
-+	struct crypto_ablkcipher *cipher;
-+	unsigned long align;
- 
--	cipher = crypto_spawn_blkcipher(spawn);
-+	cipher = crypto_spawn_skcipher(spawn);
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
- 
- 	ctx->child = cipher;
- 
-+	align = crypto_tfm_alg_alignmask(tfm);
-+	align &= ~(crypto_tfm_ctx_alignment() - 1);
-+	tfm->crt_ablkcipher.reqsize = align +
-+		sizeof(struct crypto_rfc3686_req_ctx) +
-+		crypto_ablkcipher_reqsize(cipher);
-+
- 	return 0;
- }
- 
-@@ -319,74 +330,110 @@ static void crypto_rfc3686_exit_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_rfc3686_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	crypto_free_blkcipher(ctx->child);
-+	crypto_free_ablkcipher(ctx->child);
- }
- 
- static struct crypto_instance *crypto_rfc3686_alloc(struct rtattr **tb)
- {
-+	struct crypto_attr_type *algt;
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	struct crypto_skcipher_spawn *spawn;
-+	const char *cipher_name;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
--	if (err)
-+	algt = crypto_get_attr_type(tb);
-+	err = PTR_ERR(algt);
-+	if (IS_ERR(algt))
- 		return ERR_PTR(err);
- 
--	alg = crypto_attr_alg(tb[1], CRYPTO_ALG_TYPE_BLKCIPHER,
--				  CRYPTO_ALG_TYPE_MASK);
--	err = PTR_ERR(alg);
--	if (IS_ERR(alg))
-+	if ((algt->type ^ CRYPTO_ALG_TYPE_BLKCIPHER) & algt->mask)
-+		return ERR_PTR(-EINVAL);
-+
-+	cipher_name = crypto_attr_alg_name(tb[1]);
-+	err = PTR_ERR(cipher_name);
-+	if (IS_ERR(cipher_name))
- 		return ERR_PTR(err);
- 
-+	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
-+	if (!inst)
-+		return ERR_PTR(-ENOMEM);
-+
-+	spawn = crypto_instance_ctx(inst);
-+
-+	crypto_set_skcipher_spawn(spawn, inst);
-+	err = crypto_grab_skcipher(spawn, cipher_name, 0,
-+				   crypto_requires_sync(algt->type,
-+							algt->mask));
-+	if (err)
-+		goto err_free_inst;
-+
-+	alg = crypto_skcipher_spawn_alg(spawn);
-+
- 	/* We only support 16-byte blocks. */
- 	err = -EINVAL;
--	if (alg->cra_blkcipher.ivsize != CTR_RFC3686_BLOCK_SIZE)
--		goto out_put_alg;
-+	if (alg->cra_ablkcipher.ivsize != CTR_RFC3686_BLOCK_SIZE)
-+		goto err_drop_spawn;
- 
- 	/* Not a stream cipher? */
- 	if (alg->cra_blocksize != 1)
--		goto out_put_alg;
-+		goto err_drop_spawn;
- 
--	inst = crypto_alloc_instance("rfc3686", alg);
--	if (IS_ERR(inst))
--		goto out;
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME, "rfc3686(%s)",
-+		     alg->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_drop_spawn;
-+	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "rfc3686(%s)", alg->cra_driver_name) >=
-+			CRYPTO_MAX_ALG_NAME)
-+		goto err_drop_spawn;
- 
--	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
- 	inst->alg.cra_priority = alg->cra_priority;
- 	inst->alg.cra_blocksize = 1;
- 	inst->alg.cra_alignmask = alg->cra_alignmask;
--	inst->alg.cra_type = &crypto_blkcipher_type;
- 
--	inst->alg.cra_blkcipher.ivsize = CTR_RFC3686_IV_SIZE;
--	inst->alg.cra_blkcipher.min_keysize = alg->cra_blkcipher.min_keysize
--					      + CTR_RFC3686_NONCE_SIZE;
--	inst->alg.cra_blkcipher.max_keysize = alg->cra_blkcipher.max_keysize
--					      + CTR_RFC3686_NONCE_SIZE;
-+	inst->alg.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+			      (alg->cra_flags & CRYPTO_ALG_ASYNC);
-+	inst->alg.cra_type = &crypto_ablkcipher_type;
-+
-+	inst->alg.cra_ablkcipher.ivsize = CTR_RFC3686_IV_SIZE;
-+	inst->alg.cra_ablkcipher.min_keysize =
-+		alg->cra_ablkcipher.min_keysize + CTR_RFC3686_NONCE_SIZE;
-+	inst->alg.cra_ablkcipher.max_keysize =
-+		alg->cra_ablkcipher.max_keysize + CTR_RFC3686_NONCE_SIZE;
- 
--	inst->alg.cra_blkcipher.geniv = "seqiv";
-+	inst->alg.cra_ablkcipher.geniv = "seqiv";
-+
-+	inst->alg.cra_ablkcipher.setkey = crypto_rfc3686_setkey;
-+	inst->alg.cra_ablkcipher.encrypt = crypto_rfc3686_crypt;
-+	inst->alg.cra_ablkcipher.decrypt = crypto_rfc3686_crypt;
- 
- 	inst->alg.cra_ctxsize = sizeof(struct crypto_rfc3686_ctx);
- 
- 	inst->alg.cra_init = crypto_rfc3686_init_tfm;
- 	inst->alg.cra_exit = crypto_rfc3686_exit_tfm;
- 
--	inst->alg.cra_blkcipher.setkey = crypto_rfc3686_setkey;
--	inst->alg.cra_blkcipher.encrypt = crypto_rfc3686_crypt;
--	inst->alg.cra_blkcipher.decrypt = crypto_rfc3686_crypt;
--
--out:
--	crypto_mod_put(alg);
- 	return inst;
- 
--out_put_alg:
--	inst = ERR_PTR(err);
--	goto out;
-+err_drop_spawn:
-+	crypto_drop_skcipher(spawn);
-+err_free_inst:
-+	kfree(inst);
-+	return ERR_PTR(err);
-+}
-+
-+static void crypto_rfc3686_free(struct crypto_instance *inst)
-+{
-+	struct crypto_skcipher_spawn *spawn = crypto_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(spawn);
-+	kfree(inst);
- }
- 
- static struct crypto_template crypto_rfc3686_tmpl = {
- 	.name = "rfc3686",
- 	.alloc = crypto_rfc3686_alloc,
--	.free = crypto_ctr_free,
-+	.free = crypto_rfc3686_free,
- 	.module = THIS_MODULE,
- };
- 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 7ae2130..87ef7d6 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1591,6 +1591,10 @@ static int do_test(int m)
- 				   speed_template_16_24_32);
- 		test_acipher_speed("ofb(aes)", DECRYPT, sec, NULL, 0,
- 				   speed_template_16_24_32);
-+		test_acipher_speed("rfc3686(ctr(aes))", ENCRYPT, sec, NULL, 0,
-+				   speed_template_20_28_36);
-+		test_acipher_speed("rfc3686(ctr(aes))", DECRYPT, sec, NULL, 0,
-+				   speed_template_20_28_36);
- 		break;
- 
- 	case 501:
-diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
-index cd20685..ecdeeb1 100644
---- a/crypto/tcrypt.h
-+++ b/crypto/tcrypt.h
-@@ -51,6 +51,7 @@ static u8 speed_template_8_16[] = {8, 16, 0};
- static u8 speed_template_8_32[] = {8, 32, 0};
- static u8 speed_template_16_32[] = {16, 32, 0};
- static u8 speed_template_16_24_32[] = {16, 24, 32, 0};
-+static u8 speed_template_20_28_36[] = {20, 28, 36, 0};
- static u8 speed_template_32_40_48[] = {32, 40, 48, 0};
- static u8 speed_template_32_48[] = {32, 48, 0};
- static u8 speed_template_32_48_64[] = {32, 48, 64, 0};
+And I think you mean this one to be omap_aes_get_res_of
+
+> +#endif
+> +
+> +static int omap_aes_get_res_pdev(struct omap_aes_dev *dd,
+> +               struct platform_device *pdev, struct resource *res)
+> +{
+> +       struct device *dev = &pdev->dev;
+> +       struct resource *r;
+> +       int err = 0;
+> +
+> +       /* Get the base address */
+> +       r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +       if (!r) {
+> +               dev_err(dev, "no MEM resource info\n");
+> +               err = -ENODEV;
+> +               goto err;
+> +       }
+> +       memcpy(res, r, sizeof(*res));
+> +
+> +       /* Get the DMA out channel */
+> +       r = platform_get_resource(pdev, IORESOURCE_DMA, 0);
+> +       if (!r) {
+> +               dev_err(dev, "no DMA out resource info\n");
+> +               err = -ENODEV;
+> +               goto err;
+> +       }
+> +       dd->dma_out = r->start;
+> +
+> +       /* Get the DMA in channel */
+> +       r = platform_get_resource(pdev, IORESOURCE_DMA, 1);
+> +       if (!r) {
+> +               dev_err(dev, "no DMA in resource info\n");
+> +               err = -ENODEV;
+> +               goto err;
+> +       }
+> +       dd->dma_in = r->start;
+> +
+> +err:
+> +       return err;
+> +}
+> +
+>  static int omap_aes_probe(struct platform_device *pdev)
+>  {
+>         struct device *dev = &pdev->dev;
+>         struct omap_aes_dev *dd;
+> -       struct resource *res;
+> +       struct resource res;
+>         int err = -ENOMEM, i, j;
+>         u32 reg;
+>
+> @@ -838,35 +923,18 @@ static int omap_aes_probe(struct platform_device *pdev)
+>         spin_lock_init(&dd->lock);
+>         crypto_init_queue(&dd->queue, OMAP_AES_QUEUE_LENGTH);
+>
+> -       /* Get the base address */
+> -       res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> -       if (!res) {
+> -               dev_err(dev, "invalid resource type\n");
+> -               err = -ENODEV;
+> +       err = (dev->of_node) ? omap_aes_get_res_of(dd, dev, &res) :
+> +                              omap_aes_get_res_pdev(dd, pdev, &res);
+> +       if (err)
+>                 goto err_res;
+> -       }
+> -       dd->phys_base = res->start;
+> -
+> -       /* Get the DMA */
+> -       res = platform_get_resource(pdev, IORESOURCE_DMA, 0);
+> -       if (!res)
+> -               dev_info(dev, "no DMA info\n");
+> -       else
+> -               dd->dma_out = res->start;
+> -
+> -       /* Get the DMA */
+> -       res = platform_get_resource(pdev, IORESOURCE_DMA, 1);
+> -       if (!res)
+> -               dev_info(dev, "no DMA info\n");
+> -       else
+> -               dd->dma_in = res->start;
+> -
+> -       dd->io_base = ioremap(dd->phys_base, SZ_4K);
+> +
+> +       dd->io_base = devm_request_and_ioremap(dev, &res);
+>         if (!dd->io_base) {
+>                 dev_err(dev, "can't ioremap\n");
+>                 err = -ENOMEM;
+>                 goto err_res;
+>         }
+> +       dd->phys_base = res.start;
+>
+>         pm_runtime_enable(dev);
+>         pm_runtime_get_sync(dev);
+> @@ -904,7 +972,6 @@ err_algs:
+>  err_dma:
+>         tasklet_kill(&dd->done_task);
+>         tasklet_kill(&dd->queue_task);
+> -       iounmap(dd->io_base);
+>         pm_runtime_disable(dev);
+>  err_res:
+>         kfree(dd);
+> @@ -932,7 +999,6 @@ static int omap_aes_remove(struct platform_device *pdev)
+>         tasklet_kill(&dd->done_task);
+>         tasklet_kill(&dd->queue_task);
+>         omap_aes_dma_cleanup(dd);
+> -       iounmap(dd->io_base);
+>         pm_runtime_disable(dd->dev);
+>         kfree(dd);
+>         dd = NULL;
+> @@ -965,6 +1031,7 @@ static struct platform_driver omap_aes_driver = {
+>                 .name   = "omap-aes",
+>                 .owner  = THIS_MODULE,
+>                 .pm     = &omap_aes_pm_ops,
+> +               .of_match_table = omap_aes_of_match,
+>         },
+>  };
+>
+> --
+> 1.7.12
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-omap" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
