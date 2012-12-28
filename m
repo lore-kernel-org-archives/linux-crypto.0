@@ -1,58 +1,36 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+From: Sandra Schlichting <littlesandra88@gmail.com>
 Subject: Re: Workaround for tcrypt bug?
-Date: Fri, 28 Dec 2012 14:18:25 +0200
-Message-ID: <20121228141825.11102bkeriixmuqs@www.dalek.fi>
+Date: Fri, 28 Dec 2012 13:36:10 +0100
+Message-ID: <CAELiMBMrmagP14SoE1aaDqnuXvwdtVM69zpmK5dn+9Zqby8sQw@mail.gmail.com>
 References: <CAELiMBOPsPOWNe6+LahiBqGteucai0xrqY+eQ0nxkghjAEsy-A@mail.gmail.com>
- <CAELiMBOtmQwY8kH=nLTZzjPtNqPsC_GGgs=gDe7pQwFewsxY1A@mail.gmail.com>
+ <CAELiMBOtmQwY8kH=nLTZzjPtNqPsC_GGgs=gDe7pQwFewsxY1A@mail.gmail.com> <20121228141825.11102bkeriixmuqs@www.dalek.fi>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-crypto@vger.kernel.org
-To: Sandra Schlichting <littlesandra88@gmail.com>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:51859 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751685Ab2L1MS2 (ORCPT
+Received: from mail-qa0-f43.google.com ([209.85.216.43]:39868 "EHLO
+	mail-qa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753520Ab2L1Mgu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Dec 2012 07:18:28 -0500
-In-Reply-To: <CAELiMBOtmQwY8kH=nLTZzjPtNqPsC_GGgs=gDe7pQwFewsxY1A@mail.gmail.com>
-Content-Disposition: inline
+	Fri, 28 Dec 2012 07:36:50 -0500
+Received: by mail-qa0-f43.google.com with SMTP id cr7so9515314qab.9
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Dec 2012 04:36:50 -0800 (PST)
+In-Reply-To: <20121228141825.11102bkeriixmuqs@www.dalek.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Sandra Schlichting <littlesandra88@gmail.com>:
+> Why you want to workaround this? It's safe to ignore hmac(crc32) warning.
 
-> Hi all,
->
-> On my Fedora 17 64bit AMD desktop computer I get this error
->
-> [root@amd ~]# uname -a
-> Linux amd 3.6.10-2.fc17.x86_64 #1 SMP Tue Dec 11 18:07:34 UTC 2012
-> x86_64 x86_64 x86_64 GNU/Linux
-> [root@amd ~]# modprobe tcrypt sec=1 type=1000
-> ERROR: could not insert 'tcrypt': No such file or directory
-> [root@amd ~]# tail -f /var/log/messages
-> Dec 26 02:32:04 amd kernel: [ 1908.753473] alg: hash: Failed to load
-> transform for hmac(crc32): -2
-> Dec 26 02:32:04 amd kernel: [ 1908.765333] alg: hash: Failed to load
-> transform for hmac(crc32): -2
-> Dec 26 02:32:04 amd kernel: [ 1908.772012] tcrypt: one or more tests failed!
->
-> Does anyone know of a way to workaround this?
+Because it stops from proceeding. I would have expected that
 
-Why you want to workaround this? It's safe to ignore hmac(crc32) warning.
+modprobe tcrypt sec=1 type=1000
 
--Jussi
+would have executed all test cases.
 
->
-> Hugs,
-> Sandra
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+Even if I just want to test one
+
+[root@amd ~]# modprobe tcrypt sec=2 type=402
+ERROR: could not insert 'tcrypt': No such file or directory
+
+I get an error.
