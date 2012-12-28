@@ -1,40 +1,35 @@
-From: Sandra Schlichting <littlesandra88@gmail.com>
-Subject: Re: Workaround for tcrypt bug?
-Date: Fri, 28 Dec 2012 21:01:34 +0100
-Message-ID: <CAELiMBP60_VwjdQdnSwSAY8rpBCPtQE+f_-1LYkjiz6tfDn5wA@mail.gmail.com>
-References: <CAELiMBOPsPOWNe6+LahiBqGteucai0xrqY+eQ0nxkghjAEsy-A@mail.gmail.com>
- <CAELiMBOtmQwY8kH=nLTZzjPtNqPsC_GGgs=gDe7pQwFewsxY1A@mail.gmail.com>
- <20121228141825.11102bkeriixmuqs@www.dalek.fi> <CAELiMBMrmagP14SoE1aaDqnuXvwdtVM69zpmK5dn+9Zqby8sQw@mail.gmail.com>
- <20121228145509.16824jqi8bl9komo@www.dalek.fi> <CAELiMBNaV8mS=R2O6N0eK1sm5528XMC8ex=QAjeecaJ+8KEJXg@mail.gmail.com>
- <20121228185810.28972ewnk1vl5cis@www.dalek.fi>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH 0/3] Make rfc3686 template work with asynchronous
+ block ciphers
+Date: Sat, 29 Dec 2012 09:42:49 +1100
+Message-ID: <20121228224248.GA29448@gondor.apana.org.au>
+References: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
 To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qa0-f50.google.com ([209.85.216.50]:38416 "EHLO
-	mail-qa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755025Ab2L1UCP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Dec 2012 15:02:15 -0500
-Received: by mail-qa0-f50.google.com with SMTP id cr7so6999778qab.2
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Dec 2012 12:02:15 -0800 (PST)
-In-Reply-To: <20121228185810.28972ewnk1vl5cis@www.dalek.fi>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-> Tcrypt does all work in module init, which can take long time and therefore
-> triggers 'soft lockup' warning.
->
-> Possible solutions are:
->  1. Build kernel with CONFIG_LOCKUP_DETECTOR option disabled,
->  2. Boot kernel with 'nowatchdog' argument,
->  3. Ignore warning.
->
->
->> ERROR: could not insert 'tcrypt': Resource temporarily unavailable
->
->
-> Tcrypt fails to load after running tests, that's expected.
+On Fri, Dec 28, 2012 at 12:04:48PM +0200, Jussi Kivilinna wrote:
+> I'm not sure how this patchset should be dealt with (should 1st patch go
+> through different tree than 2nd and 3rd?), so therefore it's RFC.
+> 
+> Second patch makes rfc3686 template work with asynchronous block ciphers and
+> third patch changes aesni-intel to use this template. First patch fixed problem
+> in xfrm_algo found with help of 2nd and 3rd patches and without 1st patch
+> 2nd patch breaks aes-ctr with IPSEC.
 
-Thanks a lot for clearing that out =)
+I think the easiest way is to have these patches go through Dave's
+tree.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
