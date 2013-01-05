@@ -1,47 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto api: add crc32 pclmulqdq implementation and
- wrappers for table implementation
-Date: Sat, 5 Jan 2013 21:43:41 +1100
-Message-ID: <20130105104341.GB28670@gondor.apana.org.au>
-References: <50D338AE.3010907@xyratex.com>
+Subject: Re: [PATCH 0/9] crypto: omap-sham - Updates & New Functionality
+Date: Sat, 5 Jan 2013 21:44:22 +1100
+Message-ID: <20130105104421.GC28670@gondor.apana.org.au>
+References: <1356109449-11624-1-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Andreas Dilger <andreas.dilger@intel.com>
-To: Alexander Boyko <alexander_boyko@xyratex.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:43239 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755570Ab3AEKnu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 5 Jan 2013 05:43:50 -0500
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: "Mark A. Greer" <mgreer@animalcreek.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <50D338AE.3010907@xyratex.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1356109449-11624-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Dec 20, 2012 at 08:11:26PM +0400, Alexander Boyko wrote:
-> From: Alexander Boyko <alexander_boyko@xyratex.com>
+On Fri, Dec 21, 2012 at 10:04:00AM -0700, Mark A. Greer wrote:
+> From: "Mark A. Greer" <mgreer@animalcreek.com>
 > 
-> This patch adds crc32 algorithms to shash crypto api. One is wrapper to
-> generic crc32_le function. Second is crc32 pclmulqdq implementation. It
-> use hardware provided PCLMULQDQ instruction to accelerate the CRC32
-> disposal. This instruction present from Intel Westmere and AMD Bulldozer
-> CPUs.
+> [This supersedes the omap-sham driver patches sent in the
+>  "crypto: omap-sham updates" series sent a few weeks ago.]
 > 
-> For intel core i5 I got 450MB/s for table implementation and
-> 2100MB/s for pclmulqdq implementation.
+> This patch series does several things to the omap-sham crypto
+> driver including:
+>  - converting to use pm_runtime
+>  - adding suspend/resume support
+>  - converting to use dmaengine API
+>  - adding device tree support
+>  - adding OMAP4/AM33XX support
+>  - adding SHA224 and SHA256 support
+>  - some minor cleanups
 > 
-> Signed-off-by: Alexander Boyko <alexander_boyko@xyratex.com>
+> The patches are based on the current k.o. kernel, plus:
+>  - the ARM hwmod, etc patches from
+>    "[PATCH 00/15] OMAP SHAM & AES Crypto Updates"
+>    (http://marc.info/?l=linux-omap&m=135610732120447&w=2)
+>  - the EDMA dmaengine patches submitted by Matt Porter
+>    "[RFC PATCH v3 00/16] DMA Engine support for AM33XX]"
+>    (https://lkml.org/lkml/2012/10/18/256)
+>  - some misc patches required by the EDMA patches
+>  - a hack to fix the compilation error that the current k.o. kernel has
 
-Sorry, but your patch is white space damaged and cannot be applied.
-
-You can test this yourself by sending a copy to your email address
-and checking whether you can still apply it.
-
-Thanks,
+All applied.  Thaks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
