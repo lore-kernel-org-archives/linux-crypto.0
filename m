@@ -1,89 +1,93 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH 2/2] drivers/crypto/bfin_crc.c: reposition free_irq to avoid access to invalid data
-Date: Mon,  7 Jan 2013 11:00:16 +0100
-Message-ID: <1357552816-6046-3-git-send-email-Julia.Lawall@lip6.fr>
-References: <1357552816-6046-1-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1357552816-6046-1-git-send-email-Julia.Lawall@lip6.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Vakul Garg <vakul@freescale.com>
+Subject: [PATCH] crypto: caam - Fix missing init of '.type' in AEAD algos.
+Date: Mon, 7 Jan 2013 16:58:19 +0530
+Message-ID: <1357558099-4603-1-git-send-email-vakul@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from co1ehsobe004.messaging.microsoft.com ([216.32.180.187]:14654
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753680Ab3AGLaj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jan 2013 06:30:39 -0500
+Received: from mail50-co1 (localhost [127.0.0.1])	by mail50-co1-R.bigfish.com
+ (Postfix) with ESMTP id 92F0F500058	for <linux-crypto@vger.kernel.org>; Mon,
+  7 Jan 2013 11:30:38 +0000 (UTC)
+Received: from CO1EHSMHS015.bigfish.com (unknown [10.243.78.217])	by
+ mail50-co1.bigfish.com (Postfix) with ESMTP id 3E3618C00EC	for
+ <linux-crypto@vger.kernel.org>; Mon,  7 Jan 2013 11:30:36 +0000 (UTC)
+Received: from b16394-desktop.ap.freescale.net
+ (b16394-desktop.ap.freescale.net [10.232.132.33])	by az84smr01.freescale.net
+ (8.14.3/8.14.0) with ESMTP id r07BUXCY027603	for
+ <linux-crypto@vger.kernel.org>; Mon, 7 Jan 2013 04:30:34 -0700
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Julia Lawall <Julia.Lawall@lip6.fr>
+Following AEAD algo templates are updated for '.type' initialization.
+	(a) authenc(hmac(sha224),cbc(aes))
+	(b) authenc(hmac(sha384),cbc(aes))
+	(c) authenc(hmac(sha224),cbc(des3_ede))
+	(d) authenc(hmac(sha384),cbc(des3_ede))
+	(e) authenc(hmac(sha224),cbc(des))
+	(f) authenc(hmac(sha384),cbc(des))
 
-The data referenced by an interrupt handler should not be freed before the
-interrupt is ended.  The handler is bfin_crypto_crc_handler.  It may refer
-to crc->regs, which is released by the iounmap.
-
-Furthermore, the second argument to all calls to free_irq is incorrect.  It
-should be the same as the last argument of request_irq, which is crc,
-rather than crc->dev.
-
-The semantic match that finds the first problem is as follows:
-(http://coccinelle.lip6.fr/)
-
-// <smpl>
-@fn exists@
-expression list es;
-expression a,b;
-identifier f;
-@@
-
-if (...) {
-  ... when any
-  free_irq(a,b);
-  ... when any
-  f(es);
-  ... when any
-  return ...;
-}
-
-@@
-expression list fn.es;
-expression fn.a,fn.b;
-identifier fn.f;
-@@
-
-*f(es);
-... when any
-*free_irq(a,b);
-// </smpl>
-
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-
+Signed-off-by: Vakul Garg <vakul@freescale.com>
 ---
-Not compiled.  I have not observed the problems in practice; the code just
-looks suspicious.
+ drivers/crypto/caam/caamalg.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
- drivers/crypto/bfin_crc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index a22f1a9..827913d 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -694,7 +694,7 @@ out_error_dma:
- 		dma_free_coherent(&pdev->dev, PAGE_SIZE, crc->sg_cpu, crc->sg_dma);
- 	free_dma(crc->dma_ch);
- out_error_irq:
--	free_irq(crc->irq, crc->dev);
-+	free_irq(crc->irq, crc);
- out_error_unmap:
- 	iounmap((void *)crc->regs);
- out_error_free_mem:
-@@ -720,10 +720,10 @@ static int bfin_crypto_crc_remove(struct platform_device *pdev)
- 
- 	crypto_unregister_ahash(&algs);
- 	tasklet_kill(&crc->done_task);
--	iounmap((void *)crc->regs);
- 	free_dma(crc->dma_ch);
- 	if (crc->irq > 0)
--		free_irq(crc->irq, crc->dev);
-+		free_irq(crc->irq, crc);
-+	iounmap((void *)crc->regs);
- 	kfree(crc);
- 
- 	return 0;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index b2a0a07..42420fb 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1697,6 +1697,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha224),cbc(aes))",
+ 		.driver_name = "authenc-hmac-sha224-cbc-aes-caam",
+ 		.blocksize = AES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+@@ -1736,6 +1737,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha384),cbc(aes))",
+ 		.driver_name = "authenc-hmac-sha384-cbc-aes-caam",
+ 		.blocksize = AES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+@@ -1814,6 +1816,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha224),cbc(des3_ede))",
+ 		.driver_name = "authenc-hmac-sha224-cbc-des3_ede-caam",
+ 		.blocksize = DES3_EDE_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+@@ -1853,6 +1856,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha384),cbc(des3_ede))",
+ 		.driver_name = "authenc-hmac-sha384-cbc-des3_ede-caam",
+ 		.blocksize = DES3_EDE_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+@@ -1930,6 +1934,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha224),cbc(des))",
+ 		.driver_name = "authenc-hmac-sha224-cbc-des-caam",
+ 		.blocksize = DES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+@@ -1969,6 +1974,7 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "authenc(hmac(sha384),cbc(des))",
+ 		.driver_name = "authenc-hmac-sha384-cbc-des-caam",
+ 		.blocksize = DES_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.template_aead = {
+ 			.setkey = aead_setkey,
+ 			.setauthsize = aead_setauthsize,
+-- 
+1.7.7.6
