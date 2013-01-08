@@ -1,336 +1,214 @@
 From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: [PATCH v2 09/10] crypto: omap-aes - Add OMAP4/AM33XX AES Support
-Date: Tue,  8 Jan 2013 11:57:46 -0700
-Message-ID: <1357671467-32363-10-git-send-email-mgreer@animalcreek.com>
+Subject: [PATCH v2 07/10] crypto: omap-aes - Add Device Tree Support
+Date: Tue,  8 Jan 2013 11:57:44 -0700
+Message-ID: <1357671467-32363-8-git-send-email-mgreer@animalcreek.com>
 References: <1357671467-32363-1-git-send-email-mgreer@animalcreek.com>
 Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, russ.dill@gmail.com,
 	"Mark A. Greer" <mgreer@animalcreek.com>,
-	Greg Turner <gkmturner@gmail.com>,
 	Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 To: davem@davemloft.net, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from m1plsmtpa01-06.prod.mesa1.secureserver.net ([64.202.165.34]:40679
-	"EHLO m1plsmtpa01-06.prod.mesa1.secureserver.net"
+Received: from m1plsmtpa01-05.prod.mesa1.secureserver.net ([64.202.165.10]:44025
+	"EHLO m1plsmtpa01-05.prod.mesa1.secureserver.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756905Ab3AHS55 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Jan 2013 13:57:57 -0500
+	id S1756965Ab3AHS56 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Jan 2013 13:57:58 -0500
 In-Reply-To: <1357671467-32363-1-git-send-email-mgreer@animalcreek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-Add support for the OMAP4 version of the AES module
-that is present on OMAP4 and AM33xx SoCs.
+Add Device Tree suport to the omap-aes crypto
+driver.  Currently, only support for OMAP2 and
+OMAP3 is being added but support for OMAP4 will
+be added in a subsequent patch.
 
-The modules have several differences including register
-offsets and how DMA is triggered.  To handle these
-differences, a platform_data structure is defined and
-contains routine pointers, register offsets, and bit
-offsets within registers.  OMAP2/OMAP3-specific routines
-are suffixed with '_omap2' and OMAP4/AM33xx routines are
-suffixed with '_omap4'.
-
-Note: The code being integrated is from the TI AM33xx SDK
-and was written by Greg Turner <gkmturner@gmail.com> and
-Herman Schuurman (current email unknown) while at TI.
-
-CC: Greg Turner <gkmturner@gmail.com>
 CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
 Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 ---
- drivers/crypto/omap-aes.c | 158 ++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 125 insertions(+), 33 deletions(-)
+ drivers/crypto/omap-aes.c | 123 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 97 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index d34aa5d..bd1ad97 100644
+index faf522f..dfebd40 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -5,6 +5,7 @@
-  *
-  * Copyright (c) 2010 Nokia Corporation
-  * Author: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
-+ * Copyright (c) 2011 Texas Instruments Incorporated
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 as published
-@@ -42,10 +43,11 @@
- #define FLD_MASK(start, end)	(((1 << ((start) - (end) + 1)) - 1) << (end))
- #define FLD_VAL(val, start, end) (((val) << (end)) & FLD_MASK(start, end))
- 
--#define AES_REG_KEY(x)			(0x1C - ((x ^ 0x01) * 0x04))
--#define AES_REG_IV(x)			(0x20 + ((x) * 0x04))
-+#define AES_REG_KEY(dd, x)		((dd)->pdata->key_ofs - \
-+						((x ^ 0x01) * 0x04))
-+#define AES_REG_IV(dd, x)		((dd)->pdata->iv_ofs + ((x) * 0x04))
- 
--#define AES_REG_CTRL			0x30
-+#define AES_REG_CTRL(dd)		((dd)->pdata->ctrl_ofs)
- #define AES_REG_CTRL_CTR_WIDTH		(1 << 7)
- #define AES_REG_CTRL_CTR		(1 << 6)
- #define AES_REG_CTRL_CBC		(1 << 5)
-@@ -54,14 +56,11 @@
- #define AES_REG_CTRL_INPUT_READY	(1 << 1)
- #define AES_REG_CTRL_OUTPUT_READY	(1 << 0)
- 
--#define AES_REG_DATA			0x34
--#define AES_REG_DATA_N(x)		(0x34 + ((x) * 0x04))
-+#define AES_REG_DATA_N(dd, x)		((dd)->pdata->data_ofs + ((x) * 0x04))
- 
--#define AES_REG_REV			0x44
--#define AES_REG_REV_MAJOR		0xF0
--#define AES_REG_REV_MINOR		0x0F
-+#define AES_REG_REV(dd)			((dd)->pdata->rev_ofs)
- 
--#define AES_REG_MASK			0x48
-+#define AES_REG_MASK(dd)		((dd)->pdata->mask_ofs)
- #define AES_REG_MASK_SIDLE		(1 << 6)
- #define AES_REG_MASK_START		(1 << 5)
- #define AES_REG_MASK_DMA_OUT_EN		(1 << 3)
-@@ -69,8 +68,7 @@
- #define AES_REG_MASK_SOFTRESET		(1 << 1)
- #define AES_REG_AUTOIDLE		(1 << 0)
- 
--#define AES_REG_SYSSTATUS		0x4C
--#define AES_REG_SYSSTATUS_RESETDONE	(1 << 0)
-+#define AES_REG_LENGTH_N(x)		(0x54 + ((x) * 0x04))
- 
- #define DEFAULT_TIMEOUT		(5*HZ)
- 
-@@ -98,6 +96,26 @@ struct omap_aes_reqctx {
- #define OMAP_AES_QUEUE_LENGTH	1
- #define OMAP_AES_CACHE_SIZE	0
- 
-+struct omap_aes_pdata {
-+	void		(*trigger)(struct omap_aes_dev *dd, int length);
-+
-+	u32		key_ofs;
-+	u32		iv_ofs;
-+	u32		ctrl_ofs;
-+	u32		data_ofs;
-+	u32		rev_ofs;
-+	u32		mask_ofs;
-+
-+	u32		dma_enable_in;
-+	u32		dma_enable_out;
-+	u32		dma_start;
-+
-+	u32		major_mask;
-+	u32		major_shift;
-+	u32		minor_mask;
-+	u32		minor_shift;
-+};
-+
- struct omap_aes_dev {
- 	struct list_head	list;
- 	unsigned long		phys_base;
-@@ -132,6 +150,8 @@ struct omap_aes_dev {
- 	int			dma_out;
- 	struct dma_chan		*dma_lch_out;
- 	dma_addr_t		dma_addr_out;
-+
-+	const struct omap_aes_pdata	*pdata;
- };
- 
- /* keep registered devices data here */
-@@ -194,26 +214,16 @@ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
- 	if (err)
- 		return err;
- 
--	val = 0;
--	if (dd->dma_lch_out != NULL)
--		val |= AES_REG_MASK_DMA_OUT_EN;
--	if (dd->dma_lch_in != NULL)
--		val |= AES_REG_MASK_DMA_IN_EN;
--
--	mask = AES_REG_MASK_DMA_IN_EN | AES_REG_MASK_DMA_OUT_EN;
--
--	omap_aes_write_mask(dd, AES_REG_MASK, val, mask);
--
- 	key32 = dd->ctx->keylen / sizeof(u32);
- 
- 	/* it seems a key should always be set even if it has not changed */
- 	for (i = 0; i < key32; i++) {
--		omap_aes_write(dd, AES_REG_KEY(i),
-+		omap_aes_write(dd, AES_REG_KEY(dd, i),
- 			__le32_to_cpu(dd->ctx->key[i]));
- 	}
- 
- 	if ((dd->flags & FLAGS_CBC) && dd->req->info)
--		omap_aes_write_n(dd, AES_REG_IV(0), dd->req->info, 4);
-+		omap_aes_write_n(dd, AES_REG_IV(dd, 0), dd->req->info, 4);
- 
- 	val = FLD_VAL(((dd->ctx->keylen >> 3) - 1), 4, 3);
- 	if (dd->flags & FLAGS_CBC)
-@@ -224,11 +234,47 @@ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
- 	mask = AES_REG_CTRL_CBC | AES_REG_CTRL_DIRECTION |
- 			AES_REG_CTRL_KEY_SIZE;
- 
--	omap_aes_write_mask(dd, AES_REG_CTRL, val, mask);
-+	omap_aes_write_mask(dd, AES_REG_CTRL(dd), val, mask);
- 
- 	return 0;
- }
- 
-+static void omap_aes_dma_trigger_omap2(struct omap_aes_dev *dd, int length)
-+{
-+	u32 mask, val;
-+
-+	val = dd->pdata->dma_start;
-+
-+	if (dd->dma_lch_out != NULL)
-+		val |= dd->pdata->dma_enable_out;
-+	if (dd->dma_lch_in != NULL)
-+		val |= dd->pdata->dma_enable_in;
-+
-+	mask = dd->pdata->dma_enable_out | dd->pdata->dma_enable_in |
-+	       dd->pdata->dma_start;
-+
-+	omap_aes_write_mask(dd, AES_REG_MASK(dd), val, mask);
-+
-+}
-+
-+static void omap_aes_dma_trigger_omap4(struct omap_aes_dev *dd, int length)
-+{
-+	omap_aes_write(dd, AES_REG_LENGTH_N(0), length);
-+	omap_aes_write(dd, AES_REG_LENGTH_N(1), 0);
-+
-+	omap_aes_dma_trigger_omap2(dd, length);
-+}
-+
-+static void omap_aes_dma_stop(struct omap_aes_dev *dd)
-+{
-+	u32 mask;
-+
-+	mask = dd->pdata->dma_enable_out | dd->pdata->dma_enable_in |
-+	       dd->pdata->dma_start;
-+
-+	omap_aes_write_mask(dd, AES_REG_MASK(dd), 0, mask);
-+}
-+
- static struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_ctx *ctx)
- {
- 	struct omap_aes_dev *dd = NULL, *tmp;
-@@ -413,8 +459,8 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 
- 	memset(&cfg, 0, sizeof(cfg));
- 
--	cfg.src_addr = dd->phys_base + AES_REG_DATA;
--	cfg.dst_addr = dd->phys_base + AES_REG_DATA;
-+	cfg.src_addr = dd->phys_base + AES_REG_DATA_N(dd, 0);
-+	cfg.dst_addr = dd->phys_base + AES_REG_DATA_N(dd, 0);
- 	cfg.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
- 	cfg.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
- 	cfg.src_maxburst = DST_MAXBURST;
-@@ -464,9 +510,8 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 	dma_async_issue_pending(dd->dma_lch_in);
- 	dma_async_issue_pending(dd->dma_lch_out);
- 
--	/* start DMA or disable idle mode */
--	omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_START,
--			    AES_REG_MASK_START);
-+	/* start DMA */
-+	dd->pdata->trigger(dd, length);
- 
- 	return 0;
- }
-@@ -586,7 +631,7 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 
- 	pr_debug("total: %d\n", dd->total);
- 
--	omap_aes_write_mask(dd, AES_REG_MASK, 0, AES_REG_MASK_START);
-+	omap_aes_dma_stop(dd);
- 
- 	dmaengine_terminate_all(dd->dma_lch_in);
- 	dmaengine_terminate_all(dd->dma_lch_out);
-@@ -826,10 +871,48 @@ static struct crypto_alg algs[] = {
+@@ -25,6 +25,9 @@
+ #include <linux/dmaengine.h>
+ #include <linux/omap-dma.h>
+ #include <linux/pm_runtime.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/of_address.h>
+ #include <linux/io.h>
+ #include <linux/crypto.h>
+ #include <linux/interrupt.h>
+@@ -819,11 +822,97 @@ static struct crypto_alg algs[] = {
  }
  };
  
-+static const struct omap_aes_pdata omap_aes_pdata_omap2 = {
-+	.trigger	= omap_aes_dma_trigger_omap2,
-+	.key_ofs	= 0x1c,
-+	.iv_ofs		= 0x20,
-+	.ctrl_ofs	= 0x30,
-+	.data_ofs	= 0x34,
-+	.rev_ofs	= 0x44,
-+	.mask_ofs	= 0x48,
-+	.dma_enable_in	= BIT(2),
-+	.dma_enable_out	= BIT(3),
-+	.dma_start	= BIT(5),
-+	.major_mask	= 0xf0,
-+	.major_shift	= 4,
-+	.minor_mask	= 0x0f,
-+	.minor_shift	= 0,
-+};
-+
- #ifdef CONFIG_OF
-+static const struct omap_aes_pdata omap_aes_pdata_omap4 = {
-+	.trigger	= omap_aes_dma_trigger_omap4,
-+	.key_ofs	= 0x3c,
-+	.iv_ofs		= 0x40,
-+	.ctrl_ofs	= 0x50,
-+	.data_ofs	= 0x60,
-+	.rev_ofs	= 0x80,
-+	.mask_ofs	= 0x84,
-+	.dma_enable_in	= BIT(5),
-+	.dma_enable_out	= BIT(6),
-+	.major_mask	= 0x0700,
-+	.major_shift	= 8,
-+	.minor_mask	= 0x003f,
-+	.minor_shift	= 0,
-+};
-+
- static const struct of_device_id omap_aes_of_match[] = {
- 	{
- 		.compatible	= "ti,omap2-aes",
-+		.data		= &omap_aes_pdata_omap2,
-+	},
++#ifdef CONFIG_OF
++static const struct of_device_id omap_aes_of_match[] = {
 +	{
-+		.compatible	= "ti,omap4-aes",
-+		.data		= &omap_aes_pdata_omap4,
- 	},
- 	{},
- };
-@@ -859,6 +942,8 @@ static int omap_aes_get_res_of(struct omap_aes_dev *dd,
- 	dd->dma_out = -1; /* Dummy value that's unused */
- 	dd->dma_in = -1; /* Dummy value that's unused */
- 
-+	dd->pdata = match->data;
++		.compatible	= "ti,omap2-aes",
++	},
++	{},
++};
++MODULE_DEVICE_TABLE(of, omap_aes_of_match);
 +
- err:
- 	return err;
- }
-@@ -908,6 +993,9 @@ static int omap_aes_get_res_pdev(struct omap_aes_dev *dd,
++static int omap_aes_get_res_of(struct omap_aes_dev *dd,
++		struct device *dev, struct resource *res)
++{
++	struct device_node *node = dev->of_node;
++	const struct of_device_id *match;
++	int err = 0;
++
++	match = of_match_device(of_match_ptr(omap_aes_of_match), dev);
++	if (!match) {
++		dev_err(dev, "no compatible OF match\n");
++		err = -EINVAL;
++		goto err;
++	}
++
++	err = of_address_to_resource(node, 0, res);
++	if (err < 0) {
++		dev_err(dev, "can't translate OF node address\n");
++		err = -EINVAL;
++		goto err;
++	}
++
++	dd->dma_out = -1; /* Dummy value that's unused */
++	dd->dma_in = -1; /* Dummy value that's unused */
++
++err:
++	return err;
++}
++#else
++static const struct of_device_id omap_aes_of_match[] = {
++	{},
++};
++
++static int omap_aes_get_res_of(struct omap_aes_dev *dd,
++		struct device *dev, struct resource *res)
++{
++	return -EINVAL;
++}
++#endif
++
++static int omap_aes_get_res_pdev(struct omap_aes_dev *dd,
++		struct platform_device *pdev, struct resource *res)
++{
++	struct device *dev = &pdev->dev;
++	struct resource *r;
++	int err = 0;
++
++	/* Get the base address */
++	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!r) {
++		dev_err(dev, "no MEM resource info\n");
++		err = -ENODEV;
++		goto err;
++	}
++	memcpy(res, r, sizeof(*res));
++
++	/* Get the DMA out channel */
++	r = platform_get_resource(pdev, IORESOURCE_DMA, 0);
++	if (!r) {
++		dev_err(dev, "no DMA out resource info\n");
++		err = -ENODEV;
++		goto err;
++	}
++	dd->dma_out = r->start;
++
++	/* Get the DMA in channel */
++	r = platform_get_resource(pdev, IORESOURCE_DMA, 1);
++	if (!r) {
++		dev_err(dev, "no DMA in resource info\n");
++		err = -ENODEV;
++		goto err;
++	}
++	dd->dma_in = r->start;
++
++err:
++	return err;
++}
++
+ static int omap_aes_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct omap_aes_dev *dd;
+-	struct resource *res;
++	struct resource res;
+ 	int err = -ENOMEM, i, j;
+ 	u32 reg;
+ 
+@@ -838,35 +927,18 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	spin_lock_init(&dd->lock);
+ 	crypto_init_queue(&dd->queue, OMAP_AES_QUEUE_LENGTH);
+ 
+-	/* Get the base address */
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		dev_err(dev, "invalid resource type\n");
+-		err = -ENODEV;
++	err = (dev->of_node) ? omap_aes_get_res_of(dd, dev, &res) :
++			       omap_aes_get_res_pdev(dd, pdev, &res);
++	if (err)
+ 		goto err_res;
+-	}
+-	dd->phys_base = res->start;
+-
+-	/* Get the DMA */
+-	res = platform_get_resource(pdev, IORESOURCE_DMA, 0);
+-	if (!res)
+-		dev_info(dev, "no DMA info\n");
+-	else
+-		dd->dma_out = res->start;
+-
+-	/* Get the DMA */
+-	res = platform_get_resource(pdev, IORESOURCE_DMA, 1);
+-	if (!res)
+-		dev_info(dev, "no DMA info\n");
+-	else
+-		dd->dma_in = res->start;
+-
+-	dd->io_base = ioremap(dd->phys_base, SZ_4K);
++
++	dd->io_base = devm_request_and_ioremap(dev, &res);
+ 	if (!dd->io_base) {
+ 		dev_err(dev, "can't ioremap\n");
+ 		err = -ENOMEM;
+ 		goto err_res;
  	}
- 	dd->dma_in = r->start;
++	dd->phys_base = res.start;
  
-+	/* Only OMAP2/3 can be non-DT */
-+	dd->pdata = &omap_aes_pdata_omap2;
-+
- err:
- 	return err;
- }
-@@ -947,12 +1035,16 @@ static int omap_aes_probe(struct platform_device *pdev)
  	pm_runtime_enable(dev);
  	pm_runtime_get_sync(dev);
- 
--	reg = omap_aes_read(dd, AES_REG_REV);
--	dev_info(dev, "OMAP AES hw accel rev: %u.%u\n",
--		 (reg & AES_REG_REV_MAJOR) >> 4, reg & AES_REG_REV_MINOR);
-+	omap_aes_dma_stop(dd);
-+
-+	reg = omap_aes_read(dd, AES_REG_REV(dd));
- 
- 	pm_runtime_put_sync(dev);
- 
-+	dev_info(dev, "OMAP AES hw accel rev: %u.%u\n",
-+		 (reg & dd->pdata->major_mask) >> dd->pdata->major_shift,
-+		 (reg & dd->pdata->minor_mask) >> dd->pdata->minor_shift);
-+
- 	tasklet_init(&dd->done_task, omap_aes_done_task, (unsigned long)dd);
- 	tasklet_init(&dd->queue_task, omap_aes_queue_task, (unsigned long)dd);
+@@ -904,7 +976,6 @@ err_algs:
+ err_dma:
+ 	tasklet_kill(&dd->done_task);
+ 	tasklet_kill(&dd->queue_task);
+-	iounmap(dd->io_base);
+ 	pm_runtime_disable(dev);
+ err_res:
+ 	kfree(dd);
+@@ -932,7 +1003,6 @@ static int omap_aes_remove(struct platform_device *pdev)
+ 	tasklet_kill(&dd->done_task);
+ 	tasklet_kill(&dd->queue_task);
+ 	omap_aes_dma_cleanup(dd);
+-	iounmap(dd->io_base);
+ 	pm_runtime_disable(dd->dev);
+ 	kfree(dd);
+ 	dd = NULL;
+@@ -965,6 +1035,7 @@ static struct platform_driver omap_aes_driver = {
+ 		.name	= "omap-aes",
+ 		.owner	= THIS_MODULE,
+ 		.pm	= &omap_aes_pm_ops,
++		.of_match_table	= omap_aes_of_match,
+ 	},
+ };
  
 -- 
 1.7.12
