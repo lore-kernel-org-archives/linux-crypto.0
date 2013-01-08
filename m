@@ -1,39 +1,79 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [RFC PATCH 0/3] Make rfc3686 template work with asynchronous
- block ciphers
-Date: Tue, 8 Jan 2013 08:04:31 +0100
-Message-ID: <20130108070431.GT18940@secunet.com>
-References: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20121228100448.11073.25546.stgit@localhost6.localdomain6>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Mark A. Greer" <mgreer@animalcreek.com>
+Subject: [PATCH v2 02/10] crypto: omap-aes - Don't reset controller for every operation
+Date: Tue,  8 Jan 2013 11:57:39 -0700
+Message-ID: <1357671467-32363-3-git-send-email-mgreer@animalcreek.com>
+References: <1357671467-32363-1-git-send-email-mgreer@animalcreek.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, russ.dill@gmail.com,
+	"Mark A. Greer" <mgreer@animalcreek.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from m1plsmtpa01-06.prod.mesa1.secureserver.net ([64.202.165.34]:39995
+	"EHLO m1plsmtpa01-06.prod.mesa1.secureserver.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756734Ab3AHS54 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Jan 2013 13:57:56 -0500
+In-Reply-To: <1357671467-32363-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 28, 2012 at 12:04:48PM +0200, Jussi Kivilinna wrote:
-> I'm not sure how this patchset should be dealt with (should 1st patch go
-> through different tree than 2nd and 3rd?), so therefore it's RFC.
-> 
-> Second patch makes rfc3686 template work with asynchronous block ciphers and
-> third patch changes aesni-intel to use this template. First patch fixed problem
-> in xfrm_algo found with help of 2nd and 3rd patches and without 1st patch
-> 2nd patch breaks aes-ctr with IPSEC.
-> 
-> 
-> ---
-> 
-> Jussi Kivilinna (3):
->       xfrm_algo: probe asynchronous block ciphers instead of synchronous
->       crypto: ctr - make rfc3686 asynchronous block cipher
->       crypto: aesni-intel - remove rfc3686(ctr(aes)), utilize rfc3686 from ctr-module instead
-> 
+From: "Mark A. Greer" <mgreer@animalcreek.com>
 
-All applied to ipsec-next.
+The AES controller only needs to be reset once and that will
+be done by the hwmod infrastructure, if possible.  Therefore,
+remove the reset code from the omap-aes driver.
 
-Thanks!
+CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ drivers/crypto/omap-aes.c | 27 ---------------------------
+ 1 file changed, 27 deletions(-)
+
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 481da71..33cd783 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -160,19 +160,6 @@ static void omap_aes_write_n(struct omap_aes_dev *dd, u32 offset,
+ 		omap_aes_write(dd, offset, *value);
+ }
+ 
+-static int omap_aes_wait(struct omap_aes_dev *dd, u32 offset, u32 bit)
+-{
+-	unsigned long timeout = jiffies + DEFAULT_TIMEOUT;
+-
+-	while (!(omap_aes_read(dd, offset) & bit)) {
+-		if (time_is_before_jiffies(timeout)) {
+-			dev_err(dd->dev, "omap-aes timeout\n");
+-			return -ETIMEDOUT;
+-		}
+-	}
+-	return 0;
+-}
+-
+ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ {
+ 	/*
+@@ -183,20 +170,6 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ 	clk_enable(dd->iclk);
+ 
+ 	if (!(dd->flags & FLAGS_INIT)) {
+-		/* is it necessary to reset before every operation? */
+-		omap_aes_write_mask(dd, AES_REG_MASK, AES_REG_MASK_SOFTRESET,
+-					AES_REG_MASK_SOFTRESET);
+-		/*
+-		 * prevent OCP bus error (SRESP) in case an access to the module
+-		 * is performed while the module is coming out of soft reset
+-		 */
+-		__asm__ __volatile__("nop");
+-		__asm__ __volatile__("nop");
+-
+-		if (omap_aes_wait(dd, AES_REG_SYSSTATUS,
+-				AES_REG_SYSSTATUS_RESETDONE))
+-			return -ETIMEDOUT;
+-
+ 		dd->flags |= FLAGS_INIT;
+ 		dd->err = 0;
+ 	}
+-- 
+1.7.12
