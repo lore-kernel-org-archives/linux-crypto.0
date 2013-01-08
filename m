@@ -1,118 +1,365 @@
-From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: Re: [PATCH 07/10] crypto: omap-aes - Add Device Tree Support
-Date: Mon, 7 Jan 2013 16:29:50 -0700
-Message-ID: <20130107232950.GB13938@animalcreek.com>
-References: <1356109500-11719-1-git-send-email-mgreer@animalcreek.com>
- <1356109500-11719-8-git-send-email-mgreer@animalcreek.com>
- <CA+Bv8XYz6mUJs82qAz=pvhkNDFe_Vp5Nv6918UPMGFAuAaU5Jw@mail.gmail.com>
+From: Vakul Garg <vakul@freescale.com>
+Subject: [PATCH] crypto: testmgr - add aead cbc aes hmac sha384 test vectors
+Date: Tue, 8 Jan 2013 10:19:06 +0530
+Message-ID: <1357620546-25192-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Dmitry Kasatkin <dmitry.kasatkin@intel.com>, linux-crypto@vger.kernel.org,
- "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, davem@davemloft.net,
- Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
-To: Russ Dill <russ.dill@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CA+Bv8XYz6mUJs82qAz=pvhkNDFe_Vp5Nv6918UPMGFAuAaU5Jw@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: linux-arm-kernel-bounces@lists.infradead.org
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:56395
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751241Ab3AHEv2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jan 2013 23:51:28 -0500
+Received: from mail49-co9 (localhost [127.0.0.1])	by mail49-co9-R.bigfish.com
+ (Postfix) with ESMTP id 5222E78018D	for <linux-crypto@vger.kernel.org>; Tue,
+  8 Jan 2013 04:51:27 +0000 (UTC)
+Received: from CO9EHSMHS008.bigfish.com (unknown [10.236.132.235])	by
+ mail49-co9.bigfish.com (Postfix) with ESMTP id 746B638004D	for
+ <linux-crypto@vger.kernel.org>; Tue,  8 Jan 2013 04:51:24 +0000 (UTC)
+Received: from b16394-desktop.ap.freescale.net
+ (b16394-desktop.ap.freescale.net [10.232.132.33])	by az84smr01.freescale.net
+ (8.14.3/8.14.0) with ESMTP id r084pKXU010108	for
+ <linux-crypto@vger.kernel.org>; Mon, 7 Jan 2013 21:51:21 -0700
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 28, 2012 at 02:06:02AM -0800, Russ Dill wrote:
-> On Fri, Dec 21, 2012 at 10:04 AM, Mark A. Greer <mgreer@animalcreek.com> wrote:
-> > From: "Mark A. Greer" <mgreer@animalcreek.com>
-> >
-> > Add Device Tree suport to the omap-aes crypto
-> > driver.  Currently, only support for OMAP2 and
-> > OMAP3 is being added but support for OMAP4 will
-> > be added in a subsequent patch.
-> >
-> > CC: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-> > Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
-> > ---
-> >  drivers/crypto/omap-aes.c | 119 ++++++++++++++++++++++++++++++++++++----------
-> >  1 file changed, 93 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-> > index faf522f..68bf22d 100644
-> > --- a/drivers/crypto/omap-aes.c
-> > +++ b/drivers/crypto/omap-aes.c
-> > @@ -25,6 +25,9 @@
-> >  #include <linux/dmaengine.h>
-> >  #include <linux/omap-dma.h>
-> >  #include <linux/pm_runtime.h>
-> > +#include <linux/of.h>
-> > +#include <linux/of_device.h>
-> > +#include <linux/of_address.h>
-> >  #include <linux/io.h>
-> >  #include <linux/crypto.h>
-> >  #include <linux/interrupt.h>
-> > @@ -819,11 +822,93 @@ static struct crypto_alg algs[] = {
-> >  }
-> >  };
-> >
-> > +#ifdef CONFIG_OF
-> > +static const struct of_device_id omap_aes_of_match[] = {
-> > +       {
-> > +               .compatible     = "ti,omap2-aes",
-> > +       },
-> > +       {},
-> > +};
-> > +MODULE_DEVICE_TABLE(of, omap_aes_of_match);
-> 
-> I think you mean for the above section to be outside of the '#ifdef
-> CONFIG_OF' block.
+Test vectors were generated starting from existing CBC(AES) test vectors
+(RFC3602, NIST SP800-38A) and adding HMAC(SHA384) computed with Crypto++ and
+double-checked with HashCalc.
 
-Yes, I need to rework that.
+Signed-off-by: Vakul Garg <vakul@freescale.com>
+---
+ crypto/testmgr.c |   12 ++
+ crypto/testmgr.h |  293 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 305 insertions(+), 0 deletions(-)
 
-> > +static int omap_aes_get_res_of(struct omap_aes_dev *dd,
-> > +               struct device *dev, struct resource *res)
-> > +{
-> > +       struct device_node *node = dev->of_node;
-> > +       const struct of_device_id *match;
-> > +       int err = 0;
-> > +
-> > +       match = of_match_device(of_match_ptr(omap_aes_of_match), dev);
-> > +       if (!match) {
-> > +               dev_err(dev, "no compatible OF match\n");
-> > +               err = -EINVAL;
-> > +               goto err;
-> > +       }
-> > +
-> > +       err = of_address_to_resource(node, 0, res);
-> > +       if (err < 0) {
-> > +               dev_err(dev, "can't translate OF node address\n");
-> > +               err = -EINVAL;
-> > +               goto err;
-> > +       }
-> > +
-> > +       dd->dma_out = -1; /* Dummy value that's unused */
-> > +       dd->dma_in = -1; /* Dummy value that's unused */
-> > +
-> > +err:
-> > +       return err;
-> > +}
-> > +#else
-> > +static int omap_aes_get_res_dev(struct omap_aes_dev *dd,
-> > +               struct device *dev, struct resource *res)
-> > +{
-> > +       return -EINVAL;
-> > +}
-> 
-> And I think you mean this one to be omap_aes_get_res_of
-
-I do. :(
-
-Thanks Russ. 
-
-Mark
---
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index edf4a08..a735829 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1733,6 +1733,18 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha384),cbc(aes))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs = hmac_sha384_aes_cbc_enc_tv_template,
++					.count = HMAC_SHA384_AES_CBC_ENC_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "authenc(hmac(sha512),cbc(aes))",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index b5721e0..48822c3 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -13979,6 +13979,299 @@ static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_template[] = {
+ 	},
+ };
+ 
++#define HMAC_SHA384_AES_CBC_ENC_TEST_VECTORS 7
++
++static struct aead_testvec hmac_sha384_aes_cbc_enc_tv_template[] = {
++	{ /* RFC 3602 Case 1 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x10"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x06\xa9\x21\x40\x36\xb8\xa1\x5b"
++			  "\x51\x2e\x03\xd5\x34\x12\x00\x06",
++		.klen   = 8 + 48 + 16,
++		.iv     = "\x3d\xaf\xba\x42\x9d\x9e\xb4\x30"
++			  "\xb4\x22\xda\x80\x2c\x9f\xac\x41",
++		.input  = "Single block msg",
++		.ilen   = 16,
++		.result = "\xe3\x53\x77\x9c\x10\x79\xae\xb8"
++			  "\x27\x08\x94\x2d\xbe\x77\x18\x1a"
++			  "\x79\x1c\xf1\x22\x95\x80\xe0\x60"
++			  "\x7f\xf9\x92\x60\x83\xbd\x60\x9c"
++			  "\xf6\x62\x8b\xa9\x7d\x56\xe2\xaf"
++			  "\x80\x43\xbc\x41\x4a\x63\x0b\xa0"
++			  "\x16\x25\xe2\xfe\x0a\x96\xf6\xa5"
++			  "\x6c\x0b\xc2\x53\xb4\x27\xd9\x42",
++		.rlen   = 16 + 48,
++	}, { /* RFC 3602 Case 2 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x10"	/* enc key length */
++			  "\x20\x21\x22\x23\x24\x25\x26\x27"
++			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			  "\x30\x31\x32\x33\x34\x35\x36\x37"
++			  "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			  "\x40\x41\x42\x43\x44\x45\x46\x47"
++			  "\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			  "\xc2\x86\x69\x6d\x88\x7c\x9a\xa0"
++			  "\x61\x1b\xbb\x3e\x20\x25\xa4\x5a",
++		.klen   = 8 + 48 + 16,
++		.iv     = "\x56\x2e\x17\x99\x6d\x09\x3d\x28"
++			  "\xdd\xb3\xba\x69\x5a\x2e\x6f\x58",
++		.input  = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.ilen   = 32,
++		.result = "\xd2\x96\xcd\x94\xc2\xcc\xcf\x8a"
++			  "\x3a\x86\x30\x28\xb5\xe1\xdc\x0a"
++			  "\x75\x86\x60\x2d\x25\x3c\xff\xf9"
++			  "\x1b\x82\x66\xbe\xa6\xd6\x1a\xb1"
++			  "\x4e\x5b\xa8\x65\x51\xc6\x58\xaf"
++			  "\x31\x57\x50\x3d\x01\xa1\xa4\x3f"
++			  "\x42\xd1\xd7\x31\x76\x8d\xf8\xc8"
++			  "\xe4\xd2\x7e\xc5\x23\xe7\xc6\x2e"
++			  "\x2d\xfd\x9d\xc1\xac\x50\x1e\xcf"
++			  "\xa0\x10\xeb\x1a\x9c\xb7\xe1\xca",
++		.rlen   = 32 + 48,
++	}, { /* RFC 3602 Case 3 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"            /* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x10"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x6c\x3e\xa0\x47\x76\x30\xce\x21"
++			  "\xa2\xce\x33\x4a\xa7\x46\xc2\xcd",
++		.klen   = 8 + 48 + 16,
++		.iv     = "\xc7\x82\xdc\x4c\x09\x8c\x66\xcb"
++			  "\xd9\xcd\x27\xd8\x25\x68\x2c\x81",
++		.input  = "This is a 48-byte message (exactly 3 AES blocks)",
++		.ilen   = 48,
++		.result = "\xd0\xa0\x2b\x38\x36\x45\x17\x53"
++			  "\xd4\x93\x66\x5d\x33\xf0\xe8\x86"
++			  "\x2d\xea\x54\xcd\xb2\x93\xab\xc7"
++			  "\x50\x69\x39\x27\x67\x72\xf8\xd5"
++			  "\x02\x1c\x19\x21\x6b\xad\x52\x5c"
++			  "\x85\x79\x69\x5d\x83\xba\x26\x84"
++			  "\xa1\x52\xe7\xda\xf7\x05\xb6\xca"
++			  "\xad\x0f\x51\xed\x5a\xd3\x0f\xdf"
++			  "\xde\xeb\x3f\x31\xed\x3a\x43\x93"
++			  "\x3b\xb7\xca\xc8\x1b\xe7\x3b\x61"
++			  "\x6a\x05\xfd\x2d\x6a\x5c\xb1\x0d"
++			  "\x6e\x7a\xeb\x1c\x84\xec\xdb\xde",
++		.rlen   = 48 + 48,
++	}, { /* RFC 3602 Case 4 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"            /* rta type */
++#endif
++			  "\x00\x00\x00\x10"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x56\xe4\x7a\x38\xc5\x59\x89\x74"
++			  "\xbc\x46\x90\x3d\xba\x29\x03\x49",
++		.klen   = 8 + 48 + 16,
++		.iv     = "\x8c\xe8\x2e\xef\xbe\xa0\xda\x3c"
++			  "\x44\x69\x9e\xd7\xdb\x51\xb7\xd9",
++		.input  = "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			  "\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			  "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			  "\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			  "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			  "\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			  "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			  "\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
++		.ilen   = 64,
++		.result = "\xc3\x0e\x32\xff\xed\xc0\x77\x4e"
++			  "\x6a\xff\x6a\xf0\x86\x9f\x71\xaa"
++			  "\x0f\x3a\xf0\x7a\x9a\x31\xa9\xc6"
++			  "\x84\xdb\x20\x7e\xb0\xef\x8e\x4e"
++			  "\x35\x90\x7a\xa6\x32\xc3\xff\xdf"
++			  "\x86\x8b\xb7\xb2\x9d\x3d\x46\xad"
++			  "\x83\xce\x9f\x9a\x10\x2e\xe9\x9d"
++			  "\x49\xa5\x3e\x87\xf4\xc3\xda\x55"
++			  "\x85\x7b\x91\xe0\x29\xeb\xd3\x59"
++			  "\x7c\xe3\x67\x14\xbe\x71\x2a\xd2"
++			  "\x8a\x1a\xd2\x35\x78\x6b\x69\xba"
++			  "\x64\xa5\x04\x00\x19\xc3\x4c\xae"
++			  "\x71\xff\x76\x9f\xbb\xc3\x29\x22"
++			  "\xc2\xc6\x51\xf1\xe6\x29\x5e\xa5",
++		.rlen   = 64 + 48,
++	}, { /* RFC 3602 Case 5 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"            /* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"            /* rta type */
++#endif
++			  "\x00\x00\x00\x10"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x90\xd3\x82\xb4\x10\xee\xba\x7a"
++			  "\xd9\x38\xc4\x6c\xec\x1a\x82\xbf",
++		.klen   = 8 + 48 + 16,
++		.iv     = "\xe9\x6e\x8c\x08\xab\x46\x57\x63"
++			  "\xfd\x09\x8d\x45\xdd\x3f\xf8\x93",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input  = "\x08\x00\x0e\xbd\xa7\x0a\x00\x00"
++			  "\x8e\x9c\x08\x3d\xb9\x5b\x07\x00"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			  "\x20\x21\x22\x23\x24\x25\x26\x27"
++			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			  "\x30\x31\x32\x33\x34\x35\x36\x37"
++			  "\x01\x02\x03\x04\x05\x06\x07\x08"
++			  "\x09\x0a\x0b\x0c\x0d\x0e\x0e\x01",
++		.ilen   = 80,
++		.result = "\xf6\x63\xc2\x5d\x32\x5c\x18\xc6"
++			  "\xa9\x45\x3e\x19\x4e\x12\x08\x49"
++			  "\xa4\x87\x0b\x66\xcc\x6b\x99\x65"
++			  "\x33\x00\x13\xb4\x89\x8d\xc8\x56"
++			  "\xa4\x69\x9e\x52\x3a\x55\xdb\x08"
++			  "\x0b\x59\xec\x3a\x8e\x4b\x7e\x52"
++			  "\x77\x5b\x07\xd1\xdb\x34\xed\x9c"
++			  "\x53\x8a\xb5\x0c\x55\x1b\x87\x4a"
++			  "\xa2\x69\xad\xd0\x47\xad\x2d\x59"
++			  "\x13\xac\x19\xb7\xcf\xba\xd4\xa6"
++			  "\x57\x5f\xb4\xd7\x74\x6f\x18\x97"
++			  "\xb7\xde\xfc\xf3\x4e\x0d\x29\x4d"
++			  "\xa0\xff\x39\x9e\x2d\xbf\x27\xac"
++			  "\x54\xb9\x8a\x3e\xab\x3b\xac\xd3"
++			  "\x36\x43\x74\xfc\xc2\x64\x81\x8a"
++			  "\x2c\x15\x72\xdf\x3f\x9d\x5b\xa4",
++		.rlen   = 80 + 48,
++	}, { /* NIST SP800-38A F.2.3 CBC-AES192.Encrypt */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"            /* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"            /* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x8e\x73\xb0\xf7\xda\x0e\x64\x52"
++			  "\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
++			  "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b",
++		.klen   = 8 + 48 + 24,
++		.iv     = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.input  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ilen   = 64,
++		.result = "\x4f\x02\x1d\xb2\x43\xbc\x63\x3d"
++			  "\x71\x78\x18\x3a\x9f\xa0\x71\xe8"
++			  "\xb4\xd9\xad\xa9\xad\x7d\xed\xf4"
++			  "\xe5\xe7\x38\x76\x3f\x69\x14\x5a"
++			  "\x57\x1b\x24\x20\x12\xfb\x7a\xe0"
++			  "\x7f\xa9\xba\xac\x3d\xf1\x02\xe0"
++			  "\x08\xb0\xe2\x79\x88\x59\x88\x81"
++			  "\xd9\x20\xa9\xe6\x4f\x56\x15\xcd"
++			  "\x29\x9b\x42\x47\x0b\xbf\xf3\x54"
++			  "\x54\x95\xb0\x89\xd5\xa0\xc3\x78"
++			  "\x60\x6c\x18\x39\x6d\xc9\xfb\x2a"
++			  "\x34\x1c\xed\x95\x10\x1e\x43\x0a"
++			  "\x72\xce\x26\xbc\x74\xd9\x6f\xa2"
++			  "\xf1\xd9\xd0\xb1\xdf\x3d\x93\x14",
++		.rlen   = 64 + 48,
++	}, { /* NIST SP800-38A F.2.5 CBC-AES256.Encrypt */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"            /* rta type */
++#endif
++			  "\x00\x00\x00\x20"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
++			  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
++			  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
++			  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
++		.klen   = 8 + 48 + 32,
++		.iv     = "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.input  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ilen   = 64,
++		.result = "\xf5\x8c\x4c\x04\xd6\xe5\xf1\xba"
++			  "\x77\x9e\xab\xfb\x5f\x7b\xfb\xd6"
++			  "\x9c\xfc\x4e\x96\x7e\xdb\x80\x8d"
++			  "\x67\x9f\x77\x7b\xc6\x70\x2c\x7d"
++			  "\x39\xf2\x33\x69\xa9\xd9\xba\xcf"
++			  "\xa5\x30\xe2\x63\x04\x23\x14\x61"
++			  "\xb2\xeb\x05\xe2\xc3\x9b\xe9\xfc"
++			  "\xda\x6c\x19\x07\x8c\x6a\x9d\x1b"
++			  "\x9f\x50\xce\x64\xd9\xa3\xc9\x7a"
++			  "\x15\x3a\x3d\x46\x9a\x90\xf3\x06"
++			  "\x22\xad\xc5\x24\x77\x50\xb8\xfe"
++			  "\xbe\x37\x16\x86\x34\x5f\xaf\x97"
++			  "\x00\x9d\x86\xc8\x32\x4f\x72\x2f"
++			  "\x48\x97\xad\xb6\xb9\x77\x33\xbc",
++		.rlen   = 64 + 48,
++	},
++};
++
+ static struct aead_testvec hmac_sha512_aes_cbc_enc_tv_template[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+-- 
+1.7.7.6
