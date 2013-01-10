@@ -1,734 +1,101 @@
-From: Alexander Boyko <alexander_boyko@xyratex.com>
-Subject: [PATCH v4] crypto api: add crc32 pclmulqdq implementation and wrappers
- for table implementation
-Date: Thu, 10 Jan 2013 18:54:59 +0400
-Message-ID: <50EED643.2010907@xyratex.com>
-References: <50EED427.2040309@xyratex.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH][RFC] crypto: tcrypt - Ahash tests changed to run in
+ parallel.
+Date: Thu, 10 Jan 2013 09:50:43 -0600
+Message-ID: <20130110095043.c609644407b8ebaa945db405@freescale.com>
+References: <1357123173-32534-1-git-send-email-vakul@freescale.com>
+	<20130105182556.87853b23jydihzk0@www.dalek.fi>
+	<065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
+	<20130109154552.4163137574bb7de915017e21@freescale.com>
+	<065BBB7616BCE543832A2EF096986B94150EC2@039-SN2MPN1-011.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Andreas Dilger <adilger@whamcloud.com>
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Garg Vakul-B16394 <B16394@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f53.google.com ([209.85.215.53]:57595 "EHLO
-	mail-la0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751432Ab3AJOzH (ORCPT
+Received: from db3ehsobe006.messaging.microsoft.com ([213.199.154.144]:50122
+	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753891Ab3AJPx3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Jan 2013 09:55:07 -0500
-Received: by mail-la0-f53.google.com with SMTP id fn20so678546lab.40
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2013 06:55:04 -0800 (PST)
-In-Reply-To: <50EED427.2040309@xyratex.com>
+	Thu, 10 Jan 2013 10:53:29 -0500
+In-Reply-To: <065BBB7616BCE543832A2EF096986B94150EC2@039-SN2MPN1-011.039d.mgd.msft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Alexander Boyko <alexander_boyko@xyratex.com>
+On Thu, 10 Jan 2013 00:49:23 -0600
+Garg Vakul-B16394 <B16394@freescale.com> wrote:
 
-This patch adds crc32 algorithms to shash crypto api. One is wrapper to
-gerneric crc32_le function. Second is crc32 pclmulqdq implementation. It
-use hardware provided PCLMULQDQ instruction to accelerate the CRC32 disposal.
-This instruction present from Intel Westmere and AMD Bulldozer CPUs.
+> > From: Phillips Kim-R1AAHA
+> > Sent: Thursday, January 10, 2013 3:16 AM
+> > On Sat, 5 Jan 2013 17:14:13 +0000
+> > Garg Vakul-B16394 <B16394@freescale.com> wrote:
+> > > > From: Jussi Kivilinna [mailto:jussi.kivilinna@mbnet.fi]
+> > > > Sent: Saturday, January 05, 2013 9:56 PM
+> > > >
+> > > > Quoting Vakul Garg <vakul@freescale.com>:
+> > > >
+> > > > > This allows to test & run multiple parallel crypto ahash contexts.
+> > > > > Each of the test vector under the ahash speed test template is
+> > > > > started under a separate kthread.
+> > > >
+> > > > Why you want to do this?
+> > >
+> > > In its current form, we cannot test multiple simultaneous crypto
+> > sessions with tcrypt.
+> > > Crypto offload hardware accelerators are usually capable of handling
+> > multiple session in parallel.
+> > > This patch allows to load such hardware.
+> > 
+> > tcrypt can currently test offload engines with multiple single-session
+> > async requests.  So to test multiple _session_ requests, why isn't the
+> > change to tcrypt simply to alternate keys in the request loop, as opposed
+> > to what this patch does, i.e.
+> > adding separate kthreads?  The number of sessions/keys to alternate can
+> > be added as a module parameter.
+> > 
+> > > Even if offload accelerators are not present, multiple crypto sessions
+> > can execute in parallel on Multicore.
+> > 
+> > I think that's more in the area of PCRYPT.
+> > 
+> 
+> 
+> > > > Does not this change make tcrypt give inconsistent results?
+> > > >
+> > >
+> > > Based on kernel scheduling of threads, this change can make tcrypt give
+> > varying results in different runs.
+> > > For consistent results, we can use existing synchronous mode crypto
+> > sessions.
+> > 
+> > see above.  I'm not sure, but I think multithreading tcrypt should be
+> > left to the parallel crypto engine (PCRYPT) and Software async crypto
+> > daemon (CRYPTD).
+> [VG] IIUC, PCRYPT and CRYPTD provides infrastructure to execute crypto contexts under threads to achieve different things.
+> PCRYPT allows multiple crypto requests from a transform to execute in parallel.
+> 
+> CRYPTD provides a daemon which executes crypto requests. 
+> It is more like crypto hardware accelerator running in software (e.g. on a certain core of Multicore processor).
+> 
+> My proposal is to add capability in tcrypt to launch multiple parallel crypto transforms.
 
-For intel core i5 I got 450MB/s for table implementation and 2100MB/s 
-for pclmulqdq implementation.
+but you can do that in a single thread - it's up to the algorithm
+implementation (be it a driver, pcrypt, sync s/w, etc.) to
+parallelize the requests appropriately for the underlying h/w.
 
-Signed-off-by: Alexander Boyko <alexander_boyko@xyratex.com>
+> Currently, only one transform is active at any point of time.
 
----
-Changes from V3 to V4:
- - Fix email format.
+so allocate multiple transforms at startup and round-robin through
+them in the single-threaded test loop?
 
- arch/x86/crypto/Makefile            |    2 
- arch/x86/crypto/crc32-pclmul_asm.S  |  247 ++++++++++++++++++++++++++++++++++++
- arch/x86/crypto/crc32-pclmul_glue.c |  201 +++++++++++++++++++++++++++++
- crypto/Kconfig                      |   21 +++
- crypto/Makefile                     |    1 
- crypto/crc32.c                      |  158 +++++++++++++++++++++++
- 6 files changed, 630 insertions(+)
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index e0ca7c9..63947a8 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -27,6 +27,7 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
- 
- obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
- obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
-+obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
- 
- aes-i586-y := aes-i586-asm_32.o aes_glue.o
- twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
-@@ -52,3 +53,4 @@ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
- sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
- crc32c-intel-y := crc32c-intel_glue.o
- crc32c-intel-$(CONFIG_CRYPTO_CRC32C_X86_64) += crc32c-pcl-intel-asm_64.o
-+crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
-diff --git a/arch/x86/crypto/crc32-pclmul_asm.S b/arch/x86/crypto/crc32-pclmul_asm.S
-new file mode 100644
-index 0000000..65ea6a6
---- /dev/null
-+++ b/arch/x86/crypto/crc32-pclmul_asm.S
-@@ -0,0 +1,247 @@
-+/* GPL HEADER START
-+ *
-+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 only,
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License version 2 for more details (a copy is included
-+ * in the LICENSE file that accompanied this code).
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * version 2 along with this program; If not, see http://www.gnu.org/licenses
-+ *
-+ * Please  visit http://www.xyratex.com/contact if you need additional
-+ * information or have any questions.
-+ *
-+ * GPL HEADER END
-+ */
-+
-+/*
-+ * Copyright 2012 Xyratex Technology Limited
-+ *
-+ * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
-+ * calculation.
-+ * CRC32 polynomial:0x04c11db7(BE)/0xEDB88320(LE)
-+ * PCLMULQDQ is a new instruction in Intel SSE4.2, the reference can be found
-+ * at:
-+ * http://www.intel.com/products/processor/manuals/
-+ * Intel(R) 64 and IA-32 Architectures Software Developer's Manual
-+ * Volume 2B: Instruction Set Reference, N-Z
-+ *
-+ * Authors:   Gregory Prestas <Gregory_Prestas@us.xyratex.com>
-+ *	      Alexander Boyko <Alexander_Boyko@xyratex.com>
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/inst.h>
-+
-+
-+.align 16
-+/*
-+ * [x4*128+32 mod P(x) << 32)]'  << 1   = 0x154442bd4
-+ * #define CONSTANT_R1  0x154442bd4LL
-+ *
-+ * [(x4*128-32 mod P(x) << 32)]' << 1   = 0x1c6e41596
-+ * #define CONSTANT_R2  0x1c6e41596LL
-+ */
-+.Lconstant_R2R1:
-+	.octa 0x00000001c6e415960000000154442bd4
-+/*
-+ * [(x128+32 mod P(x) << 32)]'   << 1   = 0x1751997d0
-+ * #define CONSTANT_R3  0x1751997d0LL
-+ *
-+ * [(x128-32 mod P(x) << 32)]'   << 1   = 0x0ccaa009e
-+ * #define CONSTANT_R4  0x0ccaa009eLL
-+ */
-+.Lconstant_R4R3:
-+	.octa 0x00000000ccaa009e00000001751997d0
-+/*
-+ * [(x64 mod P(x) << 32)]'       << 1   = 0x163cd6124
-+ * #define CONSTANT_R5  0x163cd6124LL
-+ */
-+.Lconstant_R5:
-+	.octa 0x00000000000000000000000163cd6124
-+.Lconstant_mask32:
-+	.octa 0x000000000000000000000000FFFFFFFF
-+/*
-+ * #define CRCPOLY_TRUE_LE_FULL 0x1DB710641LL
-+ *
-+ * Barrett Reduction constant (u64`) = u` = (x**64 / P(x))` = 0x1F7011641LL
-+ * #define CONSTANT_RU  0x1F7011641LL
-+ */
-+.Lconstant_RUpoly:
-+	.octa 0x00000001F701164100000001DB710641
-+
-+#define CONSTANT %xmm0
-+
-+#ifdef __x86_64__
-+#define BUF     %rdi
-+#define LEN     %rsi
-+#define CRC     %edx
-+#else
-+#warning Using 32bit code support
-+#define BUF     %eax
-+#define LEN     %edx
-+#define CRC     %ecx
-+#endif
-+
-+
-+
-+.text
-+/**
-+ *      Calculate crc32
-+ *      BUF - buffer (16 bytes aligned)
-+ *      LEN - sizeof buffer (16 bytes aligned), LEN should be grater than 63
-+ *      CRC - initial crc32
-+ *      return %eax crc32
-+ *      uint crc32_pclmul_le_16(unsigned char const *buffer,
-+ *	                     size_t len, uint crc32)
-+ */
-+.globl crc32_pclmul_le_16
-+.align 4, 0x90
-+crc32_pclmul_le_16:/* buffer and buffer size are 16 bytes aligned */
-+	movdqa  (BUF), %xmm1
-+	movdqa  0x10(BUF), %xmm2
-+	movdqa  0x20(BUF), %xmm3
-+	movdqa  0x30(BUF), %xmm4
-+	movd    CRC, CONSTANT
-+	pxor    CONSTANT, %xmm1
-+	sub     $0x40, LEN
-+	add     $0x40, BUF
-+#ifndef __x86_64__
-+	/* This is for position independent code(-fPIC) support for 32bit */
-+	call    delta
-+delta:
-+	pop     %ecx
-+#endif
-+	cmp     $0x40, LEN
-+	jb      less_64
-+
-+#ifdef __x86_64__
-+	movdqa .Lconstant_R2R1(%rip), CONSTANT
-+#else
-+	movdqa .Lconstant_R2R1 - delta(%ecx), CONSTANT
-+#endif
-+
-+loop_64:/*  64 bytes Full cache line folding */
-+	prefetchnta    0x40(BUF)
-+	movdqa  %xmm1, %xmm5
-+	movdqa  %xmm2, %xmm6
-+	movdqa  %xmm3, %xmm7
-+#ifdef __x86_64__
-+	movdqa  %xmm4, %xmm8
-+#endif
-+	PCLMULQDQ 00, CONSTANT, %xmm1
-+	PCLMULQDQ 00, CONSTANT, %xmm2
-+	PCLMULQDQ 00, CONSTANT, %xmm3
-+#ifdef __x86_64__
-+	PCLMULQDQ 00, CONSTANT, %xmm4
-+#endif
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	PCLMULQDQ 0x11, CONSTANT, %xmm6
-+	PCLMULQDQ 0x11, CONSTANT, %xmm7
-+#ifdef __x86_64__
-+	PCLMULQDQ 0x11, CONSTANT, %xmm8
-+#endif
-+	pxor    %xmm5, %xmm1
-+	pxor    %xmm6, %xmm2
-+	pxor    %xmm7, %xmm3
-+#ifdef __x86_64__
-+	pxor    %xmm8, %xmm4
-+#else
-+	/* xmm8 unsupported for x32 */
-+	movdqa  %xmm4, %xmm5
-+	PCLMULQDQ 00, CONSTANT, %xmm4
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	pxor    %xmm5, %xmm4
-+#endif
-+
-+	pxor    (BUF), %xmm1
-+	pxor    0x10(BUF), %xmm2
-+	pxor    0x20(BUF), %xmm3
-+	pxor    0x30(BUF), %xmm4
-+
-+	sub     $0x40, LEN
-+	add     $0x40, BUF
-+	cmp     $0x40, LEN
-+	jge     loop_64
-+less_64:/*  Folding cache line into 128bit */
-+#ifdef __x86_64__
-+	movdqa  .Lconstant_R4R3(%rip), CONSTANT
-+#else
-+	movdqa  .Lconstant_R4R3 - delta(%ecx), CONSTANT
-+#endif
-+	prefetchnta     (BUF)
-+
-+	movdqa  %xmm1, %xmm5
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	pxor    %xmm5, %xmm1
-+	pxor    %xmm2, %xmm1
-+
-+	movdqa  %xmm1, %xmm5
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	pxor    %xmm5, %xmm1
-+	pxor    %xmm3, %xmm1
-+
-+	movdqa  %xmm1, %xmm5
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	pxor    %xmm5, %xmm1
-+	pxor    %xmm4, %xmm1
-+
-+	cmp     $0x10, LEN
-+	jb      fold_64
-+loop_16:/* Folding rest buffer into 128bit */
-+	movdqa  %xmm1, %xmm5
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	PCLMULQDQ 0x11, CONSTANT, %xmm5
-+	pxor    %xmm5, %xmm1
-+	pxor    (BUF), %xmm1
-+	sub     $0x10, LEN
-+	add     $0x10, BUF
-+	cmp     $0x10, LEN
-+	jge     loop_16
-+
-+fold_64:
-+	/* perform the last 64 bit fold, also adds 32 zeroes
-+	 * to the input stream */
-+	PCLMULQDQ 0x01, %xmm1, CONSTANT /* R4 * xmm1.low */
-+	psrldq  $0x08, %xmm1
-+	pxor    CONSTANT, %xmm1
-+
-+	/* final 32-bit fold */
-+	movdqa  %xmm1, %xmm2
-+#ifdef __x86_64__
-+	movdqa  .Lconstant_R5(%rip), CONSTANT
-+	movdqa  .Lconstant_mask32(%rip), %xmm3
-+#else
-+	movdqa  .Lconstant_R5 - delta(%ecx), CONSTANT
-+	movdqa  .Lconstant_mask32 - delta(%ecx), %xmm3
-+#endif
-+	psrldq  $0x04, %xmm2
-+	pand    %xmm3, %xmm1
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	pxor    %xmm2, %xmm1
-+
-+	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
-+#ifdef __x86_64__
-+	movdqa  .Lconstant_RUpoly(%rip), CONSTANT
-+#else
-+	movdqa  .Lconstant_RUpoly - delta(%ecx), CONSTANT
-+#endif
-+	movdqa  %xmm1, %xmm2
-+	pand    %xmm3, %xmm1
-+	PCLMULQDQ 0x10, CONSTANT, %xmm1
-+	pand    %xmm3, %xmm1
-+	PCLMULQDQ 0x00, CONSTANT, %xmm1
-+	pxor    %xmm2, %xmm1
-+	pextrd  $0x01, %xmm1, %eax
-+
-+	ret
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-new file mode 100644
-index 0000000..9d014a7
---- /dev/null
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -0,0 +1,201 @@
-+/* GPL HEADER START
-+ *
-+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 only,
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License version 2 for more details (a copy is included
-+ * in the LICENSE file that accompanied this code).
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * version 2 along with this program; If not, see http://www.gnu.org/licenses
-+ *
-+ * Please  visit http://www.xyratex.com/contact if you need additional
-+ * information or have any questions.
-+ *
-+ * GPL HEADER END
-+ */
-+
-+/*
-+ * Copyright 2012 Xyratex Technology Limited
-+ *
-+ * Wrappers for kernel crypto shash api to pclmulqdq crc32 imlementation.
-+ */
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/kernel.h>
-+#include <linux/crc32.h>
-+#include <crypto/internal/hash.h>
-+
-+#include <asm/cpufeature.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/i387.h>
-+
-+#define CHKSUM_BLOCK_SIZE	1
-+#define CHKSUM_DIGEST_SIZE	4
-+
-+#define PCLMUL_MIN_LEN		64L     /* minimum size of buffer
-+					 * for crc32_pclmul_le_16 */
-+#define SCALE_F			16L	/* size of xmm register */
-+#define SCALE_F_MASK		(SCALE_F - 1)
-+
-+u32 crc32_pclmul_le_16(unsigned char const *buffer, size_t len, u32 crc32);
-+
-+static u32 __attribute__((pure))
-+	crc32_pclmul_le(u32 crc, unsigned char const *p, size_t len)
-+{
-+	unsigned int iquotient;
-+	unsigned int iremainder;
-+	unsigned int prealign;
-+
-+	if (len < PCLMUL_MIN_LEN + SCALE_F_MASK || !irq_fpu_usable())
-+		return crc32_le(crc, p, len);
-+
-+	if ((long)p & SCALE_F_MASK) {
-+		/* align p to 16 byte */
-+		prealign = SCALE_F - ((long)p & SCALE_F_MASK);
-+
-+		crc = crc32_le(crc, p, prealign);
-+		len -= prealign;
-+		p = (unsigned char *)(((unsigned long)p + SCALE_F_MASK) &
-+				     ~SCALE_F_MASK);
-+	}
-+	iquotient = len & (~SCALE_F_MASK);
-+	iremainder = len & SCALE_F_MASK;
-+
-+	kernel_fpu_begin();
-+	crc = crc32_pclmul_le_16(p, iquotient, crc);
-+	kernel_fpu_end();
-+
-+	if (iremainder)
-+		crc = crc32_le(crc, p + iquotient, iremainder);
-+
-+	return crc;
-+}
-+
-+static int crc32_pclmul_cra_init(struct crypto_tfm *tfm)
-+{
-+	u32 *key = crypto_tfm_ctx(tfm);
-+
-+	*key = 0;
-+
-+	return 0;
-+}
-+
-+static int crc32_pclmul_setkey(struct crypto_shash *hash, const u8 *key,
-+			unsigned int keylen)
-+{
-+	u32 *mctx = crypto_shash_ctx(hash);
-+
-+	if (keylen != sizeof(u32)) {
-+		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	*mctx = le32_to_cpup((__le32 *)key);
-+	return 0;
-+}
-+
-+static int crc32_pclmul_init(struct shash_desc *desc)
-+{
-+	u32 *mctx = crypto_shash_ctx(desc->tfm);
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*crcp = *mctx;
-+
-+	return 0;
-+}
-+
-+static int crc32_pclmul_update(struct shash_desc *desc, const u8 *data,
-+			       unsigned int len)
-+{
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*crcp = crc32_pclmul_le(*crcp, data, len);
-+	return 0;
-+}
-+
-+/* No final XOR 0xFFFFFFFF, like crc32_le */
-+static int __crc32_pclmul_finup(u32 *crcp, const u8 *data, unsigned int len,
-+				u8 *out)
-+{
-+	*(__le32 *)out = cpu_to_le32(crc32_pclmul_le(*crcp, data, len));
-+	return 0;
-+}
-+
-+static int crc32_pclmul_finup(struct shash_desc *desc, const u8 *data,
-+			      unsigned int len, u8 *out)
-+{
-+	return __crc32_pclmul_finup(shash_desc_ctx(desc), data, len, out);
-+}
-+
-+static int crc32_pclmul_final(struct shash_desc *desc, u8 *out)
-+{
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*(__le32 *)out = cpu_to_le32p(crcp);
-+	return 0;
-+}
-+
-+static int crc32_pclmul_digest(struct shash_desc *desc, const u8 *data,
-+			       unsigned int len, u8 *out)
-+{
-+	return __crc32_pclmul_finup(crypto_shash_ctx(desc->tfm), data, len,
-+				    out);
-+}
-+
-+static struct shash_alg alg = {
-+	.setkey		= crc32_pclmul_setkey,
-+	.init		= crc32_pclmul_init,
-+	.update		= crc32_pclmul_update,
-+	.final		= crc32_pclmul_final,
-+	.finup		= crc32_pclmul_finup,
-+	.digest		= crc32_pclmul_digest,
-+	.descsize	= sizeof(u32),
-+	.digestsize	= CHKSUM_DIGEST_SIZE,
-+	.base		= {
-+			.cra_name		= "crc32",
-+			.cra_driver_name	= "crc32-pclmul",
-+			.cra_priority		= 200,
-+			.cra_blocksize		= CHKSUM_BLOCK_SIZE,
-+			.cra_ctxsize		= sizeof(u32),
-+			.cra_module		= THIS_MODULE,
-+			.cra_init		= crc32_pclmul_cra_init,
-+	}
-+};
-+
-+static const struct x86_cpu_id crc32pclmul_cpu_id[] = {
-+	X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
-+	{}
-+};
-+MODULE_DEVICE_TABLE(x86cpu, crc32pclmul_cpu_id);
-+
-+
-+static int __init crc32_pclmul_mod_init(void)
-+{
-+
-+	if (!x86_match_cpu(crc32pclmul_cpu_id)) {
-+		pr_info("PCLMULQDQ-NI instructions are not detected.\n");
-+		return -ENODEV;
-+	}
-+	return crypto_register_shash(&alg);
-+}
-+
-+static void __exit crc32_pclmul_mod_fini(void)
-+{
-+	crypto_unregister_shash(&alg);
-+}
-+
-+module_init(crc32_pclmul_mod_init);
-+module_exit(crc32_pclmul_mod_fini);
-+
-+MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
-+MODULE_LICENSE("GPL");
-+
-+MODULE_ALIAS("crc32");
-+MODULE_ALIAS("crc32-pclmul");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 4641d95..e8b51e0 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -355,6 +355,27 @@ config CRYPTO_CRC32C_SPARC64
- 	  CRC32c CRC algorithm implemented using sparc64 crypto instructions,
- 	  when available.
- 
-+config CRYPTO_CRC32
-+	tristate "CRC32 CRC algorithm"
-+	select CRYPTO_HASH
-+	select CRC32
-+	help
-+	  CRC-32-IEEE 802.3 cyclic redundancy-check algorithm.
-+	  Shash crypto api wrappers to crc32_le function.
-+
-+config CRYPTO_CRC32_PCLMUL
-+	tristate "CRC32 PCLMULQDQ hardware acceleration"
-+	depends on X86
-+	select CRYPTO_HASH
-+	select CRC32
-+	help
-+	  From Intel Westmere and AMD Bulldozer processor with SSE4.2
-+	  and PCLMULQDQ supported, the processor will support
-+	  CRC32 PCLMULQDQ implementation using hardware accelerated PCLMULQDQ
-+	  instruction. This option will create 'crc32-plcmul' module,
-+	  which will enable any routine to use the CRC-32-IEEE 802.3 checksum
-+	  and gain better performance as compared with the table implementation.
-+
- config CRYPTO_GHASH
- 	tristate "GHASH digest algorithm"
- 	select CRYPTO_GF128MUL
-diff --git a/crypto/Makefile b/crypto/Makefile
-index d59dec7..be1a1be 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -81,6 +81,7 @@ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
- obj-$(CONFIG_CRYPTO_ZLIB) += zlib.o
- obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
- obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
-+obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_842) += 842.o
-diff --git a/crypto/crc32.c b/crypto/crc32.c
-new file mode 100644
-index 0000000..9d1c415
---- /dev/null
-+++ b/crypto/crc32.c
-@@ -0,0 +1,158 @@
-+/* GPL HEADER START
-+ *
-+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 only,
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License version 2 for more details (a copy is included
-+ * in the LICENSE file that accompanied this code).
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * version 2 along with this program; If not, see http://www.gnu.org/licenses
-+ *
-+ * Please  visit http://www.xyratex.com/contact if you need additional
-+ * information or have any questions.
-+ *
-+ * GPL HEADER END
-+ */
-+
-+/*
-+ * Copyright 2012 Xyratex Technology Limited
-+ */
-+
-+/*
-+ * This is crypto api shash wrappers to crc32_le.
-+ */
-+
-+#include <linux/crc32.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/kernel.h>
-+
-+#define CHKSUM_BLOCK_SIZE	1
-+#define CHKSUM_DIGEST_SIZE	4
-+
-+static u32 __crc32_le(u32 crc, unsigned char const *p, size_t len)
-+{
-+	return crc32_le(crc, p, len);
-+}
-+
-+/** No default init with ~0 */
-+static int crc32_cra_init(struct crypto_tfm *tfm)
-+{
-+	u32 *key = crypto_tfm_ctx(tfm);
-+
-+	*key = 0;
-+
-+	return 0;
-+}
-+
-+
-+/*
-+ * Setting the seed allows arbitrary accumulators and flexible XOR policy
-+ * If your algorithm starts with ~0, then XOR with ~0 before you set
-+ * the seed.
-+ */
-+static int crc32_setkey(struct crypto_shash *hash, const u8 *key,
-+			unsigned int keylen)
-+{
-+	u32 *mctx = crypto_shash_ctx(hash);
-+
-+	if (keylen != sizeof(u32)) {
-+		crypto_shash_set_flags(hash, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	*mctx = le32_to_cpup((__le32 *)key);
-+	return 0;
-+}
-+
-+static int crc32_init(struct shash_desc *desc)
-+{
-+	u32 *mctx = crypto_shash_ctx(desc->tfm);
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*crcp = *mctx;
-+
-+	return 0;
-+}
-+
-+static int crc32_update(struct shash_desc *desc, const u8 *data,
-+			unsigned int len)
-+{
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*crcp = __crc32_le(*crcp, data, len);
-+	return 0;
-+}
-+
-+/* No final XOR 0xFFFFFFFF, like crc32_le */
-+static int __crc32_finup(u32 *crcp, const u8 *data, unsigned int len,
-+			 u8 *out)
-+{
-+	*(__le32 *)out = cpu_to_le32(__crc32_le(*crcp, data, len));
-+	return 0;
-+}
-+
-+static int crc32_finup(struct shash_desc *desc, const u8 *data,
-+		       unsigned int len, u8 *out)
-+{
-+	return __crc32_finup(shash_desc_ctx(desc), data, len, out);
-+}
-+
-+static int crc32_final(struct shash_desc *desc, u8 *out)
-+{
-+	u32 *crcp = shash_desc_ctx(desc);
-+
-+	*(__le32 *)out = cpu_to_le32p(crcp);
-+	return 0;
-+}
-+
-+static int crc32_digest(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *out)
-+{
-+	return __crc32_finup(crypto_shash_ctx(desc->tfm), data, len,
-+			     out);
-+}
-+static struct shash_alg alg = {
-+	.setkey		= crc32_setkey,
-+	.init		= crc32_init,
-+	.update		= crc32_update,
-+	.final		= crc32_final,
-+	.finup		= crc32_finup,
-+	.digest		= crc32_digest,
-+	.descsize	= sizeof(u32),
-+	.digestsize	= CHKSUM_DIGEST_SIZE,
-+	.base		= {
-+		.cra_name		= "crc32",
-+		.cra_driver_name	= "crc32-table",
-+		.cra_priority		= 100,
-+		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(u32),
-+		.cra_module		= THIS_MODULE,
-+		.cra_init		= crc32_cra_init,
-+	}
-+};
-+
-+static int __init crc32_mod_init(void)
-+{
-+	return crypto_register_shash(&alg);
-+}
-+
-+static void __exit crc32_mod_fini(void)
-+{
-+	crypto_unregister_shash(&alg);
-+}
-+
-+module_init(crc32_mod_init);
-+module_exit(crc32_mod_fini);
-+
-+MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
-+MODULE_DESCRIPTION("CRC32 calculations wrapper for lib/crc32");
-+MODULE_LICENSE("GPL");
+btw, tcrypt's existing async cipher implementation (commit 3f3baf3
+"crypto: tcrypt - add test_acipher_speed") waits for request
+completion prior to submitting a new request - not good for h/w with
+parallel cipher capabilities.  Here's a version that suits the SEC4
+better:
+
+http://marc.info/?l=linux-crypto-vger&m=128179098817896&w=2
+
+Kim
