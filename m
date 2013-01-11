@@ -1,40 +1,116 @@
 From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCH 0/2] crypto: caam - Fix bugs in hashing module
-Date: Fri, 11 Jan 2013 15:33:55 +0530
-Message-ID: <1357898637-18971-1-git-send-email-vakul@freescale.com>
+Subject: [PATCH 2/2] crypto: caam - improve init for context state saves
+Date: Fri, 11 Jan 2013 15:33:57 +0530
+Message-ID: <1357898637-18971-3-git-send-email-vakul@freescale.com>
+References: <1357898637-18971-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe003.messaging.microsoft.com ([216.32.181.183]:7565
+Received: from ch1ehsobe006.messaging.microsoft.com ([216.32.181.186]:31614
 	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754295Ab3AKKGZ (ORCPT
+	by vger.kernel.org with ESMTP id S1754295Ab3AKKG1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jan 2013 05:06:25 -0500
-Received: from mail69-ch1 (localhost [127.0.0.1])	by mail69-ch1-R.bigfish.com
- (Postfix) with ESMTP id B58821C0245	for <linux-crypto@vger.kernel.org>; Fri,
- 11 Jan 2013 10:06:24 +0000 (UTC)
-Received: from CH1EHSMHS040.bigfish.com (snatpool1.int.messaging.microsoft.com
- [10.43.68.254])	by mail69-ch1.bigfish.com (Postfix) with ESMTP id DFF852E004C
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2013 10:06:22 +0000 (UTC)
+	Fri, 11 Jan 2013 05:06:27 -0500
+Received: from mail250-ch1 (localhost [127.0.0.1])	by
+ mail250-ch1-R.bigfish.com (Postfix) with ESMTP id E3A3416400C0	for
+ <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2013 10:06:26 +0000 (UTC)
+Received: from CH1EHSMHS025.bigfish.com (snatpool2.int.messaging.microsoft.com
+ [10.43.68.233])	by mail250-ch1.bigfish.com (Postfix) with ESMTP id
+ 8C4E03C006A	for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2013 10:06:24
+ +0000 (UTC)
 Received: from b16394-desktop.ap.freescale.net
  (b16394-desktop.ap.freescale.net [10.232.132.33])	by az84smr01.freescale.net
- (8.14.3/8.14.0) with ESMTP id r0BA6EZ2008314	for
- <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2013 03:06:15 -0700
+ (8.14.3/8.14.0) with ESMTP id r0BA6EZ4008314	for
+ <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2013 03:06:18 -0700
+In-Reply-To: <1357898637-18971-1-git-send-email-vakul@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These patches have been authored by Steve Cornelius.
-These patches fix uninitialised variables left in the hashing module.
+From: Steve Cornelius <steve.cornelius@freescale.com>
 
-<steve.cornelius@freescale.com>.
+Multiple function in asynchronous hashing use a saved-state block,
+a.k.a. struct caam_hash_state, which holds a stash of information
+between requests (init/update/final). Certain values in this state
+block are loaded for processing using an inline-if, and when this
+is done, the potential for uninitialized data can pose conflicts.
+Therefore, this patch improves initialization of state data to
+prevent false assignments using uninitialized data in the state block.
 
-Steve Cornelius (2):
-  crypto: caam - Fix DMA size in descriptor in ahash_digest()
-  crypto: caam - improve init for context state saves
+This patch addresses the following traceback, originating in
+ahash_final_ctx(), although a problem like this could certainly
+exhibit other symptoms:
 
- drivers/crypto/caam/caamhash.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+kernel BUG at arch/arm/mm/dma-mapping.c:465!
+Unable to handle kernel NULL pointer dereference at virtual address 00000000
+pgd = 80004000
+[00000000] *pgd=00000000
+Internal error: Oops: 805 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 0    Not tainted  (3.0.15-01752-gdd441b9-dirty #40)
+PC is at __bug+0x1c/0x28
+LR is at __bug+0x18/0x28
+pc : [<80043240>]    lr : [<8004323c>]    psr: 60000013
+sp : e423fd98  ip : 60000013  fp : 0000001c
+r10: e4191b84  r9 : 00000020  r8 : 00000009
+r7 : 88005038  r6 : 00000001  r5 : 2d676572  r4 : e4191a60
+r3 : 00000000  r2 : 00000001  r1 : 60000093  r0 : 00000033
+Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+Control: 10c53c7d  Table: 1000404a  DAC: 00000015
+Process cryptomgr_test (pid: 1306, stack limit = 0xe423e2f0)
+Stack: (0xe423fd98 to 0xe4240000)
+fd80:                                                       11807fd1 80048544
+fda0: 88005000 e4191a00 e5178040 8039dda0 00000000 00000014 2d676572 e4191008
+fdc0: 88005018 e4191a60 00100100 e4191a00 00000000 8039ce0c e423fea8 00000007
+fde0: e4191a00 e4227000 e5178000 8039ce18 e419183c 80203808 80a94a44 00000006
+fe00: 00000000 80207180 00000000 00000006 e423ff08 00000000 00000007 e5178000
+fe20: e41918a4 80a949b4 8c4844e2 00000000 00000049 74227000 8c4844e2 00000e90
+fe40: 0000000e 74227e90 ffff8c58 80ac29e0 e423fed4 8006a350 8c81625c e423ff5c
+fe60: 00008576 e4002500 00000003 00030010 e4002500 00000003 e5180000 e4002500
+fe80: e5178000 800e6d24 007fffff 00000000 00000010 e4001280 e4002500 60000013
+fea0: 000000d0 804df078 00000000 00000000 00000000 00000000 00000000 00000000
+fec0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+fee0: 00000000 00000000 e4227000 e4226000 e4753000 e4752000 e40a5000 e40a4000
+ff00: e41e7000 e41e6000 00000000 00000000 00000000 e423ff14 e423ff14 00000000
+ff20: 00000400 804f9080 e5178000 e4db0b40 00000000 e4db0b80 0000047c 00000400
+ff40: 00000000 8020758c 00000400 ffffffff 0000008a 00000000 e4db0b40 80206e00
+ff60: e4049dbc 00000000 00000000 00000003 e423ffa4 80062978 e41a8bfc 00000000
+ff80: 00000000 e4049db4 00000013 e4049db0 00000013 00000000 00000000 00000000
+ffa0: e4db0b40 e4db0b40 80204cbc 00000013 00000000 00000000 00000000 80204cfc
+ffc0: e4049da0 80089544 80040a40 00000000 e4db0b40 00000000 00000000 00000000
+ffe0: e423ffe0 e423ffe0 e4049da0 800894c4 80040a40 80040a40 00000000 00000000
+[<80043240>] (__bug+0x1c/0x28) from [<80048544>] (___dma_single_dev_to_cpu+0x84)
+[<80048544>] (___dma_single_dev_to_cpu+0x84/0x94) from [<8039dda0>] (ahash_fina)
+[<8039dda0>] (ahash_final_ctx+0x180/0x428) from [<8039ce18>] (ahash_final+0xc/0)
+[<8039ce18>] (ahash_final+0xc/0x10) from [<80203808>] (crypto_ahash_op+0x28/0xc)
+[<80203808>] (crypto_ahash_op+0x28/0xc0) from [<80207180>] (test_hash+0x214/0x5)
+[<80207180>] (test_hash+0x214/0x5b8) from [<8020758c>] (alg_test_hash+0x68/0x8c)
+[<8020758c>] (alg_test_hash+0x68/0x8c) from [<80206e00>] (alg_test+0x7c/0x1b8)
+[<80206e00>] (alg_test+0x7c/0x1b8) from [<80204cfc>] (cryptomgr_test+0x40/0x48)
+[<80204cfc>] (cryptomgr_test+0x40/0x48) from [<80089544>] (kthread+0x80/0x88)
+[<80089544>] (kthread+0x80/0x88) from [<80040a40>] (kernel_thread_exit+0x0/0x8)
+Code: e59f0010 e1a01003 eb126a8d e3a03000 (e5833000)
+---[ end trace d52a403a1d1eaa86 ]---
 
+Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
+---
+ drivers/crypto/caam/caamhash.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 6a26b6b..4868307 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1459,8 +1459,9 @@ static int ahash_init(struct ahash_request *req)
+ 	state->update = ahash_update_first;
+ 	state->finup = ahash_finup_first;
+ 	state->final = ahash_final_no_ctx;
+-
+ 	state->current_buf = 0;
++	state->buflen_0 = 0;
++	state->buflen_1 = 0;
+ 
+ 	return 0;
+ }
 -- 
 1.7.7.6
