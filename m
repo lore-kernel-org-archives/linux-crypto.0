@@ -1,49 +1,42 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [RFC 0/1] ima/evm: signature verification support using
- asymmetric keys
-Date: Fri, 18 Jan 2013 10:16:38 -0500
-Message-ID: <1358522198.26115.6.camel@falcor1.watson.ibm.com>
-References: <1358365541.4593.190.camel@falcor1>
-	 <cover.1358246017.git.dmitry.kasatkin@intel.com>
-	 <27882.1358445829@warthog.procyon.org.uk>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: RE: [PATCH][RFC] crypto: tcrypt - Ahash tests changed to run in
+ parallel.
+Date: Sat, 19 Jan 2013 01:54:57 +0200
+Message-ID: <20130119015457.1386129jh3k4firk@www.dalek.fi>
+References: <1357123173-32534-1-git-send-email-vakul@freescale.com>
+ <20130105182556.87853b23jydihzk0@www.dalek.fi>
+ <065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
 Content-Transfer-Encoding: 7bit
-Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>, jmorris@namei.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Garg Vakul-B16394 <B16394@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e38.co.us.ibm.com ([32.97.110.159]:36430 "EHLO
-	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751578Ab3ARPRh (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:36892 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752744Ab3ARXzA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jan 2013 10:17:37 -0500
-Received: from /spool/local
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Fri, 18 Jan 2013 08:17:37 -0700
-In-Reply-To: <27882.1358445829@warthog.procyon.org.uk>
+	Fri, 18 Jan 2013 18:55:00 -0500
+In-Reply-To: <065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2013-01-17 at 18:03 +0000, David Howells wrote:
+Quoting Garg Vakul-B16394 <B16394@freescale.com>:
 
-> I would also like to have a look at altering your trusted key type[*] to be a
-> subtype of asymmetric keys so that the asymmetric key type can cover keys from
-> more sources:
-> 
-> 	- Compiled-in keys.
-> 	- Keys from UEFI db.
-> 	- Keys from TPM (ie. the trusted key stuff).
-> 	- Keys loaded by the administrator _if_ they are validated by a key the
-> 	  kernel already has.
-> 	
-> [*] I believe that that's your asymmetric key type and that your encrypted key
->     type is your symmetric key type.
+>
+>> Does not this change make tcrypt give
+>> inconsistent results?
+>>
+>
+> Based on kernel scheduling of threads, this change can make tcrypt  
+> give varying results in different runs.
+> For consistent results, we can use existing synchronous mode crypto sessions.
 
-Both trusted and encrypted keys are random number symmetric keys.
-Trusted keys are random number symmetric keys, generated and RSA-sealed
-by the TPM.
+But one cannot get consistent results for asynchronous software  
+implementations after this patch.
 
-Mimi
+-Jussi
