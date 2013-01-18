@@ -1,30 +1,49 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 2/3] KEYS: Separate the kernel signature checking keyring from module signing
-Date: Thu, 17 Jan 2013 21:20:28 +0000
-Message-ID: <30183.1358457628@warthog.procyon.org.uk>
-References: <1358449049.2689.87.camel@falcor1> <20130117180352.27885.79893.stgit@warthog.procyon.org.uk> <20130117180400.27885.2973.stgit@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, dmitry.kasatkin@intel.com,
-	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org,
-	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1358449049.2689.87.camel@falcor1>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [RFC 0/1] ima/evm: signature verification support using
+ asymmetric keys
+Date: Fri, 18 Jan 2013 10:16:38 -0500
+Message-ID: <1358522198.26115.6.camel@falcor1.watson.ibm.com>
+References: <1358365541.4593.190.camel@falcor1>
+	 <cover.1358246017.git.dmitry.kasatkin@intel.com>
+	 <27882.1358445829@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>, jmorris@namei.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e38.co.us.ibm.com ([32.97.110.159]:36430 "EHLO
+	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751578Ab3ARPRh (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Jan 2013 10:17:37 -0500
+Received: from /spool/local
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Fri, 18 Jan 2013 08:17:37 -0700
+In-Reply-To: <27882.1358445829@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+On Thu, 2013-01-17 at 18:03 +0000, David Howells wrote:
 
-> Lets assume accepting built in keys should is acceptable for all use
-> cases.  Adding additional keys from userspace is probably not acceptable
-> for all use cases.  Those keys should be added to specific 'trusted'
-> keyrings.
+> I would also like to have a look at altering your trusted key type[*] to be a
+> subtype of asymmetric keys so that the asymmetric key type can cover keys from
+> more sources:
 > 
-> EVM and IMA-appraisal have separate keyrings for this reason.  I might
-> be interested in allowing third party packages to be installed and
-> executed, but that doesn't imply that a security.evm extended attribute,
-> signed by a third party application, is acceptable.
+> 	- Compiled-in keys.
+> 	- Keys from UEFI db.
+> 	- Keys from TPM (ie. the trusted key stuff).
+> 	- Keys loaded by the administrator _if_ they are validated by a key the
+> 	  kernel already has.
+> 	
+> [*] I believe that that's your asymmetric key type and that your encrypted key
+>     type is your symmetric key type.
 
-We should probably look at using the capability of X.509 certificates to
-indicate what a key may be used for and noting that in the public_key struct.
+Both trusted and encrypted keys are random number symmetric keys.
+Trusted keys are random number symmetric keys, generated and RSA-sealed
+by the TPM.
 
-David
+Mimi
