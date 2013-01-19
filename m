@@ -1,8 +1,9 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 08/12] crypto: x86/ghash - assembler clean-up: use ENDPROC
- at end of assember functions
-Date: Sat, 19 Jan 2013 13:39:26 +0200
-Message-ID: <20130119113926.22319.64937.stgit@localhost6.localdomain6>
+Subject: [PATCH 09/12] crypto: x86/salsa20 - assembler cleanup,
+ use ENTRY/ENDPROC for assember functions and rename ECRYPT_* to
+ salsa20_*
+Date: Sat, 19 Jan 2013 13:39:31 +0200
+Message-ID: <20130119113931.22319.23067.stgit@localhost6.localdomain6>
 References: <20130119113818.22319.26924.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,50 +12,147 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:36895 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751909Ab3ASLj2 (ORCPT
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:58367 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751909Ab3ASLjd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Jan 2013 06:39:28 -0500
+	Sat, 19 Jan 2013 06:39:33 -0500
 In-Reply-To: <20130119113818.22319.26924.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinn@mbnet.fi>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/ghash-clmulni-intel_asm.S |    4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/crypto/salsa20-i586-asm_32.S   |   28 ++++++++++++++--------------
+ arch/x86/crypto/salsa20-x86_64-asm_64.S |   28 +++++++++++++---------------
+ arch/x86/crypto/salsa20_glue.c          |    5 -----
+ 3 files changed, 27 insertions(+), 34 deletions(-)
 
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-index 1eb7f90..586f41a 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-+++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-@@ -94,6 +94,7 @@ __clmul_gf128mul_ble:
- 	pxor T2, T1
- 	pxor T1, DATA
- 	ret
-+ENDPROC(__clmul_gf128mul_ble)
+diff --git a/arch/x86/crypto/salsa20-i586-asm_32.S b/arch/x86/crypto/salsa20-i586-asm_32.S
+index 72eb306..329452b 100644
+--- a/arch/x86/crypto/salsa20-i586-asm_32.S
++++ b/arch/x86/crypto/salsa20-i586-asm_32.S
+@@ -2,11 +2,12 @@
+ # D. J. Bernstein
+ # Public domain.
  
- /* void clmul_ghash_mul(char *dst, const be128 *shash) */
- ENTRY(clmul_ghash_mul)
-@@ -105,6 +106,7 @@ ENTRY(clmul_ghash_mul)
- 	PSHUFB_XMM BSWAP DATA
- 	movups DATA, (%rdi)
+-# enter ECRYPT_encrypt_bytes
++#include <linux/linkage.h>
++
+ .text
+-.p2align 5
+-.globl ECRYPT_encrypt_bytes
+-ECRYPT_encrypt_bytes:
++
++# enter salsa20_encrypt_bytes
++ENTRY(salsa20_encrypt_bytes)
+ 	mov	%esp,%eax
+ 	and	$31,%eax
+ 	add	$256,%eax
+@@ -933,11 +934,10 @@ ECRYPT_encrypt_bytes:
+ 	add	$64,%esi
+ 	# goto bytesatleast1
+ 	jmp	._bytesatleast1
+-# enter ECRYPT_keysetup
+-.text
+-.p2align 5
+-.globl ECRYPT_keysetup
+-ECRYPT_keysetup:
++ENDPROC(salsa20_encrypt_bytes)
++
++# enter salsa20_keysetup
++ENTRY(salsa20_keysetup)
+ 	mov	%esp,%eax
+ 	and	$31,%eax
+ 	add	$256,%eax
+@@ -1060,11 +1060,10 @@ ECRYPT_keysetup:
+ 	# leave
+ 	add	%eax,%esp
  	ret
-+ENDPROC(clmul_ghash_mul)
+-# enter ECRYPT_ivsetup
+-.text
+-.p2align 5
+-.globl ECRYPT_ivsetup
+-ECRYPT_ivsetup:
++ENDPROC(salsa20_keysetup)
++
++# enter salsa20_ivsetup
++ENTRY(salsa20_ivsetup)
+ 	mov	%esp,%eax
+ 	and	$31,%eax
+ 	add	$256,%eax
+@@ -1112,3 +1111,4 @@ ECRYPT_ivsetup:
+ 	# leave
+ 	add	%eax,%esp
+ 	ret
++ENDPROC(salsa20_ivsetup)
+diff --git a/arch/x86/crypto/salsa20-x86_64-asm_64.S b/arch/x86/crypto/salsa20-x86_64-asm_64.S
+index 6214a9b..9279e0b 100644
+--- a/arch/x86/crypto/salsa20-x86_64-asm_64.S
++++ b/arch/x86/crypto/salsa20-x86_64-asm_64.S
+@@ -1,8 +1,7 @@
+-# enter ECRYPT_encrypt_bytes
+-.text
+-.p2align 5
+-.globl ECRYPT_encrypt_bytes
+-ECRYPT_encrypt_bytes:
++#include <linux/linkage.h>
++
++# enter salsa20_encrypt_bytes
++ENTRY(salsa20_encrypt_bytes)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -802,11 +801,10 @@ ECRYPT_encrypt_bytes:
+ 	# comment:fp stack unchanged by jump
+ 	# goto bytesatleast1
+ 	jmp	._bytesatleast1
+-# enter ECRYPT_keysetup
+-.text
+-.p2align 5
+-.globl ECRYPT_keysetup
+-ECRYPT_keysetup:
++ENDPROC(salsa20_encrypt_bytes)
++
++# enter salsa20_keysetup
++ENTRY(salsa20_keysetup)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -892,11 +890,10 @@ ECRYPT_keysetup:
+ 	mov	%rdi,%rax
+ 	mov	%rsi,%rdx
+ 	ret
+-# enter ECRYPT_ivsetup
+-.text
+-.p2align 5
+-.globl ECRYPT_ivsetup
+-ECRYPT_ivsetup:
++ENDPROC(salsa20_keysetup)
++
++# enter salsa20_ivsetup
++ENTRY(salsa20_ivsetup)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -918,3 +915,4 @@ ECRYPT_ivsetup:
+ 	mov	%rdi,%rax
+ 	mov	%rsi,%rdx
+ 	ret
++ENDPROC(salsa20_ivsetup)
+diff --git a/arch/x86/crypto/salsa20_glue.c b/arch/x86/crypto/salsa20_glue.c
+index a3a3c02..5e8e677 100644
+--- a/arch/x86/crypto/salsa20_glue.c
++++ b/arch/x86/crypto/salsa20_glue.c
+@@ -26,11 +26,6 @@
+ #define SALSA20_MIN_KEY_SIZE  16U
+ #define SALSA20_MAX_KEY_SIZE  32U
  
- /*
-  * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
-@@ -131,6 +133,7 @@ ENTRY(clmul_ghash_update)
- 	movups DATA, (%rdi)
- .Lupdate_just_ret:
- 	ret
-+ENDPROC(clmul_ghash_update)
- 
- /*
-  * void clmul_ghash_setkey(be128 *shash, const u8 *key);
-@@ -155,3 +158,4 @@ ENTRY(clmul_ghash_setkey)
- 	pxor %xmm1, %xmm0
- 	movups %xmm0, (%rdi)
- 	ret
-+ENDPROC(clmul_ghash_setkey)
+-// use the ECRYPT_* function names
+-#define salsa20_keysetup        ECRYPT_keysetup
+-#define salsa20_ivsetup         ECRYPT_ivsetup
+-#define salsa20_encrypt_bytes   ECRYPT_encrypt_bytes
+-
+ struct salsa20_ctx
+ {
+ 	u32 input[16];
