@@ -1,42 +1,54 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: RE: [PATCH][RFC] crypto: tcrypt - Ahash tests changed to run in
- parallel.
-Date: Sat, 19 Jan 2013 01:54:57 +0200
-Message-ID: <20130119015457.1386129jh3k4firk@www.dalek.fi>
-References: <1357123173-32534-1-git-send-email-vakul@freescale.com>
- <20130105182556.87853b23jydihzk0@www.dalek.fi>
- <065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
+Subject: [PATCH] crypto: testmgr - add test vector for fcrypt
+Date: Sat, 19 Jan 2013 13:31:36 +0200
+Message-ID: <20130119113136.20877.48105.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Garg Vakul-B16394 <B16394@freescale.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:36892 "EHLO
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:40977 "EHLO
 	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752744Ab3ARXzA (ORCPT
+	with ESMTP id S1751889Ab3ASLbl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jan 2013 18:55:00 -0500
-In-Reply-To: <065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
-Content-Disposition: inline
+	Sat, 19 Jan 2013 06:31:41 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Quoting Garg Vakul-B16394 <B16394@freescale.com>:
+fcrypt is used only as pcbc(fcrypt), but testmgr does not know this.
+Use the zero key, zero plaintext pcbc(fcrypt) test vector for
+testing plain 'fcrypt' to hide "no test for fcrypt" warnings.
 
->
->> Does not this change make tcrypt give
->> inconsistent results?
->>
->
-> Based on kernel scheduling of threads, this change can make tcrypt  
-> give varying results in different runs.
-> For consistent results, we can use existing synchronous mode crypto sessions.
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+---
+ crypto/testmgr.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-But one cannot get consistent results for asynchronous software  
-implementations after this patch.
-
--Jussi
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index edf4a08..efd8b20 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2269,6 +2269,21 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "ecb(fcrypt)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = {
++				.enc = {
++					.vecs = fcrypt_pcbc_enc_tv_template,
++					.count = 1
++				},
++				.dec = {
++					.vecs = fcrypt_pcbc_dec_tv_template,
++					.count = 1
++				}
++			}
++		}
++	}, {
+ 		.alg = "ecb(khazad)",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
