@@ -1,8 +1,8 @@
 From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: [PATCH 10/12] crypto: x86/serpent - use ENTRY/ENDPROC for assember
- functions and localize jump targets
-Date: Sat, 19 Jan 2013 13:39:36 +0200
-Message-ID: <20130119113936.22319.5134.stgit@localhost6.localdomain6>
+Subject: [PATCH 12/12] crypto: x86/twofish - assembler clean-ups: use
+ ENTRY/ENDPROC, localize jump labels
+Date: Sat, 19 Jan 2013 13:39:46 +0200
+Message-ID: <20130119113946.22319.68494.stgit@localhost6.localdomain6>
 References: <20130119113818.22319.26924.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,235 +11,264 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:36935 "EHLO
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:36974 "EHLO
 	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751909Ab3ASLjk (ORCPT
+	with ESMTP id S1751909Ab3ASLjt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Jan 2013 06:39:40 -0500
+	Sat, 19 Jan 2013 06:39:49 -0500
 In-Reply-To: <20130119113818.22319.26924.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 ---
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |   35 ++++++++------------------
- arch/x86/crypto/serpent-sse2-i586-asm_32.S   |   20 ++++++---------
- arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |   20 ++++++---------
- 3 files changed, 27 insertions(+), 48 deletions(-)
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |   35 ++++++++------------------
+ arch/x86/crypto/twofish-i586-asm_32.S        |   11 ++++----
+ arch/x86/crypto/twofish-x86_64-asm_64-3way.S |   20 ++++++---------
+ arch/x86/crypto/twofish-x86_64-asm_64.S      |   11 ++++----
+ 4 files changed, 29 insertions(+), 48 deletions(-)
 
-diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-index 02b0e9f..43c9386 100644
---- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-@@ -24,6 +24,7 @@
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index ebac16b..8d3e113 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -23,6 +23,7 @@
   *
   */
  
 +#include <linux/linkage.h>
  #include "glue_helper-asm-avx.S"
  
- .file "serpent-avx-x86_64-asm_64.S"
-@@ -566,8 +567,6 @@
- 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+ .file "twofish-avx-x86_64-asm_64.S"
+@@ -243,8 +244,6 @@
+ 	vpxor		x3, wkey, x3;
  
  .align 8
--.type   __serpent_enc_blk8_avx,@function;
+-.type	__twofish_enc_blk8,@function;
 -
- __serpent_enc_blk8_avx:
+ __twofish_enc_blk8:
  	/* input:
  	 *	%rdi: ctx, CTX
-@@ -619,10 +618,9 @@ __serpent_enc_blk8_avx:
- 	write_blocks(RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+@@ -284,10 +283,9 @@ __twofish_enc_blk8:
+ 	outunpack_blocks(RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
  
  	ret;
-+ENDPROC(__serpent_enc_blk8_avx)
++ENDPROC(__twofish_enc_blk8)
  
  .align 8
--.type   __serpent_dec_blk8_avx,@function;
+-.type	__twofish_dec_blk8,@function;
 -
- __serpent_dec_blk8_avx:
+ __twofish_dec_blk8:
  	/* input:
  	 *	%rdi: ctx, CTX
-@@ -674,12 +672,9 @@ __serpent_dec_blk8_avx:
- 	write_blocks(RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+@@ -325,12 +323,9 @@ __twofish_dec_blk8:
+ 	outunpack_blocks(RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
  
  	ret;
-+ENDPROC(__serpent_dec_blk8_avx)
++ENDPROC(__twofish_dec_blk8)
  
 -.align 8
--.global serpent_ecb_enc_8way_avx
--.type   serpent_ecb_enc_8way_avx,@function;
+-.global twofish_ecb_enc_8way
+-.type   twofish_ecb_enc_8way,@function;
 -
--serpent_ecb_enc_8way_avx:
-+ENTRY(serpent_ecb_enc_8way_avx)
+-twofish_ecb_enc_8way:
++ENTRY(twofish_ecb_enc_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst
-@@ -693,12 +688,9 @@ serpent_ecb_enc_8way_avx:
- 	store_8way(%rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -346,12 +341,9 @@ twofish_ecb_enc_8way:
+ 	store_8way(%r11, RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2);
  
  	ret;
-+ENDPROC(serpent_ecb_enc_8way_avx)
++ENDPROC(twofish_ecb_enc_8way)
  
 -.align 8
--.global serpent_ecb_dec_8way_avx
--.type   serpent_ecb_dec_8way_avx,@function;
+-.global twofish_ecb_dec_8way
+-.type   twofish_ecb_dec_8way,@function;
 -
--serpent_ecb_dec_8way_avx:
-+ENTRY(serpent_ecb_dec_8way_avx)
+-twofish_ecb_dec_8way:
++ENTRY(twofish_ecb_dec_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst
-@@ -712,12 +704,9 @@ serpent_ecb_dec_8way_avx:
- 	store_8way(%rsi, RC1, RD1, RB1, RE1, RC2, RD2, RB2, RE2);
+@@ -367,12 +359,9 @@ twofish_ecb_dec_8way:
+ 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
  
  	ret;
-+ENDPROC(serpent_ecb_dec_8way_avx)
++ENDPROC(twofish_ecb_dec_8way)
  
 -.align 8
--.global serpent_cbc_dec_8way_avx
--.type   serpent_cbc_dec_8way_avx,@function;
+-.global twofish_cbc_dec_8way
+-.type   twofish_cbc_dec_8way,@function;
 -
--serpent_cbc_dec_8way_avx:
-+ENTRY(serpent_cbc_dec_8way_avx)
+-twofish_cbc_dec_8way:
++ENTRY(twofish_cbc_dec_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst
-@@ -731,12 +720,9 @@ serpent_cbc_dec_8way_avx:
- 	store_cbc_8way(%rdx, %rsi, RC1, RD1, RB1, RE1, RC2, RD2, RB2, RE2);
+@@ -393,12 +382,9 @@ twofish_cbc_dec_8way:
+ 	popq %r12;
  
  	ret;
-+ENDPROC(serpent_cbc_dec_8way_avx)
++ENDPROC(twofish_cbc_dec_8way)
  
 -.align 8
--.global serpent_ctr_8way_avx
--.type   serpent_ctr_8way_avx,@function;
+-.global twofish_ctr_8way
+-.type   twofish_ctr_8way,@function;
 -
--serpent_ctr_8way_avx:
-+ENTRY(serpent_ctr_8way_avx)
+-twofish_ctr_8way:
++ENTRY(twofish_ctr_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst
-@@ -752,3 +738,4 @@ serpent_ctr_8way_avx:
- 	store_ctr_8way(%rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -421,3 +407,4 @@ twofish_ctr_8way:
+ 	popq %r12;
  
  	ret;
-+ENDPROC(serpent_ctr_8way_avx)
-diff --git a/arch/x86/crypto/serpent-sse2-i586-asm_32.S b/arch/x86/crypto/serpent-sse2-i586-asm_32.S
-index c00053d..d348f15 100644
---- a/arch/x86/crypto/serpent-sse2-i586-asm_32.S
-+++ b/arch/x86/crypto/serpent-sse2-i586-asm_32.S
-@@ -24,6 +24,8 @@
++ENDPROC(twofish_ctr_8way)
+diff --git a/arch/x86/crypto/twofish-i586-asm_32.S b/arch/x86/crypto/twofish-i586-asm_32.S
+index 658af4b..694ea45 100644
+--- a/arch/x86/crypto/twofish-i586-asm_32.S
++++ b/arch/x86/crypto/twofish-i586-asm_32.S
+@@ -20,6 +20,7 @@
+ .file "twofish-i586-asm.S"
+ .text
+ 
++#include <linux/linkage.h>
+ #include <asm/asm-offsets.h>
+ 
+ /* return address at 0 */
+@@ -219,11 +220,7 @@
+ 	xor	%esi,		d ## D;\
+ 	ror	$1,		d ## D;
+ 
+-.align 4
+-.global twofish_enc_blk
+-.global twofish_dec_blk
+-
+-twofish_enc_blk:
++ENTRY(twofish_enc_blk)
+ 	push	%ebp			/* save registers according to calling convention*/
+ 	push    %ebx
+ 	push    %esi
+@@ -277,8 +274,9 @@ twofish_enc_blk:
+ 	pop	%ebp
+ 	mov	$1,	%eax
+ 	ret
++ENDPROC(twofish_enc_blk)
+ 
+-twofish_dec_blk:
++ENTRY(twofish_dec_blk)
+ 	push	%ebp			/* save registers according to calling convention*/
+ 	push    %ebx
+ 	push    %esi
+@@ -333,3 +331,4 @@ twofish_dec_blk:
+ 	pop	%ebp
+ 	mov	$1,	%eax
+ 	ret
++ENDPROC(twofish_dec_blk)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+index 5b012a2..1c3b7ce 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+@@ -20,6 +20,8 @@
   *
   */
  
 +#include <linux/linkage.h>
 +
- .file "serpent-sse2-i586-asm_32.S"
+ .file "twofish-x86_64-asm-3way.S"
  .text
  
-@@ -510,11 +512,7 @@
- 	pxor t0,		x3; \
- 	movdqu x3,		(3*4*4)(out);
+@@ -214,11 +216,7 @@
+ 	rorq $32,			RAB2; \
+ 	outunpack3(mov, RIO, 2, RAB, 2);
  
 -.align 8
--.global __serpent_enc_blk_4way
--.type   __serpent_enc_blk_4way,@function;
+-.global __twofish_enc_blk_3way
+-.type   __twofish_enc_blk_3way,@function;
 -
--__serpent_enc_blk_4way:
-+ENTRY(__serpent_enc_blk_4way)
+-__twofish_enc_blk_3way:
++ENTRY(__twofish_enc_blk_3way)
  	/* input:
- 	 *	arg_ctx(%esp): ctx, CTX
- 	 *	arg_dst(%esp): dst
-@@ -566,22 +564,19 @@ __serpent_enc_blk_4way:
- 	movl arg_dst(%esp), %eax;
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -250,7 +248,7 @@ __twofish_enc_blk_3way:
+ 	popq %rbp; /* bool xor */
  
- 	cmpb $0, arg_xor(%esp);
--	jnz __enc_xor4;
-+	jnz .L__enc_xor4;
+ 	testb %bpl, %bpl;
+-	jnz __enc_xor3;
++	jnz .L__enc_xor3;
  
- 	write_blocks(%eax, RA, RB, RC, RD, RT0, RT1, RE);
+ 	outunpack_enc3(mov);
  
+@@ -262,7 +260,7 @@ __twofish_enc_blk_3way:
+ 	popq %r15;
  	ret;
  
--__enc_xor4:
-+.L__enc_xor4:
- 	xor_blocks(%eax, RA, RB, RC, RD, RT0, RT1, RE);
+-__enc_xor3:
++.L__enc_xor3:
+ 	outunpack_enc3(xor);
  
+ 	popq %rbx;
+@@ -272,11 +270,9 @@ __enc_xor3:
+ 	popq %r14;
+ 	popq %r15;
  	ret;
-+ENDPROC(__serpent_enc_blk_4way)
++ENDPROC(__twofish_enc_blk_3way)
  
--.align 8
--.global serpent_dec_blk_4way
--.type   serpent_dec_blk_4way,@function;
+-.global twofish_dec_blk_3way
+-.type   twofish_dec_blk_3way,@function;
 -
--serpent_dec_blk_4way:
-+ENTRY(serpent_dec_blk_4way)
+-twofish_dec_blk_3way:
++ENTRY(twofish_dec_blk_3way)
  	/* input:
- 	 *	arg_ctx(%esp): ctx, CTX
- 	 *	arg_dst(%esp): dst
-@@ -633,3 +628,4 @@ serpent_dec_blk_4way:
- 	write_blocks(%eax, RC, RD, RB, RE, RT0, RT1, RA);
- 
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -313,4 +309,4 @@ twofish_dec_blk_3way:
+ 	popq %r14;
+ 	popq %r15;
  	ret;
-+ENDPROC(serpent_dec_blk_4way)
-diff --git a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
-index 3ee1ff0..acc066c 100644
---- a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
-+++ b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
-@@ -24,6 +24,8 @@
-  *
-  */
+-
++ENDPROC(twofish_dec_blk_3way)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64.S b/arch/x86/crypto/twofish-x86_64-asm_64.S
+index 7bcf3fc..a039d21 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64.S
+@@ -20,6 +20,7 @@
+ .file "twofish-x86_64-asm.S"
+ .text
  
 +#include <linux/linkage.h>
-+
- .file "serpent-sse2-x86_64-asm_64.S"
- .text
+ #include <asm/asm-offsets.h>
  
-@@ -632,11 +634,7 @@
- 	pxor t0,		x3; \
- 	movdqu x3,		(3*4*4)(out);
- 
--.align 8
--.global __serpent_enc_blk_8way
--.type   __serpent_enc_blk_8way,@function;
--
--__serpent_enc_blk_8way:
-+ENTRY(__serpent_enc_blk_8way)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rsi: dst
-@@ -687,24 +685,21 @@ __serpent_enc_blk_8way:
- 	leaq (4*4*4)(%rsi), %rax;
- 
- 	testb %cl, %cl;
--	jnz __enc_xor8;
-+	jnz .L__enc_xor8;
- 
- 	write_blocks(%rsi, RA1, RB1, RC1, RD1, RK0, RK1, RK2);
- 	write_blocks(%rax, RA2, RB2, RC2, RD2, RK0, RK1, RK2);
- 
- 	ret;
- 
--__enc_xor8:
-+.L__enc_xor8:
- 	xor_blocks(%rsi, RA1, RB1, RC1, RD1, RK0, RK1, RK2);
- 	xor_blocks(%rax, RA2, RB2, RC2, RD2, RK0, RK1, RK2);
- 
- 	ret;
-+ENDPROC(__serpent_enc_blk_8way)
+ #define a_offset	0
+@@ -214,11 +215,7 @@
+ 	xor	%r8d,		d ## D;\
+ 	ror	$1,		d ## D;
  
 -.align 8
--.global serpent_dec_blk_8way
--.type   serpent_dec_blk_8way,@function;
+-.global twofish_enc_blk
+-.global twofish_dec_blk
 -
--serpent_dec_blk_8way:
-+ENTRY(serpent_dec_blk_8way)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rsi: dst
-@@ -756,3 +751,4 @@ serpent_dec_blk_8way:
- 	write_blocks(%rax, RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+-twofish_enc_blk:
++ENTRY(twofish_enc_blk)
+ 	pushq    R1
  
- 	ret;
-+ENDPROC(serpent_dec_blk_8way)
+ 	/* %rdi contains the ctx address */
+@@ -269,8 +266,9 @@ twofish_enc_blk:
+ 	popq	R1
+ 	movq	$1,%rax
+ 	ret
++ENDPROC(twofish_enc_blk)
+ 
+-twofish_dec_blk:
++ENTRY(twofish_dec_blk)
+ 	pushq    R1
+ 
+ 	/* %rdi contains the ctx address */
+@@ -320,3 +318,4 @@ twofish_dec_blk:
+ 	popq	R1
+ 	movq	$1,%rax
+ 	ret
++ENDPROC(twofish_dec_blk)
