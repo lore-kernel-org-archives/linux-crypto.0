@@ -1,42 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4] crypto api: add crc32 pclmulqdq implementation and
- wrappers for table implementation
-Date: Sun, 20 Jan 2013 11:13:19 +1100
-Message-ID: <20130120001319.GD26742@gondor.apana.org.au>
-References: <50EED427.2040309@xyratex.com>
- <50EED643.2010907@xyratex.com>
+Subject: Re: [PATCH] crypto: omap-sham - Fix compile errors when CONFIG_OF
+ not defined
+Date: Sun, 20 Jan 2013 11:13:27 +1100
+Message-ID: <20130120001327.GE26742@gondor.apana.org.au>
+References: <1358283182-29392-1-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Andreas Dilger <adilger@whamcloud.com>
-To: Alexander Boyko <alexander_boyko@xyratex.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:42205 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751389Ab3ATANY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Jan 2013 19:13:24 -0500
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: "Mark A. Greer" <mgreer@animalcreek.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <50EED643.2010907@xyratex.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1358283182-29392-1-git-send-email-mgreer@animalcreek.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 10, 2013 at 06:54:59PM +0400, Alexander Boyko wrote:
-> From: Alexander Boyko <alexander_boyko@xyratex.com>
+On Tue, Jan 15, 2013 at 01:53:02PM -0700, Mark A. Greer wrote:
+> From: "Mark A. Greer" <mgreer@animalcreek.com>
 > 
-> This patch adds crc32 algorithms to shash crypto api. One is wrapper to
-> gerneric crc32_le function. Second is crc32 pclmulqdq implementation. It
-> use hardware provided PCLMULQDQ instruction to accelerate the CRC32 disposal.
-> This instruction present from Intel Westmere and AMD Bulldozer CPUs.
+> Fix the compile errors created by commit 2545e8d
+> (crypto: omap-sham - Add Device Tree Support)
+> when CONFIG_OF is not defined.  This includes
+> changing omap_sham_get_res_dev() to omap_sham_get_res_of()
+> and creating an empty version of omap_sham_of_match[].
 > 
-> For intel core i5 I got 450MB/s for table implementation and 2100MB/s 
-> for pclmulqdq implementation.
-> 
-> Signed-off-by: Alexander Boyko <alexander_boyko@xyratex.com>
+> Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
 
-Patch applied.  Thanks!
+Also applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
