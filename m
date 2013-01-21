@@ -1,21 +1,27 @@
 From: David Dillow <dave@thedillows.org>
 Subject: Re: [PATCH] CMAC support for CryptoAPI, fixed patch issues, indent,
  and testmgr build issues
-Date: Mon, 21 Jan 2013 11:35:15 -0500
-Message-ID: <1358786115.2595.42.camel@obelisk.thedillows.org>
+Date: Mon, 21 Jan 2013 11:40:56 -0500
+Message-ID: <1358786456.2595.44.camel@obelisk.thedillows.org>
 References: <436404741.94502.1358773048618.JavaMail.root@elliptictech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, netdev@kernel.vger.org
+Cc: linux-kernel@vger.kernel.org, David Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
 To: Tom St Denis <tstdenis@elliptictech.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from matrix.voodoobox.net ([75.127.97.206]:46243 "EHLO
+	matrix.voodoobox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753117Ab3AUQk7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Jan 2013 11:40:59 -0500
 In-Reply-To: <436404741.94502.1358773048618.JavaMail.root@elliptictech.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+[Apologies for the dupe, fixing stupid typo for netdev address...
+-ENOCAFFEINE]
 
 I hesitate to reward the squeaky wheel, but in the community spirit,
 here goes...
