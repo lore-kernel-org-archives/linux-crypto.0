@@ -1,37 +1,43 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 7/15] drivers/crypto/atmel-aes.c: adjust duplicate test
-Date: Mon, 21 Jan 2013 13:19:12 -0500 (EST)
-Message-ID: <20130121.131912.602907116084738120.davem@davemloft.net>
-References: <1358773378-4700-1-git-send-email-Julia.Lawall@lip6.fr>
-	<1358773378-4700-8-git-send-email-Julia.Lawall@lip6.fr>
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [PATCH] crypto: fix FTBFS with ARM SHA1-asm and THUMB2_KERNEL
+Date: Mon, 21 Jan 2013 17:46:48 -0500 (EST)
+Message-ID: <alpine.LFD.2.02.1301211739470.6300@xanadu.home>
+References: <1358787763-1226-1-git-send-email-matt@genesi-usa.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, kernel-janitors@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Julia.Lawall@lip6.fr
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:40639 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751196Ab3AUSTO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Jan 2013 13:19:14 -0500
-In-Reply-To: <1358773378-4700-8-git-send-email-Julia.Lawall@lip6.fr>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Russell King <linux@arm.linux.org.uk>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ linux-arm-kernel@lists.infradead.org
+To: Matt Sealey <matt@genesi-usa.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-reply-to: <1358787763-1226-1-git-send-email-matt@genesi-usa.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: linux-arm-kernel-bounces@lists.infradead.org
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Date: Mon, 21 Jan 2013 14:02:51 +0100
+On Mon, 21 Jan 2013, Matt Sealey wrote:
 
-> From: Julia Lawall <Julia.Lawall@lip6.fr>
+> The optimized assembler SHA1 code for ARM does not conform to Thumb2
+> register usage requirements, so it cannot be built when the kernel is
+> configured with THUMB2_KERNEL.
 > 
-> Delete successive tests to the same location.  The code tested the result
-> of a previous allocation, that itself was already tested.  It is changed to
-> test the result of the most recent allocation.
+> Fix the FTBFS for now by preventing misconfigurations of the kernel.
 > 
-> A simplified version of the semantic match that finds this problem is as
-> follows: (http://coccinelle.lip6.fr/)
- ...
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> Signed-off-by: Matt Sealey <matt@genesi-usa.com>
 
-Acked-by: David S. Miller <davem@davemloft.net>
+A .arm directive at the top of the assembly code would be a better 
+"fix", as that wouldn't reduce functionality.
+
+Yet, I'd invite you to have a look at commit 638591cd7b in linux-next.
+
+
+Nicolas
