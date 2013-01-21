@@ -1,62 +1,58 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: RE: [PATCH][RFC] crypto: tcrypt - Ahash tests changed to run in
- parallel.
-Date: Sun, 20 Jan 2013 14:24:26 +0200
-Message-ID: <20130120142426.32982bygy4o4y874@www.dalek.fi>
-References: <1357123173-32534-1-git-send-email-vakul@freescale.com>
- <20130105182556.87853b23jydihzk0@www.dalek.fi>
- <065BBB7616BCE543832A2EF096986B9414EFE5@039-SN2MPN1-011.039d.mgd.msft.net>
- <20130119015457.1386129jh3k4firk@www.dalek.fi>
- <065BBB7616BCE543832A2EF096986B94161931@039-SN2MPN1-011.039d.mgd.msft.net>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Garg Vakul-B16394 <B16394@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:45203 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750891Ab3ATMY3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Jan 2013 07:24:29 -0500
-In-Reply-To: <065BBB7616BCE543832A2EF096986B94161931@039-SN2MPN1-011.039d.mgd.msft.net>
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Julia Lawall <Julia.Lawall@lip6.fr>
+Subject: [PATCH 7/15] drivers/crypto/atmel-aes.c: adjust duplicate test
+Date: Mon, 21 Jan 2013 14:02:51 +0100
+Message-ID: <1358773378-4700-8-git-send-email-Julia.Lawall@lip6.fr>
+References: <1358773378-4700-1-git-send-email-Julia.Lawall@lip6.fr>
+Cc: kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1358773378-4700-1-git-send-email-Julia.Lawall@lip6.fr>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Quoting Garg Vakul-B16394 <B16394@freescale.com>:
+From: Julia Lawall <Julia.Lawall@lip6.fr>
 
->
->
->> -----Original Message-----
->> From: Jussi Kivilinna [mailto:jussi.kivilinna@mbnet.fi]
->> Sent: Saturday, January 19, 2013 5:25 AM
->> To: Garg Vakul-B16394
->> Cc: linux-crypto@vger.kernel.org
->> Subject: RE: [PATCH][RFC] crypto: tcrypt - Ahash tests changed to run in
->> parallel.
->>
->> Quoting Garg Vakul-B16394 <B16394@freescale.com>:
->>
->> >
->> >> Does not this change make tcrypt give inconsistent results?
->> >>
->> >
->> > Based on kernel scheduling of threads, this change can make tcrypt
->> > give varying results in different runs.
->> > For consistent results, we can use existing synchronous mode crypto
->> sessions.
->>
->> But one cannot get consistent results for asynchronous software
->> implementations after this patch.
->
-> Should we launch threads optionally based on module argument (in  
-> both synchronous and async mode)?
-> This would preserve existing tcrypt behavior.
+Delete successive tests to the same location.  The code tested the result
+of a previous allocation, that itself was already tested.  It is changed to
+test the result of the most recent allocation.
 
-Yes, that would be better.
+A simplified version of the semantic match that finds this problem is as
+follows: (http://coccinelle.lip6.fr/)
 
--Jussi
+// <smpl>
+@s exists@
+local idexpression y;
+expression x,e;
+@@
+
+*if ( \(x == NULL\|IS_ERR(x)\|y != 0\) )
+ { ... when forall
+   return ...; }
+... when != \(y = e\|y += e\|y -= e\|y |= e\|y &= e\|y++\|y--\|&y\)
+    when != \(XT_GETPAGE(...,y)\|WMI_CMD_BUF(...)\)
+*if ( \(x == NULL\|IS_ERR(x)\|y != 0\) )
+ { ... when forall
+   return ...; }
+// </smpl>
+
+Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+
+---
+ drivers/crypto/atmel-aes.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index c9d9d5c..6f22ba5 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -332,7 +332,7 @@ static int atmel_aes_crypt_cpu_start(struct atmel_aes_dev *dd)
+ 		return -EINVAL;
+ 
+ 	dd->nb_out_sg = atmel_aes_sg_length(dd->req, dd->out_sg);
+-	if (!dd->nb_in_sg)
++	if (!dd->nb_out_sg)
+ 		return -EINVAL;
+ 
+ 	dd->bufcnt = sg_copy_to_buffer(dd->in_sg, dd->nb_in_sg,
