@@ -1,38 +1,64 @@
-From: Garg Vakul-B16394 <B16394@freescale.com>
-Subject: Query about ahash support
-Date: Tue, 22 Jan 2013 10:42:36 +0000
-Message-ID: <065BBB7616BCE543832A2EF096986B9416B394@039-SN2MPN1-011.039d.mgd.msft.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe001.messaging.microsoft.com ([216.32.181.181]:58009
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751633Ab3AVKm4 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Jan 2013 05:42:56 -0500
-Received: from mail24-ch1 (localhost [127.0.0.1])	by mail24-ch1-R.bigfish.com
- (Postfix) with ESMTP id 350B7C0BC5	for <linux-crypto@vger.kernel.org>; Tue,
- 22 Jan 2013 10:42:55 +0000 (UTC)
-Received: from CH1EHSMHS031.bigfish.com (snatpool1.int.messaging.microsoft.com
- [10.43.68.254])	by mail24-ch1.bigfish.com (Postfix) with ESMTP id 000CF2C0095
-	for <linux-crypto@vger.kernel.org>; Tue, 22 Jan 2013 10:42:53 +0000 (UTC)
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Subject: [PATCH v3 0/1] dm-integrity: integrity protection device-mapper target
+Date: Tue, 22 Jan 2013 14:36:59 +0200
+Message-ID: <cover.1358857891.git.dmitry.kasatkin@intel.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	akpm@linux-foundation.org, alan.cox@intel.com
+To: dm-devel@redhat.com, mbroz@redhat.com, mpatocka@redhat.com
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi
+Device-mapper "integrity" target provides transparent cryptographic integrity
+protection of underlying read-write block device using hash-based message
+authentication codes (HMACs), which can be stored on the same or different
+block device.
 
-Currently, tcrypt ahash speed test code waits for previous request to complete
-before sending next crypto_ahash_update() request.
-The cryptographic offload hard accelerators (e.g. CAAM) supports multiple
-outstanding crypto requests for the same transform.
+Target uses kernel keyring to obtain a secret key for using in cryptographic
+operations. It uses encrypted key type. Kernel never exposes those keys in
+plain form to user space. Encrypted keys are encrypted using master key,
+which can be either user or trusted type. User key type allows to supply a key
+from the user space and trusted key uses TPM.
 
-Does the asynchronous hash support in cryptoapi mean that one can call
-crypto_ahash_update() multiple times (in pipelined fashion) without waiting
-for previous crypto_ahash_update() to complete and give back the result?
+Secret key is usually device specific and binds integrity data to the device.
+Data blocks and corresponding HMACs cannot be copied over from other systems.
 
-Thanks & Regards
+The key advantage over dm-verity is that the target supports read-write and
+requires less hash calculation operations. The key advantage over dm-crypt
+is that it does not require encryption when it is not desired by technical or
+other reasons. HMAC calculation generally requires less resources than
+encryption.
 
-Vakul
+The main purpose of the dm-integrity is to provide read-write capable local
+block data integrity protection without encryption.
+
+Changes in v3:
+- removed unused variables and macros
+- made reboot notifier target specific
+- removed io counter
+- moved prefetch to the map function
+- added missing ti->error messages
+- replaced using of mempool with per bio data
+- replaced loff_t with sector_t for sectors and blocks
+- added new option 'zero_on_error' to return zeroed block instead of an error
+  default behavior is to return an error
+- improved error printing
+
+-Dmitry
+
+Dmitry Kasatkin (1):
+  dm-integrity: integrity protection device-mapper target
+
+ Documentation/device-mapper/dm-integrity.txt |  137 ++++
+ drivers/md/Kconfig                           |   13 +
+ drivers/md/Makefile                          |    1 +
+ drivers/md/dm-integrity.c                    |  991 ++++++++++++++++++++++++++
+ 4 files changed, 1142 insertions(+)
+ create mode 100644 Documentation/device-mapper/dm-integrity.txt
+ create mode 100644 drivers/md/dm-integrity.c
+
+-- 
+1.7.10.4
+
