@@ -1,90 +1,214 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] CMAC support for CryptoAPI, fixed patch issues, indent,
- and testmgr build issues
-Date: Wed, 23 Jan 2013 08:41:13 +0100
-Message-ID: <20130123074113.GH9147@secunet.com>
-References: <537355069.94465.1358772395763.JavaMail.root@elliptictech.com>
- <436404741.94502.1358773048618.JavaMail.root@elliptictech.com>
+From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Subject: Re: [RFC 1/1] ima: digital signature verification using asymmetric keys
+Date: Wed, 23 Jan 2013 11:03:39 +0200
+Message-ID: <CALLzPKbNVV+iWzUcsxq0Lk-Hz2BVpCBsEbjHdnRAyjDsF5___g@mail.gmail.com>
+References: <cover.1358246017.git.dmitry.kasatkin@intel.com>
+	<53febcf9f13e59a1ddd8f8c9826cadbe663f2295.1358246017.git.dmitry.kasatkin@intel.com>
+	<1358895228.2408.14.camel@falcor1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Tom St Denis <tstdenis@elliptictech.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: dhowells@redhat.com, jmorris@namei.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:50009 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751240Ab3AWHlQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Jan 2013 02:41:16 -0500
-Content-Disposition: inline
-In-Reply-To: <436404741.94502.1358773048618.JavaMail.root@elliptictech.com>
+Received: from mga05.intel.com ([192.55.52.89]:45116 "EHLO
+	fmsmga101.fm.intel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752439Ab3AWJDl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Jan 2013 04:03:41 -0500
+Received: by mail-oa0-f70.google.com with SMTP id k14so40993454oag.1
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Jan 2013 01:03:39 -0800 (PST)
+In-Reply-To: <1358895228.2408.14.camel@falcor1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-(Cc netdev@vger.kernel.org)
+On Wed, Jan 23, 2013 at 12:53 AM, Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+> On Tue, 2013-01-15 at 12:34 +0200, Dmitry Kasatkin wrote:
+>> Asymmetric keys were introduced in linux-3.7 to verify the signature on
+>> signed kernel modules.  The asymmetric keys infrastructure abstracts the
+>> signature verification from the crypto details.  This patch adds IMA/EVM
+>> signature verification using asymmetric keys.  Support for additional
+>> signature verification methods can now be delegated to the asymmetric
+>> key infrastructure.
+>>
+>> Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+>> ---
+>>  security/integrity/Kconfig  |   12 +++++
+>>  security/integrity/digsig.c |  103 ++++++++++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 114 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+>> index 5bd1cc1..19c4187 100644
+>> --- a/security/integrity/Kconfig
+>> +++ b/security/integrity/Kconfig
+>> @@ -17,5 +17,17 @@ config INTEGRITY_SIGNATURE
+>>         This is useful for evm and module keyrings, when keys are
+>>         usually only added from initramfs.
+>>
+>> +config INTEGRITY_ASYMMETRIC_KEYS
+>> +     boolean "Digital signature verification using asymmetric keys"
+>> +     depends on INTEGRITY_SIGNATURE
+>> +     default n
+>> +        select ASYMMETRIC_KEY_TYPE
+>> +        select ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+>> +        select PUBLIC_KEY_ALGO_RSA
+>> +        select X509_CERTIFICATE_PARSER
+>> +     help
+>> +       This option enables digital signature verification support
+>> +       using asymmetric keys.
+>> +
+>>  source security/integrity/ima/Kconfig
+>>  source security/integrity/evm/Kconfig
+>> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
+>> index 2dc167d..1896537 100644
+>> --- a/security/integrity/digsig.c
+>> +++ b/security/integrity/digsig.c
+>> @@ -15,10 +15,22 @@
+>>  #include <linux/err.h>
+>>  #include <linux/rbtree.h>
+>>  #include <linux/key-type.h>
+>> +#include <crypto/public_key.h>
+>> +#include <keys/asymmetric-type.h>
+>>  #include <linux/digsig.h>
+>>
+>>  #include "integrity.h"
+>>
+>> +/*
+>> + * signature format v2 - for using with asymmetric keys
+>> + */
+>> +struct signature_v2_hdr {
+>> +     uint8_t version;        /* signature format version */
+>> +     uint8_t hash_algo;      /* Digest algorithm [enum pkey_hash_algo] */
+>> +     uint8_t keyid[8];       /* IMA key identifier - not X509/PGP specific*/
+>> +     uint8_t payload[0];     /* signature payload */
+>> +} __packed;
+>> +
+>>  static struct key *keyring[INTEGRITY_KEYRING_MAX];
+>>
+>>  static const char *keyring_name[INTEGRITY_KEYRING_MAX] = {
+>> @@ -27,6 +39,91 @@ static const char *keyring_name[INTEGRITY_KEYRING_MAX] = {
+>>       "_ima",
+>>  };
+>>
+>> +#ifdef CONFIG_INTEGRITY_ASYMMETRIC_KEYS
+>> +
+>> +/*
+>> + * Request an asymmetric key.
+>> + */
+>> +static struct key *request_asymmetric_key(struct key *keyring, uint8_t *keyid)
+>> +{
+>> +     struct key *key;
+>> +     char name[20];
+>> +
+>> +     sprintf(name, "%llX", __be64_to_cpup((uint64_t *)keyid));
+>> +
+>> +     pr_debug("key search: \"%s\"\n", name);
+>> +
+>> +     if (keyring) {
+>> +             /* search in specific keyring */
+>> +             key_ref_t kref;
+>> +             kref = keyring_search(make_key_ref(keyring, 1),
+>> +                                   &key_type_asymmetric, name);
+>> +             if (IS_ERR(kref))
+>> +                     key = ERR_CAST(kref);
+>> +             else
+>> +                     key = key_ref_to_ptr(kref);
+>> +     } else {
+>> +             key = request_key(&key_type_asymmetric, name, NULL);
+>> +     }
+>> +
+>> +     if (IS_ERR(key)) {
+>> +             pr_warn("Request for unknown key '%s' err %ld\n",
+>> +                     name, PTR_ERR(key));
+>> +             switch (PTR_ERR(key)) {
+>> +                     /* Hide some search errors */
+>> +             case -EACCES:
+>> +             case -ENOTDIR:
+>> +             case -EAGAIN:
+>> +                     return ERR_PTR(-ENOKEY);
+>> +             default:
+>> +                     return key;
+>> +             }
+>> +     }
+>> +
+>> +     pr_debug("%s() = 0 [%x]\n", __func__, key_serial(key));
+>> +
+>> +     return key;
+>> +}
+>> +
+>> +static int asymmetric_verify(struct key *keyring, const char *sig,
+>> +                          size_t siglen, const char *data, int datalen)
+>> +{
+>> +     struct public_key_signature pks;
+>> +     struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
+>> +     struct key *key;
+>> +     int ret = -ENOMEM;
+>> +
+>> +     if (siglen <= sizeof(*hdr))
+>> +             return -EBADMSG;
+>> +
+>> +     siglen -= sizeof(*hdr);
+>> +
+>> +     if (hdr->hash_algo >= PKEY_HASH__LAST)
+>> +             return -ENOPKG;
+>> +
+>> +     key = request_asymmetric_key(keyring, hdr->keyid);
+>> +     if (IS_ERR(key))
+>> +             return PTR_ERR(key);
+>> +
+>> +     memset(&pks, 0, sizeof(pks));
+>> +
+>> +     pks.pkey_hash_algo = hdr->hash_algo;
+>> +     pks.digest = (u8 *)data;
+>> +     pks.digest_size = datalen;
+>> +     pks.nr_mpi = 1;
+>> +     pks.rsa.s = mpi_read_from_buffer(hdr->payload, &siglen);
+>> +
+>> +     if (pks.rsa.s)
+>> +             ret = verify_signature(key, &pks);
+>> +
+>> +     mpi_free(pks.rsa.s);
+>> +     key_put(key);
+>> +     pr_debug("%s() = %d\n", __func__, ret);
+>> +     return ret;
+>> +}
+>> +
+>> +#endif /* CONFIG_INTEGRITY_ASYMMETRIC_KEYS */
+>> +
+>>  int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+>>                                       const char *digest, int digestlen)
+>>  {
+>> @@ -43,6 +140,10 @@ int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+>>                       return err;
+>>               }
+>>       }
+>> -
+>> +#ifdef CONFIG_INTEGRITY_ASYMMETRIC_KEYS
+>> +     if (sig[0] == 2)
+>> +             return asymmetric_verify(keyring[id], sig, siglen,
+>> +                                      digest, digestlen);
+>> +#endif
+>>       return digsig_verify(keyring[id], sig, siglen, digest, digestlen);
+>>  }
+>
+> Thanks Dmitry for the patch!  According to
+> Documentation/SubmittingPatches: section 2.2, #ifdefs are ugly.  I
+> realize this is a really small '.c' file, and doesn't really hurt
+> readability, but could you remove the ifdefs anyway?
+>
 
-On Mon, Jan 21, 2013 at 07:57:28AM -0500, Tom St Denis wrote:
-> Hey all,
-> 
-> Here's an updated patch which addresses a couple of build issues and coding style complaints.  
-> 
-> I still can't get it to run via testmgr I get 
-> 
-> [  162.407807] alg: No test for cmac(aes) (cmac(aes-generic))
-> 
-> Despite the fact I have an entry for cmac(aes) (much like xcbc(aes)...).
-> 
-> Here's the patch to bring 3.8-rc4 up with CMAC ...
-> 
+Will do it.
 
-As already pointed out by David Dillow, the above comments should go
-after the '---' separator. Please use the subject line and commit
-message from the previous version of this patch when you resend,
-this was ok.
+- Dmitry
 
-> Signed-off-by: Tom St Denis <tstdenis@elliptictech.com>
-> 
-> ---
->  crypto/Kconfig               |   8 ++
->  crypto/Makefile              |   1 +
->  crypto/cmac.c                | 317 +++++++++++++++++++++++++++++++++++++++++++
->  crypto/testmgr.c             |   9 ++
->  crypto/testmgr.h             |  52 +++++++
->  include/uapi/linux/pfkeyv2.h |   1 +
->  net/xfrm/xfrm_algo.c         |  17 +++
->  7 files changed, 405 insertions(+)
->  create mode 100644 crypto/cmac.c
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 4641d95..5ac2c7f 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -301,6 +301,14 @@ config CRYPTO_XCBC
->  		http://csrc.nist.gov/encryption/modes/proposedmodes/
->  		 xcbc-mac/xcbc-mac-spec.pdf
->  
-> +config CRYPTO_CMAC
-> +	tristate "CMAC support"
-> +	depends on EXPERIMENTAL
-
-CONFIG_EXPERIMENTAL is going to be removed in linux-next,
-please remove this dependency.
-
-> +	select CRYPTO_HASH
-> +	select CRYPTO_MANAGER
-> +	help
-> +	  NIST CMAC cipher based MAC
-> +
-
-Please add some more information to the help text. Everybody who knows
-what a 'NIST CMAC cipher based MAC' is will not need this help text, all
-the others are left with almost no information. This help text is for
-users in the first place, not for developers. So it should contain some
-informations about this cipher and/or some pointers where to find
-informations.
-
-Please Cc me on your next version because we plan to route your
-patch via the ipsec-next tree into the mainline.
-
-Thanks!
+> thanks,
+>
+> Mimi
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
