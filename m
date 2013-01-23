@@ -1,26 +1,18 @@
 From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCH] crypto: caam - Added property fsl,sec-era in SEC4.0 device tree binding.
-Date: Wed, 23 Jan 2013 11:04:55 +0530
-Message-ID: <1358919295-18151-1-git-send-email-vakul@freescale.com>
+Subject: [PATCHv1] crypto: caam - Added property fsl,sec-era in SEC4.0 device tree binding.
+Date: Wed, 23 Jan 2013 12:51:08 +0530
+Message-ID: <1358925668-10330-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-To: <linux-crypto@vger.kernel.org>
+To: <linuxppc-dev@lists.ozlabs.org>,
+	<devicetree-discuss@lists.ozlabs.org>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:47572
-	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750725Ab3AWFhc (ORCPT
+Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:49523
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751240Ab3AWHYI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Jan 2013 00:37:32 -0500
-Received: from mail89-co9 (localhost [127.0.0.1])	by mail89-co9-R.bigfish.com
- (Postfix) with ESMTP id EF7288C00D0	for <linux-crypto@vger.kernel.org>; Wed,
- 23 Jan 2013 05:37:31 +0000 (UTC)
-Received: from CO9EHSMHS016.bigfish.com (unknown [10.236.132.231])	by
- mail89-co9.bigfish.com (Postfix) with ESMTP id 2BA53A8005A	for
- <linux-crypto@vger.kernel.org>; Wed, 23 Jan 2013 05:37:30 +0000 (UTC)
-Received: from b16394-desktop.ap.freescale.net
- (b16394-desktop.ap.freescale.net [10.232.132.33])	by az84smr01.freescale.net
- (8.14.3/8.14.0) with ESMTP id r0N5bPVj005114	for
- <linux-crypto@vger.kernel.org>; Tue, 22 Jan 2013 22:37:26 -0700
+	Wed, 23 Jan 2013 02:24:08 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -30,6 +22,9 @@ not to contain SEC era numbers.
 
 Signed-off-by: Vakul Garg <vakul@freescale.com>
 ---
+Changelog:
+	1. Marked fsl,sec-era as 'optional'.
+
  .../devicetree/bindings/crypto/fsl-sec4.txt        |   12 +++++++++---
  1 files changed, 9 insertions(+), 3 deletions(-)
 
@@ -46,7 +41,7 @@ index fc9ce6f..dc40055 100644
 +      Definition: Must include "fsl,sec-v4.0"
 +
 +   - fsl,sec-era
-+      Usage: required
++      Usage: optional
 +      Value type: <u32>
 +      Definition: A standard property. Define the 'ERA' of the SEC
 +          device.
