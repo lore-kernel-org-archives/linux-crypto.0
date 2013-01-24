@@ -1,70 +1,82 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCHv2] crypto: caam - Added property fsl,sec-era in SEC4.0 device tree binding.
-Date: Thu, 24 Jan 2013 12:13:46 +0530
-Message-ID: <1359009826-32483-1-git-send-email-vakul@freescale.com>
+From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Subject: Re: [PATCH] CMAC support for CryptoAPI, fixed patch issues,
+ indent, and testmgr build issues
+Date: Thu, 24 Jan 2013 10:45:18 +0200
+Message-ID: <20130124104518.13058kllaldbmoio@www.dalek.fi>
+References: <1776726593.108228.1358952383104.JavaMail.root@elliptictech.com>
+ <20130123173510.14986sla4qsstz8k@www.dalek.fi>
+ <51000CEE.9060109@linux-ipv6.org> <51000EEF.7090308@linux-ipv6.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Grant Likely <grant.likely@secretlab.ca>,
-	Rob Herring <rob.herring@calxeda.com>,
-	Rob Landley <rob@landley.net>,
-	Stephen Boyd <sboyd@codeaurora.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Vakul Garg <vakul@freescale.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Shawn Guo <shawn.guo@linaro.org>,
-	<devicetree-discuss@lists.ozlabs.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-doc-owner@vger.kernel.org>
-Sender: linux-doc-owner@vger.kernel.org
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: Tom St Denis <tstdenis@elliptictech.com>,
+	linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+To: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <51000EEF.7090308@linux-ipv6.org>
+Content-Disposition: inline
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This new property defines the era of the particular SEC version.
-The compatible property in device tree "crypto" node has been updated
-not to contain SEC era numbers.
+Quoting YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>:
 
-Signed-off-by: Vakul Garg <vakul@freescale.com>
----
-Changes in v1:
-	1. Marked fsl,sec-era as 'optional'.
+> YOSHIFUJI Hideaki wrote:
+>> Jussi Kivilinna wrote:
+>>
+>>>>>> diff --git a/include/uapi/linux/pfkeyv2.h
+>>>>>> b/include/uapi/linux/pfkeyv2.h
+>>>>>> index 0b80c80..d61898e 100644
+>>>>>> --- a/include/uapi/linux/pfkeyv2.h
+>>>>>> +++ b/include/uapi/linux/pfkeyv2.h
+>>>>>> @@ -296,6 +296,7 @@ struct sadb_x_kmaddress {
+>>>>>>  #define SADB_X_AALG_SHA2_512HMAC    7
+>>>>>>  #define SADB_X_AALG_RIPEMD160HMAC    8
+>>>>>>  #define SADB_X_AALG_AES_XCBC_MAC    9
+>>>>>> +#define SADB_X_AALG_AES_CMAC_MAC    10
+>>>>>>  #define SADB_X_AALG_NULL        251    /* kame */
+>>>>>>  #define SADB_AALG_MAX            251
+>>>>>
+>>>>> Should these values be based on IANA assigned IPSEC AH transform
+>>>>> identifiers?
+>>>>>
+>>>>> https://www.iana.org/assignments/isakmp-registry/isakmp-registry.xml#isakmp-registry-6
+>>>>
+>>>> There is no CMAC entry apparently ... despite the fact that CMAC  
+>>>> is a proposed RFC standard for IPsec.
+>>>>
+>>>> It might be safer to move that to 14 since it's currently  
+>>>> unassigned and then go through whatever channels are required to  
+>>>> allocate it.  Mostly this affects key setting.  So this means my  
+>>>> patch would break AH_RSA setkey calls (which the kernel doesn't  
+>>>> support anyways).
+>>>>
+>>>
+>>> Problem seems to be that PFKEYv2 does not quite work with IKEv2,  
+>>> and XFRM API should be used instead. There is new numbers assigned  
+>>> for IKEv2:  
+>>> https://www.iana.org/assignments/ikev2-parameters/ikev2-parameters.xml#ikev2-parameters-7
+>>>
+>>> For new SADB_X_AALG_*, I'd think you should use value from  
+>>> "Reserved for private use" range. Maybe 250?
+>>
+>> We can choose any value unless we do not break existing
+>> binaries.  When IKE used, the daemon is responsible
+>> for translation.
+>
+> I meant, we can choose any values "if" we do not break ...
+>
 
-Changes in v2:
-	1. Changed 'fsl,sec-era' in example from hex to decimal.
+Ok, so giving '10' to AES-CMAC is fine after all?
 
- .../devicetree/bindings/crypto/fsl-sec4.txt        |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
+And if I'd want to add Camellia-CTR and Camellia-CCM support, I can  
+choose next free numbers from SADB_X_EALG_*?
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index fc9ce6f..dc40055 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -54,8 +54,13 @@ PROPERTIES
-    - compatible
-       Usage: required
-       Value type: <string>
--      Definition: Must include "fsl,sec-v4.0". Also includes SEC
--           ERA versions (optional) with which the device is compatible.
-+      Definition: Must include "fsl,sec-v4.0"
-+
-+   - fsl,sec-era
-+      Usage: optional
-+      Value type: <u32>
-+      Definition: A standard property. Define the 'ERA' of the SEC
-+          device.
- 
-    - #address-cells
-        Usage: required
-@@ -107,7 +112,8 @@ PROPERTIES
- 
- EXAMPLE
- 	crypto@300000 {
--		compatible = "fsl,sec-v4.0", "fsl,sec-era-v2.0";
-+		compatible = "fsl,sec-v4.0";
-+		fsl,sec-era = <2>;
- 		#address-cells = <1>;
- 		#size-cells = <1>;
- 		reg = <0x300000 0x10000>;
--- 
-1.7.7.6
-
-
+-Jussi
