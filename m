@@ -1,47 +1,70 @@
-From: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: linux-next: Tree for Jan 23 (mtd/ubi and iio and crypto/crc32[c])
-Date: Wed, 23 Jan 2013 15:41:57 -0800
-Message-ID: <51007545.5040406@infradead.org>
-References: <20130123174336.47c0113740a14da7f6a92187@canb.auug.org.au> <51006DC9.30802@infradead.org> <20130123232316.GB25726@gondor.apana.org.au>
+From: Vakul Garg <vakul@freescale.com>
+Subject: [PATCHv2] crypto: caam - Added property fsl,sec-era in SEC4.0 device tree binding.
+Date: Thu, 24 Jan 2013 12:13:46 +0530
+Message-ID: <1359009826-32483-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>,
-	linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jonathan Cameron <jic23-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>, linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Artem Bityutskiy <dedekind1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-iio-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130123232316.GB25726-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-iio-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain
+Cc: Grant Likely <grant.likely@secretlab.ca>,
+	Rob Herring <rob.herring@calxeda.com>,
+	Rob Landley <rob@landley.net>,
+	Stephen Boyd <sboyd@codeaurora.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Vakul Garg <vakul@freescale.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	<devicetree-discuss@lists.ozlabs.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-doc-owner@vger.kernel.org>
+Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 01/23/13 15:23, Herbert Xu wrote:
-> On Wed, Jan 23, 2013 at 03:10:01PM -0800, Randy Dunlap wrote:
->> On 01/22/13 22:43, Stephen Rothwell wrote:
->>> Hi all,
->>>
->>> Changes since 20130122:
->>>
->>
->>
->> on i386:
->>
->> ERROR: "crc32_le" [drivers/mtd/ubi/ubi.ko] undefined!
->> ERROR: "iio_triggered_buffer_setup" [drivers/iio/adc/max1363.ko] undefined!
->> ERROR: "iio_triggered_buffer_cleanup" [drivers/iio/adc/max1363.ko] undefined!
->> ERROR: "__crc32c_le" [crypto/crc32c.ko] undefined!
->> ERROR: "crc32_le" [crypto/crc32.ko] undefined!
-> 
-> Weird.  You do have CONFIG_CRC32 selected, so did it compile
-> a lib/crc32.ko or not?
+This new property defines the era of the particular SEC version.
+The compatible property in device tree "crypto" node has been updated
+not to contain SEC era numbers.
 
-Hmph, this seems to be some kind of rebuild problem.  It's not
-reproducible, so the mtd/ubi and crypto reports above are incorrect --
-please ignore them.  Only the iio one is reproducible.
+Signed-off-by: Vakul Garg <vakul@freescale.com>
+---
+Changes in v1:
+	1. Marked fsl,sec-era as 'optional'.
 
-Sorry about that.
+Changes in v2:
+	1. Changed 'fsl,sec-era' in example from hex to decimal.
 
+ .../devicetree/bindings/crypto/fsl-sec4.txt        |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index fc9ce6f..dc40055 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -54,8 +54,13 @@ PROPERTIES
+    - compatible
+       Usage: required
+       Value type: <string>
+-      Definition: Must include "fsl,sec-v4.0". Also includes SEC
+-           ERA versions (optional) with which the device is compatible.
++      Definition: Must include "fsl,sec-v4.0"
++
++   - fsl,sec-era
++      Usage: optional
++      Value type: <u32>
++      Definition: A standard property. Define the 'ERA' of the SEC
++          device.
+ 
+    - #address-cells
+        Usage: required
+@@ -107,7 +112,8 @@ PROPERTIES
+ 
+ EXAMPLE
+ 	crypto@300000 {
+-		compatible = "fsl,sec-v4.0", "fsl,sec-era-v2.0";
++		compatible = "fsl,sec-v4.0";
++		fsl,sec-era = <2>;
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		reg = <0x300000 0x10000>;
 -- 
-~Randy
+1.7.7.6
+
+
