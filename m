@@ -1,8 +1,8 @@
 From: Vivek Goyal <vgoyal@redhat.com>
 Subject: Re: [RFC 1/1] ima: digital signature verification using asymmetric
  keys
-Date: Mon, 28 Jan 2013 13:52:42 -0500
-Message-ID: <20130128185242.GB5868@redhat.com>
+Date: Mon, 28 Jan 2013 13:56:25 -0500
+Message-ID: <20130128185625.GC5868@redhat.com>
 References: <cover.1358246017.git.dmitry.kasatkin@intel.com>
  <53febcf9f13e59a1ddd8f8c9826cadbe663f2295.1358246017.git.dmitry.kasatkin@intel.com>
  <1358895228.2408.14.camel@falcor1>
@@ -17,15 +17,11 @@ Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, dhowells@redhat.com,
 	jmorris@namei.org, linux-security-module@vger.kernel.org,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:15996 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751019Ab3A1Sws (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Jan 2013 13:52:48 -0500
+Return-path: <linux-security-module-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <CALLzPKbjmoLGMVgY-GygZ9ScV1GNHKaKHGYsHc4=CeoYPL4rmw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 On Mon, Jan 28, 2013 at 05:20:20PM +0200, Kasatkin, Dmitry wrote:
 
@@ -41,21 +37,10 @@ On Mon, Jan 28, 2013 at 05:20:20PM +0200, Kasatkin, Dmitry wrote:
 > of the platform.
 > It is not really a problem...
 
-Ok, I have another question. I was looking at your slide deck here.
-
-http://selinuxproject.org/~jmorris/lss2011_slides/IMA_EVM_Digital_Signature_Support.pdf
-
-Slide 12 mentions that keys are loaded into the kernel from initramfs. If
-"root" can load any key, what are we protecting against.
-
-IOW, what good ima_appraise_tcb policy, which tries to appraise any root
-owned file.  A root can sign all the files using its own key and load its
-public key in IMA keyring and then integrity check should pass on all
-root files.
-
-So what's the idea behind digital signature appraisal? By allowing root to
-unconditionally load the keys in IMA keyring, it seems to circumvent the
-appraisal mechanism.
+One more question. I specified "ima_appraise_tcb" on kernel command line
+and I had an unbootable system. It refused to run "init" as it was not
+labeled/signed. Is there any policy/way where it appraises only signed
+files and does not refuse to open/execute unsigned ones.
 
 Thanks
 Vivek
