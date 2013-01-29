@@ -1,7 +1,7 @@
 From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
 Subject: Re: [RFC 1/1] ima: digital signature verification using asymmetric keys
-Date: Tue, 29 Jan 2013 10:48:00 +0200
-Message-ID: <CALLzPKZgbz0zCMHVbcDpHX0vv=qt+T0Gi8p+rUa70LJ0E+xrNA@mail.gmail.com>
+Date: Tue, 29 Jan 2013 10:53:30 +0200
+Message-ID: <CALLzPKaFEGB_SKC6RBkU0AWz92DR0PGp-yRAhaHVU55fru+q6g@mail.gmail.com>
 References: <cover.1358246017.git.dmitry.kasatkin@intel.com>
 	<53febcf9f13e59a1ddd8f8c9826cadbe663f2295.1358246017.git.dmitry.kasatkin@intel.com>
 	<1358895228.2408.14.camel@falcor1>
@@ -11,6 +11,8 @@ References: <cover.1358246017.git.dmitry.kasatkin@intel.com>
 	<20130128151527.GA5868@redhat.com>
 	<CALLzPKbjmoLGMVgY-GygZ9ScV1GNHKaKHGYsHc4=CeoYPL4rmw@mail.gmail.com>
 	<20130128185242.GB5868@redhat.com>
+	<1359402694.3906.53.camel@falcor1>
+	<20130128201316.GA14405@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, dhowells@redhat.com,
@@ -18,60 +20,107 @@ Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, dhowells@redhat.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Vivek Goyal <vgoyal@redhat.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20130128185242.GB5868@redhat.com>
+In-Reply-To: <20130128201316.GA14405@redhat.com>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 28, 2013 at 8:52 PM, Vivek Goyal <vgoyal@redhat.com> wrote:
-> On Mon, Jan 28, 2013 at 05:20:20PM +0200, Kasatkin, Dmitry wrote:
->
-> [..]
->> > Ok. I am hoping that it will be more than the kernel command line we
->> > support. In the sense that for digital signatures one needs to parse
->> > the signature, look at what hash algorithm has been used  and then
->> > collect the hash accordingly. It is little different then IMA requirement
->> > of calculating one pre-determine hash for all files.
+On Mon, Jan 28, 2013 at 10:13 PM, Vivek Goyal <vgoyal@redhat.com> wrote:
+> On Mon, Jan 28, 2013 at 02:51:34PM -0500, Mimi Zohar wrote:
+>> On Mon, 2013-01-28 at 13:52 -0500, Vivek Goyal wrote:
+>> > On Mon, Jan 28, 2013 at 05:20:20PM +0200, Kasatkin, Dmitry wrote:
+>> >
+>> > [..]
+>> > > > Ok. I am hoping that it will be more than the kernel command line we
+>> > > > support. In the sense that for digital signatures one needs to parse
+>> > > > the signature, look at what hash algorithm has been used  and then
+>> > > > collect the hash accordingly. It is little different then IMA requirement
+>> > > > of calculating one pre-determine hash for all files.
+>> > >
+>> > > Yes... It is obvious. It's coming.
+>> > > But in general, signer should be aware of requirements and limitation
+>> > > of the platform.
+>> > > It is not really a problem...
+>> >
+>> > Ok, I have another question. I was looking at your slide deck here.
+>> >
+>> > http://selinuxproject.org/~jmorris/lss2011_slides/IMA_EVM_Digital_Signature_Support.pdf
+>> >
+>> > Slide 12 mentions that keys are loaded into the kernel from initramfs. If
+>> > "root" can load any key, what are we protecting against.
+>> >
+>> > IOW, what good ima_appraise_tcb policy, which tries to appraise any root
+>> > owned file.  A root can sign all the files using its own key and load its
+>> > public key in IMA keyring and then integrity check should pass on all
+>> > root files.
 >>
->> Yes... It is obvious. It's coming.
->> But in general, signer should be aware of requirements and limitation
->> of the platform.
->> It is not really a problem...
+>> > So what's the idea behind digital signature appraisal? By allowing root to
+>> > unconditionally load the keys in IMA keyring, it seems to circumvent the
+>> > appraisal mechanism.
+>>
+>> Vivek, you're asking obvious questions, without understanding that what
+>> you want to do is only now possible because of the work that has gone
+>> into upstreaming the different components of the linux-integrity
+>> subsystem (eg. IMA, trusted/encrypted keys, EVM, (MPI library), and now
+>> IMA-appraisal).  In case you weren't aware, Dmitry made the necessary
+>> changes so that the MPI library could be upstreamed for
+>> EVM/IMA-appraisal digital signature support.
 >
-> Ok, I have another question. I was looking at your slide deck here.
+> Hi Mimi,
 >
-> http://selinuxproject.org/~jmorris/lss2011_slides/IMA_EVM_Digital_Signature_Support.pdf
+> Sure. I am just trying to understand that where are we and how can I
+> help improve things so that I can achieve my objectives.
 >
-> Slide 12 mentions that keys are loaded into the kernel from initramfs. If
-> "root" can load any key, what are we protecting against.
->
-> IOW, what good ima_appraise_tcb policy, which tries to appraise any root
-> owned file.  A root can sign all the files using its own key and load its
-> public key in IMA keyring and then integrity check should pass on all
-> root files.
->
-> So what's the idea behind digital signature appraisal? By allowing root to
-> unconditionally load the keys in IMA keyring, it seems to circumvent the
-> appraisal mechanism.
+> The problem I am running into is that I can't find a single good
+> documentation here which explains how to use things. There is no
+> single .txt file in Documentation/ directory which explains current
+> state of affiars or which explains how to use any of the IMA/EVM
+> functionality.
 >
 
-I will answer directly to this email first.
-'keyctl setperm' command is used to lock keyring from being able to
-add new keys...
-Even root is not able to revert locked keyring to original
-write-permissive mode.
+There is Wiki page available which contains lots of examples and explanations.
 
-root@ubuntu:~# cat /proc/keys |grep ima
-16a4c685 I--Q---     1 perm 3f010000     0     0 keyring   _ima: 2/4
-root@ubuntu:~# keyctl setperm 379897477  0x0b010000
-root@ubuntu:~# keyctl add user testkey "testing1" 379897477
-add_key: Permission denied
-root@ubuntu:~# keyctl setperm 379897477  0x3f010000
-keyctl_setperm: Permission denied
-root@ubuntu:~# cat /proc/keys |grep ima
-16a4c685 I--Q---     1 perm 0b010000     0     0 keyring   _ima: 3/4
+http://sourceforge.net/p/linux-ima/wiki/Home/
 
+This is an Open Source project. Anyone can contribute and improve it.
+If you find that something is unclear or missing in the wiki, you are
+welcome to contribute/
+
+
+> So I have no way left but to read code and ask obivious questions
+> on mailing list to figure out what components are working, what
+> components are work in progress or what's the intent of components
+> and how they are supposed to be used.
+>
+> So are we saying that all the appraisal and digital signature stuff
+> is not useful till we figure a way out to lock down IMA keyring. Or
+> it is useful only when root can load the keyring but we are trying
+> to appraise only non-root files.
+>
+>>
+>> I'm pretty sure that keyrings can be locked, preventing additional keys
+>> from being added.  (If it isn't currently supported, it needs to be.)
+>> The _evm and _ima keyrings should definitely be locked.  When/how this
+>> is done, is yet to be defined.  I'm pretty sure there are a number of
+>> people thinking about this, including David Howells, Dmitry Kataskin,
+>> David Safford and myself.
+>>
+>> As I previously said, the next steps are to integrate the
+>> EVM/IMA-appraisal public keys in a safe and trusted manner, without
+>> breaking the secure boot signature chain.
+>
+> In a private conversation David howells mentioned that IMA keyring
+> should allow loading only if new key is trusted by an already loaded
+> key. He has already posted some patches for marking a keyring trusted
+> and loading keys only if it is signed by a trusted key.
+>
+> We were wondring that what use case is served by allowing the root
+> to load keys unconditionally. By understanding the use case, atleast
+> one can try not to break it.
+
+Please read my previous email on how to lock down the kernel keyring.
 
 - Dmitry
 
+>
 > Thanks
 > Vivek
