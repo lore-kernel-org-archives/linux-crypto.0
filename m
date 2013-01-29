@@ -1,34 +1,47 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] CMAC support for CryptoAPI, fixed patch issues, indent,
- and testmgr build issues
-Date: Tue, 29 Jan 2013 10:33:31 +0100
-Message-ID: <20130129093331.GA23291@secunet.com>
-References: <20130124094337.GJ9147@secunet.com>
- <20130124112410.8535.75598.stgit@localhost6.localdomain6>
+From: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [RFC 1/1] ima: digital signature verification using asymmetric
+ keys
+Date: Tue, 29 Jan 2013 11:30:36 -0500
+Message-ID: <20130129163036.GB21930@redhat.com>
+References: <1358895228.2408.14.camel@falcor1>
+ <CALLzPKbNVV+iWzUcsxq0Lk-Hz2BVpCBsEbjHdnRAyjDsF5___g@mail.gmail.com>
+ <20130125210157.GA13152@redhat.com>
+ <CALLzPKY9E8VaFf1GUstTnCeYwLOTm6ozdjJFDwSKWk_JR6QF5w@mail.gmail.com>
+ <20130128151527.GA5868@redhat.com>
+ <CALLzPKbjmoLGMVgY-GygZ9ScV1GNHKaKHGYsHc4=CeoYPL4rmw@mail.gmail.com>
+ <20130128185242.GB5868@redhat.com>
+ <1359402694.3906.53.camel@falcor1>
+ <20130128201316.GA14405@redhat.com>
+ <1359418442.3906.188.camel@falcor1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Tom St Denis <tstdenis@elliptictech.com>,
-	David Miller <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>,
+	dhowells@redhat.com, jmorris@namei.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:46500 "EHLO a.mx.secunet.com"
+Received: from mx1.redhat.com ([209.132.183.28]:50267 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751870Ab3A2Jde (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Jan 2013 04:33:34 -0500
+	id S1750809Ab3A2Qgk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Jan 2013 11:36:40 -0500
 Content-Disposition: inline
-In-Reply-To: <20130124112410.8535.75598.stgit@localhost6.localdomain6>
+In-Reply-To: <1359418442.3906.188.camel@falcor1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 24, 2013 at 01:25:46PM +0200, Jussi Kivilinna wrote:
-> 
-> Maybe it would be cleaner to not mess with pfkeyv2.h at all, but instead mark algorithms that do not support pfkey with flag. See patch below.
-> 
+On Mon, Jan 28, 2013 at 07:14:02PM -0500, Mimi Zohar wrote:
 
-As nobody seems to have another opinion, we could go either with your
-approach, or we can invert the logic and mark all existing algorithms
-as pfkey supported. Then we would not need to bother about pfkey again.
+[..]
+> The 'trusted' keyring is a solution for installing only distro or third
+> party signed packages.  How would a developer, for instance, create,
+> sign, and install his own package and add his public key safely?
 
-I'd be fine with both. Do you want to submit a patch?
+Hi Mimi,
+
+I guess using MOK, developer should be able to import his public key in
+shim database and in turn in kernel and use that to load user signed
+moduels.
+
+Thanks
+Vivek
