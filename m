@@ -1,49 +1,26 @@
-From: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Subject: Re: [PATCH] CMAC support for CryptoAPI, fixed patch issues,
- indent, and testmgr build issues
-Date: Thu, 31 Jan 2013 11:35:16 +0200
-Message-ID: <20130131113516.96632or3s6s22bwg@www.dalek.fi>
-References: <20130124094337.GJ9147@secunet.com>
- <20130124112410.8535.75598.stgit@localhost6.localdomain6>
- <20130129093331.GA23291@secunet.com>
+From: James Morris <jmorris@namei.org>
+Subject: Re: [PATCH 1/2] digsig: remove unnecessary memory allocation and
+ copying
+Date: Fri, 1 Feb 2013 16:31:25 +1100 (EST)
+Message-ID: <alpine.LRH.2.02.1302011631040.9167@tundra.namei.org>
+References: <cover.1359538137.git.dmitry.kasatkin@intel.com> <1ed8eac5fb76f096b794a5f7326eb60a3013ce3d.1359538137.git.dmitry.kasatkin@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Tom St Denis <tstdenis@elliptictech.com>,
-	David Miller <davem@davemloft.net>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:49844 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752651Ab3AaJfU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Jan 2013 04:35:20 -0500
-In-Reply-To: <20130129093331.GA23291@secunet.com>
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1ed8eac5fb76f096b794a5f7326eb60a3013ce3d.1359538137.git.dmitry.kasatkin@intel.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Quoting Steffen Klassert <steffen.klassert@secunet.com>:
+On Wed, 30 Jan 2013, Dmitry Kasatkin wrote:
 
-> On Thu, Jan 24, 2013 at 01:25:46PM +0200, Jussi Kivilinna wrote:
->>
->> Maybe it would be cleaner to not mess with pfkeyv2.h at all, but  
->> instead mark algorithms that do not support pfkey with flag. See  
->> patch below.
->>
->
-> As nobody seems to have another opinion, we could go either with your
-> approach, or we can invert the logic and mark all existing algorithms
-> as pfkey supported. Then we would not need to bother about pfkey again.
->
-> I'd be fine with both. Do you want to submit a patch?
->
+> In existing use case, copying of the decoded data is unnecessary in
+> pkcs_1_v1_5_decode_emsa. It is just enough to get pointer to the message.
+> Removing copying and extra buffer allocation.
 
-Ok, I'll invert the logic and send new patch.
+Applied.
 
--Jussi
+-- 
+James Morris
+<jmorris@namei.org>
