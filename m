@@ -1,33 +1,46 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [PATCH 2/2] mpilib: use DIV_ROUND_UP and remove unused macros
-Date: Fri, 1 Feb 2013 16:31:58 +1100 (EST)
-Message-ID: <alpine.LRH.2.02.1302011631330.9167@tundra.namei.org>
-References: <cover.1359538137.git.dmitry.kasatkin@intel.com> <ecbfc41bbf0a3d78e5522f1a37d090803d8f383f.1359538137.git.dmitry.kasatkin@intel.com>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-security-module@vger.kernel.org,
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH 0/2] crypto user API fixes
+Date: Sun,  3 Feb 2013 12:08:59 +0100
+Message-ID: <1359889741-23335-1-git-send-email-minipli@googlemail.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	linux-crypto@vger.kernel.org,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <ecbfc41bbf0a3d78e5522f1a37d090803d8f383f.1359538137.git.dmitry.kasatkin@intel.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:56229 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752108Ab3BCLJL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Feb 2013 06:09:11 -0500
+Received: by mail-wi0-f179.google.com with SMTP id ez12so1994373wid.12
+        for <linux-crypto@vger.kernel.org>; Sun, 03 Feb 2013 03:09:10 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 30 Jan 2013, Dmitry Kasatkin wrote:
+This series fixes kernel memory disclosures (aka info leaks) and a bug
+in the empty string test.
 
-> From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> 
-> Remove MIN, MAX and ABS macros that are duplicates kernel's native
-> implementation.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+The crypto user API is protected by CAP_NET_ADMIN so one needs some
+level of privilege already to exploit the leaks. It still might be
+material for stable, though. Your choice.
 
-Applied.
+Please apply!
 
-As maintainer, you should have added your signed-off-by.
 
+Mathias Krause (2):
+  crypto: user - fix info leaks in report API
+  crypto: user - fix empty string test in report API
+
+ crypto/ablkcipher.c  |   12 ++++++------
+ crypto/aead.c        |    9 ++++-----
+ crypto/ahash.c       |    2 +-
+ crypto/blkcipher.c   |    6 +++---
+ crypto/crypto_user.c |   24 ++++++++++++------------
+ crypto/pcompress.c   |    3 +--
+ crypto/rng.c         |    2 +-
+ crypto/shash.c       |    3 ++-
+ 8 files changed, 30 insertions(+), 31 deletions(-)
 
 -- 
-James Morris
-<jmorris@namei.org>
+1.7.10.4
