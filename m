@@ -1,7 +1,7 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCHv2 2/3] crypto: user - fix empty string test in report API
-Date: Tue,  5 Feb 2013 18:19:14 +0100
-Message-ID: <1360084755-11044-3-git-send-email-minipli@googlemail.com>
+Subject: [PATCHv2 1/3] crypto: user - fix info leaks in report API
+Date: Tue,  5 Feb 2013 18:19:13 +0100
+Message-ID: <1360084755-11044-2-git-send-email-minipli@googlemail.com>
 References: <1360084755-11044-1-git-send-email-minipli@googlemail.com>
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	linux-crypto@vger.kernel.org,
@@ -9,41 +9,230 @@ Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bk0-f51.google.com ([209.85.214.51]:43402 "EHLO
-	mail-bk0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755619Ab3BERTf (ORCPT
+Received: from mail-bk0-f45.google.com ([209.85.214.45]:36311 "EHLO
+	mail-bk0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755590Ab3BERTe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Feb 2013 12:19:35 -0500
-Received: by mail-bk0-f51.google.com with SMTP id ik5so208101bkc.10
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Feb 2013 09:19:34 -0800 (PST)
+	Tue, 5 Feb 2013 12:19:34 -0500
+Received: by mail-bk0-f45.google.com with SMTP id i18so203776bkv.4
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Feb 2013 09:19:33 -0800 (PST)
 In-Reply-To: <1360084755-11044-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The current test for empty strings fails because it is testing the
-address of a field, not a pointer. So the test will always be true.
-Test the first character in the string to not be null instead.
+Three errors resulting in kernel memory disclosure:
+
+1/ The structures used for the netlink based crypto algorithm report API
+are located on the stack. As snprintf() does not fill the remainder of
+the buffer with null bytes, those stack bytes will be disclosed to users
+of the API. Switch to strncpy() to fix this.
+
+2/ crypto_report_one() does not initialize all field of struct
+crypto_user_alg. Fix this to fix the heap info leak.
+
+3/ For the module name we should copy only as many bytes as
+module_name() returns -- not as much as the destination buffer could
+hold. But the current code does not and therefore copies random data
+from behind the end of the module name, as the module name is always
+shorter than CRYPTO_MAX_ALG_NAME.
+
+Also switch to use strncpy() to copy the algorithm's name and
+driver_name. They are strings, after all.
 
 Signed-off-by: Mathias Krause <minipli@googlemail.com>
 Cc: Steffen Klassert <steffen.klassert@secunet.com>
 ---
-v2: - switched to simple character test, as suggested by Herbert Xu
+ crypto/ablkcipher.c  |   12 ++++++------
+ crypto/aead.c        |    9 ++++-----
+ crypto/ahash.c       |    2 +-
+ crypto/blkcipher.c   |    6 +++---
+ crypto/crypto_user.c |   22 +++++++++++-----------
+ crypto/pcompress.c   |    3 +--
+ crypto/rng.c         |    2 +-
+ crypto/shash.c       |    3 ++-
+ 8 files changed, 29 insertions(+), 30 deletions(-)
 
- crypto/crypto_user.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index 533de95..7d4a8d2 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -388,9 +388,9 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_blkcipher rblkcipher;
+ 
+-	snprintf(rblkcipher.type, CRYPTO_MAX_ALG_NAME, "%s", "ablkcipher");
+-	snprintf(rblkcipher.geniv, CRYPTO_MAX_ALG_NAME, "%s",
+-		 alg->cra_ablkcipher.geniv ?: "<default>");
++	strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
++	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
++		sizeof(rblkcipher.geniv));
+ 
+ 	rblkcipher.blocksize = alg->cra_blocksize;
+ 	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
+@@ -469,9 +469,9 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_blkcipher rblkcipher;
+ 
+-	snprintf(rblkcipher.type, CRYPTO_MAX_ALG_NAME, "%s", "givcipher");
+-	snprintf(rblkcipher.geniv, CRYPTO_MAX_ALG_NAME, "%s",
+-		 alg->cra_ablkcipher.geniv ?: "<built-in>");
++	strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
++	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
++		sizeof(rblkcipher.geniv));
+ 
+ 	rblkcipher.blocksize = alg->cra_blocksize;
+ 	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 0b8121e..27bc487 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -117,9 +117,8 @@ static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ 	struct crypto_report_aead raead;
+ 	struct aead_alg *aead = &alg->cra_aead;
+ 
+-	snprintf(raead.type, CRYPTO_MAX_ALG_NAME, "%s", "aead");
+-	snprintf(raead.geniv, CRYPTO_MAX_ALG_NAME, "%s",
+-		 aead->geniv ?: "<built-in>");
++	strncpy(raead.type, "aead", sizeof(raead.type));
++	strncpy(raead.geniv, aead->geniv ?: "<built-in>", sizeof(raead.geniv));
+ 
+ 	raead.blocksize = alg->cra_blocksize;
+ 	raead.maxauthsize = aead->maxauthsize;
+@@ -203,8 +202,8 @@ static int crypto_nivaead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ 	struct crypto_report_aead raead;
+ 	struct aead_alg *aead = &alg->cra_aead;
+ 
+-	snprintf(raead.type, CRYPTO_MAX_ALG_NAME, "%s", "nivaead");
+-	snprintf(raead.geniv, CRYPTO_MAX_ALG_NAME, "%s", aead->geniv);
++	strncpy(raead.type, "nivaead", sizeof(raead.type));
++	strncpy(raead.geniv, aead->geniv, sizeof(raead.geniv));
+ 
+ 	raead.blocksize = alg->cra_blocksize;
+ 	raead.maxauthsize = aead->maxauthsize;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 3887856..793a27f 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -404,7 +404,7 @@ static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_hash rhash;
+ 
+-	snprintf(rhash.type, CRYPTO_MAX_ALG_NAME, "%s", "ahash");
++	strncpy(rhash.type, "ahash", sizeof(rhash.type));
+ 
+ 	rhash.blocksize = alg->cra_blocksize;
+ 	rhash.digestsize = __crypto_hash_alg_common(alg)->digestsize;
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index a8d85a1..c44e014 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -499,9 +499,9 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_blkcipher rblkcipher;
+ 
+-	snprintf(rblkcipher.type, CRYPTO_MAX_ALG_NAME, "%s", "blkcipher");
+-	snprintf(rblkcipher.geniv, CRYPTO_MAX_ALG_NAME, "%s",
+-		 alg->cra_blkcipher.geniv ?: "<default>");
++	strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
++	strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
++		sizeof(rblkcipher.geniv));
+ 
+ 	rblkcipher.blocksize = alg->cra_blocksize;
+ 	rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
 diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index f6d9baf..423a267 100644
+index 35d700a..f6d9baf 100644
 --- a/crypto/crypto_user.c
 +++ b/crypto/crypto_user.c
-@@ -196,7 +196,7 @@ static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
- 	struct crypto_dump_info info;
- 	int err;
+@@ -75,7 +75,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_cipher rcipher;
  
--	if (!p->cru_driver_name)
-+	if (!p->cru_driver_name[0])
- 		return -EINVAL;
+-	snprintf(rcipher.type, CRYPTO_MAX_ALG_NAME, "%s", "cipher");
++	strncpy(rcipher.type, "cipher", sizeof(rcipher.type));
  
- 	alg = crypto_alg_match(p, 1);
+ 	rcipher.blocksize = alg->cra_blocksize;
+ 	rcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
+@@ -94,8 +94,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_comp rcomp;
+ 
+-	snprintf(rcomp.type, CRYPTO_MAX_ALG_NAME, "%s", "compression");
+-
++	strncpy(rcomp.type, "compression", sizeof(rcomp.type));
+ 	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
+ 		    sizeof(struct crypto_report_comp), &rcomp))
+ 		goto nla_put_failure;
+@@ -108,12 +107,14 @@ nla_put_failure:
+ static int crypto_report_one(struct crypto_alg *alg,
+ 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+ {
+-	memcpy(&ualg->cru_name, &alg->cra_name, sizeof(ualg->cru_name));
+-	memcpy(&ualg->cru_driver_name, &alg->cra_driver_name,
+-	       sizeof(ualg->cru_driver_name));
+-	memcpy(&ualg->cru_module_name, module_name(alg->cra_module),
+-	       CRYPTO_MAX_ALG_NAME);
+-
++	strncpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
++	strncpy(ualg->cru_driver_name, alg->cra_driver_name,
++		sizeof(ualg->cru_driver_name));
++	strncpy(ualg->cru_module_name, module_name(alg->cra_module),
++		sizeof(ualg->cru_module_name));
++
++	ualg->cru_type = 0;
++	ualg->cru_mask = 0;
+ 	ualg->cru_flags = alg->cra_flags;
+ 	ualg->cru_refcnt = atomic_read(&alg->cra_refcnt);
+ 
+@@ -122,8 +123,7 @@ static int crypto_report_one(struct crypto_alg *alg,
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+ 		struct crypto_report_larval rl;
+ 
+-		snprintf(rl.type, CRYPTO_MAX_ALG_NAME, "%s", "larval");
+-
++		strncpy(rl.type, "larval", sizeof(rl.type));
+ 		if (nla_put(skb, CRYPTOCFGA_REPORT_LARVAL,
+ 			    sizeof(struct crypto_report_larval), &rl))
+ 			goto nla_put_failure;
+diff --git a/crypto/pcompress.c b/crypto/pcompress.c
+index 04e083f..7140fe7 100644
+--- a/crypto/pcompress.c
++++ b/crypto/pcompress.c
+@@ -53,8 +53,7 @@ static int crypto_pcomp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_comp rpcomp;
+ 
+-	snprintf(rpcomp.type, CRYPTO_MAX_ALG_NAME, "%s", "pcomp");
+-
++	strncpy(rpcomp.type, "pcomp", sizeof(rpcomp.type));
+ 	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
+ 		    sizeof(struct crypto_report_comp), &rpcomp))
+ 		goto nla_put_failure;
+diff --git a/crypto/rng.c b/crypto/rng.c
+index f3b7894..e0a25c2 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -65,7 +65,7 @@ static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_rng rrng;
+ 
+-	snprintf(rrng.type, CRYPTO_MAX_ALG_NAME, "%s", "rng");
++	strncpy(rrng.type, "rng", sizeof(rrng.type));
+ 
+ 	rrng.seedsize = alg->cra_rng.seedsize;
+ 
+diff --git a/crypto/shash.c b/crypto/shash.c
+index f426330f..929058a 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -530,7 +530,8 @@ static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
+ 	struct crypto_report_hash rhash;
+ 	struct shash_alg *salg = __crypto_shash_alg(alg);
+ 
+-	snprintf(rhash.type, CRYPTO_MAX_ALG_NAME, "%s", "shash");
++	strncpy(rhash.type, "shash", sizeof(rhash.type));
++
+ 	rhash.blocksize = alg->cra_blocksize;
+ 	rhash.digestsize = salg->digestsize;
+ 
 -- 
 1.7.10.4
