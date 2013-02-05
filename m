@@ -1,61 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: user - fix empty string test in report API
-Date: Tue, 5 Feb 2013 17:57:39 +0800
-Message-ID: <20130205095739.GA27384@gondor.apana.org.au>
-References: <1359889741-23335-1-git-send-email-minipli@googlemail.com>
- <1359889741-23335-3-git-send-email-minipli@googlemail.com>
- <20130204131552.GA21584@gondor.apana.org.au>
- <CA+rthh8Pq4EPXoHS1GtdNBM8w1fdJuCmxjptgaftRBhfjSkUpA@mail.gmail.com>
+From: Alex Porosanu <alexandru.porosanu@freescale.com>
+Subject: [PATCH 0/2] RNG4 support for SEC versions < 5
+Date: Tue, 5 Feb 2013 12:21:23 +0200
+Message-ID: <1360059685-4953-1-git-send-email-alexandru.porosanu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:38949 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750960Ab3BEJ6L (ORCPT
+Received: from co9ehsobe003.messaging.microsoft.com ([207.46.163.26]:23084
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750960Ab3BEKW1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Feb 2013 04:58:11 -0500
-Content-Disposition: inline
-In-Reply-To: <CA+rthh8Pq4EPXoHS1GtdNBM8w1fdJuCmxjptgaftRBhfjSkUpA@mail.gmail.com>
+	Tue, 5 Feb 2013 05:22:27 -0500
+Received: from mail78-co9 (localhost [127.0.0.1])	by mail78-co9-R.bigfish.com
+ (Postfix) with ESMTP id 70302A01CA	for <linux-crypto@vger.kernel.org>; Tue,
+  5 Feb 2013 10:22:26 +0000 (UTC)
+Received: from CO9EHSMHS021.bigfish.com (unknown [10.236.132.252])	by
+ mail78-co9.bigfish.com (Postfix) with ESMTP id AD4272E0085	for
+ <linux-crypto@vger.kernel.org>; Tue,  5 Feb 2013 10:22:24 +0000 (UTC)
+Received: from localhost.localdomain ([10.171.77.122])	by
+ az84smr01.freescale.net (8.14.3/8.14.0) with ESMTP id r15AMLxH028285	for
+ <linux-crypto@vger.kernel.org>; Tue, 5 Feb 2013 03:22:22 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 05, 2013 at 09:35:31AM +0100, Mathias Krause wrote:
-> On Mon, Feb 4, 2013 at 2:15 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > On Sun, Feb 03, 2013 at 12:09:01PM +0100, Mathias Krause wrote:
-> >> The current test for empty strings fails because it is testing the
-> >> address of a field, not a pointer. So the test will always be true.
-> >> Test for the string length instead.
-> >>
-> >> Signed-off-by: Mathias Krause <minipli@googlemail.com>
-> >> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> >
-> > Good catch.  However, what if cru_driver_name isn't NUL-terminated?
-> 
-> Your objection is totally valid, sure. And my initial idea wouldn't
-> have that problem as it would just test for the first character to be
-> '\0', i.e. do something like that:
-> 
-> -       if (!p->cru_driver_name)
-> +       if (!p->cru_driver_name[0])
-> 
-> But then I looked how the other code in the crypto user API does refer
-> to string lengths related to cru_driver_name and switched to strlen().
-> So the other code is (potentially) vulnerable to non-NUL-terminated
-> strings, too.
-> 
-> So, I think we need another patch that adds sanity checks for
-> non-NUL-terminated strings. I can do this, maybe this evening, and
-> send out a new version of the patch series if you like me to.
+There are (at least) two platforms which have SEC < 5 but the new
+RNG4 block. These platforms are BSC 9131 and BSC 9132 (that I know of
+so far). Thus the condition in the caam driver which checks  for the 
+version of the SEC block to decide if further initialization of the 
+RNG block is needed or not is not always correct. This set of patches 
+should fix this by adding support for retrieving the version of the 
+RNG block and executing the intialization of it depending if
+it is greater or equal than 4.
 
-Let's just fix the problem at hand first and you can follow it up
-with another patch to cure the other strlens.
+Alex Porosanu (2):
+  crypto: caam - support for RNG version retrieval
+  crypto: caam - fix RNG init for SEC with RNG version greater than 4
 
-Thanks,
+ drivers/crypto/caam/ctrl.c |   15 +++++++++++++--
+ drivers/crypto/caam/regs.h |   37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+), 2 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.7.6
