@@ -1,48 +1,49 @@
-From: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
-Subject: Re: [PATCH 3/3] KEYS: Add a 'trusted' flag and a 'trusted only' flag
-Date: Thu, 7 Feb 2013 00:18:23 +0200
-Message-ID: <CALLzPKbcWxt+tLdoy0Q9xQ-TMtn5XosESHnHOiQzGfW0F61bSQ@mail.gmail.com>
-References: <20130117180352.27885.79893.stgit@warthog.procyon.org.uk>
-	<20130117180407.27885.54342.stgit@warthog.procyon.org.uk>
-	<CALLzPKayx83x6KRs9NSjthR1H4VR1PzEcYhnGJU6gnrWMs7_fg@mail.gmail.com>
-	<14690.1359541976@warthog.procyon.org.uk>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: caam - set RDB bit in security configuration
+ register
+Date: Wed, 6 Feb 2013 19:33:15 -0600
+Message-ID: <20130206193315.cb27accf9a7a7f95870fb47f@freescale.com>
+References: <1360151266-28428-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: zohar@linux.vnet.ibm.com, linux-kernel@vger.kernel.org,
-	keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <14690.1359541976@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Shengzhou Liu <Shengzhou.Liu@freescale.com>,
+	Alex Porosanu <alexandru.porosanu@freescale.com>,
+	<linux-kernel@vger.kernel.org>
+To: Vakul Garg <vakul@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:8115 "EHLO
+	va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751044Ab3BGBf5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Feb 2013 20:35:57 -0500
+In-Reply-To: <1360151266-28428-1-git-send-email-vakul@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 30, 2013 at 12:32 PM, David Howells <dhowells@redhat.com> wrote:
-> Kasatkin, Dmitry <dmitry.kasatkin@intel.com> wrote:
->
->> What about the case when running from integrity protected initramfs?
->> Either embedded into the signed kernel, or verified by the boot loader.
->> In such case it is possible to assume that all keys which are added by
->> user space are implicitly trusted.
->> Later on, before continuing booting normal rootfs, set the key
->> subsystem state (trust-lock),
->> so that trusted keyrings accept only explicitly trusted keys...
->>
->> Does it make sense?
->
-> I'm not sure it does.  Initramfs is (re-)fabricated on the machine on which it
-> runs any time you update one of a set of rpms (such as the kernel rpm) because
-> it has machine-specific data and drivers in it.
->
+On Wed, 6 Feb 2013 17:17:46 +0530
+Vakul Garg <vakul@freescale.com> wrote:
 
-Based on my latest post on signed initramfs it might make sense.
-But it seems to be that it would be behavior anyway, because "first"
-key added is implicitly should be assumed trusted.
+> This change is required for post SEC-5.0 devices which have RNG4. Setting RDB
 
-- Dmitry
+wrap your commit message text to 75 chars
 
-> David
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> in security configuration register allows CAAM to use the "Random Data Buffer"
+> to be filled by a single request. The Random Data Buffer is large enough for
+> ten packets to get their IVs from a single request. If the Random Data Buffer
+> is not enabled, then each IV causes a separate request, and RNG4 hardware
+> cannot keep up resulting in lower IPSEC throughput.
+
+Linux kernel IPSec or another IPSEC stack?  how much lower?
+
+> +	if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
+> +		setbits32(&topregs->ctrl.scfgr, SCFGR_RDBENABLE);
+> +
+
+this belongs further down - at the end of the RNG4 initialization
+section.
+
+Kim
