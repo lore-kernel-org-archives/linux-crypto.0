@@ -1,74 +1,113 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCHv1] crypto: caam - set RDB bit in security configuration register
-Date: Thu, 7 Feb 2013 10:39:21 +0530
-Message-ID: <1360213761-7048-1-git-send-email-vakul@freescale.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [RFC][PATCH] Entropy generator with 100 kB/s throughput
+Date: Fri, 08 Feb 2013 23:04:54 +0100
+Message-ID: <51157686.9000404@chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Shengzhou Liu <Shengzhou.Liu@freescale.com>,
-	Alex Porosanu <alexandru.porosanu@freescale.com>,
-	<linux-kernel@vger.kernel.org>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:6116
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750763Ab3BGFMQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Feb 2013 00:12:16 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: lkml <linux-kernel@vger.kernel.org>
+To: Ted Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This change is required for post SEC-5.0 devices which have RNG4.
-Setting RDB in security configuration register allows CAAM to use the
-"Random Data Buffer" to be filled by a single request. The Random Data
-Buffer is large enough for ten packets to get their IVs from a single
-request. If the Random Data Buffer is not enabled, then each IV causes a
-separate request, and RNG4 hardware cannot keep up resulting in lower
-IPSEC throughput if random IVs are used.
+Hi crypto hackers,
 
-Signed-off-by: Vakul Garg <vakul@freescale.com>
----
- drivers/crypto/caam/ctrl.c |    3 +++
- drivers/crypto/caam/regs.h |    4 +++-
- 2 files changed, 6 insertions(+), 1 deletions(-)
+[1] patch at http://www.chronox.de/jitterentropy-0.1.tar.gz
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index bf20dd8..79278d5 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -304,6 +304,9 @@ static int caam_probe(struct platform_device *pdev)
- 			caam_remove(pdev);
- 			return ret;
- 		}
-+
-+		/* Enable RDB bit so that RNG works faster */
-+		setbits32(&topregs->ctrl.scfgr, SCFGR_RDBENABLE);
- 	}
- 
- 	/* NOTE: RTIC detection ought to go here, around Si time */
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 3223fc6..cd6feda 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -252,7 +252,8 @@ struct caam_ctrl {
- 	/* Read/Writable					        */
- 	u32 rsvd1;
- 	u32 mcr;		/* MCFG      Master Config Register  */
--	u32 rsvd2[2];
-+	u32 rsvd2;
-+	u32 scfgr;		/* SCFGR, Security Config Register */
- 
- 	/* Bus Access Configuration Section			010-11f */
- 	/* Read/Writable                                                */
-@@ -299,6 +300,7 @@ struct caam_ctrl {
- #define MCFGR_WDFAIL		0x20000000 /* DECO watchdog force-fail */
- #define MCFGR_DMA_RESET		0x10000000
- #define MCFGR_LONG_PTR		0x00010000 /* Use >32-bit desc addressing */
-+#define SCFGR_RDBENABLE		0x00000400
- 
- /* AXI read cache control */
- #define MCFGR_ARCACHE_SHIFT	12
--- 
-1.7.7.6
+The Linux kernel RNG which we all use via /dev/random or /dev/urandom
+received a lot of merits over the long years it exists. In particular
+it was subject to countless researches and assessments and was determined
+to deliver appropriate entropy to the caller.
+
+However, we all know that the RNG also has deficiencies, which makes
+the appropriate use not entirely clear to everybody. In the past we heard
+about weak keys in embedded systems and the like. It is not the RNG's fault,
+but rather the problem of designers of such systems. Nonetheless, things
+could be easier with the use of the Linux RNG . In particular I met the
+following shortcomings over the years:
+
+* /dev/random is regarded as high-quality RNG as it is constantly reseeded,
+  but suffers from its blocking nature
+
+* there is no in-kernel equivalent for /dev/random -- i.e. how can you
+really
+  seed the DRNG that is present in the kernel crypto API with high quality
+  entropy?
+
+* at boot time the data /dev/random or /dev/urandom spits out is
+questionable
+  which requires a reseed during reboot. Also, that seed file must first be
+  written, which may not be trivial in all circumstances. For example, in
+  embedded systems or live CDs, this may be a challenge. Or what about
+system
+  outages -- there is no clean shutdown and no new seed file.
+
+* in virtual environments (i.e. the Linux kernel operates as guest),
+  /dev/random does not have access to all the devices to collect entropy.
+
+* when generating the key for full disk encryption configuration, there
+may be
+  limited entropy in the entropy pools
+
+* random.c contains complex processing which enlarges the device event
+  processing for every event
+
+In the patch, I try to provide an entropy collector without these
+shortcomings.
+The patch offers an entropy generator based on CPU timing jitter. The
+entropy
+collector has the following properties:
+
+* it does not maintain any state and therefore does not need any seed
+
+* it delivers entropy on demand with a throughput of about 100 kB/s and does
+  not block -- it performs a synchronous entropy generation for the caller
+
+* it should work well in virtualized environments
+
+* the heart of the entropy collector is about 10 lines of code and does not
+  use cryptography
+
+* an array of statistical test suites pass the output of the entropy
+collector
+  (again, the output is not mangled with cryptography)
+
+The design and concepts are documented in source code comments.
+
+The source code is available at [1]. The code can be compiled as kernel
+module
+as well as user space application. In case the code finds its way to the
+kernel, the user space code will be removed -- currently it remains to ease
+the analysis. To compile as kernel module, just run make. To compile as user
+space application, run make -f Makefile.user. Note, the user space part
+can also
+be used in user space libraries to avoid /dev/random.
+
+Is such entropy collector of interest for the kernel? Do you see weaknesses
+in the design or its implementation?
+
+In a recent discussion about the Linux RNG Theodore Ts'o indicated that
+in the long run, he would like to see an RNG based on AES
+(see http://lkml.org/lkml/2012/12/15/162).
+
+In addition to the entropy collector, the kernel module also includes a link
+to the kernel crypto API X9.31 DRNG based on AES. Two instances of the DRNG
+are maintained. The first instance is reseeded once in a while (after
+1024 bytes
+of random data) with the CPU jitter entropy. The second is reseeded with 16
+bytes of entropy when 16 bytes are read from the DRNG. The first DRNG
+therefore
+is a fast delivering DRNG which is information theoretical weaker than the
+second DRNG (which is much slower, but the information theoretical entropy
+equals about 1 bit per 1 bit of output).
+
+For testing purposes, debugfs interface files are implemented to read from
+the entropy collector and the two DRNGs. The test mode is triggered with the
+parameter "insmod jitterentropy.ko testmode=1". The interface files are
+/sys/kernel/debug/jitterentropy/[seed|drng|strong-drng].
+
+Detailed design description is given as comments in the source code file.
+
+Thanks
+Stephan
