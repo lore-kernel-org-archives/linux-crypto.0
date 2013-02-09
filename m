@@ -1,113 +1,52 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [RFC][PATCH] Entropy generator with 100 kB/s throughput
-Date: Fri, 08 Feb 2013 23:04:54 +0100
-Message-ID: <51157686.9000404@chronox.de>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [RFC][PATCH] Entropy generator with 100 kB/s throughput
+Date: Sat, 9 Feb 2013 13:06:29 -0500
+Message-ID: <20130209180629.GD8091@thunk.org>
+References: <51157686.9000404@chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: lkml <linux-kernel@vger.kernel.org>
-To: Ted Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from li9-11.members.linode.com ([67.18.176.11]:47530 "EHLO
+	imap.thunk.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1760774Ab3BISGd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 9 Feb 2013 13:06:33 -0500
+Content-Disposition: inline
+In-Reply-To: <51157686.9000404@chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi crypto hackers,
+On Fri, Feb 08, 2013 at 11:04:54PM +0100, Stephan Mueller wrote:
+> * an array of statistical test suites pass the output of the entropy
+> collector
+>   (again, the output is not mangled with cryptography)
 
-[1] patch at http://www.chronox.de/jitterentropy-0.1.tar.gz
+You're not mangling the output with cryptography, but you are doing
+some mangling in jitterentropy_cpu_jitter().
 
-The Linux kernel RNG which we all use via /dev/random or /dev/urandom
-received a lot of merits over the long years it exists. In particular
-it was subject to countless researches and assessments and was determined
-to deliver appropriate entropy to the caller.
+So let's be clear about what the heart of your entropy source is:
 
-However, we all know that the RNG also has deficiencies, which makes
-the appropriate use not entirely clear to everybody. In the past we heard
-about weak keys in embedded systems and the like. It is not the RNG's fault,
-but rather the problem of designers of such systems. Nonetheless, things
-could be easier with the use of the Linux RNG . In particular I met the
-following shortcomings over the years:
+You're getting the nanoseconds out of clock_gettime(CLOCK_REALTIME),
+and then mixing it using XOR and a ROL(3) into a 64-bit buffer, and
+interspersing the calls to clock_gettime() with schedule().
 
-* /dev/random is regarded as high-quality RNG as it is constantly reseeded,
-  but suffers from its blocking nature
+So what a code breaker at the NSA would probably try to do first is to
+measure is whether there is any kind of bias or non-entropy in the
+nanoseconds returned by CLOCK_REALTIME after calls to schedule().  If
+they can find any kind of bias, they can use that to calculate what
+kind of patterns or non-random bits might end up showing up after you
+do your non-cryptographic mangling.
 
-* there is no in-kernel equivalent for /dev/random -- i.e. how can you
-really
-  seed the DRNG that is present in the kernel crypto API with high quality
-  entropy?
+For that reasons, what I would suggest doing first is generate a
+series of outputs of jitterentropy_get_nstime() followed by
+schedule().  Look and see if there is any pattern.  That's the problem
+with the FIPS 140-2 tests.  Passing those tests are necessary, but
+*NOT* sufficient to prove that you have a good cryptographic
+generator.  Even the tiniest amount of post-processing, even if they
+aren't cryptographic, can result in an utterly predictable series of
+numbers to pass the FIPS 140-2 tests.
 
-* at boot time the data /dev/random or /dev/urandom spits out is
-questionable
-  which requires a reseed during reboot. Also, that seed file must first be
-  written, which may not be trivial in all circumstances. For example, in
-  embedded systems or live CDs, this may be a challenge. Or what about
-system
-  outages -- there is no clean shutdown and no new seed file.
+Regards,
 
-* in virtual environments (i.e. the Linux kernel operates as guest),
-  /dev/random does not have access to all the devices to collect entropy.
-
-* when generating the key for full disk encryption configuration, there
-may be
-  limited entropy in the entropy pools
-
-* random.c contains complex processing which enlarges the device event
-  processing for every event
-
-In the patch, I try to provide an entropy collector without these
-shortcomings.
-The patch offers an entropy generator based on CPU timing jitter. The
-entropy
-collector has the following properties:
-
-* it does not maintain any state and therefore does not need any seed
-
-* it delivers entropy on demand with a throughput of about 100 kB/s and does
-  not block -- it performs a synchronous entropy generation for the caller
-
-* it should work well in virtualized environments
-
-* the heart of the entropy collector is about 10 lines of code and does not
-  use cryptography
-
-* an array of statistical test suites pass the output of the entropy
-collector
-  (again, the output is not mangled with cryptography)
-
-The design and concepts are documented in source code comments.
-
-The source code is available at [1]. The code can be compiled as kernel
-module
-as well as user space application. In case the code finds its way to the
-kernel, the user space code will be removed -- currently it remains to ease
-the analysis. To compile as kernel module, just run make. To compile as user
-space application, run make -f Makefile.user. Note, the user space part
-can also
-be used in user space libraries to avoid /dev/random.
-
-Is such entropy collector of interest for the kernel? Do you see weaknesses
-in the design or its implementation?
-
-In a recent discussion about the Linux RNG Theodore Ts'o indicated that
-in the long run, he would like to see an RNG based on AES
-(see http://lkml.org/lkml/2012/12/15/162).
-
-In addition to the entropy collector, the kernel module also includes a link
-to the kernel crypto API X9.31 DRNG based on AES. Two instances of the DRNG
-are maintained. The first instance is reseeded once in a while (after
-1024 bytes
-of random data) with the CPU jitter entropy. The second is reseeded with 16
-bytes of entropy when 16 bytes are read from the DRNG. The first DRNG
-therefore
-is a fast delivering DRNG which is information theoretical weaker than the
-second DRNG (which is much slower, but the information theoretical entropy
-equals about 1 bit per 1 bit of output).
-
-For testing purposes, debugfs interface files are implemented to read from
-the entropy collector and the two DRNGs. The test mode is triggered with the
-parameter "insmod jitterentropy.ko testmode=1". The interface files are
-/sys/kernel/debug/jitterentropy/[seed|drng|strong-drng].
-
-Detailed design description is given as comments in the source code file.
-
-Thanks
-Stephan
+						- Ted
