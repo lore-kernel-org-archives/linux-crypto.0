@@ -1,52 +1,96 @@
-From: Theodore Ts'o <tytso@mit.edu>
+From: Jeff Epler <jepler@unpythonic.net>
 Subject: Re: [RFC][PATCH] Entropy generator with 100 kB/s throughput
-Date: Sat, 9 Feb 2013 13:06:29 -0500
-Message-ID: <20130209180629.GD8091@thunk.org>
+Date: Sat, 9 Feb 2013 19:57:51 -0600
+Message-ID: <20130210015751.GA13690@unpythonic.net>
 References: <51157686.9000404@chronox.de>
+ <20130209180629.GD8091@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from li9-11.members.linode.com ([67.18.176.11]:47530 "EHLO
-	imap.thunk.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760774Ab3BISGd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 9 Feb 2013 13:06:33 -0500
+To: Theodore Ts'o <tytso@mit.edu>,
+	Stephan Mueller <smueller@chronox.de>,
+	linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <51157686.9000404@chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20130209180629.GD8091@thunk.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 08, 2013 at 11:04:54PM +0100, Stephan Mueller wrote:
-> * an array of statistical test suites pass the output of the entropy
-> collector
->   (again, the output is not mangled with cryptography)
+On Sat, Feb 09, 2013 at 01:06:29PM -0500, Theodore Ts'o wrote:
+> For that reasons, what I would suggest doing first is generate a
+> series of outputs of jitterentropy_get_nstime() followed by
+> schedule().  Look and see if there is any pattern.  That's the problem
+> with the FIPS 140-2 tests.  Passing those tests are necessary, but
+> *NOT* sufficient to prove that you have a good cryptographic
+> generator.  Even the tiniest amount of post-processing, even if they
+> aren't cryptographic, can result in an utterly predictable series of
+> numbers to pass the FIPS 140-2 tests.
 
-You're not mangling the output with cryptography, but you are doing
-some mangling in jitterentropy_cpu_jitter().
+In fact, Stephan's 'xor and shift a counter' design, even with zero
+input entropy (a counter incrementing at a constant rate), passes FIPS
+and a surprising fraction of dieharder tests (though some of the tests,
+such as diehard_count_1s_str, have this generator dead to rights); it
+also gives an ent entropy well in excess of 7.9999 bits per byte.  This
+means it's hard to be confident that the entropy measured by ent is
+coming from the input entropy as opposed to the (exceedingly
+minimal-seeming on the surface!) amount of mixing done by the
+xor-and-shift...
 
-So let's be clear about what the heart of your entropy source is:
+It appears the entropy counted is equal to the log2 of the difference
+between successive samples (minus one?), but even if you have a good
+argument why the ones bit is unpredictable it doesn't seem an argument
+that applies as strongly to the weight-128 bit.
 
-You're getting the nanoseconds out of clock_gettime(CLOCK_REALTIME),
-and then mixing it using XOR and a ROL(3) into a 64-bit buffer, and
-interspersing the calls to clock_gettime() with schedule().
+When the jitterrand loop runs 10 times, the LSB of that first loop has
+only gotten up to the 30th bit, so there are 20+ MSBs of the register
+that have not yet had bits rolled into them that are 'entropic' under
+the definition being used.
 
-So what a code breaker at the NSA would probably try to do first is to
-measure is whether there is any kind of bias or non-entropy in the
-nanoseconds returned by CLOCK_REALTIME after calls to schedule().  If
-they can find any kind of bias, they can use that to calculate what
-kind of patterns or non-random bits might end up showing up after you
-do your non-cryptographic mangling.
+Finally, in the 'turbid' random number generator
+(http://www.av8n.com/turbid/), the author develops a
+concept of hash saturation.  He concludes that if you have a noise
+source with a known (or assumed!) entropy and a has function that is
+well-distributed over N bits, you'd better put in M > N bits of entropy
+in order to be confident that the output register has N bits.  He
+appears to suggest adding around 10 extra bits of randomness, or 74 bits
+randomness for a 64-bit hash, relatively indepently of the size of the
+hash.  This design gathers only 64 bits if you trust the input entropy
+calculation, which according to the hash saturation calculation means
+that the output will only have about 63.2 bits of randomness per 64
+bits output.
 
-For that reasons, what I would suggest doing first is generate a
-series of outputs of jitterentropy_get_nstime() followed by
-schedule().  Look and see if there is any pattern.  That's the problem
-with the FIPS 140-2 tests.  Passing those tests are necessary, but
-*NOT* sufficient to prove that you have a good cryptographic
-generator.  Even the tiniest amount of post-processing, even if they
-aren't cryptographic, can result in an utterly predictable series of
-numbers to pass the FIPS 140-2 tests.
 
-Regards,
+Here's my 'absolutely zero entropy' version of the jitter random
+algorithm as I understand it:
 
-						- Ted
+#include <stdint.h>
+#include <unistd.h>
+
+const uint64_t dt = 65309;
+uint64_t t, r;
+
+static inline uint64_t rol64(uint64_t word, unsigned int shift)
+{
+    return (word << shift) | (word >> (64 - shift));
+}
+
+uint64_t jitterrand() {
+    int i;
+    // each sample from the 'stuck counter' will be accounted as 7 bits of
+    // entropy, so 10 cycles to get >= 63 bits of randomness
+    for(i=0; i<10; i++) {
+        t += dt;
+        r = rol64(r ^ t, 3);
+    }
+    return r;
+}
+
+int main() {
+    while(1) {
+        uint64_t val = jitterrand();
+        ssize_t res = write(1, &val, sizeof(val));
+        if(res < 0) break;
+    }
+    return 0;
+}
+
+// Jeff
