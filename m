@@ -1,41 +1,52 @@
-From: Kumar Gala <galak@kernel.crashing.org>
-Subject: Re: [PATCHv1] crypto: caam - Added property fsl, sec-era in SEC4.0 device tree binding.
-Date: Tue, 12 Feb 2013 14:04:49 -0600
-Message-ID: <8E12AE5C-7927-458A-B563-F7FC39143DEF@kernel.crashing.org>
-References: <1358925668-10330-1-git-send-email-vakul@freescale.com>
-Mime-Version: 1.0 (Apple Message framework v1278)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: <linuxppc-dev@lists.ozlabs.org>,
-	<devicetree-discuss@lists.ozlabs.org>,
-	<linux-crypto@vger.kernel.org>
-To: Vakul Garg <vakul@freescale.com>
+From: Joel A Fernandes <agnel.joel@gmail.com>
+Subject: [PATCH 1/2] omap-sham: Use pm_runtime_put instead of pm_runtime_put_sync
+Date: Fri, 15 Feb 2013 01:59:27 -0600
+Message-ID: <1360915168-28786-1-git-send-email-agnel.joel@gmail.com>
+Cc: Joel A Fernandes <joelagnel@ti.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Mark A. Greer" <mgreer@animalcreek.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:40446 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750822Ab3BLUHR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Feb 2013 15:07:17 -0500
-In-Reply-To: <1358925668-10330-1-git-send-email-vakul@freescale.com>
+Received: from mail-oa0-f53.google.com ([209.85.219.53]:38324 "EHLO
+	mail-oa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932900Ab3BOIAv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Feb 2013 03:00:51 -0500
+Received: by mail-oa0-f53.google.com with SMTP id m1so3446415oag.26
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Feb 2013 00:00:51 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Joel A Fernandes <joelagnel@ti.com>
 
-On Jan 23, 2013, at 1:21 AM, Vakul Garg wrote:
+Not doing so could cause sleep in interrupt context resulting in a kernel panic.
 
-> This new property defines the era of the particular SEC version.
-> The compatible property in device tree "crypto" node has been updated
-> not to contain SEC era numbers.
-> 
-> Signed-off-by: Vakul Garg <vakul@freescale.com>
-> ---
-> Changelog:
-> 	1. Marked fsl,sec-era as 'optional'.
-> 
-> .../devicetree/bindings/crypto/fsl-sec4.txt        |   12 +++++++++---
-> 1 files changed, 9 insertions(+), 3 deletions(-)
+Tested on an AM33xx SoC device (beaglebone board).
 
-applied to next.
+To reproduce the problem, I used the tcrypt kernel module as:
+modprobe tcrypt sec=2 mode=403
 
-I assume this supersedes http://patchwork.ozlabs.org/patch/204431/
+Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Mark A. Greer <mgreer@animalcreek.com>
+---
+ drivers/crypto/omap-sham.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-- k
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index edff981..b8bb583 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -923,7 +923,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
+ 	dd->flags &= ~(BIT(FLAGS_BUSY) | BIT(FLAGS_FINAL) | BIT(FLAGS_CPU) |
+ 			BIT(FLAGS_DMA_READY) | BIT(FLAGS_OUTPUT_READY));
+ 
+-	pm_runtime_put_sync(dd->dev);
++	pm_runtime_put(dd->dev);
+ 
+ 	if (req->base.complete)
+ 		req->base.complete(&req->base, err);
+-- 
+1.7.4.1
