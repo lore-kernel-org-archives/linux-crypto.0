@@ -1,54 +1,38 @@
-From: Joel A Fernandes <agnel.joel@gmail.com>
-Subject: [PATCH 2/2] omap-aes: Use pm_runtime_put instead of pm_runtime_put_sync
-Date: Fri, 15 Feb 2013 01:59:28 -0600
-Message-ID: <1360915168-28786-2-git-send-email-agnel.joel@gmail.com>
-References: <1360915168-28786-1-git-send-email-agnel.joel@gmail.com>
-Cc: Joel A Fernandes <joelagnel@ti.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCHv2 0/3] crypto user API fixes
+Date: Tue, 19 Feb 2013 20:27:55 +0800
+Message-ID: <20130219122754.GA16499@gondor.apana.org.au>
+References: <1360084755-11044-1-git-send-email-minipli@googlemail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-crypto@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f180.google.com ([209.85.214.180]:49930 "EHLO
-	mail-ob0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932900Ab3BOIBA (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:37881 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754510Ab3BSM2G (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Feb 2013 03:01:00 -0500
-Received: by mail-ob0-f180.google.com with SMTP id ef5so3358760obb.11
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Feb 2013 00:00:59 -0800 (PST)
-In-Reply-To: <1360915168-28786-1-git-send-email-agnel.joel@gmail.com>
+	Tue, 19 Feb 2013 07:28:06 -0500
+Content-Disposition: inline
+In-Reply-To: <1360084755-11044-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Joel A Fernandes <joelagnel@ti.com>
+On Tue, Feb 05, 2013 at 06:19:12PM +0100, Mathias Krause wrote:
+> This series fixes kernel memory disclosures (aka info leaks) and a bug
+> in the empty string test. In addition to the first version of this
+> series it also ensures all user supplied strings are nul-terminated
+> before using them.
+> 
+> Patch 1 is the same as in the first series, patch 2 was changed as
+> suggested by Herbert, patch 3 is new.
+> 
+> Please apply!
 
-Not doing so could cause sleep in interrupt context resulting in a kernel panic.
-
-Tested on an AM33xx SoC device (beaglebone board).
-
-To reproduce the problem, I used the tcrypt kernel module as:
-modprobe tcrypt sec=2 mode=500
-
-Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Mark A. Greer <mgreer@animalcreek.com>
----
- drivers/crypto/omap-aes.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index cf57866..8450bfd2 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -636,7 +636,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 
- 	pr_debug("err: %d\n", err);
- 
--	pm_runtime_put_sync(dd->dev);
-+	pm_runtime_put(dd->dev);
- 	dd->flags &= ~FLAGS_BUSY;
- 
- 	req->base.complete(&req->base, err);
+All applied to crypto.  Thanks!
 -- 
-1.7.4.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
