@@ -1,143 +1,47 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 2/3] crypto: sahara: Add driver for SAHARA2 accelerator.
-Date: Thu, 21 Feb 2013 13:13:45 +0000
-Message-ID: <201302211313.46078.arnd@arndb.de>
-References: <1361449162-27302-1-git-send-email-javier.martin@vista-silicon.com> <1361449162-27302-3-git-send-email-javier.martin@vista-silicon.com>
+From: Phil Carmody <pc+lkml@asdf.org>
+Subject: Re: [RFC][PATCH] Entropy generator with 100 kB/s throughput
+Date: Thu, 21 Feb 2013 16:07:12 +0200
+Message-ID: <20130221140712.GA11550@fatphil.org>
+References: <51157686.9000404@chronox.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Cc: kernel@pengutronix.de, herbert@gondor.apana.org.au,
-	davem@davemloft.net, tony@atomide.com, swarren@nvidia.com,
-	shawn.guo@linaro.org, gcembed@gmail.com,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Javier Martin <javier.martin@vista-silicon.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: smueller@chronox.de
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.186]:61773 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752950Ab3BUNOF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Feb 2013 08:14:05 -0500
-In-Reply-To: <1361449162-27302-3-git-send-email-javier.martin@vista-silicon.com>
+Received: from 87-119-183-129.tll.elisa.ee ([87.119.183.129]:37745 "EHLO
+	fatphil.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752297Ab3BUOSJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 21 Feb 2013 09:18:09 -0500
+Content-Disposition: inline
+In-Reply-To: <51157686.9000404@chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday 21 February 2013, Javier Martin wrote:
-> +
-> +struct sahara_dev {
-> +	struct device		*device;
-> +	void __iomem		*regs_base;
-> +	struct clk		*clk_ipg;
-> +	struct clk		*clk_ahb;
-> +
-> +	struct sahara_ctx	*ctx;
-> +	spinlock_t		lock;
-> +	struct crypto_queue	queue;
-> +	unsigned long		flags;
-> +
-> +	struct tasklet_struct	done_task;
-> +	struct tasklet_struct	queue_task;
-> +
-> +	struct sahara_hw_desc	*hw_desc[SAHARA_MAX_HW_DESC];
-> +	dma_addr_t		hw_phys_desc[SAHARA_MAX_HW_DESC];
-> +
-> +	u8			*key_base;
-> +	dma_addr_t		key_phys_base;
-> +
-> +	u8			*iv_base;
-> +	dma_addr_t		iv_phys_base;
-> +
-> +	struct sahara_hw_link	*hw_link[SAHARA_MAX_HW_LINK];
-> +	dma_addr_t		hw_phys_link[SAHARA_MAX_HW_LINK];
-> +
-> +	struct ablkcipher_request *req;
-> +	size_t			total;
-> +	struct scatterlist	*in_sg;
-> +	unsigned int		nb_in_sg;
-> +	struct scatterlist	*out_sg;
-> +	unsigned int		nb_out_sg;
-> +
-> +	u32			error;
-> +	struct timer_list	watchdog;
-> +};
-> +
-> +static struct sahara_dev *dev_ptr;
+Apologies if this is misthreaded, I had to hand-craft the headers.
 
-Please remove this global device pointer, it should not be needed, since you
-can store the pointer in the context object.
+> The patch offers an entropy generator based on CPU timing jitter. The 
+> entropy collector has the following properties:
+> 
+> * it does not maintain any state and therefore does not need any seed
 
+What is this "pool" if it's not "state"?
 
-> +#ifdef DEBUG
-> +
-> +static char *sahara_state[4] = { "Idle", "Busy", "Error", "HW Fault" };
-> +
-> +static void sahara_decode_status(struct sahara_dev *dev, unsigned int status)
-> +{
-> +	u8 state = SAHARA_STATUS_GET_STATE(status);
+> /* Entropy pool of the RNG which is filled upon each request for entropy */
+> struct rand_data
 
-You can simplify the code a lot if you replace the #ifdef around the function
-with an
+And, from looking at jitterentropy_entropy_calc(), it seems to think that
+the [source producing the] following sequence of timestamps:
 
-	if (!IS_ENBLED(DEBUG))
-		return;
+1000, 1010, 1030, 1050, 1060, 1080, 1090, 1110, 1120, ...
+i.e. with absolutely metronomic deltas of 10, 20, 10, 20, 10, 20, ...
 
-at the start of the function. That will lead to gcc completely removing the
-code an everything referenced by it.
+has 4 bit of entropy per reading. I hope I don't have to explicitly say
+that it clearly it has 0 bits of entropy.
 
-
-> +static void sahara_aes_done_task(unsigned long data)
-> +{
-> +	struct sahara_dev *dev = (struct sahara_dev *)data;
-> +	unsigned long flags;
-> +
-> +	dma_unmap_sg(dev->device, dev->out_sg, dev->nb_out_sg,
-> +		DMA_TO_DEVICE);
-> +	dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
-> +		DMA_FROM_DEVICE);
-> +
-> +	spin_lock_irqsave(&dev->lock, flags);
-> +	clear_bit(FLAGS_BUSY, &dev->flags);
-> +	spin_unlock_irqrestore(&dev->lock, flags);
-> +
-> +	dev->req->base.complete(&dev->req->base, dev->error);
-> +}
-
-Does dev->lock have to be irq-disabled? You don't seem to take it
-from an interrupt handler.
-
-Also, when you know that code is called without irqs enabled and
-you just want to disable them, you can use the cheaper spin_lock_irq()
-rather than spin_lock_irqsave().
-
-In short, use either spin_lock_irq or spin_lock here. When protecting
-against a tasklet, you will need spin_lock_bh.
-
-> +
-> +void sahara_watchdog(unsigned long data)
-> +{
-> +	struct sahara_dev *dev = (struct sahara_dev *)data;
-> +	unsigned int err = sahara_read(dev, SAHARA_REG_ERRSTATUS);
-> +#ifdef DEBUG
-> +	unsigned int stat = sahara_read(dev, SAHARA_REG_STATUS);
-> +	sahara_decode_status(dev, stat);
-> +#endif
-
-When you kill off the #ifdef, you should move this sahara_read()
-call into the sahara_decode_status() function so it gets
-compiled conditionally.
-
-> +static struct platform_device_id sahara_platform_ids[] = {
-> +	{ .name = "sahara-imx27" },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(platform, sahara_platform_ids);
-
-You are missing the of_device_ids here. We probably don't even
-need the platform_device_id list and can instead mandate that
-this is only used by platforms that are already converted to
-DT booting.
-
-Please also add a DT binding document for this driver that mentions
-the name and the resources that need to be provided.
-
-	Arnd
+Entropy harvesting is quite hard - entropy estimation is unimaginably harder.
+Phil
+-- 
+"In a world of magnets and miracles" 
+-- Insane Clown Posse, Miracles, 2009. Much derided.
+"Magnets, how do they work"
+-- Pink Floyd, High Hopes, 1994. Lauded as lyrical geniuses.
