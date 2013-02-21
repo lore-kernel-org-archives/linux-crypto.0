@@ -1,56 +1,40 @@
-From: Javier Martin <javier.martin@vista-silicon.com>
-Subject: [PATCH 3/3] Visstrim M10: Add support for SAHARA2 module.
-Date: Thu, 21 Feb 2013 13:19:22 +0100
-Message-ID: <1361449162-27302-4-git-send-email-javier.martin@vista-silicon.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 0/3] crypto: sahara: Add support for SAHARA in i.MX27.
+Date: Thu, 21 Feb 2013 12:59:26 +0000
+Message-ID: <201302211259.26763.arnd@arndb.de>
 References: <1361449162-27302-1-git-send-email-javier.martin@vista-silicon.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, tony@atomide.com,
-	swarren@nvidia.com, shawn.guo@linaro.org, gcembed@gmail.com,
-	arnd@arndb.de, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Javier Martin <javier.martin@vista-silicon.com>
-To: kernel@pengutronix.de
+Mime-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Cc: kernel@pengutronix.de, herbert@gondor.apana.org.au,
+	davem@davemloft.net, tony@atomide.com, swarren@nvidia.com,
+	shawn.guo@linaro.org, gcembed@gmail.com,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Javier Martin <javier.martin@vista-silicon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:42009 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753766Ab3BUMTj (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.10]:49827 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752332Ab3BUM7t (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Feb 2013 07:19:39 -0500
-Received: by mail-we0-f176.google.com with SMTP id s43so7353882wey.7
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Feb 2013 04:19:37 -0800 (PST)
+	Thu, 21 Feb 2013 07:59:49 -0500
 In-Reply-To: <1361449162-27302-1-git-send-email-javier.martin@vista-silicon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Thursday 21 February 2013, Javier Martin wrote:
+> This series of patches provide AES-ECB and AES-CBC support
+> for the SAHARA2 cryptographic accelerator which is inside the i.MX27 SoC.
+> It is expected that more algorithms will be supported in the future.
+> 
+> For testing, a Visstrim M10 board has been used and the code related
+> to this platform has been included too.
 
-Signed-off-by: Javier Martin <javier.martin@vista-silicon.com>
----
- arch/arm/mach-imx/Kconfig                   |    1 +
- arch/arm/mach-imx/mach-imx27_visstrim_m10.c |    1 +
- 2 files changed, 2 insertions(+)
+As a new device driver, this needs to be supported on the DT based imx27
+machines, while support for the individual board files seems unnecessary.
 
-diff --git a/arch/arm/mach-imx/Kconfig b/arch/arm/mach-imx/Kconfig
-index 1ad0d76..d232a56 100644
---- a/arch/arm/mach-imx/Kconfig
-+++ b/arch/arm/mach-imx/Kconfig
-@@ -402,6 +402,7 @@ config MACH_IMX27_VISSTRIM_M10
- 	select IMX_HAVE_PLATFORM_IMX_UART
- 	select IMX_HAVE_PLATFORM_MX2_CAMERA
- 	select IMX_HAVE_PLATFORM_MX2_EMMA
-+	select IMX_HAVE_PLATFORM_IMX27_SAHARA
- 	select IMX_HAVE_PLATFORM_MXC_EHCI
- 	select IMX_HAVE_PLATFORM_MXC_MMC
- 	select LEDS_GPIO_REGISTER
-diff --git a/arch/arm/mach-imx/mach-imx27_visstrim_m10.c b/arch/arm/mach-imx/mach-imx27_visstrim_m10.c
-index 318bd8d..b051592 100644
---- a/arch/arm/mach-imx/mach-imx27_visstrim_m10.c
-+++ b/arch/arm/mach-imx/mach-imx27_visstrim_m10.c
-@@ -565,6 +565,7 @@ static void __init visstrim_m10_board_init(void)
- 	imx27_add_mxc_mmc(0, &visstrim_m10_sdhc_pdata);
- 	imx27_add_mxc_ehci_otg(&visstrim_m10_usbotg_pdata);
- 	imx27_add_fec(NULL);
-+	imx27_add_sahara();
- 	imx_add_gpio_keys(&visstrim_gpio_keys_platform_data);
- 	platform_add_devices(platform_devices, ARRAY_SIZE(platform_devices));
- 	imx_add_platform_device("mx27vis", 0, NULL, 0, &snd_mx27vis_pdata,
--- 
-1.7.9.5
+How about converting the Visstrim M10 board file over to DT so you don't
+have to add any more infrastructure for imx that we will just have to
+remove again one day?
+
+	Arnd
