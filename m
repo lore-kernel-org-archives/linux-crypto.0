@@ -1,54 +1,51 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [RFC][PATCH] Entropy generator with 100 kB/s throughput
-Date: Thu, 21 Feb 2013 12:46:45 -0500
-Message-ID: <CACXcFmnBNHab57dzx+QdqS=BTbUPCJo4zkztCw7W2Yfab+m5ow@mail.gmail.com>
-References: <20130221140712.GA11550@fatphil.org>
-	<51262C62.4040707@chronox.de>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH] Update the links to the white papers on CRC32C
+ calculations with PCLMULQDQ instructions.
+Date: Thu, 21 Feb 2013 11:04:22 -0800
+Message-ID: <1361473462.17632.202.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Phil Carmody <pc+lkml@asdf.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <51262C62.4040707@chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 21, 2013 at 9:17 AM, Stephan Mueller <smueller@chronox.de> wrote:
+Herbert,
 
-> There is no state between calls. Of course, you need a scratchpad to do
-> calculations.
+The following patch update the stale link to the CRC32C white paper 
+that was referenced.
 
-But in general you need a buffer. It is quite easy to construct scenarios where
-several K bits of entropy are needed very -- for example, reboot an IPsec
-gateway the supports a few dozen tunnels and needs a few hundred bits
-to rekey each. Without state, it is quite difficult to demonstrate that you can
-meet such requirements. Given a reasonable size of buffer, some saved
-random data and the assumption that the enemy does not already have
-root on your server, it is trivial.
+Tim
 
-> ... I am working on showing that the jitter has entropy. I
-> will come back.
 
-I think that has already been shown. See the McGuire et al. paper
-I cited earlier in the thread and the HAVEGE papers. Of course it
-needs more analysis to be sure we have really good estimates of
-that entropy, but it seems clear there is some at any rate.
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
->> Entropy harvesting is quite hard - entropy estimation is unimaginably harder.
-
-Yes.
-
-> This is a statement that does not make sense. You CANNOT per definition
-> calculate entropy!
-
-The question is not /calculating/ it, but /estimating/ it. That is a perfectly
-reasonable thing to do, and it is done in most generators. It is a hard
-problem, though, and requires care in both design and implementation.
-
-Also, in some designs it is possible to get very close to calculating
-entropy. The Turbid generator, for example, uses physical measurements
-of sound card properties plus arguments from standard circuit physics to
-prove a lower bound on the Johnson noise that must exist in the circuit.
->From that plus some quite moderate assumptions about properties of
-the hash, you get a provable lower bound on output entropy.
+diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+index 93c6d39..f3f1e42 100644
+--- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
++++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+@@ -1,9 +1,10 @@
+ /*
+  * Implement fast CRC32C with PCLMULQDQ instructions. (x86_64)
+  *
+- * The white paper on CRC32C calculations with PCLMULQDQ instruction can be
++ * The white papers on CRC32C calculations with PCLMULQDQ instruction can be
+  * downloaded from:
+- * http://download.intel.com/design/intarch/papers/323405.pdf
++ * http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/crc-iscsi-polynomial-crc32-instruction-paper.pdf
++ * http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-paper.pdf
+  *
+  * Copyright (C) 2012 Intel Corporation.
+  *
+-- 
+1.7.6.5
