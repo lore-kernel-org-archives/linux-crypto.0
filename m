@@ -1,52 +1,58 @@
-From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
-Subject: Re: [PATCH 0/3] crypto: sahara: Add support for SAHARA in i.MX27.
-Date: Thu, 21 Feb 2013 21:59:29 +0100
-Message-ID: <87a9qxjscu.fsf@lebrac.rtp-net.org>
-References: <1361449162-27302-1-git-send-email-javier.martin@vista-silicon.com>
-	<201302211259.26763.arnd@arndb.de>
-	<CACKLOr1-EPK=DLz0SY+1E35qSMdtCsueuqdzV4VZdbkoM+TD6A@mail.gmail.com>
-	<201302211440.59577.arnd@arndb.de>
-	<20130221152310.GA1906@pengutronix.de>
-	<CAOMZO5Cw4fKY_hjtZtvR1sKFY8GvQMVN2RcRCS99FVRerS-Acg@mail.gmail.com>
-	<87ehg9k4cm.fsf@lebrac.rtp-net.org>
-	<CAOMZO5BrNU0mr1snG1ftiFD-=FuWfu=1_Lgi5_Q+uBxJzz1CYA@mail.gmail.com>
+From: Nick Kossifidis <mickflemm@gmail.com>
+Subject: Re: [RFC][PATCH] Entropy generator with 100 kB/s throughput
+Date: Fri, 22 Feb 2013 13:14:14 +0200
+Message-ID: <CAFtRNNxb+o0P2wpu=k7r_V_rNr8PQf_44emqku_64QD6Ox7p6Q@mail.gmail.com>
+References: <51157686.9000404@chronox.de>
+	<CAFtRNNzcUpxT3R6ttUJ0c-7QTVRxbwRVq6bPqvkSL93vbstT4g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sascha Hauer <s.hauer@pengutronix.de>, gcembed@gmail.com,
-	swarren@nvidia.com, herbert@gondor.apana.org.au,
-	Arnd Bergmann <arnd@arndb.de>, tony@atomide.com,
-	javier Martin <javier.martin@vista-silicon.com>,
-	kernel@pengutronix.de, shawn.guo@linaro.org, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Fabio Estevam <festevam@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: "Ted Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+	lkml <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lebrac.rtp-net.org ([88.191.135.105]:47667 "EHLO
-	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753709Ab3BUVBY (ORCPT
+Received: from mail-ve0-f171.google.com ([209.85.128.171]:58371 "EHLO
+	mail-ve0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756026Ab3BVLOP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Feb 2013 16:01:24 -0500
-In-Reply-To: <CAOMZO5BrNU0mr1snG1ftiFD-=FuWfu=1_Lgi5_Q+uBxJzz1CYA@mail.gmail.com>
-	(Fabio Estevam's message of "Thu, 21 Feb 2013 13:47:23 -0300")
+	Fri, 22 Feb 2013 06:14:15 -0500
+In-Reply-To: <CAFtRNNzcUpxT3R6ttUJ0c-7QTVRxbwRVq6bPqvkSL93vbstT4g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fabio Estevam <festevam@gmail.com> writes:
+I'm so sorry, something went terribly wrong with gmail/thunderbird :-(
 
-Hi,
-
-> On Thu, Feb 21, 2013 at 1:40 PM, Arnaud Patard
-> <arnaud.patard@rtp-net.org> wrote:
+2013/2/22 Nick Kossifidis <mickflemm@gmail.com>:
+> Hello all,
 >
->> How different are the variants ? I've a imx51 device with DT support so
->> if someone running sahara on a system with DT is needed, I can be this
->> person (as long as a way to test it is provided too).
+> It's nice to see there is still discussion on the matter of using cpu
+> timings for entropy. In general using cpu timings for gathering entropy is a
+> nice idea but it's not that unpredictable. If someone can profile the system
+> he/she can get enough infos to predict (to some point) the generator's
+> outcome, especially during boot/reboot. You might pass the tests on a single
+> run but if you try to compare the runs e.g. when booting the system multiple
+> times you'll see they are correlated.
 >
-> mx27 has Saharav2, mx51 has Saharav4. I didn't check the differences
-> in detail though.
+> Take a look at this:
 >
-> For mx51 the Sahara block is described in the document "MCIMX51
-> Applications Processor Security Reference Manual, Rev. 1"
+> http://dl.dropbox.com/u/11670313/runtime-data.tar.bz2
+>
+> It's the output of this patch, before passing data to the entropy pool (btw
+> did anyone review this patch or should I resend it ?):
+>
+> https://patchwork.kernel.org/patch/1759821/
+>
+> If you plot the datasets you'll see e.g. that across reboots you get a very
+> similar distribution. It is somehow different across boots but still there
+> is some correlation there too, notice the difference when fsck runs, still
+> not much.
+>
+> The distribution is good in general, for mixing it with the rest in the
+> system's entropy pool, but on its own I don't think it's enough, especially
+> without crypto post-processing.
 
-Sorry but this document is not freely available so I can't look at it.
 
-Arnaud
+
+-- 
+GPG ID: 0xEE878588
+As you read this post global entropy rises. Have Fun ;-)
+Nick
