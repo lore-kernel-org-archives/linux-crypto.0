@@ -1,53 +1,59 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH] crypto: user - constify netlink dispatch table
-Date: Sun, 24 Feb 2013 14:09:12 +0100
-Message-ID: <1361711352-7795-1-git-send-email-minipli@googlemail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+Subject: [PATCH] crypto: bfin_crc: Fix possible NULL pointer dereference
+Date: Mon, 25 Feb 2013 03:57:39 +0530
+Message-ID: <1361744859-28310-1-git-send-email-s.syam@samsung.com>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+	syamsidhardh@gmail.com
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bk0-f47.google.com ([209.85.214.47]:61845 "EHLO
-	mail-bk0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755868Ab3BXNJV (ORCPT
+Received: from mail-pa0-f48.google.com ([209.85.220.48]:55090 "EHLO
+	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758625Ab3BXW14 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Feb 2013 08:09:21 -0500
-Received: by mail-bk0-f47.google.com with SMTP id jc3so895132bkc.34
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Feb 2013 05:09:19 -0800 (PST)
+	Sun, 24 Feb 2013 17:27:56 -0500
+Received: by mail-pa0-f48.google.com with SMTP id hz10so1380317pad.35
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Feb 2013 14:27:55 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There is no need to modify the netlink dispatch table at runtime and
-making it const even makes the resulting object file slightly smaller.
+If we define dev_dbg(), then there is a possible NULL pointer
+dereference.
 
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
- crypto/crypto_user.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/bfin_crc.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 35d700a..77f6c4e 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -426,7 +426,7 @@ static const struct nla_policy crypto_policy[CRYPTOCFGA_MAX+1] = {
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index 827913d..d797f31 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -151,7 +151,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
+ 	struct bfin_crypto_crc_reqctx *ctx = ahash_request_ctx(req);
+ 	struct bfin_crypto_crc *crc;
  
- #undef MSGSIZE
+-	dev_dbg(crc->dev, "crc_init\n");
++	dev_dbg(ctx->crc->dev, "crc_init\n");
+ 	spin_lock_bh(&crc_list.lock);
+ 	list_for_each_entry(crc, &crc_list.dev_list, list) {
+ 		crc_ctx->crc = crc;
+@@ -160,7 +160,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
+ 	spin_unlock_bh(&crc_list.lock);
  
--static struct crypto_link {
-+static const struct crypto_link {
- 	int (*doit)(struct sk_buff *, struct nlmsghdr *, struct nlattr **);
- 	int (*dump)(struct sk_buff *, struct netlink_callback *);
- 	int (*done)(struct netlink_callback *);
-@@ -442,7 +442,7 @@ static struct crypto_link {
- static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
- {
- 	struct nlattr *attrs[CRYPTOCFGA_MAX+1];
--	struct crypto_link *link;
-+	const struct crypto_link *link;
- 	int type, err;
+ 	if (sg_count(req->src) > CRC_MAX_DMA_DESC) {
+-		dev_dbg(crc->dev, "init: requested sg list is too big > %d\n",
++		dev_dbg(ctx->crc->dev, "init: requested sg list is too big > %d\n",
+ 			CRC_MAX_DMA_DESC);
+ 		return -EINVAL;
+ 	}
+@@ -175,7 +175,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
+ 	/* init crc results */
+ 	put_unaligned_le32(crc_ctx->key, req->result);
  
- 	type = nlh->nlmsg_type;
+-	dev_dbg(crc->dev, "init: digest size: %d\n",
++	dev_dbg(ctx->crc->dev, "init: digest size: %d\n",
+ 		crypto_ahash_digestsize(tfm));
+ 
+ 	return bfin_crypto_crc_init_hw(crc, crc_ctx->key);
 -- 
-1.7.10.4
+1.7.9.5
