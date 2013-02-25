@@ -1,59 +1,89 @@
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-Subject: [PATCH] crypto: bfin_crc: Fix possible NULL pointer dereference
-Date: Mon, 25 Feb 2013 03:57:39 +0530
-Message-ID: <1361744859-28310-1-git-send-email-s.syam@samsung.com>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	syamsidhardh@gmail.com
-To: linux-crypto@vger.kernel.org
+From: Alexander Holler <holler@ahsoftware.de>
+Subject: [PATCH] crypto: Ignore validity dates of X.509 certificates by default
+Date: Mon, 25 Feb 2013 18:40:26 +0100
+Message-ID: <1361814026-4734-1-git-send-email-holler@ahsoftware.de>
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Holler <holler@ahsoftware.de>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:55090 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758625Ab3BXW14 (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:42919 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754600Ab3BYRnw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Feb 2013 17:27:56 -0500
-Received: by mail-pa0-f48.google.com with SMTP id hz10so1380317pad.35
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Feb 2013 14:27:55 -0800 (PST)
+	Mon, 25 Feb 2013 12:43:52 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If we define dev_dbg(), then there is a possible NULL pointer
-dereference.
+I don't see any real use case where checking the validity dates of X.509
+certificates at parsing time adds any security gain. In contrast, doing so
+makes MODSIGN unusable on systems without a RTC (or systems with a possible
+wrong date in a existing RTC or systems where the RTC is read after the keys
+got loaded).
 
-Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+So just disable checking the dates in the parser by default.
+
+(In fact I even think the check in the parser should be deleted at all,
+because those dates should be checked at the time of usage and not at
+parsing time, if someone really cares about these dates.)
+
+Signed-off-by: Alexander Holler <holler@ahsoftware.de>
 ---
- drivers/crypto/bfin_crc.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ crypto/asymmetric_keys/Kconfig           | 10 ++++++++++
+ crypto/asymmetric_keys/x509_public_key.c |  4 ++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index 827913d..d797f31 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -151,7 +151,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
- 	struct bfin_crypto_crc_reqctx *ctx = ahash_request_ctx(req);
- 	struct bfin_crypto_crc *crc;
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 6d2c2ea..333976f 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -35,4 +35,14 @@ config X509_CERTIFICATE_PARSER
+ 	  data and provides the ability to instantiate a crypto key from a
+ 	  public key packet found inside the certificate.
  
--	dev_dbg(crc->dev, "crc_init\n");
-+	dev_dbg(ctx->crc->dev, "crc_init\n");
- 	spin_lock_bh(&crc_list.lock);
- 	list_for_each_entry(crc, &crc_list.dev_list, list) {
- 		crc_ctx->crc = crc;
-@@ -160,7 +160,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
- 	spin_unlock_bh(&crc_list.lock);
- 
- 	if (sg_count(req->src) > CRC_MAX_DMA_DESC) {
--		dev_dbg(crc->dev, "init: requested sg list is too big > %d\n",
-+		dev_dbg(ctx->crc->dev, "init: requested sg list is too big > %d\n",
- 			CRC_MAX_DMA_DESC);
- 		return -EINVAL;
++config X509_CERTIFICATE_PARSER_IGNORE_DATES
++	bool "Ignore validity dates of X.509 certificates in the parser"
++	depends on X509_CERTIFICATE_PARSER
++	default y
++	help
++	  Ignore the validity dates in X.509 certificates (Not Before
++	  and Not After) when they get parsed. Otherwise loading them will
++	  fail when the time is set wrong (which is e.g. a problem at startup
++	  on systems without a RTC).
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 06007f0..c9a73e2 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -106,7 +106,9 @@ error_no_sig:
+ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ {
+ 	struct x509_certificate *cert;
++#if !defined(CONFIG_X509_CERTIFICATE_PARSER_IGNORE_DATES)
+ 	struct tm now;
++#endif
+ 	size_t srlen, sulen;
+ 	char *desc = NULL;
+ 	int ret;
+@@ -137,6 +139,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 		goto error_free_cert;
  	}
-@@ -175,7 +175,7 @@ static int bfin_crypto_crc_init(struct ahash_request *req)
- 	/* init crc results */
- 	put_unaligned_le32(crc_ctx->key, req->result);
  
--	dev_dbg(crc->dev, "init: digest size: %d\n",
-+	dev_dbg(ctx->crc->dev, "init: digest size: %d\n",
- 		crypto_ahash_digestsize(tfm));
++#if !defined(CONFIG_X509_CERTIFICATE_PARSER_IGNORE_DATES)
+ 	time_to_tm(CURRENT_TIME.tv_sec, 0, &now);
+ 	pr_devel("Now: %04ld-%02d-%02d %02d:%02d:%02d\n",
+ 		 now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+@@ -173,6 +176,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 		ret = -EKEYEXPIRED;
+ 		goto error_free_cert;
+ 	}
++#endif
  
- 	return bfin_crypto_crc_init_hw(crc, crc_ctx->key);
+ 	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
+ 	cert->pub->id_type = PKEY_ID_X509;
 -- 
-1.7.9.5
+1.8.1.2
