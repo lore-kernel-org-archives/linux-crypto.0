@@ -1,59 +1,60 @@
-From: agnel.joel@gmail.com
-Subject: [PATCH v3 2/2] omap-aes: Use pm_runtime_put instead of pm_runtime_put_sync in tasklet
-Date: Tue, 26 Feb 2013 10:04:32 -0600
-Message-ID: <1361894672-10431-2-git-send-email-agnel.joel@gmail.com>
-References: <1361894672-10431-1-git-send-email-agnel.joel@gmail.com>
-Cc: Joel A Fernandes <joelagnel@ti.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH 2/3 v2] Optimize CRC32C calculation with PCLMULQDQ
+ instruction
+Date: Tue, 26 Feb 2013 08:57:41 -0800
+Message-ID: <1361897861.17632.222.camel@schen9-DESK>
+References: <cover.1348784343.git.tim.c.chen@linux.intel.com>
+	 <1348785862.17632.17.camel@schen9-DESK>
+	 <20130226095424.GA19924@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: linux-crypto@vger.kernel.org
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Chaohong Guo <chaohong.guo@intel.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Min Li <min.a.li@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Fengguang Wu <fengguang.wu@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:61016 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759760Ab3BZQEx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Feb 2013 11:04:53 -0500
-Received: by mail-pa0-f47.google.com with SMTP id bj3so2520827pad.6
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Feb 2013 08:04:53 -0800 (PST)
-In-Reply-To: <1361894672-10431-1-git-send-email-agnel.joel@gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:57412 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751833Ab3BZQ5k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Feb 2013 11:57:40 -0500
+In-Reply-To: <20130226095424.GA19924@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Joel A Fernandes <joelagnel@ti.com>
+On Tue, 2013-02-26 at 17:54 +0800, Herbert Xu wrote:
+> On Thu, Sep 27, 2012 at 03:44:22PM -0700, Tim Chen wrote:
+> > This patch adds the crc_pcl function that calculates CRC32C checksum using the
+> > PCLMULQDQ instruction on processors that support this feature. This will
+> > provide speedup over using CRC32 instruction only.
+> > The usage of PCLMULQDQ necessitate the invocation of kernel_fpu_begin and
+> > kernel_fpu_end and incur some overhead.  So the new crc_pcl function is only
+> > invoked for buffer size of 512 bytes or more.  Larger sized
+> > buffers will expect to see greater speedup.  This feature is best used coupled
+> > with eager_fpu which reduces the kernel_fpu_begin/end overhead.  For
+> > buffer size of 1K the speedup is around 1.6x and for buffer size greater than
+> > 4K, the speedup is around 3x compared to original implementation in crc32c-intel
+> > module. Test was performed on Sandy Bridge based platform with constant frequency
+> > set for cpu.
+> > 
+> > A white paper detailing the algorithm can be found here:
+> > http://download.intel.com/design/intarch/papers/323405.pdf
+> > 
+> > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-After DMA is complete, the omap_aes_finish_req function is called as
-a part of the done_task tasklet. During this its atomic and any calls
-to pm functions should not assume they wont sleep.
+Acked.  
 
-The patch replaces a call to pm_runtime_put_sync (which can sleep) with
-pm_runtime_put thus fixing a kernel panic observed on AM33xx SoC during
-AES operation.
+BTW, Herbert, I've also sent you a patch a few days ago to update the
+link to the whitepaper on the CRC32C algorithm in the code.  Wonder if
+you have received it.  Thanks.
 
-Tested on an AM33xx SoC device (beaglebone board).
-To reproduce the problem, I used the tcrypt kernel module as:
-modprobe tcrypt sec=2 mode=500
-
-Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Mark A. Greer <mgreer@animalcreek.com>
----
- drivers/crypto/omap-aes.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index cf57866..8450bfd2 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -636,7 +636,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 
- 	pr_debug("err: %d\n", err);
- 
--	pm_runtime_put_sync(dd->dev);
-+	pm_runtime_put(dd->dev);
- 	dd->flags &= ~FLAGS_BUSY;
- 
- 	req->base.complete(&req->base, err);
--- 
-1.7.4.1
+Tim
