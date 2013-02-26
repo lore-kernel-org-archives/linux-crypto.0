@@ -1,60 +1,42 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 2/3 v2] Optimize CRC32C calculation with PCLMULQDQ
- instruction
-Date: Tue, 26 Feb 2013 08:57:41 -0800
-Message-ID: <1361897861.17632.222.camel@schen9-DESK>
-References: <cover.1348784343.git.tim.c.chen@linux.intel.com>
-	 <1348785862.17632.17.camel@schen9-DESK>
-	 <20130226095424.GA19924@gondor.apana.org.au>
+From: Zeev Zilberman <zeev@annapurnaLabs.com>
+Subject: ahash and crc32c
+Date: Tue, 26 Feb 2013 17:11:55 +0000
+Message-ID: <CD52BAD7.26798%zeev@annapurnalabs.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Suresh Siddha <suresh.b.siddha@intel.com>,
-	Chaohong Guo <chaohong.guo@intel.com>,
-	Austin Zhang <austin_zhang@linux.intel.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Min Li <min.a.li@intel.com>,
-	David Cote <david.m.cote@intel.com>,
-	Fengguang Wu <fengguang.wu@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:57412 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751833Ab3BZQ5k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Feb 2013 11:57:40 -0500
-In-Reply-To: <20130226095424.GA19924@gondor.apana.org.au>
+Received: from am1ehsobe005.messaging.microsoft.com ([213.199.154.208]:23924
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752852Ab3BZRMQ convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Feb 2013 12:12:16 -0500
+Received: from mail90-am1 (localhost [127.0.0.1])	by mail90-am1-R.bigfish.com
+ (Postfix) with ESMTP id BF436C0369	for <linux-crypto@vger.kernel.org>; Tue,
+ 26 Feb 2013 17:12:13 +0000 (UTC)
+Received: from AM1EHSMHS015.bigfish.com (unknown [10.3.201.227])	by
+ mail90-am1.bigfish.com (Postfix) with ESMTP id 34B362E00D1	for
+ <linux-crypto@vger.kernel.org>; Tue, 26 Feb 2013 17:12:11 +0000 (UTC)
+Content-Language: en-US
+Content-ID: <7E2D26D740443645920FCBB8CB9C6453@apcprd02.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2013-02-26 at 17:54 +0800, Herbert Xu wrote:
-> On Thu, Sep 27, 2012 at 03:44:22PM -0700, Tim Chen wrote:
-> > This patch adds the crc_pcl function that calculates CRC32C checksum using the
-> > PCLMULQDQ instruction on processors that support this feature. This will
-> > provide speedup over using CRC32 instruction only.
-> > The usage of PCLMULQDQ necessitate the invocation of kernel_fpu_begin and
-> > kernel_fpu_end and incur some overhead.  So the new crc_pcl function is only
-> > invoked for buffer size of 512 bytes or more.  Larger sized
-> > buffers will expect to see greater speedup.  This feature is best used coupled
-> > with eager_fpu which reduces the kernel_fpu_begin/end overhead.  For
-> > buffer size of 1K the speedup is around 1.6x and for buffer size greater than
-> > 4K, the speedup is around 3x compared to original implementation in crc32c-intel
-> > module. Test was performed on Sandy Bridge based platform with constant frequency
-> > set for cpu.
-> > 
-> > A white paper detailing the algorithm can be found here:
-> > http://download.intel.com/design/intarch/papers/323405.pdf
-> > 
-> > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+Hi,
 
-Acked.  
+I'm working on an ahash driver that supports CRC32C.
+I saw that all existing CRC32C implementations (except blackfin) are
+implementing shash interface, but ahash seems to be the correct choice
+in our case.
+On the other hand I saw that CRC32C test in testmgr.c tries to create
+shash tfm for CRC32C and assumes that the CRC context is saved in first
+4 bytes of the shash context.
 
-BTW, Herbert, I've also sent you a patch a few days ago to update the
-link to the whitepaper on the CRC32C algorithm in the code.  Wonder if
-you have received it.  Thanks.
+When I implement CRC32C algorithm this part of the test fails.
 
-Tim
+How should I treat this failure? What is the reason for the requirement
+that is tested in this scenario?
+
+Thank you.
+Zeev.
