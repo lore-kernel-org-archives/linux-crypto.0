@@ -1,66 +1,125 @@
-From: "Mark A. Greer" <mgreer@animalcreek.com>
-Subject: Re: [PATCH 1/2] omap-sham: Use pm_runtime_put instead of
- pm_runtime_put_sync
-Date: Mon, 25 Feb 2013 11:24:15 -0700
-Message-ID: <20130225182415.GB5518@animalcreek.com>
-References: <1360915168-28786-1-git-send-email-agnel.joel@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/3 v2] Optimize CRC32C calculation with PCLMULQDQ
+ instruction
+Date: Tue, 26 Feb 2013 17:54:24 +0800
+Message-ID: <20130226095424.GA19924@gondor.apana.org.au>
+References: <cover.1348784343.git.tim.c.chen@linux.intel.com>
+ <1348785862.17632.17.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Joel A Fernandes <joelagnel@ti.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Joel A Fernandes <agnel.joel@gmail.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Chaohong Guo <chaohong.guo@intel.com>,
+	Austin Zhang <austin_zhang@linux.intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Min Li <min.a.li@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	Fengguang Wu <fengguang.wu@intel.com>
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from p3plsmtpa11-07.prod.phx3.secureserver.net ([68.178.252.108]:33230
-	"EHLO p3plsmtpa11-07.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751347Ab3BYScX (ORCPT
+Received: from sting.hengli.com.au ([178.18.18.71]:57852 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754637Ab3BZJyg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Feb 2013 13:32:23 -0500
+	Tue, 26 Feb 2013 04:54:36 -0500
 Content-Disposition: inline
-In-Reply-To: <1360915168-28786-1-git-send-email-agnel.joel@gmail.com>
+In-Reply-To: <1348785862.17632.17.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 15, 2013 at 01:59:27AM -0600, Joel A Fernandes wrote:
-> From: Joel A Fernandes <joelagnel@ti.com>
-
-Hi Joel.
-
-> Not doing so could cause sleep in interrupt context resulting in a kernel panic.
+On Thu, Sep 27, 2012 at 03:44:22PM -0700, Tim Chen wrote:
+> This patch adds the crc_pcl function that calculates CRC32C checksum using the
+> PCLMULQDQ instruction on processors that support this feature. This will
+> provide speedup over using CRC32 instruction only.
+> The usage of PCLMULQDQ necessitate the invocation of kernel_fpu_begin and
+> kernel_fpu_end and incur some overhead.  So the new crc_pcl function is only
+> invoked for buffer size of 512 bytes or more.  Larger sized
+> buffers will expect to see greater speedup.  This feature is best used coupled
+> with eager_fpu which reduces the kernel_fpu_begin/end overhead.  For
+> buffer size of 1K the speedup is around 1.6x and for buffer size greater than
+> 4K, the speedup is around 3x compared to original implementation in crc32c-intel
+> module. Test was performed on Sandy Bridge based platform with constant frequency
+> set for cpu.
 > 
-> Tested on an AM33xx SoC device (beaglebone board).
+> A white paper detailing the algorithm can be found here:
+> http://download.intel.com/design/intarch/papers/323405.pdf
 > 
-> To reproduce the problem, I used the tcrypt kernel module as:
-> modprobe tcrypt sec=2 mode=403
-> 
-> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Mark A. Greer <mgreer@animalcreek.com>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 > ---
->  drivers/crypto/omap-sham.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  arch/x86/crypto/Makefile                  |    1 +
+>  arch/x86/crypto/crc32c-intel_glue.c       |   81 +++++
+>  arch/x86/crypto/crc32c-pcl-intel-asm_64.S |  460 +++++++++++++++++++++++++++++
+>  crypto/Kconfig                            |   10 +
+>  4 files changed, 552 insertions(+), 0 deletions(-)
+>  create mode 100644 arch/x86/crypto/crc32c-pcl-intel-asm_64.S
 > 
-> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-> index edff981..b8bb583 100644
-> --- a/drivers/crypto/omap-sham.c
-> +++ b/drivers/crypto/omap-sham.c
-> @@ -923,7 +923,7 @@ static void omap_sham_finish_req(struct ahash_request *req, int err)
->  	dd->flags &= ~(BIT(FLAGS_BUSY) | BIT(FLAGS_FINAL) | BIT(FLAGS_CPU) |
->  			BIT(FLAGS_DMA_READY) | BIT(FLAGS_OUTPUT_READY));
->  
-> -	pm_runtime_put_sync(dd->dev);
-> +	pm_runtime_put(dd->dev);
->  
->  	if (req->base.complete)
->  		req->base.complete(&req->base, err);
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+> index edd2268..7b6db64 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -44,3 +44,4 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+>  ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+>  sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
+>  crc32c-intel-y := crc32c-intel_glue.o
+> +crc32c-intel-$(CONFIG_CRYPTO_CRC32C_X86_64) += crc32c-pcl-intel-asm_64.o
 
-I like your patch but I think it could use a better description.
+It seems that this option is redundant.  So I'd like to kill it
+with the following patch.  If this breaks anything like i386, please
+let me know.
 
-Please put in a good description of the symptom(s) you saw,
-the root cause, and what you did to fix it (and why it fixes it).
+Thanks!
 
-Ditto for the omap-aes patch.
+commit ca81a1a1b8d79dd6706c9463a81e9491e940ca2b
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Feb 26 17:52:15 2013 +0800
 
-Mark
---
+    crypto: crc32c - Kill pointless CRYPTO_CRC32C_X86_64 option
+    
+    This bool option can never be set to anything other than y.  So
+    let's just kill it.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 63947a8..ca96761 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -52,5 +52,5 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
+ crc32c-intel-y := crc32c-intel_glue.o
+-crc32c-intel-$(CONFIG_CRYPTO_CRC32C_X86_64) += crc32c-pcl-intel-asm_64.o
++crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
+ crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 05c0ce5..aed52b2 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -322,19 +322,9 @@ config CRYPTO_CRC32C
+ 	  by iSCSI for header and data digests and by others.
+ 	  See Castagnoli93.  Module will be crc32c.
+ 
+-config CRYPTO_CRC32C_X86_64
+-	bool
+-	depends on X86 && 64BIT
+-	select CRYPTO_HASH
+-	help
+-	  In Intel processor with SSE4.2 supported, the processor will
+-	  support CRC32C calculation using hardware accelerated CRC32
+-	  instruction optimized with PCLMULQDQ instruction when available.
+-
+ config CRYPTO_CRC32C_INTEL
+ 	tristate "CRC32c INTEL hardware acceleration"
+ 	depends on X86
+-	select CRYPTO_CRC32C_X86_64 if 64BIT
+ 	select CRYPTO_HASH
+ 	help
+ 	  In Intel processor with SSE4.2 supported, the processor will
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
