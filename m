@@ -1,57 +1,52 @@
-From: Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH v3 1/2] i.MX27: Add clock support for SAHARA2.
-Date: Mon, 4 Mar 2013 08:53:06 +0100
-Message-ID: <20130304075306.GA1906@pengutronix.de>
-References: <1362137873-8827-1-git-send-email-javier.martin@vista-silicon.com>
- <1362137873-8827-2-git-send-email-javier.martin@vista-silicon.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, devicetree-discuss@lists.ozlabs.org,
-	davem@davemloft.net, herbert@gondor.apana.org.au,
-	kernel@pengutronix.de, gcembed@gmail.com, shawn.guo@linaro.org,
-	arnd@arndb.de, swarren@nvidia.com
-To: Javier Martin <javier.martin@vista-silicon.com>
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: [PATCH 1/2] crypto: omap-aes: Use module_platform_driver macro
+Date: Mon,  4 Mar 2013 15:09:42 +0530
+Message-ID: <1362389983-14141-1-git-send-email-sachin.kamat@linaro.org>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+	sachin.kamat@linaro.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:41249 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755320Ab3CDHxT (ORCPT
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:52954 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755914Ab3CDJuK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Mar 2013 02:53:19 -0500
-Content-Disposition: inline
-In-Reply-To: <1362137873-8827-2-git-send-email-javier.martin@vista-silicon.com>
+	Mon, 4 Mar 2013 04:50:10 -0500
+Received: by mail-pa0-f49.google.com with SMTP id kp6so3028097pab.8
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Mar 2013 01:50:10 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 01, 2013 at 12:37:52PM +0100, Javier Martin wrote:
-> 
-> Signed-off-by: Javier Martin <javier.martin@vista-silicon.com>
-> ---
->  arch/arm/mach-imx/clk-imx27.c |    2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm/mach-imx/clk-imx27.c b/arch/arm/mach-imx/clk-imx27.c
-> index 4c1d1e4..0b9664a 100644
-> --- a/arch/arm/mach-imx/clk-imx27.c
-> +++ b/arch/arm/mach-imx/clk-imx27.c
-> @@ -253,6 +253,8 @@ int __init mx27_clocks_init(unsigned long fref)
->  	clk_register_clkdev(clk[nfc_baud_gate], NULL, "imx27-nand.0");
->  	clk_register_clkdev(clk[vpu_baud_gate], "per", "coda-imx27.0");
->  	clk_register_clkdev(clk[vpu_ahb_gate], "ahb", "coda-imx27.0");
-> +	clk_register_clkdev(clk[sahara_ahb_gate], "ahb", "sahara-imx27.0");
-> +	clk_register_clkdev(clk[sahara_ipg_gate], "ipg", "sahara-imx27.0");
+module_platform_driver() makes the code simpler by eliminating boilerplate
+code.
 
-One of the first patches I want to push upstream for the next merge
-window is this one:
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+---
+ drivers/crypto/omap-aes.c |   13 +------------
+ 1 files changed, 1 insertions(+), 12 deletions(-)
 
-https://patchwork.kernel.org/patch/1817741/
-
-So the change above becomes unnecessary
-
-Sascha
-
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 6aa425f..bd304e1 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1248,18 +1248,7 @@ static struct platform_driver omap_aes_driver = {
+ 	},
+ };
+ 
+-static int __init omap_aes_mod_init(void)
+-{
+-	return  platform_driver_register(&omap_aes_driver);
+-}
+-
+-static void __exit omap_aes_mod_exit(void)
+-{
+-	platform_driver_unregister(&omap_aes_driver);
+-}
+-
+-module_init(omap_aes_mod_init);
+-module_exit(omap_aes_mod_exit);
++module_platform_driver(omap_aes_driver);
+ 
+ MODULE_DESCRIPTION("OMAP AES hw acceleration support.");
+ MODULE_LICENSE("GPL v2");
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+1.7.4.1
