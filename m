@@ -1,54 +1,95 @@
-From: Sachin Kamat <sachin.kamat@linaro.org>
-Subject: [PATCH 2/2] crypto: omap-sham: Use module_platform_driver macro
-Date: Mon,  4 Mar 2013 15:09:43 +0530
-Message-ID: <1362389983-14141-2-git-send-email-sachin.kamat@linaro.org>
-References: <1362389983-14141-1-git-send-email-sachin.kamat@linaro.org>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	sachin.kamat@linaro.org
-To: linux-crypto@vger.kernel.org
+From: Kent Yoder <shpedoikal@gmail.com>
+Subject: [PATCH] drivers/crypto/nx: fix init race, alignmasks and GCM bug
+Date: Mon, 4 Mar 2013 10:44:57 -0600
+Message-ID: <CAM0nabG9SeyX7t77CABiDAzECrWa9g2bRmBTjfeoWFjFE8gPiA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-da0-f48.google.com ([209.85.210.48]:40738 "EHLO
-	mail-da0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756428Ab3CDJuN (ORCPT
+Received: from mail-lb0-f175.google.com ([209.85.217.175]:43741 "EHLO
+	mail-lb0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756359Ab3CDQp3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 4 Mar 2013 04:50:13 -0500
-Received: by mail-da0-f48.google.com with SMTP id w4so2444959dam.21
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Mar 2013 01:50:12 -0800 (PST)
-In-Reply-To: <1362389983-14141-1-git-send-email-sachin.kamat@linaro.org>
+	Mon, 4 Mar 2013 11:45:29 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-module_platform_driver() makes the code simpler by eliminating boilerplate
-code.
+  Fixes a race on driver init with registering algorithms where the
+driver status flag wasn't being set before self testing started.
 
-Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+  Added the cra_alignmask field for CBC and ECB modes.
+
+  Fixed a bug in GCM where AES block size was being used instead of
+authsize.
+
+Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
 ---
- drivers/crypto/omap-sham.c |   13 +------------
- 1 files changed, 1 insertions(+), 12 deletions(-)
+ drivers/crypto/nx/nx-aes-cbc.c | 1 +
+ drivers/crypto/nx/nx-aes-ecb.c | 1 +
+ drivers/crypto/nx/nx-aes-gcm.c | 2 +-
+ drivers/crypto/nx/nx.c         | 4 ++--
+ 4 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 3d1611f..7a67d30 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -1813,18 +1813,7 @@ static struct platform_driver omap_sham_driver = {
- 	},
- };
- 
--static int __init omap_sham_mod_init(void)
--{
--	return platform_driver_register(&omap_sham_driver);
--}
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index a76d4c4..35d483f 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
+@@ -126,6 +126,7 @@ struct crypto_alg nx_cbc_aes_alg = {
+ 	.cra_blocksize   = AES_BLOCK_SIZE,
+ 	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 	.cra_type        = &crypto_blkcipher_type,
++	.cra_alignmask   = 0xf,
+ 	.cra_module      = THIS_MODULE,
+ 	.cra_init        = nx_crypto_ctx_aes_cbc_init,
+ 	.cra_exit        = nx_crypto_ctx_exit,
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index ba5f161..7bbc9a8 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -123,6 +123,7 @@ struct crypto_alg nx_ecb_aes_alg = {
+ 	.cra_priority    = 300,
+ 	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
+ 	.cra_blocksize   = AES_BLOCK_SIZE,
++	.cra_alignmask   = 0xf,
+ 	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 	.cra_type        = &crypto_blkcipher_type,
+ 	.cra_module      = THIS_MODULE,
+diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
+index c8109ed..6cca6c3 100644
+--- a/drivers/crypto/nx/nx-aes-gcm.c
++++ b/drivers/crypto/nx/nx-aes-gcm.c
+@@ -219,7 +219,7 @@ static int gcm_aes_nx_crypt(struct aead_request
+*req, int enc)
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 	else
+-		nbytes -= AES_BLOCK_SIZE;
++		nbytes -= crypto_aead_authsize(crypto_aead_reqtfm(req));
+
+ 	csbcpb->cpb.aes_gcm.bit_length_data = nbytes * 8;
+
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index c767f23..7621d05 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -454,6 +454,8 @@ static int nx_register_algs(void)
+ 	if (rc)
+ 		goto out;
+
++	nx_driver.of.status = NX_OKAY;
++
+ 	rc = crypto_register_alg(&nx_ecb_aes_alg);
+ 	if (rc)
+ 		goto out;
+@@ -498,8 +500,6 @@ static int nx_register_algs(void)
+ 	if (rc)
+ 		goto out_unreg_s512;
+
+-	nx_driver.of.status = NX_OKAY;
 -
--static void __exit omap_sham_mod_exit(void)
--{
--	platform_driver_unregister(&omap_sham_driver);
--}
--
--module_init(omap_sham_mod_init);
--module_exit(omap_sham_mod_exit);
-+module_platform_driver(omap_sham_driver);
- 
- MODULE_DESCRIPTION("OMAP SHA1/MD5 hw acceleration support.");
- MODULE_LICENSE("GPL v2");
+ 	goto out;
+
+ out_unreg_s512:
 -- 
-1.7.4.1
+1.7.11.7
