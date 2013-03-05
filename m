@@ -1,65 +1,47 @@
-From: javier Martin <javier.martin@vista-silicon.com>
-Subject: Re: [PATCH v3 1/2] i.MX27: Add clock support for SAHARA2.
-Date: Tue, 5 Mar 2013 08:48:19 +0100
-Message-ID: <CACKLOr2kuWXMreEFA4wqyYVRNnPwmEoHPM2+V+tN5P_1bQ+iJQ@mail.gmail.com>
-References: <1362137873-8827-1-git-send-email-javier.martin@vista-silicon.com>
-	<1362137873-8827-2-git-send-email-javier.martin@vista-silicon.com>
-	<20130304075306.GA1906@pengutronix.de>
+From: Paul Bolle <pebolle@tiscali.nl>
+Subject: [PATCH] crypto: caam - fix typo "CRYPTO_AHASH"
+Date: Tue, 05 Mar 2013 14:33:16 +0100
+Message-ID: <1362490396.16460.87.camel@x61.thuisdomein>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, devicetree-discuss@lists.ozlabs.org,
-	davem@davemloft.net, herbert@gondor.apana.org.au,
-	kernel@pengutronix.de, gcembed@gmail.com, shawn.guo@linaro.org,
-	arnd@arndb.de, swarren@nvidia.com
-To: Sascha Hauer <s.hauer@pengutronix.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:51772 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751018Ab3CEHsU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Mar 2013 02:48:20 -0500
-Received: by mail-we0-f170.google.com with SMTP id z53so5577874wey.15
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Mar 2013 23:48:19 -0800 (PST)
-In-Reply-To: <20130304075306.GA1906@pengutronix.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Sascha,
+The Kconfig entry for CAAM's hash algorithm implementations has always
+selected CRYPTO_AHASH. But there's no corresponding Kconfig symbol.
 
-On 4 March 2013 08:53, Sascha Hauer <s.hauer@pengutronix.de> wrote:
-> On Fri, Mar 01, 2013 at 12:37:52PM +0100, Javier Martin wrote:
->>
->> Signed-off-by: Javier Martin <javier.martin@vista-silicon.com>
->> ---
->>  arch/arm/mach-imx/clk-imx27.c |    2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/arch/arm/mach-imx/clk-imx27.c b/arch/arm/mach-imx/clk-imx27.c
->> index 4c1d1e4..0b9664a 100644
->> --- a/arch/arm/mach-imx/clk-imx27.c
->> +++ b/arch/arm/mach-imx/clk-imx27.c
->> @@ -253,6 +253,8 @@ int __init mx27_clocks_init(unsigned long fref)
->>       clk_register_clkdev(clk[nfc_baud_gate], NULL, "imx27-nand.0");
->>       clk_register_clkdev(clk[vpu_baud_gate], "per", "coda-imx27.0");
->>       clk_register_clkdev(clk[vpu_ahb_gate], "ahb", "coda-imx27.0");
->> +     clk_register_clkdev(clk[sahara_ahb_gate], "ahb", "sahara-imx27.0");
->> +     clk_register_clkdev(clk[sahara_ipg_gate], "ipg", "sahara-imx27.0");
->
-> One of the first patches I want to push upstream for the next merge
-> window is this one:
->
-> https://patchwork.kernel.org/patch/1817741/
->
-> So the change above becomes unnecessary
+It seems it was intended to select CRYPTO_HASH, like other crypto
+drivers do. That would apparently (indirectly) select CRYPTO_HASH2,
+which would enable the ahash functionality this driver uses.
 
-Very good. Then this patch can be safely dropped.
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+0) Untested!
 
+1) Apparently, one can indirectly select a Kconfig symbol. That actually
+surprised me. But if the kconfig parser does not work this way this
+patch (and it's explanation) is bogus.
+
+ drivers/crypto/caam/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 65c7668..b44091c 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -78,7 +78,7 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
+ 	tristate "Register hash algorithm implementations with Crypto API"
+ 	depends on CRYPTO_DEV_FSL_CAAM
+ 	default y
+-	select CRYPTO_AHASH
++	select CRYPTO_HASH
+ 	help
+ 	  Selecting this will offload ahash for users of the
+ 	  scatterlist crypto API to the SEC4 via job ring.
 -- 
-Javier Martin
-Vista Silicon S.L.
-CDTUC - FASE C - Oficina S-345
-Avda de los Castros s/n
-39005- Santander. Cantabria. Spain
-+34 942 25 32 60
-www.vista-silicon.com
+1.7.11.7
