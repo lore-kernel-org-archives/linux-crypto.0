@@ -1,47 +1,45 @@
-From: Paul Bolle <pebolle@tiscali.nl>
-Subject: [PATCH] crypto: caam - fix typo "CRYPTO_AHASH"
-Date: Tue, 05 Mar 2013 14:33:16 +0100
-Message-ID: <1362490396.16460.87.camel@x61.thuisdomein>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: [PATCH 2/2] crypto: cast_common - change email address for Jussi
+ Kivilinna
+Date: Thu, 07 Mar 2013 22:48:28 +0200
+Message-ID: <20130307204828.16522.46028.stgit@localhost6.localdomain6>
+References: <20130307204823.16522.95287.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:40520 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933347Ab3CGUsa convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Mar 2013 15:48:30 -0500
+In-Reply-To: <20130307204823.16522.95287.stgit@localhost6.localdomain6>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The Kconfig entry for CAAM's hash algorithm implementations has always
-selected CRYPTO_AHASH. But there's no corresponding Kconfig symbol.
+Change my email address from @mbnet.fi to @iki.fi in crypto/*
 
-It seems it was intended to select CRYPTO_HASH, like other crypto
-drivers do. That would apparently (indirectly) select CRYPTO_HASH2,
-which would enable the ahash functionality this driver uses.
-
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
-0) Untested!
-
-1) Apparently, one can indirectly select a Kconfig symbol. That actually
-surprised me. But if the kconfig parser does not work this way this
-patch (and it's explanation) is bogus.
-
- drivers/crypto/caam/Kconfig | 2 +-
+ crypto/cast_common.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 65c7668..b44091c 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -78,7 +78,7 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
- 	tristate "Register hash algorithm implementations with Crypto API"
- 	depends on CRYPTO_DEV_FSL_CAAM
- 	default y
--	select CRYPTO_AHASH
-+	select CRYPTO_HASH
- 	help
- 	  Selecting this will offload ahash for users of the
- 	  scatterlist crypto API to the SEC4 via job ring.
--- 
-1.7.11.7
+diff --git a/crypto/cast_common.c b/crypto/cast_common.c
+index a15f523..8924925 100644
+--- a/crypto/cast_common.c
++++ b/crypto/cast_common.c
+@@ -3,7 +3,7 @@
+  *
+  * Copyright =C2=A9 1998, 1999, 2000, 2001 Free Software Foundation, I=
+nc.
+  * Copyright =C2=A9 2003 Kartikey Mahendra Bhatt <kartik_me@hotmail.co=
+m>
+- * Copyright =C2=A9 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ * Copyright =C2=A9 2012 Jussi Kivilinna <jussi.kivilinna@iki.fi>
+  *
+  * This program is free software; you can redistribute it and/or modif=
+y it
+  * under the terms of GNU General Public License as published by the F=
+ree
