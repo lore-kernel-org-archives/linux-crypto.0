@@ -1,33 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: user - constify netlink dispatch table
-Date: Sun, 10 Mar 2013 18:14:59 +0800
-Message-ID: <20130310101459.GC10910@gondor.apana.org.au>
-References: <1361711352-7795-1-git-send-email-minipli@googlemail.com>
+Subject: Re: [PATCH] Update the links to the white papers on CRC32C
+ calculations with PCLMULQDQ instructions.
+Date: Sun, 10 Mar 2013 18:14:43 +0800
+Message-ID: <20130310101443.GB10910@gondor.apana.org.au>
+References: <1361473462.17632.202.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Mathias Krause <minipli@googlemail.com>
+Cc: Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sting.hengli.com.au ([178.18.18.71]:58497 "EHLO
+Received: from sting.hengli.com.au ([178.18.18.71]:39786 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752829Ab3CJKPE (ORCPT
+	with ESMTP id S1752732Ab3CJKOv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Mar 2013 06:15:04 -0400
+	Sun, 10 Mar 2013 06:14:51 -0400
 Content-Disposition: inline
-In-Reply-To: <1361711352-7795-1-git-send-email-minipli@googlemail.com>
+In-Reply-To: <1361473462.17632.202.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Feb 24, 2013 at 02:09:12PM +0100, Mathias Krause wrote:
-> There is no need to modify the netlink dispatch table at runtime and
-> making it const even makes the resulting object file slightly smaller.
+On Thu, Feb 21, 2013 at 11:04:22AM -0800, Tim Chen wrote:
+> Herbert,
 > 
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+> The following patch update the stale link to the CRC32C white paper 
+> that was referenced.
 
-Patch applied.  Thanks Mathias!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
