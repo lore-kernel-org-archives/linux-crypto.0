@@ -1,48 +1,56 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: authencesn compatibility problemn between software crypto and
- talitos driver
-Date: Mon, 11 Mar 2013 08:15:18 +0100
-Message-ID: <20130311071518.GD21448@secunet.com>
-References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp>
+From: Sascha Hauer <s.hauer@pengutronix.de>
+Subject: Re: [PATCH v3 1/2] i.MX27: Add clock support for SAHARA2.
+Date: Mon, 11 Mar 2013 08:42:06 +0100
+Message-ID: <20130311074206.GY1906@pengutronix.de>
+References: <1362137873-8827-1-git-send-email-javier.martin@vista-silicon.com>
+ <1362137873-8827-2-git-send-email-javier.martin@vista-silicon.com>
+ <20130304075306.GA1906@pengutronix.de>
+ <CACKLOr2kuWXMreEFA4wqyYVRNnPwmEoHPM2+V+tN5P_1bQ+iJQ@mail.gmail.com>
+ <20130310083401.GB10448@gondor.apana.org.au>
+ <20130310230856.GU1906@pengutronix.de>
+ <20130311011926.GA14930@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Horia Geanta <horia.geanta@freescale.com>
-To: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+Cc: javier Martin <javier.martin@vista-silicon.com>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, devicetree-discuss@lists.ozlabs.org,
+	davem@davemloft.net, kernel@pengutronix.de, gcembed@gmail.com,
+	shawn.guo@linaro.org, arnd@arndb.de, swarren@nvidia.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:41911 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751167Ab3CKHhd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Mar 2013 03:37:33 -0400
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:38092 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751000Ab3CKHmT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 Mar 2013 03:42:19 -0400
 Content-Disposition: inline
-In-Reply-To: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp>
+In-Reply-To: <20130311011926.GA14930@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ccing Horia Geanta, he did the esn implementation for talitos.
-
-On Fri, Mar 08, 2013 at 03:27:48PM +0000, Chaoxing Lin wrote:
-> 1. Can any one point me which RFC describe how exactly authencesn should work?
+On Mon, Mar 11, 2013 at 09:19:26AM +0800, Herbert Xu wrote:
+> On Mon, Mar 11, 2013 at 12:08:56AM +0100, Sascha Hauer wrote:
+> > On Sun, Mar 10, 2013 at 04:34:01PM +0800, Herbert Xu wrote:
+> > > > >
+> > > > > https://patchwork.kernel.org/patch/1817741/
+> > > > >
+> > > > > So the change above becomes unnecessary
+> > > > 
+> > > > Very good. Then this patch can be safely dropped.
+> > > 
+> > > So should I take this patch or not?
+> > 
+> > This clk patch, no. The sahara patch, yes, if it is fine for you.
 > 
+> But will the second patch work fine without the first?
 
-The ESN algorithm is described in RFC 4303 IP Encapsulating Security
-Payload (ESP).
+It will work once a device is registered. The necessary clocks for it
+will be provided by the devicetree then.
 
-> 2. I test Ipsec with "esp=aes256-sha512-esn!" options and found compatibility issue between kernel software crypto and talitos driver.
-> Talitos <---->talitos				Good
-> Soft crypto<---->soft crypto			Good
-> Soft crypto<---->talitos			link established but no traffic can pass through.
-> 
-> 3. Looking at source code of latest stable kernel 3.8.2, I found that these two implementations don't agree on what's to be hashed in ESN case.
-> Talitos driver is more intuitive in that  "assoc (SPI, SN-hi, SN-low) + IV + payload" are hashed.
+Sascha
 
-The ESN implementation of the talitos driver looks rather scary,
-it just renames authenc to authencesn in talitos_probe(). The
-algorithm pretends to be authencesn but still does authenc, of course.
-authencesn has to be implemented, it is not sufficient to change
-the name, really.
-
-> Kernel software crypto is counter-intuitive in that "hsg(SPI, SN-low) + sg(IV + payload) + tsg(SN-hi" are hashed.
-
-This might look counterintuitive, but that's what RFC 4303 describes
-for ESN if separate encryption and integrity algorithms are used.
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
