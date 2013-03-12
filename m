@@ -1,87 +1,67 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCH][REPOST] crypto: caam - Fix missing init of '.type' in AEAD algos.
-Date: Tue, 12 Mar 2013 14:09:24 +0530
-Message-ID: <1363077564-25886-1-git-send-email-vakul@freescale.com>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: authencesn compatibility problemn between software crypto and
+ talitos driver
+Date: Tue, 12 Mar 2013 19:04:42 +0200
+Message-ID: <513F602A.9000201@freescale.com>
+References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp> <20130311071518.GD21448@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.hengli.com.au>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db8lp0185.outbound.messaging.microsoft.com ([213.199.154.185]:46568
-	"EHLO db8outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752813Ab3CLI5y (ORCPT
+Received: from va3ehsobe005.messaging.microsoft.com ([216.32.180.31]:33579
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932534Ab3CLRFF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Mar 2013 04:57:54 -0400
+	Tue, 12 Mar 2013 13:05:05 -0400
+In-Reply-To: <20130311071518.GD21448@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Following AEAD algo templates are updated for '.type' initialization.
-	(a) authenc(hmac(sha224),cbc(aes))
-	(b) authenc(hmac(sha384),cbc(aes))
-	(c) authenc(hmac(sha224),cbc(des3_ede))
-	(d) authenc(hmac(sha384),cbc(des3_ede))
-	(e) authenc(hmac(sha224),cbc(des))
-	(f) authenc(hmac(sha384),cbc(des))
+On 3/11/2013 9:15 AM, Steffen Klassert wrote:
+> Ccing Horia Geanta, he did the esn implementation for talitos.
+>
+> On Fri, Mar 08, 2013 at 03:27:48PM +0000, Chaoxing Lin wrote:
+>> 1. Can any one point me which RFC describe how exactly authencesn should work?
+>>
+>
+> The ESN algorithm is described in RFC 4303 IP Encapsulating Security
+> Payload (ESP).
+>
+>> 2. I test Ipsec with "esp=aes256-sha512-esn!" options and found compatibility issue between kernel software crypto and talitos driver.
+>> Talitos <---->talitos				Good
+>> Soft crypto<---->soft crypto			Good
+>> Soft crypto<---->talitos			link established but no traffic can pass through.
 
-Signed-off-by: Vakul Garg <vakul@freescale.com>
-Reviewed-by: Kim Phillips <kim.phillips@freescale.com>
-Signed-off-by: Andy Fleming <afleming@freescale.com>
+That's what happens when interop testing is not performed...
 
----
- drivers/crypto/caam/caamalg.c |    6 ++++++
- 1 files changed, 6 insertions(+), 0 deletions(-)
+>>
+>> 3. Looking at source code of latest stable kernel 3.8.2, I found that these two implementations don't agree on what's to be hashed in ESN case.
+>> Talitos driver is more intuitive in that  "assoc (SPI, SN-hi, SN-low) + IV + payload" are hashed.
+>
+> The ESN implementation of the talitos driver looks rather scary,
+> it just renames authenc to authencesn in talitos_probe(). The
+> algorithm pretends to be authencesn but still does authenc, of course.
+> authencesn has to be implemented, it is not sufficient to change
+> the name, really.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b2a0a07..42420fb 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1697,6 +1697,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha224),cbc(aes))",
- 		.driver_name = "authenc-hmac-sha224-cbc-aes-caam",
- 		.blocksize = AES_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
-@@ -1736,6 +1737,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha384),cbc(aes))",
- 		.driver_name = "authenc-hmac-sha384-cbc-aes-caam",
- 		.blocksize = AES_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
-@@ -1814,6 +1816,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha224),cbc(des3_ede))",
- 		.driver_name = "authenc-hmac-sha224-cbc-des3_ede-caam",
- 		.blocksize = DES3_EDE_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
-@@ -1853,6 +1856,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha384),cbc(des3_ede))",
- 		.driver_name = "authenc-hmac-sha384-cbc-des3_ede-caam",
- 		.blocksize = DES3_EDE_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
-@@ -1930,6 +1934,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha224),cbc(des))",
- 		.driver_name = "authenc-hmac-sha224-cbc-des-caam",
- 		.blocksize = DES_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
-@@ -1969,6 +1974,7 @@ static struct caam_alg_template driver_algs[] = {
- 		.name = "authenc(hmac(sha384),cbc(des))",
- 		.driver_name = "authenc-hmac-sha384-cbc-des-caam",
- 		.blocksize = DES_BLOCK_SIZE,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--- 
-1.7.7.6
+Seems that somehow I got confused, considering the "one/single-pass over 
+data" description the same as "combined mode algorithm".
+
+I will post a fix or revert the patch if HW does not allow the correct 
+behaviour.
+
+>
+>> Kernel software crypto is counter-intuitive in that "hsg(SPI, SN-low) + sg(IV + payload) + tsg(SN-hi" are hashed.
+>
+> This might look counterintuitive, but that's what RFC 4303 describes
+> for ESN if separate encryption and integrity algorithms are used.
+
+Yes, appending the SN-hi after Payload (Next Header) is the correct way 
+to handle separate encryption and integrity algos.
+
+For combined ones (AES-CCM, AES-GCM, AES-GMAC etc.), behavior is defined 
+separately in corresponding RFCs (4309, 4106, 4543). Usually SN-hi is 
+positioned between SPI and SN-lo.
