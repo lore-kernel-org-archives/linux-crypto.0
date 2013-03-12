@@ -1,26 +1,17 @@
 From: Vakul Garg <vakul@freescale.com>
 Subject: [PATCHv1] crypto: caam - set RDB bit in security configuration register
-Date: Tue, 12 Mar 2013 09:26:12 +0530
-Message-ID: <1363060572-28915-1-git-send-email-vakul@freescale.com>
+Date: Tue, 12 Mar 2013 13:55:21 +0530
+Message-ID: <1363076721-21315-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
+Cc: <herbert@gondor.hengli.com.au>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe005.messaging.microsoft.com ([216.32.180.31]:25542
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754427Ab3CLD7k (ORCPT
+Received: from co9ehsobe003.messaging.microsoft.com ([207.46.163.26]:23901
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754039Ab3CLI24 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Mar 2013 23:59:40 -0400
-Received: from mail179-va3 (localhost [127.0.0.1])	by
- mail179-va3-R.bigfish.com (Postfix) with ESMTP id A3F943800E0	for
- <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2013 03:59:39 +0000 (UTC)
-Received: from VA3EHSMHS004.bigfish.com (unknown [10.7.14.254])	by
- mail179-va3.bigfish.com (Postfix) with ESMTP id 43C5636007C	for
- <linux-crypto@vger.kernel.org>; Tue, 12 Mar 2013 03:59:37 +0000 (UTC)
-Received: from b16394-desktop.ap.freescale.net
- (b16394-desktop.ap.freescale.net [10.232.132.33])	by
- tx30smr01.am.freescale.net (8.14.3/8.14.0) with ESMTP id r2C3xXMi025252	for
- <linux-crypto@vger.kernel.org>; Mon, 11 Mar 2013 20:59:34 -0700
+	Tue, 12 Mar 2013 04:28:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -34,6 +25,9 @@ IPSEC throughput if random IVs are used.
 
 Signed-off-by: Vakul Garg <vakul@freescale.com>
 ---
+Sorry for repeated sending.
+Resending as suggested by Herbert.
+
 Changes in v1: Addressed Kim Philip's comments.
 (a) Limit commit message to 75 characters.
 (b) Relocated code to set RDB bit in RNG4 initialisation section
