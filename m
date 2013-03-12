@@ -1,67 +1,41 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: authencesn compatibility problemn between software crypto and
+From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+Subject: RE: authencesn compatibility problemn between software crypto and
  talitos driver
-Date: Tue, 12 Mar 2013 19:04:42 +0200
-Message-ID: <513F602A.9000201@freescale.com>
-References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp> <20130311071518.GD21448@secunet.com>
+Date: Tue, 12 Mar 2013 20:57:59 +0000
+Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C58712@RockMX01.rock.corp>
+References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp>
+ <20130311071518.GD21448@secunet.com> <513F602A.9000201@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+To: =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>,
+	"Steffen Klassert" <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe005.messaging.microsoft.com ([216.32.180.31]:33579
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932534Ab3CLRFF (ORCPT
+Received: from mail.ultra-3eti.com ([173.13.207.162]:32949 "EHLO
+	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932542Ab3CLU6Y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Mar 2013 13:05:05 -0400
-In-Reply-To: <20130311071518.GD21448@secunet.com>
+	Tue, 12 Mar 2013 16:58:24 -0400
+In-Reply-To: <513F602A.9000201@freescale.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/11/2013 9:15 AM, Steffen Klassert wrote:
-> Ccing Horia Geanta, he did the esn implementation for talitos.
->
-> On Fri, Mar 08, 2013 at 03:27:48PM +0000, Chaoxing Lin wrote:
->> 1. Can any one point me which RFC describe how exactly authencesn should work?
->>
->
-> The ESN algorithm is described in RFC 4303 IP Encapsulating Security
-> Payload (ESP).
->
->> 2. I test Ipsec with "esp=aes256-sha512-esn!" options and found compatibility issue between kernel software crypto and talitos driver.
->> Talitos <---->talitos				Good
->> Soft crypto<---->soft crypto			Good
->> Soft crypto<---->talitos			link established but no traffic can pass through.
-
-That's what happens when interop testing is not performed...
-
->>
->> 3. Looking at source code of latest stable kernel 3.8.2, I found that these two implementations don't agree on what's to be hashed in ESN case.
->> Talitos driver is more intuitive in that  "assoc (SPI, SN-hi, SN-low) + IV + payload" are hashed.
->
-> The ESN implementation of the talitos driver looks rather scary,
-> it just renames authenc to authencesn in talitos_probe(). The
-> algorithm pretends to be authencesn but still does authenc, of course.
-> authencesn has to be implemented, it is not sufficient to change
-> the name, really.
-
-Seems that somehow I got confused, considering the "one/single-pass over 
-data" description the same as "combined mode algorithm".
-
-I will post a fix or revert the patch if HW does not allow the correct 
-behaviour.
-
->
->> Kernel software crypto is counter-intuitive in that "hsg(SPI, SN-low) + sg(IV + payload) + tsg(SN-hi" are hashed.
->
-> This might look counterintuitive, but that's what RFC 4303 describes
-> for ESN if separate encryption and integrity algorithms are used.
-
-Yes, appending the SN-hi after Payload (Next Header) is the correct way 
-to handle separate encryption and integrity algos.
-
-For combined ones (AES-CCM, AES-GCM, AES-GMAC etc.), behavior is defined 
-separately in corresponding RFCs (4309, 4106, 4543). Usually SN-hi is 
-positioned between SPI and SN-lo.
+DQo+IFNlZW1zIHRoYXQgc29tZWhvdyBJIGdvdCBjb25mdXNlZCwgY29uc2lkZXJpbmcgdGhlICJv
+bmUvc2luZ2xlLXBhc3Mgb3ZlciBkYXRhIiBkZXNjcmlwdGlvbiB0aGUgc2FtZSBhcyAiY29tYmlu
+ZWQgbW9kZSBhbGdvcml0aG0iLg0KPiBJIHdpbGwgcG9zdCBhIGZpeCBvciByZXZlcnQgdGhlIHBh
+dGNoIGlmIEhXIGRvZXMgbm90IGFsbG93IHRoZSBjb3JyZWN0IGJlaGF2aW91ci4NCg0KSG9yaWEs
+DQoNCkRvIHlvdSBwbGFuIHRvIGZpeCB0YWxpdG9zIGRyaXZlciB0byBtYWtlIGl0IEVTTiBjYXBh
+YmxlIGluIHRoZSBuZWFyIGZ1dHVyZT8gT3IganVzdCBzaW1wbHkgcmVtb3ZlIEVTTiBvcHRpb24g
+Y29tcGxldGVseS4NCg0KVGhlIGZyZWVzY2FsZSBjcnlwdG8gZW5naW5lIGlzIHN0aWxsIGNhcGFi
+bGUgb2YgZG9pbmcgQUVTLUNCQyArIEhNQUMtU0hBeHh4IGluIG9uZSBzaG90Lg0KIkRFU0NfSERS
+X1RZUEVfSVBTRUNfRVNQIiBtYXkgbm90IGFibGUgdG8gYWNoaWV2ZSBhdXRoZW5jZXNuLg0KQnV0
+IHRoZSBobWFjLXNub29wLWFlcyBzaG91bGQgZG8gdGhlIGpvYiB3ZWxsLiANCjIgZGVzY3JpcHRv
+cnMgYXJlIG5lZWRlZC4NClRoZSBmaXJzdCBvbmUgaXMgdG8gZG8gQUVTLUNCQywNClRoZSBzZWNv
+bmQgb25lIHNub29wIHRoZSBvdXRwdXQgZnJvbSB0aGUgZmlyc3QgY3J5cHRvIG9wZXJhdGlvbiBh
+bmQgdGhlbiBkb2VzIEhNQUMtU0hBeHh4Lg0KVGhlIHR3byBkZXNjcmlwdG9ycyBhcmUgY2hhaW5l
+ZCBhbmQgcHVzaGVkIHRvIGNyeXB0byBlbmdpbmUgYXQgdGhlIHNhbWUgdGltZS4gQ2FsbGJhY2sg
+aXMgdHJpZ2dlcmVkIG9ubHkgd2hlbiBib3RoIG9wZXJhdGlvbnMgYXJlIGRvbmUuDQpTaW5jZSB5
+b3UgYXJlIGZyb20gZnJlZXNjYWxlLCBJIGFzc3VtZSB5b3Uga25vdyB3aGF0IEkgYW0gdGFsa2lu
+ZyBhYm91dC4NCg0KDQoNCg==
