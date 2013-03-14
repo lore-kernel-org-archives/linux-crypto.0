@@ -1,94 +1,94 @@
 From: David Woodhouse <dwmw2@infradead.org>
-Subject: Re: Wrong system clock vs X.509 date specifiers
-Date: Thu, 14 Mar 2013 10:48:14 +0000
-Message-ID: <1363258094.4853.20.camel@i7.infradead.org>
+Subject: [PATCH] Fix x509_key_preparse() not to reject keys outside their
+ validity time range
+Date: Thu, 14 Mar 2013 12:24:02 +0000
+Message-ID: <1363263842.4853.35.camel@i7.infradead.org>
 References: <5555.1348531649@warthog.procyon.org.uk>
 	 <21845.1348585794@warthog.procyon.org.uk>
 	 <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>
+	 <1363258094.4853.20.camel@i7.infradead.org>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg="sha1"; protocol="application/x-pkcs7-signature";
-	boundary="=-fFD9nZ5HmDapRimHSVaE"
+	boundary="=-L5jYkeiCsN9QCVuuZUHu"
 Cc: David Howells <dhowells@redhat.com>, rusty@rustcorp.com.au,
 	herbert@gondor.hengli.com.au, pjones@redhat.com,
 	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
 	linux-security-module@vger.kernel.org,
 	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
 To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 173-166-109-252-newengland.hfc.comcastbusiness.net ([173.166.109.252]:56382
-	"EHLO bombadil.infradead.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756828Ab3CNKs2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Mar 2013 06:48:28 -0400
-In-Reply-To: <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1363258094.4853.20.camel@i7.infradead.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
---=-fFD9nZ5HmDapRimHSVaE
+--=-L5jYkeiCsN9QCVuuZUHu
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2012-09-25 at 16:30 +0100, Alan Cox wrote:
-> On Tue, 25 Sep 2012 16:09:54 +0100
-> David Howells <dhowells@redhat.com> wrote:
->=20
-> >=20
-> > The X.509 certificate has a pair of times in it that delineate the vali=
-d
-> > period of the cert, and I'm checking that the system clock is within th=
-e
-> > bounds they define before permitting you to use the cert.  I've been se=
-tting
-> > the expiry date to be 100 years in the future - by which time hopefully=
- I
-> > won't have to worry about it - but occasionally clock skew means a fres=
-hly
-> > built kernel won't boot because the machine trying to boot doesn't thin=
-k that
-> > the start time has been reached yet.
-> >=20
-> > Do we actually want to do this, however?  Or should we just ignore the =
-times?
-> > Or just the start time?
->=20
-> Generate a certificate that is valid from a few minutes before the
-> wallclock time. It's a certificate policy question not a kernel hackery
-> one.
+The x509_key_preparse() function will refuse to even *parse* a
+certificate when the system clock happens to be set to a time before the
+ValidFrom or after the ValidTo date.
 
-That's not good enough. I frequently encounter laptops with hardware
-clocks which are *way* slower than that. I see lots of machines booting
-up thinking it's 1970, 1900 iirc for some Macs, and more recently 2001.
+This is wrong. If date checks are to be done, they need to be done at
+the time the cert is *used*. It should be perfectly possible to load a
+cert which is post-dated, and can only be used for validation at some
+point in the future. The key in question should immediately start
+working at its ValidFrom date, and stop again at its ValidTo date. It
+should be allowed to *exist* in the kernel both before and after those
+times.
 
-This causes the kernel to refuse to load the certificate:
-[    3.116185] Loading module verification certificates
-[    3.117414] X.509: Cert e1a74f2317b1f38848278d07926ed16c2675393e is not =
-yet valid
-[    3.118639] MODSIGN: Problem loading in-kernel X.509 certificate (-129)
+On systems where the hardware clock is inaccurate (a common occurrence
+and one which doesn't even get noticed when you use NTP or something
+else to fix it during the boot sequence), this was preventing the module
+signing cert from being loaded during boot. When the clock got fixed
+later on in he boot sequence, things *should* have started working. But
+they didn't...
 
-...and then spew error messages every time a module is loaded.=20
+Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+---
 
-For the kernel, it makes *absolutely* no sense to be checking the start
-date of the certificate. We do not have a usage model where someone says
-"hey, here's this kernel module but I don't want you to be able to use
-it until tomorrow so I've post-dated its signature".
+Arguably, for the specific case of module signing we shouldn't bother
+checking for a current time before the ValidFrom date *at all*. It's
+*always* going to be a screwed up system clock, because we don't have a
+usage model of post-dating module signatures. We should simply document
+that the date is *not* checked for module signing, and have done with
+it. But that's a separate issue.
 
-If we *ever* try to load a signed kernel module when the certificate is
-"not yet valid", it's because the clock is wrong. It's as simple as
-that.
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_k=
+eys/x509_public_key.c
+index 06007f0..326dc80 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -154,8 +154,6 @@ static int x509_key_preparse(struct key_preparsed_paylo=
+ad *prep)
+ 		     (now.tm_sec < cert->valid_from.tm_sec
+ 		      ))))))))))) {
+ 		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
+-		ret =3D -EKEYREJECTED;
+-		goto error_free_cert;
+ 	}
+ 	if (now.tm_year > cert->valid_to.tm_year ||
+ 	    (now.tm_year =3D=3D cert->valid_to.tm_year &&
+@@ -170,8 +168,6 @@ static int x509_key_preparse(struct key_preparsed_paylo=
+ad *prep)
+ 		     (now.tm_sec > cert->valid_to.tm_sec
+ 		      ))))))))))) {
+ 		pr_warn("Cert %s has expired\n", cert->fingerprint);
+-		ret =3D -EKEYEXPIRED;
+-		goto error_free_cert;
+ 	}
+=20
+ 	cert->pub->algo =3D x509_public_key_algorithms[cert->pkey_algo];
 
-And even if we *did* want to support that stupid "load this tomorrow"
-use case, it's broken. You couldn't boot today, then load the offending
-module tomorrow. You'd have to *reboot* tomorrow, because the kernel
-refused to load the damn cert into its store at all.
 
-For the specific case of module signing, we should probably just disable
-the date checks completely.
+
 
 --=20
-dwmw2
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
 
---=-fFD9nZ5HmDapRimHSVaE
+--=-L5jYkeiCsN9QCVuuZUHu
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -189,19 +189,19 @@ kSIc5N4d9Lk3ypCnrYMvvqLspXcWeymdD7qC0KwcuOuRKEC6LBExggNvMIIDawIBATCBlDCBjDEL
 MAkGA1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKzApBgNVBAsTIlNlY3VyZSBEaWdp
 dGFsIENlcnRpZmljYXRlIFNpZ25pbmcxODA2BgNVBAMTL1N0YXJ0Q29tIENsYXNzIDEgUHJpbWFy
 eSBJbnRlcm1lZGlhdGUgQ2xpZW50IENBAgMEJnowCQYFKw4DAhoFAKCCAa8wGAYJKoZIhvcNAQkD
-MQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTMwMzE0MTA0ODE0WjAjBgkqhkiG9w0BCQQx
-FgQUAkeLFZbBYVGKn5QxMRzd4qs2+0gwgaUGCSsGAQQBgjcQBDGBlzCBlDCBjDELMAkGA1UEBhMC
+MQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTMwMzE0MTIyNDAyWjAjBgkqhkiG9w0BCQQx
+FgQUJ+V47EXSiELUy0As5lRRWz7DkscwgaUGCSsGAQQBgjcQBDGBlzCBlDCBjDELMAkGA1UEBhMC
 SUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKzApBgNVBAsTIlNlY3VyZSBEaWdpdGFsIENlcnRp
 ZmljYXRlIFNpZ25pbmcxODA2BgNVBAMTL1N0YXJ0Q29tIENsYXNzIDEgUHJpbWFyeSBJbnRlcm1l
 ZGlhdGUgQ2xpZW50IENBAgMEJnowgacGCyqGSIb3DQEJEAILMYGXoIGUMIGMMQswCQYDVQQGEwJJ
 TDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERpZ2l0YWwgQ2VydGlm
 aWNhdGUgU2lnbmluZzE4MDYGA1UEAxMvU3RhcnRDb20gQ2xhc3MgMSBQcmltYXJ5IEludGVybWVk
-aWF0ZSBDbGllbnQgQ0ECAwQmejANBgkqhkiG9w0BAQEFAASCAQC3nNerIEYezvVs5yiiAHP7Ur+t
-NASIKn2AMQMwfbyOimi131vjTBdN+OLTYwEcbmRbviycwFXHA1lIPG6nRqVrb/m1c8Mardq6BBTW
-YlWLZsrTRIjEaTPqL0mfcmNTo7PsZlu23qJfmuBF84pnZ6OY53B5rSS4hXyBuyr/lX74YJGY8JeK
-9czXUMLd9v/Jbwd/GBrEvCxTQFCXJouiDAaxWuDNCw+7xJ1uKfrYPXcWBz0q+r1Ssp5ryflNsmkb
-NBe9uzc8ZSUA8380xVTH2fXIU+Ujo6PulV7AmFnkFkYBtQZandSTC62HlMbgOwIRhhmHMt2HEd+R
-caOgAu1Ng3frAAAAAAAA
+aWF0ZSBDbGllbnQgQ0ECAwQmejANBgkqhkiG9w0BAQEFAASCAQAl8HDcXKpd+ggHESf34ZikZkxU
+JJvoNWOgjklwzKQHnAUkCLgT+Xhb+rqC13T8bU/+n44NwQVHXzT/yTJh7GGwD3cPyMCsS51ExluS
+xR/kSBeEwyeZoos8THhTdpcE/vPudobsqWjwRIRCMixvVx2CKgGzzqBKxqdyAATxrhyf6CYuEy+I
+5+2bOMuHBQMdJsIkdZuNnk6sBQA4++VpiFXIzeugZdbfuZX37Eou1dU4WbRdKmgR9hIyEwj2sPmq
+zqdwnr9dJGbY3brZl0neSRJ/CgleSl2pytoSmbSD2FxoIObI66XAYNvmwNc6l9aBNpuTQCrM+e27
+IrpxAnrkb6gnAAAAAAAA
 
 
---=-fFD9nZ5HmDapRimHSVaE--
+--=-L5jYkeiCsN9QCVuuZUHu--
