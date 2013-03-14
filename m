@@ -1,41 +1,42 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 0/2] lib,crypto: Add lz4 compressor module and crypto
- API
-Date: Thu, 14 Mar 2013 13:57:38 -0700
-Message-ID: <20130314135738.99fe3f091af728c149ce53a2@linux-foundation.org>
-References: <CAOAMb1D+h8BRu=YWQ9dJ3JN-5CmmDLjgq1mLnnCH9TELrPx2bw@mail.gmail.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: authencesn compatibility problemn between software crypto and
+ talitos driver
+Date: Thu, 14 Mar 2013 18:34:11 -0500
+Message-ID: <20130314183411.cb9f4c34c8a23a300dc6d63b@freescale.com>
+References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp>
+	<20130311071518.GD21448@secunet.com>
+	<513F602A.9000201@freescale.com>
+	<BD54DDEB2546894FAB0731EA7B0EDF8D07C58712@RockMX01.rock.corp>
+	<5141A4A0.1090105@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "Darrick J. Wong" <djwong@us.ibm.com>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	Richard Weinberger <richard@nod.at>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Yann Collet <yann.collet.73@gmail.com>,
-	Kyungsik Lee <kyungsik.lee@lge.com>,
-	Chanho Min <chanho0207@gmail.com>
-To: Chanho Min <chanho.min@lge.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:36049 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752129Ab3CNU5k (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Mar 2013 16:57:40 -0400
-In-Reply-To: <CAOAMb1D+h8BRu=YWQ9dJ3JN-5CmmDLjgq1mLnnCH9TELrPx2bw@mail.gmail.com>
+Received: from mail-db8lp0184.outbound.messaging.microsoft.com ([213.199.154.184]:57002
+	"EHLO db8outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751154Ab3CNXxQ convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Mar 2013 19:53:16 -0400
+In-Reply-To: <5141A4A0.1090105@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 14 Mar 2013 18:48:20 +0900 Chanho Min <chanho.min@lge.com> wrote:
+On Thu, 14 Mar 2013 12:21:20 +0200
+Horia Geant=C4=83 <horia.geanta@freescale.com> wrote:
 
-> This patchset is for supporting LZ4 compression and the crypto API using it.
-> This should be applied after the previous Kyungsik's "LZ4 compressed kernel"
-> patches - https://lkml.org/lkml/2013/3/5/181.
+> On 3/12/2013 10:57 PM, Chaoxing Lin wrote:
+> > The freescale crypto engine is still capable of doing AES-CBC + HMA=
+C-SHAxxx in one shot.
+> > "DESC_HDR_TYPE_IPSEC_ESP" may not able to achieve authencesn.
+>=20
+> Correct. And that's why I think reverting "crypto: talitos - add IPse=
+c=20
+> ESN support" is the right thing to do.
 
-Thanks.
+This would need to happen for -stable anyway.
 
-Yann, it would be appreciated if you could give us your Signed-off-by:
-as an indication of your approval for including this code into Linux. 
-This is a bit of kernel legal bureaucracy which is explained at
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/SubmittingPatches?id=refs/tags/v3.9-rc2,
-line 300.
+Kim
