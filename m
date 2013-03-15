@@ -1,42 +1,32 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: authencesn compatibility problemn between software crypto and
- talitos driver
-Date: Thu, 14 Mar 2013 18:34:11 -0500
-Message-ID: <20130314183411.cb9f4c34c8a23a300dc6d63b@freescale.com>
-References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C583E5@RockMX01.rock.corp>
-	<20130311071518.GD21448@secunet.com>
-	<513F602A.9000201@freescale.com>
-	<BD54DDEB2546894FAB0731EA7B0EDF8D07C58712@RockMX01.rock.corp>
-	<5141A4A0.1090105@freescale.com>
+From: Jamie Iles <jamie@jamieiles.com>
+Subject: Re: [PATCH 1/1] crypto: picoxcell_crypto: Use of_match_ptr() macro
+Date: Fri, 15 Mar 2013 09:54:05 +0000
+Message-ID: <20130315095405.GI6473@sycamore.jamieiles.com>
+References: <1363256218-26326-1-git-send-email-sachin.kamat@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	jamie@jamieiles.com, davem@davemloft.net
+To: Sachin Kamat <sachin.kamat@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db8lp0184.outbound.messaging.microsoft.com ([213.199.154.184]:57002
-	"EHLO db8outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751154Ab3CNXxQ convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Mar 2013 19:53:16 -0400
-In-Reply-To: <5141A4A0.1090105@freescale.com>
+Received: from mail-ea0-f175.google.com ([209.85.215.175]:63216 "EHLO
+	mail-ea0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752786Ab3COJtG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 Mar 2013 05:49:06 -0400
+Received: by mail-ea0-f175.google.com with SMTP id o10so1401424eaj.6
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Mar 2013 02:49:05 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1363256218-26326-1-git-send-email-sachin.kamat@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 14 Mar 2013 12:21:20 +0200
-Horia Geant=C4=83 <horia.geanta@freescale.com> wrote:
+Thanks Sachin!
 
-> On 3/12/2013 10:57 PM, Chaoxing Lin wrote:
-> > The freescale crypto engine is still capable of doing AES-CBC + HMA=
-C-SHAxxx in one shot.
-> > "DESC_HDR_TYPE_IPSEC_ESP" may not able to achieve authencesn.
->=20
-> Correct. And that's why I think reverting "crypto: talitos - add IPse=
-c=20
-> ESN support" is the right thing to do.
+On Thu, Mar 14, 2013 at 03:46:58PM +0530, Sachin Kamat wrote:
+> This eliminates having an #ifdef returning NULL for the case
+> when OF is disabled.
+> 
+> Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 
-This would need to happen for -stable anyway.
-
-Kim
+Acked-by: Jamie Iles <jamie@jamieiles.com>
