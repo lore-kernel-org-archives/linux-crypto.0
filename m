@@ -1,22 +1,26 @@
-From: Jarod Wilson <jarod@redhat.com>
+From: Neil Horman <nhorman@tuxdriver.com>
 Subject: Re: [PATCH] [char] random: fix priming of last_data
-Date: Tue, 19 Mar 2013 13:12:09 -0400
-Message-ID: <20130319171209.GD20163@redhat.com>
+Date: Tue, 19 Mar 2013 13:33:43 -0400
+Message-ID: <20130319173343.GA3656@hmsreliant.think-freely.org>
 References: <1363709889-22344-1-git-send-email-jarod@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	Neil Horman <nhorman@tuxdriver.com>,
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Matt Mackall <mpm@selenic.com>,
-	"Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
+	Matt Mackall <mpm@selenic.com>, Theodore Ts'o <tytso@mit.edu>,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: Jarod Wilson <jarod@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:51617 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753622Ab3CSRd5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 Mar 2013 13:33:57 -0400
 Content-Disposition: inline
 In-Reply-To: <1363709889-22344-1-git-send-email-jarod@redhat.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On Tue, Mar 19, 2013 at 12:18:09PM -0400, Jarod Wilson wrote:
 > Commit ec8f02da9e added priming of last_data per fips requirements.
@@ -28,11 +32,6 @@ On Tue, Mar 19, 2013 at 12:18:09PM -0400, Jarod Wilson wrote:
 > shot, so there's no window for multiple cpus to increment nbytes -- in
 > fact, we won't even increment or decrement nbytes anymore, we'll just
 > extract the needed EXTRACT_BYTES one time per pool and then carry on with
-                             ^^^^^
-		     EXTRACT_SIZE
-
-Error in the description, if anyone actually cares. Oops.
-
 > the normal routine.
 > 
 > All these changes have been tested across multiple hosts and architectures
@@ -41,7 +40,73 @@ Error in the description, if anyone actually cares. Oops.
 > 
 > This change should also go into 3.8-stable, to make the myriads of fips
 > users on 3.8.x happy.
-
--- 
-Jarod Wilson
-jarod@redhat.com
+> 
+> Tested-by: Jan Stancek <jstancek@redhat.com>
+> Tested-by: Jan Stodola <jstodola@redhat.com>
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> CC: Neil Horman <nhorman@tuxdriver.com>
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Matt Mackall <mpm@selenic.com>
+> CC: "Theodore Ts'o" <tytso@mit.edu>
+> CC: linux-crypto@vger.kernel.org
+> CC: stable@vger.kernel.org
+> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> ---
+>  drivers/char/random.c |   30 +++++++++++++++---------------
+>  1 files changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index 85e81ec..15e5a2b 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -953,10 +953,23 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+>  {
+>  	ssize_t ret = 0, i;
+>  	__u8 tmp[EXTRACT_SIZE];
+> +	unsigned long flags;
+>  
+>  	/* if last_data isn't primed, we need EXTRACT_SIZE extra bytes */
+> -	if (fips_enabled && !r->last_data_init)
+> -		nbytes += EXTRACT_SIZE;
+> +	if (fips_enabled) {
+> +		spin_lock_irqsave(&r->lock, flags);
+> +		if (!r->last_data_init) {
+> +			r->last_data_init = true;
+> +			spin_unlock_irqrestore(&r->lock, flags);
+> +			trace_extract_entropy(r->name, EXTRACT_SIZE,
+> +					      r->entropy_count, _RET_IP_);
+> +			xfer_secondary_pool(r, EXTRACT_SIZE);
+> +			extract_buf(r, tmp);
+> +			spin_lock_irqsave(&r->lock, flags);
+> +			memcpy(r->last_data, tmp, EXTRACT_SIZE);
+> +		}
+> +		spin_unlock_irqrestore(&r->lock, flags);
+> +	}
+>  
+>  	trace_extract_entropy(r->name, nbytes, r->entropy_count, _RET_IP_);
+>  	xfer_secondary_pool(r, nbytes);
+> @@ -966,19 +979,6 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
+>  		extract_buf(r, tmp);
+>  
+>  		if (fips_enabled) {
+> -			unsigned long flags;
+> -
+> -
+> -			/* prime last_data value if need be, per fips 140-2 */
+> -			if (!r->last_data_init) {
+> -				spin_lock_irqsave(&r->lock, flags);
+> -				memcpy(r->last_data, tmp, EXTRACT_SIZE);
+> -				r->last_data_init = true;
+> -				nbytes -= EXTRACT_SIZE;
+> -				spin_unlock_irqrestore(&r->lock, flags);
+> -				extract_buf(r, tmp);
+> -			}
+> -
+>  			spin_lock_irqsave(&r->lock, flags);
+>  			if (!memcmp(tmp, r->last_data, EXTRACT_SIZE))
+>  				panic("Hardware RNG duplicated output!\n");
+> -- 
+> 1.7.1
+> 
+> 
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
