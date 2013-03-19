@@ -1,62 +1,84 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 0/2] lib,crypto: Add lz4 compressor module and crypto
- API
-Date: Tue, 19 Mar 2013 13:52:17 -0700
-Message-ID: <20130319135217.7fe2cd4064f633c5220b6f65@linux-foundation.org>
-References: <CAOAMb1D+h8BRu=YWQ9dJ3JN-5CmmDLjgq1mLnnCH9TELrPx2bw@mail.gmail.com>
-	<20130314135738.99fe3f091af728c149ce53a2@linux-foundation.org>
-	<CADv+DGmM=rzXNpAe0vC7cQ8cKKSXh=TTzzer=65p73E6qCUkhA@mail.gmail.com>
+From: Alexander Holler <holler@ahsoftware.de>
+Subject: Re: [PATCH] Fix x509_key_preparse() not to reject keys outside their
+ validity time range
+Date: Tue, 19 Mar 2013 22:06:39 +0100
+Message-ID: <5148D35F.5070704@ahsoftware.de>
+References: <5555.1348531649@warthog.procyon.org.uk>  <21845.1348585794@warthog.procyon.org.uk>  <20120925163037.20ba3f3c@pyramind.ukuu.org.uk>  <1363258094.4853.20.camel@i7.infradead.org> <1363263842.4853.35.camel@i7.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Chanho Min <chanho.min@lge.com>,
-	"Darrick J. Wong" <djwong@us.ibm.com>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	Richard Weinberger <richard@nod.at>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Kyungsik Lee <kyungsik.lee@lge.com>,
-	Chanho Min <chanho0207@gmail.com>
-To: Yann Collet <yann.collet.73@gmail.com>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	David Howells <dhowells@redhat.com>, rusty@rustcorp.com.au,
+	herbert@gondor.hengli.com.au, pjones@redhat.com,
+	jwboyer@redhat.com, linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org, keyrings@linux-nfs.org
+To: David Woodhouse <dwmw2@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60631 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933759Ab3CSUwU (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:49389 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751542Ab3CSVHF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Mar 2013 16:52:20 -0400
-In-Reply-To: <CADv+DGmM=rzXNpAe0vC7cQ8cKKSXh=TTzzer=65p73E6qCUkhA@mail.gmail.com>
+	Tue, 19 Mar 2013 17:07:05 -0400
+In-Reply-To: <1363263842.4853.35.camel@i7.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 19 Mar 2013 15:42:04 +0100 Yann Collet <yann.collet.73@gmail.com> wrote:
+Am 14.03.2013 13:24, schrieb David Woodhouse:
+> The x509_key_preparse() function will refuse to even *parse* a
+> certificate when the system clock happens to be set to a time before the
+> ValidFrom or after the ValidTo date.
+>
+> This is wrong. If date checks are to be done, they need to be done at
+> the time the cert is *used*. It should be perfectly possible to load a
+> cert which is post-dated, and can only be used for validation at some
+> point in the future. The key in question should immediately start
+> working at its ValidFrom date, and stop again at its ValidTo date. It
+> should be allowed to *exist* in the kernel both before and after those
+> times.
+>
+> On systems where the hardware clock is inaccurate (a common occurrence
+> and one which doesn't even get noticed when you use NTP or something
+> else to fix it during the boot sequence), this was preventing the module
+> signing cert from being loaded during boot. When the clock got fixed
+> later on in he boot sequence, things *should* have started working. But
+> they didn't...
+>
+> Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+> ---
+>
+> Arguably, for the specific case of module signing we shouldn't bother
+> checking for a current time before the ValidFrom date *at all*. It's
+> *always* going to be a screwed up system clock, because we don't have a
+> usage model of post-dating module signatures. We should simply document
+> that the date is *not* checked for module signing, and have done with
+> it. But that's a separate issue.
+>
+> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+> index 06007f0..326dc80 100644
+> --- a/crypto/asymmetric_keys/x509_public_key.c
+> +++ b/crypto/asymmetric_keys/x509_public_key.c
+> @@ -154,8 +154,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+>   		     (now.tm_sec < cert->valid_from.tm_sec
+>   		      ))))))))))) {
+>   		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
+> -		ret = -EKEYREJECTED;
+> -		goto error_free_cert;
+>   	}
+>   	if (now.tm_year > cert->valid_to.tm_year ||
+>   	    (now.tm_year == cert->valid_to.tm_year &&
+> @@ -170,8 +168,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+>   		     (now.tm_sec > cert->valid_to.tm_sec
+>   		      ))))))))))) {
+>   		pr_warn("Cert %s has expired\n", cert->fingerprint);
+> -		ret = -EKEYEXPIRED;
+> -		goto error_free_cert;
+>   	}
+>
+>   	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
 
-> Thanks for pointing that out.
-> I've been looking into the document pointed by Andrew,
-> and here is my understanding :
-> 
->  Signed-off-by is a one-line, so in this case :
-> 
-> Signed-off-by: Yann Collet <yann.collet.73@gmail.com>
-> 
-> 
-> or
-> 
-> Signed-off-by follows a declaration, in this case it might be :
-> 
-> Developer's Certificate of Origin 1.1
-> 
->         By making a contribution to this project, I certify that:
-> 
->         (a) The contribution was created in whole or in part by me and I
->             have the right to submit it under the open source license
->             indicated in the file;
-> 
-> 
-> Signed-off-by: Yann Collet <yann.collet.73@gmail.com>
-> 
-> 
-> 
-> Is that correct ?
-> Should it be sent within this mailing list, or somewhere else ?
+Why not remove the check and warning there too?
 
-That's just fine - thanks!
+Regards,
+
+Alexander
