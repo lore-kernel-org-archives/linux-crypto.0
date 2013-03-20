@@ -1,8 +1,8 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] Revert "crypto: talitos - add IPsec ESN support"
-Date: Wed, 20 Mar 2013 18:46:34 -0500
-Message-ID: <20130320184634.f1443f3ed23b3c6e8648429e@freescale.com>
-References: <1363789898-15297-1-git-send-email-horia.geanta@freescale.com>
+Subject: Re: [PATCH] Revert "crypto: caam - add IPsec ESN support"
+Date: Wed, 20 Mar 2013 18:46:52 -0500
+Message-ID: <20130320184652.08baaf2c8cd50e759a15a153@freescale.com>
+References: <1363789918-15334-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
@@ -13,19 +13,19 @@ Cc: <linux-crypto@vger.kernel.org>,
 	<stable@vger.kernel.org>
 To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [213.199.154.206] ([213.199.154.206]:54012 "EHLO
+Received: from [213.199.154.206] ([213.199.154.206]:8302 "EHLO
 	am1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752153Ab3CTXup (ORCPT
+	by vger.kernel.org with ESMTP id S1752260Ab3CTXvI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Mar 2013 19:50:45 -0400
-In-Reply-To: <1363789898-15297-1-git-send-email-horia.geanta@freescale.com>
+	Wed, 20 Mar 2013 19:51:08 -0400
+In-Reply-To: <1363789918-15334-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 20 Mar 2013 16:31:38 +0200
+On Wed, 20 Mar 2013 16:31:58 +0200
 Horia Geanta <horia.geanta@freescale.com> wrote:
 
-> This reverts commit e763eb699be723fb41af818118068c6b3afdaf8d.
+> This reverts commit 891104ed008e8646c7860fe5bc70b0aac55dcc6c.
 > 
 > Current IPsec ESN implementation for authencesn(cbc(aes), hmac(sha))
 > (separate encryption and integrity algorithms) does not conform
