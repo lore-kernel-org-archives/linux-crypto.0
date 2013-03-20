@@ -1,47 +1,51 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH 08/10] workqueue: break init_and_link_pwq() into two
- functions and introduce alloc_unbound_pwq()
-Date: Wed, 20 Mar 2013 09:04:12 -0700
-Message-ID: <20130320160412.GZ3042@htj.dyndns.org>
+From: Lai Jiangshan <eag0628@gmail.com>
+Subject: Re: [PATCH 01/10] workqueue: add wq_numa_tbl_len and wq_numa_possible_cpumask[]
+Date: Thu, 21 Mar 2013 00:43:08 +0800
+Message-ID: <CACvQF52uoi0eX0x0mjHn0+q38nQbeMmh+NBamxpF3edGkK9zAQ@mail.gmail.com>
 References: <1363737629-16745-1-git-send-email-tj@kernel.org>
- <1363737629-16745-9-git-send-email-tj@kernel.org>
- <CACvQF52vBmDi7nbg2O+CEo7M=n+RZSdEK45vyuCgv=o6R36KeA@mail.gmail.com>
+	<1363737629-16745-2-git-send-email-tj@kernel.org>
+	<CACvQF53ssw_o4Hbjnp9Z2MZieBO=WhL0Po80jR6NGEjMNGENGA@mail.gmail.com>
+	<20130320154814.GY3042@htj.dyndns.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: laijs@cn.fujitsu.com, axboe@kernel.dk, jack@suse.cz,
 	fengguang.wu@intel.com, jmoyer@redhat.com, zab@redhat.com,
 	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Lai Jiangshan <eag0628@gmail.com>
+To: Tejun Heo <tj@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pb0-f42.google.com ([209.85.160.42]:44875 "EHLO
-	mail-pb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752737Ab3CTQEU (ORCPT
+Received: from mail-ie0-f178.google.com ([209.85.223.178]:34565 "EHLO
+	mail-ie0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933184Ab3CTQnI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Mar 2013 12:04:20 -0400
-Content-Disposition: inline
-In-Reply-To: <CACvQF52vBmDi7nbg2O+CEo7M=n+RZSdEK45vyuCgv=o6R36KeA@mail.gmail.com>
+	Wed, 20 Mar 2013 12:43:08 -0400
+In-Reply-To: <20130320154814.GY3042@htj.dyndns.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 20, 2013 at 11:52:03PM +0800, Lai Jiangshan wrote:
-> > +static struct pool_workqueue *alloc_unbound_pwq(struct workqueue_struct *wq,
-> > +                                       const struct workqueue_attrs *attrs)
-> > +{
-> > +       struct worker_pool *pool;
-> > +       struct pool_workqueue *pwq;
-> > +
-> > +       pool = get_unbound_pool(attrs);
-> > +       if (!pool)
-> > +               return NULL;
-> > +
-> > +       pwq = kmem_cache_zalloc(pwq_cache, GFP_KERNEL);
-> 
-> this allocation is not numa-awared, you may use pool->node here.
+On Wed, Mar 20, 2013 at 11:48 PM, Tejun Heo <tj@kernel.org> wrote:
+> On Wed, Mar 20, 2013 at 11:43:30PM +0800, Lai Jiangshan wrote:
+>> > +       for_each_node(node)
+>> > +               BUG_ON(!alloc_cpumask_var_node(&wq_numa_possible_cpumask[node],
+>> > +                                              GFP_KERNEL, node));
+>> > +       for_each_possible_cpu(cpu) {
+>> > +               node = cpu_to_node(cpu);
+>> > +               if (WARN_ON(node == NUMA_NO_NODE)) {
+>> > +                       pr_err("workqueue: NUMA node mapping not available for cpu%d, disabling NUMA support\n", cpu);
+>>
+>> since you used WARN_ON(), not BUG_ON(), I think you need to free
+>> allocated memory here.
+>
+> I don't know.  Is it necessary?  It shouldn't happen sans bugs in arch
+> code and we're vomiting warning message with full stack trace.  The
+> system will function but something is seriously screwed.  I don't
+> think it matters whether we free the puny number of bytes there or
+> not and I don't wanna nest deeper there. :P
 
-Nice catch.  Will do.
 
-Thanks.
+I agree with you, but many people use semantic analysis tools to do
+hunting in the kernel. they may interrupt you again.
 
--- 
-tejun
+>
+> --
+> tejun
