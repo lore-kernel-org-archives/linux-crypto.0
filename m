@@ -1,7 +1,8 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] Revert "crypto: caam - add IPsec ESN support"
-Date: Wed, 20 Mar 2013 16:15:07 +0200
-Message-ID: <1363788908-14714-1-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH] Revert "crypto: talitos - add IPsec ESN support"
+Date: Wed, 20 Mar 2013 16:15:08 +0200
+Message-ID: <1363788908-14714-2-git-send-email-horia.geanta@freescale.com>
+References: <1363788908-14714-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
@@ -10,16 +11,12 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	Kim Phillips <kim.phillips@freescale.com>,
 	<stable@vger.kernel.org>, <3.7@tx30smr01.am.freescale.net>
 To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [216.32.181.182] ([216.32.181.182]:6815 "EHLO
-	ch1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751239Ab3CTOSH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Mar 2013 10:18:07 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1363788908-14714-1-git-send-email-horia.geanta@freescale.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This reverts commit 891104ed008e8646c7860fe5bc70b0aac55dcc6c
+This reverts commit e763eb699be723fb41af818118068c6b3afdaf8d
 (upstream: 891104ed008e8646c7860fe5bc70b0aac55dcc6c).
 
 Current IPsec ESN implementation for authencesn(cbc(aes), hmac(sha))
@@ -35,75 +32,79 @@ Cc: <stable@vger.kernel.org> # 3.8, 3.7
 Reported-by: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c |   27 ++-------------------------
- drivers/crypto/caam/compat.h  |    1 -
- 2 files changed, 2 insertions(+), 26 deletions(-)
+ drivers/crypto/talitos.c |   30 ++----------------------------
+ 1 files changed, 2 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b2a0a07..cf268b1 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1650,11 +1650,7 @@ struct caam_alg_template {
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 09b184a..5b2b5e6 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -38,7 +38,6 @@
+ #include <linux/spinlock.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/slab.h>
+-#include <linux/string.h>
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/aes.h>
+@@ -1974,11 +1973,7 @@ struct talitos_alg_template {
  };
  
- static struct caam_alg_template driver_algs[] = {
+ static struct talitos_alg_template driver_algs[] = {
 -	/*
--	 * single-pass ipsec_esp descriptor
+-	 * AEAD algorithms. These use a single-pass ipsec_esp descriptor.
 -	 * authencesn(*,*) is also registered, although not present
 -	 * explicitly here.
 -	 */
-+	/* single-pass ipsec_esp descriptor */
- 	{
- 		.name = "authenc(hmac(md5),cbc(aes))",
- 		.driver_name = "authenc-hmac-md5-cbc-aes-caam",
-@@ -2217,9 +2213,7 @@ static int __init caam_algapi_init(void)
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
- 		/* TODO: check if h/w supports alg */
- 		struct caam_crypto_alg *t_alg;
--		bool done = false;
++	/* AEAD algorithms.  These use a single-pass ipsec_esp descriptor */
+ 	{	.type = CRYPTO_ALG_TYPE_AEAD,
+ 		.alg.crypto = {
+ 			.cra_name = "authenc(hmac(sha1),cbc(aes))",
+@@ -2820,9 +2815,7 @@ static int talitos_probe(struct platform_device *ofdev)
+ 		if (hw_supports(dev, driver_algs[i].desc_hdr_template)) {
+ 			struct talitos_crypto_alg *t_alg;
+ 			char *name = NULL;
+-			bool authenc = false;
  
 -authencesn:
- 		t_alg = caam_alg_alloc(ctrldev, &driver_algs[i]);
- 		if (IS_ERR(t_alg)) {
- 			err = PTR_ERR(t_alg);
-@@ -2233,25 +2227,8 @@ authencesn:
- 			dev_warn(ctrldev, "%s alg registration failed\n",
- 				t_alg->crypto_alg.cra_driver_name);
- 			kfree(t_alg);
--		} else {
-+		} else
- 			list_add_tail(&t_alg->entry, &priv->alg_list);
--			if (driver_algs[i].type == CRYPTO_ALG_TYPE_AEAD &&
--			    !memcmp(driver_algs[i].name, "authenc", 7) &&
--			    !done) {
--				char *name;
+ 			t_alg = talitos_alg_alloc(dev, &driver_algs[i]);
+ 			if (IS_ERR(t_alg)) {
+ 				err = PTR_ERR(t_alg);
+@@ -2837,8 +2830,6 @@ authencesn:
+ 				err = crypto_register_alg(
+ 						&t_alg->algt.alg.crypto);
+ 				name = t_alg->algt.alg.crypto.cra_driver_name;
+-				authenc = authenc ? !authenc :
+-					  !(bool)memcmp(name, "authenc", 7);
+ 				break;
+ 			case CRYPTO_ALG_TYPE_AHASH:
+ 				err = crypto_register_ahash(
+@@ -2851,25 +2842,8 @@ authencesn:
+ 				dev_err(dev, "%s alg registration failed\n",
+ 					name);
+ 				kfree(t_alg);
+-			} else {
++			} else
+ 				list_add_tail(&t_alg->entry, &priv->alg_list);
+-				if (authenc) {
+-					struct crypto_alg *alg =
+-						&driver_algs[i].alg.crypto;
 -
--				name = driver_algs[i].name;
--				memmove(name + 10, name + 7, strlen(name) - 7);
--				memcpy(name + 7, "esn", 3);
+-					name = alg->cra_name;
+-					memmove(name + 10, name + 7,
+-						strlen(name) - 7);
+-					memcpy(name + 7, "esn", 3);
 -
--				name = driver_algs[i].driver_name;
--				memmove(name + 10, name + 7, strlen(name) - 7);
--				memcpy(name + 7, "esn", 3);
+-					name = alg->cra_driver_name;
+-					memmove(name + 10, name + 7,
+-						strlen(name) - 7);
+-					memcpy(name + 7, "esn", 3);
 -
--				done = true;
--				goto authencesn;
+-					goto authencesn;
+-				}
 -			}
--		}
+ 		}
  	}
  	if (!list_empty(&priv->alg_list))
- 		dev_info(ctrldev, "%s algorithms registered in /proc/crypto\n",
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index cf15e78..762aeff 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -23,7 +23,6 @@
- #include <linux/types.h>
- #include <linux/debugfs.h>
- #include <linux/circ_buf.h>
--#include <linux/string.h>
- #include <net/xfrm.h>
- 
- #include <crypto/algapi.h>
 -- 
 1.7.7.6
