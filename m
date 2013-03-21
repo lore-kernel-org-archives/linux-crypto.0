@@ -1,40 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 2/2] crypto: sahara: Add driver for SAHARA2
- accelerator.
-Date: Thu, 21 Mar 2013 17:53:54 +0800
-Message-ID: <20130321095354.GA26931@gondor.apana.org.au>
-References: <1362137873-8827-1-git-send-email-javier.martin@vista-silicon.com>
- <1362137873-8827-3-git-send-email-javier.martin@vista-silicon.com>
+Subject: Re: [PATCH] crypto: replace kmalloc and then memcpy with kmemdup
+Date: Thu, 21 Mar 2013 17:54:16 +0800
+Message-ID: <20130321095415.GB26931@gondor.apana.org.au>
+References: <1362998890-7532-1-git-send-email-mihneadb@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, devicetree-discuss@lists.ozlabs.org,
-	davem@davemloft.net, kernel@pengutronix.de, gcembed@gmail.com,
-	shawn.guo@linaro.org, arnd@arndb.de, swarren@nvidia.com
-To: Javier Martin <javier.martin@vista-silicon.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	linus.walleij@linaro.org, andreas.westin@stericsson.com,
+	arnd@arndb.de, rubini@unipv.it, linux-kernel@vger.kernel.org
+To: Mihnea Dobrescu-Balaur <mihneadb@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:57476 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:46168 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754414Ab3CUJyW (ORCPT
+	with ESMTP id S1757856Ab3CUJyf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 Mar 2013 05:54:22 -0400
+	Thu, 21 Mar 2013 05:54:35 -0400
 Content-Disposition: inline
-In-Reply-To: <1362137873-8827-3-git-send-email-javier.martin@vista-silicon.com>
+In-Reply-To: <1362998890-7532-1-git-send-email-mihneadb@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 01, 2013 at 12:37:53PM +0100, Javier Martin wrote:
-> SAHARA2 HW module is included in the i.MX27 SoC from
-> Freescale. It is capable of performing cipher algorithms
-> such as AES, 3DES..., hashing and RNG too.
-> 
-> This driver provides support for AES-CBC and AES-ECB
-> by now.
-> 
-> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Javier Martin <javier.martin@vista-silicon.com>
+On Mon, Mar 11, 2013 at 12:48:10PM +0200, Mihnea Dobrescu-Balaur wrote:
+> Signed-off-by: Mihnea Dobrescu-Balaur <mihneadb@gmail.com>
 
-Patch applied to cryptodev.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
