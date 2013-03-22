@@ -1,30 +1,50 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH] crypto: replace kmalloc and then memcpy with kmemdup
-Date: Thu, 21 Mar 2013 19:18:45 +0100
-Message-ID: <CACRpkdbqhjm9=o5GG5Anqa5bRFL5cTdrXD=ZBd=7gntvoSSaCg@mail.gmail.com>
-References: <1362998890-7532-1-git-send-email-mihneadb@gmail.com>
-	<20130321095415.GB26931@gondor.apana.org.au>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next] crypto: ux500 - fix error return code in hash_dma_final()
+Date: Fri, 22 Mar 2013 21:18:44 +0800
+Message-ID: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Mihnea Dobrescu-Balaur <mihneadb@gmail.com>,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	andreas.westin@stericsson.com, arnd@arndb.de, rubini@unipv.it,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20130321095415.GB26931@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: yongjun_wei@trendmicro.com.cn, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, linus.walleij@linaro.org,
+	andreas.westin@stericsson.com, arnd@arndb.de, rubini@unipv.it
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bk0-f50.google.com ([209.85.214.50]:45373 "EHLO
+	mail-bk0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753876Ab3CVNSq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Mar 2013 09:18:46 -0400
+Received: by mail-bk0-f50.google.com with SMTP id jg9so1839485bkc.23
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Mar 2013 06:18:44 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 21, 2013 at 10:54 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Mon, Mar 11, 2013 at 12:48:10PM +0200, Mihnea Dobrescu-Balaur wrote:
->> Signed-off-by: Mihnea Dobrescu-Balaur <mihneadb@gmail.com>
->
-> Patch applied.  Thanks.
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-Acked-by: Linus Walleij <linus.walleij@linaro.org> FWIW, I tried to get the
-people involved with the code to ACK but somehow they must've missed it.
+Fix to return a negative error code from the error handling
+case instead of 0, as returned elsewhere in this function.
 
-Thanks,
-Linus Walleij
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ drivers/crypto/ux500/hash/hash_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 8d16d3a..d99b671 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -939,6 +939,7 @@ static int hash_dma_final(struct ahash_request *req)
+ 	if (!ctx->device->dma.nents) {
+ 		dev_err(device_data->dev, "[%s] "
+ 				"ctx->device->dma.nents = 0", __func__);
++		ret = ctx->device->dma.nents;
+ 		goto out;
+ 	}
+ 
+@@ -946,6 +947,7 @@ static int hash_dma_final(struct ahash_request *req)
+ 	if (bytes_written != req->nbytes) {
+ 		dev_err(device_data->dev, "[%s] "
+ 				"hash_dma_write() failed!", __func__);
++		ret = bytes_written;
+ 		goto out;
+ 	}
+ 
