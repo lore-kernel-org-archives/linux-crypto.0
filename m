@@ -1,61 +1,55 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCHSET wq/for-3.10] workqueue: NUMA affinity for unbound
- workqueues
-Date: Sun, 24 Mar 2013 11:55:06 -0700
-Message-ID: <20130324185506.GA4378@htj.dyndns.org>
-References: <1363737629-16745-1-git-send-email-tj@kernel.org>
- <20130320185708.GB31256@htj.dyndns.org>
- <CACvQF53=qgUHrr944D_70dZpT-EOMtPcz2+0JPp4kOnGPzAptQ@mail.gmail.com>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: Re: [PATCH 06/11] Create module providing optimized SHA256 routines
+ using SSSE3, AVX or AVX2 instructions.
+Date: Sun, 24 Mar 2013 23:52:59 +0200
+Message-ID: <514F75BB.3080501@iki.fi>
+References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987761.8972.60.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: laijs@cn.fujitsu.com, axboe@kernel.dk, jack@suse.cz,
-	fengguang.wu@intel.com, jmoyer@redhat.com, zab@redhat.com,
-	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Lai Jiangshan <eag0628@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Kirk Yap <kirk.s.yap@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-da0-f41.google.com ([209.85.210.41]:62200 "EHLO
-	mail-da0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753976Ab3CXSzR (ORCPT
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:41621 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754728Ab3CXVxC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Mar 2013 14:55:17 -0400
-Content-Disposition: inline
-In-Reply-To: <CACvQF53=qgUHrr944D_70dZpT-EOMtPcz2+0JPp4kOnGPzAptQ@mail.gmail.com>
+	Sun, 24 Mar 2013 17:53:02 -0400
+In-Reply-To: <1363987761.8972.60.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey, Lai.
+On 22.03.2013 23:29, Tim Chen wrote:
+> We added glue code and config options to create crypto
+> module that uses SSE/AVX/AVX2 optimized SHA256 x86_64 assembly routines.
+> 
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-On Mon, Mar 25, 2013 at 12:04:19AM +0800, Lai Jiangshan wrote:
-> example:
-> node0(cpu0,cpu1),node1(cpu2,cpu3),
-> wq's cpumask: 1,3
-> the pwq of this wq on the node1's cpumask: 3
-> current online cpu: 0-2.
-> so the cpumask of worker tasks of the pwq on node1 is actually cpu_all_mask.
-> so the work scheduled from cpu2 can be executed on cpu0 or cpu2.
-> we expect it is executed on cpu1 only.
+..snip..
 
-Ah, right.  I was hoping to avoid doing pwq swaps on CPU hot[un]plugs
-doing everything on possible mask.  Looks like we'll need some
-massaging after all.
+> diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+> new file mode 100644
+> index 0000000..5876a19
+> --- /dev/null
+> +++ b/arch/x86/crypto/sha256_ssse3_glue.c
 
-> It can be fixed by swapping pwqs(node's pwq <-> default pwq)
-> when cpuhotplug. But could you reschedule this patchset to wq/for-3.11?
+..snip..
 
-We're still only at -rc4 meaning we still have plenty of time to
-resolve whatever issues which come up, so I think I'm still gonna
-target 3.10.
+> +static int __init sha256_ssse3_mod_init(void)
+> +{
+> +	/* test for SSE3 first */
+> +	if (cpu_has_xmm3)
+> +		sha256_transform_asm = sha256_transform_ssse3;
+> +
 
-> the whole patchset is more complicated than my brain.
+This causes OOPS on my computer. Maybe use 'cpu_has_ssse3' instead?
 
-It isn't that complex, is it?  I mean, the difficult part - using
-multiple pwqs on unbound wq - already happened, and even that wasn't
-too complex as it in most part synchronized the behaviors between
-per-cpu and unbound workqueues.  All that NUMA support is doing is
-mapping different pwqs to different issuing CPUs.
-
-Thanks.
-
--- 
-tejun
+-Jussi
