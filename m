@@ -1,13 +1,14 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 01/11] Added macro to check for AVX2 feature.
-Date: Fri, 22 Mar 2013 17:55:38 -0700
-Message-ID: <7243684e-3017-4519-8758-651618da609f@email.android.com>
-References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987742.8972.55.camel@schen9-DESK> <09e94963-5146-4c1b-ab76-64ac73d660ab@email.android.com> <1363998796.8972.69.camel@schen9-DESK>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: Re: [PATCH 06/11] Create module providing optimized SHA256 routines
+ using SSSE3, AVX or AVX2 instructions.
+Date: Sun, 24 Mar 2013 13:30:37 +0200
+Message-ID: <514EE3DD.6060102@iki.fi>
+References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987761.8972.60.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
 	Kirk Yap <kirk.s.yap@intel.com>,
 	David Cote <david.m.cote@intel.com>,
@@ -16,25 +17,32 @@ Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	linux-kernel <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
 To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1363998796.8972.69.camel@schen9-DESK>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:38532 "EHLO
+	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753243Ab3CXLal (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 24 Mar 2013 07:30:41 -0400
+In-Reply-To: <1363987761.8972.60.camel@schen9-DESK>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Just syntactic overhead.  We should probably discuss it among ourselves first though.
+On 22.03.2013 23:29, Tim Chen wrote:
+> We added glue code and config options to create crypto
+> module that uses SSE/AVX/AVX2 optimized SHA256 x86_64 assembly routines.
+> 
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> ---
 
-Tim Chen <tim.c.chen@linux.intel.com> wrote:
+I could not apply this patch cleanly on top of cryptodev-2.6 tree:
 
->On Fri, 2013-03-22 at 17:21 -0700, H. Peter Anvin wrote:
->> I really, really hate these macros... Not sure they are worth the
->extra noise.
->> 
->
->I can do without the macro and I'll remove it.
->
->Wonder the reason that such macro should be avoided?
->
->Tim
+Applying: Create module providing optimized SHA256 routines using SSSE3, AVX or AVX2 instructions.
+Using index info to reconstruct a base tree...
+Falling back to patching base and 3-way merge...
+Auto-merging crypto/Kconfig
+Auto-merging arch/x86/crypto/Makefile
+CONFLICT (content): Merge conflict in arch/x86/crypto/Makefile
+Failed to merge in the changes.
+Patch failed at 0006 Create module providing optimized SHA256 routines using SSSE3, AVX or AVX2 instructions.
 
--- 
-Sent from my mobile phone. Please excuse brevity and lack of formatting.
+-Jussi
