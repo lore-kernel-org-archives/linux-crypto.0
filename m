@@ -1,9 +1,9 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH 11/11] Create module providing optimized SHA512 routines
- using SSSE3, AVX or AVX2 instructions.
-Date: Sun, 24 Mar 2013 13:36:54 +0200
-Message-ID: <514EE556.7020004@iki.fi>
-References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987779.8972.65.camel@schen9-DESK>
+Subject: Re: [PATCH 03/11] Optimized sha256 x86_64 assembly routine using
+ Supplemental SSE3 instructions.
+Date: Sun, 24 Mar 2013 14:26:30 +0200
+Message-ID: <514EF0F6.4080604@iki.fi>
+References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987750.8972.57.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,67 +17,37 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-kernel <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
 To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:37556 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753298Ab3CXLg5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Mar 2013 07:36:57 -0400
-In-Reply-To: <1363987779.8972.65.camel@schen9-DESK>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1363987750.8972.57.camel@schen9-DESK>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 On 22.03.2013 23:29, Tim Chen wrote:
-> We added glue code and config options to create crypto
-> module that uses SSE/AVX/AVX2 optimized SHA512 x86_64 assembly routines.
+> Provides SHA256 x86_64 assembly routine optimized with SSSE3 instructions.
+> Speedup of 40% or more has been measured over the generic implementation.
 > 
 > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 > ---
->  arch/x86/crypto/Makefile            |   2 +
->  arch/x86/crypto/sha512_ssse3_glue.c | 276 ++++++++++++++++++++++++++++++++++++
->  crypto/Kconfig                      |  11 ++
->  3 files changed, 289 insertions(+)
->  create mode 100644 arch/x86/crypto/sha512_ssse3_glue.c
+>  arch/x86/crypto/sha256-ssse3-asm.S | 504 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 504 insertions(+)
+>  create mode 100644 arch/x86/crypto/sha256-ssse3-asm.S
 > 
-> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-> index 02a664a..7d12625 100644
-> --- a/arch/x86/crypto/Makefile
-> +++ b/arch/x86/crypto/Makefile
-> @@ -28,6 +28,7 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
->  obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
->  obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
->  obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
-> +obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
->  
->  aes-i586-y := aes-i586-asm_32.o aes_glue.o
->  twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
-> @@ -54,3 +55,4 @@ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
->  crc32c-intel-y := crc32c-intel_glue.o
->  crc32c-intel-$(CONFIG_CRYPTO_CRC32C_X86_64) += crc32c-pcl-intel-asm_64.o
->  sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
-> +sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
-> diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-> new file mode 100644
-> index 0000000..25a2e07
-> --- /dev/null
-> +++ b/arch/x86/crypto/sha512_ssse3_glue.c
+> diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
 
-...snip..
+..snip..
 
-> +#include <linux/string.h>
 > +
-> +asmlinkage void sha512_transform_ssse3(const char *data, u64 *digest,
-> +				     u64 rounds);
-> +#ifdef CONFIG_AS_AVX
-> +asmlinkage void sha512_transform_avx(const char *data, u64 *digest,
-> +				     u64 rounds);
-> +asmlinkage void sha512_transform_rorx(const char *data, u64 *digest,
-> +				     u64 rounds);
-> +#endif
-> +
+> +########################################################################
+> +## void sha256_transform_ssse3(void *input_data, UINT32 digest[8], UINT64 num_blks)
+> +## arg 1 : pointer to input data
+> +## arg 2 : pointer to digest
+> +## arg 3 : Num blocks
+> +########################################################################
+> +.text
+> +.global sha256_transform_ssse3
+> +.align 32
+> +sha256_transform_ssse3:
 
-Is CONFIG_AS_AVX enough to ensure that rorx is supported by assembler?
-
-You also have #ifdef CONFIG_AS_AVX / #endif missing in 'sha256-avx-asm.S', 'sha256-avx2-asm.S', 'sha512-avx-asm.S' and 'sha512-avx2-asm.S'.
+Maybe use ENRTY/ENDPROC macros for exporting functions from assembly?
 
 -Jussi
