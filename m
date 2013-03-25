@@ -1,55 +1,38 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH 06/11] Create module providing optimized SHA256 routines
- using SSSE3, AVX or AVX2 instructions.
-Date: Sun, 24 Mar 2013 23:52:59 +0200
-Message-ID: <514F75BB.3080501@iki.fi>
-References: <cover.1363961999.git.tim.c.chen@linux.intel.com> <1363987761.8972.60.camel@schen9-DESK>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH -next] crypto: ux500 - fix error return code in hash_dma_final()
+Date: Mon, 25 Mar 2013 16:15:36 +0100
+Message-ID: <CACRpkdZYwGhXqZpmu5FovAo=_C6U97_3tcOw3hXJ0sw9gRx2CA@mail.gmail.com>
+References: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Kirk Yap <kirk.s.yap@intel.com>,
-	David Cote <david.m.cote@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: herbert@gondor.apana.org.au, andreas.westin@stericsson.com,
+	arnd@arndb.de, rubini@unipv.it, yongjun_wei@trendmicro.com.cn,
+	linux-crypto@vger.kernel.org,
+	Rikard OLSSON <rikard.p.olsson@stericsson.com>,
+	magnus.p.persson@stericsson.com
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:41621 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754728Ab3CXVxC (ORCPT
+Received: from mail-ia0-f177.google.com ([209.85.210.177]:52748 "EHLO
+	mail-ia0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756904Ab3CYPPg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Mar 2013 17:53:02 -0400
-In-Reply-To: <1363987761.8972.60.camel@schen9-DESK>
+	Mon, 25 Mar 2013 11:15:36 -0400
+Received: by mail-ia0-f177.google.com with SMTP id w33so2491884iag.22
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2013 08:15:36 -0700 (PDT)
+In-Reply-To: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 22.03.2013 23:29, Tim Chen wrote:
-> We added glue code and config options to create crypto
-> module that uses SSE/AVX/AVX2 optimized SHA256 x86_64 assembly routines.
-> 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+On Fri, Mar 22, 2013 at 2:18 PM, Wei Yongjun <weiyj.lk@gmail.com> wrote:
 
-..snip..
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+>
+> Fix to return a negative error code from the error handling
+> case instead of 0, as returned elsewhere in this function.
+>
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-> diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-> new file mode 100644
-> index 0000000..5876a19
-> --- /dev/null
-> +++ b/arch/x86/crypto/sha256_ssse3_glue.c
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-..snip..
-
-> +static int __init sha256_ssse3_mod_init(void)
-> +{
-> +	/* test for SSE3 first */
-> +	if (cpu_has_xmm3)
-> +		sha256_transform_asm = sha256_transform_ssse3;
-> +
-
-This causes OOPS on my computer. Maybe use 'cpu_has_ssse3' instead?
-
--Jussi
+Yours,
+Linus Walleij
