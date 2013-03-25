@@ -1,65 +1,39 @@
-From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
-Subject: RE: potential bug in GMAC implementation. not work in ESN mode
-Date: Mon, 25 Mar 2013 16:12:58 +0000
-Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C58F28@RockMX01.rock.corp>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCHSET wq/for-3.10] workqueue: NUMA affinity for unbound
+ workqueues
+Date: Mon, 25 Mar 2013 12:15:00 -0700
+Message-ID: <20130325191500.GA12767@htj.dyndns.org>
+References: <1363737629-16745-1-git-send-email-tj@kernel.org>
+ <20130320185708.GB31256@htj.dyndns.org>
+ <CACvQF53=qgUHrr944D_70dZpT-EOMtPcz2+0JPp4kOnGPzAptQ@mail.gmail.com>
+ <20130324185506.GA4378@htj.dyndns.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.ultra-3eti.com ([173.13.207.162]:50148 "EHLO
-	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758212Ab3CYQNB convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Mar 2013 12:13:01 -0400
-Received: from webmail.3eti.com (rockmx01.rock.corp [192.168.200.4]) by mail.ultra-3eti.com with ESMTP id tZEPCqEazDOyHh0b (version=TLSv1 cipher=AES128-SHA bits=128 verify=NO) for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2013 12:12:59 -0400 (EDT)
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: laijs@cn.fujitsu.com, axboe@kernel.dk, jack@suse.cz,
+	fengguang.wu@intel.com, jmoyer@redhat.com, zab@redhat.com,
+	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Lai Jiangshan <eag0628@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20130324185506.GA4378@htj.dyndns.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-2nd ping....
+On Sun, Mar 24, 2013 at 11:55:06AM -0700, Tejun Heo wrote:
+> > the whole patchset is more complicated than my brain.
+> 
+> It isn't that complex, is it?  I mean, the difficult part - using
+> multiple pwqs on unbound wq - already happened, and even that wasn't
+> too complex as it in most part synchronized the behaviors between
+> per-cpu and unbound workqueues.  All that NUMA support is doing is
+> mapping different pwqs to different issuing CPUs.
 
-Nobody is maintaining crypto/gcm.c?
+Oh, BTW, please feel free to rebase your patchset on top of the
+current wq/for-3.10.  I'll take care of the conflicts with the numa
+one, if there are any.
 
+Thanks.
 
-
------Original Message-----
-From: Chaoxing Lin 
-Sent: Friday, March 08, 2013 11:38 AM
-To: 'linux-crypto@vger.kernel.org'
-Subject: potential bug in GMAC implementation. not work in ESN mode
-
-I was testing ipsec with GMAC and found that the rfc4543 GMAC implementation in kernel software crypto work in "esp=aes256gmac-noesn!" mode.
-It does not work in in "esp=aes256gmac-esn!" mode. The tunnel was established but no data traffic is possible.
-
-Looking at source code, I found this piece of code is suspicious.
-Line 1146~1147 tries to put req->assoc to assoc[1]. But I think this way only works when req->assoc has only one segment. In ESN mode, req->assoc contains 3 segments (SPI, SN-hi, SN-low). Line 1146~1147 will only attach SPI segment(with total length) in assoc.
-
-Please let me know whether I understand it right.
-Thanks,
-
-Chaoxing
-
-
-Source from kernel 3.8.2
-path: root/crypto/gcm.c
-
-1136: /* construct the aad */
-1137:	dstp = sg_page(dst);
-	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
-
-	sg_init_table(payload, 2);
-	sg_set_buf(payload, req->iv, 8);
-	scatterwalk_crypto_chain(payload, dst, vdst == req->iv + 8, 2);
-	assoclen += 8 + req->cryptlen - (enc ? 0 : authsize);
-
-	sg_init_table(assoc, 2);
-1146:	sg_set_page(assoc, sg_page(req->assoc), req->assoc->length,
-1147:		    req->assoc->offset);
-	scatterwalk_crypto_chain(assoc, payload, 0, 2);
-
-	aead_request_set_tfm(subreq, ctx->child);
-	aead_request_set_callback(subreq, req->base.flags, req->base.complete,
-				  req->base.data);
-	aead_request_set_crypt(subreq, cipher, cipher, enc ? 0 : authsize, iv);
-1154:	aead_request_set_assoc(subreq, assoc, assoclen);
+-- 
+tejun
