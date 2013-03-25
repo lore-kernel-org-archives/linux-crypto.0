@@ -1,39 +1,60 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCHSET wq/for-3.10] workqueue: NUMA affinity for unbound
- workqueues
-Date: Mon, 25 Mar 2013 12:15:00 -0700
-Message-ID: <20130325191500.GA12767@htj.dyndns.org>
-References: <1363737629-16745-1-git-send-email-tj@kernel.org>
- <20130320185708.GB31256@htj.dyndns.org>
- <CACvQF53=qgUHrr944D_70dZpT-EOMtPcz2+0JPp4kOnGPzAptQ@mail.gmail.com>
- <20130324185506.GA4378@htj.dyndns.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH 06/11] Create module providing optimized SHA256
+ routines using SSSE3, AVX or AVX2 instructions.
+Date: Mon, 25 Mar 2013 13:40:40 -0700
+Message-ID: <1364244040.8972.71.camel@schen9-DESK>
+References: <cover.1363961999.git.tim.c.chen@linux.intel.com>
+	 <1363987761.8972.60.camel@schen9-DESK>  <514F75BB.3080501@iki.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: laijs@cn.fujitsu.com, axboe@kernel.dk, jack@suse.cz,
-	fengguang.wu@intel.com, jmoyer@redhat.com, zab@redhat.com,
-	linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Lai Jiangshan <eag0628@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20130324185506.GA4378@htj.dyndns.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Kirk Yap <kirk.s.yap@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:62244 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758299Ab3CYUk6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Mar 2013 16:40:58 -0400
+In-Reply-To: <514F75BB.3080501@iki.fi>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 24, 2013 at 11:55:06AM -0700, Tejun Heo wrote:
-> > the whole patchset is more complicated than my brain.
+On Sun, 2013-03-24 at 23:52 +0200, Jussi Kivilinna wrote:
+> On 22.03.2013 23:29, Tim Chen wrote:
+> > We added glue code and config options to create crypto
+> > module that uses SSE/AVX/AVX2 optimized SHA256 x86_64 assembly routines.
+> > 
+> > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 > 
-> It isn't that complex, is it?  I mean, the difficult part - using
-> multiple pwqs on unbound wq - already happened, and even that wasn't
-> too complex as it in most part synchronized the behaviors between
-> per-cpu and unbound workqueues.  All that NUMA support is doing is
-> mapping different pwqs to different issuing CPUs.
+> ..snip..
+> 
+> > diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+> > new file mode 100644
+> > index 0000000..5876a19
+> > --- /dev/null
+> > +++ b/arch/x86/crypto/sha256_ssse3_glue.c
+> 
+> ..snip..
+> 
+> > +static int __init sha256_ssse3_mod_init(void)
+> > +{
+> > +	/* test for SSE3 first */
+> > +	if (cpu_has_xmm3)
+> > +		sha256_transform_asm = sha256_transform_ssse3;
+> > +
+> 
+> This causes OOPS on my computer. Maybe use 'cpu_has_ssse3' instead?
+> 
 
-Oh, BTW, please feel free to rebase your patchset on top of the
-current wq/for-3.10.  I'll take care of the conflicts with the numa
-one, if there are any.
+Thanks and appreciate your feedback.  I'll be sending an update of the
+patch series to address the issues.
 
-Thanks.
-
--- 
-tejun
+Tim
