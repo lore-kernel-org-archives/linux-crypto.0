@@ -1,38 +1,65 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH -next] crypto: ux500 - fix error return code in hash_dma_final()
-Date: Mon, 25 Mar 2013 16:15:36 +0100
-Message-ID: <CACRpkdZYwGhXqZpmu5FovAo=_C6U97_3tcOw3hXJ0sw9gRx2CA@mail.gmail.com>
-References: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
+From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+Subject: RE: potential bug in GMAC implementation. not work in ESN mode
+Date: Mon, 25 Mar 2013 16:12:58 +0000
+Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C58F28@RockMX01.rock.corp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: herbert@gondor.apana.org.au, andreas.westin@stericsson.com,
-	arnd@arndb.de, rubini@unipv.it, yongjun_wei@trendmicro.com.cn,
-	linux-crypto@vger.kernel.org,
-	Rikard OLSSON <rikard.p.olsson@stericsson.com>,
-	magnus.p.persson@stericsson.com
-To: Wei Yongjun <weiyj.lk@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ia0-f177.google.com ([209.85.210.177]:52748 "EHLO
-	mail-ia0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756904Ab3CYPPg (ORCPT
+Received: from mail.ultra-3eti.com ([173.13.207.162]:50148 "EHLO
+	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758212Ab3CYQNB convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Mar 2013 11:15:36 -0400
-Received: by mail-ia0-f177.google.com with SMTP id w33so2491884iag.22
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2013 08:15:36 -0700 (PDT)
-In-Reply-To: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
+	Mon, 25 Mar 2013 12:13:01 -0400
+Received: from webmail.3eti.com (rockmx01.rock.corp [192.168.200.4]) by mail.ultra-3eti.com with ESMTP id tZEPCqEazDOyHh0b (version=TLSv1 cipher=AES128-SHA bits=128 verify=NO) for <linux-crypto@vger.kernel.org>; Mon, 25 Mar 2013 12:12:59 -0400 (EDT)
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 22, 2013 at 2:18 PM, Wei Yongjun <weiyj.lk@gmail.com> wrote:
+2nd ping....
 
-> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
->
-> Fix to return a negative error code from the error handling
-> case instead of 0, as returned elsewhere in this function.
->
-> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Nobody is maintaining crypto/gcm.c?
 
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-Yours,
-Linus Walleij
+
+-----Original Message-----
+From: Chaoxing Lin 
+Sent: Friday, March 08, 2013 11:38 AM
+To: 'linux-crypto@vger.kernel.org'
+Subject: potential bug in GMAC implementation. not work in ESN mode
+
+I was testing ipsec with GMAC and found that the rfc4543 GMAC implementation in kernel software crypto work in "esp=aes256gmac-noesn!" mode.
+It does not work in in "esp=aes256gmac-esn!" mode. The tunnel was established but no data traffic is possible.
+
+Looking at source code, I found this piece of code is suspicious.
+Line 1146~1147 tries to put req->assoc to assoc[1]. But I think this way only works when req->assoc has only one segment. In ESN mode, req->assoc contains 3 segments (SPI, SN-hi, SN-low). Line 1146~1147 will only attach SPI segment(with total length) in assoc.
+
+Please let me know whether I understand it right.
+Thanks,
+
+Chaoxing
+
+
+Source from kernel 3.8.2
+path: root/crypto/gcm.c
+
+1136: /* construct the aad */
+1137:	dstp = sg_page(dst);
+	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
+
+	sg_init_table(payload, 2);
+	sg_set_buf(payload, req->iv, 8);
+	scatterwalk_crypto_chain(payload, dst, vdst == req->iv + 8, 2);
+	assoclen += 8 + req->cryptlen - (enc ? 0 : authsize);
+
+	sg_init_table(assoc, 2);
+1146:	sg_set_page(assoc, sg_page(req->assoc), req->assoc->length,
+1147:		    req->assoc->offset);
+	scatterwalk_crypto_chain(assoc, payload, 0, 2);
+
+	aead_request_set_tfm(subreq, ctx->child);
+	aead_request_set_callback(subreq, req->base.flags, req->base.complete,
+				  req->base.data);
+	aead_request_set_crypt(subreq, cipher, cipher, enc ? 0 : authsize, iv);
+1154:	aead_request_set_assoc(subreq, assoc, assoclen);
