@@ -1,8 +1,8 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH v2 05/10] Create module providing optimized SHA256 routines
+Subject: [PATCH v2 10/10] Create module providing optimized SHA512 routines
  using SSSE3, AVX or AVX2 instructions.
-Date: Tue, 26 Mar 2013 13:59:17 -0700
-Message-ID: <1364331557.27102.15.camel@schen9-DESK>
+Date: Tue, 26 Mar 2013 14:00:02 -0700
+Message-ID: <1364331602.27102.20.camel@schen9-DESK>
 References: <cover.1364303479.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -18,57 +18,59 @@ Cc: Jussi Kivilinna <jussi.kivilinna@iki.fi>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:46440 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754911Ab3CZVAB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Mar 2013 17:00:01 -0400
 In-Reply-To: <cover.1364303479.git.tim.c.chen@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 We added glue code and config options to create crypto
-module that uses SSE/AVX/AVX2 optimized SHA256 x86_64 assembly routines.
+module that uses SSE/AVX/AVX2 optimized SHA512 x86_64 assembly routines.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
  arch/x86/crypto/Makefile            |   2 +
- arch/x86/crypto/sha256_ssse3_glue.c | 275 ++++++++++++++++++++++++++++++++++++
+ arch/x86/crypto/sha512_ssse3_glue.c | 282 ++++++++++++++++++++++++++++++++++++
  crypto/Kconfig                      |  11 ++
- 3 files changed, 288 insertions(+)
- create mode 100644 arch/x86/crypto/sha256_ssse3_glue.c
+ 3 files changed, 295 insertions(+)
+ create mode 100644 arch/x86/crypto/sha512_ssse3_glue.c
 
 diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index ca96761..b45f599 100644
+index b45f599..3b3d1aa 100644
 --- a/arch/x86/crypto/Makefile
 +++ b/arch/x86/crypto/Makefile
-@@ -28,6 +28,7 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
- obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+@@ -29,6 +29,7 @@ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
  obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
  obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
-+obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
++obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
  
  aes-i586-y := aes-i586-asm_32.o aes_glue.o
  twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
-@@ -54,3 +55,4 @@ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
- crc32c-intel-y := crc32c-intel_glue.o
+@@ -56,3 +57,4 @@ crc32c-intel-y := crc32c-intel_glue.o
  crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
  crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
-+sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+ sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
++sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
 new file mode 100644
-index 0000000..fa65453
+index 0000000..295f790
 --- /dev/null
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -0,0 +1,275 @@
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -0,0 +1,282 @@
 +/*
 + * Cryptographic API.
 + *
-+ * Glue code for the SHA256 Secure Hash Algorithm assembler
++ * Glue code for the SHA512 Secure Hash Algorithm assembler
 + * implementation using supplemental SSE3 / AVX / AVX2 instructions.
 + *
-+ * This file is based on sha256_generic.c
++ * This file is based on sha512_generic.c
 + *
-+ * Copyright (C) 2013 Intel Corporation.
-+ *
-+ * Author:
-+ *     Tim Chen <tim.c.chen@linux.intel.com>
++ * Copyright (C) 2013 Intel Corporation
++ * Author: Tim Chen <tim.c.chen@linux.intel.com>
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms of the GNU General Public License as published by the Free
@@ -83,8 +85,8 @@ index 0000000..fa65453
 + * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 + * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 + * SOFTWARE.
++ *
 + */
-+
 +
 +#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
 +
@@ -99,59 +101,62 @@ index 0000000..fa65453
 +#include <asm/i387.h>
 +#include <asm/xcr.h>
 +#include <asm/xsave.h>
++
 +#include <linux/string.h>
 +
-+asmlinkage void sha256_transform_ssse3(const char *data, u32 *digest,
++asmlinkage void sha512_transform_ssse3(const char *data, u64 *digest,
 +				     u64 rounds);
 +#ifdef CONFIG_AS_AVX
-+asmlinkage void sha256_transform_avx(const char *data, u32 *digest,
++asmlinkage void sha512_transform_avx(const char *data, u64 *digest,
 +				     u64 rounds);
 +#endif
 +#ifdef CONFIG_AS_AVX2
-+asmlinkage void sha256_transform_rorx(const char *data, u32 *digest,
++asmlinkage void sha512_transform_rorx(const char *data, u64 *digest,
 +				     u64 rounds);
 +#endif
 +
-+asmlinkage void (*sha256_transform_asm)(const char *, u32 *, u64);
++asmlinkage void (*sha512_transform_asm)(const char *, u64 *, u64);
 +
 +
-+static int sha256_ssse3_init(struct shash_desc *desc)
++static int sha512_ssse3_init(struct shash_desc *desc)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
 +
-+	sctx->state[0] = SHA256_H0;
-+	sctx->state[1] = SHA256_H1;
-+	sctx->state[2] = SHA256_H2;
-+	sctx->state[3] = SHA256_H3;
-+	sctx->state[4] = SHA256_H4;
-+	sctx->state[5] = SHA256_H5;
-+	sctx->state[6] = SHA256_H6;
-+	sctx->state[7] = SHA256_H7;
-+	sctx->count = 0;
++	sctx->state[0] = SHA512_H0;
++	sctx->state[1] = SHA512_H1;
++	sctx->state[2] = SHA512_H2;
++	sctx->state[3] = SHA512_H3;
++	sctx->state[4] = SHA512_H4;
++	sctx->state[5] = SHA512_H5;
++	sctx->state[6] = SHA512_H6;
++	sctx->state[7] = SHA512_H7;
++	sctx->count[0] = sctx->count[1] = 0;
 +
 +	return 0;
 +}
 +
-+static int __sha256_ssse3_update(struct shash_desc *desc, const u8 *data,
++static int __sha512_ssse3_update(struct shash_desc *desc, const u8 *data,
 +			       unsigned int len, unsigned int partial)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
 +	unsigned int done = 0;
 +
-+	sctx->count += len;
++	sctx->count[0] += len;
++	if (sctx->count[0] < len)
++		sctx->count[1]++;
 +
 +	if (partial) {
-+		done = SHA256_BLOCK_SIZE - partial;
++		done = SHA512_BLOCK_SIZE - partial;
 +		memcpy(sctx->buf + partial, data, done);
-+		sha256_transform_asm(sctx->buf, sctx->state, 1);
++		sha512_transform_asm(sctx->buf, sctx->state, 1);
 +	}
 +
-+	if (len - done >= SHA256_BLOCK_SIZE) {
-+		const unsigned int rounds = (len - done) / SHA256_BLOCK_SIZE;
++	if (len - done >= SHA512_BLOCK_SIZE) {
++		const unsigned int rounds = (len - done) / SHA512_BLOCK_SIZE;
 +
-+		sha256_transform_asm(data + done, sctx->state, (u64) rounds);
++		sha512_transform_asm(data + done, sctx->state, (u64) rounds);
 +
-+		done += rounds * SHA256_BLOCK_SIZE;
++		done += rounds * SHA512_BLOCK_SIZE;
 +	}
 +
 +	memcpy(sctx->buf, data + done, len - done);
@@ -159,26 +164,28 @@ index 0000000..fa65453
 +	return 0;
 +}
 +
-+static int sha256_ssse3_update(struct shash_desc *desc, const u8 *data,
++static int sha512_ssse3_update(struct shash_desc *desc, const u8 *data,
 +			     unsigned int len)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
++	struct sha512_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial = sctx->count[0] % SHA512_BLOCK_SIZE;
 +	int res;
 +
 +	/* Handle the fast case right here */
-+	if (partial + len < SHA256_BLOCK_SIZE) {
-+		sctx->count += len;
++	if (partial + len < SHA512_BLOCK_SIZE) {
++		sctx->count[0] += len;
++		if (sctx->count[0] < len)
++			sctx->count[1]++;
 +		memcpy(sctx->buf + partial, data, len);
 +
 +		return 0;
 +	}
 +
 +	if (!irq_fpu_usable()) {
-+		res = crypto_sha256_update(desc, data, len);
++		res = crypto_sha512_update(desc, data, len);
 +	} else {
 +		kernel_fpu_begin();
-+		res = __sha256_ssse3_update(desc, data, len, partial);
++		res = __sha512_ssse3_update(desc, data, len, partial);
 +		kernel_fpu_end();
 +	}
 +
@@ -187,40 +194,44 @@ index 0000000..fa65453
 +
 +
 +/* Add padding and return the message digest. */
-+static int sha256_ssse3_final(struct shash_desc *desc, u8 *out)
++static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
 +	unsigned int i, index, padlen;
-+	__be32 *dst = (__be32 *)out;
-+	__be64 bits;
-+	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
++	__be64 *dst = (__be64 *)out;
++	__be64 bits[2];
++	static const u8 padding[SHA512_BLOCK_SIZE] = { 0x80, };
 +
-+	bits = cpu_to_be64(sctx->count << 3);
++	/* save number of bits */
++	bits[1] = cpu_to_be64(sctx->count[0] << 3);
++	bits[0] = cpu_to_be64(sctx->count[1] << 3) | sctx->count[0] >> 61;
 +
-+	/* Pad out to 56 mod 64 and append length */
-+	index = sctx->count % SHA256_BLOCK_SIZE;
-+	padlen = (index < 56) ? (56 - index) : ((SHA256_BLOCK_SIZE+56)-index);
++	/* Pad out to 112 mod 128 and append length */
++	index = sctx->count[0] & 0x7f;
++	padlen = (index < 112) ? (112 - index) : ((128+112) - index);
 +
 +	if (!irq_fpu_usable()) {
-+		crypto_sha256_update(desc, padding, padlen);
-+		crypto_sha256_update(desc, (const u8 *)&bits, sizeof(bits));
++		crypto_sha512_update(desc, padding, padlen);
++		crypto_sha512_update(desc, (const u8 *)&bits, sizeof(bits));
 +	} else {
 +		kernel_fpu_begin();
-+		/* We need to fill a whole block for __sha256_ssse3_update() */
-+		if (padlen <= 56) {
-+			sctx->count += padlen;
++		/* We need to fill a whole block for __sha512_ssse3_update() */
++		if (padlen <= 112) {
++			sctx->count[0] += padlen;
++			if (sctx->count[0] < padlen)
++				sctx->count[1]++;
 +			memcpy(sctx->buf + index, padding, padlen);
 +		} else {
-+			__sha256_ssse3_update(desc, padding, padlen, index);
++			__sha512_ssse3_update(desc, padding, padlen, index);
 +		}
-+		__sha256_ssse3_update(desc, (const u8 *)&bits,
-+					sizeof(bits), 56);
++		__sha512_ssse3_update(desc, (const u8 *)&bits,
++					sizeof(bits), 112);
 +		kernel_fpu_end();
 +	}
 +
 +	/* Store state in digest */
 +	for (i = 0; i < 8; i++)
-+		dst[i] = cpu_to_be32(sctx->state[i]);
++		dst[i] = cpu_to_be64(sctx->state[i]);
 +
 +	/* Wipe context */
 +	memset(sctx, 0, sizeof(*sctx));
@@ -228,18 +239,18 @@ index 0000000..fa65453
 +	return 0;
 +}
 +
-+static int sha256_ssse3_export(struct shash_desc *desc, void *out)
++static int sha512_ssse3_export(struct shash_desc *desc, void *out)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
 +
 +	memcpy(out, sctx, sizeof(*sctx));
 +
 +	return 0;
 +}
 +
-+static int sha256_ssse3_import(struct shash_desc *desc, const void *in)
++static int sha512_ssse3_import(struct shash_desc *desc, const void *in)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha512_state *sctx = shash_desc_ctx(desc);
 +
 +	memcpy(sctx, in, sizeof(*sctx));
 +
@@ -247,20 +258,20 @@ index 0000000..fa65453
 +}
 +
 +static struct shash_alg alg = {
-+	.digestsize	=	SHA256_DIGEST_SIZE,
-+	.init		=	sha256_ssse3_init,
-+	.update		=	sha256_ssse3_update,
-+	.final		=	sha256_ssse3_final,
-+	.export		=	sha256_ssse3_export,
-+	.import		=	sha256_ssse3_import,
-+	.descsize	=	sizeof(struct sha256_state),
-+	.statesize	=	sizeof(struct sha256_state),
++	.digestsize	=	SHA512_DIGEST_SIZE,
++	.init		=	sha512_ssse3_init,
++	.update		=	sha512_ssse3_update,
++	.final		=	sha512_ssse3_final,
++	.export		=	sha512_ssse3_export,
++	.import		=	sha512_ssse3_import,
++	.descsize	=	sizeof(struct sha512_state),
++	.statesize	=	sizeof(struct sha512_state),
 +	.base		=	{
-+		.cra_name	=	"sha256",
-+		.cra_driver_name =	"sha256-ssse3",
++		.cra_name	=	"sha512",
++		.cra_driver_name =	"sha512-ssse3",
 +		.cra_priority	=	150,
 +		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA256_BLOCK_SIZE,
++		.cra_blocksize	=	SHA512_BLOCK_SIZE,
 +		.cra_module	=	THIS_MODULE,
 +	}
 +};
@@ -284,35 +295,35 @@ index 0000000..fa65453
 +}
 +#endif
 +
-+static int __init sha256_ssse3_mod_init(void)
++static int __init sha512_ssse3_mod_init(void)
 +{
 +	/* test for SSE3 first */
 +	if (cpu_has_ssse3)
-+		sha256_transform_asm = sha256_transform_ssse3;
++		sha512_transform_asm = sha512_transform_ssse3;
 +
 +#ifdef CONFIG_AS_AVX
 +	/* allow AVX to override SSSE3, it's a little faster */
 +	if (avx_usable()) {
 +#ifdef CONFIG_AS_AVX2
 +		if (boot_cpu_has(X86_FEATURE_AVX2))
-+			sha256_transform_asm = sha256_transform_rorx;
++			sha512_transform_asm = sha512_transform_rorx;
 +		else
 +#endif
-+			sha256_transform_asm = sha256_transform_avx;
++			sha512_transform_asm = sha512_transform_avx;
 +	}
 +#endif
 +
-+	if (sha256_transform_asm) {
++	if (sha512_transform_asm) {
 +#ifdef CONFIG_AS_AVX
-+		if (sha256_transform_asm == sha256_transform_avx)
-+			pr_info("Using AVX optimized SHA-256 implementation\n");
++		if (sha512_transform_asm == sha512_transform_avx)
++			pr_info("Using AVX optimized SHA-512 implementation\n");
 +#ifdef CONFIG_AS_AVX2
-+		else if (sha256_transform_asm == sha256_transform_rorx)
-+			pr_info("Using AVX2 optimized SHA-256 implementation\n");
++		else if (sha512_transform_asm == sha512_transform_rorx)
++			pr_info("Using AVX2 optimized SHA-512 implementation\n");
 +#endif
 +		else
 +#endif
-+			pr_info("Using SSSE3 optimized SHA-256 implementation\n");
++			pr_info("Using SSSE3 optimized SHA-512 implementation\n");
 +		return crypto_register_shash(&alg);
 +	}
 +	pr_info("Neither AVX nor SSSE3 is available/usable.\n");
@@ -320,33 +331,33 @@ index 0000000..fa65453
 +	return -ENODEV;
 +}
 +
-+static void __exit sha256_ssse3_mod_fini(void)
++static void __exit sha512_ssse3_mod_fini(void)
 +{
 +	crypto_unregister_shash(&alg);
 +}
 +
-+module_init(sha256_ssse3_mod_init);
-+module_exit(sha256_ssse3_mod_fini);
++module_init(sha512_ssse3_mod_init);
++module_exit(sha512_ssse3_mod_fini);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, Supplemental SSE3 accelerated");
++MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, Supplemental SSE3 accelerated");
 +
-+MODULE_ALIAS("sha256");
++MODULE_ALIAS("sha512");
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index aed52b2..8064ef1 100644
+index 8064ef1..a654b13 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -470,6 +470,17 @@ config CRYPTO_SHA1_SSSE3
- 	  using Supplemental SSE3 (SSSE3) instructions or Advanced Vector
- 	  Extensions (AVX), when available.
+@@ -481,6 +481,17 @@ config CRYPTO_SHA256_SSSE3
+ 	  Extensions version 1 (AVX1), or Advanced Vector Extensions
+ 	  version 2 (AVX2) instructions, when available.
  
-+config CRYPTO_SHA256_SSSE3
-+	tristate "SHA256 digest algorithm (SSSE3/AVX/AVX2)"
++config CRYPTO_SHA512_SSSE3
++	tristate "SHA512 digest algorithm (SSSE3/AVX/AVX2)"
 +	depends on X86 && 64BIT
-+	select CRYPTO_SHA256
++	select CRYPTO_SHA512
 +	select CRYPTO_HASH
 +	help
-+	  SHA-256 secure hash standard (DFIPS 180-2) implemented
++	  SHA-512 secure hash standard (DFIPS 180-2) implemented
 +	  using Supplemental SSE3 (SSSE3) instructions, or Advanced Vector
 +	  Extensions version 1 (AVX1), or Advanced Vector Extensions
 +	  version 2 (AVX2) instructions, when available.
