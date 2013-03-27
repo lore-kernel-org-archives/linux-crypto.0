@@ -1,80 +1,67 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: [PATCH v2 2/2] v2 crypto: caam - static constify error data
-Date: Tue, 26 Mar 2013 18:10:15 -0500
-Message-ID: <1364339415-23068-2-git-send-email-kim.phillips@freescale.com>
-References: <1364339415-23068-1-git-send-email-kim.phillips@freescale.com>
+From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+Subject: RE: potential bug in GMAC implementation. not work in ESN mode
+Date: Wed, 27 Mar 2013 13:43:19 +0000
+Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C590EF@RockMX01.rock.corp>
+References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C58F28@RockMX01.rock.corp>
+ <51520215.4020300@iki.fi>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: "David S. Miller" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1364339415-23068-1-git-send-email-kim.phillips@freescale.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.ultra-3eti.com ([173.13.207.162]:49070 "EHLO
+	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751142Ab3C0NnX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 Mar 2013 09:43:23 -0400
+In-Reply-To: <51520215.4020300@iki.fi>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-checkstack reports report_deco_status(), report_ccb_status() as
-particularly excessive stack users.  Move their lookup tables
-off the stack and put them in .rodata.
-
-Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
----
-v1 posted here:
-    http://article.gmane.org/gmane.linux.kernel.cryptoapi/7571
-v2: made cha_id_list, err_id_list, and rng_err_id_list
-    static const char * const, instead of just static const.
-
- drivers/crypto/caam/error.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 30b8f74..9f25f52 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -36,7 +36,7 @@ static void report_jump_idx(u32 status, char *outstr)
- 
- static void report_ccb_status(u32 status, char *outstr)
- {
--	char *cha_id_list[] = {
-+	static const char * const cha_id_list[] = {
- 		"",
- 		"AES",
- 		"DES",
-@@ -51,7 +51,7 @@ static void report_ccb_status(u32 status, char *outstr)
- 		"ZUCE",
- 		"ZUCA",
- 	};
--	char *err_id_list[] = {
-+	static const char * const err_id_list[] = {
- 		"No error.",
- 		"Mode error.",
- 		"Data size error.",
-@@ -69,7 +69,7 @@ static void report_ccb_status(u32 status, char *outstr)
- 		"Invalid CHA combination was selected",
- 		"Invalid CHA selected.",
- 	};
--	char *rng_err_id_list[] = {
-+	static const char * const rng_err_id_list[] = {
- 		"",
- 		"",
- 		"",
-@@ -117,7 +117,7 @@ static void report_jump_status(u32 status, char *outstr)
- 
- static void report_deco_status(u32 status, char *outstr)
- {
--	const struct {
-+	static const struct {
- 		u8 value;
- 		char *error_text;
- 	} desc_error_list[] = {
-@@ -245,7 +245,7 @@ static void report_cond_code_status(u32 status, char *outstr)
- 
- char *caam_jr_strstatus(char *outstr, u32 status)
- {
--	struct stat_src {
-+	static const struct stat_src {
- 		void (*report_ssed)(u32 status, char *outstr);
- 		char *error;
- 	} status_src[] = {
--- 
-1.8.1.5
+VGhhbmtzIEp1c3NpLCB0aGUgcGF0Y2ggZml4ZXMgdGhlIHByb2JsZW0uDQoNCllvdSBtYXkgY29t
+bWl0IGl0IG9mZmljaWFsbHkuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBK
+dXNzaSBLaXZpbGlubmEgW21haWx0bzpqdXNzaS5raXZpbGlubmFAaWtpLmZpXSANClNlbnQ6IFR1
+ZXNkYXksIE1hcmNoIDI2LCAyMDEzIDQ6MTYgUE0NClRvOiBDaGFveGluZyBMaW4NCkNjOiBsaW51
+eC1jcnlwdG9Admdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogcG90ZW50aWFsIGJ1ZyBpbiBH
+TUFDIGltcGxlbWVudGF0aW9uLiBub3Qgd29yayBpbiBFU04gbW9kZQ0KDQpPbiAyNS4wMy4yMDEz
+IDE4OjEyLCBDaGFveGluZyBMaW4gd3JvdGU6DQo+IDJuZCBwaW5nLi4uLg0KPiANCj4gTm9ib2R5
+IGlzIG1haW50YWluaW5nIGNyeXB0by9nY20uYz8NCj4gDQo+IA0KPiANCj4gLS0tLS1PcmlnaW5h
+bCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQ2hhb3hpbmcgTGluDQo+IFNlbnQ6IEZyaWRheSwgTWFy
+Y2ggMDgsIDIwMTMgMTE6MzggQU0NCj4gVG86ICdsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3Jn
+Jw0KPiBTdWJqZWN0OiBwb3RlbnRpYWwgYnVnIGluIEdNQUMgaW1wbGVtZW50YXRpb24uIG5vdCB3
+b3JrIGluIEVTTiBtb2RlDQo+IA0KPiBJIHdhcyB0ZXN0aW5nIGlwc2VjIHdpdGggR01BQyBhbmQg
+Zm91bmQgdGhhdCB0aGUgcmZjNDU0MyBHTUFDIGltcGxlbWVudGF0aW9uIGluIGtlcm5lbCBzb2Z0
+d2FyZSBjcnlwdG8gd29yayBpbiAiZXNwPWFlczI1NmdtYWMtbm9lc24hIiBtb2RlLg0KPiBJdCBk
+b2VzIG5vdCB3b3JrIGluIGluICJlc3A9YWVzMjU2Z21hYy1lc24hIiBtb2RlLiBUaGUgdHVubmVs
+IHdhcyBlc3RhYmxpc2hlZCBidXQgbm8gZGF0YSB0cmFmZmljIGlzIHBvc3NpYmxlLg0KPiANCj4g
+TG9va2luZyBhdCBzb3VyY2UgY29kZSwgSSBmb3VuZCB0aGlzIHBpZWNlIG9mIGNvZGUgaXMgc3Vz
+cGljaW91cy4NCj4gTGluZSAxMTQ2fjExNDcgdHJpZXMgdG8gcHV0IHJlcS0+YXNzb2MgdG8gYXNz
+b2NbMV0uIEJ1dCBJIHRoaW5rIHRoaXMgd2F5IG9ubHkgd29ya3Mgd2hlbiByZXEtPmFzc29jIGhh
+cyBvbmx5IG9uZSBzZWdtZW50LiBJbiBFU04gbW9kZSwgcmVxLT5hc3NvYyBjb250YWlucyAzIHNl
+Z21lbnRzIChTUEksIFNOLWhpLCBTTi1sb3cpLiBMaW5lIDExNDZ+MTE0NyB3aWxsIG9ubHkgYXR0
+YWNoIFNQSSBzZWdtZW50KHdpdGggdG90YWwgbGVuZ3RoKSBpbiBhc3NvYy4NCj4gDQo+IFBsZWFz
+ZSBsZXQgbWUga25vdyB3aGV0aGVyIEkgdW5kZXJzdGFuZCBpdCByaWdodC4NCg0KWW91ciBhbmFs
+eXNpcyBzZWVtcyBjb3JyZWN0LiBEb2VzIGF0dGFjaGVkIHRoZSBwYXRjaCBmaXggdGhlIHByb2Js
+ZW0/IChJJ3ZlIG9ubHkgY29tcGlsZSB0ZXN0ZWQgaXQuKQ0KDQotSnVzc2kNCg0KPiBUaGFua3Ms
+DQo+IA0KPiBDaGFveGluZw0KPiANCj4gDQo+IFNvdXJjZSBmcm9tIGtlcm5lbCAzLjguMg0KPiBw
+YXRoOiByb290L2NyeXB0by9nY20uYw0KPiANCj4gMTEzNjogLyogY29uc3RydWN0IHRoZSBhYWQg
+Ki8NCj4gMTEzNzoJZHN0cCA9IHNnX3BhZ2UoZHN0KTsNCj4gCXZkc3QgPSBQYWdlSGlnaE1lbShk
+c3RwKSA/IE5VTEwgOiBwYWdlX2FkZHJlc3MoZHN0cCkgKyBkc3QtPm9mZnNldDsNCj4gDQo+IAlz
+Z19pbml0X3RhYmxlKHBheWxvYWQsIDIpOw0KPiAJc2dfc2V0X2J1ZihwYXlsb2FkLCByZXEtPml2
+LCA4KTsNCj4gCXNjYXR0ZXJ3YWxrX2NyeXB0b19jaGFpbihwYXlsb2FkLCBkc3QsIHZkc3QgPT0g
+cmVxLT5pdiArIDgsIDIpOw0KPiAJYXNzb2NsZW4gKz0gOCArIHJlcS0+Y3J5cHRsZW4gLSAoZW5j
+ID8gMCA6IGF1dGhzaXplKTsNCj4gDQo+IAlzZ19pbml0X3RhYmxlKGFzc29jLCAyKTsNCj4gMTE0
+NjoJc2dfc2V0X3BhZ2UoYXNzb2MsIHNnX3BhZ2UocmVxLT5hc3NvYyksIHJlcS0+YXNzb2MtPmxl
+bmd0aCwNCj4gMTE0NzoJCSAgICByZXEtPmFzc29jLT5vZmZzZXQpOw0KPiAJc2NhdHRlcndhbGtf
+Y3J5cHRvX2NoYWluKGFzc29jLCBwYXlsb2FkLCAwLCAyKTsNCj4gDQo+IAlhZWFkX3JlcXVlc3Rf
+c2V0X3RmbShzdWJyZXEsIGN0eC0+Y2hpbGQpOw0KPiAJYWVhZF9yZXF1ZXN0X3NldF9jYWxsYmFj
+ayhzdWJyZXEsIHJlcS0+YmFzZS5mbGFncywgcmVxLT5iYXNlLmNvbXBsZXRlLA0KPiAJCQkJICBy
+ZXEtPmJhc2UuZGF0YSk7DQo+IAlhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0KHN1YnJlcSwgY2lwaGVy
+LCBjaXBoZXIsIGVuYyA/IDAgOiBhdXRoc2l6ZSwgaXYpOw0KPiAxMTU0OglhZWFkX3JlcXVlc3Rf
+c2V0X2Fzc29jKHN1YnJlcSwgYXNzb2MsIGFzc29jbGVuKTsNCj4gLS0NCj4gVG8gdW5zdWJzY3Jp
+YmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIA0KPiBsaW51eC1j
+cnlwdG8iIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwu
+b3JnIA0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21h
+am9yZG9tby1pbmZvLmh0bWwNCj4gDQoNCg==
