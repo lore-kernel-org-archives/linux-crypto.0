@@ -1,67 +1,109 @@
-From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
-Subject: RE: potential bug in GMAC implementation. not work in ESN mode
-Date: Wed, 27 Mar 2013 13:43:19 +0000
-Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C590EF@RockMX01.rock.corp>
-References: <BD54DDEB2546894FAB0731EA7B0EDF8D07C58F28@RockMX01.rock.corp>
- <51520215.4020300@iki.fi>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+From: Alexander Holler <holler@ahsoftware.de>
+Subject: [PATCH] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
+Date: Wed, 27 Mar 2013 19:41:50 +0100
+Message-ID: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	David Howells <dhowells@redhat.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Alexander Holler <holler@ahsoftware.de>, stable@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.ultra-3eti.com ([173.13.207.162]:49070 "EHLO
-	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751142Ab3C0NnX (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:43627 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752930Ab3C0Sm1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Mar 2013 09:43:23 -0400
-In-Reply-To: <51520215.4020300@iki.fi>
-Content-Language: en-US
+	Wed, 27 Mar 2013 14:42:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-VGhhbmtzIEp1c3NpLCB0aGUgcGF0Y2ggZml4ZXMgdGhlIHByb2JsZW0uDQoNCllvdSBtYXkgY29t
-bWl0IGl0IG9mZmljaWFsbHkuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBK
-dXNzaSBLaXZpbGlubmEgW21haWx0bzpqdXNzaS5raXZpbGlubmFAaWtpLmZpXSANClNlbnQ6IFR1
-ZXNkYXksIE1hcmNoIDI2LCAyMDEzIDQ6MTYgUE0NClRvOiBDaGFveGluZyBMaW4NCkNjOiBsaW51
-eC1jcnlwdG9Admdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogcG90ZW50aWFsIGJ1ZyBpbiBH
-TUFDIGltcGxlbWVudGF0aW9uLiBub3Qgd29yayBpbiBFU04gbW9kZQ0KDQpPbiAyNS4wMy4yMDEz
-IDE4OjEyLCBDaGFveGluZyBMaW4gd3JvdGU6DQo+IDJuZCBwaW5nLi4uLg0KPiANCj4gTm9ib2R5
-IGlzIG1haW50YWluaW5nIGNyeXB0by9nY20uYz8NCj4gDQo+IA0KPiANCj4gLS0tLS1PcmlnaW5h
-bCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQ2hhb3hpbmcgTGluDQo+IFNlbnQ6IEZyaWRheSwgTWFy
-Y2ggMDgsIDIwMTMgMTE6MzggQU0NCj4gVG86ICdsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3Jn
-Jw0KPiBTdWJqZWN0OiBwb3RlbnRpYWwgYnVnIGluIEdNQUMgaW1wbGVtZW50YXRpb24uIG5vdCB3
-b3JrIGluIEVTTiBtb2RlDQo+IA0KPiBJIHdhcyB0ZXN0aW5nIGlwc2VjIHdpdGggR01BQyBhbmQg
-Zm91bmQgdGhhdCB0aGUgcmZjNDU0MyBHTUFDIGltcGxlbWVudGF0aW9uIGluIGtlcm5lbCBzb2Z0
-d2FyZSBjcnlwdG8gd29yayBpbiAiZXNwPWFlczI1NmdtYWMtbm9lc24hIiBtb2RlLg0KPiBJdCBk
-b2VzIG5vdCB3b3JrIGluIGluICJlc3A9YWVzMjU2Z21hYy1lc24hIiBtb2RlLiBUaGUgdHVubmVs
-IHdhcyBlc3RhYmxpc2hlZCBidXQgbm8gZGF0YSB0cmFmZmljIGlzIHBvc3NpYmxlLg0KPiANCj4g
-TG9va2luZyBhdCBzb3VyY2UgY29kZSwgSSBmb3VuZCB0aGlzIHBpZWNlIG9mIGNvZGUgaXMgc3Vz
-cGljaW91cy4NCj4gTGluZSAxMTQ2fjExNDcgdHJpZXMgdG8gcHV0IHJlcS0+YXNzb2MgdG8gYXNz
-b2NbMV0uIEJ1dCBJIHRoaW5rIHRoaXMgd2F5IG9ubHkgd29ya3Mgd2hlbiByZXEtPmFzc29jIGhh
-cyBvbmx5IG9uZSBzZWdtZW50LiBJbiBFU04gbW9kZSwgcmVxLT5hc3NvYyBjb250YWlucyAzIHNl
-Z21lbnRzIChTUEksIFNOLWhpLCBTTi1sb3cpLiBMaW5lIDExNDZ+MTE0NyB3aWxsIG9ubHkgYXR0
-YWNoIFNQSSBzZWdtZW50KHdpdGggdG90YWwgbGVuZ3RoKSBpbiBhc3NvYy4NCj4gDQo+IFBsZWFz
-ZSBsZXQgbWUga25vdyB3aGV0aGVyIEkgdW5kZXJzdGFuZCBpdCByaWdodC4NCg0KWW91ciBhbmFs
-eXNpcyBzZWVtcyBjb3JyZWN0LiBEb2VzIGF0dGFjaGVkIHRoZSBwYXRjaCBmaXggdGhlIHByb2Js
-ZW0/IChJJ3ZlIG9ubHkgY29tcGlsZSB0ZXN0ZWQgaXQuKQ0KDQotSnVzc2kNCg0KPiBUaGFua3Ms
-DQo+IA0KPiBDaGFveGluZw0KPiANCj4gDQo+IFNvdXJjZSBmcm9tIGtlcm5lbCAzLjguMg0KPiBw
-YXRoOiByb290L2NyeXB0by9nY20uYw0KPiANCj4gMTEzNjogLyogY29uc3RydWN0IHRoZSBhYWQg
-Ki8NCj4gMTEzNzoJZHN0cCA9IHNnX3BhZ2UoZHN0KTsNCj4gCXZkc3QgPSBQYWdlSGlnaE1lbShk
-c3RwKSA/IE5VTEwgOiBwYWdlX2FkZHJlc3MoZHN0cCkgKyBkc3QtPm9mZnNldDsNCj4gDQo+IAlz
-Z19pbml0X3RhYmxlKHBheWxvYWQsIDIpOw0KPiAJc2dfc2V0X2J1ZihwYXlsb2FkLCByZXEtPml2
-LCA4KTsNCj4gCXNjYXR0ZXJ3YWxrX2NyeXB0b19jaGFpbihwYXlsb2FkLCBkc3QsIHZkc3QgPT0g
-cmVxLT5pdiArIDgsIDIpOw0KPiAJYXNzb2NsZW4gKz0gOCArIHJlcS0+Y3J5cHRsZW4gLSAoZW5j
-ID8gMCA6IGF1dGhzaXplKTsNCj4gDQo+IAlzZ19pbml0X3RhYmxlKGFzc29jLCAyKTsNCj4gMTE0
-NjoJc2dfc2V0X3BhZ2UoYXNzb2MsIHNnX3BhZ2UocmVxLT5hc3NvYyksIHJlcS0+YXNzb2MtPmxl
-bmd0aCwNCj4gMTE0NzoJCSAgICByZXEtPmFzc29jLT5vZmZzZXQpOw0KPiAJc2NhdHRlcndhbGtf
-Y3J5cHRvX2NoYWluKGFzc29jLCBwYXlsb2FkLCAwLCAyKTsNCj4gDQo+IAlhZWFkX3JlcXVlc3Rf
-c2V0X3RmbShzdWJyZXEsIGN0eC0+Y2hpbGQpOw0KPiAJYWVhZF9yZXF1ZXN0X3NldF9jYWxsYmFj
-ayhzdWJyZXEsIHJlcS0+YmFzZS5mbGFncywgcmVxLT5iYXNlLmNvbXBsZXRlLA0KPiAJCQkJICBy
-ZXEtPmJhc2UuZGF0YSk7DQo+IAlhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0KHN1YnJlcSwgY2lwaGVy
-LCBjaXBoZXIsIGVuYyA/IDAgOiBhdXRoc2l6ZSwgaXYpOw0KPiAxMTU0OglhZWFkX3JlcXVlc3Rf
-c2V0X2Fzc29jKHN1YnJlcSwgYXNzb2MsIGFzc29jbGVuKTsNCj4gLS0NCj4gVG8gdW5zdWJzY3Jp
-YmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIA0KPiBsaW51eC1j
-cnlwdG8iIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwu
-b3JnIA0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21h
-am9yZG9tby1pbmZvLmh0bWwNCj4gDQoNCg==
+I don't see any real use case where checking the validity dates of X.509
+certificates at parsing time adds any security gain. In contrast, doing so
+makes MODSIGN unusable on systems without a RTC (or systems with a possible
+wrong date in a existing RTC, or systems where the RTC is read after the keys
+got loaded).
+
+If something really cares about the dates, it should check them at the time
+when the certificates are used, not when they are loaded and parsed.
+
+So just remove the validity check of the dates in the parser.
+
+Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+Cc: stable@vger.kernel.org
+
+Sidenote (not for necessarily for inclusion into the patch):
+There were already 3 variations of this patch.
+The first removed the check by adding a config option:
+  https://lkml.org/lkml/2013/2/25/171
+The second just removed the return of errors:
+  https://lkml.org/lkml/2013/3/14/247
+And the third wich removed parsing of the dates too:
+  https://lkml.org/lkml/2013/3/14/257
+Maybe this one will find the approval of a maintainer.
+Here is a thread which explains the motivation for this patch a bit further:
+  https://lkml.org/lkml/2013/2/13/90
+---
+ crypto/asymmetric_keys/x509_public_key.c | 38 --------------------------------
+ 1 file changed, 38 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 06007f0..52222a2 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -106,7 +106,6 @@ error_no_sig:
+ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ {
+ 	struct x509_certificate *cert;
+-	struct tm now;
+ 	size_t srlen, sulen;
+ 	char *desc = NULL;
+ 	int ret;
+@@ -137,43 +136,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 		goto error_free_cert;
+ 	}
+ 
+-	time_to_tm(CURRENT_TIME.tv_sec, 0, &now);
+-	pr_devel("Now: %04ld-%02d-%02d %02d:%02d:%02d\n",
+-		 now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+-		 now.tm_hour, now.tm_min,  now.tm_sec);
+-	if (now.tm_year < cert->valid_from.tm_year ||
+-	    (now.tm_year == cert->valid_from.tm_year &&
+-	     (now.tm_mon < cert->valid_from.tm_mon ||
+-	      (now.tm_mon == cert->valid_from.tm_mon &&
+-	       (now.tm_mday < cert->valid_from.tm_mday ||
+-		(now.tm_mday == cert->valid_from.tm_mday &&
+-		 (now.tm_hour < cert->valid_from.tm_hour ||
+-		  (now.tm_hour == cert->valid_from.tm_hour &&
+-		   (now.tm_min < cert->valid_from.tm_min ||
+-		    (now.tm_min == cert->valid_from.tm_min &&
+-		     (now.tm_sec < cert->valid_from.tm_sec
+-		      ))))))))))) {
+-		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
+-		ret = -EKEYREJECTED;
+-		goto error_free_cert;
+-	}
+-	if (now.tm_year > cert->valid_to.tm_year ||
+-	    (now.tm_year == cert->valid_to.tm_year &&
+-	     (now.tm_mon > cert->valid_to.tm_mon ||
+-	      (now.tm_mon == cert->valid_to.tm_mon &&
+-	       (now.tm_mday > cert->valid_to.tm_mday ||
+-		(now.tm_mday == cert->valid_to.tm_mday &&
+-		 (now.tm_hour > cert->valid_to.tm_hour ||
+-		  (now.tm_hour == cert->valid_to.tm_hour &&
+-		   (now.tm_min > cert->valid_to.tm_min ||
+-		    (now.tm_min == cert->valid_to.tm_min &&
+-		     (now.tm_sec > cert->valid_to.tm_sec
+-		      ))))))))))) {
+-		pr_warn("Cert %s has expired\n", cert->fingerprint);
+-		ret = -EKEYEXPIRED;
+-		goto error_free_cert;
+-	}
+-
+ 	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
+ 	cert->pub->id_type = PKEY_ID_X509;
+ 
+-- 
+1.8.1.4
