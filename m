@@ -1,7 +1,7 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.9
-Date: Thu, 28 Mar 2013 16:28:41 +0800
-Message-ID: <20130328082841.GA7425@gondor.apana.org.au>
+From: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+Subject: RE: Crypto Fixes for 3.9
+Date: Thu, 28 Mar 2013 13:05:16 +0000
+Message-ID: <BD54DDEB2546894FAB0731EA7B0EDF8D07C59259@RockMX01.rock.corp>
 References: <20100722055043.GA25689@gondor.apana.org.au>
  <20100903060055.GA28915@gondor.apana.org.au>
  <20100903110722.GA31826@gondor.apana.org.au>
@@ -12,28 +12,114 @@ References: <20100722055043.GA25689@gondor.apana.org.au>
  <20120126024342.GA12492@gondor.apana.org.au>
  <20120823083242.GA23102@gondor.apana.org.au>
  <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34429 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755297Ab3C1I2s (ORCPT
+Received: from mail.ultra-3eti.com ([173.13.207.162]:51527 "EHLO
+	mail.ultra-3eti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755479Ab3C1NFU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Mar 2013 04:28:48 -0400
-Content-Disposition: inline
-In-Reply-To: <20121109093005.GA25632@gondor.apana.org.au>
+	Thu, 28 Mar 2013 09:05:20 -0400
+In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Would you be able to incorporate the GMAC ESN bug fix in 3.9?
+
+Thanks,
+
+Chaoxing
+
+
+--------------------------------
+Thanks Jussi, the patch fixes the problem.
+
+You may commit it officially.
+
+Chaoxing
+
+-----Original Message-----
+From: Jussi Kivilinna [mailto:jussi.kivilinna@iki.fi]
+Sent: Tuesday, March 26, 2013 4:16 PM
+To: Chaoxing Lin
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: potential bug in GMAC implementation. not work in ESN mode
+
+On 25.03.2013 18:12, Chaoxing Lin wrote:
+> 2nd ping....
+> 
+> Nobody is maintaining crypto/gcm.c?
+> 
+> 
+> 
+> -----Original Message-----
+> From: Chaoxing Lin
+> Sent: Friday, March 08, 2013 11:38 AM
+> To: 'linux-crypto@vger.kernel.org'
+> Subject: potential bug in GMAC implementation. not work in ESN mode
+> 
+> I was testing ipsec with GMAC and found that the rfc4543 GMAC implementation in kernel software crypto work in "esp=aes256gmac-noesn!" mode.
+> It does not work in in "esp=aes256gmac-esn!" mode. The tunnel was established but no data traffic is possible.
+> 
+> Looking at source code, I found this piece of code is suspicious.
+> Line 1146~1147 tries to put req->assoc to assoc[1]. But I think this way only works when req->assoc has only one segment. In ESN mode, req->assoc contains 3 segments (SPI, SN-hi, SN-low). Line 1146~1147 will only attach SPI segment(with total length) in assoc.
+> 
+> Please let me know whether I understand it right.
+
+Your analysis seems correct. Does attached the patch fix the problem? (I've only compile tested it.)
+
+-Jussi
+
+> Thanks,
+> 
+> Chaoxing
+> 
+> 
+> Source from kernel 3.8.2
+> path: root/crypto/gcm.c
+> 
+> 1136: /* construct the aad */
+> 1137:	dstp = sg_page(dst);
+> 	vdst = PageHighMem(dstp) ? NULL : page_address(dstp) + dst->offset;
+> 
+> 	sg_init_table(payload, 2);
+> 	sg_set_buf(payload, req->iv, 8);
+> 	scatterwalk_crypto_chain(payload, dst, vdst == req->iv + 8, 2);
+> 	assoclen += 8 + req->cryptlen - (enc ? 0 : authsize);
+> 
+> 	sg_init_table(assoc, 2);
+> 1146:	sg_set_page(assoc, sg_page(req->assoc), req->assoc->length,
+> 1147:		    req->assoc->offset);
+> 	scatterwalk_crypto_chain(assoc, payload, 0, 2);
+> 
+> 	aead_request_set_tfm(subreq, ctx->child);
+> 	aead_request_set_callback(subreq, req->base.flags, req->base.complete,
+> 				  req->base.data);
+> 	aead_request_set_crypt(subreq, cipher, cipher, enc ? 0 : authsize, iv);
+> 1154:	aead_request_set_assoc(subreq, assoc, assoclen);
+> --
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-crypto" in the body of a message to majordomo@vger.kernel.org 
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+Sent: Thursday, March 28, 2013 4:29 AM
+To: Linus Torvalds; David S. Miller; Linux Kernel Mailing List; Linux Crypto Mailing List
+Subject: Crypto Fixes for 3.9
+
 Hi Linus:
 
-This push removes IPsec ESN support from the talitos/caam drivers
-since they were implemented incorrectly, causing interoperability
-problems if ESN is used with them.
+This push removes IPsec ESN support from the talitos/caam drivers since they were implemented incorrectly, causing interoperability problems if ESN is used with them.
 
 Please pull from
 
@@ -54,7 +140,8 @@ Horia Geanta (2):
  3 files changed, 4 insertions(+), 54 deletions(-)
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
+--
+Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
