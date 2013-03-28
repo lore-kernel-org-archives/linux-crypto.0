@@ -1,117 +1,60 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: [PATCH 02/14] workqueue: add wq_numa_tbl_len and wq_numa_possible_cpumask[]
-Date: Wed, 27 Mar 2013 23:43:28 -0700
-Message-ID: <1364453020-2829-3-git-send-email-tj@kernel.org>
-References: <1364453020-2829-1-git-send-email-tj@kernel.org>
-Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
-	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, Tejun Heo <tj@kernel.org>
-To: laijs@cn.fujitsu.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.9
+Date: Thu, 28 Mar 2013 16:28:41 +0800
+Message-ID: <20130328082841.GA7425@gondor.apana.org.au>
+References: <20100722055043.GA25689@gondor.apana.org.au>
+ <20100903060055.GA28915@gondor.apana.org.au>
+ <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qa0-f45.google.com ([209.85.216.45]:40321 "EHLO
-	mail-qa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756043Ab3C1GoM (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:34429 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755297Ab3C1I2s (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Mar 2013 02:44:12 -0400
-In-Reply-To: <1364453020-2829-1-git-send-email-tj@kernel.org>
+	Thu, 28 Mar 2013 04:28:48 -0400
+Content-Disposition: inline
+In-Reply-To: <20121109093005.GA25632@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Unbound workqueues are going to be NUMA-affine.  Add wq_numa_tbl_len
-and wq_numa_possible_cpumask[] in preparation.  The former is the
-highest NUMA node ID + 1 and the latter is masks of possibles CPUs for
-each NUMA node.
+Hi Linus:
 
-This patch only introduces these.  Future patches will make use of
-them.
+This push removes IPsec ESN support from the talitos/caam drivers
+since they were implemented incorrectly, causing interoperability
+problems if ESN is used with them.
 
-v2: NUMA initialization move into wq_numa_init().  Also, the possible
-    cpumask array is not created if there aren't multiple nodes on the
-    system.  wq_numa_enabled bool added.
+Please pull from
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- kernel/workqueue.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 26771f4e..54b5048 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -44,6 +44,7 @@
- #include <linux/jhash.h>
- #include <linux/hashtable.h>
- #include <linux/rculist.h>
-+#include <linux/nodemask.h>
- 
- #include "workqueue_internal.h"
- 
-@@ -253,6 +254,12 @@ struct workqueue_struct {
- 
- static struct kmem_cache *pwq_cache;
- 
-+static int wq_numa_tbl_len;		/* highest possible NUMA node id + 1 */
-+static cpumask_var_t *wq_numa_possible_cpumask;
-+					/* possible CPUs of each node */
-+
-+static bool wq_numa_enabled;		/* unbound NUMA affinity enabled */
-+
- static DEFINE_MUTEX(wq_pool_mutex);	/* protects pools and workqueues list */
- static DEFINE_SPINLOCK(wq_mayday_lock);	/* protects wq->maydays list */
- 
-@@ -4402,6 +4409,43 @@ out_unlock:
- }
- #endif /* CONFIG_FREEZER */
- 
-+static void __init wq_numa_init(void)
-+{
-+	cpumask_var_t *tbl;
-+	int node, cpu;
-+
-+	/* determine NUMA pwq table len - highest node id + 1 */
-+	for_each_node(node)
-+		wq_numa_tbl_len = max(wq_numa_tbl_len, node + 1);
-+
-+	if (num_possible_nodes() <= 1)
-+		return;
-+
-+	/*
-+	 * We want masks of possible CPUs of each node which isn't readily
-+	 * available.  Build one from cpu_to_node() which should have been
-+	 * fully initialized by now.
-+	 */
-+	tbl = kzalloc(wq_numa_tbl_len * sizeof(tbl[0]), GFP_KERNEL);
-+	BUG_ON(!tbl);
-+
-+	for_each_node(node)
-+		BUG_ON(!alloc_cpumask_var_node(&tbl[node], GFP_KERNEL, node));
-+
-+	for_each_possible_cpu(cpu) {
-+		node = cpu_to_node(cpu);
-+		if (WARN_ON(node == NUMA_NO_NODE)) {
-+			pr_warn("workqueue: NUMA node mapping not available for cpu%d, disabling NUMA support\n", cpu);
-+			/* happens iff arch is bonkers, let's just proceed */
-+			return;
-+		}
-+		cpumask_set_cpu(cpu, tbl[node]);
-+	}
-+
-+	wq_numa_possible_cpumask = tbl;
-+	wq_numa_enabled = true;
-+}
-+
- static int __init init_workqueues(void)
- {
- 	int std_nice[NR_STD_WORKER_POOLS] = { 0, HIGHPRI_NICE_LEVEL };
-@@ -4418,6 +4462,8 @@ static int __init init_workqueues(void)
- 	cpu_notifier(workqueue_cpu_up_callback, CPU_PRI_WORKQUEUE_UP);
- 	hotcpu_notifier(workqueue_cpu_down_callback, CPU_PRI_WORKQUEUE_DOWN);
- 
-+	wq_numa_init();
-+
- 	/* initialize CPU pools */
- 	for_each_possible_cpu(cpu) {
- 		struct worker_pool *pool;
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Horia Geanta (2):
+      Revert "crypto: talitos - add IPsec ESN support"
+      Revert "crypto: caam - add IPsec ESN support"
+
+ drivers/crypto/caam/caamalg.c |   27 ++-------------------------
+ drivers/crypto/caam/compat.h  |    1 -
+ drivers/crypto/talitos.c      |   30 ++----------------------------
+ 3 files changed, 4 insertions(+), 54 deletions(-)
+
+Thanks,
 -- 
-1.8.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
