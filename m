@@ -1,109 +1,144 @@
-From: Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
-Date: Wed, 27 Mar 2013 19:41:50 +0100
-Message-ID: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	David Howells <dhowells@redhat.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Alexander Holler <holler@ahsoftware.de>, stable@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:43627 "EHLO
-	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752930Ab3C0Sm1 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 Mar 2013 14:42:27 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tejun Heo <tj@kernel.org>
+Subject: Subject: [PATCHSET v2 wq/for-3.10] workqueue: NUMA affinity for unbound workqueues
+Date: Wed, 27 Mar 2013 23:43:26 -0700
+Message-ID: <1364453020-2829-1-git-send-email-tj@kernel.org>
+Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
+	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: laijs@cn.fujitsu.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-I don't see any real use case where checking the validity dates of X.509
-certificates at parsing time adds any security gain. In contrast, doing so
-makes MODSIGN unusable on systems without a RTC (or systems with a possible
-wrong date in a existing RTC, or systems where the RTC is read after the keys
-got loaded).
+Hello,
 
-If something really cares about the dates, it should check them at the time
-when the certificates are used, not when they are loaded and parsed.
+Changes from the last take[L] are
 
-So just remove the validity check of the dates in the parser.
+* Lai pointed out that the previous implementation was broken in that
+  if a workqueue spans over multiple nodes and some of the nodes don't
+  have any desired online CPUs, work items queued on those nodes would
+  be spread across all CPUs violating the configured cpumask.
 
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
-Cc: stable@vger.kernel.org
+  The patchset is updated such that apply_workqueue_attrs() now only
+  assigns NUMA-affine pwqs to nodes with desired online CPUs and
+  default pwq to all other nodes.  To track CPU online state,
+  wq_update_unbound_numa_attrs() is added.  The function is called for
+  each workqueue during hot[un]plug and updates pwq association
+  accordingly.
 
-Sidenote (not for necessarily for inclusion into the patch):
-There were already 3 variations of this patch.
-The first removed the check by adding a config option:
-  https://lkml.org/lkml/2013/2/25/171
-The second just removed the return of errors:
-  https://lkml.org/lkml/2013/3/14/247
-And the third wich removed parsing of the dates too:
-  https://lkml.org/lkml/2013/3/14/257
-Maybe this one will find the approval of a maintainer.
-Here is a thread which explains the motivation for this patch a bit further:
-  https://lkml.org/lkml/2013/2/13/90
----
- crypto/asymmetric_keys/x509_public_key.c | 38 --------------------------------
- 1 file changed, 38 deletions(-)
+* Rolled in updated patches from the previous posting.
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 06007f0..52222a2 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -106,7 +106,6 @@ error_no_sig:
- static int x509_key_preparse(struct key_preparsed_payload *prep)
- {
- 	struct x509_certificate *cert;
--	struct tm now;
- 	size_t srlen, sulen;
- 	char *desc = NULL;
- 	int ret;
-@@ -137,43 +136,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 		goto error_free_cert;
- 	}
- 
--	time_to_tm(CURRENT_TIME.tv_sec, 0, &now);
--	pr_devel("Now: %04ld-%02d-%02d %02d:%02d:%02d\n",
--		 now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
--		 now.tm_hour, now.tm_min,  now.tm_sec);
--	if (now.tm_year < cert->valid_from.tm_year ||
--	    (now.tm_year == cert->valid_from.tm_year &&
--	     (now.tm_mon < cert->valid_from.tm_mon ||
--	      (now.tm_mon == cert->valid_from.tm_mon &&
--	       (now.tm_mday < cert->valid_from.tm_mday ||
--		(now.tm_mday == cert->valid_from.tm_mday &&
--		 (now.tm_hour < cert->valid_from.tm_hour ||
--		  (now.tm_hour == cert->valid_from.tm_hour &&
--		   (now.tm_min < cert->valid_from.tm_min ||
--		    (now.tm_min == cert->valid_from.tm_min &&
--		     (now.tm_sec < cert->valid_from.tm_sec
--		      ))))))))))) {
--		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
--		ret = -EKEYREJECTED;
--		goto error_free_cert;
--	}
--	if (now.tm_year > cert->valid_to.tm_year ||
--	    (now.tm_year == cert->valid_to.tm_year &&
--	     (now.tm_mon > cert->valid_to.tm_mon ||
--	      (now.tm_mon == cert->valid_to.tm_mon &&
--	       (now.tm_mday > cert->valid_to.tm_mday ||
--		(now.tm_mday == cert->valid_to.tm_mday &&
--		 (now.tm_hour > cert->valid_to.tm_hour ||
--		  (now.tm_hour == cert->valid_to.tm_hour &&
--		   (now.tm_min > cert->valid_to.tm_min ||
--		    (now.tm_min == cert->valid_to.tm_min &&
--		     (now.tm_sec > cert->valid_to.tm_sec
--		      ))))))))))) {
--		pr_warn("Cert %s has expired\n", cert->fingerprint);
--		ret = -EKEYEXPIRED;
--		goto error_free_cert;
--	}
--
- 	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
- 	cert->pub->id_type = PKEY_ID_X509;
- 
--- 
-1.8.1.4
+* More helper routines are factored out such that
+  apply_workqueue_attrs() is easier to follow and can share code paths
+  with wq_update_unbound_numa_attrs().
+
+* Various cleanups and fixes.
+
+Patchset description from the original posting follows.
+
+There are two types of workqueues - per-cpu and unbound.  The former
+is bound to each CPU and the latter isn't not bound to any by default.
+While the recently added attrs support allows unbound workqueues to be
+confined to subset of CPUs, it still is quite cumbersome for
+applications where CPU affinity is too constricted but NUMA locality
+still matters.
+
+This patchset tries to solve that issue by automatically making
+unbound workqueues affine to NUMA nodes by default.  A work item
+queued to an unbound workqueue is executed on one of the CPUs allowed
+by the workqueue in the same node.  If there's none allowed, it may be
+executed on any cpu allowed by the workqueue.  It doesn't require any
+changes on the user side.  Every interface of workqueues functions the
+same as before.
+
+This would be most helpful to subsystems which use some form of async
+execution to process significant amount of data - e.g. crypto and
+btrfs; however, I wanted to find out whether it would make any dent in
+much less favorable use cases.  The following is total run time in
+seconds of buliding allmodconfig kernel w/ -j20 on a dual socket
+opteron machine with writeback thread pool converted to unbound
+workqueue and thus made NUMA-affine.  The file system is ext4 on top
+of a WD SSD.
+
+	before conversion		after conversion
+	1396.126			1394.763
+	1397.621			1394.965
+	1399.636			1394.738
+	1397.463			1398.162
+	1395.543			1393.670
+
+AVG	1397.278			1395.260	DIFF	2.018
+STDEV	   1.585			   1.700
+
+And, yes, it actually made things go faster by about 1.2 sigma, which
+isn't completely conclusive but is a pretty good indication that it's
+actually faster.  Note that this is a workload which is dominated by
+CPU time and while there's writeback going on continously it really
+isn't touching too much data or a dominating factor, so the gain is
+understandably small, 0.14%, but hey it's still a gain and it should
+be much more interesting for crypto and btrfs which would actully
+access the data or workloads which are more sensitive to NUMA
+affinity.
+
+The implementation is fairly simple.  After the recent attrs support
+changes, a lot of the differences in pwq (pool_workqueue) handling
+between unbound and per-cpu workqueues are gone.  An unbound workqueue
+still has one "current" pwq that it uses for queueing any new work
+items but can handle multiple pwqs perfectly well while they're
+draining, so this patchset adds pwq dispatch table to unbound
+workqueues which is indexed by NUMA node and points to the matching
+pwq.  Unbound workqueues now simply have multiple "current" pwqs keyed
+by NUMA node.
+
+NUMA affinity can be turned off system-wide by workqueue.disable_numa
+kernel param or per-workqueue using "numa" sysfs file.
+
+This patchset contains the following fourteen patches.
+
+ 0001-workqueue-move-pwq_pool_locking-outside-of-get-put_u.patch
+ 0002-workqueue-add-wq_numa_tbl_len-and-wq_numa_possible_c.patch
+ 0003-workqueue-drop-H-from-kworker-names-of-unbound-worke.patch
+ 0004-workqueue-determine-NUMA-node-of-workers-accourding-.patch
+ 0005-workqueue-add-workqueue-unbound_attrs.patch
+ 0006-workqueue-make-workqueue-name-fixed-len.patch
+ 0007-workqueue-move-hot-fields-of-workqueue_struct-to-the.patch
+ 0008-workqueue-map-an-unbound-workqueues-to-multiple-per-.patch
+ 0009-workqueue-break-init_and_link_pwq-into-two-functions.patch
+ 0010-workqueue-use-NUMA-aware-allocation-for-pool_workque.patch
+ 0011-workqueue-introduce-numa_pwq_tbl_install.patch
+ 0012-workqueue-introduce-put_pwq_unlocked.patch
+ 0013-workqueue-implement-NUMA-affinity-for-unbound-workqu.patch
+ 0014-workqueue-update-sysfs-interface-to-reflect-NUMA-awa.patch
+
+0001-0009 are prep patches.
+
+0010-0013 implement NUMA affinity.
+
+0014 adds control knobs and updates sysfs interface.
+
+This patchset is on top of
+
+  wq/for-3.10 b59276054 ("workqueue: remove pwq_lock which is no longer used")
++ [1] ("workqueue: fix race condition in unbound workqueue free path") patch
++ [2] ("workqueue: fix unbound workqueue attrs hashing / comparison") patch
+
+and also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git review-numa
+
+diffstat follows.
+
+ Documentation/kernel-parameters.txt |    9 
+ include/linux/workqueue.h           |    5 
+ kernel/workqueue.c                  |  640 ++++++++++++++++++++++++++++++------
+ 3 files changed, 549 insertions(+), 105 deletions(-)
+
+Thanks.
+
+--
+tejun
+
+[L] http://thread.gmane.org/gmane.linux.kernel.cryptoapi/8501
+[1] http://article.gmane.org/gmane.linux.kernel/1465618
+[2] http://article.gmane.org/gmane.linux.kernel/1465619
