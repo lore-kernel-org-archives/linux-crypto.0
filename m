@@ -1,224 +1,128 @@
 From: Tejun Heo <tj@kernel.org>
-Subject: [PATCH 14/14] workqueue: update sysfs interface to reflect NUMA awareness and a kernel param to disable NUMA affinity
-Date: Wed, 27 Mar 2013 23:43:40 -0700
-Message-ID: <1364453020-2829-15-git-send-email-tj@kernel.org>
+Subject: [PATCH 11/14] workqueue: introduce numa_pwq_tbl_install()
+Date: Wed, 27 Mar 2013 23:43:37 -0700
+Message-ID: <1364453020-2829-12-git-send-email-tj@kernel.org>
 References: <1364453020-2829-1-git-send-email-tj@kernel.org>
 Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
 	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
 	herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, Tejun Heo <tj@kernel.org>
 To: laijs@cn.fujitsu.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qc0-f182.google.com ([209.85.216.182]:64151 "EHLO
+	mail-qc0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755983Ab3C1Go5 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 Mar 2013 02:44:57 -0400
 In-Reply-To: <1364453020-2829-1-git-send-email-tj@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Unbound workqueues are now NUMA aware.  Let's add some control knobs
-and update sysfs interface accordingly.
+Factor out pool_workqueue linking and installation into numa_pwq_tbl[]
+from apply_workqueue_attrs() into numa_pwq_tbl_install().  link_pwq()
+is made safe to call multiple times.  numa_pwq_tbl_install() links the
+pwq, installs it into numa_pwq_tbl[] at the specified node and returns
+the old entry.
 
-* Add kernel param workqueue.numa_disable which disables NUMA affinity
-  globally.
+@last_pwq is removed from link_pwq() as the return value of the new
+function can be used instead.
 
-* Replace sysfs file "pool_id" with "pool_ids" which contain
-  node:pool_id pairs.  This change is userland-visible but "pool_id"
-  hasn't seen a release yet, so this is okay.
-
-* Add a new sysf files "numa" which can toggle NUMA affinity on
-  individual workqueues.  This is implemented as attrs->no_numa whichn
-  is special in that it isn't part of a pool's attributes.  It only
-  affects how apply_workqueue_attrs() picks which pools to use.
-
-After "pool_ids" change, first_pwq() doesn't have any user left.
-Removed.
+This is to prepare for NUMA affinity support for unbound workqueues.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- Documentation/kernel-parameters.txt |  9 ++++
- include/linux/workqueue.h           |  5 +++
- kernel/workqueue.c                  | 82 ++++++++++++++++++++++++++-----------
- 3 files changed, 73 insertions(+), 23 deletions(-)
+ kernel/workqueue.c | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 4609e81..c75ea0b 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -3222,6 +3222,15 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			or other driver-specific files in the
- 			Documentation/watchdog/ directory.
- 
-+	workqueue.disable_numa
-+			By default, all work items queued to unbound
-+			workqueues are affine to the NUMA nodes they're
-+			issued on, which results in better behavior in
-+			general.  If NUMA affinity needs to be disabled for
-+			whatever reason, this option can be used.  Note
-+			that this also can be controlled per-workqueue for
-+			workqueues visible under /sys/bus/workqueue/.
-+
- 	x2apic_phys	[X86-64,APIC] Use x2apic physical mode instead of
- 			default x2apic cluster mode on platforms
- 			supporting x2apic.
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index 835d12b..7179756 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -119,10 +119,15 @@ struct delayed_work {
- /*
-  * A struct for workqueue attributes.  This can be used to change
-  * attributes of an unbound workqueue.
-+ *
-+ * Unlike other fields, ->no_numa isn't a property of a worker_pool.  It
-+ * only modifies how apply_workqueue_attrs() select pools and thus doesn't
-+ * participate in pool hash calculations or equality comparisons.
-  */
- struct workqueue_attrs {
- 	int			nice;		/* nice level */
- 	cpumask_var_t		cpumask;	/* allowed CPUs */
-+	bool			no_numa;	/* disable NUMA affinity */
- };
- 
- static inline struct delayed_work *to_delayed_work(struct work_struct *work)
 diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 637debe..0b6a3b0 100644
+index a4420be..527dc418 100644
 --- a/kernel/workqueue.c
 +++ b/kernel/workqueue.c
-@@ -268,6 +268,9 @@ static int wq_numa_tbl_len;		/* highest possible NUMA node id + 1 */
- static cpumask_var_t *wq_numa_possible_cpumask;
- 					/* possible CPUs of each node */
- 
-+static bool wq_disable_numa;
-+module_param_named(disable_numa, wq_disable_numa, bool, 0444);
-+
- static bool wq_numa_enabled;		/* unbound NUMA affinity enabled */
- 
- /* buf for wq_update_unbound_numa_attrs(), protected by CPU hotplug exclusion */
-@@ -517,21 +520,6 @@ static int worker_pool_assign_id(struct worker_pool *pool)
+@@ -3639,24 +3639,26 @@ static void init_pwq(struct pool_workqueue *pwq, struct workqueue_struct *wq,
+ 	pwq->flush_color = -1;
+ 	pwq->refcnt = 1;
+ 	INIT_LIST_HEAD(&pwq->delayed_works);
++	INIT_LIST_HEAD(&pwq->pwqs_node);
+ 	INIT_LIST_HEAD(&pwq->mayday_node);
+ 	INIT_WORK(&pwq->unbound_release_work, pwq_unbound_release_workfn);
  }
  
- /**
-- * first_pwq - return the first pool_workqueue of the specified workqueue
-- * @wq: the target workqueue
-- *
-- * This must be called either with wq->mutex held or sched RCU read locked.
-- * If the pwq needs to be used beyond the locking in effect, the caller is
-- * responsible for guaranteeing that the pwq stays online.
-- */
--static struct pool_workqueue *first_pwq(struct workqueue_struct *wq)
--{
--	assert_rcu_or_wq_mutex(wq);
--	return list_first_or_null_rcu(&wq->pwqs, struct pool_workqueue,
--				      pwqs_node);
--}
--
--/**
-  * unbound_pwq_by_node - return the unbound pool_workqueue for the given node
-  * @wq: the target workqueue
-  * @node: the node ID
-@@ -3114,16 +3102,21 @@ static struct device_attribute wq_sysfs_attrs[] = {
- 	__ATTR_NULL,
- };
- 
--static ssize_t wq_pool_id_show(struct device *dev,
--			       struct device_attribute *attr, char *buf)
-+static ssize_t wq_pool_ids_show(struct device *dev,
-+				struct device_attribute *attr, char *buf)
+ /* sync @pwq with the current state of its associated wq and link it */
+-static void link_pwq(struct pool_workqueue *pwq,
+-		     struct pool_workqueue **p_last_pwq)
++static void link_pwq(struct pool_workqueue *pwq)
  {
- 	struct workqueue_struct *wq = dev_to_wq(dev);
--	struct worker_pool *pool;
--	int written;
-+	const char *delim = "";
-+	int node, written = 0;
+ 	struct workqueue_struct *wq = pwq->wq;
  
- 	rcu_read_lock_sched();
--	pool = first_pwq(wq)->pool;
--	written = scnprintf(buf, PAGE_SIZE, "%d\n", pool->id);
-+	for_each_node(node) {
-+		written += scnprintf(buf + written, PAGE_SIZE - written,
-+				     "%s%d:%d", delim, node,
-+				     unbound_pwq_by_node(wq, node)->pool->id);
-+		delim = " ";
-+	}
-+	written += scnprintf(buf + written, PAGE_SIZE - written, "\n");
- 	rcu_read_unlock_sched();
+ 	lockdep_assert_held(&wq->mutex);
  
- 	return written;
-@@ -3212,10 +3205,46 @@ static ssize_t wq_cpumask_store(struct device *dev,
- 	return ret ?: count;
- }
- 
-+static ssize_t wq_numa_show(struct device *dev, struct device_attribute *attr,
-+			    char *buf)
-+{
-+	struct workqueue_struct *wq = dev_to_wq(dev);
-+	int written;
-+
-+	mutex_lock(&wq->mutex);
-+	written = scnprintf(buf, PAGE_SIZE, "%d\n",
-+			    !wq->unbound_attrs->no_numa);
-+	mutex_unlock(&wq->mutex);
-+
-+	return written;
-+}
-+
-+static ssize_t wq_numa_store(struct device *dev, struct device_attribute *attr,
-+			     const char *buf, size_t count)
-+{
-+	struct workqueue_struct *wq = dev_to_wq(dev);
-+	struct workqueue_attrs *attrs;
-+	int v, ret;
-+
-+	attrs = wq_sysfs_prep_attrs(wq);
-+	if (!attrs)
-+		return -ENOMEM;
-+
-+	ret = -EINVAL;
-+	if (sscanf(buf, "%d", &v) == 1) {
-+		attrs->no_numa = !v;
-+		ret = apply_workqueue_attrs(wq, attrs);
-+	}
-+
-+	free_workqueue_attrs(attrs);
-+	return ret ?: count;
-+}
-+
- static struct device_attribute wq_sysfs_unbound_attrs[] = {
--	__ATTR(pool_id, 0444, wq_pool_id_show, NULL),
-+	__ATTR(pool_ids, 0444, wq_pool_ids_show, NULL),
- 	__ATTR(nice, 0644, wq_nice_show, wq_nice_store),
- 	__ATTR(cpumask, 0644, wq_cpumask_show, wq_cpumask_store),
-+	__ATTR(numa, 0644, wq_numa_show, wq_numa_store),
- 	__ATTR_NULL,
- };
- 
-@@ -3750,7 +3779,7 @@ static void free_unbound_pwq(struct pool_workqueue *pwq)
- static bool wq_calc_node_cpumask(const struct workqueue_attrs *attrs, int node,
- 				 int cpu_going_down, cpumask_t *cpumask)
- {
--	if (!wq_numa_enabled)
-+	if (!wq_numa_enabled || attrs->no_numa)
- 		goto use_dfl;
- 
- 	/* does @node have any online CPUs @attrs wants? */
-@@ -3940,6 +3969,8 @@ static void wq_update_unbound_numa(struct workqueue_struct *wq, int cpu,
- 	cpumask = target_attrs->cpumask;
- retry:
- 	mutex_lock(&wq->mutex);
-+	if (wq->unbound_attrs->no_numa)
-+		goto out_unlock;
- 
- 	copy_workqueue_attrs(target_attrs, wq->unbound_attrs);
- 	pwq = unbound_pwq_by_node(wq, node);
-@@ -4757,6 +4788,11 @@ static void __init wq_numa_init(void)
- 	if (num_possible_nodes() <= 1)
- 		return;
- 
-+	if (wq_disable_numa) {
-+		pr_info("workqueue: NUMA affinity support disabled\n");
++	/* may be called multiple times, ignore if already linked */
++	if (!list_empty(&pwq->pwqs_node))
 +		return;
-+	}
 +
- 	wq_update_unbound_numa_attrs_buf = alloc_workqueue_attrs(GFP_KERNEL);
- 	BUG_ON(!wq_update_unbound_numa_attrs_buf);
+ 	/*
+ 	 * Set the matching work_color.  This is synchronized with
+ 	 * wq->mutex to avoid confusing flush_workqueue().
+ 	 */
+-	if (p_last_pwq)
+-		*p_last_pwq = first_pwq(wq);
+ 	pwq->work_color = wq->work_color;
  
+ 	/* sync max_active to the current setting */
+@@ -3689,6 +3691,23 @@ static struct pool_workqueue *alloc_unbound_pwq(struct workqueue_struct *wq,
+ 	return pwq;
+ }
+ 
++/* install @pwq into @wq's numa_pwq_tbl[] for @node and return the old pwq */
++static struct pool_workqueue *numa_pwq_tbl_install(struct workqueue_struct *wq,
++						   int node,
++						   struct pool_workqueue *pwq)
++{
++	struct pool_workqueue *old_pwq;
++
++	lockdep_assert_held(&wq->mutex);
++
++	/* link_pwq() can handle duplicate calls */
++	link_pwq(pwq);
++
++	old_pwq = rcu_access_pointer(wq->numa_pwq_tbl[node]);
++	rcu_assign_pointer(wq->numa_pwq_tbl[node], pwq);
++	return old_pwq;
++}
++
+ /**
+  * apply_workqueue_attrs - apply new workqueue_attrs to an unbound workqueue
+  * @wq: the target workqueue
+@@ -3707,7 +3726,7 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
+ 			  const struct workqueue_attrs *attrs)
+ {
+ 	struct workqueue_attrs *new_attrs;
+-	struct pool_workqueue *pwq, *last_pwq;
++	struct pool_workqueue *pwq, *last_pwq = NULL;
+ 	int node;
+ 
+ 	/* only unbound workqueues can change attributes */
+@@ -3734,11 +3753,9 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
+ 
+ 	mutex_lock(&wq->mutex);
+ 
+-	link_pwq(pwq, &last_pwq);
+-
+ 	copy_workqueue_attrs(wq->unbound_attrs, new_attrs);
+ 	for_each_node(node)
+-		rcu_assign_pointer(wq->numa_pwq_tbl[node], pwq);
++		last_pwq = numa_pwq_tbl_install(wq, node, pwq);
+ 
+ 	mutex_unlock(&wq->mutex);
+ 
+@@ -3774,7 +3791,7 @@ static int alloc_and_link_pwqs(struct workqueue_struct *wq)
+ 			init_pwq(pwq, wq, &cpu_pools[highpri]);
+ 
+ 			mutex_lock(&wq->mutex);
+-			link_pwq(pwq, NULL);
++			link_pwq(pwq);
+ 			mutex_unlock(&wq->mutex);
+ 		}
+ 		return 0;
 -- 
 1.8.1.4
