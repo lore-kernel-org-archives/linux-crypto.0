@@ -1,7 +1,7 @@
 From: Tejun Heo <tj@kernel.org>
-Subject: [PATCH 01/14] workqueue: move pwq_pool_locking outside of get/put_unbound_pool()
-Date: Wed, 27 Mar 2013 23:43:27 -0700
-Message-ID: <1364453020-2829-2-git-send-email-tj@kernel.org>
+Subject: [PATCH 03/14] workqueue: drop 'H' from kworker names of unbound worker pools
+Date: Wed, 27 Mar 2013 23:43:29 -0700
+Message-ID: <1364453020-2829-4-git-send-email-tj@kernel.org>
 References: <1364453020-2829-1-git-send-email-tj@kernel.org>
 Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
 	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
@@ -13,122 +13,62 @@ In-Reply-To: <1364453020-2829-1-git-send-email-tj@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The scheduled NUMA affinity support for unbound workqueues would need
-to walk workqueues list and pool related operations on each workqueue.
+Currently, all workqueue workers which have negative nice value has
+'H' postfixed to their names.  This is necessary for per-cpu workers
+as they use the CPU number instead of pool->id to identify the pool
+and the 'H' postfix is the only thing distinguishing normal and
+highpri workers.
 
-Move wq_pool_mutex locking out of get/put_unbound_pool() to their
-callers so that pool operations can be performed while walking the
-workqueues list, which is also protected by wq_pool_mutex.
+As workers for unbound pools use pool->id, the 'H' postfix is purely
+informational.  TASK_COMM_LEN is 16 and after the static part and
+delimiters, there are only five characters left for the pool and
+worker IDs.  We're expecting to have more unbound pools with the
+scheduled NUMA awareness support.  Let's drop the non-essential 'H'
+postfix from unbound kworker name.
+
+While at it, restructure kthread_create*() invocation to help future
+NUMA related changes.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- kernel/workqueue.c | 36 ++++++++++++++++++++++--------------
- 1 file changed, 22 insertions(+), 14 deletions(-)
+ kernel/workqueue.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index abe1f0d..26771f4e 100644
+index 54b5048..57ced49 100644
 --- a/kernel/workqueue.c
 +++ b/kernel/workqueue.c
-@@ -3395,31 +3395,28 @@ static void rcu_free_pool(struct rcu_head *rcu)
-  * safe manner.  get_unbound_pool() calls this function on its failure path
-  * and this function should be able to release pools which went through,
-  * successfully or not, init_worker_pool().
-+ *
-+ * Should be called with wq_pool_mutex held.
+@@ -1644,9 +1644,10 @@ static struct worker *alloc_worker(void)
   */
- static void put_unbound_pool(struct worker_pool *pool)
+ static struct worker *create_worker(struct worker_pool *pool)
  {
- 	struct worker *worker;
+-	const char *pri = pool->attrs->nice < 0  ? "H" : "";
+ 	struct worker *worker = NULL;
++	int node = pool->cpu >= 0 ? cpu_to_node(pool->cpu) : NUMA_NO_NODE;
+ 	int id = -1;
++	char id_buf[16];
  
--	mutex_lock(&wq_pool_mutex);
--	if (--pool->refcnt) {
--		mutex_unlock(&wq_pool_mutex);
-+	lockdep_assert_held(&wq_pool_mutex);
+ 	lockdep_assert_held(&pool->manager_mutex);
+ 
+@@ -1672,13 +1673,13 @@ static struct worker *create_worker(struct worker_pool *pool)
+ 	worker->id = id;
+ 
+ 	if (pool->cpu >= 0)
+-		worker->task = kthread_create_on_node(worker_thread,
+-					worker, cpu_to_node(pool->cpu),
+-					"kworker/%d:%d%s", pool->cpu, id, pri);
++		snprintf(id_buf, sizeof(id_buf), "%d:%d%s", pool->cpu, id,
++			 pool->attrs->nice < 0  ? "H" : "");
+ 	else
+-		worker->task = kthread_create(worker_thread, worker,
+-					      "kworker/u%d:%d%s",
+-					      pool->id, id, pri);
++		snprintf(id_buf, sizeof(id_buf), "u%d:%d", pool->id, id);
 +
-+	if (--pool->refcnt)
- 		return;
--	}
++	worker->task = kthread_create_on_node(worker_thread, worker, node,
++					      "kworker/%s", id_buf);
+ 	if (IS_ERR(worker->task))
+ 		goto fail;
  
- 	/* sanity checks */
- 	if (WARN_ON(!(pool->flags & POOL_DISASSOCIATED)) ||
--	    WARN_ON(!list_empty(&pool->worklist))) {
--		mutex_unlock(&wq_pool_mutex);
-+	    WARN_ON(!list_empty(&pool->worklist)))
- 		return;
--	}
- 
- 	/* release id and unhash */
- 	if (pool->id >= 0)
- 		idr_remove(&worker_pool_idr, pool->id);
- 	hash_del(&pool->hash_node);
- 
--	mutex_unlock(&wq_pool_mutex);
--
- 	/*
- 	 * Become the manager and destroy all workers.  Grabbing
- 	 * manager_arb prevents @pool's workers from blocking on
-@@ -3453,13 +3450,15 @@ static void put_unbound_pool(struct worker_pool *pool)
-  * reference count and return it.  If there already is a matching
-  * worker_pool, it will be used; otherwise, this function attempts to
-  * create a new one.  On failure, returns NULL.
-+ *
-+ * Should be called with wq_pool_mutex held.
-  */
- static struct worker_pool *get_unbound_pool(const struct workqueue_attrs *attrs)
- {
- 	u32 hash = wqattrs_hash(attrs);
- 	struct worker_pool *pool;
- 
--	mutex_lock(&wq_pool_mutex);
-+	lockdep_assert_held(&wq_pool_mutex);
- 
- 	/* do we already have a matching pool? */
- 	hash_for_each_possible(unbound_pool_hash, pool, hash_node, hash) {
-@@ -3490,10 +3489,8 @@ static struct worker_pool *get_unbound_pool(const struct workqueue_attrs *attrs)
- 	/* install */
- 	hash_add(unbound_pool_hash, &pool->hash_node, hash);
- out_unlock:
--	mutex_unlock(&wq_pool_mutex);
- 	return pool;
- fail:
--	mutex_unlock(&wq_pool_mutex);
- 	if (pool)
- 		put_unbound_pool(pool);
- 	return NULL;
-@@ -3530,7 +3527,10 @@ static void pwq_unbound_release_workfn(struct work_struct *work)
- 	is_last = list_empty(&wq->pwqs);
- 	mutex_unlock(&wq->mutex);
- 
-+	mutex_lock(&wq_pool_mutex);
- 	put_unbound_pool(pool);
-+	mutex_unlock(&wq_pool_mutex);
-+
- 	call_rcu_sched(&pwq->rcu, rcu_free_pwq);
- 
- 	/*
-@@ -3653,13 +3653,21 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
- 	copy_workqueue_attrs(new_attrs, attrs);
- 	cpumask_and(new_attrs->cpumask, new_attrs->cpumask, cpu_possible_mask);
- 
-+	mutex_lock(&wq_pool_mutex);
-+
- 	pwq = kmem_cache_zalloc(pwq_cache, GFP_KERNEL);
--	if (!pwq)
-+	if (!pwq) {
-+		mutex_unlock(&wq_pool_mutex);
- 		goto enomem;
-+	}
- 
- 	pool = get_unbound_pool(new_attrs);
--	if (!pool)
-+	if (!pool) {
-+		mutex_unlock(&wq_pool_mutex);
- 		goto enomem;
-+	}
-+
-+	mutex_unlock(&wq_pool_mutex);
- 
- 	init_and_link_pwq(pwq, wq, pool, &last_pwq);
- 	if (last_pwq) {
 -- 
 1.8.1.4
