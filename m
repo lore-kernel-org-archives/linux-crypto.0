@@ -1,59 +1,76 @@
 From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH v4 13/14] workqueue: implement NUMA affinity for unbound
- workqueues
-Date: Sun, 31 Mar 2013 12:06:33 -0700
-Message-ID: <20130331190633.GC7533@htj.dyndns.org>
+Subject: [PATCH 0.5/14] workqueue: fix memory leak in apply_workqueue_attrs()
+Date: Mon, 1 Apr 2013 11:27:57 -0700
+Message-ID: <20130401182757.GB3142@htj.dyndns.org>
 References: <1364453020-2829-1-git-send-email-tj@kernel.org>
- <1364453020-2829-14-git-send-email-tj@kernel.org>
- <20130329224434.GC9862@htj.dyndns.org>
- <CACvQF50c3m3eMiGKctagoOe6s3uhehfFy733imBfnLKTXSqZ4A@mail.gmail.com>
- <CAOS58YOgwB4s4-2e528T6SV36pDxLS3Zx+b5eR0L2kQjiZBEnw@mail.gmail.com>
- <51571FA2.2050804@cn.fujitsu.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Lai Jiangshan <eag0628@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>, fengguang.wu@intel.com,
-	jmoyer@redhat.com, zab@redhat.com,
-	LKML <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
+	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-crypto@vger.kernel.org
-To: Lai Jiangshan <laijs@cn.fujitsu.com>
+To: laijs@cn.fujitsu.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:48101 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752869Ab3CaTGi (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:45447 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751751Ab3DAS2H (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 31 Mar 2013 15:06:38 -0400
+	Mon, 1 Apr 2013 14:28:07 -0400
 Content-Disposition: inline
-In-Reply-To: <51571FA2.2050804@cn.fujitsu.com>
+In-Reply-To: <1364453020-2829-1-git-send-email-tj@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello, Lai.
+>From 4862125b0256a946d2749a1d5003b0604bc3cb4d Mon Sep 17 00:00:00 2001
+From: Tejun Heo <tj@kernel.org>
+Date: Mon, 1 Apr 2013 11:23:31 -0700
 
-On Sun, Mar 31, 2013 at 01:23:46AM +0800, Lai Jiangshan wrote:
-> But for unbound wq when cpuhotplug
-> w/o NUMA affinity, works are    always   in the cpus  if   there is online cpu in wq's cpumask
-> w/ NUMA affinity, .........   NOT always ........     even ....................................
+apply_workqueue_attrs() wasn't freeing temp attrs variable @new_attrs
+in its success path.  Fix it.
 
-Yeah, this is rather unfortunate but cpumask for unbound workqueue is
-a completely new thing anyway and I think providing a similar
-guarantee as per-cpu should be enough.  Things are much simpler that
-way and requiring users which depend on hard affinity to take care of
-flushing is reasonable enough and in line with how workqueue has
-traditionally been working.
-
-> > Workqueue's affinity guarantee is very specific - the work item owner is
-> > responsible for flushing the work item during CPU DOWN if it wants
-> > to guarantee affinity over full execution. 
-> 
-> Could you add the comments and add Reviewed-by: Lai Jiangshan <laijs@cn.fujitsu.com>
-> for the patchset?
-
-Sure thing.
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Lai Jiangshan <laijs@cn.fujitsu.com>
+---
+This causes some minor conflicts down the series but nothing
+noteworthy.  I'm not posting the whole refreshed series.  If you want
+it, holler.
 
 Thanks.
 
+ kernel/workqueue.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index abe1f0d..89480fc 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -3636,6 +3636,7 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
+ 	struct workqueue_attrs *new_attrs;
+ 	struct pool_workqueue *pwq = NULL, *last_pwq;
+ 	struct worker_pool *pool;
++	int ret;
+ 
+ 	/* only unbound workqueues can change attributes */
+ 	if (WARN_ON(!(wq->flags & WQ_UNBOUND)))
+@@ -3668,12 +3669,16 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
+ 		spin_unlock_irq(&last_pwq->pool->lock);
+ 	}
+ 
+-	return 0;
++	ret = 0;
++	/* fall through */
++out_free:
++	free_workqueue_attrs(new_attrs);
++	return ret;
+ 
+ enomem:
+ 	kmem_cache_free(pwq_cache, pwq);
+-	free_workqueue_attrs(new_attrs);
+-	return -ENOMEM;
++	ret = -ENOMEM;
++	goto out_free;
+ }
+ 
+ static int alloc_and_link_pwqs(struct workqueue_struct *wq)
 -- 
-tejun
+1.8.1.4
