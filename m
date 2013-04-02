@@ -1,31 +1,38 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: Subject: [PATCHSET v2 wq/for-3.10] workqueue: NUMA affinity for
- unbound workqueues
-Date: Mon, 1 Apr 2013 11:29:16 -0700
-Message-ID: <20130401182916.GD3142@htj.dyndns.org>
-References: <1364453020-2829-1-git-send-email-tj@kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: gcm - fix assumption that assoc has one segment
+Date: Tue, 2 Apr 2013 17:56:58 +0800
+Message-ID: <20130402095658.GA15246@gondor.apana.org.au>
+References: <20130328195403.13775.20772.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: axboe@kernel.dk, jack@suse.cz, fengguang.wu@intel.com,
-	jmoyer@redhat.com, zab@redhat.com, linux-kernel@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: laijs@cn.fujitsu.com
+Cc: linux-crypto@vger.kernel.org,
+	Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f169.google.com ([209.85.192.169]:35985 "EHLO
-	mail-pd0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757452Ab3DAS32 (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:46544 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757681Ab3DBJ5H (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Apr 2013 14:29:28 -0400
+	Tue, 2 Apr 2013 05:57:07 -0400
 Content-Disposition: inline
-In-Reply-To: <1364453020-2829-1-git-send-email-tj@kernel.org>
+In-Reply-To: <20130328195403.13775.20772.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Applied to wq/for-3.10 with the updated patches and Lai's
-Reviewed-by's added.
+On Thu, Mar 28, 2013 at 09:54:03PM +0200, Jussi Kivilinna wrote:
+> rfc4543(gcm(*)) code for GMAC assumes that assoc scatterlist always contains
+> only one segment and only makes use of this first segment. However ipsec passes
+> assoc with three segments when using 'extended sequence number' thus in this
+> case rfc4543(gcm(*)) fails to function correctly. Patch fixes this issue.
+> 
+> Reported-by: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+> Tested-by: Chaoxing Lin <Chaoxing.Lin@ultra-3eti.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
-Thanks.
-
+Patch applied.  Thanks!
 -- 
-tejun
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
