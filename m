@@ -1,42 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH -next] crypto: ux500 - fix error return code in
- hash_dma_final()
-Date: Wed, 3 Apr 2013 09:52:29 +0800
-Message-ID: <20130403015229.GA20205@gondor.apana.org.au>
-References: <CAPgLHd94xmvDhOm7xFAV0Ef2O4DFST+npQYN7sfRKVL+y+Msdw@mail.gmail.com>
- <CACRpkdZYwGhXqZpmu5FovAo=_C6U97_3tcOw3hXJ0sw9gRx2CA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] Optimize SHA256 and SHA512 for Intel x86_64
+ with SSSE3, AVX or AVX2 instructions
+Date: Wed, 3 Apr 2013 09:53:07 +0800
+Message-ID: <20130403015307.GC20205@gondor.apana.org.au>
+References: <cover.1364303479.git.tim.c.chen@linux.intel.com>
+ <1364331519.27102.10.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Wei Yongjun <weiyj.lk@gmail.com>, andreas.westin@stericsson.com,
-	arnd@arndb.de, rubini@unipv.it, yongjun_wei@trendmicro.com.cn,
-	linux-crypto@vger.kernel.org,
-	Rikard OLSSON <rikard.p.olsson@stericsson.com>,
-	magnus.p.persson@stericsson.com
-To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Kirk Yap <kirk.s.yap@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:42064 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:33225 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1760469Ab3DCBwr (ORCPT
+	with ESMTP id S1753395Ab3DCBxW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Apr 2013 21:52:47 -0400
+	Tue, 2 Apr 2013 21:53:22 -0400
 Content-Disposition: inline
-In-Reply-To: <CACRpkdZYwGhXqZpmu5FovAo=_C6U97_3tcOw3hXJ0sw9gRx2CA@mail.gmail.com>
+In-Reply-To: <1364331519.27102.10.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 25, 2013 at 04:15:36PM +0100, Linus Walleij wrote:
-> On Fri, Mar 22, 2013 at 2:18 PM, Wei Yongjun <weiyj.lk@gmail.com> wrote:
+On Tue, Mar 26, 2013 at 01:58:39PM -0700, Tim Chen wrote:
+> Herbert, 
 > 
-> > From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-> >
-> > Fix to return a negative error code from the error handling
-> > case instead of 0, as returned elsewhere in this function.
-> >
-> > Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-> 
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> The following patch series provides optimized SHA256 and SHA512 routines
+> using the SSSE3, AVX or AVX2 instructions on x86_64 for Intel cpus.
+> Depending on cpu capabilities, speedup between 40% to 70% or more can be achieved
+> over the generic SHA256 and SHA512 routines.
 
-Patch applied.
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
