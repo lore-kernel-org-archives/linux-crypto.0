@@ -1,40 +1,43 @@
-From: Jeff Garzik <jgarzik@pobox.com>
-Subject: Re: [PATCH v0] Add SHA-3 hash algorithm
-Date: Wed, 03 Apr 2013 20:29:51 -0400
-Message-ID: <515CC97F.5020200@pobox.com>
-References: <20121003054542.GA2416@havoc.gtf.org>
+From: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Subject: questions of crypto async api
+Date: Thu, 4 Apr 2013 14:38:41 +0000
+Message-ID: <A83C99F8370D4D42BEB2D2B3153A6BBC23CDB94D@NASANEXD02C.na.qualcomm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au,
-	davem@davemloft.net
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f179.google.com ([209.85.216.179]:43225 "EHLO
-	mail-qc0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761013Ab3DDA3y (ORCPT
+Received: from sabertooth01.qualcomm.com ([65.197.215.72]:33784 "EHLO
+	sabertooth01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761973Ab3DDOir convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Apr 2013 20:29:54 -0400
-In-Reply-To: <20121003054542.GA2416@havoc.gtf.org>
+	Thu, 4 Apr 2013 10:38:47 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/03/2012 01:45 AM, Jeff Garzik wrote:
->
-> Whee -- SHA-3 is out!   I wanted to explore the new toy a bit, and
-> so, here is a blatantly untested rough draft of SHA-3 kernel support.
->
-> Why rough draft?  Because answers to the questions below will inform a
-> more polished version.
+If a driver supports multiple instances of HW crypto engines, the order=
+ of=A0the request completion from HW can be different from the order of=
+ requests submitted=A0to different HW.=A0 The 2nd request sent out to t=
+he 2nd=A0HW instance may take shorter time to complete than the first r=
+equest=A0for different HW instance.=A0 Is the driver responsible for re=
+-ordering the completion callout? Or the agents (such as IP protocol st=
+ack) are responsible for reordering? How does pcrypt do it?
 
-Just to update people...  this has been in a holding pattern, because 
-apparently there are revisions to SHA-3 coming down the pipe.  They want 
-to address preimage resistance, and make things faster in hardware.
 
-Random quote from NIST, on the NIST hash-forum, which doesn't provide 
-detail but does summarize general feeling: "As best we can tell, 
-continuing to pay that performance penalty for all future uses of SHA3 
-has no benefit.  (All this is a longwinded way of saying: we were wrong, 
-but hopefully we got better.)"
+=A0Does it make sense for a transform to send multiple requests outstan=
+ding to async crypto api?
 
-	Jeff
+
+=A0Is scatterwalk_sg_next() preferred method over sg_next()?=A0 Why?
+=A0sg_copy_to_buffer() and sg_copy_from_buffer() -> sg_copy_buffer()->s=
+g_copy_buffer() -> sg_miter_next()-> sg_next()
+Sometimes sg_copy_to_buffer() and sg_copy_from_buffer() in our driver d=
+o not copy the whole list. We have to rewrite those functions by using =
+scattewalk_sg_next() to walk down the list. Is this the correct behavio=
+r?
+
+
+Thanks.
+
+Chemin
