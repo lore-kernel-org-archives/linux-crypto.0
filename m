@@ -1,46 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv2 0/2] add devicetree support for timeriomem_rng
-Date: Wed, 3 Apr 2013 09:55:07 +0800
-Message-ID: <20130403015507.GG20205@gondor.apana.org.au>
-References: <1364747691-19874-1-git-send-email-alex@digriz.org.uk>
+From: Jeff Garzik <jgarzik@pobox.com>
+Subject: Re: [PATCH v0] Add SHA-3 hash algorithm
+Date: Wed, 03 Apr 2013 20:29:51 -0400
+Message-ID: <515CC97F.5020200@pobox.com>
+References: <20121003054542.GA2416@havoc.gtf.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>
-To: Alexander Clouter <alex@digriz.org.uk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39272 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759242Ab3DCB5r (ORCPT
+Received: from mail-qc0-f179.google.com ([209.85.216.179]:43225 "EHLO
+	mail-qc0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761013Ab3DDA3y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Apr 2013 21:57:47 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by fornost.hengli.com.au with esmtp (Exim 4.72 #1 (Debian))
-	id 1UNCxN-0004vG-PR
-	for <linux-crypto@vger.kernel.org>; Wed, 03 Apr 2013 12:57:45 +1100
-Received: from herbert by gondolin.me.apana.org.au with local (Exim 4.72)
-	(envelope-from <herbert@gondor.apana.org.au>)
-	id 1UNCxN-0005K9-JE
-	for linux-crypto@vger.kernel.org; Wed, 03 Apr 2013 09:57:45 +0800
-Content-Disposition: inline
-In-Reply-To: <1364747691-19874-1-git-send-email-alex@digriz.org.uk>
+	Wed, 3 Apr 2013 20:29:54 -0400
+In-Reply-To: <20121003054542.GA2416@havoc.gtf.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 31, 2013 at 05:34:49PM +0100, Alexander Clouter wrote:
-> This patchset cleans up, readies, and adds devicetree support to the
-> timeriomem_rng driver.
-> 
-> Changelog:
->  v2 - fix probe() to release mem region in-case of error
-> 
-> Signed-off-by: Alexander Clouter <alex@digriz.org.uk>
-> 
-> Alexander Clouter (2):
->   hw_random: timeriomem_rng: update to support more than one device
->   hw_random: timeriomem_rng: added devicetree hooks
+On 10/03/2012 01:45 AM, Jeff Garzik wrote:
+>
+> Whee -- SHA-3 is out!   I wanted to explore the new toy a bit, and
+> so, here is a blatantly untested rough draft of SHA-3 kernel support.
+>
+> Why rough draft?  Because answers to the questions below will inform a
+> more polished version.
 
-Patches applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Just to update people...  this has been in a holding pattern, because 
+apparently there are revisions to SHA-3 coming down the pipe.  They want 
+to address preimage resistance, and make things faster in hardware.
+
+Random quote from NIST, on the NIST hash-forum, which doesn't provide 
+detail but does summarize general feeling: "As best we can tell, 
+continuing to pay that performance penalty for all future uses of SHA3 
+has no benefit.  (All this is a longwinded way of saying: we were wrong, 
+but hopefully we got better.)"
+
+	Jeff
