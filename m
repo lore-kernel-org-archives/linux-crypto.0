@@ -1,54 +1,56 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: questions of crypto async api
-Date: Fri, 5 Apr 2013 17:33:20 -0500
-Message-ID: <20130405173320.bed824d33bb493e8f5015835@freescale.com>
-References: <A83C99F8370D4D42BEB2D2B3153A6BBC23CDB94D@NASANEXD02C.na.qualcomm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: algif - suppress sending source address information in recvmsg
+Date: Sun,  7 Apr 2013 14:05:39 +0200
+Message-ID: <1365336339-403-1-git-send-email-minipli@googlemail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe010.messaging.microsoft.com ([216.32.180.30]:20151
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1162912Ab3DEWg5 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Apr 2013 18:36:57 -0400
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC23CDB94D@NASANEXD02C.na.qualcomm.com>
+Received: from mail-bk0-f49.google.com ([209.85.214.49]:46206 "EHLO
+	mail-bk0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933491Ab3DGMGC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Apr 2013 08:06:02 -0400
+Received: by mail-bk0-f49.google.com with SMTP id w12so2687140bku.22
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Apr 2013 05:06:01 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 4 Apr 2013 14:38:41 +0000
-"Hsieh, Che-Min" <cheminh@qti.qualcomm.com> wrote:
+The current code does not set the msg_namelen member to 0 and therefore
+makes net/socket.c leak the local sockaddr_storage variable to userland
+-- 128 bytes of kernel stack memory. Fix that.
 
-> If a driver supports multiple instances of HW crypto engines, the ord=
-er of=A0the request completion from HW can be different from the order =
-of requests submitted=A0to different HW.=A0 The 2nd request sent out to=
- the 2nd=A0HW instance may take shorter time to complete than the first=
- request=A0for different HW instance.=A0 Is the driver responsible for =
-re-ordering the completion callout? Or the agents (such as IP protocol =
-stack) are responsible for reordering? How does pcrypt do it?
->=20
-> =A0Does it make sense for a transform to send multiple requests outst=
-anding to async crypto api?
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+---
+ crypto/algif_hash.c     |    2 ++
+ crypto/algif_skcipher.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-see:
-
-http://comments.gmane.org/gmane.linux.kernel.cryptoapi/5350
-
-> =A0Is scatterwalk_sg_next() preferred method over sg_next()?=A0 Why?
-
-scatterwalk_* is the crypto subsystem's version of the function, so
-yes.
-
-> =A0sg_copy_to_buffer() and sg_copy_from_buffer() -> sg_copy_buffer()-=
->sg_copy_buffer() -> sg_miter_next()-> sg_next()
-> Sometimes sg_copy_to_buffer() and sg_copy_from_buffer() in our driver=
- do not copy the whole list. We have to rewrite those functions by usin=
-g scattewalk_sg_next() to walk down the list. Is this the correct behav=
-ior?
-
-sounds like you're on the right track, although buffers shouldn't be
-being copied that often, if at all.
-
-Kim
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index ef5356c..0262210 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -161,6 +161,8 @@ static int hash_recvmsg(struct kiocb *unused, struct socket *sock,
+ 	else if (len < ds)
+ 		msg->msg_flags |= MSG_TRUNC;
+ 
++	msg->msg_namelen = 0;
++
+ 	lock_sock(sk);
+ 	if (ctx->more) {
+ 		ctx->more = 0;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 6a6dfc0..a1c4f0a 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -432,6 +432,7 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
+ 	long copied = 0;
+ 
+ 	lock_sock(sk);
++	msg->msg_namelen = 0;
+ 	for (iov = msg->msg_iov, iovlen = msg->msg_iovlen; iovlen > 0;
+ 	     iovlen--, iov++) {
+ 		unsigned long seglen = iov->iov_len;
+-- 
+1.7.10.4
