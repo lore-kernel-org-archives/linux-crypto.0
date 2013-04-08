@@ -1,67 +1,51 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 4/4] crypto: testmgr - add empty test vectors for null
- ciphers
-Date: Sun, 07 Apr 2013 16:43:56 +0300
-Message-ID: <20130407134356.8718.61691.stgit@localhost6.localdomain6>
-References: <20130407134340.8718.96643.stgit@localhost6.localdomain6>
+Subject: [PATCH 2/2] xfrm: add rfc4494 AES-CMAC-96 support
+Date: Mon, 08 Apr 2013 10:48:49 +0300
+Message-ID: <20130408074849.6866.85578.stgit@localhost6.localdomain6>
+References: <20130408074844.6866.90093.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Tom St Denis <tstdenis@elliptictech.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:42043 "EHLO
-	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933630Ab3DGNn6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Apr 2013 09:43:58 -0400
-In-Reply-To: <20130407134340.8718.96643.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20130408074844.6866.90093.stgit@localhost6.localdomain6>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Without these, kernel log shows:
-[    5.984881] alg: No test for cipher_null (cipher_null-generic)
-[    5.985096] alg: No test for ecb(cipher_null) (ecb-cipher_null)
-[    5.985170] alg: No test for compress_null (compress_null-generic)
-[    5.985297] alg: No test for digest_null (digest_null-generic)
+Now that CryptoAPI has support for CMAC, we can add support for AES-CMAC-96
+(rfc4494).
 
+Cc: Tom St Denis <tstdenis@elliptictech.com>
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- crypto/testmgr.c |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/xfrm/xfrm_algo.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 442ddb4..f37e544 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1913,6 +1913,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "compress_null",
-+		.test = alg_test_null,
-+	}, {
- 		.alg = "crc32c",
- 		.test = alg_test_crc32c,
- 		.fips_allowed = 1,
-@@ -2127,6 +2130,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "digest_null",
-+		.test = alg_test_null,
-+	}, {
- 		.alg = "ecb(__aes-aesni)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-@@ -2237,6 +2243,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "ecb(cipher_null)",
-+		.test = alg_test_null,
-+	}, {
- 		.alg = "ecb(des)",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
+diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
+index 6fb9d00..ab4ef72 100644
+--- a/net/xfrm/xfrm_algo.c
++++ b/net/xfrm/xfrm_algo.c
+@@ -311,6 +311,19 @@ static struct xfrm_algo_desc aalg_list[] = {
+ 		.sadb_alg_maxbits = 128
+ 	}
+ },
++{
++	/* rfc4494 */
++	.name = "cmac(aes)",
++
++	.uinfo = {
++		.auth = {
++			.icv_truncbits = 96,
++			.icv_fullbits = 128,
++		}
++	},
++
++	.pfkey_supported = 0,
++},
+ };
+ 
+ static struct xfrm_algo_desc ealg_list[] = {
