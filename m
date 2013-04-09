@@ -1,120 +1,93 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: questions of crypto async api
-Date: Mon, 8 Apr 2013 20:19:00 -0500
-Message-ID: <20130408201900.b5fc071739e698c3e7ea6bcb@freescale.com>
-References: <A83C99F8370D4D42BEB2D2B3153A6BBC23CDB94D@NASANEXD02C.na.qualcomm.com>
-	<20130405173320.bed824d33bb493e8f5015835@freescale.com>
-	<A83C99F8370D4D42BEB2D2B3153A6BBC23CDC1C3@NASANEXD02C.na.qualcomm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+From: Valentin Ilie <valentin.ilie@gmail.com>
+Subject: [PATCH] crypto: proc - Clean up
+Date: Tue,  9 Apr 2013 16:47:31 +0300
+Message-ID: <1365515251-2060-1-git-send-email-valentin.ilie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Valentin Ilie <valentin.ilie@gmail.com>
+To: herbert@gondor.apana.org.a, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:11218
-	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S936057Ab3DIBWb convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Apr 2013 21:22:31 -0400
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC23CDC1C3@NASANEXD02C.na.qualcomm.com>
+Received: from mail-ea0-f173.google.com ([209.85.215.173]:54035 "EHLO
+	mail-ea0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932799Ab3DINrk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Apr 2013 09:47:40 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 8 Apr 2013 13:49:58 +0000
-"Hsieh, Che-Min" <cheminh@qti.qualcomm.com> wrote:
+Remove trailing whitespaces
+Replace seq_puts with seq_printf when there are no extra parameters.
+Fix indentation problems
 
-> Thanks for the answer.
->=20
-> I have further question on the same subject.
-> With regard to the commit in talitos.c, (attached at end of this mail=
-), =20
->   the driver submits requests of same tfm to the same channel to ensu=
-re the ordering. =20
->=20
-> Is it because the tfm context needs to be maintained from one operati=
-on to next operation? Eg, aead_givencrypt() generates iv based on previ=
-ous iv result stored in tfm.
+Signed-off-by: Valentin Ilie <valentin.ilie@gmail.com>
+---
+ crypto/proc.c |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-is that what the commit text says?
-
-> If requests are sent to different channels dynamically. And driver at=
- the completion of a request from HW, reorders the requests completion =
-callback, what would happen?=20
-
-about the same thing as wrapping the driver with pcrypt?  why not
-use the h/w to maintain ordering?
-
-Kim
-
-> Thanks in advance.
->=20
-> Chemin
->=20
->=20
->=20
-> commit 5228f0f79e983c2b39c202c75af901ceb0003fc1
-> Author: Kim Phillips <kim.phillips@freescale.com>
-> Date:   Fri Jul 15 11:21:38 2011 +0800
->=20
->     crypto: talitos - ensure request ordering within a single tfm
->=20
->     Assign single target channel per tfm in talitos_cra_init instead =
-of
->     performing channel scheduling dynamically during the encryption r=
-equest.
->     This changes the talitos_submit interface to accept a new channel
->     number argument.  Without this, rapid bursts of misc. sized reque=
-sts
->     could make it possible for IPsec packets to be encrypted out-of-o=
-rder,
->     which would result in packet drops due to sequence numbers fallin=
-g
->     outside the anti-reply window on a peer gateway.
->=20
->     Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->=20
-> -----Original Message-----
-> From: Kim Phillips [mailto:kim.phillips@freescale.com]=20
-> Sent: Friday, April 05, 2013 6:33 PM
-> To: Hsieh, Che-Min
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: questions of crypto async api
->=20
-> On Thu, 4 Apr 2013 14:38:41 +0000
-> "Hsieh, Che-Min" <cheminh@qti.qualcomm.com> wrote:
->=20
-> > If a driver supports multiple instances of HW crypto engines, the o=
-rder of=A0the request completion from HW can be different from the orde=
-r of requests submitted=A0to different HW.=A0 The 2nd request sent out =
-to the 2nd=A0HW instance may take shorter time to complete than the fir=
-st request=A0for different HW instance.=A0 Is the driver responsible fo=
-r re-ordering the completion callout? Or the agents (such as IP protoco=
-l stack) are responsible for reordering? How does pcrypt do it?
-> >=20
-> > =A0Does it make sense for a transform to send multiple requests out=
-standing to async crypto api?
->=20
-> see:
->=20
-> http://comments.gmane.org/gmane.linux.kernel.cryptoapi/5350
->=20
-> > =A0Is scatterwalk_sg_next() preferred method over sg_next()?=A0 Why=
-?
->=20
-> scatterwalk_* is the crypto subsystem's version of the function, so y=
-es.
->=20
-> > =A0sg_copy_to_buffer() and sg_copy_from_buffer() ->=20
-> > sg_copy_buffer()->sg_copy_buffer() -> sg_miter_next()-> sg_next() S=
-ometimes sg_copy_to_buffer() and sg_copy_from_buffer() in our driver do=
- not copy the whole list. We have to rewrite those functions by using s=
-cattewalk_sg_next() to walk down the list. Is this the correct behavior=
-?
->=20
-> sounds like you're on the right track, although buffers shouldn't be =
-being copied that often, if at all.
->=20
-> Kim
->=20
->=20
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 4a0a7aa..8a22f17 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -8,7 +8,7 @@
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option) 
++ * Software Foundation; either version 2 of the License, or (at your option)
+  * any later version.
+  *
+  */
+@@ -80,7 +80,7 @@ static void c_stop(struct seq_file *m, void *p)
+ static int c_show(struct seq_file *m, void *p)
+ {
+ 	struct crypto_alg *alg = list_entry(p, struct crypto_alg, cra_list);
+-	
++
+ 	seq_printf(m, "name         : %s\n", alg->cra_name);
+ 	seq_printf(m, "driver       : %s\n", alg->cra_driver_name);
+ 	seq_printf(m, "module       : %s\n", module_name(alg->cra_module));
+@@ -91,7 +91,7 @@ static int c_show(struct seq_file *m, void *p)
+ 		   "passed" : "unknown");
+ 
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+-		seq_printf(m, "type         : larval\n");
++		seq_puts(m, "type         : larval\n");
+ 		seq_printf(m, "flags        : 0x%x\n", alg->cra_flags);
+ 		goto out;
+ 	}
+@@ -100,10 +100,10 @@ static int c_show(struct seq_file *m, void *p)
+ 		alg->cra_type->show(m, alg);
+ 		goto out;
+ 	}
+-	
++
+ 	switch (alg->cra_flags & (CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_LARVAL)) {
+ 	case CRYPTO_ALG_TYPE_CIPHER:
+-		seq_printf(m, "type         : cipher\n");
++		seq_puts(m, "type         : cipher\n");
+ 		seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
+ 		seq_printf(m, "min keysize  : %u\n",
+ 					alg->cra_cipher.cia_min_keysize);
+@@ -111,10 +111,10 @@ static int c_show(struct seq_file *m, void *p)
+ 					alg->cra_cipher.cia_max_keysize);
+ 		break;
+ 	case CRYPTO_ALG_TYPE_COMPRESS:
+-		seq_printf(m, "type         : compression\n");
++		seq_puts(m, "type         : compression\n");
+ 		break;
+ 	default:
+-		seq_printf(m, "type         : unknown\n");
++		seq_puts(m, "type         : unknown\n");
+ 		break;
+ 	}
+ 
+@@ -134,7 +134,7 @@ static int crypto_info_open(struct inode *inode, struct file *file)
+ {
+ 	return seq_open(file, &crypto_seq_ops);
+ }
+-        
++
+ static const struct file_operations proc_crypto_ops = {
+ 	.open		= crypto_info_open,
+ 	.read		= seq_read,
+-- 
+1.7.10.4
