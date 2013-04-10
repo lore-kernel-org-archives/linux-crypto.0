@@ -1,93 +1,60 @@
-From: Valentin Ilie <valentin.ilie@gmail.com>
-Subject: [PATCH] crypto: proc - Clean up
-Date: Tue,  9 Apr 2013 16:47:31 +0300
-Message-ID: <1365515251-2060-1-git-send-email-valentin.ilie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Valentin Ilie <valentin.ilie@gmail.com>
-To: herbert@gondor.apana.org.a, davem@davemloft.net
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 3.9
+Date: Wed, 10 Apr 2013 10:21:13 +0800
+Message-ID: <20130410022112.GA32025@gondor.apana.org.au>
+References: <20100903060055.GA28915@gondor.apana.org.au>
+ <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f173.google.com ([209.85.215.173]:54035 "EHLO
-	mail-ea0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932799Ab3DINrk (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:51991 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1765455Ab3DJCVT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Apr 2013 09:47:40 -0400
+	Tue, 9 Apr 2013 22:21:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove trailing whitespaces
-Replace seq_puts with seq_printf when there are no extra parameters.
-Fix indentation problems
+Hi Linus:
 
-Signed-off-by: Valentin Ilie <valentin.ilie@gmail.com>
----
- crypto/proc.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+This push fixes a GCM bug that breaks IPsec and a compile problem
+in ux500.
 
-diff --git a/crypto/proc.c b/crypto/proc.c
-index 4a0a7aa..8a22f17 100644
---- a/crypto/proc.c
-+++ b/crypto/proc.c
-@@ -8,7 +8,7 @@
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option) 
-+ * Software Foundation; either version 2 of the License, or (at your option)
-  * any later version.
-  *
-  */
-@@ -80,7 +80,7 @@ static void c_stop(struct seq_file *m, void *p)
- static int c_show(struct seq_file *m, void *p)
- {
- 	struct crypto_alg *alg = list_entry(p, struct crypto_alg, cra_list);
--	
-+
- 	seq_printf(m, "name         : %s\n", alg->cra_name);
- 	seq_printf(m, "driver       : %s\n", alg->cra_driver_name);
- 	seq_printf(m, "module       : %s\n", module_name(alg->cra_module));
-@@ -91,7 +91,7 @@ static int c_show(struct seq_file *m, void *p)
- 		   "passed" : "unknown");
- 
- 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
--		seq_printf(m, "type         : larval\n");
-+		seq_puts(m, "type         : larval\n");
- 		seq_printf(m, "flags        : 0x%x\n", alg->cra_flags);
- 		goto out;
- 	}
-@@ -100,10 +100,10 @@ static int c_show(struct seq_file *m, void *p)
- 		alg->cra_type->show(m, alg);
- 		goto out;
- 	}
--	
-+
- 	switch (alg->cra_flags & (CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_LARVAL)) {
- 	case CRYPTO_ALG_TYPE_CIPHER:
--		seq_printf(m, "type         : cipher\n");
-+		seq_puts(m, "type         : cipher\n");
- 		seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
- 		seq_printf(m, "min keysize  : %u\n",
- 					alg->cra_cipher.cia_min_keysize);
-@@ -111,10 +111,10 @@ static int c_show(struct seq_file *m, void *p)
- 					alg->cra_cipher.cia_max_keysize);
- 		break;
- 	case CRYPTO_ALG_TYPE_COMPRESS:
--		seq_printf(m, "type         : compression\n");
-+		seq_puts(m, "type         : compression\n");
- 		break;
- 	default:
--		seq_printf(m, "type         : unknown\n");
-+		seq_puts(m, "type         : unknown\n");
- 		break;
- 	}
- 
-@@ -134,7 +134,7 @@ static int crypto_info_open(struct inode *inode, struct file *file)
- {
- 	return seq_open(file, &crypto_seq_ops);
- }
--        
-+
- static const struct file_operations proc_crypto_ops = {
- 	.open		= crypto_info_open,
- 	.read		= seq_read,
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Jussi Kivilinna (1):
+      crypto: gcm - fix assumption that assoc has one segment
+
+Linus Walleij (1):
+      crypto: ux500 - add missing comma
+
+ crypto/gcm.c                          |   17 ++++++++++++++---
+ drivers/crypto/ux500/cryp/cryp_core.c |    2 +-
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+Thanks,
 -- 
-1.7.10.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
