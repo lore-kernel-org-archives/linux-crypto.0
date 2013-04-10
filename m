@@ -1,59 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.9
-Date: Wed, 10 Apr 2013 10:21:13 +0800
-Message-ID: <20130410022112.GA32025@gondor.apana.org.au>
-References: <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: algif - suppress sending source address
+ information in recvmsg
+Date: Wed, 10 Apr 2013 11:31:48 +0800
+Message-ID: <20130410033148.GA32360@gondor.apana.org.au>
+References: <1365336339-403-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:51991 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:37586 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1765455Ab3DJCVT (ORCPT
+	with ESMTP id S1755146Ab3DJDbx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Apr 2013 22:21:19 -0400
+	Tue, 9 Apr 2013 23:31:53 -0400
 Content-Disposition: inline
-In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
+In-Reply-To: <1365336339-403-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Sun, Apr 07, 2013 at 02:05:39PM +0200, Mathias Krause wrote:
+> The current code does not set the msg_namelen member to 0 and therefore
+> makes net/socket.c leak the local sockaddr_storage variable to userland
+> -- 128 bytes of kernel stack memory. Fix that.
+> 
+> Signed-off-by: Mathias Krause <minipli@googlemail.com>
 
-This push fixes a GCM bug that breaks IPsec and a compile problem
-in ux500.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Jussi Kivilinna (1):
-      crypto: gcm - fix assumption that assoc has one segment
-
-Linus Walleij (1):
-      crypto: ux500 - add missing comma
-
- crypto/gcm.c                          |   17 ++++++++++++++---
- drivers/crypto/ux500/cryp/cryp_core.c |    2 +-
- 2 files changed, 15 insertions(+), 4 deletions(-)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
