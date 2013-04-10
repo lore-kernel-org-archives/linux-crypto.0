@@ -1,33 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif - suppress sending source address
- information in recvmsg
-Date: Wed, 10 Apr 2013 11:31:48 +0800
-Message-ID: <20130410033148.GA32360@gondor.apana.org.au>
-References: <1365336339-403-1-git-send-email-minipli@googlemail.com>
+Subject: Re: [PATCH 1/4] crypto: gcm - make GMAC work when dst and src are
+ different
+Date: Wed, 10 Apr 2013 11:32:06 +0800
+Message-ID: <20130410033206.GB32360@gondor.apana.org.au>
+References: <20130407134340.8718.96643.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Mathias Krause <minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:37586 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:41642 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755146Ab3DJDbx (ORCPT
+	with ESMTP id S1755146Ab3DJDcJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Apr 2013 23:31:53 -0400
+	Tue, 9 Apr 2013 23:32:09 -0400
 Content-Disposition: inline
-In-Reply-To: <1365336339-403-1-git-send-email-minipli@googlemail.com>
+In-Reply-To: <20130407134340.8718.96643.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Apr 07, 2013 at 02:05:39PM +0200, Mathias Krause wrote:
-> The current code does not set the msg_namelen member to 0 and therefore
-> makes net/socket.c leak the local sockaddr_storage variable to userland
-> -- 128 bytes of kernel stack memory. Fix that.
+On Sun, Apr 07, 2013 at 04:43:41PM +0300, Jussi Kivilinna wrote:
+> The GMAC code assumes that dst==src, which causes problems when trying to add
+> rfc4543(gcm(aes)) test vectors.
 > 
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+> So fix this code to work when source and destination buffer are different.
+> 
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
-Patch applied.  Thanks!
+All applied.  Thanks Jussi!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
