@@ -1,68 +1,237 @@
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Subject: Re: linux-next: Tree for Apr 11 [ crypto: aesni-intel ]
-Date: Fri, 12 Apr 2013 16:46:20 +0200
-Message-ID: <CA+icZUXkaOE2wyzxR-jPjxYAgzi8LEQJJDJo8fa5cfN+UMgErQ@mail.gmail.com>
-References: <CA+icZUXR-dYRWkkz=V8=zn7cO=G1Ksa0bNweGn6kbYpjPn4mTg@mail.gmail.com>
-	<20130412021336.GA14735@gondor.apana.org.au>
-Reply-To: sedat.dilek@gmail.com
+From: Kent Yoder <key@linux.vnet.ibm.com>
+Subject: [PATCH] drivers/crypto/nx: fixes for multiple issues
+Date: Fri, 12 Apr 2013 12:13:59 -0500
+Message-ID: <20130412171357.GA27924@ennui.austin.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20130412021336.GA14735@gondor.apana.org.au>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e37.co.us.ibm.com ([32.97.110.158]:47594 "EHLO
+	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752591Ab3DLRVR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Apr 2013 13:21:17 -0400
+Received: from /spool/local
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <key@linux.vnet.ibm.com>;
+	Fri, 12 Apr 2013 11:21:15 -0600
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 12, 2013 at 4:13 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, Apr 11, 2013 at 07:14:31PM +0200, Sedat Dilek wrote:
->> On Thu, Apr 11, 2013 at 10:30 AM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->> > Hi all,
->> >
->> > Changes since 20130410:
->> >
->> > The tip tree gained conflicts against the net-next and pm trees.
->> >
->> > The driver-core tree gained a conflict against the tip tree.
->> >
->> > The arm-soc tree gained a conflict against the arm-current tree.
->> >
->> > The akpm tree lost a patch that turned up elsewhere.
->> >
->> > ----------------------------------------------------------------------------
->>
->> [ CC linux-crypto folks ]
->>
->> On Ubuntu/precise AMD64 I see:
->>
->> ERROR: "glue_xts_crypt_128bit_one" [arch/x86/crypto/aesni-intel.ko] undefined!
->> ERROR: "glue_xts_crypt_128bit" [arch/x86/crypto/aesni-intel.ko] undefined!
->> make[3]: *** [__modpost] Error 1
->> make[2]: *** [modules] Error 2
->
-> Should be fixed by:
->
-> commit 110e7610190cc4693f26c05b43ea83468a0a925c
-> Author: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-> Date:   Wed Apr 10 18:39:20 2013 +0300
->
->     crypto: aesni_intel - fix Kconfig problem with CRYPTO_GLUE_HELPER_X86
->
->
+  Fixes a race on driver init with registering algorithms where the
+driver status flag wasn't being set before self testing started.
 
-Yeah, that's fixing the issue.
+  Added the cra_alignmask field for CBC and ECB modes.
 
-Can you and your patch-supplier also CC Linux-Next ML for crypto-next fixes?
-( ...would have saved one linux-kernel compilation. )
-Thanks!
+  Fixed a bug in GCM where AES block size was being used instead of
+authsize.
 
-- Sedat -
+  Removed use of blkcipher_walk routines for scatterlist processing.
+Corner cases in the code prevent us from processing an entire
+scatterlist at a time and walking the buffers in block sized chunks
+turns out to be unecessary anyway.
 
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+  Fixed off-by-one error in saving off extra data in the sha code.
+
+  Fixed accounting error for number of bytes processed in the sha code.
+
+Signed-off-by: Kent Yoder <key@linux.vnet.ibm.com>
+---
+Patch v3, was: drivers/crypto/nx: fix init race, alignmasks and GCM bug
+
+Applied to:
+git://git.kernel.org/pub/scm/linux/kernel/git/benh/powerpc.git#next
+
+ drivers/crypto/nx/nx-aes-cbc.c |  1 +
+ drivers/crypto/nx/nx-aes-ecb.c |  1 +
+ drivers/crypto/nx/nx-aes-gcm.c |  2 +-
+ drivers/crypto/nx/nx-sha256.c  |  8 +++++---
+ drivers/crypto/nx/nx-sha512.c  |  7 ++++---
+ drivers/crypto/nx/nx.c         | 38 +++++++-------------------------------
+ 6 files changed, 19 insertions(+), 38 deletions(-)
+
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index a76d4c4..35d483f 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
+@@ -126,6 +126,7 @@ struct crypto_alg nx_cbc_aes_alg = {
+ 	.cra_blocksize   = AES_BLOCK_SIZE,
+ 	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 	.cra_type        = &crypto_blkcipher_type,
++	.cra_alignmask   = 0xf,
+ 	.cra_module      = THIS_MODULE,
+ 	.cra_init        = nx_crypto_ctx_aes_cbc_init,
+ 	.cra_exit        = nx_crypto_ctx_exit,
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index ba5f161..7bbc9a8 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -123,6 +123,7 @@ struct crypto_alg nx_ecb_aes_alg = {
+ 	.cra_priority    = 300,
+ 	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
+ 	.cra_blocksize   = AES_BLOCK_SIZE,
++	.cra_alignmask   = 0xf,
+ 	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
+ 	.cra_type        = &crypto_blkcipher_type,
+ 	.cra_module      = THIS_MODULE,
+diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
+index c8109ed..6cca6c3 100644
+--- a/drivers/crypto/nx/nx-aes-gcm.c
++++ b/drivers/crypto/nx/nx-aes-gcm.c
+@@ -219,7 +219,7 @@ static int gcm_aes_nx_crypt(struct aead_request *req, int enc)
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 	else
+-		nbytes -= AES_BLOCK_SIZE;
++		nbytes -= crypto_aead_authsize(crypto_aead_reqtfm(req));
+ 
+ 	csbcpb->cpb.aes_gcm.bit_length_data = nbytes * 8;
+ 
+diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
+index 9767315..67024f2 100644
+--- a/drivers/crypto/nx/nx-sha256.c
++++ b/drivers/crypto/nx/nx-sha256.c
+@@ -69,7 +69,7 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	 *  1: <= SHA256_BLOCK_SIZE: copy into state, return 0
+ 	 *  2: > SHA256_BLOCK_SIZE: process X blocks, copy in leftover
+ 	 */
+-	if (len + sctx->count <= SHA256_BLOCK_SIZE) {
++	if (len + sctx->count < SHA256_BLOCK_SIZE) {
+ 		memcpy(sctx->buf + sctx->count, data, len);
+ 		sctx->count += len;
+ 		goto out;
+@@ -110,7 +110,8 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
+ 	atomic_inc(&(nx_ctx->stats->sha256_ops));
+ 
+ 	/* copy the leftover back into the state struct */
+-	memcpy(sctx->buf, data + len - leftover, leftover);
++	if (leftover)
++		memcpy(sctx->buf, data + len - leftover, leftover);
+ 	sctx->count = leftover;
+ 
+ 	csbcpb->cpb.sha256.message_bit_length += (u64)
+@@ -130,6 +131,7 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
+ 	struct nx_sg *in_sg, *out_sg;
+ 	int rc;
+ 
++
+ 	if (NX_CPB_FDM(csbcpb) & NX_FDM_CONTINUATION) {
+ 		/* we've hit the nx chip previously, now we're finalizing,
+ 		 * so copy over the partial digest */
+@@ -162,7 +164,7 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
+ 
+ 	atomic_inc(&(nx_ctx->stats->sha256_ops));
+ 
+-	atomic64_add(csbcpb->cpb.sha256.message_bit_length,
++	atomic64_add(csbcpb->cpb.sha256.message_bit_length / 8,
+ 		     &(nx_ctx->stats->sha256_bytes));
+ 	memcpy(out, csbcpb->cpb.sha256.message_digest, SHA256_DIGEST_SIZE);
+ out:
+diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
+index 3177b8c..08eee11 100644
+--- a/drivers/crypto/nx/nx-sha512.c
++++ b/drivers/crypto/nx/nx-sha512.c
+@@ -69,7 +69,7 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	 *  1: <= SHA512_BLOCK_SIZE: copy into state, return 0
+ 	 *  2: > SHA512_BLOCK_SIZE: process X blocks, copy in leftover
+ 	 */
+-	if ((u64)len + sctx->count[0] <= SHA512_BLOCK_SIZE) {
++	if ((u64)len + sctx->count[0] < SHA512_BLOCK_SIZE) {
+ 		memcpy(sctx->buf + sctx->count[0], data, len);
+ 		sctx->count[0] += len;
+ 		goto out;
+@@ -110,7 +110,8 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
+ 	atomic_inc(&(nx_ctx->stats->sha512_ops));
+ 
+ 	/* copy the leftover back into the state struct */
+-	memcpy(sctx->buf, data + len - leftover, leftover);
++	if (leftover)
++		memcpy(sctx->buf, data + len - leftover, leftover);
+ 	sctx->count[0] = leftover;
+ 
+ 	spbc_bits = csbcpb->cpb.sha512.spbc * 8;
+@@ -168,7 +169,7 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
+ 		goto out;
+ 
+ 	atomic_inc(&(nx_ctx->stats->sha512_ops));
+-	atomic64_add(csbcpb->cpb.sha512.message_bit_length_lo,
++	atomic64_add(csbcpb->cpb.sha512.message_bit_length_lo / 8,
+ 		     &(nx_ctx->stats->sha512_bytes));
+ 
+ 	memcpy(out, csbcpb->cpb.sha512.message_digest, SHA512_DIGEST_SIZE);
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index c767f23..bbdab6e 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -211,44 +211,20 @@ int nx_build_sg_lists(struct nx_crypto_ctx  *nx_ctx,
+ {
+ 	struct nx_sg *nx_insg = nx_ctx->in_sg;
+ 	struct nx_sg *nx_outsg = nx_ctx->out_sg;
+-	struct blkcipher_walk walk;
+-	int rc;
+-
+-	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	rc = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
+-	if (rc)
+-		goto out;
+ 
+ 	if (iv)
+-		memcpy(iv, walk.iv, AES_BLOCK_SIZE);
++		memcpy(iv, desc->info, AES_BLOCK_SIZE);
+ 
+-	while (walk.nbytes) {
+-		nx_insg = nx_build_sg_list(nx_insg, walk.src.virt.addr,
+-					   walk.nbytes, nx_ctx->ap->sglen);
+-		nx_outsg = nx_build_sg_list(nx_outsg, walk.dst.virt.addr,
+-					    walk.nbytes, nx_ctx->ap->sglen);
+-
+-		rc = blkcipher_walk_done(desc, &walk, 0);
+-		if (rc)
+-			break;
+-	}
+-
+-	if (walk.nbytes) {
+-		nx_insg = nx_build_sg_list(nx_insg, walk.src.virt.addr,
+-					   walk.nbytes, nx_ctx->ap->sglen);
+-		nx_outsg = nx_build_sg_list(nx_outsg, walk.dst.virt.addr,
+-					    walk.nbytes, nx_ctx->ap->sglen);
+-
+-		rc = 0;
+-	}
++	nx_insg = nx_walk_and_build(nx_insg, nx_ctx->ap->sglen, src, 0, nbytes);
++	nx_outsg = nx_walk_and_build(nx_outsg, nx_ctx->ap->sglen, dst, 0, nbytes);
+ 
+ 	/* these lengths should be negative, which will indicate to phyp that
+ 	 * the input and output parameters are scatterlists, not linear
+ 	 * buffers */
+ 	nx_ctx->op.inlen = (nx_ctx->in_sg - nx_insg) * sizeof(struct nx_sg);
+ 	nx_ctx->op.outlen = (nx_ctx->out_sg - nx_outsg) * sizeof(struct nx_sg);
+-out:
+-	return rc;
++
++	return 0;
+ }
+ 
+ /**
+@@ -454,6 +430,8 @@ static int nx_register_algs(void)
+ 	if (rc)
+ 		goto out;
+ 
++	nx_driver.of.status = NX_OKAY;
++
+ 	rc = crypto_register_alg(&nx_ecb_aes_alg);
+ 	if (rc)
+ 		goto out;
+@@ -498,8 +476,6 @@ static int nx_register_algs(void)
+ 	if (rc)
+ 		goto out_unreg_s512;
+ 
+-	nx_driver.of.status = NX_OKAY;
+-
+ 	goto out;
+ 
+ out_unreg_s512:
+-- 
+1.7.11.7
