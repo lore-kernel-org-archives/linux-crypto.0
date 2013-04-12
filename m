@@ -1,63 +1,62 @@
-From: Sedat Dilek <sedat.dilek@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: linux-next: Tree for Apr 11 [ crypto: aesni-intel ]
-Date: Thu, 11 Apr 2013 19:23:09 +0200
-Message-ID: <CA+icZUWZ5=c6=+SneWnuC5Qz93ENxRD--DKz-m2VxudUFLyxGA@mail.gmail.com>
+Date: Fri, 12 Apr 2013 10:13:36 +0800
+Message-ID: <20130412021336.GA14735@gondor.apana.org.au>
 References: <CA+icZUXR-dYRWkkz=V8=zn7cO=G1Ksa0bNweGn6kbYpjPn4mTg@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Sedat Dilek <sedat.dilek@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f178.google.com ([74.125.82.178]:33027 "EHLO
-	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754138Ab3DKRXL (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:56335 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750806Ab3DLCNn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Apr 2013 13:23:11 -0400
+	Thu, 11 Apr 2013 22:13:43 -0400
+Content-Disposition: inline
 In-Reply-To: <CA+icZUXR-dYRWkkz=V8=zn7cO=G1Ksa0bNweGn6kbYpjPn4mTg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 11, 2013 at 7:14 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+On Thu, Apr 11, 2013 at 07:14:31PM +0200, Sedat Dilek wrote:
 > On Thu, Apr 11, 2013 at 10:30 AM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->> Hi all,
->>
->> Changes since 20130410:
->>
->> The tip tree gained conflicts against the net-next and pm trees.
->>
->> The driver-core tree gained a conflict against the tip tree.
->>
->> The arm-soc tree gained a conflict against the arm-current tree.
->>
->> The akpm tree lost a patch that turned up elsewhere.
->>
->> ----------------------------------------------------------------------------
->
+> > Hi all,
+> >
+> > Changes since 20130410:
+> >
+> > The tip tree gained conflicts against the net-next and pm trees.
+> >
+> > The driver-core tree gained a conflict against the tip tree.
+> >
+> > The arm-soc tree gained a conflict against the arm-current tree.
+> >
+> > The akpm tree lost a patch that turned up elsewhere.
+> >
+> > ----------------------------------------------------------------------------
+> 
 > [ CC linux-crypto folks ]
->
+> 
 > On Ubuntu/precise AMD64 I see:
->
+> 
 > ERROR: "glue_xts_crypt_128bit_one" [arch/x86/crypto/aesni-intel.ko] undefined!
 > ERROR: "glue_xts_crypt_128bit" [arch/x86/crypto/aesni-intel.ko] undefined!
 > make[3]: *** [__modpost] Error 1
 > make[2]: *** [modules] Error 2
->
-> CONFIG_CRYPTO_AES=y
-> CONFIG_CRYPTO_AES_X86_64=m
-> CONFIG_CRYPTO_AES_NI_INTEL=m
->
-> Full kernel-config attached.
->
->
-> - Sedat -
 
-Trying the fix "crypto: aesni_intel - fix Kconfig problem with
-CRYPTO_GLUE_HELPER_X86" from [1].
+Should be fixed by:
 
-- Sedat -
+commit 110e7610190cc4693f26c05b43ea83468a0a925c
+Author: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Date:   Wed Apr 10 18:39:20 2013 +0300
 
-[1] http://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=110e7610190cc4693f26c05b43ea83468a0a925c
+    crypto: aesni_intel - fix Kconfig problem with CRYPTO_GLUE_HELPER_X86
+
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
