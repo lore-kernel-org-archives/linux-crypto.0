@@ -1,1251 +1,2289 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [RFC PATCH 1/6] crypto: testmgr - extend camellia test-vectors for
- camellia-aesni/avx2
-Date: Sat, 13 Apr 2013 13:46:35 +0300
-Message-ID: <20130413104635.10667.84419.stgit@localhost6.localdomain6>
+Subject: [RFC PATCH 6/6] crypto: camellia - add AVX2/AES-NI/x86_64 assembler
+ implementation of camellia cipher
+Date: Sat, 13 Apr 2013 13:47:00 +0300
+Message-ID: <20130413104700.10667.12679.stgit@localhost6.localdomain6>
 References: <20130413104245.10667.62267.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sd-mail-sa-02.sanoma.fi ([158.127.18.162]:47748 "EHLO
+	sd-mail-sa-02.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753746Ab3DMKrH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 13 Apr 2013 06:47:07 -0400
 In-Reply-To: <20130413104245.10667.62267.stgit@localhost6.localdomain6>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+Patch adds AVX2/AES-NI/x86-64 implementation of Camellia cipher, requir=
+ing
+32 parallel blocks for input (512 bytes). Compared to AVX implementatio=
+n, this
+version is extended to use the 256-bit wide YMM registers. For AES-NI
+instructions data is split to two 128-bit registers and merged afterwar=
+ds.
+Even with this additional handling, performance should be higher compar=
+ed
+to the AES-NI/AVX implementation.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- crypto/testmgr.h | 1100 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 1062 insertions(+), 38 deletions(-)
+ arch/x86/crypto/Makefile                     |    2=20
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 1368 ++++++++++++++++++=
+++++++++
+ arch/x86/crypto/camellia_aesni_avx2_glue.c   |  586 +++++++++++
+ arch/x86/crypto/camellia_aesni_avx_glue.c    |   17=20
+ arch/x86/include/asm/crypto/camellia.h       |   19=20
+ crypto/Kconfig                               |   23=20
+ crypto/testmgr.c                             |   12=20
+ 7 files changed, 2024 insertions(+), 3 deletions(-)
+ create mode 100644 arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+ create mode 100644 arch/x86/crypto/camellia_aesni_avx2_glue.c
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index d503660..dc2c054 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -20997,8 +20997,72 @@ static struct cipher_testvec camellia_enc_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.ilen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.ilen	= 1008,
- 		.result	= "\xED\xCD\xDB\xB8\x68\xCE\xBD\xEA"
- 			  "\x9D\x9D\xCD\x9F\x4F\xFC\x4D\xB7"
- 			  "\xA5\xFF\x6F\x43\x0F\xBA\x32\x04"
-@@ -21060,11 +21124,75 @@ static struct cipher_testvec camellia_enc_tv_template[] = {
- 			  "\x2C\x35\x1B\x38\x85\x7D\xE8\xF3"
- 			  "\x87\x4F\xDA\xD8\x5F\xFC\xB6\x44"
- 			  "\xD0\xE3\x9B\x8B\xBF\xD6\xB8\xC4"
--			  "\x73\xAE\x1D\x8B\x5B\x74\x8B\xCB",
--		.rlen	= 496,
-+			  "\x73\xAE\x1D\x8B\x5B\x74\x8B\xCB"
-+			  "\xA4\xAD\xCF\x5D\xD4\x58\xC9\xCD"
-+			  "\xF7\x90\x68\xCF\xC9\x11\x52\x3E"
-+			  "\xE8\xA1\xA3\x78\x8B\xD0\xAC\x0A"
-+			  "\xD4\xC9\xA3\xA5\x55\x30\xC8\x3E"
-+			  "\xED\x28\x39\xE9\x63\xED\x41\x70"
-+			  "\x51\xE3\xC4\xA0\xFC\xD5\x43\xCB"
-+			  "\x4D\x65\xC8\xFD\x3A\x91\x8F\x60"
-+			  "\x8A\xA6\x6D\x9D\x3E\x01\x23\x4B"
-+			  "\x50\x47\xC9\xDC\x9B\xDE\x37\xC5"
-+			  "\xBF\x67\xB1\x6B\x78\x38\xD5\x7E"
-+			  "\xB6\xFF\x67\x83\x3B\x6E\xBE\x23"
-+			  "\x45\xFA\x1D\x69\x44\xFD\xC6\xB9"
-+			  "\xD0\x4A\x92\xD1\xBE\xF6\x4A\xB7"
-+			  "\xCA\xA8\xA2\x9E\x13\x87\x57\x92"
-+			  "\x64\x7C\x85\x0B\xB3\x29\x37\xD8"
-+			  "\xE6\xAA\xAF\xC4\x03\x67\xA3\xBF"
-+			  "\x2E\x45\x83\xB6\xD8\x54\x00\x89"
-+			  "\xF6\xBC\x3A\x7A\x88\x58\x51\xED"
-+			  "\xF4\x4E\x01\xA5\xC3\x2E\xD9\x42"
-+			  "\xBD\x6E\x0D\x0B\x21\xB0\x1A\xCC"
-+			  "\xA4\xD3\x3F\xDC\x9B\x81\xD8\xF1"
-+			  "\xEA\x7A\x6A\xB7\x07\xC9\x6D\x91"
-+			  "\x6D\x3A\xF5\x5F\xA6\xFF\x87\x1E"
-+			  "\x3F\xDD\xC0\x72\xEA\xAC\x08\x15"
-+			  "\x21\xE6\xC6\xB6\x0D\xD8\x51\x86"
-+			  "\x2A\x03\x73\xF7\x29\xD4\xC4\xE4"
-+			  "\x7F\x95\x10\xF7\xAB\x3F\x92\x23"
-+			  "\xD3\xCE\x9C\x2E\x46\x3B\x63\x43"
-+			  "\xBB\xC2\x82\x7A\x83\xD5\x55\xE2"
-+			  "\xE7\x9B\x2F\x92\xAF\xFD\x81\x56"
-+			  "\x79\xFD\x3E\xF9\x46\xE0\x25\xD4"
-+			  "\x38\xDE\xBC\x2C\xC4\x7A\x2A\x8F"
-+			  "\x94\x4F\xD0\xAD\x9B\x37\x18\xD4"
-+			  "\x0E\x4D\x0F\x02\x3A\xDC\x5A\xA2"
-+			  "\x39\x25\x55\x20\x5A\xA6\x02\x9F"
-+			  "\xE6\x77\x21\x77\xE5\x4B\x7B\x0B"
-+			  "\x30\xF8\x5F\x33\x0F\x49\xCD\xFF"
-+			  "\xF2\xE4\x35\xF9\xF0\x63\xC3\x7E"
-+			  "\xF1\xA6\x73\xB4\xDF\xE7\xBB\x78"
-+			  "\xFF\x21\xA9\xF3\xF3\xCF\x5D\xBA"
-+			  "\xED\x87\x98\xAC\xFE\x48\x97\x6D"
-+			  "\xA6\x7F\x69\x31\xB1\xC4\xFF\x14"
-+			  "\xC6\x76\xD4\x10\xDD\xF6\x49\x2C"
-+			  "\x9C\xC8\x6D\x76\xC0\x8F\x5F\x55"
-+			  "\x2F\x3C\x8A\x30\xAA\xC3\x16\x55"
-+			  "\xC6\xFC\x8D\x8B\xB9\xE5\x80\x6C"
-+			  "\xC8\x7E\xBD\x65\x58\x36\xD5\xBC"
-+			  "\xF0\x33\x52\x29\x70\xF9\x5C\xE9"
-+			  "\xAC\x1F\xB5\x73\x56\x66\x54\xAF"
-+			  "\x1B\x8F\x7D\xED\xAB\x03\xCE\xE3"
-+			  "\xAE\x47\xB6\x69\x86\xE9\x01\x31"
-+			  "\x83\x18\x3D\xF4\x74\x7B\xF9\x42"
-+			  "\x4C\xFD\x75\x4A\x6D\xF0\x03\xA6"
-+			  "\x2B\x20\x63\xDA\x49\x65\x5E\x8B"
-+			  "\xC0\x19\xE3\x8D\xD9\xF3\xB0\x34"
-+			  "\xD3\x52\xFC\x68\x00\x43\x1B\x37"
-+			  "\x31\x93\x51\x1C\x63\x97\x70\xB0"
-+			  "\x99\x78\x83\x13\xFD\xCF\x53\x81"
-+			  "\x36\x46\xB5\x42\x52\x2F\x32\xEB"
-+			  "\x4A\x3D\xF1\x8F\x1C\x54\x2E\xFC"
-+			  "\x41\x75\x5A\x8C\x8E\x6F\xE7\x1A"
-+			  "\xAE\xEF\x3E\x82\x12\x0B\x74\x72"
-+			  "\xF8\xB2\xAA\x7A\xD6\xFF\xFA\x55"
-+			  "\x33\x1A\xBB\xD3\xA2\x7E\x97\x66",
-+		.rlen	= 1008,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 496 - 16, 16 },
-+		.tap	= { 1008 - 16, 16 },
- 	},
- };
- 
-@@ -21169,8 +21297,72 @@ static struct cipher_testvec camellia_dec_tv_template[] = {
- 			  "\x2C\x35\x1B\x38\x85\x7D\xE8\xF3"
- 			  "\x87\x4F\xDA\xD8\x5F\xFC\xB6\x44"
- 			  "\xD0\xE3\x9B\x8B\xBF\xD6\xB8\xC4"
--			  "\x73\xAE\x1D\x8B\x5B\x74\x8B\xCB",
--		.ilen	= 496,
-+			  "\x73\xAE\x1D\x8B\x5B\x74\x8B\xCB"
-+			  "\xA4\xAD\xCF\x5D\xD4\x58\xC9\xCD"
-+			  "\xF7\x90\x68\xCF\xC9\x11\x52\x3E"
-+			  "\xE8\xA1\xA3\x78\x8B\xD0\xAC\x0A"
-+			  "\xD4\xC9\xA3\xA5\x55\x30\xC8\x3E"
-+			  "\xED\x28\x39\xE9\x63\xED\x41\x70"
-+			  "\x51\xE3\xC4\xA0\xFC\xD5\x43\xCB"
-+			  "\x4D\x65\xC8\xFD\x3A\x91\x8F\x60"
-+			  "\x8A\xA6\x6D\x9D\x3E\x01\x23\x4B"
-+			  "\x50\x47\xC9\xDC\x9B\xDE\x37\xC5"
-+			  "\xBF\x67\xB1\x6B\x78\x38\xD5\x7E"
-+			  "\xB6\xFF\x67\x83\x3B\x6E\xBE\x23"
-+			  "\x45\xFA\x1D\x69\x44\xFD\xC6\xB9"
-+			  "\xD0\x4A\x92\xD1\xBE\xF6\x4A\xB7"
-+			  "\xCA\xA8\xA2\x9E\x13\x87\x57\x92"
-+			  "\x64\x7C\x85\x0B\xB3\x29\x37\xD8"
-+			  "\xE6\xAA\xAF\xC4\x03\x67\xA3\xBF"
-+			  "\x2E\x45\x83\xB6\xD8\x54\x00\x89"
-+			  "\xF6\xBC\x3A\x7A\x88\x58\x51\xED"
-+			  "\xF4\x4E\x01\xA5\xC3\x2E\xD9\x42"
-+			  "\xBD\x6E\x0D\x0B\x21\xB0\x1A\xCC"
-+			  "\xA4\xD3\x3F\xDC\x9B\x81\xD8\xF1"
-+			  "\xEA\x7A\x6A\xB7\x07\xC9\x6D\x91"
-+			  "\x6D\x3A\xF5\x5F\xA6\xFF\x87\x1E"
-+			  "\x3F\xDD\xC0\x72\xEA\xAC\x08\x15"
-+			  "\x21\xE6\xC6\xB6\x0D\xD8\x51\x86"
-+			  "\x2A\x03\x73\xF7\x29\xD4\xC4\xE4"
-+			  "\x7F\x95\x10\xF7\xAB\x3F\x92\x23"
-+			  "\xD3\xCE\x9C\x2E\x46\x3B\x63\x43"
-+			  "\xBB\xC2\x82\x7A\x83\xD5\x55\xE2"
-+			  "\xE7\x9B\x2F\x92\xAF\xFD\x81\x56"
-+			  "\x79\xFD\x3E\xF9\x46\xE0\x25\xD4"
-+			  "\x38\xDE\xBC\x2C\xC4\x7A\x2A\x8F"
-+			  "\x94\x4F\xD0\xAD\x9B\x37\x18\xD4"
-+			  "\x0E\x4D\x0F\x02\x3A\xDC\x5A\xA2"
-+			  "\x39\x25\x55\x20\x5A\xA6\x02\x9F"
-+			  "\xE6\x77\x21\x77\xE5\x4B\x7B\x0B"
-+			  "\x30\xF8\x5F\x33\x0F\x49\xCD\xFF"
-+			  "\xF2\xE4\x35\xF9\xF0\x63\xC3\x7E"
-+			  "\xF1\xA6\x73\xB4\xDF\xE7\xBB\x78"
-+			  "\xFF\x21\xA9\xF3\xF3\xCF\x5D\xBA"
-+			  "\xED\x87\x98\xAC\xFE\x48\x97\x6D"
-+			  "\xA6\x7F\x69\x31\xB1\xC4\xFF\x14"
-+			  "\xC6\x76\xD4\x10\xDD\xF6\x49\x2C"
-+			  "\x9C\xC8\x6D\x76\xC0\x8F\x5F\x55"
-+			  "\x2F\x3C\x8A\x30\xAA\xC3\x16\x55"
-+			  "\xC6\xFC\x8D\x8B\xB9\xE5\x80\x6C"
-+			  "\xC8\x7E\xBD\x65\x58\x36\xD5\xBC"
-+			  "\xF0\x33\x52\x29\x70\xF9\x5C\xE9"
-+			  "\xAC\x1F\xB5\x73\x56\x66\x54\xAF"
-+			  "\x1B\x8F\x7D\xED\xAB\x03\xCE\xE3"
-+			  "\xAE\x47\xB6\x69\x86\xE9\x01\x31"
-+			  "\x83\x18\x3D\xF4\x74\x7B\xF9\x42"
-+			  "\x4C\xFD\x75\x4A\x6D\xF0\x03\xA6"
-+			  "\x2B\x20\x63\xDA\x49\x65\x5E\x8B"
-+			  "\xC0\x19\xE3\x8D\xD9\xF3\xB0\x34"
-+			  "\xD3\x52\xFC\x68\x00\x43\x1B\x37"
-+			  "\x31\x93\x51\x1C\x63\x97\x70\xB0"
-+			  "\x99\x78\x83\x13\xFD\xCF\x53\x81"
-+			  "\x36\x46\xB5\x42\x52\x2F\x32\xEB"
-+			  "\x4A\x3D\xF1\x8F\x1C\x54\x2E\xFC"
-+			  "\x41\x75\x5A\x8C\x8E\x6F\xE7\x1A"
-+			  "\xAE\xEF\x3E\x82\x12\x0B\x74\x72"
-+			  "\xF8\xB2\xAA\x7A\xD6\xFF\xFA\x55"
-+			  "\x33\x1A\xBB\xD3\xA2\x7E\x97\x66",
-+		.ilen	= 1008,
- 		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
- 			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
- 			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-@@ -21232,11 +21424,75 @@ static struct cipher_testvec camellia_dec_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.rlen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.rlen	= 1008,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 496 - 16, 16 },
-+		.tap	= { 1008 - 16, 16 },
- 	},
- };
- 
-@@ -21337,8 +21593,72 @@ static struct cipher_testvec camellia_cbc_enc_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.ilen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.ilen	= 1008,
- 		.result	= "\xCD\x3E\x2A\x3B\x3E\x94\xC5\x77"
- 			  "\xBA\xBB\x5B\xB1\xDE\x7B\xA4\x40"
- 			  "\x88\x39\xE3\xFD\x94\x4B\x25\x58"
-@@ -21400,11 +21720,75 @@ static struct cipher_testvec camellia_cbc_enc_tv_template[] = {
- 			  "\x2D\x1A\x68\xFE\xEC\x92\x94\xDA"
- 			  "\x94\x2A\x6F\xD6\xFE\xE5\x76\x97"
- 			  "\xF4\x6E\xEE\xCB\x2B\x95\x4E\x36"
--			  "\x5F\x74\x8C\x86\x5B\x71\xD0\x20",
--		.rlen	= 496,
-+			  "\x5F\x74\x8C\x86\x5B\x71\xD0\x20"
-+			  "\x78\x1A\x7F\x18\x8C\xD9\xCD\xF5"
-+			  "\x21\x41\x56\x72\x13\xE1\x86\x07"
-+			  "\x07\x26\xF3\x4F\x7B\xEA\xB5\x18"
-+			  "\xFE\x94\x2D\x9F\xE0\x72\x18\x65"
-+			  "\xB2\xA5\x63\x48\xB4\x13\x22\xF7"
-+			  "\x25\xF1\x80\xA8\x7F\x54\x86\x7B"
-+			  "\x39\xAE\x95\x0C\x09\x32\x22\x2D"
-+			  "\x4D\x73\x39\x0C\x09\x2C\x7C\x10"
-+			  "\xD0\x4B\x53\xF6\x90\xC5\x99\x2F"
-+			  "\x15\xE1\x7F\xC6\xC5\x7A\x52\x14"
-+			  "\x65\xEE\x93\x54\xD0\x66\x15\x3C"
-+			  "\x4C\x68\xFD\x64\x0F\xF9\x10\x39"
-+			  "\x46\x7A\xDD\x97\x20\xEE\xC7\xD2"
-+			  "\x98\x4A\xB6\xE6\xF5\xA8\x1F\x4F"
-+			  "\xDB\xAB\x6D\xD5\x9B\x34\x16\x97"
-+			  "\x2F\x64\xE5\x37\xEF\x0E\xA1\xE9"
-+			  "\xBE\x31\x31\x96\x8B\x40\x18\x75"
-+			  "\x11\x75\x14\x32\xA5\x2D\x1B\x6B"
-+			  "\xDB\x59\xEB\xFA\x3D\x8E\x7C\xC4"
-+			  "\xDE\x68\xC8\x9F\xC9\x99\xE3\xC6"
-+			  "\x71\xB0\x12\x57\x89\x0D\xC0\x2B"
-+			  "\x9F\x12\x6A\x04\x67\xF1\x95\x31"
-+			  "\x59\xFD\x84\x95\x2C\x9C\x5B\xEC"
-+			  "\x09\xB0\x43\x96\x4A\x64\x80\x40"
-+			  "\xB9\x72\x19\xDD\x70\x42\xFA\xB1"
-+			  "\x4A\x2C\x0C\x0A\x60\x6E\xE3\x7C"
-+			  "\x37\x5A\xBE\xA4\x62\xCF\x29\xAB"
-+			  "\x7F\x4D\xA6\xB3\xE2\xB6\x64\xC6"
-+			  "\x33\x0B\xF3\xD5\x01\x38\x74\xA4"
-+			  "\x67\x1E\x75\x68\xC3\xAD\x76\xE9"
-+			  "\xE9\xBC\xF0\xEB\xD8\xFD\x31\x8A"
-+			  "\x5F\xC9\x18\x94\x4B\x86\x66\xFC"
-+			  "\xBD\x0B\x3D\xB3\x9F\xFA\x1F\xD9"
-+			  "\x78\xC4\xE3\x24\x1C\x67\xA2\xF8"
-+			  "\x43\xBC\x76\x75\xBF\x6C\x05\xB3"
-+			  "\x32\xE8\x7C\x80\xDB\xC7\xB6\x61"
-+			  "\x1A\x3E\x2B\xA7\x25\xED\x8F\xA0"
-+			  "\x00\x4B\xF8\x90\xCA\xD8\xFB\x12"
-+			  "\xAC\x1F\x18\xE9\xD2\x5E\xA2\x8E"
-+			  "\xE4\x84\x6B\x9D\xEB\x1E\x6B\xA3"
-+			  "\x7B\xDC\xCE\x15\x97\x27\xB2\x65"
-+			  "\xBC\x0E\x47\xAB\x55\x13\x53\xAB"
-+			  "\x0E\x34\x55\x02\x5F\x27\xC5\x89"
-+			  "\xDF\xC5\x70\xC4\xDD\x76\x82\xEE"
-+			  "\x68\xA6\x09\xB0\xE5\x5E\xF1\x0C"
-+			  "\xE3\xF3\x09\x9B\xFE\x65\x4B\xB8"
-+			  "\x30\xEC\xD5\x7C\x6A\xEC\x1D\xD2"
-+			  "\x93\xB7\xA1\x1A\x02\xD4\xC0\xD6"
-+			  "\x8D\x4D\x83\x9A\xED\x29\x4E\x14"
-+			  "\x86\xD5\x3C\x1A\xD5\xB9\x0A\x6A"
-+			  "\x72\x22\xD5\x92\x38\xF1\xA1\x86"
-+			  "\xB2\x41\x51\xCA\x4E\xAB\x8F\xD3"
-+			  "\x80\x56\xC3\xD7\x65\xE1\xB3\x86"
-+			  "\xCB\xCE\x98\xA1\xD4\x59\x1C\x06"
-+			  "\x01\xED\xF8\x29\x91\x19\x5C\x9A"
-+			  "\xEE\x28\x1B\x48\xD7\x32\xEF\x9F"
-+			  "\x6C\x2B\x66\x4E\x78\xD5\x8B\x72"
-+			  "\x80\xE7\x29\xDC\x23\x55\x98\x54"
-+			  "\xB1\xFF\x3E\x95\x56\xA8\x78\x78"
-+			  "\xEF\xC4\xA5\x11\x2D\x2B\xD8\x93"
-+			  "\x30\x6E\x7E\x51\xBB\x42\x5F\x03"
-+			  "\x43\x94\x23\x7E\xEE\xF0\xA5\x79"
-+			  "\x55\x01\xD4\x58\xB2\xF2\x85\x49"
-+			  "\x70\xC5\xB9\x0B\x3B\x7A\x6E\x6C",
-+		.rlen	= 1008,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 496 - 16, 16 },
-+		.tap	= { 1008 - 16, 16 },
- 	},
- };
- 
-@@ -21505,8 +21889,72 @@ static struct cipher_testvec camellia_cbc_dec_tv_template[] = {
- 			  "\x2D\x1A\x68\xFE\xEC\x92\x94\xDA"
- 			  "\x94\x2A\x6F\xD6\xFE\xE5\x76\x97"
- 			  "\xF4\x6E\xEE\xCB\x2B\x95\x4E\x36"
--			  "\x5F\x74\x8C\x86\x5B\x71\xD0\x20",
--		.ilen	= 496,
-+			  "\x5F\x74\x8C\x86\x5B\x71\xD0\x20"
-+			  "\x78\x1A\x7F\x18\x8C\xD9\xCD\xF5"
-+			  "\x21\x41\x56\x72\x13\xE1\x86\x07"
-+			  "\x07\x26\xF3\x4F\x7B\xEA\xB5\x18"
-+			  "\xFE\x94\x2D\x9F\xE0\x72\x18\x65"
-+			  "\xB2\xA5\x63\x48\xB4\x13\x22\xF7"
-+			  "\x25\xF1\x80\xA8\x7F\x54\x86\x7B"
-+			  "\x39\xAE\x95\x0C\x09\x32\x22\x2D"
-+			  "\x4D\x73\x39\x0C\x09\x2C\x7C\x10"
-+			  "\xD0\x4B\x53\xF6\x90\xC5\x99\x2F"
-+			  "\x15\xE1\x7F\xC6\xC5\x7A\x52\x14"
-+			  "\x65\xEE\x93\x54\xD0\x66\x15\x3C"
-+			  "\x4C\x68\xFD\x64\x0F\xF9\x10\x39"
-+			  "\x46\x7A\xDD\x97\x20\xEE\xC7\xD2"
-+			  "\x98\x4A\xB6\xE6\xF5\xA8\x1F\x4F"
-+			  "\xDB\xAB\x6D\xD5\x9B\x34\x16\x97"
-+			  "\x2F\x64\xE5\x37\xEF\x0E\xA1\xE9"
-+			  "\xBE\x31\x31\x96\x8B\x40\x18\x75"
-+			  "\x11\x75\x14\x32\xA5\x2D\x1B\x6B"
-+			  "\xDB\x59\xEB\xFA\x3D\x8E\x7C\xC4"
-+			  "\xDE\x68\xC8\x9F\xC9\x99\xE3\xC6"
-+			  "\x71\xB0\x12\x57\x89\x0D\xC0\x2B"
-+			  "\x9F\x12\x6A\x04\x67\xF1\x95\x31"
-+			  "\x59\xFD\x84\x95\x2C\x9C\x5B\xEC"
-+			  "\x09\xB0\x43\x96\x4A\x64\x80\x40"
-+			  "\xB9\x72\x19\xDD\x70\x42\xFA\xB1"
-+			  "\x4A\x2C\x0C\x0A\x60\x6E\xE3\x7C"
-+			  "\x37\x5A\xBE\xA4\x62\xCF\x29\xAB"
-+			  "\x7F\x4D\xA6\xB3\xE2\xB6\x64\xC6"
-+			  "\x33\x0B\xF3\xD5\x01\x38\x74\xA4"
-+			  "\x67\x1E\x75\x68\xC3\xAD\x76\xE9"
-+			  "\xE9\xBC\xF0\xEB\xD8\xFD\x31\x8A"
-+			  "\x5F\xC9\x18\x94\x4B\x86\x66\xFC"
-+			  "\xBD\x0B\x3D\xB3\x9F\xFA\x1F\xD9"
-+			  "\x78\xC4\xE3\x24\x1C\x67\xA2\xF8"
-+			  "\x43\xBC\x76\x75\xBF\x6C\x05\xB3"
-+			  "\x32\xE8\x7C\x80\xDB\xC7\xB6\x61"
-+			  "\x1A\x3E\x2B\xA7\x25\xED\x8F\xA0"
-+			  "\x00\x4B\xF8\x90\xCA\xD8\xFB\x12"
-+			  "\xAC\x1F\x18\xE9\xD2\x5E\xA2\x8E"
-+			  "\xE4\x84\x6B\x9D\xEB\x1E\x6B\xA3"
-+			  "\x7B\xDC\xCE\x15\x97\x27\xB2\x65"
-+			  "\xBC\x0E\x47\xAB\x55\x13\x53\xAB"
-+			  "\x0E\x34\x55\x02\x5F\x27\xC5\x89"
-+			  "\xDF\xC5\x70\xC4\xDD\x76\x82\xEE"
-+			  "\x68\xA6\x09\xB0\xE5\x5E\xF1\x0C"
-+			  "\xE3\xF3\x09\x9B\xFE\x65\x4B\xB8"
-+			  "\x30\xEC\xD5\x7C\x6A\xEC\x1D\xD2"
-+			  "\x93\xB7\xA1\x1A\x02\xD4\xC0\xD6"
-+			  "\x8D\x4D\x83\x9A\xED\x29\x4E\x14"
-+			  "\x86\xD5\x3C\x1A\xD5\xB9\x0A\x6A"
-+			  "\x72\x22\xD5\x92\x38\xF1\xA1\x86"
-+			  "\xB2\x41\x51\xCA\x4E\xAB\x8F\xD3"
-+			  "\x80\x56\xC3\xD7\x65\xE1\xB3\x86"
-+			  "\xCB\xCE\x98\xA1\xD4\x59\x1C\x06"
-+			  "\x01\xED\xF8\x29\x91\x19\x5C\x9A"
-+			  "\xEE\x28\x1B\x48\xD7\x32\xEF\x9F"
-+			  "\x6C\x2B\x66\x4E\x78\xD5\x8B\x72"
-+			  "\x80\xE7\x29\xDC\x23\x55\x98\x54"
-+			  "\xB1\xFF\x3E\x95\x56\xA8\x78\x78"
-+			  "\xEF\xC4\xA5\x11\x2D\x2B\xD8\x93"
-+			  "\x30\x6E\x7E\x51\xBB\x42\x5F\x03"
-+			  "\x43\x94\x23\x7E\xEE\xF0\xA5\x79"
-+			  "\x55\x01\xD4\x58\xB2\xF2\x85\x49"
-+			  "\x70\xC5\xB9\x0B\x3B\x7A\x6E\x6C",
-+		.ilen	= 1008,
- 		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
- 			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
- 			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-@@ -21568,11 +22016,75 @@ static struct cipher_testvec camellia_cbc_dec_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.rlen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.rlen	= 1008,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 496 - 16, 16 },
-+		.tap	= { 1008 - 16, 16 },
- 	},
- };
- 
-@@ -21781,8 +22293,72 @@ static struct cipher_testvec camellia_ctr_enc_tv_template[] = {
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
- 			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
--			  "\x2B\xC2\x59",
--		.ilen	= 499,
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D"
-+			  "\xE4\x7B\x12",
-+		.ilen	= 1011,
- 		.result	= "\xF3\x06\x3A\x84\xCD\xBA\x8E\x11"
- 			  "\xB7\x74\x6F\x5C\x97\xFB\x36\xFE"
- 			  "\xDE\x71\x58\xD4\x15\xD1\xC1\xA4"
-@@ -21845,11 +22421,75 @@ static struct cipher_testvec camellia_ctr_enc_tv_template[] = {
- 			  "\x7E\x42\xEC\xB6\x6F\x4D\x6B\x48"
- 			  "\xE6\xA6\x50\x80\x78\x9E\xF1\xB0"
- 			  "\x4D\xB2\x0D\x3D\xFC\x40\x25\x4D"
--			  "\x93\x11\x1C",
--		.rlen	= 499,
-+			  "\x93\x11\x1C\xE9\xD2\x9F\x6E\x90"
-+			  "\xE5\x41\x4A\xE2\x3C\x45\x29\x35"
-+			  "\xEC\xD6\x47\x50\xCB\x7B\xA2\x32"
-+			  "\xF7\x8B\x62\xF1\xE3\x9A\xFE\xC7"
-+			  "\x1D\x8C\x02\x72\x68\x09\xE9\xB6"
-+			  "\x4A\x80\xE6\xB1\x56\xDF\x90\xD4"
-+			  "\x93\x74\xA4\xCE\x20\x23\xBF\x48"
-+			  "\xA5\xDE\x1B\xFA\x40\x69\x31\x98"
-+			  "\x62\x6E\xA5\xC7\xBF\x0C\x62\xE5"
-+			  "\x6D\xE1\x93\xF1\x83\x10\x1C\xCA"
-+			  "\xF6\x5C\x19\xF8\x90\x78\xCB\xE4"
-+			  "\x0B\x3A\xB5\xF8\x43\x86\xD3\x3F"
-+			  "\xBA\x83\x34\x3C\x42\xCC\x7D\x28"
-+			  "\x29\x63\x4F\xD8\x02\x17\xC5\x07"
-+			  "\x2C\xA4\xAC\x79\xCB\xC3\xA9\x09"
-+			  "\x81\x45\x18\xED\xE4\xCB\x42\x3B"
-+			  "\x87\x2D\x23\xDC\xC5\xBA\x45\xBD"
-+			  "\x92\xE5\x02\x97\x96\xCE\xAD\xEC"
-+			  "\xBA\xD8\x76\xF8\xCA\xC1\x31\xEC"
-+			  "\x1E\x4F\x3F\x83\xF8\x33\xE8\x6E"
-+			  "\xCC\xF8\x5F\xDD\x65\x50\x99\x69"
-+			  "\xAF\x48\xCE\xA5\xBA\xB6\x14\x9F"
-+			  "\x05\x93\xB2\xE6\x59\xC8\x28\xFE"
-+			  "\x8F\x37\xF9\x64\xB9\xA5\x56\x8F"
-+			  "\xF1\x1B\x90\xEF\xAE\xEB\xFC\x09"
-+			  "\x11\x7A\xF2\x19\x0A\x0A\x9A\x3C"
-+			  "\xE2\x5E\x29\xFA\x31\x9B\xC1\x74"
-+			  "\x1E\x10\x3E\x07\xA9\x31\x6D\xF8"
-+			  "\x81\xF5\xD5\x8A\x04\x23\x51\xAC"
-+			  "\xA2\xE2\x63\xFD\x27\x1F\x79\x5B"
-+			  "\x1F\xE8\xDA\x11\x49\x4D\x1C\xBA"
-+			  "\x54\xCC\x0F\xBA\x92\x69\xE5\xCB"
-+			  "\x41\x1A\x67\xA6\x40\x82\x70\x8C"
-+			  "\x19\x79\x08\xA4\x51\x20\x7D\xC9"
-+			  "\x12\x27\xAE\x20\x0D\x2C\xA1\x6D"
-+			  "\xF4\x55\xD4\xE7\xE6\xD4\x28\x08"
-+			  "\x00\x70\x12\x56\x56\x50\xAD\x14"
-+			  "\x5C\x3E\xA2\xD1\x36\x3F\x36\x48"
-+			  "\xED\xB1\x57\x3E\x5D\x15\xF6\x1E"
-+			  "\x53\xE9\xA4\x3E\xED\x7D\xCF\x7D"
-+			  "\x29\xAF\xF3\x1E\x51\xA8\x9F\x85"
-+			  "\x8B\xF0\xBB\xCE\xCC\x39\xC3\x64"
-+			  "\x4B\xF2\xAD\x70\x19\xD4\x44\x8F"
-+			  "\x91\x76\xE8\x15\x66\x34\x9F\xF6"
-+			  "\x0F\x15\xA4\xA8\x24\xF8\x58\xB1"
-+			  "\x38\x46\x47\xC7\x9B\xCA\xE9\x42"
-+			  "\x44\xAA\xE6\xB5\x9C\x91\xA4\xD3"
-+			  "\x16\xA0\xED\x42\xBE\xB5\x06\x19"
-+			  "\xBE\x67\xE8\xBC\x22\x32\xA4\x1E"
-+			  "\x93\xEB\xBE\xE9\xE1\x93\xE5\x31"
-+			  "\x3A\xA2\x75\xDF\xE3\x6B\xE7\xCC"
-+			  "\xB4\x70\x20\xE0\x6D\x82\x7C\xC8"
-+			  "\x94\x5C\x5E\x37\x18\xAD\xED\x8B"
-+			  "\x44\x86\xCA\x5E\x07\xB7\x70\x8D"
-+			  "\x40\x48\x19\x73\x7C\x78\x64\x0B"
-+			  "\xDB\x01\xCA\xAE\x63\x19\xE9\xD1"
-+			  "\x6B\x2C\x84\x10\x45\x42\x2E\xC3"
-+			  "\xDF\x7F\xAA\xE8\x87\x1B\x63\x46"
-+			  "\x74\x28\x9D\x05\x30\x20\x62\x41"
-+			  "\xC0\x9F\x2C\x36\x2B\x78\xD7\x26"
-+			  "\xDF\x58\x51\xED\xFA\xDC\x87\x79"
-+			  "\xBF\x8C\xBF\xC4\x0F\xE5\x05\xDA"
-+			  "\x45\xE3\x35\x0D\x69\x91\x54\x1C"
-+			  "\xE7\x2C\x49\x08\x8B\x72\xFA\x5C"
-+			  "\xF1\x6B\xD9",
-+		.rlen	= 1011,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 499 - 16, 16 },
-+		.tap	= { 1011 - 16, 16 },
- 	}, { /* Generated with Crypto++ */
- 		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
- 			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-@@ -21919,8 +22559,72 @@ static struct cipher_testvec camellia_ctr_enc_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.ilen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.ilen	= 1008,
- 		.result	= "\x85\x79\x6C\x8B\x2B\x6D\x14\xF9"
- 			  "\xA6\x83\xB6\x80\x5B\x3A\xF3\x7E"
- 			  "\x30\x29\xEB\x1F\xDC\x19\x5F\xEB"
-@@ -21982,8 +22686,72 @@ static struct cipher_testvec camellia_ctr_enc_tv_template[] = {
- 			  "\xB4\x3A\x5F\x19\xCF\x42\x1B\x22"
- 			  "\x0B\x2D\x7B\xF1\xC5\x43\xF7\x5E"
- 			  "\x12\xA8\x01\x64\x16\x0B\x26\x5A"
--			  "\x0C\x95\x0F\x40\xC5\x5A\x06\x7C",
--		.rlen	= 496,
-+			  "\x0C\x95\x0F\x40\xC5\x5A\x06\x7C"
-+			  "\xCF\xF5\xD5\xB7\x7A\x34\x23\xB6"
-+			  "\xAA\x9E\xA8\x98\xA2\xF8\x3D\xD3"
-+			  "\x3F\x23\x69\x63\x56\x96\x45\xD6"
-+			  "\x74\x23\x1D\x5C\x63\xCC\xD8\x78"
-+			  "\x16\xE2\x9C\xD2\x80\x02\xF2\x28"
-+			  "\x69\x2F\xC4\xA8\x15\x15\x24\x3B"
-+			  "\xCB\xF0\x14\xE4\x62\xC8\xF3\xD1"
-+			  "\x03\x58\x1B\x33\x77\x74\x1F\xB4"
-+			  "\x07\x86\xF2\x21\xB7\x41\xAE\xBF"
-+			  "\x25\xC2\xFF\x51\xEF\xEA\xCE\xC4"
-+			  "\x5F\xD9\xB8\x18\x6A\xF0\x0F\x0D"
-+			  "\xF8\x04\xBB\x6D\x62\x33\x87\x26"
-+			  "\x4F\x2F\x14\x6E\xDC\xDB\x66\x09"
-+			  "\x2A\xEF\x7D\x84\x10\xAC\x82\x5E"
-+			  "\xD2\xE4\xAD\x74\x7A\x6D\xCC\x3A"
-+			  "\x7B\x62\xD8\xD6\x07\x2D\xF7\xDF"
-+			  "\x9B\xB3\x82\xCF\x9C\x1D\x76\x5C"
-+			  "\xAC\x7B\xD4\x9B\x45\xA1\x64\x11"
-+			  "\x66\xF1\xA7\x0B\xF9\xDD\x00\xDD"
-+			  "\xA4\x45\x3D\x3E\x03\xC9\x2E\xCB"
-+			  "\xC3\x14\x84\x72\xFD\x41\xDC\xBD"
-+			  "\x75\xBE\xA8\xE5\x16\x48\x64\x39"
-+			  "\xCA\xF3\xE6\xDC\x25\x24\xF1\x6D"
-+			  "\xB2\x8D\xC5\x38\x54\xD3\x5D\x6D"
-+			  "\x0B\x29\x10\x15\x0E\x13\x3B\xAC"
-+			  "\x7E\xCC\x9E\x3E\x18\x48\xA6\x02"
-+			  "\xEF\x03\xB2\x2E\xE3\xD2\x70\x21"
-+			  "\xB4\x19\x26\xBE\x3A\x3D\x05\xE0"
-+			  "\xF8\x09\xAF\xE4\x31\x26\x92\x2F"
-+			  "\x8F\x55\xAC\xED\x0B\xB2\xA5\x34"
-+			  "\xBE\x50\xB1\x02\x22\x96\xE3\x40"
-+			  "\x7B\x70\x50\x6E\x3B\xD5\xE5\xA0"
-+			  "\x8E\xA2\xAD\x14\x60\x5C\x7A\x2B"
-+			  "\x3D\x1B\x7F\xC1\xC0\x2C\x56\x36"
-+			  "\xD2\x0A\x32\x06\x97\x34\xB9\xF4"
-+			  "\x6F\x9F\x7E\x80\xD0\x9D\xF7\x6A"
-+			  "\x21\xC1\xA2\x6A\xB1\x96\x5B\x4D"
-+			  "\x7A\x15\x6C\xC4\x4E\xB8\xE0\x9E"
-+			  "\x6C\x50\xF3\x9C\xC9\xB5\x23\xB7"
-+			  "\xF1\xD4\x29\x4A\x23\xC4\xAD\x1E"
-+			  "\x2C\x07\xD2\x43\x5F\x57\x93\xCA"
-+			  "\x85\xF9\x9F\xAD\x4C\xF1\xE4\xB1"
-+			  "\x1A\x8E\x28\xA4\xB6\x52\x77\x7E"
-+			  "\x68\xC6\x47\xB9\x76\xCC\x65\x5F"
-+			  "\x0B\xF9\x67\x93\xD8\x0E\x9A\x37"
-+			  "\x5F\x41\xED\x64\x6C\xAD\x5F\xED"
-+			  "\x3F\x8D\xFB\x8E\x1E\xA0\xE4\x1F"
-+			  "\xC2\xC7\xED\x18\x43\xE1\x20\x86"
-+			  "\x5D\xBC\x30\x70\x22\xA1\xDC\x53"
-+			  "\x10\x3A\x8D\x47\x82\xCD\x7F\x59"
-+			  "\x03\x2D\x6D\xF5\xE7\x79\xD4\x07"
-+			  "\x68\x2A\xA5\x42\x19\x4D\xAF\xF5"
-+			  "\xED\x47\x83\xBC\x5F\x62\x84\xDA"
-+			  "\xDA\x41\xFF\xB0\x1D\x64\xA3\xC8"
-+			  "\xBD\x4E\xE0\xB8\x7F\xEE\x55\x0A"
-+			  "\x4E\x61\xB2\x51\xF6\x9C\x95\xF6"
-+			  "\x92\xBB\xF6\xC5\xF0\x09\x86\xDE"
-+			  "\x37\x9E\x29\xF9\x2A\x18\x73\x0D"
-+			  "\xDC\x7E\x6B\x7B\x1B\x43\x8C\xEA"
-+			  "\x13\xC8\x1A\x47\x0A\x2D\x6D\x56"
-+			  "\xCD\xD2\xE7\x53\x1A\xAB\x1C\x3C"
-+			  "\xC5\x9B\x03\x70\x29\x2A\x49\x09"
-+			  "\x67\xA1\xEA\xD6\x3A\x5B\xBF\x71"
-+			  "\x1D\x48\x64\x6C\xFB\xC0\x9E\x36",
-+		.rlen	= 1008,
- 	},
- };
- 
-@@ -22192,8 +22960,72 @@ static struct cipher_testvec camellia_ctr_dec_tv_template[] = {
- 			  "\x7E\x42\xEC\xB6\x6F\x4D\x6B\x48"
- 			  "\xE6\xA6\x50\x80\x78\x9E\xF1\xB0"
- 			  "\x4D\xB2\x0D\x3D\xFC\x40\x25\x4D"
--			  "\x93\x11\x1C",
--		.ilen	= 499,
-+			  "\x93\x11\x1C\xE9\xD2\x9F\x6E\x90"
-+			  "\xE5\x41\x4A\xE2\x3C\x45\x29\x35"
-+			  "\xEC\xD6\x47\x50\xCB\x7B\xA2\x32"
-+			  "\xF7\x8B\x62\xF1\xE3\x9A\xFE\xC7"
-+			  "\x1D\x8C\x02\x72\x68\x09\xE9\xB6"
-+			  "\x4A\x80\xE6\xB1\x56\xDF\x90\xD4"
-+			  "\x93\x74\xA4\xCE\x20\x23\xBF\x48"
-+			  "\xA5\xDE\x1B\xFA\x40\x69\x31\x98"
-+			  "\x62\x6E\xA5\xC7\xBF\x0C\x62\xE5"
-+			  "\x6D\xE1\x93\xF1\x83\x10\x1C\xCA"
-+			  "\xF6\x5C\x19\xF8\x90\x78\xCB\xE4"
-+			  "\x0B\x3A\xB5\xF8\x43\x86\xD3\x3F"
-+			  "\xBA\x83\x34\x3C\x42\xCC\x7D\x28"
-+			  "\x29\x63\x4F\xD8\x02\x17\xC5\x07"
-+			  "\x2C\xA4\xAC\x79\xCB\xC3\xA9\x09"
-+			  "\x81\x45\x18\xED\xE4\xCB\x42\x3B"
-+			  "\x87\x2D\x23\xDC\xC5\xBA\x45\xBD"
-+			  "\x92\xE5\x02\x97\x96\xCE\xAD\xEC"
-+			  "\xBA\xD8\x76\xF8\xCA\xC1\x31\xEC"
-+			  "\x1E\x4F\x3F\x83\xF8\x33\xE8\x6E"
-+			  "\xCC\xF8\x5F\xDD\x65\x50\x99\x69"
-+			  "\xAF\x48\xCE\xA5\xBA\xB6\x14\x9F"
-+			  "\x05\x93\xB2\xE6\x59\xC8\x28\xFE"
-+			  "\x8F\x37\xF9\x64\xB9\xA5\x56\x8F"
-+			  "\xF1\x1B\x90\xEF\xAE\xEB\xFC\x09"
-+			  "\x11\x7A\xF2\x19\x0A\x0A\x9A\x3C"
-+			  "\xE2\x5E\x29\xFA\x31\x9B\xC1\x74"
-+			  "\x1E\x10\x3E\x07\xA9\x31\x6D\xF8"
-+			  "\x81\xF5\xD5\x8A\x04\x23\x51\xAC"
-+			  "\xA2\xE2\x63\xFD\x27\x1F\x79\x5B"
-+			  "\x1F\xE8\xDA\x11\x49\x4D\x1C\xBA"
-+			  "\x54\xCC\x0F\xBA\x92\x69\xE5\xCB"
-+			  "\x41\x1A\x67\xA6\x40\x82\x70\x8C"
-+			  "\x19\x79\x08\xA4\x51\x20\x7D\xC9"
-+			  "\x12\x27\xAE\x20\x0D\x2C\xA1\x6D"
-+			  "\xF4\x55\xD4\xE7\xE6\xD4\x28\x08"
-+			  "\x00\x70\x12\x56\x56\x50\xAD\x14"
-+			  "\x5C\x3E\xA2\xD1\x36\x3F\x36\x48"
-+			  "\xED\xB1\x57\x3E\x5D\x15\xF6\x1E"
-+			  "\x53\xE9\xA4\x3E\xED\x7D\xCF\x7D"
-+			  "\x29\xAF\xF3\x1E\x51\xA8\x9F\x85"
-+			  "\x8B\xF0\xBB\xCE\xCC\x39\xC3\x64"
-+			  "\x4B\xF2\xAD\x70\x19\xD4\x44\x8F"
-+			  "\x91\x76\xE8\x15\x66\x34\x9F\xF6"
-+			  "\x0F\x15\xA4\xA8\x24\xF8\x58\xB1"
-+			  "\x38\x46\x47\xC7\x9B\xCA\xE9\x42"
-+			  "\x44\xAA\xE6\xB5\x9C\x91\xA4\xD3"
-+			  "\x16\xA0\xED\x42\xBE\xB5\x06\x19"
-+			  "\xBE\x67\xE8\xBC\x22\x32\xA4\x1E"
-+			  "\x93\xEB\xBE\xE9\xE1\x93\xE5\x31"
-+			  "\x3A\xA2\x75\xDF\xE3\x6B\xE7\xCC"
-+			  "\xB4\x70\x20\xE0\x6D\x82\x7C\xC8"
-+			  "\x94\x5C\x5E\x37\x18\xAD\xED\x8B"
-+			  "\x44\x86\xCA\x5E\x07\xB7\x70\x8D"
-+			  "\x40\x48\x19\x73\x7C\x78\x64\x0B"
-+			  "\xDB\x01\xCA\xAE\x63\x19\xE9\xD1"
-+			  "\x6B\x2C\x84\x10\x45\x42\x2E\xC3"
-+			  "\xDF\x7F\xAA\xE8\x87\x1B\x63\x46"
-+			  "\x74\x28\x9D\x05\x30\x20\x62\x41"
-+			  "\xC0\x9F\x2C\x36\x2B\x78\xD7\x26"
-+			  "\xDF\x58\x51\xED\xFA\xDC\x87\x79"
-+			  "\xBF\x8C\xBF\xC4\x0F\xE5\x05\xDA"
-+			  "\x45\xE3\x35\x0D\x69\x91\x54\x1C"
-+			  "\xE7\x2C\x49\x08\x8B\x72\xFA\x5C"
-+			  "\xF1\x6B\xD9",
-+		.ilen	= 1011,
- 		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
- 			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
- 			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-@@ -22256,11 +23088,75 @@ static struct cipher_testvec camellia_ctr_dec_tv_template[] = {
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
- 			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
--			  "\x2B\xC2\x59",
--		.rlen	= 499,
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D"
-+			  "\xE4\x7B\x12",
-+		.rlen	= 1011,
- 		.also_non_np = 1,
- 		.np	= 2,
--		.tap	= { 499 - 16, 16 },
-+		.tap	= { 1011 - 16, 16 },
- 	}, { /* Generated with Crypto++ */
- 		.key	= "\x85\x62\x3F\x1C\xF9\xD6\x1C\xF9"
- 			  "\xD6\xB3\x90\x6D\x4A\x90\x6D\x4A"
-@@ -22330,8 +23226,72 @@ static struct cipher_testvec camellia_ctr_dec_tv_template[] = {
- 			  "\xB4\x3A\x5F\x19\xCF\x42\x1B\x22"
- 			  "\x0B\x2D\x7B\xF1\xC5\x43\xF7\x5E"
- 			  "\x12\xA8\x01\x64\x16\x0B\x26\x5A"
--			  "\x0C\x95\x0F\x40\xC5\x5A\x06\x7C",
--		.ilen	= 496,
-+			  "\x0C\x95\x0F\x40\xC5\x5A\x06\x7C"
-+			  "\xCF\xF5\xD5\xB7\x7A\x34\x23\xB6"
-+			  "\xAA\x9E\xA8\x98\xA2\xF8\x3D\xD3"
-+			  "\x3F\x23\x69\x63\x56\x96\x45\xD6"
-+			  "\x74\x23\x1D\x5C\x63\xCC\xD8\x78"
-+			  "\x16\xE2\x9C\xD2\x80\x02\xF2\x28"
-+			  "\x69\x2F\xC4\xA8\x15\x15\x24\x3B"
-+			  "\xCB\xF0\x14\xE4\x62\xC8\xF3\xD1"
-+			  "\x03\x58\x1B\x33\x77\x74\x1F\xB4"
-+			  "\x07\x86\xF2\x21\xB7\x41\xAE\xBF"
-+			  "\x25\xC2\xFF\x51\xEF\xEA\xCE\xC4"
-+			  "\x5F\xD9\xB8\x18\x6A\xF0\x0F\x0D"
-+			  "\xF8\x04\xBB\x6D\x62\x33\x87\x26"
-+			  "\x4F\x2F\x14\x6E\xDC\xDB\x66\x09"
-+			  "\x2A\xEF\x7D\x84\x10\xAC\x82\x5E"
-+			  "\xD2\xE4\xAD\x74\x7A\x6D\xCC\x3A"
-+			  "\x7B\x62\xD8\xD6\x07\x2D\xF7\xDF"
-+			  "\x9B\xB3\x82\xCF\x9C\x1D\x76\x5C"
-+			  "\xAC\x7B\xD4\x9B\x45\xA1\x64\x11"
-+			  "\x66\xF1\xA7\x0B\xF9\xDD\x00\xDD"
-+			  "\xA4\x45\x3D\x3E\x03\xC9\x2E\xCB"
-+			  "\xC3\x14\x84\x72\xFD\x41\xDC\xBD"
-+			  "\x75\xBE\xA8\xE5\x16\x48\x64\x39"
-+			  "\xCA\xF3\xE6\xDC\x25\x24\xF1\x6D"
-+			  "\xB2\x8D\xC5\x38\x54\xD3\x5D\x6D"
-+			  "\x0B\x29\x10\x15\x0E\x13\x3B\xAC"
-+			  "\x7E\xCC\x9E\x3E\x18\x48\xA6\x02"
-+			  "\xEF\x03\xB2\x2E\xE3\xD2\x70\x21"
-+			  "\xB4\x19\x26\xBE\x3A\x3D\x05\xE0"
-+			  "\xF8\x09\xAF\xE4\x31\x26\x92\x2F"
-+			  "\x8F\x55\xAC\xED\x0B\xB2\xA5\x34"
-+			  "\xBE\x50\xB1\x02\x22\x96\xE3\x40"
-+			  "\x7B\x70\x50\x6E\x3B\xD5\xE5\xA0"
-+			  "\x8E\xA2\xAD\x14\x60\x5C\x7A\x2B"
-+			  "\x3D\x1B\x7F\xC1\xC0\x2C\x56\x36"
-+			  "\xD2\x0A\x32\x06\x97\x34\xB9\xF4"
-+			  "\x6F\x9F\x7E\x80\xD0\x9D\xF7\x6A"
-+			  "\x21\xC1\xA2\x6A\xB1\x96\x5B\x4D"
-+			  "\x7A\x15\x6C\xC4\x4E\xB8\xE0\x9E"
-+			  "\x6C\x50\xF3\x9C\xC9\xB5\x23\xB7"
-+			  "\xF1\xD4\x29\x4A\x23\xC4\xAD\x1E"
-+			  "\x2C\x07\xD2\x43\x5F\x57\x93\xCA"
-+			  "\x85\xF9\x9F\xAD\x4C\xF1\xE4\xB1"
-+			  "\x1A\x8E\x28\xA4\xB6\x52\x77\x7E"
-+			  "\x68\xC6\x47\xB9\x76\xCC\x65\x5F"
-+			  "\x0B\xF9\x67\x93\xD8\x0E\x9A\x37"
-+			  "\x5F\x41\xED\x64\x6C\xAD\x5F\xED"
-+			  "\x3F\x8D\xFB\x8E\x1E\xA0\xE4\x1F"
-+			  "\xC2\xC7\xED\x18\x43\xE1\x20\x86"
-+			  "\x5D\xBC\x30\x70\x22\xA1\xDC\x53"
-+			  "\x10\x3A\x8D\x47\x82\xCD\x7F\x59"
-+			  "\x03\x2D\x6D\xF5\xE7\x79\xD4\x07"
-+			  "\x68\x2A\xA5\x42\x19\x4D\xAF\xF5"
-+			  "\xED\x47\x83\xBC\x5F\x62\x84\xDA"
-+			  "\xDA\x41\xFF\xB0\x1D\x64\xA3\xC8"
-+			  "\xBD\x4E\xE0\xB8\x7F\xEE\x55\x0A"
-+			  "\x4E\x61\xB2\x51\xF6\x9C\x95\xF6"
-+			  "\x92\xBB\xF6\xC5\xF0\x09\x86\xDE"
-+			  "\x37\x9E\x29\xF9\x2A\x18\x73\x0D"
-+			  "\xDC\x7E\x6B\x7B\x1B\x43\x8C\xEA"
-+			  "\x13\xC8\x1A\x47\x0A\x2D\x6D\x56"
-+			  "\xCD\xD2\xE7\x53\x1A\xAB\x1C\x3C"
-+			  "\xC5\x9B\x03\x70\x29\x2A\x49\x09"
-+			  "\x67\xA1\xEA\xD6\x3A\x5B\xBF\x71"
-+			  "\x1D\x48\x64\x6C\xFB\xC0\x9E\x36",
-+		.ilen	= 1008,
- 		.result	= "\x56\xED\x84\x1B\x8F\x26\xBD\x31"
- 			  "\xC8\x5F\xF6\x6A\x01\x98\x0C\xA3"
- 			  "\x3A\xD1\x45\xDC\x73\x0A\x7E\x15"
-@@ -22393,8 +23353,72 @@ static struct cipher_testvec camellia_ctr_dec_tv_template[] = {
- 			  "\x86\x1D\xB4\x28\xBF\x56\xED\x61"
- 			  "\xF8\x8F\x03\x9A\x31\xC8\x3C\xD3"
- 			  "\x6A\x01\x75\x0C\xA3\x17\xAE\x45"
--			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7",
--		.rlen	= 496,
-+			  "\xDC\x50\xE7\x7E\x15\x89\x20\xB7"
-+			  "\x2B\xC2\x59\xF0\x64\xFB\x92\x06"
-+			  "\x9D\x34\xCB\x3F\xD6\x6D\x04\x78"
-+			  "\x0F\xA6\x1A\xB1\x48\xDF\x53\xEA"
-+			  "\x81\x18\x8C\x23\xBA\x2E\xC5\x5C"
-+			  "\xF3\x67\xFE\x95\x09\xA0\x37\xCE"
-+			  "\x42\xD9\x70\x07\x7B\x12\xA9\x1D"
-+			  "\xB4\x4B\xE2\x56\xED\x84\x1B\x8F"
-+			  "\x26\xBD\x31\xC8\x5F\xF6\x6A\x01"
-+			  "\x98\x0C\xA3\x3A\xD1\x45\xDC\x73"
-+			  "\x0A\x7E\x15\xAC\x20\xB7\x4E\xE5"
-+			  "\x59\xF0\x87\x1E\x92\x29\xC0\x34"
-+			  "\xCB\x62\xF9\x6D\x04\x9B\x0F\xA6"
-+			  "\x3D\xD4\x48\xDF\x76\x0D\x81\x18"
-+			  "\xAF\x23\xBA\x51\xE8\x5C\xF3\x8A"
-+			  "\x21\x95\x2C\xC3\x37\xCE\x65\xFC"
-+			  "\x70\x07\x9E\x12\xA9\x40\xD7\x4B"
-+			  "\xE2\x79\x10\x84\x1B\xB2\x26\xBD"
-+			  "\x54\xEB\x5F\xF6\x8D\x01\x98\x2F"
-+			  "\xC6\x3A\xD1\x68\xFF\x73\x0A\xA1"
-+			  "\x15\xAC\x43\xDA\x4E\xE5\x7C\x13"
-+			  "\x87\x1E\xB5\x29\xC0\x57\xEE\x62"
-+			  "\xF9\x90\x04\x9B\x32\xC9\x3D\xD4"
-+			  "\x6B\x02\x76\x0D\xA4\x18\xAF\x46"
-+			  "\xDD\x51\xE8\x7F\x16\x8A\x21\xB8"
-+			  "\x2C\xC3\x5A\xF1\x65\xFC\x93\x07"
-+			  "\x9E\x35\xCC\x40\xD7\x6E\x05\x79"
-+			  "\x10\xA7\x1B\xB2\x49\xE0\x54\xEB"
-+			  "\x82\x19\x8D\x24\xBB\x2F\xC6\x5D"
-+			  "\xF4\x68\xFF\x96\x0A\xA1\x38\xCF"
-+			  "\x43\xDA\x71\x08\x7C\x13\xAA\x1E"
-+			  "\xB5\x4C\xE3\x57\xEE\x85\x1C\x90"
-+			  "\x27\xBE\x32\xC9\x60\xF7\x6B\x02"
-+			  "\x99\x0D\xA4\x3B\xD2\x46\xDD\x74"
-+			  "\x0B\x7F\x16\xAD\x21\xB8\x4F\xE6"
-+			  "\x5A\xF1\x88\x1F\x93\x2A\xC1\x35"
-+			  "\xCC\x63\xFA\x6E\x05\x9C\x10\xA7"
-+			  "\x3E\xD5\x49\xE0\x77\x0E\x82\x19"
-+			  "\xB0\x24\xBB\x52\xE9\x5D\xF4\x8B"
-+			  "\x22\x96\x2D\xC4\x38\xCF\x66\xFD"
-+			  "\x71\x08\x9F\x13\xAA\x41\xD8\x4C"
-+			  "\xE3\x7A\x11\x85\x1C\xB3\x27\xBE"
-+			  "\x55\xEC\x60\xF7\x8E\x02\x99\x30"
-+			  "\xC7\x3B\xD2\x69\x00\x74\x0B\xA2"
-+			  "\x16\xAD\x44\xDB\x4F\xE6\x7D\x14"
-+			  "\x88\x1F\xB6\x2A\xC1\x58\xEF\x63"
-+			  "\xFA\x91\x05\x9C\x33\xCA\x3E\xD5"
-+			  "\x6C\x03\x77\x0E\xA5\x19\xB0\x47"
-+			  "\xDE\x52\xE9\x80\x17\x8B\x22\xB9"
-+			  "\x2D\xC4\x5B\xF2\x66\xFD\x94\x08"
-+			  "\x9F\x36\xCD\x41\xD8\x6F\x06\x7A"
-+			  "\x11\xA8\x1C\xB3\x4A\xE1\x55\xEC"
-+			  "\x83\x1A\x8E\x25\xBC\x30\xC7\x5E"
-+			  "\xF5\x69\x00\x97\x0B\xA2\x39\xD0"
-+			  "\x44\xDB\x72\x09\x7D\x14\xAB\x1F"
-+			  "\xB6\x4D\xE4\x58\xEF\x86\x1D\x91"
-+			  "\x28\xBF\x33\xCA\x61\xF8\x6C\x03"
-+			  "\x9A\x0E\xA5\x3C\xD3\x47\xDE\x75"
-+			  "\x0C\x80\x17\xAE\x22\xB9\x50\xE7"
-+			  "\x5B\xF2\x89\x20\x94\x2B\xC2\x36"
-+			  "\xCD\x64\xFB\x6F\x06\x9D\x11\xA8"
-+			  "\x3F\xD6\x4A\xE1\x78\x0F\x83\x1A"
-+			  "\xB1\x25\xBC\x53\xEA\x5E\xF5\x8C"
-+			  "\x00\x97\x2E\xC5\x39\xD0\x67\xFE"
-+			  "\x72\x09\xA0\x14\xAB\x42\xD9\x4D",
-+		.rlen	= 1008,
- 	},
- };
- 
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index a21af59..a3a0ed8 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -43,6 +43,7 @@ endif
+ # These modules require assembler to support AVX2.
+ ifeq ($(avx2_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_BLOWFISH_AVX2_X86_64) +=3D blowfish-avx2.o
++	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) +=3D camellia-aesni-a=
+vx2.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) +=3D serpent-avx2.o
+ 	obj-$(CONFIG_CRYPTO_TWOFISH_AVX2_X86_64) +=3D twofish-avx2.o
+ endif
+@@ -73,6 +74,7 @@ endif
+=20
+ ifeq ($(avx2_supported),yes)
+ 	blowfish-avx2-y :=3D blowfish-avx2-asm_64.o blowfish_avx2_glue.o
++	camellia-aesni-avx2-y :=3D camellia-aesni-avx2-asm_64.o camellia_aesn=
+i_avx2_glue.o
+ 	serpent-avx2-y :=3D serpent-avx2-asm_64.o serpent_avx2_glue.o
+ 	twofish-avx2-y :=3D twofish-avx2-asm_64.o twofish_avx2_glue.o
+ endif
+diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/cr=
+ypto/camellia-aesni-avx2-asm_64.S
+new file mode 100644
+index 0000000..91a1878
+--- /dev/null
++++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+@@ -0,0 +1,1368 @@
++/*
++ * x86_64/AVX2/AES-NI assembler implementation of Camellia
++ *
++ * Copyright =C2=A9 2013 Jussi Kivilinna <jussi.kivilinna@iki.fi>
++ *
++ * This program is free software; you can redistribute it and/or modif=
+y
++ * it under the terms of the GNU General Public License as published b=
+y
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ */
++
++#include <linux/linkage.h>
++
++#define CAMELLIA_TABLE_BYTE_LEN 272
++
++/* struct camellia_ctx: */
++#define key_table 0
++#define key_length CAMELLIA_TABLE_BYTE_LEN
++
++/* register macros */
++#define CTX %rdi
++#define RIO %r8
++
++/*********************************************************************=
+*
++  helper macros
++ *********************************************************************=
+*/
++#define filter_8bit(x, lo_t, hi_t, mask4bit, tmp0) \
++	vpand x, mask4bit, tmp0; \
++	vpandn x, mask4bit, x; \
++	vpsrld $4, x, x; \
++	\
++	vpshufb tmp0, lo_t, tmp0; \
++	vpshufb x, hi_t, x; \
++	vpxor tmp0, x, x;
++
++#define ymm0_x xmm0
++#define ymm1_x xmm1
++#define ymm2_x xmm2
++#define ymm3_x xmm3
++#define ymm4_x xmm4
++#define ymm5_x xmm5
++#define ymm6_x xmm6
++#define ymm7_x xmm7
++#define ymm8_x xmm8
++#define ymm9_x xmm9
++#define ymm10_x xmm10
++#define ymm11_x xmm11
++#define ymm12_x xmm12
++#define ymm13_x xmm13
++#define ymm14_x xmm14
++#define ymm15_x xmm15
++
++/*
++ * AES-NI instructions do not support ymmX registers, so we need split=
+ting and
++ * merging.
++ */
++#define vaesenclast256(zero, yreg, tmp) \
++	vextracti128 $1, yreg, tmp##_x; \
++	vaesenclast zero##_x, yreg##_x, yreg##_x; \
++	vaesenclast zero##_x, tmp##_x, tmp##_x; \
++	vinserti128 $1, tmp##_x, yreg, yreg;
++
++/*********************************************************************=
+*
++  32-way camellia
++ *********************************************************************=
+*/
++
++/*
++ * IN:
++ *   x0..x7: byte-sliced AB state
++ *   mem_cd: register pointer storing CD state
++ *   key: index for key material
++ * OUT:
++ *   x0..x7: new byte-sliced CD state
++ */
++#define roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, t0, t1, t2, t3, t4, =
+t5, t6, \
++		  t7, mem_cd, key) \
++	/* \
++	 * S-function with AES subbytes \
++	 */ \
++	vbroadcasti128 .Linv_shift_row, t4; \
++	vpbroadcastb .L0f0f0f0f, t7; \
++	vbroadcasti128 .Lpre_tf_lo_s1, t0; \
++	vbroadcasti128 .Lpre_tf_hi_s1, t1; \
++	\
++	/* AES inverse shift rows */ \
++	vpshufb t4, x0, x0; \
++	vpshufb t4, x7, x7; \
++	vpshufb t4, x1, x1; \
++	vpshufb t4, x4, x4; \
++	vpshufb t4, x2, x2; \
++	vpshufb t4, x5, x5; \
++	vpshufb t4, x3, x3; \
++	vpshufb t4, x6, x6; \
++	\
++	/* prefilter sboxes 1, 2 and 3 */ \
++	vbroadcasti128 .Lpre_tf_lo_s4, t2; \
++	vbroadcasti128 .Lpre_tf_hi_s4, t3; \
++	filter_8bit(x0, t0, t1, t7, t6); \
++	filter_8bit(x7, t0, t1, t7, t6); \
++	filter_8bit(x1, t0, t1, t7, t6); \
++	filter_8bit(x4, t0, t1, t7, t6); \
++	filter_8bit(x2, t0, t1, t7, t6); \
++	filter_8bit(x5, t0, t1, t7, t6); \
++	\
++	/* prefilter sbox 4 */ \
++	vpxor t4##_x, t4##_x, t4##_x; \
++	filter_8bit(x3, t2, t3, t7, t6); \
++	filter_8bit(x6, t2, t3, t7, t6); \
++	\
++	/* AES subbytes + AES shift rows */ \
++	vbroadcasti128 .Lpost_tf_lo_s1, t0; \
++	vbroadcasti128 .Lpost_tf_hi_s1, t1; \
++	vaesenclast256(t4, x0, t5); \
++	vaesenclast256(t4, x7, t5); \
++	vaesenclast256(t4, x1, t5); \
++	vaesenclast256(t4, x4, t5); \
++	vaesenclast256(t4, x2, t5); \
++	vaesenclast256(t4, x5, t5); \
++	vaesenclast256(t4, x3, t5); \
++	vaesenclast256(t4, x6, t5); \
++	\
++	/* postfilter sboxes 1 and 4 */ \
++	vbroadcasti128 .Lpost_tf_lo_s3, t2; \
++	vbroadcasti128 .Lpost_tf_hi_s3, t3; \
++	filter_8bit(x0, t0, t1, t7, t6); \
++	filter_8bit(x7, t0, t1, t7, t6); \
++	filter_8bit(x3, t0, t1, t7, t6); \
++	filter_8bit(x6, t0, t1, t7, t6); \
++	\
++	/* postfilter sbox 3 */ \
++	vbroadcasti128 .Lpost_tf_lo_s2, t4; \
++	vbroadcasti128 .Lpost_tf_hi_s2, t5; \
++	filter_8bit(x2, t2, t3, t7, t6); \
++	filter_8bit(x5, t2, t3, t7, t6); \
++	\
++	vpbroadcastq key, t0; /* higher 64-bit duplicate ignored */ \
++	\
++	/* postfilter sbox 2 */ \
++	filter_8bit(x1, t4, t5, t7, t2); \
++	filter_8bit(x4, t4, t5, t7, t2); \
++	\
++	vpsrldq $1, t0, t1; \
++	vpsrldq $2, t0, t2; \
++	vpsrldq $3, t0, t3; \
++	vpsrldq $4, t0, t4; \
++	vpsrldq $5, t0, t5; \
++	vpsrldq $6, t0, t6; \
++	vpsrldq $7, t0, t7; \
++	vpbroadcastb t0##_x, t0; \
++	vpbroadcastb t1##_x, t1; \
++	vpbroadcastb t2##_x, t2; \
++	vpbroadcastb t3##_x, t3; \
++	vpbroadcastb t4##_x, t4; \
++	vpbroadcastb t6##_x, t6; \
++	vpbroadcastb t5##_x, t5; \
++	vpbroadcastb t7##_x, t7; \
++	\
++	/* P-function */ \
++	vpxor x5, x0, x0; \
++	vpxor x6, x1, x1; \
++	vpxor x7, x2, x2; \
++	vpxor x4, x3, x3; \
++	\
++	vpxor x2, x4, x4; \
++	vpxor x3, x5, x5; \
++	vpxor x0, x6, x6; \
++	vpxor x1, x7, x7; \
++	\
++	vpxor x7, x0, x0; \
++	vpxor x4, x1, x1; \
++	vpxor x5, x2, x2; \
++	vpxor x6, x3, x3; \
++	\
++	vpxor x3, x4, x4; \
++	vpxor x0, x5, x5; \
++	vpxor x1, x6, x6; \
++	vpxor x2, x7, x7; /* note: high and low parts swapped */ \
++	\
++	/* Add key material and result to CD (x becomes new CD) */ \
++	\
++	vpxor t7, x0, x0; \
++	vpxor 4 * 32(mem_cd), x0, x0; \
++	\
++	vpxor t6, x1, x1; \
++	vpxor 5 * 32(mem_cd), x1, x1; \
++	\
++	vpxor t5, x2, x2; \
++	vpxor 6 * 32(mem_cd), x2, x2; \
++	\
++	vpxor t4, x3, x3; \
++	vpxor 7 * 32(mem_cd), x3, x3; \
++	\
++	vpxor t3, x4, x4; \
++	vpxor 0 * 32(mem_cd), x4, x4; \
++	\
++	vpxor t2, x5, x5; \
++	vpxor 1 * 32(mem_cd), x5, x5; \
++	\
++	vpxor t1, x6, x6; \
++	vpxor 2 * 32(mem_cd), x6, x6; \
++	\
++	vpxor t0, x7, x7; \
++	vpxor 3 * 32(mem_cd), x7, x7;
++
++/*
++ * Size optimization... with inlined roundsm16 binary would be over 5 =
+times
++ * larger and would only marginally faster.
++ */
++.align 8
++roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
++	roundsm32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		  %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14, %ymm15,
++		  %rcx, (%r9));
++	ret;
++ENDPROC(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
++
++.align 8
++roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
++	roundsm32(%ymm4, %ymm5, %ymm6, %ymm7, %ymm0, %ymm1, %ymm2, %ymm3,
++		  %ymm12, %ymm13, %ymm14, %ymm15, %ymm8, %ymm9, %ymm10, %ymm11,
++		  %rax, (%r9));
++	ret;
++ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
++
++/*
++ * IN/OUT:
++ *  x0..x7: byte-sliced AB state preloaded
++ *  mem_ab: byte-sliced AB state in memory
++ *  mem_cb: byte-sliced CD state in memory
++ */
++#define two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, =
+y4, y5, \
++		      y6, y7, mem_ab, mem_cd, i, dir, store_ab) \
++	leaq (key_table + (i) * 8)(CTX), %r9; \
++	call roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd; \
++	\
++	vmovdqu x0, 4 * 32(mem_cd); \
++	vmovdqu x1, 5 * 32(mem_cd); \
++	vmovdqu x2, 6 * 32(mem_cd); \
++	vmovdqu x3, 7 * 32(mem_cd); \
++	vmovdqu x4, 0 * 32(mem_cd); \
++	vmovdqu x5, 1 * 32(mem_cd); \
++	vmovdqu x6, 2 * 32(mem_cd); \
++	vmovdqu x7, 3 * 32(mem_cd); \
++	\
++	leaq (key_table + ((i) + (dir)) * 8)(CTX), %r9; \
++	call roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab; \
++	\
++	store_ab(x0, x1, x2, x3, x4, x5, x6, x7, mem_ab);
++
++#define dummy_store(x0, x1, x2, x3, x4, x5, x6, x7, mem_ab) /* do noth=
+ing */
++
++#define store_ab_state(x0, x1, x2, x3, x4, x5, x6, x7, mem_ab) \
++	/* Store new AB state */ \
++	vmovdqu x4, 4 * 32(mem_ab); \
++	vmovdqu x5, 5 * 32(mem_ab); \
++	vmovdqu x6, 6 * 32(mem_ab); \
++	vmovdqu x7, 7 * 32(mem_ab); \
++	vmovdqu x0, 0 * 32(mem_ab); \
++	vmovdqu x1, 1 * 32(mem_ab); \
++	vmovdqu x2, 2 * 32(mem_ab); \
++	vmovdqu x3, 3 * 32(mem_ab);
++
++#define enc_rounds32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y=
+4, y5, \
++		      y6, y7, mem_ab, mem_cd, i) \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 2, 1, store_ab_state); \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 4, 1, store_ab_state); \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 6, 1, dummy_store);
++
++#define dec_rounds32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y=
+4, y5, \
++		      y6, y7, mem_ab, mem_cd, i) \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 7, -1, store_ab_state); \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 5, -1, store_ab_state); \
++	two_roundsm32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4, y5,=
+ \
++		      y6, y7, mem_ab, mem_cd, (i) + 3, -1, dummy_store);
++
++/*
++ * IN:
++ *  v0..3: byte-sliced 32-bit integers
++ * OUT:
++ *  v0..3: (IN <<< 1)
++ */
++#define rol32_1_32(v0, v1, v2, v3, t0, t1, t2, zero) \
++	vpcmpgtb v0, zero, t0; \
++	vpaddb v0, v0, v0; \
++	vpabsb t0, t0; \
++	\
++	vpcmpgtb v1, zero, t1; \
++	vpaddb v1, v1, v1; \
++	vpabsb t1, t1; \
++	\
++	vpcmpgtb v2, zero, t2; \
++	vpaddb v2, v2, v2; \
++	vpabsb t2, t2; \
++	\
++	vpor t0, v1, v1; \
++	\
++	vpcmpgtb v3, zero, t0; \
++	vpaddb v3, v3, v3; \
++	vpabsb t0, t0; \
++	\
++	vpor t1, v2, v2; \
++	vpor t2, v3, v3; \
++	vpor t0, v0, v0;
++
++/*
++ * IN:
++ *   r: byte-sliced AB state in memory
++ *   l: byte-sliced CD state in memory
++ * OUT:
++ *   x0..x7: new byte-sliced CD state
++ */
++#define fls32(l, l0, l1, l2, l3, l4, l5, l6, l7, r, t0, t1, t2, t3, tt=
+0, \
++	      tt1, tt2, tt3, kll, klr, krl, krr) \
++	/* \
++	 * t0 =3D kll; \
++	 * t0 &=3D ll; \
++	 * lr ^=3D rol32(t0, 1); \
++	 */ \
++	vpbroadcastd kll, t0; /* only lowest 32-bit used */ \
++	vpxor tt0, tt0, tt0; \
++	vpbroadcastb t0##_x, t3; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t2; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t1; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t0; \
++	\
++	vpand l0, t0, t0; \
++	vpand l1, t1, t1; \
++	vpand l2, t2, t2; \
++	vpand l3, t3, t3; \
++	\
++	rol32_1_32(t3, t2, t1, t0, tt1, tt2, tt3, tt0); \
++	\
++	vpxor l4, t0, l4; \
++	vmovdqu l4, 4 * 32(l); \
++	vpxor l5, t1, l5; \
++	vmovdqu l5, 5 * 32(l); \
++	vpxor l6, t2, l6; \
++	vmovdqu l6, 6 * 32(l); \
++	vpxor l7, t3, l7; \
++	vmovdqu l7, 7 * 32(l); \
++	\
++	/* \
++	 * t2 =3D krr; \
++	 * t2 |=3D rr; \
++	 * rl ^=3D t2; \
++	 */ \
++	\
++	vpbroadcastd krr, t0; /* only lowest 32-bit used */ \
++	vpbroadcastb t0##_x, t3; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t2; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t1; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t0; \
++	\
++	vpor 4 * 32(r), t0, t0; \
++	vpor 5 * 32(r), t1, t1; \
++	vpor 6 * 32(r), t2, t2; \
++	vpor 7 * 32(r), t3, t3; \
++	\
++	vpxor 0 * 32(r), t0, t0; \
++	vpxor 1 * 32(r), t1, t1; \
++	vpxor 2 * 32(r), t2, t2; \
++	vpxor 3 * 32(r), t3, t3; \
++	vmovdqu t0, 0 * 32(r); \
++	vmovdqu t1, 1 * 32(r); \
++	vmovdqu t2, 2 * 32(r); \
++	vmovdqu t3, 3 * 32(r); \
++	\
++	/* \
++	 * t2 =3D krl; \
++	 * t2 &=3D rl; \
++	 * rr ^=3D rol32(t2, 1); \
++	 */ \
++	vpbroadcastd krl, t0; /* only lowest 32-bit used */ \
++	vpbroadcastb t0##_x, t3; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t2; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t1; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t0; \
++	\
++	vpand 0 * 32(r), t0, t0; \
++	vpand 1 * 32(r), t1, t1; \
++	vpand 2 * 32(r), t2, t2; \
++	vpand 3 * 32(r), t3, t3; \
++	\
++	rol32_1_32(t3, t2, t1, t0, tt1, tt2, tt3, tt0); \
++	\
++	vpxor 4 * 32(r), t0, t0; \
++	vpxor 5 * 32(r), t1, t1; \
++	vpxor 6 * 32(r), t2, t2; \
++	vpxor 7 * 32(r), t3, t3; \
++	vmovdqu t0, 4 * 32(r); \
++	vmovdqu t1, 5 * 32(r); \
++	vmovdqu t2, 6 * 32(r); \
++	vmovdqu t3, 7 * 32(r); \
++	\
++	/* \
++	 * t0 =3D klr; \
++	 * t0 |=3D lr; \
++	 * ll ^=3D t0; \
++	 */ \
++	\
++	vpbroadcastd klr, t0; /* only lowest 32-bit used */ \
++	vpbroadcastb t0##_x, t3; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t2; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t1; \
++	vpsrldq $1, t0, t0; \
++	vpbroadcastb t0##_x, t0; \
++	\
++	vpor l4, t0, t0; \
++	vpor l5, t1, t1; \
++	vpor l6, t2, t2; \
++	vpor l7, t3, t3; \
++	\
++	vpxor l0, t0, l0; \
++	vmovdqu l0, 0 * 32(l); \
++	vpxor l1, t1, l1; \
++	vmovdqu l1, 1 * 32(l); \
++	vpxor l2, t2, l2; \
++	vmovdqu l2, 2 * 32(l); \
++	vpxor l3, t3, l3; \
++	vmovdqu l3, 3 * 32(l);
++
++#define transpose_4x4(x0, x1, x2, x3, t1, t2) \
++	vpunpckhdq x1, x0, t2; \
++	vpunpckldq x1, x0, x0; \
++	\
++	vpunpckldq x3, x2, t1; \
++	vpunpckhdq x3, x2, x2; \
++	\
++	vpunpckhqdq t1, x0, x1; \
++	vpunpcklqdq t1, x0, x0; \
++	\
++	vpunpckhqdq x2, t2, x3; \
++	vpunpcklqdq x2, t2, x2;
++
++#define byteslice_16x16b_fast(a0, b0, c0, d0, a1, b1, c1, d1, a2, b2, =
+c2, d2, \
++			      a3, b3, c3, d3, st0, st1) \
++	vmovdqu d2, st0; \
++	vmovdqu d3, st1; \
++	transpose_4x4(a0, a1, a2, a3, d2, d3); \
++	transpose_4x4(b0, b1, b2, b3, d2, d3); \
++	vmovdqu st0, d2; \
++	vmovdqu st1, d3; \
++	\
++	vmovdqu a0, st0; \
++	vmovdqu a1, st1; \
++	transpose_4x4(c0, c1, c2, c3, a0, a1); \
++	transpose_4x4(d0, d1, d2, d3, a0, a1); \
++	\
++	vbroadcasti128 .Lshufb_16x16b, a0; \
++	vmovdqu st1, a1; \
++	vpshufb a0, a2, a2; \
++	vpshufb a0, a3, a3; \
++	vpshufb a0, b0, b0; \
++	vpshufb a0, b1, b1; \
++	vpshufb a0, b2, b2; \
++	vpshufb a0, b3, b3; \
++	vpshufb a0, a1, a1; \
++	vpshufb a0, c0, c0; \
++	vpshufb a0, c1, c1; \
++	vpshufb a0, c2, c2; \
++	vpshufb a0, c3, c3; \
++	vpshufb a0, d0, d0; \
++	vpshufb a0, d1, d1; \
++	vpshufb a0, d2, d2; \
++	vpshufb a0, d3, d3; \
++	vmovdqu d3, st1; \
++	vmovdqu st0, d3; \
++	vpshufb a0, d3, a0; \
++	vmovdqu d2, st0; \
++	\
++	transpose_4x4(a0, b0, c0, d0, d2, d3); \
++	transpose_4x4(a1, b1, c1, d1, d2, d3); \
++	vmovdqu st0, d2; \
++	vmovdqu st1, d3; \
++	\
++	vmovdqu b0, st0; \
++	vmovdqu b1, st1; \
++	transpose_4x4(a2, b2, c2, d2, b0, b1); \
++	transpose_4x4(a3, b3, c3, d3, b0, b1); \
++	vmovdqu st0, b0; \
++	vmovdqu st1, b1; \
++	/* does not adjust output bytes inside vectors */
++
++/* load blocks to registers and apply pre-whitening */
++#define inpack32_pre(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y=
+4, y5, \
++		     y6, y7, rio, key) \
++	vpbroadcastq key, x0; \
++	vpshufb .Lpack_bswap, x0, x0; \
++	\
++	vpxor 0 * 32(rio), x0, y7; \
++	vpxor 1 * 32(rio), x0, y6; \
++	vpxor 2 * 32(rio), x0, y5; \
++	vpxor 3 * 32(rio), x0, y4; \
++	vpxor 4 * 32(rio), x0, y3; \
++	vpxor 5 * 32(rio), x0, y2; \
++	vpxor 6 * 32(rio), x0, y1; \
++	vpxor 7 * 32(rio), x0, y0; \
++	vpxor 8 * 32(rio), x0, x7; \
++	vpxor 9 * 32(rio), x0, x6; \
++	vpxor 10 * 32(rio), x0, x5; \
++	vpxor 11 * 32(rio), x0, x4; \
++	vpxor 12 * 32(rio), x0, x3; \
++	vpxor 13 * 32(rio), x0, x2; \
++	vpxor 14 * 32(rio), x0, x1; \
++	vpxor 15 * 32(rio), x0, x0;
++
++/* byteslice pre-whitened blocks and store to temporary memory */
++#define inpack32_post(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, =
+y4, y5, \
++		      y6, y7, mem_ab, mem_cd) \
++	byteslice_16x16b_fast(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3,=
+ \
++			      y4, y5, y6, y7, (mem_ab), (mem_cd)); \
++	\
++	vmovdqu x0, 0 * 32(mem_ab); \
++	vmovdqu x1, 1 * 32(mem_ab); \
++	vmovdqu x2, 2 * 32(mem_ab); \
++	vmovdqu x3, 3 * 32(mem_ab); \
++	vmovdqu x4, 4 * 32(mem_ab); \
++	vmovdqu x5, 5 * 32(mem_ab); \
++	vmovdqu x6, 6 * 32(mem_ab); \
++	vmovdqu x7, 7 * 32(mem_ab); \
++	vmovdqu y0, 0 * 32(mem_cd); \
++	vmovdqu y1, 1 * 32(mem_cd); \
++	vmovdqu y2, 2 * 32(mem_cd); \
++	vmovdqu y3, 3 * 32(mem_cd); \
++	vmovdqu y4, 4 * 32(mem_cd); \
++	vmovdqu y5, 5 * 32(mem_cd); \
++	vmovdqu y6, 6 * 32(mem_cd); \
++	vmovdqu y7, 7 * 32(mem_cd);
++
++/* de-byteslice, apply post-whitening and store blocks */
++#define outunpack32(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y4=
+, \
++		    y5, y6, y7, key, stack_tmp0, stack_tmp1) \
++	byteslice_16x16b_fast(y0, y4, x0, x4, y1, y5, x1, x5, y2, y6, x2, x6,=
+ \
++			      y3, y7, x3, x7, stack_tmp0, stack_tmp1); \
++	\
++	vmovdqu x0, stack_tmp0; \
++	\
++	vpbroadcastq key, x0; \
++	vpshufb .Lpack_bswap, x0, x0; \
++	\
++	vpxor x0, y7, y7; \
++	vpxor x0, y6, y6; \
++	vpxor x0, y5, y5; \
++	vpxor x0, y4, y4; \
++	vpxor x0, y3, y3; \
++	vpxor x0, y2, y2; \
++	vpxor x0, y1, y1; \
++	vpxor x0, y0, y0; \
++	vpxor x0, x7, x7; \
++	vpxor x0, x6, x6; \
++	vpxor x0, x5, x5; \
++	vpxor x0, x4, x4; \
++	vpxor x0, x3, x3; \
++	vpxor x0, x2, x2; \
++	vpxor x0, x1, x1; \
++	vpxor stack_tmp0, x0, x0;
++
++#define write_output(x0, x1, x2, x3, x4, x5, x6, x7, y0, y1, y2, y3, y=
+4, y5, \
++		     y6, y7, rio) \
++	vmovdqu x0, 0 * 32(rio); \
++	vmovdqu x1, 1 * 32(rio); \
++	vmovdqu x2, 2 * 32(rio); \
++	vmovdqu x3, 3 * 32(rio); \
++	vmovdqu x4, 4 * 32(rio); \
++	vmovdqu x5, 5 * 32(rio); \
++	vmovdqu x6, 6 * 32(rio); \
++	vmovdqu x7, 7 * 32(rio); \
++	vmovdqu y0, 8 * 32(rio); \
++	vmovdqu y1, 9 * 32(rio); \
++	vmovdqu y2, 10 * 32(rio); \
++	vmovdqu y3, 11 * 32(rio); \
++	vmovdqu y4, 12 * 32(rio); \
++	vmovdqu y5, 13 * 32(rio); \
++	vmovdqu y6, 14 * 32(rio); \
++	vmovdqu y7, 15 * 32(rio);
++
++.data
++.align 32
++
++#define SHUFB_BYTES(idx) \
++	0 + (idx), 4 + (idx), 8 + (idx), 12 + (idx)
++
++.Lshufb_16x16b:
++	.byte SHUFB_BYTES(0), SHUFB_BYTES(1), SHUFB_BYTES(2), SHUFB_BYTES(3)
++	.byte SHUFB_BYTES(0), SHUFB_BYTES(1), SHUFB_BYTES(2), SHUFB_BYTES(3)
++
++.Lpack_bswap:
++	.long 0x00010203, 0x04050607, 0x80808080, 0x80808080
++	.long 0x00010203, 0x04050607, 0x80808080, 0x80808080
++
++/* For CTR-mode IV byteswap */
++.Lbswap128_mask:
++	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
++
++/* For XTS mode */
++.Lxts_gf128mul_and_shl1_mask_0:
++	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
++.Lxts_gf128mul_and_shl1_mask_1:
++	.byte 0x0e, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0
++
++/*
++ * pre-SubByte transform
++ *
++ * pre-lookup for sbox1, sbox2, sbox3:
++ *   swap_bitendianness(
++ *       isom_map_camellia_to_aes(
++ *           camellia_f(
++ *               swap_bitendianess(in)
++ *           )
++ *       )
++ *   )
++ *
++ * (note: '=E2=8A=95 0xc5' inside camellia_f())
++ */
++.Lpre_tf_lo_s1:
++	.byte 0x45, 0xe8, 0x40, 0xed, 0x2e, 0x83, 0x2b, 0x86
++	.byte 0x4b, 0xe6, 0x4e, 0xe3, 0x20, 0x8d, 0x25, 0x88
++.Lpre_tf_hi_s1:
++	.byte 0x00, 0x51, 0xf1, 0xa0, 0x8a, 0xdb, 0x7b, 0x2a
++	.byte 0x09, 0x58, 0xf8, 0xa9, 0x83, 0xd2, 0x72, 0x23
++
++/*
++ * pre-SubByte transform
++ *
++ * pre-lookup for sbox4:
++ *   swap_bitendianness(
++ *       isom_map_camellia_to_aes(
++ *           camellia_f(
++ *               swap_bitendianess(in <<< 1)
++ *           )
++ *       )
++ *   )
++ *
++ * (note: '=E2=8A=95 0xc5' inside camellia_f())
++ */
++.Lpre_tf_lo_s4:
++	.byte 0x45, 0x40, 0x2e, 0x2b, 0x4b, 0x4e, 0x20, 0x25
++	.byte 0x14, 0x11, 0x7f, 0x7a, 0x1a, 0x1f, 0x71, 0x74
++.Lpre_tf_hi_s4:
++	.byte 0x00, 0xf1, 0x8a, 0x7b, 0x09, 0xf8, 0x83, 0x72
++	.byte 0xad, 0x5c, 0x27, 0xd6, 0xa4, 0x55, 0x2e, 0xdf
++
++/*
++ * post-SubByte transform
++ *
++ * post-lookup for sbox1, sbox4:
++ *  swap_bitendianness(
++ *      camellia_h(
++ *          isom_map_aes_to_camellia(
++ *              swap_bitendianness(
++ *                  aes_inverse_affine_transform(in)
++ *              )
++ *          )
++ *      )
++ *  )
++ *
++ * (note: '=E2=8A=95 0x6e' inside camellia_h())
++ */
++.Lpost_tf_lo_s1:
++	.byte 0x3c, 0xcc, 0xcf, 0x3f, 0x32, 0xc2, 0xc1, 0x31
++	.byte 0xdc, 0x2c, 0x2f, 0xdf, 0xd2, 0x22, 0x21, 0xd1
++.Lpost_tf_hi_s1:
++	.byte 0x00, 0xf9, 0x86, 0x7f, 0xd7, 0x2e, 0x51, 0xa8
++	.byte 0xa4, 0x5d, 0x22, 0xdb, 0x73, 0x8a, 0xf5, 0x0c
++
++/*
++ * post-SubByte transform
++ *
++ * post-lookup for sbox2:
++ *  swap_bitendianness(
++ *      camellia_h(
++ *          isom_map_aes_to_camellia(
++ *              swap_bitendianness(
++ *                  aes_inverse_affine_transform(in)
++ *              )
++ *          )
++ *      )
++ *  ) <<< 1
++ *
++ * (note: '=E2=8A=95 0x6e' inside camellia_h())
++ */
++.Lpost_tf_lo_s2:
++	.byte 0x78, 0x99, 0x9f, 0x7e, 0x64, 0x85, 0x83, 0x62
++	.byte 0xb9, 0x58, 0x5e, 0xbf, 0xa5, 0x44, 0x42, 0xa3
++.Lpost_tf_hi_s2:
++	.byte 0x00, 0xf3, 0x0d, 0xfe, 0xaf, 0x5c, 0xa2, 0x51
++	.byte 0x49, 0xba, 0x44, 0xb7, 0xe6, 0x15, 0xeb, 0x18
++
++/*
++ * post-SubByte transform
++ *
++ * post-lookup for sbox3:
++ *  swap_bitendianness(
++ *      camellia_h(
++ *          isom_map_aes_to_camellia(
++ *              swap_bitendianness(
++ *                  aes_inverse_affine_transform(in)
++ *              )
++ *          )
++ *      )
++ *  ) >>> 1
++ *
++ * (note: '=E2=8A=95 0x6e' inside camellia_h())
++ */
++.Lpost_tf_lo_s3:
++	.byte 0x1e, 0x66, 0xe7, 0x9f, 0x19, 0x61, 0xe0, 0x98
++	.byte 0x6e, 0x16, 0x97, 0xef, 0x69, 0x11, 0x90, 0xe8
++.Lpost_tf_hi_s3:
++	.byte 0x00, 0xfc, 0x43, 0xbf, 0xeb, 0x17, 0xa8, 0x54
++	.byte 0x52, 0xae, 0x11, 0xed, 0xb9, 0x45, 0xfa, 0x06
++
++/* For isolating SubBytes from AESENCLAST, inverse shift row */
++.Linv_shift_row:
++	.byte 0x00, 0x0d, 0x0a, 0x07, 0x04, 0x01, 0x0e, 0x0b
++	.byte 0x08, 0x05, 0x02, 0x0f, 0x0c, 0x09, 0x06, 0x03
++
++.align 4
++/* 4-bit mask */
++.L0f0f0f0f:
++	.long 0x0f0f0f0f
++
++.text
++
++.align 8
++__camellia_enc_blk32:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rax: temporary storage, 512 bytes
++	 *	%ymm0..%ymm15: 32 plaintext blocks
++	 * output:
++	 *	%ymm0..%ymm15: 32 encrypted blocks, order swapped:
++	 *       7, 8, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8
++	 */
++
++	leaq 8 * 32(%rax), %rcx;
++
++	inpack32_post(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		      %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		      %ymm15, %rax, %rcx);
++
++	enc_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 0);
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (8) * 8) + 0)(CTX),
++	      ((key_table + (8) * 8) + 4)(CTX),
++	      ((key_table + (8) * 8) + 8)(CTX),
++	      ((key_table + (8) * 8) + 12)(CTX));
++
++	enc_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 8);
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (16) * 8) + 0)(CTX),
++	      ((key_table + (16) * 8) + 4)(CTX),
++	      ((key_table + (16) * 8) + 8)(CTX),
++	      ((key_table + (16) * 8) + 12)(CTX));
++
++	enc_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 16);
++
++	movl $24, %r8d;
++	cmpl $16, key_length(CTX);
++	jne .Lenc_max32;
++
++.Lenc_done:
++	/* load CD for output */
++	vmovdqu 0 * 32(%rcx), %ymm8;
++	vmovdqu 1 * 32(%rcx), %ymm9;
++	vmovdqu 2 * 32(%rcx), %ymm10;
++	vmovdqu 3 * 32(%rcx), %ymm11;
++	vmovdqu 4 * 32(%rcx), %ymm12;
++	vmovdqu 5 * 32(%rcx), %ymm13;
++	vmovdqu 6 * 32(%rcx), %ymm14;
++	vmovdqu 7 * 32(%rcx), %ymm15;
++
++	outunpack32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		    %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		    %ymm15, (key_table)(CTX, %r8, 8), (%rax), 1 * 32(%rax));
++
++	ret;
++
++.align 8
++.Lenc_max32:
++	movl $32, %r8d;
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (24) * 8) + 0)(CTX),
++	      ((key_table + (24) * 8) + 4)(CTX),
++	      ((key_table + (24) * 8) + 8)(CTX),
++	      ((key_table + (24) * 8) + 12)(CTX));
++
++	enc_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 24);
++
++	jmp .Lenc_done;
++ENDPROC(__camellia_enc_blk32)
++
++.align 8
++__camellia_dec_blk32:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rax: temporary storage, 512 bytes
++	 *	%r8d: 24 for 16 byte key, 32 for larger
++	 *	%ymm0..%ymm15: 16 encrypted blocks
++	 * output:
++	 *	%ymm0..%ymm15: 16 plaintext blocks, order swapped:
++	 *       7, 8, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8
++	 */
++
++	leaq 8 * 32(%rax), %rcx;
++
++	inpack32_post(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		      %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		      %ymm15, %rax, %rcx);
++
++	cmpl $32, %r8d;
++	je .Ldec_max32;
++
++.Ldec_max24:
++	dec_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 16);
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (16) * 8) + 8)(CTX),
++	      ((key_table + (16) * 8) + 12)(CTX),
++	      ((key_table + (16) * 8) + 0)(CTX),
++	      ((key_table + (16) * 8) + 4)(CTX));
++
++	dec_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 8);
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (8) * 8) + 8)(CTX),
++	      ((key_table + (8) * 8) + 12)(CTX),
++	      ((key_table + (8) * 8) + 0)(CTX),
++	      ((key_table + (8) * 8) + 4)(CTX));
++
++	dec_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 0);
++
++	/* load CD for output */
++	vmovdqu 0 * 32(%rcx), %ymm8;
++	vmovdqu 1 * 32(%rcx), %ymm9;
++	vmovdqu 2 * 32(%rcx), %ymm10;
++	vmovdqu 3 * 32(%rcx), %ymm11;
++	vmovdqu 4 * 32(%rcx), %ymm12;
++	vmovdqu 5 * 32(%rcx), %ymm13;
++	vmovdqu 6 * 32(%rcx), %ymm14;
++	vmovdqu 7 * 32(%rcx), %ymm15;
++
++	outunpack32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		    %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		    %ymm15, (key_table)(CTX), (%rax), 1 * 32(%rax));
++
++	ret;
++
++.align 8
++.Ldec_max32:
++	dec_rounds32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rax, %rcx, 24);
++
++	fls32(%rax, %ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++	      %rcx, %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++	      %ymm15,
++	      ((key_table + (24) * 8) + 8)(CTX),
++	      ((key_table + (24) * 8) + 12)(CTX),
++	      ((key_table + (24) * 8) + 0)(CTX),
++	      ((key_table + (24) * 8) + 4)(CTX));
++
++	jmp .Ldec_max24;
++ENDPROC(__camellia_dec_blk32)
++
++ENTRY(camellia_ecb_enc_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 */
++
++	vzeroupper;
++
++	inpack32_pre(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rdx, (key_table)(CTX));
++
++	/* now dst can be used as temporary buffer (even in src =3D=3D dst ca=
+se) */
++	movq	%rsi, %rax;
++
++	call __camellia_enc_blk32;
++
++	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
++		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
++		     %ymm8, %rsi);
++
++	vzeroupper;
++
++	ret;
++ENDPROC(camellia_ecb_enc_32way)
++
++ENTRY(camellia_ecb_dec_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 */
++
++	vzeroupper;
++
++	cmpl $16, key_length(CTX);
++	movl $32, %r8d;
++	movl $24, %eax;
++	cmovel %eax, %r8d; /* max */
++
++	inpack32_pre(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rdx, (key_table)(CTX, %r8, 8));
++
++	/* now dst can be used as temporary buffer (even in src =3D=3D dst ca=
+se) */
++	movq	%rsi, %rax;
++
++	call __camellia_dec_blk32;
++
++	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
++		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
++		     %ymm8, %rsi);
++
++	vzeroupper;
++
++	ret;
++ENDPROC(camellia_ecb_dec_32way)
++
++ENTRY(camellia_cbc_dec_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 */
++
++	vzeroupper;
++
++	cmpl $16, key_length(CTX);
++	movl $32, %r8d;
++	movl $24, %eax;
++	cmovel %eax, %r8d; /* max */
++
++	inpack32_pre(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
++		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
++		     %ymm15, %rdx, (key_table)(CTX, %r8, 8));
++
++	movq %rsp, %r10;
++	cmpq %rsi, %rdx;
++	je .Lcbc_dec_use_stack;
++
++	/* dst can be used as temporary storage, src is not overwritten. */
++	movq %rsi, %rax;
++	jmp .Lcbc_dec_continue;
++
++.Lcbc_dec_use_stack:
++	/*
++	 * dst still in-use (because dst =3D=3D src), so use stack for tempor=
+ary
++	 * storage.
++	 */
++	subq $(16 * 32), %rsp;
++	movq %rsp, %rax;
++
++.Lcbc_dec_continue:
++	call __camellia_dec_blk32;
++
++	vmovdqu %ymm7, (%rax);
++	vpxor %ymm7, %ymm7, %ymm7;
++	vinserti128 $1, (%rdx), %ymm7, %ymm7;
++	vpxor (%rax), %ymm7, %ymm7;
++	movq %r10, %rsp;
++	vpxor (0 * 32 + 16)(%rdx), %ymm6, %ymm6;
++	vpxor (1 * 32 + 16)(%rdx), %ymm5, %ymm5;
++	vpxor (2 * 32 + 16)(%rdx), %ymm4, %ymm4;
++	vpxor (3 * 32 + 16)(%rdx), %ymm3, %ymm3;
++	vpxor (4 * 32 + 16)(%rdx), %ymm2, %ymm2;
++	vpxor (5 * 32 + 16)(%rdx), %ymm1, %ymm1;
++	vpxor (6 * 32 + 16)(%rdx), %ymm0, %ymm0;
++	vpxor (7 * 32 + 16)(%rdx), %ymm15, %ymm15;
++	vpxor (8 * 32 + 16)(%rdx), %ymm14, %ymm14;
++	vpxor (9 * 32 + 16)(%rdx), %ymm13, %ymm13;
++	vpxor (10 * 32 + 16)(%rdx), %ymm12, %ymm12;
++	vpxor (11 * 32 + 16)(%rdx), %ymm11, %ymm11;
++	vpxor (12 * 32 + 16)(%rdx), %ymm10, %ymm10;
++	vpxor (13 * 32 + 16)(%rdx), %ymm9, %ymm9;
++	vpxor (14 * 32 + 16)(%rdx), %ymm8, %ymm8;
++	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
++		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
++		     %ymm8, %rsi);
++
++	vzeroupper;
++
++	ret;
++ENDPROC(camellia_cbc_dec_32way)
++
++#define inc_le128(x, minus_one, tmp) \
++	vpcmpeqq minus_one, x, tmp; \
++	vpsubq minus_one, x, x; \
++	vpslldq $8, tmp, tmp; \
++	vpsubq tmp, x, x;
++
++#define add2_le128(x, minus_one, minus_two, tmp1, tmp2) \
++	vpcmpeqq minus_one, x, tmp1; \
++	vpcmpeqq minus_two, x, tmp2; \
++	vpsubq minus_two, x, x; \
++	vpor tmp2, tmp1, tmp1; \
++	vpslldq $8, tmp1, tmp1; \
++	vpsubq tmp1, x, x;
++
++ENTRY(camellia_ctr_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 *	%rcx: iv (little endian, 128bit)
++	 */
++
++	vzeroupper;
++
++	movq %rsp, %r10;
++	cmpq %rsi, %rdx;
++	je .Lctr_use_stack;
++
++	/* dst can be used as temporary storage, src is not overwritten. */
++	movq %rsi, %rax;
++	jmp .Lctr_continue;
++
++.Lctr_use_stack:
++	subq $(16 * 32), %rsp;
++	movq %rsp, %rax;
++
++.Lctr_continue:
++	vpcmpeqd %ymm15, %ymm15, %ymm15;
++	vpsrldq $8, %ymm15, %ymm15; /* ab: -1:0 ; cd: -1:0 */
++	vpaddq %ymm15, %ymm15, %ymm12; /* ab: -2:0 ; cd: -2:0 */
++
++	/* load IV and byteswap */
++	vmovdqu (%rcx), %xmm0;
++	vmovdqa %xmm0, %xmm1;
++	inc_le128(%xmm0, %xmm15, %xmm14);
++	vbroadcasti128 .Lbswap128_mask, %ymm14;
++	vinserti128 $1, %xmm0, %ymm1, %ymm0;
++	vpshufb %ymm14, %ymm0, %ymm13;
++	vmovdqu %ymm13, 15 * 32(%rax);
++
++	/* construct IVs */
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13); /* ab:le2 ; cd:le3=
+ */
++	vpshufb %ymm14, %ymm0, %ymm13;
++	vmovdqu %ymm13, 14 * 32(%rax);
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm13;
++	vmovdqu %ymm13, 13 * 32(%rax);
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm13;
++	vmovdqu %ymm13, 12 * 32(%rax);
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm13;
++	vmovdqu %ymm13, 11 * 32(%rax);
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm10;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm9;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm8;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm7;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm6;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm5;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm4;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm3;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm2;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vpshufb %ymm14, %ymm0, %ymm1;
++	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
++	vextracti128 $1, %ymm0, %xmm13;
++	vpshufb %ymm14, %ymm0, %ymm0;
++	inc_le128(%xmm13, %xmm15, %xmm14);
++	vmovdqu %xmm13, (%rcx);
++
++	/* inpack32_pre: */
++	vpbroadcastq (key_table)(CTX), %ymm15;
++	vpshufb .Lpack_bswap, %ymm15, %ymm15;
++	vpxor %ymm0, %ymm15, %ymm0;
++	vpxor %ymm1, %ymm15, %ymm1;
++	vpxor %ymm2, %ymm15, %ymm2;
++	vpxor %ymm3, %ymm15, %ymm3;
++	vpxor %ymm4, %ymm15, %ymm4;
++	vpxor %ymm5, %ymm15, %ymm5;
++	vpxor %ymm6, %ymm15, %ymm6;
++	vpxor %ymm7, %ymm15, %ymm7;
++	vpxor %ymm8, %ymm15, %ymm8;
++	vpxor %ymm9, %ymm15, %ymm9;
++	vpxor %ymm10, %ymm15, %ymm10;
++	vpxor 11 * 32(%rax), %ymm15, %ymm11;
++	vpxor 12 * 32(%rax), %ymm15, %ymm12;
++	vpxor 13 * 32(%rax), %ymm15, %ymm13;
++	vpxor 14 * 32(%rax), %ymm15, %ymm14;
++	vpxor 15 * 32(%rax), %ymm15, %ymm15;
++
++	call __camellia_enc_blk32;
++
++	movq %r10, %rsp;
++
++	vpxor 0 * 32(%rdx), %ymm7, %ymm7;
++	vpxor 1 * 32(%rdx), %ymm6, %ymm6;
++	vpxor 2 * 32(%rdx), %ymm5, %ymm5;
++	vpxor 3 * 32(%rdx), %ymm4, %ymm4;
++	vpxor 4 * 32(%rdx), %ymm3, %ymm3;
++	vpxor 5 * 32(%rdx), %ymm2, %ymm2;
++	vpxor 6 * 32(%rdx), %ymm1, %ymm1;
++	vpxor 7 * 32(%rdx), %ymm0, %ymm0;
++	vpxor 8 * 32(%rdx), %ymm15, %ymm15;
++	vpxor 9 * 32(%rdx), %ymm14, %ymm14;
++	vpxor 10 * 32(%rdx), %ymm13, %ymm13;
++	vpxor 11 * 32(%rdx), %ymm12, %ymm12;
++	vpxor 12 * 32(%rdx), %ymm11, %ymm11;
++	vpxor 13 * 32(%rdx), %ymm10, %ymm10;
++	vpxor 14 * 32(%rdx), %ymm9, %ymm9;
++	vpxor 15 * 32(%rdx), %ymm8, %ymm8;
++	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
++		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
++		     %ymm8, %rsi);
++
++	vzeroupper;
++
++	ret;
++ENDPROC(camellia_ctr_32way)
++
++#define gf128mul_x_ble(iv, mask, tmp) \
++	vpsrad $31, iv, tmp; \
++	vpaddq iv, iv, iv; \
++	vpshufd $0x13, tmp, tmp; \
++	vpand mask, tmp, tmp; \
++	vpxor tmp, iv, iv;
++
++#define gf128mul_x2_ble(iv, mask1, mask2, tmp0, tmp1) \
++	vpsrad $31, iv, tmp0; \
++	vpaddq iv, iv, tmp1; \
++	vpsllq $2, iv, iv; \
++	vpshufd $0x13, tmp0, tmp0; \
++	vpsrad $31, tmp1, tmp1; \
++	vpand mask2, tmp0, tmp0; \
++	vpshufd $0x13, tmp1, tmp1; \
++	vpxor tmp0, iv, iv; \
++	vpand mask1, tmp1, tmp1; \
++	vpxor tmp1, iv, iv;
++
++.align 8
++camellia_xts_crypt_32way:
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
++	 *	%r8: index for input whitening key
++	 *	%r9: pointer to  __camellia_enc_blk32 or __camellia_dec_blk32
++	 */
++
++	vzeroupper;
++
++	subq $(16 * 32), %rsp;
++	movq %rsp, %rax;
++
++	vbroadcasti128 .Lxts_gf128mul_and_shl1_mask_0, %ymm12;
++
++	/* load IV and construct second IV */
++	vmovdqu (%rcx), %xmm0;
++	vmovdqa %xmm0, %xmm15;
++	gf128mul_x_ble(%xmm0, %xmm12, %xmm13);
++	vbroadcasti128 .Lxts_gf128mul_and_shl1_mask_1, %ymm13;
++	vinserti128 $1, %xmm0, %ymm15, %ymm0;
++	vpxor 0 * 32(%rdx), %ymm0, %ymm15;
++	vmovdqu %ymm15, 15 * 32(%rax);
++	vmovdqu %ymm0, 0 * 32(%rsi);
++
++	/* construct IVs */
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 1 * 32(%rdx), %ymm0, %ymm15;
++	vmovdqu %ymm15, 14 * 32(%rax);
++	vmovdqu %ymm0, 1 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 2 * 32(%rdx), %ymm0, %ymm15;
++	vmovdqu %ymm15, 13 * 32(%rax);
++	vmovdqu %ymm0, 2 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 3 * 32(%rdx), %ymm0, %ymm15;
++	vmovdqu %ymm15, 12 * 32(%rax);
++	vmovdqu %ymm0, 3 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 4 * 32(%rdx), %ymm0, %ymm11;
++	vmovdqu %ymm0, 4 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 5 * 32(%rdx), %ymm0, %ymm10;
++	vmovdqu %ymm0, 5 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 6 * 32(%rdx), %ymm0, %ymm9;
++	vmovdqu %ymm0, 6 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 7 * 32(%rdx), %ymm0, %ymm8;
++	vmovdqu %ymm0, 7 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 8 * 32(%rdx), %ymm0, %ymm7;
++	vmovdqu %ymm0, 8 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 9 * 32(%rdx), %ymm0, %ymm6;
++	vmovdqu %ymm0, 9 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 10 * 32(%rdx), %ymm0, %ymm5;
++	vmovdqu %ymm0, 10 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 11 * 32(%rdx), %ymm0, %ymm4;
++	vmovdqu %ymm0, 11 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 12 * 32(%rdx), %ymm0, %ymm3;
++	vmovdqu %ymm0, 12 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 13 * 32(%rdx), %ymm0, %ymm2;
++	vmovdqu %ymm0, 13 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 14 * 32(%rdx), %ymm0, %ymm1;
++	vmovdqu %ymm0, 14 * 32(%rsi);
++
++	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
++	vpxor 15 * 32(%rdx), %ymm0, %ymm15;
++	vmovdqu %ymm15, 0 * 32(%rax);
++	vmovdqu %ymm0, 15 * 32(%rsi);
++
++	vextracti128 $1, %ymm0, %xmm0;
++	gf128mul_x_ble(%xmm0, %xmm12, %xmm15);
++	vmovdqu %xmm0, (%rcx);
++
++	/* inpack32_pre: */
++	vpbroadcastq (key_table)(CTX, %r8, 8), %ymm15;
++	vpshufb .Lpack_bswap, %ymm15, %ymm15;
++	vpxor 0 * 32(%rax), %ymm15, %ymm0;
++	vpxor %ymm1, %ymm15, %ymm1;
++	vpxor %ymm2, %ymm15, %ymm2;
++	vpxor %ymm3, %ymm15, %ymm3;
++	vpxor %ymm4, %ymm15, %ymm4;
++	vpxor %ymm5, %ymm15, %ymm5;
++	vpxor %ymm6, %ymm15, %ymm6;
++	vpxor %ymm7, %ymm15, %ymm7;
++	vpxor %ymm8, %ymm15, %ymm8;
++	vpxor %ymm9, %ymm15, %ymm9;
++	vpxor %ymm10, %ymm15, %ymm10;
++	vpxor %ymm11, %ymm15, %ymm11;
++	vpxor 12 * 32(%rax), %ymm15, %ymm12;
++	vpxor 13 * 32(%rax), %ymm15, %ymm13;
++	vpxor 14 * 32(%rax), %ymm15, %ymm14;
++	vpxor 15 * 32(%rax), %ymm15, %ymm15;
++
++	call *%r9;
++
++	addq $(16 * 32), %rsp;
++
++	vpxor 0 * 32(%rsi), %ymm7, %ymm7;
++	vpxor 1 * 32(%rsi), %ymm6, %ymm6;
++	vpxor 2 * 32(%rsi), %ymm5, %ymm5;
++	vpxor 3 * 32(%rsi), %ymm4, %ymm4;
++	vpxor 4 * 32(%rsi), %ymm3, %ymm3;
++	vpxor 5 * 32(%rsi), %ymm2, %ymm2;
++	vpxor 6 * 32(%rsi), %ymm1, %ymm1;
++	vpxor 7 * 32(%rsi), %ymm0, %ymm0;
++	vpxor 8 * 32(%rsi), %ymm15, %ymm15;
++	vpxor 9 * 32(%rsi), %ymm14, %ymm14;
++	vpxor 10 * 32(%rsi), %ymm13, %ymm13;
++	vpxor 11 * 32(%rsi), %ymm12, %ymm12;
++	vpxor 12 * 32(%rsi), %ymm11, %ymm11;
++	vpxor 13 * 32(%rsi), %ymm10, %ymm10;
++	vpxor 14 * 32(%rsi), %ymm9, %ymm9;
++	vpxor 15 * 32(%rsi), %ymm8, %ymm8;
++	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
++		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
++		     %ymm8, %rsi);
++
++	vzeroupper;
++
++	ret;
++ENDPROC(camellia_xts_crypt_32way)
++
++ENTRY(camellia_xts_enc_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
++	 */
++
++	xorl %r8d, %r8d; /* input whitening key, 0 for enc */
++
++	leaq __camellia_enc_blk32, %r9;
++
++	jmp camellia_xts_crypt_32way;
++ENDPROC(camellia_xts_enc_32way)
++
++ENTRY(camellia_xts_dec_32way)
++	/* input:
++	 *	%rdi: ctx, CTX
++	 *	%rsi: dst (32 blocks)
++	 *	%rdx: src (32 blocks)
++	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
++	 */
++
++	cmpl $16, key_length(CTX);
++	movl $32, %r8d;
++	movl $24, %eax;
++	cmovel %eax, %r8d;  /* input whitening key, last for dec */
++
++	leaq __camellia_dec_blk32, %r9;
++
++	jmp camellia_xts_crypt_32way;
++ENDPROC(camellia_xts_dec_32way)
+diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/cryp=
+to/camellia_aesni_avx2_glue.c
+new file mode 100644
+index 0000000..414fe5d
+--- /dev/null
++++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+@@ -0,0 +1,586 @@
++/*
++ * Glue Code for x86_64/AVX2/AES-NI assembler optimized version of Cam=
+ellia
++ *
++ * Copyright =C2=A9 2013 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * This program is free software; you can redistribute it and/or modif=
+y
++ * it under the terms of the GNU General Public License as published b=
+y
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ */
++
++#include <linux/module.h>
++#include <linux/types.h>
++#include <linux/crypto.h>
++#include <linux/err.h>
++#include <crypto/algapi.h>
++#include <crypto/ctr.h>
++#include <crypto/lrw.h>
++#include <crypto/xts.h>
++#include <asm/xcr.h>
++#include <asm/xsave.h>
++#include <asm/crypto/camellia.h>
++#include <asm/crypto/ablk_helper.h>
++#include <asm/crypto/glue_helper.h>
++
++#define CAMELLIA_AESNI_PARALLEL_BLOCKS 16
++#define CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS 32
++
++/* 32-way AVX2/AES-NI parallel cipher functions */
++asmlinkage void camellia_ecb_enc_32way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++asmlinkage void camellia_ecb_dec_32way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++
++asmlinkage void camellia_cbc_dec_32way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++asmlinkage void camellia_ctr_32way(struct camellia_ctx *ctx, u8 *dst,
++				   const u8 *src, le128 *iv);
++
++asmlinkage void camellia_xts_enc_32way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src, le128 *iv);
++asmlinkage void camellia_xts_dec_32way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src, le128 *iv);
++
++static const struct common_glue_ctx camellia_enc =3D {
++	.num_funcs =3D 4,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_ecb_enc_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_ecb_enc_16way) }
++	}, {
++		.num_blocks =3D 2,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_enc_blk_2way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_enc_blk) }
++	} }
++};
++
++static const struct common_glue_ctx camellia_ctr =3D {
++	.num_funcs =3D 4,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(camellia_ctr_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(camellia_ctr_16way) }
++	}, {
++		.num_blocks =3D 2,
++		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(camellia_crypt_ctr_2way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(camellia_crypt_ctr) }
++	} }
++};
++
++static const struct common_glue_ctx camellia_enc_xts =3D {
++	.num_funcs =3D 3,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_enc_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_enc_16way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_enc) }
++	} }
++};
++
++static const struct common_glue_ctx camellia_dec =3D {
++	.num_funcs =3D 4,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_ecb_dec_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_ecb_dec_16way) }
++	}, {
++		.num_blocks =3D 2,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_dec_blk_2way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(camellia_dec_blk) }
++	} }
++};
++
++static const struct common_glue_ctx camellia_dec_cbc =3D {
++	.num_funcs =3D 4,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(camellia_cbc_dec_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(camellia_cbc_dec_16way) }
++	}, {
++		.num_blocks =3D 2,
++		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(camellia_decrypt_cbc_2way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(camellia_dec_blk) }
++	} }
++};
++
++static const struct common_glue_ctx camellia_dec_xts =3D {
++	.num_funcs =3D 3,
++	.fpu_blocks_limit =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++
++	.funcs =3D { {
++		.num_blocks =3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_dec_32way) }
++	}, {
++		.num_blocks =3D CAMELLIA_AESNI_PARALLEL_BLOCKS,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_dec_16way) }
++	}, {
++		.num_blocks =3D 1,
++		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(camellia_xts_dec) }
++	} }
++};
++
++static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	return glue_ecb_crypt_128bit(&camellia_enc, desc, dst, src, nbytes);
++}
++
++static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	return glue_ecb_crypt_128bit(&camellia_dec, desc, dst, src, nbytes);
++}
++
++static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	return glue_cbc_encrypt_128bit(GLUE_FUNC_CAST(camellia_enc_blk), desc=
+,
++				       dst, src, nbytes);
++}
++
++static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	return glue_cbc_decrypt_128bit(&camellia_dec_cbc, desc, dst, src,
++				       nbytes);
++}
++
++static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *=
+dst,
++		     struct scatterlist *src, unsigned int nbytes)
++{
++	return glue_ctr_crypt_128bit(&camellia_ctr, desc, dst, src, nbytes);
++}
++
++static inline bool camellia_fpu_begin(bool fpu_enabled, unsigned int n=
+bytes)
++{
++	return glue_fpu_begin(CAMELLIA_BLOCK_SIZE,
++			      CAMELLIA_AESNI_PARALLEL_BLOCKS, NULL, fpu_enabled,
++			      nbytes);
++}
++
++static inline void camellia_fpu_end(bool fpu_enabled)
++{
++	glue_fpu_end(fpu_enabled);
++}
++
++static int camellia_setkey(struct crypto_tfm *tfm, const u8 *in_key,
++			   unsigned int key_len)
++{
++	return __camellia_setkey(crypto_tfm_ctx(tfm), in_key, key_len,
++				 &tfm->crt_flags);
++}
++
++struct crypt_priv {
++	struct camellia_ctx *ctx;
++	bool fpu_enabled;
++};
++
++static void encrypt_callback(void *priv, u8 *srcdst, unsigned int nbyt=
+es)
++{
++	const unsigned int bsize =3D CAMELLIA_BLOCK_SIZE;
++	struct crypt_priv *ctx =3D priv;
++	int i;
++
++	ctx->fpu_enabled =3D camellia_fpu_begin(ctx->fpu_enabled, nbytes);
++
++	if (nbytes >=3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS * bsize) {
++		camellia_ecb_enc_32way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS;
++	}
++
++	if (nbytes >=3D CAMELLIA_AESNI_PARALLEL_BLOCKS * bsize) {
++		camellia_ecb_enc_16way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_AESNI_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_AESNI_PARALLEL_BLOCKS;
++	}
++
++	while (nbytes >=3D CAMELLIA_PARALLEL_BLOCKS * bsize) {
++		camellia_enc_blk_2way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_PARALLEL_BLOCKS;
++	}
++
++	for (i =3D 0; i < nbytes / bsize; i++, srcdst +=3D bsize)
++		camellia_enc_blk(ctx->ctx, srcdst, srcdst);
++}
++
++static void decrypt_callback(void *priv, u8 *srcdst, unsigned int nbyt=
+es)
++{
++	const unsigned int bsize =3D CAMELLIA_BLOCK_SIZE;
++	struct crypt_priv *ctx =3D priv;
++	int i;
++
++	ctx->fpu_enabled =3D camellia_fpu_begin(ctx->fpu_enabled, nbytes);
++
++	if (nbytes >=3D CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS * bsize) {
++		camellia_ecb_dec_32way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS;
++	}
++
++	if (nbytes >=3D CAMELLIA_AESNI_PARALLEL_BLOCKS * bsize) {
++		camellia_ecb_dec_16way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_AESNI_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_AESNI_PARALLEL_BLOCKS;
++	}
++
++	while (nbytes >=3D CAMELLIA_PARALLEL_BLOCKS * bsize) {
++		camellia_dec_blk_2way(ctx->ctx, srcdst, srcdst);
++		srcdst +=3D bsize * CAMELLIA_PARALLEL_BLOCKS;
++		nbytes -=3D bsize * CAMELLIA_PARALLEL_BLOCKS;
++	}
++
++	for (i =3D 0; i < nbytes / bsize; i++, srcdst +=3D bsize)
++		camellia_dec_blk(ctx->ctx, srcdst, srcdst);
++}
++
++static int lrw_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_lrw_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS];
++	struct crypt_priv crypt_ctx =3D {
++		.ctx =3D &ctx->camellia_ctx,
++		.fpu_enabled =3D false,
++	};
++	struct lrw_crypt_req req =3D {
++		.tbuf =3D buf,
++		.tbuflen =3D sizeof(buf),
++
++		.table_ctx =3D &ctx->lrw_table,
++		.crypt_ctx =3D &crypt_ctx,
++		.crypt_fn =3D encrypt_callback,
++	};
++	int ret;
++
++	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	ret =3D lrw_crypt(desc, dst, src, nbytes, &req);
++	camellia_fpu_end(crypt_ctx.fpu_enabled);
++
++	return ret;
++}
++
++static int lrw_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_lrw_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
++	be128 buf[CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS];
++	struct crypt_priv crypt_ctx =3D {
++		.ctx =3D &ctx->camellia_ctx,
++		.fpu_enabled =3D false,
++	};
++	struct lrw_crypt_req req =3D {
++		.tbuf =3D buf,
++		.tbuflen =3D sizeof(buf),
++
++		.table_ctx =3D &ctx->lrw_table,
++		.crypt_ctx =3D &crypt_ctx,
++		.crypt_fn =3D decrypt_callback,
++	};
++	int ret;
++
++	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	ret =3D lrw_crypt(desc, dst, src, nbytes, &req);
++	camellia_fpu_end(crypt_ctx.fpu_enabled);
++
++	return ret;
++}
++
++static int xts_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_xts_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
++
++	return glue_xts_crypt_128bit(&camellia_enc_xts, desc, dst, src, nbyte=
+s,
++				     XTS_TWEAK_CAST(camellia_enc_blk),
++				     &ctx->tweak_ctx, &ctx->crypt_ctx);
++}
++
++static int xts_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct camellia_xts_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
++
++	return glue_xts_crypt_128bit(&camellia_dec_xts, desc, dst, src, nbyte=
+s,
++				     XTS_TWEAK_CAST(camellia_enc_blk),
++				     &ctx->tweak_ctx, &ctx->crypt_ctx);
++}
++
++static struct crypto_alg cmll_algs[10] =3D { {
++	.cra_name		=3D "__ecb-camellia-aesni-avx2",
++	.cra_driver_name	=3D "__driver-ecb-camellia-aesni-avx2",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct camellia_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_blkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_u =3D {
++		.blkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.setkey		=3D camellia_setkey,
++			.encrypt	=3D ecb_encrypt,
++			.decrypt	=3D ecb_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "__cbc-camellia-aesni-avx2",
++	.cra_driver_name	=3D "__driver-cbc-camellia-aesni-avx2",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct camellia_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_blkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_u =3D {
++		.blkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.setkey		=3D camellia_setkey,
++			.encrypt	=3D cbc_encrypt,
++			.decrypt	=3D cbc_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "__ctr-camellia-aesni-avx2",
++	.cra_driver_name	=3D "__driver-ctr-camellia-aesni-avx2",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=3D 1,
++	.cra_ctxsize		=3D sizeof(struct camellia_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_blkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_u =3D {
++		.blkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D camellia_setkey,
++			.encrypt	=3D ctr_crypt,
++			.decrypt	=3D ctr_crypt,
++		},
++	},
++}, {
++	.cra_name		=3D "__lrw-camellia-aesni-avx2",
++	.cra_driver_name	=3D "__driver-lrw-camellia-aesni-avx2",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct camellia_lrw_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_blkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_exit		=3D lrw_camellia_exit_tfm,
++	.cra_u =3D {
++		.blkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE +
++					  CAMELLIA_BLOCK_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE +
++					  CAMELLIA_BLOCK_SIZE,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D lrw_camellia_setkey,
++			.encrypt	=3D lrw_encrypt,
++			.decrypt	=3D lrw_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "__xts-camellia-aesni-avx2",
++	.cra_driver_name	=3D "__driver-xts-camellia-aesni-avx2",
++	.cra_priority		=3D 0,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct camellia_xts_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_blkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_u =3D {
++		.blkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE * 2,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE * 2,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D xts_camellia_setkey,
++			.encrypt	=3D xts_encrypt,
++			.decrypt	=3D xts_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "ecb(camellia)",
++	.cra_driver_name	=3D "ecb-camellia-aesni-avx2",
++	.cra_priority		=3D 500,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_init		=3D ablk_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "cbc(camellia)",
++	.cra_driver_name	=3D "cbc-camellia-aesni-avx2",
++	.cra_priority		=3D 500,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_init		=3D ablk_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D __ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "ctr(camellia)",
++	.cra_driver_name	=3D "ctr-camellia-aesni-avx2",
++	.cra_priority		=3D 500,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D 1,
++	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_init		=3D ablk_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_encrypt,
++			.geniv		=3D "chainiv",
++		},
++	},
++}, {
++	.cra_name		=3D "lrw(camellia)",
++	.cra_driver_name	=3D "lrw-camellia-aesni-avx2",
++	.cra_priority		=3D 500,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_init		=3D ablk_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE +
++					  CAMELLIA_BLOCK_SIZE,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE +
++					  CAMELLIA_BLOCK_SIZE,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++}, {
++	.cra_name		=3D "xts(camellia)",
++	.cra_driver_name	=3D "xts-camellia-aesni-avx2",
++	.cra_priority		=3D 500,
++	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
++	.cra_blocksize		=3D CAMELLIA_BLOCK_SIZE,
++	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
++	.cra_alignmask		=3D 0,
++	.cra_type		=3D &crypto_ablkcipher_type,
++	.cra_module		=3D THIS_MODULE,
++	.cra_init		=3D ablk_init,
++	.cra_exit		=3D ablk_exit,
++	.cra_u =3D {
++		.ablkcipher =3D {
++			.min_keysize	=3D CAMELLIA_MIN_KEY_SIZE * 2,
++			.max_keysize	=3D CAMELLIA_MAX_KEY_SIZE * 2,
++			.ivsize		=3D CAMELLIA_BLOCK_SIZE,
++			.setkey		=3D ablk_set_key,
++			.encrypt	=3D ablk_encrypt,
++			.decrypt	=3D ablk_decrypt,
++		},
++	},
++} };
++
++static int __init camellia_aesni_init(void)
++{
++	u64 xcr0;
++
++	if (!cpu_has_avx2 || !cpu_has_avx || !cpu_has_aes || !cpu_has_osxsave=
+) {
++		pr_info("AVX2 or AES-NI instructions are not detected.\n");
++		return -ENODEV;
++	}
++
++	xcr0 =3D xgetbv(XCR_XFEATURE_ENABLED_MASK);
++	if ((xcr0 & (XSTATE_SSE | XSTATE_YMM)) !=3D (XSTATE_SSE | XSTATE_YMM)=
+) {
++		pr_info("AVX2 detected but unusable.\n");
++		return -ENODEV;
++	}
++
++	return crypto_register_algs(cmll_algs, ARRAY_SIZE(cmll_algs));
++}
++
++static void __exit camellia_aesni_fini(void)
++{
++	crypto_unregister_algs(cmll_algs, ARRAY_SIZE(cmll_algs));
++}
++
++module_init(camellia_aesni_init);
++module_exit(camellia_aesni_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Camellia Cipher Algorithm, AES-NI/AVX2 optimized")=
+;
++MODULE_ALIAS("camellia");
++MODULE_ALIAS("camellia-asm");
+diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypt=
+o/camellia_aesni_avx_glue.c
+index 4ff7ed4..37fd0c0 100644
+--- a/arch/x86/crypto/camellia_aesni_avx_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+@@ -26,33 +26,44 @@
+=20
+ #define CAMELLIA_AESNI_PARALLEL_BLOCKS 16
+=20
+-/* 16-way AES-NI parallel cipher functions */
++/* 16-way parallel cipher functions (avx/aes-ni) */
+ asmlinkage void camellia_ecb_enc_16way(struct camellia_ctx *ctx, u8 *d=
+st,
+ 				       const u8 *src);
++EXPORT_SYMBOL_GPL(camellia_ecb_enc_16way);
++
+ asmlinkage void camellia_ecb_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
+ 				       const u8 *src);
++EXPORT_SYMBOL_GPL(camellia_ecb_dec_16way);
+=20
+ asmlinkage void camellia_cbc_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
+ 				       const u8 *src);
++EXPORT_SYMBOL_GPL(camellia_cbc_dec_16way);
++
+ asmlinkage void camellia_ctr_16way(struct camellia_ctx *ctx, u8 *dst,
+ 				   const u8 *src, le128 *iv);
++EXPORT_SYMBOL_GPL(camellia_ctr_16way);
+=20
+ asmlinkage void camellia_xts_enc_16way(struct camellia_ctx *ctx, u8 *d=
+st,
+ 				       const u8 *src, le128 *iv);
++EXPORT_SYMBOL_GPL(camellia_xts_enc_16way);
++
+ asmlinkage void camellia_xts_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
+ 				       const u8 *src, le128 *iv);
++EXPORT_SYMBOL_GPL(camellia_xts_dec_16way);
+=20
+-static void camellia_xts_enc(void *ctx, u128 *dst, const u128 *src, le=
+128 *iv)
++void camellia_xts_enc(void *ctx, u128 *dst, const u128 *src, le128 *iv=
+)
+ {
+ 	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
+ 				  GLUE_FUNC_CAST(camellia_enc_blk));
+ }
++EXPORT_SYMBOL_GPL(camellia_xts_enc);
+=20
+-static void camellia_xts_dec(void *ctx, u128 *dst, const u128 *src, le=
+128 *iv)
++void camellia_xts_dec(void *ctx, u128 *dst, const u128 *src, le128 *iv=
+)
+ {
+ 	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
+ 				  GLUE_FUNC_CAST(camellia_dec_blk));
+ }
++EXPORT_SYMBOL_GPL(camellia_xts_dec);
+=20
+ static const struct common_glue_ctx camellia_enc =3D {
+ 	.num_funcs =3D 3,
+diff --git a/arch/x86/include/asm/crypto/camellia.h b/arch/x86/include/=
+asm/crypto/camellia.h
+index 98038ad..bb93333 100644
+--- a/arch/x86/include/asm/crypto/camellia.h
++++ b/arch/x86/include/asm/crypto/camellia.h
+@@ -48,6 +48,22 @@ asmlinkage void __camellia_enc_blk_2way(struct camel=
+lia_ctx *ctx, u8 *dst,
+ asmlinkage void camellia_dec_blk_2way(struct camellia_ctx *ctx, u8 *ds=
+t,
+ 				      const u8 *src);
+=20
++/* 16-way parallel cipher functions (avx/aes-ni) */
++asmlinkage void camellia_ecb_enc_16way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++asmlinkage void camellia_ecb_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++
++asmlinkage void camellia_cbc_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src);
++asmlinkage void camellia_ctr_16way(struct camellia_ctx *ctx, u8 *dst,
++				   const u8 *src, le128 *iv);
++
++asmlinkage void camellia_xts_enc_16way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src, le128 *iv);
++asmlinkage void camellia_xts_dec_16way(struct camellia_ctx *ctx, u8 *d=
+st,
++				       const u8 *src, le128 *iv);
++
+ static inline void camellia_enc_blk(struct camellia_ctx *ctx, u8 *dst,
+ 				    const u8 *src)
+ {
+@@ -79,4 +95,7 @@ extern void camellia_crypt_ctr(void *ctx, u128 *dst, =
+const u128 *src,
+ extern void camellia_crypt_ctr_2way(void *ctx, u128 *dst, const u128 *=
+src,
+ 				    le128 *iv);
+=20
++extern void camellia_xts_enc(void *ctx, u128 *dst, const u128 *src, le=
+128 *iv);
++extern void camellia_xts_dec(void *ctx, u128 *dst, const u128 *src, le=
+128 *iv);
++
+ #endif /* ASM_X86_CAMELLIA_H */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 9ad3d78..622d8a4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -894,6 +894,29 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+ 	  See also:
+ 	  <https://info.isl.ntt.co.jp/crypt/eng/camellia/index_s.html>
+=20
++config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
++	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX2)"
++	depends on X86 && 64BIT
++	depends on CRYPTO
++	select CRYPTO_ALGAPI
++	select CRYPTO_CRYPTD
++	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_GLUE_HELPER_X86
++	select CRYPTO_CAMELLIA_X86_64
++	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
++	select CRYPTO_LRW
++	select CRYPTO_XTS
++	help
++	  Camellia cipher algorithm module (x86_64/AES-NI/AVX2).
++
++	  Camellia is a symmetric key block cipher developed jointly
++	  at NTT and Mitsubishi Electric Corporation.
++
++	  The Camellia specifies three key sizes: 128, 192 and 256 bits.
++
++	  See also:
++	  <https://info.isl.ntt.co.jp/crypt/eng/camellia/index_s.html>
++
+ config CRYPTO_CAMELLIA_SPARC64
+ 	tristate "Camellia cipher algorithm (SPARC64)"
+ 	depends on SPARC64
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index f5e13de..5823735 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1667,6 +1667,9 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "__driver-cbc-camellia-aesni",
+ 		.test =3D alg_test_null,
+ 	}, {
++		.alg =3D "__driver-cbc-camellia-aesni-avx2",
++		.test =3D alg_test_null,
++	}, {
+ 		.alg =3D "__driver-cbc-cast5-avx",
+ 		.test =3D alg_test_null,
+ 	}, {
+@@ -1698,6 +1701,9 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "__driver-ecb-camellia-aesni",
+ 		.test =3D alg_test_null,
+ 	}, {
++		.alg =3D "__driver-ecb-camellia-aesni-avx2",
++		.test =3D alg_test_null,
++	}, {
+ 		.alg =3D "__driver-ecb-cast5-avx",
+ 		.test =3D alg_test_null,
+ 	}, {
+@@ -1978,6 +1984,9 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "cryptd(__driver-cbc-camellia-aesni)",
+ 		.test =3D alg_test_null,
+ 	}, {
++		.alg =3D "cryptd(__driver-cbc-camellia-aesni-avx2)",
++		.test =3D alg_test_null,
++	}, {
+ 		.alg =3D "cryptd(__driver-cbc-serpent-avx2)",
+ 		.test =3D alg_test_null,
+ 	}, {
+@@ -1991,6 +2000,9 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "cryptd(__driver-ecb-camellia-aesni)",
+ 		.test =3D alg_test_null,
+ 	}, {
++		.alg =3D "cryptd(__driver-ecb-camellia-aesni-avx2)",
++		.test =3D alg_test_null,
++	}, {
+ 		.alg =3D "cryptd(__driver-ecb-cast5-avx)",
+ 		.test =3D alg_test_null,
+ 	}, {
