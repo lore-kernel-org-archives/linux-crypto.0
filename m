@@ -1,157 +1,110 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH] algif_skcipher: Avoid crash if buffer is not multiple
- of cipher block size
-Date: Sun, 14 Apr 2013 18:17:36 +0200
-Message-ID: <516AD6A0.2060804@gmail.com>
-References: <1365955952-12381-1-git-send-email-gmazyland@gmail.com>
+From: Vakul Garg <vakul@freescale.com>
+Subject: [PATCHv1] crypto: caam - fix job ring cleanup code
+Date: Mon, 15 Apr 2013 09:55:51 +0530
+Message-ID: <1365999951-20635-1-git-send-email-vakul@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Bharat Bhushan <bharat.bhushan@freescale.com>,
+	<linux-kernel@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f171.google.com ([209.85.215.171]:53104 "EHLO
-	mail-ea0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752009Ab3DNQRk (ORCPT
+Received: from am1ehsobe003.messaging.microsoft.com ([213.199.154.206]:8402
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751264Ab3DOEaC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 14 Apr 2013 12:17:40 -0400
-In-Reply-To: <1365955952-12381-1-git-send-email-gmazyland@gmail.com>
+	Mon, 15 Apr 2013 00:30:02 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/14/2013 06:12 PM, Milan Broz wrote:
-> When user requests encryption (or decryption) of block which
-> is not aligned to cipher block size through userspace crypto
-> interface, an OOps like this can happen
+The job ring init function creates a platform device for each job ring.
+While the job ring is shutdown, e.g. while caam module removal, its
+platform device was not being removed. This leads to failure while
+reinsertion and then removal of caam module second time.
 
-And this is a reproducer for the problem above...
+The following kernel crash dump appears when caam module is reinserted
+and then removed again. This patch fixes it.
 
-Milan
+root@p4080ds:~# rmmod caam.ko 
+Unable to handle kernel paging request for data at address 0x00000008
+Faulting instruction address: 0xf94aca18
+Oops: Kernel access of bad area, sig: 11 [#1]
+SMP NR_CPUS=8 P4080 DS
+Modules linked in: caam(-) qoriq_dbg(O) [last unloaded: caam]
+NIP: f94aca18 LR: f94aca18 CTR: c029f950
+REGS: eac47d60 TRAP: 0300   Tainted: G           O  (3.8.4-rt2)
+MSR: 00029002 <CE,EE,ME>  CR: 22022484  XER: 20000000
+DEAR: 00000008, ESR: 00000000
+TASK = e49dfaf0[2110] 'rmmod' THREAD: eac46000 CPU: 1
+GPR00: f94ad3f4 eac47e10 e49dfaf0 00000000 00000005 ea2ac210 ffffffff 00000000 
+GPR08: c286de68 e4977ce0 c029b1c0 00000001 c029f950 10029738 00000000 100e0000 
+GPR16: 00000000 10023d00 1000cbdc 1000cb8c 1000cbb8 00000000 c07dfecc 00000000 
+GPR24: c07e0000 00000000 1000cbd8 f94e0000 ffffffff 00000000 ea53cd40 00000000 
+NIP [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
+LR [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
+Call Trace:
+[eac47e10] [eac47e30] 0xeac47e30 (unreliable)
+[eac47e20] [f94ad3f4] caam_jr_shutdown+0x34/0x220 [caam]
+[eac47e60] [f94ac0e4] caam_remove+0x54/0xb0 [caam]
+[eac47e80] [c029fb38] __device_release_driver+0x68/0x120
+[eac47e90] [c02a05c8] driver_detach+0xd8/0xe0
+[eac47eb0] [c029f8e0] bus_remove_driver+0xa0/0x110
+[eac47ed0] [c00768e4] sys_delete_module+0x144/0x270
+[eac47f40] [c000e2f0] ret_from_syscall+0x0/0x3c
 
-/* 
- * Check for unaligned buffer to block cipher size in kernel crypto API
- * fixed by patch: http://article.gmane.org/gmane.linux.kernel.cryptoapi/7980
- * 
- * Compile with gcc test.c -o tst
- */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <linux/if_alg.h>
+Signed-off-by: Vakul Garg <vakul@freescale.com>
+Signed-off-by: Bharat Bhushan <bharat.bhushan@freescale.com>
+---
+Changes in v1:
+	Addressed Horia's comments regarding commit log.
 
-#ifndef AF_ALG
-#define AF_ALG 38
-#endif
-#ifndef SOL_ALG
-#define SOL_ALG 279
-#endif
+ drivers/crypto/caam/intern.h |    1 +
+ drivers/crypto/caam/jr.c     |    4 ++++
+ 2 files changed, 5 insertions(+), 0 deletions(-)
 
-static int kernel_crypt(int opfd, const char *in, char *out, size_t length,
-			 const char *iv, size_t iv_length, uint32_t direction)
-{
-	int r = 0;
-	ssize_t len;
-	struct af_alg_iv *alg_iv;
-	struct cmsghdr *header;
-	uint32_t *type;
-	struct iovec iov = {
-		.iov_base = (void*)(uintptr_t)in,
-		.iov_len = length,
-	};
-	int iv_msg_size = iv ? CMSG_SPACE(sizeof(*alg_iv) + iv_length) : 0;
-	char buffer[CMSG_SPACE(sizeof(type)) + iv_msg_size];
-	struct msghdr msg = {
-		.msg_control = buffer,
-		.msg_controllen = sizeof(buffer),
-		.msg_iov = &iov,
-		.msg_iovlen = 1,
-	};
-
-	if (!in || !out || !length)
-		return -EINVAL;
-
-	if ((!iv && iv_length) || (iv && !iv_length))
-		return -EINVAL;
-
-	memset(buffer, 0, sizeof(buffer));
-
-	/* Set encrypt/decrypt operation */
-	header = CMSG_FIRSTHDR(&msg);
-	header->cmsg_level = SOL_ALG;
-	header->cmsg_type = ALG_SET_OP;
-	header->cmsg_len = CMSG_LEN(sizeof(type));
-	type = (void*)CMSG_DATA(header);
-	*type = direction;
-
-	/* Set IV */
-	if (iv) {
-		header = CMSG_NXTHDR(&msg, header);
-		header->cmsg_level = SOL_ALG;
-		header->cmsg_type = ALG_SET_IV;
-		header->cmsg_len = iv_msg_size;
-		alg_iv = (void*)CMSG_DATA(header);
-		alg_iv->ivlen = iv_length;
-		memcpy(alg_iv->iv, iv, iv_length);
-	}
-
-	len = sendmsg(opfd, &msg, 0);
-	if (len != (ssize_t)length) {
-		r = -EIO;
-		goto bad;
-	}
-
-	len = read(opfd, out, length);
-	if (len != (ssize_t)length)
-		r = -EIO;
-bad:
-	memset(buffer, 0, sizeof(buffer));
-	return r;
-}
-
-int main (int argc, char *argv[])
-{
-	const char key[32] = "0123456789abcdef0123456789abcdef";
-	const char iv[16] =  "0000000000000001";
-	struct sockaddr_alg sa = {
-		.salg_family = AF_ALG,
-		.salg_type = "skcipher",
-		.salg_name = "cbc(aes)"
-	};
-	int tfmfd, opfd;
-	char *data;
-
-	if (posix_memalign((void*)&data, 4096, 32)) {
-		printf("Cannot alloc memory.\n");
-		return 1;
-	}
-
-	tfmfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-	if (tfmfd == -1)
-		goto bad;
-
-	if (bind(tfmfd, (struct sockaddr *)&sa, sizeof(sa)) == -1)
-		goto bad;
-
-	opfd = accept(tfmfd, NULL, 0);
-	if (opfd == -1)
-		goto bad;
-
-	if (setsockopt(tfmfd, SOL_ALG, ALG_SET_KEY, key, sizeof(key)) == -1)
-		goto bad;
-
-	if (kernel_crypt(opfd, data, data, 1, iv, sizeof(iv), ALG_OP_ENCRYPT) < 0)
-		printf("Cannot encrypt data.\n");
-
-	close(tfmfd);
-	close(opfd);
-	free(data);
-	return 0;
-bad:
-	printf("Cannot initialise cipher.\n");
-	return 1;
-}
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 5cd4c1b..e4a16b7 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -41,6 +41,7 @@ struct caam_jrentry_info {
+ /* Private sub-storage for a single JobR */
+ struct caam_drv_private_jr {
+ 	struct device *parentdev;	/* points back to controller dev */
++	struct platform_device *jr_pdev;/* points to platform device for JR */
+ 	int ridx;
+ 	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
+ 	struct tasklet_struct irqtask;
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 93d1407..b4aa773e 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -407,6 +407,7 @@ int caam_jr_shutdown(struct device *dev)
+ 	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
+ 			  jrp->outring, outbusaddr);
+ 	kfree(jrp->entinfo);
++	of_device_unregister(jrp->jr_pdev);
+ 
+ 	return ret;
+ }
+@@ -454,6 +455,8 @@ int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+ 		kfree(jrpriv);
+ 		return -EINVAL;
+ 	}
++
++	jrpriv->jr_pdev = jr_pdev;
+ 	jrdev = &jr_pdev->dev;
+ 	dev_set_drvdata(jrdev, jrpriv);
+ 	ctrlpriv->jrdev[ring] = jrdev;
+@@ -472,6 +475,7 @@ int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+ 	/* Now do the platform independent part */
+ 	error = caam_jr_init(jrdev); /* now turn on hardware */
+ 	if (error) {
++		of_device_unregister(jr_pdev);
+ 		kfree(jrpriv);
+ 		return error;
+ 	}
+-- 
+1.7.7
