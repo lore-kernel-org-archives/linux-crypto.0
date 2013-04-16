@@ -1,69 +1,131 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCHv1] crypto: caam - fix job ring cleanup code
-Date: Mon, 15 Apr 2013 11:58:15 +0300
-Message-ID: <516BC127.3080708@freescale.com>
-References: <1365999951-20635-1-git-send-email-vakul@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH 4/4] Simple correctness and speed test for CRCT10DIF hash
+Date: Tue, 16 Apr 2013 09:20:51 -0700
+Message-ID: <de2e172b3c5b5d2ce77978be56aaa8b84272f5d6.1366120266.git.tim.c.chen@linux.intel.com>
+References: <cover.1366120266.git.tim.c.chen@linux.intel.com>
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Bharat Bhushan <bharat.bhushan@freescale.com>,
-	<linux-kernel@vger.kernel.org>
-To: Vakul Garg <vakul@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:29344
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750893Ab3DOI6a (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Apr 2013 04:58:30 -0400
-In-Reply-To: <1365999951-20635-1-git-send-email-vakul@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>
+Return-path: <linux-scsi-owner@vger.kernel.org>
+In-Reply-To: <cover.1366120266.git.tim.c.chen@linux.intel.com>
+In-Reply-To: <cover.1366120266.git.tim.c.chen@linux.intel.com>
+References: <cover.1366120266.git.tim.c.chen@linux.intel.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 4/15/2013 7:25 AM, Vakul Garg wrote:
-> The job ring init function creates a platform device for each job ring.
-> While the job ring is shutdown, e.g. while caam module removal, its
-> platform device was not being removed. This leads to failure while
-> reinsertion and then removal of caam module second time.
->
-> The following kernel crash dump appears when caam module is reinserted
-> and then removed again. This patch fixes it.
->
-> root@p4080ds:~# rmmod caam.ko
-> Unable to handle kernel paging request for data at address 0x00000008
-> Faulting instruction address: 0xf94aca18
-> Oops: Kernel access of bad area, sig: 11 [#1]
-> SMP NR_CPUS=8 P4080 DS
-> Modules linked in: caam(-) qoriq_dbg(O) [last unloaded: caam]
-> NIP: f94aca18 LR: f94aca18 CTR: c029f950
-> REGS: eac47d60 TRAP: 0300   Tainted: G           O  (3.8.4-rt2)
-> MSR: 00029002 <CE,EE,ME>  CR: 22022484  XER: 20000000
-> DEAR: 00000008, ESR: 00000000
-> TASK = e49dfaf0[2110] 'rmmod' THREAD: eac46000 CPU: 1
-> GPR00: f94ad3f4 eac47e10 e49dfaf0 00000000 00000005 ea2ac210 ffffffff 00000000
-> GPR08: c286de68 e4977ce0 c029b1c0 00000001 c029f950 10029738 00000000 100e0000
-> GPR16: 00000000 10023d00 1000cbdc 1000cb8c 1000cbb8 00000000 c07dfecc 00000000
-> GPR24: c07e0000 00000000 1000cbd8 f94e0000 ffffffff 00000000 ea53cd40 00000000
-> NIP [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
-> LR [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
-> Call Trace:
-> [eac47e10] [eac47e30] 0xeac47e30 (unreliable)
-> [eac47e20] [f94ad3f4] caam_jr_shutdown+0x34/0x220 [caam]
-> [eac47e60] [f94ac0e4] caam_remove+0x54/0xb0 [caam]
-> [eac47e80] [c029fb38] __device_release_driver+0x68/0x120
-> [eac47e90] [c02a05c8] driver_detach+0xd8/0xe0
-> [eac47eb0] [c029f8e0] bus_remove_driver+0xa0/0x110
-> [eac47ed0] [c00768e4] sys_delete_module+0x144/0x270
-> [eac47f40] [c000e2f0] ret_from_syscall+0x0/0x3c
->
->
-> Signed-off-by: Vakul Garg <vakul@freescale.com>
-> Signed-off-by: Bharat Bhushan <bharat.bhushan@freescale.com>
-> ---
+These are simple tests to do sanity check of CRC T10 DIF hash.  The
+correctness of the transform can be checked with the command
+	modprobe tcrypt mode=47
+The speed of the transform can be evaluated with the command
+	modprobe tcrypt mode=320
 
-Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
+Set the cpu frequency to constant and turn turbo off when running the
+speed test so the frequency governor will not tweak the frequency and
+affects the measurements.
 
-Horia
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+Tested-by: Keith Busch <keith.busch@intel.com>
+---
+ crypto/tcrypt.c  |  8 ++++++++
+ crypto/testmgr.c | 10 ++++++++++
+ crypto/testmgr.h | 24 ++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 24ea7df..5e95722 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1174,6 +1174,10 @@ static int do_test(int m)
+ 		ret += tcrypt_test("ghash");
+ 		break;
+ 
++	case 47:
++		ret += tcrypt_test("crct10dif");
++		break;
++
+ 	case 100:
+ 		ret += tcrypt_test("hmac(md5)");
+ 		break;
+@@ -1498,6 +1502,10 @@ static int do_test(int m)
+ 		test_hash_speed("crc32c", sec, generic_hash_speed_template);
+ 		if (mode > 300 && mode < 400) break;
+ 
++	case 320:
++		test_hash_speed("crct10dif", sec, generic_hash_speed_template);
++		if (mode > 300 && mode < 400) break;
++
+ 	case 399:
+ 		break;
+ 
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 3807084..b165316 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1944,6 +1944,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "crct10dif",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = {
++				.vecs = crct10dif_tv_template,
++				.count = CRCT10DIF_TEST_VECTORS
++			}
++		}
++	}, {
+ 		.alg = "cryptd(__driver-cbc-aes-aesni)",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index d503660..6262b74 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -450,6 +450,30 @@ static struct hash_testvec rmd320_tv_template[] = {
+ 	}
+ };
+ 
++#define CRCT10DIF_TEST_VECTORS	2
++static struct hash_testvec crct10dif_tv_template[] = {
++	{
++		.plaintext = "abc",
++		.psize  = 3,
++#ifdef __LITTLE_ENDIAN
++		.digest = "\x3b\x44",
++#else
++		.digest = "\x44\x3b",
++#endif
++	}, {
++		.plaintext =
++		"abcddddddddddddddddddddddddddddddddddddddddddddddddddddd",
++		.psize  = 56,
++#ifdef __LITTLE_ENDIAN
++		.digest = "\xe3\x9c",
++#else
++		.digest = "\x9c\xe3",
++#endif
++		.np     = 2,
++		.tap    = { 28, 28 }
++	}
++};
++
+ /*
+  * SHA1 test vectors  from from FIPS PUB 180-1
+  * Long vector from CAVS 5.0
+-- 
+1.7.11.7
+
