@@ -1,115 +1,60 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH 1/2] lib: Add lz4 compressor module
-Date: Thu, 18 Apr 2013 11:50:08 +0200
-Message-ID: <CAMuHMdXXoaQjb9sRK=X3gEDwqQBJcJQtaJbUGB8cJmteHSN3vQ@mail.gmail.com>
-References: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"Darrick J. Wong" <djwong@us.ibm.com>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	Richard Weinberger <richard@nod.at>,
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 1/9] crypto: ux500/hash - Prepare clock before enabling it
+Date: Thu, 18 Apr 2013 11:26:57 +0100
+Message-ID: <1366280825-31136-2-git-send-email-lee.jones@linaro.org>
+References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	Lee Jones <lee.jones@linaro.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Yann Collet <yann.collet.73@gmail.com>,
-	Kyungsik Lee <kyungsik.lee@lge.com>,
-	Chanho Min <chanho0207@gmail.com>,
-	"Linux/m68k" <linux-m68k@vger.kernel.org>,
-	sparclinux <sparclinux@vger.kernel.org>,
-	Linux-Next <linux-next@vger.kernel.org>
-To: Chanho Min <chanho.min@lge.com>
-Return-path: <linux-m68k-owner@vger.kernel.org>
-In-Reply-To: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
-Sender: linux-m68k-owner@vger.kernel.org
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Westin <andreas.westin@stericsson.com>,
+	linux-crypto@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 14, 2013 at 10:48 AM, Chanho Min <chanho.min@lge.com> wrote:
-> +#ifdef __BIG_ENDIAN
-> +#define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-> +#else
-> +#define LZ4_NBCOMMONBYTES(val) (__builtin_ctzll(val) >> 3)
-> +#endif
->
->  #else  /* 32-bit */
->  #define STEPSIZE 4
-> @@ -83,6 +130,14 @@ typedef struct _U64_S { u64 v; } U64_S;
->         } while (0)
->
->  #define LZ4_SECURECOPY LZ4_WILDCOPY
-> +#define HTYPE const u8*
-> +
-> +#ifdef __BIG_ENDIAN
-> +#define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
-> +#else
-> +#define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
-> +#endif
+If we fail to prepare the ux500-hash clock before enabling it the
+platform will fail to boot. Here we insure this happens.
 
-It seems at least m68k and sparc don't have the __builtin_clz() functions:
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+---
+ drivers/crypto/ux500/hash/hash_core.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-m68k-allmodconfig (http://kisskb.ellerman.id.au/kisskb/buildresult/8572593/):
-
-ERROR: "__clzsi2" [lib/lz4/lz4hc_compress.ko] undefined!
-ERROR: "__clzsi2" [lib/lz4/lz4_compress.ko] undefined!
-
-sparc64-allmodconfig (http://kisskb.ellerman.id.au/kisskb/buildresult/8572790/):
-
-ERROR: "__clzdi2" [lib/lz4/lz4hc_compress.ko] undefined!
-ERROR: "__clzdi2" [lib/lz4/lz4_compress.ko] undefined!
-
-sparc-allmodconfig (http://kisskb.ellerman.id.au/kisskb/buildresult/8572795/):
-
-ERROR: "__clzdi2" [lib/lz4/lz4hc_compress.ko] undefined!
-ERROR: "__clzdi2" [lib/lz4/lz4_compress.ko] undefined!
-
-There may be more, hidden by build errors before reaching the link or modpost
-phases.
-
-The gmail-whitespace-damaged patch below fixes the m68k and sparc builds
-for me, does this look acceptable?
-
-diff --git a/lib/lz4/lz4defs.h b/lib/lz4/lz4defs.h
-index abcecdc..81d3251 100644
---- a/lib/lz4/lz4defs.h
-+++ b/lib/lz4/lz4defs.h
-@@ -107,12 +107,6 @@ typedef struct _U64_S { u64 v; } U64_S;
-  } while (0)
- #define HTYPE u32
-
--#ifdef __BIG_ENDIAN
--#define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
--#else
--#define LZ4_NBCOMMONBYTES(val) (__builtin_ctzll(val) >> 3)
--#endif
--
- #else /* 32-bit */
- #define STEPSIZE 4
-
-@@ -132,12 +126,12 @@ typedef struct _U64_S { u64 v; } U64_S;
- #define LZ4_SECURECOPY LZ4_WILDCOPY
- #define HTYPE const u8*
-
--#ifdef __BIG_ENDIAN
--#define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
--#else
--#define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
- #endif
-
-+#ifdef __BIG_ENDIAN
-+#define LZ4_NBCOMMONBYTES(val) (((STEPSIZE * 8) - 1 - __fls(val)) >> 3)
-+#else
-+#define LZ4_NBCOMMONBYTES(val) (__ffs(val) >> 3)
- #endif
-
- #define LZ4_READ_LITTLEENDIAN_16(d, s, p) \
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 632c333..118386a 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -308,10 +308,10 @@ static int hash_disable_power(
+ 		device_data->restore_dev_state = true;
+ 	}
+ 
+-	clk_disable(device_data->clk);
++	clk_disable_unprepare(device_data->clk);
+ 	ret = regulator_disable(device_data->regulator);
+ 	if (ret)
+-		dev_err(dev, "[%s] regulator_disable() failed!", __func__);
++		dev_err(dev, "[%s] regulator_disable_unprepare() failed!", __func__);
+ 
+ 	device_data->power_state = false;
+ 
+@@ -344,9 +344,9 @@ static int hash_enable_power(
+ 					__func__);
+ 			goto out;
+ 		}
+-		ret = clk_enable(device_data->clk);
++		ret = clk_prepare_enable(device_data->clk);
+ 		if (ret) {
+-			dev_err(dev, "[%s]: clk_enable() failed!",
++			dev_err(dev, "[%s]: clk_prepare_enable() failed!",
+ 					__func__);
+ 			ret = regulator_disable(
+ 					device_data->regulator);
+-- 
+1.7.10.4
