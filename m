@@ -1,81 +1,36 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 4/9 v2] crypto: ux500/cryp - Prepare clock before enabling it
-Date: Fri, 19 Apr 2013 13:22:26 +0100
-Message-ID: <20130419122226.GB3432@gmail.com>
-References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
- <1366280825-31136-5-git-send-email-lee.jones@linaro.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 4/9 v2] crypto: ux500/cryp - Prepare clock before enabling it
+Date: Fri, 19 Apr 2013 14:23:57 +0200
+Message-ID: <201304191423.57261.arnd@arndb.de>
+References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org> <1366280825-31136-5-git-send-email-lee.jones@linaro.org> <20130419122226.GB3432@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linus.walleij@stericsson.com,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Andreas Westin <andreas.westin@stericsson.com>,
 	linux-crypto@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1366280825-31136-5-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Lee Jones <lee.jones@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from moutng.kundenserver.de ([212.227.126.186]:57538 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S968238Ab3DSMYE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 19 Apr 2013 08:24:04 -0400
+In-Reply-To: <20130419122226.GB3432@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Slight change of plan for v2.
+On Friday 19 April 2013, Lee Jones wrote:
+> Slight change of plan for v2.
+> 
+> Now we're doing a seperate clk_prepare(), as the clk_enable() in the
+> previous patch turned out to be called inside a spin_lock().
+> 
+> Arnd, can you confirm your Ack please?
+> 
 
-Now we're doing a seperate clk_prepare(), as the clk_enable() in the
-previous patch turned out to be called inside a spin_lock().
-
-Arnd, can you confirm your Ack please?
-
-----
-
-crypto: ux500/cryp - Prepare clock before enabling it
-    
-If we fail to prepare the ux500-cryp clock before enabling it the
-platform will fail to boot. Here we insure this happens.
-    
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Andreas Westin <andreas.westin@stericsson.com>
-Cc: linux-crypto@vger.kernel.org
 Acked-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
-
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 22c9063..bf78d60 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1459,11 +1459,17 @@ static int ux500_cryp_probe(struct platform_device *pdev)
- 		goto out_regulator;
- 	}
- 
-+	ret = clk_prepare(device_data->clk);
-+	if (ret) {
-+		dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
-+		goto out_clk;
-+	}
-+
- 	/* Enable device power (and clock) */
- 	ret = cryp_enable_power(device_data->dev, device_data, false);
- 	if (ret) {
- 		dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
--		goto out_clk;
-+		goto out_clk_unprepare;
- 	}
- 
- 	cryp_error = cryp_check(device_data);
-@@ -1524,6 +1530,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
- out_power:
- 	cryp_disable_power(device_data->dev, device_data, false);
- 
-+out_clk_unprepare:
-+	clk_unprepare(device_data->clk);
-+
- out_clk:
- 	clk_put(device_data->clk);
- 
-@@ -1594,6 +1603,7 @@ static int ux500_cryp_remove(struct platform_device *pdev)
- 		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
- 			__func__);
- 
-+	clk_unprepare(device_data->clk);
- 	clk_put(device_data->clk);
- 	regulator_put(device_data->pwr_regulator);
