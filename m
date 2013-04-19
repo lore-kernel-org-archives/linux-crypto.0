@@ -1,106 +1,81 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 2/9] crypto: ux500/hash - Set DMA configuration though dma_slave_config()
-Date: Thu, 18 Apr 2013 11:26:58 +0100
-Message-ID: <1366280825-31136-3-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH 4/9 v2] crypto: ux500/cryp - Prepare clock before enabling it
+Date: Fri, 19 Apr 2013 13:22:26 +0100
+Message-ID: <20130419122226.GB3432@gmail.com>
 References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
+ <1366280825-31136-5-git-send-email-lee.jones@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	Lee Jones <lee.jones@linaro.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Andreas Westin <andreas.westin@stericsson.com>,
 	linux-crypto@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:40802 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964916Ab3DRK1d (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Apr 2013 06:27:33 -0400
-Received: by mail-wi0-f172.google.com with SMTP id hq17so4108748wib.17
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Apr 2013 03:27:31 -0700 (PDT)
-In-Reply-To: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1366280825-31136-5-git-send-email-lee.jones@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The DMA controller currently takes configuration information from
-information passed though dma_channel_request(), but it shouldn't.
-Using the API, the DMA channel should only be configured during
-a dma_slave_config() call.
+Slight change of plan for v2.
 
+Now we're doing a seperate clk_prepare(), as the clk_enable() in the
+previous patch turned out to be called inside a spin_lock().
+
+Arnd, can you confirm your Ack please?
+
+----
+
+crypto: ux500/cryp - Prepare clock before enabling it
+    
+If we fail to prepare the ux500-cryp clock before enabling it the
+platform will fail to boot. Here we insure this happens.
+    
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Andreas Westin <andreas.westin@stericsson.com>
 Cc: linux-crypto@vger.kernel.org
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/crypto/ux500/hash/hash_alg.h  |    5 ++++-
- drivers/crypto/ux500/hash/hash_core.c |   10 ++++++++++
- 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ux500/hash/hash_alg.h b/drivers/crypto/ux500/hash/hash_alg.h
-index cd9351c..be6eb54 100644
---- a/drivers/crypto/ux500/hash/hash_alg.h
-+++ b/drivers/crypto/ux500/hash/hash_alg.h
-@@ -11,6 +11,7 @@
- #include <linux/bitops.h>
- 
- #define HASH_BLOCK_SIZE			64
-+#define HASH_DMA_FIFO			4
- #define HASH_DMA_ALIGN_SIZE		4
- #define HASH_DMA_PERFORMANCE_MIN_SIZE	1024
- #define HASH_BYTES_PER_WORD		4
-@@ -347,7 +348,8 @@ struct hash_req_ctx {
- 
- /**
-  * struct hash_device_data - structure for a hash device.
-- * @base:		Pointer to the hardware base address.
-+ * @base:		Pointer to virtual base address of the hash device.
-+ * @phybase:		Pointer to physical memory location of the hash device.
-  * @list_node:		For inclusion in klist.
-  * @dev:		Pointer to the device dev structure.
-  * @ctx_lock:		Spinlock for current_ctx.
-@@ -361,6 +363,7 @@ struct hash_req_ctx {
-  */
- struct hash_device_data {
- 	struct hash_register __iomem	*base;
-+	phys_addr_t             phybase;
- 	struct klist_node	list_node;
- 	struct device		*dev;
- 	struct spinlock		ctx_lock;
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 118386a..f9126f4 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -123,6 +123,13 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
- 				struct device *dev)
- {
- 	struct hash_platform_data *platform_data = dev->platform_data;
-+	struct dma_slave_config conf = {
-+		.direction = DMA_MEM_TO_DEV,
-+		.dst_addr = device_data->phybase + HASH_DMA_FIFO,
-+		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
-+		.dst_maxburst = 16,
-+        };
-+
- 	dma_cap_zero(device_data->dma.mask);
- 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
- 
-@@ -132,6 +139,8 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
- 				platform_data->dma_filter,
- 				device_data->dma.cfg_mem2hash);
- 
-+	dmaengine_slave_config(device_data->dma.chan_mem2hash, &conf);
-+
- 	init_completion(&device_data->dma.complete);
- }
- 
-@@ -1700,6 +1709,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
- 		goto out_kfree;
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 22c9063..bf78d60 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1459,11 +1459,17 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		goto out_regulator;
  	}
  
-+	device_data->phybase = res->start;
- 	device_data->base = ioremap(res->start, resource_size(res));
- 	if (!device_data->base) {
- 		dev_err(dev, "[%s] ioremap() failed!",
--- 
-1.7.10.4
++	ret = clk_prepare(device_data->clk);
++	if (ret) {
++		dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
++		goto out_clk;
++	}
++
+ 	/* Enable device power (and clock) */
+ 	ret = cryp_enable_power(device_data->dev, device_data, false);
+ 	if (ret) {
+ 		dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
+-		goto out_clk;
++		goto out_clk_unprepare;
+ 	}
+ 
+ 	cryp_error = cryp_check(device_data);
+@@ -1524,6 +1530,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ out_power:
+ 	cryp_disable_power(device_data->dev, device_data, false);
+ 
++out_clk_unprepare:
++	clk_unprepare(device_data->clk);
++
+ out_clk:
+ 	clk_put(device_data->clk);
+ 
+@@ -1594,6 +1603,7 @@ static int ux500_cryp_remove(struct platform_device *pdev)
+ 		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
+ 			__func__);
+ 
++	clk_unprepare(device_data->clk);
+ 	clk_put(device_data->clk);
+ 	regulator_put(device_data->pwr_regulator);
