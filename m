@@ -1,88 +1,47 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH] Fix prototype definitions of sha256_transform_asm,
- sha512_transform_asm
-Date: Fri, 19 Apr 2013 13:25:12 -0700
-Message-ID: <1366403112.27102.112.camel@schen9-DESK>
-References: <cover.1364303479.git.tim.c.chen@linux.intel.com>
-	 <1364331519.27102.10.camel@schen9-DESK>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] crypto: algif - suppress sending source address
+ information in recvmsg
+Date: Sun, 21 Apr 2013 21:14:49 +0200
+Message-ID: <CA+rthh81Xa7EYrKHC4czMa-SF7W85TfgOHwubJmXZfML35_y5g@mail.gmail.com>
+References: <1365336339-403-1-git-send-email-minipli@googlemail.com>
+	<20130410033148.GA32360@gondor.apana.org.au>
+	<CA+rthh9y2JiqHeOqPsDx+tS1Mk0O7rJDWsNPzqfiQz+9rEAnqA@mail.gmail.com>
+	<20130410062624.GA713@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	Jim Kukunas <james.t.kukunas@linux.intel.com>,
-	Kirk Yap <kirk.s.yap@intel.com>,
-	David Cote <david.m.cote@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:32569 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753535Ab3DSUZL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Apr 2013 16:25:11 -0400
-In-Reply-To: <1364331519.27102.10.camel@schen9-DESK>
+Received: from mail-lb0-f180.google.com ([209.85.217.180]:60705 "EHLO
+	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754147Ab3DUTOu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 21 Apr 2013 15:14:50 -0400
+Received: by mail-lb0-f180.google.com with SMTP id t11so4965452lbi.25
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Apr 2013 12:14:49 -0700 (PDT)
+In-Reply-To: <20130410062624.GA713@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+On Wed, Apr 10, 2013 at 8:26 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, Apr 10, 2013 at 08:21:51AM +0200, Mathias Krause wrote:
+>> On Wed, Apr 10, 2013 at 5:31 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>> > On Sun, Apr 07, 2013 at 02:05:39PM +0200, Mathias Krause wrote:
+>> >> The current code does not set the msg_namelen member to 0 and therefore
+>> >> makes net/socket.c leak the local sockaddr_storage variable to userland
+>> >> -- 128 bytes of kernel stack memory. Fix that.
+>> >>
+>> >> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+>> >
+>> > Patch applied.  Thanks!
+>>
+>> Thanks, but that patch shouldn't have been applied to cryptodev but
+>> crypto instead, and probably queued up for stable as well.
+>> I missed the 'Cc: stable # v2.6.38'. My bad.
+>
+> OK, I'll move it across and add the stable Cc.
 
-This is a follow on patch to the optimized sha256 and sha512 patch series that's just
-merged into the crypto-dev.  Let me know if you prefer me to respin the
-patch series.
+Any specific reason you're not pushing it to Linus for inclusion in v3.9?
 
-This patch corrects the prototype of sha256_transform_asm and
-sha512_transform_asm function pointer declaration to static.  It also
-fixes a typo in sha512_ssse3_final function that affects the computation
-of upper 64 bits of the buffer size.
-
-Thanks.
-
-Tim
-
-Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
----
- arch/x86/crypto/sha256_ssse3_glue.c | 2 +-
- arch/x86/crypto/sha512_ssse3_glue.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index fa65453..8a0b711 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -53,7 +53,7 @@ asmlinkage void sha256_transform_rorx(const char *data, u32 *digest,
- 				     u64 rounds);
- #endif
- 
--asmlinkage void (*sha256_transform_asm)(const char *, u32 *, u64);
-+static void (*sha256_transform_asm)(const char *, u32 *, u64);
- 
- 
- static int sha256_ssse3_init(struct shash_desc *desc)
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 295f790..3c844f2 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -52,7 +52,7 @@ asmlinkage void sha512_transform_rorx(const char *data, u64 *digest,
- 				     u64 rounds);
- #endif
- 
--asmlinkage void (*sha512_transform_asm)(const char *, u64 *, u64);
-+static void (*sha512_transform_asm)(const char *, u64 *, u64);
- 
- 
- static int sha512_ssse3_init(struct shash_desc *desc)
-@@ -141,7 +141,7 @@ static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
- 
- 	/* save number of bits */
- 	bits[1] = cpu_to_be64(sctx->count[0] << 3);
--	bits[0] = cpu_to_be64(sctx->count[1] << 3) | sctx->count[0] >> 61;
-+	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
- 
- 	/* Pad out to 112 mod 128 and append length */
- 	index = sctx->count[0] & 0x7f;
--- 
-1.7.11.7
+Mathias
