@@ -1,57 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.9
-Date: Mon, 22 Apr 2013 08:34:48 +0800
-Message-ID: <20130422003448.GA6020@gondor.apana.org.au>
-References: <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20130410022112.GA32025@gondor.apana.org.au>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH 1/2] lib: Add lz4 compressor module
+Date: Mon, 22 Apr 2013 11:24:21 +0200
+Message-ID: <CAMuHMdUv=GR6s=BYXHR7KyaKCUSxmkJO8dzZJMRktu3cUCTbsw@mail.gmail.com>
+References: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
+	<CAMuHMdXXoaQjb9sRK=X3gEDwqQBJcJQtaJbUGB8cJmteHSN3vQ@mail.gmail.com>
+	<51750159.07d70e0a.5461.ffffec64SMTPIN_ADDED_BROKEN@mx.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:42181 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752422Ab3DVAez (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Apr 2013 20:34:55 -0400
-Content-Disposition: inline
-In-Reply-To: <20130410022112.GA32025@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	"Darrick J. Wong" <djwong@us.ibm.com>,
+	Bob Pearson <rpearson@systemfabricworks.com>,
+	Richard Weinberger <richard@nod.at>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Yann Collet <yann.collet.73@gmail.com>,
+	Kyungsik Lee <kyungsik.lee@lge.com>,
+	"Linux/m68k" <linux-m68k@vger.kernel.org>,
+	sparclinux <sparclinux@vger.kernel.org>,
+	Linux-Next <linux-next@vger.kernel.org>
+To: Chanho Min <chanho.min@lge.com>
+Return-path: <linux-m68k-owner@vger.kernel.org>
+In-Reply-To: <51750159.07d70e0a.5461.ffffec64SMTPIN_ADDED_BROKEN@mx.google.com>
+Sender: linux-m68k-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Mon, Apr 22, 2013 at 11:22 AM, Chanho Min <chanho.min@lge.com> wrote:
+>>> +#define HTYPE const u8*
+>>> +
+>>> +#ifdef __BIG_ENDIAN
+>>> +#define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
+>>> +#else
+>>> +#define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
+>>> +#endif
+>>
+>>It seems at least m68k and sparc don't have the __builtin_clz() functions:
+>>
+>>m68k-allmodconfig (http://kisskb.ellerman.id.au/kisskb/buildresult/8572593/):
+>>
+>>ERROR: "__clzsi2" [lib/lz4/lz4hc_compress.ko] undefined!
+>>ERROR: "__clzsi2" [lib/lz4/lz4_compress.ko] undefined!
+>
+> gcc seems to define __builtin_clz as __clzsi2 in some architecture.
+> But, kernel doesn't link libgcc.a.
+> If kernel should use gcc's built-in function without libgcc.a,
+> do we need to port __clzsi2 to 'arch/*/lib/*'?
 
-This push fixes a kernel memory leak in the algif interface.
+That's another option.
 
+So far no one used __builtin_c[lt]z in generic code. We always used
+__fls and __ffs.
 
-Please pull from
+Gr{oetje,eeting}s,
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+                        Geert
 
-or
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Mathias Krause (1):
-      crypto: algif - suppress sending source address information in recvmsg
-
- crypto/algif_hash.c     |    2 ++
- crypto/algif_skcipher.c |    1 +
- 2 files changed, 3 insertions(+), 0 deletions(-)
- 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
