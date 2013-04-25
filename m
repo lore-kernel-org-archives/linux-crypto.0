@@ -1,37 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aesni_intel - fix Kconfig problem with
- CRYPTO_GLUE_HELPER_X86
-Date: Thu, 25 Apr 2013 21:06:28 +0800
-Message-ID: <20130425130628.GA29329@gondor.apana.org.au>
-References: <51652688.vLFH53k1uKh/xP2W%fengguang.wu@intel.com>
- <20130410153920.15657.98615.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
+ transform framework
+Date: Thu, 25 Apr 2013 21:22:03 +0800
+Message-ID: <20130425132203.GA29501@gondor.apana.org.au>
+References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
+ <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, kbuild-all@01.org,
-	kbuild test robot <fengguang.wu@intel.com>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:50342 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:39833 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756935Ab3DYNGc (ORCPT
+	with ESMTP id S1757121Ab3DYNWY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Apr 2013 09:06:32 -0400
+	Thu, 25 Apr 2013 09:22:24 -0400
 Content-Disposition: inline
-In-Reply-To: <20130410153920.15657.98615.stgit@localhost6.localdomain6>
+In-Reply-To: <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 10, 2013 at 06:39:20PM +0300, Jussi Kivilinna wrote:
-> The Kconfig setting for glue helper module is CRYPTO_GLUE_HELPER_X86, but
-> recent change for aesni_intel used CRYPTO_GLUE_HELPER instead. Patch corrects
-> this issue.
+On Wed, Apr 17, 2013 at 09:12:52AM -0700, Tim Chen wrote:
+> When CRC T10 DIF is calculated using the crypto transform framework, we
+> wrap the crc_t10dif function call to utilize it.  This allows us to
+> take advantage of any accelerated CRC T10 DIF transform that is
+> plugged into the crypto framework.
 > 
-> Cc: kbuild-all@01.org
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-Patch applied.  Thanks!
+Please wrap the generic implementation as we do for crc32c.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
