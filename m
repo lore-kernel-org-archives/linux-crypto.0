@@ -1,82 +1,349 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv1] crypto: caam - fix job ring cleanup code
-Date: Thu, 25 Apr 2013 22:18:57 +0800
-Message-ID: <20130425141856.GC29501@gondor.apana.org.au>
-References: <1365999951-20635-1-git-send-email-vakul@freescale.com>
- <516BC127.3080708@freescale.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
+ transform framework
+Date: Thu, 25 Apr 2013 10:28:30 -0700
+Message-ID: <1366910910.27102.126.camel@schen9-DESK>
+References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
+	 <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
+	 <20130425132203.GA29501@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Vakul Garg <vakul@freescale.com>, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Bharat Bhushan <bharat.bhushan@freescale.com>,
-	linux-kernel@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:42904 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932519Ab3DYOTB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Apr 2013 10:19:01 -0400
-Content-Disposition: inline
-In-Reply-To: <516BC127.3080708@freescale.com>
+Received: from mga02.intel.com ([134.134.136.20]:8021 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758861Ab3DYR2u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Apr 2013 13:28:50 -0400
+In-Reply-To: <20130425132203.GA29501@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 15, 2013 at 11:58:15AM +0300, Horia Geant=C4=83 wrote:
-> On 4/15/2013 7:25 AM, Vakul Garg wrote:
-> >The job ring init function creates a platform device for each job ri=
-ng.
-> >While the job ring is shutdown, e.g. while caam module removal, its
-> >platform device was not being removed. This leads to failure while
-> >reinsertion and then removal of caam module second time.
-> >
-> >The following kernel crash dump appears when caam module is reinsert=
-ed
-> >and then removed again. This patch fixes it.
-> >
-> >root@p4080ds:~# rmmod caam.ko
-> >Unable to handle kernel paging request for data at address 0x0000000=
-8
-> >Faulting instruction address: 0xf94aca18
-> >Oops: Kernel access of bad area, sig: 11 [#1]
-> >SMP NR_CPUS=3D8 P4080 DS
-> >Modules linked in: caam(-) qoriq_dbg(O) [last unloaded: caam]
-> >NIP: f94aca18 LR: f94aca18 CTR: c029f950
-> >REGS: eac47d60 TRAP: 0300   Tainted: G           O  (3.8.4-rt2)
-> >MSR: 00029002 <CE,EE,ME>  CR: 22022484  XER: 20000000
-> >DEAR: 00000008, ESR: 00000000
-> >TASK =3D e49dfaf0[2110] 'rmmod' THREAD: eac46000 CPU: 1
-> >GPR00: f94ad3f4 eac47e10 e49dfaf0 00000000 00000005 ea2ac210 fffffff=
-f 00000000
-> >GPR08: c286de68 e4977ce0 c029b1c0 00000001 c029f950 10029738 0000000=
-0 100e0000
-> >GPR16: 00000000 10023d00 1000cbdc 1000cb8c 1000cbb8 00000000 c07dfec=
-c 00000000
-> >GPR24: c07e0000 00000000 1000cbd8 f94e0000 ffffffff 00000000 ea53cd4=
-0 00000000
-> >NIP [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
-> >LR [f94aca18] caam_reset_hw_jr+0x18/0x1c0 [caam]
-> >Call Trace:
-> >[eac47e10] [eac47e30] 0xeac47e30 (unreliable)
-> >[eac47e20] [f94ad3f4] caam_jr_shutdown+0x34/0x220 [caam]
-> >[eac47e60] [f94ac0e4] caam_remove+0x54/0xb0 [caam]
-> >[eac47e80] [c029fb38] __device_release_driver+0x68/0x120
-> >[eac47e90] [c02a05c8] driver_detach+0xd8/0xe0
-> >[eac47eb0] [c029f8e0] bus_remove_driver+0xa0/0x110
-> >[eac47ed0] [c00768e4] sys_delete_module+0x144/0x270
-> >[eac47f40] [c000e2f0] ret_from_syscall+0x0/0x3c
-> >
-> >
-> >Signed-off-by: Vakul Garg <vakul@freescale.com>
-> >Signed-off-by: Bharat Bhushan <bharat.bhushan@freescale.com>
-> >---
->=20
-> Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
+On Thu, 2013-04-25 at 21:22 +0800, Herbert Xu wrote:
 
-Patch applied.  Thanks!
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Please wrap the generic implementation as we do for crc32c.
+> 
+
+Herbert,
+
+I've updated this patch to add the generic crct10dif transform (see
+below).  Let me know if this address your comment.  Thanks.
+
+Tim
+
+When CRC T10 DIF is calculated using the crypto transform framework, we
+wrap the crc_t10dif function call to utilize it.  This allows us to
+take advantage of any accelerated CRC T10 DIF transform that is
+plugged into the crypto framework.
+
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+ crypto/Makefile            |   1 +
+ crypto/crct10dif.c         | 126 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/crc-t10dif.h |  10 ++++
+ lib/crc-t10dif.c           |  96 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 233 insertions(+)
+ create mode 100644 crypto/crct10dif.c
+
+diff --git a/crypto/Makefile b/crypto/Makefile
+index a8e9b0f..62af87d 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -83,6 +83,7 @@ obj-$(CONFIG_CRYPTO_ZLIB) += zlib.o
+ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c.o
+ obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
++obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif.o
+ obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+ obj-$(CONFIG_CRYPTO_LZO) += lzo.o
+ obj-$(CONFIG_CRYPTO_842) += 842.o
+diff --git a/crypto/crct10dif.c b/crypto/crct10dif.c
+new file mode 100644
+index 0000000..76b059a
+--- /dev/null
++++ b/crypto/crct10dif.c
+@@ -0,0 +1,126 @@
++/*
++ * Cryptographic API.
++ *
++ * T10 Data Integrity Field CRC16 Crypto Xform
++ *
++ * Copyright (C) 2013 Intel Corporation
++ * Author: Tim Chen <tim.c.chen@linux.intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
++ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
++ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ *
++ */
++
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/crc-t10dif.h>
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/string.h>
++#include <linux/kernel.h>
++
++struct chksum_desc_ctx {
++	__u16 crc;
++};
++
++/*
++ * Steps through buffer one byte at at time, calculates reflected
++ * crc using table.
++ */
++
++static int chksum_init(struct shash_desc *desc)
++{
++	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	ctx->crc = 0;
++
++	return 0;
++}
++
++static int chksum_update(struct shash_desc *desc, const u8 *data,
++			 unsigned int length)
++{
++	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
++	return 0;
++}
++
++static int chksum_final(struct shash_desc *desc, u8 *out)
++{
++	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	*(__u16 *)out = ctx->crc;
++	return 0;
++}
++
++static int __chksum_finup(__u16 *crcp, const u8 *data, unsigned int len,
++			u8 *out)
++{
++	*(__u16 *)out = crc_t10dif_generic(*crcp, data, len);
++	return 0;
++}
++
++static int chksum_finup(struct shash_desc *desc, const u8 *data,
++			unsigned int len, u8 *out)
++{
++	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	return __chksum_finup(&ctx->crc, data, len, out);
++}
++
++static int chksum_digest(struct shash_desc *desc, const u8 *data,
++			 unsigned int length, u8 *out)
++{
++	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	return __chksum_finup(&ctx->crc, data, length, out);
++}
++
++static struct shash_alg alg = {
++	.digestsize		=	CRC_T10DIF_DIGEST_SIZE,
++	.init		=	chksum_init,
++	.update		=	chksum_update,
++	.final		=	chksum_final,
++	.finup		=	chksum_finup,
++	.digest		=	chksum_digest,
++	.descsize		=	sizeof(struct chksum_desc_ctx),
++	.base			=	{
++		.cra_name		=	"crct10dif",
++		.cra_driver_name	=	"crct10dif-generic",
++		.cra_priority		=	100,
++		.cra_blocksize		=	CRC_T10DIF_BLOCK_SIZE,
++		.cra_module		=	THIS_MODULE,
++	}
++};
++
++static int __init crct10dif_mod_init(void)
++{
++	int ret;
++
++	ret = crypto_register_shash(&alg);
++	return ret;
++}
++
++static void __exit crct10dif_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(crct10dif_mod_init);
++module_exit(crct10dif_mod_fini);
++
++MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
++MODULE_DESCRIPTION("T10 DIF CRC calculation.");
++MODULE_LICENSE("GPL");
+diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+index a9c96d8..f0eb4d5 100644
+--- a/include/linux/crc-t10dif.h
++++ b/include/linux/crc-t10dif.h
+@@ -3,6 +3,16 @@
+ 
+ #include <linux/types.h>
+ 
++#ifdef CONFIG_CRYPTO_CRCT10DIF
++
++#define CRC_T10DIF_DIGEST_SIZE 2
++#define CRC_T10DIF_BLOCK_SIZE 1
++
++__u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer, size_t len);
++void crc_t10dif_update_lib(void);
++
++#endif /* CONFIG_CRYPTO_CRCT10DIF */
++
+ __u16 crc_t10dif(unsigned char const *, size_t);
+ 
+ #endif
+diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+index fbbd66e..41f469a 100644
+--- a/lib/crc-t10dif.c
++++ b/lib/crc-t10dif.c
+@@ -11,6 +11,9 @@
+ #include <linux/types.h>
+ #include <linux/module.h>
+ #include <linux/crc-t10dif.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <crypto/hash.h>
+ 
+ /* Table generated using the following polynomium:
+  * x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+@@ -51,6 +54,98 @@ static const __u16 t10_dif_crc_table[256] = {
+ 	0xF0D8, 0x7B6F, 0x6C01, 0xE7B6, 0x42DD, 0xC96A, 0xDE04, 0x55B3
+ };
+ 
++#ifdef CONFIG_CRYPTO_CRCT10DIF
++
++static struct crypto_shash *crct10dif_tfm;
++
++/* flag to indicate update to new algorithm in progress*/
++static bool crc_t10dif_newalg;
++
++__u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer, size_t len)
++{
++	unsigned int i;
++
++	for (i = 0 ; i < len ; i++)
++		crc = (crc << 8) ^ t10_dif_crc_table[((crc >> 8) ^ buffer[i]) & 0xff];
++
++	return crc;
++}
++EXPORT_SYMBOL(crc_t10dif_generic);
++
++/*
++ * If we have defined crypto transform for CRC-T10DIF, use that instead.
++ * This allows us to plug in fast version of CRC-T10DIF when available.
++ */
++
++void crc_t10dif_update_lib()
++{
++	struct crypto_shash *old_tfm, *new_tfm;
++
++	old_tfm = crct10dif_tfm;
++	crc_t10dif_newalg = true;
++	/* make sure new alg flag is turned on before starting to switch tfm */
++	mb();
++
++	new_tfm = crypto_alloc_shash("crct10dif", 0, 0);
++	if (IS_ERR(new_tfm))
++		goto done;
++
++	if (old_tfm)
++		if (crypto_tfm_alg_priority(&old_tfm->base) >=
++		    crypto_tfm_alg_priority(&new_tfm->base)) {
++			crypto_free_shash(new_tfm);
++			goto done;
++		}
++	crct10dif_tfm = new_tfm;
++	/* make sure update to tfm pointer is completed */
++	mb();
++	crypto_free_shash(old_tfm);
++
++done:
++	crc_t10dif_newalg = false;
++}
++EXPORT_SYMBOL(crc_t10dif_update_lib);
++
++__u16 crc_t10dif(const unsigned char *buffer, size_t len)
++{
++	struct {
++		struct shash_desc shash;
++		char ctx[2];
++	} desc;
++	int err;
++
++	/* plugging in new alg or not using a tfm? */
++	if (unlikely(crc_t10dif_newalg) || (!crct10dif_tfm))
++		return crc_t10dif_generic(0, buffer, len);
++
++	desc.shash.tfm = crct10dif_tfm;
++	desc.shash.flags = 0;
++	*(__u16 *)desc.ctx = 0;
++
++	err = crypto_shash_update(&desc.shash, buffer, len);
++	BUG_ON(err);
++
++	return *(__u16 *)desc.ctx;
++}
++EXPORT_SYMBOL(crc_t10dif);
++
++static int __init crc_t10dif_mod_init(void)
++{
++	crct10dif_tfm = NULL;
++	crc_t10dif_newalg = false;
++	return 0;
++}
++
++static void __exit crc_t10dif_mod_fini(void)
++{
++	if (crct10dif_tfm)
++		crypto_free_shash(crct10dif_tfm);
++}
++
++module_init(crc_t10dif_mod_init);
++module_exit(crc_t10dif_mod_fini);
++
++#else
+ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+ {
+ 	__u16 crc = 0;
+@@ -62,6 +157,7 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+ 	return crc;
+ }
+ EXPORT_SYMBOL(crc_t10dif);
++#endif
+ 
+ MODULE_DESCRIPTION("T10 DIF CRC calculation");
+ MODULE_LICENSE("GPL");
+-- 
+1.7.11.7
