@@ -1,56 +1,69 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 1/2] lib: Add lz4 compressor module
-Date: Mon, 22 Apr 2013 14:29:05 -0700
-Message-ID: <20130422142905.3e4fff72671bb3e245055eee@linux-foundation.org>
-References: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
-	<CAMuHMdXXoaQjb9sRK=X3gEDwqQBJcJQtaJbUGB8cJmteHSN3vQ@mail.gmail.com>
-	<51750159.07d70e0a.5461.ffffec64SMTPIN_ADDED_BROKEN@mx.google.com>
-	<CAMuHMdUv=GR6s=BYXHR7KyaKCUSxmkJO8dzZJMRktu3cUCTbsw@mail.gmail.com>
+From: Vakul Garg <vakul@freescale.com>
+Subject: Re: Fwd: crypto accelerator driver problems
+Date: Thu, 25 Apr 2013 03:45:55 +0000 (UTC)
+Message-ID: <loom.20130425T054131-302@post.gmane.org>
+References: <AANLkTinGGsjgBKD1LqhL2u4DOU_XrACK4D67nHfPnL5e@mail.gmail.com> <20101230211900.GA22742@gondor.apana.org.au> <AANLkTinm8uy34ni_4XFLZTcdkndy0B_jeFXag0onxA66@mail.gmail.com> <AANLkTin8au=98mmfsaJjOSyJNibk3foZWihj6EGTGWK-@mail.gmail.com> <20110126070939.GA18150@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Chanho Min <chanho.min@lge.com>,
-	"Darrick J. Wong" <djwong@us.ibm.com>,
-	Bob Pearson <rpearson@systemfabricworks.com>,
-	Richard Weinberger <richard@nod.at>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Yann Collet <yann.collet.73@gmail.com>,
-	Kyungsik Lee <kyungsik.lee@lge.com>,
-	"Linux/m68k" <linux-m68k@vger.kernel.org>,
-	sparclinux <sparclinux@vger.kernel.org>,
-	Linux-Next <linux-next@vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <CAMuHMdUv=GR6s=BYXHR7KyaKCUSxmkJO8dzZJMRktu3cUCTbsw@mail.gmail.com>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from plane.gmane.org ([80.91.229.3]:35673 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758485Ab3DYDuE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Apr 2013 23:50:04 -0400
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <glkc-linux-crypto@m.gmane.org>)
+	id 1UVDC7-0006nQ-1z
+	for linux-crypto@vger.kernel.org; Thu, 25 Apr 2013 05:50:03 +0200
+Received: from gate-zin2.freescale.com ([192.88.169.1])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2013 05:50:03 +0200
+Received: from vakul by gate-zin2.freescale.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2013 05:50:03 +0200
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 22 Apr 2013 11:24:21 +0200 Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+Herbert Xu <herbert <at> gondor.apana.org.au> writes:
 
-> On Mon, Apr 22, 2013 at 11:22 AM, Chanho Min <chanho.min@lge.com> wrote:
-> >>> +#define HTYPE const u8*
-> >>> +
-> >>> +#ifdef __BIG_ENDIAN
-> >>> +#define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
-> >>> +#else
-> >>> +#define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
-> >>> +#endif
-> >>
-> >>It seems at least m68k and sparc don't have the __builtin_clz() functions:
-> >>
-> >>m68k-allmodconfig (http://kisskb.ellerman.id.au/kisskb/buildresult/8572593/):
-> >>
-> >>ERROR: "__clzsi2" [lib/lz4/lz4hc_compress.ko] undefined!
-> >>ERROR: "__clzsi2" [lib/lz4/lz4_compress.ko] undefined!
-> >
-> > gcc seems to define __builtin_clz as __clzsi2 in some architecture.
-> > But, kernel doesn't link libgcc.a.
-> > If kernel should use gcc's built-in function without libgcc.a,
-> > do we need to port __clzsi2 to 'arch/*/lib/*'?
 > 
-> That's another option.
+> On Wed, Jan 26, 2011 at 10:26:33AM +0330, Hamid Nassiby wrote:
+> >
+> > As you know, I posted my problem again to crypto list and no one 
+answered.
+> > Now I
+> > emphasize one aspect of the problem as a concept related to IPSec 
+protocol,
+> > free
+> > of my problem's nature, and I hope to get some guidelines at this time. 
+The
+> > question is as following:
+> > If IPSec delivers IP packets to hardware crypto accelerator in 
+sequential
+> > manner
+> > (e.g, packets in order: 1, 2, 3, ..., 36, 37, 38,...) and crypto 
+accelerator
+> > possibly returns back packets out of entering order to IPSec (e.g, 
+packet
+> > 37 is returned back before the packet 36 to IPSec, so the order of 
+packets
+> > is
+> > not the same before entering crypto accelerator and after exiting it); 
+Is it
+> > possible to rise any problem here?
+> 
+> We do not allow such reordering.  All crypto drivers must ensure
+> ordering within a single tfm.  Between different tfms there is no
+> ordering requirement.
+> 
+> Cheers,
 
-Without having seen the patch ....  Yes, if we fix it this way then we
-also fix it for future callers of __builtin_clz().
+
+Hello Herbert,
+
+Does this mean that processing of all the crypto requests from a single tfm 
+must be serialized even if they execute on multiple different cores?
+
+Regards
