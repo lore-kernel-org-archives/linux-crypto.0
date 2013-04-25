@@ -1,12 +1,12 @@
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 4/9 v2] crypto: ux500/cryp - Prepare clock before enabling it
-Date: Thu, 25 Apr 2013 13:57:50 +0200
-Message-ID: <CACRpkdZT-XFyDExKVppWi4NEN7XptSex10LCtAHOpZD71nom3g@mail.gmail.com>
+Subject: Re: [PATCH 5/9] crypto: ux500/cryp - Fix compile error
+Date: Thu, 25 Apr 2013 14:00:00 +0200
+Message-ID: <CACRpkdZNFqbHJB7R5zqVzkAn_nV=G+c27YRB7VCQxiMyFTnPbg@mail.gmail.com>
 References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
-	<1366280825-31136-5-git-send-email-lee.jones@linaro.org>
-	<20130419122226.GB3432@gmail.com>
+	<1366280825-31136-6-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -17,45 +17,27 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Andreas Westin <andreas.westin@stericsson.com>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f174.google.com ([209.85.223.174]:64660 "EHLO
-	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757169Ab3DYL5v (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Apr 2013 07:57:51 -0400
-Received: by mail-ie0-f174.google.com with SMTP id 10so3371047ied.19
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2013 04:57:51 -0700 (PDT)
-In-Reply-To: <20130419122226.GB3432@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1366280825-31136-6-git-send-email-lee.jones@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Apr 19, 2013 at 2:22 PM, Lee Jones <lee.jones@linaro.org> wrote:
+On Thu, Apr 18, 2013 at 12:27 PM, Lee Jones <lee.jones@linaro.org> wrot=
+e:
 
-> Slight change of plan for v2.
+> Clearly this driver hasn't been tested, or even enabled in a while.
 >
-> Now we're doing a seperate clk_prepare(), as the clk_enable() in the
-> previous patch turned out to be called inside a spin_lock().
->
-> Arnd, can you confirm your Ack please?
->
-> ----
->
-> crypto: ux500/cryp - Prepare clock before enabling it
->
-> If we fail to prepare the ux500-cryp clock before enabling it the
-> platform will fail to boot. Here we insure this happens.
+> drivers/crypto/ux500/cryp/cryp_core.c:1771:3:
+>         error: request for member =91pm=92 in something not a structu=
+re or union
 >
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: David S. Miller <davem@davemloft.net>
 > Cc: Andreas Westin <andreas.westin@stericsson.com>
 > Cc: linux-crypto@vger.kernel.org
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Lee Jones <lee.jones@linaro.org>
 
-Same formatting problems as the other prepare/enable
-patch. Include Ulf Hansson.
-
-(Apart from this it looks OK.)
+NAK. I already fixed this. It is in v3.9-rc7.
 
 Yours,
 Linus Walleij
