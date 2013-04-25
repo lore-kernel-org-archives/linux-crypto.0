@@ -1,40 +1,55 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 8/9] crypto: ux500/[cryp|hash] - Show successful start-up
- in the bootlog
-Date: Thu, 25 Apr 2013 14:03:57 +0200
-Message-ID: <CACRpkdYLQtdqCmJ_tt=1DtNeeZVWkL+S6tBG74Li9kOkU25b4A@mail.gmail.com>
-References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
-	<1366280825-31136-9-git-send-email-lee.jones@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1366280825-31136-9-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] ARM: crypto: fix stack frame handling in SHA1 asm code
+Date: Thu, 25 Apr 2013 14:51:50 +0200
+Message-ID: <1366894310-19998-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: david_mccullough@mcafee.com, appro@openssl.org,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:54258 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758463Ab3DYMwb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 25 Apr 2013 08:52:31 -0400
+Received: by mail-wi0-f171.google.com with SMTP id l13so8605974wie.16
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2013 05:52:30 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 18, 2013 at 12:27 PM, Lee Jones <lee.jones@linaro.org> wrote:
+The current code increases its stack frame size a couple of
+times throughout the function, but still performs some writes
+below the stack pointer.
 
-> The Cryp driver is currently silent and the Hash driver prints the
-> name of its probe function unnecessarily. Let's just put a nice
-> descriptive one-liner there instead.
->
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Andreas Westin <andreas.westin@stericsson.com>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+This change applies the fix from the original author so all
+writes to the stack are above the stack pointer.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Taken from origin:
+http://git.openssl.org/gitweb/?p=openssl.git;a=commit;h=1a9d60d2
 
-Yours,
-Linus Walleij
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/sha1-armv4-large.S |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
+index 92c6eed..99207c4 100644
+--- a/arch/arm/crypto/sha1-armv4-large.S
++++ b/arch/arm/crypto/sha1-armv4-large.S
+@@ -195,6 +195,7 @@ ENTRY(sha1_block_data_order)
+ 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
+ 	cmp	r14,sp
+ 	bne	.L_00_15		@ [((11+4)*5+2)*3]
++	sub	sp,sp,#25*4
+ #if __ARM_ARCH__<7
+ 	ldrb	r10,[r1,#2]
+ 	ldrb	r9,[r1,#3]
+@@ -290,7 +291,6 @@ ENTRY(sha1_block_data_order)
+ 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
+ 
+ 	ldr	r8,.LK_20_39		@ [+15+16*4]
+-	sub	sp,sp,#25*4
+ 	cmn	sp,#0			@ [+3], clear carry to denote 20_39
+ .L_20_39_or_60_79:
+ 	ldr	r9,[r14,#15*4]
+-- 
+1.7.10.4
