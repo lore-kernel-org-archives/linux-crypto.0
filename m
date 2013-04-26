@@ -1,79 +1,71 @@
-From: "Chanho Min" <chanho.min@lge.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 Subject: Re: [PATCH 1/2] lib: Add lz4 compressor module
-Date: Fri, 26 Apr 2013 14:02:01 +0900
-Message-ID: <OF6B440C9E.4A0516C8-ON49257B59.001BA689-49257B59.001BA68A@lge.com>
+Date: Fri, 26 Apr 2013 15:51:05 +1000
+Message-ID: <20130426155105.337d821415d8bfa845bf23f5@canb.auug.org.au>
 References: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
 	<CAMuHMdXXoaQjb9sRK=X3gEDwqQBJcJQtaJbUGB8cJmteHSN3vQ@mail.gmail.com>
 	<5175014e.487a420a.4c58.ffffe0b9SMTPIN_ADDED_BROKEN@mx.google.com>
-Reply-To: "Chanho Min" <chanho.min@lge.com>
+	<OF6B440C9E.4A0516C8-ON49257B59.001BA689-49257B59.001BA68A@lge.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: 'Geert Uytterhoeven' <geert@linux-m68k.org>,
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Fri__26_Apr_2013_15_51_05_+1000_yD6n__.3PFlRcJN3"
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	'Geert Uytterhoeven' <geert@linux-m68k.org>,
 	'Bob Pearson' <rpearson@systemfabricworks.com>,
 	'Richard Weinberger' <richard@nod.at>,
 	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	'Yann Collet' <yann.collet.73@gmail.com>,
-	=?EUC-KR?B?wMyw5r3E?= <kyungsik.lee@lge.com>,
+	=?UTF-8?B?7J206rK97Iud?= <kyungsik.lee@lge.com>,
 	'Linux/m68k' <linux-m68k@vger.kernel.org>,
 	'sparclinux' <sparclinux@vger.kernel.org>,
 	'Linux-Next' <linux-next@vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <5175014e.487a420a.4c58.ffffe0b9SMTPIN_ADDED_BROKEN@mx.google.com>
-Sender: linux-next-owner@vger.kernel.org
+To: "Chanho Min" <chanho.min@lge.com>
+Return-path: <linux-m68k-owner@vger.kernel.org>
+In-Reply-To: <OF6B440C9E.4A0516C8-ON49257B59.001BA689-49257B59.001BA68A@lge.com>
+Sender: linux-m68k-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+--Signature=_Fri__26_Apr_2013_15_51_05_+1000_yD6n__.3PFlRcJN3
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> gcc seems to define __builtin_clz as __clzsi2 in some architecture.
->> But, kernel doesn't link libgcc.a.
->> If kernel should use gcc's built-in function without libgcc.a,
->> do we need to port __clzsi2 to 'arch/*/lib/*'?
+Hi,
+
+On Fri, 26 Apr 2013 14:02:01 +0900 "Chanho Min" <chanho.min@lge.com> wrote:
 >
->This breaks alpha (gcc-4.4.4) as well.  Can we please get this fixed
->promptly?
+>=20
+> @@ -0,0 +1,23 @@
+> +#include <linux/kernel.h>
+> +
+> +int __attribute__((weak)) __clzsi2(int val)
 
-__clzsi2 can be implemented by using generic functions.
-It can be overridden by linking arch-specific versions may not be implemented.
-does this way look acceptable?
+We have __weak in <linux/compiler.h>
 
-diff --git a/lib/Makefile b/lib/Makefile
-index af79e8c..e17b3ee 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -23,7 +23,7 @@ lib-y += kobject.o klist.o
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
 
- obj-y += bcd.o div64.o sort.o parser.o halfmd4.o debug_locks.o random32.o \
-       bust_spinlocks.o hexdump.o kasprintf.o bitmap.o scatterlist.o \
--      gcd.o lcm.o list_sort.o uuid.o flex_array.o \
-+      gcd.o lcm.o list_sort.o uuid.o flex_array.o clz.o\
-       bsearch.o find_last_bit.o find_next_bit.o llist.o memweight.o kfifo.o
- obj-y += string_helpers.o
- obj-$(CONFIG_TEST_STRING_HELPERS) += test-string_helpers.o
-diff --git a/lib/clz.c b/lib/clz.c
-index e69de29..6794b83 100644
---- a/lib/clz.c
-+++ b/lib/clz.c
-@@ -0,0 +1,23 @@
-+#include <linux/kernel.h>
-+
-+int __attribute__((weak)) __clzsi2(int val)
-+{
-+     return BITS_PER_LONG - fls(val);
-+}
-+EXPORT_SYMBOL(__clzsi2);
-+
-+#if BITS_PER_LONG == 32
-+int __attribute__((weak)) __clzdi2(long val)
-+{
-+     return BITS_PER_LONG - fls((int)val);
-+}
-+EXPORT_SYMBOL(__clzdi2);
-+#elif BITS_PER_LONG == 64
-+int __attribute__((weak)) __clzdi2(long val)
-+{
-+     return BITS_PER_LONG - fls64((u64)val);
-+}
-+EXPORT_SYMBOL(__clzdi2);
-+#else
-+#error BITS_PER_LONG not 32 or 64
-+#endif
+--Signature=_Fri__26_Apr_2013_15_51_05_+1000_yD6n__.3PFlRcJN3
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCAAGBQJRehXJAAoJEECxmPOUX5FEtPkQAJy8Kokc7jbRt3dNSYV5FDfc
+u/8NMJibZwG1O75vR/z66P5tYRmaecOI1/2mK2aWeTA8IoraQirPKqGDNQ8fh0Uv
+tdmLYJE80TmVpquruIkpp1qQ2IW+iy1Zs3LXY2hVkNCidKldrI+Y4mB4233oRruw
+cSf/IWEg8Fms9bM9AhJRz4mxpLKBNF+FGANht5H2jWF6AUKw47RuhwxhIbPhJn5O
+qQZKvudNHduRCyAW17vGMwMgwXrRS3+yrzBNixs2IK5Dv52qjWKuxBNCLT0gsqvo
+ut8BTwj0oaRp0O30VTnDzMgSiqg5ggDg5P1q0kapC7tCBBSK11SFViWSke9/n9ur
+sPqah71egLK2iuAlIkWbn/lI+TEMMaeo+SGdXJ7ZwmZ44yaNz2UGJt9TYA4/XHga
+EfIUwt0Zpsvb7NBISHeHvttxYEG6GeMtZY2gAqj7rCdJgVXRW6ynZ/PITlzqqlMl
+ByPLj4LxNNgQL+ulxwgVJOXj6SJQDeH4O10918764tRx6rVe6O3NNPkMRpA1eS2x
+duEDv+BQ8U8pXXACuBd3zUH34LNTCPfFDGxvufIQUU81AiVZqo6nulShaxwvV949
+M6KkurSrKeJovT84FhRDHFzVXbUq5b2rSkiLNdJpW1a6ZcYnByz2qNYRKBvmT3PZ
+JXy4y6mIfn6ByclO1eKU
+=duzo
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__26_Apr_2013_15_51_05_+1000_yD6n__.3PFlRcJN3--
