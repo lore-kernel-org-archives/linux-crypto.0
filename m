@@ -1,47 +1,72 @@
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 1/2] lib: Add lz4 compressor module
-Date: Fri, 26 Apr 2013 12:46:25 -0700
-Message-ID: <20130426124625.60bee0e2bcd255c62528e621@linux-foundation.org>
-References: <CAOAMb1D8rokZpQpp6mEJw6KXcQq8fJUWBJoC5+ZfkNaE6WvAZA@mail.gmail.com>
-	<CAMuHMdXXoaQjb9sRK=X3gEDwqQBJcJQtaJbUGB8cJmteHSN3vQ@mail.gmail.com>
-	<5175014e.487a420a.4c58.ffffe0b9SMTPIN_ADDED_BROKEN@mx.google.com>
-	<OF6B440C9E.4A0516C8-ON49257B59.001BA689-49257B59.001BA68A@lge.com>
-	<20130426155105.337d821415d8bfa845bf23f5@canb.auug.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
+ transform framework
+Date: Sun, 28 Apr 2013 08:11:22 +0800
+Message-ID: <20130428001122.GA6973@gondor.apana.org.au>
+References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
+ <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
+ <20130425132203.GA29501@gondor.apana.org.au>
+ <1366910910.27102.126.camel@schen9-DESK>
+ <20130426125224.GA4855@gondor.apana.org.au>
+ <1366994657.27102.129.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "Chanho Min" <chanho.min@lge.com>,
-	"'Geert Uytterhoeven'" <geert@linux-m68k.org>,
-	"'Bob Pearson'" <rpearson@systemfabricworks.com>,
-	"'Richard Weinberger'" <richard@nod.at>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	"'Yann Collet'" <yann.collet.73@gmail.com>,
-	=?UTF-8?Q?=EC=9D=B4=EA=B2=BD=EC=8B=9D?= <kyungsik.lee@lge.com>,
-	"'Linux/m68k'" <linux-m68k@vger.kernel.org>,
-	"'sparclinux'" <sparclinux@vger.kernel.org>,
-	"'Linux-Next'" <linux-next@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20130426155105.337d821415d8bfa845bf23f5@canb.auug.org.au>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:50888 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754310Ab3D1ALs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 27 Apr 2013 20:11:48 -0400
+Content-Disposition: inline
+In-Reply-To: <1366994657.27102.129.camel@schen9-DESK>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 26 Apr 2013 15:51:05 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+On Fri, Apr 26, 2013 at 09:44:17AM -0700, Tim Chen wrote:
+>
+> +	old_tfm = crct10dif_tfm;
+> +	crc_t10dif_newalg = true;
+> +	/* make sure new alg flag is turned on before starting to switch tfm */
+> +	mb();
+> +
+> +	new_tfm = crypto_alloc_shash("crct10dif", 0, 0);
+> +	if (IS_ERR(new_tfm))
+> +		goto done;
+> +
+> +	if (old_tfm)
+> +		if (crypto_tfm_alg_priority(&old_tfm->base) >=
+> +		    crypto_tfm_alg_priority(&new_tfm->base)) {
+> +			crypto_free_shash(new_tfm);
+> +			goto done;
+> +		}
+> +	crct10dif_tfm = new_tfm;
+> +	/* make sure update to tfm pointer is completed */
+> +	mb();
+> +	crypto_free_shash(old_tfm);
 
-> Hi,
-> 
-> On Fri, 26 Apr 2013 14:02:01 +0900 "Chanho Min" <chanho.min@lge.com> wrote:
-> >
-> > 
-> > @@ -0,0 +1,23 @@
-> > +#include <linux/kernel.h>
-> > +
-> > +int __attribute__((weak)) __clzsi2(int val)
-> 
-> We have __weak in <linux/compiler.h>
+This is not safe at all.  You'd need to use something like RCU.
 
-And lib/clz.c needs a few more includes, for EXPORT_SYMBOL,
-BITS_PER_LONG maybe.
+However, I think this is an overkill.  Initialising it once should
+be enough.  If someone really wanted to change things at run-time,
+they could always build this as a module and unload/reload it.
 
-Plus a changelog and a signed-off-by, please.
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
