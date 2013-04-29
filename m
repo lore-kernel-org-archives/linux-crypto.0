@@ -1,72 +1,26 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
- transform framework
-Date: Sun, 28 Apr 2013 08:11:22 +0800
-Message-ID: <20130428001122.GA6973@gondor.apana.org.au>
-References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
- <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
- <20130425132203.GA29501@gondor.apana.org.au>
- <1366910910.27102.126.camel@schen9-DESK>
- <20130426125224.GA4855@gondor.apana.org.au>
- <1366994657.27102.129.camel@schen9-DESK>
-Mime-Version: 1.0
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.6h file/swap crypto package
+Date: Mon, 29 Apr 2013 14:10:56 +0300
+Message-ID: <517E5540.F64D5681@users.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Matthew Wilcox <willy@linux.intel.com>,
-	Jim Kukunas <james.t.kukunas@linux.intel.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:50888 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754310Ab3D1ALs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 27 Apr 2013 20:11:48 -0400
-Content-Disposition: inline
-In-Reply-To: <1366994657.27102.129.camel@schen9-DESK>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Apr 26, 2013 at 09:44:17AM -0700, Tim Chen wrote:
->
-> +	old_tfm = crct10dif_tfm;
-> +	crc_t10dif_newalg = true;
-> +	/* make sure new alg flag is turned on before starting to switch tfm */
-> +	mb();
-> +
-> +	new_tfm = crypto_alloc_shash("crct10dif", 0, 0);
-> +	if (IS_ERR(new_tfm))
-> +		goto done;
-> +
-> +	if (old_tfm)
-> +		if (crypto_tfm_alg_priority(&old_tfm->base) >=
-> +		    crypto_tfm_alg_priority(&new_tfm->base)) {
-> +			crypto_free_shash(new_tfm);
-> +			goto done;
-> +		}
-> +	crct10dif_tfm = new_tfm;
-> +	/* make sure update to tfm pointer is completed */
-> +	mb();
-> +	crypto_free_shash(old_tfm);
+loop-AES changes since previous release:
+- Fixed bug that caused compile failure if kernel configuration has
+  CONFIG_UIDGID_STRICT_TYPE_CHECKS=y. Patch from Hank Leininger.
+- Worked around block layer interface changes on 3.9 kernels.
 
-This is not safe at all.  You'd need to use something like RCU.
+bzip2 compressed tarball is here:
 
-However, I think this is an overkill.  Initialising it once should
-be enough.  If someone really wanted to change things at run-time,
-they could always build this as a module and unload/reload it.
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6h.tar.bz2
+    md5sum 7c5ad5761e58fc8eb0176b00c69b6b75
 
-Cheers,
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.6h.tar.bz2.sign
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  1024R/3A220F51 5B 4B F9 BB D3 3F 52 E9  DB 1D EB E3 24 0E A9 DD
