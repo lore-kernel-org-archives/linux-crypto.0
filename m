@@ -1,54 +1,83 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
- transform framework
-Date: Tue, 30 Apr 2013 11:27:33 +0800
-Message-ID: <20130430032733.GB20471@gondor.apana.org.au>
-References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
- <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
- <20130425132203.GA29501@gondor.apana.org.au>
- <1366910910.27102.126.camel@schen9-DESK>
- <20130426125224.GA4855@gondor.apana.org.au>
- <1366994657.27102.129.camel@schen9-DESK>
- <20130428001122.GA6973@gondor.apana.org.au>
- <1367268030.27102.172.camel@schen9-DESK>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH 6/9] crypto: ux500/cryp - Set DMA configuration though
+ dma_slave_config()
+Date: Tue, 30 Apr 2013 15:38:37 +0530
+Message-ID: <20130430100837.GB1960@intel.com>
+References: <1366280825-31136-1-git-send-email-lee.jones@linaro.org>
+ <CACRpkdbFgW6bGYt59WtN4r2izuN09AJw4J1cqir82uzFsuMmWQ@mail.gmail.com>
+ <20130425134402.GN4623@gmail.com>
+ <201304251611.39667.arnd@arndb.de>
+ <CACRpkdaBf++gy3sghC-t33uio2+eHp1MrQ2FM0XXBazZTtm3kA@mail.gmail.com>
+ <20130426081646.GD24632@intel.com>
+ <20130426094123.GG14496@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Lee Jones <lee.jones@linaro.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Matthew Wilcox <willy@linux.intel.com>,
-	Jim Kukunas <james.t.kukunas@linux.intel.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+	Andreas Westin <andreas.westin@stericsson.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	magnus.p.persson@stericsson.com
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:16214 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754852Ab3D3Kll (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Apr 2013 06:41:41 -0400
 Content-Disposition: inline
-In-Reply-To: <1367268030.27102.172.camel@schen9-DESK>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20130426094123.GG14496@n2100.arm.linux.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 29, 2013 at 01:40:30PM -0700, Tim Chen wrote:
->
-> If I allocate the transform under the mod init instead, how can I make
-> sure that the fast version is already registered if I have it compiled
-> in?  It is not clear to me how that's done looking at the libcrc32c
-> code.  
+On Fri, Apr 26, 2013 at 10:41:23AM +0100, Russell King - ARM Linux wrote:
+> On Fri, Apr 26, 2013 at 01:46:46PM +0530, Vinod Koul wrote:
+> > On Fri, Apr 26, 2013 at 10:28:39AM +0200, Linus Walleij wrote:
+> > > On Thu, Apr 25, 2013 at 4:11 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > > 
+> > > > The dma engine driver must know the address in its dma space, while the
+> > > > slave driver has it available in physical space. These two are often the
+> > > > same, but there is no generic way to convert between the two, especially
+> > > > if the dma engine resides behind an IOMMU.
+> > > >
+> > > > The best assumption we can make is that the dma engine driver knows
+> > > > how to convert between the two. Interestingly the documentation for
+> > > > dma_slave_config talks about "physical address", while the structure
+> > > > itself uses a dma_addr_t. Linus Walleij introduced the structure in
+> > > > c156d0a5b0 "DMAENGINE: generic slave channel control v3", so I assume
+> > > > he can shed some light on what he was thinking. I assume the documentation
+> > > > is right but the structure is not and should be converted to use
+> > > > phys_add_t or resource_size_t.
+> > > 
+> > > OK I could cook a patch for that, but I think I need some input from
+> > > Vinod and/or Russell on this.
+> > the dma_slave_config is physical address that should be passed directly to the
+> > controller. Obviosuly it should phys_addr_t :)
+> 
+> What you've just said is actually confusing.
+> 
+> "physical address" is normally the term used to describe the addresses
+> seen to the RAM.  phys_addr_t describes this.  This is not necessarily
+> what needs to be programmed into the DMA controller.
+Yes that would be true when you have MMU
+> 
+> For RAM addresses, they must be mapped via the DMA API - and this gives
+> you a dma_addr_t.
+> 
+> "DMA address" is the address to be programmed into a DMA controller to
+> access a particular address in RAM or device, and has type dma_addr_t.
+> When you're programming a DMA controller to access a device, you are
+> clearly telling it the address on the _DMA controller's bus_ to access
+> that register, which may or may not be the same as the physical address.
+> 
+> There are platforms in existence where phys_addr_t can be 32-bit but
+> dma_addr_t can be 64-bit.  Getting this stuff wrong can cause problems.
+Sure, thanks for pointing, so we wont do this change.
 
-This is only an issue when everything is built-in to the kernel.
-
-In that case we could make the crc implementations register at a
-point earlier than device_initcall, but no earlier than subsys_initcall
-since that's where cryptomgr sits.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+~Vinod
