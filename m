@@ -1,7 +1,7 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 7/8] crypto: ux500/[cryp|hash] - Show successful start-up in the bootlog
-Date: Thu,  2 May 2013 11:49:49 +0100
-Message-ID: <1367491790-9727-8-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH 5/8] crypto: ux500/cryp - Set DMA configuration though dma_slave_config()
+Date: Thu,  2 May 2013 11:49:47 +0100
+Message-ID: <1367491790-9727-6-git-send-email-lee.jones@linaro.org>
 References: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
 Cc: arnd@arndb.de, linus.walleij@stericsson.com,
 	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>,
@@ -10,59 +10,101 @@ Cc: arnd@arndb.de, linus.walleij@stericsson.com,
 	Andreas Westin <andreas.westin@stericsson.com>,
 	linux-crypto@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:53149 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750878Ab3EBKuQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 May 2013 06:50:16 -0400
-Received: by mail-we0-f180.google.com with SMTP id x43so346823wey.39
-        for <linux-crypto@vger.kernel.org>; Thu, 02 May 2013 03:50:15 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The Cryp driver is currently silent and the Hash driver prints the
-name of its probe function unnecessarily. Let's just put a nice
-descriptive one-liner there instead.
+The DMA controller currently takes configuration information from
+information passed though dma_channel_request(), but it shouldn't.
+Using the API, the DMA channel should only be configured during
+a dma_slave_config() call.
 
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Andreas Westin <andreas.westin@stericsson.com>
 Cc: linux-crypto@vger.kernel.org
 Acked-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/ux500/cryp/cryp_core.c |    2 ++
- drivers/crypto/ux500/hash/hash_core.c |    2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/crypto/ux500/cryp/cryp.h      |    7 ++++++-
+ drivers/crypto/ux500/cryp/cryp_core.c |   17 +++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/crypto/ux500/cryp/cryp.h b/drivers/crypto/ux500/cryp/cryp.h
+index 14cfd05..d1d6606 100644
+--- a/drivers/crypto/ux500/cryp/cryp.h
++++ b/drivers/crypto/ux500/cryp/cryp.h
+@@ -114,6 +114,9 @@ enum cryp_status_id {
+ };
+ 
+ /* Cryp DMA interface */
++#define CRYP_DMA_TX_FIFO	0x08
++#define CRYP_DMA_RX_FIFO	0x10
++
+ enum cryp_dma_req_type {
+ 	CRYP_DMA_DISABLE_BOTH,
+ 	CRYP_DMA_ENABLE_IN_DATA,
+@@ -217,7 +220,8 @@ struct cryp_dma {
+ 
+ /**
+  * struct cryp_device_data - structure for a cryp device.
+- * @base: Pointer to the hardware base address.
++ * @base: Pointer to virtual base address of the cryp device.
++ * @phybase: Pointer to physical memory location of the cryp device.
+  * @dev: Pointer to the devices dev structure.
+  * @clk: Pointer to the device's clock control.
+  * @pwr_regulator: Pointer to the device's power control.
+@@ -232,6 +236,7 @@ struct cryp_dma {
+  */
+ struct cryp_device_data {
+ 	struct cryp_register __iomem *base;
++	phys_addr_t phybase;
+ 	struct device *dev;
+ 	struct clk *clk;
+ 	struct regulator *pwr_regulator;
 diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 4b90493..78d7463 100644
+index bf78d60..4b90493 100644
 --- a/drivers/crypto/ux500/cryp/cryp_core.c
 +++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1542,6 +1542,8 @@ static int ux500_cryp_probe(struct platform_device *pdev)
- 		goto out_power;
- 	}
- 
-+	dev_info(dev, "successfully registered\n");
+@@ -476,6 +476,19 @@ static int cryp_get_device_data(struct cryp_ctx *ctx,
+ static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
+ 				   struct device *dev)
+ {
++	struct dma_slave_config mem2cryp = {
++		.direction = DMA_MEM_TO_DEV,
++		.dst_addr = device_data->phybase + CRYP_DMA_TX_FIFO,
++		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
++		.dst_maxburst = 4,
++        };
++	struct dma_slave_config cryp2mem = {
++		.direction = DMA_DEV_TO_MEM,
++		.src_addr = device_data->phybase + CRYP_DMA_RX_FIFO,
++		.src_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
++		.src_maxburst = 4,
++        };
 +
- 	return 0;
+ 	dma_cap_zero(device_data->dma.mask);
+ 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
  
- out_power:
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 5d8a7f3..ac606b6 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1773,7 +1773,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
- 		goto out_power;
+@@ -491,6 +504,9 @@ static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
+ 				    stedma40_filter,
+ 				    device_data->dma.cfg_cryp2mem);
+ 
++	dmaengine_slave_config(device_data->dma.chan_mem2cryp, &mem2cryp);
++	dmaengine_slave_config(device_data->dma.chan_cryp2mem, &cryp2mem);
++
+ 	init_completion(&device_data->dma.cryp_dma_complete);
+ }
+ 
+@@ -1432,6 +1448,7 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		goto out_kfree;
  	}
  
--	dev_info(dev, "[%s] successfully probed\n", __func__);
-+	dev_info(dev, "successfully registered\n");
- 	return 0;
- 
- out_power:
++	device_data->phybase = res->start;
+ 	device_data->base = ioremap(res->start, resource_size(res));
+ 	if (!device_data->base) {
+ 		dev_err(dev, "[%s]: ioremap failed!", __func__);
 -- 
 1.7.10.4
