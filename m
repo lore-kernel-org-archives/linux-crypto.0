@@ -1,65 +1,119 @@
-From: Laurent Navet <laurent.navet@gmail.com>
-Subject: [PATCH] drivers: crypto: use devm_ioremap_resource()
-Date: Thu,  2 May 2013 14:00:38 +0200
-Message-ID: <1367496038-4038-1-git-send-email-laurent.navet@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Laurent Navet <laurent.navet@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:45006 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758426Ab3EBLwl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 May 2013 07:52:41 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Alexander Holler <holler@ahsoftware.de>
+Subject: [PATCH  RESEND/V2] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
+Date: Thu,  2 May 2013 16:09:06 +0200
+Message-ID: <1367503746-6431-1-git-send-email-holler@ahsoftware.de>
+References: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	David Howells <dhowells@redhat.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Alexander Holler <holler@ahsoftware.de>, stable@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Replace calls to deprecated devm_request_and_ioremap by devm_ioremap_resource.
+I don't see any real use case where checking the validity dates of X.509
+certificates at parsing time adds any security gain. In contrast, doing so
+makes MODSIGN unusable on systems without a RTC (or systems with a possible
+wrong date in a existing RTC, or systems where the RTC is read after the keys
+got loaded).
 
-Found with coccicheck and this semantic patch:
- scripts/coccinelle/api/devm_request_and_ioremap.cocci.
+If something really cares about the dates, it should check them at the time
+when the certificates are used, not when they are loaded and parsed.
 
-Signed-off-by: Laurent Navet <laurent.navet@gmail.com>
+So just remove the validity check of the dates in the parser.
+
+Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+Cc: stable@vger.kernel.org
 ---
- drivers/crypto/omap-aes.c  |    7 +++----
- drivers/crypto/omap-sham.c |    7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 6aa425f..158215c 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1125,10 +1125,9 @@ static int omap_aes_probe(struct platform_device *pdev)
- 	if (err)
- 		goto err_res;
- 
--	dd->io_base = devm_request_and_ioremap(dev, &res);
--	if (!dd->io_base) {
--		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+	dd->io_base = devm_ioremap_resource(dev, &res);
-+	if (IS_ERR(dd->io_base)) {
-+		err = PTR_ERR(dd->io_base);
- 		goto err_res;
+ Updates to V1:
+  I've moved the below comment from the git commit message to this section so
+  that this patch can be applied without any further modifications.
+  Maybe this raises the statistical possibility that someone presses a button
+  or key to feed this simple patch into the mainline kernel as it fixes a real
+  bug which renders MODSIGN unusable on system without an RTC (which needs to
+  set the  time before modsign loads the crypto keys). Because I think modsign
+  is a nice security feature e.g. to prevent rootkits which do modify or add
+  modules, I care about it and try it a last time.
+
+ There were already 4 variations of this patch (I know about).
+
+ The first removed the check by adding a config option:
+  https://lkml.org/lkml/2013/2/25/171
+ The second just removed the return of errors:
+  https://lkml.org/lkml/2013/3/14/247
+ The third removed parsing of the dates too:
+  https://lkml.org/lkml/2013/3/14/257
+ And finally V1 of this patch:
+  https://lkml.org/lkml/2013/3/27/449
+
+ Here is a thread which explains the motivation for this patch a bit further:
+  https://lkml.org/lkml/2013/2/13/90
+
+ crypto/asymmetric_keys/x509_public_key.c | 38 --------------------------------
+ 1 file changed, 38 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 06007f0..52222a2 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -106,7 +106,6 @@ error_no_sig:
+ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ {
+ 	struct x509_certificate *cert;
+-	struct tm now;
+ 	size_t srlen, sulen;
+ 	char *desc = NULL;
+ 	int ret;
+@@ -137,43 +136,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 		goto error_free_cert;
  	}
- 	dd->phys_base = res.start;
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 3d1611f..4d9cca6 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -1686,10 +1686,9 @@ static int omap_sham_probe(struct platform_device *pdev)
- 	if (err)
- 		goto res_err;
  
--	dd->io_base = devm_request_and_ioremap(dev, &res);
--	if (!dd->io_base) {
--		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+	dd->io_base = devm_ioremap_resource(dev, &res);
-+	if (IS_ERR(dd->io_base)) {
-+		err = PTR_ERR(dd->io_base);
- 		goto res_err;
- 	}
- 	dd->phys_base = res.start;
+-	time_to_tm(CURRENT_TIME.tv_sec, 0, &now);
+-	pr_devel("Now: %04ld-%02d-%02d %02d:%02d:%02d\n",
+-		 now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
+-		 now.tm_hour, now.tm_min,  now.tm_sec);
+-	if (now.tm_year < cert->valid_from.tm_year ||
+-	    (now.tm_year == cert->valid_from.tm_year &&
+-	     (now.tm_mon < cert->valid_from.tm_mon ||
+-	      (now.tm_mon == cert->valid_from.tm_mon &&
+-	       (now.tm_mday < cert->valid_from.tm_mday ||
+-		(now.tm_mday == cert->valid_from.tm_mday &&
+-		 (now.tm_hour < cert->valid_from.tm_hour ||
+-		  (now.tm_hour == cert->valid_from.tm_hour &&
+-		   (now.tm_min < cert->valid_from.tm_min ||
+-		    (now.tm_min == cert->valid_from.tm_min &&
+-		     (now.tm_sec < cert->valid_from.tm_sec
+-		      ))))))))))) {
+-		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
+-		ret = -EKEYREJECTED;
+-		goto error_free_cert;
+-	}
+-	if (now.tm_year > cert->valid_to.tm_year ||
+-	    (now.tm_year == cert->valid_to.tm_year &&
+-	     (now.tm_mon > cert->valid_to.tm_mon ||
+-	      (now.tm_mon == cert->valid_to.tm_mon &&
+-	       (now.tm_mday > cert->valid_to.tm_mday ||
+-		(now.tm_mday == cert->valid_to.tm_mday &&
+-		 (now.tm_hour > cert->valid_to.tm_hour ||
+-		  (now.tm_hour == cert->valid_to.tm_hour &&
+-		   (now.tm_min > cert->valid_to.tm_min ||
+-		    (now.tm_min == cert->valid_to.tm_min &&
+-		     (now.tm_sec > cert->valid_to.tm_sec
+-		      ))))))))))) {
+-		pr_warn("Cert %s has expired\n", cert->fingerprint);
+-		ret = -EKEYEXPIRED;
+-		goto error_free_cert;
+-	}
+-
+ 	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
+ 	cert->pub->id_type = PKEY_ID_X509;
+ 
 -- 
-1.7.10.4
+1.8.1.4
