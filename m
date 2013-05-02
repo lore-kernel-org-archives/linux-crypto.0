@@ -1,61 +1,100 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v2 1/4] Wrap crc_t10dif function all to use crypto
- transform framework
-Date: Wed, 01 May 2013 19:59:34 -0700
-Message-ID: <1367463574.27102.207.camel@schen9-DESK>
-References: <cover.1366214842.git.tim.c.chen@linux.intel.com>
-	 <ea4271721b5ca130849b03da4f172f12f66e5628.1366214842.git.tim.c.chen@linux.intel.com>
-	 <20130425132203.GA29501@gondor.apana.org.au>
-	 <1366910910.27102.126.camel@schen9-DESK>
-	 <20130426125224.GA4855@gondor.apana.org.au>
-	 <1366994657.27102.129.camel@schen9-DESK>
-	 <20130428001122.GA6973@gondor.apana.org.au>
-	 <1367268030.27102.172.camel@schen9-DESK>
-	 <20130430032733.GB20471@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 2/8] crypto: ux500/hash - Set DMA configuration though dma_slave_config()
+Date: Thu,  2 May 2013 11:49:44 +0100
+Message-ID: <1367491790-9727-3-git-send-email-lee.jones@linaro.org>
+References: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Matthew Wilcox <willy@linux.intel.com>,
-	Jim Kukunas <james.t.kukunas@linux.intel.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:46858 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752891Ab3EBC7a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 May 2013 22:59:30 -0400
-In-Reply-To: <20130430032733.GB20471@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Andreas Westin <andreas.westin@stericsson.com>,
+	linux-crypto@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2013-04-30 at 11:27 +0800, Herbert Xu wrote:
-> On Mon, Apr 29, 2013 at 01:40:30PM -0700, Tim Chen wrote:
-> >
-> > If I allocate the transform under the mod init instead, how can I make
-> > sure that the fast version is already registered if I have it compiled
-> > in?  It is not clear to me how that's done looking at the libcrc32c
-> > code.  
-> 
-> This is only an issue when everything is built-in to the kernel.
-> 
-> In that case we could make the crc implementations register at a
-> point earlier than device_initcall, but no earlier than subsys_initcall
-> since that's where cryptomgr sits.
+The DMA controller currently takes configuration information from
+information passed though dma_channel_request(), but it shouldn't.
+Using the API, the DMA channel should only be configured during
+a dma_slave_config() call.
 
-I've spun version 3 of this patch series to address the concerns about
-version 2.  The patches are sent separately.
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+---
+ drivers/crypto/ux500/hash/hash_alg.h  |    5 ++++-
+ drivers/crypto/ux500/hash/hash_core.c |   10 ++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-Thanks.
-
-Tim
+diff --git a/drivers/crypto/ux500/hash/hash_alg.h b/drivers/crypto/ux500/hash/hash_alg.h
+index cd9351c..be6eb54 100644
+--- a/drivers/crypto/ux500/hash/hash_alg.h
++++ b/drivers/crypto/ux500/hash/hash_alg.h
+@@ -11,6 +11,7 @@
+ #include <linux/bitops.h>
+ 
+ #define HASH_BLOCK_SIZE			64
++#define HASH_DMA_FIFO			4
+ #define HASH_DMA_ALIGN_SIZE		4
+ #define HASH_DMA_PERFORMANCE_MIN_SIZE	1024
+ #define HASH_BYTES_PER_WORD		4
+@@ -347,7 +348,8 @@ struct hash_req_ctx {
+ 
+ /**
+  * struct hash_device_data - structure for a hash device.
+- * @base:		Pointer to the hardware base address.
++ * @base:		Pointer to virtual base address of the hash device.
++ * @phybase:		Pointer to physical memory location of the hash device.
+  * @list_node:		For inclusion in klist.
+  * @dev:		Pointer to the device dev structure.
+  * @ctx_lock:		Spinlock for current_ctx.
+@@ -361,6 +363,7 @@ struct hash_req_ctx {
+  */
+ struct hash_device_data {
+ 	struct hash_register __iomem	*base;
++	phys_addr_t             phybase;
+ 	struct klist_node	list_node;
+ 	struct device		*dev;
+ 	struct spinlock		ctx_lock;
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 1e8b2f3..5d8a7f3 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -123,6 +123,13 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
+ 				struct device *dev)
+ {
+ 	struct hash_platform_data *platform_data = dev->platform_data;
++	struct dma_slave_config conf = {
++		.direction = DMA_MEM_TO_DEV,
++		.dst_addr = device_data->phybase + HASH_DMA_FIFO,
++		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
++		.dst_maxburst = 16,
++        };
++
+ 	dma_cap_zero(device_data->dma.mask);
+ 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
+ 
+@@ -132,6 +139,8 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
+ 				platform_data->dma_filter,
+ 				device_data->dma.cfg_mem2hash);
+ 
++	dmaengine_slave_config(device_data->dma.chan_mem2hash, &conf);
++
+ 	init_completion(&device_data->dma.complete);
+ }
+ 
+@@ -1700,6 +1709,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 		goto out_kfree;
+ 	}
+ 
++	device_data->phybase = res->start;
+ 	device_data->base = ioremap(res->start, resource_size(res));
+ 	if (!device_data->base) {
+ 		dev_err(dev, "[%s] ioremap() failed!",
+-- 
+1.7.10.4
