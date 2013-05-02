@@ -1,82 +1,65 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 1/8] crypto: ux500/hash - Prepare clock before enabling it
-Date: Thu,  2 May 2013 11:49:43 +0100
-Message-ID: <1367491790-9727-2-git-send-email-lee.jones@linaro.org>
-References: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	linux-crypto@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+From: Laurent Navet <laurent.navet@gmail.com>
+Subject: [PATCH] drivers: crypto: use devm_ioremap_resource()
+Date: Thu,  2 May 2013 14:00:38 +0200
+Message-ID: <1367496038-4038-1-git-send-email-laurent.navet@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Laurent Navet <laurent.navet@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f171.google.com ([74.125.82.171]:62994 "EHLO
-	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757563Ab3EBKuF (ORCPT
+Received: from mail-we0-f180.google.com ([74.125.82.180]:45006 "EHLO
+	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758426Ab3EBLwl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 May 2013 06:50:05 -0400
-Received: by mail-we0-f171.google.com with SMTP id u7so363584wey.30
-        for <linux-crypto@vger.kernel.org>; Thu, 02 May 2013 03:50:04 -0700 (PDT)
-In-Reply-To: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
+	Thu, 2 May 2013 07:52:41 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If we fail to prepare the ux500-hash clock before enabling it the
-platform will fail to boot. Here we insure this happens.
+Replace calls to deprecated devm_request_and_ioremap by devm_ioremap_resource.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Andreas Westin <andreas.westin@stericsson.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-crypto@vger.kernel.org
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Found with coccicheck and this semantic patch:
+ scripts/coccinelle/api/devm_request_and_ioremap.cocci.
+
+Signed-off-by: Laurent Navet <laurent.navet@gmail.com>
 ---
- drivers/crypto/ux500/hash/hash_core.c |   12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ drivers/crypto/omap-aes.c  |    7 +++----
+ drivers/crypto/omap-sham.c |    7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 632c333..1e8b2f3 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1727,11 +1727,17 @@ static int ux500_hash_probe(struct platform_device *pdev)
- 		goto out_regulator;
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 6aa425f..158215c 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1125,10 +1125,9 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto err_res;
+ 
+-	dd->io_base = devm_request_and_ioremap(dev, &res);
+-	if (!dd->io_base) {
+-		dev_err(dev, "can't ioremap\n");
+-		err = -ENOMEM;
++	dd->io_base = devm_ioremap_resource(dev, &res);
++	if (IS_ERR(dd->io_base)) {
++		err = PTR_ERR(dd->io_base);
+ 		goto err_res;
  	}
+ 	dd->phys_base = res.start;
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 3d1611f..4d9cca6 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1686,10 +1686,9 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto res_err;
  
-+	ret = clk_prepare(device_data->clk);
-+	if (ret) {
-+		dev_err(dev, "[%s] clk_prepare() failed!", __func__);
-+		goto out_clk;
-+	}
-+
- 	/* Enable device power (and clock) */
- 	ret = hash_enable_power(device_data, false);
- 	if (ret) {
- 		dev_err(dev, "[%s]: hash_enable_power() failed!", __func__);
--		goto out_clk;
-+		goto out_clk_unprepare;
+-	dd->io_base = devm_request_and_ioremap(dev, &res);
+-	if (!dd->io_base) {
+-		dev_err(dev, "can't ioremap\n");
+-		err = -ENOMEM;
++	dd->io_base = devm_ioremap_resource(dev, &res);
++	if (IS_ERR(dd->io_base)) {
++		err = PTR_ERR(dd->io_base);
+ 		goto res_err;
  	}
- 
- 	ret = hash_check_hw(device_data);
-@@ -1763,6 +1769,9 @@ static int ux500_hash_probe(struct platform_device *pdev)
- out_power:
- 	hash_disable_power(device_data, false);
- 
-+out_clk_unprepare:
-+	clk_unprepare(device_data->clk);
-+
- out_clk:
- 	clk_put(device_data->clk);
- 
-@@ -1827,6 +1836,7 @@ static int ux500_hash_remove(struct platform_device *pdev)
- 		dev_err(dev, "[%s]: hash_disable_power() failed",
- 			__func__);
- 
-+	clk_unprepare(device_data->clk);
- 	clk_put(device_data->clk);
- 	regulator_put(device_data->regulator);
- 
+ 	dd->phys_base = res.start;
 -- 
 1.7.10.4
