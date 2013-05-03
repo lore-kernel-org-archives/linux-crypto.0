@@ -1,53 +1,107 @@
-From: Sachin Kamat <sachin.kamat@linaro.org>
-Subject: [PATCH 2/2] crypto: s5p-sss: Remove redundant platform_set_drvdata()
-Date: Fri,  3 May 2013 14:48:15 +0530
-Message-ID: <1367572695-10713-2-git-send-email-sachin.kamat@linaro.org>
-References: <1367572695-10713-1-git-send-email-sachin.kamat@linaro.org>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	sachin.kamat@linaro.org, patches@linaro.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>
-To: linux-crypto@vger.kernel.org
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 37/63] crypto: ux500/hash - Set DMA configuration though dma_slave_config()
+Date: Fri,  3 May 2013 15:32:23 +0100
+Message-ID: <1367591569-32197-38-git-send-email-lee.jones@linaro.org>
+References: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Westin <andreas.westin@stericsson.com>,
+	linux-crypto@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:57098 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752730Ab3ECJbQ (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:49654 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933592Ab3ECOem (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 May 2013 05:31:16 -0400
-Received: by mail-pa0-f47.google.com with SMTP id kl13so835006pab.20
-        for <linux-crypto@vger.kernel.org>; Fri, 03 May 2013 02:31:15 -0700 (PDT)
-In-Reply-To: <1367572695-10713-1-git-send-email-sachin.kamat@linaro.org>
+	Fri, 3 May 2013 10:34:42 -0400
+Received: by mail-wg0-f44.google.com with SMTP id z12so1664663wgg.35
+        for <linux-crypto@vger.kernel.org>; Fri, 03 May 2013 07:34:41 -0700 (PDT)
+In-Reply-To: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 0998d06310 (device-core: Ensure drvdata = NULL when no
-driver is bound) removes the need to set driver data field to
-NULL.
+The DMA controller currently takes configuration information from
+information passed though dma_channel_request(), but it shouldn't.
+Using the API, the DMA channel should only be configured during
+a dma_slave_config() call.
 
-Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
-Cc: Vladimir Zapolskiy <vzapolskiy@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Andreas Westin <andreas.westin@stericsson.com>
+Cc: linux-crypto@vger.kernel.org
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/s5p-sss.c |    2 --
- 1 file changed, 2 deletions(-)
+ drivers/crypto/ux500/hash/hash_alg.h  |    5 ++++-
+ drivers/crypto/ux500/hash/hash_core.c |   10 ++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 4b31432..cf149b1 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -647,7 +647,6 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	clk_disable(pdata->clk);
+diff --git a/drivers/crypto/ux500/hash/hash_alg.h b/drivers/crypto/ux500/hash/hash_alg.h
+index cd9351c..be6eb54 100644
+--- a/drivers/crypto/ux500/hash/hash_alg.h
++++ b/drivers/crypto/ux500/hash/hash_alg.h
+@@ -11,6 +11,7 @@
+ #include <linux/bitops.h>
  
- 	s5p_dev = NULL;
--	platform_set_drvdata(pdev, NULL);
+ #define HASH_BLOCK_SIZE			64
++#define HASH_DMA_FIFO			4
+ #define HASH_DMA_ALIGN_SIZE		4
+ #define HASH_DMA_PERFORMANCE_MIN_SIZE	1024
+ #define HASH_BYTES_PER_WORD		4
+@@ -347,7 +348,8 @@ struct hash_req_ctx {
  
- 	return err;
+ /**
+  * struct hash_device_data - structure for a hash device.
+- * @base:		Pointer to the hardware base address.
++ * @base:		Pointer to virtual base address of the hash device.
++ * @phybase:		Pointer to physical memory location of the hash device.
+  * @list_node:		For inclusion in klist.
+  * @dev:		Pointer to the device dev structure.
+  * @ctx_lock:		Spinlock for current_ctx.
+@@ -361,6 +363,7 @@ struct hash_req_ctx {
+  */
+ struct hash_device_data {
+ 	struct hash_register __iomem	*base;
++	phys_addr_t             phybase;
+ 	struct klist_node	list_node;
+ 	struct device		*dev;
+ 	struct spinlock		ctx_lock;
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 1e8b2f3..5d8a7f3 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -123,6 +123,13 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
+ 				struct device *dev)
+ {
+ 	struct hash_platform_data *platform_data = dev->platform_data;
++	struct dma_slave_config conf = {
++		.direction = DMA_MEM_TO_DEV,
++		.dst_addr = device_data->phybase + HASH_DMA_FIFO,
++		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
++		.dst_maxburst = 16,
++        };
++
+ 	dma_cap_zero(device_data->dma.mask);
+ 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
+ 
+@@ -132,6 +139,8 @@ static void hash_dma_setup_channel(struct hash_device_data *device_data,
+ 				platform_data->dma_filter,
+ 				device_data->dma.cfg_mem2hash);
+ 
++	dmaengine_slave_config(device_data->dma.chan_mem2hash, &conf);
++
+ 	init_completion(&device_data->dma.complete);
  }
-@@ -668,7 +667,6 @@ static int s5p_aes_remove(struct platform_device *pdev)
- 	clk_disable(pdata->clk);
  
- 	s5p_dev = NULL;
--	platform_set_drvdata(pdev, NULL);
+@@ -1700,6 +1709,7 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 		goto out_kfree;
+ 	}
  
- 	return 0;
- }
++	device_data->phybase = res->start;
+ 	device_data->base = ioremap(res->start, resource_size(res));
+ 	if (!device_data->base) {
+ 		dev_err(dev, "[%s] ioremap() failed!",
 -- 
-1.7.9.5
+1.7.10.4
