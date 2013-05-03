@@ -1,110 +1,86 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 40/63] crypto: ux500/cryp - Set DMA configuration though dma_slave_config()
-Date: Fri,  3 May 2013 15:32:26 +0100
-Message-ID: <1367591569-32197-41-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH 39/63] crypto: ux500/cryp - Prepare clock before enabling it
+Date: Fri,  3 May 2013 15:32:25 +0100
+Message-ID: <1367591569-32197-40-git-send-email-lee.jones@linaro.org>
 References: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	linux-crypto@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, arnd@arndb.de,
+ srinidhi.kasagar@stericsson.com, linux-crypto@vger.kernel.org,
+ Andreas Westin <andreas.westin@stericsson.com>,
+ Lee Jones <lee.jones@linaro.org>, "David S. Miller" <davem@davemloft.net>,
+ linus.walleij@stericsson.com
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The DMA controller currently takes configuration information from
-information passed though dma_channel_request(), but it shouldn't.
-Using the API, the DMA channel should only be configured during
-a dma_slave_config() call.
+If we fail to prepare the ux500-cryp clock before enabling it the
+platform will fail to boot. Here we insure this happens.
 
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Andreas Westin <andreas.westin@stericsson.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
 Cc: linux-crypto@vger.kernel.org
 Acked-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/ux500/cryp/cryp.h      |    7 ++++++-
- drivers/crypto/ux500/cryp/cryp_core.c |   17 +++++++++++++++++
- 2 files changed, 23 insertions(+), 1 deletion(-)
+ drivers/crypto/ux500/cryp/cryp_core.c |   12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ux500/cryp/cryp.h b/drivers/crypto/ux500/cryp/cryp.h
-index 14cfd05..d1d6606 100644
---- a/drivers/crypto/ux500/cryp/cryp.h
-+++ b/drivers/crypto/ux500/cryp/cryp.h
-@@ -114,6 +114,9 @@ enum cryp_status_id {
- };
- 
- /* Cryp DMA interface */
-+#define CRYP_DMA_TX_FIFO	0x08
-+#define CRYP_DMA_RX_FIFO	0x10
-+
- enum cryp_dma_req_type {
- 	CRYP_DMA_DISABLE_BOTH,
- 	CRYP_DMA_ENABLE_IN_DATA,
-@@ -217,7 +220,8 @@ struct cryp_dma {
- 
- /**
-  * struct cryp_device_data - structure for a cryp device.
-- * @base: Pointer to the hardware base address.
-+ * @base: Pointer to virtual base address of the cryp device.
-+ * @phybase: Pointer to physical memory location of the cryp device.
-  * @dev: Pointer to the devices dev structure.
-  * @clk: Pointer to the device's clock control.
-  * @pwr_regulator: Pointer to the device's power control.
-@@ -232,6 +236,7 @@ struct cryp_dma {
-  */
- struct cryp_device_data {
- 	struct cryp_register __iomem *base;
-+	phys_addr_t phybase;
- 	struct device *dev;
- 	struct clk *clk;
- 	struct regulator *pwr_regulator;
 diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index bf78d60..4b90493 100644
+index 22c9063..bf78d60 100644
 --- a/drivers/crypto/ux500/cryp/cryp_core.c
 +++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -476,6 +476,19 @@ static int cryp_get_device_data(struct cryp_ctx *ctx,
- static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
- 				   struct device *dev)
- {
-+	struct dma_slave_config mem2cryp = {
-+		.direction = DMA_MEM_TO_DEV,
-+		.dst_addr = device_data->phybase + CRYP_DMA_TX_FIFO,
-+		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
-+		.dst_maxburst = 4,
-+        };
-+	struct dma_slave_config cryp2mem = {
-+		.direction = DMA_DEV_TO_MEM,
-+		.src_addr = device_data->phybase + CRYP_DMA_RX_FIFO,
-+		.src_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
-+		.src_maxburst = 4,
-+        };
-+
- 	dma_cap_zero(device_data->dma.mask);
- 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
- 
-@@ -491,6 +504,9 @@ static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
- 				    stedma40_filter,
- 				    device_data->dma.cfg_cryp2mem);
- 
-+	dmaengine_slave_config(device_data->dma.chan_mem2cryp, &mem2cryp);
-+	dmaengine_slave_config(device_data->dma.chan_cryp2mem, &cryp2mem);
-+
- 	init_completion(&device_data->dma.cryp_dma_complete);
- }
- 
-@@ -1432,6 +1448,7 @@ static int ux500_cryp_probe(struct platform_device *pdev)
- 		goto out_kfree;
+@@ -1459,11 +1459,17 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ 		goto out_regulator;
  	}
  
-+	device_data->phybase = res->start;
- 	device_data->base = ioremap(res->start, resource_size(res));
- 	if (!device_data->base) {
- 		dev_err(dev, "[%s]: ioremap failed!", __func__);
++	ret = clk_prepare(device_data->clk);
++	if (ret) {
++		dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
++		goto out_clk;
++	}
++
+ 	/* Enable device power (and clock) */
+ 	ret = cryp_enable_power(device_data->dev, device_data, false);
+ 	if (ret) {
+ 		dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
+-		goto out_clk;
++		goto out_clk_unprepare;
+ 	}
+ 
+ 	cryp_error = cryp_check(device_data);
+@@ -1524,6 +1530,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
+ out_power:
+ 	cryp_disable_power(device_data->dev, device_data, false);
+ 
++out_clk_unprepare:
++	clk_unprepare(device_data->clk);
++
+ out_clk:
+ 	clk_put(device_data->clk);
+ 
+@@ -1594,6 +1603,7 @@ static int ux500_cryp_remove(struct platform_device *pdev)
+ 		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
+ 			__func__);
+ 
++	clk_unprepare(device_data->clk);
+ 	clk_put(device_data->clk);
+ 	regulator_put(device_data->pwr_regulator);
+ 
 -- 
 1.7.10.4
