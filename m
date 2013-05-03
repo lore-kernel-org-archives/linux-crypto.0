@@ -1,119 +1,43 @@
-From: Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH  RESEND/V2] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
-Date: Thu,  2 May 2013 16:09:06 +0200
-Message-ID: <1367503746-6431-1-git-send-email-holler@ahsoftware.de>
-References: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	David Howells <dhowells@redhat.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Alexander Holler <holler@ahsoftware.de>, stable@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1364409710-6458-1-git-send-email-holler@ahsoftware.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: [PATCH 1/2] crypto: mv_cesa: Remove redundant platform_set_drvdata()
+Date: Fri,  3 May 2013 14:48:14 +0530
+Message-ID: <1367572695-10713-1-git-send-email-sachin.kamat@linaro.org>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	sachin.kamat@linaro.org, patches@linaro.org,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pb0-f50.google.com ([209.85.160.50]:60656 "EHLO
+	mail-pb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752730Ab3ECJbM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 May 2013 05:31:12 -0400
+Received: by mail-pb0-f50.google.com with SMTP id um15so801909pbc.23
+        for <linux-crypto@vger.kernel.org>; Fri, 03 May 2013 02:31:12 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-I don't see any real use case where checking the validity dates of X.509
-certificates at parsing time adds any security gain. In contrast, doing so
-makes MODSIGN unusable on systems without a RTC (or systems with a possible
-wrong date in a existing RTC, or systems where the RTC is read after the keys
-got loaded).
+Commit 0998d06310 (device-core: Ensure drvdata = NULL when no
+driver is bound) removes the need to set driver data field to
+NULL.
 
-If something really cares about the dates, it should check them at the time
-when the certificates are used, not when they are loaded and parsed.
-
-So just remove the validity check of the dates in the parser.
-
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
-Cc: stable@vger.kernel.org
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 ---
+ drivers/crypto/mv_cesa.c |    1 -
+ 1 file changed, 1 deletion(-)
 
- Updates to V1:
-  I've moved the below comment from the git commit message to this section so
-  that this patch can be applied without any further modifications.
-  Maybe this raises the statistical possibility that someone presses a button
-  or key to feed this simple patch into the mainline kernel as it fixes a real
-  bug which renders MODSIGN unusable on system without an RTC (which needs to
-  set the  time before modsign loads the crypto keys). Because I think modsign
-  is a nice security feature e.g. to prevent rootkits which do modify or add
-  modules, I care about it and try it a last time.
-
- There were already 4 variations of this patch (I know about).
-
- The first removed the check by adding a config option:
-  https://lkml.org/lkml/2013/2/25/171
- The second just removed the return of errors:
-  https://lkml.org/lkml/2013/3/14/247
- The third removed parsing of the dates too:
-  https://lkml.org/lkml/2013/3/14/257
- And finally V1 of this patch:
-  https://lkml.org/lkml/2013/3/27/449
-
- Here is a thread which explains the motivation for this patch a bit further:
-  https://lkml.org/lkml/2013/2/13/90
-
- crypto/asymmetric_keys/x509_public_key.c | 38 --------------------------------
- 1 file changed, 38 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 06007f0..52222a2 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -106,7 +106,6 @@ error_no_sig:
- static int x509_key_preparse(struct key_preparsed_payload *prep)
- {
- 	struct x509_certificate *cert;
--	struct tm now;
- 	size_t srlen, sulen;
- 	char *desc = NULL;
- 	int ret;
-@@ -137,43 +136,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 		goto error_free_cert;
- 	}
- 
--	time_to_tm(CURRENT_TIME.tv_sec, 0, &now);
--	pr_devel("Now: %04ld-%02d-%02d %02d:%02d:%02d\n",
--		 now.tm_year + 1900, now.tm_mon + 1, now.tm_mday,
--		 now.tm_hour, now.tm_min,  now.tm_sec);
--	if (now.tm_year < cert->valid_from.tm_year ||
--	    (now.tm_year == cert->valid_from.tm_year &&
--	     (now.tm_mon < cert->valid_from.tm_mon ||
--	      (now.tm_mon == cert->valid_from.tm_mon &&
--	       (now.tm_mday < cert->valid_from.tm_mday ||
--		(now.tm_mday == cert->valid_from.tm_mday &&
--		 (now.tm_hour < cert->valid_from.tm_hour ||
--		  (now.tm_hour == cert->valid_from.tm_hour &&
--		   (now.tm_min < cert->valid_from.tm_min ||
--		    (now.tm_min == cert->valid_from.tm_min &&
--		     (now.tm_sec < cert->valid_from.tm_sec
--		      ))))))))))) {
--		pr_warn("Cert %s is not yet valid\n", cert->fingerprint);
--		ret = -EKEYREJECTED;
--		goto error_free_cert;
--	}
--	if (now.tm_year > cert->valid_to.tm_year ||
--	    (now.tm_year == cert->valid_to.tm_year &&
--	     (now.tm_mon > cert->valid_to.tm_mon ||
--	      (now.tm_mon == cert->valid_to.tm_mon &&
--	       (now.tm_mday > cert->valid_to.tm_mday ||
--		(now.tm_mday == cert->valid_to.tm_mday &&
--		 (now.tm_hour > cert->valid_to.tm_hour ||
--		  (now.tm_hour == cert->valid_to.tm_hour &&
--		   (now.tm_min > cert->valid_to.tm_min ||
--		    (now.tm_min == cert->valid_to.tm_min &&
--		     (now.tm_sec > cert->valid_to.tm_sec
--		      ))))))))))) {
--		pr_warn("Cert %s has expired\n", cert->fingerprint);
--		ret = -EKEYEXPIRED;
--		goto error_free_cert;
--	}
--
- 	cert->pub->algo = x509_public_key_algorithms[cert->pkey_algo];
- 	cert->pub->id_type = PKEY_ID_X509;
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index ce6290e..3374a3e 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -1146,7 +1146,6 @@ err_unmap_reg:
+ err:
+ 	kfree(cp);
+ 	cpg = NULL;
+-	platform_set_drvdata(pdev, NULL);
+ 	return ret;
+ }
  
 -- 
-1.8.1.4
+1.7.9.5
