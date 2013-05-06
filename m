@@ -1,49 +1,127 @@
-From: Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH 1/2] crypto: mv_cesa: remove unnecessary
- platform_set_drvdata()
-Date: Mon, 6 May 2013 07:12:01 +0200
-Message-ID: <20130506051201.GD2824@lunn.ch>
-References: <002501ce4a0c$994cc010$cbe64030$@samsung.com>
+From: James Morris <jmorris@namei.org>
+Subject: [ANNOUNCE] Linux Security Summit 2013 - CFP
+Date: Mon, 6 May 2013 19:18:29 +1000 (EST)
+Message-ID: <alpine.LRH.2.02.1305061853410.31937@tundra.namei.org>
+Reply-To: kernel-hardening@lists.openwall.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: 'Herbert Xu' <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	"'David S. Miller'" <davem@davemloft.net>,
-	'Phil Sutter' <phil.sutter@viprinet.com>,
-	'Andrew Lunn' <andrew@lunn.ch>
-To: Jingoo Han <jg1.han@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from londo.lunn.ch ([80.238.139.98]:51699 "EHLO londo.lunn.ch"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750720Ab3EFFMQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 May 2013 01:12:16 -0400
-Content-Disposition: inline
-In-Reply-To: <002501ce4a0c$994cc010$cbe64030$@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-kernel@vger.kernel.org,
+        Linux Security Summit Program Committee <lss-pc@ext.namei.org>,
+        lwn@lwn.net, fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
+        ubuntu-hardened@lists.ubuntu.com, tomoyo-users-en@lists.sourceforge.jp,
+        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Audit-ML <linux-audit@redhat.com>, gentoo-hardened@gentoo.org,
+        "C. Craig Ross" <ccr@linuxfoundation.org>, keyrings@linux-nfs.org,
+        tpmdd-devel@lists.sourceforge.net, kernel-hardening@lists.openwall.com
+To: linux-security-module@vger.kernel.org
+Return-path: <kernel-hardening-return-1597-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, May 06, 2013 at 12:48:41PM +0900, Jingoo Han wrote:
-> The driver core clears the driver data to NULL after device_release
-> or on probe failure, since commit 0998d0631001288a5974afc0b2a5f568bcdecb4d
-> (device-core: Ensure drvdata = NULL when no driver is bound).
-> Thus, it is not needed to manually clear the device driver data to NULL.
-> 
-> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
-> ---
->  drivers/crypto/mv_cesa.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-> index ce6290e..3374a3e 100644
-> --- a/drivers/crypto/mv_cesa.c
-> +++ b/drivers/crypto/mv_cesa.c
-> @@ -1146,7 +1146,6 @@ err_unmap_reg:
->  err:
->  	kfree(cp);
->  	cpg = NULL;
-> -	platform_set_drvdata(pdev, NULL);
->  	return ret;
->  }
->  
+==========================================================================
+                 ANNOUNCEMENT AND CALL FOR PARTICIPATION
 
-Acked-by: Andrew Lunn <andrew@lunn.ch>
+                       LINUX SECURITY SUMMIT 2013
+                            19-20 SEPTEMBER
+                            NEW ORLEANS, USA
+==========================================================================
+
+
+DESCRIPTION
+
+  The Linux Security Summit (LSS) is a technical forum for collaboration
+  between Linux developers, researchers, and end users.  Its primary aim
+  is to foster community efforts in analyzing and solving Linux security
+  challenges.
+
+  The format of the summit will be:
+  
+    * Refereed presentations
+    * Subsystem reports
+    * Breakout development sessions 
+
+
+WEB SITE
+
+  http://kernsec.org/wiki/index.php/Linux_Security_Summit_2013
+
+
+DATES / LOCATION
+
+  The Linux Security Summit for 2013 will be held across 19 and 20 September
+  in New Orleans, USA.  It will be co-located with LinuxCon, as well
+  as Linux Plumbers.
+ 
+  Note that Linux Security Summit attendees and speakers must be registered
+  to attend LinuxCon.  See the LinuxCon site for details on registration,
+  travel, and accommodation:
+  
+    https://events.linuxfoundation.org/events/linuxcon
+
+  The Linux Security Summit CFP is now open, and will close on 14th June.
+  
+  Accepted speakers will be notified by 21st of June.
+
+
+WHO SHOULD ATTEND
+
+  The event is open to all registered LinuxCon attendees.
+  
+  You do not have to be a "security person" to attend -- we're seeking a
+  diverse range of attendees, and welcome the participation of general
+  developers, researchers, operations, and end-users.
+
+
+CALL FOR PARTICIPATION
+
+  The program committee currently seeks proposals for:
+
+  * Refereed Presentations:
+      45 minutes in length, including at least 10 minutes of discussion.
+      Papers are encouraged.
+
+ 
+  Topic areas include, but are not limited to:
+  
+    * System hardening
+    * Access control
+    * Cryptography
+    * Integrity control
+    * Hardware security
+    * Networking
+    * Storage
+    * Virtualization
+    * Desktop
+    * Tools
+    * Management
+    * Case studies
+    * Emerging technologies, threats & techniques 
+    
+  Proposals should be submitted in plain text via email to the program
+  committee at:  lss-pc (_at_) ext.namei.org
+
+  Abstracts should be approximately 150 words in total.
+
+
+PROGRAM COMMITTEE
+
+  The Linux Security Summit for 2013 is organized by:
+
+    * James Morris, Oracle
+    * Serge Hallyn, Canonical
+    * Paul Moore, Red Hat
+    * Stephen Smalley, NSA
+    * Joshua Brindle, Quark Security
+    * Herbert Xu, Red Hat
+    * John Johansen, Canonical
+    * Kees Cook, Google
+    * Casey Schaufler, Intel
+    * Mimi Zohar, IBM
+
+  The program committee may be contacted as a group via email:
+
+     lss-pc (_at_) ext.namei.org
+   
