@@ -1,38 +1,59 @@
-From: Kent Yoder <shpedoikal@gmail.com>
-Subject: Re: [PATCH] drivers/crypto/nx: fixes for multiple issues
-Date: Mon, 6 May 2013 16:55:37 -0500
-Message-ID: <CAM0nabH0A-UvDP9ZBXRJdRtu-MO0HPDuNqr_z_P34ZsAXsyEBA@mail.gmail.com>
-References: <20130412171357.GA27924@ennui.austin.ibm.com> <20130506192416.GA6899@gmail.com>
- <1367877199.15842.67.camel@pasglop>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v3 0/4] Patchset to use PCLMULQDQ to accelerate
+ CRC-T10DIF checksum computation
+Date: Mon, 06 May 2013 18:12:52 -0700
+Message-ID: <1367889172.27102.261.camel@schen9-DESK>
+References: <cover.1367436101.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f171.google.com ([209.85.217.171]:35727 "EHLO
-	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757032Ab3EFV4J (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 May 2013 17:56:09 -0400
-In-Reply-To: <1367877199.15842.67.camel@pasglop>
+Received: from mga02.intel.com ([134.134.136.20]:22467 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753515Ab3EGBMt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 6 May 2013 21:12:49 -0400
+In-Reply-To: <cover.1367436101.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks!
+On Wed, 2013-05-01 at 12:52 -0700, Tim Chen wrote:
+> Currently the CRC-T10DIF checksum is computed using a generic table lookup
+> algorithm.  By switching the checksum to PCLMULQDQ based computation,
+> we can speedup the computation by 8x for checksumming 512 bytes and
+> even more for larger buffer size.  This will improve performance of SCSI
+> drivers turning on the CRC-T10IDF checksum.  In our SSD based experiments,
+> we have seen increase disk throughput by 3.5x with T10DIF for 512 byte
+> block size.
+> 
+> This patch set provides the x86_64 routine using PCLMULQDQ instruction
+> and switches the crc_t10dif library function to use the faster PCLMULQDQ
+> based routine when available.
+> 
+> Tim
+> 
+> v3
+> 1. Update the crct10dif crypto transform used in the crct10dif library in a safe way.
+> 2. Load the accelerated t10dif transform for the x86_64 cpus that support it.
+> 3. Added generic crct10dif crypto transform.
+> 
 
-Kent
+Herbert,
 
-On Mon, May 6, 2013 at 4:53 PM, Benjamin Herrenschmidt
-<benh@kernel.crashing.org> wrote:
-> On Mon, 2013-05-06 at 14:24 -0500, Kent Yoder wrote:
->> Hi Ben, just a friendly reminder to please apply.
->
-> Oh, I assumed that stuff was going via some drivers/crypto maintainer...
->
-> I can apply.
->
-> Cheers,
-> Ben.
->
->
+Any feedback on this updated patchset?  Thanks.
+
+Tim
