@@ -1,59 +1,43 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v3 0/4] Patchset to use PCLMULQDQ to accelerate
- CRC-T10DIF checksum computation
-Date: Mon, 06 May 2013 18:12:52 -0700
-Message-ID: <1367889172.27102.261.camel@schen9-DESK>
-References: <cover.1367436101.git.tim.c.chen@linux.intel.com>
+From: "John P. Goldman" <gliceaga@mendoza-conicet.gob.ar>
+Subject: dringender Vorschlag
+Date: Wed, 8 May 2013 05:46:28 -0300 (ART)
+Message-ID: <351326728.69416.1368002788604.JavaMail.root__9482.82868271253$1368003994$gmane$org@correo.mendoza-conicet.gob.ar>
+Reply-To: "John P. Goldman" <johnp.goldman@yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Matthew Wilcox <willy@linux.intel.com>,
-	Jim Kukunas <james.t.kukunas@linux.intel.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:22467 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753515Ab3EGBMt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 May 2013 21:12:49 -0400
-In-Reply-To: <cover.1367436101.git.tim.c.chen@linux.intel.com>
+Received: from mx2.mendoza-conicet.gob.ar ([200.69.149.90]:40403 "EHLO
+	mx2.mendoza-conicet.gob.ar" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752464Ab3EHJFx convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 May 2013 05:05:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2013-05-01 at 12:52 -0700, Tim Chen wrote:
-> Currently the CRC-T10DIF checksum is computed using a generic table lookup
-> algorithm.  By switching the checksum to PCLMULQDQ based computation,
-> we can speedup the computation by 8x for checksumming 512 bytes and
-> even more for larger buffer size.  This will improve performance of SCSI
-> drivers turning on the CRC-T10IDF checksum.  In our SSD based experiments,
-> we have seen increase disk throughput by 3.5x with T10DIF for 512 byte
-> block size.
-> 
-> This patch set provides the x86_64 routine using PCLMULQDQ instruction
-> and switches the crc_t10dif library function to use the faster PCLMULQDQ
-> based routine when available.
-> 
-> Tim
-> 
-> v3
-> 1. Update the crct10dif crypto transform used in the crct10dif library in a safe way.
-> 2. Load the accelerated t10dif transform for the x86_64 cpus that support it.
-> 3. Added generic crct10dif crypto transform.
-> 
 
-Herbert,
 
-Any feedback on this updated patchset?  Thanks.
+Entschuldigungen f=C3=BCr kommen in Ihre Privatsph=C3=A4re! Ich bin Rec=
+htsanwalt
+Werner Erich Zeller; Ich habe einen meiner einflussreichen und
+wohlhabenden Kunden zum Tode; und er hatte eine sehr geheime und privat=
+e
+Investitionen von =E2=82=AC15,000,000.00 bei einer privaten Bank in Gro=
+=C3=9Fbritannien
+hier zu Lebzeiten. Diese Investition wurde ohne einen deklarierten
+n=C3=A4chsten Angeh=C3=B6rigen und beg=C3=BCnstigte. Jetzt brauche ich =
+Sie arbeiten mit
+mir als mein Partner zu erholen und zu je 50 % Aktienfonds. Alle Dokume=
+nte
+werden rechtlich beantragt und beschafft, und in 5 Werktage, wird diese
+Transaktion auftreten. Aber ich brauche einen ernsten, treuen und
+glaubw=C3=BCrdigen Partner.
 
-Tim
+Bitte senden Sie mir eine vertrauliche Antwort, wenn Sie denken, Sie
+vertraut werden k=C3=B6nnen und sind von den Qualit=C3=A4ten! Ich warte=
+ auf Ihre
+schnelle Antwort.
+
+Werner Erich Zeller (Rechtsanwalt)
+Rufen Sie + 44-702-409-0820 (Office)
