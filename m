@@ -1,43 +1,89 @@
-From: "John P. Goldman" <gliceaga@mendoza-conicet.gob.ar>
-Subject: dringender Vorschlag
-Date: Wed, 8 May 2013 05:46:28 -0300 (ART)
-Message-ID: <351326728.69416.1368002788604.JavaMail.root__9482.82868271253$1368003994$gmane$org@correo.mendoza-conicet.gob.ar>
-Reply-To: "John P. Goldman" <johnp.goldman@yahoo.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH 1/8] crypto: ux500/hash - Prepare clock before enabling it
+Date: Wed, 8 May 2013 15:57:26 +0200
+Message-ID: <CAPDyKFrJsGhB9yRtF2a09Ob5_4Jz-gaBQxeuriCGaXqYwkSyeg@mail.gmail.com>
+References: <1367491790-9727-1-git-send-email-lee.jones@linaro.org>
+	<1367491790-9727-2-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Westin <andreas.westin@stericsson.com>,
+	linux-crypto@vger.kernel.org
+To: Lee Jones <lee.jones@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.mendoza-conicet.gob.ar ([200.69.149.90]:40403 "EHLO
-	mx2.mendoza-conicet.gob.ar" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752464Ab3EHJFx convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 May 2013 05:05:53 -0400
+Received: from mail-vb0-f42.google.com ([209.85.212.42]:34185 "EHLO
+	mail-vb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754851Ab3EHN51 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 May 2013 09:57:27 -0400
+Received: by mail-vb0-f42.google.com with SMTP id w16so1583541vbf.15
+        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2013 06:57:27 -0700 (PDT)
+In-Reply-To: <1367491790-9727-2-git-send-email-lee.jones@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On 2 May 2013 12:49, Lee Jones <lee.jones@linaro.org> wrote:
+> If we fail to prepare the ux500-hash clock before enabling it the
+> platform will fail to boot. Here we insure this happens.
+>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Andreas Westin <andreas.westin@stericsson.com>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: linux-crypto@vger.kernel.org
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> ---
+>  drivers/crypto/ux500/hash/hash_core.c |   12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+> index 632c333..1e8b2f3 100644
+> --- a/drivers/crypto/ux500/hash/hash_core.c
+> +++ b/drivers/crypto/ux500/hash/hash_core.c
+> @@ -1727,11 +1727,17 @@ static int ux500_hash_probe(struct platform_device *pdev)
+>                 goto out_regulator;
+>         }
+>
+> +       ret = clk_prepare(device_data->clk);
+> +       if (ret) {
+> +               dev_err(dev, "[%s] clk_prepare() failed!", __func__);
+> +               goto out_clk;
+> +       }
+> +
+>         /* Enable device power (and clock) */
+>         ret = hash_enable_power(device_data, false);
+>         if (ret) {
+>                 dev_err(dev, "[%s]: hash_enable_power() failed!", __func__);
+> -               goto out_clk;
+> +               goto out_clk_unprepare;
+>         }
+>
+>         ret = hash_check_hw(device_data);
+> @@ -1763,6 +1769,9 @@ static int ux500_hash_probe(struct platform_device *pdev)
+>  out_power:
+>         hash_disable_power(device_data, false);
+>
+> +out_clk_unprepare:
+> +       clk_unprepare(device_data->clk);
+> +
+>  out_clk:
+>         clk_put(device_data->clk);
+>
+> @@ -1827,6 +1836,7 @@ static int ux500_hash_remove(struct platform_device *pdev)
+>                 dev_err(dev, "[%s]: hash_disable_power() failed",
+>                         __func__);
+>
+> +       clk_unprepare(device_data->clk);
+>         clk_put(device_data->clk);
+>         regulator_put(device_data->regulator);
+>
+> --
+> 1.7.10.4
+>
 
-
-Entschuldigungen f=C3=BCr kommen in Ihre Privatsph=C3=A4re! Ich bin Rec=
-htsanwalt
-Werner Erich Zeller; Ich habe einen meiner einflussreichen und
-wohlhabenden Kunden zum Tode; und er hatte eine sehr geheime und privat=
-e
-Investitionen von =E2=82=AC15,000,000.00 bei einer privaten Bank in Gro=
-=C3=9Fbritannien
-hier zu Lebzeiten. Diese Investition wurde ohne einen deklarierten
-n=C3=A4chsten Angeh=C3=B6rigen und beg=C3=BCnstigte. Jetzt brauche ich =
-Sie arbeiten mit
-mir als mein Partner zu erholen und zu je 50 % Aktienfonds. Alle Dokume=
-nte
-werden rechtlich beantragt und beschafft, und in 5 Werktage, wird diese
-Transaktion auftreten. Aber ich brauche einen ernsten, treuen und
-glaubw=C3=BCrdigen Partner.
-
-Bitte senden Sie mir eine vertrauliche Antwort, wenn Sie denken, Sie
-vertraut werden k=C3=B6nnen und sind von den Qualit=C3=A4ten! Ich warte=
- auf Ihre
-schnelle Antwort.
-
-Werner Erich Zeller (Rechtsanwalt)
-Rufen Sie + 44-702-409-0820 (Office)
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
