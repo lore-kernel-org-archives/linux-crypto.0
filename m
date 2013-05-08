@@ -1,89 +1,48 @@
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: [PATCH 39/63] crypto: ux500/cryp - Prepare clock before enabling it
-Date: Wed, 8 May 2013 15:59:35 +0200
-Message-ID: <CAPDyKFqiLt=xC8NNXxKZpKh49+ewHuLt=0r+HogZ-aFrKh99NQ@mail.gmail.com>
-References: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
-	<1367591569-32197-40-git-send-email-lee.jones@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	linux-crypto@vger.kernel.org
-To: Lee Jones <lee.jones@linaro.org>
+From: Tobias Rauter <tobiasrauter@gmail.com>
+Subject: [RFC] Freescale DCP crypto acceleration
+Date: Wed,  8 May 2013 20:41:12 +0200
+Message-ID: <1368038473-6979-1-git-send-email-tobias.rauter@gmail.com>
+Cc: "Christoph G. Baumann" <cb@sgoc.de>
+To: Tobias Rauter <tobias.rauter@smaxtec.com>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vb0-f47.google.com ([209.85.212.47]:51024 "EHLO
-	mail-vb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755406Ab3EHN7f (ORCPT
+Received: from mail-ee0-f53.google.com ([74.125.83.53]:47359 "EHLO
+	mail-ee0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751031Ab3EHSlp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 May 2013 09:59:35 -0400
-Received: by mail-vb0-f47.google.com with SMTP id x14so1553408vbb.6
-        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2013 06:59:35 -0700 (PDT)
-In-Reply-To: <1367591569-32197-40-git-send-email-lee.jones@linaro.org>
+	Wed, 8 May 2013 14:41:45 -0400
+Received: by mail-ee0-f53.google.com with SMTP id d49so1129614eek.26
+        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2013 11:41:43 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3 May 2013 16:32, Lee Jones <lee.jones@linaro.org> wrote:
-> If we fail to prepare the ux500-cryp clock before enabling it the
-> platform will fail to boot. Here we insure this happens.
->
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Andreas Westin <andreas.westin@stericsson.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: linux-crypto@vger.kernel.org
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> ---
->  drivers/crypto/ux500/cryp/cryp_core.c |   12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-> index 22c9063..bf78d60 100644
-> --- a/drivers/crypto/ux500/cryp/cryp_core.c
-> +++ b/drivers/crypto/ux500/cryp/cryp_core.c
-> @@ -1459,11 +1459,17 @@ static int ux500_cryp_probe(struct platform_device *pdev)
->                 goto out_regulator;
->         }
->
-> +       ret = clk_prepare(device_data->clk);
-> +       if (ret) {
-> +               dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
-> +               goto out_clk;
-> +       }
-> +
->         /* Enable device power (and clock) */
->         ret = cryp_enable_power(device_data->dev, device_data, false);
->         if (ret) {
->                 dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
-> -               goto out_clk;
-> +               goto out_clk_unprepare;
->         }
->
->         cryp_error = cryp_check(device_data);
-> @@ -1524,6 +1530,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
->  out_power:
->         cryp_disable_power(device_data->dev, device_data, false);
->
-> +out_clk_unprepare:
-> +       clk_unprepare(device_data->clk);
-> +
->  out_clk:
->         clk_put(device_data->clk);
->
-> @@ -1594,6 +1603,7 @@ static int ux500_cryp_remove(struct platform_device *pdev)
->                 dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
->                         __func__);
->
-> +       clk_unprepare(device_data->clk);
->         clk_put(device_data->clk);
->         regulator_put(device_data->pwr_regulator);
->
-> --
-> 1.7.10.4
->
+Hi!
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+I am working on a driver for the data co processor of freescale's
+imx28 (should also work on mx23 and mx5).  I noticed that Christoph
+sent a patch for this device some days ago to the crypto mailing
+list. As far as I see this is basically the Freescale-SDK driver with
+some modifications for mainline. This was also my first
+approach. Since this driver has some problems (duplicated code, mutex in
+atomic context) I decided to get the reference manual and write the
+driver from scratch. To prevent double work (in case Christoph or
+someone else does the same thing), I want to share my work here now.
+
+This is my first real kernel driver so it would be nice if someone
+could take some time to find the noob-mistakes and send me feedback.
+
+Things I'm working on:
+- get rid of the global device
+- at the moment the number of entries of the in/out scatterlist is
+  limited to 20. I am working on a ringbuffer where the CPU fills the
+  co-processors buffer while it iterates through the pages.
+- overall performance
+- ATM each scatterlist entry of the request has to be aligned to
+  AES_BLOCK_SIZE.  Since I was not able to find a documentation, I
+  want to ask if my idea is the right approach to solve this problem:
+  use a ablkcipher walk ,iterate through this walk and do
+  dma_map_single for each buffer instead of the whole scatterlist.
+
+regards,
+Tobias
