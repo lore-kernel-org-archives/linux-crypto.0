@@ -1,9 +1,9 @@
 From: Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: [PATCH 36/63] crypto: ux500/hash - Prepare clock before enabling it
-Date: Wed, 8 May 2013 15:59:08 +0200
-Message-ID: <CAPDyKFqD93K_vBKpoWmLjFHaY06seARDpxb-KJJFv4LAzXa1Vw@mail.gmail.com>
+Subject: Re: [PATCH 39/63] crypto: ux500/cryp - Prepare clock before enabling it
+Date: Wed, 8 May 2013 15:59:35 +0200
+Message-ID: <CAPDyKFqiLt=xC8NNXxKZpKh49+ewHuLt=0r+HogZ-aFrKh99NQ@mail.gmail.com>
 References: <1367591569-32197-1-git-send-email-lee.jones@linaro.org>
-	<1367591569-32197-37-git-send-email-lee.jones@linaro.org>
+	<1367591569-32197-40-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -15,19 +15,19 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
 To: Lee Jones <lee.jones@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vc0-f178.google.com ([209.85.220.178]:53865 "EHLO
-	mail-vc0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755482Ab3EHN7J (ORCPT
+Received: from mail-vb0-f47.google.com ([209.85.212.47]:51024 "EHLO
+	mail-vb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755406Ab3EHN7f (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 May 2013 09:59:09 -0400
-Received: by mail-vc0-f178.google.com with SMTP id kw10so1677974vcb.9
-        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2013 06:59:08 -0700 (PDT)
-In-Reply-To: <1367591569-32197-37-git-send-email-lee.jones@linaro.org>
+	Wed, 8 May 2013 09:59:35 -0400
+Received: by mail-vb0-f47.google.com with SMTP id x14so1553408vbb.6
+        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2013 06:59:35 -0700 (PDT)
+In-Reply-To: <1367591569-32197-40-git-send-email-lee.jones@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 3 May 2013 16:32, Lee Jones <lee.jones@linaro.org> wrote:
-> If we fail to prepare the ux500-hash clock before enabling it the
+> If we fail to prepare the ux500-cryp clock before enabling it the
 > platform will fail to boot. Here we insure this happens.
 >
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -38,35 +38,35 @@ On 3 May 2013 16:32, Lee Jones <lee.jones@linaro.org> wrote:
 > Acked-by: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Lee Jones <lee.jones@linaro.org>
 > ---
->  drivers/crypto/ux500/hash/hash_core.c |   12 +++++++++++-
+>  drivers/crypto/ux500/cryp/cryp_core.c |   12 +++++++++++-
 >  1 file changed, 11 insertions(+), 1 deletion(-)
 >
-> diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-> index 632c333..1e8b2f3 100644
-> --- a/drivers/crypto/ux500/hash/hash_core.c
-> +++ b/drivers/crypto/ux500/hash/hash_core.c
-> @@ -1727,11 +1727,17 @@ static int ux500_hash_probe(struct platform_device *pdev)
+> diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+> index 22c9063..bf78d60 100644
+> --- a/drivers/crypto/ux500/cryp/cryp_core.c
+> +++ b/drivers/crypto/ux500/cryp/cryp_core.c
+> @@ -1459,11 +1459,17 @@ static int ux500_cryp_probe(struct platform_device *pdev)
 >                 goto out_regulator;
 >         }
 >
 > +       ret = clk_prepare(device_data->clk);
 > +       if (ret) {
-> +               dev_err(dev, "[%s] clk_prepare() failed!", __func__);
+> +               dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
 > +               goto out_clk;
 > +       }
 > +
 >         /* Enable device power (and clock) */
->         ret = hash_enable_power(device_data, false);
+>         ret = cryp_enable_power(device_data->dev, device_data, false);
 >         if (ret) {
->                 dev_err(dev, "[%s]: hash_enable_power() failed!", __func__);
+>                 dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
 > -               goto out_clk;
 > +               goto out_clk_unprepare;
 >         }
 >
->         ret = hash_check_hw(device_data);
-> @@ -1763,6 +1769,9 @@ static int ux500_hash_probe(struct platform_device *pdev)
+>         cryp_error = cryp_check(device_data);
+> @@ -1524,6 +1530,9 @@ static int ux500_cryp_probe(struct platform_device *pdev)
 >  out_power:
->         hash_disable_power(device_data, false);
+>         cryp_disable_power(device_data->dev, device_data, false);
 >
 > +out_clk_unprepare:
 > +       clk_unprepare(device_data->clk);
@@ -74,13 +74,13 @@ On 3 May 2013 16:32, Lee Jones <lee.jones@linaro.org> wrote:
 >  out_clk:
 >         clk_put(device_data->clk);
 >
-> @@ -1827,6 +1836,7 @@ static int ux500_hash_remove(struct platform_device *pdev)
->                 dev_err(dev, "[%s]: hash_disable_power() failed",
+> @@ -1594,6 +1603,7 @@ static int ux500_cryp_remove(struct platform_device *pdev)
+>                 dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
 >                         __func__);
 >
 > +       clk_unprepare(device_data->clk);
 >         clk_put(device_data->clk);
->         regulator_put(device_data->regulator);
+>         regulator_put(device_data->pwr_regulator);
 >
 > --
 > 1.7.10.4
